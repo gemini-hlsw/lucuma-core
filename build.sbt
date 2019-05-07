@@ -1,3 +1,6 @@
+import sbtcrossproject.crossProject
+import sbtcrossproject.CrossType
+
 lazy val attoVersion          = "0.6.5"
 lazy val catsVersion          = "1.6.0"
 lazy val catsEffectVersion    = "1.3.0"
@@ -75,9 +78,9 @@ inThisBuild(Seq(
   )
 ))
 
-lazy val math = project
+lazy val math = crossProject(JVMPlatform, JSPlatform)
+  .crossType(CrossType.Full)
   .in(file("modules/math"))
-  // .enablePlugins(AutomateHeaderPlugin)
   .settings(scalacSettings)
   .settings(
     name := "gsp-math",
@@ -91,4 +94,8 @@ lazy val math = project
       "com.github.julien-truffaut" %%  "monocle-law"   % monocleVersion % "test"
     )
   )
-
+  // .jvmConfigure(_.enablePlugins(AutomateHeaderPlugin))
+  .jsSettings(
+    scalacOptions ~= (_.filterNot(Set("-Xcheckinit"))),
+    scalacOptions += "-P:scalajs:sjsDefinedByDefault"
+  )
