@@ -80,10 +80,21 @@ inThisBuild(Seq(
   addCompilerPlugin("org.spire-math" %% "kind-projector" % kindProjectorVersion),
 ))
 
+lazy val headerSettings = Seq(
+  // These sbt-header settings can't be set in ThisBuild for some reason
+  headerMappings := headerMappings.value + (HeaderFileType.scala -> HeaderCommentStyle.cppStyleLineComment),
+  headerLicense  := Some(HeaderLicense.Custom(
+    """|Copyright (c) 2016-2019 Association of Universities for Research in Astronomy, Inc. (AURA)
+       |For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
+       |""".stripMargin
+  )),
+)
+
 lazy val math = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Full)
   .in(file("modules/math"))
   .settings(scalacSettings)
+  .settings(headerSettings)
   .settings(
     name := "gsp-math",
     libraryDependencies ++= Seq(
