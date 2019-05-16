@@ -65,36 +65,49 @@ lazy val scalacSettings = Seq(
 )
 
 inThisBuild(Seq(
-  addCompilerPlugin("org.spire-math" %% "kind-projector" % kindProjectorVersion),
-  organization := "edu.gemini",
+  organization     := "edu.gemini",
+  organizationName := "Association of Universities for Research in Astronomy, Inc. (AURA)",
+  startYear        := Some(2019),
+  licenses         += ("BSD-3-Clause", new URL("https://opensource.org/licenses/BSD-3-Clause")),
   homepage := Some(url("https://github.com/gemini-hlsw/gsp-math")),
-  licenses := List("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")),
   developers := List(
     Developer("cquiroz",    "Carlos Quiroz",       "cquiroz@gemini.edu",    url("http://www.gemini.edu")),
     Developer("jluhrs",     "Javier Lührs",        "jluhrs@gemini.edu",     url("http://www.gemini.edu")),
     Developer("sraaphorst", "Sebastian Raaphorst", "sraaphorst@gemini.edu", url("http://www.gemini.edu")),
     Developer("swalker2m",  "Shane Walker",        "swalker@gemini.edu",    url("http://www.gemini.edu")),
     Developer("tpolecat",   "Rob Norris",          "rnorris@gemini.edu",    url("http://www.tpolecat.org")),
-  )
+  ),
+  addCompilerPlugin("org.spire-math" %% "kind-projector" % kindProjectorVersion),
 ))
+
+lazy val headerSettings = Seq(
+  // These sbt-header settings can't be set in ThisBuild for some reason
+  headerMappings := headerMappings.value + (HeaderFileType.scala -> HeaderCommentStyle.cppStyleLineComment),
+  headerLicense  := Some(HeaderLicense.Custom(
+    """|Copyright (c) 2016-2019 Association of Universities for Research in Astronomy, Inc. (AURA)
+       |For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
+       |""".stripMargin
+  )),
+)
 
 lazy val math = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Full)
   .in(file("modules/math"))
   .settings(scalacSettings)
+  .settings(headerSettings)
   .settings(
     name := "gsp-math",
     libraryDependencies ++= Seq(
-      "org.tpolecat"               %% "atto-core"      % attoVersion,
-      "org.typelevel"              %% "cats-core"      % catsVersion,
-      "org.typelevel"              %% "cats-effect"    % catsEffectVersion,
-      "org.typelevel"              %% "cats-testkit"   % catsEffectVersion % "test",
-      "com.github.julien-truffaut" %%  "monocle-core"  % monocleVersion,
-      "com.github.julien-truffaut" %%  "monocle-macro" % monocleVersion,
-      "com.github.julien-truffaut" %%  "monocle-law"   % monocleVersion % "test"
+      "org.tpolecat"               %% "atto-core"     % attoVersion,
+      "org.typelevel"              %% "cats-core"     % catsVersion,
+      "org.typelevel"              %% "cats-effect"   % catsEffectVersion,
+      "org.typelevel"              %% "cats-testkit"  % catsEffectVersion % "test",
+      "com.github.julien-truffaut" %% "monocle-core"  % monocleVersion,
+      "com.github.julien-truffaut" %% "monocle-macro" % monocleVersion,
+      "com.github.julien-truffaut" %% "monocle-law"   % monocleVersion % "test"
     )
   )
-  // .jvmConfigure(_.enablePlugins(AutomateHeaderPlugin))
+  .jvmConfigure(_.enablePlugins(AutomateHeaderPlugin))
   .jsSettings(
     scalacOptions ~= (_.filterNot(Set("-Xcheckinit"))),
     scalacOptions += "-P:scalajs:sjsDefinedByDefault"
