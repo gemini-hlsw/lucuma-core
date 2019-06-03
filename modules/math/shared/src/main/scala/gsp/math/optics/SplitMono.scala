@@ -3,6 +3,7 @@
 
 package gsp.math.optics
 
+import cats.Functor
 import cats.arrow.Category
 import monocle.{ Fold, Getter, Iso }
 
@@ -18,9 +19,17 @@ import monocle.{ Fold, Getter, Iso }
  *
  * @param get  section of `reverseGet` such that `get andThen reverseGet` is an identity
  * @param reverseGet any function B => A
- * @see [[https://ncatlab.org/nlab/show/split+monomorphism Split Epimorphism]] at nLab
+ * @see [[https://ncatlab.org/nlab/show/split+monomorphism Split Monomorphism]] at nLab
  */
 final case class SplitMono[A, B](get: A => B, reverseGet: B => A) {
+
+  /** Modify the target of the SplitMono using a function. */
+  def modify(f: B => B): A => A =
+    a => reverseGet(f(get(a)))
+
+  /** Modify the target of the SplitMono using Functor. */
+  def modifyF[F[_]: Functor](f: B => F[B])(a: A): F[A] =
+    Functor[F].map(f(get(a)))(reverseGet)
 
   /** Swapping `get` and `reverseGet` yields a `SplitEpi. */
   def reverse: SplitEpi[B, A] =
