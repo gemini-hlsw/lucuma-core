@@ -3,6 +3,7 @@
 
 package gsp.math.optics
 
+import cats.Functor
 import cats.arrow.Category
 import monocle.{ Iso, Prism }
 
@@ -21,6 +22,14 @@ import monocle.{ Iso, Prism }
  * @see [[https://ncatlab.org/nlab/show/split+epimorphism Split Epimorphism]] at nLab
  */
 final case class SplitEpi[A, B](get: A => B, reverseGet: B => A) {
+
+  /** Modify the target of the SplitEpi using a function. */
+  def modify(f: B => B): A => A =
+    a => reverseGet(f(get(a)))
+
+  /** Modify the target of the SplitEpi using Functor. */
+  def modifyF[F[_]: Functor](f: B => F[B])(a: A): F[A] =
+    Functor[F].map(f(get(a)))(reverseGet)
 
   /** Swapping `get` and `reverseGet` yields a `SplitMono. */
   def reverse: SplitMono[B, A] =
