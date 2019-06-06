@@ -19,4 +19,12 @@ final class SplitMonoSpec extends CatsSuite {
   checkAll("Int < Long", SplitMonoTests(ex2).splitMono)
   checkAll("Byte < Int < Long", SplitMonoTests(ex1 composeSplitMono ex2).splitMono)
 
+  test("modify") {
+    ex1.modify(_ + 1)(Byte.MaxValue) shouldEqual Byte.MinValue
+  }
+
+  test("modifyF") {
+    ex1.modifyF(i => Option(i + 1))(Byte.MaxValue) shouldEqual Some(Byte.MinValue)
+  }
+
 }
