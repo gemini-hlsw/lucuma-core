@@ -105,7 +105,8 @@ lazy val math = crossProject(JVMPlatform, JSPlatform)
       "com.github.julien-truffaut" %% "monocle-core"  % monocleVersion,
       "com.github.julien-truffaut" %% "monocle-macro" % monocleVersion,
       "com.github.julien-truffaut" %% "monocle-law"   % monocleVersion % "test"
-    )
+    ),
+    publishArtifact in Test := true
   )
   .jvmConfigure(_.enablePlugins(AutomateHeaderPlugin))
   .jsSettings(
