@@ -101,10 +101,8 @@ lazy val math = crossProject(JVMPlatform, JSPlatform)
       "org.tpolecat"               %% "atto-core"     % attoVersion,
       "org.typelevel"              %% "cats-core"     % catsVersion,
       "org.typelevel"              %% "cats-effect"   % catsEffectVersion,
-      "org.typelevel"              %% "cats-testkit"  % catsEffectVersion % "test",
       "com.github.julien-truffaut" %% "monocle-core"  % monocleVersion,
       "com.github.julien-truffaut" %% "monocle-macro" % monocleVersion,
-      "com.github.julien-truffaut" %% "monocle-law"   % monocleVersion % "test"
     )
   )
   .jvmConfigure(_.enablePlugins(AutomateHeaderPlugin))
@@ -112,3 +110,41 @@ lazy val math = crossProject(JVMPlatform, JSPlatform)
     scalacOptions ~= (_.filterNot(Set("-Xcheckinit"))),
     scalacOptions += "-P:scalajs:sjsDefinedByDefault"
   )
+
+
+lazy val testkit = crossProject(JVMPlatform, JSPlatform)
+  .crossType(CrossType.Full)
+  .in(file("modules/testkit"))
+  .dependsOn(math)
+  .settings(scalacSettings)
+  .settings(headerSettings)
+  .settings(
+    name := "gsp-math-testkit",
+    libraryDependencies ++= Seq(
+      "org.typelevel"              %% "cats-testkit"  % catsEffectVersion,
+      "com.github.julien-truffaut" %% "monocle-law"   % monocleVersion,
+    )
+  )
+  .jvmConfigure(_.enablePlugins(AutomateHeaderPlugin))
+  .jsSettings(
+    scalacOptions ~= (_.filterNot(Set("-Xcheckinit"))),
+    scalacOptions += "-P:scalajs:sjsDefinedByDefault"
+  )
+
+
+lazy val tests = crossProject(JVMPlatform, JSPlatform)
+  .crossType(CrossType.Full)
+  .in(file("modules/tests"))
+  .dependsOn(math, testkit)
+  .settings(scalacSettings)
+  .settings(headerSettings)
+  .settings(
+    name := "gsp-math-tests",
+    skip in publish := true
+  )
+  .jvmConfigure(_.enablePlugins(AutomateHeaderPlugin))
+  .jsSettings(
+    scalacOptions ~= (_.filterNot(Set("-Xcheckinit"))),
+    scalacOptions += "-P:scalajs:sjsDefinedByDefault"
+  )
+
