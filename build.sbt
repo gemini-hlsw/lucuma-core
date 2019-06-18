@@ -27,10 +27,7 @@ lazy val math = crossProject(JVMPlatform, JSPlatform)
     )
   )
   .jvmConfigure(_.enablePlugins(AutomateHeaderPlugin))
-  .jsSettings(
-    scalacOptions ~= (_.filterNot(Set("-Xcheckinit"))),
-    scalacOptions += "-P:scalajs:sjsDefinedByDefault"
-  )
+  .jsSettings(gspScalaJsSettings: _*)
 
 
 lazy val testkit = crossProject(JVMPlatform, JSPlatform)
@@ -45,10 +42,7 @@ lazy val testkit = crossProject(JVMPlatform, JSPlatform)
     )
   )
   .jvmConfigure(_.enablePlugins(AutomateHeaderPlugin))
-  .jsSettings(
-    scalacOptions ~= (_.filterNot(Set("-Xcheckinit"))),
-    scalacOptions += "-P:scalajs:sjsDefinedByDefault"
-  )
+  .jsSettings(gspScalaJsSettings: _*)
 
 
 lazy val tests = crossProject(JVMPlatform, JSPlatform)
@@ -60,8 +54,5 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform)
     skip in publish := true
   )
   .jvmConfigure(_.enablePlugins(AutomateHeaderPlugin))
-  .jsSettings(
-    scalacOptions ~= (_.filterNot(Set("-Xcheckinit"))),
-    scalacOptions += "-P:scalajs:sjsDefinedByDefault"
-  )
+  .jsSettings(gspScalaJsSettings: _*)
 
