@@ -5,7 +5,7 @@ lazy val attoVersion          = "0.6.5"
 lazy val catsVersion          = "1.6.1"
 lazy val catsEffectVersion    = "1.3.1"
 lazy val kindProjectorVersion = "0.9.10"
-lazy val monocleVersion       = "1.5.1-cats"
+lazy val monocleVersion       = "1.6.0-RC1"
 lazy val scala12Version       = "2.12.8"
 
 inThisBuild(Seq(
