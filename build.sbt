@@ -37,7 +37,7 @@ lazy val testkit = crossProject(JVMPlatform, JSPlatform)
   .settings(
     name := "gsp-math-testkit",
     libraryDependencies ++= Seq(
-      "org.typelevel"              %% "cats-testkit"  % catsEffectVersion,
+      "org.typelevel"              %% "cats-testkit"  % catsVersion,
       "com.github.julien-truffaut" %% "monocle-law"   % monocleVersion,
     )
   )
