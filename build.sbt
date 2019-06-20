@@ -2,7 +2,7 @@ import sbtcrossproject.crossProject
 import sbtcrossproject.CrossType
 
 lazy val attoVersion          = "0.6.5"
-lazy val catsVersion          = "1.6.0"
+lazy val catsVersion          = "1.6.1"
 lazy val catsEffectVersion    = "1.3.0"
 lazy val kindProjectorVersion = "0.9.10"
 lazy val monocleVersion       = "1.5.0-cats"
