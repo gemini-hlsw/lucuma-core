@@ -327,7 +327,7 @@ trait AngleOptics extends OpticsHelpers { this: Angle.type =>
 
   /**
    * String parsed as unsigned DMS.
-   * @see [[gem.parser.AngleParsers]]
+   * @see [[gsp.math.parser.AngleParsers]]
    * @group Optics
    */
   lazy val fromStringDMS: Format[String, Angle] =
@@ -335,7 +335,7 @@ trait AngleOptics extends OpticsHelpers { this: Angle.type =>
 
   /**
    * String parsed as signed DMS.
-   * @see [[gem.parser.AngleParsers]]
+   * @see [[gsp.math.parser.AngleParsers]]
    * @group Optics
    */
   lazy val fromStringSignedDMS: Format[String, Angle] =
