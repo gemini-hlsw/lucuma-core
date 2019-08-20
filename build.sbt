@@ -1,16 +1,16 @@
 import sbtcrossproject.crossProject
 import sbtcrossproject.CrossType
 
-lazy val attoVersion          = "0.6.5"
-lazy val catsVersion          = "1.6.1"
-lazy val catsEffectVersion    = "1.3.1"
-lazy val kindProjectorVersion = "0.9.10"
-lazy val monocleVersion       = "1.5.1-cats"
-lazy val scala12Version       = "2.12.8"
+lazy val attoVersion          = "0.7.0-RC1"
+lazy val catsVersion          = "2.0.0-RC1"
+lazy val catsEffectVersion    = "2.0.0-RC1"
+lazy val collCompatVersion    = "2.1.2"
+lazy val kindProjectorVersion = "0.10.3"
+lazy val monocleVersion       = "2.0.0-RC1"
 
 inThisBuild(Seq(
   homepage := Some(url("https://github.com/gemini-hlsw/gsp-math")),
-  addCompilerPlugin("org.spire-math" %% "kind-projector" % kindProjectorVersion),
+  addCompilerPlugin("org.typelevel" %% "kind-projector" % kindProjectorVersion),
 ) ++ gspPublishSettings)
 
 lazy val math = crossProject(JVMPlatform, JSPlatform)
@@ -19,11 +19,12 @@ lazy val math = crossProject(JVMPlatform, JSPlatform)
   .settings(
     name := "gsp-math",
     libraryDependencies ++= Seq(
-      "org.tpolecat"               %% "atto-core"     % attoVersion,
-      "org.typelevel"              %% "cats-core"     % catsVersion,
-      "org.typelevel"              %% "cats-effect"   % catsEffectVersion,
-      "com.github.julien-truffaut" %% "monocle-core"  % monocleVersion,
-      "com.github.julien-truffaut" %% "monocle-macro" % monocleVersion,
+      "org.tpolecat"               %% "atto-core"               % attoVersion,
+      "org.typelevel"              %% "cats-core"               % catsVersion,
+      "org.typelevel"              %% "cats-effect"             % catsEffectVersion,
+      "com.github.julien-truffaut" %% "monocle-core"            % monocleVersion,
+      "com.github.julien-truffaut" %% "monocle-macro"           % monocleVersion,
+      "org.scala-lang.modules"     %% "scala-collection-compat" % collCompatVersion
     )
   )
   .jvmConfigure(_.enablePlugins(AutomateHeaderPlugin))

@@ -88,7 +88,7 @@ object Offset extends OffsetOptics {
   }
   trait POptics {
 
-    /** @Group Optics */
+    /** @group Optics */
     val angle: Iso[P, Angle] =
       GenIso[P, Angle]
 
@@ -137,7 +137,7 @@ object Offset extends OffsetOptics {
   }
   trait QOptics {
 
-    /** @Group Optics */
+    /** @group Optics */
     val angle: Iso[Q, Angle] =
       GenIso[Q, Angle]
 

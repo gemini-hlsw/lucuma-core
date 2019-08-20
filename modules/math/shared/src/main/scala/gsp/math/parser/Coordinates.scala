@@ -7,7 +7,7 @@ import cats.implicits._
 import atto._, Atto._
 import gsp.math._
 
-/** Parsers for [[gem.math.Coordinates]] and related types. */
+/** Parsers for [[gsp.math.Coordinates]] and related types. */
 trait CoordinateParsers {
   import AngleParsers.{ hms, dms }
   import MiscParsers.spaces1

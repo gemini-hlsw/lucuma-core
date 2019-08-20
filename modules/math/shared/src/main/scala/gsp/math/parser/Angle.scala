@@ -7,7 +7,7 @@ import atto._, Atto._
 import cats.implicits._
 import gsp.math.{ Angle, HourAngle }
 
-/** Parsers for `[[gem.math.Angle]].` */
+/** Parsers for `[[gsp.math.Angle]].` */
 trait AngleParsers {
   import MiscParsers._
 
