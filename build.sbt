@@ -3,7 +3,6 @@ import sbtcrossproject.CrossType
 
 lazy val attoVersion          = "0.7.0-RC1"
 lazy val catsVersion          = "2.0.0-RC1"
-lazy val catsEffectVersion    = "2.0.0-RC1"
 lazy val collCompatVersion    = "2.1.2"
 lazy val kindProjectorVersion = "0.10.3"
 lazy val monocleVersion       = "2.0.0-RC1"
@@ -21,7 +20,6 @@ lazy val math = crossProject(JVMPlatform, JSPlatform)
     libraryDependencies ++= Seq(
       "org.tpolecat"               %% "atto-core"               % attoVersion,
       "org.typelevel"              %% "cats-core"               % catsVersion,
-      "org.typelevel"              %% "cats-effect"             % catsEffectVersion,
       "com.github.julien-truffaut" %% "monocle-core"            % monocleVersion,
       "com.github.julien-truffaut" %% "monocle-macro"           % monocleVersion,
       "org.scala-lang.modules"     %% "scala-collection-compat" % collCompatVersion
