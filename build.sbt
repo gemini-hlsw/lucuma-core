@@ -1,11 +1,12 @@
 import sbtcrossproject.crossProject
 import sbtcrossproject.CrossType
 
-lazy val attoVersion          = "0.7.0-RC1"
-lazy val catsVersion          = "2.0.0-RC1"
-lazy val collCompatVersion    = "2.1.2"
-lazy val kindProjectorVersion = "0.10.3"
-lazy val monocleVersion       = "2.0.0-RC1"
+lazy val attoVersion                 = "0.7.0-RC1"
+lazy val catsVersion                 = "2.0.0-RC1"
+lazy val collCompatVersion           = "2.1.2"
+lazy val kindProjectorVersion        = "0.10.3"
+lazy val monocleVersion              = "2.0.0-RC1"
+lazy val catsTestkitScalaTestVersion = "1.0.0-M1"
 
 inThisBuild(Seq(
   homepage := Some(url("https://github.com/gemini-hlsw/gsp-math")),
@@ -36,8 +37,9 @@ lazy val testkit = crossProject(JVMPlatform, JSPlatform)
   .settings(
     name := "gsp-math-testkit",
     libraryDependencies ++= Seq(
-      "org.typelevel"              %% "cats-testkit"  % catsVersion,
-      "com.github.julien-truffaut" %% "monocle-law"   % monocleVersion,
+      "org.typelevel"              %% "cats-testkit"           % catsVersion,
+      "org.typelevel"              %% "cats-testkit-scalatest" % catsTestkitScalaTestVersion,
+      "com.github.julien-truffaut" %% "monocle-law"            % monocleVersion,
     )
   )
   .jvmConfigure(_.enablePlugins(AutomateHeaderPlugin))
