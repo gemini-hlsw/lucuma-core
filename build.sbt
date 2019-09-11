@@ -6,7 +6,7 @@ lazy val catsVersion                 = "2.0.0"
 lazy val collCompatVersion           = "2.1.2"
 lazy val kindProjectorVersion        = "0.10.3"
 lazy val monocleVersion              = "2.0.0-RC1"
-lazy val catsTestkitScalaTestVersion = "1.0.0-M1"
+lazy val catsTestkitScalaTestVersion = "1.0.0-M2"
 
 inThisBuild(Seq(
   homepage := Some(url("https://github.com/gemini-hlsw/gsp-math")),
