@@ -3,7 +3,7 @@
 
 package gsp.math.arb
 
-import gsp.math.{ Angle, Offset }
+import gsp.math.{Angle, Axis, Offset}
 import org.scalacheck._
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Cogen._
@@ -11,32 +11,30 @@ import org.scalacheck.Cogen._
 trait ArbOffset {
   import ArbAngle._
 
-  implicit val arbOffsetP: Arbitrary[Offset.P] =
+  implicit def arbOffsetComponent[A]: Arbitrary[Offset.Component[A]] =
     Arbitrary(
-      Gen.chooseNum(-10000, 10000).map(mas => Offset.P(Angle.milliarcseconds.reverseGet(mas)))
+      Gen.chooseNum(-10000, 10000).map(mas => Offset.Component[A](Angle.milliarcseconds.reverseGet(mas)))
     )
 
-  implicit val arbOffsetQ: Arbitrary[Offset.Q] =
-    Arbitrary(
-      Gen.chooseNum(-10000, 10000).map(mas => Offset.Q(Angle.milliarcseconds.reverseGet(mas)))
-    )
+  implicit val arbOffsetP: Arbitrary[Offset.Component[Axis.P]] = arbOffsetComponent[Axis.P]
+  implicit val arbOffsetQ: Arbitrary[Offset.Component[Axis.Q]] = arbOffsetComponent[Axis.Q]
 
   implicit val arbOffset: Arbitrary[Offset] =
     Arbitrary {
       for {
-        p <- arbitrary[Offset.P]
-        q <- arbitrary[Offset.Q]
+        p <- arbitrary[Offset.Component[Axis.P]]
+        q <- arbitrary[Offset.Component[Axis.Q]]
       } yield Offset(p, q)
     }
 
-  implicit val cogOffsetP: Cogen[Offset.P] =
+  implicit def cogOffsetComponent[A]: Cogen[Offset.Component[A]] =
     Cogen[Angle].contramap(_.toAngle)
 
-  implicit val cogOffsetQ: Cogen[Offset.Q] =
-    Cogen[Angle].contramap(_.toAngle)
+  implicit val cogOffsetP: Cogen[Offset.Component[Axis.P]] = cogOffsetComponent[Axis.P]
+  implicit val cogOffsetQ: Cogen[Offset.Component[Axis.Q]] = cogOffsetComponent[Axis.Q]
 
   implicit val cogOffset: Cogen[Offset] =
-    Cogen[(Offset.P, Offset.Q)].contramap(o => (o.p, o.q))
+    Cogen[(Offset.Component[Axis.P], Offset.Component[Axis.Q])].contramap(o => (o.p, o.q))
 
 }
 

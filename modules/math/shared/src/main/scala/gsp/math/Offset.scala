@@ -10,9 +10,13 @@ import gsp.math.optics.SplitMono
 import monocle.{ Iso, Lens }
 import monocle.macros.{ GenIso, GenLens }
 
-/** Angular offset with P and Q components. */
-final case class Offset(p: Offset.P, q: Offset.Q) {
+object Axis {
+  type P
+  type Q
+}
 
+/** Angular offset with P and Q components. */
+final case class Offset(p: Offset.Component[Axis.P], q: Offset.Component[Axis.Q]) {
   /** This offset, with both components reflected around the 0 .. 180° axis. Exact, invertable. */
   def unary_- : Offset =
     Offset(-p, -q)
@@ -24,14 +28,12 @@ final case class Offset(p: Offset.P, q: Offset.Q) {
   /** This offset pair in radians. */
   def toRadians: (Double, Double) =
     (p.toRadians, q.toRadians)
-
 }
 
 object Offset extends OffsetOptics {
-
   /** The zero offset. */
   val Zero: Offset =
-    Offset(P.Zero, Q.Zero)
+    Offset(Component.Zero[Axis.P], Component.Zero[Axis.Q])
 
   /** Offset forms a commutative group. */
   implicit val CommutativeGroupOffset: CommutativeGroup[Offset] =
@@ -49,122 +51,104 @@ object Offset extends OffsetOptics {
     Order.by(o => (o.p, o.q))
 
   /** P component of an angular offset.. */
-  final case class P(toAngle: Angle) {
+  final case class Component[A](toAngle: Angle) {
 
     /** This P component, reflected around the 0 .. 180° axis. Exact, invertable. */
-    def unary_- : P =
-      P(-toAngle)
+    def unary_- : Component[A] =
+      Component[A](-toAngle)
 
     /** Some of this P component and `p`. Exact. */
-    def +(p: P): P =
-      P(toAngle + p.toAngle)
+    def +(p: Component[A]): Component[A] =
+      Component[A](toAngle + p.toAngle)
 
     /** This P component in signed radians. */
     def toRadians: Double =
       toAngle.toSignedDoubleRadians
-
   }
-  object P extends POptics {
 
-    /** The zero P component. */
-    val Zero: P =
-      P(Angle.Angle0)
+  object Component extends ComponentOptics {
+    /** The zero [A] component. */
+    def Zero[A]: Component[A] =
+      Component[A](Angle.Angle0)
 
-    /** P forms a commutative group. */
-    implicit val CommutativeGroupP: CommutativeGroup[P] =
-      new CommutativeGroup[P] {
-        val empty: P = Zero
-        def combine(a: P, b: P) = a + b
-        def inverse(a: P) = -a
+    /** Component[A] forms a commutative group. */
+    implicit def CommutativeGroupComponent[A]: CommutativeGroup[Component[A]] =
+      new CommutativeGroup[Component[A]] {
+        val empty: Component[A] = Zero[A]
+        def combine(a: Component[A], b: Component[A]) = a + b
+        def inverse(a: Component[A]) = -a
       }
 
-    implicit val ShowP: Show[P] =
+    implicit def ShowComponent[A]: Show[Component[A]] =
       Show.fromToString
 
-    /** P components are by signed angle. */
-    implicit val OrderP: Order[P] =
+    /** Components are by signed angle. */
+    implicit def OrderComponent[A]: Order[Component[A]] =
       Angle.SignedAngleOrder.contramap(_.toAngle)
-
   }
-  trait POptics {
 
+  trait ComponentOptics {
     /** @group Optics */
-    val angle: Iso[P, Angle] =
-      GenIso[P, Angle]
+    def angle[A]: Iso[Component[A], Angle] =
+      GenIso[Component[A], Angle]
 
-    val signedArcseconds: SplitMono[P, BigDecimal] =
-      Angle.signedArcseconds.imapA(P(_), _.toAngle)
-
+    def signedArcseconds[A]: SplitMono[Component[A], BigDecimal] =
+      Angle.signedArcseconds.imapA(Component[A](_), _.toAngle)
   }
 
-  /** Q component of an angular offset.. */
-  final case class Q(toAngle: Angle) {
+  // P, Q types and objects defined here for source compatibility.
 
-    /** This Q component, reflected around the 0 .. 180° axis. Exact, invertable. */
-    def unary_- : Q =
-      Q(-toAngle)
+  /** @deprecated("Use Component[Axis.P] instead", "gsp-math 0.1.7") */
+  type P = Component[Axis.P]
+  /** @deprecated("Use Component[Axis.Q] instead", "gsp-math 0.1.7") */
+  type Q = Component[Axis.Q]
 
-    /** Some of this Q component and `p`. Exact. */
-    def +(p: Q): Q =
-      Q(toAngle + p.toAngle)
+  object P {
+    /** @deprecated("Use Component[Axis.P] instead", "gsp-math 0.1.7") */
+    def apply(toAngle: Angle): P = Component[Axis.P](toAngle)
 
-    /** This Q component in signed radians. */
-    def toRadians: Double =
-      toAngle.toSignedDoubleRadians
+    /** @deprecated("Use Component.Zero[Axis.P] instead", "gsp-math 0.1.7") */
+    val Zero: P = Component.Zero[Axis.P]
 
-  }
-  object Q extends QOptics {
+    /** @deprecated("Use Component.angle[Axis.P] instead", "gsp-math 0.1.7") */
+    val angle: Iso[P, Angle] = Component.angle[Axis.P]
 
-    /** The zero Q component. */
-    val Zero: Q =
-      Q(Angle.Angle0)
-
-    /** Q forms a commutative group. */
-    implicit val CommutativeGroupQ: CommutativeGroup[Q] =
-      new CommutativeGroup[Q] {
-        val empty: Q = Zero
-        def combine(a: Q, b: Q) = a + b
-        def inverse(a: Q) = -a
-      }
-
-    implicit val ShowQ: Show[Q] =
-      Show.fromToString
-
-    /** Q components are ordered by signed angle. */
-    implicit val OrderQ: Order[Q] =
-      Angle.SignedAngleOrder.contramap(_.toAngle)
-
-  }
-  trait QOptics {
-
-    /** @group Optics */
-    val angle: Iso[Q, Angle] =
-      GenIso[Q, Angle]
-
-    val signedArcseconds: SplitMono[Q, BigDecimal] =
-      Angle.signedArcseconds.imapA(Q(_), _.toAngle)
-
+    /** @deprecated("Use Component.signedArcseconds[Axis.P] instead", "gsp-math 0.1.7") */
+    val signedArcseconds: SplitMono[P, BigDecimal] = Component.signedArcseconds[Axis.P]
   }
 
+  object Q {
+    /** @deprecated("Use Component[Axis.Q] instead", "gsp-math 0.1.7") */
+    def apply(toAngle: Angle): Q = Component[Axis.Q](toAngle)
+
+    /** @deprecated("Use Component.Zero[Axis.Q] instead", "gsp-math 0.1.7") */
+    val Zero: Q = Component.Zero[Axis.Q]
+
+    /** @deprecated("Use Component.angle[Axis.Q] instead", "gsp-math 0.1.7") */
+    val angle: Iso[Q, Angle] = Component.angle[Axis.Q]
+
+    /** @deprecated("Use Component.signedArcseconds[Axis.Q] instead", "gsp-math 0.1.7") */
+    val signedArcseconds: SplitMono[Q, BigDecimal] = Component.signedArcseconds[Axis.Q]
+  }
 
 }
 
 trait OffsetOptics {
 
   /** @group Optics */
-  val p: Lens[Offset, Offset.P] =
+  val p: Lens[Offset, Offset.Component[Axis.P]] =
     GenLens[Offset](_.p)
 
   /** @group Optics */
-  val q: Lens[Offset, Offset.Q] =
+  val q: Lens[Offset, Offset.Component[Axis.Q]] =
     GenLens[Offset](_.q)
 
   /** @group Optics */
   val pAngle: Lens[Offset, Angle] =
-    p composeIso Offset.P.angle
+    p composeIso Offset.Component.angle[Axis.P]
 
   /** @group Optics */
   val qAngle: Lens[Offset, Angle] =
-    q composeIso Offset.Q.angle
+    q composeIso Offset.Component.angle[Axis.Q]
 
 }
