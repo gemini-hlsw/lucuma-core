@@ -96,41 +96,24 @@ object Offset extends OffsetOptics {
       Angle.signedArcseconds.imapA(Component[A](_), _.toAngle)
   }
 
-  // P, Q types and objects defined here for source compatibility.
+  // P, Q types and objects defined for convenience.
 
-  /** @deprecated("Use Component[Axis.P] instead", "gsp-math 0.1.7") */
   type P = Component[Axis.P]
-  /** @deprecated("Use Component[Axis.Q] instead", "gsp-math 0.1.7") */
   type Q = Component[Axis.Q]
 
-  object P {
-    /** @deprecated("Use Component[Axis.P] instead", "gsp-math 0.1.7") */
-    def apply(toAngle: Angle): P = Component[Axis.P](toAngle)
+  protected trait ComponentCompanion[A] {
+    def apply(toAngle: Angle): Component[A] = Component[A](toAngle)
 
-    /** @deprecated("Use Component.Zero[Axis.P] instead", "gsp-math 0.1.7") */
-    val Zero: P = Component.Zero[Axis.P]
+    val Zero: Component[A] = Component.Zero[A]
 
-    /** @deprecated("Use Component.angle[Axis.P] instead", "gsp-math 0.1.7") */
-    val angle: Iso[P, Angle] = Component.angle[Axis.P]
+    val angle: Iso[Component[A], Angle] = Component.angle[A]
 
-    /** @deprecated("Use Component.signedArcseconds[Axis.P] instead", "gsp-math 0.1.7") */
-    val signedArcseconds: SplitMono[P, BigDecimal] = Component.signedArcseconds[Axis.P]
+    val signedArcseconds: SplitMono[Component[A], BigDecimal] = Component.signedArcseconds[A]
   }
 
-  object Q {
-    /** @deprecated("Use Component[Axis.Q] instead", "gsp-math 0.1.7") */
-    def apply(toAngle: Angle): Q = Component[Axis.Q](toAngle)
+  object P extends ComponentCompanion[Axis.P]
 
-    /** @deprecated("Use Component.Zero[Axis.Q] instead", "gsp-math 0.1.7") */
-    val Zero: Q = Component.Zero[Axis.Q]
-
-    /** @deprecated("Use Component.angle[Axis.Q] instead", "gsp-math 0.1.7") */
-    val angle: Iso[Q, Angle] = Component.angle[Axis.Q]
-
-    /** @deprecated("Use Component.signedArcseconds[Axis.Q] instead", "gsp-math 0.1.7") */
-    val signedArcseconds: SplitMono[Q, BigDecimal] = Component.signedArcseconds[Axis.Q]
-  }
-
+  object Q extends ComponentCompanion[Axis.Q]
 }
 
 trait OffsetOptics {
