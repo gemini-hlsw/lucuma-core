@@ -17,10 +17,10 @@ final class OffsetSpec extends CatsSuite {
   // Laws
   checkAll("Offset", CommutativeGroupTests[Offset].commutativeGroup)
   checkAll("Offset", OrderTests[Offset].order)
-  checkAll("Offset.p", LensTests(Offset.p))
-  checkAll("Offset.q", LensTests(Offset.q))
-  checkAll("Offset.pAngle", LensTests(Offset.pAngle))
-  checkAll("Offset.qAngle", LensTests(Offset.qAngle))
+  checkAll("Axis.P", LensTests(Offset.p))
+  checkAll("Axis.Q", LensTests(Offset.q))
+  checkAll("Axis.PAngle", LensTests(Offset.pAngle))
+  checkAll("Axis.QAngle", LensTests(Offset.qAngle))
 
   test("Equality must be natural") {
     forAll { (a: Offset, b: Offset) =>
@@ -30,8 +30,8 @@ final class OffsetSpec extends CatsSuite {
 
   test("it must operate pairwise") {
     forAll { (a: Offset, b: Offset) =>
-      Eq[Offset.P].eqv(a.p, b.p) &&
-      Eq[Offset.Q].eqv(a.q, b.q) shouldEqual Eq[Offset].eqv(a, b)
+      Eq[Offset.Component[Axis.P]].eqv(a.p, b.p) &&
+      Eq[Offset.Component[Axis.Q]].eqv(a.q, b.q) shouldEqual Eq[Offset].eqv(a, b)
     }
   }
 

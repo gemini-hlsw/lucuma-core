@@ -16,32 +16,32 @@ final class OffsetPSpec extends CatsSuite {
   import ArbOffset._
 
   // Laws
-  checkAll("Offset.P", CommutativeGroupTests[Offset.P].commutativeGroup)
-  checkAll("Offset.P", OrderTests[Offset.P].order)
-  checkAll("Offset.P.angle", IsoTests(Offset.P.angle))
-  checkAll("Offset.P.signedArcseconds", SplitMonoTests(Offset.P.signedArcseconds).splitMono)
+  checkAll("Offset.Component[Axis.P].commutativeGroup", CommutativeGroupTests[Offset.Component[Axis.P]].commutativeGroup)
+  checkAll("Offset.Component[Axis.P].order", OrderTests[Offset.Component[Axis.P]].order)
+  checkAll("Offset.Component.angle[Axis.P]", IsoTests(Offset.Component.angle[Axis.P]))
+  checkAll("Offset.Component.signedArcseconds[Axis.P]", SplitMonoTests(Offset.Component.signedArcseconds[Axis.P]).splitMono)
 
   test("Equality must be natural") {
-    forAll { (a: Offset.P, b: Offset.P) =>
-      a.equals(b) shouldEqual Eq[Offset.P].eqv(a, b)
+    forAll { (a: Offset.Component[Axis.P], b: Offset.Component[Axis.P]) =>
+      a.equals(b) shouldEqual Eq[Offset.Component[Axis.P]].eqv(a, b)
     }
   }
 
   test("Equality be consistent with .toAngle") {
-    forAll { (a: Offset.P, b: Offset.P) =>
-      Eq[Angle].eqv(a.toAngle, b.toAngle) shouldEqual Eq[Offset.P].eqv(a, b)
+    forAll { (a: Offset.Component[Axis.P], b: Offset.Component[Axis.P]) =>
+      Eq[Angle].eqv(a.toAngle, b.toAngle) shouldEqual Eq[Offset.Component[Axis.P]].eqv(a, b)
     }
   }
 
   test("Show must be natural") {
-    forAll { (a: Offset.P) =>
-      a.toString shouldEqual Show[Offset.P].show(a)
+    forAll { (a: Offset.Component[Axis.P]) =>
+      a.toString shouldEqual Show[Offset.Component[Axis.P]].show(a)
     }
   }
 
   test("Conversion to angle must be invertable") {
-    forAll { (p: Offset.P) =>
-      Offset.P(p.toAngle) shouldEqual p
+    forAll { (p: Offset.Component[Axis.P]) =>
+      Offset.Component[Axis.P](p.toAngle) shouldEqual p
     }
   }
 
