@@ -50,18 +50,18 @@ object Offset extends OffsetOptics {
   implicit val OrderOffset: Order[Offset] =
     Order.by(o => (o.p, o.q))
 
-  /** P component of an angular offset.. */
+  /** Component of an angular offset. */
   final case class Component[A](toAngle: Angle) {
 
-    /** This P component, reflected around the 0 .. 180° axis. Exact, invertable. */
+    /** This component, reflected around the 0 .. 180° axis. Exact, invertable. */
     def unary_- : Component[A] =
       Component[A](-toAngle)
 
-    /** Some of this P component and `p`. Exact. */
-    def +(p: Component[A]): Component[A] =
-      Component[A](toAngle + p.toAngle)
+    /** Sum of this component and `o` of the same type. Exact. */
+    def +(o: Component[A]): Component[A] =
+      Component[A](toAngle + o.toAngle)
 
-    /** This P component in signed radians. */
+    /** This component in signed radians. */
     def toRadians: Double =
       toAngle.toSignedDoubleRadians
   }
