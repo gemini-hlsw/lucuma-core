@@ -4,6 +4,7 @@ import sbtcrossproject.CrossType
 lazy val attoVersion                 = "0.8.0"
 lazy val catsVersion                 = "2.1.1"
 lazy val collCompatVersion           = "2.1.6"
+lazy val jtsVersion                  = "1.16.1"
 lazy val kindProjectorVersion        = "0.10.3"
 lazy val monocleVersion              = "2.0.4"
 lazy val catsTestkitScalaTestVersion = "1.0.1"
@@ -31,6 +32,11 @@ lazy val math = crossProject(JVMPlatform, JSPlatform)
     )
   )
   .jvmConfigure(_.enablePlugins(AutomateHeaderPlugin))
+  .jvmSettings(
+    libraryDependencies ++= Seq(
+      "org.locationtech.jts" % "jts-core" % jtsVersion
+    )
+  )
   .jsSettings(gspScalaJsSettings: _*)
   .jsSettings(
     libraryDependencies += "io.github.cquiroz" %%% "scala-java-time" % scalaJavaTimeVersion

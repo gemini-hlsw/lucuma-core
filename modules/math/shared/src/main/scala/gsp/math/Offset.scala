@@ -28,6 +28,10 @@ final case class Offset(p: Offset.Component[Axis.P], q: Offset.Component[Axis.Q]
   /** This offset pair in radians. */
   def toRadians: (Double, Double) =
     (p.toRadians, q.toRadians)
+
+  /** String representation of this Offset, for debugging purposes only. */
+  override def toString: String =
+    s"Offset(Offset.P(${p.toAngle}), Offset.Q(${q.toAngle}))"
 }
 
 object Offset extends OffsetOptics {
