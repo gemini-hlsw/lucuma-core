@@ -111,7 +111,7 @@ sealed class Angle protected (val toMicroarcseconds: Long) {
     toMicroarcseconds.toInt
 
   /**
-   * angle difference or separation between two angles in the range [0 .. π)
+   * angle difference or separation between two angles in the range [0 .. π]
    */
   def difference(a: Angle): Angle =
     Angle.difference(this, a)
@@ -243,7 +243,7 @@ object Angle extends AngleOptics {
 
   /**
    * Calculate the angle difference or separation between two angles.
-   * The calculation is such that you get the minimal angle in the range [0 .. π)
+   * The calculation is such that you get the minimal angle in the range [0 .. π]
    */
   def difference(α: Angle, ϐ: Angle): Angle = {
     import cats.implicits._ // To get order syntax

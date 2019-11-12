@@ -146,16 +146,16 @@ final class AngleSpec extends CatsSuite {
     }
   }
 
-  test("Difference is in the range [0 .. π)") {
+  test("Difference is in the range [0 .. π]") {
     implicit val order: Order[Angle] = Angle.AngleOrder
     forAll { (a: Angle, b: Angle) =>
-      (a.difference(b) >= Angle.Angle0 && a.difference(b) < Angle.Angle180) shouldBe true
+      (a.difference(b) >= Angle.Angle0 && a.difference(b) <= Angle.Angle180) shouldBe true
     }
   }
 
   test("Difference is commutative") {
     forAll { (a: Angle, b: Angle) =>
-      a.difference(b) shouldEqual a.difference(b)
+      a.difference(b) shouldEqual b.difference(a)
     }
   }
 
