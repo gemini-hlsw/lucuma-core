@@ -110,6 +110,11 @@ sealed class Angle protected (val toMicroarcseconds: Long) {
   override final def hashCode =
     toMicroarcseconds.toInt
 
+  /**
+   * angle difference or separation between two angles in the range [0 .. π]
+   */
+  def difference(a: Angle): Angle =
+    Angle.difference(this, a)
 }
 
 object Angle extends AngleOptics {
@@ -236,6 +241,17 @@ object Angle extends AngleOptics {
       degrees.toLong         * 1000 * 1000 * 60 * 60
     )
 
+  /**
+   * Calculate the angle difference or separation between two angles.
+   * The calculation is such that you get the minimal angle in the range [0 .. π]
+   */
+  def difference(α: Angle, ϐ: Angle): Angle = {
+    import cats.implicits._ // To get order syntax
+    implicit val order: Order[Angle] = AngleOrder
+
+    val δ: Angle = (α - ϐ)
+    if (δ > Angle.Angle180) δ.mirrorBy(Angle.Angle180) else δ
+  }
 }
 
 trait AngleOptics extends OpticsHelpers { this: Angle.type =>
@@ -396,7 +412,6 @@ final class HourAngle private (µas: Long) extends Angle(µas) {
    * Sum of this HourAngle and `ha`. Exact, commutative, invertible.
    * @group Operations
    */
-  @SuppressWarnings(Array("org.wartremover.warts.Overloading"))
   def +(ha: HourAngle): HourAngle =
     HourAngle.fromMicroseconds(toMicroseconds.toLong + ha.toMicroseconds.toLong)
 
@@ -404,7 +419,6 @@ final class HourAngle private (µas: Long) extends Angle(µas) {
    * Difference of this HourAngle and `ha`. Exact, invertible.
    * @group Operations
    */
-  @SuppressWarnings(Array("org.wartremover.warts.Overloading"))
   def -(ha: HourAngle): HourAngle =
     HourAngle.fromMicroseconds(toMicroseconds.toLong - ha.toMicroseconds.toLong)
 

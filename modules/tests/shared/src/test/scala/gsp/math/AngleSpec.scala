@@ -4,13 +4,12 @@
 package gsp.math
 
 import cats.tests.CatsSuite
-import cats.{ Eq, Show }
+import cats.{ Eq, Show, Order }
 import cats.kernel.laws.discipline._
 import gsp.math.arb._
 import gsp.math.laws.discipline._
 import monocle.law.discipline._
 
-@SuppressWarnings(Array("org.wartremover.warts.ToString", "org.wartremover.warts.Equals"))
 final class AngleSpec extends CatsSuite {
   import ArbAngle._
 
@@ -132,6 +131,31 @@ final class AngleSpec extends CatsSuite {
       val hrs  = a.toDoubleHours
       val hrsʹ = HourAngle.fromDoubleHours(hrs).toDoubleHours
       hrs shouldEqual hrsʹ +- 0.000000001
+    }
+  }
+
+  test("Difference with itself is 0") {
+    forAll { (a: Angle) =>
+      a.difference(a) shouldEqual Angle.Angle0
+    }
+  }
+
+  test("Difference with reverse is 180") {
+    forAll { (a: Angle) =>
+      a.difference(a + Angle.Angle180) shouldEqual Angle.Angle180
+    }
+  }
+
+  test("Difference is in the range [0 .. π]") {
+    implicit val order: Order[Angle] = Angle.AngleOrder
+    forAll { (a: Angle, b: Angle) =>
+      (a.difference(b) >= Angle.Angle0 && a.difference(b) <= Angle.Angle180) shouldBe true
+    }
+  }
+
+  test("Difference is commutative") {
+    forAll { (a: Angle, b: Angle) =>
+      a.difference(b) shouldEqual b.difference(a)
     }
   }
 
