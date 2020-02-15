@@ -9,9 +9,13 @@ lazy val monocleVersion              = "2.0.1"
 lazy val catsTestkitScalaTestVersion = "1.0.0-RC1"
 lazy val scalaJavaTimeVersion        = "2.0.0-RC3"
 
+lazy val scala212Version             = "2.12.10"
+lazy val scala213Version             = "2.13.1"
+
 inThisBuild(Seq(
   homepage := Some(url("https://github.com/gemini-hlsw/gsp-math")),
   addCompilerPlugin("org.typelevel" %% "kind-projector" % kindProjectorVersion),
+  crossScalaVersions := Seq(scala212Version, scala213Version),
 ) ++ gspPublishSettings)
 
 lazy val math = crossProject(JVMPlatform, JSPlatform)
