@@ -14,6 +14,8 @@ inThisBuild(Seq(
   addCompilerPlugin("org.typelevel" %% "kind-projector" % kindProjectorVersion),
 ) ++ gspPublishSettings)
 
+skip in publish := true
+
 lazy val math = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Full)
   .in(file("modules/math"))
