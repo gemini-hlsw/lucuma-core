@@ -6,7 +6,7 @@ lazy val catsVersion                 = "2.1.0"
 lazy val collCompatVersion           = "2.1.4"
 lazy val kindProjectorVersion        = "0.10.3"
 lazy val monocleVersion              = "2.0.1"
-lazy val catsTestkitScalaTestVersion = "1.0.0-RC1"
+lazy val catsTestkitScalaTestVersion = "1.0.0"
 lazy val scalaJavaTimeVersion        = "2.0.0-RC3"
 
 inThisBuild(Seq(
