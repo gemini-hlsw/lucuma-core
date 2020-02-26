@@ -36,7 +36,7 @@ trait AngleParsers {
   val hms3: Parser[HourAngle] =
     genHMS(token(char('h')), token(char('m')), char('s')) named "hms3(00h 00m 00.000000s)"
 
-  val hms = (hms1 | hms2 | hms3) named "hms"
+  val hms: Parser[HourAngle] = (hms1 | hms2 | hms3) named "hms"
 
   /** Generic parser for the components of a DMS Angle, which is optionally prefixed by a sign. */
   def genDMS(t1: Parser[_], t2: Parser[_], t3: Parser[_]): Parser[Angle] =
@@ -57,7 +57,7 @@ trait AngleParsers {
   val dms3: Parser[Angle] =
     genDMS(token(char('°')), token(char('′')), char('″')) named "dms3(+04° 41′ 36.2072″)"
 
-  val dms = (dms1 | dms2 | dms3) named "dms"
+  val dms: Parser[Angle] = (dms1 | dms2 | dms3) named "dms"
 
 }
 

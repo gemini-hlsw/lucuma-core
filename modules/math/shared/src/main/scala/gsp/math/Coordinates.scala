@@ -87,7 +87,7 @@ final case class Coordinates(ra: RightAscension, dec: Declination) {
   def toRadians: (Double, Double) =
     (ra.toRadians, dec.toRadians)
 
-  override def toString =
+  override def toString: String =
     Coordinates.fromHmsDms.productToString(this)
 
 }

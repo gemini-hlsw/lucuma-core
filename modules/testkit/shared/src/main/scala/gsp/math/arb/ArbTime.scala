@@ -11,7 +11,7 @@ import scala.jdk.CollectionConverters._
 import scala.concurrent.duration.{Duration => SDuration}
 import java.time._
 
-// Arbitrary but resonable dates and times.
+// Arbitrary but reasonable dates and times.
 trait ArbTime {
 
   implicit val arbZoneId: Arbitrary[ZoneId] =
@@ -21,7 +21,7 @@ trait ArbTime {
 
   implicit val arbYear: Arbitrary[Year] =
     Arbitrary {
-      choose(2000, 2020).map(Year.of(_))
+      choose(2000, 2020).map(Year.of)
     }
 
   implicit val arbLocalDate: Arbitrary[LocalDate] =

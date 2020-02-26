@@ -38,7 +38,7 @@ object FormatTests extends Laws {
 
   def apply[A, B](fab: Format[A, B]): FormatTests[A, B] =
     new FormatTests[A, B] {
-      val formatLaws = new FormatLaws(fab)
+      val formatLaws: FormatLaws[A, B] = FormatLaws(fab)
     }
 
 }

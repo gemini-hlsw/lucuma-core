@@ -96,7 +96,7 @@ object Format {
   /** Format forms a category. */
   implicit def FormatCategory: Category[Format] =
     new Category[Format] {
-      def id[A] = Format(Some(_), identity)
+      def id[A]: Format[A, A] = Format(Some(_), identity)
       def compose[A, B, C](f: Format[B, C], g: Format[A, B]): Format[A, C] = g ^<-* f
     }
 

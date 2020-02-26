@@ -68,7 +68,7 @@ trait TimeParsers {
     (for {
       h  <- (intN(2) namedOpaque "2-digit hour of day")     <~ sep
       m  <- (intN(2) namedOpaque "2-digit minute of hour")  <~ sep
-      s  <- (intN(2) namedOpaque "2-digit second of minute")
+      s  <-  intN(2) namedOpaque "2-digit second of minute"
       ns <- nano
       t  <- catchDTE((_: Int) => LocalTime.of(h, m, s, ns))(ns)
     } yield t) named "00:00:00.000000000"
