@@ -35,7 +35,7 @@ object Wavelength {
    * Prism from Int in pm into Wavelength and back.
    * @group Optics
    */
-  def fromPicometers: Prism[Int, Wavelength] =
+  val fromPicometers: Prism[Int, Wavelength] =
     Prism((n: Int) => Some(n).filter(_ >= 0).map(new Wavelength(_) {}))(_.toPicometers)
 
 
@@ -82,19 +82,19 @@ object Wavelength {
   /**
    * Returns a `UnitConverter` for angstroms in the range 0 to 21474836.
    */
-  def fromAngstroms: UnitConverter =
+  val fromAngstroms: UnitConverter =
     new UnitConverter("Å", 2) {}
 
   /**
    * Returns a `UnitConverter` for nm in the range 0 to 214783.
    */
-  def fromNanometers: UnitConverter =
+  val fromNanometers: UnitConverter =
     new UnitConverter("nm", 3) {}
 
   /**
    * Returns a `UnitConverter` for μm in the range 0 to 2147.
    */
-  def fromMicrometers: UnitConverter =
+  val fromMicrometers: UnitConverter =
     new UnitConverter("μm", 6) {}
 
 }
