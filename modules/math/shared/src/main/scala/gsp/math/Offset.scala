@@ -39,8 +39,8 @@ object Offset extends OffsetOptics {
   implicit val CommutativeGroupOffset: CommutativeGroup[Offset] =
     new CommutativeGroup[Offset] {
       val empty: Offset = Zero
-      def combine(a: Offset, b: Offset) = a + b
-      def inverse(a: Offset) = -a
+      def combine(a: Offset, b: Offset): Offset = a + b
+      def inverse(a: Offset): Offset = -a
     }
 
   implicit val ShowOffset: Show[Offset] =
@@ -75,8 +75,8 @@ object Offset extends OffsetOptics {
     implicit def CommutativeGroupComponent[A]: CommutativeGroup[Component[A]] =
       new CommutativeGroup[Component[A]] {
         val empty: Component[A] = Zero[A]
-        def combine(a: Component[A], b: Component[A]) = a + b
-        def inverse(a: Component[A]) = -a
+        def combine(a: Component[A], b: Component[A]): Component[A] = a + b
+        def inverse(a: Component[A]): Component[A] = -a
       }
 
     implicit def ShowComponent[A]: Show[Component[A]] =
@@ -93,7 +93,7 @@ object Offset extends OffsetOptics {
       GenIso[Component[A], Angle]
 
     def signedArcseconds[A]: SplitMono[Component[A], BigDecimal] =
-      Angle.signedArcseconds.imapA(Component[A](_), _.toAngle)
+      Angle.signedArcseconds.imapA(Component[A], _.toAngle)
   }
 
   // P, Q types and objects defined for convenience.

@@ -31,7 +31,7 @@ final case class SplitMono[A, B](get: A => B, reverseGet: B => A) {
   def modifyF[F[_]: Functor](f: B => F[B])(a: A): F[A] =
     Functor[F].map(f(get(a)))(reverseGet)
 
-  /** Swapping `get` and `reverseGet` yields a `SplitEpi. */
+  /** Swapping `get` and `reverseGet` yields a `SplitEpi`. */
   def reverse: SplitEpi[B, A] =
     SplitEpi(reverseGet, get)
 
@@ -93,7 +93,7 @@ object SplitMono {
   /** SplitMono forms a category. */
   implicit def SplitMonoCategory: Category[SplitMono] =
     new Category[SplitMono] {
-      def id[A] = SplitMono(identity, identity)
+      def id[A]: SplitMono[A, A] = SplitMono(identity, identity)
       def compose[A, B, C](f: SplitMono[B, C], g: SplitMono[A, B]): SplitMono[A, C] = g ^<-! f
     }
 

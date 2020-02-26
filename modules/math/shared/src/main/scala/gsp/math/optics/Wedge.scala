@@ -59,7 +59,7 @@ object Wedge {
   /** Wedge forms a category. */
   implicit def WedgeCategory: Category[Wedge] =
     new Category[Wedge] {
-      def id[A] = Wedge(identity, identity)
+      def id[A]: Wedge[A, A] = Wedge(identity, identity)
       def compose[A, B, C](f: Wedge[B, C], g: Wedge[A, B]): Wedge[A, C] = g ^<-! f
     }
 

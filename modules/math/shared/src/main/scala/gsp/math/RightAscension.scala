@@ -39,7 +39,7 @@ final case class RightAscension(toHourAngle: HourAngle) {
   def toRadians: Double =
     toAngle.toDoubleRadians
 
-  override def toString =
+  override def toString: String =
     RightAscension.fromStringHMS.taggedToString("RA", this)
 
 }

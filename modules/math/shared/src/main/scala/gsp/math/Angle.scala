@@ -36,7 +36,7 @@ sealed class Angle protected (val toMicroarcseconds: Long) {
     this + Angle.Angle180
 
   /**
-   * Additive inverse of this angle, equvalent to `mirrorBy Angle0`. Exact, invertible.
+   * Additive inverse of this angle, equivalent to `mirrorBy Angle0`. Exact, invertible.
    * @group Transformations
    */
   def unary_- : Angle =
@@ -101,13 +101,13 @@ sealed class Angle protected (val toMicroarcseconds: Long) {
     f"Angle(${Angle.dms.get(this)}, $toDoubleDegrees%1.10f°)"
 
   /** Angles are equal if their magnitudes are equal. Exact. */
-  override final def equals(a: Any) =
+  override final def equals(a: Any): Boolean =
     a match {
       case a: Angle => a.toMicroarcseconds === toMicroarcseconds
       case _        => false
     }
 
-  override final def hashCode =
+  override final def hashCode: Int =
     toMicroarcseconds.toInt
 
   /**
@@ -130,7 +130,7 @@ object Angle extends AngleOptics {
    */
   def fromMicroarcseconds(µas: Long): Angle = {
     val µasPer360 = 360L * 60L * 60L * 1000L * 1000L
-    val µasʹ = (((µas % µasPer360) + µasPer360) % µasPer360)
+    val µasʹ = ((µas % µasPer360) + µasPer360) % µasPer360
     new Angle(µasʹ)
   }
 
@@ -162,8 +162,8 @@ object Angle extends AngleOptics {
   implicit val AngleCommutativeGroup: CommutativeGroup[Angle] =
     new CommutativeGroup[Angle] {
       val empty: Angle = Angle0
-      def combine(a: Angle, b: Angle) = a + b
-      def inverse(a: Angle) = -a
+      def combine(a: Angle, b: Angle): Angle = a + b
+      def inverse(a: Angle): Angle = -a
     }
 
   /** @group Typeclass Instances */
@@ -194,10 +194,10 @@ object Angle extends AngleOptics {
   // This works for both DMS and HMS so let's just do it once.
   protected[math] def toMicrosexigesimal(micros: Long): (Int, Int, Int, Int, Int) = {
     val µs =  micros                               % 1000L
-    val ms = (micros / (1000L))                    % 1000L
+    val ms = (micros /  1000L)                     % 1000L
     val s  = (micros / (1000L * 1000L))            % 60L
     val m  = (micros / (1000L * 1000L * 60L))      % 60L
-    val d  = (micros / (1000L * 1000L * 60L * 60L))
+    val d  =  micros / (1000L * 1000L * 60L * 60L)
     (d.toInt, m.toInt, s.toInt, ms.toInt, µs.toInt)
   }
 
@@ -214,7 +214,7 @@ object Angle extends AngleOptics {
       microarcseconds: Int
     ) = Angle.toMicrosexigesimal(toAngle.toMicroarcseconds)
     def format: String = f"$degrees%02d:$arcminutes%02d:$arcseconds%02d.$milliarcseconds%03d$microarcseconds%03d"
-    override final def toString = s"DMS($format)"
+    override def toString: String = s"DMS($format)"
   }
   object DMS {
     implicit val eqDMS: Eq[DMS] =
@@ -249,7 +249,7 @@ object Angle extends AngleOptics {
     import cats.implicits._ // To get order syntax
     implicit val order: Order[Angle] = AngleOrder
 
-    val δ: Angle = (α - ϐ)
+    val δ: Angle = α - ϐ
     if (δ > Angle.Angle180) δ.mirrorBy(Angle.Angle180) else δ
   }
 }
@@ -392,7 +392,7 @@ final class HourAngle private (µas: Long) extends Angle(µas) {
    * @group Transformations
    */
   override def unary_- : HourAngle =
-    HourAngle.fromMicroseconds(-toMicroseconds.toLong)
+    HourAngle.fromMicroseconds(-toMicroseconds)
 
   /**
    * This `HourAngle` in microseconds. Exact.
@@ -413,17 +413,17 @@ final class HourAngle private (µas: Long) extends Angle(µas) {
    * @group Operations
    */
   def +(ha: HourAngle): HourAngle =
-    HourAngle.fromMicroseconds(toMicroseconds.toLong + ha.toMicroseconds.toLong)
+    HourAngle.fromMicroseconds(toMicroseconds + ha.toMicroseconds)
 
   /**
    * Difference of this HourAngle and `ha`. Exact, invertible.
    * @group Operations
    */
   def -(ha: HourAngle): HourAngle =
-    HourAngle.fromMicroseconds(toMicroseconds.toLong - ha.toMicroseconds.toLong)
+    HourAngle.fromMicroseconds(toMicroseconds - ha.toMicroseconds)
 
   /** String representation of this HourAngle, for debugging purposes only. */
-  override def toString =
+  override def toString: String =
     HourAngle.fromStringHMS.taggedToString("HourAngle", this)
 
 }
@@ -441,7 +441,7 @@ object HourAngle extends HourAngleOptics {
    */
   def fromMicroseconds(µs: Long): HourAngle = {
     val µsPer24 = 24L * µsPerHour
-    val µsʹ = (((µs % µsPer24) + µsPer24) % µsPer24)
+    val µsʹ = ((µs % µsPer24) + µsPer24) % µsPer24
     new HourAngle(µsʹ * 15L)
   }
 
@@ -473,8 +473,8 @@ object HourAngle extends HourAngleOptics {
   implicit val AngleCommutativeGroup: CommutativeGroup[HourAngle] =
     new CommutativeGroup[HourAngle] {
       val empty: HourAngle = HourAngle0
-      def combine(a: HourAngle, b: HourAngle) = a + b
-      def inverse(a: HourAngle) = -a
+      def combine(a: HourAngle, b: HourAngle): HourAngle = a + b
+      def inverse(a: HourAngle): HourAngle = -a
     }
 
   /** @group Typeclass Instances */
@@ -502,7 +502,7 @@ object HourAngle extends HourAngleOptics {
       microseconds: Int
     ) = Angle.toMicrosexigesimal(toHourAngle.toMicroseconds)
     def format: String = f"$hours%02d:$minutes%02d:$seconds%02d.$milliseconds%03d$microseconds%03d"
-    override final def toString = format
+    override def toString: String = format
   }
   object HMS {
     implicit val eqHMS: Eq[HMS] =

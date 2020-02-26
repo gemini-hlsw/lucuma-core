@@ -11,7 +11,7 @@ import monocle.Prism
 /**
  * Exact wavelengths represented as unsigned integral picometers in the range [0 .. Int.MaxValue]
  * which means the largest representable wavelength is 2.147483647 mm.
- * @param toPicometers This wavelength in integral picometers (10^-12 of a meter).
+ * @param toPicometers This wavelength in integral picometers (10^-12^ of a meter).
  */
 sealed abstract case class Wavelength private (toPicometers: Int) {
   // Sanity check … should be correct via the companion constructor.
@@ -45,7 +45,8 @@ object Wavelength {
 
   /**
    * Poor man's uncomposable "optics" for converting between wavelength units.
-   * @param name
+   * @param name unit name for the resulting integral value of the reverseGet
+   *             (eg, "nm" for nanometers)
    * @param exp power of 10 difference relative to pm (Å is 2, nm is 3, μm 6)
    */
   sealed abstract case class UnitConverter(name: String, exp: Int) {
@@ -79,25 +80,19 @@ object Wavelength {
   }
 
   /**
-   * Creates a Wavelength from an Int in Å.
-   * @param Å in the range (0 to 21474836)
-   * @return a Wavelength provided Å is in range
+   * Returns a `UnitConverter` for angstroms in the range 0 to 21474836.
    */
   def fromAngstroms: UnitConverter =
     new UnitConverter("Å", 2) {}
 
   /**
-   * Creates a Wavelength from an Int in nm.
-   * @param nm in the range (0 to 2147483)
-   * @return a Wavelength provided nm is in range
+   * Returns a `UnitConverter` for nm in the range 0 to 214783.
    */
   def fromNanometers: UnitConverter =
     new UnitConverter("nm", 3) {}
 
   /**
-   * Creates a Wavelength from an Int in μm.
-   * @param μm in the range (0 to 2147)
-   * @return a Wavelength provided μm is in range
+   * Returns a `UnitConverter` for μm in the range 0 to 2147.
    */
   def fromMicrometers: UnitConverter =
     new UnitConverter("μm", 6) {}

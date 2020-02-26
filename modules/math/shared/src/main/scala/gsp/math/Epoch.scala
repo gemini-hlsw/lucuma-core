@@ -53,7 +53,7 @@ final class Epoch private (val scheme: Epoch.Scheme, private[math] val toMilliye
   override def hashCode: Int =
     scheme.hashCode ^ toMilliyears
 
-  override def toString =
+  override def toString: String =
     Epoch.fromString.taggedToString("Epoch", this)
 
 }
