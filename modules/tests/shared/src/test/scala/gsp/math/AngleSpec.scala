@@ -159,4 +159,10 @@ final class AngleSpec extends CatsSuite {
     }
   }
 
+  test("A bisected Angle has half the magnitude") {
+    forAll { (a: Angle) =>
+      val b = (a + a).bisect
+      assert(a === b || a.flip === b)
+    }
+  }
 }

@@ -9,11 +9,12 @@ package gsp.math
  * conversions traits.
  */
 package object syntax {
-  object all extends ToParserOps
+  object all extends ToDurationOps
+                with ToInstantOps
+                with ToIntOps
+                with ToParserOps
                 with ToPrismOps
                 with ToStringOps
-                with ToInstantOps
-                with ToDurationOps
                 with ToTreeMapCompanionOps
                 with ToTreeMapOps
                 with ToTreeSetCompanionOps

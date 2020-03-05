@@ -55,6 +55,13 @@ sealed class Angle protected (val toMicroarcseconds: Long) {
   }
 
   /**
+   * Angle corresponding to the bisection of this Angle.  Approximate, non-invertible.
+   * @group Transformations
+   */
+  def bisect: Angle =
+    Angle.fromMicroarcseconds(toMicroarcseconds / 2L)
+
+  /**
    * This angle in decimal degrees. Approximate, non-invertible.
    * @group Conversions
    */
