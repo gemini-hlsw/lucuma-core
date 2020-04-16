@@ -13,6 +13,7 @@ src_managed/
 project/boot/
 project/plugins/project/
 project/hydra.sbt
+project/metals.sbt
 
 # Scala-IDE specific
 .scala_dependencies
