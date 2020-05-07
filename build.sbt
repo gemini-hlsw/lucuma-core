@@ -12,6 +12,7 @@ lazy val scalaJavaTimeVersion        = "2.0.0"
 inThisBuild(Seq(
   homepage := Some(url("https://github.com/gemini-hlsw/gsp-math")),
   addCompilerPlugin("org.typelevel" %% "kind-projector" % kindProjectorVersion),
+  Global / onChangedBuildSource := ReloadOnSourceChanges
 ) ++ gspPublishSettings)
 
 skip in publish := true
