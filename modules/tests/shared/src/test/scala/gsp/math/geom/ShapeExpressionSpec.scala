@@ -12,7 +12,8 @@ import gsp.math.geom.arb._
 import org.scalacheck._
 import org.scalacheck.Arbitrary._
 
-abstract class ShapeExpressionSpec(implicit interpreter: ShapeInterpreter) extends CatsSuite {
+final class ShapeExpressionSpec extends CatsSuite {
+  implicit val interpreter = gsp.math.geom.jts.interpreter.value
 
   import ArbAngle._
   import ArbOffset._
@@ -154,3 +155,4 @@ object ShapeExpressionSpec {
     } yield (t, Offset(Offset.P(p), Offset.Q(q)))
 
 }
+
