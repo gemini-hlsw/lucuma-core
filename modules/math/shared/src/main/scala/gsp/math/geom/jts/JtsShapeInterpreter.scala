@@ -15,7 +15,7 @@ import org.locationtech.jts.util.GeometricShapeFactory
 import java.util.Collections
 
 /**
- * JVM-specific JTS shape interpreter.
+ * JTS shape interpreter.
  */
 object JtsShapeInterpreter extends ShapeInterpreter {
 

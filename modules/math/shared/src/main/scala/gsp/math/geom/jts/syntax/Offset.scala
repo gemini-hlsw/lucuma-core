@@ -13,7 +13,7 @@ import gsp.math.Offset
 import org.locationtech.jts.geom.{Coordinate, Envelope, Geometry}
 import org.locationtech.jts.util.GeometricShapeFactory
 
-// Syntax used in the JVM/ JTS implementation only.
+// Syntax used in the JTS implementation only.
 
 final class OffsetOps(val self: Offset) extends AnyVal {
 
