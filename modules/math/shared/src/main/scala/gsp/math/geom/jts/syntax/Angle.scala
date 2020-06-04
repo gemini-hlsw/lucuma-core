@@ -5,7 +5,7 @@ package gsp.math.geom.jts.syntax
 
 import gsp.math.Angle
 
-// Syntax used in the JVM / JTS implementation only.
+// Syntax used in the JTS implementation only.
 
 final class AngleOps(val self: Angle) extends AnyVal {
   def µas: Long =
