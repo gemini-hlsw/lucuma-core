@@ -23,14 +23,19 @@ object GmosScienceAreaGeometry {
   private def offsetInP(p: Angle): Offset =
     Offset(Offset.P(p), Offset.Q.Zero)
 
-  private def imagingFov(size: Angle, notch: Angle): ShapeExpression = {
+  private def imagingFov(size: Angle, corner: Angle): ShapeExpression = {
     val centerCcdWidth: Angle = 165600.mas
     val gapWidth: Angle       =   3000.mas
 
-    // `ccd` is a square with the corners cut such that each missing corner is a
-    // right isosceles triangle with the equal sides of length `notch`.
     val z   = Angle.Angle0
-    val n   = size - notch
+
+    // (size/2) + (size/2 - corner) = distance from center to any vertex
+    // Used to make a square rotated by 45 degrees with sides =
+    // sqrt(2 * ((size/2) + (size/2 - corner))^2) = sqrt(2*(size - corner)^2)
+    val n   = size - corner
+
+    // `ccd` is a square with the corners cut such that each missing corner is a
+    // right isosceles triangle with the equal sides of length `corner`.
     val ccd = ShapeExpression.centeredRectangle(size, size) ∩
                 ShapeExpression.polygonAt((z, n), (n, z), (z, -n), (-n, z))
 
