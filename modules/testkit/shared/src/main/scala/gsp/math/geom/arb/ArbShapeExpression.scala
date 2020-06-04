@@ -64,6 +64,9 @@ trait ArbShapeExpression {
       a <- arbitrary[Angle]
     } yield (s ⟲ a) ↗ o
 
+  val genEmpty: Gen[ShapeExpression] =
+    Gen.const(ShapeExpression.Empty)
+
   val genEllipse: Gen[ShapeExpression] =
     withPerturbation(genCenteredEllipse)
 
@@ -74,7 +77,7 @@ trait ArbShapeExpression {
     withPerturbation(genCenteredRectangle)
 
   val genShape: Gen[ShapeExpression] =
-    Gen.oneOf(genEllipse, genPolygon, genRectangle)
+    Gen.oneOf(genEmpty, genEllipse, genPolygon, genRectangle)
 
   // Not implicit.  This is a single arbitrary shape, not in any way a
   // combination of shapes, so it isn't really an "arbitrary ShapeExpression".

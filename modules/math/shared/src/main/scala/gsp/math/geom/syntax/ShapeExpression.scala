@@ -67,6 +67,12 @@ trait ToShapeExpressionOps {
 
 final class ShapeExpressionCompanionOps(val self: ShapeExpression.type) extends AnyVal {
 
+  /**
+   * An empty `ShapeExpression` with a broader type.
+   */
+  def empty: ShapeExpression =
+    ShapeExpression.Empty
+
   // Simplified constructors
 
   private def offset(p: Angle, q: Angle): Offset =
@@ -135,7 +141,7 @@ final class ShapeExpressionCompanionOps(val self: ShapeExpression.type) extends 
    * @group Constructors
    */
   def centeredRectangle(w: Angle, h: Angle): ShapeExpression =
-    Translate(ellipse(w, h), offset(-w.bisect, -h.bisect))
+    Translate(rectangle(w, h), offset(-w.bisect, -h.bisect))
 
   /**
    * Constructs an ellipse contained in a rectangle of width w and height h with

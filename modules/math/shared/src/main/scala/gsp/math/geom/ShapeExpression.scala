@@ -27,6 +27,13 @@ sealed trait ShapeExpression {
 object ShapeExpression {
 
   /**
+   * An empty shape for use in building up an expression iteratively.
+   *
+   * @group Constructors
+   */
+  final case object Empty extends ShapeExpression
+
+  /**
    * Ellipse contained in the rectangle defined by the two positions.
    *
    * @group Constructors
