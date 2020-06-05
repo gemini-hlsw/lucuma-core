@@ -13,7 +13,8 @@ import org.scalacheck._
 import org.scalacheck.Arbitrary._
 
 final class ShapeExpressionSpec extends CatsSuite {
-  implicit val interpreter = gsp.math.geom.jts.interpreter.value
+  implicit val interpreter: ShapeInterpreter =
+    gsp.math.geom.jts.interpreter.value
 
   import ArbAngle._
   import ArbOffset._

@@ -42,6 +42,7 @@ object JtsShapeInterpreter extends ShapeInterpreter {
 
     e match {
       // Constructors
+      case Empty              => EmptyGeometry
       case Ellipse(a, b)      => safeRectangularBoundedShape(a, b) {_.createEllipse}
       case Polygon(os)        => safePolygon(os)
       case Rectangle(a, b)    => safeRectangularBoundedShape(a, b) {_.createRectangle}

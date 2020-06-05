@@ -22,8 +22,11 @@ import scala.jdk.CollectionConverters._
 object JtsDemo extends Frame("JTS Demo") {
 
   // Shape to display
-  val shape: ShapeExpression =
-    GmosOiwfsProbeArm.shape ⟲ 45.deg
+  val shapes: List[ShapeExpression] =
+    List(
+      GmosOiwfsProbeArm.shape ⟲ 45.deg,
+      GmosScienceAreaGeometry.imaging
+    )
 
   // Scale
   val arcsecPerPixel: Double =
@@ -73,11 +76,11 @@ object JtsDemo extends Frame("JTS Demo") {
         // distance from center in arcsec
         val das = (i * Angle.signedArcseconds.get(gridSize).toDouble).round
 
-        // Draw the labels
-        if (das != 0L) g2d.drawString(s"-$das", -dpx + 5, - halfCanvas + 10)
-        g2d.drawString(s"$das", dpx + 5, - halfCanvas + 10)
-        if (das != 0L) g2d.drawString(s"-$das", - halfCanvas + 5, -dpx - 5)
-        g2d.drawString(s"$das", - halfCanvas + 5, dpx - 5)
+        // Draw the labels (p increasing to the left, q increasing upward)
+        g2d.drawString(s"$das", -dpx + 5, - halfCanvas + 10)
+        if (das != 0L) g2d.drawString(s"-$das", dpx + 5, - halfCanvas + 10)
+        g2d.drawString(s"$das", - halfCanvas + 5, -dpx - 5)
+        if (das != 0L) g2d.drawString(s"-$das", - halfCanvas + 5, dpx - 5)
 
         // Draw the grid lines
         g2d.drawLine(-dpx, -halfCanvas, -dpx, halfCanvas)
@@ -88,9 +91,11 @@ object JtsDemo extends Frame("JTS Demo") {
       g2d.setStroke(origStroke)
 
       // Finally, draw the shape.
-      shape.eval match {
-        case jts: JtsShape => g2d.draw(jts.toAwt(arcsecPerPixel))
-        case x             => sys.error(s"Whoa unexpected shape type: $x")
+      shapes.foreach { shape =>
+        shape.eval match {
+          case jts: JtsShape => g2d.draw(jts.toAwt(arcsecPerPixel))
+          case x             => sys.error(s"Whoa unexpected shape type: $x")
+        }
       }
 
     }
