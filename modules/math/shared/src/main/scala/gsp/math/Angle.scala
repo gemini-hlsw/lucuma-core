@@ -106,7 +106,7 @@ sealed class Angle protected (val toMicroarcseconds: Long) {
   /** String representation of this Angle, for debugging purposes only. */
   override def toString: String = {
     val dms = Angle.dms.get(this)
-    s"Angle.fromDMS(${dms.degrees},${dms.arcminutes},${dms.arcseconds},${dms.microarcseconds},${dms.milliarcseconds})"
+    s"Angle.fromDMS(${dms.degrees},${dms.arcminutes},${dms.arcseconds},${dms.milliarcseconds},${dms.microarcseconds})"
   }
 
   /** Angles are equal if their magnitudes are equal. Exact. */

@@ -74,6 +74,8 @@ object ShapeExpression {
    */
   final case class Rotate(e: ShapeExpression, a: Angle) extends ShapeExpression
 
+  final case class RotateAroundOffset(e: ShapeExpression, a: Angle, o: Offset) extends ShapeExpression
+
   /**
    * @group Transformations
    */

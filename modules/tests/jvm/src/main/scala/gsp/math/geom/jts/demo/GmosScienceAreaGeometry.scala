@@ -9,6 +9,8 @@ import gsp.math.geom.syntax.all._
 
 import gsp.math.syntax.int._
 
+// TODO: move to core
+
 /**
  * GMOS science area geometry.
  */
@@ -29,9 +31,9 @@ object GmosScienceAreaGeometry {
 
     val z   = Angle.Angle0
 
-    // (size/2) + (size/2 - corner) = distance from center to any vertex
-    // Used to make a square rotated by 45 degrees with sides =
+    // Used to make a square rotated by 45 degrees with side length =
     // sqrt(2 * ((size/2) + (size/2 - corner))^2) = sqrt(2*(size - corner)^2)
+    // n = distance from center to any vertex of square
     val n   = size - corner
 
     // `ccd` is a square with the corners cut such that each missing corner is a

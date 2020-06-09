@@ -3,12 +3,14 @@
 
 package gsp.math
 
-import cats.{ Order, Show }
+import cats.{Order, Show}
 import cats.kernel.CommutativeGroup
 import cats.implicits._
 import gsp.math.optics.SplitMono
-import monocle.{ Iso, Lens }
-import monocle.macros.{ GenIso, GenLens }
+import monocle.{Iso, Lens}
+import monocle.macros.{GenIso, GenLens}
+
+import scala.math.{cos, sin}
 
 object Axis {
   type P
@@ -17,13 +19,43 @@ object Axis {
 
 /** Angular offset with P and Q components. */
 final case class Offset(p: Offset.Component[Axis.P], q: Offset.Component[Axis.Q]) {
+
   /** This offset, with both components reflected around the 0 .. 180° axis. Exact, invertable. */
   def unary_- : Offset =
     Offset(-p, -q)
 
-  /** Componentwise sum of this offset and `o`. Exact. */
+  /** Component-wise sum of this offset and `o`. Exact. */
   def +(o: Offset): Offset =
     Offset(p + o.p, q + o.q)
+
+  /**
+   * Component-wise subtraction of this offset and `o`. Exact.
+   *
+   * `this - o === this + -o`
+   */
+  def -(o: Offset): Offset =
+    Offset(p - o.p, q - o.q)
+
+  /**
+   * Rotates the offset around the origin and produces a new `Offset` at the
+   * resulting location. Approximate, non-invertible.
+   *
+   * @param a rotation angle
+   *
+   * @return Offset at the new position
+   */
+  def rotate(a: Angle): Offset = {
+    val r  = a.toSignedDoubleRadians
+    val pµ = -Angle.signedMicroarcseconds.get(p.toAngle)
+    val qµ =  Angle.signedMicroarcseconds.get(q.toAngle)
+    val pʹ = (pµ * cos(r) - qµ * sin(r)).round
+    val qʹ = (pµ * sin(r) + qµ * cos(r)).round
+
+    Offset.fromAngles(
+      Angle.signedMicroarcseconds.reverseGet(-pʹ),
+      Angle.signedMicroarcseconds.reverseGet(qʹ)
+    )
+  }
 
   /** This offset pair in radians. */
   def toRadians: (Double, Double) =
@@ -35,6 +67,7 @@ final case class Offset(p: Offset.Component[Axis.P], q: Offset.Component[Axis.Q]
 }
 
 object Offset extends OffsetOptics {
+
   /** The zero offset. */
   val Zero: Offset =
     Offset(Component.Zero[Axis.P], Component.Zero[Axis.Q])
@@ -64,6 +97,10 @@ object Offset extends OffsetOptics {
     /** Sum of this component and `o` of the same type. Exact. */
     def +(o: Component[A]): Component[A] =
       Component[A](toAngle + o.toAngle)
+
+    /** Difference of this component and `o` of the same type. Exact. */
+    def -(o: Component[A]): Component[A] =
+      Component[A](toAngle - o.toAngle)
 
     /** This component in signed radians. */
     def toRadians: Double =
@@ -118,6 +155,19 @@ object Offset extends OffsetOptics {
   object P extends ComponentCompanion[Axis.P]
 
   object Q extends ComponentCompanion[Axis.Q]
+
+  /**
+   * Constructs and offset from a pair of `Angle` representing the p and q
+   * components.
+   *
+   * @param `p` offset in p expressed as angular separation
+   * @param `q` offset in q expressed as angular separation
+   *
+   * @return resulting Offset
+   */
+  def fromAngles(p: Angle, q: Angle): Offset =
+    Offset(Offset.P(p), Offset.Q(q))
+
 }
 
 trait OffsetOptics {
@@ -137,5 +187,23 @@ trait OffsetOptics {
   /** @group Optics */
   val qAngle: Lens[Offset, Angle] =
     q composeIso Offset.Component.angle[Axis.Q]
+
+  private def splitMonoFromAngleSplitMono[A](m: SplitMono[Angle, A]): SplitMono[Offset, (A, A)] =
+    SplitMono(
+      o => (m.get(o.p.toAngle), m.get(o.q.toAngle)),
+      t => Offset.fromAngles(m.reverseGet(t._1), m.reverseGet(t._2))
+    )
+
+  /** @group Optics */
+  val microarcseconds: SplitMono[Offset, (Long, Long)] =
+    splitMonoFromAngleSplitMono(Angle.microarcseconds)
+
+  /** @group Optics */
+  val signedMicroarcseconds: SplitMono[Offset, (Long, Long)] =
+    splitMonoFromAngleSplitMono(Angle.signedMicroarcseconds)
+
+  /** @group Optics */
+  val signedArcseconds: SplitMono[Offset, (BigDecimal, BigDecimal)] =
+    splitMonoFromAngleSplitMono(Angle.signedArcseconds)
 
 }

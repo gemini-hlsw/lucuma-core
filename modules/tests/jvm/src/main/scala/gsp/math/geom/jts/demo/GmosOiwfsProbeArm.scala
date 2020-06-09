@@ -4,24 +4,26 @@
 package gsp.math.geom
 
 package jts.demo
-
-import gsp.math.Angle
-
+import gsp.math.{Angle, Offset}
 import gsp.math.syntax.int._
 import gsp.math.geom.syntax.all._
 
-// WIP: would need to be moved out of this package and is missing the
-// calculation for particular offset position impact on the arm rotation
+import cats.implicits._
+import scala.math.{asin, atan2, hypot, Pi, sin}
+
+// TODO: move to core
 
 /**
  * Description of the GMOS OIWFS probe arm geometry.
  */
 object GmosOiwfsProbeArm {
-  val PickoffArmLength: Angle      = 358460.mas
-  val PickoffMirrorSize: Angle     =     20.arcsec
-  val ProbeArmLength: Angle        = PickoffArmLength - PickoffMirrorSize.bisect
-  val ProbeArmTaperedWidth: Angle  =     15.arcsec
-  val ProbeArmTaperedLength: Angle =    180.arcsec
+  private val PickoffArmLength: Angle      = 358460.mas
+  private val PickoffMirrorSize: Angle     =     20.arcsec
+  private val ProbeArmLength: Angle        = PickoffArmLength - PickoffMirrorSize.bisect
+  private val ProbeArmTaperedWidth: Angle  =     15.arcsec
+  private val ProbeArmTaperedLength: Angle =    180.arcsec
+
+  private val StageArmLength: Angle        = 124890.mas
 
   private val arm: ShapeExpression = {
     val hm: Angle  = PickoffMirrorSize.bisect
@@ -48,5 +50,69 @@ object GmosOiwfsProbeArm {
    */
   val shape: ShapeExpression =
     arm ∪ pickoff
+
+  /**
+   * The GMOS OIWFS probe arm positioned to reach a particular guide star at
+   * a particular offset.
+   *
+   * @param posAngle position angle where positive is counterclockwise
+   * @param guideStar guide star offset from the center, relative to an un-rotated frame
+   * @param offsetPos offset position from the base, if any
+   * @param ifuOffset correction for IFU FP-units, if any // TODO: replace with actual FPUnit
+   * @param sideLooking `true` when mounted on a side-looking port, `false` for up-looking // TODO: replace with enum
+   *
+   * @return probe arm shape correctly rotated and offset to reach the guide star
+   */
+  def shapeAt(
+    posAngle:    Angle,
+    guideStar:   Offset,
+    offsetPos:   Offset,
+    ifuOffset:   Offset,
+    sideLooking: Boolean
+  ): ShapeExpression =
+    shape ⟲ armAngle(posAngle, guideStar, offsetPos, ifuOffset, sideLooking) ↗ guideStar
+
+  private def armAngle(
+    posAngle:    Angle,
+    guideStar:   Offset,
+    offsetPos:   Offset,
+    ifuOffset:   Offset,
+    sideLooking: Boolean
+  ): Angle = {
+
+    val t   = Offset.fromAngles(427520.mas, 101840.mas)
+    val tʹ  = if (sideLooking) Offset.qAngle.modify(_.mirrorBy(Angle.Angle0))(t) else t
+
+    val bx  = Angle.signedArcseconds.get(StageArmLength).toDouble
+    val bxᒾ = bx*bx
+
+    val mx  = Angle.signedArcseconds.get(PickoffArmLength).toDouble
+    val mxᒾ = mx*mx
+
+    val (x, y) =
+      Offset.signedArcseconds.get(
+        tʹ.rotate(posAngle) + guideStar - (offsetPos - ifuOffset).rotate(posAngle)
+      ).bimap(x => -x.toDouble, _.toDouble)
+
+    val r  = hypot(x, y)
+    val rᒾ = r * r
+    val α  = atan2(x, -y)
+
+    val φ  =
+      math.acos(
+        (rᒾ - (bxᒾ + mxᒾ)) / (2.0 * bx * mx) match {
+          case a if a < -1.0 => -1.0
+          case a if a >  1.0 =>  1.0
+          case a             =>    a
+        }
+      ) * (if (sideLooking) -1.0 else 1.0)
+
+    val θ  = {
+      val θʹ = asin((mx / r) * sin(φ))
+      if (mxᒾ > (rᒾ + bxᒾ)) Pi - θʹ else θʹ
+    }
+
+    Angle.fromDoubleRadians(-φ + θ + α + Pi / 2.0)
+  }
 
 }

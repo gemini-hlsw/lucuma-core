@@ -20,6 +20,9 @@ final class ShapeExpressionOps(val self: ShapeExpression) extends AnyVal {
   def rotate(a: Angle): ShapeExpression =
     Rotate(self, a)
 
+  def rotateAroundOffset(a: Angle, o: Offset): ShapeExpression =
+    RotateAroundOffset(self, a, o)
+
   def translate(o: Offset): ShapeExpression =
     Translate(self, o)
 
@@ -34,6 +37,9 @@ final class ShapeExpressionOps(val self: ShapeExpression) extends AnyVal {
 
   def ⟲(a: Angle): ShapeExpression =
     rotate(a)
+
+  def ⟲(a: Angle, o: Offset): ShapeExpression =
+    rotateAroundOffset(a, o)
 
   def ↗(o: Offset): ShapeExpression =
     translate(o)

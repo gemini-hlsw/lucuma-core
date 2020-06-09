@@ -58,6 +58,12 @@ object JtsShapeInterpreter extends ShapeInterpreter {
           .rotationInstance(a.toDoubleRadians)
           .transform(toGeometry(e))
 
+      case RotateAroundOffset(e, a, o) =>
+        val c = o.coordinate
+        AffineTransformation
+          .rotationInstance(a.toDoubleRadians, c.x, c.y)
+          .transform(toGeometry(e))
+
       case Translate(e, o)    =>
         val c = o.coordinate
         AffineTransformation
