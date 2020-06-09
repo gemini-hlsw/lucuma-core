@@ -24,7 +24,7 @@ final class OffsetSpec extends CatsSuite {
   checkAll("Axis.PAngle", LensTests(Offset.pAngle))
   checkAll("Axis.QAngle", LensTests(Offset.qAngle))
   checkAll("Offset.microarcseconds", SplitMonoTests(Offset.microarcseconds).splitMono)
-  checkAll("Offset.microarcseconds", SplitMonoTests(Offset.signedMicroarcseconds).splitMono)
+  checkAll("Offset.signedMicroarcseconds", SplitMonoTests(Offset.signedMicroarcseconds).splitMono)
   checkAll("Offset.signedArcseconds", SplitMonoTests(Offset.signedArcseconds).splitMono)
 
   test("Equality must be natural") {
