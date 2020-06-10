@@ -104,7 +104,7 @@ sealed class Angle protected (val toMicroarcseconds: Long) {
     Angle.fromMicroarcseconds(toMicroarcseconds - a.toMicroarcseconds)
 
   /**
-   * This angle as an offset in p. Exact, invertible.
+   * This angle as an Offset.P. Exact, invertible.
    *
    * @group Conversions
    */
@@ -112,12 +112,28 @@ sealed class Angle protected (val toMicroarcseconds: Long) {
     Offset.P(this)
 
   /**
-   * This angle as an offset in q. Exact, invertible.
+   * This angle as an Offset.Q. Exact, invertible.
    *
    * @group Conversions
    */
   def q: Offset.Q =
     Offset.Q(this)
+
+  /**
+   * This angle as an offset in p.  Exact, invertible.
+   *
+   * @group Conversions
+   */
+  def offsetInP: Offset =
+    Offset(p, Offset.Q.Zero)
+
+  /**
+   * This angle as an offset in q.  Exact, invertible.
+   *
+   * @group Conversions
+   */
+  def offsetInQ: Offset =
+    Offset(Offset.P.Zero, q)
 
   /** String representation of this Angle, for debugging purposes only. */
   override def toString: String = {

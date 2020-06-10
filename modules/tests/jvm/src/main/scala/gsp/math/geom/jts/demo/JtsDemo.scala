@@ -30,10 +30,19 @@ object JtsDemo extends Frame("JTS Demo") {
   val offsetPos: Offset       =
     Offset(60.arcsec.p, 60.arcsec.q)
 
+  // TODO: should come from the FPUnit enum in core
+  val ifuOffset: Offset       =
+    Offset.Zero
+
+  // TODO: when we move this core there should be an enum
+  val sideLooking: Boolean    =
+    true
+
   // Shape to display
   val shapes: List[ShapeExpression] =
     List(
-      GmosOiwfsProbeArm.shapeAt(posAngle, guideStarOffset, offsetPos, Offset.Zero, sideLooking = true),
+      GmosOiwfsProbeArm.shapeAt(posAngle, guideStarOffset, offsetPos, ifuOffset, sideLooking),
+      GmosOiwfsProbeArm.patrolFieldAt(posAngle, offsetPos, ifuOffset, sideLooking),
       GmosScienceAreaGeometry.imaging ↗ offsetPos ⟲ posAngle
     )
 

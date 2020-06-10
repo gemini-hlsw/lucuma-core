@@ -37,8 +37,8 @@ final case class Offset(p: Offset.Component[Axis.P], q: Offset.Component[Axis.Q]
     Offset(p - o.p, q - o.q)
 
   /**
-   * Rotates the offset around the origin and produces a new `Offset` at the
-   * resulting location. Approximate, non-invertible.
+   * Rotates the offset around the origin (counterclockwise) and produces a
+   * new `Offset` at the resulting location. Approximate, non-invertible.
    *
    * @param θ rotation angle
    *
@@ -146,6 +146,12 @@ object Offset extends OffsetOptics {
 
   object Q extends ComponentCompanion[Axis.Q]
 
+  /**
+   * Produces a function that will calculate `Offset` positions rotated by
+   * the given angle θ (counterclockwise).  Approximate, non-invertible.
+   *
+   * @param θ rotation angle
+   */
   def rotateBy(θ: Angle): Offset => Offset = {
     val r  = θ.toSignedDoubleRadians
     Offset.signedMicroarcseconds.modify { case (pµ, qµ) => (

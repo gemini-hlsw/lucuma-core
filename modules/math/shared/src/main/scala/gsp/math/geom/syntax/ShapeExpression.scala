@@ -85,22 +85,14 @@ final class ShapeExpressionCompanionOps(val self: ShapeExpression.type) extends 
   def empty: ShapeExpression =
     ShapeExpression.Empty
 
-  // Simplified constructors
-
-  private def offset(p: Angle, q: Angle): Offset =
-    Offset(Offset.P(p), Offset.Q(q))
-
-  private def offset(o: (Angle, Angle)): Offset =
-    Offset(Offset.P(o._1), Offset.Q(o._2))
-
   /**
    * Constructs an ellipse bound by the rectangle defined by the given
    * coordinates expressed as angular separation.
    *
    * @group Constructors
    */
-  def ellipseAt(a: (Angle, Angle), b: (Angle, Angle)): ShapeExpression =
-    Ellipse(offset(a), offset(b))
+  def ellipseAt(a: (Offset.P, Offset.Q), b: (Offset.P, Offset.Q)): ShapeExpression =
+    Ellipse(Offset(a._1, a._2), Offset(b._1, b._2))
 
   /**
    * Constructs an arbitrary polygon defined by the given coordinate list
@@ -108,8 +100,8 @@ final class ShapeExpressionCompanionOps(val self: ShapeExpression.type) extends 
    *
    * @group Constructors
    */
-  def polygonAt(os: (Angle, Angle)*): ShapeExpression =
-    Polygon(os.toList.map(offset))
+  def polygonAt(os: (Offset.P, Offset.Q)*): ShapeExpression =
+    Polygon(os.toList.map(o => Offset(o._1, o._2)))
 
   /**
    * Constructs a rectangle bound by the two given coordinates expressed as
@@ -117,8 +109,8 @@ final class ShapeExpressionCompanionOps(val self: ShapeExpression.type) extends 
    *
    * @group Constructors
    */
-  def rectangleAt(a: (Angle, Angle), b: (Angle, Angle)): ShapeExpression =
-    Rectangle(offset(a), offset(b))
+  def rectangleAt(a: (Offset.P, Offset.Q), b: (Offset.P, Offset.Q)): ShapeExpression =
+    Rectangle(Offset(a._1, a._2), Offset(b._1, b._2))
 
   /**
    * Constructs a regular polygon of a given radius and number of sides,
@@ -128,12 +120,13 @@ final class ShapeExpressionCompanionOps(val self: ShapeExpression.type) extends 
    */
   def regularPolygon(radius: Angle, nSides: Int): ShapeExpression = {
     val µas = radius.toMicroarcseconds
-    val v0  = Offset(Offset.P(radius), Offset.Q.Zero)
+    val v0  = radius.offsetInP
     val vs  = (1 until nSides).foldLeft(List(v0)) { (os, v) =>
       val θ = 2*v*Math.PI/nSides.toDouble
-      val p = Angle.signedMicroarcseconds.reverseGet((µas * Math.cos(θ)).round).p
-      val q = Angle.signedMicroarcseconds.reverseGet((µas * Math.sin(θ)).round).q
-      Offset(p, q) :: os
+      Offset.signedMicroarcseconds.reverseGet((
+        (µas * Math.cos(θ)).round,
+        (µas * Math.sin(θ)).round
+      )) :: os
     }
     Polygon(vs)
   }
@@ -144,7 +137,7 @@ final class ShapeExpressionCompanionOps(val self: ShapeExpression.type) extends 
    * @group Constructors
    */
   def rectangle(w: Angle, h: Angle): ShapeExpression =
-    Rectangle(Offset.Zero, offset(w, h))
+    Rectangle(Offset.Zero, Offset(w.p, h.q))
 
   /**
    * Constructs a rectangle of width w and height h centered at the base
@@ -153,7 +146,7 @@ final class ShapeExpressionCompanionOps(val self: ShapeExpression.type) extends 
    * @group Constructors
    */
   def centeredRectangle(w: Angle, h: Angle): ShapeExpression =
-    Translate(rectangle(w, h), offset(-w.bisect, -h.bisect))
+    Translate(rectangle(w, h), Offset(-w.bisect.p, -h.bisect.q))
 
   /**
    * Constructs an ellipse contained in a rectangle of width w and height h with
@@ -162,7 +155,7 @@ final class ShapeExpressionCompanionOps(val self: ShapeExpression.type) extends 
    * @group Constructors
    */
   def ellipse(w: Angle, h: Angle): ShapeExpression =
-    Ellipse(Offset.Zero, offset(w, h))
+    Ellipse(Offset.Zero, Offset(w.p, h.q))
 
   /**
    * Constructs an ellipse contained in a rectangle of width w and height
@@ -171,7 +164,7 @@ final class ShapeExpressionCompanionOps(val self: ShapeExpression.type) extends 
    * @group Constructors
    */
   def centeredEllipse(w: Angle, h: Angle): ShapeExpression =
-    Translate(ellipse(w, h), offset(-(w.bisect), -(h.bisect)))
+    Translate(ellipse(w, h), Offset(-w.bisect.p, -h.bisect.q))
 
 }
 

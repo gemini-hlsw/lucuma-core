@@ -29,19 +29,19 @@ object GmosOiwfsProbeArm {
     val hm: Angle  = PickoffMirrorSize.bisect
     val htw: Angle = ProbeArmTaperedWidth.bisect
 
-    val p0 = (-hm,                           htw  )
-    val p1 = (p0._1 - ProbeArmTaperedLength, hm   )
-    val p2 = (p0._1 - ProbeArmLength,        p1._2)
-    val p3 = (p2._1,                        -hm   )
-    val p4 = (p1._1,                         p3._2)
-    val p5 = (p0._1,                        -htw  )
+    val p0 = (-hm.p,                                                   htw.q)
+    val p1 = (Offset.P.angle.modify(_ - ProbeArmTaperedLength)(p0._1), hm.q )
+    val p2 = (Offset.P.angle.modify(_ - ProbeArmLength)(p0._1),        p1._2)
+    val p3 = (p2._1,                                                  -hm.q )
+    val p4 = (p1._1,                                                   p3._2)
+    val p5 = (p0._1,                                                  -htw.q)
 
     ShapeExpression.polygonAt(p0, p1, p2, p3, p4, p5, p0)
   }
 
   private val pickoff: ShapeExpression = {
     val s = PickoffMirrorSize.bisect
-    ShapeExpression.rectangleAt((s, s), (s - PickoffMirrorSize, s - PickoffMirrorSize))
+    ShapeExpression.rectangleAt((s.p, s.q), ((s - PickoffMirrorSize).p, (s - PickoffMirrorSize).q))
   }
 
   /**
@@ -115,21 +115,31 @@ object GmosOiwfsProbeArm {
     Angle.fromDoubleRadians(-φ + θ + α + Pi / 2.0)
   }
 
-  /*
+  /**
+   * GMOS patrol field shape centered at the base position.
+   */
   val patrolField: ShapeExpression =
-    ShapeExpression.Rectangle(
-      Offset(-11400.mas.p, -34920.mas.q),
-      Offset(201300.mas.p,  21469.mas.q)
-    )
+    ShapeExpression.centeredRectangle(212700.mas, 249600.mas)
 
+  /**
+   * GMOS patrol field shape, in context.
+   *
+   * @param posAngle position angle where positive is counterclockwise
+   * @param offsetPos offset position from the base, if any
+   * @param ifuOffset correction for IFU FP-units, if any // TODO: replace with actual FPUnit
+   * @param sideLooking `true` when mounted on a side-looking port, `false` for up-looking // TODO: replace with enum
+   *
+   * @return probe field shape rotated and offset
+   */
   def patrolFieldAt(
-//    posAngle:    Angle,
-//    offsetPos:   Offset,
-//    ifuOffset:   Offset,
+    posAngle:    Angle,
+    offsetPos:   Offset,
+    ifuOffset:   Offset,
     sideLooking: Boolean
   ): ShapeExpression = {
-    val s = if (sideLooking) patrolField.flipVertical else patrolField
-    s
+    val pf = patrolField ↗ (ifuOffset - Offset(94950.mas.p, 89880.mas.q))
+    val s  = if (sideLooking) pf.flipQ else pf
+    s ↗ offsetPos  ⟲ posAngle
   }
-  */
+
 }
