@@ -61,25 +61,25 @@ final class OffsetSpec extends CatsSuite {
 
   test("Fixed Rotation tests") {
     val pqa = List(
-      (-1.arcsec,  0.arcsec,  90.deg) -> (( 0.arcsec,  1.arcsec)),
-      ( 0.arcsec,  1.arcsec,  90.deg) -> (( 1.arcsec,  0.arcsec)),
-      ( 1.arcsec,  0.arcsec,  90.deg) -> (( 0.arcsec, -1.arcsec)),
-      ( 0.arcsec, -1.arcsec,  90.deg) -> ((-1.arcsec,  0.arcsec)),
-      (-1.arcsec,  0.arcsec, -90.deg) -> (( 0.arcsec, -1.arcsec)),
-      ( 0.arcsec,  1.arcsec, -90.deg) -> ((-1.arcsec,  0.arcsec)),
-      ( 1.arcsec,  0.arcsec, -90.deg) -> (( 0.arcsec,  1.arcsec)),
-      ( 0.arcsec, -1.arcsec, -90.deg) -> (( 1.arcsec,  0.arcsec)),
-      (-1.arcsec,  0.arcsec,  30.deg) -> ((-866025.µas,  500000.µas)),
-      (-1.arcsec,  0.arcsec, -30.deg) -> ((-866025.µas, -500000.µas)),
-      (-2999291.µas,  9537000.µas,  Angle.fromDMS(148, 0, 54, 775, 807)) -> (( 7595657.µas, -6500470.µas)),
-      ( 7595657.µas, -6500470.µas, -Angle.fromDMS(148, 0, 54, 775, 807)) -> ((-2999291.µas,  9537000.µas))
+      (-1.arcsec.p,  0.arcsec.q,  90.deg) -> (( 0.arcsec.p,  1.arcsec.q)),
+      ( 0.arcsec.p,  1.arcsec.q,  90.deg) -> (( 1.arcsec.p,  0.arcsec.q)),
+      ( 1.arcsec.p,  0.arcsec.q,  90.deg) -> (( 0.arcsec.p, -1.arcsec.q)),
+      ( 0.arcsec.p, -1.arcsec.q,  90.deg) -> ((-1.arcsec.p,  0.arcsec.q)),
+      (-1.arcsec.p,  0.arcsec.q, -90.deg) -> (( 0.arcsec.p, -1.arcsec.q)),
+      ( 0.arcsec.p,  1.arcsec.q, -90.deg) -> ((-1.arcsec.p,  0.arcsec.q)),
+      ( 1.arcsec.p,  0.arcsec.q, -90.deg) -> (( 0.arcsec.p,  1.arcsec.q)),
+      ( 0.arcsec.p, -1.arcsec.q, -90.deg) -> (( 1.arcsec.p,  0.arcsec.q)),
+      (-1.arcsec.p,  0.arcsec.q,  30.deg) -> ((-866025.µas.p,  500000.µas.q)),
+      (-1.arcsec.p,  0.arcsec.q, -30.deg) -> ((-866025.µas.p, -500000.µas.q)),
+      (-2999291.µas.p,  9537000.µas.q,  Angle.fromDMS(148, 0, 54, 775, 807)) -> (( 7595657.µas.p, -6500470.µas.q)),
+      ( 7595657.µas.p, -6500470.µas.q, -Angle.fromDMS(148, 0, 54, 775, 807)) -> ((-2999291.µas.p,  9537000.µas.q))
     )
 
-    pqa.foreach { case ((p, q, a), (pʹ, qʹ)) =>
-      val expected = Offset.fromAngles(pʹ, qʹ)
-      val actual = Offset.fromAngles(p, q).rotate(a)
+    pqa.foreach { case ((p, q, θ), (pʹ, qʹ)) =>
+      val expected = Offset(pʹ, qʹ)
+      val actual = Offset(p, q).rotate(θ)
       if (Eq[Offset].neqv(expected, actual)) {
-        val t = s"Offset(${Angle.signedArcseconds.get(p)}, ${Angle.signedArcseconds.get(q)}).rotate(${a.toSignedDoubleDegrees}º)"
+        val t = s"Offset(${Offset.P.signedArcseconds.get(p)}, ${Offset.Q.signedArcseconds.get(q)}).rotate(${θ.toSignedDoubleDegrees}º)"
 
         fail(
           s"""$t
@@ -92,8 +92,8 @@ final class OffsetSpec extends CatsSuite {
 
   test("Rotation is invertable within 1 µas") {
     // not exactly invertable because of rounding
-    forAll { (o: Offset, a: Angle) =>
-      val oʹ = o.rotate(a).rotate(-a)
+    forAll { (o: Offset, θ: Angle) =>
+      val oʹ = o.rotate(θ).rotate(-θ)
       val (p,  q)  = Offset.microarcseconds.get(o)
       val (pʹ, qʹ) = Offset.microarcseconds.get(oʹ)
       assert(

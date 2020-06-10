@@ -74,7 +74,23 @@ object ShapeExpression {
    */
   final case class Rotate(e: ShapeExpression, a: Angle) extends ShapeExpression
 
+  /**
+   * Rotates the shape around the point at the given offset rather than the
+   * origin.
+   *
+   * @group Transformations
+   */
   final case class RotateAroundOffset(e: ShapeExpression, a: Angle, o: Offset) extends ShapeExpression
+
+  /**
+   * @group Transformations
+   */
+  final case class FlipP(e: ShapeExpression) extends ShapeExpression
+
+  /**
+   * @group Transformations
+   */
+  final case class FlipQ(e: ShapeExpression) extends ShapeExpression
 
   /**
    * @group Transformations

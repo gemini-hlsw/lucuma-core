@@ -83,7 +83,7 @@ object ProperMotion extends ProperMotionOptics {
     val (ra, dec) = properMotionʹ(
       baseCoordinates.toRadians,
       epoch.scheme.lengthOfYear,
-      properVelocity.toRadians,
+      properVelocity.toSignedDoubleRadians,
       radialVelocity,
       parallax.toMicroarcseconds.toDouble / 1000000.0,
       elapsedYears

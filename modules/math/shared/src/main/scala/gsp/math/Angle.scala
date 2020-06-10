@@ -103,6 +103,22 @@ sealed class Angle protected (val toMicroarcseconds: Long) {
   def -(a: Angle): Angle =
     Angle.fromMicroarcseconds(toMicroarcseconds - a.toMicroarcseconds)
 
+  /**
+   * This angle as an offset in p. Exact, invertible.
+   *
+   * @group Conversions
+   */
+  def p: Offset.P =
+    Offset.P(this)
+
+  /**
+   * This angle as an offset in q. Exact, invertible.
+   *
+   * @group Conversions
+   */
+  def q: Offset.Q =
+    Offset.Q(this)
+
   /** String representation of this Angle, for debugging purposes only. */
   override def toString: String = {
     val dms = Angle.dms.get(this)

@@ -53,6 +53,14 @@ object JtsShapeInterpreter extends ShapeInterpreter {
       case Union(a, b)        => toGeometry(a).union(toGeometry(b))
 
       // Transformations
+      case FlipP(e) =>
+        AffineTransformation.scaleInstance(-1.0, 1.0)
+          .transform(toGeometry(e))
+
+      case FlipQ(e) =>
+        AffineTransformation.scaleInstance(1.0, -1.0)
+          .transform(toGeometry(e))
+
       case Rotate(e, a)       =>
         AffineTransformation
           .rotationInstance(a.toDoubleRadians)

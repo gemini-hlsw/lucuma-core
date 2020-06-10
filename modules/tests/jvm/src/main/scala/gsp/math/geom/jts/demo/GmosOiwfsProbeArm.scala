@@ -80,7 +80,7 @@ object GmosOiwfsProbeArm {
     sideLooking: Boolean
   ): Angle = {
 
-    val t   = Offset.fromAngles(427520.mas, 101840.mas)
+    val t   = Offset(427520.mas.p, 101840.mas.q)
     val tʹ  = if (sideLooking) Offset.qAngle.modify(_.mirrorBy(Angle.Angle0))(t) else t
 
     val bx  = Angle.signedArcseconds.get(StageArmLength).toDouble
@@ -115,4 +115,21 @@ object GmosOiwfsProbeArm {
     Angle.fromDoubleRadians(-φ + θ + α + Pi / 2.0)
   }
 
+  /*
+  val patrolField: ShapeExpression =
+    ShapeExpression.Rectangle(
+      Offset(-11400.mas.p, -34920.mas.q),
+      Offset(201300.mas.p,  21469.mas.q)
+    )
+
+  def patrolFieldAt(
+//    posAngle:    Angle,
+//    offsetPos:   Offset,
+//    ifuOffset:   Offset,
+    sideLooking: Boolean
+  ): ShapeExpression = {
+    val s = if (sideLooking) patrolField.flipVertical else patrolField
+    s
+  }
+  */
 }

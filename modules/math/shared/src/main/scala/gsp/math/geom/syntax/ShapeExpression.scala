@@ -17,6 +17,12 @@ final class ShapeExpressionOps(val self: ShapeExpression) extends AnyVal {
   def intersection(that: ShapeExpression): ShapeExpression =
     Intersection(self, that)
 
+  def flipP: ShapeExpression =
+    FlipP(self)
+
+  def flipQ: ShapeExpression =
+    FlipQ(self)
+
   def rotate(a: Angle): ShapeExpression =
     Rotate(self, a)
 
@@ -125,9 +131,9 @@ final class ShapeExpressionCompanionOps(val self: ShapeExpression.type) extends 
     val v0  = Offset(Offset.P(radius), Offset.Q.Zero)
     val vs  = (1 until nSides).foldLeft(List(v0)) { (os, v) =>
       val θ = 2*v*Math.PI/nSides.toDouble
-      val p = Angle.signedMicroarcseconds.reverseGet((µas * Math.cos(θ)).round)
-      val q = Angle.signedMicroarcseconds.reverseGet((µas * Math.sin(θ)).round)
-      offset(p, q) :: os
+      val p = Angle.signedMicroarcseconds.reverseGet((µas * Math.cos(θ)).round).p
+      val q = Angle.signedMicroarcseconds.reverseGet((µas * Math.sin(θ)).round).q
+      Offset(p, q) :: os
     }
     Polygon(vs)
   }

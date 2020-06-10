@@ -25,10 +25,10 @@ object JtsDemo extends Frame("JTS Demo") {
     145.deg
 
   val guideStarOffset: Offset =
-    Offset.fromAngles(170543999.µas, -24177003.µas)
+    Offset(170543999.µas.p, -24177003.µas.q)
 
   val offsetPos: Offset       =
-    Offset.fromAngles(60.arcsec, 60.arcsec)
+    Offset(60.arcsec.p, 60.arcsec.q)
 
   // Shape to display
   val shapes: List[ShapeExpression] =

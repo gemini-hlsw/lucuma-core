@@ -40,26 +40,16 @@ final case class Offset(p: Offset.Component[Axis.P], q: Offset.Component[Axis.Q]
    * Rotates the offset around the origin and produces a new `Offset` at the
    * resulting location. Approximate, non-invertible.
    *
-   * @param a rotation angle
+   * @param θ rotation angle
    *
    * @return Offset at the new position
    */
-  def rotate(a: Angle): Offset = {
-    val r  = a.toSignedDoubleRadians
-    val pµ = -Angle.signedMicroarcseconds.get(p.toAngle)
-    val qµ =  Angle.signedMicroarcseconds.get(q.toAngle)
-    val pʹ = (pµ * cos(r) - qµ * sin(r)).round
-    val qʹ = (pµ * sin(r) + qµ * cos(r)).round
-
-    Offset.fromAngles(
-      Angle.signedMicroarcseconds.reverseGet(-pʹ),
-      Angle.signedMicroarcseconds.reverseGet(qʹ)
-    )
-  }
+  def rotate(θ: Angle): Offset =
+    Offset.rotateBy(θ)(this)
 
   /** This offset pair in radians. */
-  def toRadians: (Double, Double) =
-    (p.toRadians, q.toRadians)
+  def toSignedDoubleRadians: (Double, Double) =
+    (p.toSignedDoubleRadians, q.toSignedDoubleRadians)
 
   /** String representation of this Offset, for debugging purposes only. */
   override def toString: String =
@@ -103,7 +93,7 @@ object Offset extends OffsetOptics {
       Component[A](toAngle - o.toAngle)
 
     /** This component in signed radians. */
-    def toRadians: Double =
+    def toSignedDoubleRadians: Double =
       toAngle.toSignedDoubleRadians
   }
 
@@ -156,17 +146,14 @@ object Offset extends OffsetOptics {
 
   object Q extends ComponentCompanion[Axis.Q]
 
-  /**
-   * Constructs and offset from a pair of `Angle` representing the p and q
-   * components.
-   *
-   * @param `p` offset in p expressed as angular separation
-   * @param `q` offset in q expressed as angular separation
-   *
-   * @return resulting Offset
-   */
-  def fromAngles(p: Angle, q: Angle): Offset =
-    Offset(Offset.P(p), Offset.Q(q))
+  def rotateBy(θ: Angle): Offset => Offset = {
+    val r  = θ.toSignedDoubleRadians
+    Offset.signedMicroarcseconds.modify { case (pµ, qµ) => (
+      // p is converted to normal cartesian coordinates and back here
+      -(-pµ * cos(r) - qµ * sin(r)).round,
+       (-pµ * sin(r) + qµ * cos(r)).round
+    )}
+  }
 
 }
 
@@ -191,7 +178,7 @@ trait OffsetOptics {
   private def splitMonoFromAngleSplitMono[A](m: SplitMono[Angle, A]): SplitMono[Offset, (A, A)] =
     SplitMono(
       o => (m.get(o.p.toAngle), m.get(o.q.toAngle)),
-      t => Offset.fromAngles(m.reverseGet(t._1), m.reverseGet(t._2))
+      t => Offset(m.reverseGet(t._1).p, m.reverseGet(t._2).q)
     )
 
   /** @group Optics */
