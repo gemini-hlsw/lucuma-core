@@ -4,7 +4,7 @@
 package gsp.math.geom.jts
 package demo
 
-import gsp.math.Angle
+import gsp.math.{Angle, Offset}
 import gsp.math.geom.ShapeExpression
 import gsp.math.geom.jts.jvm.syntax.awt._
 import gsp.math.geom.jts.interpreter._
@@ -21,11 +21,29 @@ import scala.jdk.CollectionConverters._
  */
 object JtsDemo extends Frame("JTS Demo") {
 
+  val posAngle: Angle         =
+    145.deg
+
+  val guideStarOffset: Offset =
+    Offset(170543999.µas.p, -24177003.µas.q)
+
+  val offsetPos: Offset       =
+    Offset(60.arcsec.p, 60.arcsec.q)
+
+  // TODO: should come from the FPUnit enum in core
+  val ifuOffset: Offset       =
+    Offset.Zero
+
+  // TODO: when we move this core there should be an enum
+  val sideLooking: Boolean    =
+    true
+
   // Shape to display
   val shapes: List[ShapeExpression] =
     List(
-      GmosOiwfsProbeArm.shape ⟲ 45.deg,
-      GmosScienceAreaGeometry.imaging
+      GmosOiwfsProbeArm.shapeAt(posAngle, guideStarOffset, offsetPos, ifuOffset, sideLooking),
+      GmosOiwfsProbeArm.patrolFieldAt(posAngle, offsetPos, ifuOffset, sideLooking),
+      GmosScienceAreaGeometry.imaging ↗ offsetPos ⟲ posAngle
     )
 
   // Scale
