@@ -83,14 +83,14 @@ object GmosOiwfsProbeArm {
     val t   = Offset(427520.mas.p, 101840.mas.q)
     val tʹ  = if (sideLooking) Offset.qAngle.modify(_.mirrorBy(Angle.Angle0))(t) else t
 
-    val bx  = Angle.signedArcseconds.get(StageArmLength).toDouble
+    val bx  = Angle.signedDecimalArcseconds.get(StageArmLength).toDouble
     val bxᒾ = bx*bx
 
-    val mx  = Angle.signedArcseconds.get(PickoffArmLength).toDouble
+    val mx  = Angle.signedDecimalArcseconds.get(PickoffArmLength).toDouble
     val mxᒾ = mx*mx
 
     val (x, y) =
-      Offset.signedArcseconds.get(
+      Offset.signedDecimalArcseconds.get(
         tʹ.rotate(posAngle) + guideStar - (offsetPos - ifuOffset).rotate(posAngle)
       ).bimap(x => -x.toDouble, _.toDouble)
 

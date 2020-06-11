@@ -123,8 +123,8 @@ object Offset extends OffsetOptics {
     def angle[A]: Iso[Component[A], Angle] =
       GenIso[Component[A], Angle]
 
-    def signedArcseconds[A]: SplitMono[Component[A], BigDecimal] =
-      Angle.signedArcseconds.imapA(Component[A], _.toAngle)
+    def signedDecimalArcseconds[A]: SplitMono[Component[A], BigDecimal] =
+      Angle.signedDecimalArcseconds.imapA(Component[A], _.toAngle)
   }
 
   // P, Q types and objects defined for convenience.
@@ -139,7 +139,7 @@ object Offset extends OffsetOptics {
 
     val angle: Iso[Component[A], Angle] = Component.angle[A]
 
-    val signedArcseconds: SplitMono[Component[A], BigDecimal] = Component.signedArcseconds[A]
+    val signedDecimalArcseconds: SplitMono[Component[A], BigDecimal] = Component.signedDecimalArcseconds[A]
   }
 
   object P extends ComponentCompanion[Axis.P]
@@ -196,7 +196,7 @@ trait OffsetOptics {
     splitMonoFromAngleSplitMono(Angle.signedMicroarcseconds)
 
   /** @group Optics */
-  val signedArcseconds: SplitMono[Offset, (BigDecimal, BigDecimal)] =
-    splitMonoFromAngleSplitMono(Angle.signedArcseconds)
+  val signedDecimalArcseconds: SplitMono[Offset, (BigDecimal, BigDecimal)] =
+    splitMonoFromAngleSplitMono(Angle.signedDecimalArcseconds)
 
 }

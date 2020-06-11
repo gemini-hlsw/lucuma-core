@@ -22,8 +22,8 @@ final class AngleSpec extends CatsSuite {
   // Optics
   checkAll("microarcseconds", SplitMonoTests(Angle.microarcseconds).splitMono)
   checkAll("signedMicroarcseconds", SplitMonoTests(Angle.signedMicroarcseconds).splitMono)
-  checkAll("signedMilliarcseconds", SplitMonoTests(Angle.signedMilliarcseconds).splitMono)
-  checkAll("signedArcseconds", SplitMonoTests(Angle.signedArcseconds).splitMono)
+  checkAll("signedDecimalMilliarcseconds", SplitMonoTests(Angle.signedDecimalMilliarcseconds).splitMono)
+  checkAll("signedDecimalArcseconds", SplitMonoTests(Angle.signedDecimalArcseconds).splitMono)
   checkAll("milliarcseconds", WedgeTests(Angle.milliarcseconds).wedge)
   checkAll("arcseconds", WedgeTests(Angle.arcseconds).wedge)
   checkAll("arcminutes", WedgeTests(Angle.arcminutes).wedge)

@@ -78,7 +78,7 @@ object JtsDemo extends Frame("JTS Demo") {
       g2d.drawLine(0, -2, 0, 2)
 
       // Pixels in each grid square.
-      val gpx = Angle.signedArcseconds.get(gridSize).toDouble / arcsecPerPixel
+      val gpx = Angle.signedDecimalArcseconds.get(gridSize).toDouble / arcsecPerPixel
 
       val origStroke = g2d.getStroke
 
@@ -92,7 +92,7 @@ object JtsDemo extends Frame("JTS Demo") {
         val dpx = (i * gpx).round.toInt
 
         // distance from center in arcsec
-        val das = (i * Angle.signedArcseconds.get(gridSize).toDouble).round
+        val das = (i * Angle.signedDecimalArcseconds.get(gridSize).toDouble).round
 
         // Draw the labels (p increasing to the left, q increasing upward)
         g2d.drawString(s"$das", -dpx + 5, - halfCanvas + 10)
