@@ -19,7 +19,7 @@ final class OffsetQSpec extends CatsSuite {
   checkAll("Offset.Component[Axis.Q].commutativeGroup", CommutativeGroupTests[Offset.Component[Axis.Q]].commutativeGroup)
   checkAll("Offset.Component[Axis.Q].order", OrderTests[Offset.Component[Axis.Q]].order)
   checkAll("Offset.Component.angle[Axis.Q]", IsoTests(Offset.Component.angle[Axis.Q]))
-  checkAll("Offset.Component.signedArcseconds[Axis.Q]", SplitMonoTests(Offset.Component.signedArcseconds[Axis.Q]).splitMono)
+  checkAll("Offset.Component.signedArcseconds[Axis.Q]", SplitMonoTests(Offset.Component.signedDecimalArcseconds[Axis.Q]).splitMono)
 
   test("Equality must be natural") {
     forAll { (a: Offset.Component[Axis.Q], b: Offset.Component[Axis.Q]) =>

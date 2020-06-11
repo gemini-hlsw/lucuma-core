@@ -25,7 +25,7 @@ final class OffsetSpec extends CatsSuite {
   checkAll("Axis.QAngle", LensTests(Offset.qAngle))
   checkAll("Offset.microarcseconds", SplitMonoTests(Offset.microarcseconds).splitMono)
   checkAll("Offset.signedMicroarcseconds", SplitMonoTests(Offset.signedMicroarcseconds).splitMono)
-  checkAll("Offset.signedArcseconds", SplitMonoTests(Offset.signedArcseconds).splitMono)
+  checkAll("Offset.signedArcseconds", SplitMonoTests(Offset.signedDecimalArcseconds).splitMono)
 
   test("Equality must be natural") {
     forAll { (a: Offset, b: Offset) =>
@@ -79,7 +79,7 @@ final class OffsetSpec extends CatsSuite {
       val expected = Offset(pʹ, qʹ)
       val actual = Offset(p, q).rotate(θ)
       if (Eq[Offset].neqv(expected, actual)) {
-        val t = s"Offset(${Offset.P.signedArcseconds.get(p)}, ${Offset.Q.signedArcseconds.get(q)}).rotate(${θ.toSignedDoubleDegrees}º)"
+        val t = s"Offset(${Offset.P.signedDecimalArcseconds.get(p)}, ${Offset.Q.signedDecimalArcseconds.get(q)}).rotate(${θ.toSignedDoubleDegrees}º)"
 
         fail(
           s"""$t
