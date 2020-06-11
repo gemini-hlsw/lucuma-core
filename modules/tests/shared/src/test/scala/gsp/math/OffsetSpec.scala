@@ -94,8 +94,8 @@ final class OffsetSpec extends CatsSuite {
     // not exactly invertable because of rounding
     forAll { (o: Offset, θ: Angle) =>
       val oʹ = o.rotate(θ).rotate(-θ)
-      val (p,  q)  = Offset.microarcseconds.get(o)
-      val (pʹ, qʹ) = Offset.microarcseconds.get(oʹ)
+      val (p,  q)  = Offset.signedMicroarcseconds.get(o)
+      val (pʹ, qʹ) = Offset.signedMicroarcseconds.get(oʹ)
       assert(
         ((p - pʹ).abs <= 1) && ((q - qʹ).abs <= 1)
       )
