@@ -4,12 +4,12 @@
 package gsp.math.geom
 
 package jts.demo
-import gsp.math.{Angle, Offset}
+import gsp.math.{ Angle, Offset }
 import gsp.math.syntax.int._
 import gsp.math.geom.syntax.all._
 
 import cats.implicits._
-import scala.math.{asin, atan2, hypot, Pi, sin}
+import scala.math.{ Pi, asin, atan2, hypot, sin }
 
 // TODO: move to core
 
