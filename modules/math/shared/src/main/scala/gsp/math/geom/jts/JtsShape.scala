@@ -4,8 +4,8 @@
 package gsp.math.geom
 package jts
 
-import gsp.math.geom.jts.syntax.offset._
 import gsp.math.Offset
+import gsp.math.geom.jts.syntax.offset._
 import org.locationtech.jts.geom.Geometry
 
 
