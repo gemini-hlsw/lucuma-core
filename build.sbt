@@ -72,30 +72,3 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform)
   .jvmConfigure(_.enablePlugins(AutomateHeaderPlugin))
   .jsSettings(gspScalaJsSettings: _*)
 
-lazy val svgtests = project
-  .enablePlugins(ScalaJSPlugin)
-  .enablePlugins(ScalaJSBundlerPlugin)
-  .enablePlugins(AutomateHeaderPlugin)
-  .in(file("modules/svgtests"))
-  .dependsOn(math.js, tests.js)
-  .settings(
-    name := "gsp-math-svgtests",
-    skip in publish := true
-  )
-  .settings(gspScalaJsSettings: _*)
-  .settings(
-    Test / requireJsDomEnv := true,
-    version in installJsdom := "16.2.0",
-    useYarn := true,
-    version in webpack := "4.30.0",
-    webpackConfigFile in Test := Some(
-      baseDirectory.value / "src" / "test" / "test.webpack.config.js"
-    ),
-    libraryDependencies ++= Seq(
-      "org.scalameta" %%% "munit" % "0.7.8"
-    ),
-    testFrameworks := Seq(new TestFramework("munit.Framework")),
-    Compile / npmDependencies ++= Seq(
-      "@svgdotjs/svg.js" -> "3.0.16"
-    )
-  )
