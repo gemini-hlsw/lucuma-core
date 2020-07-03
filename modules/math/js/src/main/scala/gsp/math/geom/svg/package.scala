@@ -19,7 +19,7 @@ import org.locationtech.jts.geom.GeometryCollection
 import org.locationtech.jts.geom.Polygon
 import cats.data.NonEmptyList
 
-package object svg   {
+package object svg {
   type ScalingFn        = Double => Double
   type SvgPostProcessor = Element => Element
 
@@ -114,9 +114,7 @@ package svg {
           scalingFn: ScalingFn,
           a:         JtsShape
         ): Container = {
-          val svg      = a.g.toSvg(base, pp, scalingFn)
-          val envelope = a.g.getBoundary.getEnvelopeInternal
-          base.viewbox(envelope.getMinX, envelope.getMinY, envelope.getWidth, envelope.getHeight)
+          val svg = a.g.toSvg(base, pp, scalingFn)
           pp(svg).asInstanceOf[Container]
         }
       }
@@ -129,17 +127,18 @@ package svg {
           scalingFn: ScalingFn,
           a:         NonEmptyList[JtsShape]
         ): Container = {
+          // Safari doesn't support transformations on the svg directly, but it can transfor a group below it
+          val containerGroup = base.group()
+          containerGroup.addClass("jts-root-group")
           // We should calculate the viewbox of the whole geometry
           val composite = a.map(_.g).reduce(svg.geometryUnionSemigroup)
-          a.map(_.g).toList.map(_.toSvg(base, pp, scalingFn))
-          val envelope  = composite.getBoundary.getEnvelopeInternal
+          a.map(_.g).toList.map(_.toSvg(containerGroup, pp, scalingFn))
+          val envelope = composite.getBoundary.getEnvelopeInternal
           base.viewbox(scalingFn(envelope.getMinX),
                        scalingFn(envelope.getMinY),
                        scalingFn(envelope.getWidth),
-                       scalingFn(envelope.getHeight)
-          )
-          // we need to reverse the Y axis to match SVG
-          base.scale(1, -1)
+                       scalingFn(envelope.getHeight))
+          // Note the svg is reversed on y but we'll let clients do the flip
           pp(base).asInstanceOf[Container]
         }
       }
@@ -152,22 +151,23 @@ package svg {
           scalingFn: ScalingFn,
           a:         NonEmptyList[(String, JtsShape)]
         ): Container = {
+          // Safari doesn't support transformations on the svg directly, but it can transfor a group below it
+          val containerGroup = base.group()
+          containerGroup.addClass("jts-root-group")
           // We should calculate the viewbox of the whole geometry
           val composite = a.map(_._2.g).reduce(svg.geometryUnionSemigroup)
           a.map {
             case (id, g) =>
-              val c = g.toSvg(base, pp, scalingFn)
+              val c = g.toSvg(containerGroup, pp, scalingFn)
               // Set an id per geometry
               c.id(id)
           }
-          val envelope  = composite.getBoundary.getEnvelopeInternal
+          val envelope = composite.getBoundary.getEnvelopeInternal
           base.viewbox(scalingFn(envelope.getMinX),
                        scalingFn(envelope.getMinY),
                        scalingFn(envelope.getWidth),
-                       scalingFn(envelope.getHeight)
-          )
-          // we need to reverse the Y axis to match SVG
-          base.scale(1, -1)
+                       scalingFn(envelope.getHeight))
+          // Note the svg is reversed on y but we'll let clients do the flip
           base
         }
       }
