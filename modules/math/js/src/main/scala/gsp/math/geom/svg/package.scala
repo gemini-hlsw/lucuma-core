@@ -18,6 +18,7 @@ import org.locationtech.jts.geom.Geometry
 import org.locationtech.jts.geom.GeometryCollection
 import org.locationtech.jts.geom.Polygon
 import cats.data.NonEmptyList
+import cats.data.NonEmptyMap
 
 package object svg {
   type ScalingFn        = Double => Double
@@ -143,20 +144,21 @@ package svg {
         }
       }
 
-    implicit val renderJtsShapeListWithIds: RenderSvg[NonEmptyList[(String, JtsShape)]] =
-      new RenderSvg[NonEmptyList[(String, JtsShape)]] {
+    implicit val renderJtsShapeMapOfIds: RenderSvg[NonEmptyMap[String, JtsShape]] =
+      new RenderSvg[NonEmptyMap[String, JtsShape]] {
         def toSvg(
           base:      Container,
           pp:        SvgPostProcessor,
           scalingFn: ScalingFn,
-          a:         NonEmptyList[(String, JtsShape)]
+          a:         NonEmptyMap[String, JtsShape]
         ): Container = {
           // Safari doesn't support transformations on the svg directly, but it can transfor a group below it
           val containerGroup = base.group()
+          
           containerGroup.addClass("jts-root-group")
           // We should calculate the viewbox of the whole geometry
-          val composite = a.map(_._2.g).reduce(svg.geometryUnionSemigroup)
-          a.map {
+          val composite = a.toNonEmptyList.map(_.g).reduce(geometryUnionSemigroup)
+          a.toNel.map {
             case (id, g) =>
               val c = g.toSvg(containerGroup, pp, scalingFn)
               // Set an id per geometry
@@ -171,5 +173,6 @@ package svg {
           base
         }
       }
+
   }
 }
