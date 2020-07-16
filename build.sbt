@@ -70,5 +70,15 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform)
     skip in publish := true
   )
   .jvmConfigure(_.enablePlugins(AutomateHeaderPlugin))
+  .jvmSettings(
+    resolvers += "Gemini Repository" at "https://github.com/gemini-hlsw/maven-repo/raw/master/releases",
+    libraryDependencies ++= Seq(
+      "edu.gemini.ocs" %%% "edu-gemini-util-skycalc" % "2020001.1.7",
+      "com.disneystreaming" %%% "weaver-framework" % "0.4.1",
+      "com.disneystreaming" %%% "weaver-scalacheck" % "0.4.1",
+      "com.47deg" %%% "scalacheck-toolbox-datetime" % "0.3.5"
+    ),
+    testFrameworks += new TestFramework("weaver.framework.TestFramework")
+  )
   .jsSettings(gspScalaJsSettings: _*)
 
