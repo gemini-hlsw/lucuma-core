@@ -18,7 +18,7 @@ import com.fortysevendeg.scalacheck.datetime.GenDateTime.genDateTimeWithinRange
 import java.time._
 import gsp.math.Angle
 
-object ImprovedSkyCalcSpec extends SimpleIOSuite with IOCheckers {
+object ImprovedSkyCalcSpecJVM extends SimpleIOSuite with IOCheckers {
 
   implicit val showInstant: Show[Instant]   = Show.fromToString
   implicit val showZDT: Show[ZonedDateTime] = Show.fromToString
