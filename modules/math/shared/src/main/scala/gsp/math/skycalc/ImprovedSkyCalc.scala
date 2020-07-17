@@ -56,11 +56,10 @@ final class ImprovedSkyCalc(siteLatitude: Angle, siteLongitude: Angle, siteAlt: 
       cachedCoordinates = coords.some
       cachedInstant = instant.some
       cachedCalculateMoon = calculateMoon.some
-      val dateTime = DateTime(instant)
       val jdut     = new DoubleRef
       val sid      = new DoubleRef
       val curepoch = new DoubleRef
-      setup_time_place(dateTime, hoursLongitude, jdut, sid, curepoch)
+      setup_time_place(instant, hoursLongitude, jdut, sid, curepoch)
       val objra    = coords.ra.toAngle.toDoubleDegrees / 15
       val objdec   = coords.dec.toAngle.toDoubleDegrees
       val objepoch = 2000.0
@@ -192,8 +191,7 @@ final class ImprovedSkyCalc(siteLatitude: Angle, siteLongitude: Angle, siteAlt: 
     * Return the LST time for the given instant at the given site.
     */
   def getLst(instant: Instant): ZonedDateTime = {
-    val dateTime = DateTime(instant)
-    val jd       = date_to_jd(dateTime)
+    val jd       = instant_to_jd(instant)
     val lstHours = lst(jd, hoursLongitude)
     getLst(lstHours, instant)
   }

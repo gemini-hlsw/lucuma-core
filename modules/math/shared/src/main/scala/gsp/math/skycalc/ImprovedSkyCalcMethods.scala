@@ -9,6 +9,7 @@ import java.time.ZonedDateTime
 import java.time.ZoneId
 
 import scala.annotation.unused
+import java.time.ZoneOffset
 
 trait ImprovedSkyCalcMethods {
 
@@ -49,10 +50,8 @@ trait ImprovedSkyCalcMethods {
     Array[Double](-2.72, 3.86, 10.46, 17.20, 21.16, 23.62, 24.02, 23.93, 24.33, 26.77, 29.15, 31.07,
       33.15, 35.73, 40.18, 45.48, 50.54, 54.34, 56.86, 60.78, 62.97)
 
-  private val UT: ZoneId         = ZoneId.of("UT")
-  // private val NanosPerSecond: Double = 1e9
-  private val MillisPerNano: Int =
-    1_000_000 // Deliberately an Int to drop Nano precision
+  private val UT: ZoneId             = ZoneId.of("UT")
+  private val NanosPerSecond: Double = 1e9
 
   final protected class DoubleRef(var d: Double) {
     def this() = {
@@ -60,33 +59,6 @@ trait ImprovedSkyCalcMethods {
     }
 
     override def toString: String = d.toString
-  }
-
-  protected case class DateTime(
-    y:  Short,
-    mo: Short,
-    d:  Short,
-    h:  Short,
-    mn: Short,
-    s:  Double
-  )
-
-  protected object DateTime {
-    def apply(i: Instant): DateTime = {
-      val zdt = i.atZone(UT)
-
-      // println(zdt.getNano / MillisPerNano / 1000.0)
-
-      DateTime(
-        y = zdt.getYear.toShort,
-        mo = zdt.getMonthValue.toShort,
-        d = zdt.getDayOfMonth.toShort,
-        h = zdt.getHour.toShort,
-        mn = zdt.getMinute.toShort,
-        // s = zdt.getSecond + zdt.getNano / NanosPerSecond // Should we keep extra precision?
-        s = zdt.getSecond + zdt.getNano / MillisPerNano / 1000.0
-      )
-    }
   }
 
   /**
@@ -109,8 +81,8 @@ trait ImprovedSkyCalcMethods {
     val min    = md.toInt
     val sd     = (md - min) * 60.0
     val sec    = sd.toInt
-    val ms     = ((sd - sec) * 1000).toInt
-    val newZDT = zdt.`with`(LocalTime.of(h, min, sec, ms * MillisPerNano))
+    val ns     = ((sd - sec) * NanosPerSecond).toInt
+    val newZDT = zdt.`with`(LocalTime.of(h, min, sec, ns))
     if (nextDay) newZDT.plusHours(24) else newZDT
   }
 
@@ -134,13 +106,13 @@ trait ImprovedSkyCalcMethods {
     * change; returns zero if successful.
     */
   protected def setup_time_place(
-    date:     DateTime,
+    instant:  Instant,
     longit:   Double,
     jdut:     DoubleRef,
     sid:      DoubleRef,
     curepoch: DoubleRef
   ): Short = {
-    val jd = date_to_jd(date)
+    val jd = instant_to_jd(instant)
     sid.d = lst(jd, longit)
     jdut.d = jd
     curepoch.d = 2000.0 + (jd - J2000) / 365.25
@@ -893,7 +865,7 @@ trait ImprovedSkyCalcMethods {
     result
   }
 
-  protected def date_to_jd(date: DateTime): Double = {
+  protected def instant_to_jd(instant: Instant): Double = {
     var yr1    = 0
     var mo1    = 1
     val jdzpt  = 1720982
@@ -901,22 +873,23 @@ trait ImprovedSkyCalcMethods {
     var inter  = 0L
     var jd     = .0
     var jdfrac = .0
+    val date = instant.atZone(ZoneOffset.UTC)
     if (
-      (date.y <= 1900) | (date.y >= 2100)
+      (date.getYear <= 1900) | (date.getYear >= 2100)
     ) //        printf("Date out of range.  1900 - 2100 only.\n");
       //        return(0.);
       throw new IllegalArgumentException(
         "Date out of range.  1900 - 2100 only."
       )
-    if (date.mo <= 2) {
+    if (date.getMonthValue <= 2) {
       yr1 = -1
       mo1 = 13
     }
-    jdint = (365.25 * (date.y + yr1)).toLong /* truncates */
-    inter = (30.6001 * (date.mo + mo1)).toLong
-    jdint = jdint + inter + date.d + jdzpt
+    jdint = (365.25 * (date.getYear + yr1)).toLong /* truncates */
+    inter = (30.6001 * (date.getMonthValue + mo1)).toLong
+    jdint = jdint + inter + date.getDayOfMonth + jdzpt
     jd = jdint.toDouble
-    jdfrac = date.h / 24.0 + date.mn / 1440.0 + date.s / SEC_IN_DAY
+    jdfrac = date.getHour / 24.0 + date.getMinute / 1440.0 + (date.getSecond + date.getNano / NanosPerSecond) / SEC_IN_DAY
     if (jdfrac < 0.5) {
       jdint -= 1
       jdfrac = jdfrac + 0.5
