@@ -3,32 +3,30 @@
 
 package edu.gemini.skycalc
 
-import cats.Eq
-import cats.implicits._
-import gsp.math.Angle
-import gsp.math.Coordinates
 import java.time.Instant
 import java.time.ZonedDateTime
 
 import edu.gemini.skycalc.ImprovedSkyCalcMethods._
 import java.{ util => ju }
+import jsky.coords.WorldCoords
 
 /**
   * This class exists purely for testing purposes.
   * It provides the same functionality as {gsp.math.skycalc.ImprovedSkyCalc},
   * but it extends the Java implementation of ImprovedSkyCalcMethods, so that
   * its results can be compared against its Scala version.
-  * 
+  *
   * Must be in edu.gemini.skycalc package to be able to access ImprovedSkyCalcMethods
   * protected members.
   */
-final class ImprovedSkyCalcTest(siteLatitude: Angle, siteLongitude: Angle, siteAlt: Int)
-    extends ImprovedSkyCalcMethods {
+final class ImprovedSkyCalcTest(
+  val degreesLatitude: Double,
+  longitude:           Double,
+  val siteAltitude:    Double
+) extends ImprovedSkyCalcMethods {
 
   // Site parameters
-  private val hoursLongitude  = -siteLongitude.toDoubleDegrees / 15.0
-  private val degreesLatitude = siteLatitude.toDoubleDegrees
-  private val siteAltitude    = siteAlt.toDouble
+  private val hoursLongitude = -longitude / 15.0
 
   // calculated results
   private var altitude                             = .0
@@ -44,44 +42,29 @@ final class ImprovedSkyCalcTest(siteLatitude: Angle, siteLongitude: Angle, siteA
   private var sunAltitude                          = .0
   private var lunarElevation                       = .0
 
-  // caching for calculate()
-  private var cachedCoordinates: Option[Coordinates] = none
-  private var cachedInstant: Option[Instant]         = none
-  private var cachedCalculateMoon: Option[Boolean]   = none
-
-  private implicit val eqInstant: Eq[Instant] = Eq.by(i => (i.getEpochSecond, i.getNano))
-
   def calculate(
-    coords:        Coordinates,
-    instant:       Instant,
+    obj:           WorldCoords,
+    date:          ju.Date,
     calculateMoon: Boolean
-  ): Unit = { // Early exit if the parameters haven't changed.
-    if (coords.some =!= cachedCoordinates ||
-        instant.some =!= cachedInstant ||
-        calculateMoon.some =!= cachedCalculateMoon
-    ) {
-      cachedCoordinates = coords.some
-      cachedInstant = instant.some
-      cachedCalculateMoon = calculateMoon.some
-      val dateTime = new DateTime(ju.Date.from(instant))
-      val jdut     = new DoubleRef
-      val sid      = new DoubleRef
-      val curepoch = new DoubleRef
-      setup_time_place(dateTime, hoursLongitude, jdut, sid, curepoch)
-      val objra    = coords.ra.toAngle.toDoubleDegrees / 15
-      val objdec   = coords.dec.toAngle.toDoubleDegrees
-      val objepoch = 2000.0
-      getCircumstances(
-        objra,
-        objdec,
-        objepoch,
-        curepoch.d,
-        sid.d,
-        degreesLatitude,
-        jdut,
-        calculateMoon
-      )
-    }
+  ): Unit = {
+    val dateTime = new DateTime(date)
+    val jdut     = new DoubleRef
+    val sid      = new DoubleRef
+    val curepoch = new DoubleRef
+    setup_time_place(dateTime, hoursLongitude, jdut, sid, curepoch)
+    val objra    = obj.getRaDeg() / 15
+    val objdec   = obj.getDecDeg()
+    val objepoch = 2000.0
+    getCircumstances(
+      objra,
+      objdec,
+      objepoch,
+      curepoch.d,
+      sid.d,
+      degreesLatitude,
+      jdut,
+      calculateMoon
+    )
   }
 
   private def getCircumstances(

@@ -11,12 +11,14 @@ import edu.gemini.skycalc.ImprovedSkyCalcTest
 import cats.Show
 import java.time.Instant
 import gsp.math.Coordinates
-import gsp.math.arb.ArbAngle._
 import gsp.math.arb.ArbCoordinates._
+import gsp.math.arb.ArbLocation._
 import com.fortysevendeg.scalacheck.datetime.instances.jdk8._
 import com.fortysevendeg.scalacheck.datetime.GenDateTime.genDateTimeWithinRange
 import java.time._
-import gsp.math.Angle
+import gsp.math.Location
+import jsky.coords.WorldCoords
+import java.{ util => ju }
 
 object ImprovedSkyCalcSpecJVM extends SimpleIOSuite with IOCheckers {
 
@@ -31,30 +33,36 @@ object ImprovedSkyCalcSpecJVM extends SimpleIOSuite with IOCheckers {
   private val zdtRange = Duration.ofDays(Period.ofYears(1000).getDays.toLong)
 
   simpleTest("ImprovedSkyCalcSpec: Arbitrary sky calculations") {
-    forall { (latitude: Angle, longitude: Angle, altitude: Int) =>
-      // This generator already provides ZDTs with millisecond precision, not nano.
-      forall(genDateTimeWithinRange(zdtFrom, zdtRange)) { zdt =>
-        forall { coords: Coordinates =>
-          val calc     = new ImprovedSkyCalc(latitude, longitude, altitude)
-          val javaCalc = new ImprovedSkyCalcTest(latitude, longitude, altitude)
+    // This generator already provides ZDTs with millisecond precision, not nano.
+    forall(genDateTimeWithinRange(zdtFrom, zdtRange)) { zdt =>
+      forall { (location: Location, coords: Coordinates) =>
+        val calc = ImprovedSkyCalc(location)
+        val javaCalc = new ImprovedSkyCalcTest(location.latitude.toAngle.toSignedDoubleDegrees,
+                                               location.longitude.toSignedDoubleDegrees,
+                                               location.altitude
+        )
 
-          val instant = zdt.toInstant
+        val instant = zdt.toInstant
 
-          calc.calculate(coords, instant, false)
-          javaCalc.calculate(coords, instant, false)
+        val results = calc.calculate(coords, instant, false)
+        javaCalc.calculate(new WorldCoords(coords.ra.toAngle.toSignedDoubleDegrees,
+                                           coords.dec.toAngle.toSignedDoubleDegrees
+                           ),
+                           ju.Date.from(instant),
+                           false
+        )
 
-          expect(calc.getAltitude == javaCalc.getAltitude)
-          expect(calc.getAzimuth == javaCalc.getAzimuth)
-          expect(calc.getParallacticAngle == javaCalc.getParallacticAngle)
-          expect(calc.getHourAngle == javaCalc.getHourAngle)
-          expect(calc.getLunarIlluminatedFraction == javaCalc.getLunarIlluminatedFraction)
-          expect(calc.getLunarSkyBrightness == javaCalc.getLunarSkyBrightness)
-          expect(calc.getTotalSkyBrightness == javaCalc.getTotalSkyBrightness)
-          expect(calc.getLunarPhaseAngle == javaCalc.getLunarPhaseAngle)
-          expect(calc.getSunAltitude == javaCalc.getSunAltitude)
-          expect(calc.getLunarDistance == javaCalc.getLunarDistance)
-          expect(calc.getLunarElevation == javaCalc.getLunarElevation)
-        }
+        expect(results.altitudeRaw === javaCalc.getAltitude)
+          .and(expect(results.azimuthRaw === javaCalc.getAzimuth))
+          .and(expect(results.parallacticAngleRaw === javaCalc.getParallacticAngle))
+          .and(expect(results.hourAngleRaw === javaCalc.getHourAngle))
+          .and(expect(results.lunarIlluminatedFraction === javaCalc.getLunarIlluminatedFraction))
+          .and(expect(results.lunarSkyBrightness === javaCalc.getLunarSkyBrightness))
+          .and(expect(results.totalSkyBrightness === javaCalc.getTotalSkyBrightness))
+          .and(expect(results.lunarPhaseAngleRaw === javaCalc.getLunarPhaseAngle))
+          .and(expect(results.sunAltitudeRaw === javaCalc.getSunAltitude))
+          .and(expect(results.lunarDistance === javaCalc.getLunarDistance))
+          .and(expect(results.lunarElevationRaw === javaCalc.getLunarElevation))
       }
     }
   }

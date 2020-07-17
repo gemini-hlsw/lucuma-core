@@ -5,11 +5,14 @@ package gsp.math.skycalc
 
 import weaver._
 
+import cats.implicits._
 import cats.Monoid
 import cats.Show
 import java.time._
 import gsp.math.Coordinates
 import gsp.math.Angle
+import gsp.math.Location
+import gsp.math.Lat
 
 // This is just a basic case, mostly to test linking in JS.
 // Property based testing is in ImprovedSkyCalcSpecJVM, where output
@@ -19,23 +22,45 @@ object ImprovedSkyCalcSpec extends SimpleIOSuite {
   implicit val showInstant: Show[Instant]   = Show.fromToString
   implicit val showZDT: Show[ZonedDateTime] = Show.fromToString
 
-  private val GN = (Angle.fromDoubleDegrees(19.8238068), Angle.fromDoubleDegrees(-155.4690550), 4213)
-  private val GS = (Angle.fromDoubleDegrees(-30.2407494), Angle.fromDoubleDegrees(-70.7366867), 2722)
-  private val M51 = Coordinates.fromHmsDms.getOption("13 29 52.698000 +47 11 42.929988").get
-  private val Moment  = ZonedDateTime.of(LocalDate.of(2000,1,1), LocalTime.MIDNIGHT, ZoneOffset.UTC).toInstant
+  private val NanosPerMillis: Int = 1_000_000
 
-  private val expected: Map[((Angle, Angle, Int), Coordinates, Instant), Double] =
+  private def truncateInstantToMillis(i: Instant): Instant =
+    Instant.ofEpochSecond(
+      i.getEpochSecond,
+      (i.getNano / NanosPerMillis * NanosPerMillis).toLong
+    )
+
+  private val GN     =
+    Location(
+      Lat.fromAngleWithCarry(Angle.fromDoubleDegrees(19.8238068))._1,
+       Angle.hourAngle.get(Angle.fromDoubleDegrees(-155.4690550)),
+      4213.0
+    )
+  private val GS     =
+    Location(
+      Lat.fromAngleWithCarry(Angle.fromDoubleDegrees(-30.2407494))._1,
+      Angle.hourAngle.get(Angle.fromDoubleDegrees(-70.7366867)),
+      2722.0
+    )
+  private val M51    = Coordinates.fromHmsDms.getOption("13 29 52.698000 +47 11 42.929988").get
+  private val Moment = truncateInstantToMillis(
+    ZonedDateTime.of(LocalDate.of(2000, 1, 1), LocalTime.MIDNIGHT, ZoneOffset.UTC).toInstant
+  )
+
+  // Known results with OCS, computed with millis precision (uses ju.Date)
+  private val expected: Map[(Location, Coordinates, Instant), Double] =
     Map(
-      (GN, M51, Moment) -> 6.637492164370325,
-      (GS, M51, Moment) -> -72.26086414074315
+      (GN, M51, Moment) -> 6.637492164341347,
+      (GS, M51, Moment) -> -72.26086414073282
     )
 
   pureTest("ImprovedSkyCalcSpec: Elevation of M51 at midnight 2000-01-01 UTC") {
     Monoid[Expectations].combineAll(
-      expected.map{ case (((lat, long, alt), coords, instant), elevation) =>
-        val calc     = new ImprovedSkyCalc(lat, long, alt)
-        calc.calculate(coords, instant, false)
-        expect(calc.getAltitude == elevation)
+      expected.map {
+        case ((location, coords, instant), elevation) =>
+          val calc = ImprovedSkyCalc(location)
+          val results = calc.calculate(coords, instant, false)
+          expect(results.altitudeRaw === elevation)
       }
     )
   }

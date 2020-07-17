@@ -3,10 +3,8 @@
 
 package gsp.math.skycalc
 
-import cats.Eq
-import cats.implicits._
-import gsp.math.Angle
 import gsp.math.Coordinates
+import gsp.math.Location
 import java.time.Instant
 import java.time.ZonedDateTime
 
@@ -15,77 +13,62 @@ import java.time.ZonedDateTime
   * the trait is exclusively static stuff.
   * @author brighton, rnorris
   */
-final class ImprovedSkyCalc(siteLatitude: Angle, siteLongitude: Angle, siteAlt: Int)
-    extends ImprovedSkyCalcMethods {
-
-  // Site parameters
-  private val hoursLongitude  = -siteLongitude.toDoubleDegrees / 15.0
-  private val degreesLatitude = siteLatitude.toDoubleDegrees
-  private val siteAltitude    = siteAlt.toDouble
-
-  // calculated results
-  private var altitude                             = .0
-  private var hourAngle                            = .0
-  private var azimuth                              = .0
-  private var parallacticAngle                     = .0
-  private var airmass                              = .0
-  private var lunarSkyBrightness: java.lang.Double = .0
-  private var lunarDistance                        = .0
-  private var lunarIlluminatedFraction             = .0
-  private var totalSkyBrightness                   = .0
-  private var lunarPhaseAngle                      = .0
-  private var sunAltitude                          = .0
-  private var lunarElevation                       = .0
-
-  // caching for calculate()
-  private var cachedCoordinates: Option[Coordinates] = none
-  private var cachedInstant: Option[Instant]         = none
-  private var cachedCalculateMoon: Option[Boolean]   = none
-
-  private implicit val eqInstant: Eq[Instant] = Eq.by(i => (i.getEpochSecond, i.getNano))
+case class ImprovedSkyCalc(location: Location) extends ImprovedSkyCalcMethods {
+  val degreesLatitude = location.latitude.toAngle.toSignedDoubleDegrees
+  val hoursLongitude  = -location.longitude.toSignedDoubleDegrees / 15
+  val siteAltitude    = location.altitude.toDouble
 
   def calculate(
     coords:        Coordinates,
     instant:       Instant,
     calculateMoon: Boolean
-  ): Unit = { // Early exit if the parameters haven't changed.
-    if (coords.some =!= cachedCoordinates ||
-        instant.some =!= cachedInstant ||
-        calculateMoon.some =!= cachedCalculateMoon
-    ) {
-      cachedCoordinates = coords.some
-      cachedInstant = instant.some
-      cachedCalculateMoon = calculateMoon.some
-      val jdut     = new DoubleRef
-      val sid      = new DoubleRef
-      val curepoch = new DoubleRef
-      setup_time_place(instant, hoursLongitude, jdut, sid, curepoch)
-      val objra    = coords.ra.toAngle.toDoubleDegrees / 15
-      val objdec   = coords.dec.toAngle.toDoubleDegrees
-      val objepoch = 2000.0
-      getCircumstances(
-        objra,
-        objdec,
-        objepoch,
-        curepoch.d,
-        sid.d,
-        degreesLatitude,
-        jdut,
-        calculateMoon
-      )
-    }
+  ): SkyCalcResults = {
+    val jdut     = new DoubleRef
+    val sid      = new DoubleRef
+    val curepoch = new DoubleRef
+    setup_time_place(instant, hoursLongitude, jdut, sid, curepoch)
+    val objra    = coords.ra.toAngle.toSignedDoubleDegrees / 15
+    val objdec   = coords.dec.toAngle.toSignedDoubleDegrees
+    val objepoch = 2000.0
+    getCircumstances(
+      degreesLatitude,
+      siteAltitude,
+      objra,
+      objdec,
+      objepoch,
+      curepoch.d,
+      sid.d,
+      degreesLatitude,
+      jdut,
+      calculateMoon
+    )
   }
 
   private def getCircumstances(
-    objra:         Double,
-    objdec:        Double,
-    objepoch:      Double,
-    curep:         Double,
-    sid:           Double,
-    lat:           Double,
-    jdut:          DoubleRef,
-    calculateMoon: Boolean
-  ): Unit = {
+    degreesLatitude: Double,
+    siteAltitude:    Double,
+    objra:           Double,
+    objdec:          Double,
+    objepoch:        Double,
+    curep:           Double,
+    sid:             Double,
+    lat:             Double,
+    jdut:            DoubleRef,
+    calculateMoon:   Boolean
+  ): SkyCalcResults = {
+    var altitude                             = .0
+    var hourAngle                            = .0
+    var azimuth                              = .0
+    var parallacticAngle                     = .0
+    var airmass                              = .0
+    var lunarSkyBrightness: java.lang.Double = .0
+    var lunarDistance                        = .0
+    var lunarIlluminatedFraction             = .0
+    var totalSkyBrightness                   = .0
+    var lunarPhaseAngle                      = .0
+    var sunAltitude                          = .0
+    var lunarElevation                       = .0
+
     var ha     = .0
     var alt    = .0
     val az     = new DoubleRef
@@ -185,6 +168,21 @@ final class ImprovedSkyCalc(siteLatitude: Angle, siteLongitude: Angle, siteAlt: 
         subtend(ramoon.d, decmoon.d, rasun.d, decsun.d)
       )))
     }
+
+    SkyCalcResults(
+      altitude,
+      azimuth,
+      parallacticAngle,
+      airmass,
+      hourAngle,
+      lunarIlluminatedFraction.toFloat,
+      lunarSkyBrightness,
+      totalSkyBrightness,
+      lunarPhaseAngle,
+      sunAltitude,
+      lunarDistance,
+      lunarElevation
+    )
   }
 
   /**
@@ -195,28 +193,4 @@ final class ImprovedSkyCalc(siteLatitude: Angle, siteLongitude: Angle, siteAlt: 
     val lstHours = lst(jd, hoursLongitude)
     getLst(lstHours, instant)
   }
-
-  def getAltitude: Double = altitude
-
-  def getAzimuth: Double = azimuth
-
-  def getParallacticAngle: Double = parallacticAngle
-
-  def getAirmass: Double = airmass
-
-  def getHourAngle: Double = hourAngle
-
-  def getLunarIlluminatedFraction: Float = lunarIlluminatedFraction.toFloat
-
-  def getLunarSkyBrightness: Double = lunarSkyBrightness
-
-  def getTotalSkyBrightness: Double = totalSkyBrightness
-
-  def getLunarPhaseAngle: Double = lunarPhaseAngle
-
-  def getSunAltitude: Double = sunAltitude
-
-  def getLunarDistance: Double = lunarDistance
-
-  def getLunarElevation: Double = lunarElevation
 }

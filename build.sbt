@@ -9,12 +9,15 @@ lazy val catsTestkitScalaTestVersion = "1.0.1"
 lazy val scalaJavaTimeVersion        = "2.0.0"
 lazy val jtsVersion                  = "0.0.9"
 lazy val svgdotjsVersion             = "0.0.1"
+lazy val newType                     = "0.4.4"
 
-inThisBuild(Seq(
-  homepage := Some(url("https://github.com/gemini-hlsw/gsp-math")),
-  addCompilerPlugin("org.typelevel" %% "kind-projector" % kindProjectorVersion),
-  Global / onChangedBuildSource := ReloadOnSourceChanges
-) ++ gspPublishSettings)
+inThisBuild(
+  Seq(
+    homepage := Some(url("https://github.com/gemini-hlsw/gsp-math")),
+    addCompilerPlugin("org.typelevel" %% "kind-projector" % kindProjectorVersion),
+    Global / onChangedBuildSource := ReloadOnSourceChanges
+  ) ++ gspPublishSettings
+)
 
 skip in publish := true
 
@@ -76,12 +79,13 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform)
   )
   .jvmConfigure(_.enablePlugins(AutomateHeaderPlugin))
   .jvmSettings(
-    resolvers += "Gemini Repository" at "https://github.com/gemini-hlsw/maven-repo/raw/master/releases",
+    resolvers += "Gemini Repository".at(
+      "https://github.com/gemini-hlsw/maven-repo/raw/master/releases"
+    ),
     libraryDependencies ++= Seq(
-      "edu.gemini.ocs" %% "edu-gemini-util-skycalc" % "2020001.1.7",
-      "com.disneystreaming" %% "weaver-scalacheck" % "0.4.1",
-      "com.47deg" %% "scalacheck-toolbox-datetime" % "0.3.5"
+      "edu.gemini.ocs"      %% "edu-gemini-util-skycalc"     % "2020001.1.7",
+      "com.disneystreaming" %% "weaver-scalacheck"           % "0.4.1",
+      "com.47deg"           %% "scalacheck-toolbox-datetime" % "0.3.5"
     )
   )
   .jsSettings(gspScalaJsSettings: _*)
-
