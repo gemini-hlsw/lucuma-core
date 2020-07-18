@@ -10,7 +10,7 @@ import gsp.math.Declination
 import gsp.math.HourAngle
 import monocle.Getter
 
-/** Record that holds results of SkyCalc */
+/** Struct that holds results of SkyCalc. */
 final case class SkyCalcResults protected[skycalc](
   protected[skycalc] val altitudeRaw:         Double,
   protected[skycalc] val azimuthRaw:          Double,

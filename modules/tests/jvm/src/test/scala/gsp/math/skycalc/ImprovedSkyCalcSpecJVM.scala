@@ -33,36 +33,40 @@ object ImprovedSkyCalcSpecJVM extends SimpleIOSuite with IOCheckers {
   private val zdtRange = Duration.ofDays(Period.ofYears(1000).getDays.toLong)
 
   simpleTest("ImprovedSkyCalcSpec: Arbitrary sky calculations") {
-    // This generator already provides ZDTs with millisecond precision, not nano.
-    forall(genDateTimeWithinRange(zdtFrom, zdtRange)) { zdt =>
-      forall { (location: Location, coords: Coordinates) =>
-        val calc = ImprovedSkyCalc(location)
-        val javaCalc = new ImprovedSkyCalcTest(location.latitude.toAngle.toSignedDoubleDegrees,
-                                               location.longitude.toSignedDoubleDegrees,
-                                               location.altitude
-        )
-
+    forall { location: Location =>
+      // This SkyCalc should be thread safe, but Java's isn't.
+      val calc = ImprovedSkyCalc(location)
+      
+      // This generator already provides ZDTs with millisecond precision, not nano.
+      forall(genDateTimeWithinRange(zdtFrom, zdtRange)) { zdt =>
         val instant = zdt.toInstant
 
-        val results = calc.calculate(coords, instant, false)
-        javaCalc.calculate(new WorldCoords(coords.ra.toAngle.toSignedDoubleDegrees,
-                                           coords.dec.toAngle.toSignedDoubleDegrees
-                           ),
-                           ju.Date.from(instant),
-                           false
-        )
+        forall { coords: Coordinates =>
+          val javaCalc = new ImprovedSkyCalcTest(location.latitude.toAngle.toSignedDoubleDegrees,
+                                                location.longitude.toSignedDoubleDegrees,
+                                                location.altitude
+          )
 
-        expect(results.altitudeRaw === javaCalc.getAltitude)
-          .and(expect(results.azimuthRaw === javaCalc.getAzimuth))
-          .and(expect(results.parallacticAngleRaw === javaCalc.getParallacticAngle))
-          .and(expect(results.hourAngleRaw === javaCalc.getHourAngle))
-          .and(expect(results.lunarIlluminatedFraction === javaCalc.getLunarIlluminatedFraction))
-          .and(expect(results.lunarSkyBrightness === javaCalc.getLunarSkyBrightness))
-          .and(expect(results.totalSkyBrightness === javaCalc.getTotalSkyBrightness))
-          .and(expect(results.lunarPhaseAngleRaw === javaCalc.getLunarPhaseAngle))
-          .and(expect(results.sunAltitudeRaw === javaCalc.getSunAltitude))
-          .and(expect(results.lunarDistance === javaCalc.getLunarDistance))
-          .and(expect(results.lunarElevationRaw === javaCalc.getLunarElevation))
+          val results = calc.calculate(coords, instant, false)
+          javaCalc.calculate(new WorldCoords(coords.ra.toAngle.toSignedDoubleDegrees,
+                                            coords.dec.toAngle.toSignedDoubleDegrees
+                            ),
+                            ju.Date.from(instant),
+                            false
+          )
+
+          expect(results.altitudeRaw === javaCalc.getAltitude)
+            .and(expect(results.azimuthRaw === javaCalc.getAzimuth))
+            .and(expect(results.parallacticAngleRaw === javaCalc.getParallacticAngle))
+            .and(expect(results.hourAngleRaw === javaCalc.getHourAngle))
+            .and(expect(results.lunarIlluminatedFraction === javaCalc.getLunarIlluminatedFraction))
+            .and(expect(results.lunarSkyBrightness === javaCalc.getLunarSkyBrightness))
+            .and(expect(results.totalSkyBrightness === javaCalc.getTotalSkyBrightness))
+            .and(expect(results.lunarPhaseAngleRaw === javaCalc.getLunarPhaseAngle))
+            .and(expect(results.sunAltitudeRaw === javaCalc.getSunAltitude))
+            .and(expect(results.lunarDistance === javaCalc.getLunarDistance))
+            .and(expect(results.lunarElevationRaw === javaCalc.getLunarElevation))
+        }
       }
     }
   }
