@@ -4,7 +4,7 @@
 package gsp.math.skycalc
 
 import gsp.math.Coordinates
-import gsp.math.Location
+import gsp.math.Place
 import java.time.Instant
 import java.time.ZonedDateTime
 
@@ -13,10 +13,10 @@ import java.time.ZonedDateTime
   * the trait is exclusively static stuff.
   * @author brighton, rnorris
   */
-case class ImprovedSkyCalc(location: Location) extends ImprovedSkyCalcMethods {
-  val degreesLatitude = location.latitude.toAngle.toSignedDoubleDegrees
-  val hoursLongitude  = -location.longitude.toSignedDoubleDegrees / 15
-  val siteAltitude    = location.altitude.toDouble
+case class ImprovedSkyCalc(place: Place) extends ImprovedSkyCalcMethods {
+  val degreesLatitude = place.latitude.toAngle.toSignedDoubleDegrees
+  val hoursLongitude  = -place.longitude.toSignedDoubleDegrees / 15
+  val siteAltitude    = place.altitude.toDouble
 
   def calculate(
     coords:        Coordinates,

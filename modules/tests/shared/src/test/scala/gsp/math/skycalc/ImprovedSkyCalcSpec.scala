@@ -11,7 +11,7 @@ import cats.Show
 import java.time._
 import gsp.math.Coordinates
 import gsp.math.Angle
-import gsp.math.Location
+import gsp.math.Place
 import gsp.math.Lat
 
 // This is just a basic case, mostly to test linking in JS.
@@ -21,7 +21,7 @@ object ImprovedSkyCalcSpec extends SimpleIOSuite {
 
   implicit val showInstant: Show[Instant]   = Show.fromToString
   implicit val showZDT: Show[ZonedDateTime] = Show.fromToString
-  
+
   private val NanosPerMillis: Int = 1_000_000
 
   private def truncateInstantToMillis(i: Instant): Instant =
@@ -31,13 +31,13 @@ object ImprovedSkyCalcSpec extends SimpleIOSuite {
     )
 
   private val GN     =
-    Location(
+    Place(
       Lat.fromAngleWithCarry(Angle.fromDoubleDegrees(19.8238068))._1,
-       Angle.fromDoubleDegrees(-155.4690550),
+      Angle.fromDoubleDegrees(-155.4690550),
       4213.0
     )
   private val GS     =
-    Location(
+    Place(
       Lat.fromAngleWithCarry(Angle.fromDoubleDegrees(-30.2407494))._1,
       Angle.fromDoubleDegrees(-70.7366867),
       2722.0
@@ -48,7 +48,7 @@ object ImprovedSkyCalcSpec extends SimpleIOSuite {
   )
 
   // Known results with OCS, computed with millis precision (uses ju.Date)
-  private val expected: Map[(Location, Coordinates, Instant), Double] =
+  private val expected: Map[(Place, Coordinates, Instant), Double] =
     Map(
       (GN, M51, Moment) -> 6.637492164341347,
       (GS, M51, Moment) -> -72.26086414073282
@@ -58,7 +58,7 @@ object ImprovedSkyCalcSpec extends SimpleIOSuite {
     Monoid[Expectations].combineAll(
       expected.map {
         case ((location, coords, instant), elevation) =>
-          val calc = ImprovedSkyCalc(location)
+          val calc    = ImprovedSkyCalc(location)
           val results = calc.calculate(coords, instant, false)
           expect(results.altitudeRaw === elevation)
       }

@@ -9,24 +9,24 @@ import gsp.math.arb._
 import monocle.law.discipline._
 
 @SuppressWarnings(Array("org.wartremover.warts.ToString", "org.wartremover.warts.Equals"))
-object LocationSpec extends CatsSuite {
-  import ArbLocation._
+object PlaceSpec extends CatsSuite {
+  import ArbPlace._
   import ArbDeclination._
   import ArbAngle._
 
-  checkAll("Location.latitude", LensTests(Location.latitude))
-  checkAll("Location.longitude", LensTests(Location.longitude))
-  checkAll("Location.altitude", LensTests(Location.altitude))
+  checkAll("Place.latitude", LensTests(Place.latitude))
+  checkAll("Place.longitude", LensTests(Place.longitude))
+  checkAll("Place.altitude", LensTests(Place.altitude))
 
   test("Equality must be natural") {
-    forAll { (a: Location, b: Location) =>
-      a.equals(b) shouldEqual Eq[Location].eqv(a, b)
+    forAll { (a: Place, b: Place) =>
+      a.equals(b) shouldEqual Eq[Place].eqv(a, b)
     }
   }
 
   test("Show must be natural") {
-    forAll { (a: Location) =>
-      a.toString shouldEqual Show[Location].show(a)
+    forAll { (a: Place) =>
+      a.toString shouldEqual Show[Place].show(a)
     }
   }
 }

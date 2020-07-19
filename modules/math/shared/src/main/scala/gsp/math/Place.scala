@@ -9,25 +9,25 @@ import monocle.Lens
 import monocle.macros.GenLens
 
 /** A point on Earth, given latitude, longitude and altitude in m above sea level. */
-final case class Location(latitude: Lat, longitude: Lon, altitude: Double)
+final case class Place(latitude: Lat, longitude: Lon, altitude: Double)
 
-object Location {
-
-  /** @group Typeclass Instances */
-  implicit val LocationEqual: Eq[Location] = Eq.fromUniversalEquals
+object Place {
 
   /** @group Typeclass Instances */
-  implicit val LocationShow: Show[Location] = Show.fromToString
+  implicit val PlaceEqual: Eq[Place] = Eq.fromUniversalEquals
+
+  /** @group Typeclass Instances */
+  implicit val PlaceShow: Show[Place] = Show.fromToString
 
   /** @group Optics */
-  val latitude: Lens[Location, Lat] =
-    GenLens[Location](_.latitude)
+  val latitude: Lens[Place, Lat] =
+    GenLens[Place](_.latitude)
 
   /** @group Optics */
-  val longitude: Lens[Location, Lon] =
-    GenLens[Location](_.longitude)
+  val longitude: Lens[Place, Lon] =
+    GenLens[Place](_.longitude)
 
   /** @group Optics */
-  val altitude: Lens[Location, Double] =
-    GenLens[Location](_.altitude)
+  val altitude: Lens[Place, Double] =
+    GenLens[Place](_.altitude)
 }
