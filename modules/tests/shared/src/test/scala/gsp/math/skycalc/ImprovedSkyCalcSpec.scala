@@ -21,7 +21,7 @@ object ImprovedSkyCalcSpec extends SimpleIOSuite {
 
   implicit val showInstant: Show[Instant]   = Show.fromToString
   implicit val showZDT: Show[ZonedDateTime] = Show.fromToString
-
+  
   private val NanosPerMillis: Int = 1_000_000
 
   private def truncateInstantToMillis(i: Instant): Instant =
@@ -33,13 +33,13 @@ object ImprovedSkyCalcSpec extends SimpleIOSuite {
   private val GN     =
     Location(
       Lat.fromAngleWithCarry(Angle.fromDoubleDegrees(19.8238068))._1,
-       Angle.hourAngle.get(Angle.fromDoubleDegrees(-155.4690550)),
+       Angle.fromDoubleDegrees(-155.4690550),
       4213.0
     )
   private val GS     =
     Location(
       Lat.fromAngleWithCarry(Angle.fromDoubleDegrees(-30.2407494))._1,
-      Angle.hourAngle.get(Angle.fromDoubleDegrees(-70.7366867)),
+      Angle.fromDoubleDegrees(-70.7366867),
       2722.0
     )
   private val M51    = Coordinates.fromHmsDms.getOption("13 29 52.698000 +47 11 42.929988").get

@@ -3,7 +3,7 @@
 
 package gsp.math.arb
 
-import gsp.math.{ Declination, HourAngle, Location }
+import gsp.math.{ Angle, Declination, Location }
 import org.scalacheck._
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Cogen._
@@ -16,13 +16,13 @@ trait ArbLocation {
     Arbitrary {
       for {
         lat <- arbitrary[Declination]
-        lon <- arbitrary[HourAngle]
+        lon <- arbitrary[Angle]
         alt <- arbitrary[Double]
       } yield Location(lat, lon, alt)
     }
 
   implicit val cogCoordinates: Cogen[Location] =
-    Cogen[(Declination, HourAngle, Double)].contramap(loc => (loc.latitude, loc.longitude, loc.altitude))
+    Cogen[(Declination, Angle, Double)].contramap(loc => (loc.latitude, loc.longitude, loc.altitude))
 }
 
 object ArbLocation extends ArbLocation

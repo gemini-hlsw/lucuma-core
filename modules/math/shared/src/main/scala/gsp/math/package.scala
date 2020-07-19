@@ -15,7 +15,7 @@ package object math {
   type Lat = Declination
   val Lat: Declination.type = Declination
 
-  type Lon = HourAngle
-  val Lon: HourAngle.type = HourAngle
+  type Lon = Angle
+  val Lon: Angle.type = Angle
 
 }
