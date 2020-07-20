@@ -7,9 +7,15 @@ package gsp
 package object math {
 
   type RA = RightAscension
-  val  RA: RightAscension.type = RightAscension
+  val RA: RightAscension.type = RightAscension
 
   type Dec = Declination
-  val  Dec:  Declination.type = Declination
+  val Dec: Declination.type = Declination
+
+  type Lat = Declination
+  val Lat: Declination.type = Declination
+
+  type Lon = Angle
+  val Lon: Angle.type = Angle
 
 }
