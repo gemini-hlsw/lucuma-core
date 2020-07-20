@@ -7,9 +7,10 @@ import cats.Eq
 import cats.Show
 import monocle.Lens
 import monocle.macros.GenLens
+import java.time.ZoneId
 
 /** A point on Earth, given latitude, longitude and altitude in m above sea level. */
-final case class Place(latitude: Lat, longitude: Lon, altitude: Double)
+final case class Place(latitude: Lat, longitude: Lon, altitude: Double, zoneId: ZoneId)
 
 object Place {
 
@@ -30,4 +31,8 @@ object Place {
   /** @group Optics */
   val altitude: Lens[Place, Double] =
     GenLens[Place](_.altitude)
+
+  /** @group Optics */
+  val zoneId: Lens[Place, ZoneId] =
+    GenLens[Place](_.zoneId)
 }

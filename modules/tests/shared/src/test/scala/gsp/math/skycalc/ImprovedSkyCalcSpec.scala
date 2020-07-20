@@ -10,9 +10,7 @@ import cats.Monoid
 import cats.Show
 import java.time._
 import gsp.math.Coordinates
-import gsp.math.Angle
 import gsp.math.Place
-import gsp.math.Lat
 
 // This is just a basic case, mostly to test linking in JS.
 // Property based testing is in ImprovedSkyCalcSpecJVM, where output
@@ -30,18 +28,6 @@ object ImprovedSkyCalcSpec extends SimpleIOSuite {
       (i.getNano / NanosPerMillis * NanosPerMillis).toLong
     )
 
-  private val GN     =
-    Place(
-      Lat.fromAngleWithCarry(Angle.fromDoubleDegrees(19.8238068))._1,
-      Angle.fromDoubleDegrees(-155.4690550),
-      4213.0
-    )
-  private val GS     =
-    Place(
-      Lat.fromAngleWithCarry(Angle.fromDoubleDegrees(-30.2407494))._1,
-      Angle.fromDoubleDegrees(-70.7366867),
-      2722.0
-    )
   private val M51    = Coordinates.fromHmsDms.getOption("13 29 52.698000 +47 11 42.929988").get
   private val Moment = truncateInstantToMillis(
     ZonedDateTime.of(LocalDate.of(2000, 1, 1), LocalTime.MIDNIGHT, ZoneOffset.UTC).toInstant
@@ -57,8 +43,8 @@ object ImprovedSkyCalcSpec extends SimpleIOSuite {
   pureTest("ImprovedSkyCalcSpec: Elevation of M51 at midnight 2000-01-01 UTC") {
     Monoid[Expectations].combineAll(
       expected.map {
-        case ((location, coords, instant), elevation) =>
-          val calc    = ImprovedSkyCalc(location)
+        case ((place, coords, instant), elevation) =>
+          val calc    = ImprovedSkyCalc(place)
           val results = calc.calculate(coords, instant, false)
           expect(results.altitudeRaw === elevation)
       }
