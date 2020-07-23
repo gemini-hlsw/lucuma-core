@@ -8,7 +8,6 @@ import cats.kernel.laws.discipline._
 import gsp.math.arb._
 import monocle.law.discipline._
 
-@SuppressWarnings(Array("org.wartremover.warts.ToString", "org.wartremover.warts.Equals"))
 final class ProperMotionSpec extends CatsSuite {
   import ArbAngle._
   import ArbCoordinates._

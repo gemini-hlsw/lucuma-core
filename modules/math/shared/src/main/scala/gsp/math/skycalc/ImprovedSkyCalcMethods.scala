@@ -3,6 +3,8 @@
 
 package gsp.math.skycalc
 
+import gsp.math.JulianDate
+
 import java.time.LocalTime
 import java.time.Instant
 import java.time.ZonedDateTime
@@ -24,18 +26,18 @@ trait ImprovedSkyCalcMethods {
   protected val PI_OVER_2 = 1.57079632679490 // From Abramowitz & Stegun
 
   protected val ARCSEC_IN_RADIAN = 206264.8062471
-  protected val DEG_IN_RADIAN    = 57.2957795130823
+  val DEG_IN_RADIAN              = 57.2957795130823
   protected val HRS_IN_RADIAN    = 3.819718634205
   protected val KMS_AUDAY        = 1731.45683633 // km per sec in 1 AU/day
 
   protected val SPEED_OF_LIGHT = 299792.458 // in km per sec ... exact.
 
-  protected val J2000 = 2451545.0 // Julian date at standard epoch
+  protected val J2000 = JulianDate.J2000.toDouble
 
   protected val SEC_IN_DAY = 86400.0
   protected val FLATTEN    = 0.003352813 // flattening of earth, 1/298.257
 
-  protected val EQUAT_RAD = 6378137.0 // equatorial radius of earth, meters
+  val EQUAT_RAD = 6378137.0 // equatorial radius of earth, meters
 
   protected val ASTRO_UNIT = 1.4959787066e11 // 1 AU in meters
 
@@ -873,7 +875,7 @@ trait ImprovedSkyCalcMethods {
     var inter  = 0L
     var jd     = .0
     var jdfrac = .0
-    val date = instant.atZone(ZoneOffset.UTC)
+    val date   = instant.atZone(ZoneOffset.UTC)
     if (
       (date.getYear <= 1900) | (date.getYear >= 2100)
     ) //        printf("Date out of range.  1900 - 2100 only.\n");
@@ -889,7 +891,8 @@ trait ImprovedSkyCalcMethods {
     inter = (30.6001 * (date.getMonthValue + mo1)).toLong
     jdint = jdint + inter + date.getDayOfMonth + jdzpt
     jd = jdint.toDouble
-    jdfrac = date.getHour / 24.0 + date.getMinute / 1440.0 + (date.getSecond + date.getNano / NanosPerSecond) / SEC_IN_DAY
+    jdfrac =
+      date.getHour / 24.0 + date.getMinute / 1440.0 + (date.getSecond + date.getNano / NanosPerSecond) / SEC_IN_DAY
     if (jdfrac < 0.5) {
       jdint -= 1
       jdfrac = jdfrac + 0.5

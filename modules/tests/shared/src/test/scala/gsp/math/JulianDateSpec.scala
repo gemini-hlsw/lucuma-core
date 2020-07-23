@@ -8,11 +8,12 @@ import cats.kernel.laws.discipline._
 import cats.tests.CatsSuite
 
 import gsp.math.arb._
+import org.scalacheck.Gen._
 
 import java.time.LocalDateTime
+import java.time.Instant
+import org.scalacheck.Arbitrary
 
-
-@SuppressWarnings(Array("org.wartremover.warts.ToString", "org.wartremover.warts.Equals"))
 final class JulianDateSpec extends CatsSuite {
 
   import ArbJulianDate._
@@ -41,12 +42,12 @@ final class JulianDateSpec extends CatsSuite {
     val y = dt.getYear + 4800.0 - a
     val m = dt.getMonthValue + 12 * a - 3.0
     dt.getDayOfMonth +
-    floor((153.0 * m + 2.0) / 5.0) +
-    365 * y +
-    floor(y / 4.0) -
-    floor(y / 100.0) +
-    floor(y / 400.0) -
-    32045.0
+      floor((153.0 * m + 2.0) / 5.0) +
+      365 * y +
+      floor(y / 4.0) -
+      floor(y / 100.0) +
+      floor(y / 400.0) -
+      32045.0
   }
 
   test("JulianDate.dayNumber matches old calculation") {
@@ -62,21 +63,45 @@ final class JulianDateSpec extends CatsSuite {
 
     // See http://aa.usno.navy.mil/data/docs/JulianDate.php
     val tests = List(
-      (LocalDateTime.of(1918, 11, 11, 11,  0,  0), 2421908.958333),
-      (LocalDateTime.of(1969,  7, 21,  2, 56, 15), 2440423.622396),
-      (LocalDateTime.of(2001,  9, 11,  8, 46,  0), 2452163.865278),
-      (LocalDateTime.of(2345,  6,  7, 12,  0,  0), 2577711.000000)
+      (LocalDateTime.of(1918, 11, 11, 11, 0, 0), 2421908.958333),
+      (LocalDateTime.of(1969, 7, 21, 2, 56, 15), 2440423.622396),
+      (LocalDateTime.of(2001, 9, 11, 8, 46, 0), 2452163.865278),
+      (LocalDateTime.of(2345, 6, 7, 12, 0, 0), 2577711.000000)
     )
 
-    tests.foreach { case (ldt, expected) =>
-      val jd  = JulianDate.ofLocalDateTime(ldt)
-      assert((expected - jd.toDouble).abs <= 0.000001)
+    tests.foreach {
+      case (ldt, expected) =>
+        val jd = JulianDate.ofLocalDateTime(ldt)
+        assert((expected - jd.toDouble).abs <= 0.000001)
     }
   }
 
   test("Modified JulianDate should almost equal JulianDate - 2400000.5") {
     forAll { (j: JulianDate) =>
       assert(j.toModifiedDouble === (j.toDouble - 2400000.5) +- 0.000000001)
+    }
+  }
+
+  test("JulianDate.ofInstant(instant).toInstant === instant") {
+    implicit val InstantEq: Eq[Instant] = Eq.fromUniversalEquals
+
+    val positiveJDInstant =
+      implicitly[Arbitrary[Instant]].arbitrary.suchThat(i => !(i.isBefore(JulianDate.Epoch)))
+
+    forAll(positiveJDInstant) { (i: Instant) =>
+      assert(JulianDate.ofInstant(i).toInstant === i)
+    }
+  }
+
+  test("JulianDate.ofInstant(julianDate.toInstant) === julianDate") {
+    forAll { (j: JulianDate) =>
+      assert(JulianDate.ofInstant(j.toInstant) === j)
+    }
+  }
+
+  test("JulianDate.fromDoubleApprox(double).toDouble =~= double") {
+    forAll(posNum[Double]) { (d: Double) =>
+      assert(JulianDate.fromDoubleApprox(d).toDouble === d +- 0.000000000001)
     }
   }
 }

@@ -8,7 +8,6 @@ import cats.{ Eq, Show }
 import gsp.math.arb._
 import monocle.law.discipline._
 
-@SuppressWarnings(Array("org.wartremover.warts.ToString", "org.wartremover.warts.Equals"))
 object PlaceSpec extends CatsSuite {
   import ArbPlace._
   import ArbDeclination._

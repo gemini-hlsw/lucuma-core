@@ -10,7 +10,6 @@ import gsp.math.arb._
 import gsp.math.laws.discipline._
 import monocle.law.discipline._
 
-@SuppressWarnings(Array("org.wartremover.warts.ToString", "org.wartremover.warts.Equals"))
 final class DeclinationSpec extends CatsSuite {
   import ArbDeclination._
   import ArbAngle._
@@ -18,7 +17,9 @@ final class DeclinationSpec extends CatsSuite {
   // Laws
   checkAll("Declination", OrderTests[Declination].order)
   checkAll("fromAngle", PrismTests(Declination.fromAngle))
-  checkAll("fromStringHMS", FormatTests(Declination.fromStringSignedDMS).formatWith(ArbAngle.stringsDMS))
+  checkAll("fromStringHMS",
+           FormatTests(Declination.fromStringSignedDMS).formatWith(ArbAngle.stringsDMS)
+  )
 
   test("Equality must be natural") {
     forAll { (a: Declination, b: Declination) =>
@@ -29,7 +30,7 @@ final class DeclinationSpec extends CatsSuite {
   test("Eq must be consistent with .toAngle.toMicroarcseconds") {
     forAll { (a: Declination, b: Declination) =>
       Eq[Long].eqv(a.toAngle.toMicroarcseconds, b.toAngle.toMicroarcseconds) shouldEqual
-      Eq[Declination].eqv(a, b)
+        Eq[Declination].eqv(a, b)
     }
   }
 
@@ -43,7 +44,7 @@ final class DeclinationSpec extends CatsSuite {
     forAll { (a: Angle) =>
       (Declination.fromAngle.getOption(a), Declination.fromAngleWithCarry(a)) match {
         case (Some(d), (dʹ, false)) => d shouldEqual dʹ
-        case (None,    (d,  true))  => d.toAngle shouldEqual a.mirrorBy(Angle.Angle90)
+        case (None, (d, true))      => d.toAngle shouldEqual a.mirrorBy(Angle.Angle90)
         case _                      => fail("Unpossible")
       }
     }

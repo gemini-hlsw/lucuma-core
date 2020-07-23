@@ -6,7 +6,6 @@ package gsp.math.syntax
 import gsp.math.optics.Format
 import monocle.Prism
 
-@SuppressWarnings(Array("org.wartremover.warts.Null"))
 final class PrismOps[A, B](val self: Prism[A, B]) extends AnyVal {
 
   /** Weaken to Format. */
@@ -14,7 +13,6 @@ final class PrismOps[A, B](val self: Prism[A, B]) extends AnyVal {
     Format.fromPrism(self)
 
   /** Like getOption, but throws IllegalArgumentException on failure. */
-  @SuppressWarnings(Array("org.wartremover.warts.DefaultArguments"))
   def unsafeGet(a: A): B =
     asFormat.unsafeGet(a)
 

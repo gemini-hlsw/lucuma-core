@@ -4,11 +4,10 @@
 package gsp.math
 
 import cats.tests.CatsSuite
-import cats.{ Eq, Show, Order }
+import cats.{ Eq, Order, Show }
 import cats.kernel.laws.discipline._
 import gsp.math.arb._
 
-@SuppressWarnings(Array("org.wartremover.warts.ToString"))
 final class MagnitudeValueSpec extends CatsSuite {
   import ArbMagnitudeValue._
 
@@ -24,7 +23,7 @@ final class MagnitudeValueSpec extends CatsSuite {
   test("Order must be consistent with .scaledValue") {
     forAll { (a: MagnitudeValue, b: MagnitudeValue) =>
       Order[Int].comparison(a.scaledValue, b.scaledValue) shouldEqual
-      Order[MagnitudeValue].comparison(a, b)
+        Order[MagnitudeValue].comparison(a, b)
     }
   }
 

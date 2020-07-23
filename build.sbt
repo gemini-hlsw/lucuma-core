@@ -7,6 +7,7 @@ lazy val kindProjectorVersion        = "0.10.3"
 lazy val monocleVersion              = "2.0.5"
 lazy val catsTestkitScalaTestVersion = "1.0.1"
 lazy val scalaJavaTimeVersion        = "2.0.0"
+lazy val geminiLocalesVersion        = "0.5.0"
 lazy val jtsVersion                  = "0.0.9"
 lazy val svgdotjsVersion             = "0.0.1"
 lazy val newType                     = "0.4.4"
@@ -45,6 +46,7 @@ lazy val math = crossProject(JVMPlatform, JSPlatform)
   .jsSettings(
     libraryDependencies ++= Seq(
       "io.github.cquiroz" %%% "scala-java-time" % scalaJavaTimeVersion,
+      "edu.gemini"        %%% "gemini-locales"  % geminiLocalesVersion,
       "edu.gemini"        %%% "gpp-svgdotjs"    % svgdotjsVersion
     )
   )

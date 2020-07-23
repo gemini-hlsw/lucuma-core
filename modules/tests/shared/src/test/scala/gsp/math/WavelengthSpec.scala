@@ -4,20 +4,19 @@
 package gsp.math
 
 import cats.tests.CatsSuite
-import cats.{ Eq, Show, Order }
+import cats.{ Eq, Order, Show }
 import cats.kernel.laws.discipline._
 import gsp.math.arb._
 import monocle.law.discipline._
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Gen
 
-@SuppressWarnings(Array("org.wartremover.warts.ToString", "org.wartremover.warts.Equals"))
 final class WavelengthSpec extends CatsSuite {
   import ArbWavelength._
 
   // Laws
-  checkAll("Wavelength",      OrderTests[Wavelength].order)
-  checkAll("fromPicometers",  PrismTests(Wavelength.fromPicometers))
+  checkAll("Wavelength", OrderTests[Wavelength].order)
+  checkAll("fromPicometers", PrismTests(Wavelength.fromPicometers))
 
   // These are not valid `Format` because they don't round trip Wavelength -> Int -> Wavelength
   // Switching to bigger units loses precision.
@@ -34,7 +33,7 @@ final class WavelengthSpec extends CatsSuite {
   test("Order must be consistent with .toPicometers") {
     forAll { (a: Wavelength, b: Wavelength) =>
       Order[Int].comparison(a.toPicometers, b.toPicometers) shouldEqual
-      Order[Wavelength].comparison(a, b)
+        Order[Wavelength].comparison(a, b)
     }
   }
 
