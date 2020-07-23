@@ -10,7 +10,6 @@ import gsp.math.arb._
 import gsp.math.laws.discipline._
 import monocle.law.discipline._
 
-@SuppressWarnings(Array("org.wartremover.warts.ToString", "org.wartremover.warts.Equals"))
 final class HourAngleSpec extends CatsSuite {
   import ArbAngle._
 
@@ -38,7 +37,7 @@ final class HourAngleSpec extends CatsSuite {
   test("Equality must be consistent with .toMicroseconds") {
     forAll { (a: HourAngle, b: HourAngle) =>
       Eq[Long].eqv(a.toMicroseconds, b.toMicroseconds) shouldEqual
-      Eq[HourAngle].eqv(a, b)
+        Eq[HourAngle].eqv(a, b)
     }
   }
 
@@ -69,10 +68,10 @@ final class HourAngleSpec extends CatsSuite {
 
   test("Construction must normalize [non-pathological] angles") {
     forAll { (a: HourAngle, n: Int) =>
-      val factor   = n % 10
+      val factor = n % 10
       val msIn24 = 24L * 60L * 60L * 1000L * 1000L
-      val offset   = msIn24 * factor
-      val b = HourAngle.fromMicroseconds(a.toMicroseconds + offset)
+      val offset = msIn24 * factor
+      val b      = HourAngle.fromMicroseconds(a.toMicroseconds + offset)
       a shouldEqual b
     }
   }

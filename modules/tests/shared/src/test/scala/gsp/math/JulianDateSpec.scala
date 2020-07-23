@@ -14,7 +14,6 @@ import java.time.LocalDateTime
 import java.time.Instant
 import org.scalacheck.Arbitrary
 
-@SuppressWarnings(Array("org.wartremover.warts.ToString", "org.wartremover.warts.Equals"))
 final class JulianDateSpec extends CatsSuite {
 
   import ArbJulianDate._

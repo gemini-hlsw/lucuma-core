@@ -8,7 +8,6 @@ import cats.{ Eq, Show }
 import gsp.math.arb._
 import gsp.math.skycalc.TwilightBoundType
 
-@SuppressWarnings(Array("org.wartremover.warts.ToString", "org.wartremover.warts.Equals"))
 object TwilightBoundTypeSpec extends CatsSuite {
   import ArbTwilightBoundType._
 

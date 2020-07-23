@@ -10,7 +10,6 @@ import gsp.math.arb._
 import gsp.math.laws.discipline._
 import java.time.LocalDateTime
 
-@SuppressWarnings(Array("org.wartremover.warts.ToString", "org.wartremover.warts.Equals"))
 final class EpochSpec extends CatsSuite {
   import ArbEpoch._
   import ArbTime._

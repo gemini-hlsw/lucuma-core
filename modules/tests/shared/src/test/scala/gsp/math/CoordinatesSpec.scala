@@ -10,7 +10,6 @@ import gsp.math.laws.discipline._
 import gsp.math.arb._
 import monocle.law.discipline._
 
-@SuppressWarnings(Array("org.wartremover.warts.ToString", "org.wartremover.warts.Equals"))
 final class CoordinatesSpec extends CatsSuite {
   import ArbCoordinates._
   import ArbRightAscension._
@@ -19,7 +18,9 @@ final class CoordinatesSpec extends CatsSuite {
 
   // Laws
   checkAll("Coordinates", OrderTests[Coordinates].order)
-  checkAll("Coordinates.fromHmsDms", FormatTests(Coordinates.fromHmsDms).formatWith(ArbCoordinates.strings))
+  checkAll("Coordinates.fromHmsDms",
+           FormatTests(Coordinates.fromHmsDms).formatWith(ArbCoordinates.strings)
+  )
   checkAll("Coordinates.rightAscension", LensTests(Coordinates.rightAscension))
   checkAll("Coordinates.declination", LensTests(Coordinates.declination))
 
@@ -45,21 +46,21 @@ final class CoordinatesSpec extends CatsSuite {
     forAll { (a: Coordinates, dRA: HourAngle, dDec: Angle) =>
       a.offsetWithCarry(dRA, dDec) match {
         case (cs, false) => cs.offset(-dRA, -dDec) shouldEqual a
-        case (cs, true)  => cs.offset(-dRA,  dDec) shouldEqual a
+        case (cs, true)  => cs.offset(-dRA, dDec) shouldEqual a
       }
     }
   }
 
   test("diff must be consistent with offset") {
     forAll { (a: Coordinates, b: Coordinates) =>
-      val (dRA, dDec) = a diff b
+      val (dRA, dDec) = a.diff(b)
       a.offset(dRA, dDec) shouldEqual b
     }
   }
 
   test("diff must be consistent with offsetWithCarry, and never carry") {
     forAll { (a: Coordinates, b: Coordinates) =>
-      val (dRA, dDec) = a diff b
+      val (dRA, dDec) = a.diff(b)
       a.offsetWithCarry(dRA, dDec).shouldEqual((b, false))
     }
   }
@@ -91,7 +92,9 @@ final class CoordinatesSpec extends CatsSuite {
     }
   }
 
-  test("angularDistance must be 90° between either pole and any point on the equator, regardless of RA, within 1µas") {
+  test(
+    "angularDistance must be 90° between either pole and any point on the equator, regardless of RA, within 1µas"
+  ) {
     forAll { (ra1: RA, ra2: RA, b: Boolean) =>
       val pole  = Coordinates(ra1, if (b) Dec.Min else Dec.Max)
       val point = Coordinates(ra2, Dec.Zero)
@@ -100,7 +103,9 @@ final class CoordinatesSpec extends CatsSuite {
     }
   }
 
-  test("angularDistance must equal any offset in declination from either pole, regardless of RA, to within 1µas") {
+  test(
+    "angularDistance must equal any offset in declination from either pole, regardless of RA, to within 1µas"
+  ) {
     forAll { (ra1: RA, ra2: RA, dec: Dec, b: Boolean) =>
       val pole = Coordinates(ra1, if (b) Dec.Min else Dec.Max)
       val Δdec = dec.toAngle + Angle.Angle90 // [0, 180]
@@ -109,7 +114,9 @@ final class CoordinatesSpec extends CatsSuite {
     }
   }
 
-  test("angularDistance must equal any offset in right ascension along the equator, to within 1µas") {
+  test(
+    "angularDistance must equal any offset in right ascension along the equator, to within 1µas"
+  ) {
     forAll { (ra: RA, ha: HourAngle) =>
       val a = Coordinates(ra, Dec.Zero)
       val b = a.offset(ha, Angle.Angle0)
@@ -119,14 +126,18 @@ final class CoordinatesSpec extends CatsSuite {
     }
   }
 
-  test("interpolate should result in angular distance of 0° from `a` for factor 0.0, within 1µsec (15µas)") {
+  test(
+    "interpolate should result in angular distance of 0° from `a` for factor 0.0, within 1µsec (15µas)"
+  ) {
     forAll { (a: Coordinates, b: Coordinates) =>
       val Δ = a.angularDistance(a.interpolate(b, 0.0))
       Angle.signedMicroarcseconds.get(Δ).abs should be <= 15L
     }
   }
 
-  test("interpolate should result in angular distance of 0° from `b` for factor 1.0, within 1µsec (15µas)") {
+  test(
+    "interpolate should result in angular distance of 0° from `b` for factor 1.0, within 1µsec (15µas)"
+  ) {
     forAll { (a: Coordinates, b: Coordinates) =>
       val Δ = b.angularDistance(a.interpolate(b, 1.0))
       Angle.signedMicroarcseconds.get(Δ).abs should be <= 15L
