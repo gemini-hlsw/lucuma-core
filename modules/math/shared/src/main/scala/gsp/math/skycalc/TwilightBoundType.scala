@@ -4,6 +4,7 @@
 package gsp.math.skycalc
 
 import cats._
+import cats.implicits._
 
 /**
   * Definition for how the range from sunset to sunrise should be defined for
@@ -21,8 +22,11 @@ object TwilightBoundType {
 
   val all: List[TwilightBoundType] = List(Official, Civil, Nautical, Astronomical)
 
+  // Hashed index lookup, for efficient use as an `Order`.
+  private lazy val indexOfTag: Map[TwilightBoundType, Int] = all.zipWithIndex.toMap
+
   /** @group Typeclass Instances */
-  implicit val TwilightBoundTypeEqual: Eq[TwilightBoundType] = Eq.fromUniversalEquals
+  implicit val TwilightBoundTypeOrder: Order[TwilightBoundType] = Order.by(indexOfTag)
 
   /** @group Typeclass Instances */
   implicit val TwilightBoundTypeShow: Show[TwilightBoundType] = Show.show(_.name)
