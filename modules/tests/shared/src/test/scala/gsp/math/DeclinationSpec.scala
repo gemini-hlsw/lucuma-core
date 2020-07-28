@@ -65,4 +65,13 @@ final class DeclinationSpec extends CatsSuite {
     }
   }
 
+  test("Declination from degrees") {
+    // Sanity checks
+    Declination.fromDoubleDegrees(0) shouldEqual Declination.Zero.some
+    Declination.fromDoubleDegrees(90) shouldEqual Declination.Max.some
+    Declination.fromDoubleDegrees(-90) shouldEqual Declination.Min.some
+    Declination.fromDoubleDegrees(-90) shouldEqual Declination.fromDoubleDegrees(270)
+    Declination.fromDoubleDegrees(180) shouldEqual None
+  }
+
 }

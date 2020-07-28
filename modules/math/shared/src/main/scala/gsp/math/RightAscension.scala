@@ -54,6 +54,13 @@ object RightAscension extends RightAscensionOptics {
     RightAscension(Angle.hourAngle.get(Angle.fromDoubleRadians(rad)))
 
   /**
+   * Construct a `RightAscension` from an angle in degrees. Approximate
+   * @group Constructors
+   */
+  def fromDoubleDegrees(deg: Double): RightAscension =
+    fromHourAngle.get(HourAngle.fromDoubleDegrees(deg))
+
+  /**
    * The `RightAscension` at zero degrees.
    * @group Constructors
    */
