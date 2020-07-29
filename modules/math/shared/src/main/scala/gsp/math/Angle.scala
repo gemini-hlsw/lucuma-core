@@ -257,6 +257,7 @@ object Angle extends AngleOptics {
     def format: String = f"$degrees%02d:$arcminutes%02d:$arcseconds%02d.$milliarcseconds%03d$microarcseconds%03d"
     override def toString: String = s"DMS($format)"
   }
+
   object DMS {
     implicit val eqDMS: Eq[DMS] =
       Eq.by(_.toAngle)
@@ -487,11 +488,18 @@ object HourAngle extends HourAngleOptics {
   }
 
   /**
-   * Construct a new Angle of the given magnitude in floating point hours, modulo 24h. Approximate.
+   * Construct a new HourAngle of the given magnitude in floating point hours, modulo 24h. Approximate.
    * @group Constructors
    */
   def fromDoubleHours(hs: Double): HourAngle =
     fromMicroseconds((hs * µsPerHour).round)
+
+  /**
+   * Construct a new HourAngle of the given magnitude in double degrees, modulo 360°. Approximate.
+   * @group Constructors
+   */
+  def fromDoubleDegrees(deg: Double): HourAngle =
+    Angle.hourAngle.get(Angle.fromDoubleDegrees(deg))
 
   /**
    * Construct a new HourAngle of the given magnitude as a sum of hours, minutes, seconds,
@@ -545,6 +553,7 @@ object HourAngle extends HourAngleOptics {
     def format: String = f"$hours%02d:$minutes%02d:$seconds%02d.$milliseconds%03d$microseconds%03d"
     override def toString: String = format
   }
+
   object HMS {
     implicit val eqHMS: Eq[HMS] =
       Eq.by(_.toHourAngle)

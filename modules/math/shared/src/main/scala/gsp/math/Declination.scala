@@ -63,6 +63,14 @@ object Declination extends DeclinationOptics {
       (fromAngle.unsafeGet(a mirrorBy Angle.Angle90), true)
     }
 
+  /**
+   * Attempt to build a `Declination` from double degrees. To get a `Declination` degrees must be
+   * in the range [-90°, 90°], or [270 - 360) + [0-90]
+   * @group Constructors
+   */
+  def fromDoubleDegrees(deg: Double): Option[Declination] = 
+    fromAngle.getOption(Angle.fromDoubleDegrees(deg))
+
   def fromRadians(rad: Double): Option[Declination] =
     fromAngle.getOption(Angle.fromDoubleRadians(rad))
 
