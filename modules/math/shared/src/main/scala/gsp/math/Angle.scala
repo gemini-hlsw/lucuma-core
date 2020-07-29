@@ -498,8 +498,8 @@ object HourAngle extends HourAngleOptics {
    * Construct a new HourAngle of the given magnitude in double degrees, modulo 360°. Approximate.
    * @group Constructors
    */
-  def fromDoubleDegrees(hs: Double): HourAngle =
-    Angle.hourAngle.get(Angle.fromDoubleDegrees(hs))
+  def fromDoubleDegrees(deg: Double): HourAngle =
+    Angle.hourAngle.get(Angle.fromDoubleDegrees(deg))
 
   /**
    * Construct a new HourAngle of the given magnitude as a sum of hours, minutes, seconds,
