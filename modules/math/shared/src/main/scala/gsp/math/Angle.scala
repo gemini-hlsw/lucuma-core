@@ -233,7 +233,7 @@ object Angle extends AngleOptics {
     Order.by(signedMicroarcseconds.get)
 
   // This works for both DMS and HMS so let's just do it once.
-  protected[math] def toMicrosexigesimal(micros: Long): (Int, Int, Int, Int, Int) = {
+  def toMicrosexigesimal(micros: Long): (Int, Int, Int, Int, Int) = {
     val µs =  micros                               % 1000L
     val ms = (micros /  1000L)                     % 1000L
     val s  = (micros / (1000L * 1000L))            % 60L
