@@ -84,9 +84,12 @@ trait ArbTime {
 
   implicit val cogYear: Cogen[Year] =
     Cogen[Int].contramap(_.getValue)
+<<<<<<< HEAD:modules/testkit/src/main/scala/lucuma/core/math/arb/ArbTime.scala
 
   implicit val cogZoneId: Cogen[ZoneId] =
     Cogen[String].contramap(_.getId)
+=======
+>>>>>>> f88e96d... Migration of constraint solver classes.:modules/testkit/shared/src/main/scala/gsp/math/arb/ArbTime.scala
 }
 
 object ArbTime extends ArbTime

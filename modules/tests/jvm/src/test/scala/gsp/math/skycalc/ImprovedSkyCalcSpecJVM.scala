@@ -7,22 +7,26 @@ import munit.ScalaCheckSuite
 import org.scalacheck.Prop._
 
 import edu.gemini.skycalc.ImprovedSkyCalcTest
+<<<<<<< HEAD
 import cats.Show
 import java.time.Instant
 import lucuma.core.math.Coordinates
 import lucuma.core.math.arb.ArbCoordinates._
 import lucuma.core.math.arb.ArbPlace._
+=======
+import gsp.math.Coordinates
+import gsp.math.arb.ArbCoordinates._
+import gsp.math.arb.ArbPlace._
+>>>>>>> f88e96d... Migration of constraint solver classes.
 import com.fortysevendeg.scalacheck.datetime.instances.jdk8._
 import com.fortysevendeg.scalacheck.datetime.GenDateTime.genDateTimeWithinRange
 import java.time._
 import lucuma.core.math.Place
 import jsky.coords.WorldCoords
 import java.{ util => ju }
+import io.chrisdavenport.cats.time._
 
 final class ImprovedSkyCalcSpecJVM extends ScalaCheckSuite {
-
-  implicit val showInstant: Show[Instant]   = Show.fromToString
-  implicit val showZDT: Show[ZonedDateTime] = Show.fromToString
 
   private val zdtFrom  = ZonedDateTime.of(
     LocalDate.of(1901, 1, 1),

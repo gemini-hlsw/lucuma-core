@@ -3,8 +3,15 @@
 
 package lucuma.core.math.skycalc
 
+<<<<<<< HEAD:modules/core/shared/src/main/scala/lucuma/core/math/skycalc/ImprovedSkyCalc.scala
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Place
+=======
+import Constants._
+
+import gsp.math.Coordinates
+import gsp.math.Place
+>>>>>>> f88e96d... Migration of constraint solver classes.:modules/math/shared/src/main/scala/gsp/math/skycalc/ImprovedSkyCalc.scala
 import java.time.Instant
 import java.time.ZonedDateTime
 
@@ -144,15 +151,15 @@ case class ImprovedSkyCalc(place: Place) extends ImprovedSkyCalcMethods {
       // Sky brightness
       lunarSkyBrightness = null
       lunarDistance =
-        DEG_IN_RADIAN * subtend(ramoon.d, decmoon.d, objra, objdec)
+        DegsInRadian * subtend(ramoon.d, decmoon.d, objra, objdec)
       lunarPhaseAngle =
-        DEG_IN_RADIAN * subtend(ramoon.d, decmoon.d, toporasun.d, topodecsun.d)
+        DegsInRadian * subtend(ramoon.d, decmoon.d, toporasun.d, topodecsun.d)
       if (lunarElevation > -2.0)
         if ((lunarElevation > 0.0) && (altitude > 0.5) && (sunAltitude < -9.0))
           lunarSkyBrightness = lunskybright(
             lunarPhaseAngle,
             lunarDistance,
-            KZEN,
+            KZen,
             lunarElevation,
             altitude,
             distmoon.d
