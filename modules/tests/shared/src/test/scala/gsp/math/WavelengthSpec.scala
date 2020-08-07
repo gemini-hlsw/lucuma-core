@@ -7,22 +7,21 @@ import cats.tests.CatsSuite
 import cats.{ Eq, Order, Show }
 import cats.kernel.laws.discipline._
 import gsp.math.arb._
+import gsp.math.units._
 import monocle.law.discipline._
-import org.scalacheck.Arbitrary._
-import org.scalacheck.Gen
+import coulomb.refined._
+import eu.timepit.refined.auto._
+import eu.timepit.refined.numeric._
+import eu.timepit.refined.scalacheck.numeric._
+import eu.timepit.refined.cats._
 
 final class WavelengthSpec extends CatsSuite {
   import ArbWavelength._
 
   // Laws
   checkAll("Wavelength", OrderTests[Wavelength].order)
+  checkAll("picometers", IsoTests(Wavelength.picometers))
   checkAll("fromPicometers", PrismTests(Wavelength.fromPicometers))
-
-  // These are not valid `Format` because they don't round trip Wavelength -> Int -> Wavelength
-  // Switching to bigger units loses precision.
-//  checkAll("fromAngstroms",   FormatTests(Wavelength.fromAngstroms).formatWith(arbitrary[Int]))
-//  checkAll("fromNanometers",  FormatTests(Wavelength.fromNanometers).formatWith(arbitrary[Int]))
-//  checkAll("fromMicrometers", FormatTests(Wavelength.fromMicrometers).formatWith(arbitrary[Int]))
 
   test("Equality must be natural") {
     forAll { (a: Wavelength, b: Wavelength) =>
@@ -32,7 +31,7 @@ final class WavelengthSpec extends CatsSuite {
 
   test("Order must be consistent with .toPicometers") {
     forAll { (a: Wavelength, b: Wavelength) =>
-      Order[Int].comparison(a.toPicometers, b.toPicometers) shouldEqual
+      Order[PositiveInt].comparison(a.toPicometers.value, b.toPicometers.value) shouldEqual
         Order[Wavelength].comparison(a, b)
     }
   }
@@ -43,64 +42,30 @@ final class WavelengthSpec extends CatsSuite {
     }
   }
 
-  test("Construction from an arbitrary Int must not allow negative values") {
-    forAll { (n: Int) =>
-      Wavelength.fromPicometers.getOption(n).isDefined shouldEqual n >= 0
+  test("Conversions") {
+    Wavelength.fromAngstrom(1) shouldEqual Wavelength(100.withRefinedUnit[Positive, Picometer]).some
+    Wavelength.fromNanometers(1) shouldEqual Wavelength(
+      1000.withRefinedUnit[Positive, Picometer]
+    ).some
+    Wavelength.fromNanometers(Wavelength.MaxNanometer + 1) shouldEqual none
+    Wavelength.fromAngstrom(Wavelength.MaxAngstrom + 1) shouldEqual none
+  }
+
+  test("toAmstrong") {
+    forAll { (a: PositiveInt) =>
+      whenever(a.value <= Wavelength.MaxAngstrom) {
+        Wavelength.fromAngstrom(a).map(_.angstrom.value.isWhole) shouldEqual true.some
+        Wavelength.fromAngstrom(a).map(_.angstrom.value) shouldEqual a.value.some
+      }
     }
   }
 
-  private def pow10(exp: Int): Int =
-    BigInt(10).pow(exp).toInt
-
-  private def conversionTo(u: Wavelength.UnitConverter): org.scalatest.Assertion =
-    forAll { (a: Wavelength) =>
-      u.reverseGet(a) shouldEqual a.toPicometers / pow10(u.exp)
+  test("toNanometers") {
+    forAll { (a: PositiveInt) =>
+      whenever(a.value <= Wavelength.MaxNanometer) {
+        Wavelength.fromNanometers(a).map(_.angstrom.value.isWhole) shouldEqual true.some
+        Wavelength.fromNanometers(a).map(_.nm.value) shouldEqual a.value.some
+      }
     }
-
-  private def conversionFrom(u: Wavelength.UnitConverter): org.scalatest.Assertion =
-    forAll(Gen.chooseNum(0, u.maxValue)) { (n: Int) =>
-      u.unsafeGet(n).toPicometers shouldEqual n * pow10(u.exp)
-    }
-
-  private def range(u: Wavelength.UnitConverter): org.scalatest.Assertion =
-    forAll { (n: Int) =>
-      u.getOption(n).isDefined shouldEqual ((n >= 0) && (n <= u.maxValue))
-    }
-
-  test("Conversion λ => Int (Å)") {
-    conversionTo(Wavelength.fromAngstroms)
   }
-
-  test("Conversion Int (Å) => λ") {
-    conversionFrom(Wavelength.fromAngstroms)
-  }
-
-  test("Range Å") {
-    range(Wavelength.fromAngstroms)
-  }
-
-  test("Conversion λ => Int (nm)") {
-    conversionTo(Wavelength.fromNanometers)
-  }
-
-  test("Conversion Int (nm) => λ") {
-    conversionFrom(Wavelength.fromNanometers)
-  }
-
-  test("Range nm") {
-    range(Wavelength.fromNanometers)
-  }
-
-  test("Conversion λ => Int (μm)") {
-    conversionTo(Wavelength.fromMicrometers)
-  }
-
-  test("Conversion Int (μm) => λ") {
-    conversionFrom(Wavelength.fromMicrometers)
-  }
-
-  test("Range μm") {
-    range(Wavelength.fromMicrometers)
-  }
-
 }

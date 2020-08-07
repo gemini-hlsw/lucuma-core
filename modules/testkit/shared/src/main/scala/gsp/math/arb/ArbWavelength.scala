@@ -3,19 +3,21 @@
 
 package gsp.math.arb
 
+import eu.timepit.refined.scalacheck.numeric._
 import gsp.math.Wavelength
-import gsp.math.syntax.prism._
-import org.scalacheck._
-import org.scalacheck.Gen._
+import gsp.math.units._
+import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Cogen._
+import org.scalacheck._
 
 trait ArbWavelength {
 
-  implicit val arbWavelength: Arbitrary[Wavelength] =
-    Arbitrary(choose(0, Int.MaxValue).map(Wavelength.fromPicometers.unsafeGet(_)))
+  implicit val arbWavelength: Arbitrary[Wavelength] = Arbitrary {
+    arbitrary[PositiveInt].map(Wavelength(_))
+  }
 
   implicit val cogWavelength: Cogen[Wavelength] =
-    Cogen[Int].contramap(_.toPicometers)
+    Cogen[Int].contramap(_.toPicometers.value.value)
 
 }
 

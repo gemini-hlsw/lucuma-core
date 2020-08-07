@@ -11,6 +11,10 @@ lazy val geminiLocalesVersion        = "0.5.0"
 lazy val jtsVersion                  = "0.0.9"
 lazy val svgdotjsVersion             = "0.0.1"
 lazy val newType                     = "0.4.4"
+lazy val coulombVersion              = "0.5.0"
+lazy val spireVersion                = "0.17.0-RC1"
+lazy val singletonOpsVersion         = "0.5.1"
+lazy val refinedVersion              = "0.9.15"
 
 inThisBuild(
   Seq(
@@ -33,7 +37,15 @@ lazy val math = crossProject(JVMPlatform, JSPlatform)
       "com.github.julien-truffaut" %%% "monocle-core"            % monocleVersion,
       "com.github.julien-truffaut" %%% "monocle-macro"           % monocleVersion,
       "org.scala-lang.modules"     %%% "scala-collection-compat" % collCompatVersion,
-      "edu.gemini"                 %%% "gpp-jts"                 % jtsVersion
+      "edu.gemini"                 %%% "gpp-jts"                 % jtsVersion,
+      "com.manyangled"             %%% "coulomb"                 % coulombVersion,
+      "com.manyangled"             %%% "coulomb-si-units"        % coulombVersion,
+      "com.manyangled"             %%% "coulomb-cats"            % coulombVersion,
+      "com.manyangled"             %%% "coulomb-refined"         % coulombVersion,
+      "org.typelevel"              %%% "spire"                   % spireVersion,
+      "eu.timepit"                 %%% "singleton-ops"           % singletonOpsVersion,
+      "eu.timepit"                 %%% "refined"                 % refinedVersion,
+      "eu.timepit"                 %%% "refined-cats"            % refinedVersion
     )
   )
   .jvmConfigure(_.enablePlugins(AutomateHeaderPlugin))
@@ -60,7 +72,9 @@ lazy val testkit = crossProject(JVMPlatform, JSPlatform)
     libraryDependencies ++= Seq(
       "org.typelevel"              %%% "cats-testkit"           % catsVersion,
       "org.typelevel"              %%% "cats-testkit-scalatest" % catsTestkitScalaTestVersion,
-      "com.github.julien-truffaut" %%% "monocle-law"            % monocleVersion
+      "com.github.julien-truffaut" %%% "monocle-law"            % monocleVersion,
+      "org.typelevel"              %%% "spire-laws"             % spireVersion,
+      "eu.timepit"                 %%% "refined-scalacheck"     % refinedVersion
     )
   )
   .jvmConfigure(_.enablePlugins(AutomateHeaderPlugin))
