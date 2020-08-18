@@ -1,22 +1,27 @@
 // Copyright (c) 2016-2020 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package gsp.math.arb
+package gsp.math
+package arb
 
-import gsp.math._
-import gsp.math.syntax.prism._
-import org.scalacheck._
-import org.scalacheck.Arbitrary._
+import coulomb._
+import gsp.math.PhysicalConstants._
+import gsp.math.units._
+import org.scalacheck.Arbitrary
 import org.scalacheck.Cogen
+import org.scalacheck.Gen
 
 trait ArbRadialVelocity {
 
   implicit val arbRadialVelocity: Arbitrary[RadialVelocity] =
-    Arbitrary(arbitrary[Short].map(n => RadialVelocity.fromMetersPerSecond.unsafeGet(n.toInt)))
+    Arbitrary {
+      for {
+        rv <- Gen.chooseNum(-SpeedOfLight + 1, SpeedOfLight - 1)
+      } yield RadialVelocity.unsafeFromQuantity(rv.withUnit[MetersPerSecond])
+    }
 
   implicit val cogRadialVelocity: Cogen[RadialVelocity] =
-    Cogen[Int].contramap(_.toMetersPerSecond)
-
+    Cogen[BigDecimal].contramap(_.rv.value)
 }
 
 object ArbRadialVelocity extends ArbRadialVelocity

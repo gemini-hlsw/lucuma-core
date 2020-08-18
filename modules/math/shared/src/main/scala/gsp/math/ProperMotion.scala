@@ -55,7 +55,6 @@ final case class ProperMotion(
 
 }
 
-
 object ProperMotion extends ProperMotionOptics {
   import PhysicalConstants.{ AstronomicalUnit, TwoPi }
 

@@ -3,8 +3,8 @@
 
 package gsp.math
 
+import cats._
 import cats.tests.CatsSuite
-import gsp.math.laws.discipline._
 import gsp.math.arb._
 import monocle.law.discipline._
 
@@ -12,7 +12,26 @@ final class RadialVelocitySpec extends CatsSuite {
   import ArbRadialVelocity._
 
   // Laws
-  checkAll("RadialVelocity.fromMetersPerSecond", PrismTests(RadialVelocity.fromMetersPerSecond))
-  checkAll("RadialVelocity.fromKilometersPerSecond", FormatTests(RadialVelocity.fromKilometersPerSecond).format)
+  checkAll("fromMetersPerSecond", PrismTests(RadialVelocity.fromMetersPerSecond))
+
+  test("Equality must be natural") {
+    forAll { (a: RadialVelocity, b: RadialVelocity) =>
+      a.equals(b) shouldEqual Eq[RadialVelocity].eqv(a, b)
+    }
+  }
+
+  test("Order must be consistent with .rv") {
+    forAll { (a: RadialVelocity, b: RadialVelocity) =>
+      Order[BigDecimal].comparison(a.rv.value, b.rv.value) shouldEqual
+        Order[RadialVelocity].comparison(a, b)
+    }
+  }
+
+  test("Show must be natural") {
+    forAll { (a: RadialVelocity) =>
+      a.toString shouldEqual Show[RadialVelocity].show(a)
+    }
+  }
 
 }
+
