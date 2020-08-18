@@ -8,42 +8,48 @@ import cats.implicits._
 import gsp.math.PhysicalConstants.SpeedOfLight
 import gsp.math.optics.Format
 import gsp.math.syntax.prism._
-import scala.math.sqrt
+import gsp.math.units._
 import monocle.Prism
+import coulomb._
+import coulomb.cats.implicits._
+import spire.math.Rational
 
 /**
- * Radial Velocity represented as integral meters per second, positive if receding. We can also
- * view velocity in terms of redshift (a dimensionless value called '''z''').
- * @see Wikipedia on [[https://en.wikipedia.org/wiki/Radial_velocity Radial Velocity]]
- * @see Wikipedia on [[https://en.wikipedia.org/wiki/Redshift Redshift]]
- */
-sealed abstract case class RadialVelocity(toMetersPerSecond: Int) {
+  * Radial Velocity represented as integral meters per second, positive if receding. We can also
+  * view velocity in terms of redshift (a dimensionless value called '''z''').
+  * @see Wikipedia on [[https://en.wikipedia.org/wiki/Radial_velocity Radial Velocity]]
+  * @see Wikipedia on [[https://en.wikipedia.org/wiki/Redshift Redshift]]
+  */
+sealed abstract case class RadialVelocity(toMetersPerSecond: Quantity[Int, MetersPerSecond]) {
 
   // Sanity check
-  assert(toMetersPerSecond.abs <= SpeedOfLight, "Radial velocity exceeds the speed of light.")
+  assert(toMetersPerSecond.value.abs <= SpeedOfLight, "Radial velocity exceeds the speed of light.")
+
+  def toKilometersPerSecond: Quantity[Rational, KilometersPerSecond] =
+    toMetersPerSecond.to[Rational, KilometersPerSecond]
 
   def toDoubleKilometersPerSecond: Double =
-    toMetersPerSecond.toDouble / 1000.0
-
-  def toRedshift: Double = {
-    val v = toMetersPerSecond.toDouble
-    val C = SpeedOfLight.toDouble
-    val t = (1.0 + v / C) / (1.0 - v / C)
-    sqrt(t) - 1.0
-  }
+    toKilometersPerSecond.toValue[Double].value
 
   override def toString =
-    f"RadialVelocity($toDoubleKilometersPerSecond%3.3fkm/s)"
+    s"RadialVelocity(${toMetersPerSecond.to[Double, KilometersPerSecond].show})"
 
 }
 
 object RadialVelocity {
 
   val fromMetersPerSecond: Prism[Int, RadialVelocity] =
-    Prism(Some(_: Int).filter(_.abs <= SpeedOfLight).map(new RadialVelocity(_) {}))(_.toMetersPerSecond)
+    Prism[Int, RadialVelocity](
+      _.some
+        .filter(_.abs <= SpeedOfLight)
+        .map(v => new RadialVelocity(v.withUnit[MetersPerSecond]) {})
+    )(
+      _.toMetersPerSecond.value
+    )
 
   val fromKilometersPerSecond: Format[BigDecimal, RadialVelocity] =
-    Format.fromPrism(fromMetersPerSecond)
+    Format
+      .fromPrism(fromMetersPerSecond)
       .imapA(
         n => new java.math.BigDecimal(n).movePointLeft(3),
         d => d.underlying.movePointRight(3).intValue
@@ -55,12 +61,6 @@ object RadialVelocity {
   /** Construct a [[RadialVelocity]] from floating point kilometers per second. */
   def unsafeFromDoubleKilometersPerSecond(kms: Double): RadialVelocity =
     fromKilometersPerSecond.unsafeGet(BigDecimal(kms))
-
-  def unsafeFromRedshift(z: Double): RadialVelocity = {
-    val C = SpeedOfLight.toDouble
-    val m = C * ((z + 1.0) * (z + 1.0) - 1.0) / ((z + 1.0) * (z + 1.0) + 1.0)
-    fromMetersPerSecond.unsafeGet(m.toInt)
-  }
 
   /** Instances are ordered by their `.toMetersPerSecond` values. */
   implicit val RadialVelocityOrder: Order[RadialVelocity] =

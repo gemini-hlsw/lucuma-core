@@ -5,17 +5,21 @@ package gsp.math.arb
 
 import gsp.math._
 import gsp.math.syntax.prism._
+import gsp.math.PhysicalConstants.SpeedOfLight
 import org.scalacheck._
-import org.scalacheck.Arbitrary._
 import org.scalacheck.Cogen
 
 trait ArbRadialVelocity {
 
   implicit val arbRadialVelocity: Arbitrary[RadialVelocity] =
-    Arbitrary(arbitrary[Short].map(n => RadialVelocity.fromMetersPerSecond.unsafeGet(n.toInt)))
+    Arbitrary {
+      for {
+        v <- Gen.choose(-SpeedOfLight + 1, SpeedOfLight - 1)
+      } yield RadialVelocity.fromMetersPerSecond.unsafeGet(v)
+    }
 
   implicit val cogRadialVelocity: Cogen[RadialVelocity] =
-    Cogen[Int].contramap(_.toMetersPerSecond)
+    Cogen[Int].contramap(_.toMetersPerSecond.value)
 
 }
 
