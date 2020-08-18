@@ -7,6 +7,7 @@ import cats.Order
 import cats.Show
 import cats.implicits._
 import coulomb._
+import coulomb.cats.implicits._
 import eu.timepit.refined._
 import eu.timepit.refined.auto._
 import eu.timepit.refined.cats._
@@ -49,7 +50,7 @@ object Wavelength {
   // Max allowed value in nanometers
   lazy val MaxNanometer: Int = Int.MaxValue / BigInt(10).pow(3).toInt
   // Max allowed value in angstrom
-  val MaxAngstrom: Int       = Int.MaxValue / BigInt(10).pow(2).toInt
+  lazy val MaxAngstrom: Int  = Int.MaxValue / BigInt(10).pow(2).toInt
 
   /**
     * Construct a wavelength from a positive int
@@ -64,7 +65,7 @@ object Wavelength {
 
   /** @group Typeclass Instances */
   implicit val WavelengthOrd: Order[Wavelength] =
-    Order.by(_.toPicometers.value)
+    Order.by(_.toPicometers)
 
   /**
     * Try to build a Wavelength from a plain Int. Negatives and Zero will produce a None

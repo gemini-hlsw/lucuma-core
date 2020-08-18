@@ -51,7 +51,7 @@ final class WavelengthSpec extends CatsSuite {
     Wavelength.fromAngstrom(Wavelength.MaxAngstrom + 1) shouldEqual none
   }
 
-  test("toAmstrong") {
+  test("toAngstrom") {
     forAll { (a: PositiveInt) =>
       whenever(a.value <= Wavelength.MaxAngstrom) {
         Wavelength.fromAngstrom(a).map(_.angstrom.value.isWhole) shouldEqual true.some
