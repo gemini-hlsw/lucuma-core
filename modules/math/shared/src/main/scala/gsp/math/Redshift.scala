@@ -41,7 +41,7 @@ object Redshift {
     * The `No redshift`
     * @group Constructors
     */
-  val Zero: Redshift = new Redshift(0)
+  val Zero: Redshift = Redshift(0)
 
   /** @group Typeclass Instances */
   implicit val orderRedshift: Order[Redshift] =
