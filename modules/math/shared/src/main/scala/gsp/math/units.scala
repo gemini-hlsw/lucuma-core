@@ -16,9 +16,12 @@ import spire.math.Rational
 
 trait units {
   // Wavelength units
-  type Picometer = Pico %* Meter
-  type Nanometer = Nano %* Meter
-  type Angstrom  = Hecto %* Picometer
+  type Picometer            = Pico %* Meter
+  type Nanometer            = Nano %* Meter
+  type Angstrom             = Hecto %* Picometer
+  type CentimetersPerSecond = (Centi %* Meter) %/ Second
+  type MetersPerSecond      = Meter %/ Second
+  type KilometersPerSecond  = (Kilo %* Meter) %/ Second
 
   // Ints greater than zero
   type PositiveInt = Int Refined Positive

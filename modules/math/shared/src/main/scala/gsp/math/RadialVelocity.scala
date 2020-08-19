@@ -3,70 +3,85 @@
 
 package gsp.math
 
-import cats.{ Order, Show }
-import cats.implicits._
-import gsp.math.PhysicalConstants.SpeedOfLight
-import gsp.math.optics.Format
-import gsp.math.syntax.prism._
-import scala.math.sqrt
+import java.math.MathContext
+
+import cats._
+import coulomb._
+import coulomb.cats.implicits._
+import coulomb.si._
+import coulomb.siprefix._
+import gsp.math.PhysicalConstants._
+import gsp.math.units._
 import monocle.Prism
+import spire.std.bigDecimal._
 
 /**
- * Radial Velocity represented as integral meters per second, positive if receding. We can also
- * view velocity in terms of redshift (a dimensionless value called '''z''').
- * @see Wikipedia on [[https://en.wikipedia.org/wiki/Radial_velocity Radial Velocity]]
- * @see Wikipedia on [[https://en.wikipedia.org/wiki/Redshift Redshift]]
- */
-sealed abstract case class RadialVelocity(toMetersPerSecond: Int) {
+  * Representation of a radial velocity in meters per second
+  * Valid range is (-C, C) where C is the speed of light
+  * Radial Velocity is often represented as RV
+  *
+  * The selection of units is based on references to velocities as low as 20 cm/s
+  * https://en.wikipedia.org/wiki/Radial_velocity
+  */
+final case class RadialVelocity private (rv: Quantity[BigDecimal, MetersPerSecond]) {
 
-  // Sanity check
-  assert(toMetersPerSecond.abs <= SpeedOfLight, "Radial velocity exceeds the speed of light.")
+  def toDoubleKilometersPerSecond: Double = rv.to[Double, KilometersPerSecond].value
 
-  def toDoubleKilometersPerSecond: Double =
-    toMetersPerSecond.toDouble / 1000.0
-
-  def toRedshift: Double = {
-    val v = toMetersPerSecond.toDouble
-    val C = SpeedOfLight.toDouble
-    val t = (1.0 + v / C) / (1.0 - v / C)
-    sqrt(t) - 1.0
-  }
+  /**
+    * Converts the radial velocity to a Redshift, approximate
+    * a return value of None should be understood as an infinity Redshift
+    */
+  def toRedshift: Option[Redshift] =
+    if (rv.value.abs < RadialVelocity.CValue) {
+      val i = (rv / RadialVelocity.C).value
+      val t = (1 + i) / (1 - i)
+      Some(Redshift(BigDecimal.decimal(scala.math.sqrt(t.toDouble) - 1).round(rv.value.mc)))
+    } else None
 
   override def toString =
-    f"RadialVelocity($toDoubleKilometersPerSecond%3.3fkm/s)"
-
+    s"RadialVelocity(${rv.to[Double, KilometersPerSecond].show})"
 }
 
 object RadialVelocity {
 
-  val fromMetersPerSecond: Prism[Int, RadialVelocity] =
-    Prism(Some(_: Int).filter(_.abs <= SpeedOfLight).map(new RadialVelocity(_) {}))(_.toMetersPerSecond)
+  // Reference: https://www.nist.gov/si-redefinition/meet-constants
+  // Exact value of the speed of light in m/s
+  private val CValue: BigDecimal = BigDecimal.decimal(SpeedOfLight.toDouble, MathContext.DECIMAL64)
 
-  val fromKilometersPerSecond: Format[BigDecimal, RadialVelocity] =
-    Format.fromPrism(fromMetersPerSecond)
-      .imapA(
-        n => new java.math.BigDecimal(n).movePointLeft(3),
-        d => d.underlying.movePointRight(3).intValue
-      )
+  val C: Quantity[BigDecimal, MetersPerSecond] =
+    CValue.withUnit[MetersPerSecond].toUnit[MetersPerSecond] // Speed of light in m/s
 
-  /** Radial velocity of zero. */
-  val Zero: RadialVelocity = fromMetersPerSecond.unsafeGet(0)
+  val fromMetersPerSecond: Prism[BigDecimal, RadialVelocity] =
+    Prism[BigDecimal, RadialVelocity](b =>
+      Some(b).filter(_.abs <= CValue).flatMap(v => RadialVelocity(v.withUnit[MetersPerSecond]))
+    )(_.rv.value)
 
-  /** Construct a [[RadialVelocity]] from floating point kilometers per second. */
-  def unsafeFromDoubleKilometersPerSecond(kms: Double): RadialVelocity =
-    fromKilometersPerSecond.unsafeGet(BigDecimal(kms))
+  /**
+    * Construct a RadialVelocity if the value is in the allowed range
+    * @group Constructors
+    */
+  def apply(rv: Quantity[BigDecimal, MetersPerSecond]): Option[RadialVelocity] =
+    if (rv.value.abs < CValue) Some(new RadialVelocity(rv)) else None
 
-  def unsafeFromRedshift(z: Double): RadialVelocity = {
-    val C = SpeedOfLight.toDouble
-    val m = C * ((z + 1.0) * (z + 1.0) - 1.0) / ((z + 1.0) * (z + 1.0) + 1.0)
-    fromMetersPerSecond.unsafeGet(m.toInt)
-  }
+  /**
+    * Attempts to construct a RadialVelocity, it will fail if the value is outside the allowed range
+    * @group Constructors
+    */
+  def unsafeFromQuantity(rv: Quantity[BigDecimal, MetersPerSecond]): RadialVelocity =
+    apply(rv).getOrElse(sys.error(s"Value of rv $rv not allowed"))
 
-  /** Instances are ordered by their `.toMetersPerSecond` values. */
-  implicit val RadialVelocityOrder: Order[RadialVelocity] =
-    Order.by(_.toMetersPerSecond)
+  /**
+    * `Zero RadialVelocity`
+    * @group Constructors
+    */
+  val Zero: RadialVelocity = new RadialVelocity(0.withUnit[MetersPerSecond])
 
-  implicit val RadialVelocityShow: Show[RadialVelocity] =
+  /** @group Typeclass Instances */
+  implicit val orderRadialVelocity: Order[RadialVelocity] =
+    Order.by(_.rv)
+
+  /** @group Typeclass Instances */
+  implicit val showRadialVelocity: Show[RadialVelocity] =
     Show.fromToString
 
 }
