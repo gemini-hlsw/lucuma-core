@@ -7,6 +7,7 @@ import cats.{ Order, Show }
 import cats.instances.int._
 import spire.math.Rational
 import scala.math.rint
+import gsp.math.optics.Format
 
 /**
   * Exact magnitude value represented as an int with the original value scaled up
@@ -17,8 +18,13 @@ import scala.math.rint
 final case class MagnitudeValue(private[gsp] val scaledValue: Int)
     extends Product
     with Serializable {
-  def toRational: Rational  = Rational(scaledValue.toLong, 100)
+  def toRational: Rational = Rational(scaledValue.toLong, 100)
+
   def toDoubleValue: Double = scaledValue / 100.0
+
+  override def toString: String =
+    s"MagnitudeValue(${scaledValue / 100})"
+
 }
 
 object MagnitudeValue {
@@ -26,11 +32,29 @@ object MagnitudeValue {
   final lazy val ZeroMagnitude = MagnitudeValue(0)
 
   /**
+    * Construct a new MagnitudeValue of the given int value which be scaled up.
+    * @group Constructors
+    */
+  def apply(mg: Int): MagnitudeValue =
+    MagnitudeValue(mg * 100)
+
+  /**
     * Construct a new MagnitudeValue of the given double value. Approximate.
     * @group Constructors
     */
   def fromDouble(mg: Double): MagnitudeValue =
     MagnitudeValue(rint(mg * 100).toInt)
+
+  /**
+    * Format with BigDecimal
+    * @group Optics
+    */
+  val fromBigDecimal: Format[BigDecimal, MagnitudeValue] =
+    Format[Int, MagnitudeValue](v => Some(MagnitudeValue(v)), _.scaledValue)
+      .imapA[BigDecimal](
+        n => new java.math.BigDecimal(n).movePointLeft(2),
+        d => d.underlying.movePointRight(2).intValue
+      )
 
   /** @group Typeclass Instances */
   implicit val MagnitudeValueShow: Show[MagnitudeValue] =
