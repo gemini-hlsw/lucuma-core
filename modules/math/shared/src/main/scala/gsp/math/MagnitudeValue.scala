@@ -36,21 +36,21 @@ object MagnitudeValue {
     * @group Constructors
     */
   def apply(mg: Int): MagnitudeValue =
-    MagnitudeValue(mg * 100)
+    new MagnitudeValue(mg * 100)
 
   /**
     * Construct a new MagnitudeValue of the given double value. Approximate.
     * @group Constructors
     */
   def fromDouble(mg: Double): MagnitudeValue =
-    MagnitudeValue(rint(mg * 100).toInt)
+    new MagnitudeValue(rint(mg * 100).toInt)
 
   /**
     * Format with BigDecimal
     * @group Optics
     */
   val fromBigDecimal: Format[BigDecimal, MagnitudeValue] =
-    Format[Int, MagnitudeValue](v => Some(MagnitudeValue(v)), _.scaledValue)
+    Format[Int, MagnitudeValue](v => Some(new MagnitudeValue(v)), _.scaledValue)
       .imapA[BigDecimal](
         n => new java.math.BigDecimal(n).movePointLeft(2),
         d => d.underlying.movePointRight(2).intValue
