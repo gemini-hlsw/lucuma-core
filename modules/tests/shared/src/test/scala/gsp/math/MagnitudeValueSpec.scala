@@ -7,12 +7,14 @@ import cats.tests.CatsSuite
 import cats.{ Eq, Order, Show }
 import cats.kernel.laws.discipline._
 import gsp.math.arb._
+import gsp.math.laws.discipline.FormatTests
 
 final class MagnitudeValueSpec extends CatsSuite {
   import ArbMagnitudeValue._
 
   // Laws
   checkAll("MagnitudeValue", OrderTests[MagnitudeValue].order)
+  checkAll("fromBigDecimal", FormatTests(MagnitudeValue.fromBigDecimal).format)
 
   test("Equality must be natural") {
     forAll { (a: MagnitudeValue, b: MagnitudeValue) =>
