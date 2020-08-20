@@ -9,6 +9,8 @@ import gsp.math.Declination
 import gsp.math.Angle
 import gsp.math.HourAngle
 import io.chrisdavenport.cats.time._
+import spire.math.Number
+import spire.math.Rational
 
 object implicits {
 
@@ -41,7 +43,32 @@ object implicits {
       }
     }
 
-  implicit val interpolatedDeclinationGetter
+  implicit val interpolatedNumberGetter: CalcGetter[GetterStrategy.LinearInterpolating, Number] =
+    new CalcGetter[GetterStrategy.LinearInterpolating, Number] {
+      def get[T](
+        calc:  Calculator[GetterStrategy.LinearInterpolating, T]
+      )(field: T => Number)(instant: Instant): Number = {
+        val idx     = calc.toIndex(instant)
+        val result0 = calc.timedResults(idx)
+        val i0      = result0._1
+        val v0      = field(result0._2)
+        if (i0 === instant || idx === calc.timedResults.length - 1) v0
+        else {
+          val result1 = calc.timedResults(idx + 1)
+          val i1      = result1._1
+          // require(t0 <= t && t < t1)
+          val v1      = field(result1._2)
+          val v       =
+            v0 + Rational(instant.toEpochMilli - i0.toEpochMilli,
+                          i1.toEpochMilli - i0.toEpochMilli
+            ) * (v1 - v0)
+          // require((v0 >= v1 && v0 >= v && v >= v1) || (v0 < v1 && v0 <= v && v <= v1))
+          v
+        }
+      }
+    }
+
+  implicit val interpolatedDeclinationGetter1
     : CalcGetter[GetterStrategy.LinearInterpolating, Declination] =
     new CalcGetter[GetterStrategy.LinearInterpolating, Declination] {
       def get[T](
@@ -56,6 +83,21 @@ object implicits {
           )
           ._1
     }
+
+  // implicit val interpolatedAngleGetter: CalcGetter[GetterStrategy.LinearInterpolating, Angle] =
+  //   new CalcGetter[GetterStrategy.LinearInterpolating, Angle] {
+  //     def get[T](
+  //       calc:  Calculator[GetterStrategy.LinearInterpolating, T]
+  //     )(field: T => Angle)(instant: Instant): Angle =
+  //       // Declination
+  //       //   .fromAngleWithCarry(
+  //       //     Angle.fromDoubleDegrees(
+  //       //       interpolatedDoubleGetter
+  //       //         .get(calc)(field.andThen(_.toAngle.toSignedDoubleDegrees))(instant)
+  //       //     )
+  //       //   )
+  //       //   ._1
+  //   }
 
   implicit val interpolatedHourAngleGetter
     : CalcGetter[GetterStrategy.LinearInterpolating, HourAngle] =
