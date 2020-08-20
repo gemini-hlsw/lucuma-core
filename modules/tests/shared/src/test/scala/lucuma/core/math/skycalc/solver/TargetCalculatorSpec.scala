@@ -12,7 +12,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.Instant
 import org.scalactic.Tolerance
-import implicits._
+import gsp.math.skycalc.solver.implicits._
 
 /**
   * Compare some random values with results from http://catserver.ing.iac.es/staralt/index.php

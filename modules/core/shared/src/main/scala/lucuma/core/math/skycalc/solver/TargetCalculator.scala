@@ -3,12 +3,11 @@
 
 package gsp.math.skycalc.solver
 
+import java.time.Duration
+import java.time.Instant
 import gsp.math.Coordinates
 import gsp.math.Place
 import gsp.math.skycalc.ImprovedSkyCalc
-
-import java.time.Duration
-import java.time.Instant
 import gsp.math.skycalc.SkyCalcResults
 
 /**

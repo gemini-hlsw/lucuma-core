@@ -6,9 +6,9 @@ package gsp.math.skycalc.solver
 import cats.implicits._
 import java.time.Instant
 import gsp.math.Declination
-import io.chrisdavenport.cats.time._
 import gsp.math.Angle
 import gsp.math.HourAngle
+import io.chrisdavenport.cats.time._
 
 object implicits {
 

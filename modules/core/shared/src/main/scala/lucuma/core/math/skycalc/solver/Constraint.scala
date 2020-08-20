@@ -6,10 +6,10 @@ package gsp.math.skycalc.solver
 import cats.implicits._
 import java.time.Duration
 import java.time.Instant
+import gsp.math.Angle
 import gsp.math.Declination
 import gsp.math.HourAngle
 import gsp.math.skycalc.SkyCalcResults
-import gsp.math.Angle
 
 trait Constraint[T, A] {
   protected val solver: Solver[A]

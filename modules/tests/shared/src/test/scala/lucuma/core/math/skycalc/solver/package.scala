@@ -8,10 +8,10 @@ import cats.Eq
 import java.time.Duration
 import java.time.Instant
 import org.scalacheck.Gen
+import org.scalacheck.Gen.Choose
 import org.scalacheck.Arbitrary._
 import gsp.math.arb.ArbTime._
 import io.chrisdavenport.cats.time._
-import org.scalacheck.Gen.Choose
 
 package object solver {
   private val MaxDelta: Long = Duration.ofMinutes(10).toNanos

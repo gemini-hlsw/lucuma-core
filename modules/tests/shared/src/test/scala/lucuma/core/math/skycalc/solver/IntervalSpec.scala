@@ -11,10 +11,10 @@ import java.time.Instant
 import java.time.Duration
 import java.time.LocalTime
 import java.time.ZoneId
-import gsp.math.arb._
-import io.chrisdavenport.cats.time._
 import org.scalacheck.Gen
 import org.scalacheck.Arbitrary._
+import gsp.math.arb._
+import io.chrisdavenport.cats.time._
 import cats.kernel.laws.discipline.EqTests
 import cats.kernel.laws.discipline.OrderTests
 import monocle.law.discipline.PrismTests

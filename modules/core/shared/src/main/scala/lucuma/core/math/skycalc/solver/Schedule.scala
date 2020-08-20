@@ -99,9 +99,7 @@ sealed abstract case class Schedule protected (intervals: List[Interval]) {
       Schedule.unsafe(
         intervals
           .sliding(2)
-          .map({
-            case List(i, j) => Interval.unsafe(i.end, j.start)
-          })
+          .map { case List(i, j) => Interval.unsafe(i.end, j.start) }
           .toList
       )
 }

@@ -4,12 +4,12 @@
 package gsp.math.skycalc.solver
 
 import cats.tests.CatsSuite
-import gsp.math.skycalc.SkyCalcResults
 import java.time.Instant
 import java.time.Duration
 import gsp.math.Declination
-import implicits._
 import gsp.math.HourAngle
+import gsp.math.skycalc.SkyCalcResults
+import gsp.math.skycalc.solver.implicits._
 
 /**
   * This is not meant to test the underlying SkyCalc implementations, we assume that this is all working,

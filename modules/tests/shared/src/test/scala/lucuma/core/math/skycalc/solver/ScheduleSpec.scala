@@ -7,17 +7,17 @@ import cats.tests.CatsSuite
 
 import cats.Eq
 import cats.Show
+import java.time.ZoneId
+import java.time.LocalTime
+import java.time.Instant
+import org.scalacheck.Arbitrary._
+import org.scalacheck.Gen
 import gsp.math.arb._
 import io.chrisdavenport.cats.time._
 import cats.kernel.laws.discipline.EqTests
 import gsp.math.laws.discipline.SplitEpiTests
 import monocle.law.discipline.PrismTests
 import cats.kernel.laws.discipline.BoundedSemilatticeTests
-import java.time.ZoneId
-import java.time.LocalTime
-import java.time.Instant
-import org.scalacheck.Arbitrary._
-import org.scalacheck.Gen
 
 final class ScheduleSpec extends CatsSuite {
   import ArbSchedule._
