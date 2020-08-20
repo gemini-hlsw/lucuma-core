@@ -44,7 +44,8 @@ sealed abstract case class Interval protected (start: Instant, end: Instant) {
   def overlaps(other: Interval): Boolean =
     start < other.end && end > other.start
 
-  /** Join two abutting or overlapping intervals.
+  /**
+    * Join two abutting or overlapping intervals.
     *
     * This operation is only defined if the two intervals overlap
     * or abut each other, i.e. in all cases where adding the two intervals results in one single interval.
@@ -82,7 +83,8 @@ sealed abstract case class Interval protected (start: Instant, end: Instant) {
   def diff(other: Schedule): Schedule =
     Schedule.single(this).diff(other)
 
-  /** Convert to the minimal full-day interval that includes this interval.
+  /**
+    * Convert to the minimal full-day interval that includes this interval.
     *
     * @param zone the timezone where the start of the day should be computed
     * @param startOfDay time at which the day starts
@@ -161,7 +163,8 @@ trait IntervalOptics { self: Interval.type =>
         if (start < end) (new Interval(start, end) {}).some else none
     }(i => (i.start, i.end))
 
-  /** A tuple of Instants, which will be sorted if necessary. Can still fail if they are both the same.
+  /**
+    * A tuple of Instants, which will be sorted if necessary. Can still fail if they are both the same.
     * @group Optics
     */
   val fromInstants: Format[(Instant, Instant), Interval] =
@@ -175,7 +178,8 @@ trait IntervalOptics { self: Interval.type =>
       i => (i.start, i.end)
     )
 
-  /** A tuple containing the start Instant and the Duration of the Interval. Can still fail if duration <= 0.
+  /**
+    *  A tuple containing the start Instant and the Duration of the Interval. Can still fail if duration <= 0.
     *  @group Optics
     */
   val fromStartDuration: Prism[(Instant, Duration), Interval] =

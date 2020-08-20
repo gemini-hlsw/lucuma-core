@@ -18,7 +18,7 @@ import io.chrisdavenport.cats.time._
 import scala.annotation.tailrec
 
 /**
-  * A sequence of Intervals.
+  * A sequence of [[Interval]]s.
   *
   * The intervals are sorted by their start time and don't overlap or abut, i.e. the Schedule is always represented
   * by the smallest possible set of Intervals.
@@ -80,7 +80,8 @@ sealed abstract case class Schedule protected (intervals: List[Interval]) {
   /** Compute minimal Schedule that contains all instants covered in both this Schedule and the Interval. */
   def intersection(interval: Interval): Schedule = intersection(Schedule.single(interval))
 
-  /** Remove from this Schedule the intersection with another one.
+  /**
+    *  Remove from this Schedule the intersection with another one.
     *
     * The result will cover all instants of this Schedule which are NOT covered by the the given Schedule.
     */
@@ -98,9 +99,8 @@ sealed abstract case class Schedule protected (intervals: List[Interval]) {
     else
       Schedule.unsafe(
         intervals
-          .sliding(2)
-          .map { case List(i, j) => Interval.unsafe(i.end, j.start) }
-          .toList
+          .zip(intervals.tail)
+          .map { case (i, j) => Interval.unsafe(i.end, j.start) }
       )
 }
 
@@ -298,15 +298,15 @@ trait ScheduleOptics { self: Schedule.type =>
   val intervals: Getter[Schedule, List[Interval]] =
     Getter(_.intervals)
 
-  /** A list of Intervals, which are sorted and do not abut or overlap each other.
+  /**
+    * A list of [[Interval]]s, which are sorted and do not abut or overlap each other.
     * @group Optics
     */
   val fromDisjointSortedIntervals: Prism[List[Interval], Schedule] =
     Prism { intervals: List[Interval] =>
       if (
-        intervals.sliding(2).forall {
-          case List(a, b) => a.end < b.start
-          case _          => true // Zero or one intervals
+        intervals.length < 2 || intervals.zip(intervals.tail).forall {
+          case (a, b) => a.end < b.start
         }
       )
         (new Schedule(intervals) {}).some
@@ -314,7 +314,8 @@ trait ScheduleOptics { self: Schedule.type =>
         none
     }(_.intervals)
 
-  /** Any list of Intervals. They will be sorted and merged if necessary.
+  /**
+    * Any list of [[Interval]]s. They will be sorted and merged if necessary.
     * @group Optics
     */
   val fromIntervals: SplitEpi[List[Interval], Schedule] =

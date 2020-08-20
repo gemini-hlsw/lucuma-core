@@ -21,7 +21,7 @@ final case class FormatLaws[A, B](fab: Format[A, B]) {
     fab.getOption(fab.reverseGet(b)) <-> Some(b)
 
   // True if `a` is parsable but not in normal form. The existence of such a value in our test data
-  // will show that `normalize` and `parseRoundTrup` are actually testing something.
+  // will show that `normalize` and `parseRoundTrip` are actually testing something.
   def demonstratesNormalization(a: A)(implicit ev: Eq[A]): Boolean =
     fab.getOption(a).map(fab.reverseGet) match {
       case None     => false

@@ -160,6 +160,6 @@ package object solver {
     val breaks = ((Instant.MIN +: schedule.intervals.flatMap(i =>
       List(i.start, i.end)
     )) :+ Instant.MAX).distinct
-    Gen.oneOf(breaks.sliding(2).map { case List(s, e) => Interval.unsafe(s, e) }.toList)
+    Gen.oneOf(breaks.zip(breaks.tail).map { case (s, e) => Interval.unsafe(s, e) }.toList)
   }
 }

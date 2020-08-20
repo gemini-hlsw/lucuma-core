@@ -19,7 +19,8 @@ trait Constraint[T, A] {
   ): Schedule =
     solver.solve(metAt(calc))(interval)
 
-  /** This function defines the actual constraint by returning true or false for a given instant <code>i</code>
+  /**
+    * This function defines the actual constraint by returning true or false for a given instant <code>i</code>
     * depending on whether to constraint is met or not.
     */
   def metAt[G](calc: Calculator[G, T])(i: Instant)(implicit getter: CalcGetter[G, A]): Boolean

@@ -8,7 +8,8 @@ import java.time.Instant
 import java.time.Duration
 import io.chrisdavenport.cats.time._
 
-/** A Calculator holds a list of results which are sampled at defined [[java.time.Instant]]s over a given interval.
+/**
+  * A Calculator holds a list of results which are sampled at defined [[java.time.Instant]]s over a given interval.
   *
   * @tparam G [[GetterStrategy]] to use for computing values derived from results.
   * @tparam T type of the results held
@@ -44,7 +45,8 @@ trait Calculator[G, T] {
   def mean(field:             T => Double): Double        = results.map(field).sum / sampleCount
 }
 
-/** A Calculator that holds a result for a single [[java.time.Instant]].
+/**
+  * A Calculator that holds a result for a single [[java.time.Instant]].
   *
   * The caller doesn't need to provide a [[CalcGetter]] when obtaining the result via the <code>value</code> method.
   */

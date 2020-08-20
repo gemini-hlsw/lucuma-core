@@ -23,7 +23,7 @@ final class TargetCalculatorSpec extends CatsSuite with Tolerance {
   import gsp.math.skycalc.GN
 
   private val testInstant     =
-    ZonedDateTime.of(LocalDate.of(2014, 3, 1), LocalTime.of(20, 0, 0), GN.zoneId).toInstant
+    ZonedDateTime.of(LocalDate.of(2014, 3, 1), LocalTime.of(20, 0, 0), GN.zone).toInstant
   private val testCoordinates = (_: Instant) =>
     Coordinates(RightAscension.fromDoubleDegrees(150), Declination.fromDoubleDegrees(20).get)
 

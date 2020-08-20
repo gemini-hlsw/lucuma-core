@@ -46,7 +46,6 @@ final class IntervalSpec extends CatsSuite {
   checkAll("fromInstants", FormatTests(Interval.fromInstants).format)
   checkAll("fromStartDuration", PrismTests(Interval.fromStartDuration))
 
-// Test:  diff x 2, toFullDays
   test("Contains Instant") {
     forAll { i: Interval =>
       forAll(instantInInterval(i)) { inst: Instant =>
@@ -285,9 +284,7 @@ final class IntervalSpec extends CatsSuite {
         val restrictedSchedule = s.restrictTo(i)
         // Next val contains all intervals from diff plus all intervals from schedule limited to original interval.
         val intervals          = (diff.intervals ++ restrictedSchedule.intervals).sorted
-        assert(intervals.sliding(2).forall {
-          case List(a, b) => a.abuts(b)
-        })
+        assert(intervals.zip(intervals.tail).forall { case (a, b) => a.abuts(b) })
         assert(restrictedSchedule.union(diff) === Schedule(i))
     }
   }
