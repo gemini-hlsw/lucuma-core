@@ -11,10 +11,9 @@ import io.chrisdavenport.cats.time._
 /**
   * A Calculator holds a list of results which are sampled at defined [[java.time.Instant]]s over a given interval.
   *
-  * @tparam G [[GetterStrategy]] to use for computing values derived from results.
   * @tparam T type of the results held
   */
-trait Calculator[G, T] {
+trait Calculator[T] {
   def instants: List[Instant]
   def toIndex(i: Instant): Int // Must return the first Instant >= i
   def result: Instant => T
@@ -32,10 +31,12 @@ trait Calculator[G, T] {
 
   def result(ix: Int): T = results(ix)
 
-  def valueAt[A](field: T => A)(i: Instant)(implicit
-    getter:             CalcGetter[G, A]
-  ): A =
-    getter.get(this)(field)(i)
+  def valueAt[G]: GetterWithStrategy[G] = new GetterWithStrategy[G]
+
+  protected class GetterWithStrategy[G] {
+    def apply[A](field: T => A)(i: Instant)(implicit getter: CalcGetter[G, A]): A =
+      getter.get(Calculator.this)(field)(i)
+  }
 
   def timedValues[A](field:   T => A): List[(Instant, A)] =
     timedResults.map { case (i, r) => (i, field(r)) }
@@ -50,19 +51,17 @@ trait Calculator[G, T] {
   *
   * The caller doesn't need to provide a [[CalcGetter]] when obtaining the result via the <code>value</code> method.
   */
-trait SingleValueCalculator[T] extends Calculator[GetterStrategy.Closest, T] {
-  import implicits.closestGetter
-
+trait SingleValueCalculator[T] extends Calculator[T] {
   val instant: Instant
   val instants = List(instant)
   def toIndex(i: Instant) = 0
 
   def value[A](field: T => A): A =
-    valueAt(field)(start)
+    valueAt(field)(instant)(CalcGetter.closestGetter)
 }
 
 /** A Calculator that holds results for evenly spaced [[java.time.Instant]]s within an [[Interval]] */
-trait FixedRateCalculator[T] extends Calculator[GetterStrategy.LinearInterpolating, T] {
+trait FixedRateCalculator[T] extends Calculator[T] {
   def interval: Interval
   def rate: Duration
 
@@ -86,7 +85,7 @@ trait FixedRateCalculator[T] extends Calculator[GetterStrategy.LinearInterpolati
 }
 
 /** A Calculator that holds results for the provided [[java.time.Instant]]s */
-trait IrregularIntervalCalculator[T] extends Calculator[GetterStrategy.LinearInterpolating, T] {
+trait IrregularIntervalCalculator[T] extends Calculator[T] {
 
   /** Gets the index of the immediately prior existing [[java.time.Instant]]. */
   override def toIndex(i: Instant): Int = {

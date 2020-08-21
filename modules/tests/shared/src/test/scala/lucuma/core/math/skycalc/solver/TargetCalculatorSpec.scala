@@ -12,7 +12,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.Instant
 import org.scalactic.Tolerance
-import gsp.math.skycalc.solver.implicits._
+import gsp.math.skycalc.solver.GetterStrategy.LinearInterpolating
 
 /**
   * Compare some random values with results from http://catserver.ing.iac.es/staralt/index.php
@@ -53,11 +53,13 @@ final class TargetCalculatorSpec extends CatsSuite with Tolerance {
     // check some values
     assert(
       37.0 === intervalTargetCalculator
-        .valueAt(_.altitude)(testInstant)
+        .valueAt[LinearInterpolating](_.altitude)(testInstant)
         .toAngle
         .toSignedDoubleDegrees +- 1
     )
-    assert(1.6 === intervalTargetCalculator.valueAt(_.airmass)(testInstant) +- 0.1)
+    assert(
+      1.6 === intervalTargetCalculator.valueAt[LinearInterpolating](_.airmass)(testInstant) +- 0.1
+    )
     assert(89.0 === intervalTargetCalculator.max(_.altitude).toAngle.toSignedDoubleDegrees +- 1)
     assert(37.0 === intervalTargetCalculator.min(_.altitude).toAngle.toSignedDoubleDegrees +- 1)
   }

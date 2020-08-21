@@ -6,9 +6,11 @@ package gsp.math.skycalc.solver
 import cats.tests.CatsSuite
 import java.time.Instant
 import java.time.Duration
+import gsp.math.skycalc.solver.SolverStrategy._
+import gsp.math.skycalc.solver.GetterStrategy._
 
 final class SolverSpec extends CatsSuite {
-  class TestCalculator extends Calculator[GetterStrategy.Closest, Unit] {
+  object TestCalculator extends Calculator[Unit] {
     override val instants: List[Instant] = List.empty
 
     override def toIndex(i: Instant): Int = 0
@@ -16,21 +18,20 @@ final class SolverSpec extends CatsSuite {
     override val result: Instant => Unit = _ => ()
   }
 
-  case class TestConstraint(solver: Solver[Unit], f: Instant => Boolean)
-      extends Constraint[Unit, Unit] {
-
-    override def metAt[G](calc: Calculator[G, Unit])(i: Instant)(implicit
+  case class TestConstraint(f: Instant => Boolean) extends Constraint[Unit, Unit] {
+    override def metAt[G](calc: Calculator[Unit])(i: Instant)(implicit
       getter:                   CalcGetter[G, Unit]
     ): Boolean = f(i)
   }
 
-  val testCalculator = new TestCalculator
-
-  implicit val testValueGetter = new CalcGetter[GetterStrategy.Closest, Unit] {
-    def get[T](calc: Calculator[GetterStrategy.Closest, T])(field: T => Unit)(
+  implicit val testValueGetter = new CalcGetter[Closest, Unit] {
+    def get[T](calc: Calculator[T])(field: T => Unit)(
       instant:       Instant
     ): Unit = ()
   }
+
+  def constraintSolver[S](f: Instant => Boolean)(implicit solver: Solver[S]) =
+    ConstraintSolver[S, Closest](TestConstraint(f), Duration.ofMillis(1))
 
   def f1(i: Instant) =
     if (i.toEpochMilli < 150) true
@@ -38,9 +39,8 @@ final class SolverSpec extends CatsSuite {
     else false
 
   test("Check Default Solver") {
-    val s     = DefaultSolver[Unit](Duration.ofMillis(1))
-    val c     = TestConstraint(s, f1)
-    val solve = c.solve(testCalculator) _
+    val solver = constraintSolver[Default](f1)
+    val solve  = solver.solve(TestCalculator) _
 
     assert(Schedule(List(buildInterval(0, 150))) === solve(buildInterval(0, 200)).some)
     assert(Schedule(List(buildInterval(250, 400))) === solve(buildInterval(200, 400)).some)
@@ -53,8 +53,8 @@ final class SolverSpec extends CatsSuite {
   }
 
   test("Check Parabola Solver") {
-    val c     = TestConstraint(ParabolaSolver[Unit](Duration.ofMillis(1)), f1)
-    val solve = c.solve(testCalculator) _
+    val solver = constraintSolver[Parabola](f1)
+    val solve  = solver.solve(TestCalculator) _
 
     assert(Schedule(List(buildInterval(0, 150))) === solve(buildInterval(0, 200)).some)
     assert(Schedule(List(buildInterval(250, 400))) === solve(buildInterval(200, 400)).some)
@@ -71,8 +71,8 @@ final class SolverSpec extends CatsSuite {
     else false
 
   test("Check Parabola Solver 2") {
-    val c     = TestConstraint(ParabolaSolver[Unit](Duration.ofMillis(1)), f2)
-    val solve = c.solve(testCalculator) _
+    val solver = constraintSolver[Parabola](f2)
+    val solve  = solver.solve(TestCalculator) _
 
     assert(
       (Schedule(List(buildInterval(5000, 6000))) === solve(buildInterval(0, 10000)).some)

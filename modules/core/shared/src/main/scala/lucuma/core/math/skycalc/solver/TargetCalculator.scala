@@ -16,7 +16,7 @@ import gsp.math.skycalc.SkyCalcResults
   * If in doubt use {@link isDefinedAt} to make sure that values for a given time are actually calculated before
   * accessing them, otherwise an out of bounds exception will be thrown.
   */
-trait TargetCalculator[G] extends Calculator[G, SkyCalcResults] {
+trait TargetCalculator[G] extends Calculator[SkyCalcResults] {
 
   val place: Place
   val targetLocation: Instant => Coordinates
