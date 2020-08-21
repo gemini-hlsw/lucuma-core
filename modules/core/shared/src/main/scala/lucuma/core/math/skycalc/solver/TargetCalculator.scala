@@ -66,7 +66,7 @@ case class SingleValueTargetCalculator(
   targetLocation: Instant => Coordinates,
   instant:        Instant
 ) extends SingleValueCalculator[SkyCalcResults]
-    with TargetCalculator[GetterStrategy.Exact]
+    with TargetCalculator[GetterStrategy.Closest]
 
 case class IntervalTargetCalculator(
   place:          Place,

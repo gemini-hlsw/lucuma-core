@@ -16,7 +16,7 @@ import io.chrisdavenport.cats.time._
   */
 trait Calculator[G, T] {
   def instants: List[Instant]
-  def toIndex(i: Instant): Int
+  def toIndex(i: Instant): Int // Must return the first Instant >= i
   def result: Instant => T
 
   lazy val start: Instant   = instants.head
@@ -50,8 +50,8 @@ trait Calculator[G, T] {
   *
   * The caller doesn't need to provide a [[CalcGetter]] when obtaining the result via the <code>value</code> method.
   */
-trait SingleValueCalculator[T] extends Calculator[GetterStrategy.Exact, T] {
-  import implicits.exactGetter
+trait SingleValueCalculator[T] extends Calculator[GetterStrategy.Closest, T] {
+  import implicits.closestGetter
 
   val instant: Instant
   val instants = List(instant)

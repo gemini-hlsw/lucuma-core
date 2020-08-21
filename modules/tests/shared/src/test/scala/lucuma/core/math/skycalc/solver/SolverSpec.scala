@@ -8,7 +8,7 @@ import java.time.Instant
 import java.time.Duration
 
 final class SolverSpec extends CatsSuite {
-  class TestCalculator extends Calculator[GetterStrategy.Exact, Unit] {
+  class TestCalculator extends Calculator[GetterStrategy.Closest, Unit] {
     override val instants: List[Instant] = List.empty
 
     override def toIndex(i: Instant): Int = 0
@@ -26,8 +26,8 @@ final class SolverSpec extends CatsSuite {
 
   val testCalculator = new TestCalculator
 
-  implicit val testValueGetter = new CalcGetter[GetterStrategy.Exact, Unit] {
-    def get[T](calc: Calculator[GetterStrategy.Exact, T])(field: T => Unit)(
+  implicit val testValueGetter = new CalcGetter[GetterStrategy.Closest, Unit] {
+    def get[T](calc: Calculator[GetterStrategy.Closest, T])(field: T => Unit)(
       instant:       Instant
     ): Unit = ()
   }
