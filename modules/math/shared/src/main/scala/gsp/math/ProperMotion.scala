@@ -28,7 +28,7 @@ import scala.math.{ sin, cos, hypot, atan2 }
 final case class ProperMotion(
   baseCoordinates: Coordinates,
   epoch:           Epoch,
-  properVelocity:  Option[Offset],
+  properVelocity:  Option[ProperVelocity],
   radialVelocity:  Option[RadialVelocity],
   parallax:        Option[Parallax]
 ) {
@@ -74,7 +74,7 @@ object ProperMotion extends ProperMotionOptics {
   def properMotion(
     baseCoordinates: Coordinates,
     epoch:           Epoch,
-    properVelocity:  Offset,
+    properVelocity:  ProperVelocity,
     radialVelocity:  Double,
     parallax:        Parallax,
     elapsedYears:    Double
@@ -82,7 +82,7 @@ object ProperMotion extends ProperMotionOptics {
     val (ra, dec) = properMotionʹ(
       baseCoordinates.toRadians,
       epoch.scheme.lengthOfYear,
-      properVelocity.toSignedDoubleRadians,
+      properVelocity.toRadians,
       radialVelocity,
       parallax.μas.value / 1000000.0,
       elapsedYears
@@ -209,7 +209,7 @@ trait ProperMotionOptics {
     GenLens[ProperMotion](_.epoch)
 
   /** @group Optics */
-  val properVelocity: Lens[ProperMotion, Option[Offset]] =
+  val properVelocity: Lens[ProperMotion, Option[ProperVelocity]] =
     GenLens[ProperMotion](_.properVelocity)
 
   /** @group Optics */

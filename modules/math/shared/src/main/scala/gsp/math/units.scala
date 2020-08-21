@@ -8,33 +8,66 @@ import coulomb.accepted._
 import coulomb.define.DerivedUnit
 import coulomb.si._
 import coulomb.siprefix._
+import coulomb.time._
 import coulomb.unitops.ConvertableUnits
 import coulomb.unitops.UnitConverter
 import eu.timepit.refined._
 import eu.timepit.refined.auto._
 import eu.timepit.refined.numeric._
 import eu.timepit.refined.types.numeric.PosInt
-import spire.math.Rational
+import spire.math._
 
 trait units {
   // Wavelength units
-  type Picometer            = Pico %* Meter
-  type Nanometer            = Nano %* Meter
-  type Angstrom             = Hecto %* Picometer
-  type CentimetersPerSecond = (Centi %* Meter) %/ Second
-  type MetersPerSecond      = Meter %/ Second
-  type KilometersPerSecond  = (Kilo %* Meter) %/ Second
+  type Picometer = Pico %* Meter
+  type Nanometer = Nano %* Meter
+  type Angstrom  = Hecto %* Picometer
+
+  trait CentimetersPerSecond
+  implicit val defineUnitCentimetersPerSecond =
+    DerivedUnit[CentimetersPerSecond, (Centi %* Meter) %/ Second](Rational(1, 100), abbv = "cm/s")
+
+  trait MetersPerSecond
+  implicit val defineUnitMetersPerSecond =
+    DerivedUnit[MetersPerSecond, Meter %/ Second](Rational(1), abbv = "m/s")
+
+  trait KilometersPerSecond
+  implicit val defineUnitKilometerPerSecond =
+    DerivedUnit[KilometersPerSecond, Meter %/ Second](Rational(1000), abbv = "km/s")
+
+  trait Year
+  implicit val defineUnitYear =
+    DerivedUnit[Year, Day](Rational(365), abbv = "y")
+
+  private val MiliArcSecondsPerDegree: SafeLong  = 3600 * 1000L
+  private val MicroArcSecondsPerDegree: SafeLong = 3600 * 1000000L
 
   trait MilliArcSecond
   implicit val defineUnitMilliArcSecond =
-    DerivedUnit[MilliArcSecond, Degree](Rational(1, 3600 * 1000L), abbv = "mas")
+    DerivedUnit[MilliArcSecond, Degree](Rational(1, MiliArcSecondsPerDegree), abbv = "mas")
 
   trait MicroArcSecond
   implicit val defineUnitMicroArcSecond =
-    DerivedUnit[MicroArcSecond, Degree](Rational(1, 3600 * 1000000L), abbv = "μas")
+    DerivedUnit[MicroArcSecond, Degree](Rational(1, MicroArcSecondsPerDegree), abbv = "μas")
 
-  // PositiveInt can be converted to Rational exactly
-  implicit def rationalPositiveIntConverter[U1, U2](implicit
+  private val DaysPerYear: SafeLong = 365 * 8640L
+
+  trait MilliArcSecondPerYear
+  implicit val defineUnitMilliArcSecondPerYear =
+    DerivedUnit[MilliArcSecondPerYear, Degree %/ Second](
+      Rational(1, DaysPerYear * MiliArcSecondsPerDegree),
+      abbv = "mas/y"
+    )
+
+  trait MicroArcSecondPerYear
+  implicit val defineUnitMicroArcSecondPerYear =
+    DerivedUnit[MicroArcSecondPerYear, Degree %/ Second](
+      Rational(1L, DaysPerYear * MicroArcSecondsPerDegree),
+      abbv = "μas/y"
+    )
+
+  // PosInt can be converted to Rational exactly
+  implicit def rationalPosIntConverter[U1, U2](implicit
     cu: ConvertableUnits[U1, U2]
   ): UnitConverter[PosInt, U1, Rational, U2] =
     new UnitConverter[PosInt, U1, Rational, U2] {
@@ -47,7 +80,7 @@ trait units {
   // The reverse is not true, remaining in the PosInt domain we can't ensure we can go from
   // Picometer to Nanometer without loosing precision
   // Thus we shouldn't make this implicit by default~
-  def unsafePositiveIntConverter[U1, U2](implicit
+  def unsafePosIntConverter[U1, U2](implicit
     cu: ConvertableUnits[U1, U2]
   ): UnitConverter[PosInt, U1, PosInt, U2] =
     new UnitConverter[PosInt, U1, PosInt, U2] {
@@ -63,10 +96,10 @@ trait units {
 
   // Implicit conversions that can be exact as Pico/Nano/Angstrom are multiples of 10
   implicit val convNP: UnitConverter[PosInt, Nanometer, PosInt, Picometer] =
-    unsafePositiveIntConverter[Nanometer, Picometer]
+    unsafePosIntConverter[Nanometer, Picometer]
 
   implicit val convAP: UnitConverter[PosInt, Angstrom, PosInt, Picometer] =
-    unsafePositiveIntConverter[Angstrom, Picometer]
+    unsafePosIntConverter[Angstrom, Picometer]
 
 }
 

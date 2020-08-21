@@ -11,7 +11,7 @@ import org.scalacheck._
 trait ArbProperMotion {
   import ArbEpoch._
   import ArbCoordinates._
-  import ArbOffset._
+  import ArbProperVelocity._
   import ArbRadialVelocity._
   import ArbParallax._
 
@@ -20,14 +20,14 @@ trait ArbProperMotion {
       for {
         cs <- arbitrary[Coordinates]
         ap <- arbitrary[Epoch]
-        pv <- arbitrary[Option[Offset]]
+        pv <- arbitrary[Option[ProperVelocity]]
         rv <- arbitrary[Option[RadialVelocity]]
         px <- arbitrary[Option[Parallax]]
       } yield ProperMotion(cs, ap, pv, rv, px)
     }
 
   implicit val cogProperMotion: Cogen[ProperMotion] =
-    Cogen[(Coordinates, Epoch, Option[Offset], Option[RadialVelocity], Option[Parallax])]
+    Cogen[(Coordinates, Epoch, Option[ProperVelocity], Option[RadialVelocity], Option[Parallax])]
       .contramap { p =>
         (p.baseCoordinates, p.epoch, p.properVelocity, p.radialVelocity, p.parallax)
       }

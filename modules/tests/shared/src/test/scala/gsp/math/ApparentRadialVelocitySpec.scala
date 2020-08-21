@@ -10,7 +10,6 @@ import cats.kernel.laws.discipline._
 import cats.tests.CatsSuite
 import coulomb._
 import coulomb.si._
-import coulomb.siprefix._
 import gsp.math.arb._
 import gsp.math.units._
 
