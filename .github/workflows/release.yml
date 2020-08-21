@@ -8,7 +8,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - uses: olafurpg/setup-scala@v2
+      - uses: coursier/cache-action@v3
+      - name: Set up JDK 14
+        uses: olafurpg/setup-scala@v7
+        with:
+          java-version: adoptjdk@14
       - uses: olafurpg/setup-gpg@v2
       - name: Publish
         run: csbt ci-release
