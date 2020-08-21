@@ -40,6 +40,7 @@ lazy val math = crossProject(JVMPlatform, JSPlatform)
       "edu.gemini"                 %%% "gpp-jts"                 % jtsVersion,
       "com.manyangled"             %%% "coulomb"                 % coulombVersion,
       "com.manyangled"             %%% "coulomb-si-units"        % coulombVersion,
+      "com.manyangled"             %%% "coulomb-accepted-units"  % coulombVersion,
       "com.manyangled"             %%% "coulomb-cats"            % coulombVersion,
       "com.manyangled"             %%% "coulomb-refined"         % coulombVersion,
       "org.typelevel"              %%% "spire"                   % spireVersion,
