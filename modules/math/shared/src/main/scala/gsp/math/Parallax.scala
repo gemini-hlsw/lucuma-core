@@ -4,30 +4,43 @@
 package gsp.math
 
 import cats._
-import cats.implicits._
 import coulomb._
 import coulomb.cats.implicits._
-import gsp.math.optics.SplitMono
+import gsp.math.optics._
 import gsp.math.units._
-import monocle.Iso
 import spire.math.Rational
+import spire.std.long._
 
 /**
   * Parallax stored as microarcseconds
   * Normally parallax is expressed in milliarcseconds but simbad reports them
   * with a higher precision thus using microarcseconds gives us enough space
+  * Absolute allowed parallax values need to be less or equal thán 180 degrees
   */
-final case class Parallax(μas: Quantity[Long, MicroArcSecond]) {
+sealed abstract case class Parallax protected (μas: Quantity[Long, MicroArcSecond]) {
   val mas: Quantity[Rational, MilliArcSecond] = μas.to[Rational, MilliArcSecond]
+
+  override def toString: String =
+    s"Parallax(${μas.show})"
 }
 
 object Parallax extends ParallaxOptics {
+  val MaxValue: Parallax = apply(648000000000L)
+  val MinValue: Parallax = apply(-648000000000L)
 
   /**
     * The `No parallax`
     * @group Constructors
     */
-  val Zero: Parallax = Parallax(0.withUnit[MicroArcSecond])
+  val Zero: Parallax = apply(0L)
+
+  // Internal unbounded constructor
+  private def apply(μas: Long): Parallax =
+    apply(μas.withUnit[MicroArcSecond])
+
+  // Internal unbounded constructor
+  private def apply(μas: Quantity[Long, MicroArcSecond]): Parallax =
+    new Parallax(μas) {}
 
   /** @group Typeclass Instances */
   implicit val orderParallax: Order[Parallax] =
@@ -35,24 +48,37 @@ object Parallax extends ParallaxOptics {
 
   /** @group Typeclass Instances */
   implicit val monoidParallax: Monoid[Parallax] =
-    Monoid.instance(Zero, (a, b) => Parallax((a.μas.value + b.μas.value).withUnit[MicroArcSecond]))
+    Monoid.instance(Zero, (a, b) => apply(a.μas + b.μas))
+
+  /**
+    * Construct a new Parallax of the given magnitude in integral microarcseconds, modulo 180°. Exact.
+    * @group Constructors
+    */
+  def fromMicroarcseconds(μas: Long): Parallax = {
+    val µasPer180 = 180L * 60L * 60L * 1000L * 1000L
+    val µasʹ      = μas % µasPer180
+    apply(µasʹ)
+  }
 
 }
 
 sealed trait ParallaxOptics {
 
-  val μas: Iso[Long, Parallax] =
-    Iso[Long, Parallax](v => Parallax(v.withUnit[MicroArcSecond]))(_.μas.value)
+  /**
+    * This `Parallax` in microarcseconds. modulo 180°.
+    */
+  lazy val microarcseconds: SplitMono[Parallax, Long] =
+    SplitMono(_.μas.value, Parallax.fromMicroarcseconds)
 
-  val microarcseconds: Iso[Long, Parallax] = μas
+  lazy val μas: SplitMono[Parallax, Long] = microarcseconds
 
   /**
-    * This `Parallax` as signed decimal milliseconds.
+    * This `Parallax` as in milliarcseconds.
     */
-  val milliarcseconds: SplitMono[Parallax, BigDecimal] =
-    SplitMono
-      .fromIso(microarcseconds.reverse)
+  lazy val milliarcseconds: SplitMono[Parallax, BigDecimal] =
+    microarcseconds
       .imapB(_.underlying.movePointRight(3).longValue,
              n => new java.math.BigDecimal(n).movePointLeft(3)
       )
+
 }

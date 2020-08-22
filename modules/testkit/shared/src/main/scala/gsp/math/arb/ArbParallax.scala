@@ -6,14 +6,16 @@ package arb
 
 import gsp.math.Parallax
 import org.scalacheck.Arbitrary
-import org.scalacheck.Arbitrary._
+import org.scalacheck.Gen
 import org.scalacheck.Cogen
 
 trait ArbParallax {
 
   implicit val arbParallax: Arbitrary[Parallax] =
     Arbitrary {
-      arbitrary[Long].map(Parallax.μas.get)
+      Gen
+        .choose(Parallax.MinValue.μas.value, Parallax.MaxValue.μas.value)
+        .map(Parallax.fromMicroarcseconds(_))
     }
 
   implicit val cogParallax: Cogen[Parallax] =
