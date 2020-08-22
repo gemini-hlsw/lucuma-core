@@ -44,7 +44,7 @@ trait TwilightCalc extends SunCalc {
       case TwilightBoundType.Official =>
         // Horizon geometric correction from p. 24 of the Skycalc manual: sqrt(2 * elevation / Re) (radians)
         boundType.horizonAngle + Math.sqrt(
-          2.0 * place.altitude / TwilightCalc.EQUAT_RAD
+          2.0 * place.altitudeDouble / TwilightCalc.EQUAT_RAD
         ) * TwilightCalc.DEG_IN_RADIAN
       case _                          => boundType.horizonAngle
     }

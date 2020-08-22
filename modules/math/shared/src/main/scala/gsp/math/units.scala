@@ -11,8 +11,8 @@ import coulomb.unitops.UnitConverter
 import eu.timepit.refined._
 import eu.timepit.refined.auto._
 import eu.timepit.refined.numeric._
-import spire.math.Rational
 import eu.timepit.refined.types.numeric.PosInt
+import spire.math.Rational
 
 trait units {
   // Wavelength units
@@ -22,7 +22,6 @@ trait units {
   type CentimetersPerSecond = (Centi %* Meter) %/ Second
   type MetersPerSecond      = Meter %/ Second
   type KilometersPerSecond  = (Kilo %* Meter) %/ Second
-
 
   // PositiveInt can be converted to Rational exactly
   implicit def rationalConverter[U1, U2](implicit

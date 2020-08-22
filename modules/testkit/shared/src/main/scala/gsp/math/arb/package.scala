@@ -4,6 +4,7 @@
 package gsp.math
 
 import cats.Applicative
+import eu.timepit.refined.types.numeric.NonNegInt
 import org.scalacheck._
 
 package object arb {
@@ -36,5 +37,7 @@ package object arb {
     def pure[A](a: A): Gen[A] =
       Gen.const(a)
   }
+
+  implicit val cogenNonNegativeInt: Cogen[NonNegInt] = Cogen[Int].contramap(_.value)
 
 }

@@ -3,12 +3,19 @@
 
 package gsp.math
 
-import cats.tests.CatsSuite
 import cats.{ Eq, Show }
+import cats.implicits._
+import coulomb.scalacheck.ArbQuantity._
+import coulomb.cats.implicits._
+import eu.timepit.refined.auto._
+import eu.timepit.refined.scalacheck.numeric._
+import eu.timepit.refined.cats._
 import gsp.math.arb._
 import monocle.law.discipline._
+import munit._
+import org.scalacheck.Prop._
 
-object PlaceSpec extends CatsSuite {
+class PlaceSuite extends FunSuite with DisciplineSuite with ScalaCheckSuite {
   import ArbPlace._
   import ArbDeclination._
   import ArbAngle._
@@ -19,13 +26,13 @@ object PlaceSpec extends CatsSuite {
 
   test("Equality must be natural") {
     forAll { (a: Place, b: Place) =>
-      a.equals(b) shouldEqual Eq[Place].eqv(a, b)
+      assertEquals(a.equals(b), Eq[Place].eqv(a, b))
     }
   }
 
   test("Show must be natural") {
     forAll { (a: Place) =>
-      a.toString shouldEqual Show[Place].show(a)
+      assertEquals(a.toString, Show[Place].show(a))
     }
   }
 }

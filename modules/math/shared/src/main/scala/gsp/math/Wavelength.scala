@@ -12,11 +12,11 @@ import eu.timepit.refined._
 import eu.timepit.refined.auto._
 import eu.timepit.refined.cats._
 import eu.timepit.refined.numeric._
+import eu.timepit.refined.types.numeric.PosInt
 import gsp.math.units._
 import monocle.Iso
 import monocle.Prism
 import spire.math.Rational
-import eu.timepit.refined.types.numeric.PosInt
 
 /**
   * Exact wavelengths represented as positive integral picometers in the range (0 .. PosInt.MaxValue]
@@ -29,7 +29,8 @@ final case class Wavelength(toPicometers: Quantity[PosInt, Picometer]) {
     * Returns the wavelength value in nanometers
     * The exact nanometer value needs to be represented as a Rational
     */
-  def nm: Quantity[Rational, Nanometer]        = toPicometers.to[Rational, Nanometer]
+  def nm: Quantity[Rational, Nanometer] = toPicometers.to[Rational, Nanometer]
+
   def nanometer: Quantity[Rational, Nanometer] = nm
 
   /**

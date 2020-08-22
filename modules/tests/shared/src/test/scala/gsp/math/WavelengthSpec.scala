@@ -11,9 +11,9 @@ import gsp.math.units._
 import monocle.law.discipline._
 import coulomb.refined._
 import eu.timepit.refined.auto._
+import eu.timepit.refined.cats._
 import eu.timepit.refined.numeric._
 import eu.timepit.refined.scalacheck.numeric._
-import eu.timepit.refined.cats._
 import eu.timepit.refined.types.numeric.PosInt
 
 final class WavelengthSpec extends CatsSuite {

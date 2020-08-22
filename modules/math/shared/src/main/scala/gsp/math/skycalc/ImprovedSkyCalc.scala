@@ -16,7 +16,7 @@ import java.time.ZonedDateTime
 case class ImprovedSkyCalc(place: Place) extends ImprovedSkyCalcMethods {
   val degreesLatitude = place.latitude.toAngle.toSignedDoubleDegrees
   val hoursLongitude  = -place.longitude.toSignedDoubleDegrees / 15
-  val siteAltitude    = place.altitude.toDouble
+  val siteAltitude    = place.altitudeDouble
 
   def calculate(
     coords:        Coordinates,

@@ -4,11 +4,11 @@
 package gsp.math.arb
 
 import eu.timepit.refined.scalacheck.numeric._
+import eu.timepit.refined.types.numeric.PosInt
 import gsp.math.Wavelength
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Cogen._
 import org.scalacheck._
-import eu.timepit.refined.types.numeric.PosInt
 
 trait ArbWavelength {
 

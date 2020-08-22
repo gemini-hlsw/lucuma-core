@@ -72,6 +72,7 @@ lazy val testkit = crossProject(JVMPlatform, JSPlatform)
     libraryDependencies ++= Seq(
       "org.typelevel"              %%% "cats-testkit"           % catsVersion,
       "org.typelevel"              %%% "cats-testkit-scalatest" % catsTestkitScalaTestVersion,
+      "com.manyangled"             %%% "coulomb-scalacheck"     % coulombVersion,
       "com.github.julien-truffaut" %%% "monocle-law"            % monocleVersion,
       "org.typelevel"              %%% "spire-laws"             % spireVersion,
       "eu.timepit"                 %%% "refined-scalacheck"     % refinedVersion
@@ -88,8 +89,11 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform)
     name := "gsp-math-tests",
     skip in publish := true,
     libraryDependencies ++= Seq(
-      "com.disneystreaming" %%% "weaver-framework" % "0.4.3"
+      "com.disneystreaming" %%% "weaver-framework" % "0.4.3",
+      "org.scalameta"       %%% "munit"            % "0.7.11" % Test,
+      "org.typelevel"       %%% "discipline-munit" % "0.2.3"  % Test
     ),
+    testFrameworks += new TestFramework("munit.Framework"),
     testFrameworks += new TestFramework("weaver.framework.TestFramework"),
     scalaJSLinkerConfig ~= (_.withModuleKind(ModuleKind.CommonJSModule))
   )
