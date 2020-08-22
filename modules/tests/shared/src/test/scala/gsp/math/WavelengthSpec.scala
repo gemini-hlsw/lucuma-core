@@ -14,6 +14,7 @@ import eu.timepit.refined.auto._
 import eu.timepit.refined.numeric._
 import eu.timepit.refined.scalacheck.numeric._
 import eu.timepit.refined.cats._
+import eu.timepit.refined.types.numeric.PosInt
 
 final class WavelengthSpec extends CatsSuite {
   import ArbWavelength._
@@ -31,7 +32,7 @@ final class WavelengthSpec extends CatsSuite {
 
   test("Order must be consistent with .toPicometers") {
     forAll { (a: Wavelength, b: Wavelength) =>
-      Order[PositiveInt].comparison(a.toPicometers.value, b.toPicometers.value) shouldEqual
+      Order[PosInt].comparison(a.toPicometers.value, b.toPicometers.value) shouldEqual
         Order[Wavelength].comparison(a, b)
     }
   }
@@ -52,7 +53,7 @@ final class WavelengthSpec extends CatsSuite {
   }
 
   test("toAngstrom") {
-    forAll { (a: PositiveInt) =>
+    forAll { (a: PosInt) =>
       whenever(a.value <= Wavelength.MaxAngstrom) {
         Wavelength.fromAngstrom(a).map(_.angstrom.value.isWhole) shouldEqual true.some
         Wavelength.fromAngstrom(a).map(_.angstrom.value) shouldEqual a.value.some
@@ -61,7 +62,7 @@ final class WavelengthSpec extends CatsSuite {
   }
 
   test("toNanometers") {
-    forAll { (a: PositiveInt) =>
+    forAll { (a: PosInt) =>
       whenever(a.value <= Wavelength.MaxNanometer) {
         Wavelength.fromNanometers(a).map(_.angstrom.value.isWhole) shouldEqual true.some
         Wavelength.fromNanometers(a).map(_.nm.value) shouldEqual a.value.some

@@ -16,20 +16,20 @@ import gsp.math.units._
 import monocle.Iso
 import monocle.Prism
 import spire.math.Rational
+import eu.timepit.refined.types.numeric.PosInt
 
 /**
-  * Exact wavelengths represented as positive integral picometers in the range (0 .. PositiveInt.MaxValue]
+  * Exact wavelengths represented as positive integral picometers in the range (0 .. PosInt.MaxValue]
   * which means the largest representable wavelength is 2.147483647 mm.
   * @param toPicometers This wavelength in positive integral picometers (10^-12^ of a meter).
   */
-final case class Wavelength(toPicometers: Quantity[PositiveInt, Picometer]) {
+final case class Wavelength(toPicometers: Quantity[PosInt, Picometer]) {
 
   /**
     * Returns the wavelength value in nanometers
     * The exact nanometer value needs to be represented as a Rational
     */
-  def nm: Quantity[Rational, Nanometer] = toPicometers.to[Rational, Nanometer]
-
+  def nm: Quantity[Rational, Nanometer]        = toPicometers.to[Rational, Nanometer]
   def nanometer: Quantity[Rational, Nanometer] = nm
 
   /**
@@ -56,7 +56,7 @@ object Wavelength {
     * Construct a wavelength from a positive int
     * @group constructor
     */
-  def apply(picometers: PositiveInt): Wavelength =
+  def apply(picometers: PosInt): Wavelength =
     new Wavelength(picometers.withUnit[Picometer])
 
   /** @group Typeclass Instances */
@@ -96,11 +96,11 @@ object Wavelength {
     )
 
   /**
-    * Iso from PositiveInt in pm into Wavelength and back.
+    * Iso from PosInt in pm into Wavelength and back.
     * @group Optics
     */
-  val picometers: Iso[PositiveInt, Wavelength] =
-    Iso[PositiveInt, Wavelength](i => Wavelength(i.withUnit[Picometer]))(_.toPicometers.value)
+  val picometers: Iso[PosInt, Wavelength] =
+    Iso[PosInt, Wavelength](i => Wavelength(i.withUnit[Picometer]))(_.toPicometers.value)
 
   /**
     * Prism from Int in pm into Wavelength and back.
