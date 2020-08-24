@@ -54,11 +54,7 @@ object Parallax extends ParallaxOptics {
     * Construct a new Parallax of the given magnitude in integral microarcseconds, modulo 180°. Exact.
     * @group Constructors
     */
-  def fromMicroarcseconds(μas: Long): Parallax = {
-    val µasPer180 = 180L * 60L * 60L * 1000L * 1000L
-    val µasʹ      = μas % µasPer180
-    apply(µasʹ)
-  }
+   def fromMicroarcseconds(μas: Long): Parallax = apply(Angle.signedMicroarcseconds.normalize(μas))
 
 }
 
