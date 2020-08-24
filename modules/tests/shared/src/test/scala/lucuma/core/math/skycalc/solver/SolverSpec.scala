@@ -8,14 +8,15 @@ import java.time.Instant
 import java.time.Duration
 import gsp.math.skycalc.solver.SolverStrategy._
 import gsp.math.skycalc.solver.GetterStrategy._
+import cats.Eval
 
 final class SolverSpec extends CatsSuite {
   object TestCalculator extends Calculator[Unit] {
     override val instants: List[Instant] = List.empty
 
-    override def toIndex(i: Instant): Int = 0
+    override def toIndex(i: Instant): Option[Int] = Some(0)
 
-    override val result: Instant => Unit = _ => ()
+    override def result(i: Instant): Eval[Unit] = Eval.now(())
   }
 
   case class TestConstraint(f: Instant => Boolean) extends Constraint[Unit, Unit] {
@@ -25,9 +26,9 @@ final class SolverSpec extends CatsSuite {
   }
 
   implicit val testValueGetter = new CalcGetter[Closest, Unit] {
-    def get[T](calc: Calculator[T])(field: T => Unit)(
+    def get(calc: Calculator[Unit])(
       instant:       Instant
-    ): Unit = ()
+    ): Option[Unit] = Some(())
   }
 
   def constraintSolver[S](f: Instant => Boolean)(implicit solver: Solver[S]) =

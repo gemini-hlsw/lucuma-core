@@ -36,8 +36,8 @@ final class TargetCalculatorSpec extends CatsSuite with Tolerance {
     assert(!singleTargetCalculator.isDefinedAt(testInstant.plusMillis(1)))
 
     // check some values
-    assert(37.0 === singleTargetCalculator.value(_.altitudeRaw) +- 1)
-    assert(1.6 === singleTargetCalculator.value(_.airmass) +- 0.1)
+    assert(singleTargetCalculator.value.map(_.altitudeRaw).exists(a => 37.0 === a +- 1))
+    assert(singleTargetCalculator.value.map(_.airmass).exists(a => 1.6 === a +- 0.1))
   }
 
   test("Calculates for Target in Interval") {
@@ -52,15 +52,16 @@ final class TargetCalculatorSpec extends CatsSuite with Tolerance {
 
     // check some values
     assert(
-      37.0 === intervalTargetCalculator
-        .valueAt[LinearInterpolating](_.altitude)(testInstant)
-        .toAngle
-        .toSignedDoubleDegrees +- 1
+      intervalTargetCalculator
+        .map(_.altitude)
+        .valueAt[LinearInterpolating](testInstant)
+        .map(_.toAngle.toSignedDoubleDegrees)
+        .exists(a => 37.0 === a +- 1)
     )
     assert(
-      1.6 === intervalTargetCalculator.valueAt[LinearInterpolating](_.airmass)(testInstant) +- 0.1
+      intervalTargetCalculator.map(_.airmass).valueAt[LinearInterpolating](testInstant).exists(a => 1.6 ===  a +- 0.1)
     )
-    assert(89.0 === intervalTargetCalculator.max(_.altitude).toAngle.toSignedDoubleDegrees +- 1)
-    assert(37.0 === intervalTargetCalculator.min(_.altitude).toAngle.toSignedDoubleDegrees +- 1)
+    assert(89.0 === intervalTargetCalculator.map(_.altitude).results.max.map(_.toAngle.toSignedDoubleDegrees).value +- 1)
+    assert(37.0 === intervalTargetCalculator.map(_.altitude).results.min.map(_.toAngle.toSignedDoubleDegrees).value +- 1)
   }
 }

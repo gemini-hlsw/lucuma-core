@@ -9,12 +9,13 @@ import java.time.Instant
 import org.scalacheck.Gen._
 import gsp.math.arb._
 import io.chrisdavenport.cats.time._
+import cats.Eval
 
 final class CalculatorSpec extends CatsSuite {
   import ArbInterval._
 
   case class TestCalculator(interval: Interval, rate: Duration) extends FixedRateCalculator[Unit] {
-    override val result: Instant => Unit = _ => ()
+    override def result(i: Instant): Eval[Unit] = Eval.now(())
   }
 
   test("Fixed Rate Instants") {
@@ -27,10 +28,13 @@ final class CalculatorSpec extends CatsSuite {
         assert(last >= interval.end)
         assert(last < interval.end.plus(duration))
         forAll(instantInInterval(interval, includeEnd = true)) { instant: Instant =>
-          val idx = intervalTargetCalculator.toIndex(instant).toLong
-          assert(idx >= 0 && idx < instants.length)
-          assert(instants.get(idx).exists(_ <= instant))
-          assert(instants.get(idx + 1).forall(_ > instant))
+          val idx = intervalTargetCalculator.toIndex(instant).map(_.toLong)
+          assert(idx.isDefined)
+          idx.foreach{ idx =>
+            assert(idx >= 0 && idx < instants.length)
+            assert(instants.get(idx).exists(_ <= instant))
+            assert(instants.get(idx + 1).forall(_ > instant))
+          }
         }
       }
     }

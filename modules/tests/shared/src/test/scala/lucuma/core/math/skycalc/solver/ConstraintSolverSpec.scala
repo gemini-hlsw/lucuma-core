@@ -9,6 +9,7 @@ import java.time.Duration
 import gsp.math.Declination
 import gsp.math.HourAngle
 import gsp.math.skycalc.SkyCalcResults
+import cats.Eval
 
 /**
   * This is not meant to test the underlying SkyCalc implementations, we assume that this is all working,
@@ -21,20 +22,22 @@ final class ConstraintSolverSpec extends CatsSuite {
 
     override val rate: Duration = Duration.ofMillis(1)
 
-    override val result: Instant => SkyCalcResults = i =>
-      SkyCalcResults(
-        i.toEpochMilli.toDouble, // Elevation
-        0.0,
-        0.0,
-        i.toEpochMilli.toDouble, // Airmass
-        i.toEpochMilli.toDouble % 24, // HourAngle
-        0,
-        0.0,
-        i.toEpochMilli.toDouble, // SkyBrightness
-        0.0,
-        0.0,
-        0.0,
-        0.0
+    override def result(i: Instant): Eval[SkyCalcResults] =
+      Eval.now(
+        SkyCalcResults(
+          i.toEpochMilli.toDouble, // Elevation
+          0.0,
+          0.0,
+          i.toEpochMilli.toDouble, // Airmass
+          i.toEpochMilli.toDouble % 24, // HourAngle
+          0,
+          0.0,
+          i.toEpochMilli.toDouble, // SkyBrightness
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        )
       )
   }
 

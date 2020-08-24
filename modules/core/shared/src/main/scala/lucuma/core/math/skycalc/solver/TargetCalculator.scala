@@ -9,6 +9,7 @@ import gsp.math.Coordinates
 import gsp.math.Place
 import gsp.math.skycalc.ImprovedSkyCalc
 import gsp.math.skycalc.SkyCalcResults
+import cats.Eval
 
 /**
   * Target calculator that allows to calculate different attributes of a target for a given set of instants.
@@ -23,15 +24,15 @@ trait TargetCalculator[G] extends Calculator[SkyCalcResults] {
 
   val skycalc = ImprovedSkyCalc(place)
 
-  val result: Instant => SkyCalcResults = i => skycalc.calculate(targetLocation(i), i, true)
+  def result(i: Instant): Eval[SkyCalcResults] = Eval.later(skycalc.calculate(targetLocation(i), i, true))
 
   // If the target is visible during the scheduled time, return the weighted mean parallactic angle as Some(angle in degrees).
   // Otherwise, the target is not visible, so return None.
   lazy val weightedMeanParallacticAngle: Option[Double] = {
     val (weightedAngles, weights) = results
-      .map(_.parallacticAngleRaw)
+      .map(_.value.parallacticAngleRaw)
       .zip(instants)
-      .zip(results.map(_.airmass))
+      .zip(results.map(_.value.airmass))
       .map {
         case ((angle, t), airmass) =>
           // Wrap negative angles as per Andy's comment in OCSADV-16.

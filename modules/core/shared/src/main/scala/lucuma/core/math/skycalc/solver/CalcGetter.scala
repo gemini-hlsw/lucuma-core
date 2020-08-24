@@ -39,12 +39,12 @@ trait CalcGetter[G, A] { self =>
     * @param field how to extract a partial result of type [[A]] from a [[T]]
     * @param instant the desired [[java.time.Instant]] at which to get the value of type [[A]]
     */
-  def get[T](calc: Calculator[T])(field: T => A)(instant: Instant): A
+  def get(calc: Calculator[A])(instant: Instant): Option[A]
 
   def imap[B](f: A => B)(g: B => A): CalcGetter[G, B] =
     new CalcGetter[G, B] {
-      def get[T](calc: Calculator[T])(field: T => B)(instant: Instant): B =
-        f(self.get(calc)(field.andThen(g))(instant))
+      def get(calc: Calculator[B])(instant: Instant): Option[B] =
+        self.get(calc.map(g))(instant).map(f)
     }
 
   def imap[B](optic: Wedge[A, B]): CalcGetter[G, B] =
@@ -64,46 +64,46 @@ trait CalcGetterInstances {
 
   implicit def closestGetter[A]: CalcGetter[GetterStrategy.Closest, A] =
     new CalcGetter[GetterStrategy.Closest, A] {
-      def get[T](calc: Calculator[T])(field: T => A)(instant: Instant): A = {
-        val idx         = calc.toIndex(instant)
-        val timedResult = calc.timedResults(idx)
-        if (idx >= calc.instants.length - 1)
-          field(timedResult._2)
-        else {
-          val nextTimedResult = calc.timedResults(idx + 1)
-          if (
-            Duration.between(timedResult._1, instant) <
-              Duration.between(instant, nextTimedResult._1)
-          )
-            field(timedResult._2)
-          else
-            field(nextTimedResult._2)
+      def get(calc: Calculator[A])(instant: Instant): Option[A] =
+        calc.toIndex(instant).map { idx =>
+          val timedResult = calc.timedResults(idx)
+          if (idx >= calc.instants.length - 1)
+            timedResult._2.value
+          else {
+            val nextTimedResult = calc.timedResults(idx + 1)
+            if (
+              Duration.between(timedResult._1, instant) <
+                Duration.between(instant, nextTimedResult._1)
+            )
+              timedResult._2.value
+            else
+              nextTimedResult._2.value
+          }
         }
       }
-    }
 
   implicit val interpolatedNumberGetter: CalcGetter[GetterStrategy.LinearInterpolating, Number] =
     new CalcGetter[GetterStrategy.LinearInterpolating, Number] {
-      def get[T](calc: Calculator[T])(field: T => Number)(instant: Instant): Number = {
-        val idx     = calc.toIndex(instant)
-        val result0 = calc.timedResults(idx)
-        val i0      = result0._1
-        val v0      = field(result0._2)
-        if (i0 === instant || idx === calc.timedResults.length - 1) v0
-        else {
-          val result1 = calc.timedResults(idx + 1)
-          val i1      = result1._1
-          // require(t0 <= t && t < t1)
-          val v1      = field(result1._2)
-          val v       =
-            v0 + Rational(instant.toEpochMilli - i0.toEpochMilli,
-                          i1.toEpochMilli - i0.toEpochMilli
-            ) * (v1 - v0)
-          // require((v0 >= v1 && v0 >= v && v >= v1) || (v0 < v1 && v0 <= v && v <= v1))
-          v
+      def get(calc: Calculator[Number])(instant: Instant): Option[Number] =
+        calc.toIndex(instant).map { idx =>
+          val result0 = calc.timedResults(idx)
+          val i0      = result0._1
+          val v0      = result0._2
+          if (i0 === instant || idx === calc.timedResults.length - 1) v0.value
+          else {
+            val result1 = calc.timedResults(idx + 1)
+            val i1      = result1._1
+            // require(t0 <= t && t < t1)
+            val v1      = result1._2
+            val v       =
+              v0.value + Rational(instant.toEpochMilli - i0.toEpochMilli,
+                            i1.toEpochMilli - i0.toEpochMilli
+              ) * (v1.value - v0.value)
+            // require((v0 >= v1 && v0 >= v && v >= v1) || (v0 < v1 && v0 <= v && v <= v1))
+            v
+          }
         }
       }
-    }
 
   // Fails on Infinity
   implicit val interpolatedDoubleGetter: CalcGetter[GetterStrategy.LinearInterpolating, Double] =
@@ -139,12 +139,10 @@ trait CalcGetterInstances {
     getterB: CalcGetter[G, B]
   ): CalcGetter[G, (A, B)] =
     new CalcGetter[G, (A, B)] {
-      def get[T](calc: Calculator[T])(field: T => (A, B))(instant: Instant): (A, B) =
-        (
-          getterA.get(calc)(field.andThen(_._1))(instant),
-          getterB.get(calc)(field.andThen(_._2))(instant)
-        )
-    }
+      def get(calc: Calculator[(A, B)])(instant: Instant): Option[(A, B)] =
+        getterA.get(calc.map(_._1))(instant) product
+        getterB.get(calc.map(_._2))(instant)
+      }
 
 }
 

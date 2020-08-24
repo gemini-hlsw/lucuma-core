@@ -25,50 +25,52 @@ trait Constraint[T, A] {
   def metAt[G](calc: Calculator[T])(i: Instant)(implicit getter: CalcGetter[G, A]): Boolean
 }
 
-case class ElevationConstraint(min: Declination, max: Declination)
-    extends Constraint[SkyCalcResults, Declination] {
-  override def metAt[G](calc: Calculator[SkyCalcResults])(
-    i:                        Instant
-  )(implicit getter:          CalcGetter[G, Declination]): Boolean = {
-    val elevation = calc.valueAt(_.altitude)(i)
-    elevation >= min && elevation <= max
-  }
+case class ElevationConstraint(min: Declination, max: Declination) extends Constraint[SkyCalcResults, Declination] {
+  override def metAt[G](calc: Calculator[SkyCalcResults])(i: Instant)(
+    implicit getter: CalcGetter[G, Declination]
+  ): Boolean =
+    calc.map(_.altitude).valueAt(i).map { elevation =>
+      elevation >= min && elevation <= max
+    } .getOrElse(false)
 }
 
-case class SkyBrightnessConstraint(min: Double, max: Double)
-    extends Constraint[SkyCalcResults, Double] {
-  override def metAt[G](calc: Calculator[SkyCalcResults])(
-    i:                        Instant
-  )(implicit getter:          CalcGetter[G, Double]): Boolean = {
-    val skyBrightness = calc.valueAt(_.totalSkyBrightness)(i)
-    skyBrightness >= min && skyBrightness <= max
-  }
+case class SkyBrightnessConstraint(min: Double, max: Double) extends Constraint[SkyCalcResults, Double] {
+  override def metAt[G](calc: Calculator[SkyCalcResults])(i: Instant)(
+    implicit getter: CalcGetter[G, Double]
+  ): Boolean =
+    calc.map(_.totalSkyBrightness).valueAt(i).map { skyBrightness =>
+      skyBrightness >= min && skyBrightness <= max
+    } .getOrElse(false)
 }
 
-case class AirmassConstraint(min: Double, max: Double)
-    extends Constraint[SkyCalcResults, (Double, Declination)] {
+case class AirmassConstraint(min: Double, max: Double) extends Constraint[SkyCalcResults, (Double, Declination)] {
+
   private val MinElevation: Declination =
     Declination.fromAngleWithCarry(Angle.fromDoubleDegrees(5.0))._1
-  override def metAt[G](calc: Calculator[SkyCalcResults])(i: Instant)(implicit
-    getter:                   CalcGetter[G, (Double, Declination)]
-  ): Boolean = {
-    val (airmass, elevation) = calc.valueAt(r => (r.airmass, r.altitude))(i)
-    // NOTE: we need to work around errors with interpolation etc which may cause to give wrong airmass values for very small altitudes (<1deg)
-    elevation >= MinElevation && airmass >= min && airmass <= max
-  }
+
+  override def metAt[G](calc: Calculator[SkyCalcResults])(i: Instant)(
+    implicit  getter: CalcGetter[G, (Double, Declination)]
+  ): Boolean =
+    calc.map(r => (r.airmass, r.altitude)).valueAt(i).map { case (airmass, elevation) =>
+      // NOTE: we need to work around errors with interpolation etc which may cause to give wrong airmass values for very small altitudes (<1deg)
+      elevation >= MinElevation && airmass >= min && airmass <= max
+    } .getOrElse(false)
+
 }
 
-case class HourAngleConstraint(min: HourAngle, max: HourAngle)
-    extends Constraint[SkyCalcResults, (HourAngle, Declination)] {
+case class HourAngleConstraint(min: HourAngle, max: HourAngle) extends Constraint[SkyCalcResults, (HourAngle, Declination)] {
+
   private val MinElevation: Declination =
     Declination.fromAngleWithCarry(Angle.fromDoubleDegrees(5.0))._1
-  override def metAt[G](calc: Calculator[SkyCalcResults])(i: Instant)(implicit
-    getter:                   CalcGetter[G, (HourAngle, Declination)]
-  ): Boolean = {
-    val (hourAngle, elevation) = calc.valueAt(r => (r.hourAngle, r.altitude))(i)
-    // NOTE: we need to work around errors with interpolation etc which may cause to give wrong hour angle values for very small altitudes (<1deg)
-    elevation >= MinElevation && hourAngle.toMicroarcseconds >= min.toMicroarcseconds && hourAngle.toMicroarcseconds <= max.toMicroarcseconds
-  }
+
+  override def metAt[G](calc: Calculator[SkyCalcResults])(i: Instant)(
+    implicit getter: CalcGetter[G, (HourAngle, Declination)]
+  ): Boolean =
+    calc.map(r => (r.hourAngle, r.altitude)).valueAt(i).map { case (hourAngle, elevation) =>
+      // NOTE: we need to work around errors with interpolation etc which may cause to give wrong hour angle values for very small altitudes (<1deg)
+      elevation >= MinElevation && hourAngle.toMicroarcseconds >= min.toMicroarcseconds && hourAngle.toMicroarcseconds <= max.toMicroarcseconds
+    } .getOrElse(false)
+
 }
 
 // MoonCalculator is not ported yet.
