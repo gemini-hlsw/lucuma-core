@@ -30,7 +30,7 @@ final case class ProperMotion(
   epoch:           Epoch,
   properVelocity:  Option[Offset],
   radialVelocity:  Option[RadialVelocity],
-  parallax:        Option[Angle]
+  parallax:        Option[Parallax]
 ) {
 
   def at(i: Instant): ProperMotion =
@@ -76,7 +76,7 @@ object ProperMotion extends ProperMotionOptics {
     epoch:           Epoch,
     properVelocity:  Offset,
     radialVelocity:  Double,
-    parallax:        Angle,
+    parallax:        Parallax,
     elapsedYears:    Double
   ): Coordinates = {
     val (ra, dec) = properMotionʹ(
@@ -84,7 +84,7 @@ object ProperMotion extends ProperMotionOptics {
       epoch.scheme.lengthOfYear,
       properVelocity.toSignedDoubleRadians,
       radialVelocity,
-      parallax.toMicroarcseconds.toDouble / 1000000.0,
+      parallax.μas.value / 1000000.0,
       elapsedYears
     )
     Coordinates.unsafeFromRadians(ra, dec)
@@ -176,9 +176,6 @@ object ProperMotion extends ProperMotionOptics {
     implicit val MonoidOrder: Monoid[Order[ProperMotion]] =
       Order.whenEqualMonoid[ProperMotion]
 
-    implicit val AngleOrder: Order[Angle] =
-      Angle.SignedAngleOrder
-
     def order[A: Order](f: ProperMotion => A): Order[ProperMotion] =
       Order.by(f)
 
@@ -220,7 +217,7 @@ trait ProperMotionOptics {
     GenLens[ProperMotion](_.radialVelocity)
 
   /** @group Optics */
-  val parallax: Lens[ProperMotion, Option[Angle]] =
+  val parallax: Lens[ProperMotion, Option[Parallax]] =
     GenLens[ProperMotion](_.parallax)
 
 }

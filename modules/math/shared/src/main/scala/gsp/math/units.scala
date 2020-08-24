@@ -4,6 +4,8 @@
 package gsp.math
 
 import coulomb._
+import coulomb.accepted._
+import coulomb.define.DerivedUnit
 import coulomb.si._
 import coulomb.siprefix._
 import coulomb.unitops.ConvertableUnits
@@ -23,8 +25,16 @@ trait units {
   type MetersPerSecond      = Meter %/ Second
   type KilometersPerSecond  = (Kilo %* Meter) %/ Second
 
+  trait MilliArcSecond
+  implicit val defineUnitMilliArcSecond =
+    DerivedUnit[MilliArcSecond, Degree](Rational(1, 3600 * 1000L), abbv = "mas")
+
+  trait MicroArcSecond
+  implicit val defineUnitMicroArcSecond =
+    DerivedUnit[MicroArcSecond, Degree](Rational(1, 3600 * 1000000L), abbv = "μas")
+
   // PositiveInt can be converted to Rational exactly
-  implicit def rationalConverter[U1, U2](implicit
+  implicit def rationalPositiveIntConverter[U1, U2](implicit
     cu: ConvertableUnits[U1, U2]
   ): UnitConverter[PosInt, U1, Rational, U2] =
     new UnitConverter[PosInt, U1, Rational, U2] {

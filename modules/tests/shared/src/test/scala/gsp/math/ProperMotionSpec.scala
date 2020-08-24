@@ -9,7 +9,7 @@ import gsp.math.arb._
 import monocle.law.discipline._
 
 final class ProperMotionSpec extends CatsSuite {
-  import ArbAngle._
+  import ArbParallax._
   import ArbCoordinates._
   import ArbEpoch._
   import ArbOffset._

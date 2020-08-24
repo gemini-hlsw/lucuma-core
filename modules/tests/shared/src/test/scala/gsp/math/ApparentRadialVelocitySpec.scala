@@ -29,8 +29,10 @@ final class ApparentRadialVelocitySpec extends CatsSuite {
     assert(ApparentRadialVelocity(RadialVelocity.C).toRedshift === Redshift(1))
     assert(
       ApparentRadialVelocity(
-        BigDecimal.decimal(1000, MathContext.DECIMAL32).withUnit[KilometersPerSecond]
-      ).toRedshift === Redshift(BigDecimal.decimal(0.003335641, MathContext.DECIMAL32))
+        BigDecimal.decimal(1744792.10556, MathContext.DECIMAL64).withUnit[KilometersPerSecond]
+      ).toRedshift === Redshift(
+        BigDecimal.decimal(5.82, MathContext.DECIMAL64)
+      )
     )
   }
 
