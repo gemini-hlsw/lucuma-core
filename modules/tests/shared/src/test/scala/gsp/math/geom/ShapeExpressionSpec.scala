@@ -79,7 +79,7 @@ final class ShapeExpressionSpec extends CatsSuite {
       val nominal = e.µasSquared
       val rotated = (e ⟲ a).µasSquared
       val error   = if (nominal === 0L) 0L else (nominal - rotated).toDouble / nominal.toDouble
-      error shouldEqual 0.0 +- 1.0e-14
+      error shouldEqual 0.0 +- 1.0e-13
     }
   }
 
@@ -88,7 +88,7 @@ final class ShapeExpressionSpec extends CatsSuite {
       val nominal = e.µasSquared
       val moved   = (e ↗ o).µasSquared
       val error   = if (nominal === 0L) 0L else (nominal - moved).toDouble / nominal.toDouble
-      error shouldEqual 0.0 +- 1.0e-14
+      error shouldEqual 0.0 +- 1.0e-13
     }
   }
 
