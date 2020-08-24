@@ -24,13 +24,16 @@ final case class Format[A, B](getOption: A => Option[B], reverseGet: B => A) {
   def composeFormat[C](f: Format[B, C]): Format[A, C] =
     Format(getOption(_).flatMap(f.getOption), reverseGet.compose(f.reverseGet))
 
-  /** Compose with another Format. */
+  /** Compose with a Prism. */
   def composePrism[C](f: Prism[B, C]): Format[A, C] =
     Format(getOption(_).flatMap(f.getOption), reverseGet.compose(f.reverseGet))
 
-  /** Compose with another Format. */
+  /** Compose with an Iso. */
   def composeIso[C](f: Iso[B, C]): Format[A, C] =
     Format(getOption(_).map(f.get), reverseGet.compose(f.reverseGet))
+
+  def composeSplitEpi[C](f: SplitEpi[B, C]): Format[A, C] =
+    composeFormat(f.asFormat)
 
   /** Alias to composeFormat. */
   def ^<-*[C](f: Format[B, C]): Format[A, C] =
