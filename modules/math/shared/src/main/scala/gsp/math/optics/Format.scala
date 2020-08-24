@@ -32,6 +32,7 @@ final case class Format[A, B](getOption: A => Option[B], reverseGet: B => A) {
   def composeIso[C](f: Iso[B, C]): Format[A, C] =
     Format(getOption(_).map(f.get), reverseGet.compose(f.reverseGet))
 
+  /** Compose with a SplitEpi. */
   def composeSplitEpi[C](f: SplitEpi[B, C]): Format[A, C] =
     composeFormat(f.asFormat)
 
