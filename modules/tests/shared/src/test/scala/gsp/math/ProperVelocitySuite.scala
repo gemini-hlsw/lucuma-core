@@ -3,11 +3,14 @@
 
 package gsp.math
 
-import cats.tests.CatsSuite
+import cats.implicits._
 import cats.kernel.laws.discipline._
 import gsp.math.arb.ArbProperVelocity._
+import munit.FunSuite
+import munit.DisciplineSuite
+import munit.ScalaCheckSuite
 
-final class ProperVelocitySpec extends CatsSuite {
+final class ProperVelocitySuite extends FunSuite with DisciplineSuite with ScalaCheckSuite {
 
   // Laws
   checkAll("Order[ProperVelocity]", OrderTests[ProperVelocity].order)

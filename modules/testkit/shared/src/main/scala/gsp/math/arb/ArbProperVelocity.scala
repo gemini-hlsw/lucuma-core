@@ -5,26 +5,36 @@ package gsp.math
 package arb
 
 import gsp.math.ProperVelocity
-import gsp.math.RightAscensionAngularVelocity
-import gsp.math.DeclinationAngularVelocity
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Cogen
 
 trait ArbProperVelocity {
-  import ArbRightAscensionAngularVelocity._
-  import ArbDeclinationAngularVelocity._
+  import ProperVelocity._
+
+  implicit def arbAngularVelocityComponent[A]: Arbitrary[AngularVelocityComponent[A]] =
+    Arbitrary {
+      arbitrary[Long].map(AngularVelocityComponent.μasy[A].get)
+    }
+
+  implicit def cogAngularVelocity[A]: Cogen[AngularVelocityComponent[A]] =
+    Cogen[Long].contramap(_.μasy.value)
 
   implicit val arbProperVelocity: Arbitrary[ProperVelocity] =
     Arbitrary {
       for {
-        ra  <- arbitrary[RightAscensionAngularVelocity]
-        dec <- arbitrary[DeclinationAngularVelocity]
+        ra  <- arbitrary[AngularVelocityComponent[VelocityAxis.RA]]
+        dec <- arbitrary[AngularVelocityComponent[VelocityAxis.Dec]]
       } yield ProperVelocity(ra, dec)
     }
 
   implicit val cogProperVelocity: Cogen[ProperVelocity] =
-    Cogen[(RightAscensionAngularVelocity, DeclinationAngularVelocity)].contramap(x => (x.ra, x.dec))
+    Cogen[
+      (
+        AngularVelocityComponent[VelocityAxis.RA],
+        AngularVelocityComponent[VelocityAxis.Dec]
+      )
+    ].contramap(x => (x.ra, x.dec))
 }
 
 object ArbProperVelocity extends ArbProperVelocity
