@@ -4,8 +4,8 @@
 package gsp.math.arb
 
 import eu.timepit.refined.scalacheck.numeric._
+import eu.timepit.refined.types.numeric.PosInt
 import gsp.math.Wavelength
-import gsp.math.units._
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Cogen._
 import org.scalacheck._
@@ -13,7 +13,7 @@ import org.scalacheck._
 trait ArbWavelength {
 
   implicit val arbWavelength: Arbitrary[Wavelength] = Arbitrary {
-    arbitrary[PositiveInt].map(Wavelength(_))
+    arbitrary[PosInt].map(Wavelength(_))
   }
 
   implicit val cogWavelength: Cogen[Wavelength] =

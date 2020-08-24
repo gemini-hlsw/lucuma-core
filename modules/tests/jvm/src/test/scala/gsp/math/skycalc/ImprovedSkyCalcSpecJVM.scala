@@ -44,7 +44,7 @@ object ImprovedSkyCalcSpecJVM extends SimpleIOSuite with IOCheckers {
         forall { coords: Coordinates =>
           val javaCalc = new ImprovedSkyCalcTest(place.latitude.toAngle.toSignedDoubleDegrees,
                                                  place.longitude.toSignedDoubleDegrees,
-                                                 place.altitude
+                                                 place.altitudeDouble
           )
 
           val results = calc.calculate(coords, instant, false)

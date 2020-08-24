@@ -3,6 +3,9 @@
 
 package gsp.math
 
+import coulomb.si._
+import coulomb.refined._
+import eu.timepit.refined.numeric._
 import java.time.ZoneId
 
 package object skycalc {
@@ -10,7 +13,7 @@ package object skycalc {
     Place(
       Lat.fromAngleWithCarry(Angle.fromDoubleDegrees(19.8238068))._1,
       Angle.fromDoubleDegrees(-155.4690550),
-      4213.0,
+      4213.withRefinedUnit[NonNegative, Meter],
       ZoneId.of("Pacific/Honolulu")
     )
 
@@ -18,7 +21,7 @@ package object skycalc {
     Place(
       Lat.fromAngleWithCarry(Angle.fromDoubleDegrees(-30.2407494))._1,
       Angle.fromDoubleDegrees(-70.7366867),
-      2722.0,
+      2722.withRefinedUnit[NonNegative, Meter],
       ZoneId.of("America/Santiago")
     )
 }

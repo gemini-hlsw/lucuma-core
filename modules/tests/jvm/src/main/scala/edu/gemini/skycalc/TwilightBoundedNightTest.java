@@ -153,7 +153,8 @@ public final class TwilightBoundedNightTest {
         final double angle;
         if(type == gsp.math.skycalc.TwilightBoundType.Official$.MODULE$)
             // Horizon geometric correction from p. 24 of the Skycalc manual: sqrt(2 * elevation / Re) (radians)
-            angle = type.horizonAngle() + Math.sqrt(2.0 * place.altitude() / ImprovedSkyCalcMethods.EQUAT_RAD) *
+
+            angle = type.horizonAngle() + Math.sqrt(2.0 * place.altitudeDouble() / ImprovedSkyCalcMethods.EQUAT_RAD) *
                     ImprovedSkyCalcMethods.DEG_IN_RADIAN;
         else angle = type.horizonAngle();
         _calcTimes(angle, jdmid, place);
