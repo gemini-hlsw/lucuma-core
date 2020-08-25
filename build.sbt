@@ -1,6 +1,5 @@
 import sbtcrossproject.CrossType
 
-lazy val doobieVersion               = "0.8.6"
 lazy val attoVersion                 = "0.8.0"
 lazy val catsVersion                 = "2.1.1"
 lazy val collCompatVersion           = "2.1.6"
@@ -27,11 +26,11 @@ inThisBuild(
 
 skip in publish := true
 
-lazy val math = crossProject(JVMPlatform, JSPlatform)
+lazy val core = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Full)
-  .in(file("modules/math"))
+  .in(file("modules/core"))
   .settings(
-    name := "lucuma-math",
+    name := "lucuma-core",
     libraryDependencies ++= Seq(
       "org.tpolecat"               %%% "atto-core"               % attoVersion,
       "org.typelevel"              %%% "cats-core"               % catsVersion,
@@ -66,23 +65,10 @@ lazy val math = crossProject(JVMPlatform, JSPlatform)
     )
   )
 
-lazy val enum = crossProject(JVMPlatform, JSPlatform)
-  .crossType(CrossType.Pure)
-  .in(file("modules/enum"))
-  .settings(
-    name := "lucuma-enum",
-    libraryDependencies ++= Seq(
-      "org.typelevel" %%% "cats-core" % catsVersion
-    )
-  )
-  .dependsOn(math)
-  .jvmConfigure(_.enablePlugins(AutomateHeaderPlugin))
-  .jsSettings(gspScalaJsSettings: _*)
-
 lazy val testkit = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Pure)
   .in(file("modules/testkit"))
-  .dependsOn(math, enum)
+  .dependsOn(core)
   .settings(
     name := "lucuma-testkit",
     libraryDependencies ++= Seq(
@@ -100,7 +86,7 @@ lazy val testkit = crossProject(JVMPlatform, JSPlatform)
 lazy val tests = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Full)
   .in(file("modules/tests"))
-  .dependsOn(math, testkit)
+  .dependsOn(testkit)
   .settings(
     name := "lucuma-tests",
     skip in publish := true,

@@ -1,19 +1,19 @@
 // Copyright (c) 2016-2020 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package lucuma.math.skycalc
+package lucuma.core.math.skycalc
 
 import weaver._
 import weaver.scalacheck._
 
 import cats._
 import cats.implicits._
-import lucuma.math.skycalc.TwilightCalc
+import lucuma.core.math.skycalc.TwilightCalc
 import java.time.LocalDate
-import lucuma.math.Place
-import lucuma.math.arb.ArbTime._
-import lucuma.math.arb.ArbPlace._
-import lucuma.math.arb.ArbTwilightBoundType._
+import lucuma.core.math.Place
+import lucuma.core.math.arb.ArbTime._
+import lucuma.core.math.arb.ArbPlace._
+import lucuma.core.math.arb.ArbTwilightBoundType._
 import edu.gemini.skycalc.TwilightBoundedNightTest
 import java.time.Instant
 import org.scalactic.Tolerance

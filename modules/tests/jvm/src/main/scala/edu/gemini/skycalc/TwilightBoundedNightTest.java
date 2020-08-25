@@ -12,11 +12,11 @@ import java.util.logging.Logger;
 import java.util.logging.Level;
 
 import java.util.Calendar;
-import lucuma.math.Place;
+import lucuma.core.math.Place;
 
 /**
   * This class exists purely for testing purposes.
-  * It provides the same functionality as {lucuma.math.skycalc.TwilightCalc},
+  * It provides the same functionality as {lucuma.core.math.skycalc.TwilightCalc},
   * but using the Java implementation of ImprovedSkyCalcMethods, so that
   * its results can be compared against its Scala version.
   *
@@ -44,7 +44,7 @@ public final class TwilightBoundedNightTest {
      *
      * @return TwilightBoundedNightTest starting on the specified date
      */
-    public static TwilightBoundedNightTest forDate(lucuma.math.skycalc.TwilightBoundType type, int date, int month, int year, Place place) {
+    public static TwilightBoundedNightTest forDate(lucuma.core.math.skycalc.TwilightBoundType type, int date, int month, int year, Place place) {
 
         Calendar c = Calendar.getInstance(TimeZone.getTimeZone(place.zoneId()));
 
@@ -75,7 +75,7 @@ public final class TwilightBoundedNightTest {
      *
      * @param place the place in the world
      */
-    public static TwilightBoundedNightTest forTime(lucuma.math.skycalc.TwilightBoundType type, long time, Place place) {
+    public static TwilightBoundedNightTest forTime(lucuma.core.math.skycalc.TwilightBoundType type, long time, Place place) {
         TwilightBoundedNightTest tonight;
         tonight = new TwilightBoundedNightTest(type, time, place);
 
@@ -106,7 +106,7 @@ public final class TwilightBoundedNightTest {
         return tonight;
     }
 
-    private lucuma.math.skycalc.TwilightBoundType _type;
+    private lucuma.core.math.skycalc.TwilightBoundType _type;
     private Place _place;
     private long _start;
     private long _end;
@@ -126,7 +126,7 @@ public final class TwilightBoundedNightTest {
      *
      * @param place the place in the world
      */
-    public TwilightBoundedNightTest(lucuma.math.skycalc.TwilightBoundType type, long time, Place place) {
+    public TwilightBoundedNightTest(lucuma.core.math.skycalc.TwilightBoundType type, long time, Place place) {
         _type = type;
         _place = place;
 
@@ -151,7 +151,7 @@ public final class TwilightBoundedNightTest {
         // -- Andrew Stephens 2017-11-14
 
         final double angle;
-        if(type == lucuma.math.skycalc.TwilightBoundType.Official$.MODULE$)
+        if(type == lucuma.core.math.skycalc.TwilightBoundType.Official$.MODULE$)
             // Horizon geometric correction from p. 24 of the Skycalc manual: sqrt(2 * elevation / Re) (radians)
 
             angle = type.horizonAngle() + Math.sqrt(2.0 * place.altitudeDouble() / ImprovedSkyCalcMethods.EQUAT_RAD) *
@@ -209,7 +209,7 @@ public final class TwilightBoundedNightTest {
         _end = jdrise.toTimestamp();
     }
 
-    public lucuma.math.skycalc.TwilightBoundType getType() {
+    public lucuma.core.math.skycalc.TwilightBoundType getType() {
         return _type;
     }
 
