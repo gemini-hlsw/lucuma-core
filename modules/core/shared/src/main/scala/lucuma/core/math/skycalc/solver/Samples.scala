@@ -4,7 +4,7 @@
 package gsp.math.skycalc
 package solver
 
-import cats.{ Eval, MonoidK }
+import cats.{ Eval, Functor, MonoidK }
 import cats.implicits._
 import gsp.math.{ Coordinates, Place }
 import io.chrisdavenport.cats.time._
@@ -103,6 +103,12 @@ object Samples {
   /** An empty `Samples`. */
   def empty[A]: Samples[A] =
     Samples(TreeMap.empty)
+
+  /** Samples is a covariant functor. */
+  implicit val FunctorSamples: Functor[Samples] =
+    new Functor[Samples] {
+      def map[A,B](fa: Samples[A])(f: A => B) = fa.map(f)
+    }
 
   /** `Samples` is a `MonoidK`. */
   implicit val MonoidKSamples: MonoidK[Samples] =
