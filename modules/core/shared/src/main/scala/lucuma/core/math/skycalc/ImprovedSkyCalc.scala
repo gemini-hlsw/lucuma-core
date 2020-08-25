@@ -47,7 +47,8 @@ case class ImprovedSkyCalc(place: Place) extends ImprovedSkyCalcMethods {
       sid.d,
       degreesLatitude,
       jdut,
-      calculateMoon
+      calculateMoon,
+      coords,
     )
   }
 
@@ -61,7 +62,8 @@ case class ImprovedSkyCalc(place: Place) extends ImprovedSkyCalcMethods {
     sid:             Double,
     lat:             Double,
     jdut:            DoubleRef,
-    calculateMoon:   Boolean
+    calculateMoon:   Boolean,
+    coords:          Coordinates,
   ): SkyCalcResults = {
     var altitude                             = .0
     var hourAngle                            = .0
@@ -188,7 +190,9 @@ case class ImprovedSkyCalc(place: Place) extends ImprovedSkyCalcMethods {
       lunarPhaseAngle,
       sunAltitude,
       lunarDistance,
-      lunarElevation
+      lunarElevation,
+      coords,
+      place
     )
   }
 

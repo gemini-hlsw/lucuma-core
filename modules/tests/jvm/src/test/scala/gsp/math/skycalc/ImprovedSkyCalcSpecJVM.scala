@@ -28,6 +28,11 @@ import io.chrisdavenport.cats.time._
 
 final class ImprovedSkyCalcSpecJVM extends ScalaCheckSuite {
 
+  override val checkConfig: CheckConfig = {
+    val old = super.checkConfig
+    old.copy(minimumSuccessful = old.minimumSuccessful / 3) // this is a slow test
+  }
+
   private val zdtFrom  = ZonedDateTime.of(
     LocalDate.of(1901, 1, 1),
     LocalTime.MIDNIGHT,

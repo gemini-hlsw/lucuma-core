@@ -20,7 +20,7 @@ class ConstraintSolver[S, G, T, A](
   constraint:      Constraint[T, A],
   tolerance:       Duration = Duration.ofSeconds(30)
 )(implicit solver: Solver[S]) {
-  def solve(calc: Calculator[T])(interval: Interval)(implicit getter: CalcGetter[G, A]): Schedule =
+  def solve(calc: Samples[T])(interval: Interval)(implicit getter: CalcGetter[G, A]): Schedule =
     solver.solve(constraint.metAt[G](calc))(interval, tolerance)
 }
 

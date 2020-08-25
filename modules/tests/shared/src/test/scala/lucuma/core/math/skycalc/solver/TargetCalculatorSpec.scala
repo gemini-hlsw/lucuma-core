@@ -10,8 +10,9 @@ import gsp.math.RightAscension
 import java.time.ZonedDateTime
 import java.time.LocalDate
 import java.time.LocalTime
-import java.time.Instant
 import org.scalactic.Tolerance
+import gsp.math.skycalc.SkyCalcResults
+import java.time.Duration
 import gsp.math.skycalc.solver.GetterStrategy.LinearInterpolating
 
 /**
@@ -24,31 +25,21 @@ final class TargetCalculatorSpec extends CatsSuite with Tolerance {
 
   private val testInstant     =
     ZonedDateTime.of(LocalDate.of(2014, 3, 1), LocalTime.of(20, 0, 0), GN.zone).toInstant
-  private val testCoordinates = (_: Instant) =>
+
+  private val testCoordinates =
     Coordinates(RightAscension.fromDoubleDegrees(150), Declination.fromDoubleDegrees(20).get)
 
-  private def singleTargetCalculator = TargetCalculator(GN, testCoordinates, testInstant)
+  val singleTargetCalculator: Samples[SkyCalcResults] =
+    Samples.single(testInstant, testCoordinates).toSkyCalResultsAt(GN)
 
-  test("Calculates for Single Target") {
-    // check definition interval
-    assert(!singleTargetCalculator.isDefinedAt(testInstant.minusMillis(1)))
-    assert(singleTargetCalculator.isDefinedAt(testInstant))
-    assert(!singleTargetCalculator.isDefinedAt(testInstant.plusMillis(1)))
-
-    // check some values
-    assert(singleTargetCalculator.value.map(_.altitudeRaw).exists(a => 37.0 === a +- 1))
-    assert(singleTargetCalculator.value.map(_.airmass).exists(a => 1.6 === a +- 0.1))
+  test("Retrieves singleton value at singleton time.") {
+    assert(singleTargetCalculator.valueAt[GetterStrategy.Closest](testInstant).map(_.altitudeRaw).exists(a => 37.0 === a +- 1))
+    assert(singleTargetCalculator.valueAt[GetterStrategy.Closest](testInstant).map(_.airmass).exists(a => 1.6 === a +- 0.1))
   }
 
   test("Calculates for Target in Interval") {
-    Coordinates(RightAscension.fromDoubleDegrees(150), Declination.fromDoubleDegrees(20).get)
     val interval                 = Interval.unsafe(testInstant, testInstant.plusSeconds(4 * 60 * 60))
-    val intervalTargetCalculator = TargetCalculator(GN, testCoordinates, interval)
-
-    // check definition interval
-    assert(!intervalTargetCalculator.isDefinedAt(interval.start.minusMillis(1)))
-    assert(intervalTargetCalculator.isDefinedAt(interval.start))
-    assert(intervalTargetCalculator.isDefinedAt(interval.end))
+    val intervalTargetCalculator = Samples.atFixedRate(interval, Duration.ofSeconds(30L))(_ => testCoordinates).toSkyCalResultsAt(GN)
 
     // check some values
     assert(
@@ -61,7 +52,8 @@ final class TargetCalculatorSpec extends CatsSuite with Tolerance {
     assert(
       intervalTargetCalculator.map(_.airmass).valueAt[LinearInterpolating](testInstant).exists(a => 1.6 ===  a +- 0.1)
     )
-    assert(89.0 === intervalTargetCalculator.map(_.altitude).results.max.map(_.toAngle.toSignedDoubleDegrees).value +- 1)
-    assert(37.0 === intervalTargetCalculator.map(_.altitude).results.min.map(_.toAngle.toSignedDoubleDegrees).value +- 1)
+
+    assert(89.0 === intervalTargetCalculator.map(_.altitude).data.values.max.map(_.toAngle.toSignedDoubleDegrees).value +- 1)
+    assert(37.0 === intervalTargetCalculator.map(_.altitude).data.values.min.map(_.toAngle.toSignedDoubleDegrees).value +- 1)
   }
 }

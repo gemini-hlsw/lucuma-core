@@ -1,45 +1,41 @@
 // Copyright (c) 2016-2020 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package gsp.math.skycalc.solver
+package gsp.math.skycalc
+package solver
 
 import cats.tests.CatsSuite
-import java.time.Instant
 import java.time.Duration
 import gsp.math.Declination
 import gsp.math.HourAngle
 import gsp.math.skycalc.SkyCalcResults
-import cats.Eval
+import gsp.math.Coordinates
 
 /**
   * This is not meant to test the underlying SkyCalc implementations, we assume that this is all working,
   * this only tests the general mechanics of the TargetCalculator class.
   */
 final class ConstraintSolverSpec extends CatsSuite {
-  object TestCalculator extends FixedRateCalculator[SkyCalcResults] {
 
-    override val interval: Interval = buildInterval(0, 90)
-
-    override val rate: Duration = Duration.ofMillis(1)
-
-    override def result(i: Instant): Eval[SkyCalcResults] =
-      Eval.now(
-        SkyCalcResults(
-          i.toEpochMilli.toDouble, // Elevation
-          0.0,
-          0.0,
-          i.toEpochMilli.toDouble, // Airmass
-          i.toEpochMilli.toDouble % 24, // HourAngle
-          0,
-          0.0,
-          i.toEpochMilli.toDouble, // SkyBrightness
-          0.0,
-          0.0,
-          0.0,
-          0.0
-        )
+  val TestCalculator =
+    Samples.atFixedRate(buildInterval(0, 90), Duration.ofMillis(1L)) { i =>
+      SkyCalcResults(
+        i.toEpochMilli.toDouble, // Elevation
+        0.0,
+        0.0,
+        i.toEpochMilli.toDouble, // Airmass
+        i.toEpochMilli.toDouble % 24, // HourAngle
+        0,
+        0.0,
+        i.toEpochMilli.toDouble, // SkyBrightness
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        Coordinates.Zero,
+        GN,
       )
-  }
+    }
 
   test("ElevationSolver") {
     val solver =

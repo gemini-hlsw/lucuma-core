@@ -22,11 +22,11 @@ trait Constraint[T, A] {
     * Defines the actual constraint by returning true or false for a given instant <code>i</code>
     * depending on whether to constraint is met or not.
     */
-  def metAt[G](calc: Calculator[T])(i: Instant)(implicit getter: CalcGetter[G, A]): Boolean
+  def metAt[G](calc: Samples[T])(i: Instant)(implicit getter: CalcGetter[G, A]): Boolean
 }
 
 case class ElevationConstraint(min: Declination, max: Declination) extends Constraint[SkyCalcResults, Declination] {
-  override def metAt[G](calc: Calculator[SkyCalcResults])(i: Instant)(
+  override def metAt[G](calc: Samples[SkyCalcResults])(i: Instant)(
     implicit getter: CalcGetter[G, Declination]
   ): Boolean =
     calc.map(_.altitude).valueAt(i).map { elevation =>
@@ -35,7 +35,7 @@ case class ElevationConstraint(min: Declination, max: Declination) extends Const
 }
 
 case class SkyBrightnessConstraint(min: Double, max: Double) extends Constraint[SkyCalcResults, Double] {
-  override def metAt[G](calc: Calculator[SkyCalcResults])(i: Instant)(
+  override def metAt[G](calc: Samples[SkyCalcResults])(i: Instant)(
     implicit getter: CalcGetter[G, Double]
   ): Boolean =
     calc.map(_.totalSkyBrightness).valueAt(i).map { skyBrightness =>
@@ -48,7 +48,7 @@ case class AirmassConstraint(min: Double, max: Double) extends Constraint[SkyCal
   private val MinElevation: Declination =
     Declination.fromAngleWithCarry(Angle.fromDoubleDegrees(5.0))._1
 
-  override def metAt[G](calc: Calculator[SkyCalcResults])(i: Instant)(
+  override def metAt[G](calc: Samples[SkyCalcResults])(i: Instant)(
     implicit  getter: CalcGetter[G, (Double, Declination)]
   ): Boolean =
     calc.map(r => (r.airmass, r.altitude)).valueAt(i).map { case (airmass, elevation) =>
@@ -63,7 +63,7 @@ case class HourAngleConstraint(min: HourAngle, max: HourAngle) extends Constrain
   private val MinElevation: Declination =
     Declination.fromAngleWithCarry(Angle.fromDoubleDegrees(5.0))._1
 
-  override def metAt[G](calc: Calculator[SkyCalcResults])(i: Instant)(
+  override def metAt[G](calc: Samples[SkyCalcResults])(i: Instant)(
     implicit getter: CalcGetter[G, (HourAngle, Declination)]
   ): Boolean =
     calc.map(r => (r.hourAngle, r.altitude)).valueAt(i).map { case (hourAngle, elevation) =>
