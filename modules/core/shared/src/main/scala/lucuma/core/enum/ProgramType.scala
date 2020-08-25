@@ -10,27 +10,45 @@ import cats.syntax.eq._
 import lucuma.core.util.Enumerated
 
 /**
- * Enumerated type for program types (see [[lucuma.ProgramId ProgramId]]).
- * @group Enumerations (Generated)
- */
+  * Enumerated type for program types (see lucuma.core.ProgramId ProgramId.
+  * @group Enumerations (Generated)
+  */
 sealed abstract class ProgramType(
-  val tag: String,
+  val tag:       String,
   val shortName: String,
-  val longName: String,
-  val obsolete: Boolean
-) extends Product with Serializable
+  val longName:  String,
+  val obsolete:  Boolean
+) extends Product
+    with Serializable
 
 object ProgramType {
 
-  /** @group Constructors */ case object CAL extends ProgramType("CAL", "CAL", "Calibration", false)
-  /** @group Constructors */ case object C extends ProgramType("C", "C", "Classical", false)
-  /** @group Constructors */ case object DS extends ProgramType("DS", "DS", "Demo Science", false)
-  /** @group Constructors */ case object DD extends ProgramType("DD", "DD", "Director's Time", false)
-  /** @group Constructors */ case object ENG extends ProgramType("ENG", "ENG", "Engineering", false)
-  /** @group Constructors */ case object FT extends ProgramType("FT", "FT", "Fast Turnaround", false)
-  /** @group Constructors */ case object LP extends ProgramType("LP", "LP", "Large Program", false)
-  /** @group Constructors */ case object Q extends ProgramType("Q", "Q", "Queue", false)
-  /** @group Constructors */ case object SV extends ProgramType("SV", "SV", "System Verification", false)
+  /** @group Constructors */
+  case object CAL extends ProgramType("CAL", "CAL", "Calibration", false)
+
+  /** @group Constructors */
+  case object C extends ProgramType("C", "C", "Classical", false)
+
+  /** @group Constructors */
+  case object DS extends ProgramType("DS", "DS", "Demo Science", false)
+
+  /** @group Constructors */
+  case object DD extends ProgramType("DD", "DD", "Director's Time", false)
+
+  /** @group Constructors */
+  case object ENG extends ProgramType("ENG", "ENG", "Engineering", false)
+
+  /** @group Constructors */
+  case object FT extends ProgramType("FT", "FT", "Fast Turnaround", false)
+
+  /** @group Constructors */
+  case object LP extends ProgramType("LP", "LP", "Large Program", false)
+
+  /** @group Constructors */
+  case object Q extends ProgramType("Q", "Q", "Queue", false)
+
+  /** @group Constructors */
+  case object SV extends ProgramType("SV", "SV", "System Verification", false)
 
   /** All members of ProgramType, in canonical order. */
   val all: List[ProgramType] =
@@ -48,9 +66,10 @@ object ProgramType {
   implicit val ProgramTypeEnumerated: Enumerated[ProgramType] =
     new Enumerated[ProgramType] {
       def all = ProgramType.all
-      def tag(a: ProgramType) = a.tag
+      def tag(a:                    ProgramType)         = a.tag
       override def unsafeFromTag(s: String): ProgramType =
         ProgramType.unsafeFromTag(s)
     }
 
 }
+
