@@ -1,5 +1,6 @@
 import sbtcrossproject.CrossType
 
+lazy val doobieVersion               = "0.8.6"
 lazy val attoVersion                 = "0.8.0"
 lazy val catsVersion                 = "2.1.1"
 lazy val collCompatVersion           = "2.1.6"
@@ -25,6 +26,14 @@ inThisBuild(
 )
 
 skip in publish := true
+
+addCommandAlias(
+  "genEnums",
+  "; gen/runMain gsp.sql.Main modules/enum/src/main/scala/gsp/enum; headerCreate"
+)
+addCommandAlias("rebuildEnums",
+                "; schema/flywayClean; schema/flywayMigrate; genEnums; enumJVM/compile"
+)
 
 lazy val math = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Full)
@@ -64,6 +73,45 @@ lazy val math = crossProject(JVMPlatform, JSPlatform)
       "edu.gemini"        %%% "gpp-svgdotjs"    % svgdotjsVersion
     )
   )
+
+lazy val schema = project
+  .in(file("modules/schema"))
+  .enablePlugins(FlywayPlugin)
+  .enablePlugins(AutomateHeaderPlugin)
+  .settings(
+    name := "gsp-core-schema",
+    skip in publish := true,
+    flywayUrl := "jdbc:postgresql:gsp",
+    flywayUser := "postgres",
+    flywayLocations := Seq(
+      s"filesystem:${baseDirectory.value}/src/main/resources/db/migration"
+    )
+  )
+
+lazy val gen = project
+  .in(file("modules/gen"))
+  .enablePlugins(AutomateHeaderPlugin)
+  .dependsOn(schema)
+  .settings(
+    name := "gsp-core-gen",
+    skip in publish := true,
+    libraryDependencies ++= Seq(
+      "org.tpolecat" %% "doobie-postgres" % doobieVersion
+    )
+  )
+
+lazy val enum = crossProject(JVMPlatform, JSPlatform)
+  .crossType(CrossType.Pure)
+  .in(file("modules/enum"))
+  .settings(
+    name := "gsp-enum",
+    libraryDependencies ++= Seq(
+      "org.typelevel" %%% "cats-core" % catsVersion
+    )
+  )
+  .dependsOn(math)
+  .jvmConfigure(_.enablePlugins(AutomateHeaderPlugin))
+  .jsSettings(gspScalaJsSettings: _*)
 
 lazy val testkit = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Full)
