@@ -12,7 +12,7 @@ final class ProperMotionSpec extends CatsSuite {
   import ArbParallax._
   import ArbCoordinates._
   import ArbEpoch._
-  import ArbOffset._
+  import ArbProperVelocity._
   import ArbProperMotion._
   import ArbRadialVelocity._
 

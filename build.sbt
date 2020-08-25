@@ -41,6 +41,7 @@ lazy val math = crossProject(JVMPlatform, JSPlatform)
       "com.manyangled"             %%% "coulomb"                 % coulombVersion,
       "com.manyangled"             %%% "coulomb-si-units"        % coulombVersion,
       "com.manyangled"             %%% "coulomb-accepted-units"  % coulombVersion,
+      "com.manyangled"             %%% "coulomb-time-units"      % coulombVersion,
       "com.manyangled"             %%% "coulomb-cats"            % coulombVersion,
       "com.manyangled"             %%% "coulomb-refined"         % coulombVersion,
       "org.typelevel"              %%% "spire"                   % spireVersion,

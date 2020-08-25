@@ -9,7 +9,6 @@ import cats._
 import coulomb._
 import coulomb.cats.implicits._
 import coulomb.si._
-import coulomb.siprefix._
 import gsp.math.PhysicalConstants._
 import gsp.math.units._
 import monocle.Prism
