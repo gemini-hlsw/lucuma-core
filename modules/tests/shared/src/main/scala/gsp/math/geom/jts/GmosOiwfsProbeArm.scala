@@ -1,12 +1,12 @@
 // Copyright (c) 2016-2020 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package gsp.math.geom
+package lucuma.math.geom
 
 package jts.demo
-import gsp.math.{ Angle, Offset }
-import gsp.math.syntax.int._
-import gsp.math.geom.syntax.all._
+import lucuma.math.{ Angle, Offset }
+import lucuma.math.syntax.int._
+import lucuma.math.geom.syntax.all._
 
 import cats.implicits._
 import scala.math.{ Pi, asin, atan2, hypot, sin }

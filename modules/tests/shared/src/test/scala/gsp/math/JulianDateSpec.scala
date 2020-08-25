@@ -1,13 +1,13 @@
 // Copyright (c) 2016-2020 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package gsp.math
+package lucuma.math
 
 import cats.{ Eq, Show }
 import cats.kernel.laws.discipline._
 import cats.tests.CatsSuite
 
-import gsp.math.arb._
+import lucuma.math.arb._
 import org.scalacheck.Gen._
 
 import java.time.LocalDateTime

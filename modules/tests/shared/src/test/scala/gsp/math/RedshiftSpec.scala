@@ -1,7 +1,7 @@
 // Copyright (c) 2016-2020 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package gsp.math
+package lucuma.math
 
 import java.math.MathContext
 
@@ -10,8 +10,8 @@ import cats.kernel.laws.discipline._
 import cats.tests.CatsSuite
 import coulomb._
 import coulomb.si._
-import gsp.math.arb._
-import gsp.math.units._
+import lucuma.math.arb._
+import lucuma.math.units._
 
 final class RedshiftSpec extends CatsSuite {
   import ArbRedshift._

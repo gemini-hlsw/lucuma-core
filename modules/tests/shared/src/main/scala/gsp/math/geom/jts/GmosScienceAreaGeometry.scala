@@ -1,13 +1,13 @@
 // Copyright (c) 2016-2020 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package gsp.math.geom.jts.demo
+package lucuma.math.geom.jts.demo
 
-import gsp.math.Angle
-import gsp.math.geom._
-import gsp.math.geom.syntax.all._
+import lucuma.math.Angle
+import lucuma.math.geom._
+import lucuma.math.geom.syntax.all._
 
-import gsp.math.syntax.int._
+import lucuma.math.syntax.int._
 
 // TODO: move to core
 

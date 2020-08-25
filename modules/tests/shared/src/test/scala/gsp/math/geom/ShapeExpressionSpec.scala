@@ -1,20 +1,20 @@
 // Copyright (c) 2016-2020 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package gsp.math.geom
+package lucuma.math.geom
 
 import cats.tests.CatsSuite
-import gsp.math.{Angle, Offset}
-import gsp.math.geom.syntax.all._
-import gsp.math.arb._
-import gsp.math.syntax.int._
-import gsp.math.geom.arb._
+import lucuma.math.{Angle, Offset}
+import lucuma.math.geom.syntax.all._
+import lucuma.math.arb._
+import lucuma.math.syntax.int._
+import lucuma.math.geom.arb._
 import org.scalacheck._
 import org.scalacheck.Arbitrary._
 
 final class ShapeExpressionSpec extends CatsSuite {
   implicit val interpreter: ShapeInterpreter =
-    gsp.math.geom.jts.interpreter.value
+    lucuma.math.geom.jts.interpreter.value
 
   import ArbAngle._
   import ArbOffset._
@@ -125,7 +125,7 @@ final class ShapeExpressionSpec extends CatsSuite {
 
 object ShapeExpressionSpec {
 
-  import gsp.math.geom.arb.ArbShapeExpression.genCenteredShapeOf
+  import lucuma.math.geom.arb.ArbShapeExpression.genCenteredShapeOf
 
   case class TwoCenteredShapes(
     radius0: Angle,

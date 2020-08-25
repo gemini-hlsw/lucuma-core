@@ -1,10 +1,10 @@
 // Copyright (c) 2016-2020 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package gsp.math.optics
+package lucuma.math.optics
 
 import cats.tests.CatsSuite
-import gsp.math.laws.discipline._
+import lucuma.math.laws.discipline._
 
 final class WedgeSpec extends CatsSuite {
 

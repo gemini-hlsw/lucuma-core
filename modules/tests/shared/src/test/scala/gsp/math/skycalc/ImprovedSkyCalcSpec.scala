@@ -1,7 +1,7 @@
 // Copyright (c) 2016-2020 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package gsp.math.skycalc
+package lucuma.math.skycalc
 
 import weaver._
 
@@ -9,8 +9,8 @@ import cats.implicits._
 import cats.Monoid
 import cats.Show
 import java.time._
-import gsp.math.Coordinates
-import gsp.math.Place
+import lucuma.math.Coordinates
+import lucuma.math.Place
 
 // This is just a basic case, mostly to test linking in JS.
 // Property based testing is in ImprovedSkyCalcSpecJVM, where output

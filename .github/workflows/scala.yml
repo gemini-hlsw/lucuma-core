@@ -13,7 +13,5 @@ jobs:
         uses: olafurpg/setup-scala@v7
         with:
           java-version: adoptjdk@14
-      - name: Build the docker-compose stack
-        run: docker-compose up -d
       - name: Run compile
-        run: csbt headerCheck rebuildEnums +compile +test 
+        run: csbt headerCheck +compile +test

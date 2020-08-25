@@ -26,31 +26,31 @@ object EnumDef {
     implicit def caseDouble[S]                     = at[(S, Double)](_ => Option.empty[String])
     implicit def caseBigDecimal[S]                 = at[(S, BigDecimal)](_ => Option.empty[String])
     implicit def caseOptionBigDecimal[S]           = at[(S, Option[BigDecimal])](_ => Option.empty[String])
-    implicit def caseArcseconds[S]                 = at[(S, Arcseconds)](_ => Some("gsp.math.Angle"))
-    implicit def caseDegrees[S]                    = at[(S, Degrees)](_ => Some("gsp.math.Angle"))
+    implicit def caseArcseconds[S]                 = at[(S, Arcseconds)](_ => Some("lucuma.math.Angle"))
+    implicit def caseDegrees[S]                    = at[(S, Degrees)](_ => Some("lucuma.math.Angle"))
     implicit def caseZoneId[S]                     = at[(S, ZoneId)](_ => Some("java.time.ZoneId"))
-    implicit def caseWavelengthNm[S]               = at[(S, Wavelength.Nm)](_ => Some("gsp.math.Wavelength"))
-    implicit def caseWavelengthUm[S]               = at[(S, Wavelength.Um)](_ => Some("gsp.math.Wavelength"))
+    implicit def caseWavelengthNm[S]               = at[(S, Wavelength.Nm)](_ => Some("lucuma.math.Wavelength"))
+    implicit def caseWavelengthUm[S]               = at[(S, Wavelength.Um)](_ => Some("lucuma.math.Wavelength"))
     implicit def caseFiniteDurationSeconds[S]      =
       at[(S, FiniteDuration.Seconds)](_ => Some("scala.concurrent.duration._"))
     implicit def caseFiniteDurationMilliseconds[S] =
       at[(S, FiniteDuration.Milliseconds)](_ => Some("scala.concurrent.duration._"))
     implicit def caseOptionArcseconds[S]           =
-      at[(S, Option[Arcseconds])](_ => Some("gsp.math.Angle"))
-    implicit def caseOptionDegrees[S]              = at[(S, Option[Degrees])](_ => Some("gsp.math.Angle"))
+      at[(S, Option[Arcseconds])](_ => Some("lucuma.math.Angle"))
+    implicit def caseOptionDegrees[S]              = at[(S, Option[Degrees])](_ => Some("lucuma.math.Angle"))
     implicit def caseOptionDouble[S]               = at[(S, Option[Double])](_ => Option.empty[String])
     implicit def caseOptionWavelengthNm[S]         =
-      at[(S, Option[Wavelength.Nm])](_ => Some("gsp.math.Wavelength"))
+      at[(S, Option[Wavelength.Nm])](_ => Some("lucuma.math.Wavelength"))
     implicit def caseOptionWavelengthUm[S]         =
-      at[(S, Option[Wavelength.Um])](_ => Some("gsp.math.Wavelength"))
+      at[(S, Option[Wavelength.Um])](_ => Some("lucuma.math.Wavelength"))
     implicit def caseMagnitudeSystem[S]            = at[(S, MagnitudeSystem)](_ => Option.empty[String])
     implicit def caseMagnitudeBand[S]              = at[(S, MagnitudeBand)](_ => Option.empty[String])
     implicit def caseOptionMagnitudeBand[S]        =
       at[(S, Option[MagnitudeBand])](_ => Option.empty[String])
     implicit def caseMagnitudeValue[S]             =
-      at[(S, MagnitudeValue)](_ => Some("gsp.math.MagnitudeValue"))
+      at[(S, MagnitudeValue)](_ => Some("lucuma.math.MagnitudeValue"))
     implicit def caseOptionMagnitudeValue[S]       =
-      at[(S, Option[MagnitudeValue])](_ => Some("gsp.math.MagnitudeValue"))
+      at[(S, Option[MagnitudeValue])](_ => Some("lucuma.math.MagnitudeValue"))
     implicit def caseGnirsPixelScale[S]            = at[(S, GnirsPixelScale)](_ => Option.empty[String])
     implicit def caseKeywordName[S]                = at[(S, KeywordName)](_ => Option.empty[String])
     implicit def caseEnumRef[T <: Symbol, S]       = at[(S, EnumRef[T])](_ => Option.empty[String])
@@ -221,7 +221,7 @@ object EnumDef {
     ta:                                     ToTraversable.Aux[O, List, Option[String]]
   ): String = {
     val is: List[String] =
-      List("cats.syntax.eq._", "cats.instances.string._", "gsp.util.Enumerated") ++
+      List("cats.syntax.eq._", "cats.instances.string._", "lucuma.enum.Enumerated") ++
         h.map(ToImport).toList.collect { case Some(s) => s }
     is.distinct.sorted.map(s => s"import $s").mkString("\n")
   }
@@ -249,7 +249,7 @@ object EnumDef {
     EnumDef(
       s"$name.scala",
       s"""
-      |package gsp
+      |package lucuma
       |package enum
       |
       |${imports(records.head._2.fields)}

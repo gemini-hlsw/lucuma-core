@@ -1,7 +1,7 @@
 // Copyright (c) 2016-2020 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package gsp.math.skycalc
+package lucuma.math.skycalc
 
 import cats.implicits._
 import weaver._
@@ -10,13 +10,13 @@ import weaver.scalacheck._
 import edu.gemini.skycalc.ImprovedSkyCalcTest
 import cats.Show
 import java.time.Instant
-import gsp.math.Coordinates
-import gsp.math.arb.ArbCoordinates._
-import gsp.math.arb.ArbPlace._
+import lucuma.math.Coordinates
+import lucuma.math.arb.ArbCoordinates._
+import lucuma.math.arb.ArbPlace._
 import com.fortysevendeg.scalacheck.datetime.instances.jdk8._
 import com.fortysevendeg.scalacheck.datetime.GenDateTime.genDateTimeWithinRange
 import java.time._
-import gsp.math.Place
+import lucuma.math.Place
 import jsky.coords.WorldCoords
 import java.{ util => ju }
 

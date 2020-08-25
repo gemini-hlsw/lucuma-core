@@ -38,7 +38,7 @@ object MiscEnums {
          """.query[(String, R)]
       },
 
-      EnumDef.fromQuery("EventType", "observe [[gsp.Event Event]]) types") {
+      EnumDef.fromQuery("EventType", "observe [[lucuma.Event Event]]) types") {
         type R = Record.`Symbol("tag")-> String`.T
         sql"""
           SELECT enumlabel a, enumlabel b
@@ -52,7 +52,7 @@ object MiscEnums {
         sql"SELECT id, id tag, short_name, long_name, obsolete FROM e_instrument".query[(String, R)]
       },
 
-      EnumDef.fromQuery("ProgramType", "program types (see [[gsp.ProgramId ProgramId]])") {
+      EnumDef.fromQuery("ProgramType", "program types (see [[lucuma.ProgramId ProgramId]])") {
         type R = Record.`Symbol("tag")-> String, Symbol("shortName")-> String, Symbol("longName")-> String, Symbol("obsolete")-> Boolean`.T
         sql"SELECT id, id tag, short_name, long_name, obsolete FROM e_program_type".query[(String, R)]
       },

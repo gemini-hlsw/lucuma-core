@@ -1,7 +1,7 @@
 // Copyright (c) 2016-2020 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package gsp.math
+package lucuma.math
 
 import cats.{ Eq, Show }
 import cats.implicits._
@@ -10,7 +10,7 @@ import coulomb.cats.implicits._
 import eu.timepit.refined.auto._
 import eu.timepit.refined.scalacheck.numeric._
 import eu.timepit.refined.cats._
-import gsp.math.arb._
+import lucuma.math.arb._
 import monocle.law.discipline._
 import munit._
 import org.scalacheck.Prop._

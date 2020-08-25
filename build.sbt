@@ -27,19 +27,11 @@ inThisBuild(
 
 skip in publish := true
 
-addCommandAlias(
-  "genEnums",
-  "; gen/runMain gsp.sql.Main modules/enum/src/main/scala/gsp/enum; headerCreate"
-)
-addCommandAlias("rebuildEnums",
-                "; schema/flywayClean; schema/flywayMigrate; genEnums; enumJVM/compile"
-)
-
 lazy val math = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Full)
   .in(file("modules/math"))
   .settings(
-    name := "gsp-math",
+    name := "lucuma-math",
     libraryDependencies ++= Seq(
       "org.tpolecat"               %%% "atto-core"               % attoVersion,
       "org.typelevel"              %%% "cats-core"               % catsVersion,
@@ -74,37 +66,11 @@ lazy val math = crossProject(JVMPlatform, JSPlatform)
     )
   )
 
-lazy val schema = project
-  .in(file("modules/schema"))
-  .enablePlugins(FlywayPlugin)
-  .enablePlugins(AutomateHeaderPlugin)
-  .settings(
-    name := "gsp-core-schema",
-    skip in publish := true,
-    flywayUrl := "jdbc:postgresql:gsp",
-    flywayUser := "postgres",
-    flywayLocations := Seq(
-      s"filesystem:${baseDirectory.value}/src/main/resources/db/migration"
-    )
-  )
-
-lazy val gen = project
-  .in(file("modules/gen"))
-  .enablePlugins(AutomateHeaderPlugin)
-  .dependsOn(schema)
-  .settings(
-    name := "gsp-core-gen",
-    skip in publish := true,
-    libraryDependencies ++= Seq(
-      "org.tpolecat" %% "doobie-postgres" % doobieVersion
-    )
-  )
-
 lazy val enum = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Pure)
   .in(file("modules/enum"))
   .settings(
-    name := "gsp-enum",
+    name := "lucuma-enum",
     libraryDependencies ++= Seq(
       "org.typelevel" %%% "cats-core" % catsVersion
     )
@@ -114,11 +80,11 @@ lazy val enum = crossProject(JVMPlatform, JSPlatform)
   .jsSettings(gspScalaJsSettings: _*)
 
 lazy val testkit = crossProject(JVMPlatform, JSPlatform)
-  .crossType(CrossType.Full)
+  .crossType(CrossType.Pure)
   .in(file("modules/testkit"))
-  .dependsOn(math)
+  .dependsOn(math, enum)
   .settings(
-    name := "gsp-math-testkit",
+    name := "lucuma-testkit",
     libraryDependencies ++= Seq(
       "org.typelevel"              %%% "cats-testkit"           % catsVersion,
       "org.typelevel"              %%% "cats-testkit-scalatest" % catsTestkitScalaTestVersion,
@@ -136,7 +102,7 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform)
   .in(file("modules/tests"))
   .dependsOn(math, testkit)
   .settings(
-    name := "gsp-math-tests",
+    name := "lucuma-tests",
     skip in publish := true,
     libraryDependencies ++= Seq(
       "com.disneystreaming" %%% "weaver-framework" % "0.4.3",
