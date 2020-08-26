@@ -7,6 +7,7 @@ import munit.FunSuite
 import lucuma.core.math.Place
 import java.time.LocalDate
 import org.scalactic.Tolerance
+import lucuma.core.enum.Site
 
 final class TwilightCalcSpec extends FunSuite with Tolerance {
   import TwilightBoundType._
@@ -16,14 +17,14 @@ final class TwilightCalcSpec extends FunSuite with Tolerance {
   // Known results with OCS
   private val expected: Map[(Place, TwilightBoundType, LocalDate), (Long, Long)] =
     Map(
-      (GN, Official, Date)     -> ((946785833352L, 946831636357L)),
-      (GN, Civil, Date)        -> ((946786687500L, 946830782669L)),
-      (GN, Nautical, Date)     -> ((946788331171L, 946829139780L)),
-      (GN, Astronomical, Date) -> ((946789955319L, 946827516290L)),
-      (GS, Official, Date)     -> ((946771013083L, 946805782320L)),
-      (GS, Civil, Date)        -> ((946772131479L, 946804663970L)),
-      (GS, Nautical, Date)     -> ((946774129507L, 946802666017L)),
-      (GS, Astronomical, Date) -> ((946776266779L, 946800528816L))
+      (Site.GN, Official, Date)     -> ((946785833352L, 946831636357L)),
+      (Site.GN, Civil, Date)        -> ((946786687500L, 946830782669L)),
+      (Site.GN, Nautical, Date)     -> ((946788331171L, 946829139780L)),
+      (Site.GN, Astronomical, Date) -> ((946789955319L, 946827516290L)),
+      (Site.GS, Official, Date)     -> ((946771013083L, 946805782320L)),
+      (Site.GS, Civil, Date)        -> ((946772131479L, 946804663970L)),
+      (Site.GS, Nautical, Date)     -> ((946774129507L, 946802666017L)),
+      (Site.GS, Astronomical, Date) -> ((946776266779L, 946800528816L))
     )
 
   test("TwilightCalcSpec: Sunrise and sunset on 2000-01-01") {

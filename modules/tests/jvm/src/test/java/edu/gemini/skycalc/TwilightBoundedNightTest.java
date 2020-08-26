@@ -46,7 +46,7 @@ public final class TwilightBoundedNightTest {
      */
     public static TwilightBoundedNightTest forDate(lucuma.core.math.skycalc.TwilightBoundType type, int date, int month, int year, Place place) {
 
-        Calendar c = Calendar.getInstance(TimeZone.getTimeZone(place.zoneId()));
+        Calendar c = Calendar.getInstance(TimeZone.getTimeZone(place.timezone()));
 
         // Set to midnight on that date
         c.set(Calendar.YEAR, year);
@@ -92,7 +92,7 @@ public final class TwilightBoundedNightTest {
         // So it is possible that the current time is during the night from
         // October 8/9. In other words, the time is between midnight and dawn.
         // So construct "yesterday night" and check.
-        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone(place.zoneId()));
+        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone(place.timezone()));
         cal.setTimeInMillis(time);
         cal.add(Calendar.DAY_OF_YEAR, -1);
 
@@ -130,7 +130,7 @@ public final class TwilightBoundedNightTest {
         _type = type;
         _place = place;
 
-        Calendar c = Calendar.getInstance(TimeZone.getTimeZone(place.zoneId()));
+        Calendar c = Calendar.getInstance(TimeZone.getTimeZone(place.timezone()));
         c.setTimeInMillis(time);
 
         // Set to midnight.

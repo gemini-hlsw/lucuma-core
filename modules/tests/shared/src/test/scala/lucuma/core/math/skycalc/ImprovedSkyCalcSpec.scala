@@ -5,18 +5,15 @@ package lucuma.core.math.skycalc
 
 import munit.FunSuite
 
-import cats.Show
 import java.time._
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Place
+import lucuma.core.enum.Site
 
 // This is just a basic case, mostly to test linking in JS.
 // Property based testing is in ImprovedSkyCalcSpecJVM, where output
 // is compared to the one from {edu.gemini.skycalc} in Java.
 final class ImprovedSkyCalcSpec extends FunSuite {
-
-  implicit val showInstant: Show[Instant]   = Show.fromToString
-  implicit val showZDT: Show[ZonedDateTime] = Show.fromToString
 
   private val NanosPerMillis: Int = 1_000_000
 
@@ -34,8 +31,8 @@ final class ImprovedSkyCalcSpec extends FunSuite {
   // Known results with OCS, computed with millis precision (uses ju.Date)
   private val expected: Map[(Place, Coordinates, Instant), Double] =
     Map(
-      (GN, M51, Moment) -> 6.637492164341347,
-      (GS, M51, Moment) -> -72.26086414073282
+      (Site.GN, M51, Moment) -> 6.637492164341347,
+      (Site.GS, M51, Moment) -> -72.26086414073282
     )
 
   test("ImprovedSkyCalcSpec: Elevation of M51 at midnight 2000-01-01 UTC") {
