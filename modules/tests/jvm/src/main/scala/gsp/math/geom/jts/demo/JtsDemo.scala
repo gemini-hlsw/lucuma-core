@@ -1,15 +1,15 @@
 // Copyright (c) 2016-2020 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package gsp.math.geom.jts
+package lucuma.core.math.geom.jts
 package demo
 
-import gsp.math.{Angle, Offset}
-import gsp.math.geom.ShapeExpression
-import gsp.math.geom.jts.jvm.syntax.awt._
-import gsp.math.geom.jts.interpreter._
-import gsp.math.geom.syntax.shapeexpression._
-import gsp.math.syntax.int._
+import lucuma.core.math.{Angle, Offset}
+import lucuma.core.math.geom.ShapeExpression
+import lucuma.core.math.geom.jts.jvm.syntax.awt._
+import lucuma.core.math.geom.jts.interpreter._
+import lucuma.core.math.geom.syntax.shapeexpression._
+import lucuma.core.math.syntax.int._
 
 import java.awt.{List => _, _}
 import java.awt.event._

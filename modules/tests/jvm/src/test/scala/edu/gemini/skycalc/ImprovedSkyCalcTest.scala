@@ -12,7 +12,7 @@ import jsky.coords.WorldCoords
 
 /**
   * This class exists purely for testing purposes.
-  * It provides the same functionality as {gsp.math.skycalc.ImprovedSkyCalc},
+  * It provides the same functionality as {lucuma.core.math.skycalc.ImprovedSkyCalc},
   * but it extends the Java implementation of ImprovedSkyCalcMethods, so that
   * its results can be compared against its Scala version.
   *

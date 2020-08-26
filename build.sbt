@@ -3,7 +3,7 @@ import sbtcrossproject.CrossType
 lazy val attoVersion                 = "0.8.0"
 lazy val catsVersion                 = "2.1.1"
 lazy val collCompatVersion           = "2.1.6"
-lazy val kindProjectorVersion        = "0.10.3"
+lazy val kindProjectorVersion        = "0.11.0"
 lazy val monocleVersion              = "2.1.0"
 lazy val catsTestkitScalaTestVersion = "2.0.0"
 lazy val scalaJavaTimeVersion        = "2.0.0"
@@ -19,18 +19,21 @@ lazy val refinedVersion              = "0.9.15"
 inThisBuild(
   Seq(
     homepage := Some(url("https://github.com/gemini-hlsw/gsp-math")),
-    addCompilerPlugin("org.typelevel" %% "kind-projector" % kindProjectorVersion),
-    Global / onChangedBuildSource := ReloadOnSourceChanges
+    addCompilerPlugin(
+      ("org.typelevel" % "kind-projector" % kindProjectorVersion).cross(CrossVersion.full)
+    ),
+    Global / onChangedBuildSource := ReloadOnSourceChanges,
+    scalacOptions += "-Ymacro-annotations"
   ) ++ gspPublishSettings
 )
 
 skip in publish := true
 
-lazy val math = crossProject(JVMPlatform, JSPlatform)
+lazy val core = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Full)
-  .in(file("modules/math"))
+  .in(file("modules/core"))
   .settings(
-    name := "gsp-math",
+    name := "lucuma-core",
     libraryDependencies ++= Seq(
       "org.tpolecat"               %%% "atto-core"               % attoVersion,
       "org.typelevel"              %%% "cats-core"               % catsVersion,
@@ -66,11 +69,11 @@ lazy val math = crossProject(JVMPlatform, JSPlatform)
   )
 
 lazy val testkit = crossProject(JVMPlatform, JSPlatform)
-  .crossType(CrossType.Full)
+  .crossType(CrossType.Pure)
   .in(file("modules/testkit"))
-  .dependsOn(math)
+  .dependsOn(core)
   .settings(
-    name := "gsp-math-testkit",
+    name := "lucuma-core-testkit",
     libraryDependencies ++= Seq(
       "org.typelevel"              %%% "cats-testkit"           % catsVersion,
       "org.typelevel"              %%% "cats-testkit-scalatest" % catsTestkitScalaTestVersion,
@@ -86,9 +89,9 @@ lazy val testkit = crossProject(JVMPlatform, JSPlatform)
 lazy val tests = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Full)
   .in(file("modules/tests"))
-  .dependsOn(math, testkit)
+  .dependsOn(testkit)
   .settings(
-    name := "gsp-math-tests",
+    name := "lucuma-core-tests",
     skip in publish := true,
     libraryDependencies ++= Seq(
       "com.disneystreaming" %%% "weaver-framework" % "0.4.3",
