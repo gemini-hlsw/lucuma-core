@@ -3,9 +3,8 @@
 
 package lucuma.core.math.skycalc
 
-import cats.implicits._
-import weaver._
-import weaver.scalacheck._
+import munit.ScalaCheckSuite
+import org.scalacheck.Prop._
 
 import edu.gemini.skycalc.ImprovedSkyCalcTest
 import cats.Show
@@ -20,7 +19,7 @@ import lucuma.core.math.Place
 import jsky.coords.WorldCoords
 import java.{ util => ju }
 
-object ImprovedSkyCalcSpecJVM extends SimpleIOSuite with IOCheckers {
+final class ImprovedSkyCalcSpecJVM extends ScalaCheckSuite {
 
   implicit val showInstant: Show[Instant]   = Show.fromToString
   implicit val showZDT: Show[ZonedDateTime] = Show.fromToString
@@ -32,16 +31,16 @@ object ImprovedSkyCalcSpecJVM extends SimpleIOSuite with IOCheckers {
   )
   private val zdtRange = Duration.ofDays(Period.ofYears(1000).getDays.toLong)
 
-  simpleTest("ImprovedSkyCalcSpec: Arbitrary sky calculations") {
-    forall { place: Place =>
+  test("ImprovedSkyCalcSpec: Arbitrary sky calculations") {
+    forAll { place: Place =>
       // This SkyCalc should be thread safe, but Java's isn't.
       val calc = ImprovedSkyCalc(place)
 
       // This generator already provides ZDTs with millisecond precision, not nano.
-      forall(genDateTimeWithinRange(zdtFrom, zdtRange)) { zdt =>
+      forAll(genDateTimeWithinRange(zdtFrom, zdtRange)) { zdt =>
         val instant = zdt.toInstant
 
-        forall { coords: Coordinates =>
+        forAll { coords: Coordinates =>
           val javaCalc = new ImprovedSkyCalcTest(place.latitude.toAngle.toSignedDoubleDegrees,
                                                  place.longitude.toSignedDoubleDegrees,
                                                  place.altitudeDouble
@@ -55,17 +54,17 @@ object ImprovedSkyCalcSpecJVM extends SimpleIOSuite with IOCheckers {
                              false
           )
 
-          expect(results.altitudeRaw === javaCalc.getAltitude)
-            .and(expect(results.azimuthRaw === javaCalc.getAzimuth))
-            .and(expect(results.parallacticAngleRaw === javaCalc.getParallacticAngle))
-            .and(expect(results.hourAngleRaw === javaCalc.getHourAngle))
-            .and(expect(results.lunarIlluminatedFraction === javaCalc.getLunarIlluminatedFraction))
-            .and(expect(results.lunarSkyBrightness === javaCalc.getLunarSkyBrightness))
-            .and(expect(results.totalSkyBrightness === javaCalc.getTotalSkyBrightness))
-            .and(expect(results.lunarPhaseAngleRaw === javaCalc.getLunarPhaseAngle))
-            .and(expect(results.sunAltitudeRaw === javaCalc.getSunAltitude))
-            .and(expect(results.lunarDistance === javaCalc.getLunarDistance))
-            .and(expect(results.lunarElevationRaw === javaCalc.getLunarElevation))
+          assertEquals(results.altitudeRaw, javaCalc.getAltitude)
+          assertEquals(results.azimuthRaw, javaCalc.getAzimuth)
+          assertEquals(results.parallacticAngleRaw, javaCalc.getParallacticAngle)
+          assertEquals(results.hourAngleRaw, javaCalc.getHourAngle)
+          assertEquals(results.lunarIlluminatedFraction, javaCalc.getLunarIlluminatedFraction)
+          assertEquals(results.lunarSkyBrightness, javaCalc.getLunarSkyBrightness)
+          assertEquals(results.totalSkyBrightness, javaCalc.getTotalSkyBrightness)
+          assertEquals(results.lunarPhaseAngleRaw, javaCalc.getLunarPhaseAngle)
+          assertEquals(results.sunAltitudeRaw, javaCalc.getSunAltitude)
+          assertEquals(results.lunarDistance, javaCalc.getLunarDistance)
+          assertEquals(results.lunarElevationRaw, javaCalc.getLunarElevation)
         }
       }
     }

@@ -98,12 +98,10 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform)
     name := "lucuma-core-tests",
     skip in publish := true,
     libraryDependencies ++= Seq(
-      "com.disneystreaming" %%% "weaver-framework" % "0.4.3",
-      "org.scalameta"       %%% "munit"            % "0.7.11" % Test,
-      "org.typelevel"       %%% "discipline-munit" % "0.2.3"  % Test
+      "org.scalameta" %%% "munit"            % "0.7.11" % Test,
+      "org.typelevel" %%% "discipline-munit" % "0.2.3"  % Test
     ),
     testFrameworks += new TestFramework("munit.Framework"),
-    testFrameworks += new TestFramework("weaver.framework.TestFramework"),
     scalaJSLinkerConfig ~= (_.withModuleKind(ModuleKind.CommonJSModule))
   )
   .jvmConfigure(_.enablePlugins(AutomateHeaderPlugin))
@@ -112,9 +110,8 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform)
       "https://github.com/gemini-hlsw/maven-repo/raw/master/releases"
     ),
     libraryDependencies ++= Seq(
-      "edu.gemini.ocs"      %% "edu-gemini-util-skycalc"     % "2020001.1.7",
-      "com.disneystreaming" %% "weaver-scalacheck"           % "0.4.3",
-      "com.47deg"           %% "scalacheck-toolbox-datetime" % "0.3.5"
+      "edu.gemini.ocs" %% "edu-gemini-util-skycalc"     % "2020001.1.7" % Test,
+      "com.47deg"      %% "scalacheck-toolbox-datetime" % "0.3.5"       % Test
     )
   )
   .jsSettings(gspScalaJsSettings: _*)
