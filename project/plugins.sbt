@@ -9,5 +9,5 @@ addSbtPlugin("ch.epfl.scala"         % "sbt-scalajs-bundler"      % "0.18.0")
 addSbtPlugin("io.github.davidmweber" % "flyway-sbt"               % "6.5.0")
 
 libraryDependencies ++= Seq(
-  "org.postgresql" % "postgresql" % "42.2.15" // needed by flyway
+  "org.postgresql" % "postgresql" % "42.2.16" // needed by flyway
 )
