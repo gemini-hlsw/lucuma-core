@@ -24,15 +24,15 @@ object RoundStrategy {
 }
 
 /**
-  * Typeclass defininig how to round values associated to [[Instant]]s using a certain [[RoundStrategy]].
+  * Typeclass defininig how to round values associated with `Instant`s using a certain [[RoundStrategy]].
   *
-  * @tparam G [[RoundStrategy]] to use
-  * @tparam A type of the value in [[Samples]]
+  * @tparam R [[RoundStrategy]] to use
+  * @tparam A type of the value
   */
-trait SampleRounder[G, A] { self =>
+trait SampleRounder[R, A] { self =>
 
   /**
-    * Compute rounded value from [[Samples]] when there's not an exact match.
+    * Round values associated with `Instant`s.
     */
   def round(leftI: Instant, leftV: A, rightI: Instant, rightV: A, i: Instant): Option[A]
 
@@ -49,40 +49,40 @@ trait SampleRounder[G, A] { self =>
       rightA <- f(rightV)
     } yield round(leftI, leftA, rightI, rightA, i)).flatten
 
-  def imap[B](f: A => B)(g: B => A): SampleRounder[G, B] =
-    new SampleRounder[G, B] {
+  def imap[B](f: A => B)(g: B => A): SampleRounder[R, B] =
+    new SampleRounder[R, B] {
       def round(leftI: Instant, leftV: B, rightI: Instant, rightV: B, i: Instant): Option[B] =
         self.contraMapRound(g)(leftI, leftV, rightI, rightV, i).map(f)
     }
 
-  def imap[B](optic: Wedge[A, B]): SampleRounder[G, B] =
+  def imap[B](optic: Wedge[A, B]): SampleRounder[R, B] =
     imap(optic.get)(optic.reverseGet)
 
-  def imap[B](optic: SplitEpi[A, B]): SampleRounder[G, B] =
+  def imap[B](optic: SplitEpi[A, B]): SampleRounder[R, B] =
     imap(optic.asWedge)
 
-  def imap[B](optic: SplitMono[A, B]): SampleRounder[G, B] =
+  def imap[B](optic: SplitMono[A, B]): SampleRounder[R, B] =
     imap(optic.asWedge)
 
-  def imap[B](optic: Iso[A, B]): SampleRounder[G, B] =
+  def imap[B](optic: Iso[A, B]): SampleRounder[R, B] =
     imap(Wedge.fromIso(optic))
 
-  def imapOpt[B](f: A => Option[B])(g: B => Option[A]): SampleRounder[G, B] =
-    new SampleRounder[G, B] {
+  def imapOpt[B](f: A => Option[B])(g: B => Option[A]): SampleRounder[R, B] =
+    new SampleRounder[R, B] {
       def round(leftI: Instant, leftV: B, rightI: Instant, rightV: B, i: Instant): Option[B] =
         self.contraFlatMapRound(g)(leftI, leftV, rightI, rightV, i).flatMap(f)
     }
 
-  def imapOpt[B](optic: Wedge[Option[A], Option[B]]): SampleRounder[G, B] =
+  def imapOpt[B](optic: Wedge[Option[A], Option[B]]): SampleRounder[R, B] =
     imapOpt(a => optic.get(a.some))(b => optic.reverseGet(b.some))
 
-  def imapOpt[B](optic: SplitMono[Option[A], Option[B]]): SampleRounder[G, B] =
+  def imapOpt[B](optic: SplitMono[Option[A], Option[B]]): SampleRounder[R, B] =
     imapOpt(optic.asWedge)
 
-  def imapOpt[B](optic: SplitEpi[Option[A], Option[B]]): SampleRounder[G, B] =
+  def imapOpt[B](optic: SplitEpi[Option[A], Option[B]]): SampleRounder[R, B] =
     imapOpt(optic.asWedge)
 
-  def imapOpt[B](optic: Iso[Option[A], Option[B]]): SampleRounder[G, B] =
+  def imapOpt[B](optic: Iso[Option[A], Option[B]]): SampleRounder[R, B] =
     imapOpt(Wedge.fromIso(optic))
 }
 
@@ -136,11 +136,11 @@ trait SampleRounderInstances {
   implicit val interpolatedHourAngleRounder: SampleRounder[LinearInterpolating, HourAngle] =
     interpolatedAngleRounder.imap(HourAngle.angle.reverse)
 
-  implicit def toTupledRounder[G, A, B](implicit
-    rounderA: SampleRounder[G, A],
-    rounderB: SampleRounder[G, B]
-  ): SampleRounder[G, (A, B)] =
-    new SampleRounder[G, (A, B)] {
+  implicit def toTupledRounder[R, A, B](implicit
+    rounderA: SampleRounder[R, A],
+    rounderB: SampleRounder[R, B]
+  ): SampleRounder[R, (A, B)] =
+    new SampleRounder[R, (A, B)] {
       def round(
         leftI:  Instant,
         leftV:  (A, B),

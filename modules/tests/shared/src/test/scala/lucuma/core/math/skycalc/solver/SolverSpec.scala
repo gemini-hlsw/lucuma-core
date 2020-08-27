@@ -14,8 +14,8 @@ final class SolverSpec extends CatsSuite {
   val TestCalculator = Samples.single(Instant.MIN, ())
 
   case class TestConstraint(f: Instant => Boolean) extends Constraint[Unit, Unit] {
-    override def metAt[G](calc: Samples[Unit])(i: Instant)(implicit
-      rounder:                  SampleRounder[G, Unit]
+    override def metAt[R](calc: Samples[Unit])(i: Instant)(implicit
+      rounder:                  SampleRounder[R, Unit]
     ): Boolean = f(i)
   }
 

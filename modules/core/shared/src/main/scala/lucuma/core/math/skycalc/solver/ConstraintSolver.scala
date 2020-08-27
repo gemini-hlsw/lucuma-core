@@ -12,16 +12,16 @@ import gsp.math.HourAngle
   * Convenience class to find a [[Schedule]] meeting a [[Constraint]] from [[Samples]] at a given [[Interval]].
   *
   * @tparam S [[SolverStrategy]] to use
-  * @tparam G [[RoundStrategy]] to use
+  * @tparam R [[RoundStrategy]] to use
   * @tparam T the type of results held by the [[Samples]]
   * @tparam A the type on which the [[Constraint]] is checked (usually obtainable from <code>T</code>)
   */
-class ConstraintSolver[S, G, T, A](
+class ConstraintSolver[S, R, T, A](
   constraint:      Constraint[T, A],
   tolerance:       Duration = Duration.ofSeconds(30)
 )(implicit solver: Solver[S]) {
-  def solve(calc: Samples[T])(interval: Interval)(implicit rounder: SampleRounder[G, A]): Schedule =
-    solver.solve(constraint.metAt[G](calc))(interval, tolerance)
+  def solve(calc: Samples[T])(interval: Interval)(implicit rounder: SampleRounder[R, A]): Schedule =
+    solver.solve(constraint.metAt[R](calc))(interval, tolerance)
 }
 
 object ConstraintSolver {

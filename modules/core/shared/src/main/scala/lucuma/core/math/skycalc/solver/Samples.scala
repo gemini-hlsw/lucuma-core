@@ -62,8 +62,8 @@ trait Samples[A] { outer =>
     Bracket(left, focus, right)
   }
 
-  /** Compute the value at `i`, under a strategy `G`. */
-  def valueAt[G](i: Instant)(implicit rounder: SampleRounder[G, A]): Option[A] =
+  /** Compute the value at `i`, using round strategy `R`. */
+  def valueAt[R](i: Instant)(implicit rounder: SampleRounder[R, A]): Option[A] =
     bracket(i) match {
       // Simple cases, no decisions to make.
       case Bracket(_, Some((_, a)), _)                                 => a.value.some // Exact match
@@ -73,7 +73,6 @@ trait Samples[A] { outer =>
       case Bracket(Some((leftI, leftE)), None, Some((rightI, rightE))) =>
         rounder.round(leftI, leftE.value, rightI, rightE.value, i)
     }
-  // getter.get(this)(i)
 
   /** Construct a new `Samples` with samples of type `B`. `f` is evaluated lazily. */
   def map[B](f: A => B): Samples[B] =
