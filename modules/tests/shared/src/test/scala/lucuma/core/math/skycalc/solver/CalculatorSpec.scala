@@ -18,7 +18,7 @@ final class CalculatorSpec extends CatsSuite {
     forAll { interval: Interval =>
       forAll(rateForInterval(interval)) { duration: Duration =>
         val intervalTargetCalculator = Samples.atFixedRate(interval, duration)(_ => Eval.now(()))
-        val instants                 = intervalTargetCalculator.data.keys
+        val instants                 = intervalTargetCalculator.toMap.keys
         assert(instants.head === interval.start)
         val last                     = instants.last
         assert(last >= interval.end)

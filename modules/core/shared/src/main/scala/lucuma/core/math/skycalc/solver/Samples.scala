@@ -11,21 +11,44 @@ import io.chrisdavenport.cats.time._
 import java.time.{ Duration, Instant }
 import scala.collection.immutable.TreeMap
 
-/** A set of samples, keyed by `Instant`. Samples are lazy and must be forced by the user. */
-final case class Samples[A](data: TreeMap[Instant, Eval[A]]) {
+/**
+ * A set of samples, keyed by `Instant`. Samples are lazy and must be forced by the user, and
+ * mapping operations are also applied lazily.
+ */
+trait Samples[A] { outer =>
   import Samples.{ Bracket, Lookup }
+
+  // We can't use Coyoneda here because our continuation `k` has a richer type, but otherwise the
+  // encoding is the same. Values in `data` are of some unknowable type `P` but we know how to map
+  // them to `A` and we know what `A` is. So `map` operations can just append to `k` and we don't
+  // have to duplicate `data`. Our most general mapping operation is `mapEvalWithKeys` so that
+  // determines the type of `k`.
+  protected type P // "pivot" type
+  protected val  data: TreeMap[Instant, Eval[P]]
+  protected val  k: (Instant, P) => Eval[A]
+
+  /** The value at `i`, if any. */
+  def get(i: Instant): Option[Eval[A]] =
+    data.get(i).map(_.flatMap(k(i, _)))
+
+  /**
+   * Sample data, as a map. Accessing this field has an initial cost of duplicating the underlying
+   * structure and applying any mapped fuctions to the value cells (which remain unforced).
+   */
+  lazy val toMap: TreeMap[Instant, Eval[A]] =
+    data.map { case (i, ep) => (i, ep.flatMap(k(i, _))) }
 
   /**
    * Split the samples at `i`, yielding a `Lookup` containing the matching sample, if any, and all
    * samples before and after `i`.
    */
-  def lookup(i: Instant): Samples.Lookup[A] = {
-    val ls = data.rangeUntil(i) // will not contain i
-    val rs = data.rangeFrom(i)  // may start with i
-    if (data.contains(i)) {
-      Samples.Lookup(ls, rs.headOption, rs.drop(1))
+  def lookup(i: Instant): Lookup[A] = {
+    val ls = toMap.rangeUntil(i) // will not contain i
+    val rs = toMap.rangeFrom(i)  // may start with i
+    if (toMap.contains(i)) {
+      Lookup(ls, rs.headOption, rs.drop(1))
     } else {
-      Samples.Lookup(ls, None, rs)
+      Lookup(ls, None, rs)
     }
   }
 
@@ -34,32 +57,48 @@ final case class Samples[A](data: TreeMap[Instant, Eval[A]]) {
    * samples immediately before and after `i`, if any.
    */
   def bracket(i: Instant): Bracket[A] = {
-    // TODO: we can compute this more efficiently
-    val Lookup(ls, f, rs) = lookup(i)
-    Bracket(ls.lastOption, f, rs.headOption)
+    val left  = data.maxBefore(i).map { case (i, ep) => (i, ep.flatMap(k(i, _))) }
+    val focus = get(i).map((i, _))
+    val right = data.minAfter(i).map { case (i, ep) => (i, ep.flatMap(k(i, _))) }
+    Bracket(left, focus, right)
   }
 
   /** Compute the value at `i`, under a strategy `G`. */
   def valueAt[G](i: Instant)(implicit getter: CalcGetter[G, A]): Option[A] =
     getter.get(this)(i)
 
-  /** Construct a new `Samples` with samples of type `B`. */
+  /** Construct a new `Samples` with samples of type `B`. `f` is evaluated lazily. */
   def map[B](f: A => B): Samples[B] =
-    Samples(data.map { case (k, v) => (k, v map f)})
+    mapWithKeys((_, a) => f(a))
+
+  /**
+   * Construct a new `Samples` with samples of type `B`, allowing inspection of the associated
+   * key. `f` is evaluated lazily.
+   */
+  def mapWithKeys[B](f: (Instant, A) => B): Samples[B] =
+    mapEvalWithKeys((i, a) => Eval.later(f(i, a)))
+
+  /** Construct a new `Samples` with samples of type `B`. */
+  def mapEval[B](f: A => Eval[B]): Samples[B] =
+    mapEvalWithKeys((_, a) => f(a))
 
   /**
    * Construct a new `Samples` with samples of type `B`, allowing inspection of the associated
    * key.
    */
-  def mapWithKeys[B](f: (Instant, A) => B): Samples[B] =
-    Samples(data.map { case (k, v) => (k, v.map(f(k, _))) })
+  def mapEvalWithKeys[B](f: (Instant, A) => Eval[B]): Samples[B] =
+    new Samples[B] {
+      type P    = outer.P
+      val  data = outer.data
+      val  k    = (i, p) => outer.k(i, p).flatMap(a => f(i, a))
+    }
 
   /**
    * Concatenate another `Samples` using `Map` semantics (i.e., in case of conflct the `Samples`
    * on the RHS wins).
    */
   def ++(other: Samples[A]): Samples[A] =
-    Samples(data ++ other.data)
+    Samples.fromMap(toMap ++ other.toMap)
 
 }
 
@@ -85,24 +124,31 @@ object Samples {
     right: Option[(Instant, Eval[A])]
   )
 
+  /** Construct a `Samples` from a map. */
+  def fromMap[A](values: TreeMap[Instant, Eval[A]]): Samples[A] =
+    new Samples[A] {
+      type P    = A
+      val  data = values
+      val  k    = (_, a) => Eval.always(a)
+    }
+
   /** Construct a `Samples` with a single sample. */
   def single[A](instant: Instant, value: => A): Samples[A] =
-    Samples(TreeMap(instant -> Eval.later(value)))
+    fromMap(TreeMap(instant -> Eval.later(value)))
 
   /** Construct a `Samples` across an interval, sampled at the given rate. */
-  def atFixedRate[A](interval: Interval, rate: Duration)(f: Instant => A): Samples[A] = {
-    Samples(
+  def atFixedRate[A](interval: Interval, rate: Duration)(f: Instant => A): Samples[A] =
+    fromMap(
       Iterator
         .iterate(interval.start)(_.plus(rate))
         .takeWhile(_ < interval.end.plus(rate))
         .map(i => (i, Eval.later(f(i))))
         .to(TreeMap)
     )
-  }
 
   /** An empty `Samples`. */
-  def empty[A]: Samples[A] =
-    Samples(TreeMap.empty)
+  def empty[A]: Samples[A] = ???
+    // Samples(TreeMap.empty)
 
   /** Samples is a covariant functor. */
   implicit val FunctorSamples: Functor[Samples] =
@@ -155,7 +201,7 @@ object Samples {
         (normalizedAngle * weight, weight)
 
       }
-      .data
+      .toMap
       .values
       .toList
       .sequence

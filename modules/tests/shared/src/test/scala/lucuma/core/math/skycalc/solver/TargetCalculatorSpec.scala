@@ -53,7 +53,7 @@ final class TargetCalculatorSpec extends CatsSuite with Tolerance {
       intervalTargetCalculator.map(_.airmass).valueAt[LinearInterpolating](testInstant).exists(a => 1.6 ===  a +- 0.1)
     )
 
-    assert(89.0 === intervalTargetCalculator.map(_.altitude).data.values.max.map(_.toAngle.toSignedDoubleDegrees).value +- 1)
-    assert(37.0 === intervalTargetCalculator.map(_.altitude).data.values.min.map(_.toAngle.toSignedDoubleDegrees).value +- 1)
+    assert(89.0 === intervalTargetCalculator.map(_.altitude).toMap.values.max.map(_.toAngle.toSignedDoubleDegrees).value +- 1)
+    assert(37.0 === intervalTargetCalculator.map(_.altitude).toMap.values.min.map(_.toAngle.toSignedDoubleDegrees).value +- 1)
   }
 }
