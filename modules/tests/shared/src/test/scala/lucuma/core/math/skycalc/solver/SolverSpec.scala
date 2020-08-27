@@ -7,7 +7,7 @@ import cats.tests.CatsSuite
 import java.time.Instant
 import java.time.Duration
 import gsp.math.skycalc.solver.SolverStrategy._
-import gsp.math.skycalc.solver.GetterStrategy._
+import gsp.math.skycalc.solver.RoundStrategy._
 
 final class SolverSpec extends CatsSuite {
 
@@ -15,14 +15,19 @@ final class SolverSpec extends CatsSuite {
 
   case class TestConstraint(f: Instant => Boolean) extends Constraint[Unit, Unit] {
     override def metAt[G](calc: Samples[Unit])(i: Instant)(implicit
-      getter:                   CalcGetter[G, Unit]
+      rounder:                  SampleRounder[G, Unit]
     ): Boolean = f(i)
   }
 
-  implicit val testValueGetter = new CalcGetter[Closest, Unit] {
-    def get(calc: Samples[Unit])(
-      instant:       Instant
-    ): Option[Unit] = Some(())
+  implicit val testValueRounder = new SampleRounder[Closest, Unit] {
+    def round(
+      leftI:  Instant,
+      leftV:  Unit,
+      rightI: Instant,
+      rightV: Unit,
+      i:      Instant
+    ): Option[Unit] =
+      Some(())
   }
 
   def constraintSolver[S](f: Instant => Boolean)(implicit solver: Solver[S]) =

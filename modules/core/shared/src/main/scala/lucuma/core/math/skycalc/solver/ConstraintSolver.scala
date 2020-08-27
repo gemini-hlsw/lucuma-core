@@ -9,18 +9,18 @@ import gsp.math.skycalc.SkyCalcResults
 import gsp.math.HourAngle
 
 /**
-  * Convenience class to find a [[Schedule]] meeting a [[Constraint]] from a [[Calculator]] at a given [[Interval]].
+  * Convenience class to find a [[Schedule]] meeting a [[Constraint]] from [[Samples]] at a given [[Interval]].
   *
   * @tparam S [[SolverStrategy]] to use
-  * @tparam G [[GetterStrategy]] to use
-  * @tparam T the type of results held by the [[Calculator]]
+  * @tparam G [[RoundStrategy]] to use
+  * @tparam T the type of results held by the [[Samples]]
   * @tparam A the type on which the [[Constraint]] is checked (usually obtainable from <code>T</code>)
   */
 class ConstraintSolver[S, G, T, A](
   constraint:      Constraint[T, A],
   tolerance:       Duration = Duration.ofSeconds(30)
 )(implicit solver: Solver[S]) {
-  def solve(calc: Samples[T])(interval: Interval)(implicit getter: CalcGetter[G, A]): Schedule =
+  def solve(calc: Samples[T])(interval: Interval)(implicit rounder: SampleRounder[G, A]): Schedule =
     solver.solve(constraint.metAt[G](calc))(interval, tolerance)
 }
 
@@ -46,7 +46,7 @@ case class ElevationSolver(
   tolerance: Duration = Duration.ofSeconds(30)
 ) extends ConstraintSolver[
       SolverStrategy.Default,
-      GetterStrategy.LinearInterpolating,
+      RoundStrategy.LinearInterpolating,
       SkyCalcResults,
       Declination
     ](ElevationConstraint(min, max), tolerance)
@@ -57,7 +57,7 @@ case class SkyBrightnessSolver(
   tolerance: Duration = Duration.ofSeconds(30)
 ) extends ConstraintSolver[
       SolverStrategy.Default,
-      GetterStrategy.LinearInterpolating,
+      RoundStrategy.LinearInterpolating,
       SkyCalcResults,
       Double
     ](SkyBrightnessConstraint(min, max), tolerance)
@@ -65,7 +65,7 @@ case class SkyBrightnessSolver(
 case class AirmassSolver(min: Double, max: Double, tolerance: Duration = Duration.ofSeconds(30))
     extends ConstraintSolver[
       SolverStrategy.Default,
-      GetterStrategy.LinearInterpolating,
+      RoundStrategy.LinearInterpolating,
       SkyCalcResults,
       (Double, Declination)
     ](AirmassConstraint(min, max), tolerance)
@@ -76,7 +76,7 @@ case class HourAngleSolver(
   tolerance: Duration = Duration.ofSeconds(30)
 ) extends ConstraintSolver[
       SolverStrategy.Default,
-      GetterStrategy.LinearInterpolating,
+      RoundStrategy.LinearInterpolating,
       SkyCalcResults,
       (HourAngle, Declination)
     ](HourAngleConstraint(min, max), tolerance)
