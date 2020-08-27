@@ -4,10 +4,9 @@
 package lucuma.core.math.skycalc
 
 import munit.FunSuite
-import lucuma.core.math.Place
+import lucuma.core.enum.Site
 import java.time.LocalDate
 import org.scalactic.Tolerance
-import lucuma.core.enum.Site
 
 final class TwilightCalcSpec extends FunSuite with Tolerance {
   import TwilightBoundType._
@@ -15,7 +14,7 @@ final class TwilightCalcSpec extends FunSuite with Tolerance {
   private val Date = LocalDate.of(2000, 1, 1)
 
   // Known results with OCS
-  private val expected: Map[(Place, TwilightBoundType, LocalDate), (Long, Long)] =
+  private val expected: Map[(Site, TwilightBoundType, LocalDate), (Long, Long)] =
     Map(
       (Site.GN, Official, Date)     -> ((946785833352L, 946831636357L)),
       (Site.GN, Civil, Date)        -> ((946786687500L, 946830782669L)),
@@ -29,8 +28,8 @@ final class TwilightCalcSpec extends FunSuite with Tolerance {
 
   test("TwilightCalcSpec: Sunrise and sunset on 2000-01-01") {
     expected.foreach {
-      case ((place, tbType, date), (s, e)) =>
-        val (start, end) = TwilightCalc.calculate(tbType, date, place).get
+      case ((site, tbType, date), (s, e)) =>
+        val (start, end) = TwilightCalc.calculate(tbType, date, site.place).get
         // The use of a different JulianDate throughout the calculations produces a very slight difference,
         // therefore we allow a couple of milliseconds of tolerance.
         assert((start.toEpochMilli +- 2).isWithin(s))

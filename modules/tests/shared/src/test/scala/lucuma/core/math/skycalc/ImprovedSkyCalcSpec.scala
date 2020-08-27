@@ -7,7 +7,6 @@ import munit.FunSuite
 
 import java.time._
 import lucuma.core.math.Coordinates
-import lucuma.core.math.Place
 import lucuma.core.enum.Site
 
 // This is just a basic case, mostly to test linking in JS.
@@ -29,7 +28,7 @@ final class ImprovedSkyCalcSpec extends FunSuite {
   )
 
   // Known results with OCS, computed with millis precision (uses ju.Date)
-  private val expected: Map[(Place, Coordinates, Instant), Double] =
+  private val expected: Map[(Site, Coordinates, Instant), Double] =
     Map(
       (Site.GN, M51, Moment) -> 6.637492164341347,
       (Site.GS, M51, Moment) -> -72.26086414073282
@@ -37,8 +36,8 @@ final class ImprovedSkyCalcSpec extends FunSuite {
 
   test("ImprovedSkyCalcSpec: Elevation of M51 at midnight 2000-01-01 UTC") {
     expected.foreach {
-      case ((place, coords, instant), elevation) =>
-        val calc    = ImprovedSkyCalc(place)
+      case ((site, coords, instant), elevation) =>
+        val calc    = ImprovedSkyCalc(site.place)
         val results = calc.calculate(coords, instant, false)
         assertEquals(results.altitudeRaw, elevation)
     }

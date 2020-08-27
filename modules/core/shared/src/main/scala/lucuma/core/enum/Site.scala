@@ -24,17 +24,18 @@ import eu.timepit.refined.numeric._
   * @group Enumerations (Generated)
   */
 sealed abstract class Site(
-  val tag:                String,
-  val shortName:          String,
-  val longName:           String,
-  val mountain:           String,
-  override val latitude:  Lat,
-  override val longitude: Lon,
-  override val altitude:  Quantity[NonNegInt, Meter],
-  override val timezone:  ZoneId
-) extends Place(latitude, longitude, altitude, timezone)
-    with Product
-    with Serializable
+  val tag:       String,
+  val shortName: String,
+  val longName:  String,
+  val place:     Place,
+  val mountain:  String
+) extends Product
+    with Serializable {
+  val latitude: Lat                        = place.latitude
+  val longitude: Lon                       = place.longitude
+  val altitude: Quantity[NonNegInt, Meter] = place.altitude
+  val timezone: ZoneId                     = place.timezone
+}
 
 object Site {
 
@@ -43,11 +44,13 @@ object Site {
       extends Site("GN",
                    "GN",
                    "Gemini North",
-                   "Mauna Kea",
-                   Lat.fromAngleWithCarry(Angle.fromDoubleDegrees(19.8238068))._1,
-                   Lon.fromDoubleDegrees(-155.4690550),
-                   4213.withRefinedUnit[NonNegative, Meter],
-                   ZoneId.of("Pacific/Honolulu")
+                   Place(
+                     Lat.fromAngleWithCarry(Angle.fromDoubleDegrees(19.8238068))._1,
+                     Lon.fromDoubleDegrees(-155.4690550),
+                     4213.withRefinedUnit[NonNegative, Meter],
+                     ZoneId.of("Pacific/Honolulu")
+                   ),
+                   "Mauna Kea"
       )
 
   /** @group Constructors */
@@ -55,11 +58,13 @@ object Site {
       extends Site("GS",
                    "GS",
                    "Gemini South",
-                   "Cerro Pachon",
-                   Lat.fromAngleWithCarry(Angle.fromDoubleDegrees(-30.2407494))._1,
-                   Lon.fromDoubleDegrees(-70.7366867),
-                   2722.withRefinedUnit[NonNegative, Meter],
-                   ZoneId.of("America/Santiago")
+                   Place(
+                     Lat.fromAngleWithCarry(Angle.fromDoubleDegrees(-30.2407494))._1,
+                     Lon.fromDoubleDegrees(-70.7366867),
+                     2722.withRefinedUnit[NonNegative, Meter],
+                     ZoneId.of("America/Santiago")
+                   ),
+                   "Cerro Pachon"
       )
 
   /** All members of Site, in canonical order. */
