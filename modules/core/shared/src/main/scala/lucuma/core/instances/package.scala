@@ -9,6 +9,6 @@ package lucuma.core
   */
 package object instances {
 
-  object all extends TimeInstances with TreeMapInstances with TreeSetInstances
+  object all extends TreeMapInstances with TreeSetInstances
 
 }

@@ -14,13 +14,13 @@ import org.scalacheck.{ Arbitrary, Gen }
 import org.scalacheck.Prop._
 import munit._
 
-final class EphemerisCoordinatesSuite extends FunSuite with DisciplineSuite with ScalaCheckSuite {
+final class EphemerisCoordinatesSuite extends DisciplineSuite {
   import ArbCoordinates._
   import ArbEphemeris._
   import ArbOffset._
   import ArbRightAscension._
   import ArbDeclination._
-  import EphemerisCoordinatesSpec._
+  import EphemerisCoordinatesSuite._
 
   // Laws
   checkAll("EphemerisCoordinates", EqTests[EphemerisCoordinates].eqv)
@@ -95,7 +95,7 @@ final class EphemerisCoordinatesSuite extends FunSuite with DisciplineSuite with
 
 }
 
-object EphemerisCoordinatesSpec {
+object EphemerisCoordinatesSuite {
 
   final case class Ratio(ratio: Double)
 

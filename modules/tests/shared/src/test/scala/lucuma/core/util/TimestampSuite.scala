@@ -1,15 +1,15 @@
 // Copyright (c) 2016-2020 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package lucuma.core.uti
-package util
+package lucuma.core.util
 
 import lucuma.core.util.Timestamp
 import lucuma.core.util.arb.ArbTimestamp._
-import lucuma.core.instances.time._
 import lucuma.core.math.arb.ArbTime._
 import lucuma.core.math.laws.discipline._
 
+import cats.implicits._
+import io.chrisdavenport.cats.time._
 import cats.kernel.laws.discipline._
 
 import java.time.ZonedDateTime
@@ -21,7 +21,7 @@ import org.scalacheck.Arbitrary
 
 import munit._
 
-final class TimestampSpec extends FunSuite with DisciplineSuite with ScalaCheckSuite {
+final class TimestampSuite extends DisciplineSuite {
 
   // Laws
   checkAll("Timestamp", OrderTests[Timestamp].order)

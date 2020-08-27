@@ -3,12 +3,12 @@
 
 package lucuma.core.model
 
+import cats.implicits._
 import cats.kernel.laws.discipline._
-
 import lucuma.core.model.arb._
 import munit._
 
-final class TargetSuite extends FunSuite with DisciplineSuite {
+final class TargetSuite extends DisciplineSuite {
   import ArbTarget._
 
   // Laws
