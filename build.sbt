@@ -2,6 +2,7 @@ import sbtcrossproject.CrossType
 
 lazy val attoVersion                 = "0.8.0"
 lazy val catsVersion                 = "2.1.1"
+lazy val catsEffectVersion           = "2.1.4"
 lazy val collCompatVersion           = "2.1.6"
 lazy val kindProjectorVersion        = "0.11.0"
 lazy val monocleVersion              = "2.1.0"
@@ -15,6 +16,7 @@ lazy val coulombVersion              = "0.5.0"
 lazy val spireVersion                = "0.17.0-RC1"
 lazy val singletonOpsVersion         = "0.5.1"
 lazy val refinedVersion              = "0.9.15"
+lazy val catsTimeVersion             = "0.3.4"
 
 inThisBuild(
   Seq(
@@ -37,6 +39,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
     libraryDependencies ++= Seq(
       "org.tpolecat"               %%% "atto-core"               % attoVersion,
       "org.typelevel"              %%% "cats-core"               % catsVersion,
+      "org.typelevel"              %%% "cats-effect"             % catsEffectVersion,
       "com.github.julien-truffaut" %%% "monocle-core"            % monocleVersion,
       "com.github.julien-truffaut" %%% "monocle-macro"           % monocleVersion,
       "org.scala-lang.modules"     %%% "scala-collection-compat" % collCompatVersion,
@@ -50,7 +53,8 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
       "org.typelevel"              %%% "spire"                   % spireVersion,
       "eu.timepit"                 %%% "singleton-ops"           % singletonOpsVersion,
       "eu.timepit"                 %%% "refined"                 % refinedVersion,
-      "eu.timepit"                 %%% "refined-cats"            % refinedVersion
+      "eu.timepit"                 %%% "refined-cats"            % refinedVersion,
+      "io.chrisdavenport"          %%% "cats-time"               % catsTimeVersion
     )
   )
   .jvmConfigure(_.enablePlugins(AutomateHeaderPlugin))
