@@ -1,5 +1,6 @@
 import sbtcrossproject.CrossType
 
+lazy val fs2Version                  = "2.4.3"
 lazy val attoVersion                 = "0.8.0"
 lazy val catsVersion                 = "2.1.1"
 lazy val collCompatVersion           = "2.1.6"
@@ -35,6 +36,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
   .settings(
     name := "lucuma-core",
     libraryDependencies ++= Seq(
+      "co.fs2"                     %%% "fs2-core"                % fs2Version,
       "org.tpolecat"               %%% "atto-core"               % attoVersion,
       "org.typelevel"              %%% "cats-core"               % catsVersion,
       "com.github.julien-truffaut" %%% "monocle-core"            % monocleVersion,
