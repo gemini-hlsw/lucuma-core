@@ -24,7 +24,7 @@ object RoundStrategy {
 }
 
 /**
-  * Typeclass defininig how to round values from [[Samples]] using a certain [[RoundStrategy]].
+  * Typeclass defininig how to round values associated to [[Instant]]s using a certain [[RoundStrategy]].
   *
   * @tparam G [[RoundStrategy]] to use
   * @tparam A type of the value in [[Samples]]
@@ -32,7 +32,7 @@ object RoundStrategy {
 trait SampleRounder[G, A] { self =>
 
   /**
-    * Compute rounder value from [[Samples]] when there's not an exact match.
+    * Compute rounded value from [[Samples]] when there's not an exact match.
     */
   def round(leftI: Instant, leftV: A, rightI: Instant, rightV: A, i: Instant): Option[A]
 
@@ -41,11 +41,13 @@ trait SampleRounder[G, A] { self =>
   )(leftI: Instant, leftV: B, rightI: Instant, rightV: B, i: Instant): Option[A] =
     round(leftI, f(leftV), rightI, f(rightV), i)
 
-  // def contraFlatMapRound[B](f: B => Option[A])(leftI: Instant, leftV: B, rightI: Instant, rightV: B, i: Instant): Option[A] =
-  //   f(leftV).fl
-
-  //   round(sampleMap(left), sampleMap(right))(i)
-  // }
+  def contraFlatMapRound[B](
+    f:     B => Option[A]
+  )(leftI: Instant, leftV: B, rightI: Instant, rightV: B, i: Instant): Option[A] =
+    (for {
+      leftA  <- f(leftV)
+      rightA <- f(rightV)
+    } yield round(leftI, leftA, rightI, rightA, i)).flatten
 
   def imap[B](f: A => B)(g: B => A): SampleRounder[G, B] =
     new SampleRounder[G, B] {
@@ -57,30 +59,38 @@ trait SampleRounder[G, A] { self =>
     imap(optic.get)(optic.reverseGet)
 
   def imap[B](optic: SplitEpi[A, B]): SampleRounder[G, B] =
-    imap(optic.get)(optic.reverseGet)
+    imap(optic.asWedge)
 
   def imap[B](optic: SplitMono[A, B]): SampleRounder[G, B] =
-    imap(optic.get)(optic.reverseGet)
+    imap(optic.asWedge)
 
   def imap[B](optic: Iso[A, B]): SampleRounder[G, B] =
-    imap(optic.get _)(optic.reverseGet)
+    imap(Wedge.fromIso(optic))
 
-  // def forOption: SampleRounder[G, Option[A]] =
-  //   new SampleRounder[G, Option[A]] {
-  //     override def get(samples: Samples[Option[A]])(instant: Instant): Option[Option[A]] = ???
-  //   }
+  def imapOpt[B](f: A => Option[B])(g: B => Option[A]): SampleRounder[G, B] =
+    new SampleRounder[G, B] {
+      def round(leftI: Instant, leftV: B, rightI: Instant, rightV: B, i: Instant): Option[B] =
+        self.contraFlatMapRound(g)(leftI, leftV, rightI, rightV, i).flatMap(f)
+    }
 
-  // def imapOpt[B](f: A => Option[B])(g: B => Option[A]): SampleRounder[G, B] =
-  //   new SampleRounder[G, B] {
-  //     def get(samples: Samples[B])(instant: Instant): Option[B] =
-  //       self.get(samples.map[Option[A]](g))(instant).map(f).flatten
-  //   }
+  def imapOpt[B](optic: Wedge[Option[A], Option[B]]): SampleRounder[G, B] =
+    imapOpt(a => optic.get(a.some))(b => optic.reverseGet(b.some))
+
+  def imapOpt[B](optic: SplitMono[Option[A], Option[B]]): SampleRounder[G, B] =
+    imapOpt(optic.asWedge)
+
+  def imapOpt[B](optic: SplitEpi[Option[A], Option[B]]): SampleRounder[G, B] =
+    imapOpt(optic.asWedge)
+
+  def imapOpt[B](optic: Iso[Option[A], Option[B]]): SampleRounder[G, B] =
+    imapOpt(Wedge.fromIso(optic))
 }
 
 trait SampleRounderInstances {
+  import RoundStrategy._
 
-  implicit def closestRounder[A]: SampleRounder[RoundStrategy.Closest, A] =
-    new SampleRounder[RoundStrategy.Closest, A] {
+  implicit def closestRounder[A]: SampleRounder[Closest, A] =
+    new SampleRounder[Closest, A] {
       def round(leftI: Instant, leftV: A, rightI: Instant, rightV: A, i: Instant): Option[A] = {
         val leftD  = Duration.between(leftI, i)
         val rightD = Duration.between(i, rightI)
@@ -88,8 +98,8 @@ trait SampleRounderInstances {
       }
     }
 
-  implicit val interpolatedNumberRounder: SampleRounder[RoundStrategy.LinearInterpolating, Number] =
-    new SampleRounder[RoundStrategy.LinearInterpolating, Number] {
+  implicit val interpolatedNumberRounder: SampleRounder[LinearInterpolating, Number] =
+    new SampleRounder[LinearInterpolating, Number] {
       def round(
         leftI:  Instant,
         leftV:  Number,
@@ -103,36 +113,27 @@ trait SampleRounderInstances {
         ) * (rightV - leftV)).some
     }
 
-  // Fails on Infinity
-  implicit val interpolatedDoubleRounder: SampleRounder[RoundStrategy.LinearInterpolating, Double] =
-    // def round(left: (Instant, Eval[Double]), right: (Instant, Eval[Double]))(
-    // i:            Instant
-    // ): Option[Double] =
-    interpolatedNumberRounder.imap(n => numberDouble.get(n.some).get)(d =>
-      numberDouble.reverseGet(d.some).get
-    )
+  // Returns None if any value is Infinity
+  implicit val interpolatedDoubleRounder: SampleRounder[LinearInterpolating, Double] =
+    interpolatedNumberRounder.imapOpt(numberDouble)
 
-  // Fails on Infinity
-  implicit val interpolatedFloatRounder: SampleRounder[RoundStrategy.LinearInterpolating, Float] =
-    interpolatedNumberRounder.imap(n => numberFloat.get(n.some).get)(d =>
-      numberFloat.reverseGet(d.some).get
-    )
+  // Returns None if any value is Infinity
+  implicit val interpolatedFloatRounder: SampleRounder[LinearInterpolating, Float] =
+    interpolatedNumberRounder.imapOpt(numberFloat)
 
-  implicit val interpolatedLongRounder: SampleRounder[RoundStrategy.LinearInterpolating, Long] =
+  implicit val interpolatedLongRounder: SampleRounder[LinearInterpolating, Long] =
     interpolatedNumberRounder.imap(numberLong)
 
-  implicit val interpolatedIntRounder: SampleRounder[RoundStrategy.LinearInterpolating, Int] =
+  implicit val interpolatedIntRounder: SampleRounder[LinearInterpolating, Int] =
     interpolatedNumberRounder.imap(numberInt)
 
-  implicit val interpolatedAngleRounder: SampleRounder[RoundStrategy.LinearInterpolating, Angle] =
+  implicit val interpolatedAngleRounder: SampleRounder[LinearInterpolating, Angle] =
     interpolatedLongRounder.imap(Angle.microarcseconds.reverse)
 
-  implicit val interpolatedDeclinationRounder
-    : SampleRounder[RoundStrategy.LinearInterpolating, Declination] =
+  implicit val interpolatedDeclinationRounder: SampleRounder[LinearInterpolating, Declination] =
     interpolatedAngleRounder.imap((Declination.fromAngleWithCarry _).andThen(_._1))(_.toAngle)
 
-  implicit val interpolatedHourAngleRounder
-    : SampleRounder[RoundStrategy.LinearInterpolating, HourAngle] =
+  implicit val interpolatedHourAngleRounder: SampleRounder[LinearInterpolating, HourAngle] =
     interpolatedAngleRounder.imap(HourAngle.angle.reverse)
 
   implicit def toTupledRounder[G, A, B](implicit
@@ -151,7 +152,6 @@ trait SampleRounderInstances {
           .contraMapRound[(A, B)](_._1)(leftI, leftV, rightI, rightV, i)
           .product(rounderB.contraMapRound[(A, B)](_._2)(leftI, leftV, rightI, rightV, i))
     }
-
 }
 
 object SampleRounder extends SampleRounderInstances
