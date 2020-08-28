@@ -154,8 +154,8 @@ object Samples {
     )
 
   /** An empty `Samples`. */
-  def empty[A]: Samples[A] = ???
-  // Samples(TreeMap.empty)
+  def empty[A]: Samples[A] =
+    Samples.fromMap(TreeMap.empty)
 
   /** Samples is a covariant functor. */
   implicit val FunctorSamples: Functor[Samples] =
@@ -178,7 +178,6 @@ object Samples {
       val skycalc = ImprovedSkyCalc(place)
       self.mapWithKeys { case (i, cs) => skycalc.calculate(cs, i, true) }
     }
-
   }
 
   /** Convenience syntax for sampled `SkyCalcResults`. */
@@ -219,7 +218,5 @@ object Samples {
           else Some(weightedAngles.sum / weightedSum)
 
         }
-
   }
-
 }
