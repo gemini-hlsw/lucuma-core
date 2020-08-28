@@ -54,7 +54,13 @@ trait SampleRounder[R, A] { self =>
 
   def product[B](rounderB: SampleRounder[R, B]): SampleRounder[R, (A, B)] =
     new SampleRounder[R, (A, B)] {
-      def round(leftI: Instant, leftV: (A, B), rightI: Instant, rightV: (A, B), i: Instant): Option[(A, B)] =
+      def round(
+        leftI:  Instant,
+        leftV:  (A, B),
+        rightI: Instant,
+        rightV: (A, B),
+        i:      Instant
+      ): Option[(A, B)] =
         self
           .contraMapRound[(A, B)](_._1)(leftI, leftV, rightI, rightV, i)
           .product(rounderB.contraMapRound[(A, B)](_._2)(leftI, leftV, rightI, rightV, i))
@@ -103,8 +109,13 @@ trait SampleRounderInstances {
   /** SampleRounder is an invariant semigroupal functor. */
   implicit def invariantSemigroupalSampleRounder[R]: InvariantSemigroupal[SampleRounder[R, *]] =
     new InvariantSemigroupal[SampleRounder[R, *]] {
-      def product[A, B](fa: SampleRounder[R,A], fb: SampleRounder[R,B]) = fa.product(fb)
-      def imap[A, B](fa: SampleRounder[R,A])(f: A => B)(g: B => A) = fa.imap(f)(g)
+      def product[A, B](
+        fa: SampleRounder[R, A],
+        fb: SampleRounder[R, B]
+      ): SampleRounder[R, (A, B)] = fa.product(fb)
+
+      def imap[A, B](fa: SampleRounder[R, A])(f: A => B)(g: B => A): SampleRounder[R, B] =
+        fa.imap(f)(g)
     }
 
   implicit def closestRounder[A]: SampleRounder[Closest, A] =
@@ -158,8 +169,7 @@ trait SampleRounderInstances {
     rounderA: SampleRounder[R, A],
     rounderB: SampleRounder[R, B]
   ): SampleRounder[R, (A, B)] =
-    rounderA product rounderB
-
+    rounderA.product(rounderB)
 }
 
 object SampleRounder extends SampleRounderInstances

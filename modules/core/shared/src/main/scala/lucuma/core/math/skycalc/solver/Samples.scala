@@ -4,12 +4,13 @@
 package gsp.math.skycalc
 package solver
 
-import cats.{ Eval, Functor, MonoidK }
+import cats.{ Eq, Eval, Functor, MonoidK }
 import cats.implicits._
 import gsp.math.{ Coordinates, Place }
 import io.chrisdavenport.cats.time._
 import java.time.{ Duration, Instant }
 import scala.collection.immutable.TreeMap
+import monocle.Iso
 
 /**
   * A set of samples, keyed by `Instant`. Samples are lazy and must be forced by the user, and
@@ -26,6 +27,13 @@ trait Samples[A] { outer =>
   protected type P // "pivot" type
   protected val data: TreeMap[Instant, Eval[P]]
   protected val k: (Instant, P) => Eval[A]
+
+  /** The [[Interval]] covered by the samples. Note: change this to a closed Interval when we switch to Spire. */
+  def interval: Option[Interval] =
+    (data.headOption, data.lastOption)
+      .bimap(_.map(_._1), _.map(_._1))
+      .mapN(Interval.apply)
+      .flatten
 
   /** The value at `i`, if any. */
   def get(i: Instant): Option[Eval[A]] =
@@ -109,7 +117,7 @@ trait Samples[A] { outer =>
 
 }
 
-object Samples {
+object Samples extends SamplesOptics {
 
   /**
     * A lookup result, which contains the samples prior to `i`, the sample at `i` (if any), and the
@@ -157,13 +165,25 @@ object Samples {
   def empty[A]: Samples[A] =
     Samples.fromMap(TreeMap.empty)
 
-  /** Samples is a covariant functor. */
+  /**
+    * @group Typeclass Instances
+    */
+  implicit def eqSamples[A: Eq]: Eq[Samples[A]] =
+    Eq.by(_.toMap.toMap)
+
+  /**
+    * Samples is a covariant functor.
+    * @group Typeclass Instances
+    */
   implicit val FunctorSamples: Functor[Samples] =
     new Functor[Samples] {
       def map[A, B](fa: Samples[A])(f: A => B) = fa.map(f)
     }
 
-  /** `Samples` is a `MonoidK`. */
+  /**
+    * `Samples` is a `MonoidK`.
+    * @group Typeclass Instances
+    */
   implicit val MonoidKSamples: MonoidK[Samples] =
     new MonoidK[Samples] {
       def combineK[A](x: Samples[A], y: Samples[A]) = x ++ y
@@ -216,7 +236,17 @@ object Samples {
           val weightedSum               = weights.sum
           if (weightedSum == 0) None
           else Some(weightedAngles.sum / weightedSum)
-
         }
   }
+
+}
+
+trait SamplesOptics {
+
+  /**
+    * @group Optics
+    */
+  def data[A]: Iso[Samples[A], TreeMap[Instant, Eval[A]]] =
+    Iso[Samples[A], TreeMap[Instant, Eval[A]]](_.toMap)(Samples.fromMap)
+
 }

@@ -10,8 +10,8 @@ import io.chrisdavenport.cats.time._
 import scala.annotation.tailrec
 
 object SolverStrategy {
-  sealed trait Default
-  sealed trait Parabola
+  type Default
+  type Parabola
 }
 
 /**
