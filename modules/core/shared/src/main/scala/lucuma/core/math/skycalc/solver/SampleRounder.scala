@@ -17,6 +17,7 @@ import spire.math.Rational
 import monocle.Iso
 import gsp.math.optics.Spire._
 import io.chrisdavenport.cats.time._
+import cats.InvariantSemigroupal
 
 object RoundStrategy {
   sealed trait Closest
@@ -36,18 +37,28 @@ trait SampleRounder[R, A] { self =>
     */
   def round(leftI: Instant, leftV: A, rightI: Instant, rightV: A, i: Instant): Option[A]
 
-  def contraMapRound[B](
+  // weird signature, keep private
+  private def contraMapRound[B](
     f:     B => A
   )(leftI: Instant, leftV: B, rightI: Instant, rightV: B, i: Instant): Option[A] =
     round(leftI, f(leftV), rightI, f(rightV), i)
 
-  def contraFlatMapRound[B](
+  // weird signature, keep private
+  private def contraMapRoundOpt[B](
     f:     B => Option[A]
   )(leftI: Instant, leftV: B, rightI: Instant, rightV: B, i: Instant): Option[A] =
     (for {
       leftA  <- f(leftV)
       rightA <- f(rightV)
     } yield round(leftI, leftA, rightI, rightA, i)).flatten
+
+  def product[B](rounderB: SampleRounder[R, B]): SampleRounder[R, (A, B)] =
+    new SampleRounder[R, (A, B)] {
+      def round(leftI: Instant, leftV: (A, B), rightI: Instant, rightV: (A, B), i: Instant): Option[(A, B)] =
+        self
+          .contraMapRound[(A, B)](_._1)(leftI, leftV, rightI, rightV, i)
+          .product(rounderB.contraMapRound[(A, B)](_._2)(leftI, leftV, rightI, rightV, i))
+    }
 
   def imap[B](f: A => B)(g: B => A): SampleRounder[R, B] =
     new SampleRounder[R, B] {
@@ -70,7 +81,7 @@ trait SampleRounder[R, A] { self =>
   def imapOpt[B](f: A => Option[B])(g: B => Option[A]): SampleRounder[R, B] =
     new SampleRounder[R, B] {
       def round(leftI: Instant, leftV: B, rightI: Instant, rightV: B, i: Instant): Option[B] =
-        self.contraFlatMapRound(g)(leftI, leftV, rightI, rightV, i).flatMap(f)
+        self.contraMapRoundOpt(g)(leftI, leftV, rightI, rightV, i).flatMap(f)
     }
 
   def imapOpt[B](optic: Wedge[Option[A], Option[B]]): SampleRounder[R, B] =
@@ -88,6 +99,13 @@ trait SampleRounder[R, A] { self =>
 
 trait SampleRounderInstances {
   import RoundStrategy._
+
+  /** SampleRounder is an invariant semigroupal functor. */
+  implicit def invariantSemigroupalSampleRounder[R]: InvariantSemigroupal[SampleRounder[R, *]] =
+    new InvariantSemigroupal[SampleRounder[R, *]] {
+      def product[A, B](fa: SampleRounder[R,A], fb: SampleRounder[R,B]) = fa.product(fb)
+      def imap[A, B](fa: SampleRounder[R,A])(f: A => B)(g: B => A) = fa.imap(f)(g)
+    }
 
   implicit def closestRounder[A]: SampleRounder[Closest, A] =
     new SampleRounder[Closest, A] {
@@ -140,18 +158,8 @@ trait SampleRounderInstances {
     rounderA: SampleRounder[R, A],
     rounderB: SampleRounder[R, B]
   ): SampleRounder[R, (A, B)] =
-    new SampleRounder[R, (A, B)] {
-      def round(
-        leftI:  Instant,
-        leftV:  (A, B),
-        rightI: Instant,
-        rightV: (A, B),
-        i:      Instant
-      ): Option[(A, B)] =
-        rounderA
-          .contraMapRound[(A, B)](_._1)(leftI, leftV, rightI, rightV, i)
-          .product(rounderB.contraMapRound[(A, B)](_._2)(leftI, leftV, rightI, rightV, i))
-    }
+    rounderA product rounderB
+
 }
 
 object SampleRounder extends SampleRounderInstances
