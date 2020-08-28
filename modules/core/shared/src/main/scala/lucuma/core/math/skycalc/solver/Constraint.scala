@@ -22,15 +22,15 @@ trait Constraint[T, A] {
     * Defines the actual constraint by returning true or false for a given instant <code>i</code>
     * depending on whether to constraint is met or not.
     */
-  def metAt[R](calc: Samples[T])(i: Instant)(implicit rounder: SampleRounder[R, A]): Boolean
+  def metAt[R: SampleRounder[*, A]](samples: Samples[T])(i: Instant): Boolean
 }
 
 case class ElevationConstraint(min: Declination, max: Declination)
     extends Constraint[SkyCalcResults, Declination] {
-  override def metAt[R](calc: Samples[SkyCalcResults])(i: Instant)(implicit
-    rounder:                  SampleRounder[R, Declination]
-  ): Boolean =
-    calc
+  override def metAt[R: SampleRounder[*, Declination]](
+    samples: Samples[SkyCalcResults]
+  )(i:       Instant): Boolean =
+    samples
       .map(_.altitude)
       .valueAt(i)
       .map { elevation =>
@@ -41,10 +41,10 @@ case class ElevationConstraint(min: Declination, max: Declination)
 
 case class SkyBrightnessConstraint(min: Double, max: Double)
     extends Constraint[SkyCalcResults, Double] {
-  override def metAt[R](calc: Samples[SkyCalcResults])(i: Instant)(implicit
-    rounder:                  SampleRounder[R, Double]
-  ): Boolean =
-    calc
+  override def metAt[R: SampleRounder[*, Double]](
+    samples: Samples[SkyCalcResults]
+  )(i:       Instant): Boolean =
+    samples
       .map(_.totalSkyBrightness)
       .valueAt(i)
       .map { skyBrightness =>
@@ -59,10 +59,10 @@ case class AirmassConstraint(min: Double, max: Double)
   private val MinElevation: Declination =
     Declination.fromAngleWithCarry(Angle.fromDoubleDegrees(5.0))._1
 
-  override def metAt[R](calc: Samples[SkyCalcResults])(i: Instant)(implicit
-    rounder:                  SampleRounder[R, (Double, Declination)]
-  ): Boolean =
-    calc
+  override def metAt[R: SampleRounder[*, (Double, Declination)]](
+    samples: Samples[SkyCalcResults]
+  )(i:       Instant): Boolean =
+    samples
       .map(r => (r.airmass, r.altitude))
       .valueAt(i)
       .map {
@@ -80,10 +80,10 @@ case class HourAngleConstraint(min: HourAngle, max: HourAngle)
   private val MinElevation: Declination =
     Declination.fromAngleWithCarry(Angle.fromDoubleDegrees(5.0))._1
 
-  override def metAt[R](calc: Samples[SkyCalcResults])(i: Instant)(implicit
-    rounder:                  SampleRounder[R, (HourAngle, Declination)]
-  ): Boolean =
-    calc
+  override def metAt[R: SampleRounder[*, (HourAngle, Declination)]](
+    samples: Samples[SkyCalcResults]
+  )(i:       Instant): Boolean =
+    samples
       .map(r => (r.hourAngle, r.altitude))
       .valueAt(i)
       .map {

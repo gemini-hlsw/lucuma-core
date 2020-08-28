@@ -20,8 +20,8 @@ import io.chrisdavenport.cats.time._
 import cats.InvariantSemigroupal
 
 object RoundStrategy {
-  sealed trait Closest
-  sealed trait LinearInterpolating
+  type Closest
+  type LinearInterpolating
 }
 
 /**

@@ -22,7 +22,7 @@ object Constants {
   val J2000 = JulianDate.J2000.toDouble
 
   val SecsInDay         = 86400.0
-  val FlatteningOfEarth = 0.003352813 // FlatteningOfEarthing of earth, 1/298.257
+  val FlatteningOfEarth = 0.003352813 // flattening of earth, 1/298.257
 
   val EquatorialRadiusMeters = 6378137.0 // equatorial radius of earth, meters
 
