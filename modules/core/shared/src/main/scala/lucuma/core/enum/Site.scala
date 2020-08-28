@@ -10,26 +10,62 @@ import cats.syntax.eq._
 import java.time.ZoneId
 import lucuma.core.util.Enumerated
 import lucuma.core.math.Angle
+import lucuma.core.math.Lat
+import lucuma.core.math.Lon
+import lucuma.core.math.Place
+import coulomb.Quantity
+import coulomb.si.Meter
+import coulomb.refined._
+import eu.timepit.refined.types.numeric.NonNegInt
+import eu.timepit.refined.numeric._
 
 /**
- * Enumerated type for Gemini observing sites.
- * @group Enumerations (Generated)
- */
+  * Enumerated type for Gemini observing sites.
+  * @group Enumerations (Generated)
+  */
 sealed abstract class Site(
-  val tag: String,
+  val tag:       String,
   val shortName: String,
-  val longName: String,
-  val mountain: String,
-  val latitude: Angle,
-  val longitude: Angle,
-  val altitude: Int,
-  val timezone: ZoneId
-) extends Product with Serializable
+  val longName:  String,
+  val place:     Place,
+  val mountain:  String
+) extends Product
+    with Serializable {
+  val latitude: Lat                        = place.latitude
+  val longitude: Lon                       = place.longitude
+  val altitude: Quantity[NonNegInt, Meter] = place.altitude
+  val timezone: ZoneId                     = place.timezone
+}
 
 object Site {
 
-  /** @group Constructors */ case object GN extends Site("GN", "GN", "Gemini North", "Mauna Kea", Angle.fromDoubleDegrees(19.8238068), Angle.fromDoubleDegrees(-155.4690550), 4213, ZoneId.of("Pacific/Honolulu"))
-  /** @group Constructors */ case object GS extends Site("GS", "GS", "Gemini South", "Cerro Pachon", Angle.fromDoubleDegrees(-30.2407494), Angle.fromDoubleDegrees(-70.7366867), 2722, ZoneId.of("America/Santiago"))
+  /** @group Constructors */
+  case object GN
+      extends Site("GN",
+                   "GN",
+                   "Gemini North",
+                   Place(
+                     Lat.fromAngleWithCarry(Angle.fromDoubleDegrees(19.8238068))._1,
+                     Lon.fromDoubleDegrees(-155.4690550),
+                     4213.withRefinedUnit[NonNegative, Meter],
+                     ZoneId.of("Pacific/Honolulu")
+                   ),
+                   "Mauna Kea"
+      )
+
+  /** @group Constructors */
+  case object GS
+      extends Site("GS",
+                   "GS",
+                   "Gemini South",
+                   Place(
+                     Lat.fromAngleWithCarry(Angle.fromDoubleDegrees(-30.2407494))._1,
+                     Lon.fromDoubleDegrees(-70.7366867),
+                     2722.withRefinedUnit[NonNegative, Meter],
+                     ZoneId.of("America/Santiago")
+                   ),
+                   "Cerro Pachon"
+      )
 
   /** All members of Site, in canonical order. */
   val all: List[Site] =
@@ -47,7 +83,7 @@ object Site {
   implicit val SiteEnumerated: Enumerated[Site] =
     new Enumerated[Site] {
       def all = Site.all
-      def tag(a: Site) = a.tag
+      def tag(a:                    Site)         = a.tag
       override def unsafeFromTag(s: String): Site =
         Site.unsafeFromTag(s)
     }

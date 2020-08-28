@@ -32,11 +32,11 @@ trait ArbPlace {
   implicit val arbPlace: Arbitrary[Place] =
     Arbitrary {
       for {
-        lat    <- arbitrary[Lat]
-        lon    <- arbitrary[Lon]
-        alt    <- genEarthAlt.map(_.withUnit[Meter])
-        zoneId <- arbitrary[ZoneId]
-      } yield Place(lat, lon, alt, zoneId)
+        lat      <- arbitrary[Lat]
+        lon      <- arbitrary[Lon]
+        alt      <- genEarthAlt.map(_.withUnit[Meter])
+        timezone <- arbitrary[ZoneId]
+      } yield Place(lat, lon, alt, timezone)
     }
 
   implicit val cogCoordinates: Cogen[Place] =

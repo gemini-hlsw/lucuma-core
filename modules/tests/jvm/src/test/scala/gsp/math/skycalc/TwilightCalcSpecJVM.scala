@@ -3,8 +3,8 @@
 
 package lucuma.core.math.skycalc
 
-import weaver._
-import weaver.scalacheck._
+import munit.ScalaCheckSuite
+import org.scalacheck.Prop._
 
 import cats._
 import cats.implicits._
@@ -18,13 +18,13 @@ import edu.gemini.skycalc.TwilightBoundedNightTest
 import java.time.Instant
 import org.scalactic.Tolerance
 
-object TwilightCalcSpecJVM extends SimpleIOSuite with IOCheckers with Tolerance {
+final class TwilightCalcSpecJVM extends ScalaCheckSuite with Tolerance {
 
   implicit val showLocalDate: Show[LocalDate] = Show.fromToString
   implicit val InstantEq: Eq[Instant]         = Eq.fromUniversalEquals
 
-  simpleTest("TwilightCalcSpec: Arbitrary sky calculations") {
-    forall { (boundType: TwilightBoundType, localDate: LocalDate, place: Place) =>
+  test("TwilightCalcSpec: Arbitrary sky calculations") {
+    forAll { (boundType: TwilightBoundType, localDate: LocalDate, place: Place) =>
       val (start, end) = TwilightCalc
         .calculate(boundType, localDate, place)
         .map(_.bimap(_.toEpochMilli, _.toEpochMilli))
@@ -40,7 +40,7 @@ object TwilightCalcSpecJVM extends SimpleIOSuite with IOCheckers with Tolerance 
       // The use of a different JulianDate throughout the calculations produces a very slight difference,
       // therefore we allow a couple of milliseconds of tolerance.
       assert((start +- 2).isWithin(tbn.getStartTime))
-        .and(assert((end +- 2).isWithin(tbn.getEndTime)))
+      assert((end +- 2).isWithin(tbn.getEndTime))
     }
   }
 }

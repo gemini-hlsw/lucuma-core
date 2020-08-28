@@ -6,11 +6,9 @@ package lucuma.core.math
 import cats.implicits._
 import cats.kernel.laws.discipline._
 import lucuma.core.math.arb.ArbProperVelocity._
-import munit.FunSuite
 import munit.DisciplineSuite
-import munit.ScalaCheckSuite
 
-final class ProperVelocitySuite extends FunSuite with DisciplineSuite with ScalaCheckSuite {
+final class ProperVelocitySuite extends DisciplineSuite {
 
   // Laws
   checkAll("Order[ProperVelocity]", OrderTests[ProperVelocity].order)

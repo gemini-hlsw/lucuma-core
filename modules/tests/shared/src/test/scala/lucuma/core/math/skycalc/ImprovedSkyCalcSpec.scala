@@ -3,22 +3,16 @@
 
 package lucuma.core.math.skycalc
 
-import weaver._
+import munit.FunSuite
 
-import cats.implicits._
-import cats.Monoid
-import cats.Show
 import java.time._
 import lucuma.core.math.Coordinates
-import lucuma.core.math.Place
+import lucuma.core.enum.Site
 
 // This is just a basic case, mostly to test linking in JS.
 // Property based testing is in ImprovedSkyCalcSpecJVM, where output
 // is compared to the one from {edu.gemini.skycalc} in Java.
-object ImprovedSkyCalcSpec extends SimpleIOSuite {
-
-  implicit val showInstant: Show[Instant]   = Show.fromToString
-  implicit val showZDT: Show[ZonedDateTime] = Show.fromToString
+final class ImprovedSkyCalcSpec extends FunSuite {
 
   private val NanosPerMillis: Int = 1_000_000
 
@@ -34,20 +28,18 @@ object ImprovedSkyCalcSpec extends SimpleIOSuite {
   )
 
   // Known results with OCS, computed with millis precision (uses ju.Date)
-  private val expected: Map[(Place, Coordinates, Instant), Double] =
+  private val expected: Map[(Site, Coordinates, Instant), Double] =
     Map(
-      (GN, M51, Moment) -> 6.637492164341347,
-      (GS, M51, Moment) -> -72.26086414073282
+      (Site.GN, M51, Moment) -> 6.637492164341347,
+      (Site.GS, M51, Moment) -> -72.26086414073282
     )
 
-  pureTest("ImprovedSkyCalcSpec: Elevation of M51 at midnight 2000-01-01 UTC") {
-    Monoid[Expectations].combineAll(
-      expected.map {
-        case ((place, coords, instant), elevation) =>
-          val calc    = ImprovedSkyCalc(place)
-          val results = calc.calculate(coords, instant, false)
-          expect(results.altitudeRaw === elevation)
-      }
-    )
+  test("ImprovedSkyCalcSpec: Elevation of M51 at midnight 2000-01-01 UTC") {
+    expected.foreach {
+      case ((site, coords, instant), elevation) =>
+        val calc    = ImprovedSkyCalc(site.place)
+        val results = calc.calculate(coords, instant, false)
+        assertEquals(results.altitudeRaw, elevation)
+    }
   }
 }

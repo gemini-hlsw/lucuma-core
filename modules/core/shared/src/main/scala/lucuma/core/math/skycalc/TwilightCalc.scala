@@ -30,7 +30,7 @@ trait TwilightCalc extends SunCalc {
     date:      LocalDate,
     place:     Place
   ): Option[(Instant, Instant)] = {
-    val nextMidnight = date.atStartOfDay(place.zoneId).plusDays(1)
+    val nextMidnight = date.atStartOfDay(place.timezone).plusDays(1)
     val jdmid        = JulianDate.ofInstant(nextMidnight.toInstant)
 
     // Sunrise/set take altitude into account whereas the twilights don't.

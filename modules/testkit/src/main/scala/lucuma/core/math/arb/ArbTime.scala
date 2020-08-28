@@ -8,7 +8,7 @@ import org.scalacheck.Gen._
 import org.scalacheck.Arbitrary._
 
 import scala.jdk.CollectionConverters._
-import scala.concurrent.duration.{Duration => SDuration}
+import scala.concurrent.duration.{ Duration => SDuration }
 import java.time._
 
 // Arbitrary but reasonable dates and times.
@@ -80,11 +80,13 @@ trait ArbTime {
     Cogen[(Int, Int)].contramap(d => (d.getYear, d.getDayOfYear))
 
   implicit val cogDuration: Cogen[Duration] =
-    Cogen[(Long,Int)].contramap(d => (d.getSeconds, d.getNano))
+    Cogen[(Long, Int)].contramap(d => (d.getSeconds, d.getNano))
 
   implicit val cogYear: Cogen[Year] =
     Cogen[Int].contramap(_.getValue)
 
+  implicit val cogZoneId: Cogen[ZoneId] =
+    Cogen[String].contramap(_.getId)
 }
 
 object ArbTime extends ArbTime
