@@ -7,8 +7,6 @@ import munit.ScalaCheckSuite
 import org.scalacheck.Prop._
 
 import edu.gemini.skycalc.ImprovedSkyCalcTest
-import cats.Show
-import java.time.Instant
 import lucuma.core.math.Coordinates
 import lucuma.core.math.arb.ArbCoordinates._
 import lucuma.core.math.arb.ArbPlace._
@@ -18,11 +16,14 @@ import java.time._
 import lucuma.core.math.Place
 import jsky.coords.WorldCoords
 import java.{ util => ju }
+import org.scalacheck.{ Test => ScalaCheckTest }
 
 final class ImprovedSkyCalcSpecJVM extends ScalaCheckSuite {
 
-  implicit val showInstant: Show[Instant]   = Show.fromToString
-  implicit val showZDT: Show[ZonedDateTime] = Show.fromToString
+  override protected val scalaCheckTestParameters = {
+    val old = ScalaCheckTest.Parameters.default
+    old.withMinSuccessfulTests(old.minSuccessfulTests / 3) // this is a slow test
+  }
 
   private val zdtFrom  = ZonedDateTime.of(
     LocalDate.of(1901, 1, 1),

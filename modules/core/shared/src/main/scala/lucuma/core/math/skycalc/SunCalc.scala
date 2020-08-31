@@ -5,6 +5,7 @@ package lucuma.core.math.skycalc
 
 import cats.implicits._
 import lucuma.core.math.JulianDate
+import lucuma.core.math.skycalc.Constants._
 
 trait SunCalc extends ImprovedSkyCalcMethods {
   protected def lst(jd: JulianDate, longit: Double): Double =
@@ -88,12 +89,12 @@ trait SunCalc extends ImprovedSkyCalcMethods {
     }
     if (alt < min_max(0)) return 1000.0  // flag value - always higher than asked
     if (alt > min_max(1)) return -1000.0 // flag for object always lower than asked
-    dec = PI_OVER_2 - dec / DEG_IN_RADIAN
-    lat = PI_OVER_2 - lat / DEG_IN_RADIAN
-    val coalt = PI_OVER_2 - alt / DEG_IN_RADIAN
+    dec = HalfPi - dec / DegsInRadian
+    lat = HalfPi - lat / DegsInRadian
+    val coalt = HalfPi - alt / DegsInRadian
     val x     = (Math.cos(coalt) - Math.cos(dec) * Math.cos(lat)) / (Math.sin(dec) * Math.sin(lat))
     if (Math.abs(x) <= 1.0)
-      Math.acos(x) * HRS_IN_RADIAN
+      Math.acos(x) * HrsInRadian
     else
       throw new RuntimeException("Error in ha_alt ... acos(>1).")
   }
@@ -111,14 +112,14 @@ trait SunCalc extends ImprovedSkyCalcMethods {
 
     var min = 0.0
     var max = 0.0
-    lat = lat / DEG_IN_RADIAN
-    dec = dec / DEG_IN_RADIAN
+    lat = lat / DegsInRadian
+    dec = dec / DegsInRadian
     var x   = Math.cos(dec) * Math.cos(lat) + Math.sin(dec) * Math.sin(lat)
-    if (Math.abs(x) <= 1.0) max = Math.asin(x) * DEG_IN_RADIAN
+    if (Math.abs(x) <= 1.0) max = Math.asin(x) * DegsInRadian
     else
       throw new RuntimeException("Error in min_max_alt -- arcsin(>1)")
     x = Math.sin(dec) * Math.sin(lat) - Math.cos(dec) * Math.cos(lat)
-    if (Math.abs(x) <= 1.0) min = Math.asin(x) * DEG_IN_RADIAN
+    if (Math.abs(x) <= 1.0) min = Math.asin(x) * DegsInRadian
     else
       throw new RuntimeException("Error in min_max_alt -- arcsin(>1)")
     Array[Double](min, max)
@@ -132,14 +133,14 @@ trait SunCalc extends ImprovedSkyCalcMethods {
   protected def lpsun(jd: JulianDate): (Double, Double) = {
     val n       = jd.toDouble - JulianDate.J2000.toDouble
     val L       = 280.460 + 0.9856474 * n
-    val g       = (357.528 + 0.9856003 * n) / DEG_IN_RADIAN
-    val lambda  = (L + 1.915 * Math.sin(g) + 0.020 * Math.sin(2.0 * g)) / DEG_IN_RADIAN
-    val epsilon = (23.439 - 0.0000004 * n) / DEG_IN_RADIAN
+    val g       = (357.528 + 0.9856003 * n) / DegsInRadian
+    val lambda  = (L + 1.915 * Math.sin(g) + 0.020 * Math.sin(2.0 * g)) / DegsInRadian
+    val epsilon = (23.439 - 0.0000004 * n) / DegsInRadian
     val x       = Math.cos(lambda)
     val y       = Math.cos(epsilon) * Math.sin(lambda)
     val z       = Math.sin(epsilon) * Math.sin(lambda)
-    val ra      = atan_circ(x, y) * HRS_IN_RADIAN
-    val dec     = Math.asin(z) * DEG_IN_RADIAN
+    val ra      = atan_circ(x, y) * HrsInRadian
+    val dec     = Math.asin(z) * DegsInRadian
     (ra, dec)
   }
 

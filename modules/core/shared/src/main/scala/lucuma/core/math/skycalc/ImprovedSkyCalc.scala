@@ -5,6 +5,7 @@ package lucuma.core.math.skycalc
 
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Place
+import lucuma.core.math.skycalc.Constants._
 import java.time.Instant
 import java.time.ZonedDateTime
 
@@ -40,7 +41,8 @@ case class ImprovedSkyCalc(place: Place) extends ImprovedSkyCalcMethods {
       sid.d,
       degreesLatitude,
       jdut,
-      calculateMoon
+      calculateMoon,
+      coords
     )
   }
 
@@ -54,7 +56,8 @@ case class ImprovedSkyCalc(place: Place) extends ImprovedSkyCalcMethods {
     sid:             Double,
     lat:             Double,
     jdut:            DoubleRef,
-    calculateMoon:   Boolean
+    calculateMoon:   Boolean,
+    coords:          Coordinates
   ): SkyCalcResults = {
     var altitude                             = .0
     var hourAngle                            = .0
@@ -144,15 +147,15 @@ case class ImprovedSkyCalc(place: Place) extends ImprovedSkyCalcMethods {
       // Sky brightness
       lunarSkyBrightness = null
       lunarDistance =
-        DEG_IN_RADIAN * subtend(ramoon.d, decmoon.d, objra, objdec)
+        DegsInRadian * subtend(ramoon.d, decmoon.d, objra, objdec)
       lunarPhaseAngle =
-        DEG_IN_RADIAN * subtend(ramoon.d, decmoon.d, toporasun.d, topodecsun.d)
+        DegsInRadian * subtend(ramoon.d, decmoon.d, toporasun.d, topodecsun.d)
       if (lunarElevation > -2.0)
         if ((lunarElevation > 0.0) && (altitude > 0.5) && (sunAltitude < -9.0))
           lunarSkyBrightness = lunskybright(
             lunarPhaseAngle,
             lunarDistance,
-            KZEN,
+            KZen,
             lunarElevation,
             altitude,
             distmoon.d
@@ -181,7 +184,9 @@ case class ImprovedSkyCalc(place: Place) extends ImprovedSkyCalcMethods {
       lunarPhaseAngle,
       sunAltitude,
       lunarDistance,
-      lunarElevation
+      lunarElevation,
+      coords,
+      place
     )
   }
 

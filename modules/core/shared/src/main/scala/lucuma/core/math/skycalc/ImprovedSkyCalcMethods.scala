@@ -3,15 +3,12 @@
 
 package lucuma.core.math.skycalc
 
-import lucuma.core.math.JulianDate
-
-import java.time.LocalTime
+import lucuma.core.math.skycalc.Constants._
 import java.time.Instant
-import java.time.ZonedDateTime
-import java.time.ZoneId
-
-import scala.annotation.unused
+import java.time.LocalTime
 import java.time.ZoneOffset
+import java.time.ZonedDateTime
+import scala.annotation.unused
 
 trait ImprovedSkyCalcMethods {
 
@@ -21,39 +18,10 @@ trait ImprovedSkyCalcMethods {
   protected val XFORM_JUSTPRE      = 1
   protected val XFORM_DOAPPAR      = 0
 
-  // some (not all) physical, mathematical, and astronomical constants used are defined here.
-  protected val TWOPI     = 6.28318530717959
-  protected val PI_OVER_2 = 1.57079632679490 // From Abramowitz & Stegun
-
-  protected val ARCSEC_IN_RADIAN = 206264.8062471
-  val DEG_IN_RADIAN              = 57.2957795130823
-  protected val HRS_IN_RADIAN    = 3.819718634205
-  protected val KMS_AUDAY        = 1731.45683633 // km per sec in 1 AU/day
-
-  protected val SPEED_OF_LIGHT = 299792.458 // in km per sec ... exact.
-
-  protected val J2000 = JulianDate.J2000.toDouble
-
-  protected val SEC_IN_DAY = 86400.0
-  protected val FLATTEN    = 0.003352813 // flattening of earth, 1/298.257
-
-  val EQUAT_RAD = 6378137.0 // equatorial radius of earth, meters
-
-  protected val ASTRO_UNIT = 1.4959787066e11 // 1 AU in meters
-
-  protected val KZEN =
-    0.172 // zenith extinction, mag, for use in lunar sky brightness calculations.
-
-  protected val EARTH_DIFF =
-    0.05 // used in numerical differentiation to find earth velocity
-
   // Constants needed in etcorr method
   protected val DELTS: Array[Double] =
     Array[Double](-2.72, 3.86, 10.46, 17.20, 21.16, 23.62, 24.02, 23.93, 24.33, 26.77, 29.15, 31.07,
       33.15, 35.73, 40.18, 45.48, 50.54, 54.34, 56.86, 60.78, 62.97)
-
-  private val UT: ZoneId             = ZoneId.of("UT")
-  private val NanosPerSecond: Double = 1e9
 
   final protected class DoubleRef(var d: Double) {
     def this() = {
@@ -175,9 +143,9 @@ trait ImprovedSkyCalcMethods {
     theta =
       (2004.3109 - 0.8533 * ti - 0.000217 * ti * ti) * tf - (0.42665 + 0.000217 * ti) * tf * tf - 0.041833 * tf * tf * tf
     /* convert to radians */
-    zeta = zeta / ARCSEC_IN_RADIAN
-    z = z / ARCSEC_IN_RADIAN
-    theta = theta / ARCSEC_IN_RADIAN
+    zeta = zeta / ArcsecsInRadian
+    z = z / ArcsecsInRadian
+    theta = theta / ArcsecsInRadian
     /* compute the necessary trig functions for speed and simplicity */
     cosz = Math.cos(z)
     coszeta = Math.cos(zeta)
@@ -260,8 +228,8 @@ trait ImprovedSkyCalcMethods {
       }
     }
     /* finally, transform original coordinates */
-    radian_ra = rin / HRS_IN_RADIAN
-    radian_dec = din / DEG_IN_RADIAN
+    radian_ra = rin / HrsInRadian
+    radian_dec = din / DegsInRadian
     orig(1) = Math.cos(radian_dec) * Math.cos(radian_ra)
     orig(2) = Math.cos(radian_dec) * Math.sin(radian_ra)
     orig(3) = Math.sin(radian_dec)
@@ -316,11 +284,11 @@ trait ImprovedSkyCalcMethods {
     M = 358.4758 + (35999.0498 - 0.000150 * T) * T
     Mprime = 296.1046 + (477198.8491 + 0.009192 * T) * T
     Omega = 259.1833 - (1934.1420 - 0.002078 * T) * T
-    L = L / DEG_IN_RADIAN
-    Lprime = Lprime / DEG_IN_RADIAN
-    M = M / DEG_IN_RADIAN
-    Mprime = Mprime / DEG_IN_RADIAN
-    Omega = Omega / DEG_IN_RADIAN
+    L = L / DegsInRadian
+    Lprime = Lprime / DegsInRadian
+    M = M / DegsInRadian
+    Mprime = Mprime / DegsInRadian
+    Omega = Omega / DegsInRadian
     del_psi.d = -1.0 * (17.2327 + 0.01737 * T) * Math.sin(
       Omega
     ) - (1.2729 + 0.00013 * T) * Math.sin(2.0 * L) + 0.2088 * Math.sin(
@@ -345,8 +313,8 @@ trait ImprovedSkyCalcMethods {
       ) + 0.0113 * Math.cos(2 * Lprime + Mprime) - 0.0093 * Math.cos(
         2 * L - M
       ) - 0.0066 * Math.cos(2 * L - Omega)
-    del_psi.d = del_psi.d / ARCSEC_IN_RADIAN
-    del_ep.d = del_ep.d / ARCSEC_IN_RADIAN
+    del_psi.d = del_psi.d / ArcsecsInRadian
+    del_ep.d = del_ep.d / ArcsecsInRadian
   }
 
   /**
@@ -388,15 +356,15 @@ trait ImprovedSkyCalcMethods {
     if (xy < 1.0e-11) {
       /* practically on a pole -- limit is arbitrary ...  */
       ra.d = 0.0 /* degenerate anyway */
-      dec.d = PI_OVER_2
+      dec.d = HalfPi
       if (z < 0.0) dec.d *= -1.0
     } else {
       /* in a normal part of the sky ... */
       dec.d = Math.asin(z)
       ra.d = atan_circ(x, y)
     }
-    ra.d *= HRS_IN_RADIAN
-    dec.d *= DEG_IN_RADIAN
+    ra.d *= HrsInRadian
+    dec.d *= DegsInRadian
   }
 
   /**
@@ -435,16 +403,16 @@ trait ImprovedSkyCalcMethods {
     var norm    = .0
     /* find heliocentric velocity of earth as a fraction of the speed of light ... */
     jd = J2000 + (epoch - 2000.0) * 365.25
-    jd1 = jd - EARTH_DIFF
-    jd2 = jd + EARTH_DIFF
+    jd1 = jd - EarthDiff
+    jd2 = jd + EarthDiff
     accusun(jd1, 0.0, 0.0, ras, decs, dists, topora, topodec, x1, y1, z1)
     accusun(jd2, 0.0, 0.0, ras, decs, dists, topora, topodec, x2, y2, z2)
     accusun(jd, 0.0, 0.0, ras, decs, dists, topora, topodec, x, y, z)
     Xdot =
-      KMS_AUDAY * (x2.d - x1.d) / (2.0 * EARTH_DIFF * SPEED_OF_LIGHT) /* numerical differentiation */
+      KmSInAUDay * (x2.d - x1.d) / (2.0 * EarthDiff * SpeedOfLight) /* numerical differentiation */
     Ydot =
-      KMS_AUDAY * (y2.d - y1.d) / (2.0 * EARTH_DIFF * SPEED_OF_LIGHT) /* crude but accurate */
-    Zdot = KMS_AUDAY * (z2.d - z1.d) / (2.0 * EARTH_DIFF * SPEED_OF_LIGHT)
+      KmSInAUDay * (y2.d - y1.d) / (2.0 * EarthDiff * SpeedOfLight) /* crude but accurate */
+    Zdot = KmSInAUDay * (z2.d - z1.d) / (2.0 * EarthDiff * SpeedOfLight)
     /* approximate correction ... non-relativistic but very close.  */
     vec(1) += from_std * Xdot
     vec(2) += from_std * Ydot
@@ -463,7 +431,7 @@ trait ImprovedSkyCalcMethods {
     var theta = .0
     if ((x == 0.0) && (y == 0.0)) return 0.0 /* guard ... */
     theta = Math.atan2(y, x)
-    while (theta < 0.0) theta += TWOPI
+    while (theta < 0.0) theta += TwicePi
     theta
   }
 
@@ -526,7 +494,7 @@ trait ImprovedSkyCalcMethods {
     val xgeo     = new DoubleRef
     val ygeo     = new DoubleRef
     val zgeo     = new DoubleRef
-    jd = jd + etcorr(jd) / SEC_IN_DAY /* might as well do it right .... */
+    jd = jd + etcorr(jd) / SecsInDay /* might as well do it right .... */
     T = (jd - 2415020.0) / 36525.0 /* 1900 --- this is an oldish theory*/
     Tsq = T * T
     Tcb = T * Tsq
@@ -544,16 +512,16 @@ trait ImprovedSkyCalcMethods {
     D = 350.74 + 445267.1142 * T - 0.00144 * Tsq
     E = 231.19 + 20.20 * T /* "inequality of long period .. */
     H = 353.40 + 65928.7155 * T /* Jupiter. */
-    A = circulo(A) / DEG_IN_RADIAN
-    B = circulo(B) / DEG_IN_RADIAN
-    C = circulo(C) / DEG_IN_RADIAN
-    D = circulo(D) / DEG_IN_RADIAN
-    E = circulo(E) / DEG_IN_RADIAN
-    H = circulo(H) / DEG_IN_RADIAN
+    A = circulo(A) / DegsInRadian
+    B = circulo(B) / DegsInRadian
+    C = circulo(C) / DegsInRadian
+    D = circulo(D) / DegsInRadian
+    E = circulo(E) / DegsInRadian
+    H = circulo(H) / DegsInRadian
     L = L + 0.00134 * Math.cos(A) + 0.00154 * Math.cos(B) + 0.00200 * Math.cos(
       C
     ) + 0.00179 * Math.sin(D) + 0.00178 * Math.sin(E)
-    Mrad = M / DEG_IN_RADIAN
+    Mrad = M / DegsInRadian
     Cent = (1.919460 - 0.004789 * T - 0.000014 * Tsq) * Math.sin(
       Mrad
     ) + (0.020094 - 0.000100 * T) * Math.sin(2.0 * Mrad) + 0.000293 * Math.sin(
@@ -561,13 +529,13 @@ trait ImprovedSkyCalcMethods {
     )
     sunlong = L + Cent
     nu = M + Cent
-    nurad = nu / DEG_IN_RADIAN
+    nurad = nu / DegsInRadian
     R = (1.0000002 * (1.0 - e * e)) / (1.0 + e * Math.cos(nurad))
     R = R + 0.00000543 * Math.sin(A) + 0.00001575 * Math.sin(
       B
     ) + 0.00001627 * Math.sin(C) + 0.00003076 * Math.cos(D) + 0.00000927 * Math
       .sin(H)
-    sunlong = sunlong / DEG_IN_RADIAN
+    sunlong = sunlong / DegsInRadian
     dist.d = R
     x.d = Math.cos(sunlong) /* geocentric */
     y.d = Math.sin(sunlong)
@@ -575,17 +543,17 @@ trait ImprovedSkyCalcMethods {
     eclrot(jd, y, z)
     /*      --- code to include topocentric correction for sun .... */
     geocent(lst, geolat, 0.0, xgeo, ygeo, zgeo)
-    xtop = x.d - xgeo.d * EQUAT_RAD / ASTRO_UNIT
-    ytop = y.d - ygeo.d * EQUAT_RAD / ASTRO_UNIT
-    ztop = z.d - zgeo.d * EQUAT_RAD / ASTRO_UNIT
+    xtop = x.d - xgeo.d * EquatorialRadiusMeters / MetersInAU
+    ytop = y.d - ygeo.d * EquatorialRadiusMeters / MetersInAU
+    ztop = z.d - zgeo.d * EquatorialRadiusMeters / MetersInAU
     topodist = Math.sqrt(xtop * xtop + ytop * ytop + ztop * ztop)
     l = xtop / topodist
     m = ytop / topodist
     n = ztop / topodist
-    topora.d = atan_circ(l, m) * HRS_IN_RADIAN
-    topodec.d = Math.asin(n) * DEG_IN_RADIAN
-    ra.d = atan_circ(x.d, y.d) * HRS_IN_RADIAN
-    dec.d = Math.asin(z.d) * DEG_IN_RADIAN
+    topora.d = atan_circ(l, m) * HrsInRadian
+    topodec.d = Math.asin(n) * DegsInRadian
+    ra.d = atan_circ(x.d, y.d) * HrsInRadian
+    dec.d = Math.asin(z.d) * DegsInRadian
     x.d = x.d * R * -1 /* heliocentric */
     y.d = y.d * R * -1
     z.d = z.d * R * -1
@@ -663,7 +631,7 @@ trait ImprovedSkyCalcMethods {
     var zpr  = .0
     var T    = .0
     T = (jd - J2000) / 36525 /* centuries since J2000 */
-    incl = (23.439291 + T * (-0.0130042 - 0.00000016 * T)) / DEG_IN_RADIAN
+    incl = (23.439291 + T * (-0.0130042 - 0.00000016 * T)) / DegsInRadian
     /* 1992 Astron Almanac, p. B18, dropping the
                    cubic term, which is 2 milli-arcsec! */
     ypr = Math.cos(incl) * y.d - Math.sin(incl) * z.d
@@ -684,7 +652,7 @@ trait ImprovedSkyCalcMethods {
     var zpr           = .0
     var T             = .0
     T = (jd - J2000) / 36525
-    incl = (23.439291 + T * (-0.0130042 - 0.00000016 * T)) / DEG_IN_RADIAN
+    incl = (23.439291 + T * (-0.0130042 - 0.00000016 * T)) / DegsInRadian
     ypr = Math.cos(incl) * y.d - Math.sin(incl) * z.d
     zpr = Math.sin(incl) * y.d + Math.cos(incl) * z.d
     y.d = ypr
@@ -711,15 +679,15 @@ trait ImprovedSkyCalcMethods {
     var denom   = .0
     var C_geo   = .0
     var S_geo   = .0
-    geolat = geolat / DEG_IN_RADIAN
-    geolong = geolong / HRS_IN_RADIAN
-    denom = (1.0 - FLATTEN) * Math.sin(geolat)
+    geolat = geolat / DegsInRadian
+    geolong = geolong / HrsInRadian
+    denom = (1.0 - FlatteningOfEarth) * Math.sin(geolat)
     denom = Math.cos(geolat) * Math.cos(geolat) + denom * denom
     C_geo = 1.0 / Math.sqrt(denom)
-    S_geo = (1.0 - FLATTEN) * (1.0 - FLATTEN) * C_geo
-    C_geo = C_geo + height / EQUAT_RAD /* deviation from almanac
+    S_geo = (1.0 - FlatteningOfEarth) * (1.0 - FlatteningOfEarth) * C_geo
+    C_geo = C_geo + height / EquatorialRadiusMeters /* deviation from almanac
                    notation -- include height here. */
-    S_geo = S_geo + height / EQUAT_RAD
+    S_geo = S_geo + height / EquatorialRadiusMeters
     x_geo.d = C_geo * Math.cos(geolat) * Math.cos(geolong)
     y_geo.d = C_geo * Math.cos(geolat) * Math.sin(geolong)
     z_geo.d = S_geo * Math.sin(geolat)
@@ -773,16 +741,16 @@ trait ImprovedSkyCalcMethods {
     var coslat = .0
     var sinlat = .0
     /* time-savers ... */
-    dec = dec / DEG_IN_RADIAN
-    ha = ha / HRS_IN_RADIAN
-    lat = lat / DEG_IN_RADIAN /* thank heavens for pass-by-value */
+    dec = dec / DegsInRadian
+    ha = ha / HrsInRadian
+    lat = lat / DegsInRadian /* thank heavens for pass-by-value */
     cosdec = Math.cos(dec)
     sindec = Math.sin(dec)
     cosha = Math.cos(ha)
     sinha = Math.sin(ha)
     coslat = Math.cos(lat)
     sinlat = Math.sin(lat)
-    x = DEG_IN_RADIAN * Math.asin(cosdec * cosha * coslat + sindec * sinlat)
+    x = DegsInRadian * Math.asin(cosdec * cosha * coslat + sindec * sinlat)
     y = sindec * coslat - cosdec * cosha * sinlat /* due N comp. */
     z = -1.0 * cosdec * sinha /* due east comp. */
     az.d = Math.atan2(z, y)
@@ -800,12 +768,12 @@ trait ImprovedSkyCalcMethods {
       cosp = -1.0 * Math.cos(az.d) * cosha - Math.sin(az.d) * sinha * sinlat
       /* spherical law of cosines ... also transformed to local
                                 available variables. */
-      parang.d = Math.atan2(sinp, cosp) * DEG_IN_RADIAN
+      parang.d = Math.atan2(sinp, cosp) * DegsInRadian
       /* let the library function find the quadrant ... */
     } else /* you're on the pole */
     if (lat >= 0.0) parang.d = 180.0
     else parang.d = 0.0
-    az.d *= DEG_IN_RADIAN /* done with taking trig functions of it ... */
+    az.d *= DegsInRadian /* done with taking trig functions of it ... */
     while (az.d < 0.0) az.d += 360.0 /* force 0 -> 360 */
     while (az.d >= 360.0) az.d -= 360.0
     x
@@ -819,7 +787,7 @@ trait ImprovedSkyCalcMethods {
     */
   protected def secant_z(alt: Double): Double = {
     var secz = .0
-    if (alt != 0) secz = 1.0 / Math.sin(alt / DEG_IN_RADIAN)
+    if (alt != 0) secz = 1.0 / Math.sin(alt / DegsInRadian)
     else secz = 100.0
     if (secz > 100.0) secz = 100.0
     if (secz < -100.0) secz = -100.0
@@ -892,7 +860,7 @@ trait ImprovedSkyCalcMethods {
     jdint = jdint + inter + date.getDayOfMonth + jdzpt
     jd = jdint.toDouble
     jdfrac =
-      date.getHour / 24.0 + date.getMinute / 1440.0 + (date.getSecond + date.getNano / NanosPerSecond) / SEC_IN_DAY
+      date.getHour / 24.0 + date.getMinute / 1440.0 + (date.getSecond + date.getNano.toDouble / NanosPerSecond) / SecsInDay
     if (jdfrac < 0.5) {
       jdint -= 1
       jdfrac = jdfrac + 0.5
@@ -931,7 +899,7 @@ trait ImprovedSkyCalcMethods {
     }
     t = (jdmid - J2000) / 36525
     sid_g =
-      (24110.54841 + 8640184.812866 * t + 0.093104 * t * t - 6.2e-6 * t * t * t) / SEC_IN_DAY
+      (24110.54841 + 8640184.812866 * t + 0.093104 * t * t - 6.2e-6 * t * t * t) / SecsInDay
     sid_int = sid_g.toLong
     sid_g = sid_g - sid_int
     sid_g = sid_g + 1.0027379093 * ut - longit / 24.0
@@ -1017,7 +985,7 @@ trait ImprovedSkyCalcMethods {
   protected def lunskybright(
     alpha0:    Double,
     rho:       Double,
-    kzen:      Double,
+    KZen:      Double,
     altmoon:   Double,
     alt:       Double,
     moondist0: Double
@@ -1032,10 +1000,10 @@ trait ImprovedSkyCalcMethods {
     var Bmoon    = .0
     var fofrho   = .0
     var rho_rad  = .0 //,test;
-    rho_rad = rho / DEG_IN_RADIAN
+    rho_rad = rho / DegsInRadian
     alpha = 180.0 - alpha
-    Zmoon = (90.0 - altmoon) / DEG_IN_RADIAN
-    Z = (90.0 - alt) / DEG_IN_RADIAN
+    Zmoon = (90.0 - altmoon) / DegsInRadian
+    Z = (90.0 - alt) / DegsInRadian
     moondist = moondist / 60.27 /* divide by mean distance */
     istar = -0.4 * (3.84 + 0.026 * Math
       .abs(alpha) + 4.0e-9 * Math.pow(alpha, 4.0)) /*eqn 20*/
@@ -1058,8 +1026,8 @@ trait ImprovedSkyCalcMethods {
     Xo = Math.sqrt(1.0 - 0.96 * Math.sin(Z) * Math.sin(Z))
     if (Xo != 0.0) Xo = 1.0 / Xo
     else Xo = 10000.0
-    Bmoon = fofrho * istar * Math.pow(10.0, -0.4 * kzen * Xzm) * (1.0 - Math
-      .pow(10.0, -0.4 * kzen * Xo)) /* nanoLamberts */
+    Bmoon = fofrho * istar * Math.pow(10.0, -0.4 * KZen * Xzm) * (1.0 - Math
+      .pow(10.0, -0.4 * KZen * Xo)) /* nanoLamberts */
     if (Bmoon > 0.001)
       22.50 - 1.08574 * Math.log(Bmoon / 34.08) /* V mag per sq arcs-eqn 1 */
     else 99.0
@@ -1108,7 +1076,7 @@ trait ImprovedSkyCalcMethods {
     //            double x_geo, y_geo, z_geo;  /* geocentric position of *observer* */
     jd = jd + etcorr(
       jd
-    ) / SEC_IN_DAY /* approximate correction to ephemeris time */
+    ) / SecsInDay /* approximate correction to ephemeris time */
     T = (jd - 2415020.0) / 36525.0 /* this based around 1900 ... */
     Tsq = T * T
     Tcb = Tsq * T
@@ -1124,30 +1092,30 @@ trait ImprovedSkyCalcMethods {
     D = circulo(D)
     F = circulo(F)
     Om = circulo(Om)
-    sinx = Math.sin((51.2 + 20.2 * T) / DEG_IN_RADIAN)
+    sinx = Math.sin((51.2 + 20.2 * T) / DegsInRadian)
     Lpr = Lpr + 0.000233 * sinx
     M = M - 0.001778 * sinx
     Mpr = Mpr + 0.000817 * sinx
     D = D + 0.002011 * sinx
     sinx =
       0.003964 * Math.sin(
-        (346.560 + 132.870 * T - 0.0091731 * Tsq) / DEG_IN_RADIAN
+        (346.560 + 132.870 * T - 0.0091731 * Tsq) / DegsInRadian
       )
     Lpr = Lpr + sinx
     Mpr = Mpr + sinx
     D = D + sinx
     F = F + sinx
-    sinx = Math.sin(Om / DEG_IN_RADIAN)
+    sinx = Math.sin(Om / DegsInRadian)
     Lpr = Lpr + 0.001964 * sinx
     Mpr = Mpr + 0.002541 * sinx
     D = D + 0.001964 * sinx
     F = F - 0.024691 * sinx
-    F = F - 0.004328 * Math.sin((Om + 275.05 - 2.30 * T) / DEG_IN_RADIAN)
+    F = F - 0.004328 * Math.sin((Om + 275.05 - 2.30 * T) / DegsInRadian)
     e = 1 - 0.002495 * T - 0.00000752 * Tsq
-    M = M / DEG_IN_RADIAN /* these will all be arguments ... */
-    Mpr = Mpr / DEG_IN_RADIAN
-    D = D / DEG_IN_RADIAN
-    F = F / DEG_IN_RADIAN
+    M = M / DegsInRadian /* these will all be arguments ... */
+    Mpr = Mpr / DegsInRadian
+    D = D / DegsInRadian
+    F = F / DegsInRadian
     lambda =
       Lpr + 6.288750 * Math.sin(Mpr) + 1.274018 * Math.sin(
         2 * D - Mpr
@@ -1252,8 +1220,8 @@ trait ImprovedSkyCalcMethods {
       .sin(
         2 * D - 2 * M - F
       ) - 0.000283 * Math.sin(Mpr + 3 * F)
-    om1 = 0.0004664 * Math.cos(Om / DEG_IN_RADIAN)
-    om2 = 0.0000754 * Math.cos((Om + 275.05 - 2.30 * T) / DEG_IN_RADIAN)
+    om1 = 0.0004664 * Math.cos(Om / DegsInRadian)
+    om2 = 0.0000754 * Math.cos((Om + 275.05 - 2.30 * T) / DegsInRadian)
     beta = B * (1.0 - om1 - om2)
     /*      *eclatit = beta; */
     pie = 0.950724 + 0.051818 * Math.cos(Mpr) + 0.009531 * Math.cos(
@@ -1289,18 +1257,18 @@ trait ImprovedSkyCalcMethods {
     ) + e * e * 0.000026 * Math.cos(2 * D - 2 * M) - 0.000023 * Math.cos(
       2 * F - 2 * D + Mpr
     ) + e * 0.000019 * Math.cos(4 * D - M - Mpr)
-    beta = beta / DEG_IN_RADIAN
-    lambda = lambda / DEG_IN_RADIAN
+    beta = beta / DegsInRadian
+    lambda = lambda / DegsInRadian
     val l      = new DoubleRef(Math.cos(lambda) * Math.cos(beta))
     val m      = new DoubleRef(Math.sin(lambda) * Math.cos(beta))
     val n      = new DoubleRef(Math.sin(beta))
     eclrot(jd, l, m, n)
-    dist = 1 / Math.sin(pie / DEG_IN_RADIAN)
+    dist = 1 / Math.sin(pie / DegsInRadian)
     x = l.d * dist
     y = m.d * dist
     z = n.d * dist
-    geora.d = atan_circ(l.d, m.d) * HRS_IN_RADIAN
-    geodec.d = Math.asin(n.d) * DEG_IN_RADIAN
+    geora.d = atan_circ(l.d, m.d) * HrsInRadian
+    geodec.d = Math.asin(n.d) * DegsInRadian
     geodist.d = dist
     geocent(lst, geolat, elevsea, x_geo, y_geo, z_geo)
     x = x - x_geo.d /* topocentric correction using elliptical earth fig. */
@@ -1310,8 +1278,8 @@ trait ImprovedSkyCalcMethods {
     l.d = x / topodist.d
     m.d = y / topodist.d
     n.d = z / topodist.d
-    topora.d = atan_circ(l.d, m.d) * HRS_IN_RADIAN
-    topodec.d = Math.asin(n.d) * DEG_IN_RADIAN
+    topora.d = atan_circ(l.d, m.d) * HrsInRadian
+    topodec.d = Math.asin(n.d) * DegsInRadian
   }
 
   protected def ztwilight(alt: Double): Double = {
@@ -1357,10 +1325,10 @@ trait ImprovedSkyCalcMethods {
     var y2    = .0
     var z2    = .0
     var theta = .0
-    ra1 = ra1 / HRS_IN_RADIAN
-    dec1 = dec1 / DEG_IN_RADIAN
-    ra2 = ra2 / HRS_IN_RADIAN
-    dec2 = dec2 / DEG_IN_RADIAN
+    ra1 = ra1 / HrsInRadian
+    dec1 = dec1 / DegsInRadian
+    ra2 = ra2 / HrsInRadian
+    dec2 = dec2 / DegsInRadian
     x1 = Math.cos(ra1) * Math.cos(dec1)
     y1 = Math.sin(ra1) * Math.cos(dec1)
     z1 = Math.sin(dec1)
