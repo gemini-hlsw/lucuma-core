@@ -3,15 +3,9 @@
 
 package lucuma.core.math.skycalc
 
-<<<<<<< HEAD:modules/core/shared/src/main/scala/lucuma/core/math/skycalc/ImprovedSkyCalc.scala
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Place
-=======
-import Constants._
-
-import gsp.math.Coordinates
-import gsp.math.Place
->>>>>>> f88e96d... Migration of constraint solver classes.:modules/math/shared/src/main/scala/gsp/math/skycalc/ImprovedSkyCalc.scala
+import lucuma.core.math.skycalc.Constants._
 import java.time.Instant
 import java.time.ZonedDateTime
 
@@ -48,7 +42,7 @@ case class ImprovedSkyCalc(place: Place) extends ImprovedSkyCalcMethods {
       degreesLatitude,
       jdut,
       calculateMoon,
-      coords,
+      coords
     )
   }
 
@@ -63,7 +57,7 @@ case class ImprovedSkyCalc(place: Place) extends ImprovedSkyCalcMethods {
     lat:             Double,
     jdut:            DoubleRef,
     calculateMoon:   Boolean,
-    coords:          Coordinates,
+    coords:          Coordinates
   ): SkyCalcResults = {
     var altitude                             = .0
     var hourAngle                            = .0

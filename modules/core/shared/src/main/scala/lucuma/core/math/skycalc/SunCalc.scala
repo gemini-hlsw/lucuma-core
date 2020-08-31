@@ -3,10 +3,9 @@
 
 package lucuma.core.math.skycalc
 
-import Constants._
-
 import cats.implicits._
 import lucuma.core.math.JulianDate
+import lucuma.core.math.skycalc.Constants._
 
 trait SunCalc extends ImprovedSkyCalcMethods {
   protected def lst(jd: JulianDate, longit: Double): Double =

@@ -6,6 +6,7 @@ package lucuma.core.math
 import cats.Applicative
 import eu.timepit.refined.types.numeric.NonNegInt
 import org.scalacheck._
+import scala.collection.immutable.TreeMap
 
 package object arb {
 
@@ -24,6 +25,10 @@ package object arb {
   // This isn't in scalacheck for whatever reason
   implicit def mapCogen[A: Cogen, B: Cogen]: Cogen[Map[A, B]] =
     Cogen[List[(A, B)]].contramap(_.toList)
+
+  // The above doesn't seem to match a TreeMap unless explicitly cast to a Map
+  implicit def treeMapCogen[A: Cogen, B: Cogen]: Cogen[TreeMap[A, B]] =
+    Cogen[Map[A, B]].contramap(_.toMap)
 
   // This doesn't seem to exist anywhere?  https://github.com/non/cats-check
   // would be useful.  All we need is `Applicative` for now though I suppose.

@@ -6,14 +6,14 @@ package lucuma.core.math.skycalc
 import cats.Eq
 import cats.Show
 import lucuma.core.math.Angle
+import lucuma.core.math.Coordinates
 import lucuma.core.math.Declination
 import lucuma.core.math.HourAngle
+import lucuma.core.math.Place
 import monocle.Getter
-import gsp.math.Coordinates
-import gsp.math.Place
 
 /** Struct that holds results of SkyCalc. */
-final case class SkyCalcResults protected[skycalc](
+final case class SkyCalcResults protected[skycalc] (
   protected[skycalc] val altitudeRaw:         Double,
   protected[skycalc] val azimuthRaw:          Double,
   protected[skycalc] val parallacticAngleRaw: Double,
@@ -27,18 +27,22 @@ final case class SkyCalcResults protected[skycalc](
   lunarDistance:                              Double,
   protected[skycalc] val lunarElevationRaw:   Double,
   coordinates:                                Coordinates,
-  place:                                      Place,
+  place:                                      Place
 ) {
-  val altitude: Declination       = Declination.fromAngleWithCarry(Angle.fromDoubleDegrees(altitudeRaw))._1
+  val altitude: Declination       =
+    Declination.fromAngleWithCarry(Angle.fromDoubleDegrees(altitudeRaw))._1
   val azimuth: Angle              = Angle.fromDoubleDegrees(azimuthRaw)
   val parallacticAngle: Angle     = Angle.fromDoubleDegrees(parallacticAngleRaw)
   val hourAngle: HourAngle        = HourAngle.fromDoubleHours(hourAngleRaw)
   val lunarPhaseAngle: Angle      = Angle.fromDoubleDegrees(lunarPhaseAngleRaw)
-  val sunAltitude: Declination    = Declination.fromAngleWithCarry(Angle.fromDoubleDegrees(sunAltitudeRaw))._1
-  val lunarElevation: Declination = Declination.fromAngleWithCarry(Angle.fromDoubleDegrees(lunarElevationRaw))._1
+  val sunAltitude: Declination    =
+    Declination.fromAngleWithCarry(Angle.fromDoubleDegrees(sunAltitudeRaw))._1
+  val lunarElevation: Declination =
+    Declination.fromAngleWithCarry(Angle.fromDoubleDegrees(lunarElevationRaw))._1
 }
 
 object SkyCalcResults {
+
   /** @group Typeclass Instances */
   implicit val SkyCalcResultsEqual: Eq[SkyCalcResults] = Eq.fromUniversalEquals
 

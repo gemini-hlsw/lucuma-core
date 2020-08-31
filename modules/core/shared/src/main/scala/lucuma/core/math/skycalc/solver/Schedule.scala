@@ -1,7 +1,7 @@
 // Copyright (c) 2016-2020 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package gsp.math.skycalc.solver
+package lucuma.core.math.skycalc.solver
 
 import cats.implicits._
 import cats.Eq
@@ -13,7 +13,7 @@ import java.time.LocalTime
 import java.time.ZoneId
 import monocle.Getter
 import monocle.Prism
-import gsp.math.optics.SplitEpi
+import lucuma.core.math.optics.SplitEpi
 import io.chrisdavenport.cats.time._
 import scala.annotation.tailrec
 

@@ -1,7 +1,7 @@
 // Copyright (c) 2016-2020 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package gsp.math.skycalc.solver
+package lucuma.core.math.skycalc.solver
 
 import cats.tests.CatsSuite
 
@@ -13,12 +13,12 @@ import java.time.LocalTime
 import java.time.ZoneId
 import org.scalacheck.Gen
 import org.scalacheck.Arbitrary._
-import gsp.math.arb._
+import lucuma.core.math.arb._
 import io.chrisdavenport.cats.time._
 import cats.kernel.laws.discipline.EqTests
 import cats.kernel.laws.discipline.OrderTests
 import monocle.law.discipline.PrismTests
-import gsp.math.laws.discipline.FormatTests
+import lucuma.core.math.laws.discipline.FormatTests
 
 final class IntervalSpec extends CatsSuite {
   import ArbInterval._

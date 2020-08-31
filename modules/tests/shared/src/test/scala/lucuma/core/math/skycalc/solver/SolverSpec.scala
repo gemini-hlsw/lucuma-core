@@ -1,13 +1,13 @@
 // Copyright (c) 2016-2020 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package gsp.math.skycalc.solver
+package lucuma.core.math.skycalc.solver
 
 import cats.tests.CatsSuite
 import java.time.Instant
 import java.time.Duration
-import gsp.math.skycalc.solver.SolverStrategy._
-import gsp.math.skycalc.solver.RoundStrategy._
+import lucuma.core.math.skycalc.solver.SolverStrategy._
+import lucuma.core.math.skycalc.solver.RoundStrategy._
 
 final class SolverSpec extends CatsSuite {
 

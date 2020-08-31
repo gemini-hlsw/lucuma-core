@@ -1,12 +1,12 @@
 // Copyright (c) 2016-2020 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package gsp.math.skycalc.solver
+package lucuma.core.math.skycalc.solver
 
 import java.time.Duration
-import gsp.math.Declination
-import gsp.math.skycalc.SkyCalcResults
-import gsp.math.HourAngle
+import lucuma.core.math.Declination
+import lucuma.core.math.skycalc.SkyCalcResults
+import lucuma.core.math.HourAngle
 
 /**
   * Convenience class to find a [[Schedule]] meeting a [[Constraint]] from [[Samples]] at a given [[Interval]].

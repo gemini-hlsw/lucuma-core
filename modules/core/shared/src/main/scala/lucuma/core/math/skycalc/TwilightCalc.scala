@@ -3,13 +3,12 @@
 
 package lucuma.core.math.skycalc
 
-import Constants._
-
 import cats.implicits._
-import lucuma.core.math.JulianDate
-import lucuma.core.math.Place
 import java.time.Instant
 import java.time.LocalDate
+import lucuma.core.math.JulianDate
+import lucuma.core.math.Place
+import lucuma.core.math.skycalc.Constants._
 
 trait TwilightCalc extends SunCalc {
 
@@ -46,8 +45,8 @@ trait TwilightCalc extends SunCalc {
       case TwilightBoundType.Official =>
         // Horizon geometric correction from p. 24 of the Skycalc manual: sqrt(2 * elevation / Re) (radians)
         boundType.horizonAngle + Math.sqrt(
-          2.0 * place.altitudeDouble / TwilightCalc.EQUAT_RAD
-        ) * TwilightCalc.DEG_IN_RADIAN
+          2.0 * place.altitudeDouble / EquatorialRadiusMeters
+        ) * DegsInRadian
       case _                          => boundType.horizonAngle
     }
 

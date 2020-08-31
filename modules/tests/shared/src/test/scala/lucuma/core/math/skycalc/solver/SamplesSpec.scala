@@ -1,17 +1,17 @@
 // Copyright (c) 2016-2020 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package gsp.math.skycalc.solver
+package lucuma.core.math.skycalc.solver
 
 import cats.tests.CatsSuite
 import cats.Eq
 import cats.Eval
 import java.time.Duration
 import scala.collection.immutable.TreeMap
-import gsp.math.skycalc.solver.Samples.Bracket
+import lucuma.core.math.skycalc.solver.Samples.Bracket
 import org.scalacheck.Gen._
 import org.scalacheck.Arbitrary._
-import gsp.math.arb._
+import lucuma.core.math.arb._
 import cats.laws.discipline.FunctorTests
 import cats.laws.discipline.MonoidKTests
 import cats.kernel.laws.discipline.EqTests

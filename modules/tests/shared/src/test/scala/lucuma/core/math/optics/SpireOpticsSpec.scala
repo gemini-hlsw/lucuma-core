@@ -1,13 +1,13 @@
 // Copyright (c) 2016-2020 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package gsp.math.optics
+package lucuma.core.math.optics
 
 import cats.tests.CatsSuite
-import gsp.math.optics.Spire._
+import lucuma.core.math.optics.Spire._
 import spire.laws.arb._
-import gsp.math.laws.discipline.FormatTests
-import gsp.math.laws.discipline.SplitEpiTests
+import lucuma.core.math.laws.discipline.FormatTests
+import lucuma.core.math.laws.discipline.SplitEpiTests
 import org.scalacheck.Arbitrary._
 import monocle.law.discipline.IsoTests
 

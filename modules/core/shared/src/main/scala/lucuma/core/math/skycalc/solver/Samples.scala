@@ -1,12 +1,12 @@
 // Copyright (c) 2016-2020 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package gsp.math.skycalc
+package lucuma.core.math.skycalc
 package solver
 
 import cats.{ Eq, Eval, Functor, MonoidK }
 import cats.implicits._
-import gsp.math.{ Coordinates, Place }
+import lucuma.core.math.{ Coordinates, Place }
 import io.chrisdavenport.cats.time._
 import java.time.{ Duration, Instant }
 import scala.collection.immutable.TreeMap

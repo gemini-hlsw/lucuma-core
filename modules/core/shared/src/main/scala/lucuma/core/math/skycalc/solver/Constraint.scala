@@ -1,14 +1,14 @@
 // Copyright (c) 2016-2020 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package gsp.math.skycalc.solver
+package lucuma.core.math.skycalc.solver
 
 import cats.implicits._
 import java.time.Instant
-import gsp.math.Angle
-import gsp.math.Declination
-import gsp.math.HourAngle
-import gsp.math.skycalc.SkyCalcResults
+import lucuma.core.math.Angle
+import lucuma.core.math.Declination
+import lucuma.core.math.HourAngle
+import lucuma.core.math.skycalc.SkyCalcResults
 
 /**
   * Defines whether a condition is met at an [[java.time.Instant]] among [[Samples]].

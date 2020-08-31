@@ -1,11 +1,11 @@
 // Copyright (c) 2016-2020 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package gsp.math.arb
+package lucuma.core.math.arb
 
 import cats.implicits._
-import gsp.math.skycalc.solver.Interval
-import gsp.math.skycalc.solver.Schedule
+import lucuma.core.math.skycalc.solver.Interval
+import lucuma.core.math.skycalc.solver.Schedule
 import org.scalacheck._
 import org.scalacheck.Arbitrary._
 import java.time.Instant

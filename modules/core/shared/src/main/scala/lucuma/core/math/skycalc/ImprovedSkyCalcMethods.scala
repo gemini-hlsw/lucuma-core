@@ -3,18 +3,12 @@
 
 package lucuma.core.math.skycalc
 
-<<<<<<< HEAD:modules/core/shared/src/main/scala/lucuma/core/math/skycalc/ImprovedSkyCalcMethods.scala
-import lucuma.core.math.JulianDate
-=======
-import Constants._
->>>>>>> f88e96d... Migration of constraint solver classes.:modules/math/shared/src/main/scala/gsp/math/skycalc/ImprovedSkyCalcMethods.scala
-
-import java.time.LocalTime
+import lucuma.core.math.skycalc.Constants._
 import java.time.Instant
-import java.time.ZonedDateTime
-
-import scala.annotation.unused
+import java.time.LocalTime
 import java.time.ZoneOffset
+import java.time.ZonedDateTime
+import scala.annotation.unused
 
 trait ImprovedSkyCalcMethods {
 

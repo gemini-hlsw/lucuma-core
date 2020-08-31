@@ -1,15 +1,15 @@
 // Copyright (c) 2016-2020 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package gsp.math.skycalc.solver
+package lucuma.core.math.skycalc.solver
 
 import cats.tests.CatsSuite
 import java.time.Duration
 import org.scalacheck.Gen._
-import gsp.math.arb._
+import lucuma.core.math.arb._
 import io.chrisdavenport.cats.time._
 import cats.Eval
-import gsp.math.skycalc.solver.Samples.Bracket
+import lucuma.core.math.skycalc.solver.Samples.Bracket
 
 final class CalculatorSpec extends CatsSuite {
   import ArbInterval._
@@ -30,8 +30,8 @@ final class CalculatorSpec extends CatsSuite {
               assert(i0 < i1)
               assert(i1 < i2)
               assert(i2 <= interval.end)
-            case Bracket(None, None, None) => fail(s"Couldn't find $i")
-            case _ => succeed
+            case Bracket(None, None, None)                            => fail(s"Couldn't find $i")
+            case _                                                    => succeed
           }
         }
       }

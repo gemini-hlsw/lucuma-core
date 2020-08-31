@@ -5,11 +5,6 @@ package lucuma.core.math.skycalc
 
 import munit.FunSuite
 
-<<<<<<< HEAD:modules/tests/shared/src/test/scala/lucuma/core/math/skycalc/ImprovedSkyCalcSpec.scala
-=======
-import cats.implicits._
-import cats.Monoid
->>>>>>> f88e96d... Migration of constraint solver classes.:modules/tests/shared/src/test/scala/gsp/math/skycalc/ImprovedSkyCalcSpec.scala
 import java.time._
 import lucuma.core.math.Coordinates
 import lucuma.core.enum.Site
@@ -17,11 +12,7 @@ import lucuma.core.enum.Site
 // This is just a basic case, mostly to test linking in JS.
 // Property based testing is in ImprovedSkyCalcSpecJVM, where output
 // is compared to the one from {edu.gemini.skycalc} in Java.
-<<<<<<< HEAD:modules/tests/shared/src/test/scala/lucuma/core/math/skycalc/ImprovedSkyCalcSpec.scala
 final class ImprovedSkyCalcSpec extends FunSuite {
-=======
-object ImprovedSkyCalcSpec extends SimpleIOSuite {
->>>>>>> f88e96d... Migration of constraint solver classes.:modules/tests/shared/src/test/scala/gsp/math/skycalc/ImprovedSkyCalcSpec.scala
 
   private val NanosPerMillis: Int = 1_000_000
 
