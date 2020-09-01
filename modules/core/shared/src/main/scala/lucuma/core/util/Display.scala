@@ -3,6 +3,8 @@
 
 package lucuma.core.util
 
+import cats.Contravariant
+
 /**
   * Typeclass for things that can be shown in a user interface.
   * @group Typeclasses
@@ -20,7 +22,7 @@ object Display {
    * @param toShortName function that maps A to the shortName
    * @param toLongName function that maps A to the longName
   */
-  def from[A](toShortName: A => String, toLongName: A => String): Display[A] = 
+  def by[A](toShortName: A => String, toLongName: A => String): Display[A] = 
     new Display[A] {
       def shortName(a: A) = toShortName(a)
       override def longName(a: A)  = toLongName(a)
@@ -32,8 +34,16 @@ object Display {
    * 
    * @param toShortName function that maps A to the shortName
    */
-  def fromToShortName[A](toShortName: A => String): Display[A] = 
+  def byShortName[A](toShortName: A => String): Display[A] = 
     new Display[A] {
       def shortName(a: A) = toShortName(a)
     }
+
+  implicit val contravariantDisplay: Contravariant[Display] = new Contravariant[Display] {
+    def contramap[A, B](fa: Display[A])(f: B => A): Display[B] =
+      new Display[B] {
+        def shortName(b: B) = fa.shortName(f(b)) 
+        override def longName(b: B) = fa.longName(f(b))
+      }
+  }
 }
