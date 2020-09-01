@@ -4,8 +4,8 @@
 package lucuma.core.model
 
 import lucuma.core.enum.Site
-import lucuma.core.math.skycalc.Interval
-import lucuma.core.math.skycalc.TwilightBoundType
+import lucuma.core.math.Interval
+import lucuma.core.enum.TwilightType
 
 import cats._
 import cats.effect.Sync
@@ -25,22 +25,22 @@ final case class ObservingNight(site: Site, toLocalObservingNight: LocalObservin
     extends Night {
 
   /** Constructs a [[TwilightBoundedNight]] for this observing night
-    * according to the specified [[lucuma.core.math.skycalc.TwilightBoundType]].
+    * according to the specified [[lucuma.core.enum.TwilightType]].
     *
     * Returns None if there's no sunset or sunrise for the specified
-    * [[lucuma.core.math.skycalc.TwilightBoundType]].
+    * [[lucuma.core.enum.TwilightType]].
     */
-  def twilightBounded(boundType: TwilightBoundType): Option[TwilightBoundedNight] =
-    TwilightBoundedNight.fromBoundTypeAndObservingNight(boundType, this)
+  def twilightBounded(twilightType: TwilightType): Option[TwilightBoundedNight] =
+    TwilightBoundedNight.fromTwilightTypeAndObservingNight(twilightType, this)
 
   /** Constructs a [[TwilightBoundedNight]] for this observing night
-    * according to the specified [[lucuma.core.math.skycalc.TwilightBoundType]].
+    * according to the specified [[lucuma.core.enum.TwilightType]].
     *
     * Throws and exeception if there's no sunset or sunrise for the specified
-    * [[lucuma.core.math.skycalc.TwilightBoundType]].
+    * [[lucuma.core.enum.TwilightType]].
     */
-  def twilightBoundedUnsafe(boundType: TwilightBoundType): TwilightBoundedNight =
-    twilightBounded(boundType).get
+  def twilightBoundedUnsafe(twilightType: TwilightType): TwilightBoundedNight =
+    twilightBounded(twilightType).get
 
   /** The `Interval`for the the observing night at the associated site. */
   override lazy val interval: Interval =

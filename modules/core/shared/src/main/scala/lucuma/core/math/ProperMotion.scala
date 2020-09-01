@@ -8,23 +8,23 @@ import cats.implicits._
 import java.time.Instant
 import monocle.Lens
 import monocle.macros.GenLens
-import scala.math.{ sin, cos, hypot, atan2 }
+import scala.math.{ atan2, cos, hypot, sin }
 
 /**
- * Time-parameterized coordinates, based on an observed position at some point in time (called
- * the `epoch`) and measured velocities in distance (`radialVelocity`; i.e., doppler shift) and
- * position (`properVelocity`) per year. Given this information we can compute the position at any
- * instant in time. The references below are ''extremely'' helpful, so do check them out if you're
+  * Time-parameterized coordinates, based on an observed position at some point in time (called
+  * the `epoch`) and measured velocities in distance (`radialVelocity`; i.e., doppler shift) and
+  * position (`properVelocity`) per year. Given this information we can compute the position at any
+  * instant in time. The references below are ''extremely'' helpful, so do check them out if you're
   * trying to understand the implementation.
- * @see The pretty good [[https://en.wikipedia.org/wiki/Proper_motion wikipedia]] article
- * @see Astronomical Almanac 1984 [[https://babel.hathitrust.org/cgi/pt?id=uc1.b3754036;view=1up;seq=141 p.B39]]
- * @see Astronomy and Astrophysics 134 (1984) [[http://articles.adsabs.harvard.edu/cgi-bin/nph-iarticle_query?bibcode=1984A%26A...134....1L&db_key=AST&page_ind=0&data_type=GIF&type=SCREEN_VIEW&classic=YES p.1-6]]
- * @param baseCoordinates observed coordinates at `epoch`
- * @param epoch           time of the base observation; typically `Epoch.J2000`
- * @param properVelocity  proper velocity '''per year''' in [[RightAscension]] and [[Declination]], if any
- * @param radialVelocity  radial velocity (km/y, positive if receding), if any
- * @param parallax        parallax, if any
- */
+  * @see The pretty good [[https://en.wikipedia.org/wiki/Proper_motion wikipedia]] article
+  * @see Astronomical Almanac 1984 [[https://babel.hathitrust.org/cgi/pt?id=uc1.b3754036;view=1up;seq=141 p.B39]]
+  * @see Astronomy and Astrophysics 134 (1984) [[http://articles.adsabs.harvard.edu/cgi-bin/nph-iarticle_query?bibcode=1984A%26A...134....1L&db_key=AST&page_ind=0&data_type=GIF&type=SCREEN_VIEW&classic=YES p.1-6]]
+  * @param baseCoordinates observed coordinates at `epoch`
+  * @param epoch           time of the base observation; typically `Epoch.J2000`
+  * @param properVelocity  proper velocity '''per year''' in [[RightAscension]] and [[Declination]], if any
+  * @param radialVelocity  radial velocity (km/y, positive if receding), if any
+  * @param parallax        parallax, if any
+  */
 final case class ProperMotion(
   baseCoordinates: Coordinates,
   epoch:           Epoch,
@@ -56,21 +56,21 @@ final case class ProperMotion(
 }
 
 object ProperMotion extends ProperMotionOptics {
-  import PhysicalConstants.{ AstronomicalUnit, TwoPi }
+  import Constants.{ AstronomicalUnit, TwicePi }
 
   def const(cs: Coordinates): ProperMotion =
     ProperMotion(cs, Epoch.J2000, None, None, None)
 
   /**
-   * Proper motion correction in model units.
-   * @param baseCoordinates base coordinates
-   * @param epoch           the epoch
-   * @param properVelocity  proper velocity per epoch year
-   * @param radialVelocity  radial velocity (km/sec, positive if receding)
-   * @param parallax        parallax
-   * @param elapsedYears    elapsed time in epoch years
-   * @return Coordinates corrected for proper motion
-   */
+    * Proper motion correction in model units.
+    * @param baseCoordinates base coordinates
+    * @param epoch           the epoch
+    * @param properVelocity  proper velocity per epoch year
+    * @param radialVelocity  radial velocity (km/sec, positive if receding)
+    * @param parallax        parallax
+    * @param elapsedYears    elapsed time in epoch years
+    * @return Coordinates corrected for proper motion
+    */
   def properMotion(
     baseCoordinates: Coordinates,
     epoch:           Epoch,
@@ -106,15 +106,15 @@ object ProperMotion extends ProperMotionOptics {
   }
 
   /**
-   * Proper motion correction in base units.
-   * @param baseCoordinates base (ra, dec) in radians, [0 … 2π) and (-π/2 … π/2)
-   * @param daysPerYear     length of epoch year in fractonal days
-   * @param properVelocity  proper velocity in (ra, dec) in radians per epoch year
-   * @param radialVelocity  radial velocity (km/sec, positive means away from earth)
-   * @param parallax        parallax in arcseconds (!)
-   * @param elapsedYears    elapsed time in epoch years
-   * @return (ra, dec) in radians, corrected for proper motion
-   */
+    * Proper motion correction in base units.
+    * @param baseCoordinates base (ra, dec) in radians, [0 … 2π) and (-π/2 … π/2)
+    * @param daysPerYear     length of epoch year in fractonal days
+    * @param properVelocity  proper velocity in (ra, dec) in radians per epoch year
+    * @param radialVelocity  radial velocity (km/sec, positive means away from earth)
+    * @param parallax        parallax in arcseconds (!)
+    * @param elapsedYears    elapsed time in epoch years
+    * @return (ra, dec) in radians, corrected for proper motion
+    */
   // scalastyle:off method.length
   private def properMotionʹ(
     baseCoordinates: Vec2,
@@ -126,7 +126,7 @@ object ProperMotion extends ProperMotionOptics {
   ): Vec2 = {
 
     // Break out our components
-    val (ra,   dec) = baseCoordinates
+    val (ra, dec)   = baseCoordinates
     val (dRa, dDec) = properVelocity
 
     // Convert to cartesian
@@ -137,19 +137,19 @@ object ProperMotion extends ProperMotionOptics {
 
     // Change per year due to radial velocity and parallax. The units work out to asec/y.
     val dPos1: Vec3 =
-      pos            *
-      daysPerYear    *
-      secsPerDay     *
-      radsPerAsec    *
-      auPerKm        *
-      radialVelocity *
-      parallax
+      pos *
+        daysPerYear *
+        secsPerDay *
+        radsPerAsec *
+        auPerKm *
+        radialVelocity *
+        parallax
 
     // Change per year due to proper velocity
     val dPos2 = (
       -dRa * pos._2 - dDec * cos(ra) * sin(dec),
-       dRa * pos._1 - dDec * sin(ra) * sin(dec),
-                      dDec *           cos(dec)
+      dRa * pos._1 - dDec * sin(ra) * sin(dec),
+      dDec * cos(dec)
     )
 
     // Our new position (still in polar coordinates). `|+|` here is scalar addition provided by
@@ -158,13 +158,13 @@ object ProperMotion extends ProperMotionOptics {
 
     // Back to spherical
     val (x, y, z) = pʹ
-    val r    = hypot(x, y)
-    val raʹ  = if (r === 0.0) 0.0 else atan2(y, x)
-    val decʹ = if (z === 0.0) 0.0 else atan2(z, r)
+    val r         = hypot(x, y)
+    val raʹ       = if (r === 0.0) 0.0 else atan2(y, x)
+    val decʹ      = if (z === 0.0) 0.0 else atan2(z, r)
     val raʹʹ = {
       // Normalize to [0 .. 2π)
-      val rem = raʹ % TwoPi
-      if (rem < 0.0) rem + TwoPi else rem
+      val rem = raʹ % TwicePi
+      if (rem < 0.0) rem + TwicePi else rem
     }
     (raʹʹ, decʹ)
 
@@ -189,8 +189,8 @@ object ProperMotion extends ProperMotionOptics {
     // This is premature optimization perhaps but it seems like it might make a
     // difference when sorting a long list of targets.
 
-    order(_.baseCoordinates)  |+|
-      order(_.epoch)          |+|
+    order(_.baseCoordinates) |+|
+      order(_.epoch) |+|
       order(_.properVelocity) |+|
       order(_.radialVelocity) |+|
       order(_.parallax)

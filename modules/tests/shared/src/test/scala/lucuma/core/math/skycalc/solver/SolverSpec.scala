@@ -6,11 +6,12 @@ package lucuma.core.math.skycalc.solver
 import cats.tests.CatsSuite
 import java.time.Instant
 import java.time.Duration
-import lucuma.core.math.skycalc._
+import lucuma.core.math.Schedule
+import lucuma.core.math.IntervalGens
 import lucuma.core.math.skycalc.solver.SolverStrategy._
 import lucuma.core.math.skycalc.solver.RoundStrategy._
 
-final class SolverSpec extends CatsSuite {
+final class SolverSpec extends CatsSuite with IntervalGens {
 
   val TestCalculator = Samples.single(Instant.MIN, ())
 

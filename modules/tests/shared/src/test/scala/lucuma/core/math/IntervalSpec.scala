@@ -1,7 +1,7 @@
 // Copyright (c) 2016-2020 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package lucuma.core.math.skycalc
+package lucuma.core.math
 
 import cats.tests.CatsSuite
 
@@ -20,7 +20,7 @@ import cats.kernel.laws.discipline.OrderTests
 import monocle.law.discipline.PrismTests
 import lucuma.core.math.laws.discipline.FormatTests
 
-final class IntervalSpec extends CatsSuite {
+final class IntervalSpec extends CatsSuite with IntervalGens {
   import ArbInterval._
   import ArbSchedule._
   import ArbTime._

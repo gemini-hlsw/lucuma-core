@@ -5,7 +5,7 @@ package lucuma.core.math
 package arb
 
 import coulomb._
-import lucuma.core.math.PhysicalConstants._
+import lucuma.core.math.Constants._
 import lucuma.core.math.units._
 import org.scalacheck.Arbitrary
 import org.scalacheck.Cogen

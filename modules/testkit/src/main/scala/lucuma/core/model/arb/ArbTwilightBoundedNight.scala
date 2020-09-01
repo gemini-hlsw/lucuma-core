@@ -6,10 +6,10 @@ package core
 package model
 package arb
 
-import lucuma.core.math.skycalc.TwilightBoundType
+import lucuma.core.enum.TwilightType
 import lucuma.core.model.{ ObservingNight, TwilightBoundedNight }
 import lucuma.core.model.arb.ArbObservingNight._
-import lucuma.core.math.arb.ArbTwilightBoundType._
+import lucuma.core.util.arb.ArbEnumerated._
 
 import org.scalacheck._
 import org.scalacheck.Arbitrary._
@@ -20,14 +20,14 @@ trait ArbTwilightBoundedNight {
     Arbitrary {
       (
         for {
-          b <- arbitrary[TwilightBoundType]
+          b <- arbitrary[TwilightType]
           n <- arbitrary[ObservingNight]
         } yield n.twilightBounded(b)
       ).suchThat(_.isDefined).map(_.get)
     }
 
   implicit val cogTwilightBoundedNight: Cogen[TwilightBoundedNight] =
-    Cogen[(TwilightBoundType, ObservingNight)].contramap(o => (o.boundType, o.toObservingNight))
+    Cogen[(TwilightType, ObservingNight)].contramap(o => (o.twilightType, o.toObservingNight))
 }
 
 object ArbTwilightBoundedNight extends ArbTwilightBoundedNight

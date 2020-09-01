@@ -9,9 +9,8 @@ import cats.implicits._
 import cats.{ Eq, Show }
 import java.time._
 import lucuma.core.enum.Site
-import lucuma.core.math.skycalc.TwilightBoundType
+import lucuma.core.enum.TwilightType
 import lucuma.core.math.arb.ArbTime._
-import lucuma.core.math.arb.ArbTwilightBoundType._
 import lucuma.core.model.arb.ArbObservingNight._
 import lucuma.core.model.arb.ArbTwilightBoundedNight._
 import lucuma.core.util.arb.ArbEnumerated._
@@ -21,7 +20,7 @@ import io.chrisdavenport.cats.time._
 
 final class TwilightBoundedNightSuite extends DisciplineSuite {
   checkAll("TwilightBoundedNight", OrderTests[TwilightBoundedNight].order)
-  checkAll("TwilightBoundedNight.boundType", LensTests(TwilightBoundedNight.boundType))
+  checkAll("TwilightBoundedNight.twilightType", LensTests(TwilightBoundedNight.twilightType))
   checkAll("TwilightBoundedNight.observingNight", LensTests(TwilightBoundedNight.observingNight))
   checkAll("TwilightBoundedNight.localObservingNight",
            LensTests(TwilightBoundedNight.localObservingNight)
@@ -73,17 +72,17 @@ final class TwilightBoundedNightSuite extends DisciplineSuite {
     }
   }
 
-  test("fromBoundTypeAndSiteAndLocalDate consistent") {
-    forAll { (b: TwilightBoundType, s: Site, l: LocalDate) =>
+  test("fromTwilightTypeAndSiteAndLocalDate consistent") {
+    forAll { (b: TwilightType, s: Site, l: LocalDate) =>
       TwilightBoundedNight
-        .fromBoundTypeAndSiteAndLocalDate(b, s, l)
+        .fromTwilightTypeAndSiteAndLocalDate(b, s, l)
         .foreach(tbn => assertEquals(tbn.toLocalDate, l))
     }
   }
 
-  test("fromBoundTypeAndSiteAndLocalDateTime consistent") {
-    forAll { (b: TwilightBoundType, s: Site, l: LocalDateTime) =>
-      val n  = TwilightBoundedNight.fromBoundTypeAndSiteAndLocalDateTime(b, s, l)
+  test("fromTwilightTypeAndSiteAndLocalDateTime consistent") {
+    forAll { (b: TwilightType, s: Site, l: LocalDateTime) =>
+      val n  = TwilightBoundedNight.fromTwilightTypeAndSiteAndLocalDateTime(b, s, l)
       val d  = l.toLocalDate
       val dʹ = if (l.toLocalTime.isBefore(LocalObservingNight.Start)) d else d.plusDays(1L)
       n.foreach(tbn => assertEquals(tbn.toLocalDate, dʹ))

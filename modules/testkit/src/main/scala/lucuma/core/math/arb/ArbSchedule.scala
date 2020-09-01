@@ -4,8 +4,8 @@
 package lucuma.core.math.arb
 
 import cats.implicits._
-import lucuma.core.math.skycalc.Interval
-import lucuma.core.math.skycalc.Schedule
+import lucuma.core.math.Interval
+import lucuma.core.math.Schedule
 import org.scalacheck._
 import org.scalacheck.Arbitrary._
 import java.time.Instant

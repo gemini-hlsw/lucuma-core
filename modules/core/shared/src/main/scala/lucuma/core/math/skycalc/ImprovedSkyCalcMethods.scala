@@ -3,11 +3,12 @@
 
 package lucuma.core.math.skycalc
 
-import lucuma.core.math.skycalc.Constants._
+import lucuma.core.math.Constants._
 import java.time.Instant
 import java.time.LocalTime
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
+import lucuma.core.math.JulianDate.J2000
 import scala.annotation.unused
 
 trait ImprovedSkyCalcMethods {
@@ -35,7 +36,7 @@ trait ImprovedSkyCalcMethods {
     * Return the LST time as a ZonedDateTime object for the given instant.
     */
   protected def getLst(lstHours: Double, instant: Instant): ZonedDateTime = {
-    val zdt     = instant.atZone(UT)
+    val zdt     = instant.atZone(ZoneOffset.UTC)
     val h       = zdt.getHour
     val nextDay = lstHours < h
     setHours(zdt, lstHours, nextDay)
@@ -51,7 +52,7 @@ trait ImprovedSkyCalcMethods {
     val min    = md.toInt
     val sd     = (md - min) * 60.0
     val sec    = sd.toInt
-    val ns     = ((sd - sec) * NanosPerSecond).toInt
+    val ns     = ((sd - sec) * NanosInSecond).toInt
     val newZDT = zdt.`with`(LocalTime.of(h, min, sec, ns))
     if (nextDay) newZDT.plusHours(24) else newZDT
   }
@@ -85,7 +86,7 @@ trait ImprovedSkyCalcMethods {
     val jd = instant_to_jd(instant)
     sid.d = lst(jd, longit)
     jdut.d = jd
-    curepoch.d = 2000.0 + (jd - J2000) / 365.25
+    curepoch.d = 2000.0 + (jd - J2000.toDouble) / 365.25
     0
   }
 
@@ -277,7 +278,7 @@ trait ImprovedSkyCalcMethods {
     var M      = .0
     var Mprime = .0
     var Omega  = .0
-    jd = (date_epoch - 2000.0) * 365.25 + J2000
+    jd = (date_epoch - 2000.0) * 365.25 + J2000.toDouble
     T = (jd - 2415020.0) / 36525.0
     L = 279.6967 + (36000.7689 + 0.000303 * T) * T
     Lprime = 270.4342 + (481267.8831 - 0.001133 * T) * T
@@ -402,17 +403,17 @@ trait ImprovedSkyCalcMethods {
     val z2      = new DoubleRef
     var norm    = .0
     /* find heliocentric velocity of earth as a fraction of the speed of light ... */
-    jd = J2000 + (epoch - 2000.0) * 365.25
+    jd = J2000.toDouble + (epoch - 2000.0) * 365.25
     jd1 = jd - EarthDiff
     jd2 = jd + EarthDiff
     accusun(jd1, 0.0, 0.0, ras, decs, dists, topora, topodec, x1, y1, z1)
     accusun(jd2, 0.0, 0.0, ras, decs, dists, topora, topodec, x2, y2, z2)
     accusun(jd, 0.0, 0.0, ras, decs, dists, topora, topodec, x, y, z)
     Xdot =
-      KmSInAUDay * (x2.d - x1.d) / (2.0 * EarthDiff * SpeedOfLight) /* numerical differentiation */
+      KmSInAUDay * (x2.d - x1.d) / (2.0 * EarthDiff * SpeedOfLight / 1000) /* numerical differentiation */
     Ydot =
-      KmSInAUDay * (y2.d - y1.d) / (2.0 * EarthDiff * SpeedOfLight) /* crude but accurate */
-    Zdot = KmSInAUDay * (z2.d - z1.d) / (2.0 * EarthDiff * SpeedOfLight)
+      KmSInAUDay * (y2.d - y1.d) / (2.0 * EarthDiff * SpeedOfLight / 1000) /* crude but accurate */
+    Zdot = KmSInAUDay * (z2.d - z1.d) / (2.0 * EarthDiff * SpeedOfLight / 1000)
     /* approximate correction ... non-relativistic but very close.  */
     vec(1) += from_std * Xdot
     vec(2) += from_std * Ydot
@@ -630,7 +631,7 @@ trait ImprovedSkyCalcMethods {
     var ypr  = .0
     var zpr  = .0
     var T    = .0
-    T = (jd - J2000) / 36525 /* centuries since J2000 */
+    T = (jd - J2000.toDouble) / 36525 /* centuries since J2000 */
     incl = (23.439291 + T * (-0.0130042 - 0.00000016 * T)) / DegsInRadian
     /* 1992 Astron Almanac, p. B18, dropping the
                    cubic term, which is 2 milli-arcsec! */
@@ -651,7 +652,7 @@ trait ImprovedSkyCalcMethods {
     var /*xpr, */ ypr = .0
     var zpr           = .0
     var T             = .0
-    T = (jd - J2000) / 36525
+    T = (jd - J2000.toDouble) / 36525
     incl = (23.439291 + T * (-0.0130042 - 0.00000016 * T)) / DegsInRadian
     ypr = Math.cos(incl) * y.d - Math.sin(incl) * z.d
     zpr = Math.sin(incl) * y.d + Math.cos(incl) * z.d
@@ -860,7 +861,7 @@ trait ImprovedSkyCalcMethods {
     jdint = jdint + inter + date.getDayOfMonth + jdzpt
     jd = jdint.toDouble
     jdfrac =
-      date.getHour / 24.0 + date.getMinute / 1440.0 + (date.getSecond + date.getNano.toDouble / NanosPerSecond) / SecsInDay
+      date.getHour / 24.0 + date.getMinute / 1440.0 + (date.getSecond + date.getNano.toDouble / NanosInSecond) / SecsInDay
     if (jdfrac < 0.5) {
       jdint -= 1
       jdfrac = jdfrac + 0.5
@@ -897,7 +898,7 @@ trait ImprovedSkyCalcMethods {
       jdmid = jdint + 0.5
       ut = jdfrac - 0.5
     }
-    t = (jdmid - J2000) / 36525
+    t = (jdmid - J2000.toDouble) / 36525
     sid_g =
       (24110.54841 + 8640184.812866 * t + 0.093104 * t * t - 6.2e-6 * t * t * t) / SecsInDay
     sid_int = sid_g.toLong
