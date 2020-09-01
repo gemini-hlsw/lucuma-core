@@ -10,8 +10,7 @@ import java.time.ZonedDateTime
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Declination
 import lucuma.core.math.RightAscension
-import lucuma.core.math.skycalc.solver.Samples
-import lucuma.core.math.skycalc.SkyCalcResults
+import lucuma.core.math.skycalc._
 import org.scalactic.Tolerance
 import java.time.Duration
 import lucuma.core.math.skycalc.solver.RoundStrategy._

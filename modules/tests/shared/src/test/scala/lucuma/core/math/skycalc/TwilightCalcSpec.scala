@@ -29,11 +29,11 @@ final class TwilightCalcSpec extends FunSuite with Tolerance {
   test("TwilightCalcSpec: Sunrise and sunset on 2000-01-01") {
     expected.foreach {
       case ((site, tbType, date), (s, e)) =>
-        val (start, end) = TwilightCalc.calculate(tbType, date, site.place).get
-        // The use of a different JulianDate throughout the calculations produces a very slight difference,
-        // therefore we allow a couple of milliseconds of tolerance.
-        assert((start.toEpochMilli +- 2).isWithin(s))
-        assert((end.toEpochMilli +- 2).isWithin(e))
+         val interval = TwilightCalc.forDate(tbType, date, site.place).get
+          // The use of a different JulianDate throughout the calculations produces a very slight difference,
+          // therefore we allow a couple of milliseconds of tolerance.
+          assert((interval.start.toEpochMilli +- 2).isWithin(s))
+            assert((interval.end.toEpochMilli +- 2).isWithin(e))
     }
   }
 }

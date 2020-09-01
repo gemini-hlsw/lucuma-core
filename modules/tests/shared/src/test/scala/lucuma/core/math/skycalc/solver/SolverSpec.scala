@@ -6,6 +6,7 @@ package lucuma.core.math.skycalc.solver
 import cats.tests.CatsSuite
 import java.time.Instant
 import java.time.Duration
+import lucuma.core.math.skycalc._
 import lucuma.core.math.skycalc.solver.SolverStrategy._
 import lucuma.core.math.skycalc.solver.RoundStrategy._
 

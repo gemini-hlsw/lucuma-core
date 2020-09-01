@@ -8,11 +8,15 @@ import java.time.Instant
 import java.time.LocalDate
 import lucuma.core.math.JulianDate
 import lucuma.core.math.Place
+import lucuma.core.math.skycalc.Interval
+import lucuma.core.math.skycalc.Schedule
 import lucuma.core.math.skycalc.Constants._
+import io.chrisdavenport.cats.time._
 
 trait TwilightCalc extends SunCalc {
 
-  /** Compute start and end of night for a particular date and place.
+  /**
+    * Compute start and end of night for a particular date and place.
     *
     * The night will be bounded by twilight as defined by
     * [[lucuma.core.math.skycalc.TwilightBoundType]]. It will be the night that starts
@@ -26,11 +30,11 @@ trait TwilightCalc extends SunCalc {
     * respectively, or None if there's no sunset or sunrise for the
     * provided parameters.
     */
-  def calculate(
+  def forDate(
     boundType: TwilightBoundType,
     date:      LocalDate,
     place:     Place
-  ): Option[(Instant, Instant)] = {
+  ): Option[Interval] = {
     val nextMidnight = date.atStartOfDay(place.timezone).plusDays(1)
     val jdmid        = JulianDate.ofInstant(nextMidnight.toInstant)
 
@@ -50,14 +54,27 @@ trait TwilightCalc extends SunCalc {
       case _                          => boundType.horizonAngle
     }
 
-    calcTimes(angle, jdmid, place)
+    calcTimes(angle, jdmid, place).flatMap(Interval.fromInstants.getOption)
+  }
+
+  def forInterval(
+    boundType: TwilightBoundType,
+    interval:  Interval,
+    place:     Place
+  ): Schedule = {
+    val startDate         = interval.start.atZone(place.timezone).toLocalDate
+    val endDate           = interval.end.atZone(place.timezone).toLocalDate
+    val dates             =
+      List.unfold(startDate)(date => if (date <= endDate) (date, date.plusDays(1)).some else none)
+    val twilightIntervals = dates.flatMap(d => forDate(boundType, d, place))
+    Schedule.fromIntervals.get(twilightIntervals).intersection(interval)
   }
 
   private def calcTimes(
     angle: Double,
     jdmid: JulianDate,
     place: Place
-  ): Option[(Instant, Instant)] = { // (Start, End)
+  ): Option[(Instant, Instant)] = { // (sunset, sunrise)
     val (rasun, decsun) = lpsun(jdmid)
 
     val lat    = place.latitude.toAngle.toSignedDoubleDegrees

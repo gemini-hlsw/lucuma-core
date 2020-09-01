@@ -5,11 +5,14 @@ package lucuma.core.math.skycalc.solver
 
 import java.time.Duration
 import lucuma.core.math.Declination
-import lucuma.core.math.skycalc.SkyCalcResults
 import lucuma.core.math.HourAngle
+import lucuma.core.math.skycalc.Interval
+import lucuma.core.math.skycalc.Schedule
+import lucuma.core.math.skycalc.SkyCalcResults
 
 /**
-  * Convenience class to find a [[Schedule]] meeting a [[Constraint]] from [[Samples]] at a given [[Interval]].
+  * Convenience class to find a [[lucuma.core.math.skycalc.Schedule]] meeting a [[Constraint]]
+  * from [[Samples]] at a given [[lucuma.core.math.skycalc.Interval]].
   *
   * @tparam S [[SolverStrategy]] to use
   * @tparam R [[RoundStrategy]] to use

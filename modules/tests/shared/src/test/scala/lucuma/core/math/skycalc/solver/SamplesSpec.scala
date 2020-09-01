@@ -8,6 +8,7 @@ import cats.Eq
 import cats.Eval
 import java.time.Duration
 import scala.collection.immutable.TreeMap
+import lucuma.core.math.skycalc._
 import lucuma.core.math.skycalc.solver.Samples.Bracket
 import org.scalacheck.Gen._
 import org.scalacheck.Arbitrary._

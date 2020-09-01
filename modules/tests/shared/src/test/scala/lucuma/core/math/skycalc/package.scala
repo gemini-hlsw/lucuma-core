@@ -1,7 +1,7 @@
 // Copyright (c) 2016-2020 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package lucuma.core.math.skycalc
+package lucuma.core.math
 
 import cats.implicits._
 import cats.Eq
@@ -13,7 +13,7 @@ import org.scalacheck.Arbitrary._
 import lucuma.core.math.arb.ArbTime._
 import io.chrisdavenport.cats.time._
 
-package object solver {
+package object skycalc {
   private val MaxDelta: Long = Duration.ofMinutes(10).toNanos
 
   def buildInterval(start: Int, end: Int): Interval =
