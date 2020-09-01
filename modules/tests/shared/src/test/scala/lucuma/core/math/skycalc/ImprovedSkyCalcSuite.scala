@@ -12,7 +12,7 @@ import lucuma.core.enum.Site
 // This is just a basic case, mostly to test linking in JS.
 // Property based testing is in ImprovedSkyCalcSpecJVM, where output
 // is compared to the one from {edu.gemini.skycalc} in Java.
-final class ImprovedSkyCalcSpec extends FunSuite {
+final class ImprovedSkyCalcSuite extends FunSuite {
 
   private val NanosPerMillis: Int = 1_000_000
 
