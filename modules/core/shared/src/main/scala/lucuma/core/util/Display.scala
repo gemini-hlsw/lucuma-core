@@ -17,23 +17,23 @@ object Display {
 
   /** Create an instance of Display using the provided functions. 
    * 
-   * @param toShort function that maps A to the shortName
-   * @param toLong function that maps A to the longName
+   * @param toShortName function that maps A to the shortName
+   * @param toLongName function that maps A to the longName
   */
-  def from[A](toShort: A => String, toLong: A => String): Display[A] = 
+  def from[A](toShortName: A => String, toLongName: A => String): Display[A] = 
     new Display[A] {
-      def shortName(a: A) = toShort(a)
-      override def longName(a: A)  = toLong(a)
+      def shortName(a: A) = toShortName(a)
+      override def longName(a: A)  = toLongName(a)
     }
 
   /** Create an instance of Display using the provided function 
    * for the shortName. The longName will be the same as the 
    * shortName.
    * 
-   * @param toShort function that maps A to the shortName
+   * @param toShortName function that maps A to the shortName
    */
-  def fromShort[A](toShort: A => String): Display[A] = 
+  def fromToShortName[A](toShortName: A => String): Display[A] = 
     new Display[A] {
-      def shortName(a: A) = toShort(a)
+      def shortName(a: A) = toShortName(a)
     }
 }

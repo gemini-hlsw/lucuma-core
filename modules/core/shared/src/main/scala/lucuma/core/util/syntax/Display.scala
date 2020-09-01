@@ -12,7 +12,8 @@ final class DisplayOps[A](val value: A) extends AnyVal {
 }
 
 trait ToDisplayOps {
-  implicit def ToDisplayOps[A](value: A): DisplayOps[A] = new DisplayOps[A](value)
+  implicit def ToDisplayOps[A](value: A): DisplayOps[A] = 
+    new DisplayOps[A](value)
 }
 
 object display extends ToDisplayOps
