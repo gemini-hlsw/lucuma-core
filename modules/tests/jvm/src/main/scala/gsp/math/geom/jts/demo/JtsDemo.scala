@@ -4,6 +4,9 @@
 package lucuma.core.math.geom.jts
 package demo
 
+import lucuma.core.enum.PortDisposition
+import lucuma.core.enum.GmosSouthFpu
+import lucuma.core.enum.GmosNorthFpu
 import lucuma.core.math.{ Angle, Offset }
 import lucuma.core.math.geom.GmosOiwfsProbeArm
 import lucuma.core.math.geom.GmosScienceAreaGeometry
@@ -30,21 +33,20 @@ object JtsDemo extends Frame("JTS Demo") {
     Offset(170543999.µas.p, -24177003.µas.q)
 
   val offsetPos: Offset =
-    Offset(60.arcsec.p, 60.arcsec.q)
+    Offset(-60.arcsec.p, 60.arcsec.q)
 
-  // TODO: should come from the FPUnit enum in core
-  val ifuOffset: Offset =
-    Offset.Zero
+  val fpu: Option[Either[GmosNorthFpu, GmosSouthFpu]] =
+    Some(Right(GmosSouthFpu.LongSlit_5_00))
 
-  // TODO: when we move this core there should be an enum
-  val sideLooking: Boolean =
-    true
+  val port: PortDisposition =
+    PortDisposition.Side
 
   // Shape to display
   val shapes: List[ShapeExpression] =
     List(
-      GmosOiwfsProbeArm.shapeAt(posAngle, guideStarOffset, offsetPos, ifuOffset, sideLooking),
-      GmosOiwfsProbeArm.patrolFieldAt(posAngle, offsetPos, ifuOffset, sideLooking),
+      GmosOiwfsProbeArm.shapeAt(posAngle, guideStarOffset, offsetPos, fpu, port),
+      GmosOiwfsProbeArm.patrolFieldAt(posAngle, offsetPos, fpu, port),
+      GmosScienceAreaGeometry.imaging ⟲ posAngle,
       GmosScienceAreaGeometry.imaging ↗ offsetPos ⟲ posAngle
     )
 
