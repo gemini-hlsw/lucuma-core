@@ -34,13 +34,13 @@ final class LocalObservingNightSuite extends DisciplineSuite {
 
   test("Always begins at 2PM") {
     forAll { (o: LocalObservingNight) =>
-      assertEquals(o.start.getHour, LocalObservingNight.StartHour)
+      assertEquals(o.start.toLocalTime, LocalObservingNight.StartTime)
     }
   }
 
   test("Always ends at 2PM") {
     forAll { (o: LocalObservingNight) =>
-      assertEquals(o.end.getHour, LocalObservingNight.StartHour)
+      assertEquals(o.end.toLocalTime, LocalObservingNight.StartTime)
     }
   }
 

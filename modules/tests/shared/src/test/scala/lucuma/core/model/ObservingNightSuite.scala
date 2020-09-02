@@ -103,7 +103,7 @@ final class ObservingNightSuite extends DisciplineSuite {
     forAll { (s: Site, l: LocalDateTime) =>
       val n  = ObservingNight.fromSiteAndLocalDateTime(s, l)
       val d  = l.toLocalDate
-      val dʹ = if (l.toLocalTime.isBefore(LocalObservingNight.Start)) d else d.plusDays(1L)
+      val dʹ = if (l.toLocalTime.isBefore(LocalObservingNight.StartTime)) d else d.plusDays(1L)
       assertEquals(n.toLocalDate, dʹ)
     }
   }

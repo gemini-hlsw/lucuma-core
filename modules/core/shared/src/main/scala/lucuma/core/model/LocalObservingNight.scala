@@ -32,7 +32,7 @@ final case class LocalObservingNight(toLocalDate: LocalDate) {
 
   /** The end time (exclusive) of the local observing night. */
   def end: LocalDateTime =
-    LocalDateTime.of(toLocalDate, LocalObservingNight.Start)
+    LocalDateTime.of(toLocalDate, LocalObservingNight.StartTime)
 
   /** The previous local observing night. */
   def previous: LocalObservingNight =
@@ -62,14 +62,14 @@ object LocalObservingNight extends LocalObservingNightOptics {
     *
     * @group Constants
     */
-  val StartHour: Int =
+  private val StartHour: Int =
     14
 
   /** The local time at which the night is considered to officially start.
     *
     * @group Constants
     */
-  val Start: LocalTime =
+  val StartTime: LocalTime =
     LocalTime.of(StartHour, 0)
 
   /** Formatter for nights.  The night string representation corresponds to the
@@ -87,7 +87,7 @@ object LocalObservingNight extends LocalObservingNightOptics {
     */
   def fromLocalDateTime(d: LocalDateTime): LocalObservingNight =
     LocalObservingNight(
-      d.toLocalDate.plusDays(if (d.toLocalTime >= Start) 1L else 0L)
+      d.toLocalDate.plusDays(if (d.toLocalTime >= StartTime) 1L else 0L)
     )
 
   /** Constructs the LocalObservingNight corresponding to the given time, taking

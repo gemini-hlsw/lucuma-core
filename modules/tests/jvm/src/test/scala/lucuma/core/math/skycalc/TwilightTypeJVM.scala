@@ -9,6 +9,7 @@ import lucuma.core.enum.TwilightType
 case class TwilightTypeJVM(wrapped: TwilightType) {
   val horizonAngle = wrapped.horizonAngle.toAngle.toSignedDoubleDegrees
 }
+
 object TwilightTypeJVM {
   val OFFICIAL = TwilightType.Official
 }

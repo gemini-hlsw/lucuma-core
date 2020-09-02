@@ -84,7 +84,7 @@ final class TwilightBoundedNightSuite extends DisciplineSuite {
     forAll { (b: TwilightType, s: Site, l: LocalDateTime) =>
       val n  = TwilightBoundedNight.fromTwilightTypeAndSiteAndLocalDateTime(b, s, l)
       val d  = l.toLocalDate
-      val dʹ = if (l.toLocalTime.isBefore(LocalObservingNight.Start)) d else d.plusDays(1L)
+      val dʹ = if (l.toLocalTime.isBefore(LocalObservingNight.StartTime)) d else d.plusDays(1L)
       n.foreach(tbn => assertEquals(tbn.toLocalDate, dʹ))
     }
   }
