@@ -1,7 +1,7 @@
 // Copyright (c) 2016-2020 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package lucuma.core.util.syntax
+package lucuma.core.syntax
 
 import lucuma.core.util.Display
 
@@ -12,7 +12,8 @@ final class DisplayOps[A](val value: A) extends AnyVal {
 }
 
 trait ToDisplayOps {
-  implicit def ToDisplayOps[A](value: A): DisplayOps[A] = new DisplayOps[A](value)
+  implicit def ToDisplayOps[A](value: A): DisplayOps[A] = 
+    new DisplayOps[A](value)
 }
 
 object display extends ToDisplayOps
