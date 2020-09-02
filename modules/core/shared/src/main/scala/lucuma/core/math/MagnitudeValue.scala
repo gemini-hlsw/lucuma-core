@@ -3,26 +3,28 @@
 
 package lucuma.core.math
 
-import cats.{ Order, Show }
-import spire.math.Rational
 import scala.math.rint
+
+import cats.Order
+import cats.Show
 import lucuma.core.optics.Format
+import spire.math.Rational
 
 /**
  * Exact magnitude value represented as an int with the original value scaled up
  *
- * @param scaledValue This magnitude integral value, as the original multiplied by 100. value is dimensionless
+ * @param scaledValue This magnitude integral value, as the original multiplied by 1000. value is dimensionless
  * @see The Wikipedia [[https://en.wikipedia.org/wiki/Apparent_magnitude]]
  */
 final case class MagnitudeValue(private[lucuma] val scaledValue: Int)
     extends Product
     with Serializable {
-  def toRational: Rational = Rational(scaledValue.toLong, 100)
+  def toRational: Rational = Rational(scaledValue.toLong, 1000)
 
-  def toDoubleValue: Double = scaledValue / 100.0
+  def toDoubleValue: Double = scaledValue / 1000.0
 
   override def toString: String =
-    s"MagnitudeValue(${scaledValue / 100})"
+    s"MagnitudeValue(${scaledValue / 1000})"
 
 }
 
@@ -35,14 +37,14 @@ object MagnitudeValue {
    * @group Constructors
    */
   def apply(mg: Int): MagnitudeValue =
-    new MagnitudeValue(mg * 100)
+    new MagnitudeValue(mg * 1000)
 
   /**
    * Construct a new MagnitudeValue of the given double value. Approximate.
    * @group Constructors
    */
   def fromDouble(mg: Double): MagnitudeValue =
-    new MagnitudeValue(rint(mg * 100).toInt)
+    new MagnitudeValue(rint(mg * 1000).toInt)
 
   /**
    * Format with BigDecimal
@@ -51,8 +53,8 @@ object MagnitudeValue {
   val fromBigDecimal: Format[BigDecimal, MagnitudeValue] =
     Format[Int, MagnitudeValue](v => Some(new MagnitudeValue(v)), _.scaledValue)
       .imapA[BigDecimal](
-        n => new java.math.BigDecimal(n).movePointLeft(2),
-        d => d.underlying.movePointRight(2).intValue
+        n => new java.math.BigDecimal(n).movePointLeft(3),
+        d => d.underlying.movePointRight(3).intValue
       )
 
   /** @group Typeclass Instances */

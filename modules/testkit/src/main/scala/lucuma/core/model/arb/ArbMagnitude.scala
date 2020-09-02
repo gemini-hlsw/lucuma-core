@@ -4,14 +4,17 @@
 package lucuma.core.model
 package arb
 
+import scala.collection.immutable.SortedMap
+
+import cats.implicits._
 import lucuma.core.enum.MagnitudeBand
 import lucuma.core.enum.MagnitudeSystem
-import lucuma.core.math.arb.ArbMagnitudeValue._
 import lucuma.core.math.MagnitudeValue
+import lucuma.core.math.arb.ArbMagnitudeValue._
 import lucuma.core.util.arb.ArbEnumerated
-import org.scalacheck._
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Cogen._
+import org.scalacheck._
 
 trait ArbMagnitude {
 
@@ -31,6 +34,12 @@ trait ArbMagnitude {
     Cogen[(MagnitudeValue, MagnitudeBand, Option[MagnitudeValue], MagnitudeSystem)].contramap { u =>
       (u.value, u.band, u.error, u.system)
     }
+
+  implicit val arbMagnitudesMap: Arbitrary[SortedMap[MagnitudeBand, Magnitude]] =
+    Arbitrary(arbitrary[Vector[Magnitude]].map(_.fproductLeft(_.band)).map(x => SortedMap(x: _*)))
+
+  implicit val cogMagnitudesMap: Cogen[SortedMap[MagnitudeBand, Magnitude]] =
+    Cogen[Vector[(MagnitudeBand, Magnitude)]].contramap(_.toVector)
 }
 
 object ArbMagnitude extends ArbMagnitude

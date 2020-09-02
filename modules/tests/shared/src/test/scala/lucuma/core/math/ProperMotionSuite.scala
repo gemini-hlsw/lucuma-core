@@ -3,12 +3,13 @@
 
 package lucuma.core.math
 
-import cats.tests.CatsSuite
 import cats.kernel.laws.discipline._
 import lucuma.core.math.arb._
 import monocle.law.discipline._
+import munit.DisciplineSuite
+import org.scalacheck.Prop.forAll
 
-final class ProperMotionSpec extends CatsSuite {
+final class ProperMotionSuite extends DisciplineSuite {
   import ArbParallax._
   import ArbCoordinates._
   import ArbEpoch._
@@ -28,7 +29,7 @@ final class ProperMotionSpec extends CatsSuite {
     forAll { (pm: ProperMotion) =>
       val c1 = pm.baseCoordinates
       val c2 = pm.plusYears(0.0).baseCoordinates
-      c1.angularDistance(c2).toMicroarcseconds should be <= 20L
+      assert(c1.angularDistance(c2).toMicroarcseconds <= 20L)
     }
   }
 

@@ -3,12 +3,17 @@
 
 package lucuma.core.math
 
+import java.time.Instant
+
+import scala.math.atan2
+import scala.math.cos
+import scala.math.hypot
+import scala.math.sin
+
 import cats._
 import cats.syntax.all._
-import java.time.Instant
 import monocle.Lens
 import monocle.macros.GenLens
-import scala.math.{ atan2, cos, hypot, sin }
 
 /**
   * Time-parameterized coordinates, based on an observed position at some point in time (called

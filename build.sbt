@@ -105,7 +105,6 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform)
       "org.typelevel" %%% "discipline-munit" % "0.3.0"  % Test
     ),
     testFrameworks += new TestFramework("munit.Framework"),
-    scalaJSLinkerConfig ~= (_.withModuleKind(ModuleKind.CommonJSModule))
   )
   .jvmConfigure(_.enablePlugins(AutomateHeaderPlugin))
   .jvmSettings(
@@ -118,3 +117,4 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform)
     )
   )
   .jsSettings(lucumaScalaJsSettings: _*)
+  .jsSettings(scalaJSLinkerConfig ~= (_.withModuleKind(ModuleKind.CommonJSModule)))
