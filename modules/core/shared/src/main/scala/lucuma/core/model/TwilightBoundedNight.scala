@@ -52,11 +52,10 @@ sealed abstract case class TwilightBoundedNight private (
 
 object TwilightBoundedNight extends TwilightBoundedNightOptics {
 
-  /** Constructs a [[gem.math.TwilightBoundedNight]] corresponding to a
-    * [[gem.math.ObservingNight]].
+  /** Constructs a [[TwilightBoundedNight]] corresponding to an [[ObservingNight]].
     *
     * Returns None if there's no sunset or sunrise for the specified
-    * [[gsp.math.skycalc.TwilightType]] and [[gem.math.ObservingNight]].
+    * [[lucuma.core.enum.TwilightType]] and [[ObservingNight]].
     *
     * @group Constructors
     */
