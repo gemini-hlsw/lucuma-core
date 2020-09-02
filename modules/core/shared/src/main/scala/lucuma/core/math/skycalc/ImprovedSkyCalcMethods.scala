@@ -410,10 +410,10 @@ trait ImprovedSkyCalcMethods {
     accusun(jd2, 0.0, 0.0, ras, decs, dists, topora, topodec, x2, y2, z2)
     accusun(jd, 0.0, 0.0, ras, decs, dists, topora, topodec, x, y, z)
     Xdot =
-      KmSInAUDay * (x2.d - x1.d) / (2.0 * EarthDiff * SpeedOfLight / 1000) /* numerical differentiation */
+      MetersPerSecondInAUPerDay * (x2.d - x1.d) / (2.0 * EarthDiff * SpeedOfLight) /* numerical differentiation */
     Ydot =
-      KmSInAUDay * (y2.d - y1.d) / (2.0 * EarthDiff * SpeedOfLight / 1000) /* crude but accurate */
-    Zdot = KmSInAUDay * (z2.d - z1.d) / (2.0 * EarthDiff * SpeedOfLight / 1000)
+      MetersPerSecondInAUPerDay * (y2.d - y1.d) / (2.0 * EarthDiff * SpeedOfLight) /* crude but accurate */
+    Zdot = MetersPerSecondInAUPerDay * (z2.d - z1.d) / (2.0 * EarthDiff * SpeedOfLight)
     /* approximate correction ... non-relativistic but very close.  */
     vec(1) += from_std * Xdot
     vec(2) += from_std * Ydot
@@ -432,7 +432,7 @@ trait ImprovedSkyCalcMethods {
     var theta = .0
     if ((x == 0.0) && (y == 0.0)) return 0.0 /* guard ... */
     theta = Math.atan2(y, x)
-    while (theta < 0.0) theta += TwicePi
+    while (theta < 0.0) theta += TwoPi
     theta
   }
 

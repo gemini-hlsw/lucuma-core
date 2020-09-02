@@ -322,8 +322,12 @@ final class IntervalSpec extends CatsSuite with IntervalGens {
     forAll { (i: Interval, z: ZoneId, t: LocalTime) =>
       val allDay = i.toFullDays(z, t)
       assert(allDay.contains(i))
-      assert(allDay.start.atZone(z).toLocalTime === t)
-      assert(allDay.end.atZone(z).toLocalTime === t)
+      // We can't comparte LocalTimes directly since the LocalTime may not exist at
+      // the given day if there was a DST transition.
+      val start  = allDay.start.atZone(z)
+      assert(start === start.`with`(t))
+      val end    = allDay.end.atZone(z)
+      assert(end === end.`with`(t))
       assert(allDay.diff(i).forall(_.duration < Duration.ofDays(1)))
     }
   }

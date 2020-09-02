@@ -11,22 +11,13 @@ import java.time._
 import lucuma.core.enum.Site
 import lucuma.core.enum.TwilightType
 import lucuma.core.math.arb.ArbTime._
-import lucuma.core.model.arb.ArbObservingNight._
 import lucuma.core.model.arb.ArbTwilightBoundedNight._
 import lucuma.core.util.arb.ArbEnumerated._
 import cats.kernel.laws.discipline._
-import monocle.law.discipline._
 import io.chrisdavenport.cats.time._
 
 final class TwilightBoundedNightSuite extends DisciplineSuite {
   checkAll("TwilightBoundedNight", OrderTests[TwilightBoundedNight].order)
-  checkAll("TwilightBoundedNight.twilightType", LensTests(TwilightBoundedNight.twilightType))
-  checkAll("TwilightBoundedNight.observingNight", LensTests(TwilightBoundedNight.observingNight))
-  checkAll("TwilightBoundedNight.localObservingNight",
-           LensTests(TwilightBoundedNight.localObservingNight)
-  )
-  checkAll("TwilightBoundedNight.site", LensTests(ObservingNight.site))
-  checkAll("TwilightBoundedNight.localDate", LensTests(ObservingNight.localDate))
 
   test("Equality must be natural") {
     forAll { (a: TwilightBoundedNight, b: TwilightBoundedNight) =>

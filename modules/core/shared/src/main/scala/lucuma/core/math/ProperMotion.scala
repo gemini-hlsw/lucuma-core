@@ -56,7 +56,7 @@ final case class ProperMotion(
 }
 
 object ProperMotion extends ProperMotionOptics {
-  import Constants.{ AstronomicalUnit, TwicePi }
+  import Constants.{ AstronomicalUnit, TwoPi }
 
   def const(cs: Coordinates): ProperMotion =
     ProperMotion(cs, Epoch.J2000, None, None, None)
@@ -163,8 +163,8 @@ object ProperMotion extends ProperMotionOptics {
     val decʹ      = if (z === 0.0) 0.0 else atan2(z, r)
     val raʹʹ = {
       // Normalize to [0 .. 2π)
-      val rem = raʹ % TwicePi
-      if (rem < 0.0) rem + TwicePi else rem
+      val rem = raʹ % TwoPi
+      if (rem < 0.0) rem + TwoPi else rem
     }
     (raʹʹ, decʹ)
 

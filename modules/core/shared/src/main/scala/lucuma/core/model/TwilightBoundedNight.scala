@@ -11,15 +11,14 @@ import lucuma.core.math.skycalc.TwilightCalc
 import cats.{ Order, Show }
 import cats.effect.Sync
 import cats.implicits._
-import monocle.Lens
-import monocle.macros.GenLens
 
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
+import monocle.Getter
 
 /** The start and end of a particular night at a [[lucuma.core.enum.Site]]. */
-final case class TwilightBoundedNight private (
+sealed abstract case class TwilightBoundedNight private (
   twilightType:     TwilightType,
   toObservingNight: ObservingNight,
   interval:         Interval
@@ -68,7 +67,7 @@ object TwilightBoundedNight extends TwilightBoundedNightOptics {
     val site = observingNight.site
     TwilightCalc
       .forDate(twilightType, observingNight.toLocalDate.minusDays(1), site.place)
-      .map(interval => TwilightBoundedNight(twilightType, observingNight, interval))
+      .map(interval => new TwilightBoundedNight(twilightType, observingNight, interval) {})
   }
 
   /** Constructs a [[TwilightBoundedNight]] corresponding to a [[ObservingNight]].
@@ -211,22 +210,22 @@ object TwilightBoundedNight extends TwilightBoundedNightOptics {
 trait TwilightBoundedNightOptics {
 
   /** @group Optics */
-  val twilightType: Lens[TwilightBoundedNight, TwilightType] =
-    GenLens[TwilightBoundedNight](_.twilightType)
+  val twilightType: Getter[TwilightBoundedNight, TwilightType] =
+    Getter(_.twilightType)
 
   /** @group Optics */
-  val observingNight: Lens[TwilightBoundedNight, ObservingNight] =
-    GenLens[TwilightBoundedNight](_.toObservingNight)
+  val observingNight: Getter[TwilightBoundedNight, ObservingNight] =
+    Getter(_.toObservingNight)
 
   /** @group Optics */
-  val localObservingNight: Lens[TwilightBoundedNight, LocalObservingNight] =
+  val localObservingNight: Getter[TwilightBoundedNight, LocalObservingNight] =
     observingNight.composeLens(ObservingNight.localObservingNight)
 
   /** @group Optics */
-  val site: Lens[TwilightBoundedNight, Site] =
+  val site: Getter[TwilightBoundedNight, Site] =
     observingNight.composeLens(ObservingNight.site)
 
   /** @group Optics */
-  val localDate: Lens[TwilightBoundedNight, LocalDate] =
+  val localDate: Getter[TwilightBoundedNight, LocalDate] =
     localObservingNight.composeIso(LocalObservingNight.localDate)
 }

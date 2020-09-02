@@ -50,11 +50,9 @@ object TwilightType {
     fromTag(s).getOrElse(throw new NoSuchElementException(s"TwilightType: Invalid tag: '$s'"))
 
   /** @group Typeclass Instances */
-  implicit val SiteEnumerated: Enumerated[TwilightType] =
+  implicit val enumeratedTwilightType: Enumerated[TwilightType] =
     new Enumerated[TwilightType] {
       def all = TwilightType.all
-      def tag(a:                    TwilightType)         = a.tag
-      override def unsafeFromTag(s: String): TwilightType =
-        TwilightType.unsafeFromTag(s)
+      def tag(a: TwilightType) = a.tag
     }
 }

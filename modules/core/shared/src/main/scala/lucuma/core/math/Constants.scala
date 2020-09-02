@@ -14,8 +14,8 @@ object Constants {
   /** One AU in meters. */
   val AstronomicalUnit: Long = 149597870660L
 
-  /** Km/sec in 1 AU/day. */
-  val KmSInAUDay: Double = 1731.45683633
+  /** Meters/sec in 1 AU/day. */
+  val MetersPerSecondInAUPerDay: Double = 1731456.83633
 
   /** Flattening of earth, 1/298.257 */
   val FlatteningOfEarth: Double = 0.003352813
@@ -50,7 +50,7 @@ object Constants {
    */
 
   /** 2π, to higher precision than what you get in stdlib. */
-  val TwicePi: Double = 6.283185307179586476925286766559
+  val TwoPi: Double = 6.283185307179586476925286766559
 
   /** π/2, from Abramowitz & Stegun. */
   val HalfPi: Double = 1.57079632679490
