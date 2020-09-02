@@ -4,38 +4,40 @@
 package lucuma.core.math.geom.jts
 package demo
 
-import lucuma.core.math.{Angle, Offset}
+import lucuma.core.math.{ Angle, Offset }
+import lucuma.core.math.geom.GmosOiwfsProbeArm
+import lucuma.core.math.geom.GmosScienceAreaGeometry
 import lucuma.core.math.geom.ShapeExpression
 import lucuma.core.math.geom.jts.jvm.syntax.awt._
 import lucuma.core.math.geom.jts.interpreter._
 import lucuma.core.math.geom.syntax.shapeexpression._
 import lucuma.core.math.syntax.int._
 
-import java.awt.{List => _, _}
+import java.awt.{ List => _, _ }
 import java.awt.event._
 
 import scala.jdk.CollectionConverters._
 
 /**
- * Throwaway demo code to visualize a shape created using `ShapeExpression`s.
- */
+  * Throwaway demo code to visualize a shape created using `ShapeExpression`s.
+  */
 object JtsDemo extends Frame("JTS Demo") {
 
-  val posAngle: Angle         =
+  val posAngle: Angle =
     145.deg
 
   val guideStarOffset: Offset =
     Offset(170543999.µas.p, -24177003.µas.q)
 
-  val offsetPos: Offset       =
+  val offsetPos: Offset =
     Offset(60.arcsec.p, 60.arcsec.q)
 
   // TODO: should come from the FPUnit enum in core
-  val ifuOffset: Offset       =
+  val ifuOffset: Offset =
     Offset.Zero
 
   // TODO: when we move this core there should be an enum
-  val sideLooking: Boolean    =
+  val sideLooking: Boolean =
     true
 
   // Shape to display
@@ -68,7 +70,7 @@ object JtsDemo extends Frame("JTS Demo") {
 
     override def paint(g: Graphics): Unit = {
       val halfCanvas = canvasSize / 2
-      val g2d = g.asInstanceOf[Graphics2D]
+      val g2d        = g.asInstanceOf[Graphics2D]
       g2d.setRenderingHints(hints.asJava)
       g2d.setFont(g2d.getFont.deriveFont(8.0f))
       g2d.translate(halfCanvas, halfCanvas)
@@ -83,11 +85,18 @@ object JtsDemo extends Frame("JTS Demo") {
       val origStroke = g2d.getStroke
 
       // Use a light dotted line for the grid.
-      g2d.setStroke(new BasicStroke(0.5f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, Array(1.0f, 3.0f), 0.0f))
+      g2d.setStroke(
+        new BasicStroke(0.5f,
+                        BasicStroke.CAP_BUTT,
+                        BasicStroke.JOIN_MITER,
+                        10.0f,
+                        Array(1.0f, 3.0f),
+                        0.0f
+        )
+      )
 
       // Draw the grid.
-      (0 to (canvasSize.toDouble / gpx).floor.toInt/2).foreach { i =>
-
+      (0 to (canvasSize.toDouble / gpx).floor.toInt / 2).foreach { i =>
         // distance from center in pixels
         val dpx = (i * gpx).round.toInt
 
@@ -95,10 +104,10 @@ object JtsDemo extends Frame("JTS Demo") {
         val das = (i * Angle.signedDecimalArcseconds.get(gridSize).toDouble).round
 
         // Draw the labels (p increasing to the left, q increasing upward)
-        g2d.drawString(s"$das", -dpx + 5, - halfCanvas + 10)
-        if (das != 0L) g2d.drawString(s"-$das", dpx + 5, - halfCanvas + 10)
-        g2d.drawString(s"$das", - halfCanvas + 5, -dpx - 5)
-        if (das != 0L) g2d.drawString(s"-$das", - halfCanvas + 5, dpx - 5)
+        g2d.drawString(s"$das", -dpx + 5, -halfCanvas + 10)
+        if (das != 0L) g2d.drawString(s"-$das", dpx + 5, -halfCanvas + 10)
+        g2d.drawString(s"$das", -halfCanvas + 5, -dpx - 5)
+        if (das != 0L) g2d.drawString(s"-$das", -halfCanvas + 5, dpx - 5)
 
         // Draw the grid lines
         g2d.drawLine(-dpx, -halfCanvas, -dpx, halfCanvas)
@@ -123,9 +132,8 @@ object JtsDemo extends Frame("JTS Demo") {
     setSize(canvasSize, canvasSize)
 
     addWindowListener(new WindowAdapter() {
-      override def windowClosing(windowEvent: WindowEvent): Unit = {
+      override def windowClosing(windowEvent: WindowEvent): Unit =
         System.exit(0)
-      }
     })
 
     add(BorderLayout.CENTER, canvas)
