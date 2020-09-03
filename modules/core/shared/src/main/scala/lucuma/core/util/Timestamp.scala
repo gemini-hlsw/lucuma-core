@@ -4,7 +4,7 @@
 package lucuma.core.util
 
 import cats._
-import cats.implicits._
+import cats.syntax.all._
 import cats.effect.IO
 import lucuma.core.optics.Format
 import java.time.{ Instant, ZonedDateTime }

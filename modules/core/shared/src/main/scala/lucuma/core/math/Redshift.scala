@@ -4,7 +4,6 @@
 package lucuma.core.math
 
 import cats._
-import cats.implicits._
 import coulomb._
 import lucuma.core.math.units._
 

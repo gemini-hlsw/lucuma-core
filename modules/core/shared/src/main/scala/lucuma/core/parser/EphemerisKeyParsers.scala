@@ -7,7 +7,7 @@ import lucuma.core.model.EphemerisKey
 import lucuma.core.model.EphemerisKey._
 import atto._
 import Atto._
-import cats.implicits._
+import cats.syntax.all._
 
 /** Parser for [[lucuma.core.model.EphemerisKey]]. */
 trait EphemerisKeyParsers {

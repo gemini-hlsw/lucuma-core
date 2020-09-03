@@ -3,7 +3,7 @@
 
 package lucuma.core.math.skycalc
 
-import cats.implicits._
+import cats.syntax.all._
 import lucuma.core.math.JulianDate
 import lucuma.core.math.Constants._
 

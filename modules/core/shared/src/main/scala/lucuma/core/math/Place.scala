@@ -2,8 +2,6 @@
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.math
-
-import cats.implicits._
 import cats.Eq
 import cats.Show
 import java.time.ZoneId

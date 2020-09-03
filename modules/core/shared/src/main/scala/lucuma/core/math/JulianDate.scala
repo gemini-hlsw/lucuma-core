@@ -4,7 +4,6 @@
 package lucuma.core.math
 
 import cats.{ Order, Show }
-import cats.implicits._
 
 import java.time.{ Instant, LocalDateTime }
 import java.time.ZoneOffset.UTC

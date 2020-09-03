@@ -4,7 +4,6 @@
 package lucuma.core.math
 
 import cats.{ Order, Show }
-import cats.instances.int._
 import spire.math.Rational
 import scala.math.rint
 import lucuma.core.optics.Format

@@ -4,7 +4,6 @@
 package lucuma.core.model
 
 import cats._
-import cats.implicits._
 import lucuma.core.enum.MagnitudeBand
 import lucuma.core.enum.MagnitudeSystem
 import lucuma.core.math.MagnitudeValue

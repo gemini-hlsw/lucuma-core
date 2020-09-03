@@ -6,7 +6,7 @@ package core
 package data
 
 import cats._
-import cats.implicits._
+import cats.syntax.all._
 import monocle.Lens
 
 protected[data] trait ZipperFactory[Z[A] <: ZipperOps[A, Zipper[A]]] {

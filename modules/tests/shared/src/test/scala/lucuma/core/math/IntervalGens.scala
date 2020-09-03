@@ -3,7 +3,7 @@
 
 package lucuma.core.math
 
-import cats.implicits._
+import cats.syntax.all._
 import cats.Eq
 import java.time.Duration
 import java.time.Instant

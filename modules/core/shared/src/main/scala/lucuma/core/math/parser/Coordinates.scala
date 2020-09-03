@@ -3,7 +3,7 @@
 
 package lucuma.core.math.parser
 
-import cats.implicits._
+import cats.syntax.all._
 import atto._, Atto._
 import lucuma.core.math._
 

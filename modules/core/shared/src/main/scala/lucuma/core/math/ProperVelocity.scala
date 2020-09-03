@@ -4,7 +4,7 @@
 package lucuma.core.math
 
 import cats._
-import cats.implicits._
+import cats.syntax.all._
 import coulomb._
 import coulomb.accepted._
 import coulomb.cats.implicits._

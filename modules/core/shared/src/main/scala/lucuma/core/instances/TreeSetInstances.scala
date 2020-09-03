@@ -7,7 +7,7 @@ import cats._
 import cats.kernel.{ BoundedSemilattice, Hash, Order }
 import scala.collection.immutable.TreeSet
 import scala.annotation.tailrec
-import cats.implicits._
+import cats.syntax.all._
 
 trait TreeSetInstances extends TreeSetInstances1 {
 
