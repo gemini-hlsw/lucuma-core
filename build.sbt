@@ -97,8 +97,8 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform)
     name := "lucuma-core-tests",
     skip in publish := true,
     libraryDependencies ++= Seq(
-      "org.scalameta" %%% "munit"            % "0.7.11" % Test,
-      "org.typelevel" %%% "discipline-munit" % "0.2.4"  % Test
+      "org.scalameta" %%% "munit"            % "0.7.12" % Test,
+      "org.typelevel" %%% "discipline-munit" % "0.2.3"  % Test
     ),
     testFrameworks += new TestFramework("munit.Framework"),
     scalaJSLinkerConfig ~= (_.withModuleKind(ModuleKind.CommonJSModule))
