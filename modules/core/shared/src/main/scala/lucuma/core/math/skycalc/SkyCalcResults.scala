@@ -12,7 +12,11 @@ import lucuma.core.math.HourAngle
 import lucuma.core.math.Place
 import monocle.Getter
 
-/** Struct that holds results of SkyCalc. */
+/**
+  * Struct that holds results of SkyCalc.
+  *
+  * Raw values are held exclusively to compare with OCS output.
+  */
 final case class SkyCalcResults protected[skycalc] (
   protected[skycalc] val altitudeRaw:         Double,
   protected[skycalc] val azimuthRaw:          Double,

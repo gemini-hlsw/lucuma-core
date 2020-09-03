@@ -9,7 +9,7 @@ import cats._
 import coulomb._
 import coulomb.cats.implicits._
 import coulomb.si._
-import lucuma.core.math.PhysicalConstants._
+import lucuma.core.math.Constants._
 import lucuma.core.math.units._
 import monocle.Prism
 import spire.std.bigDecimal._

@@ -6,17 +6,19 @@ package solver
 
 import cats.tests.CatsSuite
 import java.time.Duration
+import lucuma.core.math.Coordinates
 import lucuma.core.math.Declination
 import lucuma.core.math.HourAngle
+import lucuma.core.math.Schedule
+import lucuma.core.math.IntervalGens
 import lucuma.core.math.skycalc.SkyCalcResults
-import lucuma.core.math.Coordinates
 import lucuma.core.enum.Site.GN
 
 /**
   * This is not meant to test the underlying SkyCalc implementations, we assume that this is all working,
   * this only tests the general mechanics of the ConstraintSolver instances.
   */
-final class ConstraintSolverSpec extends CatsSuite {
+final class ConstraintSolverSpec extends CatsSuite with IntervalGens {
 
   val testSamples =
     Samples.atFixedRate(buildInterval(0, 90), Duration.ofMillis(1L)) { i =>

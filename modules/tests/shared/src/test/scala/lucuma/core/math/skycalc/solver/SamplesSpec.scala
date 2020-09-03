@@ -8,6 +8,8 @@ import cats.Eq
 import cats.Eval
 import java.time.Duration
 import scala.collection.immutable.TreeMap
+import lucuma.core.math.Interval
+import lucuma.core.math.IntervalGens
 import lucuma.core.math.skycalc.solver.Samples.Bracket
 import org.scalacheck.Gen._
 import org.scalacheck.Arbitrary._
@@ -18,7 +20,7 @@ import cats.kernel.laws.discipline.EqTests
 import monocle.law.discipline.IsoTests
 import io.chrisdavenport.cats.time._
 
-final class SamplesSpec extends CatsSuite {
+final class SamplesSpec extends CatsSuite with IntervalGens {
   import ArbInterval._
   import ArbSamples._
   import ArbTime._

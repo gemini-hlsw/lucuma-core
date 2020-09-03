@@ -6,6 +6,8 @@ package lucuma.core.math.skycalc.solver
 import cats.implicits._
 import java.time.Duration
 import java.time.Instant
+import lucuma.core.math.Interval
+import lucuma.core.math.Schedule
 import io.chrisdavenport.cats.time._
 import scala.annotation.tailrec
 

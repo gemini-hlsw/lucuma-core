@@ -23,21 +23,26 @@ trait ArbPlace {
   private val MinAltitude: Int = 0
   private val MaxAltitude: Int = 8000
 
-  val genEarthAlt: Gen[NonNegInt] =
-    Gen.chooseNum(MinAltitude, MaxAltitude).map { a =>
-      refineV[NonNegative](a)
-        .getOrElse(sys.error("Min altitude is non negative"))
-    }
+  val genEarthAlt: Gen[Quantity[NonNegInt, Meter]] =
+    Gen
+      .chooseNum(MinAltitude, MaxAltitude)
+      .map { a =>
+        refineV[NonNegative](a)
+          .getOrElse(sys.error("Min altitude is non negative"))
+      }
+      .map(_.withUnit[Meter])
+
+  val genPlace: Gen[Place] =
+    for {
+      lat    <- arbitrary[Lat]
+      lon    <- arbitrary[Lon]
+      alt    <- genEarthAlt
+      zoneId <- arbitrary[ZoneId]
+    } yield Place(lat, lon, alt, zoneId)
+
 
   implicit val arbPlace: Arbitrary[Place] =
-    Arbitrary {
-      for {
-        lat      <- arbitrary[Lat]
-        lon      <- arbitrary[Lon]
-        alt      <- genEarthAlt.map(_.withUnit[Meter])
-        timezone <- arbitrary[ZoneId]
-      } yield Place(lat, lon, alt, timezone)
-    }
+    Arbitrary(genPlace)
 
   implicit val cogCoordinates: Cogen[Place] =
     Cogen[(Lat, Angle, BigDecimal)].contramap(loc =>

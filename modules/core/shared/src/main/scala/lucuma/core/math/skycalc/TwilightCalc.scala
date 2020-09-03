@@ -6,19 +6,24 @@ package lucuma.core.math.skycalc
 import cats.implicits._
 import java.time.Instant
 import java.time.LocalDate
+import lucuma.core.enum.TwilightType
+import lucuma.core.math.Interval
 import lucuma.core.math.JulianDate
 import lucuma.core.math.Place
-import lucuma.core.math.skycalc.Constants._
+import lucuma.core.math.Schedule
+import lucuma.core.math.Constants._
+import io.chrisdavenport.cats.time._
 
 trait TwilightCalc extends SunCalc {
 
-  /** Compute start and end of night for a particular date and place.
+  /**
+    * Compute start and end of night for a particular date and place.
     *
     * The night will be bounded by twilight as defined by
-    * [[lucuma.core.math.skycalc.TwilightBoundType]]. It will be the night that starts
+    * [[lucuma.core.enum.TwilightType]]. It will be the night that starts
     * on the given date and ends on the following day.
     *
-    * @param boundType twilight bound type to use
+    * @param twilightType twilight bound type to use
     * @param date date when the night starts
     * @param place place on Earth
     *
@@ -26,11 +31,11 @@ trait TwilightCalc extends SunCalc {
     * respectively, or None if there's no sunset or sunrise for the
     * provided parameters.
     */
-  def calculate(
-    boundType: TwilightBoundType,
-    date:      LocalDate,
-    place:     Place
-  ): Option[(Instant, Instant)] = {
+  def forDate(
+    twilightType: TwilightType,
+    date:         LocalDate,
+    place:        Place
+  ): Option[Interval] = {
     val nextMidnight = date.atStartOfDay(place.timezone).plusDays(1)
     val jdmid        = JulianDate.ofInstant(nextMidnight.toInstant)
 
@@ -41,23 +46,36 @@ trait TwilightCalc extends SunCalc {
     // sky brightness above them is the same, while the time when they see the sun dip below the horizon is not"
     // -- Andrew Stephens 2017-11-14
 
-    val angle: Double = boundType match {
-      case TwilightBoundType.Official =>
+    val angle: Double = twilightType match {
+      case TwilightType.Official =>
         // Horizon geometric correction from p. 24 of the Skycalc manual: sqrt(2 * elevation / Re) (radians)
-        boundType.horizonAngle + Math.sqrt(
+        twilightType.horizonAngle.toAngle.toSignedDoubleDegrees + Math.sqrt(
           2.0 * place.altitudeDouble / EquatorialRadiusMeters
         ) * DegsInRadian
-      case _                          => boundType.horizonAngle
+      case _                     => twilightType.horizonAngle.toAngle.toSignedDoubleDegrees
     }
 
-    calcTimes(angle, jdmid, place)
+    calcTimes(angle, jdmid, place).flatMap(Interval.fromInstants.getOption)
+  }
+
+  def forInterval(
+    twilightType: TwilightType,
+    interval:     Interval,
+    place:        Place
+  ): Schedule = {
+    val startDate         = interval.start.atZone(place.timezone).toLocalDate
+    val endDate           = interval.end.atZone(place.timezone).toLocalDate
+    val dates             =
+      List.unfold(startDate)(date => if (date <= endDate) (date, date.plusDays(1)).some else none)
+    val twilightIntervals = dates.flatMap(d => forDate(twilightType, d, place))
+    Schedule.fromIntervals.get(twilightIntervals).intersection(interval)
   }
 
   private def calcTimes(
     angle: Double,
     jdmid: JulianDate,
     place: Place
-  ): Option[(Instant, Instant)] = { // (Start, End)
+  ): Option[(Instant, Instant)] = { // (sunset, sunrise)
     val (rasun, decsun) = lpsun(jdmid)
 
     val lat    = place.latitude.toAngle.toSignedDoubleDegrees

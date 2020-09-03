@@ -7,6 +7,7 @@ package util
 
 import cats.Order
 import cats.implicits._
+import monocle.Prism
 
 /**
   * Typeclass for an enumerated type with unique string tags and a canonical ordering.
@@ -35,7 +36,7 @@ trait Enumerated[A] extends Order[A] {
 
 }
 
-object Enumerated {
+object Enumerated    {
   def apply[A](implicit ev: Enumerated[A]): ev.type = ev
 
   def of[A <: Product](a: A, as: A*): Enumerated[A] =
@@ -44,6 +45,8 @@ object Enumerated {
       def tag(a: A): String = a.productPrefix
     }
 
+  def fromTag[A](implicit ev: Enumerated[A]): Prism[String, A] =
+    Prism[String, A](ev.fromTag)(e => ev.tag(e))
 }
 
 /** @group Typeclasses */
@@ -51,4 +54,3 @@ trait Obsoletable[A] {
   def isActive(a:         A): Boolean
   final def isObsolete(a: A): Boolean = !isActive(a)
 }
-

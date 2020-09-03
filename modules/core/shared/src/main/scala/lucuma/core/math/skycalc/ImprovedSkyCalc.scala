@@ -5,7 +5,7 @@ package lucuma.core.math.skycalc
 
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Place
-import lucuma.core.math.skycalc.Constants._
+import lucuma.core.math.Constants._
 import java.time.Instant
 import java.time.ZonedDateTime
 

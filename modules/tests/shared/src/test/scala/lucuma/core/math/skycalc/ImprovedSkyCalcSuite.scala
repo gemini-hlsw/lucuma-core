@@ -8,11 +8,12 @@ import munit.FunSuite
 import java.time._
 import lucuma.core.math.Coordinates
 import lucuma.core.enum.Site
+import org.scalactic.Tolerance
 
 // This is just a basic case, mostly to test linking in JS.
 // Property based testing is in ImprovedSkyCalcSpecJVM, where output
 // is compared to the one from {edu.gemini.skycalc} in Java.
-final class ImprovedSkyCalcSpec extends FunSuite {
+final class ImprovedSkyCalcSuite extends FunSuite with Tolerance {
 
   private val NanosPerMillis: Int = 1_000_000
 
@@ -34,12 +35,13 @@ final class ImprovedSkyCalcSpec extends FunSuite {
       (Site.GS, M51, Moment) -> -72.26086414073282
     )
 
-  test("ImprovedSkyCalcSpec: Elevation of M51 at midnight 2000-01-01 UTC") {
+  test("Elevation of M51 at midnight 2000-01-01 UTC") {
     expected.foreach {
       case ((site, coords, instant), elevation) =>
         val calc    = ImprovedSkyCalc(site.place)
         val results = calc.calculate(coords, instant, false)
-        assertEquals(results.altitudeRaw, elevation)
+        // We use constants with more precision
+        assert((results.altitudeRaw +- 1e-12).isWithin(elevation))
     }
   }
 }
