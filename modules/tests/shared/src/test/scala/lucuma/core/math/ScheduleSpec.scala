@@ -142,8 +142,14 @@ final class ScheduleSpec extends CatsSuite with IntervalGens {
     forAll { (s: Schedule, z: ZoneId, t: LocalTime) =>
       val allDay = s.toFullDays(z, t)
       assert(allDay.union(s) === allDay)
-      assert(allDay.intervals.forall(_.start.atZone(z).toLocalTime === t))
-      assert(allDay.intervals.forall(_.end.atZone(z).toLocalTime === t))
+      // We can't comparte LocalTimes directly since the LocalTime may not exist at
+      // the given day if there was a DST transition.
+      allDay.intervals.foreach { interval =>
+        val start = interval.start.atZone(z)
+        assert(start === start.`with`(t))
+        val end   = interval.end.atZone(z)
+        assert(end === end.`with`(t))
+      }
     }
   }
 

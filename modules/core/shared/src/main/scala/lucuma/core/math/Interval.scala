@@ -86,6 +86,8 @@ sealed abstract case class Interval protected (start: Instant, end: Instant) {
   /**
     * Convert to the minimal full-day interval that includes this interval.
     *
+    * Hours in interval may not be a multiple of 24 if there's a DST transition in the resulting interval.
+    *
     * @param zone the timezone where the start of the day should be computed
     * @param startOfDay time at which the day starts
     */
@@ -95,8 +97,10 @@ sealed abstract case class Interval protected (start: Instant, end: Instant) {
     val endAtZone   = end.atZone(zone)
     val newEnd      = endAtZone.`with`(startOfDay)
     Interval.unsafe(
-      if (newStart <= startAtZone) newStart.toInstant else newStart.minusDays(1).toInstant,
-      if (newEnd >= endAtZone) newEnd.toInstant else newEnd.plusDays(1).toInstant
+      if (newStart <= startAtZone) newStart.toInstant
+      else newStart.minusDays(1).`with`(startOfDay).toInstant,
+      if (newEnd >= endAtZone) newEnd.toInstant
+      else newEnd.plusDays(1).`with`(startOfDay).toInstant
     )
   }
 }

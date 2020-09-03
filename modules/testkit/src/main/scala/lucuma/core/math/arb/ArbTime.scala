@@ -53,6 +53,8 @@ trait ArbTime {
     }
 
   // Special case for instants in transitions
+  // We can't cache this in a TrieMap since it's not available in Scala.js,
+  // and it doesn't seem worthwhile dealing with Java's ConcurrentMap for this.
   private def transitions(zid: ZoneId): List[Instant] = {
     val span  = Period.ofYears(50)
     val now   = Instant.now.atZone(zid)
@@ -62,10 +64,7 @@ trait ArbTime {
       Option(zid.getRules.nextTransition(i)).flatMap(transition =>
         transition.getInstant.some
           .filter(_ < end)
-          .map(instant =>
-            // Get an Instant smack in the middle of the transition.
-            (instant.plus(transition.getDuration.dividedBy(2)), instant)
-          )
+          .map(instant => (instant, instant))
       )
     )
   }
