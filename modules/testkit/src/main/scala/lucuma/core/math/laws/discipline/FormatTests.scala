@@ -5,7 +5,6 @@ package lucuma.core.math.laws
 package discipline
 
 import cats.Eq
-import cats.instances.option._
 import lucuma.core.math.optics.Format
 import org.scalacheck.{ Arbitrary, Gen }
 import org.scalacheck.Prop._

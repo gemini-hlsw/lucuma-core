@@ -3,7 +3,7 @@
 
 package lucuma.core.math.arb
 
-import cats.implicits._
+import cats.syntax.all._
 import lucuma.core.math.skycalc.solver.Interval
 import lucuma.core.math.skycalc.solver.Schedule
 import org.scalacheck._

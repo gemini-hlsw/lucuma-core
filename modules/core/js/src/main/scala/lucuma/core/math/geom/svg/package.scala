@@ -6,7 +6,7 @@ package lucuma.core.math.geom
 import scala.scalajs.js.JSConverters._
 
 import cats._
-import cats.implicits._
+import cats.syntax.all._
 import gpp.svgdotjs.svgdotjsSvgJs.mod.ArrayXY
 import gpp.svgdotjs.svgdotjsSvgJs.mod.Container
 import gpp.svgdotjs.svgdotjsSvgJs.mod.PointArray

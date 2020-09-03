@@ -4,7 +4,7 @@
 package lucuma.core.math
 
 import cats._
-import cats.implicits._
+import cats.syntax.all._
 import java.time.Instant
 import monocle.Lens
 import monocle.macros.GenLens

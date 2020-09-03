@@ -6,7 +6,7 @@ package core
 package util
 
 import cats.Order
-import cats.implicits._
+import cats.syntax.all._
 
 /**
   * Typeclass for an enumerated type with unique string tags and a canonical ordering.

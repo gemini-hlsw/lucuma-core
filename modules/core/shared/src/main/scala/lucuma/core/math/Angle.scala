@@ -5,7 +5,6 @@ package lucuma.core.math
 
 import cats.{ Eq, Order, Show }
 import cats.kernel.CommutativeGroup
-import cats.instances.long._
 import cats.syntax.eq._
 import lucuma.core.math.parser.AngleParsers
 import lucuma.core.math.syntax.parser._
@@ -288,7 +287,7 @@ object Angle extends AngleOptics {
    * The calculation is such that you get the minimal angle in the range [0 .. π]
    */
   def difference(α: Angle, ϐ: Angle): Angle = {
-    import cats.implicits._ // To get order syntax
+    import cats.syntax.all._ // To get order syntax
     implicit val order: Order[Angle] = AngleOrder
 
     val δ: Angle = α - ϐ

@@ -3,7 +3,7 @@
 
 package lucuma.core.math.skycalc.solver
 
-import cats.implicits._
+import cats.syntax.all._
 import java.time.Duration
 import java.time.Instant
 import io.chrisdavenport.cats.time._

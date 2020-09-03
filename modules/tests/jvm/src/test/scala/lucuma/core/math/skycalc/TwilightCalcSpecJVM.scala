@@ -7,7 +7,7 @@ import munit.ScalaCheckSuite
 import org.scalacheck.Prop._
 
 import cats._
-import cats.implicits._
+import cats.syntax.all._
 import lucuma.core.math.skycalc.TwilightCalc
 import java.time.LocalDate
 import lucuma.core.math.Place

@@ -4,7 +4,7 @@
 package lucuma.core.math.laws
 
 import cats.Eq
-import cats.implicits._
+import cats.syntax.all._
 import lucuma.core.math.optics.SplitEpi
 
 final case class SplitEpiLaws[A, B](fab: SplitEpi[A, B]) {

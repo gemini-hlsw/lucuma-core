@@ -8,7 +8,7 @@ import lucuma.core.math.{ Angle, Offset }
 import lucuma.core.math.syntax.int._
 import lucuma.core.math.geom.syntax.all._
 
-import cats.implicits._
+import cats.syntax.all._
 import scala.math.{ Pi, asin, atan2, hypot, sin }
 
 // TODO: move to core

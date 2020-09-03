@@ -5,7 +5,7 @@ package lucuma.core.math
 
 import cats.Order
 import cats.Show
-import cats.implicits._
+import cats.syntax.all._
 import coulomb._
 import coulomb.cats.implicits._
 import eu.timepit.refined._

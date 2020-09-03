@@ -4,7 +4,7 @@
 package lucuma.core.math.laws
 
 import cats.Eq
-import cats.implicits._
+import cats.syntax.all._
 import lucuma.core.math.optics.Format
 
 final case class FormatLaws[A, B](fab: Format[A, B]) {

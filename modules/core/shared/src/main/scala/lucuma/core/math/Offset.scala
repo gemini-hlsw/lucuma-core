@@ -5,7 +5,7 @@ package lucuma.core.math
 
 import cats.{Order, Show}
 import cats.kernel.CommutativeGroup
-import cats.implicits._
+import cats.syntax.all._
 import lucuma.core.math.optics.SplitMono
 import monocle.{Iso, Lens}
 import monocle.macros.{GenIso, GenLens}

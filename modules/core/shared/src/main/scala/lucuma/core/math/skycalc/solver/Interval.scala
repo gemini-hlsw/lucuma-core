@@ -3,7 +3,7 @@
 
 package lucuma.core.math.skycalc.solver
 
-import cats.implicits._
+import cats.syntax.all._
 import cats.Eq
 import cats.Order
 import cats.Show

@@ -4,7 +4,6 @@
 package lucuma.core.model
 
 import cats._
-import cats.implicits._
 
 import lucuma.core.math.ProperMotion
 

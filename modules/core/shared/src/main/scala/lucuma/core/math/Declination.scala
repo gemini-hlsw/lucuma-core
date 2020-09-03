@@ -4,7 +4,6 @@
 package lucuma.core.math
 
 import cats.{ Order, Show }
-import cats.instances.long._
 import lucuma.core.math.syntax.all._
 import lucuma.core.math.optics.Format
 import monocle.Prism

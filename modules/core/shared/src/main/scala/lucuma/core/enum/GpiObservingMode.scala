@@ -6,7 +6,6 @@ package core
 package enum
 
 import cats.Eval
-import cats.instances.string._
 import cats.syntax.eq._
 import lucuma.core.util.Enumerated
 import lucuma.core.math.MagnitudeValue

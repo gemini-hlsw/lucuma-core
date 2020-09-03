@@ -10,7 +10,6 @@ import lucuma.core.math.syntax.string._
 import lucuma.core.math.optics.Format
 
 import cats.{ Order, Show }
-import cats.implicits._
 import monocle.macros.Lenses
 
 /** Ephemeris data lookup key which uniquely identifies a non-sidreal object in

@@ -3,7 +3,7 @@
 
 package lucuma.core.math.skycalc.solver
 
-import cats.implicits._
+import cats.syntax.all._
 import java.time.Instant
 import lucuma.core.math.Angle
 import lucuma.core.math.Declination

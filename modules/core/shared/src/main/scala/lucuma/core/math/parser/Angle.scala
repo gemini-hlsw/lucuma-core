@@ -4,7 +4,7 @@
 package lucuma.core.math.parser
 
 import atto._, Atto._
-import cats.implicits._
+import cats.syntax.all._
 import lucuma.core.math.{ Angle, HourAngle }
 
 /** Parsers for `[[lucuma.core.math.Angle]].` */

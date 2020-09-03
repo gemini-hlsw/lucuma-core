@@ -4,7 +4,6 @@
 package lucuma.core.math.skycalc
 
 import cats._
-import cats.implicits._
 
 /**
   * Definition for how the range from sunset to sunrise should be defined for
