@@ -1,7 +1,7 @@
 // Copyright (c) 2016-2020 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package lucuma.core.math.geom
+package lucuma.core.geom
 
 import scala.scalajs.js.JSConverters._
 
@@ -12,7 +12,7 @@ import gpp.svgdotjs.svgdotjsSvgJs.mod.Container
 import gpp.svgdotjs.svgdotjsSvgJs.mod.PointArray
 import gpp.svgdotjs.svgdotjsSvgJs.mod.{ Array => SVGArray }
 import gpp.svgdotjs.svgdotjsSvgJs.mod.Element
-import lucuma.core.math.geom.jts.JtsShape
+import lucuma.core.geom.jts.JtsShape
 import org.locationtech.jts.geom.Coordinate
 import org.locationtech.jts.geom.Geometry
 import org.locationtech.jts.geom.GeometryCollection
@@ -20,7 +20,7 @@ import org.locationtech.jts.geom.Polygon
 import cats.data.NonEmptyList
 import cats.data.NonEmptyMap
 
-package object svg {
+package object svg   {
   type ScalingFn        = Double => Double
   type SvgPostProcessor = Element => Element
 
@@ -132,13 +132,14 @@ package svg {
           val containerGroup = base.group()
           containerGroup.addClass("jts-root-group")
           // We should calculate the viewbox of the whole geometry
-          val composite = a.map(_.g).reduce(svg.geometryUnionSemigroup)
+          val composite      = a.map(_.g).reduce(svg.geometryUnionSemigroup)
           a.map(_.g).toList.map(_.toSvg(containerGroup, pp, scalingFn))
-          val envelope = composite.getBoundary.getEnvelopeInternal
+          val envelope       = composite.getBoundary.getEnvelopeInternal
           base.viewbox(scalingFn(envelope.getMinX),
                        scalingFn(envelope.getMinY),
                        scalingFn(envelope.getWidth),
-                       scalingFn(envelope.getHeight))
+                       scalingFn(envelope.getHeight)
+          )
           // Note the svg is reversed on y but we'll let clients do the flip
           pp(base).asInstanceOf[Container]
         }
@@ -154,7 +155,7 @@ package svg {
         ): Container = {
           // Safari doesn't support transformations on the svg directly, but it can transfor a group below it
           val containerGroup = base.group()
-          
+
           containerGroup.addClass("jts-root-group")
           // We should calculate the viewbox of the whole geometry
           val composite = a.toNonEmptyList.map(_.g).reduce(geometryUnionSemigroup)
@@ -164,11 +165,12 @@ package svg {
               // Set an id per geometry
               c.id(id)
           }
-          val envelope = composite.getBoundary.getEnvelopeInternal
+          val envelope  = composite.getBoundary.getEnvelopeInternal
           base.viewbox(scalingFn(envelope.getMinX),
                        scalingFn(envelope.getMinY),
                        scalingFn(envelope.getWidth),
-                       scalingFn(envelope.getHeight))
+                       scalingFn(envelope.getHeight)
+          )
           // Note the svg is reversed on y but we'll let clients do the flip
           base
         }
