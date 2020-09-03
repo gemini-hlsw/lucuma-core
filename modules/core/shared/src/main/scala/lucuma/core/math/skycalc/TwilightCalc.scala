@@ -10,6 +10,7 @@ import lucuma.core.math.JulianDate
 import lucuma.core.math.Place
 import lucuma.core.math.Schedule
 import lucuma.core.math.Constants._
+import cats.syntax.all._
 import io.chrisdavenport.cats.time._
 
 trait TwilightCalc extends SunCalc {
