@@ -3,7 +3,7 @@
 
 package lucuma.core.math.syntax
 
-import lucuma.core.math.optics.Format
+import lucuma.core.optics.Format
 import monocle.Prism
 
 final class PrismOps[A, B](val self: Prism[A, B]) extends AnyVal {

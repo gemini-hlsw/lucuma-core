@@ -4,7 +4,7 @@
 package lucuma.core.model
 
 import lucuma.core.util.Timestamp
-import lucuma.core.math.optics.SplitMono
+import lucuma.core.optics.SplitMono
 import lucuma.core.math.syntax.treemap._
 
 import cats.{ Eq, Foldable, Monoid }

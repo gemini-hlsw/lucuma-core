@@ -7,7 +7,7 @@ import cats.{ Order, Show }
 import cats.instances.int._
 import spire.math.Rational
 import scala.math.rint
-import lucuma.core.math.optics.Format
+import lucuma.core.optics.Format
 
 /**
   * Exact magnitude value represented as an int with the original value scaled up

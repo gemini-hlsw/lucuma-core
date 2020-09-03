@@ -6,7 +6,7 @@ package lucuma.core.math
 import cats.tests.CatsSuite
 import cats.kernel.laws.discipline._
 import lucuma.core.math.arb.ArbParallax._
-import lucuma.core.math.laws.discipline._
+import lucuma.core.optics.laws.discipline._
 import spire.math.Rational
 
 final class ParallaxSpec extends CatsSuite {

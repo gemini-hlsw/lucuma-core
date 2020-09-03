@@ -3,14 +3,14 @@
 
 package lucuma.core.math
 
-import cats.{Order, Show}
+import cats.{ Order, Show }
 import cats.kernel.CommutativeGroup
 import cats.implicits._
-import lucuma.core.math.optics.SplitMono
-import monocle.{Iso, Lens}
-import monocle.macros.{GenIso, GenLens}
+import lucuma.core.optics.SplitMono
+import monocle.{ Iso, Lens }
+import monocle.macros.{ GenIso, GenLens }
 
-import scala.math.{cos, sin}
+import scala.math.{ cos, sin }
 
 object Axis {
   type P
@@ -29,21 +29,21 @@ final case class Offset(p: Offset.Component[Axis.P], q: Offset.Component[Axis.Q]
     Offset(p + o.p, q + o.q)
 
   /**
-   * Component-wise subtraction of this offset and `o`. Exact.
-   *
-   * `this - o === this + -o`
-   */
+    * Component-wise subtraction of this offset and `o`. Exact.
+    *
+    * `this - o === this + -o`
+    */
   def -(o: Offset): Offset =
     Offset(p - o.p, q - o.q)
 
   /**
-   * Rotates the offset around the origin (counterclockwise) and produces a
-   * new `Offset` at the resulting location. Approximate, non-invertible.
-   *
-   * @param θ rotation angle
-   *
-   * @return Offset at the new position
-   */
+    * Rotates the offset around the origin (counterclockwise) and produces a
+    * new `Offset` at the resulting location. Approximate, non-invertible.
+    *
+    * @param θ rotation angle
+    *
+    * @return Offset at the new position
+    */
   def rotate(θ: Angle): Offset =
     Offset.rotateBy(θ)(this)
 
@@ -98,6 +98,7 @@ object Offset extends OffsetOptics {
   }
 
   object Component extends ComponentOptics {
+
     /** The zero [A] component. */
     def Zero[A]: Component[A] =
       Component[A](Angle.Angle0)
@@ -119,6 +120,7 @@ object Offset extends OffsetOptics {
   }
 
   trait ComponentOptics {
+
     /** @group Optics */
     def angle[A]: Iso[Component[A], Angle] =
       GenIso[Component[A], Angle]
@@ -139,7 +141,8 @@ object Offset extends OffsetOptics {
 
     val angle: Iso[Component[A], Angle] = Component.angle[A]
 
-    val signedDecimalArcseconds: SplitMono[Component[A], BigDecimal] = Component.signedDecimalArcseconds[A]
+    val signedDecimalArcseconds: SplitMono[Component[A], BigDecimal] =
+      Component.signedDecimalArcseconds[A]
   }
 
   object P extends ComponentCompanion[Axis.P]
@@ -147,18 +150,21 @@ object Offset extends OffsetOptics {
   object Q extends ComponentCompanion[Axis.Q]
 
   /**
-   * Produces a function that will calculate `Offset` positions rotated by
-   * the given angle θ (counterclockwise).  Approximate, non-invertible.
-   *
-   * @param θ rotation angle
-   */
+    * Produces a function that will calculate `Offset` positions rotated by
+    * the given angle θ (counterclockwise).  Approximate, non-invertible.
+    *
+    * @param θ rotation angle
+    */
   def rotateBy(θ: Angle): Offset => Offset = {
-    val r  = θ.toSignedDoubleRadians
-    Offset.signedMicroarcseconds.modify { case (pµ, qµ) => (
-      // p is converted to normal cartesian coordinates and back here
-      -(-pµ * cos(r) - qµ * sin(r)).round,
-       (-pµ * sin(r) + qµ * cos(r)).round
-    )}
+    val r = θ.toSignedDoubleRadians
+    Offset.signedMicroarcseconds.modify {
+      case (pµ, qµ) =>
+        (
+          // p is converted to normal cartesian coordinates and back here
+          -(-pµ * cos(r) - qµ * sin(r)).round,
+          (-pµ * sin(r) + qµ * cos(r)).round
+        )
+    }
   }
 
 }
@@ -175,11 +181,11 @@ trait OffsetOptics {
 
   /** @group Optics */
   val pAngle: Lens[Offset, Angle] =
-    p composeIso Offset.Component.angle[Axis.P]
+    p.composeIso(Offset.Component.angle[Axis.P])
 
   /** @group Optics */
   val qAngle: Lens[Offset, Angle] =
-    q composeIso Offset.Component.angle[Axis.Q]
+    q.composeIso(Offset.Component.angle[Axis.Q])
 
   private def splitMonoFromAngleSplitMono[A](m: SplitMono[Angle, A]): SplitMono[Offset, (A, A)] =
     SplitMono(

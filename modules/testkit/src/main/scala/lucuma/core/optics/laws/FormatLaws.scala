@@ -1,11 +1,11 @@
 // Copyright (c) 2016-2020 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package lucuma.core.math.laws
+package lucuma.core.optics.laws
 
 import cats.Eq
 import cats.implicits._
-import lucuma.core.math.optics.Format
+import lucuma.core.optics.Format
 
 final case class FormatLaws[A, B](fab: Format[A, B]) {
 

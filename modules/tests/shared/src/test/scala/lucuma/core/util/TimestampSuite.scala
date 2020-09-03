@@ -6,7 +6,7 @@ package lucuma.core.util
 import lucuma.core.util.Timestamp
 import lucuma.core.util.arb.ArbTimestamp._
 import lucuma.core.math.arb.ArbTime._
-import lucuma.core.math.laws.discipline._
+import lucuma.core.optics.laws.discipline._
 
 import cats.implicits._
 import io.chrisdavenport.cats.time._

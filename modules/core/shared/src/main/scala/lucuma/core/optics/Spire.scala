@@ -1,13 +1,13 @@
 // Copyright (c) 2016-2020 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package lucuma.core.math.optics
+package lucuma.core.optics
 
 import spire.math._
 import scala.util.Try
 import monocle.Iso
-import lucuma.core.math.optics.Format
-import lucuma.core.math.optics.SplitEpi
+import lucuma.core.optics.Format
+import lucuma.core.optics.SplitEpi
 
 object Spire {
   val numberInt: SplitEpi[Number, Int] = SplitEpi(_.intValue, Number.apply)

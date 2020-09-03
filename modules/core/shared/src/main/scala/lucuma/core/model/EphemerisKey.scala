@@ -7,7 +7,7 @@ import lucuma.core.enum.EphemerisKeyType
 import lucuma.core.model.parser.EphemerisKeyParsers
 import lucuma.core.math.syntax.parser._
 import lucuma.core.math.syntax.string._
-import lucuma.core.math.optics.Format
+import lucuma.core.optics.Format
 
 import cats.{ Order, Show }
 import cats.implicits._

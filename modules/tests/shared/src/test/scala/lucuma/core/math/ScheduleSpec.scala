@@ -15,7 +15,7 @@ import org.scalacheck.Gen
 import lucuma.core.math.arb._
 import io.chrisdavenport.cats.time._
 import cats.kernel.laws.discipline.EqTests
-import lucuma.core.math.laws.discipline.SplitEpiTests
+import lucuma.core.optics.laws.discipline.SplitEpiTests
 import monocle.law.discipline.PrismTests
 import cats.kernel.laws.discipline.BoundedSemilatticeTests
 

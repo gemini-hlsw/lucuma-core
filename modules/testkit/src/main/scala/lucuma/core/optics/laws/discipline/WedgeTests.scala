@@ -1,11 +1,11 @@
 // Copyright (c) 2016-2020 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package lucuma.core.math.laws
+package lucuma.core.optics.laws
 package discipline
 
 import cats.Eq
-import lucuma.core.math.optics.Wedge
+import lucuma.core.optics.Wedge
 import org.scalacheck.{ Arbitrary, Gen }
 import org.scalacheck.Prop._
 import org.typelevel.discipline.Laws
@@ -13,11 +13,14 @@ import org.typelevel.discipline.Laws
 trait WedgeTests[A, B] extends Laws {
   val laws: WedgeLaws[A, B]
 
-  def wedge(
-    implicit aa: Arbitrary[A], ea: Eq[A],
-             ab: Arbitrary[B], eb: Eq[B]
+  def wedge(implicit
+    aa: Arbitrary[A],
+    ea: Eq[A],
+    ab: Arbitrary[B],
+    eb: Eq[B]
   ): RuleSet =
-    new SimpleRuleSet("Wedge",
+    new SimpleRuleSet(
+      "Wedge",
       "normalize A"                     -> forAll((a: A) => laws.normalizeA(a)),
       "normalize B"                     -> forAll((b: B) => laws.normalizeB(b)),
       "reverseGet reverseGet roundtrip" -> forAll((a: A) => laws.normalizedGetRoundTrip(a)),
@@ -27,9 +30,10 @@ trait WedgeTests[A, B] extends Laws {
     )
 
   /** Convenience constructor that allows passing an explicit generator for input values. */
-  def splitMonoWith(ga: Gen[A])(
-    implicit ea: Eq[A],
-             ab: Arbitrary[B], eb: Eq[B]
+  def splitMonoWith(ga: Gen[A])(implicit
+    ea:                 Eq[A],
+    ab:                 Arbitrary[B],
+    eb:                 Eq[B]
   ): RuleSet =
     wedge(Arbitrary(ga), ea, ab, eb)
 

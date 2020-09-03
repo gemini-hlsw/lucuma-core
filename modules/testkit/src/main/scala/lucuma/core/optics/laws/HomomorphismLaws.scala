@@ -1,9 +1,9 @@
 // Copyright (c) 2016-2020 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package lucuma.core.math.laws
+package lucuma.core.optics.laws
 
-import cats.{ Semigroup, Monoid, Group }
+import cats.{ Group, Monoid, Semigroup }
 
 abstract class SemigroupHomomorphismLaws[A, B](f: A => B) {
   val A: Semigroup[A]

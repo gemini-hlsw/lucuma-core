@@ -13,7 +13,7 @@ import java.time.LocalTime
 import java.time.ZoneId
 import monocle.Getter
 import monocle.Prism
-import lucuma.core.math.optics.Format
+import lucuma.core.optics.Format
 import io.chrisdavenport.cats.time._
 
 /**

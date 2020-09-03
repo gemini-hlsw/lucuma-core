@@ -1,26 +1,26 @@
 // Copyright (c) 2016-2020 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package lucuma.core.math.optics
+package lucuma.core.optics
 
 import cats.Functor
 import cats.arrow.Category
 import monocle.{ Fold, Getter, Iso }
 
 /**
- * A split monomorphism, which we can think of as a weaker `Iso[A, B]` where `A` is a ''smaller''
- . type. So `get andThen reverseGet andThen` remains an identity but `reverseGet andThen get` is merely
- * idempotent (i.e., it normalizes values in `B`). The following statements hold:
- *
- *  - `reverseGet` is a ''retraction'' of `get`,
- *  - `get` is a ''section'' of `reverseGet`,
- *  - `A` is a ''retract'' of `B`,
- *  - the pair `(reverseGet, get)` is a ''splitting'' of the idempotent `reverseGet andThen get`.
- *
- * @param get  section of `reverseGet` such that `get andThen reverseGet` is an identity
- * @param reverseGet any function B => A
- * @see [[https://ncatlab.org/nlab/show/split+monomorphism Split Monomorphism]] at nLab
- */
+  * A split monomorphism, which we can think of as a weaker `Iso[A, B]` where `A` is a ''smaller''
+  * . type. So `get andThen reverseGet andThen` remains an identity but `reverseGet andThen get` is merely
+  * idempotent (i.e., it normalizes values in `B`). The following statements hold:
+  *
+  *  - `reverseGet` is a ''retraction'' of `get`,
+  *  - `get` is a ''section'' of `reverseGet`,
+  *  - `A` is a ''retract'' of `B`,
+  *  - the pair `(reverseGet, get)` is a ''splitting'' of the idempotent `reverseGet andThen get`.
+  *
+  * @param get  section of `reverseGet` such that `get andThen reverseGet` is an identity
+  * @param reverseGet any function B => A
+  * @see [[https://ncatlab.org/nlab/show/split+monomorphism Split Monomorphism]] at nLab
+  */
 final case class SplitMono[A, B](get: A => B, reverseGet: B => A) {
 
   /** Modify the target of the SplitMono using a function. */
@@ -37,15 +37,15 @@ final case class SplitMono[A, B](get: A => B, reverseGet: B => A) {
 
   /** Compose with another SplitMono. */
   def composeSplitMono[C](f: SplitMono[B, C]): SplitMono[A, C] =
-    SplitMono(get andThen f.get, reverseGet compose f.reverseGet)
+    SplitMono(get.andThen(f.get), reverseGet.compose(f.reverseGet))
 
   /** Compose with another SplitEpi. */
   def composeSplitEpi[C](f: SplitEpi[B, C]): Wedge[A, C] =
-    Wedge(get andThen f.get, reverseGet compose f.reverseGet)
+    Wedge(get.andThen(f.get), reverseGet.compose(f.reverseGet))
 
   /** Compose with an Iso. */
   def composeIso[C](f: Iso[B, C]): SplitMono[A, C] =
-    SplitMono(get andThen f.get, reverseGet compose f.reverseGet)
+    SplitMono(get.andThen(f.get), reverseGet.compose(f.reverseGet))
 
   /** View this SplitEpi as a Fold. */
   def asFold: Fold[A, B] =
@@ -69,16 +69,16 @@ final case class SplitMono[A, B](get: A => B, reverseGet: B => A) {
 
   /** SplitMono is an invariant functor over A. */
   def imapA[C](f: A => C, g: C => A): SplitMono[C, B] =
-    SplitMono(g andThen get, reverseGet andThen f)
+    SplitMono(g.andThen(get), reverseGet.andThen(f))
 
   /** SplitMono is an invariant functor over B. */
   def imapB[C](f: C => B, g: B => C): SplitMono[A, C] =
-    SplitMono(get andThen g, f andThen reverseGet)
+    SplitMono(get.andThen(g), f.andThen(reverseGet))
 
   /**
-   * reverseGet and get, yielding a normalized formatted value. Subsequent reverseGet/get cycles are
-   * idempotent.
-   */
+    * reverseGet and get, yielding a normalized formatted value. Subsequent reverseGet/get cycles are
+    * idempotent.
+    */
   def normalize(b: B): B =
     get(reverseGet(b))
 

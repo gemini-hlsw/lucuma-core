@@ -7,18 +7,18 @@ import cats.{ Order, Show }
 import cats.implicits._
 import lucuma.core.math.parser.EpochParsers
 import lucuma.core.math.syntax.parser._
-import lucuma.core.math.optics.Format
+import lucuma.core.optics.Format
 import java.time._
 
 /**
- * An epoch, the astronomer's equivalent of `Instant`, based on a fractional year in some temporal
- * scheme (Julian or Besselian) that determines year zero and the length of a year. The only
- * meaningful operation for an `Epoch` is to ask the elapsed epoch-years between it and some other
- * point in time. We need this for proper motion corrections because velocities are measured in
- * motion per epoch-year. The epoch year is stored internally as integral milliyears.
- * @param scheme This `Epoch`'s temporal scheme.
- * @see The Wikipedia [[https://en.wikipedia.org/wiki/Epoch_(astronomy) article]]
- */
+  * An epoch, the astronomer's equivalent of `Instant`, based on a fractional year in some temporal
+  * scheme (Julian or Besselian) that determines year zero and the length of a year. The only
+  * meaningful operation for an `Epoch` is to ask the elapsed epoch-years between it and some other
+  * point in time. We need this for proper motion corrections because velocities are measured in
+  * motion per epoch-year. The epoch year is stored internally as integral milliyears.
+  * @param scheme This `Epoch`'s temporal scheme.
+  * @see The Wikipedia [[https://en.wikipedia.org/wiki/Epoch_(astronomy) article]]
+  */
 final class Epoch private (val scheme: Epoch.Scheme, private[math] val toMilliyears: Int) {
 
   /** This `Epoch`'s year. Note that this value is not very useful without the `Scheme`. */
@@ -47,7 +47,7 @@ final class Epoch private (val scheme: Epoch.Scheme, private[math] val toMilliye
   override def equals(a: Any): Boolean =
     a match {
       case e: Epoch => (scheme === e.scheme) && toMilliyears === e.toMilliyears
-      case _ => false
+      case _        => false
     }
 
   override def hashCode: Int =
@@ -61,21 +61,21 @@ final class Epoch private (val scheme: Epoch.Scheme, private[math] val toMilliye
 object Epoch extends EpochOptics {
 
   /**
-   * Standard epoch.
-   * @group Constructors
-   */
+    * Standard epoch.
+    * @group Constructors
+    */
   val J2000: Epoch = Julian.fromIntegralYears(2000)
 
   /**
-   * Standard epoch prior to J2000. Obsolete but still in use.
-   * @group Constructors
-   */
+    * Standard epoch prior to J2000. Obsolete but still in use.
+    * @group Constructors
+    */
   val B1950: Epoch = Besselian.fromIntegralYears(1950)
 
   /**
-   * The scheme defines year zero and length of a year in terms of Julian days. There are two
-   * common schemes that we support here.
-   */
+    * The scheme defines year zero and length of a year in terms of Julian days. There are two
+    * common schemes that we support here.
+    */
   sealed abstract class Scheme(
     val prefix:       Char,
     val yearBasis:    Double,
@@ -102,9 +102,9 @@ object Epoch extends EpochOptics {
   object Scheme {
 
     /**
-     * Convert a `LocalDateTime` to a fractional Julian day.
-     * @see The Wikipedia [[https://en.wikipedia.org/wiki/Julian_day article]]
-     */
+      * Convert a `LocalDateTime` to a fractional Julian day.
+      * @see The Wikipedia [[https://en.wikipedia.org/wiki/Julian_day article]]
+      */
     def toJulianDay(dt: LocalDateTime): Double =
       JulianDate.ofLocalDateTime(dt).dayNumber.toDouble
 
@@ -117,15 +117,15 @@ object Epoch extends EpochOptics {
   }
 
   /**
-   * Module of constructors for Besselian epochs.
-   * @group Constructors
-   */
+    * Module of constructors for Besselian epochs.
+    * @group Constructors
+    */
   case object Besselian extends Scheme('B', 1900.0, 2415020.31352, 365.242198781)
 
   /**
-   * Module of constructors for Julian epochs.
-   * @group Constructors
-   */
+    * Module of constructors for Julian epochs.
+    * @group Constructors
+    */
   case object Julian extends Scheme('J', 2000.0, 2451545.0, 365.25)
 
   implicit val EpochOrder: Order[Epoch] =

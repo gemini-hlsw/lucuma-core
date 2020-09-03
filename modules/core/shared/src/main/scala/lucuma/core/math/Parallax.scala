@@ -6,7 +6,7 @@ package lucuma.core.math
 import cats._
 import coulomb._
 import coulomb.cats.implicits._
-import lucuma.core.math.optics._
+import lucuma.core.optics._
 import lucuma.core.math.units._
 import spire.math.Rational
 import spire.std.long._
@@ -54,7 +54,7 @@ object Parallax extends ParallaxOptics {
     * Construct a new Parallax of the given magnitude in integral microarcseconds, modulo 180°. Exact.
     * @group Constructors
     */
-   def fromMicroarcseconds(μas: Long): Parallax = apply(Angle.signedMicroarcseconds.normalize(μas))
+  def fromMicroarcseconds(μas: Long): Parallax = apply(Angle.signedMicroarcseconds.normalize(μas))
 
 }
 
