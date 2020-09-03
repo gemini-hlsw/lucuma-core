@@ -1,2 +1,2 @@
-# gsp-math
-GSP Math Classes
+# Lucuma Core
+Lucuma core data types.
