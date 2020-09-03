@@ -7,7 +7,7 @@ import cats.tests.CatsSuite
 import cats.{ Eq, Show }
 import cats.kernel.laws.discipline._
 import lucuma.core.math.arb._
-import lucuma.core.math.laws.discipline._
+import lucuma.core.optics.laws.discipline._
 import java.time.LocalDateTime
 
 final class EpochSpec extends CatsSuite {

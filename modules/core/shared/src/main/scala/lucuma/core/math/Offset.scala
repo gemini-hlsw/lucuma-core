@@ -3,14 +3,14 @@
 
 package lucuma.core.math
 
-import cats.{Order, Show}
+import cats.{ Order, Show }
 import cats.kernel.CommutativeGroup
-import cats.implicits._
-import lucuma.core.math.optics.SplitMono
-import monocle.{Iso, Lens}
-import monocle.macros.{GenIso, GenLens}
+import cats.syntax.all._
+import lucuma.core.optics.SplitMono
+import monocle.{ Iso, Lens }
+import monocle.macros.{ GenIso, GenLens }
 
-import scala.math.{cos, sin}
+import scala.math.{ cos, sin }
 
 object Axis {
   type P
@@ -98,6 +98,7 @@ object Offset extends OffsetOptics {
   }
 
   object Component extends ComponentOptics {
+
     /** The zero [A] component. */
     def Zero[A]: Component[A] =
       Component[A](Angle.Angle0)
@@ -119,6 +120,7 @@ object Offset extends OffsetOptics {
   }
 
   trait ComponentOptics {
+
     /** @group Optics */
     def angle[A]: Iso[Component[A], Angle] =
       GenIso[Component[A], Angle]
@@ -139,7 +141,8 @@ object Offset extends OffsetOptics {
 
     val angle: Iso[Component[A], Angle] = Component.angle[A]
 
-    val signedDecimalArcseconds: SplitMono[Component[A], BigDecimal] = Component.signedDecimalArcseconds[A]
+    val signedDecimalArcseconds: SplitMono[Component[A], BigDecimal] =
+      Component.signedDecimalArcseconds[A]
   }
 
   object P extends ComponentCompanion[Axis.P]
@@ -153,12 +156,15 @@ object Offset extends OffsetOptics {
    * @param θ rotation angle
    */
   def rotateBy(θ: Angle): Offset => Offset = {
-    val r  = θ.toSignedDoubleRadians
-    Offset.signedMicroarcseconds.modify { case (pµ, qµ) => (
-      // p is converted to normal cartesian coordinates and back here
-      -(-pµ * cos(r) - qµ * sin(r)).round,
-       (-pµ * sin(r) + qµ * cos(r)).round
-    )}
+    val r = θ.toSignedDoubleRadians
+    Offset.signedMicroarcseconds.modify {
+      case (pµ, qµ) =>
+        (
+          // p is converted to normal cartesian coordinates and back here
+          -(-pµ * cos(r) - qµ * sin(r)).round,
+          (-pµ * sin(r) + qµ * cos(r)).round
+        )
+    }
   }
 
 }
@@ -175,11 +181,11 @@ trait OffsetOptics {
 
   /** @group Optics */
   val pAngle: Lens[Offset, Angle] =
-    p composeIso Offset.Component.angle[Axis.P]
+    p.composeIso(Offset.Component.angle[Axis.P])
 
   /** @group Optics */
   val qAngle: Lens[Offset, Angle] =
-    q composeIso Offset.Component.angle[Axis.Q]
+    q.composeIso(Offset.Component.angle[Axis.Q])
 
   private def splitMonoFromAngleSplitMono[A](m: SplitMono[Angle, A]): SplitMono[Offset, (A, A)] =
     SplitMono(

@@ -5,11 +5,10 @@ package lucuma.core.math
 
 import cats.{ Eq, Order, Show }
 import cats.kernel.CommutativeGroup
-import cats.instances.long._
 import cats.syntax.eq._
 import lucuma.core.math.parser.AngleParsers
 import lucuma.core.math.syntax.parser._
-import lucuma.core.math.optics._
+import lucuma.core.optics._
 import monocle.{ Iso, Prism }
 
 /**
@@ -26,7 +25,9 @@ sealed class Angle protected (val toMicroarcseconds: Long) {
 
   // Sanity checks … should be correct via the companion constructor.
   assert(toMicroarcseconds >= 0, s"Invariant violated. $toMicroarcseconds is negative.")
-  assert(toMicroarcseconds < 360L * 60L * 60L * 1000L * 1000L, s"Invariant violated. $toMicroarcseconds is >= 360°.")
+  assert(toMicroarcseconds < 360L * 60L * 60L * 1000L * 1000L,
+         s"Invariant violated. $toMicroarcseconds is >= 360°."
+  )
 
   /**
    * Flip this angle 180°. Equivalent to `mirrorBy(this + Angle90)`. Exact, invertible.
@@ -160,10 +161,17 @@ sealed class Angle protected (val toMicroarcseconds: Long) {
 
 object Angle extends AngleOptics {
 
-  /** @group Constants */ lazy val Angle0:   Angle = degrees.reverseGet(0)
-  /** @group Constants */ lazy val Angle90:  Angle = degrees.reverseGet(90)
-  /** @group Constants */ lazy val Angle180: Angle = degrees.reverseGet(180)
-  /** @group Constants */ lazy val Angle270: Angle = degrees.reverseGet(270)
+  /** @group Constants */
+  lazy val Angle0: Angle = degrees.reverseGet(0)
+
+  /** @group Constants */
+  lazy val Angle90: Angle = degrees.reverseGet(90)
+
+  /** @group Constants */
+  lazy val Angle180: Angle = degrees.reverseGet(180)
+
+  /** @group Constants */
+  lazy val Angle270: Angle = degrees.reverseGet(270)
 
   /**
    * Construct a new Angle of the given magnitude in integral microarcseconds, modulo 360°. Exact.
@@ -171,7 +179,7 @@ object Angle extends AngleOptics {
    */
   def fromMicroarcseconds(µas: Long): Angle = {
     val µasPer360 = 360L * 60L * 60L * 1000L * 1000L
-    val µasʹ = ((µas % µasPer360) + µasPer360) % µasPer360
+    val µasʹ      = ((µas % µasPer360) + µasPer360) % µasPer360
     new Angle(µasʹ)
   }
 
@@ -234,11 +242,11 @@ object Angle extends AngleOptics {
 
   // This works for both DMS and HMS so let's just do it once.
   protected[math] def toMicrosexigesimal(micros: Long): (Int, Int, Int, Int, Int) = {
-    val µs =  micros                               % 1000L
-    val ms = (micros /  1000L)                     % 1000L
-    val s  = (micros / (1000L * 1000L))            % 60L
-    val m  = (micros / (1000L * 1000L * 60L))      % 60L
-    val d  =  micros / (1000L * 1000L * 60L * 60L)
+    val µs = micros                           % 1000L
+    val ms = (micros / 1000L)                 % 1000L
+    val s  = (micros / (1000L * 1000L))       % 60L
+    val m  = (micros / (1000L * 1000L * 60L)) % 60L
+    val d  = micros / (1000L * 1000L * 60L * 60L)
     (d.toInt, m.toInt, s.toInt, ms.toInt, µs.toInt)
   }
 
@@ -253,8 +261,9 @@ object Angle extends AngleOptics {
       arcseconds: Int,
       milliarcseconds: Int,
       microarcseconds: Int
-    ) = Angle.toMicrosexigesimal(toAngle.toMicroarcseconds)
-    def format: String = f"$degrees%02d:$arcminutes%02d:$arcseconds%02d.$milliarcseconds%03d$microarcseconds%03d"
+    )                             = Angle.toMicrosexigesimal(toAngle.toMicroarcseconds)
+    def format: String            =
+      f"$degrees%02d:$arcminutes%02d:$arcseconds%02d.$milliarcseconds%03d$microarcseconds%03d"
     override def toString: String = s"DMS($format)"
   }
 
@@ -277,10 +286,10 @@ object Angle extends AngleOptics {
   ): Angle =
     fromMicroarcseconds(
       microarcseconds.toLong +
-      milliarcseconds.toLong * 1000 +
-      arcseconds.toLong      * 1000 * 1000 +
-      arcminutes.toLong      * 1000 * 1000 * 60 +
-      degrees.toLong         * 1000 * 1000 * 60 * 60
+        milliarcseconds.toLong * 1000 +
+        arcseconds.toLong * 1000 * 1000 +
+        arcminutes.toLong * 1000 * 1000 * 60 +
+        degrees.toLong * 1000 * 1000 * 60 * 60
     )
 
   /**
@@ -288,7 +297,7 @@ object Angle extends AngleOptics {
    * The calculation is such that you get the minimal angle in the range [0 .. π]
    */
   def difference(α: Angle, ϐ: Angle): Angle = {
-    import cats.implicits._ // To get order syntax
+    import cats.syntax.all._ // To get order syntax
     implicit val order: Order[Angle] = AngleOrder
 
     val δ: Angle = α - ϐ
@@ -313,13 +322,15 @@ trait AngleOptics extends OpticsHelpers { this: Angle.type =>
     lazy val µas360 = Angle.Angle180.toMicroarcseconds * 2L
     microarcseconds.imapB[Long](
       identity,
-      µas => if (µas >= Angle.Angle180.toMicroarcseconds) µas - µas360  else µas
+      µas => if (µas >= Angle.Angle180.toMicroarcseconds) µas - µas360 else µas
     )
   }
 
   // Exact signed angles, scaled by moving the decimal point `scale` digits to the left
   private def signedDecimalMicroarcsecondsScaled(scale: Int): SplitMono[Angle, BigDecimal] =
-    signedMicroarcseconds.imapB(_.underlying.movePointRight(scale).longValue, n => new java.math.BigDecimal(n).movePointLeft(scale))
+    signedMicroarcseconds.imapB(_.underlying.movePointRight(scale).longValue,
+                                n => new java.math.BigDecimal(n).movePointLeft(scale)
+    )
 
   /**
    * Signed decimal milliarcseconds, exact, in [-180°, 180°).
@@ -354,7 +365,7 @@ trait AngleOptics extends OpticsHelpers { this: Angle.type =>
    * @group Optics
    */
   lazy val arcminutes: Wedge[Angle, Int] =
-      microarcseconds.scaled(1000L * 1000L * 60L)
+    microarcseconds.scaled(1000L * 1000L * 60L)
 
   /**
    * Degrees, in [0, 360).
@@ -374,7 +385,9 @@ trait AngleOptics extends OpticsHelpers { this: Angle.type =>
    * @group Optics
    */
   lazy val hourAngleExact: Prism[Angle, HourAngle] =
-    Prism((a: Angle) => if (a.toMicroarcseconds % 15L === 0L) Some(hourAngle.get(a)) else None)(identity)
+    Prism((a: Angle) => if (a.toMicroarcseconds % 15L === 0L) Some(hourAngle.get(a)) else None)(
+      identity
+    )
 
   /**
    * This angle as an DMS.
@@ -397,13 +410,13 @@ trait AngleOptics extends OpticsHelpers { this: Angle.type =>
    * @group Optics
    */
   lazy val fromStringSignedDMS: Format[String, Angle] =
-    Format(fromStringDMS.getOption, { a =>
-      if (signedMicroarcseconds.get(a) < 0) "-" + fromStringDMS.reverseGet(-a)
-      else "+" + fromStringDMS.reverseGet(a)
-    })
+    Format(fromStringDMS.getOption,
+           a =>
+             if (signedMicroarcseconds.get(a) < 0) "-" + fromStringDMS.reverseGet(-a)
+             else "+" + fromStringDMS.reverseGet(a)
+    )
 
 }
-
 
 /**
  * Exact hour angles represented as integral microseconds. These values form a commutative group
@@ -417,7 +430,7 @@ trait AngleOptics extends OpticsHelpers { this: Angle.type =>
 final class HourAngle private (µas: Long) extends Angle(µas) {
 
   // Sanity checks … should be correct via the companion constructor.
-  assert(toMicroarcseconds %  15 === 0, s"Invariant violated. $µas isn't divisible by 15.")
+  assert(toMicroarcseconds % 15 === 0, s"Invariant violated. $µas isn't divisible by 15.")
 
   /**
    * Flip this HourAngle by 12h. This is logically identical to the superclass implementation
@@ -474,8 +487,11 @@ object HourAngle extends HourAngleOptics {
 
   private val µsPerHour: Long = 60L * 60L * 1000L * 1000L
 
-  /** @group Constants */ lazy val HourAngle0 : HourAngle = microseconds.reverseGet(0)
-  /** @group Constants */ lazy val HourAngle12: HourAngle = hours.reverseGet(12)
+  /** @group Constants */
+  lazy val HourAngle0: HourAngle = microseconds.reverseGet(0)
+
+  /** @group Constants */
+  lazy val HourAngle12: HourAngle = hours.reverseGet(12)
 
   /**
    * Construct a new Angle of the given magnitude in integral microseconds, modulo 24h. Exact.
@@ -483,7 +499,7 @@ object HourAngle extends HourAngleOptics {
    */
   def fromMicroseconds(µs: Long): HourAngle = {
     val µsPer24 = 24L * µsPerHour
-    val µsʹ = ((µs % µsPer24) + µsPer24) % µsPer24
+    val µsʹ     = ((µs % µsPer24) + µsPer24) % µsPer24
     new HourAngle(µsʹ * 15L)
   }
 
@@ -506,13 +522,19 @@ object HourAngle extends HourAngleOptics {
    * milliseconds, and microseconds. Exact modulo 24h.
    * @group Constructors
    */
-  def fromHMS(hours: Int, minutes: Int, seconds: Int, milliseconds: Int, microseconds: Int): HourAngle =
+  def fromHMS(
+    hours:        Int,
+    minutes:      Int,
+    seconds:      Int,
+    milliseconds: Int,
+    microseconds: Int
+  ): HourAngle =
     fromMicroseconds(
       microseconds.toLong +
-      milliseconds.toLong * 1000L +
-      seconds.toLong      * 1000L * 1000L +
-      minutes.toLong      * 1000L * 1000L * 60L +
-      hours.toLong        * 1000L * 1000L * 60L * 60L
+        milliseconds.toLong * 1000L +
+        seconds.toLong * 1000L * 1000L +
+        minutes.toLong * 1000L * 1000L * 60L +
+        hours.toLong * 1000L * 1000L * 60L * 60L
     )
 
   /**
@@ -542,15 +564,15 @@ object HourAngle extends HourAngleOptics {
    * microseconds. This type is exact and isomorphic to HourAngle.
    */
   final case class HMS(toHourAngle: HourAngle) {
-    def toAngle: Angle = toHourAngle // forget it's an hour angle
+    def toAngle: Angle            = toHourAngle // forget it's an hour angle
     val (
       hours: Int,
       minutes: Int,
       seconds: Int,
       milliseconds: Int,
       microseconds: Int
-    ) = Angle.toMicrosexigesimal(toHourAngle.toMicroseconds)
-    def format: String = f"$hours%02d:$minutes%02d:$seconds%02d.$milliseconds%03d$microseconds%03d"
+    )                             = Angle.toMicrosexigesimal(toHourAngle.toMicroseconds)
+    def format: String            = f"$hours%02d:$minutes%02d:$seconds%02d.$milliseconds%03d$microseconds%03d"
     override def toString: String = format
   }
 
@@ -629,7 +651,7 @@ trait OpticsHelpers {
       SplitEpi(_.toInt, _.toLong)
 
     def scaled(n: Long): Wedge[A, Int] =
-      self.imapB[Long](_ * n, _ / n) composeSplitEpi longToInt
+      self.imapB[Long](_ * n, _ / n).composeSplitEpi(longToInt)
 
   }
 

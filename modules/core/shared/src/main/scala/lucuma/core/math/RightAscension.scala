@@ -4,8 +4,7 @@
 package lucuma.core.math
 
 import cats.{ Order, Show }
-import cats.instances.long._
-import lucuma.core.math.optics.Format
+import lucuma.core.optics.Format
 import monocle._
 
 /**
@@ -86,9 +85,9 @@ trait RightAscensionOptics { this: RightAscension.type =>
     Iso(RightAscension(_))(_.toHourAngle)
 
   val fromStringHMS: Format[String, RightAscension] =
-    HourAngle.fromStringHMS composeIso fromHourAngle
+    HourAngle.fromStringHMS.composeIso(fromHourAngle)
 
   val fromAngleExact: Prism[Angle, RightAscension] =
-    Angle.hourAngleExact composeIso fromHourAngle
+    Angle.hourAngleExact.composeIso(fromHourAngle)
 
 }

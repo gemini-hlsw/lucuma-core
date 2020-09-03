@@ -6,17 +6,17 @@ package lucuma.core.math
 import cats._
 import coulomb._
 import coulomb.cats.implicits._
-import lucuma.core.math.optics._
+import lucuma.core.optics._
 import lucuma.core.math.units._
 import spire.math.Rational
 import spire.std.long._
 
 /**
-  * Parallax stored as microarcseconds
-  * Normally parallax is expressed in milliarcseconds but simbad reports them
-  * with a higher precision thus using microarcseconds gives us enough space
-  * Absolute allowed parallax values need to be less or equal thán 180 degrees
-  */
+ * Parallax stored as microarcseconds
+ * Normally parallax is expressed in milliarcseconds but simbad reports them
+ * with a higher precision thus using microarcseconds gives us enough space
+ * Absolute allowed parallax values need to be less or equal thán 180 degrees
+ */
 sealed abstract case class Parallax protected (μas: Quantity[Long, MicroArcSecond]) {
   val mas: Quantity[Rational, MilliArcSecond] = μas.to[Rational, MilliArcSecond]
 
@@ -29,9 +29,9 @@ object Parallax extends ParallaxOptics {
   val MinValue: Parallax = apply(-648000000000L)
 
   /**
-    * The `No parallax`
-    * @group Constructors
-    */
+   * The `No parallax`
+   * @group Constructors
+   */
   val Zero: Parallax = apply(0L)
 
   // Internal unbounded constructor
@@ -51,26 +51,26 @@ object Parallax extends ParallaxOptics {
     Monoid.instance(Zero, (a, b) => apply(a.μas + b.μas))
 
   /**
-    * Construct a new Parallax of the given magnitude in integral microarcseconds, modulo 180°. Exact.
-    * @group Constructors
-    */
-   def fromMicroarcseconds(μas: Long): Parallax = apply(Angle.signedMicroarcseconds.normalize(μas))
+   * Construct a new Parallax of the given magnitude in integral microarcseconds, modulo 180°. Exact.
+   * @group Constructors
+   */
+  def fromMicroarcseconds(μas: Long): Parallax = apply(Angle.signedMicroarcseconds.normalize(μas))
 
 }
 
 sealed trait ParallaxOptics {
 
   /**
-    * This `Parallax` in microarcseconds. modulo 180°.
-    */
+   * This `Parallax` in microarcseconds. modulo 180°.
+   */
   lazy val microarcseconds: SplitMono[Parallax, Long] =
     SplitMono(_.μas.value, Parallax.fromMicroarcseconds)
 
   lazy val μas: SplitMono[Parallax, Long] = microarcseconds
 
   /**
-    * This `Parallax` as in milliarcseconds.
-    */
+   * This `Parallax` as in milliarcseconds.
+   */
   lazy val milliarcseconds: SplitMono[Parallax, BigDecimal] =
     microarcseconds
       .imapB(_.underlying.movePointRight(3).longValue,

@@ -3,19 +3,19 @@
 
 package lucuma.core.math.skycalc.solver
 
-import cats.implicits._
+import cats.syntax.all._
 import java.time.Duration
 import java.time.Instant
 import lucuma.core.math.Declination
 import lucuma.core.math.Angle
 import lucuma.core.math.HourAngle
-import lucuma.core.math.optics.Wedge
-import lucuma.core.math.optics.SplitEpi
-import lucuma.core.math.optics.SplitMono
+import lucuma.core.optics.Wedge
+import lucuma.core.optics.SplitEpi
+import lucuma.core.optics.SplitMono
 import spire.math.Number
 import spire.math.Rational
 import monocle.Iso
-import lucuma.core.math.optics.Spire._
+import lucuma.core.optics.Spire._
 import io.chrisdavenport.cats.time._
 import cats.InvariantSemigroupal
 

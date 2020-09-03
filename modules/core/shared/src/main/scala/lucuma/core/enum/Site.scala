@@ -4,8 +4,6 @@
 package lucuma
 package core
 package enum
-
-import cats.instances.string._
 import cats.syntax.eq._
 import java.time.ZoneId
 import lucuma.core.util.Enumerated

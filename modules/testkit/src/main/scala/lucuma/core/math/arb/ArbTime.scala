@@ -10,6 +10,8 @@ import org.scalacheck.Arbitrary._
 import scala.jdk.CollectionConverters._
 import scala.concurrent.duration.{ Duration => SDuration }
 import java.time._
+import cats.implicits._
+import io.chrisdavenport.cats.time._
 
 // Arbitrary but reasonable dates and times.
 trait ArbTime {
@@ -50,13 +52,39 @@ trait ArbTime {
       } yield LocalDateTime.of(d, t)
     }
 
-  implicit val arbZonedDateTime: Arbitrary[ZonedDateTime] =
-    Arbitrary {
-      for {
-        ldt <- arbitrary[LocalDateTime]
-        zid <- arbitrary[ZoneId]
-      } yield ZonedDateTime.of(ldt, zid)
+  // Special case for instants in transitions
+  // We can't cache this in a TrieMap since it's not available in Scala.js,
+  // and it doesn't seem worthwhile dealing with Java's ConcurrentMap for this.
+  private def transitions(zid: ZoneId): List[Instant] = {
+    val span  = Period.ofYears(50)
+    val now   = Instant.now.atZone(zid)
+    val start = now.minus(span).toInstant
+    val end   = now.plus(span).toInstant
+    List.unfold(start)(i =>
+      Option(zid.getRules.nextTransition(i)).flatMap(transition =>
+        transition.getInstant.some
+          .filter(_ < end)
+          .map(instant => (instant, instant))
+      )
+    )
+  }
+
+  def genArbitraryZDT(zid: ZoneId): Gen[ZonedDateTime] =
+    arbitrary[LocalDateTime].map(ldt => ZonedDateTime.of(ldt, zid))
+
+  def genTransitioningZDT(zid: ZoneId): Gen[ZonedDateTime] =
+    transitions(zid) match {
+      case Nil  => genArbitraryZDT(zid)
+      case list => Gen.oneOf(list).map(_.atZone(zid))
     }
+
+  val genZonedDateTime: Gen[ZonedDateTime] =
+    arbitrary[ZoneId].flatMap(zid =>
+      Gen.frequency((1, genTransitioningZDT(zid)), (9, genArbitraryZDT(zid)))
+    )
+
+  implicit val arbZonedDateTime: Arbitrary[ZonedDateTime] =
+    Arbitrary(genZonedDateTime)
 
   implicit val arbInstant: Arbitrary[Instant] =
     Arbitrary(arbitrary[ZonedDateTime].map(_.toInstant))

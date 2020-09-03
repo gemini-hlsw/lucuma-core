@@ -7,7 +7,7 @@ import cats.tests.CatsSuite
 import cats.{ Eq, Order, Show }
 import cats.kernel.laws.discipline._
 import lucuma.core.math.arb._
-import lucuma.core.math.laws.discipline._
+import lucuma.core.optics.laws.discipline._
 import monocle.law.discipline._
 
 final class RightAscensionSpec extends CatsSuite {

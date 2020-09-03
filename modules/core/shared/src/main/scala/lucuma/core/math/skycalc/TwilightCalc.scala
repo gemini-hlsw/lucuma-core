@@ -2,8 +2,6 @@
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.math.skycalc
-
-import cats.implicits._
 import java.time.Instant
 import java.time.LocalDate
 import lucuma.core.enum.TwilightType
@@ -12,6 +10,7 @@ import lucuma.core.math.JulianDate
 import lucuma.core.math.Place
 import lucuma.core.math.Schedule
 import lucuma.core.math.Constants._
+import cats.syntax.all._
 import io.chrisdavenport.cats.time._
 
 trait TwilightCalc extends SunCalc {

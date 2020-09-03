@@ -1,10 +1,10 @@
 // Copyright (c) 2016-2020 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package lucuma.core.math.optics
+package lucuma.core.optics
 
 import cats.tests.CatsSuite
-import lucuma.core.math.laws.discipline._
+import lucuma.core.optics.laws.discipline._
 
 final class SplitEpiSpec extends CatsSuite {
 
@@ -17,7 +17,7 @@ final class SplitEpiSpec extends CatsSuite {
   // Laws
   checkAll("Long > Int", SplitEpiTests(ex1).splitEpi)
   checkAll("Int > Byte", SplitEpiTests(ex2).splitEpi)
-  checkAll("Long > Int > Byte", SplitEpiTests(ex1 composeSplitEpi ex2).splitEpi)
+  checkAll("Long > Int > Byte", SplitEpiTests(ex1.composeSplitEpi(ex2)).splitEpi)
 
   test("modify") {
     ex1.modify(_ + 1)(Int.MaxValue.toLong) shouldEqual Int.MinValue.toLong

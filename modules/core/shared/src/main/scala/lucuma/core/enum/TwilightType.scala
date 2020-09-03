@@ -5,7 +5,7 @@ package lucuma
 package core
 package enum
 
-import cats.implicits._
+import cats.syntax.all._
 import lucuma.core.math.Angle
 import lucuma.core.math.Declination
 import lucuma.core.math.syntax.all._

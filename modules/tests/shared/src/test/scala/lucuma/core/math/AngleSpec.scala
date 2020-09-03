@@ -4,10 +4,10 @@
 package lucuma.core.math
 
 import cats.tests.CatsSuite
-import cats.{ Eq, Show, Order }
+import cats.{ Eq, Order, Show }
 import cats.kernel.laws.discipline._
 import lucuma.core.math.arb._
-import lucuma.core.math.laws.discipline._
+import lucuma.core.optics.laws.discipline._
 import monocle.law.discipline._
 
 final class AngleSpec extends CatsSuite {
@@ -22,7 +22,9 @@ final class AngleSpec extends CatsSuite {
   // Optics
   checkAll("microarcseconds", SplitMonoTests(Angle.microarcseconds).splitMono)
   checkAll("signedMicroarcseconds", SplitMonoTests(Angle.signedMicroarcseconds).splitMono)
-  checkAll("signedDecimalMilliarcseconds", SplitMonoTests(Angle.signedDecimalMilliarcseconds).splitMono)
+  checkAll("signedDecimalMilliarcseconds",
+           SplitMonoTests(Angle.signedDecimalMilliarcseconds).splitMono
+  )
   checkAll("signedDecimalArcseconds", SplitMonoTests(Angle.signedDecimalArcseconds).splitMono)
   checkAll("milliarcseconds", WedgeTests(Angle.milliarcseconds).wedge)
   checkAll("arcseconds", WedgeTests(Angle.arcseconds).wedge)
@@ -32,7 +34,9 @@ final class AngleSpec extends CatsSuite {
   checkAll("hourAngleExact", PrismTests(Angle.hourAngleExact))
   checkAll("dms", IsoTests(Angle.dms))
   checkAll("fromStringDMS", FormatTests(Angle.fromStringDMS).formatWith(ArbAngle.stringsDMS))
-  checkAll("fromStringSignedDMS", FormatTests(Angle.fromStringSignedDMS).formatWith(ArbAngle.stringsSignedDMS))
+  checkAll("fromStringSignedDMS",
+           FormatTests(Angle.fromStringSignedDMS).formatWith(ArbAngle.stringsSignedDMS)
+  )
 
   test("Equality must be natural") {
     forAll { (a: Angle, b: Angle) =>
@@ -43,7 +47,7 @@ final class AngleSpec extends CatsSuite {
   test("Equality must be consistent with .toMicroarcseconds") {
     forAll { (a: Angle, b: Angle) =>
       Eq[Long].eqv(a.toMicroarcseconds, b.toMicroarcseconds) shouldEqual
-      Eq[Angle].eqv(a, b)
+        Eq[Angle].eqv(a, b)
     }
   }
 
@@ -78,7 +82,7 @@ final class AngleSpec extends CatsSuite {
       val factor   = n % 10
       val masIn360 = 360L * 60L * 60L * 1000L * 1000L
       val offset   = masIn360 * factor
-      val b = Angle.fromMicroarcseconds(a.toMicroarcseconds + offset)
+      val b        = Angle.fromMicroarcseconds(a.toMicroarcseconds + offset)
       a shouldEqual b
     }
   }
@@ -86,13 +90,13 @@ final class AngleSpec extends CatsSuite {
   // In principle I think this is the only thing we need to check.
   test("mirrorBy must obey the mirror law") {
     forAll { (a: Angle, b: Angle) =>
-      b - a shouldEqual (a mirrorBy b) - b
+      b - a shouldEqual (a.mirrorBy(b)) - b
     }
   }
 
   test("mirrorBy must be reflexive") {
     forAll { (a: Angle) =>
-      a mirrorBy a shouldEqual a
+      a.mirrorBy(a) shouldEqual a
     }
   }
 
@@ -110,7 +114,7 @@ final class AngleSpec extends CatsSuite {
 
   test("mirrorBy must distribute over flip in target angle") {
     forAll { (a: Angle, b: Angle) =>
-      (a mirrorBy b).flip shouldEqual (a.flip mirrorBy b)
+      a.mirrorBy(b).flip shouldEqual (a.flip.mirrorBy(b))
     }
   }
 

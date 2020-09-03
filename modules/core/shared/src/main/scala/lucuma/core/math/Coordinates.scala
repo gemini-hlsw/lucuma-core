@@ -5,7 +5,7 @@ package lucuma.core.math
 
 import cats._, cats.implicits._
 import lucuma.core.math.parser.CoordinateParsers
-import lucuma.core.math.optics.Format
+import lucuma.core.optics.Format
 import lucuma.core.math.syntax.all._
 import monocle.Lens
 import monocle.macros._

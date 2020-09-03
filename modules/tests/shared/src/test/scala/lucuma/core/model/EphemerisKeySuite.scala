@@ -7,9 +7,8 @@ import lucuma.core.model.arb._
 import lucuma.core.util.arb._
 
 import cats.{ Eq, Show }
-import cats.implicits._
 import cats.kernel.laws.discipline._
-import lucuma.core.math.laws.discipline._
+import lucuma.core.optics.laws.discipline._
 import munit._
 import org.scalacheck.Prop._
 

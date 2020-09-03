@@ -4,10 +4,10 @@
 package lucuma.core.math
 
 import cats.{ Order, Show }
-import cats.implicits._
+import cats.syntax.all._
 import lucuma.core.math.parser.EpochParsers
 import lucuma.core.math.syntax.parser._
-import lucuma.core.math.optics.Format
+import lucuma.core.optics.Format
 import java.time._
 
 /**
@@ -47,7 +47,7 @@ final class Epoch private (val scheme: Epoch.Scheme, private[math] val toMilliye
   override def equals(a: Any): Boolean =
     a match {
       case e: Epoch => (scheme === e.scheme) && toMilliyears === e.toMilliyears
-      case _ => false
+      case _        => false
     }
 
   override def hashCode: Int =

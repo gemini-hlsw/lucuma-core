@@ -4,9 +4,8 @@
 package lucuma.core.math
 
 import cats.{ Order, Show }
-import cats.instances.long._
 import lucuma.core.math.syntax.all._
-import lucuma.core.math.optics.Format
+import lucuma.core.optics.Format
 import monocle.Prism
 
 /**
@@ -21,7 +20,7 @@ sealed abstract case class Declination protected (toAngle: Angle) {
   // Sanity check … should be correct via the companion constructor.
   assert(
     toAngle.toMicroarcseconds >= Angle.Angle270.toMicroarcseconds ||
-    toAngle.toMicroarcseconds <= Angle.Angle90.toMicroarcseconds,
+      toAngle.toMicroarcseconds <= Angle.Angle90.toMicroarcseconds,
     s"Invariant violated. $toAngle is outside the range [270 - 360) + [0 - 90]"
   )
 
@@ -47,8 +46,8 @@ sealed abstract case class Declination protected (toAngle: Angle) {
 
 object Declination extends DeclinationOptics {
 
-  val Min:  Declination = fromAngle.unsafeGet(Angle.Angle270)
-  val Max:  Declination = fromAngle.unsafeGet(Angle.Angle90)
+  val Min: Declination  = fromAngle.unsafeGet(Angle.Angle270)
+  val Max: Declination  = fromAngle.unsafeGet(Angle.Angle90)
   val Zero: Declination = fromAngle.unsafeGet(Angle.Angle0)
 
   /**
@@ -59,8 +58,8 @@ object Declination extends DeclinationOptics {
    * @group Constructors
    */
   def fromAngleWithCarry(a: Angle): (Declination, Boolean) =
-    fromAngle.getOption(a).map((_, false)) getOrElse {
-      (fromAngle.unsafeGet(a mirrorBy Angle.Angle90), true)
+    fromAngle.getOption(a).map((_, false)).getOrElse {
+      (fromAngle.unsafeGet(a.mirrorBy(Angle.Angle90)), true)
     }
 
   /**
@@ -68,7 +67,7 @@ object Declination extends DeclinationOptics {
    * in the range [-90°, 90°], or [270 - 360) + [0-90]
    * @group Constructors
    */
-  def fromDoubleDegrees(deg: Double): Option[Declination] = 
+  def fromDoubleDegrees(deg: Double): Option[Declination] =
     fromAngle.getOption(Angle.fromDoubleDegrees(deg))
 
   def fromRadians(rad: Double): Option[Declination] =
@@ -92,11 +91,13 @@ object Declination extends DeclinationOptics {
 trait DeclinationOptics { this: Declination.type =>
 
   val fromAngle: Prism[Angle, Declination] =
-    Prism((a: Angle) => {
-      if (a.toMicroarcseconds >= Angle.Angle270.toMicroarcseconds ||
-          a.toMicroarcseconds <= Angle.Angle90.toMicroarcseconds) Some(new Declination(a) {})
+    Prism { (a: Angle) =>
+      if (
+        a.toMicroarcseconds >= Angle.Angle270.toMicroarcseconds ||
+        a.toMicroarcseconds <= Angle.Angle90.toMicroarcseconds
+      ) Some(new Declination(a) {})
       else None
-    })(_.toAngle)
+    }(_.toAngle)
 
   val fromStringSignedDMS: Format[String, Declination] =
     Angle.fromStringSignedDMS.composePrism(fromAngle)

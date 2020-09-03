@@ -7,7 +7,7 @@ import cats.tests.CatsSuite
 import cats.{ Eq, Show }
 import cats.kernel.laws.discipline._
 import lucuma.core.math.arb._
-import lucuma.core.math.laws.discipline.SplitMonoTests
+import lucuma.core.optics.laws.discipline.SplitMonoTests
 import lucuma.core.math.syntax.int._
 import monocle.law.discipline._
 

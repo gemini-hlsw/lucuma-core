@@ -6,7 +6,7 @@ package core
 package data
 
 import cats._
-import cats.implicits._
+import cats.syntax.all._
 import cats.data.NonEmptyList
 import monocle.{ Prism, Traversal }
 

@@ -2,8 +2,6 @@
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.model
-
-import cats.implicits._
 import cats.kernel.laws.discipline._
 import lucuma.core.model.arb._
 import munit._

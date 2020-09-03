@@ -7,7 +7,7 @@ package data
 
 import cats.kernel.Eq
 import lucuma.core.util.Enumerated
-import cats.implicits._
+import cats.syntax.all._
 
 class EnumZipper[A] private (lefts: List[A], focus: A, rights: List[A])
     extends Zipper[A](lefts: List[A], focus: A, rights: List[A])

@@ -4,7 +4,7 @@
 package lucuma.core.math
 
 import cats._
-import cats.implicits._
+import cats.syntax.all._
 import coulomb._
 import coulomb.accepted._
 import coulomb.cats.implicits._
@@ -12,7 +12,7 @@ import lucuma.core.math.units._
 import monocle.Lens
 import monocle.Iso
 import monocle.macros.GenLens
-import lucuma.core.math.optics.SplitMono
+import lucuma.core.optics.SplitMono
 import lucuma.core.math.ProperVelocity.AngularVelocityComponent
 import spire.math.Rational
 

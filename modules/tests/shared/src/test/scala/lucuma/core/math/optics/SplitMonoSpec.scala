@@ -1,10 +1,10 @@
 // Copyright (c) 2016-2020 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package lucuma.core.math.optics
+package lucuma.core.optics
 
 import cats.tests.CatsSuite
-import lucuma.core.math.laws.discipline._
+import lucuma.core.optics.laws.discipline._
 
 final class SplitMonoSpec extends CatsSuite {
 
@@ -17,7 +17,7 @@ final class SplitMonoSpec extends CatsSuite {
   // Laws
   checkAll("Byte < Int", SplitMonoTests(ex1).splitMono)
   checkAll("Int < Long", SplitMonoTests(ex2).splitMono)
-  checkAll("Byte < Int < Long", SplitMonoTests(ex1 composeSplitMono ex2).splitMono)
+  checkAll("Byte < Int < Long", SplitMonoTests(ex1.composeSplitMono(ex2)).splitMono)
 
   test("modify") {
     ex1.modify(_ + 1)(Byte.MaxValue) shouldEqual Byte.MinValue
