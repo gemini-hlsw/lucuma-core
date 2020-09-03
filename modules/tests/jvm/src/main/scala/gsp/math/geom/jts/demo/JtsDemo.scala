@@ -8,8 +8,8 @@ import lucuma.core.enum.PortDisposition
 import lucuma.core.enum.GmosSouthFpu
 import lucuma.core.enum.GmosNorthFpu
 import lucuma.core.math.{ Angle, Offset }
-import lucuma.core.math.geom.GmosOiwfsProbeArm
-import lucuma.core.math.geom.GmosScienceAreaGeometry
+import lucuma.core.geom.GmosOiwfsProbeArm
+import lucuma.core.geom.GmosScienceAreaGeometry
 import lucuma.core.math.geom.ShapeExpression
 import lucuma.core.math.geom.jts.jvm.syntax.awt._
 import lucuma.core.math.geom.jts.interpreter._

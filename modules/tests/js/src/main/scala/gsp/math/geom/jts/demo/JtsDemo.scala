@@ -6,11 +6,11 @@ package demo
 
 import gpp.svgdotjs.svgdotjsSvgJs.mod.SVG_
 import gpp.svgdotjs.svgdotjsSvgJs.mod.Svg
+import lucuma.core.geom.GmosOiwfsProbeArm
 import lucuma.core.math.geom.jts.JtsShape
 import lucuma.core.math.geom.jts.interpreter._
 import lucuma.core.math.geom.svg._
 import lucuma.core.math.geom.svg.implicits._
-import lucuma.core.math.geom.GmosOiwfsProbeArm
 
 /**
   * Throwaway demo code to visualize a shape created using `ShapeExpression`s.
