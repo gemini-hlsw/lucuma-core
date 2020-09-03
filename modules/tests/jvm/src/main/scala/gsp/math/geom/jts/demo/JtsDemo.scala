@@ -13,7 +13,6 @@ import lucuma.core.geom.GmosScienceAreaGeometry
 import lucuma.core.math.geom.ShapeExpression
 import lucuma.core.math.geom.jts.jvm.syntax.awt._
 import lucuma.core.math.geom.jts.interpreter._
-import lucuma.core.math.geom.syntax.shapeexpression._
 import lucuma.core.math.syntax.int._
 
 import java.awt.{ List => _, _ }
@@ -36,7 +35,7 @@ object JtsDemo extends Frame("JTS Demo") {
     Offset(-60.arcsec.p, 60.arcsec.q)
 
   val fpu: Option[Either[GmosNorthFpu, GmosSouthFpu]] =
-    Some(Right(GmosSouthFpu.LongSlit_5_00))
+    Some(Right(GmosSouthFpu.LongSlit_5_00)) // None will render imaging detector
 
   val port: PortDisposition =
     PortDisposition.Side
