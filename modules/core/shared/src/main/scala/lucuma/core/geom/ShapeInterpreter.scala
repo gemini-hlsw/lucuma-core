@@ -4,8 +4,8 @@
 package lucuma.core.geom
 
 /**
-  * Interprets a `ShapeExpression` to a `Shape`.
-  */
+ * Interprets a `ShapeExpression` to a `Shape`.
+ */
 trait ShapeInterpreter {
   def interpret(e: ShapeExpression): Shape
 }

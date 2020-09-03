@@ -29,21 +29,21 @@ final case class Offset(p: Offset.Component[Axis.P], q: Offset.Component[Axis.Q]
     Offset(p + o.p, q + o.q)
 
   /**
-    * Component-wise subtraction of this offset and `o`. Exact.
-    *
-    * `this - o === this + -o`
-    */
+   * Component-wise subtraction of this offset and `o`. Exact.
+   *
+   * `this - o === this + -o`
+   */
   def -(o: Offset): Offset =
     Offset(p - o.p, q - o.q)
 
   /**
-    * Rotates the offset around the origin (counterclockwise) and produces a
-    * new `Offset` at the resulting location. Approximate, non-invertible.
-    *
-    * @param θ rotation angle
-    *
-    * @return Offset at the new position
-    */
+   * Rotates the offset around the origin (counterclockwise) and produces a
+   * new `Offset` at the resulting location. Approximate, non-invertible.
+   *
+   * @param θ rotation angle
+   *
+   * @return Offset at the new position
+   */
   def rotate(θ: Angle): Offset =
     Offset.rotateBy(θ)(this)
 
@@ -150,11 +150,11 @@ object Offset extends OffsetOptics {
   object Q extends ComponentCompanion[Axis.Q]
 
   /**
-    * Produces a function that will calculate `Offset` positions rotated by
-    * the given angle θ (counterclockwise).  Approximate, non-invertible.
-    *
-    * @param θ rotation angle
-    */
+   * Produces a function that will calculate `Offset` positions rotated by
+   * the given angle θ (counterclockwise).  Approximate, non-invertible.
+   *
+   * @param θ rotation angle
+   */
   def rotateBy(θ: Angle): Offset => Offset = {
     val r = θ.toSignedDoubleRadians
     Offset.signedMicroarcseconds.modify {

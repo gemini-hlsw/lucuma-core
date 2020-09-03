@@ -8,19 +8,19 @@ import cats.arrow.Category
 import monocle.{ Fold, Getter, Iso }
 
 /**
-  * A split monomorphism, which we can think of as a weaker `Iso[A, B]` where `A` is a ''smaller''
-  * . type. So `get andThen reverseGet andThen` remains an identity but `reverseGet andThen get` is merely
-  * idempotent (i.e., it normalizes values in `B`). The following statements hold:
-  *
-  *  - `reverseGet` is a ''retraction'' of `get`,
-  *  - `get` is a ''section'' of `reverseGet`,
-  *  - `A` is a ''retract'' of `B`,
-  *  - the pair `(reverseGet, get)` is a ''splitting'' of the idempotent `reverseGet andThen get`.
-  *
-  * @param get  section of `reverseGet` such that `get andThen reverseGet` is an identity
-  * @param reverseGet any function B => A
-  * @see [[https://ncatlab.org/nlab/show/split+monomorphism Split Monomorphism]] at nLab
-  */
+ * A split monomorphism, which we can think of as a weaker `Iso[A, B]` where `A` is a ''smaller''
+ * . type. So `get andThen reverseGet andThen` remains an identity but `reverseGet andThen get` is merely
+ * idempotent (i.e., it normalizes values in `B`). The following statements hold:
+ *
+ *  - `reverseGet` is a ''retraction'' of `get`,
+ *  - `get` is a ''section'' of `reverseGet`,
+ *  - `A` is a ''retract'' of `B`,
+ *  - the pair `(reverseGet, get)` is a ''splitting'' of the idempotent `reverseGet andThen get`.
+ *
+ * @param get  section of `reverseGet` such that `get andThen reverseGet` is an identity
+ * @param reverseGet any function B => A
+ * @see [[https://ncatlab.org/nlab/show/split+monomorphism Split Monomorphism]] at nLab
+ */
 final case class SplitMono[A, B](get: A => B, reverseGet: B => A) {
 
   /** Modify the target of the SplitMono using a function. */
@@ -76,9 +76,9 @@ final case class SplitMono[A, B](get: A => B, reverseGet: B => A) {
     SplitMono(get.andThen(g), f.andThen(reverseGet))
 
   /**
-    * reverseGet and get, yielding a normalized formatted value. Subsequent reverseGet/get cycles are
-    * idempotent.
-    */
+   * reverseGet and get, yielding a normalized formatted value. Subsequent reverseGet/get cycles are
+   * idempotent.
+   */
   def normalize(b: B): B =
     get(reverseGet(b))
 

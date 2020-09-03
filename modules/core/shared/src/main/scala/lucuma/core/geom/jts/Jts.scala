@@ -6,8 +6,8 @@ package lucuma.core.geom.jts
 import org.locationtech.jts.geom.{ GeometryFactory, PrecisionModel }
 
 /**
-  * Shared JTS setup.
-  */
+ * Shared JTS setup.
+ */
 object Jts {
 
   val precisionModel: PrecisionModel =

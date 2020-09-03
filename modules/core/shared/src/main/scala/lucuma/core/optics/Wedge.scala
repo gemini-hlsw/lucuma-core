@@ -7,9 +7,9 @@ import cats.arrow.Category
 import monocle.Iso
 
 /**
-  * Composition of a `SplitMono` and a `SplitEpi`, yielding an even weaker structure where neither
-  * `get andThen reverseGet` and `reverseGet andThen get` is an identity but both are idempotent.
-  */
+ * Composition of a `SplitMono` and a `SplitEpi`, yielding an even weaker structure where neither
+ * `get andThen reverseGet` and `reverseGet andThen get` is an identity but both are idempotent.
+ */
 final case class Wedge[A, B](get: A => B, reverseGet: B => A) {
 
   /** Swapping `get` and `reverseGet` yields a `Wedge`. */

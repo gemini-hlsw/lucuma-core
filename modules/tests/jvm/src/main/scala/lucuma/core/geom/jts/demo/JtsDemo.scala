@@ -21,8 +21,8 @@ import java.awt.event._
 import scala.jdk.CollectionConverters._
 
 /**
-  * Throwaway demo code to visualize a shape created using `ShapeExpression`s.
-  */
+ * Throwaway demo code to visualize a shape created using `ShapeExpression`s.
+ */
 object JtsDemo extends Frame("JTS Demo") {
 
   val posAngle: Angle =

@@ -9,12 +9,12 @@ import cats.syntax.eq._
 import monocle.Prism
 
 /**
-  * Shape area is useful for comparison, for example to determine which area
-  * resulting from the intersection of a guide probe arm with the science FOV
-  * is smaller.
-  *
-  * @param toMicroarcsecondsSquared area in µas^2^
-  */
+ * Shape area is useful for comparison, for example to determine which area
+ * resulting from the intersection of a guide probe arm with the science FOV
+ * is smaller.
+ *
+ * @param toMicroarcsecondsSquared area in µas^2^
+ */
 sealed class Area protected (val toMicroarcsecondsSquared: Long) {
 
   // Sanity check ... should be correct via the companion constructor
@@ -47,19 +47,19 @@ object Area {
   lazy val MaxArea: Area = new Area(Long.MaxValue) {}
 
   /**
-    * Prism from Long in µas^2^ into Area and back.
-    * @group Optics
-    */
+   * Prism from Long in µas^2^ into Area and back.
+   * @group Optics
+   */
   val fromMicroarcsecondsSquared: Prism[Long, Area] =
     Prism((n: Long) => Some(n).filter(_ >= 0).map(new Area(_) {}))(_.toMicroarcsecondsSquared)
 
   /**
-    * Sorts Area by size, ascending. This may be used, for example, to select a
-    * a guide star that results in the minimum vignetting of a science area by a
-    * probe arm.
-    *
-    * @group Typeclass Instances
-    */
+   * Sorts Area by size, ascending. This may be used, for example, to select a
+   * a guide star that results in the minimum vignetting of a science area by a
+   * probe arm.
+   *
+   * @group Typeclass Instances
+   */
   implicit val AreaOrder: Order[Area]               =
     Order.by(_.toMicroarcsecondsSquared)
 

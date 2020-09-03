@@ -8,19 +8,19 @@ import cats.arrow.Category
 import monocle.{ Iso, Prism }
 
 /**
-  * A split epimorphism, which we can think of as a weaker `Iso[A, B]` where `B` is a ''smaller''
-  * . type. So `reverseGet andThen get` remains an identity but `get andThen reverseGet` is merely
-  * idempotent (i.e., it normalizes values in `A`). The following statements hold:
-  *
-  *  - `reverseGet` is a ''section'' of `get`,
-  *  - `get` is a ''retraction'' of `reverseGet`,
-  *  - `B` is a ''retract'' of `A`,
-  *  - the pair `(get, reverseGet)` is a ''splitting'' of the idempotent `get andThen reverseGet`.
-  *
-  * @param get any function A => B.
-  * @param reverseGet a section of `get` such that `reverseGet andThen get` is an identity.
-  * @see [[https://ncatlab.org/nlab/show/split+epimorphism Split Epimorphism]] at nLab
-  */
+ * A split epimorphism, which we can think of as a weaker `Iso[A, B]` where `B` is a ''smaller''
+ * . type. So `reverseGet andThen get` remains an identity but `get andThen reverseGet` is merely
+ * idempotent (i.e., it normalizes values in `A`). The following statements hold:
+ *
+ *  - `reverseGet` is a ''section'' of `get`,
+ *  - `get` is a ''retraction'' of `reverseGet`,
+ *  - `B` is a ''retract'' of `A`,
+ *  - the pair `(get, reverseGet)` is a ''splitting'' of the idempotent `get andThen reverseGet`.
+ *
+ * @param get any function A => B.
+ * @param reverseGet a section of `get` such that `reverseGet andThen get` is an identity.
+ * @see [[https://ncatlab.org/nlab/show/split+epimorphism Split Epimorphism]] at nLab
+ */
 final case class SplitEpi[A, B](get: A => B, reverseGet: B => A) {
 
   /** Modify the target of the SplitEpi using a function. */
@@ -80,9 +80,9 @@ final case class SplitEpi[A, B](get: A => B, reverseGet: B => A) {
     SplitEpi(g.andThen(get), reverseGet.andThen(f))
 
   /**
-    * get and reverseGet, yielding a normalized formatted value. Subsequent get/reverseGet cycles are
-    * idempotent.
-    */
+   * get and reverseGet, yielding a normalized formatted value. Subsequent get/reverseGet cycles are
+   * idempotent.
+   */
   def normalize(a: A): A =
     reverseGet(get(a))
 
@@ -94,9 +94,9 @@ final case class SplitEpi[A, B](get: A => B, reverseGet: B => A) {
     taggedToString(b.productPrefix, b)
 
   /**
-    * If we provide a tag like "Foo" and reverseGet as a String we can implement a nice toString like
-    * "Foo(stuff)".
-    */
+   * If we provide a tag like "Foo" and reverseGet as a String we can implement a nice toString like
+   * "Foo(stuff)".
+   */
   def taggedToString(tag: String, b: B)(implicit
     as:                   A =:= String
   ): String =

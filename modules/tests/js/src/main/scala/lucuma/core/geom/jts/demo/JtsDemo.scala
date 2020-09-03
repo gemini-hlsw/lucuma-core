@@ -13,8 +13,8 @@ import lucuma.core.geom.svg._
 import lucuma.core.geom.svg.implicits._
 
 /**
-  * Throwaway demo code to visualize a shape created using `ShapeExpression`s.
-  */
+ * Throwaway demo code to visualize a shape created using `ShapeExpression`s.
+ */
 object JtsDemo {
   def main(args: Array[String]): Unit =
     GmosOiwfsProbeArm.shape.eval match {

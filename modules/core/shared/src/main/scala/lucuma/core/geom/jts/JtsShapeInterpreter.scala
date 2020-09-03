@@ -15,8 +15,8 @@ import org.locationtech.jts.geom.util.AffineTransformation
 import org.locationtech.jts.util.GeometricShapeFactory
 
 /**
-  * JTS shape interpreter.
-  */
+ * JTS shape interpreter.
+ */
 object JtsShapeInterpreter extends ShapeInterpreter {
 
   private val EmptyGeometry: Geometry =

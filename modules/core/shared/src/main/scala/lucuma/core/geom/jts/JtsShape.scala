@@ -9,8 +9,8 @@ import lucuma.core.geom.jts.syntax.offset._
 import org.locationtech.jts.geom.Geometry
 
 /**
-  * JTS implementation of Shape.
-  */
+ * JTS implementation of Shape.
+ */
 final case class JtsShape(g: Geometry) extends Shape {
 
   override def contains(o: Offset): Boolean =

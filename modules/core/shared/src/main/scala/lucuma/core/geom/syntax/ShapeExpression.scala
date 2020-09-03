@@ -53,20 +53,20 @@ final class ShapeExpressionOps(val self: ShapeExpression) extends AnyVal {
     union(that)
 
   /**
-    * Promotes `Shape.contains` through evaluation.
-    */
+   * Promotes `Shape.contains` through evaluation.
+   */
   def contains(o: Offset)(implicit ev: ShapeInterpreter): Boolean =
     self.eval.contains(o)
 
   /**
-    * Promotes `Shape.area` through evaluation.
-    */
+   * Promotes `Shape.area` through evaluation.
+   */
   def area(implicit ev: ShapeInterpreter): Area =
     self.eval.area
 
   /**
-    * Promotes `Shape.area` through evaluation and produces µas^2^ as a `Long`.
-    */
+   * Promotes `Shape.area` through evaluation and produces µas^2^ as a `Long`.
+   */
   def µasSquared(implicit ev: ShapeInterpreter): Long =
     area.toMicroarcsecondsSquared
 }
@@ -79,44 +79,44 @@ trait ToShapeExpressionOps {
 final class ShapeExpressionCompanionOps(val self: ShapeExpression.type) extends AnyVal {
 
   /**
-    * An empty `ShapeExpression` with a broader type.
-    */
+   * An empty `ShapeExpression` with a broader type.
+   */
   def empty: ShapeExpression =
     ShapeExpression.Empty
 
   /**
-    * Constructs an ellipse bound by the rectangle defined by the given
-    * coordinates expressed as angular separation.
-    *
-    * @group Constructors
-    */
+   * Constructs an ellipse bound by the rectangle defined by the given
+   * coordinates expressed as angular separation.
+   *
+   * @group Constructors
+   */
   def ellipseAt(a: (Offset.P, Offset.Q), b: (Offset.P, Offset.Q)): ShapeExpression =
     Ellipse(Offset(a._1, a._2), Offset(b._1, b._2))
 
   /**
-    * Constructs an arbitrary polygon defined by the given coordinate list
-    * expressed as angular separation.
-    *
-    * @group Constructors
-    */
+   * Constructs an arbitrary polygon defined by the given coordinate list
+   * expressed as angular separation.
+   *
+   * @group Constructors
+   */
   def polygonAt(os: (Offset.P, Offset.Q)*): ShapeExpression =
     Polygon(os.toList.map(o => Offset(o._1, o._2)))
 
   /**
-    * Constructs a rectangle bound by the two given coordinates expressed as
-    * angular separation.
-    *
-    * @group Constructors
-    */
+   * Constructs a rectangle bound by the two given coordinates expressed as
+   * angular separation.
+   *
+   * @group Constructors
+   */
   def rectangleAt(a: (Offset.P, Offset.Q), b: (Offset.P, Offset.Q)): ShapeExpression =
     Rectangle(Offset(a._1, a._2), Offset(b._1, b._2))
 
   /**
-    * Constructs a regular polygon of a given radius and number of sides,
-    * centered at the origin with a vertex at (radius, 0).
-    *
-    * @group Constructors
-    */
+   * Constructs a regular polygon of a given radius and number of sides,
+   * centered at the origin with a vertex at (radius, 0).
+   *
+   * @group Constructors
+   */
   def regularPolygon(radius: Angle, nSides: Int): ShapeExpression = {
     val µas = radius.toMicroarcseconds
     val v0  = radius.offsetInP
@@ -133,37 +133,37 @@ final class ShapeExpressionCompanionOps(val self: ShapeExpression.type) extends 
   }
 
   /**
-    * Constructs a rectangle of width w and height h with a corner at (0,0).
-    *
-    * @group Constructors
-    */
+   * Constructs a rectangle of width w and height h with a corner at (0,0).
+   *
+   * @group Constructors
+   */
   def rectangle(w: Angle, h: Angle): ShapeExpression =
     Rectangle(Offset.Zero, Offset(w.p, h.q))
 
   /**
-    * Constructs a rectangle of width w and height h centered at the base
-    * position, to within microarcsecond precision.
-    *
-    * @group Constructors
-    */
+   * Constructs a rectangle of width w and height h centered at the base
+   * position, to within microarcsecond precision.
+   *
+   * @group Constructors
+   */
   def centeredRectangle(w: Angle, h: Angle): ShapeExpression =
     Translate(rectangle(w, h), Offset(-w.bisect.p, -h.bisect.q))
 
   /**
-    * Constructs an ellipse contained in a rectangle of width w and height h with
-    * a corner at (0,0).
-    *
-    * @group Constructors
-    */
+   * Constructs an ellipse contained in a rectangle of width w and height h with
+   * a corner at (0,0).
+   *
+   * @group Constructors
+   */
   def ellipse(w: Angle, h: Angle): ShapeExpression =
     Ellipse(Offset.Zero, Offset(w.p, h.q))
 
   /**
-    * Constructs an ellipse contained in a rectangle of width w and height
-    * centered at the base position, to within microarcsecond precision.
-    *
-    * @group Constructors
-    */
+   * Constructs an ellipse contained in a rectangle of width w and height
+   * centered at the base position, to within microarcsecond precision.
+   *
+   * @group Constructors
+   */
   def centeredEllipse(w: Angle, h: Angle): ShapeExpression =
     Translate(ellipse(w, h), Offset(-w.bisect.p, -h.bisect.q))
 
