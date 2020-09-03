@@ -46,8 +46,7 @@ object JtsDemo extends Frame("JTS Demo") {
     List(
       GmosOiwfsProbeArm.shapeAt(posAngle, guideStarOffset, offsetPos, fpu, port),
       GmosOiwfsProbeArm.patrolFieldAt(posAngle, offsetPos, fpu, port),
-      GmosScienceAreaGeometry.imaging ⟲ posAngle,
-      GmosScienceAreaGeometry.imaging ↗ offsetPos ⟲ posAngle
+      GmosScienceAreaGeometry.shapeAt(posAngle, offsetPos, fpu)
     )
 
   // Scale
