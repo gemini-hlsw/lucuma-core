@@ -13,11 +13,12 @@ import java.time.Instant
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Gen
 import lucuma.core.math.arb._
-import io.chrisdavenport.cats.time._
-import cats.kernel.laws.discipline.EqTests
-import lucuma.core.optics.laws.discipline.SplitEpiTests
-import monocle.law.discipline.PrismTests
+import lucuma.core.arb.ArbTime
 import cats.kernel.laws.discipline.BoundedSemilatticeTests
+import cats.kernel.laws.discipline.EqTests
+import monocle.law.discipline.PrismTests
+import lucuma.core.optics.laws.discipline.SplitEpiTests
+import io.chrisdavenport.cats.time._
 
 final class ScheduleSpec extends CatsSuite with IntervalGens {
   import ArbSchedule._

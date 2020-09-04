@@ -7,7 +7,7 @@ import cats.{ Eq, Order, Show }
 import cats.kernel.CommutativeGroup
 import cats.syntax.eq._
 import lucuma.core.math.parser.AngleParsers
-import lucuma.core.math.syntax.parser._
+import lucuma.core.syntax.parser._
 import lucuma.core.optics._
 import monocle.{ Iso, Prism }
 

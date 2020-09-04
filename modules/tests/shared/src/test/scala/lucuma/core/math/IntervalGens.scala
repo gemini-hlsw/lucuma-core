@@ -10,7 +10,8 @@ import java.time.Instant
 import org.scalacheck.Gen
 import org.scalacheck.Gen.Choose
 import org.scalacheck.Arbitrary._
-import lucuma.core.math.arb.ArbTime._
+import lucuma.core.syntax.time._
+import lucuma.core.arb.ArbTime._
 import io.chrisdavenport.cats.time._
 
 trait IntervalGens {
@@ -105,7 +106,7 @@ trait IntervalGens {
     for {
       samples <- Gen.choose(50L, 400L)
       delta   <- Gen.choose(0, MaxDelta)
-    } yield interval.duration.dividedBy(samples).plusNanos(delta)
+    } yield (interval.duration / samples).plusNanos(delta)
 
   def distinctZip[A: Eq](gen1: Gen[A], gen2: Gen[A]): Gen[(A, A)] =
     Gen.zip(gen1, gen2).suchThat(t => t._1 =!= t._2)

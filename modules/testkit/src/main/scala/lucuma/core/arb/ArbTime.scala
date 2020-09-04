@@ -1,12 +1,12 @@
 // Copyright (c) 2016-2020 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package lucuma.core.math.arb
+package lucuma.core.arb
 
 import org.scalacheck._
 import org.scalacheck.Gen._
 import org.scalacheck.Arbitrary._
-
+import lucuma.core.syntax.time._
 import scala.jdk.CollectionConverters._
 import scala.concurrent.duration.{ Duration => SDuration }
 import java.time._
@@ -58,8 +58,8 @@ trait ArbTime {
   private def transitions(zid: ZoneId): List[Instant] = {
     val span  = Period.ofYears(50)
     val now   = Instant.now.atZone(zid)
-    val start = now.minus(span).toInstant
-    val end   = now.plus(span).toInstant
+    val start = (now - span).toInstant
+    val end   = (now + span).toInstant
     List.unfold(start)(i =>
       Option(zid.getRules.nextTransition(i)).flatMap(transition =>
         transition.getInstant.some

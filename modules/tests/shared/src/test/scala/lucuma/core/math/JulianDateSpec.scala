@@ -13,9 +13,9 @@ import org.scalacheck.Gen._
 import java.time.LocalDateTime
 import java.time.Instant
 import org.scalacheck.Arbitrary
+import lucuma.core.arb.ArbTime
 
 final class JulianDateSpec extends CatsSuite {
-
   import ArbJulianDate._
   import ArbTime._
 

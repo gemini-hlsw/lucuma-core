@@ -1,18 +1,19 @@
 // Copyright (c) 2016-2020 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package lucuma.core.math.syntax
+package lucuma.core.syntax
 
 final class StringOps(val self: String) extends AnyVal {
 
   private def parse[A](f: String => A): Option[A] =
-    try Some(f(self)) catch { case _: IllegalArgumentException => None }
+    try Some(f(self))
+    catch { case _: IllegalArgumentException => None }
 
-  def parseShortOption:   Option[Short]   = parse(_.toShort)
-  def parseIntOption:     Option[Int]     = parse(_.toInt)
-  def parseLongOption:    Option[Long]    = parse(_.toLong)
-  def parseDoubleOption:  Option[Double]  = parse(_.toDouble)
-  def parseBooleanOption: Option[Boolean] = parse(_.toBoolean)
+  def parseShortOption: Option[Short] = parse(_.toShort)
+  def parseIntOption: Option[Int]               = parse(_.toInt)
+  def parseLongOption: Option[Long]             = parse(_.toLong)
+  def parseDoubleOption: Option[Double]         = parse(_.toDouble)
+  def parseBooleanOption: Option[Boolean]       = parse(_.toBoolean)
   def parseBigDecimalOption: Option[BigDecimal] = parse(BigDecimal(_))
 
 }

@@ -14,6 +14,7 @@ import org.scalacheck._
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Cogen._
 import java.time.ZoneId
+import lucuma.core.arb.ArbTime
 
 trait ArbPlace {
   import ArbAngle._
@@ -39,7 +40,6 @@ trait ArbPlace {
       alt    <- genEarthAlt
       zoneId <- arbitrary[ZoneId]
     } yield Place(lat, lon, alt, zoneId)
-
 
   implicit val arbPlace: Arbitrary[Place] =
     Arbitrary(genPlace)

@@ -9,7 +9,7 @@ import java.time.LocalDateTime
 
 import org.scalacheck._
 import org.scalacheck.Arbitrary._
-
+import lucuma.core.arb.ArbTime
 
 trait ArbJulianDate {
   import ArbTime._

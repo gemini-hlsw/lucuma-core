@@ -5,7 +5,7 @@ package lucuma.core.model
 
 import lucuma.core.util.Timestamp
 import lucuma.core.optics.SplitMono
-import lucuma.core.math.syntax.treemap._
+import lucuma.core.syntax.treemap._
 
 import cats.{ Eq, Foldable, Monoid }
 import cats.implicits._
@@ -13,9 +13,9 @@ import cats.implicits._
 import scala.collection.immutable.TreeMap
 
 /**
-  * Time-parameterized coordinates over a fixed interval, defined pairwise. Coordinates that fall
-  * between known instants are interpolated.
-  */
+ * Time-parameterized coordinates over a fixed interval, defined pairwise. Coordinates that fall
+ * between known instants are interpolated.
+ */
 sealed abstract case class Ephemeris private (toMap: TreeMap[Timestamp, EphemerisCoordinates]) {
   import Ephemeris.Element
 
@@ -42,9 +42,9 @@ sealed abstract case class Ephemeris private (toMap: TreeMap[Timestamp, Ephemeri
       })
 
   /**
-    * Greatest lower and least upper bounds of `t`; i.e., the closest elements on either side,
-    * inclusive (so if `t` is present then `bracket(t) = (t, t)`).
-    */
+   * Greatest lower and least upper bounds of `t`; i.e., the closest elements on either side,
+   * inclusive (so if `t` is present then `bracket(t) = (t, t)`).
+   */
   def bracket(t: Timestamp): Option[(Element, Element)] =
     (toMap.rangeTo(t).lastOption, toMap.rangeFrom(t).headOption).tupled
 

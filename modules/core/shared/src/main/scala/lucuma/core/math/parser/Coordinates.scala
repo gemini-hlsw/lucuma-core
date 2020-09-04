@@ -6,26 +6,30 @@ package lucuma.core.math.parser
 import cats.syntax.all._
 import atto._, Atto._
 import lucuma.core.math._
+import lucuma.core.parser.MiscParsers
 
 /** Parsers for [[lucuma.core.math.Coordinates]] and related types. */
 trait CoordinateParsers {
-  import AngleParsers.{ hms, dms }
+  import AngleParsers.{ dms, hms }
   import MiscParsers.spaces1
 
   /** Parser for a RightAscension, always a positive angle in HMS. */
   val ra: Parser[RightAscension] =
-    hms.map(RightAscension(_)) named "ra"
+    hms.map(RightAscension(_)).named("ra")
 
   /** Parser for a RightAscension, always a positive angle in HMS. */
   val dec: Parser[Declination] =
-    dms.map(Declination.fromAngle.getOption).flatMap {
-      case Some(ra) => ok(ra)
-      case None     => err[Declination]("Invalid Declination")
-    } named "dec"
+    dms
+      .map(Declination.fromAngle.getOption)
+      .flatMap {
+        case Some(ra) => ok(ra)
+        case None     => err[Declination]("Invalid Declination")
+      }
+      .named("dec")
 
   /** Parser for coordinates: HMS and DMS separated by spaces. */
   val coordinates: Parser[Coordinates] =
-    (ra <~ spaces1, dec).mapN(Coordinates(_, _)) named "coordinates"
+    (ra <~ spaces1, dec).mapN(Coordinates(_, _)).named("coordinates")
 
 }
 object CoordinateParsers extends CoordinateParsers

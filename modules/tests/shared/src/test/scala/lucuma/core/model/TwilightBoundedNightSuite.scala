@@ -10,7 +10,7 @@ import cats.{ Eq, Show }
 import java.time._
 import lucuma.core.enum.Site
 import lucuma.core.enum.TwilightType
-import lucuma.core.math.arb.ArbTime._
+import lucuma.core.arb.ArbTime._
 import lucuma.core.model.arb.ArbTwilightBoundedNight._
 import lucuma.core.util.arb.ArbEnumerated._
 import cats.kernel.laws.discipline._

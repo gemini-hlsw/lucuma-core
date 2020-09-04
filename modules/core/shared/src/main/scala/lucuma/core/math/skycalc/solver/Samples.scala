@@ -8,14 +8,15 @@ import cats.implicits._
 import cats.{ Eq, Eval, Functor, MonoidK }
 import java.time.{ Duration, Instant }
 import lucuma.core.math.{ Coordinates, Interval, Place }
+import lucuma.core.syntax.time._
 import scala.collection.immutable.TreeMap
 import monocle.Iso
 import io.chrisdavenport.cats.time._
 
 /**
-  * A set of samples, keyed by `Instant`. Samples are lazy and must be forced by the user, and
-  * mapping operations are also applied lazily.
-  */
+ * A set of samples, keyed by `Instant`. Samples are lazy and must be forced by the user, and
+ * mapping operations are also applied lazily.
+ */
 trait Samples[A] { outer =>
   import Samples.{ Bracket, Lookup }
 
@@ -40,16 +41,16 @@ trait Samples[A] { outer =>
     data.get(i).map(_.flatMap(k(i, _)))
 
   /**
-    * Sample data, as a map. Accessing this field has an initial cost of duplicating the underlying
-    * structure and applying any mapped fuctions to the value cells (which remain unforced).
-    */
+   * Sample data, as a map. Accessing this field has an initial cost of duplicating the underlying
+   * structure and applying any mapped fuctions to the value cells (which remain unforced).
+   */
   lazy val toMap: TreeMap[Instant, Eval[A]] =
     data.map { case (i, ep) => (i, ep.flatMap(k(i, _))) }
 
   /**
-    * Split the samples at `i`, yielding a `Lookup` containing the matching sample, if any, and all
-    * samples before and after `i`.
-    */
+   * Split the samples at `i`, yielding a `Lookup` containing the matching sample, if any, and all
+   * samples before and after `i`.
+   */
   def lookup(i: Instant): Lookup[A] = {
     val ls = toMap.rangeUntil(i) // will not contain i
     val rs = toMap.rangeFrom(i)  // may start with i
@@ -60,9 +61,9 @@ trait Samples[A] { outer =>
   }
 
   /**
-    * Split the samples at `i`, yielding a `Bracket` containing the matching sample, if any, and the
-    * samples immediately before and after `i`, if any.
-    */
+   * Split the samples at `i`, yielding a `Bracket` containing the matching sample, if any, and the
+   * samples immediately before and after `i`, if any.
+   */
   def bracket(i: Instant): Bracket[A] = {
     val left  = data.maxBefore(i).map { case (i, ep) => (i, ep.flatMap(k(i, _))) }
     val focus = get(i).map((i, _))
@@ -87,9 +88,9 @@ trait Samples[A] { outer =>
     mapWithKeys((_, a) => f(a))
 
   /**
-    * Construct a new `Samples` with samples of type `B`, allowing inspection of the associated
-    * key. `f` is evaluated lazily.
-    */
+   * Construct a new `Samples` with samples of type `B`, allowing inspection of the associated
+   * key. `f` is evaluated lazily.
+   */
   def mapWithKeys[B](f: (Instant, A) => B): Samples[B] =
     mapEvalWithKeys((i, a) => Eval.later(f(i, a)))
 
@@ -98,9 +99,9 @@ trait Samples[A] { outer =>
     mapEvalWithKeys((_, a) => f(a))
 
   /**
-    * Construct a new `Samples` with samples of type `B`, allowing inspection of the associated
-    * key.
-    */
+   * Construct a new `Samples` with samples of type `B`, allowing inspection of the associated
+   * key.
+   */
   def mapEvalWithKeys[B](f: (Instant, A) => Eval[B]): Samples[B] =
     new Samples[B] {
       type P = outer.P
@@ -109,9 +110,9 @@ trait Samples[A] { outer =>
     }
 
   /**
-    * Concatenate another `Samples` using `Map` semantics (i.e., in case of conflct the `Samples`
-    * on the RHS wins).
-    */
+   * Concatenate another `Samples` using `Map` semantics (i.e., in case of conflct the `Samples`
+   * on the RHS wins).
+   */
   def ++(other: Samples[A]): Samples[A] =
     Samples.fromMap(toMap ++ other.toMap)
 
@@ -120,9 +121,9 @@ trait Samples[A] { outer =>
 object Samples extends SamplesOptics {
 
   /**
-    * A lookup result, which contains the samples prior to `i`, the sample at `i` (if any), and the
-    * samples subsequent to `i`.
-    */
+   * A lookup result, which contains the samples prior to `i`, the sample at `i` (if any), and the
+   * samples subsequent to `i`.
+   */
   case class Lookup[A](
     lefts:  TreeMap[Instant, Eval[A]],
     focus:  Option[(Instant, Eval[A])],
@@ -130,9 +131,9 @@ object Samples extends SamplesOptics {
   )
 
   /**
-    * A bracket result, which contains the sample immediately prior to `i` (if any), the sample at
-    * `i` (if any), and the sample immediately following to `i` (if any).
-    */
+   * A bracket result, which contains the sample immediately prior to `i` (if any), the sample at
+   * `i` (if any), and the sample immediately following to `i` (if any).
+   */
   case class Bracket[A](
     left:  Option[(Instant, Eval[A])],
     focus: Option[(Instant, Eval[A])],
@@ -155,8 +156,8 @@ object Samples extends SamplesOptics {
   def atFixedRate[A](interval: Interval, rate: Duration)(f: Instant => A): Samples[A] =
     fromMap(
       Iterator
-        .iterate(interval.start)(_.plus(rate))
-        .takeWhile(_ < interval.end.plus(rate))
+        .iterate(interval.start)(_ + rate)
+        .takeWhile(_ < interval.end + rate)
         .map(i => (i, Eval.later(f(i))))
         .to(TreeMap)
     )
@@ -166,24 +167,24 @@ object Samples extends SamplesOptics {
     Samples.fromMap(TreeMap.empty)
 
   /**
-    * @group Typeclass Instances
-    */
+   * @group Typeclass Instances
+   */
   implicit def eqSamples[A: Eq]: Eq[Samples[A]] =
     Eq.by(_.toMap.toMap)
 
   /**
-    * Samples is a covariant functor.
-    * @group Typeclass Instances
-    */
+   * Samples is a covariant functor.
+   * @group Typeclass Instances
+   */
   implicit val FunctorSamples: Functor[Samples] =
     new Functor[Samples] {
       def map[A, B](fa: Samples[A])(f: A => B) = fa.map(f)
     }
 
   /**
-    * `Samples` is a `MonoidK`.
-    * @group Typeclass Instances
-    */
+   * `Samples` is a `MonoidK`.
+   * @group Typeclass Instances
+   */
   implicit val MonoidKSamples: MonoidK[Samples] =
     new MonoidK[Samples] {
       def combineK[A](x: Samples[A], y: Samples[A]) = x ++ y
@@ -204,9 +205,9 @@ object Samples extends SamplesOptics {
   implicit class SkyCalcResultsSamplesSyntax(self: Samples[SkyCalcResults]) {
 
     /**
-      * Compute the weighted mean parallactic angle over this `Samples`, if the target is visible for
-      * at least one sample.
-      */
+     * Compute the weighted mean parallactic angle over this `Samples`, if the target is visible for
+     * at least one sample.
+     */
     lazy val weightedMeanParallacticAngle: Eval[Option[Double]] =
       self
         .map { r =>
@@ -244,8 +245,8 @@ object Samples extends SamplesOptics {
 trait SamplesOptics {
 
   /**
-    * @group Optics
-    */
+   * @group Optics
+   */
   def data[A]: Iso[Samples[A], TreeMap[Instant, Eval[A]]] =
     Iso[Samples[A], TreeMap[Instant, Eval[A]]](_.toMap)(Samples.fromMap)
 

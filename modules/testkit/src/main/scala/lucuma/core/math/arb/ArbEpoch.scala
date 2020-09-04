@@ -8,6 +8,8 @@ import java.time.LocalDateTime
 import org.scalacheck._
 import org.scalacheck.Gen._
 import org.scalacheck.Arbitrary._
+import lucuma.core.arb._
+import lucuma.core.arb.ArbTime
 
 trait ArbEpoch {
   import ArbTime._

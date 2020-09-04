@@ -6,7 +6,7 @@ package lucuma.core.math.parser
 import atto._, Atto._
 import cats.tests.CatsSuite
 import lucuma.core.math.Index
-import lucuma.core.math.parser.MiscParsers.index
+import lucuma.core.parser.MiscParsers.index
 
 final class MiscParsersSpec extends CatsSuite {
 

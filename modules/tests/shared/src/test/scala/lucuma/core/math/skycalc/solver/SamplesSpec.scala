@@ -11,6 +11,7 @@ import scala.collection.immutable.TreeMap
 import lucuma.core.math.Interval
 import lucuma.core.math.IntervalGens
 import lucuma.core.math.skycalc.solver.Samples.Bracket
+import lucuma.core.syntax.time._
 import org.scalacheck.Gen._
 import org.scalacheck.Arbitrary._
 import lucuma.core.math.arb._
@@ -18,13 +19,16 @@ import cats.laws.discipline.FunctorTests
 import cats.laws.discipline.MonoidKTests
 import cats.kernel.laws.discipline.EqTests
 import monocle.law.discipline.IsoTests
+import lucuma.core.arb._
+import lucuma.core.arb.ArbEval
+import lucuma.core.arb.ArbTime
 import io.chrisdavenport.cats.time._
 
 final class SamplesSpec extends CatsSuite with IntervalGens {
+  import ArbEval._
   import ArbInterval._
   import ArbSamples._
   import ArbTime._
-  import ArbEval._
 
   // Laws
   checkAll("Eq", EqTests[Samples[Int]].eqv)
@@ -44,7 +48,7 @@ final class SamplesSpec extends CatsSuite with IntervalGens {
         val instants         = fixedRateSamples.toMap.keys.toList
         assert(instants.head === interval.start)
         val last             = instants.last
-        val maxSample        = interval.end.plus(duration)
+        val maxSample        = interval.end + duration
         assert(last >= interval.end)
         assert(last < maxSample)
         val intervalSamples  = interval.duration.toNanos / duration.toNanos + 1

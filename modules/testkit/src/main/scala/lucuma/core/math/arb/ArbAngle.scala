@@ -4,6 +4,7 @@
 package lucuma.core.math.arb
 
 import lucuma.core.math.{ Angle, HourAngle }
+import lucuma.core.arb._
 import org.scalacheck._
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Cogen._
@@ -42,7 +43,9 @@ trait ArbAngle {
 
   // Strings that are often parsable as HMS.
   val stringsHMS: Gen[String] =
-    arbitrary[HourAngle].map(HourAngle.fromStringHMS.reverseGet).flatMapOneOf(Gen.const, perturbations: _*)
+    arbitrary[HourAngle]
+      .map(HourAngle.fromStringHMS.reverseGet)
+      .flatMapOneOf(Gen.const, perturbations: _*)
 
   // Strings that are often parsable as DMS.
   val stringsDMS: Gen[String] =
@@ -50,7 +53,9 @@ trait ArbAngle {
 
   // Strings that are often parsable as signed DMS.
   val stringsSignedDMS: Gen[String] =
-    arbitrary[Angle].map(Angle.fromStringSignedDMS.reverseGet).flatMapOneOf(Gen.const, perturbations: _*)
+    arbitrary[Angle]
+      .map(Angle.fromStringSignedDMS.reverseGet)
+      .flatMapOneOf(Gen.const, perturbations: _*)
 
 }
 

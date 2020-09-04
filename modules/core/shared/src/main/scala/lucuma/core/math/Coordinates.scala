@@ -6,7 +6,7 @@ package lucuma.core.math
 import cats._, cats.implicits._
 import lucuma.core.math.parser.CoordinateParsers
 import lucuma.core.optics.Format
-import lucuma.core.math.syntax.all._
+import lucuma.core.syntax.all._
 import monocle.Lens
 import monocle.macros._
 import scala.math.{ atan2, cos, sin, sqrt }
@@ -15,10 +15,10 @@ import scala.math.{ atan2, cos, sin, sqrt }
 final case class Coordinates(ra: RightAscension, dec: Declination) {
 
   /**
-    * Offset these `Coordinates` by the given deltas, and indicate whether the declination crossed
-    * a pole; if so the right ascension will have been flipped 180°.
-    * @group Operations
-    */
+   * Offset these `Coordinates` by the given deltas, and indicate whether the declination crossed
+   * a pole; if so the right ascension will have been flipped 180°.
+   * @group Operations
+   */
   def offsetWithCarry(dRA: HourAngle, dDec: Angle): (Coordinates, Boolean) =
     dec.offset(dDec) match {
       case (decʹ, false) => (Coordinates(ra.offset(dRA), decʹ), false)
@@ -26,24 +26,24 @@ final case class Coordinates(ra: RightAscension, dec: Declination) {
     }
 
   /**
-    * Offset these `Coordinates` by the given deltas. If the declination crossed a pole the right
-    * ascension will have been flipped 180°.
-    * @group Operations
-    */
+   * Offset these `Coordinates` by the given deltas. If the declination crossed a pole the right
+   * ascension will have been flipped 180°.
+   * @group Operations
+   */
   def offset(dRA: HourAngle, dDec: Angle): Coordinates =
     offsetWithCarry(dRA, dDec)._1
 
   /**
-    * Compute the offset between points, such that `a offset (a diff b) = b`.
-    * @group Operations
-    */
+   * Compute the offset between points, such that `a offset (a diff b) = b`.
+   * @group Operations
+   */
   def diff(c: Coordinates): (HourAngle, Angle) =
     (c.ra.toHourAngle - ra.toHourAngle, c.dec.toAngle - dec.toAngle)
 
   /**
-    * Angular distance from `this` to `that`, always a positive angle in [0, 180]). Approximate.
-    * @see Algorithm at [[http://www.movable-type.co.uk/scripts/latlong.html Movable Type Scripts]].
-    */
+   * Angular distance from `this` to `that`, always a positive angle in [0, 180]). Approximate.
+   * @see Algorithm at [[http://www.movable-type.co.uk/scripts/latlong.html Movable Type Scripts]].
+   */
   def angularDistance(that: Coordinates): Angle = {
     val φ1 = this.dec.toAngle.toDoubleRadians
     val φ2 = that.dec.toAngle.toDoubleRadians
@@ -56,11 +56,11 @@ final case class Coordinates(ra: RightAscension, dec: Declination) {
   }
 
   /**
-    * Interpolate between `this` and `that` at a position specified by `f`, where `0.0` is `this`,
-    * `1.0` is `other`, and `0.5` is halfway along the great circle connecting them. Note that this
-    * computation is undefined where `f` is `NaN` or `Infinity`. Approximate.
-    * @see Algorithm at [[http://www.movable-type.co.uk/scripts/latlong.html Movable Type Scripts]].
-    */
+   * Interpolate between `this` and `that` at a position specified by `f`, where `0.0` is `this`,
+   * `1.0` is `other`, and `0.5` is halfway along the great circle connecting them. Note that this
+   * computation is undefined where `f` is `NaN` or `Infinity`. Approximate.
+   * @see Algorithm at [[http://www.movable-type.co.uk/scripts/latlong.html Movable Type Scripts]].
+   */
   def interpolate(that: Coordinates, f: Double): Coordinates = {
     val δ = angularDistance(that).toDoubleRadians
     if (δ === 0) this
@@ -120,9 +120,9 @@ object Coordinates extends CoordinatesOptics {
 trait CoordinatesOptics { this: Coordinates.type =>
 
   /**
-    * Format as a String like "17 57 48.49803 +04 41 36.2072".
-    * @group Optics
-    */
+   * Format as a String like "17 57 48.49803 +04 41 36.2072".
+   * @group Optics
+   */
   val fromHmsDms: Format[String, Coordinates] = Format(
     CoordinateParsers.coordinates.parseExact,
     cs =>

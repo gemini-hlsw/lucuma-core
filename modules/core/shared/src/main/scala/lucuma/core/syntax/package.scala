@@ -3,11 +3,24 @@
 
 package lucuma.core
 
+import lucuma.core.math.syntax.ToIntOps
+import lucuma.core.optics.syntax.ToPrismOps
+
 /**
  * Syntax classes for extension methods, organized à la cats. Each syntax class has an associated
  * conversion trait and module that extends it; and the `all` module which extends all
  * conversions traits.
  */
 package object syntax {
-  object all extends ToDisplayOps
+  object all
+      extends ToDisplayOps
+      with ToDurationOps
+      with ToInstantOps
+      with ToIntOps
+      with ToParserOps
+      with ToPrismOps
+      with ToStringOps
+      with ToTreeMapCompanionOps
+      with ToTreeMapOps
+      with ToTreeSetCompanionOps
 }
