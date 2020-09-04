@@ -4,7 +4,7 @@
 package lucuma.core.math.arb
 
 import lucuma.core.math.Index
-import lucuma.core.math.syntax.prism._
+import lucuma.core.optics.syntax.prism._
 import org.scalacheck._
 import org.scalacheck.Gen._
 

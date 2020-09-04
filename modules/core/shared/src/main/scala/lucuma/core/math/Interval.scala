@@ -14,6 +14,7 @@ import java.time.ZoneId
 import monocle.Getter
 import monocle.Prism
 import lucuma.core.optics.Format
+import lucuma.core.syntax.time._
 import io.chrisdavenport.cats.time._
 
 /**
@@ -191,7 +192,7 @@ trait IntervalOptics { self: Interval.type =>
     Prism[(Instant, Duration), Interval] {
       case (start, duration) =>
         if (duration > Duration.ZERO)
-          (new Interval(start, start.plus(duration)) {}).some
+          (new Interval(start, start + duration) {}).some
         else
           none
     }(i => (i.start, i.duration))

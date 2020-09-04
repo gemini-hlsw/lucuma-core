@@ -8,6 +8,7 @@ import java.time.Duration
 import java.time.Instant
 import lucuma.core.math.Interval
 import lucuma.core.math.Schedule
+import lucuma.core.syntax.time._
 import io.chrisdavenport.cats.time._
 import scala.annotation.tailrec
 
@@ -17,11 +18,11 @@ object SolverStrategy {
 }
 
 /**
-  * Typeclass defininig an algorithm that finds a [[Schedule]] within a given [[Interval]] for which a given
-  * function <code>Instant => Boolean</code> is true.
-  *
-  * @tparam S [[SolverStrategy]] to use
-  */
+ * Typeclass defininig an algorithm that finds a [[Schedule]] within a given [[Interval]] for which a given
+ * function <code>Instant => Boolean</code> is true.
+ *
+ * @tparam S [[SolverStrategy]] to use
+ */
 trait Solver[S] {
   def solve(
     metAt:    Instant => Boolean
@@ -31,11 +32,11 @@ trait Solver[S] {
 trait SolverInstances {
 
   /**
-    * Solver that finds all intervals for which the underlying constraint is true by sampling the constraint function
-    * at a given rate. Intervals shorter than the sampling rate may be missed by this solver. Use this solver
-    * for complex functions which can have an arbitrary amount of separate intervals for which the constraint
-    * meats its criteria (e.g. Sky Background).
-    */
+   * Solver that finds all intervals for which the underlying constraint is true by sampling the constraint function
+   * at a given rate. Intervals shorter than the sampling rate may be missed by this solver. Use this solver
+   * for complex functions which can have an arbitrary amount of separate intervals for which the constraint
+   * meats its criteria (e.g. Sky Background).
+   */
   implicit object DefaultSolver extends Solver[SolverStrategy.Default] {
     def solve(metAt: Instant => Boolean)(interval: Interval, step: Duration): Schedule = {
       require(step > Duration.ZERO)
@@ -48,20 +49,20 @@ trait SolverInstances {
           else
             accum
         else if (metAt(i) == curState)
-          solve(curStart, curState, i.plus(step), accum)
+          solve(curStart, curState, i + step, accum)
         else if (curState)
-          solve(i, curState = false, i.plus(step), accum.union(Interval.unsafe(curStart, i)))
+          solve(i, curState = false, i + step, accum.union(Interval.unsafe(curStart, i)))
         else
-          solve(i, curState = true, i.plus(step), accum)
+          solve(i, curState = true, i + step, accum)
 
       solve(interval.start, metAt(interval.start), interval.start, Schedule.Never)
     }
   }
 
   /**
-    * Finds a solution for a constraint on a parabolic curve that crosses that constraint
-    * at most twice during the given interval. This is true for all basic elevation constraints for a single night.
-    */
+   * Finds a solution for a constraint on a parabolic curve that crosses that constraint
+   * at most twice during the given interval. This is true for all basic elevation constraints for a single night.
+   */
   implicit object ParabolaSolver extends Solver[SolverStrategy.Parabola] {
     def solve(metAt: Instant => Boolean)(interval: Interval, step: Duration): Schedule = {
       require(step > Duration.ZERO)

@@ -19,6 +19,7 @@ import cats.kernel.laws.discipline.EqTests
 import cats.kernel.laws.discipline.OrderTests
 import monocle.law.discipline.PrismTests
 import lucuma.core.optics.laws.discipline.FormatTests
+import lucuma.core.arb.ArbTime
 
 final class IntervalSpec extends CatsSuite with IntervalGens {
   import ArbInterval._

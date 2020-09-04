@@ -5,11 +5,10 @@ package lucuma.core.model
 
 import munit._
 import org.scalacheck.Prop._
-import cats.implicits._
 import cats.{ Eq, Show }
 import java.time._
 import lucuma.core.enum.Site
-import lucuma.core.math.arb.ArbTime._
+import lucuma.core.arb.ArbTime._
 import lucuma.core.model.arb.ArbObservingNight._
 import lucuma.core.util.arb.ArbEnumerated._
 import cats.kernel.laws.discipline._

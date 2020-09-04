@@ -9,6 +9,7 @@ import cats.kernel.laws.discipline._
 import lucuma.core.math.arb._
 import lucuma.core.optics.laws.discipline._
 import java.time.LocalDateTime
+import lucuma.core.arb.ArbTime
 
 final class EpochSpec extends CatsSuite {
   import ArbEpoch._

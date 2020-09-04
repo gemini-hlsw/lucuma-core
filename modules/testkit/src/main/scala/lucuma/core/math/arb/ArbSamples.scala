@@ -3,18 +3,20 @@
 
 package lucuma.core.math.arb
 
+import cats.Eval
+import java.time.Instant
 import org.scalacheck.Gen
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary._
 import lucuma.core.math.skycalc.solver.Samples
 import scala.collection.immutable.TreeMap
-import cats.Eval
-import java.time.Instant
-import ArbTime._
+import lucuma.core.arb.ArbEval
+import lucuma.core.arb.ArbTime
 import org.scalacheck.Cogen
 
 trait ArbSamples {
   import ArbEval._
+  import ArbTime._
 
   def genSamples[A: Arbitrary]: Gen[Samples[A]] =
     arbitrary[TreeMap[Instant, Eval[A]]].map(Samples.fromMap)

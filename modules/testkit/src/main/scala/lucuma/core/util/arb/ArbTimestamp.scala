@@ -5,7 +5,7 @@ package lucuma.core.util
 package arb
 
 import lucuma.core.util.Timestamp
-import lucuma.core.math.arb.ArbTime
+import lucuma.core.arb.ArbTime
 
 import org.scalacheck._
 
@@ -13,7 +13,6 @@ import java.time._
 
 // Arbitrary but reasonable Timestamp
 trait ArbTimestamp {
-
   import ArbTime.cogInstant
 
   implicit val arbTimestamp: Arbitrary[Timestamp] =

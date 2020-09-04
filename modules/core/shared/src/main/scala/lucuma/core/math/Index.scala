@@ -4,8 +4,8 @@
 package lucuma.core.math
 
 import cats.{ Order, Show }
-import lucuma.core.math.parser.MiscParsers
-import lucuma.core.math.syntax.all._
+import lucuma.core.parser.MiscParsers
+import lucuma.core.syntax.all._
 import monocle.Prism
 
 /** A positive, non-zero value for numbered identifiers. */
@@ -29,7 +29,7 @@ object Index extends IndexOptics {
 trait IndexOptics {
 
   /** @group Optics */
-  val fromShort: Prism[Short, Index] =
+  val fromShort: Prism[Short, Index]   =
     Prism((i: Short) => Option(i).filter(_ > 0).map(new Index(_) {}))(_.toShort)
 
   /** @group Optics */

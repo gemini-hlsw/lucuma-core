@@ -4,15 +4,16 @@
 package lucuma.core.math.skycalc.solver
 
 import cats.tests.CatsSuite
+import org.scalacheck.Prop
 import cats.Eq
 import java.time.Duration
 import java.time.Instant
 import org.scalacheck.Arbitrary
 import org.scalacheck.Gen
-import lucuma.core.math.arb._
-import org.scalacheck.Prop
-import cats.laws.discipline.InvariantSemigroupalTests
+import lucuma.core.arb.ArbTime
+import lucuma.core.syntax.time._
 import io.chrisdavenport.cats.time._
+import cats.laws.discipline.InvariantSemigroupalTests
 import org.scalactic.Tolerance
 
 final class SampleRounderSpec extends CatsSuite with Tolerance {
@@ -47,7 +48,7 @@ final class SampleRounderSpec extends CatsSuite with Tolerance {
     forAll { (i0: Instant, i1: Instant, i2: Instant) =>
       val i        = List(i0, i1, i2).sorted
       val rounded  = rounder.round(i(0), i(0), i(2), i(2), i(1))
-      val midpoint = i(0).plus(Duration.between(i(0), i(2)).dividedBy(2))
+      val midpoint = i(0) + Duration.between(i(0), i(2)) / 2
       if (i(1) < midpoint)
         assert(rounded === i(0).some)
       else

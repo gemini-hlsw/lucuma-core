@@ -8,15 +8,15 @@ package enum
 import cats.syntax.all._
 import lucuma.core.math.Angle
 import lucuma.core.math.Declination
-import lucuma.core.math.syntax.all._
 import lucuma.core.util.Enumerated
+import lucuma.core.optics.syntax.prism._
 
 /**
-  * Definition for how the range from sunset to sunrise should be defined for
-  * a night. There are various standard options for definition where the night
-  * begins and ends which are represented as static constants in side this
-  * class.
-  */
+ * Definition for how the range from sunset to sunrise should be defined for
+ * a night. There are various standard options for definition where the night
+ * begins and ends which are represented as static constants in side this
+ * class.
+ */
 sealed abstract class TwilightType(val tag: String, val horizonAngle: Declination)
     extends Product
     with Serializable

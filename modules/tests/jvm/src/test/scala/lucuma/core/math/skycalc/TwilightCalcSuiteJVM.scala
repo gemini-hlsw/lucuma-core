@@ -14,12 +14,14 @@ import java.time.LocalDate
 import lucuma.core.enum.Site
 import lucuma.core.enum.TwilightType
 import lucuma.core.math.Interval
-import lucuma.core.math.arb.ArbTime._
-import lucuma.core.util.arb.ArbEnumerated._
+import lucuma.core.arb.ArbTime
+import lucuma.core.util.arb.ArbEnumerated
 import edu.gemini.skycalc.TwilightBoundedNightTest
 import org.scalactic.Tolerance
 
 final class TwilightCalcSuiteJVM extends ScalaCheckSuite with Tolerance {
+  import ArbEnumerated._
+  import ArbTime._
 
   implicit val showLocalDate: Show[LocalDate] = Show.fromToString
   implicit val InstantEq: Eq[Instant]         = Eq.fromUniversalEquals

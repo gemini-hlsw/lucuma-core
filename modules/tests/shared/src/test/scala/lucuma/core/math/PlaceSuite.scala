@@ -2,6 +2,9 @@
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.math
+
+import munit.DisciplineSuite
+import org.scalacheck.Prop._
 import cats.Show
 import coulomb.scalacheck.ArbQuantity._
 import coulomb.cats.implicits._
@@ -9,11 +12,11 @@ import eu.timepit.refined.auto._
 import eu.timepit.refined.scalacheck.numeric._
 import eu.timepit.refined.cats._
 import lucuma.core.math.arb._
+import lucuma.core.arb._
+import lucuma.core.arb.ArbTime
 import monocle.law.discipline._
-import io.chrisdavenport.cats.time._
-import org.scalacheck.Prop._
-import munit.DisciplineSuite
 import cats.kernel.laws.discipline.EqTests
+import io.chrisdavenport.cats.time._
 
 final class PlaceSuite extends DisciplineSuite {
   import ArbPlace._

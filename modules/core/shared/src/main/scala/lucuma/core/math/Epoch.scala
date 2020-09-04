@@ -6,7 +6,7 @@ package lucuma.core.math
 import cats.{ Order, Show }
 import cats.syntax.all._
 import lucuma.core.math.parser.EpochParsers
-import lucuma.core.math.syntax.parser._
+import lucuma.core.syntax.parser._
 import lucuma.core.optics.Format
 import java.time._
 

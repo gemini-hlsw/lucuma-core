@@ -10,7 +10,7 @@ import lucuma.core.math.skycalc.TwilightCalc
 
 import cats.{ Order, Show }
 import cats.effect.Sync
-import cats.implicits._
+import cats.syntax.all._
 
 import java.time.Instant
 import java.time.LocalDate
@@ -52,13 +52,14 @@ sealed abstract case class TwilightBoundedNight private (
 
 object TwilightBoundedNight extends TwilightBoundedNightOptics {
 
-  /** Constructs a [[TwilightBoundedNight]] corresponding to an [[ObservingNight]].
-    *
-    * Returns None if there's no sunset or sunrise for the specified
-    * [[lucuma.core.enum.TwilightType]] and [[ObservingNight]].
-    *
-    * @group Constructors
-    */
+  /**
+   * Constructs a [[TwilightBoundedNight]] corresponding to an [[ObservingNight]].
+   *
+   * Returns None if there's no sunset or sunrise for the specified
+   * [[lucuma.core.enum.TwilightType]] and [[ObservingNight]].
+   *
+   * @group Constructors
+   */
   def fromTwilightTypeAndObservingNight(
     twilightType:   TwilightType,
     observingNight: ObservingNight
@@ -69,28 +70,30 @@ object TwilightBoundedNight extends TwilightBoundedNightOptics {
       .map(interval => new TwilightBoundedNight(twilightType, observingNight, interval) {})
   }
 
-  /** Constructs a [[TwilightBoundedNight]] corresponding to a [[ObservingNight]].
-    *
-    * Throws an exception if there's no sunset or sunrise for the specified
-    * [[lucuma.core.enum.TwilightType]] and [[ObservingNight]].
-    *
-    * @group Constructors
-    */
+  /**
+   * Constructs a [[TwilightBoundedNight]] corresponding to a [[ObservingNight]].
+   *
+   * Throws an exception if there's no sunset or sunrise for the specified
+   * [[lucuma.core.enum.TwilightType]] and [[ObservingNight]].
+   *
+   * @group Constructors
+   */
   def fromTwilightTypeAndObservingNightUnsafe(
     twilightType:   TwilightType,
     observingNight: ObservingNight
   ): TwilightBoundedNight =
     fromTwilightTypeAndObservingNight(twilightType, observingNight).get
 
-  /** Constructs a [[TwilightBoundedNight]] that ends on the given
-    * local date for for the given site.
-    *
-    * Returns None if there's no sunset or sunrise for the specified
-    * [[lucuma.core.enum.TwilightType]], [[lucuma.core.enum.Site]] and
-    * [[java.time.LocalDate]].
-    *
-    * @group Constructors
-    */
+  /**
+   * Constructs a [[TwilightBoundedNight]] that ends on the given
+   * local date for for the given site.
+   *
+   * Returns None if there's no sunset or sunrise for the specified
+   * [[lucuma.core.enum.TwilightType]], [[lucuma.core.enum.Site]] and
+   * [[java.time.LocalDate]].
+   *
+   * @group Constructors
+   */
   def fromTwilightTypeAndSiteAndLocalDate(
     twilightType: TwilightType,
     s:            Site,
@@ -100,15 +103,16 @@ object TwilightBoundedNight extends TwilightBoundedNightOptics {
                                                            ObservingNight.fromSiteAndLocalDate(s, d)
     )
 
-  /** Constructs a [[TwilightBoundedNight]] that ends on the given
-    * local date for for the given site.
-    *
-    * Throws an exception if there's no sunset or sunrise for the specified
-    * [[lucuma.core.enum.TwilightType]], [[lucuma.core.enum.Site]] and
-    * [[java.time.LocalDate]].
-    *
-    * @group Constructors
-    */
+  /**
+   * Constructs a [[TwilightBoundedNight]] that ends on the given
+   * local date for for the given site.
+   *
+   * Throws an exception if there's no sunset or sunrise for the specified
+   * [[lucuma.core.enum.TwilightType]], [[lucuma.core.enum.Site]] and
+   * [[java.time.LocalDate]].
+   *
+   * @group Constructors
+   */
   def fromTwilightTypeAndSiteAndLocalDateUnsafe(
     twilightType: TwilightType,
     s:            Site,
@@ -116,15 +120,16 @@ object TwilightBoundedNight extends TwilightBoundedNightOptics {
   ): TwilightBoundedNight =
     fromTwilightTypeAndSiteAndLocalDate(twilightType, s, d).get
 
-  /** Constructs a [[TwilightBoundedNight]] that ends on the date
-    * from the given local datetime for for the given site.
-    *
-    * Returns None if there's no sunset or sunrise for the specified
-    * [[lucuma.core.enum.TwilightType]], [[lucuma.core.enum.Site]] and
-    * [[java.time.LocalDateTime]].
-    *
-    * @group Constructors
-    */
+  /**
+   * Constructs a [[TwilightBoundedNight]] that ends on the date
+   * from the given local datetime for for the given site.
+   *
+   * Returns None if there's no sunset or sunrise for the specified
+   * [[lucuma.core.enum.TwilightType]], [[lucuma.core.enum.Site]] and
+   * [[java.time.LocalDateTime]].
+   *
+   * @group Constructors
+   */
   def fromTwilightTypeAndSiteAndLocalDateTime(
     twilightType: TwilightType,
     s:            Site,
@@ -135,15 +140,16 @@ object TwilightBoundedNight extends TwilightBoundedNightOptics {
       ObservingNight.fromSiteAndLocalDateTime(s, d)
     )
 
-  /** Constructs a [[TwilightBoundedNight]] that ends on the date
-    * from the given local datetime for for the given site.
-    *
-    * Throws an exception if there's no sunset or sunrise for the specified
-    * [[lucuma.core.enum.TwilightType]], [[lucuma.core.enum.Site]] and
-    * [[java.time.LocalDateTime]].
-    *
-    * @group Constructors
-    */
+  /**
+   * Constructs a [[TwilightBoundedNight]] that ends on the date
+   * from the given local datetime for for the given site.
+   *
+   * Throws an exception if there's no sunset or sunrise for the specified
+   * [[lucuma.core.enum.TwilightType]], [[lucuma.core.enum.Site]] and
+   * [[java.time.LocalDateTime]].
+   *
+   * @group Constructors
+   */
   def fromTwilightTypeAndSiteAndLocalDateTimeUnsafe(
     twilightType: TwilightType,
     s:            Site,
@@ -151,15 +157,16 @@ object TwilightBoundedNight extends TwilightBoundedNightOptics {
   ): TwilightBoundedNight =
     fromTwilightTypeAndSiteAndLocalDateTime(twilightType, s, d).get
 
-  /** Constructs a [[TwilightBoundedNight]] for the observing night
-    * that includes the given time at the specified site.
-    *
-    * Returns None if there's no sunset or sunrise for the specified
-    * [[lucuma.core.enum.TwilightType]] and the observing night
-    * that includes the given time at the specified site.
-    *
-    * @group Constructors
-    */
+  /**
+   * Constructs a [[TwilightBoundedNight]] for the observing night
+   * that includes the given time at the specified site.
+   *
+   * Returns None if there's no sunset or sunrise for the specified
+   * [[lucuma.core.enum.TwilightType]] and the observing night
+   * that includes the given time at the specified site.
+   *
+   * @group Constructors
+   */
   def fromTwilightTypeAndSiteAndInstant(
     twilightType: TwilightType,
     s:            Site,
@@ -169,15 +176,16 @@ object TwilightBoundedNight extends TwilightBoundedNightOptics {
                                                            ObservingNight.fromSiteAndInstant(s, i)
     )
 
-  /** Constructs a [[TwilightBoundedNight]] for the observing night
-    * that includes the given time at the specified site.
-    *
-    * Throws an exception if there's no sunset or sunrise for the specified
-    * [[lucuma.core.enum.TwilightType]] and the observing night
-    * that includes the given time at the specified site.
-    *
-    * @group Constructors
-    */
+  /**
+   * Constructs a [[TwilightBoundedNight]] for the observing night
+   * that includes the given time at the specified site.
+   *
+   * Throws an exception if there's no sunset or sunrise for the specified
+   * [[lucuma.core.enum.TwilightType]] and the observing night
+   * that includes the given time at the specified site.
+   *
+   * @group Constructors
+   */
   def fromTwilightTypeAndSiteAndInstantUnsafe(
     twilightType: TwilightType,
     s:            Site,
@@ -185,11 +193,12 @@ object TwilightBoundedNight extends TwilightBoundedNightOptics {
   ): TwilightBoundedNight =
     fromTwilightTypeAndSiteAndInstant(twilightType, s, i).get
 
-  /** Returns a program in M that computes a [[TwilightBoundedNight]]
-    * corresponding to the observing night for the instant it is executed.
-    *
-    * @group Constructors
-    */
+  /**
+   * Returns a program in M that computes a [[TwilightBoundedNight]]
+   * corresponding to the observing night for the instant it is executed.
+   *
+   * @group Constructors
+   */
   def current[M[_]: Sync](twilightType: TwilightType, s: Site): M[Option[TwilightBoundedNight]] =
     ObservingNight.current(s).map(_.twilightBounded(twilightType))
 
@@ -197,10 +206,11 @@ object TwilightBoundedNight extends TwilightBoundedNightOptics {
   implicit val ShowTwilightBoundedNight: Show[TwilightBoundedNight] =
     Show.fromToString
 
-  /** TwilightBoundedNight is ordered by observing night and bound type.
-    *
-    * @group Typeclass Instances
-    */
+  /**
+   * TwilightBoundedNight is ordered by observing night and bound type.
+   *
+   * @group Typeclass Instances
+   */
   implicit val OrderTwilightBoundedNight: Order[TwilightBoundedNight] =
     Order.by(n => (n.toObservingNight, n.twilightType))
 
