@@ -3,7 +3,8 @@
 
 package lucuma.core.math
 
-import cats._, cats.implicits._
+import cats._
+import cats.syntax.all._
 import lucuma.core.math.parser.CoordinateParsers
 import lucuma.core.optics.Format
 import lucuma.core.syntax.all._

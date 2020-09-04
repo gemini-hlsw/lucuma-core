@@ -4,7 +4,7 @@
 package lucuma.core.math.skycalc
 package solver
 
-import cats.implicits._
+import cats.syntax.all._
 import cats.{ Eq, Eval, Functor, MonoidK }
 import java.time.{ Duration, Instant }
 import lucuma.core.math.{ Coordinates, Interval, Place }

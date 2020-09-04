@@ -5,7 +5,6 @@ package gem.math
 
 import munit._
 import org.scalacheck.Prop._
-import cats.implicits._
 import cats.{ Eq, Show }
 import lucuma.core.model.LocalObservingNight
 import lucuma.core.arb.ArbTime._

@@ -10,7 +10,7 @@ import lucuma.core.syntax.time._
 import scala.jdk.CollectionConverters._
 import scala.concurrent.duration.{ Duration => SDuration }
 import java.time._
-import cats.implicits._
+import cats.syntax.all._
 import io.chrisdavenport.cats.time._
 
 // Arbitrary but reasonable dates and times.

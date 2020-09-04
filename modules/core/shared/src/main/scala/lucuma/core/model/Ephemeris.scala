@@ -8,7 +8,7 @@ import lucuma.core.optics.SplitMono
 import lucuma.core.syntax.treemap._
 
 import cats.{ Eq, Foldable, Monoid }
-import cats.implicits._
+import cats.syntax.all._
 
 import scala.collection.immutable.TreeMap
 

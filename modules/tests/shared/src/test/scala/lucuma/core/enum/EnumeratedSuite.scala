@@ -7,7 +7,6 @@ import munit._
 import monocle.law.discipline.PrismTests
 import lucuma.core.util.Enumerated
 import lucuma.core.util.arb.ArbEnumerated._
-import cats.implicits._
 import cats.kernel.laws.discipline.OrderTests
 import scala.reflect.ClassTag
 

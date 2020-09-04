@@ -13,14 +13,32 @@ import lucuma.core.util.Enumerated
  */
 sealed abstract class SmartGcalType(
   val tag: String
-) extends Product with Serializable
+) extends Product
+    with Serializable {
+
+  def fold[X](lamp: GcalLampType => X, baseline: GcalBaselineType => X): X =
+    this match {
+      case SmartGcalType.Arc           => lamp(GcalLampType.Arc)
+      case SmartGcalType.Flat          => lamp(GcalLampType.Flat)
+      case SmartGcalType.DayBaseline   => baseline(GcalBaselineType.Day)
+      case SmartGcalType.NightBaseline => baseline(GcalBaselineType.Night)
+    }
+
+}
 
 object SmartGcalType {
 
-  /** @group Constructors */ case object Arc extends SmartGcalType("Arc")
-  /** @group Constructors */ case object Flat extends SmartGcalType("Flat")
-  /** @group Constructors */ case object DayBaseline extends SmartGcalType("DayBaseline")
-  /** @group Constructors */ case object NightBaseline extends SmartGcalType("NightBaseline")
+  /** @group Constructors */
+  case object Arc extends SmartGcalType("Arc")
+
+  /** @group Constructors */
+  case object Flat extends SmartGcalType("Flat")
+
+  /** @group Constructors */
+  case object DayBaseline extends SmartGcalType("DayBaseline")
+
+  /** @group Constructors */
+  case object NightBaseline extends SmartGcalType("NightBaseline")
 
   /** All members of SmartGcalType, in canonical order. */
   val all: List[SmartGcalType] =
@@ -38,7 +56,7 @@ object SmartGcalType {
   implicit val SmartGcalTypeEnumerated: Enumerated[SmartGcalType] =
     new Enumerated[SmartGcalType] {
       def all = SmartGcalType.all
-      def tag(a: SmartGcalType) = a.tag
+      def tag(a:                    SmartGcalType)         = a.tag
       override def unsafeFromTag(s: String): SmartGcalType =
         SmartGcalType.unsafeFromTag(s)
     }

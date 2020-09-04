@@ -9,6 +9,7 @@ import cats.syntax.all._
 import lucuma.core.math.Angle
 import lucuma.core.math.Declination
 import lucuma.core.util.Enumerated
+import lucuma.core.optics.syntax.prism._
 
 /**
  * Definition for how the range from sunset to sunrise should be defined for

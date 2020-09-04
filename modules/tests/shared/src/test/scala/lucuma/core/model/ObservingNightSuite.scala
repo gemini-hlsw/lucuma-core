@@ -5,7 +5,6 @@ package lucuma.core.model
 
 import munit._
 import org.scalacheck.Prop._
-import cats.implicits._
 import cats.{ Eq, Show }
 import java.time._
 import lucuma.core.enum.Site
