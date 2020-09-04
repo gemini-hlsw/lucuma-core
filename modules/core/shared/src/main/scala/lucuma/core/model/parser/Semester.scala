@@ -11,7 +11,7 @@ import atto._, Atto._
 import lucuma.core.enum.parser.EnumParsers._
 import lucuma.core.parser.TimeParsers._
 
-/** Parser for [[gem.Semester]]. */
+/** Parser for [[lucuma.core.model.Semester]]. */
 trait SemesterParsers {
 
   /** Parser for a full-year `Semester` like `2015A`. */
