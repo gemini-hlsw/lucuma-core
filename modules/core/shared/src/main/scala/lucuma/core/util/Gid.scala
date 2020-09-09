@@ -12,6 +12,7 @@ import eu.timepit.refined.types.numeric.PosLong
 import eu.timepit.refined.numeric.Positive
 import eu.timepit.refined._
 import eu.timepit.refined.api.Refined
+import _root_.cats.kernel.BoundedEnumerable
 
 /**
  * A typeclass for Lucuma identifiers, which are of the form T-26fd21b3 where T is a constant,
@@ -43,7 +44,8 @@ import eu.timepit.refined.api.Refined
 final class Gid[A](
   val tag:        Char Refined Letter,
   val isoPosLong: Iso[A, PosLong]
-) extends Order[A]
+) extends BoundedEnumerable[A]
+     with Order[A]
      with Show[A] {
 
   // We use this in a few places
@@ -72,13 +74,32 @@ final class Gid[A](
 
   }
 
-  // Show
-  final override def show(a: A): String =
-    fromString.reverseGet(a)
+  // BoundedEnumerable
+
+  final override def maxBound: A =
+    isoPosLong.reverseGet(PosLong.MaxValue)
+
+  final override def minBound: A =
+    isoPosLong.reverseGet(PosLong.MinValue)
+
+  final override def order: Order[A] =
+    this
+
+  final override def partialNext(a: A): Option[A] =
+    refineV[Positive](isoPosLong.get(a).value + 1L).toOption.map(isoPosLong.reverseGet)
+
+  final override def partialPrevious(a: A): Option[A] =
+    refineV[Positive](isoPosLong.get(a).value - 1L).toOption.map(isoPosLong.reverseGet)
 
   // Order
+
   final override def compare(a: A, b: A): Int =
     isoPosLong.get(a).value compare isoPosLong.get(b).value
+
+  // Show
+
+  final override def show(a: A): String =
+    fromString.reverseGet(a)
 
 }
 

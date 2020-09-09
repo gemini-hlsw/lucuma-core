@@ -4,17 +4,17 @@
 package lucuma.core.util
 
 import cats.implicits._
-import cats.kernel.laws.discipline.OrderTests
-import eu.timepit.refined.refineMV
+import cats.kernel.laws.discipline.{ BoundedEnumerableTests, OrderTests }
+import eu.timepit.refined.api.Refined
 import eu.timepit.refined.cats._
+import eu.timepit.refined.char.Letter
+import eu.timepit.refined.refineMV
 import eu.timepit.refined.scalacheck.all._
 import eu.timepit.refined.types.numeric.PosLong
 import lucuma.core.util.arb.ArbGid._
 import monocle.law.discipline.{ IsoTests, PrismTests }
 import munit._
 import org.scalacheck.Prop._
-import eu.timepit.refined.api.Refined
-import eu.timepit.refined.char.Letter
 
 final class GidSuite extends DisciplineSuite {
 
@@ -23,9 +23,10 @@ final class GidSuite extends DisciplineSuite {
     implicit val gid: Gid[Id] = Gid.instance(refineMV('i'), _.value, apply)
   }
 
-  checkAll("order", OrderTests[Id].order)
-  checkAll("isoPosLong", IsoTests(Gid[Id].isoPosLong))
-  checkAll("fromString", PrismTests(Gid[Id].fromString))
+  checkAll("Gid[Id]", BoundedEnumerableTests[Id].boundedEnumerable)
+  checkAll("Gid[Id]", OrderTests[Id].order)
+  checkAll("Gid[Id].isoPosLong", IsoTests(Gid[Id].isoPosLong))
+  checkAll("Gid[Id].fromString", PrismTests(Gid[Id].fromString))
 
   test("fromString: Tag") {
     forAll { (c: Char Refined Letter, n: PosLong) =>
