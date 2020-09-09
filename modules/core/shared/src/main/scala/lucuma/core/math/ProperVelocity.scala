@@ -82,6 +82,30 @@ object ProperVelocity extends ProperVelocityOptics {
         )
   }
 
+  type RA  = AngularVelocityComponent[VelocityAxis.RA]
+
+  type Dec = AngularVelocityComponent[VelocityAxis.Dec]
+
+  trait AngularVelocityComponentCompanion[A] {
+
+    def apply(μasy: Quantity[Long, MicroArcSecondPerYear]): AngularVelocityComponent[A] =
+      AngularVelocityComponent[A](μasy)
+
+    val Zero: AngularVelocityComponent[A] =
+      AngularVelocityComponent.Zero[A]
+
+    val microarcsecondsPerYear: Iso[AngularVelocityComponent[A], Long] =
+      AngularVelocityComponent.microarcsecondsPerYear[A].reverse
+
+    val milliarcsecondsPerYear: SplitMono[AngularVelocityComponent[A], BigDecimal] =
+      AngularVelocityComponent.milliarcsecondsPerYear[A]
+
+  }
+
+  object RA extends AngularVelocityComponentCompanion[VelocityAxis.RA]
+
+  object Dec extends AngularVelocityComponentCompanion[VelocityAxis.Dec]
+
   /**
     * The `No parallax`
     * @group Constructors
@@ -110,5 +134,21 @@ sealed trait ProperVelocityOptics {
   /** @group Optics */
   val dec: Lens[ProperVelocity, AngularVelocityComponent[VelocityAxis.Dec]] =
     GenLens[ProperVelocity](_.dec)
+
+  private def splitMonoFromComponents[A](
+    raMono:  SplitMono[AngularVelocityComponent[VelocityAxis.RA], A],
+    decMono: SplitMono[AngularVelocityComponent[VelocityAxis.Dec], A]
+  ): SplitMono[ProperVelocity, (A, A)] =
+    SplitMono(
+      v => (raMono.get(v.ra), decMono.get(v.dec)),
+      t => ProperVelocity(raMono.reverseGet(t._1), decMono.reverseGet(t._2))
+    )
+
+  /** @group Optics */
+  val milliarcsecondsPerYear: SplitMono[ProperVelocity, (BigDecimal, BigDecimal)] =
+    splitMonoFromComponents(
+      ProperVelocity.RA.milliarcsecondsPerYear,
+      ProperVelocity.Dec.milliarcsecondsPerYear
+    )
 
 }

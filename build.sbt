@@ -19,7 +19,7 @@ lazy val catsTimeVersion             = "0.3.4"
 
 inThisBuild(
   Seq(
-    homepage := Some(url("https://github.com/gemini-hlsw/gsp-math")),
+    homepage := Some(url("https://github.com/gemini-hlsw/lucuma-core")),
     addCompilerPlugin(
       ("org.typelevel" % "kind-projector" % kindProjectorVersion).cross(CrossVersion.full)
     ),
