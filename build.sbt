@@ -16,6 +16,7 @@ lazy val spireVersion                = "0.17.0-RC1"
 lazy val singletonOpsVersion         = "0.5.1"
 lazy val refinedVersion              = "0.9.15"
 lazy val catsTimeVersion             = "0.3.4"
+lazy val circeVersion                = "0.13.0"
 
 inThisBuild(
   Seq(
@@ -53,7 +54,9 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
       "eu.timepit"                 %%% "singleton-ops"           % singletonOpsVersion,
       "eu.timepit"                 %%% "refined"                 % refinedVersion,
       "eu.timepit"                 %%% "refined-cats"            % refinedVersion,
-      "io.chrisdavenport"          %%% "cats-time"               % catsTimeVersion
+      "io.chrisdavenport"          %%% "cats-time"               % catsTimeVersion,
+      "io.circe"                   %%% "circe-core"              % circeVersion,
+      "io.circe"                   %%% "circe-refined"           % circeVersion,
     )
   )
   .jvmConfigure(_.enablePlugins(AutomateHeaderPlugin))
@@ -83,7 +86,8 @@ lazy val testkit = crossProject(JVMPlatform, JSPlatform)
       "com.manyangled"             %%% "coulomb-scalacheck"     % coulombVersion,
       "com.github.julien-truffaut" %%% "monocle-law"            % monocleVersion,
       "org.typelevel"              %%% "spire-laws"             % spireVersion,
-      "eu.timepit"                 %%% "refined-scalacheck"     % refinedVersion
+      "eu.timepit"                 %%% "refined-scalacheck"     % refinedVersion,
+      "io.circe"                   %%% "circe-testing"          % circeVersion,
     )
   )
   .jvmConfigure(_.enablePlugins(AutomateHeaderPlugin))

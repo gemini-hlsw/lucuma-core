@@ -4,6 +4,7 @@
 package lucuma.core.util
 
 import cats._
+import cats.kernel.BoundedEnumerable
 import cats.implicits._
 import monocle.{ Iso, Prism }
 import scala.util.matching.Regex
@@ -12,7 +13,8 @@ import eu.timepit.refined.types.numeric.PosLong
 import eu.timepit.refined.numeric.Positive
 import eu.timepit.refined._
 import eu.timepit.refined.api.Refined
-import _root_.cats.kernel.BoundedEnumerable
+import io.circe._
+import io.circe.syntax._
 
 /**
  * A typeclass for Lucuma identifiers, which are of the form T-26fd21b3 where T is a constant,
@@ -46,7 +48,9 @@ final class Gid[A](
   val isoPosLong: Iso[A, PosLong]
 ) extends BoundedEnumerable[A]
      with Order[A]
-     with Show[A] {
+     with Show[A]
+     with Encoder[A]
+     with Decoder[A] {
 
   // We use this in a few places
   private final val TagString: String = tag.value.toString
@@ -92,14 +96,20 @@ final class Gid[A](
     refineV[Positive](isoPosLong.get(a).value - 1L).toOption.map(isoPosLong.reverseGet)
 
   // Order
-
   final override def compare(a: A, b: A): Int =
     isoPosLong.get(a).value compare isoPosLong.get(b).value
 
   // Show
-
   final override def show(a: A): String =
     fromString.reverseGet(a)
+
+  // Decoder
+  final override def apply(c: HCursor): Decoder.Result[A] =
+    c.as[String].flatMap(s => fromString.getOption(s).toRight(DecodingFailure(s"Invalid GID: $s", Nil)))
+
+  // Encoder
+  final override def apply(a: A): Json =
+    fromString.reverseGet(a).asJson
 
 }
 

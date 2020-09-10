@@ -11,6 +11,8 @@ import eu.timepit.refined.char.Letter
 import eu.timepit.refined.refineMV
 import eu.timepit.refined.scalacheck.all._
 import eu.timepit.refined.types.numeric.PosLong
+import io.circe.testing.CodecTests
+import io.circe.testing.instances._
 import lucuma.core.util.arb.ArbGid._
 import monocle.law.discipline.{ IsoTests, PrismTests }
 import munit._
@@ -27,6 +29,7 @@ final class GidSuite extends DisciplineSuite {
   checkAll("Gid[Id]", OrderTests[Id].order)
   checkAll("Gid[Id].isoPosLong", IsoTests(Gid[Id].isoPosLong))
   checkAll("Gid[Id].fromString", PrismTests(Gid[Id].fromString))
+  checkAll("Gid[Id]", CodecTests[Id].unserializableCodec)
 
   test("fromString: Tag") {
     forAll { (c: Char Refined Letter, n: PosLong) =>
