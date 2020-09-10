@@ -5,7 +5,11 @@ package lucuma.core.model
 
 import lucuma.core.util.Enumerated
 
-/** Much of the time we only care about a user's access level. */
+/**
+ * A role can be reduced to an `AccessLevel` by discarding the NGO role's partner, leaving us with
+ * a simple enumerated (and thus ordered) type. Usually this is all we care about when checking
+ * whether a user is allowed to do something.
+ */
 sealed abstract class Access(val name: String, val tag: String) extends Product with Serializable
 object Access {
 

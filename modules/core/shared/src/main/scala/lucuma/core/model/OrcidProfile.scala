@@ -5,12 +5,13 @@ package lucuma.core.model
 
 import cats.implicits._
 
+/** An ORCID profile is an OrcidId and a set of optional fields. */
 final case class OrcidProfile(
   orcidId:      OrcidId,
   givenName:    Option[String],
   familyName:   Option[String],
   creditName:   Option[String],
-  primaryEmail: String,
+  primaryEmail: Option[String],
 ) {
 
   /** The best display name we can provide, based on available information. */

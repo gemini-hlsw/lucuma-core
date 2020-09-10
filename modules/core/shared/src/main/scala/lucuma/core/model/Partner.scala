@@ -5,6 +5,7 @@ package lucuma.core.model
 
 import lucuma.core.util.Enumerated
 
+/** NGO users are associated with a partner. */
 sealed abstract class Partner(
   val tag:  String,
   val name: String,

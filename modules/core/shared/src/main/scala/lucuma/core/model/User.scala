@@ -17,8 +17,8 @@ sealed trait User extends Product with Serializable {
   def role: Role
 
   /**
-   * A name to display in interfaces. This is never empty, and respects users' formatting preferences
-   * as given in their ORCID record.
+   * A name to display in interfaces. This is never empty, and respects users' formatting
+   * preferences as specified in their ORCID record.
    */
   def displayName: String
 
@@ -33,6 +33,7 @@ sealed trait User extends Product with Serializable {
 
 object User {
 
+  /** Every user has a unique id. */
   case class Id(value: PosLong) {
     override def toString = this.show
   }
@@ -42,25 +43,21 @@ object User {
 
 }
 
-/**
- * Guest users have the lowest access and no identifying information.
- */
+/** Guest users have the weakest `Role` and no identifying information. */
 final case class GuestUser(id: User.Id) extends User {
   val role = GuestRole
   val displayName = "Guest User"
 }
 
-/**
- * Service users have the highest access and represent services themselves.
- */
+/** Service users have the strongest `Role` and represent services themselves. */
 final case class ServiceUser(id: User.Id, name: String) extends User {
   val role = ServiceRole(name)
   val displayName = s"Service User ($name)"
 }
 
 /**
- * Standard users are authenticated and have a role and ORCID profile, as well as a set of other
- * roles they can assume.
+ * Standard users are authenticated and have a current role and ORCID profile, as well as a set of
+ * other roles they can assume.
  */
 final case class StandardUser(
   id:         User.Id,
