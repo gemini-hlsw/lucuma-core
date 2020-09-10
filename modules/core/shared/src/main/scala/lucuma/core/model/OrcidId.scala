@@ -40,14 +40,16 @@ object OrcidId {
   implicit val decoder: Decoder[OrcidId] =
     Decoder[String].emap(s => fromString(s))
 
+  // adapted from the code at the link above
   def checkDigit(baseDigits: String): String = {
+    require(baseDigits.forall(c => c >= '0' && c <= '9'))
     val total = baseDigits.foldLeft(0) { (acc, c) =>
-      val digit = Character.getNumericValue(c)
+      val digit = c - '0'
       (acc + digit) * 2
     }
-    val remainder = total % 11;
-    val result = (12 - remainder) % 11;
-    if (result == 10) "X" else String.valueOf(result);
+    val remainder = total % 11
+    val result    = (12 - remainder) % 11
+    if (result == 10) "X" else result.toString
   }
 
 }
