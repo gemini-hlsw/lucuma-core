@@ -17,6 +17,7 @@ lazy val singletonOpsVersion         = "0.5.1"
 lazy val refinedVersion              = "0.9.15"
 lazy val catsTimeVersion             = "0.3.4"
 lazy val circeVersion                = "0.13.0"
+lazy val catsScalacheckVersion       = "0.3.0"
 
 inThisBuild(
   Seq(
@@ -88,6 +89,7 @@ lazy val testkit = crossProject(JVMPlatform, JSPlatform)
       "org.typelevel"              %%% "spire-laws"             % spireVersion,
       "eu.timepit"                 %%% "refined-scalacheck"     % refinedVersion,
       "io.circe"                   %%% "circe-testing"          % circeVersion,
+      "io.chrisdavenport"          %%% "cats-scalacheck"        % catsScalacheckVersion,
     )
   )
   .jvmConfigure(_.enablePlugins(AutomateHeaderPlugin))

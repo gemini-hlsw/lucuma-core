@@ -14,7 +14,7 @@ trait ArbGid {
   implicit def ArbGid[A](implicit ev: Gid[A]): Arbitrary[A] =
     Arbitrary(arbitrary[PosLong].map(ev.isoPosLong.reverseGet))
 
-  implicit def CogGif[A](implicit ev: Gid[A]): Cogen[A] =
+  implicit def CogGid[A](implicit ev: Gid[A]): Cogen[A] =
     Cogen[Long].contramap(ev.isoPosLong.get(_).value)
 
 }

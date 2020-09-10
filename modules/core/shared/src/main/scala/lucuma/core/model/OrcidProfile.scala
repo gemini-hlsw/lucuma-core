@@ -19,6 +19,6 @@ final case class OrcidProfile(
     (givenName, familyName).mapN((g, f) => s"$g $f") <+>
     familyName                                       <+>
     givenName
-  ).getOrElse(orcidId.value)
+  ).getOrElse(orcidId.value.toString())
 
 }
