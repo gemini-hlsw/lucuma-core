@@ -98,7 +98,7 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform)
     skip in publish := true,
     libraryDependencies ++= Seq(
       "org.scalameta" %%% "munit"            % "0.7.12" % Test,
-      "org.typelevel" %%% "discipline-munit" % "0.2.4"  % Test
+      "org.typelevel" %%% "discipline-munit" % "0.3.0"  % Test
     ),
     testFrameworks += new TestFramework("munit.Framework"),
     scalaJSLinkerConfig ~= (_.withModuleKind(ModuleKind.CommonJSModule))
