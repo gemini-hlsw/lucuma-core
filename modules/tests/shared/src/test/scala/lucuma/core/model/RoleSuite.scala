@@ -4,13 +4,13 @@
 package lucuma.core.model
 
 import lucuma.core.util.arb._
-import lucuma.core.util.laws.EnumeratedTests
 import munit._
+import lucuma.core.util.laws.GidTests
 
-final class AccessSuite extends DisciplineSuite {
-  import ArbEnumerated._
+final class RoleSuite extends DisciplineSuite {
+  import ArbGid._
 
   // Laws
-  checkAll("Access", EnumeratedTests[Access].enumerated)
+  checkAll("StandardRole.Id", GidTests[StandardRole.Id].gid)
 
 }

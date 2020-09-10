@@ -1,19 +1,14 @@
 package lucuma.core.util.laws
 
-import io.circe.testing.CodecLaws
-import cats.kernel.laws.OrderLaws
-import io.circe.{ Encoder, Decoder }
-import cats.kernel.Order
-import lucuma.core.util.Enumerated
-import io.circe.testing.CodecTests
+import cats._
 import cats.kernel.laws.discipline.OrderTests
-import org.scalacheck.Prop
-import org.scalacheck.Arbitrary
-import org.scalacheck.Shrink
-import cats.kernel.Eq
-import io.circe.Json
-import org.scalacheck.Cogen
+import cats.kernel.laws.OrderLaws
 import cats.laws.discipline._
+import io.circe.{ Encoder, Decoder }
+import io.circe.testing.{ CodecLaws, CodecTests }
+import io.circe.testing.instances.arbitraryJson
+import lucuma.core.util.Enumerated
+import org.scalacheck._
 
 trait EnumeratedLaws[A] extends CodecLaws[A] with OrderLaws[A] {
 
@@ -42,8 +37,6 @@ trait EnumeratedTests[A] extends CodecTests[A] with OrderTests[A] {
     arbitraryA: Arbitrary[A],
     shrinkA: Shrink[A],
     eqA: Eq[A],
-    arbitraryJson: Arbitrary[Json],
-    shrinkJson: Shrink[Json],
     cog: Cogen[A],
   ): RuleSet =
     new RuleSet {

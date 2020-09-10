@@ -3,7 +3,6 @@
 
 package lucuma.core.model
 
-import io.circe.testing.instances.arbitraryJson
 import lucuma.core.util.arb._
 import lucuma.core.util.laws.EnumeratedTests
 import munit._
