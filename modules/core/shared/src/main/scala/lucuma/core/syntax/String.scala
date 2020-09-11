@@ -3,6 +3,8 @@
 
 package lucuma.core.syntax
 
+import java.util.regex.Pattern
+
 final class StringOps(val self: String) extends AnyVal {
 
   private def parse[A](f: String => A): Option[A] =
@@ -15,6 +17,48 @@ final class StringOps(val self: String) extends AnyVal {
   def parseDoubleOption: Option[Double]         = parse(_.toDouble)
   def parseBooleanOption: Option[Boolean]       = parse(_.toBoolean)
   def parseBigDecimalOption: Option[BigDecimal] = parse(BigDecimal(_))
+
+  /**
+   * Converts the `String` to "snake case" (eg "foo_bar").
+   */
+  def toSnakeCase: String =
+    StringOps.snakeCaseTransformation(self)
+
+  /**
+   * Converts the `String` to "screaming snake case" (eg "FOO_BAR").
+   */
+  def toScreamingSnakeCase: String =
+    StringOps.screamingSnakeCaseTransformation(self)
+
+  /**
+   * Converts the `String` to "kebab case" (eg "foo-bar").
+   */
+  def toKebabCase: String =
+    StringOps.kebabCaseTransformation(self)
+
+}
+
+object StringOps {
+
+  // Case transformation implementation adapted from:
+  // https://github.com/circe/circe-generic-extras/blob/master/generic-extras/src/main/scala/io/circe/generic/extras/Configuration.scala
+
+  private val basePattern: Pattern = Pattern.compile("([A-Z]+)([A-Z][a-z])")
+  private val swapPattern: Pattern = Pattern.compile("([a-z\\d])([A-Z])")
+
+  private def transformation(input: String, replacement: String): String = {
+    val partial = basePattern.matcher(input).replaceAll(replacement)
+    swapPattern.matcher(partial).replaceAll(replacement)
+  }
+
+  private def snakeCaseTransformation(s: String): String =
+    transformation(s, "$1_$2").toLowerCase
+
+  private def screamingSnakeCaseTransformation(s: String): String =
+    transformation(s, "$1_$2").toUpperCase
+
+  private def kebabCaseTransformation(s: String): String =
+    transformation(s, "$1-$2").toLowerCase
 
 }
 
