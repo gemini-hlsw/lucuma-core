@@ -43,34 +43,22 @@ object StringOps {
   // Case transformation implementation adapted from:
   // https://github.com/circe/circe-generic-extras/blob/master/generic-extras/src/main/scala/io/circe/generic/extras/Configuration.scala
 
-  private sealed trait Case extends Product with Serializable {
-    def convert(s: String): String =
-      this match {
-        case LowerCase => s.toLowerCase
-        case UpperCase => s.toUpperCase
-      }
-  }
-
-  private case object LowerCase extends Case
-  private case object UpperCase extends Case
-
   private val basePattern: Pattern = Pattern.compile("([A-Z]+)([A-Z][a-z])")
   private val swapPattern: Pattern = Pattern.compile("([a-z\\d])([A-Z])")
 
-  private def transformation(replacement: String, caze: Case): String => String =
-    s => {
-      val partial = basePattern.matcher(s).replaceAll(replacement)
-      caze.convert(swapPattern.matcher(partial).replaceAll(replacement))
-    }
+  private def transformation(input: String, replacement: String): String = {
+    val partial = basePattern.matcher(input).replaceAll(replacement)
+    swapPattern.matcher(partial).replaceAll(replacement)
+  }
 
-  private val snakeCaseTransformation: String => String =
-    transformation("$1_$2", LowerCase)
+  private def snakeCaseTransformation(s: String): String =
+    transformation(s, "$1_$2").toLowerCase
 
-  private val screamingSnakeCaseTransformation: String => String =
-    transformation("$1_$2", UpperCase)
+  private def screamingSnakeCaseTransformation(s: String): String =
+    transformation(s, "$1_$2").toUpperCase
 
-  private val kebabCaseTransformation: String => String =
-    transformation("$1-$2", LowerCase)
+  private def kebabCaseTransformation(s: String): String =
+    transformation(s, "$1-$2").toLowerCase
 
 }
 
