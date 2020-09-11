@@ -5,11 +5,12 @@ package lucuma
 package core
 package util
 
+import lucuma.core.syntax.string._
+
 import cats.Order
 import cats.syntax.all._
 import monocle.Prism
 import io.circe._
-import java.util.regex.Pattern
 
 /**
   * Typeclass for an enumerated type with unique string tags and a canonical ordering.
@@ -43,13 +44,13 @@ trait Enumerated[A]
   def apply(c: HCursor): Decoder.Result[A] =
     c.as[String].flatMap { s =>
       all
-        .find(e => Enumerated.toSnakeCase(tag(e)) === s)
+        .find(e => tag(e).toScreamingSnakeCase === s)
         .toRight(DecodingFailure(s"Could not parse enumerated type value '$s'", Nil))
     }
 
   // Encoder
   def apply(a: A): Json =
-    Json.fromString(Enumerated.toSnakeCase(tag(a)))
+    Json.fromString(tag(a).toScreamingSnakeCase)
 
 }
 
@@ -65,15 +66,6 @@ object Enumerated    {
 
   def fromTag[A](implicit ev: Enumerated[A]): Prism[String, A] =
     Prism[String, A](ev.fromTag)(e => ev.tag(e))
-
-
-  // Borrowed from io.circe.generic.extras.Configuration
-  private val basePattern: Pattern = Pattern.compile("([A-Z]+)([A-Z][a-z])")
-  private val swapPattern: Pattern = Pattern.compile("([a-z\\d])([A-Z])")
-  private def toSnakeCase(s: String): String = {
-    val partial = basePattern.matcher(s).replaceAll("$1_$2")
-    swapPattern.matcher(partial).replaceAll("$1_$2").toUpperCase
-  }
 
 }
 
