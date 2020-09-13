@@ -3,7 +3,6 @@ import sbtcrossproject.CrossType
 lazy val attoVersion                 = "0.8.0"
 lazy val catsVersion                 = "2.2.0"
 lazy val catsEffectVersion           = "2.2.0"
-lazy val collCompatVersion           = "2.1.6"
 lazy val kindProjectorVersion        = "0.11.0"
 lazy val monocleVersion              = "2.1.0"
 lazy val catsTestkitScalaTestVersion = "2.0.0"
@@ -43,7 +42,6 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
       "org.typelevel"              %%% "cats-effect"             % catsEffectVersion,
       "com.github.julien-truffaut" %%% "monocle-core"            % monocleVersion,
       "com.github.julien-truffaut" %%% "monocle-macro"           % monocleVersion,
-      "org.scala-lang.modules"     %%% "scala-collection-compat" % collCompatVersion,
       "edu.gemini"                 %%% "gpp-jts"                 % jtsVersion,
       "com.manyangled"             %%% "coulomb"                 % coulombVersion,
       "com.manyangled"             %%% "coulomb-si-units"        % coulombVersion,
