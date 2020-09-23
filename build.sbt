@@ -26,7 +26,7 @@ inThisBuild(
     ),
     Global / onChangedBuildSource := ReloadOnSourceChanges,
     scalacOptions += "-Ymacro-annotations"
-  ) ++ gspPublishSettings
+  ) ++ lucumaPublishSettings
 )
 
 skip in publish := true
@@ -64,7 +64,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
       "edu.gemini" %%% "gpp-jts-awt" % jtsVersion
     )
   )
-  .jsSettings(gspScalaJsSettings: _*)
+  .jsSettings(lucumaScalaJsSettings: _*)
   .jsSettings(
     libraryDependencies ++= Seq(
       "io.github.cquiroz" %%% "scala-java-time" % scalaJavaTimeVersion,
@@ -91,7 +91,7 @@ lazy val testkit = crossProject(JVMPlatform, JSPlatform)
     )
   )
   .jvmConfigure(_.enablePlugins(AutomateHeaderPlugin))
-  .jsSettings(gspScalaJsSettings: _*)
+  .jsSettings(lucumaScalaJsSettings: _*)
 
 lazy val tests = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Full)
@@ -117,4 +117,4 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform)
       "com.47deg"      %% "scalacheck-toolbox-datetime" % "0.3.5"       % Test
     )
   )
-  .jsSettings(gspScalaJsSettings: _*)
+  .jsSettings(lucumaScalaJsSettings: _*)
