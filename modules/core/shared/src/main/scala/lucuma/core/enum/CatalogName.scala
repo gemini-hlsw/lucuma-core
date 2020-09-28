@@ -13,7 +13,7 @@ object CatalogName {
   case object Gaia extends CatalogName
 
   /** @group Typeclass Instances */
-  implicit val SectionVisibilityStateEnumerated: Enumerated[CatalogName] =
-    Enumerated.of(Simbad)
+  implicit val CatalogNameEnumerated: Enumerated[CatalogName] =
+    Enumerated.of(Simbad, Horizon, Gaia)
 
 }
