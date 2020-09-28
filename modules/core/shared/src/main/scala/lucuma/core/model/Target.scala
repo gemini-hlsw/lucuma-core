@@ -23,8 +23,7 @@ import monocle.std.option
 /** A target of observation. */
 final case class Target(
   name:       NonEmptyString,
-  catalogId:  Option[NonEmptyString],
-  track:      Either[EphemerisKey, ProperMotion],
+  track:      Either[EphemerisKey, SiderealTracking],
   magnitudes: SortedMap[MagnitudeBand, Magnitude]
 )
 
@@ -41,7 +40,7 @@ object Target extends TargetOptics {
   }
 
   implicit val TargetEq: Eq[Target] =
-    Eq.by(x => (x.name, x.catalogId, x.track, x.magnitudes))
+    Eq.by(x => (x.name, x.track, x.magnitudes))
 
   /** A target order based on tracking information.  For sidereal targets this
     * roughly means by base coordinate without applying proper motion.  For
@@ -50,14 +49,14 @@ object Target extends TargetOptics {
     * Not implicit.
     */
   val TargetTrackOrder: Order[Target] =
-    Order.by(t => (t.track, t.name, t.catalogId))
+    Order.by(t => (t.track, t.name))
 
   /** Targets ordered by name first and then tracking information.
     *
     * Not implicit.
     */
   val TargetNameOrder: Order[Target] =
-    Order.by(t => (t.name.value, t.catalogId, t.track))
+    Order.by(t => (t.name.value, t.track))
 
 }
 
@@ -68,11 +67,7 @@ trait TargetOptics {
     GenLens[Target](_.name)
 
   /** @group Optics */
-  lazy val catalogId: Lens[Target, Option[NonEmptyString]] =
-    GenLens[Target](_.catalogId)
-
-  /** @group Optics */
-  lazy val track: Lens[Target, Either[EphemerisKey, ProperMotion]] =
+  lazy val track: Lens[Target, Either[EphemerisKey, SiderealTracking]] =
     GenLens[Target](_.track)
 
   /** @group Optics */
@@ -80,7 +75,7 @@ trait TargetOptics {
     track.composePrism(stdLeft)
 
   /** @group Optics */
-  lazy val properMotion: Optional[Target, ProperMotion] =
+  lazy val properMotion: Optional[Target, SiderealTracking] =
     track.composePrism(stdRight)
 
   /** @group Optics */
@@ -102,15 +97,15 @@ trait TargetOptics {
 
   /** @group Optics */
   lazy val parallax: Optional[Target, Option[Parallax]] =
-    properMotion.composeLens(ProperMotion.parallax)
+    properMotion.composeLens(SiderealTracking.parallax)
 
   /** @group Optics */
   lazy val radialVelocity: Optional[Target, Option[RadialVelocity]] =
-    properMotion.composeLens(ProperMotion.radialVelocity)
+    properMotion.composeLens(SiderealTracking.radialVelocity)
 
   /** @group Optics */
   lazy val baseCoordinates: Optional[Target, Coordinates] =
-    properMotion.composeLens(ProperMotion.baseCoordinates)
+    properMotion.composeLens(SiderealTracking.baseCoordinates)
 
   /** @group Optics */
   lazy val baseRA: Optional[Target, RightAscension] =
@@ -122,7 +117,7 @@ trait TargetOptics {
 
   /** @group Optics */
   lazy val properVelocity =
-    properMotion.composeOptional(ProperMotion.properVelocity.composePrism(option.some))
+    properMotion.composeOptional(SiderealTracking.properVelocity.composePrism(option.some))
 
   /** @group Optics */
   lazy val properVelocityRA = properVelocity.composeLens(ProperVelocity.ra)

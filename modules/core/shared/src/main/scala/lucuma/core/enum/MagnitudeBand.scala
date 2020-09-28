@@ -68,11 +68,11 @@ object MagnitudeBand {
     }
 
   /** @group Typeclass Instances */
-  implicit val MagnitudeBandOrder: Order[MagnitudeBand] =
+  val MagnitudeBandWavelengthOrder: Order[MagnitudeBand] =
     Order.by(_.center)
 
   /** @group Typeclass Instances */
   implicit val MagnitudeBandOrdering: Ordering[MagnitudeBand] =
-    MagnitudeBandOrder.toOrdering
+    MagnitudeBandEnumerated.toOrdering
 
 }

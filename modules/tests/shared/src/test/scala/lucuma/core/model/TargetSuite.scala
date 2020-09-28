@@ -17,7 +17,7 @@ import munit._
 final class TargetSuite extends DisciplineSuite {
   import ArbTarget._
   import ArbMagnitude._
-  import ArbProperMotion._
+  import ArbSiderealTracking._
   import ArbEphemerisKey._
   import ArbParallax._
   import ArbEnumerated._
@@ -32,7 +32,6 @@ final class TargetSuite extends DisciplineSuite {
   checkAll("TargetTrack", OrderTests[Target](Target.TargetTrackOrder).order)
   checkAll("TargetName", OrderTests[Target](Target.TargetNameOrder).order)
   checkAll("Target.name", LensTests(Target.name))
-  checkAll("Target.catalogId", LensTests(Target.catalogId))
   checkAll("Target.properMotion", OptionalTests(Target.properMotion))
   checkAll("Target.ephemerisKey", OptionalTests(Target.ephemerisKey))
   checkAll("Target.magnitudes", LensTests(Target.magnitudes))
