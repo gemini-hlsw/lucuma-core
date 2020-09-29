@@ -4,9 +4,11 @@
 package lucuma
 package core
 package enum
+
+import cats.Order
 import cats.syntax.eq._
-import lucuma.core.util.Enumerated
 import lucuma.core.math.Wavelength
+import lucuma.core.util.Enumerated
 
 /**
  * Enumerated type for magnitude band.
@@ -64,5 +66,13 @@ object MagnitudeBand {
       override def unsafeFromTag(s: String): MagnitudeBand =
         MagnitudeBand.unsafeFromTag(s)
     }
+
+  /** @group Typeclass Instances */
+  val MagnitudeBandWavelengthOrder: Order[MagnitudeBand] =
+    Order.by(_.center)
+
+  /** @group Typeclass Instances */
+  implicit val MagnitudeBandOrdering: Ordering[MagnitudeBand] =
+    MagnitudeBandEnumerated.toOrdering
 
 }

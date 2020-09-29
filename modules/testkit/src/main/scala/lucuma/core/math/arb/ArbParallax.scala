@@ -6,8 +6,8 @@ package arb
 
 import lucuma.core.math.Parallax
 import org.scalacheck.Arbitrary
-import org.scalacheck.Gen
 import org.scalacheck.Cogen
+import org.scalacheck.Gen
 
 trait ArbParallax {
 

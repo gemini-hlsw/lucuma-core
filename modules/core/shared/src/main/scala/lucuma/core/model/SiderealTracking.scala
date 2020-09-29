@@ -1,14 +1,20 @@
 // Copyright (c) 2016-2020 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package lucuma.core.math
+package lucuma.core.model
+
+import java.time.Instant
+
+import scala.math.atan2
+import scala.math.cos
+import scala.math.hypot
+import scala.math.sin
 
 import cats._
 import cats.syntax.all._
-import java.time.Instant
+import lucuma.core.math._
 import monocle.Lens
 import monocle.macros.GenLens
-import scala.math.{ atan2, cos, hypot, sin }
 
 /**
   * Time-parameterized coordinates, based on an observed position at some point in time (called
@@ -21,11 +27,12 @@ import scala.math.{ atan2, cos, hypot, sin }
   * @see Astronomy and Astrophysics 134 (1984) [[http://articles.adsabs.harvard.edu/cgi-bin/nph-iarticle_query?bibcode=1984A%26A...134....1L&db_key=AST&page_ind=0&data_type=GIF&type=SCREEN_VIEW&classic=YES p.1-6]]
   * @param baseCoordinates observed coordinates at `epoch`
   * @param epoch           time of the base observation; typically `Epoch.J2000`
-  * @param properVelocity  proper velocity '''per year''' in [[RightAscension]] and [[Declination]], if any
+  * @param properVelocity  proper velocity '''per year''' in [[lucuma.core.math.RightAscension]] and [[lucuma.core.math.Declination]], if any
   * @param radialVelocity  radial velocity (km/y, positive if receding), if any
   * @param parallax        parallax, if any
   */
-final case class ProperMotion(
+final case class SiderealTracking(
+  catalogId:       Option[CatalogId],
   baseCoordinates: Coordinates,
   epoch:           Epoch,
   properVelocity:  Option[ProperVelocity],
@@ -33,13 +40,14 @@ final case class ProperMotion(
   parallax:        Option[Parallax]
 ) {
 
-  def at(i: Instant): ProperMotion =
+  def at(i: Instant): SiderealTracking =
     plusYears(epoch.untilInstant(i))
 
   /** Coordinates `elapsedYears` fractional epoch-years after `epoch`. */
-  def plusYears(elapsedYears: Double): ProperMotion =
-    ProperMotion(
-      ProperMotion.properMotion(
+  def plusYears(elapsedYears: Double): SiderealTracking =
+    SiderealTracking(
+      catalogId,
+      SiderealTracking.properMotion(
         baseCoordinates,
         epoch,
         properVelocity.orEmpty,
@@ -55,11 +63,11 @@ final case class ProperMotion(
 
 }
 
-object ProperMotion extends ProperMotionOptics {
+object SiderealTracking extends SiderealTrackingOptics {
   import Constants.{ AstronomicalUnit, TwoPi }
 
-  def const(cs: Coordinates): ProperMotion =
-    ProperMotion(cs, Epoch.J2000, None, None, None)
+  def const(cs: Coordinates): SiderealTracking =
+    SiderealTracking(none, cs, Epoch.J2000, None, None, None)
 
   /**
     * Proper motion correction in model units.
@@ -171,12 +179,12 @@ object ProperMotion extends ProperMotionOptics {
   }
   // scalastyle:on method.length
 
-  implicit val OrderProperMotion: Order[ProperMotion] = {
+  implicit val OrderSiderealTracking: Order[SiderealTracking] = {
 
-    implicit val MonoidOrder: Monoid[Order[ProperMotion]] =
-      Order.whenEqualMonoid[ProperMotion]
+    implicit val MonoidOrder: Monoid[Order[SiderealTracking]] =
+      Order.whenEqualMonoid[SiderealTracking]
 
-    def order[A: Order](f: ProperMotion => A): Order[ProperMotion] =
+    def order[A: Order](f: SiderealTracking => A): Order[SiderealTracking] =
       Order.by(f)
 
     // This could be done with:
@@ -198,26 +206,26 @@ object ProperMotion extends ProperMotionOptics {
   }
 }
 
-trait ProperMotionOptics {
+trait SiderealTrackingOptics {
 
   /** @group Optics */
-  val baseCoordinates: Lens[ProperMotion, Coordinates] =
-    GenLens[ProperMotion](_.baseCoordinates)
+  val baseCoordinates: Lens[SiderealTracking, Coordinates] =
+    GenLens[SiderealTracking](_.baseCoordinates)
 
   /** @group Optics */
-  val epoch: Lens[ProperMotion, Epoch] =
-    GenLens[ProperMotion](_.epoch)
+  val epoch: Lens[SiderealTracking, Epoch] =
+    GenLens[SiderealTracking](_.epoch)
 
   /** @group Optics */
-  val properVelocity: Lens[ProperMotion, Option[ProperVelocity]] =
-    GenLens[ProperMotion](_.properVelocity)
+  val properVelocity: Lens[SiderealTracking, Option[ProperVelocity]] =
+    GenLens[SiderealTracking](_.properVelocity)
 
   /** @group Optics */
-  val radialVelocity: Lens[ProperMotion, Option[RadialVelocity]] =
-    GenLens[ProperMotion](_.radialVelocity)
+  val radialVelocity: Lens[SiderealTracking, Option[RadialVelocity]] =
+    GenLens[SiderealTracking](_.radialVelocity)
 
   /** @group Optics */
-  val parallax: Lens[ProperMotion, Option[Parallax]] =
-    GenLens[ProperMotion](_.parallax)
+  val parallax: Lens[SiderealTracking, Option[Parallax]] =
+    GenLens[SiderealTracking](_.parallax)
 
 }

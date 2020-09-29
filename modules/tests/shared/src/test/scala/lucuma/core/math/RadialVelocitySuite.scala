@@ -4,11 +4,12 @@
 package lucuma.core.math
 
 import cats._
-import cats.tests.CatsSuite
 import lucuma.core.math.arb._
 import monocle.law.discipline._
+import munit.DisciplineSuite
+import org.scalacheck.Prop._
 
-final class RadialVelocitySpec extends CatsSuite {
+final class RadialVelocitySuite extends DisciplineSuite {
   import ArbRadialVelocity._
 
   // Laws
@@ -16,22 +17,22 @@ final class RadialVelocitySpec extends CatsSuite {
 
   test("Equality must be natural") {
     forAll { (a: RadialVelocity, b: RadialVelocity) =>
-      a.equals(b) shouldEqual Eq[RadialVelocity].eqv(a, b)
+      assertEquals(a.equals(b), Eq[RadialVelocity].eqv(a, b))
     }
   }
 
   test("Order must be consistent with .rv") {
     forAll { (a: RadialVelocity, b: RadialVelocity) =>
-      Order[BigDecimal].comparison(a.rv.value, b.rv.value) shouldEqual
-        Order[RadialVelocity].comparison(a, b)
+      assertEquals(Order[BigDecimal].comparison(a.rv.value, b.rv.value),
+                   Order[RadialVelocity].comparison(a, b)
+      )
     }
   }
 
   test("Show must be natural") {
     forAll { (a: RadialVelocity) =>
-      a.toString shouldEqual Show[RadialVelocity].show(a)
+      assertEquals(a.toString, Show[RadialVelocity].show(a))
     }
   }
 
 }
-

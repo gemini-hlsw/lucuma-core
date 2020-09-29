@@ -4,9 +4,9 @@
 package lucuma.core.math.arb
 
 import lucuma.core.math.MagnitudeValue
-import org.scalacheck._
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Cogen._
+import org.scalacheck._
 
 trait ArbMagnitudeValue {
 

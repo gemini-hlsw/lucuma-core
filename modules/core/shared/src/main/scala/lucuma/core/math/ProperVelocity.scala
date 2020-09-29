@@ -8,12 +8,12 @@ import cats.syntax.all._
 import coulomb._
 import coulomb.accepted._
 import coulomb.cats.implicits._
-import lucuma.core.math.units._
-import monocle.Lens
-import monocle.Iso
-import monocle.macros.GenLens
-import lucuma.core.optics.SplitMono
 import lucuma.core.math.ProperVelocity.AngularVelocityComponent
+import lucuma.core.math.units._
+import lucuma.core.optics.SplitMono
+import monocle.Iso
+import monocle.Lens
+import monocle.macros.GenLens
 import spire.math.Rational
 
 object VelocityAxis {

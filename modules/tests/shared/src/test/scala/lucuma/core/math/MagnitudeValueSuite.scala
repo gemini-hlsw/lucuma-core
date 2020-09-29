@@ -3,13 +3,14 @@
 
 package lucuma.core.math
 
-import cats.tests.CatsSuite
 import cats.{ Eq, Order, Show }
 import cats.kernel.laws.discipline._
 import lucuma.core.math.arb._
 import lucuma.core.optics.laws.discipline.FormatTests
+import munit.DisciplineSuite
+import org.scalacheck.Prop.forAll
 
-final class MagnitudeValueSpec extends CatsSuite {
+final class MagnitudeValueSuite extends DisciplineSuite {
   import ArbMagnitudeValue._
 
   // Laws
@@ -18,26 +19,27 @@ final class MagnitudeValueSpec extends CatsSuite {
 
   test("Equality must be natural") {
     forAll { (a: MagnitudeValue, b: MagnitudeValue) =>
-      a.equals(b) shouldEqual Eq[MagnitudeValue].eqv(a, b)
+      assertEquals(a.equals(b), Eq[MagnitudeValue].eqv(a, b))
     }
   }
 
   test("Order must be consistent with .scaledValue") {
     forAll { (a: MagnitudeValue, b: MagnitudeValue) =>
-      Order[Int].comparison(a.scaledValue, b.scaledValue) shouldEqual
-        Order[MagnitudeValue].comparison(a, b)
+      assertEquals(Order[Int].comparison(a.scaledValue, b.scaledValue),
+                   Order[MagnitudeValue].comparison(a, b)
+      )
     }
   }
 
   test("Show must be natural") {
     forAll { (a: MagnitudeValue) =>
-      a.toString shouldEqual Show[MagnitudeValue].show(a)
+      assertEquals(a.toString, Show[MagnitudeValue].show(a))
     }
   }
 
   test("Can extract the magnitude as a double") {
     forAll { (a: MagnitudeValue) =>
-      a.toDoubleValue shouldEqual a.scaledValue / 100.0
+      assertEquals(a.toDoubleValue, a.scaledValue / 1000.0)
     }
   }
 

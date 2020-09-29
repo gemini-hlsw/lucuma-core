@@ -4,30 +4,37 @@
 package lucuma.core.model
 package arb
 
-import lucuma.core.math.ProperMotion
-import lucuma.core.math.arb.ArbProperMotion
+import scala.collection.immutable.SortedMap
 
-import org.scalacheck._
-import org.scalacheck.Arbitrary._
+import eu.timepit.refined.scalacheck.string._
+import eu.timepit.refined.types.string.NonEmptyString
+import lucuma.core.enum.MagnitudeBand
+import lucuma.core.util.arb.ArbEnumerated
+import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Cogen._
+import org.scalacheck._
 
 trait ArbTarget {
 
   import ArbEphemerisKey._
-  import ArbProperMotion._
+  import ArbSiderealTracking._
+  import ArbMagnitude._
+  import ArbEnumerated._
 
   implicit val arbTarget: Arbitrary[Target] =
     Arbitrary {
       for {
-        n <- Gen.alphaStr.map(_.take(64))
-        t <- arbitrary[Either[EphemerisKey, ProperMotion]]
-      } yield Target(n, t)
+        n <- arbitrary[NonEmptyString]
+        t <- arbitrary[Either[EphemerisKey, SiderealTracking]]
+        m <- arbitrary[Vector[(MagnitudeBand, Magnitude)]]
+      } yield Target(n, t, SortedMap(m: _*))
     }
 
   implicit val cogTarget: Cogen[Target] =
-    Cogen[(String, Either[EphemerisKey, ProperMotion])].contramap { t =>
-      (t.name, t.track)
-    }
+    Cogen[(String, Either[EphemerisKey, SiderealTracking], Vector[(MagnitudeBand, Magnitude)])]
+      .contramap { t =>
+        (t.name.value, t.track, t.magnitudes.toVector)
+      }
 }
 
 object ArbTarget extends ArbTarget

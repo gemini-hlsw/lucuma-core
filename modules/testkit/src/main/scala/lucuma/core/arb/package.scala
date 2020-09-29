@@ -3,10 +3,12 @@
 
 package lucuma.core
 
+import scala.collection.immutable.TreeMap
+
 import cats.Applicative
 import eu.timepit.refined.types.numeric.NonNegInt
+import eu.timepit.refined.types.string.NonEmptyString
 import org.scalacheck._
-import scala.collection.immutable.TreeMap
 
 package object arb {
 
@@ -44,5 +46,7 @@ package object arb {
   }
 
   implicit val cogenNonNegativeInt: Cogen[NonNegInt] = Cogen[Int].contramap(_.value)
+
+  implicit val cogenNonEmptyString: Cogen[NonEmptyString] = Cogen[String].contramap(_.value)
 
 }
