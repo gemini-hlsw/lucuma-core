@@ -1,7 +1,7 @@
 // Copyright (c) 2016-2020 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package lucuma.core.util.arb
+package lucuma.core.model.arb
 
 import cats.implicits._
 import lucuma.core.model.OrcidId
@@ -17,7 +17,7 @@ trait ArbOrcidId {
     Arbitrary {
       (digits(4), digits(4), digits(4), digits(3)).mapN { case (a, b, c, d) =>
         val x = OrcidId.checkDigit(a + b + c + d)
-        OrcidId.fromString(s"https://orcid.org/$a-$b-$c-$d$x") match {
+        OrcidId.fromValue(s"$a-$b-$c-$d$x") match {
           case Left(s)  => sys.error(s)
           case Right(o) => o
         }
