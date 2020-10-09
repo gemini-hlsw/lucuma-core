@@ -7,19 +7,21 @@ import lucuma.core.util.Enumerated
 
 /** NGO users are associated with a partner. */
 sealed abstract class Partner(
-  val tag:  String,
-  val name: String,
-) extends Product with Serializable
+  val tag:       String,
+  val name:      String,
+  val shortName: String
+) extends Product
+    with Serializable
 
 case object Partner {
 
-  case object Ar extends Partner("ar", "Argentina")
-  case object Br extends Partner("br", "Brazil")
-  case object Ca extends Partner("ca", "Canada")
-  case object Cl extends Partner("cl", "Chile")
-  case object Kr extends Partner("kr", "Korea")
-  case object Uh extends Partner("uh", "University of Hawaii")
-  case object Us extends Partner("us", "United States")
+  case object Ar extends Partner("ar", "Argentina", "Argentina")
+  case object Br extends Partner("br", "Brazil", "Brazil")
+  case object Ca extends Partner("ca", "Canada", "Canada")
+  case object Cl extends Partner("cl", "Chile", "Chile")
+  case object Kr extends Partner("kr", "Korea", "Korea")
+  case object Uh extends Partner("uh", "University of Hawaii", "U of H")
+  case object Us extends Partner("us", "United States", "USA")
 
   implicit val EnumeratedPartner: Enumerated[Partner] =
     new Enumerated[Partner] {
