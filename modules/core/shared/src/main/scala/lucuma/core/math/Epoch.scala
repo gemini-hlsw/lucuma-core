@@ -19,7 +19,7 @@ import java.time._
  * @param scheme This `Epoch`'s temporal scheme.
  * @see The Wikipedia [[https://en.wikipedia.org/wiki/Epoch_(astronomy) article]]
  */
-final class Epoch private (val scheme: Epoch.Scheme, private[math] val toMilliyears: Int) {
+final class Epoch private (val scheme: Epoch.Scheme, val toMilliyears: Int) {
 
   /** This `Epoch`'s year. Note that this value is not very useful without the `Scheme`. */
   def epochYear: Double =
