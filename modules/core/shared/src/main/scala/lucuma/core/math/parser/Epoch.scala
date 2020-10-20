@@ -38,7 +38,7 @@ trait EpochParsers {
         case (s, y, f) =>
           s.getOrElse(Julian).fromMilliyears(y * 1000 + f)
       }
-      .named("epoch")
+      .named("julianEpoch")
 
 }
 
