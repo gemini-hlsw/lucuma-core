@@ -3,12 +3,14 @@
 
 package lucuma.core.math
 
-import cats.{ Order, Show }
+import java.time._
+
+import cats.Order
+import cats.Show
 import cats.syntax.all._
 import lucuma.core.math.parser.EpochParsers
-import lucuma.core.syntax.parser._
 import lucuma.core.optics.Format
-import java.time._
+import lucuma.core.syntax.parser._
 
 /**
  * An epoch, the astronomer's equivalent of `Instant`, based on a fractional year in some temporal
@@ -19,7 +21,7 @@ import java.time._
  * @param scheme This `Epoch`'s temporal scheme.
  * @see The Wikipedia [[https://en.wikipedia.org/wiki/Epoch_(astronomy) article]]
  */
-final class Epoch private (val scheme: Epoch.Scheme, private[math] val toMilliyears: Int) {
+final class Epoch private (val scheme: Epoch.Scheme, val toMilliyears: Int) {
 
   /** This `Epoch`'s year. Note that this value is not very useful without the `Scheme`. */
   def epochYear: Double =
@@ -142,6 +144,21 @@ trait EpochOptics { this: Epoch.type =>
     Format(
       s => EpochParsers.epoch.parseExact(s),
       e => f"${e.scheme.prefix}%s${e.toMilliyears / 1000}%d.${e.toMilliyears % 1000}%03d"
+    )
+
+  val fromStringNoScheme: Format[String, Epoch] =
+    Format(
+      s => EpochParsers.epochLenient.parseExact(s),
+      {
+        case e if e.toMilliyears % 1000 === 0 =>
+          f"${e.toMilliyears / 1000}%d"
+        case e if e.toMilliyears % 100 === 0  =>
+          f"${e.toMilliyears / 1000}%d.${(e.toMilliyears % 1000) / 100}%01d"
+        case e if e.toMilliyears % 10 === 0   =>
+          f"${e.toMilliyears / 1000}%d.${(e.toMilliyears % 1000) / 10}%02d"
+        case e =>
+          f"${e.toMilliyears / 1000}%d.${e.toMilliyears % 1000}%03d"
+      }
     )
 
 }

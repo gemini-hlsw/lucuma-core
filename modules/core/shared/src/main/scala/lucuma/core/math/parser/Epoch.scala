@@ -7,6 +7,7 @@ import cats.syntax.all._
 import atto._, Atto._
 import lucuma.core.math.Epoch
 import lucuma.core.parser.MiscParsers
+import lucuma.core.math.Epoch.Julian
 
 /** Parser for [[lucuma.core.math.Epoch]]. */
 trait EpochParsers {
@@ -30,5 +31,15 @@ trait EpochParsers {
       }
       .named("epoch")
 
+  /** Parser for an `Epoch` with a default Julian schemme. */
+  val epochLenient: Parser[Epoch] =
+    (opt(epochScheme), int <~ opt(char('.')), MiscParsers.frac(3))
+      .mapN {
+        case (s, y, f) =>
+          s.getOrElse(Julian).fromMilliyears(y * 1000 + f)
+      }
+      .named("julianEpoch")
+
 }
+
 object EpochParsers extends EpochParsers
