@@ -3,13 +3,15 @@
 
 package lucuma.core.math.arb
 
-import lucuma.core.math.Epoch
 import java.time.LocalDateTime
-import org.scalacheck._
-import org.scalacheck.Gen._
-import org.scalacheck.Arbitrary._
-import lucuma.core.arb._
+
 import lucuma.core.arb.ArbTime
+import lucuma.core.arb._
+import lucuma.core.math.Epoch
+import lucuma.core.math.Epoch.Julian
+import org.scalacheck.Arbitrary._
+import org.scalacheck.Gen._
+import org.scalacheck._
 
 trait ArbEpoch {
   import ArbTime._
@@ -34,10 +36,19 @@ trait ArbEpoch {
       s => Gen.const(s.replace("2", "0")) // create a leading zero, maybe (ok)
     )
 
-  // Strings that are often parsable as DMS.
+  // Strings that are often parsable as epoch
   val strings: Gen[String] =
     arbitrary[Epoch].map(Epoch.fromString.reverseGet).flatMapOneOf(Gen.const, perturbations: _*)
 
+  val stringsNoScheme: Gen[String] =
+    arbitrary[Epoch]
+      .map(Epoch.fromStringNoScheme.reverseGet)
+      .flatMapOneOf(Gen.const, perturbations: _*)
+
+  val arbJulianEpoch: Arbitrary[Epoch] =
+    Arbitrary {
+      arbitrary[LocalDateTime].map(Julian.fromLocalDateTime)
+    }
 }
 
 object ArbEpoch extends ArbEpoch
