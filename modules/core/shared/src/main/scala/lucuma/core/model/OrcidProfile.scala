@@ -3,6 +3,7 @@
 
 package lucuma.core.model
 
+import cats._
 import cats.implicits._
 
 /** An ORCID profile is an OrcidId and a set of optional fields. */
@@ -22,4 +23,9 @@ final case class OrcidProfile(
     givenName
   ).getOrElse(orcidId.value.toString())
 
+}
+
+object OrcidProfile {
+  implicit val eqOrcidProfile: Eq[OrcidProfile] =
+    Eq.by(x => (x.orcidId, x.givenName, x.familyName, x.creditName, x.primaryEmail))
 }
