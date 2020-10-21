@@ -6,6 +6,7 @@ package core
 package enum
 
 import lucuma.core.util.Enumerated
+import lucuma.core.util.Display
 
 sealed abstract class ObsStatus(val label: String) extends Product with Serializable
 
@@ -22,4 +23,6 @@ object ObsStatus {
   /** @group Typeclass Instances */
   implicit val ObsStatusEnumerated: Enumerated[ObsStatus] =
     Enumerated.of(New, Included, Proposed, Approved, ForReview, Ready, Ongoing, Observed)
+
+  implicit val ObsStatusDisplay: Display[ObsStatus] = Display.byShortName(_.label)
 }
