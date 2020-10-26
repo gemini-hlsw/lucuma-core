@@ -25,9 +25,12 @@ inThisBuild(
       ("org.typelevel" % "kind-projector" % kindProjectorVersion).cross(CrossVersion.full)
     ),
     Global / onChangedBuildSource := ReloadOnSourceChanges,
-    scalacOptions += "-Ymacro-annotations"
+    scalacOptions += "-Ymacro-annotations",
   ) ++ lucumaPublishSettings
 )
+
+ThisBuild / bintrayRemoteCacheOrganization := "geminihlsw"
+ThisBuild / bintrayRemoteCachePackage := "lucuma-core"
 
 skip in publish := true
 
