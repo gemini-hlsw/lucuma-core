@@ -3,14 +3,18 @@
 
 package lucuma.core.model
 
+import lucuma.core.model.arb._
 import lucuma.core.util.arb._
-import munit._
 import lucuma.core.util.laws.GidTests
+import munit._
+import cats.kernel.laws.discipline.EqTests
 
 final class UserSuite extends DisciplineSuite {
   import ArbGid._
+  import ArbUser._
 
   // Laws
   checkAll("User.Id", GidTests[User.Id].gid)
+  checkAll("User.Id", EqTests[User].eqv)
 
 }
