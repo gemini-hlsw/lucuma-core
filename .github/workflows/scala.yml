@@ -14,4 +14,7 @@ jobs:
         with:
           java-version: adopt@1.11
       - name: Run compile
-        run: csbt headerCheck +compile +test +doc
+        run: csbt pullRemoteCache headerCheck +compile pushRemoteCache bintrayRemoteCacheCleanOld
+        env:
+          BINTRAY_REMOTE_CACHE_USER: ${{ secrets.BINTRAY_REMOTE_CACHE_USER }}
+          BINTRAY_REMOTE_CACHE_PASS: ${{ secrets.BINTRAY_REMOTE_CACHE_PASS }}
