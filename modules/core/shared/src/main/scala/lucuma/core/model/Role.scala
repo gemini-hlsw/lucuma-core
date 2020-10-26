@@ -3,13 +3,14 @@
 
 package lucuma.core.model
 
+import cats.Eq
 import cats.implicits._
 import eu.timepit.refined.auto._
 
 /**
- * Each user has a current `Role` and a set of other roles they may assume. A role has (at least)
- * an `Access` level.
- */
+  * Each user has a current `Role` and a set of other roles they may assume. A role has (at least)
+  * an `Access` level.
+  */
 sealed abstract class Role(val access: Access, elaboration: Option[String] = None) {
   final def name = elaboration.foldLeft(access.name)((n, e) => s"$n ($e)")
 }
@@ -42,4 +43,12 @@ object StandardRole extends WithId {
 
   /** The `Admin` role is a superuser role that allows access to all functionality. */
   final case class Admin(id: StandardRole.Id) extends StandardRole(Access.Admin)
+
+  implicit val eqStandardRole: Eq[StandardRole] = Eq.instance {
+    case (Pi(a), Pi(b))         => a === b
+    case (Ngo(a, b), Ngo(c, d)) => a === c && b === d
+    case (Staff(a), Staff(b))   => a === b
+    case (Admin(a), Admin(b))   => a === b
+    case _                      => false
+  }
 }
