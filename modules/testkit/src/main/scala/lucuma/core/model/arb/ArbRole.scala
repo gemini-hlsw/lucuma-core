@@ -8,10 +8,19 @@ import lucuma.core.model.StandardRole
 import lucuma.core.util.arb._
 import org.scalacheck._
 import org.scalacheck.Arbitrary._
+import lucuma.core.model.ServiceRole
+import lucuma.core.model.GuestRole
+import lucuma.core.model.Role
 
-trait ArbStandardRole {
+trait ArbRole {
   import ArbGid._
   import ArbEnumerated._
+
+  implicit val ArbServiceRole: Arbitrary[ServiceRole] =
+    Arbitrary(arbitrary[String].map(ServiceRole(_)))
+
+  implicit val CogServiceRole: Cogen[ServiceRole] =
+    Cogen[String].contramap(_.serviceName)
 
   implicit val ArbStandardRolePi: Arbitrary[StandardRole.Pi] =
     Arbitrary(arbitrary[StandardRole.Id].map(StandardRole.Pi(_)))
@@ -64,6 +73,23 @@ trait ArbStandardRole {
       case admin: StandardRole.Admin => Right(Right(Right(admin)))
     }
 
+  implicit val ArbRole: Arbitrary[Role] =
+    Arbitrary {
+      for {
+        guest    <- Gen.const(GuestRole)
+        service  <- arbitrary[ServiceRole]
+        standard <- arbitrary[StandardRole]
+        role     <- Gen.oneOf(guest, service, standard)
+      } yield role
+    }
+
+  implicit val CogRole: Cogen[Role] =
+    Cogen[Option[Either[ServiceRole, StandardRole]]].contramap {
+      case GuestRole              => None
+      case service: ServiceRole   => Some(Left(service))
+      case standard: StandardRole => Some(Right(standard))
+    }
+
 }
 
-object ArbStandardRole extends ArbStandardRole
+object ArbRole extends ArbRole

@@ -15,6 +15,15 @@ sealed abstract class Role(val access: Access, elaboration: Option[String] = Non
   final def name = elaboration.foldLeft(access.name)((n, e) => s"$n ($e)")
 }
 
+object Role {
+  implicit val eqRole: Eq[Role] = Eq.instance {
+    case (GuestRole, GuestRole)             => true
+    case (a: ServiceRole, b: ServiceRole)   => a === b
+    case (a: StandardRole, b: StandardRole) => a === b
+    case _                                  => false
+  }
+}
+
 // Special roles
 
 /** `GuestRole` allows limited access to temporary programs. */
@@ -22,6 +31,10 @@ final case object GuestRole extends Role(Access.Guest)
 
 /** `ServiceRole` is used only for inter-service communication. */
 final case class ServiceRole(serviceName: String) extends Role(Access.Service, Some(serviceName))
+
+object ServiceRole {
+  implicit val eqServiceRole: Eq[ServiceRole] = Eq.by(_.serviceName)
+}
 
 /** The class of roles taken on by authenticated users. */
 sealed abstract class StandardRole(access: Access, elaboration: Option[String] = None)

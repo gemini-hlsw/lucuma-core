@@ -11,7 +11,7 @@ import org.scalacheck.Arbitrary._
 trait ArbUser {
   import ArbGid._
   import ArbEnumerated._
-  import ArbStandardRole._
+  import ArbRole._
   import ArbOrcidProfile._
 
   implicit val ArbGuestUser: Arbitrary[GuestUser] =

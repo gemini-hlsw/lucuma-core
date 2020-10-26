@@ -11,10 +11,11 @@ import cats.kernel.laws.discipline.EqTests
 
 final class RoleSuite extends DisciplineSuite {
   import ArbGid._
-  import ArbStandardRole._
+  import ArbRole._
 
   // Laws
   checkAll("StandardRole.Id", GidTests[StandardRole.Id].gid)
+  checkAll("Eq[Role]", EqTests[Role].eqv)
   checkAll("Eq[StandardRole]", EqTests[StandardRole].eqv)
 
 }
