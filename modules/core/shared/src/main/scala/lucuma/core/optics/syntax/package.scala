@@ -4,5 +4,7 @@
 package lucuma.core.optics
 
 package object syntax {
-  object all extends ToPrismOps with ToLensEditorOps
+  object all extends ToLensOps
+                with ToOptionalOps
+                with ToPrismOps
 }
