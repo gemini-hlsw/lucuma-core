@@ -42,6 +42,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
       "org.typelevel"              %%% "cats-effect"            % catsEffectVersion,
       "com.github.julien-truffaut" %%% "monocle-core"           % monocleVersion,
       "com.github.julien-truffaut" %%% "monocle-macro"          % monocleVersion,
+      "com.github.julien-truffaut" %%% "monocle-state"          % monocleVersion,
       "edu.gemini"                 %%% "lucuma-jts"             % jtsVersion,
       "com.manyangled"             %%% "coulomb"                % coulombVersion,
       "com.manyangled"             %%% "coulomb-si-units"       % coulombVersion,
