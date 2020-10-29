@@ -7,7 +7,7 @@ import cats.data.State
 import monocle.Lens
 import monocle.state.all._
 
-final class LensEditorOps[S, A](val self: Lens[S, A]) extends AnyVal {
+final class LensOps[S, A](val self: Lens[S, A]) extends AnyVal {
   def edit(a: A): State[S, A] =
     self.assign(a)
 
@@ -21,9 +21,9 @@ final class LensEditorOps[S, A](val self: Lens[S, A]) extends AnyVal {
     edit(a)
 }
 
-trait ToLensEditorOps {
-  implicit def ToLensOps[S, B](l: Lens[S, B]): LensEditorOps[S, B] =
-    new LensEditorOps(l)
+trait ToLensOps {
+  implicit def ToLensOps[S, B](l: Lens[S, B]): LensOps[S, B] =
+    new LensOps(l)
 }
 
-object lens extends ToLensEditorOps
+object lens extends ToLensOps
