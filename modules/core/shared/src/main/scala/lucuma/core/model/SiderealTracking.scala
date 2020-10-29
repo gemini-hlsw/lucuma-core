@@ -213,6 +213,10 @@ trait SiderealTrackingOptics {
     GenLens[SiderealTracking](_.baseCoordinates)
 
   /** @group Optics */
+  val catalogId: Lens[SiderealTracking, Option[CatalogId]] =
+    GenLens[SiderealTracking](_.catalogId)
+
+  /** @group Optics */
   val epoch: Lens[SiderealTracking, Epoch] =
     GenLens[SiderealTracking](_.epoch)
 
