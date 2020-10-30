@@ -3,6 +3,7 @@
 
 package lucuma.core.math.arb
 
+import lucuma.core.arb._
 import lucuma.core.math.MagnitudeValue
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Cogen._
@@ -16,6 +17,16 @@ trait ArbMagnitudeValue {
 
   implicit val cogMagnitudeValue: Cogen[MagnitudeValue] =
     Cogen[Int].contramap(_.scaledValue)
+
+  // Strings that are often parseable as a magnitude value
+  val stringsMagnitudeValue: Gen[String] =
+    arbitrary[MagnitudeValue]
+      .map(_.toDoubleValue.toString)
+      .flatMapOneOf(
+        Gen.const,
+        _ => arbitrary[BigDecimal].toString,
+        _ => arbitrary[String]  // swap for a random String
+      )
 
 }
 
