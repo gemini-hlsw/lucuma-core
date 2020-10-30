@@ -16,6 +16,7 @@ final class MagnitudeValueSuite extends DisciplineSuite {
   // Laws
   checkAll("MagnitudeValue", OrderTests[MagnitudeValue].order)
   checkAll("fromBigDecimal", FormatTests(MagnitudeValue.fromBigDecimal).format)
+  checkAll("fromString", FormatTests(MagnitudeValue.fromString).formatWith(stringsMagnitudeValue))
 
   test("Equality must be natural") {
     forAll { (a: MagnitudeValue, b: MagnitudeValue) =>

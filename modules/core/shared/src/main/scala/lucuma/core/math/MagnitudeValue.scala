@@ -4,11 +4,12 @@
 package lucuma.core.math
 
 import scala.math.rint
-
 import cats.Order
 import cats.Show
 import lucuma.core.optics.Format
 import spire.math.Rational
+
+import scala.util.Try
 
 /**
  * Exact magnitude value represented as an int with the original value scaled up
@@ -24,7 +25,7 @@ final case class MagnitudeValue(private[lucuma] val scaledValue: Int)
   def toDoubleValue: Double = scaledValue / 1000.0
 
   override def toString: String =
-    s"MagnitudeValue(${scaledValue / 1000})"
+    s"MagnitudeValue.fromDouble(${BigDecimal(scaledValue).underlying.movePointLeft(3).toString})"
 
 }
 
@@ -56,6 +57,13 @@ object MagnitudeValue {
         n => new java.math.BigDecimal(n).movePointLeft(3),
         d => d.underlying.movePointRight(3).intValue
       )
+
+  /**
+   * @group Optics
+   */
+  val fromString: Format[String, MagnitudeValue] =
+    Format[String, BigDecimal](s => Try(BigDecimal(s)).toOption, _.toString)
+      .composeFormat(fromBigDecimal)
 
   /** @group Typeclass Instances */
   implicit val MagnitudeValueShow: Show[MagnitudeValue] =
