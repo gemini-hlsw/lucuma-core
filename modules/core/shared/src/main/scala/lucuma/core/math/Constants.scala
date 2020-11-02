@@ -4,24 +4,25 @@
 package lucuma.core.math
 
 import java.time.Duration
+
 import coulomb._
+import coulomb.define.DerivedUnit
 import coulomb.physicalconstants._
+import coulomb.physicalconstants.infra.PhysicalConstantQuantity
+import coulomb.si.Meter
 import lucuma.core.math.units.MetersPerSecond
 import spire.math.Rational
-import coulomb.define.DerivedUnit
-import coulomb.si.Meter
-import coulomb.physicalconstants.infra.PhysicalConstantQuantity
 
 object Constants {
-  object infra {
+  private object infra {
     trait AstronomicalUnit
-    implicit val defineAU = {
+    implicit val defineAU: DerivedUnit[AstronomicalUnit, Meter] = {
       val coef = Rational(149597870660L)
       DerivedUnit[AstronomicalUnit, Meter](abbv = "AU", coef = coef)
     }
 
     trait EquatorialRadius
-    implicit val defineEquatorialRadius = {
+    implicit val defineEquatorialRadius: DerivedUnit[EquatorialRadius, Meter] = {
       val coef = Rational(6378137L)
       DerivedUnit[EquatorialRadius, Meter](abbv = "equatorial-radius", coef = coef)
     }
