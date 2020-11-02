@@ -4,12 +4,13 @@
 package lucuma.core.math.skycalc
 
 import lucuma.core.math.Constants._
+import lucuma.core.math.JulianDate.J2000
 import java.time.Instant
 import java.time.LocalTime
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
-import lucuma.core.math.JulianDate.J2000
 import scala.annotation.unused
+import spire.std.double._
 
 trait ImprovedSkyCalcMethods {
 
@@ -410,10 +411,10 @@ trait ImprovedSkyCalcMethods {
     accusun(jd2, 0.0, 0.0, ras, decs, dists, topora, topodec, x2, y2, z2)
     accusun(jd, 0.0, 0.0, ras, decs, dists, topora, topodec, x, y, z)
     Xdot =
-      MetersPerSecondInAUPerDay * (x2.d - x1.d) / (2.0 * EarthDiff * SpeedOfLight) /* numerical differentiation */
+      MetersPerSecondInAUPerDay * (x2.d - x1.d) / (2.0 * EarthDiff * SpeedOfLight.value) /* numerical differentiation */
     Ydot =
-      MetersPerSecondInAUPerDay * (y2.d - y1.d) / (2.0 * EarthDiff * SpeedOfLight) /* crude but accurate */
-    Zdot = MetersPerSecondInAUPerDay * (z2.d - z1.d) / (2.0 * EarthDiff * SpeedOfLight)
+      MetersPerSecondInAUPerDay * (y2.d - y1.d) / (2.0 * EarthDiff * SpeedOfLight.value) /* crude but accurate */
+    Zdot = MetersPerSecondInAUPerDay * (z2.d - z1.d) / (2.0 * EarthDiff * SpeedOfLight.value)
     /* approximate correction ... non-relativistic but very close.  */
     vec(1) += from_std * Xdot
     vec(2) += from_std * Ydot
@@ -544,9 +545,9 @@ trait ImprovedSkyCalcMethods {
     eclrot(jd, y, z)
     /*      --- code to include topocentric correction for sun .... */
     geocent(lst, geolat, 0.0, xgeo, ygeo, zgeo)
-    xtop = x.d - xgeo.d * EquatorialRadiusMeters / MetersInAU
-    ytop = y.d - ygeo.d * EquatorialRadiusMeters / MetersInAU
-    ztop = z.d - zgeo.d * EquatorialRadiusMeters / MetersInAU
+    xtop = x.d - xgeo.d * (EquatorialRadius[Double] / AstronomicalUnit[Double]).value
+    ytop = y.d - ygeo.d * (EquatorialRadius[Double] / AstronomicalUnit[Double]).value
+    ztop = z.d - zgeo.d * (EquatorialRadius[Double] / AstronomicalUnit[Double]).value
     topodist = Math.sqrt(xtop * xtop + ytop * ytop + ztop * ztop)
     l = xtop / topodist
     m = ytop / topodist
@@ -686,9 +687,9 @@ trait ImprovedSkyCalcMethods {
     denom = Math.cos(geolat) * Math.cos(geolat) + denom * denom
     C_geo = 1.0 / Math.sqrt(denom)
     S_geo = (1.0 - FlatteningOfEarth) * (1.0 - FlatteningOfEarth) * C_geo
-    C_geo = C_geo + height / EquatorialRadiusMeters /* deviation from almanac
+    C_geo = C_geo + height / EquatorialRadius[Double].value /* deviation from almanac
                    notation -- include height here. */
-    S_geo = S_geo + height / EquatorialRadiusMeters
+    S_geo = S_geo + height / EquatorialRadius[Double].value
     x_geo.d = C_geo * Math.cos(geolat) * Math.cos(geolong)
     y_geo.d = C_geo * Math.cos(geolat) * Math.sin(geolong)
     z_geo.d = S_geo * Math.sin(geolat)

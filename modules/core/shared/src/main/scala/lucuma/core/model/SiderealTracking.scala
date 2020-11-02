@@ -100,7 +100,7 @@ object SiderealTracking extends SiderealTrackingOptics {
 
   // Some constants we need
   private val secsPerDay  = 86400.0
-  private val auPerKm     = 1000.0 / AstronomicalUnit.toDouble
+  private val auPerKm     = 1000.0 / AstronomicalUnit[Double].value
   private val radsPerAsec = Angle.arcseconds.reverseGet(1).toDoubleRadians
 
   // We need to do things with little vectors of doubles

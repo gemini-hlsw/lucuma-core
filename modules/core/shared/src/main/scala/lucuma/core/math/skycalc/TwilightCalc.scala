@@ -2,6 +2,9 @@
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.math.skycalc
+
+import cats.syntax.all._
+import coulomb.refined._
 import java.time.Instant
 import java.time.LocalDate
 import lucuma.core.enum.TwilightType
@@ -10,8 +13,8 @@ import lucuma.core.math.JulianDate
 import lucuma.core.math.Place
 import lucuma.core.math.Schedule
 import lucuma.core.math.Constants._
-import cats.syntax.all._
 import io.chrisdavenport.cats.time._
+import spire.std.double._
 
 trait TwilightCalc extends SunCalc {
 
@@ -49,7 +52,7 @@ trait TwilightCalc extends SunCalc {
       case TwilightType.Official =>
         // Horizon geometric correction from p. 24 of the Skycalc manual: sqrt(2 * elevation / Re) (radians)
         twilightType.horizonAngle.toAngle.toSignedDoubleDegrees + Math.sqrt(
-          2.0 * place.altitudeDouble / EquatorialRadiusMeters
+          2.0 * (place.altitude.toValue[Double] / EquatorialRadius[Double]).value
         ) * DegsInRadian
       case _                     => twilightType.horizonAngle.toAngle.toSignedDoubleDegrees
     }

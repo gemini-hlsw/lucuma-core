@@ -4,15 +4,38 @@
 package lucuma.core.math
 
 import java.time.Duration
+import coulomb._
+import coulomb.physicalconstants._
+import lucuma.core.math.units.MetersPerSecond
+import spire.math.Rational
+import coulomb.define.DerivedUnit
+import coulomb.si.Meter
+import coulomb.physicalconstants.infra.PhysicalConstantQuantity
 
 object Constants {
+  object infra {
+    trait AstronomicalUnit
+    implicit val defineAU = {
+      val coef = Rational(149597870660L)
+      DerivedUnit[AstronomicalUnit, Meter](abbv = "AU", coef = coef)
+    }
+
+    trait EquatorialRadius
+    implicit val defineEquatorialRadius = {
+      val coef = Rational(6378137L)
+      DerivedUnit[EquatorialRadius, Meter](abbv = "equatorial-radius", coef = coef)
+    }
+  }
+  import infra._
 
   /*
    * Astronomical Constants
    */
 
   /** One AU in meters. */
-  val AstronomicalUnit: Long = 149597870660L
+  def AstronomicalUnit[V](implicit
+    pcq: PhysicalConstantQuantity[V, AstronomicalUnit]
+  ): Quantity[V, pcq.QU] = pcq.q
 
   /** Meters/sec in 1 AU/day. */
   val MetersPerSecondInAUPerDay: Double = 1731456.83633
@@ -20,11 +43,10 @@ object Constants {
   /** Flattening of earth, 1/298.257 */
   val FlatteningOfEarth: Double = 0.003352813
 
-  /** Equatorial radius of Earth in meters. */
-  val EquatorialRadiusMeters: Int = 6378137
-
-  /** 1 AU in meters. */
-  val MetersInAU: Double = 1.4959787066e11
+  /** Equatorial radius of Earth. */
+  def EquatorialRadius[V](implicit
+    pcq: PhysicalConstantQuantity[V, EquatorialRadius]
+  ): Quantity[V, pcq.QU] = pcq.q
 
   /** Zenith extinction as magnitude. For use in lunar sky brightness calculations. */
   val KZen: Double = 0.172
@@ -37,7 +59,8 @@ object Constants {
    */
 
   /** Speed of light in meters per second. Exact. */
-  val SpeedOfLight: Int = 299792458
+  val SpeedOfLight: Quantity[Int, MetersPerSecond] =
+    speedOfLightInVacuum[Int]
 
   /** Seconds in a Day. For Convenience. */
   val SecsInDay: Long = Duration.ofDays(1).getSeconds

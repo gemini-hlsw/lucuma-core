@@ -16,7 +16,7 @@ trait ArbRadialVelocity {
   implicit val arbRadialVelocity: Arbitrary[RadialVelocity] =
     Arbitrary {
       for {
-        rv <- Gen.chooseNum(-SpeedOfLight + 1, SpeedOfLight - 1)
+        rv <- Gen.chooseNum(-SpeedOfLight.value + 1, SpeedOfLight.value - 1)
       } yield RadialVelocity.unsafeFromQuantity(rv.withUnit[MetersPerSecond])
     }
 
