@@ -25,7 +25,7 @@ trait units {
 
   trait CentimetersPerSecond
   implicit val defineUnitCentimetersPerSecond =
-    DerivedUnit[CentimetersPerSecond, (Centi %* Meter) %/ Second](Rational(1, 100), abbv = "cm/s")
+    DerivedUnit[CentimetersPerSecond, (Centi %* Meter) %/ Second](Rational.one, abbv = "cm/s")
 
   trait MetersPerSecond
   implicit val defineUnitMetersPerSecond =

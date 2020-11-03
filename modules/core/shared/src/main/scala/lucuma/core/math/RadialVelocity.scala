@@ -3,14 +3,12 @@
 
 package lucuma.core.math
 
-import java.math.MathContext
-
 import cats._
 import coulomb._
 import coulomb.cats.implicits._
 import coulomb.si._
-import lucuma.core.math.Constants._
 import lucuma.core.math.units._
+import lucuma.core.math.Constants.SpeedOfLight
 import monocle.Prism
 import spire.std.bigDecimal._
 
@@ -31,8 +29,8 @@ final case class RadialVelocity private (rv: Quantity[BigDecimal, MetersPerSecon
     * a return value of None should be understood as an infinity Redshift
     */
   def toRedshift: Option[Redshift] =
-    if (rv.value.abs < RadialVelocity.CValue) {
-      val i = (rv / RadialVelocity.C).value
+    if (rv.value.abs < SpeedOfLight.value) {
+      val i = (rv / SpeedOfLight).value
       val t = (1 + i) / (1 - i)
       Some(Redshift(BigDecimal.decimal(scala.math.sqrt(t.toDouble) - 1).round(rv.value.mc)))
     } else None
@@ -43,16 +41,11 @@ final case class RadialVelocity private (rv: Quantity[BigDecimal, MetersPerSecon
 
 object RadialVelocity {
 
-  // Reference: https://www.nist.gov/si-redefinition/meet-constants
-  // Exact value of the speed of light in m/s
-  private val CValue: BigDecimal = BigDecimal.decimal(SpeedOfLight.toDouble, MathContext.DECIMAL64)
-
-  val C: Quantity[BigDecimal, MetersPerSecond] =
-    CValue.withUnit[MetersPerSecond].toUnit[MetersPerSecond] // Speed of light in m/s
-
   val fromMetersPerSecond: Prism[BigDecimal, RadialVelocity] =
     Prism[BigDecimal, RadialVelocity](b =>
-      Some(b).filter(_.abs <= CValue).flatMap(v => RadialVelocity(v.withUnit[MetersPerSecond]))
+      Some(b)
+        .filter(_.abs <= SpeedOfLight.value)
+        .flatMap(v => RadialVelocity(v.withUnit[MetersPerSecond]))
     )(_.rv.value)
 
   /**
@@ -60,7 +53,7 @@ object RadialVelocity {
     * @group Constructors
     */
   def apply(rv: Quantity[BigDecimal, MetersPerSecond]): Option[RadialVelocity] =
-    if (rv.value.abs < CValue) Some(new RadialVelocity(rv)) else None
+    if (rv.value.abs < SpeedOfLight.value) Some(new RadialVelocity(rv)) else None
 
   /**
     * Attempts to construct a RadialVelocity, it will fail if the value is outside the allowed range

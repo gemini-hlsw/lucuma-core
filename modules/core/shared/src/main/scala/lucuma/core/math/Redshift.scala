@@ -5,6 +5,7 @@ package lucuma.core.math
 
 import cats._
 import coulomb._
+import lucuma.core.math.Constants.SpeedOfLight
 import lucuma.core.math.units._
 
 /**
@@ -23,12 +24,12 @@ final case class Redshift(z: BigDecimal) {
     * Converts to RadialVelocity, approximate
     */
   def toRadialVelocity: Option[RadialVelocity] = {
-    val rv = RadialVelocity.C.value * (((z + 1) * (z + 1) - 1) / ((z + 1) * (z + 1) + 1))
+    val rv = SpeedOfLight.value * (((z + 1) * (z + 1) - 1) / ((z + 1) * (z + 1) + 1))
     RadialVelocity(rv.round(z.mc).withUnit[MetersPerSecond])
   }
 
   def toApparentRadialVelocity: ApparentRadialVelocity =
-    ApparentRadialVelocity((RadialVelocity.C.value * z).withUnit[MetersPerSecond])
+    ApparentRadialVelocity((SpeedOfLight.value * z).withUnit[MetersPerSecond])
 
   override def toString =
     s"Redshift($z)"
