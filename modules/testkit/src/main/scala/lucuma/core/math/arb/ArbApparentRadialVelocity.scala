@@ -19,7 +19,7 @@ trait ArbApparentRadialVelocity {
       } yield ApparentRadialVelocity(cz.withUnit[MetersPerSecond])
     }
 
-  implicit val cogRedshift: Cogen[ApparentRadialVelocity] =
+  implicit val cogApparentRadialVelocity: Cogen[ApparentRadialVelocity] =
     Cogen[BigDecimal].contramap(_.cz.value)
 }
 
