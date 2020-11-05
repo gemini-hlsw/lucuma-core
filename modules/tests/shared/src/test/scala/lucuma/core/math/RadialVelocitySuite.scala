@@ -8,12 +8,14 @@ import lucuma.core.math.arb._
 import monocle.law.discipline._
 import munit.DisciplineSuite
 import org.scalacheck.Prop._
+import lucuma.core.optics.laws.discipline.FormatTests
 
 final class RadialVelocitySuite extends DisciplineSuite {
   import ArbRadialVelocity._
 
   // Laws
   checkAll("fromMetersPerSecond", PrismTests(RadialVelocity.fromMetersPerSecond))
+  checkAll("fromKilometersPerSecond", FormatTests(RadialVelocity.kilometerspersecond).format)
 
   test("Equality must be natural") {
     forAll { (a: RadialVelocity, b: RadialVelocity) =>

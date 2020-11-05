@@ -7,6 +7,7 @@ import cats._
 import coulomb._
 import lucuma.core.math.Constants.SpeedOfLight
 import lucuma.core.math.units._
+import monocle.Iso
 
 /**
   * Represents a redshift of an object as it moves away (positive) or towards (negative) the observing point
@@ -42,6 +43,11 @@ object Redshift {
     * @group Constructors
     */
   val Zero: Redshift = Redshift(0)
+
+  /**
+    * Optic to go from BigDecimal to Redshift and viceversa
+    */
+  val redshift: Iso[BigDecimal, Redshift] = Iso(Redshift.apply)(_.z)
 
   /** @group Typeclass Instances */
   implicit val orderRedshift: Order[Redshift] =

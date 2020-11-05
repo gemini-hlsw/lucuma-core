@@ -19,7 +19,7 @@ import monocle.macros.GenLens
 /**
   * Time-parameterized coordinates, based on an observed position at some point in time (called
   * the `epoch`) and measured velocities in distance (`radialVelocity`; i.e., doppler shift) and
-  * position (`properVelocity`) per year. Given this information we can compute the position at any
+  * position (`properMotion`) per year. Given this information we can compute the position at any
   * instant in time. The references below are ''extremely'' helpful, so do check them out if you're
   * trying to understand the implementation.
   * @see The pretty good [[https://en.wikipedia.org/wiki/Proper_motion wikipedia]] article
@@ -27,7 +27,7 @@ import monocle.macros.GenLens
   * @see Astronomy and Astrophysics 134 (1984) [[http://articles.adsabs.harvard.edu/cgi-bin/nph-iarticle_query?bibcode=1984A%26A...134....1L&db_key=AST&page_ind=0&data_type=GIF&type=SCREEN_VIEW&classic=YES p.1-6]]
   * @param baseCoordinates observed coordinates at `epoch`
   * @param epoch           time of the base observation; typically `Epoch.J2000`
-  * @param properVelocity  proper velocity '''per year''' in [[lucuma.core.math.RightAscension]] and [[lucuma.core.math.Declination]], if any
+  * @param properMotion  proper velocity '''per year''' in [[lucuma.core.math.RightAscension]] and [[lucuma.core.math.Declination]], if any
   * @param radialVelocity  radial velocity (km/y, positive if receding), if any
   * @param parallax        parallax, if any
   */
@@ -35,7 +35,7 @@ final case class SiderealTracking(
   catalogId:       Option[CatalogId],
   baseCoordinates: Coordinates,
   epoch:           Epoch,
-  properVelocity:  Option[ProperVelocity],
+  properMotion:    Option[ProperMotion],
   radialVelocity:  Option[RadialVelocity],
   parallax:        Option[Parallax]
 ) {
@@ -47,16 +47,16 @@ final case class SiderealTracking(
   def plusYears(elapsedYears: Double): SiderealTracking =
     SiderealTracking(
       catalogId,
-      SiderealTracking.properMotion(
+      SiderealTracking.properMotionOn(
         baseCoordinates,
         epoch,
-        properVelocity.orEmpty,
+        properMotion.orEmpty,
         radialVelocity.getOrElse(RadialVelocity.Zero).toDoubleKilometersPerSecond,
         parallax.orEmpty,
         elapsedYears
       ),
       epoch.plusYears(elapsedYears),
-      properVelocity,
+      properMotion,
       radialVelocity,
       parallax
     )
@@ -73,16 +73,16 @@ object SiderealTracking extends SiderealTrackingOptics {
     * Proper motion correction in model units.
     * @param baseCoordinates base coordinates
     * @param epoch           the epoch
-    * @param properVelocity  proper velocity per epoch year
+    * @param properMotion  proper velocity per epoch year
     * @param radialVelocity  radial velocity (km/sec, positive if receding)
     * @param parallax        parallax
     * @param elapsedYears    elapsed time in epoch years
     * @return Coordinates corrected for proper motion
     */
-  def properMotion(
+  def properMotionOn(
     baseCoordinates: Coordinates,
     epoch:           Epoch,
-    properVelocity:  ProperVelocity,
+    properMotion:    ProperMotion,
     radialVelocity:  Double,
     parallax:        Parallax,
     elapsedYears:    Double
@@ -90,7 +90,7 @@ object SiderealTracking extends SiderealTrackingOptics {
     val (ra, dec) = properMotionʹ(
       baseCoordinates.toRadians,
       epoch.scheme.lengthOfYear,
-      properVelocity.toRadians,
+      properMotion.toRadians,
       radialVelocity,
       parallax.μas.value / 1000000.0,
       elapsedYears
@@ -117,7 +117,7 @@ object SiderealTracking extends SiderealTrackingOptics {
     * Proper motion correction in base units.
     * @param baseCoordinates base (ra, dec) in radians, [0 … 2π) and (-π/2 … π/2)
     * @param daysPerYear     length of epoch year in fractonal days
-    * @param properVelocity  proper velocity in (ra, dec) in radians per epoch year
+    * @param properMotion  proper velocity in (ra, dec) in radians per epoch year
     * @param radialVelocity  radial velocity (km/sec, positive means away from earth)
     * @param parallax        parallax in arcseconds (!)
     * @param elapsedYears    elapsed time in epoch years
@@ -127,7 +127,7 @@ object SiderealTracking extends SiderealTrackingOptics {
   private def properMotionʹ(
     baseCoordinates: Vec2,
     daysPerYear:     Double,
-    properVelocity:  Vec2,
+    properMotion:    Vec2,
     parallax:        Double,
     radialVelocity:  Double,
     elapsedYears:    Double
@@ -135,7 +135,7 @@ object SiderealTracking extends SiderealTrackingOptics {
 
     // Break out our components
     val (ra, dec)   = baseCoordinates
-    val (dRa, dDec) = properVelocity
+    val (dRa, dDec) = properMotion
 
     // Convert to cartesian
     val pos: Vec3 = {
@@ -199,7 +199,7 @@ object SiderealTracking extends SiderealTrackingOptics {
 
     order(_.baseCoordinates) |+|
       order(_.epoch) |+|
-      order(_.properVelocity) |+|
+      order(_.properMotion) |+|
       order(_.radialVelocity) |+|
       order(_.parallax)
 
@@ -221,8 +221,8 @@ trait SiderealTrackingOptics {
     GenLens[SiderealTracking](_.epoch)
 
   /** @group Optics */
-  val properVelocity: Lens[SiderealTracking, Option[ProperVelocity]] =
-    GenLens[SiderealTracking](_.properVelocity)
+  val properMotion: Lens[SiderealTracking, Option[ProperMotion]] =
+    GenLens[SiderealTracking](_.properMotion)
 
   /** @group Optics */
   val radialVelocity: Lens[SiderealTracking, Option[RadialVelocity]] =

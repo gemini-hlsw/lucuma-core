@@ -11,6 +11,7 @@ import lucuma.core.math.units._
 import lucuma.core.math.Constants.SpeedOfLight
 import monocle.Prism
 import spire.std.bigDecimal._
+import lucuma.core.optics.Format
 
 /**
   * Representation of a radial velocity in meters per second
@@ -47,6 +48,15 @@ object RadialVelocity {
         .filter(_.abs <= SpeedOfLight.value)
         .flatMap(v => RadialVelocity(v.withUnit[MetersPerSecond]))
     )(_.rv.value)
+
+  val kilometerspersecond: Format[BigDecimal, RadialVelocity] =
+    Format[BigDecimal, RadialVelocity](
+      b =>
+        Some(b)
+          .filter(_.abs <= SpeedOfLight.to[BigDecimal, KilometersPerSecond].value)
+          .flatMap(v => RadialVelocity(v.withUnit[KilometersPerSecond])),
+      rv => rv.rv.toUnit[KilometersPerSecond].value
+    )
 
   /**
     * Construct a RadialVelocity if the value is in the allowed range

@@ -24,7 +24,7 @@ final class TargetSuite extends DisciplineSuite {
   import ArbCoordinates._
   import ArbRightAscension._
   import ArbDeclination._
-  import ArbProperVelocity._
+  import ArbProperMotion._
   import ArbRadialVelocity._
 
   // Laws
@@ -41,8 +41,9 @@ final class TargetSuite extends DisciplineSuite {
   checkAll("Target.baseCoordinates", OptionalTests(Target.baseCoordinates))
   checkAll("Target.baseRA", OptionalTests(Target.baseRA))
   checkAll("Target.baseDec", OptionalTests(Target.baseDec))
-  checkAll("Target.properVelocity", OptionalTests(Target.properVelocity))
-  checkAll("Target.properVelocityRA", OptionalTests(Target.properVelocityDec))
-  checkAll("Target.properVelocityDec", OptionalTests(Target.properVelocityDec))
+  checkAll("Target.siderealTracking", OptionalTests(Target.siderealTracking))
+  checkAll("Target.properMotion", OptionalTests(Target.properMotion))
+  checkAll("Target.properMotionRA", OptionalTests(Target.properMotionRA))
+  checkAll("Target.properMotionDec", OptionalTests(Target.properMotionDec))
   checkAll("Target.magnitudeInBand", TraversalTests(Target.magnitudeIn(MagnitudeBand.B)))
 }
