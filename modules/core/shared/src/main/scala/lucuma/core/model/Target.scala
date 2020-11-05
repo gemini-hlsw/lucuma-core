@@ -35,20 +35,20 @@ object Target extends WithId with TargetOptics {
     Eq.by(x => (x.name, x.track, x.magnitudes))
 
   /**
-   * A target order based on tracking information.  For sidereal targets this
-   * roughly means by base coordinate without applying proper motion.  For
-   * non-sidereal this means by `EphemerisKey`.
-   *
+    * A target order based on tracking information.  For sidereal targets this
+    * roughly means by base coordinate without applying proper motion.  For
+    * non-sidereal this means by `EphemerisKey`.
+    *
    * Not implicit.
-   */
+    */
   val TargetTrackOrder: Order[Target] =
     Order.by(t => (t.track, t.name))
 
   /**
-   * Targets ordered by name first and then tracking information.
-   *
+    * Targets ordered by name first and then tracking information.
+    *
    * Not implicit.
-   */
+    */
   val TargetNameOrder: Order[Target] =
     Order.by(t => (t.name.value, t.track))
 
@@ -69,7 +69,7 @@ trait TargetOptics {
     track.composePrism(stdLeft)
 
   /** @group Optics */
-  lazy val properMotion: Optional[Target, SiderealTracking] =
+  lazy val siderealTracking: Optional[Target, SiderealTracking] =
     track.composePrism(stdRight)
 
   /** @group Optics */
@@ -91,15 +91,15 @@ trait TargetOptics {
 
   /** @group Optics */
   lazy val parallax: Optional[Target, Option[Parallax]] =
-    properMotion.composeLens(SiderealTracking.parallax)
+    siderealTracking.composeLens(SiderealTracking.parallax)
 
   /** @group Optics */
   lazy val radialVelocity: Optional[Target, Option[RadialVelocity]] =
-    properMotion.composeLens(SiderealTracking.radialVelocity)
+    siderealTracking.composeLens(SiderealTracking.radialVelocity)
 
   /** @group Optics */
   lazy val baseCoordinates: Optional[Target, Coordinates] =
-    properMotion.composeLens(SiderealTracking.baseCoordinates)
+    siderealTracking.composeLens(SiderealTracking.baseCoordinates)
 
   /** @group Optics */
   lazy val baseRA: Optional[Target, RightAscension] =
@@ -110,13 +110,13 @@ trait TargetOptics {
     baseCoordinates.composeLens(Coordinates.declination)
 
   /** @group Optics */
-  lazy val properVelocity =
-    properMotion.composeOptional(SiderealTracking.properVelocity.composePrism(option.some))
+  lazy val properMotion =
+    siderealTracking.composeOptional(SiderealTracking.properMotion.composePrism(option.some))
 
   /** @group Optics */
-  lazy val properVelocityRA = properVelocity.composeLens(ProperVelocity.ra)
+  lazy val properMotionRA = properMotion.composeLens(ProperMotion.ra)
 
   /** @group Optics */
-  lazy val properVelocityDec = properVelocity.composeLens(ProperVelocity.dec)
+  lazy val properMotionDec = properMotion.composeLens(ProperMotion.dec)
 
 }

@@ -13,6 +13,7 @@ import lucuma.core.math.arb._
 import lucuma.core.math.units._
 import lucuma.core.math.Constants.SpeedOfLight
 import org.scalacheck.Prop._
+import monocle.law.discipline.IsoTests
 
 final class RedshiftSuite extends munit.DisciplineSuite {
   import ArbRedshift._
@@ -20,6 +21,7 @@ final class RedshiftSuite extends munit.DisciplineSuite {
   // Laws
   checkAll("Redshift", EqTests[Redshift].eqv)
   checkAll("RedshiftOrder", OrderTests[Redshift].order)
+  checkAll("fromBigDecimal", IsoTests(Redshift.redshift))
 
   test("toRadialVelocity") {
     assertEquals(Redshift.Zero.toRadialVelocity, RadialVelocity(0.withUnit[MetersPerSecond]))

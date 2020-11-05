@@ -13,7 +13,7 @@ import org.scalacheck._
 trait ArbSiderealTracking {
   import ArbEpoch._
   import ArbCoordinates._
-  import ArbProperVelocity._
+  import ArbProperMotion._
   import ArbRadialVelocity._
   import ArbParallax._
   import ArbCatalogId._
@@ -24,7 +24,7 @@ trait ArbSiderealTracking {
         ci <- arbitrary[Option[CatalogId]]
         cs <- arbitrary[Coordinates]
         ap <- arbitrary[Epoch]
-        pv <- arbitrary[Option[ProperVelocity]]
+        pv <- arbitrary[Option[ProperMotion]]
         rv <- arbitrary[Option[RadialVelocity]]
         px <- arbitrary[Option[Parallax]]
       } yield SiderealTracking(ci, cs, ap, pv, rv, px)
@@ -36,12 +36,12 @@ trait ArbSiderealTracking {
         Option[CatalogId],
         Coordinates,
         Epoch,
-        Option[ProperVelocity],
+        Option[ProperMotion],
         Option[RadialVelocity],
         Option[Parallax]
       )
     ].contramap { p =>
-        (p.catalogId, p.baseCoordinates, p.epoch, p.properVelocity, p.radialVelocity, p.parallax)
+        (p.catalogId, p.baseCoordinates, p.epoch, p.properMotion, p.radialVelocity, p.parallax)
       }
 
 }

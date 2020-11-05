@@ -12,6 +12,8 @@ import coulomb.si._
 import lucuma.core.math.arb._
 import lucuma.core.math.Constants.SpeedOfLight
 import lucuma.core.math.units._
+import lucuma.core.optics.laws.discipline.WedgeTests
+import monocle.law.discipline.IsoTests
 import org.scalacheck.Prop._
 
 final class ApparentRadialVelocitySuite extends munit.DisciplineSuite {
@@ -20,6 +22,8 @@ final class ApparentRadialVelocitySuite extends munit.DisciplineSuite {
   // Laws
   checkAll("ApparentRadialVelocity", EqTests[ApparentRadialVelocity].eqv)
   checkAll("ApparentRadialVelocityOrder", OrderTests[ApparentRadialVelocity].order)
+  checkAll("meterspersecond", IsoTests(ApparentRadialVelocity.meterspersecond))
+  checkAll("kilometerspersecond", WedgeTests(ApparentRadialVelocity.kilometerspersecond).wedge)
 
   test("toRedshift") {
     assertEquals(

@@ -8,6 +8,8 @@ import coulomb._
 import coulomb.cats.implicits._
 import lucuma.core.math.units._
 import lucuma.core.math.Constants.SpeedOfLight
+import lucuma.core.optics.Wedge
+import monocle.Iso
 import spire.std.bigDecimal._
 
 /**
@@ -33,6 +35,24 @@ object ApparentRadialVelocity {
     * @group Constructors
     */
   val Zero: ApparentRadialVelocity = new ApparentRadialVelocity(0.withUnit[MetersPerSecond])
+
+  /**
+    * Iso to convert BigDecimal to ApparentRadialVelocity and viceversa
+    * The value is assumed to be in m/s
+    */
+  val meterspersecond: Iso[BigDecimal, ApparentRadialVelocity] =
+    Iso[BigDecimal, ApparentRadialVelocity](b =>
+      ApparentRadialVelocity(b.withUnit[MetersPerSecond])
+    )(cz => cz.cz.value)
+
+  /**
+    * Wedge to convert BigDecimal to ApparentRadialVelocity in kilometers per second
+    */
+  val kilometerspersecond: Wedge[BigDecimal, ApparentRadialVelocity] =
+    Wedge[BigDecimal, ApparentRadialVelocity](
+      b => ApparentRadialVelocity(b.withUnit[KilometersPerSecond]),
+      cz => cz.cz.toUnit[KilometersPerSecond].value
+    )
 
   /** @group Typeclass Instances */
   implicit val order: Order[ApparentRadialVelocity] =

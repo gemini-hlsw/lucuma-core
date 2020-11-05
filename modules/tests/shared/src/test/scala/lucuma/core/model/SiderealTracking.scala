@@ -15,7 +15,7 @@ final class SiderealTrackingSuite extends DisciplineSuite {
   import ArbParallax._
   import ArbCoordinates._
   import ArbEpoch._
-  import ArbProperVelocity._
+  import ArbProperMotion._
   import ArbSiderealTracking._
   import ArbRadialVelocity._
 
@@ -24,7 +24,7 @@ final class SiderealTrackingSuite extends DisciplineSuite {
   checkAll("SiderealTracking.baseCoordinates", LensTests(SiderealTracking.baseCoordinates))
   checkAll("SiderealTracking.catalogId", LensTests(SiderealTracking.catalogId))
   checkAll("SiderealTracking.epoch", LensTests(SiderealTracking.epoch))
-  checkAll("SiderealTracking.properVelocity", LensTests(SiderealTracking.properVelocity))
+  checkAll("SiderealTracking.properMotion", LensTests(SiderealTracking.properMotion))
   checkAll("SiderealTracking.radialVelocity", LensTests(SiderealTracking.radialVelocity))
   checkAll("SiderealTracking.parallax", LensTests(SiderealTracking.parallax))
 
