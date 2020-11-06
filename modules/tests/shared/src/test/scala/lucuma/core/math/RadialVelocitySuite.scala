@@ -14,8 +14,8 @@ final class RadialVelocitySuite extends DisciplineSuite {
   import ArbRadialVelocity._
 
   // Laws
-  checkAll("fromMetersPerSecond", PrismTests(RadialVelocity.fromMetersPerSecond))
-  checkAll("fromKilometersPerSecond", FormatTests(RadialVelocity.kilometerspersecond).format)
+  checkAll("meterspersecond", PrismTests(RadialVelocity.fromMetersPerSecond))
+  checkAll("kilometerspersecond", FormatTests(RadialVelocity.kilometerspersecond).format)
 
   test("Equality must be natural") {
     forAll { (a: RadialVelocity, b: RadialVelocity) =>
