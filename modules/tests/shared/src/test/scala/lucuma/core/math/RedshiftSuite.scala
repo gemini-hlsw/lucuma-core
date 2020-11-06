@@ -21,7 +21,7 @@ final class RedshiftSuite extends munit.DisciplineSuite {
   // Laws
   checkAll("Redshift", EqTests[Redshift].eqv)
   checkAll("RedshiftOrder", OrderTests[Redshift].order)
-  checkAll("fromBigDecimal", IsoTests(Redshift.redshift))
+  checkAll("redshift", IsoTests(Redshift.redshift))
 
   test("toRadialVelocity") {
     assertEquals(Redshift.Zero.toRadialVelocity, RadialVelocity(0.withUnit[MetersPerSecond]))
