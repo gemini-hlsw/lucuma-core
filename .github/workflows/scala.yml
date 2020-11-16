@@ -12,6 +12,6 @@ jobs:
       - name: Set up JDK
         uses: olafurpg/setup-scala@v10
         with:
-          java-version: adoptjdk@11
+          java-version: adopt@1.11
       - name: Run compile
         run: csbt headerCheck +compile +test +doc
