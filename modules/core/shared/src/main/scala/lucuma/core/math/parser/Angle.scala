@@ -12,8 +12,8 @@ import lucuma.core.parser.MiscParsers._
 trait AngleParsers {
 
   /**
-    * Generic parser for the components of an angle in "11 22 33.444555" format, with at least 1
-    * and at most 6 digits following the decimal point, and terminal parsers for each segment.
+    * Generic parser for the components of an angle in "11 22 33.444555" format, with an
+    * optional decimal point and at most 6 digits following it, and terminal parsers for each segment.
     */
   def genAngle(t1: Parser[_], t2: Parser[_], t3: Parser[_]): Parser[(Int, Int, Int, Int, Int)] =
     (int <~ t1, int <~ t2, int, (char('.') ~> frac(6) | ok(0)) <~ t3)
