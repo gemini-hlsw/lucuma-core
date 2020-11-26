@@ -197,11 +197,12 @@ object SiderealTracking extends SiderealTrackingOptics {
     // This is premature optimization perhaps but it seems like it might make a
     // difference when sorting a long list of targets.
 
-    order(_.baseCoordinates) |+|
-      order(_.epoch) |+|
-      order(_.properMotion) |+|
+    order(_.baseCoordinates)  |+|
+      order(_.epoch)          |+|
+      order(_.properMotion)   |+|
       order(_.radialVelocity) |+|
-      order(_.parallax)
+      order(_.parallax)       |+|
+      order(_.catalogId)
 
   }
 }
