@@ -7,11 +7,11 @@ import scala.scalajs.js.JSConverters._
 
 import cats._
 import cats.syntax.all._
-import gpp.svgdotjs.svgdotjsSvgJs.mod.ArrayXY
-import gpp.svgdotjs.svgdotjsSvgJs.mod.Container
-import gpp.svgdotjs.svgdotjsSvgJs.mod.PointArray
-import gpp.svgdotjs.svgdotjsSvgJs.mod.{ Array => SVGArray }
-import gpp.svgdotjs.svgdotjsSvgJs.mod.Element
+import lucuma.svgdotjs.ArrayXY
+import lucuma.svgdotjs.Container
+import lucuma.svgdotjs.PointArray
+import lucuma.svgdotjs.SVGArray
+import lucuma.svgdotjs.Element
 import lucuma.core.geom.jts.JtsShape
 import org.locationtech.jts.geom.Coordinate
 import org.locationtech.jts.geom.Geometry

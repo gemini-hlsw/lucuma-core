@@ -9,7 +9,7 @@ lazy val catsTestkitScalaTestVersion = "2.0.0"
 lazy val scalaJavaTimeVersion        = "2.0.0"
 lazy val geminiLocalesVersion        = "0.5.0"
 lazy val jtsVersion                  = "0.1.0"
-lazy val svgdotjsVersion             = "0.0.1"
+lazy val svgdotjsVersion             = "0.0.4"
 lazy val coulombVersion              = "0.5.5"
 lazy val spireVersion                = "0.17.0"
 lazy val singletonOpsVersion         = "0.5.2"
@@ -71,7 +71,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
     libraryDependencies ++= Seq(
       "io.github.cquiroz" %%% "scala-java-time" % scalaJavaTimeVersion,
       "edu.gemini"        %%% "gemini-locales"  % geminiLocalesVersion,
-      "edu.gemini"        %%% "gpp-svgdotjs"    % svgdotjsVersion
+      "edu.gemini"        %%% "lucuma-svgdotjs" % svgdotjsVersion
     )
   )
 
@@ -106,7 +106,8 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform)
       "org.scalameta" %%% "munit"            % "0.7.19" % Test,
       "org.typelevel" %%% "discipline-munit" % "1.0.3"  % Test
     ),
-    testFrameworks += new TestFramework("munit.Framework")
+    testFrameworks += new TestFramework("munit.Framework"),
+    scalaJSUseMainModuleInitializer := true
   )
   .jvmConfigure(_.enablePlugins(AutomateHeaderPlugin))
   .jvmSettings(
