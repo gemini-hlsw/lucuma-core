@@ -38,6 +38,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
     name := "lucuma-core",
     libraryDependencies ++= Seq(
       "org.tpolecat"               %%% "atto-core"                  % attoVersion,
+      "org.tpolecat"               %%% "atto-refined"               % attoVersion,
       "org.typelevel"              %%% "cats-core"                  % catsVersion,
       "org.typelevel"              %%% "cats-effect"                % catsEffectVersion,
       "com.github.julien-truffaut" %%% "monocle-core"               % monocleVersion,

@@ -31,7 +31,7 @@ final class SiderealTrackingSuite extends DisciplineSuite {
   test("SiderealTracking.identity") {
     forAll { (pm: SiderealTracking) =>
       val c1 = pm.baseCoordinates
-      val c2 = pm.plusYears(0.0).baseCoordinates
+      val c2 = pm.plusYears(0.0).get.baseCoordinates
       assert(c1.angularDistance(c2).toMicroarcseconds <= 20L)
     }
   }

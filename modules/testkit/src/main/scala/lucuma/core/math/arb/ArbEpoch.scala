@@ -3,19 +3,16 @@
 
 package lucuma.core.math.arb
 
-import java.time.LocalDateTime
-
-import lucuma.core.arb.ArbTime
+import eu.timepit.refined.scalacheck.numeric._
 import lucuma.core.arb._
 import lucuma.core.math.Epoch
+import lucuma.core.math.Epoch.Besselian
 import lucuma.core.math.Epoch.Julian
-import org.scalacheck.Arbitrary._
+import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen._
 import org.scalacheck._
 
 trait ArbEpoch {
-  import ArbTime._
-
   implicit val arbScheme: Arbitrary[Epoch.Scheme] =
     Arbitrary(oneOf(Epoch.Julian, Epoch.Besselian))
 
@@ -23,8 +20,8 @@ trait ArbEpoch {
     Arbitrary {
       for {
         sch <- arbitrary[Epoch.Scheme]
-        ldt <- arbitrary[LocalDateTime]
-      } yield sch.fromLocalDateTime(ldt)
+        mys <- arbitrary[Epoch.IntMilliYear]
+      } yield sch.fromMilliyears(mys)
     }
 
   implicit val cogEpoch: Cogen[Epoch] =
@@ -32,22 +29,32 @@ trait ArbEpoch {
 
   private val perturbations: List[String => Gen[String]] =
     List(
-      _ => arbitrary[String],             // swap for a random string
-      s => Gen.const(s.replace("2", "0")) // create a leading zero, maybe (ok)
+      _ => arbitrary[String],   // swap for a random string
+      s => Gen.const(s.drop(1)) // strip the scheme - won't parse
+    )
+
+  private val noSchemePerturbations: List[String => Gen[String]] =
+    List(
+      _ => arbitrary[String],                // swap for a random string
+      s => Gen.const(s"${s}0"),              // test normalization with trailing zeros
+      s => Gen.const(s"${Julian.prefix}$s"), // add the schemes, should not parse
+      s => Gen.const(s"${Besselian.prefix}$s")
     )
 
   // Strings that are often parsable as epoch
   val strings: Gen[String] =
-    arbitrary[Epoch].map(Epoch.fromString.reverseGet).flatMapOneOf(Gen.const, perturbations: _*)
+    arbitrary[Epoch]
+      .map(Epoch.fromString.reverseGet)
+      .flatMapOneOf(Gen.const, perturbations: _*) // include random strings
 
   val stringsNoScheme: Gen[String] =
     arbitrary[Epoch]
       .map(Epoch.fromStringNoScheme.reverseGet)
-      .flatMapOneOf(Gen.const, perturbations: _*)
+      .flatMapOneOf(Gen.const, noSchemePerturbations: _*)
 
   val arbJulianEpoch: Arbitrary[Epoch] =
     Arbitrary {
-      arbitrary[LocalDateTime].map(Julian.fromLocalDateTime)
+      arbitrary[Epoch.IntMilliYear].map(Julian.fromMilliyears)
     }
 }
 
