@@ -20,7 +20,7 @@ object JtsDemo {
       case j: JtsShape =>
         val svg: Svg = new Svg()
         j.toSvg(svg)
-        ()
+        println(svg)
       case _           => throw new RuntimeException()
     }
 }
