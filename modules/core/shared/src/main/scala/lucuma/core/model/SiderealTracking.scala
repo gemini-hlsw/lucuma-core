@@ -40,31 +40,19 @@ final case class SiderealTracking(
   parallax:        Option[Parallax]
 ) {
 
-  def at(i: Instant): Option[SiderealTracking] =
+  def at(i: Instant): Coordinates =
     plusYears(epoch.untilInstant(i))
 
   /** Coordinates `elapsedYears` fractional epoch-years after `epoch`. */
-  def plusYears(elapsedYears: Double): Option[SiderealTracking] =
-    epoch
-      .plusYears(elapsedYears)
-      .map(newEpoch =>
-        SiderealTracking(
-          catalogId,
-          SiderealTracking.coordinatesOn(
-            baseCoordinates,
-            epoch,
-            properMotion.orEmpty,
-            radialVelocity.getOrElse(RadialVelocity.Zero).toDoubleKilometersPerSecond,
-            parallax.orEmpty,
-            elapsedYears
-          ),
-          newEpoch,
-          properMotion,
-          radialVelocity,
-          parallax
-        )
-      )
-
+  def plusYears(elapsedYears: Double): Coordinates =
+    SiderealTracking.coordinatesOn(
+      baseCoordinates,
+      epoch,
+      properMotion.orEmpty,
+      radialVelocity.getOrElse(RadialVelocity.Zero).toDoubleKilometersPerSecond,
+      parallax.orEmpty,
+      elapsedYears
+    )
 }
 
 object SiderealTracking extends SiderealTrackingOptics {
