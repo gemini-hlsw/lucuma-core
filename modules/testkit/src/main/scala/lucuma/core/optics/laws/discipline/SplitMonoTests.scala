@@ -9,9 +9,32 @@ import lucuma.core.optics.SplitMono
 import org.scalacheck.{ Arbitrary, Gen }
 import org.scalacheck.Prop._
 import org.typelevel.discipline.Laws
+import org.scalacheck.Prop
 
 trait SplitMonoTests[A, B] extends Laws {
-  val laws: SplitMonoLaws[A, B]
+  val splitMonoProps: SplitMonoProps[A, B]
+
+  private def lawsProps(implicit
+    aa: Arbitrary[A],
+    ea: Eq[A],
+    ab: Arbitrary[B],
+    eb: Eq[B]
+  ): List[(String, Prop)] = List(
+    "normalize"                -> forAll((b: B) => splitMonoProps.laws.normalize(b)),
+    "normalized get roundtrip" -> forAll((b: B) =>
+      splitMonoProps.laws.normalizedReverseGetRoundTrip(b)
+    ),
+    "reverseGet roundtrip"     -> forAll((a: A) => splitMonoProps.laws.getRoundTrip(a))
+  )
+
+  private def allProps(implicit
+    aa: Arbitrary[A],
+    ea: Eq[A],
+    ab: Arbitrary[B],
+    eb: Eq[B]
+  ): List[(String, Prop)] = lawsProps :+ (
+    "coverage" -> exists((b: B) => splitMonoProps.demonstratesNormalization(b))
+  )
 
   def splitMono(implicit
     aa: Arbitrary[A],
@@ -19,13 +42,7 @@ trait SplitMonoTests[A, B] extends Laws {
     ab: Arbitrary[B],
     eb: Eq[B]
   ): RuleSet =
-    new SimpleRuleSet(
-      "SplitMono",
-      "normalize"                -> forAll((b: B) => laws.normalize(b)),
-      "normalized get roundtrip" -> forAll((b: B) => laws.normalizedReverseGetRoundTrip(b)),
-      "reverseGet roundtrip"     -> forAll((a: A) => laws.getRoundTrip(a)),
-      "coverage"                 -> exists((b: B) => laws.demonstratesNormalization(b))
-    )
+    new SimpleRuleSet("SplitMono", allProps: _*)
 
   /** Convenience constructor that allows passing an explicit generator for input values. */
   def splitMonoWith(ga: Gen[A])(implicit
@@ -35,13 +52,26 @@ trait SplitMonoTests[A, B] extends Laws {
   ): RuleSet =
     splitMono(Arbitrary(ga), ea, ab, eb)
 
+  def splitMonoLaws(implicit
+    aa: Arbitrary[A],
+    ea: Eq[A],
+    ab: Arbitrary[B],
+    eb: Eq[B]
+  ): RuleSet =
+    new SimpleRuleSet("SplitMono", lawsProps: _*)
+
+  /** Convenience constructor that allows passing an explicit generator for input values. */
+  def splitMonoLawsWith(ga: Gen[A])(implicit
+    ea:                     Eq[A],
+    ab:                     Arbitrary[B],
+    eb:                     Eq[B]
+  ): RuleSet =
+    splitMonoLaws(Arbitrary(ga), ea, ab, eb)
 }
 
 object SplitMonoTests extends Laws {
-
   def apply[A, B](fab: SplitMono[A, B]): SplitMonoTests[A, B] =
     new SplitMonoTests[A, B] {
-      val laws = new SplitMonoLaws(fab)
+      val splitMonoProps = new SplitMonoProps(fab)
     }
-
 }

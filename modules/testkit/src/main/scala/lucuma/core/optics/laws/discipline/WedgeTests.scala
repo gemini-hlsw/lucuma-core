@@ -9,9 +9,34 @@ import lucuma.core.optics.Wedge
 import org.scalacheck.{ Arbitrary, Gen }
 import org.scalacheck.Prop._
 import org.typelevel.discipline.Laws
+import org.scalacheck.Prop
 
 trait WedgeTests[A, B] extends Laws {
-  val laws: WedgeLaws[A, B]
+  val wedgeProps: WedgeProps[A, B]
+
+  private def lawsProps(implicit
+    aa: Arbitrary[A],
+    ea: Eq[A],
+    ab: Arbitrary[B],
+    eb: Eq[B]
+  ): List[(String, Prop)] = List(
+    "normalize A"                     -> forAll((a: A) => wedgeProps.laws.normalizeA(a)),
+    "normalize B"                     -> forAll((b: B) => wedgeProps.laws.normalizeB(b)),
+    "reverseGet reverseGet roundtrip" -> forAll((a: A) =>
+      wedgeProps.laws.normalizedGetRoundTrip(a)
+    ),
+    "normalized get roundtrip"        -> forAll((b: B) => wedgeProps.laws.normalizedReverseGetRoundTrip(b))
+  )
+
+  private def allProps(implicit
+    aa: Arbitrary[A],
+    ea: Eq[A],
+    ab: Arbitrary[B],
+    eb: Eq[B]
+  ): List[(String, Prop)] = lawsProps ++ List(
+    "coverage A" -> exists((a: A) => wedgeProps.demonstratesCoverageA(a)),
+    "coverage B" -> exists((b: B) => wedgeProps.demonstratesCoverageB(b))
+  )
 
   def wedge(implicit
     aa: Arbitrary[A],
@@ -19,15 +44,7 @@ trait WedgeTests[A, B] extends Laws {
     ab: Arbitrary[B],
     eb: Eq[B]
   ): RuleSet =
-    new SimpleRuleSet(
-      "Wedge",
-      "normalize A"                     -> forAll((a: A) => laws.normalizeA(a)),
-      "normalize B"                     -> forAll((b: B) => laws.normalizeB(b)),
-      "reverseGet reverseGet roundtrip" -> forAll((a: A) => laws.normalizedGetRoundTrip(a)),
-      "normalized get roundtrip"        -> forAll((b: B) => laws.normalizedReverseGetRoundTrip(b)),
-      "coverage A"                      -> exists((a: A) => laws.demonstratesCoverageA(a)),
-      "coverage B"                      -> exists((b: B) => laws.demonstratesCoverageB(b))
-    )
+    new SimpleRuleSet("Wedge", allProps: _*)
 
   /** Convenience constructor that allows passing an explicit generator for input values. */
   def splitMonoWith(ga: Gen[A])(implicit
@@ -37,13 +54,26 @@ trait WedgeTests[A, B] extends Laws {
   ): RuleSet =
     wedge(Arbitrary(ga), ea, ab, eb)
 
+  def wedgeLaws(implicit
+    aa: Arbitrary[A],
+    ea: Eq[A],
+    ab: Arbitrary[B],
+    eb: Eq[B]
+  ): RuleSet =
+    new SimpleRuleSet("Wedge", lawsProps: _*)
+
+  /** Convenience constructor that allows passing an explicit generator for input values. */
+  def wedgeLawsWith(ga: Gen[A])(implicit
+    ea:                 Eq[A],
+    ab:                 Arbitrary[B],
+    eb:                 Eq[B]
+  ): RuleSet =
+    wedgeLaws(Arbitrary(ga), ea, ab, eb)
 }
 
 object WedgeTests extends Laws {
-
   def apply[A, B](fab: Wedge[A, B]): WedgeTests[A, B] =
     new WedgeTests[A, B] {
-      val laws = new WedgeLaws(fab)
+      val wedgeProps = new WedgeProps(fab)
     }
-
 }

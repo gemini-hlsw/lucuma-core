@@ -9,9 +9,30 @@ import lucuma.core.optics.Format
 import org.scalacheck.{ Arbitrary, Gen }
 import org.scalacheck.Prop._
 import org.typelevel.discipline.Laws
+import org.scalacheck.Prop
 
 trait FormatTests[A, B] extends Laws {
-  val formatLaws: FormatLaws[A, B]
+  val formatProps: FormatProps[A, B]
+
+  private def lawsProps(implicit
+    aa: Arbitrary[A],
+    ea: Eq[A],
+    ab: Arbitrary[B],
+    eb: Eq[B]
+  ): List[(String, Prop)] = List(
+    "normalize"        -> forAll((a: A) => formatProps.laws.normalize(a)),
+    "parse roundtrip"  -> forAll((a: A) => formatProps.laws.parseRoundTrip(a)),
+    "format roundtrip" -> forAll((b: B) => formatProps.laws.formatRoundTrip(b))
+  )
+
+  private def allProps(implicit
+    aa: Arbitrary[A],
+    ea: Eq[A],
+    ab: Arbitrary[B],
+    eb: Eq[B]
+  ): List[(String, Prop)] = lawsProps :+ (
+    "coverage" -> exists((a: A) => formatProps.demonstratesNormalization(a))
+  )
 
   def format(implicit
     aa: Arbitrary[A],
@@ -19,12 +40,7 @@ trait FormatTests[A, B] extends Laws {
     ab: Arbitrary[B],
     eb: Eq[B]
   ): RuleSet =
-    new SimpleRuleSet("format",
-                      "normalize"        -> forAll((a: A) => formatLaws.normalize(a)),
-                      "parse roundtrip"  -> forAll((a: A) => formatLaws.parseRoundTrip(a)),
-                      "format roundtrip" -> forAll((b: B) => formatLaws.formatRoundTrip(b)),
-                      "coverage"         -> exists((a: A) => formatLaws.demonstratesNormalization(a))
-    )
+    new SimpleRuleSet("format", allProps: _*)
 
   /** Convenience constructor that allows passing an explicit generator for input values. */
   def formatWith(ga: Gen[A])(implicit
@@ -34,13 +50,26 @@ trait FormatTests[A, B] extends Laws {
   ): RuleSet =
     format(Arbitrary(ga), ea, ab, eb)
 
+  def formatLaws(implicit
+    aa: Arbitrary[A],
+    ea: Eq[A],
+    ab: Arbitrary[B],
+    eb: Eq[B]
+  ): RuleSet =
+    new SimpleRuleSet("format", lawsProps: _*)
+
+  /** Convenience constructor that allows passing an explicit generator for input values. */
+  def formatLawsWith(ga: Gen[A])(implicit
+    ea:                  Eq[A],
+    ab:                  Arbitrary[B],
+    eb:                  Eq[B]
+  ): RuleSet =
+    formatLaws(Arbitrary(ga), ea, ab, eb)
 }
 
 object FormatTests extends Laws {
-
   def apply[A, B](fab: Format[A, B]): FormatTests[A, B] =
     new FormatTests[A, B] {
-      val formatLaws: FormatLaws[A, B] = FormatLaws(fab)
+      val formatProps: FormatProps[A, B] = FormatProps(fab)
     }
-
 }
