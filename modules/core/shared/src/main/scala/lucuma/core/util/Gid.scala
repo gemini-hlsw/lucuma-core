@@ -55,22 +55,22 @@ final class Gid[A](
   // We use this in a few places
   private final val TagString: String = tag.value.toString
 
-  private final val AnchoredRegex: Regex = raw"$TagString-([1-9a-f][0-9a-f]*)".r
+  final val regexPattern: String = raw"$TagString-([1-9a-f][0-9a-f]*)"
 
-  final val regex: Regex = AnchoredRegex.unanchored
+  private final val R: Regex = regexPattern.r
 
   /** Gids have a unique String representation. */
   final val fromString: Prism[String, A] = {
 
     def parse(s: String): Option[A] =
       s match {
-        case AnchoredRegex(s) =>
+        case R(s) =>
           for {
             signed <-
               Either.catchOnly[NumberFormatException](java.lang.Long.parseLong(s, 16)).toOption
             pos    <- refineV[Positive](signed).toOption
           } yield isoPosLong.reverseGet(pos)
-        case _                => None
+        case _    => None
       }
 
     def show(a: A): String =

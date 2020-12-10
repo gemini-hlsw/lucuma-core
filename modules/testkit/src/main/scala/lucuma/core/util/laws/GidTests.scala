@@ -20,6 +20,7 @@ import monocle.law.discipline.{ IsoTests, PrismTests }
 import org.scalacheck._
 import org.scalacheck.Gen
 import org.scalacheck.Arbitrary.arbitrary
+import scala.util.matching.Regex
 
 trait GidLaws[A] extends CodecLaws[A] with OrderLaws[A] with BoundedEnumerableLaws[A] {
   def gidA: Gid[A]
@@ -40,6 +41,8 @@ object GidLaws {
 trait GidTests[A] extends CodecTests[A] with OrderTests[A] with BoundedEnumerableTests[A] {
 
   def laws: GidLaws[A]
+
+  private final lazy val regex: Regex = laws.gidA.regexPattern.r
 
   private final val genTag: Gen[Char Refined Letter] = arbitrary[Char Refined Letter]
 
@@ -70,13 +73,13 @@ trait GidTests[A] extends CodecTests[A] with OrderTests[A] with BoundedEnumerabl
         ) { case (c, s) =>
           laws.gidA.fromString.getOption(s).isDefined == (c.value == laws.gidA.tag.value)
         },
-        "regex"            -> Prop.forAll(
+        "regexPattern"     -> Prop.forAll(
           Gen.frequency(
             9 -> genTag.flatMap(genGidString),
             1 -> arbitrary[String]
           )
         ) { s =>
-          laws.gidA.fromString.getOption(s).isDefined == laws.gidA.regex.matches(s)
+          laws.gidA.fromString.getOption(s).isDefined == regex.matches(s)
         }
       )
     }
