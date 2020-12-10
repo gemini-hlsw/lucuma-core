@@ -44,4 +44,9 @@ final class MagnitudeValueSuite extends DisciplineSuite {
     }
   }
 
+  test("MagnitudeValue rounding") {
+    assertEquals(MagnitudeValue.fromBigDecimal.unsafeGet(BigDecimal("1.0004")).scaledValue, 1000)
+    assertEquals(MagnitudeValue.fromBigDecimal.unsafeGet(BigDecimal("1.0005")).scaledValue, 1001)
+  }
+
 }
