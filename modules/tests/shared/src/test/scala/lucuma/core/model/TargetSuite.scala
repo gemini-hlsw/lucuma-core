@@ -11,6 +11,7 @@ import lucuma.core.enum.MagnitudeBand
 import lucuma.core.math.arb._
 import lucuma.core.model.arb._
 import lucuma.core.util.arb._
+import lucuma.core.util.laws.GidTests
 import monocle.law.discipline._
 import munit._
 
@@ -26,8 +27,10 @@ final class TargetSuite extends DisciplineSuite {
   import ArbDeclination._
   import ArbProperMotion._
   import ArbRadialVelocity._
+  import ArbGid._
 
   // Laws
+  checkAll("Target.Id", GidTests[Target.Id].gid)
   checkAll("Eq[Target]", EqTests[Target].eqv)
   checkAll("TargetTrack", OrderTests[Target](Target.TargetTrackOrder).order)
   checkAll("TargetName", OrderTests[Target](Target.TargetNameOrder).order)

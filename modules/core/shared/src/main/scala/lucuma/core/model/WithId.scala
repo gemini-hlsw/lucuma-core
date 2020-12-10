@@ -25,12 +25,12 @@ trait WithId {
   object Id {
 
     /** @group Typeclass Instances */
-    implicit val GidTargetId: Gid[Id] = Gid.instance(idTag, _.value, apply)
+    implicit val GidId: Gid[Id] = Gid.instance(idTag, _.value, apply)
 
     /** Convenience method to construct from a Long */
-    def fromLong(l: Long): Either[String, Id] = PosLong.from(l).map(apply)
+    def fromLong(l: Long): Option[Id] = GidId.fromLong.getOption(l)
 
     /** Convenience method to construct from a String */
-    def parse(s: String): Option[Id] = GidTargetId.fromString.getOption(s)
+    def parse(s: String): Option[Id] = GidId.fromString.getOption(s)
   }
 }

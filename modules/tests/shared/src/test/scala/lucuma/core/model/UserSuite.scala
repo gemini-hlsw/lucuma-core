@@ -15,6 +15,6 @@ final class UserSuite extends DisciplineSuite {
 
   // Laws
   checkAll("User.Id", GidTests[User.Id].gid)
-  checkAll("User.Id", EqTests[User].eqv)
+  checkAll("Eq[User]", EqTests[User].eqv)
 
 }

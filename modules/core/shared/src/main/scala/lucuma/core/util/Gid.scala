@@ -47,36 +47,42 @@ final class Gid[A](
   val tag:        Char Refined Letter,
   val isoPosLong: Iso[A, PosLong]
 ) extends BoundedEnumerable[A]
-     with Order[A]
-     with Show[A]
-     with Encoder[A]
-     with Decoder[A] {
+    with Order[A]
+    with Show[A]
+    with Encoder[A]
+    with Decoder[A] {
 
   // We use this in a few places
   private final val TagString: String = tag.value.toString
 
+  final val regexPattern: String = raw"$TagString-([1-9a-f][0-9a-f]*)"
+
+  private final val R: Regex = regexPattern.r
+
   /** Gids have a unique String representation. */
   final val fromString: Prism[String, A] = {
-
-    val R: Regex =
-      raw"^$TagString-([1-9a-f][0-9a-f]*)$$".r
 
     def parse(s: String): Option[A] =
       s match {
         case R(s) =>
           for {
-            signed <- Either.catchOnly[NumberFormatException](java.lang.Long.parseLong(s, 16)).toOption
+            signed <-
+              Either.catchOnly[NumberFormatException](java.lang.Long.parseLong(s, 16)).toOption
             pos    <- refineV[Positive](signed).toOption
           } yield isoPosLong.reverseGet(pos)
-        case _ => None
+        case _    => None
       }
 
     def show(a: A): String =
       s"$TagString-${isoPosLong.get(a).value.toHexString}"
 
     Prism(parse)(show)
-
   }
+
+  final val fromLong: Prism[Long, A] =
+    Prism[Long, A](l => PosLong.from(l).toOption.map(isoPosLong.reverseGet))(a =>
+      isoPosLong.get(a).value
+    )
 
   // BoundedEnumerable
 
@@ -97,7 +103,7 @@ final class Gid[A](
 
   // Order
   final override def compare(a: A, b: A): Int =
-    isoPosLong.get(a).value compare isoPosLong.get(b).value
+    isoPosLong.get(a).value.compare(isoPosLong.get(b).value)
 
   // Show
   final override def show(a: A): String =
@@ -105,7 +111,8 @@ final class Gid[A](
 
   // Decoder
   final override def apply(c: HCursor): Decoder.Result[A] =
-    c.as[String].flatMap(s => fromString.getOption(s).toRight(DecodingFailure(s"Invalid GID: $s", Nil)))
+    c.as[String]
+      .flatMap(s => fromString.getOption(s).toRight(DecodingFailure(s"Invalid GID: $s", Nil)))
 
   // Encoder
   final override def apply(a: A): Json =
@@ -121,4 +128,3 @@ object Gid {
     new Gid[A](tag, Iso(toLong)(fromLong))
 
 }
-
