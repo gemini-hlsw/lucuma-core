@@ -4,22 +4,23 @@
 package lucuma.core.math
 package arb
 
+import coulomb._
+import eu.timepit.refined.scalacheck.numeric._
 import lucuma.core.math.Parallax
+import lucuma.core.math.units._
 import org.scalacheck.Arbitrary
+import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Cogen
-import org.scalacheck.Gen
 
 trait ArbParallax {
 
   implicit val arbParallax: Arbitrary[Parallax] =
     Arbitrary {
-      Gen
-        .choose(Parallax.MinValue.μas.value, Parallax.MaxValue.μas.value)
-        .map(Parallax.fromMicroarcseconds(_))
+      arbitrary[Parallax.LongParallaxμas].map(μas => Parallax(μas.withUnit[MicroArcSecond]))
     }
 
   implicit val cogParallax: Cogen[Parallax] =
-    Cogen[Long].contramap(_.μas.value)
+    Cogen[Long].contramap(_.μas.value.value)
 }
 
 object ArbParallax extends ArbParallax

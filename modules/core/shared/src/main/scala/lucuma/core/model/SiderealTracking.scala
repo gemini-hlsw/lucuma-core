@@ -50,7 +50,7 @@ final case class SiderealTracking(
       epoch,
       properMotion.orEmpty,
       radialVelocity.getOrElse(RadialVelocity.Zero).toDoubleKilometersPerSecond,
-      parallax.orEmpty,
+      parallax.getOrElse(Parallax.Zero),
       elapsedYears
     )
 }
@@ -84,7 +84,7 @@ object SiderealTracking extends SiderealTrackingOptics {
       epoch.scheme.lengthOfYear,
       properMotion.toRadians,
       radialVelocity,
-      parallax.μas.value / 1000000.0,
+      parallax.μas.value.value / 1000000.0,
       elapsedYears
     )
     Coordinates.unsafeFromRadians(ra, dec)
