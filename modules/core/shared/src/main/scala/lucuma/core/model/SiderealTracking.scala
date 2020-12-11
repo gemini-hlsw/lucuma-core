@@ -52,7 +52,7 @@ final case class SiderealTracking(
         epoch,
         properMotion.orEmpty,
         radialVelocity.getOrElse(RadialVelocity.Zero).toDoubleKilometersPerSecond,
-        parallax.orEmpty,
+        parallax.getOrElse(Parallax.Zero),
         elapsedYears
       ),
       epoch.plusYears(elapsedYears),
@@ -92,7 +92,7 @@ object SiderealTracking extends SiderealTrackingOptics {
       epoch.scheme.lengthOfYear,
       properMotion.toRadians,
       radialVelocity,
-      parallax.μas.value / 1000000.0,
+      parallax.μas.value.value / 1000000.0,
       elapsedYears
     )
     Coordinates.unsafeFromRadians(ra, dec)
@@ -197,11 +197,11 @@ object SiderealTracking extends SiderealTrackingOptics {
     // This is premature optimization perhaps but it seems like it might make a
     // difference when sorting a long list of targets.
 
-    order(_.baseCoordinates)  |+|
-      order(_.epoch)          |+|
-      order(_.properMotion)   |+|
+    order(_.baseCoordinates) |+|
+      order(_.epoch) |+|
+      order(_.properMotion) |+|
       order(_.radialVelocity) |+|
-      order(_.parallax)       |+|
+      order(_.parallax) |+|
       order(_.catalogId)
 
   }
