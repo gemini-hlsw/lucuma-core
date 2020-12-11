@@ -5,7 +5,6 @@ package lucuma.core.math
 
 import cats.Order
 import cats.Show
-import cats.syntax.all._
 import coulomb._
 import coulomb.cats.implicits._
 import eu.timepit.refined._
@@ -14,9 +13,14 @@ import eu.timepit.refined.cats._
 import eu.timepit.refined.numeric._
 import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.math.units._
+import lucuma.core.optics.Format
 import monocle.Iso
 import monocle.Prism
 import spire.math.Rational
+
+import java.math.RoundingMode
+
+import scala.util.Try
 
 /**
   * Exact wavelengths represented as positive integral picometers in the range (0 .. PosInt.MaxValue]
@@ -24,6 +28,21 @@ import spire.math.Rational
   * @param toPicometers This wavelength in positive integral picometers (10^-12^ of a meter).
   */
 final case class Wavelength(toPicometers: Quantity[PosInt, Picometer]) {
+
+  /**
+   * Returns the wavelength value in microns. The exact microns value must be
+   * represented as a Rational.
+   */
+  def µm: Quantity[Rational, Micrometer] =
+    toPicometers.to[Rational, Micrometer]
+
+  /** Alias for `µm`. */
+  def micrometer: Quantity[Rational, Micrometer] =
+    µm
+
+  /** Alias for `µm`. */
+  def micron: Quantity[Rational, Micrometer] =
+    µm
 
   /**
     * Returns the wavelength value in nanometers
@@ -43,11 +62,15 @@ final case class Wavelength(toPicometers: Quantity[PosInt, Picometer]) {
 
   override def toString: String =
     s"Wavelength(${toPicometers.show})"
+
 }
 
 object Wavelength {
   lazy val Min: Wavelength   = unsafeFromInt(1)
   lazy val Max: Wavelength   = unsafeFromInt(Int.MaxValue)
+
+  // Max allowed value in microns
+  lazy val MaxMicrometer: Int = Int.MaxValue / BigInt(10).pow(6).toInt
   // Max allowed value in nanometers
   lazy val MaxNanometer: Int = Int.MaxValue / BigInt(10).pow(3).toInt
   // Max allowed value in angstrom
@@ -79,37 +102,63 @@ object Wavelength {
     fromInt(i).getOrElse(sys.error(s"Cannot build a Wavelength with value $i"))
 
   /**
-    * Try to build a Wavelength with a value in nm in the range (0 .. 214783]
-    * @group constructor
-    */
+   * Try to build a Wavelength with a value in nm in the range (0 .. 2147]
+   * @group constructor
+   */
+  def fromMicrometers(µm: Int): Option[Wavelength] =
+    refineV[Positive](µm).toOption.flatMap(µm =>
+      Option.when(µm.value <= MaxMicrometer)(Wavelength(µm.withUnit[Micrometer]))
+    )
+
+  /**
+   * Try to build a Wavelength with a value in nm in the range (0 .. 2147483]
+   * @group constructor
+   */
   def fromNanometers(nm: Int): Option[Wavelength] =
     refineV[Positive](nm).toOption.flatMap(nm =>
-      if (nm.value <= MaxNanometer) Wavelength(nm.withUnit[Nanometer]).some else none
+      Option.when(nm.value <= MaxNanometer)(Wavelength(nm.withUnit[Nanometer]))
     )
-
   /**
-    * Try to build a Wavelength with a value in angstrom in the range (0 .. 2147]
-    * @group constructor
-    */
-  def fromAngstrom(a: Int): Option[Wavelength] =
+   * Try to build a Wavelength with a value in angstrom in the range (0 .. 21474836]
+   * @group constructor
+   */
+  def fromAngstroms(a: Int): Option[Wavelength] =
     refineV[Positive](a).toOption.flatMap(a =>
-      if (a.value <= MaxAngstrom) Some(Wavelength(a.withUnit[Angstrom])) else None
+      Option.when(a.value <= MaxAngstrom)(Wavelength(a.withUnit[Angstrom]))
     )
 
   /**
-    * Iso from PosInt in pm into Wavelength and back.
-    * @group Optics
-    */
-  val picometers: Iso[PosInt, Wavelength] =
-    Iso[PosInt, Wavelength](i => Wavelength(i.withUnit[Picometer]))(_.toPicometers.value)
-
-  /**
-    * Prism from Int in pm into Wavelength and back.
-    * @group Optics
-    */
+   * Prism from Int in pm into Wavelength and back.
+   * @group Optics
+   */
   val fromPicometers: Prism[Int, Wavelength] =
     Prism[Int, Wavelength](pm =>
       refineV[Positive](pm).toOption.map(v => Wavelength(v.withUnit[Picometer]))
     )(_.toPicometers.value)
+
+  /**
+   * Iso from PosInt in pm into Wavelength and back.
+   * @group Optics
+   */
+  val picometers: Iso[PosInt, Wavelength] =
+    Iso[PosInt, Wavelength](i => Wavelength(i.withUnit[Picometer]))(_.toPicometers.value)
+
+  private def scalingFormat(move: Int): Format[BigDecimal, Wavelength] =
+    Format[BigDecimal, Int](
+      bd => Try(bd.underlying.movePointRight(move).setScale(0, RoundingMode.HALF_UP).intValueExact()).toOption,
+      i  => BigDecimal(new java.math.BigDecimal(i).movePointLeft(move))
+    ).composePrism(fromPicometers)
+
+  val decimalPicometers: Format[BigDecimal, Wavelength] =
+    scalingFormat(0)
+
+  val decimalAngstroms: Format[BigDecimal, Wavelength] =
+    scalingFormat(2)
+
+  val decimalNanometers: Format[BigDecimal, Wavelength] =
+    scalingFormat(3)
+
+  val decimalMicrometers: Format[BigDecimal, Wavelength] =
+    scalingFormat(6)
 
 }

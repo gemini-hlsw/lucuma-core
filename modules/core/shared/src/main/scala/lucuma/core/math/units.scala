@@ -19,9 +19,10 @@ import spire.math._
 
 trait units {
   // Wavelength units
-  type Picometer = Pico %* Meter
-  type Nanometer = Nano %* Meter
-  type Angstrom  = Hecto %* Picometer
+  type Picometer  = Pico %* Meter
+  type Nanometer  = Nano %* Meter
+  type Angstrom   = Hecto %* Picometer
+  type Micrometer = Micro %* Meter
 
   trait CentimetersPerSecond
   implicit val defineUnitCentimetersPerSecond =
@@ -101,6 +102,8 @@ trait units {
   implicit val convAP: UnitConverter[PosInt, Angstrom, PosInt, Picometer] =
     unsafePosIntConverter[Angstrom, Picometer]
 
+  implicit val convMP: UnitConverter[PosInt, Micrometer, PosInt, Picometer] =
+    unsafePosIntConverter[Micrometer, Picometer]
 }
 
 object units extends units
