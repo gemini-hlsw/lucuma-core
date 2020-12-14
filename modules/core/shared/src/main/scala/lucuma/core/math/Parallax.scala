@@ -33,7 +33,7 @@ sealed abstract case class Parallax protected (
 }
 
 object Parallax extends ParallaxOptics {
-  type Parallaxμas     = Interval.Closed[0, 648000000000L]
+  type Parallaxμas     = Interval.Closed[0, Angle.Angle180µas]
   type LongParallaxμas = Long Refined Parallaxμas
 
   /**
