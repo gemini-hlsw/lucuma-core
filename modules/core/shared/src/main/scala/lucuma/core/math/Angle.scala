@@ -25,9 +25,7 @@ sealed class Angle protected (val toMicroarcseconds: Long) {
 
   // Sanity checks … should be correct via the companion constructor.
   assert(toMicroarcseconds >= 0, s"Invariant violated. $toMicroarcseconds is negative.")
-  assert(toMicroarcseconds < 360L * 60L * 60L * 1000L * 1000L,
-         s"Invariant violated. $toMicroarcseconds is >= 360°."
-  )
+  assert(toMicroarcseconds < Angle.µasPer360, s"Invariant violated. $toMicroarcseconds is >= 360°.")
 
   /**
    * Flip this angle 180°. Equivalent to `mirrorBy(this + Angle90)`. Exact, invertible.
@@ -67,14 +65,14 @@ sealed class Angle protected (val toMicroarcseconds: Long) {
    * @group Conversions
    */
   def toDoubleDegrees: Double =
-    toMicroarcseconds.toDouble / (60.0 * 60.0 * 1000.0 * 1000.0)
+    toMicroarcseconds.toDouble / Angle.µasPerDegree.toDouble
 
   /**
    * This angle in signed decimal degrees. Approximate, non-invertible
    * @group Conversions
    */
   def toSignedDoubleDegrees: Double =
-    Angle.signedMicroarcseconds.get(this).toDouble / (60.0 * 60.0 * 1000.0 * 1000.0)
+    Angle.signedMicroarcseconds.get(this).toDouble / Angle.µasPerDegree.toDouble
 
   /**
    * This angle in decimal radian, [0 .. 2π) Approximate, non-invertible
@@ -160,6 +158,15 @@ sealed class Angle protected (val toMicroarcseconds: Long) {
 }
 
 object Angle extends AngleOptics {
+  type Angle180µas = 648000000000L  // 180 * µasPerDegree
+  type Angle360µas = 1296000000000L // 360 * µasPerDegree
+
+  val µasPerDegree: Long = 60L * 60L * 1000L * 1000L
+  val µasPer180: Long    = valueOf[Angle180µas]
+  val µasPer360: Long    = valueOf[Angle360µas]
+
+  assert(Angle.µasPer180 == Angle.µasPerDegree * 180L, "Singleton type Angle180µas is incorrect")
+  assert(Angle.µasPer360 == Angle.µasPerDegree * 360L, "Singleton type Angle360µas is incorrect")
 
   /** @group Constants */
   lazy val Angle0: Angle = degrees.reverseGet(0)
@@ -178,8 +185,7 @@ object Angle extends AngleOptics {
    * @group Constructors
    */
   def fromMicroarcseconds(µas: Long): Angle = {
-    val µasPer360 = 360L * 60L * 60L * 1000L * 1000L
-    val µasʹ      = ((µas % µasPer360) + µasPer360) % µasPer360
+    val µasʹ = ((µas % µasPer360) + µasPer360) % µasPer360
     new Angle(µasʹ)
   }
 
@@ -188,6 +194,8 @@ object Angle extends AngleOptics {
    * @group Constructors
    */
   def fromDoubleDegrees(ds: Double): Angle =
+    // Changing this to use µasPerDegree changes the precision of the
+    // ImprovedSkyCalc calculations.
     fromMicroarcseconds((ds * 60 * 60 * 1000 * 1000).toLong)
 
   /**
@@ -246,7 +254,7 @@ object Angle extends AngleOptics {
     val ms = (micros / 1000L)                 % 1000L
     val s  = (micros / (1000L * 1000L))       % 60L
     val m  = (micros / (1000L * 1000L * 60L)) % 60L
-    val d  = micros / (1000L * 1000L * 60L * 60L)
+    val d  = micros / µasPerDegree
     (d.toInt, m.toInt, s.toInt, ms.toInt, µs.toInt)
   }
 
@@ -289,7 +297,7 @@ object Angle extends AngleOptics {
         milliarcseconds.toLong * 1000 +
         arcseconds.toLong * 1000 * 1000 +
         arcminutes.toLong * 1000 * 1000 * 60 +
-        degrees.toLong * 1000 * 1000 * 60 * 60
+        degrees.toLong * µasPerDegree
     )
 
   /**
@@ -371,7 +379,7 @@ trait AngleOptics extends OpticsHelpers { this: Angle.type =>
    * Degrees, in [0, 360).
    * @group Optics
    */
-  lazy val degrees: Wedge[Angle, Int] = microarcseconds.scaled(1000L * 1000L * 60L * 60L)
+  lazy val degrees: Wedge[Angle, Int] = microarcseconds.scaled(µasPerDegree)
 
   /**
    * This angle, rounded down to the nearest HourAngle.

@@ -24,7 +24,7 @@ final class ParallaxSpec extends CatsSuite {
 
   test("fromMicroarcseconds") {
     def toμas(deg: Int, μas: Int = 0): Long =
-      deg.toLong * 60L * 60L * 1000L * 1000L + μas.toLong
+      deg.toLong * Angle.µasPerDegree + μas.toLong
     def from(deg:  Int, μas: Int = 0)       =
       Parallax.fromMicroarcseconds(toμas(deg, μas)).μas.value.value
     from(12) shouldEqual toμas(12)
