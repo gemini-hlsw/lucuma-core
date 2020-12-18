@@ -105,7 +105,7 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform)
     skip in publish := true,
     libraryDependencies ++= Seq(
       "org.scalameta" %%% "munit"            % "0.7.20" % Test,
-      "org.typelevel" %%% "discipline-munit" % "1.0.3"  % Test
+      "org.typelevel" %%% "discipline-munit" % "1.0.4"  % Test
     ),
     testFrameworks += new TestFramework("munit.Framework"),
     scalaJSUseMainModuleInitializer := true
