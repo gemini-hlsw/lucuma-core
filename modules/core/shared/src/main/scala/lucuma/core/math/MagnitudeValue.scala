@@ -9,6 +9,8 @@ import cats.Show
 import lucuma.core.optics.Format
 import spire.math.Rational
 
+import java.math.RoundingMode
+
 import scala.util.Try
 
 /**
@@ -55,7 +57,7 @@ object MagnitudeValue {
     Format[Int, MagnitudeValue](v => Some(new MagnitudeValue(v)), _.scaledValue)
       .imapA[BigDecimal](
         n => new java.math.BigDecimal(n).movePointLeft(3),
-        d => d.underlying.movePointRight(3).intValue
+        d => d.underlying.movePointRight(3).setScale(0, RoundingMode.HALF_UP).intValue
       )
 
   /**

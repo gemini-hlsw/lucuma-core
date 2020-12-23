@@ -4,7 +4,7 @@
 package lucuma.core.math.parser
 
 import cats.syntax.all._
-import atto._, Atto._
+import atto._, Atto._, atto.syntax.refined._
 import lucuma.core.math.Epoch
 import lucuma.core.parser.MiscParsers
 import lucuma.core.math.Epoch.Julian
@@ -25,18 +25,18 @@ trait EpochParsers {
 
   /** Parser for an `Epoch`. */
   val epoch: Parser[Epoch] =
-    (epochScheme, int <~ char('.'), intN(3))
+    (epochScheme, int.refined[Epoch.Year] <~ char('.'), intN(3))
       .mapN { (s, y, f) =>
-        s.fromMilliyears(y * 1000 + f)
+        s.fromMilliyearsUnsafe(y.value * 1000 + f)
       }
       .named("epoch")
 
   /** Parser for an `Epoch` with a default Julian schemme. */
-  val epochLenient: Parser[Epoch] =
-    (opt(epochScheme), int <~ opt(char('.')), MiscParsers.frac(3))
+  val epochLenientNoScheme: Parser[Epoch] =
+    (int.refined[Epoch.Year] <~ opt(char('.')), MiscParsers.frac(3))
       .mapN {
-        case (s, y, f) =>
-          s.getOrElse(Julian).fromMilliyears(y * 1000 + f)
+        case (y, f) =>
+          Julian.fromMilliyearsUnsafe(y.value * 1000 + f)
       }
       .named("julianEpoch")
 

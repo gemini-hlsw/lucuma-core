@@ -40,27 +40,19 @@ final case class SiderealTracking(
   parallax:        Option[Parallax]
 ) {
 
-  def at(i: Instant): SiderealTracking =
+  def at(i: Instant): Coordinates =
     plusYears(epoch.untilInstant(i))
 
   /** Coordinates `elapsedYears` fractional epoch-years after `epoch`. */
-  def plusYears(elapsedYears: Double): SiderealTracking =
-    SiderealTracking(
-      catalogId,
-      SiderealTracking.coordinatesOn(
-        baseCoordinates,
-        epoch,
-        properMotion.orEmpty,
-        radialVelocity.getOrElse(RadialVelocity.Zero).toDoubleKilometersPerSecond,
-        parallax.orEmpty,
-        elapsedYears
-      ),
-      epoch.plusYears(elapsedYears),
-      properMotion,
-      radialVelocity,
-      parallax
+  def plusYears(elapsedYears: Double): Coordinates =
+    SiderealTracking.coordinatesOn(
+      baseCoordinates,
+      epoch,
+      properMotion.orEmpty,
+      radialVelocity.getOrElse(RadialVelocity.Zero).toDoubleKilometersPerSecond,
+      parallax.getOrElse(Parallax.Zero),
+      elapsedYears
     )
-
 }
 
 object SiderealTracking extends SiderealTrackingOptics {
@@ -92,7 +84,7 @@ object SiderealTracking extends SiderealTrackingOptics {
       epoch.scheme.lengthOfYear,
       properMotion.toRadians,
       radialVelocity,
-      parallax.μas.value / 1000000.0,
+      parallax.μas.value.value / 1000000.0,
       elapsedYears
     )
     Coordinates.unsafeFromRadians(ra, dec)
@@ -197,11 +189,11 @@ object SiderealTracking extends SiderealTrackingOptics {
     // This is premature optimization perhaps but it seems like it might make a
     // difference when sorting a long list of targets.
 
-    order(_.baseCoordinates)  |+|
-      order(_.epoch)          |+|
-      order(_.properMotion)   |+|
+    order(_.baseCoordinates) |+|
+      order(_.epoch) |+|
+      order(_.properMotion) |+|
       order(_.radialVelocity) |+|
-      order(_.parallax)       |+|
+      order(_.parallax) |+|
       order(_.catalogId)
 
   }

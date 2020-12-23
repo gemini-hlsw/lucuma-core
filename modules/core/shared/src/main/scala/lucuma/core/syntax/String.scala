@@ -4,6 +4,7 @@
 package lucuma.core.syntax
 
 import java.util.regex.Pattern
+import spire.math.Rational
 
 final class StringOps(val self: String) extends AnyVal {
 
@@ -17,22 +18,23 @@ final class StringOps(val self: String) extends AnyVal {
   def parseDoubleOption: Option[Double]         = parse(_.toDouble)
   def parseBooleanOption: Option[Boolean]       = parse(_.toBoolean)
   def parseBigDecimalOption: Option[BigDecimal] = parse(BigDecimal(_))
+  def parseRationalOption: Option[Rational]     = parse(Rational(_))
 
   /**
-   * Converts the `String` to "snake case" (eg "foo_bar").
-   */
+    * Converts the `String` to "snake case" (eg "foo_bar").
+    */
   def toSnakeCase: String =
     StringOps.snakeCaseTransformation(self)
 
   /**
-   * Converts the `String` to "screaming snake case" (eg "FOO_BAR").
-   */
+    * Converts the `String` to "screaming snake case" (eg "FOO_BAR").
+    */
   def toScreamingSnakeCase: String =
     StringOps.screamingSnakeCaseTransformation(self)
 
   /**
-   * Converts the `String` to "kebab case" (eg "foo-bar").
-   */
+    * Converts the `String` to "kebab case" (eg "foo-bar").
+    */
   def toKebabCase: String =
     StringOps.kebabCaseTransformation(self)
 

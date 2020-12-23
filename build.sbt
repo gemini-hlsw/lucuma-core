@@ -1,12 +1,12 @@
 import sbtcrossproject.CrossType
 
 lazy val attoVersion                 = "0.8.0"
-lazy val catsVersion                 = "2.3.0"
-lazy val catsEffectVersion           = "2.3.0"
+lazy val catsVersion                 = "2.3.1"
+lazy val catsEffectVersion           = "2.3.1"
 lazy val kindProjectorVersion        = "0.11.2"
 lazy val monocleVersion              = "2.1.0"
-lazy val catsTestkitScalaTestVersion = "2.1.0"
-lazy val scalaJavaTimeVersion        = "2.0.0"
+lazy val catsTestkitScalaTestVersion = "2.0.0"
+lazy val scalaJavaTimeVersion        = "2.1.0"
 lazy val geminiLocalesVersion        = "0.5.0"
 lazy val jtsVersion                  = "0.1.0"
 lazy val svgdotjsVersion             = "0.0.4"
@@ -38,6 +38,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
     name := "lucuma-core",
     libraryDependencies ++= Seq(
       "org.tpolecat"               %%% "atto-core"                  % attoVersion,
+      "org.tpolecat"               %%% "atto-refined"               % attoVersion,
       "org.typelevel"              %%% "cats-core"                  % catsVersion,
       "org.typelevel"              %%% "cats-effect"                % catsEffectVersion,
       "com.github.julien-truffaut" %%% "monocle-core"               % monocleVersion,
@@ -103,8 +104,8 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform)
     name := "lucuma-core-tests",
     skip in publish := true,
     libraryDependencies ++= Seq(
-      "org.scalameta" %%% "munit"            % "0.7.19" % Test,
-      "org.typelevel" %%% "discipline-munit" % "1.0.3"  % Test
+      "org.scalameta" %%% "munit"            % "0.7.20" % Test,
+      "org.typelevel" %%% "discipline-munit" % "1.0.4"  % Test
     ),
     testFrameworks += new TestFramework("munit.Framework"),
     scalaJSUseMainModuleInitializer := true
