@@ -11,10 +11,10 @@ import eu.timepit.refined.scalacheck.numeric._
 
 trait ArbGid {
 
-  implicit def ArbGid[A](implicit ev: Gid[A]): Arbitrary[A] =
+  implicit def arbGid[A](implicit ev: Gid[A]): Arbitrary[A] =
     Arbitrary(arbitrary[PosLong].map(ev.isoPosLong.reverseGet))
 
-  implicit def CogGid[A](implicit ev: Gid[A]): Cogen[A] =
+  implicit def cogGid[A](implicit ev: Gid[A]): Cogen[A] =
     Cogen[Long].contramap(ev.isoPosLong.get(_).value)
 
 }
