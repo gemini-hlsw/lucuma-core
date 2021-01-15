@@ -7,4 +7,5 @@ package object syntax {
   object all extends ToLensOps
                 with ToOptionalOps
                 with ToPrismOps
+                with ToSetterOps
 }
