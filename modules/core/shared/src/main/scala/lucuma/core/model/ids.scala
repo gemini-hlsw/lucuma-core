@@ -13,10 +13,6 @@ object Configuration extends WithId {
   protected val idTag = 'x'
 }
 
-object ConstraintSet extends WithId {
-  protected val idTag = 'c'
-}
-
 object Observation extends WithId {
   protected val idTag = 'o'
 }
