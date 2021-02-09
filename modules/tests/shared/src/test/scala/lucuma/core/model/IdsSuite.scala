@@ -12,6 +12,7 @@ final class IdsSuite extends DisciplineSuite {
 
   checkAll("Asterism.Id", GidTests[Asterism.Id].gid)
   checkAll("Configuration.Id", GidTests[Configuration.Id].gid)
+  checkAll("ConstraintSet.Id", GidTests[ConstraintSet.Id].gid)
   checkAll("Observation.Id", GidTests[Observation.Id].gid)
   checkAll("Program.Id", GidTests[Program.Id].gid)
 }
