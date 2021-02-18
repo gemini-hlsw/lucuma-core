@@ -18,12 +18,12 @@ import lucuma.core.syntax.time._
 import io.chrisdavenport.cats.time._
 
 /**
- * Representation of an interval between two points in time, including the start time and excluding the end time
- * (i.e. the interval [start, end)).
- *
+  * Representation of an interval between two points in time, including the start time and excluding the end time
+  * (i.e. the interval [start, end)).
+  *
  * Note that an interval can not represent a single point in time (i.e. start == end) because such an interval
- * could not contain any time t for which t >= start && t < end.
- */
+  * could not contain any time t for which t >= start && t < end.
+  */
 sealed abstract case class Interval protected (start: Instant, end: Instant) {
   // Extra checks. Should be correct via the companion constructors.
   require(start.isBefore(end), "start of interval must be < end")
@@ -46,11 +46,11 @@ sealed abstract case class Interval protected (start: Instant, end: Instant) {
     start < other.end && end > other.start
 
   /**
-   * Join two abutting or overlapping intervals.
-   *
+    * Join two abutting or overlapping intervals.
+    *
    * This operation is only defined if the two intervals overlap
-   * or abut each other, i.e. in all cases where adding the two intervals results in one single interval.
-   */
+    * or abut each other, i.e. in all cases where adding the two intervals results in one single interval.
+    */
   def join(other: Interval): Option[Interval] =
     if (overlaps(other) || abuts(other))
       Interval(start.min(other.start), end.max(other.end))
@@ -85,13 +85,13 @@ sealed abstract case class Interval protected (start: Instant, end: Instant) {
     Schedule.single(this).diff(other)
 
   /**
-   * Convert to the minimal full-day interval that includes this interval.
-   *
+    * Convert to the minimal full-day interval that includes this interval.
+    *
    * Hours in interval may not be a multiple of 24 if there's a DST transition in the resulting interval.
-   *
+    *
    * @param zone the timezone where the start of the day should be computed
-   * @param startOfDay time at which the day starts
-   */
+    * @param startOfDay time at which the day starts
+    */
   def toFullDays(zone: ZoneId, startOfDay: LocalTime): Interval = {
     val startAtZone = start.atZone(zone)
     val newStart    = startAtZone.`with`(startOfDay)
@@ -112,23 +112,23 @@ object Interval extends IntervalOptics {
   val Always: Interval = unsafe(Instant.MIN, Instant.MAX)
 
   /**
-   * Construct a new Interval with specified start and end instants, as long as start < end.
-   * @group Constructors
-   */
+    * Construct a new Interval with specified start and end instants, as long as start < end.
+    * @group Constructors
+    */
   def apply(start: Instant, end: Instant): Option[Interval] =
     fromOrderedInstants.getOption((start, end))
 
   /**
-   * Construct a new Interval with specified start and end instants, throwing an exception if start >= end.
-   * @group Constructors
-   */
+    * Construct a new Interval with specified start and end instants, throwing an exception if start >= end.
+    * @group Constructors
+    */
   def unsafe(start: Instant, end: Instant): Interval =
     apply(start, end).get
 
   /**
-   * Construct a new Interval with specified start instant and duration, as long as duration >= 0.
-   * @group Constructors
-   */
+    * Construct a new Interval with specified start instant and duration, as long as duration >= 0.
+    * @group Constructors
+    */
   def apply(start: Instant, duration: Duration): Option[Interval] =
     fromStartDuration.getOption((start, duration))
 
@@ -143,6 +143,10 @@ object Interval extends IntervalOptics {
   /** @group Typeclass Instances */
   implicit val IntervalOrder: Order[Interval] =
     Order.by(i => (i.start, i.end))
+
+  /** @group Typeclass Instances */
+  implicit val IntervalOrdering: Ordering[Interval] =
+    IntervalOrder.toOrdering
 }
 
 trait IntervalOptics { self: Interval.type =>
@@ -160,9 +164,9 @@ trait IntervalOptics { self: Interval.type =>
     Getter(_.duration)
 
   /**
-   * A tuple of Instants corresponding to (start, end).
-   * @group Optics
-   */
+    * A tuple of Instants corresponding to (start, end).
+    * @group Optics
+    */
   val fromOrderedInstants: Prism[(Instant, Instant), Interval] =
     Prism[(Instant, Instant), Interval] {
       case (start: Instant, end: Instant) =>
@@ -170,9 +174,9 @@ trait IntervalOptics { self: Interval.type =>
     }(i => (i.start, i.end))
 
   /**
-   * A tuple of Instants, which will be sorted if necessary. Can still fail if they are both the same.
-   * @group Optics
-   */
+    * A tuple of Instants, which will be sorted if necessary. Can still fail if they are both the same.
+    * @group Optics
+    */
   val fromInstants: Format[(Instant, Instant), Interval] =
     Format[(Instant, Instant), Interval](
       {
@@ -185,9 +189,9 @@ trait IntervalOptics { self: Interval.type =>
     )
 
   /**
-   *  A tuple containing the start Instant and the Duration of the Interval. Can still fail if duration <= 0.
-   *  @group Optics
-   */
+    *  A tuple containing the start Instant and the Duration of the Interval. Can still fail if duration <= 0.
+    *  @group Optics
+    */
   val fromStartDuration: Prism[(Instant, Duration), Interval] =
     Prism[(Instant, Duration), Interval] {
       case (start, duration) =>
