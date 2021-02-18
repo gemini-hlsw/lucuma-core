@@ -3,16 +3,15 @@
 
 package lucuma.core.math
 
-import cats.tests.CatsSuite
-
-import cats.Eq
-import cats.Show
+import cats._
+import cats.syntax.all._
 import java.time.Instant
 import java.time.Duration
 import java.time.LocalTime
 import java.time.ZoneId
 import org.scalacheck.Gen
 import org.scalacheck.Arbitrary.arbitrary
+import org.scalacheck.Prop._
 import lucuma.core.math.arb._
 import io.chrisdavenport.cats.time._
 import cats.kernel.laws.discipline.EqTests
@@ -21,20 +20,20 @@ import monocle.law.discipline.PrismTests
 import lucuma.core.optics.laws.discipline.FormatTests
 import lucuma.core.arb.ArbTime
 
-final class IntervalSpec extends CatsSuite with IntervalGens {
+final class IntervalSuite extends munit.DisciplineSuite with IntervalGens {
   import ArbInterval._
   import ArbSchedule._
   import ArbTime._
 
   test("Equality must be natural") {
     forAll { (a: Interval, b: Interval) =>
-      a.equals(b) shouldEqual Eq[Interval].eqv(a, b)
+      assertEquals(a.equals(b), Eq[Interval].eqv(a, b))
     }
   }
 
   test("Show must be natural") {
     forAll { (a: Interval) =>
-      a.toString shouldEqual Show[Interval].show(a)
+      assertEquals(a.toString, Show[Interval].show(a))
     }
   }
 
@@ -155,8 +154,8 @@ final class IntervalSpec extends CatsSuite with IntervalGens {
       ) { instants =>
         Interval.fromInstants.getOption(instants).foreach { other =>
           val join = i.join(other)
-          assert(join.map(_.start) === List(i.start, other.start).min.some)
-          assert(join.map(_.end) === List(i.end, other.end).max.some)
+          assertEquals(join.map(_.start), List(i.start, other.start).min.some)
+          assertEquals(join.map(_.end), List(i.end, other.end).max.some)
         }
       }
     }
@@ -191,8 +190,8 @@ final class IntervalSpec extends CatsSuite with IntervalGens {
       ) { instants =>
         Interval.fromInstants.getOption(instants).foreach { other =>
           val intersection = i.intersection(other)
-          assert(intersection.map(_.start) === List(i.start, other.start).max.some)
-          assert(intersection.map(_.end) === List(i.end, other.end).min.some)
+          assertEquals(intersection.map(_.start), List(i.start, other.start).max.some)
+          assertEquals(intersection.map(_.end), List(i.end, other.end).min.some)
         }
       }
     }
@@ -283,10 +282,11 @@ final class IntervalSpec extends CatsSuite with IntervalGens {
         val diff = i.diff(s)
         assert(diff.intervals.forall(i.contains)) // Original interval contains all results.
         val restrictedSchedule = s.restrictTo(i)
+
         // Next val contains all intervals from diff plus all intervals from schedule limited to original interval.
-        val intervals          = (diff.intervals ++ restrictedSchedule.intervals).sorted
+        val intervals = (diff.intervals ++ restrictedSchedule.intervals).sorted
         assert(intervals.zip(intervals.tail).forall { case (a, b) => a.abuts(b) })
-        assert(restrictedSchedule.union(diff) === Schedule(i))
+        assertEquals(restrictedSchedule.union(diff), Schedule(i))
     }
   }
 
@@ -295,9 +295,9 @@ final class IntervalSpec extends CatsSuite with IntervalGens {
       for {
         before <- Interval(Instant.MIN, i.start)
         after  <- Interval(i.end, Instant.MAX)
-      } yield {
+      } {
         val disjointSchedule = s.restrictTo(before).union(s.restrictTo(after))
-        assert(i.diff(disjointSchedule) === Schedule(i))
+        assertEquals(i.diff(disjointSchedule), Schedule(i))
       }
     }
   }
@@ -326,9 +326,9 @@ final class IntervalSpec extends CatsSuite with IntervalGens {
       // We can't comparte LocalTimes directly since the LocalTime may not exist at
       // the given day if there was a DST transition.
       val start  = allDay.start.atZone(z)
-      assert(start === start.`with`(t))
+      assertEquals(start, start.`with`(t))
       val end    = allDay.end.atZone(z)
-      assert(end === end.`with`(t))
+      assertEquals(end, end.`with`(t))
       assert(allDay.diff(i).forall(_.duration < Duration.ofDays(1)))
     }
   }
