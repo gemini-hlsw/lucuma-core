@@ -1,7 +1,7 @@
 import sbtcrossproject.CrossType
 
 lazy val attoVersion                 = "0.9.1"
-lazy val catsVersion                 = "2.3.1"
+lazy val catsVersion                 = "2.4.2"
 lazy val catsEffectVersion           = "2.3.3"
 lazy val kindProjectorVersion        = "0.11.3"
 lazy val monocleVersion              = "2.1.0"
@@ -13,7 +13,7 @@ lazy val svgdotjsVersion             = "0.0.4"
 lazy val coulombVersion              = "0.5.6"
 lazy val spireVersion                = "0.17.0"
 lazy val singletonOpsVersion         = "0.5.2"
-lazy val refinedVersion              = "0.9.20"
+lazy val refinedVersion              = "0.9.21"
 lazy val catsTimeVersion             = "0.3.4"
 lazy val circeVersion                = "0.13.0"
 lazy val catsScalacheckVersion       = "0.3.0"
@@ -105,7 +105,7 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform)
     skip in publish := true,
     libraryDependencies ++= Seq(
       "org.scalameta" %%% "munit"            % "0.7.22" % Test,
-      "org.typelevel" %%% "discipline-munit" % "1.0.5"  % Test
+      "org.typelevel" %%% "discipline-munit" % "1.0.6"  % Test
     ),
     testFrameworks += new TestFramework("munit.Framework"),
     scalaJSUseMainModuleInitializer := true

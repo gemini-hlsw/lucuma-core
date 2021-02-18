@@ -6,7 +6,7 @@ package lucuma.core.arb
 import cats.syntax.all._
 import org.scalacheck._
 import org.scalacheck.Gen._
-import org.scalacheck.Arbitrary._
+import org.scalacheck.Arbitrary.arbitrary
 import lucuma.core.syntax.time._
 import scala.jdk.CollectionConverters._
 import scala.concurrent.duration.{ Duration => SDuration }

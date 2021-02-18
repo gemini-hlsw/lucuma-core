@@ -12,7 +12,7 @@ import java.time.Duration
 import java.time.LocalTime
 import java.time.ZoneId
 import org.scalacheck.Gen
-import org.scalacheck.Arbitrary._
+import org.scalacheck.Arbitrary.arbitrary
 import lucuma.core.math.arb._
 import io.chrisdavenport.cats.time._
 import cats.kernel.laws.discipline.EqTests
