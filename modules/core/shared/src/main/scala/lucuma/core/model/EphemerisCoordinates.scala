@@ -25,9 +25,8 @@ final case class EphemerisCoordinates(coord: Coordinates, delta: Offset /* per t
   def interpolate(that: EphemerisCoordinates, f: Double): EphemerisCoordinates = {
     def interpolateAngle(a: Angle, b: Angle): Angle =
       Angle.fromMicroarcseconds(
-        (Angle.signedMicroarcseconds.get(a).toDouble * (1 - f) + Angle.signedMicroarcseconds.get(
-          b
-        ) * f).round
+        (Angle.signedMicroarcseconds.get(a).toDouble * (1 - f) +
+          Angle.signedMicroarcseconds.get( b) * f).round
       )
 
     val coordʹ = coord.interpolate(that.coord, f)
