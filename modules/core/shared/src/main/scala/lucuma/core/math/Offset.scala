@@ -8,9 +8,10 @@ import cats.kernel.CommutativeGroup
 import cats.syntax.all._
 import lucuma.core.optics.SplitMono
 import monocle.{ Iso, Lens }
-import monocle.macros.{ GenIso, GenLens }
+import monocle.macros.GenIso
 
 import scala.math.{ cos, sin }
+import monocle.Focus
 
 object Axis {
   type P
@@ -173,19 +174,19 @@ trait OffsetOptics {
 
   /** @group Optics */
   val p: Lens[Offset, Offset.Component[Axis.P]] =
-    GenLens[Offset](_.p)
+    Focus[Offset](_.p)
 
   /** @group Optics */
   val q: Lens[Offset, Offset.Component[Axis.Q]] =
-    GenLens[Offset](_.q)
+    Focus[Offset](_.q)
 
   /** @group Optics */
   val pAngle: Lens[Offset, Angle] =
-    p.composeIso(Offset.Component.angle[Axis.P])
+    p.andThen(Offset.Component.angle[Axis.P])
 
   /** @group Optics */
   val qAngle: Lens[Offset, Angle] =
-    q.composeIso(Offset.Component.angle[Axis.Q])
+    q.andThen(Offset.Component.angle[Axis.Q])
 
   private def splitMonoFromAngleSplitMono[A](m: SplitMono[Angle, A]): SplitMono[Offset, (A, A)] =
     SplitMono(

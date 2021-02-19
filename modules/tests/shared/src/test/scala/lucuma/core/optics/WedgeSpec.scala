@@ -15,7 +15,7 @@ final class WedgeSpec extends CatsSuite {
     SplitMono(_.toInt, _.toShort)
 
   val w: Wedge[Long, Int] =
-    se.composeSplitMono(sm)
+    se.andThen(sm)
 
   // Laws
   checkAll("Long > Short", SplitEpiTests(se).splitEpi)

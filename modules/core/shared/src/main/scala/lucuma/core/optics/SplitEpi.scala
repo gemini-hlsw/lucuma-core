@@ -8,19 +8,19 @@ import cats.arrow.Category
 import monocle.{ Iso, Prism }
 
 /**
- * A split epimorphism, which we can think of as a weaker `Iso[A, B]` where `B` is a ''smaller''
- * . type. So `reverseGet andThen get` remains an identity but `get andThen reverseGet` is merely
- * idempotent (i.e., it normalizes values in `A`). The following statements hold:
- *
+  * A split epimorphism, which we can think of as a weaker `Iso[A, B]` where `B` is a ''smaller''
+  * . type. So `reverseGet andThen get` remains an identity but `get andThen reverseGet` is merely
+  * idempotent (i.e., it normalizes values in `A`). The following statements hold:
+  *
  *  - `reverseGet` is a ''section'' of `get`,
- *  - `get` is a ''retraction'' of `reverseGet`,
- *  - `B` is a ''retract'' of `A`,
- *  - the pair `(get, reverseGet)` is a ''splitting'' of the idempotent `get andThen reverseGet`.
- *
+  *  - `get` is a ''retraction'' of `reverseGet`,
+  *  - `B` is a ''retract'' of `A`,
+  *  - the pair `(get, reverseGet)` is a ''splitting'' of the idempotent `get andThen reverseGet`.
+  *
  * @param get any function A => B.
- * @param reverseGet a section of `get` such that `reverseGet andThen get` is an identity.
- * @see [[https://ncatlab.org/nlab/show/split+epimorphism Split Epimorphism]] at nLab
- */
+  * @param reverseGet a section of `get` such that `reverseGet andThen get` is an identity.
+  * @see [[https://ncatlab.org/nlab/show/split+epimorphism Split Epimorphism]] at nLab
+  */
 final case class SplitEpi[A, B](get: A => B, reverseGet: B => A) {
 
   /** Modify the target of the SplitEpi using a function. */
@@ -36,19 +36,19 @@ final case class SplitEpi[A, B](get: A => B, reverseGet: B => A) {
     SplitMono(reverseGet, get)
 
   /** Compose with another SplitEpi. */
-  def composeSplitEpi[C](f: SplitEpi[B, C]): SplitEpi[A, C] =
+  def andThen[C](f: SplitEpi[B, C]): SplitEpi[A, C] =
     SplitEpi(get.andThen(f.get), reverseGet.compose(f.reverseGet))
 
   /** Compose with another SplitEpi. */
-  def composeSplitMono[C](f: SplitMono[B, C]): Wedge[A, C] =
+  def andThen[C](f: SplitMono[B, C]): Wedge[A, C] =
     Wedge(get.andThen(f.get), reverseGet.compose(f.reverseGet))
 
   /** Compose with an Iso. */
-  def composeIso[C](f: Iso[B, C]): SplitEpi[A, C] =
+  def andThen[C](f: Iso[B, C]): SplitEpi[A, C] =
     SplitEpi(get.andThen(f.get), reverseGet.compose(f.reverseGet))
 
   /** Compose with a Prism to get a Format. */
-  def composePrism[C](bc: Prism[B, C]): Format[A, C] =
+  def andThen[C](bc: Prism[B, C]): Format[A, C] =
     Format(a => bc.getOption(get(a)), reverseGet.compose(bc.reverseGet))
 
   /** View this SplitEpi as a Format. */
@@ -59,18 +59,6 @@ final case class SplitEpi[A, B](get: A => B, reverseGet: B => A) {
   def asWedge: Wedge[A, B] =
     Wedge(get, reverseGet)
 
-  /** Alias to composeSplitEpi. */
-  def ^<-![C](f: SplitEpi[B, C]): SplitEpi[A, C] =
-    composeSplitEpi(f)
-
-  /** Alias to composeIso. */
-  def ^<->[C](f: Iso[B, C]): SplitEpi[A, C] =
-    composeIso(f)
-
-  /** Alias to composePrism. */
-  def ^<-?[C](f: Prism[B, C]): Format[A, C] =
-    composePrism(f)
-
   /** SplitEpi is an invariant functor over A. */
   def imapA[C](f: C => B, g: B => C): SplitEpi[A, C] =
     SplitEpi(get.andThen(g), f.andThen(reverseGet))
@@ -80,9 +68,9 @@ final case class SplitEpi[A, B](get: A => B, reverseGet: B => A) {
     SplitEpi(g.andThen(get), reverseGet.andThen(f))
 
   /**
-   * get and reverseGet, yielding a normalized formatted value. Subsequent get/reverseGet cycles are
-   * idempotent.
-   */
+    * get and reverseGet, yielding a normalized formatted value. Subsequent get/reverseGet cycles are
+    * idempotent.
+    */
   def normalize(a: A): A =
     reverseGet(get(a))
 
@@ -94,9 +82,9 @@ final case class SplitEpi[A, B](get: A => B, reverseGet: B => A) {
     taggedToString(b.productPrefix, b)
 
   /**
-   * If we provide a tag like "Foo" and reverseGet as a String we can implement a nice toString like
-   * "Foo(stuff)".
-   */
+    * If we provide a tag like "Foo" and reverseGet as a String we can implement a nice toString like
+    * "Foo(stuff)".
+    */
   def taggedToString(tag: String, b: B)(implicit
     as:                   A =:= String
   ): String =
@@ -118,7 +106,7 @@ object SplitEpi {
   implicit def SplitEpiCategory: Category[SplitEpi] =
     new Category[SplitEpi] {
       def id[A]: SplitEpi[A, A] = SplitEpi(identity, identity)
-      def compose[A, B, C](f: SplitEpi[B, C], g: SplitEpi[A, B]): SplitEpi[A, C] = g ^<-! f
+      def compose[A, B, C](f: SplitEpi[B, C], g: SplitEpi[A, B]): SplitEpi[A, C] = g.andThen(f)
     }
 
 }
