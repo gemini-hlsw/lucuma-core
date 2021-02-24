@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2020 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.instances
@@ -21,7 +21,7 @@ trait TreeMapInstances extends TreeMapInstances2 {
     : CommutativeMonoid[TreeMap[K, V]] =
     new TreeMapCommutativeMonoid[K, V]
 
-  implicit def catsStdShowForTreeMap[A: Order, B](implicit
+  implicit def catsStdShowForTreeMap[A, B](implicit
     showA: Show[A],
     showB: Show[B]
   ): Show[TreeMap[A, B]] =

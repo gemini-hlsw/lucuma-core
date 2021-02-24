@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2020 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.syntax
@@ -75,7 +75,7 @@ final class TreeMapOps[A, B](val self: TreeMap[A, B]) extends AnyVal {
 }
 
 trait ToTreeMapOps {
-  implicit def ToTreeMapOps[A: Ordering, B](m: TreeMap[A, B]): TreeMapOps[A, B] =
+  implicit def ToTreeMapOps[A, B](m: TreeMap[A, B]): TreeMapOps[A, B] =
     new TreeMapOps(m)
 }
 
