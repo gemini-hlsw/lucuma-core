@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2020 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.math.skycalc.solver
@@ -36,7 +36,7 @@ final class SamplesSpec extends CatsSuite with IntervalGens {
   checkAll("MonoidK", MonoidKTests[Samples].monoidK[Int])
 
   // The explicit cast to Map seems to be needed for implicit resolution.
-  implicit def treeMapEq[K: Eq, V: Eq]: Eq[TreeMap[K, V]] = Eq.by(_.toMap)
+  implicit def treeMapEq[K, V: Eq]: Eq[TreeMap[K, V]] = Eq.by(_.toMap)
 
   // Optics
   checkAll("data", IsoTests(Samples.data[Int]))
