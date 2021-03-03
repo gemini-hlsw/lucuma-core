@@ -44,7 +44,7 @@ final case class SplitMono[A, B](get: A => B, reverseGet: B => A) {
     Wedge(get.andThen(f.get), reverseGet.compose(f.reverseGet))
 
   /** Compose with an Iso. */
-  def andTen[C](f: Iso[B, C]): SplitMono[A, C] =
+  def andThen[C](f: Iso[B, C]): SplitMono[A, C] =
     SplitMono(get.andThen(f.get), reverseGet.compose(f.reverseGet))
 
   /** View this SplitEpi as a Fold. */
