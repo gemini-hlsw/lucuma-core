@@ -12,7 +12,7 @@ import cats.effect.Sync
 import cats.syntax.all._
 import java.time._
 import monocle.Lens
-import monocle.macros.GenLens
+import monocle.Focus
 
 /**
  * An observing night is defined as the period of time from 14:00 on one day
@@ -119,14 +119,14 @@ trait ObservingNightOptics {
 
   /** @group Optics */
   val site: Lens[ObservingNight, Site] =
-    GenLens[ObservingNight](_.site)
+    Focus[ObservingNight](_.site)
 
   /** @group Optics */
   val localObservingNight: Lens[ObservingNight, LocalObservingNight] =
-    GenLens[ObservingNight](_.toLocalObservingNight)
+    Focus[ObservingNight](_.toLocalObservingNight)
 
   /** @group Optics */
   val localDate: Lens[ObservingNight, LocalDate] =
-    localObservingNight.composeIso(LocalObservingNight.localDate)
+    localObservingNight.andThen(LocalObservingNight.localDate)
 
 }

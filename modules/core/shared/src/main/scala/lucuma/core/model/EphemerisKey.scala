@@ -10,7 +10,8 @@ import lucuma.core.syntax.string._
 import lucuma.core.optics.Format
 
 import cats.{ Order, Show }
-import monocle.macros.Lenses
+import monocle.Focus
+import monocle.Lens
 
 /**
  * Ephemeris data lookup key which uniquely identifies a non-sidreal object in
@@ -58,45 +59,59 @@ object EphemerisKey extends EphemerisOptics {
    * Designation for a comet, in the current apparition. Example: `C/1973 E1`
    * for Kohoutek, yielding the query string `NAME=C/1973 E1;CAP`.
    */
-  @Lenses final case class Comet(des: String) extends Horizons(s"NAME=$des;CAP")
-  object Comet
+  final case class Comet(des: String) extends Horizons(s"NAME=$des;CAP")
+
+  object Comet {
+    val des: Lens[Comet, String] = Focus[Comet](_.des)
+  }
 
   /**
    * Designation for an asteroid under modern naming conventions. Example:
    * `1971 UC1` for 1896 Beer, yielding a query string `ASTNAM=1971 UC1`.
    */
-  @Lenses final case class AsteroidNew(des: String) extends Asteroid(s"ASTNAM=$des")
-  object AsteroidNew
+  final case class AsteroidNew(des: String) extends Asteroid(s"ASTNAM=$des")
+
+  object AsteroidNew {
+    val des: Lens[AsteroidNew, String] = Focus[AsteroidNew](_.des)
+  }
 
   /**
    * Designation for an asteroid under "old" naming conventions. These are
    * small numbers. Example: `4` for Vesta, yielding a query string `4;`
    */
-  @Lenses final case class AsteroidOld(num: Int) extends Asteroid(s"$num;") {
+  final case class AsteroidOld(num: Int) extends Asteroid(s"$num;") {
     override def des: String =
       num.toString
   }
-  object AsteroidOld
+
+  object AsteroidOld {
+    val num: Lens[AsteroidOld, Int] = Focus[AsteroidOld](_.num)
+  }
 
   /**
    * Designation for a major body (planet or satellite thereof). These have
    * small numbers. Example: `606` for Titan, yielding a query string `606`.
    */
-  @Lenses final case class MajorBody(num: Int) extends Horizons(s"$num") {
+  final case class MajorBody(num: Int) extends Horizons(s"$num") {
     override def des: String =
       num.toString
   }
-  object MajorBody
+  object MajorBody {
+    val num: Lens[MajorBody, Int] = Focus[MajorBody](_.num)
+  }
 
   /**
    * Identifies a user-supplied collection of ephemeris data, where the number
    * comes from a database sequence.
    */
-  @Lenses final case class UserSupplied(id: Int) extends EphemerisKey {
+  final case class UserSupplied(id: Int) extends EphemerisKey {
     override def des: String =
       id.toString
   }
-  object UserSupplied
+
+  object UserSupplied {
+    val id: Lens[UserSupplied, Int] = Focus[UserSupplied](_.id)
+  }
 
   implicit val ShowEphemerisKey: Show[EphemerisKey] =
     Show.fromToString

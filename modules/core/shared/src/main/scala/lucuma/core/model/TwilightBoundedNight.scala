@@ -228,13 +228,13 @@ trait TwilightBoundedNightOptics {
 
   /** @group Optics */
   val localObservingNight: Getter[TwilightBoundedNight, LocalObservingNight] =
-    observingNight.composeLens(ObservingNight.localObservingNight)
+    observingNight.andThen(ObservingNight.localObservingNight)
 
   /** @group Optics */
   val site: Getter[TwilightBoundedNight, Site] =
-    observingNight.composeLens(ObservingNight.site)
+    observingNight.andThen(ObservingNight.site)
 
   /** @group Optics */
   val localDate: Getter[TwilightBoundedNight, LocalDate] =
-    localObservingNight.composeIso(LocalObservingNight.localDate)
+    localObservingNight.andThen(LocalObservingNight.localDate)
 }

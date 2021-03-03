@@ -13,7 +13,7 @@ import lucuma.core.math.units._
 import lucuma.core.optics.SplitMono
 import monocle.Iso
 import monocle.Lens
-import monocle.macros.GenLens
+import monocle.Focus
 import spire.math.Rational
 
 object VelocityAxis {
@@ -129,11 +129,11 @@ sealed trait ProperMotionOptics {
 
   /** @group Optics */
   val ra: Lens[ProperMotion, AngularVelocityComponent[VelocityAxis.RA]] =
-    GenLens[ProperMotion](_.ra)
+    Focus[ProperMotion](_.ra)
 
   /** @group Optics */
   val dec: Lens[ProperMotion, AngularVelocityComponent[VelocityAxis.Dec]] =
-    GenLens[ProperMotion](_.dec)
+    Focus[ProperMotion](_.dec)
 
   private def splitMonoFromComponents[A](
     raMono:  SplitMono[AngularVelocityComponent[VelocityAxis.RA], A],

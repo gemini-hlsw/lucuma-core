@@ -17,7 +17,7 @@ final class SplitEpiSpec extends CatsSuite {
   // Laws
   checkAll("Long > Int", SplitEpiTests(ex1).splitEpi)
   checkAll("Int > Byte", SplitEpiTests(ex2).splitEpi)
-  checkAll("Long > Int > Byte", SplitEpiTests(ex1.composeSplitEpi(ex2)).splitEpi)
+  checkAll("Long > Int > Byte", SplitEpiTests(ex1.andThen(ex2)).splitEpi)
 
   test("modify") {
     ex1.modify(_ + 1)(Int.MaxValue.toLong) shouldEqual Int.MinValue.toLong

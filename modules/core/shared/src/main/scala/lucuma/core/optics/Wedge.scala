@@ -17,20 +17,12 @@ final case class Wedge[A, B](get: A => B, reverseGet: B => A) {
     Wedge(reverseGet, get)
 
   /** Compose with another Wedge. */
-  def composeWedge[C](f: Wedge[B, C]): Wedge[A, C] =
+  def andThen[C](f: Wedge[B, C]): Wedge[A, C] =
     Wedge(get.andThen(f.get), reverseGet.compose(f.reverseGet))
 
   /** Compose with an Iso. */
-  def composeIso[C](f: Iso[B, C]): Wedge[A, C] =
+  def andThen[C](f: Iso[B, C]): Wedge[A, C] =
     Wedge(get.andThen(f.get), reverseGet.compose(f.reverseGet))
-
-  /** Alias to composeWedge. */
-  def ^<-![C](f: Wedge[B, C]): Wedge[A, C] =
-    composeWedge(f)
-
-  /** Alias to composeIso. */
-  def ^<->[C](f: Iso[B, C]): Wedge[A, C] =
-    composeIso(f)
 
   /** Wedge is an invariant functor over A. */
   def imapA[C](f: A => C, g: C => A): Wedge[C, B] =
@@ -60,7 +52,7 @@ object Wedge {
   implicit def WedgeCategory: Category[Wedge] =
     new Category[Wedge] {
       def id[A]: Wedge[A, A] = Wedge(identity, identity)
-      def compose[A, B, C](f: Wedge[B, C], g: Wedge[A, B]): Wedge[A, C] = g ^<-! f
+      def compose[A, B, C](f: Wedge[B, C], g: Wedge[A, B]): Wedge[A, C] = g.andThen(f)
     }
 
 }

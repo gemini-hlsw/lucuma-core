@@ -147,7 +147,7 @@ object Wavelength {
     Format[BigDecimal, Int](
       bd => Try(bd.underlying.movePointRight(move).setScale(0, RoundingMode.HALF_UP).intValueExact()).toOption,
       i  => BigDecimal(new java.math.BigDecimal(i).movePointLeft(move))
-    ).composePrism(fromPicometers)
+    ).andThen(fromPicometers)
 
   val decimalPicometers: Format[BigDecimal, Wavelength] =
     scalingFormat(0)

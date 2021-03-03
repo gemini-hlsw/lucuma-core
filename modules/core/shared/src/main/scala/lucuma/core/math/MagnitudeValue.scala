@@ -65,7 +65,7 @@ object MagnitudeValue {
    */
   val fromString: Format[String, MagnitudeValue] =
     Format[String, BigDecimal](s => Try(BigDecimal(s)).toOption, _.toString)
-      .composeFormat(fromBigDecimal)
+      .andThen(fromBigDecimal)
 
   /** @group Typeclass Instances */
   implicit val MagnitudeValueShow: Show[MagnitudeValue] =
