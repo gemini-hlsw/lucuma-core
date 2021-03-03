@@ -15,11 +15,8 @@ import lucuma.core.math._
 import monocle.Lens
 import monocle.Optional
 import monocle.Traversal
-import monocle.function.Each.mapEach
-import monocle.function.FilterIndex
-import monocle.macros.GenLens
+import monocle.Focus
 import monocle.std.either._
-import monocle.std.option
 
 /** A target of observation. */
 final case class Target(
@@ -56,65 +53,60 @@ trait TargetOptics {
 
   /** @group Optics */
   lazy val name: Lens[Target, NonEmptyString] =
-    GenLens[Target](_.name)
+    Focus[Target](_.name)
 
   /** @group Optics */
   lazy val track: Lens[Target, Either[EphemerisKey, SiderealTracking]] =
-    GenLens[Target](_.track)
+    Focus[Target](_.track)
 
   /** @group Optics */
   lazy val ephemerisKey: Optional[Target, EphemerisKey] =
-    track.composePrism(stdLeft)
+    track.andThen(stdLeft[EphemerisKey, SiderealTracking])
 
   /** @group Optics */
   lazy val siderealTracking: Optional[Target, SiderealTracking] =
-    track.composePrism(stdRight)
+    track.andThen(stdRight[EphemerisKey, SiderealTracking])
 
   /** @group Optics */
   lazy val magnitudes: Lens[Target, SortedMap[MagnitudeBand, Magnitude]] =
-    GenLens[Target](_.magnitudes)
+    Focus[Target](_.magnitudes)
 
   /** @group Optics */
   lazy val magnitudesT: Traversal[Target, Magnitude] =
-    magnitudes.composeTraversal(mapEach(Order[MagnitudeBand]).each)
+    magnitudes.each
 
   /** @group Optics */
   def magnitudeIn(b: MagnitudeBand): Traversal[Target, Magnitude] =
-    magnitudes
-      .composeTraversal(
-        FilterIndex
-          .sortedMapFilterIndex(Order[MagnitudeBand])
-          .filterIndex(_ === b)
-      )
+    magnitudes.filterIndex((a: MagnitudeBand) => a === b)
 
   /** @group Optics */
   lazy val parallax: Optional[Target, Option[Parallax]] =
-    siderealTracking.composeLens(SiderealTracking.parallax)
+    siderealTracking.andThen(SiderealTracking.parallax)
 
   /** @group Optics */
   lazy val radialVelocity: Optional[Target, Option[RadialVelocity]] =
-    siderealTracking.composeLens(SiderealTracking.radialVelocity)
+    siderealTracking.andThen(SiderealTracking.radialVelocity)
 
   /** @group Optics */
   lazy val baseCoordinates: Optional[Target, Coordinates] =
-    siderealTracking.composeLens(SiderealTracking.baseCoordinates)
+    siderealTracking.andThen(SiderealTracking.baseCoordinates)
 
   /** @group Optics */
   lazy val baseRA: Optional[Target, RightAscension] =
-    baseCoordinates.composeLens(Coordinates.rightAscension)
+    baseCoordinates.andThen(Coordinates.rightAscension)
 
   /** @group Optics */
   lazy val baseDec: Optional[Target, Declination] =
-    baseCoordinates.composeLens(Coordinates.declination)
+    baseCoordinates.andThen(Coordinates.declination)
 
   /** @group Optics */
   lazy val properMotion =
-    siderealTracking.composeOptional(SiderealTracking.properMotion.composePrism(option.some))
+    siderealTracking.andThen(SiderealTracking.properMotion.some)
 
   /** @group Optics */
-  lazy val properMotionRA = properMotion.composeLens(ProperMotion.ra)
+  lazy val properMotionRA = properMotion.andThen(ProperMotion.ra)
 
   /** @group Optics */
-  lazy val properMotionDec = properMotion.composeLens(ProperMotion.dec)
+  lazy val properMotionDec = properMotion.andThen(ProperMotion.dec)
 
 }

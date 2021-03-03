@@ -8,8 +8,8 @@ import cats.syntax.all._
 import lucuma.core.math.parser.CoordinateParsers
 import lucuma.core.optics.Format
 import lucuma.core.syntax.all._
+import monocle.Focus
 import monocle.Lens
-import monocle.macros._
 import scala.math.{ atan2, cos, sin, sqrt }
 
 /** A point in the sky, given right ascension and declination. */
@@ -133,10 +133,10 @@ trait CoordinatesOptics { this: Coordinates.type =>
 
   /** @group Optics */
   val rightAscension: Lens[Coordinates, RightAscension] =
-    GenLens[Coordinates](_.ra)
+    Focus[Coordinates](_.ra)
 
   /** @group Optics */
   val declination: Lens[Coordinates, Declination] =
-    GenLens[Coordinates](_.dec)
+    Focus[Coordinates](_.dec)
 
 }

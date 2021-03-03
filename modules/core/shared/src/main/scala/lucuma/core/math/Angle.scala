@@ -659,7 +659,7 @@ trait OpticsHelpers {
       SplitEpi(_.toInt, _.toLong)
 
     def scaled(n: Long): Wedge[A, Int] =
-      self.imapB[Long](_ * n, _ / n).composeSplitEpi(longToInt)
+      self.imapB[Long](_ * n, _ / n).andThen(longToInt)
 
   }
 

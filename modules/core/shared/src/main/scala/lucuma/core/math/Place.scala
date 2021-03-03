@@ -9,7 +9,7 @@ import coulomb.Quantity
 import coulomb.si.Meter
 import eu.timepit.refined.types.numeric.NonNegInt
 import monocle.Lens
-import monocle.macros.GenLens
+import monocle.Focus
 import io.chrisdavenport.cats.time._
 import coulomb.cats.implicits._
 import eu.timepit.refined.cats._
@@ -36,17 +36,17 @@ object Place {
 
   /** @group Optics */
   val latitude: Lens[Place, Lat] =
-    GenLens[Place](_.latitude)
+    Focus[Place](_.latitude)
 
   /** @group Optics */
   val longitude: Lens[Place, Lon] =
-    GenLens[Place](_.longitude)
+    Focus[Place](_.longitude)
 
   /** @group Optics */
   val altitude: Lens[Place, Quantity[NonNegInt, Meter]] =
-    GenLens[Place](_.altitude)
+    Focus[Place](_.altitude)
 
   /** @group Optics */
   val timezone: Lens[Place, ZoneId] =
-    GenLens[Place](_.timezone)
+    Focus[Place](_.timezone)
 }

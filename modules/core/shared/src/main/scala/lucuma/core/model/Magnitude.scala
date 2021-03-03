@@ -7,12 +7,12 @@ import cats._
 import lucuma.core.enum.MagnitudeBand
 import lucuma.core.enum.MagnitudeSystem
 import lucuma.core.math.MagnitudeValue
-import monocle.macros.Lenses
+import monocle.Focus
+import monocle.Lens
 
 /**
   * Describes the magnitude of a target on a given band
   */
-@Lenses
 final case class Magnitude(
   value:  MagnitudeValue,
   band:   MagnitudeBand,
@@ -26,6 +26,13 @@ final case class Magnitude(
 }
 
 object Magnitude {
+  val value: Lens[Magnitude, MagnitudeValue] = Focus[Magnitude](_.value)
+
+  val band: Lens[Magnitude, MagnitudeBand] = Focus[Magnitude](_.band)
+
+  val error: Lens[Magnitude, Option[MagnitudeValue]] = Focus[Magnitude](_.error)
+
+  val system: Lens[Magnitude, MagnitudeSystem] = Focus[Magnitude](_.system)
 
   /** Secondary constructor. */
   def apply(value: MagnitudeValue, band: MagnitudeBand, error: MagnitudeValue) =
