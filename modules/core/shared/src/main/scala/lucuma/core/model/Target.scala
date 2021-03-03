@@ -15,8 +15,6 @@ import lucuma.core.math._
 import monocle.Lens
 import monocle.Optional
 import monocle.Traversal
-import monocle.function.Each.mapEach
-import monocle.function.FilterIndex
 import monocle.Focus
 import monocle.std.either._
 
@@ -77,16 +75,11 @@ trait TargetOptics {
 
   /** @group Optics */
   lazy val magnitudesT: Traversal[Target, Magnitude] =
-    magnitudes.andThen(mapEach(Order[MagnitudeBand]).each)
+    magnitudes.each
 
   /** @group Optics */
   def magnitudeIn(b: MagnitudeBand): Traversal[Target, Magnitude] =
-    magnitudes
-      .andThen(
-        FilterIndex
-          .sortedMapFilterIndex(Order[MagnitudeBand])
-          .filterIndex(_ === b)
-      )
+    magnitudes.filterIndex((a: MagnitudeBand) => a === b)
 
   /** @group Optics */
   lazy val parallax: Optional[Target, Option[Parallax]] =
