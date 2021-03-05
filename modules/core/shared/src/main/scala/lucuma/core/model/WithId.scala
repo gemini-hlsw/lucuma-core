@@ -32,5 +32,8 @@ trait WithId {
 
     /** Convenience method to construct from a String */
     def parse(s: String): Option[Id] = GidId.fromString.getOption(s)
+
+    /** Allow pattern match style parsing */
+    def unapply[T](s: String): Option[Id] = parse(s)
   }
 }
