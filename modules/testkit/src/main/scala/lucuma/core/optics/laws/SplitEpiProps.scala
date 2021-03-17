@@ -8,7 +8,6 @@ import cats.syntax.all._
 import lucuma.core.optics.SplitEpi
 
 final case class SplitEpiLaws[A, B](fab: SplitEpi[A, B]) {
-
   def normalize(a: A): IsEq[B] =
     fab.get(fab.normalize(a)) <-> fab.get(a)
 
@@ -19,6 +18,10 @@ final case class SplitEpiLaws[A, B](fab: SplitEpi[A, B]) {
 
   def reverseGetRoundTrip(b: B): IsEq[B] =
     (fab.reverseGet.andThen(fab.get))(b) <-> b
+}
+
+final case class SplitEpiProps[A, B](fab: SplitEpi[A, B]) {
+  val laws: SplitEpiLaws[A, B] = SplitEpiLaws(fab)
 
   // True if `a` is parsable but not in normal form. The existence of such a value in our test data
   // will show that `normalize` and `parseRoundTrup` are actually testing something.

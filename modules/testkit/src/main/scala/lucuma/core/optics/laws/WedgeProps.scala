@@ -8,7 +8,6 @@ import cats.syntax.all._
 import lucuma.core.optics.Wedge
 
 final case class WedgeLaws[A, B](fab: Wedge[A, B]) {
-
   def normalizeA(a: A): IsEq[B] =
     fab.get(fab.normalizeA(a)) <-> fab.get(a)
 
@@ -24,6 +23,10 @@ final case class WedgeLaws[A, B](fab: Wedge[A, B]) {
     val aʹ = fab.normalizeA(a)
     (fab.reverseGet.compose(fab.get))(aʹ) <-> aʹ
   }
+}
+
+final case class WedgeProps[A, B](fab: Wedge[A, B]) {
+  val laws: WedgeLaws[A, B] = WedgeLaws(fab)
 
   // Demonstrate coverage
   def demonstratesCoverageA(b: A)(implicit ev: Eq[A]): Boolean =
