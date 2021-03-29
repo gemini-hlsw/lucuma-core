@@ -5,7 +5,6 @@ package lucuma.core.util
 
 import cats._
 import cats.syntax.all._
-import cats.effect.IO
 import lucuma.core.optics.Format
 import java.time.{ Instant, ZonedDateTime }
 import java.time.ZoneOffset.UTC
@@ -106,16 +105,6 @@ object Timestamp {
 
   val instant: Format[Instant, Timestamp] =
     Format[Instant, Timestamp](fromInstant, _.toInstant)
-
-  /** Creates a Timestamp representing the current time, truncated to the
-    * last integral number of microseconds.
-    *
-    * @group Constructors
-    */
-  def now: IO[Timestamp] =
-    IO {
-      unsafeFromInstant(Instant.now())
-    }
 
   /** Creates a Timestamp representing the current time using milliseconds
     * from the Java time epoch.

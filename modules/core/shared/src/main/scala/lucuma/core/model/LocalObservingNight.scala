@@ -5,7 +5,6 @@ package lucuma.core.model
 
 import cats._
 import cats.data.Validated
-import cats.effect.Sync
 import cats.syntax.all._
 import lucuma.core.enum.Site
 import java.time._
@@ -114,15 +113,6 @@ object LocalObservingNight extends LocalObservingNightOptics {
    */
   def fromSiteAndInstant(s: Site, i: Instant): LocalObservingNight =
     fromZonedDateTime(ZonedDateTime.ofInstant(i, s.timezone))
-
-  /**
-   * Returns a program in M that computes the LocalObservingNight for the
-   * instant it is executed.
-   *
-   * @group Constructors
-   */
-  def current[M[_]: Sync]: M[LocalObservingNight] =
-    Sync[M].delay(LocalDateTime.now).map(fromLocalDateTime)
 
   /** Parse a LocalObservingNight like `20180307` from a String, if possible. */
   def fromString(s: String): Option[LocalObservingNight] =
