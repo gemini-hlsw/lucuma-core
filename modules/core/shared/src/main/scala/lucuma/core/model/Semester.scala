@@ -4,7 +4,6 @@
 package lucuma.core.model
 
 import cats.{ Order, Show }
-import cats.effect.IO
 import lucuma.core.enum.{ Half, Site }
 import lucuma.core.model.parser.SemesterParsers
 import lucuma.core.syntax.parser._
@@ -119,10 +118,6 @@ object Semester {
   /** Semester for the zoned date and time of the given Site and Instant. */
   def fromSiteAndInstant(s: Site, i: Instant): Semester =
     fromZonedDateTime(ZonedDateTime.ofInstant(i, s.timezone))
-
-  /** Current semester. */
-  def current(s: Site): IO[Semester] =
-    IO(LocalDateTime.now(s.timezone)).map(fromLocalDateTime)
 
   /** Parse a full-year Semester like `2009A` from a String, if possible. */
   def fromString(s: String): Option[Semester] =

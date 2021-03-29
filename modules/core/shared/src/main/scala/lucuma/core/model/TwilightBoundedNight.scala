@@ -9,8 +9,6 @@ import lucuma.core.enum.TwilightType
 import lucuma.core.math.skycalc.TwilightCalc
 
 import cats.{ Order, Show }
-import cats.effect.Sync
-import cats.syntax.all._
 
 import java.time.Instant
 import java.time.LocalDate
@@ -192,15 +190,6 @@ object TwilightBoundedNight extends TwilightBoundedNightOptics {
     i:            Instant
   ): TwilightBoundedNight =
     fromTwilightTypeAndSiteAndInstant(twilightType, s, i).get
-
-  /**
-   * Returns a program in M that computes a [[TwilightBoundedNight]]
-   * corresponding to the observing night for the instant it is executed.
-   *
-   * @group Constructors
-   */
-  def current[M[_]: Sync](twilightType: TwilightType, s: Site): M[Option[TwilightBoundedNight]] =
-    ObservingNight.current(s).map(_.twilightBounded(twilightType))
 
   /** @group Typeclass Instances. */
   implicit val ShowTwilightBoundedNight: Show[TwilightBoundedNight] =

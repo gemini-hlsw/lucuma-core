@@ -8,8 +8,6 @@ import lucuma.core.math.Interval
 import lucuma.core.enum.TwilightType
 
 import cats._
-import cats.effect.Sync
-import cats.syntax.all._
 import java.time._
 import monocle.Lens
 import monocle.macros.GenLens
@@ -91,15 +89,6 @@ object ObservingNight extends ObservingNightOptics {
    */
   def fromSiteAndInstant(s: Site, i: Instant): ObservingNight =
     ObservingNight(s, LocalObservingNight.fromSiteAndInstant(s, i))
-
-  /**
-   * Returns a program in M that computes the ObservingNight for the instant it
-   * is executed.
-   *
-   * @group Constructors
-   */
-  def current[M[_]: Sync](s: Site): M[ObservingNight] =
-    LocalObservingNight.current.map(_.atSite(s))
 
   /** @group Typeclass Instances. */
   implicit val ShowObservingNight: Show[ObservingNight] =
