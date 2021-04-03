@@ -3,10 +3,9 @@
 
 package lucuma.core.optics
 
-import cats.tests.CatsSuite
 import lucuma.core.optics.laws.discipline._
 
-final class SplitMonoSpec extends CatsSuite {
+final class SplitMonoSuite extends munit.DisciplineSuite {
 
   val ex1: SplitMono[Byte, Int] =
     SplitMono(_.toInt, _.toByte)
@@ -20,11 +19,11 @@ final class SplitMonoSpec extends CatsSuite {
   checkAll("Byte < Int < Long", SplitMonoTests(ex1.composeSplitMono(ex2)).splitMono)
 
   test("modify") {
-    ex1.modify(_ + 1)(Byte.MaxValue) shouldEqual Byte.MinValue
+    assertEquals(ex1.modify(_ + 1)(Byte.MaxValue),  Byte.MinValue)
   }
 
   test("modifyF") {
-    ex1.modifyF(i => Option(i + 1))(Byte.MaxValue) shouldEqual Some(Byte.MinValue)
+    assertEquals(ex1.modifyF(i => Option(i + 1))(Byte.MaxValue),  Some(Byte.MinValue))
   }
 
 }

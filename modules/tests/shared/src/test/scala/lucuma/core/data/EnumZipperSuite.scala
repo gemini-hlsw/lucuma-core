@@ -5,14 +5,14 @@ package lucuma
 package core
 package data
 
-import cats.tests.CatsSuite
+import cats.syntax.all._
 import lucuma.core.enum.StepType
 import lucuma.core.enum.StepType._
 import lucuma.core.util.arb.ArbEnumerated._
 import arb.ArbEnumZipper._
 import cats.kernel.laws.discipline.EqTests
 
-final class EnumZipperSpec extends CatsSuite {
+final class EnumZipperSuite extends munit.DisciplineSuite {
   test("withFocus on focus") {
     // move two positions to the right
     val z1 = EnumZipper.of[StepType].next.flatMap(_.next)

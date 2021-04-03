@@ -3,10 +3,11 @@
 
 package lucuma.core.optics
 
-import cats.tests.CatsSuite
+import cats.syntax.all._
 import lucuma.core.optics.laws.discipline._
+import org.scalacheck.Prop._
 
-final class FormatSpec extends CatsSuite {
+final class FormatSuite extends munit.DisciplineSuite {
 
   // Our example Format injects ints into "positive and even"
   val example: Format[Int, Boolean] =
@@ -17,15 +18,15 @@ final class FormatSpec extends CatsSuite {
 
   test("unsafeGet.consistent with getOption") {
     forAll { (n: Int) =>
-      example.getOption(n) shouldEqual Either.catchNonFatal(example.unsafeGet(n)).toOption
+      assertEquals(example.getOption(n), Either.catchNonFatal(example.unsafeGet(n)).toOption)
     }
   }
 
   test("unsafeGet.error message") {
     forAll { (n: Int) =>
       Either.catchNonFatal(example.unsafeGet(n)) match {
-        case Left(t)  => t.getMessage shouldEqual s"unsafeGet failed: $n"
-        case Right(_) => true
+        case Left(t)  => assertEquals(t.getMessage, s"unsafeGet failed: $n")
+        case Right(_) => assert(true)
       }
     }
   }

@@ -3,14 +3,14 @@
 
 package lucuma.core.math
 
-import cats.tests.CatsSuite
 import cats.{ Eq, Show }
 import cats.kernel.laws.discipline._
 import lucuma.core.math.arb._
 import lucuma.core.optics.laws.discipline._
 import monocle.law.discipline._
+import org.scalacheck.Prop._
 
-final class HourAngleSpec extends CatsSuite {
+final class HourAngleSuite extends munit.DisciplineSuite {
   import ArbAngle._
 
   // Laws
@@ -30,39 +30,40 @@ final class HourAngleSpec extends CatsSuite {
 
   test("Equality must be natural") {
     forAll { (a: HourAngle, b: HourAngle) =>
-      a.equals(b) shouldEqual Eq[HourAngle].eqv(a, b)
+      assertEquals(a.equals(b),  Eq[HourAngle].eqv(a, b))
     }
   }
 
   test("Equality must be consistent with .toMicroseconds") {
     forAll { (a: HourAngle, b: HourAngle) =>
-      Eq[Long].eqv(a.toMicroseconds, b.toMicroseconds) shouldEqual
+      assertEquals(Eq[Long].eqv(a.toMicroseconds, b.toMicroseconds),
         Eq[HourAngle].eqv(a, b)
+      )
     }
   }
 
   test("Show must be natural") {
     forAll { (a: HourAngle) =>
-      a.toString shouldEqual Show[HourAngle].show(a)
+      assertEquals(a.toString,  Show[HourAngle].show(a))
     }
   }
 
   test("Conversion to HMS must be invertable") {
     forAll { (a: HourAngle) =>
       val hms = HourAngle.hms.get(a)
-      HourAngle.fromHMS(
+      assertEquals(HourAngle.fromHMS(
         hms.hours,
         hms.minutes,
         hms.seconds,
         hms.milliseconds,
-        hms.microseconds
-      ) shouldEqual a
+        hms.microseconds),
+        a)
     }
   }
 
   test("Flipping must be invertable") {
     forAll { (a: HourAngle) =>
-      a.flip.flip shouldEqual a
+      assertEquals(a.flip.flip,  a)
     }
   }
 
@@ -72,7 +73,7 @@ final class HourAngleSpec extends CatsSuite {
       val msIn24 = 24L * 60L * 60L * 1000L * 1000L
       val offset = msIn24 * factor
       val b      = HourAngle.fromMicroseconds(a.toMicroseconds + offset)
-      a shouldEqual b
+      assertEquals(a,  b)
     }
   }
 

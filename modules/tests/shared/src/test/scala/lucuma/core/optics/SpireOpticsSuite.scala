@@ -3,7 +3,6 @@
 
 package lucuma.core.optics
 
-import cats.tests.CatsSuite
 import lucuma.core.optics.Spire._
 import spire.laws.arb._
 import lucuma.core.optics.laws.discipline.FormatTests
@@ -11,7 +10,7 @@ import lucuma.core.optics.laws.discipline.SplitEpiTests
 import org.scalacheck.Arbitrary._
 import monocle.law.discipline.IsoTests
 
-final class SpireOpticsSpec extends CatsSuite {
+final class SpireOpticsSuite extends munit.DisciplineSuite {
 
   checkAll("numberInt", SplitEpiTests(numberInt).splitEpi)
   checkAll("numberLong", SplitEpiTests(numberLong).splitEpi)

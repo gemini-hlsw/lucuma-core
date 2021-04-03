@@ -3,7 +3,7 @@
 
 package lucuma.core.math.skycalc.solver
 
-import cats.tests.CatsSuite
+import cats.syntax.all._
 import java.time.Instant
 import java.time.Duration
 import lucuma.core.math.Schedule
@@ -11,7 +11,7 @@ import lucuma.core.math.IntervalGens
 import lucuma.core.math.skycalc.solver.SolverStrategy._
 import lucuma.core.math.skycalc.solver.RoundStrategy._
 
-final class SolverSpec extends CatsSuite with IntervalGens {
+final class SolverSuite extends munit.DisciplineSuite with IntervalGens {
 
   val TestCalculator = Samples.single(Instant.MIN, ())
 
@@ -44,11 +44,11 @@ final class SolverSpec extends CatsSuite with IntervalGens {
     val solver = constraintSolver[Default](f1)
     val solve  = solver.solve(TestCalculator) _
 
-    assert(Schedule(List(buildInterval(0, 150))) === solve(buildInterval(0, 200)).some)
-    assert(Schedule(List(buildInterval(250, 400))) === solve(buildInterval(200, 400)).some)
-    assert(Schedule(List(buildInterval(250, 450))) === solve(buildInterval(200, 500)).some)
-    assert(
-      Schedule(List(buildInterval(0, 150), buildInterval(250, 400))) === solve(
+    assertEquals(Schedule(List(buildInterval(0, 150))), solve(buildInterval(0, 200)).some)
+    assertEquals(Schedule(List(buildInterval(250, 400))), solve(buildInterval(200, 400)).some)
+    assertEquals(Schedule(List(buildInterval(250, 450))), solve(buildInterval(200, 500)).some)
+    assertEquals(
+      Schedule(List(buildInterval(0, 150), buildInterval(250, 400))), solve(
         buildInterval(0, 400)
       ).some
     )
@@ -58,11 +58,11 @@ final class SolverSpec extends CatsSuite with IntervalGens {
     val solver = constraintSolver[Parabola](f1)
     val solve  = solver.solve(TestCalculator) _
 
-    assert(Schedule(List(buildInterval(0, 150))) === solve(buildInterval(0, 200)).some)
-    assert(Schedule(List(buildInterval(250, 400))) === solve(buildInterval(200, 400)).some)
-    assert(Schedule(List(buildInterval(250, 450))) === solve(buildInterval(200, 500)).some)
-    assert(
-      Schedule(List(buildInterval(0, 150), buildInterval(250, 400))) === solve(
+    assertEquals(Schedule(List(buildInterval(0, 150))), solve(buildInterval(0, 200)).some)
+    assertEquals(Schedule(List(buildInterval(250, 400))), solve(buildInterval(200, 400)).some)
+    assertEquals(Schedule(List(buildInterval(250, 450))), solve(buildInterval(200, 500)).some)
+    assertEquals(
+      Schedule(List(buildInterval(0, 150), buildInterval(250, 400))), solve(
         buildInterval(0, 400)
       ).some
     )

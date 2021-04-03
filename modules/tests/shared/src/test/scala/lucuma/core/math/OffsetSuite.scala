@@ -3,15 +3,15 @@
 
 package lucuma.core.math
 
-import cats.tests.CatsSuite
 import cats.{ Eq, Show }
 import cats.kernel.laws.discipline._
 import lucuma.core.math.arb._
 import lucuma.core.optics.laws.discipline.SplitMonoTests
 import lucuma.core.math.syntax.int._
 import monocle.law.discipline._
+import org.scalacheck.Prop._
 
-final class OffsetSpec extends CatsSuite {
+final class OffsetSuite extends munit.DisciplineSuite {
   import ArbAngle._
   import ArbOffset._
 
@@ -28,33 +28,33 @@ final class OffsetSpec extends CatsSuite {
 
   test("Equality must be natural") {
     forAll { (a: Offset, b: Offset) =>
-      a.equals(b) shouldEqual Eq[Offset].eqv(a, b)
+      assertEquals(a.equals(b),  Eq[Offset].eqv(a, b))
     }
   }
 
   test("it must operate pairwise") {
     forAll { (a: Offset, b: Offset) =>
-      Eq[Offset.Component[Axis.P]].eqv(a.p, b.p) &&
-      Eq[Offset.Component[Axis.Q]].eqv(a.q, b.q) shouldEqual Eq[Offset].eqv(a, b)
+      assertEquals(Eq[Offset.Component[Axis.P]].eqv(a.p, b.p) &&
+        Eq[Offset.Component[Axis.Q]].eqv(a.q, b.q),  Eq[Offset].eqv(a, b))
     }
   }
 
   test("Show must be natural") {
     forAll { a: Offset =>
-      a.toString shouldEqual Show[Offset].show(a)
+      assertEquals(a.toString,  Show[Offset].show(a))
     }
   }
 
   test("Conversion to components must be invertable") {
     forAll { o: Offset =>
       val (p, q) = (o.p, o.q)
-      Offset(p, q) shouldEqual o
+      assertEquals(Offset(p, q),  o)
     }
   }
 
   test("subtraction is addition with unary_-") {
     forAll { (a: Offset, b: Offset) =>
-      (a - b) shouldEqual (a + -b)
+      assertEquals((a - b),  (a + -b))
     }
   }
 

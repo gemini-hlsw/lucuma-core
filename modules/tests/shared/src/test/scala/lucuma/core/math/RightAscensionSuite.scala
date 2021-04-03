@@ -3,14 +3,14 @@
 
 package lucuma.core.math
 
-import cats.tests.CatsSuite
 import cats.{ Eq, Order, Show }
 import cats.kernel.laws.discipline._
 import lucuma.core.math.arb._
 import lucuma.core.optics.laws.discipline._
 import monocle.law.discipline._
+import org.scalacheck.Prop._
 
-final class RightAscensionSpec extends CatsSuite {
+final class RightAscensionSuite extends munit.DisciplineSuite {
   import ArbRightAscension._
   import ArbAngle._
 
@@ -24,22 +24,22 @@ final class RightAscensionSpec extends CatsSuite {
 
   test("Equality must be natural") {
     forAll { (a: RightAscension, b: RightAscension) =>
-      a.equals(b) shouldEqual Eq[RightAscension].eqv(a, b)
+      assertEquals(a.equals(b), Eq[RightAscension].eqv(a, b))
     }
   }
 
   test("Order must be consistent with .toHourAngle.toMicroarcseconds") {
     forAll { (a: RightAscension, b: RightAscension) =>
-      Order[Long].comparison(a.toHourAngle.toMicroarcseconds,
-                             b.toHourAngle.toMicroarcseconds
-      ) shouldEqual
+      assertEquals(Order[Long].comparison(a.toHourAngle.toMicroarcseconds,
+                             b.toHourAngle.toMicroarcseconds),
         Order[RightAscension].comparison(a, b)
+      )
     }
   }
 
   test("Show must be natural") {
     forAll { (a: RightAscension) =>
-      a.toString shouldEqual Show[RightAscension].show(a)
+      assertEquals(a.toString, Show[RightAscension].show(a))
     }
   }
 
