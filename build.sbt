@@ -28,7 +28,7 @@ inThisBuild(
   ) ++ lucumaPublishSettings
 )
 
-skip in publish := true
+publish / skip := true
 
 lazy val core = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Full)
