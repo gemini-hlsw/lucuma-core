@@ -3,14 +3,15 @@
 
 package lucuma.core.math
 
-import cats.tests.CatsSuite
+import cats.syntax.all._
 import cats.{ Eq, Show }
 import cats.kernel.laws.discipline._
 import lucuma.core.math.arb._
 import lucuma.core.optics.laws.discipline._
 import monocle.law.discipline._
+import org.scalacheck.Prop._
 
-final class DeclinationSpec extends CatsSuite {
+final class DeclinationSuite extends munit.DisciplineSuite {
   import ArbDeclination._
   import ArbAngle._
 
@@ -23,28 +24,28 @@ final class DeclinationSpec extends CatsSuite {
 
   test("Equality must be natural") {
     forAll { (a: Declination, b: Declination) =>
-      a.equals(b) shouldEqual Eq[Declination].eqv(a, b)
+      assertEquals(a.equals(b), Eq[Declination].eqv(a, b))
     }
   }
 
   test("Eq must be consistent with .toAngle.toMicroarcseconds") {
     forAll { (a: Declination, b: Declination) =>
-      Eq[Long].eqv(a.toAngle.toMicroarcseconds, b.toAngle.toMicroarcseconds) shouldEqual
-        Eq[Declination].eqv(a, b)
+      assertEquals(Eq[Long].eqv(a.toAngle.toMicroarcseconds, b.toAngle.toMicroarcseconds),
+        Eq[Declination].eqv(a, b))
     }
   }
 
   test("Show must be natural") {
     forAll { (a: Declination) =>
-      a.toString shouldEqual Show[Declination].show(a)
+      assertEquals(a.toString, Show[Declination].show(a))
     }
   }
 
   test("Construction must be consistent between fromAngle and fromAngleWithCarry") {
     forAll { (a: Angle) =>
       (Declination.fromAngle.getOption(a), Declination.fromAngleWithCarry(a)) match {
-        case (Some(d), (dʹ, false)) => d shouldEqual dʹ
-        case (None, (d, true))      => d.toAngle shouldEqual a.mirrorBy(Angle.Angle90)
+        case (Some(d), (dʹ, false)) => assertEquals(d, dʹ)
+        case (None, (d, true))      => assertEquals(d.toAngle, a.mirrorBy(Angle.Angle90))
         case _                      => fail("Unpossible")
       }
     }
@@ -52,26 +53,26 @@ final class DeclinationSpec extends CatsSuite {
 
   test("Offsetting must have an identity") {
     forAll { (a: Declination) =>
-      a.offset(Angle.Angle0).shouldEqual((a, false))
+      assertEquals(a.offset(Angle.Angle0), (a, false))
     }
   }
 
   test("Offsetting must be invertible") {
     forAll { (a: Declination, b: Angle) =>
       a.offset(b) match {
-        case (aʹ, false) => aʹ.offset(-b).shouldEqual((a, false))
-        case (aʹ, true)  => aʹ.offset(b).shouldEqual((a, true))
+        case (aʹ, false) => assertEquals(aʹ.offset(-b), (a, false))
+        case (aʹ, true)  => assertEquals(aʹ.offset(b), (a, true))
       }
     }
   }
 
   test("Declination from degrees") {
     // Sanity checks
-    Declination.fromDoubleDegrees(0) shouldEqual Declination.Zero.some
-    Declination.fromDoubleDegrees(90) shouldEqual Declination.Max.some
-    Declination.fromDoubleDegrees(-90) shouldEqual Declination.Min.some
-    Declination.fromDoubleDegrees(-90) shouldEqual Declination.fromDoubleDegrees(270)
-    Declination.fromDoubleDegrees(180) shouldEqual None
+    assertEquals(Declination.fromDoubleDegrees(0), Declination.Zero.some)
+    assertEquals(Declination.fromDoubleDegrees(90), Declination.Max.some)
+    assertEquals(Declination.fromDoubleDegrees(-90), Declination.Min.some)
+    assertEquals(Declination.fromDoubleDegrees(-90), Declination.fromDoubleDegrees(270))
+    assertEquals(Declination.fromDoubleDegrees(180), None)
   }
 
 }

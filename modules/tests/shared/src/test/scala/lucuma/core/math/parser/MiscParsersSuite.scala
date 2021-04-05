@@ -4,15 +4,15 @@
 package lucuma.core.math.parser
 
 import atto._, Atto._
-import cats.tests.CatsSuite
 import lucuma.core.math.Index
 import lucuma.core.parser.MiscParsers.index
+import org.scalacheck.Prop._
 
-final class MiscParsersSpec extends CatsSuite {
+final class MiscParsersSuite extends munit.DisciplineSuite {
 
   test("index parser must be consistent with Index.fromShort") {
     forAll { (s: Short) =>
-      index.parseOnly(s.toString).option shouldEqual Index.fromShort.getOption(s)
+      assertEquals(index.parseOnly(s.toString).option,  Index.fromShort.getOption(s))
     }
   }
 

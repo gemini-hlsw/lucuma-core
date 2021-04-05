@@ -3,10 +3,9 @@
 
 package lucuma.core.optics
 
-import cats.tests.CatsSuite
 import lucuma.core.optics.laws.discipline._
 
-final class SplitEpiSpec extends CatsSuite {
+final class SplitEpiSuite extends munit.DisciplineSuite {
 
   val ex1: SplitEpi[Long, Int] =
     SplitEpi(_.toInt, _.toLong)
@@ -20,11 +19,11 @@ final class SplitEpiSpec extends CatsSuite {
   checkAll("Long > Int > Byte", SplitEpiTests(ex1.composeSplitEpi(ex2)).splitEpi)
 
   test("modify") {
-    ex1.modify(_ + 1)(Int.MaxValue.toLong) shouldEqual Int.MinValue.toLong
+    assertEquals(ex1.modify(_ + 1)(Int.MaxValue.toLong),  Int.MinValue.toLong)
   }
 
   test("modifyF") {
-    ex1.modifyF(i => Option(i + 1))(Int.MaxValue.toLong) shouldEqual Some(Int.MinValue.toLong)
+    assertEquals(ex1.modifyF(i => Option(i + 1))(Int.MaxValue.toLong),  Some(Int.MinValue.toLong))
   }
 
 }

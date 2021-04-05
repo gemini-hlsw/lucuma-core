@@ -3,19 +3,20 @@
 
 package lucuma.core.math
 
+import cats.syntax.all._
 import cats.{ Eq, Show }
 import cats.kernel.laws.discipline._
-import cats.tests.CatsSuite
 
 import lucuma.core.math.arb._
-import org.scalacheck.Gen._
 
 import java.time.LocalDateTime
 import java.time.Instant
+import org.scalacheck.Gen._
 import org.scalacheck.Arbitrary
+import org.scalacheck.Prop._
 import lucuma.core.arb.ArbTime
 
-final class JulianDateSpec extends CatsSuite {
+final class JulianDateSuute extends munit.DisciplineSuite {
   import ArbJulianDate._
   import ArbTime._
 
@@ -24,13 +25,13 @@ final class JulianDateSpec extends CatsSuite {
 
   test("JulianDate.eq.natural") {
     forAll { (a: JulianDate, b: JulianDate) =>
-      a.equals(b) shouldEqual Eq[JulianDate].eqv(a, b)
+      assertEquals(a.equals(b),  Eq[JulianDate].eqv(a, b))
     }
   }
 
   test("JulianDate.show.natural") {
     forAll { (a: JulianDate) =>
-      a.toString shouldEqual Show[JulianDate].show(a)
+      assertEquals(a.toString,  Show[JulianDate].show(a))
     }
   }
 
@@ -55,7 +56,7 @@ final class JulianDateSpec extends CatsSuite {
       val jd0 = oldEpochSchemeJulianDate(ldt)
       val jd1 = JulianDate.ofLocalDateTime(ldt).dayNumber.toDouble
 
-      jd0 shouldEqual jd1
+      assertEquals(jd0,  jd1)
     }
   }
 
@@ -78,7 +79,7 @@ final class JulianDateSpec extends CatsSuite {
 
   test("Modified JulianDate should almost equal JulianDate - 2400000.5") {
     forAll { (j: JulianDate) =>
-      assert(j.toModifiedDouble === (j.toDouble - 2400000.5) +- 0.000000001)
+      assertEqualsDouble(j.toModifiedDouble, (j.toDouble - 2400000.5), 0.000000001)
     }
   }
 
@@ -101,7 +102,7 @@ final class JulianDateSpec extends CatsSuite {
 
   test("JulianDate.fromDoubleApprox(double).toDouble =~= double") {
     forAll(posNum[Double]) { (d: Double) =>
-      assert(JulianDate.fromDoubleApprox(d).toDouble === d +- 0.000000000001)
+      assertEqualsDouble(JulianDate.fromDoubleApprox(d).toDouble, d, 0.000000000001)
     }
   }
 }

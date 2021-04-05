@@ -4,7 +4,6 @@ lazy val attoVersion                 = "0.9.3"
 lazy val catsVersion                 = "2.5.0"
 lazy val kindProjectorVersion        = "0.11.3"
 lazy val monocleVersion              = "2.1.0"
-lazy val catsTestkitScalaTestVersion = "2.1.3"
 lazy val scalaJavaTimeVersion        = "2.2.0"
 lazy val geminiLocalesVersion        = "0.5.1"
 lazy val jtsVersion                  = "0.1.2"
@@ -82,7 +81,6 @@ lazy val testkit = crossProject(JVMPlatform, JSPlatform)
     name := "lucuma-core-testkit",
     libraryDependencies ++= Seq(
       "org.typelevel"              %%% "cats-testkit"           % catsVersion,
-      "org.typelevel"              %%% "cats-testkit-scalatest" % catsTestkitScalaTestVersion,
       "com.manyangled"             %%% "coulomb-scalacheck"     % coulombVersion,
       "com.github.julien-truffaut" %%% "monocle-law"            % monocleVersion,
       "org.typelevel"              %%% "spire-laws"             % spireVersion,

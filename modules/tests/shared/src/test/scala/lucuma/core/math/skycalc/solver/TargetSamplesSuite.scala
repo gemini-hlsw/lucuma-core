@@ -3,7 +3,7 @@
 
 package lucuma.core.math.skycalc.solver
 
-import cats.tests.CatsSuite
+import cats.implicits._
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZonedDateTime
@@ -12,16 +12,16 @@ import lucuma.core.math.Declination
 import lucuma.core.math.Interval
 import lucuma.core.math.RightAscension
 import lucuma.core.math.skycalc._
-import org.scalactic.Tolerance
 import java.time.Duration
 import lucuma.core.math.skycalc.solver.RoundStrategy._
+import scala.math.abs
 
 /**
   * Compare some random values with results from http://catserver.ing.iac.es/staralt/index.php
   * This is not meant to test the underlying SkyCalc implementations, we assume that this is all working,
   * this only tests the general mechanics of specific Samples classes for targets.
   */
-final class TargetSamplesSpec extends CatsSuite with Tolerance {
+final class TargetSamplesSuite extends munit.DisciplineSuite {
   import lucuma.core.enum.Site.GN
 
   private val testInstant =
@@ -38,13 +38,13 @@ final class TargetSamplesSpec extends CatsSuite with Tolerance {
       singleSample
         .valueAt[Closest](testInstant)
         .map(_.altitudeRaw)
-        .exists(a => 37.0 === a +- 1)
+        .exists(a => abs(37.0 - a) <= 1)
     )
     assert(
       singleSample
         .valueAt[Closest](testInstant)
         .map(_.airmass)
-        .exists(a => 1.6 === a +- 0.1)
+        .exists(a => abs(1.6 - a) <= 0.1)
     )
   }
 
@@ -60,32 +60,30 @@ final class TargetSamplesSpec extends CatsSuite with Tolerance {
         .map(_.altitude)
         .valueAt[LinearInterpolating](testInstant)
         .map(_.toAngle.toSignedDoubleDegrees)
-        .exists(a => 37.0 === a +- 1)
+        .exists(a => abs(37.0 - a) <= 1)
     )
     assert(
       intervalSamples
         .map(_.airmass)
         .valueAt[LinearInterpolating](testInstant)
-        .exists(a => 1.6 === a +- 0.1)
+        .exists(a => (1.6 - a) <= 0.1)
     )
 
-    assert(
-      89.0 === intervalSamples
+    assertEqualsDouble(
+      89.0, intervalSamples
         .map(_.altitude)
         .toMap
         .values
         .max
         .map(_.toAngle.toSignedDoubleDegrees)
-        .value +- 1
-    )
-    assert(
-      37.0 === intervalSamples
+        .value, 1)
+    assertEqualsDouble(
+      37.0, intervalSamples
         .map(_.altitude)
         .toMap
         .values
         .min
         .map(_.toAngle.toSignedDoubleDegrees)
-        .value +- 1
-    )
+        .value, 1)
   }
 }

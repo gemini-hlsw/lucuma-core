@@ -3,14 +3,14 @@
 
 package lucuma.core.math
 
-import cats.tests.CatsSuite
 import cats.{ Eq, Show }
 import cats.kernel.laws.discipline._
 import lucuma.core.optics.laws.discipline._
 import lucuma.core.math.arb._
 import monocle.law.discipline._
+import org.scalacheck.Prop._
 
-final class CoordinatesSpec extends CatsSuite {
+final class CoordinatesSuite extends munit.DisciplineSuite {
   import ArbCoordinates._
   import ArbRightAscension._
   import ArbDeclination._
@@ -26,27 +26,27 @@ final class CoordinatesSpec extends CatsSuite {
 
   test("Equality must be natural") {
     forAll { (a: Coordinates, b: Coordinates) =>
-      a.equals(b) shouldEqual Eq[Coordinates].eqv(a, b)
+      assertEquals(a.equals(b), Eq[Coordinates].eqv(a, b))
     }
   }
 
   test("Show must be natural") {
     forAll { (a: Coordinates) =>
-      a.toString shouldEqual Show[Coordinates].show(a)
+      assertEquals(a.toString, Show[Coordinates].show(a))
     }
   }
 
   test("offsetWithCarry must be consistent with offset") {
     forAll { (a: Coordinates, dRA: HourAngle, dDec: Angle) =>
-      a.offset(dRA, dDec) shouldEqual a.offsetWithCarry(dRA, dDec)._1
+      assertEquals(a.offset(dRA, dDec), a.offsetWithCarry(dRA, dDec)._1)
     }
   }
 
   test("offsetWithCarry must be invertable") {
     forAll { (a: Coordinates, dRA: HourAngle, dDec: Angle) =>
       a.offsetWithCarry(dRA, dDec) match {
-        case (cs, false) => cs.offset(-dRA, -dDec) shouldEqual a
-        case (cs, true)  => cs.offset(-dRA, dDec) shouldEqual a
+        case (cs, false) => assertEquals(cs.offset(-dRA, -dDec), a)
+        case (cs, true)  => assertEquals(cs.offset(-dRA, dDec), a)
       }
     }
   }
@@ -54,33 +54,33 @@ final class CoordinatesSpec extends CatsSuite {
   test("diff must be consistent with offset") {
     forAll { (a: Coordinates, b: Coordinates) =>
       val (dRA, dDec) = a.diff(b)
-      a.offset(dRA, dDec) shouldEqual b
+      assertEquals(a.offset(dRA, dDec), b)
     }
   }
 
   test("diff must be consistent with offsetWithCarry, and never carry") {
     forAll { (a: Coordinates, b: Coordinates) =>
       val (dRA, dDec) = a.diff(b)
-      a.offsetWithCarry(dRA, dDec).shouldEqual((b, false))
+      assertEquals(a.offsetWithCarry(dRA, dDec), (b, false))
     }
   }
 
   test("angularDistance must be in [0, 180°]") {
     forAll { (a: Coordinates, b: Coordinates) =>
-      a.angularDistance(b).toMicroarcseconds should be <= Angle.Angle180.toMicroarcseconds
+      assert(a.angularDistance(b).toMicroarcseconds <= Angle.Angle180.toMicroarcseconds)
     }
   }
 
   test("angularDistance must be zero between any point and itself") {
     forAll { (c: Coordinates) =>
-      c.angularDistance(c) shouldEqual Angle.Angle0
+      assertEquals(c.angularDistance(c), Angle.Angle0)
     }
   }
 
   test("angularDistance must be symmetric to within 1µas") {
     forAll { (a: Coordinates, b: Coordinates) =>
       val Δ = a.angularDistance(b) - b.angularDistance(a)
-      Angle.signedMicroarcseconds.get(Δ).abs should be <= 1L
+      assert(Angle.signedMicroarcseconds.get(Δ).abs <= 1L)
     }
   }
 
@@ -88,7 +88,7 @@ final class CoordinatesSpec extends CatsSuite {
     forAll { (ra1: RA, ra2: RA) =>
       val s = Coordinates(ra1, Dec.Min)
       val n = Coordinates(ra2, Dec.Max)
-      n.angularDistance(s) shouldEqual Angle.Angle180
+      assertEquals(n.angularDistance(s), Angle.Angle180)
     }
   }
 
@@ -99,7 +99,7 @@ final class CoordinatesSpec extends CatsSuite {
       val pole  = Coordinates(ra1, if (b) Dec.Min else Dec.Max)
       val point = Coordinates(ra2, Dec.Zero)
       val delta = point.angularDistance(pole)
-      (delta.toMicroarcseconds - Angle.Angle90.toMicroarcseconds).abs should be <= 1L
+      assert((delta.toMicroarcseconds - Angle.Angle90.toMicroarcseconds).abs <= 1L)
     }
   }
 
@@ -110,7 +110,7 @@ final class CoordinatesSpec extends CatsSuite {
       val pole = Coordinates(ra1, if (b) Dec.Min else Dec.Max)
       val Δdec = dec.toAngle + Angle.Angle90 // [0, 180]
       val Δ    = pole.angularDistance(pole.offset(ra2.toHourAngle, Δdec)) - Δdec
-      Angle.signedMicroarcseconds.get(Δ).abs should be <= 1L
+      assert(Angle.signedMicroarcseconds.get(Δ).abs <= 1L)
     }
   }
 
@@ -122,7 +122,7 @@ final class CoordinatesSpec extends CatsSuite {
       val b = a.offset(ha, Angle.Angle0)
       val d = a.angularDistance(b)
       val Δ = Angle.signedMicroarcseconds.get(d).abs - Angle.signedMicroarcseconds.get(ha).abs
-      Δ.abs should be <= 1L
+      assert(Δ.abs <= 1L)
     }
   }
 
@@ -131,7 +131,7 @@ final class CoordinatesSpec extends CatsSuite {
   ) {
     forAll { (a: Coordinates, b: Coordinates) =>
       val Δ = a.angularDistance(a.interpolate(b, 0.0))
-      Angle.signedMicroarcseconds.get(Δ).abs should be <= 15L
+      assert(Angle.signedMicroarcseconds.get(Δ).abs <= 15L)
     }
   }
 
@@ -140,7 +140,7 @@ final class CoordinatesSpec extends CatsSuite {
   ) {
     forAll { (a: Coordinates, b: Coordinates) =>
       val Δ = b.angularDistance(a.interpolate(b, 1.0))
-      Angle.signedMicroarcseconds.get(Δ).abs should be <= 15L
+      assert(Angle.signedMicroarcseconds.get(Δ).abs <= 15L)
     }
   }
 
@@ -156,7 +156,7 @@ final class CoordinatesSpec extends CatsSuite {
         val fracSepʹ = if (fracSep <= µas180) fracSep else µas360 - fracSep
         (stepSep - fracSepʹ).abs
       }
-      Δs.filter(_ > 20L) shouldBe empty
+      assert(Δs.filter(_ > 20L).isEmpty)
     }
 
   }

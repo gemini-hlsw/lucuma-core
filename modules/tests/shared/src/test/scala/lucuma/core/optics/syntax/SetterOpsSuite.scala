@@ -3,10 +3,10 @@
 
 package lucuma.core.optics.syntax
 
-import cats.tests.CatsSuite
 import monocle.Setter
 import org.scalacheck.Arbitrary
 import org.scalacheck.Gen
+import org.scalacheck.Prop._
 
 final case class Person(
   name: String,
@@ -31,28 +31,28 @@ object Person {
 
 }
 
-final class SetterOpsSpec extends CatsSuite {
+final class SetterOpsSuite extends munit.DisciplineSuite {
 
   import setter._
 
   test("SetterOps (1)") {
     forAll { p: Person =>
       // Assign a single property, keeping the other.
-      (Person.name := "Biff").runS(p).value shouldEqual Person("Biff", p.age)
+      assertEquals((Person.name := "Biff").runS(p).value,  Person("Biff", p.age))
     }
   }
 
   test("SetterOps Some (1)") {
     forAll { p: Person =>
       // Assign a single property, keeping the other.
-      (Person.name := Some("Biff")).runS(p).value shouldEqual Person("Biff", p.age)
+      assertEquals((Person.name := Some("Biff")).runS(p).value,  Person("Biff", p.age))
     }
   }
 
   test("SetterOps None (1)") {
     forAll { p: Person =>
       // Assign a single property, keeping the other.
-      (Person.name := None).runS(p).value shouldEqual p
+      assertEquals((Person.name := None).runS(p).value,  p)
     }
   }
 
@@ -60,10 +60,11 @@ final class SetterOpsSpec extends CatsSuite {
     forAll { p: Person =>
 
       // Assign both properties, the initial state is essentially irrelevant.
-      (for {
+      val r = (for {
         _ <- Person.name := "Biff"
         _ <- Person.age  := 99
-      } yield ()).runS(p).value shouldEqual Person("Biff", 99)
+      } yield ()).runS(p).value
+      assertEquals(r, Person("Biff", 99))
 
     }
   }

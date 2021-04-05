@@ -3,15 +3,14 @@
 
 package lucuma.core.math
 
-import cats.tests.CatsSuite
-
-import cats.Eq
-import cats.Show
+import cats._
+import cats.syntax.all._
 import java.time.ZoneId
 import java.time.LocalTime
 import java.time.Instant
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Gen
+import org.scalacheck.Prop._
 import lucuma.core.math.arb._
 import lucuma.core.arb.ArbTime
 import cats.kernel.laws.discipline.BoundedSemilatticeTests
@@ -20,20 +19,26 @@ import monocle.law.discipline.PrismTests
 import lucuma.core.optics.laws.discipline.SplitEpiTests
 import io.chrisdavenport.cats.time._
 
-final class ScheduleSpec extends CatsSuite with IntervalGens {
+final class ScheduleSuite extends munit.DisciplineSuite with IntervalGens {
   import ArbSchedule._
   import ArbInterval._
   import ArbTime._
 
+  // Reduce the search space, to make
+  override def scalaCheckTestParameters =
+    super.scalaCheckTestParameters
+      .withMinSuccessfulTests(20)
+      .withMaxSize(50)
+
   test("Equality must be natural") {
     forAll { (a: Schedule, b: Schedule) =>
-      a.equals(b) shouldEqual Eq[Schedule].eqv(a, b)
+      assertEquals(a.equals(b),  Eq[Schedule].eqv(a, b))
     }
   }
 
   test("Show must be natural") {
     forAll { (a: Schedule) =>
-      a.toString shouldEqual Show[Schedule].show(a)
+      assertEquals(a.toString,  Show[Schedule].show(a))
     }
   }
 

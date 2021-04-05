@@ -5,22 +5,23 @@ package lucuma
 package core
 package data
 
+import cats.syntax.all._
 import cats.data.NonEmptyList
-import cats.tests.CatsSuite
 import cats.kernel.laws.discipline.EqTests
 import cats.laws.discipline.{ FunctorTests, TraverseTests }
 import cats.laws.discipline.arbitrary._
 import monocle.law.discipline.TraversalTests
 import lucuma.core.data.arb.ArbZipper._
+import org.scalacheck.Prop._
 
 /**
   * Tests the Zipper typeclasses
   */
-final class ZipperSpec extends CatsSuite {
+final class ZipperSuite extends munit.DisciplineSuite {
   test("support modify") {
     forAll { (l: List[Int]) =>
       val z = Zipper.fromNel(NonEmptyList(0, l))
-      assert(z.modify(_ => 1) !== z)
+      assert(z.modify(_ => 1) =!= z)
     }
   }
   test("Zipper always has at least one item") {

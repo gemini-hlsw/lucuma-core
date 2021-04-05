@@ -3,9 +3,9 @@
 
 package lucuma.core.math.skycalc.solver
 
-import cats.tests.CatsSuite
 import cats.Eq
 import cats.Eval
+import cats.syntax.all._
 import java.time.Duration
 import scala.collection.immutable.TreeMap
 import lucuma.core.math.Interval
@@ -14,6 +14,7 @@ import lucuma.core.math.skycalc.solver.Samples.Bracket
 import lucuma.core.syntax.time._
 import org.scalacheck.Gen._
 import org.scalacheck.Arbitrary._
+import org.scalacheck.Prop._
 import lucuma.core.math.arb._
 import cats.laws.discipline.FunctorTests
 import cats.laws.discipline.MonoidKTests
@@ -24,7 +25,7 @@ import lucuma.core.arb.ArbEval
 import lucuma.core.arb.ArbTime
 import io.chrisdavenport.cats.time._
 
-final class SamplesSpec extends CatsSuite with IntervalGens {
+final class SamplesSuite extends munit.DisciplineSuite with IntervalGens {
   import ArbEval._
   import ArbInterval._
   import ArbSamples._
@@ -46,7 +47,7 @@ final class SamplesSpec extends CatsSuite with IntervalGens {
       forAll(rateForInterval(interval)) { duration: Duration =>
         val fixedRateSamples = Samples.atFixedRate(interval, duration)(_ => Eval.now(()))
         val instants         = fixedRateSamples.toMap.keys.toList
-        assert(instants.head === interval.start)
+        assertEquals(instants.head, interval.start)
         val last             = instants.last
         val maxSample        = interval.end + duration
         assert(last >= interval.end)

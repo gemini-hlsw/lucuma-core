@@ -3,10 +3,9 @@
 
 package lucuma.core.optics
 
-import cats.tests.CatsSuite
 import lucuma.core.optics.laws.discipline._
 
-final class WedgeSpec extends CatsSuite {
+final class WedgeSuite extends munit.DisciplineSuite {
 
   val se: SplitEpi[Long, Short] =
     SplitEpi(_.toShort, _.toLong)

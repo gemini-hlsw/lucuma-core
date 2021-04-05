@@ -3,20 +3,20 @@
 
 package lucuma.core.math.skycalc.solver
 
-import cats.tests.CatsSuite
-import org.scalacheck.Prop
 import cats.Eq
+import cats.syntax.all._
 import java.time.Duration
 import java.time.Instant
 import org.scalacheck.Arbitrary
 import org.scalacheck.Gen
+import org.scalacheck.Prop
+import org.scalacheck.Prop._
 import lucuma.core.arb.ArbTime
 import lucuma.core.syntax.time._
 import io.chrisdavenport.cats.time._
 import cats.laws.discipline.InvariantSemigroupalTests
-import org.scalactic.Tolerance
 
-final class SampleRounderSpec extends CatsSuite with Tolerance {
+final class SampleRounderSuite extends munit.DisciplineSuite {
   import ArbTime._
 
   implicit def arbRounder[R, A](implicit r: SampleRounder[R, A]) =
@@ -63,7 +63,7 @@ final class SampleRounderSpec extends CatsSuite with Tolerance {
       val i       = List(i0, i1, i2).sorted
       val rounded = rounder.round(i(0), i(0), i(2), i(2), i(1))
       assert(
-        rounded.exists(_.toEpochMilli === i(1).toEpochMilli +- 1)
+        rounded.exists(a => scala.math.abs(a.toEpochMilli - i(1).toEpochMilli) <= 1)
       ) // Since we are rounding to millis, we lose precision
     }
   }
