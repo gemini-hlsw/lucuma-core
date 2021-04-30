@@ -28,27 +28,25 @@ final case class Target(
   magnitudes: SortedMap[MagnitudeBand, Magnitude]
 )
 
-object Target extends WithId with TargetOptics {
-  protected val idTag = 't'
-
+object Target extends WithId('t') with TargetOptics {
   implicit val TargetEq: Eq[Target] =
     Eq.by(x => (x.name, x.track, x.magnitudes))
 
   /**
-    * A target order based on tracking information.  For sidereal targets this
-    * roughly means by base coordinate without applying proper motion.  For
-    * non-sidereal this means by `EphemerisKey`.
-    *
+   * A target order based on tracking information.  For sidereal targets this
+   * roughly means by base coordinate without applying proper motion.  For
+   * non-sidereal this means by `EphemerisKey`.
+   *
    * Not implicit.
-    */
+   */
   val TargetTrackOrder: Order[Target] =
     Order.by(t => (t.track, t.name))
 
   /**
-    * Targets ordered by name first and then tracking information.
-    *
+   * Targets ordered by name first and then tracking information.
+   *
    * Not implicit.
-    */
+   */
   val TargetNameOrder: Order[Target] =
     Order.by(t => (t.name.value, t.track))
 

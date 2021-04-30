@@ -21,13 +21,13 @@ sealed abstract class GmosCustomSlitWidth(
 
 object GmosCustomSlitWidth {
 
-  /** @group Constructors */ case object CustomWidth_0_25 extends GmosCustomSlitWidth("CustomWidth_0_25", "0.25", "0.25 arcsec", Angle.fromDoubleArcseconds(0.25))
-  /** @group Constructors */ case object CustomWidth_0_50 extends GmosCustomSlitWidth("CustomWidth_0_50", "0.50", "0.50 arcsec", Angle.fromDoubleArcseconds(0.50))
-  /** @group Constructors */ case object CustomWidth_0_75 extends GmosCustomSlitWidth("CustomWidth_0_75", "0.75", "0.75 arcsec", Angle.fromDoubleArcseconds(0.75))
-  /** @group Constructors */ case object CustomWidth_1_00 extends GmosCustomSlitWidth("CustomWidth_1_00", "1.00", "1.00 arcsec", Angle.fromDoubleArcseconds(1.00))
-  /** @group Constructors */ case object CustomWidth_1_50 extends GmosCustomSlitWidth("CustomWidth_1_50", "1.50", "1.50 arcsec", Angle.fromDoubleArcseconds(1.50))
-  /** @group Constructors */ case object CustomWidth_2_00 extends GmosCustomSlitWidth("CustomWidth_2_00", "2.00", "2.00 arcsec", Angle.fromDoubleArcseconds(2.00))
-  /** @group Constructors */ case object CustomWidth_5_00 extends GmosCustomSlitWidth("CustomWidth_5_00", "5.00", "5.00 arcsec", Angle.fromDoubleArcseconds(5.00))
+  /** @group Constructors */ case object CustomWidth_0_25 extends GmosCustomSlitWidth("CustomWidth_0_25", "0.25\"", "0.25 arcsec", Angle.fromDoubleArcseconds(0.25))
+  /** @group Constructors */ case object CustomWidth_0_50 extends GmosCustomSlitWidth("CustomWidth_0_50", "0.50\"", "0.50 arcsec", Angle.fromDoubleArcseconds(0.50))
+  /** @group Constructors */ case object CustomWidth_0_75 extends GmosCustomSlitWidth("CustomWidth_0_75", "0.75\"", "0.75 arcsec", Angle.fromDoubleArcseconds(0.75))
+  /** @group Constructors */ case object CustomWidth_1_00 extends GmosCustomSlitWidth("CustomWidth_1_00", "1.00\"", "1.00 arcsec", Angle.fromDoubleArcseconds(1.00))
+  /** @group Constructors */ case object CustomWidth_1_50 extends GmosCustomSlitWidth("CustomWidth_1_50", "1.50\"", "1.50 arcsec", Angle.fromDoubleArcseconds(1.50))
+  /** @group Constructors */ case object CustomWidth_2_00 extends GmosCustomSlitWidth("CustomWidth_2_00", "2.00\"", "2.00 arcsec", Angle.fromDoubleArcseconds(2.00))
+  /** @group Constructors */ case object CustomWidth_5_00 extends GmosCustomSlitWidth("CustomWidth_5_00", "5.00\"", "5.00 arcsec", Angle.fromDoubleArcseconds(5.00))
 
   /** All members of GmosCustomSlitWidth, in canonical order. */
   val all: List[GmosCustomSlitWidth] =

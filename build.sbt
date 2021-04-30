@@ -1,20 +1,20 @@
 import sbtcrossproject.CrossType
 
-lazy val attoVersion                 = "0.9.3"
-lazy val catsVersion                 = "2.6.0"
-lazy val kindProjectorVersion        = "0.11.3"
-lazy val monocleVersion              = "2.1.0"
-lazy val scalaJavaTimeVersion        = "2.2.2"
-lazy val geminiLocalesVersion        = "0.6.0"
-lazy val jtsVersion                  = "0.1.2"
-lazy val svgdotjsVersion             = "0.0.4"
-lazy val coulombVersion              = "0.5.6"
-lazy val spireVersion                = "0.17.0"
-lazy val singletonOpsVersion         = "0.5.2"
-lazy val refinedVersion              = "0.9.24"
-lazy val catsTimeVersion             = "0.3.4"
-lazy val circeVersion                = "0.13.0"
-lazy val catsScalacheckVersion       = "0.3.0"
+lazy val attoVersion           = "0.9.3"
+lazy val catsVersion           = "2.6.0"
+lazy val kindProjectorVersion  = "0.11.3"
+lazy val monocleVersion        = "2.1.0"
+lazy val scalaJavaTimeVersion  = "2.2.2"
+lazy val geminiLocalesVersion  = "0.6.0"
+lazy val jtsVersion            = "0.1.2"
+lazy val svgdotjsVersion       = "0.0.4"
+lazy val coulombVersion        = "0.5.6"
+lazy val spireVersion          = "0.17.0"
+lazy val singletonOpsVersion   = "0.5.2"
+lazy val refinedVersion        = "0.9.24"
+lazy val catsTimeVersion       = "0.3.4"
+lazy val circeVersion          = "0.13.0"
+lazy val catsScalacheckVersion = "0.3.0"
 
 inThisBuild(
   Seq(
@@ -80,13 +80,13 @@ lazy val testkit = crossProject(JVMPlatform, JSPlatform)
   .settings(
     name := "lucuma-core-testkit",
     libraryDependencies ++= Seq(
-      "org.typelevel"              %%% "cats-testkit"           % catsVersion,
-      "com.manyangled"             %%% "coulomb-scalacheck"     % coulombVersion,
-      "com.github.julien-truffaut" %%% "monocle-law"            % monocleVersion,
-      "org.typelevel"              %%% "spire-laws"             % spireVersion,
-      "eu.timepit"                 %%% "refined-scalacheck"     % refinedVersion,
-      "io.circe"                   %%% "circe-testing"          % circeVersion,
-      "io.chrisdavenport"          %%% "cats-scalacheck"        % catsScalacheckVersion
+      "org.typelevel"              %%% "cats-testkit"       % catsVersion,
+      "com.manyangled"             %%% "coulomb-scalacheck" % coulombVersion,
+      "com.github.julien-truffaut" %%% "monocle-law"        % monocleVersion,
+      "org.typelevel"              %%% "spire-laws"         % spireVersion,
+      "eu.timepit"                 %%% "refined-scalacheck" % refinedVersion,
+      "io.circe"                   %%% "circe-testing"      % circeVersion,
+      "io.chrisdavenport"          %%% "cats-scalacheck"    % catsScalacheckVersion
     )
   )
   .jvmConfigure(_.enablePlugins(AutomateHeaderPlugin))
@@ -98,13 +98,12 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform)
   .dependsOn(testkit)
   .settings(
     name := "lucuma-core-tests",
-    skip in publish := true,
+    publish / skip := true,
     libraryDependencies ++= Seq(
       "org.scalameta" %%% "munit"            % "0.7.25" % Test,
       "org.typelevel" %%% "discipline-munit" % "1.0.8"  % Test
     ),
-    testFrameworks += new TestFramework("munit.Framework"),
-    scalaJSUseMainModuleInitializer := true
+    testFrameworks += new TestFramework("munit.Framework")
   )
   .jvmConfigure(_.enablePlugins(AutomateHeaderPlugin))
   .jvmSettings(

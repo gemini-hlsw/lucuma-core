@@ -5,22 +5,10 @@ package lucuma.core.model
 
 import eu.timepit.refined.auto._
 
-object Asterism extends WithId {
-  protected val idTag = 'a'
-}
-
-object Configuration extends WithId {
-  protected val idTag = 'x'
-}
-
-object ConstraintSet extends WithId {
-  protected val idTag = 'c'
-}
-
-object Observation extends WithId {
-  protected val idTag = 'o'
-}
-
-object Program extends WithId {
-  protected val idTag = 'p'
-}
+object Asterism      extends WithId('a')
+object Atom          extends WithId('m')
+object Configuration extends WithId('x')
+object ConstraintSet extends WithId('c')
+object Observation   extends WithId('o')
+object Program       extends WithId('p')
+object Step          extends WithId('s')

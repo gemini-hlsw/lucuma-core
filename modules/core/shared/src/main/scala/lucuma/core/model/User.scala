@@ -16,9 +16,9 @@ sealed trait User extends Product with Serializable {
   def role: Role
 
   /**
-    * A name to display in interfaces. This is never empty, and respects users' formatting
-    * preferences as specified in their ORCID record.
-    */
+   * A name to display in interfaces. This is never empty, and respects users' formatting
+   * preferences as specified in their ORCID record.
+   */
   def displayName: String
 
   /** Verity that this user has access greater than or equal to `access`. */
@@ -26,17 +26,14 @@ sealed trait User extends Product with Serializable {
     access:      Access
   )(implicit ev: ApplicativeError[F, Throwable]): F[Unit] =
     ev.raiseError(
-        new AccessControlException(
-          s"$displayName (User ${id.value}, $role) does not have required access $access."
-        )
+      new AccessControlException(
+        s"$displayName (User ${id.value}, $role) does not have required access $access."
       )
-      .whenA(role.access < access)
+    ).whenA(role.access < access)
 
 }
 
-object User extends WithId {
-  protected val idTag = 'u'
-
+object User extends WithId('u') {
   implicit val eqUser: Eq[User] = Eq.instance {
     case (a: GuestUser, b: GuestUser)       => a === b
     case (a: ServiceUser, b: ServiceUser)   => a === b
@@ -67,9 +64,9 @@ object ServiceUser {
 }
 
 /**
-  * Standard users are authenticated and have a current role and ORCID profile, as well as a set of
-  * other roles they can assume.
-  */
+ * Standard users are authenticated and have a current role and ORCID profile, as well as a set of
+ * other roles they can assume.
+ */
 final case class StandardUser(
   id:         User.Id,
   role:       StandardRole,

@@ -11,10 +11,7 @@ import eu.timepit.refined.types.numeric.PosLong
 /**
  * Defines `<Entity>.Id` class, its `Gid` instance, and convenience methods.
  */
-trait WithId {
-
-  /** Tag for Gid instance */
-  protected val idTag: Char Refined Letter
+class WithId(idTag: Char Refined Letter) {
 
   /** Id class for `<Entity>` */
   case class Id(value: PosLong) {
