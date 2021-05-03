@@ -8,9 +8,9 @@ import cats.implicits._
 import eu.timepit.refined.auto._
 
 /**
-  * Each user has a current `Role` and a set of other roles they may assume. A role has (at least)
-  * an `Access` level.
-  */
+ * Each user has a current `Role` and a set of other roles they may assume. A role has (at least)
+ * an `Access` level.
+ */
 sealed abstract class Role(val access: Access, elaboration: Option[String] = None) {
   final def name = elaboration.foldLeft(access.name)((n, e) => s"$n ($e)")
 }
@@ -41,8 +41,7 @@ sealed abstract class StandardRole(access: Access, elaboration: Option[String] =
     extends Role(access, elaboration) {
   def id: StandardRole.Id
 }
-object StandardRole extends WithId {
-  protected val idTag = 'r'
+object StandardRole extends WithId('r') {
 
   /** The `Pi` role gives access to programs on which the user is a collaborator. */
   final case class Pi(id: StandardRole.Id) extends StandardRole(Access.Pi)
