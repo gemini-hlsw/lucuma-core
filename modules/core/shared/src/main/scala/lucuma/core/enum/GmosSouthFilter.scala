@@ -44,7 +44,7 @@ object GmosSouthFilter {
   /** @group Constructors */ case object GPrime_GG455 extends GmosSouthFilter("GPrime_GG455", "g+GG455", "g_G0325 + GG455_G0329", Wavelength.unsafeFromInt(506000), false, Interval(Wavelength.unsafeFromInt(460000), Wavelength.unsafeFromInt(552000)).some)
   /** @group Constructors */ case object GPrime_OG515 extends GmosSouthFilter("GPrime_OG515", "g+OG515", "g_G0325 + OG515_G0330", Wavelength.unsafeFromInt(536000), false, Interval(Wavelength.unsafeFromInt(520000), Wavelength.unsafeFromInt(552000)).some)
   /** @group Constructors */ case object RPrime_RG610 extends GmosSouthFilter("RPrime_RG610", "r+RG610", "r_G0326 + RG610_G0331", Wavelength.unsafeFromInt(657000), false, Interval(Wavelength.unsafeFromInt(615000), Wavelength.unsafeFromInt(698000)).some)
-  /** @group Constructors */ case object IPrime_RG780 extends GmosSouthFilter("IPrime_RG780", "i+RG780", "i_G0327 + RG780_G0334", Wavelength.unsafeFromInt(819000), false, none)
+  /** @group Constructors */ case object IPrime_RG780 extends GmosSouthFilter("IPrime_RG780", "i+RG780", "i_G0327 + RG780_G0334", Wavelength.unsafeFromInt(819000), false, Interval(Wavelength.unsafeFromInt(777000), Wavelength.unsafeFromInt(851000)).some)
   /** @group Constructors */ case object IPrime_CaT extends GmosSouthFilter("IPrime_CaT", "i+CaT", "i_G0327 + CaT_G0333", Wavelength.unsafeFromInt(815000), false, Interval(Wavelength.unsafeFromInt(780000), Wavelength.unsafeFromInt(850000)).some)
   /** @group Constructors */ case object ZPrime_CaT extends GmosSouthFilter("ZPrime_CaT", "z+Cat", "z_G0328 + CaT_G0333", Wavelength.unsafeFromInt(890000), false, Interval(Wavelength.unsafeFromInt(848000), Wavelength.unsafeFromInt(933000)).some)
   /** @group Constructors */ case object Ha extends GmosSouthFilter("Ha", "Ha", "Ha_G0336", Wavelength.unsafeFromInt(656000), false, Interval(Wavelength.unsafeFromInt(654000), Wavelength.unsafeFromInt(661000)).some)
@@ -54,7 +54,7 @@ object GmosSouthFilter {
   /** @group Constructors */ case object OIIIC extends GmosSouthFilter("OIIIC", "OIIIC", "OIIIC_G0339", Wavelength.unsafeFromInt(514000), false, Interval(Wavelength.unsafeFromInt(509000), Wavelength.unsafeFromInt(519000)).some)
   /** @group Constructors */ case object HeII extends GmosSouthFilter("HeII", "HeII", "HeII_G0340", Wavelength.unsafeFromInt(468000), false, Interval(Wavelength.unsafeFromInt(464000), Wavelength.unsafeFromInt(472000)).some)
   /** @group Constructors */ case object HeIIC extends GmosSouthFilter("HeIIC", "HeIIC", "HeIIC_G0341", Wavelength.unsafeFromInt(478000), false, Interval(Wavelength.unsafeFromInt(474000), Wavelength.unsafeFromInt(482000)).some)
-  /** @group Constructors */ case object Lya395 extends GmosSouthFilter("Lya395", "Lya395", "Lya395_G0342", Wavelength.unsafeFromInt(396000), false, none)
+  /** @group Constructors */ case object Lya395 extends GmosSouthFilter("Lya395", "Lya395", "Lya395_G0342", Wavelength.unsafeFromInt(396000), true, none)
 
   /** All members of GmosSouthFilter, in canonical order. */
   val all: List[GmosSouthFilter] =
