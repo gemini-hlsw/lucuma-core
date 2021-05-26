@@ -13,7 +13,7 @@ lazy val spireVersion          = "0.17.0"
 lazy val singletonOpsVersion   = "0.5.2"
 lazy val refinedVersion        = "0.9.26"
 lazy val catsTimeVersion       = "0.3.4"
-lazy val circeVersion          = "0.14.0"
+lazy val circeVersion          = "0.14.1"
 lazy val catsScalacheckVersion = "0.3.0"
 
 inThisBuild(
