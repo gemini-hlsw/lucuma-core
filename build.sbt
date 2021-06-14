@@ -112,7 +112,7 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform)
     ),
     libraryDependencies ++= Seq(
       "edu.gemini.ocs" %% "edu-gemini-util-skycalc"     % "2020001.1.7" % Test,
-      "com.47deg"      %% "scalacheck-toolbox-datetime" % "0.5.0"       % Test
+      "com.47deg"      %% "scalacheck-toolbox-datetime" % "0.6.0"       % Test
     )
   )
   .jsSettings(lucumaScalaJsSettings: _*)
