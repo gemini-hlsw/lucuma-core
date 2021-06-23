@@ -22,7 +22,17 @@ object ObsStatus {
 
   /** @group Typeclass Instances */
   implicit val ObsStatusEnumerated: Enumerated[ObsStatus] =
-    Enumerated.of(New, Included, Proposed, Approved, ForReview, Ready, Ongoing, Observed)
+    Enumerated.of(
+      New,
+      Included,
+      Proposed,
+      Approved,
+      ForReview,
+      Ready,
+      Ongoing,
+      Observed
+    )
 
-  implicit val ObsStatusDisplay: Display[ObsStatus] = Display.byShortName(_.label)
+  implicit val ObsStatusDisplay: Display[ObsStatus] =
+    Display.byShortName(_.label)
 }
