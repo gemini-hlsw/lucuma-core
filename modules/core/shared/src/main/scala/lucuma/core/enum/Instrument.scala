@@ -37,6 +37,9 @@ object Instrument {
   /** @group Constructors */ case object Phoenix    extends Instrument("Phoenix", "Phoenix", "Phoenix", false)
   /** @group Constructors */ case object Trecs      extends Instrument("Trecs", "TReCS", "TReCS", false)
   /** @group Constructors */ case object Visitor    extends Instrument("Visitor", "Visitor Instrument", "Visitor Instrument", false)
+  /** @group Constructors */ case object Scorpio    extends Instrument("Scorpio", "SCORPIO", "Scorpio", false)
+  /** @group Constructors */ case object Alopeke    extends Instrument("Alopeke", "ALOPEKE", "Alopeke", false)
+  /** @group Constructors */ case object Zorro      extends Instrument("Zorro", "ZORRO", "Zorro", false)
 
   /** All members of Instrument, in canonical order. */
   val all: List[Instrument] =
@@ -56,7 +59,10 @@ object Instrument {
       Niri,
       Phoenix,
       Trecs,
-      Visitor
+      Visitor,
+      Scorpio,
+      Alopeke,
+      Zorro
     )
 
   /** Select the member of Instrument with the given tag, if any. */
