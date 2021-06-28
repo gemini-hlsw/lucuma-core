@@ -56,3 +56,5 @@ metals.sbt
 # Hydra
 project/hydra.sbt
 .hydra/
+
+gnupg*
