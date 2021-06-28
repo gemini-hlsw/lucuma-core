@@ -11,11 +11,7 @@ jobs:
       - uses: olafurpg/setup-scala@v11
       - uses: olafurpg/setup-gpg@v3
       - name: Publish
-        run: |
-          git status
-          git tag -n
-          sbt ci-release
-          git status
+        run: sbt ci-release
         env:
           PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
           PGP_SECRET: ${{ secrets.PGP_SECRET }}
