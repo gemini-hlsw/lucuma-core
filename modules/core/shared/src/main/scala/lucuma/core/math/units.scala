@@ -40,8 +40,13 @@ trait units {
   implicit val defineUnitYear =
     DerivedUnit[Year, Day](Rational(365), abbv = "y")
 
+  private val DeciArcSecondsPerDegree: SafeLong  = 3600 * 10L
   private val MiliArcSecondsPerDegree: SafeLong  = 3600 * 1000L
   private val MicroArcSecondsPerDegree: SafeLong = 3600 * 1000000L
+
+  trait DeciArcSecond
+  implicit val defineUnitDeciArcSecond =
+    DerivedUnit[DeciArcSecond, Degree](Rational(1, DeciArcSecondsPerDegree), abbv = "das")
 
   trait MilliArcSecond
   implicit val defineUnitMilliArcSecond =

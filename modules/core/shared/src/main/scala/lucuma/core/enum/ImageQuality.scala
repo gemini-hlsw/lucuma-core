@@ -3,23 +3,30 @@
 
 package lucuma.core.enum
 
+import coulomb._
+import coulomb.accepted.ArcSecond
+import eu.timepit.refined._
+import eu.timepit.refined.numeric.Positive
+import eu.timepit.refined.types.numeric.PosInt
+import lucuma.core.math.units.DeciArcSecond
 import lucuma.core.util.{ Display, Enumerated }
+import spire.math.Rational
 
-sealed abstract class ImageQuality(val toDeciArcSeconds: Int) extends Product with Serializable {
-  def toArcSeconds: Double = toDeciArcSeconds / 10.0
-  def label: String        = f"""< $toArcSeconds%.1f\""""
+sealed abstract class ImageQuality(val toDeciArcSeconds: Quantity[PosInt, DeciArcSecond]) extends Product with Serializable {
+  def toArcSeconds: Quantity[Rational, ArcSecond] = toDeciArcSeconds.to[Rational, ArcSecond]
+  def label: String        = f"""< ${toArcSeconds.value.toDouble}%.1f\""""
 }
 
 object ImageQuality {
-  case object PointOne     extends ImageQuality(1)
-  case object PointTwo     extends ImageQuality(2)
-  case object PointThree   extends ImageQuality(3)
-  case object PointFour    extends ImageQuality(4)
-  case object PointSix     extends ImageQuality(6)
-  case object PointEight   extends ImageQuality(8)
-  case object OnePointZero extends ImageQuality(10)
-  case object OnePointFive extends ImageQuality(15)
-  case object TwoPointZero extends ImageQuality(20)
+  case object PointOne     extends ImageQuality(refineMV[Positive](1).withUnit[DeciArcSecond])
+  case object PointTwo     extends ImageQuality(refineMV[Positive](2).withUnit[DeciArcSecond])
+  case object PointThree   extends ImageQuality(refineMV[Positive](3).withUnit[DeciArcSecond])
+  case object PointFour    extends ImageQuality(refineMV[Positive](4).withUnit[DeciArcSecond])
+  case object PointSix     extends ImageQuality(refineMV[Positive](6).withUnit[DeciArcSecond])
+  case object PointEight   extends ImageQuality(refineMV[Positive](8).withUnit[DeciArcSecond])
+  case object OnePointZero extends ImageQuality(refineMV[Positive](10).withUnit[DeciArcSecond])
+  case object OnePointFive extends ImageQuality(refineMV[Positive](15).withUnit[DeciArcSecond])
+  case object TwoPointZero extends ImageQuality(refineMV[Positive](20).withUnit[DeciArcSecond])
 
   implicit val ImageQualityEnumerated: Enumerated[ImageQuality] =
     Enumerated.of(PointOne,
