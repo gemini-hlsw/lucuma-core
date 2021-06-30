@@ -28,7 +28,7 @@ object GmosNorthDisperser {
   /** @group Constructors */ case object R600_G5304 extends GmosNorthDisperser("R600_G5304", "R600", "R600_G5304", 600, false)
   /** @group Constructors */ case object B480_G5309 extends GmosNorthDisperser("B480_G5309", "B480", "B480_G5309", 480, false)
   /** @group Constructors */ case object R400_G5305 extends GmosNorthDisperser("R400_G5305", "R400", "R400_G5305", 400, false)
-  /** @group Constructors */ case object R150_G5306 extends GmosNorthDisperser("R150_G5306", "R150", "R150_G5306", 150, false)
+  /** @group Constructors */ case object R150_G5306 extends GmosNorthDisperser("R150_G5306", "R150", "R150_G5306", 150, true)
   /** @group Constructors */ case object R150_G5308 extends GmosNorthDisperser("R150_G5308", "R150", "R150_G5308", 150, false)
 
   /** All members of GmosNorthDisperser, in canonical order. */
