@@ -5,7 +5,7 @@ package lucuma.core.optics.syntax
 
 import cats.data.State
 import monocle.Setter
-import monocle.state.all._
+import lucuma.core.optics.state.all._
 
 final class SetterOps[S, A](val self: Setter[S, A]) extends AnyVal {
 

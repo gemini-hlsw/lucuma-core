@@ -171,7 +171,7 @@ object Zipper extends ZipperFactory[Zipper] {
     */
   def unsafeSelect[A](predicate: A => Boolean): Traversal[Zipper[A], A] =
     new Traversal[Zipper[A], A] {
-      override def modifyF[F[_]: Applicative](f: A => F[A])(s: Zipper[A]): F[Zipper[A]] = {
+      override def modifyA[F[_]: Applicative](f: A => F[A])(s: Zipper[A]): F[Zipper[A]] = {
         val lefts: F[List[A]]  = s.lefts.traverse {
           case x if predicate(x) => f(x)
           case x                 => x.pure[F]

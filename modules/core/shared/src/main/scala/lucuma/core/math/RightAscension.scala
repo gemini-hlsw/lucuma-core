@@ -85,9 +85,9 @@ trait RightAscensionOptics { this: RightAscension.type =>
     Iso(RightAscension(_))(_.toHourAngle)
 
   val fromStringHMS: Format[String, RightAscension] =
-    HourAngle.fromStringHMS.composeIso(fromHourAngle)
+    HourAngle.fromStringHMS.andThen(fromHourAngle)
 
   val fromAngleExact: Prism[Angle, RightAscension] =
-    Angle.hourAngleExact.composeIso(fromHourAngle)
+    Angle.hourAngleExact.andThen(fromHourAngle)
 
 }

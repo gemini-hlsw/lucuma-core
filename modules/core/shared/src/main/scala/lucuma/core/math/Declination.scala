@@ -100,6 +100,6 @@ trait DeclinationOptics { this: Declination.type =>
     }(_.toAngle)
 
   val fromStringSignedDMS: Format[String, Declination] =
-    Angle.fromStringSignedDMS.composePrism(fromAngle)
+    Angle.fromStringSignedDMS.andThen(fromAngle)
 
 }

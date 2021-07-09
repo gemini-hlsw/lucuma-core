@@ -14,7 +14,7 @@ import cats._
 import cats.syntax.all._
 import lucuma.core.math._
 import monocle.Lens
-import monocle.macros.GenLens
+import monocle.Focus
 
 /**
   * Time-parameterized coordinates, based on an observed position at some point in time (called
@@ -203,26 +203,26 @@ trait SiderealTrackingOptics {
 
   /** @group Optics */
   val baseCoordinates: Lens[SiderealTracking, Coordinates] =
-    GenLens[SiderealTracking](_.baseCoordinates)
+    Focus[SiderealTracking](_.baseCoordinates)
 
   /** @group Optics */
   val catalogId: Lens[SiderealTracking, Option[CatalogId]] =
-    GenLens[SiderealTracking](_.catalogId)
+    Focus[SiderealTracking](_.catalogId)
 
   /** @group Optics */
   val epoch: Lens[SiderealTracking, Epoch] =
-    GenLens[SiderealTracking](_.epoch)
+    Focus[SiderealTracking](_.epoch)
 
   /** @group Optics */
   val properMotion: Lens[SiderealTracking, Option[ProperMotion]] =
-    GenLens[SiderealTracking](_.properMotion)
+    Focus[SiderealTracking](_.properMotion)
 
   /** @group Optics */
   val radialVelocity: Lens[SiderealTracking, Option[RadialVelocity]] =
-    GenLens[SiderealTracking](_.radialVelocity)
+    Focus[SiderealTracking](_.radialVelocity)
 
   /** @group Optics */
   val parallax: Lens[SiderealTracking, Option[Parallax]] =
-    GenLens[SiderealTracking](_.parallax)
+    Focus[SiderealTracking](_.parallax)
 
 }

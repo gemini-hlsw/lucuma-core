@@ -7,7 +7,7 @@ import lucuma.core.math._
 
 import cats._
 import monocle.Lens
-import monocle.macros.GenLens
+import monocle.Focus
 
 /** A coordinate along with a rate of change in RA and Dec for some time unit,
   * expressed as an offset in p and q.  In reality the velocity information
@@ -27,7 +27,7 @@ final case class EphemerisCoordinates(
   def interpolate(that: EphemerisCoordinates, f: Double): EphemerisCoordinates = {
     def interpolateAngle(a: Angle, b: Angle): Angle =
       Angle.fromMicroarcseconds(
-        (Angle.signedMicroarcseconds.get(a).toDouble * (1 - f) + Angle.signedMicroarcseconds.get(b) * f).round
+        (Angle.signedMicroarcseconds.get(a).toDouble * (1 - f) + Angle.signedMicroarcseconds.get( b) * f).round
       )
 
     val coordʹ = coord.interpolate(that.coord, f)
@@ -58,26 +58,26 @@ trait EphemerisCoordinatesOptics {
 
   /** @group Optics */
   val coordinates: Lens[EphemerisCoordinates, Coordinates] =
-    GenLens[EphemerisCoordinates](_.coord)
+    Focus[EphemerisCoordinates](_.coord)
 
   /** @group Optics */
   val delta: Lens[EphemerisCoordinates, Offset] =
-    GenLens[EphemerisCoordinates](_.delta)
+    Focus[EphemerisCoordinates](_.delta)
 
   /** @group Optics */
   val rightAscension: Lens[EphemerisCoordinates, RightAscension] =
-    coordinates composeLens Coordinates.rightAscension
+    coordinates.andThen(Coordinates.rightAscension)
 
   /** @group Optics */
   val declination: Lens[EphemerisCoordinates, Declination] =
-    coordinates composeLens Coordinates.declination
+    coordinates.andThen(Coordinates.declination)
 
   /** @group Optics */
   val deltaP: Lens[EphemerisCoordinates, Offset.P] =
-    delta composeLens Offset.p
+    delta.andThen(Offset.p)
 
   /** @group Optics */
   val deltaQ: Lens[EphemerisCoordinates, Offset.Q] =
-    delta composeLens Offset.q
+    delta.andThen(Offset.q)
 
 }

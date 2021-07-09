@@ -36,19 +36,19 @@ final case class SplitEpi[A, B](get: A => B, reverseGet: B => A) {
     SplitMono(reverseGet, get)
 
   /** Compose with another SplitEpi. */
-  def composeSplitEpi[C](f: SplitEpi[B, C]): SplitEpi[A, C] =
+  def andThen[C](f: SplitEpi[B, C]): SplitEpi[A, C] =
     SplitEpi(get.andThen(f.get), reverseGet.compose(f.reverseGet))
 
   /** Compose with another SplitEpi. */
-  def composeSplitMono[C](f: SplitMono[B, C]): Wedge[A, C] =
+  def andThen[C](f: SplitMono[B, C]): Wedge[A, C] =
     Wedge(get.andThen(f.get), reverseGet.compose(f.reverseGet))
 
   /** Compose with an Iso. */
-  def composeIso[C](f: Iso[B, C]): SplitEpi[A, C] =
+  def andThen[C](f: Iso[B, C]): SplitEpi[A, C] =
     SplitEpi(get.andThen(f.get), reverseGet.compose(f.reverseGet))
 
   /** Compose with a Prism to get a Format. */
-  def composePrism[C](bc: Prism[B, C]): Format[A, C] =
+  def andThen[C](bc: Prism[B, C]): Format[A, C] =
     Format(a => bc.getOption(get(a)), reverseGet.compose(bc.reverseGet))
 
   /** View this SplitEpi as a Format. */
@@ -58,18 +58,6 @@ final case class SplitEpi[A, B](get: A => B, reverseGet: B => A) {
   /** View this SplitEpi as a Wedge. */
   def asWedge: Wedge[A, B] =
     Wedge(get, reverseGet)
-
-  /** Alias to composeSplitEpi. */
-  def ^<-![C](f: SplitEpi[B, C]): SplitEpi[A, C] =
-    composeSplitEpi(f)
-
-  /** Alias to composeIso. */
-  def ^<->[C](f: Iso[B, C]): SplitEpi[A, C] =
-    composeIso(f)
-
-  /** Alias to composePrism. */
-  def ^<-?[C](f: Prism[B, C]): Format[A, C] =
-    composePrism(f)
 
   /** SplitEpi is an invariant functor over A. */
   def imapA[C](f: C => B, g: B => C): SplitEpi[A, C] =
@@ -118,7 +106,7 @@ object SplitEpi {
   implicit def SplitEpiCategory: Category[SplitEpi] =
     new Category[SplitEpi] {
       def id[A]: SplitEpi[A, A] = SplitEpi(identity, identity)
-      def compose[A, B, C](f: SplitEpi[B, C], g: SplitEpi[A, B]): SplitEpi[A, C] = g ^<-! f
+      def compose[A, B, C](f: SplitEpi[B, C], g: SplitEpi[A, B]): SplitEpi[A, C] = g.andThen(f)
     }
 
 }
