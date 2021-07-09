@@ -7,14 +7,13 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2.3.4
+        with:
+          fetch-depth: 0
       - uses: olafurpg/setup-scala@v12
       - uses: olafurpg/setup-gpg@v3
       - name: Publish
-        run: |
-          git status
-          sbt ci-release
-          git status
+        run: sbt ci-release
         env:
           PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
           PGP_SECRET: ${{ secrets.PGP_SECRET }}
