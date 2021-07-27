@@ -7,7 +7,7 @@ import eu.timepit.refined.auto._
 
 object Asterism       extends WithId('a')
 object Atom           extends WithId('m')
-object Configuration  extends WithId('x')
+object Configuration  extends WithId('c')
 object Dataset        extends WithId('d')
 object ExecutionEvent extends WithId('e')
 object Observation    extends WithId('o')
