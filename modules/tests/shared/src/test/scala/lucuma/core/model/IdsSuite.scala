@@ -11,8 +11,11 @@ final class IdsSuite extends DisciplineSuite {
   import ArbGid._
 
   checkAll("Asterism.Id", GidTests[Asterism.Id].gid)
+  checkAll("Atom.Id", GidTests[Atom.Id].gid)
   checkAll("Configuration.Id", GidTests[Configuration.Id].gid)
-  checkAll("ConstraintSet.Id", GidTests[ConstraintSet.Id].gid)
+  checkAll("Dataset.Id", GidTests[Dataset.Id].gid)
+  checkAll("ExecutionEvent.Id", GidTests[ExecutionEvent.Id].gid)
   checkAll("Observation.Id", GidTests[Observation.Id].gid)
   checkAll("Program.Id", GidTests[Program.Id].gid)
+  checkAll("Step.Id", GidTests[Step.Id].gid)
 }
