@@ -4,17 +4,19 @@
 package lucuma.core.util
 
 import cats._
-import cats.kernel.BoundedEnumerable
 import cats.implicits._
-import monocle.{ Iso, Prism }
-import scala.util.matching.Regex
-import eu.timepit.refined.char.Letter
-import eu.timepit.refined.types.numeric.PosLong
-import eu.timepit.refined.numeric.Positive
+import cats.kernel.BoundedEnumerable
 import eu.timepit.refined._
 import eu.timepit.refined.api.Refined
+import eu.timepit.refined.char.Letter
+import eu.timepit.refined.numeric.Positive
+import eu.timepit.refined.types.numeric.PosLong
 import io.circe._
 import io.circe.syntax._
+import monocle.Iso
+import monocle.Prism
+
+import scala.util.matching.Regex
 
 /**
  * A typeclass for Lucuma identifiers, which are of the form T-26fd21b3 where T is a constant,

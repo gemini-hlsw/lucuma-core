@@ -4,9 +4,10 @@
 package lucuma.core.model
 
 import lucuma.core.enum.Site
-
-import java.time.{ Duration, Instant }
 import lucuma.core.math.Interval
+
+import java.time.Duration
+import java.time.Instant
 
 /** Description of the start/end times for a night according to some criterion.
   * For example, the official observing night begins and ends at 2PM local time

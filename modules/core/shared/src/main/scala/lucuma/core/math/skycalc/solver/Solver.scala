@@ -4,12 +4,13 @@
 package lucuma.core.math.skycalc.solver
 
 import cats.syntax.all._
-import java.time.Duration
-import java.time.Instant
+import io.chrisdavenport.cats.time._
 import lucuma.core.math.Interval
 import lucuma.core.math.Schedule
 import lucuma.core.syntax.time._
-import io.chrisdavenport.cats.time._
+
+import java.time.Duration
+import java.time.Instant
 import scala.annotation.tailrec
 
 object SolverStrategy {

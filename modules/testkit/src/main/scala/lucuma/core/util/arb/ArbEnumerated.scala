@@ -7,8 +7,8 @@ package util
 package arb
 
 import lucuma.core.util.Enumerated
-import org.scalacheck._
 import org.scalacheck.Gen._
+import org.scalacheck._
 
 trait ArbEnumerated {
 

@@ -5,12 +5,13 @@ package lucuma.core.math.skycalc
 
 import lucuma.core.math.Constants._
 import lucuma.core.math.JulianDate.J2000
+import spire.std.double._
+
 import java.time.Instant
 import java.time.LocalTime
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import scala.annotation.unused
-import spire.std.double._
 
 trait ImprovedSkyCalcMethods {
 

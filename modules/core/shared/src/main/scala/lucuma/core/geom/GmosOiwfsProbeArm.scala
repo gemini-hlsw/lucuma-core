@@ -3,13 +3,21 @@
 
 package lucuma.core.geom
 
-import lucuma.core.math.{ Angle, Offset }
-import lucuma.core.math.syntax.int._
-import lucuma.core.geom.syntax.all._
-import lucuma.core.enum.{ GmosNorthFpu, GmosSouthFpu, PortDisposition }
-import lucuma.core.geom.ShapeExpression
 import cats.syntax.all._
-import scala.math.{ Pi, asin, atan2, hypot, sin }
+import lucuma.core.enum.GmosNorthFpu
+import lucuma.core.enum.GmosSouthFpu
+import lucuma.core.enum.PortDisposition
+import lucuma.core.geom.ShapeExpression
+import lucuma.core.geom.syntax.all._
+import lucuma.core.math.Angle
+import lucuma.core.math.Offset
+import lucuma.core.math.syntax.int._
+
+import scala.math.Pi
+import scala.math.asin
+import scala.math.atan2
+import scala.math.hypot
+import scala.math.sin
 
 /**
   * Description of the GMOS OIWFS probe arm geometry.

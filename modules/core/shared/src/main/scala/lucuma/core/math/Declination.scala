@@ -3,9 +3,10 @@
 
 package lucuma.core.math
 
-import cats.{ Order, Show }
-import lucuma.core.syntax.all._
+import cats.Order
+import cats.Show
 import lucuma.core.optics.Format
+import lucuma.core.syntax.all._
 import monocle.Prism
 
 /**

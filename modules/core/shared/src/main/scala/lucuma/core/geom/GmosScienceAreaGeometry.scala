@@ -3,10 +3,12 @@
 
 package lucuma.core.geom
 
-import lucuma.core.enum.{ GmosNorthFpu, GmosSouthFpu }
-import lucuma.core.math.{ Angle, Offset }
+import lucuma.core.enum.GmosNorthFpu
+import lucuma.core.enum.GmosSouthFpu
 import lucuma.core.geom._
 import lucuma.core.geom.syntax.all._
+import lucuma.core.math.Angle
+import lucuma.core.math.Offset
 import lucuma.core.math.syntax.int._
 
 /**

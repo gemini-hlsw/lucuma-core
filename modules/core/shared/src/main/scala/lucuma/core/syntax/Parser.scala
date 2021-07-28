@@ -3,7 +3,9 @@
 
 package lucuma.core.syntax
 
-import atto._, Atto._
+import atto._
+
+import Atto._
 
 final class ParserOps[A](val self: Parser[A]) extends AnyVal {
 

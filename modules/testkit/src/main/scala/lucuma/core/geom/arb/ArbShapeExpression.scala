@@ -5,11 +5,12 @@ package lucuma.core.geom
 package arb
 
 import lucuma.core.geom.syntax.all._
-import lucuma.core.math.syntax.int._
-import lucuma.core.math.{ Angle, Offset }
+import lucuma.core.math.Angle
+import lucuma.core.math.Offset
 import lucuma.core.math.arb._
-import org.scalacheck._
+import lucuma.core.math.syntax.int._
 import org.scalacheck.Arbitrary._
+import org.scalacheck._
 
 trait ArbShapeExpression {
 

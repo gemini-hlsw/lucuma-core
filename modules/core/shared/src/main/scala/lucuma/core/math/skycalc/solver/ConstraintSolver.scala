@@ -3,12 +3,13 @@
 
 package lucuma.core.math.skycalc.solver
 
-import java.time.Duration
 import lucuma.core.math.Declination
 import lucuma.core.math.HourAngle
 import lucuma.core.math.Interval
 import lucuma.core.math.Schedule
 import lucuma.core.math.skycalc.SkyCalcResults
+
+import java.time.Duration
 
 /**
   * Convenience class to find a [[lucuma.core.math.Schedule]] meeting a [[Constraint]]

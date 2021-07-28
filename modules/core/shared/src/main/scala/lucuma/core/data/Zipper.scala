@@ -6,9 +6,10 @@ package core
 package data
 
 import cats._
-import cats.syntax.all._
 import cats.data.NonEmptyList
-import monocle.{ Prism, Traversal }
+import cats.syntax.all._
+import monocle.Prism
+import monocle.Traversal
 
 /**
   * Minimal zipper based on scalaz's implementation

@@ -4,10 +4,13 @@
 package lucuma.core.instances
 
 import cats._
-import cats.kernel.{ BoundedSemilattice, Hash, Order }
-import scala.collection.immutable.TreeSet
-import scala.annotation.tailrec
+import cats.kernel.BoundedSemilattice
+import cats.kernel.Hash
+import cats.kernel.Order
 import cats.syntax.all._
+
+import scala.annotation.tailrec
+import scala.collection.immutable.TreeSet
 
 trait TreeSetInstances extends TreeSetInstances1 {
 

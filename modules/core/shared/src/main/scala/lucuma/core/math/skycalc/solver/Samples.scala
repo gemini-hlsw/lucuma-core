@@ -4,14 +4,21 @@
 package lucuma.core.math.skycalc
 package solver
 
+import cats.Eq
+import cats.Eval
+import cats.Functor
+import cats.MonoidK
 import cats.syntax.all._
-import cats.{ Eq, Eval, Functor, MonoidK }
-import java.time.{ Duration, Instant }
-import lucuma.core.math.{ Coordinates, Interval, Place }
-import lucuma.core.syntax.time._
-import scala.collection.immutable.TreeMap
-import monocle.Iso
 import io.chrisdavenport.cats.time._
+import lucuma.core.math.Coordinates
+import lucuma.core.math.Interval
+import lucuma.core.math.Place
+import lucuma.core.syntax.time._
+import monocle.Iso
+
+import java.time.Duration
+import java.time.Instant
+import scala.collection.immutable.TreeMap
 
 /**
  * A set of samples, keyed by `Instant`. Samples are lazy and must be forced by the user, and

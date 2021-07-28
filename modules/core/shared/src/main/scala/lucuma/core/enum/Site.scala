@@ -5,17 +5,18 @@ package lucuma
 package core
 package enum
 import cats.syntax.eq._
-import java.time.ZoneId
-import lucuma.core.util.Enumerated
+import coulomb.Quantity
+import coulomb.refined._
+import coulomb.si.Meter
+import eu.timepit.refined.numeric._
+import eu.timepit.refined.types.numeric.NonNegInt
 import lucuma.core.math.Angle
 import lucuma.core.math.Lat
 import lucuma.core.math.Lon
 import lucuma.core.math.Place
-import coulomb.Quantity
-import coulomb.si.Meter
-import coulomb.refined._
-import eu.timepit.refined.types.numeric.NonNegInt
-import eu.timepit.refined.numeric._
+import lucuma.core.util.Enumerated
+
+import java.time.ZoneId
 
 /**
   * Enumerated type for Gemini observing sites.

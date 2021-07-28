@@ -5,6 +5,7 @@ package lucuma.core.model
 
 import cats.Eq
 import io.circe._
+
 import java.net.URI
 import scala.util.matching.Regex
 

@@ -3,11 +3,12 @@
 
 package lucuma.core.optics
 
-import spire.math._
-import scala.util.Try
-import monocle.Iso
 import lucuma.core.optics.Format
 import lucuma.core.optics.SplitEpi
+import monocle.Iso
+import spire.math._
+
+import scala.util.Try
 
 object Spire {
   val numberInt: SplitEpi[Number, Int] = SplitEpi(_.intValue, Number.apply)

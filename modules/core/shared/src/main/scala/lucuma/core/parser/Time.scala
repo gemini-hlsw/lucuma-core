@@ -3,19 +3,19 @@
 
 package lucuma.core.parser
 
+import atto._
 import cats.syntax.all._
 
-import atto._, Atto._
-import java.time.{
-  DateTimeException,
-  Instant,
-  LocalDate,
-  LocalDateTime,
-  LocalTime,
-  Month,
-  Year,
-  ZoneOffset
-}
+import java.time.DateTimeException
+import java.time.Instant
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.Month
+import java.time.Year
+import java.time.ZoneOffset
+
+import Atto._
 
 /** Parsers for `java.time` data types. */
 trait TimeParsers {

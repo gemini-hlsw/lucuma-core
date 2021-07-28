@@ -3,12 +3,13 @@
 
 package lucuma.core.model
 
-import lucuma.core.util.Timestamp
+import cats.Eq
+import cats.Foldable
+import cats.Monoid
+import cats.syntax.all._
 import lucuma.core.optics.SplitMono
 import lucuma.core.syntax.treemap._
-
-import cats.{ Eq, Foldable, Monoid }
-import cats.syntax.all._
+import lucuma.core.util.Timestamp
 
 import scala.collection.immutable.TreeMap
 

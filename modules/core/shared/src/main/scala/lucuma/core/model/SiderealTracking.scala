@@ -3,18 +3,17 @@
 
 package lucuma.core.model
 
-import java.time.Instant
+import cats._
+import cats.syntax.all._
+import lucuma.core.math._
+import monocle.Focus
+import monocle.Lens
 
+import java.time.Instant
 import scala.math.atan2
 import scala.math.cos
 import scala.math.hypot
 import scala.math.sin
-
-import cats._
-import cats.syntax.all._
-import lucuma.core.math._
-import monocle.Lens
-import monocle.Focus
 
 /**
   * Time-parameterized coordinates, based on an observed position at some point in time (called

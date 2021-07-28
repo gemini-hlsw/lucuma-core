@@ -3,13 +3,13 @@
 
 package lucuma.core.model
 
+import cats.Order
+import cats.Show
 import lucuma.core.enum.EphemerisKeyType
 import lucuma.core.model.parser.EphemerisKeyParsers
+import lucuma.core.optics.Format
 import lucuma.core.syntax.parser._
 import lucuma.core.syntax.string._
-import lucuma.core.optics.Format
-
-import cats.{ Order, Show }
 import monocle.Focus
 import monocle.Lens
 

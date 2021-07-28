@@ -3,7 +3,9 @@
 
 package lucuma.core.syntax
 
-import java.time.{ Duration, Instant, ZonedDateTime }
+import java.time.Duration
+import java.time.Instant
+import java.time.ZonedDateTime
 import java.time.temporal.TemporalAmount
 
 // A bit of syntax to make working with Java Instant and Duration a bit less

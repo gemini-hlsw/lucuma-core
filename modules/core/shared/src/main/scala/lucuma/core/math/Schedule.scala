@@ -3,18 +3,19 @@
 
 package lucuma.core.math
 
-import cats.syntax.all._
 import cats.Eq
 import cats.Show
 import cats.kernel.BoundedSemilattice
+import cats.syntax.all._
+import io.chrisdavenport.cats.time._
+import lucuma.core.optics.SplitEpi
+import monocle.Getter
+import monocle.Prism
+
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalTime
 import java.time.ZoneId
-import monocle.Getter
-import monocle.Prism
-import lucuma.core.optics.SplitEpi
-import io.chrisdavenport.cats.time._
 import scala.annotation.tailrec
 
 /**

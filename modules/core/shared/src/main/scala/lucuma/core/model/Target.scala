@@ -3,8 +3,6 @@
 
 package lucuma.core.model
 
-import scala.collection.immutable.SortedMap
-
 import cats._
 import cats.implicits._
 import eu.timepit.refined.auto._
@@ -12,11 +10,13 @@ import eu.timepit.refined.cats._
 import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.core.enum.MagnitudeBand
 import lucuma.core.math._
+import monocle.Focus
 import monocle.Lens
 import monocle.Optional
 import monocle.Traversal
-import monocle.Focus
 import monocle.std.either._
+
+import scala.collection.immutable.SortedMap
 
 /** A target of observation. */
 final case class Target(

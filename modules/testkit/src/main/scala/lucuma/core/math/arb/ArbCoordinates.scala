@@ -3,10 +3,12 @@
 
 package lucuma.core.math.arb
 
-import lucuma.core.math.{ RightAscension, Declination, Coordinates }
-import org.scalacheck._
+import lucuma.core.math.Coordinates
+import lucuma.core.math.Declination
+import lucuma.core.math.RightAscension
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Cogen._
+import org.scalacheck._
 
 trait ArbCoordinates {
   import ArbAngle._

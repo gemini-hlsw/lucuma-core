@@ -5,7 +5,9 @@ package lucuma.core.optics
 
 import cats.Functor
 import cats.arrow.Category
-import monocle.{ Fold, Getter, Iso }
+import monocle.Fold
+import monocle.Getter
+import monocle.Iso
 
 /**
  * A split monomorphism, which we can think of as a weaker `Iso[A, B]` where `A` is a ''smaller''

@@ -3,13 +3,16 @@
 
 package lucuma.core.model
 
-import cats.{ Order, Show }
-import lucuma.core.enum.{ Half, Site }
+import cats.Order
+import cats.Show
+import io.chrisdavenport.cats.time._
+import lucuma.core.enum.Half
+import lucuma.core.enum.Site
 import lucuma.core.model.parser.SemesterParsers
 import lucuma.core.syntax.parser._
-import java.time._
+
 import java.time.Month._
-import io.chrisdavenport.cats.time._
+import java.time._
 
 /**
  * A (Year, Half) pair.

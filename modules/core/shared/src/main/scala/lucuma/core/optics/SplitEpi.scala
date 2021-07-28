@@ -5,7 +5,8 @@ package lucuma.core.optics
 
 import cats.Functor
 import cats.arrow.Category
-import monocle.{ Iso, Prism }
+import monocle.Iso
+import monocle.Prism
 
 /**
  * A split epimorphism, which we can think of as a weaker `Iso[A, B]` where `B` is a ''smaller''

@@ -3,10 +3,12 @@
 
 package lucuma.core.math.parser
 
+import atto._
 import cats.syntax.all._
-import atto._, Atto._
 import lucuma.core.math._
 import lucuma.core.parser.MiscParsers
+
+import Atto._
 
 /** Parsers for [[lucuma.core.math.Coordinates]] and related types. */
 trait CoordinateParsers {

@@ -4,12 +4,13 @@
 package lucuma.core.math.arb
 
 import cats.syntax.all._
-import lucuma.core.math.Interval
-import org.scalacheck._
-import org.scalacheck.Arbitrary._
-import java.time.Instant
-import lucuma.core.arb.ArbTime
 import io.chrisdavenport.cats.time._
+import lucuma.core.arb.ArbTime
+import lucuma.core.math.Interval
+import org.scalacheck.Arbitrary._
+import org.scalacheck._
+
+import java.time.Instant
 
 trait ArbInterval {
   import ArbTime._

@@ -3,9 +3,11 @@
 
 package lucuma.core.optics.state
 
-import cats.{Eval, Now}
+import cats.Eval
+import cats.Now
+import cats.data.IndexedStateT
+import cats.data.State
 import monocle.POptional
-import cats.data.{IndexedStateT, State}
 
 trait StateOptionalSyntax {
   implicit def toStateOptionalOps[S, T, A, B](optional: POptional[S, T, A, B]): StateOptionalOps[S, T, A, B] =

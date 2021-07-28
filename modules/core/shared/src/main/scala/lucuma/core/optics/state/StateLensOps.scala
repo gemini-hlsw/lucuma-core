@@ -3,9 +3,11 @@
 
 package lucuma.core.optics.state
 
-import cats.{ Eval, Now }
+import cats.Eval
+import cats.Now
+import cats.data.IndexedStateT
+import cats.data.State
 import monocle.PLens
-import cats.data.{ IndexedStateT, State }
 
 trait StateLensSyntax {
   implicit def toStateLensOps[S, T, A, B](lens: PLens[S, T, A, B]): StateLensOps[S, T, A, B] =

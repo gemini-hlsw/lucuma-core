@@ -6,10 +6,12 @@ package core
 package model
 package parser
 
+import atto._
 import cats.syntax.all._
-import atto._, Atto._
 import lucuma.core.enum.parser.EnumParsers._
 import lucuma.core.parser.TimeParsers._
+
+import Atto._
 
 /** Parser for [[lucuma.core.model.Semester]]. */
 trait SemesterParsers {

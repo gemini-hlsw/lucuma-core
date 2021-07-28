@@ -3,14 +3,14 @@
 
 package lucuma.core.model.arb
 
+import lucuma.core.model.GuestRole
 import lucuma.core.model.Partner
+import lucuma.core.model.Role
+import lucuma.core.model.ServiceRole
 import lucuma.core.model.StandardRole
 import lucuma.core.util.arb._
-import org.scalacheck._
 import org.scalacheck.Arbitrary._
-import lucuma.core.model.ServiceRole
-import lucuma.core.model.GuestRole
-import lucuma.core.model.Role
+import org.scalacheck._
 
 trait ArbRole {
   import ArbGid._

@@ -4,8 +4,6 @@
 package lucuma.core.model
 package arb
 
-import scala.collection.immutable.SortedMap
-
 import eu.timepit.refined.scalacheck.string._
 import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.core.enum.MagnitudeBand
@@ -13,6 +11,8 @@ import lucuma.core.util.arb.ArbEnumerated
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Cogen._
 import org.scalacheck._
+
+import scala.collection.immutable.SortedMap
 
 trait ArbTarget {
 

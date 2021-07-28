@@ -3,14 +3,13 @@
 
 package lucuma.core.math
 
-import scala.math.rint
 import cats.Order
 import cats.Show
 import lucuma.core.optics.Format
 import spire.math.Rational
 
 import java.math.RoundingMode
-
+import scala.math.rint
 import scala.util.Try
 
 /**

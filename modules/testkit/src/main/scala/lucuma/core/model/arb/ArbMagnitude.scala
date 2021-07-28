@@ -4,8 +4,6 @@
 package lucuma.core.model
 package arb
 
-import scala.collection.immutable.SortedMap
-
 import cats.implicits._
 import lucuma.core.enum.MagnitudeBand
 import lucuma.core.enum.MagnitudeSystem
@@ -15,6 +13,8 @@ import lucuma.core.util.arb.ArbEnumerated
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Cogen._
 import org.scalacheck._
+
+import scala.collection.immutable.SortedMap
 
 trait ArbMagnitude {
 

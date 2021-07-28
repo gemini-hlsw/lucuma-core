@@ -4,11 +4,12 @@
 package lucuma.core.math.skycalc.solver
 
 import cats.syntax.all._
-import java.time.Instant
 import lucuma.core.math.Angle
 import lucuma.core.math.Declination
 import lucuma.core.math.HourAngle
 import lucuma.core.math.skycalc.SkyCalcResults
+
+import java.time.Instant
 
 /**
   * Defines whether a condition is met at an [[java.time.Instant]] among [[Samples]].

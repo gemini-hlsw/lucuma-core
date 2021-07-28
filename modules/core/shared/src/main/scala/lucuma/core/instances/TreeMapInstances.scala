@@ -3,9 +3,17 @@
 
 package lucuma.core.instances
 
-import cats.{ Always, Applicative, Eval, FlatMap, Foldable, Monoid, Show, Traverse }
+import cats.Always
+import cats.Applicative
+import cats.Eval
+import cats.FlatMap
+import cats.Foldable
+import cats.Monoid
+import cats.Show
+import cats.Traverse
 import cats.kernel._
 import cats.kernel.instances.StaticMethods
+
 import scala.annotation.tailrec
 import scala.collection.immutable.TreeMap
 

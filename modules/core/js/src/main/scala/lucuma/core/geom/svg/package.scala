@@ -3,22 +3,22 @@
 
 package lucuma.core.geom
 
-import scala.scalajs.js.JSConverters._
-
 import cats._
+import cats.data.NonEmptyList
+import cats.data.NonEmptyMap
 import cats.syntax.all._
+import lucuma.core.geom.jts.JtsShape
 import lucuma.svgdotjs.ArrayXY
 import lucuma.svgdotjs.Container
+import lucuma.svgdotjs.Element
 import lucuma.svgdotjs.PointArray
 import lucuma.svgdotjs.SVGArray
-import lucuma.svgdotjs.Element
-import lucuma.core.geom.jts.JtsShape
 import org.locationtech.jts.geom.Coordinate
 import org.locationtech.jts.geom.Geometry
 import org.locationtech.jts.geom.GeometryCollection
 import org.locationtech.jts.geom.Polygon
-import cats.data.NonEmptyList
-import cats.data.NonEmptyMap
+
+import scala.scalajs.js.JSConverters._
 
 package object svg   {
   type ScalingFn        = Double => Double

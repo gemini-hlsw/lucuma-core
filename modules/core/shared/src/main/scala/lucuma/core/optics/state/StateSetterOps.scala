@@ -3,9 +3,10 @@
 
 package lucuma.core.optics.state
 
-import cats.{ Eval, Now }
-import monocle.PSetter
+import cats.Eval
+import cats.Now
 import cats.data.IndexedStateT
+import monocle.PSetter
 
 trait StateSetterSyntax {
   implicit def toStateSetterOps[S, T, A, B](

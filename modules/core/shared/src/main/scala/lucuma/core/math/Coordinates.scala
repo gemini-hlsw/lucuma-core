@@ -10,7 +10,11 @@ import lucuma.core.optics.Format
 import lucuma.core.syntax.all._
 import monocle.Focus
 import monocle.Lens
-import scala.math.{ atan2, cos, sin, sqrt }
+
+import scala.math.atan2
+import scala.math.cos
+import scala.math.sin
+import scala.math.sqrt
 
 /** A point in the sky, given right ascension and declination. */
 final case class Coordinates(ra: RightAscension, dec: Declination) {

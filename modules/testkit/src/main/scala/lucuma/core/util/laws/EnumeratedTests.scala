@@ -4,11 +4,13 @@
 package lucuma.core.util.laws
 
 import cats._
-import cats.kernel.laws.discipline.OrderTests
 import cats.kernel.laws.OrderLaws
+import cats.kernel.laws.discipline.OrderTests
 import cats.laws.discipline._
-import io.circe.{ Encoder, Decoder }
-import io.circe.testing.{ CodecLaws, CodecTests }
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.testing.CodecLaws
+import io.circe.testing.CodecTests
 import io.circe.testing.instances.arbitraryJson
 import lucuma.core.util.Enumerated
 import org.scalacheck._

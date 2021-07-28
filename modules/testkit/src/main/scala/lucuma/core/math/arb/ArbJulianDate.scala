@@ -3,13 +3,12 @@
 
 package lucuma.core.math.arb
 
+import lucuma.core.arb.ArbTime
 import lucuma.core.math.JulianDate
+import org.scalacheck.Arbitrary._
+import org.scalacheck._
 
 import java.time.LocalDateTime
-
-import org.scalacheck._
-import org.scalacheck.Arbitrary._
-import lucuma.core.arb.ArbTime
 
 trait ArbJulianDate {
   import ArbTime._

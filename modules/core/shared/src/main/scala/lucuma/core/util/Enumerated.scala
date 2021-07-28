@@ -5,12 +5,11 @@ package lucuma
 package core
 package util
 
-import lucuma.core.syntax.string._
-
 import cats.Order
 import cats.syntax.all._
-import monocle.Prism
 import io.circe._
+import lucuma.core.syntax.string._
+import monocle.Prism
 
 /**
   * Typeclass for an enumerated type with unique string tags and a canonical ordering.

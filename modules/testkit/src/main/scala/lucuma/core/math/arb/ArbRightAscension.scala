@@ -3,9 +3,10 @@
 
 package lucuma.core.math.arb
 
-import lucuma.core.math.{ HourAngle, RightAscension }
-import org.scalacheck._
+import lucuma.core.math.HourAngle
+import lucuma.core.math.RightAscension
 import org.scalacheck.Arbitrary._
+import org.scalacheck._
 
 trait ArbRightAscension {
   import ArbAngle._

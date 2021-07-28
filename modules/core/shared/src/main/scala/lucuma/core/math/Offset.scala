@@ -3,15 +3,18 @@
 
 package lucuma.core.math
 
-import cats.{ Order, Show }
+import cats.Order
+import cats.Show
 import cats.kernel.CommutativeGroup
 import cats.syntax.all._
 import lucuma.core.optics.SplitMono
-import monocle.{ Iso, Lens }
 import monocle.Focus
+import monocle.Iso
+import monocle.Lens
 import monocle.macros.GenIso
 
-import scala.math.{ cos, sin }
+import scala.math.cos
+import scala.math.sin
 
 object Axis {
   type P

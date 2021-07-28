@@ -4,15 +4,17 @@
 package lucuma.core.model
 package arb
 
-import lucuma.core.model.{ Ephemeris, EphemerisCoordinates }
-import lucuma.core.math.{ Coordinates, Offset }
-import lucuma.core.math.arb.{ ArbCoordinates, ArbOffset }
+import lucuma.core.math.Coordinates
+import lucuma.core.math.Offset
+import lucuma.core.math.arb.ArbCoordinates
+import lucuma.core.math.arb.ArbOffset
+import lucuma.core.model.Ephemeris
+import lucuma.core.model.EphemerisCoordinates
 import lucuma.core.util.Timestamp
 import lucuma.core.util.arb.ArbTimestamp
-
-import org.scalacheck._
-import org.scalacheck.Gen._
 import org.scalacheck.Arbitrary._
+import org.scalacheck.Gen._
+import org.scalacheck._
 
 trait ArbEphemeris {
   import ArbCoordinates._

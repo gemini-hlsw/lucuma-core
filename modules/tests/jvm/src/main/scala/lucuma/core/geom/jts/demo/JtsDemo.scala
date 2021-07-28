@@ -4,20 +4,20 @@
 package lucuma.core.geom.jts
 package demo
 
-import lucuma.core.enum.PortDisposition
-import lucuma.core.enum.GmosSouthFpu
 import lucuma.core.enum.GmosNorthFpu
-import lucuma.core.math.{ Angle, Offset }
+import lucuma.core.enum.GmosSouthFpu
+import lucuma.core.enum.PortDisposition
 import lucuma.core.geom.GmosOiwfsProbeArm
 import lucuma.core.geom.GmosScienceAreaGeometry
 import lucuma.core.geom.ShapeExpression
-import lucuma.core.geom.jts.jvm.syntax.awt._
 import lucuma.core.geom.jts.interpreter._
+import lucuma.core.geom.jts.jvm.syntax.awt._
+import lucuma.core.math.Angle
+import lucuma.core.math.Offset
 import lucuma.core.math.syntax.int._
 
-import java.awt.{ List => _, _ }
 import java.awt.event._
-
+import java.awt.{List => _, _}
 import scala.jdk.CollectionConverters._
 
 /**

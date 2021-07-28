@@ -3,7 +3,8 @@
 
 package lucuma.core.math
 
-import cats.{ Order, Show }
+import cats.Order
+import cats.Show
 import lucuma.core.parser.MiscParsers
 import lucuma.core.syntax.all._
 import monocle.Prism

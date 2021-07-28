@@ -9,7 +9,8 @@ import eu.timepit.refined._
 import eu.timepit.refined.numeric.Positive
 import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.math.units.DeciArcSecond
-import lucuma.core.util.{ Display, Enumerated }
+import lucuma.core.util.Display
+import lucuma.core.util.Enumerated
 import spire.math.Rational
 
 sealed abstract class ImageQuality(val toDeciArcSeconds: Quantity[PosInt, DeciArcSecond]) extends Product with Serializable {

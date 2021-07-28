@@ -3,10 +3,13 @@
 
 package lucuma.core.math.parser
 
-import atto._, Atto._
+import atto._
 import cats.syntax.all._
-import lucuma.core.math.{ Angle, HourAngle }
+import lucuma.core.math.Angle
+import lucuma.core.math.HourAngle
 import lucuma.core.parser.MiscParsers._
+
+import Atto._
 
 /** Parsers for `[[lucuma.core.math.Angle]].` */
 trait AngleParsers {

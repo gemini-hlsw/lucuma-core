@@ -5,8 +5,8 @@ package lucuma.core.model.arb
 
 import lucuma.core.model.OrcidId
 import lucuma.core.model.OrcidProfile
-import org.scalacheck._
 import org.scalacheck.Arbitrary._
+import org.scalacheck._
 
 trait ArbOrcidProfile {
   import ArbOrcidId._
