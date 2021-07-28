@@ -3,24 +3,26 @@
 
 package lucuma.core.math.skycalc.solver
 
-import cats.implicits._
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZonedDateTime
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Declination
-import lucuma.core.math.Interval
+import spire.math.Bounded
+import lucuma.core.syntax.boundedInterval._
 import lucuma.core.math.RightAscension
 import lucuma.core.math.skycalc._
 import java.time.Duration
 import lucuma.core.math.skycalc.solver.RoundStrategy._
 import scala.math.abs
+import io.chrisdavenport.cats.time._
+import cats.Order._
 
 /**
-  * Compare some random values with results from http://catserver.ing.iac.es/staralt/index.php
-  * This is not meant to test the underlying SkyCalc implementations, we assume that this is all working,
-  * this only tests the general mechanics of specific Samples classes for targets.
-  */
+ * Compare some random values with results from http://catserver.ing.iac.es/staralt/index.php
+ * This is not meant to test the underlying SkyCalc implementations, we assume that this is all working,
+ * this only tests the general mechanics of specific Samples classes for targets.
+ */
 final class TargetSamplesSuite extends munit.DisciplineSuite {
   import lucuma.core.enum.Site.GN
 
@@ -49,7 +51,8 @@ final class TargetSamplesSuite extends munit.DisciplineSuite {
   }
 
   test("Calculates for Target in Interval") {
-    val interval        = Interval.unsafe(testInstant, testInstant.plusSeconds(4 * 60 * 60))
+    val interval        =
+      Bounded.unsafeOpenUpper(testInstant, testInstant.plusSeconds(4 * 60 * 60))
     val intervalSamples = Samples
       .atFixedRate(interval, Duration.ofSeconds(30L))(_ => testCoordinates)
       .toSkyCalResultsAt(GN.place)
@@ -70,20 +73,26 @@ final class TargetSamplesSuite extends munit.DisciplineSuite {
     )
 
     assertEqualsDouble(
-      89.0, intervalSamples
+      89.0,
+      intervalSamples
         .map(_.altitude)
         .toMap
         .values
         .max
         .map(_.toAngle.toSignedDoubleDegrees)
-        .value, 1)
+        .value,
+      1
+    )
     assertEqualsDouble(
-      37.0, intervalSamples
+      37.0,
+      intervalSamples
         .map(_.altitude)
         .toMap
         .values
         .min
         .map(_.toAngle.toSignedDoubleDegrees)
-        .value, 1)
+        .value,
+      1
+    )
   }
 }

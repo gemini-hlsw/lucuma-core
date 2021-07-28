@@ -7,9 +7,9 @@ import cats.Order
 import cats.Show
 import lucuma.core.enum.Site
 import lucuma.core.enum.TwilightType
-import lucuma.core.math.Interval
 import lucuma.core.math.skycalc.TwilightCalc
 import monocle.Getter
+import spire.math.Bounded
 
 import java.time.Instant
 import java.time.LocalDate
@@ -19,7 +19,7 @@ import java.time.LocalDateTime
 sealed abstract case class TwilightBoundedNight private (
   twilightType:     TwilightType,
   toObservingNight: ObservingNight,
-  interval:         Interval
+  interval:         Bounded[Instant]
 ) extends Night {
 
   /** Location at which the times described by this night are valid. */
@@ -97,8 +97,9 @@ object TwilightBoundedNight extends TwilightBoundedNightOptics {
     s:            Site,
     d:            LocalDate
   ): Option[TwilightBoundedNight] =
-    TwilightBoundedNight.fromTwilightTypeAndObservingNight(twilightType,
-                                                           ObservingNight.fromSiteAndLocalDate(s, d)
+    TwilightBoundedNight.fromTwilightTypeAndObservingNight(
+      twilightType,
+      ObservingNight.fromSiteAndLocalDate(s, d)
     )
 
   /**
@@ -170,8 +171,9 @@ object TwilightBoundedNight extends TwilightBoundedNightOptics {
     s:            Site,
     i:            Instant
   ): Option[TwilightBoundedNight] =
-    TwilightBoundedNight.fromTwilightTypeAndObservingNight(twilightType,
-                                                           ObservingNight.fromSiteAndInstant(s, i)
+    TwilightBoundedNight.fromTwilightTypeAndObservingNight(
+      twilightType,
+      ObservingNight.fromSiteAndInstant(s, i)
     )
 
   /**

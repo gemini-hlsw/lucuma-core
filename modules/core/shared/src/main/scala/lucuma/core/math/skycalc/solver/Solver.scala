@@ -5,9 +5,10 @@ package lucuma.core.math.skycalc.solver
 
 import cats.syntax.all._
 import io.chrisdavenport.cats.time._
-import lucuma.core.math.Interval
-import lucuma.core.math.Schedule
+import lucuma.core.syntax.boundedInterval._
 import lucuma.core.syntax.time._
+import spire.math.Bounded
+import spire.math.extras.interval.IntervalSeq
 
 import java.time.Duration
 import java.time.Instant
@@ -19,15 +20,15 @@ object SolverStrategy {
 }
 
 /**
- * Typeclass defininig an algorithm that finds a [[Schedule]] within a given [[Interval]] for which a given
- * function <code>Instant => Boolean</code> is true.
+ * Typeclass defininig an algorithm that finds an `IntervalSeq[Instant]` within a
+ * given `Bounded[Interval]` for which a given function <code>Instant => Boolean</code> is true.
  *
  * @tparam S [[SolverStrategy]] to use
  */
 trait Solver[S] {
   def solve(
     metAt:    Instant => Boolean
-  )(interval: Interval, step: Duration = Duration.ofSeconds(30)): Schedule
+  )(interval: Bounded[Instant], step: Duration = Duration.ofSeconds(30)): IntervalSeq[Instant]
 }
 
 trait SolverInstances {
@@ -39,24 +40,36 @@ trait SolverInstances {
    * meats its criteria (e.g. Sky Background).
    */
   implicit object DefaultSolver extends Solver[SolverStrategy.Default] {
-    def solve(metAt: Instant => Boolean)(interval: Interval, step: Duration): Schedule = {
+    def solve(
+      metAt:    Instant => Boolean
+    )(interval: Bounded[Instant], step: Duration): IntervalSeq[Instant] = {
       require(step > Duration.ZERO)
 
       @tailrec
-      def solve(curStart: Instant, curState: Boolean, i: Instant, accum: Schedule): Schedule =
-        if (i >= interval.end)
+      def solve(
+        curStart: Instant,
+        curState: Boolean,
+        i:        Instant,
+        accum:    IntervalSeq[Instant]
+      ): IntervalSeq[Instant] =
+        if (i >= interval.upper)
           if (curState)
-            accum.union(Interval.unsafe(curStart, interval.end))
+            accum | (Bounded.unsafeOpenUpper(curStart, interval.upper))
           else
             accum
         else if (metAt(i) == curState)
           solve(curStart, curState, i + step, accum)
         else if (curState)
-          solve(i, curState = false, i + step, accum.union(Interval.unsafe(curStart, i)))
+          solve(
+            i,
+            curState = false,
+            i + step,
+            accum | (Bounded.unsafeOpenUpper(curStart, i))
+          )
         else
           solve(i, curState = true, i + step, accum)
 
-      solve(interval.start, metAt(interval.start), interval.start, Schedule.Never)
+      solve(interval.lower, metAt(interval.lower), interval.lower, IntervalSeq.empty[Instant])
     }
   }
 
@@ -65,32 +78,36 @@ trait SolverInstances {
    * at most twice during the given interval. This is true for all basic elevation constraints for a single night.
    */
   implicit object ParabolaSolver extends Solver[SolverStrategy.Parabola] {
-    def solve(metAt: Instant => Boolean)(interval: Interval, step: Duration): Schedule = {
+    def solve(
+      metAt:    Instant => Boolean
+    )(interval: Bounded[Instant], step: Duration): IntervalSeq[Instant] = {
       require(step > Duration.ZERO)
 
-      def solve(s: Instant, fs: Boolean, e: Instant, fe: Boolean): Schedule = {
+      def solve(s: Instant, fs: Boolean, e: Instant, fe: Boolean): IntervalSeq[Instant] = {
         val m  = Instant.ofEpochMilli((s.toEpochMilli + e.toEpochMilli) / 2)
         val fm = metAt(m)
-        if (Interval.unsafe(s, e).duration > step)
+        if (Bounded.unsafeOpenUpper(s, e).duration > step)
           (fs, fm, fe) match {
-            case (false, false, false) => solve(s, fs, m, fm).union(solve(m, fm, e, fe))
+            case (false, false, false) => solve(s, fs, m, fm) | (solve(m, fm, e, fe))
             case (false, false, true)  => solve(m, fm, e, fe)
-            case (false, true, false)  => solve(s, fs, m, fm).union(solve(m, fm, e, fe))
-            case (false, true, true)   => solve(s, fs, m, fm).union(Schedule.unsafe(m, e))
+            case (false, true, false)  => solve(s, fs, m, fm) | (solve(m, fm, e, fe))
+            case (false, true, true)   =>
+              solve(s, fs, m, fm) | IntervalSeq(Bounded.unsafeOpenUpper(m, e))
             case (true, false, false)  => solve(s, fs, m, fm)
-            case (true, false, true)   => solve(s, fs, m, fm).union(solve(m, fm, e, fe))
-            case (true, true, false)   => Schedule.unsafe(s, m).union(solve(m, fm, e, fe))
-            case (true, true, true)    => solve(s, fs, m, fm).union(solve(m, fm, e, fe))
+            case (true, false, true)   => solve(s, fs, m, fm) | (solve(m, fm, e, fe))
+            case (true, true, false)   =>
+              IntervalSeq(Bounded.unsafeOpenUpper(s, m)) | (solve(m, fm, e, fe))
+            case (true, true, true)    => solve(s, fs, m, fm) | (solve(m, fm, e, fe))
           }
         else if (fm)
-          Schedule.single(Interval.unsafe(s, e))
+          IntervalSeq[Instant](Bounded.unsafeOpenUpper(s, e))
         else
-          Schedule.Never
+          IntervalSeq.empty[Instant]
       }
 
-      val fs = metAt(interval.start)
-      val fe = metAt(interval.end)
-      solve(interval.start, fs, interval.end, fe)
+      val fs = metAt(interval.lower)
+      val fe = metAt(interval.upper)
+      solve(interval.lower, fs, interval.upper, fe)
     }
   }
 }

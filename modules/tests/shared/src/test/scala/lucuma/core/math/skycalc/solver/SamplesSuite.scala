@@ -8,7 +8,7 @@ import cats.Eval
 import cats.syntax.all._
 import java.time.Duration
 import scala.collection.immutable.TreeMap
-import lucuma.core.math.Interval
+import spire.math.Bounded
 import lucuma.core.math.IntervalGens
 import lucuma.core.math.skycalc.solver.Samples.Bracket
 import lucuma.core.syntax.time._
@@ -24,6 +24,7 @@ import lucuma.core.arb._
 import lucuma.core.arb.ArbEval
 import lucuma.core.arb.ArbTime
 import io.chrisdavenport.cats.time._
+import java.time.Instant
 
 final class SamplesSuite extends munit.DisciplineSuite with IntervalGens {
   import ArbEval._
@@ -43,14 +44,14 @@ final class SamplesSuite extends munit.DisciplineSuite with IntervalGens {
   checkAll("data", IsoTests(Samples.data[Int]))
 
   test("Fixed Rate Instants") {
-    forAll { interval: Interval =>
+    forAll { interval: Bounded[Instant] =>
       forAll(rateForInterval(interval)) { duration: Duration =>
         val fixedRateSamples = Samples.atFixedRate(interval, duration)(_ => Eval.now(()))
         val instants         = fixedRateSamples.toMap.keys.toList
-        assertEquals(instants.head, interval.start)
+        assertEquals(instants.head, interval.lower)
         val last             = instants.last
-        val maxSample        = interval.end + duration
-        assert(last >= interval.end)
+        val maxSample        = interval.upper + duration
+        assert(last >= interval.upper)
         assert(last < maxSample)
         val intervalSamples  = interval.duration.toNanos / duration.toNanos + 1
         assert(instants.length >= intervalSamples)
@@ -62,29 +63,29 @@ final class SamplesSuite extends munit.DisciplineSuite with IntervalGens {
   test("Bracket") {
     forAll(arbitrary[Samples[Unit]].suchThat(_.interval.isDefined)) { samples =>
       val interval = samples.interval.get
-      forAll(instantInInterval(interval, includeEnd = true)) { i =>
+      forAll(instantInInterval(interval)) { i =>
         samples.bracket(i) match {
           case Bracket(Some((i0, _)), Some((i1, _)), Some((i2, _))) =>
-            assert(i0 >= interval.start)
+            assert(i0 >= interval.lower)
             assert(i0 < i1)
             assert(i1 === i)
             assert(i1 < i2)
-            assert(i2 <= interval.end)
+            assert(i2 <= interval.upper)
           case Bracket(Some((i0, _)), None, Some((i2, _)))          =>
-            assert(i0 >= interval.start)
+            assert(i0 >= interval.lower)
             assert(i0 < i)
             assert(i < i2)
-            assert(i2 <= interval.end)
+            assert(i2 <= interval.upper)
           case Bracket(None, Some((i1, _)), Some((i2, _)))          =>
-            assert(i1 === interval.start)
+            assert(i1 === interval.lower)
             assert(i1 === i)
             assert(i1 < i2)
-            assert(i2 <= interval.end)
+            assert(i2 <= interval.upper)
           case Bracket(Some((i0, _)), Some((i1, _)), None)          =>
-            assert(i0 >= interval.start)
+            assert(i0 >= interval.lower)
             assert(i1 === i)
             assert(i0 < i1)
-            assert(i1 === interval.end)
+            assert(i1 === interval.upper)
           case Bracket(None, Some((_, _)), None)                    =>
             fail(s"$i returned a single-element bracket")
           case Bracket(None, None, _)                               =>
@@ -93,7 +94,7 @@ final class SamplesSuite extends munit.DisciplineSuite with IntervalGens {
             fail(s"$i returned an out-of-bounds bracket")
         }
       }
-      forAll(instantOutsideInterval(interval, includeEnd = false)) {
+      forAll(instantOutsideInterval(interval)) {
         _.foreach { i =>
           samples.bracket(i) match {
             case Bracket(left, None, right) =>

@@ -50,6 +50,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
       "com.manyangled"    %%% "coulomb-refined"            % coulombVersion,
       "com.manyangled"    %%% "coulomb-physical-constants" % coulombVersion,
       "org.typelevel"     %%% "spire"                      % spireVersion,
+      "org.typelevel"     %%% "spire-extras"               % spireVersion,
       "eu.timepit"        %%% "singleton-ops"              % singletonOpsVersion,
       "eu.timepit"        %%% "refined"                    % refinedVersion,
       "eu.timepit"        %%% "refined-cats"               % refinedVersion,

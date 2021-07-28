@@ -13,11 +13,12 @@ import java.time.Instant
 import java.time.LocalDate
 import lucuma.core.enum.Site
 import lucuma.core.enum.TwilightType
-import lucuma.core.math.Interval
 import lucuma.core.arb.ArbTime
 import lucuma.core.util.arb.ArbEnumerated
 import edu.gemini.skycalc.TwilightBoundedNightTest
 import org.scalactic.Tolerance
+import lucuma.core.optics.Spire
+import io.chrisdavenport.cats.time._
 
 final class TwilightCalcSuiteJVM extends ScalaCheckSuite with Tolerance {
   import ArbEnumerated._
@@ -32,7 +33,7 @@ final class TwilightCalcSuiteJVM extends ScalaCheckSuite with Tolerance {
     forAll { (twilightType: TwilightType, localDate: LocalDate, site: Site) =>
       val (start, end) = TwilightCalc
         .forDate(twilightType, localDate, site.place)
-        .map(Interval.fromInstants.reverseGet.andThen(_.bimap(_.toEpochMilli, _.toEpochMilli)))
+        .map(Spire.openUpperIntervalFromTuple[Instant].reverseGet.andThen(_.bimap(_.toEpochMilli, _.toEpochMilli)))
         .getOrElse((0L, 0L))
       val tbn          =
         TwilightBoundedNightTest.forDate(TwilightTypeJVM(twilightType),
