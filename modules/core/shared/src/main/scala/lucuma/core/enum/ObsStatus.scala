@@ -5,8 +5,8 @@ package lucuma
 package core
 package enum
 
-import lucuma.core.util.Enumerated
 import lucuma.core.util.Display
+import lucuma.core.util.Enumerated
 
 sealed abstract class ObsStatus(val label: String) extends Product with Serializable
 

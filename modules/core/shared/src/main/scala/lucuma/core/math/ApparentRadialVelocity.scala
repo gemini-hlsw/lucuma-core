@@ -6,8 +6,8 @@ package lucuma.core.math
 import cats._
 import coulomb._
 import coulomb.cats.implicits._
-import lucuma.core.math.units._
 import lucuma.core.math.Constants.SpeedOfLight
+import lucuma.core.math.units._
 import lucuma.core.optics.Wedge
 import monocle.Iso
 import spire.std.bigDecimal._

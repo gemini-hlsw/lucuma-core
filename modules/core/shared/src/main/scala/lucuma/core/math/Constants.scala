@@ -3,8 +3,6 @@
 
 package lucuma.core.math
 
-import java.time.Duration
-
 import coulomb._
 import coulomb.define.DerivedUnit
 import coulomb.physicalconstants._
@@ -12,6 +10,8 @@ import coulomb.physicalconstants.infra.PhysicalConstantQuantity
 import coulomb.si.Meter
 import lucuma.core.math.units.MetersPerSecond
 import spire.math.Rational
+
+import java.time.Duration
 
 object Constants {
   private object infra {

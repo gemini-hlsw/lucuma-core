@@ -6,8 +6,8 @@ package lucuma.core.arb
 import cats.Eval
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary._
-import org.scalacheck.Gen
 import org.scalacheck.Cogen
+import org.scalacheck.Gen
 
 trait ArbEval {
   def genSampleValue[A: Arbitrary]: Gen[Eval[A]] =

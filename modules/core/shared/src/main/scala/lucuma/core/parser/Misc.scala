@@ -3,10 +3,13 @@
 
 package lucuma.core.parser
 
-import atto._, Atto._
+import atto._
 import lucuma.core.math.Index
 import lucuma.core.optics.syntax.prism._
+
 import scala.annotation.tailrec
+
+import Atto._
 
 /** General-purpose parsers and combinators that aren't provided by atto. */
 trait MiscParsers {

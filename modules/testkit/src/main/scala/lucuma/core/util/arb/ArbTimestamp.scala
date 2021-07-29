@@ -4,9 +4,8 @@
 package lucuma.core.util
 package arb
 
-import lucuma.core.util.Timestamp
 import lucuma.core.arb.ArbTime
-
+import lucuma.core.util.Timestamp
 import org.scalacheck._
 
 import java.time._

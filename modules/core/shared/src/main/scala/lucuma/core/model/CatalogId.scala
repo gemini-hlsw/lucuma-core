@@ -5,9 +5,9 @@ package lucuma.core.model
 
 import cats._
 import eu.timepit.refined._
+import eu.timepit.refined.cats._
 import eu.timepit.refined.collection.NonEmpty
 import eu.timepit.refined.types.string.NonEmptyString
-import eu.timepit.refined.cats._
 import lucuma.core.enum.CatalogName
 
 final case class CatalogId(catalog: CatalogName, id: NonEmptyString)

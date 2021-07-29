@@ -3,13 +3,16 @@
 
 package lucuma.core.math
 
-import cats.{ Eq, Order, Show }
+import cats.Eq
+import cats.Order
+import cats.Show
 import cats.kernel.CommutativeGroup
 import cats.syntax.eq._
 import lucuma.core.math.parser.AngleParsers
-import lucuma.core.syntax.parser._
 import lucuma.core.optics._
-import monocle.{ Iso, Prism }
+import lucuma.core.syntax.parser._
+import monocle.Iso
+import monocle.Prism
 
 /**
  * Exact angles represented as integral microarcseconds. These values form a commutative group over

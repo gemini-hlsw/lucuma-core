@@ -4,14 +4,15 @@
 package lucuma.core.arb
 
 import cats.syntax.all._
-import org.scalacheck._
-import org.scalacheck.Gen._
-import org.scalacheck.Arbitrary.arbitrary
-import lucuma.core.syntax.time._
-import scala.jdk.CollectionConverters._
-import scala.concurrent.duration.{ Duration => SDuration }
-import java.time._
 import io.chrisdavenport.cats.time._
+import lucuma.core.syntax.time._
+import org.scalacheck.Arbitrary.arbitrary
+import org.scalacheck.Gen._
+import org.scalacheck._
+
+import java.time._
+import scala.concurrent.duration.{ Duration => SDuration }
+import scala.jdk.CollectionConverters._
 
 // Arbitrary but reasonable dates and times.
 trait ArbTime {

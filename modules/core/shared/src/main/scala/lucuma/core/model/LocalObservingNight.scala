@@ -6,12 +6,13 @@ package lucuma.core.model
 import cats._
 import cats.data.Validated
 import cats.syntax.all._
+import io.chrisdavenport.cats.time._
 import lucuma.core.enum.Site
-import java.time._
-import java.time.format.DateTimeFormatter
 import monocle.Iso
 import monocle.macros.GenIso
-import io.chrisdavenport.cats.time._
+
+import java.time._
+import java.time.format.DateTimeFormatter
 
 /**
  * A local observing night is defined as the period of time starting at 14:00

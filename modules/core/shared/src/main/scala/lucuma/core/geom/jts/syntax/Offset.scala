@@ -4,14 +4,14 @@
 package lucuma.core.geom.jts.syntax
 
 import lucuma.core.geom.jts.Jts.geometryFactory
+import lucuma.core.math.Offset
+import org.locationtech.jts.geom.Coordinate
+import org.locationtech.jts.geom.Envelope
+import org.locationtech.jts.geom.Geometry
+import org.locationtech.jts.util.GeometricShapeFactory
 
 import angle._
 import offset._
-
-import lucuma.core.math.Offset
-
-import org.locationtech.jts.geom.{ Coordinate, Envelope, Geometry }
-import org.locationtech.jts.util.GeometricShapeFactory
 
 // Syntax used in the JTS implementation only.
 

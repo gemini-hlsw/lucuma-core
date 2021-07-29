@@ -3,7 +3,8 @@
 
 package lucuma.core.geom.jts
 
-import org.locationtech.jts.geom.{ GeometryFactory, PrecisionModel }
+import org.locationtech.jts.geom.GeometryFactory
+import org.locationtech.jts.geom.PrecisionModel
 
 /**
  * Shared JTS setup.

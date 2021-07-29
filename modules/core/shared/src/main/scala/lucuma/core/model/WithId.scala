@@ -3,10 +3,10 @@
 
 package lucuma.core.model
 
-import lucuma.core.util.Gid
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.char.Letter
 import eu.timepit.refined.types.numeric.PosLong
+import lucuma.core.util.Gid
 
 /**
  * Defines `<Entity>.Id` class, its `Gid` instance, and convenience methods.

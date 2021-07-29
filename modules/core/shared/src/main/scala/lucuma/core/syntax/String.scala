@@ -3,8 +3,9 @@
 
 package lucuma.core.syntax
 
-import java.util.regex.Pattern
 import spire.math.Rational
+
+import java.util.regex.Pattern
 
 final class StringOps(val self: String) extends AnyVal {
 

@@ -6,12 +6,13 @@ package core
 package model
 package arb
 
-import java.time.Year
-import lucuma.core.enum.Half
 import lucuma.core.arb.ArbTime
+import lucuma.core.enum.Half
 import lucuma.core.util.arb.ArbEnumerated
-import org.scalacheck._
 import org.scalacheck.Arbitrary._
+import org.scalacheck._
+
+import java.time.Year
 
 trait ArbSemester {
   import ArbEnumerated._

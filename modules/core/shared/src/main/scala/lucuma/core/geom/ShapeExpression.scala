@@ -3,7 +3,8 @@
 
 package lucuma.core.geom
 
-import lucuma.core.math.{ Angle, Offset }
+import lucuma.core.math.Angle
+import lucuma.core.math.Offset
 
 /**
  * Describes a `Shape`, which is produced by evaluating the expression using

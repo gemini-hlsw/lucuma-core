@@ -3,19 +3,20 @@
 
 package lucuma.core.math
 
-import cats.syntax.all._
 import cats.Eq
 import cats.Order
 import cats.Show
+import cats.syntax.all._
+import io.chrisdavenport.cats.time._
+import lucuma.core.optics.Format
+import lucuma.core.syntax.time._
+import monocle.Getter
+import monocle.Prism
+
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalTime
 import java.time.ZoneId
-import monocle.Getter
-import monocle.Prism
-import lucuma.core.optics.Format
-import lucuma.core.syntax.time._
-import io.chrisdavenport.cats.time._
 
 /**
   * Representation of an interval between two points in time, including the start time and excluding the end time

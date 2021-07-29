@@ -3,10 +3,11 @@
 
 package lucuma.core.model
 
-import cats.Eq
 import cats.ApplicativeError
+import cats.Eq
 import cats.implicits._
 import eu.timepit.refined.auto._
+
 import java.security.AccessControlException
 
 /** A user has [at least] an identity and a role. */

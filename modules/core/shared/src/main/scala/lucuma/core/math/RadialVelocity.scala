@@ -7,11 +7,11 @@ import cats._
 import coulomb._
 import coulomb.cats.implicits._
 import coulomb.si._
-import lucuma.core.math.units._
 import lucuma.core.math.Constants.SpeedOfLight
+import lucuma.core.math.units._
+import lucuma.core.optics.Format
 import monocle.Prism
 import spire.std.bigDecimal._
-import lucuma.core.optics.Format
 
 /**
   * Representation of a radial velocity in meters per second

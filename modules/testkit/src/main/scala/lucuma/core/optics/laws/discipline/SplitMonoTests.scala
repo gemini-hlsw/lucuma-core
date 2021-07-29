@@ -6,10 +6,11 @@ package discipline
 
 import cats.Eq
 import lucuma.core.optics.SplitMono
-import org.scalacheck.{ Arbitrary, Gen }
+import org.scalacheck.Arbitrary
+import org.scalacheck.Gen
+import org.scalacheck.Prop
 import org.scalacheck.Prop._
 import org.typelevel.discipline.Laws
-import org.scalacheck.Prop
 
 trait SplitMonoTests[A, B] extends Laws {
   val splitMonoProps: SplitMonoProps[A, B]

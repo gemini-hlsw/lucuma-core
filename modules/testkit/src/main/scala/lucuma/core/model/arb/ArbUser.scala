@@ -3,10 +3,10 @@
 
 package lucuma.core.model.arb
 
-import lucuma.core.util.arb._
 import lucuma.core.model._
-import org.scalacheck._
+import lucuma.core.util.arb._
 import org.scalacheck.Arbitrary._
+import org.scalacheck._
 
 trait ArbUser {
   import ArbGid._

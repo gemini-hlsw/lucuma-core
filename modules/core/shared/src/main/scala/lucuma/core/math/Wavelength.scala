@@ -19,7 +19,6 @@ import monocle.Prism
 import spire.math.Rational
 
 import java.math.RoundingMode
-
 import scala.util.Try
 
 /**

@@ -4,13 +4,12 @@
 package lucuma.core.model
 package arb
 
-import lucuma.core.model.EphemerisKey._
-import lucuma.core.enum.EphemerisKeyType
-import lucuma.core.util.arb.ArbEnumerated
 import lucuma.core.arb._
-
-import org.scalacheck._
+import lucuma.core.enum.EphemerisKeyType
+import lucuma.core.model.EphemerisKey._
+import lucuma.core.util.arb.ArbEnumerated
 import org.scalacheck.Arbitrary._
+import org.scalacheck._
 
 trait ArbEphemerisKey {
   import ArbEnumerated._

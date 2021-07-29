@@ -5,7 +5,6 @@ package lucuma.core.geom
 
 import cats.Order
 import cats.syntax.eq._
-
 import monocle.Prism
 
 /**

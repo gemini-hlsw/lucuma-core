@@ -4,8 +4,8 @@
 package lucuma.core.optics.syntax
 
 import cats.data.State
-import monocle.Optional
 import lucuma.core.optics.state.all._
+import monocle.Optional
 
 final class OptionalOps[S, A](val self: Optional[S, A]) extends AnyVal {
 

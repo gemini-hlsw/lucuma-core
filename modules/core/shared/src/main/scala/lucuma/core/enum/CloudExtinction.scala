@@ -3,7 +3,8 @@
 
 package lucuma.core.enum
 
-import lucuma.core.util.{ Display, Enumerated }
+import lucuma.core.util.Display
+import lucuma.core.util.Enumerated
 
 sealed abstract class CloudExtinction(val toDeciMagnitudes: Int) extends Product with Serializable {
   def toMagnitudes: Double = toDeciMagnitudes / 10.0

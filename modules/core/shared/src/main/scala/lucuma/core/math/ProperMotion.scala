@@ -11,9 +11,9 @@ import coulomb.cats.implicits._
 import lucuma.core.math.ProperMotion.AngularVelocityComponent
 import lucuma.core.math.units._
 import lucuma.core.optics.SplitMono
+import monocle.Focus
 import monocle.Iso
 import monocle.Lens
-import monocle.Focus
 import spire.math.Rational
 
 object VelocityAxis {

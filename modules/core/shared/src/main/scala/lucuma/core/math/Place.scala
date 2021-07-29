@@ -4,15 +4,16 @@
 package lucuma.core.math
 import cats.Eq
 import cats.Show
-import java.time.ZoneId
 import coulomb.Quantity
-import coulomb.si.Meter
-import eu.timepit.refined.types.numeric.NonNegInt
-import monocle.Lens
-import monocle.Focus
-import io.chrisdavenport.cats.time._
 import coulomb.cats.implicits._
+import coulomb.si.Meter
 import eu.timepit.refined.cats._
+import eu.timepit.refined.types.numeric.NonNegInt
+import io.chrisdavenport.cats.time._
+import monocle.Focus
+import monocle.Lens
+
+import java.time.ZoneId
 
 /** A point on Earth, given latitude, longitude and altitude in m above sea level. */
 final case class Place(

@@ -6,8 +6,10 @@ package lucuma.core.util
 import cats._
 import cats.syntax.all._
 import lucuma.core.optics.Format
-import java.time.{ Instant, ZonedDateTime }
+
+import java.time.Instant
 import java.time.ZoneOffset.UTC
+import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit.MICROS
 
 /** Timestamp wraps a `java.util.Instant` that is truncated to microsecond

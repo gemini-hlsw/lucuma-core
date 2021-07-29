@@ -3,10 +3,12 @@
 
 package lucuma.core.math.arb
 
-import lucuma.core.math.{Angle, Axis, Offset}
-import org.scalacheck._
+import lucuma.core.math.Angle
+import lucuma.core.math.Axis
+import lucuma.core.math.Offset
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Cogen._
+import org.scalacheck._
 
 trait ArbOffset {
   import ArbAngle._

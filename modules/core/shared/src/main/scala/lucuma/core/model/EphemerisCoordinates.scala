@@ -3,11 +3,10 @@
 
 package lucuma.core.model
 
-import lucuma.core.math._
-
 import cats._
-import monocle.Lens
+import lucuma.core.math._
 import monocle.Focus
+import monocle.Lens
 
 /** A coordinate along with a rate of change in RA and Dec for some time unit,
   * expressed as an offset in p and q.  In reality the velocity information

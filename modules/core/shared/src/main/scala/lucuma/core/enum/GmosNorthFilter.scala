@@ -6,8 +6,8 @@ package core
 package enum
 
 import cats.syntax.all._
-import lucuma.core.util.Enumerated
 import lucuma.core.math.Wavelength
+import lucuma.core.util.Enumerated
 import spire.math.Interval
 
 /**

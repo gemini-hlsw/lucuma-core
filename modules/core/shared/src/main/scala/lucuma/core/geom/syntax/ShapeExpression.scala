@@ -4,9 +4,10 @@
 package lucuma.core.geom
 package syntax
 
-import ShapeExpression._
+import lucuma.core.math.Angle
+import lucuma.core.math.Offset
 
-import lucuma.core.math.{ Angle, Offset }
+import ShapeExpression._
 
 final class ShapeExpressionOps(val self: ShapeExpression) extends AnyVal {
 

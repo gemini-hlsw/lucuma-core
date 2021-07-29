@@ -3,11 +3,11 @@
 
 package lucuma.core.util.arb
 
-import lucuma.core.util.Gid
-import org.scalacheck._
-import org.scalacheck.Arbitrary.arbitrary
-import eu.timepit.refined.types.numeric.PosLong
 import eu.timepit.refined.scalacheck.numeric._
+import eu.timepit.refined.types.numeric.PosLong
+import lucuma.core.util.Gid
+import org.scalacheck.Arbitrary.arbitrary
+import org.scalacheck._
 
 trait ArbGid {
 

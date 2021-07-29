@@ -5,16 +5,17 @@ package lucuma.core.math.skycalc
 
 import cats.syntax.all._
 import coulomb.refined._
-import java.time.Instant
-import java.time.LocalDate
+import io.chrisdavenport.cats.time._
 import lucuma.core.enum.TwilightType
+import lucuma.core.math.Constants._
 import lucuma.core.math.Interval
 import lucuma.core.math.JulianDate
 import lucuma.core.math.Place
 import lucuma.core.math.Schedule
-import lucuma.core.math.Constants._
-import io.chrisdavenport.cats.time._
 import spire.std.double._
+
+import java.time.Instant
+import java.time.LocalDate
 
 trait TwilightCalc extends SunCalc {
 

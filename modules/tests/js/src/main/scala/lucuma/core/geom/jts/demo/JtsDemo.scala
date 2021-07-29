@@ -4,12 +4,12 @@
 package lucuma.core.geom.jts
 package demo
 
-import lucuma.svgdotjs.Svg
 import lucuma.core.geom.GmosOiwfsProbeArm
 import lucuma.core.geom.jts.JtsShape
 import lucuma.core.geom.jts.interpreter._
 import lucuma.core.geom.svg._
 import lucuma.core.geom.svg.implicits._
+import lucuma.svgdotjs.Svg
 
 /**
  * Throwaway demo code to visualize a shape created using `ShapeExpression`s.

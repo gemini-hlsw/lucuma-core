@@ -3,7 +3,8 @@
 
 package lucuma.core.math
 
-import cats.{ Order, Show }
+import cats.Order
+import cats.Show
 import lucuma.core.optics.Format
 import monocle._
 

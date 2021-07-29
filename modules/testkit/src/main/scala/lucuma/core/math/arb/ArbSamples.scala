@@ -4,15 +4,16 @@
 package lucuma.core.math.arb
 
 import cats.Eval
-import java.time.Instant
-import org.scalacheck.Gen
-import org.scalacheck.Arbitrary
-import org.scalacheck.Arbitrary._
-import lucuma.core.math.skycalc.solver.Samples
-import scala.collection.immutable.TreeMap
 import lucuma.core.arb.ArbEval
 import lucuma.core.arb.ArbTime
+import lucuma.core.math.skycalc.solver.Samples
+import org.scalacheck.Arbitrary
+import org.scalacheck.Arbitrary._
 import org.scalacheck.Cogen
+import org.scalacheck.Gen
+
+import java.time.Instant
+import scala.collection.immutable.TreeMap
 
 trait ArbSamples {
   import ArbEval._

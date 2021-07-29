@@ -7,8 +7,8 @@ package enum
 
 import cats.Eval
 import cats.syntax.eq._
-import lucuma.core.util.Enumerated
 import lucuma.core.math.MagnitudeValue
+import lucuma.core.util.Enumerated
 
 /**
  * Enumerated type for GPI ObservingMode.

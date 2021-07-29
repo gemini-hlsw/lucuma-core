@@ -3,17 +3,17 @@
 
 package lucuma.core.model
 
+import cats.Order
+import cats.Show
 import lucuma.core.enum.Site
-import lucuma.core.math.Interval
 import lucuma.core.enum.TwilightType
+import lucuma.core.math.Interval
 import lucuma.core.math.skycalc.TwilightCalc
-
-import cats.{ Order, Show }
+import monocle.Getter
 
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
-import monocle.Getter
 
 /** The start and end of a particular night at a [[lucuma.core.enum.Site]]. */
 sealed abstract case class TwilightBoundedNight private (

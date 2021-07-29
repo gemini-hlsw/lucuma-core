@@ -3,8 +3,6 @@
 
 package lucuma.core.math
 
-import java.time._
-
 import cats.Order
 import cats.Show
 import cats.syntax.all._
@@ -18,6 +16,8 @@ import lucuma.core.optics.Format
 import lucuma.core.optics.syntax.all._
 import lucuma.core.syntax.parser._
 import monocle.Prism
+
+import java.time._
 
 /**
   * An epoch, the astronomer's equivalent of `Instant`, based on a fractional year in some temporal

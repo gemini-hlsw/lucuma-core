@@ -3,7 +3,9 @@
 
 package lucuma.core.optics.laws
 
-import cats.{ Group, Monoid, Semigroup }
+import cats.Group
+import cats.Monoid
+import cats.Semigroup
 
 abstract class SemigroupHomomorphismLaws[A, B](f: A => B) {
   val A: Semigroup[A]

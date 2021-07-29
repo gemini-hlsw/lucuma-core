@@ -4,7 +4,8 @@
 package lucuma.core.optics
 
 import cats.arrow._
-import monocle.{ Iso, Prism }
+import monocle.Iso
+import monocle.Prism
 
 /**
   * A normalizing optic, isomorphic to Prism but with different laws, specifically `getOption`

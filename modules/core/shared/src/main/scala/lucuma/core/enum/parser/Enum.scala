@@ -3,10 +3,12 @@
 
 package lucuma.core.enum.parser
 
+import atto._
 import cats.syntax.all._
-import atto._, Atto._
 import lucuma.core.enum._
 import lucuma.core.util.Enumerated
+
+import Atto._
 
 /** Parsers for `gem.enum` data types. */
 trait EnumParsers {
