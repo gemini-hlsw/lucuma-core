@@ -56,6 +56,13 @@ trait Samples[A] { outer =>
     data.map { case (i, ep) => (i, ep.flatMap(k(i, _))) }
 
   /**
+   * Iterator for samples, which are computed dynamically while the iterator is traversed.
+   */
+  def iterator: Iterator[(Instant, A)]      = data.iterator.map { case (i, ep) =>
+    (i, ep.flatMap(k(i, _)).value)
+  }
+
+  /**
    * Split the samples at `i`, yielding a `Lookup` containing the matching sample, if any, and all
    * samples before and after `i`.
    */
