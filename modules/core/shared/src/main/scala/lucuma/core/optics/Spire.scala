@@ -3,10 +3,14 @@
 
 package lucuma.core.optics
 
+import cats.Order
+import cats.syntax.all._
 import lucuma.core.optics.Format
 import lucuma.core.optics.SplitEpi
+import lucuma.core.syntax.boundedInterval._
 import monocle.Iso
 import spire.math._
+import spire.math.extras.interval.IntervalSeq
 
 import scala.util.Try
 
@@ -43,4 +47,45 @@ object Spire {
 
   val numberNatural: Format[Number, Natural] =
     Format(n => Try(Natural(n.toBigInt)).toOption, Number.apply)
+
+  /**
+   * Makes a best-effort attempt to convert the tuple (a, b) into interval [a, b) or [b, a).
+   *
+   * It's a Format to contemplate the case of tuple (a, a).
+   */
+  def openUpperIntervalFromTuple[A: Order]: Format[(A, A), Bounded[A]] =
+    Format[(A, A), Bounded[A]](
+      { case (start, end) =>
+        if (start < end)(Bounded.unsafeOpenUpper(start, end)).some
+        else if (start > end)(Bounded.unsafeOpenUpper(end, start)).some
+        else none
+      },
+      i => (i.lower, i.upper)
+    )
+
+  /**
+   * Makes a best-effort attempt to convert the tuple (a, b) into interval [a, b] or [b, a].
+   *
+   * It's a Format to contemplate the case of tuple (a, a).
+   */
+  def closedIntervalFromTuple[A: Order]: Format[(A, A), Bounded[A]] =
+    Format[(A, A), Bounded[A]](
+      { case (start, end) =>
+        if (start < end)(Bounded.unsafeClosed(start, end)).some
+        else if (start > end)(Bounded.unsafeClosed(end, start)).some
+        else none
+      },
+      i => (i.lower, i.upper)
+    )
+
+  /**
+   * The union of any list of `Interval[A]`.
+   *
+   * Building an InervalSeq from a List will normalize it into a minimal set covering the Intervals.
+   */
+  def intervalListUnion[A: Order]: SplitEpi[List[Interval[A]], IntervalSeq[A]] =
+    SplitEpi[List[Interval[A]], IntervalSeq[A]](
+      _.foldLeft(IntervalSeq.empty[A])((s, i) => s | i),
+      _.intervals.toList
+    )
 }

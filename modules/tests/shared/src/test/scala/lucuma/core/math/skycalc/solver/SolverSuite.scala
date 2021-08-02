@@ -6,10 +6,11 @@ package lucuma.core.math.skycalc.solver
 import cats.syntax.all._
 import java.time.Instant
 import java.time.Duration
-import lucuma.core.math.Schedule
+import spire.math.extras.interval.IntervalSeq
 import lucuma.core.math.IntervalGens
 import lucuma.core.math.skycalc.solver.SolverStrategy._
 import lucuma.core.math.skycalc.solver.RoundStrategy._
+import io.chrisdavenport.cats.time._
 
 final class SolverSuite extends munit.DisciplineSuite with IntervalGens {
 
@@ -44,13 +45,12 @@ final class SolverSuite extends munit.DisciplineSuite with IntervalGens {
     val solver = constraintSolver[Default](f1)
     val solve  = solver.solve(TestCalculator) _
 
-    assertEquals(Schedule(List(buildInterval(0, 150))), solve(buildInterval(0, 200)).some)
-    assertEquals(Schedule(List(buildInterval(250, 400))), solve(buildInterval(200, 400)).some)
-    assertEquals(Schedule(List(buildInterval(250, 450))), solve(buildInterval(200, 500)).some)
+    assertEquals(IntervalSeq(buildInterval(0, 150)), solve(buildInterval(0, 200)))
+    assertEquals(IntervalSeq(buildInterval(250, 400)), solve(buildInterval(200, 400)))
+    assertEquals(IntervalSeq(buildInterval(250, 450)), solve(buildInterval(200, 500)))
     assertEquals(
-      Schedule(List(buildInterval(0, 150), buildInterval(250, 400))), solve(
-        buildInterval(0, 400)
-      ).some
+      IntervalSeq(buildInterval(0, 150)) | buildInterval(250, 400),
+      solve(buildInterval(0, 400))
     )
   }
 
@@ -58,13 +58,12 @@ final class SolverSuite extends munit.DisciplineSuite with IntervalGens {
     val solver = constraintSolver[Parabola](f1)
     val solve  = solver.solve(TestCalculator) _
 
-    assertEquals(Schedule(List(buildInterval(0, 150))), solve(buildInterval(0, 200)).some)
-    assertEquals(Schedule(List(buildInterval(250, 400))), solve(buildInterval(200, 400)).some)
-    assertEquals(Schedule(List(buildInterval(250, 450))), solve(buildInterval(200, 500)).some)
+    assertEquals(IntervalSeq(buildInterval(0, 150)), solve(buildInterval(0, 200)))
+    assertEquals(IntervalSeq(buildInterval(250, 400)), solve(buildInterval(200, 400)))
+    assertEquals(IntervalSeq(buildInterval(250, 450)), solve(buildInterval(200, 500)))
     assertEquals(
-      Schedule(List(buildInterval(0, 150), buildInterval(250, 400))), solve(
-        buildInterval(0, 400)
-      ).some
+      IntervalSeq(buildInterval(0, 150)) | buildInterval(250, 400),
+      solve(buildInterval(0, 400))
     )
   }
 
@@ -77,7 +76,7 @@ final class SolverSuite extends munit.DisciplineSuite with IntervalGens {
     val solve  = solver.solve(TestCalculator) _
 
     assert(
-      (Schedule(List(buildInterval(5000, 6000))) === solve(buildInterval(0, 10000)).some)
+      (IntervalSeq(buildInterval(5000, 6000)) === solve(buildInterval(0, 10000)))
     )
   }
 }

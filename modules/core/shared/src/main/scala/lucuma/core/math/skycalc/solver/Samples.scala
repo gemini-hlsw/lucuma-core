@@ -11,10 +11,11 @@ import cats.MonoidK
 import cats.syntax.all._
 import io.chrisdavenport.cats.time._
 import lucuma.core.math.Coordinates
-import lucuma.core.math.Interval
 import lucuma.core.math.Place
+import lucuma.core.optics.Spire
 import lucuma.core.syntax.time._
 import monocle.Iso
+import spire.math.Bounded
 
 import java.time.Duration
 import java.time.Instant
@@ -36,11 +37,11 @@ trait Samples[A] { outer =>
   protected val data: TreeMap[Instant, Eval[P]]
   protected val k: (Instant, P) => Eval[A]
 
-  /** The [[Interval]] covered by the samples. Note: change this to a closed Interval when we switch to Spire. */
-  def interval: Option[Interval] =
+  /** The `Bounded[Instant]` covered by the samples. */
+  def interval: Option[Bounded[Instant]] =
     (data.headOption, data.lastOption)
       .bimap(_.map(_._1), _.map(_._1))
-      .mapN(Interval.apply)
+      .mapN(Function.untupled(Spire.closedIntervalFromTuple[Instant].getOption))
       .flatten
 
   /** The value at `i`, if any. */
@@ -156,15 +157,15 @@ object Samples extends SamplesOptics {
     }
 
   /** Construct a `Samples` with a single sample. */
-  def single[A](instant:       Instant, value: => A): Samples[A] =
+  def single[A](instant:       Instant, value:         => A): Samples[A] =
     fromMap(TreeMap(instant -> Eval.later(value)))
 
   /** Construct a `Samples` across an interval, sampled at the given rate. */
-  def atFixedRate[A](interval: Interval, rate: Duration)(f: Instant => A): Samples[A] =
+  def atFixedRate[A](interval: Bounded[Instant], rate: Duration)(f: Instant => A): Samples[A] =
     fromMap(
       Iterator
-        .iterate(interval.start)(_ + rate)
-        .takeWhile(_ < interval.end + rate)
+        .iterate(interval.lower)(_ + rate)
+        .takeWhile(_ < interval.upper + rate)
         .map(i => (i, Eval.later(f(i))))
         .to(TreeMap)
     )

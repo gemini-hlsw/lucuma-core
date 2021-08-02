@@ -8,15 +8,16 @@ import java.time.Duration
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Declination
 import lucuma.core.math.HourAngle
-import lucuma.core.math.Schedule
 import lucuma.core.math.IntervalGens
 import lucuma.core.math.skycalc.SkyCalcResults
 import lucuma.core.enum.Site.GN
+import spire.math.extras.interval.IntervalSeq
+import io.chrisdavenport.cats.time._
 
 /**
-  * This is not meant to test the underlying SkyCalc implementations, we assume that this is all working,
-  * this only tests the general mechanics of the ConstraintSolver instances.
-  */
+ * This is not meant to test the underlying SkyCalc implementations, we assume that this is all working,
+ * this only tests the general mechanics of the ConstraintSolver instances.
+ */
 final class ConstraintSolverSuite extends munit.DisciplineSuite with IntervalGens {
 
   val testSamples =
@@ -41,55 +42,57 @@ final class ConstraintSolverSuite extends munit.DisciplineSuite with IntervalGen
 
   test("ElevationSolver") {
     val solver =
-      ElevationSolver(Declination.fromDoubleDegrees(40.0).get,
-                      Declination.fromDoubleDegrees(49.0).get,
-                      Duration.ofMillis(1)
+      ElevationSolver(
+        Declination.fromDoubleDegrees(40.0).get,
+        Declination.fromDoubleDegrees(49.0).get,
+        Duration.ofMillis(1)
       )
     val s1     = solver.solve(testSamples)(buildInterval(0, 90))
-    assertEquals(s1, Schedule(buildInterval(40, 50)))
+    assertEquals(s1, IntervalSeq(buildInterval(40, 50)))
     val s2     = solver.solve(testSamples)(buildInterval(0, 45))
-    assertEquals(s2, Schedule(buildInterval(40, 45)))
+    assertEquals(s2, IntervalSeq(buildInterval(40, 45)))
     val s3     = solver.solve(testSamples)(buildInterval(45, 90))
-    assertEquals(s3, Schedule(buildInterval(45, 50)))
+    assertEquals(s3, IntervalSeq(buildInterval(45, 50)))
   }
 
   test("SkyBrightnessSolver") {
     val solver = SkyBrightnessSolver(40.0, 49.0, Duration.ofMillis(1))
     val s1     = solver.solve(testSamples)(buildInterval(0, 90))
-    assertEquals(s1, Schedule(buildInterval(40, 50)))
+    assertEquals(s1, IntervalSeq(buildInterval(40, 50)))
     val s2     = solver.solve(testSamples)(buildInterval(0, 45))
-    assertEquals(s2, Schedule(buildInterval(40, 45)))
+    assertEquals(s2, IntervalSeq(buildInterval(40, 45)))
     val s3     = solver.solve(testSamples)(buildInterval(45, 90))
-    assertEquals(s3, Schedule(buildInterval(45, 50)))
+    assertEquals(s3, IntervalSeq(buildInterval(45, 50)))
   }
 
   test("AirmassSolver") {
     val solver = AirmassSolver(2.0, 15.0, Duration.ofMillis(1))
     val s1     = solver.solve(testSamples)(buildInterval(0, 90))
-    assertEquals(s1, Schedule(buildInterval(5, 16)))
+    assertEquals(s1, IntervalSeq(buildInterval(5, 16)))
     val s2     = solver.solve(testSamples)(buildInterval(0, 10))
-    assertEquals(s2, Schedule(buildInterval(5, 10)))
+    assertEquals(s2, IntervalSeq(buildInterval(5, 10)))
     val s3     = solver.solve(testSamples)(buildInterval(10, 90))
-    assertEquals(s3, Schedule(buildInterval(10, 16)))
+    assertEquals(s3, IntervalSeq(buildInterval(10, 16)))
   }
 
   test("HourAngleSolver") {
     val solver =
-      HourAngleSolver(HourAngle.fromHMS(2, 0, 0, 0, 0),
-                      HourAngle.fromHMS(15, 0, 0, 0, 0),
-                      Duration.ofMillis(1)
+      HourAngleSolver(
+        HourAngle.fromHMS(2, 0, 0, 0, 0),
+        HourAngle.fromHMS(15, 0, 0, 0, 0),
+        Duration.ofMillis(1)
       )
     val s1     = solver.solve(testSamples)(buildInterval(0, 24))
-    assertEquals(s1, Schedule(buildInterval(5, 16)))
+    assertEquals(s1, IntervalSeq(buildInterval(5, 16)))
     val s2     = solver.solve(testSamples)(buildInterval(0, 10))
-    assertEquals(s2, Schedule(buildInterval(5, 10)))
+    assertEquals(s2, IntervalSeq(buildInterval(5, 10)))
     val s3     = solver.solve(testSamples)(buildInterval(10, 24))
-    assertEquals(s3, Schedule(buildInterval(10, 16)))
+    assertEquals(s3, IntervalSeq(buildInterval(10, 16)))
     val s4     = solver.solve(testSamples)(buildInterval(0, 48))
-    assertEquals(s4, Schedule(buildInterval(5, 16)).union(Schedule(buildInterval(26, 40))))
+    assertEquals(s4, IntervalSeq(buildInterval(5, 16)) | (IntervalSeq(buildInterval(26, 40))))
     val s5     = solver.solve(testSamples)(buildInterval(0, 34))
-    assertEquals(s5, Schedule(buildInterval(5, 16)).union(Schedule(buildInterval(26, 34))))
+    assertEquals(s5, IntervalSeq(buildInterval(5, 16)) | (IntervalSeq(buildInterval(26, 34))))
     val s6     = solver.solve(testSamples)(buildInterval(10, 48))
-    assertEquals(s6, Schedule(buildInterval(10, 16)).union(Schedule(buildInterval(26, 40))))
+    assertEquals(s6, IntervalSeq(buildInterval(10, 16)) | (IntervalSeq(buildInterval(26, 40))))
   }
 }

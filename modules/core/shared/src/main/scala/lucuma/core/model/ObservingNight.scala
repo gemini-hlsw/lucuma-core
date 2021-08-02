@@ -4,11 +4,13 @@
 package lucuma.core.model
 
 import cats._
+import io.chrisdavenport.cats.time._
 import lucuma.core.enum.Site
 import lucuma.core.enum.TwilightType
-import lucuma.core.math.Interval
+import lucuma.core.syntax.boundedInterval._
 import monocle.Focus
 import monocle.Lens
+import spire.math.Bounded
 
 import java.time._
 
@@ -44,9 +46,10 @@ final case class ObservingNight(site: Site, toLocalObservingNight: LocalObservin
     twilightBounded(twilightType).get
 
   /** The `Interval`for the the observing night at the associated site. */
-  override lazy val interval: Interval =
-    Interval.unsafe(toLocalObservingNight.start.atZone(site.timezone).toInstant,
-                    toLocalObservingNight.end.atZone(site.timezone).toInstant
+  override lazy val interval: Bounded[Instant] =
+    Bounded.unsafeOpenUpper(
+      toLocalObservingNight.start.atZone(site.timezone).toInstant,
+      toLocalObservingNight.end.atZone(site.timezone).toInstant
     )
 
   /** The previous observing night. */
