@@ -21,7 +21,7 @@ object SolverStrategy {
 
 /**
  * Typeclass defininig an algorithm that finds an `IntervalSeq[Instant]` within a
- * given `Bounded[Interval]` for which a given function <code>Instant => Boolean</code> is true.
+ * given `Bounded[Instant]` for which a given function <code>Instant => Boolean</code> is true.
  *
  * @tparam S [[SolverStrategy]] to use
  */
