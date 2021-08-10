@@ -101,7 +101,7 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform)
     name := "lucuma-core-tests",
     publish / skip := true,
     libraryDependencies ++= Seq(
-      "org.scalameta" %%% "munit"            % "0.7.27" % Test,
+      "org.scalameta" %%% "munit"            % "0.7.28" % Test,
       "org.typelevel" %%% "discipline-munit" % "1.0.9"  % Test
     ),
     testFrameworks += new TestFramework("munit.Framework")
