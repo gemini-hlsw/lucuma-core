@@ -33,7 +33,7 @@ object GmosNorthDisperser {
 
   /** All members of GmosNorthDisperser, in canonical order. */
   val all: List[GmosNorthDisperser] =
-    List(B1200_G5301, R831_G5302, B600_G5303, B600_G5307, R600_G5304, R400_G5305, R150_G5306, R150_G5308)
+    List(B1200_G5301, R831_G5302, B600_G5303, B600_G5307, R600_G5304, B480_G5309, R400_G5305, R150_G5306, R150_G5308)
 
   /** Select the member of GmosNorthDisperser with the given tag, if any. */
   def fromTag(s: String): Option[GmosNorthDisperser] =
