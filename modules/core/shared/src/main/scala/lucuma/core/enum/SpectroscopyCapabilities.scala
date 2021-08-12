@@ -10,8 +10,8 @@ sealed abstract class SpectroscopyCapabilities extends Product with Serializable
 object SpectroscopyCapabilities {
   case object NodAndShuffle extends SpectroscopyCapabilities
   case object Polarimetry   extends SpectroscopyCapabilities
-  case object Corongraphy   extends SpectroscopyCapabilities
+  case object Coronagraphy  extends SpectroscopyCapabilities
 
   implicit val SpectroscopyCapabilitiesEnumerated: Enumerated[SpectroscopyCapabilities] =
-    Enumerated.of(NodAndShuffle, Polarimetry, Corongraphy)
+    Enumerated.of(NodAndShuffle, Polarimetry, Coronagraphy)
 }
