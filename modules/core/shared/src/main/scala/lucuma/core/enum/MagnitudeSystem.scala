@@ -4,26 +4,46 @@
 package lucuma
 package core
 package enum
+
 import cats.syntax.eq._
+import coulomb.Unitless
 import lucuma.core.util.Enumerated
+import lucuma.core.math.units
 
 /**
  * Enumerated type for magnitude system.
+ * @tparam A units
  * @group Enumerations (Generated)
  */
 sealed abstract class MagnitudeSystem(
   val tag: String
-) extends Product with Serializable
+) extends Product with Serializable {
+  type Units
+}
 
 object MagnitudeSystem {
 
-  /** @group Constructors */ case object Vega extends MagnitudeSystem("Vega")
-  /** @group Constructors */ case object AB extends MagnitudeSystem("AB")
-  /** @group Constructors */ case object Jy extends MagnitudeSystem("Jy")
-
+  /** @group Constructors */ case object Vega           extends MagnitudeSystem("Vega") {
+                                                                  type Units = Unitless
+                                                                }
+  /** @group Constructors */ case object AB             extends MagnitudeSystem("AB") {
+                                                                  type Units = Unitless
+                                                                }
+  /** @group Constructors */ case object Jy             extends MagnitudeSystem("Jy") {
+                                                                  type Units = units.Jansky
+                                                                }
+  /** @group Constructors */ case object Watts          extends MagnitudeSystem("W/m²/µm") {
+                                                                  type Units = units.WattsMag
+                                                                }
+  /** @group Constructors */ case object ErgsWavelength extends MagnitudeSystem("erg/s/cm²/Å") {
+                                                                  type Units = units.ErgsWavelengthMag
+                                                                }
+  /** @group Constructors */ case object ErgsFrequency  extends MagnitudeSystem("erg/s/cm²/Hz") {
+                                                                  type Units = units.ErgsFrequencyMag
+                                                                }
   /** All members of MagnitudeSystem, in canonical order. */
   val all: List[MagnitudeSystem] =
-    List(Vega, AB, Jy)
+    List(Vega, AB, Jy, Watts, ErgsWavelength, ErgsFrequency)
 
   /** Select the member of MagnitudeSystem with the given tag, if any. */
   def fromTag(s: String): Option[MagnitudeSystem] =
