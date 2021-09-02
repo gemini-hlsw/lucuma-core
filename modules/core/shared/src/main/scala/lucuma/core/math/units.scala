@@ -5,7 +5,7 @@ package lucuma.core.math
 
 import coulomb._
 import coulomb.accepted._
-import coulomb.define.DerivedUnit
+import coulomb.define._
 import coulomb.mks._
 import coulomb.si._
 import coulomb.siprefix._
@@ -19,6 +19,9 @@ import eu.timepit.refined.types.numeric.PosInt
 import spire.math._
 
 trait units {
+  trait Pixels
+  implicit val defineUnitPixels = BaseUnit[Pixels](abbv = "px")
+
   // Wavelength units
   type Picometer  = Pico %* Meter
   type Nanometer  = Nano %* Meter

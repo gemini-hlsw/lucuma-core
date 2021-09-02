@@ -4,8 +4,15 @@
 package lucuma
 package core
 package enum
+
 import cats.syntax.eq._
+import coulomb._
+import coulomb.refined._
+import eu.timepit.refined.auto._
+import eu.timepit.refined.numeric.Positive
+import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.math.Angle
+import lucuma.core.math.units.Pixels
 import lucuma.core.util.Enumerated
 
 /**
@@ -16,22 +23,60 @@ sealed abstract class GmosDetector(
   val tag: String,
   val shortName: String,
   val longName: String,
-  val northPixelSize: Angle,
-  val southPixelSize: Angle,
-  val shuffleOffset: Int,
-  val xSize: Int,
-  val ySize: Int,
-  val maxRois: Int
-) extends Product with Serializable
+  val pixelSize: Angle,
+  val shuffleOffset: Quantity[PosInt, Pixels],
+  val xSize: Quantity[PosInt, Pixels],
+  val ySize: Quantity[PosInt, Pixels],
+  val maxRois: PosInt
+) extends Product with Serializable {
+}
 
 object GmosDetector {
 
-  /** @group Constructors */ case object E2V extends GmosDetector("E2V", "E2V", "E2V", Angle.fromDoubleArcseconds(0.0727), Angle.fromDoubleArcseconds(0.0730), 1536, 6144, 4608, 4)
-  /** @group Constructors */ case object HAMAMATSU extends GmosDetector("HAMAMATSU", "Hamamatsu", "Hamamatsu", Angle.fromDoubleArcseconds(0.0809), Angle.fromDoubleArcseconds(0.0809), 1392, 6144, 4224, 5)
+  /** @group Constructors */ case object GmosNE2V extends GmosDetector(
+                               "GmosNE2V",
+                               "E2V",
+                               "E2V",
+                               Angle.fromMicroarcseconds(72700),
+                               1536.withRefinedUnit[Positive, Pixels],
+                               6144.withRefinedUnit[Positive, Pixels],
+                               4608.withRefinedUnit[Positive, Pixels],
+                               4
+                             )
+  /** @group Constructors */ case object GmosSE2V extends GmosDetector(
+                               "GmosSE2V",
+                               "E2V",
+                               "E2V",
+                               Angle.fromMicroarcseconds(73000),
+                               1536.withRefinedUnit[Positive, Pixels],
+                               6144.withRefinedUnit[Positive, Pixels],
+                               4608.withRefinedUnit[Positive, Pixels],
+                               4
+                             )
+  /** @group Constructors */ case object GmosNHammamtsu extends GmosDetector(
+                               "GmosNHAMAMATSU",
+                               "Hamamatsu",
+                               "Hamamatsu",
+                               Angle.fromMicroarcseconds(80900),
+                               1392.withRefinedUnit[Positive, Pixels],
+                               6278.withRefinedUnit[Positive, Pixels],
+                               4176.withRefinedUnit[Positive, Pixels],
+                               5
+                             )
+  /** @group Constructors */ case object GmosSHammamtsu extends GmosDetector(
+                               "GmosSHAMAMATSU",
+                               "Hamamatsu",
+                               "Hamamatsu",
+                               Angle.fromMicroarcseconds(80000),
+                               1392.withRefinedUnit[Positive, Pixels],
+                               6255.withRefinedUnit[Positive, Pixels],
+                               4176.withRefinedUnit[Positive, Pixels],
+                               5
+                             )
 
   /** All members of GmosDetector, in canonical order. */
   val all: List[GmosDetector] =
-    List(E2V, HAMAMATSU)
+    List(GmosNE2V, GmosSE2V, GmosNHammamtsu, GmosSHammamtsu)
 
   /** Select the member of GmosDetector with the given tag, if any. */
   def fromTag(s: String): Option[GmosDetector] =
