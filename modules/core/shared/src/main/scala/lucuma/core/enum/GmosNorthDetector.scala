@@ -34,7 +34,7 @@ sealed abstract class GmosNorthDetector(
 object GmosNorthDetector {
 
   /** @group Constructors */ case object E2V extends GmosNorthDetector(
-                               "GmosNE2V",
+                               "E2V",
                                "E2V",
                                "E2V",
                                Angle.fromMicroarcseconds(72700),
