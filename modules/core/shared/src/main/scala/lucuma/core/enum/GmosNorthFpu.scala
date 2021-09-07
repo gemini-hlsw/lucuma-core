@@ -35,13 +35,13 @@ object GmosNorthFpu {
   /** @group Constructors */ case object LongSlit_1_50 extends GmosNorthFpu("LongSlit_1_50", "1.5\"", "Longslit 1.50 arcsec", Some(Angle.fromDoubleArcseconds(1.50)), Angle.fromDoubleArcseconds(0.000))
   /** @group Constructors */ case object LongSlit_2_00 extends GmosNorthFpu("LongSlit_2_00", "2.0\"", "Longslit 2.00 arcsec", Some(Angle.fromDoubleArcseconds(2.00)), Angle.fromDoubleArcseconds(0.000))
   /** @group Constructors */ case object LongSlit_5_00 extends GmosNorthFpu("LongSlit_5_00", "5.0\"", "Longslit 5.00 arcsec", Some(Angle.fromDoubleArcseconds(5.00)), Angle.fromDoubleArcseconds(0.000))
-  /** @group Constructors */ case object Ifu1 extends GmosNorthFpu("Ifu1", "IFU-2", "IFU 2 Slits", Option.empty[Angle], Angle.fromDoubleArcseconds(33.500))
-  /** @group Constructors */ case object Ifu2 extends GmosNorthFpu("Ifu2", "IFU-B", "IFU Left Slit (blue)", Option.empty[Angle], Angle.fromDoubleArcseconds(31.750))
-  /** @group Constructors */ case object Ifu3 extends GmosNorthFpu("Ifu3", "IFU-R", "IFU Right Slit (red)", Option.empty[Angle], Angle.fromDoubleArcseconds(35.250))
+  /** @group Constructors */ case object Ifu2 extends GmosNorthFpu("Ifu2", "IFU-2", "IFU 2 Slits", Option.empty[Angle], Angle.fromDoubleArcseconds(33.500))
+  /** @group Constructors */ case object IfuBlue extends GmosNorthFpu("IfuBlue", "IFU-B", "IFU Left Slit (blue)", Option.empty[Angle], Angle.fromDoubleArcseconds(31.750))
+  /** @group Constructors */ case object IfuRed extends GmosNorthFpu("IfuRed", "IFU-R", "IFU Right Slit (red)", Option.empty[Angle], Angle.fromDoubleArcseconds(35.250))
 
   /** All members of GmosNorthFpu, in canonical order. */
   val all: List[GmosNorthFpu] =
-    List(Ns0, Ns1, Ns2, Ns3, Ns4, Ns5, LongSlit_0_25, LongSlit_0_50, LongSlit_0_75, LongSlit_1_00, LongSlit_1_50, LongSlit_2_00, LongSlit_5_00, Ifu1, Ifu2, Ifu3)
+    List(Ns0, Ns1, Ns2, Ns3, Ns4, Ns5, LongSlit_0_25, LongSlit_0_50, LongSlit_0_75, LongSlit_1_00, LongSlit_1_50, LongSlit_2_00, LongSlit_5_00, Ifu2, IfuBlue, IfuRed)
 
   /** Select the member of GmosNorthFpu with the given tag, if any. */
   def fromTag(s: String): Option[GmosNorthFpu] =
