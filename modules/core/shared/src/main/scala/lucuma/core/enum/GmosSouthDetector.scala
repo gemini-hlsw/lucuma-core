@@ -43,10 +43,10 @@ object GmosSouthDetector {
                                4608.withRefinedUnit[Positive, Pixels],
                                4
                              )
-  /** @group Constructors */ case object Hammamtsu extends GmosSouthDetector(
+  /** @group Constructors */ case object Hamamatsu extends GmosSouthDetector(
                                "HAMAMATSU",
-                               "Hammamatsu",
-                               "Hammamatsu",
+                               "Hamamatsu",
+                               "Hamamatsu",
                                Angle.fromMicroarcseconds(80000),
                                1392.withRefinedUnit[Positive, Pixels],
                                6255.withRefinedUnit[Positive, Pixels],
@@ -56,7 +56,7 @@ object GmosSouthDetector {
 
   /** All members of GmosSouthDetector, in canonical order. */
   val all: List[GmosSouthDetector] =
-    List(E2V, Hammamtsu)
+    List(E2V, Hamamatsu)
 
   /** Select the member of GmosSouthDetector with the given tag, if any. */
   def fromTag(s: String): Option[GmosSouthDetector] =
