@@ -35,8 +35,8 @@ object GmosScienceAreaGeometry {
         n =>
           n match {
             case GmosNorthFpu.Ns0 | GmosNorthFpu.Ns1 | GmosNorthFpu.Ns2 | GmosNorthFpu.Ns3 |
-                GmosNorthFpu.Ns4 | GmosNorthFpu.Ns5 | GmosNorthFpu.Ifu1 | GmosNorthFpu.Ifu2 |
-                GmosNorthFpu.Ifu3 =>
+                GmosNorthFpu.Ns4 | GmosNorthFpu.Ns5 | GmosNorthFpu.Ifu2Slits | GmosNorthFpu.IfuBlue |
+                GmosNorthFpu.IfuRed =>
               ShapeExpression.empty
 
             case GmosNorthFpu.LongSlit_0_25 | GmosNorthFpu.LongSlit_0_50 |
@@ -48,8 +48,9 @@ object GmosScienceAreaGeometry {
         s =>
           s match {
             case GmosSouthFpu.Bhros | GmosSouthFpu.Ns1 | GmosSouthFpu.Ns2 | GmosSouthFpu.Ns3 |
-                GmosSouthFpu.Ns4 | GmosSouthFpu.Ns5 | GmosSouthFpu.Ifu1 | GmosSouthFpu.Ifu2 |
-                GmosSouthFpu.Ifu3 | GmosSouthFpu.IfuN | GmosSouthFpu.IfuNB | GmosSouthFpu.IfuNR =>
+                GmosSouthFpu.Ns4 | GmosSouthFpu.Ns5 | GmosSouthFpu.Ifu2Slits | GmosSouthFpu.IfuBlue |
+                GmosSouthFpu.IfuRed | GmosSouthFpu.IfuNS2Slits | GmosSouthFpu.IfuNSBlue |
+                GmosSouthFpu.IfuNSRed =>
               ShapeExpression.empty
 
             case GmosSouthFpu.LongSlit_0_25 | GmosSouthFpu.LongSlit_0_50 |
