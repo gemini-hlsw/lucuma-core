@@ -35,7 +35,7 @@ object GmosScienceAreaGeometry {
         n =>
           n match {
             case GmosNorthFpu.Ns0 | GmosNorthFpu.Ns1 | GmosNorthFpu.Ns2 | GmosNorthFpu.Ns3 |
-                GmosNorthFpu.Ns4 | GmosNorthFpu.Ns5 | GmosNorthFpu.Ifu2 | GmosNorthFpu.IfuBlue |
+                GmosNorthFpu.Ns4 | GmosNorthFpu.Ns5 | GmosNorthFpu.Ifu2Slits | GmosNorthFpu.IfuBlue |
                 GmosNorthFpu.IfuRed =>
               ShapeExpression.empty
 
@@ -48,8 +48,8 @@ object GmosScienceAreaGeometry {
         s =>
           s match {
             case GmosSouthFpu.Bhros | GmosSouthFpu.Ns1 | GmosSouthFpu.Ns2 | GmosSouthFpu.Ns3 |
-                GmosSouthFpu.Ns4 | GmosSouthFpu.Ns5 | GmosSouthFpu.Ifu2 | GmosSouthFpu.IfuBlue |
-                GmosSouthFpu.IfuRed | GmosSouthFpu.IfuNS2 | GmosSouthFpu.IfuNSBlue |
+                GmosSouthFpu.Ns4 | GmosSouthFpu.Ns5 | GmosSouthFpu.Ifu2Slits | GmosSouthFpu.IfuBlue |
+                GmosSouthFpu.IfuRed | GmosSouthFpu.IfuNS2Slits | GmosSouthFpu.IfuNSBlue |
                 GmosSouthFpu.IfuNSRed =>
               ShapeExpression.empty
 
