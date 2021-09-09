@@ -22,7 +22,7 @@ import scala.collection.immutable.SortedMap
 final case class Target(
   name:       NonEmptyString,
   track:      Either[EphemerisKey, SiderealTracking],
-  magnitudes: SortedMap[MagnitudeBand, Magnitude]
+  magnitudes: SortedMap[MagnitudeBand, Magnitude]  // essentially deprecated -- need to move this to a source definition
 )
 
 object Target extends WithId('t') with TargetOptics {
@@ -36,7 +36,7 @@ object Target extends WithId('t') with TargetOptics {
    *
    * Not implicit.
    */
-  val TargetTrackOrder: Order[Target] =
+  val TargetNameOrder: Order[Target] =
     Order.by(t => (t.track, t.name))
 
   /**
@@ -44,7 +44,7 @@ object Target extends WithId('t') with TargetOptics {
    *
    * Not implicit.
    */
-  val TargetNameOrder: Order[Target] =
+  val TargetTrackOrder: Order[Target] =
     Order.by(t => (t.name.value, t.track))
 
 }
