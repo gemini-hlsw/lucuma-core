@@ -191,11 +191,18 @@ case class ImprovedSkyCalc(place: Place) extends ImprovedSkyCalcMethods {
   }
 
   /**
+   * Return the sidereal time for the given instant at the given site, in decimal hours.
+   */
+  def getSiderealTime(instant: Instant): Double = {
+    val jd = instant_to_jd(instant)
+    lst(jd, hoursLongitude)
+  }
+
+  /**
    * Return the LST time for the given instant at the given site.
    */
   def getLst(instant: Instant): ZonedDateTime = {
-    val jd       = instant_to_jd(instant)
-    val lstHours = lst(jd, hoursLongitude)
+    val lstHours = getSiderealTime(instant)
     getLst(lstHours, instant)
   }
 }
