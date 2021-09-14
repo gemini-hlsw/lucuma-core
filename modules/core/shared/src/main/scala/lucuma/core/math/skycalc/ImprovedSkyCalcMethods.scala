@@ -64,10 +64,9 @@ trait ImprovedSkyCalcMethods {
    */
   def getAirmass(alt: Double): Double = {
     val secz = secant_z(alt)
-    if (secz >= 0.0)
-      if (secz < 12.0) return true_airmass(secz)
-      else return secz
-    0.0
+    if (secz < 0.0) 0.0
+    else if (secz < 12.0) true_airmass(secz)
+    else secz
   }
 
   /**
@@ -430,11 +429,12 @@ trait ImprovedSkyCalcMethods {
    * get that quadrant right !!
    */
   protected def atan_circ(x: Double, y: Double): Double = {
-    var theta = .0
-    if ((x == 0.0) && (y == 0.0)) return 0.0 /* guard ... */
-    theta = Math.atan2(y, x)
-    while (theta < 0.0) theta += TwoPi
-    theta
+    var theta = 0.0
+    if ((x != 0.0) || (y != 0.0)) {
+      theta = Math.atan2(y, x)
+      while (theta < 0.0) theta += TwoPi
+      theta
+    } else 0.0
   }
 
   /**
@@ -822,19 +822,19 @@ trait ImprovedSkyCalcMethods {
     coef(2) = 3.033104e-3
     coef(3) = 1.351167e-3
     coef(4) = -4.716679e-5
-    if (secz < 0.0) return -1.0 /* out of range. */
-    if (secz > 12) return secz - 1.5 /* shouldn't happen .... */
-    seczmin1 = secz - 1.0
-    /* evaluate polynomial ... */
-    i = ord
-    while (i > 0) {
-      result = (result + coef(i)) * seczmin1
-
-      i -= 1
+    if (secz < 0.0) -1.0 /* out of range. */
+    else if (secz > 12) secz - 1.5 /* shouldn't happen .... */
+    else {
+      seczmin1 = secz - 1.0
+      /* evaluate polynomial ... */
+      i = ord
+      while (i > 0) {
+        result = (result + coef(i)) * seczmin1
+        i -= 1
+      }
+      /* no zeroth order term. */
+      secz - result
     }
-    /* no zeroth order term. */
-    result = secz - result
-    result
   }
 
   protected def instant_to_jd(instant: Instant): Double = {
@@ -978,9 +978,8 @@ trait ImprovedSkyCalcMethods {
     //    ;print,Q-alog10((Bsky)/0.263)/alog10(a),Q-alog10((Bmoon)/0.263)/alog10(a)
     //    ; sky brightness in Vmag/arcsec^2
     //  return Q - alog10((Bmoon+Bsky)/0.263)/    alog10(a);
-    val ret = Q - Math.log10((Bmoon + Bsky) / 0.263) / Math.log10(a)
+    Q - Math.log10((Bmoon + Bsky) / 0.263) / Math.log10(a)
     //    System.out.printf("sb(%1.2f, %1.2f, %1.2f, %1.2f, %1.2f) => %1.3f\n", mpa, mdist, mZD, ZD, sZD, ret);
-    ret
   }
 
   protected def xair(z: Double): Double = { //    ;degrad=180.0d/!PI
