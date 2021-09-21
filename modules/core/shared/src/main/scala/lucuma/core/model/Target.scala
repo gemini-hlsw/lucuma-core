@@ -37,7 +37,7 @@ object Target extends WithId('t') with TargetOptics {
    * Not implicit.
    */
   val TargetTrackOrder: Order[Target] =
-    Order.by(t => (t.track, t.name))
+    Order.by(t => (t.track, t.name, t.magnitudes.toList))
 
   /**
    * Targets ordered by name first and then tracking information.
@@ -45,7 +45,7 @@ object Target extends WithId('t') with TargetOptics {
    * Not implicit.
    */
   val TargetNameOrder: Order[Target] =
-    Order.by(t => (t.name.value, t.track))
+    Order.by(t => (t.name, t.track, t.magnitudes.toList))
 
 }
 
