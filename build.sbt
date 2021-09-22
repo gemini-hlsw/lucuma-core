@@ -12,7 +12,7 @@ lazy val coulombVersion        = "0.5.7"
 lazy val spireVersion          = "0.17.0"
 lazy val singletonOpsVersion   = "0.5.2"
 lazy val refinedVersion        = "0.9.27"
-lazy val catsTimeVersion       = "0.3.4"
+lazy val catsTimeVersion       = "0.4.0"
 lazy val circeVersion          = "0.14.1"
 lazy val catsScalacheckVersion = "0.3.1"
 
