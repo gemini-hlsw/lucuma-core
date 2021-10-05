@@ -5,6 +5,7 @@ package lucuma.core.model
 
 import cats.Order
 import cats.Show
+import io.circe._
 import lucuma.core.enum.EphemerisKeyType
 import lucuma.core.model.parser.EphemerisKeyParsers
 import lucuma.core.optics.Format
@@ -14,7 +15,7 @@ import monocle.Focus
 import monocle.Lens
 
 /**
- * Ephemeris data lookup key which uniquely identifies a non-sidreal object in
+ * Ephemeris data lookup key which uniquely identifies a non-sidereal object in
  * the database.
  */
 sealed trait EphemerisKey extends Product with Serializable {
@@ -41,7 +42,7 @@ sealed trait EphemerisKey extends Product with Serializable {
 
 }
 
-object EphemerisKey extends EphemerisOptics {
+object EphemerisKey extends EphemerisOptics with EphemerisJson {
 
   /**
    * Unique Horizons designation, which should allow for reproducible ephemeris
@@ -133,17 +134,23 @@ trait EphemerisOptics { this: EphemerisKey.type =>
 
   val fromTypeAndDes: Format[(EphemerisKeyType, String), EphemerisKey] =
     Format(
-      {
-        case (t, des) =>
-          t match {
-            case EphemerisKeyType.Comet        => Some(Comet(des))
-            case EphemerisKeyType.AsteroidNew  => Some(AsteroidNew(des))
-            case EphemerisKeyType.AsteroidOld  => des.parseIntOption.map(AsteroidOld(_))
-            case EphemerisKeyType.MajorBody    => des.parseIntOption.map(MajorBody(_))
-            case EphemerisKeyType.UserSupplied => des.parseIntOption.map(UserSupplied(_))
-          }
+      { case (t, des) =>
+        t match {
+          case EphemerisKeyType.Comet        => Some(Comet(des))
+          case EphemerisKeyType.AsteroidNew  => Some(AsteroidNew(des))
+          case EphemerisKeyType.AsteroidOld  => des.parseIntOption.map(AsteroidOld(_))
+          case EphemerisKeyType.MajorBody    => des.parseIntOption.map(MajorBody(_))
+          case EphemerisKeyType.UserSupplied => des.parseIntOption.map(UserSupplied(_))
+        }
       },
       k => (k.keyType, k.des)
     )
+}
 
+trait EphemerisJson { this: EphemerisOptics =>
+  implicit val encoder: Encoder[EphemerisKey] =
+    Encoder[String].contramap(fromString.reverseGet)
+
+  implicit val decoder: Decoder[EphemerisKey] =
+    Decoder[String].emap(s => fromString.getOption(s).toRight(s"Invalid EphemerisKey value: [$s]"))
 }
