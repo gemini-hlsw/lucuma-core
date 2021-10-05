@@ -10,7 +10,6 @@ import lucuma.core.util.laws.GidTests
 final class IdsSuite extends DisciplineSuite {
   import ArbGid._
 
-  checkAll("Asterism.Id", GidTests[Asterism.Id].gid)
   checkAll("Atom.Id", GidTests[Atom.Id].gid)
   checkAll("Configuration.Id", GidTests[Configuration.Id].gid)
   checkAll("Dataset.Id", GidTests[Dataset.Id].gid)
@@ -18,4 +17,5 @@ final class IdsSuite extends DisciplineSuite {
   checkAll("Observation.Id", GidTests[Observation.Id].gid)
   checkAll("Program.Id", GidTests[Program.Id].gid)
   checkAll("Step.Id", GidTests[Step.Id].gid)
+  checkAll("TargetEnvironment.Id", GidTests[TargetEnvironment.Id].gid)
 }
