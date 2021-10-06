@@ -28,17 +28,57 @@ final class TargetSuite extends DisciplineSuite {
   import ArbProperMotion._
   import ArbRadialVelocity._
   import ArbGid._
+  import Target._
 
-  // Laws
+  // Laws for SiderealTarget
+  checkAll("Eq[SiderealTarget]", EqTests[SiderealTarget].eqv)
+  checkAll("SiderealTarget.TrackOrder", OrderTests[SiderealTarget](SiderealTarget.TrackOrder).order)
+  checkAll("SiderealTarget.NameOrder", OrderTests[SiderealTarget](SiderealTarget.NameOrder).order)
+  checkAll("SiderealTarget.name", LensTests(SiderealTarget.name))
+  checkAll("SiderealTarget.tracking", LensTests(SiderealTarget.tracking))
+  checkAll("SiderealTarget.properMotion", OptionalTests(SiderealTarget.properMotion))
+  checkAll("SiderealTarget.magnitudes", LensTests(SiderealTarget.magnitudes))
+  checkAll("SiderealTarget.magnitudesT", TraversalTests(SiderealTarget.magnitudesT))
+  checkAll("SiderealTarget.parallax", LensTests(SiderealTarget.parallax))
+  checkAll("SiderealTarget.radialVelocity", LensTests(SiderealTarget.radialVelocity))
+  checkAll("SiderealTarget.baseCoordinates", LensTests(SiderealTarget.baseCoordinates))
+  checkAll("SiderealTarget.baseRA", LensTests(SiderealTarget.baseRA))
+  checkAll("SiderealTarget.baseDec", LensTests(SiderealTarget.baseDec))
+  checkAll("SiderealTarget.properMotion", OptionalTests(SiderealTarget.properMotion))
+  checkAll("SiderealTarget.properMotionRA", OptionalTests(SiderealTarget.properMotionRA))
+  checkAll("SiderealTarget.properMotionDec", OptionalTests(SiderealTarget.properMotionDec))
+  checkAll(
+    "SiderealTarget.magnitudeInBand",
+    TraversalTests(SiderealTarget.magnitudeIn(MagnitudeBand.B))
+  )
+
+  // Laws for NonsiderealTarget
+  checkAll("Eq[NonsiderealTarget]", EqTests[NonsiderealTarget].eqv)
+  checkAll(
+    "NonsiderealTarget.TrackOrder",
+    OrderTests[NonsiderealTarget](NonsiderealTarget.TrackOrder).order
+  )
+  checkAll(
+    "NonsiderealTarget.NameOrder",
+    OrderTests[NonsiderealTarget](NonsiderealTarget.NameOrder).order
+  )
+  checkAll("NonsiderealTarget.name", LensTests(NonsiderealTarget.name))
+  checkAll("NonsiderealTarget.ephemerisKey", LensTests(NonsiderealTarget.ephemerisKey))
+  checkAll("NonsiderealTarget.magnitudes", LensTests(NonsiderealTarget.magnitudes))
+  checkAll("NonsiderealTarget.magnitudesT", TraversalTests(NonsiderealTarget.magnitudesT))
+
+  // Laws for Target
   checkAll("Target.Id", GidTests[Target.Id].gid)
   checkAll("Eq[Target]", EqTests[Target].eqv)
-  checkAll("TargetTrack", OrderTests[Target](Target.TargetTrackOrder).order)
-  checkAll("TargetName", OrderTests[Target](Target.TargetNameOrder).order)
+  checkAll("Target.TrackOrder", OrderTests[Target](Target.TrackOrder).order)
+  checkAll("Target.NameOrder", OrderTests[Target](Target.NameOrder).order)
   checkAll("Target.name", LensTests(Target.name))
   checkAll("Target.properMotion", OptionalTests(Target.properMotion))
   checkAll("Target.ephemerisKey", OptionalTests(Target.ephemerisKey))
   checkAll("Target.magnitudes", LensTests(Target.magnitudes))
   checkAll("Target.magnitudesT", TraversalTests(Target.magnitudesT))
+  checkAll("Target.sidereal", PrismTests(Target.sidereal))
+  checkAll("Target.nonsidereal", PrismTests(Target.nonsidereal))
   checkAll("Target.parallax", OptionalTests(Target.parallax))
   checkAll("Target.radialVelocity", OptionalTests(Target.radialVelocity))
   checkAll("Target.baseCoordinates", OptionalTests(Target.baseCoordinates))
