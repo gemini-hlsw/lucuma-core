@@ -4,6 +4,7 @@
 package lucuma.core.model
 package arb
 
+import cats.syntax.all._
 import eu.timepit.refined.scalacheck.string._
 import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.core.enum.MagnitudeBand
@@ -21,19 +22,41 @@ trait ArbTarget {
   import ArbMagnitude._
   import ArbEnumerated._
 
-  implicit val arbTarget: Arbitrary[Target] =
+  implicit val arbSiderealTarget: Arbitrary[SiderealTarget] =
     Arbitrary {
       for {
         n <- arbitrary[NonEmptyString]
-        t <- arbitrary[Either[EphemerisKey, SiderealTracking]]
+        t <- arbitrary[SiderealTracking]
         m <- arbitrary[Vector[(MagnitudeBand, Magnitude)]]
-      } yield Target(n, t, SortedMap(m: _*))
+      } yield SiderealTarget(n, t, SortedMap(m: _*))
     }
 
+  implicit val arbNonsiderealTarget: Arbitrary[NonsiderealTarget] =
+    Arbitrary {
+      for {
+        n <- arbitrary[NonEmptyString]
+        t <- arbitrary[EphemerisKey]
+        m <- arbitrary[Vector[(MagnitudeBand, Magnitude)]]
+      } yield NonsiderealTarget(n, t, SortedMap(m: _*))
+    }
+
+  implicit val arbTarget: Arbitrary[Target] = Arbitrary(
+    Gen.oneOf(arbitrary[SiderealTarget], arbitrary[NonsiderealTarget])
+  )
+
+  implicit val cogSiderealTarget: Cogen[SiderealTarget] =
+    Cogen[(String, SiderealTracking, Vector[(MagnitudeBand, Magnitude)])]
+      .contramap(t => (t.name.value, t.tracking, t.magnitudes.toVector))
+
+  implicit val cogNonsiderealTarget: Cogen[NonsiderealTarget] =
+    Cogen[(String, EphemerisKey, Vector[(MagnitudeBand, Magnitude)])]
+      .contramap(t => (t.name.value, t.ephemerisKey, t.magnitudes.toVector))
+
   implicit val cogTarget: Cogen[Target] =
-    Cogen[(String, Either[EphemerisKey, SiderealTracking], Vector[(MagnitudeBand, Magnitude)])]
-      .contramap { t =>
-        (t.name.value, t.track, t.magnitudes.toVector)
+    Cogen[Either[SiderealTarget, NonsiderealTarget]]
+      .contramap {
+        case t @ SiderealTarget(_, _, _)    => t.asLeft
+        case t @ NonsiderealTarget(_, _, _) => t.asRight
       }
 }
 
