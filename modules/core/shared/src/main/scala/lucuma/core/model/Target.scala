@@ -175,13 +175,11 @@ trait SiderealTargetOptics {
     tracking.andThen(SiderealTracking.properMotion.some)
 
   /** @group Optics */
-  lazy val properMotionRA
-    : Optional[SiderealTarget, ProperMotion.AngularVelocityComponent[VelocityAxis.RA]] =
+  lazy val properMotionRA: Optional[SiderealTarget, ProperMotion.RA] =
     properMotion.andThen(ProperMotion.ra)
 
   /** @group Optics */
-  lazy val properMotionDec
-    : Optional[SiderealTarget, ProperMotion.AngularVelocityComponent[VelocityAxis.Dec]] =
+  lazy val properMotionDec: Optional[SiderealTarget, ProperMotion.Dec] =
     properMotion.andThen(ProperMotion.dec)
 }
 
@@ -275,12 +273,14 @@ trait TargetOptics {
     sidereal.andThen(SiderealTarget.epoch)
 
   /** @group Optics */
-  lazy val properMotion =
+  lazy val properMotion: Optional[Target, ProperMotion] =
     siderealTracking.andThen(SiderealTracking.properMotion.some)
 
   /** @group Optics */
-  lazy val properMotionRA = properMotion.andThen(ProperMotion.ra)
+  lazy val properMotionRA: Optional[Target, ProperMotion.RA] =
+    properMotion.andThen(ProperMotion.ra)
 
   /** @group Optics */
-  lazy val properMotionDec = properMotion.andThen(ProperMotion.dec)
+  lazy val properMotionDec: Optional[Target, ProperMotion.Dec] =
+    properMotion.andThen(ProperMotion.dec)
 }
