@@ -163,6 +163,14 @@ trait SiderealTargetOptics {
     baseCoordinates.andThen(Coordinates.declination)
 
   /** @group Optics */
+  lazy val catalogId: Lens[SiderealTarget, Option[CatalogId]] =
+    tracking.andThen(SiderealTracking.catalogId)
+
+  /** @group Optics */
+  lazy val epoch: Lens[SiderealTarget, Epoch] =
+    tracking.andThen(SiderealTracking.epoch)
+
+  /** @group Optics */
   lazy val properMotion: Optional[SiderealTarget, ProperMotion] =
     tracking.andThen(SiderealTracking.properMotion.some)
 
@@ -257,6 +265,14 @@ trait TargetOptics {
   /** @group Optics */
   lazy val baseDec: Optional[Target, Declination] =
     baseCoordinates.andThen(Coordinates.declination)
+
+  /** @group Optics */
+  lazy val catalogId: Optional[Target, Option[CatalogId]] =
+    sidereal.andThen(SiderealTarget.catalogId)
+
+  /** @group Optics */
+  lazy val epoch: Optional[Target, Epoch] =
+    sidereal.andThen(SiderealTarget.epoch)
 
   /** @group Optics */
   lazy val properMotion =

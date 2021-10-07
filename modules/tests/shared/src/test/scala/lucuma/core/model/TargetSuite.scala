@@ -28,6 +28,8 @@ final class TargetSuite extends DisciplineSuite {
   import ArbProperMotion._
   import ArbRadialVelocity._
   import ArbGid._
+  import ArbEpoch._
+  import ArbCatalogId._
   import Target._
 
   // Laws for SiderealTarget
@@ -44,6 +46,8 @@ final class TargetSuite extends DisciplineSuite {
   checkAll("SiderealTarget.baseCoordinates", LensTests(SiderealTarget.baseCoordinates))
   checkAll("SiderealTarget.baseRA", LensTests(SiderealTarget.baseRA))
   checkAll("SiderealTarget.baseDec", LensTests(SiderealTarget.baseDec))
+  checkAll("SiderealTarget.catalogId", LensTests(SiderealTarget.catalogId))
+  checkAll("SiderealTarget.epoch", LensTests(SiderealTarget.epoch))
   checkAll("SiderealTarget.properMotion", OptionalTests(SiderealTarget.properMotion))
   checkAll("SiderealTarget.properMotionRA", OptionalTests(SiderealTarget.properMotionRA))
   checkAll("SiderealTarget.properMotionDec", OptionalTests(SiderealTarget.properMotionDec))
@@ -79,12 +83,14 @@ final class TargetSuite extends DisciplineSuite {
   checkAll("Target.magnitudesT", TraversalTests(Target.magnitudesT))
   checkAll("Target.sidereal", PrismTests(Target.sidereal))
   checkAll("Target.nonsidereal", PrismTests(Target.nonsidereal))
+  checkAll("Target.siderealTracking", OptionalTests(Target.siderealTracking))
   checkAll("Target.parallax", OptionalTests(Target.parallax))
   checkAll("Target.radialVelocity", OptionalTests(Target.radialVelocity))
   checkAll("Target.baseCoordinates", OptionalTests(Target.baseCoordinates))
   checkAll("Target.baseRA", OptionalTests(Target.baseRA))
   checkAll("Target.baseDec", OptionalTests(Target.baseDec))
-  checkAll("Target.siderealTracking", OptionalTests(Target.siderealTracking))
+  checkAll("Target.catalogId", OptionalTests(Target.catalogId))
+  checkAll("Target.epoch", OptionalTests(Target.epoch))
   checkAll("Target.properMotion", OptionalTests(Target.properMotion))
   checkAll("Target.properMotionRA", OptionalTests(Target.properMotionRA))
   checkAll("Target.properMotionDec", OptionalTests(Target.properMotionDec))
