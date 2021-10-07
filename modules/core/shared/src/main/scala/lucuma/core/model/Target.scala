@@ -120,22 +120,22 @@ object Target extends WithId('t') with TargetOptics {
     }
 }
 
-trait SiderealTargetOptics {
+trait SiderealTargetOptics { this: SiderealTarget.type =>
 
   /** @group Optics */
-  lazy val name: Lens[SiderealTarget, NonEmptyString] =
+  val name: Lens[SiderealTarget, NonEmptyString] =
     Focus[SiderealTarget](_.name)
 
   /** @group Optics */
-  lazy val tracking: Lens[SiderealTarget, SiderealTracking] =
+  val tracking: Lens[SiderealTarget, SiderealTracking] =
     Focus[SiderealTarget](_.tracking)
 
   /** @group Optics */
-  lazy val magnitudes: Lens[SiderealTarget, SortedMap[MagnitudeBand, Magnitude]] =
+  val magnitudes: Lens[SiderealTarget, SortedMap[MagnitudeBand, Magnitude]] =
     Focus[SiderealTarget](_.magnitudes)
 
   /** @group Optics */
-  lazy val magnitudesT: Traversal[SiderealTarget, Magnitude] =
+  val magnitudesT: Traversal[SiderealTarget, Magnitude] =
     magnitudes.each
 
   /** @group Optics */
@@ -143,62 +143,62 @@ trait SiderealTargetOptics {
     magnitudes.filterIndex((a: MagnitudeBand) => a === b)
 
   /** @group Optics */
-  lazy val parallax: Lens[SiderealTarget, Option[Parallax]] =
+  val parallax: Lens[SiderealTarget, Option[Parallax]] =
     tracking.andThen(SiderealTracking.parallax)
 
   /** @group Optics */
-  lazy val radialVelocity: Lens[SiderealTarget, Option[RadialVelocity]] =
+  val radialVelocity: Lens[SiderealTarget, Option[RadialVelocity]] =
     tracking.andThen(SiderealTracking.radialVelocity)
 
   /** @group Optics */
-  lazy val baseCoordinates: Lens[SiderealTarget, Coordinates] =
+  val baseCoordinates: Lens[SiderealTarget, Coordinates] =
     tracking.andThen(SiderealTracking.baseCoordinates)
 
   /** @group Optics */
-  lazy val baseRA: Lens[SiderealTarget, RightAscension] =
+  val baseRA: Lens[SiderealTarget, RightAscension] =
     baseCoordinates.andThen(Coordinates.rightAscension)
 
   /** @group Optics */
-  lazy val baseDec: Lens[SiderealTarget, Declination] =
+  val baseDec: Lens[SiderealTarget, Declination] =
     baseCoordinates.andThen(Coordinates.declination)
 
   /** @group Optics */
-  lazy val catalogId: Lens[SiderealTarget, Option[CatalogId]] =
+  val catalogId: Lens[SiderealTarget, Option[CatalogId]] =
     tracking.andThen(SiderealTracking.catalogId)
 
   /** @group Optics */
-  lazy val epoch: Lens[SiderealTarget, Epoch] =
+  val epoch: Lens[SiderealTarget, Epoch] =
     tracking.andThen(SiderealTracking.epoch)
 
   /** @group Optics */
-  lazy val properMotion: Optional[SiderealTarget, ProperMotion] =
+  val properMotion: Optional[SiderealTarget, ProperMotion] =
     tracking.andThen(SiderealTracking.properMotion.some)
 
   /** @group Optics */
-  lazy val properMotionRA: Optional[SiderealTarget, ProperMotion.RA] =
+  val properMotionRA: Optional[SiderealTarget, ProperMotion.RA] =
     properMotion.andThen(ProperMotion.ra)
 
   /** @group Optics */
-  lazy val properMotionDec: Optional[SiderealTarget, ProperMotion.Dec] =
+  val properMotionDec: Optional[SiderealTarget, ProperMotion.Dec] =
     properMotion.andThen(ProperMotion.dec)
 }
 
-trait NonsiderealTargetOptics {
+trait NonsiderealTargetOptics { this: NonsiderealTarget.type =>
 
   /** @group Optics */
-  lazy val name: Lens[NonsiderealTarget, NonEmptyString] =
+  val name: Lens[NonsiderealTarget, NonEmptyString] =
     Focus[NonsiderealTarget](_.name)
 
   /** @group Optics */
-  lazy val ephemerisKey: Lens[NonsiderealTarget, EphemerisKey] =
+  val ephemerisKey: Lens[NonsiderealTarget, EphemerisKey] =
     Focus[NonsiderealTarget](_.ephemerisKey)
 
   /** @group Optics */
-  lazy val magnitudes: Lens[NonsiderealTarget, SortedMap[MagnitudeBand, Magnitude]] =
+  val magnitudes: Lens[NonsiderealTarget, SortedMap[MagnitudeBand, Magnitude]] =
     Focus[NonsiderealTarget](_.magnitudes)
 
   /** @group Optics */
-  lazy val magnitudesT: Traversal[NonsiderealTarget, Magnitude] =
+  val magnitudesT: Traversal[NonsiderealTarget, Magnitude] =
     magnitudes.each
 
   /** @group Optics */
@@ -206,38 +206,38 @@ trait NonsiderealTargetOptics {
     magnitudes.filterIndex((a: MagnitudeBand) => a === b)
 }
 
-trait TargetOptics {
+trait TargetOptics { this: Target.type =>
 
   /** @group Optics */
-  lazy val sidereal: Prism[Target, SiderealTarget] = GenPrism[Target, SiderealTarget]
+  val sidereal: Prism[Target, SiderealTarget] = GenPrism[Target, SiderealTarget]
 
   /** @group Optics */
-  lazy val nonsidereal: Prism[Target, NonsiderealTarget] = GenPrism[Target, NonsiderealTarget]
+  val nonsidereal: Prism[Target, NonsiderealTarget] = GenPrism[Target, NonsiderealTarget]
 
   /** @group Optics */
-  lazy val name: Lens[Target, NonEmptyString] =
+  val name: Lens[Target, NonEmptyString] =
     Lens[Target, NonEmptyString](_.name)(v => {
       case t @ SiderealTarget(_, _, _)    => SiderealTarget.name.replace(v)(t)
       case t @ NonsiderealTarget(_, _, _) => NonsiderealTarget.name.replace(v)(t)
     })
 
   /** @group Optics */
-  lazy val ephemerisKey: Optional[Target, EphemerisKey] =
+  val ephemerisKey: Optional[Target, EphemerisKey] =
     nonsidereal.andThen(NonsiderealTarget.ephemerisKey)
 
   /** @group Optics */
-  lazy val siderealTracking: Optional[Target, SiderealTracking] =
+  val siderealTracking: Optional[Target, SiderealTracking] =
     sidereal.andThen(SiderealTarget.tracking)
 
   /** @group Optics */
-  lazy val magnitudes: Lens[Target, SortedMap[MagnitudeBand, Magnitude]] =
+  val magnitudes: Lens[Target, SortedMap[MagnitudeBand, Magnitude]] =
     Lens[Target, SortedMap[MagnitudeBand, Magnitude]](_.magnitudes)(v => {
       case t @ SiderealTarget(_, _, _)    => SiderealTarget.magnitudes.replace(v)(t)
       case t @ NonsiderealTarget(_, _, _) => NonsiderealTarget.magnitudes.replace(v)(t)
     })
 
   /** @group Optics */
-  lazy val magnitudesT: Traversal[Target, Magnitude] =
+  val magnitudesT: Traversal[Target, Magnitude] =
     magnitudes.each
 
   /** @group Optics */
@@ -245,42 +245,42 @@ trait TargetOptics {
     magnitudes.filterIndex((a: MagnitudeBand) => a === b)
 
   /** @group Optics */
-  lazy val parallax: Optional[Target, Option[Parallax]] =
+  val parallax: Optional[Target, Option[Parallax]] =
     siderealTracking.andThen(SiderealTracking.parallax)
 
   /** @group Optics */
-  lazy val radialVelocity: Optional[Target, Option[RadialVelocity]] =
+  val radialVelocity: Optional[Target, Option[RadialVelocity]] =
     siderealTracking.andThen(SiderealTracking.radialVelocity)
 
   /** @group Optics */
-  lazy val baseCoordinates: Optional[Target, Coordinates] =
+  val baseCoordinates: Optional[Target, Coordinates] =
     siderealTracking.andThen(SiderealTracking.baseCoordinates)
 
   /** @group Optics */
-  lazy val baseRA: Optional[Target, RightAscension] =
+  val baseRA: Optional[Target, RightAscension] =
     baseCoordinates.andThen(Coordinates.rightAscension)
 
   /** @group Optics */
-  lazy val baseDec: Optional[Target, Declination] =
+  val baseDec: Optional[Target, Declination] =
     baseCoordinates.andThen(Coordinates.declination)
 
   /** @group Optics */
-  lazy val catalogId: Optional[Target, Option[CatalogId]] =
+  val catalogId: Optional[Target, Option[CatalogId]] =
     sidereal.andThen(SiderealTarget.catalogId)
 
   /** @group Optics */
-  lazy val epoch: Optional[Target, Epoch] =
+  val epoch: Optional[Target, Epoch] =
     sidereal.andThen(SiderealTarget.epoch)
 
   /** @group Optics */
-  lazy val properMotion: Optional[Target, ProperMotion] =
+  val properMotion: Optional[Target, ProperMotion] =
     siderealTracking.andThen(SiderealTracking.properMotion.some)
 
   /** @group Optics */
-  lazy val properMotionRA: Optional[Target, ProperMotion.RA] =
+  val properMotionRA: Optional[Target, ProperMotion.RA] =
     properMotion.andThen(ProperMotion.ra)
 
   /** @group Optics */
-  lazy val properMotionDec: Optional[Target, ProperMotion.Dec] =
+  val properMotionDec: Optional[Target, ProperMotion.Dec] =
     properMotion.andThen(ProperMotion.dec)
 }
