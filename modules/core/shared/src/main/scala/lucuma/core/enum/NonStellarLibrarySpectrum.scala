@@ -3,7 +3,7 @@
 
 package lucuma.core.enum
 
-import cats.implicits._
+import lucuma.core.util.Enumerated
 
 sealed abstract class NonStellarLibrarySpectrum(
   val tag:         String,
@@ -169,47 +169,43 @@ object NonStellarLibrarySpectrum {
   case object Uranus  extends NonStellarLibrarySpectrum("Uranus", "Uranus", "Uranus", "Uranus")
   case object Neptune extends NonStellarLibrarySpectrum("Neptune", "Neptune", "Neptune", "Neptune")
 
-  val all = List(
-    EllipticalGalaxy,
-    SpiralGalaxy,
-    QS0,
-    QS02,
-    OrionNebula,
-    PlanetaryNebula,
-    PlanetaryNebula2,
-    PlanetaryNebula3,
-    StarburstGalaxy,
-    PmsStar,
-    GalacticCenter,
-    Afgl230,
-    Afgl3068,
-    AlphaBoo,
-    AlphaCar,
-    BetaAnd,
-    BetaGru,
-    GammaCas,
-    GammaDra,
-    L1511Irs,
-    NGC1068,
-    NGC2023,
-    NGC2440,
-    OCet,
-    OrionBar,
-    Rscl,
-    Txpsc,
-    Wr104,
-    Wr34,
-    Mars,
-    Jupiter,
-    Saturn,
-    Uranus,
-    Neptune
-  )
-
-  def fromTag(tag: String): Option[NonStellarLibrarySpectrum] =
-    all.find(_.tag === tag)
-
-  def fromTagIgnoreCase(tag: String): Option[NonStellarLibrarySpectrum] =
-    all.find(_.tag.equalsIgnoreCase(tag))
+  /** @group Typeclass Instances */
+  implicit val NonStellarLibrarySpectrumEnumerated: Enumerated[NonStellarLibrarySpectrum] =
+    Enumerated.of(
+      EllipticalGalaxy,
+      SpiralGalaxy,
+      QS0,
+      QS02,
+      OrionNebula,
+      PlanetaryNebula,
+      PlanetaryNebula2,
+      PlanetaryNebula3,
+      StarburstGalaxy,
+      PmsStar,
+      GalacticCenter,
+      Afgl230,
+      Afgl3068,
+      AlphaBoo,
+      AlphaCar,
+      BetaAnd,
+      BetaGru,
+      GammaCas,
+      GammaDra,
+      L1511Irs,
+      NGC1068,
+      NGC2023,
+      NGC2440,
+      OCet,
+      OrionBar,
+      Rscl,
+      Txpsc,
+      Wr104,
+      Wr34,
+      Mars,
+      Jupiter,
+      Saturn,
+      Uranus,
+      Neptune
+    )
 
 }

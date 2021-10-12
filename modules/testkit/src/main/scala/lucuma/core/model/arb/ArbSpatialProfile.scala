@@ -34,7 +34,7 @@ trait ArbSpatialProfile {
       } yield r
     }
 
-  implicit val cogSpatialPraofile: Cogen[SpatialProfile] =
+  implicit val cogSpatialProfile: Cogen[SpatialProfile] =
     Cogen[Either[Unit, Either[Unit, Angle]]].contramap {
       case PointSource       => ().asLeft
       case UniformSource     => ().asLeft.asRight
