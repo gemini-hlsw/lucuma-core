@@ -29,7 +29,7 @@ object GmosNorthFpu {
   /** @group Constructors */ case object Ns4 extends GmosNorthFpu("Ns4", "NS1.5\"", "N and S 1.50 arcsec", Some(Angle.fromDoubleArcseconds(1.50)), Angle.fromDoubleArcseconds(0.000))
   /** @group Constructors */ case object Ns5 extends GmosNorthFpu("Ns5", "NS2.0\"", "N and S 2.00 arcsec", Some(Angle.fromDoubleArcseconds(2.00)), Angle.fromDoubleArcseconds(0.000))
   /** @group Constructors */ case object LongSlit_0_25 extends GmosNorthFpu("LongSlit_0_25", "0.25\"", "Longslit 0.25 arcsec", Some(Angle.fromDoubleArcseconds(0.25)), Angle.fromDoubleArcseconds(0.000))
-  /** @group Constructors */ case object LongSlit_0_50 extends GmosNorthFpu("LongSlit_0_50", "0.50\"", "Longslit 0.50 arcsec", Some(Angle.fromDoubleArcseconds(0.50)), Angle.fromDoubleArcseconds(0.000))
+  /** @group Constructors */ case object LongSlit_0_50 extends GmosNorthFpu("LongSlit_0_50", "0.5\"", "Longslit 0.50 arcsec", Some(Angle.fromDoubleArcseconds(0.50)), Angle.fromDoubleArcseconds(0.000))
   /** @group Constructors */ case object LongSlit_0_75 extends GmosNorthFpu("LongSlit_0_75", "0.75\"", "Longslit 0.75 arcsec", Some(Angle.fromDoubleArcseconds(0.75)), Angle.fromDoubleArcseconds(0.000))
   /** @group Constructors */ case object LongSlit_1_00 extends GmosNorthFpu("LongSlit_1_00", "1.0\"", "Longslit 1.00 arcsec", Some(Angle.fromDoubleArcseconds(1.00)), Angle.fromDoubleArcseconds(0.000))
   /** @group Constructors */ case object LongSlit_1_50 extends GmosNorthFpu("LongSlit_1_50", "1.5\"", "Longslit 1.50 arcsec", Some(Angle.fromDoubleArcseconds(1.50)), Angle.fromDoubleArcseconds(0.000))
@@ -61,3 +61,4 @@ object GmosNorthFpu {
     }
 
 }
+
