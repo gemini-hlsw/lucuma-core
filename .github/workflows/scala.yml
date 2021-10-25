@@ -2,6 +2,9 @@ name: build
 
 on: [push, pull_request]
 
+env:
+  JABBA_INDEX: 'https://github.com/typelevel/jdk-index/raw/main/index.json'
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -12,6 +15,6 @@ jobs:
       - name: Set up JDK
         uses: olafurpg/setup-scala@v13
         with:
-          java-version: adopt@1.11
+          java-version: adoptium@17
       - name: Run compile
         run: sbt headerCheck +compile +test +doc
