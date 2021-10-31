@@ -7,7 +7,7 @@ lazy val monocleVersion        = "3.1.0"
 lazy val scalaJavaTimeVersion  = "2.3.0"
 lazy val geminiLocalesVersion  = "0.7.0"
 lazy val jtsVersion            = "0.2.2"
-lazy val svgdotjsVersion       = "0.1.1"
+lazy val svgdotjsVersion       = "0.2.1"
 lazy val coulombVersion        = "0.5.7"
 lazy val spireVersion          = "0.17.0"
 lazy val singletonOpsVersion   = "0.5.2"
@@ -18,9 +18,9 @@ lazy val catsScalacheckVersion = "0.3.1"
 
 inThisBuild(
   Seq(
-    homepage := Some(url("https://github.com/gemini-hlsw/lucuma-core")),
+    homepage                      := Some(url("https://github.com/gemini-hlsw/lucuma-core")),
     addCompilerPlugin(
-      ("org.typelevel" % "kind-projector" % kindProjectorVersion).cross(CrossVersion.full)
+      ("org.typelevel"             % "kind-projector" % kindProjectorVersion).cross(CrossVersion.full)
     ),
     Global / onChangedBuildSource := ReloadOnSourceChanges,
     scalacOptions += "-Ymacro-annotations"
@@ -98,7 +98,7 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform)
   .in(file("modules/tests"))
   .dependsOn(testkit)
   .settings(
-    name := "lucuma-core-tests",
+    name           := "lucuma-core-tests",
     publish / skip := true,
     libraryDependencies ++= Seq(
       "org.scalameta" %%% "munit"            % "0.7.29" % Test,
