@@ -273,14 +273,14 @@ trait TargetOptics { this: Target.type =>
     sidereal.andThen(SiderealTarget.epoch)
 
   /** @group Optics */
-  val properMotion: Optional[Target, ProperMotion] =
-    siderealTracking.andThen(SiderealTracking.properMotion.some)
+  val properMotion: Optional[Target, Option[ProperMotion]] =
+    siderealTracking.andThen(SiderealTracking.properMotion)
 
   /** @group Optics */
   val properMotionRA: Optional[Target, ProperMotion.RA] =
-    properMotion.andThen(ProperMotion.ra)
+    properMotion.some.andThen(ProperMotion.ra)
 
   /** @group Optics */
   val properMotionDec: Optional[Target, ProperMotion.Dec] =
-    properMotion.andThen(ProperMotion.dec)
+    properMotion.some.andThen(ProperMotion.dec)
 }
