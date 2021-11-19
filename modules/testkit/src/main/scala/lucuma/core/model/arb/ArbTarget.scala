@@ -20,6 +20,7 @@ trait ArbTarget {
   import ArbEphemerisKey._
   import ArbSiderealTracking._
   import ArbMagnitude._
+  import ArbAngularSize._
   import ArbEnumerated._
 
   implicit val arbSiderealTarget: Arbitrary[SiderealTarget] =
@@ -28,7 +29,8 @@ trait ArbTarget {
         n <- arbitrary[NonEmptyString]
         t <- arbitrary[SiderealTracking]
         m <- arbitrary[Vector[(MagnitudeBand, Magnitude)]]
-      } yield SiderealTarget(n, t, SortedMap(m: _*))
+        s <- arbitrary[Option[AngularSize]]
+      } yield SiderealTarget(n, t, SortedMap(m: _*), s)
     }
 
   implicit val arbNonsiderealTarget: Arbitrary[NonsiderealTarget] =
@@ -37,7 +39,8 @@ trait ArbTarget {
         n <- arbitrary[NonEmptyString]
         t <- arbitrary[EphemerisKey]
         m <- arbitrary[Vector[(MagnitudeBand, Magnitude)]]
-      } yield NonsiderealTarget(n, t, SortedMap(m: _*))
+        s <- arbitrary[Option[AngularSize]]
+      } yield NonsiderealTarget(n, t, SortedMap(m: _*), s)
     }
 
   implicit val arbTarget: Arbitrary[Target] = Arbitrary(
@@ -55,8 +58,8 @@ trait ArbTarget {
   implicit val cogTarget: Cogen[Target] =
     Cogen[Either[SiderealTarget, NonsiderealTarget]]
       .contramap {
-        case t @ SiderealTarget(_, _, _)    => t.asLeft
-        case t @ NonsiderealTarget(_, _, _) => t.asRight
+        case t @ SiderealTarget(_, _, _, _)    => t.asLeft
+        case t @ NonsiderealTarget(_, _, _, _) => t.asRight
       }
 }
 

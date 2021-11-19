@@ -23,12 +23,14 @@ import scala.collection.immutable.SortedMap
 sealed trait Target extends Product with Serializable {
   def name: NonEmptyString
   def magnitudes: SortedMap[MagnitudeBand, Magnitude]
+  def angularSize: Option[AngularSize]
 }
 
 final case class SiderealTarget(
-  name:       NonEmptyString,
-  tracking:   SiderealTracking,
-  magnitudes: SortedMap[MagnitudeBand, Magnitude]
+  name:        NonEmptyString,
+  tracking:    SiderealTracking,
+  magnitudes:  SortedMap[MagnitudeBand, Magnitude],
+  angularSize: Option[AngularSize]
 ) extends Target
 
 object SiderealTarget extends SiderealTargetOptics {
@@ -56,7 +58,8 @@ object SiderealTarget extends SiderealTargetOptics {
 final case class NonsiderealTarget(
   name:         NonEmptyString,
   ephemerisKey: EphemerisKey,
-  magnitudes:   SortedMap[MagnitudeBand, Magnitude]
+  magnitudes:   SortedMap[MagnitudeBand, Magnitude],
+  angularSize:  Option[AngularSize]
 ) extends Target
 
 object NonsiderealTarget extends NonsiderealTargetOptics {
@@ -83,9 +86,9 @@ object NonsiderealTarget extends NonsiderealTargetOptics {
 object Target extends WithId('t') with TargetOptics {
 
   implicit val TargetEq: Eq[Target] = Eq.instance {
-    case (a @ SiderealTarget(_, _, _), b @ SiderealTarget(_, _, _))       => a === b
-    case (a @ NonsiderealTarget(_, _, _), b @ NonsiderealTarget(_, _, _)) => a === b
-    case _                                                                => false
+    case (a @ SiderealTarget(_, _, _, _), b @ SiderealTarget(_, _, _, _))       => a === b
+    case (a @ NonsiderealTarget(_, _, _, _), b @ NonsiderealTarget(_, _, _, _)) => a === b
+    case _                                                                      => false
   }
 
   /**
@@ -96,12 +99,12 @@ object Target extends WithId('t') with TargetOptics {
    */
   val TrackOrder: Order[Target] =
     Order.from {
-      case (a @ SiderealTarget(_, _, _), b @ SiderealTarget(_, _, _))       =>
+      case (a @ SiderealTarget(_, _, _, _), b @ SiderealTarget(_, _, _, _))       =>
         SiderealTarget.TrackOrder.compare(a, b)
-      case (a @ NonsiderealTarget(_, _, _), b @ NonsiderealTarget(_, _, _)) =>
+      case (a @ NonsiderealTarget(_, _, _, _), b @ NonsiderealTarget(_, _, _, _)) =>
         NonsiderealTarget.TrackOrder.compare(a, b)
-      case (NonsiderealTarget(_, _, _), _)                                  => -1
-      case _                                                                => 1
+      case (NonsiderealTarget(_, _, _, _), _)                                     => -1
+      case _                                                                      => 1
     }
 
   /**
@@ -111,12 +114,12 @@ object Target extends WithId('t') with TargetOptics {
    */
   val NameOrder: Order[Target] =
     Order.from {
-      case (a @ SiderealTarget(_, _, _), b @ SiderealTarget(_, _, _))       =>
+      case (a @ SiderealTarget(_, _, _, _), b @ SiderealTarget(_, _, _, _))       =>
         SiderealTarget.NameOrder.compare(a, b)
-      case (a @ NonsiderealTarget(_, _, _), b @ NonsiderealTarget(_, _, _)) =>
+      case (a @ NonsiderealTarget(_, _, _, _), b @ NonsiderealTarget(_, _, _, _)) =>
         NonsiderealTarget.NameOrder.compare(a, b)
-      case (NonsiderealTarget(_, _, _), _)                                  => -1
-      case _                                                                => 1
+      case (NonsiderealTarget(_, _, _, _), _)                                     => -1
+      case _                                                                      => 1
     }
 }
 
@@ -217,8 +220,8 @@ trait TargetOptics { this: Target.type =>
   /** @group Optics */
   val name: Lens[Target, NonEmptyString] =
     Lens[Target, NonEmptyString](_.name)(v => {
-      case t @ SiderealTarget(_, _, _)    => SiderealTarget.name.replace(v)(t)
-      case t @ NonsiderealTarget(_, _, _) => NonsiderealTarget.name.replace(v)(t)
+      case t @ SiderealTarget(_, _, _, _)    => SiderealTarget.name.replace(v)(t)
+      case t @ NonsiderealTarget(_, _, _, _) => NonsiderealTarget.name.replace(v)(t)
     })
 
   /** @group Optics */
@@ -232,8 +235,8 @@ trait TargetOptics { this: Target.type =>
   /** @group Optics */
   val magnitudes: Lens[Target, SortedMap[MagnitudeBand, Magnitude]] =
     Lens[Target, SortedMap[MagnitudeBand, Magnitude]](_.magnitudes)(v => {
-      case t @ SiderealTarget(_, _, _)    => SiderealTarget.magnitudes.replace(v)(t)
-      case t @ NonsiderealTarget(_, _, _) => NonsiderealTarget.magnitudes.replace(v)(t)
+      case t @ SiderealTarget(_, _, _, _)    => SiderealTarget.magnitudes.replace(v)(t)
+      case t @ NonsiderealTarget(_, _, _, _) => NonsiderealTarget.magnitudes.replace(v)(t)
     })
 
   /** @group Optics */

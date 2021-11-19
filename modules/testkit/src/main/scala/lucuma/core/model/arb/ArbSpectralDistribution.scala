@@ -8,8 +8,8 @@ import cats.implicits._
 import coulomb.refined._
 import coulomb.si.Kelvin
 import eu.timepit.refined.numeric.Positive
-import lucuma.core.enum.StellarLibrarySpectrum
 import lucuma.core.enum.NonStellarLibrarySpectrum
+import lucuma.core.enum.StellarLibrarySpectrum
 import lucuma.core.util.arb.ArbEnumerated._
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck._
