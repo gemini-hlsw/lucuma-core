@@ -48,7 +48,7 @@ final class TargetSuite extends DisciplineSuite {
   checkAll("SiderealTarget.baseDec", LensTests(SiderealTarget.baseDec))
   checkAll("SiderealTarget.catalogId", LensTests(SiderealTarget.catalogId))
   checkAll("SiderealTarget.epoch", LensTests(SiderealTarget.epoch))
-  checkAll("SiderealTarget.properMotion", OptionalTests(SiderealTarget.properMotion))
+  checkAll("SiderealTarget.properMotion", LensTests(SiderealTarget.properMotion))
   checkAll("SiderealTarget.properMotionRA", OptionalTests(SiderealTarget.properMotionRA))
   checkAll("SiderealTarget.properMotionDec", OptionalTests(SiderealTarget.properMotionDec))
   checkAll(
