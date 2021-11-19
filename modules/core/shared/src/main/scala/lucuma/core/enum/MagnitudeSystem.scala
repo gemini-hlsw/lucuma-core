@@ -7,9 +7,9 @@ package enum
 
 import cats.syntax.eq._
 import coulomb.Unitless
+import lucuma.core.math.units
 import lucuma.core.util.Display
 import lucuma.core.util.Enumerated
-import lucuma.core.math.units
 
 /**
  * Enumerated type for magnitude system.
