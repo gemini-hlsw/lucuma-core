@@ -13,12 +13,14 @@ import scala.math.rint
 import scala.util.Try
 
 /**
- * Exact magnitude value represented as an int with the original value scaled up
+ * Exact brightness value represented as an int with the original value scaled up
  *
- * @param scaledValue This magnitude integral value, as the original multiplied by 1000. value is dimensionless
- * @see The Wikipedia [[https://en.wikipedia.org/wiki/Apparent_magnitude]]
+ * @param scaledValue
+ *   A brightness integral value, as the original multiplied by 1000. value is unitless.
+ * @see
+ *   The Wikipedia [[https://en.wikipedia.org/wiki/Apparent_magnitude]]
  */
-final case class MagnitudeValue(private[lucuma] val scaledValue: Int)
+final case class BrightnessValue(private[lucuma] val scaledValue: Int)
     extends Product
     with Serializable {
   def toRational: Rational = Rational(scaledValue.toLong, 1000)
@@ -26,34 +28,34 @@ final case class MagnitudeValue(private[lucuma] val scaledValue: Int)
   def toDoubleValue: Double = scaledValue / 1000.0
 
   override def toString: String =
-    s"MagnitudeValue.fromDouble(${BigDecimal(scaledValue).underlying.movePointLeft(3).toString})"
+    s"BrightnessValue.fromDouble(${BigDecimal(scaledValue).underlying.movePointLeft(3).toString})"
 
 }
 
-object MagnitudeValue {
+object BrightnessValue {
 
-  final lazy val ZeroMagnitude = MagnitudeValue(0)
-
-  /**
-   * Construct a new MagnitudeValue of the given int value which be scaled up.
-   * @group Constructors
-   */
-  def apply(mg: Int): MagnitudeValue =
-    new MagnitudeValue(mg * 1000)
+  final lazy val ZeroMagnitude = BrightnessValue(0)
 
   /**
-   * Construct a new MagnitudeValue of the given double value. Approximate.
+   * Construct a new BrightnessValue of the given int value which be scaled up.
    * @group Constructors
    */
-  def fromDouble(mg: Double): MagnitudeValue =
-    new MagnitudeValue(rint(mg * 1000).toInt)
+  def apply(mg: Int): BrightnessValue =
+    new BrightnessValue(mg * 1000)
+
+  /**
+   * Construct a new BrightnessValue of the given double value. Approximate.
+   * @group Constructors
+   */
+  def fromDouble(mg: Double): BrightnessValue =
+    new BrightnessValue(rint(mg * 1000).toInt)
 
   /**
    * Format with BigDecimal
    * @group Optics
    */
-  val fromBigDecimal: Format[BigDecimal, MagnitudeValue] =
-    Format[Int, MagnitudeValue](v => Some(new MagnitudeValue(v)), _.scaledValue)
+  val fromBigDecimal: Format[BigDecimal, BrightnessValue] =
+    Format[Int, BrightnessValue](v => Some(new BrightnessValue(v)), _.scaledValue)
       .imapA[BigDecimal](
         n => new java.math.BigDecimal(n).movePointLeft(3),
         d => d.underlying.movePointRight(3).setScale(0, RoundingMode.HALF_UP).intValue
@@ -62,16 +64,16 @@ object MagnitudeValue {
   /**
    * @group Optics
    */
-  val fromString: Format[String, MagnitudeValue] =
+  val fromString: Format[String, BrightnessValue] =
     Format[String, BigDecimal](s => Try(BigDecimal(s)).toOption, _.toString)
       .andThen(fromBigDecimal)
 
   /** @group Typeclass Instances */
-  implicit val MagnitudeValueShow: Show[MagnitudeValue] =
+  implicit val BrightnessValueShow: Show[BrightnessValue] =
     Show.fromToString
 
   /** @group Typeclass Instances */
-  implicit val MagnitudeValueOrder: Order[MagnitudeValue] =
+  implicit val BrightnessValueOrder: Order[BrightnessValue] =
     Order.by(_.scaledValue)
 
 }

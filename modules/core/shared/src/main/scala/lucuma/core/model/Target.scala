@@ -8,7 +8,7 @@ import cats.implicits._
 import eu.timepit.refined.auto._
 import eu.timepit.refined.cats._
 import eu.timepit.refined.types.string.NonEmptyString
-import lucuma.core.enum.MagnitudeBand
+import lucuma.core.enum.WavelengthBand
 import lucuma.core.math._
 import monocle.Focus
 import monocle.Lens
@@ -22,20 +22,20 @@ import scala.collection.immutable.SortedMap
 /** A target of observation. */
 sealed trait Target extends Product with Serializable {
   def name: NonEmptyString
-  def magnitudes: SortedMap[MagnitudeBand, Magnitude]
+  def brightnesses: SortedMap[WavelengthBand, Brightness]
   def angularSize: Option[AngularSize]
 }
 
 final case class SiderealTarget(
-  name:        NonEmptyString,
-  tracking:    SiderealTracking,
-  magnitudes:  SortedMap[MagnitudeBand, Magnitude],
-  angularSize: Option[AngularSize]
+  name:         NonEmptyString,
+  tracking:     SiderealTracking,
+  brightnesses: SortedMap[WavelengthBand, Brightness],
+  angularSize:  Option[AngularSize]
 ) extends Target
 
 object SiderealTarget extends SiderealTargetOptics {
   implicit val SiderealTargetTargetEq: Eq[SiderealTarget] =
-    Eq.by(x => (x.name, x.tracking, x.magnitudes))
+    Eq.by(x => (x.name, x.tracking, x.brightnesses))
 
   /**
    * A sidereal target order based on tracking information, which roughly means by base coordinate
@@ -44,7 +44,7 @@ object SiderealTarget extends SiderealTargetOptics {
    * Not implicit.
    */
   val TrackOrder: Order[SiderealTarget] =
-    Order.by(t => (t.tracking, t.name, t.magnitudes.toList))
+    Order.by(t => (t.tracking, t.name, t.brightnesses.toList))
 
   /**
    * Sidereal targets ordered by name first and then tracking information.
@@ -52,19 +52,19 @@ object SiderealTarget extends SiderealTargetOptics {
    * Not implicit.
    */
   val NameOrder: Order[SiderealTarget] =
-    Order.by(t => (t.name, t.tracking, t.magnitudes.toList))
+    Order.by(t => (t.name, t.tracking, t.brightnesses.toList))
 }
 
 final case class NonsiderealTarget(
   name:         NonEmptyString,
   ephemerisKey: EphemerisKey,
-  magnitudes:   SortedMap[MagnitudeBand, Magnitude],
+  brightnesses: SortedMap[WavelengthBand, Brightness],
   angularSize:  Option[AngularSize]
 ) extends Target
 
 object NonsiderealTarget extends NonsiderealTargetOptics {
   implicit val NonsiderealTargetTargetEq: Eq[NonsiderealTarget] =
-    Eq.by(x => (x.name, x.ephemerisKey, x.magnitudes))
+    Eq.by(x => (x.name, x.ephemerisKey, x.brightnesses))
 
   /**
    * A nonsidereal target order based on ephemeris key.
@@ -72,7 +72,7 @@ object NonsiderealTarget extends NonsiderealTargetOptics {
    * Not implicit.
    */
   val TrackOrder: Order[NonsiderealTarget] =
-    Order.by(t => (t.ephemerisKey, t.name, t.magnitudes.toList))
+    Order.by(t => (t.ephemerisKey, t.name, t.brightnesses.toList))
 
   /**
    * Nonsidereal targets ordered by name first and then ephemeris key.
@@ -80,7 +80,7 @@ object NonsiderealTarget extends NonsiderealTargetOptics {
    * Not implicit.
    */
   val NameOrder: Order[NonsiderealTarget] =
-    Order.by(t => (t.name, t.ephemerisKey, t.magnitudes.toList))
+    Order.by(t => (t.name, t.ephemerisKey, t.brightnesses.toList))
 }
 
 object Target extends WithId('t') with TargetOptics {
@@ -134,16 +134,16 @@ trait SiderealTargetOptics { this: SiderealTarget.type =>
     Focus[SiderealTarget](_.tracking)
 
   /** @group Optics */
-  val magnitudes: Lens[SiderealTarget, SortedMap[MagnitudeBand, Magnitude]] =
-    Focus[SiderealTarget](_.magnitudes)
+  val brightnesses: Lens[SiderealTarget, SortedMap[WavelengthBand, Brightness]] =
+    Focus[SiderealTarget](_.brightnesses)
 
   /** @group Optics */
-  val magnitudesT: Traversal[SiderealTarget, Magnitude] =
-    magnitudes.each
+  val brightnessesT: Traversal[SiderealTarget, Brightness] =
+    brightnesses.each
 
   /** @group Optics */
-  def magnitudeIn(b: MagnitudeBand): Traversal[SiderealTarget, Magnitude] =
-    magnitudes.filterIndex((a: MagnitudeBand) => a === b)
+  def brightnessIn(b: WavelengthBand): Traversal[SiderealTarget, Brightness] =
+    brightnesses.filterIndex((a: WavelengthBand) => a === b)
 
   /** @group Optics */
   val parallax: Lens[SiderealTarget, Option[Parallax]] =
@@ -197,16 +197,16 @@ trait NonsiderealTargetOptics { this: NonsiderealTarget.type =>
     Focus[NonsiderealTarget](_.ephemerisKey)
 
   /** @group Optics */
-  val magnitudes: Lens[NonsiderealTarget, SortedMap[MagnitudeBand, Magnitude]] =
-    Focus[NonsiderealTarget](_.magnitudes)
+  val brightnesses: Lens[NonsiderealTarget, SortedMap[WavelengthBand, Brightness]] =
+    Focus[NonsiderealTarget](_.brightnesses)
 
   /** @group Optics */
-  val magnitudesT: Traversal[NonsiderealTarget, Magnitude] =
-    magnitudes.each
+  val brightnessesT: Traversal[NonsiderealTarget, Brightness] =
+    brightnesses.each
 
   /** @group Optics */
-  def magnitudeIn(b: MagnitudeBand): Traversal[NonsiderealTarget, Magnitude] =
-    magnitudes.filterIndex((a: MagnitudeBand) => a === b)
+  def brightnessIn(b: WavelengthBand): Traversal[NonsiderealTarget, Brightness] =
+    brightnesses.filterIndex((a: WavelengthBand) => a === b)
 }
 
 trait TargetOptics { this: Target.type =>
@@ -233,19 +233,19 @@ trait TargetOptics { this: Target.type =>
     sidereal.andThen(SiderealTarget.tracking)
 
   /** @group Optics */
-  val magnitudes: Lens[Target, SortedMap[MagnitudeBand, Magnitude]] =
-    Lens[Target, SortedMap[MagnitudeBand, Magnitude]](_.magnitudes)(v => {
-      case t @ SiderealTarget(_, _, _, _)    => SiderealTarget.magnitudes.replace(v)(t)
-      case t @ NonsiderealTarget(_, _, _, _) => NonsiderealTarget.magnitudes.replace(v)(t)
+  val brightnesses: Lens[Target, SortedMap[WavelengthBand, Brightness]] =
+    Lens[Target, SortedMap[WavelengthBand, Brightness]](_.brightnesses)(v => {
+      case t @ SiderealTarget(_, _, _, _)    => SiderealTarget.brightnesses.replace(v)(t)
+      case t @ NonsiderealTarget(_, _, _, _) => NonsiderealTarget.brightnesses.replace(v)(t)
     })
 
   /** @group Optics */
-  val magnitudesT: Traversal[Target, Magnitude] =
-    magnitudes.each
+  val brightnessesT: Traversal[Target, Brightness] =
+    brightnesses.each
 
   /** @group Optics */
-  def magnitudeIn(b: MagnitudeBand): Traversal[Target, Magnitude] =
-    magnitudes.filterIndex((a: MagnitudeBand) => a === b)
+  def brightnessIn(b: WavelengthBand): Traversal[Target, Brightness] =
+    brightnesses.filterIndex((a: WavelengthBand) => a === b)
 
   /** @group Optics */
   val parallax: Optional[Target, Option[Parallax]] =
