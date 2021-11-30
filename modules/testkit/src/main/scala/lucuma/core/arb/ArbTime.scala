@@ -4,7 +4,7 @@
 package lucuma.core.arb
 
 import cats.syntax.all._
-import io.chrisdavenport.cats.time._
+import org.typelevel.cats.time._
 import lucuma.core.syntax.time._
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen._

@@ -6,7 +6,7 @@ package lucuma.core.model
 import cats._
 import cats.data.Validated
 import cats.syntax.all._
-import io.chrisdavenport.cats.time._
+import org.typelevel.cats.time._
 import lucuma.core.enum.Site
 import monocle.Iso
 import monocle.macros.GenIso

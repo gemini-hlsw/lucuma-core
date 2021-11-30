@@ -12,7 +12,7 @@ lazy val coulombVersion        = "0.5.7"
 lazy val spireVersion          = "0.17.0"
 lazy val singletonOpsVersion   = "0.5.2"
 lazy val refinedVersion        = "0.9.28"
-lazy val catsTimeVersion       = "0.4.0"
+lazy val catsTimeVersion       = "0.5.0"
 lazy val circeVersion          = "0.14.1"
 lazy val catsScalacheckVersion = "0.3.1"
 
@@ -54,7 +54,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
       "eu.timepit"        %%% "singleton-ops"              % singletonOpsVersion,
       "eu.timepit"        %%% "refined"                    % refinedVersion,
       "eu.timepit"        %%% "refined-cats"               % refinedVersion,
-      "io.chrisdavenport" %%% "cats-time"                  % catsTimeVersion,
+      "org.typelevel"     %%% "cats-time"                  % catsTimeVersion,
       "io.circe"          %%% "circe-core"                 % circeVersion,
       "io.circe"          %%% "circe-refined"              % circeVersion
     )

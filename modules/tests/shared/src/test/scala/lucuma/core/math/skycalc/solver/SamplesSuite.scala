@@ -23,7 +23,7 @@ import monocle.law.discipline.IsoTests
 import lucuma.core.arb._
 import lucuma.core.arb.ArbEval
 import lucuma.core.arb.ArbTime
-import io.chrisdavenport.cats.time._
+import org.typelevel.cats.time._
 import java.time.Instant
 
 final class SamplesSuite extends munit.DisciplineSuite with IntervalGens {

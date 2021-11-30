@@ -12,7 +12,7 @@ import org.scalacheck.Gen.Choose
 import org.scalacheck.Arbitrary._
 import lucuma.core.syntax.time._
 import lucuma.core.arb.ArbTime._
-import io.chrisdavenport.cats.time._
+import org.typelevel.cats.time._
 import spire.math.Bounded
 import lucuma.core.optics.Spire
 import lucuma.core.syntax.boundedInterval._

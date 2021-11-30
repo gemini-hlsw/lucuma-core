@@ -12,7 +12,7 @@ import lucuma.core.math.IntervalGens
 import lucuma.core.math.skycalc.SkyCalcResults
 import lucuma.core.enum.Site.GN
 import spire.math.extras.interval.IntervalSeq
-import io.chrisdavenport.cats.time._
+import org.typelevel.cats.time._
 
 /**
  * This is not meant to test the underlying SkyCalc implementations, we assume that this is all working,

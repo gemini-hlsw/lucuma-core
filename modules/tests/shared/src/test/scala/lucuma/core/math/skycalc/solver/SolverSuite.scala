@@ -10,7 +10,7 @@ import spire.math.extras.interval.IntervalSeq
 import lucuma.core.math.IntervalGens
 import lucuma.core.math.skycalc.solver.SolverStrategy._
 import lucuma.core.math.skycalc.solver.RoundStrategy._
-import io.chrisdavenport.cats.time._
+import org.typelevel.cats.time._
 
 final class SolverSuite extends munit.DisciplineSuite with IntervalGens {
 
