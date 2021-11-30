@@ -11,7 +11,7 @@ import lucuma.core.arb.ArbTime._
 import lucuma.core.model.arb.ArbSemester._
 import java.time.format.DateTimeFormatter
 import cats.kernel.laws.discipline._
-import io.chrisdavenport.cats.time._
+import org.typelevel.cats.time._
 import org.scalacheck.Prop._
 
 final class SemesterSuite extends munit.DisciplineSuite {

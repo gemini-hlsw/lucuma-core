@@ -15,7 +15,7 @@ import lucuma.core.math.skycalc._
 import java.time.Duration
 import lucuma.core.math.skycalc.solver.RoundStrategy._
 import scala.math.abs
-import io.chrisdavenport.cats.time._
+import org.typelevel.cats.time._
 import cats.Order._
 
 /**

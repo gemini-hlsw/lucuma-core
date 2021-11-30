@@ -13,7 +13,7 @@ import org.scalacheck.Prop
 import org.scalacheck.Prop._
 import lucuma.core.arb.ArbTime
 import lucuma.core.syntax.time._
-import io.chrisdavenport.cats.time._
+import org.typelevel.cats.time._
 import cats.laws.discipline.InvariantSemigroupalTests
 
 final class SampleRounderSuite extends munit.DisciplineSuite {

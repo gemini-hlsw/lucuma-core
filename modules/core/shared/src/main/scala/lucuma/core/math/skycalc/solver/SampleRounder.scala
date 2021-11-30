@@ -5,7 +5,7 @@ package lucuma.core.math.skycalc.solver
 
 import cats.InvariantSemigroupal
 import cats.syntax.all._
-import io.chrisdavenport.cats.time._
+import org.typelevel.cats.time._
 import lucuma.core.math.Angle
 import lucuma.core.math.Declination
 import lucuma.core.math.HourAngle

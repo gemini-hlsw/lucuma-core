@@ -9,7 +9,7 @@ import coulomb.cats.implicits._
 import coulomb.si.Meter
 import eu.timepit.refined.cats._
 import eu.timepit.refined.types.numeric.NonNegInt
-import io.chrisdavenport.cats.time._
+import org.typelevel.cats.time._
 import monocle.Focus
 import monocle.Lens
 

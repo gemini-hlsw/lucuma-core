@@ -18,7 +18,7 @@ import lucuma.core.util.arb.ArbEnumerated
 import edu.gemini.skycalc.TwilightBoundedNightTest
 import org.scalactic.Tolerance
 import lucuma.core.optics.Spire
-import io.chrisdavenport.cats.time._
+import org.typelevel.cats.time._
 
 final class TwilightCalcSuiteJVM extends ScalaCheckSuite with Tolerance {
   import ArbEnumerated._

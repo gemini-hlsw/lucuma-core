@@ -11,7 +11,7 @@ import org.scalacheck.Gen
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Prop._
 import lucuma.core.math.arb._
-import io.chrisdavenport.cats.time._
+import org.typelevel.cats.time._
 import lucuma.core.optics.laws.discipline.FormatTests
 import lucuma.core.arb.ArbTime
 import spire.math.Bounded

@@ -14,7 +14,7 @@ import lucuma.core.arb.ArbTime._
 import lucuma.core.model.arb.ArbTwilightBoundedNight._
 import lucuma.core.util.arb.ArbEnumerated._
 import cats.kernel.laws.discipline._
-import io.chrisdavenport.cats.time._
+import org.typelevel.cats.time._
 
 final class TwilightBoundedNightSuite extends DisciplineSuite {
   checkAll("TwilightBoundedNight", OrderTests[TwilightBoundedNight].order)

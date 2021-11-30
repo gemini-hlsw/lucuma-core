@@ -5,7 +5,7 @@ package lucuma.core.math.skycalc
 
 import cats.syntax.all._
 import coulomb.refined._
-import io.chrisdavenport.cats.time._
+import org.typelevel.cats.time._
 import lucuma.core.enum.TwilightType
 import lucuma.core.math.Constants._
 import lucuma.core.math.JulianDate

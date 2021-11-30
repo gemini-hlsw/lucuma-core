@@ -5,7 +5,7 @@ package lucuma.core.model
 
 import cats.Order
 import cats.Show
-import io.chrisdavenport.cats.time._
+import org.typelevel.cats.time._
 import lucuma.core.enum.Half
 import lucuma.core.enum.Site
 import lucuma.core.model.parser.SemesterParsers

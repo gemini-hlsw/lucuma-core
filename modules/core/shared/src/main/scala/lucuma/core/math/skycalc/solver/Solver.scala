@@ -4,7 +4,7 @@
 package lucuma.core.math.skycalc.solver
 
 import cats.syntax.all._
-import io.chrisdavenport.cats.time._
+import org.typelevel.cats.time._
 import lucuma.core.syntax.boundedInterval._
 import lucuma.core.syntax.time._
 import spire.math.Bounded

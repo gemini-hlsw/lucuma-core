@@ -6,6 +6,7 @@ package lucuma.core.math
 import cats.Order
 import cats.Show
 import cats.syntax.all._
+import eu.timepit.refined._
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.auto._
 import eu.timepit.refined.cats._
@@ -77,13 +78,13 @@ object Epoch extends EpochOptics {
     * Standard epoch.
     * @group Constructors
     */
-  val J2000: Epoch = Julian.fromIntegralYears(2000)
+  val J2000: Epoch = Julian.fromIntegralYears(refineMV[Year](2000))
 
   /**
     * Standard epoch prior to J2000. Obsolete but still in use.
     * @group Constructors
     */
-  val B1950: Epoch = Besselian.fromIntegralYears(1950)
+  val B1950: Epoch = Besselian.fromIntegralYears(refineMV[Year](1950))
 
   /**
     * The scheme defines year zero and length of a year in terms of Julian days. There are two

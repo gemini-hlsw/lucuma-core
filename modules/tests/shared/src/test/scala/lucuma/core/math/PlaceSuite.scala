@@ -16,7 +16,7 @@ import lucuma.core.arb._
 import lucuma.core.arb.ArbTime
 import monocle.law.discipline._
 import cats.kernel.laws.discipline.EqTests
-import io.chrisdavenport.cats.time._
+import org.typelevel.cats.time._
 
 final class PlaceSuite extends DisciplineSuite {
   import ArbPlace._

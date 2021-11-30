@@ -13,7 +13,7 @@ import lucuma.core.model.arb.ArbObservingNight._
 import lucuma.core.util.arb.ArbEnumerated._
 import cats.kernel.laws.discipline._
 import monocle.law.discipline._
-import io.chrisdavenport.cats.time._
+import org.typelevel.cats.time._
 
 final class ObservingNightSuite extends DisciplineSuite {
 
