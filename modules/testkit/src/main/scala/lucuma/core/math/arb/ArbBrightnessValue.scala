@@ -4,30 +4,30 @@
 package lucuma.core.math.arb
 
 import lucuma.core.arb._
-import lucuma.core.math.MagnitudeValue
+import lucuma.core.math.BrightnessValue
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Cogen._
 import org.scalacheck._
 
-trait ArbMagnitudeValue {
+trait ArbBrightnessValue {
 
-  implicit val arbMagnitudeValue: Arbitrary[MagnitudeValue] = Arbitrary {
-    arbitrary[Int].map(MagnitudeValue.apply)
+  implicit val arbBrightnessValue: Arbitrary[BrightnessValue] = Arbitrary {
+    arbitrary[Int].map(BrightnessValue.apply)
   }
 
-  implicit val cogMagnitudeValue: Cogen[MagnitudeValue] =
+  implicit val cogBrightnessValue: Cogen[BrightnessValue] =
     Cogen[Int].contramap(_.scaledValue)
 
   // Strings that are often parseable as a magnitude value
-  val stringsMagnitudeValue: Gen[String] =
-    arbitrary[MagnitudeValue]
+  val stringsBrightnessValue: Gen[String] =
+    arbitrary[BrightnessValue]
       .map(_.toDoubleValue.toString)
       .flatMapOneOf(
         Gen.const,
         _ => arbitrary[BigDecimal].toString,
-        _ => arbitrary[String]  // swap for a random String
+        _ => arbitrary[String] // swap for a random String
       )
 
 }
 
-object ArbMagnitudeValue extends ArbMagnitudeValue
+object ArbBrightnessValue extends ArbBrightnessValue

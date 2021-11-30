@@ -23,8 +23,8 @@ trait units {
   implicit val defineUnitPixels = BaseUnit[Pixels](abbv = "px")
 
   // Wavelength units
-  type Picometer  = Pico %* Meter
-  type Nanometer  = Nano %* Meter
+  type Picometer = Pico %* Meter
+  type Nanometer = Nano %* Meter
   trait Angstrom
   implicit val defineAngstrom =
     DerivedUnit[Angstrom, Hecto %* Picometer](Rational.one, abbv = "Å")
@@ -81,17 +81,20 @@ trait units {
   // Magnitude system units
   private val JanskyPerWattMeter2Hertz: SafeLong = SafeLong(10).pow(26)
   trait Jansky
-  implicit val defineJansky =
-    DerivedUnit[Jansky, Watt %/ ((Meter %^ 2) %* (Hertz %^ -1))](Rational(1, JanskyPerWattMeter2Hertz), abbv = "Jy")
+  implicit val defineJansky                      =
+    DerivedUnit[Jansky, Watt %/ ((Meter %^ 2) %* (Hertz %^ -1))](
+      Rational(1, JanskyPerWattMeter2Hertz),
+      abbv = "Jy"
+    )
 
   private val ErgPerJoule: SafeLong = SafeLong(10).pow(7)
   trait Erg
-  implicit val defineErg =
+  implicit val defineErg            =
     DerivedUnit[Erg, Joule](Rational(1, ErgPerJoule), abbv = "erg")
 
-  type WattsMag = Watt %/ ((Meter %^ 2) %* Micrometer)
+  type WattsMag          = Watt %/ ((Meter %^ 2) %* Micrometer)
   type ErgsWavelengthMag = Erg %/ (Second %* (Centimeter %^ 2) %* Angstrom)
-  type ErgsFrequencyMag = Erg %/ (Second %* (Centimeter %^ 2) %* Hertz)
+  type ErgsFrequencyMag  = Erg %/ (Second %* Centimeter %* Hertz)
 
   // PosInt can be converted to Rational exactly
   implicit def rationalPosIntConverter[U1, U2](implicit
