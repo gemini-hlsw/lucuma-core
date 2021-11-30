@@ -15,7 +15,7 @@ sealed abstract class GpiFilter(
   val tag:       String,
   val shortName: String,
   val longName:  String,
-  val band:      WavelengthBand,
+  val band:      Band,
   val obsolete:  Boolean
 ) extends Product
     with Serializable
@@ -23,19 +23,19 @@ sealed abstract class GpiFilter(
 object GpiFilter {
 
   /** @group Constructors */
-  case object Y extends GpiFilter("Y", "Y", "Y", WavelengthBand.Y, false)
+  case object Y extends GpiFilter("Y", "Y", "Y", Band.Y, false)
 
   /** @group Constructors */
-  case object J extends GpiFilter("J", "J", "J", WavelengthBand.J, false)
+  case object J extends GpiFilter("J", "J", "J", Band.J, false)
 
   /** @group Constructors */
-  case object H extends GpiFilter("H", "H", "H", WavelengthBand.H, false)
+  case object H extends GpiFilter("H", "H", "H", Band.H, false)
 
   /** @group Constructors */
-  case object K1 extends GpiFilter("K1", "K1", "K1", WavelengthBand.K, false)
+  case object K1 extends GpiFilter("K1", "K1", "K1", Band.K, false)
 
   /** @group Constructors */
-  case object K2 extends GpiFilter("K2", "K2", "K2", WavelengthBand.K, false)
+  case object K2 extends GpiFilter("K2", "K2", "K2", Band.K, false)
 
   /** All members of GpiFilter, in canonical order. */
   val all: List[GpiFilter] =

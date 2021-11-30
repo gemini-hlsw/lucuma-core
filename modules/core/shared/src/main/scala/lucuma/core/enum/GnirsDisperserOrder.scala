@@ -21,7 +21,7 @@ sealed abstract class GnirsDisperserOrder(
   val minWavelength:     Wavelength,
   val maxWavelength:     Wavelength,
   val deltaWavelength:   Wavelength,
-  val band:              Option[WavelengthBand],
+  val band:              Option[Band],
   val cross_dispersed:   Boolean
 ) extends Product
     with Serializable
@@ -39,7 +39,7 @@ object GnirsDisperserOrder {
         Wavelength.unsafeFromInt(4300000),
         Wavelength.unsafeFromInt(6000000),
         Wavelength.unsafeFromInt(0),
-        Some(WavelengthBand.M),
+        Some(Band.M),
         false
       )
 
@@ -54,7 +54,7 @@ object GnirsDisperserOrder {
         Wavelength.unsafeFromInt(2700000),
         Wavelength.unsafeFromInt(4300000),
         Wavelength.unsafeFromInt(0),
-        Some(WavelengthBand.L),
+        Some(Band.L),
         false
       )
 
@@ -69,7 +69,7 @@ object GnirsDisperserOrder {
         Wavelength.unsafeFromInt(1860000),
         Wavelength.unsafeFromInt(2700000),
         Wavelength.unsafeFromInt(647),
-        Some(WavelengthBand.K),
+        Some(Band.K),
         true
       )
 
@@ -84,7 +84,7 @@ object GnirsDisperserOrder {
         Wavelength.unsafeFromInt(1420000),
         Wavelength.unsafeFromInt(1860000),
         Wavelength.unsafeFromInt(482),
-        Some(WavelengthBand.H),
+        Some(Band.H),
         true
       )
 
@@ -99,7 +99,7 @@ object GnirsDisperserOrder {
         Wavelength.unsafeFromInt(1420000),
         Wavelength.unsafeFromInt(1860000),
         Wavelength.unsafeFromInt(485),
-        Some(WavelengthBand.H),
+        Some(Band.H),
         true
       )
 
@@ -114,7 +114,7 @@ object GnirsDisperserOrder {
         Wavelength.unsafeFromInt(1170000),
         Wavelength.unsafeFromInt(1420000),
         Wavelength.unsafeFromInt(388),
-        Some(WavelengthBand.J),
+        Some(Band.J),
         true
       )
 

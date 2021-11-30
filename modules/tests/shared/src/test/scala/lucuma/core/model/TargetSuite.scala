@@ -7,7 +7,7 @@ import cats.kernel.laws.discipline._
 import eu.timepit.refined.cats._
 import eu.timepit.refined.scalacheck.string._
 import lucuma.core.arb._
-import lucuma.core.enum.WavelengthBand
+import lucuma.core.enum.Band
 import lucuma.core.math.arb._
 import lucuma.core.model.arb._
 import lucuma.core.util.arb._
@@ -53,7 +53,7 @@ final class TargetSuite extends DisciplineSuite {
   checkAll("SiderealTarget.properMotionDec", OptionalTests(SiderealTarget.properMotionDec))
   checkAll(
     "SiderealTarget.brightnessIn",
-    TraversalTests(SiderealTarget.brightnessIn(WavelengthBand.B))
+    TraversalTests(SiderealTarget.brightnessIn(Band.B))
   )
 
   // Laws for NonsiderealTarget
@@ -94,5 +94,5 @@ final class TargetSuite extends DisciplineSuite {
   checkAll("Target.properMotion", OptionalTests(Target.properMotion))
   checkAll("Target.properMotionRA", OptionalTests(Target.properMotionRA))
   checkAll("Target.properMotionDec", OptionalTests(Target.properMotionDec))
-  checkAll("Target.brightnessIn", TraversalTests(Target.brightnessIn(WavelengthBand.B)))
+  checkAll("Target.brightnessIn", TraversalTests(Target.brightnessIn(Band.B)))
 }

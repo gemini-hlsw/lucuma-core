@@ -7,7 +7,7 @@ package arb
 import cats.syntax.all._
 import eu.timepit.refined.scalacheck.string._
 import eu.timepit.refined.types.string.NonEmptyString
-import lucuma.core.enum.WavelengthBand
+import lucuma.core.enum.Band
 import lucuma.core.util.arb.ArbEnumerated
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Cogen._
@@ -28,7 +28,7 @@ trait ArbTarget {
       for {
         n <- arbitrary[NonEmptyString]
         t <- arbitrary[SiderealTracking]
-        m <- arbitrary[Vector[(WavelengthBand, Brightness)]]
+        m <- arbitrary[Vector[(Band, Brightness)]]
         s <- arbitrary[Option[AngularSize]]
       } yield SiderealTarget(n, t, SortedMap(m: _*), s)
     }
@@ -38,7 +38,7 @@ trait ArbTarget {
       for {
         n <- arbitrary[NonEmptyString]
         t <- arbitrary[EphemerisKey]
-        m <- arbitrary[Vector[(WavelengthBand, Brightness)]]
+        m <- arbitrary[Vector[(Band, Brightness)]]
         s <- arbitrary[Option[AngularSize]]
       } yield NonsiderealTarget(n, t, SortedMap(m: _*), s)
     }
@@ -48,11 +48,11 @@ trait ArbTarget {
   )
 
   implicit val cogSiderealTarget: Cogen[SiderealTarget] =
-    Cogen[(String, SiderealTracking, Vector[(WavelengthBand, Brightness)])]
+    Cogen[(String, SiderealTracking, Vector[(Band, Brightness)])]
       .contramap(t => (t.name.value, t.tracking, t.brightnesses.toVector))
 
   implicit val cogNonsiderealTarget: Cogen[NonsiderealTarget] =
-    Cogen[(String, EphemerisKey, Vector[(WavelengthBand, Brightness)])]
+    Cogen[(String, EphemerisKey, Vector[(Band, Brightness)])]
       .contramap(t => (t.name.value, t.ephemerisKey, t.brightnesses.toVector))
 
   implicit val cogTarget: Cogen[Target] =

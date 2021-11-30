@@ -22,13 +22,13 @@ import spire.syntax.all._
  * Enumerated type for wavelength band.
  * @group Enumerations
  */
-sealed abstract class WavelengthBand(
+sealed abstract class Band(
   val tag:             String,
   val shortName:       String,
   val longName:        String,
   val center:          Wavelength,
   val width:           Quantity[PosInt, Nanometer],
-  val BrightnessUnits: BrightnessUnits
+  val brightnessUnits: BrightnessUnits
 ) extends Product
     with Serializable {
   require(center.toPicometers.value >= width.value / 2)
@@ -44,11 +44,11 @@ sealed abstract class WavelengthBand(
   )
 }
 
-object WavelengthBand {
+object Band {
 
   /** @group Constructors */
   case object SloanU
-      extends WavelengthBand(
+      extends Band(
         "SloanU",
         "u",
         "UV",
@@ -59,7 +59,7 @@ object WavelengthBand {
 
   /** @group Constructors */
   case object SloanG
-      extends WavelengthBand(
+      extends Band(
         "SloanG",
         "g",
         "Green",
@@ -70,7 +70,7 @@ object WavelengthBand {
 
   /** @group Constructors */
   case object SloanR
-      extends WavelengthBand(
+      extends Band(
         "SloanR",
         "r",
         "Red",
@@ -81,7 +81,7 @@ object WavelengthBand {
 
   /** @group Constructors */
   case object SloanI
-      extends WavelengthBand(
+      extends Band(
         "SloanI",
         "i",
         "Far red",
@@ -92,7 +92,7 @@ object WavelengthBand {
 
   /** @group Constructors */
   case object SloanZ
-      extends WavelengthBand(
+      extends Band(
         "SloanZ",
         "z",
         "Near infrared",
@@ -103,7 +103,7 @@ object WavelengthBand {
 
   /** @group Constructors */
   case object U
-      extends WavelengthBand(
+      extends Band(
         "U",
         "U",
         "Ultraviolet",
@@ -114,7 +114,7 @@ object WavelengthBand {
 
   /** @group Constructors */
   case object B
-      extends WavelengthBand(
+      extends Band(
         "B",
         "B",
         "Blue",
@@ -125,7 +125,7 @@ object WavelengthBand {
 
   /** @group Constructors */
   case object V
-      extends WavelengthBand(
+      extends Band(
         "V",
         "V",
         "Visual",
@@ -136,7 +136,7 @@ object WavelengthBand {
 
   /** @group Constructors */
   case object Uc
-      extends WavelengthBand(
+      extends Band(
         "Uc",
         "UC",
         "UCAC",
@@ -147,7 +147,7 @@ object WavelengthBand {
 
   /** @group Constructors */
   case object R
-      extends WavelengthBand(
+      extends Band(
         "R",
         "R",
         "Red",
@@ -158,7 +158,7 @@ object WavelengthBand {
 
   /** @group Constructors */
   case object I
-      extends WavelengthBand(
+      extends Band(
         "I",
         "I",
         "Infrared",
@@ -169,7 +169,7 @@ object WavelengthBand {
 
   /** @group Constructors */
   case object Y
-      extends WavelengthBand(
+      extends Band(
         "Y",
         "Y",
         "Y",
@@ -180,7 +180,7 @@ object WavelengthBand {
 
   /** @group Constructors */
   case object J
-      extends WavelengthBand(
+      extends Band(
         "J",
         "J",
         "J",
@@ -191,7 +191,7 @@ object WavelengthBand {
 
   /** @group Constructors */
   case object H
-      extends WavelengthBand(
+      extends Band(
         "H",
         "H",
         "H",
@@ -202,7 +202,7 @@ object WavelengthBand {
 
   /** @group Constructors */
   case object K
-      extends WavelengthBand(
+      extends Band(
         "K",
         "K",
         "K",
@@ -213,7 +213,7 @@ object WavelengthBand {
 
   /** @group Constructors */
   case object L
-      extends WavelengthBand(
+      extends Band(
         "L",
         "L",
         "L",
@@ -224,7 +224,7 @@ object WavelengthBand {
 
   /** @group Constructors */
   case object M
-      extends WavelengthBand(
+      extends Band(
         "M",
         "M",
         "M",
@@ -235,7 +235,7 @@ object WavelengthBand {
 
   /** @group Constructors */
   case object N
-      extends WavelengthBand(
+      extends Band(
         "N",
         "N",
         "N",
@@ -246,7 +246,7 @@ object WavelengthBand {
 
   /** @group Constructors */
   case object Q
-      extends WavelengthBand(
+      extends Band(
         "Q",
         "Q",
         "Q",
@@ -257,7 +257,7 @@ object WavelengthBand {
 
   /** @group Constructors */
   case object Ap
-      extends WavelengthBand(
+      extends Band(
         "Ap",
         "AP",
         "Apparent",
@@ -266,33 +266,33 @@ object WavelengthBand {
         BrightnessUnits.VegaMagnitudes
       )
 
-  /** All members of WavelengthBand, in canonical order. */
-  val all: List[WavelengthBand] =
+  /** All members of Band, in canonical order. */
+  val all: List[Band] =
     List(SloanU, SloanG, SloanR, SloanI, SloanZ, U, B, V, Uc, R, I, Y, J, H, K, L, M, N, Q, Ap)
 
-  /** Select the member of WavelengthBand with the given tag, if any. */
-  def fromTag(s: String): Option[WavelengthBand] =
+  /** Select the member of Band with the given tag, if any. */
+  def fromTag(s: String): Option[Band] =
     all.find(_.tag === s)
 
-  /** Select the member of WavelengthBand with the given tag, throwing if absent. */
-  def unsafeFromTag(s: String): WavelengthBand =
-    fromTag(s).getOrElse(throw new NoSuchElementException(s"WavelengthBand: Invalid tag: '$s'"))
+  /** Select the member of Band with the given tag, throwing if absent. */
+  def unsafeFromTag(s: String): Band =
+    fromTag(s).getOrElse(throw new NoSuchElementException(s"Band: Invalid tag: '$s'"))
 
   /** @group Typeclass Instances */
-  implicit val WavelengthBandEnumerated: Enumerated[WavelengthBand] =
-    new Enumerated[WavelengthBand] {
-      def all                                               = WavelengthBand.all
-      def tag(a: WavelengthBand)                            = a.tag
-      override def unsafeFromTag(s: String): WavelengthBand =
-        WavelengthBand.unsafeFromTag(s)
+  implicit val BandEnumerated: Enumerated[Band] =
+    new Enumerated[Band] {
+      def all                                     = Band.all
+      def tag(a: Band)                            = a.tag
+      override def unsafeFromTag(s: String): Band =
+        Band.unsafeFromTag(s)
     }
 
   /** @group Typeclass Instances */
-  val WavelengthBandWavelengthOrder: Order[WavelengthBand] =
+  val BandWavelengthOrder: Order[Band] =
     Order.by(_.center)
 
   /** @group Typeclass Instances */
-  implicit val WavelengthBandOrdering: Ordering[WavelengthBand] =
-    WavelengthBandEnumerated.toOrdering
+  implicit val BandOrdering: Ordering[Band] =
+    BandEnumerated.toOrdering
 
 }

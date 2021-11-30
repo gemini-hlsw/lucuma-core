@@ -5,7 +5,7 @@ package lucuma.core.model
 package arb
 
 import cats.implicits._
-import lucuma.core.enum.WavelengthBand
+import lucuma.core.enum.Band
 import lucuma.core.enum.BrightnessUnits
 import lucuma.core.math.BrightnessValue
 import lucuma.core.math.arb.ArbBrightnessValue._
@@ -24,23 +24,22 @@ trait ArbBrightness {
     Arbitrary {
       for {
         v <- arbitrary[BrightnessValue]
-        b <- arbitrary[WavelengthBand]
+        b <- arbitrary[Band]
         e <- arbitrary[Option[BrightnessValue]]
         s <- arbitrary[BrightnessUnits]
       } yield Brightness(v, b, e, s)
     }
 
   implicit val cogBrightness: Cogen[Brightness] =
-    Cogen[(BrightnessValue, WavelengthBand, Option[BrightnessValue], BrightnessUnits)].contramap {
-      u =>
-        (u.value, u.band, u.error, u.system)
+    Cogen[(BrightnessValue, Band, Option[BrightnessValue], BrightnessUnits)].contramap { u =>
+      (u.value, u.band, u.error, u.units)
     }
 
-  implicit val arbBrightnessesMap: Arbitrary[SortedMap[WavelengthBand, Brightness]] =
+  implicit val arbBrightnessesMap: Arbitrary[SortedMap[Band, Brightness]] =
     Arbitrary(arbitrary[Vector[Brightness]].map(_.fproductLeft(_.band)).map(x => SortedMap(x: _*)))
 
-  implicit val cogBrightnessesMap: Cogen[SortedMap[WavelengthBand, Brightness]] =
-    Cogen[Vector[(WavelengthBand, Brightness)]].contramap(_.toVector)
+  implicit val cogBrightnessesMap: Cogen[SortedMap[Band, Brightness]] =
+    Cogen[Vector[(Band, Brightness)]].contramap(_.toVector)
 }
 
 object ArbBrightness extends ArbBrightness

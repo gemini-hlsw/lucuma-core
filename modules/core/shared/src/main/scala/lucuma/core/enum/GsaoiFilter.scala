@@ -22,7 +22,7 @@ sealed abstract class GsaoiFilter(
   val readMode:             GsaoiReadMode,
   val exposureTime5050:     FiniteDuration,
   val exposureTimeHalfWell: FiniteDuration,
-  val band:                 Option[WavelengthBand]
+  val band:                 Option[Band]
 ) extends Product
     with Serializable
 
@@ -38,7 +38,7 @@ object GsaoiFilter {
         GsaoiReadMode.Faint,
         26000.millis,
         4619000.millis,
-        Some(WavelengthBand.J)
+        Some(Band.J)
       )
 
   /** @group Constructors */
@@ -51,7 +51,7 @@ object GsaoiFilter {
         GsaoiReadMode.VeryFaint,
         72600.millis,
         21792000.millis,
-        Some(WavelengthBand.J)
+        Some(Band.J)
       )
 
   /** @group Constructors */
@@ -64,7 +64,7 @@ object GsaoiFilter {
         GsaoiReadMode.VeryFaint,
         122000.millis,
         36585000.millis,
-        Some(WavelengthBand.J)
+        Some(Band.J)
       )
 
   /** @group Constructors */
@@ -77,7 +77,7 @@ object GsaoiFilter {
         GsaoiReadMode.VeryFaint,
         32600.millis,
         9793000.millis,
-        Some(WavelengthBand.J)
+        Some(Band.J)
       )
 
   /** @group Constructors */
@@ -90,7 +90,7 @@ object GsaoiFilter {
         GsaoiReadMode.Faint,
         5700.millis,
         1004000.millis,
-        Some(WavelengthBand.J)
+        Some(Band.J)
       )
 
   /** @group Constructors */
@@ -103,7 +103,7 @@ object GsaoiFilter {
         GsaoiReadMode.Bright,
         12000.millis,
         460000.millis,
-        Some(WavelengthBand.H)
+        Some(Band.H)
       )
 
   /** @group Constructors */
@@ -116,7 +116,7 @@ object GsaoiFilter {
         GsaoiReadMode.Faint,
         21800.millis,
         3879000.millis,
-        Some(WavelengthBand.J)
+        Some(Band.J)
       )
 
   /** @group Constructors */
@@ -129,7 +129,7 @@ object GsaoiFilter {
         GsaoiReadMode.Faint,
         31200.millis,
         5545000.millis,
-        Some(WavelengthBand.H)
+        Some(Band.H)
       )
 
   /** @group Constructors */
@@ -142,7 +142,7 @@ object GsaoiFilter {
         GsaoiReadMode.Faint,
         6600.millis,
         1174000.millis,
-        Some(WavelengthBand.H)
+        Some(Band.H)
       )
 
   /** @group Constructors */
@@ -155,7 +155,7 @@ object GsaoiFilter {
         GsaoiReadMode.Faint,
         24900.millis,
         4416000.millis,
-        Some(WavelengthBand.H)
+        Some(Band.H)
       )
 
   /** @group Constructors */
@@ -168,7 +168,7 @@ object GsaoiFilter {
         GsaoiReadMode.Faint,
         6800.millis,
         1202000.millis,
-        Some(WavelengthBand.H)
+        Some(Band.H)
       )
 
   /** @group Constructors */
@@ -181,7 +181,7 @@ object GsaoiFilter {
         GsaoiReadMode.Faint,
         19100.millis,
         3395000.millis,
-        Some(WavelengthBand.K)
+        Some(Band.K)
       )
 
   /** @group Constructors */
@@ -194,7 +194,7 @@ object GsaoiFilter {
         GsaoiReadMode.Faint,
         28300.millis,
         5032000.millis,
-        Some(WavelengthBand.K)
+        Some(Band.K)
       )
 
   /** @group Constructors */
@@ -207,7 +207,7 @@ object GsaoiFilter {
         GsaoiReadMode.Faint,
         7800.millis,
         6069000.millis,
-        Some(WavelengthBand.K)
+        Some(Band.K)
       )
 
   /** @group Constructors */
@@ -220,7 +220,7 @@ object GsaoiFilter {
         GsaoiReadMode.Faint,
         31000.millis,
         5496000.millis,
-        Some(WavelengthBand.K)
+        Some(Band.K)
       )
 
   /** @group Constructors */
@@ -233,7 +233,7 @@ object GsaoiFilter {
         GsaoiReadMode.Faint,
         33300.millis,
         5911000.millis,
-        Some(WavelengthBand.K)
+        Some(Band.K)
       )
 
   /** @group Constructors */
@@ -246,7 +246,7 @@ object GsaoiFilter {
         GsaoiReadMode.Bright,
         14800.millis,
         566000.millis,
-        Some(WavelengthBand.K)
+        Some(Band.K)
       )
 
   /** @group Constructors */
@@ -259,7 +259,7 @@ object GsaoiFilter {
         GsaoiReadMode.Faint,
         27500.millis,
         5400000.millis,
-        Some(WavelengthBand.K)
+        Some(Band.K)
       )
 
   /** @group Constructors */
@@ -272,7 +272,7 @@ object GsaoiFilter {
         GsaoiReadMode.Bright,
         14400.millis,
         551000.millis,
-        Some(WavelengthBand.K)
+        Some(Band.K)
       )
 
   /** @group Constructors */
@@ -285,7 +285,7 @@ object GsaoiFilter {
         GsaoiReadMode.Bright,
         12300.millis,
         470000.millis,
-        Some(WavelengthBand.K)
+        Some(Band.K)
       )
 
   /** @group Constructors */
@@ -298,7 +298,7 @@ object GsaoiFilter {
         GsaoiReadMode.Faint,
         32600.millis,
         5784000.millis,
-        Some(WavelengthBand.K)
+        Some(Band.K)
       )
 
   /** @group Constructors */
@@ -311,7 +311,7 @@ object GsaoiFilter {
         GsaoiReadMode.Faint,
         7700.millis,
         1370000.millis,
-        Some(WavelengthBand.K)
+        Some(Band.K)
       )
 
   /** @group Constructors */
@@ -324,7 +324,7 @@ object GsaoiFilter {
         GsaoiReadMode.Bright,
         0.millis,
         0.millis,
-        Option.empty[WavelengthBand]
+        Option.empty[Band]
       )
 
   /** @group Constructors */
@@ -337,7 +337,7 @@ object GsaoiFilter {
         GsaoiReadMode.Bright,
         0.millis,
         0.millis,
-        Option.empty[WavelengthBand]
+        Option.empty[Band]
       )
 
   /** @group Constructors */
@@ -350,7 +350,7 @@ object GsaoiFilter {
         GsaoiReadMode.Bright,
         0.millis,
         0.millis,
-        Option.empty[WavelengthBand]
+        Option.empty[Band]
       )
 
   /** All members of GsaoiFilter, in canonical order. */

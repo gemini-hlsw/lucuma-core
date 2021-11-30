@@ -77,11 +77,6 @@ object BrightnessUnits {
     }
 
   // This Display can be useful to nicely format the units
-  val unitDisplay: Display[BrightnessUnits] = Display.byShortName {
-    case BrightnessUnits.Watts          => "W/m²/µm"
-    case BrightnessUnits.ErgsWavelength => "erg/s/cm²/Å"
-    case BrightnessUnits.ErgsFrequency  => "erg/s/cm²/Hz"
-    case a                              => a.tag
-  }
+  val unitDisplay: Display[BrightnessUnits] = Display.byShortName(_.show)
 
 }
