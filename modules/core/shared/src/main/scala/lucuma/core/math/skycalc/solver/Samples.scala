@@ -9,12 +9,12 @@ import cats.Eval
 import cats.Functor
 import cats.MonoidK
 import cats.syntax.all._
-import org.typelevel.cats.time._
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Place
 import lucuma.core.optics.Spire
 import lucuma.core.syntax.time._
 import monocle.Iso
+import org.typelevel.cats.time._
 import spire.math.Bounded
 
 import java.time.Duration

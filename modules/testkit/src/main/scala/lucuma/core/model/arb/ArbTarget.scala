@@ -19,7 +19,7 @@ trait ArbTarget {
 
   import ArbEphemerisKey._
   import ArbSiderealTracking._
-  import ArbBrightness._
+  import ArbTargetBrightness._
   import ArbAngularSize._
   import ArbEnumerated._
 
@@ -28,7 +28,7 @@ trait ArbTarget {
       for {
         n <- arbitrary[NonEmptyString]
         t <- arbitrary[SiderealTracking]
-        m <- arbitrary[Vector[(Band, Brightness)]]
+        m <- arbitrary[Vector[(Band, TargetBrightness)]]
         s <- arbitrary[Option[AngularSize]]
       } yield SiderealTarget(n, t, SortedMap(m: _*), s)
     }
@@ -38,7 +38,7 @@ trait ArbTarget {
       for {
         n <- arbitrary[NonEmptyString]
         t <- arbitrary[EphemerisKey]
-        m <- arbitrary[Vector[(Band, Brightness)]]
+        m <- arbitrary[Vector[(Band, TargetBrightness)]]
         s <- arbitrary[Option[AngularSize]]
       } yield NonsiderealTarget(n, t, SortedMap(m: _*), s)
     }
@@ -48,11 +48,11 @@ trait ArbTarget {
   )
 
   implicit val cogSiderealTarget: Cogen[SiderealTarget] =
-    Cogen[(String, SiderealTracking, Vector[(Band, Brightness)])]
+    Cogen[(String, SiderealTracking, Vector[(Band, TargetBrightness)])]
       .contramap(t => (t.name.value, t.tracking, t.brightnesses.toVector))
 
   implicit val cogNonsiderealTarget: Cogen[NonsiderealTarget] =
-    Cogen[(String, EphemerisKey, Vector[(Band, Brightness)])]
+    Cogen[(String, EphemerisKey, Vector[(Band, TargetBrightness)])]
       .contramap(t => (t.name.value, t.ephemerisKey, t.brightnesses.toVector))
 
   implicit val cogTarget: Cogen[Target] =

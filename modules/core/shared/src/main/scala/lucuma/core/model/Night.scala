@@ -3,9 +3,9 @@
 
 package lucuma.core.model
 
-import org.typelevel.cats.time._
 import lucuma.core.enum.Site
 import lucuma.core.syntax.time._
+import org.typelevel.cats.time._
 import spire.math.Bounded
 
 import java.time.Duration

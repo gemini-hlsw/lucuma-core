@@ -16,8 +16,20 @@ final class UnitsSuite extends FunSuite {
 
   test("Sanity tests") {
     assert(Rational.one.withUnit[Angstrom] === Rational(1, SafeLong(10).pow(10)).withUnit[Meter])
-    assert(Rational.one.withUnit[Jansky] === Rational(1, SafeLong(10).pow(26)).withUnit[Watt %/ (Meter %^ 2) %* Hertz])
+    assert(
+      Rational.one.withUnit[Jansky] === Rational(1, SafeLong(10).pow(26))
+        .withUnit[Watt %/ (Meter %^ 2) %* Hertz]
+    )
     assert(Rational.one.withUnit[Erg] === Rational(1, SafeLong(10).pow(7)).withUnit[Joule])
+  }
+
+  test("Check brightness unit names") {
+    assertEquals(1.withUnit[VegaMagnitude].show, "1 Vega mags")
+    assertEquals(1.withUnit[ABMagnitude].show, "1 AB mags")
+    assertEquals(1.withUnit[Jansky].show, "1 Jy")
+    assertEquals(1.withUnit[WattsBrightness].show, "1 W/m²/µm")
+    assertEquals(1.withUnit[ErgsWavelengthBrightness].show, "1 erg/s/cm²/Å")
+    assertEquals(1.withUnit[ErgsFrequencyBrightness].show, "1 erg/s/cm²/Hz")
   }
 
 }

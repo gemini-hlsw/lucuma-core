@@ -6,11 +6,14 @@ import cats.kernel.laws.discipline._
 import lucuma.core.model.arb._
 import munit._
 
-final class BrightnessSuite extends DisciplineSuite {
+final class TargetBrightnessSuite extends DisciplineSuite {
 
-  import ArbBrightness._
+  import ArbTargetBrightness._
 
   // Laws
-  checkAll("Brightness", EqTests[Brightness].eqv)
-  checkAll("BrightnessOrdering", OrderTests[Brightness](Brightness.BrightnessOrdering).order)
+  checkAll("Brightness", EqTests[TargetBrightness].eqv)
+  checkAll(
+    "BrightnessOrdering",
+    OrderTests[TargetBrightness](TargetBrightness.TargetBrightnessOrder).order
+  )
 }

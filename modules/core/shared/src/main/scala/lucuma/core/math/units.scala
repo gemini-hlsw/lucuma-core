@@ -16,9 +16,11 @@ import eu.timepit.refined._
 import eu.timepit.refined.auto._
 import eu.timepit.refined.numeric._
 import eu.timepit.refined.types.numeric.PosInt
+import lucuma.core.math.dimensional._
 import spire.math._
 
 trait units {
+
   trait Pixels
   implicit val defineUnitPixels = BaseUnit[Pixels](abbv = "px")
 
@@ -78,23 +80,76 @@ trait units {
       abbv = "μas/y"
     )
 
-  // Magnitude system units
+  // Integrated Brightness units
+  type VegaMagnitude
+  implicit val defineVegaMagnitude =
+    PrefixUnit[VegaMagnitude](name = "Vega magnitudes", abbv = "Vega mags")
+
+  type ABMagnitude
+  implicit val defineABMagnitude =
+    PrefixUnit[ABMagnitude](name = "AB magnitudes", abbv = "AB mags")
+
   private val JanskyPerWattMeter2Hertz: SafeLong = SafeLong(10).pow(26)
-  trait Jansky
+  type Jansky
   implicit val defineJansky                      =
     DerivedUnit[Jansky, Watt %/ ((Meter %^ 2) %* (Hertz %^ -1))](
       Rational(1, JanskyPerWattMeter2Hertz),
       abbv = "Jy"
     )
 
+  type WattsBrightness
+  implicit val defineWattsBrightness =
+    DerivedUnit[WattsBrightness, Watt %/ ((Meter %^ 2) %* Micrometer)](abbv = "W/m²/µm")
+
   private val ErgPerJoule: SafeLong = SafeLong(10).pow(7)
-  trait Erg
+  type Erg
   implicit val defineErg            =
     DerivedUnit[Erg, Joule](Rational(1, ErgPerJoule), abbv = "erg")
 
-  type WattsMag          = Watt %/ ((Meter %^ 2) %* Micrometer)
-  type ErgsWavelengthMag = Erg %/ (Second %* (Centimeter %^ 2) %* Angstrom)
-  type ErgsFrequencyMag  = Erg %/ (Second %* Centimeter %* Hertz)
+  type ErgsWavelengthBrightness
+  implicit val defineErgsWavelengthBrightness =
+    DerivedUnit[ErgsWavelengthBrightness, Erg %/ (Second %* (Centimeter %^ 2) %* Angstrom)](
+      abbv = "erg/s/cm²/Å"
+    )
+
+  type ErgsFrequencyBrightness
+  implicit val defineErgsFrequencyBrightness =
+    DerivedUnit[ErgsFrequencyBrightness, Erg %/ (Second %* (Centimeter %^ 2) %* Hertz)](
+      abbv = "erg/s/cm²/Hz"
+    )
+
+  // Surface Brightness units
+
+  // Derive a surfrace unit from an integrated unit
+  private def defineSurfaceUnit[U, D](implicit unitD: UnitOfMeasure[D]) =
+    DerivedUnit[U, D %/ (ArcSecond %^ 2)](
+      name = unitD.definition.name + "per arcsec²",
+      abbv = unitD.definition.abbv + "/arcsec²"
+    )
+
+  type VegaMagnitudePerArcsec2
+  implicit val defineVegaMagnitudePerArcsec2 =
+    defineSurfaceUnit[VegaMagnitudePerArcsec2, VegaMagnitude]
+
+  type ABMagnitudePerArcsec2
+  implicit val defineABMagnitudePerArcsec2 =
+    defineSurfaceUnit[ABMagnitudePerArcsec2, ABMagnitude]
+
+  type JanskyPerArcsec2
+  implicit val defineJanskyPerArcsec2 =
+    defineSurfaceUnit[JanskyPerArcsec2, Jansky]
+
+  type WattsBrightnessPerArcsec2
+  implicit val defineWattsBrightnessPerArcsec2 =
+    defineSurfaceUnit[WattsBrightnessPerArcsec2, WattsBrightness]
+
+  type ErgsWavelengthBrightnessPerArcsec2
+  implicit val defineErgsWavelengthBrightnessPerArcsec2 =
+    defineSurfaceUnit[ErgsWavelengthBrightnessPerArcsec2, ErgsWavelengthBrightness]
+
+  type ErgsFrequencyBrightnessPerArcsec2
+  implicit val defineErgsFrequencyBrightnessPerArcsec2 =
+    defineSurfaceUnit[ErgsFrequencyBrightnessPerArcsec2, ErgsFrequencyBrightness]
 
   // PosInt can be converted to Rational exactly
   implicit def rationalPosIntConverter[U1, U2](implicit

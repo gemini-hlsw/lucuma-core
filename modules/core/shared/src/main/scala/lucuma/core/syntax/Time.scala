@@ -4,9 +4,9 @@
 package lucuma.core.syntax
 
 import cats.syntax.all._
-import org.typelevel.cats.time._
 import lucuma.core.optics.Spire
 import lucuma.core.syntax.boundedInterval._
+import org.typelevel.cats.time._
 import spire.math.Bounded
 import spire.math.Empty
 import spire.math.Point
