@@ -4,11 +4,11 @@
 package lucuma.core.arb
 
 import cats.syntax.all._
-import org.typelevel.cats.time._
 import lucuma.core.syntax.time._
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen._
 import org.scalacheck._
+import org.typelevel.cats.time._
 
 import java.time._
 import scala.concurrent.duration.{ Duration => SDuration }

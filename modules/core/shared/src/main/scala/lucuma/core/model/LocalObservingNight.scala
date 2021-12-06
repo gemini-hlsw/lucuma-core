@@ -6,10 +6,10 @@ package lucuma.core.model
 import cats._
 import cats.data.Validated
 import cats.syntax.all._
-import org.typelevel.cats.time._
 import lucuma.core.enum.Site
 import monocle.Iso
 import monocle.macros.GenIso
+import org.typelevel.cats.time._
 
 import java.time._
 import java.time.format.DateTimeFormatter

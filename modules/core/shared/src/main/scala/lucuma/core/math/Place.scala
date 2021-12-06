@@ -9,9 +9,9 @@ import coulomb.cats.implicits._
 import coulomb.si.Meter
 import eu.timepit.refined.cats._
 import eu.timepit.refined.types.numeric.NonNegInt
-import org.typelevel.cats.time._
 import monocle.Focus
 import monocle.Lens
+import org.typelevel.cats.time._
 
 import java.time.ZoneId
 

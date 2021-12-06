@@ -12,8 +12,12 @@ import coulomb.refined._
 import eu.timepit.refined.auto._
 import eu.timepit.refined.numeric.Positive
 import eu.timepit.refined.types.numeric.PosInt
+import lucuma.core.math.BrightnessUnit
+import lucuma.core.math.BrightnessValue
 import lucuma.core.math.Wavelength
+import lucuma.core.math.dimensional._
 import lucuma.core.math.units.Nanometer
+import lucuma.core.math.units._
 import lucuma.core.util.Enumerated
 import spire.std.any._
 import spire.syntax.all._
@@ -23,12 +27,11 @@ import spire.syntax.all._
  * @group Enumerations
  */
 sealed abstract class Band(
-  val tag:             String,
-  val shortName:       String,
-  val longName:        String,
-  val center:          Wavelength,
-  val width:           Quantity[PosInt, Nanometer],
-  val brightnessUnits: BrightnessUnits
+  val tag:       String,
+  val shortName: String,
+  val longName:  String,
+  val center:    Wavelength,
+  val width:     Quantity[PosInt, Nanometer]
 ) extends Product
     with Serializable {
   require(center.toPicometers.value >= width.value / 2)
@@ -44,7 +47,32 @@ sealed abstract class Band(
   )
 }
 
-object Band {
+trait BandDefaultUnit {
+  trait DefaultUnit[B <: Band, G <: BrightnessUnit.Group] {
+    val unit: GroupedUnitType[G]
+
+    def withValue(
+      value: BrightnessValue
+    ): GroupedUnitQuantity[BrightnessValue, BrightnessUnit.Group] =
+      GroupedUnitQuantity(value, unit)
+  }
+  object DefaultUnit                                      {
+    def apply[B <: Band, G <: BrightnessUnit.Group, U](implicit ev: UnitOfMeasure[U]) =
+      new DefaultUnit[B, G] {
+        val unit: GroupedUnitType[G] = ev.groupedIn[G]
+      }
+  }
+}
+
+trait BandDefaultUnitLowPriorityImplicits extends BandDefaultUnit {
+  // These are the defaults
+  implicit def defaultIntegratedUnit[B <: Band]: DefaultUnit[B, BrightnessUnit.Integrated] =
+    DefaultUnit[B, BrightnessUnit.Integrated, VegaMagnitude]
+  implicit def defaultSurfaceUnit[B <: Band]: DefaultUnit[B, BrightnessUnit.Surface]       =
+    DefaultUnit[B, BrightnessUnit.Surface, VegaMagnitudePerArcsec2]
+}
+
+object Band extends BandDefaultUnitLowPriorityImplicits {
 
   /** @group Constructors */
   case object SloanU
@@ -53,9 +81,12 @@ object Band {
         "u",
         "UV",
         Wavelength(356000),
-        46.withRefinedUnit[Positive, Nanometer],
-        BrightnessUnits.ABMagnitudes
+        46.withRefinedUnit[Positive, Nanometer]
       )
+  implicit val defaultSloanUIntegratedUnit: DefaultUnit[SloanU.type, BrightnessUnit.Integrated] =
+    DefaultUnit[SloanU.type, BrightnessUnit.Integrated, ABMagnitude]
+  implicit val defaultSloanUSurfaceUnit: DefaultUnit[SloanU.type, BrightnessUnit.Surface]       =
+    DefaultUnit[SloanU.type, BrightnessUnit.Surface, ABMagnitudePerArcsec2]
 
   /** @group Constructors */
   case object SloanG
@@ -64,9 +95,12 @@ object Band {
         "g",
         "Green",
         Wavelength(483000),
-        99.withRefinedUnit[Positive, Nanometer],
-        BrightnessUnits.ABMagnitudes
+        99.withRefinedUnit[Positive, Nanometer]
       )
+  implicit val defaultSloanGIntegratedUnit: DefaultUnit[SloanG.type, BrightnessUnit.Integrated] =
+    DefaultUnit[SloanG.type, BrightnessUnit.Integrated, ABMagnitude]
+  implicit val defaultSloanGSurfaceUnit: DefaultUnit[SloanG.type, BrightnessUnit.Surface]       =
+    DefaultUnit[SloanG.type, BrightnessUnit.Surface, ABMagnitudePerArcsec2]
 
   /** @group Constructors */
   case object SloanR
@@ -75,9 +109,12 @@ object Band {
         "r",
         "Red",
         Wavelength(626000),
-        96.withRefinedUnit[Positive, Nanometer],
-        BrightnessUnits.ABMagnitudes
+        96.withRefinedUnit[Positive, Nanometer]
       )
+  implicit val defaultSloanRIntegratedUnit: DefaultUnit[SloanR.type, BrightnessUnit.Integrated] =
+    DefaultUnit[SloanR.type, BrightnessUnit.Integrated, ABMagnitude]
+  implicit val defaultSloanRSurfaceUnit: DefaultUnit[SloanR.type, BrightnessUnit.Surface]       =
+    DefaultUnit[SloanR.type, BrightnessUnit.Surface, ABMagnitudePerArcsec2]
 
   /** @group Constructors */
   case object SloanI
@@ -86,9 +123,12 @@ object Band {
         "i",
         "Far red",
         Wavelength(767000),
-        106.withRefinedUnit[Positive, Nanometer],
-        BrightnessUnits.ABMagnitudes
+        106.withRefinedUnit[Positive, Nanometer]
       )
+  implicit val defaultSloanIIntegratedUnit: DefaultUnit[SloanI.type, BrightnessUnit.Integrated] =
+    DefaultUnit[SloanI.type, BrightnessUnit.Integrated, ABMagnitude]
+  implicit val defaultSloanISurfaceUnit: DefaultUnit[SloanI.type, BrightnessUnit.Surface]       =
+    DefaultUnit[SloanI.type, BrightnessUnit.Surface, ABMagnitudePerArcsec2]
 
   /** @group Constructors */
   case object SloanZ
@@ -97,9 +137,12 @@ object Band {
         "z",
         "Near infrared",
         Wavelength(910000),
-        125.withRefinedUnit[Positive, Nanometer],
-        BrightnessUnits.ABMagnitudes
+        125.withRefinedUnit[Positive, Nanometer]
       )
+  implicit val defaultSloanZIntegratedUnit: DefaultUnit[SloanZ.type, BrightnessUnit.Integrated] =
+    DefaultUnit[SloanZ.type, BrightnessUnit.Integrated, ABMagnitude]
+  implicit val defaultSloanZSurfaceUnit: DefaultUnit[SloanZ.type, BrightnessUnit.Surface]       =
+    DefaultUnit[SloanZ.type, BrightnessUnit.Surface, ABMagnitudePerArcsec2]
 
   /** @group Constructors */
   case object U
@@ -108,8 +151,7 @@ object Band {
         "U",
         "Ultraviolet",
         Wavelength(360000),
-        75.withRefinedUnit[Positive, Nanometer],
-        BrightnessUnits.VegaMagnitudes
+        75.withRefinedUnit[Positive, Nanometer]
       )
 
   /** @group Constructors */
@@ -119,8 +161,7 @@ object Band {
         "B",
         "Blue",
         Wavelength(440000),
-        90.withRefinedUnit[Positive, Nanometer],
-        BrightnessUnits.VegaMagnitudes
+        90.withRefinedUnit[Positive, Nanometer]
       )
 
   /** @group Constructors */
@@ -130,8 +171,7 @@ object Band {
         "V",
         "Visual",
         Wavelength(550000),
-        85.withRefinedUnit[Positive, Nanometer],
-        BrightnessUnits.VegaMagnitudes
+        85.withRefinedUnit[Positive, Nanometer]
       )
 
   /** @group Constructors */
@@ -141,8 +181,7 @@ object Band {
         "UC",
         "UCAC",
         Wavelength(610000),
-        63.withRefinedUnit[Positive, Nanometer],
-        BrightnessUnits.VegaMagnitudes
+        63.withRefinedUnit[Positive, Nanometer]
       )
 
   /** @group Constructors */
@@ -152,8 +191,7 @@ object Band {
         "R",
         "Red",
         Wavelength(670000),
-        100.withRefinedUnit[Positive, Nanometer],
-        BrightnessUnits.VegaMagnitudes
+        100.withRefinedUnit[Positive, Nanometer]
       )
 
   /** @group Constructors */
@@ -163,8 +201,7 @@ object Band {
         "I",
         "Infrared",
         Wavelength(870000),
-        100.withRefinedUnit[Positive, Nanometer],
-        BrightnessUnits.VegaMagnitudes
+        100.withRefinedUnit[Positive, Nanometer]
       )
 
   /** @group Constructors */
@@ -174,8 +211,7 @@ object Band {
         "Y",
         "Y",
         Wavelength(1020000),
-        120.withRefinedUnit[Positive, Nanometer],
-        BrightnessUnits.VegaMagnitudes
+        120.withRefinedUnit[Positive, Nanometer]
       )
 
   /** @group Constructors */
@@ -185,8 +221,7 @@ object Band {
         "J",
         "J",
         Wavelength(1250000),
-        240.withRefinedUnit[Positive, Nanometer],
-        BrightnessUnits.VegaMagnitudes
+        240.withRefinedUnit[Positive, Nanometer]
       )
 
   /** @group Constructors */
@@ -196,8 +231,7 @@ object Band {
         "H",
         "H",
         Wavelength(1650000),
-        300.withRefinedUnit[Positive, Nanometer],
-        BrightnessUnits.VegaMagnitudes
+        300.withRefinedUnit[Positive, Nanometer]
       )
 
   /** @group Constructors */
@@ -207,8 +241,7 @@ object Band {
         "K",
         "K",
         Wavelength(2200000),
-        410.withRefinedUnit[Positive, Nanometer],
-        BrightnessUnits.VegaMagnitudes
+        410.withRefinedUnit[Positive, Nanometer]
       )
 
   /** @group Constructors */
@@ -218,8 +251,7 @@ object Band {
         "L",
         "L",
         Wavelength(3760000),
-        700.withRefinedUnit[Positive, Nanometer],
-        BrightnessUnits.VegaMagnitudes
+        700.withRefinedUnit[Positive, Nanometer]
       )
 
   /** @group Constructors */
@@ -229,8 +261,7 @@ object Band {
         "M",
         "M",
         Wavelength(4770000),
-        240.withRefinedUnit[Positive, Nanometer],
-        BrightnessUnits.VegaMagnitudes
+        240.withRefinedUnit[Positive, Nanometer]
       )
 
   /** @group Constructors */
@@ -240,8 +271,7 @@ object Band {
         "N",
         "N",
         Wavelength(10470000),
-        5230.withRefinedUnit[Positive, Nanometer],
-        BrightnessUnits.VegaMagnitudes
+        5230.withRefinedUnit[Positive, Nanometer]
       )
 
   /** @group Constructors */
@@ -251,8 +281,7 @@ object Band {
         "Q",
         "Q",
         Wavelength(20130000),
-        1650.withRefinedUnit[Positive, Nanometer],
-        BrightnessUnits.VegaMagnitudes
+        1650.withRefinedUnit[Positive, Nanometer]
       )
 
   /** @group Constructors */
@@ -262,8 +291,7 @@ object Band {
         "AP",
         "Apparent",
         Wavelength(550000),
-        85.withRefinedUnit[Positive, Nanometer],
-        BrightnessUnits.VegaMagnitudes
+        85.withRefinedUnit[Positive, Nanometer]
       )
 
   /** All members of Band, in canonical order. */

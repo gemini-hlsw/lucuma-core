@@ -22,7 +22,7 @@ sealed abstract class GnirsDisperserOrder(
   val maxWavelength:     Wavelength,
   val deltaWavelength:   Wavelength,
   val band:              Option[Band],
-  val cross_dispersed:   Boolean
+  val crossDispersed:    Boolean
 ) extends Product
     with Serializable
 

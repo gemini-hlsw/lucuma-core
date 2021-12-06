@@ -17,7 +17,7 @@ import munit._
 
 final class TargetSuite extends DisciplineSuite {
   import ArbTarget._
-  import ArbBrightness._
+  import ArbTargetBrightness._
   import ArbSiderealTracking._
   import ArbEphemerisKey._
   import ArbParallax._

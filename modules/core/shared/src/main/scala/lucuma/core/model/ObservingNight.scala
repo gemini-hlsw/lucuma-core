@@ -4,12 +4,12 @@
 package lucuma.core.model
 
 import cats._
-import org.typelevel.cats.time._
 import lucuma.core.enum.Site
 import lucuma.core.enum.TwilightType
 import lucuma.core.syntax.boundedInterval._
 import monocle.Focus
 import monocle.Lens
+import org.typelevel.cats.time._
 import spire.math.Bounded
 
 import java.time._

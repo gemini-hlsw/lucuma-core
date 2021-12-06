@@ -4,9 +4,9 @@
 package lucuma.core.math.skycalc.solver
 
 import cats.syntax.all._
-import org.typelevel.cats.time._
 import lucuma.core.syntax.boundedInterval._
 import lucuma.core.syntax.time._
+import org.typelevel.cats.time._
 import spire.math.Bounded
 import spire.math.extras.interval.IntervalSeq
 
