@@ -120,7 +120,7 @@ trait units {
 
   // Surface Brightness units
 
-  // Derive a surfrace unit from an integrated unit
+  // Derive a surface unit from an integrated unit
   private def defineSurfaceUnit[U, D](implicit unitD: UnitOfMeasure[D]) =
     DerivedUnit[U, D %/ (ArcSecond %^ 2)](
       name = unitD.definition.name + "per arcsec²",
