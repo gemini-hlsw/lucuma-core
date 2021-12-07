@@ -49,19 +49,22 @@ object TargetBrightness {
   ): TargetBrightness =
     new TargetBrightness(quantity, band, none)
 
-  /** Secondary constructor defaulting to no error and default unit for given group. */
+  /** Secondary constructor using default units for the band. */
   def apply[G <: BrightnessUnit.Group] = new GroupApplied[G]
-  class GroupApplied[G <: BrightnessUnit.Group] {
+  protected class GroupApplied[G <: BrightnessUnit.Group] {
+    def apply[B <: Band](value: BrightnessValue, band: B, error: Option[BrightnessValue])(implicit
+      ev:                       Band.DefaultUnit[B, G]
+    ): TargetBrightness =
+      new TargetBrightness(ev.unit.withValue(value), band, error)
+
     def apply[B <: Band](value: BrightnessValue, band: B)(implicit
       ev:                       Band.DefaultUnit[B, G]
     ): TargetBrightness =
-      new TargetBrightness(ev.unit.withValue(value), band, none)
+      apply(value, band, none)
   }
 
   implicit def TargetBrightnessOrder: Order[TargetBrightness] =
-    // TODO Now we can use the enums
-    // Not same order as before, this doesn't take into account unit definition order
-    Order.by(m => (m.quantity.unit.definition.name, m.band.tag, m.quantity.value, m.error))
+    Order.by(m => (m.quantity.unit, m.band.tag, m.quantity.value, m.error))
 
   /** group Typeclass Instances */
   implicit def TargetBrightnessShow[Units]: Show[TargetBrightness] =
