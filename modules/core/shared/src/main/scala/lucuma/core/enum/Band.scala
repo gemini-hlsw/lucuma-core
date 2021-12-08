@@ -48,8 +48,8 @@ sealed abstract class Band(
 }
 
 trait BandDefaultUnit {
-  trait DefaultUnit[B <: Band, G <: BrightnessUnit.Group] {
-    val unit: GroupedUnitType[G]
+  trait DefaultUnit[N <: Band, B <: BrightnessUnit.Group] {
+    val unit: GroupedUnitType[B]
 
     def withValue(
       value: BrightnessValue
@@ -57,9 +57,9 @@ trait BandDefaultUnit {
       GroupedUnitQuantity(value, unit)
   }
   object DefaultUnit                                      {
-    def apply[B <: Band, G <: BrightnessUnit.Group, U](implicit ev: UnitOfMeasure[U]) =
-      new DefaultUnit[B, G] {
-        val unit: GroupedUnitType[G] = ev.groupedIn[G]
+    def apply[N <: Band, B <: BrightnessUnit.Group, U](implicit ev: UnitOfMeasure[U]) =
+      new DefaultUnit[N, B] {
+        val unit: GroupedUnitType[B] = ev.groupedIn[B]
       }
   }
 }

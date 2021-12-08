@@ -17,8 +17,8 @@ import monocle.Lens
  *
  * This class replaces the previous `Magnitude`.
  */
-final case class TargetBrightness(
-  quantity: GroupedUnitQuantity[BrightnessValue, BrightnessUnit.Group],
+final case class TargetBrightness[B](
+  quantity: GroupedUnitQuantity[BrightnessValue, B],
   band:     Band,
   error:    Option[BrightnessValue]
 ) {
@@ -30,44 +30,48 @@ final case class TargetBrightness(
 }
 
 object TargetBrightness {
-  val quantity: Lens[TargetBrightness, GroupedUnitQuantity[BrightnessValue, BrightnessUnit.Group]] =
-    Focus[TargetBrightness](_.quantity)
+  def quantity[B]: Lens[TargetBrightness[B], GroupedUnitQuantity[BrightnessValue, B]] =
+    Focus[TargetBrightness[B]](_.quantity)
 
-  val value: Lens[TargetBrightness, BrightnessValue] = quantity.andThen(GroupedUnitQuantity.value)
+  def value[B]: Lens[TargetBrightness[B], BrightnessValue] =
+    quantity.andThen(GroupedUnitQuantity.value)
 
-  val unit: Lens[TargetBrightness, GroupedUnitType[BrightnessUnit.Group]] =
+  def unit[B]: Lens[TargetBrightness[B], GroupedUnitType[B]] =
     quantity.andThen(GroupedUnitQuantity.unit)
 
-  val band: Lens[TargetBrightness, Band] = Focus[TargetBrightness](_.band)
+  def band[B]: Lens[TargetBrightness[B], Band] = Focus[TargetBrightness[B]](_.band)
 
-  val error: Lens[TargetBrightness, Option[BrightnessValue]] = Focus[TargetBrightness](_.error)
+  def error[B]: Lens[TargetBrightness[B], Option[BrightnessValue]] =
+    Focus[TargetBrightness[B]](_.error)
 
   /** Secondary constructor defaulting to no error. */
-  def apply[Units](
-    quantity: GroupedUnitQuantity[BrightnessValue, BrightnessUnit.Group],
+  def apply[B](
+    quantity: GroupedUnitQuantity[BrightnessValue, B],
     band:     Band
-  ): TargetBrightness =
+  ): TargetBrightness[B] =
     new TargetBrightness(quantity, band, none)
 
   /** Secondary constructor using default units for the band. */
-  def apply[G <: BrightnessUnit.Group] = new GroupApplied[G]
-  protected class GroupApplied[G <: BrightnessUnit.Group] {
-    def apply[B <: Band](value: BrightnessValue, band: B, error: Option[BrightnessValue])(implicit
-      ev:                       Band.DefaultUnit[B, G]
-    ): TargetBrightness =
+  def apply[B <: BrightnessUnit.Group] = new GroupApplied[B]
+  protected class GroupApplied[B <: BrightnessUnit.Group] {
+    def apply[N <: Band](value: BrightnessValue, band: N, error: Option[BrightnessValue])(implicit
+      ev:                       Band.DefaultUnit[N, B]
+    ): TargetBrightness[B] =
       new TargetBrightness(ev.unit.withValue(value), band, error)
 
-    def apply[B <: Band](value: BrightnessValue, band: B)(implicit
-      ev:                       Band.DefaultUnit[B, G]
-    ): TargetBrightness =
+    def apply[N <: Band](value: BrightnessValue, band: N)(implicit
+      ev:                       Band.DefaultUnit[N, B]
+    ): TargetBrightness[B] =
       apply(value, band, none)
   }
 
-  implicit def TargetBrightnessOrder: Order[TargetBrightness] =
+  implicit def TargetBrightnessOrder[B](implicit
+    unitOrder: Order[GroupedUnitType[B]]
+  ): Order[TargetBrightness[B]] =
     Order.by(m => (m.quantity.unit, m.band.tag, m.quantity.value, m.error))
 
   /** group Typeclass Instances */
-  implicit def TargetBrightnessShow[Units]: Show[TargetBrightness] =
+  implicit def TargetBrightnessShow[B]: Show[TargetBrightness[B]] =
     Show.fromToString
 
 }

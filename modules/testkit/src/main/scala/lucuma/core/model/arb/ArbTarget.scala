@@ -7,30 +7,27 @@ package arb
 import cats.syntax.all._
 import eu.timepit.refined.scalacheck.string._
 import eu.timepit.refined.types.string.NonEmptyString
-import lucuma.core.enum.Band
 import lucuma.core.util.arb.ArbEnumerated
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Cogen._
 import org.scalacheck._
 
-import scala.collection.immutable.SortedMap
-
 trait ArbTarget {
 
   import ArbEphemerisKey._
   import ArbSiderealTracking._
-  import ArbTargetBrightness._
   import ArbAngularSize._
   import ArbEnumerated._
+  import ArbBrightnessProfile._
 
   implicit val arbSiderealTarget: Arbitrary[SiderealTarget] =
     Arbitrary {
       for {
         n <- arbitrary[NonEmptyString]
         t <- arbitrary[SiderealTracking]
-        m <- arbitrary[Vector[(Band, TargetBrightness)]]
+        b <- arbitrary[BrightnessProfile]
         s <- arbitrary[Option[AngularSize]]
-      } yield SiderealTarget(n, t, SortedMap(m: _*), s)
+      } yield SiderealTarget(n, t, b, s)
     }
 
   implicit val arbNonsiderealTarget: Arbitrary[NonsiderealTarget] =
@@ -38,9 +35,9 @@ trait ArbTarget {
       for {
         n <- arbitrary[NonEmptyString]
         t <- arbitrary[EphemerisKey]
-        m <- arbitrary[Vector[(Band, TargetBrightness)]]
+        b <- arbitrary[BrightnessProfile]
         s <- arbitrary[Option[AngularSize]]
-      } yield NonsiderealTarget(n, t, SortedMap(m: _*), s)
+      } yield NonsiderealTarget(n, t, b, s)
     }
 
   implicit val arbTarget: Arbitrary[Target] = Arbitrary(
@@ -48,12 +45,12 @@ trait ArbTarget {
   )
 
   implicit val cogSiderealTarget: Cogen[SiderealTarget] =
-    Cogen[(String, SiderealTracking, Vector[(Band, TargetBrightness)])]
-      .contramap(t => (t.name.value, t.tracking, t.brightnesses.toVector))
+    Cogen[(String, SiderealTracking, BrightnessProfile)]
+      .contramap(t => (t.name.value, t.tracking, t.brightnessProfile))
 
   implicit val cogNonsiderealTarget: Cogen[NonsiderealTarget] =
-    Cogen[(String, EphemerisKey, Vector[(Band, TargetBrightness)])]
-      .contramap(t => (t.name.value, t.ephemerisKey, t.brightnesses.toVector))
+    Cogen[(String, EphemerisKey, BrightnessProfile)]
+      .contramap(t => (t.name.value, t.ephemerisKey, t.brightnessProfile))
 
   implicit val cogTarget: Cogen[Target] =
     Cogen[Either[SiderealTarget, NonsiderealTarget]]

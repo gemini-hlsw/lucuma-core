@@ -11,6 +11,7 @@ import org.scalacheck.Arbitrary._
 import org.scalacheck.Cogen._
 import org.scalacheck._
 
+// TODO: Can we safely remove this file?
 trait ArbSpatialProfile {
 
   import ArbAngle._

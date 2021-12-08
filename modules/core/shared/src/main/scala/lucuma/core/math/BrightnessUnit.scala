@@ -8,7 +8,6 @@ package math
 import lucuma.core.math.dimensional._
 import lucuma.core.math.units._
 import lucuma.core.util.Enumerated
-import cats.Order
 
 object BrightnessUnit {
   type Group
@@ -54,14 +53,4 @@ object BrightnessUnit {
       override def unsafeFromTag(s: String): GroupedUnitType[Surface] =
         all.find(_.definition.abbv == s).get
     }
-
-  // Ordering for all brightness units. Integral ones come before surface ones.
-  // This is artificial, but allows defining an Order on TargetBrightness.
-  private val index: Map[GroupedUnitType[Group], Int] =
-    (Enumerated[GroupedUnitType[Integrated]].all ++ Enumerated[
-      GroupedUnitType[Surface]
-    ].all).zipWithIndex.toMap
-
-  implicit val orderBrightnessUnit: Order[GroupedUnitType[Group]] =
-    Order.by(index)
 }

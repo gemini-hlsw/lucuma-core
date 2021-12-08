@@ -15,30 +15,9 @@ import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck._
 
 trait ArbSpectralDistribution {
-
   import SpectralDistribution._
 
-  implicit val arbBlackBody: Arbitrary[SpectralDistribution.BlackBody] =
-    Arbitrary {
-      for {
-        a <- Gen.choose(BigDecimal(1), BigDecimal(10000))
-      } yield BlackBody(a.withRefinedUnit[Positive, Kelvin])
-    }
-
-  implicit val cogBlackBody: Cogen[BlackBody] =
-    Cogen[BigDecimal].contramap(_.temperature.value.value)
-
-  implicit val arbPowerLaw: Arbitrary[SpectralDistribution.PowerLaw] =
-    Arbitrary {
-      for {
-        a <- arbitrary[BigDecimal]
-      } yield PowerLaw(a)
-    }
-
-  implicit val cogPowerLaw: Cogen[PowerLaw] =
-    Cogen[BigDecimal].contramap(_.index)
-
-  implicit val arbLibrary: Arbitrary[SpectralDistribution.Library] =
+  implicit val arbLibrary: Arbitrary[Library] =
     Arbitrary {
       for {
         s <- arbitrary[StellarLibrarySpectrum].map(_.asLeft)
@@ -50,21 +29,80 @@ trait ArbSpectralDistribution {
   implicit val cogLibrary: Cogen[Library] =
     Cogen[Either[StellarLibrarySpectrum, NonStellarLibrarySpectrum]].contramap(_.librarySpectrum)
 
-  implicit val arbSpectralDistribution: Arbitrary[SpectralDistribution] =
+  implicit val arbCoolStarModel: Arbitrary[CoolStarModel] =
     Arbitrary {
       for {
-        b <- arbitrary[BlackBody]
-        p <- arbitrary[PowerLaw]
-        l <- arbitrary[Library]
-        r <- Gen.oneOf(b, p, l)
+        a <- Gen.choose(BigDecimal(1), BigDecimal(10000))
+      } yield CoolStarModel(a.withRefinedUnit[Positive, Kelvin])
+    }
+
+  implicit val cogCoolStarModel: Cogen[CoolStarModel] =
+    Cogen[BigDecimal].contramap(_.temperature.value.value)
+
+  // TODO Correct parameters
+  implicit def arbEmissionLine[B]: Arbitrary[EmissionLine[B]] =
+    Arbitrary {
+      for {
+        a <- arbitrary[Int]
+        b <- arbitrary[Int]
+      } yield EmissionLine[B](a, b)
+    }
+
+  implicit def cogEmissionLine[B]: Cogen[EmissionLine[B]] =
+    Cogen[(Int, Int)].contramap(x => (x.line, x.continuum))
+
+  implicit val arbPowerLaw: Arbitrary[PowerLaw] =
+    Arbitrary {
+      for {
+        a <- arbitrary[BigDecimal]
+      } yield PowerLaw(a)
+    }
+
+  implicit val cogPowerLaw: Cogen[PowerLaw] =
+    Cogen[BigDecimal].contramap(_.index)
+
+  implicit val arbBlackBody: Arbitrary[BlackBody] =
+    Arbitrary {
+      for {
+        a <- Gen.choose(BigDecimal(1), BigDecimal(10000))
+      } yield BlackBody(a.withRefinedUnit[Positive, Kelvin])
+    }
+
+  implicit val cogBlackBody: Cogen[BlackBody] =
+    Cogen[BigDecimal].contramap(_.temperature.value.value)
+
+  implicit def arbSpectralDistribution[B]: Arbitrary[SpectralDistribution[B]] =
+    Arbitrary {
+      for {
+        r <- Gen.oneOf(
+               arbitrary[Library],
+               arbitrary[CoolStarModel],
+               arbitrary[EmissionLine[B]],
+               arbitrary[PowerLaw],
+               arbitrary[BlackBody]
+             )
       } yield r
     }
 
-  implicit val cogSpectralDistribution: Cogen[SpectralDistribution] =
-    Cogen[Either[BigDecimal, Either[BigDecimal, Either[StellarLibrarySpectrum, NonStellarLibrarySpectrum]]]].contramap {
-      case BlackBody(t) => t.value.value.asLeft
-      case PowerLaw(i)  => i.asLeft.asRight
-      case Library(l)   => l.asRight.asRight
+  implicit def cogSpectralDistribution[B]: Cogen[SpectralDistribution[B]] =
+    Cogen[Either[
+      Library,
+      Either[
+        CoolStarModel,
+        Either[
+          EmissionLine[B],
+          Either[
+            PowerLaw,
+            BlackBody,
+          ]
+        ]
+      ]
+    ]].contramap {
+      case d @ Library(_)         => d.asLeft
+      case d @ CoolStarModel(_)   => d.asLeft.asRight
+      case d @ EmissionLine(_, _) => d.asLeft.asRight.asRight
+      case d @ PowerLaw(_)        => d.asLeft.asRight.asRight.asRight
+      case d @ BlackBody(_)       => d.asRight.asRight.asRight.asRight
     }
 }
 

@@ -8,18 +8,19 @@ import cats.syntax.all._
 import lucuma.core.math.Angle
 import lucuma.core.optics.SplitMono
 
+// TODO: Can we safely remove this file?
 sealed trait SpatialProfile extends Product with Serializable
 
 object SpatialProfile {
-  final case object PointSource                extends SpatialProfile
-  final case object UniformSource              extends SpatialProfile
+  final case object PointSource   extends SpatialProfile
+  final case object UniformSource extends SpatialProfile
 
   /**
-   * Gaussian source. For a good discussion of seeing see the
-   * ["Astronomical seeing" wikipedia entry](https://en.wikipedia.org/wiki/Astronomical_seeing).
+   * Gaussian source. For a good discussion of seeing see the ["Astronomical seeing" wikipedia
+   * entry](https://en.wikipedia.org/wiki/Astronomical_seeing).
    *
-   * @param fwhm full width at half maximum of the seeing disc (typically
-   *             in arcsec)
+   * @param fwhm
+   *   full width at half maximum of the seeing disc (typically in arcsec)
    */
   final case class GaussianSource(fwhm: Angle) extends SpatialProfile
 
@@ -28,8 +29,7 @@ object SpatialProfile {
   trait GaussianSourceOptics {
 
     /**
-     * Conversion between GaussianSource and arcsec of the FWHM of the seeing
-     * disc.
+     * Conversion between GaussianSource and arcsec of the FWHM of the seeing disc.
      *
      * @group Optics
      */

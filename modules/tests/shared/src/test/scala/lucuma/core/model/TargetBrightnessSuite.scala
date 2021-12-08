@@ -5,15 +5,21 @@ package lucuma.core.model
 import cats.kernel.laws.discipline._
 import lucuma.core.model.arb._
 import munit._
+import lucuma.core.math.BrightnessUnit
+import lucuma.core.util.arb.ArbEnumerated
 
 final class TargetBrightnessSuite extends DisciplineSuite {
 
   import ArbTargetBrightness._
+  import ArbEnumerated._
 
   // Laws
-  checkAll("Brightness", EqTests[TargetBrightness].eqv)
   checkAll(
-    "BrightnessOrdering",
-    OrderTests[TargetBrightness](TargetBrightness.TargetBrightnessOrder).order
+    "Order[TargetBrightness[Integrated]]",
+    OrderTests[TargetBrightness[BrightnessUnit.Integrated]].order
+  )
+  checkAll(
+    "Order[TargetBrightness[Surface]]",
+    OrderTests[TargetBrightness[BrightnessUnit.Surface]].order
   )
 }
