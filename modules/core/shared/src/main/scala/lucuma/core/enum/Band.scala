@@ -47,13 +47,13 @@ sealed abstract class Band(
 }
 
 trait BandDefaultUnit {
-  trait DefaultUnit[N, B] {
-    val unit: GroupedUnitType[B]
+  trait DefaultUnit[B, UG] {
+    val unit: GroupedUnitType[UG]
   }
-  object DefaultUnit      {
-    def apply[N, B, U](implicit ev: UnitOfMeasure[U]) =
-      new DefaultUnit[N, B] {
-        val unit: GroupedUnitType[B] = ev.groupedIn[B]
+  object DefaultUnit       {
+    def apply[B, UG, U](implicit ev: UnitOfMeasure[U]) =
+      new DefaultUnit[B, UG] {
+        val unit: GroupedUnitType[UG] = ev.groupedIn[UG]
       }
   }
 }
