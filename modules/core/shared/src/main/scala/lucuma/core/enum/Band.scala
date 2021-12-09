@@ -13,7 +13,6 @@ import eu.timepit.refined.auto._
 import eu.timepit.refined.numeric.Positive
 import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.math.BrightnessUnit
-import lucuma.core.math.BrightnessValue
 import lucuma.core.math.Wavelength
 import lucuma.core.math.dimensional._
 import lucuma.core.math.units.Nanometer
@@ -48,16 +47,11 @@ sealed abstract class Band(
 }
 
 trait BandDefaultUnit {
-  trait DefaultUnit[N <: Band, B <: BrightnessUnit.Group] {
+  trait DefaultUnit[N, B] {
     val unit: GroupedUnitType[B]
-
-    def withValue(
-      value: BrightnessValue
-    ): GroupedUnitQuantity[BrightnessValue, BrightnessUnit.Group] =
-      GroupedUnitQuantity(value, unit)
   }
-  object DefaultUnit                                      {
-    def apply[N <: Band, B <: BrightnessUnit.Group, U](implicit ev: UnitOfMeasure[U]) =
+  object DefaultUnit      {
+    def apply[N, B, U](implicit ev: UnitOfMeasure[U]) =
       new DefaultUnit[N, B] {
         val unit: GroupedUnitType[B] = ev.groupedIn[B]
       }
@@ -66,9 +60,9 @@ trait BandDefaultUnit {
 
 trait BandDefaultUnitLowPriorityImplicits extends BandDefaultUnit {
   // These are the defaults
-  implicit def defaultIntegratedUnit[B <: Band]: DefaultUnit[B, BrightnessUnit.Integrated] =
+  implicit def defaultIntegratedUnit[B]: DefaultUnit[B, BrightnessUnit.Integrated] =
     DefaultUnit[B, BrightnessUnit.Integrated, VegaMagnitude]
-  implicit def defaultSurfaceUnit[B <: Band]: DefaultUnit[B, BrightnessUnit.Surface]       =
+  implicit def defaultSurfaceUnit[B]: DefaultUnit[B, BrightnessUnit.Surface]       =
     DefaultUnit[B, BrightnessUnit.Surface, VegaMagnitudePerArcsec2]
 }
 

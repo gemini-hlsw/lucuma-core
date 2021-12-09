@@ -24,8 +24,8 @@ final class UnitsSuite extends FunSuite {
   }
 
   test("Check brightness unit names") {
-    assertEquals(1.withUnit[VegaMagnitude].show, "1 Vega mags")
-    assertEquals(1.withUnit[ABMagnitude].show, "1 AB mags")
+    assertEquals(1.withUnit[VegaMagnitude].show, "1 Vega mag")
+    assertEquals(1.withUnit[ABMagnitude].show, "1 AB mag")
     assertEquals(1.withUnit[Jansky].show, "1 Jy")
     assertEquals(1.withUnit[WattsBrightness].show, "1 W/m²/µm")
     assertEquals(1.withUnit[ErgsWavelengthBrightness].show, "1 erg/s/cm²/Å")

@@ -10,9 +10,8 @@ import lucuma.core.math.units._
 import lucuma.core.util.Enumerated
 
 object BrightnessUnit {
-  type Group
-  type Integrated <: Group
-  type Surface <: Group
+  type Integrated
+  type Surface
 
   object Integrated {
     val all: List[GroupedUnitType[Integrated]] =

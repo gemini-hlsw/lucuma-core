@@ -6,7 +6,6 @@ package lucuma.core.model
 import cats._
 import cats.syntax.all._
 import lucuma.core.enum.Band
-import lucuma.core.math.BrightnessUnit
 import lucuma.core.math.BrightnessValue
 import lucuma.core.math.dimensional._
 import monocle.Focus
@@ -52,8 +51,8 @@ object TargetBrightness {
     new TargetBrightness(quantity, band, none)
 
   /** Secondary constructor using default units for the band. */
-  def apply[B <: BrightnessUnit.Group] = new GroupApplied[B]
-  protected class GroupApplied[B <: BrightnessUnit.Group] {
+  def apply[B] = new GroupApplied[B]
+  protected class GroupApplied[B] {
     def apply[N <: Band](value: BrightnessValue, band: N, error: Option[BrightnessValue])(implicit
       ev:                       Band.DefaultUnit[N, B]
     ): TargetBrightness[B] =
