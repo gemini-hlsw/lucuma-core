@@ -83,11 +83,11 @@ trait units {
   // Integrated Brightness units
   type VegaMagnitude
   implicit val defineVegaMagnitude =
-    PrefixUnit[VegaMagnitude](name = "Vega magnitudes", abbv = "Vega mags")
+    PrefixUnit[VegaMagnitude](name = "Vega magnitude", abbv = "Vega mag")
 
   type ABMagnitude
   implicit val defineABMagnitude =
-    PrefixUnit[ABMagnitude](name = "AB magnitudes", abbv = "AB mags")
+    PrefixUnit[ABMagnitude](name = "AB magnitude", abbv = "AB mag")
 
   private val JanskyPerWattMeter2Hertz: SafeLong = SafeLong(10).pow(26)
   type Jansky
@@ -150,6 +150,26 @@ trait units {
   type ErgsFrequencyBrightnessPerArcsec2
   implicit val defineErgsFrequencyBrightnessPerArcsec2 =
     defineSurfaceUnit[ErgsFrequencyBrightnessPerArcsec2, ErgsFrequencyBrightness]
+
+  // line_flux and continuum_flux_density (which is the same as brightness??)
+
+  // Integrated Line Flux units
+  type WattsLineFlux
+  implicit val defineWattsLineFlux =
+    DerivedUnit[WattsLineFlux, Watt %/ (Meter %^ 2)](abbv = "W/m²")
+
+  type ErgsLineFlux
+  implicit val defineErgsLineFlux =
+    DerivedUnit[ErgsLineFlux, Erg %/ (Second %* (Centimeter %^ 2))](abbv = "erg/s/cm²")
+
+  // Surface Line Flux units
+  type WattsLineFluxPerArcsec2
+  implicit val defineWattsLineFluxPerArcsec2 =
+    defineSurfaceUnit[WattsLineFluxPerArcsec2, WattsLineFlux]
+
+  type ErgsLineFluxPerArcsec2
+  implicit val defineErgsLineFluxPerArcsec2 =
+    defineSurfaceUnit[ErgsLineFluxPerArcsec2, ErgsLineFlux]
 
   // PosInt can be converted to Rational exactly
   implicit def rationalPosIntConverter[U1, U2](implicit
