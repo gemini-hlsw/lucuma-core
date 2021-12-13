@@ -4,7 +4,6 @@
 package lucuma.core.model
 package arb
 
-import coulomb.define.UnitDefinition
 import lucuma.core.enum.Band
 import lucuma.core.math.BrightnessValue
 import lucuma.core.math.arb.ArbBrightnessValue._
@@ -13,30 +12,25 @@ import lucuma.core.util.arb.ArbEnumerated
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Cogen._
 import org.scalacheck._
+import lucuma.core.math.BrightnessUnit
+import lucuma.core.math.dimensional.arb.ArbQty
 
 trait ArbTargetBrightness {
 
   import ArbEnumerated._
+  import BrightnessUnit._
+  import ArbQty._
 
-  implicit def arbTargetBrightness[B](implicit
-    arbUnit: Arbitrary[GroupedUnitType[B]]
-  ): Arbitrary[TargetBrightness[B]] =
+  implicit def arbTargetBrightness[T](implicit
+    arbUnit: Arbitrary[GroupedUnitType[Brightness[T]]]
+  ): Arbitrary[TargetBrightness[T]] =
     Arbitrary {
       for {
-        s <- arbitrary[GroupedUnitType[B]]
-        v <- arbitrary[BrightnessValue]
+        q <- arbitrary[GroupedUnitQuantity[BrightnessValue, Brightness[T]]]
         b <- arbitrary[Band]
         e <- arbitrary[Option[BrightnessValue]]
-      } yield TargetBrightness(s.withValue(v), b, e)
+      } yield TargetBrightness(q, b, e)
     }
-
-  // TODO Move these two to a separate file, testing the whole dimensional package.
-  implicit val cogUnitDefinition: Cogen[UnitDefinition] =
-    Cogen[(String, String)].contramap(u => (u.name, u.abbv))
-
-  implicit def cogQuantityTrait[N: Cogen]: Cogen[Qty[N]] =
-    Cogen[(N, UnitDefinition)].contramap(q => (q.value, q.unit.definition))
-  // END Move to another file
 
   implicit def cogTargetBrightness[B]: Cogen[TargetBrightness[B]] =
     Cogen[

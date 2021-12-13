@@ -7,30 +7,25 @@ import cats.kernel.laws.discipline._
 import lucuma.core.model.arb._
 import munit._
 import lucuma.core.math.BrightnessUnit
+import lucuma.core.util.arb.ArbEnumerated
 
 final class SpectralDistributionSuite extends DisciplineSuite {
   import SpectralDistribution._
   import ArbSpectralDistribution._
+  import BrightnessUnit._
+  import ArbEnumerated._
 
   // Laws
   checkAll("Order[CoolStarModel]", OrderTests[CoolStarModel].order)
-  checkAll(
-    "Order[EmissionLine[Integrated]]",
-    OrderTests[EmissionLine[BrightnessUnit.Integrated]].order
-  )
-  checkAll(
-    "Order[EmissionLine[Surface]]",
-    OrderTests[EmissionLine[BrightnessUnit.Surface]].order
-  )
-
   checkAll("Order[PowerLaw]", OrderTests[PowerLaw].order)
   checkAll("Order[BlackBody]", OrderTests[BlackBody].order)
+
   checkAll(
     "Eq[SpectralDistribution[Integrated]]",
-    EqTests[SpectralDistribution[BrightnessUnit.Integrated]].eqv
+    EqTests[SpectralDistribution[Integrated]].eqv
   )
   checkAll(
     "Eq[SpectralDistribution[Surface]]",
-    EqTests[SpectralDistribution[BrightnessUnit.Surface]].eqv
+    EqTests[SpectralDistribution[Surface]].eqv
   )
 }

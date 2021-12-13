@@ -10,15 +10,18 @@ import coulomb.si.Kelvin
 import eu.timepit.refined.numeric.Positive
 import lucuma.core.enum.NonStellarLibrarySpectrum
 import lucuma.core.enum.StellarLibrarySpectrum
-import lucuma.core.util.arb.ArbEnumerated._
+import lucuma.core.util.arb.ArbEnumerated
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck._
 import lucuma.core.math.dimensional._
 import lucuma.core.math.BrightnessUnit
+import lucuma.core.math.dimensional.arb.ArbQty
 
 trait ArbSpectralDistribution {
+  import ArbEnumerated._
   import SpectralDistribution._
   import BrightnessUnit._
+  import ArbQty._
 
   implicit val arbLibrary: Arbitrary[Library] =
     Arbitrary {
@@ -42,17 +45,27 @@ trait ArbSpectralDistribution {
   implicit val cogCoolStarModel: Cogen[CoolStarModel] =
     Cogen[BigDecimal].contramap(_.temperature.value.value)
 
-  // TODO Correct parameters
-  implicit def arbEmissionLine[T]: Arbitrary[EmissionLine[T]] =
+  implicit def arbEmissionLine[T](implicit
+    arbLineUnit:      Arbitrary[GroupedUnitType[LineFlux[T]]],
+    arbContinuumUnit: Arbitrary[GroupedUnitType[ContinuumFluxDensity[T]]]
+  ): Arbitrary[EmissionLine[T]] =
     Arbitrary {
       for {
-        l           <- arbitrary[GroupedUnitQuantity[BigDecimal, LineFlux[T]]]
-        calculation <- arbitrary[Int]
-      } yield EmissionLine[B](l, c)
+        l <- arbitrary[GroupedUnitQuantity[BigDecimal, LineFlux[T]]]
+        c <- arbitrary[GroupedUnitQuantity[BigDecimal, ContinuumFluxDensity[T]]]
+      } yield EmissionLine[T](l, c)
     }
 
-  implicit def cogEmissionLine[B]: Cogen[EmissionLine[B]] =
-    Cogen[(Int, Int)].contramap(x => (x.line, x.continuum))
+  implicit def cogEmissionLine[T](implicit
+    cogenLineUnit:      Cogen[GroupedUnitType[LineFlux[T]]],
+    cogenContinuumUnit: Cogen[GroupedUnitType[ContinuumFluxDensity[T]]]
+  ): Cogen[EmissionLine[T]] =
+    Cogen[
+      (
+        GroupedUnitQuantity[BigDecimal, LineFlux[T]],
+        GroupedUnitQuantity[BigDecimal, ContinuumFluxDensity[T]]
+      )
+    ].contramap(x => (x.line, x.continuum))
 
   implicit val arbPowerLaw: Arbitrary[PowerLaw] =
     Arbitrary {
@@ -74,26 +87,32 @@ trait ArbSpectralDistribution {
   implicit val cogBlackBody: Cogen[BlackBody] =
     Cogen[BigDecimal].contramap(_.temperature.value.value)
 
-  implicit def arbSpectralDistribution[B]: Arbitrary[SpectralDistribution[B]] =
+  implicit def arbSpectralDistribution[T](implicit
+    arbLineUnit:      Arbitrary[GroupedUnitType[LineFlux[T]]],
+    arbContinuumUnit: Arbitrary[GroupedUnitType[ContinuumFluxDensity[T]]]
+  ): Arbitrary[SpectralDistribution[T]] =
     Arbitrary {
       for {
         r <- Gen.oneOf(
                arbitrary[Library],
                arbitrary[CoolStarModel],
-               arbitrary[EmissionLine[B]],
+               arbitrary[EmissionLine[T]],
                arbitrary[PowerLaw],
                arbitrary[BlackBody]
              )
       } yield r
     }
 
-  implicit def cogSpectralDistribution[B]: Cogen[SpectralDistribution[B]] =
+  implicit def cogSpectralDistribution[T](implicit
+    cogenLineUnit:      Cogen[GroupedUnitType[LineFlux[T]]],
+    cogenContinuumUnit: Cogen[GroupedUnitType[ContinuumFluxDensity[T]]]
+  ): Cogen[SpectralDistribution[T]] =
     Cogen[Either[
       Library,
       Either[
         CoolStarModel,
         Either[
-          EmissionLine[B],
+          EmissionLine[T],
           Either[
             PowerLaw,
             BlackBody,

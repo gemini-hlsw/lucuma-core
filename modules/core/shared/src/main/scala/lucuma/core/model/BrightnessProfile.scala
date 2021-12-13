@@ -14,15 +14,15 @@ sealed trait BrightnessProfile extends Product with Serializable {
 }
 
 final case class PointBrightnessProfile(
-  brightnesses: SortedMap[Band, TargetBrightness[Brightness[Integrated]]],
-  sed:          SpectralDistribution[Brightness[Integrated]]
+  brightnesses: SortedMap[Band, TargetBrightness[Integrated]],
+  sed:          SpectralDistribution[Integrated]
 ) extends BrightnessProfile {
   lazy val bands: List[Band] = brightnesses.keys.toList
 }
 
 final case class UniformBrightnessProfile(
-  brightnesses: SortedMap[Band, TargetBrightness[Brightness[Surface]]],
-  sed:          SpectralDistribution[Brightness[Surface]]
+  brightnesses: SortedMap[Band, TargetBrightness[Surface]],
+  sed:          SpectralDistribution[Surface]
 ) extends BrightnessProfile {
   lazy val bands: List[Band] = brightnesses.keys.toList
 }
@@ -36,8 +36,8 @@ final case class UniformBrightnessProfile(
  */
 final case class GaussianBrightnessProfile(
   source:       GaussianSource,
-  brightnesses: SortedMap[Band, TargetBrightness[Brightness[Integrated]]],
-  sed:          SpectralDistribution[Brightness[Integrated]]
+  brightnesses: SortedMap[Band, TargetBrightness[Integrated]],
+  sed:          SpectralDistribution[Integrated]
 ) extends BrightnessProfile {
   lazy val bands: List[Band] = brightnesses.keys.toList
 }

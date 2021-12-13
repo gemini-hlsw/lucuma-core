@@ -12,14 +12,15 @@ final class TargetBrightnessSuite extends DisciplineSuite {
 
   import ArbTargetBrightness._
   import ArbEnumerated._
+  import BrightnessUnit._
 
   // Laws
   checkAll(
     "Order[TargetBrightness[Integrated]]",
-    OrderTests[TargetBrightness[BrightnessUnit.Integrated]].order
+    OrderTests[TargetBrightness[Integrated]].order
   )
   checkAll(
     "Order[TargetBrightness[Surface]]",
-    OrderTests[TargetBrightness[BrightnessUnit.Surface]].order
+    OrderTests[TargetBrightness[Surface]].order
   )
 }

@@ -15,6 +15,7 @@ import org.scalacheck.Gen._
 import org.scalacheck.Arbitrary
 import org.scalacheck.Prop._
 import lucuma.core.arb.ArbTime
+import org.typelevel.cats.time._
 
 final class JulianDateSuute extends munit.DisciplineSuite {
   import ArbJulianDate._

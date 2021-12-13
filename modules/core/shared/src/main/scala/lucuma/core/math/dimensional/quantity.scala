@@ -21,6 +21,11 @@ trait Qty[N] {
   def toCoulomb: Quantity[N, unit.Type] = value.withUnit[unit.Type]
 }
 
+object Qty {
+  // TODO TEst!!
+  // implicit def eqQty[N]: Eq[Qty[N]] = Eq.fromUniversalEquals
+}
+
 /**
  * A magnitude of type `N` and a runtime representation of a physical unit in group `G`.
  */
@@ -35,10 +40,12 @@ object GroupedUnitQuantity {
   )(implicit unit: GroupedUnitOfMeasure[UG, U]): GroupedUnitQuantity[N, UG] =
     GroupedUnitQuantity(q.value, unit)
 
+  // TODO Test lenses!!!
   def value[N, UG]: Lens[GroupedUnitQuantity[N, UG], N] = Focus[GroupedUnitQuantity[N, UG]](_.value)
 
   def unit[N, UG]: Lens[GroupedUnitQuantity[N, UG], GroupedUnitType[UG]] =
     Focus[GroupedUnitQuantity[N, UG]](_.unit)
 
+  // TODO TEST!
   implicit def eqGroupedUnitQuantity[N, UG]: Eq[GroupedUnitQuantity[N, UG]] = Eq.fromUniversalEquals
 }

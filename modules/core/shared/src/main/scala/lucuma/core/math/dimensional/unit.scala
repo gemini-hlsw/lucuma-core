@@ -28,6 +28,7 @@ trait UnitType { self =>
 
 object UnitType {
   // `UnitDefiniton`s are expected to be singletons.
+  // TODO TEST!!
   implicit val eqUnitType: Eq[UnitType] = Eq.instance((a, b) => a.definition == b.definition)
 }
 
@@ -65,9 +66,7 @@ object UnitOfMeasure {
 /**
  * Runtime association of a `UnitType` to unit group `UG`.
  *
- * The group doesn't exist in runtime, it's just a type tag. It's covariant since we can have a
- * hierarchy of groups. Eg: We have unit groups for "integral brightness" and "surface brightness",
- * and they are both subgroups of the larger "brightness" group.
+ * The group doesn't exist in runtime, it's just a type tag.
  */
 trait GroupedUnitType[+UG] extends UnitType {
   override def withValue[N](value: N): GroupedUnitQuantity[N, UG] =
@@ -76,13 +75,13 @@ trait GroupedUnitType[+UG] extends UnitType {
 
 /**
  * Type-parametrized runtime representation of physical unit `U` and its association to unit group
- * `G`.
+ * `UG`.
  */
-trait GroupedUnitOfMeasure[+G, U] extends UnitOfMeasure[U] with GroupedUnitType[G]
+trait GroupedUnitOfMeasure[UG, U] extends UnitOfMeasure[U] with GroupedUnitType[UG]
 
 object GroupedUnitOfMeasure {
-  def apply[G, U](implicit unit: UnitOfMeasure[U]): GroupedUnitOfMeasure[G, U] =
-    new GroupedUnitOfMeasure[G, U] {
+  def apply[UG, U](implicit unit: UnitOfMeasure[U]): GroupedUnitOfMeasure[UG, U] =
+    new GroupedUnitOfMeasure[UG, U] {
       val definition = unit.definition
     }
 }
