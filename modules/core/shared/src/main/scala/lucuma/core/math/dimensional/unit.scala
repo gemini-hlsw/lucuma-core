@@ -3,8 +3,8 @@
 
 package lucuma.core.math.dimensional
 
-import coulomb.define._
 import cats.Eq
+import coulomb.define._
 
 // All of this is a bridge between coulomb an runtime quantities (as defined in `Qty`).
 

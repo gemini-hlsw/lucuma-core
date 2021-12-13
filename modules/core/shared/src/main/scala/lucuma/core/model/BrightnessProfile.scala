@@ -7,14 +7,14 @@ import cats.Eq
 import cats.syntax.all._
 import lucuma.core.enum.Band
 import lucuma.core.math.BrightnessUnit._
+import monocle.Focus
+import monocle.Lens
+import monocle.Optional
+import monocle.Prism
+import monocle.Traversal
+import monocle.macros.GenPrism
 
 import scala.collection.immutable.SortedMap
-import monocle.Lens
-import monocle.Focus
-import monocle.Prism
-import monocle.macros.GenPrism
-import monocle.Optional
-import monocle.Traversal
 
 sealed trait BrightnessProfile extends Product with Serializable {
   def bands: List[Band]

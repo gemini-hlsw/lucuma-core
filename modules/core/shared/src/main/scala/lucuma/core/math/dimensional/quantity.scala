@@ -3,10 +3,10 @@
 
 package lucuma.core.math.dimensional
 
+import _root_.cats.kernel.Eq
 import coulomb._
 import monocle.Focus
 import monocle.Lens
-import _root_.cats.kernel.Eq
 
 /**
  * A magnitude of type `N` and a runtime representation of a physical unit.

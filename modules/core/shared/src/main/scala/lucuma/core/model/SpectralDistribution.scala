@@ -13,14 +13,14 @@ import eu.timepit.refined.cats._
 import eu.timepit.refined.types.numeric.PosBigDecimal
 import lucuma.core.enum.NonStellarLibrarySpectrum
 import lucuma.core.enum.StellarLibrarySpectrum
-import lucuma.core.math.dimensional.GroupedUnitQuantity
 import lucuma.core.math.BrightnessUnit._
-import monocle.std.either._
-import monocle.Prism
-import monocle.Lens
+import lucuma.core.math.dimensional.GroupedUnitQuantity
 import monocle.Focus
+import monocle.Lens
 import monocle.Optional
+import monocle.Prism
 import monocle.macros.GenPrism
+import monocle.std.either._
 
 // T = Brightness type (integral or surface); used only in EmissionLine
 sealed trait SpectralDistribution[+T] extends Serializable

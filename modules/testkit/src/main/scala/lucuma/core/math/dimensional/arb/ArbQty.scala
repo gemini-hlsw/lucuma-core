@@ -4,11 +4,10 @@
 package lucuma.core.math.dimensional.arb
 
 // import coulomb.define.UnitDefinition
+import coulomb.define.UnitDefinition
 import lucuma.core.math.dimensional._
 import org.scalacheck.Arbitrary._
-// import org.scalacheck.Cogen._
 import org.scalacheck._
-import coulomb.define.UnitDefinition
 
 trait ArbQty {
   implicit val cogenUnitDefinition: Cogen[UnitDefinition] =

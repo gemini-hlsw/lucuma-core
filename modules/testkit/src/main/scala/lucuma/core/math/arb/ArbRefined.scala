@@ -3,9 +3,9 @@
 
 package lucuma.core.math.arb
 
+import eu.timepit.refined.types.numeric.PosBigDecimal
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary._
-import eu.timepit.refined.types.numeric.PosBigDecimal
 import org.scalacheck.Cogen
 
 trait ArbRefined {

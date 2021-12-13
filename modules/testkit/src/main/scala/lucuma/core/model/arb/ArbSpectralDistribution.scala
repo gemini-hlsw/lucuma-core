@@ -10,12 +10,12 @@ import coulomb.si.Kelvin
 import eu.timepit.refined.numeric.Positive
 import lucuma.core.enum.NonStellarLibrarySpectrum
 import lucuma.core.enum.StellarLibrarySpectrum
+import lucuma.core.math.BrightnessUnit
+import lucuma.core.math.dimensional._
+import lucuma.core.math.dimensional.arb.ArbQty
 import lucuma.core.util.arb.ArbEnumerated
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck._
-import lucuma.core.math.dimensional._
-import lucuma.core.math.BrightnessUnit
-import lucuma.core.math.dimensional.arb.ArbQty
 
 trait ArbSpectralDistribution {
   import ArbEnumerated._

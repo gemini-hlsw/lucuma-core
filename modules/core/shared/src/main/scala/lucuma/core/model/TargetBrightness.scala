@@ -6,11 +6,11 @@ package lucuma.core.model
 import cats._
 import cats.syntax.all._
 import lucuma.core.enum.Band
+import lucuma.core.math.BrightnessUnit._
 import lucuma.core.math.BrightnessValue
 import lucuma.core.math.dimensional._
 import monocle.Focus
 import monocle.Lens
-import lucuma.core.math.BrightnessUnit._
 
 /**
  * Describes the brightness of a target on a given band.

@@ -7,10 +7,10 @@ package arb
 import cats.syntax.all._
 import lucuma.core.enum.Band
 import lucuma.core.math.BrightnessUnit
+import lucuma.core.math.dimensional._
 import lucuma.core.util.arb.ArbEnumerated
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck._
-import lucuma.core.math.dimensional._
 
 import scala.collection.immutable.SortedMap
 

@@ -5,10 +5,10 @@ package lucuma
 package core
 package math
 
+import cats.syntax.all._
 import lucuma.core.math.dimensional._
 import lucuma.core.math.units._
 import lucuma.core.util.Enumerated
-import cats.syntax.all._
 
 object BrightnessUnit {
   type Integrated
