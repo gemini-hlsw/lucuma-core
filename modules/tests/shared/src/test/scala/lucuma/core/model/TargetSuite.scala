@@ -39,8 +39,6 @@ final class TargetSuite extends DisciplineSuite {
   checkAll("SiderealTarget.tracking", LensTests(SiderealTarget.tracking))
   checkAll("SiderealTarget.properMotion", OptionalTests(SiderealTarget.properMotion))
   checkAll("SiderealTarget.brightnessProfile", LensTests(SiderealTarget.brightnessProfile))
-  // checkAll("SiderealTarget.brightnesses", LensTests(SiderealTarget.brightnesses))
-  // checkAll("SiderealTarget.brightnessesT", TraversalTests(SiderealTarget.brightnessesT))
   checkAll("SiderealTarget.parallax", LensTests(SiderealTarget.parallax))
   checkAll("SiderealTarget.radialVelocity", LensTests(SiderealTarget.radialVelocity))
   checkAll("SiderealTarget.baseCoordinates", LensTests(SiderealTarget.baseCoordinates))
@@ -51,10 +49,6 @@ final class TargetSuite extends DisciplineSuite {
   checkAll("SiderealTarget.properMotion", LensTests(SiderealTarget.properMotion))
   checkAll("SiderealTarget.properMotionRA", OptionalTests(SiderealTarget.properMotionRA))
   checkAll("SiderealTarget.properMotionDec", OptionalTests(SiderealTarget.properMotionDec))
-  // checkAll(
-  //   "SiderealTarget.brightnessIn",
-  //   TraversalTests(SiderealTarget.brightnessIn(Band.B))
-  // )
 
   // Laws for NonsiderealTarget
   checkAll("Eq[NonsiderealTarget]", EqTests[NonsiderealTarget].eqv)
@@ -69,8 +63,6 @@ final class TargetSuite extends DisciplineSuite {
   checkAll("NonsiderealTarget.name", LensTests(NonsiderealTarget.name))
   checkAll("NonsiderealTarget.ephemerisKey", LensTests(NonsiderealTarget.ephemerisKey))
   checkAll("NonsiderealTarget.brightnessProfile", LensTests(NonsiderealTarget.brightnessProfile))
-  // checkAll("NonsiderealTarget.brightnesses", LensTests(NonsiderealTarget.brightnesses))
-  // checkAll("NonsiderealTarget.brightnessesT", TraversalTests(NonsiderealTarget.brightnessesT))
 
   // Laws for Target
   checkAll("Target.Id", GidTests[Target.Id].gid)
@@ -81,8 +73,6 @@ final class TargetSuite extends DisciplineSuite {
   checkAll("Target.properMotion", OptionalTests(Target.properMotion))
   checkAll("Target.ephemerisKey", OptionalTests(Target.ephemerisKey))
   checkAll("Target.brightnessProfile", LensTests(Target.brightnessProfile))
-  // checkAll("Target.brightnesses", LensTests(Target.brightnesses))
-  // checkAll("Target.brightnessesT", TraversalTests(Target.brightnessesT))
   checkAll("Target.sidereal", PrismTests(Target.sidereal))
   checkAll("Target.nonsidereal", PrismTests(Target.nonsidereal))
   checkAll("Target.siderealTracking", OptionalTests(Target.siderealTracking))
@@ -96,5 +86,4 @@ final class TargetSuite extends DisciplineSuite {
   checkAll("Target.properMotion", OptionalTests(Target.properMotion))
   checkAll("Target.properMotionRA", OptionalTests(Target.properMotionRA))
   checkAll("Target.properMotionDec", OptionalTests(Target.properMotionDec))
-  // checkAll("Target.brightnessIn", TraversalTests(Target.brightnessIn(Band.B)))
 }

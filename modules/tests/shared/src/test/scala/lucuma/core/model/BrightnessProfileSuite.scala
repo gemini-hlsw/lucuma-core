@@ -5,20 +5,13 @@ package lucuma.core.model
 
 import cats.kernel.laws.discipline._
 import eu.timepit.refined.cats._
-// import eu.timepit.refined.scalacheck.string._
-// import lucuma.core.arb._
-// import lucuma.core.math.arb._
 import lucuma.core.model.arb._
-// import lucuma.core.util.arb._
-// import lucuma.core.util.laws.GidTests
 import monocle.law.discipline._
 import munit._
-// import lucuma.core.enum.Band
-// import lucuma.core.math.dimensional._
 import lucuma.core.util.arb.ArbEnumerated
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Cogen._
-// import org.scalacheck._
+import lucuma.core.enum.Band
 
 final class BrightnessProfileSuite extends DisciplineSuite {
   import ArbBrightnessProfile._
@@ -30,6 +23,14 @@ final class BrightnessProfileSuite extends DisciplineSuite {
   // Laws for PointBrightnessProfile
   checkAll("Eq[PointBrightnessProfile]", EqTests[PointBrightnessProfile].eqv)
   checkAll("PointBrightnessProfile.brightnesses", LensTests(PointBrightnessProfile.brightnesses))
+  checkAll(
+    "PointBrightnessProfile.brightnessesT",
+    TraversalTests(PointBrightnessProfile.brightnessesT)
+  )
+  checkAll(
+    "PointBrightnessProfile.brightnessIn",
+    TraversalTests(PointBrightnessProfile.brightnessIn(Band.B))
+  )
   checkAll("PointBrightnessProfile.sed", LensTests(PointBrightnessProfile.sed))
 
   // Laws for UniformBrightnessProfile
@@ -37,6 +38,14 @@ final class BrightnessProfileSuite extends DisciplineSuite {
   checkAll(
     "UniformBrightnessProfile.brightnesses",
     LensTests(UniformBrightnessProfile.brightnesses)
+  )
+  checkAll(
+    "UniformBrightnessProfile.brightnessesT",
+    TraversalTests(UniformBrightnessProfile.brightnessesT)
+  )
+  checkAll(
+    "UniformBrightnessProfile.brightnessIn",
+    TraversalTests(UniformBrightnessProfile.brightnessIn(Band.B))
   )
   checkAll("UniformBrightnessProfile.sed", LensTests(UniformBrightnessProfile.sed))
 
@@ -46,6 +55,14 @@ final class BrightnessProfileSuite extends DisciplineSuite {
   checkAll(
     "GaussianBrightnessProfile.brightnesses",
     LensTests(GaussianBrightnessProfile.brightnesses)
+  )
+  checkAll(
+    "GaussianBrightnessProfile.brightnessesT",
+    TraversalTests(GaussianBrightnessProfile.brightnessesT)
+  )
+  checkAll(
+    "GaussianBrightnessProfile.brightnessIn",
+    TraversalTests(GaussianBrightnessProfile.brightnessIn(Band.B))
   )
   checkAll("GaussianBrightnessProfile.sed", LensTests(GaussianBrightnessProfile.sed))
 
@@ -59,8 +76,24 @@ final class BrightnessProfileSuite extends DisciplineSuite {
     OptionalTests(BrightnessProfile.integratedBrightnesses)
   )
   checkAll(
+    "BrightnessProfile.integratedBrightnessesT",
+    TraversalTests(BrightnessProfile.integratedBrightnessesT)
+  )
+  checkAll(
+    "BrightnessProfile.integratedBrightnessIn",
+    TraversalTests(BrightnessProfile.integratedBrightnessIn(Band.B))
+  )
+  checkAll(
     "BrightnessProfile.surfaceBrightnesses",
     OptionalTests(BrightnessProfile.surfaceBrightnesses)
+  )
+  checkAll(
+    "BrightnessProfile.surfaceBrightnessesT",
+    TraversalTests(BrightnessProfile.surfaceBrightnessesT)
+  )
+  checkAll(
+    "BrightnessProfile.surfaceBrightnessIn",
+    TraversalTests(BrightnessProfile.surfaceBrightnessIn(Band.B))
   )
   checkAll(
     "BrightnessProfile.integratedSED",

@@ -133,20 +133,6 @@ trait SiderealTargetOptics { this: SiderealTarget.type =>
   val brightnessProfile: Lens[SiderealTarget, BrightnessProfile] =
     Focus[SiderealTarget](_.brightnessProfile)
 
-  // Copy these to BrightnessProfile
-
-  /** @group Optics */
-  // val brightnesses: Lens[NonsiderealTarget, SortedMap[Band, TargetBrightness]] =
-  //   Focus[NonsiderealTarget](_.brightnesses)
-
-  /** @group Optics */
-  // val brightnessesT: Traversal[SiderealTarget, TargetBrightness] =
-  //   brightnesses.each
-
-  /** @group Optics */
-  // def brightnessIn(b: Band): Traversal[SiderealTarget, TargetBrightness] =
-  //   brightnesses.filterIndex((a: Band) => a === b)
-
   /** @group Optics */
   val parallax: Lens[SiderealTarget, Option[Parallax]] =
     tracking.andThen(SiderealTracking.parallax)
@@ -200,20 +186,6 @@ trait NonsiderealTargetOptics { this: NonsiderealTarget.type =>
 
   val brightnessProfile: Lens[NonsiderealTarget, BrightnessProfile] =
     Focus[NonsiderealTarget](_.brightnessProfile)
-
-  // Copy these to BrightnessProfile
-
-  /** @group Optics */
-  // val brightnesses: Lens[NonsiderealTarget, SortedMap[Band, TargetBrightness]] =
-  //   Focus[NonsiderealTarget](_.brightnesses)
-
-  // /** @group Optics */
-  // val brightnessesT: Traversal[NonsiderealTarget, TargetBrightness] =
-  //   brightnesses.each
-
-  // /** @group Optics */
-  // def brightnessIn(b: Band): Traversal[NonsiderealTarget, TargetBrightness] =
-  //   brightnesses.filterIndex((a: Band) => a === b)
 }
 
 trait TargetOptics { this: Target.type =>
@@ -244,23 +216,6 @@ trait TargetOptics { this: Target.type =>
       case t @ SiderealTarget(_, _, _, _)    => SiderealTarget.brightnessProfile.replace(v)(t)
       case t @ NonsiderealTarget(_, _, _, _) => NonsiderealTarget.brightnessProfile.replace(v)(t)
     })
-
-  // Copy these to BrightnessProfile
-
-  /** @group Optics */
-  // val brightnesses: Lens[Target, SortedMap[Band, TargetBrightness]] =
-  //   Lens[Target, SortedMap[Band, TargetBrightness]](_.brightnesses)(v => {
-  //     case t @ SiderealTarget(_, _, _, _)    => SiderealTarget.brightnesses.replace(v)(t)
-  //     case t @ NonsiderealTarget(_, _, _, _) => NonsiderealTarget.brightnesses.replace(v)(t)
-  //   })
-
-  // /** @group Optics */
-  // val brightnessesT: Traversal[Target, TargetBrightness] =
-  //   brightnesses.each
-
-  // /** @group Optics */
-  // def brightnessIn(b: Band): Traversal[Target, TargetBrightness] =
-  //   brightnesses.filterIndex((a: Band) => a === b)
 
   /** @group Optics */
   val parallax: Optional[Target, Option[Parallax]] =

@@ -13,14 +13,17 @@ import eu.timepit.refined.cats._
 import eu.timepit.refined.types.numeric.PosBigDecimal
 import lucuma.core.enum.NonStellarLibrarySpectrum
 import lucuma.core.enum.StellarLibrarySpectrum
-// import lucuma.core.math.dimensional.Qty
 import lucuma.core.math.dimensional.GroupedUnitQuantity
 import lucuma.core.math.BrightnessUnit._
+import monocle.std.either._
+import monocle.Prism
+import monocle.Lens
+import monocle.Focus
+import monocle.Optional
+import monocle.macros.GenPrism
 
-// B = Brightness unit group; used only in EmissionLine for the moment
+// T = Brightness type (integral or surface); used only in EmissionLine
 sealed trait SpectralDistribution[+T] extends Serializable
-
-// TODO Lenses
 
 object SpectralDistribution {
 
@@ -33,6 +36,18 @@ object SpectralDistribution {
 
   object Library {
     implicit val eqLibrary: Eq[Library] = Eq.by(_.librarySpectrum)
+
+    /** @group Optics */
+    val spectrum: Lens[Library, Either[StellarLibrarySpectrum, NonStellarLibrarySpectrum]] =
+      Focus[Library](_.librarySpectrum)
+
+    /** @group Optics */
+    val stellar: Optional[Library, StellarLibrarySpectrum] =
+      spectrum.andThen(stdLeft[StellarLibrarySpectrum, NonStellarLibrarySpectrum])
+
+    /** @group Optics */
+    val nonstellar: Optional[Library, NonStellarLibrarySpectrum] =
+      spectrum.andThen(stdRight[StellarLibrarySpectrum, NonStellarLibrarySpectrum])
   }
 
   final case class CoolStarModel(temperature: Quantity[PosBigDecimal, Kelvin])
@@ -40,6 +55,10 @@ object SpectralDistribution {
 
   object CoolStarModel {
     implicit val orderCoolStarModel: Order[CoolStarModel] = Order.by(_.temperature)
+
+    /** @group Optics */
+    val temperature: Lens[CoolStarModel, Quantity[PosBigDecimal, Kelvin]] =
+      Focus[CoolStarModel](_.temperature)
   }
 
   // Galaxy
@@ -54,7 +73,6 @@ object SpectralDistribution {
 
   // EmissionLine
   // TODO Check if BigDecimal [parse from/toString to] "5e-19"
-
   // Both line and continuum have to be specified. It's OK for both units not be congruent.
   final case class EmissionLine[+T](
     line:      GroupedUnitQuantity[BigDecimal, LineFlux[T]],
@@ -63,6 +81,15 @@ object SpectralDistribution {
   object EmissionLine {
     implicit def eqEmissionLine[T]: Eq[EmissionLine[T]] =
       Eq.by(x => (x.line, x.continuum))
+
+    /** @group Optics */
+    def line[T]: Lens[EmissionLine[T], GroupedUnitQuantity[BigDecimal, LineFlux[T]]] =
+      Focus[EmissionLine[T]](_.line)
+
+    /** @group Optics */
+    def continuum[T]
+      : Lens[EmissionLine[T], GroupedUnitQuantity[BigDecimal, ContinuumFluxDensity[T]]] =
+      Focus[EmissionLine[T]](_.continuum)
   }
 
   /** Defined by power law function. */
@@ -70,6 +97,9 @@ object SpectralDistribution {
 
   object PowerLaw {
     implicit val orderPowerLaw: Order[PowerLaw] = Order.by(_.index)
+
+    /** @group Optics */
+    val index: Lens[PowerLaw, BigDecimal] = Focus[PowerLaw](_.index)
   }
 
   /** A black body with a temperature in Kelvin. */
@@ -78,6 +108,10 @@ object SpectralDistribution {
 
   object BlackBody {
     implicit val orderBlackBody: Order[BlackBody] = Order.by(_.temperature)
+
+    /** @group Optics */
+    val temperature: Lens[BlackBody, Quantity[PosBigDecimal, Kelvin]] =
+      Focus[BlackBody](_.temperature)
   }
 
   // TODO UserDefined
@@ -91,4 +125,24 @@ object SpectralDistribution {
       case (a @ PowerLaw(_), b @ PowerLaw(_))               => a === b
       case _                                                => false
     }
+
+  /** @group Optics */
+  def library[T]: Prism[SpectralDistribution[T], Library] =
+    GenPrism[SpectralDistribution[T], Library]
+
+  /** @group Optics */
+  def coolStarModel[T]: Prism[SpectralDistribution[T], CoolStarModel] =
+    GenPrism[SpectralDistribution[T], CoolStarModel]
+
+  /** @group Optics */
+  def emissionLine[T]: Prism[SpectralDistribution[T], EmissionLine[T]] =
+    GenPrism[SpectralDistribution[T], EmissionLine[T]]
+
+  /** @group Optics */
+  def powerLaw[T]: Prism[SpectralDistribution[T], PowerLaw] =
+    GenPrism[SpectralDistribution[T], PowerLaw]
+
+  /** @group Optics */
+  def blackBody[T]: Prism[SpectralDistribution[T], BlackBody] =
+    GenPrism[SpectralDistribution[T], BlackBody]
 }
