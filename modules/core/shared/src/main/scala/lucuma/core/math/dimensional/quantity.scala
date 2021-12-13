@@ -22,12 +22,11 @@ trait Qty[N] {
 }
 
 object Qty {
-  // TODO TEst!!
-  // implicit def eqQty[N]: Eq[Qty[N]] = Eq.fromUniversalEquals
+  implicit def eqQty[N: Eq]: Eq[Qty[N]] = Eq.by(x => (x.value, x.unit))
 }
 
 /**
- * A magnitude of type `N` and a runtime representation of a physical unit in group `G`.
+ * A magnitude of type `N` and a runtime representation of a physical unit in group `UG`.
  */
 case class GroupedUnitQuantity[N, +UG] private (value: N, unit: GroupedUnitType[UG]) extends Qty[N]
 object GroupedUnitQuantity {
@@ -40,12 +39,10 @@ object GroupedUnitQuantity {
   )(implicit unit: GroupedUnitOfMeasure[UG, U]): GroupedUnitQuantity[N, UG] =
     GroupedUnitQuantity(q.value, unit)
 
-  // TODO Test lenses!!!
   def value[N, UG]: Lens[GroupedUnitQuantity[N, UG], N] = Focus[GroupedUnitQuantity[N, UG]](_.value)
 
   def unit[N, UG]: Lens[GroupedUnitQuantity[N, UG], GroupedUnitType[UG]] =
     Focus[GroupedUnitQuantity[N, UG]](_.unit)
 
-  // TODO TEST!
   implicit def eqGroupedUnitQuantity[N, UG]: Eq[GroupedUnitQuantity[N, UG]] = Eq.fromUniversalEquals
 }

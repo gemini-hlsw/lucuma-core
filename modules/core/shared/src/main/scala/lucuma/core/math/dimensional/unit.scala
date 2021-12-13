@@ -28,7 +28,6 @@ trait UnitType { self =>
 
 object UnitType {
   // `UnitDefiniton`s are expected to be singletons.
-  // TODO TEST!!
   implicit val eqUnitType: Eq[UnitType] = Eq.instance((a, b) => a.definition == b.definition)
 }
 
