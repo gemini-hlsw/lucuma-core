@@ -4,10 +4,16 @@
 package lucuma.core.model
 
 import cats.Eq
+import cats.syntax.all._
 import lucuma.core.enum.Band
 import lucuma.core.math.BrightnessUnit._
 
 import scala.collection.immutable.SortedMap
+import monocle.Lens
+import monocle.Focus
+import monocle.Prism
+import monocle.macros.GenPrism
+import monocle.Optional
 
 sealed trait BrightnessProfile extends Product with Serializable {
   def bands: List[Band]
@@ -20,11 +26,35 @@ final case class PointBrightnessProfile(
   lazy val bands: List[Band] = brightnesses.keys.toList
 }
 
+object PointBrightnessProfile {
+  implicit val eq: Eq[PointBrightnessProfile] = Eq.by(x => (x.brightnesses, x.sed))
+
+  /** @group Optics */
+  val brightnesses: Lens[PointBrightnessProfile, SortedMap[Band, TargetBrightness[Integrated]]] =
+    Focus[PointBrightnessProfile](_.brightnesses)
+
+  /** @group Optics */
+  val sed: Lens[PointBrightnessProfile, SpectralDistribution[Integrated]] =
+    Focus[PointBrightnessProfile](_.sed)
+}
+
 final case class UniformBrightnessProfile(
   brightnesses: SortedMap[Band, TargetBrightness[Surface]],
   sed:          SpectralDistribution[Surface]
 ) extends BrightnessProfile {
   lazy val bands: List[Band] = brightnesses.keys.toList
+}
+
+object UniformBrightnessProfile {
+  implicit val eq: Eq[UniformBrightnessProfile] = Eq.by(x => (x.brightnesses, x.sed))
+
+  /** @group Optics */
+  val brightnesses: Lens[UniformBrightnessProfile, SortedMap[Band, TargetBrightness[Surface]]] =
+    Focus[UniformBrightnessProfile](_.brightnesses)
+
+  /** @group Optics */
+  val sed: Lens[UniformBrightnessProfile, SpectralDistribution[Surface]] =
+    Focus[UniformBrightnessProfile](_.sed)
 }
 
 /**
@@ -42,9 +72,91 @@ final case class GaussianBrightnessProfile(
   lazy val bands: List[Band] = brightnesses.keys.toList
 }
 
-object BrightnessProfile {
-  // TODO This right
-  implicit val eqBrightnessProfile: Eq[BrightnessProfile] = Eq.fromUniversalEquals
+object GaussianBrightnessProfile {
+  implicit val eq: Eq[GaussianBrightnessProfile] = Eq.by(x => (x.source, x.brightnesses, x.sed))
 
-  // TODO Lenses
+  /** @group Optics */
+  val source: Lens[GaussianBrightnessProfile, GaussianSource] =
+    Focus[GaussianBrightnessProfile](_.source)
+
+  /** @group Optics */
+  val brightnesses: Lens[GaussianBrightnessProfile, SortedMap[Band, TargetBrightness[Integrated]]] =
+    Focus[GaussianBrightnessProfile](_.brightnesses)
+
+  /** @group Optics */
+  val sed: Lens[GaussianBrightnessProfile, SpectralDistribution[Integrated]] =
+    Focus[GaussianBrightnessProfile](_.sed)
+}
+
+object BrightnessProfile {
+  implicit val eqBrightnessProfile: Eq[BrightnessProfile] = Eq.instance {
+    case (a @ PointBrightnessProfile(_, _), b @ PointBrightnessProfile(_, _))             => a === b
+    case (a @ UniformBrightnessProfile(_, _), b @ UniformBrightnessProfile(_, _))         => a === b
+    case (a @ GaussianBrightnessProfile(_, _, _), b @ GaussianBrightnessProfile(_, _, _)) => a === b
+    case _                                                                                => false
+  }
+
+  /** @group Optics */
+  val point: Prism[BrightnessProfile, PointBrightnessProfile] =
+    GenPrism[BrightnessProfile, PointBrightnessProfile]
+
+  /** @group Optics */
+  val uniform: Prism[BrightnessProfile, UniformBrightnessProfile] =
+    GenPrism[BrightnessProfile, UniformBrightnessProfile]
+
+  /** @group Optics */
+  val gaussian: Prism[BrightnessProfile, GaussianBrightnessProfile] =
+    GenPrism[BrightnessProfile, GaussianBrightnessProfile]
+
+  /** @group Optics */
+  val integratedBrightnesses
+    : Optional[BrightnessProfile, SortedMap[Band, TargetBrightness[Integrated]]] =
+    Optional[BrightnessProfile, SortedMap[Band, TargetBrightness[Integrated]]](p =>
+      point
+        .andThen(PointBrightnessProfile.brightnesses)
+        .getOption(p)
+        .orElse(
+          gaussian
+            .andThen(GaussianBrightnessProfile.brightnesses)
+            .getOption(p)
+        )
+    )(v => {
+      case p @ PointBrightnessProfile(_, _)       =>
+        PointBrightnessProfile.brightnesses.replace(v)(p)
+      case p @ GaussianBrightnessProfile(_, _, _) =>
+        GaussianBrightnessProfile.brightnesses.replace(v)(p)
+      case p                                      => p
+    })
+
+  /** @group Optics */
+  val surfaceBrightnesses: Optional[BrightnessProfile, SortedMap[Band, TargetBrightness[Surface]]] =
+    uniform.andThen(UniformBrightnessProfile.brightnesses)
+
+  /** @group Optics */
+  val integratedSED: Optional[BrightnessProfile, SpectralDistribution[Integrated]] =
+    Optional[BrightnessProfile, SpectralDistribution[Integrated]](p =>
+      point
+        .andThen(PointBrightnessProfile.sed)
+        .getOption(p)
+        .orElse(
+          gaussian
+            .andThen(GaussianBrightnessProfile.sed)
+            .getOption(p)
+        )
+    )(v => {
+      case p @ PointBrightnessProfile(_, _)       =>
+        PointBrightnessProfile.sed.replace(v)(p)
+      case p @ GaussianBrightnessProfile(_, _, _) =>
+        GaussianBrightnessProfile.sed.replace(v)(p)
+      case p                                      => p
+    })
+
+  /** @group Optics */
+  val surfaceSED: Optional[BrightnessProfile, SpectralDistribution[Surface]] =
+    uniform.andThen(UniformBrightnessProfile.sed)
+
+  /** @group Optics */
+  val gaussianSource: Optional[BrightnessProfile, GaussianSource] =
+    gaussian.andThen(GaussianBrightnessProfile.source)
+
 }

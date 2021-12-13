@@ -16,7 +16,6 @@ import lucuma.core.math.BrightnessUnit
 import lucuma.core.math.dimensional.arb.ArbQty
 
 trait ArbTargetBrightness {
-
   import ArbEnumerated._
   import BrightnessUnit._
   import ArbQty._
@@ -36,15 +35,6 @@ trait ArbTargetBrightness {
     Cogen[
       (Qty[BrightnessValue], Band, Option[BrightnessValue])
     ].contramap(u => (u.quantity, u.band, u.error))
-
-  // Move to ArbBrightnessProfile
-  // implicit val arbBrightnessesMap: Arbitrary[SortedMap[Band, TargetBrightness]] =
-  //   Arbitrary(
-  //     arbitrary[Vector[TargetBrightness]].map(_.fproductLeft(_.band)).map(x => SortedMap(x: _*))
-  //   )
-
-  // implicit val cogBrightnessesMap: Cogen[SortedMap[Band, TargetBrightness]] =
-  //   Cogen[Vector[(Band, TargetBrightness)]].contramap(_.toVector)
 }
 
 object ArbTargetBrightness extends ArbTargetBrightness

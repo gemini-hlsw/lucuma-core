@@ -10,6 +10,7 @@ import lucuma.core.math.BrightnessUnit
 import lucuma.core.util.arb.ArbEnumerated
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck._
+import lucuma.core.math.dimensional._
 
 import scala.collection.immutable.SortedMap
 
@@ -19,6 +20,16 @@ trait ArbBrightnessProfile {
   import ArbEnumerated._
   import ArbGaussianSource._
   import BrightnessUnit._
+
+  implicit def arbBrightnessesMap[T](implicit
+    arbUnit: Arbitrary[GroupedUnitType[Brightness[T]]]
+  ): Arbitrary[SortedMap[Band, TargetBrightness[T]]] =
+    Arbitrary(
+      arbitrary[Vector[TargetBrightness[T]]].map(_.fproductLeft(_.band)).map(x => SortedMap(x: _*))
+    )
+
+  implicit def cogBrightnessesMap[T]: Cogen[SortedMap[Band, TargetBrightness[T]]] =
+    Cogen[Vector[(Band, TargetBrightness[T])]].contramap(_.toVector)
 
   implicit val arbPointBrightnessProfile: Arbitrary[PointBrightnessProfile] =
     Arbitrary {
