@@ -5,7 +5,7 @@ package lucuma.core.model
 
 import cats.Eq
 import lucuma.core.enum.Band
-import lucuma.core.math.BrightnessUnit
+import lucuma.core.math.BrightnessUnit._
 
 import scala.collection.immutable.SortedMap
 
@@ -14,15 +14,15 @@ sealed trait BrightnessProfile extends Product with Serializable {
 }
 
 final case class PointBrightnessProfile(
-  brightnesses: SortedMap[Band, TargetBrightness[BrightnessUnit.Integrated]],
-  sed:          SpectralDistribution[BrightnessUnit.Integrated]
+  brightnesses: SortedMap[Band, TargetBrightness[Brightness[Integrated]]],
+  sed:          SpectralDistribution[Brightness[Integrated]]
 ) extends BrightnessProfile {
   lazy val bands: List[Band] = brightnesses.keys.toList
 }
 
 final case class UniformBrightnessProfile(
-  brightnesses: SortedMap[Band, TargetBrightness[BrightnessUnit.Surface]],
-  sed:          SpectralDistribution[BrightnessUnit.Surface]
+  brightnesses: SortedMap[Band, TargetBrightness[Brightness[Surface]]],
+  sed:          SpectralDistribution[Brightness[Surface]]
 ) extends BrightnessProfile {
   lazy val bands: List[Band] = brightnesses.keys.toList
 }
@@ -36,8 +36,8 @@ final case class UniformBrightnessProfile(
  */
 final case class GaussianBrightnessProfile(
   source:       GaussianSource,
-  brightnesses: SortedMap[Band, TargetBrightness[BrightnessUnit.Integrated]],
-  sed:          SpectralDistribution[BrightnessUnit.Integrated]
+  brightnesses: SortedMap[Band, TargetBrightness[Brightness[Integrated]]],
+  sed:          SpectralDistribution[Brightness[Integrated]]
 ) extends BrightnessProfile {
   lazy val bands: List[Band] = brightnesses.keys.toList
 }

@@ -18,20 +18,21 @@ trait ArbBrightnessProfile {
   import ArbTargetBrightness._
   import ArbEnumerated._
   import ArbGaussianSource._
+  import BrightnessUnit._
 
   implicit val arbPointBrightnessProfile: Arbitrary[PointBrightnessProfile] =
     Arbitrary {
       for {
-        b <- arbitrary[Vector[(Band, TargetBrightness[BrightnessUnit.Integrated])]]
-        s <- arbitrary[SpectralDistribution[BrightnessUnit.Integrated]]
+        b <- arbitrary[Vector[(Band, TargetBrightness[Brightness[Integrated]])]]
+        s <- arbitrary[SpectralDistribution[Brightness[Integrated]]]
       } yield PointBrightnessProfile(SortedMap(b: _*), s)
     }
 
   implicit val arbUniformBrightnessProfile: Arbitrary[UniformBrightnessProfile] =
     Arbitrary {
       for {
-        b <- arbitrary[Vector[(Band, TargetBrightness[BrightnessUnit.Surface])]]
-        s <- arbitrary[SpectralDistribution[BrightnessUnit.Surface]]
+        b <- arbitrary[Vector[(Band, TargetBrightness[Brightness[Surface]])]]
+        s <- arbitrary[SpectralDistribution[Brightness[Surface]]]
       } yield UniformBrightnessProfile(SortedMap(b: _*), s)
     }
 
@@ -39,8 +40,8 @@ trait ArbBrightnessProfile {
     Arbitrary {
       for {
         g <- arbitrary[GaussianSource]
-        b <- arbitrary[Vector[(Band, TargetBrightness[BrightnessUnit.Integrated])]]
-        s <- arbitrary[SpectralDistribution[BrightnessUnit.Integrated]]
+        b <- arbitrary[Vector[(Band, TargetBrightness[Brightness[Integrated]])]]
+        s <- arbitrary[SpectralDistribution[Brightness[Integrated]]]
       } yield GaussianBrightnessProfile(g, SortedMap(b: _*), s)
     }
 
@@ -56,16 +57,16 @@ trait ArbBrightnessProfile {
   implicit val cogenPointBrightnessProfile: Cogen[PointBrightnessProfile] =
     Cogen[
       (
-        Map[Band, TargetBrightness[BrightnessUnit.Integrated]],
-        SpectralDistribution[BrightnessUnit.Integrated]
+        Map[Band, TargetBrightness[Brightness[Integrated]]],
+        SpectralDistribution[Brightness[Integrated]]
       )
     ].contramap(x => (x.brightnesses, x.sed))
 
   implicit val cogenUniformBrightnessProfile: Cogen[UniformBrightnessProfile] =
     Cogen[
       (
-        Map[Band, TargetBrightness[BrightnessUnit.Surface]],
-        SpectralDistribution[BrightnessUnit.Surface]
+        Map[Band, TargetBrightness[Brightness[Surface]]],
+        SpectralDistribution[Brightness[Surface]]
       )
     ].contramap(x => (x.brightnesses, x.sed))
 
@@ -73,8 +74,8 @@ trait ArbBrightnessProfile {
     Cogen[
       (
         GaussianSource,
-        Map[Band, TargetBrightness[BrightnessUnit.Integrated]],
-        SpectralDistribution[BrightnessUnit.Integrated]
+        Map[Band, TargetBrightness[Brightness[Integrated]]],
+        SpectralDistribution[Brightness[Integrated]]
       )
     ].contramap(x => (x.source, x.brightnesses, x.sed))
 

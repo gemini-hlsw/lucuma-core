@@ -4,6 +4,7 @@
 package lucuma.core.math.dimensional
 
 import coulomb.define._
+import cats.Eq
 
 // All of this is a bridge between coulomb an runtime quantities (as defined in `Qty`).
 
@@ -23,6 +24,11 @@ trait UnitType { self =>
     val value = _value
     val unit  = self
   }
+}
+
+object UnitType {
+  // `UnitDefiniton`s are expected to be singletons.
+  implicit val eqUnitType: Eq[UnitType] = Eq.instance((a, b) => a.definition == b.definition)
 }
 
 /**
@@ -57,14 +63,14 @@ object UnitOfMeasure {
 }
 
 /**
- * Runtime association of a `UnitType` to group `G`.
+ * Runtime association of a `UnitType` to unit group `UG`.
  *
  * The group doesn't exist in runtime, it's just a type tag. It's covariant since we can have a
  * hierarchy of groups. Eg: We have unit groups for "integral brightness" and "surface brightness",
  * and they are both subgroups of the larger "brightness" group.
  */
-trait GroupedUnitType[+G] extends UnitType {
-  override def withValue[N](value: N): GroupedUnitQuantity[N, G] =
+trait GroupedUnitType[+UG] extends UnitType {
+  override def withValue[N](value: N): GroupedUnitQuantity[N, UG] =
     GroupedUnitQuantity(value, this)
 }
 

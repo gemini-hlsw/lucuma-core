@@ -6,6 +6,7 @@ package lucuma.core.math.dimensional
 import coulomb._
 import monocle.Focus
 import monocle.Lens
+import _root_.cats.kernel.Eq
 
 /**
  * A magnitude of type `N` and a runtime representation of a physical unit.
@@ -23,19 +24,21 @@ trait Qty[N] {
 /**
  * A magnitude of type `N` and a runtime representation of a physical unit in group `G`.
  */
-case class GroupedUnitQuantity[N, +G] private (value: N, unit: GroupedUnitType[G]) extends Qty[N]
+case class GroupedUnitQuantity[N, +UG] private (value: N, unit: GroupedUnitType[UG]) extends Qty[N]
 object GroupedUnitQuantity {
 
   /**
    * Create a `GroupedUnitQuantity` from a `coulomb.Quantity`.
    */
-  def apply[N, G, U](
+  def apply[N, UG, U](
     q:             Quantity[N, U]
-  )(implicit unit: GroupedUnitOfMeasure[G, U]): GroupedUnitQuantity[N, G] =
+  )(implicit unit: GroupedUnitOfMeasure[UG, U]): GroupedUnitQuantity[N, UG] =
     GroupedUnitQuantity(q.value, unit)
 
-  def value[N, G]: Lens[GroupedUnitQuantity[N, G], N] = Focus[GroupedUnitQuantity[N, G]](_.value)
+  def value[N, UG]: Lens[GroupedUnitQuantity[N, UG], N] = Focus[GroupedUnitQuantity[N, UG]](_.value)
 
-  def unit[N, G]: Lens[GroupedUnitQuantity[N, G], GroupedUnitType[G]] =
-    Focus[GroupedUnitQuantity[N, G]](_.unit)
+  def unit[N, UG]: Lens[GroupedUnitQuantity[N, UG], GroupedUnitType[UG]] =
+    Focus[GroupedUnitQuantity[N, UG]](_.unit)
+
+  implicit def eqGroupedUnitQuantity[N, UG]: Eq[GroupedUnitQuantity[N, UG]] = Eq.fromUniversalEquals
 }

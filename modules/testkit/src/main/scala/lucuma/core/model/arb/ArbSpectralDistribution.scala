@@ -13,9 +13,12 @@ import lucuma.core.enum.StellarLibrarySpectrum
 import lucuma.core.util.arb.ArbEnumerated._
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck._
+import lucuma.core.math.dimensional._
+import lucuma.core.math.BrightnessUnit
 
 trait ArbSpectralDistribution {
   import SpectralDistribution._
+  import BrightnessUnit._
 
   implicit val arbLibrary: Arbitrary[Library] =
     Arbitrary {
@@ -40,12 +43,12 @@ trait ArbSpectralDistribution {
     Cogen[BigDecimal].contramap(_.temperature.value.value)
 
   // TODO Correct parameters
-  implicit def arbEmissionLine[B]: Arbitrary[EmissionLine[B]] =
+  implicit def arbEmissionLine[T]: Arbitrary[EmissionLine[T]] =
     Arbitrary {
       for {
-        a <- arbitrary[Int]
-        b <- arbitrary[Int]
-      } yield EmissionLine[B](a, b)
+        l           <- arbitrary[GroupedUnitQuantity[BigDecimal, LineFlux[T]]]
+        calculation <- arbitrary[Int]
+      } yield EmissionLine[B](l, c)
     }
 
   implicit def cogEmissionLine[B]: Cogen[EmissionLine[B]] =

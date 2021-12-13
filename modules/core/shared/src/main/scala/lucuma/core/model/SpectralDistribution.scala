@@ -13,9 +13,12 @@ import eu.timepit.refined.cats._
 import eu.timepit.refined.types.numeric.PosBigDecimal
 import lucuma.core.enum.NonStellarLibrarySpectrum
 import lucuma.core.enum.StellarLibrarySpectrum
+// import lucuma.core.math.dimensional.Qty
+import lucuma.core.math.dimensional.GroupedUnitQuantity
+import lucuma.core.math.BrightnessUnit._
 
 // B = Brightness unit group; used only in EmissionLine for the moment
-sealed trait SpectralDistribution[+B] extends Serializable
+sealed trait SpectralDistribution[+T] extends Serializable
 
 // TODO Lenses
 
@@ -50,11 +53,16 @@ object SpectralDistribution {
   // Planetary Nebula
 
   // EmissionLine
-  // Are Line and Continuum both specified, or is it one or the other?
-  // TODO Model correctly
-  final case class EmissionLine[+B](line: Int, continuum: Int) extends SpectralDistribution[B]
+  // TODO Check if BigDecimal [parse from/toString to] "5e-19"
+
+  // Both line and continuum have to be specified. It's OK for both units not be congruent.
+  final case class EmissionLine[+T](
+    line:      GroupedUnitQuantity[BigDecimal, LineFlux[T]],
+    continuum: GroupedUnitQuantity[BigDecimal, ContinuumFluxDensity[T]]
+  ) extends SpectralDistribution[T]
   object EmissionLine {
-    implicit def orderEmissionLine[B]: Order[EmissionLine[B]] = Order.by(x => (x.line, x.continuum))
+    implicit def eqEmissionLine[T]: Eq[EmissionLine[T]] =
+      Eq.by(x => (x.line, x.continuum))
   }
 
   /** Defined by power law function. */
