@@ -25,7 +25,7 @@ trait ArbTargetBrightness {
   ): Arbitrary[TargetBrightness[T]] =
     Arbitrary {
       for {
-        q <- arbitrary[GroupedUnitQuantity[BrightnessValue, Brightness[T]]]
+        q <- arbitrary[GroupedUnitQty[BrightnessValue, Brightness[T]]]
         b <- arbitrary[Band]
         e <- arbitrary[Option[BrightnessValue]]
       } yield TargetBrightness(q, b, e)

@@ -28,22 +28,22 @@ object Qty {
 /**
  * A magnitude of type `N` and a runtime representation of a physical unit in group `UG`.
  */
-case class GroupedUnitQuantity[N, +UG] private (value: N, unit: GroupedUnitType[UG]) extends Qty[N]
-object GroupedUnitQuantity {
+case class GroupedUnitQty[N, +UG] private (value: N, unit: GroupedUnitType[UG]) extends Qty[N]
+object GroupedUnitQty {
 
   /**
-   * Create a `GroupedUnitQuantity` from a `coulomb.Quantity`.
+   * Create a `GroupedUnitQty` from a `coulomb.Quantity`.
    */
   def apply[N, UG, U](
     q:             Quantity[N, U]
-  )(implicit unit: GroupedUnitOfMeasure[UG, U]): GroupedUnitQuantity[N, UG] =
-    GroupedUnitQuantity(q.value, unit)
+  )(implicit unit: GroupedUnitOfMeasure[UG, U]): GroupedUnitQty[N, UG] =
+    GroupedUnitQty(q.value, unit)
 
-  def value[N, UG]: Lens[GroupedUnitQuantity[N, UG], N] = Focus[GroupedUnitQuantity[N, UG]](_.value)
+  def value[N, UG]: Lens[GroupedUnitQty[N, UG], N] = Focus[GroupedUnitQty[N, UG]](_.value)
 
-  def unit[N, UG]: Lens[GroupedUnitQuantity[N, UG], GroupedUnitType[UG]] =
-    Focus[GroupedUnitQuantity[N, UG]](_.unit)
+  def unit[N, UG]: Lens[GroupedUnitQty[N, UG], GroupedUnitType[UG]] =
+    Focus[GroupedUnitQty[N, UG]](_.unit)
 
-  implicit def eqGroupedUnitQuantity[N: Eq, UG]: Eq[GroupedUnitQuantity[N, UG]] =
+  implicit def eqGroupedUnitQty[N: Eq, UG]: Eq[GroupedUnitQty[N, UG]] =
     Eq.by(x => (x.value, x.unit))
 }

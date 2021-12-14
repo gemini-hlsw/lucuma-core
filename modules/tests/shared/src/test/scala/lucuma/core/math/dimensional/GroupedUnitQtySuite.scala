@@ -9,20 +9,20 @@ import lucuma.core.math.BrightnessUnits._
 import lucuma.core.util.arb.ArbEnumerated._
 import lucuma.core.math.dimensional.arb.ArbQty._
 
-class GroupedUnitQuantitySuite extends munit.DisciplineSuite {
+class GroupedUnitQtySuite extends munit.DisciplineSuite {
   // Laws
   checkAll(
-    "GroupedUnitQuantity[BigDecimal, Brightness[Surface]]",
-    EqTests[GroupedUnitQuantity[BigDecimal, Brightness[Surface]]].eqv
+    "GroupedUnitQty[BigDecimal, Brightness[Surface]]",
+    EqTests[GroupedUnitQty[BigDecimal, Brightness[Surface]]].eqv
   )
 
   // Optics
   checkAll(
-    "GroupedUnitQuantity[BigDecimal, Brightness[Surface]].value",
-    LensTests(GroupedUnitQuantity.value[BigDecimal, Brightness[Surface]])
+    "GroupedUnitQty[BigDecimal, Brightness[Surface]].value",
+    LensTests(GroupedUnitQty.value[BigDecimal, Brightness[Surface]])
   )
   checkAll(
-    "GroupedUnitQuantity[BigDecimal, Brightness[Surface]].unit",
-    LensTests(GroupedUnitQuantity.unit[BigDecimal, Brightness[Surface]])
+    "GroupedUnitQty[BigDecimal, Brightness[Surface]].unit",
+    LensTests(GroupedUnitQty.unit[BigDecimal, Brightness[Surface]])
   )
 }

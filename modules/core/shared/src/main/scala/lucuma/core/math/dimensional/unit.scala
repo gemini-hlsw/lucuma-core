@@ -72,8 +72,8 @@ object UnitOfMeasure {
  * The group doesn't exist in runtime, it's just a type tag.
  */
 trait GroupedUnitType[+UG] extends UnitType {
-  override def withValue[N](value: N): GroupedUnitQuantity[N, UG] =
-    GroupedUnitQuantity(value, this)
+  override def withValue[N](value: N): GroupedUnitQty[N, UG] =
+    GroupedUnitQty(value, this)
 }
 
 object GroupedUnitType {

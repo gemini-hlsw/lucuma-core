@@ -21,7 +21,7 @@ import monocle.Lens
  *   The brightness unit type. For example: Integrated or Surface.
  */
 final case class TargetBrightness[T](
-  quantity: GroupedUnitQuantity[BrightnessValue, Brightness[T]],
+  quantity: GroupedUnitQty[BrightnessValue, Brightness[T]],
   band:     Band,
   error:    Option[BrightnessValue]
 ) {
@@ -33,14 +33,14 @@ final case class TargetBrightness[T](
 }
 
 object TargetBrightness {
-  def quantity[T]: Lens[TargetBrightness[T], GroupedUnitQuantity[BrightnessValue, Brightness[T]]] =
+  def quantity[T]: Lens[TargetBrightness[T], GroupedUnitQty[BrightnessValue, Brightness[T]]] =
     Focus[TargetBrightness[T]](_.quantity)
 
   def value[T]: Lens[TargetBrightness[T], BrightnessValue] =
-    quantity.andThen(GroupedUnitQuantity.value)
+    quantity.andThen(GroupedUnitQty.value)
 
   def unit[T]: Lens[TargetBrightness[T], GroupedUnitType[Brightness[T]]] =
-    quantity.andThen(GroupedUnitQuantity.unit)
+    quantity.andThen(GroupedUnitQty.unit)
 
   def band[T]: Lens[TargetBrightness[T], Band] = Focus[TargetBrightness[T]](_.band)
 
@@ -49,7 +49,7 @@ object TargetBrightness {
 
   /** Secondary constructor defaulting to no error. */
   def apply[T](
-    quantity: GroupedUnitQuantity[BrightnessValue, Brightness[T]],
+    quantity: GroupedUnitQty[BrightnessValue, Brightness[T]],
     band:     Band
   ): TargetBrightness[T] =
     new TargetBrightness(quantity, band, none)

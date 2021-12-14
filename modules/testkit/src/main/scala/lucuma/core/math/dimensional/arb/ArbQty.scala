@@ -27,9 +27,9 @@ trait ArbQty {
   implicit def cogenQty[N: Cogen]: Cogen[Qty[N]] =
     Cogen[(N, UnitType)].contramap(q => (q.value, q.unit))
 
-  implicit def arbGroupedUnitQuantity[N: Arbitrary, UG](implicit
+  implicit def arbGroupedUnitQty[N: Arbitrary, UG](implicit
     arbUnit: Arbitrary[GroupedUnitType[UG]]
-  ): Arbitrary[GroupedUnitQuantity[N, UG]] =
+  ): Arbitrary[GroupedUnitQty[N, UG]] =
     Arbitrary {
       for {
         n <- arbitrary[N]
@@ -37,9 +37,9 @@ trait ArbQty {
       } yield u.withValue(n)
     }
 
-  implicit def cogenGroupedUnitQuantity[N: Cogen, UG](implicit
+  implicit def cogenGroupedUnitQty[N: Cogen, UG](implicit
     cogenUnit: Cogen[GroupedUnitType[UG]]
-  ): Cogen[GroupedUnitQuantity[N, UG]] =
+  ): Cogen[GroupedUnitQty[N, UG]] =
     Cogen[(N, GroupedUnitType[UG])].contramap(q => (q.value, q.unit))
 }
 

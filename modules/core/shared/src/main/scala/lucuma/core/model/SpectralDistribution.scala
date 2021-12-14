@@ -14,7 +14,7 @@ import eu.timepit.refined.types.numeric.PosBigDecimal
 import lucuma.core.enum.NonStellarLibrarySpectrum
 import lucuma.core.enum.StellarLibrarySpectrum
 import lucuma.core.math.BrightnessUnits._
-import lucuma.core.math.dimensional.GroupedUnitQuantity
+import lucuma.core.math.dimensional.GroupedUnitQty
 import monocle.Focus
 import monocle.Lens
 import monocle.Optional
@@ -75,20 +75,19 @@ object SpectralDistribution {
   // TODO Check if BigDecimal [parse from/toString to] "5e-19"
   // Both line and continuum have to be specified. It's OK for both units not be congruent.
   final case class EmissionLine[+T](
-    line:      GroupedUnitQuantity[BigDecimal, LineFlux[T]],
-    continuum: GroupedUnitQuantity[BigDecimal, ContinuumFluxDensity[T]]
+    line:      GroupedUnitQty[BigDecimal, LineFlux[T]],
+    continuum: GroupedUnitQty[BigDecimal, ContinuumFluxDensity[T]]
   ) extends SpectralDistribution[T]
   object EmissionLine {
     implicit def eqEmissionLine[T]: Eq[EmissionLine[T]] =
       Eq.by(x => (x.line, x.continuum))
 
     /** @group Optics */
-    def line[T]: Lens[EmissionLine[T], GroupedUnitQuantity[BigDecimal, LineFlux[T]]] =
+    def line[T]: Lens[EmissionLine[T], GroupedUnitQty[BigDecimal, LineFlux[T]]] =
       Focus[EmissionLine[T]](_.line)
 
     /** @group Optics */
-    def continuum[T]
-      : Lens[EmissionLine[T], GroupedUnitQuantity[BigDecimal, ContinuumFluxDensity[T]]] =
+    def continuum[T]: Lens[EmissionLine[T], GroupedUnitQty[BigDecimal, ContinuumFluxDensity[T]]] =
       Focus[EmissionLine[T]](_.continuum)
   }
 

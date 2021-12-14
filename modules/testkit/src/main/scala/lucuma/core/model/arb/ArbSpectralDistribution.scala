@@ -51,8 +51,8 @@ trait ArbSpectralDistribution {
   ): Arbitrary[EmissionLine[T]] =
     Arbitrary {
       for {
-        l <- arbitrary[GroupedUnitQuantity[BigDecimal, LineFlux[T]]]
-        c <- arbitrary[GroupedUnitQuantity[BigDecimal, ContinuumFluxDensity[T]]]
+        l <- arbitrary[GroupedUnitQty[BigDecimal, LineFlux[T]]]
+        c <- arbitrary[GroupedUnitQty[BigDecimal, ContinuumFluxDensity[T]]]
       } yield EmissionLine[T](l, c)
     }
 
@@ -62,8 +62,8 @@ trait ArbSpectralDistribution {
   ): Cogen[EmissionLine[T]] =
     Cogen[
       (
-        GroupedUnitQuantity[BigDecimal, LineFlux[T]],
-        GroupedUnitQuantity[BigDecimal, ContinuumFluxDensity[T]]
+        GroupedUnitQty[BigDecimal, LineFlux[T]],
+        GroupedUnitQty[BigDecimal, ContinuumFluxDensity[T]]
       )
     ].contramap(x => (x.line, x.continuum))
 
