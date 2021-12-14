@@ -3,6 +3,7 @@
 
 package lucuma.core.math.dimensional
 
+import cats.Eq
 import coulomb.define._
 
 // All of this is a bridge between coulomb an runtime quantities (as defined in `Qty`).
@@ -23,6 +24,11 @@ trait UnitType { self =>
     val value = _value
     val unit  = self
   }
+}
+
+object UnitType {
+  // `UnitDefiniton`s are expected to be singletons.
+  implicit val eqUnitType: Eq[UnitType] = Eq.instance((a, b) => a.definition == b.definition)
 }
 
 /**
@@ -54,29 +60,41 @@ object UnitOfMeasure {
     new UnitOfMeasure[U] {
       val definition = ev
     }
+
+  // `UnitDefiniton`s are expected to be singletons.
+  implicit def eqUnitOfMeasure[U]: Eq[UnitOfMeasure[U]] =
+    Eq.instance((a, b) => a.definition == b.definition)
 }
 
 /**
- * Runtime association of a `UnitType` to group `G`.
+ * Runtime association of a `UnitType` to unit group `UG`.
  *
- * The group doesn't exist in runtime, it's just a type tag. It's covariant since we can have a
- * hierarchy of groups. Eg: We have unit groups for "integral brightness" and "surface brightness",
- * and they are both subgroups of the larger "brightness" group.
+ * The group doesn't exist in runtime, it's just a type tag.
  */
-trait GroupedUnitType[+G] extends UnitType {
-  override def withValue[N](value: N): GroupedUnitQuantity[N, G] =
-    GroupedUnitQuantity(value, this)
+trait GroupedUnitType[+UG] extends UnitType {
+  override def withValue[N](value: N): GroupedUnitQty[N, UG] =
+    GroupedUnitQty(value, this)
+}
+
+object GroupedUnitType {
+  // `UnitDefiniton`s are expected to be singletons.
+  implicit def eqGroupedUnitType[UG]: Eq[GroupedUnitType[UG]] =
+    Eq.instance((a, b) => a.definition == b.definition)
 }
 
 /**
  * Type-parametrized runtime representation of physical unit `U` and its association to unit group
- * `G`.
+ * `UG`.
  */
-trait GroupedUnitOfMeasure[+G, U] extends UnitOfMeasure[U] with GroupedUnitType[G]
+trait GroupedUnitOfMeasure[UG, U] extends UnitOfMeasure[U] with GroupedUnitType[UG]
 
 object GroupedUnitOfMeasure {
-  def apply[G, U](implicit unit: UnitOfMeasure[U]): GroupedUnitOfMeasure[G, U] =
-    new GroupedUnitOfMeasure[G, U] {
+  def apply[UG, U](implicit unit: UnitOfMeasure[U]): GroupedUnitOfMeasure[UG, U] =
+    new GroupedUnitOfMeasure[UG, U] {
       val definition = unit.definition
     }
+
+  // `UnitDefiniton`s are expected to be singletons.
+  implicit def eqGroupedUnitOfMeasure[UG, U]: Eq[GroupedUnitOfMeasure[UG, U]] =
+    Eq.instance((a, b) => a.definition == b.definition)
 }

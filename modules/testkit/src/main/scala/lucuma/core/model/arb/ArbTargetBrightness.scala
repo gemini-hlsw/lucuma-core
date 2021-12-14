@@ -4,55 +4,37 @@
 package lucuma.core.model
 package arb
 
-import cats.implicits._
-import coulomb.define.UnitDefinition
 import lucuma.core.enum.Band
-import lucuma.core.math.BrightnessUnit
+import lucuma.core.math.BrightnessUnits
 import lucuma.core.math.BrightnessValue
 import lucuma.core.math.arb.ArbBrightnessValue._
 import lucuma.core.math.dimensional._
+import lucuma.core.math.dimensional.arb.ArbQty
 import lucuma.core.util.arb.ArbEnumerated
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Cogen._
 import org.scalacheck._
 
-import scala.collection.immutable.SortedMap
-
 trait ArbTargetBrightness {
-
   import ArbEnumerated._
+  import BrightnessUnits._
+  import ArbQty._
 
-  implicit val arbTargetBrightness: Arbitrary[TargetBrightness] =
+  implicit def arbTargetBrightness[T](implicit
+    arbUnit: Arbitrary[GroupedUnitType[Brightness[T]]]
+  ): Arbitrary[TargetBrightness[T]] =
     Arbitrary {
       for {
-        s <- Gen.oneOf(
-               arbitrary[GroupedUnitType[BrightnessUnit.Integrated]],
-               arbitrary[GroupedUnitType[BrightnessUnit.Surface]]
-             )
-        v <- arbitrary[BrightnessValue]
+        q <- arbitrary[GroupedUnitQty[BrightnessValue, Brightness[T]]]
         b <- arbitrary[Band]
         e <- arbitrary[Option[BrightnessValue]]
-      } yield TargetBrightness(s.withValue(v), b, e)
+      } yield TargetBrightness(q, b, e)
     }
 
-  implicit val cogUnitDefinition: Cogen[UnitDefinition] =
-    Cogen[(String, String)].contramap(u => (u.name, u.abbv))
-
-  implicit def cogQuantityTrait[N: Cogen]: Cogen[Qty[N]] =
-    Cogen[(N, UnitDefinition)].contramap(q => (q.value, q.unit.definition))
-
-  implicit val cogBrightness: Cogen[TargetBrightness] =
+  implicit def cogTargetBrightness[B]: Cogen[TargetBrightness[B]] =
     Cogen[
       (Qty[BrightnessValue], Band, Option[BrightnessValue])
     ].contramap(u => (u.quantity, u.band, u.error))
-
-  implicit val arbBrightnessesMap: Arbitrary[SortedMap[Band, TargetBrightness]] =
-    Arbitrary(
-      arbitrary[Vector[TargetBrightness]].map(_.fproductLeft(_.band)).map(x => SortedMap(x: _*))
-    )
-
-  implicit val cogBrightnessesMap: Cogen[SortedMap[Band, TargetBrightness]] =
-    Cogen[Vector[(Band, TargetBrightness)]].contramap(_.toVector)
 }
 
 object ArbTargetBrightness extends ArbTargetBrightness

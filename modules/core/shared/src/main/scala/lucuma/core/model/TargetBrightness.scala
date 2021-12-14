@@ -6,7 +6,7 @@ package lucuma.core.model
 import cats._
 import cats.syntax.all._
 import lucuma.core.enum.Band
-import lucuma.core.math.BrightnessUnit
+import lucuma.core.math.BrightnessUnits._
 import lucuma.core.math.BrightnessValue
 import lucuma.core.math.dimensional._
 import monocle.Focus
@@ -16,9 +16,12 @@ import monocle.Lens
  * Describes the brightness of a target on a given band.
  *
  * This class replaces the previous `Magnitude`.
+ *
+ * @tparam T
+ *   The brightness unit type. For example: Integrated or Surface.
  */
-final case class TargetBrightness(
-  quantity: GroupedUnitQuantity[BrightnessValue, BrightnessUnit.Group],
+final case class TargetBrightness[T](
+  quantity: GroupedUnitQty[BrightnessValue, Brightness[T]],
   band:     Band,
   error:    Option[BrightnessValue]
 ) {
@@ -30,41 +33,48 @@ final case class TargetBrightness(
 }
 
 object TargetBrightness {
-  val quantity: Lens[TargetBrightness, GroupedUnitQuantity[BrightnessValue, BrightnessUnit.Group]] =
-    Focus[TargetBrightness](_.quantity)
+  def quantity[T]: Lens[TargetBrightness[T], GroupedUnitQty[BrightnessValue, Brightness[T]]] =
+    Focus[TargetBrightness[T]](_.quantity)
 
-  val value: Lens[TargetBrightness, BrightnessValue] = quantity.andThen(GroupedUnitQuantity.value)
+  def value[T]: Lens[TargetBrightness[T], BrightnessValue] =
+    quantity.andThen(GroupedUnitQty.value)
 
-  val unit: Lens[TargetBrightness, GroupedUnitType[BrightnessUnit.Group]] =
-    quantity.andThen(GroupedUnitQuantity.unit)
+  def unit[T]: Lens[TargetBrightness[T], GroupedUnitType[Brightness[T]]] =
+    quantity.andThen(GroupedUnitQty.unit)
 
-  val band: Lens[TargetBrightness, Band] = Focus[TargetBrightness](_.band)
+  def band[T]: Lens[TargetBrightness[T], Band] = Focus[TargetBrightness[T]](_.band)
 
-  val error: Lens[TargetBrightness, Option[BrightnessValue]] = Focus[TargetBrightness](_.error)
+  def error[T]: Lens[TargetBrightness[T], Option[BrightnessValue]] =
+    Focus[TargetBrightness[T]](_.error)
 
   /** Secondary constructor defaulting to no error. */
-  def apply[Units](
-    quantity: GroupedUnitQuantity[BrightnessValue, BrightnessUnit.Group],
+  def apply[T](
+    quantity: GroupedUnitQty[BrightnessValue, Brightness[T]],
     band:     Band
-  ): TargetBrightness =
+  ): TargetBrightness[T] =
     new TargetBrightness(quantity, band, none)
 
-  /** Secondary constructor defaulting to no error and default unit for given group. */
-  def apply[G <: BrightnessUnit.Group] = new GroupApplied[G]
-  class GroupApplied[G <: BrightnessUnit.Group] {
+  /** Secondary constructor using default units for the band. */
+  def apply[T] = new GroupApplied[T]
+  protected class GroupApplied[T] {
+    def apply[B <: Band](value: BrightnessValue, band: B, error: Option[BrightnessValue])(implicit
+      ev:                       Band.DefaultUnit[B, T]
+    ): TargetBrightness[T] =
+      new TargetBrightness(ev.unit.withValue(value), band, error)
+
     def apply[B <: Band](value: BrightnessValue, band: B)(implicit
-      ev:                       Band.DefaultUnit[B, G]
-    ): TargetBrightness =
-      new TargetBrightness(ev.unit.withValue(value), band, none)
+      ev:                       Band.DefaultUnit[B, T]
+    ): TargetBrightness[T] =
+      apply(value, band, none)
   }
 
-  implicit def TargetBrightnessOrder: Order[TargetBrightness] =
-    // TODO Now we can use the enums
-    // Not same order as before, this doesn't take into account unit definition order
-    Order.by(m => (m.quantity.unit.definition.name, m.band.tag, m.quantity.value, m.error))
+  implicit def TargetBrightnessOrder[T](implicit
+    unitOrder: Order[GroupedUnitType[Brightness[T]]]
+  ): Order[TargetBrightness[T]] =
+    Order.by(m => (m.quantity.unit, m.band.tag, m.quantity.value, m.error))
 
   /** group Typeclass Instances */
-  implicit def TargetBrightnessShow[Units]: Show[TargetBrightness] =
+  implicit def TargetBrightnessShow[UG]: Show[TargetBrightness[UG]] =
     Show.fromToString
 
 }

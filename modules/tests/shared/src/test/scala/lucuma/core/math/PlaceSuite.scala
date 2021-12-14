@@ -6,7 +6,7 @@ package lucuma.core.math
 import munit.DisciplineSuite
 import org.scalacheck.Prop._
 import cats.Show
-import coulomb.scalacheck.ArbQuantity._
+import coulomb.scalacheck.ArbQuantity
 import coulomb.cats.implicits._
 import eu.timepit.refined.auto._
 import eu.timepit.refined.scalacheck.numeric._
@@ -23,6 +23,7 @@ final class PlaceSuite extends DisciplineSuite {
   import ArbDeclination._
   import ArbAngle._
   import ArbTime._
+  import ArbQuantity._
 
   checkAll("Place", EqTests[Place].eqv)
 

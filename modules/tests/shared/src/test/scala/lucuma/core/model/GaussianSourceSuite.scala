@@ -3,19 +3,13 @@
 
 package lucuma.core.model
 
-import cats.kernel.laws.discipline.EqTests
-import lucuma.core.model.arb._
-import lucuma.core.model.SpatialProfile.GaussianSource
+import cats.kernel.laws.discipline._
 import munit._
 import lucuma.core.optics.laws.discipline.SplitMonoTests
 
-final class SpatialProfileSuite extends DisciplineSuite {
-  import ArbSpatialProfile._
+class GaussianSourceSuite extends DisciplineSuite {
+  import lucuma.core.model.arb.ArbGaussianSource._
 
-  // Laws
-  checkAll("Eq[SpatialProfile]", EqTests[SpatialProfile].eqv)
-
-  // Optics
+  checkAll("Eq[GaussianSource]", EqTests[GaussianSource].eqv)
   checkAll("GaussianSource.arcsec", SplitMonoTests(GaussianSource.arcsec).splitMono)
-
 }
