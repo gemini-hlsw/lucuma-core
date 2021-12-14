@@ -5,7 +5,7 @@ package lucuma
 package core
 package math
 
-import cats.syntax.all._
+import cats.data.NonEmptyList
 import lucuma.core.math.dimensional._
 import lucuma.core.math.units._
 import lucuma.core.util.Enumerated
@@ -16,78 +16,87 @@ object BrightnessUnits {
 
   trait Brightness[+T]
   trait LineFlux[+T]
-  trait ContinuumFluxDensity[+T]
+  trait FluxDensityContinuum[+T]
 
   object Brightness {
     object Integrated {
-      val all: List[GroupedUnitType[Brightness[Integrated]]] =
-        List(
-          UnitOfMeasure[VegaMagnitude],
-          UnitOfMeasure[ABMagnitude],
-          UnitOfMeasure[Jansky],
-          UnitOfMeasure[WattsBrightness],
-          UnitOfMeasure[ErgsWavelengthBrightness],
-          UnitOfMeasure[ErgsFrequencyBrightness]
-        ).map(_.groupedIn[Brightness[Integrated]])
+      val all: NonEmptyList[GroupedUnitType[Brightness[Integrated]]] =
+        NonEmptyList
+          .of(
+            UnitOfMeasure[VegaMagnitude],
+            UnitOfMeasure[ABMagnitude],
+            UnitOfMeasure[Jansky],
+            UnitOfMeasure[WattsBrightness],
+            UnitOfMeasure[ErgsWavelengthBrightness],
+            UnitOfMeasure[ErgsFrequencyBrightness]
+          )
+          .map(_.groupedIn[Brightness[Integrated]])
     }
 
     object Surface {
-      val all: List[GroupedUnitType[Brightness[Surface]]] =
-        List(
-          UnitOfMeasure[VegaMagnitudePerArcsec2],
-          UnitOfMeasure[ABMagnitudePerArcsec2],
-          UnitOfMeasure[JanskyPerArcsec2],
-          UnitOfMeasure[WattsBrightnessPerArcsec2],
-          UnitOfMeasure[ErgsWavelengthBrightnessPerArcsec2],
-          UnitOfMeasure[ErgsFrequencyBrightnessPerArcsec2]
-        ).map(_.groupedIn[Brightness[Surface]])
+      val all: NonEmptyList[GroupedUnitType[Brightness[Surface]]] =
+        NonEmptyList
+          .of(
+            UnitOfMeasure[VegaMagnitudePerArcsec2],
+            UnitOfMeasure[ABMagnitudePerArcsec2],
+            UnitOfMeasure[JanskyPerArcsec2],
+            UnitOfMeasure[WattsBrightnessPerArcsec2],
+            UnitOfMeasure[ErgsWavelengthBrightnessPerArcsec2],
+            UnitOfMeasure[ErgsFrequencyBrightnessPerArcsec2]
+          )
+          .map(_.groupedIn[Brightness[Surface]])
     }
   }
 
   object LineFlux {
     object Integrated {
-      val all: List[GroupedUnitType[LineFlux[Integrated]]] =
-        List(
-          UnitOfMeasure[WattsLineFlux],
-          UnitOfMeasure[ErgsLineFlux]
-        ).map(_.groupedIn[LineFlux[Integrated]])
+      val all: NonEmptyList[GroupedUnitType[LineFlux[Integrated]]] =
+        NonEmptyList
+          .of(
+            UnitOfMeasure[WattsLineFlux],
+            UnitOfMeasure[ErgsLineFlux]
+          )
+          .map(_.groupedIn[LineFlux[Integrated]])
     }
 
     object Surface {
-      val all: List[GroupedUnitType[LineFlux[Surface]]] =
-        List(
-          UnitOfMeasure[WattsLineFluxPerArcsec2],
-          UnitOfMeasure[ErgsLineFluxPerArcsec2]
-        ).map(_.groupedIn[LineFlux[Surface]])
+      val all: NonEmptyList[GroupedUnitType[LineFlux[Surface]]] =
+        NonEmptyList
+          .of(
+            UnitOfMeasure[WattsLineFluxPerArcsec2],
+            UnitOfMeasure[ErgsLineFluxPerArcsec2]
+          )
+          .map(_.groupedIn[LineFlux[Surface]])
     }
   }
 
-  object ContinuumFluxDensity {
+  object FluxDensityContinuum {
     object Integrated {
-      val all: List[GroupedUnitType[ContinuumFluxDensity[Integrated]]] =
-        List(
-          UnitOfMeasure[WattsBrightness],
-          UnitOfMeasure[ErgsWavelengthBrightness]
-        ).map(_.groupedIn[ContinuumFluxDensity[Integrated]])
+      val all: NonEmptyList[GroupedUnitType[FluxDensityContinuum[Integrated]]] =
+        NonEmptyList
+          .of(
+            UnitOfMeasure[WattsBrightness],
+            UnitOfMeasure[ErgsWavelengthBrightness]
+          )
+          .map(_.groupedIn[FluxDensityContinuum[Integrated]])
     }
 
     object Surface {
-      val all: List[GroupedUnitType[ContinuumFluxDensity[Surface]]] =
-        List(
-          UnitOfMeasure[WattsBrightnessPerArcsec2],
-          UnitOfMeasure[ErgsWavelengthBrightnessPerArcsec2]
-        ).map(_.groupedIn[ContinuumFluxDensity[Surface]])
+      val all: NonEmptyList[GroupedUnitType[FluxDensityContinuum[Surface]]] =
+        NonEmptyList
+          .of(
+            UnitOfMeasure[WattsBrightnessPerArcsec2],
+            UnitOfMeasure[ErgsWavelengthBrightnessPerArcsec2]
+          )
+          .map(_.groupedIn[FluxDensityContinuum[Surface]])
     }
 
   }
 
   private def enumGroupedUnitType[UG](
-    allList: List[GroupedUnitType[UG]]
-  ): Enumerated[GroupedUnitType[UG]] = new Enumerated[GroupedUnitType[UG]] {
-    val all                                                    = allList
-    def tag(a: GroupedUnitType[UG])                            = a.definition.abbv
-    override def unsafeFromTag(s: String): GroupedUnitType[UG] = all.find(tag(_) === s).get
-  }
+    allList: NonEmptyList[GroupedUnitType[UG]]
+  ): Enumerated[GroupedUnitType[UG]] =
+    Enumerated.fromNEL(allList).withTag(_.definition.abbv)
 
   implicit val enumBrightnessIntegrated: Enumerated[GroupedUnitType[Brightness[Integrated]]] =
     enumGroupedUnitType[Brightness[Integrated]](Brightness.Integrated.all)
@@ -101,11 +110,11 @@ object BrightnessUnits {
   implicit val enumLineFluxSurface: Enumerated[GroupedUnitType[LineFlux[Surface]]] =
     enumGroupedUnitType[LineFlux[Surface]](LineFlux.Surface.all)
 
-  implicit val enumContinuumFluxDensityIntegrated
-    : Enumerated[GroupedUnitType[ContinuumFluxDensity[Integrated]]] =
-    enumGroupedUnitType[ContinuumFluxDensity[Integrated]](ContinuumFluxDensity.Integrated.all)
+  implicit val enumFluxDensityContinuumIntegrated
+    : Enumerated[GroupedUnitType[FluxDensityContinuum[Integrated]]] =
+    enumGroupedUnitType[FluxDensityContinuum[Integrated]](FluxDensityContinuum.Integrated.all)
 
-  implicit val enumContinuumFluxDensitySurface
-    : Enumerated[GroupedUnitType[ContinuumFluxDensity[Surface]]] =
-    enumGroupedUnitType[ContinuumFluxDensity[Surface]](ContinuumFluxDensity.Surface.all)
+  implicit val enumFluxDensityContinuumSurface
+    : Enumerated[GroupedUnitType[FluxDensityContinuum[Surface]]] =
+    enumGroupedUnitType[FluxDensityContinuum[Surface]](FluxDensityContinuum.Surface.all)
 }

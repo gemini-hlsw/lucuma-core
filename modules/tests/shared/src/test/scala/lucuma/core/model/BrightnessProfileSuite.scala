@@ -4,13 +4,10 @@
 package lucuma.core.model
 
 import cats.kernel.laws.discipline._
-import eu.timepit.refined.cats._
 import lucuma.core.model.arb._
 import monocle.law.discipline._
 import munit._
 import lucuma.core.util.arb.ArbEnumerated
-import org.scalacheck.Arbitrary._
-import org.scalacheck.Cogen._
 import lucuma.core.enum.Band
 
 final class BrightnessProfileSuite extends DisciplineSuite {

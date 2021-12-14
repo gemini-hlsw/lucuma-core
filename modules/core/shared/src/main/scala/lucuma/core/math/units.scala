@@ -151,8 +151,6 @@ trait units {
   implicit val defineErgsFrequencyBrightnessPerArcsec2 =
     defineSurfaceUnit[ErgsFrequencyBrightnessPerArcsec2, ErgsFrequencyBrightness]
 
-  // line_flux and continuum_flux_density (which is the same as brightness??)
-
   // Integrated Line Flux units
   type WattsLineFlux
   implicit val defineWattsLineFlux =

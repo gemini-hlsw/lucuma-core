@@ -31,9 +31,11 @@ trait ArbTargetBrightness {
       } yield TargetBrightness(q, b, e)
     }
 
-  implicit def cogTargetBrightness[B]: Cogen[TargetBrightness[B]] =
+  implicit def cogTargetBrightness[T](implicit
+    cogenUnit: Cogen[GroupedUnitType[Brightness[T]]]
+  ): Cogen[TargetBrightness[T]] =
     Cogen[
-      (Qty[BrightnessValue], Band, Option[BrightnessValue])
+      (GroupedUnitQty[BrightnessValue, Brightness[T]], Band, Option[BrightnessValue])
     ].contramap(u => (u.quantity, u.band, u.error))
 }
 
