@@ -5,7 +5,7 @@ package lucuma.core.model
 package arb
 
 import lucuma.core.enum.Band
-import lucuma.core.math.BrightnessUnit
+import lucuma.core.math.BrightnessUnits
 import lucuma.core.math.BrightnessValue
 import lucuma.core.math.arb.ArbBrightnessValue._
 import lucuma.core.math.dimensional._
@@ -17,7 +17,7 @@ import org.scalacheck._
 
 trait ArbTargetBrightness {
   import ArbEnumerated._
-  import BrightnessUnit._
+  import BrightnessUnits._
   import ArbQty._
 
   implicit def arbTargetBrightness[T](implicit

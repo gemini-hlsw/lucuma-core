@@ -6,7 +6,7 @@ package arb
 
 import cats.syntax.all._
 import lucuma.core.enum.Band
-import lucuma.core.math.BrightnessUnit
+import lucuma.core.math.BrightnessUnits
 import lucuma.core.math.dimensional._
 import lucuma.core.util.arb.ArbEnumerated
 import org.scalacheck.Arbitrary.arbitrary
@@ -19,7 +19,7 @@ trait ArbBrightnessProfile {
   import ArbTargetBrightness._
   import ArbEnumerated._
   import ArbGaussianSource._
-  import BrightnessUnit._
+  import BrightnessUnits._
 
   implicit def arbBrightnessesMap[T](implicit
     arbUnit: Arbitrary[GroupedUnitType[Brightness[T]]]

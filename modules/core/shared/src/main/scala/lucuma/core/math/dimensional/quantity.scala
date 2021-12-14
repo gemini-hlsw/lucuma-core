@@ -44,5 +44,6 @@ object GroupedUnitQuantity {
   def unit[N, UG]: Lens[GroupedUnitQuantity[N, UG], GroupedUnitType[UG]] =
     Focus[GroupedUnitQuantity[N, UG]](_.unit)
 
-  implicit def eqGroupedUnitQuantity[N, UG]: Eq[GroupedUnitQuantity[N, UG]] = Eq.fromUniversalEquals
+  implicit def eqGroupedUnitQuantity[N: Eq, UG]: Eq[GroupedUnitQuantity[N, UG]] =
+    Eq.by(x => (x.value, x.unit))
 }

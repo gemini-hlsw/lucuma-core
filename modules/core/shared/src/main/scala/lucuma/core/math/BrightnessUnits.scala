@@ -10,7 +10,7 @@ import lucuma.core.math.dimensional._
 import lucuma.core.math.units._
 import lucuma.core.util.Enumerated
 
-object BrightnessUnit {
+object BrightnessUnits {
   type Integrated
   type Surface
 
@@ -81,55 +81,31 @@ object BrightnessUnit {
 
   }
 
+  private def enumGroupedUnitType[UG](
+    allList: List[GroupedUnitType[UG]]
+  ): Enumerated[GroupedUnitType[UG]] = new Enumerated[GroupedUnitType[UG]] {
+    val all                                                    = allList
+    def tag(a: GroupedUnitType[UG])                            = a.definition.abbv
+    override def unsafeFromTag(s: String): GroupedUnitType[UG] = all.find(tag(_) === s).get
+  }
+
   implicit val enumBrightnessIntegrated: Enumerated[GroupedUnitType[Brightness[Integrated]]] =
-    new Enumerated[GroupedUnitType[Brightness[Integrated]]] {
-      val all                                                                        = Brightness.Integrated.all
-      def tag(a: GroupedUnitType[Brightness[Integrated]])                            = a.definition.abbv
-      override def unsafeFromTag(s: String): GroupedUnitType[Brightness[Integrated]] =
-        all.find(tag(_) === s).get
-    }
+    enumGroupedUnitType[Brightness[Integrated]](Brightness.Integrated.all)
 
   implicit val enumBrightnessSurface: Enumerated[GroupedUnitType[Brightness[Surface]]] =
-    new Enumerated[GroupedUnitType[Brightness[Surface]]] {
-      val all                                                                     = Brightness.Surface.all
-      def tag(a: GroupedUnitType[Brightness[Surface]])                            = a.definition.abbv
-      override def unsafeFromTag(s: String): GroupedUnitType[Brightness[Surface]] =
-        all.find(tag(_) === s).get
-    }
+    enumGroupedUnitType[Brightness[Surface]](Brightness.Surface.all)
 
   implicit val enumLineFluxIntegrated: Enumerated[GroupedUnitType[LineFlux[Integrated]]] =
-    new Enumerated[GroupedUnitType[LineFlux[Integrated]]] {
-      val all                                                                      = LineFlux.Integrated.all
-      def tag(a: GroupedUnitType[LineFlux[Integrated]])                            = a.definition.abbv
-      override def unsafeFromTag(s: String): GroupedUnitType[LineFlux[Integrated]] =
-        all.find(tag(_) === s).get
-    }
+    enumGroupedUnitType[LineFlux[Integrated]](LineFlux.Integrated.all)
 
   implicit val enumLineFluxSurface: Enumerated[GroupedUnitType[LineFlux[Surface]]] =
-    new Enumerated[GroupedUnitType[LineFlux[Surface]]] {
-      val all                                                                   = LineFlux.Surface.all
-      def tag(a: GroupedUnitType[LineFlux[Surface]])                            = a.definition.abbv
-      override def unsafeFromTag(s: String): GroupedUnitType[LineFlux[Surface]] =
-        all.find(tag(_) === s).get
-    }
-
-  //
+    enumGroupedUnitType[LineFlux[Surface]](LineFlux.Surface.all)
 
   implicit val enumContinuumFluxDensityIntegrated
     : Enumerated[GroupedUnitType[ContinuumFluxDensity[Integrated]]] =
-    new Enumerated[GroupedUnitType[ContinuumFluxDensity[Integrated]]] {
-      val all                                                                                  = ContinuumFluxDensity.Integrated.all
-      def tag(a: GroupedUnitType[ContinuumFluxDensity[Integrated]])                            = a.definition.abbv
-      override def unsafeFromTag(s: String): GroupedUnitType[ContinuumFluxDensity[Integrated]] =
-        all.find(tag(_) === s).get
-    }
+    enumGroupedUnitType[ContinuumFluxDensity[Integrated]](ContinuumFluxDensity.Integrated.all)
 
   implicit val enumContinuumFluxDensitySurface
     : Enumerated[GroupedUnitType[ContinuumFluxDensity[Surface]]] =
-    new Enumerated[GroupedUnitType[ContinuumFluxDensity[Surface]]] {
-      val all                                                                               = ContinuumFluxDensity.Surface.all
-      def tag(a: GroupedUnitType[ContinuumFluxDensity[Surface]])                            = a.definition.abbv
-      override def unsafeFromTag(s: String): GroupedUnitType[ContinuumFluxDensity[Surface]] =
-        all.find(tag(_) === s).get
-    }
+    enumGroupedUnitType[ContinuumFluxDensity[Surface]](ContinuumFluxDensity.Surface.all)
 }

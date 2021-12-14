@@ -60,6 +60,10 @@ object UnitOfMeasure {
     new UnitOfMeasure[U] {
       val definition = ev
     }
+
+  // `UnitDefiniton`s are expected to be singletons.
+  implicit def eqUnitOfMeasure[U]: Eq[UnitOfMeasure[U]] =
+    Eq.instance((a, b) => a.definition == b.definition)
 }
 
 /**
@@ -70,6 +74,12 @@ object UnitOfMeasure {
 trait GroupedUnitType[+UG] extends UnitType {
   override def withValue[N](value: N): GroupedUnitQuantity[N, UG] =
     GroupedUnitQuantity(value, this)
+}
+
+object GroupedUnitType {
+  // `UnitDefiniton`s are expected to be singletons.
+  implicit def eqGroupedUnitType[UG]: Eq[GroupedUnitType[UG]] =
+    Eq.instance((a, b) => a.definition == b.definition)
 }
 
 /**
@@ -83,4 +93,8 @@ object GroupedUnitOfMeasure {
     new GroupedUnitOfMeasure[UG, U] {
       val definition = unit.definition
     }
+
+  // `UnitDefiniton`s are expected to be singletons.
+  implicit def eqGroupedUnitOfMeasure[UG, U]: Eq[GroupedUnitOfMeasure[UG, U]] =
+    Eq.instance((a, b) => a.definition == b.definition)
 }

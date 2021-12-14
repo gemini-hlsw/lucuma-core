@@ -12,7 +12,7 @@ import coulomb.refined._
 import eu.timepit.refined.auto._
 import eu.timepit.refined.numeric.Positive
 import eu.timepit.refined.types.numeric.PosInt
-import lucuma.core.math.BrightnessUnit._
+import lucuma.core.math.BrightnessUnits._
 import lucuma.core.math.Wavelength
 import lucuma.core.math.dimensional._
 import lucuma.core.math.units.Nanometer

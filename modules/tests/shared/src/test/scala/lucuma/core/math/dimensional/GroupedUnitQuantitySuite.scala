@@ -5,7 +5,7 @@ package lucuma.core.math.dimensional
 
 import cats.kernel.laws.discipline._
 import monocle.law.discipline._
-import lucuma.core.math.BrightnessUnit._
+import lucuma.core.math.BrightnessUnits._
 import lucuma.core.util.arb.ArbEnumerated._
 import lucuma.core.math.dimensional.arb.ArbQty._
 

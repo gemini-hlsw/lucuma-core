@@ -5,14 +5,14 @@ package lucuma.core.model
 import cats.kernel.laws.discipline._
 import lucuma.core.model.arb._
 import munit._
-import lucuma.core.math.BrightnessUnit
+import lucuma.core.math.BrightnessUnits
 import lucuma.core.util.arb.ArbEnumerated
 
 final class TargetBrightnessSuite extends DisciplineSuite {
 
   import ArbTargetBrightness._
   import ArbEnumerated._
-  import BrightnessUnit._
+  import BrightnessUnits._
 
   // Laws
   checkAll(

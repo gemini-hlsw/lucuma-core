@@ -6,7 +6,7 @@ package lucuma.core.model
 import cats.kernel.laws.discipline._
 import lucuma.core.model.arb._
 import munit._
-import lucuma.core.math.BrightnessUnit
+import lucuma.core.math.BrightnessUnits
 import lucuma.core.math.arb.ArbRefined
 import lucuma.core.util.arb.ArbEnumerated
 import monocle.law.discipline.LensTests
@@ -20,7 +20,7 @@ import coulomb.cats.implicits._
 final class SpectralDistributionSuite extends DisciplineSuite {
   import SpectralDistribution._
   import ArbSpectralDistribution._
-  import BrightnessUnit._
+  import BrightnessUnits._
   import ArbEnumerated._
   import ArbQuantity._
   import ArbQty._

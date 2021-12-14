@@ -6,7 +6,7 @@ package lucuma.core.model
 import cats.Eq
 import cats.syntax.all._
 import lucuma.core.enum.Band
-import lucuma.core.math.BrightnessUnit._
+import lucuma.core.math.BrightnessUnits._
 import monocle.Focus
 import monocle.Lens
 import monocle.Optional

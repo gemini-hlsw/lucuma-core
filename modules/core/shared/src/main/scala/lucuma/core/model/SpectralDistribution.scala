@@ -13,7 +13,7 @@ import eu.timepit.refined.cats._
 import eu.timepit.refined.types.numeric.PosBigDecimal
 import lucuma.core.enum.NonStellarLibrarySpectrum
 import lucuma.core.enum.StellarLibrarySpectrum
-import lucuma.core.math.BrightnessUnit._
+import lucuma.core.math.BrightnessUnits._
 import lucuma.core.math.dimensional.GroupedUnitQuantity
 import monocle.Focus
 import monocle.Lens

@@ -84,8 +84,6 @@ final class JulianDateSuute extends munit.DisciplineSuite {
   }
 
   test("JulianDate.ofInstant(instant).toInstant === instant") {
-    // implicit val InstantEq: Eq[Instant] = Eq.fromUniversalEquals
-
     val positiveJDInstant =
       implicitly[Arbitrary[Instant]].arbitrary.suchThat(i => !(i.isBefore(JulianDate.Epoch)))
 

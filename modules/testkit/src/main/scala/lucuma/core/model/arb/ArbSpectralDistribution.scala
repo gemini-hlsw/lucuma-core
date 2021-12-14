@@ -10,7 +10,7 @@ import coulomb.si.Kelvin
 import eu.timepit.refined.numeric.Positive
 import lucuma.core.enum.NonStellarLibrarySpectrum
 import lucuma.core.enum.StellarLibrarySpectrum
-import lucuma.core.math.BrightnessUnit
+import lucuma.core.math.BrightnessUnits
 import lucuma.core.math.dimensional._
 import lucuma.core.math.dimensional.arb.ArbQty
 import lucuma.core.util.arb.ArbEnumerated
@@ -20,7 +20,7 @@ import org.scalacheck._
 trait ArbSpectralDistribution {
   import ArbEnumerated._
   import SpectralDistribution._
-  import BrightnessUnit._
+  import BrightnessUnits._
   import ArbQty._
 
   implicit val arbLibrary: Arbitrary[Library] =
