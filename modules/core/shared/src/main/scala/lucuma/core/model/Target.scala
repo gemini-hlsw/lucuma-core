@@ -18,73 +18,69 @@ import monocle.macros.GenPrism
 /** A target of observation. */
 sealed trait Target extends Product with Serializable {
   def name: NonEmptyString
-  def brightnessProfile: BrightnessProfile
-  def angularSize: Option[AngularSize]
-}
-
-final case class SiderealTarget(
-  name:              NonEmptyString,
-  tracking:          SiderealTracking,
-  brightnessProfile: BrightnessProfile,
-  angularSize:       Option[AngularSize] // This is just used for visualization
-) extends Target
-
-object SiderealTarget extends SiderealTargetOptics {
-  implicit val SiderealTargetTargetEq: Eq[SiderealTarget] =
-    Eq.by(x => (x.name, x.tracking, x.brightnessProfile))
-
-  /**
-   * A sidereal target order based on tracking information, which roughly means by base coordinate
-   * without applying proper motion.
-   *
-   * Not implicit.
-   */
-  val TrackOrder: Order[SiderealTarget] =
-    Order.by(x => (x.tracking, x.name, x.brightnessProfile.bands))
-
-  /**
-   * Sidereal targets ordered by name first and then tracking information.
-   *
-   * Not implicit.
-   */
-  val NameOrder: Order[SiderealTarget] =
-    Order.by(x => (x.name, x.tracking, x.brightnessProfile.bands))
-}
-
-final case class NonsiderealTarget(
-  name:              NonEmptyString,
-  ephemerisKey:      EphemerisKey,
-  brightnessProfile: BrightnessProfile,
-  angularSize:       Option[AngularSize]
-) extends Target
-
-object NonsiderealTarget extends NonsiderealTargetOptics {
-  implicit val NonsiderealTargetTargetEq: Eq[NonsiderealTarget] =
-    Eq.by(x => (x.name, x.ephemerisKey, x.brightnessProfile))
-
-  /**
-   * A nonsidereal target order based on ephemeris key.
-   *
-   * Not implicit.
-   */
-  val TrackOrder: Order[NonsiderealTarget] =
-    Order.by(x => (x.ephemerisKey, x.name, x.brightnessProfile.bands))
-
-  /**
-   * Nonsidereal targets ordered by name first and then ephemeris key.
-   *
-   * Not implicit.
-   */
-  val NameOrder: Order[NonsiderealTarget] =
-    Order.by(x => (x.name, x.ephemerisKey, x.brightnessProfile.bands))
+  def sourceProfile: SourceProfile
+  def angularSize: Option[AngularSize] // This is just used for visualization
 }
 
 object Target extends WithId('t') with TargetOptics {
 
+  final case class Sidereal(
+    name:          NonEmptyString,
+    tracking:      SiderealTracking,
+    sourceProfile: SourceProfile,
+    angularSize:   Option[AngularSize]
+  ) extends Target
+
+  object Sidereal extends SiderealOptics {
+    implicit val eqSidereal: Eq[Sidereal] =
+      Eq.by(x => (x.name, x.tracking, x.sourceProfile))
+
+    /**
+     * A sidereal target order based on tracking information, which roughly means by base coordinate
+     * without applying proper motion.
+     *
+     * Not implicit.
+     */
+    val TrackOrder: Order[Sidereal] = Order.by(x => (x.tracking, x.name))
+
+    /**
+     * Sidereal targets ordered by name first and then tracking information.
+     *
+     * Not implicit.
+     */
+    val NameOrder: Order[Sidereal] = Order.by(x => (x.name, x.tracking))
+  }
+
+  final case class Nonsidereal(
+    name:          NonEmptyString,
+    ephemerisKey:  EphemerisKey,
+    sourceProfile: SourceProfile,
+    angularSize:   Option[AngularSize]
+  ) extends Target
+
+  object Nonsidereal extends NonsiderealOptics {
+    implicit val eqNonsidereal: Eq[Nonsidereal] =
+      Eq.by(x => (x.name, x.ephemerisKey, x.sourceProfile))
+
+    /**
+     * A nonsidereal target order based on ephemeris key.
+     *
+     * Not implicit.
+     */
+    val TrackOrder: Order[Nonsidereal] = Order.by(x => (x.ephemerisKey, x.name))
+
+    /**
+     * Nonsidereal targets ordered by name first and then ephemeris key.
+     *
+     * Not implicit.
+     */
+    val NameOrder: Order[Nonsidereal] = Order.by(x => (x.name, x.ephemerisKey))
+  }
+
   implicit val TargetEq: Eq[Target] = Eq.instance {
-    case (a @ SiderealTarget(_, _, _, _), b @ SiderealTarget(_, _, _, _))       => a === b
-    case (a @ NonsiderealTarget(_, _, _, _), b @ NonsiderealTarget(_, _, _, _)) => a === b
-    case _                                                                      => false
+    case (a @ Sidereal(_, _, _, _), b @ Sidereal(_, _, _, _))       => a === b
+    case (a @ Nonsidereal(_, _, _, _), b @ Nonsidereal(_, _, _, _)) => a === b
+    case _                                                          => false
   }
 
   /**
@@ -95,12 +91,12 @@ object Target extends WithId('t') with TargetOptics {
    */
   val TrackOrder: Order[Target] =
     Order.from {
-      case (a @ SiderealTarget(_, _, _, _), b @ SiderealTarget(_, _, _, _))       =>
-        SiderealTarget.TrackOrder.compare(a, b)
-      case (a @ NonsiderealTarget(_, _, _, _), b @ NonsiderealTarget(_, _, _, _)) =>
-        NonsiderealTarget.TrackOrder.compare(a, b)
-      case (NonsiderealTarget(_, _, _, _), _)                                     => -1
-      case _                                                                      => 1
+      case (a @ Sidereal(_, _, _, _), b @ Sidereal(_, _, _, _))       =>
+        Sidereal.TrackOrder.compare(a, b)
+      case (a @ Nonsidereal(_, _, _, _), b @ Nonsidereal(_, _, _, _)) =>
+        Nonsidereal.TrackOrder.compare(a, b)
+      case (Nonsidereal(_, _, _, _), _)                               => -1
+      case _                                                          => 1
     }
 
   /**
@@ -110,111 +106,111 @@ object Target extends WithId('t') with TargetOptics {
    */
   val NameOrder: Order[Target] =
     Order.from {
-      case (a @ SiderealTarget(_, _, _, _), b @ SiderealTarget(_, _, _, _))       =>
-        SiderealTarget.NameOrder.compare(a, b)
-      case (a @ NonsiderealTarget(_, _, _, _), b @ NonsiderealTarget(_, _, _, _)) =>
-        NonsiderealTarget.NameOrder.compare(a, b)
-      case (NonsiderealTarget(_, _, _, _), _)                                     => -1
-      case _                                                                      => 1
+      case (a @ Sidereal(_, _, _, _), b @ Sidereal(_, _, _, _))       =>
+        Sidereal.NameOrder.compare(a, b)
+      case (a @ Nonsidereal(_, _, _, _), b @ Nonsidereal(_, _, _, _)) =>
+        Nonsidereal.NameOrder.compare(a, b)
+      case (Nonsidereal(_, _, _, _), _)                               => -1
+      case _                                                          => 1
     }
-}
 
-trait SiderealTargetOptics { this: SiderealTarget.type =>
+  trait SiderealOptics { this: Sidereal.type =>
 
-  /** @group Optics */
-  val name: Lens[SiderealTarget, NonEmptyString] =
-    Focus[SiderealTarget](_.name)
+    /** @group Optics */
+    val name: Lens[Sidereal, NonEmptyString] =
+      Focus[Sidereal](_.name)
 
-  /** @group Optics */
-  val tracking: Lens[SiderealTarget, SiderealTracking] =
-    Focus[SiderealTarget](_.tracking)
+    /** @group Optics */
+    val tracking: Lens[Sidereal, SiderealTracking] =
+      Focus[Sidereal](_.tracking)
 
-  /** @group Optics */
-  val brightnessProfile: Lens[SiderealTarget, BrightnessProfile] =
-    Focus[SiderealTarget](_.brightnessProfile)
+    /** @group Optics */
+    val sourceProfile: Lens[Sidereal, SourceProfile] =
+      Focus[Sidereal](_.sourceProfile)
 
-  /** @group Optics */
-  val parallax: Lens[SiderealTarget, Option[Parallax]] =
-    tracking.andThen(SiderealTracking.parallax)
+    /** @group Optics */
+    val parallax: Lens[Sidereal, Option[Parallax]] =
+      tracking.andThen(SiderealTracking.parallax)
 
-  /** @group Optics */
-  val radialVelocity: Lens[SiderealTarget, Option[RadialVelocity]] =
-    tracking.andThen(SiderealTracking.radialVelocity)
+    /** @group Optics */
+    val radialVelocity: Lens[Sidereal, Option[RadialVelocity]] =
+      tracking.andThen(SiderealTracking.radialVelocity)
 
-  /** @group Optics */
-  val baseCoordinates: Lens[SiderealTarget, Coordinates] =
-    tracking.andThen(SiderealTracking.baseCoordinates)
+    /** @group Optics */
+    val baseCoordinates: Lens[Sidereal, Coordinates] =
+      tracking.andThen(SiderealTracking.baseCoordinates)
 
-  /** @group Optics */
-  val baseRA: Lens[SiderealTarget, RightAscension] =
-    baseCoordinates.andThen(Coordinates.rightAscension)
+    /** @group Optics */
+    val baseRA: Lens[Sidereal, RightAscension] =
+      baseCoordinates.andThen(Coordinates.rightAscension)
 
-  /** @group Optics */
-  val baseDec: Lens[SiderealTarget, Declination] =
-    baseCoordinates.andThen(Coordinates.declination)
+    /** @group Optics */
+    val baseDec: Lens[Sidereal, Declination] =
+      baseCoordinates.andThen(Coordinates.declination)
 
-  /** @group Optics */
-  val catalogId: Lens[SiderealTarget, Option[CatalogId]] =
-    tracking.andThen(SiderealTracking.catalogId)
+    /** @group Optics */
+    val catalogId: Lens[Sidereal, Option[CatalogId]] =
+      tracking.andThen(SiderealTracking.catalogId)
 
-  /** @group Optics */
-  val epoch: Lens[SiderealTarget, Epoch] =
-    tracking.andThen(SiderealTracking.epoch)
+    /** @group Optics */
+    val epoch: Lens[Sidereal, Epoch] =
+      tracking.andThen(SiderealTracking.epoch)
 
-  /** @group Optics */
-  val properMotion: Lens[SiderealTarget, Option[ProperMotion]] =
-    tracking.andThen(SiderealTracking.properMotion)
+    /** @group Optics */
+    val properMotion: Lens[Sidereal, Option[ProperMotion]] =
+      tracking.andThen(SiderealTracking.properMotion)
 
-  /** @group Optics */
-  val properMotionRA: Optional[SiderealTarget, ProperMotion.RA] =
-    properMotion.some.andThen(ProperMotion.ra)
+    /** @group Optics */
+    val properMotionRA: Optional[Sidereal, ProperMotion.RA] =
+      properMotion.some.andThen(ProperMotion.ra)
 
-  /** @group Optics */
-  val properMotionDec: Optional[SiderealTarget, ProperMotion.Dec] =
-    properMotion.some.andThen(ProperMotion.dec)
-}
+    /** @group Optics */
+    val properMotionDec: Optional[Sidereal, ProperMotion.Dec] =
+      properMotion.some.andThen(ProperMotion.dec)
+  }
 
-trait NonsiderealTargetOptics { this: NonsiderealTarget.type =>
+  trait NonsiderealOptics { this: Nonsidereal.type =>
 
-  /** @group Optics */
-  val name: Lens[NonsiderealTarget, NonEmptyString] =
-    Focus[NonsiderealTarget](_.name)
+    /** @group Optics */
+    val name: Lens[Nonsidereal, NonEmptyString] =
+      Focus[Nonsidereal](_.name)
 
-  /** @group Optics */
-  val ephemerisKey: Lens[NonsiderealTarget, EphemerisKey] =
-    Focus[NonsiderealTarget](_.ephemerisKey)
+    /** @group Optics */
+    val ephemerisKey: Lens[Nonsidereal, EphemerisKey] =
+      Focus[Nonsidereal](_.ephemerisKey)
 
-  val brightnessProfile: Lens[NonsiderealTarget, BrightnessProfile] =
-    Focus[NonsiderealTarget](_.brightnessProfile)
+    val sourceProfile: Lens[Nonsidereal, SourceProfile] =
+      Focus[Nonsidereal](_.sourceProfile)
+  }
 }
 
 trait TargetOptics { this: Target.type =>
 
   /** @group Optics */
-  val sidereal: Prism[Target, SiderealTarget] = GenPrism[Target, SiderealTarget]
+  val sidereal: Prism[Target, Target.Sidereal] = GenPrism[Target, Target.Sidereal]
 
   /** @group Optics */
-  val nonsidereal: Prism[Target, NonsiderealTarget] = GenPrism[Target, NonsiderealTarget]
+  val nonsidereal: Prism[Target, Target.Nonsidereal] = GenPrism[Target, Target.Nonsidereal]
 
   /** @group Optics */
   val name: Lens[Target, NonEmptyString] =
     Lens[Target, NonEmptyString](_.name)(v => {
-      case t @ SiderealTarget(_, _, _, _)    => SiderealTarget.name.replace(v)(t)
-      case t @ NonsiderealTarget(_, _, _, _) => NonsiderealTarget.name.replace(v)(t)
+      case t @ Target.Sidereal(_, _, _, _)    => Target.Sidereal.name.replace(v)(t)
+      case t @ Target.Nonsidereal(_, _, _, _) => Target.Nonsidereal.name.replace(v)(t)
     })
 
   /** @group Optics */
   val ephemerisKey: Optional[Target, EphemerisKey] =
-    nonsidereal.andThen(NonsiderealTarget.ephemerisKey)
+    nonsidereal.andThen(Nonsidereal.ephemerisKey)
 
   /** @group Optics */
   val siderealTracking: Optional[Target, SiderealTracking] =
-    sidereal.andThen(SiderealTarget.tracking)
+    sidereal.andThen(Sidereal.tracking)
 
-  val brightnessProfile: Lens[Target, BrightnessProfile] =
-    Lens[Target, BrightnessProfile](_.brightnessProfile)(v => {
-      case t @ SiderealTarget(_, _, _, _)    => SiderealTarget.brightnessProfile.replace(v)(t)
-      case t @ NonsiderealTarget(_, _, _, _) => NonsiderealTarget.brightnessProfile.replace(v)(t)
+  val sourceProfile: Lens[Target, SourceProfile] =
+    Lens[Target, SourceProfile](_.sourceProfile)(v => {
+      case t @ Target.Sidereal(_, _, _, _)    => Target.Sidereal.sourceProfile.replace(v)(t)
+      case t @ Target.Nonsidereal(_, _, _, _) => Target.Nonsidereal.sourceProfile.replace(v)(t)
     })
 
   /** @group Optics */
@@ -239,21 +235,21 @@ trait TargetOptics { this: Target.type =>
 
   /** @group Optics */
   val catalogId: Optional[Target, Option[CatalogId]] =
-    sidereal.andThen(SiderealTarget.catalogId)
+    sidereal.andThen(Sidereal.catalogId)
 
   /** @group Optics */
   val epoch: Optional[Target, Epoch] =
-    sidereal.andThen(SiderealTarget.epoch)
+    sidereal.andThen(Sidereal.epoch)
 
   /** @group Optics */
   val properMotion: Optional[Target, Option[ProperMotion]] =
-    sidereal.andThen(SiderealTarget.properMotion)
+    sidereal.andThen(Sidereal.properMotion)
 
   /** @group Optics */
   val properMotionRA: Optional[Target, ProperMotion.RA] =
-    sidereal.andThen(SiderealTarget.properMotionRA)
+    sidereal.andThen(Sidereal.properMotionRA)
 
   /** @group Optics */
   val properMotionDec: Optional[Target, ProperMotion.Dec] =
-    sidereal.andThen(SiderealTarget.properMotionDec)
+    sidereal.andThen(Sidereal.properMotionDec)
 }

@@ -20,7 +20,7 @@ import monocle.Lens
  * @tparam T
  *   The brightness unit type. For example: Integrated or Surface.
  */
-final case class TargetBrightness[T](
+final case class BandBrightness[T](
   quantity: GroupedUnitQty[BrightnessValue, Brightness[T]],
   band:     Band,
   error:    Option[BrightnessValue]
@@ -32,49 +32,49 @@ final case class TargetBrightness[T](
   }
 }
 
-object TargetBrightness {
-  def quantity[T]: Lens[TargetBrightness[T], GroupedUnitQty[BrightnessValue, Brightness[T]]] =
-    Focus[TargetBrightness[T]](_.quantity)
+object BandBrightness {
+  def quantity[T]: Lens[BandBrightness[T], GroupedUnitQty[BrightnessValue, Brightness[T]]] =
+    Focus[BandBrightness[T]](_.quantity)
 
-  def value[T]: Lens[TargetBrightness[T], BrightnessValue] =
+  def value[T]: Lens[BandBrightness[T], BrightnessValue] =
     quantity.andThen(GroupedUnitQty.value)
 
-  def unit[T]: Lens[TargetBrightness[T], GroupedUnitType[Brightness[T]]] =
+  def unit[T]: Lens[BandBrightness[T], GroupedUnitType[Brightness[T]]] =
     quantity.andThen(GroupedUnitQty.unit)
 
-  def band[T]: Lens[TargetBrightness[T], Band] = Focus[TargetBrightness[T]](_.band)
+  def band[T]: Lens[BandBrightness[T], Band] = Focus[BandBrightness[T]](_.band)
 
-  def error[T]: Lens[TargetBrightness[T], Option[BrightnessValue]] =
-    Focus[TargetBrightness[T]](_.error)
+  def error[T]: Lens[BandBrightness[T], Option[BrightnessValue]] =
+    Focus[BandBrightness[T]](_.error)
 
   /** Secondary constructor defaulting to no error. */
   def apply[T](
     quantity: GroupedUnitQty[BrightnessValue, Brightness[T]],
     band:     Band
-  ): TargetBrightness[T] =
-    new TargetBrightness(quantity, band, none)
+  ): BandBrightness[T] =
+    new BandBrightness(quantity, band, none)
 
   /** Secondary constructor using default units for the band. */
   def apply[T] = new GroupApplied[T]
   protected class GroupApplied[T] {
     def apply[B <: Band](value: BrightnessValue, band: B, error: Option[BrightnessValue])(implicit
       ev:                       Band.DefaultUnit[B, T]
-    ): TargetBrightness[T] =
-      new TargetBrightness(ev.unit.withValue(value), band, error)
+    ): BandBrightness[T] =
+      new BandBrightness(ev.unit.withValue(value), band, error)
 
     def apply[B <: Band](value: BrightnessValue, band: B)(implicit
       ev:                       Band.DefaultUnit[B, T]
-    ): TargetBrightness[T] =
+    ): BandBrightness[T] =
       apply(value, band, none)
   }
 
   implicit def TargetBrightnessOrder[T](implicit
     unitOrder: Order[GroupedUnitType[Brightness[T]]]
-  ): Order[TargetBrightness[T]] =
+  ): Order[BandBrightness[T]] =
     Order.by(m => (m.quantity.unit, m.band.tag, m.quantity.value, m.error))
 
   /** group Typeclass Instances */
-  implicit def TargetBrightnessShow[UG]: Show[TargetBrightness[UG]] =
+  implicit def TargetBrightnessShow[UG]: Show[BandBrightness[UG]] =
     Show.fromToString
 
 }
