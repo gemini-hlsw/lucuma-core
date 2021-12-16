@@ -18,45 +18,45 @@ trait ArbTarget {
   import ArbSiderealTracking._
   import ArbAngularSize._
   import ArbEnumerated._
-  import ArbBrightnessProfile._
+  import ArbSourceProfile._
 
-  implicit val arbSiderealTarget: Arbitrary[SiderealTarget] =
+  implicit val ArbSiderealTarget: Arbitrary[Target.Sidereal] =
     Arbitrary {
       for {
         n <- arbitrary[NonEmptyString]
         t <- arbitrary[SiderealTracking]
-        b <- arbitrary[BrightnessProfile]
+        b <- arbitrary[SourceProfile]
         s <- arbitrary[Option[AngularSize]]
-      } yield SiderealTarget(n, t, b, s)
+      } yield Target.Sidereal(n, t, b, s)
     }
 
-  implicit val arbNonsiderealTarget: Arbitrary[NonsiderealTarget] =
+  implicit val arbNonsiderealTarget: Arbitrary[Target.Nonsidereal] =
     Arbitrary {
       for {
         n <- arbitrary[NonEmptyString]
         t <- arbitrary[EphemerisKey]
-        b <- arbitrary[BrightnessProfile]
+        b <- arbitrary[SourceProfile]
         s <- arbitrary[Option[AngularSize]]
-      } yield NonsiderealTarget(n, t, b, s)
+      } yield Target.Nonsidereal(n, t, b, s)
     }
 
   implicit val arbTarget: Arbitrary[Target] = Arbitrary(
-    Gen.oneOf(arbitrary[SiderealTarget], arbitrary[NonsiderealTarget])
+    Gen.oneOf(arbitrary[Target.Sidereal], arbitrary[Target.Nonsidereal])
   )
 
-  implicit val cogSiderealTarget: Cogen[SiderealTarget] =
-    Cogen[(String, SiderealTracking, BrightnessProfile)]
-      .contramap(t => (t.name.value, t.tracking, t.brightnessProfile))
+  implicit val cogSiderealTarget: Cogen[Target.Sidereal] =
+    Cogen[(String, SiderealTracking, SourceProfile)]
+      .contramap(t => (t.name.value, t.tracking, t.sourceProfile))
 
-  implicit val cogNonsiderealTarget: Cogen[NonsiderealTarget] =
-    Cogen[(String, EphemerisKey, BrightnessProfile)]
-      .contramap(t => (t.name.value, t.ephemerisKey, t.brightnessProfile))
+  implicit val cogNonsiderealTarget: Cogen[Target.Nonsidereal] =
+    Cogen[(String, EphemerisKey, SourceProfile)]
+      .contramap(t => (t.name.value, t.ephemerisKey, t.sourceProfile))
 
   implicit val cogTarget: Cogen[Target] =
-    Cogen[Either[SiderealTarget, NonsiderealTarget]]
+    Cogen[Either[Target.Sidereal, Target.Nonsidereal]]
       .contramap {
-        case t @ SiderealTarget(_, _, _, _)    => t.asLeft
-        case t @ NonsiderealTarget(_, _, _, _) => t.asRight
+        case t @ Target.Sidereal(_, _, _, _)    => t.asLeft
+        case t @ Target.Nonsidereal(_, _, _, _) => t.asRight
       }
 }
 

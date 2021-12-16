@@ -7,6 +7,7 @@ import cats.Eq
 import cats.implicits._
 import coulomb._
 import coulomb.cats.implicits._
+import eu.timepit.refined.cats._
 import eu.timepit.refined.types.numeric.PosBigDecimal
 import lucuma.core.math.BrightnessUnits._
 import lucuma.core.math.Wavelength
@@ -14,8 +15,6 @@ import lucuma.core.math.dimensional._
 import lucuma.core.math.units._
 import monocle.Focus
 import monocle.Lens
-
-import eu.timepit.refined.cats._
 
 final case class EmissionLine[+T](
   wavelength: Wavelength,

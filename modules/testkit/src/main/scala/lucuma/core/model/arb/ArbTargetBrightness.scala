@@ -15,28 +15,28 @@ import org.scalacheck.Arbitrary._
 import org.scalacheck.Cogen._
 import org.scalacheck._
 
-trait ArbTargetBrightness {
+trait ArbBandBrightness {
   import ArbEnumerated._
   import BrightnessUnits._
   import ArbQty._
 
-  implicit def arbTargetBrightness[T](implicit
+  implicit def arbBandBrightness[T](implicit
     arbUnit: Arbitrary[GroupedUnitType[Brightness[T]]]
-  ): Arbitrary[TargetBrightness[T]] =
+  ): Arbitrary[BandBrightness[T]] =
     Arbitrary {
       for {
         q <- arbitrary[GroupedUnitQty[BrightnessValue, Brightness[T]]]
         b <- arbitrary[Band]
         e <- arbitrary[Option[BrightnessValue]]
-      } yield TargetBrightness(q, b, e)
+      } yield BandBrightness(q, b, e)
     }
 
-  implicit def cogTargetBrightness[T](implicit
+  implicit def cogBandBrightness[T](implicit
     cogenUnit: Cogen[GroupedUnitType[Brightness[T]]]
-  ): Cogen[TargetBrightness[T]] =
+  ): Cogen[BandBrightness[T]] =
     Cogen[
       (GroupedUnitQty[BrightnessValue, Brightness[T]], Band, Option[BrightnessValue])
     ].contramap(u => (u.quantity, u.band, u.error))
 }
 
-object ArbTargetBrightness extends ArbTargetBrightness
+object ArbBandBrightness extends ArbBandBrightness
