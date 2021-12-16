@@ -6,19 +6,17 @@ package core
 package util
 
 import cats.Order
+import cats.data.NonEmptyList
 import cats.syntax.all._
 import io.circe._
 import lucuma.core.syntax.string._
 import monocle.Prism
 
 /**
-  * Typeclass for an enumerated type with unique string tags and a canonical ordering.
-  * @group Typeclasses
-  */
-trait Enumerated[A]
-  extends Order[A]
-     with Encoder[A]
-     with Decoder[A] {
+ * Typeclass for an enumerated type with unique string tags and a canonical ordering.
+ * @group Typeclasses
+ */
+trait Enumerated[A] extends Order[A] with Encoder[A] with Decoder[A] {
 
   /** All members of this enumeration, in unspecified but canonical order. */
   def all: List[A]
@@ -53,15 +51,27 @@ trait Enumerated[A]
 
 }
 
-object Enumerated    {
+object Enumerated {
 
   def apply[A](implicit ev: Enumerated[A]): ev.type = ev
 
   def of[A <: Product](a: A, as: A*): Enumerated[A] =
     new Enumerated[A] {
-      def all: List[A] = a :: as.toList
+      def all: List[A]      = a :: as.toList
       def tag(a: A): String = a.productPrefix
     }
+
+  @inline
+  def from[A](a: A, as: A*): Applied[A] = new Applied(a :: as.toList)
+  def fromNEL[A](as: NonEmptyList[A]): Applied[A]   = new Applied(as.toList)
+
+  class Applied[A] private[Enumerated] (val as: List[A]) extends AnyVal {
+    def withTag(f: A => String): Enumerated[A] =
+      new Enumerated[A] {
+        def all: List[A]      = as
+        def tag(a: A): String = f(a)
+      }
+  }
 
   def fromTag[A](implicit ev: Enumerated[A]): Prism[String, A] =
     Prism[String, A](ev.fromTag)(e => ev.tag(e))
@@ -70,7 +80,6 @@ object Enumerated    {
 
 /** @group Typeclasses */
 trait Obsoletable[A] {
-  def isActive(a:         A): Boolean
+  def isActive(a: A): Boolean
   final def isObsolete(a: A): Boolean = !isActive(a)
 }
-

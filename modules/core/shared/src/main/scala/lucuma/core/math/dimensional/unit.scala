@@ -24,6 +24,8 @@ trait UnitType { self =>
     val value = _value
     val unit  = self
   }
+
+  override def toString: String = definition.abbv
 }
 
 object UnitType {

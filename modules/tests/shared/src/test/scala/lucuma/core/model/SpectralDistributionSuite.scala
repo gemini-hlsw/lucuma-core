@@ -10,7 +10,6 @@ import lucuma.core.math.BrightnessUnits
 import lucuma.core.math.arb.ArbRefined
 import lucuma.core.util.arb.ArbEnumerated
 import monocle.law.discipline.LensTests
-import monocle.law.discipline.OptionalTests
 import coulomb.scalacheck.ArbQuantity
 import eu.timepit.refined.cats._
 import lucuma.core.math.dimensional.arb.ArbQty
@@ -41,24 +40,36 @@ final class SpectralDistributionSuite extends DisciplineSuite {
   )
 
   // Optics
-  checkAll("Library.spectrum", LensTests(Library.spectrum))
-  checkAll("Library.stellar", OptionalTests(Library.stellar))
-  checkAll("Library.nonstellar", OptionalTests(Library.nonstellar))
+  checkAll("StellarLibrary.librarySpectrum", LensTests(StellarLibrary.librarySpectrum))
   checkAll("CoolStarModel.temperature", LensTests(CoolStarModel.temperature))
-  checkAll("EmissionLine[Integrated].line", LensTests(EmissionLine.line[Integrated]))
-  checkAll("EmissionLine[Surface].line", LensTests(EmissionLine.line[Surface]))
-  checkAll("EmissionLine[Integrated].continuum", LensTests(EmissionLine.continuum[Integrated]))
-  checkAll("EmissionLine[Surface].continuum", LensTests(EmissionLine.continuum[Surface]))
+  checkAll("Galaxy.galaxySpectrum", LensTests(Galaxy.galaxySpectrum))
+  checkAll("Planet.planetSpectrum", LensTests(Planet.planetSpectrum))
+  checkAll("Quasar.quasarSpectrum", LensTests(Quasar.quasarSpectrum))
+  checkAll("HIIRegion.hiiRegionSpectrum", LensTests(HIIRegion.hiiRegionSpectrum))
+  checkAll(
+    "PlanetaryNebula.planetaryNebulaSpectrum",
+    LensTests(PlanetaryNebula.planetaryNebulaSpectrum)
+  )
+  checkAll("EmissionLines[Integrated].lines", LensTests(EmissionLines.lines[Integrated]))
+  checkAll("EmissionLines[Surface].lines", LensTests(EmissionLines.lines[Surface]))
+  checkAll(
+    "EmissionLines[Integrated].fluxDensityContinuum",
+    LensTests(EmissionLines.fluxDensityContinuum[Integrated])
+  )
+  checkAll(
+    "EmissionLines[Surface].fluxDensityContinuum",
+    LensTests(EmissionLines.fluxDensityContinuum[Surface])
+  )
   checkAll("PowerLaw.index", LensTests(PowerLaw.index))
   checkAll("BlackBody.temperature", LensTests(BlackBody.temperature))
 
   checkAll(
-    "SpectralDistribution[Integrated].library",
-    PrismTests(SpectralDistribution.library[Integrated])
+    "SpectralDistribution[Integrated].stellarLibrary",
+    PrismTests(SpectralDistribution.stellarLibrary[Integrated])
   )
   checkAll(
-    "SpectralDistribution[Surface].library",
-    PrismTests(SpectralDistribution.library[Surface])
+    "SpectralDistribution[Surface].stellarLibrary",
+    PrismTests(SpectralDistribution.stellarLibrary[Surface])
   )
   checkAll(
     "SpectralDistribution[Integrated].coolStarModel",
@@ -69,12 +80,52 @@ final class SpectralDistributionSuite extends DisciplineSuite {
     PrismTests(SpectralDistribution.coolStarModel[Surface])
   )
   checkAll(
-    "SpectralDistribution[Integrated].emissionLine",
-    PrismTests(SpectralDistribution.emissionLine[Integrated])
+    "SpectralDistribution[Integrated].galaxy",
+    PrismTests(SpectralDistribution.galaxy[Integrated])
   )
   checkAll(
-    "SpectralDistribution[Surface].emissionLine",
-    PrismTests(SpectralDistribution.emissionLine[Surface])
+    "SpectralDistribution[Surface].galaxy",
+    PrismTests(SpectralDistribution.galaxy[Surface])
+  )
+  checkAll(
+    "SpectralDistribution[Integrated].planet",
+    PrismTests(SpectralDistribution.planet[Integrated])
+  )
+  checkAll(
+    "SpectralDistribution[Surface].planet",
+    PrismTests(SpectralDistribution.planet[Surface])
+  )
+  checkAll(
+    "SpectralDistribution[Integrated].quasar",
+    PrismTests(SpectralDistribution.quasar[Integrated])
+  )
+  checkAll(
+    "SpectralDistribution[Surface].quasar",
+    PrismTests(SpectralDistribution.quasar[Surface])
+  )
+  checkAll(
+    "SpectralDistribution[Integrated].hiiRegion",
+    PrismTests(SpectralDistribution.hiiRegion[Integrated])
+  )
+  checkAll(
+    "SpectralDistribution[Surface].hiiRegion",
+    PrismTests(SpectralDistribution.hiiRegion[Surface])
+  )
+  checkAll(
+    "SpectralDistribution[Integrated].planetaryNebula",
+    PrismTests(SpectralDistribution.planetaryNebula[Integrated])
+  )
+  checkAll(
+    "SpectralDistribution[Surface].planetaryNebula",
+    PrismTests(SpectralDistribution.planetaryNebula[Surface])
+  )
+  checkAll(
+    "SpectralDistribution[Integrated].emissionLines",
+    PrismTests(SpectralDistribution.emissionLines[Integrated])
+  )
+  checkAll(
+    "SpectralDistribution[Surface].emissionLines",
+    PrismTests(SpectralDistribution.emissionLines[Surface])
   )
   checkAll(
     "SpectralDistribution[Integrated].powerLaw",
@@ -91,5 +142,13 @@ final class SpectralDistributionSuite extends DisciplineSuite {
   checkAll(
     "SpectralDistribution[Surface].blackBody",
     PrismTests(SpectralDistribution.blackBody[Surface])
+  )
+  checkAll(
+    "SpectralDistribution[Integrated].userDefined",
+    PrismTests(SpectralDistribution.userDefined[Integrated])
+  )
+  checkAll(
+    "SpectralDistribution[Surface].userDefined",
+    PrismTests(SpectralDistribution.userDefined[Surface])
   )
 }
