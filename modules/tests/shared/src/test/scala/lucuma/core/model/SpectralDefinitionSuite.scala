@@ -15,13 +15,14 @@ import lucuma.core.math.dimensional.arb.ArbQty
 import eu.timepit.refined.cats._
 
 final class SpectralDefinitionSuite extends DisciplineSuite {
-  import ArbUnnormalizedSpectralEnergyDistribution._
+  import ArbUSED._
   import ArbEnumerated._
   import ArbBandBrightness._
   import BrightnessUnits._
   import ArbSpectralDefinition._
   import ArbRefined._
   import ArbQty._
+  import ArbEmissionLine._
 
   // Laws for SpectralDefinition.BandNormalized
   checkAll(
@@ -83,6 +84,22 @@ final class SpectralDefinitionSuite extends DisciplineSuite {
     LensTests(SpectralDefinition.EmissionLines.lines[Surface])
   )
   checkAll(
+    "SpectralDefinition.EmissionLines.linesT[Integrated]",
+    TraversalTests(SpectralDefinition.EmissionLines.linesT[Integrated])
+  )
+  checkAll(
+    "SpectralDefinition.EmissionLines.linesT[Surface]",
+    TraversalTests(SpectralDefinition.EmissionLines.linesT[Surface])
+  )
+  checkAll(
+    "SpectralDefinition.EmissionLines.lines[Integrated]",
+    TraversalTests(SpectralDefinition.EmissionLines.lineIn[Integrated](RedWavelength))
+  )
+  checkAll(
+    "SpectralDefinition.EmissionLines.lines[Surface]",
+    TraversalTests(SpectralDefinition.EmissionLines.lineIn[Surface](RedWavelength))
+  )
+  checkAll(
     "SpectralDefinition.EmissionLines.fluxDensityContinuum[Integrated]",
     LensTests(SpectralDefinition.EmissionLines.fluxDensityContinuum[Integrated])
   )
@@ -111,4 +128,68 @@ final class SpectralDefinitionSuite extends DisciplineSuite {
     PrismTests(SpectralDefinition.emissionLines[Surface])
   )
 
+  checkAll(
+    "SpectralDefinition.used[Integrated]",
+    OptionalTests(SpectralDefinition.used[Integrated])
+  )
+  checkAll(
+    "SpectralDefinition.sed[Surface]",
+    OptionalTests(SpectralDefinition.used[Surface])
+  )
+  checkAll(
+    "SpectralDefinition.bandBrightnesses[Integrated]",
+    OptionalTests(SpectralDefinition.bandBrightnesses[Integrated])
+  )
+  checkAll(
+    "SpectralDefinition.bandBrightnesses[Surface]",
+    OptionalTests(SpectralDefinition.bandBrightnesses[Surface])
+  )
+  checkAll(
+    "SpectralDefinition.bandBrightnessesT[Integrated]",
+    TraversalTests(SpectralDefinition.bandBrightnessesT[Integrated])
+  )
+  checkAll(
+    "SpectralDefinition.bandBrightnessesT[Surface]",
+    TraversalTests(SpectralDefinition.bandBrightnessesT[Surface])
+  )
+  checkAll(
+    "SpectralDefinition.bandBrightnessIn[Integrated]",
+    TraversalTests(SpectralDefinition.bandBrightnessIn[Integrated](Band.B))
+  )
+  checkAll(
+    "SpectralDefinition.bandBrightnessIn[Surface]",
+    TraversalTests(SpectralDefinition.bandBrightnessIn[Surface](Band.B))
+  )
+  checkAll(
+    "SpectralDefinition.wavelengthLines[Integrated]",
+    OptionalTests(SpectralDefinition.wavelengthLines[Integrated])
+  )
+  checkAll(
+    "SpectralDefinition.wavelengthLines[Surface]",
+    OptionalTests(SpectralDefinition.wavelengthLines[Surface])
+  )
+  checkAll(
+    "SpectralDefinition.wavelengthLinesT[Integrated]",
+    TraversalTests(SpectralDefinition.wavelengthLinesT[Integrated])
+  )
+  checkAll(
+    "SpectralDefinition.wavelengthLinesT[Surface]",
+    TraversalTests(SpectralDefinition.wavelengthLinesT[Surface])
+  )
+  checkAll(
+    "SpectralDefinition.wavelengthLineIn[Integrated]",
+    TraversalTests(SpectralDefinition.wavelengthLineIn[Integrated](RedWavelength))
+  )
+  checkAll(
+    "SpectralDefinition.wavelengthLineIn[Surface]",
+    TraversalTests(SpectralDefinition.wavelengthLineIn[Surface](RedWavelength))
+  )
+  checkAll(
+    "SpectralDefinition.fluxDensityContinuum[Integrated]",
+    OptionalTests(SpectralDefinition.fluxDensityContinuum[Integrated])
+  )
+  checkAll(
+    "SpectralDefinition.fluxDensityContinuum[Surface]",
+    OptionalTests(SpectralDefinition.fluxDensityContinuum[Surface])
+  )
 }

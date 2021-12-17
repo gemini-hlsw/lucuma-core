@@ -5,6 +5,7 @@ package lucuma.core.model.arb
 
 import coulomb._
 import eu.timepit.refined.types.numeric.PosBigDecimal
+import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.math.BrightnessUnits
 import lucuma.core.math.Wavelength
 import lucuma.core.math.arb.ArbRefined
@@ -24,12 +25,18 @@ trait ArbEmissionLine {
   import ArbWavelength._
   import ArbRefined._
 
+  val RedWavelength: Wavelength = Wavelength.picometers.get(PosInt(620000))
+
   implicit def arbEmissionLine[T](implicit
     arbLineFluxUnit: Arbitrary[GroupedUnitType[LineFlux[T]]]
   ): Arbitrary[EmissionLine[T]] =
     Arbitrary {
       for {
-        w  <- arbitrary[Wavelength]
+        w  <-
+          Gen.frequency(
+            1  -> RedWavelength,
+            20 -> arbitrary[Wavelength]
+          )
         lw <- arbitrary[PosBigDecimal]
         lf <- arbitrary[GroupedUnitQty[PosBigDecimal, LineFlux[T]]]
       } yield EmissionLine[T](w, lw.withUnit[KilometersPerSecond], lf)

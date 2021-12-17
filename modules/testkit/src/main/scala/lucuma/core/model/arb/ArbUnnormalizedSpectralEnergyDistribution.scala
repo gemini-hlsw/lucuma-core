@@ -21,7 +21,7 @@ import org.scalacheck._
 
 trait ArbUnnormalizedSpectralEnergyDistribution {
   import ArbEnumerated._
-  import UnnormalizedSpectralEnergyDistribution._
+  import USED._
   import ArbRefined._
   import ArbWavelength._
 
@@ -95,7 +95,7 @@ trait ArbUnnormalizedSpectralEnergyDistribution {
   implicit val cogUserDefined: Cogen[UserDefined] =
     Cogen[Map[Wavelength, PosBigDecimal]].contramap(_.fluxDensities.toSortedMap)
 
-  implicit def arbSpectralDistribution[T]: Arbitrary[UnnormalizedSpectralEnergyDistribution] =
+  implicit def arbSpectralDistribution[T]: Arbitrary[USED] =
     Arbitrary(
       Gen.oneOf(
         arbitrary[StellarLibrary],
@@ -111,12 +111,7 @@ trait ArbUnnormalizedSpectralEnergyDistribution {
       )
     )
 
-  implicit def cogSpectralDistribution[T]
-  // (implicit
-  //   cogenLineUnit:      Cogen[GroupedUnitType[LineFlux[T]]],
-  //   cogenContinuumUnit: Cogen[GroupedUnitType[FluxDensityContinuum[T]]]
-  // )
-    : Cogen[UnnormalizedSpectralEnergyDistribution] =
+  implicit def cogSpectralDistribution[T]: Cogen[USED] =
     Cogen[Either[
       StellarLibrary,
       Either[

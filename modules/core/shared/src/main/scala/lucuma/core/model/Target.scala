@@ -7,13 +7,20 @@ import cats._
 import cats.implicits._
 import eu.timepit.refined.auto._
 import eu.timepit.refined.cats._
+import eu.timepit.refined.types.numeric.PosBigDecimal
 import eu.timepit.refined.types.string.NonEmptyString
+import lucuma.core.enum.Band
+import lucuma.core.math.BrightnessUnits._
 import lucuma.core.math._
+import lucuma.core.math.dimensional.GroupedUnitQty
 import monocle.Focus
 import monocle.Lens
 import monocle.Optional
 import monocle.Prism
+import monocle.Traversal
 import monocle.macros.GenPrism
+
+import scala.collection.immutable.SortedMap
 
 /** A target of observation. */
 sealed trait Target extends Product with Serializable {
@@ -129,6 +136,112 @@ object Target extends WithId('t') with TargetOptics {
       Focus[Sidereal](_.sourceProfile)
 
     /** @group Optics */
+    val integratedSpectralDefinition: Optional[Sidereal, SpectralDefinition[Integrated]] =
+      sourceProfile.andThen(SourceProfile.integratedSpectralDefinition)
+
+    /** @group Optics */
+    val surfaceSpectralDefinition: Optional[Sidereal, SpectralDefinition[Surface]] =
+      sourceProfile.andThen(SourceProfile.surfaceSpectralDefinition)
+
+    /** @group Optics */
+    val gaussianSource: Optional[Sidereal, GaussianSource] =
+      sourceProfile.andThen(SourceProfile.gaussianSource)
+
+    /** @group Optics */
+    val integratedBandNormalizedSpectralDefinition
+      : Optional[Sidereal, SpectralDefinition.BandNormalized[Integrated]] =
+      sourceProfile.andThen(SourceProfile.integratedBandNormalizedSpectralDefinition)
+
+    /** @group Optics */
+    val surfaceBandNormalizedSpectralDefinition
+      : Optional[Sidereal, SpectralDefinition.BandNormalized[Surface]] =
+      sourceProfile.andThen(SourceProfile.surfaceBandNormalizedSpectralDefinition)
+
+    /** @group Optics */
+    val integratedEmissionLinesSpectralDefinition
+      : Optional[Sidereal, SpectralDefinition.EmissionLines[Integrated]] =
+      sourceProfile.andThen(SourceProfile.integratedEmissionLinesSpectralDefinition)
+
+    /** @group Optics */
+    val surfaceEmissionLinesSpectralDefinition
+      : Optional[Sidereal, SpectralDefinition.EmissionLines[Surface]] =
+      sourceProfile.andThen(SourceProfile.surfaceEmissionLinesSpectralDefinition)
+
+    /** @group Optics */
+    val integratedUSED: Optional[Sidereal, USED] =
+      sourceProfile.andThen(SourceProfile.integratedUSED)
+
+    /** @group Optics */
+    val surfaceUSED: Optional[Sidereal, USED] =
+      sourceProfile.andThen(SourceProfile.surfaceUSED)
+
+    /** @group Optics */
+    val integratedBandBrightnesses
+      : Optional[Sidereal, SortedMap[Band, BandBrightness[Integrated]]] =
+      sourceProfile.andThen(SourceProfile.integratedBandBrightnesses)
+
+    /** @group Optics */
+    val surfaceBandBrightnesses: Optional[Sidereal, SortedMap[Band, BandBrightness[Surface]]] =
+      sourceProfile.andThen(SourceProfile.surfaceBandBrightnesses)
+
+    /** @group Optics */
+    val integratedBandBrightnessesT: Traversal[Sidereal, BandBrightness[Integrated]] =
+      sourceProfile.andThen(SourceProfile.integratedBandBrightnessesT)
+
+    /** @group Optics */
+    val surfaceBandBrightnessesT: Traversal[Sidereal, BandBrightness[Surface]] =
+      sourceProfile.andThen(SourceProfile.surfaceBandBrightnessesT)
+
+    /** @group Optics */
+    def integratedBandBrightnessIn[T](
+      b: Band
+    ): Traversal[Sidereal, BandBrightness[Integrated]] =
+      sourceProfile.andThen(SourceProfile.integratedBandBrightnessIn(b))
+
+    /** @group Optics */
+    def surfaceBandBrightnessIn[T](b: Band): Traversal[Sidereal, BandBrightness[Surface]] =
+      sourceProfile.andThen(SourceProfile.surfaceBandBrightnessIn(b))
+
+    /** @group Optics */
+    val integratedWavelengthLines
+      : Optional[Sidereal, SortedMap[Wavelength, EmissionLine[Integrated]]] =
+      sourceProfile.andThen(SourceProfile.integratedWavelengthLines)
+
+    /** @group Optics */
+    val surfaceWavelengthLines: Optional[Sidereal, SortedMap[Wavelength, EmissionLine[Surface]]] =
+      sourceProfile.andThen(SourceProfile.surfaceWavelengthLines)
+
+    /** @group Optics */
+    val integratedWavelengthLinesT: Traversal[Sidereal, EmissionLine[Integrated]] =
+      sourceProfile.andThen(SourceProfile.integratedWavelengthLinesT)
+
+    /** @group Optics */
+    val surfaceWavelengthLinesT: Traversal[Sidereal, EmissionLine[Surface]] =
+      sourceProfile.andThen(SourceProfile.surfaceWavelengthLinesT)
+
+    /** @group Optics */
+    def integratedWavelengthLineIn(
+      w: Wavelength
+    ): Traversal[Sidereal, EmissionLine[Integrated]] =
+      sourceProfile.andThen(SourceProfile.integratedWavelengthLineIn(w))
+
+    /** @group Optics */
+    def surfaceWavelengthLineIn[T](w: Wavelength): Traversal[Sidereal, EmissionLine[Surface]] =
+      sourceProfile.andThen(SourceProfile.surfaceWavelengthLineIn(w))
+
+    /** @group Optics */
+    val integratedFluxDensityContinuum: Optional[
+      Sidereal,
+      GroupedUnitQty[PosBigDecimal, FluxDensityContinuum[Integrated]]
+    ] = sourceProfile.andThen(SourceProfile.integratedFluxDensityContinuum)
+
+    /** @group Optics */
+    val surfaceFluxDensityContinuum: Optional[
+      Sidereal,
+      GroupedUnitQty[PosBigDecimal, FluxDensityContinuum[Surface]]
+    ] = sourceProfile.andThen(SourceProfile.surfaceFluxDensityContinuum)
+
+    /** @group Optics */
     val parallax: Lens[Sidereal, Option[Parallax]] =
       tracking.andThen(SiderealTracking.parallax)
 
@@ -181,6 +294,113 @@ object Target extends WithId('t') with TargetOptics {
 
     val sourceProfile: Lens[Nonsidereal, SourceProfile] =
       Focus[Nonsidereal](_.sourceProfile)
+
+    /** @group Optics */
+    val integratedSpectralDefinition: Optional[Nonsidereal, SpectralDefinition[Integrated]] =
+      sourceProfile.andThen(SourceProfile.integratedSpectralDefinition)
+
+    /** @group Optics */
+    val surfaceSpectralDefinition: Optional[Nonsidereal, SpectralDefinition[Surface]] =
+      sourceProfile.andThen(SourceProfile.surfaceSpectralDefinition)
+
+    /** @group Optics */
+    val gaussianSource: Optional[Nonsidereal, GaussianSource] =
+      sourceProfile.andThen(SourceProfile.gaussianSource)
+
+    /** @group Optics */
+    val integratedBandNormalizedSpectralDefinition
+      : Optional[Nonsidereal, SpectralDefinition.BandNormalized[Integrated]] =
+      sourceProfile.andThen(SourceProfile.integratedBandNormalizedSpectralDefinition)
+
+    /** @group Optics */
+    val surfaceBandNormalizedSpectralDefinition
+      : Optional[Nonsidereal, SpectralDefinition.BandNormalized[Surface]] =
+      sourceProfile.andThen(SourceProfile.surfaceBandNormalizedSpectralDefinition)
+
+    /** @group Optics */
+    val integratedEmissionLinesSpectralDefinition
+      : Optional[Nonsidereal, SpectralDefinition.EmissionLines[Integrated]] =
+      sourceProfile.andThen(SourceProfile.integratedEmissionLinesSpectralDefinition)
+
+    /** @group Optics */
+    val surfaceEmissionLinesSpectralDefinition
+      : Optional[Nonsidereal, SpectralDefinition.EmissionLines[Surface]] =
+      sourceProfile.andThen(SourceProfile.surfaceEmissionLinesSpectralDefinition)
+
+    /** @group Optics */
+    val integratedUSED: Optional[Nonsidereal, USED] =
+      sourceProfile.andThen(SourceProfile.integratedUSED)
+
+    /** @group Optics */
+    val surfaceUSED: Optional[Nonsidereal, USED] =
+      sourceProfile.andThen(SourceProfile.surfaceUSED)
+
+    /** @group Optics */
+    val integratedBandBrightnesses
+      : Optional[Nonsidereal, SortedMap[Band, BandBrightness[Integrated]]] =
+      sourceProfile.andThen(SourceProfile.integratedBandBrightnesses)
+
+    /** @group Optics */
+    val surfaceBandBrightnesses: Optional[Nonsidereal, SortedMap[Band, BandBrightness[Surface]]] =
+      sourceProfile.andThen(SourceProfile.surfaceBandBrightnesses)
+
+    /** @group Optics */
+    val integratedBandBrightnessesT: Traversal[Nonsidereal, BandBrightness[Integrated]] =
+      sourceProfile.andThen(SourceProfile.integratedBandBrightnessesT)
+
+    /** @group Optics */
+    val surfaceBandBrightnessesT: Traversal[Nonsidereal, BandBrightness[Surface]] =
+      sourceProfile.andThen(SourceProfile.surfaceBandBrightnessesT)
+
+    /** @group Optics */
+    def integratedBandBrightnessIn[T](
+      b: Band
+    ): Traversal[Nonsidereal, BandBrightness[Integrated]] =
+      sourceProfile.andThen(SourceProfile.integratedBandBrightnessIn(b))
+
+    /** @group Optics */
+    def surfaceBandBrightnessIn[T](b: Band): Traversal[Nonsidereal, BandBrightness[Surface]] =
+      sourceProfile.andThen(SourceProfile.surfaceBandBrightnessIn(b))
+
+    /** @group Optics */
+    val integratedWavelengthLines
+      : Optional[Nonsidereal, SortedMap[Wavelength, EmissionLine[Integrated]]] =
+      sourceProfile.andThen(SourceProfile.integratedWavelengthLines)
+
+    /** @group Optics */
+    val surfaceWavelengthLines
+      : Optional[Nonsidereal, SortedMap[Wavelength, EmissionLine[Surface]]] =
+      sourceProfile.andThen(SourceProfile.surfaceWavelengthLines)
+
+    /** @group Optics */
+    val integratedWavelengthLinesT: Traversal[Nonsidereal, EmissionLine[Integrated]] =
+      sourceProfile.andThen(SourceProfile.integratedWavelengthLinesT)
+
+    /** @group Optics */
+    val surfaceWavelengthLinesT: Traversal[Nonsidereal, EmissionLine[Surface]] =
+      sourceProfile.andThen(SourceProfile.surfaceWavelengthLinesT)
+
+    /** @group Optics */
+    def integratedWavelengthLineIn(
+      w: Wavelength
+    ): Traversal[Nonsidereal, EmissionLine[Integrated]] =
+      sourceProfile.andThen(SourceProfile.integratedWavelengthLineIn(w))
+
+    /** @group Optics */
+    def surfaceWavelengthLineIn[T](w: Wavelength): Traversal[Nonsidereal, EmissionLine[Surface]] =
+      sourceProfile.andThen(SourceProfile.surfaceWavelengthLineIn(w))
+
+    /** @group Optics */
+    val integratedFluxDensityContinuum: Optional[
+      Nonsidereal,
+      GroupedUnitQty[PosBigDecimal, FluxDensityContinuum[Integrated]]
+    ] = sourceProfile.andThen(SourceProfile.integratedFluxDensityContinuum)
+
+    /** @group Optics */
+    val surfaceFluxDensityContinuum: Optional[
+      Nonsidereal,
+      GroupedUnitQty[PosBigDecimal, FluxDensityContinuum[Surface]]
+    ] = sourceProfile.andThen(SourceProfile.surfaceFluxDensityContinuum)
   }
 }
 
@@ -212,6 +432,110 @@ trait TargetOptics { this: Target.type =>
       case t @ Target.Sidereal(_, _, _, _)    => Target.Sidereal.sourceProfile.replace(v)(t)
       case t @ Target.Nonsidereal(_, _, _, _) => Target.Nonsidereal.sourceProfile.replace(v)(t)
     })
+
+  /** @group Optics */
+  val integratedSpectralDefinition: Optional[Target, SpectralDefinition[Integrated]] =
+    sourceProfile.andThen(SourceProfile.integratedSpectralDefinition)
+
+  /** @group Optics */
+  val surfaceSpectralDefinition: Optional[Target, SpectralDefinition[Surface]] =
+    sourceProfile.andThen(SourceProfile.surfaceSpectralDefinition)
+
+  /** @group Optics */
+  val gaussianSource: Optional[Target, GaussianSource] =
+    sourceProfile.andThen(SourceProfile.gaussianSource)
+
+  /** @group Optics */
+  val integratedBandNormalizedSpectralDefinition
+    : Optional[Target, SpectralDefinition.BandNormalized[Integrated]] =
+    sourceProfile.andThen(SourceProfile.integratedBandNormalizedSpectralDefinition)
+
+  /** @group Optics */
+  val surfaceBandNormalizedSpectralDefinition
+    : Optional[Target, SpectralDefinition.BandNormalized[Surface]] =
+    sourceProfile.andThen(SourceProfile.surfaceBandNormalizedSpectralDefinition)
+
+  /** @group Optics */
+  val integratedEmissionLinesSpectralDefinition
+    : Optional[Target, SpectralDefinition.EmissionLines[Integrated]] =
+    sourceProfile.andThen(SourceProfile.integratedEmissionLinesSpectralDefinition)
+
+  /** @group Optics */
+  val surfaceEmissionLinesSpectralDefinition
+    : Optional[Target, SpectralDefinition.EmissionLines[Surface]] =
+    sourceProfile.andThen(SourceProfile.surfaceEmissionLinesSpectralDefinition)
+
+  /** @group Optics */
+  val integratedUSED: Optional[Target, USED] =
+    sourceProfile.andThen(SourceProfile.integratedUSED)
+
+  /** @group Optics */
+  val surfaceUSED: Optional[Target, USED] =
+    sourceProfile.andThen(SourceProfile.surfaceUSED)
+
+  /** @group Optics */
+  val integratedBandBrightnesses: Optional[Target, SortedMap[Band, BandBrightness[Integrated]]] =
+    sourceProfile.andThen(SourceProfile.integratedBandBrightnesses)
+
+  /** @group Optics */
+  val surfaceBandBrightnesses: Optional[Target, SortedMap[Band, BandBrightness[Surface]]] =
+    sourceProfile.andThen(SourceProfile.surfaceBandBrightnesses)
+
+  /** @group Optics */
+  val integratedBandBrightnessesT: Traversal[Target, BandBrightness[Integrated]] =
+    sourceProfile.andThen(SourceProfile.integratedBandBrightnessesT)
+
+  /** @group Optics */
+  val surfaceBandBrightnessesT: Traversal[Target, BandBrightness[Surface]] =
+    sourceProfile.andThen(SourceProfile.surfaceBandBrightnessesT)
+
+  /** @group Optics */
+  def integratedBandBrightnessIn[T](
+    b: Band
+  ): Traversal[Target, BandBrightness[Integrated]] =
+    sourceProfile.andThen(SourceProfile.integratedBandBrightnessIn(b))
+
+  /** @group Optics */
+  def surfaceBandBrightnessIn[T](b: Band): Traversal[Target, BandBrightness[Surface]] =
+    sourceProfile.andThen(SourceProfile.surfaceBandBrightnessIn(b))
+
+  /** @group Optics */
+  val integratedWavelengthLines: Optional[Target, SortedMap[Wavelength, EmissionLine[Integrated]]] =
+    sourceProfile.andThen(SourceProfile.integratedWavelengthLines)
+
+  /** @group Optics */
+  val surfaceWavelengthLines: Optional[Target, SortedMap[Wavelength, EmissionLine[Surface]]] =
+    sourceProfile.andThen(SourceProfile.surfaceWavelengthLines)
+
+  /** @group Optics */
+  val integratedWavelengthLinesT: Traversal[Target, EmissionLine[Integrated]] =
+    sourceProfile.andThen(SourceProfile.integratedWavelengthLinesT)
+
+  /** @group Optics */
+  val surfaceWavelengthLinesT: Traversal[Target, EmissionLine[Surface]] =
+    sourceProfile.andThen(SourceProfile.surfaceWavelengthLinesT)
+
+  /** @group Optics */
+  def integratedWavelengthLineIn(
+    w: Wavelength
+  ): Traversal[Target, EmissionLine[Integrated]] =
+    sourceProfile.andThen(SourceProfile.integratedWavelengthLineIn(w))
+
+  /** @group Optics */
+  def surfaceWavelengthLineIn[T](w: Wavelength): Traversal[Target, EmissionLine[Surface]] =
+    sourceProfile.andThen(SourceProfile.surfaceWavelengthLineIn(w))
+
+  /** @group Optics */
+  val integratedFluxDensityContinuum: Optional[
+    Target,
+    GroupedUnitQty[PosBigDecimal, FluxDensityContinuum[Integrated]]
+  ] = sourceProfile.andThen(SourceProfile.integratedFluxDensityContinuum)
+
+  /** @group Optics */
+  val surfaceFluxDensityContinuum: Optional[
+    Target,
+    GroupedUnitQty[PosBigDecimal, FluxDensityContinuum[Surface]]
+  ] = sourceProfile.andThen(SourceProfile.surfaceFluxDensityContinuum)
 
   /** @group Optics */
   val parallax: Optional[Target, Option[Parallax]] =

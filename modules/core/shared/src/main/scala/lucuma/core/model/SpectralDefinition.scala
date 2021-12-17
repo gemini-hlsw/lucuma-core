@@ -13,6 +13,7 @@ import lucuma.core.math.Wavelength
 import lucuma.core.math.dimensional.GroupedUnitQty
 import monocle.Focus
 import monocle.Lens
+import monocle.Optional
 import monocle.Prism
 import monocle.Traversal
 import monocle.macros.GenPrism
@@ -25,20 +26,18 @@ sealed trait SpectralDefinition[T]
 object SpectralDefinition {
 
   final case class BandNormalized[T](
-    sed:          UnnormalizedSpectralEnergyDistribution,
+    sed:          USED,
     brightnesses: SortedMap[Band, BandBrightness[T]]
   ) extends SpectralDefinition[T] {
     lazy val bands: List[Band] = brightnesses.keys.toList
   }
 
   object BandNormalized {
-    implicit def eqBandNormalized[T](implicit
-      tbeq: Eq[BandBrightness[T]]
-    ): Eq[BandNormalized[T]] =
+    implicit def eqBandNormalized[T](implicit bbeq: Eq[BandBrightness[T]]): Eq[BandNormalized[T]] =
       Eq.by(x => (x.sed, x.brightnesses))
 
     /** @group Optics */
-    def sed[T]: Lens[BandNormalized[T], UnnormalizedSpectralEnergyDistribution] =
+    def sed[T]: Lens[BandNormalized[T], USED] =
       Focus[BandNormalized[T]](_.sed)
 
     /** @group Optics */
@@ -75,6 +74,10 @@ object SpectralDefinition {
       lines.each
 
     /** @group Optics */
+    def lineIn[T](w: Wavelength): Traversal[EmissionLines[T], EmissionLine[T]] =
+      lines.filterIndex((a: Wavelength) => a === w)
+
+    /** @group Optics */
     def fluxDensityContinuum[T]: Lens[
       EmissionLines[T],
       GroupedUnitQty[PosBigDecimal, FluxDensityContinuum[T]]
@@ -96,4 +99,38 @@ object SpectralDefinition {
   /** @group Optics */
   def emissionLines[T]: Prism[SpectralDefinition[T], EmissionLines[T]] =
     GenPrism[SpectralDefinition[T], EmissionLines[T]]
+
+  /** @group Optics */
+  def used[T]: Optional[SpectralDefinition[T], USED] =
+    bandNormalized.andThen(BandNormalized.sed[T])
+
+  /** @group Optics */
+  def bandBrightnesses[T]: Optional[SpectralDefinition[T], SortedMap[Band, BandBrightness[T]]] =
+    bandNormalized.andThen(BandNormalized.brightnesses[T])
+
+  /** @group Optics */
+  def bandBrightnessesT[T]: Traversal[SpectralDefinition[T], BandBrightness[T]] =
+    bandNormalized.andThen(BandNormalized.brightnessesT[T])
+
+  /** @group Optics */
+  def bandBrightnessIn[T](b: Band): Traversal[SpectralDefinition[T], BandBrightness[T]] =
+    bandNormalized.andThen(BandNormalized.brightnessIn[T](b))
+
+  /** @group Optics */
+  def wavelengthLines[T]: Optional[SpectralDefinition[T], SortedMap[Wavelength, EmissionLine[T]]] =
+    emissionLines.andThen(EmissionLines.lines[T])
+
+  /** @group Optics */
+  def wavelengthLinesT[T]: Traversal[SpectralDefinition[T], EmissionLine[T]] =
+    emissionLines.andThen(EmissionLines.linesT[T])
+
+  /** @group Optics */
+  def wavelengthLineIn[T](w: Wavelength): Traversal[SpectralDefinition[T], EmissionLine[T]] =
+    emissionLines.andThen(EmissionLines.lineIn[T](w))
+
+  /** @group Optics */
+  def fluxDensityContinuum[T]: Optional[
+    SpectralDefinition[T],
+    GroupedUnitQty[PosBigDecimal, FluxDensityContinuum[T]]
+  ] = emissionLines.andThen(EmissionLines.fluxDensityContinuum[T])
 }
