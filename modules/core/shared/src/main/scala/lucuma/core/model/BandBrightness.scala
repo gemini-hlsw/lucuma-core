@@ -54,6 +54,13 @@ object BandBrightness {
   ): BandBrightness[T] =
     new BandBrightness(quantity, band, none)
 
+  def apply[T](
+    quantity: GroupedUnitQty[BrightnessValue, Brightness[T]],
+    band:     Band,
+    error:    BrightnessValue
+  ): BandBrightness[T] =
+    new BandBrightness(quantity, band, error.some)
+
   /** Secondary constructor using default units for the band. */
   def apply[T] = new GroupApplied[T]
   protected class GroupApplied[T] {
@@ -66,6 +73,10 @@ object BandBrightness {
       ev:                       Band.DefaultUnit[B, T]
     ): BandBrightness[T] =
       apply(value, band, none)
+
+    def apply[B <: Band](value: BrightnessValue, band: B, error: BrightnessValue)(implicit
+      ev:                       Band.DefaultUnit[B, T]
+    ): BandBrightness[T] = apply(value, band, error.some)
   }
 
   implicit def TargetBrightnessOrder[T](implicit
