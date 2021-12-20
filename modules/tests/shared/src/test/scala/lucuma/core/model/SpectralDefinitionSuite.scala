@@ -15,7 +15,7 @@ import lucuma.core.math.dimensional.arb.ArbQty
 import eu.timepit.refined.cats._
 
 final class SpectralDefinitionSuite extends DisciplineSuite {
-  import ArbUSED._
+  import ArbUnnormalizedSED._
   import ArbEnumerated._
   import ArbBandBrightness._
   import BrightnessUnits._

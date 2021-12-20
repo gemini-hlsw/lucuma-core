@@ -16,7 +16,7 @@ import lucuma.core.math.dimensional.arb.ArbQty
 import lucuma.core.model.BandBrightness
 import lucuma.core.model.EmissionLine
 import lucuma.core.model.SpectralDefinition
-import lucuma.core.model.USED
+import lucuma.core.model.UnnormalizedSED
 import lucuma.core.util.arb.ArbEnumerated
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck._
@@ -24,7 +24,7 @@ import org.scalacheck._
 import scala.collection.immutable.SortedMap
 
 trait ArbSpectralDefinition {
-  import ArbUSED._
+  import ArbUnnormalizedSED._
   import ArbBandBrightness._
   import ArbEnumerated._
   import SpectralDefinition._
@@ -65,7 +65,7 @@ trait ArbSpectralDefinition {
   ): Arbitrary[BandNormalized[T]] =
     Arbitrary {
       for {
-        s <- arbitrary[USED]
+        s <- arbitrary[UnnormalizedSED]
         b <- arbitrary[SortedMap[Band, BandBrightness[T]]]
       } yield BandNormalized(s, b)
     }
@@ -73,7 +73,9 @@ trait ArbSpectralDefinition {
   implicit def cogBandNormalizedSpectralDefinition[T](implicit
     cogenUnit: Cogen[GroupedUnitType[Brightness[T]]]
   ): Cogen[BandNormalized[T]] =
-    Cogen[(USED, SortedMap[Band, BandBrightness[T]])].contramap(x => (x.sed, x.brightnesses))
+    Cogen[(UnnormalizedSED, SortedMap[Band, BandBrightness[T]])].contramap(x =>
+      (x.sed, x.brightnesses)
+    )
 
   implicit def arbEmissionLines[T](implicit
     arbLineFluxUnit:             Arbitrary[GroupedUnitType[LineFlux[T]]],

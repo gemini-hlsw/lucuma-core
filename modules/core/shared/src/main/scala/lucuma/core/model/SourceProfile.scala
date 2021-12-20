@@ -127,11 +127,11 @@ object SourceProfile {
     surfaceSpectralDefinition.andThen(SpectralDefinition.emissionLines[Surface])
 
   /** @group Optics */
-  val integratedUSED: Optional[SourceProfile, USED] =
+  val integratedUnnormalizedSED: Optional[SourceProfile, UnnormalizedSED] =
     integratedSpectralDefinition.andThen(SpectralDefinition.used[Integrated])
 
   /** @group Optics */
-  val surfaceUSED: Optional[SourceProfile, USED] =
+  val surfaceUnnormalizedSED: Optional[SourceProfile, UnnormalizedSED] =
     surfaceSpectralDefinition.andThen(SpectralDefinition.used[Surface])
 
   /** @group Optics */

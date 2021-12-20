@@ -19,9 +19,9 @@ import lucuma.core.util.arb.ArbEnumerated
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck._
 
-trait ArbUnnormalizedSpectralEnergyDistribution {
+trait ArbUnnormalizedSED {
   import ArbEnumerated._
-  import USED._
+  import UnnormalizedSED._
   import ArbRefined._
   import ArbWavelength._
 
@@ -95,7 +95,7 @@ trait ArbUnnormalizedSpectralEnergyDistribution {
   implicit val cogUserDefined: Cogen[UserDefined] =
     Cogen[Map[Wavelength, PosBigDecimal]].contramap(_.fluxDensities.toSortedMap)
 
-  implicit def arbSpectralDistribution[T]: Arbitrary[USED] =
+  implicit def arbSpectralDistribution[T]: Arbitrary[UnnormalizedSED] =
     Arbitrary(
       Gen.oneOf(
         arbitrary[StellarLibrary],
@@ -111,7 +111,7 @@ trait ArbUnnormalizedSpectralEnergyDistribution {
       )
     )
 
-  implicit def cogSpectralDistribution[T]: Cogen[USED] =
+  implicit def cogSpectralDistribution[T]: Cogen[UnnormalizedSED] =
     Cogen[Either[
       StellarLibrary,
       Either[
@@ -155,4 +155,4 @@ trait ArbUnnormalizedSpectralEnergyDistribution {
     }
 }
 
-object ArbUnnormalizedSpectralEnergyDistribution extends ArbUnnormalizedSpectralEnergyDistribution
+object ArbUnnormalizedSED extends ArbUnnormalizedSED

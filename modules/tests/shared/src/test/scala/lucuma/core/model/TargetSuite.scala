@@ -35,7 +35,7 @@ final class TargetSuite extends DisciplineSuite {
   import ArbEmissionLine._
   import ArbSpectralDefinition._
   import ArbGaussianSource._
-  import ArbUSED._
+  import ArbUnnormalizedSED._
   import ArbBandBrightness._
   import ArbRefined._
   import ArbQty._
@@ -83,12 +83,12 @@ final class TargetSuite extends DisciplineSuite {
     OptionalTests(Target.Sidereal.surfaceEmissionLinesSpectralDefinition)
   )
   checkAll(
-    "Target.Sidereal.integratedUSED",
-    OptionalTests(Target.Sidereal.integratedUSED)
+    "Target.Sidereal.integratedUnnormalizedSED",
+    OptionalTests(Target.Sidereal.integratedUnnormalizedSED)
   )
   checkAll(
-    "Target.Sidereal.surfaceUSED",
-    OptionalTests(Target.Sidereal.surfaceUSED)
+    "Target.Sidereal.surfaceUnnormalizedSED",
+    OptionalTests(Target.Sidereal.surfaceUnnormalizedSED)
   )
   checkAll(
     "Target.Sidereal.integratedBandBrightnesses",
@@ -203,12 +203,12 @@ final class TargetSuite extends DisciplineSuite {
     OptionalTests(Target.Nonsidereal.surfaceEmissionLinesSpectralDefinition)
   )
   checkAll(
-    "Target.Nonsidereal.integratedUSED",
-    OptionalTests(Target.Nonsidereal.integratedUSED)
+    "Target.Nonsidereal.integratedUnnormalizedSED",
+    OptionalTests(Target.Nonsidereal.integratedUnnormalizedSED)
   )
   checkAll(
-    "Target.Nonsidereal.surfaceUSED",
-    OptionalTests(Target.Nonsidereal.surfaceUSED)
+    "Target.Nonsidereal.surfaceUnnormalizedSED",
+    OptionalTests(Target.Nonsidereal.surfaceUnnormalizedSED)
   )
   checkAll(
     "Target.Nonsidereal.integratedBandBrightnesses",
@@ -311,12 +311,12 @@ final class TargetSuite extends DisciplineSuite {
     OptionalTests(Target.surfaceEmissionLinesSpectralDefinition)
   )
   checkAll(
-    "Target.integratedUSED",
-    OptionalTests(Target.integratedUSED)
+    "Target.integratedUnnormalizedSED",
+    OptionalTests(Target.integratedUnnormalizedSED)
   )
   checkAll(
-    "Target.surfaceUSED",
-    OptionalTests(Target.surfaceUSED)
+    "Target.surfaceUnnormalizedSED",
+    OptionalTests(Target.surfaceUnnormalizedSED)
   )
   checkAll(
     "Target.integratedBandBrightnesses",

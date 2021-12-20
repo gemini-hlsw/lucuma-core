@@ -19,12 +19,18 @@ import monocle.Lens
 import monocle.Prism
 import monocle.macros.GenPrism
 
-sealed trait UnnormalizedSpectralEnergyDistribution extends Product with Serializable
+/**
+ * Unnormalized Spectral Energy Distribution.
+ *
+ * An unnormalized SED describes the shape of the SED across wavelengths. It's then normalized
+ * around a certain wavelength by using band brightnesses. By contrast, emission lines specify a
+ * normalized SED directly, without the need for band brightness information.
+ */
+sealed trait UnnormalizedSED extends Product with Serializable
 
-object UnnormalizedSpectralEnergyDistribution {
+object UnnormalizedSED {
 
-  final case class StellarLibrary(librarySpectrum: StellarLibrarySpectrum)
-      extends UnnormalizedSpectralEnergyDistribution
+  final case class StellarLibrary(librarySpectrum: StellarLibrarySpectrum) extends UnnormalizedSED
 
   object StellarLibrary {
     implicit val eqStellarLibrary: Eq[StellarLibrary] = Eq.by(_.librarySpectrum)
@@ -35,7 +41,7 @@ object UnnormalizedSpectralEnergyDistribution {
   }
 
   final case class CoolStarModel(temperature: Quantity[PosBigDecimal, Kelvin])
-      extends UnnormalizedSpectralEnergyDistribution
+      extends UnnormalizedSED
 
   object CoolStarModel {
     implicit val orderCoolStarModel: Order[CoolStarModel] = Order.by(_.temperature)
@@ -45,8 +51,7 @@ object UnnormalizedSpectralEnergyDistribution {
       Focus[CoolStarModel](_.temperature)
   }
 
-  final case class Galaxy(galaxySpectrum: GalaxySpectrum)
-      extends UnnormalizedSpectralEnergyDistribution
+  final case class Galaxy(galaxySpectrum: GalaxySpectrum) extends UnnormalizedSED
 
   object Galaxy {
     implicit val eqGalaxy: Eq[Galaxy] = Eq.by(_.galaxySpectrum)
@@ -56,8 +61,7 @@ object UnnormalizedSpectralEnergyDistribution {
       Focus[Galaxy](_.galaxySpectrum)
   }
 
-  final case class Planet(planetSpectrum: PlanetSpectrum)
-      extends UnnormalizedSpectralEnergyDistribution
+  final case class Planet(planetSpectrum: PlanetSpectrum) extends UnnormalizedSED
 
   object Planet {
     implicit val eqPlanet: Eq[Planet] = Eq.by(_.planetSpectrum)
@@ -67,8 +71,7 @@ object UnnormalizedSpectralEnergyDistribution {
       Focus[Planet](_.planetSpectrum)
   }
 
-  final case class Quasar(quasarSpectrum: QuasarSpectrum)
-      extends UnnormalizedSpectralEnergyDistribution
+  final case class Quasar(quasarSpectrum: QuasarSpectrum) extends UnnormalizedSED
 
   object Quasar {
     implicit val eqQuasar: Eq[Quasar] = Eq.by(_.quasarSpectrum)
@@ -78,8 +81,7 @@ object UnnormalizedSpectralEnergyDistribution {
       Focus[Quasar](_.quasarSpectrum)
   }
 
-  final case class HIIRegion(hiiRegionSpectrum: HIIRegionSpectrum)
-      extends UnnormalizedSpectralEnergyDistribution
+  final case class HIIRegion(hiiRegionSpectrum: HIIRegionSpectrum) extends UnnormalizedSED
 
   object HIIRegion {
     implicit val eqHIIRegion: Eq[HIIRegion] = Eq.by(_.hiiRegionSpectrum)
@@ -90,7 +92,7 @@ object UnnormalizedSpectralEnergyDistribution {
   }
 
   final case class PlanetaryNebula(planetaryNebulaSpectrum: PlanetaryNebulaSpectrum)
-      extends UnnormalizedSpectralEnergyDistribution
+      extends UnnormalizedSED
 
   object PlanetaryNebula {
     implicit val eqPlanetaryNebula: Eq[PlanetaryNebula] = Eq.by(_.planetaryNebulaSpectrum)
@@ -101,7 +103,7 @@ object UnnormalizedSpectralEnergyDistribution {
   }
 
   /** Defined by power law function. */
-  final case class PowerLaw(index: BigDecimal) extends UnnormalizedSpectralEnergyDistribution
+  final case class PowerLaw(index: BigDecimal) extends UnnormalizedSED
 
   object PowerLaw {
     implicit val orderPowerLaw: Order[PowerLaw] = Order.by(_.index)
@@ -111,8 +113,7 @@ object UnnormalizedSpectralEnergyDistribution {
   }
 
   /** A black body with a temperature in Kelvin. */
-  final case class BlackBody(temperature: Quantity[PosBigDecimal, Kelvin])
-      extends UnnormalizedSpectralEnergyDistribution
+  final case class BlackBody(temperature: Quantity[PosBigDecimal, Kelvin]) extends UnnormalizedSED
 
   object BlackBody {
     implicit val orderBlackBody: Order[BlackBody] = Order.by(_.temperature)
@@ -124,7 +125,7 @@ object UnnormalizedSpectralEnergyDistribution {
 
   // Flux density is unitless since we just need the shape of the function. It can be in any applicable units.
   final case class UserDefined(fluxDensities: NonEmptyMap[Wavelength, PosBigDecimal])
-      extends UnnormalizedSpectralEnergyDistribution
+      extends UnnormalizedSED
 
   object UserDefined {
     implicit val eqUserDefined: Eq[UserDefined] = Eq.by(_.fluxDensities)
@@ -134,7 +135,7 @@ object UnnormalizedSpectralEnergyDistribution {
       Focus[UserDefined](_.fluxDensities)
   }
 
-  implicit val eqSpectralDistribution: Eq[UnnormalizedSpectralEnergyDistribution] =
+  implicit val eqSpectralDistribution: Eq[UnnormalizedSED] =
     Eq.instance {
       case (a @ StellarLibrary(_), b @ StellarLibrary(_))   => a === b
       case (a @ CoolStarModel(_), b @ CoolStarModel(_))     => a === b
@@ -150,42 +151,42 @@ object UnnormalizedSpectralEnergyDistribution {
     }
 
   /** @group Optics */
-  val stellarLibrary: Prism[UnnormalizedSpectralEnergyDistribution, StellarLibrary] =
-    GenPrism[UnnormalizedSpectralEnergyDistribution, StellarLibrary]
+  val stellarLibrary: Prism[UnnormalizedSED, StellarLibrary] =
+    GenPrism[UnnormalizedSED, StellarLibrary]
 
   /** @group Optics */
-  val coolStarModel: Prism[UnnormalizedSpectralEnergyDistribution, CoolStarModel] =
-    GenPrism[UnnormalizedSpectralEnergyDistribution, CoolStarModel]
+  val coolStarModel: Prism[UnnormalizedSED, CoolStarModel] =
+    GenPrism[UnnormalizedSED, CoolStarModel]
 
   /** @group Optics */
-  val galaxy: Prism[UnnormalizedSpectralEnergyDistribution, Galaxy] =
-    GenPrism[UnnormalizedSpectralEnergyDistribution, Galaxy]
+  val galaxy: Prism[UnnormalizedSED, Galaxy] =
+    GenPrism[UnnormalizedSED, Galaxy]
 
   /** @group Optics */
-  val planet: Prism[UnnormalizedSpectralEnergyDistribution, Planet] =
-    GenPrism[UnnormalizedSpectralEnergyDistribution, Planet]
+  val planet: Prism[UnnormalizedSED, Planet] =
+    GenPrism[UnnormalizedSED, Planet]
 
   /** @group Optics */
-  val quasar: Prism[UnnormalizedSpectralEnergyDistribution, Quasar] =
-    GenPrism[UnnormalizedSpectralEnergyDistribution, Quasar]
+  val quasar: Prism[UnnormalizedSED, Quasar] =
+    GenPrism[UnnormalizedSED, Quasar]
 
   /** @group Optics */
-  val hiiRegion: Prism[UnnormalizedSpectralEnergyDistribution, HIIRegion] =
-    GenPrism[UnnormalizedSpectralEnergyDistribution, HIIRegion]
+  val hiiRegion: Prism[UnnormalizedSED, HIIRegion] =
+    GenPrism[UnnormalizedSED, HIIRegion]
 
   /** @group Optics */
-  val planetaryNebula: Prism[UnnormalizedSpectralEnergyDistribution, PlanetaryNebula] =
-    GenPrism[UnnormalizedSpectralEnergyDistribution, PlanetaryNebula]
+  val planetaryNebula: Prism[UnnormalizedSED, PlanetaryNebula] =
+    GenPrism[UnnormalizedSED, PlanetaryNebula]
 
   /** @group Optics */
-  val powerLaw: Prism[UnnormalizedSpectralEnergyDistribution, PowerLaw] =
-    GenPrism[UnnormalizedSpectralEnergyDistribution, PowerLaw]
+  val powerLaw: Prism[UnnormalizedSED, PowerLaw] =
+    GenPrism[UnnormalizedSED, PowerLaw]
 
   /** @group Optics */
-  val blackBody: Prism[UnnormalizedSpectralEnergyDistribution, BlackBody] =
-    GenPrism[UnnormalizedSpectralEnergyDistribution, BlackBody]
+  val blackBody: Prism[UnnormalizedSED, BlackBody] =
+    GenPrism[UnnormalizedSED, BlackBody]
 
   /** @group Optics */
-  val userDefined: Prism[UnnormalizedSpectralEnergyDistribution, UserDefined] =
-    GenPrism[UnnormalizedSpectralEnergyDistribution, UserDefined]
+  val userDefined: Prism[UnnormalizedSED, UserDefined] =
+    GenPrism[UnnormalizedSED, UserDefined]
 }

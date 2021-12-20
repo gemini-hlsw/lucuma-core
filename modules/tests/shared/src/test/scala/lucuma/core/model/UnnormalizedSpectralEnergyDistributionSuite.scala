@@ -15,8 +15,8 @@ import monocle.law.discipline.PrismTests
 import coulomb.cats.implicits._
 
 final class UnnormalizedSpectralEnergyDistributionSuite extends DisciplineSuite {
-  import USED._
-  import ArbUSED._
+  import UnnormalizedSED._
+  import ArbUnnormalizedSED._
   import ArbEnumerated._
   import ArbQuantity._
   import ArbRefined._
@@ -27,8 +27,8 @@ final class UnnormalizedSpectralEnergyDistributionSuite extends DisciplineSuite 
   checkAll("Order[BlackBody]", OrderTests[BlackBody].order)
 
   checkAll(
-    "Eq[USED]",
-    EqTests[USED].eqv
+    "Eq[UnnormalizedSED]",
+    EqTests[UnnormalizedSED].eqv
   )
 
   // Optics
@@ -46,43 +46,43 @@ final class UnnormalizedSpectralEnergyDistributionSuite extends DisciplineSuite 
   checkAll("BlackBody.temperature", LensTests(BlackBody.temperature))
 
   checkAll(
-    "USED.stellarLibrary",
-    PrismTests(USED.stellarLibrary)
+    "UnnormalizedSED.stellarLibrary",
+    PrismTests(UnnormalizedSED.stellarLibrary)
   )
   checkAll(
-    "USED.coolStarModel",
-    PrismTests(USED.coolStarModel)
+    "UnnormalizedSED.coolStarModel",
+    PrismTests(UnnormalizedSED.coolStarModel)
   )
   checkAll(
-    "USED.galaxy",
-    PrismTests(USED.galaxy)
+    "UnnormalizedSED.galaxy",
+    PrismTests(UnnormalizedSED.galaxy)
   )
   checkAll(
-    "USED.planet",
-    PrismTests(USED.planet)
+    "UnnormalizedSED.planet",
+    PrismTests(UnnormalizedSED.planet)
   )
   checkAll(
-    "USED.quasar",
-    PrismTests(USED.quasar)
+    "UnnormalizedSED.quasar",
+    PrismTests(UnnormalizedSED.quasar)
   )
   checkAll(
-    "USED.hiiRegion",
-    PrismTests(USED.hiiRegion)
+    "UnnormalizedSED.hiiRegion",
+    PrismTests(UnnormalizedSED.hiiRegion)
   )
   checkAll(
-    "USED.planetaryNebula",
-    PrismTests(USED.planetaryNebula)
+    "UnnormalizedSED.planetaryNebula",
+    PrismTests(UnnormalizedSED.planetaryNebula)
   )
   checkAll(
-    "USED.powerLaw",
-    PrismTests(USED.powerLaw)
+    "UnnormalizedSED.powerLaw",
+    PrismTests(UnnormalizedSED.powerLaw)
   )
   checkAll(
-    "USED.blackBody",
-    PrismTests(USED.blackBody)
+    "UnnormalizedSED.blackBody",
+    PrismTests(UnnormalizedSED.blackBody)
   )
   checkAll(
-    "USED.userDefined",
-    PrismTests(USED.userDefined)
+    "UnnormalizedSED.userDefined",
+    PrismTests(UnnormalizedSED.userDefined)
   )
 }

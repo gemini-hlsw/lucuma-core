@@ -168,12 +168,12 @@ object Target extends WithId('t') with TargetOptics {
       sourceProfile.andThen(SourceProfile.surfaceEmissionLinesSpectralDefinition)
 
     /** @group Optics */
-    val integratedUSED: Optional[Sidereal, USED] =
-      sourceProfile.andThen(SourceProfile.integratedUSED)
+    val integratedUnnormalizedSED: Optional[Sidereal, UnnormalizedSED] =
+      sourceProfile.andThen(SourceProfile.integratedUnnormalizedSED)
 
     /** @group Optics */
-    val surfaceUSED: Optional[Sidereal, USED] =
-      sourceProfile.andThen(SourceProfile.surfaceUSED)
+    val surfaceUnnormalizedSED: Optional[Sidereal, UnnormalizedSED] =
+      sourceProfile.andThen(SourceProfile.surfaceUnnormalizedSED)
 
     /** @group Optics */
     val integratedBandBrightnesses
@@ -328,12 +328,12 @@ object Target extends WithId('t') with TargetOptics {
       sourceProfile.andThen(SourceProfile.surfaceEmissionLinesSpectralDefinition)
 
     /** @group Optics */
-    val integratedUSED: Optional[Nonsidereal, USED] =
-      sourceProfile.andThen(SourceProfile.integratedUSED)
+    val integratedUnnormalizedSED: Optional[Nonsidereal, UnnormalizedSED] =
+      sourceProfile.andThen(SourceProfile.integratedUnnormalizedSED)
 
     /** @group Optics */
-    val surfaceUSED: Optional[Nonsidereal, USED] =
-      sourceProfile.andThen(SourceProfile.surfaceUSED)
+    val surfaceUnnormalizedSED: Optional[Nonsidereal, UnnormalizedSED] =
+      sourceProfile.andThen(SourceProfile.surfaceUnnormalizedSED)
 
     /** @group Optics */
     val integratedBandBrightnesses
@@ -466,12 +466,12 @@ trait TargetOptics { this: Target.type =>
     sourceProfile.andThen(SourceProfile.surfaceEmissionLinesSpectralDefinition)
 
   /** @group Optics */
-  val integratedUSED: Optional[Target, USED] =
-    sourceProfile.andThen(SourceProfile.integratedUSED)
+  val integratedUnnormalizedSED: Optional[Target, UnnormalizedSED] =
+    sourceProfile.andThen(SourceProfile.integratedUnnormalizedSED)
 
   /** @group Optics */
-  val surfaceUSED: Optional[Target, USED] =
-    sourceProfile.andThen(SourceProfile.surfaceUSED)
+  val surfaceUnnormalizedSED: Optional[Target, UnnormalizedSED] =
+    sourceProfile.andThen(SourceProfile.surfaceUnnormalizedSED)
 
   /** @group Optics */
   val integratedBandBrightnesses: Optional[Target, SortedMap[Band, BandBrightness[Integrated]]] =

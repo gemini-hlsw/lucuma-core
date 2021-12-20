@@ -26,7 +26,7 @@ sealed trait SpectralDefinition[T]
 object SpectralDefinition {
 
   final case class BandNormalized[T](
-    sed:          USED,
+    sed:          UnnormalizedSED,
     brightnesses: SortedMap[Band, BandBrightness[T]]
   ) extends SpectralDefinition[T] {
     lazy val bands: List[Band] = brightnesses.keys.toList
@@ -37,7 +37,7 @@ object SpectralDefinition {
       Eq.by(x => (x.sed, x.brightnesses))
 
     /** @group Optics */
-    def sed[T]: Lens[BandNormalized[T], USED] =
+    def sed[T]: Lens[BandNormalized[T], UnnormalizedSED] =
       Focus[BandNormalized[T]](_.sed)
 
     /** @group Optics */
@@ -101,7 +101,7 @@ object SpectralDefinition {
     GenPrism[SpectralDefinition[T], EmissionLines[T]]
 
   /** @group Optics */
-  def used[T]: Optional[SpectralDefinition[T], USED] =
+  def used[T]: Optional[SpectralDefinition[T], UnnormalizedSED] =
     bandNormalized.andThen(BandNormalized.sed[T])
 
   /** @group Optics */

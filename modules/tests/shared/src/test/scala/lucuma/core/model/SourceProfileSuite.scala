@@ -19,7 +19,7 @@ final class SourceProfileSuite extends DisciplineSuite {
   import ArbSpectralDefinition._
   import ArbEnumerated._
   import ArbGaussianSource._
-  import ArbUSED._
+  import ArbUnnormalizedSED._
   import ArbBandBrightness._
   import ArbEmissionLine._
   import ArbRefined._
@@ -77,12 +77,12 @@ final class SourceProfileSuite extends DisciplineSuite {
     OptionalTests(SourceProfile.surfaceEmissionLinesSpectralDefinition)
   )
   checkAll(
-    "SourceProfile.integratedUSED",
-    OptionalTests(SourceProfile.integratedUSED)
+    "SourceProfile.integratedUnnormalizedSED",
+    OptionalTests(SourceProfile.integratedUnnormalizedSED)
   )
   checkAll(
-    "SourceProfile.surfaceUSED",
-    OptionalTests(SourceProfile.surfaceUSED)
+    "SourceProfile.surfaceUnnormalizedSED",
+    OptionalTests(SourceProfile.surfaceUnnormalizedSED)
   )
   checkAll(
     "SourceProfile.integratedBandBrightnesses",
