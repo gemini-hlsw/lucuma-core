@@ -25,12 +25,19 @@ trait UnitType { self =>
     val unit  = self
   }
 
+  // `UnitDefiniton`s are expected to be singletons.
+  override def equals(obj: Any): Boolean = obj match {
+    case that: UnitType => definition == that.definition
+    case _              => false
+  }
+
+  override def hashCode: Int = definition.hashCode
+
   override def toString: String = definition.abbv
 }
 
 object UnitType {
-  // `UnitDefiniton`s are expected to be singletons.
-  implicit val eqUnitType: Eq[UnitType] = Eq.instance((a, b) => a.definition == b.definition)
+  implicit val eqUnitType: Eq[UnitType] = Eq.fromUniversalEquals
 }
 
 /**

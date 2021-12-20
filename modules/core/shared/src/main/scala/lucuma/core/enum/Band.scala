@@ -60,10 +60,10 @@ trait BandDefaultUnit {
 
 trait BandDefaultUnitLowPriorityImplicits extends BandDefaultUnit {
   // These are the defaults
-  implicit def defaultIntegratedUnit[B]: DefaultUnit[B, Brightness[Integrated]] =
-    DefaultUnit[B, Brightness[Integrated], VegaMagnitude]
-  implicit def defaultSurfaceUnit[B]: DefaultUnit[B, Brightness[Surface]]       =
-    DefaultUnit[B, Brightness[Surface], VegaMagnitudePerArcsec2]
+  implicit def defaultIntegratedUnit[B]: DefaultUnit[B, Integrated] =
+    DefaultUnit[B, Integrated, VegaMagnitude]
+  implicit def defaultSurfaceUnit[B]: DefaultUnit[B, Surface]       =
+    DefaultUnit[B, Surface, VegaMagnitudePerArcsec2]
 }
 
 object Band extends BandDefaultUnitLowPriorityImplicits {
@@ -77,10 +77,10 @@ object Band extends BandDefaultUnitLowPriorityImplicits {
         Wavelength(356000),
         46.withRefinedUnit[Positive, Nanometer]
       )
-  implicit val defaultSloanUIntegratedUnit: DefaultUnit[SloanU.type, Brightness[Integrated]] =
-    DefaultUnit[SloanU.type, Brightness[Integrated], ABMagnitude]
-  implicit val defaultSloanUSurfaceUnit: DefaultUnit[SloanU.type, Brightness[Surface]]       =
-    DefaultUnit[SloanU.type, Brightness[Surface], ABMagnitudePerArcsec2]
+  implicit val defaultSloanUIntegratedUnit: DefaultUnit[SloanU.type, Integrated] =
+    DefaultUnit[SloanU.type, Integrated, ABMagnitude]
+  implicit val defaultSloanUSurfaceUnit: DefaultUnit[SloanU.type, Surface]       =
+    DefaultUnit[SloanU.type, Surface, ABMagnitudePerArcsec2]
 
   /** @group Constructors */
   case object SloanG
@@ -91,10 +91,10 @@ object Band extends BandDefaultUnitLowPriorityImplicits {
         Wavelength(483000),
         99.withRefinedUnit[Positive, Nanometer]
       )
-  implicit val defaultSloanGIntegratedUnit: DefaultUnit[SloanG.type, Brightness[Integrated]] =
-    DefaultUnit[SloanG.type, Brightness[Integrated], ABMagnitude]
-  implicit val defaultSloanGSurfaceUnit: DefaultUnit[SloanG.type, Brightness[Surface]]       =
-    DefaultUnit[SloanG.type, Brightness[Surface], ABMagnitudePerArcsec2]
+  implicit val defaultSloanGIntegratedUnit: DefaultUnit[SloanG.type, Integrated] =
+    DefaultUnit[SloanG.type, Integrated, ABMagnitude]
+  implicit val defaultSloanGSurfaceUnit: DefaultUnit[SloanG.type, Surface]       =
+    DefaultUnit[SloanG.type, Surface, ABMagnitudePerArcsec2]
 
   /** @group Constructors */
   case object SloanR
@@ -105,10 +105,10 @@ object Band extends BandDefaultUnitLowPriorityImplicits {
         Wavelength(626000),
         96.withRefinedUnit[Positive, Nanometer]
       )
-  implicit val defaultSloanRIntegratedUnit: DefaultUnit[SloanR.type, Brightness[Integrated]] =
-    DefaultUnit[SloanR.type, Brightness[Integrated], ABMagnitude]
-  implicit val defaultSloanRSurfaceUnit: DefaultUnit[SloanR.type, Brightness[Surface]]       =
-    DefaultUnit[SloanR.type, Brightness[Surface], ABMagnitudePerArcsec2]
+  implicit val defaultSloanRIntegratedUnit: DefaultUnit[SloanR.type, Integrated] =
+    DefaultUnit[SloanR.type, Integrated, ABMagnitude]
+  implicit val defaultSloanRSurfaceUnit: DefaultUnit[SloanR.type, Surface]       =
+    DefaultUnit[SloanR.type, Surface, ABMagnitudePerArcsec2]
 
   /** @group Constructors */
   case object SloanI
@@ -119,10 +119,10 @@ object Band extends BandDefaultUnitLowPriorityImplicits {
         Wavelength(767000),
         106.withRefinedUnit[Positive, Nanometer]
       )
-  implicit val defaultSloanIIntegratedUnit: DefaultUnit[SloanI.type, Brightness[Integrated]] =
-    DefaultUnit[SloanI.type, Brightness[Integrated], ABMagnitude]
-  implicit val defaultSloanISurfaceUnit: DefaultUnit[SloanI.type, Brightness[Surface]]       =
-    DefaultUnit[SloanI.type, Brightness[Surface], ABMagnitudePerArcsec2]
+  implicit val defaultSloanIIntegratedUnit: DefaultUnit[SloanI.type, Integrated] =
+    DefaultUnit[SloanI.type, Integrated, ABMagnitude]
+  implicit val defaultSloanISurfaceUnit: DefaultUnit[SloanI.type, Surface]       =
+    DefaultUnit[SloanI.type, Surface, ABMagnitudePerArcsec2]
 
   /** @group Constructors */
   case object SloanZ
@@ -133,10 +133,10 @@ object Band extends BandDefaultUnitLowPriorityImplicits {
         Wavelength(910000),
         125.withRefinedUnit[Positive, Nanometer]
       )
-  implicit val defaultSloanZIntegratedUnit: DefaultUnit[SloanZ.type, Brightness[Integrated]] =
-    DefaultUnit[SloanZ.type, Brightness[Integrated], ABMagnitude]
-  implicit val defaultSloanZSurfaceUnit: DefaultUnit[SloanZ.type, Brightness[Surface]]       =
-    DefaultUnit[SloanZ.type, Brightness[Surface], ABMagnitudePerArcsec2]
+  implicit val defaultSloanZIntegratedUnit: DefaultUnit[SloanZ.type, Integrated] =
+    DefaultUnit[SloanZ.type, Integrated, ABMagnitude]
+  implicit val defaultSloanZSurfaceUnit: DefaultUnit[SloanZ.type, Surface]       =
+    DefaultUnit[SloanZ.type, Surface, ABMagnitudePerArcsec2]
 
   /** @group Constructors */
   case object U

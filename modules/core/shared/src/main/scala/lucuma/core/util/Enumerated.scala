@@ -8,10 +8,9 @@ package util
 import cats.Order
 import cats.data.NonEmptyList
 import cats.syntax.all._
+import io.circe._
 import lucuma.core.syntax.string._
 import monocle.Prism
-
-import io.circe._
 
 /**
  * Typeclass for an enumerated type with unique string tags and a canonical ordering.

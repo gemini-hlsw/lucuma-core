@@ -15,8 +15,8 @@ import monocle.law.discipline.PrismTests
 import coulomb.cats.implicits._
 
 final class UnnormalizedSpectralEnergyDistributionSuite extends DisciplineSuite {
-  import UnnormalizedSpectralEnergyDistribution._
-  import ArbUnnormalizedSpectralEnergyDistribution._
+  import UnnormalizedSED._
+  import ArbUnnormalizedSED._
   import ArbEnumerated._
   import ArbQuantity._
   import ArbRefined._
@@ -27,8 +27,8 @@ final class UnnormalizedSpectralEnergyDistributionSuite extends DisciplineSuite 
   checkAll("Order[BlackBody]", OrderTests[BlackBody].order)
 
   checkAll(
-    "Eq[UnnormalizedSpectralEnergyDistribution]",
-    EqTests[UnnormalizedSpectralEnergyDistribution].eqv
+    "Eq[UnnormalizedSED]",
+    EqTests[UnnormalizedSED].eqv
   )
 
   // Optics
@@ -46,43 +46,43 @@ final class UnnormalizedSpectralEnergyDistributionSuite extends DisciplineSuite 
   checkAll("BlackBody.temperature", LensTests(BlackBody.temperature))
 
   checkAll(
-    "UnnormalizedSpectralEnergyDistribution.stellarLibrary",
-    PrismTests(UnnormalizedSpectralEnergyDistribution.stellarLibrary)
+    "UnnormalizedSED.stellarLibrary",
+    PrismTests(UnnormalizedSED.stellarLibrary)
   )
   checkAll(
-    "UnnormalizedSpectralEnergyDistribution.coolStarModel",
-    PrismTests(UnnormalizedSpectralEnergyDistribution.coolStarModel)
+    "UnnormalizedSED.coolStarModel",
+    PrismTests(UnnormalizedSED.coolStarModel)
   )
   checkAll(
-    "UnnormalizedSpectralEnergyDistribution.galaxy",
-    PrismTests(UnnormalizedSpectralEnergyDistribution.galaxy)
+    "UnnormalizedSED.galaxy",
+    PrismTests(UnnormalizedSED.galaxy)
   )
   checkAll(
-    "UnnormalizedSpectralEnergyDistribution.planet",
-    PrismTests(UnnormalizedSpectralEnergyDistribution.planet)
+    "UnnormalizedSED.planet",
+    PrismTests(UnnormalizedSED.planet)
   )
   checkAll(
-    "UnnormalizedSpectralEnergyDistribution.quasar",
-    PrismTests(UnnormalizedSpectralEnergyDistribution.quasar)
+    "UnnormalizedSED.quasar",
+    PrismTests(UnnormalizedSED.quasar)
   )
   checkAll(
-    "UnnormalizedSpectralEnergyDistribution.hiiRegion",
-    PrismTests(UnnormalizedSpectralEnergyDistribution.hiiRegion)
+    "UnnormalizedSED.hiiRegion",
+    PrismTests(UnnormalizedSED.hiiRegion)
   )
   checkAll(
-    "UnnormalizedSpectralEnergyDistribution.planetaryNebula",
-    PrismTests(UnnormalizedSpectralEnergyDistribution.planetaryNebula)
+    "UnnormalizedSED.planetaryNebula",
+    PrismTests(UnnormalizedSED.planetaryNebula)
   )
   checkAll(
-    "UnnormalizedSpectralEnergyDistribution.powerLaw",
-    PrismTests(UnnormalizedSpectralEnergyDistribution.powerLaw)
+    "UnnormalizedSED.powerLaw",
+    PrismTests(UnnormalizedSED.powerLaw)
   )
   checkAll(
-    "UnnormalizedSpectralEnergyDistribution.blackBody",
-    PrismTests(UnnormalizedSpectralEnergyDistribution.blackBody)
+    "UnnormalizedSED.blackBody",
+    PrismTests(UnnormalizedSED.blackBody)
   )
   checkAll(
-    "UnnormalizedSpectralEnergyDistribution.userDefined",
-    PrismTests(UnnormalizedSpectralEnergyDistribution.userDefined)
+    "UnnormalizedSED.userDefined",
+    PrismTests(UnnormalizedSED.userDefined)
   )
 }

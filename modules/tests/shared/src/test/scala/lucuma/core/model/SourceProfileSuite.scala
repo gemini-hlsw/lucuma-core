@@ -8,13 +8,22 @@ import lucuma.core.model.arb._
 import monocle.law.discipline._
 import munit._
 import lucuma.core.util.arb.ArbEnumerated
+import lucuma.core.enum.Band
+import lucuma.core.math.Wavelength
+import lucuma.core.math.arb.ArbRefined
+import lucuma.core.math.dimensional.arb.ArbQty
+import eu.timepit.refined.cats._
 
 final class SourceProfileSuite extends DisciplineSuite {
   import ArbSourceProfile._
   import ArbSpectralDefinition._
   import ArbEnumerated._
-  // import ArbBandBrightness._
   import ArbGaussianSource._
+  import ArbUnnormalizedSED._
+  import ArbBandBrightness._
+  import ArbEmissionLine._
+  import ArbRefined._
+  import ArbQty._
 
   // Laws for SourceProfile.Point
   checkAll("Eq[SourceProfile.Point]", EqTests[SourceProfile.Point].eqv)
@@ -50,5 +59,89 @@ final class SourceProfileSuite extends DisciplineSuite {
   checkAll(
     "SourceProfile.gaussianSource",
     OptionalTests(SourceProfile.gaussianSource)
+  )
+  checkAll(
+    "SourceProfile.integratedBandNormalizedSpectralDefinition",
+    OptionalTests(SourceProfile.integratedBandNormalizedSpectralDefinition)
+  )
+  checkAll(
+    "SourceProfile.surfaceBandNormalizedSpectralDefinition",
+    OptionalTests(SourceProfile.surfaceBandNormalizedSpectralDefinition)
+  )
+  checkAll(
+    "SourceProfile.integratedEmissionLinesSpectralDefinition",
+    OptionalTests(SourceProfile.integratedEmissionLinesSpectralDefinition)
+  )
+  checkAll(
+    "SourceProfile.surfaceEmissionLinesSpectralDefinition",
+    OptionalTests(SourceProfile.surfaceEmissionLinesSpectralDefinition)
+  )
+  checkAll(
+    "SourceProfile.integratedUnnormalizedSED",
+    OptionalTests(SourceProfile.integratedUnnormalizedSED)
+  )
+  checkAll(
+    "SourceProfile.surfaceUnnormalizedSED",
+    OptionalTests(SourceProfile.surfaceUnnormalizedSED)
+  )
+  checkAll(
+    "SourceProfile.integratedBandBrightnesses",
+    OptionalTests(SourceProfile.integratedBandBrightnesses)
+  )
+  checkAll(
+    "SourceProfile.surfaceBandBrightnesses",
+    OptionalTests(SourceProfile.surfaceBandBrightnesses)
+  )
+  checkAll(
+    "SourceProfile.integratedBandBrightnessesT",
+    TraversalTests(SourceProfile.integratedBandBrightnessesT)
+  )
+  checkAll(
+    "SourceProfile.surfaceBandBrightnessesT",
+    TraversalTests(SourceProfile.surfaceBandBrightnessesT)
+  )
+  checkAll(
+    "SourceProfile.integratedBandBrightnessIn",
+    TraversalTests(SourceProfile.integratedBandBrightnessIn(Band.B))
+  )
+  checkAll(
+    "SourceProfile.surfaceBandBrightnessIn",
+    TraversalTests(SourceProfile.surfaceBandBrightnessIn(Band.B))
+  )
+  checkAll(
+    "SourceProfile.integratedWavelengthLines",
+    OptionalTests(SourceProfile.integratedWavelengthLines)
+  )
+  checkAll(
+    "SourceProfile.surfaceWavelengthLines",
+    OptionalTests(SourceProfile.surfaceWavelengthLines)
+  )
+  checkAll(
+    "SourceProfile.integratedWavelengthLinesT",
+    TraversalTests(SourceProfile.integratedWavelengthLinesT)
+  )
+  checkAll(
+    "SourceProfile.surfaceWavelengthLinesT",
+    TraversalTests(SourceProfile.surfaceWavelengthLinesT)
+  )
+  checkAll(
+    "SourceProfile.integratedWavelengthLineIn",
+    TraversalTests(
+      SourceProfile.integratedWavelengthLineIn(Wavelength.fromPicometers.getOption(620000).get)
+    )
+  )
+  checkAll(
+    "SourceProfile.surfaceWavelengthLineIn",
+    TraversalTests(
+      SourceProfile.surfaceWavelengthLineIn(Wavelength.fromPicometers.getOption(620000).get)
+    )
+  )
+  checkAll(
+    "SourceProfile.integratedFluxDensityContinuum",
+    OptionalTests(SourceProfile.integratedFluxDensityContinuum)
+  )
+  checkAll(
+    "SourceProfile.surfaceFluxDensityContinuum",
+    OptionalTests(SourceProfile.surfaceFluxDensityContinuum)
   )
 }
