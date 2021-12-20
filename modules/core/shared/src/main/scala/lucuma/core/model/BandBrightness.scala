@@ -29,7 +29,7 @@ final case class BandBrightness[T](
 
   override def toString: String = {
     val errStr = error.map(e => f"${e.toDoubleValue}%.2f")
-    f"BandBrightness(${quantity.value.toDoubleValue}%.2f ${quantity.unit.definition.abbv}, ${band.shortName}, $errStr)"
+    f"BandBrightness(${quantity.value.toDoubleValue}%.2f ${quantity.unit.abbv}, ${band.shortName}, $errStr)"
   }
 }
 

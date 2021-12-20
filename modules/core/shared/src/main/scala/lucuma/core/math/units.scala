@@ -97,9 +97,10 @@ trait units {
       abbv = "Jy"
     )
 
-  type WattsBrightness
-  implicit val defineWattsBrightness =
-    DerivedUnit[WattsBrightness, Watt %/ ((Meter %^ 2) %* Micrometer)](abbv = "W/m²/µm")
+  // type WattsBrightness
+  // implicit val defineWattsBrightness =
+  //   DerivedUnit[WattsBrightness, Watt %/ ((Meter %^ 2) %* Micrometer)](abbv = "W/m²/µm")
+  type WattsBrightness = Watt %/ ((Meter %^ 2) %* Micrometer)
 
   private val ErgPerJoule: SafeLong = SafeLong(10).pow(7)
   type Erg
@@ -123,9 +124,11 @@ trait units {
   // Derive a surface unit from an integrated unit
   private def defineSurfaceUnit[U, D](implicit unitD: UnitOfMeasure[D]) =
     DerivedUnit[U, D %/ (ArcSecond %^ 2)](
-      name = unitD.definition.name + "per arcsec²",
-      abbv = unitD.definition.abbv + "/arcsec²"
+      name = unitD.name + "per arcsec²",
+      abbv = unitD.abbv + "/arcsec²"
     )
+
+  type SurfaceUnits[U] = U %/ (ArcSecond %^ 2)
 
   type VegaMagnitudePerArcsec2
   implicit val defineVegaMagnitudePerArcsec2 =
@@ -139,9 +142,10 @@ trait units {
   implicit val defineJanskyPerArcsec2 =
     defineSurfaceUnit[JanskyPerArcsec2, Jansky]
 
-  type WattsBrightnessPerArcsec2
-  implicit val defineWattsBrightnessPerArcsec2 =
-    defineSurfaceUnit[WattsBrightnessPerArcsec2, WattsBrightness]
+  // type WattsBrightnessPerArcsec2 = SurfaceUnits[WattsBrightness]
+  // type WattsBrightnessPerArcsec2
+  // implicit val defineWattsBrightnessPerArcsec2 =
+  //   defineSurfaceUnit[WattsBrightnessPerArcsec2, WattsBrightness]
 
   type ErgsWavelengthBrightnessPerArcsec2
   implicit val defineErgsWavelengthBrightnessPerArcsec2 =

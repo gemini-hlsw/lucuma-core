@@ -9,6 +9,13 @@ import cats.data.NonEmptyList
 import lucuma.core.math.dimensional._
 import lucuma.core.math.units._
 import lucuma.core.util.Enumerated
+// import coulomb._
+// import coulomb.accepted._
+// import coulomb.define._
+// import coulomb.mks._
+// import coulomb.si._
+// import coulomb.siprefix._
+// import coulomb.time._
 
 object BrightnessUnits {
   type Integrated
@@ -40,7 +47,7 @@ object BrightnessUnits {
             UnitOfMeasure[VegaMagnitudePerArcsec2],
             UnitOfMeasure[ABMagnitudePerArcsec2],
             UnitOfMeasure[JanskyPerArcsec2],
-            UnitOfMeasure[WattsBrightnessPerArcsec2],
+            UnitOfMeasure[SurfaceUnits[WattsBrightness]],
             UnitOfMeasure[ErgsWavelengthBrightnessPerArcsec2],
             UnitOfMeasure[ErgsFrequencyBrightnessPerArcsec2]
           )
@@ -85,7 +92,7 @@ object BrightnessUnits {
       val all: NonEmptyList[GroupedUnitType[FluxDensityContinuum[Surface]]] =
         NonEmptyList
           .of(
-            UnitOfMeasure[WattsBrightnessPerArcsec2],
+            UnitOfMeasure[SurfaceUnits[WattsBrightness]],
             UnitOfMeasure[ErgsWavelengthBrightnessPerArcsec2]
           )
           .map(_.groupedIn[FluxDensityContinuum[Surface]])
@@ -96,7 +103,7 @@ object BrightnessUnits {
   private def enumGroupedUnitType[UG](
     allList: NonEmptyList[GroupedUnitType[UG]]
   ): Enumerated[GroupedUnitType[UG]] =
-    Enumerated.fromNEL(allList).withTag(_.definition.abbv)
+    Enumerated.fromNEL(allList).withTag(_.abbv)
 
   implicit val enumBrightnessIntegrated: Enumerated[GroupedUnitType[Brightness[Integrated]]] =
     enumGroupedUnitType[Brightness[Integrated]](Brightness.Integrated.all)
