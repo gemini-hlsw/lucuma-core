@@ -3,11 +3,11 @@
 
 package lucuma.core.model
 
-import lucuma.core.util.arb._
-import lucuma.core.model.arb._
-import munit._
-import lucuma.core.util.laws.GidTests
 import cats.kernel.laws.discipline.EqTests
+import lucuma.core.model.arb._
+import lucuma.core.util.arb._
+import lucuma.core.util.laws.GidTests
+import munit._
 
 final class RoleSuite extends DisciplineSuite {
   import ArbGid._

@@ -4,15 +4,15 @@
 package lucuma.core.model
 
 import cats.kernel.laws.discipline._
-import lucuma.core.model.arb._
-import monocle.law.discipline._
-import munit._
-import lucuma.core.util.arb.ArbEnumerated
+import eu.timepit.refined.cats._
 import lucuma.core.enum.Band
 import lucuma.core.math.BrightnessUnits
 import lucuma.core.math.arb.ArbRefined
 import lucuma.core.math.dimensional.arb.ArbQty
-import eu.timepit.refined.cats._
+import lucuma.core.model.arb._
+import lucuma.core.util.arb.ArbEnumerated
+import monocle.law.discipline._
+import munit._
 
 final class SpectralDefinitionSuite extends DisciplineSuite {
   import ArbUnnormalizedSED._

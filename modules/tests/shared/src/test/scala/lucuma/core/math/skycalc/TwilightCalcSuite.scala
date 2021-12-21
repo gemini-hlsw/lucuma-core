@@ -3,11 +3,12 @@
 
 package lucuma.core.math.skycalc
 
-import munit.FunSuite
 import lucuma.core.enum.Site
 import lucuma.core.enum.TwilightType
-import java.time.LocalDate
+import munit.FunSuite
 import org.scalactic.Tolerance
+
+import java.time.LocalDate
 
 final class TwilightCalcSuite extends FunSuite with Tolerance {
   private val Date = LocalDate.of(2000, 1, 1)

@@ -3,15 +3,16 @@
 
 package gem.math
 
-import munit._
-import org.scalacheck.Prop._
-import cats.{ Eq, Show }
-import lucuma.core.model.LocalObservingNight
+import cats.Eq
+import cats.Show
+import cats.kernel.laws.discipline._
 import lucuma.core.arb.ArbTime._
+import lucuma.core.model.LocalObservingNight
 import lucuma.core.model.arb.ArbObservingNight._
 import lucuma.core.util.arb.ArbEnumerated._
-import cats.kernel.laws.discipline._
 import monocle.law.discipline._
+import munit._
+import org.scalacheck.Prop._
 import org.typelevel.cats.time._
 
 final class LocalObservingNightSuite extends DisciplineSuite {

@@ -3,19 +3,19 @@
 
 package lucuma.core.math
 
-import cats.syntax.all._
-import cats.{ Eq, Show }
+import cats.Eq
+import cats.Show
 import cats.kernel.laws.discipline._
-
-import lucuma.core.math.arb._
-
-import java.time.LocalDateTime
-import java.time.Instant
-import org.scalacheck.Gen._
-import org.scalacheck.Arbitrary
-import org.scalacheck.Prop._
+import cats.syntax.all._
 import lucuma.core.arb.ArbTime
+import lucuma.core.math.arb._
+import org.scalacheck.Arbitrary
+import org.scalacheck.Gen._
+import org.scalacheck.Prop._
 import org.typelevel.cats.time._
+
+import java.time.Instant
+import java.time.LocalDateTime
 
 final class JulianDateSuute extends munit.DisciplineSuite {
   import ArbJulianDate._

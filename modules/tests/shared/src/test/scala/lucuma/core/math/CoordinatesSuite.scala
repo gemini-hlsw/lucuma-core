@@ -3,10 +3,11 @@
 
 package lucuma.core.math
 
-import cats.{ Eq, Show }
+import cats.Eq
+import cats.Show
 import cats.kernel.laws.discipline._
-import lucuma.core.optics.laws.discipline._
 import lucuma.core.math.arb._
+import lucuma.core.optics.laws.discipline._
 import monocle.law.discipline._
 import org.scalacheck.Prop._
 

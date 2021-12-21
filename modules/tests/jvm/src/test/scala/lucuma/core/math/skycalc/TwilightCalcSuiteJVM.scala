@@ -3,22 +3,22 @@
 
 package lucuma.core.math.skycalc
 
-import munit.ScalaCheckSuite
-import org.scalacheck.Prop._
-
 import cats._
 import cats.syntax.all._
-import lucuma.core.math.skycalc.TwilightCalc
-import java.time.Instant
-import java.time.LocalDate
+import edu.gemini.skycalc.TwilightBoundedNightTest
+import lucuma.core.arb.ArbTime
 import lucuma.core.enum.Site
 import lucuma.core.enum.TwilightType
-import lucuma.core.arb.ArbTime
-import lucuma.core.util.arb.ArbEnumerated
-import edu.gemini.skycalc.TwilightBoundedNightTest
-import org.scalactic.Tolerance
+import lucuma.core.math.skycalc.TwilightCalc
 import lucuma.core.optics.Spire
+import lucuma.core.util.arb.ArbEnumerated
+import munit.ScalaCheckSuite
+import org.scalacheck.Prop._
+import org.scalactic.Tolerance
 import org.typelevel.cats.time._
+
+import java.time.Instant
+import java.time.LocalDate
 
 final class TwilightCalcSuiteJVM extends ScalaCheckSuite with Tolerance {
   import ArbEnumerated._

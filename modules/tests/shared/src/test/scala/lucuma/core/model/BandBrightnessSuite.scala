@@ -3,13 +3,13 @@
 
 package lucuma.core.model
 import cats.kernel.laws.discipline._
-import lucuma.core.model.arb._
-import munit._
 import lucuma.core.math.BrightnessUnits
-import lucuma.core.util.arb.ArbEnumerated
-import monocle.law.discipline.LensTests
 import lucuma.core.math.arb.ArbBrightnessValue
 import lucuma.core.math.dimensional.arb.ArbQty
+import lucuma.core.model.arb._
+import lucuma.core.util.arb.ArbEnumerated
+import monocle.law.discipline.LensTests
+import munit._
 
 final class BandBrightnessSuite extends DisciplineSuite {
   import ArbBandBrightness._

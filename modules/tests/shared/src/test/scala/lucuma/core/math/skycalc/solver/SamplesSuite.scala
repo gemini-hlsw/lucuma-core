@@ -5,26 +5,27 @@ package lucuma.core.math.skycalc.solver
 
 import cats.Eq
 import cats.Eval
-import cats.syntax.all._
-import java.time.Duration
-import scala.collection.immutable.TreeMap
-import spire.math.Bounded
-import lucuma.core.math.IntervalGens
-import lucuma.core.math.skycalc.solver.Samples.Bracket
-import lucuma.core.syntax.time._
-import org.scalacheck.Gen._
-import org.scalacheck.Arbitrary._
-import org.scalacheck.Prop._
-import lucuma.core.math.arb._
+import cats.kernel.laws.discipline.EqTests
 import cats.laws.discipline.FunctorTests
 import cats.laws.discipline.MonoidKTests
-import cats.kernel.laws.discipline.EqTests
-import monocle.law.discipline.IsoTests
-import lucuma.core.arb._
+import cats.syntax.all._
 import lucuma.core.arb.ArbEval
 import lucuma.core.arb.ArbTime
+import lucuma.core.arb._
+import lucuma.core.math.IntervalGens
+import lucuma.core.math.arb._
+import lucuma.core.math.skycalc.solver.Samples.Bracket
+import lucuma.core.syntax.time._
+import monocle.law.discipline.IsoTests
+import org.scalacheck.Arbitrary._
+import org.scalacheck.Gen._
+import org.scalacheck.Prop._
 import org.typelevel.cats.time._
+import spire.math.Bounded
+
+import java.time.Duration
 import java.time.Instant
+import scala.collection.immutable.TreeMap
 
 final class SamplesSuite extends munit.DisciplineSuite with IntervalGens {
   import ArbEval._

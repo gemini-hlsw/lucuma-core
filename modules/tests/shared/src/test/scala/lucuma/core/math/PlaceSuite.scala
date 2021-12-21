@@ -3,19 +3,19 @@
 
 package lucuma.core.math
 
+import cats.Show
+import cats.kernel.laws.discipline.EqTests
+import coulomb.cats.implicits._
+import coulomb.scalacheck.ArbQuantity
+import eu.timepit.refined.auto._
+import eu.timepit.refined.cats._
+import eu.timepit.refined.scalacheck.numeric._
+import lucuma.core.arb.ArbTime
+import lucuma.core.arb._
+import lucuma.core.math.arb._
+import monocle.law.discipline._
 import munit.DisciplineSuite
 import org.scalacheck.Prop._
-import cats.Show
-import coulomb.scalacheck.ArbQuantity
-import coulomb.cats.implicits._
-import eu.timepit.refined.auto._
-import eu.timepit.refined.scalacheck.numeric._
-import eu.timepit.refined.cats._
-import lucuma.core.math.arb._
-import lucuma.core.arb._
-import lucuma.core.arb.ArbTime
-import monocle.law.discipline._
-import cats.kernel.laws.discipline.EqTests
 import org.typelevel.cats.time._
 
 final class PlaceSuite extends DisciplineSuite {

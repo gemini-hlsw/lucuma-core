@@ -3,9 +3,9 @@
 
 package lucuma.core.model
 
-import munit.DisciplineSuite
 import lucuma.core.util.arb._
 import lucuma.core.util.laws.GidTests
+import munit.DisciplineSuite
 
 final class IdsSuite extends DisciplineSuite {
   import ArbGid._

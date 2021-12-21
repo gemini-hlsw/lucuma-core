@@ -3,20 +3,21 @@
 
 package lucuma.core.math.skycalc.solver
 
+import cats.Order._
+import lucuma.core.math.Coordinates
+import lucuma.core.math.Declination
+import lucuma.core.math.RightAscension
+import lucuma.core.math.skycalc._
+import lucuma.core.math.skycalc.solver.RoundStrategy._
+import lucuma.core.syntax.boundedInterval._
+import org.typelevel.cats.time._
+import spire.math.Bounded
+
+import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZonedDateTime
-import lucuma.core.math.Coordinates
-import lucuma.core.math.Declination
-import spire.math.Bounded
-import lucuma.core.syntax.boundedInterval._
-import lucuma.core.math.RightAscension
-import lucuma.core.math.skycalc._
-import java.time.Duration
-import lucuma.core.math.skycalc.solver.RoundStrategy._
 import scala.math.abs
-import org.typelevel.cats.time._
-import cats.Order._
 
 /**
  * Compare some random values with results from http://catserver.ing.iac.es/staralt/index.php

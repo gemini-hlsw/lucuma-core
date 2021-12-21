@@ -3,14 +3,14 @@
 
 package lucuma.core.model
 
-import lucuma.core.model.arb._
-import lucuma.core.util.arb._
-
-import cats.{ Eq, Show }
+import cats.Eq
+import cats.Show
 import cats.kernel.laws.discipline._
 import io.circe.testing.CodecTests
 import io.circe.testing.instances._
+import lucuma.core.model.arb._
 import lucuma.core.optics.laws.discipline._
+import lucuma.core.util.arb._
 import munit._
 import org.scalacheck.Prop._
 

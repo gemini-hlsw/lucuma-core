@@ -3,12 +3,12 @@
 
 package lucuma.core.math.skycalc
 
+import lucuma.core.enum.Site
+import lucuma.core.math.Coordinates
 import munit.FunSuite
+import org.scalactic.Tolerance
 
 import java.time._
-import lucuma.core.math.Coordinates
-import lucuma.core.enum.Site
-import org.scalactic.Tolerance
 
 // This is just a basic case, mostly to test linking in JS.
 // Property based testing is in ImprovedSkyCalcSpecJVM, where output

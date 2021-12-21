@@ -3,19 +3,19 @@
 
 package lucuma.core.model
 
-import cats.kernel.laws.discipline._
-import eu.timepit.refined.cats._
-import munit._
-import lucuma.core.util.arb.ArbEnumerated
-import lucuma.core.math.BrightnessUnits._
-import lucuma.core.model.arb.ArbEmissionLine
-import monocle.law.discipline.LensTests
-import lucuma.core.math.arb.ArbWavelength
-import lucuma.core.math.arb.ArbRefined
-import lucuma.core.math.dimensional.arb.ArbQty
-import coulomb.scalacheck.ArbQuantity
-import coulomb.cats.implicits._
 import cats.implicits._
+import cats.kernel.laws.discipline._
+import coulomb.cats.implicits._
+import coulomb.scalacheck.ArbQuantity
+import eu.timepit.refined.cats._
+import lucuma.core.math.BrightnessUnits._
+import lucuma.core.math.arb.ArbRefined
+import lucuma.core.math.arb.ArbWavelength
+import lucuma.core.math.dimensional.arb.ArbQty
+import lucuma.core.model.arb.ArbEmissionLine
+import lucuma.core.util.arb.ArbEnumerated
+import monocle.law.discipline.LensTests
+import munit._
 
 final class EmissionLineSuite extends DisciplineSuite {
   import ArbEnumerated._

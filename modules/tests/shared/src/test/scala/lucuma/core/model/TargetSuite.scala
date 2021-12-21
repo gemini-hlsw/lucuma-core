@@ -7,14 +7,14 @@ import cats.kernel.laws.discipline._
 import eu.timepit.refined.cats._
 import eu.timepit.refined.scalacheck.string._
 import lucuma.core.arb._
+import lucuma.core.enum.Band
 import lucuma.core.math.arb._
+import lucuma.core.math.dimensional.arb.ArbQty
 import lucuma.core.model.arb._
 import lucuma.core.util.arb._
 import lucuma.core.util.laws.GidTests
 import monocle.law.discipline._
-import lucuma.core.math.dimensional.arb.ArbQty
 import munit._
-import lucuma.core.enum.Band
 
 final class TargetSuite extends DisciplineSuite {
   import ArbTarget._

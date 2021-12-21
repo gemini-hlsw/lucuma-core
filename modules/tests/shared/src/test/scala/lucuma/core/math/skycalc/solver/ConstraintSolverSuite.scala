@@ -4,15 +4,16 @@
 package lucuma.core.math.skycalc
 package solver
 
-import java.time.Duration
+import lucuma.core.enum.Site.GN
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Declination
 import lucuma.core.math.HourAngle
 import lucuma.core.math.IntervalGens
 import lucuma.core.math.skycalc.SkyCalcResults
-import lucuma.core.enum.Site.GN
-import spire.math.extras.interval.IntervalSeq
 import org.typelevel.cats.time._
+import spire.math.extras.interval.IntervalSeq
+
+import java.time.Duration
 
 /**
  * This is not meant to test the underlying SkyCalc implementations, we assume that this is all working,

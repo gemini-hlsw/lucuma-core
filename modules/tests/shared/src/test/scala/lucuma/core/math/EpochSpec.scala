@@ -3,19 +3,21 @@
 
 package lucuma.core.math
 
-import cats.{ Eq, Show }
+import cats.Eq
+import cats.Show
 import cats.implicits._
 import cats.kernel.laws.discipline._
 import eu.timepit.refined.auto._
-import lucuma.core.math.arb._
-import lucuma.core.optics.laws.discipline._
-import java.time.LocalDateTime
 import lucuma.core.arb.ArbTime
-import org.scalacheck.Arbitrary
-import org.scalacheck.Prop._
+import lucuma.core.math.arb._
 import lucuma.core.math.parser.EpochParsers._
+import lucuma.core.optics.laws.discipline._
 import lucuma.core.syntax.parser._
 import monocle.law.discipline.PrismTests
+import org.scalacheck.Arbitrary
+import org.scalacheck.Prop._
+
+import java.time.LocalDateTime
 
 final class EpochSuite extends munit.DisciplineSuite {
   import ArbEpoch._
