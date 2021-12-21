@@ -26,6 +26,7 @@ import scala.collection.immutable.SortedMap
 sealed trait Target extends Product with Serializable {
   def name: NonEmptyString
   def sourceProfile: SourceProfile
+  def catalogInfo: Option[CatalogInfo]
   def angularSize: Option[AngularSize] // This is just used for visualization
 }
 
@@ -35,12 +36,13 @@ object Target extends WithId('t') with TargetOptics {
     name:          NonEmptyString,
     tracking:      SiderealTracking,
     sourceProfile: SourceProfile,
+    catalogInfo:   Option[CatalogInfo],
     angularSize:   Option[AngularSize]
   ) extends Target
 
   object Sidereal extends SiderealOptics {
     implicit val eqSidereal: Eq[Sidereal] =
-      Eq.by(x => (x.name, x.tracking, x.sourceProfile))
+      Eq.by(x => (x.name, x.tracking, x.sourceProfile, x.catalogInfo))
 
     /**
      * A sidereal target order based on tracking information, which roughly means by base coordinate
@@ -62,12 +64,13 @@ object Target extends WithId('t') with TargetOptics {
     name:          NonEmptyString,
     ephemerisKey:  EphemerisKey,
     sourceProfile: SourceProfile,
+    catalogInfo:   Option[CatalogInfo],
     angularSize:   Option[AngularSize]
   ) extends Target
 
   object Nonsidereal extends NonsiderealOptics {
     implicit val eqNonsidereal: Eq[Nonsidereal] =
-      Eq.by(x => (x.name, x.ephemerisKey, x.sourceProfile))
+      Eq.by(x => (x.name, x.ephemerisKey, x.sourceProfile, x.catalogInfo))
 
     /**
      * A nonsidereal target order based on ephemeris key.
@@ -85,9 +88,9 @@ object Target extends WithId('t') with TargetOptics {
   }
 
   implicit val TargetEq: Eq[Target] = Eq.instance {
-    case (a @ Sidereal(_, _, _, _), b @ Sidereal(_, _, _, _))       => a === b
-    case (a @ Nonsidereal(_, _, _, _), b @ Nonsidereal(_, _, _, _)) => a === b
-    case _                                                          => false
+    case (a @ Sidereal(_, _, _, _, _), b @ Sidereal(_, _, _, _, _))       => a === b
+    case (a @ Nonsidereal(_, _, _, _, _), b @ Nonsidereal(_, _, _, _, _)) => a === b
+    case _                                                                => false
   }
 
   /**
@@ -98,12 +101,12 @@ object Target extends WithId('t') with TargetOptics {
    */
   val TrackOrder: Order[Target] =
     Order.from {
-      case (a @ Sidereal(_, _, _, _), b @ Sidereal(_, _, _, _))       =>
+      case (a @ Sidereal(_, _, _, _, _), b @ Sidereal(_, _, _, _, _))       =>
         Sidereal.TrackOrder.compare(a, b)
-      case (a @ Nonsidereal(_, _, _, _), b @ Nonsidereal(_, _, _, _)) =>
+      case (a @ Nonsidereal(_, _, _, _, _), b @ Nonsidereal(_, _, _, _, _)) =>
         Nonsidereal.TrackOrder.compare(a, b)
-      case (Nonsidereal(_, _, _, _), _)                               => -1
-      case _                                                          => 1
+      case (Nonsidereal(_, _, _, _, _), _)                                  => -1
+      case _                                                                => 1
     }
 
   /**
@@ -113,12 +116,12 @@ object Target extends WithId('t') with TargetOptics {
    */
   val NameOrder: Order[Target] =
     Order.from {
-      case (a @ Sidereal(_, _, _, _), b @ Sidereal(_, _, _, _))       =>
+      case (a @ Sidereal(_, _, _, _, _), b @ Sidereal(_, _, _, _, _))       =>
         Sidereal.NameOrder.compare(a, b)
-      case (a @ Nonsidereal(_, _, _, _), b @ Nonsidereal(_, _, _, _)) =>
+      case (a @ Nonsidereal(_, _, _, _, _), b @ Nonsidereal(_, _, _, _, _)) =>
         Nonsidereal.NameOrder.compare(a, b)
-      case (Nonsidereal(_, _, _, _), _)                               => -1
-      case _                                                          => 1
+      case (Nonsidereal(_, _, _, _, _), _)                                  => -1
+      case _                                                                => 1
     }
 
   trait SiderealOptics { this: Sidereal.type =>
@@ -130,6 +133,42 @@ object Target extends WithId('t') with TargetOptics {
     /** @group Optics */
     val tracking: Lens[Sidereal, SiderealTracking] =
       Focus[Sidereal](_.tracking)
+
+    /** @group Optics */
+    val parallax: Lens[Sidereal, Option[Parallax]] =
+      tracking.andThen(SiderealTracking.parallax)
+
+    /** @group Optics */
+    val radialVelocity: Lens[Sidereal, Option[RadialVelocity]] =
+      tracking.andThen(SiderealTracking.radialVelocity)
+
+    /** @group Optics */
+    val baseCoordinates: Lens[Sidereal, Coordinates] =
+      tracking.andThen(SiderealTracking.baseCoordinates)
+
+    /** @group Optics */
+    val baseRA: Lens[Sidereal, RightAscension] =
+      baseCoordinates.andThen(Coordinates.rightAscension)
+
+    /** @group Optics */
+    val baseDec: Lens[Sidereal, Declination] =
+      baseCoordinates.andThen(Coordinates.declination)
+
+    /** @group Optics */
+    val epoch: Lens[Sidereal, Epoch] =
+      tracking.andThen(SiderealTracking.epoch)
+
+    /** @group Optics */
+    val properMotion: Lens[Sidereal, Option[ProperMotion]] =
+      tracking.andThen(SiderealTracking.properMotion)
+
+    /** @group Optics */
+    val properMotionRA: Optional[Sidereal, ProperMotion.RA] =
+      properMotion.some.andThen(ProperMotion.ra)
+
+    /** @group Optics */
+    val properMotionDec: Optional[Sidereal, ProperMotion.Dec] =
+      properMotion.some.andThen(ProperMotion.dec)
 
     /** @group Optics */
     val sourceProfile: Lens[Sidereal, SourceProfile] =
@@ -242,44 +281,13 @@ object Target extends WithId('t') with TargetOptics {
     ] = sourceProfile.andThen(SourceProfile.surfaceFluxDensityContinuum)
 
     /** @group Optics */
-    val parallax: Lens[Sidereal, Option[Parallax]] =
-      tracking.andThen(SiderealTracking.parallax)
+    val catalogInfo: Lens[Sidereal, Option[CatalogInfo]] =
+      Focus[Sidereal](_.catalogInfo)
 
     /** @group Optics */
-    val radialVelocity: Lens[Sidereal, Option[RadialVelocity]] =
-      tracking.andThen(SiderealTracking.radialVelocity)
+    val angularSize: Lens[Sidereal, Option[AngularSize]] =
+      Focus[Sidereal](_.angularSize)
 
-    /** @group Optics */
-    val baseCoordinates: Lens[Sidereal, Coordinates] =
-      tracking.andThen(SiderealTracking.baseCoordinates)
-
-    /** @group Optics */
-    val baseRA: Lens[Sidereal, RightAscension] =
-      baseCoordinates.andThen(Coordinates.rightAscension)
-
-    /** @group Optics */
-    val baseDec: Lens[Sidereal, Declination] =
-      baseCoordinates.andThen(Coordinates.declination)
-
-    /** @group Optics */
-    val catalogId: Lens[Sidereal, Option[CatalogId]] =
-      tracking.andThen(SiderealTracking.catalogId)
-
-    /** @group Optics */
-    val epoch: Lens[Sidereal, Epoch] =
-      tracking.andThen(SiderealTracking.epoch)
-
-    /** @group Optics */
-    val properMotion: Lens[Sidereal, Option[ProperMotion]] =
-      tracking.andThen(SiderealTracking.properMotion)
-
-    /** @group Optics */
-    val properMotionRA: Optional[Sidereal, ProperMotion.RA] =
-      properMotion.some.andThen(ProperMotion.ra)
-
-    /** @group Optics */
-    val properMotionDec: Optional[Sidereal, ProperMotion.Dec] =
-      properMotion.some.andThen(ProperMotion.dec)
   }
 
   trait NonsiderealOptics { this: Nonsidereal.type =>
@@ -401,6 +409,14 @@ object Target extends WithId('t') with TargetOptics {
       Nonsidereal,
       GroupedUnitQty[PosBigDecimal, FluxDensityContinuum[Surface]]
     ] = sourceProfile.andThen(SourceProfile.surfaceFluxDensityContinuum)
+
+    /** @group Optics */
+    val catalogInfo: Lens[Nonsidereal, Option[CatalogInfo]] =
+      Focus[Nonsidereal](_.catalogInfo)
+
+    /** @group Optics */
+    val angularSize: Lens[Nonsidereal, Option[AngularSize]] =
+      Focus[Nonsidereal](_.angularSize)
   }
 }
 
@@ -415,8 +431,8 @@ trait TargetOptics { this: Target.type =>
   /** @group Optics */
   val name: Lens[Target, NonEmptyString] =
     Lens[Target, NonEmptyString](_.name)(v => {
-      case t @ Target.Sidereal(_, _, _, _)    => Target.Sidereal.name.replace(v)(t)
-      case t @ Target.Nonsidereal(_, _, _, _) => Target.Nonsidereal.name.replace(v)(t)
+      case t @ Target.Sidereal(_, _, _, _, _)    => Target.Sidereal.name.replace(v)(t)
+      case t @ Target.Nonsidereal(_, _, _, _, _) => Target.Nonsidereal.name.replace(v)(t)
     })
 
   /** @group Optics */
@@ -427,10 +443,11 @@ trait TargetOptics { this: Target.type =>
   val siderealTracking: Optional[Target, SiderealTracking] =
     sidereal.andThen(Sidereal.tracking)
 
+  /** @group Optics */
   val sourceProfile: Lens[Target, SourceProfile] =
     Lens[Target, SourceProfile](_.sourceProfile)(v => {
-      case t @ Target.Sidereal(_, _, _, _)    => Target.Sidereal.sourceProfile.replace(v)(t)
-      case t @ Target.Nonsidereal(_, _, _, _) => Target.Nonsidereal.sourceProfile.replace(v)(t)
+      case t @ Target.Sidereal(_, _, _, _, _)    => Target.Sidereal.sourceProfile.replace(v)(t)
+      case t @ Target.Nonsidereal(_, _, _, _, _) => Target.Nonsidereal.sourceProfile.replace(v)(t)
     })
 
   /** @group Optics */
@@ -558,10 +575,6 @@ trait TargetOptics { this: Target.type =>
     baseCoordinates.andThen(Coordinates.declination)
 
   /** @group Optics */
-  val catalogId: Optional[Target, Option[CatalogId]] =
-    sidereal.andThen(Sidereal.catalogId)
-
-  /** @group Optics */
   val epoch: Optional[Target, Epoch] =
     sidereal.andThen(Sidereal.epoch)
 
@@ -576,4 +589,18 @@ trait TargetOptics { this: Target.type =>
   /** @group Optics */
   val properMotionDec: Optional[Target, ProperMotion.Dec] =
     sidereal.andThen(Sidereal.properMotionDec)
+
+  /** @group Optics */
+  val catalogInfo: Lens[Target, Option[CatalogInfo]] =
+    Lens[Target, Option[CatalogInfo]](_.catalogInfo)(v => {
+      case t @ Target.Sidereal(_, _, _, _, _)    => Target.Sidereal.catalogInfo.replace(v)(t)
+      case t @ Target.Nonsidereal(_, _, _, _, _) => Target.Nonsidereal.catalogInfo.replace(v)(t)
+    })
+
+  /** @group Optics */
+  val angularSize: Lens[Target, Option[AngularSize]] =
+    Lens[Target, Option[AngularSize]](_.angularSize)(v => {
+      case t @ Target.Sidereal(_, _, _, _, _)    => Target.Sidereal.angularSize.replace(v)(t)
+      case t @ Target.Nonsidereal(_, _, _, _, _) => Target.Nonsidereal.angularSize.replace(v)(t)
+    })
 }

@@ -19,6 +19,7 @@ lazy val catsScalacheckVersion = "0.3.1"
 inThisBuild(
   Seq(
     homepage                      := Some(url("https://github.com/gemini-hlsw/lucuma-core")),
+    versionScheme                 := Some("early-semver"),
     addCompilerPlugin(
       ("org.typelevel"             % "kind-projector" % kindProjectorVersion).cross(CrossVersion.full)
     ),
@@ -35,28 +36,28 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
   .settings(
     name := "lucuma-core",
     libraryDependencies ++= Seq(
-      "org.tpolecat"      %%% "atto-core"                  % attoVersion,
-      "org.tpolecat"      %%% "atto-refined"               % attoVersion,
-      "org.typelevel"     %%% "cats-core"                  % catsVersion,
-      "dev.optics"        %%% "monocle-core"               % monocleVersion,
-      "dev.optics"        %%% "monocle-macro"              % monocleVersion,
-      "dev.optics"        %%% "monocle-state"              % monocleVersion,
-      "edu.gemini"        %%% "lucuma-jts"                 % jtsVersion,
-      "com.manyangled"    %%% "coulomb"                    % coulombVersion,
-      "com.manyangled"    %%% "coulomb-si-units"           % coulombVersion,
-      "com.manyangled"    %%% "coulomb-accepted-units"     % coulombVersion,
-      "com.manyangled"    %%% "coulomb-time-units"         % coulombVersion,
-      "com.manyangled"    %%% "coulomb-cats"               % coulombVersion,
-      "com.manyangled"    %%% "coulomb-refined"            % coulombVersion,
-      "com.manyangled"    %%% "coulomb-physical-constants" % coulombVersion,
-      "org.typelevel"     %%% "spire"                      % spireVersion,
-      "org.typelevel"     %%% "spire-extras"               % spireVersion,
-      "eu.timepit"        %%% "singleton-ops"              % singletonOpsVersion,
-      "eu.timepit"        %%% "refined"                    % refinedVersion,
-      "eu.timepit"        %%% "refined-cats"               % refinedVersion,
-      "org.typelevel"     %%% "cats-time"                  % catsTimeVersion,
-      "io.circe"          %%% "circe-core"                 % circeVersion,
-      "io.circe"          %%% "circe-refined"              % circeVersion
+      "org.tpolecat"   %%% "atto-core"                  % attoVersion,
+      "org.tpolecat"   %%% "atto-refined"               % attoVersion,
+      "org.typelevel"  %%% "cats-core"                  % catsVersion,
+      "dev.optics"     %%% "monocle-core"               % monocleVersion,
+      "dev.optics"     %%% "monocle-macro"              % monocleVersion,
+      "dev.optics"     %%% "monocle-state"              % monocleVersion,
+      "edu.gemini"     %%% "lucuma-jts"                 % jtsVersion,
+      "com.manyangled" %%% "coulomb"                    % coulombVersion,
+      "com.manyangled" %%% "coulomb-si-units"           % coulombVersion,
+      "com.manyangled" %%% "coulomb-accepted-units"     % coulombVersion,
+      "com.manyangled" %%% "coulomb-time-units"         % coulombVersion,
+      "com.manyangled" %%% "coulomb-cats"               % coulombVersion,
+      "com.manyangled" %%% "coulomb-refined"            % coulombVersion,
+      "com.manyangled" %%% "coulomb-physical-constants" % coulombVersion,
+      "org.typelevel"  %%% "spire"                      % spireVersion,
+      "org.typelevel"  %%% "spire-extras"               % spireVersion,
+      "eu.timepit"     %%% "singleton-ops"              % singletonOpsVersion,
+      "eu.timepit"     %%% "refined"                    % refinedVersion,
+      "eu.timepit"     %%% "refined-cats"               % refinedVersion,
+      "org.typelevel"  %%% "cats-time"                  % catsTimeVersion,
+      "io.circe"       %%% "circe-core"                 % circeVersion,
+      "io.circe"       %%% "circe-refined"              % circeVersion
     )
   )
   .jvmConfigure(_.enablePlugins(AutomateHeaderPlugin))

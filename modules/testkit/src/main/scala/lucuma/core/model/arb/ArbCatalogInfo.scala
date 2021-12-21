@@ -13,20 +13,21 @@ import lucuma.core.util.arb.ArbEnumerated
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck._
 
-trait ArbCatalogId {
+trait ArbCatalogInfo {
   import ArbEnumerated._
 
-  implicit val arbCatalogId: Arbitrary[CatalogId] =
+  implicit val arbCatalogInfo: Arbitrary[CatalogInfo] =
     Arbitrary {
       for {
-        name <- arbitrary[CatalogName]
-        id   <- arbitrary[NonEmptyString]
-      } yield CatalogId(name, id)
+        name    <- arbitrary[CatalogName]
+        id      <- arbitrary[NonEmptyString]
+        objType <- arbitrary[String]
+      } yield CatalogInfo(name, id, objType)
     }
 
-  implicit val cogSemester: Cogen[CatalogId] =
-    Cogen[(CatalogName, String)].contramap(s => (s.catalog, s.id.value))
+  implicit val cogSemester: Cogen[CatalogInfo] =
+    Cogen[(CatalogName, String, String)].contramap(s => (s.catalog, s.id.value, s.objectType))
 
 }
 
-object ArbCatalogId extends ArbCatalogId
+object ArbCatalogInfo extends ArbCatalogInfo

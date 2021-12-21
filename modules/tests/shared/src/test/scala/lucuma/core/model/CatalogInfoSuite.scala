@@ -7,9 +7,11 @@ import cats.kernel.laws.discipline._
 import lucuma.core.model.arb._
 import munit._
 
-final class CatalogIdSuite extends DisciplineSuite {
-  import ArbCatalogId._
+final class CatalogInfoSuite extends DisciplineSuite {
+  import ArbCatalogInfo._
 
   // Laws
-  checkAll("Order[CatalogId]", OrderTests[CatalogId].order)
+  checkAll("Order[CatalogInfo]", OrderTests[CatalogInfo].order)
+
+  // Optics
 }
