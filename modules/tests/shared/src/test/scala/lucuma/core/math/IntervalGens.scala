@@ -5,6 +5,7 @@ package lucuma.core.math
 
 import cats.Eq
 import cats.syntax.all._
+import lucuma.core.arb.ArbTime
 import lucuma.core.optics.Spire
 import lucuma.core.syntax.boundedInterval._
 import lucuma.core.syntax.time._
@@ -25,6 +26,8 @@ import java.time.Duration
 import java.time.Instant
 
 trait IntervalGens {
+  import ArbTime._
+
   private val MaxDelta: Long = Duration.ofMinutes(10).toNanos
 
   def buildInterval(start: Int, end: Int): Bounded[Instant] =
