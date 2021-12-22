@@ -21,12 +21,14 @@ trait ArbCatalogInfo {
       for {
         name    <- arbitrary[CatalogName]
         id      <- arbitrary[NonEmptyString]
-        objType <- arbitrary[String]
+        objType <- arbitrary[Option[NonEmptyString]]
       } yield CatalogInfo(name, id, objType)
     }
 
   implicit val cogSemester: Cogen[CatalogInfo] =
-    Cogen[(CatalogName, String, String)].contramap(s => (s.catalog, s.id.value, s.objectType))
+    Cogen[(CatalogName, String, Option[String])].contramap(s =>
+      (s.catalog, s.id.value, s.objectType.map(_.value))
+    )
 
 }
 

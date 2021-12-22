@@ -272,7 +272,6 @@ final class TargetSuite extends DisciplineSuite {
     "Target.Nonsidereal.surfaceFluxDensityContinuum",
     OptionalTests(Target.Nonsidereal.surfaceFluxDensityContinuum)
   )
-  checkAll("Target.Nonsidereal.catalogInfo", LensTests(Target.Nonsidereal.catalogInfo))
   checkAll("Target.Nonsidereal.angularSize", LensTests(Target.Nonsidereal.angularSize))
 
   // Laws for Target
@@ -392,6 +391,6 @@ final class TargetSuite extends DisciplineSuite {
   checkAll("Target.properMotion", OptionalTests(Target.properMotion))
   checkAll("Target.properMotionRA", OptionalTests(Target.properMotionRA))
   checkAll("Target.properMotionDec", OptionalTests(Target.properMotionDec))
-  checkAll("Target.catalogInfo", LensTests(Target.catalogInfo))
+  checkAll("Target.catalogInfo", OptionalTests(Target.catalogInfo))
   checkAll("Target.angularSize", LensTests(Target.angularSize))
 }
