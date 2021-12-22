@@ -572,8 +572,8 @@ trait TargetOptics { this: Target.type =>
     sidereal.andThen(Sidereal.properMotionDec)
 
   /** @group Optics */
-  val catalogInfo: Optional[Target, CatalogInfo] =
-    sidereal.andThen(Sidereal.catalogInfo.some)
+  val catalogInfo: Optional[Target, Option[CatalogInfo]] =
+    sidereal.andThen(Sidereal.catalogInfo)
 
   /** @group Optics */
   val angularSize: Lens[Target, Option[AngularSize]] =

@@ -374,7 +374,6 @@ final class TargetSuite extends DisciplineSuite {
   checkAll("Target.baseCoordinates", OptionalTests(Target.baseCoordinates))
   checkAll("Target.baseRA", OptionalTests(Target.baseRA))
   checkAll("Target.baseDec", OptionalTests(Target.baseDec))
-  checkAll("Target.catalogInfo", OptionalTests(Target.catalogInfo))
   checkAll("Target.epoch", OptionalTests(Target.epoch))
   checkAll("Target.properMotion", OptionalTests(Target.properMotion))
   checkAll("Target.properMotionRA", OptionalTests(Target.properMotionRA))
