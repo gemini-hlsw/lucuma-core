@@ -93,12 +93,8 @@ final class TargetSuite extends DisciplineSuite {
     OptionalTests(Target.Sidereal.surfaceEmissionLinesSpectralDefinition)
   )
   checkAll(
-    "Target.Sidereal.integratedUnnormalizedSED",
-    OptionalTests(Target.Sidereal.integratedUnnormalizedSED)
-  )
-  checkAll(
-    "Target.Sidereal.surfaceUnnormalizedSED",
-    OptionalTests(Target.Sidereal.surfaceUnnormalizedSED)
+    "Target.Sidereal.unnormalizedSED",
+    OptionalTests(Target.Sidereal.unnormalizedSED)
   )
   checkAll(
     "Target.Sidereal.integratedBandBrightnesses",
@@ -205,12 +201,8 @@ final class TargetSuite extends DisciplineSuite {
     OptionalTests(Target.Nonsidereal.surfaceEmissionLinesSpectralDefinition)
   )
   checkAll(
-    "Target.Nonsidereal.integratedUnnormalizedSED",
-    OptionalTests(Target.Nonsidereal.integratedUnnormalizedSED)
-  )
-  checkAll(
-    "Target.Nonsidereal.surfaceUnnormalizedSED",
-    OptionalTests(Target.Nonsidereal.surfaceUnnormalizedSED)
+    "Target.Nonsidereal.unnormalizedSED",
+    OptionalTests(Target.Nonsidereal.unnormalizedSED)
   )
   checkAll(
     "Target.Nonsidereal.integratedBandBrightnesses",
@@ -313,12 +305,8 @@ final class TargetSuite extends DisciplineSuite {
     OptionalTests(Target.surfaceEmissionLinesSpectralDefinition)
   )
   checkAll(
-    "Target.integratedUnnormalizedSED",
-    OptionalTests(Target.integratedUnnormalizedSED)
-  )
-  checkAll(
-    "Target.surfaceUnnormalizedSED",
-    OptionalTests(Target.surfaceUnnormalizedSED)
+    "Target.unnormalizedSED",
+    OptionalTests(Target.unnormalizedSED)
   )
   checkAll(
     "Target.integratedBandBrightnesses",

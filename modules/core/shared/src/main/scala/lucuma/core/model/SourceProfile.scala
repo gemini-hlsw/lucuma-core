@@ -127,12 +127,24 @@ object SourceProfile {
     surfaceSpectralDefinition.andThen(SpectralDefinition.emissionLines[Surface])
 
   /** @group Optics */
-  val integratedUnnormalizedSED: Optional[SourceProfile, UnnormalizedSED] =
-    integratedSpectralDefinition.andThen(SpectralDefinition.used[Integrated])
-
-  /** @group Optics */
-  val surfaceUnnormalizedSED: Optional[SourceProfile, UnnormalizedSED] =
-    surfaceSpectralDefinition.andThen(SpectralDefinition.used[Surface])
+  val unnormalizedSED: Optional[SourceProfile, UnnormalizedSED] =
+    Optional[SourceProfile, UnnormalizedSED](p =>
+      integratedSpectralDefinition
+        .andThen(SpectralDefinition.unnormalizedSED[Integrated])
+        .getOption(p)
+        .orElse(
+          surfaceSpectralDefinition
+            .andThen(SpectralDefinition.unnormalizedSED[Surface])
+            .getOption(p)
+        )
+    )(v => {
+      case p @ Uniform(_) =>
+        surfaceSpectralDefinition.andThen(SpectralDefinition.unnormalizedSED[Surface]).replace(v)(p)
+      case p              =>
+        integratedSpectralDefinition
+          .andThen(SpectralDefinition.unnormalizedSED[Integrated])
+          .replace(v)(p)
+    })
 
   /** @group Optics */
   val integratedBandBrightnesses

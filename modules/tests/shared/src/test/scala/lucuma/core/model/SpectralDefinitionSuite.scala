@@ -129,12 +129,12 @@ final class SpectralDefinitionSuite extends DisciplineSuite {
   )
 
   checkAll(
-    "SpectralDefinition.used[Integrated]",
-    OptionalTests(SpectralDefinition.used[Integrated])
+    "SpectralDefinition.unnormalizedSED[Integrated]",
+    OptionalTests(SpectralDefinition.unnormalizedSED[Integrated])
   )
   checkAll(
-    "SpectralDefinition.sed[Surface]",
-    OptionalTests(SpectralDefinition.used[Surface])
+    "SpectralDefinition.unnormalizedSED[Surface]",
+    OptionalTests(SpectralDefinition.unnormalizedSED[Surface])
   )
   checkAll(
     "SpectralDefinition.bandBrightnesses[Integrated]",

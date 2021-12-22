@@ -205,12 +205,8 @@ object Target extends WithId('t') with TargetOptics {
       sourceProfile.andThen(SourceProfile.surfaceEmissionLinesSpectralDefinition)
 
     /** @group Optics */
-    val integratedUnnormalizedSED: Optional[Sidereal, UnnormalizedSED] =
-      sourceProfile.andThen(SourceProfile.integratedUnnormalizedSED)
-
-    /** @group Optics */
-    val surfaceUnnormalizedSED: Optional[Sidereal, UnnormalizedSED] =
-      sourceProfile.andThen(SourceProfile.surfaceUnnormalizedSED)
+    val unnormalizedSED: Optional[Sidereal, UnnormalizedSED] =
+      sourceProfile.andThen(SourceProfile.unnormalizedSED)
 
     /** @group Optics */
     val integratedBandBrightnesses
@@ -333,12 +329,8 @@ object Target extends WithId('t') with TargetOptics {
       sourceProfile.andThen(SourceProfile.surfaceEmissionLinesSpectralDefinition)
 
     /** @group Optics */
-    val integratedUnnormalizedSED: Optional[Nonsidereal, UnnormalizedSED] =
-      sourceProfile.andThen(SourceProfile.integratedUnnormalizedSED)
-
-    /** @group Optics */
-    val surfaceUnnormalizedSED: Optional[Nonsidereal, UnnormalizedSED] =
-      sourceProfile.andThen(SourceProfile.surfaceUnnormalizedSED)
+    val unnormalizedSED: Optional[Nonsidereal, UnnormalizedSED] =
+      sourceProfile.andThen(SourceProfile.unnormalizedSED)
 
     /** @group Optics */
     val integratedBandBrightnesses
@@ -476,12 +468,8 @@ trait TargetOptics { this: Target.type =>
     sourceProfile.andThen(SourceProfile.surfaceEmissionLinesSpectralDefinition)
 
   /** @group Optics */
-  val integratedUnnormalizedSED: Optional[Target, UnnormalizedSED] =
-    sourceProfile.andThen(SourceProfile.integratedUnnormalizedSED)
-
-  /** @group Optics */
-  val surfaceUnnormalizedSED: Optional[Target, UnnormalizedSED] =
-    sourceProfile.andThen(SourceProfile.surfaceUnnormalizedSED)
+  val unnormalizedSED: Optional[Target, UnnormalizedSED] =
+    sourceProfile.andThen(SourceProfile.unnormalizedSED)
 
   /** @group Optics */
   val integratedBandBrightnesses: Optional[Target, SortedMap[Band, BandBrightness[Integrated]]] =
