@@ -3,11 +3,11 @@
 
 package lucuma.core.math
 
-import munit.DisciplineSuite
 import lucuma.core.math.BrightnessUnits
-import lucuma.core.util.laws.EnumeratedTests
 import lucuma.core.math.dimensional.GroupedUnitType
 import lucuma.core.util.arb.ArbEnumerated
+import lucuma.core.util.laws.EnumeratedTests
+import munit.DisciplineSuite
 
 final class BrightnessUnitsSuite extends DisciplineSuite {
   import ArbEnumerated._
