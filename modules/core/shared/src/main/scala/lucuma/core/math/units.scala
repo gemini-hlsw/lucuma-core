@@ -18,6 +18,7 @@ import eu.timepit.refined.numeric._
 import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.math.dimensional._
 import spire.math._
+import coulomb.unitops.UnitString
 
 trait units {
 
@@ -101,6 +102,11 @@ trait units {
   // implicit val defineWattsBrightness =
   //   DerivedUnit[WattsBrightness, Watt %/ ((Meter %^ 2) %* Micrometer)](abbv = "W/m²/µm")
   type WattsBrightness = Watt %/ ((Meter %^ 2) %* Micrometer)
+  implicit val strWattsBrightness: UnitString[WattsBrightness] =
+    new UnitString[WattsBrightness] {
+      val full = "W/m²/µm"
+      val abbv = "W/m²/µm"
+    }
 
   private val ErgPerJoule: SafeLong = SafeLong(10).pow(7)
   type Erg
