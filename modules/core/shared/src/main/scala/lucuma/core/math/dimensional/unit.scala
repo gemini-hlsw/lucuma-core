@@ -4,8 +4,10 @@
 package lucuma.core.math.dimensional
 
 import cats.Eq
-import java.util.Objects
 import coulomb.unitops.UnitString
+import lucuma.core.util.Display
+
+import java.util.Objects
 
 // All of this is a bridge between coulomb an runtime quantities (as defined in `Qty`).
 
@@ -44,7 +46,7 @@ trait UnitType { self =>
 object UnitType {
   implicit val eqUnitType: Eq[UnitType] = Eq.fromUniversalEquals
 
-  // DISPLAY!
+  implicit def displayUnitType: Display[UnitType] = Display.by(_.abbv, _.name)
 }
 
 /**

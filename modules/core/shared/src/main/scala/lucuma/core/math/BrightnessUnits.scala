@@ -9,13 +9,6 @@ import cats.data.NonEmptyList
 import lucuma.core.math.dimensional._
 import lucuma.core.math.units._
 import lucuma.core.util.Enumerated
-// import coulomb._
-// import coulomb.accepted._
-// import coulomb.define._
-// import coulomb.mks._
-// import coulomb.si._
-// import coulomb.siprefix._
-// import coulomb.time._
 
 object BrightnessUnits {
   type Integrated
@@ -33,9 +26,9 @@ object BrightnessUnits {
             UnitOfMeasure[VegaMagnitude],
             UnitOfMeasure[ABMagnitude],
             UnitOfMeasure[Jansky],
-            UnitOfMeasure[WattsBrightness],
-            UnitOfMeasure[ErgsWavelengthBrightness],
-            UnitOfMeasure[ErgsFrequencyBrightness]
+            UnitOfMeasure[WattsPerMeter2µMeter],
+            UnitOfMeasure[ErgsPerSecondCentimeter2Angstrom],
+            UnitOfMeasure[ErgsPerSecondCentimeter2Hertz]
           )
           .map(_.groupedIn[Brightness[Integrated]])
     }
@@ -47,9 +40,9 @@ object BrightnessUnits {
             UnitOfMeasure[VegaMagnitudePerArcsec2],
             UnitOfMeasure[ABMagnitudePerArcsec2],
             UnitOfMeasure[JanskyPerArcsec2],
-            UnitOfMeasure[SurfaceUnits[WattsBrightness]],
-            UnitOfMeasure[ErgsWavelengthBrightnessPerArcsec2],
-            UnitOfMeasure[ErgsFrequencyBrightnessPerArcsec2]
+            UnitOfMeasure[WattsPerMeter2µMeterArcsec2],
+            UnitOfMeasure[ErgsPerSecondCentimeter2AngstromArcsec2],
+            UnitOfMeasure[ErgsPerSecondCentimeter2HertzArcsec2]
           )
           .map(_.groupedIn[Brightness[Surface]])
     }
@@ -60,8 +53,8 @@ object BrightnessUnits {
       val all: NonEmptyList[GroupedUnitType[LineFlux[Integrated]]] =
         NonEmptyList
           .of(
-            UnitOfMeasure[WattsLineFlux],
-            UnitOfMeasure[ErgsLineFlux]
+            UnitOfMeasure[WattsPerMeter2],
+            UnitOfMeasure[ErgsPerSecondCentimeter2]
           )
           .map(_.groupedIn[LineFlux[Integrated]])
     }
@@ -70,8 +63,8 @@ object BrightnessUnits {
       val all: NonEmptyList[GroupedUnitType[LineFlux[Surface]]] =
         NonEmptyList
           .of(
-            UnitOfMeasure[WattsLineFluxPerArcsec2],
-            UnitOfMeasure[ErgsLineFluxPerArcsec2]
+            UnitOfMeasure[WattsPerMeter2Arcsec2],
+            UnitOfMeasure[ErgsPerSecondCentimeter2Arcsec2]
           )
           .map(_.groupedIn[LineFlux[Surface]])
     }
@@ -82,8 +75,8 @@ object BrightnessUnits {
       val all: NonEmptyList[GroupedUnitType[FluxDensityContinuum[Integrated]]] =
         NonEmptyList
           .of(
-            UnitOfMeasure[WattsBrightness],
-            UnitOfMeasure[ErgsWavelengthBrightness]
+            UnitOfMeasure[WattsPerMeter2µMeter],
+            UnitOfMeasure[ErgsPerSecondCentimeter2Angstrom]
           )
           .map(_.groupedIn[FluxDensityContinuum[Integrated]])
     }
@@ -92,8 +85,8 @@ object BrightnessUnits {
       val all: NonEmptyList[GroupedUnitType[FluxDensityContinuum[Surface]]] =
         NonEmptyList
           .of(
-            UnitOfMeasure[SurfaceUnits[WattsBrightness]],
-            UnitOfMeasure[ErgsWavelengthBrightnessPerArcsec2]
+            UnitOfMeasure[WattsPerMeter2µMeterArcsec2],
+            UnitOfMeasure[ErgsPerSecondCentimeter2AngstromArcsec2]
           )
           .map(_.groupedIn[FluxDensityContinuum[Surface]])
     }
