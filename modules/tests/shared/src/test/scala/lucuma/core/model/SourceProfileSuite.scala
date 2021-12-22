@@ -77,12 +77,8 @@ final class SourceProfileSuite extends DisciplineSuite {
     OptionalTests(SourceProfile.surfaceEmissionLinesSpectralDefinition)
   )
   checkAll(
-    "SourceProfile.integratedUnnormalizedSED",
-    OptionalTests(SourceProfile.integratedUnnormalizedSED)
-  )
-  checkAll(
-    "SourceProfile.surfaceUnnormalizedSED",
-    OptionalTests(SourceProfile.surfaceUnnormalizedSED)
+    "SourceProfile.unnormalizedSED",
+    OptionalTests(SourceProfile.unnormalizedSED)
   )
   checkAll(
     "SourceProfile.integratedBandBrightnesses",

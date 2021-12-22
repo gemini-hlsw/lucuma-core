@@ -101,7 +101,7 @@ object SpectralDefinition {
     GenPrism[SpectralDefinition[T], EmissionLines[T]]
 
   /** @group Optics */
-  def used[T]: Optional[SpectralDefinition[T], UnnormalizedSED] =
+  def unnormalizedSED[T]: Optional[SpectralDefinition[T], UnnormalizedSED] =
     bandNormalized.andThen(BandNormalized.sed[T])
 
   /** @group Optics */
