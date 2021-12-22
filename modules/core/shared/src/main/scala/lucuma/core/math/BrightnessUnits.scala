@@ -26,7 +26,7 @@ object BrightnessUnits {
             UnitOfMeasure[VegaMagnitude],
             UnitOfMeasure[ABMagnitude],
             UnitOfMeasure[Jansky],
-            UnitOfMeasure[WattsPerMeter2µMeter],
+            UnitOfMeasure[WattsPerMeter2Micrometer],
             UnitOfMeasure[ErgsPerSecondCentimeter2Angstrom],
             UnitOfMeasure[ErgsPerSecondCentimeter2Hertz]
           )
@@ -40,7 +40,7 @@ object BrightnessUnits {
             UnitOfMeasure[VegaMagnitudePerArcsec2],
             UnitOfMeasure[ABMagnitudePerArcsec2],
             UnitOfMeasure[JanskyPerArcsec2],
-            UnitOfMeasure[WattsPerMeter2µMeterArcsec2],
+            UnitOfMeasure[WattsPerMeter2MicrometerArcsec2],
             UnitOfMeasure[ErgsPerSecondCentimeter2AngstromArcsec2],
             UnitOfMeasure[ErgsPerSecondCentimeter2HertzArcsec2]
           )
@@ -75,7 +75,7 @@ object BrightnessUnits {
       val all: NonEmptyList[GroupedUnitType[FluxDensityContinuum[Integrated]]] =
         NonEmptyList
           .of(
-            UnitOfMeasure[WattsPerMeter2µMeter],
+            UnitOfMeasure[WattsPerMeter2Micrometer],
             UnitOfMeasure[ErgsPerSecondCentimeter2Angstrom]
           )
           .map(_.groupedIn[FluxDensityContinuum[Integrated]])
@@ -85,7 +85,7 @@ object BrightnessUnits {
       val all: NonEmptyList[GroupedUnitType[FluxDensityContinuum[Surface]]] =
         NonEmptyList
           .of(
-            UnitOfMeasure[WattsPerMeter2µMeterArcsec2],
+            UnitOfMeasure[WattsPerMeter2MicrometerArcsec2],
             UnitOfMeasure[ErgsPerSecondCentimeter2AngstromArcsec2]
           )
           .map(_.groupedIn[FluxDensityContinuum[Surface]])

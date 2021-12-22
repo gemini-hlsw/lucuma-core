@@ -27,13 +27,13 @@ final class UnitsSuite extends FunSuite {
     assertEquals(1.withUnit[VegaMagnitude].show, "1 Vega mag")
     assertEquals(1.withUnit[ABMagnitude].show, "1 AB mag")
     assertEquals(1.withUnit[Jansky].show, "1 Jy")
-    assertEquals(1.withUnit[WattsPerMeter2µMeter].show, "1 W/m²/µm")
+    assertEquals(1.withUnit[WattsPerMeter2Micrometer].show, "1 W/m²/µm")
     assertEquals(1.withUnit[ErgsPerSecondCentimeter2Angstrom].show, "1 erg/s/cm²/Å")
     assertEquals(1.withUnit[ErgsPerSecondCentimeter2Hertz].show, "1 erg/s/cm²/Hz")
     assertEquals(1.withUnit[VegaMagnitudePerArcsec2].show, "1 Vega mag/arcsec²")
     assertEquals(1.withUnit[ABMagnitudePerArcsec2].show, "1 AB mag/arcsec²")
     assertEquals(1.withUnit[JanskyPerArcsec2].show, "1 Jy/arcsec²")
-    assertEquals(1.withUnit[WattsPerMeter2µMeterArcsec2].show, "1 W/m²/µm/arcsec²")
+    assertEquals(1.withUnit[WattsPerMeter2MicrometerArcsec2].show, "1 W/m²/µm/arcsec²")
     assertEquals(
       1.withUnit[ErgsPerSecondCentimeter2AngstromArcsec2].show,
       "1 erg/s/cm²/Å/arcsec²"

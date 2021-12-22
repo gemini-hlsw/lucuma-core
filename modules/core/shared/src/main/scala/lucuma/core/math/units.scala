@@ -70,9 +70,9 @@ trait units {
       abbv = "Jy"
     )
 
-  type WattsPerMeter2µMeter = Watt %/ ((Meter %^ 2) %* Micrometer)
-  implicit val strWattsPerMeter2µMeter: UnitString[WattsPerMeter2µMeter] =
-    UnitString[WattsPerMeter2µMeter]("W/m²/µm")
+  type WattsPerMeter2Micrometer = Watt %/ ((Meter %^ 2) %* Micrometer)
+  implicit val strWattsPerMeter2Micrometer: UnitString[WattsPerMeter2Micrometer] =
+    UnitString[WattsPerMeter2Micrometer]("W/m²/µm")
 
   private val ErgsPerJoule: SafeLong = SafeLong(10).pow(7)
   type Erg
@@ -100,9 +100,9 @@ trait units {
   implicit val strJanskyPerArcsec2: UnitString[JanskyPerArcsec2] =
     UnitString[JanskyPerArcsec2]("Jy/arcsec²")
 
-  type WattsPerMeter2µMeterArcsec2 = WattsPerMeter2µMeter %/ (ArcSecond %^ 2)
-  implicit val strWattsPerMeter2µMeterArcsec2: UnitString[WattsPerMeter2µMeterArcsec2] =
-    UnitString[WattsPerMeter2µMeterArcsec2]("W/m²/µm/arcsec²")
+  type WattsPerMeter2MicrometerArcsec2 = WattsPerMeter2Micrometer %/ (ArcSecond %^ 2)
+  implicit val strWattsPerMeter2MicrometerArcsec2: UnitString[WattsPerMeter2MicrometerArcsec2] =
+    UnitString[WattsPerMeter2MicrometerArcsec2]("W/m²/µm/arcsec²")
 
   type ErgsPerSecondCentimeter2AngstromArcsec2 =
     ErgsPerSecondCentimeter2Angstrom %/ (ArcSecond %^ 2)
