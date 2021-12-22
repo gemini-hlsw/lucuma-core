@@ -4,7 +4,10 @@
 package lucuma.core.math.dimensional
 
 import cats.Eq
-import coulomb.define._
+import coulomb.unitops.UnitString
+import lucuma.core.util.Display
+
+import java.util.Objects
 
 // All of this is a bridge between coulomb an runtime quantities (as defined in `Qty`).
 
@@ -18,26 +21,32 @@ import coulomb.define._
  */
 trait UnitType { self =>
   type Type
-  def definition: UnitDefinition
+
+  /** the full name of a unit, e.g. "meter" */
+  def name: String
+
+  /** the abbreviation of a unit, e.g. "m" for "meter" */
+  def abbv: String
 
   def withValue[N](_value: N): Qty[N] = new Qty[N] {
     val value = _value
     val unit  = self
   }
 
-  // `UnitDefiniton`s are expected to be singletons.
   override def equals(obj: Any): Boolean = obj match {
-    case that: UnitType => definition == that.definition
+    case that: UnitType => name == that.name && abbv == that.abbv
     case _              => false
   }
 
-  override def hashCode: Int = definition.hashCode
+  override def hashCode: Int = Objects.hash(name, abbv)
 
-  override def toString: String = definition.abbv
+  override def toString: String = abbv
 }
 
 object UnitType {
   implicit val eqUnitType: Eq[UnitType] = Eq.fromUniversalEquals
+
+  implicit def displayUnitType: Display[UnitType] = Display.by(_.abbv, _.name)
 }
 
 /**
@@ -58,21 +67,14 @@ trait UnitOfMeasure[U] extends UnitType {
 object UnitOfMeasure {
   def apply[U: UnitOfMeasure]: UnitOfMeasure[U] = implicitly[UnitOfMeasure[U]]
 
-  implicit def unitOfMeasureFromBaseUnit[U](implicit ev: BaseUnit[U]): UnitOfMeasure[U] =
+  implicit def unitOfMeasureFromUnitString[U](implicit ev: UnitString[U]): UnitOfMeasure[U] =
     new UnitOfMeasure[U] {
-      val definition = ev
+      override type Type = U
+      override val name = ev.full
+      override val abbv = ev.abbv
     }
 
-  implicit def unitOfMeasureFromDerivedUnit[U, D](implicit
-    ev: DerivedUnit[U, D]
-  ): UnitOfMeasure[U] =
-    new UnitOfMeasure[U] {
-      val definition = ev
-    }
-
-  // `UnitDefiniton`s are expected to be singletons.
-  implicit def eqUnitOfMeasure[U]: Eq[UnitOfMeasure[U]] =
-    Eq.instance((a, b) => a.definition == b.definition)
+  implicit def eqUnitOfMeasure[U]: Eq[UnitOfMeasure[U]] = Eq.fromUniversalEquals
 }
 
 /**
@@ -88,9 +90,7 @@ trait GroupedUnitType[+UG] extends UnitType {
 }
 
 object GroupedUnitType {
-  // `UnitDefiniton`s are expected to be singletons.
-  implicit def eqGroupedUnitType[UG]: Eq[GroupedUnitType[UG]] =
-    Eq.instance((a, b) => a.definition == b.definition)
+  implicit def eqGroupedUnitType[UG]: Eq[GroupedUnitType[UG]] = Eq.fromUniversalEquals
 }
 
 /**
@@ -104,10 +104,11 @@ trait GroupedUnitOfMeasure[UG, U] extends UnitOfMeasure[U] with GroupedUnitType[
 object GroupedUnitOfMeasure {
   def apply[UG, U](implicit unit: UnitOfMeasure[U]): GroupedUnitOfMeasure[UG, U] =
     new GroupedUnitOfMeasure[UG, U] {
-      val definition = unit.definition
+      val name = unit.name
+      val abbv = unit.abbv
     }
 
   // `UnitDefiniton`s are expected to be singletons.
   implicit def eqGroupedUnitOfMeasure[UG, U]: Eq[GroupedUnitOfMeasure[UG, U]] =
-    Eq.instance((a, b) => a.definition == b.definition)
+    Eq.fromUniversalEquals
 }

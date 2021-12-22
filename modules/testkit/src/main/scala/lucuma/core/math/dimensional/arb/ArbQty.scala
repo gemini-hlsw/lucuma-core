@@ -3,16 +3,14 @@
 
 package lucuma.core.math.dimensional.arb
 
-import coulomb.define.UnitDefinition
+// import coulomb.define.UnitDefinition
 import lucuma.core.math.dimensional._
 import org.scalacheck.Arbitrary._
 import org.scalacheck._
 
 trait ArbQty {
-  implicit val cogenUnitDefinition: Cogen[UnitDefinition] =
+  implicit val cogenUnitType: Cogen[UnitType] =
     Cogen[(String, String)].contramap(x => (x.name, x.abbv))
-
-  implicit val cogenUnitType: Cogen[UnitType] = Cogen[UnitDefinition].contramap(_.definition)
 
   implicit def arbQty[N: Arbitrary, U](implicit
     unit: UnitOfMeasure[U]

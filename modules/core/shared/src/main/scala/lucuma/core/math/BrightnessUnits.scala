@@ -26,9 +26,9 @@ object BrightnessUnits {
             UnitOfMeasure[VegaMagnitude],
             UnitOfMeasure[ABMagnitude],
             UnitOfMeasure[Jansky],
-            UnitOfMeasure[WattsBrightness],
-            UnitOfMeasure[ErgsWavelengthBrightness],
-            UnitOfMeasure[ErgsFrequencyBrightness]
+            UnitOfMeasure[WattsPerMeter2Micrometer],
+            UnitOfMeasure[ErgsPerSecondCentimeter2Angstrom],
+            UnitOfMeasure[ErgsPerSecondCentimeter2Hertz]
           )
           .map(_.groupedIn[Brightness[Integrated]])
     }
@@ -40,9 +40,9 @@ object BrightnessUnits {
             UnitOfMeasure[VegaMagnitudePerArcsec2],
             UnitOfMeasure[ABMagnitudePerArcsec2],
             UnitOfMeasure[JanskyPerArcsec2],
-            UnitOfMeasure[WattsBrightnessPerArcsec2],
-            UnitOfMeasure[ErgsWavelengthBrightnessPerArcsec2],
-            UnitOfMeasure[ErgsFrequencyBrightnessPerArcsec2]
+            UnitOfMeasure[WattsPerMeter2MicrometerArcsec2],
+            UnitOfMeasure[ErgsPerSecondCentimeter2AngstromArcsec2],
+            UnitOfMeasure[ErgsPerSecondCentimeter2HertzArcsec2]
           )
           .map(_.groupedIn[Brightness[Surface]])
     }
@@ -53,8 +53,8 @@ object BrightnessUnits {
       val all: NonEmptyList[GroupedUnitType[LineFlux[Integrated]]] =
         NonEmptyList
           .of(
-            UnitOfMeasure[WattsLineFlux],
-            UnitOfMeasure[ErgsLineFlux]
+            UnitOfMeasure[WattsPerMeter2],
+            UnitOfMeasure[ErgsPerSecondCentimeter2]
           )
           .map(_.groupedIn[LineFlux[Integrated]])
     }
@@ -63,8 +63,8 @@ object BrightnessUnits {
       val all: NonEmptyList[GroupedUnitType[LineFlux[Surface]]] =
         NonEmptyList
           .of(
-            UnitOfMeasure[WattsLineFluxPerArcsec2],
-            UnitOfMeasure[ErgsLineFluxPerArcsec2]
+            UnitOfMeasure[WattsPerMeter2Arcsec2],
+            UnitOfMeasure[ErgsPerSecondCentimeter2Arcsec2]
           )
           .map(_.groupedIn[LineFlux[Surface]])
     }
@@ -75,8 +75,8 @@ object BrightnessUnits {
       val all: NonEmptyList[GroupedUnitType[FluxDensityContinuum[Integrated]]] =
         NonEmptyList
           .of(
-            UnitOfMeasure[WattsBrightness],
-            UnitOfMeasure[ErgsWavelengthBrightness]
+            UnitOfMeasure[WattsPerMeter2Micrometer],
+            UnitOfMeasure[ErgsPerSecondCentimeter2Angstrom]
           )
           .map(_.groupedIn[FluxDensityContinuum[Integrated]])
     }
@@ -85,8 +85,8 @@ object BrightnessUnits {
       val all: NonEmptyList[GroupedUnitType[FluxDensityContinuum[Surface]]] =
         NonEmptyList
           .of(
-            UnitOfMeasure[WattsBrightnessPerArcsec2],
-            UnitOfMeasure[ErgsWavelengthBrightnessPerArcsec2]
+            UnitOfMeasure[WattsPerMeter2MicrometerArcsec2],
+            UnitOfMeasure[ErgsPerSecondCentimeter2AngstromArcsec2]
           )
           .map(_.groupedIn[FluxDensityContinuum[Surface]])
     }
@@ -96,7 +96,7 @@ object BrightnessUnits {
   private def enumGroupedUnitType[UG](
     allList: NonEmptyList[GroupedUnitType[UG]]
   ): Enumerated[GroupedUnitType[UG]] =
-    Enumerated.fromNEL(allList).withTag(_.definition.abbv)
+    Enumerated.fromNEL(allList).withTag(_.abbv)
 
   implicit val enumBrightnessIntegrated: Enumerated[GroupedUnitType[Brightness[Integrated]]] =
     enumGroupedUnitType[Brightness[Integrated]](Brightness.Integrated.all)
