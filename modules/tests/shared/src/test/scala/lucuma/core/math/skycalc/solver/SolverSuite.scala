@@ -4,13 +4,14 @@
 package lucuma.core.math.skycalc.solver
 
 import cats.syntax.all._
-import java.time.Instant
-import java.time.Duration
-import spire.math.extras.interval.IntervalSeq
 import lucuma.core.math.IntervalGens
-import lucuma.core.math.skycalc.solver.SolverStrategy._
 import lucuma.core.math.skycalc.solver.RoundStrategy._
+import lucuma.core.math.skycalc.solver.SolverStrategy._
 import org.typelevel.cats.time._
+import spire.math.extras.interval.IntervalSeq
+
+import java.time.Duration
+import java.time.Instant
 
 final class SolverSuite extends munit.DisciplineSuite with IntervalGens {
 

@@ -3,28 +3,31 @@
 
 package lucuma.core.math
 
-import cats.syntax.all._
 import cats.Eq
-import java.time.Duration
-import java.time.Instant
-import org.scalacheck.Gen
-import org.scalacheck.Gen.Choose
-import org.scalacheck.Arbitrary._
-import lucuma.core.syntax.time._
-import lucuma.core.arb.ArbTime._
-import org.typelevel.cats.time._
-import spire.math.Bounded
+import cats.syntax.all._
+import lucuma.core.arb.ArbTime
 import lucuma.core.optics.Spire
 import lucuma.core.syntax.boundedInterval._
-import spire.math.extras.interval.IntervalSeq
+import lucuma.core.syntax.time._
+import org.scalacheck.Arbitrary._
+import org.scalacheck.Gen
+import org.scalacheck.Gen.Choose
+import org.typelevel.cats.time._
+import spire.math.Bounded
 import spire.math.Interval
+import spire.math.extras.interval.IntervalSeq
+import spire.math.interval.Closed
 import spire.math.interval.EmptyBound
+import spire.math.interval.Open
 import spire.math.interval.Unbound
 import spire.math.interval.ValueBound
-import spire.math.interval.Closed
-import spire.math.interval.Open
+
+import java.time.Duration
+import java.time.Instant
 
 trait IntervalGens {
+  import ArbTime._
+
   private val MaxDelta: Long = Duration.ofMinutes(10).toNanos
 
   def buildInterval(start: Int, end: Int): Bounded[Instant] =

@@ -4,15 +4,15 @@
 package lucuma.core.model
 
 import cats.kernel.laws.discipline._
-import lucuma.core.model.arb._
-import munit._
-import lucuma.core.math.arb.ArbRefined
-import lucuma.core.util.arb.ArbEnumerated
-import monocle.law.discipline.LensTests
+import coulomb.cats.implicits._
 import coulomb.scalacheck.ArbQuantity
 import eu.timepit.refined.cats._
+import lucuma.core.math.arb.ArbRefined
+import lucuma.core.model.arb._
+import lucuma.core.util.arb.ArbEnumerated
+import monocle.law.discipline.LensTests
 import monocle.law.discipline.PrismTests
-import coulomb.cats.implicits._
+import munit._
 
 final class UnnormalizedSpectralEnergyDistributionSuite extends DisciplineSuite {
   import UnnormalizedSED._

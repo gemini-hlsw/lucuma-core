@@ -3,11 +3,12 @@
 
 package lucuma.core.enum
 
-import munit._
-import monocle.law.discipline.PrismTests
+import cats.kernel.laws.discipline.OrderTests
 import lucuma.core.util.Enumerated
 import lucuma.core.util.arb.ArbEnumerated._
-import cats.kernel.laws.discipline.OrderTests
+import monocle.law.discipline.PrismTests
+import munit._
+
 import scala.reflect.ClassTag
 
 final class EnumeratedSuite extends DisciplineSuite {

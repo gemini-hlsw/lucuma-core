@@ -3,21 +3,23 @@
 
 package lucuma.core.math
 
-import cats.{Eq, Order, Show}
-import cats.syntax.all._
+import cats.Eq
+import cats.Order
+import cats.Show
 import cats.kernel.laws.discipline._
+import cats.syntax.all._
 import coulomb.Quantity
-import lucuma.core.math.arb._
-import lucuma.core.math.units._
-import monocle.law.discipline._
 import coulomb.refined._
 import eu.timepit.refined.auto._
 import eu.timepit.refined.cats._
 import eu.timepit.refined.numeric._
 import eu.timepit.refined.scalacheck.numeric._
 import eu.timepit.refined.types.numeric.PosInt
+import lucuma.core.math.arb._
+import lucuma.core.math.units._
 import lucuma.core.optics.Format
 import lucuma.core.optics.laws.discipline.FormatTests
+import monocle.law.discipline._
 import org.scalacheck.Prop._
 import spire.math.Rational
 

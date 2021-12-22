@@ -3,10 +3,12 @@
 
 package lucuma.core.math.parser
 
-import atto._, Atto._
+import atto._
 import lucuma.core.math.Index
 import lucuma.core.parser.MiscParsers.index
 import org.scalacheck.Prop._
+
+import Atto._
 
 final class MiscParsersSuite extends munit.DisciplineSuite {
 

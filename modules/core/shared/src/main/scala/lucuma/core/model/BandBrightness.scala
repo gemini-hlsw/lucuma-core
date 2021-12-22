@@ -9,6 +9,7 @@ import lucuma.core.enum.Band
 import lucuma.core.math.BrightnessUnits._
 import lucuma.core.math.BrightnessValue
 import lucuma.core.math.dimensional._
+import lucuma.core.util.Enumerated
 import monocle.Focus
 import monocle.Lens
 
@@ -60,6 +61,26 @@ object BandBrightness {
     error:    BrightnessValue
   ): BandBrightness[T] =
     new BandBrightness(quantity, band, error.some)
+
+  def apply[T, U](value: BrightnessValue, band: Band, error: Option[BrightnessValue])(implicit
+    enumerated:          Enumerated[GroupedUnitType[Brightness[T]]],
+    unit:                UnitOfMeasure[U]
+  ): Option[BandBrightness[T]] =
+    enumerated.all
+      .find(_.ungrouped === unit)
+      .map(u => new BandBrightness(u.withValue(value), band, error))
+
+  def apply[T, U](value: BrightnessValue, band: Band, error: BrightnessValue)(implicit
+    enumerated:          Enumerated[GroupedUnitType[Brightness[T]]],
+    unit:                UnitOfMeasure[U]
+  ): Option[BandBrightness[T]] =
+    apply[T, U](value, band, error.some)
+
+  def apply[T, U](value: BrightnessValue, band: Band)(implicit
+    enumerated:          Enumerated[GroupedUnitType[Brightness[T]]],
+    unit:                UnitOfMeasure[U]
+  ): Option[BandBrightness[T]] =
+    apply[T, U](value, band, none)
 
   /** Secondary constructor using default units for the band. */
   def apply[T] = new GroupApplied[T]

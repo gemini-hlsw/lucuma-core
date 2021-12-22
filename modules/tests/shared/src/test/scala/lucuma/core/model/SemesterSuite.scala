@@ -3,16 +3,20 @@
 
 package lucuma.core.model
 
-import cats.{ Eq, Show }
-import java.time.{ Year, ZoneId }
-import lucuma.core.enum.{ Half, Site }
-import lucuma.core.util.arb.ArbEnumerated._
-import lucuma.core.arb.ArbTime._
-import lucuma.core.model.arb.ArbSemester._
-import java.time.format.DateTimeFormatter
+import cats.Eq
+import cats.Show
 import cats.kernel.laws.discipline._
-import org.typelevel.cats.time._
+import lucuma.core.arb.ArbTime._
+import lucuma.core.enum.Half
+import lucuma.core.enum.Site
+import lucuma.core.model.arb.ArbSemester._
+import lucuma.core.util.arb.ArbEnumerated._
 import org.scalacheck.Prop._
+import org.typelevel.cats.time._
+
+import java.time.Year
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 final class SemesterSuite extends munit.DisciplineSuite {
   // Laws

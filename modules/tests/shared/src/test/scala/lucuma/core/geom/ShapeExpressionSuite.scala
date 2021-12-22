@@ -4,14 +4,15 @@
 package lucuma.core.geom
 
 import cats.syntax.all._
-import lucuma.core.math.{ Angle, Offset }
+import lucuma.core.geom.arb._
 import lucuma.core.geom.syntax.all._
+import lucuma.core.math.Angle
+import lucuma.core.math.Offset
 import lucuma.core.math.arb._
 import lucuma.core.math.syntax.int._
-import lucuma.core.geom.arb._
-import org.scalacheck._
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Prop._
+import org.scalacheck._
 
 final class ShapeExpressionSuite extends munit.DisciplineSuite {
   implicit val interpreter: ShapeInterpreter =

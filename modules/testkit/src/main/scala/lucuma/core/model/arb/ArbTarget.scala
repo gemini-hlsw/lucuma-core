@@ -19,6 +19,7 @@ trait ArbTarget {
   import ArbAngularSize._
   import ArbEnumerated._
   import ArbSourceProfile._
+  import ArbCatalogInfo._
 
   implicit val ArbSiderealTarget: Arbitrary[Target.Sidereal] =
     Arbitrary {
@@ -26,8 +27,9 @@ trait ArbTarget {
         n <- arbitrary[NonEmptyString]
         t <- arbitrary[SiderealTracking]
         b <- arbitrary[SourceProfile]
+        c <- arbitrary[Option[CatalogInfo]]
         s <- arbitrary[Option[AngularSize]]
-      } yield Target.Sidereal(n, t, b, s)
+      } yield Target.Sidereal(n, t, b, c, s)
     }
 
   implicit val arbNonsiderealTarget: Arbitrary[Target.Nonsidereal] =
@@ -45,17 +47,17 @@ trait ArbTarget {
   )
 
   implicit val cogSiderealTarget: Cogen[Target.Sidereal] =
-    Cogen[(String, SiderealTracking, SourceProfile)]
-      .contramap(t => (t.name.value, t.tracking, t.sourceProfile))
+    Cogen[(String, SiderealTracking, SourceProfile, Option[CatalogInfo], Option[AngularSize])]
+      .contramap(t => (t.name.value, t.tracking, t.sourceProfile, t.catalogInfo, t.angularSize))
 
   implicit val cogNonsiderealTarget: Cogen[Target.Nonsidereal] =
-    Cogen[(String, EphemerisKey, SourceProfile)]
-      .contramap(t => (t.name.value, t.ephemerisKey, t.sourceProfile))
+    Cogen[(String, EphemerisKey, SourceProfile, Option[AngularSize])]
+      .contramap(t => (t.name.value, t.ephemerisKey, t.sourceProfile, t.angularSize))
 
   implicit val cogTarget: Cogen[Target] =
     Cogen[Either[Target.Sidereal, Target.Nonsidereal]]
       .contramap {
-        case t @ Target.Sidereal(_, _, _, _)    => t.asLeft
+        case t @ Target.Sidereal(_, _, _, _, _) => t.asLeft
         case t @ Target.Nonsidereal(_, _, _, _) => t.asRight
       }
 }

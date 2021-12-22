@@ -4,11 +4,11 @@
 package lucuma.core.optics
 
 import lucuma.core.optics.Spire._
-import spire.laws.arb._
 import lucuma.core.optics.laws.discipline.FormatTests
 import lucuma.core.optics.laws.discipline.SplitEpiTests
-import org.scalacheck.Arbitrary._
 import monocle.law.discipline.IsoTests
+import org.scalacheck.Arbitrary._
+import spire.laws.arb._
 
 final class SpireOpticsSuite extends munit.DisciplineSuite {
 

@@ -4,8 +4,8 @@
 package lucuma.core.model
 
 import cats.kernel.laws.discipline._
-import munit._
 import lucuma.core.optics.laws.discipline.SplitMonoTests
+import munit._
 
 class GaussianSourceSuite extends DisciplineSuite {
   import lucuma.core.model.arb.ArbGaussianSource._

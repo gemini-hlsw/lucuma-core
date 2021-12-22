@@ -83,6 +83,8 @@ object UnitOfMeasure {
 trait GroupedUnitType[+UG] extends UnitType {
   override def withValue[N](value: N): GroupedUnitQty[N, UG] =
     GroupedUnitQty(value, this)
+
+  def ungrouped: UnitType = this
 }
 
 object GroupedUnitType {
@@ -95,7 +97,9 @@ object GroupedUnitType {
  * Type-parametrized runtime representation of physical unit `U` and its association to unit group
  * `UG`.
  */
-trait GroupedUnitOfMeasure[UG, U] extends UnitOfMeasure[U] with GroupedUnitType[UG]
+trait GroupedUnitOfMeasure[UG, U] extends UnitOfMeasure[U] with GroupedUnitType[UG] {
+  override def ungrouped: UnitOfMeasure[U] = this
+}
 
 object GroupedUnitOfMeasure {
   def apply[UG, U](implicit unit: UnitOfMeasure[U]): GroupedUnitOfMeasure[UG, U] =

@@ -3,25 +3,26 @@
 
 package lucuma.core.math
 
+import cats.Order._
 import cats.syntax.all._
+import lucuma.core.arb.ArbTime
+import lucuma.core.instances.boundedInterval._
+import lucuma.core.math.arb._
+import lucuma.core.optics.Spire
+import lucuma.core.optics.laws.discipline.FormatTests
+import lucuma.core.optics.laws.discipline.SplitEpiTests
+import lucuma.core.syntax.boundedInterval._
+import lucuma.core.syntax.time._
+import org.scalacheck.Arbitrary._
+import org.scalacheck.Gen
+import org.scalacheck.Prop._
+import org.typelevel.cats.time._
+import spire.math.Bounded
+
+import java.time.Duration
 import java.time.Instant
 import java.time.LocalTime
 import java.time.ZoneId
-import org.scalacheck.Gen
-import org.scalacheck.Arbitrary._
-import org.scalacheck.Prop._
-import lucuma.core.math.arb._
-import org.typelevel.cats.time._
-import lucuma.core.optics.laws.discipline.FormatTests
-import lucuma.core.arb.ArbTime
-import spire.math.Bounded
-import lucuma.core.syntax.boundedInterval._
-import lucuma.core.syntax.time._
-import lucuma.core.optics.Spire
-import java.time.Duration
-import cats.Order._
-import lucuma.core.optics.laws.discipline.SplitEpiTests
-import lucuma.core.instances.boundedInterval._
 
 final class IntervalSuite extends munit.DisciplineSuite with IntervalGens {
   import ArbInterval._

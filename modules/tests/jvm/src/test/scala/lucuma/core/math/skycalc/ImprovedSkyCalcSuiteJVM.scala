@@ -3,21 +3,21 @@
 
 package lucuma.core.math.skycalc
 
-import munit.ScalaCheckSuite
-import org.scalacheck.Prop._
-
+import com.fortysevendeg.scalacheck.datetime.GenDateTime.genDateTimeWithinRange
+import com.fortysevendeg.scalacheck.datetime.instances.jdk8._
 import edu.gemini.skycalc.ImprovedSkyCalcTest
+import jsky.coords.WorldCoords
 import lucuma.core.math.Coordinates
+import lucuma.core.math.Place
 import lucuma.core.math.arb.ArbCoordinates._
 import lucuma.core.math.arb.ArbPlace._
-import com.fortysevendeg.scalacheck.datetime.instances.jdk8._
-import com.fortysevendeg.scalacheck.datetime.GenDateTime.genDateTimeWithinRange
-import java.time._
-import lucuma.core.math.Place
-import jsky.coords.WorldCoords
-import java.{ util => ju }
+import munit.ScalaCheckSuite
+import org.scalacheck.Prop._
 import org.scalacheck.{ Test => ScalaCheckTest }
 import org.scalactic.Tolerance
+
+import java.time._
+import java.{ util => ju }
 
 final class ImprovedSkyCalcSuiteJVM extends ScalaCheckSuite with Tolerance {
 

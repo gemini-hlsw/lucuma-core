@@ -3,21 +3,19 @@
 
 package lucuma.core.util
 
-import lucuma.core.util.Timestamp
-import lucuma.core.util.arb.ArbTimestamp._
+import cats.kernel.laws.discipline._
 import lucuma.core.arb.ArbTime._
 import lucuma.core.optics.laws.discipline._
-import cats.kernel.laws.discipline._
+import lucuma.core.util.Timestamp
+import lucuma.core.util.arb.ArbTimestamp._
+import munit._
+import org.scalacheck.Arbitrary
+import org.scalacheck.Gen
+import org.scalacheck.Prop._
 import org.typelevel.cats.time._
 
-import java.time.ZonedDateTime
 import java.time.ZoneOffset.UTC
-
-import org.scalacheck.Prop._
-import org.scalacheck.Gen
-import org.scalacheck.Arbitrary
-
-import munit._
+import java.time.ZonedDateTime
 
 final class TimestampSuite extends DisciplineSuite {
 

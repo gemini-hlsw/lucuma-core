@@ -7,14 +7,14 @@ import cats.kernel.laws.discipline._
 import eu.timepit.refined.cats._
 import eu.timepit.refined.scalacheck.string._
 import lucuma.core.arb._
+import lucuma.core.enum.Band
 import lucuma.core.math.arb._
+import lucuma.core.math.dimensional.arb.ArbQty
 import lucuma.core.model.arb._
 import lucuma.core.util.arb._
 import lucuma.core.util.laws.GidTests
 import monocle.law.discipline._
-import lucuma.core.math.dimensional.arb.ArbQty
 import munit._
-import lucuma.core.enum.Band
 
 final class TargetSuite extends DisciplineSuite {
   import ArbTarget._
@@ -30,7 +30,7 @@ final class TargetSuite extends DisciplineSuite {
   import ArbRadialVelocity._
   import ArbGid._
   import ArbEpoch._
-  import ArbCatalogId._
+  import ArbCatalogInfo._
   import Target._
   import ArbEmissionLine._
   import ArbSpectralDefinition._
@@ -39,6 +39,7 @@ final class TargetSuite extends DisciplineSuite {
   import ArbBandBrightness._
   import ArbRefined._
   import ArbQty._
+  import ArbAngularSize._
 
   // Laws for Target.Sidereal
   checkAll("Eq[Target.Sidereal]", EqTests[Target.Sidereal].eqv)
@@ -52,7 +53,16 @@ final class TargetSuite extends DisciplineSuite {
   )
   checkAll("Target.Sidereal.name", LensTests(Target.Sidereal.name))
   checkAll("Target.Sidereal.tracking", LensTests(Target.Sidereal.tracking))
-  checkAll("Target.Sidereal.properMotion", OptionalTests(Target.Sidereal.properMotion))
+  checkAll("Target.Sidereal.parallax", LensTests(Target.Sidereal.parallax))
+  checkAll("Target.Sidereal.radialVelocity", LensTests(Target.Sidereal.radialVelocity))
+  checkAll("Target.Sidereal.baseCoordinates", LensTests(Target.Sidereal.baseCoordinates))
+  checkAll("Target.Sidereal.baseRA", LensTests(Target.Sidereal.baseRA))
+  checkAll("Target.Sidereal.baseDec", LensTests(Target.Sidereal.baseDec))
+  checkAll("Target.Sidereal.catalogInfo", LensTests(Target.Sidereal.catalogInfo))
+  checkAll("Target.Sidereal.epoch", LensTests(Target.Sidereal.epoch))
+  checkAll("Target.Sidereal.properMotion", LensTests(Target.Sidereal.properMotion))
+  checkAll("Target.Sidereal.properMotionRA", OptionalTests(Target.Sidereal.properMotionRA))
+  checkAll("Target.Sidereal.properMotionDec", OptionalTests(Target.Sidereal.properMotionDec))
   checkAll("Target.Sidereal.sourceProfile", LensTests(Target.Sidereal.sourceProfile))
   checkAll(
     "Target.Sidereal.integratedSpectralDefinition",
@@ -150,16 +160,8 @@ final class TargetSuite extends DisciplineSuite {
     "Target.Sidereal.surfaceFluxDensityContinuum",
     OptionalTests(Target.Sidereal.surfaceFluxDensityContinuum)
   )
-  checkAll("Target.Sidereal.parallax", LensTests(Target.Sidereal.parallax))
-  checkAll("Target.Sidereal.radialVelocity", LensTests(Target.Sidereal.radialVelocity))
-  checkAll("Target.Sidereal.baseCoordinates", LensTests(Target.Sidereal.baseCoordinates))
-  checkAll("Target.Sidereal.baseRA", LensTests(Target.Sidereal.baseRA))
-  checkAll("Target.Sidereal.baseDec", LensTests(Target.Sidereal.baseDec))
-  checkAll("Target.Sidereal.catalogId", LensTests(Target.Sidereal.catalogId))
-  checkAll("Target.Sidereal.epoch", LensTests(Target.Sidereal.epoch))
-  checkAll("Target.Sidereal.properMotion", LensTests(Target.Sidereal.properMotion))
-  checkAll("Target.Sidereal.properMotionRA", OptionalTests(Target.Sidereal.properMotionRA))
-  checkAll("Target.Sidereal.properMotionDec", OptionalTests(Target.Sidereal.properMotionDec))
+  checkAll("Target.Sidereal.catalogInfo", LensTests(Target.Sidereal.catalogInfo))
+  checkAll("Target.Sidereal.angularSize", LensTests(Target.Sidereal.angularSize))
 
   // Laws for Target.Nonsidereal
   checkAll("Eq[Target.Nonsidereal]", EqTests[Target.Nonsidereal].eqv)
@@ -270,6 +272,7 @@ final class TargetSuite extends DisciplineSuite {
     "Target.Nonsidereal.surfaceFluxDensityContinuum",
     OptionalTests(Target.Nonsidereal.surfaceFluxDensityContinuum)
   )
+  checkAll("Target.Nonsidereal.angularSize", LensTests(Target.Nonsidereal.angularSize))
 
   // Laws for Target
   checkAll("Target.Id", GidTests[Target.Id].gid)
@@ -279,7 +282,6 @@ final class TargetSuite extends DisciplineSuite {
   checkAll("Target.sidereal", PrismTests(Target.sidereal))
   checkAll("Target.nonsidereal", PrismTests(Target.nonsidereal))
   checkAll("Target.name", LensTests(Target.name))
-  checkAll("Target.properMotion", OptionalTests(Target.properMotion))
   checkAll("Target.ephemerisKey", OptionalTests(Target.ephemerisKey))
   checkAll("Target.sourceProfile", LensTests(Target.sourceProfile))
   checkAll(
@@ -378,16 +380,17 @@ final class TargetSuite extends DisciplineSuite {
     "Target.surfaceFluxDensityContinuum",
     OptionalTests(Target.surfaceFluxDensityContinuum)
   )
-
   checkAll("Target.siderealTracking", OptionalTests(Target.siderealTracking))
   checkAll("Target.parallax", OptionalTests(Target.parallax))
   checkAll("Target.radialVelocity", OptionalTests(Target.radialVelocity))
   checkAll("Target.baseCoordinates", OptionalTests(Target.baseCoordinates))
   checkAll("Target.baseRA", OptionalTests(Target.baseRA))
   checkAll("Target.baseDec", OptionalTests(Target.baseDec))
-  checkAll("Target.catalogId", OptionalTests(Target.catalogId))
+  checkAll("Target.catalogInfo", OptionalTests(Target.catalogInfo))
   checkAll("Target.epoch", OptionalTests(Target.epoch))
   checkAll("Target.properMotion", OptionalTests(Target.properMotion))
   checkAll("Target.properMotionRA", OptionalTests(Target.properMotionRA))
   checkAll("Target.properMotionDec", OptionalTests(Target.properMotionDec))
+  checkAll("Target.catalogInfo", OptionalTests(Target.catalogInfo))
+  checkAll("Target.angularSize", LensTests(Target.angularSize))
 }

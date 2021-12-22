@@ -4,13 +4,13 @@
 package lucuma.core.math
 
 import coulomb._
+import coulomb.mks._
 import coulomb.si.Meter
 import lucuma.core.math.units._
 import munit.FunSuite
+import spire.implicits._
 import spire.math.Rational
 import spire.math.SafeLong
-import spire.implicits._
-import coulomb.mks._
 
 final class UnitsSuite extends FunSuite {
 

@@ -3,17 +3,17 @@
 
 package lucuma.core.math
 
-import java.math.MathContext
-
 import cats._
 import cats.kernel.laws.discipline._
 import coulomb._
 import coulomb.si._
+import lucuma.core.math.Constants.SpeedOfLight
 import lucuma.core.math.arb._
 import lucuma.core.math.units._
-import lucuma.core.math.Constants.SpeedOfLight
-import org.scalacheck.Prop._
 import monocle.law.discipline.IsoTests
+import org.scalacheck.Prop._
+
+import java.math.MathContext
 
 final class RedshiftSuite extends munit.DisciplineSuite {
   import ArbRedshift._

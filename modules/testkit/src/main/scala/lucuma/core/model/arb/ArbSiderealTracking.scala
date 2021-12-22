@@ -16,24 +16,21 @@ trait ArbSiderealTracking {
   import ArbProperMotion._
   import ArbRadialVelocity._
   import ArbParallax._
-  import ArbCatalogId._
 
   implicit val arbSiderealTracking: Arbitrary[SiderealTracking] =
     Arbitrary {
       for {
-        ci <- arbitrary[Option[CatalogId]]
         cs <- arbitrary[Coordinates]
         ap <- arbitrary[Epoch]
         pv <- arbitrary[Option[ProperMotion]]
         rv <- arbitrary[Option[RadialVelocity]]
         px <- arbitrary[Option[Parallax]]
-      } yield SiderealTracking(ci, cs, ap, pv, rv, px)
+      } yield SiderealTracking(cs, ap, pv, rv, px)
     }
 
   implicit val cogSiderealTracking: Cogen[SiderealTracking] =
     Cogen[
       (
-        Option[CatalogId],
         Coordinates,
         Epoch,
         Option[ProperMotion],
@@ -41,8 +38,8 @@ trait ArbSiderealTracking {
         Option[Parallax]
       )
     ].contramap { p =>
-        (p.catalogId, p.baseCoordinates, p.epoch, p.properMotion, p.radialVelocity, p.parallax)
-      }
+      (p.baseCoordinates, p.epoch, p.properMotion, p.radialVelocity, p.parallax)
+    }
 
 }
 

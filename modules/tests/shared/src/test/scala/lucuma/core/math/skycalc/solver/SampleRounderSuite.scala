@@ -4,17 +4,18 @@
 package lucuma.core.math.skycalc.solver
 
 import cats.Eq
+import cats.laws.discipline.InvariantSemigroupalTests
 import cats.syntax.all._
-import java.time.Duration
-import java.time.Instant
+import lucuma.core.arb.ArbTime
+import lucuma.core.syntax.time._
 import org.scalacheck.Arbitrary
 import org.scalacheck.Gen
 import org.scalacheck.Prop
 import org.scalacheck.Prop._
-import lucuma.core.arb.ArbTime
-import lucuma.core.syntax.time._
 import org.typelevel.cats.time._
-import cats.laws.discipline.InvariantSemigroupalTests
+
+import java.time.Duration
+import java.time.Instant
 
 final class SampleRounderSuite extends munit.DisciplineSuite {
   import ArbTime._

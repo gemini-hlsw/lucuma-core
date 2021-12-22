@@ -3,10 +3,9 @@
 
 package lucuma.core.model
 
-import lucuma.core.model.arb._
-
-import munit._
 import cats.kernel.laws.discipline.EqTests
+import lucuma.core.model.arb._
+import munit._
 
 final class OrcidProfileSuite extends DisciplineSuite {
   import ArbOrcidProfile._

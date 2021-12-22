@@ -11,7 +11,6 @@ import munit.DisciplineSuite
 import org.scalacheck.Prop.forAll
 
 final class SiderealTrackingSuite extends DisciplineSuite {
-  import ArbCatalogId._
   import ArbParallax._
   import ArbCoordinates._
   import ArbEpoch._
@@ -22,7 +21,6 @@ final class SiderealTrackingSuite extends DisciplineSuite {
   // Laws
   checkAll("SiderealTracking", OrderTests[SiderealTracking].order)
   checkAll("SiderealTracking.baseCoordinates", LensTests(SiderealTracking.baseCoordinates))
-  checkAll("SiderealTracking.catalogId", LensTests(SiderealTracking.catalogId))
   checkAll("SiderealTracking.epoch", LensTests(SiderealTracking.epoch))
   checkAll("SiderealTracking.properMotion", LensTests(SiderealTracking.properMotion))
   checkAll("SiderealTracking.radialVelocity", LensTests(SiderealTracking.radialVelocity))

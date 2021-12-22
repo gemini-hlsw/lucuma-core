@@ -5,10 +5,10 @@ package lucuma.core.math
 
 import cats._
 import lucuma.core.math.arb._
+import lucuma.core.optics.laws.discipline.FormatTests
 import monocle.law.discipline._
 import munit.DisciplineSuite
 import org.scalacheck.Prop._
-import lucuma.core.optics.laws.discipline.FormatTests
 
 final class RadialVelocitySuite extends DisciplineSuite {
   import ArbRadialVelocity._
