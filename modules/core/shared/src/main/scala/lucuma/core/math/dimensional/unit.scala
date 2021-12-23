@@ -6,10 +6,11 @@ package lucuma.core.math.dimensional
 import cats.Eq
 import coulomb.unitops.UnitString
 import lucuma.core.util.Display
+import lucuma.core.util.IsTagged
+import shapeless.tag
+import shapeless.tag.@@
 
 import java.util.Objects
-
-// All of this is a bridge between coulomb an runtime quantities (as defined in `Qty`).
 
 /**
  * Runtime representation of a physical unit. Wraps:
@@ -28,10 +29,8 @@ trait UnitType { self =>
   /** the abbreviation of a unit, e.g. "m" for "meter" */
   def abbv: String
 
-  def withValue[N](_value: N): Qty[N] = new Qty[N] {
-    val value = _value
-    val unit  = self
-  }
+  /** Create a `Qty` with the specified value, keeping the runtime represantation of the units. */
+  def withValue[N](value: N): Qty[N] = Qty[N](value, self)
 
   override def equals(obj: Any): Boolean = obj match {
     case that: UnitType => name == that.name && abbv == that.abbv
@@ -47,6 +46,16 @@ object UnitType {
   implicit val eqUnitType: Eq[UnitType] = Eq.fromUniversalEquals
 
   implicit def displayUnitType: Display[UnitType] = Display.by(_.abbv, _.name)
+
+  implicit class TaggedUnitTypeOps[Tag](val unitType: UnitType @@ Tag) extends AnyVal {
+
+    /**
+     * Create a `Qty` with the specified value, keeping the runtime represantation of the units,
+     * propagating the unit tag into the `Qty`.
+     */
+    def withValueT[N](value: N): Qty[N] @@ Tag =
+      tag[Tag](Qty[N](value, unitType))
+  }
 }
 
 /**
@@ -57,11 +66,6 @@ object UnitType {
  */
 trait UnitOfMeasure[U] extends UnitType {
   type Type = U
-
-  /**
-   * Build an association between this unit and group `G`.
-   */
-  def groupedIn[G]: GroupedUnitOfMeasure[G, U] = GroupedUnitOfMeasure(this)
 }
 
 object UnitOfMeasure {
@@ -78,37 +82,8 @@ object UnitOfMeasure {
 }
 
 /**
- * Runtime association of a `UnitType` to unit group `UG`.
- *
- * The group doesn't exist in runtime, it's just a type tag.
+ * Type class placing a tag `Tag` on a unit of measure.
  */
-trait GroupedUnitType[+UG] extends UnitType {
-  override def withValue[N](value: N): GroupedUnitQty[N, UG] =
-    GroupedUnitQty(value, this)
-
-  def ungrouped: UnitType = this
-}
-
-object GroupedUnitType {
-  implicit def eqGroupedUnitType[UG]: Eq[GroupedUnitType[UG]] = Eq.fromUniversalEquals
-}
-
-/**
- * Type-parametrized runtime representation of physical unit `U` and its association to unit group
- * `UG`.
- */
-trait GroupedUnitOfMeasure[UG, U] extends UnitOfMeasure[U] with GroupedUnitType[UG] {
-  override def ungrouped: UnitOfMeasure[U] = this
-}
-
-object GroupedUnitOfMeasure {
-  def apply[UG, U](implicit unit: UnitOfMeasure[U]): GroupedUnitOfMeasure[UG, U] =
-    new GroupedUnitOfMeasure[UG, U] {
-      val name = unit.name
-      val abbv = unit.abbv
-    }
-
-  // `UnitDefiniton`s are expected to be singletons.
-  implicit def eqGroupedUnitOfMeasure[UG, U]: Eq[GroupedUnitOfMeasure[UG, U]] =
-    Eq.fromUniversalEquals
+class IsTaggedUnit[U, Tag](implicit ev: UnitOfMeasure[U]) extends IsTagged[UnitOfMeasure[U], Tag] {
+  def unit: UnitOfMeasure[U] @@ Tag = tag[Tag](ev)
 }

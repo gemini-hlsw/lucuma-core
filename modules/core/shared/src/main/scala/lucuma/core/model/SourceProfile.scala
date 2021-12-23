@@ -9,13 +9,14 @@ import eu.timepit.refined.types.numeric.PosBigDecimal
 import lucuma.core.enum.Band
 import lucuma.core.math.BrightnessUnits._
 import lucuma.core.math.Wavelength
-import lucuma.core.math.dimensional.GroupedUnitQty
+import lucuma.core.math.dimensional.Qty
 import monocle.Focus
 import monocle.Lens
 import monocle.Optional
 import monocle.Prism
 import monocle.Traversal
 import monocle.macros.GenPrism
+import shapeless.tag.@@
 
 import scala.collection.immutable.SortedMap
 
@@ -202,12 +203,12 @@ object SourceProfile {
   /** @group Optics */
   val integratedFluxDensityContinuum: Optional[
     SourceProfile,
-    GroupedUnitQty[PosBigDecimal, FluxDensityContinuum[Integrated]]
+    Qty[PosBigDecimal] @@ FluxDensityContinuum[Integrated]
   ] = integratedSpectralDefinition.andThen(SpectralDefinition.fluxDensityContinuum[Integrated])
 
   /** @group Optics */
   val surfaceFluxDensityContinuum: Optional[
     SourceProfile,
-    GroupedUnitQty[PosBigDecimal, FluxDensityContinuum[Surface]]
+    Qty[PosBigDecimal] @@ FluxDensityContinuum[Surface]
   ] = surfaceSpectralDefinition.andThen(SpectralDefinition.fluxDensityContinuum[Surface])
 }

@@ -10,13 +10,14 @@ import eu.timepit.refined.types.numeric.PosBigDecimal
 import lucuma.core.enum.Band
 import lucuma.core.math.BrightnessUnits._
 import lucuma.core.math.Wavelength
-import lucuma.core.math.dimensional.GroupedUnitQty
+import lucuma.core.math.dimensional.Qty
 import monocle.Focus
 import monocle.Lens
 import monocle.Optional
 import monocle.Prism
 import monocle.Traversal
 import monocle.macros.GenPrism
+import shapeless.tag.@@
 
 import scala.collection.immutable.SortedMap
 
@@ -56,7 +57,7 @@ object SpectralDefinition {
   // TODO Check if BigDecimal [parse from/toString to] "5e-19".
   final case class EmissionLines[T](
     lines:                SortedMap[Wavelength, EmissionLine[T]],
-    fluxDensityContinuum: GroupedUnitQty[PosBigDecimal, FluxDensityContinuum[T]]
+    fluxDensityContinuum: Qty[PosBigDecimal] @@ FluxDensityContinuum[T]
   ) extends SpectralDefinition[T] {
     lazy val wavelengths: List[Wavelength] = lines.keys.toList
   }
@@ -80,7 +81,7 @@ object SpectralDefinition {
     /** @group Optics */
     def fluxDensityContinuum[T]: Lens[
       EmissionLines[T],
-      GroupedUnitQty[PosBigDecimal, FluxDensityContinuum[T]]
+      Qty[PosBigDecimal] @@ FluxDensityContinuum[T]
     ] = Focus[EmissionLines[T]](_.fluxDensityContinuum)
   }
 
@@ -131,6 +132,6 @@ object SpectralDefinition {
   /** @group Optics */
   def fluxDensityContinuum[T]: Optional[
     SpectralDefinition[T],
-    GroupedUnitQty[PosBigDecimal, FluxDensityContinuum[T]]
+    Qty[PosBigDecimal] @@ FluxDensityContinuum[T]
   ] = emissionLines.andThen(EmissionLines.fluxDensityContinuum[T])
 }

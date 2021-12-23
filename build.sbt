@@ -15,6 +15,7 @@ lazy val refinedVersion        = "0.9.28"
 lazy val catsTimeVersion       = "0.5.0"
 lazy val circeVersion          = "0.14.1"
 lazy val catsScalacheckVersion = "0.3.1"
+lazy val shapelessVersion      = "2.3.3"
 
 inThisBuild(
   Seq(
@@ -57,7 +58,8 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
       "eu.timepit"     %%% "refined-cats"               % refinedVersion,
       "org.typelevel"  %%% "cats-time"                  % catsTimeVersion,
       "io.circe"       %%% "circe-core"                 % circeVersion,
-      "io.circe"       %%% "circe-refined"              % circeVersion
+      "io.circe"       %%% "circe-refined"              % circeVersion,
+      "com.chuusai"    %%% "shapeless"                  % shapelessVersion
     )
   )
   .jvmConfigure(_.enablePlugins(AutomateHeaderPlugin))

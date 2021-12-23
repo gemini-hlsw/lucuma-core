@@ -3,7 +3,10 @@
 
 package lucuma.core.math
 
+import coulomb.Quantity
 import coulomb.unitops.UnitString
+import shapeless.tag
+import shapeless.tag.@@
 
 package object dimensional {
 
@@ -23,5 +26,19 @@ package object dimensional {
      */
     def apply[U](abbreviation: String): UnitString[U] =
       apply(abbreviation, abbreviation)
+  }
+
+  implicit class QuantityOps[N, U](quantity: Quantity[N, U]) {
+
+    /**
+     * Convert a coulomb `Quantity` to a `Qty` with runtime unit representation.
+     */
+    def toQty(implicit unit: UnitOfMeasure[U]): Qty[N] = Qty(quantity.value, unit)
+
+    /**
+     * Convert a coulomb `Quantity` to a `Qty` with runtime unit representation and tag `Tag`.
+     */
+    def toQtyT[Tag](implicit unit: UnitOfMeasure[U]): Qty[N] @@ Tag =
+      tag[Tag](Qty(quantity.value, unit))
   }
 }

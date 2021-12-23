@@ -7,13 +7,13 @@ import _root_.cats.kernel.Eq
 import coulomb._
 import monocle.Focus
 import monocle.Lens
+import shapeless.tag
+import shapeless.tag.@@
 
 /**
  * A magnitude of type `N` and a runtime representation of a physical unit.
  */
-trait Qty[N] {
-  val value: N
-  val unit: UnitType
+final case class Qty[N](value: N, unit: UnitType) {
 
   /**
    * Convert to `coulomb.Quantity`.
@@ -23,27 +23,22 @@ trait Qty[N] {
 
 object Qty {
   implicit def eqQty[N: Eq]: Eq[Qty[N]] = Eq.by(x => (x.value, x.unit))
-}
 
-/**
- * A magnitude of type `N` and a runtime representation of a physical unit in group `UG`.
- */
-case class GroupedUnitQty[N, +UG] private (value: N, unit: GroupedUnitType[UG]) extends Qty[N]
-object GroupedUnitQty {
+  implicit def eqTaggedQty[N: Eq, Tag]: Eq[Qty[N] @@ Tag] = Eq.by(x => (x.value, x.unit))
 
-  /**
-   * Create a `GroupedUnitQty` from a `coulomb.Quantity`.
-   */
-  def apply[N, UG, U](
-    q:             Quantity[N, U]
-  )(implicit unit: GroupedUnitOfMeasure[UG, U]): GroupedUnitQty[N, UG] =
-    GroupedUnitQty(q.value, unit)
+  /** @group Optics */
+  def value[N]: Lens[Qty[N], N] = Focus[Qty[N]](_.value)
 
-  def value[N, UG]: Lens[GroupedUnitQty[N, UG], N] = Focus[GroupedUnitQty[N, UG]](_.value)
+  /** @group Optics */
+  def valueT[N, Tag]: Lens[Qty[N] @@ Tag, N] =
+    Lens[Qty[N] @@ Tag, N](_.value)(v => q => tag[Tag](value.replace(v)(q)))
 
-  def unit[N, UG]: Lens[GroupedUnitQty[N, UG], GroupedUnitType[UG]] =
-    Focus[GroupedUnitQty[N, UG]](_.unit)
+  /** @group Optics */
+  def unit[N]: Lens[Qty[N], UnitType] = Focus[Qty[N]](_.unit)
 
-  implicit def eqGroupedUnitQty[N: Eq, UG]: Eq[GroupedUnitQty[N, UG]] =
-    Eq.by(x => (x.value, x.unit))
+  /** @group Optics */
+  def unitT[N, Tag]: Lens[Qty[N] @@ Tag, UnitType @@ Tag] =
+    Lens[Qty[N] @@ Tag, UnitType @@ Tag](q => tag[Tag](q.unit))(v =>
+      q => tag[Tag](unit.replace(v)(q))
+    )
 }
