@@ -29,6 +29,7 @@ trait UnitType { self =>
   /** the abbreviation of a unit, e.g. "m" for "meter" */
   def abbv: String
 
+  /** Create a `Qty` with the specified value, keeping the runtime represantation of the units. */
   def withValue[N](value: N): Qty[N] = Qty[N](value, self)
 
   override def equals(obj: Any): Boolean = obj match {
@@ -47,6 +48,11 @@ object UnitType {
   implicit def displayUnitType: Display[UnitType] = Display.by(_.abbv, _.name)
 
   implicit class TaggedUnitTypeOps[Tag](val unitType: UnitType @@ Tag) extends AnyVal {
+
+    /**
+     * Create a `Qty` with the specified value, keeping the runtime represantation of the units,
+     * propagating the unit tag into the `Qty`.
+     */
     def withValueT[N](value: N): Qty[N] @@ Tag =
       tag[Tag](Qty[N](value, unitType))
   }

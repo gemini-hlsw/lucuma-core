@@ -50,6 +50,7 @@ sealed abstract class Band(
 trait BandDefaultUnit {
   class DefaultUnit[B, T](val unit: UnitType @@ Brightness[T])
   object DefaultUnit {
+    // Declare `U` as the default unit for band `B` and brightness type `T` (Integrated or Surface).
     def apply[B, T, U](implicit tagged: IsTaggedUnit[U, Brightness[T]]) =
       new DefaultUnit[B, T](tagged.unit)
   }
