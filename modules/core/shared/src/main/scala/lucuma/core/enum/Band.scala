@@ -18,9 +18,9 @@ import lucuma.core.math.dimensional._
 import lucuma.core.math.units.Nanometer
 import lucuma.core.math.units._
 import lucuma.core.util.Enumerated
+import shapeless.tag.@@
 import spire.std.any._
 import spire.syntax.all._
-import shapeless.tag.@@
 
 /**
  * Enumerated type for wavelength band.

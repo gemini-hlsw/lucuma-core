@@ -6,6 +6,7 @@ package lucuma.core.math.dimensional
 import cats.Eq
 import coulomb.unitops.UnitString
 import lucuma.core.util.Display
+import lucuma.core.util.IsTagged
 import shapeless.tag
 import shapeless.tag.@@
 
@@ -28,10 +29,7 @@ trait UnitType { self =>
   /** the abbreviation of a unit, e.g. "m" for "meter" */
   def abbv: String
 
-  def withValue[N](_value: N): Qty[N] = new Qty[N] {
-    val value = _value
-    val unit  = self
-  }
+  def withValue[N](value: N): Qty[N] = Qty[N](value, self)
 
   override def equals(obj: Any): Boolean = obj match {
     case that: UnitType => name == that.name && abbv == that.abbv
@@ -49,11 +47,8 @@ object UnitType {
   implicit def displayUnitType: Display[UnitType] = Display.by(_.abbv, _.name)
 
   implicit class TaggedUnitTypeOps[Tag](val unitType: UnitType @@ Tag) extends AnyVal {
-    def withValueT[N](_value: N): Qty[N] @@ Tag =
-      tag[Tag](new Qty[N] {
-        val value = _value
-        val unit  = unitType
-      })
+    def withValueT[N](value: N): Qty[N] @@ Tag =
+      tag[Tag](Qty[N](value, unitType))
   }
 }
 
@@ -78,4 +73,11 @@ object UnitOfMeasure {
     }
 
   implicit def eqUnitOfMeasure[U]: Eq[UnitOfMeasure[U]] = Eq.fromUniversalEquals
+}
+
+/**
+ * Type class placing a tag `Tag` on a unit of measure.
+ */
+class IsTaggedUnit[U, Tag](implicit ev: UnitOfMeasure[U]) extends IsTagged[UnitOfMeasure[U], Tag] {
+  def unit: UnitOfMeasure[U] @@ Tag = tag[Tag](ev)
 }

@@ -9,7 +9,6 @@ import cats.data.NonEmptyList
 import lucuma.core.math.dimensional._
 import lucuma.core.math.units._
 import lucuma.core.util.Enumerated
-import shapeless.tag
 import shapeless.tag.@@
 
 object BrightnessUnits {
@@ -19,17 +18,6 @@ object BrightnessUnits {
   trait Brightness[+T]
   trait LineFlux[+T]
   trait FluxDensityContinuum[+T]
-
-  // TODO This is general, move somewhere else
-
-  trait IsTagged[T, U] {
-    def apply(t: T): T @@ U = tag[U](t)
-  }
-
-  class IsTaggedUnit[U, Tag](implicit ev: UnitOfMeasure[U])
-      extends IsTagged[UnitOfMeasure[U], Tag] {
-    def unit: UnitOfMeasure[U] @@ Tag = tag[Tag](ev)
-  }
 
   // Brightness Integrated
   implicit object VegaMagnitudeIsIntegratedBrightnessUnit

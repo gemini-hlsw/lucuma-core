@@ -5,7 +5,7 @@ package lucuma.core.math.dimensional
 
 import _root_.cats.kernel.Eq
 import coulomb._
-// import monocle.Focus
+import monocle.Focus
 import monocle.Lens
 import shapeless.tag
 import shapeless.tag.@@
@@ -13,9 +13,7 @@ import shapeless.tag.@@
 /**
  * A magnitude of type `N` and a runtime representation of a physical unit.
  */
-trait Qty[N] {
-  val value: N
-  val unit: UnitType
+final case class Qty[N](value: N, unit: UnitType) {
 
   /**
    * Convert to `coulomb.Quantity`.
@@ -26,36 +24,17 @@ trait Qty[N] {
 object Qty {
   implicit def eqQty[N: Eq]: Eq[Qty[N]] = Eq.by(x => (x.value, x.unit))
 
-  def value[N]: Lens[Qty[N], N] = Lens[Qty[N], N](_.value)(v =>
-    q =>
-      new Qty[N] {
-        val value = v
-        val unit  = q.unit
-      }
-  )
+  implicit def eqTaggedQty[N: Eq, Tag]: Eq[Qty[N] @@ Tag] = Eq.by(x => (x.value, x.unit))
 
-  def valueT[N, Tag]: Lens[Qty[N] @@ Tag, N] = Lens[Qty[N] @@ Tag, N](_.value)(v =>
-    q =>
-      tag[Tag](new Qty[N] {
-        val value = v
-        val unit  = q.unit
-      })
-  )
+  def value[N]: Lens[Qty[N], N] = Focus[Qty[N]](_.value)
 
-  def unit[N]: Lens[Qty[N], UnitType] = Lens[Qty[N], UnitType](_.unit)(v =>
-    q =>
-      new Qty[N] {
-        val value = q.value
-        val unit  = v
-      }
-  )
+  def valueT[N, Tag]: Lens[Qty[N] @@ Tag, N] =
+    Lens[Qty[N] @@ Tag, N](_.value)(v => q => tag[Tag](value.replace(v)(q)))
+
+  def unit[N]: Lens[Qty[N], UnitType] = Focus[Qty[N]](_.unit)
 
   def unitT[N, Tag]: Lens[Qty[N] @@ Tag, UnitType @@ Tag] =
     Lens[Qty[N] @@ Tag, UnitType @@ Tag](q => tag[Tag](q.unit))(v =>
-      q =>
-        tag[Tag](new Qty[N] {
-          val value = q.value
-          val unit  = v
-        })
+      q => tag[Tag](unit.replace(v)(q))
     )
 }
