@@ -65,12 +65,12 @@ final class BandBrightnessSuite extends DisciplineSuite {
   val b5 = BandBrightness[Integrated](BrightnessValue.fromDouble(10.0), Band.R)
   checkValues[Integrated, VegaMagnitude](b5)(10000, Band.R, None)
 
-  val b6 = BandBrightness[Integrated](
+  val b6 = BandBrightness[Surface](
     BrightnessValue.fromDouble(10.0),
-    Band.R,
+    Band.SloanR,
     BrightnessValue.fromDouble(2.0)
   )
-  checkValues[Integrated, VegaMagnitude](b6)(10000, Band.R, 2000.some)
+  checkValues[Surface, ABMagnitudePerArcsec2](b6)(10000, Band.SloanR, 2000.some)
 
   // Laws
   checkAll(
