@@ -7,6 +7,7 @@ package lucuma.core.math.dimensional.arb
 import lucuma.core.math.dimensional._
 import org.scalacheck.Arbitrary._
 import org.scalacheck._
+import shapeless.tag.@@
 
 trait ArbQty {
   implicit val cogenUnitType: Cogen[UnitType] =
@@ -24,20 +25,20 @@ trait ArbQty {
   implicit def cogenQty[N: Cogen]: Cogen[Qty[N]] =
     Cogen[(N, UnitType)].contramap(q => (q.value, q.unit))
 
-  implicit def arbGroupedUnitQty[N: Arbitrary, UG](implicit
-    arbUnit: Arbitrary[GroupedUnitType[UG]]
-  ): Arbitrary[GroupedUnitQty[N, UG]] =
+  implicit def arbTaggedUnitQty[N: Arbitrary, Tag](implicit
+    arbUnit: Arbitrary[UnitType @@ Tag]
+  ): Arbitrary[Qty[N] @@ Tag] =
     Arbitrary {
       for {
         n <- arbitrary[N]
-        u <- arbitrary[GroupedUnitType[UG]]
-      } yield u.withValue(n)
+        u <- arbitrary[UnitType @@ Tag]
+      } yield u.withValueT(n)
     }
 
-  implicit def cogenGroupedUnitQty[N: Cogen, UG](implicit
-    cogenUnit: Cogen[GroupedUnitType[UG]]
-  ): Cogen[GroupedUnitQty[N, UG]] =
-    Cogen[(N, GroupedUnitType[UG])].contramap(q => (q.value, q.unit))
+  // implicit def cogenTaggedUnitQty[N: Cogen, Tag](implicit
+  //   cogenUnit: Cogen[UnitType @@ Tag]
+  // ): Cogen[UnitType @@ Tag] =
+  //   Cogen[(N, UnitType @@ Tag)].contramap(q => (q.value, q.unit))
 }
 
 object ArbQty extends ArbQty

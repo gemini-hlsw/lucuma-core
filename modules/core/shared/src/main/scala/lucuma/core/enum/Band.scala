@@ -20,6 +20,7 @@ import lucuma.core.math.units._
 import lucuma.core.util.Enumerated
 import spire.std.any._
 import spire.syntax.all._
+import shapeless.tag.@@
 
 /**
  * Enumerated type for wavelength band.
@@ -47,14 +48,10 @@ sealed abstract class Band(
 }
 
 trait BandDefaultUnit {
-  trait DefaultUnit[B, T] {
-    val unit: GroupedUnitType[Brightness[T]]
-  }
-  object DefaultUnit      {
-    def apply[B, T, U](implicit ev: UnitOfMeasure[U]) =
-      new DefaultUnit[B, T] {
-        val unit: GroupedUnitType[Brightness[T]] = ev.groupedIn[Brightness[T]]
-      }
+  class DefaultUnit[B, T](val unit: UnitType @@ Brightness[T])
+  object DefaultUnit {
+    def apply[B, T, U](implicit tagged: IsTaggedUnit[U, Brightness[T]]) =
+      new DefaultUnit[B, T](tagged.unit)
   }
 }
 

@@ -15,11 +15,12 @@ import lucuma.core.math.dimensional._
 import lucuma.core.math.units._
 import monocle.Focus
 import monocle.Lens
+import shapeless.tag.@@
 
-final case class EmissionLine[+T](
+final case class EmissionLine[T](
   wavelength: Wavelength,
   lineWidth:  Quantity[PosBigDecimal, KilometersPerSecond],
-  lineFlux:   GroupedUnitQty[PosBigDecimal, LineFlux[T]]
+  lineFlux:   Qty[PosBigDecimal] @@ LineFlux[T]
 )
 
 object EmissionLine {
@@ -35,6 +36,6 @@ object EmissionLine {
     Focus[EmissionLine[T]](_.lineWidth)
 
   /** @group Optics */
-  def lineFlux[T]: Lens[EmissionLine[T], GroupedUnitQty[PosBigDecimal, LineFlux[T]]] =
+  def lineFlux[T]: Lens[EmissionLine[T], Qty[PosBigDecimal] @@ LineFlux[T]] =
     Focus[EmissionLine[T]](_.lineFlux)
 }

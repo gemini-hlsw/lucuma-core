@@ -5,8 +5,10 @@ package lucuma.core.math.dimensional
 
 import _root_.cats.kernel.Eq
 import coulomb._
-import monocle.Focus
+// import monocle.Focus
 import monocle.Lens
+import shapeless.tag
+import shapeless.tag.@@
 
 /**
  * A magnitude of type `N` and a runtime representation of a physical unit.
@@ -23,27 +25,37 @@ trait Qty[N] {
 
 object Qty {
   implicit def eqQty[N: Eq]: Eq[Qty[N]] = Eq.by(x => (x.value, x.unit))
-}
 
-/**
- * A magnitude of type `N` and a runtime representation of a physical unit in group `UG`.
- */
-case class GroupedUnitQty[N, +UG] private (value: N, unit: GroupedUnitType[UG]) extends Qty[N]
-object GroupedUnitQty {
+  def value[N]: Lens[Qty[N], N] = Lens[Qty[N], N](_.value)(v =>
+    q =>
+      new Qty[N] {
+        val value = v
+        val unit  = q.unit
+      }
+  )
 
-  /**
-   * Create a `GroupedUnitQty` from a `coulomb.Quantity`.
-   */
-  def apply[N, UG, U](
-    q:             Quantity[N, U]
-  )(implicit unit: GroupedUnitOfMeasure[UG, U]): GroupedUnitQty[N, UG] =
-    GroupedUnitQty(q.value, unit)
+  def valueT[N, Tag]: Lens[Qty[N] @@ Tag, N] = Lens[Qty[N] @@ Tag, N](_.value)(v =>
+    q =>
+      tag[Tag](new Qty[N] {
+        val value = v
+        val unit  = q.unit
+      })
+  )
 
-  def value[N, UG]: Lens[GroupedUnitQty[N, UG], N] = Focus[GroupedUnitQty[N, UG]](_.value)
+  def unit[N]: Lens[Qty[N], UnitType] = Lens[Qty[N], UnitType](_.unit)(v =>
+    q =>
+      new Qty[N] {
+        val value = q.value
+        val unit  = v
+      }
+  )
 
-  def unit[N, UG]: Lens[GroupedUnitQty[N, UG], GroupedUnitType[UG]] =
-    Focus[GroupedUnitQty[N, UG]](_.unit)
-
-  implicit def eqGroupedUnitQty[N: Eq, UG]: Eq[GroupedUnitQty[N, UG]] =
-    Eq.by(x => (x.value, x.unit))
+  def unitT[N, Tag]: Lens[Qty[N] @@ Tag, UnitType @@ Tag] =
+    Lens[Qty[N] @@ Tag, UnitType @@ Tag](q => tag[Tag](q.unit))(v =>
+      q =>
+        tag[Tag](new Qty[N] {
+          val value = q.value
+          val unit  = v
+        })
+    )
 }

@@ -9,7 +9,7 @@ import lucuma.core.math.dimensional.arb.ArbQty._
 import lucuma.core.util.arb.ArbEnumerated._
 import monocle.law.discipline._
 
-class GroupedUnitQtySuite extends munit.DisciplineSuite {
+class QtySuite extends munit.DisciplineSuite {
   // Laws
   checkAll(
     "GroupedUnitQty[BigDecimal, Brightness[Surface]]",

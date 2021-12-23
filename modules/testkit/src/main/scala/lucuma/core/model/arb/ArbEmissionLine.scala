@@ -17,6 +17,7 @@ import lucuma.core.model.EmissionLine
 import lucuma.core.util.arb.ArbEnumerated
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck._
+import shapeless.tag.@@
 
 trait ArbEmissionLine {
   import ArbEnumerated._
@@ -28,7 +29,7 @@ trait ArbEmissionLine {
   val RedWavelength: Wavelength = Wavelength.picometers.get(PosInt(620000))
 
   implicit def arbEmissionLine[T](implicit
-    arbLineFluxUnit: Arbitrary[GroupedUnitType[LineFlux[T]]]
+    arbLineFluxUnit: Arbitrary[UnitType @@ LineFlux[T]]
   ): Arbitrary[EmissionLine[T]] =
     Arbitrary {
       for {
@@ -38,15 +39,13 @@ trait ArbEmissionLine {
             20 -> arbitrary[Wavelength]
           )
         lw <- arbitrary[PosBigDecimal]
-        lf <- arbitrary[GroupedUnitQty[PosBigDecimal, LineFlux[T]]]
+        lf <- arbitrary[Qty[PosBigDecimal] @@ LineFlux[T]]
       } yield EmissionLine[T](w, lw.withUnit[KilometersPerSecond], lf)
     }
 
-  implicit def cogEmissionLine[T](implicit
-    cogenLineFluxUnit: Cogen[GroupedUnitType[LineFlux[T]]]
-  ): Cogen[EmissionLine[T]] =
+  implicit def cogEmissionLine[T]: Cogen[EmissionLine[T]] =
     Cogen[
-      (Wavelength, PosBigDecimal, GroupedUnitQty[PosBigDecimal, LineFlux[T]])
+      (Wavelength, PosBigDecimal, Qty[PosBigDecimal])
     ].contramap(x => (x.wavelength, x.lineWidth.value, x.lineFlux))
 }
 

@@ -9,9 +9,9 @@ import lucuma.core.enum.Band
 import lucuma.core.math.BrightnessUnits._
 import lucuma.core.math.BrightnessValue
 import lucuma.core.math.dimensional._
-import lucuma.core.util.Enumerated
 import monocle.Focus
 import monocle.Lens
+import shapeless.tag.@@
 
 /**
  * Describes the brightness of a target on a given band.
@@ -22,7 +22,7 @@ import monocle.Lens
  *   The brightness unit type. For example: Integrated or Surface.
  */
 final case class BandBrightness[T](
-  quantity: GroupedUnitQty[BrightnessValue, Brightness[T]],
+  quantity: Qty[BrightnessValue] @@ Brightness[T],
   band:     Band,
   error:    Option[BrightnessValue]
 ) {
@@ -34,14 +34,14 @@ final case class BandBrightness[T](
 }
 
 object BandBrightness {
-  def quantity[T]: Lens[BandBrightness[T], GroupedUnitQty[BrightnessValue, Brightness[T]]] =
+  def quantity[T]: Lens[BandBrightness[T], Qty[BrightnessValue] @@ Brightness[T]] =
     Focus[BandBrightness[T]](_.quantity)
 
   def value[T]: Lens[BandBrightness[T], BrightnessValue] =
-    quantity.andThen(GroupedUnitQty.value)
+    quantity.andThen(Qty.valueT)
 
-  def unit[T]: Lens[BandBrightness[T], GroupedUnitType[Brightness[T]]] =
-    quantity.andThen(GroupedUnitQty.unit)
+  def unit[T]: Lens[BandBrightness[T], UnitType @@ Brightness[T]] =
+    quantity.andThen(Qty.unitT)
 
   def band[T]: Lens[BandBrightness[T], Band] = Focus[BandBrightness[T]](_.band)
 
@@ -50,63 +50,60 @@ object BandBrightness {
 
   /** Secondary constructor defaulting to no error. */
   def apply[T](
-    quantity: GroupedUnitQty[BrightnessValue, Brightness[T]],
+    quantity: Qty[BrightnessValue] @@ Brightness[T],
     band:     Band
   ): BandBrightness[T] =
     new BandBrightness(quantity, band, none)
 
   def apply[T](
-    quantity: GroupedUnitQty[BrightnessValue, Brightness[T]],
+    quantity: Qty[BrightnessValue] @@ Brightness[T],
     band:     Band,
     error:    BrightnessValue
   ): BandBrightness[T] =
     new BandBrightness(quantity, band, error.some)
 
   def apply[T, U](value: BrightnessValue, band: Band, error: Option[BrightnessValue])(implicit
-    enumerated:          Enumerated[GroupedUnitType[Brightness[T]]],
-    unit:                UnitOfMeasure[U]
-  ): Option[BandBrightness[T]] =
-    enumerated.all
-      .find(_.ungrouped === unit)
-      .map(u => new BandBrightness(u.withValue(value), band, error))
+    tagged:              IsTaggedUnit[U, Brightness[T]]
+  ): BandBrightness[T] =
+    new BandBrightness(tagged.unit.withValueT(value), band, error)
 
-  def apply[T, U](value: BrightnessValue, band: Band, error: BrightnessValue)(implicit
-    enumerated:          Enumerated[GroupedUnitType[Brightness[T]]],
-    unit:                UnitOfMeasure[U]
-  ): Option[BandBrightness[T]] =
-    apply[T, U](value, band, error.some)
+  // def apply[T, U](value: BrightnessValue, band: Band, error: BrightnessValue)(implicit
+  //   enumerated:          Enumerated[GroupedUnitType[Brightness[T]]],
+  //   unit:                UnitOfMeasure[U]
+  // ): Option[BandBrightness[T]] =
+  //   apply[T, U](value, band, error.some)
 
-  def apply[T, U](value: BrightnessValue, band: Band)(implicit
-    enumerated:          Enumerated[GroupedUnitType[Brightness[T]]],
-    unit:                UnitOfMeasure[U]
-  ): Option[BandBrightness[T]] =
-    apply[T, U](value, band, none)
+  // def apply[T, U](value: BrightnessValue, band: Band)(implicit
+  //   enumerated:          Enumerated[GroupedUnitType[Brightness[T]]],
+  //   unit:                UnitOfMeasure[U]
+  // ): Option[BandBrightness[T]] =
+  //   apply[T, U](value, band, none)
 
-  /** Secondary constructor using default units for the band. */
-  def apply[T] = new GroupApplied[T]
-  protected class GroupApplied[T] {
-    def apply[B <: Band](value: BrightnessValue, band: B, error: Option[BrightnessValue])(implicit
-      ev:                       Band.DefaultUnit[B, T]
-    ): BandBrightness[T] =
-      new BandBrightness(ev.unit.withValue(value), band, error)
+  // /** Secondary constructor using default units for the band. */
+  // def apply[T] = new GroupApplied[T]
+  // protected class GroupApplied[T] {
+  //   def apply[B <: Band](value: BrightnessValue, band: B, error: Option[BrightnessValue])(implicit
+  //     ev:                       Band.DefaultUnit[B, T]
+  //   ): BandBrightness[T] =
+  //     new BandBrightness(ev.unit.withValue(value), band, error)
 
-    def apply[B <: Band](value: BrightnessValue, band: B)(implicit
-      ev:                       Band.DefaultUnit[B, T]
-    ): BandBrightness[T] =
-      apply(value, band, none)
+  //   def apply[B <: Band](value: BrightnessValue, band: B)(implicit
+  //     ev:                       Band.DefaultUnit[B, T]
+  //   ): BandBrightness[T] =
+  //     apply(value, band, none)
 
-    def apply[B <: Band](value: BrightnessValue, band: B, error: BrightnessValue)(implicit
-      ev:                       Band.DefaultUnit[B, T]
-    ): BandBrightness[T] = apply(value, band, error.some)
-  }
+  //   def apply[B <: Band](value: BrightnessValue, band: B, error: BrightnessValue)(implicit
+  //     ev:                       Band.DefaultUnit[B, T]
+  //   ): BandBrightness[T] = apply(value, band, error.some)
+  // }
 
-  implicit def TargetBrightnessOrder[T](implicit
-    unitOrder: Order[GroupedUnitType[Brightness[T]]]
+  implicit def bandBrightnessOrder[T](implicit
+    unitOrder: Order[UnitType @@ Brightness[T]]
   ): Order[BandBrightness[T]] =
-    Order.by(m => (m.quantity.unit, m.band.tag, m.quantity.value, m.error))
+    Order.by(m => (Qty.unitT.get(m.quantity), m.band.tag, Qty.value.get(m.quantity), m.error))
 
   /** group Typeclass Instances */
-  implicit def TargetBrightnessShow[UG]: Show[BandBrightness[UG]] =
+  implicit def TargetBrightnessShow[T]: Show[BandBrightness[T]] =
     Show.fromToString
 
 }

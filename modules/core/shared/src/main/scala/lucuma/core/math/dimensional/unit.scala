@@ -6,10 +6,10 @@ package lucuma.core.math.dimensional
 import cats.Eq
 import coulomb.unitops.UnitString
 import lucuma.core.util.Display
+import shapeless.tag
+import shapeless.tag.@@
 
 import java.util.Objects
-
-// All of this is a bridge between coulomb an runtime quantities (as defined in `Qty`).
 
 /**
  * Runtime representation of a physical unit. Wraps:
@@ -47,6 +47,14 @@ object UnitType {
   implicit val eqUnitType: Eq[UnitType] = Eq.fromUniversalEquals
 
   implicit def displayUnitType: Display[UnitType] = Display.by(_.abbv, _.name)
+
+  implicit class TaggedUnitTypeOps[Tag](val unitType: UnitType @@ Tag) extends AnyVal {
+    def withValueT[N](_value: N): Qty[N] @@ Tag =
+      tag[Tag](new Qty[N] {
+        val value = _value
+        val unit  = unitType
+      })
+  }
 }
 
 /**
@@ -57,11 +65,6 @@ object UnitType {
  */
 trait UnitOfMeasure[U] extends UnitType {
   type Type = U
-
-  /**
-   * Build an association between this unit and group `G`.
-   */
-  def groupedIn[G]: GroupedUnitOfMeasure[G, U] = GroupedUnitOfMeasure(this)
 }
 
 object UnitOfMeasure {
@@ -75,40 +78,4 @@ object UnitOfMeasure {
     }
 
   implicit def eqUnitOfMeasure[U]: Eq[UnitOfMeasure[U]] = Eq.fromUniversalEquals
-}
-
-/**
- * Runtime association of a `UnitType` to unit group `UG`.
- *
- * The group doesn't exist in runtime, it's just a type tag.
- */
-trait GroupedUnitType[+UG] extends UnitType {
-  override def withValue[N](value: N): GroupedUnitQty[N, UG] =
-    GroupedUnitQty(value, this)
-
-  def ungrouped: UnitType = this
-}
-
-object GroupedUnitType {
-  implicit def eqGroupedUnitType[UG]: Eq[GroupedUnitType[UG]] = Eq.fromUniversalEquals
-}
-
-/**
- * Type-parametrized runtime representation of physical unit `U` and its association to unit group
- * `UG`.
- */
-trait GroupedUnitOfMeasure[UG, U] extends UnitOfMeasure[U] with GroupedUnitType[UG] {
-  override def ungrouped: UnitOfMeasure[U] = this
-}
-
-object GroupedUnitOfMeasure {
-  def apply[UG, U](implicit unit: UnitOfMeasure[U]): GroupedUnitOfMeasure[UG, U] =
-    new GroupedUnitOfMeasure[UG, U] {
-      val name = unit.name
-      val abbv = unit.abbv
-    }
-
-  // `UnitDefiniton`s are expected to be singletons.
-  implicit def eqGroupedUnitOfMeasure[UG, U]: Eq[GroupedUnitOfMeasure[UG, U]] =
-    Eq.fromUniversalEquals
 }

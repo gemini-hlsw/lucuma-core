@@ -14,6 +14,7 @@ import lucuma.core.util.arb.ArbEnumerated
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Cogen._
 import org.scalacheck._
+import shapeless.tag.@@
 
 trait ArbBandBrightness {
   import ArbEnumerated._
@@ -21,21 +22,19 @@ trait ArbBandBrightness {
   import ArbQty._
 
   implicit def arbBandBrightness[T](implicit
-    arbUnit: Arbitrary[GroupedUnitType[Brightness[T]]]
+    arbUnit: Arbitrary[UnitType @@ Brightness[T]]
   ): Arbitrary[BandBrightness[T]] =
     Arbitrary {
       for {
-        q <- arbitrary[GroupedUnitQty[BrightnessValue, Brightness[T]]]
+        q <- arbitrary[Qty[BrightnessValue] @@ Brightness[T]]
         b <- arbitrary[Band]
         e <- arbitrary[Option[BrightnessValue]]
       } yield BandBrightness(q, b, e)
     }
 
-  implicit def cogBandBrightness[T](implicit
-    cogenUnit: Cogen[GroupedUnitType[Brightness[T]]]
-  ): Cogen[BandBrightness[T]] =
+  implicit def cogBandBrightness[T]: Cogen[BandBrightness[T]] =
     Cogen[
-      (GroupedUnitQty[BrightnessValue, Brightness[T]], Band, Option[BrightnessValue])
+      (Qty[BrightnessValue], Band, Option[BrightnessValue])
     ].contramap(u => (u.quantity, u.band, u.error))
 }
 
