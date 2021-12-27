@@ -92,20 +92,24 @@ object BandBrightness {
   protected class GroupApplied[T] {
 
     /** Secondary constructor using default units for the band. */
-    def apply[B <: Band](value: BrightnessValue, band: B, error: Option[BrightnessValue])(implicit
-      ev:                       Band.DefaultUnit[B, T]
+    def apply(
+      value: BrightnessValue,
+      band:  Band,
+      error: Option[BrightnessValue]
+    )(implicit
+      ev:    Band.DefaultUnit[band.type, T]
     ): BandBrightness[T] =
-      new BandBrightness(ev.unit.withValueT(value), band, error)
+      new BandBrightness(band.defaultUnit[T].withValueT(value), band, error)
 
     /** Secondary constructor using default units for the band and no error. */
-    def apply[B <: Band](value: BrightnessValue, band: B)(implicit
-      ev:                       Band.DefaultUnit[B, T]
+    def apply(value: BrightnessValue, band: Band)(implicit
+      ev:            Band.DefaultUnit[band.type, T]
     ): BandBrightness[T] =
       apply(value, band, none)
 
     /** Secondary constructor with error and using default units for the band. */
-    def apply[B <: Band](value: BrightnessValue, band: B, error: BrightnessValue)(implicit
-      ev:                       Band.DefaultUnit[B, T]
+    def apply(value: BrightnessValue, band: Band, error: BrightnessValue)(implicit
+      ev:            Band.DefaultUnit[band.type, T]
     ): BandBrightness[T] = apply(value, band, error.some)
   }
 

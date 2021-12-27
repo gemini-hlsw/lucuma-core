@@ -33,7 +33,7 @@ sealed abstract class Band(
   val center:    Wavelength,
   val width:     Quantity[PosInt, Nanometer]
 ) extends Product
-    with Serializable {
+    with Serializable { self =>
   require(center.toPicometers.value >= width.value / 2)
 
   def end: Wavelength = Wavelength(
@@ -45,100 +45,102 @@ sealed abstract class Band(
   def start: Wavelength = Wavelength(
     center.toPicometers - (width.value.value / 2).withRefinedUnit[Positive, Nanometer]
   )
+
+  type DefaultIntegratedUnits
+  type DefaultSurfaceUnits
+
+  // These implicits here allow resolving the default units at the type level, where the brightness
+  // type is a type parameter (used in BandBrightness constructors);  and also in runtime (used eg when parsing)
+  // by using `import band._`.
+  implicit def defaultIntegrated: Band.DefaultUnit[self.type, Integrated]
+  implicit def defaultSurface: Band.DefaultUnit[self.type, Surface]
+
+  def defaultUnit[T](implicit ev: Band.DefaultUnit[self.type, T]): UnitType @@ Brightness[T] =
+    ev.unit
 }
 
-trait BandDefaultUnit {
+sealed abstract class BandWithDefaultUnits[DI, DS](
+  tag:       String,
+  shortName: String,
+  longName:  String,
+  center:    Wavelength,
+  width:     Quantity[PosInt, Nanometer]
+)(implicit
+  taggedI:   IsTaggedUnit[DI, Brightness[Integrated]],
+  taggedS:   IsTaggedUnit[DS, Brightness[Surface]]
+) extends Band(tag, shortName, longName, center, width) { self =>
+  type DefaultIntegratedUnits = DI
+  type DefaultSurfaceUnits    = DS
+
+  implicit val defaultIntegrated: Band.DefaultUnit[self.type, Integrated] =
+    Band.DefaultUnit[self.type, Integrated, DI]
+
+  implicit val defaultSurface: Band.DefaultUnit[self.type, Surface] =
+    Band.DefaultUnit[self.type, Surface, DS]
+}
+
+object Band {
+
   class DefaultUnit[B, T](val unit: UnitType @@ Brightness[T])
   object DefaultUnit {
     // Declare `U` as the default unit for band `B` and brightness type `T` (Integrated or Surface).
     def apply[B, T, U](implicit tagged: IsTaggedUnit[U, Brightness[T]]) =
       new DefaultUnit[B, T](tagged.unit)
   }
-}
-
-trait BandDefaultUnitLowPriorityImplicits extends BandDefaultUnit {
-  // These are the defaults
-  implicit def defaultIntegratedUnit[B]: DefaultUnit[B, Integrated] =
-    DefaultUnit[B, Integrated, VegaMagnitude]
-  implicit def defaultSurfaceUnit[B]: DefaultUnit[B, Surface]       =
-    DefaultUnit[B, Surface, VegaMagnitudePerArcsec2]
-}
-
-object Band extends BandDefaultUnitLowPriorityImplicits {
 
   /** @group Constructors */
   case object SloanU
-      extends Band(
+      extends BandWithDefaultUnits[ABMagnitude, ABMagnitudePerArcsec2](
         "SloanU",
         "u",
         "UV",
         Wavelength(356000),
         46.withRefinedUnit[Positive, Nanometer]
       )
-  implicit val defaultSloanUIntegratedUnit: DefaultUnit[SloanU.type, Integrated] =
-    DefaultUnit[SloanU.type, Integrated, ABMagnitude]
-  implicit val defaultSloanUSurfaceUnit: DefaultUnit[SloanU.type, Surface]       =
-    DefaultUnit[SloanU.type, Surface, ABMagnitudePerArcsec2]
 
   /** @group Constructors */
   case object SloanG
-      extends Band(
+      extends BandWithDefaultUnits[ABMagnitude, ABMagnitudePerArcsec2](
         "SloanG",
         "g",
         "Green",
         Wavelength(483000),
         99.withRefinedUnit[Positive, Nanometer]
       )
-  implicit val defaultSloanGIntegratedUnit: DefaultUnit[SloanG.type, Integrated] =
-    DefaultUnit[SloanG.type, Integrated, ABMagnitude]
-  implicit val defaultSloanGSurfaceUnit: DefaultUnit[SloanG.type, Surface]       =
-    DefaultUnit[SloanG.type, Surface, ABMagnitudePerArcsec2]
 
   /** @group Constructors */
   case object SloanR
-      extends Band(
+      extends BandWithDefaultUnits[ABMagnitude, ABMagnitudePerArcsec2](
         "SloanR",
         "r",
         "Red",
         Wavelength(626000),
         96.withRefinedUnit[Positive, Nanometer]
       )
-  implicit val defaultSloanRIntegratedUnit: DefaultUnit[SloanR.type, Integrated] =
-    DefaultUnit[SloanR.type, Integrated, ABMagnitude]
-  implicit val defaultSloanRSurfaceUnit: DefaultUnit[SloanR.type, Surface]       =
-    DefaultUnit[SloanR.type, Surface, ABMagnitudePerArcsec2]
 
   /** @group Constructors */
   case object SloanI
-      extends Band(
+      extends BandWithDefaultUnits[ABMagnitude, ABMagnitudePerArcsec2](
         "SloanI",
         "i",
         "Far red",
         Wavelength(767000),
         106.withRefinedUnit[Positive, Nanometer]
       )
-  implicit val defaultSloanIIntegratedUnit: DefaultUnit[SloanI.type, Integrated] =
-    DefaultUnit[SloanI.type, Integrated, ABMagnitude]
-  implicit val defaultSloanISurfaceUnit: DefaultUnit[SloanI.type, Surface]       =
-    DefaultUnit[SloanI.type, Surface, ABMagnitudePerArcsec2]
 
   /** @group Constructors */
   case object SloanZ
-      extends Band(
+      extends BandWithDefaultUnits[ABMagnitude, ABMagnitudePerArcsec2](
         "SloanZ",
         "z",
         "Near infrared",
         Wavelength(910000),
         125.withRefinedUnit[Positive, Nanometer]
       )
-  implicit val defaultSloanZIntegratedUnit: DefaultUnit[SloanZ.type, Integrated] =
-    DefaultUnit[SloanZ.type, Integrated, ABMagnitude]
-  implicit val defaultSloanZSurfaceUnit: DefaultUnit[SloanZ.type, Surface]       =
-    DefaultUnit[SloanZ.type, Surface, ABMagnitudePerArcsec2]
 
   /** @group Constructors */
   case object U
-      extends Band(
+      extends BandWithDefaultUnits[VegaMagnitude, VegaMagnitudePerArcsec2](
         "U",
         "U",
         "Ultraviolet",
@@ -148,7 +150,7 @@ object Band extends BandDefaultUnitLowPriorityImplicits {
 
   /** @group Constructors */
   case object B
-      extends Band(
+      extends BandWithDefaultUnits[VegaMagnitude, VegaMagnitudePerArcsec2](
         "B",
         "B",
         "Blue",
@@ -158,7 +160,7 @@ object Band extends BandDefaultUnitLowPriorityImplicits {
 
   /** @group Constructors */
   case object V
-      extends Band(
+      extends BandWithDefaultUnits[VegaMagnitude, VegaMagnitudePerArcsec2](
         "V",
         "V",
         "Visual",
@@ -168,7 +170,7 @@ object Band extends BandDefaultUnitLowPriorityImplicits {
 
   /** @group Constructors */
   case object Uc
-      extends Band(
+      extends BandWithDefaultUnits[VegaMagnitude, VegaMagnitudePerArcsec2](
         "Uc",
         "UC",
         "UCAC",
@@ -178,7 +180,7 @@ object Band extends BandDefaultUnitLowPriorityImplicits {
 
   /** @group Constructors */
   case object R
-      extends Band(
+      extends BandWithDefaultUnits[VegaMagnitude, VegaMagnitudePerArcsec2](
         "R",
         "R",
         "Red",
@@ -188,7 +190,7 @@ object Band extends BandDefaultUnitLowPriorityImplicits {
 
   /** @group Constructors */
   case object I
-      extends Band(
+      extends BandWithDefaultUnits[VegaMagnitude, VegaMagnitudePerArcsec2](
         "I",
         "I",
         "Infrared",
@@ -198,7 +200,7 @@ object Band extends BandDefaultUnitLowPriorityImplicits {
 
   /** @group Constructors */
   case object Y
-      extends Band(
+      extends BandWithDefaultUnits[VegaMagnitude, VegaMagnitudePerArcsec2](
         "Y",
         "Y",
         "Y",
@@ -208,7 +210,7 @@ object Band extends BandDefaultUnitLowPriorityImplicits {
 
   /** @group Constructors */
   case object J
-      extends Band(
+      extends BandWithDefaultUnits[VegaMagnitude, VegaMagnitudePerArcsec2](
         "J",
         "J",
         "J",
@@ -218,7 +220,7 @@ object Band extends BandDefaultUnitLowPriorityImplicits {
 
   /** @group Constructors */
   case object H
-      extends Band(
+      extends BandWithDefaultUnits[VegaMagnitude, VegaMagnitudePerArcsec2](
         "H",
         "H",
         "H",
@@ -228,7 +230,7 @@ object Band extends BandDefaultUnitLowPriorityImplicits {
 
   /** @group Constructors */
   case object K
-      extends Band(
+      extends BandWithDefaultUnits[VegaMagnitude, VegaMagnitudePerArcsec2](
         "K",
         "K",
         "K",
@@ -238,7 +240,7 @@ object Band extends BandDefaultUnitLowPriorityImplicits {
 
   /** @group Constructors */
   case object L
-      extends Band(
+      extends BandWithDefaultUnits[VegaMagnitude, VegaMagnitudePerArcsec2](
         "L",
         "L",
         "L",
@@ -248,7 +250,7 @@ object Band extends BandDefaultUnitLowPriorityImplicits {
 
   /** @group Constructors */
   case object M
-      extends Band(
+      extends BandWithDefaultUnits[VegaMagnitude, VegaMagnitudePerArcsec2](
         "M",
         "M",
         "M",
@@ -258,7 +260,7 @@ object Band extends BandDefaultUnitLowPriorityImplicits {
 
   /** @group Constructors */
   case object N
-      extends Band(
+      extends BandWithDefaultUnits[VegaMagnitude, VegaMagnitudePerArcsec2](
         "N",
         "N",
         "N",
@@ -268,7 +270,7 @@ object Band extends BandDefaultUnitLowPriorityImplicits {
 
   /** @group Constructors */
   case object Q
-      extends Band(
+      extends BandWithDefaultUnits[VegaMagnitude, VegaMagnitudePerArcsec2](
         "Q",
         "Q",
         "Q",
@@ -278,7 +280,7 @@ object Band extends BandDefaultUnitLowPriorityImplicits {
 
   /** @group Constructors */
   case object Ap
-      extends Band(
+      extends BandWithDefaultUnits[VegaMagnitude, VegaMagnitudePerArcsec2](
         "Ap",
         "AP",
         "Apparent",
