@@ -43,7 +43,7 @@ trait ArbQty {
       for {
         n <- arbitrary[N]
         u <- arbitrary[UnitType @@ Tag]
-      } yield u.withValueT(n)
+      } yield u.withValueTagged(n)
     }
 
   implicit def cogenTaggedUnitQty[N: Cogen, Tag]: Cogen[Qty[N] @@ Tag] =

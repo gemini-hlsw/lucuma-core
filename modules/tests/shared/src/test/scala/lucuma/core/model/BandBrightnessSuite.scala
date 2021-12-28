@@ -25,11 +25,11 @@ final class BandBrightnessSuite extends DisciplineSuite {
   import ArbBrightnessValue._
   import ArbQty._
 
-  def checkValues[T, U](
-    b:           BandBrightness[T]
-  )(scaledValue: Int, band: Band, scaledError: Option[Int])(implicit
-    unit:        UnitOfMeasure[U]
-  ): Unit = {
+  def checkValues[T, U](name: String)(
+    b:                        BandBrightness[T]
+  )(scaledValue:              Int, band: Band, scaledError: Option[Int])(implicit
+    unit:                     UnitOfMeasure[U]
+  ): Unit = test(s"Constructor: $name") {
     assertEquals(b.quantity.value.scaledValue, scaledValue)
     assertEquals(b.quantity.unit, unit)
     assertEquals(b.band, band)
@@ -38,39 +38,77 @@ final class BandBrightnessSuite extends DisciplineSuite {
 
   // Full constructors
   val b1 = BandBrightness(
-    BrightnessValue.fromDouble(10.0).withUnit[VegaMagnitude].toQtyT[Brightness[Integrated]],
+    BrightnessValue.fromDouble(10.0).withUnit[VegaMagnitude].toQtyTagged[Brightness[Integrated]],
     Band.R
   )
-  checkValues[Integrated, VegaMagnitude](b1)(10000, Band.R, None)
+  checkValues[Integrated, VegaMagnitude]("Full without error")(b1)(10000, Band.R, None)
 
   val b2 = BandBrightness(
-    BrightnessValue.fromDouble(10.0).withUnit[VegaMagnitude].toQtyT[Brightness[Integrated]],
+    BrightnessValue.fromDouble(10.0).withUnit[VegaMagnitude].toQtyTagged[Brightness[Integrated]],
     Band.R,
     BrightnessValue.fromDouble(2.0)
   )
-  checkValues[Integrated, VegaMagnitude](b2)(10000, Band.R, 2000.some)
+  checkValues[Integrated, VegaMagnitude]("Full with error")(b2)(
+    10000,
+    Band.R,
+    2000.some
+  )
 
   // Convenience constructors
   val b3 = BandBrightness[Surface, ABMagnitudePerArcsec2](BrightnessValue.fromDouble(10.0), Band.R)
-  checkValues[Surface, ABMagnitudePerArcsec2](b3)(10000, Band.R, None)
+  checkValues[Surface, ABMagnitudePerArcsec2](
+    "Type-parametrized units without error"
+  )(b3)(10000, Band.R, None)
 
   val b4 = BandBrightness[Surface, ABMagnitudePerArcsec2](
     BrightnessValue.fromDouble(10.0),
     Band.R,
     BrightnessValue.fromDouble(2.0)
   )
-  checkValues[Surface, ABMagnitudePerArcsec2](b4)(10000, Band.R, 2000.some)
+  checkValues[Surface, ABMagnitudePerArcsec2]("Type-parametrized units with error")(b4)(
+    10000,
+    Band.R,
+    2000.some
+  )
 
   // Default units
   val b5 = BandBrightness[Integrated](BrightnessValue.fromDouble(10.0), Band.R)
-  checkValues[Integrated, VegaMagnitude](b5)(10000, Band.R, None)
+  checkValues[Integrated, VegaMagnitude]("Default band units without error")(b5)(
+    10000,
+    Band.R,
+    None
+  )
 
   val b6 = BandBrightness[Surface](
     BrightnessValue.fromDouble(10.0),
     Band.SloanR,
     BrightnessValue.fromDouble(2.0)
   )
-  checkValues[Surface, ABMagnitudePerArcsec2](b6)(10000, Band.SloanR, 2000.some)
+  checkValues[Surface, ABMagnitudePerArcsec2]("Default band units with error")(b6)(
+    10000,
+    Band.SloanR,
+    2000.some
+  )
+
+  // Brightness type conversions
+  val b1Surface = BandBrightness(
+    BrightnessValue
+      .fromDouble(10.0)
+      .withUnit[VegaMagnitudePerArcsec2]
+      .toQtyTagged[Brightness[Surface]],
+    Band.R
+  )
+  test("Brightness type conversion Integrated -> Surface") {
+    assertEquals(b1.to[Surface], b1Surface)
+  }
+
+  test("Brightness identity type conversion") {
+    assertEquals(b1Surface.to[Surface], b1Surface)
+  }
+
+  test("Brightness type conversion roundtrip") {
+    assertEquals(b1Surface.to[Integrated].to[Surface], b1Surface)
+  }
 
   // Laws
   checkAll(

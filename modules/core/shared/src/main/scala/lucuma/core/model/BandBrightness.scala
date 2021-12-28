@@ -27,6 +27,16 @@ final case class BandBrightness[T](
   error:    Option[BrightnessValue]
 ) {
 
+  /**
+   * Convert units to `T0` brightness type.
+   *
+   * @tparam `T0`
+   *   `Integrated` or `Surface`
+   */
+  def to[T0](implicit
+    conv: TagConverter[Brightness[T], Brightness[T0]]
+  ): BandBrightness[T0] = BandBrightness[T0](quantity.toTag[Brightness[T0]], band, error)
+
   override def toString: String = {
     val errStr = error.map(e => f"${e.toDoubleValue}%.2f")
     f"BandBrightness(${quantity.value.toDoubleValue}%.2f ${quantity.unit.abbv}, ${band.shortName}, $errStr)"
@@ -41,11 +51,11 @@ object BandBrightness {
 
   /** @group Optics */
   def value[T]: Lens[BandBrightness[T], BrightnessValue] =
-    quantity.andThen(Qty.valueT)
+    quantity.andThen(Qty.valueTagged)
 
   /** @group Optics */
   def unit[T]: Lens[BandBrightness[T], UnitType @@ Brightness[T]] =
-    quantity.andThen(Qty.unitT)
+    quantity.andThen(Qty.unitTagged)
 
   /** @group Optics */
   def band[T]: Lens[BandBrightness[T], Band] = Focus[BandBrightness[T]](_.band)
@@ -73,7 +83,7 @@ object BandBrightness {
   def apply[T, U](value: BrightnessValue, band: Band, error: Option[BrightnessValue])(implicit
     tagged:              IsTaggedUnit[U, Brightness[T]]
   ): BandBrightness[T] =
-    new BandBrightness(tagged.unit.withValueT(value), band, error)
+    new BandBrightness(tagged.unit.withValueTagged(value), band, error)
 
   /** Secondary constructor using type units and no error. */
   def apply[T, U](value: BrightnessValue, band: Band)(implicit
@@ -99,7 +109,7 @@ object BandBrightness {
     )(implicit
       ev:    Band.DefaultUnit[band.type, T]
     ): BandBrightness[T] =
-      new BandBrightness(band.defaultUnit[T].withValueT(value), band, error)
+      new BandBrightness(band.defaultUnit[T].withValueTagged(value), band, error)
 
     /** Secondary constructor using default units for the band and no error. */
     def apply(value: BrightnessValue, band: Band)(implicit
@@ -117,7 +127,7 @@ object BandBrightness {
   implicit def bandBrightnessOrder[T](implicit
     unitOrder: Order[UnitType @@ Brightness[T]]
   ): Order[BandBrightness[T]] =
-    Order.by(m => (Qty.unitT.get(m.quantity), m.band.tag, Qty.value.get(m.quantity), m.error))
+    Order.by(m => (Qty.unitTagged.get(m.quantity), m.band.tag, Qty.value.get(m.quantity), m.error))
 
   /** group Typeclass Instances */
   implicit def bandBrightnessShow[T]: Show[BandBrightness[T]] =

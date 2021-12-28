@@ -30,14 +30,14 @@ object Qty {
   def value[N]: Lens[Qty[N], N] = Focus[Qty[N]](_.value)
 
   /** @group Optics */
-  def valueT[N, Tag]: Lens[Qty[N] @@ Tag, N] =
+  def valueTagged[N, Tag]: Lens[Qty[N] @@ Tag, N] =
     Lens[Qty[N] @@ Tag, N](_.value)(v => q => tag[Tag](value.replace(v)(q)))
 
   /** @group Optics */
   def unit[N]: Lens[Qty[N], UnitType] = Focus[Qty[N]](_.unit)
 
   /** @group Optics */
-  def unitT[N, Tag]: Lens[Qty[N] @@ Tag, UnitType @@ Tag] =
+  def unitTagged[N, Tag]: Lens[Qty[N] @@ Tag, UnitType @@ Tag] =
     Lens[Qty[N] @@ Tag, UnitType @@ Tag](q => tag[Tag](q.unit))(v =>
       q => tag[Tag](unit.replace(v)(q))
     )

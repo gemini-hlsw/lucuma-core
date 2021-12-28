@@ -20,20 +20,58 @@ import shapeless.tag.@@
 
 import scala.collection.immutable.SortedMap
 
-sealed trait SourceProfile extends Product with Serializable
+sealed trait SourceProfile extends Product with Serializable {
+
+  /**
+   * Convert to a `Point` source profile. Units are converted to their `Integrated` versions, if
+   * necessary.
+   */
+  def toPoint: SourceProfile.Point
+
+  /**
+   * Convert to a `Uniform` source profile. Units are converted to their `Surface` versions, if
+   * necessary.
+   */
+  def toUniform: SourceProfile.Uniform
+
+  /**
+   * Convert to a `Gaussian` source profile. Units are converted to their `Integrated` versions, if
+   * necessary.
+   */
+  def toGaussian: SourceProfile.Gaussian
+}
 
 object SourceProfile {
 
-  final case class Point(spectralDefinition: SpectralDefinition[Integrated]) extends SourceProfile
+  final case class Point(spectralDefinition: SpectralDefinition[Integrated]) extends SourceProfile {
+
+    override def toPoint: Point = this
+
+    override def toUniform: Uniform =
+      Uniform(spectralDefinition.to[Surface])
+
+    override def toGaussian: Gaussian = Gaussian(GaussianSource.Zero, spectralDefinition)
+  }
+
   object Point {
     implicit val eqPoint: Eq[Point] = Eq.by(_.spectralDefinition)
 
     /** @group Optics */
     val spectralDefinition: Lens[Point, SpectralDefinition[Integrated]] =
       Focus[Point](_.spectralDefinition)
+
   }
 
-  final case class Uniform(spectralDefinition: SpectralDefinition[Surface]) extends SourceProfile
+  final case class Uniform(spectralDefinition: SpectralDefinition[Surface]) extends SourceProfile {
+
+    override def toPoint: Point = Point(spectralDefinition.to[Integrated])
+
+    override def toUniform: Uniform = this
+
+    override def toGaussian: Gaussian =
+      Gaussian(GaussianSource.Zero, spectralDefinition.to[Integrated])
+
+  }
   object Uniform {
     implicit val eqUniform: Eq[Uniform] = Eq.by(_.spectralDefinition)
 
@@ -52,7 +90,15 @@ object SourceProfile {
   final case class Gaussian(
     source:             GaussianSource,
     spectralDefinition: SpectralDefinition[Integrated]
-  ) extends SourceProfile
+  ) extends SourceProfile {
+
+    override def toPoint: Point = Point(spectralDefinition)
+
+    override def toUniform: Uniform = Uniform(spectralDefinition.to[Surface])
+
+    override def toGaussian: Gaussian = this
+
+  }
   object Gaussian {
 
     implicit val eqGaussian: Eq[Gaussian] = Eq.by(x => (x.source, x.spectralDefinition))

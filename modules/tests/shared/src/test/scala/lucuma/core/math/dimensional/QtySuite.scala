@@ -22,7 +22,36 @@ class QtySuite extends munit.DisciplineSuite {
 
   // Optics
   checkAll("Qty[BigDecimal].value", LensTests(Qty.value[BigDecimal]))
-  checkAll("Qty[BigDecimal].valueT", LensTests(Qty.valueT[BigDecimal, Brightness[Surface]]))
+  checkAll("Qty[BigDecimal].valueT", LensTests(Qty.valueTagged[BigDecimal, Brightness[Surface]]))
   checkAll("Qty[BigDecimal].unit", LensTests(Qty.unit[BigDecimal]))
-  checkAll("Qty[BigDecimal].unitT", LensTests(Qty.unitT[BigDecimal, Brightness[Surface]]))
+  checkAll("Qty[BigDecimal].unitT", LensTests(Qty.unitTagged[BigDecimal, Brightness[Surface]]))
+
+  // Tag Conversions
+  test("Tag conversion Brightness[Surface] -> Brightness[Integrated]") {
+    assertEquals(
+      WattsPerMeter2Arcsec2IsSurfaceLineFluxUnit.unit
+        .withValueTagged(1)
+        .toTag[LineFlux[Integrated]],
+      WattsPerMeter2IsIntegratedLineFluxUnit.unit.withValueTagged(1)
+    )
+  }
+
+  test("Tag conversion identity") {
+    assertEquals(
+      WattsPerMeter2Arcsec2IsSurfaceLineFluxUnit.unit
+        .withValueTagged(1)
+        .toTag[LineFlux[Surface]],
+      WattsPerMeter2Arcsec2IsSurfaceLineFluxUnit.unit.withValueTagged(1)
+    )
+  }
+
+  test("Tag conversion roundtrip") {
+    assertEquals(
+      WattsPerMeter2MicrometerIsIntegratedFluxDensityContinuumUnit.unit
+        .withValueTagged(1)
+        .toTag[FluxDensityContinuum[Surface]]
+        .toTag[FluxDensityContinuum[Integrated]],
+      WattsPerMeter2MicrometerIsIntegratedFluxDensityContinuumUnit.unit.withValueTagged(1)
+    )
+  }
 }
