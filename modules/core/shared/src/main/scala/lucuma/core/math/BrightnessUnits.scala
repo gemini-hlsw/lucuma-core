@@ -88,6 +88,7 @@ object BrightnessUnits {
     }
 
     object Surface {
+
       val all: NonEmptyList[UnitType @@ Brightness[Surface]] =
         NonEmptyList
           .of(
@@ -147,6 +148,8 @@ object BrightnessUnits {
 
   }
 
+  // Enumerated instances
+
   private def enumTaggedUnit[Tag](
     allList: NonEmptyList[UnitType @@ Tag]
   ): Enumerated[UnitType @@ Tag] =
@@ -171,4 +174,73 @@ object BrightnessUnits {
   implicit val enumFluxDensityContinuumSurface
     : Enumerated[UnitType @@ FluxDensityContinuum[Surface]] =
     enumTaggedUnit[FluxDensityContinuum[Surface]](FluxDensityContinuum.Surface.all)
+
+  /**
+   * Type class providing a conversion between a `UnitType` tagged with `T` to a corresponding
+   * `UnitType` tagged with `T0`.
+   *
+   * This is used to convert between `Integrated` <-> `Surface` units.
+   */
+  trait TagConverter[T, T0] {
+    def convert(unit: UnitType @@ T): UnitType @@ T0
+  }
+
+  // `TagConverter` based on a `Map`.
+
+  protected class MapConverter[T, T0](map: Map[UnitType @@ T, UnitType @@ T0])
+      extends TagConverter[T, T0] {
+    def convert(unit: UnitType @@ T): UnitType @@ T0 =
+      map(unit)
+  }
+
+  // Identity type `TagConverter`.
+
+  implicit def idConverter[T]: TagConverter[T, T] = new TagConverter[T, T] {
+    override def convert(unit: UnitType @@ T): UnitType @@ T = unit
+  }
+
+  implicit object IntegratedToSurfaceBrightnessConverter
+      extends MapConverter[Brightness[Integrated], Brightness[Surface]](
+        Brightness.Integrated.all.zip(Brightness.Surface.all).toNem.toSortedMap
+      )
+
+  implicit object SurfaceToIntegratedBrightnessConverter
+      extends MapConverter[Brightness[Surface], Brightness[Integrated]](
+        Brightness.Surface.all.zip(Brightness.Integrated.all).toNem.toSortedMap
+      )
+
+  implicit object IntegratedToSurfaceLineFluxConverter
+      extends MapConverter[LineFlux[Integrated], LineFlux[Surface]](
+        LineFlux.Integrated.all.zip(LineFlux.Surface.all).toNem.toSortedMap
+      )
+
+  implicit object SurfaceToIntegratedLineFluxConverter
+      extends MapConverter[LineFlux[Surface], LineFlux[Integrated]](
+        LineFlux.Surface.all.zip(LineFlux.Integrated.all).toNem.toSortedMap
+      )
+
+  implicit object IntegratedToSurfaceFluxDensityContinuumConverter
+      extends MapConverter[FluxDensityContinuum[Integrated], FluxDensityContinuum[Surface]](
+        FluxDensityContinuum.Integrated.all.zip(FluxDensityContinuum.Surface.all).toNem.toSortedMap
+      )
+
+  implicit object SurfaceToIntegratedFluxDensityContinuumConverter
+      extends MapConverter[FluxDensityContinuum[Surface], FluxDensityContinuum[Integrated]](
+        FluxDensityContinuum.Surface.all.zip(FluxDensityContinuum.Integrated.all).toNem.toSortedMap
+      )
+
+  implicit class BrightnessUnitOps[T](val unit: UnitType @@ T) extends AnyVal {
+
+    /** Convert `T`-tagged `UnitType` to a `T0`-tagged one. */
+    def toTag[T0](implicit conv: TagConverter[T, T0]): UnitType @@ T0 =
+      conv.convert(unit)
+  }
+
+  implicit class BrightnessQtyOps[N, T](val qty: Qty[N] @@ T) extends AnyVal {
+
+    /** Convert `T`-tagged `Qty` to a `T0`-tagged one. */
+    def toTag[T0](implicit conv: TagConverter[T, T0]): Qty[N] @@ T0 =
+      conv.convert(Qty.unitTagged.get(qty)).withValueTagged(Qty.valueTagged.get(qty))
+  }
+
 }

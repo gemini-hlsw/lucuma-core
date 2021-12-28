@@ -3,6 +3,7 @@
 
 package lucuma.core.model
 
+import cats.Order._
 import cats.kernel.laws.discipline._
 import eu.timepit.refined.cats._
 import lucuma.core.enum.Band
@@ -13,6 +14,12 @@ import lucuma.core.model.arb._
 import lucuma.core.util.arb.ArbEnumerated
 import monocle.law.discipline._
 import munit._
+import lucuma.core.math.Wavelength
+import coulomb._
+import lucuma.core.math.units._
+import scala.collection.immutable.SortedMap
+import lucuma.core.enum.StellarLibrarySpectrum
+import lucuma.core.math.BrightnessValue
 
 final class SpectralDefinitionSuite extends DisciplineSuite {
   import ArbUnnormalizedSED._
@@ -23,6 +30,74 @@ final class SpectralDefinitionSuite extends DisciplineSuite {
   import ArbRefined._
   import ArbQty._
   import ArbEmissionLine._
+
+  // Brightness type conversions
+  val sd1Integrated: SpectralDefinition[Integrated] = {
+    val b: BandBrightness[Integrated] =
+      BandBrightness[Integrated](BrightnessValue.fromDouble(10.0), Band.R)
+
+    SpectralDefinition.BandNormalized(
+      UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.A0I),
+      SortedMap(b.band -> b)
+    )
+  }
+
+  val sd1Surface: SpectralDefinition[Surface] = {
+    val b: BandBrightness[Surface] =
+      BandBrightness[Surface](BrightnessValue.fromDouble(10.0), Band.R)
+
+    SpectralDefinition.BandNormalized(
+      UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.A0I),
+      SortedMap(b.band -> b)
+    )
+  }
+
+  val sd2Integrated: SpectralDefinition[Integrated] = {
+    val line: EmissionLine[Integrated] =
+      EmissionLine(
+        Wavelength.Min,
+        PosBigDecimalOne.withUnit[KilometersPerSecond],
+        WattsPerMeter2IsIntegratedLineFluxUnit.unit.withValueTagged(PosBigDecimalOne)
+      )
+
+    SpectralDefinition.EmissionLines(
+      SortedMap(line.wavelength -> line),
+      WattsPerMeter2MicrometerIsIntegratedFluxDensityContinuumUnit.unit.withValueTagged(
+        PosBigDecimalOne
+      )
+    )
+  }
+
+  val sd2Surface: SpectralDefinition[Surface] = {
+    val line: EmissionLine[Surface] =
+      EmissionLine(
+        Wavelength.Min,
+        PosBigDecimalOne.withUnit[KilometersPerSecond],
+        WattsPerMeter2Arcsec2IsSurfaceLineFluxUnit.unit.withValueTagged(PosBigDecimalOne)
+      )
+
+    SpectralDefinition.EmissionLines(
+      SortedMap(line.wavelength -> line),
+      WattsPerMeter2MicrometerArcsec2IsSurfaceFluxDensityContinuumUnit.unit.withValueTagged(
+        PosBigDecimalOne
+      )
+    )
+  }
+
+  test("Brightness type conversion Integrated -> Surface") {
+    assertEquals(sd1Integrated.to[Surface], sd1Surface)
+    assertEquals(sd2Integrated.to[Surface], sd2Surface)
+  }
+
+  test("Brightness identity type conversion") {
+    assertEquals(sd1Surface.to[Integrated], sd1Integrated)
+    assertEquals(sd2Surface.to[Integrated], sd2Integrated)
+  }
+
+  test("Brightness type conversion roundtrip") {
+    assertEquals(sd1Surface.to[Integrated].to[Surface], sd1Surface)
+    assertEquals(sd2Surface.to[Integrated].to[Surface], sd2Surface)
+  }
 
   // Laws for SpectralDefinition.BandNormalized
   checkAll(

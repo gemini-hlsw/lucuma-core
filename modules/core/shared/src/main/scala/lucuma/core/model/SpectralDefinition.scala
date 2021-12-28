@@ -4,6 +4,7 @@
 package lucuma.core.model
 
 import cats.Eq
+import cats.Order._
 import cats.syntax.all._
 import eu.timepit.refined.cats._
 import eu.timepit.refined.types.numeric.PosBigDecimal
@@ -21,8 +22,24 @@ import shapeless.tag.@@
 
 import scala.collection.immutable.SortedMap
 
-// T = Brightness type (integral or surface)
-sealed trait SpectralDefinition[T]
+// T = Brightness type (Integrated or Surface)
+sealed trait SpectralDefinition[T] {
+
+  /**
+   * Convert units to `T0` brightness type.
+   *
+   * @tparam `T0`
+   *   `Integrated` or `Surface`
+   */
+  def to[T0](implicit
+    convBrightness: TagConverter[Brightness[T], Brightness[T0]],
+    convLine:       TagConverter[LineFlux[T], LineFlux[T0]],
+    convContinuum:  TagConverter[FluxDensityContinuum[T], FluxDensityContinuum[T0]]
+  ): SpectralDefinition[T0] = this match {
+    case a @ SpectralDefinition.BandNormalized(_, _) => a.to[T0]
+    case a @ SpectralDefinition.EmissionLines(_, _)  => a.to[T0]
+  }
+}
 
 object SpectralDefinition {
 
@@ -31,6 +48,20 @@ object SpectralDefinition {
     brightnesses: SortedMap[Band, BandBrightness[T]]
   ) extends SpectralDefinition[T] {
     lazy val bands: List[Band] = brightnesses.keys.toList
+
+    /**
+     * Convert units to `T0` brightness type.
+     *
+     * @tparam `T0`
+     *   `Integrated` or `Surface`
+     */
+    def to[T0](implicit
+      conv: TagConverter[Brightness[T], Brightness[T0]]
+    ): BandNormalized[T0] =
+      BandNormalized(
+        sed,
+        brightnesses.map { case (band, brightness) => band -> brightness.to[T0] }
+      )
   }
 
   object BandNormalized {
@@ -60,6 +91,21 @@ object SpectralDefinition {
     fluxDensityContinuum: Qty[PosBigDecimal] @@ FluxDensityContinuum[T]
   ) extends SpectralDefinition[T] {
     lazy val wavelengths: List[Wavelength] = lines.keys.toList
+
+    /**
+     * Convert units to `T0` brightness type.
+     *
+     * @tparam `T0`
+     *   `Integrated` or `Surface`
+     */
+    def to[T0](implicit
+      convLine:      TagConverter[LineFlux[T], LineFlux[T0]],
+      convContinuum: TagConverter[FluxDensityContinuum[T], FluxDensityContinuum[T0]]
+    ): EmissionLines[T0] =
+      EmissionLines(
+        lines.map { case (wavelength, line) => wavelength -> line.to[T0] },
+        fluxDensityContinuum.toTag[FluxDensityContinuum[T0]]
+      )
   }
 
   object EmissionLines {

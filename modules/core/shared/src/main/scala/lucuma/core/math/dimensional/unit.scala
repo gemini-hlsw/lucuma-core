@@ -53,7 +53,7 @@ object UnitType {
      * Create a `Qty` with the specified value, keeping the runtime represantation of the units,
      * propagating the unit tag into the `Qty`.
      */
-    def withValueT[N](value: N): Qty[N] @@ Tag =
+    def withValueTagged[N](value: N): Qty[N] @@ Tag =
       tag[Tag](Qty[N](value, unitType))
   }
 }
@@ -82,7 +82,7 @@ object UnitOfMeasure {
 }
 
 /**
- * Type class placing a tag `Tag` on a unit of measure.
+ * Type class placing a `Tag` on a unit of measure.
  */
 class IsTaggedUnit[U, Tag](implicit ev: UnitOfMeasure[U]) extends IsTagged[UnitOfMeasure[U], Tag] {
   def unit: UnitOfMeasure[U] @@ Tag = tag[Tag](ev)

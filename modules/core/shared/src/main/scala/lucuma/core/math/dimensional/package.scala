@@ -38,7 +38,7 @@ package object dimensional {
     /**
      * Convert a coulomb `Quantity` to a `Qty` with runtime unit representation and tag `Tag`.
      */
-    def toQtyT[Tag](implicit unit: UnitOfMeasure[U]): Qty[N] @@ Tag =
+    def toQtyTagged[Tag](implicit unit: UnitOfMeasure[U]): Qty[N] @@ Tag =
       tag[Tag](Qty(quantity.value, unit))
   }
 }

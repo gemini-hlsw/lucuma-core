@@ -21,7 +21,17 @@ final case class EmissionLine[T](
   wavelength: Wavelength,
   lineWidth:  Quantity[PosBigDecimal, KilometersPerSecond],
   lineFlux:   Qty[PosBigDecimal] @@ LineFlux[T]
-)
+) {
+
+  /**
+   * Convert units to `T0` brightness type.
+   *
+   * @tparam `T0`
+   *   `Integrated` or `Surface`
+   */
+  def to[T0](implicit conv: TagConverter[LineFlux[T], LineFlux[T0]]): EmissionLine[T0] =
+    EmissionLine[T0](wavelength, lineWidth, lineFlux.toTag[LineFlux[T0]])
+}
 
 object EmissionLine {
   implicit def eqEmissionLine[T]: Eq[EmissionLine[T]] =

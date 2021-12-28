@@ -32,4 +32,6 @@ trait GaussianSourceOptics {
   implicit val EqGaussiansource: Eq[GaussianSource] = Eq.by(_.fwhm)
 }
 
-object GaussianSource extends GaussianSourceOptics
+object GaussianSource extends GaussianSourceOptics {
+  val Zero: GaussianSource = GaussianSource(Angle.Angle0)
+}
