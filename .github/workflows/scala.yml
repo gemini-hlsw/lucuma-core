@@ -7,6 +7,11 @@ env:
 
 jobs:
   build:
+    strategy:
+      fail-fast: false
+      matrix:
+        jdk: [adoptium@8, adoptium@17]
+      
     runs-on: ubuntu-latest
 
     steps:
@@ -15,6 +20,6 @@ jobs:
       - name: Set up JDK
         uses: olafurpg/setup-scala@v13
         with:
-          java-version: adoptium@17
+          java-version: ${{ matrix.jdk }}
       - name: Run compile
         run: sbt -v -J-Xmx6g -J-Xss4m headerCheck +compile +test +doc

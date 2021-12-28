@@ -3,6 +3,10 @@ on:
   push:
     branches: [master]
     tags: ["*"]
+
+env:
+  JABBA_INDEX: 'https://github.com/typelevel/jdk-index/raw/main/index.json'
+
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -11,6 +15,8 @@ jobs:
         with:
           fetch-depth: 0
       - uses: olafurpg/setup-scala@v13
+        with:
+          java-version: adoptium@8
       - uses: olafurpg/setup-gpg@v3
       - name: Publish
         run: sbt -v -J-Xmx6g -J-Xss4m ci-release
