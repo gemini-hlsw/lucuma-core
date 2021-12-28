@@ -7,47 +7,46 @@ import coulomb.Unitless
 import lucuma.core.math.dimensional._
 import org.scalacheck.Arbitrary._
 import org.scalacheck._
-import shapeless.tag.@@
 
-trait ArbQty {
-  implicit val arbUnitType: Arbitrary[UnitType] =
+trait ArbMeasure {
+  implicit val arbUnitType: Arbitrary[Units] =
     Arbitrary {
       for {
         _name <- arbitrary[String]
         _abbv <- arbitrary[String]
-      } yield new UnitType {
+      } yield new Units {
         type Type = Unitless
         val name = _name
         val abbv = _abbv
       }
     }
 
-  implicit val cogenUnitType: Cogen[UnitType] =
+  implicit val cogenUnitType: Cogen[Units] =
     Cogen[(String, String)].contramap(x => (x.name, x.abbv))
 
-  implicit def arbQty[N: Arbitrary]: Arbitrary[Qty[N]] =
+  implicit def arbMeasure[N: Arbitrary]: Arbitrary[Measure[N]] =
     Arbitrary {
       for {
         n <- arbitrary[N]
-        u <- arbitrary[UnitType]
+        u <- arbitrary[Units]
       } yield u.withValue(n)
     }
 
-  implicit def cogenQty[N: Cogen]: Cogen[Qty[N]] =
-    Cogen[(N, UnitType)].contramap(q => (q.value, q.unit))
+  implicit def cogenMeasure[N: Cogen]: Cogen[Measure[N]] =
+    Cogen[(N, Units)].contramap(q => (q.value, q.units))
 
-  implicit def arbTaggedUnitQty[N: Arbitrary, Tag](implicit
-    arbUnit: Arbitrary[UnitType @@ Tag]
-  ): Arbitrary[Qty[N] @@ Tag] =
+  implicit def arbTaggedUnitMeasure[N: Arbitrary, Tag](implicit
+    arbUnit: Arbitrary[Units Of Tag]
+  ): Arbitrary[Measure[N] Of Tag] =
     Arbitrary {
       for {
         n <- arbitrary[N]
-        u <- arbitrary[UnitType @@ Tag]
+        u <- arbitrary[Units Of Tag]
       } yield u.withValueTagged(n)
     }
 
-  implicit def cogenTaggedUnitQty[N: Cogen, Tag]: Cogen[Qty[N] @@ Tag] =
-    Cogen[(N, UnitType)].contramap(q => (q.value, q.unit))
+  implicit def cogenTaggedUnitMeasure[N: Cogen, Tag]: Cogen[Measure[N] Of Tag] =
+    Cogen[(N, Units)].contramap(q => (q.value, q.units))
 }
 
-object ArbQty extends ArbQty
+object ArbMeasure extends ArbMeasure

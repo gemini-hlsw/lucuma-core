@@ -5,26 +5,31 @@ package lucuma.core.math.dimensional
 
 import cats.kernel.laws.discipline._
 import lucuma.core.math.BrightnessUnits._
-import lucuma.core.math.dimensional.arb.ArbQty
+import lucuma.core.math.dimensional.arb.ArbMeasure
 import lucuma.core.util.arb.ArbEnumerated._
 import monocle.law.discipline._
-import shapeless.tag.@@
 
-class QtySuite extends munit.DisciplineSuite {
-  import ArbQty._
+class MeasureSuite extends munit.DisciplineSuite {
+  import ArbMeasure._
 
   // Laws
-  checkAll("Qty[BigDecimal]", EqTests[Qty[BigDecimal]].eqv)
+  checkAll("Measure[BigDecimal]", EqTests[Measure[BigDecimal]].eqv)
   checkAll(
-    "Qty[BigDecimal] @@ Brightness[Integrated]",
-    EqTests[Qty[BigDecimal] @@ Brightness[Integrated]].eqv
+    "Measure[BigDecimal] Of Brightness[Integrated]",
+    EqTests[Measure[BigDecimal] Of Brightness[Integrated]].eqv
   )
 
   // Optics
-  checkAll("Qty[BigDecimal].value", LensTests(Qty.value[BigDecimal]))
-  checkAll("Qty[BigDecimal].valueT", LensTests(Qty.valueTagged[BigDecimal, Brightness[Surface]]))
-  checkAll("Qty[BigDecimal].unit", LensTests(Qty.unit[BigDecimal]))
-  checkAll("Qty[BigDecimal].unitT", LensTests(Qty.unitTagged[BigDecimal, Brightness[Surface]]))
+  checkAll("Measure[BigDecimal].value", LensTests(Measure.value[BigDecimal]))
+  checkAll(
+    "Measure[BigDecimal].valueTagged",
+    LensTests(Measure.valueTagged[BigDecimal, Brightness[Surface]])
+  )
+  checkAll("Measure[BigDecimal].units", LensTests(Measure.units[BigDecimal]))
+  checkAll(
+    "Measure[BigDecimal].unitsTagged",
+    LensTests(Measure.unitsTagged[BigDecimal, Brightness[Surface]])
+  )
 
   // Tag Conversions
   test("Tag conversion Brightness[Surface] -> Brightness[Integrated]") {

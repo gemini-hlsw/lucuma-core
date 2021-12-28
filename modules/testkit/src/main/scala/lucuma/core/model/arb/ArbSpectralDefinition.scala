@@ -12,7 +12,7 @@ import lucuma.core.math.Wavelength
 import lucuma.core.math.arb.ArbRefined
 import lucuma.core.math.arb.ArbWavelength
 import lucuma.core.math.dimensional._
-import lucuma.core.math.dimensional.arb.ArbQty
+import lucuma.core.math.dimensional.arb.ArbMeasure
 import lucuma.core.model.BandBrightness
 import lucuma.core.model.EmissionLine
 import lucuma.core.model.SpectralDefinition
@@ -20,7 +20,6 @@ import lucuma.core.model.UnnormalizedSED
 import lucuma.core.util.arb.ArbEnumerated
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck._
-import shapeless.tag.@@
 
 import scala.collection.immutable.SortedMap
 
@@ -30,13 +29,13 @@ trait ArbSpectralDefinition {
   import ArbEnumerated._
   import SpectralDefinition._
   import BrightnessUnits._
-  import ArbQty._
+  import ArbMeasure._
   import ArbEmissionLine._
   import ArbRefined._
   import ArbWavelength._
 
   implicit def arbBrightnessesMap[T](implicit
-    arbUnit: Arbitrary[UnitType @@ Brightness[T]]
+    arbUnit: Arbitrary[Units Of Brightness[T]]
   ): Arbitrary[SortedMap[Band, BandBrightness[T]]] =
     Arbitrary(
       arbitrary[Vector[BandBrightness[T]]].map(_.fproductLeft(_.band)).map(x => SortedMap(x: _*))
@@ -46,7 +45,7 @@ trait ArbSpectralDefinition {
     Cogen[Vector[(Band, BandBrightness[T])]].contramap(_.toVector)
 
   implicit def arbEmissionLineMap[T](implicit
-    arbUnit: Arbitrary[UnitType @@ LineFlux[T]]
+    arbUnit: Arbitrary[Units Of LineFlux[T]]
   ): Arbitrary[SortedMap[Wavelength, EmissionLine[T]]] =
     Arbitrary(
       arbitrary[Vector[EmissionLine[T]]]
@@ -58,7 +57,7 @@ trait ArbSpectralDefinition {
     Cogen[Vector[(Wavelength, EmissionLine[T])]].contramap(_.toVector)
 
   implicit def arbBandNormalizedSpectralDefinition[T](implicit
-    arbUnit: Arbitrary[UnitType @@ Brightness[T]]
+    arbUnit: Arbitrary[Units Of Brightness[T]]
   ): Arbitrary[BandNormalized[T]] =
     Arbitrary {
       for {
@@ -73,25 +72,25 @@ trait ArbSpectralDefinition {
     )
 
   implicit def arbEmissionLines[T](implicit
-    arbLineFluxUnit:             Arbitrary[UnitType @@ LineFlux[T]],
-    arbFluxDensityContinuumUnit: Arbitrary[UnitType @@ FluxDensityContinuum[T]]
+    arbLineFluxUnit:             Arbitrary[Units Of LineFlux[T]],
+    arbFluxDensityContinuumUnit: Arbitrary[Units Of FluxDensityContinuum[T]]
   ): Arbitrary[EmissionLines[T]] =
     Arbitrary {
       for {
         l <- arbitrary[SortedMap[Wavelength, EmissionLine[T]]]
-        c <- arbitrary[Qty[PosBigDecimal] @@ FluxDensityContinuum[T]]
+        c <- arbitrary[Measure[PosBigDecimal] Of FluxDensityContinuum[T]]
       } yield EmissionLines[T](l, c)
     }
 
   implicit def cogEmissionLines[T]: Cogen[EmissionLines[T]] =
-    Cogen[(SortedMap[Wavelength, EmissionLine[T]], Qty[PosBigDecimal])].contramap(x =>
+    Cogen[(SortedMap[Wavelength, EmissionLine[T]], Measure[PosBigDecimal])].contramap(x =>
       (x.lines, x.fluxDensityContinuum)
     )
 
   implicit def arbSpectralDefinition[T](implicit
-    arbBrightnessUnit: Arbitrary[UnitType @@ Brightness[T]],
-    arbLineUnit:       Arbitrary[UnitType @@ LineFlux[T]],
-    arbContinuumUnit:  Arbitrary[UnitType @@ FluxDensityContinuum[T]]
+    arbBrightnessUnit: Arbitrary[Units Of Brightness[T]],
+    arbLineUnit:       Arbitrary[Units Of LineFlux[T]],
+    arbContinuumUnit:  Arbitrary[Units Of FluxDensityContinuum[T]]
   ): Arbitrary[SpectralDefinition[T]] =
     Arbitrary(
       Gen.oneOf(arbitrary[BandNormalized[T]], arbitrary[EmissionLines[T]])

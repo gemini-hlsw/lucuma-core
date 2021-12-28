@@ -11,7 +11,6 @@ import lucuma.core.math.BrightnessValue
 import lucuma.core.math.dimensional._
 import monocle.Focus
 import monocle.Lens
-import shapeless.tag.@@
 
 /**
  * Describes the brightness of a target on a given band.
@@ -22,7 +21,7 @@ import shapeless.tag.@@
  *   The brightness unit type. For example: Integrated or Surface.
  */
 final case class BandBrightness[T](
-  quantity: Qty[BrightnessValue] @@ Brightness[T],
+  quantity: Measure[BrightnessValue] Of Brightness[T],
   band:     Band,
   error:    Option[BrightnessValue]
 ) {
@@ -39,23 +38,23 @@ final case class BandBrightness[T](
 
   override def toString: String = {
     val errStr = error.map(e => f"${e.toDoubleValue}%.2f")
-    f"BandBrightness(${quantity.value.toDoubleValue}%.2f ${quantity.unit.abbv}, ${band.shortName}, $errStr)"
+    f"BandBrightness(${quantity.value.toDoubleValue}%.2f ${quantity.units.abbv}, ${band.shortName}, $errStr)"
   }
 }
 
 object BandBrightness {
 
   /** @group Optics */
-  def quantity[T]: Lens[BandBrightness[T], Qty[BrightnessValue] @@ Brightness[T]] =
+  def quantity[T]: Lens[BandBrightness[T], Measure[BrightnessValue] Of Brightness[T]] =
     Focus[BandBrightness[T]](_.quantity)
 
   /** @group Optics */
   def value[T]: Lens[BandBrightness[T], BrightnessValue] =
-    quantity.andThen(Qty.valueTagged)
+    quantity.andThen(Measure.valueTagged)
 
   /** @group Optics */
-  def unit[T]: Lens[BandBrightness[T], UnitType @@ Brightness[T]] =
-    quantity.andThen(Qty.unitTagged)
+  def units[T]: Lens[BandBrightness[T], Units Of Brightness[T]] =
+    quantity.andThen(Measure.unitsTagged)
 
   /** @group Optics */
   def band[T]: Lens[BandBrightness[T], Band] = Focus[BandBrightness[T]](_.band)
@@ -66,14 +65,14 @@ object BandBrightness {
 
   /** Secondary constructor defaulting to no error. */
   def apply[T](
-    quantity: Qty[BrightnessValue] @@ Brightness[T],
+    quantity: Measure[BrightnessValue] Of Brightness[T],
     band:     Band
   ): BandBrightness[T] =
     new BandBrightness(quantity, band, none)
 
   /** Secondary constructor with error. */
   def apply[T](
-    quantity: Qty[BrightnessValue] @@ Brightness[T],
+    quantity: Measure[BrightnessValue] Of Brightness[T],
     band:     Band,
     error:    BrightnessValue
   ): BandBrightness[T] =
@@ -81,19 +80,19 @@ object BandBrightness {
 
   /** Secondary constructor using type units. */
   def apply[T, U](value: BrightnessValue, band: Band, error: Option[BrightnessValue])(implicit
-    tagged:              IsTaggedUnit[U, Brightness[T]]
+    tagged:              TaggedUnit[U, Brightness[T]]
   ): BandBrightness[T] =
     new BandBrightness(tagged.unit.withValueTagged(value), band, error)
 
   /** Secondary constructor using type units and no error. */
   def apply[T, U](value: BrightnessValue, band: Band)(implicit
-    tagged:              IsTaggedUnit[U, Brightness[T]]
+    tagged:              TaggedUnit[U, Brightness[T]]
   ): BandBrightness[T] =
     apply[T, U](value, band, none)
 
   /** Secondary constructor with error and using type units. */
   def apply[T, U](value: BrightnessValue, band: Band, error: BrightnessValue)(implicit
-    tagged:              IsTaggedUnit[U, Brightness[T]]
+    tagged:              TaggedUnit[U, Brightness[T]]
   ): BandBrightness[T] =
     apply[T, U](value, band, error.some)
 
@@ -125,9 +124,11 @@ object BandBrightness {
 
   /** group Typeclass Instances */
   implicit def bandBrightnessOrder[T](implicit
-    unitOrder: Order[UnitType @@ Brightness[T]]
+    unitsOrder: Order[Units Of Brightness[T]]
   ): Order[BandBrightness[T]] =
-    Order.by(m => (Qty.unitTagged.get(m.quantity), m.band.tag, Qty.value.get(m.quantity), m.error))
+    Order.by(m =>
+      (Measure.unitsTagged.get(m.quantity), m.band.tag, Measure.value.get(m.quantity), m.error)
+    )
 
   /** group Typeclass Instances */
   implicit def bandBrightnessShow[T]: Show[BandBrightness[T]] =

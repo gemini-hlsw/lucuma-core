@@ -12,14 +12,13 @@ import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.core.enum.Band
 import lucuma.core.math.BrightnessUnits._
 import lucuma.core.math._
-import lucuma.core.math.dimensional.Qty
+import lucuma.core.math.dimensional._
 import monocle.Focus
 import monocle.Lens
 import monocle.Optional
 import monocle.Prism
 import monocle.Traversal
 import monocle.macros.GenPrism
-import shapeless.tag.@@
 
 import scala.collection.immutable.SortedMap
 
@@ -266,13 +265,13 @@ object Target extends WithId('t') with TargetOptics {
     /** @group Optics */
     val integratedFluxDensityContinuum: Optional[
       Sidereal,
-      Qty[PosBigDecimal] @@ FluxDensityContinuum[Integrated]
+      Measure[PosBigDecimal] Of FluxDensityContinuum[Integrated]
     ] = sourceProfile.andThen(SourceProfile.integratedFluxDensityContinuum)
 
     /** @group Optics */
     val surfaceFluxDensityContinuum: Optional[
       Sidereal,
-      Qty[PosBigDecimal] @@ FluxDensityContinuum[Surface]
+      Measure[PosBigDecimal] Of FluxDensityContinuum[Surface]
     ] = sourceProfile.andThen(SourceProfile.surfaceFluxDensityContinuum)
 
     /** @group Optics */
@@ -391,13 +390,13 @@ object Target extends WithId('t') with TargetOptics {
     /** @group Optics */
     val integratedFluxDensityContinuum: Optional[
       Nonsidereal,
-      Qty[PosBigDecimal] @@ FluxDensityContinuum[Integrated]
+      Measure[PosBigDecimal] Of FluxDensityContinuum[Integrated]
     ] = sourceProfile.andThen(SourceProfile.integratedFluxDensityContinuum)
 
     /** @group Optics */
     val surfaceFluxDensityContinuum: Optional[
       Nonsidereal,
-      Qty[PosBigDecimal] @@ FluxDensityContinuum[Surface]
+      Measure[PosBigDecimal] Of FluxDensityContinuum[Surface]
     ] = sourceProfile.andThen(SourceProfile.surfaceFluxDensityContinuum)
 
     /** @group Optics */
@@ -527,13 +526,13 @@ trait TargetOptics { this: Target.type =>
   /** @group Optics */
   val integratedFluxDensityContinuum: Optional[
     Target,
-    Qty[PosBigDecimal] @@ FluxDensityContinuum[Integrated]
+    Measure[PosBigDecimal] Of FluxDensityContinuum[Integrated]
   ] = sourceProfile.andThen(SourceProfile.integratedFluxDensityContinuum)
 
   /** @group Optics */
   val surfaceFluxDensityContinuum: Optional[
     Target,
-    Qty[PosBigDecimal] @@ FluxDensityContinuum[Surface]
+    Measure[PosBigDecimal] Of FluxDensityContinuum[Surface]
   ] = sourceProfile.andThen(SourceProfile.surfaceFluxDensityContinuum)
 
   /** @group Optics */

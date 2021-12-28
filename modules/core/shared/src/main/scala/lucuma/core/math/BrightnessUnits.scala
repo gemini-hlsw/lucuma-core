@@ -9,7 +9,6 @@ import cats.data.NonEmptyList
 import lucuma.core.math.dimensional._
 import lucuma.core.math.units._
 import lucuma.core.util.Enumerated
-import shapeless.tag.@@
 
 object BrightnessUnits {
   type Integrated
@@ -21,60 +20,60 @@ object BrightnessUnits {
 
   // Brightness Integrated
   implicit object VegaMagnitudeIsIntegratedBrightnessUnit
-      extends IsTaggedUnit[VegaMagnitude, Brightness[Integrated]]
+      extends TaggedUnit[VegaMagnitude, Brightness[Integrated]]
   implicit object ABMagnitudeIsIntegratedBrightnessUnit
-      extends IsTaggedUnit[ABMagnitude, Brightness[Integrated]]
+      extends TaggedUnit[ABMagnitude, Brightness[Integrated]]
   implicit object JanskyIsIntegratedBrightnessUnit
-      extends IsTaggedUnit[Jansky, Brightness[Integrated]]
+      extends TaggedUnit[Jansky, Brightness[Integrated]]
   implicit object WattsPerMeter2MicrometerIsIntegratedBrightnessUnit
-      extends IsTaggedUnit[WattsPerMeter2Micrometer, Brightness[Integrated]]
+      extends TaggedUnit[WattsPerMeter2Micrometer, Brightness[Integrated]]
   implicit object ErgsPerSecondCentimeter2AngstromIsIntegratedBrightnessUnit
-      extends IsTaggedUnit[ErgsPerSecondCentimeter2Angstrom, Brightness[Integrated]]
+      extends TaggedUnit[ErgsPerSecondCentimeter2Angstrom, Brightness[Integrated]]
   implicit object ErgsPerSecondCentimeter2HertzIsIntegratedBrightnessUnit
-      extends IsTaggedUnit[ErgsPerSecondCentimeter2Hertz, Brightness[Integrated]]
+      extends TaggedUnit[ErgsPerSecondCentimeter2Hertz, Brightness[Integrated]]
 
   // Brightness Surface
   implicit object VegaMagnitudePerArcsec2IsSurfaceBrightnessUnit
-      extends IsTaggedUnit[VegaMagnitudePerArcsec2, Brightness[Surface]]
+      extends TaggedUnit[VegaMagnitudePerArcsec2, Brightness[Surface]]
   implicit object ABMagnitudePerArcsec2IsSurfaceBrightnessUnit
-      extends IsTaggedUnit[ABMagnitudePerArcsec2, Brightness[Surface]]
+      extends TaggedUnit[ABMagnitudePerArcsec2, Brightness[Surface]]
   implicit object JanskyPerArcsec2IsSurfaceBrightnessUnit
-      extends IsTaggedUnit[JanskyPerArcsec2, Brightness[Surface]]
+      extends TaggedUnit[JanskyPerArcsec2, Brightness[Surface]]
   implicit object WattsPerMeter2MicrometerArcsec2IsSurfaceBrightnessUnit
-      extends IsTaggedUnit[WattsPerMeter2MicrometerArcsec2, Brightness[Surface]]
+      extends TaggedUnit[WattsPerMeter2MicrometerArcsec2, Brightness[Surface]]
   implicit object ErgsPerSecondCentimeter2AngstromArcsec2IsSurfaceBrightnessUnit
-      extends IsTaggedUnit[ErgsPerSecondCentimeter2AngstromArcsec2, Brightness[Surface]]
+      extends TaggedUnit[ErgsPerSecondCentimeter2AngstromArcsec2, Brightness[Surface]]
   implicit object ErgsPerSecondCentimeter2HertzArcsec2IsSurfaceBrightnessUnit
-      extends IsTaggedUnit[ErgsPerSecondCentimeter2HertzArcsec2, Brightness[Surface]]
+      extends TaggedUnit[ErgsPerSecondCentimeter2HertzArcsec2, Brightness[Surface]]
 
   // Line Flux Integrated
   implicit object WattsPerMeter2IsIntegratedLineFluxUnit
-      extends IsTaggedUnit[WattsPerMeter2, LineFlux[Integrated]]
+      extends TaggedUnit[WattsPerMeter2, LineFlux[Integrated]]
   implicit object ErgsPerSecondCentimeter2IsIntegratedLineFluxUnit
-      extends IsTaggedUnit[ErgsPerSecondCentimeter2, LineFlux[Integrated]]
+      extends TaggedUnit[ErgsPerSecondCentimeter2, LineFlux[Integrated]]
 
   // Line Flux Surface
   implicit object WattsPerMeter2Arcsec2IsSurfaceLineFluxUnit
-      extends IsTaggedUnit[WattsPerMeter2Arcsec2, LineFlux[Surface]]
+      extends TaggedUnit[WattsPerMeter2Arcsec2, LineFlux[Surface]]
   implicit object ErgsPerSecondCentimeter2Arcsec2IsSurfaceLineFluxUnit
-      extends IsTaggedUnit[ErgsPerSecondCentimeter2Arcsec2, LineFlux[Surface]]
+      extends TaggedUnit[ErgsPerSecondCentimeter2Arcsec2, LineFlux[Surface]]
 
   // Flux Density Continuum Integrated
   implicit object WattsPerMeter2MicrometerIsIntegratedFluxDensityContinuumUnit
-      extends IsTaggedUnit[WattsPerMeter2Micrometer, FluxDensityContinuum[Integrated]]
+      extends TaggedUnit[WattsPerMeter2Micrometer, FluxDensityContinuum[Integrated]]
   implicit object ErgsPerSecondCentimeter2AngstromIsIntegratedFluxDensityContinuumUnit
-      extends IsTaggedUnit[ErgsPerSecondCentimeter2Angstrom, FluxDensityContinuum[Integrated]]
+      extends TaggedUnit[ErgsPerSecondCentimeter2Angstrom, FluxDensityContinuum[Integrated]]
 
   // Flux Density Continuum Surface
   implicit object WattsPerMeter2MicrometerArcsec2IsSurfaceFluxDensityContinuumUnit
-      extends IsTaggedUnit[WattsPerMeter2MicrometerArcsec2, FluxDensityContinuum[Surface]]
+      extends TaggedUnit[WattsPerMeter2MicrometerArcsec2, FluxDensityContinuum[Surface]]
   implicit object ErgsPerSecondCentimeter2AngstromArcsec2IsSurfaceFluxDensityContinuumUnit
-      extends IsTaggedUnit[ErgsPerSecondCentimeter2AngstromArcsec2, FluxDensityContinuum[Surface]]
+      extends TaggedUnit[ErgsPerSecondCentimeter2AngstromArcsec2, FluxDensityContinuum[Surface]]
 
   object Brightness {
     object Integrated {
 
-      val all: NonEmptyList[UnitType @@ Brightness[Integrated]] =
+      val all: NonEmptyList[Units Of Brightness[Integrated]] =
         NonEmptyList
           .of(
             VegaMagnitudeIsIntegratedBrightnessUnit,
@@ -89,7 +88,7 @@ object BrightnessUnits {
 
     object Surface {
 
-      val all: NonEmptyList[UnitType @@ Brightness[Surface]] =
+      val all: NonEmptyList[Units Of Brightness[Surface]] =
         NonEmptyList
           .of(
             VegaMagnitudePerArcsec2IsSurfaceBrightnessUnit,
@@ -105,7 +104,7 @@ object BrightnessUnits {
 
   object LineFlux {
     object Integrated {
-      val all: NonEmptyList[UnitType @@ LineFlux[Integrated]] =
+      val all: NonEmptyList[Units Of LineFlux[Integrated]] =
         NonEmptyList
           .of(
             WattsPerMeter2IsIntegratedLineFluxUnit,
@@ -115,7 +114,7 @@ object BrightnessUnits {
     }
 
     object Surface {
-      val all: NonEmptyList[UnitType @@ LineFlux[Surface]] =
+      val all: NonEmptyList[Units Of LineFlux[Surface]] =
         NonEmptyList
           .of(
             WattsPerMeter2Arcsec2IsSurfaceLineFluxUnit,
@@ -127,7 +126,7 @@ object BrightnessUnits {
 
   object FluxDensityContinuum {
     object Integrated {
-      val all: NonEmptyList[UnitType @@ FluxDensityContinuum[Integrated]] =
+      val all: NonEmptyList[Units Of FluxDensityContinuum[Integrated]] =
         NonEmptyList
           .of(
             WattsPerMeter2MicrometerIsIntegratedFluxDensityContinuumUnit,
@@ -137,7 +136,7 @@ object BrightnessUnits {
     }
 
     object Surface {
-      val all: NonEmptyList[UnitType @@ FluxDensityContinuum[Surface]] =
+      val all: NonEmptyList[Units Of FluxDensityContinuum[Surface]] =
         NonEmptyList
           .of(
             WattsPerMeter2MicrometerArcsec2IsSurfaceFluxDensityContinuumUnit,
@@ -150,29 +149,28 @@ object BrightnessUnits {
 
   // Enumerated instances
 
-  private def enumTaggedUnit[Tag](
-    allList: NonEmptyList[UnitType @@ Tag]
-  ): Enumerated[UnitType @@ Tag] =
+  private def enumTaggedUnit[T](
+    allList: NonEmptyList[Units Of T]
+  ): Enumerated[Units Of T] =
     Enumerated.fromNEL(allList).withTag(_.abbv)
 
-  implicit val enumBrightnessIntegrated: Enumerated[UnitType @@ Brightness[Integrated]] =
+  implicit val enumBrightnessIntegrated: Enumerated[Units Of Brightness[Integrated]] =
     enumTaggedUnit[Brightness[Integrated]](Brightness.Integrated.all)
 
-  implicit val enumBrightnessSurface: Enumerated[UnitType @@ Brightness[Surface]] =
+  implicit val enumBrightnessSurface: Enumerated[Units Of Brightness[Surface]] =
     enumTaggedUnit[Brightness[Surface]](Brightness.Surface.all)
 
-  implicit val enumLineFluxIntegrated: Enumerated[UnitType @@ LineFlux[Integrated]] =
+  implicit val enumLineFluxIntegrated: Enumerated[Units Of LineFlux[Integrated]] =
     enumTaggedUnit[LineFlux[Integrated]](LineFlux.Integrated.all)
 
-  implicit val enumLineFluxSurface: Enumerated[UnitType @@ LineFlux[Surface]] =
+  implicit val enumLineFluxSurface: Enumerated[Units Of LineFlux[Surface]] =
     enumTaggedUnit[LineFlux[Surface]](LineFlux.Surface.all)
 
   implicit val enumFluxDensityContinuumIntegrated
-    : Enumerated[UnitType @@ FluxDensityContinuum[Integrated]] =
+    : Enumerated[Units Of FluxDensityContinuum[Integrated]] =
     enumTaggedUnit[FluxDensityContinuum[Integrated]](FluxDensityContinuum.Integrated.all)
 
-  implicit val enumFluxDensityContinuumSurface
-    : Enumerated[UnitType @@ FluxDensityContinuum[Surface]] =
+  implicit val enumFluxDensityContinuumSurface: Enumerated[Units Of FluxDensityContinuum[Surface]] =
     enumTaggedUnit[FluxDensityContinuum[Surface]](FluxDensityContinuum.Surface.all)
 
   /**
@@ -182,21 +180,21 @@ object BrightnessUnits {
    * This is used to convert between `Integrated` <-> `Surface` units.
    */
   trait TagConverter[T, T0] {
-    def convert(unit: UnitType @@ T): UnitType @@ T0
+    def convert(units: Units Of T): Units Of T0
   }
 
   // `TagConverter` based on a `Map`.
 
-  protected class MapConverter[T, T0](map: Map[UnitType @@ T, UnitType @@ T0])
+  protected class MapConverter[T, T0](map: Map[Units Of T, Units Of T0])
       extends TagConverter[T, T0] {
-    def convert(unit: UnitType @@ T): UnitType @@ T0 =
-      map(unit)
+    def convert(units: Units Of T): Units Of T0 =
+      map(units)
   }
 
   // Identity type `TagConverter`.
 
   implicit def idConverter[T]: TagConverter[T, T] = new TagConverter[T, T] {
-    override def convert(unit: UnitType @@ T): UnitType @@ T = unit
+    override def convert(units: Units Of T): Units Of T = units
   }
 
   implicit object IntegratedToSurfaceBrightnessConverter
@@ -229,18 +227,20 @@ object BrightnessUnits {
         FluxDensityContinuum.Surface.all.zip(FluxDensityContinuum.Integrated.all).toNem.toSortedMap
       )
 
-  implicit class BrightnessUnitOps[T](val unit: UnitType @@ T) extends AnyVal {
+  implicit class BrightnessUnitOps[T](val units: Units Of T) extends AnyVal {
 
     /** Convert `T`-tagged `UnitType` to a `T0`-tagged one. */
-    def toTag[T0](implicit conv: TagConverter[T, T0]): UnitType @@ T0 =
-      conv.convert(unit)
+    def toTag[T0](implicit conv: TagConverter[T, T0]): Units Of T0 =
+      conv.convert(units)
   }
 
-  implicit class BrightnessQtyOps[N, T](val qty: Qty[N] @@ T) extends AnyVal {
+  implicit class BrightnessMeasureOps[N, T](val measure: Measure[N] Of T) extends AnyVal {
 
-    /** Convert `T`-tagged `Qty` to a `T0`-tagged one. */
-    def toTag[T0](implicit conv: TagConverter[T, T0]): Qty[N] @@ T0 =
-      conv.convert(Qty.unitTagged.get(qty)).withValueTagged(Qty.valueTagged.get(qty))
+    /** Convert `T`-tagged `Measure` to a `T0`-tagged one. */
+    def toTag[T0](implicit conv: TagConverter[T, T0]): Measure[N] Of T0 =
+      conv
+        .convert(Measure.unitsTagged.get(measure))
+        .withValueTagged(Measure.valueTagged.get(measure))
   }
 
 }

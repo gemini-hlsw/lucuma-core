@@ -9,6 +9,7 @@ import shapeless.tag
 import shapeless.tag.@@
 
 package object dimensional {
+  type Of[+T, U] = @@[T, U]
 
   implicit class UnitStringModuleOps(val unitStringModule: UnitString.type) extends AnyVal {
 
@@ -31,14 +32,16 @@ package object dimensional {
   implicit class QuantityOps[N, U](quantity: Quantity[N, U]) {
 
     /**
-     * Convert a coulomb `Quantity` to a `Qty` with runtime unit representation.
+     * Convert a coulomb `Quantity` to a `Measure` with runtime unit representation.
      */
-    def toQty(implicit unit: UnitOfMeasure[U]): Qty[N] = Qty(quantity.value, unit)
+    def toMeasure(implicit unit: UnitOfMeasure[U]): Measure[N] = Measure(quantity.value, unit)
 
     /**
-     * Convert a coulomb `Quantity` to a `Qty` with runtime unit representation and tag `Tag`.
+     * Convert a coulomb `Quantity` to a `Measure` with runtime unit representation and tag `Tag`.
      */
-    def toQtyTagged[Tag](implicit unit: UnitOfMeasure[U]): Qty[N] @@ Tag =
-      tag[Tag](Qty(quantity.value, unit))
+    def toMeasureTagged[T](implicit unit: UnitOfMeasure[U]): Measure[N] Of T = {
+      val tagged: Measure[N] @@ T = tag[T](Measure(quantity.value, unit))
+      tagged
+    }
   }
 }

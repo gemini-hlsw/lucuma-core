@@ -6,9 +6,8 @@ package lucuma.core.math.dimensional
 import cats.Eq
 import coulomb.unitops.UnitString
 import lucuma.core.util.Display
-import lucuma.core.util.IsTagged
+import lucuma.core.util.Tag
 import shapeless.tag
-import shapeless.tag.@@
 
 import java.util.Objects
 
@@ -20,7 +19,7 @@ import java.util.Objects
  * In `coulomb` units are types. However in some cases we want to have runtime representations of
  * units.
  */
-trait UnitType { self =>
+trait Units { self =>
   type Type
 
   /** the full name of a unit, e.g. "meter" */
@@ -29,12 +28,14 @@ trait UnitType { self =>
   /** the abbreviation of a unit, e.g. "m" for "meter" */
   def abbv: String
 
-  /** Create a `Qty` with the specified value, keeping the runtime represantation of the units. */
-  def withValue[N](value: N): Qty[N] = Qty[N](value, self)
+  /**
+   * Create a `Measure` with the specified value, keeping the runtime represantation of the units.
+   */
+  def withValue[N](value: N): Measure[N] = Measure[N](value, self)
 
   override def equals(obj: Any): Boolean = obj match {
-    case that: UnitType => name == that.name && abbv == that.abbv
-    case _              => false
+    case that: Units => name == that.name && abbv == that.abbv
+    case _           => false
   }
 
   override def hashCode: Int = Objects.hash(name, abbv)
@@ -42,19 +43,21 @@ trait UnitType { self =>
   override def toString: String = abbv
 }
 
-object UnitType {
-  implicit val eqUnitType: Eq[UnitType] = Eq.fromUniversalEquals
+object Units {
+  implicit val eqUnitType: Eq[Units] = Eq.fromUniversalEquals
 
-  implicit def displayUnitType: Display[UnitType] = Display.by(_.abbv, _.name)
+  implicit def displayUnitType: Display[Units] = Display.by(_.abbv, _.name)
 
-  implicit class TaggedUnitTypeOps[Tag](val unitType: UnitType @@ Tag) extends AnyVal {
+  implicit class TaggedUnitTypeOps[T](val unitType: Units Of T) extends AnyVal {
 
     /**
-     * Create a `Qty` with the specified value, keeping the runtime represantation of the units,
-     * propagating the unit tag into the `Qty`.
+     * Create a `Measure` with the specified value, keeping the runtime represantation of the units,
+     * propagating the unit tag into the `Measure`.
      */
-    def withValueTagged[N](value: N): Qty[N] @@ Tag =
-      tag[Tag](Qty[N](value, unitType))
+    def withValueTagged[N](value: N): Measure[N] Of T = {
+      val tagged = tag[T](Measure[N](value, unitType))
+      tagged
+    }
   }
 }
 
@@ -64,7 +67,7 @@ object UnitType {
  * Can be automatically derived if there's an implicit `BaseUnit[U]` or `DerivedUnit[U, _]` in
  * scope.
  */
-trait UnitOfMeasure[U] extends UnitType {
+trait UnitOfMeasure[U] extends Units {
   type Type = U
 }
 
@@ -84,6 +87,9 @@ object UnitOfMeasure {
 /**
  * Type class placing a `Tag` on a unit of measure.
  */
-class IsTaggedUnit[U, Tag](implicit ev: UnitOfMeasure[U]) extends IsTagged[UnitOfMeasure[U], Tag] {
-  def unit: UnitOfMeasure[U] @@ Tag = tag[Tag](ev)
+class TaggedUnit[U, T](implicit ev: UnitOfMeasure[U]) extends Tag[UnitOfMeasure[U], T] {
+  def unit: UnitOfMeasure[U] Of T = {
+    val tagged = tag[T](ev)
+    tagged
+  }
 }
