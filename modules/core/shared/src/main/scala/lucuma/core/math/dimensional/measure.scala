@@ -17,7 +17,7 @@ final case class Measure[N](value: N, units: Units) {
   /**
    * Convert to `coulomb.Quantity`.
    */
-  def toCoulomb: Quantity[N, units.Type] = value.withUnit[units.Type]
+  def toQuantity: Quantity[N, units.Type] = value.withUnit[units.Type]
 }
 
 object Measure {
