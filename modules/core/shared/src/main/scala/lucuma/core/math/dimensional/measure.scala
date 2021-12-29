@@ -3,7 +3,7 @@
 
 package lucuma.core.math.dimensional
 
-import _root_.cats.kernel.Eq
+import cats.Eq
 import coulomb._
 import monocle.Focus
 import monocle.Lens
