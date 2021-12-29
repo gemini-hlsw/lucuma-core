@@ -181,8 +181,8 @@ object Target extends WithId('t') with TargetOptics {
       sourceProfile.andThen(SourceProfile.surfaceSpectralDefinition)
 
     /** @group Optics */
-    val gaussianSource: Optional[Sidereal, GaussianSource] =
-      sourceProfile.andThen(SourceProfile.gaussianSource)
+    val fwhm: Optional[Sidereal, Angle] =
+      sourceProfile.andThen(SourceProfile.fwhm)
 
     /** @group Optics */
     val integratedBandNormalizedSpectralDefinition
@@ -305,8 +305,8 @@ object Target extends WithId('t') with TargetOptics {
       sourceProfile.andThen(SourceProfile.surfaceSpectralDefinition)
 
     /** @group Optics */
-    val gaussianSource: Optional[Nonsidereal, GaussianSource] =
-      sourceProfile.andThen(SourceProfile.gaussianSource)
+    val fwhm: Optional[Nonsidereal, Angle] =
+      sourceProfile.andThen(SourceProfile.fwhm)
 
     /** @group Optics */
     val integratedBandNormalizedSpectralDefinition
@@ -444,8 +444,8 @@ trait TargetOptics { this: Target.type =>
     sourceProfile.andThen(SourceProfile.surfaceSpectralDefinition)
 
   /** @group Optics */
-  val gaussianSource: Optional[Target, GaussianSource] =
-    sourceProfile.andThen(SourceProfile.gaussianSource)
+  val fwhm: Optional[Target, Angle] =
+    sourceProfile.andThen(SourceProfile.fwhm)
 
   /** @group Optics */
   val integratedBandNormalizedSpectralDefinition

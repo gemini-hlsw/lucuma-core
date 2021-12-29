@@ -34,7 +34,7 @@ final class TargetSuite extends DisciplineSuite {
   import Target._
   import ArbEmissionLine._
   import ArbSpectralDefinition._
-  import ArbGaussianSource._
+  import ArbAngle._
   import ArbUnnormalizedSED._
   import ArbBandBrightness._
   import ArbRefined._
@@ -72,10 +72,7 @@ final class TargetSuite extends DisciplineSuite {
     "Target.Sidereal.surfaceSpectralDefinition",
     OptionalTests(Target.Sidereal.surfaceSpectralDefinition)
   )
-  checkAll(
-    "Target.Sidereal.gaussianSource",
-    OptionalTests(Target.Sidereal.gaussianSource)
-  )
+  checkAll("Target.Sidereal.fwhm", OptionalTests(Target.Sidereal.fwhm))
   checkAll(
     "Target.Sidereal.integratedBandNormalizedSpectralDefinition",
     OptionalTests(Target.Sidereal.integratedBandNormalizedSpectralDefinition)
@@ -180,10 +177,7 @@ final class TargetSuite extends DisciplineSuite {
     "Target.Nonsidereal.surfaceSpectralDefinition",
     OptionalTests(Target.Nonsidereal.surfaceSpectralDefinition)
   )
-  checkAll(
-    "Target.Nonsidereal.gaussianSource",
-    OptionalTests(Target.Nonsidereal.gaussianSource)
-  )
+  checkAll("Target.Nonsidereal.fwhm", OptionalTests(Target.Nonsidereal.fwhm))
   checkAll(
     "Target.Nonsidereal.integratedBandNormalizedSpectralDefinition",
     OptionalTests(Target.Nonsidereal.integratedBandNormalizedSpectralDefinition)
@@ -284,10 +278,7 @@ final class TargetSuite extends DisciplineSuite {
     "Target.surfaceSpectralDefinition",
     OptionalTests(Target.surfaceSpectralDefinition)
   )
-  checkAll(
-    "Target.gaussianSource",
-    OptionalTests(Target.gaussianSource)
-  )
+  checkAll("Target.fwhm", OptionalTests(Target.fwhm))
   checkAll(
     "Target.integratedBandNormalizedSpectralDefinition",
     OptionalTests(Target.integratedBandNormalizedSpectralDefinition)

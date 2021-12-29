@@ -7,6 +7,7 @@ import cats.Eq
 import cats.syntax.all._
 import eu.timepit.refined.types.numeric.PosBigDecimal
 import lucuma.core.enum.Band
+import lucuma.core.math.Angle
 import lucuma.core.math.BrightnessUnits._
 import lucuma.core.math.Wavelength
 import lucuma.core.math.dimensional._
@@ -42,6 +43,12 @@ sealed trait SourceProfile extends Product with Serializable {
 
 object SourceProfile {
 
+  /**
+   * Point source.
+   *
+   * @param spectralDefinition
+   *   integrated spectral definition
+   */
   final case class Point(spectralDefinition: SpectralDefinition[Integrated]) extends SourceProfile {
 
     override def toPoint: Point = this
@@ -49,7 +56,7 @@ object SourceProfile {
     override def toUniform: Uniform =
       Uniform(spectralDefinition.to[Surface])
 
-    override def toGaussian: Gaussian = Gaussian(GaussianSource.Zero, spectralDefinition)
+    override def toGaussian: Gaussian = Gaussian(Angle.Angle0, spectralDefinition)
   }
 
   object Point {
@@ -61,6 +68,12 @@ object SourceProfile {
 
   }
 
+  /**
+   * Uniform source.
+   *
+   * @param spectralDefinition
+   *   integrated spectral definition
+   */
   final case class Uniform(spectralDefinition: SpectralDefinition[Surface]) extends SourceProfile {
 
     override def toPoint: Point = Point(spectralDefinition.to[Integrated])
@@ -68,7 +81,7 @@ object SourceProfile {
     override def toUniform: Uniform = this
 
     override def toGaussian: Gaussian =
-      Gaussian(GaussianSource.Zero, spectralDefinition.to[Integrated])
+      Gaussian(Angle.Angle0, spectralDefinition.to[Integrated])
 
   }
   object Uniform {
@@ -85,9 +98,11 @@ object SourceProfile {
    *
    * @param fwhm
    *   full width at half maximum of the seeing disc (typically in arcsec)
+   * @param spectralDefinition
+   *   integrated spectral definition
    */
   final case class Gaussian(
-    source:             GaussianSource,
+    fwhm:               Angle,
     spectralDefinition: SpectralDefinition[Integrated]
   ) extends SourceProfile {
 
@@ -100,11 +115,11 @@ object SourceProfile {
   }
   object Gaussian {
 
-    implicit val eqGaussian: Eq[Gaussian] = Eq.by(x => (x.source, x.spectralDefinition))
+    implicit val eqGaussian: Eq[Gaussian] = Eq.by(x => (x.fwhm, x.spectralDefinition))
 
     /** @group Optics */
-    val source: Lens[Gaussian, GaussianSource] =
-      Focus[Gaussian](_.source)
+    val fwhm: Lens[Gaussian, Angle] =
+      Focus[Gaussian](_.fwhm)
 
     /** @group Optics */
     val spectralDefinition: Lens[Gaussian, SpectralDefinition[Integrated]] =
@@ -149,8 +164,8 @@ object SourceProfile {
     uniform.andThen(Uniform.spectralDefinition)
 
   /** @group Optics */
-  val gaussianSource: Optional[SourceProfile, GaussianSource] =
-    gaussian.andThen(Gaussian.source)
+  val fwhm: Optional[SourceProfile, Angle] =
+    gaussian.andThen(Gaussian.fwhm)
 
   /** @group Optics */
   val integratedBandNormalizedSpectralDefinition

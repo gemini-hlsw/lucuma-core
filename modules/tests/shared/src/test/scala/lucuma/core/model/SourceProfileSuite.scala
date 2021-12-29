@@ -12,6 +12,7 @@ import lucuma.core.math.arb.ArbRefined
 import lucuma.core.math.dimensional.arb.ArbMeasure
 import lucuma.core.model.arb._
 import lucuma.core.util.arb.ArbEnumerated
+import lucuma.core.math.arb.ArbAngle
 import monocle.law.discipline._
 import munit._
 import coulomb._
@@ -20,17 +21,18 @@ import scala.collection.immutable.SortedMap
 import lucuma.core.enum.StellarLibrarySpectrum
 import lucuma.core.math.BrightnessValue
 import lucuma.core.math.BrightnessUnits._
+import lucuma.core.math.Angle
 
 final class SourceProfileSuite extends DisciplineSuite {
-  import ArbSourceProfile._
-  import ArbSpectralDefinition._
-  import ArbEnumerated._
-  import ArbGaussianSource._
-  import ArbUnnormalizedSED._
+  import ArbAngle._
   import ArbBandBrightness._
   import ArbEmissionLine._
-  import ArbRefined._
+  import ArbEnumerated._
   import ArbMeasure._
+  import ArbRefined._
+  import ArbSourceProfile._
+  import ArbSpectralDefinition._
+  import ArbUnnormalizedSED._
 
   // Conversions
   val sd1Integrated: SpectralDefinition[Integrated] = {
@@ -87,8 +89,8 @@ final class SourceProfileSuite extends DisciplineSuite {
   val point2    = SourceProfile.Point(sd2Integrated)
   val uniform1  = SourceProfile.Uniform(sd1Surface)
   val uniform2  = SourceProfile.Uniform(sd2Surface)
-  val gaussian1 = SourceProfile.Gaussian(GaussianSource.Zero, sd1Integrated)
-  val gaussian2 = SourceProfile.Gaussian(GaussianSource.Zero, sd2Integrated)
+  val gaussian1 = SourceProfile.Gaussian(Angle.Angle0, sd1Integrated)
+  val gaussian2 = SourceProfile.Gaussian(Angle.Angle0, sd2Integrated)
 
   test("toPoint") {
     assertEquals(point1.toPoint, point1)
@@ -129,7 +131,7 @@ final class SourceProfileSuite extends DisciplineSuite {
 
   // Laws for SourceProfile.Gaussian
   checkAll("Eq[SourceProfile.Gaussian]", EqTests[SourceProfile.Gaussian].eqv)
-  checkAll("SourceProfile.Gaussian.source", LensTests(SourceProfile.Gaussian.source))
+  checkAll("SourceProfile.Gaussian.fwhm", LensTests(SourceProfile.Gaussian.fwhm))
   checkAll(
     "SourceProfile.Gaussian.spectralDefinition",
     LensTests(SourceProfile.Gaussian.spectralDefinition)
@@ -148,10 +150,7 @@ final class SourceProfileSuite extends DisciplineSuite {
     "SourceProfile.surfaceSpectralDefinition",
     OptionalTests(SourceProfile.surfaceSpectralDefinition)
   )
-  checkAll(
-    "SourceProfile.gaussianSource",
-    OptionalTests(SourceProfile.gaussianSource)
-  )
+  checkAll("SourceProfile.fwhm", OptionalTests(SourceProfile.fwhm))
   checkAll(
     "SourceProfile.integratedBandNormalizedSpectralDefinition",
     OptionalTests(SourceProfile.integratedBandNormalizedSpectralDefinition)
