@@ -9,7 +9,7 @@ import eu.timepit.refined.cats._
 import lucuma.core.enum.Band
 import lucuma.core.math.Wavelength
 import lucuma.core.math.arb.ArbRefined
-import lucuma.core.math.dimensional.arb.ArbQty
+import lucuma.core.math.dimensional.arb.ArbMeasure
 import lucuma.core.model.arb._
 import lucuma.core.util.arb.ArbEnumerated
 import monocle.law.discipline._
@@ -30,7 +30,7 @@ final class SourceProfileSuite extends DisciplineSuite {
   import ArbBandBrightness._
   import ArbEmissionLine._
   import ArbRefined._
-  import ArbQty._
+  import ArbMeasure._
 
   // Conversions
   val sd1Integrated: SpectralDefinition[Integrated] = {

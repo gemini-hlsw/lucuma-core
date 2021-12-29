@@ -10,7 +10,7 @@ import lucuma.core.math.BrightnessUnits
 import lucuma.core.math.BrightnessValue
 import lucuma.core.math.arb.ArbBrightnessValue
 import lucuma.core.math.dimensional._
-import lucuma.core.math.dimensional.arb.ArbQty
+import lucuma.core.math.dimensional.arb.ArbMeasure
 import lucuma.core.math.units._
 import lucuma.core.model.arb._
 import lucuma.core.util.arb.ArbEnumerated
@@ -23,28 +23,34 @@ final class BandBrightnessSuite extends DisciplineSuite {
   import ArbEnumerated._
   import BrightnessUnits._
   import ArbBrightnessValue._
-  import ArbQty._
+  import ArbMeasure._
 
   def checkValues[T, U](name: String)(
     b:                        BandBrightness[T]
   )(scaledValue:              Int, band: Band, scaledError: Option[Int])(implicit
-    unit:                     UnitOfMeasure[U]
+    units:                    UnitOfMeasure[U]
   ): Unit = test(s"Constructor: $name") {
     assertEquals(b.quantity.value.scaledValue, scaledValue)
-    assertEquals(b.quantity.unit, unit)
+    assertEquals(b.quantity.units, units)
     assertEquals(b.band, band)
     assertEquals(b.error.map(_.scaledValue), scaledError)
   }
 
   // Full constructors
   val b1 = BandBrightness(
-    BrightnessValue.fromDouble(10.0).withUnit[VegaMagnitude].toQtyTagged[Brightness[Integrated]],
+    BrightnessValue
+      .fromDouble(10.0)
+      .withUnit[VegaMagnitude]
+      .toMeasureTagged[Brightness[Integrated]],
     Band.R
   )
   checkValues[Integrated, VegaMagnitude]("Full without error")(b1)(10000, Band.R, None)
 
   val b2 = BandBrightness(
-    BrightnessValue.fromDouble(10.0).withUnit[VegaMagnitude].toQtyTagged[Brightness[Integrated]],
+    BrightnessValue
+      .fromDouble(10.0)
+      .withUnit[VegaMagnitude]
+      .toMeasureTagged[Brightness[Integrated]],
     Band.R,
     BrightnessValue.fromDouble(2.0)
   )
@@ -95,7 +101,7 @@ final class BandBrightnessSuite extends DisciplineSuite {
     BrightnessValue
       .fromDouble(10.0)
       .withUnit[VegaMagnitudePerArcsec2]
-      .toQtyTagged[Brightness[Surface]],
+      .toMeasureTagged[Brightness[Surface]],
     Band.R
   )
   test("Brightness type conversion Integrated -> Surface") {
@@ -138,11 +144,11 @@ final class BandBrightnessSuite extends DisciplineSuite {
   )
   checkAll(
     "BandBrightness.unit[Integrated]",
-    LensTests(BandBrightness.unit[Integrated])
+    LensTests(BandBrightness.units[Integrated])
   )
   checkAll(
     "BandBrightness.unit[Surface]",
-    LensTests(BandBrightness.unit[Surface])
+    LensTests(BandBrightness.units[Surface])
   )
   checkAll(
     "BandBrightness.band[Integrated]",

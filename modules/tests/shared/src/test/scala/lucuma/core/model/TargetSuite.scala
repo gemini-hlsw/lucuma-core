@@ -9,7 +9,7 @@ import eu.timepit.refined.scalacheck.string._
 import lucuma.core.arb._
 import lucuma.core.enum.Band
 import lucuma.core.math.arb._
-import lucuma.core.math.dimensional.arb.ArbQty
+import lucuma.core.math.dimensional.arb.ArbMeasure
 import lucuma.core.model.arb._
 import lucuma.core.util.arb._
 import lucuma.core.util.laws.GidTests
@@ -38,7 +38,7 @@ final class TargetSuite extends DisciplineSuite {
   import ArbUnnormalizedSED._
   import ArbBandBrightness._
   import ArbRefined._
-  import ArbQty._
+  import ArbMeasure._
   import ArbAngularSize._
 
   // Laws for Target.Sidereal

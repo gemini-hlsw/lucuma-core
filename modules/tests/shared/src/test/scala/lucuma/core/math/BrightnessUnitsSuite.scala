@@ -4,11 +4,10 @@
 package lucuma.core.math
 
 import lucuma.core.math.BrightnessUnits
-import lucuma.core.math.dimensional.UnitType
+import lucuma.core.math.dimensional._
 import lucuma.core.util.arb.ArbEnumerated
 import lucuma.core.util.laws.EnumeratedTests
 import munit.DisciplineSuite
-import shapeless.tag.@@
 
 final class BrightnessUnitsSuite extends DisciplineSuite {
   import ArbEnumerated._
@@ -16,28 +15,28 @@ final class BrightnessUnitsSuite extends DisciplineSuite {
 
   // Type classes
   checkAll(
-    "UnitType @@ Brightness[Integrated]",
-    EnumeratedTests[UnitType @@ Brightness[Integrated]].enumerated
+    "Units Of Brightness[Integrated]",
+    EnumeratedTests[Units Of Brightness[Integrated]].enumerated
   )
   checkAll(
-    "UnitType @@ Brightness[Surface]",
-    EnumeratedTests[UnitType @@ Brightness[Surface]].enumerated
+    "Units Of Brightness[Surface]",
+    EnumeratedTests[Units Of Brightness[Surface]].enumerated
   )
   checkAll(
-    "UnitType @@ LineFlux[Integrated]",
-    EnumeratedTests[UnitType @@ LineFlux[Integrated]].enumerated
+    "Units Of LineFlux[Integrated]",
+    EnumeratedTests[Units Of LineFlux[Integrated]].enumerated
   )
   checkAll(
-    "UnitType @@ LineFlux[Surface]",
-    EnumeratedTests[UnitType @@ LineFlux[Surface]].enumerated
+    "Units Of LineFlux[Surface]",
+    EnumeratedTests[Units Of LineFlux[Surface]].enumerated
   )
   checkAll(
-    "UnitType @@ [FluxDensityContinuum[Integrated]]",
-    EnumeratedTests[UnitType @@ FluxDensityContinuum[Integrated]].enumerated
+    "Units Of [FluxDensityContinuum[Integrated]]",
+    EnumeratedTests[Units Of FluxDensityContinuum[Integrated]].enumerated
   )
   checkAll(
-    "UnitType @@ [FluxDensityContinuum[Surface]]",
-    EnumeratedTests[UnitType @@ FluxDensityContinuum[Surface]].enumerated
+    "Units Of [FluxDensityContinuum[Surface]]",
+    EnumeratedTests[Units Of FluxDensityContinuum[Surface]].enumerated
   )
 
   // Tag Conversions

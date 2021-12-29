@@ -18,7 +18,6 @@ import lucuma.core.math.dimensional._
 import lucuma.core.math.units.Nanometer
 import lucuma.core.math.units._
 import lucuma.core.util.Enumerated
-import shapeless.tag.@@
 import spire.std.any._
 import spire.syntax.all._
 
@@ -55,8 +54,8 @@ sealed abstract class Band(
   implicit def defaultIntegrated: Band.DefaultUnit[self.type, Integrated]
   implicit def defaultSurface: Band.DefaultUnit[self.type, Surface]
 
-  def defaultUnit[T](implicit ev: Band.DefaultUnit[self.type, T]): UnitType @@ Brightness[T] =
-    ev.unit
+  def defaultUnit[T](implicit ev: Band.DefaultUnit[self.type, T]): Units Of Brightness[T] =
+    ev.units
 }
 
 sealed abstract class BandWithDefaultUnits[DI, DS](
@@ -66,8 +65,8 @@ sealed abstract class BandWithDefaultUnits[DI, DS](
   center:    Wavelength,
   width:     Quantity[PosInt, Nanometer]
 )(implicit
-  taggedI:   IsTaggedUnit[DI, Brightness[Integrated]],
-  taggedS:   IsTaggedUnit[DS, Brightness[Surface]]
+  taggedI:   TaggedUnit[DI, Brightness[Integrated]],
+  taggedS:   TaggedUnit[DS, Brightness[Surface]]
 ) extends Band(tag, shortName, longName, center, width) { self =>
   type DefaultIntegratedUnits = DI
   type DefaultSurfaceUnits    = DS
@@ -81,10 +80,10 @@ sealed abstract class BandWithDefaultUnits[DI, DS](
 
 object Band {
 
-  class DefaultUnit[B, T](val unit: UnitType @@ Brightness[T])
+  class DefaultUnit[B, T](val units: Units Of Brightness[T])
   object DefaultUnit {
     // Declare `U` as the default unit for band `B` and brightness type `T` (Integrated or Surface).
-    def apply[B, T, U](implicit tagged: IsTaggedUnit[U, Brightness[T]]) =
+    def apply[B, T, U](implicit tagged: TaggedUnit[U, Brightness[T]]) =
       new DefaultUnit[B, T](tagged.unit)
   }
 

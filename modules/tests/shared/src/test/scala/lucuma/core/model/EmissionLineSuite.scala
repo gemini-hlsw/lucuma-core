@@ -11,7 +11,7 @@ import eu.timepit.refined.cats._
 import lucuma.core.math.BrightnessUnits._
 import lucuma.core.math.arb.ArbRefined
 import lucuma.core.math.arb.ArbWavelength
-import lucuma.core.math.dimensional.arb.ArbQty
+import lucuma.core.math.dimensional.arb.ArbMeasure
 import lucuma.core.model.arb.ArbEmissionLine
 import lucuma.core.util.arb.ArbEnumerated
 import monocle.law.discipline.LensTests
@@ -25,7 +25,7 @@ final class EmissionLineSuite extends DisciplineSuite {
   import ArbEmissionLine._
   import ArbWavelength._
   import ArbRefined._
-  import ArbQty._
+  import ArbMeasure._
   import ArbQuantity._
 
   // Brightness type conversions
