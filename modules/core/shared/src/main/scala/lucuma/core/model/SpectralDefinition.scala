@@ -11,13 +11,13 @@ import eu.timepit.refined.types.numeric.PosBigDecimal
 import lucuma.core.enum.Band
 import lucuma.core.math.BrightnessUnits._
 import lucuma.core.math.Wavelength
+import lucuma.core.math.dimensional._
 import monocle.Focus
 import monocle.Lens
 import monocle.Optional
 import monocle.Prism
 import monocle.Traversal
 import monocle.macros.GenPrism
-import lucuma.core.math.dimensional._
 
 import scala.collection.immutable.SortedMap
 

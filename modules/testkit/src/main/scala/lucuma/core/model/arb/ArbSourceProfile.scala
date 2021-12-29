@@ -5,14 +5,16 @@ package lucuma.core.model
 package arb
 
 import cats.syntax.all._
+import lucuma.core.math.Angle
 import lucuma.core.math.BrightnessUnits
+import lucuma.core.math.arb.ArbAngle
 import lucuma.core.util.arb.ArbEnumerated
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck._
 
 trait ArbSourceProfile {
+  import ArbAngle._
   import ArbEnumerated._
-  import ArbGaussianSource._
   import BrightnessUnits._
   import ArbSpectralDefinition._
 
@@ -29,9 +31,9 @@ trait ArbSourceProfile {
   implicit val arbGaussianSourceProfile: Arbitrary[SourceProfile.Gaussian] =
     Arbitrary {
       for {
-        g <- arbitrary[GaussianSource]
+        a <- arbitrary[Angle]
         d <- arbitrary[SpectralDefinition[Integrated]]
-      } yield SourceProfile.Gaussian(g, d)
+      } yield SourceProfile.Gaussian(a, d)
     }
 
   implicit val arbSourceProfile: Arbitrary[SourceProfile] =
@@ -50,9 +52,7 @@ trait ArbSourceProfile {
     Cogen[SpectralDefinition[Surface]].contramap(_.spectralDefinition)
 
   implicit val cogenGaussianSourceProfile: Cogen[SourceProfile.Gaussian] =
-    Cogen[(GaussianSource, SpectralDefinition[Integrated])].contramap(x =>
-      (x.source, x.spectralDefinition)
-    )
+    Cogen[(Angle, SpectralDefinition[Integrated])].contramap(x => (x.fwhm, x.spectralDefinition))
 
   implicit val cogSourceProfile: Cogen[SourceProfile] =
     Cogen[
