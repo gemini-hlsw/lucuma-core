@@ -40,14 +40,14 @@ object UnnormalizedSED {
       Focus[StellarLibrary](_.librarySpectrum)
   }
 
-  final case class CoolStarModel(temperature: Quantity[PosBigDecimal, Kelvin])
+  final case class CoolStarModel(temperature: CoolStarTemperature)
       extends UnnormalizedSED
 
   object CoolStarModel {
     implicit val orderCoolStarModel: Order[CoolStarModel] = Order.by(_.temperature)
 
     /** @group Optics */
-    val temperature: Lens[CoolStarModel, Quantity[PosBigDecimal, Kelvin]] =
+    val temperature: Lens[CoolStarModel, CoolStarTemperature] =
       Focus[CoolStarModel](_.temperature)
   }
 
