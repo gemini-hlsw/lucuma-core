@@ -32,14 +32,10 @@ trait ArbUnnormalizedSED {
     Cogen[StellarLibrarySpectrum].contramap(_.librarySpectrum)
 
   implicit val arbCoolStarModel: Arbitrary[CoolStarModel] =
-    Arbitrary(
-      Gen
-        .choose(BigDecimal(1), BigDecimal(10000))
-        .map(a => CoolStarModel(a.withRefinedUnit[Positive, Kelvin]))
-    )
+    Arbitrary(arbitrary[CoolStarTemperature].map(CoolStarModel(_)))
 
   implicit val cogCoolStarModel: Cogen[CoolStarModel] =
-    Cogen[BigDecimal].contramap(_.temperature.value.value)
+    Cogen[BigDecimal].contramap(_.temperature.temperature.value.value)
 
   implicit val arbGalaxy: Arbitrary[Galaxy] =
     Arbitrary(arbitrary[GalaxySpectrum].map(Galaxy(_)))
