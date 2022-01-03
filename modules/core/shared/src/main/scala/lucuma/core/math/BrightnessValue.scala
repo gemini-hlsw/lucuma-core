@@ -5,11 +5,11 @@ package lucuma.core.math
 
 import cats.Order
 import cats.Show
-import lucuma.core.optics.{Format, SplitEpi}
+import lucuma.core.optics.Format
+import lucuma.core.optics.SplitEpi
 import spire.math.Rational
 
 import java.math.RoundingMode
-
 import scala.math.rint
 import scala.util.Try
 

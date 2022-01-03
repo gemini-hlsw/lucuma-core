@@ -17,4 +17,4 @@ jobs:
         with:
           java-version: adoptium@17
       - name: Run compile
-        run: sbt headerCheck +compile +test +doc
+        run: sbt -v -J-Xmx6g -J-Xss4m headerCheck +compile +test +doc

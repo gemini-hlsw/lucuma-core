@@ -152,7 +152,7 @@ object BrightnessUnits {
   private def enumTaggedUnit[T](
     allList: NonEmptyList[Units Of T]
   ): Enumerated[Units Of T] =
-    Enumerated.fromNEL(allList).withTag(_.abbv)
+    Enumerated.fromNEL(allList).withTag(_.serialized)
 
   implicit val enumBrightnessIntegrated: Enumerated[Units Of Brightness[Integrated]] =
     enumTaggedUnit[Brightness[Integrated]](Brightness.Integrated.all)
