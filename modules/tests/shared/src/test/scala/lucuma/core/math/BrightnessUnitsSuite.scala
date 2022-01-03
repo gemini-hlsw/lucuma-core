@@ -8,6 +8,7 @@ import lucuma.core.math.dimensional._
 import lucuma.core.util.arb.ArbEnumerated
 import lucuma.core.util.laws.EnumeratedTests
 import munit.DisciplineSuite
+import lucuma.core.util.Enumerated
 
 final class BrightnessUnitsSuite extends DisciplineSuite {
   import ArbEnumerated._
@@ -38,6 +39,15 @@ final class BrightnessUnitsSuite extends DisciplineSuite {
     "Units Of [FluxDensityContinuum[Surface]]",
     EnumeratedTests[Units Of FluxDensityContinuum[Surface]].enumerated
   )
+
+  // Serialization
+  test("Serialization (via Enumerated tag)") {
+    val enum1 = implicitly[Enumerated[Units Of FluxDensityContinuum[Integrated]]]
+    assertEquals(
+      enum1.all.map(enum1.tag),
+      List("W_PER_M_SQUARED_PER_UM", "ERG_PER_S_PER_CM_SQUARED_PER_A")
+    )
+  }
 
   // Tag Conversions
   test("Tag conversion Brightness[Integrated] -> Brightness[Surface]") {

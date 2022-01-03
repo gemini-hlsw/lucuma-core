@@ -37,7 +37,7 @@ final class SourceProfileSuite extends DisciplineSuite {
   // Conversions
   val sd1Integrated: SpectralDefinition[Integrated] = {
     val b: BandBrightness[Integrated] =
-      BandBrightness[Integrated](BrightnessValue.fromDouble(10.0), Band.R)
+      BandBrightness.withDefaultUnits[Integrated](BrightnessValue.fromDouble(10.0), Band.R)
 
     SpectralDefinition.BandNormalized(
       UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.A0I),
@@ -47,7 +47,7 @@ final class SourceProfileSuite extends DisciplineSuite {
 
   val sd1Surface: SpectralDefinition[Surface] = {
     val b: BandBrightness[Surface] =
-      BandBrightness[Surface](BrightnessValue.fromDouble(10.0), Band.R)
+      BandBrightness.withDefaultUnits[Surface](BrightnessValue.fromDouble(10.0), Band.R)
 
     SpectralDefinition.BandNormalized(
       UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.A0I),

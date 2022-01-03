@@ -12,13 +12,10 @@ trait ArbMeasure {
   implicit val arbUnitType: Arbitrary[Units] =
     Arbitrary {
       for {
-        _name <- arbitrary[String]
-        _abbv <- arbitrary[String]
-      } yield new Units {
-        type Type = Unitless
-        val name = _name
-        val abbv = _abbv
-      }
+        name <- arbitrary[String]
+        abbv <- arbitrary[String]
+        tag  <- arbitrary[String]
+      } yield UnitOfMeasure[Unitless](name, abbv, tag)
     }
 
   implicit val cogenUnitType: Cogen[Units] =

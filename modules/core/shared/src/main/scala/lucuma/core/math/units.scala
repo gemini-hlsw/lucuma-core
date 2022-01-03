@@ -10,7 +10,6 @@ import coulomb.mks._
 import coulomb.si._
 import coulomb.siprefix._
 import coulomb.time._
-import coulomb.unitops.UnitString
 import coulomb.unitops._
 import eu.timepit.refined._
 import eu.timepit.refined.auto._
@@ -56,23 +55,24 @@ trait units {
   // Integrated Brightness units
   type VegaMagnitude
   implicit val defineVegaMagnitude =
-    BaseUnit[VegaMagnitude](name = "Vega magnitude", abbv = "Vega mag")
+    BaseUnitDef[VegaMagnitude]("Vega magnitude", "Vega mag", "VEGA_MAGNITUDE")
 
   type ABMagnitude
   implicit val defineABMagnitude =
-    BaseUnit[ABMagnitude](name = "AB magnitude", abbv = "AB mag")
+    BaseUnitDef[ABMagnitude]("AB magnitude", "AB mag", "AB_MAGNITUDE")
 
   private val JanskysPerWattMeter2Hertz: SafeLong = SafeLong(10).pow(26)
   type Jansky
   implicit val defineJansky                       =
-    DerivedUnit[Jansky, Watt %/ ((Meter %^ 2) %* (Hertz %^ -1))](
+    DerivedUnitDef[Jansky, Watt %/ ((Meter %^ 2) %* (Hertz %^ -1))](
       Rational(1, JanskysPerWattMeter2Hertz),
-      abbv = "Jy"
+      abbv = "Jy",
+      serialized = "JANSKY"
     )
 
   type WattsPerMeter2Micrometer = Watt %/ ((Meter %^ 2) %* Micrometer)
-  implicit val strWattsPerMeter2Micrometer: UnitString[WattsPerMeter2Micrometer] =
-    UnitString[WattsPerMeter2Micrometer]("W/m²/µm")
+  implicit val strWattsPerMeter2Micrometer =
+    UnitStringDef[WattsPerMeter2Micrometer]("W/m²/µm", "W_PER_M_SQUARED_PER_UM")
 
   private val ErgsPerJoule: SafeLong = SafeLong(10).pow(7)
   type Erg
@@ -80,58 +80,68 @@ trait units {
     DerivedUnit[Erg, Joule](Rational(1, ErgsPerJoule), abbv = "erg")
 
   type ErgsPerSecondCentimeter2Angstrom = Erg %/ (Second %* (Centimeter %^ 2) %* Angstrom)
-  implicit val strErgsPerSecondCentimeter2Angstrom: UnitString[ErgsPerSecondCentimeter2Angstrom] =
-    UnitString[ErgsPerSecondCentimeter2Angstrom]("erg/s/cm²/Å")
+  implicit val strErgsPerSecondCentimeter2Angstrom =
+    UnitStringDef[ErgsPerSecondCentimeter2Angstrom]("erg/s/cm²/Å", "ERG_PER_S_PER_CM_SQUARED_PER_A")
 
   type ErgsPerSecondCentimeter2Hertz = Erg %/ (Second %* (Centimeter %^ 2) %* Hertz)
-  implicit val strErgsPerSecondCentimeter2Hertz: UnitString[ErgsPerSecondCentimeter2Hertz] =
-    UnitString[ErgsPerSecondCentimeter2Hertz]("erg/s/cm²/Hz")
+  implicit val strErgsPerSecondCentimeter2Hertz =
+    UnitStringDef[ErgsPerSecondCentimeter2Hertz]("erg/s/cm²/Hz", "ERG_PER_S_PER_CM_SQUARED_PER_HZ")
 
   // Surface Brightness units
   type VegaMagnitudePerArcsec2 = VegaMagnitude %/ (ArcSecond %^ 2)
-  implicit val strVegaMagnitudePerArcsec2: UnitString[VegaMagnitudePerArcsec2] =
-    UnitString[VegaMagnitudePerArcsec2]("Vega mag/arcsec²")
+  implicit val strVegaMagnitudePerArcsec2 =
+    UnitStringDef[VegaMagnitudePerArcsec2]("Vega mag/arcsec²", "VEGA_MAG_PER_ARCSEC_SQUARED")
 
   type ABMagnitudePerArcsec2 = ABMagnitude %/ (ArcSecond %^ 2)
-  implicit val strABMagnitudePerArcsec2: UnitString[ABMagnitudePerArcsec2] =
-    UnitString[ABMagnitudePerArcsec2]("AB mag/arcsec²")
+  implicit val strABMagnitudePerArcsec2 =
+    UnitStringDef[ABMagnitudePerArcsec2]("AB mag/arcsec²", "AB_MAG_PER_ARCSEC_SQUARED")
 
   type JanskyPerArcsec2 = Jansky %/ (ArcSecond %^ 2)
-  implicit val strJanskyPerArcsec2: UnitString[JanskyPerArcsec2] =
-    UnitString[JanskyPerArcsec2]("Jy/arcsec²")
+  implicit val strJanskyPerArcsec2 =
+    UnitStringDef[JanskyPerArcsec2]("Jy/arcsec²", "JY_PER_ARCSEC_SQUARED")
 
   type WattsPerMeter2MicrometerArcsec2 = WattsPerMeter2Micrometer %/ (ArcSecond %^ 2)
-  implicit val strWattsPerMeter2MicrometerArcsec2: UnitString[WattsPerMeter2MicrometerArcsec2] =
-    UnitString[WattsPerMeter2MicrometerArcsec2]("W/m²/µm/arcsec²")
+  implicit val strWattsPerMeter2MicrometerArcsec2 =
+    UnitStringDef[WattsPerMeter2MicrometerArcsec2](
+      "W/m²/µm/arcsec²",
+      "W_PER_M_SQUARED_PER_UM_PER_ARCSEC_SQUARED"
+    )
 
   type ErgsPerSecondCentimeter2AngstromArcsec2 =
     ErgsPerSecondCentimeter2Angstrom %/ (ArcSecond %^ 2)
-  implicit val strErgsPerSecondCentimeter2AngstromArcsec2
-    : UnitString[ErgsPerSecondCentimeter2AngstromArcsec2] =
-    UnitString[ErgsPerSecondCentimeter2AngstromArcsec2]("erg/s/cm²/Å/arcsec²")
+  implicit val strErgsPerSecondCentimeter2AngstromArcsec2 =
+    UnitStringDef[ErgsPerSecondCentimeter2AngstromArcsec2](
+      "erg/s/cm²/Å/arcsec²",
+      "ERG_PER_S_PER_CM_SQUARED_PER_A_PER_ARCSEC_SQUARED"
+    )
 
   type ErgsPerSecondCentimeter2HertzArcsec2 = ErgsPerSecondCentimeter2Hertz %/ (ArcSecond %^ 2)
-  implicit val strErgsPerSecondCentimeter2HertzArcsec2
-    : UnitString[ErgsPerSecondCentimeter2HertzArcsec2] =
-    UnitString[ErgsPerSecondCentimeter2HertzArcsec2]("erg/s/cm²/Hz/arcsec²")
+  implicit val strErgsPerSecondCentimeter2HertzArcsec2 =
+    UnitStringDef[ErgsPerSecondCentimeter2HertzArcsec2](
+      "erg/s/cm²/Hz/arcsec²",
+      "ERG_PER_S_PER_CM_SQUARED_PER_HZ_PER_ARCSEC_SQUARED"
+    )
 
   // Integrated Line Flux units
   type WattsPerMeter2 = Watt %/ (Meter %^ 2)
-  implicit val strWattsPerMeter2: UnitString[WattsPerMeter2] =
-    UnitString[WattsPerMeter2]("W/m²")
+  implicit val strWattsPerMeter2 =
+    UnitStringDef[WattsPerMeter2]("W/m²", "W_PER_M_SQUARED")
 
   type ErgsPerSecondCentimeter2 = Erg %/ (Second %* (Centimeter %^ 2))
-  implicit val strErgsPerSecondCentimeter2: UnitString[ErgsPerSecondCentimeter2] =
-    UnitString[ErgsPerSecondCentimeter2]("erg/s/cm²")
+  implicit val strErgsPerSecondCentimeter2 =
+    UnitStringDef[ErgsPerSecondCentimeter2]("erg/s/cm²", "ERG_PER_S_PER_CM_SQUARED")
 
   // Surface Line Flux units
   type WattsPerMeter2Arcsec2 = WattsPerMeter2 %/ (ArcSecond %^ 2)
-  implicit val strWattsPerMeter2Arcsec2: UnitString[WattsPerMeter2Arcsec2] =
-    UnitString[WattsPerMeter2Arcsec2]("W/m²/arcsec²")
+  implicit val strWattsPerMeter2Arcsec2 =
+    UnitStringDef[WattsPerMeter2Arcsec2]("W/m²/arcsec²", "W_PER_M_SQUARED_PER_ARCSEC_SQUARED")
 
   type ErgsPerSecondCentimeter2Arcsec2 = ErgsPerSecondCentimeter2 %/ (ArcSecond %^ 2)
-  implicit val strErgsPerSecondCentimeter2Arcsec2: UnitString[ErgsPerSecondCentimeter2Arcsec2] =
-    UnitString[ErgsPerSecondCentimeter2Arcsec2]("erg/s/cm²/arcsec²")
+  implicit val strErgsPerSecondCentimeter2Arcsec2 =
+    UnitStringDef[ErgsPerSecondCentimeter2Arcsec2](
+      "erg/s/cm²/arcsec²",
+      "ERG_PER_S_PER_CM_SQUARED_PER_ARCSEC_SQUARED"
+    )
 
   // PosInt can be converted to Rational exactly
   implicit def rationalPosIntConverter[U1, U2](implicit

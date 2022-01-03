@@ -61,31 +61,31 @@ final class BandBrightnessSuite extends DisciplineSuite {
   )
 
   // Convenience constructors
-  val b3 = BandBrightness[Surface, ABMagnitudePerArcsec2](BrightnessValue.fromDouble(10.0), Band.R)
+  val b3 = BandBrightness[ABMagnitudePerArcsec2](BrightnessValue.fromDouble(10.0), Band.R)
   checkValues[Surface, ABMagnitudePerArcsec2](
     "Type-parametrized units without error"
   )(b3)(10000, Band.R, None)
 
-  val b4 = BandBrightness[Surface, ABMagnitudePerArcsec2](
+  val b4 = BandBrightness[ABMagnitude](
     BrightnessValue.fromDouble(10.0),
     Band.R,
     BrightnessValue.fromDouble(2.0)
   )
-  checkValues[Surface, ABMagnitudePerArcsec2]("Type-parametrized units with error")(b4)(
+  checkValues[Integrated, ABMagnitude]("Type-parametrized units with error")(b4)(
     10000,
     Band.R,
     2000.some
   )
 
   // Default units
-  val b5 = BandBrightness[Integrated](BrightnessValue.fromDouble(10.0), Band.R)
+  val b5 = BandBrightness.withDefaultUnits[Integrated](BrightnessValue.fromDouble(10.0), Band.R)
   checkValues[Integrated, VegaMagnitude]("Default band units without error")(b5)(
     10000,
     Band.R,
     None
   )
 
-  val b6 = BandBrightness[Surface](
+  val b6 = BandBrightness.withDefaultUnits[Surface](
     BrightnessValue.fromDouble(10.0),
     Band.SloanR,
     BrightnessValue.fromDouble(2.0)

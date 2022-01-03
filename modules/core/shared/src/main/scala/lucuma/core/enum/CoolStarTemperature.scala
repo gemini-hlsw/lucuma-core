@@ -4,8 +4,8 @@
 package lucuma.core.enum
 
 import coulomb._
-import coulomb.si.Kelvin
 import coulomb.refined._
+import coulomb.si.Kelvin
 import eu.timepit.refined.numeric.Positive
 import eu.timepit.refined.types.numeric.PosBigDecimal
 import lucuma.core.util.Display

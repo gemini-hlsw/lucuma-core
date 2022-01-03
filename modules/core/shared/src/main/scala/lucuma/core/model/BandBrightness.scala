@@ -79,26 +79,26 @@ object BandBrightness {
     new BandBrightness(quantity, band, error.some)
 
   /** Secondary constructor using type units. */
-  def apply[T, U](value: BrightnessValue, band: Band, error: Option[BrightnessValue])(implicit
-    tagged:              TaggedUnit[U, Brightness[T]]
-  ): BandBrightness[T] =
-    new BandBrightness(tagged.unit.withValueTagged(value), band, error)
+  def apply[U]: UnitsApplied[U] = new UnitsApplied[U]
 
-  /** Secondary constructor using type units and no error. */
-  def apply[T, U](value: BrightnessValue, band: Band)(implicit
-    tagged:              TaggedUnit[U, Brightness[T]]
-  ): BandBrightness[T] =
-    apply[T, U](value, band, none)
+  protected class UnitsApplied[U] {
+    def apply[T](value: BrightnessValue, band: Band, error: Option[BrightnessValue])(implicit
+      tagged:           TaggedUnit[U, Brightness[T]]
+    ): BandBrightness[T] =
+      new BandBrightness(tagged.unit.withValueTagged(value), band, error)
 
-  /** Secondary constructor with error and using type units. */
-  def apply[T, U](value: BrightnessValue, band: Band, error: BrightnessValue)(implicit
-    tagged:              TaggedUnit[U, Brightness[T]]
-  ): BandBrightness[T] =
-    apply[T, U](value, band, error.some)
+    def apply[T](value: BrightnessValue, band: Band)(implicit
+      tagged:           TaggedUnit[U, Brightness[T]]
+    ): BandBrightness[T] = apply(value, band, none)
+
+    def apply[T](value: BrightnessValue, band: Band, error: BrightnessValue)(implicit
+      tagged:           TaggedUnit[U, Brightness[T]]
+    ): BandBrightness[T] = apply(value, band, error.some)
+  }
 
   /** Secondary constructor using default units for the band. */
-  def apply[T] = new GroupApplied[T]
-  protected class GroupApplied[T] {
+  def withDefaultUnits[T] = new BrightnessTypeApplied[T]
+  protected class BrightnessTypeApplied[T] {
 
     /** Secondary constructor using default units for the band. */
     def apply(
