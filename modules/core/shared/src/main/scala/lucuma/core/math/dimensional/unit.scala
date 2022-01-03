@@ -45,7 +45,7 @@ trait Units { self =>
   def withValue[N](value: N): Measure[N] = Measure[N](value, self)
 
   override def equals(obj: Any): Boolean = obj match {
-    case that: Units => name == that.name && abbv == that.abbv
+    case that: Units => name == that.name && abbv == that.abbv && serialized == that.serialized
     case _           => false
   }
 

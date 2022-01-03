@@ -34,7 +34,7 @@ object DerivedUnitDef {
     coef:        Rational = Rational(1),
     name:        String = "",
     abbv:        String = "",
-    serialized:  String
+    serialized:  String = ""
   )(implicit ut: UnitTypeName[U]): DerivedUnit[U, D] with TypeString[U] = {
     val base = DerivedUnit[U, D](coef, name, abbv)
 
