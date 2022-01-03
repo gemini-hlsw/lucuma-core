@@ -5,10 +5,11 @@ package lucuma.core.math
 
 import cats.Order
 import cats.Show
-import lucuma.core.optics.Format
+import lucuma.core.optics.{Format, SplitEpi}
 import spire.math.Rational
 
 import java.math.RoundingMode
+
 import scala.math.rint
 import scala.util.Try
 
@@ -51,22 +52,21 @@ object BrightnessValue {
     new BrightnessValue(rint(mg * 1000).toInt)
 
   /**
-   * Format with BigDecimal
+   * SplitEpi with BigDecimal
    * @group Optics
    */
-  val fromBigDecimal: Format[BigDecimal, BrightnessValue] =
-    Format[Int, BrightnessValue](v => Some(new BrightnessValue(v)), _.scaledValue)
-      .imapA[BigDecimal](
-        n => new java.math.BigDecimal(n).movePointLeft(3),
-        d => d.underlying.movePointRight(3).setScale(0, RoundingMode.HALF_UP).intValue
-      )
+  val fromBigDecimal: SplitEpi[BigDecimal, BrightnessValue] =
+    SplitEpi[BigDecimal, BrightnessValue](
+      d => new BrightnessValue(d.underlying.movePointRight(3).setScale(0, RoundingMode.HALF_UP).intValue),
+      b => new java.math.BigDecimal(b.scaledValue).movePointLeft(3)
+    )
 
   /**
    * @group Optics
    */
   val fromString: Format[String, BrightnessValue] =
     Format[String, BigDecimal](s => Try(BigDecimal(s)).toOption, _.toString)
-      .andThen(fromBigDecimal)
+      .andThen(fromBigDecimal.asFormat)
 
   /** @group Typeclass Instances */
   implicit val BrightnessValueShow: Show[BrightnessValue] =

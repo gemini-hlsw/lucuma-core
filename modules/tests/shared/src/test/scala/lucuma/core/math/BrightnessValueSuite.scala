@@ -8,7 +8,7 @@ import cats.Order
 import cats.Show
 import cats.kernel.laws.discipline._
 import lucuma.core.math.arb._
-import lucuma.core.optics.laws.discipline.FormatTests
+import lucuma.core.optics.laws.discipline.{FormatTests, SplitEpiTests}
 import munit.DisciplineSuite
 import org.scalacheck.Prop.forAll
 
@@ -17,7 +17,7 @@ final class BrightnessValueSuite extends DisciplineSuite {
 
   // Laws
   checkAll("BrightnessValue", OrderTests[BrightnessValue].order)
-  checkAll("fromBigDecimal", FormatTests(BrightnessValue.fromBigDecimal).format)
+  checkAll("fromBigDecimal", SplitEpiTests(BrightnessValue.fromBigDecimal).splitEpi)
   checkAll("fromString", FormatTests(BrightnessValue.fromString).formatWith(stringsBrightnessValue))
 
   test("Equality must be natural") {
@@ -48,8 +48,8 @@ final class BrightnessValueSuite extends DisciplineSuite {
   }
 
   test("BrightnessValue rounding") {
-    assertEquals(BrightnessValue.fromBigDecimal.unsafeGet(BigDecimal("1.0004")).scaledValue, 1000)
-    assertEquals(BrightnessValue.fromBigDecimal.unsafeGet(BigDecimal("1.0005")).scaledValue, 1001)
+    assertEquals(BrightnessValue.fromBigDecimal.get(BigDecimal("1.0004")).scaledValue, 1000)
+    assertEquals(BrightnessValue.fromBigDecimal.get(BigDecimal("1.0005")).scaledValue, 1001)
   }
 
 }
