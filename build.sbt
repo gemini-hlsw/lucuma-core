@@ -1,5 +1,7 @@
 import sbtcrossproject.CrossType
 
+Global / concurrentRestrictions += Tags.limit(Tags.Compile, 1)
+
 lazy val attoVersion           = "0.9.5"
 lazy val catsVersion           = "2.7.0"
 lazy val kindProjectorVersion  = "0.13.2"
