@@ -79,8 +79,12 @@ object Measure {
   }
 
   implicit class MeasureOps[N](val measure: Measure[N]) extends AnyVal {
+
+    /** Add an error value. */
     def withError(error: N): Measure[N] = Measure.error.replace(error.some)(measure)
-    def exact: Measure[N]               = Measure.error.replace(none)(measure)
+
+    /** Remove error value. */
+    def exact: Measure[N] = Measure.error.replace(none)(measure)
   }
 
 }

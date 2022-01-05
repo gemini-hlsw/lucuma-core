@@ -49,8 +49,8 @@ sealed abstract class Band(
   type DefaultIntegratedUnits
   type DefaultSurfaceUnits
 
-  // These implicits here allow resolving the default units at the type level, where the brightness
-  // type is a type parameter (used in Brightness constructors);  and also in runtime (used eg when parsing)
+  // These implicits here allow resolving the default units at the type level, allowing use of
+  // `brightnessMeasure[T]`; and also in runtime (used eg when parsing).
   // by using `import band._`.
   implicit def defaultIntegrated: Band.DefaultUnit[self.type, Integrated]
   implicit def defaultSurface: Band.DefaultUnit[self.type, Surface]
