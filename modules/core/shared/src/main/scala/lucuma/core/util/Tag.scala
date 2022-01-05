@@ -7,7 +7,7 @@ import shapeless.tag
 import shapeless.tag.@@
 
 /**
- * Type class placing a tag `U` on type `T`. Helps produce tagged instances of `T`.
+ * Typeclass placing a tag `U` on type `T`. Helps produce tagged instances of `T`.
  */
 trait Tag[T, U] {
   def apply(t: T): T @@ U = tag[U](t)

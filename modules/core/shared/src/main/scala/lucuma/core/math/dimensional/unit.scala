@@ -97,7 +97,7 @@ object UnitOfMeasure {
 }
 
 /**
- * Type class placing a `Tag` on a unit of measure.
+ * Typeclass placing a `Tag` on a unit of measure.
  */
 class TaggedUnit[U, T](implicit ev: UnitOfMeasure[U]) extends Tag[UnitOfMeasure[U], T] {
   def unit: UnitOfMeasure[U] Of T = {

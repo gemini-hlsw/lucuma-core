@@ -14,7 +14,7 @@ final class BrightnessUnitsSuite extends DisciplineSuite {
   import ArbEnumerated._
   import BrightnessUnits._
 
-  // Type classes
+  // Typeclasses
   checkAll(
     "Units Of Brightness[Integrated]",
     EnumeratedTests[Units Of Brightness[Integrated]].enumerated

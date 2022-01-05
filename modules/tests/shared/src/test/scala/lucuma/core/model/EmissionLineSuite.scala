@@ -53,7 +53,7 @@ final class EmissionLineSuite extends DisciplineSuite {
     assertEquals(e1Surface.to[Integrated].to[Surface], e1Surface)
   }
 
-  // Type classes
+  // Typeclasses
   checkAll("Eq[EmissionLine[Integrated]]", EqTests[EmissionLine[Integrated]].eqv)
   checkAll("Eq[EmissionLine[Surface]]", EqTests[EmissionLine[Surface]].eqv)
 

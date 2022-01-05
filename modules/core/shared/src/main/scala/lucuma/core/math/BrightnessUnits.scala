@@ -174,7 +174,7 @@ object BrightnessUnits {
     enumTaggedUnit[FluxDensityContinuum[Surface]](FluxDensityContinuum.Surface.all)
 
   /**
-   * Type class providing a conversion between a `UnitType` tagged with `T` to a corresponding
+   * Typeclass providing a conversion between a `UnitType` tagged with `T` to a corresponding
    * `UnitType` tagged with `T0`.
    *
    * This is used to convert between `Integrated` <-> `Surface` units.
