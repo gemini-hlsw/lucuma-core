@@ -25,9 +25,6 @@ final case class Measure[N](value: N, units: Units, error: Option[N] = none) { s
    */
   def valueQuantity: Option[Quantity[N, units.Type]] = error.map(_.withUnit[units.Type])
 
-  // def withError(error: N): self.type = copy(error = error.some).asInstanceOf[self.type]
-  // def exact: self.type               = copy(error = none).asInstanceOf[self.type]
-
   override def toString: String = {
     val errStr = error.map(e => f"± $e ").orEmpty
     f"Measure($value $errStr${units.abbv})"
