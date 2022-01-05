@@ -24,32 +24,33 @@ final class ShapeExpressionSuite extends munit.DisciplineSuite {
   import ShapeExpressionSpec._
 
   test("intersection contains") {
-    forAll(genTwoCenteredShapesAndAnOffset) {
-      case (tcs, off) =>
-        assertEquals((tcs.shape0 ∩ tcs.shape1).contains(off),
-          tcs.shape0.contains(off) && tcs.shape1.contains(off))
+    forAll(genTwoCenteredShapesAndAnOffset) { case (tcs, off) =>
+      assertEquals(
+        (tcs.shape0 ∩ tcs.shape1).contains(off),
+        tcs.shape0.contains(off) && tcs.shape1.contains(off)
+      )
     }
   }
 
   test("union contains") {
-    forAll(genTwoCenteredShapesAndAnOffset) {
-      case (tcs, off) =>
-        assertEquals((tcs.shape0 ∪ tcs.shape1).contains(off),
-          tcs.shape0.contains(off) || tcs.shape1.contains(off)
-        )
+    forAll(genTwoCenteredShapesAndAnOffset) { case (tcs, off) =>
+      assertEquals(
+        (tcs.shape0 ∪ tcs.shape1).contains(off),
+        tcs.shape0.contains(off) || tcs.shape1.contains(off)
+      )
     }
   }
 
   test("difference contains") {
-    forAll(genTwoCenteredShapesAndAnOffset) {
-      case (tcs, off) =>
-        assertEquals((tcs.shape0 - tcs.shape1).contains(off),
-          tcs.shape0.contains(off) && !tcs.shape1.contains(off)
-        )
+    forAll(genTwoCenteredShapesAndAnOffset) { case (tcs, off) =>
+      assertEquals(
+        (tcs.shape0 - tcs.shape1).contains(off),
+        tcs.shape0.contains(off) && !tcs.shape1.contains(off)
+      )
     }
   }
 
-  test("(a ∪ b).area = (a.area + b.area) - (a ∩ b).area") {
+  test("(a ∪ b).area = (a.area + b.area) - (a ∩ b).area".flaky) {
     forAll(genTwoCenteredShapes) { tcs =>
       val rhs = (tcs.shape0 ∪ tcs.shape1).µasSquared
       val lhs = (tcs.shape0.µasSquared + tcs.shape1.µasSquared) -

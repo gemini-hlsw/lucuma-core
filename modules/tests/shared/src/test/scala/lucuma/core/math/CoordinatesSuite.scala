@@ -19,8 +19,9 @@ final class CoordinatesSuite extends munit.DisciplineSuite {
 
   // Laws
   checkAll("Coordinates", OrderTests[Coordinates].order)
-  checkAll("Coordinates.fromHmsDms",
-           FormatTests(Coordinates.fromHmsDms).formatWith(ArbCoordinates.strings)
+  checkAll(
+    "Coordinates.fromHmsDms",
+    FormatTests(Coordinates.fromHmsDms).formatWith(ArbCoordinates.strings)
   )
   checkAll("Coordinates.rightAscension", LensTests(Coordinates.rightAscension))
   checkAll("Coordinates.declination", LensTests(Coordinates.declination))
@@ -145,7 +146,9 @@ final class CoordinatesSuite extends munit.DisciplineSuite {
     }
   }
 
-  test("interpolate should be consistent with fractional angular separation, to within 20 µas") {
+  test(
+    "interpolate should be consistent with fractional angular separation, to within 20 µas".flaky
+  ) {
     val µas180 = Angle.Angle180.toMicroarcseconds
     val µas360 = µas180 * 2L
 
