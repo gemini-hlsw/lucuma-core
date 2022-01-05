@@ -6,13 +6,14 @@ package core
 package enum
 
 import cats.Order
-import cats.syntax.eq._
+import cats.syntax.all._
 import coulomb._
 import coulomb.refined._
 import eu.timepit.refined.auto._
 import eu.timepit.refined.numeric.Positive
 import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.math.BrightnessUnits._
+import lucuma.core.math.BrightnessValue
 import lucuma.core.math.Wavelength
 import lucuma.core.math.dimensional._
 import lucuma.core.math.units.Nanometer
@@ -49,13 +50,18 @@ sealed abstract class Band(
   type DefaultSurfaceUnits
 
   // These implicits here allow resolving the default units at the type level, where the brightness
-  // type is a type parameter (used in BandBrightness constructors);  and also in runtime (used eg when parsing)
+  // type is a type parameter (used in Brightness constructors);  and also in runtime (used eg when parsing)
   // by using `import band._`.
   implicit def defaultIntegrated: Band.DefaultUnit[self.type, Integrated]
   implicit def defaultSurface: Band.DefaultUnit[self.type, Surface]
 
   def defaultUnit[T](implicit ev: Band.DefaultUnit[self.type, T]): Units Of Brightness[T] =
     ev.units
+
+  def brightnessMeasure[T](value: BrightnessValue, error: Option[BrightnessValue] = none)(implicit
+    ev:                           Band.DefaultUnit[self.type, T]
+  ): BrightnessMeasure[T] =
+    ev.units.withValueTagged(value, error)
 }
 
 sealed abstract class BandWithDefaultUnits[DI, DS](

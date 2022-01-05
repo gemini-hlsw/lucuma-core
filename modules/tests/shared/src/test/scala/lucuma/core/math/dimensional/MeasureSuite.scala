@@ -4,6 +4,7 @@
 package lucuma.core.math.dimensional
 
 import cats.kernel.laws.discipline._
+import cats.syntax.all._
 import lucuma.core.math.BrightnessUnits._
 import lucuma.core.math.dimensional.arb.ArbMeasure
 import lucuma.core.util.arb.ArbEnumerated._
@@ -30,14 +31,19 @@ class MeasureSuite extends munit.DisciplineSuite {
     "Measure[BigDecimal].unitsTagged",
     LensTests(Measure.unitsTagged[BigDecimal, Brightness[Surface]])
   )
+  checkAll("Measure[BigDecimal].error", LensTests(Measure.error[BigDecimal]))
+  checkAll(
+    "Measure[BigDecimal].errorTagged",
+    LensTests(Measure.errorTagged[BigDecimal, Brightness[Surface]])
+  )
 
   // Tag Conversions
   test("Tag conversion Brightness[Surface] -> Brightness[Integrated]") {
     assertEquals(
       WattsPerMeter2Arcsec2IsSurfaceLineFluxUnit.unit
-        .withValueTagged(1)
+        .withValueTagged(5, 1.some)
         .toTag[LineFlux[Integrated]],
-      WattsPerMeter2IsIntegratedLineFluxUnit.unit.withValueTagged(1)
+      WattsPerMeter2IsIntegratedLineFluxUnit.unit.withValueTagged(5, 1.some)
     )
   }
 
@@ -53,10 +59,10 @@ class MeasureSuite extends munit.DisciplineSuite {
   test("Tag conversion roundtrip") {
     assertEquals(
       WattsPerMeter2MicrometerIsIntegratedFluxDensityContinuumUnit.unit
-        .withValueTagged(1)
+        .withValueTagged(5, 1.some)
         .toTag[FluxDensityContinuum[Surface]]
         .toTag[FluxDensityContinuum[Integrated]],
-      WattsPerMeter2MicrometerIsIntegratedFluxDensityContinuumUnit.unit.withValueTagged(1)
+      WattsPerMeter2MicrometerIsIntegratedFluxDensityContinuumUnit.unit.withValueTagged(5, 1.some)
     )
   }
 }

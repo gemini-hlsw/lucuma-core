@@ -11,10 +11,14 @@ import org.scalacheck.Cogen._
 import org.scalacheck._
 
 trait ArbWavelength {
+  val RedWavelength: Wavelength = Wavelength.picometers.get(PosInt(620000))
 
-  implicit val arbWavelength: Arbitrary[Wavelength] = Arbitrary {
-    arbitrary[PosInt].map(Wavelength(_))
-  }
+  implicit val arbWavelength: Arbitrary[Wavelength] = Arbitrary(
+    Gen.frequency(
+      1  -> RedWavelength,
+      20 -> arbitrary[PosInt].map(Wavelength(_))
+    )
+  )
 
   implicit val cogWavelength: Cogen[Wavelength] =
     Cogen[Int].contramap(_.toPicometers.value.value)

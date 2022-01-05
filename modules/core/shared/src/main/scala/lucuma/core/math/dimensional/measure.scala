@@ -4,6 +4,7 @@
 package lucuma.core.math.dimensional
 
 import cats.Eq
+import cats.syntax.option._
 import coulomb._
 import monocle.Focus
 import monocle.Lens
@@ -12,18 +13,32 @@ import shapeless.tag
 /**
  * A magnitude of type `N` and a runtime representation of a physical unit.
  */
-final case class Measure[N](value: N, units: Units) {
+final case class Measure[N](value: N, units: Units, error: Option[N] = none) { self =>
 
   /**
-   * Convert to `coulomb.Quantity`.
+   * Convert to `coulomb.Quantity`. Error is dropped.
    */
-  def toQuantity: Quantity[N, units.Type] = value.withUnit[units.Type]
+  def toExactQuantity: Quantity[N, units.Type] = value.withUnit[units.Type]
+
+  /**
+   * Convert error to `coulomb.Quantity`.
+   */
+  def valueQuantity: Option[Quantity[N, units.Type]] = error.map(_.withUnit[units.Type])
+
+  // def withError(error: N): self.type = copy(error = error.some).asInstanceOf[self.type]
+  // def exact: self.type               = copy(error = none).asInstanceOf[self.type]
+
+  override def toString: String = {
+    val errStr = error.map(e => f"± $e ").orEmpty
+    f"Measure($value $errStr${units.abbv})"
+  }
 }
 
 object Measure {
-  implicit def eqMeasure[N: Eq]: Eq[Measure[N]] = Eq.by(x => (x.value, x.units))
+  implicit def eqMeasure[N: Eq]: Eq[Measure[N]] = Eq.by(x => (x.value, x.units, x.error))
 
-  implicit def eqTaggedMeasure[N: Eq, Tag]: Eq[Measure[N] Of Tag] = Eq.by(x => (x.value, x.units))
+  implicit def eqTaggedMeasure[N: Eq, Tag]: Eq[Measure[N] Of Tag] =
+    Eq.by(x => (x.value, x.units, x.error))
 
   /** @group Optics */
   def value[N]: Lens[Measure[N], N] = Focus[Measure[N]](_.value)
@@ -47,4 +62,25 @@ object Measure {
       val tagged = tag[T](units.replace(v)(q))
       tagged
     }
+
+  /** @group Optics */
+  def error[N]: Lens[Measure[N], Option[N]] = Focus[Measure[N]](_.error)
+
+  /** @group Optics */
+  def errorTagged[N, T]: Lens[Measure[N] Of T, Option[N]] =
+    Lens[Measure[N] Of T, Option[N]](_.error) { v => q =>
+      val tagged = tag[T](error.replace(v)(q))
+      tagged
+    }
+
+  implicit class TaggedMeasureOps[N, T](val measure: Measure[N] Of T) extends AnyVal {
+    def withError(error: N): Measure[N] Of T = Measure.errorTagged.replace(error.some)(measure)
+    def exact: Measure[N] Of T               = Measure.errorTagged.replace(none)(measure)
+  }
+
+  implicit class MeasureOps[N](val measure: Measure[N]) extends AnyVal {
+    def withError(error: N): Measure[N] = Measure.error.replace(error.some)(measure)
+    def exact: Measure[N]               = Measure.error.replace(none)(measure)
+  }
+
 }

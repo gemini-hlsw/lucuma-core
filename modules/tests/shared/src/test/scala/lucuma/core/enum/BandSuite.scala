@@ -3,23 +3,31 @@
 
 package lucuma.core.enum
 
-import munit.DisciplineSuite
 import lucuma.core.math.BrightnessUnits._
+import lucuma.core.math.BrightnessValue
 import lucuma.core.math.dimensional._
 import lucuma.core.math.units._
+import lucuma.core.util.arb.ArbEnumerated
+import lucuma.core.util.laws.EnumeratedTests
+import munit.DisciplineSuite
 import shapeless.tag
 
 final class BandSuite extends DisciplineSuite {
+  import ArbEnumerated._
 
-  test("default units") {
+  test("BrightnessMeasure with default units") {
     assertEquals(
-      Band.SloanR.defaultUnit[Surface],
+      Band.SloanR.brightnessMeasure[Surface](BrightnessValue(10)),
       tag[Brightness[Surface]](UnitOfMeasure[ABMagnitudePerArcsec2])
+        .withValueTagged(BrightnessValue(10))
     )
 
     assertEquals(
-      Band.R.defaultUnit[Integrated],
-      tag[Brightness[Integrated]](UnitOfMeasure[VegaMagnitude])
+      Band.R.brightnessMeasure[Integrated](BrightnessValue(20)),
+      tag[Brightness[Integrated]](UnitOfMeasure[VegaMagnitude]).withValueTagged(BrightnessValue(20))
     )
   }
+
+  // Typeclasses
+  checkAll(s"Enumerated[Band]", EnumeratedTests[Band].enumerated)
 }

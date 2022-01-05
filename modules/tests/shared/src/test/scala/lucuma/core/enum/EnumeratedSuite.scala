@@ -3,9 +3,9 @@
 
 package lucuma.core.enum
 
-import cats.kernel.laws.discipline.OrderTests
 import lucuma.core.util.Enumerated
 import lucuma.core.util.arb.ArbEnumerated._
+import lucuma.core.util.laws.EnumeratedTests
 import monocle.law.discipline.PrismTests
 import munit._
 
@@ -15,7 +15,7 @@ final class EnumeratedSuite extends DisciplineSuite {
 
   def checkEnumLaws[A: Enumerated](implicit ct: ClassTag[A]) = {
     val className = ct.runtimeClass.getSimpleName
-    checkAll(s"Order[$className]", OrderTests[A].order)
+    checkAll(s"Enumerated[$className]", EnumeratedTests[A].enumerated)
     checkAll(s"Prism[String, $className]", PrismTests(Enumerated.fromTag[A]))
   }
 

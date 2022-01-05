@@ -18,6 +18,8 @@ object BrightnessUnits {
   trait LineFlux[+T]
   trait FluxDensityContinuum[+T]
 
+  type BrightnessMeasure[T] = Measure[BrightnessValue] Of Brightness[T]
+
   // Brightness Integrated
   implicit object VegaMagnitudeIsIntegratedBrightnessUnit
       extends TaggedUnit[VegaMagnitude, Brightness[Integrated]]
@@ -227,20 +229,20 @@ object BrightnessUnits {
         FluxDensityContinuum.Surface.all.zip(FluxDensityContinuum.Integrated.all).toNem.toSortedMap
       )
 
-  implicit class BrightnessUnitOps[T](val units: Units Of T) extends AnyVal {
+  implicit class TaggedUnitOps[T](val units: Units Of T) extends AnyVal {
 
     /** Convert `T`-tagged `UnitType` to a `T0`-tagged one. */
     def toTag[T0](implicit conv: TagConverter[T, T0]): Units Of T0 =
       conv.convert(units)
   }
 
-  implicit class BrightnessMeasureOps[N, T](val measure: Measure[N] Of T) extends AnyVal {
+  implicit class TaggedMeasureOps[N, T](val measure: Measure[N] Of T) extends AnyVal {
 
     /** Convert `T`-tagged `Measure` to a `T0`-tagged one. */
     def toTag[T0](implicit conv: TagConverter[T, T0]): Measure[N] Of T0 =
       conv
         .convert(Measure.unitsTagged.get(measure))
-        .withValueTagged(Measure.valueTagged.get(measure))
+        .withValueTagged(Measure.valueTagged.get(measure), Measure.errorTagged.get(measure))
   }
 
 }

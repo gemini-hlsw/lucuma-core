@@ -5,10 +5,10 @@ package lucuma.core.math
 
 import lucuma.core.math.BrightnessUnits
 import lucuma.core.math.dimensional._
+import lucuma.core.util.Enumerated
 import lucuma.core.util.arb.ArbEnumerated
 import lucuma.core.util.laws.EnumeratedTests
 import munit.DisciplineSuite
-import lucuma.core.util.Enumerated
 
 final class BrightnessUnitsSuite extends DisciplineSuite {
   import ArbEnumerated._

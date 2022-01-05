@@ -8,7 +8,8 @@ import cats.Order
 import cats.Show
 import cats.kernel.laws.discipline._
 import lucuma.core.math.arb._
-import lucuma.core.optics.laws.discipline.{FormatTests, SplitEpiTests}
+import lucuma.core.optics.laws.discipline.FormatTests
+import lucuma.core.optics.laws.discipline.SplitEpiTests
 import munit.DisciplineSuite
 import org.scalacheck.Prop.forAll
 

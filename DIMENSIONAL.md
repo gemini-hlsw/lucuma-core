@@ -12,6 +12,8 @@
 - In `coulomb`, a `Quantity[N, U]` is a wrapper over a `value: N` and the units (`U`) information is lost at runtime:
 
 ```scala
+scala> import coulomb._, coulomb.si._, lucuma.core.math.dimensional._
+
 scala> val velocity = 10.withUnit[Meter %/ Second]
 val velocity: coulomb.Quantity[Int,coulomb.si.Meter %/ coulomb.si.Second] = Quantity(10)
 ```
@@ -20,7 +22,17 @@ val velocity: coulomb.Quantity[Int,coulomb.si.Meter %/ coulomb.si.Second] = Quan
 
 ```scala
 scala> val velocityM = velocity.toMeasure
-val velocityM: lucuma.core.math.dimensional.Measure[Int] = Measure(10,m/s)
+val velocityM: lucuma.core.math.dimensional.Measure[Int] = Measure(10 m/s)
+```
+
+- A `Measure` can optionally have an error interval:
+
+```scala
+scala> val velocityME = velocityM.withError(1)
+val velocityME: lucuma.core.math.dimensional.Measure[Int] = Measure(10 ± 1 m/s)
+
+scala> val velocityM2 = velocityME.exact
+val velocityM2: lucuma.core.math.dimensional.Measure[Int] = Measure(10 m/s)
 ```
 
 ### `Units` and `UnitOfMeasure[U]`
@@ -39,7 +51,7 @@ val units: lucuma.core.math.dimensional.Units = m/s
 
 ```scala
 scala> val measure = units.withValue(10)
-val measure: lucuma.core.math.dimensional.Measure[Int] = Measure(10,m/s)
+val measure: lucuma.core.math.dimensional.Measure[Int] = Measure(10 m/s)
 ```
 
 ## Tagged measures and units
@@ -47,12 +59,12 @@ val measure: lucuma.core.math.dimensional.Measure[Int] = Measure(10,m/s)
 - Sometimes we want to group units together. We can do this by assigning them a type tag via implicit `TaggedUnit[U, T]` instances:
 
 ```scala
-scala> trait Velocity
+scala> trait Velocity // This could be a phantom type
 
 scala> implicit val MPerS_Velocity = new TaggedUnit[Meter %/ Second, Velocity]
 
 scala> val velocityMTagged: Measure[Int] Of Velocity = velocity.toMeasureTagged
-val velocityMTagged: lucuma.core.math.dimensional.Of[lucuma.core.math.dimensional.Measure[Int],Velocity] = Measure(10,m/s)
+val velocityMTagged: lucuma.core.math.dimensional.Of[lucuma.core.math.dimensional.Measure[Int],Velocity] = Measure(10 m/s)
 ```
 
 This is usually not necessary. `coulomb` allows us to define conversions between units, and we don't need to explicitly define abstract quantities (like velocity). However, in some cases like brightness, we may want to group together units that are not readily convertible among them without further information.
@@ -68,9 +80,9 @@ val unitsTagged: lucuma.core.math.dimensional.Of[lucuma.core.math.dimensional.Un
 
 ```scala
 scala> val velocityMTagged2: Measure[Int] Of Velocity = unitsTagged.withValueTagged(20)
-val velocityMTagged2: lucuma.core.math.dimensional.Of[lucuma.core.math.dimensional.Measure[Int],Velocity] = Measure(20,m/s)
+val velocityMTagged2: lucuma.core.math.dimensional.Of[lucuma.core.math.dimensional.Measure[Int],Velocity] = Measure(20 m/s)
 ```
 
 ### Final note
 
-- `coulomb` supports numeric operations between `Quantity` instances (eg: order, addition, negation, etc.) by relying on a set of typeclasses (`UnitOrd`, `UnitAdd`, etc.). `Measure` does not support this for the moment, but it could probably be implemented if needed, reusing `coulomb`'s typeclasses.
+- `coulomb` supports numeric operations between `Quantity` instances (eg: order, addition, negation, etc.) by relying on a set of typeclasses (`UnitOrd`, `UnitAdd`, etc.). `Measure` does not support this for the moment, but it could probably be implemented if needed, reusing `coulomb`'s typeclasses. Note that we would also have to deal with `error`.

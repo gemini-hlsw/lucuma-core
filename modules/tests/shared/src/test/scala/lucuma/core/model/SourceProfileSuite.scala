@@ -5,27 +5,30 @@ package lucuma.core.model
 
 import cats.Order._
 import cats.kernel.laws.discipline._
+import coulomb._
 import eu.timepit.refined.cats._
 import lucuma.core.enum.Band
+import lucuma.core.enum.StellarLibrarySpectrum
+import lucuma.core.math.Angle
+import lucuma.core.math.BrightnessUnits._
+import lucuma.core.math.BrightnessValue
 import lucuma.core.math.Wavelength
-import lucuma.core.math.arb.ArbRefined
-import lucuma.core.math.dimensional.arb.ArbMeasure
-import lucuma.core.model.arb._
-import lucuma.core.util.arb.ArbEnumerated
 import lucuma.core.math.arb.ArbAngle
+import lucuma.core.math.arb.ArbBrightnessValue
+import lucuma.core.math.arb.ArbRefined
+import lucuma.core.math.arb.ArbWavelength
+import lucuma.core.math.dimensional.arb.ArbMeasure
+import lucuma.core.math.units._
+import lucuma.core.model.arb._
+import lucuma.core.util.arb.ArbCollection
+import lucuma.core.util.arb.ArbEnumerated
 import monocle.law.discipline._
 import munit._
-import coulomb._
-import lucuma.core.math.units._
+
 import scala.collection.immutable.SortedMap
-import lucuma.core.enum.StellarLibrarySpectrum
-import lucuma.core.math.BrightnessValue
-import lucuma.core.math.BrightnessUnits._
-import lucuma.core.math.Angle
 
 final class SourceProfileSuite extends DisciplineSuite {
   import ArbAngle._
-  import ArbBandBrightness._
   import ArbEmissionLine._
   import ArbEnumerated._
   import ArbMeasure._
@@ -33,57 +36,46 @@ final class SourceProfileSuite extends DisciplineSuite {
   import ArbSourceProfile._
   import ArbSpectralDefinition._
   import ArbUnnormalizedSED._
+  import ArbBrightnessValue._
+  import ArbWavelength._
+  import ArbCollection._
 
   // Conversions
-  val sd1Integrated: SpectralDefinition[Integrated] = {
-    val b: BandBrightness[Integrated] =
-      BandBrightness.withDefaultUnits[Integrated](BrightnessValue.fromDouble(10.0), Band.R)
-
+  val sd1Integrated: SpectralDefinition[Integrated] =
     SpectralDefinition.BandNormalized(
       UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.A0I),
-      SortedMap(b.band -> b)
+      SortedMap(Band.R -> Band.R.brightnessMeasure[Integrated](BrightnessValue.fromDouble(10.0)))
     )
-  }
 
-  val sd1Surface: SpectralDefinition[Surface] = {
-    val b: BandBrightness[Surface] =
-      BandBrightness.withDefaultUnits[Surface](BrightnessValue.fromDouble(10.0), Band.R)
-
+  val sd1Surface: SpectralDefinition[Surface] =
     SpectralDefinition.BandNormalized(
       UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.A0I),
-      SortedMap(b.band -> b)
+      SortedMap(Band.R -> Band.R.brightnessMeasure[Surface](BrightnessValue.fromDouble(10.0)))
     )
-  }
 
-  val sd2Integrated: SpectralDefinition[Integrated] = {
-    val line: EmissionLine[Integrated] =
-      EmissionLine(
-        Wavelength.Min,
-        PosBigDecimalOne.withUnit[KilometersPerSecond],
-        WattsPerMeter2IsIntegratedLineFluxUnit.unit.withValueTagged(PosBigDecimalOne)
-      )
-
+  val sd2Integrated: SpectralDefinition[Integrated] =
     SpectralDefinition.EmissionLines(
-      SortedMap(line.wavelength -> line),
+      SortedMap(
+        Wavelength.Min -> EmissionLine(
+          PosBigDecimalOne.withUnit[KilometersPerSecond],
+          WattsPerMeter2IsIntegratedLineFluxUnit.unit.withValueTagged(PosBigDecimalOne)
+        )
+      ),
       WattsPerMeter2MicrometerIsIntegratedFluxDensityContinuumUnit.unit
         .withValueTagged(PosBigDecimalOne)
     )
-  }
 
-  val sd2Surface: SpectralDefinition[Surface] = {
-    val line: EmissionLine[Surface] =
-      EmissionLine(
-        Wavelength.Min,
-        PosBigDecimalOne.withUnit[KilometersPerSecond],
-        WattsPerMeter2Arcsec2IsSurfaceLineFluxUnit.unit.withValueTagged(PosBigDecimalOne)
-      )
-
+  val sd2Surface: SpectralDefinition[Surface] =
     SpectralDefinition.EmissionLines(
-      SortedMap(line.wavelength -> line),
+      SortedMap(
+        Wavelength.Min -> EmissionLine(
+          PosBigDecimalOne.withUnit[KilometersPerSecond],
+          WattsPerMeter2Arcsec2IsSurfaceLineFluxUnit.unit.withValueTagged(PosBigDecimalOne)
+        )
+      ),
       WattsPerMeter2MicrometerArcsec2IsSurfaceFluxDensityContinuumUnit.unit
         .withValueTagged(PosBigDecimalOne)
     )
-  }
 
   val point1    = SourceProfile.Point(sd1Integrated)
   val point2    = SourceProfile.Point(sd2Integrated)
@@ -172,28 +164,28 @@ final class SourceProfileSuite extends DisciplineSuite {
     OptionalTests(SourceProfile.unnormalizedSED)
   )
   checkAll(
-    "SourceProfile.integratedBandBrightnesses",
-    OptionalTests(SourceProfile.integratedBandBrightnesses)
+    "SourceProfile.integratedBrightnesses",
+    OptionalTests(SourceProfile.integratedBrightnesses)
   )
   checkAll(
-    "SourceProfile.surfaceBandBrightnesses",
-    OptionalTests(SourceProfile.surfaceBandBrightnesses)
+    "SourceProfile.surfaceBrightnesses",
+    OptionalTests(SourceProfile.surfaceBrightnesses)
   )
   checkAll(
-    "SourceProfile.integratedBandBrightnessesT",
-    TraversalTests(SourceProfile.integratedBandBrightnessesT)
+    "SourceProfile.integratedBrightnessesT",
+    TraversalTests(SourceProfile.integratedBrightnessesT)
   )
   checkAll(
-    "SourceProfile.surfaceBandBrightnessesT",
-    TraversalTests(SourceProfile.surfaceBandBrightnessesT)
+    "SourceProfile.surfaceBrightnessesT",
+    TraversalTests(SourceProfile.surfaceBrightnessesT)
   )
   checkAll(
-    "SourceProfile.integratedBandBrightnessIn",
-    TraversalTests(SourceProfile.integratedBandBrightnessIn(Band.B))
+    "SourceProfile.integratedBrightnessIn",
+    TraversalTests(SourceProfile.integratedBrightnessIn(Band.B))
   )
   checkAll(
-    "SourceProfile.surfaceBandBrightnessIn",
-    TraversalTests(SourceProfile.surfaceBandBrightnessIn(Band.B))
+    "SourceProfile.surfaceBrightnessIn",
+    TraversalTests(SourceProfile.surfaceBrightnessIn(Band.B))
   )
   checkAll(
     "SourceProfile.integratedWavelengthLines",
