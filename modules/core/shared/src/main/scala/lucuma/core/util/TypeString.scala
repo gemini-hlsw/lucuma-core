@@ -4,7 +4,7 @@
 package lucuma.core.util
 
 /**
- * Type class defining a custom serialized representation of type `T`.
+ * Typeclass defining a custom serialized representation of type `T`.
  */
 trait TypeString[T] {
   def serialized: String
