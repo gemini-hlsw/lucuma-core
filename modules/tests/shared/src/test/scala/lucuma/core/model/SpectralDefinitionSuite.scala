@@ -41,13 +41,17 @@ final class SpectralDefinitionSuite extends DisciplineSuite {
   val sd1Integrated: SpectralDefinition[Integrated] =
     SpectralDefinition.BandNormalized(
       UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.A0I),
-      SortedMap(Band.R -> Band.R.brightnessMeasure[Integrated](BrightnessValue.fromDouble(10.0)))
+      SortedMap(
+        Band.R -> Band.R.defaultUnits[Integrated].withValueTagged(BrightnessValue.fromDouble(10.0))
+      )
     )
 
   val sd1Surface: SpectralDefinition[Surface] =
     SpectralDefinition.BandNormalized(
       UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.A0I),
-      SortedMap(Band.R -> Band.R.brightnessMeasure[Surface](BrightnessValue.fromDouble(10.0)))
+      SortedMap(
+        Band.R -> Band.R.defaultUnits[Surface].withValueTagged(BrightnessValue.fromDouble(10.0))
+      )
     )
 
   val sd2Integrated: SpectralDefinition[Integrated] =

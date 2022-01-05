@@ -4,7 +4,6 @@
 package lucuma.core.enum
 
 import lucuma.core.math.BrightnessUnits._
-import lucuma.core.math.BrightnessValue
 import lucuma.core.math.dimensional._
 import lucuma.core.math.units._
 import lucuma.core.util.arb.ArbEnumerated
@@ -15,16 +14,15 @@ import shapeless.tag
 final class BandSuite extends DisciplineSuite {
   import ArbEnumerated._
 
-  test("BrightnessMeasure with default units") {
+  test("default units") {
     assertEquals(
-      Band.SloanR.brightnessMeasure[Surface](BrightnessValue(10)),
+      Band.SloanR.defaultUnits[Surface],
       tag[Brightness[Surface]](UnitOfMeasure[ABMagnitudePerArcsec2])
-        .withValueTagged(BrightnessValue(10))
     )
 
     assertEquals(
-      Band.R.brightnessMeasure[Integrated](BrightnessValue(20)),
-      tag[Brightness[Integrated]](UnitOfMeasure[VegaMagnitude]).withValueTagged(BrightnessValue(20))
+      Band.R.defaultUnits[Integrated],
+      tag[Brightness[Integrated]](UnitOfMeasure[VegaMagnitude])
     )
   }
 
