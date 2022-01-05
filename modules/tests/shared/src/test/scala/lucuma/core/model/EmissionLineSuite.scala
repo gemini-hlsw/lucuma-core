@@ -5,25 +5,22 @@ package lucuma.core.model
 
 import cats.implicits._
 import cats.kernel.laws.discipline._
+import coulomb._
 import coulomb.cats.implicits._
 import coulomb.scalacheck.ArbQuantity
 import eu.timepit.refined.cats._
 import lucuma.core.math.BrightnessUnits._
 import lucuma.core.math.arb.ArbRefined
-import lucuma.core.math.arb.ArbWavelength
 import lucuma.core.math.dimensional.arb.ArbMeasure
+import lucuma.core.math.units._
 import lucuma.core.model.arb.ArbEmissionLine
 import lucuma.core.util.arb.ArbEnumerated
 import monocle.law.discipline.LensTests
 import munit._
-import lucuma.core.math.Wavelength
-import coulomb._
-import lucuma.core.math.units._
 
 final class EmissionLineSuite extends DisciplineSuite {
   import ArbEnumerated._
   import ArbEmissionLine._
-  import ArbWavelength._
   import ArbRefined._
   import ArbMeasure._
   import ArbQuantity._
@@ -31,13 +28,11 @@ final class EmissionLineSuite extends DisciplineSuite {
   // Brightness type conversions
   val e1Integrated: EmissionLine[Integrated] =
     EmissionLine(
-      Wavelength.Min,
       PosBigDecimalOne.withUnit[KilometersPerSecond],
       WattsPerMeter2IsIntegratedLineFluxUnit.unit.withValueTagged(PosBigDecimalOne)
     )
   val e1Surface: EmissionLine[Surface]       =
     EmissionLine(
-      Wavelength.Min,
       PosBigDecimalOne.withUnit[KilometersPerSecond],
       WattsPerMeter2Arcsec2IsSurfaceLineFluxUnit.unit.withValueTagged(PosBigDecimalOne)
     )
@@ -58,7 +53,6 @@ final class EmissionLineSuite extends DisciplineSuite {
   checkAll("Eq[EmissionLine[Surface]]", EqTests[EmissionLine[Surface]].eqv)
 
   // Optics
-  checkAll("EmissionLine.wavelength[Integrated]", LensTests(EmissionLine.wavelength[Integrated]))
   checkAll("EmissionLine.lineWidth[Integrated]", LensTests(EmissionLine.lineWidth[Integrated]))
   checkAll("EmissionLine.lineFlux[Integrated]", LensTests(EmissionLine.lineFlux[Integrated]))
 }

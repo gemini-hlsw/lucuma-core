@@ -3,6 +3,7 @@
 
 package lucuma.core.model
 
+import cats.Order._
 import cats.kernel.laws.discipline._
 import eu.timepit.refined.cats._
 import eu.timepit.refined.scalacheck.string._
@@ -11,6 +12,7 @@ import lucuma.core.enum.Band
 import lucuma.core.math.arb._
 import lucuma.core.math.dimensional.arb.ArbMeasure
 import lucuma.core.model.arb._
+import lucuma.core.util.arb.ArbCollection
 import lucuma.core.util.arb._
 import lucuma.core.util.laws.GidTests
 import monocle.law.discipline._
@@ -36,10 +38,12 @@ final class TargetSuite extends DisciplineSuite {
   import ArbSpectralDefinition._
   import ArbAngle._
   import ArbUnnormalizedSED._
-  import ArbBandBrightness._
+  import ArbBrightnessValue._
   import ArbRefined._
   import ArbMeasure._
   import ArbAngularSize._
+  import ArbCollection._
+  import ArbWavelength._
 
   // Laws for Target.Sidereal
   checkAll("Eq[Target.Sidereal]", EqTests[Target.Sidereal].eqv)
@@ -94,28 +98,28 @@ final class TargetSuite extends DisciplineSuite {
     OptionalTests(Target.Sidereal.unnormalizedSED)
   )
   checkAll(
-    "Target.Sidereal.integratedBandBrightnesses",
-    OptionalTests(Target.Sidereal.integratedBandBrightnesses)
+    "Target.Sidereal.integratedBrightnesses",
+    OptionalTests(Target.Sidereal.integratedBrightnesses)
   )
   checkAll(
-    "Target.Sidereal.surfaceBandBrightnesses",
-    OptionalTests(Target.Sidereal.surfaceBandBrightnesses)
+    "Target.Sidereal.surfaceBrightnesses",
+    OptionalTests(Target.Sidereal.surfaceBrightnesses)
   )
   checkAll(
-    "Target.Sidereal.integratedBandBrightnessesT",
-    TraversalTests(Target.Sidereal.integratedBandBrightnessesT)
+    "Target.Sidereal.integratedBrightnessesT",
+    TraversalTests(Target.Sidereal.integratedBrightnessesT)
   )
   checkAll(
-    "Target.Sidereal.surfaceBandBrightnessesT",
-    TraversalTests(Target.Sidereal.surfaceBandBrightnessesT)
+    "Target.Sidereal.surfaceBrightnessesT",
+    TraversalTests(Target.Sidereal.surfaceBrightnessesT)
   )
   checkAll(
-    "Target.Sidereal.integratedBandBrightnessIn",
-    TraversalTests(Target.Sidereal.integratedBandBrightnessIn(Band.B))
+    "Target.Sidereal.integratedBrightnessIn",
+    TraversalTests(Target.Sidereal.integratedBrightnessIn(Band.B))
   )
   checkAll(
-    "Target.Sidereal.surfaceBandBrightnessIn",
-    TraversalTests(Target.Sidereal.surfaceBandBrightnessIn(Band.B))
+    "Target.Sidereal.surfaceBrightnessIn",
+    TraversalTests(Target.Sidereal.surfaceBrightnessIn(Band.B))
   )
   checkAll(
     "Target.Sidereal.integratedWavelengthLines",
@@ -199,28 +203,28 @@ final class TargetSuite extends DisciplineSuite {
     OptionalTests(Target.Nonsidereal.unnormalizedSED)
   )
   checkAll(
-    "Target.Nonsidereal.integratedBandBrightnesses",
-    OptionalTests(Target.Nonsidereal.integratedBandBrightnesses)
+    "Target.Nonsidereal.integratedBrightnesses",
+    OptionalTests(Target.Nonsidereal.integratedBrightnesses)
   )
   checkAll(
-    "Target.Nonsidereal.surfaceBandBrightnesses",
-    OptionalTests(Target.Nonsidereal.surfaceBandBrightnesses)
+    "Target.Nonsidereal.surfaceBrightnesses",
+    OptionalTests(Target.Nonsidereal.surfaceBrightnesses)
   )
   checkAll(
-    "Target.Nonsidereal.integratedBandBrightnessesT",
-    TraversalTests(Target.Nonsidereal.integratedBandBrightnessesT)
+    "Target.Nonsidereal.integratedBrightnessesT",
+    TraversalTests(Target.Nonsidereal.integratedBrightnessesT)
   )
   checkAll(
-    "Target.Nonsidereal.surfaceBandBrightnessesT",
-    TraversalTests(Target.Nonsidereal.surfaceBandBrightnessesT)
+    "Target.Nonsidereal.surfaceBrightnessesT",
+    TraversalTests(Target.Nonsidereal.surfaceBrightnessesT)
   )
   checkAll(
-    "Target.Nonsidereal.integratedBandBrightnessIn",
-    TraversalTests(Target.Nonsidereal.integratedBandBrightnessIn(Band.B))
+    "Target.Nonsidereal.integratedBrightnessIn",
+    TraversalTests(Target.Nonsidereal.integratedBrightnessIn(Band.B))
   )
   checkAll(
-    "Target.Nonsidereal.surfaceBandBrightnessIn",
-    TraversalTests(Target.Nonsidereal.surfaceBandBrightnessIn(Band.B))
+    "Target.Nonsidereal.surfaceBrightnessIn",
+    TraversalTests(Target.Nonsidereal.surfaceBrightnessIn(Band.B))
   )
   checkAll(
     "Target.Nonsidereal.integratedWavelengthLines",
@@ -300,28 +304,28 @@ final class TargetSuite extends DisciplineSuite {
     OptionalTests(Target.unnormalizedSED)
   )
   checkAll(
-    "Target.integratedBandBrightnesses",
-    OptionalTests(Target.integratedBandBrightnesses)
+    "Target.integratedBrightnesses",
+    OptionalTests(Target.integratedBrightnesses)
   )
   checkAll(
-    "Target.surfaceBandBrightnesses",
-    OptionalTests(Target.surfaceBandBrightnesses)
+    "Target.surfaceBrightnesses",
+    OptionalTests(Target.surfaceBrightnesses)
   )
   checkAll(
-    "Target.integratedBandBrightnessesT",
-    TraversalTests(Target.integratedBandBrightnessesT)
+    "Target.integratedBrightnessesT",
+    TraversalTests(Target.integratedBrightnessesT)
   )
   checkAll(
-    "Target.surfaceBandBrightnessesT",
-    TraversalTests(Target.surfaceBandBrightnessesT)
+    "Target.surfaceBrightnessesT",
+    TraversalTests(Target.surfaceBrightnessesT)
   )
   checkAll(
-    "Target.integratedBandBrightnessIn",
-    TraversalTests(Target.integratedBandBrightnessIn(Band.B))
+    "Target.integratedBrightnessIn",
+    TraversalTests(Target.integratedBrightnessIn(Band.B))
   )
   checkAll(
-    "Target.surfaceBandBrightnessIn",
-    TraversalTests(Target.surfaceBandBrightnessIn(Band.B))
+    "Target.surfaceBrightnessIn",
+    TraversalTests(Target.surfaceBrightnessIn(Band.B))
   )
   checkAll(
     "Target.integratedWavelengthLines",

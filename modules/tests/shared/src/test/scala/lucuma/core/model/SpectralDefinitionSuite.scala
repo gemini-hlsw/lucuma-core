@@ -5,84 +5,80 @@ package lucuma.core.model
 
 import cats.Order._
 import cats.kernel.laws.discipline._
+import coulomb._
 import eu.timepit.refined.cats._
 import lucuma.core.enum.Band
+import lucuma.core.enum.StellarLibrarySpectrum
 import lucuma.core.math.BrightnessUnits
+import lucuma.core.math.BrightnessValue
+import lucuma.core.math.Wavelength
+import lucuma.core.math.arb.ArbBrightnessValue
 import lucuma.core.math.arb.ArbRefined
+import lucuma.core.math.arb.ArbWavelength
 import lucuma.core.math.dimensional.arb.ArbMeasure
+import lucuma.core.math.units._
 import lucuma.core.model.arb._
+import lucuma.core.util.arb.ArbCollection
 import lucuma.core.util.arb.ArbEnumerated
 import monocle.law.discipline._
 import munit._
-import lucuma.core.math.Wavelength
-import coulomb._
-import lucuma.core.math.units._
+
 import scala.collection.immutable.SortedMap
-import lucuma.core.enum.StellarLibrarySpectrum
-import lucuma.core.math.BrightnessValue
 
 final class SpectralDefinitionSuite extends DisciplineSuite {
   import ArbUnnormalizedSED._
   import ArbEnumerated._
-  import ArbBandBrightness._
+  import ArbBrightnessValue._
   import BrightnessUnits._
   import ArbSpectralDefinition._
   import ArbRefined._
   import ArbMeasure._
   import ArbEmissionLine._
+  import ArbCollection._
+  import ArbWavelength._
 
   // Brightness type conversions
-  val sd1Integrated: SpectralDefinition[Integrated] = {
-    val b: BandBrightness[Integrated] =
-      BandBrightness.withDefaultUnits[Integrated](BrightnessValue.fromDouble(10.0), Band.R)
-
+  val sd1Integrated: SpectralDefinition[Integrated] =
     SpectralDefinition.BandNormalized(
       UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.A0I),
-      SortedMap(b.band -> b)
-    )
-  }
-
-  val sd1Surface: SpectralDefinition[Surface] = {
-    val b: BandBrightness[Surface] =
-      BandBrightness.withDefaultUnits[Surface](BrightnessValue.fromDouble(10.0), Band.R)
-
-    SpectralDefinition.BandNormalized(
-      UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.A0I),
-      SortedMap(b.band -> b)
-    )
-  }
-
-  val sd2Integrated: SpectralDefinition[Integrated] = {
-    val line: EmissionLine[Integrated] =
-      EmissionLine(
-        Wavelength.Min,
-        PosBigDecimalOne.withUnit[KilometersPerSecond],
-        WattsPerMeter2IsIntegratedLineFluxUnit.unit.withValueTagged(PosBigDecimalOne)
+      SortedMap(
+        Band.R -> Band.R.defaultUnits[Integrated].withValueTagged(BrightnessValue.fromDouble(10.0))
       )
+    )
 
+  val sd1Surface: SpectralDefinition[Surface] =
+    SpectralDefinition.BandNormalized(
+      UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.A0I),
+      SortedMap(
+        Band.R -> Band.R.defaultUnits[Surface].withValueTagged(BrightnessValue.fromDouble(10.0))
+      )
+    )
+
+  val sd2Integrated: SpectralDefinition[Integrated] =
     SpectralDefinition.EmissionLines(
-      SortedMap(line.wavelength -> line),
+      SortedMap(
+        Wavelength.Min -> EmissionLine(
+          PosBigDecimalOne.withUnit[KilometersPerSecond],
+          WattsPerMeter2IsIntegratedLineFluxUnit.unit.withValueTagged(PosBigDecimalOne)
+        )
+      ),
       WattsPerMeter2MicrometerIsIntegratedFluxDensityContinuumUnit.unit.withValueTagged(
         PosBigDecimalOne
       )
     )
-  }
 
-  val sd2Surface: SpectralDefinition[Surface] = {
-    val line: EmissionLine[Surface] =
-      EmissionLine(
-        Wavelength.Min,
-        PosBigDecimalOne.withUnit[KilometersPerSecond],
-        WattsPerMeter2Arcsec2IsSurfaceLineFluxUnit.unit.withValueTagged(PosBigDecimalOne)
-      )
-
+  val sd2Surface: SpectralDefinition[Surface] =
     SpectralDefinition.EmissionLines(
-      SortedMap(line.wavelength -> line),
+      SortedMap(
+        Wavelength.Min -> EmissionLine(
+          PosBigDecimalOne.withUnit[KilometersPerSecond],
+          WattsPerMeter2Arcsec2IsSurfaceLineFluxUnit.unit.withValueTagged(PosBigDecimalOne)
+        )
+      ),
       WattsPerMeter2MicrometerArcsec2IsSurfaceFluxDensityContinuumUnit.unit.withValueTagged(
         PosBigDecimalOne
       )
     )
-  }
 
   test("Brightness type conversion Integrated -> Surface") {
     assertEquals(sd1Integrated.to[Surface], sd1Surface)
@@ -212,28 +208,28 @@ final class SpectralDefinitionSuite extends DisciplineSuite {
     OptionalTests(SpectralDefinition.unnormalizedSED[Surface])
   )
   checkAll(
-    "SpectralDefinition.bandBrightnesses[Integrated]",
-    OptionalTests(SpectralDefinition.bandBrightnesses[Integrated])
+    "SpectralDefinition.brightnesses[Integrated]",
+    OptionalTests(SpectralDefinition.brightnesses[Integrated])
   )
   checkAll(
-    "SpectralDefinition.bandBrightnesses[Surface]",
-    OptionalTests(SpectralDefinition.bandBrightnesses[Surface])
+    "SpectralDefinition.brightnesses[Surface]",
+    OptionalTests(SpectralDefinition.brightnesses[Surface])
   )
   checkAll(
-    "SpectralDefinition.bandBrightnessesT[Integrated]",
-    TraversalTests(SpectralDefinition.bandBrightnessesT[Integrated])
+    "SpectralDefinition.brightnessesT[Integrated]",
+    TraversalTests(SpectralDefinition.brightnessesT[Integrated])
   )
   checkAll(
-    "SpectralDefinition.bandBrightnessesT[Surface]",
-    TraversalTests(SpectralDefinition.bandBrightnessesT[Surface])
+    "SpectralDefinition.brightnessesT[Surface]",
+    TraversalTests(SpectralDefinition.brightnessesT[Surface])
   )
   checkAll(
-    "SpectralDefinition.bandBrightnessIn[Integrated]",
-    TraversalTests(SpectralDefinition.bandBrightnessIn[Integrated](Band.B))
+    "SpectralDefinition.brightnessIn[Integrated]",
+    TraversalTests(SpectralDefinition.brightnessIn[Integrated](Band.B))
   )
   checkAll(
-    "SpectralDefinition.bandBrightnessIn[Surface]",
-    TraversalTests(SpectralDefinition.bandBrightnessIn[Surface](Band.B))
+    "SpectralDefinition.brightnessIn[Surface]",
+    TraversalTests(SpectralDefinition.brightnessIn[Surface](Band.B))
   )
   checkAll(
     "SpectralDefinition.wavelengthLines[Integrated]",

@@ -4,12 +4,11 @@ on: [push, pull_request]
 
 env:
   JABBA_INDEX: 'https://github.com/typelevel/jdk-index/raw/main/index.json'
-  MUNIT_FLAKY_OK: 'true'
-
+  MUNIT_FLAKY_OK: true
+  
 jobs:
   build:
     strategy:
-      fail-fast: false
       matrix:
         jdk: [adoptium@8, adoptium@17]
       

@@ -6,7 +6,7 @@ package core
 package enum
 
 import cats.Order
-import cats.syntax.eq._
+import cats.syntax.all._
 import coulomb._
 import coulomb.refined._
 import eu.timepit.refined.auto._
@@ -48,13 +48,12 @@ sealed abstract class Band(
   type DefaultIntegratedUnits
   type DefaultSurfaceUnits
 
-  // These implicits here allow resolving the default units at the type level, where the brightness
-  // type is a type parameter (used in BandBrightness constructors);  and also in runtime (used eg when parsing)
-  // by using `import band._`.
-  implicit def defaultIntegrated: Band.DefaultUnit[self.type, Integrated]
-  implicit def defaultSurface: Band.DefaultUnit[self.type, Surface]
+  // These implicits here allow resolving the default units at the type level, allowing use of
+  // `defaultUnits[T]`; and also in runtime (used eg when parsing) by using `import band._`.
+  implicit def defaultIntegrated: Band.DefaultUnits[self.type, Integrated]
+  implicit def defaultSurface: Band.DefaultUnits[self.type, Surface]
 
-  def defaultUnit[T](implicit ev: Band.DefaultUnit[self.type, T]): Units Of Brightness[T] =
+  def defaultUnits[T](implicit ev: Band.DefaultUnits[self.type, T]): Units Of Brightness[T] =
     ev.units
 }
 
@@ -71,20 +70,20 @@ sealed abstract class BandWithDefaultUnits[DI, DS](
   type DefaultIntegratedUnits = DI
   type DefaultSurfaceUnits    = DS
 
-  implicit val defaultIntegrated: Band.DefaultUnit[self.type, Integrated] =
-    Band.DefaultUnit[self.type, Integrated, DI]
+  implicit val defaultIntegrated: Band.DefaultUnits[self.type, Integrated] =
+    Band.DefaultUnits[self.type, Integrated, DI]
 
-  implicit val defaultSurface: Band.DefaultUnit[self.type, Surface] =
-    Band.DefaultUnit[self.type, Surface, DS]
+  implicit val defaultSurface: Band.DefaultUnits[self.type, Surface] =
+    Band.DefaultUnits[self.type, Surface, DS]
 }
 
 object Band {
 
-  class DefaultUnit[B, T](val units: Units Of Brightness[T])
-  object DefaultUnit {
+  class DefaultUnits[B, T](val units: Units Of Brightness[T])
+  object DefaultUnits {
     // Declare `U` as the default unit for band `B` and brightness type `T` (Integrated or Surface).
     def apply[B, T, U](implicit tagged: TaggedUnit[U, Brightness[T]]) =
-      new DefaultUnit[B, T](tagged.unit)
+      new DefaultUnits[B, T](tagged.unit)
   }
 
   /** @group Constructors */

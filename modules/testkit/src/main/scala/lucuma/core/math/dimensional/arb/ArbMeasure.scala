@@ -26,11 +26,12 @@ trait ArbMeasure {
       for {
         n <- arbitrary[N]
         u <- arbitrary[Units]
-      } yield u.withValue(n)
+        e <- arbitrary[Option[N]]
+      } yield u.withValue(n, e)
     }
 
   implicit def cogenMeasure[N: Cogen]: Cogen[Measure[N]] =
-    Cogen[(N, Units)].contramap(q => (q.value, q.units))
+    Cogen[(N, Units, Option[N])].contramap(m => (m.value, m.units, m.error))
 
   implicit def arbTaggedUnitMeasure[N: Arbitrary, Tag](implicit
     arbUnit: Arbitrary[Units Of Tag]
@@ -39,11 +40,12 @@ trait ArbMeasure {
       for {
         n <- arbitrary[N]
         u <- arbitrary[Units Of Tag]
-      } yield u.withValueTagged(n)
+        e <- arbitrary[Option[N]]
+      } yield u.withValueTagged(n, e)
     }
 
   implicit def cogenTaggedUnitMeasure[N: Cogen, Tag]: Cogen[Measure[N] Of Tag] =
-    Cogen[(N, Units)].contramap(q => (q.value, q.units))
+    Cogen[(N, Units, Option[N])].contramap(m => (m.value, m.units, m.error))
 }
 
 object ArbMeasure extends ArbMeasure

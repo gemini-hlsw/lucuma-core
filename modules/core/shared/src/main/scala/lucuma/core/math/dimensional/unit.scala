@@ -4,6 +4,7 @@
 package lucuma.core.math.dimensional
 
 import cats.Eq
+import cats.syntax.all._
 import coulomb.unitops.UnitString
 import lucuma.core.util.Display
 import lucuma.core.util.Tag
@@ -42,7 +43,7 @@ trait Units { self =>
   /**
    * Create a `Measure` with the specified value, keeping the runtime represantation of the units.
    */
-  def withValue[N](value: N): Measure[N] = Measure[N](value, self)
+  def withValue[N](value: N, error: Option[N] = none): Measure[N] = Measure[N](value, self, error)
 
   override def equals(obj: Any): Boolean = obj match {
     case that: Units => name == that.name && abbv == that.abbv && serialized == that.serialized
@@ -65,8 +66,8 @@ object Units {
      * Create a `Measure` with the specified value, keeping the runtime represantation of the units,
      * propagating the unit tag into the `Measure`.
      */
-    def withValueTagged[N](value: N): Measure[N] Of T = {
-      val tagged = tag[T](Measure[N](value, unitType))
+    def withValueTagged[N](value: N, error: Option[N] = none): Measure[N] Of T = {
+      val tagged = tag[T](Measure[N](value, unitType, error))
       tagged
     }
   }

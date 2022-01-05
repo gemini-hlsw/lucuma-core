@@ -43,7 +43,6 @@ final class UnitsSuite extends FunSuite {
     assertEquals(1.withUnit[ErgsPerSecondCentimeter2].show, "1 erg/s/cm²")
     assertEquals(1.withUnit[WattsPerMeter2Arcsec2].show, "1 W/m²/arcsec²")
     assertEquals(1.withUnit[ErgsPerSecondCentimeter2Arcsec2].show, "1 erg/s/cm²/arcsec²")
-
   }
 
 }

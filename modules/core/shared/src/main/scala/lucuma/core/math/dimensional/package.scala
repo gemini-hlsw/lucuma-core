@@ -5,30 +5,12 @@ package lucuma.core.math
 
 import coulomb.Quantity
 import coulomb.unitops.UnitString
+import lucuma.core.util.TypeString
 import shapeless.tag
 import shapeless.tag.@@
-import lucuma.core.util.TypeString
 
 package object dimensional {
   type Of[+T, U] = @@[T, U]
-
-  implicit class UnitStringModuleOps(val unitStringModule: UnitString.type) extends AnyVal {
-
-    /**
-     * Convenience method for creating UnitString instances.
-     */
-    def apply[U](fullName: String, abbreviation: String): UnitString[U] =
-      new UnitString[U] {
-        override val full: String = fullName
-        override val abbv: String = abbreviation
-      }
-
-    /**
-     * Convenience method for creating UnitString instances.
-     */
-    def apply[U](abbreviation: String): UnitString[U] =
-      apply(abbreviation, abbreviation)
-  }
 
   implicit class QuantityOps[N, U](quantity: Quantity[N, U]) {
 

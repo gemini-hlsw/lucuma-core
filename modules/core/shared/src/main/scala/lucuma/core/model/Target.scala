@@ -209,31 +209,30 @@ object Target extends WithId('t') with TargetOptics {
       sourceProfile.andThen(SourceProfile.unnormalizedSED)
 
     /** @group Optics */
-    val integratedBandBrightnesses
-      : Optional[Sidereal, SortedMap[Band, BandBrightness[Integrated]]] =
-      sourceProfile.andThen(SourceProfile.integratedBandBrightnesses)
+    val integratedBrightnesses: Optional[Sidereal, SortedMap[Band, BrightnessMeasure[Integrated]]] =
+      sourceProfile.andThen(SourceProfile.integratedBrightnesses)
 
     /** @group Optics */
-    val surfaceBandBrightnesses: Optional[Sidereal, SortedMap[Band, BandBrightness[Surface]]] =
-      sourceProfile.andThen(SourceProfile.surfaceBandBrightnesses)
+    val surfaceBrightnesses: Optional[Sidereal, SortedMap[Band, BrightnessMeasure[Surface]]] =
+      sourceProfile.andThen(SourceProfile.surfaceBrightnesses)
 
     /** @group Optics */
-    val integratedBandBrightnessesT: Traversal[Sidereal, BandBrightness[Integrated]] =
-      sourceProfile.andThen(SourceProfile.integratedBandBrightnessesT)
+    val integratedBrightnessesT: Traversal[Sidereal, BrightnessMeasure[Integrated]] =
+      sourceProfile.andThen(SourceProfile.integratedBrightnessesT)
 
     /** @group Optics */
-    val surfaceBandBrightnessesT: Traversal[Sidereal, BandBrightness[Surface]] =
-      sourceProfile.andThen(SourceProfile.surfaceBandBrightnessesT)
+    val surfaceBrightnessesT: Traversal[Sidereal, BrightnessMeasure[Surface]] =
+      sourceProfile.andThen(SourceProfile.surfaceBrightnessesT)
 
     /** @group Optics */
-    def integratedBandBrightnessIn[T](
+    def integratedBrightnessIn[T](
       b: Band
-    ): Traversal[Sidereal, BandBrightness[Integrated]] =
-      sourceProfile.andThen(SourceProfile.integratedBandBrightnessIn(b))
+    ): Traversal[Sidereal, BrightnessMeasure[Integrated]] =
+      sourceProfile.andThen(SourceProfile.integratedBrightnessIn(b))
 
     /** @group Optics */
-    def surfaceBandBrightnessIn[T](b: Band): Traversal[Sidereal, BandBrightness[Surface]] =
-      sourceProfile.andThen(SourceProfile.surfaceBandBrightnessIn(b))
+    def surfaceBrightnessIn[T](b: Band): Traversal[Sidereal, BrightnessMeasure[Surface]] =
+      sourceProfile.andThen(SourceProfile.surfaceBrightnessIn(b))
 
     /** @group Optics */
     val integratedWavelengthLines
@@ -333,31 +332,31 @@ object Target extends WithId('t') with TargetOptics {
       sourceProfile.andThen(SourceProfile.unnormalizedSED)
 
     /** @group Optics */
-    val integratedBandBrightnesses
-      : Optional[Nonsidereal, SortedMap[Band, BandBrightness[Integrated]]] =
-      sourceProfile.andThen(SourceProfile.integratedBandBrightnesses)
+    val integratedBrightnesses
+      : Optional[Nonsidereal, SortedMap[Band, BrightnessMeasure[Integrated]]] =
+      sourceProfile.andThen(SourceProfile.integratedBrightnesses)
 
     /** @group Optics */
-    val surfaceBandBrightnesses: Optional[Nonsidereal, SortedMap[Band, BandBrightness[Surface]]] =
-      sourceProfile.andThen(SourceProfile.surfaceBandBrightnesses)
+    val surfaceBrightnesses: Optional[Nonsidereal, SortedMap[Band, BrightnessMeasure[Surface]]] =
+      sourceProfile.andThen(SourceProfile.surfaceBrightnesses)
 
     /** @group Optics */
-    val integratedBandBrightnessesT: Traversal[Nonsidereal, BandBrightness[Integrated]] =
-      sourceProfile.andThen(SourceProfile.integratedBandBrightnessesT)
+    val integratedBrightnessesT: Traversal[Nonsidereal, BrightnessMeasure[Integrated]] =
+      sourceProfile.andThen(SourceProfile.integratedBrightnessesT)
 
     /** @group Optics */
-    val surfaceBandBrightnessesT: Traversal[Nonsidereal, BandBrightness[Surface]] =
-      sourceProfile.andThen(SourceProfile.surfaceBandBrightnessesT)
+    val surfaceBrightnessesT: Traversal[Nonsidereal, BrightnessMeasure[Surface]] =
+      sourceProfile.andThen(SourceProfile.surfaceBrightnessesT)
 
     /** @group Optics */
-    def integratedBandBrightnessIn[T](
+    def integratedBrightnessIn[T](
       b: Band
-    ): Traversal[Nonsidereal, BandBrightness[Integrated]] =
-      sourceProfile.andThen(SourceProfile.integratedBandBrightnessIn(b))
+    ): Traversal[Nonsidereal, BrightnessMeasure[Integrated]] =
+      sourceProfile.andThen(SourceProfile.integratedBrightnessIn(b))
 
     /** @group Optics */
-    def surfaceBandBrightnessIn[T](b: Band): Traversal[Nonsidereal, BandBrightness[Surface]] =
-      sourceProfile.andThen(SourceProfile.surfaceBandBrightnessIn(b))
+    def surfaceBrightnessIn[T](b: Band): Traversal[Nonsidereal, BrightnessMeasure[Surface]] =
+      sourceProfile.andThen(SourceProfile.surfaceBrightnessIn(b))
 
     /** @group Optics */
     val integratedWavelengthLines
@@ -472,30 +471,30 @@ trait TargetOptics { this: Target.type =>
     sourceProfile.andThen(SourceProfile.unnormalizedSED)
 
   /** @group Optics */
-  val integratedBandBrightnesses: Optional[Target, SortedMap[Band, BandBrightness[Integrated]]] =
-    sourceProfile.andThen(SourceProfile.integratedBandBrightnesses)
+  val integratedBrightnesses: Optional[Target, SortedMap[Band, BrightnessMeasure[Integrated]]] =
+    sourceProfile.andThen(SourceProfile.integratedBrightnesses)
 
   /** @group Optics */
-  val surfaceBandBrightnesses: Optional[Target, SortedMap[Band, BandBrightness[Surface]]] =
-    sourceProfile.andThen(SourceProfile.surfaceBandBrightnesses)
+  val surfaceBrightnesses: Optional[Target, SortedMap[Band, BrightnessMeasure[Surface]]] =
+    sourceProfile.andThen(SourceProfile.surfaceBrightnesses)
 
   /** @group Optics */
-  val integratedBandBrightnessesT: Traversal[Target, BandBrightness[Integrated]] =
-    sourceProfile.andThen(SourceProfile.integratedBandBrightnessesT)
+  val integratedBrightnessesT: Traversal[Target, BrightnessMeasure[Integrated]] =
+    sourceProfile.andThen(SourceProfile.integratedBrightnessesT)
 
   /** @group Optics */
-  val surfaceBandBrightnessesT: Traversal[Target, BandBrightness[Surface]] =
-    sourceProfile.andThen(SourceProfile.surfaceBandBrightnessesT)
+  val surfaceBrightnessesT: Traversal[Target, BrightnessMeasure[Surface]] =
+    sourceProfile.andThen(SourceProfile.surfaceBrightnessesT)
 
   /** @group Optics */
-  def integratedBandBrightnessIn[T](
+  def integratedBrightnessIn[T](
     b: Band
-  ): Traversal[Target, BandBrightness[Integrated]] =
-    sourceProfile.andThen(SourceProfile.integratedBandBrightnessIn(b))
+  ): Traversal[Target, BrightnessMeasure[Integrated]] =
+    sourceProfile.andThen(SourceProfile.integratedBrightnessIn(b))
 
   /** @group Optics */
-  def surfaceBandBrightnessIn[T](b: Band): Traversal[Target, BandBrightness[Surface]] =
-    sourceProfile.andThen(SourceProfile.surfaceBandBrightnessIn(b))
+  def surfaceBrightnessIn[T](b: Band): Traversal[Target, BrightnessMeasure[Surface]] =
+    sourceProfile.andThen(SourceProfile.surfaceBrightnessIn(b))
 
   /** @group Optics */
   val integratedWavelengthLines: Optional[Target, SortedMap[Wavelength, EmissionLine[Integrated]]] =

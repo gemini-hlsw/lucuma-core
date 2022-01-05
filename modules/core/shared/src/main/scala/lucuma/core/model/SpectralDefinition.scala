@@ -44,7 +44,7 @@ object SpectralDefinition {
 
   final case class BandNormalized[T](
     sed:          UnnormalizedSED,
-    brightnesses: SortedMap[Band, BandBrightness[T]]
+    brightnesses: SortedMap[Band, BrightnessMeasure[T]]
   ) extends SpectralDefinition[T] {
     lazy val bands: List[Band] = brightnesses.keys.toList
 
@@ -59,12 +59,14 @@ object SpectralDefinition {
     ): BandNormalized[T0] =
       BandNormalized(
         sed,
-        brightnesses.map { case (band, brightness) => band -> brightness.to[T0] }
+        brightnesses.map { case (band, brightness) => band -> brightness.toTag[Brightness[T0]] }
       )
   }
 
   object BandNormalized {
-    implicit def eqBandNormalized[T](implicit bbeq: Eq[BandBrightness[T]]): Eq[BandNormalized[T]] =
+    implicit def eqBandNormalized[T](implicit
+      bbeq: Eq[BrightnessMeasure[T]]
+    ): Eq[BandNormalized[T]] =
       Eq.by(x => (x.sed, x.brightnesses))
 
     /** @group Optics */
@@ -72,15 +74,15 @@ object SpectralDefinition {
       Focus[BandNormalized[T]](_.sed)
 
     /** @group Optics */
-    def brightnesses[T]: Lens[BandNormalized[T], SortedMap[Band, BandBrightness[T]]] =
+    def brightnesses[T]: Lens[BandNormalized[T], SortedMap[Band, BrightnessMeasure[T]]] =
       Focus[BandNormalized[T]](_.brightnesses)
 
     /** @group Optics */
-    def brightnessesT[T]: Traversal[BandNormalized[T], BandBrightness[T]] =
+    def brightnessesT[T]: Traversal[BandNormalized[T], BrightnessMeasure[T]] =
       brightnesses.each
 
     /** @group Optics */
-    def brightnessIn[T](b: Band): Traversal[BandNormalized[T], BandBrightness[T]] =
+    def brightnessIn[T](b: Band): Traversal[BandNormalized[T], BrightnessMeasure[T]] =
       brightnesses.filterIndex((a: Band) => a === b)
   }
 
@@ -131,7 +133,7 @@ object SpectralDefinition {
   }
 
   implicit def eqSpectralDefinition[T](implicit
-    tbeq: Eq[BandBrightness[T]]
+    tbeq: Eq[BrightnessMeasure[T]]
   ): Eq[SpectralDefinition[T]] = Eq.instance {
     case (a @ BandNormalized(_, _), b @ BandNormalized(_, _)) => a === b
     case (a @ EmissionLines(_, _), b @ EmissionLines(_, _))   => a === b
@@ -151,15 +153,15 @@ object SpectralDefinition {
     bandNormalized.andThen(BandNormalized.sed[T])
 
   /** @group Optics */
-  def bandBrightnesses[T]: Optional[SpectralDefinition[T], SortedMap[Band, BandBrightness[T]]] =
+  def brightnesses[T]: Optional[SpectralDefinition[T], SortedMap[Band, BrightnessMeasure[T]]] =
     bandNormalized.andThen(BandNormalized.brightnesses[T])
 
   /** @group Optics */
-  def bandBrightnessesT[T]: Traversal[SpectralDefinition[T], BandBrightness[T]] =
+  def brightnessesT[T]: Traversal[SpectralDefinition[T], BrightnessMeasure[T]] =
     bandNormalized.andThen(BandNormalized.brightnessesT[T])
 
   /** @group Optics */
-  def bandBrightnessIn[T](b: Band): Traversal[SpectralDefinition[T], BandBrightness[T]] =
+  def brightnessIn[T](b: Band): Traversal[SpectralDefinition[T], BrightnessMeasure[T]] =
     bandNormalized.andThen(BandNormalized.brightnessIn[T](b))
 
   /** @group Optics */
