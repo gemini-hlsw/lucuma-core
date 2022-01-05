@@ -7,6 +7,7 @@ import coulomb.Quantity
 import coulomb.unitops.UnitString
 import shapeless.tag
 import shapeless.tag.@@
+import lucuma.core.util.TypeString
 
 package object dimensional {
   type Of[+T, U] = @@[T, U]
@@ -39,9 +40,15 @@ package object dimensional {
     /**
      * Convert a coulomb `Quantity` to a `Measure` with runtime unit representation and tag `Tag`.
      */
-    def toMeasureTagged[T](implicit unit: UnitOfMeasure[U]): Measure[N] Of T = {
-      val tagged: Measure[N] @@ T = tag[T](Measure(quantity.value, unit))
+    def toMeasureTagged[T](implicit ev: TaggedUnit[U, T]): Measure[N] Of T = {
+      val tagged: Measure[N] @@ T = tag[T](Measure(quantity.value, ev.unit))
       tagged
     }
   }
+
+  // Default `TypeString` for a unit type.
+  implicit def typeStringFromUnitString[U](implicit ev: UnitString[U]): TypeString[U] =
+    new TypeString[U] {
+      val serialized: String = ev.abbv
+    }
 }
