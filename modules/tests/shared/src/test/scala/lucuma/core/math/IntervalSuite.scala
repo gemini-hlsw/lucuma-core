@@ -101,7 +101,7 @@ final class IntervalSuite extends munit.DisciplineSuite with IntervalGens {
     }
   }
 
-  test("ToFullDays") {
+  test("ToFullDays".flaky) {
     forAll { (i: Bounded[Instant], z: ZoneId, t: LocalTime) =>
       val allDay = i.toFullDays(z, t)
       assert(i.isSubsetOf(allDay))
