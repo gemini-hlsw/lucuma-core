@@ -98,6 +98,12 @@ lazy val testkit = crossProject(JVMPlatform, JSPlatform)
   .jvmConfigure(_.enablePlugins(AutomateHeaderPlugin))
   .jsSettings(lucumaScalaJsSettings: _*)
 
+val MUnitFramework = new TestFramework("munit.Framework")
+val MUnitFlakyOK   = sys.env.get("MUNIT_FLAKY_OK") match {
+  case Some("true") => Tests.Argument(MUnitFramework, "--exclude-tags=ScalaCheckFlaky")
+  case _            => Tests.Argument()
+}
+
 lazy val tests = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Full)
   .in(file("modules/tests"))
@@ -109,7 +115,8 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform)
       "org.scalameta" %%% "munit"            % "0.7.29" % Test,
       "org.typelevel" %%% "discipline-munit" % "1.0.9"  % Test
     ),
-    testFrameworks += new TestFramework("munit.Framework")
+    testFrameworks += MUnitFramework,
+    testOptions += MUnitFlakyOK
   )
   .jvmConfigure(_.enablePlugins(AutomateHeaderPlugin))
   .jvmSettings(

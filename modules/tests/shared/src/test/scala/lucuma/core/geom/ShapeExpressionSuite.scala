@@ -10,6 +10,7 @@ import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 import lucuma.core.math.arb._
 import lucuma.core.math.syntax.int._
+import lucuma.core.tests.ScalaCheckFlaky
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Prop._
 import org.scalacheck._
@@ -50,7 +51,7 @@ final class ShapeExpressionSuite extends munit.DisciplineSuite {
     }
   }
 
-  test("(a ∪ b).area = (a.area + b.area) - (a ∩ b).area".flaky) {
+  test("(a ∪ b).area = (a.area + b.area) - (a ∩ b).area".tag(ScalaCheckFlaky)) {
     forAll(genTwoCenteredShapes) { tcs =>
       val rhs = (tcs.shape0 ∪ tcs.shape1).µasSquared
       val lhs = (tcs.shape0.µasSquared + tcs.shape1.µasSquared) -
