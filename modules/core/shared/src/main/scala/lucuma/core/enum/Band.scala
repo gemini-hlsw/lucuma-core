@@ -167,16 +167,6 @@ object Band {
       )
 
   /** @group Constructors */
-  case object Uc
-      extends BandWithDefaultUnits[VegaMagnitude, VegaMagnitudePerArcsec2](
-        "Uc",
-        "UC",
-        "UCAC",
-        Wavelength(610000),
-        63.withRefinedUnit[Positive, Nanometer]
-      )
-
-  /** @group Constructors */
   case object R
       extends BandWithDefaultUnits[VegaMagnitude, VegaMagnitudePerArcsec2](
         "R",
@@ -288,7 +278,7 @@ object Band {
 
   /** All members of Band, in canonical order. */
   val all: List[Band] =
-    List(SloanU, SloanG, SloanR, SloanI, SloanZ, U, B, V, Uc, R, I, Y, J, H, K, L, M, N, Q, Ap)
+    List(SloanU, SloanG, SloanR, SloanI, SloanZ, U, B, V, R, I, Y, J, H, K, L, M, N, Q, Ap)
 
   /** Select the member of Band with the given tag, if any. */
   def fromTag(s: String): Option[Band] =
