@@ -4,7 +4,6 @@
 package lucuma.core.math.dimensional
 
 import cats.Eq
-import cats.Show
 import cats.kernel.laws.discipline._
 import cats.syntax.all._
 import lucuma.core.math.BrightnessUnits._
@@ -28,12 +27,6 @@ class MeasureSuite extends munit.DisciplineSuite {
   test("Equality must be natural") {
     forAll { (a: Measure[BigDecimal], b: Measure[BigDecimal]) =>
       assertEquals(a.equals(b), Eq[Measure[BigDecimal]].eqv(a, b))
-    }
-  }
-
-  test("Show must be natural") {
-    forAll { (a: Measure[BigDecimal]) =>
-      assertEquals(a.toString, Show[Measure[BigDecimal]].show(a))
     }
   }
 

@@ -6,11 +6,10 @@ package lucuma.core.math.dimensional
 import cats.Eq
 import cats.syntax.option._
 import coulomb._
+import lucuma.core.util.Display
 import monocle.Focus
 import monocle.Lens
 import shapeless.tag
-import _root_.cats.Show
-import lucuma.core.util.Display
 
 /**
  * A magnitude of type `N` and a runtime representation of a physical unit.
@@ -38,8 +37,6 @@ object Measure {
 
   implicit def eqTaggedMeasure[N: Eq, T]: Eq[Measure[N] Of T] =
     Eq.by(x => (x.value, x.units, x.error))
-
-  implicit def showMeasure[N]: Show[Measure[N]] = Show.fromToString
 
   implicit def displayMeasure[N]: Display[Measure[N]] =
     Display.by(

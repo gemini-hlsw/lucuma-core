@@ -12,7 +12,6 @@ import lucuma.core.util.TypeString
 import shapeless.tag
 
 import java.util.Objects
-import cats.Show
 
 /**
  * Runtime representation of a physical unit. Wraps:
@@ -58,8 +57,6 @@ trait Units { self =>
 
 object Units {
   implicit val eqUnits: Eq[Units] = Eq.fromUniversalEquals
-
-  implicit val showUnits: Show[Units] = Show.fromToString
 
   implicit val displayUnits: Display[Units] = Display.by(_.abbv, _.name)
 

@@ -4,7 +4,6 @@
 package lucuma.core.math.dimensional
 
 import cats.Eq
-import cats.Show
 import cats.kernel.laws.discipline._
 import lucuma.core.math.BrightnessUnits._
 import lucuma.core.math.dimensional.arb.ArbUnits
@@ -24,12 +23,6 @@ class UnitSuite extends munit.DisciplineSuite {
   test("Equality must be natural") {
     forAll { (a: Units, b: Units) =>
       assertEquals(a.equals(b), Eq[Units].eqv(a, b))
-    }
-  }
-
-  test("Show must be natural") {
-    forAll { (a: Units) =>
-      assertEquals(a.toString, Show[Units].show(a))
     }
   }
 }
