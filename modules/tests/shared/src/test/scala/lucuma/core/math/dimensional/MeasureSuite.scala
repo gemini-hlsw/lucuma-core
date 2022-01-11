@@ -3,15 +3,20 @@
 
 package lucuma.core.math.dimensional
 
+import cats.Eq
+import cats.Show
 import cats.kernel.laws.discipline._
 import cats.syntax.all._
 import lucuma.core.math.BrightnessUnits._
 import lucuma.core.math.dimensional.arb.ArbMeasure
+import lucuma.core.math.dimensional.arb.ArbUnits
 import lucuma.core.util.arb.ArbEnumerated._
 import monocle.law.discipline._
+import org.scalacheck.Prop._
 
 class MeasureSuite extends munit.DisciplineSuite {
   import ArbMeasure._
+  import ArbUnits._
 
   // Laws
   checkAll("Measure[BigDecimal]", EqTests[Measure[BigDecimal]].eqv)
@@ -19,6 +24,18 @@ class MeasureSuite extends munit.DisciplineSuite {
     "Measure[BigDecimal] Of Brightness[Integrated]",
     EqTests[Measure[BigDecimal] Of Brightness[Integrated]].eqv
   )
+
+  test("Equality must be natural") {
+    forAll { (a: Measure[BigDecimal], b: Measure[BigDecimal]) =>
+      assertEquals(a.equals(b), Eq[Measure[BigDecimal]].eqv(a, b))
+    }
+  }
+
+  test("Show must be natural") {
+    forAll { (a: Measure[BigDecimal]) =>
+      assertEquals(a.toString, Show[Measure[BigDecimal]].show(a))
+    }
+  }
 
   // Optics
   checkAll("Measure[BigDecimal].value", LensTests(Measure.value[BigDecimal]))

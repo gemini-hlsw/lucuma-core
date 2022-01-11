@@ -39,10 +39,8 @@ object Measure {
   implicit def eqTaggedMeasure[N: Eq, T]: Eq[Measure[N] Of T] =
     Eq.by(x => (x.value, x.units, x.error))
 
-  // TODO TEST
   implicit def showMeasure[N]: Show[Measure[N]] = Show.fromToString
 
-  // TODO TEST
   implicit def displayMeasure[N]: Display[Measure[N]] =
     Display.by(
       m => s"${m.value}${m.errStr} ${m.units.abbv}",

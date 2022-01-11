@@ -12,6 +12,7 @@ import lucuma.core.util.TypeString
 import shapeless.tag
 
 import java.util.Objects
+import cats.Show
 
 /**
  * Runtime representation of a physical unit. Wraps:
@@ -56,18 +57,20 @@ trait Units { self =>
 }
 
 object Units {
-  implicit val eqUnitType: Eq[Units] = Eq.fromUniversalEquals
+  implicit val eqUnits: Eq[Units] = Eq.fromUniversalEquals
 
-  implicit def displayUnitType: Display[Units] = Display.by(_.abbv, _.name)
+  implicit val showUnits: Show[Units] = Show.fromToString
 
-  implicit class TaggedUnitTypeOps[T](val unitType: Units Of T) extends AnyVal {
+  implicit val displayUnits: Display[Units] = Display.by(_.abbv, _.name)
+
+  implicit class TaggedUnitsOps[T](val units: Units Of T) extends AnyVal {
 
     /**
      * Create a `Measure` with the specified value, keeping the runtime represantation of the units,
      * propagating the unit tag into the `Measure`.
      */
     def withValueTagged[N](value: N, error: Option[N] = none): Measure[N] Of T = {
-      val tagged = tag[T](Measure[N](value, unitType, error))
+      val tagged = tag[T](Measure[N](value, units, error))
       tagged
     }
   }
