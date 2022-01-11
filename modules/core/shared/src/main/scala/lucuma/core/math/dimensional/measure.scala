@@ -9,6 +9,8 @@ import coulomb._
 import monocle.Focus
 import monocle.Lens
 import shapeless.tag
+import _root_.cats.Show
+import lucuma.core.util.Display
 
 /**
  * A magnitude of type `N` and a runtime representation of a physical unit.
@@ -25,17 +27,27 @@ final case class Measure[N](value: N, units: Units, error: Option[N] = none) { s
    */
   def valueQuantity: Option[Quantity[N, units.Type]] = error.map(_.withUnit[units.Type])
 
-  override def toString: String = {
-    val errStr = error.map(e => f"± $e ").orEmpty
-    f"Measure($value $errStr${units.abbv})"
-  }
+  protected[dimensional] def errStr = error.map(e => f" ± $e").orEmpty
+
+  override def toString: String =
+    s"Measure($value$errStr ${units.abbv})"
 }
 
 object Measure {
   implicit def eqMeasure[N: Eq]: Eq[Measure[N]] = Eq.by(x => (x.value, x.units, x.error))
 
-  implicit def eqTaggedMeasure[N: Eq, Tag]: Eq[Measure[N] Of Tag] =
+  implicit def eqTaggedMeasure[N: Eq, T]: Eq[Measure[N] Of T] =
     Eq.by(x => (x.value, x.units, x.error))
+
+  // TODO TEST
+  implicit def showMeasure[N]: Show[Measure[N]] = Show.fromToString
+
+  // TODO TEST
+  implicit def displayMeasure[N]: Display[Measure[N]] =
+    Display.by(
+      m => s"${m.value}${m.errStr} ${m.units.abbv}",
+      m => s"${m.value}${m.errStr} ${m.units.name}"
+    )
 
   /** @group Optics */
   def value[N]: Lens[Measure[N], N] = Focus[Measure[N]](_.value)
