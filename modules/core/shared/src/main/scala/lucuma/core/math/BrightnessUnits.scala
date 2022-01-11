@@ -176,8 +176,8 @@ object BrightnessUnits {
     enumTaggedUnit[FluxDensityContinuum[Surface]](FluxDensityContinuum.Surface.all)
 
   /**
-   * Typeclass providing a conversion between a `UnitType` tagged with `T` to a corresponding
-   * `UnitType` tagged with `T0`.
+   * Typeclass providing a conversion between a `Units` tagged with `T` to a corresponding `Units`
+   * tagged with `T0`.
    *
    * This is used to convert between `Integrated` <-> `Surface` units.
    */
@@ -231,7 +231,7 @@ object BrightnessUnits {
 
   implicit class TaggedUnitOps[T](val units: Units Of T) extends AnyVal {
 
-    /** Convert `T`-tagged `UnitType` to a `T0`-tagged one. */
+    /** Convert `T`-tagged `Units` to a `T0`-tagged ones. */
     def toTag[T0](implicit conv: TagConverter[T, T0]): Units Of T0 =
       conv.convert(units)
   }
