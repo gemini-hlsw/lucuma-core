@@ -6,6 +6,7 @@ package lucuma.core.math.dimensional
 import cats.Eq
 import cats.syntax.option._
 import coulomb._
+import lucuma.core.syntax.display._
 import lucuma.core.util.Display
 import monocle.Focus
 import monocle.Lens
@@ -38,10 +39,10 @@ object Measure {
   implicit def eqTaggedMeasure[N: Eq, T]: Eq[Measure[N] Of T] =
     Eq.by(x => (x.value, x.units, x.error))
 
-  implicit def displayMeasure[N]: Display[Measure[N]] =
+  implicit def displayMeasure[N: Display]: Display[Measure[N]] =
     Display.by(
-      m => s"${m.value}${m.errStr} ${m.units.abbv}",
-      m => s"${m.value}${m.errStr} ${m.units.name}"
+      m => s"${m.value.shortName}${m.errStr} ${m.units.abbv}",
+      m => s"${m.value.longName}${m.errStr} ${m.units.name}"
     )
 
   /** @group Optics */

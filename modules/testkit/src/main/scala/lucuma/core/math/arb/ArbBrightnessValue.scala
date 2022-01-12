@@ -21,7 +21,7 @@ trait ArbBrightnessValue {
   // Strings that are often parseable as a magnitude value
   val stringsBrightnessValue: Gen[String] =
     arbitrary[BrightnessValue]
-      .map(_.toDoubleValue.toString)
+      .map(_.toDouble.toString)
       .flatMapOneOf(
         Gen.const,
         _ => arbitrary[BigDecimal].toString,
