@@ -63,7 +63,7 @@ final class ShapeExpressionSuite extends munit.DisciplineSuite {
     }
   }
 
-  test("(a ∩ b).area = (a ∪ b).area - ((a - b).area + (b - a).area)") {
+  test("(a ∩ b).area = (a ∪ b).area - ((a - b).area + (b - a).area)".tag(ScalaCheckFlaky)) {
     forAll(genTwoCenteredShapes) { tcs =>
       val rhs = (tcs.shape0 ∩ tcs.shape1).µasSquared
       val lhs = (tcs.shape0 ∪ tcs.shape1).µasSquared - (
