@@ -44,7 +44,7 @@ final class BrightnessValueSuite extends DisciplineSuite {
 
   test("Can extract the magnitude as a double") {
     forAll { (a: BrightnessValue) =>
-      assertEquals(a.toDoubleValue, a.scaledValue / 1000.0)
+      assertEquals(a.toDouble, a.scaledValue / 1000.0)
     }
   }
 

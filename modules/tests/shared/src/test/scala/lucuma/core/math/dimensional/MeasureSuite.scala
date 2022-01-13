@@ -30,6 +30,17 @@ class MeasureSuite extends munit.DisciplineSuite {
     }
   }
 
+  test("Derived Display") {
+    import lucuma.core.math.BrightnessValue
+    import lucuma.core.math.units._
+    import lucuma.core.syntax.display._
+
+    assertEquals(
+      UnitOfMeasure[ABMagnitude].withValue(BrightnessValue.fromDouble(1.235)).shortName,
+      "1.235 AB mag"
+    )
+  }
+
   // Optics
   checkAll("Measure[BigDecimal].value", LensTests(Measure.value[BigDecimal]))
   checkAll(

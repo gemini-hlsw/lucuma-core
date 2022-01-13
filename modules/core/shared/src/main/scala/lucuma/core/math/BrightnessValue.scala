@@ -7,6 +7,7 @@ import cats.Order
 import cats.Show
 import lucuma.core.optics.Format
 import lucuma.core.optics.SplitEpi
+import lucuma.core.util.Display
 import spire.math.Rational
 
 import java.math.RoundingMode
@@ -26,10 +27,12 @@ final case class BrightnessValue(private[lucuma] val scaledValue: Int)
     with Serializable {
   def toRational: Rational = Rational(scaledValue.toLong, 1000)
 
-  def toDoubleValue: Double = scaledValue / 1000.0
+  def toDouble: Double = scaledValue / 1000.0
+
+  def toBigDecimal: BigDecimal = BigDecimal(scaledValue).underlying.movePointLeft(3)
 
   override def toString: String =
-    s"BrightnessValue.fromDouble(${BigDecimal(scaledValue).underlying.movePointLeft(3).toString})"
+    s"BrightnessValue.fromDouble(${toBigDecimal.toString})"
 
 }
 
@@ -57,7 +60,10 @@ object BrightnessValue {
    */
   val fromBigDecimal: SplitEpi[BigDecimal, BrightnessValue] =
     SplitEpi[BigDecimal, BrightnessValue](
-      d => new BrightnessValue(d.underlying.movePointRight(3).setScale(0, RoundingMode.HALF_UP).intValue),
+      d =>
+        new BrightnessValue(
+          d.underlying.movePointRight(3).setScale(0, RoundingMode.HALF_UP).intValue
+        ),
       b => new java.math.BigDecimal(b.scaledValue).movePointLeft(3)
     )
 
@@ -75,5 +81,9 @@ object BrightnessValue {
   /** @group Typeclass Instances */
   implicit val BrightnessValueOrder: Order[BrightnessValue] =
     Order.by(_.scaledValue)
+
+  /** @group Typeclass Instances */
+  implicit val BrightnessValueDisplay: Display[BrightnessValue] =
+    Display.byShortName(_.toBigDecimal.toString)
 
 }
