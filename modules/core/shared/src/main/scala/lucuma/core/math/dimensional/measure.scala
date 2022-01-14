@@ -40,8 +40,10 @@ object Measure {
 
   implicit def displayMeasure[N: Display]: Display[Measure[N]] =
     Display.by(
-      m => s"${m.value.shortName}${m.error.map(e => f" ± ${e.shortName}").orEmpty} ${m.units.abbv}",
-      m => s"${m.value.longName}${m.error.map(e => f" ± ${e.longName}").orEmpty} ${m.units.name}"
+      m =>
+        s"${m.value.shortName}${m.error.map(e => f" ± ${e.shortName}").orEmpty} ${m.units.shortName}",
+      m =>
+        s"${m.value.longName}${m.error.map(e => f" ± ${e.longName}").orEmpty} ${m.units.longName}"
     )
 
   implicit def displayTaggedMeasure[N: Display, T]: Display[Measure[N] Of T] =
@@ -92,6 +94,10 @@ object Measure {
 
     /** Remove error value. */
     def exact: Measure[N] = Measure.error.replace(none)(measure)
+
+    /** Display measure without the uncertainty */
+    def displayWithoutError(implicit d: Display[N]): String =
+      s"${measure.value.shortName} ${measure.units.shortName}"
   }
 
 }

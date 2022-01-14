@@ -39,6 +39,7 @@ class MeasureSuite extends munit.DisciplineSuite {
 
     assertEquals(m.shortName, "1.235 AB mag")
     assertEquals(m.withError(BrightnessValue.fromDouble(0.005)).shortName, "1.235 ± 0.005 AB mag")
+    assertEquals(m.withError(BrightnessValue.fromDouble(0.005)).displayWithoutError, "1.235 AB mag")
   }
 
   // Optics
