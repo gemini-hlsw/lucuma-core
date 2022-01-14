@@ -4,6 +4,7 @@
 package lucuma.core.math.dimensional
 
 import cats.Eq
+import cats.syntax.contravariant._
 import cats.syntax.option._
 import coulomb._
 import lucuma.core.syntax.display._
@@ -27,10 +28,8 @@ final case class Measure[N](value: N, units: Units, error: Option[N] = none) { s
    */
   def valueQuantity: Option[Quantity[N, units.Type]] = error.map(_.withUnit[units.Type])
 
-  protected[dimensional] def errStr = error.map(e => f" ± $e").orEmpty
-
   override def toString: String =
-    s"Measure($value$errStr ${units.abbv})"
+    s"Measure($value${error.map(e => f" ± $e").orEmpty} ${units.abbv})"
 }
 
 object Measure {
@@ -41,9 +40,12 @@ object Measure {
 
   implicit def displayMeasure[N: Display]: Display[Measure[N]] =
     Display.by(
-      m => s"${m.value.shortName}${m.errStr} ${m.units.abbv}",
-      m => s"${m.value.longName}${m.errStr} ${m.units.name}"
+      m => s"${m.value.shortName}${m.error.map(e => f" ± ${e.shortName}").orEmpty} ${m.units.abbv}",
+      m => s"${m.value.longName}${m.error.map(e => f" ± ${e.longName}").orEmpty} ${m.units.name}"
     )
+
+  implicit def displayTaggedMeasure[N: Display, T]: Display[Measure[N] Of T] =
+    Display[Measure[N]].narrow
 
   /** @group Optics */
   def value[N]: Lens[Measure[N], N] = Focus[Measure[N]](_.value)

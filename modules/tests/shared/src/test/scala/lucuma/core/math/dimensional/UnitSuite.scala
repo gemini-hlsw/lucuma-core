@@ -8,6 +8,7 @@ import cats.kernel.laws.discipline._
 import lucuma.core.math.BrightnessUnits._
 import lucuma.core.math.dimensional.arb.ArbUnits
 import lucuma.core.util.arb.ArbEnumerated._
+import lucuma.core.syntax.display._
 import org.scalacheck.Prop._
 
 class UnitSuite extends munit.DisciplineSuite {
@@ -23,6 +24,20 @@ class UnitSuite extends munit.DisciplineSuite {
   test("Equality must be natural") {
     forAll { (a: Units, b: Units) =>
       assertEquals(a.equals(b), Eq[Units].eqv(a, b))
+    }
+  }
+
+  test("Display[Units]") {
+    forAll { u: Units =>
+      assertEquals(u.longName, u.name)
+      assertEquals(u.shortName, u.abbv)
+    }
+  }
+
+  test("Display[Units Of Brightness[Integrated]]") {
+    forAll { u: Units Of Brightness[Integrated] =>
+      assertEquals(u.longName, u.name)
+      assertEquals(u.shortName, u.abbv)
     }
   }
 }
