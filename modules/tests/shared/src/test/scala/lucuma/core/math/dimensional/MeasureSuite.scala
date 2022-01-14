@@ -35,10 +35,10 @@ class MeasureSuite extends munit.DisciplineSuite {
     import lucuma.core.math.units._
     import lucuma.core.syntax.display._
 
-    assertEquals(
-      UnitOfMeasure[ABMagnitude].withValue(BrightnessValue.fromDouble(1.235)).shortName,
-      "1.235 AB mag"
-    )
+    val m = UnitOfMeasure[ABMagnitude].withValue(BrightnessValue.fromDouble(1.235))
+
+    assertEquals(m.shortName, "1.235 AB mag")
+    assertEquals(m.withError(BrightnessValue.fromDouble(0.005)).shortName, "1.235 ± 0.005 AB mag")
   }
 
   // Optics

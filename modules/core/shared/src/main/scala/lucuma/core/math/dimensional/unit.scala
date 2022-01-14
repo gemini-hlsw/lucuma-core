@@ -60,6 +60,9 @@ object Units {
 
   implicit val displayUnits: Display[Units] = Display.by(_.abbv, _.name)
 
+  implicit def displayTaggedUnits[T]: Display[Units Of T] =
+    Display[Units].narrow
+
   implicit class TaggedUnitsOps[T](val units: Units Of T) extends AnyVal {
 
     /**
