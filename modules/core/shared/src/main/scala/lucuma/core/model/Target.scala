@@ -26,7 +26,6 @@ import scala.collection.immutable.SortedMap
 sealed trait Target extends Product with Serializable {
   def name: NonEmptyString
   def sourceProfile: SourceProfile
-  def angularSize: Option[AngularSize] // This is just used for visualization
 }
 
 object Target extends WithId('t') with TargetOptics {
@@ -35,8 +34,7 @@ object Target extends WithId('t') with TargetOptics {
     name:          NonEmptyString,
     tracking:      SiderealTracking,
     sourceProfile: SourceProfile,
-    catalogInfo:   Option[CatalogInfo],
-    angularSize:   Option[AngularSize]
+    catalogInfo:   Option[CatalogInfo]
   ) extends Target
 
   object Sidereal extends SiderealOptics {
@@ -62,8 +60,7 @@ object Target extends WithId('t') with TargetOptics {
   final case class Nonsidereal(
     name:          NonEmptyString,
     ephemerisKey:  EphemerisKey,
-    sourceProfile: SourceProfile,
-    angularSize:   Option[AngularSize]
+    sourceProfile: SourceProfile
   ) extends Target
 
   object Nonsidereal extends NonsiderealOptics {
@@ -86,9 +83,9 @@ object Target extends WithId('t') with TargetOptics {
   }
 
   implicit val TargetEq: Eq[Target] = Eq.instance {
-    case (a @ Sidereal(_, _, _, _, _), b @ Sidereal(_, _, _, _, _)) => a === b
-    case (a @ Nonsidereal(_, _, _, _), b @ Nonsidereal(_, _, _, _)) => a === b
-    case _                                                          => false
+    case (a @ Sidereal(_, _, _, _), b @ Sidereal(_, _, _, _)) => a === b
+    case (a @ Nonsidereal(_, _, _), b @ Nonsidereal(_, _, _)) => a === b
+    case _                                                    => false
   }
 
   /**
@@ -99,12 +96,12 @@ object Target extends WithId('t') with TargetOptics {
    */
   val TrackOrder: Order[Target] =
     Order.from {
-      case (a @ Sidereal(_, _, _, _, _), b @ Sidereal(_, _, _, _, _)) =>
+      case (a @ Sidereal(_, _, _, _), b @ Sidereal(_, _, _, _)) =>
         Sidereal.TrackOrder.compare(a, b)
-      case (a @ Nonsidereal(_, _, _, _), b @ Nonsidereal(_, _, _, _)) =>
+      case (a @ Nonsidereal(_, _, _), b @ Nonsidereal(_, _, _)) =>
         Nonsidereal.TrackOrder.compare(a, b)
-      case (Nonsidereal(_, _, _, _), _)                               => -1
-      case _                                                          => 1
+      case (Nonsidereal(_, _, _), _)                            => -1
+      case _                                                    => 1
     }
 
   /**
@@ -114,12 +111,12 @@ object Target extends WithId('t') with TargetOptics {
    */
   val NameOrder: Order[Target] =
     Order.from {
-      case (a @ Sidereal(_, _, _, _, _), b @ Sidereal(_, _, _, _, _)) =>
+      case (a @ Sidereal(_, _, _, _), b @ Sidereal(_, _, _, _)) =>
         Sidereal.NameOrder.compare(a, b)
-      case (a @ Nonsidereal(_, _, _, _), b @ Nonsidereal(_, _, _, _)) =>
+      case (a @ Nonsidereal(_, _, _), b @ Nonsidereal(_, _, _)) =>
         Nonsidereal.NameOrder.compare(a, b)
-      case (Nonsidereal(_, _, _, _), _)                               => -1
-      case _                                                          => 1
+      case (Nonsidereal(_, _, _), _)                            => -1
+      case _                                                    => 1
     }
 
   trait SiderealOptics { this: Sidereal.type =>
@@ -276,10 +273,6 @@ object Target extends WithId('t') with TargetOptics {
     /** @group Optics */
     val catalogInfo: Lens[Sidereal, Option[CatalogInfo]] =
       Focus[Sidereal](_.catalogInfo)
-
-    /** @group Optics */
-    val angularSize: Lens[Sidereal, Option[AngularSize]] =
-      Focus[Sidereal](_.angularSize)
   }
 
   trait NonsiderealOptics { this: Nonsidereal.type =>
@@ -397,10 +390,6 @@ object Target extends WithId('t') with TargetOptics {
       Nonsidereal,
       Measure[PosBigDecimal] Of FluxDensityContinuum[Surface]
     ] = sourceProfile.andThen(SourceProfile.surfaceFluxDensityContinuum)
-
-    /** @group Optics */
-    val angularSize: Lens[Nonsidereal, Option[AngularSize]] =
-      Focus[Nonsidereal](_.angularSize)
   }
 }
 
@@ -415,8 +404,8 @@ trait TargetOptics { this: Target.type =>
   /** @group Optics */
   val name: Lens[Target, NonEmptyString] =
     Lens[Target, NonEmptyString](_.name)(v => {
-      case t @ Target.Sidereal(_, _, _, _, _) => Target.Sidereal.name.replace(v)(t)
-      case t @ Target.Nonsidereal(_, _, _, _) => Target.Nonsidereal.name.replace(v)(t)
+      case t @ Target.Sidereal(_, _, _, _) => Target.Sidereal.name.replace(v)(t)
+      case t @ Target.Nonsidereal(_, _, _) => Target.Nonsidereal.name.replace(v)(t)
     })
 
   /** @group Optics */
@@ -430,8 +419,8 @@ trait TargetOptics { this: Target.type =>
   /** @group Optics */
   val sourceProfile: Lens[Target, SourceProfile] =
     Lens[Target, SourceProfile](_.sourceProfile)(v => {
-      case t @ Target.Sidereal(_, _, _, _, _) => Target.Sidereal.sourceProfile.replace(v)(t)
-      case t @ Target.Nonsidereal(_, _, _, _) => Target.Nonsidereal.sourceProfile.replace(v)(t)
+      case t @ Target.Sidereal(_, _, _, _) => Target.Sidereal.sourceProfile.replace(v)(t)
+      case t @ Target.Nonsidereal(_, _, _) => Target.Nonsidereal.sourceProfile.replace(v)(t)
     })
 
   /** @group Optics */
@@ -573,11 +562,4 @@ trait TargetOptics { this: Target.type =>
   /** @group Optics */
   val catalogInfo: Optional[Target, Option[CatalogInfo]] =
     sidereal.andThen(Sidereal.catalogInfo)
-
-  /** @group Optics */
-  val angularSize: Lens[Target, Option[AngularSize]] =
-    Lens[Target, Option[AngularSize]](_.angularSize)(v => {
-      case t @ Target.Sidereal(_, _, _, _, _) => Target.Sidereal.angularSize.replace(v)(t)
-      case t @ Target.Nonsidereal(_, _, _, _) => Target.Nonsidereal.angularSize.replace(v)(t)
-    })
 }

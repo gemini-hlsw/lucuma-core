@@ -41,7 +41,6 @@ final class TargetSuite extends DisciplineSuite {
   import ArbBrightnessValue._
   import ArbRefined._
   import ArbMeasure._
-  import ArbAngularSize._
   import ArbCollection._
   import ArbWavelength._
 
@@ -158,7 +157,6 @@ final class TargetSuite extends DisciplineSuite {
     OptionalTests(Target.Sidereal.surfaceFluxDensityContinuum)
   )
   checkAll("Target.Sidereal.catalogInfo", LensTests(Target.Sidereal.catalogInfo))
-  checkAll("Target.Sidereal.angularSize", LensTests(Target.Sidereal.angularSize))
 
   // Laws for Target.Nonsidereal
   checkAll("Eq[Target.Nonsidereal]", EqTests[Target.Nonsidereal].eqv)
@@ -262,7 +260,6 @@ final class TargetSuite extends DisciplineSuite {
     "Target.Nonsidereal.surfaceFluxDensityContinuum",
     OptionalTests(Target.Nonsidereal.surfaceFluxDensityContinuum)
   )
-  checkAll("Target.Nonsidereal.angularSize", LensTests(Target.Nonsidereal.angularSize))
 
   // Laws for Target
   checkAll("Target.Id", GidTests[Target.Id].gid)
@@ -374,5 +371,4 @@ final class TargetSuite extends DisciplineSuite {
   checkAll("Target.properMotionRA", OptionalTests(Target.properMotionRA))
   checkAll("Target.properMotionDec", OptionalTests(Target.properMotionDec))
   checkAll("Target.catalogInfo", OptionalTests(Target.catalogInfo))
-  checkAll("Target.angularSize", LensTests(Target.angularSize))
 }
