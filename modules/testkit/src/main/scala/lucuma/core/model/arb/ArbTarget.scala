@@ -16,7 +16,6 @@ trait ArbTarget {
 
   import ArbEphemerisKey._
   import ArbSiderealTracking._
-  import ArbAngularSize._
   import ArbEnumerated._
   import ArbSourceProfile._
   import ArbCatalogInfo._
@@ -28,8 +27,7 @@ trait ArbTarget {
         t <- arbitrary[SiderealTracking]
         b <- arbitrary[SourceProfile]
         c <- arbitrary[Option[CatalogInfo]]
-        s <- arbitrary[Option[AngularSize]]
-      } yield Target.Sidereal(n, t, b, c, s)
+      } yield Target.Sidereal(n, t, b, c)
     }
 
   implicit val arbNonsiderealTarget: Arbitrary[Target.Nonsidereal] =
@@ -38,8 +36,7 @@ trait ArbTarget {
         n <- arbitrary[NonEmptyString]
         t <- arbitrary[EphemerisKey]
         b <- arbitrary[SourceProfile]
-        s <- arbitrary[Option[AngularSize]]
-      } yield Target.Nonsidereal(n, t, b, s)
+      } yield Target.Nonsidereal(n, t, b)
     }
 
   implicit val arbTarget: Arbitrary[Target] = Arbitrary(
@@ -47,18 +44,18 @@ trait ArbTarget {
   )
 
   implicit val cogSiderealTarget: Cogen[Target.Sidereal] =
-    Cogen[(String, SiderealTracking, SourceProfile, Option[CatalogInfo], Option[AngularSize])]
-      .contramap(t => (t.name.value, t.tracking, t.sourceProfile, t.catalogInfo, t.angularSize))
+    Cogen[(String, SiderealTracking, SourceProfile, Option[CatalogInfo])]
+      .contramap(t => (t.name.value, t.tracking, t.sourceProfile, t.catalogInfo))
 
   implicit val cogNonsiderealTarget: Cogen[Target.Nonsidereal] =
-    Cogen[(String, EphemerisKey, SourceProfile, Option[AngularSize])]
-      .contramap(t => (t.name.value, t.ephemerisKey, t.sourceProfile, t.angularSize))
+    Cogen[(String, EphemerisKey, SourceProfile)]
+      .contramap(t => (t.name.value, t.ephemerisKey, t.sourceProfile))
 
   implicit val cogTarget: Cogen[Target] =
     Cogen[Either[Target.Sidereal, Target.Nonsidereal]]
       .contramap {
-        case t @ Target.Sidereal(_, _, _, _, _) => t.asLeft
-        case t @ Target.Nonsidereal(_, _, _, _) => t.asRight
+        case t @ Target.Sidereal(_, _, _, _) => t.asLeft
+        case t @ Target.Nonsidereal(_, _, _) => t.asRight
       }
 }
 
