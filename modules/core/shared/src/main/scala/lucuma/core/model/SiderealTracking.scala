@@ -228,6 +228,14 @@ trait SiderealTrackingOptics {
     Focus[SiderealTracking](_.baseCoordinates)
 
   /** @group Optics */
+  val baseRa: Lens[SiderealTracking, RightAscension] =
+    baseCoordinates.andThen(Coordinates.rightAscension)
+
+  /** @group Optics */
+  val baseDec: Lens[SiderealTracking, Declination] =
+    baseCoordinates.andThen(Coordinates.declination)
+
+  /** @group Optics */
   val epoch: Lens[SiderealTracking, Epoch] =
     Focus[SiderealTracking](_.epoch)
 

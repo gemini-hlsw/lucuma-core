@@ -143,11 +143,11 @@ object Target extends WithId('t') with TargetOptics {
 
     /** @group Optics */
     val baseRA: Lens[Sidereal, RightAscension] =
-      baseCoordinates.andThen(Coordinates.rightAscension)
+      tracking.andThen(SiderealTracking.baseRa)
 
     /** @group Optics */
     val baseDec: Lens[Sidereal, Declination] =
-      baseCoordinates.andThen(Coordinates.declination)
+      tracking.andThen(SiderealTracking.baseDec)
 
     /** @group Optics */
     val epoch: Lens[Sidereal, Epoch] =
@@ -537,11 +537,11 @@ trait TargetOptics { this: Target.type =>
 
   /** @group Optics */
   val baseRA: Optional[Target, RightAscension] =
-    baseCoordinates.andThen(Coordinates.rightAscension)
+    siderealTracking.andThen(SiderealTracking.baseRa)
 
   /** @group Optics */
   val baseDec: Optional[Target, Declination] =
-    baseCoordinates.andThen(Coordinates.declination)
+    siderealTracking.andThen(SiderealTracking.baseDec)
 
   /** @group Optics */
   val epoch: Optional[Target, Epoch] =
