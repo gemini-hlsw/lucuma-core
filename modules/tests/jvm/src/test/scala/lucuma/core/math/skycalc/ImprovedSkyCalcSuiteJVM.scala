@@ -11,13 +11,14 @@ import lucuma.core.math.Coordinates
 import lucuma.core.math.Place
 import lucuma.core.math.arb.ArbCoordinates._
 import lucuma.core.math.arb.ArbPlace._
+import lucuma.core.tests.ScalaCheckFlaky
 import munit.ScalaCheckSuite
 import org.scalacheck.Prop._
-import org.scalacheck.{ Test => ScalaCheckTest }
+import org.scalacheck.{Test => ScalaCheckTest}
 import org.scalactic.Tolerance
 
 import java.time._
-import java.{ util => ju }
+import java.{util => ju}
 
 final class ImprovedSkyCalcSuiteJVM extends ScalaCheckSuite with Tolerance {
 
@@ -33,7 +34,7 @@ final class ImprovedSkyCalcSuiteJVM extends ScalaCheckSuite with Tolerance {
   )
   private val zdtRange = Duration.ofDays(Period.ofYears(1000).getDays.toLong)
 
-  test("Arbitrary sky calculations") {
+  test("Arbitrary sky calculations".tag(ScalaCheckFlaky)) {
     forAll { place: Place =>
       // This SkyCalc should be thread safe, but Java's isn't.
       val calc = ImprovedSkyCalc(place)
