@@ -1,4 +1,4 @@
-ThisBuild / tlBaseVersion := "0.24"
+ThisBuild / tlBaseVersion := "0.25"
 ThisBuild / tlCiReleaseBranches := Seq("master")
 ThisBuild / githubWorkflowEnv += "MUNIT_FLAKY_OK" -> "true"
 
