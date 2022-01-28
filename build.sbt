@@ -96,10 +96,10 @@ val MUnitFlakyOK   = sys.env.get("MUNIT_FLAKY_OK") match {
 lazy val tests = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Full)
   .in(file("modules/tests"))
+  .enablePlugins(NoPublishPlugin)
   .dependsOn(testkit)
   .settings(
     name           := "lucuma-core-tests",
-    publish / skip := true,
     libraryDependencies ++= Seq(
       "org.scalameta" %%% "munit"            % "0.7.29" % Test,
       "org.typelevel" %%% "discipline-munit" % "1.0.9"  % Test
