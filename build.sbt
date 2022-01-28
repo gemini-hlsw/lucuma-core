@@ -1,5 +1,6 @@
 ThisBuild / tlBaseVersion := "0.24"
 ThisBuild / tlCiReleaseBranches := Seq("master")
+ThisBuild / githubWorkflowEnv += "MUNIT_FLAKY_OK" -> "true"
 
 Global / concurrentRestrictions += Tags.limit(Tags.Compile, 1)
 
