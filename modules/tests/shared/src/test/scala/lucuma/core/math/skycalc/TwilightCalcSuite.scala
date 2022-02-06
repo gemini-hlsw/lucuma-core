@@ -6,11 +6,10 @@ package lucuma.core.math.skycalc
 import lucuma.core.enum.Site
 import lucuma.core.enum.TwilightType
 import munit.FunSuite
-import org.scalactic.Tolerance
 
 import java.time.LocalDate
 
-final class TwilightCalcSuite extends FunSuite with Tolerance {
+final class TwilightCalcSuite extends FunSuite {
   private val Date = LocalDate.of(2000, 1, 1)
 
   // Known results with OCS
@@ -31,8 +30,8 @@ final class TwilightCalcSuite extends FunSuite with Tolerance {
       val interval = TwilightCalc.forDate(tbType, date, site.place).get
       // The use of a different JulianDate throughout the calculations produces a very slight difference,
       // therefore we allow a couple of milliseconds of tolerance.
-      assert((interval.lower.toEpochMilli +- 2).isWithin(s))
-      assert((interval.upper.toEpochMilli +- 2).isWithin(e))
+      assertEqualsDouble(interval.lower.toEpochMilli.toDouble, s.toDouble, 2)
+      assertEqualsDouble(interval.upper.toEpochMilli.toDouble, e.toDouble, 2)
     }
   }
 }
