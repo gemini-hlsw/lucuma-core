@@ -3,22 +3,21 @@
 
 package lucuma.core.math
 
-import cats.Order
 import cats.Show
 import coulomb._
-import coulomb.cats.implicits._
 import eu.timepit.refined._
 import eu.timepit.refined.auto._
-import eu.timepit.refined.cats._
 import eu.timepit.refined.numeric._
 import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.math.units._
 import lucuma.core.optics.Format
+import lucuma.core.util.HashWithOrder
 import monocle.Iso
 import monocle.Prism
 import spire.math.Rational
 
 import java.math.RoundingMode
+
 import scala.util.Try
 
 /**
@@ -87,8 +86,8 @@ object Wavelength {
     Show.fromToString
 
   /** @group Typeclass Instances */
-  implicit val WavelengthOrd: Order[Wavelength] =
-    Order.by(_.toPicometers)
+  implicit val HashWithOrderWavelength: HashWithOrder[Wavelength] =
+    HashWithOrder.by(_.toPicometers.value.value)
 
   /**
     * Try to build a Wavelength from a plain Int. Negatives and Zero will produce a None
