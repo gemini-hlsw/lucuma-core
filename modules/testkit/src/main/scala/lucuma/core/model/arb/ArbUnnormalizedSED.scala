@@ -11,6 +11,8 @@ import coulomb.refined._
 import coulomb.si.Kelvin
 import eu.timepit.refined.numeric.Positive
 import eu.timepit.refined.types.numeric.PosBigDecimal
+import eu.timepit.refined.types.string.NonEmptyString
+import eu.timepit.refined.scalacheck.string._
 import lucuma.core.enum._
 import lucuma.core.math.Wavelength
 import lucuma.core.math.arb.ArbRefined
@@ -85,11 +87,14 @@ trait ArbUnnormalizedSED {
 
   implicit val arbUserDefined: Arbitrary[UserDefined] =
     Arbitrary(
-      arbitrary[NonEmptyMap[Wavelength, PosBigDecimal]].map(UserDefined(_))
+      for {
+        n <- arbitrary[NonEmptyString]
+        f <- arbitrary[NonEmptyMap[Wavelength, PosBigDecimal]]
+      } yield UserDefined(n, f)
     )
 
   implicit val cogUserDefined: Cogen[UserDefined] =
-    Cogen[Map[Wavelength, PosBigDecimal]].contramap(_.fluxDensities.toSortedMap)
+    Cogen[(String, Map[Wavelength, PosBigDecimal])].contramap(s => (s.name.value, s.fluxDensities.toSortedMap))
 
   implicit def arbSpectralDistribution[T]: Arbitrary[UnnormalizedSED] =
     Arbitrary(
@@ -146,7 +151,7 @@ trait ArbUnnormalizedSED {
       case d @ PowerLaw(_)        => d.asLeft.asRight.asRight.asRight.asRight.asRight.asRight.asRight
       case d @ BlackBody(_)       =>
         d.asLeft.asRight.asRight.asRight.asRight.asRight.asRight.asRight.asRight
-      case d @ UserDefined(_)     =>
+      case d @ UserDefined(_, _)  =>
         d.asRight.asRight.asRight.asRight.asRight.asRight.asRight.asRight.asRight
     }
 }

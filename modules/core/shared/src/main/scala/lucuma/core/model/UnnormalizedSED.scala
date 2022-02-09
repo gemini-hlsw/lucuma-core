@@ -12,6 +12,7 @@ import coulomb.cats.implicits._
 import coulomb.si.Kelvin
 import eu.timepit.refined.cats._
 import eu.timepit.refined.types.numeric.PosBigDecimal
+import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.core.enum._
 import lucuma.core.math.Wavelength
 import monocle.Focus
@@ -124,11 +125,15 @@ object UnnormalizedSED {
   }
 
   // Flux density is unitless since we just need the shape of the function. It can be in any applicable units.
-  final case class UserDefined(fluxDensities: NonEmptyMap[Wavelength, PosBigDecimal])
+  final case class UserDefined(name: NonEmptyString, fluxDensities: NonEmptyMap[Wavelength, PosBigDecimal])
       extends UnnormalizedSED
 
   object UserDefined {
-    implicit val eqUserDefined: Eq[UserDefined] = Eq.by(_.fluxDensities)
+    implicit val eqUserDefined: Eq[UserDefined] = Eq.by(u => (u.name, u.fluxDensities))
+
+    /** @group Optics */
+    val name: Lens[UserDefined, NonEmptyString] =
+      Focus[UserDefined](_.name)
 
     /** @group Optics */
     val fluxDensities: Lens[UserDefined, NonEmptyMap[Wavelength, PosBigDecimal]] =
@@ -146,7 +151,7 @@ object UnnormalizedSED {
       case (a @ PlanetaryNebula(_), b @ PlanetaryNebula(_)) => a === b
       case (a @ PowerLaw(_), b @ PowerLaw(_))               => a === b
       case (a @ BlackBody(_), b @ BlackBody(_))             => a === b
-      case (a @ UserDefined(_), b @ UserDefined(_))         => a === b
+      case (a @ UserDefined(_, _), b @ UserDefined(_, _))   => a === b
       case _                                                => false
     }
 
