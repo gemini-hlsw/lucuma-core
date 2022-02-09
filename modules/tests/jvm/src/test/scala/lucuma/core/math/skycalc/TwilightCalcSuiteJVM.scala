@@ -14,13 +14,12 @@ import lucuma.core.optics.Spire
 import lucuma.core.util.arb.ArbEnumerated
 import munit.ScalaCheckSuite
 import org.scalacheck.Prop._
-import org.scalactic.Tolerance
 import org.typelevel.cats.time._
 
 import java.time.Instant
 import java.time.LocalDate
 
-final class TwilightCalcSuiteJVM extends ScalaCheckSuite with Tolerance {
+final class TwilightCalcSuiteJVM extends ScalaCheckSuite {
   import ArbEnumerated._
   import ArbTime._
 
@@ -45,8 +44,10 @@ final class TwilightCalcSuiteJVM extends ScalaCheckSuite with Tolerance {
 
       // The use of a different JulianDate implementation throughout the calculations produces
       // a very slight difference, therefore we allow a couple of milliseconds of tolerance.
-      assert((start +- 2).isWithin(tbn.getStartTime))
-      assert((end +- 2).isWithin(tbn.getEndTime))
+      assertEqualsDouble(start.toDouble, tbn.getStartTime.toDouble, 2)
+      assertEqualsDouble(end.toDouble, tbn.getEndTime.toDouble, 2)
+      assertEqualsDouble(end.toDouble, tbn.getEndTime.toDouble, 2)
+      assertEqualsDouble(end.toDouble, tbn.getEndTime.toDouble, 2)
     }
   }
 }
