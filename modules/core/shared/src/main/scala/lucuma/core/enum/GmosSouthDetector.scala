@@ -3,7 +3,7 @@
 
 package lucuma
 package core
-package enum
+package `enum`
 
 import cats.syntax.eq._
 import coulomb._
@@ -18,6 +18,7 @@ import lucuma.core.util.Enumerated
 /**
  * Enumerated type for GMOS detector.
  * @group Enumerations (Generated)
+ * @see https://www.gemini.edu/instrumentation/gmos/components#Detector
  */
 sealed abstract class GmosSouthDetector(
   val tag: String,
@@ -27,6 +28,7 @@ sealed abstract class GmosSouthDetector(
   val shuffleOffset: Quantity[PosInt, Pixels],
   val xSize: Quantity[PosInt, Pixels],
   val ySize: Quantity[PosInt, Pixels],
+  val gapSize: Quantity[PosInt, Pixels],
   val maxRois: PosInt
 ) extends Product with Serializable {
 }
@@ -41,6 +43,7 @@ object GmosSouthDetector {
                                1536.withRefinedUnit[Positive, Pixels],
                                6144.withRefinedUnit[Positive, Pixels],
                                4608.withRefinedUnit[Positive, Pixels],
+                               37.withRefinedUnit[Positive, Pixels],
                                4
                              )
   /** @group Constructors */ case object Hamamatsu extends GmosSouthDetector(
@@ -51,6 +54,7 @@ object GmosSouthDetector {
                                1392.withRefinedUnit[Positive, Pixels],
                                6255.withRefinedUnit[Positive, Pixels],
                                4176.withRefinedUnit[Positive, Pixels],
+                               61.withRefinedUnit[Positive, Pixels],
                                5
                              )
 
@@ -69,8 +73,12 @@ object GmosSouthDetector {
   /** @group Typeclass Instances */
   implicit val GmosDetectorEnumerated: Enumerated[GmosSouthDetector] =
     new Enumerated[GmosSouthDetector] {
-      def all = GmosSouthDetector.all
-      def tag(a: GmosSouthDetector) = a.tag
+      def all: List[GmosSouthDetector] =
+        GmosSouthDetector.all
+
+      def tag(a: GmosSouthDetector): String =
+        a.tag
+
       override def unsafeFromTag(s: String): GmosSouthDetector =
         GmosSouthDetector.unsafeFromTag(s)
     }
