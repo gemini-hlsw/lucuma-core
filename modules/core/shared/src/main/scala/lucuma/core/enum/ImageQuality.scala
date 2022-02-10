@@ -20,7 +20,7 @@ sealed abstract class ImageQuality(val toDeciArcSeconds: Quantity[PosInt, DeciAr
   def label: String        = f"""< ${toArcSeconds.value.toDouble}%.1f\""""
 
   def toAngle: Angle =
-    Angle.fromMicroarcseconds(toDeciArcSeconds.to[PosInt, MicroArcSecond].value.value)
+    Angle.fromMicroarcseconds(toDeciArcSeconds.to[PosInt, MicroArcSecond].value.value.toLong)
 }
 
 object ImageQuality {
