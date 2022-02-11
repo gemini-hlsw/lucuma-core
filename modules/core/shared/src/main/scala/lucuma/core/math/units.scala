@@ -31,6 +31,9 @@ trait units {
   implicit val defineAngstrom =
     DerivedUnit[Angstrom, Hecto %* Picometer](Rational.one, abbv = "Å")
 
+  type NanometersPerPixel = Nanometer %/ Pixels
+  type PicometersPerPixel = Picometer %/ Pixels
+
   type MetersPerSecond      = Meter %/ Second
   type CentimetersPerSecond = (Centi %* Meter) %/ Second
   type KilometersPerSecond  = (Kilo %* Meter) %/ Second

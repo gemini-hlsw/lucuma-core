@@ -1,4 +1,6 @@
-import sbtcrossproject.CrossType
+ThisBuild / tlBaseVersion := "0.25"
+ThisBuild / tlCiReleaseBranches := Seq("master")
+ThisBuild / githubWorkflowEnv += "MUNIT_FLAKY_OK" -> "true"
 
 Global / concurrentRestrictions += Tags.limit(Tags.Compile, 1)
 
@@ -10,8 +12,8 @@ lazy val scalaJavaTimeVersion  = "2.3.0"
 lazy val geminiLocalesVersion  = "0.7.0"
 lazy val jtsVersion            = "0.2.2"
 lazy val svgdotjsVersion       = "0.2.1"
-lazy val coulombVersion        = "0.5.7"
-lazy val spireVersion          = "0.17.0"
+lazy val coulombVersion        = "0.5.8"
+lazy val spireVersion          = "0.18.0-M3"
 lazy val singletonOpsVersion   = "0.5.2"
 lazy val refinedVersion        = "0.9.28"
 lazy val catsTimeVersion       = "0.5.0"
@@ -19,19 +21,9 @@ lazy val circeVersion          = "0.14.1"
 lazy val catsScalacheckVersion = "0.3.1"
 lazy val shapelessVersion      = "2.3.7"
 
-inThisBuild(
-  Seq(
-    homepage                      := Some(url("https://github.com/gemini-hlsw/lucuma-core")),
-    versionScheme                 := Some("early-semver"),
-    addCompilerPlugin(
-      ("org.typelevel"             % "kind-projector" % kindProjectorVersion).cross(CrossVersion.full)
-    ),
-    Global / onChangedBuildSource := ReloadOnSourceChanges,
-    scalacOptions += "-Ymacro-annotations"
-  ) ++ lucumaPublishSettings
-)
+Global / onChangedBuildSource := ReloadOnSourceChanges
 
-publish / skip := true
+val root = tlCrossRootProject.aggregate(core, testkit, tests)
 
 lazy val core = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Full)
@@ -70,7 +62,6 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
       "edu.gemini" %%% "lucuma-jts-awt" % jtsVersion
     )
   )
-  .jsSettings(lucumaScalaJsSettings: _*)
   .jsSettings(
     libraryDependencies ++= Seq(
       "io.github.cquiroz" %%% "scala-java-time" % scalaJavaTimeVersion,
@@ -96,7 +87,6 @@ lazy val testkit = crossProject(JVMPlatform, JSPlatform)
     )
   )
   .jvmConfigure(_.enablePlugins(AutomateHeaderPlugin))
-  .jsSettings(lucumaScalaJsSettings: _*)
 
 val MUnitFramework = new TestFramework("munit.Framework")
 val MUnitFlakyOK   = sys.env.get("MUNIT_FLAKY_OK") match {
@@ -107,10 +97,10 @@ val MUnitFlakyOK   = sys.env.get("MUNIT_FLAKY_OK") match {
 lazy val tests = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Full)
   .in(file("modules/tests"))
+  .enablePlugins(NoPublishPlugin)
   .dependsOn(testkit)
   .settings(
     name           := "lucuma-core-tests",
-    publish / skip := true,
     libraryDependencies ++= Seq(
       "org.scalameta" %%% "munit"            % "0.7.29" % Test,
       "org.typelevel" %%% "discipline-munit" % "1.0.9"  % Test
@@ -128,5 +118,3 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform)
       "com.47deg"      %% "scalacheck-toolbox-datetime" % "0.6.0"       % Test
     )
   )
-  .jsSettings(lucumaScalaJsSettings: _*)
-  .jsSettings(scalaJSLinkerConfig ~= (_.withModuleKind(ModuleKind.CommonJSModule)))

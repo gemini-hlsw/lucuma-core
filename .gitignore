@@ -50,11 +50,9 @@ metals.sbt
 # Vim
 *.swp
 
-# Scalafmt
-.scalafmt.conf
-
 # Hydra
 project/hydra.sbt
 .hydra/
 
 gnupg*
+.direnv/

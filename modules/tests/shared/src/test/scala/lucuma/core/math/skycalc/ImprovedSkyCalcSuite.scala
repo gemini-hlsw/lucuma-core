@@ -6,14 +6,13 @@ package lucuma.core.math.skycalc
 import lucuma.core.enum.Site
 import lucuma.core.math.Coordinates
 import munit.FunSuite
-import org.scalactic.Tolerance
 
 import java.time._
 
 // This is just a basic case, mostly to test linking in JS.
 // Property based testing is in ImprovedSkyCalcSpecJVM, where output
 // is compared to the one from {edu.gemini.skycalc} in Java.
-final class ImprovedSkyCalcSuite extends FunSuite with Tolerance {
+final class ImprovedSkyCalcSuite extends FunSuite {
 
   private val NanosPerMillis: Int = 1_000_000
 
@@ -41,7 +40,7 @@ final class ImprovedSkyCalcSuite extends FunSuite with Tolerance {
         val calc    = ImprovedSkyCalc(site.place)
         val results = calc.calculate(coords, instant, false)
         // We use constants with more precision
-        assert((results.altitudeRaw +- 1e-12).isWithin(elevation))
+        assertEqualsDouble(results.altitudeRaw, elevation, 1e-12)
     }
   }
 }
