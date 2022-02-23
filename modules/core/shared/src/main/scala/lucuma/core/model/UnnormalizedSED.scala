@@ -12,6 +12,7 @@ import coulomb.cats.implicits._
 import coulomb.si.Kelvin
 import eu.timepit.refined.cats._
 import eu.timepit.refined.types.numeric.PosBigDecimal
+import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.enum._
 import lucuma.core.math.Wavelength
 import monocle.Focus
@@ -113,13 +114,13 @@ object UnnormalizedSED {
   }
 
   /** A black body with a temperature in Kelvin. */
-  final case class BlackBody(temperature: Quantity[PosBigDecimal, Kelvin]) extends UnnormalizedSED
+  final case class BlackBody(temperature: Quantity[PosInt, Kelvin]) extends UnnormalizedSED
 
   object BlackBody {
     implicit val orderBlackBody: Order[BlackBody] = Order.by(_.temperature)
 
     /** @group Optics */
-    val temperature: Lens[BlackBody, Quantity[PosBigDecimal, Kelvin]] =
+    val temperature: Lens[BlackBody, Quantity[PosInt, Kelvin]] =
       Focus[BlackBody](_.temperature)
   }
 
