@@ -5,6 +5,7 @@ ThisBuild / githubWorkflowEnv += "MUNIT_FLAKY_OK" -> "true"
 val Scala3 = "3.1.1"
 ThisBuild / scalaVersion := Scala3
 ThisBuild / crossScalaVersions += Scala3
+ThisBuild / tlVersionIntroduced := Map("3" -> "0.99")
 
 Global / concurrentRestrictions += Tags.limit(Tags.Compile, 1)
 
