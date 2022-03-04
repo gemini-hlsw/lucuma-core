@@ -2,6 +2,10 @@ ThisBuild / tlBaseVersion := "0.25"
 ThisBuild / tlCiReleaseBranches := Seq("master")
 ThisBuild / githubWorkflowEnv += "MUNIT_FLAKY_OK" -> "true"
 
+val Scala3 = "3.1.1"
+ThisBuild / scalaVersion := Scala3
+ThisBuild / crossScalaVersions += "3.1.1"
+
 Global / concurrentRestrictions += Tags.limit(Tags.Compile, 1)
 
 lazy val attoVersion           = "0.9.5"
@@ -13,6 +17,7 @@ lazy val geminiLocalesVersion  = "0.7.0"
 lazy val jtsVersion            = "0.2.2"
 lazy val svgdotjsVersion       = "0.2.1"
 lazy val coulombVersion        = "0.5.8"
+lazy val coulomb06Version      = "0.6-2766487-SNAPSHOT"
 lazy val spireVersion          = "0.18.0-M3"
 lazy val singletonOpsVersion   = "0.5.2"
 lazy val refinedVersion        = "0.9.28"
@@ -38,22 +43,22 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
       "dev.optics"     %%% "monocle-macro"              % monocleVersion,
       "dev.optics"     %%% "monocle-state"              % monocleVersion,
       "edu.gemini"     %%% "lucuma-jts"                 % jtsVersion,
-      "com.manyangled" %%% "coulomb"                    % coulombVersion,
-      "com.manyangled" %%% "coulomb-si-units"           % coulombVersion,
-      "com.manyangled" %%% "coulomb-accepted-units"     % coulombVersion,
-      "com.manyangled" %%% "coulomb-time-units"         % coulombVersion,
-      "com.manyangled" %%% "coulomb-cats"               % coulombVersion,
-      "com.manyangled" %%% "coulomb-refined"            % coulombVersion,
-      "com.manyangled" %%% "coulomb-physical-constants" % coulombVersion,
+      "com.manyangled" %%% "coulomb"                    % coulombVersion cross CrossVersion.for3Use2_13,
+      "com.manyangled" %%% "coulomb-si-units"           % coulombVersion cross CrossVersion.for3Use2_13,
+      "com.manyangled" %%% "coulomb-accepted-units"     % coulombVersion cross CrossVersion.for3Use2_13,
+      "com.manyangled" %%% "coulomb-time-units"         % coulombVersion cross CrossVersion.for3Use2_13,
+      "com.manyangled" %%% "coulomb-cats"               % coulombVersion cross CrossVersion.for3Use2_13,
+      "com.manyangled" %%% "coulomb-refined"            % coulombVersion cross CrossVersion.for3Use2_13,
+      "com.manyangled" %%% "coulomb-physical-constants" % coulombVersion cross CrossVersion.for3Use2_13,
       "org.typelevel"  %%% "spire"                      % spireVersion,
       "org.typelevel"  %%% "spire-extras"               % spireVersion,
-      "eu.timepit"     %%% "singleton-ops"              % singletonOpsVersion,
+      "eu.timepit"     %%% "singleton-ops"              % singletonOpsVersion cross CrossVersion.for3Use2_13,
       "eu.timepit"     %%% "refined"                    % refinedVersion,
       "eu.timepit"     %%% "refined-cats"               % refinedVersion,
       "org.typelevel"  %%% "cats-time"                  % catsTimeVersion,
       "io.circe"       %%% "circe-core"                 % circeVersion,
       "io.circe"       %%% "circe-refined"              % circeVersion,
-      "com.chuusai"    %%% "shapeless"                  % shapelessVersion
+      "com.chuusai"    %%% "shapeless"                  % shapelessVersion cross CrossVersion.for3Use2_13
     )
   )
   .jvmConfigure(_.enablePlugins(AutomateHeaderPlugin))
