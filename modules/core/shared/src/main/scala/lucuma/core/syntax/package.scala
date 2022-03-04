@@ -3,7 +3,7 @@
 
 package lucuma.core
 
-// import lucuma.core.math.syntax.ToIntOps
+import lucuma.core.math.syntax.ToIntOps
 import lucuma.core.optics.syntax.ToPrismOps
 
 /**
@@ -17,7 +17,7 @@ package object syntax {
       with ToDurationOps
       with ToEnumeratedOps
       with ToInstantOps
-      // with ToIntOps
+      with ToIntOps
       with ToParserOps
       with ToPrismOps
       with ToStringOps
