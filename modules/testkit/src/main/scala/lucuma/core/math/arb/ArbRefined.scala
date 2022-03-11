@@ -3,11 +3,11 @@
 
 package lucuma.core.math.arb
 
+import eu.timepit.refined.api.Refined
 import eu.timepit.refined.types.numeric.PosBigDecimal
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Cogen
-import eu.timepit.refined.types.numeric.PosInt
 
 trait ArbRefined {
   val BigDecimalZero: BigDecimal      = BigDecimal(0)
@@ -24,11 +24,8 @@ trait ArbRefined {
         }
     )
 
-  implicit val cogenPosInt: Cogen[PosInt] =
-    Cogen[Int].contramap(_.value)
-
-  implicit val cogenPosBigDecimal: Cogen[PosBigDecimal] =
-    Cogen[BigDecimal].contramap(_.value)
+  implicit def cogenRefined[A: Cogen, P]: Cogen[A Refined P] =
+    Cogen[A].contramap(_.value)
 }
 
 object ArbRefined extends ArbRefined
