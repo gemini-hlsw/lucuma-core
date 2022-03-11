@@ -59,7 +59,7 @@ final class SpectralDefinitionSuite extends DisciplineSuite {
       SortedMap(
         Wavelength.Min -> EmissionLine(
           PosBigDecimalOne.withUnit[KilometersPerSecond],
-          WattsPerMeter2IsIntegratedLineFluxUnit.unit.withValueTagged(PosBigDecimalOne)
+          ErgsPerSecondCentimeter2IsIntegratedLineFluxUnit.unit.withValueTagged(PosBigDecimalOne)
         )
       ),
       WattsPerMeter2MicrometerIsIntegratedFluxDensityContinuumUnit.unit.withValueTagged(
@@ -72,7 +72,7 @@ final class SpectralDefinitionSuite extends DisciplineSuite {
       SortedMap(
         Wavelength.Min -> EmissionLine(
           PosBigDecimalOne.withUnit[KilometersPerSecond],
-          WattsPerMeter2Arcsec2IsSurfaceLineFluxUnit.unit.withValueTagged(PosBigDecimalOne)
+          ErgsPerSecondCentimeter2Arcsec2IsSurfaceLineFluxUnit.unit.withValueTagged(PosBigDecimalOne)
         )
       ),
       WattsPerMeter2MicrometerArcsec2IsSurfaceFluxDensityContinuumUnit.unit.withValueTagged(

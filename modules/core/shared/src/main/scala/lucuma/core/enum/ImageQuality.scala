@@ -10,7 +10,8 @@ import eu.timepit.refined._
 import eu.timepit.refined.numeric.Positive
 import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.math.Angle
-import lucuma.core.math.units.{DeciArcSecond, MicroArcSecond}
+import lucuma.core.math.units.DeciArcSecond
+import lucuma.core.math.units.MicroArcSecond
 import lucuma.core.util.Display
 import lucuma.core.util.Enumerated
 import spire.math.Rational
