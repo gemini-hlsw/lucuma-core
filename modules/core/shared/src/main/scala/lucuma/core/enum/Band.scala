@@ -276,9 +276,39 @@ object Band {
         85.withRefinedUnit[Positive, Nanometer]
       )
 
+  /** @group Constructors */
+  case object GaiaG
+      extends BandWithDefaultUnits[VegaMagnitude, VegaMagnitudePerArcsec2](
+        "GaiaG",
+        "r",
+        "G",
+        Wavelength(690000),
+        720.withRefinedUnit[Positive, Nanometer] // 330-1050
+      )
+
+  /** @group Constructors */
+  case object GaiaGbp
+      extends BandWithDefaultUnits[VegaMagnitude, VegaMagnitudePerArcsec2](
+        "GaiaGbp",
+        "gbp",
+        "Gbp",
+        Wavelength(505000),
+        350.withRefinedUnit[Positive, Nanometer] // 330-680
+      )
+
+  /** @group Constructors */
+  case object GaiaGrp
+      extends BandWithDefaultUnits[VegaMagnitude, VegaMagnitudePerArcsec2](
+        "GaiaGrp",
+        "grp",
+        "Grp",
+        Wavelength(845000),
+        410.withRefinedUnit[Positive, Nanometer] // 640-1050
+      )
+
   /** All members of Band, in canonical order. */
   val all: List[Band] =
-    List(SloanU, SloanG, SloanR, SloanI, SloanZ, U, B, V, R, I, Y, J, H, K, L, M, N, Q, Ap)
+    List(SloanU, SloanG, SloanR, SloanI, SloanZ, U, B, V, R, I, Y, J, H, K, L, M, N, Q, Ap, GaiaG, GaiaGbp, GaiaGrp)
 
   /** Select the member of Band with the given tag, if any. */
   def fromTag(s: String): Option[Band] =
