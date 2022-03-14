@@ -42,7 +42,7 @@ object GmosNorthDisperser {
   /** @group Constructors */ case object R150_G5308  extends GmosNorthDisperser("R150_G5308",  "R150",  "R150_G5308",   150, pmToDispersion(193), false)
 
   /** All members of GmosNorthDisperser, in canonical order. */
-  val all: List[GmosNorthDisperser] =
+  lazy val all: List[GmosNorthDisperser] =
     List(B1200_G5301, R831_G5302, B600_G5303, B600_G5307, R600_G5304, B480_G5309, R400_G5305, R150_G5306, R150_G5308)
 
   /** Select the member of GmosNorthDisperser with the given tag, if any. */
