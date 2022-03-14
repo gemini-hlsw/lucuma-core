@@ -277,31 +277,31 @@ object Band {
       )
 
   /** @group Constructors */
-  case object GaiaG
+  case object Gaia
       extends BandWithDefaultUnits[VegaMagnitude, VegaMagnitudePerArcsec2](
-        "GaiaG",
-        "r",
+        "Gaia",
         "G",
+        "Gaia Pass Band",
         Wavelength(690000),
         720.withRefinedUnit[Positive, Nanometer] // 330-1050
       )
 
   /** @group Constructors */
-  case object GaiaGbp
+  case object GaiaBP
       extends BandWithDefaultUnits[VegaMagnitude, VegaMagnitudePerArcsec2](
-        "GaiaGbp",
-        "gbp",
-        "Gbp",
+        "GaiaBP",
+        "G_BP",
+        "Gaia Blue Pass Band",
         Wavelength(505000),
         350.withRefinedUnit[Positive, Nanometer] // 330-680
       )
 
   /** @group Constructors */
-  case object GaiaGrp
+  case object GaiaRP
       extends BandWithDefaultUnits[VegaMagnitude, VegaMagnitudePerArcsec2](
-        "GaiaGrp",
-        "grp",
-        "Grp",
+        "GaiaRP",
+        "G_RP",
+        "Gaia Red Pass Band",
         Wavelength(845000),
         410.withRefinedUnit[Positive, Nanometer] // 640-1050
       )
