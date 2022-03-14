@@ -308,7 +308,7 @@ object Band {
 
   /** All members of Band, in canonical order. */
   val all: List[Band] =
-    List(SloanU, SloanG, SloanR, SloanI, SloanZ, U, B, V, R, I, Y, J, H, K, L, M, N, Q, Ap, GaiaG, GaiaGbp, GaiaGrp)
+    List(SloanU, SloanG, SloanR, SloanI, SloanZ, U, B, V, R, I, Y, J, H, K, L, M, N, Q, Ap, Gaia, GaiaBP, GaiaRP)
 
   /** Select the member of Band with the given tag, if any. */
   def fromTag(s: String): Option[Band] =
