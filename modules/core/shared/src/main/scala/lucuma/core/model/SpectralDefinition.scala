@@ -86,7 +86,6 @@ object SpectralDefinition {
       brightnesses.filterIndex((a: Band) => a === b)
   }
 
-  // TODO Check if BigDecimal [parse from/toString to] "5e-19".
   final case class EmissionLines[T](
     lines:                SortedMap[Wavelength, EmissionLine[T]],
     fluxDensityContinuum: Measure[PosBigDecimal] Of FluxDensityContinuum[T]
