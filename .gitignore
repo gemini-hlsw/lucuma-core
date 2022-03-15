@@ -56,3 +56,5 @@ project/hydra.sbt
 
 gnupg*
 .direnv/
+
+.scalafmt-local.conf
