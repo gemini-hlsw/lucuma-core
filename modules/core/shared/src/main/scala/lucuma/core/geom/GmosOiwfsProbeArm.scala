@@ -154,4 +154,11 @@ object GmosOiwfsProbeArm {
     s ↗ offsetPos ⟲ posAngle
   }
 
+  /**
+    * GMOS complete afs field shape, an ellipse centered at the base position. This area covers
+    * every allowed position angle
+    */
+  val agsField: ShapeExpression =
+    ShapeExpression.centeredEllipse((2 * 490000).mas, (2 * 490000).mas)
+
 }

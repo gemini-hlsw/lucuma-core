@@ -3,6 +3,7 @@
 
 package lucuma.core.geom
 
+import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 
 /**
@@ -13,6 +14,15 @@ import lucuma.core.math.Offset
  * intersected with science area).
  */
 trait Shape {
+  /**
+   * Radius of a circle covering the shape
+   */
+  def circumscribedRadius: Angle
+
+  /**
+   * Returns a four offset defining the shape's bounding box
+   */
+  def boundingBox: (Offset, Offset, Offset, Offset)
 
   /**
    * Determines whether the given position is contained in the shape.
