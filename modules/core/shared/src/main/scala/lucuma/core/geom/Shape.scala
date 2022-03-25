@@ -3,26 +3,20 @@
 
 package lucuma.core.geom
 
-import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 
 /**
- * Shape description usable for testing point inclusion and calculating the
- * area.  Point inclusion is used to determine, for instance, guide star
- * reachability for a probe range.  Comparative area is usable when calculating
- * which guide star options produce the minimum vignetting (probe arm shadow
+ * Shape description usable for testing point inclusion and calculating the area. Point inclusion is
+ * used to determine, for instance, guide star reachability for a probe range. Comparative area is
+ * usable when calculating which guide star options produce the minimum vignetting (probe arm shadow
  * intersected with science area).
  */
 trait Shape {
-  /**
-   * Radius of a circle covering the shape
-   */
-  def circumscribedRadius: Angle
 
   /**
-   * Returns a four offset defining the shape's bounding box
+   * Returns a set of four offsets defining the shape's bounding box
    */
-  def boundingBox: (Offset, Offset, Offset, Offset)
+  def boundingOffsets: BoundingOffsets
 
   /**
    * Determines whether the given position is contained in the shape.
@@ -30,9 +24,8 @@ trait Shape {
   def contains(o: Offset): Boolean
 
   /**
-   * Area of the shape. The value is in microarcseconds angular separation^2^
-   * but the absolute value is less useful than comparing across multiple
-   * shapes (to determine minimum vignetting).
+   * Area of the shape. The value is in microarcseconds angular separation^2^ but the absolute value
+   * is less useful than comparing across multiple shapes (to determine minimum vignetting).
    */
   def area: Area
 

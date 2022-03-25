@@ -18,8 +18,9 @@ import lucuma.core.math.Offset
 import lucuma.core.math.syntax.int._
 
 import java.awt.event._
-import java.awt.{List => _, _}
+import java.awt.{ List => _, _ }
 import scala.jdk.CollectionConverters._
+import lucuma.core.geom.BoundingOffsets
 
 /**
  * Throwaway demo code to visualize a shape created using `ShapeExpression`s.
@@ -46,11 +47,8 @@ object JtsDemo extends Frame("JTS Demo") {
     List(
       GmosOiwfsProbeArm.shapeAt(posAngle, guideStarOffset, offsetPos, fpu, port),
       GmosOiwfsProbeArm.patrolFieldAt(posAngle, offsetPos, fpu, port),
-      GmosScienceAreaGeometry.shapeAt(posAngle, offsetPos, fpu),
+      GmosScienceAreaGeometry.shapeAt(posAngle, offsetPos, fpu)
     )
-
-  val fullPatrolShape =
-      GmosOiwfsProbeArm.fullPatrolFieldAt(posAngle, offsetPos)
 
   // Scale
   val arcsecPerPixel: Double =
@@ -68,7 +66,7 @@ object JtsDemo extends Frame("JTS Demo") {
       RenderingHints.KEY_RENDERING    -> RenderingHints.VALUE_RENDER_QUALITY
     )
 
-  def canvas(boundingBox: Boolean, circunscribedCircle: Boolean) = new Canvas {
+  def canvas(boundingBox: Boolean) = new Canvas {
     setBackground(Color.lightGray)
     setSize(canvasSize, canvasSize)
 
@@ -133,53 +131,17 @@ object JtsDemo extends Frame("JTS Demo") {
         )
 
         // Draw the bounding boxes
-        (fullPatrolShape :: shapes).foreach { shapeExpr =>
+        shapes.foreach { shapeExpr =>
           shapeExpr.eval match {
             case jts: JtsShape =>
-              val (p1, p2, p3, p4) = jts.boundingBox
-              val boundingBox = ShapeExpression.polygonAt(List(p1, p2, p3, p4).map(o => (o.p, o.q)): _*)
+              val BoundingOffsets(p1, p2, p3, p4) = jts.boundingOffsets
+              val boundingBox                     =
+                ShapeExpression.polygonAt(List(p1, p2, p3, p4).map(o => (o.p, o.q)): _*)
               boundingBox.eval match {
                 case box: JtsShape =>
                   g2d.setPaint(Color.magenta)
                   g2d.draw(box.toAwt(arcsecPerPixel))
-                case _ => sys.error("Unexpected")
-              }
-            case x             => sys.error(s"Whoa unexpected shape type: $x")
-          }
-        }
-      }
-      if (circunscribedCircle) {
-        g2d.setStroke(
-          new BasicStroke(1f,
-                          BasicStroke.CAP_BUTT,
-                          BasicStroke.JOIN_MITER,
-                          10.0f,
-                          Array(2.0f, 4.0f),
-                          1.0f
-          )
-        )
-
-        // Draw the bounding boxes
-        (fullPatrolShape :: shapes).foreach { shapeExpr =>
-          shapeExpr.eval match {
-            case jts: JtsShape =>
-              val (p1, _, p3, _) = jts.boundingBox
-              val radius = jts.circumscribedRadius
-              val halfP = Offset.p.andThen(Offset.P.angle).modify(x => Angle.signedMicroarcseconds.modify( _ / 2)(x))
-              val halfQ = Offset.q.andThen(Offset.Q.angle).modify(x => Angle.signedDecimalArcseconds.modify( _ / 2)(x))
-              val halfP1 = Offset.p.andThen(Offset.P.angle).modify(_ - radius)
-              val halfQ1 = Offset.q.andThen(Offset.Q.angle).modify(_ + radius)
-              val halfP2 = Offset.p.andThen(Offset.P.angle).modify(_ + radius)
-              val halfQ2 = Offset.q.andThen(Offset.Q.angle).modify(_ - radius)
-              val center = halfP(halfQ(p1 + p3))
-              val boundingCircle1 = halfQ2(halfP2(center))
-              val boundingCircle2 = halfQ1(halfP1(center))
-              val boundingCircle = ShapeExpression.ellipseAt((boundingCircle1.p, boundingCircle1.q), (boundingCircle2.p, boundingCircle2.q))
-              boundingCircle.eval match {
-                case circle: JtsShape =>
-                  g2d.setPaint(Color.blue)
-                  g2d.draw(circle.toAwt(arcsecPerPixel))
-                case _ => sys.error("Unexpected")
+                case _             => sys.error("Unexpected")
               }
             case x             => sys.error(s"Whoa unexpected shape type: $x")
           }
@@ -199,12 +161,7 @@ object JtsDemo extends Frame("JTS Demo") {
       }
 
       g2d.setColor(Color.green)
-      fullPatrolShape.eval match {
-          case jts: JtsShape =>
-            g2d.draw(jts.toAwt(arcsecPerPixel))
-          case x             => sys.error(s"Whoa unexpected shape type: $x")
-        }
-      }
+    }
   }
 
   def main(args: Array[String]): Unit = {
@@ -215,7 +172,7 @@ object JtsDemo extends Frame("JTS Demo") {
         System.exit(0)
     })
 
-    add(BorderLayout.CENTER, canvas(args.contains("--boxes"), args.contains("--circles")))
+    add(BorderLayout.CENTER, canvas(args.contains("--boxes")))
 
     setVisible(true)
   }
