@@ -54,35 +54,136 @@ object GiapiStatusApply {
   /** @group Constructors */ case object GpiIFSEndX extends GiapiStatusApply("GpiIFSEndX", Instrument.Gpi, GiapiType.Int, "gpi:currentEndX", "gpi:gpi:configIfs.endx", Option.empty[BigDecimal])
   /** @group Constructors */ case object GpiIFSEndY extends GiapiStatusApply("GpiIFSEndY", Instrument.Gpi, GiapiType.Int, "gpi:currentEndY", "gpi:gpi:configIfs.endy", Option.empty[BigDecimal])
   /** @group Constructors */ case object GpiPolarizerAngle extends GiapiStatusApply("GpiPolarizerAngle", Instrument.Gpi, GiapiType.Float, "gpi:polarizerAngle", "gpi:configPolarizer.angle", Some(1.0000))
-  /** @group Constructors */ case object GhostFiberAgitator extends GiapiStatusApply("GhostFiberAgitator", Instrument.Ghost, GiapiType.Int, "ghost:GhostSlitUnitCC.status.fa1.active", "ghost:cc:slu:fa1.type", Option.empty[BigDecimal])
-  /** @group Constructors */ case object GhostRedExposureTime extends GiapiStatusApply("GhostRedExposureTime", Instrument.Ghost, GiapiType.Double, "ghost:GhostRed.target", "ghost:dc:red.duration", Option.empty[BigDecimal])
-  /** @group Constructors */ case object GhostRedExposureCount extends GiapiStatusApply("GhostRedExposureCount", Instrument.Ghost, GiapiType.Int, "ghost:GhostRed.repeat", "ghost:dc:red.repeat", Option.empty[BigDecimal])
-  /** @group Constructors */ case object GhostRedExposureBinningRcf extends GiapiStatusApply("GhostRedExposureBinningRcf", Instrument.Ghost, GiapiType.Int, "ghost:GhostRed.Hardware_Status_u.camera_status.rcf", "ghost:dc:red.rcf", Option.empty[BigDecimal])
-  /** @group Constructors */ case object GhostRedExposureBinningCcf extends GiapiStatusApply("GhostRedExposureBinningCcf", Instrument.Ghost, GiapiType.Int, "ghost:GhostRed.Hardware_Status_u.camera_status.ccf", "ghost:dc:red.ccf", Option.empty[BigDecimal])
-  /** @group Constructors */ case object GhostBlueExposureTime extends GiapiStatusApply("GhostBlueExposureTime", Instrument.Ghost, GiapiType.Double, "ghost:GhostBlue.target", "ghost:dc:blue.duration", Option.empty[BigDecimal])
-  /** @group Constructors */ case object GhostBlueExposureCount extends GiapiStatusApply("GhostBlueExposureCount", Instrument.Ghost, GiapiType.Int, "ghost:GhostBlue.repeat", "ghost:dc:blue.repeat", Option.empty[BigDecimal])
-  /** @group Constructors */ case object GhostBlueExposureBinningRcf extends GiapiStatusApply("GhostBlueExposureBinningRcf", Instrument.Ghost, GiapiType.Int, "ghost:GhostBlue.Hardware_Status_u.camera_status.rcf", "ghost:dc:blue.rcf", Option.empty[BigDecimal])
-  /** @group Constructors */ case object GhostBlueExposureBinningCcf extends GiapiStatusApply("GhostBlueExposureBinningCcf", Instrument.Ghost, GiapiType.Int, "ghost:GhostBlue.Hardware_Status_u.camera_status.ccf", "ghost:dc:blue.ccf", Option.empty[BigDecimal])
-  /** @group Constructors */ case object GhostSRIFU1CoordsRADeg extends GiapiStatusApply("GhostSRIFU1CoordsRADeg", Instrument.Ghost, GiapiType.Double, "ghost:GhostCassegrainUnitCC.status.ifu1.std.fpx", "ghost:cc:cu:ifu1.fpx", Option.empty[BigDecimal])
-  /** @group Constructors */ case object GhostSRIFU1CoordsDecDeg extends GiapiStatusApply("GhostSRIFU1CoordsDecDeg", Instrument.Ghost, GiapiType.Double, "ghost:GhostCassegrainUnitCC.status.ifu1.std.fpy", "ghost:cc:cu:ifu1.fpy", Option.empty[BigDecimal])
-  /** @group Constructors */ case object GhostSRIFU1CoordsRAHMS extends GiapiStatusApply("GhostSRIFU1CoordsRAHMS", Instrument.Ghost, GiapiType.String, "ghost:GhostCassegrainUnitCC.status.ifu1.std.ra", "ghost:cc:cu:ifu1.ra", Option.empty[BigDecimal])
-  /** @group Constructors */ case object GhostSRIFU1CoordsDecDMS extends GiapiStatusApply("GhostSRIFU1CoordsDecDMS", Instrument.Ghost, GiapiType.String, "ghost:GhostCassegrainUnitCC.status.ifu1.std.dec", "ghost:cc:cu:ifu1.dec", Option.empty[BigDecimal])
-  /** @group Constructors */ case object GhostSRIFU2CoordsRADeg extends GiapiStatusApply("GhostSRIFU2CoordsRADeg", Instrument.Ghost, GiapiType.Double, "ghost:GhostCassegrainUnitCC.status.ifu2.std.fpx", "ghost:cc:cu:ifu2.fpx", Option.empty[BigDecimal])
-  /** @group Constructors */ case object GhostSRIFU2CoordsDecDeg extends GiapiStatusApply("GhostSRIFU2CoordsDecDeg", Instrument.Ghost, GiapiType.Double, "ghost:GhostCassegrainUnitCC.status.ifu2.std.fpy", "ghost:cc:cu:ifu2.fpy", Option.empty[BigDecimal])
-  /** @group Constructors */ case object GhostSRIFU2CoordsRAHMS extends GiapiStatusApply("GhostSRIFU2CoordsRAHMS", Instrument.Ghost, GiapiType.String, "ghost:GhostCassegrainUnitCC.status.ifu2.std.ra", "ghost:cc:cu:ifu2.ra", Option.empty[BigDecimal])
-  /** @group Constructors */ case object GhostSRIFU2CoordsDecDMS extends GiapiStatusApply("GhostSRIFU2CoordsDecDMS", Instrument.Ghost, GiapiType.String, "ghost:GhostCassegrainUnitCC.status.ifu2.std.dec", "ghost:cc:cu:ifu2.dec", Option.empty[BigDecimal])
-  /** @group Constructors */ case object GhostHRIFU1CoordsRADeg extends GiapiStatusApply("GhostHRIFU1CoordsRADeg", Instrument.Ghost, GiapiType.Double, "ghost:GhostCassegrainUnitCC.status.ifu1.hi.fpx", "ghost:cc:cu:ifu1.fpx", Option.empty[BigDecimal])
-  /** @group Constructors */ case object GhostHRIFU1CoordsDecDeg extends GiapiStatusApply("GhostHRIFU1CoordsDecDeg", Instrument.Ghost, GiapiType.Double, "ghost:GhostCassegrainUnitCC.status.ifu1.hi.fpy", "ghost:cc:cu:ifu1.fpy", Option.empty[BigDecimal])
-  /** @group Constructors */ case object GhostHRIFU1CoordsRAHMS extends GiapiStatusApply("GhostHRIFU1CoordsRAHMS", Instrument.Ghost, GiapiType.String, "ghost:GhostCassegrainUnitCC.status.ifu1.hi.ra", "ghost:cc:cu:ifu1.ra", Option.empty[BigDecimal])
-  /** @group Constructors */ case object GhostHRIFU1CoordsDecDMS extends GiapiStatusApply("GhostHRIFU1CoordsDecDMS", Instrument.Ghost, GiapiType.String, "ghost:GhostCassegrainUnitCC.status.ifu1.hi.dec", "ghost:cc:cu:ifu1.dec", Option.empty[BigDecimal])
-  /** @group Constructors */ case object GhostHRIFU2CoordsRADeg extends GiapiStatusApply("GhostHRIFU2CoordsRADeg", Instrument.Ghost, GiapiType.Double, "ghost:GhostCassegrainUnitCC.status.ifu2.hi.fpx", "ghost:cc:cu:ifu2.fpx", Option.empty[BigDecimal])
-  /** @group Constructors */ case object GhostHRIFU2CoordsDecDeg extends GiapiStatusApply("GhostHRIFU2CoordsDecDeg", Instrument.Ghost, GiapiType.Double, "ghost:GhostCassegrainUnitCC.status.ifu2.hi.fpy", "ghost:cc:cu:ifu2.fpy", Option.empty[BigDecimal])
-  /** @group Constructors */ case object GhostHRIFU2CoordsRAHMS extends GiapiStatusApply("GhostHRIFU2CoordsRAHMS", Instrument.Ghost, GiapiType.String, "ghost:GhostCassegrainUnitCC.status.ifu2.hi.ra", "ghost:cc:cu:ifu2.ra", Option.empty[BigDecimal])
-  /** @group Constructors */ case object GhostHRIFU2CoordsDecDMS extends GiapiStatusApply("GhostHRIFU2CoordsDecDMS", Instrument.Ghost, GiapiType.String, "ghost:GhostCassegrainUnitCC.status.ifu2.hi.dec", "ghost:cc:cu:ifu2.dec", Option.empty[BigDecimal])
+
+  /** @group Constructors */ case object GhostFiberAgitator1 extends GiapiStatusApply("GhostFiberAgitator1", Instrument.Ghost, GiapiType.Int, "ghost:sad:cc:slu:fa1.active", "ghost:cc:slu:fa1.type", Option.empty[BigDecimal])
+  /** @group Constructors */ case object GhostFiberAgitator2 extends GiapiStatusApply("GhostFiberAgitator2", Instrument.Ghost, GiapiType.Int, "ghost:sad:cc:slu:fa2.active", "ghost:cc:slu:fa2.type", Option.empty[BigDecimal])
+  /** @group Constructors */ case object GhostRedExposureTime extends GiapiStatusApply("GhostRedExposureTime", Instrument.Ghost, GiapiType.Double, "ghost:sad:dc:red.exposedRQ", "ghost:dc:red.duration", Option.empty[BigDecimal])
+  /** @group Constructors */ case object GhostRedExposureCount extends GiapiStatusApply("GhostRedExposureCount", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:red.repeat", "ghost:dc:red.repeat", Option.empty[BigDecimal])
+  /** @group Constructors */ case object GhostRedExposureBinningRcf extends GiapiStatusApply("GhostRedExposureBinningRcf", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:red:binx", "ghost:dc:red.rcf", Option.empty[BigDecimal])
+  /** @group Constructors */ case object GhostRedExposureBinningCcf extends GiapiStatusApply("GhostRedExposureBinningCcf", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:red:biny", "ghost:dc:red.ccf", Option.empty[BigDecimal])
+  /** @group Constructors */ case object GhostBlueExposureTime extends GiapiStatusApply("GhostBlueExposureTime", Instrument.Ghost, GiapiType.Double, "ghost:sad:dc:blue.exposedRQ", "ghost:dc:blue.duration", Option.empty[BigDecimal])
+  /** @group Constructors */ case object GhostBlueExposureCount extends GiapiStatusApply("GhostBlueExposureCount", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:blue.repeat:GhostBlue.repeat", "ghost:dc:blue.repeat", Option.empty[BigDecimal])
+  /** @group Constructors */ case object GhostBlueExposureBinningRcf extends GiapiStatusApply("GhostBlueExposureBinningRcf", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:blue:binx", "ghost:dc:blue.rcf", Option.empty[BigDecimal])
+  /** @group Constructors */ case object GhostBlueExposureBinningCcf extends GiapiStatusApply("GhostBlueExposureBinningCcf", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:blue:biny", "ghost:dc:blue.ccf", Option.empty[BigDecimal])
+  /** @group Constructors */ case object GhostIFU1Type extends GiapiStatusApply("GhostIFU1Type", Instrument.Ghost, GiapiType.Int, "ghost:sad:cc:cu:ifu1.type", "ghost:cc:cu:ifu1.type", Option.empty[BigDecimal])
+  /** @group Constructors */ case object GhostIFU2Type extends GiapiStatusApply("GhostIFU2Type", Instrument.Ghost, GiapiType.Int, "ghost:sad:cc:cu:ifu2.type", "ghost:cc:cu:ifu2.type", Option.empty[BigDecimal])
+  /** @group Constructors */ case object GhostIFU1Bundle extends GiapiStatusApply("GhostIFU1Bundle", Instrument.Ghost, GiapiType.Int, "ghost:sad:cc:cu:ifu1.bundle", "ghost:cc:cu:ifu1.bundle", Option.empty[BigDecimal])
+  /** @group Constructors */ case object GhostIFU2Bundle extends GiapiStatusApply("GhostIFU2Bundle", Instrument.Ghost, GiapiType.Int, "ghost:sad:cc:cu:ifu2.bundle", "ghost:cc:cu:ifu2.bundle", Option.empty[BigDecimal])
+  /** @group Constructors */ case object GhostSRIFU1CoordsRADeg extends GiapiStatusApply("GhostSRIFU1CoordsRADeg", Instrument.Ghost, GiapiType.Double, "ghost:sad:cc:cu:ifu1.ra", "ghost:cc:cu:ifu1.ra", Option.empty[BigDecimal])
+  /** @group Constructors */ case object GhostSRIFU1CoordsDecDeg extends GiapiStatusApply("GhostSRIFU1CoordsDecDeg", Instrument.Ghost, GiapiType.Double, "ghost:sad:cc:cu:ifu1.dec", "ghost:cc:cu:ifu1.dec", Option.empty[BigDecimal])
+  /** @group Constructors */ case object GhostSRIFU2CoordsRADeg extends GiapiStatusApply("GhostSRIFU2CoordsRADeg", Instrument.Ghost, GiapiType.Double, "ghost:sad:cc:cu:ifu2.ra", "ghost:cc:cu:ifu2.ra", Option.empty[BigDecimal])
+  /** @group Constructors */ case object GhostSRIFU2CoordsDecDeg extends GiapiStatusApply("GhostSRIFU2CoordsDecDeg", Instrument.Ghost, GiapiType.Double, "ghost:sad:cc:cu:ifu2.dec", "ghost:cc:cu:ifu2.dec", Option.empty[BigDecimal])
+  /** @group Constructors */ case object GhostHRIFU1CoordsRADeg extends GiapiStatusApply("GhostHRIFU1CoordsRADeg", Instrument.Ghost, GiapiType.Double, "ghost:sad:cc:cu:ifu1.ra", "ghost:cc:cu:ifu1.ra", Option.empty[BigDecimal])
+  /** @group Constructors */ case object GhostHRIFU1CoordsDecDeg extends GiapiStatusApply("GhostHRIFU1CoordsDecDeg", Instrument.Ghost, GiapiType.Double, "ghost:sad:cc:cu:ifu1.dec", "ghost:cc:cu:ifu1.dec", Option.empty[BigDecimal])
+  /** @group Constructors */ case object GhostHRIFU2CoordsRADeg extends GiapiStatusApply("GhostHRIFU2CoordsRADeg", Instrument.Ghost, GiapiType.Double, "ghost:sad:cc:cu:ifu2.ra", "ghost:cc:cu:ifu2.ra", Option.empty[BigDecimal])
+  /** @group Constructors */ case object GhostHRIFU2CoordsDecDeg extends GiapiStatusApply("GhostHRIFU2CoordsDecDeg", Instrument.Ghost, GiapiType.Double, "ghost:sad:cc:cu:ifu2.dec", "ghost:cc:cu:ifu2.dec", Option.empty[BigDecimal])
+  /** @group Constructors */ case object GhostUserTarget0Name extends GiapiStatusApply("GhostUserTarget0Name", Instrument.Ghost, GiapiType.String, "ghost:cc:cu:targets.target0_name", "ghost:cc:cu:targets.target0_name", Option.empty[BigDecimal])
+  /** @group Constructors */ case object GhostUserTarget0CoordsRADeg extends GiapiStatusApply("GhostUserTarget0CoordsRADeg", Instrument.Ghost, GiapiType.Double, "ghost:cc:cu:targets.target0_ra", "ghost:cc:cu:targets.target0_ra", Option.empty[BigDecimal])
+  /** @group Constructors */ case object GhostUserTarget0CoordsDecDeg extends GiapiStatusApply("GhostUserTarget0CoordsDecDeg", Instrument.Ghost, GiapiType.Double, "ghost:cc:cu:targets.target0_dec", "ghost:cc:cu:targets.target0_dec", Option.empty[BigDecimal])
+  /** @group Constructors */ case object GhostUserTarget1Name extends GiapiStatusApply("GhostUserTarget1Name", Instrument.Ghost, GiapiType.String, "ghost:cc:cu:targets.target1_name", "ghost:cc:cu:targets.target1_name", Option.empty[BigDecimal])
+  /** @group Constructors */ case object GhostUserTarget1CoordsRADeg extends GiapiStatusApply("GhostUserTarget1CoordsRADeg", Instrument.Ghost, GiapiType.Double, "ghost:cc:cu:targets.target1_ra", "ghost:cc:cu:targets.target1_ra", Option.empty[BigDecimal])
+  /** @group Constructors */ case object GhostUserTarget1CoordsDecDeg extends GiapiStatusApply("GhostUserTarget1CoordsDecDeg", Instrument.Ghost, GiapiType.Double, "ghost:cc:cu:targets.target1_dec", "ghost:cc:cu:targets.target1_dec", Option.empty[BigDecimal])
+  /** @group Constructors */ case object GhostUserTarget2Name extends GiapiStatusApply("GhostUserTarget2Name", Instrument.Ghost, GiapiType.String, "ghost:cc:cu:targets.target2_name", "ghost:cc:cu:targets.target2_name", Option.empty[BigDecimal])
+  /** @group Constructors */ case object GhostUserTarget2CoordsRADeg extends GiapiStatusApply("GhostUserTarget2CoordsRADeg", Instrument.Ghost, GiapiType.Double, "ghost:cc:cu:targets.target2_ra", "ghost:cc:cu:targets.target2_ra", Option.empty[BigDecimal])
+  /** @group Constructors */ case object GhostUserTarget2CoordsDecDeg extends GiapiStatusApply("GhostUserTarget2CoordsDecDeg", Instrument.Ghost, GiapiType.Double, "ghost:cc:cu:targets.target2_dec", "ghost:cc:cu:targets.target2_dec", Option.empty[BigDecimal])
+  /** @group Constructors */ case object GhostUserTarget3Name extends GiapiStatusApply("GhostUserTarget3Name", Instrument.Ghost, GiapiType.String, "ghost:cc:cu:targets.target3_name", "ghost:cc:cu:targets.target3_name", Option.empty[BigDecimal])
+  /** @group Constructors */ case object GhostUserTarget3CoordsRADeg extends GiapiStatusApply("GhostUserTarget3CoordsRADeg", Instrument.Ghost, GiapiType.Double, "ghost:cc:cu:targets.target3_ra", "ghost:cc:cu:targets.target3_ra", Option.empty[BigDecimal])
+  /** @group Constructors */ case object GhostUserTarget3CoordsDecDeg extends GiapiStatusApply("GhostUserTarget3CoordsDecDeg", Instrument.Ghost, GiapiType.Double, "ghost:cc:cu:targets.target3_dec", "ghost:cc:cu:targets.target3_dec", Option.empty[BigDecimal])
+  /** @group Constructors */ case object GhostUserTarget4Name extends GiapiStatusApply("GhostUserTarget4Name", Instrument.Ghost, GiapiType.String, "ghost:cc:cu:targets.target4_name", "ghost:cc:cu:targets.target4_name", Option.empty[BigDecimal])
+  /** @group Constructors */ case object GhostUserTarget4CoordsRADeg extends GiapiStatusApply("GhostUserTarget4CoordsRADeg", Instrument.Ghost, GiapiType.Double, "ghost:cc:cu:targets.target4_ra", "ghost:cc:cu:targets.target4_ra", Option.empty[BigDecimal])
+  /** @group Constructors */ case object GhostUserTarget4CoordsDecDeg extends GiapiStatusApply("GhostUserTarget4CoordsDecDeg", Instrument.Ghost, GiapiType.Double, "ghost:cc:cu:targets.target4_dec", "ghost:cc:cu:targets.target4_dec", Option.empty[BigDecimal])
+  /** @group Constructors */ case object GhostUserTarget5Name extends GiapiStatusApply("GhostUserTarget5Name", Instrument.Ghost, GiapiType.String, "ghost:cc:cu:targets.target5_name", "ghost:cc:cu:targets.target5_name", Option.empty[BigDecimal])
+  /** @group Constructors */ case object GhostUserTarget5CoordsRADeg extends GiapiStatusApply("GhostUserTarget5CoordsRADeg", Instrument.Ghost, GiapiType.Double, "ghost:cc:cu:targets.target5_ra", "ghost:cc:cu:targets.target5_ra", Option.empty[BigDecimal])
+  /** @group Constructors */ case object GhostUserTarget5CoordsDecDeg extends GiapiStatusApply("GhostUserTarget5CoordsDecDeg", Instrument.Ghost, GiapiType.Double, "ghost:cc:cu:targets.target5_dec", "ghost:cc:cu:targets.target5_dec", Option.empty[BigDecimal])
+  /** @group Constructors */ case object GhostUserTarget6Name extends GiapiStatusApply("GhostUserTarget6Name", Instrument.Ghost, GiapiType.String, "ghost:cc:cu:targets.target6_name", "ghost:cc:cu:targets.target6_name", Option.empty[BigDecimal])
+  /** @group Constructors */ case object GhostUserTarget6CoordsRADeg extends GiapiStatusApply("GhostUserTarget6CoordsRADeg", Instrument.Ghost, GiapiType.Double, "ghost:cc:cu:targets.target6_ra", "ghost:cc:cu:targets.target6_ra", Option.empty[BigDecimal])
+  /** @group Constructors */ case object GhostUserTarget6CoordsDecDeg extends GiapiStatusApply("GhostUserTarget6CoordsDecDeg", Instrument.Ghost, GiapiType.Double, "ghost:cc:cu:targets.target6_dec", "ghost:cc:cu:targets.target6_dec", Option.empty[BigDecimal])
+  /** @group Constructors */ case object GhostUserTarget7Name extends GiapiStatusApply("GhostUserTarget7Name", Instrument.Ghost, GiapiType.String, "ghost:cc:cu:targets.target7_name", "ghost:cc:cu:targets.target7_name", Option.empty[BigDecimal])
+  /** @group Constructors */ case object GhostUserTarget7CoordsRADeg extends GiapiStatusApply("GhostUserTarget7CoordsRADeg", Instrument.Ghost, GiapiType.Double, "ghost:cc:cu:targets.target7_ra", "ghost:cc:cu:targets.target7_ra", Option.empty[BigDecimal])
+  /** @group Constructors */ case object GhostUserTarget7CoordsDecDeg extends GiapiStatusApply("GhostUserTarget7CoordsDecDeg", Instrument.Ghost, GiapiType.Double, "ghost:cc:cu:targets.target7_dec", "ghost:cc:cu:targets.target7_dec", Option.empty[BigDecimal])
+  /** @group Constructors */ case object GhostUserTargetCount extends GiapiStatusApply("GhostUserTargetCount", Instrument.Ghost, GiapiType.Int, "ghost:cc:cu:targets.targets.n_targets", "ghost:cc:cu:targets.targets.n_targets", Option.empty[BigDecimal])
 
   /** All members of GiapiStatusApply, in canonical order. */
   val all: List[GiapiStatusApply] =
-    List(GpiAdc, GpiUseAo, GpiAoOptimize, GpiUseCal, GpiFpmPinholeBias, GpiIntegrationTime, GpiNumCoadds, GpiMagI, GpiMagH, GpiCalEntranceShutter, GpiCalReferenceShutter, GpiCalScienceShutter, GpiEntranceShutter, GpiCalExitShutter, GpiPupilCamera, GpiSCPower, GpiSCAttenuation, GpiSrcVis, GpiSrcIR, GpiPolarizerDeplay, GpiObservationMode, GpiIFSFilter, GpiPPM, GpiFPM, GpiLyot, GpiAlignAndCalib, GpiIFSReadMode, GpiIFSStartX, GpiIFSStartY, GpiIFSEndX, GpiIFSEndY, GpiPolarizerAngle, GhostFiberAgitator, GhostRedExposureTime, GhostRedExposureCount, GhostRedExposureBinningRcf, GhostRedExposureBinningCcf, GhostBlueExposureTime, GhostBlueExposureCount, GhostBlueExposureBinningRcf, GhostBlueExposureBinningCcf, GhostSRIFU1CoordsRADeg, GhostSRIFU1CoordsDecDeg, GhostSRIFU1CoordsRAHMS, GhostSRIFU1CoordsDecDMS, GhostSRIFU2CoordsRADeg, GhostSRIFU2CoordsDecDeg, GhostSRIFU2CoordsRAHMS, GhostSRIFU2CoordsDecDMS, GhostHRIFU1CoordsRADeg, GhostHRIFU1CoordsDecDeg, GhostHRIFU1CoordsRAHMS, GhostHRIFU1CoordsDecDMS, GhostHRIFU2CoordsRADeg, GhostHRIFU2CoordsDecDeg, GhostHRIFU2CoordsRAHMS, GhostHRIFU2CoordsDecDMS)
+    List(GpiAdc,
+      GpiUseAo,
+      GpiAoOptimize,
+      GpiUseCal,
+      GpiFpmPinholeBias,
+      GpiIntegrationTime,
+      GpiNumCoadds,
+      GpiMagI,
+      GpiMagH,
+      GpiCalEntranceShutter,
+      GpiCalReferenceShutter,
+      GpiCalScienceShutter,
+      GpiEntranceShutter,
+      GpiCalExitShutter,
+      GpiPupilCamera,
+      GpiSCPower,
+      GpiSCAttenuation,
+      GpiSrcVis,
+      GpiSrcIR,
+      GpiPolarizerDeplay,
+      GpiObservationMode,
+      GpiIFSFilter,
+      GpiPPM,
+      GpiFPM,
+      GpiLyot,
+      GpiAlignAndCalib,
+      GpiIFSReadMode,
+      GpiIFSStartX,
+      GpiIFSStartY,
+      GpiIFSEndX,
+      GpiIFSEndY,
+      GpiPolarizerAngle,
+      GhostFiberAgitator1,
+      GhostFiberAgitator2,
+      GhostRedExposureTime,
+      GhostRedExposureCount,
+      GhostRedExposureBinningRcf,
+      GhostRedExposureBinningCcf,
+      GhostBlueExposureTime,
+      GhostBlueExposureCount,
+      GhostBlueExposureBinningRcf,
+      GhostBlueExposureBinningCcf,
+      GhostIFU1Type,
+      GhostIFU2Type,
+      GhostIFU1Bundle,
+      GhostIFU2Bundle,
+      GhostSRIFU1CoordsRADeg,
+      GhostSRIFU1CoordsDecDeg,
+      GhostSRIFU2CoordsRADeg,
+      GhostSRIFU2CoordsDecDeg,
+      GhostHRIFU1CoordsRADeg,
+      GhostHRIFU1CoordsDecDeg,
+      GhostHRIFU2CoordsRADeg,
+      GhostHRIFU2CoordsDecDeg,
+      GhostUserTarget0Name,
+      GhostUserTarget0CoordsRADeg,
+      GhostUserTarget0CoordsDecDeg,
+      GhostUserTarget1Name,
+      GhostUserTarget1CoordsRADeg,
+      GhostUserTarget1CoordsDecDeg,
+      GhostUserTarget2Name,
+      GhostUserTarget2CoordsRADeg,
+      GhostUserTarget2CoordsDecDeg,
+      GhostUserTarget3Name,
+      GhostUserTarget3CoordsRADeg,
+      GhostUserTarget3CoordsDecDeg,
+      GhostUserTarget4Name,
+      GhostUserTarget4CoordsRADeg,
+      GhostUserTarget4CoordsDecDeg,
+      GhostUserTarget5Name,
+      GhostUserTarget5CoordsRADeg,
+      GhostUserTarget5CoordsDecDeg,
+      GhostUserTarget6Name,
+      GhostUserTarget6CoordsRADeg,
+      GhostUserTarget6CoordsDecDeg,
+      GhostUserTarget7Name,
+      GhostUserTarget7CoordsRADeg,
+      GhostUserTarget7CoordsDecDeg,
+      GhostUserTargetCount)
 
   /** Select the member of GiapiStatusApply with the given tag, if any. */
   def fromTag(s: String): Option[GiapiStatusApply] =

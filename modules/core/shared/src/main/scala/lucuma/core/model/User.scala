@@ -7,7 +7,6 @@ import cats.Eq
 import cats.ApplicativeError
 import cats.implicits._
 import eu.timepit.refined.auto._
-import java.security.AccessControlException
 
 /** A user has [at least] an identity and a role. */
 sealed trait User extends Product with Serializable {
@@ -26,7 +25,7 @@ sealed trait User extends Product with Serializable {
     access:      Access
   )(implicit ev: ApplicativeError[F, Throwable]): F[Unit] =
     ev.raiseError(
-      new AccessControlException(
+      new RuntimeException(
         s"$displayName (User ${id.value}, $role) does not have required access $access."
       )
     ).whenA(role.access < access)
