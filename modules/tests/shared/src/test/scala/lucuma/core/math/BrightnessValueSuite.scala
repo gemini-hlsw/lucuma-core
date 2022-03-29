@@ -22,7 +22,7 @@ final class BrightnessValueSuite extends DisciplineSuite {
   checkAll("BrightnessValue", OrderTests[BrightnessValue].order)
   checkAll("fromBigDecimal", SplitEpiTests(BrightnessValue.fromBigDecimal).splitEpi)
   checkAll("fromString", FormatTests(BrightnessValue.fromString).formatWith(stringsBrightnessValue))
-  checkAll("Ring[BrightnessValue]", RingLaws[BrightnessValue].ring)
+  checkAll("AdditiveCommutatineGroup[BrightnessValue]", RingLaws[BrightnessValue].additiveCommutativeGroup)
 
   test("Equality must be natural") {
     forAll { (a: BrightnessValue, b: BrightnessValue) =>
@@ -74,9 +74,4 @@ final class BrightnessValueSuite extends DisciplineSuite {
     }
   }
 
-  test("scalar multiplication") {
-    forAll { (a: BrightnessValue, b: Int) =>
-      assertEquals(b * a, a * b)
-    }
-  }
 }

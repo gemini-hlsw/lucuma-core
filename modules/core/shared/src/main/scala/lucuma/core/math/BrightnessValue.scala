@@ -3,6 +3,7 @@
 
 package lucuma.core.math
 
+import algebra.ring.AdditiveCommutativeGroup
 import cats.Order
 import cats.Show
 import lucuma.core.optics.Format
@@ -10,7 +11,6 @@ import lucuma.core.optics.SplitEpi
 import lucuma.core.util.Display
 import spire.math.Rational
 
-import algebra.ring.CommutativeRing
 import java.math.RoundingMode
 import scala.math.rint
 import scala.util.Try
@@ -87,30 +87,22 @@ object BrightnessValue {
   implicit val BrightnessValueDisplay: Display[BrightnessValue] =
     Display.byShortName(_.toBigDecimal.toString)
 
+  val Zero: BrightnessValue = new BrightnessValue(0)
+
   /**
    * @group Typeclass Instances
    * Support addition, multiplication and scalar operations
    */
-  implicit val algebraBrightnessValue: CommutativeRing[BrightnessValue] =
-    new CommutativeRing[BrightnessValue] {
+  implicit val algebraBrightnessValue: AdditiveCommutativeGroup[BrightnessValue] =
+    new AdditiveCommutativeGroup[BrightnessValue] {
       override def negate(a: BrightnessValue): BrightnessValue =
         new BrightnessValue(-a.scaledValue)
 
       override val zero: BrightnessValue =
-        new BrightnessValue(0)
-
-      override val one: BrightnessValue =
-        new BrightnessValue(1)
-
-      override def times(x: BrightnessValue, y: BrightnessValue): BrightnessValue =
-        new BrightnessValue(x.scaledValue * y.scaledValue)
+        Zero
 
       override def plus(x: BrightnessValue, y: BrightnessValue): BrightnessValue =
         new BrightnessValue(x.scaledValue + y.scaledValue)
-
-      override def fromInt(n: Int): BrightnessValue = new BrightnessValue(n)
-
-      override def fromBigInt(n: BigInt): BrightnessValue = new BrightnessValue(n.toInt)
 
     }
 
