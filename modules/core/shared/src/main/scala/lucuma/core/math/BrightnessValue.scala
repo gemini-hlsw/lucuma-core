@@ -3,6 +3,7 @@
 
 package lucuma.core.math
 
+import algebra.ring.AdditiveCommutativeGroup
 import cats.Order
 import cats.Show
 import lucuma.core.optics.Format
@@ -85,5 +86,23 @@ object BrightnessValue {
   /** @group Typeclass Instances */
   implicit val BrightnessValueDisplay: Display[BrightnessValue] =
     Display.byShortName(_.toBigDecimal.toString)
+
+  /**
+   * @group Typeclass Instances
+   *
+   * Support addition, substraction and negation
+   */
+  implicit val algebraBrightnessValue: AdditiveCommutativeGroup[BrightnessValue] =
+    new AdditiveCommutativeGroup[BrightnessValue] {
+      override def negate(a: BrightnessValue): BrightnessValue =
+        new BrightnessValue(-a.scaledValue)
+
+      override val zero: BrightnessValue =
+        ZeroMagnitude
+
+      override def plus(x: BrightnessValue, y: BrightnessValue): BrightnessValue =
+        new BrightnessValue(x.scaledValue + y.scaledValue)
+
+    }
 
 }
