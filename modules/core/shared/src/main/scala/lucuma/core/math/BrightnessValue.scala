@@ -87,11 +87,10 @@ object BrightnessValue {
   implicit val BrightnessValueDisplay: Display[BrightnessValue] =
     Display.byShortName(_.toBigDecimal.toString)
 
-  val Zero: BrightnessValue = new BrightnessValue(0)
-
   /**
    * @group Typeclass Instances
-   * Support addition, multiplication and scalar operations
+   *
+   * Support addition, substraction and negation
    */
   implicit val algebraBrightnessValue: AdditiveCommutativeGroup[BrightnessValue] =
     new AdditiveCommutativeGroup[BrightnessValue] {
@@ -99,7 +98,7 @@ object BrightnessValue {
         new BrightnessValue(-a.scaledValue)
 
       override val zero: BrightnessValue =
-        Zero
+        ZeroMagnitude
 
       override def plus(x: BrightnessValue, y: BrightnessValue): BrightnessValue =
         new BrightnessValue(x.scaledValue + y.scaledValue)
