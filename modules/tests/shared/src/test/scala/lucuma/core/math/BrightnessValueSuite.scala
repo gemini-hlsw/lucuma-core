@@ -3,6 +3,7 @@
 
 package lucuma.core.math
 
+import algebra.laws._
 import cats.Eq
 import cats.Order
 import cats.Show
@@ -12,6 +13,7 @@ import lucuma.core.optics.laws.discipline.FormatTests
 import lucuma.core.optics.laws.discipline.SplitEpiTests
 import munit.DisciplineSuite
 import org.scalacheck.Prop.forAll
+import spire.syntax.all._
 
 final class BrightnessValueSuite extends DisciplineSuite {
   import ArbBrightnessValue._
@@ -20,6 +22,7 @@ final class BrightnessValueSuite extends DisciplineSuite {
   checkAll("BrightnessValue", OrderTests[BrightnessValue].order)
   checkAll("fromBigDecimal", SplitEpiTests(BrightnessValue.fromBigDecimal).splitEpi)
   checkAll("fromString", FormatTests(BrightnessValue.fromString).formatWith(stringsBrightnessValue))
+  checkAll("Ring[BrightnessValue]", RingLaws[BrightnessValue].ring)
 
   test("Equality must be natural") {
     forAll { (a: BrightnessValue, b: BrightnessValue) =>
@@ -53,4 +56,27 @@ final class BrightnessValueSuite extends DisciplineSuite {
     assertEquals(BrightnessValue.fromBigDecimal.get(BigDecimal("1.0005")).scaledValue, 1001)
   }
 
+  test("BrightnessValue sum") {
+    forAll { (a: BrightnessValue, b: BrightnessValue) =>
+      assertEquals(BrightnessValue.fromBigDecimal.get(a.toBigDecimal + b.toBigDecimal), a + b)
+    }
+  }
+
+  test("BrightnessValue substraction") {
+    forAll { (a: BrightnessValue, b: BrightnessValue) =>
+      assertEquals(BrightnessValue.fromBigDecimal.get(a.toBigDecimal - b.toBigDecimal), a - b)
+    }
+  }
+
+  test("subtraction is addition with unary_-") {
+    forAll { (a: BrightnessValue, b: BrightnessValue) =>
+      assertEquals((a - b), (a + -b))
+    }
+  }
+
+  test("scalar multiplication") {
+    forAll { (a: BrightnessValue, b: Int) =>
+      assertEquals(b * a, a * b)
+    }
+  }
 }
