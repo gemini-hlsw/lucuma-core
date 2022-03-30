@@ -31,7 +31,6 @@ final case class BrightnessValue(private[lucuma] val scaledValue: Int)
   def toDouble: Double = scaledValue / 1000.0
 
   def toBigDecimal: BigDecimal = BigDecimal(scaledValue).underlying.movePointLeft(3)
-
   override def toString: String =
     s"BrightnessValue.fromDouble(${toBigDecimal.toString})"
 
