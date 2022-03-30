@@ -17,10 +17,10 @@ import lucuma.core.math.syntax.int._
 object GmosScienceAreaGeometry {
 
   // base target
-  def base =
+  def base: ShapeExpression =
     ShapeExpression.point(Offset.Zero)
 
-  def baseAt(posAngle: Angle, offsetPos: Offset) =
+  def pointAt(posAngle: Angle, offsetPos: Offset) =
     base ↗ offsetPos ⟲ posAngle
 
   val imaging: ShapeExpression =
