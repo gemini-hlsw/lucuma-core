@@ -172,4 +172,13 @@ final class AngleSuite extends munit.DisciplineSuite {
       assert(a === b || a.flip === b)
     }
   }
+
+  test("Trigonometric functions") {
+    forAll { (a: Angle) =>
+      // Trivial checks
+      assertEquals(a.sin, scala.math.sin(a.toDoubleRadians))
+      assertEquals(a.cos, scala.math.cos(a.toDoubleRadians))
+      assertEquals(a.tan, scala.math.tan(a.toDoubleRadians))
+    }
+  }
 }
