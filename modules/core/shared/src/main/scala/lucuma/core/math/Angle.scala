@@ -13,6 +13,7 @@ import lucuma.core.optics._
 import lucuma.core.syntax.parser._
 import monocle.Iso
 import monocle.Prism
+import scala.math
 
 /**
  * Exact angles represented as integral microarcseconds. These values form a commutative group over
@@ -136,6 +137,21 @@ sealed class Angle protected (val toMicroarcseconds: Long) {
    */
   def offsetInQ: Offset =
     Offset(Offset.P.Zero, q)
+
+  /**
+   * Trigonometric sine of the angle.
+   */
+  def sin: Double = math.sin(toDoubleRadians)
+
+  /**
+   * Trigonometric cosine of the angle.
+   */
+  def cos: Double = math.cos(toDoubleRadians)
+
+  /**
+   * Trigonometric tangent of the angle.
+   */
+  def tan: Double = math.tan(toDoubleRadians)
 
   /** String representation of this Angle, for debugging purposes only. */
   override def toString: String = {
