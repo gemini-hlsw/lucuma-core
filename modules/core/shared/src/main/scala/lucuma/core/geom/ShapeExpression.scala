@@ -35,6 +35,13 @@ object ShapeExpression {
   final case object Empty extends ShapeExpression
 
   /**
+   * An shape representing a point
+   *
+   * @group Constructors
+   */
+  final case class Point(x: Offset) extends ShapeExpression
+
+  /**
    * Ellipse contained in the rectangle defined by the two positions.
    *
    * @group Constructors

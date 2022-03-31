@@ -48,6 +48,7 @@ object JtsShapeInterpreter extends ShapeInterpreter {
       case Ellipse(a, b)   => safeRectangularBoundedShape(a, b)(_.createEllipse)
       case Polygon(os)     => safePolygon(os)
       case Rectangle(a, b) => safeRectangularBoundedShape(a, b)(_.createRectangle)
+      case Point(a)        => a.point
 
       // Combinations
       case Difference(a, b)   => toGeometry(a).difference(toGeometry(b))

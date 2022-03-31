@@ -86,6 +86,12 @@ final class ShapeExpressionCompanionOps(val self: ShapeExpression.type) extends 
     ShapeExpression.Empty
 
   /**
+   * An single point `ShapeExpression`
+   */
+  def point(a: Offset): ShapeExpression =
+    ShapeExpression.Point(a)
+
+  /**
    * Constructs an ellipse bound by the rectangle defined by the given
    * coordinates expressed as angular separation.
    *
