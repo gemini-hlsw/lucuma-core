@@ -11,39 +11,50 @@ import lucuma.core.syntax.all._
 import monocle.Focus
 import monocle.Lens
 
-import scala.math.atan2
-import scala.math.cos
-import scala.math.sin
-import scala.math.sqrt
+import scala.math._
 
 /** A point in the sky, given right ascension and declination. */
 final case class Coordinates(ra: RightAscension, dec: Declination) {
 
   /**
-   * Offset these `Coordinates` by the given deltas, and indicate whether the declination crossed
-   * a pole; if so the right ascension will have been flipped 180°.
-   * @group Operations
+   * Calculates the offset, posAngle and distance to another coordinate
+   * Taken from the OT calculations.
+   * (Based on the C version from A. P. Martinez)
    */
-  def offsetWithCarry(dRA: HourAngle, dDec: Angle): (Coordinates, Boolean) =
-    dec.offset(dDec) match {
-      case (decʹ, false) => (Coordinates(ra.offset(dRA), decʹ), false)
-      case (decʹ, true)  => (Coordinates(ra.flip.offset(dRA), decʹ), true)
+  def diff(x: Coordinates): CoordinatesDiff = {
+    val alf           = x.ra.toRadians
+    val alf0          = ra.toRadians
+    val limitDistance = 0.0000004
+
+    val sd0           = dec.toAngle.sin
+    val sd            = x.dec.toAngle.sin
+    val cd0           = dec.toAngle.cos
+    val cd            = x.dec.toAngle.cos
+    val cosda         = (x.ra.toAngle - ra.toAngle).cos
+    val cosd          = sd0 * sd + cd0 * cd * cosda
+
+    val dist = {
+      val acosValue = acos(cosd)
+      if (acosValue.isNaN) 0.0 else acosValue
     }
 
-  /**
-   * Offset these `Coordinates` by the given deltas. If the declination crossed a pole the right
-   * ascension will have been flipped 180°.
-   * @group Operations
-   */
-  def offset(dRA: HourAngle, dDec: Angle): Coordinates =
-    offsetWithCarry(dRA, dDec)._1
+    val phi = if (dist > limitDistance) {
+      val sind   = sin(dist)
+      val pcospa = (sd * cd0 - cd * sd0 * cosda) / sind
+      val cospa  = {
+        val absValue = abs(pcospa)
+        if (absValue > 1.0) pcospa / absValue else pcospa
+      }
+      val sinpa  = cd * sin(alf - alf0) / sind
+      val pphi   = acos(cospa)
 
-  /**
-   * Compute the offset between points, such that `a offset (a diff b) = b`.
-   * @group Operations
-   */
-  def diff(c: Coordinates): (HourAngle, Angle) =
-    (c.ra.toHourAngle - ra.toHourAngle, c.dec.toAngle - dec.toAngle)
+      if (sinpa < 0.0) (Pi * 2) - pphi else pphi
+    } else {
+      0
+    }
+
+    CoordinatesDiff(Angle.fromDoubleDegrees(phi * 180.0 / Pi), Angle.fromDoubleDegrees(dist * 180.0 / Pi))
+  }
 
   /**
    * Angular distance from `this` to `that`, always a positive angle in [0, 180]). Approximate.
