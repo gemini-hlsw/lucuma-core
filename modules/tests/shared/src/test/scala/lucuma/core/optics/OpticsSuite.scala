@@ -4,8 +4,8 @@
 package lucuma.core.optics
 
 import coulomb.accepted.Percent
-import coulomb.scalacheck.ArbQuantity
 import coulomb.cats.implicits._
+import coulomb.scalacheck.ArbQuantity
 import eu.timepit.refined.cats._
 import eu.timepit.refined.collection.NonEmpty
 import eu.timepit.refined.numeric.Positive

@@ -7,8 +7,8 @@ import cats.Eq
 import cats.kernel.laws.discipline._
 import lucuma.core.math.BrightnessUnits._
 import lucuma.core.math.dimensional.arb.ArbUnits
-import lucuma.core.util.arb.ArbEnumerated._
 import lucuma.core.syntax.display._
+import lucuma.core.util.arb.ArbEnumerated._
 import org.scalacheck.Prop._
 
 class UnitSuite extends munit.DisciplineSuite {

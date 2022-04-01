@@ -8,10 +8,10 @@ import eu.timepit.refined.cats._
 import eu.timepit.refined.scalacheck.numeric._
 import lucuma.core.math.arb._
 import lucuma.core.model.arb._
+import lucuma.core.optics.laws.discipline.SplitEpiTests
 import lucuma.core.util.arb._
 import monocle.law.discipline._
 import munit._
-import lucuma.core.optics.laws.discipline.SplitEpiTests
 
 final class ElevationRangeSuite extends DisciplineSuite {
   import ArbElevationRange._

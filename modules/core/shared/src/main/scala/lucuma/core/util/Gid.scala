@@ -123,10 +123,35 @@ final class Gid[A](
 }
 
 object Gid {
-
   def apply[A](implicit ev: Gid[A]): ev.type = ev
 
   def instance[A](tag: Char Refined Letter, toLong: A => PosLong, fromLong: PosLong => A): Gid[A] =
     new Gid[A](tag, Iso(toLong)(fromLong))
+}
 
+/**
+ * Defines `<Entity>.Id` class, its `Gid` instance, and convenience methods.
+ */
+class WithGid(idTag: Char Refined Letter) {
+
+  /** Id class for `<Entity>` */
+  case class Id(value: PosLong) {
+    override def toString: String =
+      Gid[Id].show(this)
+  }
+
+  object Id {
+
+    /** @group Typeclass Instances */
+    implicit val GidId: Gid[Id] = Gid.instance(idTag, _.value, apply)
+
+    /** Convenience method to construct from a Long */
+    def fromLong(l: Long): Option[Id] = GidId.fromLong.getOption(l)
+
+    /** Convenience method to construct from a String */
+    def parse(s: String): Option[Id] = GidId.fromString.getOption(s)
+
+    /** Allow pattern match style parsing */
+    def unapply[T](s: String): Option[Id] = parse(s)
+  }
 }

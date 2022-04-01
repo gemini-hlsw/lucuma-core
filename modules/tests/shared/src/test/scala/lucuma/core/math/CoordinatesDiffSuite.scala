@@ -5,6 +5,7 @@ package lucuma.core.math
 
 import cats.kernel.laws.discipline._
 import lucuma.core.math.arb._
+
 import scala.math._
 
 final class CoordinatesDiffSuite extends munit.DisciplineSuite {
