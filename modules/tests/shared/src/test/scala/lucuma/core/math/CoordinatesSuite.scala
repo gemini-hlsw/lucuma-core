@@ -39,35 +39,6 @@ final class CoordinatesSuite extends munit.DisciplineSuite {
     }
   }
 
-  test("offsetWithCarry must be consistent with offset") {
-    forAll { (a: Coordinates, dRA: HourAngle, dDec: Angle) =>
-      assertEquals(a.offset(dRA, dDec), a.offsetWithCarry(dRA, dDec)._1)
-    }
-  }
-
-  test("offsetWithCarry must be invertable") {
-    forAll { (a: Coordinates, dRA: HourAngle, dDec: Angle) =>
-      a.offsetWithCarry(dRA, dDec) match {
-        case (cs, false) => assertEquals(cs.offset(-dRA, -dDec), a)
-        case (cs, true)  => assertEquals(cs.offset(-dRA, dDec), a)
-      }
-    }
-  }
-
-  test("diff must be consistent with offset") {
-    forAll { (a: Coordinates, b: Coordinates) =>
-      val (dRA, dDec) = a.diff(b)
-      assertEquals(a.offset(dRA, dDec), b)
-    }
-  }
-
-  test("diff must be consistent with offsetWithCarry, and never carry") {
-    forAll { (a: Coordinates, b: Coordinates) =>
-      val (dRA, dDec) = a.diff(b)
-      assertEquals(a.offsetWithCarry(dRA, dDec), (b, false))
-    }
-  }
-
   test("angularDistance must be in [0, 180°]") {
     forAll { (a: Coordinates, b: Coordinates) =>
       assert(a.angularDistance(b).toMicroarcseconds <= Angle.Angle180.toMicroarcseconds)
@@ -112,7 +83,7 @@ final class CoordinatesSuite extends munit.DisciplineSuite {
     forAll { (ra1: RA, ra2: RA, dec: Dec, b: Boolean) =>
       val pole = Coordinates(ra1, if (b) Dec.Min else Dec.Max)
       val Δdec = dec.toAngle + Angle.Angle90 // [0, 180]
-      val Δ    = pole.angularDistance(pole.offset(ra2.toHourAngle, Δdec)) - Δdec
+      val Δ    = pole.angularDistance(pole.shift(ra2.toHourAngle, Δdec)) - Δdec
       assert(Angle.signedMicroarcseconds.get(Δ).abs <= 1L)
     }
   }
@@ -122,7 +93,7 @@ final class CoordinatesSuite extends munit.DisciplineSuite {
   ) {
     forAll { (ra: RA, ha: HourAngle) =>
       val a = Coordinates(ra, Dec.Zero)
-      val b = a.offset(ha, Angle.Angle0)
+      val b = a.shift(ha, Angle.Angle0)
       val d = a.angularDistance(b)
       val Δ = Angle.signedMicroarcseconds.get(d).abs - Angle.signedMicroarcseconds.get(ha).abs
       assert(Δ.abs <= 1L)
