@@ -16,6 +16,7 @@ final class CoordinatesSuite extends munit.DisciplineSuite {
   import ArbCoordinates._
   import ArbRightAscension._
   import ArbDeclination._
+  import ArbAngle._
 
   // Laws
   checkAll("Coordinates", OrderTests[Coordinates].order)
@@ -73,6 +74,29 @@ final class CoordinatesSuite extends munit.DisciplineSuite {
       val point = Coordinates(ra2, Dec.Zero)
       val delta = point.angularDistance(pole)
       assert((delta.toMicroarcseconds - Angle.Angle90.toMicroarcseconds).abs <= 1L)
+    }
+  }
+
+  test(
+    "angularDistance must equal any offset in declination from either pole, regardless of RA, to within 1µas"
+  ) {
+    forAll { (ra1: RA, ra2: RA, dec: Dec, b: Boolean) =>
+      val pole = Coordinates(ra1, if (b) Dec.Min else Dec.Max)
+      val Δdec = dec.toAngle + Angle.Angle90 // [0, 180]
+      val Δ    = pole.angularDistance(pole.shift(ra2.toHourAngle, Δdec)) - Δdec
+      assert(Angle.signedMicroarcseconds.get(Δ).abs <= 1L)
+    }
+  }
+
+  test(
+    "angularDistance must equal any offset in right ascension along the equator, to within 1µas"
+  ) {
+    forAll { (ra: RA, ha: HourAngle) =>
+      val a = Coordinates(ra, Dec.Zero)
+      val b = a.shift(ha, Angle.Angle0)
+      val d = a.angularDistance(b)
+      val Δ = Angle.signedMicroarcseconds.get(d).abs - Angle.signedMicroarcseconds.get(ha).abs
+      assert(Δ.abs <= 1L)
     }
   }
 

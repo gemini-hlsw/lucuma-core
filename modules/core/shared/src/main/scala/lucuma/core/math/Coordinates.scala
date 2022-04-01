@@ -15,11 +15,30 @@ import scala.math._
 
 /** A point in the sky, given right ascension and declination. */
 final case class Coordinates(ra: RightAscension, dec: Declination) {
+  /**
+   * Shift these `Coordinates` by the given deltas, and indicate whether the declination crossed
+   * a pole; if so the right ascension will have been flipped 180°.
+   * @group Operations
+   */
+  def shiftWithCarry(dRA: HourAngle, dDec: Angle): (Coordinates, Boolean) =
+    dec.offset(dDec) match {
+      case (decʹ, false) => (Coordinates(ra.offset(dRA), decʹ), false)
+      case (decʹ, true)  => (Coordinates(ra.flip.offset(dRA), decʹ), true)
+    }
+
+  /**
+   * Shift these `Coordinates` by the given deltas. If the declination crossed a pole the right
+   * ascension will have been flipped 180°.
+   * @group Operations
+   */
+  def shift(dRA: HourAngle, dDec: Angle): Coordinates =
+    shiftWithCarry(dRA, dDec)._1
 
   /**
    * Calculates the offset, posAngle and distance to another coordinate
    * Taken from the OT calculations.
    * (Based on the C version from A. P. Martinez)
+   * @group Operations
    */
   def diff(x: Coordinates): CoordinatesDiff = {
     val alf           = x.ra.toRadians
