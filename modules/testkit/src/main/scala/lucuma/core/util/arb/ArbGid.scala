@@ -10,13 +10,11 @@ import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck._
 
 trait ArbGid {
-
   implicit def arbGid[A](implicit ev: Gid[A]): Arbitrary[A] =
     Arbitrary(arbitrary[PosLong].map(ev.isoPosLong.reverseGet))
 
   implicit def cogGid[A](implicit ev: Gid[A]): Cogen[A] =
     Cogen[Long].contramap(ev.isoPosLong.get(_).value)
-
 }
 
 object ArbGid extends ArbGid

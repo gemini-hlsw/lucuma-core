@@ -5,8 +5,8 @@ package lucuma.core.model
 package arb
 
 import eu.timepit.refined.scalacheck.numeric._
-import lucuma.core.util.arb.ArbEnumerated
 import lucuma.core.math.arb.ArbRefined
+import lucuma.core.util.arb.ArbEnumerated
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Cogen._
 import org.scalacheck._

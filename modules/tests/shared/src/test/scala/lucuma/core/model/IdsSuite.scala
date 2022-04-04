@@ -5,17 +5,19 @@ package lucuma.core.model
 
 import lucuma.core.util.arb._
 import lucuma.core.util.laws.GidTests
+import lucuma.core.util.laws.UidTests
 import munit.DisciplineSuite
 
 final class IdsSuite extends DisciplineSuite {
   import ArbGid._
+  import ArbUid._
 
-  checkAll("Atom.Id", GidTests[Atom.Id].gid)
+  checkAll("Atom.Id", UidTests[Atom.Id].uid)
   checkAll("Configuration.Id", GidTests[Configuration.Id].gid)
   checkAll("Dataset.Id", GidTests[Dataset.Id].gid)
   checkAll("ExecutionEvent.Id", GidTests[ExecutionEvent.Id].gid)
   checkAll("Observation.Id", GidTests[Observation.Id].gid)
   checkAll("Program.Id", GidTests[Program.Id].gid)
-  checkAll("Step.Id", GidTests[Step.Id].gid)
-  checkAll("TargetEnvironment.Id", GidTests[TargetEnvironment.Id].gid)
+  checkAll("Step.Id", UidTests[Step.Id].uid)
+  checkAll("Visit.Id", UidTests[Visit.Id].uid)
 }
