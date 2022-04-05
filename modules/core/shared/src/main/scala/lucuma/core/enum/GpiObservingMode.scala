@@ -7,7 +7,6 @@ package enum
 
 import cats.Eval
 import cats.syntax.eq._
-import lucuma.core.math.BrightnessValue
 import lucuma.core.util.Enumerated
 
 /**
@@ -23,8 +22,8 @@ sealed abstract class GpiObservingMode(
   val apodizer:             Option[GpiApodizer],
   val fpm:                  Option[GpiFPM],
   val lyot:                 Option[GpiLyot],
-  val brightLimitPrism:     Option[BrightnessValue],
-  val brightLimitWollaston: Option[BrightnessValue],
+  val brightLimitPrism:     Option[BigDecimal],
+  val brightLimitWollaston: Option[BigDecimal],
   val correspondingHMode:   Eval[GpiObservingMode],
   val obsolete:             Boolean
 ) extends Product
@@ -43,8 +42,8 @@ object GpiObservingMode {
         Some(GpiApodizer.APOD_Y),
         Some(GpiFPM.FPM_Y),
         Some(GpiLyot.LYOT_080m12_03),
-        Some(BrightnessValue(50)),
-        Some(BrightnessValue(300)),
+        Some(BigDecimal(50)),
+        Some(BigDecimal(300)),
         cats.Eval.later(GpiObservingMode.unsafeFromTag("CORON_H_BAND")),
         false
       )
@@ -60,8 +59,8 @@ object GpiObservingMode {
         Some(GpiApodizer.APOD_J),
         Some(GpiFPM.FPM_J),
         Some(GpiLyot.LYOT_080m12_04),
-        Some(BrightnessValue(50)),
-        Some(BrightnessValue(300)),
+        Some(BigDecimal(50)),
+        Some(BigDecimal(300)),
         cats.Eval.later(GpiObservingMode.unsafeFromTag("CORON_H_BAND")),
         false
       )
@@ -77,8 +76,8 @@ object GpiObservingMode {
         Some(GpiApodizer.APOD_H),
         Some(GpiFPM.FPM_H),
         Some(GpiLyot.LYOT_080m12_04),
-        Some(BrightnessValue(50)),
-        Some(BrightnessValue(300)),
+        Some(BigDecimal(50)),
+        Some(BigDecimal(300)),
         cats.Eval.later(GpiObservingMode.unsafeFromTag("CORON_H_BAND")),
         false
       )
@@ -94,8 +93,8 @@ object GpiObservingMode {
         Some(GpiApodizer.APOD_K1),
         Some(GpiFPM.FPM_K1),
         Some(GpiLyot.LYOT_080m12_06_03),
-        Some(BrightnessValue(50)),
-        Some(BrightnessValue(300)),
+        Some(BigDecimal(50)),
+        Some(BigDecimal(300)),
         cats.Eval.later(GpiObservingMode.unsafeFromTag("CORON_H_BAND")),
         false
       )
@@ -111,8 +110,8 @@ object GpiObservingMode {
         Some(GpiApodizer.APOD_K2),
         Some(GpiFPM.FPM_K1),
         Some(GpiLyot.LYOT_080m12_07),
-        Some(BrightnessValue(50)),
-        Some(BrightnessValue(300)),
+        Some(BigDecimal(50)),
+        Some(BigDecimal(300)),
         cats.Eval.later(GpiObservingMode.unsafeFromTag("CORON_H_BAND")),
         false
       )
@@ -128,8 +127,8 @@ object GpiObservingMode {
         Some(GpiApodizer.APOD_STAR),
         Some(GpiFPM.FPM_H),
         Some(GpiLyot.LYOT_080m12_03),
-        Option.empty[BrightnessValue],
-        Option.empty[BrightnessValue],
+        Option.empty[BigDecimal],
+        Option.empty[BigDecimal],
         cats.Eval.later(GpiObservingMode.unsafeFromTag("H_STAR")),
         true
       )
@@ -145,8 +144,8 @@ object GpiObservingMode {
         Some(GpiApodizer.APOD_HL),
         Some(GpiFPM.FPM_K1),
         Some(GpiLyot.LYOT_080m12_04),
-        Option.empty[BrightnessValue],
-        Option.empty[BrightnessValue],
+        Option.empty[BigDecimal],
+        Option.empty[BigDecimal],
         cats.Eval.later(GpiObservingMode.unsafeFromTag("H_LIWA")),
         false
       )
@@ -162,8 +161,8 @@ object GpiObservingMode {
         Some(GpiApodizer.CLEAR),
         Some(GpiFPM.SCIENCE),
         Some(GpiLyot.OPEN),
-        Some(BrightnessValue(550)),
-        Some(BrightnessValue(750)),
+        Some(BigDecimal(550)),
+        Some(BigDecimal(750)),
         cats.Eval.later(GpiObservingMode.unsafeFromTag("DIRECT_H_BAND")),
         false
       )
@@ -179,8 +178,8 @@ object GpiObservingMode {
         Some(GpiApodizer.CLEAR),
         Some(GpiFPM.SCIENCE),
         Some(GpiLyot.OPEN),
-        Some(BrightnessValue(550)),
-        Some(BrightnessValue(750)),
+        Some(BigDecimal(550)),
+        Some(BigDecimal(750)),
         cats.Eval.later(GpiObservingMode.unsafeFromTag("DIRECT_H_BAND")),
         false
       )
@@ -196,8 +195,8 @@ object GpiObservingMode {
         Some(GpiApodizer.CLEAR),
         Some(GpiFPM.SCIENCE),
         Some(GpiLyot.OPEN),
-        Some(BrightnessValue(550)),
-        Some(BrightnessValue(750)),
+        Some(BigDecimal(550)),
+        Some(BigDecimal(750)),
         cats.Eval.later(GpiObservingMode.unsafeFromTag("DIRECT_H_BAND")),
         false
       )
@@ -213,8 +212,8 @@ object GpiObservingMode {
         Some(GpiApodizer.CLEAR),
         Some(GpiFPM.SCIENCE),
         Some(GpiLyot.OPEN),
-        Some(BrightnessValue(550)),
-        Some(BrightnessValue(750)),
+        Some(BigDecimal(550)),
+        Some(BigDecimal(750)),
         cats.Eval.later(GpiObservingMode.unsafeFromTag("DIRECT_H_BAND")),
         false
       )
@@ -230,8 +229,8 @@ object GpiObservingMode {
         Some(GpiApodizer.CLEAR),
         Some(GpiFPM.SCIENCE),
         Some(GpiLyot.OPEN),
-        Some(BrightnessValue(550)),
-        Some(BrightnessValue(750)),
+        Some(BigDecimal(550)),
+        Some(BigDecimal(750)),
         cats.Eval.later(GpiObservingMode.unsafeFromTag("DIRECT_H_BAND")),
         false
       )
@@ -247,8 +246,8 @@ object GpiObservingMode {
         Some(GpiApodizer.NRM),
         Some(GpiFPM.SCIENCE),
         Some(GpiLyot.OPEN),
-        Option.empty[BrightnessValue],
-        Option.empty[BrightnessValue],
+        Option.empty[BigDecimal],
+        Option.empty[BigDecimal],
         cats.Eval.later(GpiObservingMode.unsafeFromTag("NRM_H")),
         false
       )
@@ -264,8 +263,8 @@ object GpiObservingMode {
         Some(GpiApodizer.NRM),
         Some(GpiFPM.SCIENCE),
         Some(GpiLyot.OPEN),
-        Option.empty[BrightnessValue],
-        Option.empty[BrightnessValue],
+        Option.empty[BigDecimal],
+        Option.empty[BigDecimal],
         cats.Eval.later(GpiObservingMode.unsafeFromTag("NRM_H")),
         false
       )
@@ -281,8 +280,8 @@ object GpiObservingMode {
         Some(GpiApodizer.NRM),
         Some(GpiFPM.SCIENCE),
         Some(GpiLyot.OPEN),
-        Option.empty[BrightnessValue],
-        Option.empty[BrightnessValue],
+        Option.empty[BigDecimal],
+        Option.empty[BigDecimal],
         cats.Eval.later(GpiObservingMode.unsafeFromTag("NRM_H")),
         false
       )
@@ -298,8 +297,8 @@ object GpiObservingMode {
         Some(GpiApodizer.NRM),
         Some(GpiFPM.SCIENCE),
         Some(GpiLyot.OPEN),
-        Option.empty[BrightnessValue],
-        Option.empty[BrightnessValue],
+        Option.empty[BigDecimal],
+        Option.empty[BigDecimal],
         cats.Eval.later(GpiObservingMode.unsafeFromTag("NRM_H")),
         false
       )
@@ -315,8 +314,8 @@ object GpiObservingMode {
         Some(GpiApodizer.NRM),
         Some(GpiFPM.SCIENCE),
         Some(GpiLyot.OPEN),
-        Option.empty[BrightnessValue],
-        Option.empty[BrightnessValue],
+        Option.empty[BigDecimal],
+        Option.empty[BigDecimal],
         cats.Eval.later(GpiObservingMode.unsafeFromTag("NRM_H")),
         false
       )
@@ -332,8 +331,8 @@ object GpiObservingMode {
         Some(GpiApodizer.APOD_H),
         Some(GpiFPM.FPM_H),
         Some(GpiLyot.BLANK),
-        Some(BrightnessValue(50)),
-        Some(BrightnessValue(300)),
+        Some(BigDecimal(50)),
+        Some(BigDecimal(300)),
         cats.Eval.later(GpiObservingMode.unsafeFromTag("DARK")),
         false
       )
@@ -349,8 +348,8 @@ object GpiObservingMode {
         Some(GpiApodizer.APOD_Y),
         Some(GpiFPM.SCIENCE),
         Some(GpiLyot.LYOT_080m12_03),
-        Some(BrightnessValue(400)),
-        Some(BrightnessValue(650)),
+        Some(BigDecimal(400)),
+        Some(BigDecimal(650)),
         cats.Eval.later(GpiObservingMode.unsafeFromTag("UNBLOCKED_Y")),
         false
       )
@@ -366,8 +365,8 @@ object GpiObservingMode {
         Some(GpiApodizer.APOD_J),
         Some(GpiFPM.SCIENCE),
         Some(GpiLyot.LYOT_080m12_04),
-        Some(BrightnessValue(400)),
-        Some(BrightnessValue(650)),
+        Some(BigDecimal(400)),
+        Some(BigDecimal(650)),
         cats.Eval.later(GpiObservingMode.unsafeFromTag("UNBLOCKED_J")),
         false
       )
@@ -383,8 +382,8 @@ object GpiObservingMode {
         Some(GpiApodizer.APOD_H),
         Some(GpiFPM.SCIENCE),
         Some(GpiLyot.LYOT_080m12_04),
-        Some(BrightnessValue(400)),
-        Some(BrightnessValue(650)),
+        Some(BigDecimal(400)),
+        Some(BigDecimal(650)),
         cats.Eval.later(GpiObservingMode.unsafeFromTag("UNBLOCKED_H")),
         false
       )
@@ -400,8 +399,8 @@ object GpiObservingMode {
         Some(GpiApodizer.APOD_K1),
         Some(GpiFPM.SCIENCE),
         Some(GpiLyot.LYOT_080m12_06_03),
-        Some(BrightnessValue(400)),
-        Some(BrightnessValue(650)),
+        Some(BigDecimal(400)),
+        Some(BigDecimal(650)),
         cats.Eval.later(GpiObservingMode.unsafeFromTag("UNBLOCKED_K1")),
         false
       )
@@ -417,8 +416,8 @@ object GpiObservingMode {
         Some(GpiApodizer.APOD_K2),
         Some(GpiFPM.SCIENCE),
         Some(GpiLyot.LYOT_080m12_07),
-        Some(BrightnessValue(400)),
-        Some(BrightnessValue(650)),
+        Some(BigDecimal(400)),
+        Some(BigDecimal(650)),
         cats.Eval.later(GpiObservingMode.unsafeFromTag("UNBLOCKED_K2")),
         false
       )
@@ -434,8 +433,8 @@ object GpiObservingMode {
         Option.empty[GpiApodizer],
         Option.empty[GpiFPM],
         Option.empty[GpiLyot],
-        Option.empty[BrightnessValue],
-        Option.empty[BrightnessValue],
+        Option.empty[BigDecimal],
+        Option.empty[BigDecimal],
         cats.Eval.later(GpiObservingMode.unsafeFromTag("NONSTANDARD")),
         false
       )

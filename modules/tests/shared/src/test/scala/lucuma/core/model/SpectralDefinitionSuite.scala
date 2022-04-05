@@ -10,9 +10,7 @@ import eu.timepit.refined.cats._
 import lucuma.core.enum.Band
 import lucuma.core.enum.StellarLibrarySpectrum
 import lucuma.core.math.BrightnessUnits
-import lucuma.core.math.BrightnessValue
 import lucuma.core.math.Wavelength
-import lucuma.core.math.arb.ArbBrightnessValue
 import lucuma.core.math.arb.ArbRefined
 import lucuma.core.math.arb.ArbWavelength
 import lucuma.core.math.dimensional.arb.ArbMeasure
@@ -28,7 +26,6 @@ import scala.collection.immutable.SortedMap
 final class SpectralDefinitionSuite extends DisciplineSuite {
   import ArbUnnormalizedSED._
   import ArbEnumerated._
-  import ArbBrightnessValue._
   import BrightnessUnits._
   import ArbSpectralDefinition._
   import ArbRefined._
@@ -42,7 +39,7 @@ final class SpectralDefinitionSuite extends DisciplineSuite {
     SpectralDefinition.BandNormalized(
       UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.A0I),
       SortedMap(
-        Band.R -> Band.R.defaultUnits[Integrated].withValueTagged(BrightnessValue.fromDouble(10.0))
+        Band.R -> Band.R.defaultUnits[Integrated].withValueTagged(BigDecimal(10.0))
       )
     )
 
@@ -50,7 +47,7 @@ final class SpectralDefinitionSuite extends DisciplineSuite {
     SpectralDefinition.BandNormalized(
       UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.A0I),
       SortedMap(
-        Band.R -> Band.R.defaultUnits[Surface].withValueTagged(BrightnessValue.fromDouble(10.0))
+        Band.R -> Band.R.defaultUnits[Surface].withValueTagged(BigDecimal(10.0))
       )
     )
 
@@ -72,7 +69,9 @@ final class SpectralDefinitionSuite extends DisciplineSuite {
       SortedMap(
         Wavelength.Min -> EmissionLine(
           PosBigDecimalOne.withUnit[KilometersPerSecond],
-          ErgsPerSecondCentimeter2Arcsec2IsSurfaceLineFluxUnit.unit.withValueTagged(PosBigDecimalOne)
+          ErgsPerSecondCentimeter2Arcsec2IsSurfaceLineFluxUnit.unit.withValueTagged(
+            PosBigDecimalOne
+          )
         )
       ),
       WattsPerMeter2MicrometerArcsec2IsSurfaceFluxDensityContinuumUnit.unit.withValueTagged(
