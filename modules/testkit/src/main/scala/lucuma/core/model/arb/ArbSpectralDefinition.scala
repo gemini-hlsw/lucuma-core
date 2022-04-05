@@ -9,7 +9,6 @@ import eu.timepit.refined.types.numeric.PosBigDecimal
 import lucuma.core.enum.Band
 import lucuma.core.math.BrightnessUnits
 import lucuma.core.math.Wavelength
-import lucuma.core.math.arb.ArbBrightnessValue
 import lucuma.core.math.arb.ArbRefined
 import lucuma.core.math.arb.ArbWavelength
 import lucuma.core.math.dimensional._
@@ -32,7 +31,6 @@ trait ArbSpectralDefinition {
   import ArbEmissionLine._
   import ArbRefined._
   import ArbWavelength._
-  import ArbBrightnessValue._
 
   implicit def arbBandNormalizedSpectralDefinition[T](implicit
     arbUnit: Arbitrary[Units Of Brightness[T]]

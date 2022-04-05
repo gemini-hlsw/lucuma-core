@@ -31,15 +31,18 @@ class MeasureSuite extends munit.DisciplineSuite {
   }
 
   test("Derived Display") {
-    import lucuma.core.math.BrightnessValue
     import lucuma.core.math.units._
+    import lucuma.core.util.Display
     import lucuma.core.syntax.display._
 
-    val m = UnitOfMeasure[ABMagnitude].withValue(BrightnessValue.fromDouble(1.235))
+    val m = UnitOfMeasure[ABMagnitude].withValue(BigDecimal(1.235))
+
+    implicit val displayBigDecimal: Display[BigDecimal] =
+      Display.byShortName(_.toString)
 
     assertEquals(m.shortName, "1.235 AB mag")
-    assertEquals(m.withError(BrightnessValue.fromDouble(0.005)).shortName, "1.235 ± 0.005 AB mag")
-    assertEquals(m.withError(BrightnessValue.fromDouble(0.005)).displayWithoutError, "1.235 AB mag")
+    assertEquals(m.withError(BigDecimal(0.005)).shortName, "1.235 ± 0.005 AB mag")
+    assertEquals(m.withError(BigDecimal(0.005)).displayWithoutError, "1.235 AB mag")
   }
 
   // Optics

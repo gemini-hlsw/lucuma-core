@@ -38,7 +38,6 @@ final class TargetSuite extends DisciplineSuite {
   import ArbSpectralDefinition._
   import ArbAngle._
   import ArbUnnormalizedSED._
-  import ArbBrightnessValue._
   import ArbRefined._
   import ArbMeasure._
   import ArbCollection._
