@@ -49,6 +49,9 @@ object JtsShapeInterpreter extends ShapeInterpreter {
       case Polygon(os)     => safePolygon(os)
       case Rectangle(a, b) => safeRectangularBoundedShape(a, b)(_.createRectangle)
       case Point(a)        => a.point
+      case BoundingBox(e) =>
+        val (a, b) = Jts.boundingOffsets(toGeometry(e))
+        safeRectangularBoundedShape(a, b)(_.createRectangle)
 
       // Combinations
       case Difference(a, b)   => toGeometry(a).difference(toGeometry(b))

@@ -5,7 +5,6 @@ package lucuma.core.geom
 package jts
 
 import lucuma.core.geom.jts.syntax.offset._
-import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 import org.locationtech.jts.geom.Geometry
 
@@ -14,23 +13,9 @@ import org.locationtech.jts.geom.Geometry
  */
 final case class JtsShape(g: Geometry) extends Shape {
 
-  /**
-   * Convert jts coordinates back to offset
-   */
-  private def coord2offset(x: Double, y: Double): Offset =
-    // Reverse p
-    Offset(Offset.P(Angle.fromMicroarcseconds(-x.toLong)),
-           Offset.Q(Angle.fromMicroarcseconds(y.toLong))
-    )
-
   def boundingOffsets: BoundingOffsets = {
-    val envelope = g.getEnvelopeInternal
-    val p1       = coord2offset(envelope.getMinX, envelope.getMaxY)
-    val p2       = coord2offset(envelope.getMaxX, envelope.getMaxY)
-    val p3       = coord2offset(envelope.getMaxX, envelope.getMinY)
-    val p4       = coord2offset(envelope.getMinX, envelope.getMinY)
-
-    BoundingOffsets(p1, p2, p3, p4)
+    val (tl, br) = Jts.boundingOffsets(g)
+    BoundingOffsets(tl, br)
   }
 
   override def contains(o: Offset): Boolean =

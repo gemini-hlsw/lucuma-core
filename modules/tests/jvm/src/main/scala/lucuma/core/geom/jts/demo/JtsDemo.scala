@@ -20,7 +20,6 @@ import lucuma.core.math.syntax.int._
 import java.awt.event._
 import java.awt.{ List => _, _ }
 import scala.jdk.CollectionConverters._
-import lucuma.core.geom.BoundingOffsets
 
 /**
  * Throwaway demo code to visualize a shape created using `ShapeExpression`s.
@@ -132,17 +131,10 @@ object JtsDemo extends Frame("JTS Demo") {
 
         // Draw the bounding boxes
         shapes.foreach { shapeExpr =>
-          shapeExpr.eval match {
-            case jts: JtsShape =>
-              val BoundingOffsets(p1, p2, p3, p4) = jts.boundingOffsets
-              val boundingBox                     =
-                ShapeExpression.polygonAt(List(p1, p2, p3, p4).map(o => (o.p, o.q)): _*)
-              boundingBox.eval match {
-                case box: JtsShape =>
-                  g2d.setPaint(Color.magenta)
-                  g2d.draw(box.toAwt(arcsecPerPixel))
-                case _             => sys.error("Unexpected")
-              }
+          shapeExpr.boundingBox.eval match {
+            case box: JtsShape =>
+              g2d.setPaint(Color.magenta)
+              g2d.draw(box.toAwt(arcsecPerPixel))
             case x             => sys.error(s"Whoa unexpected shape type: $x")
           }
         }

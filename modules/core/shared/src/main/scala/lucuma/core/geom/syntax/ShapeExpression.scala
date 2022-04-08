@@ -54,6 +54,12 @@ final class ShapeExpressionOps(val self: ShapeExpression) extends AnyVal {
     union(that)
 
   /**
+   * Creates a bounding box for an expression
+   */
+  def boundingBox: ShapeExpression =
+    BoundingBox(self)
+
+  /**
    * Promotes `Shape.contains` through evaluation.
    */
   def contains(o: Offset)(implicit ev: ShapeInterpreter): Boolean =
@@ -70,6 +76,13 @@ final class ShapeExpressionOps(val self: ShapeExpression) extends AnyVal {
    */
   def µasSquared(implicit ev: ShapeInterpreter): Long =
     area.toMicroarcsecondsSquared
+
+  /**
+   * Promotes `Shape.boundingOffsets.maxSide` through evaluation and produces an Angle
+   */
+  def maxSide(implicit ev: ShapeInterpreter): Angle =
+    self.eval.boundingOffsets.maxSide
+
 }
 
 trait ToShapeExpressionOps {

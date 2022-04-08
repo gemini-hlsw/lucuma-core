@@ -92,6 +92,11 @@ object ShapeExpression {
       extends ShapeExpression
 
   /**
+   * @group Transformations
+   */
+  final case class BoundingBox(e: ShapeExpression) extends ShapeExpression
+
+  /**
    * Flips the provided ShapeExpression around the y axis (ie, horizontally).
    *
    * @group Transformations
