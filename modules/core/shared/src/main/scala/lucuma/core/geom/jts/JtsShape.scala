@@ -13,6 +13,11 @@ import org.locationtech.jts.geom.Geometry
  */
 final case class JtsShape(g: Geometry) extends Shape {
 
+  def boundingOffsets: BoundingOffsets = {
+    val (tl, br) = Jts.boundingOffsets(g)
+    BoundingOffsets(tl, br)
+  }
+
   override def contains(o: Offset): Boolean =
     g.contains(o.point)
 

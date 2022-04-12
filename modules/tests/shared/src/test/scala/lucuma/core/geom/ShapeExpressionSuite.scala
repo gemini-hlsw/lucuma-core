@@ -42,6 +42,18 @@ final class ShapeExpressionSuite extends munit.DisciplineSuite {
     }
   }
 
+  test("max side of the bounding box is bigger than for each shape") {
+    implicit val order = Angle.SignedAngleOrder
+    forAll(genTwoCenteredShapes) { case shapes =>
+      assert(
+        (shapes.shape0 ∪ shapes.shape1).maxSide >= shapes.shape0.maxSide
+      )
+      assert(
+        (shapes.shape0 ∪ shapes.shape1).maxSide >= shapes.shape1.maxSide
+      )
+    }
+  }
+
   test("difference contains") {
     forAll(genTwoCenteredShapesAndAnOffset) { case (tcs, off) =>
       assertEquals(
@@ -59,7 +71,7 @@ final class ShapeExpressionSuite extends munit.DisciplineSuite {
 
       // Area calculation isn't exact but within 1/2 mas^2 seems fine for our
       // purposes.
-      assertEqualsDouble((rhs - lhs).toDouble, 0L, 500L)
+      assertEqualsDouble((rhs - lhs).toDouble, 0L, 700L)
     }
   }
 
@@ -72,9 +84,28 @@ final class ShapeExpressionSuite extends munit.DisciplineSuite {
       )
 
       // Area calculation isn't exact but within 1/2 mas^2 seems fine.
-      assertEqualsDouble((rhs - lhs).toDouble, 0L, 500L)
+      assertEqualsDouble((rhs - lhs).toDouble, 0L, 700L)
     }
   }
+
+  test("bounding box area contains the shape") {
+    forAll(genShape) { (e: ShapeExpression) =>
+      val error = e.boundingBox.µasSquared - e.µasSquared
+
+      // Area calculation isn't exact but within 1/2 mas^2 seems fine.
+      assert(error >= 0 || error.toDouble < -1.0e-13)
+    }
+  }
+
+  test("bounding box area contains two unioned shapes") {
+    forAll(genShape, genShape) { (a: ShapeExpression, b: ShapeExpression) =>
+      val error = (a ∪ b).boundingBox.µasSquared - (a ∪ b).µasSquared
+
+      // Area calculation isn't exact but within 1/2 mas^2 seems fine.
+      assert(error >= 0 || error.toDouble < -1.0e-13)
+    }
+  }
+
 
   // There is a bug apparently in JTS that makes the area calculation a bit off
   // after rotation and/or translation in some cases.  This is expressed as a

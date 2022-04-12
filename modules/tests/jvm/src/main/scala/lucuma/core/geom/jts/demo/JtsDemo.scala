@@ -12,12 +12,13 @@ import lucuma.core.geom.GmosScienceAreaGeometry
 import lucuma.core.geom.ShapeExpression
 import lucuma.core.geom.jts.interpreter._
 import lucuma.core.geom.jts.jvm.syntax.awt._
+import lucuma.core.geom.syntax.all._
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 import lucuma.core.math.syntax.int._
 
 import java.awt.event._
-import java.awt.{List => _, _}
+import java.awt.{ List => _, _ }
 import scala.jdk.CollectionConverters._
 
 /**
@@ -64,7 +65,7 @@ object JtsDemo extends Frame("JTS Demo") {
       RenderingHints.KEY_RENDERING    -> RenderingHints.VALUE_RENDER_QUALITY
     )
 
-  object canvas extends Canvas {
+  def canvas(boundingBox: Boolean) = new Canvas {
     setBackground(Color.lightGray)
     setSize(canvasSize, canvasSize)
 
@@ -115,16 +116,43 @@ object JtsDemo extends Frame("JTS Demo") {
         g2d.drawLine(-halfCanvas, -dpx, halfCanvas, -dpx)
         g2d.drawLine(-halfCanvas, dpx, halfCanvas, dpx)
       }
+
+      val originalColor = g2d.getColor
+      if (boundingBox) {
+        g2d.setStroke(
+          new BasicStroke(1f,
+                          BasicStroke.CAP_BUTT,
+                          BasicStroke.JOIN_MITER,
+                          10.0f,
+                          Array(2.0f, 4.0f),
+                          1.0f
+          )
+        )
+
+        // Draw the bounding boxes
+        shapes.foreach { shapeExpr =>
+          shapeExpr.boundingBox.eval match {
+            case box: JtsShape =>
+              g2d.setPaint(Color.magenta)
+              g2d.draw(box.toAwt(arcsecPerPixel))
+            case x             => sys.error(s"Whoa unexpected shape type: $x")
+          }
+        }
+      }
+
+      g2d.setPaint(originalColor)
       g2d.setStroke(origStroke)
 
       // Finally, draw the shape.
-      shapes.foreach { shape =>
-        shape.eval match {
-          case jts: JtsShape => g2d.draw(jts.toAwt(arcsecPerPixel))
+      shapes.foreach { shapeExpr =>
+        shapeExpr.eval match {
+          case jts: JtsShape =>
+            g2d.draw(jts.toAwt(arcsecPerPixel))
           case x             => sys.error(s"Whoa unexpected shape type: $x")
         }
       }
 
+      g2d.setColor(Color.green)
     }
   }
 
@@ -136,7 +164,7 @@ object JtsDemo extends Frame("JTS Demo") {
         System.exit(0)
     })
 
-    add(BorderLayout.CENTER, canvas)
+    add(BorderLayout.CENTER, canvas(args.contains("--boxes")))
 
     setVisible(true)
   }
