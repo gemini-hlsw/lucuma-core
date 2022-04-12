@@ -31,7 +31,7 @@ final case class BoundingOffsets(topLeft: Offset, bottomRight: Offset) {
    * |---|
    * |   |
    * |---|
-   * p3 p4
+   * p4 p3
    * }}}
    */
   def vertices: (Offset, Offset, Offset, Offset) =
