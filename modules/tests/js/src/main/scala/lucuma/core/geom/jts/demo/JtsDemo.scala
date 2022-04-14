@@ -4,7 +4,7 @@
 package lucuma.core.geom.jts
 package demo
 
-import lucuma.core.geom.GmosOiwfsProbeArm
+import lucuma.core.geom.gmos._
 import lucuma.core.geom.jts.JtsShape
 import lucuma.core.geom.jts.interpreter._
 import lucuma.core.geom.svg._
@@ -16,7 +16,7 @@ import lucuma.svgdotjs.Svg
  */
 object JtsDemo {
   def main(args: Array[String]): Unit =
-    GmosOiwfsProbeArm.shape.eval match {
+    probeArm.shape.eval match {
       case j: JtsShape =>
         val svg: Svg = new Svg()
         j.toSvg(svg)

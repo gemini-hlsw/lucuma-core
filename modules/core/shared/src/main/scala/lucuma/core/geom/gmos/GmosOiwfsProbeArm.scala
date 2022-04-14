@@ -1,7 +1,7 @@
 // Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package lucuma.core.geom
+package lucuma.core.geom.gmos
 
 import cats.syntax.all._
 import lucuma.core.enum.GmosNorthFpu
@@ -22,7 +22,7 @@ import scala.math.sin
 /**
   * Description of the GMOS OIWFS probe arm geometry.
   */
-object GmosOiwfsProbeArm {
+trait GmosOiwfsProbeArm {
   private val PickoffArmLength: Angle      = 358460.mas
   private val PickoffMirrorSize: Angle     = 20.arcsec
   private val ProbeArmLength: Angle        = PickoffArmLength - PickoffMirrorSize.bisect
@@ -155,3 +155,5 @@ object GmosOiwfsProbeArm {
   }
 
 }
+
+object probeArm extends GmosOiwfsProbeArm with GmosCandidatesArea

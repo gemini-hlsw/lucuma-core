@@ -1,7 +1,7 @@
 // Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package lucuma.core.geom
+package lucuma.core.geom.gmos
 
 import lucuma.core.enum.GmosNorthFpu
 import lucuma.core.enum.GmosSouthFpu
@@ -14,7 +14,7 @@ import lucuma.core.math.syntax.int._
 /**
   * GMOS science area geometry.
   */
-object GmosScienceAreaGeometry {
+trait GmosScienceAreaGeometry {
 
   // base target
   def base: ShapeExpression =
@@ -110,3 +110,5 @@ object GmosScienceAreaGeometry {
   }
 
 }
+
+object scienceArea extends GmosScienceAreaGeometry
