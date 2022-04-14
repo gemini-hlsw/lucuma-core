@@ -3,4 +3,4 @@
 
 package lucuma.core.geom.gmos
 
-object all extends GmosOiwfsProbeArm with GmosScienceAreaGeometry with GmosPatrolArea
+object all extends GmosOiwfsProbeArm with GmosScienceAreaGeometry with GmosCandidatesArea

@@ -156,4 +156,4 @@ trait GmosOiwfsProbeArm {
 
 }
 
-object probeArm extends GmosOiwfsProbeArm
+object probeArm extends GmosOiwfsProbeArm with GmosCandidatesArea

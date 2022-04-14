@@ -46,7 +46,7 @@ object JtsDemo extends Frame("JTS Demo") {
       probeArm.shapeAt(posAngle, guideStarOffset, offsetPos, fpu, port),
       probeArm.patrolFieldAt(posAngle, offsetPos, fpu, port),
       scienceArea.shapeAt(posAngle, offsetPos, fpu),
-      patrolArea.patrolAreaAt(posAngle, offsetPos)
+      probeArm.candidatesAreaAt(posAngle, offsetPos)
     )
 
   // Scale
