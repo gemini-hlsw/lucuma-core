@@ -7,8 +7,7 @@ package demo
 import lucuma.core.enum.GmosNorthFpu
 import lucuma.core.enum.GmosSouthFpu
 import lucuma.core.enum.PortDisposition
-import lucuma.core.geom.GmosOiwfsProbeArm
-import lucuma.core.geom.GmosScienceAreaGeometry
+import lucuma.core.geom.gmos._
 import lucuma.core.geom.ShapeExpression
 import lucuma.core.geom.jts.interpreter._
 import lucuma.core.geom.jts.jvm.syntax.awt._
@@ -44,9 +43,10 @@ object JtsDemo extends Frame("JTS Demo") {
   // Shape to display
   val shapes: List[ShapeExpression] =
     List(
-      GmosOiwfsProbeArm.shapeAt(posAngle, guideStarOffset, offsetPos, fpu, port),
-      GmosOiwfsProbeArm.patrolFieldAt(posAngle, offsetPos, fpu, port),
-      GmosScienceAreaGeometry.shapeAt(posAngle, offsetPos, fpu)
+      probeArm.shapeAt(posAngle, guideStarOffset, offsetPos, fpu, port),
+      probeArm.patrolFieldAt(posAngle, offsetPos, fpu, port),
+      scienceArea.shapeAt(posAngle, offsetPos, fpu),
+      patrolArea.patrolAreaAt(posAngle, offsetPos)
     )
 
   // Scale
