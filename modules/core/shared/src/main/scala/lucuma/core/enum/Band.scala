@@ -7,19 +7,12 @@ package enum
 
 import cats.Order
 import cats.syntax.all._
-import coulomb._
-import coulomb.refined._
 import eu.timepit.refined.auto._
-import eu.timepit.refined.numeric.Positive
-import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.math.BrightnessUnits._
 import lucuma.core.math.Wavelength
 import lucuma.core.math.dimensional._
-import lucuma.core.math.units.Nanometer
 import lucuma.core.math.units._
 import lucuma.core.util.Enumerated
-import spire.std.any._
-import spire.syntax.all._
 
 /**
  * Enumerated type for wavelength band.
@@ -29,21 +22,13 @@ sealed abstract class Band(
   val tag:       String,
   val shortName: String,
   val longName:  String,
+  val start:     Wavelength,
   val center:    Wavelength,
-  val width:     Quantity[PosInt, Nanometer]
+  val end:       Wavelength
 ) extends Product
     with Serializable { self =>
-  require(center.toPicometers.value >= width.value / 2)
-
-  def end: Wavelength = Wavelength(
-    center.toPicometers + (width.value.value / 2).withRefinedUnit[Positive, Nanometer]
-  )
-
-  // The require above lets ensure we can do this unsafe refine conversion
-  import coulomb.refined.policy.unsoundRefinedConversions._
-  def start: Wavelength = Wavelength(
-    center.toPicometers - (width.value.value / 2).withRefinedUnit[Positive, Nanometer]
-  )
+  require(center >= start)
+  require(end >= center)
 
   type DefaultIntegratedUnits
   type DefaultSurfaceUnits
@@ -61,12 +46,13 @@ sealed abstract class BandWithDefaultUnits[DI, DS](
   tag:       String,
   shortName: String,
   longName:  String,
+  start:     Wavelength,
   center:    Wavelength,
-  width:     Quantity[PosInt, Nanometer]
+  end:       Wavelength
 )(implicit
   taggedI:   TaggedUnit[DI, Brightness[Integrated]],
   taggedS:   TaggedUnit[DS, Brightness[Surface]]
-) extends Band(tag, shortName, longName, center, width) { self =>
+) extends Band(tag, shortName, longName, start, center, end) { self =>
   type DefaultIntegratedUnits = DI
   type DefaultSurfaceUnits    = DS
 
@@ -92,8 +78,9 @@ object Band {
         "SloanU",
         "u",
         "UV",
+        Wavelength(333000),
         Wavelength(356000),
-        46.withRefinedUnit[Positive, Nanometer]
+        Wavelength(379000)
       )
 
   /** @group Constructors */
@@ -102,8 +89,9 @@ object Band {
         "SloanG",
         "g",
         "Green",
+        Wavelength(433000),
         Wavelength(483000),
-        99.withRefinedUnit[Positive, Nanometer]
+        Wavelength(533000)
       )
 
   /** @group Constructors */
@@ -112,8 +100,9 @@ object Band {
         "SloanR",
         "r",
         "Red",
+        Wavelength(578000),
         Wavelength(626000),
-        96.withRefinedUnit[Positive, Nanometer]
+        Wavelength(674000)
       )
 
   /** @group Constructors */
@@ -122,8 +111,9 @@ object Band {
         "SloanI",
         "i",
         "Far red",
+        Wavelength(714000),
         Wavelength(767000),
-        106.withRefinedUnit[Positive, Nanometer]
+        Wavelength(820000)
       )
 
   /** @group Constructors */
@@ -132,8 +122,9 @@ object Band {
         "SloanZ",
         "z",
         "Near infrared",
+        Wavelength(847000),
         Wavelength(910000),
-        125.withRefinedUnit[Positive, Nanometer]
+        Wavelength(973000)
       )
 
   /** @group Constructors */
@@ -142,8 +133,9 @@ object Band {
         "U",
         "U",
         "Ultraviolet",
+        Wavelength(322000),
         Wavelength(360000),
-        75.withRefinedUnit[Positive, Nanometer]
+        Wavelength(398000)
       )
 
   /** @group Constructors */
@@ -152,8 +144,9 @@ object Band {
         "B",
         "B",
         "Blue",
+        Wavelength(395000),
         Wavelength(440000),
-        90.withRefinedUnit[Positive, Nanometer]
+        Wavelength(485000)
       )
 
   /** @group Constructors */
@@ -162,8 +155,9 @@ object Band {
         "V",
         "V",
         "Visual",
+        Wavelength(507000),
         Wavelength(550000),
-        85.withRefinedUnit[Positive, Nanometer]
+        Wavelength(593000)
       )
 
   /** @group Constructors */
@@ -172,8 +166,9 @@ object Band {
         "R",
         "R",
         "Red",
+        Wavelength(620000),
         Wavelength(670000),
-        100.withRefinedUnit[Positive, Nanometer]
+        Wavelength(720000)
       )
 
   /** @group Constructors */
@@ -182,8 +177,9 @@ object Band {
         "I",
         "I",
         "Infrared",
+        Wavelength(820000),
         Wavelength(870000),
-        100.withRefinedUnit[Positive, Nanometer]
+        Wavelength(920000)
       )
 
   /** @group Constructors */
@@ -192,8 +188,9 @@ object Band {
         "Y",
         "Y",
         "Y",
+        Wavelength(960000),
         Wavelength(1020000),
-        120.withRefinedUnit[Positive, Nanometer]
+        Wavelength(1080000)
       )
 
   /** @group Constructors */
@@ -202,8 +199,9 @@ object Band {
         "J",
         "J",
         "J",
+        Wavelength(1130000),
         Wavelength(1250000),
-        240.withRefinedUnit[Positive, Nanometer]
+        Wavelength(1370000)
       )
 
   /** @group Constructors */
@@ -212,8 +210,9 @@ object Band {
         "H",
         "H",
         "H",
+        Wavelength(1500000),
         Wavelength(1650000),
-        300.withRefinedUnit[Positive, Nanometer]
+        Wavelength(1800000)
       )
 
   /** @group Constructors */
@@ -222,8 +221,9 @@ object Band {
         "K",
         "K",
         "K",
+        Wavelength(1995000),
         Wavelength(2200000),
-        410.withRefinedUnit[Positive, Nanometer]
+        Wavelength(2405000)
       )
 
   /** @group Constructors */
@@ -232,8 +232,9 @@ object Band {
         "L",
         "L",
         "L",
+        Wavelength(3410000),
         Wavelength(3760000),
-        700.withRefinedUnit[Positive, Nanometer]
+        Wavelength(4110000)
       )
 
   /** @group Constructors */
@@ -242,8 +243,9 @@ object Band {
         "M",
         "M",
         "M",
+        Wavelength(4650000),
         Wavelength(4770000),
-        240.withRefinedUnit[Positive, Nanometer]
+        Wavelength(4890000)
       )
 
   /** @group Constructors */
@@ -252,8 +254,9 @@ object Band {
         "N",
         "N",
         "N",
+        Wavelength(7855000),
         Wavelength(10470000),
-        5230.withRefinedUnit[Positive, Nanometer]
+        Wavelength(13085000)
       )
 
   /** @group Constructors */
@@ -262,8 +265,9 @@ object Band {
         "Q",
         "Q",
         "Q",
+        Wavelength(19305000),
         Wavelength(20130000),
-        1650.withRefinedUnit[Positive, Nanometer]
+        Wavelength(20955000)
       )
 
   /** @group Constructors */
@@ -272,8 +276,9 @@ object Band {
         "Ap",
         "AP",
         "Apparent",
-        Wavelength(550000),
-        85.withRefinedUnit[Positive, Nanometer]
+        V.start,
+        V.center,
+        V.end
       )
 
   /** @group Constructors */
@@ -282,8 +287,9 @@ object Band {
         "Gaia",
         "G",
         "Gaia Pass Band",
-        Wavelength(690000),
-        720.withRefinedUnit[Positive, Nanometer] // 330-1050
+        Wavelength(330000),
+        Wavelength(641000),
+        Wavelength(1037000)
       )
 
   /** @group Constructors */
@@ -292,8 +298,9 @@ object Band {
         "GaiaBP",
         "G_BP",
         "Gaia Blue Pass Band",
-        Wavelength(505000),
-        350.withRefinedUnit[Positive, Nanometer] // 330-680
+        Wavelength(328000),
+        Wavelength(513000),
+        Wavelength(671000)
       )
 
   /** @group Constructors */
@@ -302,8 +309,9 @@ object Band {
         "GaiaRP",
         "G_RP",
         "Gaia Red Pass Band",
-        Wavelength(845000),
-        410.withRefinedUnit[Positive, Nanometer] // 640-1050
+        Wavelength(626000),
+        Wavelength(778000),
+        Wavelength(1051000)
       )
 
   /** All members of Band, in canonical order. */
