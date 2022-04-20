@@ -12,7 +12,6 @@ lazy val monocleVersion        = "3.1.0"
 lazy val scalaJavaTimeVersion  = "2.3.0"
 lazy val geminiLocalesVersion  = "0.7.0"
 lazy val jtsVersion            = "0.2.2"
-lazy val svgdotjsVersion       = "0.2.1"
 lazy val coulombVersion        = "0.5.8"
 lazy val spireVersion          = "0.18.0-M3"
 lazy val singletonOpsVersion   = "0.5.2"
@@ -66,8 +65,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
   .jsSettings(
     libraryDependencies ++= Seq(
       "io.github.cquiroz" %%% "scala-java-time" % scalaJavaTimeVersion,
-      "edu.gemini"        %%% "gemini-locales"  % geminiLocalesVersion,
-      "edu.gemini"        %%% "lucuma-svgdotjs" % svgdotjsVersion
+      "edu.gemini"        %%% "gemini-locales"  % geminiLocalesVersion
     )
   )
 
