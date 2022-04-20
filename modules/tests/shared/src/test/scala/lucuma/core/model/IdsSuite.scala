@@ -12,12 +12,12 @@ final class IdsSuite extends DisciplineSuite {
   import ArbGid._
   import ArbUid._
 
-  checkAll("Atom.Id", UidTests[Atom.Id].uid)
+  // checkAll("Atom.Id", UidTests[Atom.Id].uid)
   checkAll("Configuration.Id", GidTests[Configuration.Id].gid)
   checkAll("Dataset.Id", GidTests[Dataset.Id].gid)
   checkAll("ExecutionEvent.Id", GidTests[ExecutionEvent.Id].gid)
   checkAll("Observation.Id", GidTests[Observation.Id].gid)
   checkAll("Program.Id", GidTests[Program.Id].gid)
-  checkAll("Step.Id", UidTests[Step.Id].uid)
+  // checkAll("Step.Id", UidTests[Step.Id].uid)
   checkAll("Visit.Id", UidTests[Visit.Id].uid)
 }
