@@ -9,7 +9,7 @@ import spire.math.Rational
 final class GmosNorthDisperserSuite extends DisciplineSuite {
 
   test("dispersion") {
-    assertEquals(GmosNorthDisperser.B1200_G5301.dispersion.value, Rational(26, 1000))
+    assertEquals(GmosNorthGrating.B1200_G5301.dispersion.value, Rational(26, 1000))
   }
 
 }
