@@ -6,7 +6,7 @@ package lucuma.core.`enum`
 import munit.DisciplineSuite
 import spire.math.Rational
 
-final class GmosNorthDisperserSuite extends DisciplineSuite {
+final class GmosNorthGratingSuite extends DisciplineSuite {
 
   test("dispersion") {
     assertEquals(GmosNorthGrating.B1200_G5301.dispersion.value, Rational(26, 1000))
