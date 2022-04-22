@@ -59,12 +59,12 @@ object GiapiStatusApply {
   /** @group Constructors */ case object GhostFiberAgitator2 extends GiapiStatusApply("GhostFiberAgitator2", Instrument.Ghost, GiapiType.Int, "ghost:sad:cc:slu:fa2.active", "ghost:cc:slu:fa2.type", Option.empty[BigDecimal])
   /** @group Constructors */ case object GhostRedExposureTime extends GiapiStatusApply("GhostRedExposureTime", Instrument.Ghost, GiapiType.Double, "ghost:sad:dc:red.exposedRQ", "ghost:dc:red.duration", Option.empty[BigDecimal])
   /** @group Constructors */ case object GhostRedExposureCount extends GiapiStatusApply("GhostRedExposureCount", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:red.repeat", "ghost:dc:red.repeat", Option.empty[BigDecimal])
-  /** @group Constructors */ case object GhostRedExposureBinningRcf extends GiapiStatusApply("GhostRedExposureBinningRcf", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:red:binx", "ghost:dc:red.rcf", Option.empty[BigDecimal])
-  /** @group Constructors */ case object GhostRedExposureBinningCcf extends GiapiStatusApply("GhostRedExposureBinningCcf", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:red:biny", "ghost:dc:red.ccf", Option.empty[BigDecimal])
+  /** @group Constructors */ case object GhostRedBinningRcf extends GiapiStatusApply("GhostRedBinningRcf", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:red:binx", "ghost:dc:red.rcf", Option.empty[BigDecimal])
+  /** @group Constructors */ case object GhostRedBinningCcf extends GiapiStatusApply("GhostRedBinningCcf", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:red:biny", "ghost:dc:red.ccf", Option.empty[BigDecimal])
   /** @group Constructors */ case object GhostBlueExposureTime extends GiapiStatusApply("GhostBlueExposureTime", Instrument.Ghost, GiapiType.Double, "ghost:sad:dc:blue.exposedRQ", "ghost:dc:blue.duration", Option.empty[BigDecimal])
   /** @group Constructors */ case object GhostBlueExposureCount extends GiapiStatusApply("GhostBlueExposureCount", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:blue.repeat:GhostBlue.repeat", "ghost:dc:blue.repeat", Option.empty[BigDecimal])
-  /** @group Constructors */ case object GhostBlueExposureBinningRcf extends GiapiStatusApply("GhostBlueExposureBinningRcf", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:blue:binx", "ghost:dc:blue.rcf", Option.empty[BigDecimal])
-  /** @group Constructors */ case object GhostBlueExposureBinningCcf extends GiapiStatusApply("GhostBlueExposureBinningCcf", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:blue:biny", "ghost:dc:blue.ccf", Option.empty[BigDecimal])
+  /** @group Constructors */ case object GhostBlueBinningRcf extends GiapiStatusApply("GhostBlueBinningRcf", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:blue:binx", "ghost:dc:blue.rcf", Option.empty[BigDecimal])
+  /** @group Constructors */ case object GhostBlueBinningCcf extends GiapiStatusApply("GhostBlueBinningCcf", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:blue:biny", "ghost:dc:blue.ccf", Option.empty[BigDecimal])
   /** @group Constructors */ case object GhostIFU1Type extends GiapiStatusApply("GhostIFU1Type", Instrument.Ghost, GiapiType.Int, "ghost:sad:cc:cu:ifu1.type", "ghost:cc:cu:ifu1.type", Option.empty[BigDecimal])
   /** @group Constructors */ case object GhostIFU2Type extends GiapiStatusApply("GhostIFU2Type", Instrument.Ghost, GiapiType.Int, "ghost:sad:cc:cu:ifu2.type", "ghost:cc:cu:ifu2.type", Option.empty[BigDecimal])
   /** @group Constructors */ case object GhostIFU1Target extends GiapiStatusApply("GhostIFU1Target", Instrument.Ghost, GiapiType.Int, "ghost:sad:cc:cu:ifu1.target", "ghost:cc:cu:ifu1.target", Option.empty[BigDecimal])
@@ -143,12 +143,12 @@ object GiapiStatusApply {
       GhostFiberAgitator2,
       GhostRedExposureTime,
       GhostRedExposureCount,
-      GhostRedExposureBinningRcf,
-      GhostRedExposureBinningCcf,
+      GhostRedBinningRcf,
+      GhostRedBinningCcf,
       GhostBlueExposureTime,
       GhostBlueExposureCount,
-      GhostBlueExposureBinningRcf,
-      GhostBlueExposureBinningCcf,
+      GhostBlueBinningRcf,
+      GhostBlueBinningCcf,
       GhostIFU1Type,
       GhostIFU2Type,
       GhostIFU1Target,
