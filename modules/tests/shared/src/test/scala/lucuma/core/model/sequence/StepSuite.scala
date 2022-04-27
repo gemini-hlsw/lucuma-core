@@ -32,6 +32,7 @@ final class StepSuite extends DisciplineSuite {
   checkAll("Step.GmosSouth.breakpoint", LensTests(Step.GmosSouth.breakpoint))
 
   checkAll("Eq[Step]", EqTests[Step].eqv)
+  checkAll("Step.Id", UidTests[Step.Id].uid)
   checkAll("Step.gmosNorth", PrismTests(Step.gmosNorth))
   checkAll("Step.gmosSouth", PrismTests(Step.gmosSouth))
 }

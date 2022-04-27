@@ -30,6 +30,7 @@ final class AtomSuite extends DisciplineSuite {
   checkAll("Atom.GmosSouth.time", LensTests(Atom.GmosSouth.time))
 
   checkAll("Eq[Atom]", EqTests[Atom].eqv)
+  checkAll("Atom.Id", UidTests[Atom.Id].uid)
   checkAll("Atom.gmosNorth", PrismTests(Atom.gmosNorth))
   checkAll("Atom.gmosSouth", PrismTests(Atom.gmosSouth))
 }
