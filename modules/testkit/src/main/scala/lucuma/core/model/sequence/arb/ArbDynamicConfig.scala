@@ -6,7 +6,7 @@ package lucuma.core.model.sequence.arb
 import cats.syntax.all._
 import lucuma.core.arb.ArbTime
 import lucuma.core.enum._
-import lucuma.core.model.sequence.InstrumentConfig
+import lucuma.core.model.sequence.DynamicConfig
 import lucuma.core.model.sequence._
 import lucuma.core.util.arb.ArbEnumerated
 import org.scalacheck.Arbitrary
@@ -16,14 +16,14 @@ import org.scalacheck.Gen
 
 import java.time.Duration
 
-trait ArbInstrumentConfig {
+trait ArbDynamicConfig {
   import ArbGmosCcdMode._
   import ArbEnumerated._
   import ArbGmosGrating._
   import ArbGmosFpuMask._
   import ArbTime._
 
-  implicit val arbInstrumentConfigGmosNorth: Arbitrary[InstrumentConfig.GmosNorth] = Arbitrary(
+  implicit val arbDynamicConfigGmosNorth: Arbitrary[DynamicConfig.GmosNorth] = Arbitrary(
     for {
       exposure <- arbitrary[Duration]
       readout  <- arbitrary[GmosCcdMode]
@@ -32,10 +32,10 @@ trait ArbInstrumentConfig {
       grating  <- arbitrary[Option[GmosGrating.North]]
       filter   <- arbitrary[Option[GmosNorthFilter]]
       fpu      <- arbitrary[Option[GmosFpuMask[GmosNorthFpu]]]
-    } yield InstrumentConfig.GmosNorth(exposure, readout, dtax, roi, grating, filter, fpu)
+    } yield DynamicConfig.GmosNorth(exposure, readout, dtax, roi, grating, filter, fpu)
   )
 
-  implicit val cogInstrumentConfigGmosNorth: Cogen[InstrumentConfig.GmosNorth] =
+  implicit val cogDynamicConfigGmosNorth: Cogen[DynamicConfig.GmosNorth] =
     Cogen[
       (Duration,
        GmosCcdMode,
@@ -47,7 +47,7 @@ trait ArbInstrumentConfig {
       )
     ].contramap(c => (c.exposure, c.readout, c.dtax, c.roi, c.grating, c.filter, c.fpu))
 
-  implicit val arbInstrumentConfigGmosSouth: Arbitrary[InstrumentConfig.GmosSouth] = Arbitrary(
+  implicit val arbDynamicConfigGmosSouth: Arbitrary[DynamicConfig.GmosSouth] = Arbitrary(
     for {
       exposure <- arbitrary[Duration]
       readout  <- arbitrary[GmosCcdMode]
@@ -56,10 +56,10 @@ trait ArbInstrumentConfig {
       grating  <- arbitrary[Option[GmosGrating.South]]
       filter   <- arbitrary[Option[GmosSouthFilter]]
       fpu      <- arbitrary[Option[GmosFpuMask[GmosSouthFpu]]]
-    } yield InstrumentConfig.GmosSouth(exposure, readout, dtax, roi, grating, filter, fpu)
+    } yield DynamicConfig.GmosSouth(exposure, readout, dtax, roi, grating, filter, fpu)
   )
 
-  implicit val cogInstrumentConfigGmosSouth: Cogen[InstrumentConfig.GmosSouth] = Cogen[
+  implicit val cogDynamicConfigGmosSouth: Cogen[DynamicConfig.GmosSouth] = Cogen[
     (Duration,
      GmosCcdMode,
      GmosDtax,
@@ -70,18 +70,18 @@ trait ArbInstrumentConfig {
     )
   ].contramap(c => (c.exposure, c.readout, c.dtax, c.roi, c.grating, c.filter, c.fpu))
 
-  implicit val arbInstrumentConfig: Arbitrary[InstrumentConfig] = Arbitrary(
+  implicit val arbDynamicConfig: Arbitrary[DynamicConfig] = Arbitrary(
     Gen.oneOf(
-      arbitrary[InstrumentConfig.GmosNorth],
-      arbitrary[InstrumentConfig.GmosSouth]
+      arbitrary[DynamicConfig.GmosNorth],
+      arbitrary[DynamicConfig.GmosSouth]
     )
   )
 
-  implicit val cogInstrumentConfig: Cogen[InstrumentConfig] =
-    Cogen[Either[InstrumentConfig.GmosNorth, InstrumentConfig.GmosSouth]].contramap {
-      case c @ InstrumentConfig.GmosNorth(_, _, _, _, _, _, _) => c.asLeft
-      case c @ InstrumentConfig.GmosSouth(_, _, _, _, _, _, _) => c.asRight
+  implicit val cogDynamicConfig: Cogen[DynamicConfig] =
+    Cogen[Either[DynamicConfig.GmosNorth, DynamicConfig.GmosSouth]].contramap {
+      case c @ DynamicConfig.GmosNorth(_, _, _, _, _, _, _) => c.asLeft
+      case c @ DynamicConfig.GmosSouth(_, _, _, _, _, _, _) => c.asRight
     }
 }
 
-object ArbInstrumentConfig extends ArbInstrumentConfig
+object ArbDynamicConfig extends ArbDynamicConfig

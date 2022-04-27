@@ -6,6 +6,7 @@ package lucuma.core.model.sequence
 import cats.kernel.laws.discipline._
 import lucuma.core.model.sequence.arb._
 import lucuma.core.util.arb._
+import lucuma.core.util.laws.UidTests
 import monocle.law.discipline._
 import munit._
 import org.scalacheck.Test

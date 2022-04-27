@@ -15,7 +15,7 @@ import monocle.macros.GenPrism
 
 sealed trait Step {
   val id: Step.Id
-  val instrumentConfig: InstrumentConfig
+  val instrumentConfig: DynamicConfig
   val stepConfig: StepConfig
   val time: StepTime
   val breakpoint: Breakpoint
@@ -24,7 +24,7 @@ sealed trait Step {
 object Step extends WithUid('s') {
   final case class GmosNorth(
     id:               Step.Id,
-    instrumentConfig: InstrumentConfig.GmosNorth,
+    instrumentConfig: DynamicConfig.GmosNorth,
     stepConfig:       StepConfig,
     time:             StepTime,
     breakpoint:       Breakpoint
@@ -38,7 +38,7 @@ object Step extends WithUid('s') {
       Focus[GmosNorth](_.id)
 
     /** @group Optics */
-    val instrumentConfig: Lens[GmosNorth, InstrumentConfig.GmosNorth] =
+    val instrumentConfig: Lens[GmosNorth, DynamicConfig.GmosNorth] =
       Focus[GmosNorth](_.instrumentConfig)
 
     /** @group Optics */
@@ -56,7 +56,7 @@ object Step extends WithUid('s') {
 
   final case class GmosSouth(
     id:               Step.Id,
-    instrumentConfig: InstrumentConfig.GmosSouth,
+    instrumentConfig: DynamicConfig.GmosSouth,
     stepConfig:       StepConfig,
     time:             StepTime,
     breakpoint:       Breakpoint
@@ -70,7 +70,7 @@ object Step extends WithUid('s') {
       Focus[GmosSouth](_.id)
 
     /** @group Optics */
-    val instrumentConfig: Lens[GmosSouth, InstrumentConfig.GmosSouth] =
+    val instrumentConfig: Lens[GmosSouth, DynamicConfig.GmosSouth] =
       Focus[GmosSouth](_.instrumentConfig)
 
     /** @group Optics */

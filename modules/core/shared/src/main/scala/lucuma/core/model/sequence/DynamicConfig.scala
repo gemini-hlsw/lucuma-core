@@ -14,8 +14,8 @@ import org.typelevel.cats.time._
 
 import java.time.Duration
 
-sealed trait InstrumentConfig
-object InstrumentConfig {
+sealed trait DynamicConfig
+object DynamicConfig {
   final case class GmosNorth(
     exposure: Duration,
     readout:  GmosCcdMode,
@@ -24,7 +24,7 @@ object InstrumentConfig {
     grating:  Option[GmosGrating.North],
     filter:   Option[GmosNorthFilter],
     fpu:      Option[GmosFpuMask[GmosNorthFpu]]
-  ) extends InstrumentConfig
+  ) extends DynamicConfig
   object GmosNorth {
     implicit val eqInstrumentConfigGmosNorth: Eq[GmosNorth] =
       Eq.by(x => (x.exposure, x.readout, x.dtax, x.roi, x.grating, x.filter, x.fpu))
@@ -66,7 +66,7 @@ object InstrumentConfig {
     grating:  Option[GmosGrating.South],
     filter:   Option[GmosSouthFilter],
     fpu:      Option[GmosFpuMask[GmosSouthFpu]]
-  ) extends InstrumentConfig
+  ) extends DynamicConfig
   object GmosSouth {
     implicit val eqInstrumentConfigGmosSouth: Eq[GmosSouth] =
       Eq.by(x => (x.exposure, x.readout, x.dtax, x.roi, x.grating, x.filter, x.fpu))
@@ -100,17 +100,17 @@ object InstrumentConfig {
       Focus[GmosSouth](_.fpu)
   }
 
-  implicit val eqInstrumentConfig: Eq[InstrumentConfig] = Eq.instance {
+  implicit val eqDynamicConfig: Eq[DynamicConfig] = Eq.instance {
     case (a @ GmosNorth(_, _, _, _, _, _, _), b @ GmosNorth(_, _, _, _, _, _, _)) => a === b
     case (a @ GmosSouth(_, _, _, _, _, _, _), b @ GmosSouth(_, _, _, _, _, _, _)) => a === b
     case _                                                                        => false
   }
 
   /** @group Optics */
-  val gmosNorth: Prism[InstrumentConfig, GmosNorth] =
-    GenPrism[InstrumentConfig, GmosNorth]
+  val gmosNorth: Prism[DynamicConfig, GmosNorth] =
+    GenPrism[DynamicConfig, GmosNorth]
 
   /** @group Optics */
-  val gmosSouth: Prism[InstrumentConfig, GmosSouth] =
-    GenPrism[InstrumentConfig, GmosSouth]
+  val gmosSouth: Prism[DynamicConfig, GmosSouth] =
+    GenPrism[DynamicConfig, GmosSouth]
 }

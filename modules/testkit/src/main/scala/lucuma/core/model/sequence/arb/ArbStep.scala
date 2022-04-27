@@ -15,38 +15,38 @@ import org.scalacheck.Gen
 
 trait ArbStep {
   import ArbUid._
-  import ArbInstrumentConfig._
+  import ArbDynamicConfig._
   import ArbStepConfig._
   import ArbStepTime._
   import ArbEnumerated._
 
   implicit val arbStepGmosNorth: Arbitrary[Step.GmosNorth] = Arbitrary(
     for {
-      id               <- arbitrary[Step.Id]
-      instrumentConfig <- arbitrary[InstrumentConfig.GmosNorth]
-      stepConfig       <- arbitrary[StepConfig]
-      time             <- arbitrary[StepTime]
-      breakpoint       <- arbitrary[Breakpoint]
-    } yield Step.GmosNorth(id, instrumentConfig, stepConfig, time, breakpoint)
+      id            <- arbitrary[Step.Id]
+      DynamicConfig <- arbitrary[DynamicConfig.GmosNorth]
+      stepConfig    <- arbitrary[StepConfig]
+      time          <- arbitrary[StepTime]
+      breakpoint    <- arbitrary[Breakpoint]
+    } yield Step.GmosNorth(id, DynamicConfig, stepConfig, time, breakpoint)
   )
 
   implicit val cogStepGmosNorth: Cogen[Step.GmosNorth] =
-    Cogen[(Step.Id, InstrumentConfig.GmosNorth, StepConfig, StepTime, Breakpoint)].contramap(s =>
+    Cogen[(Step.Id, DynamicConfig.GmosNorth, StepConfig, StepTime, Breakpoint)].contramap(s =>
       (s.id, s.instrumentConfig, s.stepConfig, s.time, s.breakpoint)
     )
 
   implicit val arbStepGmosSouth: Arbitrary[Step.GmosSouth] = Arbitrary(
     for {
-      id               <- arbitrary[Step.Id]
-      instrumentConfig <- arbitrary[InstrumentConfig.GmosSouth]
-      stepConfig       <- arbitrary[StepConfig]
-      time             <- arbitrary[StepTime]
-      breakpoint       <- arbitrary[Breakpoint]
-    } yield Step.GmosSouth(id, instrumentConfig, stepConfig, time, breakpoint)
+      id            <- arbitrary[Step.Id]
+      DynamicConfig <- arbitrary[DynamicConfig.GmosSouth]
+      stepConfig    <- arbitrary[StepConfig]
+      time          <- arbitrary[StepTime]
+      breakpoint    <- arbitrary[Breakpoint]
+    } yield Step.GmosSouth(id, DynamicConfig, stepConfig, time, breakpoint)
   )
 
   implicit val cogStepGmosSouth: Cogen[Step.GmosSouth] =
-    Cogen[(Step.Id, InstrumentConfig.GmosSouth, StepConfig, StepTime, Breakpoint)].contramap(s =>
+    Cogen[(Step.Id, DynamicConfig.GmosSouth, StepConfig, StepTime, Breakpoint)].contramap(s =>
       (s.id, s.instrumentConfig, s.stepConfig, s.time, s.breakpoint)
     )
 
