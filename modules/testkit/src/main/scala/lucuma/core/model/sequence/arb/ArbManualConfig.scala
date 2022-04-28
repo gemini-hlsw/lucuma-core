@@ -15,37 +15,37 @@ import org.scalacheck.Gen
 import java.time.Duration
 
 trait ArbManualConfig {
-  import ArbUid._
+  import ArbAtom._
   import ArbStaticConfig._
-  import ArbSequence._
   import ArbTime._
+  import ArbUid._
 
   implicit val arbManualConfigGmosNorth: Arbitrary[ManualConfig.GmosNorth] = Arbitrary(
     for {
       static      <- arbitrary[StaticConfig.GmosNorth]
       setupTime   <- arbitrary[Duration]
-      acquisition <- arbitrary[Sequence.GmosNorth]
-      science     <- arbitrary[Sequence.GmosNorth]
+      acquisition <- arbitrary[List[Atom.GmosNorth]]
+      science     <- arbitrary[List[Atom.GmosNorth]]
     } yield ManualConfig.GmosNorth(static, setupTime, acquisition, science)
   )
 
   implicit val cogManualConfigGmosNorth: Cogen[ManualConfig.GmosNorth] =
-    Cogen[(StaticConfig.GmosNorth, Duration, Sequence.GmosNorth, Sequence.GmosNorth)].contramap(c =>
-      (c.static, c.setupTime, c.acquisition, c.science)
+    Cogen[(StaticConfig.GmosNorth, Duration, List[Atom.GmosNorth], List[Atom.GmosNorth])].contramap(
+      c => (c.static, c.setupTime, c.acquisition, c.science)
     )
 
   implicit val arbManualConfigGmosSouth: Arbitrary[ManualConfig.GmosSouth] = Arbitrary(
     for {
       static      <- arbitrary[StaticConfig.GmosSouth]
       setupTime   <- arbitrary[Duration]
-      acquisition <- arbitrary[Sequence.GmosSouth]
-      science     <- arbitrary[Sequence.GmosSouth]
+      acquisition <- arbitrary[List[Atom.GmosSouth]]
+      science     <- arbitrary[List[Atom.GmosSouth]]
     } yield ManualConfig.GmosSouth(static, setupTime, acquisition, science)
   )
 
   implicit val cogManualConfigGmosSouth: Cogen[ManualConfig.GmosSouth] =
-    Cogen[(StaticConfig.GmosSouth, Duration, Sequence.GmosSouth, Sequence.GmosSouth)].contramap(c =>
-      (c.static, c.setupTime, c.acquisition, c.science)
+    Cogen[(StaticConfig.GmosSouth, Duration, List[Atom.GmosSouth], List[Atom.GmosSouth])].contramap(
+      c => (c.static, c.setupTime, c.acquisition, c.science)
     )
 
   implicit val arbManualConfig: Arbitrary[ManualConfig] = Arbitrary(

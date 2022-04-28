@@ -16,19 +16,16 @@ final class AtomSuite extends DisciplineSuite {
   import ArbEnumerated._
   import ArbUid._
   import ArbAtom._
-  import ArbStepTime._
 
   override val scalaCheckTestParameters = Test.Parameters.default.withMaxSize(20)
 
   checkAll("Eq[Atom.GmosNorth]", EqTests[Atom.GmosNorth].eqv)
   checkAll("Atom.GmosNorth.id", LensTests(Atom.GmosNorth.id))
   checkAll("Atom.GmosNorth.steps", LensTests(Atom.GmosNorth.steps))
-  checkAll("Atom.GmosNorth.time", LensTests(Atom.GmosNorth.time))
 
   checkAll("Eq[Atom.GmosSouth]", EqTests[Atom.GmosSouth].eqv)
   checkAll("Atom.GmosSouth.id", LensTests(Atom.GmosSouth.id))
   checkAll("Atom.GmosSouth.steps", LensTests(Atom.GmosSouth.steps))
-  checkAll("Atom.GmosSouth.time", LensTests(Atom.GmosSouth.time))
 
   checkAll("Eq[Atom]", EqTests[Atom].eqv)
   checkAll("Atom.Id", UidTests[Atom.Id].uid)

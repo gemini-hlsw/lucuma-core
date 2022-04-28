@@ -13,12 +13,12 @@ import org.scalacheck.Test
 import org.typelevel.cats.time._
 
 final class ManualConfigSuite extends DisciplineSuite {
+  import ArbAtom._
   import ArbEnumerated._
-  import ArbUid._
-  import ArbSequence._
   import ArbManualConfig._
   import ArbStaticConfig._
   import ArbTime._
+  import ArbUid._
 
   override val scalaCheckTestParameters = Test.Parameters.default.withMaxSize(10)
 

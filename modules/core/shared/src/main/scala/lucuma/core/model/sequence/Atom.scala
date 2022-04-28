@@ -15,13 +15,12 @@ import monocle.macros.GenPrism
 sealed trait Atom {
   val id: Atom.Id
   val steps: List[Step]
-  val time: StepTime
 }
 
 object Atom extends WithUid('a') {
-  final case class GmosNorth(id: Atom.Id, steps: List[Step.GmosNorth], time: StepTime) extends Atom
+  final case class GmosNorth(id: Atom.Id, steps: List[Step.GmosNorth]) extends Atom
   object GmosNorth {
-    implicit val eqAtomGmosNorth: Eq[GmosNorth] = Eq.by(a => (a.id, a.steps, a.time))
+    implicit val eqAtomGmosNorth: Eq[GmosNorth] = Eq.by(a => (a.id, a.steps))
 
     /** @group Optics */
     val id: Lens[GmosNorth, Atom.Id] =
@@ -30,15 +29,11 @@ object Atom extends WithUid('a') {
     /** @group Optics */
     val steps: Lens[GmosNorth, List[Step.GmosNorth]] =
       Focus[GmosNorth](_.steps)
-
-    /** @group Optics */
-    val time: Lens[GmosNorth, StepTime] =
-      Focus[GmosNorth](_.time)
   }
 
-  final case class GmosSouth(id: Atom.Id, steps: List[Step.GmosSouth], time: StepTime) extends Atom
+  final case class GmosSouth(id: Atom.Id, steps: List[Step.GmosSouth]) extends Atom
   object GmosSouth {
-    implicit val eqAtomGmosSouth: Eq[GmosSouth] = Eq.by(a => (a.id, a.steps, a.time))
+    implicit val eqAtomGmosSouth: Eq[GmosSouth] = Eq.by(a => (a.id, a.steps))
 
     /** @group Optics */
     val id: Lens[GmosSouth, Atom.Id] =
@@ -47,16 +42,12 @@ object Atom extends WithUid('a') {
     /** @group Optics */
     val steps: Lens[GmosSouth, List[Step.GmosSouth]] =
       Focus[GmosSouth](_.steps)
-
-    /** @group Optics */
-    val time: Lens[GmosSouth, StepTime] =
-      Focus[GmosSouth](_.time)
   }
 
   implicit val eqAtom: Eq[Atom] = Eq.instance {
-    case (a @ GmosNorth(_, _, _), b @ GmosNorth(_, _, _)) => a === b
-    case (a @ GmosSouth(_, _, _), b @ GmosSouth(_, _, _)) => a === b
-    case _                                                => false
+    case (a @ GmosNorth(_, _), b @ GmosNorth(_, _)) => a === b
+    case (a @ GmosSouth(_, _), b @ GmosSouth(_, _)) => a === b
+    case _                                          => false
   }
 
   /** @group Optics */

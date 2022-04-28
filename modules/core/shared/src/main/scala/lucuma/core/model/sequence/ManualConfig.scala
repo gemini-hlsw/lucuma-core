@@ -16,16 +16,16 @@ import java.time.Duration
 sealed trait ManualConfig {
   val static: StaticConfig
   val setupTime: Duration
-  val acquisition: Sequence
-  val science: Sequence
+  val acquisition: List[Atom]
+  val science: List[Atom]
 }
 
 object ManualConfig {
   final case class GmosNorth(
     static:      StaticConfig.GmosNorth,
     setupTime:   Duration,
-    acquisition: Sequence.GmosNorth,
-    science:     Sequence.GmosNorth
+    acquisition: List[Atom.GmosNorth],
+    science:     List[Atom.GmosNorth]
   ) extends ManualConfig
   object GmosNorth {
     implicit val eqManualConfigGmosNorth: Eq[GmosNorth] =
@@ -40,19 +40,19 @@ object ManualConfig {
       Focus[GmosNorth](_.setupTime)
 
     /** @group Optics */
-    val acquisition: Lens[GmosNorth, Sequence.GmosNorth] =
+    val acquisition: Lens[GmosNorth, List[Atom.GmosNorth]] =
       Focus[GmosNorth](_.acquisition)
 
     /** @group Optics */
-    val science: Lens[GmosNorth, Sequence.GmosNorth] =
+    val science: Lens[GmosNorth, List[Atom.GmosNorth]] =
       Focus[GmosNorth](_.science)
   }
 
   final case class GmosSouth(
     static:      StaticConfig.GmosSouth,
     setupTime:   Duration,
-    acquisition: Sequence.GmosSouth,
-    science:     Sequence.GmosSouth
+    acquisition: List[Atom.GmosSouth],
+    science:     List[Atom.GmosSouth]
   ) extends ManualConfig
   object GmosSouth {
     implicit val eqManualConfigGmosSouth: Eq[GmosSouth] =
@@ -67,11 +67,11 @@ object ManualConfig {
       Focus[GmosSouth](_.setupTime)
 
     /** @group Optics */
-    val acquisition: Lens[GmosSouth, Sequence.GmosSouth] =
+    val acquisition: Lens[GmosSouth, List[Atom.GmosSouth]] =
       Focus[GmosSouth](_.acquisition)
 
     /** @group Optics */
-    val science: Lens[GmosSouth, Sequence.GmosSouth] =
+    val science: Lens[GmosSouth, List[Atom.GmosSouth]] =
       Focus[GmosSouth](_.science)
   }
 
