@@ -19,20 +19,20 @@ import java.time.Duration
 trait ArbDynamicConfig {
   import ArbGmosCcdMode._
   import ArbEnumerated._
-  import ArbGmosGrating._
+  import ArbGmosGratingConfig._
   import ArbGmosFpuMask._
   import ArbTime._
 
   implicit val arbDynamicConfigGmosNorth: Arbitrary[DynamicConfig.GmosNorth] = Arbitrary(
     for {
-      exposure <- arbitrary[Duration]
-      readout  <- arbitrary[GmosCcdMode]
-      dtax     <- arbitrary[GmosDtax]
-      roi      <- arbitrary[GmosRoi]
-      grating  <- arbitrary[Option[GmosGrating.North]]
-      filter   <- arbitrary[Option[GmosNorthFilter]]
-      fpu      <- arbitrary[Option[GmosFpuMask[GmosNorthFpu]]]
-    } yield DynamicConfig.GmosNorth(exposure, readout, dtax, roi, grating, filter, fpu)
+      exposure      <- arbitrary[Duration]
+      readout       <- arbitrary[GmosCcdMode]
+      dtax          <- arbitrary[GmosDtax]
+      roi           <- arbitrary[GmosRoi]
+      gratingConfig <- arbitrary[Option[GmosGratingConfig.North]]
+      filter        <- arbitrary[Option[GmosNorthFilter]]
+      fpu           <- arbitrary[Option[GmosFpuMask[GmosNorthFpu]]]
+    } yield DynamicConfig.GmosNorth(exposure, readout, dtax, roi, gratingConfig, filter, fpu)
   )
 
   implicit val cogDynamicConfigGmosNorth: Cogen[DynamicConfig.GmosNorth] =
@@ -41,22 +41,22 @@ trait ArbDynamicConfig {
        GmosCcdMode,
        GmosDtax,
        GmosRoi,
-       Option[GmosGrating.North],
+       Option[GmosGratingConfig.North],
        Option[GmosNorthFilter],
        Option[GmosFpuMask[GmosNorthFpu]]
       )
-    ].contramap(c => (c.exposure, c.readout, c.dtax, c.roi, c.grating, c.filter, c.fpu))
+    ].contramap(c => (c.exposure, c.readout, c.dtax, c.roi, c.gratingConfig, c.filter, c.fpu))
 
   implicit val arbDynamicConfigGmosSouth: Arbitrary[DynamicConfig.GmosSouth] = Arbitrary(
     for {
-      exposure <- arbitrary[Duration]
-      readout  <- arbitrary[GmosCcdMode]
-      dtax     <- arbitrary[GmosDtax]
-      roi      <- arbitrary[GmosRoi]
-      grating  <- arbitrary[Option[GmosGrating.South]]
-      filter   <- arbitrary[Option[GmosSouthFilter]]
-      fpu      <- arbitrary[Option[GmosFpuMask[GmosSouthFpu]]]
-    } yield DynamicConfig.GmosSouth(exposure, readout, dtax, roi, grating, filter, fpu)
+      exposure      <- arbitrary[Duration]
+      readout       <- arbitrary[GmosCcdMode]
+      dtax          <- arbitrary[GmosDtax]
+      roi           <- arbitrary[GmosRoi]
+      gratingConfig <- arbitrary[Option[GmosGratingConfig.South]]
+      filter        <- arbitrary[Option[GmosSouthFilter]]
+      fpu           <- arbitrary[Option[GmosFpuMask[GmosSouthFpu]]]
+    } yield DynamicConfig.GmosSouth(exposure, readout, dtax, roi, gratingConfig, filter, fpu)
   )
 
   implicit val cogDynamicConfigGmosSouth: Cogen[DynamicConfig.GmosSouth] = Cogen[
@@ -64,11 +64,11 @@ trait ArbDynamicConfig {
      GmosCcdMode,
      GmosDtax,
      GmosRoi,
-     Option[GmosGrating.South],
+     Option[GmosGratingConfig.South],
      Option[GmosSouthFilter],
      Option[GmosFpuMask[GmosSouthFpu]]
     )
-  ].contramap(c => (c.exposure, c.readout, c.dtax, c.roi, c.grating, c.filter, c.fpu))
+  ].contramap(c => (c.exposure, c.readout, c.dtax, c.roi, c.gratingConfig, c.filter, c.fpu))
 
   implicit val arbDynamicConfig: Arbitrary[DynamicConfig] = Arbitrary(
     Gen.oneOf(

@@ -17,17 +17,17 @@ import java.time.Duration
 sealed trait DynamicConfig
 object DynamicConfig {
   final case class GmosNorth(
-    exposure: Duration,
-    readout:  GmosCcdMode,
-    dtax:     GmosDtax,
-    roi:      GmosRoi,
-    grating:  Option[GmosGrating.North],
-    filter:   Option[GmosNorthFilter],
-    fpu:      Option[GmosFpuMask[GmosNorthFpu]]
+    exposure:      Duration,
+    readout:       GmosCcdMode,
+    dtax:          GmosDtax,
+    roi:           GmosRoi,
+    gratingConfig: Option[GmosGratingConfig.North],
+    filter:        Option[GmosNorthFilter],
+    fpu:           Option[GmosFpuMask[GmosNorthFpu]]
   ) extends DynamicConfig
   object GmosNorth {
     implicit val eqInstrumentConfigGmosNorth: Eq[GmosNorth] =
-      Eq.by(x => (x.exposure, x.readout, x.dtax, x.roi, x.grating, x.filter, x.fpu))
+      Eq.by(x => (x.exposure, x.readout, x.dtax, x.roi, x.gratingConfig, x.filter, x.fpu))
 
     /** @group Optics */
     val exposure: Lens[GmosNorth, Duration] =
@@ -46,8 +46,8 @@ object DynamicConfig {
       Focus[GmosNorth](_.roi)
 
     /** @group Optics */
-    val grating: Lens[GmosNorth, Option[GmosGrating.North]] =
-      Focus[GmosNorth](_.grating)
+    val gratingConfig: Lens[GmosNorth, Option[GmosGratingConfig.North]] =
+      Focus[GmosNorth](_.gratingConfig)
 
     /** @group Optics */
     val filter: Lens[GmosNorth, Option[GmosNorthFilter]] =
@@ -59,17 +59,17 @@ object DynamicConfig {
   }
 
   final case class GmosSouth(
-    exposure: Duration,
-    readout:  GmosCcdMode,
-    dtax:     GmosDtax,
-    roi:      GmosRoi,
-    grating:  Option[GmosGrating.South],
-    filter:   Option[GmosSouthFilter],
-    fpu:      Option[GmosFpuMask[GmosSouthFpu]]
+    exposure:      Duration,
+    readout:       GmosCcdMode,
+    dtax:          GmosDtax,
+    roi:           GmosRoi,
+    gratingConfig: Option[GmosGratingConfig.South],
+    filter:        Option[GmosSouthFilter],
+    fpu:           Option[GmosFpuMask[GmosSouthFpu]]
   ) extends DynamicConfig
   object GmosSouth {
     implicit val eqInstrumentConfigGmosSouth: Eq[GmosSouth] =
-      Eq.by(x => (x.exposure, x.readout, x.dtax, x.roi, x.grating, x.filter, x.fpu))
+      Eq.by(x => (x.exposure, x.readout, x.dtax, x.roi, x.gratingConfig, x.filter, x.fpu))
 
     /** @group Optics */
     val exposure: Lens[GmosSouth, Duration] =
@@ -88,8 +88,8 @@ object DynamicConfig {
       Focus[GmosSouth](_.roi)
 
     /** @group Optics */
-    val grating: Lens[GmosSouth, Option[GmosGrating.South]] =
-      Focus[GmosSouth](_.grating)
+    val gratingConfig: Lens[GmosSouth, Option[GmosGratingConfig.South]] =
+      Focus[GmosSouth](_.gratingConfig)
 
     /** @group Optics */
     val filter: Lens[GmosSouth, Option[GmosSouthFilter]] =

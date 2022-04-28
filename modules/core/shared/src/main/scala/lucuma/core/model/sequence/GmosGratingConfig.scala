@@ -14,13 +14,13 @@ import monocle.Lens
 import monocle.Prism
 import monocle.macros.GenPrism
 
-sealed trait GmosGrating
-object GmosGrating {
+sealed trait GmosGratingConfig
+object GmosGratingConfig {
   final case class North(
     grating:    GmosNorthGrating,
     order:      GmosGratingOrder,
     wavelength: Wavelength
-  ) extends GmosGrating
+  ) extends GmosGratingConfig
   object North {
     implicit val eqGmosGratingNorth: Eq[North] = Eq.by(x => (x.grating, x.order, x.wavelength))
 
@@ -41,7 +41,7 @@ object GmosGrating {
     grating:    GmosSouthGrating,
     order:      GmosGratingOrder,
     wavelength: Wavelength
-  ) extends GmosGrating
+  ) extends GmosGratingConfig
   object South {
     implicit val eqGmosGratingSouth: Eq[South] = Eq.by(x => (x.grating, x.order, x.wavelength))
 
@@ -58,15 +58,17 @@ object GmosGrating {
       Focus[South](_.wavelength)
   }
 
-  implicit val eqGmosGrating: Eq[GmosGrating] = Eq.instance {
+  implicit val eqGmosGrating: Eq[GmosGratingConfig] = Eq.instance {
     case (a @ North(_, _, _), b @ North(_, _, _)) => a === b
     case (a @ South(_, _, _), b @ South(_, _, _)) => a === b
     case _                                        => false
   }
 
   /** @group Optics */
-  val north: Prism[GmosGrating, GmosGrating.North] = GenPrism[GmosGrating, GmosGrating.North]
+  val north: Prism[GmosGratingConfig, GmosGratingConfig.North] =
+    GenPrism[GmosGratingConfig, GmosGratingConfig.North]
 
   /** @group Optics */
-  val south: Prism[GmosGrating, GmosGrating.South] = GenPrism[GmosGrating, GmosGrating.South]
+  val south: Prism[GmosGratingConfig, GmosGratingConfig.South] =
+    GenPrism[GmosGratingConfig, GmosGratingConfig.South]
 }
