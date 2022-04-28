@@ -16,7 +16,7 @@ final class DynamicConfigSuite extends DisciplineSuite {
   import ArbEnumerated._
   import ArbTime._
   import ArbGmosCcdMode._
-  import ArbGmosGrating._
+  import ArbGmosGratingConfig._
   import ArbGmosFpuMask._
 
   checkAll("Eq[DynamicConfig.GmosNorth]", EqTests[DynamicConfig.GmosNorth].eqv)
@@ -24,7 +24,9 @@ final class DynamicConfigSuite extends DisciplineSuite {
   checkAll("DynamicConfig.GmosNorth.readout", LensTests(DynamicConfig.GmosNorth.readout))
   checkAll("DynamicConfig.GmosNorth.dtax", LensTests(DynamicConfig.GmosNorth.dtax))
   checkAll("DynamicConfig.GmosNorth.roi", LensTests(DynamicConfig.GmosNorth.roi))
-  checkAll("DynamicConfig.GmosNorth.grating", LensTests(DynamicConfig.GmosNorth.grating))
+  checkAll("DynamicConfig.GmosNorth.gratingConfig",
+           LensTests(DynamicConfig.GmosNorth.gratingConfig)
+  )
   checkAll("DynamicConfig.GmosNorth.filter", LensTests(DynamicConfig.GmosNorth.filter))
   checkAll("DynamicConfig.GmosNorth.fpu", LensTests(DynamicConfig.GmosNorth.fpu))
 
@@ -33,7 +35,9 @@ final class DynamicConfigSuite extends DisciplineSuite {
   checkAll("DynamicConfig.GmosSouth.readout", LensTests(DynamicConfig.GmosSouth.readout))
   checkAll("DynamicConfig.GmosSouth.dtax", LensTests(DynamicConfig.GmosSouth.dtax))
   checkAll("DynamicConfig.GmosSouth.roi", LensTests(DynamicConfig.GmosSouth.roi))
-  checkAll("DynamicConfig.GmosSouth.grating", LensTests(DynamicConfig.GmosSouth.grating))
+  checkAll("DynamicConfig.GmosSouth.gratingConfig",
+           LensTests(DynamicConfig.GmosSouth.gratingConfig)
+  )
   checkAll("DynamicConfig.GmosSouth.filter", LensTests(DynamicConfig.GmosSouth.filter))
   checkAll("DynamicConfig.GmosSouth.fpu", LensTests(DynamicConfig.GmosSouth.fpu))
 
