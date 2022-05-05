@@ -70,6 +70,8 @@ final class DurationOps(val self: Duration) extends AnyVal {
 
   def /(d: Long): Duration =
     self.dividedBy(d)
+
+  def toMicros: Long = self.toNanos / 1000
 }
 
 trait ToDurationOps {
@@ -78,6 +80,29 @@ trait ToDurationOps {
 }
 
 object duration extends ToDurationOps
+
+final class LongDurationOps(val self: Long) extends AnyVal {
+  def nanoseconds: Duration =
+    Duration.ofNanos(self)
+
+  def microseconds: Duration =
+    Duration.ofNanos(self * 1000)
+
+  def milliseconds: Duration =
+    Duration.ofMillis(self)
+
+  def seconds: Duration =
+    Duration.ofSeconds(self)
+
+  def minutes: Duration =
+    Duration.ofMinutes(self)
+}
+
+trait ToLongDurationOps {
+  implicit def ToLongDurationOps(l: Long): LongDurationOps = new LongDurationOps(l)
+}
+
+object longDuration extends ToLongDurationOps
 
 final class InstantBoundedOps(val self: Bounded[Instant]) extends AnyVal {
 
@@ -146,6 +171,7 @@ object instantInterval extends ToInstantIntervalSeqOps
 object time
     extends ToInstantOps
     with ToDurationOps
+    with ToLongDurationOps
     with ToZonedDateTimeOps
     with ToInstantBoundedOps
     with ToInstantIntervalSeqOps

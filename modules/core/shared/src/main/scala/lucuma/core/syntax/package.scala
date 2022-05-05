@@ -8,13 +8,14 @@ import lucuma.core.optics.syntax.ToPrismOps
 
 /**
  * Syntax classes for extension methods, organized à la cats. Each syntax class has an associated
- * conversion trait and module that extends it; and the `all` module which extends all
- * conversions traits.
+ * conversion trait and module that extends it; and the `all` module which extends all conversions
+ * traits.
  */
 package object syntax {
   object all
       extends ToDisplayOps
       with ToDurationOps
+      with ToLongDurationOps
       with ToEnumeratedOps
       with ToInstantOps
       with ToIntOps
