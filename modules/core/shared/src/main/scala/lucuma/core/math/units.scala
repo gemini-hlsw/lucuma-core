@@ -20,45 +20,42 @@ import _root_.spire.math._
 
 trait units {
 
-  final type Pixels
+  type Pixels
   given BaseUnit[Pixels, "pixels", "px"] = BaseUnit()
 
   // // Wavelength units
-  // type Picometer  = Pico %* Meter
-  // type Nanometer  = Nano %* Meter
-  // type Micrometer = Micro %* Meter
-  // type Angstrom
-  // implicit val defineAngstrom =
-  //   DerivedUnit[Angstrom, Hecto %* Picometer](Rational.one, abbv = "Å")
+  type Picometer  = Pico * Meter
+  type Nanometer  = Nano * Meter
+  type Micrometer = Micro * Meter
+  final type Angstrom
+  given DerivedUnit[Angstrom, Hecto * Picometer, "angstrom", "Å"] = DerivedUnit()
 
-  // type NanometersPerPixel = Nanometer %/ Pixels
-  // type PicometersPerPixel = Picometer %/ Pixels
+  type NanometersPerPixel = Nanometer / Pixels
+  type PicometersPerPixel = Picometer / Pixels
 
-  // type MetersPerSecond      = Meter %/ Second
-  // type CentimetersPerSecond = (Centi %* Meter) %/ Second
-  // type KilometersPerSecond  = (Kilo %* Meter) %/ Second
+  type MetersPerSecond      = Meter / Second
+  type CentimetersPerSecond = (Centi * Meter) / Second
+  type KilometersPerSecond  = (Kilo * Meter) / Second
 
-  // type Year
-  // implicit val defineUnitYear =
-  //   DerivedUnit[Year, Day](Rational(365), abbv = "y")
+  type Year
+  given DerivedUnit[Year, 365 * Day, "year", "y"] = DerivedUnit()
 
-  // private val ArcSecondsPerDegree: SafeLong = 3600
+  private val ArcSecondsPerDegree: SafeLong = 3600
 
-  // type ArcSecond
-  // implicit val defineUnitArcSecond =
-  //   DerivedUnit[ArcSecond, Degree](Rational(1, ArcSecondsPerDegree), abbv = "arcsec")
+  type ArcSecond
+  given DerivedUnit[ArcSecond, Degree / 3600, "arc second", "arcsec"] = DerivedUnit()
 
-  // type DeciArcSecond  = Deci %* ArcSecond
-  // type MilliArcSecond = Milli %* ArcSecond
-  // type MicroArcSecond = Micro %* ArcSecond
+  type DeciArcSecond  = Deci * ArcSecond
+  type MilliArcSecond = Milli * ArcSecond
+  type MicroArcSecond = Micro * ArcSecond
 
-  // type MilliArcSecondPerYear = MilliArcSecond %/ Year
-  // type MicroArcSecondPerYear = MicroArcSecond %/ Year
+  type MilliArcSecondPerYear = MilliArcSecond / Year
+  type MicroArcSecondPerYear = MicroArcSecond / Year
 
-  // // Integrated Brightness units
-  // type VegaMagnitude
+  // Integrated Brightness units
+  type VegaMagnitude
   // implicit val defineVegaMagnitude =
-  //   BaseUnitDef[VegaMagnitude]("Vega magnitude", "Vega mag", "VEGA_MAGNITUDE")
+  //   BaseUnit[VegaMagnitude, "Vega magnitude", "Vega mag"]
 
   // type ABMagnitude
   // implicit val defineABMagnitude =
