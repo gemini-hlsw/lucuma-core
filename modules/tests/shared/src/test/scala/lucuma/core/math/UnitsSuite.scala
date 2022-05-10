@@ -3,8 +3,7 @@
 
 package lucuma.core.math
 
-import coulomb.{*, given}
-import coulomb.policy.standard.given
+import coulomb.*
 import coulomb.policy.spire.standard.given
 import coulomb.units.mks.{*, given}
 import coulomb.units.si.{*, given}
