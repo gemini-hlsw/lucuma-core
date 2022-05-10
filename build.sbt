@@ -76,7 +76,6 @@ lazy val testkit = crossProject(JVMPlatform, JSPlatform)
     name := "lucuma-core-testkit",
     libraryDependencies ++= Seq(
       "org.typelevel"     %%% "cats-testkit"       % catsVersion,
-      "com.manyangled"    %%% "coulomb-scalacheck" % coulombVersion,
       "dev.optics"        %%% "monocle-law"        % monocleVersion,
       "org.typelevel"     %%% "spire-laws"         % spireVersion,
       "eu.timepit"        %%% "refined-scalacheck" % refinedVersion,
@@ -112,7 +111,7 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform)
       "https://github.com/gemini-hlsw/maven-repo/raw/master/releases"
     ),
     libraryDependencies ++= Seq(
-      "edu.gemini.ocs" %% "edu-gemini-util-skycalc"     % "2020001.1.7" % Test,
+      "edu.gemini.ocs" %% "edu-gemini-util-skycalc"     % "2020001.1.7" % Test cross CrossVersion.for3Use2_13 exclude("org.scala-lang.modules", "scala-xml_2.13"),
       "com.47deg"      %% "scalacheck-toolbox-datetime" % "0.6.0"       % Test
     )
   )
