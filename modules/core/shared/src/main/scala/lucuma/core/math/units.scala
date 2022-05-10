@@ -28,7 +28,7 @@ trait units {
   type Picometer  = Pico * Meter
   type Nanometer  = Nano * Meter
   type Micrometer = Micro * Meter
-  final type Angstrom
+  type Angstrom
   given DerivedUnit[Angstrom, Hecto * Picometer, "angstrom", "Å"] = DerivedUnit()
 
   type NanometersPerPixel = Nanometer / Pixels
