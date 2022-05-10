@@ -43,6 +43,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
       "dev.optics"     %%% "monocle-state"              % monocleVersion,
       "edu.gemini"     %%% "lucuma-jts"                 % jtsVersion,
       "com.manyangled" %%% "coulomb-core"               % coulombVersion,
+      "com.manyangled" %%% "coulomb-spire"              % coulombVersion,
       "com.manyangled" %%% "coulomb-units"              % coulombVersion,
       "org.typelevel"  %%% "spire"                      % spireVersion,
       "org.typelevel"  %%% "spire-extras"               % spireVersion,
