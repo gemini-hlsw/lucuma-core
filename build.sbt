@@ -1,9 +1,13 @@
 ThisBuild / tlBaseVersion                         := "0.34"
 ThisBuild / tlCiReleaseBranches                   := Seq("master")
 ThisBuild / githubWorkflowEnv += "MUNIT_FLAKY_OK" -> "true"
-ThisBuild / scalacOptions += "-Xsource:3"
 
 Global / concurrentRestrictions += Tags.limit(Tags.Compile, 1)
+
+ThisBuild / scalaVersion := "3.1.2"
+ThisBuild / crossScalaVersions := Seq("3.1.2")
+
+ThisBuild / resolvers += Resolver.sonatypeRepo("snapshots")
 
 lazy val attoVersion           = "0.9.5"
 lazy val catsVersion           = "2.7.0"
@@ -12,7 +16,7 @@ lazy val monocleVersion        = "3.1.0"
 lazy val scalaJavaTimeVersion  = "2.3.0"
 lazy val geminiLocalesVersion  = "0.7.0"
 lazy val jtsVersion            = "0.2.2"
-lazy val coulombVersion        = "0.5.8"
+lazy val coulombVersion        = "0.6-3cc9f7f-SNAPSHOT"
 lazy val spireVersion          = "0.18.0-M3"
 lazy val singletonOpsVersion   = "0.5.2"
 lazy val refinedVersion        = "0.9.29"
@@ -38,22 +42,17 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
       "dev.optics"     %%% "monocle-macro"              % monocleVersion,
       "dev.optics"     %%% "monocle-state"              % monocleVersion,
       "edu.gemini"     %%% "lucuma-jts"                 % jtsVersion,
-      "com.manyangled" %%% "coulomb"                    % coulombVersion,
-      "com.manyangled" %%% "coulomb-si-units"           % coulombVersion,
-      "com.manyangled" %%% "coulomb-accepted-units"     % coulombVersion,
-      "com.manyangled" %%% "coulomb-time-units"         % coulombVersion,
-      "com.manyangled" %%% "coulomb-cats"               % coulombVersion,
-      "com.manyangled" %%% "coulomb-refined"            % coulombVersion,
-      "com.manyangled" %%% "coulomb-physical-constants" % coulombVersion,
+      "com.manyangled" %%% "coulomb-core"               % coulombVersion,
+      "com.manyangled" %%% "coulomb-units"              % coulombVersion,
       "org.typelevel"  %%% "spire"                      % spireVersion,
       "org.typelevel"  %%% "spire-extras"               % spireVersion,
-      "eu.timepit"     %%% "singleton-ops"              % singletonOpsVersion,
+      "eu.timepit"     %%% "singleton-ops"              % singletonOpsVersion cross CrossVersion.for3Use2_13,
       "eu.timepit"     %%% "refined"                    % refinedVersion,
       "eu.timepit"     %%% "refined-cats"               % refinedVersion,
       "org.typelevel"  %%% "cats-time"                  % catsTimeVersion,
       "io.circe"       %%% "circe-core"                 % circeVersion,
       "io.circe"       %%% "circe-refined"              % circeVersion,
-      "com.chuusai"    %%% "shapeless"                  % shapelessVersion
+      "com.chuusai"    %%% "shapeless"                  % shapelessVersion cross CrossVersion.for3Use2_13
     )
   )
   .jvmConfigure(_.enablePlugins(AutomateHeaderPlugin))
