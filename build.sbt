@@ -6,6 +6,7 @@ Global / concurrentRestrictions += Tags.limit(Tags.Compile, 1)
 
 ThisBuild / scalaVersion := "3.1.2"
 ThisBuild / crossScalaVersions := Seq("3.1.2")
+ThisBuild / scalacOptions += "-language:implicitConversions" // TODO
 
 ThisBuild / resolvers += Resolver.sonatypeRepo("snapshots")
 
