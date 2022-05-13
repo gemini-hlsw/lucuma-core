@@ -24,7 +24,7 @@ trait units {
   type Pixels
   given BaseUnit[Pixels, "pixels", "px"] = BaseUnit()
 
-  // // Wavelength units
+  // Wavelength units
   type Picometer  = Pico * Meter
   type Nanometer  = Nano * Meter
   type Micrometer = Micro * Meter
