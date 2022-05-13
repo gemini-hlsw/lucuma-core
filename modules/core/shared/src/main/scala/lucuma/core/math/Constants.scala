@@ -55,7 +55,8 @@ object Constants {
    */
 
   /** Speed of light in meters per second. Exact. */
-  val SpeedOfLight: Quantity[Int, MetersPerSecond] = ???
+  val SpeedOfLight: Quantity[Int, MetersPerSecond] =
+    constant[Rational, SpeedOfLight].tToValue[Int]
 
   /** Seconds in a Day. For Convenience. */
   val SecsInDay: Long = Duration.ofDays(1).getSeconds
