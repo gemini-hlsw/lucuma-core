@@ -66,52 +66,64 @@ trait units {
   given DerivedUnit[Jansky, (10 ^ -26) * Watt / ((Meter ^ 2) * (Hertz ^ -1)), "Jansky", "Jy"] = DerivedUnit()
   given TypeString[Jansky] = TypeString("JANSKY")
 
-  type WattsPerMeter2Micrometer = Watt / ((Meter ^ 2) * Micrometer)
+  type WattsPerMeter2Micrometer
+  given DerivedUnit[WattsPerMeter2Micrometer, Watt / ((Meter ^ 2) * Micrometer), "W/m²/µm", "W/m²/µm"] = DerivedUnit()
   given TypeString[WattsPerMeter2Micrometer] = TypeString("W_PER_M_SQUARED_PER_UM")
 
   type Erg
   given DerivedUnit[Erg, (10 ^ -7) * Joule, "erg", "erg"] = DerivedUnit()
 
-  type ErgsPerSecondCentimeter2Angstrom = Erg / (Second * (Centimeter ^ 2) * Angstrom)
+  type ErgsPerSecondCentimeter2Angstrom
+  given DerivedUnit[ErgsPerSecondCentimeter2Angstrom, Erg / (Second * (Centimeter ^ 2) * Hertz), "erg/s/cm²/Å", "erg/s/cm²/Å"] = DerivedUnit()
   given TypeString[ErgsPerSecondCentimeter2Angstrom] = TypeString("ERG_PER_S_PER_CM_SQUARED_PER_A")
 
-  type ErgsPerSecondCentimeter2Hertz = Erg / (Second * (Centimeter ^ 2) * Hertz)
+  type ErgsPerSecondCentimeter2Hertz
+  given DerivedUnit[ErgsPerSecondCentimeter2Hertz, Erg / (Second * (Centimeter ^ 2) * Hertz), "erg/s/cm²/Hz", "erg/s/cm²/Hz"] = DerivedUnit()
   given TypeString[ErgsPerSecondCentimeter2Hertz] = TypeString("ERG_PER_S_PER_CM_SQUARED_PER_HZ")
 
   // Surface Brightness units
-  type VegaMagnitudePerArcsec2 = VegaMagnitude / (ArcSecond ^ 2)
+  type VegaMagnitudePerArcsec2
+  given DerivedUnit[VegaMagnitudePerArcsec2, VegaMagnitude / (ArcSecond ^ 2), "Vega mag/arcsec²", "Vega mag/arcsec²"] = DerivedUnit()
   given TypeString[VegaMagnitudePerArcsec2] = TypeString("VEGA_MAG_PER_ARCSEC_SQUARED")
 
-  type ABMagnitudePerArcsec2 = ABMagnitude / (ArcSecond ^ 2)
+  type ABMagnitudePerArcsec2
+  given DerivedUnit[ABMagnitudePerArcsec2, ABMagnitude / (ArcSecond ^ 2), "AB mag/arcsec²", "AB mag/arcsec²"] = DerivedUnit()
   given TypeString[ABMagnitudePerArcsec2] = TypeString("AB_MAG_PER_ARCSEC_SQUARED")
 
-  type JanskyPerArcsec2 = Jansky / (ArcSecond ^ 2)
+  type JanskyPerArcsec2
+  given DerivedUnit[JanskyPerArcsec2, Jansky / (ArcSecond ^ 2), "Jy/arcsec²", "Jy/arcsec²"] = DerivedUnit()
   given TypeString[JanskyPerArcsec2] = TypeString("JY_PER_ARCSEC_SQUARED")
 
-  type WattsPerMeter2MicrometerArcsec2 = WattsPerMeter2Micrometer / (ArcSecond ^ 2)
+  type WattsPerMeter2MicrometerArcsec2
+  given DerivedUnit[WattsPerMeter2MicrometerArcsec2, WattsPerMeter2Micrometer / (ArcSecond ^ 2), "W/m²/µm/arcsec²", "W/m²/µm/arcsec²"] = DerivedUnit()
   given TypeString[WattsPerMeter2MicrometerArcsec2] = TypeString("W_PER_M_SQUARED_PER_UM_PER_ARCSEC_SQUARED")
 
-  type ErgsPerSecondCentimeter2AngstromArcsec2 =
-    ErgsPerSecondCentimeter2Angstrom / (ArcSecond ^ 2)
+  type ErgsPerSecondCentimeter2AngstromArcsec2
+  given DerivedUnit[ErgsPerSecondCentimeter2AngstromArcsec2, ErgsPerSecondCentimeter2Angstrom / (ArcSecond ^ 2), "erg/s/cm²/Å/arcsec²", "erg/s/cm²/Å/arcsec²"] = DerivedUnit()
   given TypeString[ErgsPerSecondCentimeter2AngstromArcsec2] =
     TypeString("ERG_PER_S_PER_CM_SQUARED_PER_A_PER_ARCSEC_SQUARED")
 
-  type ErgsPerSecondCentimeter2HertzArcsec2 = ErgsPerSecondCentimeter2Hertz / (ArcSecond ^ 2)
+  type ErgsPerSecondCentimeter2HertzArcsec2
+  given DerivedUnit[ErgsPerSecondCentimeter2HertzArcsec2, ErgsPerSecondCentimeter2Hertz / (ArcSecond ^ 2), "erg/s/cm²/Hz/arcsec²", "erg/s/cm²/Hz/arcsec²"] = DerivedUnit()
   given TypeString[ErgsPerSecondCentimeter2HertzArcsec2] =
     TypeString("ERG_PER_S_PER_CM_SQUARED_PER_HZ_PER_ARCSEC_SQUARED")
 
   // Integrated Line Flux units
-  type WattsPerMeter2 = Watt / (Meter ^ 2)
+  type WattsPerMeter2
+  given DerivedUnit[WattsPerMeter2, Watt / (Meter ^ 2), "W/m²", "W/m²"] = DerivedUnit()
   given TypeString[WattsPerMeter2] = TypeString("W_PER_M_SQUARED")
 
-  type ErgsPerSecondCentimeter2 = Erg / (Second * (Centimeter ^ 2))
+  type ErgsPerSecondCentimeter2
+  given DerivedUnit[ErgsPerSecondCentimeter2, Erg / (Second * (Centimeter ^ 2)), "erg/s/cm²", "erg/s/cm²"] = DerivedUnit()
   given TypeString[ErgsPerSecondCentimeter2] = TypeString("ERG_PER_S_PER_CM_SQUARED")
 
   // Surface Line Flux units
-  type WattsPerMeter2Arcsec2 = WattsPerMeter2 / (ArcSecond ^ 2)
+  type WattsPerMeter2Arcsec2
+  given DerivedUnit[WattsPerMeter2Arcsec2, WattsPerMeter2 / (ArcSecond ^ 2), "W/m²/arcsec²", "W/m²/arcsec²"] = DerivedUnit()
   given TypeString[WattsPerMeter2Arcsec2] = TypeString("W_PER_M_SQUARED_PER_ARCSEC_SQUARED")
 
-  type ErgsPerSecondCentimeter2Arcsec2 = ErgsPerSecondCentimeter2 / (ArcSecond ^ 2)
+  type ErgsPerSecondCentimeter2Arcsec2
+  given DerivedUnit[ErgsPerSecondCentimeter2Arcsec2, ErgsPerSecondCentimeter2 / (ArcSecond ^ 2), "erg/s/cm²/arcsec²", "erg/s/cm²/arcsec²"] = DerivedUnit()
   given TypeString[ErgsPerSecondCentimeter2Arcsec2] =
     TypeString("ERG_PER_S_PER_CM_SQUARED_PER_ARCSEC_SQUARED")
 
