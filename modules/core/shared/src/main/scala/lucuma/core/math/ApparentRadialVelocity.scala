@@ -5,8 +5,8 @@ package lucuma.core.math
 
 import cats._
 import coulomb._
-import coulomb.cats.implicits._
-import lucuma.core.math.Constants.SpeedOfLight
+import coulomb.policy.spire.standard.given
+import coulomb.units.constants.{*, given}
 import lucuma.core.math.units._
 import lucuma.core.optics.Wedge
 import monocle.Iso
@@ -22,10 +22,10 @@ final case class ApparentRadialVelocity(cz: Quantity[BigDecimal, MetersPerSecond
   /**
     * Converts the apparent radial velocity to a Redshift
     */
-  def toRedshift: Redshift = Redshift((cz / SpeedOfLight).value)
+  def toRedshift: Redshift = Redshift((cz / constant[BigDecimal, SpeedOfLight]).value)
 
   override def toString =
-    s"ApparentRadialVelocity(${cz.to[Double, KilometersPerSecond].show})"
+    s"ApparentRadialVelocity(${cz.toUnit[KilometersPerSecond].toValue[Double].show})"
 }
 
 object ApparentRadialVelocity {
