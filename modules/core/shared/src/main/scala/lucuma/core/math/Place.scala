@@ -5,8 +5,7 @@ package lucuma.core.math
 import cats.Eq
 import cats.Show
 import coulomb.Quantity
-import coulomb.cats.implicits._
-import coulomb.si.Meter
+import coulomb.units.si.Meter
 import eu.timepit.refined.cats._
 import eu.timepit.refined.types.numeric.NonNegInt
 import monocle.Focus
