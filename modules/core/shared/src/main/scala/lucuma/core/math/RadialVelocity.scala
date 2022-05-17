@@ -4,7 +4,8 @@
 package lucuma.core.math
 
 import cats._
-import coulomb._
+import coulomb.qopaque.Quantity
+import coulomb.qopaque.withUnit
 import coulomb.policy.spire.standard.given
 import coulomb.units.si.{*, given}
 import lucuma.core.math.Constants.SpeedOfLight

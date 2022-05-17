@@ -9,7 +9,6 @@ import coulomb.units.mks.{*, given}
 import coulomb.units.si.{*, given}
 import lucuma.core.math.units.{*, given}
 import munit.FunSuite
-import spire.implicits._
 import spire.math.Rational
 import spire.math.SafeLong
 

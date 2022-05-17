@@ -3,7 +3,9 @@
 
 package lucuma.core.math
 
-import coulomb._
+import coulomb.{`*`, `/`, `^`}
+import coulomb.qopaque.Quantity
+import coulomb.qopaque.withUnit
 import coulomb.conversion.ValueConversion
 import coulomb.define.DerivedUnit
 import coulomb.units.constants.{*, given}
