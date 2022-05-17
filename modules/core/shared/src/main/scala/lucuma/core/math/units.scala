@@ -8,6 +8,7 @@ import coulomb.qopaque.Quantity
 import coulomb.qopaque.withUnit
 import coulomb.units.accepted._
 import coulomb.define._
+import coulomb.conversion.ValueConversion
 import coulomb.units.mks._
 import coulomb.units.si._
 import coulomb.units.si.prefixes._
@@ -129,14 +130,8 @@ trait units {
   given TypeString[ErgsPerSecondCentimeter2Arcsec2] =
     TypeString("ERG_PER_S_PER_CM_SQUARED_PER_ARCSEC_SQUARED")
 
-  // // PosInt can be converted to Rational exactly
-  // implicit def rationalPosIntConverter[U1, U2](implicit
-  //   cu: ConvertableUnits[U1, U2]
-  // ): UnitConverter[PosInt, U1, Rational, U2] =
-  //   new UnitConverter[PosInt, U1, Rational, U2] {
-  //     @inline def vcnv(v: PosInt): Rational =
-  //       cu.coef * v.value
-  //   }
+  // PosInt can be converted to Rational exactly
+  given rationalPosIntConverter: ValueConversion[PosInt, Rational] = Rational(_)
 
   // // This can build a converter for units that use PosInt but they are exact only
   // // if the coef is more than 1 and whole, i.e. going from Nanometer to Picometer
