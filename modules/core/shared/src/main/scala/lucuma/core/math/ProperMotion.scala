@@ -3,11 +3,13 @@
 
 package lucuma.core.math
 
+import algebra.instances.all.given
 import cats._
 import cats.syntax.all._
-import coulomb._
-import coulomb.accepted._
-import coulomb.cats.implicits._
+import coulomb.{`/`}
+import coulomb.qopaque.{Quantity, withUnit}
+import coulomb.policy.spire.standard.given
+import coulomb.units.accepted._
 import lucuma.core.math.ProperMotion.AngularVelocityComponent
 import lucuma.core.math.units._
 import lucuma.core.optics.SplitMono
@@ -36,9 +38,9 @@ final case class ProperMotion(
 
 object ProperMotion extends ProperMotionOptics {
   final case class AngularVelocityComponent[A](μasy: Quantity[Long, MicroArcSecondPerYear]) {
-    def toRadians: Double = μasy.to[Double, Degree %/ Year].value.toRadians
+    def toRadians: Double = μasy.toValue[Double].toUnit[Degree / Year].value.toRadians
 
-    val masy: Quantity[Rational, MilliArcSecondPerYear] = μasy.to[Rational, MilliArcSecondPerYear]
+    val masy: Quantity[Rational, MilliArcSecondPerYear] = μasy.toValue[Rational].toUnit[MilliArcSecondPerYear]
 
     override def toString =
       s"AngularVelocityComponent(${masy.show})"
@@ -54,7 +56,7 @@ object ProperMotion extends ProperMotionOptics {
 
     /** @group Typeclass Instances */
     implicit def monoidAngularVelocity[A]: Monoid[AngularVelocityComponent[A]] =
-      Monoid.instance(Zero[A], (a, b) => AngularVelocityComponent[A](a.μasy |+| b.μasy))
+      Monoid.instance(Zero[A], (a, b) => AngularVelocityComponent[A](a.μasy + b.μasy))
 
     /** @group Typeclass Instances */
     implicit def showAngularVelocity[A]: Show[AngularVelocityComponent[A]] =
