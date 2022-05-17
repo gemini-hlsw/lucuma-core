@@ -5,7 +5,8 @@ package lucuma.core.math.dimensional
 
 import cats.Eq
 import cats.syntax.all._
-import coulomb.unitops.UnitString
+import coulomb.ops.ShowUnit
+import coulomb.ops.ShowUnitFull
 import lucuma.core.util.Display
 import lucuma.core.util.Tag
 import lucuma.core.util.TypeString
@@ -92,10 +93,11 @@ object UnitOfMeasure {
   def apply[U: UnitOfMeasure]: UnitOfMeasure[U] = implicitly[UnitOfMeasure[U]]
 
   implicit def unitOfMeasureFromUnitString[U](implicit
-    ev: UnitString[U],
+    full: ShowUnitFull[U],
+    abbv: ShowUnit[U],
     s:  TypeString[U]
   ): UnitOfMeasure[U] =
-    UnitOfMeasure(ev.full, ev.abbv, s.serialized)
+    UnitOfMeasure(full.value, abbv.value, s.serialized)
 
   implicit def eqUnitOfMeasure[U]: Eq[UnitOfMeasure[U]] = Eq.fromUniversalEquals
 }

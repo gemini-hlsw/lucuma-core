@@ -4,10 +4,10 @@
 package lucuma.core.math
 
 import coulomb.Quantity
-import coulomb.unitops.UnitString
 import lucuma.core.util.TypeString
 import shapeless.tag
 import shapeless.tag.@@
+import coulomb.ops.ShowUnit
 
 package object dimensional {
   type Of[+T, U] = @@[T, U]
@@ -29,8 +29,8 @@ package object dimensional {
   }
 
   // Default `TypeString` for a unit type.
-  implicit def typeStringFromUnitString[U](implicit ev: UnitString[U]): TypeString[U] =
+  implicit def typeStringFromUnitString[U](implicit ev: ShowUnit[U]): TypeString[U] =
     new TypeString[U] {
-      val serialized: String = ev.abbv
+      val serialized: String = ev.value
     }
 }
