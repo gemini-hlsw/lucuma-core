@@ -106,7 +106,7 @@ object Wavelength {
    */
   def fromMicrometers(µm: Int): Option[Wavelength] =
     refineV[Positive](µm).toOption.flatMap(µm =>
-      Option.when(µm.value <= MaxMicrometer)(Wavelength(µm.withUnit[Micrometer].toUnit[Picometer]))
+      Option.when(µm.value <= MaxMicrometer)(Wavelength(µm.withUnit[Micrometer].tToUnit[Picometer]))
     )
 
   /**
@@ -115,7 +115,7 @@ object Wavelength {
    */
   def fromNanometers(nm: Int): Option[Wavelength] =
     refineV[Positive](nm).toOption.flatMap(nm =>
-      Option.when(nm.value <= MaxNanometer)(Wavelength(nm.withUnit[Nanometer]))
+      Option.when(nm.value <= MaxNanometer)(Wavelength(nm.withUnit[Nanometer].tToUnit[Picometer]))
     )
   /**
    * Try to build a Wavelength with a value in angstrom in the range (0 .. 21474836]
@@ -123,7 +123,7 @@ object Wavelength {
    */
   def fromAngstroms(a: Int): Option[Wavelength] =
     refineV[Positive](a).toOption.flatMap(a =>
-      Option.when(a.value <= MaxAngstrom)(Wavelength(a.withUnit[Angstrom]))
+      Option.when(a.value <= MaxAngstrom)(Wavelength(a.withUnit[Angstrom].tToUnit[Picometer]))
     )
 
   /**

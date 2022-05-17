@@ -9,12 +9,14 @@ import coulomb.qopaque.withUnit
 import coulomb.units.accepted._
 import coulomb.define._
 import coulomb.conversion.ValueConversion
+import coulomb.conversion.TruncatingUnitConversion
 import coulomb.units.mks._
 import coulomb.units.si._
 import coulomb.units.si.prefixes._
 import coulomb.units.time._
 // import coulomb.unitops._
 import lucuma.core.util.TypeString
+import lucuma.core.math.refined.*
 import eu.timepit.refined._
 import eu.timepit.refined.auto._
 import eu.timepit.refined.numeric._
@@ -132,6 +134,10 @@ trait units {
 
   // PosInt can be converted to Rational exactly
   given rationalPosIntConverter: ValueConversion[PosInt, Rational] = Rational(_)
+
+  inline given [UF, UT]: TruncatingUnitConversion[PosInt, UF, UT] = v =>
+    refineV[Positive](coulomb.conversion.standard.unit.ctx_TDUC_Int(v))
+      .getOrElse(refineMV[Int, Positive](1))
 
   // // This can build a converter for units that use PosInt but they are exact only
   // // if the coef is more than 1 and whole, i.e. going from Nanometer to Picometer
