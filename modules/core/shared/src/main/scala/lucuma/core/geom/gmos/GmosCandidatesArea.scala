@@ -41,4 +41,3 @@ trait GmosCandidatesArea {
     } yield candidatesAreaAt(a, o)).fold(ShapeExpression.Empty)(_ ∪ _)
 }
 
-

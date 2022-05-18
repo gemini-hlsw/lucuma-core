@@ -3,12 +3,18 @@
 
 package lucuma.core.model
 
+import cats.syntax.all._
 import cats.kernel.laws.discipline._
 import lucuma.core.math.arb._
+import lucuma.core.math.Coordinates
+import lucuma.core.math.Epoch
+import lucuma.core.math.Parallax
+import lucuma.core.math.ProperMotion
 import lucuma.core.model.arb._
 import monocle.law.discipline._
 import munit.DisciplineSuite
 import org.scalacheck.Prop.forAll
+import java.time.Instant
 
 final class SiderealTrackingSuite extends DisciplineSuite {
   import ArbCoordinates._
@@ -36,6 +42,24 @@ final class SiderealTrackingSuite extends DisciplineSuite {
       val c2 = pm.plusYears(0.0)
       assert(c1.angularDistance(c2).toMicroarcseconds <= 20L)
     }
+  }
+
+  test("coordinatesOn corrected by cos(dec) case 1") {
+    val coord = Coordinates.fromHmsDms.getOption("11 05 28.577 +43 31 36.39").get
+    val pmra = ProperMotion.RA.milliarcsecondsPerYear.reverseGet(BigDecimal(-4406.469))
+    val pmdec = ProperMotion.Dec.milliarcsecondsPerYear.reverseGet(BigDecimal(938.527))
+    val tracking = SiderealTracking(coord, Epoch.J2000, ProperMotion(pmra, pmdec).some, none, Parallax.fromMicroarcseconds(203887).some)
+    val refEpoch = Instant.ofEpochSecond(4102444800L)
+    assertEquals(tracking.at(refEpoch), Coordinates.fromHmsDms.getOption("11 04 48.043284 +43 33 09.795210").get)
+  }
+
+  test("coordinatesOn corrected by cos(dec) case 2") {
+    val coord = Coordinates.fromHmsDms.getOption("14 29 42.946 -62 40 46.16").get
+    val pmra = ProperMotion.RA.milliarcsecondsPerYear.reverseGet(BigDecimal(-3781.741))
+    val pmdec = ProperMotion.Dec.milliarcsecondsPerYear.reverseGet(BigDecimal(769.465))
+    val tracking = SiderealTracking(coord, Epoch.J2000, ProperMotion(pmra, pmdec).some, none, Parallax.fromMicroarcseconds(768465).some)
+    val refEpoch = Instant.ofEpochSecond(4102444800L)
+    assertEquals(tracking.at(refEpoch), Coordinates.fromHmsDms.getOption("14 28 48.054809 -62 39 28.543030").get)
   }
 
 }

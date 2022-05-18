@@ -150,7 +150,9 @@ object SiderealTracking extends SiderealTrackingOptics {
 
     // Break out our components
     val (ra, dec)   = baseCoordinates
-    val (dRa, dDec) = properMotion
+    val (dRaʹ, dDec) = properMotion
+    // See: https://app.shortcut.com/lucuma/story/1388/proper-motion-calculation
+    val dRa  =  dRaʹ / cos(dec)
 
     // Convert to cartesian
     val pos: Vec3 = {
