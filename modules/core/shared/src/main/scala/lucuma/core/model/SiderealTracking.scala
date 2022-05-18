@@ -49,11 +49,11 @@ final case class SiderealTracking(
   parallax:        Option[Parallax]
 ) {
 
-  def at(i: Instant): Coordinates =
+  def at(i: Instant): Option[Coordinates] =
     plusYears(epoch.untilInstant(i))
 
   /** Coordinates `elapsedYears` fractional epoch-years after `epoch`. */
-  def plusYears(elapsedYears: Double): Coordinates =
+  def plusYears(elapsedYears: Double): Option[Coordinates] =
     SiderealTracking.coordinatesOn(
       baseCoordinates,
       epoch,
@@ -85,7 +85,8 @@ object SiderealTracking extends SiderealTrackingOptics {
    * @param elapsedYears
    *   elapsed time in epoch years
    * @return
-   *   Coordinates corrected for proper motion
+   *   Coordinates corrected for proper motion.
+   *   None for invalid Declination, e.g. +/-90
    */
   def coordinatesOn(
     baseCoordinates: Coordinates,
@@ -94,8 +95,8 @@ object SiderealTracking extends SiderealTrackingOptics {
     radialVelocity:  Double,
     parallax:        Parallax,
     elapsedYears:    Double
-  ): Coordinates = {
-    val (ra, dec) = coordinatesOnʹ(
+  ): Option[Coordinates] = {
+    val result = coordinatesOnʹ(
       baseCoordinates.toRadians,
       epoch.scheme.lengthOfYear,
       properMotion.toRadians,
@@ -103,7 +104,7 @@ object SiderealTracking extends SiderealTrackingOptics {
       parallax.μas.value.value / 1000000.0,
       elapsedYears
     )
-    Coordinates.unsafeFromRadians(ra, dec)
+    result.map(Function.tupled(Coordinates.unsafeFromRadians))
   }
 
   // Some constants we need
@@ -138,7 +139,6 @@ object SiderealTracking extends SiderealTrackingOptics {
    * @return
    *   (ra, dec) in radians, corrected for proper motion
    */
-  // scalastyle:off method.length
   private def coordinatesOnʹ(
     baseCoordinates: Vec2,
     daysPerYear:     Double,
@@ -146,53 +146,57 @@ object SiderealTracking extends SiderealTrackingOptics {
     parallax:        Double,
     radialVelocity:  Double,
     elapsedYears:    Double
-  ): Vec2 = {
-
+  ): Option[Vec2] = {
     // Break out our components
     val (ra, dec)   = baseCoordinates
-    val (dRa, dDec) = properMotion
+    val (dRaʹ, dDec) = properMotion
 
-    // Convert to cartesian
-    val pos: Vec3 = {
-      val cd = cos(dec)
-      (cos(ra) * cd, sin(ra) * cd, sin(dec))
-    }
+    if (cos(dec) != 0) {
 
-    // Change per year due to radial velocity and parallax. The units work out to asec/y.
-    val dPos1: Vec3 =
-      pos *
-        daysPerYear *
-        secsPerDay *
-        radsPerAsec *
-        auPerKm *
-        radialVelocity *
-        parallax
+      // See: https://app.shortcut.com/lucuma/story/1388/proper-motion-calculation
+      val dRa  =  dRaʹ / cos(dec)
 
-    // Change per year due to proper velocity
-    val dPos2 = (
-      -dRa * pos._2 - dDec * cos(ra) * sin(dec),
-      dRa * pos._1 - dDec * sin(ra) * sin(dec),
-      dDec * cos(dec)
-    )
+      // Convert to cartesian
+      val pos: Vec3 = {
+        val cd = cos(dec)
+        (cos(ra) * cd, sin(ra) * cd, sin(dec))
+      }
 
-    // Our new position (still in polar coordinates). `|+|` here is scalar addition provided by
-    // cats … unlike scalaz it does give you Semigroup[Double] even though it's not strictly lawful.
-    val pʹ = pos |+| ((dPos1 |+| dPos2) * elapsedYears)
+      // Change per year due to radial velocity and parallax. The units work out to asec/y.
+      val dPos1: Vec3 =
+        pos *
+          daysPerYear *
+          secsPerDay *
+          radsPerAsec *
+          auPerKm *
+          radialVelocity *
+          parallax
 
-    // Back to spherical
-    val (x, y, z) = pʹ
-    val r         = hypot(x, y)
-    val raʹ       = if (r === 0.0) 0.0 else atan2(y, x)
-    val decʹ      = if (z === 0.0) 0.0 else atan2(z, r)
-    val raʹʹ      = {
-      // Normalize to [0 .. 2π)
-      val rem = raʹ % TwoPi
-      if (rem < 0.0) rem + TwoPi else rem
-    }
-    (raʹʹ, decʹ)
+      // Change per year due to proper velocity
+      val dPos2 = (
+        -dRa * pos._2 - dDec * cos(ra) * sin(dec),
+        dRa * pos._1 - dDec * sin(ra) * sin(dec),
+        dDec * cos(dec)
+      )
 
+      // Our new position (still in polar coordinates). `|+|` here is scalar addition provided by
+      // cats … unlike scalaz it does give you Semigroup[Double] even though it's not strictly lawful.
+      val pʹ = pos |+| ((dPos1 |+| dPos2) * elapsedYears)
+
+      // Back to spherical
+      val (x, y, z) = pʹ
+      val r         = hypot(x, y)
+      val raʹ       = if (r === 0.0) 0.0 else atan2(y, x)
+      val decʹ      = if (z === 0.0) 0.0 else atan2(z, r)
+      val raʹʹ      = {
+        // Normalize to [0 .. 2π)
+        val rem = raʹ % TwoPi
+        if (rem < 0.0) rem + TwoPi else rem
+      }
+      (raʹʹ, decʹ).some
+
+    } else none
   }
-  // scalastyle:on method.length
 
   implicit val OrderSiderealTracking: Order[SiderealTracking] = {
 
