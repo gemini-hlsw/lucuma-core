@@ -5,13 +5,14 @@ package lucuma.core.math.arb
 
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.types.numeric.PosBigDecimal
+import lucuma.core.math.refined._
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Cogen
 
 trait ArbRefined {
   val BigDecimalZero: BigDecimal      = BigDecimal(0)
-  val PosBigDecimalOne: PosBigDecimal = PosBigDecimal(BigDecimal(1))
+  val PosBigDecimalOne: PosBigDecimal = BigDecimal(1).refined
 
   // Refined does not derive this arbitrary. Generally deriving `Arbitrary` instances for `Pos`
   // numbers requires instances of `Adjacent` and `Max`, which don't exist for `BigDecimal`.

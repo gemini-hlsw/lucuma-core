@@ -4,7 +4,7 @@
 package lucuma.core.math.arb
 
 import coulomb._
-import coulomb.si.Meter
+import coulomb.units.si.Meter
 import eu.timepit.refined._
 import eu.timepit.refined.auto._
 import eu.timepit.refined.numeric._

@@ -34,7 +34,7 @@ package object arb {
 
   // This doesn't seem to exist anywhere?  https://github.com/non/cats-check
   // would be useful.  All we need is `Applicative` for now though I suppose.
-  implicit val applicativeGen = new Applicative[Gen] {
+  implicit val applicativeGen: Applicative[Gen] = new Applicative[Gen] {
     def ap[A, B](gf: Gen[A => B])(ga: Gen[A]): Gen[B] =
       for {
         f <- gf

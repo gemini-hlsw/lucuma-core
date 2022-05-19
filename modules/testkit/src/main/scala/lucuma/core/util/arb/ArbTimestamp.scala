@@ -18,7 +18,7 @@ trait ArbTimestamp {
     Arbitrary {
       for {
         m <- Gen.choose(0L, Duration.between(Instant.EPOCH, Timestamp.Max.toInstant).toMillis)
-        u <- Gen.choose(0, 999L)
+        u <- Gen.choose(0L, 999L)
       } yield Timestamp.Epoch.plusMillis(m).flatMap(_.plusMicros(u)).getOrElse(Timestamp.Epoch)
     }
 

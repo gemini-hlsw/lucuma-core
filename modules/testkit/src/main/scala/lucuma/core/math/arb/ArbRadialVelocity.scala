@@ -4,7 +4,8 @@
 package lucuma.core.math
 package arb
 
-import coulomb._
+import coulomb.qopaque.{Quantity, withUnit}
+import coulomb.policy.spire.standard.given
 import lucuma.core.math.Constants._
 import lucuma.core.math.units._
 import org.scalacheck.Arbitrary
@@ -17,7 +18,7 @@ trait ArbRadialVelocity {
     Arbitrary {
       for {
         rv <- Gen.chooseNum(-SpeedOfLight.value + 1, SpeedOfLight.value - 1)
-      } yield RadialVelocity.unsafeFromQuantity(rv.withUnit[MetersPerSecond])
+      } yield RadialVelocity.unsafeFromQuantity(rv.withUnit[MetersPerSecond].toValue[BigDecimal])
     }
 
   implicit val cogRadialVelocity: Cogen[RadialVelocity] =
