@@ -136,7 +136,7 @@ trait units {
   given rationalPosIntConverter: ValueConversion[PosInt, Rational] = Rational(_)
 
   inline given [UF, UT]: TruncatingUnitConversion[PosInt, UF, UT] = v =>
-    refineV[Positive](coulomb.conversion.standard.unit.ctx_TDUC_Int(v))
+    refineV[Positive](coulomb.conversion.standard.unit.ctx_TUC_Int(v))
       .getOrElse(refineMV[Int, Positive](1))
 
   // // This can build a converter for units that use PosInt but they are exact only
