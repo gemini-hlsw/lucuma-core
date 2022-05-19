@@ -10,6 +10,8 @@ import eu.timepit.refined.numeric.Positive
 import eu.timepit.refined.numeric.Negative
 
 import scala.compiletime.constValue
+import scala.quoted.Expr
+import scala.quoted.Quotes
 
 inline def refineMV[T, P](inline t: T)(using inline p: Predicate[T, P]): Refined[T, P] = {
   inline if (p.isValid(t)) Refined.unsafeApply(t) else scala.compiletime.error("no")
@@ -31,7 +33,11 @@ object Predicate {
     transparent inline def isValid(inline t: Int): Boolean = t > 0
 
   inline given Predicate[BigDecimal, Positive] with
-    transparent inline def isValid(inline t: Int): Boolean = t > 0
+    transparent inline def isValid(inline t: BigDecimal): Boolean = ${ isValidMacro('t) }
+    private def isValidMacro(expr: Expr[BigDecimal])(using Quotes): Expr[Boolean] =
+      expr match {
+        case '{ BigDecimal($i: Int) } => '{ $i > 0 }
+      }
 
   inline given Predicate[Int, Negative] with
     transparent inline def isValid(inline t: Int): Boolean = t < 0
