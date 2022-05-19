@@ -135,6 +135,8 @@ trait units {
   // PosInt can be converted to Rational exactly
   given rationalPosIntConverter: ValueConversion[PosInt, Rational] = Rational(_)
 
+  given ValueConversion[Parallax.LongParallaxμas, Rational] = Rational(_)
+
   inline given [UF, UT]: TruncatingUnitConversion[PosInt, UF, UT] = v =>
     refineV[Positive](coulomb.conversion.standard.unit.ctx_TUC_Int(v))
       .getOrElse(refineMV[Int, Positive](1))

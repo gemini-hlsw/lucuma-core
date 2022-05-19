@@ -4,14 +4,13 @@
 package lucuma.core.math
 
 import cats._
-import coulomb._
-import coulomb.cats.implicits._
-import coulomb.refined._
+import coulomb.qopaque.{Quantity}
+import coulomb.policy.spire.standard.given
 import eu.timepit.refined.api._
 import eu.timepit.refined.auto._
 import eu.timepit.refined.cats._
 import eu.timepit.refined.numeric._
-import lucuma.core.math.units._
+import lucuma.core.math.units.{*, given}
 import lucuma.core.optics._
 import spire.math.Rational
 import spire.std.long._
@@ -26,7 +25,7 @@ import spire.std.long._
 sealed abstract case class Parallax protected (
   μas: Quantity[Parallax.LongParallaxμas, MicroArcSecond]
 ) {
-  val mas: Quantity[Rational, MilliArcSecond] = μas.to[Rational, MilliArcSecond]
+  val mas: Quantity[Rational, MilliArcSecond] = μas.toValue[Rational].toUnit[MilliArcSecond]
 
   override def toString: String =
     s"Parallax(${μas.show})"
@@ -44,7 +43,8 @@ object Parallax extends ParallaxOptics {
 
   // Internal unbounded constructor
   private def applyUnsafe(μas: Long): Parallax =
-    apply(μas.withRefinedUnit[Parallaxμas, MicroArcSecond])
+    // TODO well, it does say unsafe :)
+    apply(μas.asInstanceOf[Quantity[LongParallaxμas, MicroArcSecond]])
 
   def apply(μas: Quantity[LongParallaxμas, MicroArcSecond]): Parallax =
     new Parallax(μas) {}
