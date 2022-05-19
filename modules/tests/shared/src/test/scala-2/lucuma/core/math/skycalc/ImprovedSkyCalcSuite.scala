@@ -3,7 +3,7 @@
 
 package lucuma.core.math.skycalc
 
-import lucuma.core.enum.Site
+import lucuma.core.`enum`.Site
 import lucuma.core.math.Coordinates
 import munit.FunSuite
 

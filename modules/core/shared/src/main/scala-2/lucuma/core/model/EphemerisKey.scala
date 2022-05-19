@@ -6,7 +6,7 @@ package lucuma.core.model
 import cats.Order
 import cats.Show
 import io.circe._
-import lucuma.core.enum.EphemerisKeyType
+import lucuma.core.`enum`.EphemerisKeyType
 import lucuma.core.model.parser.EphemerisKeyParsers
 import lucuma.core.optics.Format
 import lucuma.core.syntax.parser._

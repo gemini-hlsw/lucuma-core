@@ -6,7 +6,7 @@ package lucuma.core.model
 import cats.Eq
 import cats.syntax.all._
 import eu.timepit.refined.types.numeric.PosBigDecimal
-import lucuma.core.enum.Band
+import lucuma.core.`enum`.Band
 import lucuma.core.math.Angle
 import lucuma.core.math.BrightnessUnits._
 import lucuma.core.math.Wavelength

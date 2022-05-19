@@ -4,9 +4,9 @@
 package lucuma.core.geom.jts
 package demo
 
-import lucuma.core.enum.GmosNorthFpu
-import lucuma.core.enum.GmosSouthFpu
-import lucuma.core.enum.PortDisposition
+import lucuma.core.`enum`.GmosNorthFpu
+import lucuma.core.`enum`.GmosSouthFpu
+import lucuma.core.`enum`.PortDisposition
 import lucuma.core.geom.ShapeExpression
 import lucuma.core.geom.gmos._
 import lucuma.core.geom.jts.interpreter._

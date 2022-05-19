@@ -5,7 +5,7 @@ package lucuma.core.model.sequence.arb
 
 import cats.syntax.all._
 import lucuma.core.arb.ArbTime
-import lucuma.core.enum._
+import lucuma.core.`enum`._
 import lucuma.core.model.sequence.DynamicConfig
 import lucuma.core.model.sequence._
 import lucuma.core.util.arb.ArbEnumerated

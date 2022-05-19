@@ -4,7 +4,7 @@
 package lucuma.core.model.sequence
 
 import cats.Eq
-import lucuma.core.enum._
+import lucuma.core.`enum`._
 import monocle.Focus
 import monocle.Lens
 

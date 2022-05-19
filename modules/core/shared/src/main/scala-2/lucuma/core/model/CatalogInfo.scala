@@ -9,7 +9,7 @@ import eu.timepit.refined._
 import eu.timepit.refined.cats._
 import eu.timepit.refined.collection.NonEmpty
 import eu.timepit.refined.types.string.NonEmptyString
-import lucuma.core.enum.CatalogName
+import lucuma.core.`enum`.CatalogName
 import monocle.Focus
 import monocle.Lens
 

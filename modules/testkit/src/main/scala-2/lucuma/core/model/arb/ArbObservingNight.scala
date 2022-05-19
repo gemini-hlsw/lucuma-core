@@ -7,7 +7,7 @@ package model
 package arb
 
 import lucuma.core.arb.ArbTime
-import lucuma.core.enum.Site
+import lucuma.core.`enum`.Site
 import lucuma.core.model.LocalObservingNight
 import lucuma.core.model.ObservingNight
 import lucuma.core.util.arb.ArbEnumerated

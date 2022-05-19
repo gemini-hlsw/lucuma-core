@@ -17,6 +17,7 @@ import coulomb.units.time._
 // import coulomb.unitops._
 import lucuma.core.util.TypeString
 import lucuma.core.math.refined.*
+import eu.timepit.refined.api.Refined
 import eu.timepit.refined._
 import eu.timepit.refined.auto._
 import eu.timepit.refined.numeric._
@@ -141,6 +142,9 @@ trait units {
     refineV[Positive](coulomb.conversion.standard.unit.ctx_TUC_Int(v))
       .getOrElse(refineMV[Int, Positive](1))
 
+  extension [A](inline a: A)
+    inline def withRefinedUnit[P, U](using inline p: Predicate[A, P]): Quantity[Refined[A, P], U] = refineMV(a).withUnit[U]
+      
   // // This can build a converter for units that use PosInt but they are exact only
   // // if the coef is more than 1 and whole, i.e. going from Nanometer to Picometer
   // // The reverse is not true, remaining in the PosInt domain we can't ensure we can go from

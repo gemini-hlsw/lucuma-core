@@ -6,7 +6,7 @@ package core
 package model
 package arb
 
-import lucuma.core.enum.TwilightType
+import lucuma.core.`enum`.TwilightType
 import lucuma.core.model.ObservingNight
 import lucuma.core.model.TwilightBoundedNight
 import lucuma.core.model.arb.ArbObservingNight._

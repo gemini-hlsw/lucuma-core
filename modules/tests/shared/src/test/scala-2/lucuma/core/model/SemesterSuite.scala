@@ -7,8 +7,8 @@ import cats.Eq
 import cats.Show
 import cats.kernel.laws.discipline._
 import lucuma.core.arb.ArbTime._
-import lucuma.core.enum.Half
-import lucuma.core.enum.Site
+import lucuma.core.`enum`.Half
+import lucuma.core.`enum`.Site
 import lucuma.core.model.arb.ArbSemester._
 import lucuma.core.util.arb.ArbEnumerated._
 import org.scalacheck.Prop._

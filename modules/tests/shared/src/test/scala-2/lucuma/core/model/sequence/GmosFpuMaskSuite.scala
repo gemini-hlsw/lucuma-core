@@ -6,8 +6,8 @@ package lucuma.core.model.sequence
 import cats.kernel.laws.discipline._
 import eu.timepit.refined.cats._
 import eu.timepit.refined.scalacheck.string._
-import lucuma.core.enum.GmosNorthGrating
-import lucuma.core.enum.GmosSouthGrating
+import lucuma.core.`enum`.GmosNorthGrating
+import lucuma.core.`enum`.GmosSouthGrating
 import lucuma.core.math.arb._
 import lucuma.core.model.sequence.arb._
 import lucuma.core.util.arb._

@@ -4,14 +4,19 @@
 package lucuma.core.math.refined
 
 import eu.timepit.refined.api.Refined
+import eu.timepit.refined.boolean.Not
 import eu.timepit.refined.numeric.Interval
 import eu.timepit.refined.numeric.Positive
+import eu.timepit.refined.numeric.Negative
 
 import scala.compiletime.constValue
 
 inline def refineMV[T, P](inline t: T)(using inline p: Predicate[T, P]): Refined[T, P] = {
   inline if (p.isValid(t)) Refined.unsafeApply(t) else scala.compiletime.error("no")
 }
+
+extension [T](inline t: T) inline def refined[P](using inline p: Predicate[T, P]): Refined[T, P] =
+  refineMV(t)
 
 trait Predicate[T, P] {
   transparent inline def isValid(inline t: T): Boolean
@@ -24,4 +29,13 @@ object Predicate {
 
   inline given Predicate[Int, Positive] with
     transparent inline def isValid(inline t: Int): Boolean = t > 0
+
+  inline given Predicate[BigDecimal, Positive] with
+    transparent inline def isValid(inline t: Int): Boolean = t > 0
+
+  inline given Predicate[Int, Negative] with
+    transparent inline def isValid(inline t: Int): Boolean = t < 0
+
+  inline given [T, A, P <: Predicate[T, A]](using p: P): Predicate[T, Not[A]] with
+    transparent inline def isValid(inline t: T): Boolean = !p.isValid(t)
 }
