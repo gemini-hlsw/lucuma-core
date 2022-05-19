@@ -9,9 +9,10 @@ ThisBuild / crossScalaVersions := Seq("3.1.2")
 ThisBuild / scalacOptions += "-language:implicitConversions" // TODO
 
 ThisBuild / resolvers += Resolver.sonatypeRepo("snapshots")
+ThisBuild / resolvers += ("s01 snapshots" at "https://s01.oss.sonatype.org/content/repositories/snapshots/")
 
 lazy val attoVersion           = "0.9.5"
-lazy val catsVersion           = "2.7.0"
+lazy val catsVersion           = "2.8-3cb7639-SNAPSHOT"
 lazy val kindProjectorVersion  = "0.13.2"
 lazy val monocleVersion        = "3.1.0"
 lazy val scalaJavaTimeVersion  = "2.3.0"
