@@ -2,9 +2,10 @@
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.math
+
 import cats.Eq
 import cats.Show
-import coulomb.Quantity
+import coulomb.qopaque.{Quantity, withUnit}
 import coulomb.units.si.Meter
 import eu.timepit.refined.cats._
 import eu.timepit.refined.types.numeric.NonNegInt

@@ -22,6 +22,7 @@ import eu.timepit.refined._
 import eu.timepit.refined.auto._
 import eu.timepit.refined.numeric._
 import eu.timepit.refined.types.numeric.PosInt
+import eu.timepit.refined.types.numeric.NonNegInt
 // import lucuma.core.math.dimensional._
 import _root_.spire.math._
 
@@ -135,6 +136,8 @@ trait units {
 
   // PosInt can be converted to Rational exactly
   given rationalPosIntConverter: ValueConversion[PosInt, Rational] = Rational(_)
+
+  given ValueConversion[NonNegInt, Double] = _.value.toDouble
 
   given ValueConversion[Parallax.LongParallaxμas, Rational] = Rational(_)
 

@@ -3,6 +3,7 @@
 
 package lucuma.core.math.skycalc
 
+import coulomb.policy.spire.standard.given
 import lucuma.core.math.Constants._
 import lucuma.core.math.JulianDate.J2000
 import spire.std.double._
