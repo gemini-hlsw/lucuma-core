@@ -34,7 +34,7 @@ final class ImprovedSkyCalcSuiteJVM extends ScalaCheckSuite {
   private val zdtRange = Duration.ofDays(Period.ofYears(1000).getDays.toLong)
 
   test("Arbitrary sky calculations".tag(ScalaCheckFlaky)) {
-    forAll { place: Place =>
+    forAll { (place: Place) =>
       // This SkyCalc should be thread safe, but Java's isn't.
       val calc = ImprovedSkyCalc(place)
 
@@ -42,7 +42,7 @@ final class ImprovedSkyCalcSuiteJVM extends ScalaCheckSuite {
       forAll(genDateTimeWithinRange(zdtFrom, zdtRange)) { zdt =>
         val instant = zdt.toInstant
 
-        forAll { coords: Coordinates =>
+        forAll { (coords: Coordinates) =>
           val javaCalc = new ImprovedSkyCalcTest(place.latitude.toAngle.toSignedDoubleDegrees,
                                                  place.longitude.toSignedDoubleDegrees,
                                                  place.altitudeDouble
