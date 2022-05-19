@@ -20,7 +20,7 @@ import java.time.Instant
 final class SampleRounderSuite extends munit.DisciplineSuite {
   import ArbTime._
 
-  implicit def arbRounder[R, A](implicit r: SampleRounder[R, A]) =
+  implicit def arbRounder[R, A](implicit r: SampleRounder[R, A]): Arbitrary[SampleRounder[R, A]] =
     Arbitrary(Gen.const(r))
 
   implicit def eqRounder[R, A: Eq: Arbitrary]: Eq[SampleRounder[R, A]] =

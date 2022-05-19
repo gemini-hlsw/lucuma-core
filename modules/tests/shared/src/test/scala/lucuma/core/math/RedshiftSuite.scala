@@ -5,8 +5,9 @@ package lucuma.core.math
 
 import cats._
 import cats.kernel.laws.discipline._
-import coulomb._
-import coulomb.si._
+import coulomb.qopaque.{Quantity, withUnit}
+import coulomb.policy.spire.standard.given
+import coulomb.units.si._
 import lucuma.core.math.Constants.SpeedOfLight
 import lucuma.core.math.arb._
 import lucuma.core.math.units._
@@ -24,7 +25,7 @@ final class RedshiftSuite extends munit.DisciplineSuite {
   checkAll("redshift", IsoTests(Redshift.redshift))
 
   test("toRadialVelocity") {
-    assertEquals(Redshift.Zero.toRadialVelocity, RadialVelocity(0.withUnit[MetersPerSecond]))
+    assertEquals(Redshift.Zero.toRadialVelocity, RadialVelocity((BigDecimal(0).withUnit[MetersPerSecond])))
     assertEquals(
       // Example from http://spiff.rit.edu/classes/phys240/lectures/expand/expand.html
       // We need to specify the Math context to properly compare
@@ -32,7 +33,7 @@ final class RedshiftSuite extends munit.DisciplineSuite {
       RadialVelocity(
         BigDecimal
           .decimal(287172.9120288430, MathContext.DECIMAL64)
-          .withUnit[KilometersPerSecond]
+          .withUnit[MetersPerSecond]
       )
     )
   }
@@ -40,9 +41,9 @@ final class RedshiftSuite extends munit.DisciplineSuite {
   test("toApparentRadialVelocity") {
     assertEquals(
       Redshift.Zero.toApparentRadialVelocity,
-      ApparentRadialVelocity(0.withUnit[MetersPerSecond])
+      ApparentRadialVelocity(BigDecimal(0).withUnit[MetersPerSecond])
     )
-    assertEquals(Redshift(1).toApparentRadialVelocity, ApparentRadialVelocity(SpeedOfLight))
+    assertEquals(Redshift(1).toApparentRadialVelocity, ApparentRadialVelocity(SpeedOfLight.toValue[BigDecimal]))
     assertEquals(
       // In apparent radial velocity we can go faster than C
       Redshift(
@@ -51,7 +52,7 @@ final class RedshiftSuite extends munit.DisciplineSuite {
       ApparentRadialVelocity(
         BigDecimal
           .decimal(1744792.10556, MathContext.DECIMAL64)
-          .withUnit[KilometersPerSecond]
+          .withUnit[MetersPerSecond]
       )
     )
   }

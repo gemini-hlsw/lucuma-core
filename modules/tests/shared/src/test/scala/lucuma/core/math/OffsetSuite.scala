@@ -41,13 +41,13 @@ final class OffsetSuite extends munit.DisciplineSuite {
   }
 
   test("Show must be natural") {
-    forAll { a: Offset =>
+    forAll { (a: Offset) =>
       assertEquals(a.toString,  Show[Offset].show(a))
     }
   }
 
   test("Conversion to components must be invertable") {
-    forAll { o: Offset =>
+    forAll { (o: Offset) =>
       val (p, q) = (o.p, o.q)
       assertEquals(Offset(p, q),  o)
     }

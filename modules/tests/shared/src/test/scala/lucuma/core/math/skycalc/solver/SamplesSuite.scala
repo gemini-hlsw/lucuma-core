@@ -45,8 +45,8 @@ final class SamplesSuite extends munit.DisciplineSuite with IntervalGens {
   checkAll("data", IsoTests(Samples.data[Int]))
 
   test("Fixed Rate Instants") {
-    forAll { interval: Bounded[Instant] =>
-      forAll(rateForInterval(interval)) { duration: Duration =>
+    forAll { (interval: Bounded[Instant]) =>
+      forAll(rateForInterval(interval)) { (duration: Duration) =>
         val fixedRateSamples = Samples.atFixedRate(interval, duration)(_ => Eval.now(()))
         val instants         = fixedRateSamples.toMap.keys.toList
         assertEquals(instants.head, interval.lower)

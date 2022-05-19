@@ -5,8 +5,6 @@ package lucuma.core.math
 
 import cats.Show
 import cats.kernel.laws.discipline.EqTests
-import coulomb.cats.implicits._
-import coulomb.scalacheck.ArbQuantity
 import eu.timepit.refined.auto._
 import eu.timepit.refined.cats._
 import eu.timepit.refined.scalacheck.numeric._
@@ -28,7 +26,7 @@ final class PlaceSuite extends DisciplineSuite {
   checkAll("Place", EqTests[Place].eqv)
 
   test("Show must be natural") {
-    forAll { a: Place =>
+    forAll { (a: Place) =>
       assertEquals(a.toString, Show[Place].show(a))
     }
   }

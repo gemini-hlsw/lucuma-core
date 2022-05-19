@@ -6,7 +6,7 @@ package lucuma.core.math
 import cats._
 import cats.kernel.laws.discipline._
 import coulomb._
-import coulomb.si._
+import coulomb.units.si._
 import lucuma.core.math.Constants.SpeedOfLight
 import lucuma.core.math.arb._
 import lucuma.core.math.units._
