@@ -3,6 +3,7 @@
 
 package lucuma.core.model.arb
 
+import cats.implicits._
 import eu.timepit.refined.scalacheck.all._
 import lucuma.core.arb.ArbTime
 import lucuma.core.math.units.IntPercent
@@ -109,33 +110,48 @@ trait ArbProposalClass {
     )
 
   implicit val cogProposalClass: Cogen[ProposalClass] =
-    Cogen[
-      (
-        Option[Classical],
-        Option[DemoScience],
-        Option[DirectorsTime],
-        Option[Exchange],
-        Option[FastTurnaround],
-        Option[PoorWeather],
-        Option[Queue],
-        Option[SystemVerification],
-        Option[LargeProgram],
-        Option[Intensive]
-      )
-    ].contramap(p =>
-      (
-        ProposalClass.classical.getOption(p),
-        ProposalClass.demoScience.getOption(p),
-        ProposalClass.directorsTime.getOption(p),
-        ProposalClass.exchange.getOption(p),
-        ProposalClass.fastTurnaround.getOption(p),
-        ProposalClass.poorWeather.getOption(p),
-        ProposalClass.queue.getOption(p),
-        ProposalClass.systemVerification.getOption(p),
-        ProposalClass.largeProgram.getOption(p),
-        ProposalClass.intensive.getOption(p)
-      )
-    )
+    Cogen[Either[
+      Classical,
+      Either[
+        DemoScience,
+        Either[
+          DirectorsTime,
+          Either[
+            Exchange,
+            Either[
+              FastTurnaround,
+              Either[
+                PoorWeather,
+                Either[
+                  Queue,
+                  Either[
+                    SystemVerification,
+                    Either[
+                      LargeProgram,
+                      Intensive
+                    ]
+                  ]
+                ]
+              ]
+            ]
+          ]
+        ]
+      ]
+    ]].contramap {
+      case p @ Classical(_)          => p.asLeft
+      case p @ DemoScience(_)        => p.asLeft.asRight
+      case p @ DirectorsTime(_)      => p.asLeft.asRight.asRight
+      case p @ Exchange(_)           => p.asLeft.asRight.asRight.asRight
+      case p @ FastTurnaround(_)     => p.asLeft.asRight.asRight.asRight.asRight
+      case p @ PoorWeather(_)        => p.asLeft.asRight.asRight.asRight.asRight.asRight
+      case p @ Queue(_)              => p.asLeft.asRight.asRight.asRight.asRight.asRight.asRight
+      case p @ SystemVerification(_) =>
+        p.asLeft.asRight.asRight.asRight.asRight.asRight.asRight.asRight
+      case p @ LargeProgram(_, _, _) =>
+        p.asLeft.asRight.asRight.asRight.asRight.asRight.asRight.asRight.asRight
+      case p @ Intensive(_, _, _)    =>
+        p.asRight.asRight.asRight.asRight.asRight.asRight.asRight.asRight.asRight
+    }
 }
 
 object ArbProposalClass extends ArbProposalClass

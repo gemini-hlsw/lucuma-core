@@ -20,22 +20,22 @@ sealed trait ProposalClass { val minPercentTime: IntPercent }
 
 object ProposalClass {
 
-  case class Classical(minPercentTime: IntPercent)          extends ProposalClass
-  case class DemoScience(minPercentTime: IntPercent)        extends ProposalClass
-  case class DirectorsTime(minPercentTime: IntPercent)      extends ProposalClass
-  case class Exchange(minPercentTime: IntPercent)           extends ProposalClass
-  case class FastTurnaround(minPercentTime: IntPercent)     extends ProposalClass
-  case class PoorWeather(minPercentTime: IntPercent)        extends ProposalClass
-  case class Queue(minPercentTime: IntPercent)              extends ProposalClass
-  case class SystemVerification(minPercentTime: IntPercent) extends ProposalClass
+  final case class Classical(minPercentTime: IntPercent)          extends ProposalClass
+  final case class DemoScience(minPercentTime: IntPercent)        extends ProposalClass
+  final case class DirectorsTime(minPercentTime: IntPercent)      extends ProposalClass
+  final case class Exchange(minPercentTime: IntPercent)           extends ProposalClass
+  final case class FastTurnaround(minPercentTime: IntPercent)     extends ProposalClass
+  final case class PoorWeather(minPercentTime: IntPercent)        extends ProposalClass
+  final case class Queue(minPercentTime: IntPercent)              extends ProposalClass
+  final case class SystemVerification(minPercentTime: IntPercent) extends ProposalClass
 
-  case class LargeProgram(
+  final case class LargeProgram(
     minPercentTime:      IntPercent,
     minPercentTotalTime: IntPercent,
     totalTime:           Duration
   ) extends ProposalClass
 
-  case class Intensive(
+  final case class Intensive(
     minPercentTime:      IntPercent,
     minPercentTotalTime: IntPercent,
     totalTime:           Duration
