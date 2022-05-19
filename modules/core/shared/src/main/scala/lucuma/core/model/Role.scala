@@ -29,10 +29,10 @@ object Role {
 // Special roles
 
 /** `GuestRole` allows limited access to temporary programs. */
-final case object GuestRole extends Role(Access.Guest)
+case object GuestRole extends Role(Access.Guest)
 
 /** `ServiceRole` is used only for inter-service communication. */
-final case class ServiceRole(serviceName: String) extends Role(Access.Service, Some(serviceName))
+case class ServiceRole(serviceName: String) extends Role(Access.Service, Some(serviceName))
 
 object ServiceRole {
   implicit val eqServiceRole: Eq[ServiceRole] = Eq.by(_.serviceName)

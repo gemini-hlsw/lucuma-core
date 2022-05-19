@@ -147,7 +147,7 @@ trait EphemerisOptics { this: EphemerisKey.type =>
     )
 }
 
-trait EphemerisJson { this: EphemerisOptics =>
+trait EphemerisJson { this: EphemerisOptics & EphemerisKey.type =>
   implicit val encoder: Encoder[EphemerisKey] =
     Encoder[String].contramap(fromString.reverseGet)
 
