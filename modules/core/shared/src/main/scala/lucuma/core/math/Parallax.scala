@@ -4,8 +4,9 @@
 package lucuma.core.math
 
 import cats._
-import coulomb.qopaque.{Quantity}
+import coulomb.qopaque.{Quantity, withUnit}
 import coulomb.policy.spire.standard.given
+import eu.timepit.refined.refineV
 import eu.timepit.refined.api._
 import eu.timepit.refined.auto._
 import eu.timepit.refined.cats._
@@ -43,8 +44,7 @@ object Parallax extends ParallaxOptics {
 
   // Internal unbounded constructor
   private def applyUnsafe(μas: Long): Parallax =
-    // TODO well, it does say unsafe :)
-    apply(μas.asInstanceOf[Quantity[LongParallaxμas, MicroArcSecond]])
+    apply(refineV[Parallaxμas](μas).toOption.get.withUnit[MicroArcSecond])
 
   def apply(μas: Quantity[LongParallaxμas, MicroArcSecond]): Parallax =
     new Parallax(μas) {}
