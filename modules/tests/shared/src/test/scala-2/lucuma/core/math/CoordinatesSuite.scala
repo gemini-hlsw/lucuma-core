@@ -5,6 +5,7 @@ package lucuma.core.math
 
 import cats.Eq
 import cats.Show
+import cats.syntax.all._
 import cats.kernel.laws.discipline._
 import lucuma.core.math.arb._
 import lucuma.core.optics.laws.discipline._
@@ -17,6 +18,7 @@ final class CoordinatesSuite extends munit.DisciplineSuite {
   import ArbRightAscension._
   import ArbDeclination._
   import ArbAngle._
+  import ArbOffset._
 
   // Laws
   checkAll("Coordinates", OrderTests[Coordinates].order)
@@ -136,6 +138,20 @@ final class CoordinatesSuite extends munit.DisciplineSuite {
       assert(Δs.filter(_ > 20L).isEmpty)
     }
 
+  }
+
+  test("offsetBy 0 is identical") {
+    forAll { (a: Coordinates, posAngle: Angle) =>
+      assertEquals(a.offsetBy(posAngle, Offset.Zero), a.some)
+    }
+  }
+
+  test("offsetBy complements itself (with a small error)") {
+    forAll { (a: Coordinates, posAngle: Angle, offset: Offset) =>
+      val b = a.offsetBy(posAngle, offset)
+      val c = b.flatMap(_.offsetBy(posAngle, -offset))
+      assertEqualsDouble((b, c).mapN(_.angularDistance(_).toDoubleDegrees).getOrElse(Double.MaxValue), 0, 0.01)
+    }
   }
 
 }

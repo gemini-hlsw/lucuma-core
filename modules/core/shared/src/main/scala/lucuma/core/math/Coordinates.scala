@@ -118,6 +118,30 @@ final case class Coordinates(ra: RightAscension, dec: Declination) {
     }
   }
 
+  /**
+   * Offset the coordinates on the posAngl axis a given offset. Approximate
+   * This operation is undefined at Dec +/-90
+   * @return the coordinates offseted on the posAngle axis.
+   */
+  def offsetBy(posAngle: Angle, offset: Offset): Option[Coordinates] =
+    if (offset =!= Offset.Zero) {
+      val paCos  = posAngle.cos
+      val paSin  = posAngle.sin
+      val pDeg   = offset.p.toAngle.toSignedDoubleDegrees
+      val qDeg   = offset.q.toAngle.toSignedDoubleDegrees
+      val dRa    = pDeg * paCos + qDeg * paSin
+      val dDec   = -pDeg * paSin + qDeg * paCos
+      val decCos = dec.toAngle.cos
+
+      Declination
+        .fromDoubleDegrees(dec.toAngle.toSignedDoubleDegrees + dDec)
+        .filter(_ => decCos != 0)
+        .map { dec =>
+          val newRa = RightAscension.fromDoubleDegrees(ra.toAngle.toDoubleDegrees + dRa / decCos)
+          Coordinates(newRa, dec)
+        }
+    } else this.some // Return itself on no offset
+
   /** These coordinates in radians, [0 .. 2π) and [-π/2 .. π/2]. */
   def toRadians: (Double, Double) =
     (ra.toRadians, dec.toRadians)
