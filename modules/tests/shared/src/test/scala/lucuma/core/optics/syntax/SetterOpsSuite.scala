@@ -36,28 +36,28 @@ final class SetterOpsSuite extends munit.DisciplineSuite {
   import setter._
 
   test("SetterOps (1)") {
-    forAll { p: Person =>
+    forAll { (p: Person) =>
       // Assign a single property, keeping the other.
       assertEquals((Person.name := "Biff").runS(p).value,  Person("Biff", p.age))
     }
   }
 
   test("SetterOps Some (1)") {
-    forAll { p: Person =>
+    forAll { (p: Person) =>
       // Assign a single property, keeping the other.
       assertEquals((Person.name := Some("Biff")).runS(p).value,  Person("Biff", p.age))
     }
   }
 
   test("SetterOps None (1)") {
-    forAll { p: Person =>
+    forAll { (p: Person) =>
       // Assign a single property, keeping the other.
       assertEquals((Person.name := None).runS(p).value,  p)
     }
   }
 
   test("SetterOps (2)") {
-    forAll { p: Person =>
+    forAll { (p: Person) =>
 
       // Assign both properties, the initial state is essentially irrelevant.
       val r = (for {

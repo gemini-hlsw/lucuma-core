@@ -6,11 +6,9 @@ package lucuma.core.model
 import cats.implicits._
 import cats.kernel.laws.discipline._
 import coulomb._
-import coulomb.cats.implicits._
-import coulomb.scalacheck.ArbQuantity
 import eu.timepit.refined.cats._
 import lucuma.core.math.BrightnessUnits._
-import lucuma.core.math.arb.ArbRefined
+import lucuma.core.math.arb._
 import lucuma.core.math.dimensional.arb.ArbMeasure
 import lucuma.core.math.units._
 import lucuma.core.model.arb.ArbEmissionLine
@@ -23,7 +21,7 @@ final class EmissionLineSuite extends DisciplineSuite {
   import ArbEmissionLine._
   import ArbRefined._
   import ArbMeasure._
-  import ArbQuantity._
+  import ArbQuantity.given
 
   // Brightness type conversions
   val e1Integrated: EmissionLine[Integrated] =

@@ -16,6 +16,12 @@ import org.scalacheck.Prop._
 import org.scalacheck._
 
 final class ShapeExpressionSuite extends munit.DisciplineSuite {
+
+  // Override to remove implicit modifier
+  override def unitToProp = super.unitToProp
+  // Scala 3 likes this better
+  implicit def saneUnitToProp(unit: Unit): Prop = unitToProp(unit)
+
   implicit val interpreter: ShapeInterpreter =
     lucuma.core.geom.jts.interpreter.value
 
@@ -115,7 +121,7 @@ final class ShapeExpressionSuite extends munit.DisciplineSuite {
     forAll(genShape, arbitrary[Angle]) { (e: ShapeExpression, a) =>
       val nominal = e.µasSquared
       val rotated = (e ⟲ a).µasSquared
-      val error   = if (nominal === 0L) 0L else (nominal - rotated).toDouble / nominal.toDouble
+      val error   = if (nominal === 0L) 0.0 else (nominal - rotated).toDouble / nominal.toDouble
       assertEqualsDouble(error, 0.0, 1.0e-13)
     }
   }
@@ -124,7 +130,7 @@ final class ShapeExpressionSuite extends munit.DisciplineSuite {
     forAll(genShape, arbitrary[Offset]) { (e: ShapeExpression, o) =>
       val nominal = e.µasSquared
       val moved   = (e ↗ o).µasSquared
-      val error   = if (nominal === 0L) 0L else (nominal - moved).toDouble / nominal.toDouble
+      val error   = if (nominal === 0L) 0.0 else (nominal - moved).toDouble / nominal.toDouble
       assertEqualsDouble(error, 0.0, 1.0e-13)
     }
   }

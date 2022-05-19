@@ -3,22 +3,21 @@
 
 package lucuma.core.optics
 
-import coulomb.accepted.Percent
-import coulomb.cats.implicits._
-import coulomb.scalacheck.ArbQuantity
+import coulomb.units.accepted.Percent
 import eu.timepit.refined.cats._
 import eu.timepit.refined.collection.NonEmpty
 import eu.timepit.refined.numeric.Positive
 import eu.timepit.refined.scalacheck.numeric._
 import eu.timepit.refined.scalacheck.string._
 import lucuma.core.math.arb.ArbRefined
+import lucuma.core.math.arb.ArbQuantity
 import monocle.law.discipline.IsoTests
 import monocle.law.discipline.PrismTests
 import munit.DisciplineSuite
 
 class OpticsSpec extends DisciplineSuite {
   import ArbRefined._
-  import ArbQuantity._ // This import has to be last.
+  import ArbQuantity.given // This import has to be last.
   
   checkAll("refinedPrism[String, NonEmpty]", PrismTests(refinedPrism[String, NonEmpty]))
   checkAll("refinedPrism[Int, Positive]", PrismTests(refinedPrism[Int, Positive]))

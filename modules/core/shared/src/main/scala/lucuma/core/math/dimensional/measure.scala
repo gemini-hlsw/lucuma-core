@@ -32,11 +32,8 @@ final case class Measure[N](value: N, units: Units, error: Option[N] = none) { s
     s"Measure($value${error.map(e => f" ± $e").orEmpty} ${units.abbv})"
 }
 
-object Measure {
+object Measure extends MeasureLowPriority {
   implicit def eqMeasure[N: Eq]: Eq[Measure[N]] = Eq.by(x => (x.value, x.units, x.error))
-
-  implicit def eqTaggedMeasure[N: Eq, T]: Eq[Measure[N] Of T] =
-    Eq.by(x => (x.value, x.units, x.error))
 
   implicit def displayMeasure[N: Display]: Display[Measure[N]] =
     Display.by(
@@ -100,4 +97,9 @@ object Measure {
       s"${measure.value.shortName} ${measure.units.shortName}"
   }
 
+}
+
+private class MeasureLowPriority {
+  implicit def eqTaggedMeasure[N: Eq, T]: Eq[Measure[N] Of T] =
+    Eq.by(x => (x.value, x.units, x.error))
 }
