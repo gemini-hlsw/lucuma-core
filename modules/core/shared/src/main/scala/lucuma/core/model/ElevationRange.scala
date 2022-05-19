@@ -7,11 +7,11 @@ import cats._
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.api.RefinedTypeOps
 import eu.timepit.refined.numeric.Interval
-import eu.timepit.refined.refineV
 import lucuma.core.optics.SplitEpi
 import monocle.Focus
 import monocle.Prism
 import monocle.macros.GenPrism
+import eu.timepit.refined.internal.WitnessAs
 
 sealed trait ElevationRange extends Product with Serializable
 
@@ -29,13 +29,13 @@ object ElevationRange {
 
   object AirMass {
     val MinValue = BigDecimal(1.0)
+    given WitnessAs[MinValue.type, BigDecimal] = WitnessAs(MinValue, MinValue)
     val MaxValue = BigDecimal(3.0)
+    given WitnessAs[MaxValue.type, BigDecimal] = WitnessAs(MaxValue, MaxValue)
 
     type Value        = Interval.Closed[MinValue.type, MaxValue.type]
     type DecimalValue = BigDecimal Refined Value
-    object DecimalValue {
-      def unsafeFrom(x: BigDecimal): DecimalValue = refineV[Value](x).toOption.get
-    }
+    object DecimalValue extends RefinedTypeOps[DecimalValue, BigDecimal]
 
     val DefaultMin: DecimalValue = DecimalValue.unsafeFrom(BigDecimal(1.0))
     val DefaultMax: DecimalValue = DecimalValue.unsafeFrom(BigDecimal(2.0))
@@ -71,7 +71,9 @@ object ElevationRange {
 
   object HourAngle {
     val MinHour = BigDecimal(-5.0)
+    given WitnessAs[MinHour.type, BigDecimal] = WitnessAs(MinHour, MinHour)
     val MaxHour = BigDecimal(5.0)
+    given WitnessAs[MaxHour.type, BigDecimal] = WitnessAs(MaxHour, MaxHour)
 
     type Hour        = Interval.Closed[MinHour.type, MaxHour.type]
     type DecimalHour = BigDecimal Refined Hour
