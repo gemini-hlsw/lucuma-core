@@ -5,6 +5,7 @@ package lucuma.core.math.refined
 
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.numeric.Interval
+import eu.timepit.refined.numeric.Positive
 
 import scala.compiletime.constValue
 
@@ -20,4 +21,7 @@ object Predicate {
 
   inline given [M <: Int, N <: Int]: Predicate[Int, Interval.Closed[M, N]] with
     transparent inline def isValid(inline t: Int): Boolean = constValue[M] <= t && t <= constValue[N]
+
+  inline given Predicate[Int, Positive] with
+    transparent inline def isValid(inline t: Int): Boolean = t > 0
 }
