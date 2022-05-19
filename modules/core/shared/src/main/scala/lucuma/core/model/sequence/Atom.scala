@@ -7,6 +7,7 @@ import cats.Eq
 import cats.syntax.all._
 import eu.timepit.refined.auto._
 import lucuma.core.util.WithUid
+import lucuma.core.math.refined._
 import monocle.Focus
 import monocle.Lens
 import monocle.Prism
@@ -17,7 +18,7 @@ sealed trait Atom {
   val steps: List[Step]
 }
 
-object Atom extends WithUid('a') {
+object Atom extends WithUid('a'.refined) {
   final case class GmosNorth(id: Atom.Id, steps: List[Step.GmosNorth]) extends Atom
   object GmosNorth {
     implicit val eqAtomGmosNorth: Eq[GmosNorth] = Eq.by(a => (a.id, a.steps))

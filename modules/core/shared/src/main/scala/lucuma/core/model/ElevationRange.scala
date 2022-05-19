@@ -7,6 +7,7 @@ import cats._
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.api.RefinedTypeOps
 import eu.timepit.refined.numeric.Interval
+import eu.timepit.refined.refineV
 import lucuma.core.optics.SplitEpi
 import monocle.Focus
 import monocle.Prism
@@ -32,7 +33,9 @@ object ElevationRange {
 
     type Value        = Interval.Closed[MinValue.type, MaxValue.type]
     type DecimalValue = BigDecimal Refined Value
-    object DecimalValue extends RefinedTypeOps[DecimalValue, BigDecimal]
+    object DecimalValue {
+      def unsafeFrom(x: BigDecimal): DecimalValue = refineV[Value](x).toOption.get
+    }
 
     val DefaultMin: DecimalValue = DecimalValue.unsafeFrom(BigDecimal(1.0))
     val DefaultMax: DecimalValue = DecimalValue.unsafeFrom(BigDecimal(2.0))

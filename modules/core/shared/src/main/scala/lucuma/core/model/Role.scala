@@ -6,6 +6,7 @@ package lucuma.core.model
 import cats.Eq
 import cats.implicits._
 import eu.timepit.refined.auto._
+import lucuma.core.math.refined._
 import lucuma.core.util.WithGid
 
 /**
@@ -42,7 +43,7 @@ sealed abstract class StandardRole(access: Access, elaboration: Option[String] =
     extends Role(access, elaboration) {
   def id: StandardRole.Id
 }
-object StandardRole extends WithGid('r') {
+object StandardRole extends WithGid('r'.refined) {
 
   /** The `Pi` role gives access to programs on which the user is a collaborator. */
   final case class Pi(id: StandardRole.Id) extends StandardRole(Access.Pi)

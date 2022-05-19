@@ -5,6 +5,7 @@ package lucuma.core.model
 
 import cats._
 import cats.syntax.all._
+import coulomb.policy.spire.standard.given
 import lucuma.core.math._
 import monocle.Focus
 import monocle.Lens

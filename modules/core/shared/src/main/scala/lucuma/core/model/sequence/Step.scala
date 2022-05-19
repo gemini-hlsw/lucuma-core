@@ -8,6 +8,7 @@ import cats.syntax.all._
 import eu.timepit.refined.auto._
 import lucuma.core.`enum`.Breakpoint
 import lucuma.core.util.WithUid
+import lucuma.core.math.refined._
 import monocle.Focus
 import monocle.Lens
 import monocle.Prism
@@ -21,7 +22,7 @@ sealed trait Step {
   val breakpoint: Breakpoint
 }
 
-object Step extends WithUid('s') {
+object Step extends WithUid('s'.refined) {
   final case class GmosNorth(
     id:               Step.Id,
     instrumentConfig: DynamicConfig.GmosNorth,

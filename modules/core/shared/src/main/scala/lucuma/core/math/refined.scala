@@ -5,6 +5,7 @@ package lucuma.core.math.refined
 
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.boolean.Not
+import eu.timepit.refined.char.Letter
 import eu.timepit.refined.numeric.Interval
 import eu.timepit.refined.numeric.Positive
 import eu.timepit.refined.numeric.Negative
@@ -42,6 +43,10 @@ object Predicate {
 
   inline given Predicate[Int, Negative] with
     transparent inline def isValid(inline t: Int): Boolean = t < 0
+
+  inline given Predicate[Char, Letter] with
+    transparent inline def isValid(inline t: Char): Boolean =
+      ('a' <= t && t <= 'z') || ('A' <= t && t <= 'Z')
 
   inline given [T, A, P <: Predicate[T, A]](using p: P): Predicate[T, Not[A]] with
     transparent inline def isValid(inline t: T): Boolean = !p.isValid(t)

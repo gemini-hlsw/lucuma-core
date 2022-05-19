@@ -12,6 +12,7 @@ import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.core.`enum`.Band
 import lucuma.core.math.BrightnessUnits._
 import lucuma.core.math._
+import lucuma.core.math.refined._
 import lucuma.core.math.dimensional._
 import lucuma.core.util.WithGid
 import monocle.Focus
@@ -29,7 +30,7 @@ sealed trait Target extends Product with Serializable {
   def sourceProfile: SourceProfile
 }
 
-object Target extends WithGid('t') with TargetOptics {
+object Target extends WithGid('t'.refined) with TargetOptics {
 
   final case class Sidereal(
     name:          NonEmptyString,
