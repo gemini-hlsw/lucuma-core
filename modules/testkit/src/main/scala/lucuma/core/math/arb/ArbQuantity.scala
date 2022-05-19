@@ -5,8 +5,12 @@ package lucuma.core.math.arb
 
 import coulomb.qopaque.{Quantity, withUnit}
 import org.scalacheck.Arbitrary
+import org.scalacheck.Cogen
 
 object ArbQuantity {
   given [V, U](using arbV: Arbitrary[V]): Arbitrary[Quantity[V, U]] =
     Arbitrary(arbV.arbitrary.map(_.withUnit[U]))
+
+  given [V, U](using cogenV: Cogen[V]): Cogen[Quantity[V, U]] =
+    cogenV.contramap(_.value)
 }
