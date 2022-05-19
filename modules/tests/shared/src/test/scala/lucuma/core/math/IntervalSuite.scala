@@ -40,7 +40,7 @@ final class IntervalSuite extends munit.DisciplineSuite with IntervalGens {
   )
 
   test("Abuts") {
-    forAll { i: Bounded[Instant] =>
+    forAll { (i: Bounded[Instant]) =>
       forAll(
         Gen.oneOf(
           instantBeforeInterval(i).map(
@@ -56,19 +56,19 @@ final class IntervalSuite extends munit.DisciplineSuite with IntervalGens {
   }
 
   test("Not Abuts") {
-    forAll { i: Bounded[Instant] =>
+    forAll { (i: Bounded[Instant]) =>
       forAll(
         arbitrary[Bounded[Instant]]
           .suchThat(i2 => catsSyntaxEq(i2.upper) =!= i.lower)
           .suchThat(i2 => catsSyntaxEq(i2.lower) =!= i.upper)
-      ) { i2: Bounded[Instant] =>
+      ) { (i2: Bounded[Instant]) =>
         assert(!i.abuts(i2))
       }
     }
   }
 
   test("Join") {
-    forAll { i: Bounded[Instant] =>
+    forAll { (i: Bounded[Instant]) =>
       forAll(
         distinctZip(instantUntilEndOfInterval(i), instantFromStartOfInterval(i))
       ) { instants =>
@@ -82,7 +82,7 @@ final class IntervalSuite extends munit.DisciplineSuite with IntervalGens {
   }
 
   test("Empty Join") {
-    forAll { i: Bounded[Instant] =>
+    forAll { (i: Bounded[Instant]) =>
       forAll(
         Gen
           .oneOf(

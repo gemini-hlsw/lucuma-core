@@ -21,7 +21,8 @@ final class PlaceSuite extends DisciplineSuite {
   import ArbDeclination._
   import ArbAngle._
   import ArbTime._
-  import ArbQuantity._
+  import ArbRefined.given
+  import ArbQuantity.given
 
   checkAll("Place", EqTests[Place].eqv)
 
@@ -31,6 +32,7 @@ final class PlaceSuite extends DisciplineSuite {
     }
   }
 
+  org.scalacheck.Arbitrary.arbitrary[coulomb.qopaque.Quantity[eu.timepit.refined.types.numeric.NonNegInt, coulomb.units.si.Meter]]
   checkAll("Place.latitude", LensTests(Place.latitude))
   checkAll("Place.longitude", LensTests(Place.longitude))
   checkAll("Place.altitude", LensTests(Place.altitude))
