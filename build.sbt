@@ -1,4 +1,4 @@
-ThisBuild / tlBaseVersion                         := "0.35"
+ThisBuild / tlBaseVersion                         := "0.36"
 ThisBuild / tlCiReleaseBranches                   := Seq("master")
 ThisBuild / githubWorkflowEnv += "MUNIT_FLAKY_OK" -> "true"
 ThisBuild / scalacOptions += "-Xsource:3"
@@ -52,6 +52,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
       "eu.timepit"     %%% "refined-cats"               % refinedVersion,
       "org.typelevel"  %%% "cats-time"                  % catsTimeVersion,
       "io.circe"       %%% "circe-core"                 % circeVersion,
+      "io.circe"       %%% "circe-generic"              % circeVersion,
       "io.circe"       %%% "circe-refined"              % circeVersion,
       "com.chuusai"    %%% "shapeless"                  % shapelessVersion
     )
