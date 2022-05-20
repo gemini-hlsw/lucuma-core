@@ -5,11 +5,11 @@ package lucuma
 package core
 package `enum`
 
-import cats.syntax.eq.*
-import coulomb.*
+import cats.syntax.eq._
+import coulomb._
 import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.math.{Angle, Coverage, Wavelength}
-import lucuma.core.math.units.*
+import lucuma.core.math.units._
 import lucuma.core.util.Enumerated
 import spire.math.Rational
 
@@ -137,12 +137,9 @@ object GmosNorthGrating {
     longName             = "B480_G5309",
     rulingDensity        = 480,
     dispersion           = pmToDispersion( 62),
-
-    // FAKE NEWS!  TODO: what are the real values?
-    simultaneousCoverage = nm( 1),
-    blazeWavelength      = blazeNm( 1),
-    referenceResolution  = resolution(1),
-
+    simultaneousCoverage = nm( 390),
+    blazeWavelength      = blazeNm( 422),
+    referenceResolution  = resolution(1520),
     obsolete             = false
   )
 

@@ -124,12 +124,9 @@ object GmosSouthGrating {
     longName             = "B480_G5327",
     rulingDensity        = 480,
     dispersion           = pmToDispersion( 62),
-
-    // FAKE NEWS!  TODO: what are the real values?
-    simultaneousCoverage = nm( 1),
-    blazeWavelength      = blazeNm( 1),
-    referenceResolution  = resolution(1),
-
+    simultaneousCoverage = nm( 390),
+    blazeWavelength      = blazeNm( 422),
+    referenceResolution  = resolution(1520),
     obsolete             = false
   )
 
