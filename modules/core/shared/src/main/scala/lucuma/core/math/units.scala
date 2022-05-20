@@ -21,6 +21,9 @@ import spire.math._
 
 trait units {
 
+  type Electron
+  implicit val defineUnitElectron = BaseUnit[Electron](abbv = "e-")
+
   type Pixels
   implicit val defineUnitPixels = BaseUnit[Pixels](abbv = "px")
 
