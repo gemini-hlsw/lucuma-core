@@ -5,10 +5,11 @@ package lucuma
 package core
 package `enum`
 
-import cats.syntax.eq._
-import coulomb._
+import cats.syntax.eq.*
+import coulomb.*
 import eu.timepit.refined.types.numeric.PosInt
-import lucuma.core.math.units._
+import lucuma.core.math.{Angle, Coverage, Wavelength}
+import lucuma.core.math.units.*
 import lucuma.core.util.Enumerated
 import spire.math.Rational
 
@@ -18,26 +19,146 @@ import spire.math.Rational
  * @see https://www.gemini.edu/instrumentation/gmos/components#Gratings
  */
 sealed abstract class GmosSouthGrating(
-  val tag: String,
-  val shortName: String,
-  val longName: String,
-  val rulingDensity: Int,
-  val dispersion: Quantity[Rational, NanometersPerPixel],
-  val obsolete: Boolean
-) extends Product with Serializable
+  val tag:                  String,
+  val shortName:            String,
+  val longName:             String,
+  val rulingDensity:        Int,
+  val dispersion:           Quantity[Rational, NanometersPerPixel],
+  val simultaneousCoverage: Quantity[PosInt, Nanometer],
+  val blazeWavelength:      Wavelength,
+  val referenceResolution:  PosInt,
+  val obsolete:             Boolean
+) extends Product with Serializable {
+
+  /** Compute the coverage of this disperser, given a central wavelength. */
+  def coverage(λ: Wavelength): Coverage =
+    Coverage.centered(λ, simultaneousCoverage)
+
+    /**
+   * Δλ for 0.5" slit.
+   * @see http://hyperphysics.phy-astr.gsu.edu/hbase/phyopt/gratres.html
+   */
+  private def Δλ: Double =
+    blazeWavelength.nm.value.toDouble / referenceResolution.value.toDouble
+
+  /** Resolution at λ with the specified slit width. */
+  def resolution(λ: Wavelength, slitWidth: Angle): Int =
+    ((λ.nm.value.toDouble / Δλ) * (0.5 / Angle.signedDecimalArcseconds.get(slitWidth).toDouble)).toInt
+
+  /** Resolution at λ with the effective slit width of the given FPU. */
+  def resolution(λ: Wavelength, fpu: GmosSouthFpu): Int =
+    resolution(λ, fpu.effectiveSlitWidth)
+
+}
 
 object GmosSouthGrating {
 
-  private def pmToDispersion(pm: Int): Quantity[Rational, NanometersPerPixel] =
-    PosInt.unsafeFrom(pm).withUnit[PicometersPerPixel].to[Rational, NanometersPerPixel]
+  private def pmToDispersion(value: Int): Quantity[Rational, NanometersPerPixel] =
+    PosInt.unsafeFrom(value).withUnit[PicometersPerPixel].to[Rational, NanometersPerPixel]
 
-  /** @group Constructors */ case object B1200_G5321 extends GmosSouthGrating("B1200_G5321", "B1200", "B1200_G5321", 1200, pmToDispersion( 26), false)
-  /** @group Constructors */ case object R831_G5322  extends GmosSouthGrating("R831_G5322",  "R831",  "R831_G5322",   831, pmToDispersion( 38), false)
-  /** @group Constructors */ case object B600_G5323  extends GmosSouthGrating("B600_G5323",  "B600",  "B600_G5323",   600, pmToDispersion( 50), false)
-  /** @group Constructors */ case object R600_G5324  extends GmosSouthGrating("R600_G5324",  "R600",  "R600_G5324",   600, pmToDispersion( 52), false)
-  /** @group Constructors */ case object B480_G5327  extends GmosSouthGrating("B480_G5327",  "B480",  "B480_G5327",   480, pmToDispersion( 62), false)
-  /** @group Constructors */ case object R400_G5325  extends GmosSouthGrating("R400_G5325",  "R400",  "R400_G5325",   400, pmToDispersion( 74), false)
-  /** @group Constructors */ case object R150_G5326  extends GmosSouthGrating("R150_G5326",  "R150",  "R150_G5326",   150, pmToDispersion(193), false)
+  private def nm(value: Int): Quantity[PosInt, Nanometer] =
+    PosInt.unsafeFrom(value).withUnit[Nanometer]
+
+  private def blazeNm(value: Int): Wavelength =
+    Wavelength.fromNanometers(value).get
+
+  private def resolution(value: Int): PosInt =
+    PosInt.unsafeFrom(value)
+
+  /** @group Constructors */
+  case object B1200_G5321 extends GmosSouthGrating(
+    tag                  = "B1200_G5321",
+    shortName            = "B1200",
+    longName             = "B1200_G5321",
+    rulingDensity        = 1200,
+    dispersion           = pmToDispersion( 26),
+    simultaneousCoverage = nm( 159),
+    blazeWavelength      = blazeNm( 463),
+    referenceResolution  = resolution(3744),
+    obsolete             = false
+  )
+
+  /** @group Constructors */
+  case object R831_G5322  extends GmosSouthGrating(
+    tag                  = "R831_G5322",
+    shortName            = "R831",
+    longName             = "R831_G5322",
+    rulingDensity        = 831,
+    dispersion           = pmToDispersion( 38),
+    simultaneousCoverage = nm( 230),
+    blazeWavelength      = blazeNm(757),
+    referenceResolution  = resolution(4396),
+    obsolete             = false
+  )
+
+  /** @group Constructors */
+  case object B600_G5323  extends GmosSouthGrating(
+    tag                  = "B600_G5323",
+    shortName            = "B600",
+    longName             = "B600_G5323",
+    rulingDensity        = 600,
+    dispersion           = pmToDispersion( 50),
+    simultaneousCoverage = nm( 307),
+    blazeWavelength      = blazeNm( 461),
+    referenceResolution  = resolution(1688),
+    obsolete             = false
+  )
+
+  /** @group Constructors */
+  case object R600_G5324  extends GmosSouthGrating(
+    tag                  = "R600_G5324",
+    shortName            = "R600",
+    longName             = "R600_G5324",
+    rulingDensity        = 600,
+    dispersion           = pmToDispersion( 52),
+    simultaneousCoverage = nm( 318),
+    blazeWavelength      = blazeNm( 926),
+    referenceResolution  = resolution(3744),
+    obsolete             = false
+  )
+
+  /** @group Constructors */
+  case object B480_G5327  extends GmosSouthGrating(
+    tag                  = "B480_G5327",
+    shortName            = "B480",
+    longName             = "B480_G5327",
+    rulingDensity        = 480,
+    dispersion           = pmToDispersion( 62),
+
+    // FAKE NEWS!  TODO: what are the real values?
+    simultaneousCoverage = nm( 1),
+    blazeWavelength      = blazeNm( 1),
+    referenceResolution  = resolution(1),
+
+    obsolete             = false
+  )
+
+  /** @group Constructors */
+  case object R400_G5325  extends GmosSouthGrating(
+    tag                  = "R400_G5325",
+    shortName            = "R400",
+    longName             = "R400_G5325",
+    rulingDensity        = 400,
+    dispersion           = pmToDispersion( 74),
+    simultaneousCoverage = nm( 462),
+    blazeWavelength      = blazeNm( 764),
+    referenceResolution  = resolution(1918),
+    obsolete             = false
+  )
+
+  /** @group Constructors */
+  case object R150_G5326  extends GmosSouthGrating(
+    tag                  = "R150_G5326",
+    shortName            = "R150",
+    longName             = "R150_G5326",
+    rulingDensity        = 150,
+    dispersion           = pmToDispersion(193),
+    simultaneousCoverage = nm(1190),
+    blazeWavelength      = blazeNm( 717),
+    referenceResolution  = resolution(631),
+    obsolete             = false
+  )
+
 
   /** All members of GmosSouthDisperser, in canonical order. */
   lazy val all: List[GmosSouthGrating] =
