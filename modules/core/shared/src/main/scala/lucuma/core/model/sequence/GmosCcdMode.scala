@@ -19,7 +19,7 @@ final case class GmosCcdMode(
   ampReadMode: GmosAmpReadMode
 ) {
 
-  def readNoise: Quantity[PosBigDecimal, Electron] = {
+  def gmosNorthReadNoise: Quantity[PosBigDecimal, Electron] = {
     val bd = (ampReadMode, ampGain) match {
       case (GmosAmpReadMode.Slow, GmosAmpGain.Low ) => BigDecimal(414L, 2)
       case (GmosAmpReadMode.Slow, GmosAmpGain.High) => BigDecimal(480L, 2)
@@ -29,6 +29,23 @@ final case class GmosCcdMode(
 
     PosBigDecimal.unsafeFrom(bd).withUnit[Electron]
   }
+
+  def gmosSouthReadNoise: Quantity[PosBigDecimal, Electron] = {
+    val bd = (ampReadMode, ampGain) match {
+      case (GmosAmpReadMode.Slow, GmosAmpGain.Low ) => BigDecimal(400L, 2)
+      case (GmosAmpReadMode.Slow, GmosAmpGain.High) => BigDecimal(480L, 2)
+      case (GmosAmpReadMode.Fast, GmosAmpGain.Low ) => BigDecimal(660L, 2)
+      case (GmosAmpReadMode.Fast, GmosAmpGain.High) => BigDecimal(790L, 2)
+    }
+
+    PosBigDecimal.unsafeFrom(bd).withUnit[Electron]
+  }
+
+  def readNoise(site: Site): Quantity[PosBigDecimal, Electron] =
+    site match {
+      case Site.GN => gmosNorthReadNoise
+      case Site.GS => gmosSouthReadNoise
+    }
 
 }
 
