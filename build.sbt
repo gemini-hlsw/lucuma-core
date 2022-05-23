@@ -54,6 +54,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
       "eu.timepit"     %%% "refined-cats"               % refinedVersion,
       "org.typelevel"  %%% "cats-time"                  % catsTimeVersion,
       "io.circe"       %%% "circe-core"                 % circeVersion,
+      "io.circe"       %%% "circe-generic"              % circeVersion,
       "io.circe"       %%% "circe-refined"              % circeVersion,
       "com.chuusai"    %%% "shapeless"                  % shapelessVersion cross CrossVersion.for3Use2_13
     )

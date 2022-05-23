@@ -19,6 +19,7 @@ import lucuma.core.util.TypeString
 import lucuma.core.math.refined.*
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined._
+import eu.timepit.refined.api.Refined
 import eu.timepit.refined.auto._
 import eu.timepit.refined.numeric._
 import eu.timepit.refined.types.numeric.PosInt
@@ -27,6 +28,9 @@ import eu.timepit.refined.types.numeric.NonNegInt
 import _root_.spire.math._
 
 trait units {
+
+  type Electron
+  given BaseUnit[Electron, "electron", "e-"] = BaseUnit()
 
   type Pixels
   given BaseUnit[Pixels, "pixels", "px"] = BaseUnit()
@@ -176,6 +180,10 @@ trait units {
 
   // implicit val convMP: UnitConverter[PosInt, Micrometer, PosInt, Picometer] =
   //   unsafePosIntConverter[Micrometer, Picometer]
+
+  // Integer Percents
+  type ZeroTo100  = numeric.Interval.Closed[0, 100]
+  type IntPercent = Int Refined ZeroTo100
 }
 
 object units extends units
