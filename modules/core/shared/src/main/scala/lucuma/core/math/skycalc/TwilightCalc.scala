@@ -4,7 +4,8 @@
 package lucuma.core.math.skycalc
 
 import cats.syntax.all._
-import coulomb.qopaque.{Quantity, withUnit}
+import coulomb.*
+import coulomb.syntax.*
 import coulomb.policy.spire.standard.given
 import lucuma.core.`enum`.TwilightType
 import lucuma.core.math.Constants._

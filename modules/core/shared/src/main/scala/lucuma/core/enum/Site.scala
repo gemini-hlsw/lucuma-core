@@ -5,7 +5,8 @@ package lucuma
 package core
 package `enum`
 import cats.syntax.eq._
-import coulomb.qopaque.{Quantity, withUnit}
+import coulomb.*
+import coulomb.syntax.*
 import coulomb.units.si.Meter
 import eu.timepit.refined.numeric._
 import eu.timepit.refined.types.numeric.NonNegInt

@@ -3,7 +3,8 @@
 
 package lucuma.core.model.arb
 
-import coulomb._
+import coulomb.*
+import coulomb.syntax.*
 import eu.timepit.refined.types.numeric.PosBigDecimal
 import lucuma.core.math.BrightnessUnits
 import lucuma.core.math.arb.ArbRefined

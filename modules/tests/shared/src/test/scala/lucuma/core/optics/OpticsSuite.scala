@@ -4,6 +4,7 @@
 package lucuma.core.optics
 
 import coulomb.units.accepted.Percent
+import coulomb.cats.quantity.given
 import eu.timepit.refined.cats._
 import eu.timepit.refined.collection.NonEmpty
 import eu.timepit.refined.numeric.Positive

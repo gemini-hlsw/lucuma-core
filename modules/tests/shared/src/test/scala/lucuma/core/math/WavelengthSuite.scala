@@ -8,7 +8,8 @@ import cats.Order
 import cats.Show
 import cats.kernel.laws.discipline._
 import cats.syntax.all._
-import coulomb.qopaque.Quantity
+import coulomb.*
+import coulomb.syntax.*
 import coulomb.policy.spire.standard.given
 import eu.timepit.refined.auto._
 import eu.timepit.refined.cats._

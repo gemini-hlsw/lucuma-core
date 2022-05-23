@@ -4,6 +4,7 @@
 package lucuma.core.math
 
 import coulomb.*
+import coulomb.syntax.*
 import coulomb.policy.spire.standard.given
 import coulomb.units.mks.{*, given}
 import coulomb.units.si.{*, given}

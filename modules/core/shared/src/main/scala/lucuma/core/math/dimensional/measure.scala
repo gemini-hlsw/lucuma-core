@@ -6,7 +6,8 @@ package lucuma.core.math.dimensional
 import cats.Eq
 import cats.syntax.contravariant._
 import cats.syntax.option._
-import coulomb._
+import coulomb.*
+import coulomb.syntax.*
 import lucuma.core.syntax.display._
 import lucuma.core.util.Display
 import monocle.Focus

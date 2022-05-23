@@ -3,7 +3,8 @@
 
 package lucuma.core.`enum`
 
-import coulomb.qopaque.{Quantity, withUnit}
+import coulomb.*
+import coulomb.syntax.*
 import coulomb.policy.spire.standard.{*, given}
 import eu.timepit.refined._
 import eu.timepit.refined.numeric.Positive

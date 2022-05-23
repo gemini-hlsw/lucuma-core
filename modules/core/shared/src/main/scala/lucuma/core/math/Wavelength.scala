@@ -5,7 +5,9 @@ package lucuma.core.math
 
 import cats.Order
 import cats.Show
-import coulomb.qopaque.{Quantity, withUnit}
+import coulomb.*
+import coulomb.syntax.*
+import coulomb.cats.quantity.given
 import coulomb.policy.spire.standard.given
 import eu.timepit.refined._
 import eu.timepit.refined.auto._

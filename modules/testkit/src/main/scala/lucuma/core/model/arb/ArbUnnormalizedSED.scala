@@ -8,7 +8,8 @@ import cats.data.NonEmptyMap
 import cats.implicits._
 import cats.laws.discipline.arbitrary._
 import coulomb.units.si.Kelvin
-import coulomb.qopaque.withUnit
+import coulomb.*
+import coulomb.syntax.*
 import eu.timepit.refined.refineV
 import eu.timepit.refined.numeric.Positive
 import eu.timepit.refined.types.numeric.PosBigDecimal

@@ -4,7 +4,8 @@
 package lucuma.core.model.sequence
 
 import cats.Eq
-import coulomb.qopaque.{Quantity, withUnit}
+import coulomb.*
+import coulomb.syntax.*
 import eu.timepit.refined.types.numeric.PosBigDecimal
 import lucuma.core.`enum`.*
 import lucuma.core.math.units.Electron

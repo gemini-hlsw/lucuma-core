@@ -3,7 +3,8 @@
 
 package lucuma.core.math.arb
 
-import coulomb.qopaque.{Quantity, withUnit}
+import coulomb.*
+import coulomb.syntax.*
 import org.scalacheck.Arbitrary
 import org.scalacheck.Cogen
 

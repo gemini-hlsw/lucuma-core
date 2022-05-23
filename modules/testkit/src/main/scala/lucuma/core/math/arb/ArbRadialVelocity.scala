@@ -4,7 +4,8 @@
 package lucuma.core.math
 package arb
 
-import coulomb.qopaque.{Quantity, withUnit}
+import coulomb.*
+import coulomb.syntax.*
 import coulomb.policy.spire.standard.given
 import lucuma.core.math.Constants._
 import lucuma.core.math.units._

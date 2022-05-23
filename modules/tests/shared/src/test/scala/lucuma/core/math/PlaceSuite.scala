@@ -5,6 +5,7 @@ package lucuma.core.math
 
 import cats.Show
 import cats.kernel.laws.discipline.EqTests
+import coulomb.cats.quantity.given
 import eu.timepit.refined.auto._
 import eu.timepit.refined.cats._
 import eu.timepit.refined.scalacheck.numeric._
@@ -32,7 +33,6 @@ final class PlaceSuite extends DisciplineSuite {
     }
   }
 
-  org.scalacheck.Arbitrary.arbitrary[coulomb.qopaque.Quantity[eu.timepit.refined.types.numeric.NonNegInt, coulomb.units.si.Meter]]
   checkAll("Place.latitude", LensTests(Place.latitude))
   checkAll("Place.longitude", LensTests(Place.longitude))
   checkAll("Place.altitude", LensTests(Place.altitude))

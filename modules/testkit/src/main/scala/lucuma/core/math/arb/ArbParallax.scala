@@ -4,7 +4,8 @@
 package lucuma.core.math
 package arb
 
-import coulomb._
+import coulomb.*
+import coulomb.syntax.*
 import eu.timepit.refined.scalacheck.numeric._
 import lucuma.core.math.Parallax
 import lucuma.core.math.units._

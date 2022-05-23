@@ -4,6 +4,7 @@
 package lucuma.core.model
 
 import cats.kernel.laws.discipline._
+import coulomb.cats.quantity.given
 import eu.timepit.refined.cats._
 import eu.timepit.refined.scalacheck.numeric._
 import lucuma.core.math.arb._

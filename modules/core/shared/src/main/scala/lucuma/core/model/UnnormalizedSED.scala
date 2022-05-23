@@ -7,7 +7,9 @@ import cats.Eq
 import cats.Order
 import cats.data.NonEmptyMap
 import cats.implicits._
-import coulomb.qopaque.{Quantity, withUnit}
+import coulomb.*
+import coulomb.syntax.*
+import coulomb.cats.quantity.given
 import coulomb.units.si.Kelvin
 import eu.timepit.refined.cats._
 import eu.timepit.refined.types.numeric.PosBigDecimal

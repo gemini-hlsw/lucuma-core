@@ -4,8 +4,8 @@
 package lucuma.core.math
 
 import coulomb.{`*`, `/`, `^`}
-import coulomb.qopaque.Quantity
-import coulomb.qopaque.withUnit
+import coulomb.*
+import coulomb.syntax.*
 import coulomb.units.accepted._
 import coulomb.define._
 import coulomb.conversion.ValueConversion

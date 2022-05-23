@@ -5,7 +5,8 @@ package lucuma.core.math
 
 import cats._
 import cats.kernel.laws.discipline._
-import coulomb.qopaque.{Quantity, withUnit}
+import coulomb.*
+import coulomb.syntax.*
 import coulomb.policy.spire.standard.given
 import coulomb.units.si._
 import lucuma.core.math.Constants.SpeedOfLight

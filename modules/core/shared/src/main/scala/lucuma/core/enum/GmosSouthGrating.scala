@@ -6,7 +6,8 @@ package core
 package `enum`
 
 import cats.syntax.eq._
-import coulomb.qopaque.{Quantity, withUnit}
+import coulomb.*
+import coulomb.syntax.*
 import coulomb.policy.spire.standard.given
 import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.math.{Angle, Coverage, Wavelength}

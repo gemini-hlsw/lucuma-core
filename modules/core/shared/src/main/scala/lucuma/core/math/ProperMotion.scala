@@ -6,8 +6,9 @@ package lucuma.core.math
 import algebra.instances.all.given
 import cats._
 import cats.syntax.all._
-import coulomb.{`/`}
-import coulomb.qopaque.{Quantity, withUnit}
+import coulomb.*
+import coulomb.syntax.*
+import coulomb.cats.quantity.given
 import coulomb.policy.spire.standard.given
 import coulomb.units.accepted._
 import lucuma.core.math.ProperMotion.AngularVelocityComponent

@@ -3,7 +3,8 @@
 
 package lucuma.core
 
-import coulomb._
+import coulomb.*
+import coulomb.syntax.*
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.api.Validate
 import eu.timepit.refined.refineV

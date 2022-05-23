@@ -4,7 +4,9 @@
 package lucuma.core.math
 
 import cats._
-import coulomb.qopaque.{Quantity, withUnit}
+import coulomb.*
+import coulomb.syntax.*
+import coulomb.cats.quantity.given
 import coulomb.policy.spire.standard.given
 import eu.timepit.refined.refineV
 import eu.timepit.refined.api._

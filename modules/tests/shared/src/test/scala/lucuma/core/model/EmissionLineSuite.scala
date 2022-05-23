@@ -5,7 +5,9 @@ package lucuma.core.model
 
 import cats.implicits._
 import cats.kernel.laws.discipline._
-import coulomb._
+import coulomb.*
+import coulomb.syntax.*
+import coulomb.cats.quantity.given
 import eu.timepit.refined.cats._
 import lucuma.core.math.BrightnessUnits._
 import lucuma.core.math.arb._

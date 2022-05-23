@@ -3,7 +3,8 @@
 
 package lucuma.core.math.arb
 
-import coulomb._
+import coulomb.*
+import coulomb.syntax.*
 import coulomb.units.si.Meter
 import eu.timepit.refined._
 import eu.timepit.refined.auto._
