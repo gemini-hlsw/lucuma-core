@@ -15,7 +15,7 @@ import monocle.macros.GenPrism
 /**
   * Position Angle model
   */
-sealed trait PosAngle
+sealed trait PosAngle extends Product with Serializable
 
 object PosAngle {
   case class Fixed(angle: Angle) extends PosAngle {
