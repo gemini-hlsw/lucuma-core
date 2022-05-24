@@ -12,7 +12,7 @@ import coulomb.siprefix._
 import coulomb.time._
 import coulomb.unitops._
 import eu.timepit.refined._
-import eu.timepit.refined.api.Refined
+import eu.timepit.refined.api._
 import eu.timepit.refined.auto._
 import eu.timepit.refined.numeric._
 import eu.timepit.refined.types.numeric.PosInt
@@ -191,6 +191,8 @@ trait units {
   // Integer Percents
   type ZeroTo100  = numeric.Interval.Closed[0, 100]
   type IntPercent = Int Refined ZeroTo100
+
+  object IntPercent extends RefinedTypeOps[IntPercent, Int]
 }
 
 object units extends units
