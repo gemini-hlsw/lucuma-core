@@ -34,7 +34,8 @@ final class RedshiftSuite extends munit.DisciplineSuite {
       RadialVelocity(
         BigDecimal
           .decimal(287172.9120288430, MathContext.DECIMAL64)
-          .withUnit[MetersPerSecond]
+          .withUnit[KilometersPerSecond]
+          .toUnit[MetersPerSecond]
       )
     )
   }
@@ -53,7 +54,8 @@ final class RedshiftSuite extends munit.DisciplineSuite {
       ApparentRadialVelocity(
         BigDecimal
           .decimal(1744792.10556, MathContext.DECIMAL64)
-          .withUnit[MetersPerSecond]
+          .withUnit[KilometersPerSecond]
+          .toUnit[MetersPerSecond]
       )
     )
   }
