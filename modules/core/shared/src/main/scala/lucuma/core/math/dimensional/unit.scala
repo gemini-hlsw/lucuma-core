@@ -10,7 +10,6 @@ import coulomb.ops.ShowUnitFull
 import lucuma.core.util.Display
 import lucuma.core.util.Tag
 import lucuma.core.util.TypeString
-import shapeless.tag
 
 import java.util.Objects
 

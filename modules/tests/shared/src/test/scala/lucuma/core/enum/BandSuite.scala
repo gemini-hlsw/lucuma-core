@@ -9,7 +9,6 @@ import lucuma.core.math.units._
 import lucuma.core.util.arb.ArbEnumerated
 import lucuma.core.util.laws.EnumeratedTests
 import munit.DisciplineSuite
-import shapeless.tag
 
 final class BandSuite extends DisciplineSuite {
   import ArbEnumerated._

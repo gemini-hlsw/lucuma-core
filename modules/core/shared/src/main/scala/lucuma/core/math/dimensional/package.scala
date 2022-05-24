@@ -5,12 +5,14 @@ package lucuma.core.math
 
 import coulomb.Quantity
 import lucuma.core.util.TypeString
-import shapeless.tag
-import shapeless.tag.@@
 import coulomb.ops.ShowUnit
 
 package object dimensional {
-  type Of[+T, U] = @@[T, U]
+  opaque infix type Of[+T, U] <: T = T
+  inline def tag[U]: Tagger[U] = Tagger()
+  final class Tagger[U] {
+    inline def apply[T](t: T): T Of U = t
+  }
 
   implicit class QuantityOps[N, U](quantity: Quantity[N, U]) {
 
@@ -23,7 +25,7 @@ package object dimensional {
      * Convert a coulomb `Quantity` to a `Measure` with runtime unit representation and tag `Tag`.
      */
     def toMeasureTagged[T](implicit ev: TaggedUnit[U, T]): Measure[N] Of T = {
-      val tagged: Measure[N] @@ T = tag[T](Measure(quantity.value, ev.unit))
+      val tagged: Measure[N] Of T = tag[T](Measure(quantity.value, ev.unit))
       tagged
     }
   }

@@ -12,7 +12,6 @@ import lucuma.core.syntax.display._
 import lucuma.core.util.Display
 import monocle.Focus
 import monocle.Lens
-import shapeless.tag
 
 /**
  * A magnitude of type `N` and a runtime representation of a physical unit.
