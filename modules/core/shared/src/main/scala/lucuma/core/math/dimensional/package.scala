@@ -31,8 +31,8 @@ package object dimensional {
   }
 
   // Default `TypeString` for a unit type.
-  implicit def typeStringFromUnitString[U](implicit ev: ShowUnit[U]): TypeString[U] =
-    new TypeString[U] {
-      val serialized: String = ev.value
-    }
+  // implicit def typeStringFromUnitString[U](implicit ev: ShowUnit[U]): TypeString[U] =
+  //   new TypeString[U] {
+  //     val serialized: String = ev.value
+  //   }
 }
