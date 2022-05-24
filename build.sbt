@@ -111,7 +111,6 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform)
   )
   .jvmConfigure(_.enablePlugins(AutomateHeaderPlugin))
   .jvmSettings(
-    Test / fork := true,
     resolvers += "Gemini Repository".at(
       "https://github.com/gemini-hlsw/maven-repo/raw/master/releases"
     ),
