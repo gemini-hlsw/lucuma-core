@@ -6,9 +6,9 @@ package lucuma.core.`enum`
 import lucuma.core.util.Display
 import lucuma.core.util.Enumerated
 
-sealed abstract class CloudExtinction(val toDeciMagnitudes: Int) extends Product with Serializable {
-  def toMagnitudes: Double = toDeciMagnitudes / 10.0
-  def label: String        = f"< $toMagnitudes%.1f mag"
+sealed abstract class CloudExtinction(val toDeciBrightness: Int) extends Product with Serializable {
+  def toBrightness: Double = toDeciBrightness / 10.0
+  def label: String        = f"< $toBrightness%.1f mag"
 }
 
 object CloudExtinction {
