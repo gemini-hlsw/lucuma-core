@@ -106,27 +106,28 @@ object Wavelength {
    * Try to build a Wavelength with a value in nm in the range (0 .. 2147]
    * @group constructor
    */
-  def fromMicrometers(µm: Int): Option[Wavelength] =
-    refineV[Positive](µm).toOption.flatMap(µm =>
-      Option.when(µm.value <= MaxMicrometer)(Wavelength(µm.withUnit[Micrometer].tToUnit[Picometer]))
-    )
+  def fromMicrometers(µm: Int): Option[Wavelength] = for {
+    q <- refineQV[Positive](µm.withUnit[Micrometer].tToUnit[Picometer]).toOption
+    if µm <= MaxMicrometer
+  } yield Wavelength(q)
 
   /**
    * Try to build a Wavelength with a value in nm in the range (0 .. 2147483]
    * @group constructor
    */
-  def fromNanometers(nm: Int): Option[Wavelength] =
-    refineV[Positive](nm).toOption.flatMap(nm =>
-      Option.when(nm.value <= MaxNanometer)(Wavelength(nm.withUnit[Nanometer].tToUnit[Picometer]))
-    )
+  def fromNanometers(nm: Int): Option[Wavelength] = for {
+    q <- refineQV[Positive](nm.withUnit[Nanometer].tToUnit[Picometer]).toOption
+    if nm <= MaxNanometer
+  } yield Wavelength(q)
+
   /**
    * Try to build a Wavelength with a value in angstrom in the range (0 .. 21474836]
    * @group constructor
    */
-  def fromAngstroms(a: Int): Option[Wavelength] =
-    refineV[Positive](a).toOption.flatMap(a =>
-      Option.when(a.value <= MaxAngstrom)(Wavelength(a.withUnit[Angstrom].tToUnit[Picometer]))
-    )
+  def fromAngstroms(a: Int): Option[Wavelength] = for {
+    q <- refineQV[Positive](a.withUnit[Angstrom].tToUnit[Picometer]).toOption
+    if a <= MaxAngstrom
+  } yield Wavelength(q)
 
   /**
    * Prism from Int in pm into Wavelength and back.

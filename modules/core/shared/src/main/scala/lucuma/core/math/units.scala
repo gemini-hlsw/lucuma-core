@@ -20,6 +20,7 @@ import lucuma.core.math.refined.*
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined._
 import eu.timepit.refined.api.Refined
+import eu.timepit.refined.api.Validate
 import eu.timepit.refined.auto._
 import eu.timepit.refined.numeric._
 import eu.timepit.refined.types.numeric.PosInt
@@ -152,6 +153,14 @@ trait units {
   extension [A](inline a: A)
     inline def withRefinedUnit[P, U](using inline p: Predicate[A, P]): Quantity[Refined[A, P], U] = refineMV(a).withUnit[U]
       
+  inline def refineQV[R]: RefineQV[R] = RefineQV()
+
+  final class RefineQV[P] {
+    inline def apply[V, U](q: Quantity[V, U])(using Validate[V, P]): Either[String, Quantity[V Refined P, U]] = {
+      refineV(q.value).map(_.withUnit[U])
+    }
+  }
+
   // // This can build a converter for units that use PosInt but they are exact only
   // // if the coef is more than 1 and whole, i.e. going from Nanometer to Picometer
   // // The reverse is not true, remaining in the PosInt domain we can't ensure we can go from
