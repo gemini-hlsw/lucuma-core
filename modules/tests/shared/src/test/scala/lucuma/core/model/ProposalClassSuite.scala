@@ -6,17 +6,16 @@ package lucuma.core.model
 import cats.kernel.laws.discipline._
 import eu.timepit.refined.cats._
 import eu.timepit.refined.scalacheck.all._
-import lucuma.core.arb.ArbTime
 import lucuma.core.model.ProposalClass
 import lucuma.core.model.ProposalClass._
 import lucuma.core.model.arb._
+import lucuma.core.model.implicits._
 import monocle.law.discipline._
 import munit._
-import org.typelevel.cats.time.instances.duration._
 
 class ProposalClassSuite extends DisciplineSuite {
+  import ArbNonNegDuration._
   import ArbProposalClass._
-  import ArbTime._
 
   // Laws for instances
   checkAll("Eq[Classical]", EqTests[Classical].eqv)
