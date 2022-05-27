@@ -6,15 +6,10 @@ package lucuma.core.model
 import cats.Eq
 import cats.syntax.all._
 import eu.timepit.refined.cats._
-import io.circe.Decoder
-import io.circe.generic.semiauto._
-import io.circe.refined._
-import lucuma.core.math.units.IntPercent
+import lucuma.core.model.{ IntPercent, NonNegDuration }
+import lucuma.core.model.implicits._
 import monocle.macros.GenPrism
 import monocle.{ Focus, Lens, Optional, Prism }
-import org.typelevel.cats.time.instances.duration._
-
-import java.time.Duration
 
 sealed trait ProposalClass { val minPercentTime: IntPercent }
 
@@ -32,13 +27,13 @@ object ProposalClass {
   final case class LargeProgram(
     minPercentTime:      IntPercent,
     minPercentTotalTime: IntPercent,
-    totalTime:           Duration
+    totalTime:           NonNegDuration
   ) extends ProposalClass
 
   final case class Intensive(
     minPercentTime:      IntPercent,
     minPercentTotalTime: IntPercent,
-    totalTime:           Duration
+    totalTime:           NonNegDuration
   ) extends ProposalClass
 
   val classical: Prism[ProposalClass, Classical]                   = GenPrism[ProposalClass, Classical]
@@ -82,8 +77,8 @@ object ProposalClass {
       }
     }
 
-  val totalTime: Optional[ProposalClass, Duration] =
-    Optional[ProposalClass, Duration] {
+  val totalTime: Optional[ProposalClass, NonNegDuration] =
+    Optional[ProposalClass, NonNegDuration] {
       case LargeProgram(_, _, totalTime) => totalTime.some
       case Intensive(_, _, totalTime)    => totalTime.some
       case _                             => none
@@ -98,83 +93,70 @@ object ProposalClass {
   object Classical {
     val minPercentTime: Lens[Classical, IntPercent] = Focus[Classical](_.minPercentTime)
 
-    implicit val eqClassical: Eq[Classical]           = Eq.by(_.minPercentTime)
-    implicit val decoderClassical: Decoder[Classical] = deriveDecoder[Classical]
+    implicit val eqClassical: Eq[Classical] = Eq.by(_.minPercentTime)
   }
 
   object DemoScience {
     val minPercentTime: Lens[DemoScience, IntPercent] = Focus[DemoScience](_.minPercentTime)
 
-    implicit val eqDemoScience: Eq[DemoScience]           = Eq.by(_.minPercentTime)
-    implicit val decoderDemoScience: Decoder[DemoScience] = deriveDecoder[DemoScience]
+    implicit val eqDemoScience: Eq[DemoScience] = Eq.by(_.minPercentTime)
   }
 
   object DirectorsTime {
     val minPercentTime: Lens[DirectorsTime, IntPercent] = Focus[DirectorsTime](_.minPercentTime)
 
-    implicit val eqDirectorsTime: Eq[DirectorsTime]           = Eq.by(_.minPercentTime)
-    implicit val decoderDirectorsTime: Decoder[DirectorsTime] = deriveDecoder[DirectorsTime]
+    implicit val eqDirectorsTime: Eq[DirectorsTime] = Eq.by(_.minPercentTime)
   }
 
   object Exchange {
     val minPercentTime: Lens[Exchange, IntPercent] = Focus[Exchange](_.minPercentTime)
 
-    implicit val eqExchange: Eq[Exchange]           = Eq.by(_.minPercentTime)
-    implicit val decoderExchange: Decoder[Exchange] = deriveDecoder[Exchange]
+    implicit val eqExchange: Eq[Exchange] = Eq.by(_.minPercentTime)
   }
 
   object FastTurnaround {
     val minPercentTime: Lens[FastTurnaround, IntPercent] = Focus[FastTurnaround](_.minPercentTime)
 
-    implicit val eqFastTurnaround: Eq[FastTurnaround]           = Eq.by(_.minPercentTime)
-    implicit val decoderFastTurnaround: Decoder[FastTurnaround] = deriveDecoder[FastTurnaround]
+    implicit val eqFastTurnaround: Eq[FastTurnaround] = Eq.by(_.minPercentTime)
   }
 
   object PoorWeather {
     val minPercentTime: Lens[PoorWeather, IntPercent] = Focus[PoorWeather](_.minPercentTime)
 
-    implicit val eqPoorWeather: Eq[PoorWeather]           = Eq.by(_.minPercentTime)
-    implicit val decoderPoorWeather: Decoder[PoorWeather] = deriveDecoder[PoorWeather]
+    implicit val eqPoorWeather: Eq[PoorWeather] = Eq.by(_.minPercentTime)
   }
 
   object Queue {
     val minPercentTime: Lens[Queue, IntPercent] = Focus[Queue](_.minPercentTime)
 
-    implicit val eqQueue: Eq[Queue]           = Eq.by(_.minPercentTime)
-    implicit val decoderQueue: Decoder[Queue] = deriveDecoder[Queue]
+    implicit val eqQueue: Eq[Queue] = Eq.by(_.minPercentTime)
   }
 
   object SystemVerification {
     val minPercentTime: Lens[SystemVerification, IntPercent] =
       Focus[SystemVerification](_.minPercentTime)
 
-    implicit val eqSystemVerification: Eq[SystemVerification]           = Eq.by(_.minPercentTime)
-    implicit val decoderSystemVerification: Decoder[SystemVerification] =
-      deriveDecoder[SystemVerification]
+    implicit val eqSystemVerification: Eq[SystemVerification] = Eq.by(_.minPercentTime)
   }
 
   object LargeProgram {
     val minPercentTime: Lens[LargeProgram, IntPercent]      = Focus[LargeProgram](_.minPercentTime)
     val minPercentTotalTime: Lens[LargeProgram, IntPercent] =
       Focus[LargeProgram](_.minPercentTotalTime)
-    val totalTime: Lens[LargeProgram, Duration]             = Focus[LargeProgram](_.totalTime)
+    val totalTime: Lens[LargeProgram, NonNegDuration]       = Focus[LargeProgram](_.totalTime)
 
-    implicit val eqLargeProgram: Eq[LargeProgram]           =
+    implicit val eqLargeProgram: Eq[LargeProgram] =
       Eq.by(p => (p.minPercentTime, p.minPercentTotalTime, p.totalTime))
-    implicit val decoderLargeProgram: Decoder[LargeProgram] = deriveDecoder[LargeProgram]
   }
 
   object Intensive {
     val minPercentTime: Lens[Intensive, IntPercent]      = Focus[Intensive](_.minPercentTime)
     val minPercentTotalTime: Lens[Intensive, IntPercent] = Focus[Intensive](_.minPercentTotalTime)
-    val totalTime: Lens[Intensive, Duration]             = Focus[Intensive](_.totalTime)
+    val totalTime: Lens[Intensive, NonNegDuration]       = Focus[Intensive](_.totalTime)
 
-    implicit val eqIntensive: Eq[Intensive]           =
+    implicit val eqIntensive: Eq[Intensive] =
       Eq.by(p => (p.minPercentTime, p.minPercentTotalTime, p.totalTime))
-    implicit val decoderIntensive: Decoder[Intensive] = deriveDecoder[Intensive]
   }
-
-  implicit val decoderProposalClass: Decoder[ProposalClass] = deriveDecoder[ProposalClass]
 
   implicit val eqProposalClass: Eq[ProposalClass] = Eq.instance {
     case (Classical(a1), Classical(a2))                       => a1 === a2

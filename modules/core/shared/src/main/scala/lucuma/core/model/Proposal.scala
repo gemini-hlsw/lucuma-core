@@ -12,7 +12,7 @@ import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.core.`enum`.TacCategory
 import lucuma.core.`enum`.ToOActivation
 import lucuma.core.math.refined.*
-import lucuma.core.math.units.IntPercent
+import lucuma.core.model.IntPercent
 import monocle.Focus
 
 import scala.collection.immutable.SortedMap

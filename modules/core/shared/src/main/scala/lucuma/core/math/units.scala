@@ -18,8 +18,8 @@ import coulomb.units.time._
 import lucuma.core.util.TypeString
 import lucuma.core.math.refined.*
 import eu.timepit.refined.api.Refined
+import eu.timepit.refined.api.Validate
 import eu.timepit.refined._
-import eu.timepit.refined.api._
 import eu.timepit.refined.auto._
 import eu.timepit.refined.numeric._
 import eu.timepit.refined.types.numeric.PosInt
@@ -186,14 +186,6 @@ trait units {
   // implicit val convAP: UnitConverter[PosInt, Angstrom, PosInt, Picometer] =
   //   unsafePosIntConverter[Angstrom, Picometer]
 
-  // implicit val convMP: UnitConverter[PosInt, Micrometer, PosInt, Picometer] =
-  //   unsafePosIntConverter[Micrometer, Picometer]
-
-  // Integer Percents
-  type ZeroTo100  = numeric.Interval.Closed[0, 100]
-  type IntPercent = Int Refined ZeroTo100
-
-  object IntPercent extends RefinedTypeOps[IntPercent, Int]
 }
 
 object units extends units

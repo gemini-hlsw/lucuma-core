@@ -7,8 +7,7 @@ import cats.implicits._
 import eu.timepit.refined.scalacheck.all._
 import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.core.`enum`.{ TacCategory, ToOActivation }
-import lucuma.core.math.units.IntPercent
-import lucuma.core.model.{ Partner, Proposal, ProposalClass }
+import lucuma.core.model.{ IntPercent, Partner, Proposal, ProposalClass }
 import lucuma.core.util.arb.{ ArbCollection, ArbEnumerated }
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Cogen._

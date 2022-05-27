@@ -4,17 +4,14 @@
 package lucuma.core.model.arb
 
 import eu.timepit.refined.scalacheck.all._
-import lucuma.core.arb.ArbTime
-import lucuma.core.math.units.IntPercent
-import lucuma.core.model.ProposalClass
+import lucuma.core.model.arb.ArbNonNegDuration
+import lucuma.core.model.{ IntPercent, NonNegDuration, ProposalClass }
 import lucuma.core.model.ProposalClass._
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck._
 
-import java.time.Duration
-
 trait ArbProposalClass {
-  import ArbTime._
+  import ArbNonNegDuration._
 
   implicit val arbClassical: Arbitrary[Classical] =
     Arbitrary(arbitrary[IntPercent].map(Classical(_)))
@@ -69,12 +66,12 @@ trait ArbProposalClass {
       for {
         minPct    <- arbitrary[IntPercent]
         minTotPct <- arbitrary[IntPercent]
-        totalTime <- arbitrary[Duration]
+        totalTime <- arbitrary[NonNegDuration]
       } yield LargeProgram(minPct, minTotPct, totalTime)
     }
 
   implicit val cogLargeProgram: Cogen[LargeProgram] =
-    Cogen[(IntPercent, IntPercent, Duration)].contramap(p =>
+    Cogen[(IntPercent, IntPercent, NonNegDuration)].contramap(p =>
       (p.minPercentTime, p.minPercentTotalTime, p.totalTime)
     )
 
@@ -83,12 +80,12 @@ trait ArbProposalClass {
       for {
         minPct    <- arbitrary[IntPercent]
         minTotPct <- arbitrary[IntPercent]
-        totalTime <- arbitrary[Duration]
+        totalTime <- arbitrary[NonNegDuration]
       } yield Intensive(minPct, minTotPct, totalTime)
     }
 
   implicit val cogIntensive: Cogen[Intensive] =
-    Cogen[(IntPercent, IntPercent, Duration)].contramap(p =>
+    Cogen[(IntPercent, IntPercent, NonNegDuration)].contramap(p =>
       (p.minPercentTime, p.minPercentTotalTime, p.totalTime)
     )
 
