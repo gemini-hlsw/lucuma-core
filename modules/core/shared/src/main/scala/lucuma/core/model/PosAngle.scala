@@ -26,6 +26,14 @@ object PosAngle {
     val angle: Lens[Fixed, Angle] = Focus[Fixed](_.angle)
   }
 
+  /**
+   *  Constructs a `Fixed` instance with a wider `PosAngle` type.
+   *
+   *  @group Constructors
+   */
+  def fixed(angle: Angle): PosAngle =
+    Fixed(angle)
+
   case class AllowFlip(angle: Angle) extends PosAngle {
     override def toString: String = s"AllowFlip(${angle.toDoubleDegrees})"
   }
@@ -34,9 +42,25 @@ object PosAngle {
     val angle: Lens[AllowFlip, Angle] = Focus[AllowFlip](_.angle)
   }
 
+  /**
+   *  Constructs an `AllowFlip` instance with a wider `PosAngle` type.
+   *
+   *  @group Constructors
+   */
+  def allowFlip(angle: Angle): PosAngle =
+    AllowFlip(angle)
+
   case object AverageParallactic extends PosAngle {
     override def toString: String = "AverageParallactic"
   }
+
+  /**
+   * Constructs an `AverageParallactic` instance with a wider `PosAngle` type.
+   *
+   *  @group Constructors
+   */
+  val averageParallactic: PosAngle =
+    AverageParallactic
 
   case class ParallacticOverride(angle: Angle) extends PosAngle {
     override def toString: String = s"ParallacticOverride(${angle.toDoubleDegrees})"
@@ -46,9 +70,25 @@ object PosAngle {
     val angle: Lens[ParallacticOverride, Angle] = Focus[ParallacticOverride](_.angle)
   }
 
+  /**
+   * Constructs a `ParallacticOverride` instance with a wider `PosAngle` type.
+   *
+   *  @group Constructors
+   */
+  def parallacticOverride(angle: Angle): PosAngle =
+    ParallacticOverride(angle)
+
   case object Unconstrained extends PosAngle {
     override def toString: String = "Unconstrained"
   }
+
+  /**
+   *  Constructs an `Unconstrained` instance with a wider `PosAngle` type.
+   *
+   *  @group Constructors
+   */
+  val unconstrained: PosAngle =
+    Unconstrained
 
   val Default: PosAngle = Fixed(Angle.Angle0)
 
