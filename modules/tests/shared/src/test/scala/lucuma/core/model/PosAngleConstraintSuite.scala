@@ -9,12 +9,12 @@ import lucuma.core.model.arb.ArbPosAngle
 import monocle.law.discipline._
 import munit.DisciplineSuite
 
-class PosAngleSuite extends DisciplineSuite {
+class PosAngleConstraintSuite extends DisciplineSuite {
 
   import ArbAngle._
   import ArbPosAngle._
 
   checkAll("Eq[PosAngle]", EqTests[PosAngleConstraint].eqv)
 
-  checkAll("Optional[PosAngle, Angle]", OptionalTests(PosAngleConstraint.angleOptional))
+  checkAll("Optional[PosAngle, Angle]", OptionalTests(PosAngleConstraint.angle))
 }
