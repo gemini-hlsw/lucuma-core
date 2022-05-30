@@ -4,10 +4,17 @@
 package lucuma.core.model
 
 import cats.kernel.laws.discipline.EqTests
-import lucuma.core.model.PosAngle
-import lucuma.core.model.arb.ArbPosAngle._
+import lucuma.core.math.arb.ArbAngle
+import lucuma.core.model.arb.ArbPosAngle
+import monocle.law.discipline._
 import munit.DisciplineSuite
 
 class PosAngleSuite extends DisciplineSuite {
+
+  import ArbAngle._
+  import ArbPosAngle._
+
   checkAll("Eq[PosAngle]", EqTests[PosAngle].eqv)
+
+  checkAll("Optional[PosAngle, Angle]", OptionalTests(PosAngle.angleOptional))
 }

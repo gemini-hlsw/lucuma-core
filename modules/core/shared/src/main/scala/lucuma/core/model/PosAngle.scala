@@ -4,7 +4,7 @@
 package lucuma.core.model
 
 import cats.Eq
-import cats.syntax.all._
+import cats.syntax.all.*
 import lucuma.core.math.Angle
 import monocle.Focus
 import monocle.Lens
@@ -114,5 +114,20 @@ object PosAngle {
 
   val parallacticOverrideAnglePrism: Optional[PosAngle, Angle] =
     parallacticOverridePrism.andThen(ParallacticOverride.angle)
+
+  val angleOptional: Optional[PosAngle, Angle] =
+    Optional[PosAngle, Angle]({
+      case Fixed(angle)               => angle.some
+      case AllowFlip(angle)           => angle.some
+      case AverageParallactic         => none
+      case ParallacticOverride(angle) => angle.some
+      case Unconstrained              => none
+    })({ a => {
+      case Fixed(_)                   => Fixed(a)
+      case AllowFlip(_)               => AllowFlip(a)
+      case AverageParallactic         => AverageParallactic
+      case ParallacticOverride(_)     => ParallacticOverride(a)
+      case Unconstrained              => Unconstrained
+    }})
 
 }
