@@ -13,9 +13,9 @@ import monocle.Prism
 import monocle.macros.GenPrism
 
 /**
-  * Position Angle Constraint model.  Defines how the position angle will be
+ * Position Angle Constraint model.  Defines how the position angle will be
  * constrained.
-  */
+ */
 sealed trait PosAngleConstraint extends Product with Serializable
 
 object PosAngleConstraint extends PosAngleConstraintOptics {
