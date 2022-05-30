@@ -13,12 +13,17 @@ import monocle.Prism
 import monocle.macros.GenPrism
 
 /**
-  * Position Angle model
+  * Position Angle Constraint model.  Defines how the position angle will be
+ * constrained.
   */
-sealed trait PosAngle extends Product with Serializable
+sealed trait PosAngleConstraint extends Product with Serializable
 
-object PosAngle {
-  case class Fixed(angle: Angle) extends PosAngle {
+object PosAngleConstraint {
+
+  /**
+   * Specifies that the position angle must be set to the specified angle.
+   */
+  case class Fixed(angle: Angle) extends PosAngleConstraint {
     override def toString: String = s"Fixed(${angle.toDoubleDegrees})"
   }
 
@@ -31,10 +36,14 @@ object PosAngle {
    *
    *  @group Constructors
    */
-  def fixed(angle: Angle): PosAngle =
+  def fixed(angle: Angle): PosAngleConstraint =
     Fixed(angle)
 
-  case class AllowFlip(angle: Angle) extends PosAngle {
+  /**
+   * Specifies a position angle equal to the given angle or the given angle
+   * plus 180 degrees.
+   */
+  case class AllowFlip(angle: Angle) extends PosAngleConstraint {
     override def toString: String = s"AllowFlip(${angle.toDoubleDegrees})"
   }
 
@@ -47,10 +56,14 @@ object PosAngle {
    *
    *  @group Constructors
    */
-  def allowFlip(angle: Angle): PosAngle =
+  def allowFlip(angle: Angle): PosAngleConstraint =
     AllowFlip(angle)
 
-  case object AverageParallactic extends PosAngle {
+  /**
+   * Specifies that the position angle be set to the average parallactic
+   * angle at the time of the observation.
+   */
+  case object AverageParallactic extends PosAngleConstraint {
     override def toString: String = "AverageParallactic"
   }
 
@@ -59,10 +72,14 @@ object PosAngle {
    *
    *  @group Constructors
    */
-  val averageParallactic: PosAngle =
+  val averageParallactic: PosAngleConstraint =
     AverageParallactic
 
-  case class ParallacticOverride(angle: Angle) extends PosAngle {
+  /**
+   * Specifies a fixed position angle, remembering that originally the
+   * average parallactic angle was desired.
+   */
+  case class ParallacticOverride(angle: Angle) extends PosAngleConstraint {
     override def toString: String = s"ParallacticOverride(${angle.toDoubleDegrees})"
   }
 
@@ -75,10 +92,14 @@ object PosAngle {
    *
    *  @group Constructors
    */
-  def parallacticOverride(angle: Angle): PosAngle =
+  def parallacticOverride(angle: Angle): PosAngleConstraint =
     ParallacticOverride(angle)
 
-  case object Unconstrained extends PosAngle {
+  /**
+   * Specifies that there is no constraint on the position angle.  It may be
+   * set to any value for this observation.
+   */
+  case object Unconstrained extends PosAngleConstraint {
     override def toString: String = "Unconstrained"
   }
 
@@ -87,12 +108,12 @@ object PosAngle {
    *
    *  @group Constructors
    */
-  val unconstrained: PosAngle =
+  val unconstrained: PosAngleConstraint =
     Unconstrained
 
-  val Default: PosAngle = Fixed(Angle.Angle0)
+  val Default: PosAngleConstraint = Fixed(Angle.Angle0)
 
-  implicit val eqPosAngle: Eq[PosAngle] = Eq.instance {
+  implicit val eqPosAngle: Eq[PosAngleConstraint] = Eq.instance {
     case (Fixed(a), Fixed(b))                             => a === b
     case (AllowFlip(a), AllowFlip(b))                     => a === b
     case (AverageParallactic, AverageParallactic)         => true
@@ -101,22 +122,22 @@ object PosAngle {
     case _                                                => false
   }
 
-  val fixedPrism: Prism[PosAngle, Fixed] = GenPrism[PosAngle, Fixed]
+  val fixedPrism: Prism[PosAngleConstraint, Fixed] = GenPrism[PosAngleConstraint, Fixed]
 
-  val fixedAnglePrism: Optional[PosAngle, Angle] = fixedPrism.andThen(Fixed.angle)
+  val fixedAnglePrism: Optional[PosAngleConstraint, Angle] = fixedPrism.andThen(Fixed.angle)
 
-  val allowFlipPrism: Prism[PosAngle, AllowFlip] = GenPrism[PosAngle, AllowFlip]
+  val allowFlipPrism: Prism[PosAngleConstraint, AllowFlip] = GenPrism[PosAngleConstraint, AllowFlip]
 
-  val allowFlipAnglePrism: Optional[PosAngle, Angle] = allowFlipPrism.andThen(AllowFlip.angle)
+  val allowFlipAnglePrism: Optional[PosAngleConstraint, Angle] = allowFlipPrism.andThen(AllowFlip.angle)
 
-  val parallacticOverridePrism: Prism[PosAngle, ParallacticOverride] =
-    GenPrism[PosAngle, ParallacticOverride]
+  val parallacticOverridePrism: Prism[PosAngleConstraint, ParallacticOverride] =
+    GenPrism[PosAngleConstraint, ParallacticOverride]
 
-  val parallacticOverrideAnglePrism: Optional[PosAngle, Angle] =
+  val parallacticOverrideAnglePrism: Optional[PosAngleConstraint, Angle] =
     parallacticOverridePrism.andThen(ParallacticOverride.angle)
 
-  val angleOptional: Optional[PosAngle, Angle] =
-    Optional[PosAngle, Angle]({
+  val angleOptional: Optional[PosAngleConstraint, Angle] =
+    Optional[PosAngleConstraint, Angle]({
       case Fixed(angle)               => angle.some
       case AllowFlip(angle)           => angle.some
       case AverageParallactic         => none

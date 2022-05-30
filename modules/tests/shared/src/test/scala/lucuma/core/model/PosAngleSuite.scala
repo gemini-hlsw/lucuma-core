@@ -14,7 +14,7 @@ class PosAngleSuite extends DisciplineSuite {
   import ArbAngle._
   import ArbPosAngle._
 
-  checkAll("Eq[PosAngle]", EqTests[PosAngle].eqv)
+  checkAll("Eq[PosAngle]", EqTests[PosAngleConstraint].eqv)
 
-  checkAll("Optional[PosAngle, Angle]", OptionalTests(PosAngle.angleOptional))
+  checkAll("Optional[PosAngle, Angle]", OptionalTests(PosAngleConstraint.angleOptional))
 }

@@ -3,7 +3,7 @@
 
 package lucuma.core.model.arb
 
-import lucuma.core.model.PosAngle
+import lucuma.core.model.PosAngleConstraint
 import lucuma.core.math.arb.ArbAngle._
 import lucuma.core.math.Angle
 import org.scalacheck.Arbitrary
@@ -13,51 +13,51 @@ import org.scalacheck.Gen
 
 trait ArbPosAngle {
 
-  implicit val fixedPosAngleArb = Arbitrary[PosAngle.Fixed] {
+  implicit val fixedPosAngleArb = Arbitrary[PosAngleConstraint.Fixed] {
     for {
       a <- arbitrary[Angle]
-    } yield PosAngle.Fixed(a)
+    } yield PosAngleConstraint.Fixed(a)
   }
 
-  implicit def fixedPosAngleCogen: Cogen[PosAngle.Fixed] =
+  implicit def fixedPosAngleCogen: Cogen[PosAngleConstraint.Fixed] =
     Cogen[Angle].contramap(_.angle)
 
-  implicit val allowFlipPosAngleArb = Arbitrary[PosAngle.AllowFlip] {
+  implicit val allowFlipPosAngleArb = Arbitrary[PosAngleConstraint.AllowFlip] {
     for {
       a <- arbitrary[Angle]
-    } yield PosAngle.AllowFlip(a)
+    } yield PosAngleConstraint.AllowFlip(a)
   }
 
-  implicit def allowFlipCogen: Cogen[PosAngle.AllowFlip] =
+  implicit def allowFlipCogen: Cogen[PosAngleConstraint.AllowFlip] =
     Cogen[Angle].contramap(_.angle)
 
-  implicit val parallacticOverridePosAngleArb = Arbitrary[PosAngle.ParallacticOverride] {
+  implicit val parallacticOverridePosAngleArb = Arbitrary[PosAngleConstraint.ParallacticOverride] {
     for {
       a <- arbitrary[Angle]
-    } yield PosAngle.ParallacticOverride(a)
+    } yield PosAngleConstraint.ParallacticOverride(a)
   }
 
-  implicit def parallacticOverridePosAngleCogen: Cogen[PosAngle.ParallacticOverride] =
+  implicit def parallacticOverridePosAngleCogen: Cogen[PosAngleConstraint.ParallacticOverride] =
     Cogen[Angle].contramap(_.angle)
 
-  implicit val posAngleArb = Arbitrary[PosAngle] {
+  implicit val posAngleArb = Arbitrary[PosAngleConstraint] {
     for {
-      f <- arbitrary[PosAngle.Fixed]
-      v <- arbitrary[PosAngle.AllowFlip]
-      p <- Gen.const(PosAngle.AverageParallactic)
-      o <- arbitrary[PosAngle.ParallacticOverride]
-      u <- Gen.const(PosAngle.Unconstrained)
+      f <- arbitrary[PosAngleConstraint.Fixed]
+      v <- arbitrary[PosAngleConstraint.AllowFlip]
+      p <- Gen.const(PosAngleConstraint.AverageParallactic)
+      o <- arbitrary[PosAngleConstraint.ParallacticOverride]
+      u <- Gen.const(PosAngleConstraint.Unconstrained)
       a <- Gen.oneOf(f, v, p, o, u)
     } yield a
   }
 
-  implicit def posAngleCogen: Cogen[PosAngle] =
+  implicit def posAngleCogen: Cogen[PosAngleConstraint] =
     Cogen[Option[Option[Either[Angle, Either[Angle, Either[Angle, Angle]]]]]].contramap {
-      case PosAngle.AverageParallactic     => None
-      case PosAngle.Unconstrained          => Some(None)
-      case PosAngle.Fixed(a)               => Some(Some(Left(a)))
-      case PosAngle.AllowFlip(a)           => Some(Some(Right(Left(a))))
-      case PosAngle.ParallacticOverride(a) => Some(Some(Right(Right(Left(a)))))
+      case PosAngleConstraint.AverageParallactic     => None
+      case PosAngleConstraint.Unconstrained          => Some(None)
+      case PosAngleConstraint.Fixed(a)               => Some(Some(Left(a)))
+      case PosAngleConstraint.AllowFlip(a)           => Some(Some(Right(Left(a))))
+      case PosAngleConstraint.ParallacticOverride(a) => Some(Some(Right(Right(Left(a)))))
     }
 }
 
