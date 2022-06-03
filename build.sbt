@@ -2,6 +2,8 @@ ThisBuild / tlBaseVersion                         := "0.40"
 ThisBuild / tlCiReleaseBranches                   := Seq("master")
 ThisBuild / githubWorkflowEnv += "MUNIT_FLAKY_OK" -> "true"
 
+ThisBuild / tlCiReleaseBranches += "topic/scala3"
+
 Global / concurrentRestrictions += Tags.limit(Tags.Compile, 1)
 
 ThisBuild / scalaVersion := "3.1.2"
