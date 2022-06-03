@@ -6,7 +6,6 @@ package arb
 
 import cats.syntax.option._
 import cats.syntax.order._
-
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Cogen._
 import org.scalacheck._

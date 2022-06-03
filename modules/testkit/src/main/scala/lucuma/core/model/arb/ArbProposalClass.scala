@@ -4,9 +4,11 @@
 package lucuma.core.model.arb
 
 import eu.timepit.refined.scalacheck.all._
-import lucuma.core.model.arb.ArbNonNegDuration
-import lucuma.core.model.{ IntPercent, NonNegDuration, ProposalClass }
+import lucuma.core.model.IntPercent
+import lucuma.core.model.NonNegDuration
+import lucuma.core.model.ProposalClass
 import lucuma.core.model.ProposalClass._
+import lucuma.core.model.arb.ArbNonNegDuration
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck._
 

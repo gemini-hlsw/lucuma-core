@@ -3,9 +3,9 @@
 
 package lucuma.core.model.arb
 
-import lucuma.core.model.PosAngle
-import lucuma.core.math.arb.ArbAngle._
 import lucuma.core.math.Angle
+import lucuma.core.math.arb.ArbAngle._
+import lucuma.core.model.PosAngle
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Cogen

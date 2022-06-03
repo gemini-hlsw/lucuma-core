@@ -3,10 +3,9 @@
 
 package lucuma.core.math
 
-import lucuma.core.math.arb._
-
-import cats.syntax.order._
 import cats.kernel.laws.discipline._
+import cats.syntax.order._
+import lucuma.core.math.arb._
 import org.scalacheck.Prop._
 
 final class CoverageSuite extends munit.DisciplineSuite {
