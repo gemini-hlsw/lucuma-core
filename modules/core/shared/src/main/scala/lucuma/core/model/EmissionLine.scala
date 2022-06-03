@@ -6,8 +6,8 @@ package lucuma.core.model
 import cats.Eq
 import cats.implicits._
 import coulomb.*
-import coulomb.syntax.*
 import coulomb.cats.quantity.given
+import coulomb.syntax.*
 import eu.timepit.refined.cats._
 import eu.timepit.refined.types.numeric.PosBigDecimal
 import lucuma.core.math.BrightnessUnits._

@@ -5,10 +5,10 @@ package lucuma.core.math
 
 import cats._
 import coulomb.*
-import coulomb.syntax.*
 import coulomb.cats.quantity.given
 import coulomb.policy.spire.standard.given
-import coulomb.units.si.{*, given}
+import coulomb.syntax.*
+import coulomb.units.si.{_, given}
 import lucuma.core.math.Constants.SpeedOfLight
 import lucuma.core.math.units._
 import lucuma.core.optics.Format

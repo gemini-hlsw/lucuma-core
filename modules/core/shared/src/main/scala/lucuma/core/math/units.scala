@@ -3,29 +3,29 @@
 
 package lucuma.core.math
 
-import coulomb.{`*`, `/`, `^`}
+import _root_.spire.math._
+import coulomb./
+import coulomb.^
 import coulomb.*
+import coulomb.*
+import coulomb.conversion.TruncatingUnitConversion
+import coulomb.conversion.ValueConversion
+import coulomb.define._
 import coulomb.syntax.*
 import coulomb.units.accepted._
-import coulomb.define._
-import coulomb.conversion.ValueConversion
-import coulomb.conversion.TruncatingUnitConversion
 import coulomb.units.mks._
 import coulomb.units.si._
 import coulomb.units.si.prefixes._
 import coulomb.units.time._
-// import coulomb.unitops._
-import lucuma.core.util.TypeString
-import lucuma.core.math.refined.*
+import eu.timepit.refined._
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.api.Validate
-import eu.timepit.refined._
 import eu.timepit.refined.auto._
 import eu.timepit.refined.numeric._
-import eu.timepit.refined.types.numeric.PosInt
 import eu.timepit.refined.types.numeric.NonNegInt
-// import lucuma.core.math.dimensional._
-import _root_.spire.math._
+import eu.timepit.refined.types.numeric.PosInt
+import lucuma.core.math.refined.*
+import lucuma.core.util.TypeString
 
 trait units {
 

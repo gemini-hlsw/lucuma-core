@@ -6,15 +6,15 @@ package lucuma.core.math
 import cats.Order
 import cats.Show
 import coulomb.*
-import coulomb.syntax.*
 import coulomb.cats.quantity.given
 import coulomb.policy.spire.standard.given
+import coulomb.syntax.*
 import eu.timepit.refined._
 import eu.timepit.refined.auto._
 import eu.timepit.refined.cats._
 import eu.timepit.refined.numeric._
 import eu.timepit.refined.types.numeric.PosInt
-import lucuma.core.math.units.{*, given}
+import lucuma.core.math.units.{_, given}
 import lucuma.core.optics.Format
 import monocle.Iso
 import monocle.Prism

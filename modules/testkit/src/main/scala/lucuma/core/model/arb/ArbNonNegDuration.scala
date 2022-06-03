@@ -4,7 +4,9 @@
 package lucuma.core.model.arb
 
 import lucuma.core.model.NonNegDuration
-import org.scalacheck.{ Arbitrary, Cogen, Gen }
+import org.scalacheck.Arbitrary
+import org.scalacheck.Cogen
+import org.scalacheck.Gen
 
 import java.time.Duration
 

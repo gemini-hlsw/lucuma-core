@@ -10,8 +10,8 @@ import cats.kernel.laws.discipline._
 import eu.timepit.refined.auto._
 import lucuma.core.arb.ArbTime
 import lucuma.core.math.arb._
-import lucuma.core.math.refined._
 import lucuma.core.math.parser.EpochParsers._
+import lucuma.core.math.refined._
 import lucuma.core.optics.laws.discipline._
 import lucuma.core.syntax.parser._
 import monocle.law.discipline.PrismTests

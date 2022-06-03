@@ -6,12 +6,12 @@ package lucuma.core.model
 import cats._
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.api.RefinedTypeOps
+import eu.timepit.refined.internal.WitnessAs
 import eu.timepit.refined.numeric.Interval
 import lucuma.core.optics.SplitEpi
 import monocle.Focus
 import monocle.Prism
 import monocle.macros.GenPrism
-import eu.timepit.refined.internal.WitnessAs
 
 sealed trait ElevationRange extends Product with Serializable
 

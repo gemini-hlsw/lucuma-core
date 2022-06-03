@@ -6,10 +6,14 @@ package lucuma.core.model
 import cats.Eq
 import cats.syntax.all._
 import eu.timepit.refined.cats._
-import lucuma.core.model.{ IntPercent, NonNegDuration }
+import lucuma.core.model.IntPercent
+import lucuma.core.model.NonNegDuration
 import lucuma.core.model.implicits._
+import monocle.Focus
+import monocle.Lens
+import monocle.Optional
+import monocle.Prism
 import monocle.macros.GenPrism
-import monocle.{ Focus, Lens, Optional, Prism }
 
 sealed trait ProposalClass { val minPercentTime: IntPercent }
 

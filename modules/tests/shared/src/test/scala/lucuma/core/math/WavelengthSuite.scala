@@ -9,15 +9,15 @@ import cats.Show
 import cats.kernel.laws.discipline._
 import cats.syntax.all._
 import coulomb.*
-import coulomb.syntax.*
 import coulomb.policy.spire.standard.given
+import coulomb.syntax.*
 import eu.timepit.refined.auto._
 import eu.timepit.refined.cats._
 import eu.timepit.refined.numeric._
 import eu.timepit.refined.scalacheck.numeric._
 import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.math.arb._
-import lucuma.core.math.units.{*, given}
+import lucuma.core.math.units.{_, given}
 import lucuma.core.optics.Format
 import lucuma.core.optics.laws.discipline.FormatTests
 import monocle.law.discipline._

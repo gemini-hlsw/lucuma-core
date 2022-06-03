@@ -5,8 +5,8 @@ package lucuma.core.math.skycalc
 
 import cats.syntax.all._
 import coulomb.*
-import coulomb.syntax.*
 import coulomb.policy.spire.standard.given
+import coulomb.syntax.*
 import lucuma.core.`enum`.TwilightType
 import lucuma.core.math.Constants._
 import lucuma.core.math.JulianDate

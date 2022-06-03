@@ -14,8 +14,8 @@ import lucuma.core.math.Angle
 import lucuma.core.math.Lat
 import lucuma.core.math.Lon
 import lucuma.core.math.Place
-import lucuma.core.util.Enumerated
 import lucuma.core.math.units._
+import lucuma.core.util.Enumerated
 
 import java.time.ZoneId
 

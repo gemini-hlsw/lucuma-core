@@ -4,11 +4,11 @@
 package lucuma.core.math
 
 import coulomb.*
-import coulomb.syntax.*
 import coulomb.conversion.ValueConversion
 import coulomb.define.DerivedUnit
-import coulomb.units.constants.{*, given}
 import coulomb.policy.spire.standard.given
+import coulomb.syntax.*
+import coulomb.units.constants.{_, given}
 import coulomb.units.si.Meter
 import lucuma.core.math.units.MetersPerSecond
 import spire.math.Rational

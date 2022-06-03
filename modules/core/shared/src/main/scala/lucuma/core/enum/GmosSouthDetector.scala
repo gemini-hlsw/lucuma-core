@@ -11,10 +11,10 @@ import eu.timepit.refined.auto._
 import eu.timepit.refined.numeric.Positive
 import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.math.Angle
-import lucuma.core.math.units.Pixels
-import lucuma.core.util.Enumerated
-import lucuma.core.math.units._
 import lucuma.core.math.refined._
+import lucuma.core.math.units.Pixels
+import lucuma.core.math.units._
+import lucuma.core.util.Enumerated
 
 /**
  * Enumerated type for GMOS detector.

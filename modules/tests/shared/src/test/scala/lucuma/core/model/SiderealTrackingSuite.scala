@@ -3,17 +3,18 @@
 
 package lucuma.core.model
 
-import cats.syntax.all._
 import cats.kernel.laws.discipline._
-import lucuma.core.math.arb._
+import cats.syntax.all._
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Epoch
 import lucuma.core.math.Parallax
 import lucuma.core.math.ProperMotion
+import lucuma.core.math.arb._
 import lucuma.core.model.arb._
 import monocle.law.discipline._
 import munit.DisciplineSuite
 import org.scalacheck.Prop.forAll
+
 import java.time.Instant
 
 final class SiderealTrackingSuite extends DisciplineSuite {

@@ -3,15 +3,15 @@
 
 package lucuma.core.optics
 
-import coulomb.units.accepted.Percent
 import coulomb.cats.quantity.given
+import coulomb.units.accepted.Percent
 import eu.timepit.refined.cats._
 import eu.timepit.refined.collection.NonEmpty
 import eu.timepit.refined.numeric.Positive
 import eu.timepit.refined.scalacheck.numeric._
 import eu.timepit.refined.scalacheck.string._
-import lucuma.core.math.arb.ArbRefined
 import lucuma.core.math.arb.ArbQuantity
+import lucuma.core.math.arb.ArbRefined
 import monocle.law.discipline.IsoTests
 import monocle.law.discipline.PrismTests
 import munit.DisciplineSuite

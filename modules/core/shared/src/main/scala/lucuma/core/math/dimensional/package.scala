@@ -4,8 +4,8 @@
 package lucuma.core.math
 
 import coulomb.Quantity
-import lucuma.core.util.TypeString
 import coulomb.ops.ShowUnit
+import lucuma.core.util.TypeString
 
 package object dimensional {
   opaque infix type Of[+T, U] <: T = T

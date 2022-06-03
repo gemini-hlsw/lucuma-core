@@ -3,7 +3,8 @@
 
 package lucuma.core.model.syntax
 
-import eu.timepit.refined.types.all.{ NonNegInt, NonNegLong }
+import eu.timepit.refined.types.all.NonNegInt
+import eu.timepit.refined.types.all.NonNegLong
 import lucuma.core.model.NonNegDuration
 
 final class NonNegDurationOps(self: NonNegDuration) {

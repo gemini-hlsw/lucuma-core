@@ -7,8 +7,8 @@ import eu.timepit.refined.api.Refined
 import eu.timepit.refined.boolean.Not
 import eu.timepit.refined.char.Letter
 import eu.timepit.refined.numeric.Interval
-import eu.timepit.refined.numeric.Positive
 import eu.timepit.refined.numeric.Negative
+import eu.timepit.refined.numeric.Positive
 
 import scala.compiletime.constValue
 import scala.quoted.Expr

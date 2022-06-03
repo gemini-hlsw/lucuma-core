@@ -5,10 +5,10 @@ package lucuma.core.math
 
 import cats._
 import coulomb.*
-import coulomb.syntax.*
 import coulomb.cats.quantity.given
 import coulomb.policy.spire.standard.given
-import coulomb.units.constants.{*, given}
+import coulomb.syntax.*
+import coulomb.units.constants.{_, given}
 import lucuma.core.math.units._
 import lucuma.core.optics.Wedge
 import monocle.Iso

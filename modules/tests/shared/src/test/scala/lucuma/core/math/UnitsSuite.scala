@@ -4,11 +4,11 @@
 package lucuma.core.math
 
 import coulomb.*
-import coulomb.syntax.*
 import coulomb.policy.spire.standard.given
-import coulomb.units.mks.{*, given}
-import coulomb.units.si.{*, given}
-import lucuma.core.math.units.{*, given}
+import coulomb.syntax.*
+import coulomb.units.mks.{_, given}
+import coulomb.units.si.{_, given}
+import lucuma.core.math.units.{_, given}
 import munit.FunSuite
 import spire.math.Rational
 import spire.math.SafeLong

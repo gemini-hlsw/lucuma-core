@@ -7,9 +7,9 @@ import coulomb._
 import coulomb.units.si.Kelvin
 import eu.timepit.refined.numeric.Positive
 import eu.timepit.refined.types.numeric.PosBigDecimal
+import lucuma.core.math.units._
 import lucuma.core.util.Display
 import lucuma.core.util.Enumerated
-import lucuma.core.math.units._
 
 sealed abstract class CoolStarTemperature(
   val name: String,

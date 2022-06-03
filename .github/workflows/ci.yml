@@ -72,7 +72,7 @@ jobs:
 
       - name: Check headers and formatting
         if: matrix.java == 'temurin@17'
-        run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' headerCheckAll scalafmtCheckAll 'project /' scalafmtSbtCheck lucumaScalafmtCheck
+        run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' headerCheckAll scalafmtCheckAll 'project /' scalafmtSbtCheck lucumaScalafmtCheck lucumaScalafixCheck
 
       - name: scalaJSLink
         if: matrix.project == 'rootJS'
@@ -80,6 +80,10 @@ jobs:
 
       - name: Test
         run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' test
+
+      - name: Check scalafix lints
+        if: matrix.java == 'temurin@17'
+        run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' 'scalafixAll --check'
 
       - name: Check binary compatibility
         if: matrix.java == 'temurin@17'

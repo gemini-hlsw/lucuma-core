@@ -6,9 +6,14 @@ package lucuma.core.model.arb
 import cats.implicits._
 import eu.timepit.refined.scalacheck.all._
 import eu.timepit.refined.types.string.NonEmptyString
-import lucuma.core.`enum`.{ TacCategory, ToOActivation }
-import lucuma.core.model.{ IntPercent, Partner, Proposal, ProposalClass }
-import lucuma.core.util.arb.{ ArbCollection, ArbEnumerated }
+import lucuma.core.`enum`.TacCategory
+import lucuma.core.`enum`.ToOActivation
+import lucuma.core.model.IntPercent
+import lucuma.core.model.Partner
+import lucuma.core.model.Proposal
+import lucuma.core.model.ProposalClass
+import lucuma.core.util.arb.ArbCollection
+import lucuma.core.util.arb.ArbEnumerated
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Cogen._
 import org.scalacheck._

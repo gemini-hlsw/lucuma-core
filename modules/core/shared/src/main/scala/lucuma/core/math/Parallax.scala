@@ -5,15 +5,15 @@ package lucuma.core.math
 
 import cats._
 import coulomb.*
-import coulomb.syntax.*
 import coulomb.cats.quantity.given
 import coulomb.policy.spire.standard.given
-import eu.timepit.refined.refineV
+import coulomb.syntax.*
 import eu.timepit.refined.api._
 import eu.timepit.refined.auto._
 import eu.timepit.refined.cats._
 import eu.timepit.refined.numeric._
-import lucuma.core.math.units.{*, given}
+import eu.timepit.refined.refineV
+import lucuma.core.math.units.{_, given}
 import lucuma.core.optics._
 import spire.math.Rational
 import spire.std.long._
