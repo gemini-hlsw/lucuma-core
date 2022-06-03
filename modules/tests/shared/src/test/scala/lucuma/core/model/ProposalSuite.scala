@@ -9,7 +9,8 @@ import eu.timepit.refined.cats._
 import eu.timepit.refined.scalacheck.all._
 import lucuma.core.model.Proposal
 import lucuma.core.model.arb._
-import lucuma.core.util.arb.{ ArbCollection, ArbEnumerated }
+import lucuma.core.util.arb.ArbCollection
+import lucuma.core.util.arb.ArbEnumerated
 import monocle.law.discipline._
 import munit._
 import org.scalacheck.Cogen._

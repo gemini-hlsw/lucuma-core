@@ -6,7 +6,8 @@ package lucuma.core.math
 import cats.Eq
 import cats.syntax.order._
 import coulomb._
-import eu.timepit.refined.types.numeric.{NonNegInt, PosInt}
+import eu.timepit.refined.types.numeric.NonNegInt
+import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.math.units._
 
 /** Wavelength coverage. */

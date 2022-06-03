@@ -6,15 +6,20 @@ package lucuma.core
 import cats.Eq
 import cats.Monoid
 import cats.syntax.all._
-import eu.timepit.refined.api.{ Refined, RefinedTypeOps, Validate }
+import eu.timepit.refined.api.Refined
+import eu.timepit.refined.api.RefinedTypeOps
+import eu.timepit.refined.api.Validate
 import eu.timepit.refined.api.Validate.Plain
 import eu.timepit.refined.boolean.Not
-import eu.timepit.refined.numeric.{ GreaterEqual, Interval, Less, NonNegative }
-import shapeless.Nat._0
+import eu.timepit.refined.numeric.GreaterEqual
+import eu.timepit.refined.numeric.Interval
+import eu.timepit.refined.numeric.Less
+import eu.timepit.refined.numeric.NonNegative
 import org.typelevel.cats.time.instances.duration._
+import shapeless.Nat._0
 
-import java.time.temporal.Temporal
 import java.time.Duration
+import java.time.temporal.Temporal
 
 package object model {
 

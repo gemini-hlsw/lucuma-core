@@ -5,8 +5,8 @@ package lucuma.core.math
 
 import cats.Eq
 import cats.Show
-import cats.syntax.all._
 import cats.kernel.laws.discipline._
+import cats.syntax.all._
 import lucuma.core.math.arb._
 import lucuma.core.optics.laws.discipline._
 import lucuma.core.tests.ScalaCheckFlaky

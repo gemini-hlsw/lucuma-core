@@ -8,7 +8,9 @@ package `enum`
 import cats.syntax.eq._
 import coulomb._
 import eu.timepit.refined.types.numeric.PosInt
-import lucuma.core.math.{Angle, Coverage, Wavelength}
+import lucuma.core.math.Angle
+import lucuma.core.math.Coverage
+import lucuma.core.math.Wavelength
 import lucuma.core.math.units._
 import lucuma.core.util.Enumerated
 import spire.math.Rational
