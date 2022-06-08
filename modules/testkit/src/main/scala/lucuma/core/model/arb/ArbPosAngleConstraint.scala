@@ -50,18 +50,16 @@ trait ArbPosAngleConstraint {
         v <- arbitrary[PosAngleConstraint.AllowFlip]
         p <- Gen.const(PosAngleConstraint.AverageParallactic)
         o <- arbitrary[PosAngleConstraint.ParallacticOverride]
-        u <- Gen.const(PosAngleConstraint.Unconstrained)
-        a <- Gen.oneOf(f, v, p, o, u)
+        a <- Gen.oneOf(f, v, p, o)
       } yield a
     }
 
   implicit def posAngleCogen: Cogen[PosAngleConstraint] =
-    Cogen[Option[Option[Either[Angle, Either[Angle, Either[Angle, Angle]]]]]].contramap {
+    Cogen[Option[Either[Angle, Either[Angle, Either[Angle, Angle]]]]].contramap {
       case PosAngleConstraint.AverageParallactic     => None
-      case PosAngleConstraint.Unconstrained          => Some(None)
-      case PosAngleConstraint.Fixed(a)               => Some(Some(Left(a)))
-      case PosAngleConstraint.AllowFlip(a)           => Some(Some(Right(Left(a))))
-      case PosAngleConstraint.ParallacticOverride(a) => Some(Some(Right(Right(Left(a)))))
+      case PosAngleConstraint.Fixed(a)               => Some(Left(a))
+      case PosAngleConstraint.AllowFlip(a)           => Some(Right(Left(a)))
+      case PosAngleConstraint.ParallacticOverride(a) => Some(Right(Right(Left(a))))
     }
 }
 
