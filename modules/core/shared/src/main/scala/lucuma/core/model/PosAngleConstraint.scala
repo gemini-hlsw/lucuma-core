@@ -95,22 +95,6 @@ object PosAngleConstraint extends PosAngleConstraintOptics {
   def parallacticOverride(angle: Angle): PosAngleConstraint =
     ParallacticOverride(angle)
 
-  /**
-   * Specifies that there is no constraint on the position angle.  It may be
-   * set to any value for this observation.
-   */
-  case object Unconstrained extends PosAngleConstraint {
-    override def toString: String = "Unconstrained"
-  }
-
-  /**
-   *  Constructs an `Unconstrained` instance with a wider `PosAngle` type.
-   *
-   *  @group Constructors
-   */
-  val unconstrained: PosAngleConstraint =
-    Unconstrained
-
   val Default: PosAngleConstraint = Fixed(Angle.Angle0)
 
   implicit val eqPosAngle: Eq[PosAngleConstraint] = Eq.instance {
@@ -118,7 +102,6 @@ object PosAngleConstraint extends PosAngleConstraintOptics {
     case (AllowFlip(a), AllowFlip(b))                     => a === b
     case (AverageParallactic, AverageParallactic)         => true
     case (ParallacticOverride(a), ParallacticOverride(b)) => a === b
-    case (Unconstrained, Unconstrained)                   => true
     case _                                                => false
   }
 
@@ -138,13 +121,11 @@ sealed trait PosAngleConstraintOptics { self: PosAngleConstraint.type =>
       case PosAngleConstraint.AllowFlip(angle)           => angle.some
       case PosAngleConstraint.AverageParallactic         => none
       case PosAngleConstraint.ParallacticOverride(angle) => angle.some
-      case PosAngleConstraint.Unconstrained              => none
     })({ a => {
       case PosAngleConstraint.Fixed(_)                   => PosAngleConstraint.Fixed(a)
       case PosAngleConstraint.AllowFlip(_)               => PosAngleConstraint.AllowFlip(a)
       case PosAngleConstraint.AverageParallactic         => PosAngleConstraint.AverageParallactic
       case PosAngleConstraint.ParallacticOverride(_)     => PosAngleConstraint.ParallacticOverride(a)
-      case PosAngleConstraint.Unconstrained              => PosAngleConstraint.Unconstrained
     }})
 
   /**
