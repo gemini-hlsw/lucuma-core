@@ -29,8 +29,8 @@ final case class WedgeProps[A, B](fab: Wedge[A, B]) {
   val laws: WedgeLaws[A, B] = WedgeLaws(fab)
 
   // Demonstrate coverage
-  def demonstratesCoverageA(b: A)(implicit ev: Eq[A]): Boolean =
-    (fab.reverseGet.compose(fab.get))(b) =!= b
+  def demonstratesCoverageA(a: A)(implicit ev: Eq[A]): Boolean =
+    (fab.reverseGet.compose(fab.get))(a) =!= a
 
   def demonstratesCoverageB(b: B)(implicit ev: Eq[B]): Boolean =
     (fab.reverseGet.andThen(fab.get))(b) =!= b
