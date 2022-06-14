@@ -5,6 +5,7 @@ package lucuma.core.optics.laws
 package discipline
 
 import cats.Eq
+import cats.laws.discipline._
 import lucuma.core.optics.Format
 import org.scalacheck.Arbitrary
 import org.scalacheck.Gen

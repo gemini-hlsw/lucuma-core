@@ -5,6 +5,7 @@ package lucuma.core.optics.laws
 package discipline
 
 import cats._
+import cats.laws.discipline._
 import org.scalacheck.Arbitrary
 import org.scalacheck.Prop._
 import org.typelevel.discipline.Laws
