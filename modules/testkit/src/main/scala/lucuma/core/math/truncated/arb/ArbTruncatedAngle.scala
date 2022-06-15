@@ -1,0 +1,25 @@
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
+// For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
+
+package lucuma.core.math.truncated.arb
+
+import lucuma.core.math.truncated.TruncatedAngle
+import lucuma.core.math.arb.ArbAngle._
+import lucuma.core.math.Angle
+import org.scalacheck.Arbitrary
+import org.scalacheck.Arbitrary._
+import org.scalacheck.Cogen
+
+trait ArbTruncatedAngle {
+
+  implicit val TruncatedAngleArb = Arbitrary[TruncatedAngle] {
+    for {
+      a <- arbitrary[Angle]
+    } yield TruncatedAngle(a)
+  }
+
+  implicit def TruncatedAngleCogen: Cogen[TruncatedAngle] =
+    Cogen[Angle].contramap(_.angle)
+}
+
+object ArbTruncatedAngle extends ArbTruncatedAngle

@@ -1,11 +1,11 @@
 // Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package lucuma.core.validation
+package lucuma.core.math.truncated
 
 import cats.kernel.laws.discipline.EqTests
 import lucuma.core.optics.laws.discipline.SplitEpiTests
-import lucuma.core.validation.arb._
+import lucuma.core.math.truncated.arb._
 import munit.DisciplineSuite
 import org.scalacheck.Arbitrary._
 

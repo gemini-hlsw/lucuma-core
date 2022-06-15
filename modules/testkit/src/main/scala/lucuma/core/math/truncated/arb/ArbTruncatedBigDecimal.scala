@@ -1,9 +1,9 @@
 // Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package lucuma.core.validation.arb
+package lucuma.core.math.truncated.arb
 
-import lucuma.core.validation.TruncatedBigDecimal
+import lucuma.core.math.truncated.TruncatedBigDecimal
 import org.scalacheck.Arbitrary._
 import org.scalacheck._
 

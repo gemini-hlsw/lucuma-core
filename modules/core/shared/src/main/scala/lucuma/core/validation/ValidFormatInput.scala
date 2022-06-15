@@ -16,6 +16,7 @@ import lucuma.core.optics._
 import monocle.Iso
 import monocle.Prism
 import singleton.ops._
+import lucuma.core.math.truncated._
 
 import java.math.RoundingMode
 import java.text.DecimalFormat

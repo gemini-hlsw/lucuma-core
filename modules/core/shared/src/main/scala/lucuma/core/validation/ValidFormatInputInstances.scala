@@ -8,6 +8,7 @@ import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.core.math.Declination
 import lucuma.core.math.RightAscension
 import singleton.ops._
+import lucuma.core.math.truncated._
 
 /**
  * Convenience ValidFormatInput instances.
@@ -18,15 +19,11 @@ trait ValidFormatInputInstances {
     _.toString
   )
 
-  val upperNESValidFormat = ValidFormatInput[UpperNES](
-    s => UpperNES.from(s.toUpperCase).toValidInputUnsafe,
-    _.toString
-  )
-
-  def intValidFormat(errorMessage: NonEmptyString = "Must be an integer") = ValidFormatInput[Int](
-    s => fixIntString(s).toIntOption.toRight(errorMessage).toValidInput,
-    _.toString
-  )
+  def intValidFormat(errorMessage: NonEmptyString = "Must be an integer") =
+    ValidFormatInput[Int](
+      s => fixIntString(s).toIntOption.toRight(errorMessage).toValidInput,
+      _.toString
+    )
 
   // Does not, and cannot, format to a particular number of decimal places. For that
   // you need a TruncatedBigDecimal.

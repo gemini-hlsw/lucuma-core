@@ -6,14 +6,7 @@ package lucuma.core
 import cats.data.NonEmptyChain
 import cats.data.NonEmptyList
 import cats.syntax.all._
-import eu.timepit.refined.api.Refined
-import eu.timepit.refined.api.RefinedTypeOps
 import eu.timepit.refined.auto._
-import eu.timepit.refined.boolean.And
-import eu.timepit.refined.boolean.Not
-import eu.timepit.refined.char.LowerCase
-import eu.timepit.refined.collection.Forall
-import eu.timepit.refined.collection.NonEmpty
 import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.core.optics._
 
@@ -27,11 +20,6 @@ package object validation {
   type ValidInput[A]           = ValidNec[NonEmptyString, A]
   type ValidFormatNec[E, T, A] = ValidFormat[NonEmptyChain[E], T, A]
   type ValidFormatInput[A]     = ValidFormatNec[NonEmptyString, String, A]
-
-  // Convenience refined definitions
-  type UpperNEPred = And[NonEmpty, Forall[Not[LowerCase]]]
-  type UpperNES    = String Refined UpperNEPred
-  object UpperNES extends RefinedTypeOps[UpperNES, String]
 
   implicit class StringParseOps(val s: String) extends AnyVal {
     def toBigDecimalOption: Option[BigDecimal] =
