@@ -7,8 +7,8 @@ import eu.timepit.refined.auto._
 import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.core.math.Declination
 import lucuma.core.math.RightAscension
-import singleton.ops._
 import lucuma.core.math.truncated._
+import singleton.ops._
 
 /**
  * Convenience ValidFormatInput instances.

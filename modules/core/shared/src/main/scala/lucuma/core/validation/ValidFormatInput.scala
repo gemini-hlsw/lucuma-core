@@ -12,11 +12,11 @@ import eu.timepit.refined.numeric.Positive
 import eu.timepit.refined.types.numeric.PosBigDecimal
 import eu.timepit.refined.types.numeric.PosInt
 import eu.timepit.refined.types.string.NonEmptyString
+import lucuma.core.math.truncated._
 import lucuma.core.optics._
 import monocle.Iso
 import monocle.Prism
 import singleton.ops._
-import lucuma.core.math.truncated._
 
 import java.math.RoundingMode
 import java.text.DecimalFormat

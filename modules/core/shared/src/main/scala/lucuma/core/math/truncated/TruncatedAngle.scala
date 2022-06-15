@@ -5,8 +5,8 @@ package lucuma.core.math.truncated
 
 import cats.Eq
 import lucuma.core.math.Angle
-import spire.math.Rational
 import lucuma.core.optics.SplitEpi
+import spire.math.Rational
 
 /**
  * A wrapper for Angle that is rounded to 2 decimal places of precision. This is used for input in

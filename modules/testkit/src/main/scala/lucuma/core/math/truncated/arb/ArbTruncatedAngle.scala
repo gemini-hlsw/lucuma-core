@@ -3,9 +3,9 @@
 
 package lucuma.core.math.truncated.arb
 
-import lucuma.core.math.truncated.TruncatedAngle
-import lucuma.core.math.arb.ArbAngle._
 import lucuma.core.math.Angle
+import lucuma.core.math.arb.ArbAngle._
+import lucuma.core.math.truncated.TruncatedAngle
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Cogen
