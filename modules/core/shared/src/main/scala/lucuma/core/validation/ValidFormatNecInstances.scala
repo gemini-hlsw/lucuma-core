@@ -15,7 +15,7 @@ trait ValidFormatNecInstances {
     upperBound: A,
     error:      NonEmptyString
   ): ValidFormatNec[NonEmptyString, A, A] = {
-    def get(a: A): ValidNec[NonEmptyString, A] =
+    def get(a: A): EitherNec[NonEmptyString, A] =
       if (a < upperBound) a.asRight
       else NonEmptyChain(error).asLeft
     ValidFormatNec(get, identity)
@@ -25,7 +25,7 @@ trait ValidFormatNecInstances {
     upperBound: A,
     error:      NonEmptyString
   ): ValidFormatNec[NonEmptyString, A, A] = {
-    def get(a: A): ValidNec[NonEmptyString, A] =
+    def get(a: A): EitherNec[NonEmptyString, A] =
       if (a <= upperBound) a.asRight
       else NonEmptyChain(error).asLeft
     ValidFormatNec(get, identity)
@@ -35,7 +35,7 @@ trait ValidFormatNecInstances {
     lowerBound: A,
     error:      NonEmptyString
   ): ValidFormatNec[NonEmptyString, A, A] = {
-    def get(a: A): ValidNec[NonEmptyString, A] =
+    def get(a: A): EitherNec[NonEmptyString, A] =
       if (a > lowerBound) a.asRight
       else NonEmptyChain(error).asLeft
     ValidFormatNec(get, identity)
@@ -45,7 +45,7 @@ trait ValidFormatNecInstances {
     lowerBound: A,
     error:      NonEmptyString
   ): ValidFormatNec[NonEmptyString, A, A] = {
-    def get(a: A): ValidNec[NonEmptyString, A] =
+    def get(a: A): EitherNec[NonEmptyString, A] =
       if (a >= lowerBound) a.asRight
       else NonEmptyChain(error).asLeft
     ValidFormatNec(get, identity)

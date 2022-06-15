@@ -15,9 +15,13 @@ import scala.util.Try
 package object validation {
 
   // Convenience type aliases
-  type InputFormat[A]          = Format[String, A]
-  type ValidNec[E, A]          = Either[NonEmptyChain[E], A]
-  type ValidInput[A]           = ValidNec[NonEmptyString, A]
+  // The `Input` types fix the input type to `String` and the error type to `NonEmptyChain[NonEmptyString]`.
+
+  type FormatInput[A] = Format[String, A]
+
+  type EitherNec[E, A] = Either[NonEmptyChain[E], A]
+  type EitherInput[A]  = EitherNec[NonEmptyString, A]
+
   type ValidFormatNec[E, T, A] = ValidFormat[NonEmptyChain[E], T, A]
   type ValidFormatInput[A]     = ValidFormatNec[NonEmptyString, String, A]
 
@@ -27,12 +31,12 @@ package object validation {
   }
 
   implicit class EitherStringOps[A](val e: Either[String, A]) extends AnyVal {
-    def toValidInputUnsafe: ValidInput[A] =
+    def toEitherNecInputUnsafe: EitherInput[A] =
       e.leftMap(s => NonEmptyChain(NonEmptyString.unsafeFrom(s)))
   }
 
   implicit class EitherNESOps[A](val e: Either[NonEmptyString, A]) extends AnyVal {
-    def toValidInput: ValidInput[A] =
+    def toEitherNecInput: EitherInput[A] =
       e.leftMap(s => NonEmptyChain(s))
   }
 

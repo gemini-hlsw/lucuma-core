@@ -78,11 +78,11 @@ abstract class ValidFormat[E, T, A] extends Serializable { self =>
       reverseGet.compose(f.reverseGet)
     )
 
-  // /** ValidFormat is an invariant functor over A. */
+  /** ValidFormat is an invariant functor over A. */
   def imapA[B](f: B => A, g: A => B): ValidFormat[E, T, B] =
     ValidFormat(getValid(_).map(g), f.andThen(reverseGet))
 
-  // /** ValidFormat is an invariant functor over T. */
+  /** ValidFormat is an invariant functor over T. */
   def imapT[S](f: T => S, g: S => T): ValidFormat[E, S, A] =
     ValidFormat(g.andThen(getValid), reverseGet.andThen(f))
 }
@@ -130,6 +130,9 @@ object ValidFormat {
       iso.reverseGet
     )
 
+  /**
+   * Build optic for a Refined predicate
+   */
   def forRefined[E, A, P](error: E)(implicit
     v:                           RefinedValidate[A, P]
   ): ValidFormat[E, A, A Refined P] =

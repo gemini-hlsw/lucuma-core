@@ -24,7 +24,7 @@ object ValidFormatNec extends ValidFormatNecInstances {
    * Build optic from getValidated and reverseGet functions.
    */
   def apply[E, T, A](
-    getValid:   T => ValidNec[E, A],
+    getValid:   T => EitherNec[E, A],
     reverseGet: A => T
   ): ValidFormatNec[E, T, A] =
     ValidFormat(getValid, reverseGet)

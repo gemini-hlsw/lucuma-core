@@ -37,7 +37,7 @@ object ValidFormatInput extends ValidFormatInputInstances {
    * Build optic from getValid and reverseGet functions.
    */
   def apply[A](
-    getValid:   String => ValidInput[A],
+    getValid:   String => EitherInput[A],
     reverseGet: A => String
   ): ValidFormatInput[A] =
     ValidFormat(getValid, reverseGet)
@@ -50,7 +50,7 @@ object ValidFormatInput extends ValidFormatInputInstances {
     errorMessage: NonEmptyString = "Invalid format"
   ): ValidFormatInput[A] =
     ValidFormat(
-      format.getOption.andThen(_.toRight(errorMessage).toValidInput),
+      format.getOption.andThen(_.toRight(errorMessage).toEitherNecInput),
       format.reverseGet
     )
 
@@ -115,7 +115,7 @@ object ValidFormatInput extends ValidFormatInputInstances {
           .flatMap(prism.getOption(_))
           .flatMap(TruncatedRefinedBigDecimal.apply[P, Dec](_))
           .toRight(error)
-          .toValidInput,
+          .toEitherNecInput,
       trbd => s"%.${vo.value}f".format(trbd.value.value)
     )
   }

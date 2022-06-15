@@ -15,13 +15,13 @@ import singleton.ops._
  */
 trait ValidFormatInputInstances {
   val nonEmptyValidFormat = ValidFormatInput[NonEmptyString](
-    s => NonEmptyString.from(s).toValidInputUnsafe,
+    s => NonEmptyString.from(s).toEitherNecInputUnsafe,
     _.toString
   )
 
   def intValidFormat(errorMessage: NonEmptyString = "Must be an integer") =
     ValidFormatInput[Int](
-      s => fixIntString(s).toIntOption.toRight(errorMessage).toValidInput,
+      s => fixIntString(s).toIntOption.toRight(errorMessage).toEitherNecInput,
       _.toString
     )
 
@@ -29,7 +29,7 @@ trait ValidFormatInputInstances {
   // you need a TruncatedBigDecimal.
   def bigDecimalValidFormat(errorMessage: NonEmptyString = "Must be a number") =
     ValidFormatInput[BigDecimal](
-      s => fixDecimalString(s).toBigDecimalOption.toRight(errorMessage).toValidInput,
+      s => fixDecimalString(s).toBigDecimalOption.toRight(errorMessage).toEitherNecInput,
       _.toString.toLowerCase.replace("+", "") // Strip + sign from exponent.
     )
 
@@ -47,7 +47,7 @@ trait ValidFormatInputInstances {
         .getOption(s)
         .map(TruncatedRA(_))
         .toRight("Invalid Right Ascension")
-        .toValidInputUnsafe,
+        .toEitherNecInputUnsafe,
     tra => {
       val s = RightAscension.fromStringHMS.reverseGet(tra.ra)
       s.dropRight(3)
@@ -60,7 +60,7 @@ trait ValidFormatInputInstances {
         .getOption(s)
         .map(TruncatedDec(_))
         .toRight("Invalid Declination")
-        .toValidInputUnsafe,
+        .toEitherNecInputUnsafe,
     tdec => {
       val s = Declination.fromStringSignedDMS.reverseGet(tdec.dec)
       s.dropRight(4)
