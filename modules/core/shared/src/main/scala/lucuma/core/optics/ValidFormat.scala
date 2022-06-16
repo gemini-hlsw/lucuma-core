@@ -40,40 +40,47 @@ abstract class ValidFormat[E, T, A] extends Serializable { self =>
       throw new IllegalArgumentException(s"unsafeGet failed: $t")
     }
 
-  /** Compose with another Validate. */
+  /** Always return a single instance of `E` in case of an invalid `T`. */
+  def withError(e: E): ValidFormat[E, T, A] =
+    ValidFormat(
+      getValid.andThen(_.leftMap(_ => e)),
+      reverseGet
+    )
+
+  /** Compose with another `ValidFormat`. */
   def andThen[B](f: ValidFormat[E, A, B]): ValidFormat[E, T, B] =
     ValidFormat[E, T, B](
       getValid(_).fold(_.asLeft, f.getValid),
       reverseGet.compose(f.reverseGet)
     )
 
-  /** Compose with a Format. */
+  /** Compose with a `Format`. */
   def andThen[B](f: Format[A, B], error: E): ValidFormat[E, T, B] =
     andThen(ValidFormat.fromFormat(f, error))
 
-  /** Compose with a Prism. */
+  /** Compose with a `Prism`. */
   def andThen[B](f: Prism[A, B], error: E): ValidFormat[E, T, B] =
     andThen(ValidFormat.fromPrism(f, error))
 
-  /** Compose with an Iso. */
+  /** Compose with an `Iso`. */
   def andThen[B](f: Iso[A, B]): ValidFormat[E, T, B] =
     ValidFormat[E, T, B](
       getValid(_).map(f.get),
       reverseGet.compose(f.reverseGet)
     )
 
-  /** Compose with a SplitEpi. */
+  /** Compose with a `SplitEpi`. */
   def andThen[B](f: SplitEpi[A, B], error: E): ValidFormat[E, T, B] =
     andThen(ValidFormat.fromFormat(f.asFormat, error))
 
-  /** Compose with a SplitMono. */
+  /** Compose with a `SplitMono`. */
   def andThen[B](f: SplitMono[A, B]): ValidFormat[E, T, B] =
     ValidFormat(
       getValid(_).map(f.get),
       reverseGet.compose(f.reverseGet)
     )
 
-  /** Compose with a Wedge. */
+  /** Compose with a `Wedge`. */
   def andThen[B](f: Wedge[A, B]): ValidFormat[E, T, B] =
     ValidFormat(
       getValid(_).map(f.get),
@@ -89,7 +96,7 @@ abstract class ValidFormat[E, T, A] extends Serializable { self =>
     ValidFormat(g.andThen(getValid), reverseGet.andThen(f))
 
   /**
-   * Build `ValidFormat` from another one, but allow empty values to become `None`
+   * Build `ValidFormat` from another one, but allow empty values to become `None`.
    */
   def optional(implicit ev: Monoid[T], eq: Eq[T]): ValidFormat[E, T, Option[A]] =
     ValidFormat(
@@ -101,6 +108,9 @@ abstract class ValidFormat[E, T, A] extends Serializable { self =>
       (a: Option[A]) => a.foldMap(self.reverseGet)
     )
 
+  /**
+   * Build `ValidFormat` from another one, refining the return type with predicate `P`.
+   */
   def refined[P](error: E)(implicit ev: RefinedValidate[A, P]): ValidFormat[E, T, Refined[A, P]] =
     this.andThen(ValidFormat.forRefined[E, A, P](error))
 }

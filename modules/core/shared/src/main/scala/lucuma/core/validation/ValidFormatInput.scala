@@ -78,125 +78,114 @@ object ValidFormatInput {
   /**
    * Build a `ValidFormatInput` for `String Refined P`
    */
-  def refinedString[P](
-    error:      NonEmptyString = "Invalid format"
-  )(implicit v: RefinedValidate[String, P]): ValidFormatInput[String Refined P] =
-    id.refined[P](NonEmptyChain(error))
+  def refinedString[P](implicit v: RefinedValidate[String, P]): ValidFormatInput[String Refined P] =
+    id.refined[P](NonEmptyChain("Invalid value"))
 
   /**
-   * Build a `ValidFormatInput` for `NonEmptyString`
+   * `ValidFormatInput` for `NonEmptyString`
    */
-  def nonEmptyString(
-    error: NonEmptyString = "Must have a value"
-  ): ValidFormatInput[NonEmptyString] =
-    refinedString[NonEmpty](error)
+  val nonEmptyString: ValidFormatInput[NonEmptyString] =
+    refinedString[NonEmpty].withErrorMessage("Must be defined")
 
-  def int(errorMessage: NonEmptyString = "Must be an integer") =
-    ValidFormatInput[Int](
-      s => fixIntString(s).toIntOption.toRight(errorMessage).toEitherInput,
+  /**
+   * `ValidFormatInput` for `Int`
+   */
+  val int: ValidFormatInput[Int] =
+    ValidFormatInput(
+      s => fixIntString(s).toIntOption.toRight(NonEmptyChain("Must be an integer")),
       _.toString
     )
 
   /**
    * Build a `ValidFormatInput` for `Int Refined P`
    */
-  def refinedInt[P](
-    error:      NonEmptyString = "Invalid format"
-  )(implicit v: RefinedValidate[Int, P]): ValidFormatInput[Int Refined P] =
-    int(error)
-      .refined[P](NonEmptyChain(error))
+  def refinedInt[P](implicit v: RefinedValidate[Int, P]): ValidFormatInput[Int Refined P] =
+    int.refined[P](NonEmptyChain("Invalid format"))
 
   /**
-   * Build a `ValidFormatInput` for `PosInt`
+   * `ValidFormatInput` for `PosInt`
    */
-  def posInt(
-    error: NonEmptyString = "Invalid format"
-  ): ValidFormatInput[PosInt] =
-    refinedInt[Positive](error)
+  val posInt: ValidFormatInput[PosInt] =
+    refinedInt[Positive]
 
   /**
-   * Build a `ValidFormatInput` for `BigDecimal`.
+   * `ValidFormatInput` for `BigDecimal`.
    *
    * Does not, and cannot, format to a particular number of decimal places. For that you need a
    * `TruncatedBigDecimal`.
    */
-  def bigDecimal(errorMessage: NonEmptyString = "Must be a number") =
-    ValidFormatInput[BigDecimal](
-      s => fixDecimalString(s).toBigDecimalOption.toRight(errorMessage).toEitherInput,
+  val bigDecimal: ValidFormatInput[BigDecimal] =
+    ValidFormatInput(
+      s => fixDecimalString(s).toBigDecimalOption.toRight(NonEmptyChain("Must be a number")),
       _.toString.toLowerCase.replace("+", "") // Strip + sign from exponent.
     )
 
   /**
    * Build a `ValidFormatInput` for `BigDecimal Refined P`
    */
-  def refinedBigDecimal[P](
-    error:      NonEmptyString = "Invalid format"
-  )(implicit v: RefinedValidate[BigDecimal, P]): ValidFormatInput[BigDecimal Refined P] =
-    bigDecimal(error)
-      .refined[P](NonEmptyChain(error))
+  def refinedBigDecimal[P](implicit
+    v: RefinedValidate[BigDecimal, P]
+  ): ValidFormatInput[BigDecimal Refined P] =
+    bigDecimal.refined[P](NonEmptyChain("Invalid format"))
 
   /**
-   * Build a `ValidFormatInput` for `PosBigDecimal`
+   * `ValidFormatInput` for `PosBigDecimal`
    */
-  def posBigDecimal(
-    error: NonEmptyString = "Invalid format"
-  ): ValidFormatInput[PosBigDecimal] =
-    refinedBigDecimal[Positive](error)
+  val posBigDecimal: ValidFormatInput[PosBigDecimal] =
+    refinedBigDecimal[Positive]
 
   /**
    * Build a `ValidFormatInput` for `TruncatedBigDecimal[Dec]`
    */
-  def truncatedBigDecimal[Dec <: XInt](
-    errorMessage: NonEmptyString = "Must be a number"
-  )(implicit req: Require[&&[Dec > 0, Dec < 10]], vo: ValueOf[Dec]) =
-    ValidFormatInput[TruncatedBigDecimal[Dec]](
-      s => bigDecimal(errorMessage).getValid(s).map(TruncatedBigDecimal(_)),
+  def truncatedBigDecimal[Dec <: XInt](implicit
+    req: Require[&&[Dec > 0, Dec < 10]],
+    vo:  ValueOf[Dec]
+  ): ValidFormatInput[TruncatedBigDecimal[Dec]] =
+    ValidFormatInput(
+      s => bigDecimal.getValid(s).map(TruncatedBigDecimal(_)),
       tbd => s"%.${vo.value}f".format(tbd.value)
     )
 
   /**
    * Build a `ValidFormatInput` for `TruncatedRefinedBigDecimal[P, Dec]`
    */
-  def truncatedRefinedBigDecimal[P, Dec <: XInt](
-    error: NonEmptyString = "Invalid format"
-  )(implicit
-    v:     RefinedValidate[BigDecimal, P],
-    req:   Require[&&[Dec > 0, Dec < 10]],
-    vo:    ValueOf[Dec]
+  def truncatedRefinedBigDecimal[P, Dec <: XInt](implicit
+    v:   RefinedValidate[BigDecimal, P],
+    req: Require[&&[Dec > 0, Dec < 10]],
+    vo:  ValueOf[Dec]
   ): ValidFormatInput[TruncatedRefinedBigDecimal[P, Dec]] =
-    ValidFormatInput[TruncatedRefinedBigDecimal[P, Dec]](
-      refinedBigDecimal[P](error)
-        .andThen(TruncatedRefinedBigDecimal.unsafeRefinedBigDecimal[P, Dec], NonEmptyChain(error))
+    ValidFormatInput(
+      refinedBigDecimal[P]
+        .andThen(
+          TruncatedRefinedBigDecimal.unsafeRefinedBigDecimal[P, Dec],
+          NonEmptyChain("Invalid format")
+        )
         .getValid,
       trbd => s"%.${vo.value}f".format(trbd.value.value)
     )
 
   /**
-   * Build a `ValidFormatInput` for `BigDecimal` accepting scientific notation
+   * `ValidFormatInput` for `BigDecimal` accepting scientific notation
    */
-  def bigDecimalWithScientificNotation(
-    error: NonEmptyString = "Invalid format"
-  ): ValidFormatInput[BigDecimal] =
+  def bigDecimalWithScientificNotation: ValidFormatInput[BigDecimal] =
     ValidFormatInput(
-      bigDecimal(error).getValid,
+      bigDecimal.getValid,
       n => Try(scientificNotationFormat(n)).toOption.orEmpty
     ) // We shouldn't need to catch errors here, but https://github.com/scala-js/scala-js/issues/4655
 
   /**
    * Build a `ValidFormatInput` for `BigDecimal Refined P` accepting scientific notation
    */
-  def refinedBigDecimalWithScientificNotation[P](
-    error:      NonEmptyString = "Invalid format"
-  )(implicit v: RefinedValidate[BigDecimal, P]): ValidFormatInput[BigDecimal Refined P] =
-    bigDecimalWithScientificNotation(error).refined[P](NonEmptyChain(error))
+  def refinedBigDecimalWithScientificNotation[P](implicit
+    v: RefinedValidate[BigDecimal, P]
+  ): ValidFormatInput[BigDecimal Refined P] =
+    bigDecimalWithScientificNotation.refined[P](NonEmptyChain("Invalid format"))
 
   /**
-   * Build a `ValidFormatInput` for `PosBigDecimal` accepting scientific notation
+   * `ValidFormatInput` for `PosBigDecimal` accepting scientific notation
    */
-  def posBigDecimalWithScientificNotation(
-    error: NonEmptyString = "Invalid format"
-  ): ValidFormatInput[PosBigDecimal] =
-    refinedBigDecimalWithScientificNotation[Positive](error)
+  val posBigDecimalWithScientificNotation: ValidFormatInput[PosBigDecimal] =
+    refinedBigDecimalWithScientificNotation[Positive]
 
   private def fixIntString(str: String): String = str match {
     case ""  => "0"

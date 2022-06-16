@@ -61,22 +61,20 @@ package object validation {
     //     (a: Option[A]) => a.foldMap(self.reverseGet)
     //   )
 
+    def withErrorMessage(msg: NonEmptyString): ValidFormatInput[A] =
+      self.withError(NonEmptyChain(msg))
+
     // def refined[P](implicit v: Validate[A, P])
 
     /**
      * Build `ValidFormatInput[NonEmptyList[A]]` given a `ValidFormatInput[A]`
      */
-    def toNel(
-      separator: NonEmptyString = ",",
-      error:     Option[NonEmptyString] = none // If not set, will show the list of individual errors
-    ): ValidFormatInput[NonEmptyList[A]] =
+    def toNel(separator: NonEmptyString = ","): ValidFormatInput[NonEmptyList[A]] =
       ValidFormatInput[NonEmptyList[A]](
         _.split(separator).toList.toNel
-          .toRight[NonEmptyChain[NonEmptyString]](NonEmptyChain("Cannot be empty"))
-          .flatMap(
-            _.traverse(self.getValid)
-              .leftMap(errorNec => error.fold(errorNec)(e => NonEmptyChain(e)))
-          ),
+          .toRight("Must be defined")
+          .toEitherInputUnsafe
+          .flatMap(_.traverse(self.getValid)),
         _.map(self.reverseGet).toList.mkString(separator)
       )
   }
