@@ -167,7 +167,7 @@ object ValidFormatInput {
   /**
    * `ValidFormatInput` for `BigDecimal` accepting scientific notation
    */
-  def bigDecimalWithScientificNotation: ValidFormatInput[BigDecimal] =
+  val bigDecimalWithScientificNotation: ValidFormatInput[BigDecimal] =
     ValidFormatInput(
       bigDecimal.getValid,
       n => Try(scientificNotationFormat(n)).toOption.orEmpty
@@ -203,7 +203,7 @@ object ValidFormatInput {
   private def scientificNotationFormat(x: BigDecimal): String = {
     val formatter = new DecimalFormat("0.0E0")
     formatter.setRoundingMode(RoundingMode.HALF_UP)
-    formatter.setMinimumFractionDigits(if (x.scale > 0) x.precision - 1 else x.scale)
-    formatter.format(x.bigDecimal).stripSuffix("E0").toLowerCase
+    formatter.setMinimumFractionDigits(x.precision - 1)
+    formatter.format(x.bigDecimal)
   }
 }

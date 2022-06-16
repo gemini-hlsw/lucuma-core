@@ -14,8 +14,6 @@ import lucuma.core.math.Epoch
 
 trait MathValidators {
 
-  // TODO TEST ALL THESE!!!!!
-
   val epoch: ValidFormatInput[Epoch] =
     ValidFormatInput.fromPrism(Epoch.fromString, "Invalid epoch")
 
@@ -70,7 +68,7 @@ trait MathValidators {
       declination
         .andThen(TruncatedDec.declination, NonEmptyChain("Invalid Declination"))
         .getValid,
-      tdec => {
+      tdec => { // Move this as toString/format in the TruncatedDec object ???
         val s = Declination.fromStringSignedDMS.reverseGet(tdec.dec)
         s.dropRight(4)
       }
