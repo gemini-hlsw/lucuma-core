@@ -11,6 +11,7 @@ import eu.timepit.refined.types.string.NonEmptyString
 
 trait ValidFormatNecInstances {
 
+  /** Build a `ValidFormatNec` that will accept `A < upperBound` */
   def lt[A: Order](
     upperBound: A,
     error:      NonEmptyString
@@ -21,6 +22,7 @@ trait ValidFormatNecInstances {
     ValidFormatNec(get, identity)
   }
 
+  /** Build a `ValidFormatNec` that will accept `A <= upperBound` */
   def lte[A: Order](
     upperBound: A,
     error:      NonEmptyString
@@ -31,6 +33,7 @@ trait ValidFormatNecInstances {
     ValidFormatNec(get, identity)
   }
 
+  /** Build a `ValidFormatNec` that will accept `A > upperBound` */
   def gt[A: Order](
     lowerBound: A,
     error:      NonEmptyString
@@ -41,6 +44,7 @@ trait ValidFormatNecInstances {
     ValidFormatNec(get, identity)
   }
 
+  /** Build a `ValidFormatNec` that will accept `A >= upperBound` */
   def gte[A: Order](
     lowerBound: A,
     error:      NonEmptyString

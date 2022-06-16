@@ -9,6 +9,8 @@ import eu.timepit.refined.api.{Validate => RefinedValidate}
 import lucuma.core.optics._
 import monocle.Iso
 import monocle.Prism
+import cats.kernel.Monoid
+import cats.kernel.Eq
 
 /**
  * A validating and normalizing optic. Behaves similarly to `Format`, but the getter returns an
@@ -85,6 +87,22 @@ abstract class ValidFormat[E, T, A] extends Serializable { self =>
   /** ValidFormat is an invariant functor over T. */
   def imapT[S](f: T => S, g: S => T): ValidFormat[E, S, A] =
     ValidFormat(g.andThen(getValid), reverseGet.andThen(f))
+
+  /**
+   * Build `ValidFormat` from another one, but allow empty values to become `None`
+   */
+  def optional(implicit ev: Monoid[T], eq: Eq[T]): ValidFormat[E, T, Option[A]] =
+    ValidFormat(
+      (t: T) =>
+        if (t.isEmpty)
+          none.asRight
+        else
+          self.getValid(t).map(_.some),
+      (a: Option[A]) => a.foldMap(self.reverseGet)
+    )
+
+  def refined[P](error: E)(implicit ev: RefinedValidate[A, P]): ValidFormat[E, T, Refined[A, P]] =
+    this.andThen(ValidFormat.forRefined[E, A, P](error))
 }
 
 object ValidFormat {

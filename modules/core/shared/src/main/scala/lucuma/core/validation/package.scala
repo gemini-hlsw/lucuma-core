@@ -26,17 +26,23 @@ package object validation {
   type ValidFormatInput[A]     = ValidFormatNec[NonEmptyString, String, A]
 
   implicit class StringParseOps(val s: String) extends AnyVal {
+
+    /** Try to parse as a `BigDecimal` */
     def toBigDecimalOption: Option[BigDecimal] =
       Try(BigDecimal(s)).toOption
   }
 
   implicit class EitherStringOps[A](val e: Either[String, A]) extends AnyVal {
-    def toEitherNecInputUnsafe: EitherInput[A] =
+
+    /** Convert an `Either[String, A]` to an `Either[NonEmptyChain[NonEmptyString], A]` */
+    def toEitherInputUnsafe: EitherInput[A] =
       e.leftMap(s => NonEmptyChain(NonEmptyString.unsafeFrom(s)))
   }
 
   implicit class EitherNESOps[A](val e: Either[NonEmptyString, A]) extends AnyVal {
-    def toEitherNecInput: EitherInput[A] =
+
+    /** Convert an `Either[NonEmptyString, A]` to an `Either[NonEmptyChain[NonEmptyString], A]` */
+    def toEitherInput: EitherInput[A] =
       e.leftMap(s => NonEmptyChain(s))
   }
 
@@ -45,15 +51,17 @@ package object validation {
     /**
      * Build `ValidFormatInput` from another one, but allow empty values to become `None`
      */
-    def optional: ValidFormatInput[Option[A]] =
-      ValidFormatInput(
-        (a: String) =>
-          if (a.isEmpty)
-            none.asRight
-          else
-            self.getValid(a).map(_.some),
-        (a: Option[A]) => a.foldMap(self.reverseGet)
-      )
+    // def optional: ValidFormatInput[Option[A]] =
+    //   ValidFormatInput(
+    //     (a: String) =>
+    //       if (a.isEmpty)
+    //         none.asRight
+    //       else
+    //         self.getValid(a).map(_.some),
+    //     (a: Option[A]) => a.foldMap(self.reverseGet)
+    //   )
+
+    // def refined[P](implicit v: Validate[A, P])
 
     /**
      * Build `ValidFormatInput[NonEmptyList[A]]` given a `ValidFormatInput[A]`
