@@ -3,14 +3,14 @@
 
 package lucuma.core.optics
 
+import cats.kernel.Eq
+import cats.kernel.Monoid
 import cats.syntax.all._
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.api.{Validate => RefinedValidate}
 import lucuma.core.optics._
 import monocle.Iso
 import monocle.Prism
-import cats.kernel.Monoid
-import cats.kernel.Eq
 
 /**
  * A validating and normalizing optic. Behaves similarly to `Format`, but the getter returns an

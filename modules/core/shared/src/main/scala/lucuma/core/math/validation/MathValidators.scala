@@ -3,14 +3,14 @@
 
 package lucuma.core.math.validation
 
+import cats.data.NonEmptyChain
 import eu.timepit.refined.auto._
+import lucuma.core.math.Angle
 import lucuma.core.math.Declination
+import lucuma.core.math.Epoch
 import lucuma.core.math.RightAscension
 import lucuma.core.math.truncated._
 import lucuma.core.validation._
-import cats.data.NonEmptyChain
-import lucuma.core.math.Angle
-import lucuma.core.math.Epoch
 
 trait MathValidators {
 

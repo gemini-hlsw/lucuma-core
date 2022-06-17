@@ -8,19 +8,19 @@ import cats.syntax.all._
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.api.{Validate => RefinedValidate}
 import eu.timepit.refined.auto._
+import eu.timepit.refined.collection.NonEmpty
 import eu.timepit.refined.numeric.Positive
 import eu.timepit.refined.types.numeric.PosBigDecimal
 import eu.timepit.refined.types.numeric.PosInt
 import eu.timepit.refined.types.string.NonEmptyString
-import eu.timepit.refined.collection.NonEmpty
 import lucuma.core.math.truncated._
 import lucuma.core.optics._
 import monocle.Iso
 import monocle.Prism
 import singleton.ops._
-import java.text.DecimalFormat
-import java.math.RoundingMode
 
+import java.math.RoundingMode
+import java.text.DecimalFormat
 import scala.util.Try
 
 /**
