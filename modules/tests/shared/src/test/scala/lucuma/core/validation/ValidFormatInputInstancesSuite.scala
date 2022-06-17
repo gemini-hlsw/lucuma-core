@@ -18,12 +18,13 @@ final class ValidFormatInputInstancesSpec extends DisciplineSuite {
   // The scientific notation formatters use `java.text.DecimalFormat` which in Scala.js seems
   // to have trouble formatting BigDecimals with very high absolute scale or precision.
   // We therefore use these bounded arbitraries.
-  implicit lazy val arbBigDecimalLimitedPrecision: Arbitrary[BigDecimal]       =
+  implicit lazy val arbBigDecimalLimitedPrecision: Arbitrary[BigDecimal] =
     Arbitrary(
       org.scalacheck.Arbitrary.arbBigDecimal.arbitrary.suchThat(x =>
         x.scale.abs < 100 && x.precision <= 15
       )
     )
+
   implicit lazy val arbPosBigDecimalLimitedPrecision: Arbitrary[PosBigDecimal] =
     Arbitrary(
       arbBigDecimalLimitedPrecision.arbitrary

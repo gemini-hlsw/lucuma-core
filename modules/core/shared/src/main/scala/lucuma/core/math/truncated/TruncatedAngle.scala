@@ -19,7 +19,10 @@ sealed abstract case class TruncatedAngle private (angle: Angle)
 object TruncatedAngle {
   def apply(angle: Angle): TruncatedAngle =
     new TruncatedAngle(
-      Angle.fromBigDecimalDegrees((angle.toBigDecimalDegrees * 100).toLong / 100)
+      Angle.fromBigDecimalDegrees(
+        (angle.toBigDecimalDegrees * 100)
+          .setScale(0, scala.math.BigDecimal.RoundingMode.HALF_UP) / 100
+      )
     ) {}
 
   val angle: SplitEpi[Angle, TruncatedAngle] =

@@ -165,7 +165,7 @@ object ValidFormatInput {
     )
 
   /**
-   * `ValidFormatInput` for `BigDecimal` accepting scientific notation
+   * `ValidFormatInput` for `BigDecimal`, formatting with only one integer digit.
    */
   val bigDecimalWithScientificNotation: ValidFormatInput[BigDecimal] =
     ValidFormatInput(
@@ -174,7 +174,7 @@ object ValidFormatInput {
     ) // We shouldn't need to catch errors here, but https://github.com/scala-js/scala-js/issues/4655
 
   /**
-   * Build a `ValidFormatInput` for `BigDecimal Refined P` accepting scientific notation
+   * Build a `ValidFormatInput` for `BigDecimal Refined P`, formatting with only one integer digit.
    */
   def refinedBigDecimalWithScientificNotation[P](implicit
     v: RefinedValidate[BigDecimal, P]
@@ -182,7 +182,7 @@ object ValidFormatInput {
     bigDecimalWithScientificNotation.refined[P](NonEmptyChain("Invalid format"))
 
   /**
-   * `ValidFormatInput` for `PosBigDecimal` accepting scientific notation
+   * `ValidFormatInput` for `PosBigDecimal`, formatting with only one integer digit.
    */
   val posBigDecimalWithScientificNotation: ValidFormatInput[PosBigDecimal] =
     refinedBigDecimalWithScientificNotation[Positive]
