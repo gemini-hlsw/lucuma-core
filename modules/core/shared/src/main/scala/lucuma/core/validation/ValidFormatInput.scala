@@ -187,6 +187,8 @@ object ValidFormatInput {
   val posBigDecimalWithScientificNotation: ValidFormatInput[PosBigDecimal] =
     refinedBigDecimalWithScientificNotation[Positive]
 
+// TODO We probably  want a truncatedbigdecimal with scientific notation
+
   private def fixIntString(str: String): String = str match {
     case ""  => "0"
     case "-" => "-0"

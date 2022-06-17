@@ -17,19 +17,16 @@ trait MathValidators {
   val epoch: ValidFormatInput[Epoch] =
     ValidFormatInput.fromPrism(Epoch.fromString, "Invalid epoch")
 
-  val angle: ValidFormatInput[Angle] =
+  // We can't have a general `ValidFormatInput[Angle]`.
+  // It fails format roundtrip law check because of rounding.
+  val truncatedAngleSignedDegrees: ValidFormatInput[TruncatedAngle] =
     ValidFormatInput(
-      _.toDoubleOption
-        .map(Angle.fromDoubleArcseconds)
+      _.toBigDecimalOption
+        .map(Angle.fromBigDecimalDegrees)
+        .map(TruncatedAngle.apply)
         .toRight("Invalid Angle")
         .toEitherInputUnsafe,
-      a => (a.toMicroarcseconds / 1000000.0).toString
-    )
-
-  val truncatedAngle: ValidFormatInput[TruncatedAngle] =
-    ValidFormatInput(
-      angle.andThen(TruncatedAngle.angle, NonEmptyChain("Invalid Angle")).getValid,
-      ta => f"${ta.angle.toSignedDoubleDegrees}%.2f"
+      ta => f"${ta.angle.toSignedBigDecimalDegrees}%.2f"
     )
 
   val rightAscension: ValidFormatInput[RightAscension] =

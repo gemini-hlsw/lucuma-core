@@ -10,7 +10,6 @@ import lucuma.core.optics.laws.discipline.ValidFormatTests
 import munit.DisciplineSuite
 
 final class MathValidatorsSuite extends DisciplineSuite {
-  import ArbAngle._
   import ArbDeclination._
   import ArbEpoch._
   import ArbRightAscension._
@@ -19,8 +18,10 @@ final class MathValidatorsSuite extends DisciplineSuite {
   import ArbTruncatedRA._
 
   checkAll("epoch", ValidFormatTests(MathValidators.epoch).validFormat)
-  // checkAll("angle", ValidFormatTests(MathValidators.angle).validFormat)
-  checkAll("truncatedAngle", ValidFormatTests(MathValidators.truncatedAngle).validFormat)
+  checkAll(
+    "truncatedAngleSignedDegrees",
+    ValidFormatTests(MathValidators.truncatedAngleSignedDegrees).validFormat
+  )
   checkAll("rightAscension", ValidFormatTests(MathValidators.rightAscension).validFormat)
   checkAll("truncatedRA", ValidFormatTests(MathValidators.truncatedRA).validFormat)
   checkAll("declination", ValidFormatTests(MathValidators.declination).validFormat)

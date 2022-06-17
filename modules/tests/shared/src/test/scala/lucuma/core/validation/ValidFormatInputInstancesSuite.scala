@@ -46,7 +46,6 @@ final class ValidFormatInputInstancesSpec extends DisciplineSuite {
     "truncatedRefinedBigDecimal[OneToThree, 1]",
     ValidFormatTests(ValidFormatInput.truncatedRefinedBigDecimal[OneToThree, 1]).validFormat
   )
-
   checkAll(
     "bigDecimalWithScientificNotation",
     ValidFormatTests(ValidFormatInput.bigDecimalWithScientificNotation).validFormat
@@ -55,5 +54,4 @@ final class ValidFormatInputInstancesSpec extends DisciplineSuite {
     "posBigDecimalWithScientificNotation",
     ValidFormatTests(ValidFormatInput.posBigDecimalWithScientificNotation).validFormat
   )
-  // We want a truncatedbigdecimal with scientific notation
 }
