@@ -28,13 +28,19 @@ trait MathValidators {
 
   // We can't have a general `ValidFormatInput[Angle]`.
   // It fails format roundtrip law check because of rounding.
-  val truncatedAngleSignedDegrees: ValidFormatInput[TruncatedAngle] =
+  val truncatedAngleDegrees: ValidFormatInput[TruncatedAngle] =
     ValidFormatInput(
       _.toBigDecimalOption
         .map(Angle.fromBigDecimalDegrees)
         .map(TruncatedAngle.apply)
         .toRight("Invalid Angle")
         .toEitherInputUnsafe,
+      ta => f"${ta.angle.toBigDecimalDegrees}%.2f"
+    )
+
+  val truncatedAngleSignedDegrees: ValidFormatInput[TruncatedAngle] =
+    ValidFormatInput(
+      truncatedAngleDegrees.getValid,
       ta => f"${ta.angle.toSignedBigDecimalDegrees}%.2f"
     )
 

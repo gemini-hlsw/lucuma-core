@@ -21,6 +21,10 @@ final class MathValidatorsSuite extends DisciplineSuite {
   checkAll("epoch", ValidFormatTests(MathValidators.epoch).validFormat)
   checkAll("angleArcSec", ValidFormatTests(MathValidators.angleArcSec).validFormat)
   checkAll(
+    "truncatedAngleDegrees",
+    ValidFormatTests(MathValidators.truncatedAngleDegrees).validFormat
+  )
+  checkAll(
     "truncatedAngleSignedDegrees",
     ValidFormatTests(MathValidators.truncatedAngleSignedDegrees).validFormat
   )
