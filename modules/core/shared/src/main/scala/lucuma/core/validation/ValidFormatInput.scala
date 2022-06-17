@@ -142,7 +142,7 @@ object ValidFormatInput {
     vo:  ValueOf[Dec]
   ): ValidFormatInput[TruncatedBigDecimal[Dec]] =
     ValidFormatInput(
-      s => bigDecimal.getValid(s).map(TruncatedBigDecimal(_)),
+      s => bigDecimal.getValid(s).map(TruncatedBigDecimal[Dec](_)),
       tbd => s"%.${vo.value}f".format(tbd.value)
     )
 
@@ -187,8 +187,6 @@ object ValidFormatInput {
   val posBigDecimalWithScientificNotation: ValidFormatInput[PosBigDecimal] =
     refinedBigDecimalWithScientificNotation[Positive]
 
-// TODO We probably  want a truncatedbigdecimal with scientific notation
-
   private def fixIntString(str: String): String = str match {
     case ""  => "0"
     case "-" => "-0"
@@ -202,10 +200,10 @@ object ValidFormatInput {
     case _   => str
   }
 
-  private def scientificNotationFormat(x: BigDecimal): String = {
+  private def scientificNotationFormat(x: BigDecimal, decimals: Option[Int] = none): String = {
     val formatter = new DecimalFormat("0.0E0")
     formatter.setRoundingMode(RoundingMode.HALF_UP)
-    formatter.setMinimumFractionDigits(x.precision - 1)
+    formatter.setMaximumFractionDigits(decimals.getOrElse(x.precision - 1))
     formatter.format(x.bigDecimal)
   }
 }

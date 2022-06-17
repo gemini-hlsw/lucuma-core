@@ -8,8 +8,8 @@ import eu.timepit.refined.scalacheck.all._
 import lucuma.core.math.truncated.arb._
 import lucuma.core.optics.laws.discipline.ValidFormatTests
 import munit.DisciplineSuite
-import org.scalacheck.Arbitrary
 import eu.timepit.refined.types.numeric.PosBigDecimal
+import org.scalacheck.Arbitrary
 
 final class ValidFormatInputInstancesSpec extends DisciplineSuite {
   import ArbTruncatedBigDecimal._
