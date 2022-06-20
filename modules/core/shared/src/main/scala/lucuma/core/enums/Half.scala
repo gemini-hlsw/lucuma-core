@@ -4,6 +4,7 @@
 package lucuma
 package core
 package enums
+
 import cats.syntax.eq._
 import lucuma.core.util.Enumerated
 

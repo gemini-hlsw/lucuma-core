@@ -10,8 +10,6 @@ import lucuma.core.util.arb.ArbEnumerated
 import munit.DisciplineSuite
 import org.scalacheck.Prop._
 
-
-
 final class ImageQualitySuite extends DisciplineSuite {
 
   import ArbEnumerated._
