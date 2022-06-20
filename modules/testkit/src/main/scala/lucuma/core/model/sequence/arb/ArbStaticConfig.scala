@@ -4,7 +4,7 @@
 package lucuma.core.model.sequence.arb
 
 import cats.syntax.all._
-import lucuma.core.`enum`._
+import lucuma.core.enums._
 import lucuma.core.model.sequence.GmosNodAndShuffle
 import lucuma.core.model.sequence.StaticConfig
 import lucuma.core.util.arb.ArbEnumerated

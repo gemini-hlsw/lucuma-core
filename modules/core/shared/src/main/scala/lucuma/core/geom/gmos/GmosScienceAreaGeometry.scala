@@ -3,8 +3,8 @@
 
 package lucuma.core.geom.gmos
 
-import lucuma.core.`enum`.GmosNorthFpu
-import lucuma.core.`enum`.GmosSouthFpu
+import lucuma.core.enums.GmosNorthFpu
+import lucuma.core.enums.GmosSouthFpu
 import lucuma.core.geom._
 import lucuma.core.geom.syntax.all._
 import lucuma.core.math.Angle

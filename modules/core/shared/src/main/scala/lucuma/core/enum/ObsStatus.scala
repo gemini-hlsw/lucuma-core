@@ -3,7 +3,7 @@
 
 package lucuma
 package core
-package `enum`
+package enums
 
 import lucuma.core.util.Display
 import lucuma.core.util.Enumerated

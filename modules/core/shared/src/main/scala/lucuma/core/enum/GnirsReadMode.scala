@@ -2,7 +2,7 @@
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core
-package `enum`
+package enums
 
 import cats.instances.string._
 import cats.syntax.eq._

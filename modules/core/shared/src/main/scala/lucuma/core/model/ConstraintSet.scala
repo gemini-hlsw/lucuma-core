@@ -8,10 +8,10 @@ package lucuma.core.model
 
 import cats._
 import eu.timepit.refined.cats._
-import lucuma.core.`enum`.CloudExtinction
-import lucuma.core.`enum`.ImageQuality
-import lucuma.core.`enum`.SkyBackground
-import lucuma.core.`enum`.WaterVapor
+import lucuma.core.enums.CloudExtinction
+import lucuma.core.enums.ImageQuality
+import lucuma.core.enums.SkyBackground
+import lucuma.core.enums.WaterVapor
 import monocle.Focus
 import monocle.Lens
 import monocle.Optional

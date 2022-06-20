@@ -3,7 +3,7 @@
 
 package lucuma.core.math.skycalc
 
-import lucuma.core.`enum`.TwilightType
+import lucuma.core.enums.TwilightType
 
 // For use from Java when testing SkyCalc (enum is a reserved keyword)
 case class TwilightTypeJVM(wrapped: TwilightType) {

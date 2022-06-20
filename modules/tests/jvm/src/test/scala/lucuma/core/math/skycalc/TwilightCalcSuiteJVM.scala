@@ -7,8 +7,8 @@ import cats._
 import cats.syntax.all._
 import edu.gemini.skycalc.TwilightBoundedNightTest
 import lucuma.core.arb.ArbTime
-import lucuma.core.`enum`.Site
-import lucuma.core.`enum`.TwilightType
+import lucuma.core.enums.Site
+import lucuma.core.enums.TwilightType
 import lucuma.core.math.skycalc.TwilightCalc
 import lucuma.core.optics.Spire
 import lucuma.core.util.arb.ArbEnumerated

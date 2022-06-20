@@ -7,7 +7,7 @@ import cats.syntax.all._
 import coulomb.*
 import coulomb.policy.spire.standard.given
 import coulomb.syntax.*
-import lucuma.core.`enum`.TwilightType
+import lucuma.core.enums.TwilightType
 import lucuma.core.math.Constants._
 import lucuma.core.math.JulianDate
 import lucuma.core.math.Place
@@ -27,7 +27,7 @@ trait TwilightCalc extends SunCalc {
    * Compute start and end of night for a particular date and place.
    *
    * The night will be bounded by twilight as defined by
-   * [[lucuma.core.`enum`.TwilightType]]. It will be the night that starts
+   * [[lucuma.core.enums.TwilightType]]. It will be the night that starts
    * on the given date and ends on the following day.
    *
    * @param twilightType twilight bound type to use

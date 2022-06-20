@@ -5,7 +5,7 @@ package lucuma.core.model.sequence.arb
 
 import eu.timepit.refined.scalacheck.numeric._
 import eu.timepit.refined.types.numeric.PosInt
-import lucuma.core.`enum`._
+import lucuma.core.enums._
 import lucuma.core.math.Offset
 import lucuma.core.math.arb.ArbOffset
 import lucuma.core.math.arb.ArbRefined

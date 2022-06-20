@@ -3,7 +3,7 @@
 
 package lucuma
 package core
-package `enum`
+package enums
 
 import cats.Order
 import cats.syntax.all._

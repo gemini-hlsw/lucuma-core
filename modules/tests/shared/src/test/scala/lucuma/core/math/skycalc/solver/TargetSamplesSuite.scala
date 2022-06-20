@@ -25,7 +25,7 @@ import scala.math.abs
  * this only tests the general mechanics of specific Samples classes for targets.
  */
 final class TargetSamplesSuite extends munit.DisciplineSuite {
-  import lucuma.core.`enum`.Site.GN
+  import lucuma.core.enums.Site.GN
 
   private val testInstant =
     ZonedDateTime.of(LocalDate.of(2014, 3, 1), LocalTime.of(20, 0, 0), GN.timezone).toInstant

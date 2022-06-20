@@ -6,8 +6,8 @@ package lucuma.core.model.arb
 import cats.implicits._
 import eu.timepit.refined.scalacheck.all._
 import eu.timepit.refined.types.string.NonEmptyString
-import lucuma.core.`enum`.TacCategory
-import lucuma.core.`enum`.ToOActivation
+import lucuma.core.enums.TacCategory
+import lucuma.core.enums.ToOActivation
 import lucuma.core.model.IntPercent
 import lucuma.core.model.Partner
 import lucuma.core.model.Proposal

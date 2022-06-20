@@ -4,9 +4,9 @@
 package lucuma.core.model.sequence.arb
 
 import cats.syntax.all._
-import lucuma.core.`enum`.GmosGratingOrder
-import lucuma.core.`enum`.GmosNorthGrating
-import lucuma.core.`enum`.GmosSouthGrating
+import lucuma.core.enums.GmosGratingOrder
+import lucuma.core.enums.GmosNorthGrating
+import lucuma.core.enums.GmosSouthGrating
 import lucuma.core.math.Wavelength
 import lucuma.core.math.arb.ArbWavelength
 import lucuma.core.model.sequence.GmosGratingConfig

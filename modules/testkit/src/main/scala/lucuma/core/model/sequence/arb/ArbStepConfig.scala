@@ -4,7 +4,7 @@
 package lucuma.core.model.sequence.arb
 
 import cats.syntax.all._
-import lucuma.core.`enum`._
+import lucuma.core.enums._
 import lucuma.core.math.Offset
 import lucuma.core.math.arb.ArbOffset
 import lucuma.core.model.sequence.StepConfig

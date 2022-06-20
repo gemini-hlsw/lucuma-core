@@ -8,7 +8,7 @@ package parser
 
 import atto._
 import cats.syntax.all._
-import lucuma.core.`enum`.parser.EnumParsers._
+import lucuma.core.enums.parser.EnumParsers._
 import lucuma.core.parser.TimeParsers._
 
 import Atto._

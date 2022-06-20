@@ -7,7 +7,7 @@ import cats.Eq
 import coulomb.*
 import coulomb.syntax.*
 import eu.timepit.refined.types.numeric.PosBigDecimal
-import lucuma.core.`enum`.*
+import lucuma.core.enums.*
 import lucuma.core.math.units.Electron
 import monocle.Focus
 import monocle.Lens

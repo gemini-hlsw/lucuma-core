@@ -7,7 +7,7 @@ package model
 package arb
 
 import lucuma.core.arb.ArbTime
-import lucuma.core.`enum`.Half
+import lucuma.core.enums.Half
 import lucuma.core.util.arb.ArbEnumerated
 import org.scalacheck.Arbitrary._
 import org.scalacheck._

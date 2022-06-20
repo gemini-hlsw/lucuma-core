@@ -8,8 +8,8 @@ import cats.kernel.laws.discipline._
 import coulomb.*
 import coulomb.syntax.*
 import eu.timepit.refined.cats._
-import lucuma.core.`enum`.Band
-import lucuma.core.`enum`.StellarLibrarySpectrum
+import lucuma.core.enums.Band
+import lucuma.core.enums.StellarLibrarySpectrum
 import lucuma.core.math.BrightnessUnits
 import lucuma.core.math.Wavelength
 import lucuma.core.math.arb.ArbRefined

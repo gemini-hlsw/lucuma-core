@@ -5,7 +5,7 @@ package lucuma.core.model.sequence
 
 import cats.Eq
 import cats.syntax.all._
-import lucuma.core.`enum`._
+import lucuma.core.enums._
 import monocle.Focus
 import monocle.Lens
 import monocle.Prism

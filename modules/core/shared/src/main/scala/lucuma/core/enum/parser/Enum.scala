@@ -1,11 +1,11 @@
 // Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package lucuma.core.`enum`.parser
+package lucuma.core.enums.parser
 
 import atto._
 import cats.syntax.all._
-import lucuma.core.`enum`._
+import lucuma.core.enums._
 import lucuma.core.util.Enumerated
 
 import Atto._
