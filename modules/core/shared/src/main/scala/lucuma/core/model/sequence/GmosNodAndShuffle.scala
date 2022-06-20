@@ -6,7 +6,7 @@ package lucuma.core.model.sequence
 import cats.Eq
 import eu.timepit.refined.cats._
 import eu.timepit.refined.types.numeric.PosInt
-import lucuma.core.enum.GmosEOffsetting
+import lucuma.core.enums.GmosEOffsetting
 import lucuma.core.math.Offset
 import monocle.Focus
 import monocle.Lens

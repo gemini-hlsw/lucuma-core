@@ -4,7 +4,7 @@
 package lucuma.core.math.skycalc
 package solver
 
-import lucuma.core.enum.Site.GN
+import lucuma.core.enums.Site.GN
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Declination
 import lucuma.core.math.HourAngle

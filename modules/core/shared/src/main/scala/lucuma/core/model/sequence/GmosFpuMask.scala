@@ -7,7 +7,7 @@ import cats.Eq
 import cats.syntax.all._
 import eu.timepit.refined.cats._
 import eu.timepit.refined.types.string.NonEmptyString
-import lucuma.core.enum.GmosCustomSlitWidth
+import lucuma.core.enums.GmosCustomSlitWidth
 import monocle.Focus
 import monocle.Iso
 import monocle.Lens

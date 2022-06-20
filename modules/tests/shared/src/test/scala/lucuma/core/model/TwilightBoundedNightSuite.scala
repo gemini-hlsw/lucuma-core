@@ -8,8 +8,8 @@ import cats.Show
 import cats.kernel.laws.discipline._
 import cats.syntax.all._
 import lucuma.core.arb.ArbTime._
-import lucuma.core.enum.Site
-import lucuma.core.enum.TwilightType
+import lucuma.core.enums.Site
+import lucuma.core.enums.TwilightType
 import lucuma.core.model.arb.ArbTwilightBoundedNight._
 import lucuma.core.util.arb.ArbEnumerated._
 import munit._

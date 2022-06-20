@@ -13,7 +13,7 @@ import coulomb.si.Kelvin
 import eu.timepit.refined.cats._
 import eu.timepit.refined.types.numeric.PosBigDecimal
 import eu.timepit.refined.types.numeric.PosInt
-import lucuma.core.enum._
+import lucuma.core.enums._
 import lucuma.core.math.Wavelength
 import monocle.Focus
 import monocle.Lens

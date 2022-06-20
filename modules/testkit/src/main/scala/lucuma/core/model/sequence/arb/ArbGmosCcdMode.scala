@@ -3,7 +3,7 @@
 
 package lucuma.core.model.sequence.arb
 
-import lucuma.core.enum._
+import lucuma.core.enums._
 import lucuma.core.model.sequence.GmosCcdMode
 import lucuma.core.util.arb.ArbEnumerated
 import org.scalacheck.Arbitrary._

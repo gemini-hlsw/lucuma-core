@@ -8,7 +8,7 @@ import cats.kernel.laws.discipline._
 import eu.timepit.refined.cats._
 import eu.timepit.refined.scalacheck.string._
 import lucuma.core.arb._
-import lucuma.core.enum.Band
+import lucuma.core.enums.Band
 import lucuma.core.math.arb._
 import lucuma.core.math.dimensional.arb.ArbMeasure
 import lucuma.core.model.arb._

@@ -3,7 +3,7 @@
 
 package lucuma.core.model
 
-import lucuma.core.enum.Site
+import lucuma.core.enums.Site
 import lucuma.core.syntax.time._
 import org.typelevel.cats.time._
 import spire.math.Bounded

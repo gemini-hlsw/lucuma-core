@@ -4,7 +4,7 @@
 package lucuma.core.model.sequence.arb
 
 import cats.syntax.all._
-import lucuma.core.enum.Breakpoint
+import lucuma.core.enums.Breakpoint
 import lucuma.core.model.sequence._
 import lucuma.core.util.arb.ArbEnumerated
 import lucuma.core.util.arb.ArbUid

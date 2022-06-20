@@ -3,8 +3,8 @@
 
 package lucuma.core.math.skycalc
 
-import lucuma.core.enum.Site
-import lucuma.core.enum.TwilightType
+import lucuma.core.enums.Site
+import lucuma.core.enums.TwilightType
 import munit.FunSuite
 
 import java.time.LocalDate
