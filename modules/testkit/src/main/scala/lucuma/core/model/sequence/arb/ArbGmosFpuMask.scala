@@ -6,7 +6,7 @@ package lucuma.core.model.sequence.arb
 import cats.syntax.all._
 import eu.timepit.refined.scalacheck.string._
 import eu.timepit.refined.types.string.NonEmptyString
-import lucuma.core.enum.GmosCustomSlitWidth
+import lucuma.core.enums.GmosCustomSlitWidth
 import lucuma.core.math.arb.ArbRefined
 import lucuma.core.model.sequence.GmosFpuMask
 import lucuma.core.util.arb.ArbEnumerated

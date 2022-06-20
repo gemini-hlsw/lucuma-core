@@ -5,7 +5,7 @@ package lucuma.core.model
 package arb
 
 import lucuma.core.arb._
-import lucuma.core.enum.EphemerisKeyType
+import lucuma.core.enums.EphemerisKeyType
 import lucuma.core.model.EphemerisKey._
 import lucuma.core.util.arb.ArbEnumerated
 import org.scalacheck.Arbitrary._

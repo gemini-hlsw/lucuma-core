@@ -8,7 +8,7 @@ import cats.Order._
 import cats.syntax.all._
 import eu.timepit.refined.cats._
 import eu.timepit.refined.types.numeric.PosBigDecimal
-import lucuma.core.enum.Band
+import lucuma.core.enums.Band
 import lucuma.core.math.BrightnessUnits._
 import lucuma.core.math.Wavelength
 import lucuma.core.math.dimensional._

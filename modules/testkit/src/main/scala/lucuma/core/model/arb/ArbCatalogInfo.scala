@@ -8,7 +8,7 @@ package arb
 
 import eu.timepit.refined.scalacheck.string._
 import eu.timepit.refined.types.string._
-import lucuma.core.enum.CatalogName
+import lucuma.core.enums.CatalogName
 import lucuma.core.util.arb.ArbEnumerated
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck._

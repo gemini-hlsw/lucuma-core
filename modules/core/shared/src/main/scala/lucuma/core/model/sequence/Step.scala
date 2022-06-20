@@ -6,7 +6,7 @@ package lucuma.core.model.sequence
 import cats.Eq
 import cats.syntax.all._
 import eu.timepit.refined.auto._
-import lucuma.core.enum.Breakpoint
+import lucuma.core.enums.Breakpoint
 import lucuma.core.util.WithUid
 import monocle.Focus
 import monocle.Lens

@@ -4,8 +4,8 @@
 package lucuma.core.model
 
 import cats._
-import lucuma.core.enum.Site
-import lucuma.core.enum.TwilightType
+import lucuma.core.enums.Site
+import lucuma.core.enums.TwilightType
 import lucuma.core.syntax.boundedInterval._
 import monocle.Focus
 import monocle.Lens
@@ -27,20 +27,20 @@ final case class ObservingNight(site: Site, toLocalObservingNight: LocalObservin
 
   /**
    * Constructs a [[TwilightBoundedNight]] for this observing night
-   * according to the specified [[lucuma.core.enum.TwilightType]].
+   * according to the specified [[lucuma.core.enums.TwilightType]].
    *
    * Returns None if there's no sunset or sunrise for the specified
-   * [[lucuma.core.enum.TwilightType]].
+   * [[lucuma.core.enums.TwilightType]].
    */
   def twilightBounded(twilightType: TwilightType): Option[TwilightBoundedNight] =
     TwilightBoundedNight.fromTwilightTypeAndObservingNight(twilightType, this)
 
   /**
    * Constructs a [[TwilightBoundedNight]] for this observing night
-   * according to the specified [[lucuma.core.enum.TwilightType]].
+   * according to the specified [[lucuma.core.enums.TwilightType]].
    *
    * Throws and exeception if there's no sunset or sunrise for the specified
-   * [[lucuma.core.enum.TwilightType]].
+   * [[lucuma.core.enums.TwilightType]].
    */
   def twilightBoundedUnsafe(twilightType: TwilightType): TwilightBoundedNight =
     twilightBounded(twilightType).get

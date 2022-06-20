@@ -5,8 +5,8 @@ package lucuma.core.model
 
 import cats.Order
 import cats.Show
-import lucuma.core.enum.Site
-import lucuma.core.enum.TwilightType
+import lucuma.core.enums.Site
+import lucuma.core.enums.TwilightType
 import lucuma.core.math.skycalc.TwilightCalc
 import monocle.Getter
 import spire.math.Bounded
@@ -15,7 +15,7 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-/** The start and end of a particular night at a [[lucuma.core.enum.Site]]. */
+/** The start and end of a particular night at a [[lucuma.core.enums.Site]]. */
 sealed abstract case class TwilightBoundedNight private (
   twilightType:     TwilightType,
   toObservingNight: ObservingNight,
@@ -54,7 +54,7 @@ object TwilightBoundedNight extends TwilightBoundedNightOptics {
    * Constructs a [[TwilightBoundedNight]] corresponding to an [[ObservingNight]].
    *
    * Returns None if there's no sunset or sunrise for the specified
-   * [[lucuma.core.enum.TwilightType]] and [[ObservingNight]].
+   * [[lucuma.core.enums.TwilightType]] and [[ObservingNight]].
    *
    * @group Constructors
    */
@@ -72,7 +72,7 @@ object TwilightBoundedNight extends TwilightBoundedNightOptics {
    * Constructs a [[TwilightBoundedNight]] corresponding to a [[ObservingNight]].
    *
    * Throws an exception if there's no sunset or sunrise for the specified
-   * [[lucuma.core.enum.TwilightType]] and [[ObservingNight]].
+   * [[lucuma.core.enums.TwilightType]] and [[ObservingNight]].
    *
    * @group Constructors
    */
@@ -87,7 +87,7 @@ object TwilightBoundedNight extends TwilightBoundedNightOptics {
    * local date for for the given site.
    *
    * Returns None if there's no sunset or sunrise for the specified
-   * [[lucuma.core.enum.TwilightType]], [[lucuma.core.enum.Site]] and
+   * [[lucuma.core.enums.TwilightType]], [[lucuma.core.enums.Site]] and
    * [[java.time.LocalDate]].
    *
    * @group Constructors
@@ -107,7 +107,7 @@ object TwilightBoundedNight extends TwilightBoundedNightOptics {
    * local date for for the given site.
    *
    * Throws an exception if there's no sunset or sunrise for the specified
-   * [[lucuma.core.enum.TwilightType]], [[lucuma.core.enum.Site]] and
+   * [[lucuma.core.enums.TwilightType]], [[lucuma.core.enums.Site]] and
    * [[java.time.LocalDate]].
    *
    * @group Constructors
@@ -124,7 +124,7 @@ object TwilightBoundedNight extends TwilightBoundedNightOptics {
    * from the given local datetime for for the given site.
    *
    * Returns None if there's no sunset or sunrise for the specified
-   * [[lucuma.core.enum.TwilightType]], [[lucuma.core.enum.Site]] and
+   * [[lucuma.core.enums.TwilightType]], [[lucuma.core.enums.Site]] and
    * [[java.time.LocalDateTime]].
    *
    * @group Constructors
@@ -144,7 +144,7 @@ object TwilightBoundedNight extends TwilightBoundedNightOptics {
    * from the given local datetime for for the given site.
    *
    * Throws an exception if there's no sunset or sunrise for the specified
-   * [[lucuma.core.enum.TwilightType]], [[lucuma.core.enum.Site]] and
+   * [[lucuma.core.enums.TwilightType]], [[lucuma.core.enums.Site]] and
    * [[java.time.LocalDateTime]].
    *
    * @group Constructors
@@ -161,7 +161,7 @@ object TwilightBoundedNight extends TwilightBoundedNightOptics {
    * that includes the given time at the specified site.
    *
    * Returns None if there's no sunset or sunrise for the specified
-   * [[lucuma.core.enum.TwilightType]] and the observing night
+   * [[lucuma.core.enums.TwilightType]] and the observing night
    * that includes the given time at the specified site.
    *
    * @group Constructors
@@ -181,7 +181,7 @@ object TwilightBoundedNight extends TwilightBoundedNightOptics {
    * that includes the given time at the specified site.
    *
    * Throws an exception if there's no sunset or sunrise for the specified
-   * [[lucuma.core.enum.TwilightType]] and the observing night
+   * [[lucuma.core.enums.TwilightType]] and the observing night
    * that includes the given time at the specified site.
    *
    * @group Constructors
