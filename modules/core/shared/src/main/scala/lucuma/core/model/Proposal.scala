@@ -11,8 +11,8 @@ import eu.timepit.refined.cats._
 import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.core.enums.TacCategory
 import lucuma.core.enums.ToOActivation
-import lucuma.core.math.refined.*
 import lucuma.core.model.IntPercent
+import lucuma.refined._
 import monocle.Focus
 
 import scala.collection.immutable.SortedMap

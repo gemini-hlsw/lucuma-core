@@ -21,6 +21,7 @@ lazy val coulombVersion        = "0.6.0-M2"
 lazy val spireVersion          = "0.18.0"
 lazy val singletonOpsVersion   = "0.5.2"
 lazy val refinedVersion        = "0.9.29"
+lazy val lucumaRefinedVersion  = "0.0-21cb1ca-SNAPSHOT"
 lazy val catsTimeVersion       = "0.5.0"
 lazy val circeVersion          = "0.14.1"
 lazy val catsScalacheckVersion = "0.3.1"
@@ -51,6 +52,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
       "eu.timepit"     %%% "singleton-ops"              % singletonOpsVersion cross CrossVersion.for3Use2_13,
       "eu.timepit"     %%% "refined"                    % refinedVersion,
       "eu.timepit"     %%% "refined-cats"               % refinedVersion,
+      "edu.gemini"     %%% "lucuma-refined"             % lucumaRefinedVersion,
       "org.typelevel"  %%% "cats-time"                  % catsTimeVersion,
       "io.circe"       %%% "circe-core"                 % circeVersion,
       "io.circe"       %%% "circe-generic"              % circeVersion,

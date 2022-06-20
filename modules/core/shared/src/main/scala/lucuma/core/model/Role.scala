@@ -6,8 +6,8 @@ package lucuma.core.model
 import cats.Eq
 import cats.implicits._
 import eu.timepit.refined.auto._
-import lucuma.core.math.refined._
 import lucuma.core.util.WithGid
+import lucuma.refined._
 
 /**
  * Each user has a current `Role` and a set of other roles they may assume. A role has (at least) an

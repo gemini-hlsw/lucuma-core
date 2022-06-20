@@ -10,10 +10,10 @@ import eu.timepit.refined._
 import eu.timepit.refined.numeric.Positive
 import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.math.Angle
-import lucuma.core.math.refined._
 import lucuma.core.math.units.{_, given}
 import lucuma.core.util.Display
 import lucuma.core.util.Enumerated
+import lucuma.refined._
 import spire.math.Rational
 
 sealed abstract class ImageQuality(val toDeciArcSeconds: Quantity[PosInt, DeciArcSecond]) extends Product with Serializable {

@@ -12,9 +12,9 @@ import eu.timepit.refined.numeric.Positive
 import lucuma.core.math.BrightnessUnits._
 import lucuma.core.math.Wavelength
 import lucuma.core.math.dimensional._
-import lucuma.core.math.refined._
 import lucuma.core.math.units._
 import lucuma.core.util.Enumerated
+import lucuma.refined._
 
 /**
  * Enumerated type for wavelength band.

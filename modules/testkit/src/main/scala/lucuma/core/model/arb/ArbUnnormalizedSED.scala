@@ -17,9 +17,9 @@ import lucuma.core.enums._
 import lucuma.core.math.Wavelength
 import lucuma.core.math.arb.ArbRefined
 import lucuma.core.math.arb.ArbWavelength
-import lucuma.core.math.refined._
 import lucuma.core.math.units._
 import lucuma.core.util.arb.ArbEnumerated
+import lucuma.refined._
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck._
 

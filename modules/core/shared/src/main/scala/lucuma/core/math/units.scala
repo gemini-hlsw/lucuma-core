@@ -24,8 +24,8 @@ import eu.timepit.refined.auto._
 import eu.timepit.refined.numeric._
 import eu.timepit.refined.types.numeric.NonNegInt
 import eu.timepit.refined.types.numeric.PosInt
-import lucuma.core.math.refined.*
 import lucuma.core.util.TypeString
+import lucuma.refined._
 
 trait units {
 

@@ -5,7 +5,7 @@ package lucuma.core.math.arb
 
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.types.numeric.PosBigDecimal
-import lucuma.core.math.refined._
+import lucuma.refined._
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Cogen

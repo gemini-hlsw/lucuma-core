@@ -7,8 +7,8 @@ import cats.Eq
 import cats.syntax.all._
 import eu.timepit.refined.auto._
 import lucuma.core.enums.Breakpoint
-import lucuma.core.math.refined._
 import lucuma.core.util.WithUid
+import lucuma.refined._
 import monocle.Focus
 import monocle.Lens
 import monocle.Prism

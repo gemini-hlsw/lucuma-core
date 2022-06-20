@@ -13,10 +13,10 @@ import eu.timepit.refined.cats._
 import eu.timepit.refined.numeric.{ Interval => RefinedInterval }
 import eu.timepit.refined.refineV
 import lucuma.core.math.parser.EpochParsers
-import lucuma.core.math.refined.refineMV
 import lucuma.core.optics.Format
 import lucuma.core.optics.syntax.all._
 import lucuma.core.syntax.parser._
+import lucuma.refined._
 import monocle.Prism
 
 import java.time._

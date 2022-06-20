@@ -7,8 +7,8 @@ import cats.ApplicativeError
 import cats.Eq
 import cats.implicits._
 import eu.timepit.refined.auto._
-import lucuma.core.math.refined._
 import lucuma.core.util.WithGid
+import lucuma.refined._
 
 /** A user has [at least] an identity and a role. */
 sealed trait User extends Product with Serializable {
