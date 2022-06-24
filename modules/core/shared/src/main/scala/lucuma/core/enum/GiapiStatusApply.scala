@@ -57,14 +57,41 @@ object GiapiStatusApply {
 
   /** @group Constructors */ case object GhostFiberAgitator1 extends GiapiStatusApply("GhostFiberAgitator1", Instrument.Ghost, GiapiType.Int, "ghost:sad:cc:slu:fa1.active", "ghost:cc:slu:fa1.type", Option.empty[BigDecimal])
   /** @group Constructors */ case object GhostFiberAgitator2 extends GiapiStatusApply("GhostFiberAgitator2", Instrument.Ghost, GiapiType.Int, "ghost:sad:cc:slu:fa2.active", "ghost:cc:slu:fa2.type", Option.empty[BigDecimal])
+
   /** @group Constructors */ case object GhostRedExposureTime extends GiapiStatusApply("GhostRedExposureTime", Instrument.Ghost, GiapiType.Double, "ghost:sad:dc:red.exposedRQ", "ghost:dc:red.duration", Option.empty[BigDecimal])
   /** @group Constructors */ case object GhostRedExposureCount extends GiapiStatusApply("GhostRedExposureCount", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:red.repeat", "ghost:dc:red.repeat", Option.empty[BigDecimal])
   /** @group Constructors */ case object GhostRedBinningRcf extends GiapiStatusApply("GhostRedBinningRcf", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:red:binx", "ghost:dc:red.rcf", Option.empty[BigDecimal])
   /** @group Constructors */ case object GhostRedBinningCcf extends GiapiStatusApply("GhostRedBinningCcf", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:red:biny", "ghost:dc:red.ccf", Option.empty[BigDecimal])
+  /** @group Constructors */ case object GhostRedUnit extends GiapiStatusApply("GhostRedUnit", Instrument.Ghost, GiapiType.Double, "ghost:sad:dc:red.unit", "ghost:dc:red.unit", None)
+  /** @group Constructors */ case object GhostRedRequestType extends GiapiStatusApply("GhostRedRequestType", Instrument.Ghost, GiapiType.String, "ghost:sad:dc:red.request_type", "ghost:dc:red.request_type", None)
+  /** @group Constructors */ case object GhostRedRepeat extends GiapiStatusApply("GhostRedRepeat", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:red.repeat", "ghost:dc:red.repeat", None)
+  /** @group Constructors */ case object GhostRedReadMode extends GiapiStatusApply("GhostRedReadMode", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:red.read_mode", "ghost:dc:red.read_mode", None)
+  /** @group Constructors */ case object GhostRedImageType extends GiapiStatusApply("GhostRedImageType", Instrument.Ghost, GiapiType.String, "ghost:sad:dc:red.imagetyp", "ghost:dc:red.imagetyp", None)
+  /** @group Constructors */ case object GhostRedDoDisplay extends GiapiStatusApply("GhostRedDoDisplay", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:red.do_display", "ghost:dc:red.do_display", None)
+  /** @group Constructors */ case object GhostRedDoFlush extends GiapiStatusApply("GhostRedDoFlush", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:red.do_flush", "ghost:dc:red.do_flush", None)
+  /** @group Constructors */ case object GhostRedDoContinuous extends GiapiStatusApply("GhostRedDoContinous", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:red.do_continuous", "ghost:dc:red.do_continuous", None)
+  /** @group Constructors */ case object GhostRedDoReadout extends GiapiStatusApply("GhostRedDoReadout", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:red.do_readout", "ghost:dc:red.do_readout", None)
+  /** @group Constructors */ case object GhostRedDoSave extends GiapiStatusApply("GhostRedDoSave", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:red.do_save", "ghost:dc:red.do_save", None)
+  /** @group Constructors */ case object GhostRedCcdType extends GiapiStatusApply("GhostRedCcdType", Instrument.Ghost, GiapiType.String, "ghost:sad:dc:red.ccd_type", "ghost:dc:red.ccd_type", None)
+  /** @group Constructors */ case object GhostRedDuration extends GiapiStatusApply("GhostRedDuration", Instrument.Ghost, GiapiType.Double, "ghost:sad:dc:red.duration", "ghost:dc:red.duration", Option.empty[BigDecimal])
+
   /** @group Constructors */ case object GhostBlueExposureTime extends GiapiStatusApply("GhostBlueExposureTime", Instrument.Ghost, GiapiType.Double, "ghost:sad:dc:blue.exposedRQ", "ghost:dc:blue.duration", Option.empty[BigDecimal])
   /** @group Constructors */ case object GhostBlueExposureCount extends GiapiStatusApply("GhostBlueExposureCount", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:blue.repeat:GhostBlue.repeat", "ghost:dc:blue.repeat", Option.empty[BigDecimal])
   /** @group Constructors */ case object GhostBlueBinningRcf extends GiapiStatusApply("GhostBlueBinningRcf", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:blue:binx", "ghost:dc:blue.rcf", Option.empty[BigDecimal])
   /** @group Constructors */ case object GhostBlueBinningCcf extends GiapiStatusApply("GhostBlueBinningCcf", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:blue:biny", "ghost:dc:blue.ccf", Option.empty[BigDecimal])
+  /** @group Constructors */ case object GhostBlueUnit extends GiapiStatusApply("GhostBlueUnit", Instrument.Ghost, GiapiType.Double, "ghost:sad:dc:blue.unit", "ghost:dc:blue.unit", None)
+  /** @group Constructors */ case object GhostBlueRequestType extends GiapiStatusApply("GhostBlueRequestType", Instrument.Ghost, GiapiType.String, "ghost:sad:dc:blue.request_type", "ghost:dc:blue.request_type", None)
+  /** @group Constructors */ case object GhostBlueRepeat extends GiapiStatusApply("GhostBlueRepeat", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:blue.repeat", "ghost:dc:blue.repeat", None)
+  /** @group Constructors */ case object GhostBlueReadMode extends GiapiStatusApply("GhostBlueReadMode", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:blue.read_mode", "ghost:dc:blue.read_mode", None)
+  /** @group Constructors */ case object GhostBlueImageType extends GiapiStatusApply("GhostBlueImageType", Instrument.Ghost, GiapiType.String, "ghost:sad:dc:blue.imagetyp", "ghost:dc:blue.imagetyp", None)
+  /** @group Constructors */ case object GhostBlueDoDisplay extends GiapiStatusApply("GhostBlueDoDisplay", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:blue.do_display", "ghost:dc:blue.do_display", None)
+  /** @group Constructors */ case object GhostBlueDoFlush extends GiapiStatusApply("GhostBlueDoFlush", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:blue.do_flush", "ghost:dc:blue.do_flush", None)
+  /** @group Constructors */ case object GhostBlueDoContinuous extends GiapiStatusApply("GhostBlueDoContinous", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:blue.do_continuous", "ghost:dc:blue.do_continuous", None)
+  /** @group Constructors */ case object GhostBlueDoReadout extends GiapiStatusApply("GhostBlueDoReadout", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:blue.do_readout", "ghost:dc:blue.do_readout", None)
+  /** @group Constructors */ case object GhostBlueDoSave extends GiapiStatusApply("GhostBlueDoSave", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:blue.do_save", "ghost:dc:blue.do_save", None)
+  /** @group Constructors */ case object GhostBlueCcdType extends GiapiStatusApply("GhostBlueCcdType", Instrument.Ghost, GiapiType.String, "ghost:sad:dc:blue.ccd_type", "ghost:dc:blue.ccd_type", None)
+  /** @group Constructors */ case object GhostBlueDuration extends GiapiStatusApply("GhostBlueDuration", Instrument.Ghost, GiapiType.Double, "ghost:sad:dc:blue.duration", "ghost:dc:blue.duration", Option.empty[BigDecimal])
+
   /** @group Constructors */ case object GhostIFU1Type extends GiapiStatusApply("GhostIFU1Type", Instrument.Ghost, GiapiType.Int, "ghost:sad:cc:cu:ifu1.type", "ghost:cc:cu:ifu1.type", Option.empty[BigDecimal])
   /** @group Constructors */ case object GhostIFU2Type extends GiapiStatusApply("GhostIFU2Type", Instrument.Ghost, GiapiType.Int, "ghost:sad:cc:cu:ifu2.type", "ghost:cc:cu:ifu2.type", Option.empty[BigDecimal])
   /** @group Constructors */ case object GhostIFU1Target extends GiapiStatusApply("GhostIFU1Target", Instrument.Ghost, GiapiType.Int, "ghost:sad:cc:cu:ifu1.target", "ghost:cc:cu:ifu1.target", Option.empty[BigDecimal])
@@ -145,10 +172,36 @@ object GiapiStatusApply {
       GhostRedExposureCount,
       GhostRedBinningRcf,
       GhostRedBinningCcf,
+      GhostRedUnit,
+      GhostRedRequestType,
+      GhostRedRepeat,
+      GhostRedReadMode,
+      GhostRedImageType,
+      GhostRedDoDisplay,
+      GhostRedDoFlush,
+      GhostRedDoContinuous,
+      GhostRedDoReadout,
+      GhostRedDoSave,
+      GhostRedDoSave,
+      GhostRedCcdType,
+      GhostRedDuration,
       GhostBlueExposureTime,
       GhostBlueExposureCount,
       GhostBlueBinningRcf,
       GhostBlueBinningCcf,
+      GhostBlueUnit,
+      GhostBlueRequestType,
+      GhostBlueRepeat,
+      GhostBlueReadMode,
+      GhostBlueImageType,
+      GhostBlueDoDisplay,
+      GhostBlueDoFlush,
+      GhostBlueDoContinuous,
+      GhostBlueDoReadout,
+      GhostBlueDoSave,
+      GhostBlueDoSave,
+      GhostBlueCcdType,
+      GhostBlueDuration,
       GhostIFU1Type,
       GhostIFU2Type,
       GhostIFU1Target,
