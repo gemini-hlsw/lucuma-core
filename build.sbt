@@ -1,4 +1,4 @@
-ThisBuild / tlBaseVersion                         := "0.41"
+ThisBuild / tlBaseVersion                         := "0.43"
 ThisBuild / tlCiReleaseBranches                   := Seq("master")
 ThisBuild / githubWorkflowEnv += "MUNIT_FLAKY_OK" -> "true"
 
@@ -16,7 +16,7 @@ lazy val kindProjectorVersion  = "0.13.2"
 lazy val monocleVersion        = "3.1.0"
 lazy val scalaJavaTimeVersion  = "2.4.0"
 lazy val geminiLocalesVersion  = "0.7.0"
-lazy val jtsVersion            = "0.2.2"
+lazy val jtsVersion            = "0.3.0"
 lazy val coulombVersion        = "0.6.0-M2"
 lazy val spireVersion          = "0.18.0"
 lazy val singletonOpsVersion   = "0.5.2"
