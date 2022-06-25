@@ -73,6 +73,7 @@ object GiapiStatusApply {
   /** @group Constructors */ case object GhostRedDoReadout extends GiapiStatusApply("GhostRedDoReadout", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:red.do_readout", "ghost:dc:red.do_readout", None)
   /** @group Constructors */ case object GhostRedDoSave extends GiapiStatusApply("GhostRedDoSave", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:red.do_save", "ghost:dc:red.do_save", None)
   /** @group Constructors */ case object GhostRedCcdType extends GiapiStatusApply("GhostRedCcdType", Instrument.Ghost, GiapiType.String, "ghost:sad:dc:red.ccd_type", "ghost:dc:red.ccd_type", None)
+  /** @group Constructors */ case object GhostRedCcdRequestType extends GiapiStatusApply("GhostRedCcdRequestType", Instrument.Ghost, GiapiType.String, "ghost:sad:dc:red.ccd_request_type", "ghost:dc:red.ccd_request_type", None)
   /** @group Constructors */ case object GhostRedDuration extends GiapiStatusApply("GhostRedDuration", Instrument.Ghost, GiapiType.Double, "ghost:sad:dc:red.duration", "ghost:dc:red.duration", Option.empty[BigDecimal])
 
   /** @group Constructors */ case object GhostBlueExposureTime extends GiapiStatusApply("GhostBlueExposureTime", Instrument.Ghost, GiapiType.Double, "ghost:sad:dc:blue.exposedRQ", "ghost:dc:blue.duration", Option.empty[BigDecimal])
@@ -90,6 +91,7 @@ object GiapiStatusApply {
   /** @group Constructors */ case object GhostBlueDoReadout extends GiapiStatusApply("GhostBlueDoReadout", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:blue.do_readout", "ghost:dc:blue.do_readout", None)
   /** @group Constructors */ case object GhostBlueDoSave extends GiapiStatusApply("GhostBlueDoSave", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:blue.do_save", "ghost:dc:blue.do_save", None)
   /** @group Constructors */ case object GhostBlueCcdType extends GiapiStatusApply("GhostBlueCcdType", Instrument.Ghost, GiapiType.String, "ghost:sad:dc:blue.ccd_type", "ghost:dc:blue.ccd_type", None)
+  /** @group Constructors */ case object GhostBlueCcdRequestType extends GiapiStatusApply("GhostBlueCcdRequestType", Instrument.Ghost, GiapiType.String, "ghost:sad:dc:blue.ccd_request_type", "ghost:dc:blue.ccd_request_type", None)
   /** @group Constructors */ case object GhostBlueDuration extends GiapiStatusApply("GhostBlueDuration", Instrument.Ghost, GiapiType.Double, "ghost:sad:dc:blue.duration", "ghost:dc:blue.duration", Option.empty[BigDecimal])
 
   /** @group Constructors */ case object GhostIFU1Type extends GiapiStatusApply("GhostIFU1Type", Instrument.Ghost, GiapiType.Int, "ghost:sad:cc:cu:ifu1.type", "ghost:cc:cu:ifu1.type", Option.empty[BigDecimal])
@@ -184,6 +186,7 @@ object GiapiStatusApply {
       GhostRedDoSave,
       GhostRedDoSave,
       GhostRedCcdType,
+      GhostRedCcdRequestType,
       GhostRedDuration,
       GhostBlueExposureTime,
       GhostBlueExposureCount,
@@ -201,6 +204,7 @@ object GiapiStatusApply {
       GhostBlueDoSave,
       GhostBlueDoSave,
       GhostBlueCcdType,
+      GhostBlueCcdRequestType,
       GhostBlueDuration,
       GhostIFU1Type,
       GhostIFU2Type,
