@@ -3,6 +3,7 @@
 
 package lucuma.core.geom.gmos
 
+import lucuma.core.enums.GuideProbe
 import lucuma.core.geom.ShapeExpression
 import lucuma.core.geom.syntax.all._
 import lucuma.core.math.Angle
@@ -39,5 +40,36 @@ trait GmosCandidatesArea {
       a <- posAngles
       o <- offsetPositions
     } yield candidatesAreaAt(a, o)).fold(ShapeExpression.Empty)(_ ∪ _)
+
+  /**
+    * GMOS inner radius
+    */
+  def innerRadius(probe: GuideProbe): ShapeExpression =
+    probe match {
+      case GuideProbe.GmosOIWFS =>
+        // 20 arcsec
+        ShapeExpression.centeredEllipse((20 * 2).arcsec, (20 * 2).arcsec)
+      case GuideProbe.PWFS1 =>
+        ShapeExpression.centeredEllipse((345 * 2).arcsec, (345 * 2).arcsec)
+      case GuideProbe.PWFS2 =>
+        ShapeExpression.centeredEllipse((315 * 2).arcsec, (315 * 2).arcsec)
+    }
+
+  /**
+    * GMOS inner radius at a given pa and offset
+    * The area is circular thus posAngle should be irrelevant but it maybe refined in the future
+    */
+  def innerRadiusAt(probe: GuideProbe, posAngle: Angle, offsetPos: Offset): ShapeExpression =
+    innerRadius(probe) ↗ offsetPos ⟲ posAngle
+
+  /**
+    * GMOS inner radius for a set of of PA and offsets
+    */
+  def innerRadiusAt(probe: GuideProbe, posAngles: List[Angle], offsetPositions: List[Offset]): ShapeExpression =
+    (for {
+      a <- posAngles
+      o <- offsetPositions
+    } yield innerRadiusAt(probe, a, o)).fold(ShapeExpression.Empty)(_ ∪ _)
+
 }
 
