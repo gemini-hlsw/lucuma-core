@@ -58,3 +58,10 @@ class ProperMotionBenchmark {
 // [info]   (min, avg, max) = (4677.622, 4752.024, 4765.228), stdev = 26.708
 // [info]   CI (99.9%): [4711.645, 4792.402] (assumes normal distribution)
 // [info] # Run complete. Total time: 00:01:45
+//
+// Inline trigonometric functions
+// [info] Result "lucuma.core.ProperMotionBenchmark.simpleRun":
+// [info]   5013.637 ±(99.9%) 5.885 ops/ms [Average]
+// [info]   (min, avg, max) = (5010.050, 5013.637, 5021.292), stdev = 3.892
+// [info]   CI (99.9%): [5007.753, 5019.522] (assumes normal distribution)
+// [info] # Run complete. Total time: 00:01:45
