@@ -23,6 +23,7 @@ import spire.std.bigDecimal._
   */
 final case class RadialVelocity private (rv: Quantity[BigDecimal, MetersPerSecond]) {
 
+  // Direct conversion via coulomb turns to be too slow
   def toDoubleKilometersPerSecond: Double = rv.value.toDouble / 1000
 
   /**

@@ -28,6 +28,7 @@ final class ProperMotionSuite extends DisciplineSuite {
         Some(Parallax.fromMicroarcseconds(10000000L))
       )
 
+    // July 4th 2022, around mid day
     val instant = Instant.ofEpochMilli(1656966489)
     assertEquals(tracking.at(instant), Some(Coordinates.fromHmsDms.getOption("11:59:57.096334 -00:00:58.073307").get))
   }

@@ -36,6 +36,7 @@ final case class ProperMotion(
 
 object ProperMotion extends ProperMotionOptics {
   final case class AngularVelocityComponent[A](μasy: Quantity[Long, MicroArcSecondPerYear]) {
+    // Direct conversion via coulomb turns to be too slow
     def toRadians: Double = (μasy.value.toDouble / (3600 * 1e6)).toRadians
 
     val masy: Quantity[Rational, MilliArcSecondPerYear] = μasy.to[Rational, MilliArcSecondPerYear]
