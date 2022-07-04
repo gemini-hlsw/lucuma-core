@@ -117,4 +117,11 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform)
       "edu.gemini.ocs" %% "edu-gemini-util-skycalc"     % "2020001.1.7" % Test,
       "com.47deg"      %% "scalacheck-toolbox-datetime" % "0.6.0"       % Test
     )
+
   )
+
+lazy val benchmarks = project
+  .in(file("modules/benchmarks"))
+  .dependsOn(core.jvm)
+  .settings(name := "lucuma-core-benchmarks")
+  .enablePlugins(NoPublishPlugin, JmhPlugin)

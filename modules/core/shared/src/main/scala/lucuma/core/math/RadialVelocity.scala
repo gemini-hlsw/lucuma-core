@@ -23,7 +23,7 @@ import spire.std.bigDecimal._
   */
 final case class RadialVelocity private (rv: Quantity[BigDecimal, MetersPerSecond]) {
 
-  def toDoubleKilometersPerSecond: Double = rv.to[Double, KilometersPerSecond].value
+  def toDoubleKilometersPerSecond: Double = rv.value.toDouble / 1000
 
   /**
     * Converts the radial velocity to a Redshift, approximate
