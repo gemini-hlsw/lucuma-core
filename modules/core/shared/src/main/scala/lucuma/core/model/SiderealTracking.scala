@@ -118,7 +118,7 @@ object SiderealTracking extends SiderealTrackingOptics {
   private type Vec3 = (Double, Double, Double)
 
   // |+| gives us addition for VecN, but we also need scalar multiplication
-  private implicit class Vec3Ops(a: Vec3) {
+  private implicit class Vec3Ops(val a: Vec3) extends AnyVal {
     def *(d: Double): Vec3 =
       (a._1 * d, a._2 * d, a._3 * d)
   }
@@ -151,17 +151,19 @@ object SiderealTracking extends SiderealTrackingOptics {
     // Break out our components
     val (ra, dec)   = baseCoordinates
     val (dRaʹ, dDec) = properMotion
+    val cosDec = cos(dec)
+    val cosRa = cos(ra)
+    val sinDec = sin(dec)
+    val sinRa = sin(ra)
 
-    if (cos(dec) != 0) {
+    if (cosDec != 0) {
 
       // See: https://app.shortcut.com/lucuma/story/1388/proper-motion-calculation
-      val dRa  =  dRaʹ / cos(dec)
+      val dRa  =  dRaʹ / cosDec
 
       // Convert to cartesian
-      val pos: Vec3 = {
-        val cd = cos(dec)
-        (cos(ra) * cd, sin(ra) * cd, sin(dec))
-      }
+      val pos: Vec3 =
+        (cosRa * cosDec, sinRa * cosDec, sinDec)
 
       // Change per year due to radial velocity and parallax. The units work out to asec/y.
       val dPos1: Vec3 =
@@ -175,9 +177,9 @@ object SiderealTracking extends SiderealTrackingOptics {
 
       // Change per year due to proper velocity
       val dPos2 = (
-        -dRa * pos._2 - dDec * cos(ra) * sin(dec),
-        dRa * pos._1 - dDec * sin(ra) * sin(dec),
-        dDec * cos(dec)
+        -dRa * pos._2 - dDec * cosRa * sinDec,
+        dRa * pos._1 - dDec * sinRa * sinDec,
+        dDec * cosDec
       )
 
       // Our new position (still in polar coordinates). `|+|` here is scalar addition provided by

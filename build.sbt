@@ -1,4 +1,4 @@
-ThisBuild / tlBaseVersion                         := "0.43"
+ThisBuild / tlBaseVersion                         := "0.44"
 ThisBuild / tlCiReleaseBranches                   := Seq("master")
 ThisBuild / githubWorkflowEnv += "MUNIT_FLAKY_OK" -> "true"
 
@@ -119,4 +119,11 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform)
       "edu.gemini.ocs" %% "edu-gemini-util-skycalc"     % "2020001.1.7" % Test cross CrossVersion.for3Use2_13 exclude("org.scala-lang.modules", "scala-xml_2.13"),
       "com.47deg"      %% "scalacheck-toolbox-datetime" % "0.6.0"       % Test
     )
+
   )
+
+lazy val benchmarks = project
+  .in(file("modules/benchmarks"))
+  .dependsOn(core.jvm)
+  .settings(name := "lucuma-core-benchmarks")
+  .enablePlugins(NoPublishPlugin, JmhPlugin)
