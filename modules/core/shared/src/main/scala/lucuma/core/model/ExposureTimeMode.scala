@@ -4,7 +4,7 @@
 package lucuma.core.model
 
 import cats.Eq
-import cats.syntax.eq._
+import cats.syntax.all._
 import eu.timepit.refined.cats._
 import eu.timepit.refined.types.numeric.NonNegInt
 import eu.timepit.refined.types.numeric.PosBigDecimal
@@ -12,6 +12,7 @@ import lucuma.core.model.NonNegDuration
 import lucuma.core.model.implicits._
 import monocle.Focus
 import monocle.Lens
+import monocle.Optional
 import monocle.Prism
 import monocle.macros.GenPrism
 
@@ -34,6 +35,39 @@ object ExposureTimeMode {
 
   val fixedExposure: Prism[ExposureTimeMode, FixedExposure] =
     GenPrism[ExposureTimeMode, FixedExposure]
+
+  val signalToNoiseValue: Optional[ExposureTimeMode, PosBigDecimal] =
+    Optional[ExposureTimeMode, PosBigDecimal] {
+      case SignalToNoise(value) => value.some
+      case FixedExposure(_, _)  => none
+    } { nnd =>
+      {
+        case s @ SignalToNoise(_)    => SignalToNoise.value.replace(nnd)(s)
+        case f @ FixedExposure(_, _) => f
+      }
+    }
+
+  val exposureCount: Optional[ExposureTimeMode, NonNegInt] =
+    Optional[ExposureTimeMode, NonNegInt] {
+      case FixedExposure(count, _) => count.some
+      case SignalToNoise(_)        => none
+    } { nni =>
+      {
+        case f @ FixedExposure(_, _) => FixedExposure.count.replace(nni)(f)
+        case s @ SignalToNoise(_)    => s
+      }
+    }
+
+  val exposureTime: Optional[ExposureTimeMode, NonNegDuration] =
+    Optional[ExposureTimeMode, NonNegDuration] {
+      case FixedExposure(_, time) => time.some
+      case SignalToNoise(_)       => none
+    } { pbd =>
+      {
+        case f @ FixedExposure(_, _) => FixedExposure.time.replace(pbd)(f)
+        case s @ SignalToNoise(_)    => s
+      }
+    }
 
   object SignalToNoise {
     val value: Lens[SignalToNoise, PosBigDecimal] = Focus[SignalToNoise](_.value)
