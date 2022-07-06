@@ -11,6 +11,7 @@ import lucuma.core.model.arb.ArbExposureTimeMode
 import lucuma.core.model.arb.ArbNonNegDuration
 import lucuma.core.model.implicits._
 import monocle.law.discipline.LensTests
+import monocle.law.discipline.OptionalTests
 import monocle.law.discipline.PrismTests
 import munit.DisciplineSuite
 
@@ -22,6 +23,11 @@ class ExposureTimeModeSuite extends DisciplineSuite {
   checkAll("Eq[ExposureTimeMode]", EqTests[ExposureTimeMode].eqv)
   checkAll("ExposureTimeMode.signalToNoise", PrismTests(ExposureTimeMode.signalToNoise))
   checkAll("ExposureTimeMode.fixedExposure", PrismTests(ExposureTimeMode.fixedExposure))
+  checkAll("ExposureTimeMode.signalToNoiseValue",
+           OptionalTests(ExposureTimeMode.signalToNoiseValue)
+  )
+  checkAll("ExposureTimeMode.exposureCount", OptionalTests(ExposureTimeMode.exposureCount))
+  checkAll("ExposureTimeMode.exposureTime", OptionalTests(ExposureTimeMode.exposureTime))
 
   checkAll("Eq[SignalToNoise]", EqTests[ExposureTimeMode.SignalToNoise].eqv)
   checkAll("SignalToNoise.value", LensTests(ExposureTimeMode.SignalToNoise.value))
