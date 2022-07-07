@@ -4,9 +4,9 @@
 package lucuma.core.math.validation
 
 import eu.timepit.refined.cats._
-import lucuma.core.math.arb._
 import lucuma.core.math.Declination
 import lucuma.core.math.HourAngle
+import lucuma.core.math.arb._
 import lucuma.core.optics.laws.discipline.ValidSplitEpiTests
 import lucuma.core.optics.laws.discipline.ValidWedgeTests
 import munit.DisciplineSuite
