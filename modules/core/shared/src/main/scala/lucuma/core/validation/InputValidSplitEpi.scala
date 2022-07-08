@@ -176,6 +176,6 @@ object InputValidSplitEpi {
     val formatter = new DecimalFormat("0.0E0")
     formatter.setRoundingMode(RoundingMode.HALF_UP)
     formatter.setMaximumFractionDigits(decimals.map(_.value).getOrElse(x.precision - 1))
-    formatter.format(x.bigDecimal)
+    formatter.format(x.bigDecimal).stripSuffix("E0").toLowerCase
   }
 }
