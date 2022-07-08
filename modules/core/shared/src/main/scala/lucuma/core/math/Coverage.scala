@@ -16,6 +16,7 @@ sealed trait Coverage {
   import Coverage.{ Empty, Range }
 
   /** Intersect this `Coverage` with another. */
+  @scala.annotation.nowarn // TODO
   def ⋂(other: Coverage): Coverage =
     (this, other) match {
       case (Empty, _) => Empty
@@ -49,6 +50,7 @@ object Coverage {
     require(min < max) // smart ctor should guarantee this
   }
 
+  @scala.annotation.nowarn // TODO
   implicit val EqCoverage: Eq[Coverage] =
     Eq.instance {
       case (Empty, Empty)                         => true

@@ -7,6 +7,7 @@ import eu.timepit.refined.auto._
 import eu.timepit.refined.cats._
 import lucuma.core.math.arb.ArbRefined
 import lucuma.core.optics.laws.discipline.ValidWedgeTests
+import lucuma.refined._
 import munit.DisciplineSuite
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
@@ -20,12 +21,12 @@ final class InputValidWedgeInstancesSuite extends DisciplineSuite {
 
   checkAll(
     "truncatedBigDecimal(2)",
-    ValidWedgeTests(InputValidWedge.truncatedBigDecimal(2)).validWedgeWith(genMaybeNumericString)
+    ValidWedgeTests(InputValidWedge.truncatedBigDecimal(2.refined)).validWedgeWith(genMaybeNumericString)
   )
 
   checkAll(
     "truncatedPosBigDecimal(2)",
-    ValidWedgeTests(InputValidWedge.truncatedPosBigDecimal(2)).validWedgeWith(genMaybeNumericString)
+    ValidWedgeTests(InputValidWedge.truncatedPosBigDecimal(2.refined)).validWedgeWith(genMaybeNumericString)
   )
 
 }

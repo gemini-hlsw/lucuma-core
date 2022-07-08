@@ -14,6 +14,7 @@ import eu.timepit.refined.types.numeric.PosBigDecimal
 import eu.timepit.refined.types.numeric.PosInt
 import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.core.optics._
+import lucuma.refined._
 import monocle.Iso
 import monocle.Prism
 
@@ -46,7 +47,7 @@ object InputValidSplitEpi {
    */
   def fromFormat[A](
     format:       Format[String, A],
-    errorMessage: NonEmptyString = "Invalid format"
+    errorMessage: NonEmptyString = "Invalid format".refined
   ): InputValidSplitEpi[A] =
     ValidSplitEpi(
       format.getOption.andThen(_.toRight(errorMessage).toEitherErrors),
@@ -58,7 +59,7 @@ object InputValidSplitEpi {
    */
   def fromPrism[A](
     prism:        Prism[String, A],
-    errorMessage: NonEmptyString = "Invalid value"
+    errorMessage: NonEmptyString = "Invalid value".refined
   ): InputValidSplitEpi[A] =
     fromFormat(Format.fromPrism(prism), errorMessage)
 
@@ -77,20 +78,20 @@ object InputValidSplitEpi {
   def refinedString[P](implicit
     v: RefinedValidate[String, P]
   ): InputValidSplitEpi[String Refined P] =
-    id.refined[P](NonEmptyChain("Invalid value"))
+    id.refined[P](NonEmptyChain("Invalid value".refined))
 
   /**
    * `InputValidSplitEpi` for `NonEmptyString`
    */
   val nonEmptyString: InputValidSplitEpi[NonEmptyString] =
-    refinedString[NonEmpty].withErrorMessage("Must be defined")
+    refinedString[NonEmpty].withErrorMessage("Must be defined".refined)
 
   /**
    * `InputValidSplitEpi` for `Int`
    */
   val int: InputValidSplitEpi[Int] =
     InputValidSplitEpi(
-      s => fixIntString(s).toIntOption.toRight(NonEmptyChain("Must be an integer")),
+      s => fixIntString(s).toIntOption.toRight(NonEmptyChain("Must be an integer".refined)),
       _.toString
     )
 
@@ -98,7 +99,7 @@ object InputValidSplitEpi {
    * Build a `InputValidSplitEpi` for `Int Refined P`
    */
   def refinedInt[P](implicit v: RefinedValidate[Int, P]): InputValidSplitEpi[Int Refined P] =
-    int.refined[P](NonEmptyChain("Invalid format"))
+    int.refined[P](NonEmptyChain("Invalid format".refined))
 
   /**
    * `InputValidSplitEpi` for `PosInt`
@@ -114,7 +115,7 @@ object InputValidSplitEpi {
    */
   val bigDecimal: InputValidSplitEpi[BigDecimal] =
     InputValidSplitEpi(
-      s => fixDecimalString(s).toBigDecimalOption.toRight(NonEmptyChain("Must be a number")),
+      s => fixDecimalString(s).toBigDecimalOption.toRight(NonEmptyChain("Must be a number".refined)),
       _.toString.toLowerCase.replace("+", "") // Strip + sign from exponent.
     )
 
@@ -124,7 +125,7 @@ object InputValidSplitEpi {
   def refinedBigDecimal[P](implicit
     v: RefinedValidate[BigDecimal, P]
   ): InputValidSplitEpi[BigDecimal Refined P] =
-    bigDecimal.refined[P](NonEmptyChain("Invalid format"))
+    bigDecimal.refined[P](NonEmptyChain("Invalid format".refined))
 
   /**
    * `InputValidSplitEpi` for `PosBigDecimal`
@@ -148,7 +149,7 @@ object InputValidSplitEpi {
   def refinedBigDecimalWithScientificNotation[P](implicit
     v: RefinedValidate[BigDecimal, P]
   ): InputValidSplitEpi[BigDecimal Refined P] =
-    bigDecimalWithScientificNotation.refined[P](NonEmptyChain("Invalid format"))
+    bigDecimalWithScientificNotation.refined[P](NonEmptyChain("Invalid format".refined))
 
   /**
    * `InputValidSplitEpi` for `PosBigDecimal`, formatting with only one integer digit.

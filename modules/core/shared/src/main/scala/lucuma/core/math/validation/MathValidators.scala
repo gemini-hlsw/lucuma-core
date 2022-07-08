@@ -10,12 +10,13 @@ import lucuma.core.math.Epoch
 import lucuma.core.math.HourAngle
 import lucuma.core.math.RightAscension
 import lucuma.core.validation._
+import lucuma.refined._
 import spire.math.Rational
 
 trait MathValidators {
 
   val epoch: InputValidSplitEpi[Epoch] =
-    InputValidSplitEpi.fromPrism(Epoch.fromString, "Invalid epoch")
+    InputValidSplitEpi.fromPrism(Epoch.fromString, "Invalid epoch".refined)
 
   val angleArcSec: InputValidSplitEpi[Angle] =
     InputValidSplitEpi(

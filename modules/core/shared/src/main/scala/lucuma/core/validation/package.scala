@@ -11,6 +11,7 @@ import eu.timepit.refined.auto._
 import eu.timepit.refined.numeric.Interval
 import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.core.optics._
+import lucuma.refined._
 
 import scala.util.Try
 
@@ -89,7 +90,7 @@ package object validation {
     /**
      * Build an `InputValidWedge[NonEmptyList[A]]` given a `InputValidWedge[A]`
      */
-    def toNel(separator: NonEmptyString = ","): InputValidWedge[NonEmptyList[A]] =
+    def toNel(separator: NonEmptyString = ",".refined): InputValidWedge[NonEmptyList[A]] =
       InputValidWedge[NonEmptyList[A]](
         _.split(separator).toList.toNel
           .toRight("Must be defined")
@@ -106,7 +107,7 @@ package object validation {
     /**
      * Build an `InputValidSplitEpi[NonEmptyList[A]]` given a `InputValidSplitEpi[A]`
      */
-    def toNel(separator: NonEmptyString = ","): InputValidSplitEpi[NonEmptyList[A]] =
+    def toNel(separator: NonEmptyString = ",".refined): InputValidSplitEpi[NonEmptyList[A]] =
       InputValidSplitEpi[NonEmptyList[A]](
         _.split(separator).toList.toNel
           .toRight("Must be defined")
