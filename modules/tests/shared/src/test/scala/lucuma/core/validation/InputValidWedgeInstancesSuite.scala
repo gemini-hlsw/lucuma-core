@@ -3,8 +3,8 @@
 
 package lucuma.core.validation
 
-import eu.timepit.refined.cats._
 import eu.timepit.refined.auto._
+import eu.timepit.refined.cats._
 import lucuma.core.math.arb.ArbRefined
 import lucuma.core.optics.laws.discipline.ValidWedgeTests
 import munit.DisciplineSuite

@@ -6,13 +6,13 @@ package lucuma.core
 import cats.data.NonEmptyChain
 import cats.data.NonEmptyList
 import cats.syntax.all._
+import eu.timepit.refined.api.Refined
 import eu.timepit.refined.auto._
+import eu.timepit.refined.numeric.Interval
 import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.core.optics._
 
 import scala.util.Try
-import eu.timepit.refined.api.Refined
-import eu.timepit.refined.numeric.Interval
 
 package object validation {
   type DigitCount = Int Refined Interval.Closed[0, 1000]
