@@ -15,7 +15,9 @@ trait ArbOffset {
 
   implicit def arbOffsetComponent[A]: Arbitrary[Offset.Component[A]] =
     Arbitrary(
-      Gen.chooseNum(-10000, 10000).map(mas => Offset.Component[A](Angle.milliarcseconds.reverseGet(mas)))
+      Gen
+        .chooseNum(-10000, 10000)
+        .map(mas => Offset.Component[A](Angle.milliarcseconds.reverseGet(mas)))
     )
 
   implicit val arbOffsetP: Arbitrary[Offset.Component[Axis.P]] = arbOffsetComponent[Axis.P]

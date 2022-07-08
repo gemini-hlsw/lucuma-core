@@ -10,6 +10,9 @@ When we compose a split mono and a split epi end-to-end in either direction we e
 
 A `Format` is a weaker `Prism` where a *subset* of `A` forms a split epi with `B`. Every `Prism` is a `Format` where the split epi happens to be an `Iso`; and every `SplitEpi` forms a `Prism` where the subset of `A` is `A` itself.
 
+A `ValidSplitEpi` is a reformulation of a `Format`, where elements of `A` that don't map to an element of `B` return an element of `E` instead. A `Format[A, B]` is a `ValidSplitEpi[Unit, A, B]`.
+
+A `ValidWedge` is to a `Wedge` what a `ValidSplitEpi` is to a `SplitEpi`. In other words, it allows for reverse normalization.
 
 ```
                Wedge[A,B]
@@ -29,4 +32,3 @@ A `Format` is a weaker `Prism` where a *subset* of `A` forms a split epi with `B
                 Iso[A,B]  ─────────────────┘
                  A = B
 ```
-
