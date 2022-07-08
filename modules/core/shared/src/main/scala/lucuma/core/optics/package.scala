@@ -12,6 +12,7 @@ import monocle.Iso
 import monocle.Prism
 
 package object optics {
+
   /** Prism from `A` into `A` with refined predicate `P`. */
   def refinedPrism[A, P](implicit v: Validate[A, P]): Prism[A, A Refined P] =
     Prism[A, A Refined P](i => refineV[P](i).toOption)(_.value)

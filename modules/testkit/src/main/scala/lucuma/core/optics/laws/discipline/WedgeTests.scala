@@ -5,6 +5,7 @@ package lucuma.core.optics.laws
 package discipline
 
 import cats.Eq
+import cats.laws.discipline._
 import lucuma.core.optics.Wedge
 import org.scalacheck.Arbitrary
 import org.scalacheck.Gen
@@ -48,10 +49,10 @@ trait WedgeTests[A, B] extends Laws {
     new SimpleRuleSet("Wedge", allProps: _*)
 
   /** Convenience constructor that allows passing an explicit generator for input values. */
-  def splitMonoWith(ga: Gen[A])(implicit
-    ea:                 Eq[A],
-    ab:                 Arbitrary[B],
-    eb:                 Eq[B]
+  def wedgeWith(ga: Gen[A])(implicit
+    ea:             Eq[A],
+    ab:             Arbitrary[B],
+    eb:             Eq[B]
   ): RuleSet =
     wedge(Arbitrary(ga), ea, ab, eb)
 
