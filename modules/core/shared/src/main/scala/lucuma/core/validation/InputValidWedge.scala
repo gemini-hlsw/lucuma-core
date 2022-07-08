@@ -12,9 +12,6 @@ import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.core.optics._
 import monocle.Iso
 import monocle.Prism
-import singleton.ops._
-
-import scala.annotation.unused
 
 /**
  * Convenience version of `ValidWedge` when the error type is `NonEmptyChain[NonEmptyString]` and
@@ -69,15 +66,12 @@ object InputValidWedge {
   /**
    * Build a `InputValidWedge` for `BigDecimal` truncated to `Dec` decimals.
    */
-  def truncatedBigDecimal[Dec <: XInt](implicit
-    @unused req: Require[&&[Dec >= 0, Dec < 10]],
-    vo:          ValueOf[Dec]
-  ): InputValidWedge[BigDecimal] =
+  def truncatedBigDecimal(decimals: DigitCount): InputValidWedge[BigDecimal] =
     InputValidWedge(
       InputValidSplitEpi.bigDecimal.getValid
-        .andThen(_.map(_.setScale(vo.value, scala.math.BigDecimal.RoundingMode.HALF_UP))),
+        .andThen(_.map(_.setScale(decimals.value, scala.math.BigDecimal.RoundingMode.HALF_UP))),
       bd =>
-        s"%.${vo.value}f"
+        s"%.${decimals.value}f"
           .format(bd)
           .replaceAll("^-0\\.(0+)$", "0.$1") // Remove negative 0
     )
@@ -88,16 +82,13 @@ object InputValidWedge {
   /**
    * Build a `InputValidWedge` for `PosBigDecimal` truncated to `Dec` decimals.
    */
-  def truncatedPosBigDecimal[Dec <: XInt](implicit
-    @unused req: Require[&&[Dec >= 0, Dec < 10]],
-    vo:          ValueOf[Dec]
-  ): InputValidWedge[PosBigDecimal] = {
-    val base     = truncatedBigDecimal.andThen(
+  def truncatedPosBigDecimal(decimals: DigitCount): InputValidWedge[PosBigDecimal] = {
+    val base     = truncatedBigDecimal(decimals).andThen(
       ValidWedge.forRefined[NonEmptyChain[NonEmptyString], BigDecimal, Positive](
         NonEmptyChain("Invalid format")
       )
     )
-    val minValue = "0." + "0" * (vo.value - 1) + "1"
+    val minValue = "0." + "0" * (decimals.value - 1) + "1"
 
     InputValidWedge(
       base.getValid,

@@ -13,16 +13,12 @@ import monocle.Iso
 import monocle.Prism
 
 /**
- * A `ValidWedge` is to a `Wedge` what `ValidSplitEpi` is to a `SplitEpi`.
- */
-
-/**
  * A validating and normalizing optic. It is to a `Wedge` what `ValidSplitEpi` is to a `SplitEpi`.
  *
  * Composition with stronger optics yields another `ValidWedge`, and require providing an `E`
  * instance for the invalid cases (except when composing with `ValidSplitEpi`).
  */
-abstract class ValidWedge[E, A, B] extends Serializable { self =>
+abstract class ValidWedge[E, A, B] extends ValidFormat[E, A, B] with Serializable { self =>
   val getValid: A => Either[E, B]
 
   val reverseGet: B => A

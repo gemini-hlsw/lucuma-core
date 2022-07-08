@@ -11,8 +11,12 @@ import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.core.optics._
 
 import scala.util.Try
+import eu.timepit.refined.api.Refined
+import eu.timepit.refined.numeric.Interval
 
 package object validation {
+  type DigitCount = Int Refined Interval.Closed[0, 1000]
+
   // Convenience type aliases
   type Errors = NonEmptyChain[NonEmptyString]
 
@@ -20,12 +24,14 @@ package object validation {
   type EitherErrors[A] = EitherNec[NonEmptyString, A]
 
   // The `Input` types fix the input type to `String` and the error type to `Errors`.
-
   type ValidSplitEpiNec[E, A, B] = ValidSplitEpi[NonEmptyChain[E], A, B]
   type InputValidSplitEpi[A]     = ValidSplitEpiNec[NonEmptyString, String, A]
 
   type ValidWedgeNec[E, A, B] = ValidWedge[NonEmptyChain[E], A, B]
   type InputValidWedge[A]     = ValidWedgeNec[NonEmptyString, String, A]
+
+  type ValidFormatNec[E, A, B] = ValidFormat[NonEmptyChain[E], A, B]
+  type InputValidFormat[A]     = ValidFormatNec[NonEmptyString, String, A]
 
   implicit class StringParseOps(val s: String) extends AnyVal {
 

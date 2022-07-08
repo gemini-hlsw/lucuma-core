@@ -4,6 +4,7 @@
 package lucuma.core.validation
 
 import eu.timepit.refined.cats._
+import eu.timepit.refined.auto._
 import lucuma.core.math.arb.ArbRefined
 import lucuma.core.optics.laws.discipline.ValidWedgeTests
 import munit.DisciplineSuite
@@ -18,13 +19,13 @@ final class InputValidWedgeInstancesSuite extends DisciplineSuite {
     Gen.frequency(5 -> genNumericString, 1 -> arbitrary[String])
 
   checkAll(
-    "truncatedBigDecimal[2]",
-    ValidWedgeTests(InputValidWedge.truncatedBigDecimal[2]).validWedgeWith(genMaybeNumericString)
+    "truncatedBigDecimal(2)",
+    ValidWedgeTests(InputValidWedge.truncatedBigDecimal(2)).validWedgeWith(genMaybeNumericString)
   )
 
   checkAll(
-    "truncatedPosBigDecimal[2]",
-    ValidWedgeTests(InputValidWedge.truncatedPosBigDecimal[2]).validWedgeWith(genMaybeNumericString)
+    "truncatedPosBigDecimal(2)",
+    ValidWedgeTests(InputValidWedge.truncatedPosBigDecimal(2)).validWedgeWith(genMaybeNumericString)
   )
 
 }

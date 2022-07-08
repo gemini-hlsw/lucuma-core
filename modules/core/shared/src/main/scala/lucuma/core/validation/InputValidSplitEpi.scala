@@ -22,7 +22,7 @@ import java.text.DecimalFormat
 import scala.util.Try
 
 /**
- * Convenience version of `ValidFormat` when the error type is `NonEmptyChain[NonEmptyString]` and
+ * Convenience version of `ValidSplitEpi` when the error type is `NonEmptyChain[NonEmptyString]` and
  * `T` is `String`.
  */
 object InputValidSplitEpi {
@@ -169,10 +169,13 @@ object InputValidSplitEpi {
     case _   => str
   }
 
-  private def scientificNotationFormat(x: BigDecimal, decimals: Option[Int] = none): String = {
+  private def scientificNotationFormat(
+    x:        BigDecimal,
+    decimals: Option[DigitCount] = none
+  ): String = {
     val formatter = new DecimalFormat("0.0E0")
     formatter.setRoundingMode(RoundingMode.HALF_UP)
-    formatter.setMaximumFractionDigits(decimals.getOrElse(x.precision - 1))
+    formatter.setMaximumFractionDigits(decimals.map(_.value).getOrElse(x.precision - 1))
     formatter.format(x.bigDecimal)
   }
 }

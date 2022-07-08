@@ -22,7 +22,7 @@ import monocle.Prism
  * Composition with `Format` or stronger optics (`Prism` and `Iso`) yields another `ValidSplitEpi`,
  * and require providing an `E` instance for the invalid cases.
  */
-abstract class ValidSplitEpi[E, A, B] extends Serializable { self =>
+abstract class ValidSplitEpi[E, A, B] extends ValidFormat[E, A, B] with Serializable { self =>
   val getValid: A => Either[E, B]
 
   val reverseGet: B => A
@@ -46,6 +46,10 @@ abstract class ValidSplitEpi[E, A, B] extends Serializable { self =>
       getValid.andThen(_.leftMap(_ => e)),
       reverseGet
     )
+
+  /** Build a `Format` with the same funcionality, discarding the `E` instances. */
+  def asFormat: Format[A, B] =
+    Format(a => getValid(a).toOption, reverseGet)
 
   /** Build a `ValidWedge` with the same functionality. */
   def asValidWedge: ValidWedge[E, A, B] =
