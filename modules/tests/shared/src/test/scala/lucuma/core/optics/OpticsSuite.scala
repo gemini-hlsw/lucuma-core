@@ -3,7 +3,7 @@
 
 package lucuma.core.optics
 
-import coulomb.cats.quantity.given
+import coulomb.ops.algebra.cats.all.given
 import coulomb.units.accepted.Percent
 import eu.timepit.refined.cats._
 import eu.timepit.refined.collection.NonEmpty

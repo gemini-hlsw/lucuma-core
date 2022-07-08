@@ -6,7 +6,7 @@ package lucuma.core.model
 import cats.Eq
 import cats.implicits._
 import coulomb.*
-import coulomb.cats.quantity.given
+import coulomb.ops.algebra.cats.all.given
 import coulomb.syntax.*
 import eu.timepit.refined.cats._
 import eu.timepit.refined.types.numeric.PosBigDecimal

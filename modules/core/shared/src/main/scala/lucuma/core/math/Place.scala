@@ -6,7 +6,7 @@ package lucuma.core.math
 import cats.Eq
 import cats.Show
 import coulomb.*
-import coulomb.cats.quantity.given
+import coulomb.ops.algebra.cats.all.given
 import coulomb.syntax.*
 import coulomb.units.si.Meter
 import eu.timepit.refined.cats._

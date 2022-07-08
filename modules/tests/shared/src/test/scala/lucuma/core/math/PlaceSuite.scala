@@ -5,7 +5,7 @@ package lucuma.core.math
 
 import cats.Show
 import cats.kernel.laws.discipline.EqTests
-import coulomb.cats.quantity.given
+import coulomb.ops.algebra.cats.all.given
 import eu.timepit.refined.auto._
 import eu.timepit.refined.cats._
 import eu.timepit.refined.scalacheck.numeric._

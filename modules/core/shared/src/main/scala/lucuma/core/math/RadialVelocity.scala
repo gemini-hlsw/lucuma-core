@@ -5,7 +5,7 @@ package lucuma.core.math
 
 import cats._
 import coulomb.*
-import coulomb.cats.quantity.given
+import coulomb.ops.algebra.cats.all.given
 import coulomb.policy.spire.standard.given
 import coulomb.syntax.*
 import coulomb.units.si.{_, given}

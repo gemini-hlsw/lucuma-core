@@ -8,7 +8,7 @@ import cats.Order
 import cats.data.NonEmptyMap
 import cats.implicits._
 import coulomb.*
-import coulomb.cats.quantity.given
+import coulomb.ops.algebra.cats.all.given
 import coulomb.syntax.*
 import coulomb.units.si.Kelvin
 import eu.timepit.refined.cats._
