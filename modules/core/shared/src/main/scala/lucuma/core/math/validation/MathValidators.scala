@@ -19,7 +19,7 @@ trait MathValidators {
     InputValidSplitEpi.fromPrism(Epoch.fromString, "Invalid epoch".refined)
 
   val epochNoScheme:InputValidWedge[Epoch] = 
-    InputValidWedge.fromFormat(Epoch.fromStringNoScheme, "Invalid epoch")
+    InputValidWedge.fromFormat(Epoch.fromStringNoScheme, "Invalid epoch".refined)
 
   val angleArcSec: InputValidSplitEpi[Angle] =
     InputValidSplitEpi(
