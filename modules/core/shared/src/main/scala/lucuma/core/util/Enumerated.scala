@@ -62,10 +62,10 @@ object Enumerated {
     }
 
   @inline
-  def from[A](a: A, as: A*): Applied[A] = new Applied(a :: as.toList)
-  def fromNEL[A](as: NonEmptyList[A]): Applied[A]   = new Applied(as.toList)
+  def from[A](a: A, as: A*): Applied[A]           = new Applied(a :: as.toList)
+  def fromNEL[A](as: NonEmptyList[A]): Applied[A] = new Applied(as.toList)
 
-  class Applied[A] private[Enumerated] (val as: List[A]) extends AnyVal {
+  class Applied[A] private[Enumerated] (private val as: List[A]) extends AnyVal {
     def withTag(f: A => String): Enumerated[A] =
       new Enumerated[A] {
         def all: List[A]      = as

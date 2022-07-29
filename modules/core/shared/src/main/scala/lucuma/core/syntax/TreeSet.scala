@@ -5,7 +5,7 @@ package lucuma.core.syntax
 
 import scala.collection.immutable.TreeSet
 
-final class TreeSetCompanionOps(val self: TreeSet.type) extends AnyVal {
+final class TreeSetCompanionOps(private val self: TreeSet.type) extends AnyVal {
 
   /** Creates a `TreeSet` from a `List`, provided an `Ordering` is available. */
   def fromList[A: Ordering](lst: List[A]): TreeSet[A] =

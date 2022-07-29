@@ -5,7 +5,7 @@ package lucuma.core.math.syntax
 
 import lucuma.core.math.Angle
 
-final class IntOps(val self: Int) extends AnyVal {
+final class IntOps(private val self: Int) extends AnyVal {
 
   private def scaled(µas: Long): Angle =
     Angle.signedMicroarcseconds.reverseGet(self.toLong * µas)

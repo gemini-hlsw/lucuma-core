@@ -79,12 +79,12 @@ object Measure extends MeasureLowPriority {
       tagged
     }
 
-  implicit class TaggedMeasureOps[N, T](val measure: Measure[N] Of T) extends AnyVal {
+  implicit class TaggedMeasureOps[N, T](private val measure: Measure[N] Of T) extends AnyVal {
     def withError(error: N): Measure[N] Of T = Measure.errorTagged.replace(error.some)(measure)
     def exact: Measure[N] Of T               = Measure.errorTagged.replace(none)(measure)
   }
 
-  implicit class MeasureOps[N](val measure: Measure[N]) extends AnyVal {
+  implicit class MeasureOps[N](private val measure: Measure[N]) extends AnyVal {
 
     /** Add an error value. */
     def withError(error: N): Measure[N] = Measure.error.replace(error.some)(measure)

@@ -7,7 +7,7 @@ import cats.data.State
 import lucuma.core.optics.state.all._
 import monocle.Optional
 
-final class OptionalOps[S, A](val self: Optional[S, A]) extends AnyVal {
+final class OptionalOps[S, A](private val self: Optional[S, A]) extends AnyVal {
 
   def edit(a: A): State[S, Option[A]] =
     self.assign(a)

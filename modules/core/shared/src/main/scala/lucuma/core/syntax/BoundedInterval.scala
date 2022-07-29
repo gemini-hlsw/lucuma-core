@@ -9,7 +9,7 @@ import cats.Order
 import cats.syntax.all._
 import spire.math.Bounded
 import spire.math.Interval
-final class BoundedIntervalOps[A](val self: Bounded[A]) extends AnyVal {
+final class BoundedIntervalOps[A](private val self: Bounded[A]) extends AnyVal {
 
   /** True if this and the other interval abut each other. */
   def abuts(other: Bounded[A])(implicit order: Order[A]): Boolean =
@@ -18,8 +18,8 @@ final class BoundedIntervalOps[A](val self: Bounded[A]) extends AnyVal {
   /**
    * Join two abutting or overlapping intervals.
    *
-   * This operation is only defined if the two intervals overlap
-   * or abut each other, i.e. in all cases where adding the two intervals results in one single interval.
+   * This operation is only defined if the two intervals overlap or abut each other, i.e. in all
+   * cases where adding the two intervals results in one single interval.
    */
   def join(other: Bounded[A])(implicit order: Order[A]): Option[Bounded[A]] =
     if (self.intersects(other) || abuts(other))
@@ -28,7 +28,7 @@ final class BoundedIntervalOps[A](val self: Bounded[A]) extends AnyVal {
       none
 }
 
-final class BoundedModuleOps(val self: Bounded.type) extends AnyVal {
+final class BoundedModuleOps(private val self: Bounded.type) extends AnyVal {
   def unsafeOpenUpper[A: Order](lower: A, upper: A): Bounded[A] =
     Interval.openUpper(lower, upper).asInstanceOf[Bounded[A]]
 

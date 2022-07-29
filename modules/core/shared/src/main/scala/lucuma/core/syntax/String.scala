@@ -7,13 +7,13 @@ import spire.math.Rational
 
 import java.util.regex.Pattern
 
-final class StringOps(val self: String) extends AnyVal {
+final class StringOps(private val self: String) extends AnyVal {
 
   private def parse[A](f: String => A): Option[A] =
     try Some(f(self))
     catch { case _: IllegalArgumentException => None }
 
-  def parseShortOption: Option[Short] = parse(_.toShort)
+  def parseShortOption: Option[Short]           = parse(_.toShort)
   def parseIntOption: Option[Int]               = parse(_.toInt)
   def parseLongOption: Option[Long]             = parse(_.toLong)
   def parseDoubleOption: Option[Double]         = parse(_.toDouble)
@@ -22,20 +22,20 @@ final class StringOps(val self: String) extends AnyVal {
   def parseRationalOption: Option[Rational]     = parse(Rational(_))
 
   /**
-    * Converts the `String` to "snake case" (eg "foo_bar").
-    */
+   * Converts the `String` to "snake case" (eg "foo_bar").
+   */
   def toSnakeCase: String =
     StringOps.snakeCaseTransformation(self)
 
   /**
-    * Converts the `String` to "screaming snake case" (eg "FOO_BAR").
-    */
+   * Converts the `String` to "screaming snake case" (eg "FOO_BAR").
+   */
   def toScreamingSnakeCase: String =
     StringOps.screamingSnakeCaseTransformation(self)
 
   /**
-    * Converts the `String` to "kebab case" (eg "foo-bar").
-    */
+   * Converts the `String` to "kebab case" (eg "foo-bar").
+   */
   def toKebabCase: String =
     StringOps.kebabCaseTransformation(self)
 
