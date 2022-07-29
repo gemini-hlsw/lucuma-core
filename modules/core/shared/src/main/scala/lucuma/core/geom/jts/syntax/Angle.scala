@@ -7,7 +7,7 @@ import lucuma.core.math.Angle
 
 // Syntax used in the JTS implementation only.
 
-final class AngleOps(val self: Angle) extends AnyVal {
+final class AngleOps(private val self: Angle) extends AnyVal {
   def µas: Long =
     Angle.signedMicroarcseconds.get(self)
 }

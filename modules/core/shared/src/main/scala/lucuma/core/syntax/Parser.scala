@@ -7,7 +7,7 @@ import atto._
 
 import Atto._
 
-final class ParserOps[A](val self: Parser[A]) extends AnyVal {
+final class ParserOps[A](private val self: Parser[A]) extends AnyVal {
 
   /** Parse entire input into an Option. */
   def parseExact(s: String): Option[A] =

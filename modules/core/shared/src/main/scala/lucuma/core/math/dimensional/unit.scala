@@ -63,7 +63,7 @@ object Units {
   implicit def displayTaggedUnits[T]: Display[Units Of T] =
     Display[Units].narrow
 
-  implicit class TaggedUnitsOps[T](val units: Units Of T) extends AnyVal {
+  implicit class TaggedUnitsOps[T](private val units: Units Of T) extends AnyVal {
 
     /**
      * Create a `Measure` with the specified value, keeping the runtime represantation of the units,
@@ -94,7 +94,7 @@ object UnitOfMeasure {
   implicit def unitOfMeasureFromUnitString[U](implicit
     full: ShowUnitFull[U],
     abbv: ShowUnit[U],
-    s:  TypeString[U]
+    s:    TypeString[U]
   ): UnitOfMeasure[U] =
     UnitOfMeasure(full.value, abbv.value, s.serialized)
 

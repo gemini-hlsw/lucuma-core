@@ -15,7 +15,7 @@ import offset._
 
 // Syntax used in the JTS implementation only.
 
-final class OffsetOps(val self: Offset) extends AnyVal {
+final class OffsetOps(private val self: Offset) extends AnyVal {
 
   def µas: (Long, Long) =
     (self.p.toAngle.µas, self.q.toAngle.µas)

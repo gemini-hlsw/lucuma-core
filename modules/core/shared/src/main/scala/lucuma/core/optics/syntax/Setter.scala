@@ -7,7 +7,7 @@ import cats.data.State
 import lucuma.core.optics.state.all._
 import monocle.Setter
 
-final class SetterOps[S, A](val self: Setter[S, A]) extends AnyVal {
+final class SetterOps[S, A](private val self: Setter[S, A]) extends AnyVal {
 
   def edit(a: A): State[S, Unit] =
     self.assign_(a)
