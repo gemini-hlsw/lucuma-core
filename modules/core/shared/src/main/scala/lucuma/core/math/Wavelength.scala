@@ -59,6 +59,16 @@ final case class Wavelength(toPicometers: Quantity[PosInt, Picometer]) {
 
   def angstrom: Quantity[Rational, Angstrom] = Å
 
+  /**
+    * Addition, with result constrained to Wavelength.Max
+    */
+  def +(that: Wavelength): Wavelength = Wavelength.plus(this, that)
+  
+  /**
+    * Subtraction, with result constrained to Wavelength.Min
+    */
+  def -(that: Wavelength): Wavelength = Wavelength.minus(this, that)
+
   override def toString: String =
     s"Wavelength(${toPicometers.show})"
 
@@ -125,6 +135,25 @@ object Wavelength {
     refineV[Positive](a).toOption.flatMap(a =>
       Option.when(a.value <= MaxAngstrom)(Wavelength(a.withUnit[Angstrom]))
     )
+
+  /**
+   * Adds 2 Wavelengths, constraining new value to Wavelength.Max
+   * @group operator
+   */
+  def plus(a: Wavelength, b: Wavelength): Wavelength = {
+    val newPico = a.toPicometers.value.value + b.toPicometers.value.value
+    Wavelength.fromInt(newPico).getOrElse(Wavelength.Max)
+  }
+
+  /**
+   * Subracts Wavelength b from Wavelength a, constraining new value to Wavelength.Min
+   * @group operator
+   */
+  def minus(a: Wavelength, b: Wavelength): Wavelength = {
+    val newPico = a.toPicometers.value.value - b.toPicometers.value.value
+    Wavelength.fromInt(newPico).getOrElse(Wavelength.Min)
+  }
+    
 
   /**
    * Prism from Int in pm into Wavelength and back.

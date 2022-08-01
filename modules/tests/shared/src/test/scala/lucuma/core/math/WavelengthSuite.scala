@@ -94,6 +94,30 @@ final class WavelengthSuite extends munit.DisciplineSuite {
     assertEquals(Wavelength.fromAngstroms(Wavelength.MaxAngstrom + 1),  none)
   }
 
+  test("Addition") {
+    forAll { (a: Wavelength, b: Wavelength) =>
+      val newPico = a.toPicometers.value.value.toLong + b.toPicometers.value.value.toLong
+      val newWavelength = 
+        if (newPico.isValidInt && newPico.toInt <= Wavelength.Max.toPicometers.value.value) 
+          Wavelength.unsafeFromInt(newPico.toInt)
+        else Wavelength.Max
+      assertEquals(Wavelength.plus(a, b), newWavelength)
+      assertEquals(a + b, newWavelength)
+    }
+  }
+
+  test("Subtraction") {
+    forAll { (a: Wavelength, b: Wavelength) =>
+      val newPico = a.toPicometers.value.value - b.toPicometers.value.value
+      val newWavelength = 
+        if (newPico >= Wavelength.Min.toPicometers.value.value)
+          Wavelength.unsafeFromInt(newPico)
+        else Wavelength.Min
+      assertEquals(Wavelength.minus(a, b), newWavelength)
+      assertEquals(a - b, newWavelength)
+    }
+  }
+
   private def testFormat[U](scale: Int, format: Format[BigDecimal, Wavelength])(toRational: Wavelength => Quantity[Rational, U]) =
     forAll { (w: Wavelength) =>
       assertEquals(format.getOption(toRational(w).value.toBigDecimal(scale, RoundingMode.HALF_UP)),  w.some)
