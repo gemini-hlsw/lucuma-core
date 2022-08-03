@@ -157,32 +157,6 @@ trait units {
     }
   }
 
-  // // This can build a converter for units that use PosInt but they are exact only
-  // // if the coef is more than 1 and whole, i.e. going from Nanometer to Picometer
-  // // The reverse is not true, remaining in the PosInt domain we can't ensure we can go from
-  // // Picometer to Nanometer without loosing precision
-  // // Thus we shouldn't make this implicit by default~
-  // def unsafePosIntConverter[U1, U2](implicit
-  //   cu: ConvertableUnits[U1, U2]
-  // ): UnitConverter[PosInt, U1, PosInt, U2] =
-  //   new UnitConverter[PosInt, U1, PosInt, U2] {
-  //     @inline def vcnv(v: PosInt): PosInt =
-  //       // We only allow the conversion if the coef is more than one and exact
-  //       if (cu.coef.compareToOne > 0 && cu.coef.isWhole)
-  //         // given the check above this should be positive and the refinement should always succeed
-  //         refineV[Positive]((cu.coef * v.value).toInt).getOrElse(sys.error(s"Shouldn't happen"))
-  //       else
-  //         sys.error(s"Cannot convert exactly with coef ${cu.coef}")
-
-  //   }
-
-  // // Implicit conversions that can be exact as Pico/Nano/Angstrom are multiples of 10
-  // implicit val convNP: UnitConverter[PosInt, Nanometer, PosInt, Picometer] =
-  //   unsafePosIntConverter[Nanometer, Picometer]
-
-  // implicit val convAP: UnitConverter[PosInt, Angstrom, PosInt, Picometer] =
-  //   unsafePosIntConverter[Angstrom, Picometer]
-
 }
 
 object units extends units
