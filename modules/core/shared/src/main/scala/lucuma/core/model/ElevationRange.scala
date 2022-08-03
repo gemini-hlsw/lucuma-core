@@ -28,6 +28,8 @@ object ElevationRange {
   ) extends ElevationRange
 
   object AirMass {
+    // manually create witnesses, since refined macro not working in scala 3
+    // these are necessary to implement RefinedTypeOps
     val MinValue = BigDecimal(1.0)
     given WitnessAs[MinValue.type, BigDecimal] = WitnessAs(MinValue, MinValue)
     val MaxValue = BigDecimal(3.0)
