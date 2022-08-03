@@ -3,10 +3,6 @@
 
 package lucuma.core.math
 
-import _root_.spire.math._
-import coulomb./
-import coulomb.^
-import coulomb.*
 import coulomb.*
 import coulomb.conversion.TruncatingUnitConversion
 import coulomb.conversion.ValueConversion
@@ -26,6 +22,7 @@ import eu.timepit.refined.types.numeric.NonNegInt
 import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.util.TypeString
 import lucuma.refined._
+import spire.math._
 
 trait units {
 
