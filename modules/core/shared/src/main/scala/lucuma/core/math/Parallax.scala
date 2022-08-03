@@ -13,7 +13,7 @@ import eu.timepit.refined.auto._
 import eu.timepit.refined.cats._
 import eu.timepit.refined.numeric._
 import eu.timepit.refined.refineV
-import lucuma.core.math.units.{*, given}
+import lucuma.core.math.units.{_, given}
 import lucuma.core.optics._
 import spire.math.Rational
 import spire.std.long._

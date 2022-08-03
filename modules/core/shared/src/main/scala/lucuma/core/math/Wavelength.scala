@@ -14,7 +14,7 @@ import eu.timepit.refined.auto._
 import eu.timepit.refined.cats._
 import eu.timepit.refined.numeric._
 import eu.timepit.refined.types.numeric.PosInt
-import lucuma.core.math.units.{*, given}
+import lucuma.core.math.units.{_, given}
 import lucuma.core.optics.Format
 import monocle.Iso
 import monocle.Prism
