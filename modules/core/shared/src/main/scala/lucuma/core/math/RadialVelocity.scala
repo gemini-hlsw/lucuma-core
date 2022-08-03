@@ -8,7 +8,7 @@ import coulomb.*
 import coulomb.ops.algebra.cats.all.given
 import coulomb.policy.spire.standard.given
 import coulomb.syntax.*
-import coulomb.units.si.{_, given}
+import coulomb.units.si.{*, given}
 import lucuma.core.math.Constants.SpeedOfLight
 import lucuma.core.math.units._
 import lucuma.core.optics.Format

@@ -8,7 +8,7 @@ import coulomb.*
 import coulomb.ops.algebra.cats.all.given
 import coulomb.policy.spire.standard.given
 import coulomb.syntax.*
-import coulomb.units.constants.{_, given}
+import coulomb.units.constants.{*, given}
 import lucuma.core.math.units._
 import lucuma.core.optics.Wedge
 import monocle.Iso
