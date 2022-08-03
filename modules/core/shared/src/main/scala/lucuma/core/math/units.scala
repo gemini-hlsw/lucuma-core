@@ -147,7 +147,7 @@ trait units {
 
   inline given [UF, UT]: TruncatingUnitConversion[PosInt, UF, UT] = v =>
     refineV[Positive](coulomb.conversion.standard.unit.ctx_TUC_Int(v))
-      .getOrElse(refineMV[Int, Positive](1))
+      .getOrElse(1.refined[Positive])
 
   extension [A](inline a: A)
     inline def withRefinedUnit[P, U](using inline p: Predicate[A, P]): Quantity[Refined[A, P], U] = refineMV(a).withUnit[U]

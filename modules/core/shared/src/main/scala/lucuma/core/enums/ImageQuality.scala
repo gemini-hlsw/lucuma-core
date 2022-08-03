@@ -25,15 +25,15 @@ sealed abstract class ImageQuality(val toDeciArcSeconds: Quantity[PosInt, DeciAr
 }
 
 object ImageQuality {
-  case object PointOne     extends ImageQuality(refineMV[Int, Positive](1).withUnit[DeciArcSecond])
-  case object PointTwo     extends ImageQuality(refineMV[Int, Positive](2).withUnit[DeciArcSecond])
-  case object PointThree   extends ImageQuality(refineMV[Int, Positive](3).withUnit[DeciArcSecond])
-  case object PointFour    extends ImageQuality(refineMV[Int, Positive](4).withUnit[DeciArcSecond])
-  case object PointSix     extends ImageQuality(refineMV[Int, Positive](6).withUnit[DeciArcSecond])
-  case object PointEight   extends ImageQuality(refineMV[Int, Positive](8).withUnit[DeciArcSecond])
-  case object OnePointZero extends ImageQuality(refineMV[Int, Positive](10).withUnit[DeciArcSecond])
-  case object OnePointFive extends ImageQuality(refineMV[Int, Positive](15).withUnit[DeciArcSecond])
-  case object TwoPointZero extends ImageQuality(refineMV[Int, Positive](20).withUnit[DeciArcSecond])
+  case object PointOne     extends ImageQuality(1.refined[Positive].withUnit[DeciArcSecond])
+  case object PointTwo     extends ImageQuality(2.refined[Positive].withUnit[DeciArcSecond])
+  case object PointThree   extends ImageQuality(3.refined[Positive].withUnit[DeciArcSecond])
+  case object PointFour    extends ImageQuality(4.refined[Positive].withUnit[DeciArcSecond])
+  case object PointSix     extends ImageQuality(6.refined[Positive].withUnit[DeciArcSecond])
+  case object PointEight   extends ImageQuality(8.refined[Positive].withUnit[DeciArcSecond])
+  case object OnePointZero extends ImageQuality(10.refined[Positive].withUnit[DeciArcSecond])
+  case object OnePointFive extends ImageQuality(15.refined[Positive].withUnit[DeciArcSecond])
+  case object TwoPointZero extends ImageQuality(20.refined[Positive].withUnit[DeciArcSecond])
 
   implicit val ImageQualityEnumerated: Enumerated[ImageQuality] =
     Enumerated.of(PointOne,
