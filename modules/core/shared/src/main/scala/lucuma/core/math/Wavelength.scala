@@ -21,6 +21,7 @@ import monocle.Prism
 import spire.math.Rational
 
 import java.math.RoundingMode
+import scala.annotation.targetName
 import scala.util.Try
 
 /**
@@ -81,7 +82,8 @@ object Wavelength {
     * Construct a wavelength from a positive int
     * @group constructor
     */
-  def apply(picometers: PosInt)(using DummyImplicit): Wavelength =
+  @targetName("applyPicometers") // to distinguish from apply(Quantity[PosInt, Picometer])
+  def apply(picometers: PosInt): Wavelength =
     new Wavelength(picometers.withUnit[Picometer])
 
   /** @group Typeclass Instances */
