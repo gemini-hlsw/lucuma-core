@@ -5,7 +5,7 @@ package lucuma.core.model.sequence.arb
 
 import cats.syntax.all._
 import lucuma.core.model.sequence.Atom
-import lucuma.core.model.sequence.Step
+import lucuma.core.model.sequence.FutureStep
 import lucuma.core.util.arb.ArbUid
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary._
@@ -14,27 +14,27 @@ import org.scalacheck.Gen
 
 trait ArbAtom {
   import ArbUid._
-  import ArbStep._
+  import ArbFutureStep._
 
   implicit val arbAtomGmosNorth: Arbitrary[Atom.GmosNorth] = Arbitrary(
     for {
       id    <- arbitrary[Atom.Id]
-      steps <- arbitrary[List[Step.GmosNorth]]
+      steps <- arbitrary[List[FutureStep.GmosNorth]]
     } yield Atom.GmosNorth(id, steps)
   )
 
   implicit val cogAtomGmosNorth: Cogen[Atom.GmosNorth] =
-    Cogen[(Atom.Id, List[Step.GmosNorth])].contramap(a => (a.id, a.steps))
+    Cogen[(Atom.Id, List[FutureStep.GmosNorth])].contramap(a => (a.id, a.steps))
 
   implicit val arbAtomGmosSouth: Arbitrary[Atom.GmosSouth] = Arbitrary(
     for {
       id    <- arbitrary[Atom.Id]
-      steps <- arbitrary[List[Step.GmosSouth]]
+      steps <- arbitrary[List[FutureStep.GmosSouth]]
     } yield Atom.GmosSouth(id, steps)
   )
 
   implicit val cogAtomGmosSouth: Cogen[Atom.GmosSouth] =
-    Cogen[(Atom.Id, List[Step.GmosSouth])].contramap(a => (a.id, a.steps))
+    Cogen[(Atom.Id, List[FutureStep.GmosSouth])].contramap(a => (a.id, a.steps))
 
   implicit val arbAtom: Arbitrary[Atom] = Arbitrary(
     Gen.oneOf(

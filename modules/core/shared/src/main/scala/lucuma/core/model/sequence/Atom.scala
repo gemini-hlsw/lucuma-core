@@ -13,12 +13,12 @@ import monocle.Prism
 import monocle.macros.GenPrism
 
 sealed trait Atom {
-  val id: Atom.Id
-  val steps: List[Step]
+  def id: Atom.Id
+  def steps: List[Step]
 }
 
 object Atom extends WithUid('a') {
-  final case class GmosNorth(id: Atom.Id, steps: List[Step.GmosNorth]) extends Atom
+  final case class GmosNorth(id: Atom.Id, steps: List[FutureStep.GmosNorth]) extends Atom
   object GmosNorth {
     implicit val eqAtomGmosNorth: Eq[GmosNorth] = Eq.by(a => (a.id, a.steps))
 
@@ -27,11 +27,11 @@ object Atom extends WithUid('a') {
       Focus[GmosNorth](_.id)
 
     /** @group Optics */
-    val steps: Lens[GmosNorth, List[Step.GmosNorth]] =
+    val steps: Lens[GmosNorth, List[FutureStep.GmosNorth]] =
       Focus[GmosNorth](_.steps)
   }
 
-  final case class GmosSouth(id: Atom.Id, steps: List[Step.GmosSouth]) extends Atom
+  final case class GmosSouth(id: Atom.Id, steps: List[FutureStep.GmosSouth]) extends Atom
   object GmosSouth {
     implicit val eqAtomGmosSouth: Eq[GmosSouth] = Eq.by(a => (a.id, a.steps))
 
@@ -40,7 +40,7 @@ object Atom extends WithUid('a') {
       Focus[GmosSouth](_.id)
 
     /** @group Optics */
-    val steps: Lens[GmosSouth, List[Step.GmosSouth]] =
+    val steps: Lens[GmosSouth, List[FutureStep.GmosSouth]] =
       Focus[GmosSouth](_.steps)
   }
 

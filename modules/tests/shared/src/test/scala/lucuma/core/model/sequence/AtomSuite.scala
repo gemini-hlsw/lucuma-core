@@ -12,7 +12,7 @@ import munit._
 import org.scalacheck.Test
 
 final class AtomSuite extends DisciplineSuite {
-  import ArbStep._
+  import ArbFutureStep._
   import ArbEnumerated._
   import ArbUid._
   import ArbAtom._
