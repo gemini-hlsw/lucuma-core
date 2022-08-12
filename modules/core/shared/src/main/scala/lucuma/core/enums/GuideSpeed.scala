@@ -41,6 +41,6 @@ object GuideSpeed {
 
   /** @group Typeclass Instances */
   implicit val GuideProbeEnumerated: Enumerated[GuideSpeed] =
-    Enumerated.of[GuideSpeed](Fast, Medium, Slow)
+    Enumerated.from(Fast, Medium, Slow).withTag(_.tag)
 
 }
