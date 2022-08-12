@@ -12,7 +12,7 @@ import monocle.Iso
  * example, "allows PIs to prevent or halt execution of "Ready'' or "Ongoing''
  * observations while retaining their status information".
  */
-sealed abstract class ObsActiveStatus(val label: String, val toBoolean: Boolean) extends Product with Serializable {
+sealed abstract class ObsActiveStatus(val tag: String, val label: String, val toBoolean: Boolean) extends Product with Serializable {
 
   def fold[A](active: => A, inactive: => A): A =
     this match {
@@ -24,15 +24,15 @@ sealed abstract class ObsActiveStatus(val label: String, val toBoolean: Boolean)
 
 object ObsActiveStatus {
 
-  case object Active   extends ObsActiveStatus("Active", true)
-  case object Inactive extends ObsActiveStatus("Inactive", false)
+  case object Active   extends ObsActiveStatus("active", "Active", true)
+  case object Inactive extends ObsActiveStatus("inactive", "Inactive", false)
 
   /** @group Typeclass Instances */
   implicit val EnumeratedObsActiveStatus: Enumerated[ObsActiveStatus] =
-    Enumerated.of(
+    Enumerated.from(
       Active,
       Inactive
-    )
+    ).withTag(_.tag)
 
   implicit val DisplayObsActiveStatus: Display[ObsActiveStatus] =
     Display.byShortName(_.label)

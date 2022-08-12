@@ -6,16 +6,16 @@ package lucuma.core.enums
 import lucuma.core.util.Display
 import lucuma.core.util.Enumerated
 
-sealed abstract class WaterVapor(val label: String) extends Product with Serializable
+sealed abstract class WaterVapor(val tag: String, val label: String) extends Product with Serializable
 
 object WaterVapor {
-  case object VeryDry extends WaterVapor("Very Dry")
-  case object Dry     extends WaterVapor("Dry")
-  case object Median  extends WaterVapor("Median")
-  case object Wet     extends WaterVapor("Wet")
+  case object VeryDry extends WaterVapor("very_dry", "Very Dry")
+  case object Dry     extends WaterVapor("dry", "Dry")
+  case object Median  extends WaterVapor("median", "Median")
+  case object Wet     extends WaterVapor("wet", "Wet")
 
   implicit val WaterVaporEnumerated: Enumerated[WaterVapor] =
-    Enumerated.of(VeryDry, Dry, Median, Wet)
+    Enumerated.from(VeryDry, Dry, Median, Wet).withTag(_.tag)
 
   implicit val WatorVaporDisplay: Display[WaterVapor] =
     Display.byShortName(_.label)

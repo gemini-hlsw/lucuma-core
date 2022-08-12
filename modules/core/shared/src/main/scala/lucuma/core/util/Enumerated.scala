@@ -55,12 +55,6 @@ object Enumerated {
 
   def apply[A](implicit ev: Enumerated[A]): ev.type = ev
 
-  def of[A <: Product](a: A, as: A*): Enumerated[A] =
-    new Enumerated[A] {
-      def all: List[A]      = a :: as.toList
-      def tag(a: A): String = a.productPrefix
-    }
-
   @inline
   def from[A](a: A, as: A*): Applied[A] = new Applied(a :: as.toList)
   def fromNEL[A](as: NonEmptyList[A]): Applied[A]   = new Applied(as.toList)

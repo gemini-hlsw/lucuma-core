@@ -5,12 +5,13 @@ package lucuma.core.enums
 
 import lucuma.core.util.Enumerated
 
-sealed trait Breakpoint extends Product with Serializable
+sealed abstract class Breakpoint(val tag: String) extends Product with Serializable
 
 object Breakpoint {
-  /** @group Constructors */ case object Enabled extends Breakpoint
-  /** @group Constructors */ case object Disabled extends Breakpoint
+  /** @group Constructors */ case object Enabled extends Breakpoint("enabled")
+  /** @group Constructors */ case object Disabled extends Breakpoint("disabled")
 
-  implicit val BreakpointEnumerated: Enumerated[Breakpoint] = Enumerated.of(Enabled, Disabled)
+  implicit val BreakpointEnumerated: Enumerated[Breakpoint] =
+    Enumerated.from(Enabled, Disabled).withTag(_.tag)
 
 }

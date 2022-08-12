@@ -6,29 +6,30 @@ package lucuma.core.enums
 import lucuma.core.util.Display
 import lucuma.core.util.Enumerated
 
-sealed abstract class CloudExtinction(val toDeciBrightness: Int) extends Product with Serializable {
+sealed abstract class CloudExtinction(val tag: String, val toDeciBrightness: Int) extends Product with Serializable {
   def toBrightness: Double = toDeciBrightness / 10.0
   def label: String        = f"< $toBrightness%.1f mag"
 }
 
 object CloudExtinction {
-  case object PointOne       extends CloudExtinction(1)
-  case object PointThree     extends CloudExtinction(3)
-  case object PointFive      extends CloudExtinction(5)
-  case object OnePointZero   extends CloudExtinction(10)
-  case object OnePointFive   extends CloudExtinction(15)
-  case object TwoPointZero   extends CloudExtinction(20)
-  case object ThreePointZero extends CloudExtinction(30)
+  case object PointOne       extends CloudExtinction("point_one", 1)
+  case object PointThree     extends CloudExtinction("point_three", 3)
+  case object PointFive      extends CloudExtinction("point_five", 5)
+  case object OnePointZero   extends CloudExtinction("one_point_zero", 10)
+  case object OnePointFive   extends CloudExtinction("one_point_five", 15)
+  case object TwoPointZero   extends CloudExtinction("two_point_zero", 20)
+  case object ThreePointZero extends CloudExtinction("three_point_zero", 30)
 
   implicit val CloudExtinctionEnumerated: Enumerated[CloudExtinction] =
-    Enumerated.of(PointOne,
-                  PointThree,
-                  PointFive,
-                  OnePointZero,
-                  OnePointFive,
-                  TwoPointZero,
-                  ThreePointZero
-    )
+    Enumerated.from(
+      PointOne,
+      PointThree,
+      PointFive,
+      OnePointZero,
+      OnePointFive,
+      TwoPointZero,
+      ThreePointZero
+    ).withTag(_.tag)
 
   implicit val CloudExtinctionDisplay: Display[CloudExtinction] =
     Display.byShortName(_.label)

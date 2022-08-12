@@ -66,7 +66,7 @@ object StellarLibrarySpectrum {
 
   /** @group Typeclass Instances */
   implicit val StellarLibrarySpectrumEnumerated: Enumerated[StellarLibrarySpectrum] =
-    Enumerated.of(
+    Enumerated.from(
       O5V,
       O8III,
       B0V,
@@ -117,6 +117,6 @@ object StellarLibrarySpectrum {
       M6V,
       M6III,
       M9III
-    )
+    ).withTag(_.tag)
 
 }
