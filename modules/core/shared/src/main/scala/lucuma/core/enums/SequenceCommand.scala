@@ -5,23 +5,23 @@ package lucuma.core.enums
 
 import lucuma.core.util.Enumerated
 
-sealed trait SequenceCommand extends Product with Serializable
+sealed abstract class SequenceCommand(val tag: String) extends Product with Serializable
 
 object SequenceCommand {
-  /** @group Constructors */ case object Abort extends SequenceCommand
-  /** @group Constructors */ case object Continue extends SequenceCommand
-  /** @group Constructors */ case object Pause extends SequenceCommand
-  /** @group Constructors */ case object Slew extends SequenceCommand
-  /** @group Constructors */ case object Start extends SequenceCommand
-  /** @group Constructors */ case object Stop extends SequenceCommand
+  /** @group Constructors */ case object Abort extends SequenceCommand("abort")
+  /** @group Constructors */ case object Continue extends SequenceCommand("continue")
+  /** @group Constructors */ case object Pause extends SequenceCommand("pause")
+  /** @group Constructors */ case object Slew extends SequenceCommand("slew")
+  /** @group Constructors */ case object Start extends SequenceCommand("start")
+  /** @group Constructors */ case object Stop extends SequenceCommand("stop")
 
   implicit val SequenceCommandEnumerated: Enumerated[SequenceCommand] =
-    Enumerated.of(
+    Enumerated.from(
       Abort,
       Continue,
       Pause,
       Slew,
       Start,
       Stop
-    )
+    ).withTag(_.tag)
 }

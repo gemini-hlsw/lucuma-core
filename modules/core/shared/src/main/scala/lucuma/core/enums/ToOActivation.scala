@@ -5,13 +5,13 @@ package lucuma.core.enums
 
 import lucuma.core.util.Enumerated
 
-sealed abstract class ToOActivation(val label: String) extends Product with Serializable
+sealed abstract class ToOActivation(val tag: String, val label: String) extends Product with Serializable
 
 object ToOActivation {
-  case object None     extends ToOActivation("None")
-  case object Standard extends ToOActivation("Standard")
-  case object Rapid    extends ToOActivation("Rapid")
+  case object None     extends ToOActivation("none", "None")
+  case object Standard extends ToOActivation("standard", "Standard")
+  case object Rapid    extends ToOActivation("rapid", "Rapid")
 
   implicit val ToOActivationEnumerated: Enumerated[ToOActivation] =
-    Enumerated.of(None, Standard, Rapid)
+    Enumerated.from(None, Standard, Rapid).withTag(_.tag)
 }

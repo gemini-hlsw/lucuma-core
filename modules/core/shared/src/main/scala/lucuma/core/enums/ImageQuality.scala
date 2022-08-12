@@ -16,7 +16,7 @@ import lucuma.core.util.Enumerated
 import lucuma.refined._
 import spire.math.Rational
 
-sealed abstract class ImageQuality(val toDeciArcSeconds: Quantity[PosInt, DeciArcSecond]) extends Product with Serializable {
+sealed abstract class ImageQuality(val tag: String, val toDeciArcSeconds: Quantity[PosInt, DeciArcSecond]) extends Product with Serializable {
   def toArcSeconds: Quantity[Rational, ArcSecond] = toDeciArcSeconds.toValue[Rational].toUnit[ArcSecond]
   def label: String        = f"""< ${toArcSeconds.value.toDouble}%.1f\""""
 
@@ -25,27 +25,28 @@ sealed abstract class ImageQuality(val toDeciArcSeconds: Quantity[PosInt, DeciAr
 }
 
 object ImageQuality {
-  case object PointOne     extends ImageQuality(1.refined[Positive].withUnit[DeciArcSecond])
-  case object PointTwo     extends ImageQuality(2.refined[Positive].withUnit[DeciArcSecond])
-  case object PointThree   extends ImageQuality(3.refined[Positive].withUnit[DeciArcSecond])
-  case object PointFour    extends ImageQuality(4.refined[Positive].withUnit[DeciArcSecond])
-  case object PointSix     extends ImageQuality(6.refined[Positive].withUnit[DeciArcSecond])
-  case object PointEight   extends ImageQuality(8.refined[Positive].withUnit[DeciArcSecond])
-  case object OnePointZero extends ImageQuality(10.refined[Positive].withUnit[DeciArcSecond])
-  case object OnePointFive extends ImageQuality(15.refined[Positive].withUnit[DeciArcSecond])
-  case object TwoPointZero extends ImageQuality(20.refined[Positive].withUnit[DeciArcSecond])
+  case object PointOne     extends ImageQuality("point_one", 1.withRefinedUnit[Positive, DeciArcSecond])
+  case object PointTwo     extends ImageQuality("point_two", 2.withRefinedUnit[Positive, DeciArcSecond])
+  case object PointThree   extends ImageQuality("point_three", 3.withRefinedUnit[Positive, DeciArcSecond])
+  case object PointFour    extends ImageQuality("point_four", 4.withRefinedUnit[Positive, DeciArcSecond])
+  case object PointSix     extends ImageQuality("point_six", 6.withRefinedUnit[Positive, DeciArcSecond])
+  case object PointEight   extends ImageQuality("point_eight", 8.withRefinedUnit[Positive, DeciArcSecond])
+  case object OnePointZero extends ImageQuality("one_point_zero", 10.withRefinedUnit[Positive, DeciArcSecond])
+  case object OnePointFive extends ImageQuality("one_point_five", 15.withRefinedUnit[Positive, DeciArcSecond])
+  case object TwoPointZero extends ImageQuality("two_point_zero", 20.withRefinedUnit[Positive, DeciArcSecond])
 
   implicit val ImageQualityEnumerated: Enumerated[ImageQuality] =
-    Enumerated.of(PointOne,
-                  PointTwo,
-                  PointThree,
-                  PointFour,
-                  PointSix,
-                  PointEight,
-                  OnePointZero,
-                  OnePointFive,
-                  TwoPointZero
-    )
+    Enumerated.from(
+      PointOne,
+      PointTwo,
+      PointThree,
+      PointFour,
+      PointSix,
+      PointEight,
+      OnePointZero,
+      OnePointFive,
+      TwoPointZero
+    ).withTag(_.tag)
 
   implicit val ImageQualityDisplay: Display[ImageQuality] =
     Display.byShortName(_.label)

@@ -43,13 +43,6 @@ object Display {
       def shortName(a: A) = toShortName(a)
     }
 
-  /**
-   * Create an instance of `Display` for an `Enumerated` using its `tag` as both shortName and
-   * longName.
-   */
-  def byTag[A: Enumerated]: Display[A] =
-    Display.byShortName(Enumerated[A].tag)
-
   implicit val contravariantDisplay: Contravariant[Display] = new Contravariant[Display] {
     def contramap[A, B](fa: Display[A])(f: B => A): Display[B] =
       new Display[B] {
