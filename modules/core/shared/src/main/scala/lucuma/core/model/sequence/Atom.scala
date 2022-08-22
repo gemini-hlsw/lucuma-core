@@ -14,8 +14,8 @@ import monocle.Prism
 import monocle.macros.GenPrism
 
 sealed trait Atom {
-  val id: Atom.Id
-  val steps: List[Step]
+  def id: Atom.Id
+  def steps: List[Step]
 }
 
 object Atom extends WithUid('a'.refined) {

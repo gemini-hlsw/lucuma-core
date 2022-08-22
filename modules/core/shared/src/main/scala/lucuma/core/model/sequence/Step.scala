@@ -15,11 +15,11 @@ import monocle.Prism
 import monocle.macros.GenPrism
 
 sealed trait Step {
-  val id: Step.Id
-  val instrumentConfig: DynamicConfig
-  val stepConfig: StepConfig
-  val time: StepTime
-  val breakpoint: Breakpoint
+  def id: Step.Id
+  def instrumentConfig: DynamicConfig
+  def stepConfig: StepConfig
+  def time: StepTime
+  def breakpoint: Breakpoint
 }
 
 object Step extends WithUid('s'.refined) {
