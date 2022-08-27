@@ -7,10 +7,11 @@ package util
 
 import cats.Order
 import cats.data.NonEmptyList
-import cats.syntax.all._
-import io.circe._
-import lucuma.core.syntax.string._
+import cats.syntax.all.*
+import io.circe.*
+import lucuma.core.syntax.string.*
 import monocle.Prism
+
 import scala.quoted.*
 
 /**
