@@ -229,14 +229,14 @@ object BrightnessUnits {
         FluxDensityContinuum.Surface.all.zip(FluxDensityContinuum.Integrated.all).toNem.toSortedMap
       )
 
-  implicit class TaggedUnitOps[T](val units: Units Of T) extends AnyVal {
+  implicit class TaggedUnitOps[T](private val units: Units Of T) extends AnyVal {
 
     /** Convert `T`-tagged `Units` to a `T0`-tagged ones. */
     def toTag[T0](implicit conv: TagConverter[T, T0]): Units Of T0 =
       conv.convert(units)
   }
 
-  implicit class TaggedMeasureOps[N, T](val measure: Measure[N] Of T) extends AnyVal {
+  implicit class TaggedMeasureOps[N, T](private val measure: Measure[N] Of T) extends AnyVal {
 
     /** Convert `T`-tagged `Measure` to a `T0`-tagged one. */
     def toTag[T0](implicit conv: TagConverter[T, T0]): Measure[N] Of T0 =

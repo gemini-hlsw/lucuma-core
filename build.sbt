@@ -1,9 +1,13 @@
-ThisBuild / tlBaseVersion                         := "0.46"
+ThisBuild / tlBaseVersion                         := "0.54"
 ThisBuild / tlCiReleaseBranches                   := Seq("master")
 ThisBuild / githubWorkflowEnv += "MUNIT_FLAKY_OK" -> "true"
-ThisBuild / scalacOptions += "-Xsource:3"
+
+ThisBuild / tlCiReleaseBranches += "topic/scala3"
 
 Global / concurrentRestrictions += Tags.limit(Tags.Compile, 1)
+
+ThisBuild / crossScalaVersions := Seq("3.1.3")
+ThisBuild / scalacOptions += "-language:implicitConversions" // TODO
 
 lazy val attoVersion           = "0.9.5"
 lazy val catsVersion           = "2.8.0"
@@ -12,12 +16,13 @@ lazy val monocleVersion        = "3.1.0"
 lazy val scalaJavaTimeVersion  = "2.4.0"
 lazy val geminiLocalesVersion  = "0.7.0"
 lazy val jtsVersion            = "0.3.0"
-lazy val coulombVersion        = "0.5.8"
+lazy val coulombVersion        = "0.6.0-M4"
 lazy val spireVersion          = "0.18.0"
 lazy val singletonOpsVersion   = "0.5.2"
 lazy val refinedVersion        = "0.10.1"
+lazy val lucumaRefinedVersion  = "0.1.0"
 lazy val catsTimeVersion       = "0.5.0"
-lazy val circeVersion          = "0.14.2"
+lazy val circeVersion          = "0.14.1"
 lazy val catsScalacheckVersion = "0.3.1"
 lazy val shapelessVersion      = "2.3.9"
 
@@ -38,23 +43,20 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
       "dev.optics"     %%% "monocle-macro"              % monocleVersion,
       "dev.optics"     %%% "monocle-state"              % monocleVersion,
       "edu.gemini"     %%% "lucuma-jts"                 % jtsVersion,
-      "com.manyangled" %%% "coulomb"                    % coulombVersion,
-      "com.manyangled" %%% "coulomb-si-units"           % coulombVersion,
-      "com.manyangled" %%% "coulomb-accepted-units"     % coulombVersion,
-      "com.manyangled" %%% "coulomb-time-units"         % coulombVersion,
-      "com.manyangled" %%% "coulomb-cats"               % coulombVersion,
-      "com.manyangled" %%% "coulomb-refined"            % coulombVersion,
-      "com.manyangled" %%% "coulomb-physical-constants" % coulombVersion,
+      "com.manyangled" %%% "coulomb-core"               % coulombVersion,
+      "com.manyangled" %%% "coulomb-spire"              % coulombVersion,
+      "com.manyangled" %%% "coulomb-units"              % coulombVersion,
       "org.typelevel"  %%% "spire"                      % spireVersion,
       "org.typelevel"  %%% "spire-extras"               % spireVersion,
-      "eu.timepit"     %%% "singleton-ops"              % singletonOpsVersion,
+      "eu.timepit"     %%% "singleton-ops"              % singletonOpsVersion cross CrossVersion.for3Use2_13,
       "eu.timepit"     %%% "refined"                    % refinedVersion,
       "eu.timepit"     %%% "refined-cats"               % refinedVersion,
+      "edu.gemini"     %%% "lucuma-refined"             % lucumaRefinedVersion,
       "org.typelevel"  %%% "cats-time"                  % catsTimeVersion,
       "io.circe"       %%% "circe-core"                 % circeVersion,
       "io.circe"       %%% "circe-generic"              % circeVersion,
       "io.circe"       %%% "circe-refined"              % circeVersion,
-      "com.chuusai"    %%% "shapeless"                  % shapelessVersion
+      "com.chuusai"    %%% "shapeless"                  % shapelessVersion cross CrossVersion.for3Use2_13
     )
   )
   .jvmConfigure(_.enablePlugins(AutomateHeaderPlugin))
@@ -78,7 +80,6 @@ lazy val testkit = crossProject(JVMPlatform, JSPlatform)
     name := "lucuma-core-testkit",
     libraryDependencies ++= Seq(
       "org.typelevel"     %%% "cats-testkit"       % catsVersion,
-      "com.manyangled"    %%% "coulomb-scalacheck" % coulombVersion,
       "dev.optics"        %%% "monocle-law"        % monocleVersion,
       "org.typelevel"     %%% "spire-laws"         % spireVersion,
       "eu.timepit"        %%% "refined-scalacheck" % refinedVersion,
@@ -114,7 +115,7 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform)
       "https://github.com/gemini-hlsw/maven-repo/raw/master/releases"
     ),
     libraryDependencies ++= Seq(
-      "edu.gemini.ocs" %% "edu-gemini-util-skycalc"     % "2020001.1.7" % Test,
+      "edu.gemini.ocs" %% "edu-gemini-util-skycalc"     % "2020001.1.7" % Test cross CrossVersion.for3Use2_13 exclude("org.scala-lang.modules", "scala-xml_2.13"),
       "com.47deg"      %% "scalacheck-toolbox-datetime" % "0.6.0"       % Test
     )
   )

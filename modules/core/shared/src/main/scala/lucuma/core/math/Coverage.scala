@@ -5,7 +5,8 @@ package lucuma.core.math
 
 import cats.Eq
 import cats.syntax.order._
-import coulomb._
+import coulomb.*
+import coulomb.syntax.*
 import eu.timepit.refined.types.numeric.NonNegInt
 import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.math.units._
@@ -15,6 +16,7 @@ sealed trait Coverage {
   import Coverage.{ Empty, Range }
 
   /** Intersect this `Coverage` with another. */
+  @scala.annotation.nowarn // TODO
   def ⋂(other: Coverage): Coverage =
     (this, other) match {
       case (Empty, _) => Empty
@@ -48,6 +50,7 @@ object Coverage {
     require(min < max) // smart ctor should guarantee this
   }
 
+  @scala.annotation.nowarn // TODO
   implicit val EqCoverage: Eq[Coverage] =
     Eq.instance {
       case (Empty, Empty)                         => true

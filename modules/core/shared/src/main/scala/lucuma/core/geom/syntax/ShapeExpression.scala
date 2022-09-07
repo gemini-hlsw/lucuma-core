@@ -9,7 +9,7 @@ import lucuma.core.math.Offset
 
 import ShapeExpression._
 
-final class ShapeExpressionOps(val self: ShapeExpression) extends AnyVal {
+final class ShapeExpressionOps(private val self: ShapeExpression) extends AnyVal {
 
   def difference(that: ShapeExpression): ShapeExpression =
     Difference(self, that)
@@ -90,7 +90,7 @@ trait ToShapeExpressionOps {
     new ShapeExpressionOps(e)
 }
 
-final class ShapeExpressionCompanionOps(val self: ShapeExpression.type) extends AnyVal {
+final class ShapeExpressionCompanionOps(private val self: ShapeExpression.type) extends AnyVal {
 
   /**
    * An empty `ShapeExpression` with a broader type.
@@ -105,8 +105,8 @@ final class ShapeExpressionCompanionOps(val self: ShapeExpression.type) extends 
     ShapeExpression.Point(a)
 
   /**
-   * Constructs an ellipse bound by the rectangle defined by the given
-   * coordinates expressed as angular separation.
+   * Constructs an ellipse bound by the rectangle defined by the given coordinates expressed as
+   * angular separation.
    *
    * @group Constructors
    */
@@ -114,8 +114,8 @@ final class ShapeExpressionCompanionOps(val self: ShapeExpression.type) extends 
     Ellipse(Offset(a._1, a._2), Offset(b._1, b._2))
 
   /**
-   * Constructs an arbitrary polygon defined by the given coordinate list
-   * expressed as angular separation.
+   * Constructs an arbitrary polygon defined by the given coordinate list expressed as angular
+   * separation.
    *
    * @group Constructors
    */
@@ -123,8 +123,7 @@ final class ShapeExpressionCompanionOps(val self: ShapeExpression.type) extends 
     Polygon(os.toList.map(o => Offset(o._1, o._2)))
 
   /**
-   * Constructs a rectangle bound by the two given coordinates expressed as
-   * angular separation.
+   * Constructs a rectangle bound by the two given coordinates expressed as angular separation.
    *
    * @group Constructors
    */
@@ -132,8 +131,8 @@ final class ShapeExpressionCompanionOps(val self: ShapeExpression.type) extends 
     Rectangle(Offset(a._1, a._2), Offset(b._1, b._2))
 
   /**
-   * Constructs a regular polygon of a given radius and number of sides,
-   * centered at the origin with a vertex at (radius, 0).
+   * Constructs a regular polygon of a given radius and number of sides, centered at the origin with
+   * a vertex at (radius, 0).
    *
    * @group Constructors
    */
@@ -161,8 +160,8 @@ final class ShapeExpressionCompanionOps(val self: ShapeExpression.type) extends 
     Rectangle(Offset.Zero, Offset(w.p, h.q))
 
   /**
-   * Constructs a rectangle of width w and height h centered at the base
-   * position, to within microarcsecond precision.
+   * Constructs a rectangle of width w and height h centered at the base position, to within
+   * microarcsecond precision.
    *
    * @group Constructors
    */
@@ -170,8 +169,7 @@ final class ShapeExpressionCompanionOps(val self: ShapeExpression.type) extends 
     Translate(rectangle(w, h), Offset(-w.bisect.p, -h.bisect.q))
 
   /**
-   * Constructs an ellipse contained in a rectangle of width w and height h with
-   * a corner at (0,0).
+   * Constructs an ellipse contained in a rectangle of width w and height h with a corner at (0,0).
    *
    * @group Constructors
    */
@@ -179,8 +177,8 @@ final class ShapeExpressionCompanionOps(val self: ShapeExpression.type) extends 
     Ellipse(Offset.Zero, Offset(w.p, h.q))
 
   /**
-   * Constructs an ellipse contained in a rectangle of width w and height
-   * centered at the base position, to within microarcsecond precision.
+   * Constructs an ellipse contained in a rectangle of width w and height centered at the base
+   * position, to within microarcsecond precision.
    *
    * @group Constructors
    */

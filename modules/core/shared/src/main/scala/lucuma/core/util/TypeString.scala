@@ -9,3 +9,9 @@ package lucuma.core.util
 trait TypeString[T] {
   def serialized: String
 }
+
+object TypeString {
+  def apply[T](s: String): TypeString[T] = new TypeString[T] {
+    def serialized = s
+  }
+}

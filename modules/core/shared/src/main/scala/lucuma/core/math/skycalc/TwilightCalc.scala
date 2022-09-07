@@ -4,11 +4,14 @@
 package lucuma.core.math.skycalc
 
 import cats.syntax.all._
-import coulomb.refined._
+import coulomb.*
+import coulomb.policy.spire.standard.given
+import coulomb.syntax.*
 import lucuma.core.enums.TwilightType
 import lucuma.core.math.Constants._
 import lucuma.core.math.JulianDate
 import lucuma.core.math.Place
+import lucuma.core.math.units.given
 import lucuma.core.optics.Spire
 import org.typelevel.cats.time._
 import spire.math.Bounded

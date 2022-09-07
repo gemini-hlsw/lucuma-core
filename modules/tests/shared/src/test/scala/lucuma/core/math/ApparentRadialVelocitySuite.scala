@@ -5,8 +5,10 @@ package lucuma.core.math
 
 import cats._
 import cats.kernel.laws.discipline._
-import coulomb._
-import coulomb.si._
+import coulomb.*
+import coulomb.policy.spire.standard.given
+import coulomb.syntax.*
+import coulomb.units.si._
 import lucuma.core.math.Constants.SpeedOfLight
 import lucuma.core.math.arb._
 import lucuma.core.math.units._
@@ -28,13 +30,13 @@ final class ApparentRadialVelocitySuite extends munit.DisciplineSuite {
   test("toRedshift") {
     assertEquals(
       // Note the speed is given in Meter per second but coulomb will convert
-      ApparentRadialVelocity(0.withUnit[MetersPerSecond]).toRedshift,
+      ApparentRadialVelocity(BigDecimal(0).withUnit[MetersPerSecond]).toRedshift,
       Redshift.Zero
     )
     assertEquals(ApparentRadialVelocity(SpeedOfLight).toRedshift, Redshift(1))
     assertEquals(
       ApparentRadialVelocity(
-        BigDecimal.decimal(1744792.10556, MathContext.DECIMAL64).withUnit[KilometersPerSecond]
+        BigDecimal.decimal(1744792.10556, MathContext.DECIMAL64).withUnit[KilometersPerSecond].toUnit[MetersPerSecond]
       ).toRedshift,
       Redshift(BigDecimal.decimal(5.82, MathContext.DECIMAL64))
     )

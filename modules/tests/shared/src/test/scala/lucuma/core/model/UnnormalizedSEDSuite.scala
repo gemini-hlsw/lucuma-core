@@ -4,11 +4,10 @@
 package lucuma.core.model
 
 import cats.kernel.laws.discipline._
-import coulomb.cats.implicits._
-import coulomb.scalacheck.ArbQuantity
+import coulomb.ops.algebra.cats.all.given
 import eu.timepit.refined.cats._
 import eu.timepit.refined.scalacheck.numeric._
-import lucuma.core.math.arb.ArbRefined
+import lucuma.core.math.arb._
 import lucuma.core.model.arb._
 import lucuma.core.util.arb.ArbEnumerated
 import monocle.law.discipline.LensTests
@@ -19,7 +18,7 @@ final class UnnormalizedSEDSuite extends DisciplineSuite {
   import UnnormalizedSED._
   import ArbUnnormalizedSED._
   import ArbEnumerated._
-  import ArbQuantity._
+  import ArbQuantity.given
   import ArbRefined._
 
   // Laws

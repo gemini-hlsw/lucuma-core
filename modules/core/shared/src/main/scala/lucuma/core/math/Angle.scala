@@ -451,7 +451,7 @@ trait AngleOptics extends OpticsHelpers { this: Angle.type =>
    * This angle as an DMS.
    * @group Optics
    */
-  lazy val dms: Iso[Angle, DMS] =
+  lazy val dms: Iso[Angle, Angle.DMS] =
     Iso(DMS(_))(_.toAngle)
 
   /**
@@ -692,7 +692,7 @@ trait HourAngleOptics extends OpticsHelpers { this: HourAngle.type =>
    * This `HourAngle` as an `HMS`.
    * @group Optics
    */
-  lazy val hms: Iso[HourAngle, HMS] =
+  lazy val hms: Iso[HourAngle, HourAngle.HMS] =
     Iso(HMS(_))(_.toHourAngle)
 
   /**

@@ -12,6 +12,7 @@ import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.core.enums.TacCategory
 import lucuma.core.enums.ToOActivation
 import lucuma.core.model.IntPercent
+import lucuma.refined._
 import monocle.Focus
 
 import scala.collection.immutable.SortedMap
@@ -34,7 +35,7 @@ object Proposal {
   val partnerSplits = Focus[Proposal](_.partnerSplits)
 
   val Default: Proposal =
-    Proposal(None, ProposalClass.Queue(80), None, ToOActivation.None, None, SortedMap.empty)
+    Proposal(None, ProposalClass.Queue(80.refined), None, ToOActivation.None, None, SortedMap.empty)
 
   implicit val eqProposal: Eq[Proposal] = Eq.instance {
     case (Proposal(t1, pc1, c1, to1, a1, ps1), Proposal(t2, pc2, c2, to2, a2, ps2)) =>

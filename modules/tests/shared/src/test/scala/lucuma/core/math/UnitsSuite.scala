@@ -3,12 +3,13 @@
 
 package lucuma.core.math
 
-import coulomb._
-import coulomb.mks._
-import coulomb.si.Meter
-import lucuma.core.math.units._
+import coulomb.*
+import coulomb.policy.spire.standard.given
+import coulomb.syntax.*
+import coulomb.units.mks.{_, given}
+import coulomb.units.si.{_, given}
+import lucuma.core.math.units.{_, given}
 import munit.FunSuite
-import spire.implicits._
 import spire.math.Rational
 import spire.math.SafeLong
 
@@ -18,7 +19,7 @@ final class UnitsSuite extends FunSuite {
     assert(Rational.one.withUnit[Angstrom] === Rational(1, SafeLong(10).pow(10)).withUnit[Meter])
     assert(
       Rational.one.withUnit[Jansky] === Rational(1, SafeLong(10).pow(26))
-        .withUnit[Watt %/ (Meter %^ 2) %* Hertz]
+        .withUnit[Watt / (Meter ^ 2) * Hertz]
     )
     assert(Rational.one.withUnit[Erg] === Rational(1, SafeLong(10).pow(7)).withUnit[Joule])
   }

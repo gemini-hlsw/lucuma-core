@@ -16,6 +16,7 @@ import lucuma.core.math.parser.EpochParsers
 import lucuma.core.optics.Format
 import lucuma.core.optics.syntax.all._
 import lucuma.core.syntax.parser._
+import lucuma.refined._
 import monocle.Prism
 
 import java.time._
@@ -78,13 +79,13 @@ object Epoch extends EpochOptics {
     * Standard epoch.
     * @group Constructors
     */
-  val J2000: Epoch = Julian.fromIntegralYears(refineMV[Year](2000))
+  val J2000: Epoch = Julian.fromIntegralYears(2000.refined[Year])
 
   /**
     * Standard epoch prior to J2000. Obsolete but still in use.
     * @group Constructors
     */
-  val B1950: Epoch = Besselian.fromIntegralYears(refineMV[Year](1950))
+  val B1950: Epoch = Besselian.fromIntegralYears(1950.refined[Year])
 
   /**
     * The scheme defines year zero and length of a year in terms of Julian days. There are two

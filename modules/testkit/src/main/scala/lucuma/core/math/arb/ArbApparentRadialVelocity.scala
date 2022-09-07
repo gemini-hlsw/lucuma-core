@@ -4,7 +4,8 @@
 package lucuma.core.math
 package arb
 
-import coulomb._
+import coulomb.*
+import coulomb.syntax.*
 import lucuma.core.math.units._
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary._

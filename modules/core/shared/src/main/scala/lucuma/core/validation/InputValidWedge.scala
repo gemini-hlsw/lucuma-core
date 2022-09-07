@@ -10,6 +10,7 @@ import eu.timepit.refined.numeric.Positive
 import eu.timepit.refined.types.numeric.PosBigDecimal
 import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.core.optics._
+import lucuma.refined._
 import monocle.Iso
 import monocle.Prism
 
@@ -38,7 +39,7 @@ object InputValidWedge {
    */
   def fromFormat[A](
     format:       Format[String, A],
-    errorMessage: NonEmptyString = "Invalid format"
+    errorMessage: NonEmptyString = "Invalid format".refined
   ): InputValidWedge[A] =
     ValidWedge(
       format.getOption.andThen(_.toRight(errorMessage).toEitherErrors),
@@ -50,7 +51,7 @@ object InputValidWedge {
    */
   def fromPrism[A](
     prism:        Prism[String, A],
-    errorMessage: NonEmptyString = "Invalid value"
+    errorMessage: NonEmptyString = "Invalid value".refined
   ): InputValidWedge[A] =
     fromFormat(Format.fromPrism(prism), errorMessage)
 
@@ -85,7 +86,7 @@ object InputValidWedge {
   def truncatedPosBigDecimal(decimals: DigitCount): InputValidWedge[PosBigDecimal] = {
     val base     = truncatedBigDecimal(decimals).andThen(
       ValidWedge.forRefined[NonEmptyChain[NonEmptyString], BigDecimal, Positive](
-        NonEmptyChain("Invalid format")
+        NonEmptyChain("Invalid format".refined)
       )
     )
     val minValue = "0." + "0" * (decimals.value - 1) + "1"

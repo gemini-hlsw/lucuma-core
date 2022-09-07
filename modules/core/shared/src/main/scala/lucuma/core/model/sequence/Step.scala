@@ -8,20 +8,21 @@ import cats.syntax.all._
 import eu.timepit.refined.auto._
 import lucuma.core.enums.Breakpoint
 import lucuma.core.util.WithUid
+import lucuma.refined._
 import monocle.Focus
 import monocle.Lens
 import monocle.Prism
 import monocle.macros.GenPrism
 
 sealed trait Step {
-  val id: Step.Id
-  val instrumentConfig: DynamicConfig
-  val stepConfig: StepConfig
-  val time: StepTime
-  val breakpoint: Breakpoint
+  def id: Step.Id
+  def instrumentConfig: DynamicConfig
+  def stepConfig: StepConfig
+  def time: StepTime
+  def breakpoint: Breakpoint
 }
 
-object Step extends WithUid('s') {
+object Step extends WithUid('s'.refined) {
   final case class GmosNorth(
     id:               Step.Id,
     instrumentConfig: DynamicConfig.GmosNorth,

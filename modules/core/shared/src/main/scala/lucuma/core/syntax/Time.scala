@@ -23,7 +23,7 @@ import java.time.temporal.TemporalAmount
 // A bit of syntax to make working with Java Instant and Duration a bit less
 // cumbersome / easier to read.
 
-final class InstantOps(val self: Instant) extends AnyVal {
+final class InstantOps(private val self: Instant) extends AnyVal {
 
   def +(t: TemporalAmount): Instant =
     self.plus(t)
@@ -40,7 +40,7 @@ trait ToInstantOps {
 
 object instant extends ToInstantOps
 
-final class ZonedDateTimeOps(val self: ZonedDateTime) extends AnyVal {
+final class ZonedDateTimeOps(private val self: ZonedDateTime) extends AnyVal {
 
   def +(t: TemporalAmount): ZonedDateTime =
     self.plus(t)
@@ -57,7 +57,7 @@ trait ToZonedDateTimeOps {
 
 object zonedDateTime extends ToZonedDateTimeOps
 
-final class DurationOps(val self: Duration) extends AnyVal {
+final class DurationOps(private val self: Duration) extends AnyVal {
 
   def +(that: Duration): Duration =
     self.plus(that)
@@ -104,15 +104,18 @@ trait ToLongDurationOps {
 
 object longDuration extends ToLongDurationOps
 
-final class InstantBoundedOps(val self: Bounded[Instant]) extends AnyVal {
+final class InstantBoundedOps(private val self: Bounded[Instant]) extends AnyVal {
 
   /**
    * Convert to the minimal full-day interval that includes this interval.
    *
-   * Hours in interval may not be a multiple of 24 if there's a DST transition in the resulting interval.
+   * Hours in interval may not be a multiple of 24 if there's a DST transition in the resulting
+   * interval.
    *
-   * @param zone the timezone where the start of the day should be computed
-   * @param startOfDay time at which the day starts
+   * @param zone
+   *   the timezone where the start of the day should be computed
+   * @param startOfDay
+   *   time at which the day starts
    */
   def toFullDays(zone: ZoneId, startOfDay: LocalTime): Bounded[Instant] = {
     val fullDayStart = {
@@ -145,7 +148,7 @@ trait ToInstantBoundedOps {
 
 object instantBoundedInterval extends ToInstantBoundedOps
 
-final class InstantIntervalSeqOps(val self: IntervalSeq[Instant]) extends AnyVal {
+final class InstantIntervalSeqOps(private val self: IntervalSeq[Instant]) extends AnyVal {
   import instantBoundedInterval._
 
   def duration: Duration =

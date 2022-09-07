@@ -6,12 +6,12 @@ package lucuma.core.math.dimensional
 import cats.Eq
 import cats.syntax.contravariant._
 import cats.syntax.option._
-import coulomb._
+import coulomb.*
+import coulomb.syntax.*
 import lucuma.core.syntax.display._
 import lucuma.core.util.Display
 import monocle.Focus
 import monocle.Lens
-import shapeless.tag
 
 /**
  * A magnitude of type `N` and a runtime representation of a physical unit.
@@ -32,11 +32,8 @@ final case class Measure[N](value: N, units: Units, error: Option[N] = none) { s
     s"Measure($value${error.map(e => f" ± $e").orEmpty} ${units.abbv})"
 }
 
-object Measure {
+object Measure extends MeasureLowPriority {
   implicit def eqMeasure[N: Eq]: Eq[Measure[N]] = Eq.by(x => (x.value, x.units, x.error))
-
-  implicit def eqTaggedMeasure[N: Eq, T]: Eq[Measure[N] Of T] =
-    Eq.by(x => (x.value, x.units, x.error))
 
   implicit def displayMeasure[N: Display]: Display[Measure[N]] =
     Display.by(
@@ -82,12 +79,12 @@ object Measure {
       tagged
     }
 
-  implicit class TaggedMeasureOps[N, T](val measure: Measure[N] Of T) extends AnyVal {
+  implicit class TaggedMeasureOps[N, T](private val measure: Measure[N] Of T) extends AnyVal {
     def withError(error: N): Measure[N] Of T = Measure.errorTagged.replace(error.some)(measure)
     def exact: Measure[N] Of T               = Measure.errorTagged.replace(none)(measure)
   }
 
-  implicit class MeasureOps[N](val measure: Measure[N]) extends AnyVal {
+  implicit class MeasureOps[N](private val measure: Measure[N]) extends AnyVal {
 
     /** Add an error value. */
     def withError(error: N): Measure[N] = Measure.error.replace(error.some)(measure)
@@ -100,4 +97,9 @@ object Measure {
       s"${measure.value.shortName} ${measure.units.shortName}"
   }
 
+}
+
+private class MeasureLowPriority {
+  implicit def eqTaggedMeasure[N: Eq, T]: Eq[Measure[N] Of T] =
+    Eq.by(x => (x.value, x.units, x.error))
 }

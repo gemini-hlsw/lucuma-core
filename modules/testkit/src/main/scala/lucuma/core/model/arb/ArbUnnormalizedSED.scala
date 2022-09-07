@@ -7,15 +7,19 @@ package arb
 import cats.data.NonEmptyMap
 import cats.implicits._
 import cats.laws.discipline.arbitrary._
-import coulomb.refined._
-import coulomb.si.Kelvin
+import coulomb.*
+import coulomb.syntax.*
+import coulomb.units.si.Kelvin
 import eu.timepit.refined.numeric.Positive
+import eu.timepit.refined.refineV
 import eu.timepit.refined.types.numeric.PosBigDecimal
 import lucuma.core.enums._
 import lucuma.core.math.Wavelength
 import lucuma.core.math.arb.ArbRefined
 import lucuma.core.math.arb.ArbWavelength
+import lucuma.core.math.units._
 import lucuma.core.util.arb.ArbEnumerated
+import lucuma.refined._
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck._
 
@@ -76,8 +80,8 @@ trait ArbUnnormalizedSED {
   implicit val arbBlackBody: Arbitrary[BlackBody] =
     Arbitrary(
       Gen
-        .choose(BigDecimal(1), BigDecimal(10000))
-        .map(a => BlackBody(a.withRefinedUnit[Positive, Kelvin]))
+        .choose(1, 10000)
+        .map(a => BlackBody(refineV[Positive](a).toOption.get.withUnit[Kelvin]))
     )
 
   implicit val cogBlackBody: Cogen[BlackBody] =

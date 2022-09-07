@@ -6,12 +6,14 @@ package core
 package enums
 
 import cats.syntax.eq._
-import coulomb._
+import coulomb.*
+import coulomb.policy.spire.standard.given
+import coulomb.syntax.*
 import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.math.Angle
 import lucuma.core.math.Coverage
 import lucuma.core.math.Wavelength
-import lucuma.core.math.units._
+import lucuma.core.math.units.{_, given}
 import lucuma.core.util.Enumerated
 import spire.math.Rational
 
@@ -34,7 +36,7 @@ sealed abstract class GmosNorthGrating(
 
   /** Compute the coverage of this disperser, given a central wavelength. */
   def coverage(λ: Wavelength): Coverage =
-    Coverage.centered(λ, simultaneousCoverage)
+    Coverage.centered(λ, simultaneousCoverage.tToUnit[Picometer])
 
   /**
    * Δλ for 0.5" slit.
@@ -56,7 +58,7 @@ sealed abstract class GmosNorthGrating(
 object GmosNorthGrating {
 
   private def pmToDispersion(pm: Int): Quantity[Rational, NanometersPerPixel] =
-    PosInt.unsafeFrom(pm).withUnit[PicometersPerPixel].to[Rational, NanometersPerPixel]
+    PosInt.unsafeFrom(pm).withUnit[PicometersPerPixel].toValue[Rational].toUnit[NanometersPerPixel]
 
   private def nm(value: Int): Quantity[PosInt, Nanometer] =
     PosInt.unsafeFrom(value).withUnit[Nanometer]

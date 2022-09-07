@@ -18,7 +18,7 @@ trait AngleParsers {
     * Generic parser for the components of an angle in "11 22 33.444555" format, with an
     * optional decimal point and at most 6 digits following it, and terminal parsers for each segment.
     */
-  def genAngle(t1: Parser[_], t2: Parser[_], t3: Parser[_]): Parser[(Int, Int, Int, Int, Int)] =
+  def genAngle(t1: Parser[?], t2: Parser[?], t3: Parser[?]): Parser[(Int, Int, Int, Int, Int)] =
     (int <~ t1, int <~ t2, int, (char('.') ~> frac(6) | ok(0)) <~ t3)
       .mapN { (h, m, s, µs) =>
         (h, m, s, µs / 1000, µs % 1000)
@@ -26,7 +26,7 @@ trait AngleParsers {
       .named(s"genAngle($t1, $t2, $t3)")
 
   /** Generic parser for the components of an HourAngle; see `genAngle`. */
-  def genHMS(t1: Parser[_], t2: Parser[_], t3: Parser[_]): Parser[HourAngle] =
+  def genHMS(t1: Parser[?], t2: Parser[?], t3: Parser[?]): Parser[HourAngle] =
     genAngle(t1, t2, t3).map((HourAngle.fromHMS _).tupled).named(s"genHMS($t1, $t2, $t3)")
 
   /** 00:00:00.000000 */
@@ -44,7 +44,7 @@ trait AngleParsers {
   val hms: Parser[HourAngle] = (hms1 | hms2 | hms3).named("hms")
 
   /** Generic parser for the components of a DMS Angle, which is optionally prefixed by a sign. */
-  def genDMS(t1: Parser[_], t2: Parser[_], t3: Parser[_]): Parser[Angle] =
+  def genDMS(t1: Parser[?], t2: Parser[?], t3: Parser[?]): Parser[Angle] =
     (neg, genAngle(t1, t2, t3).map((Angle.fromDMS _).tupled))
       .mapN {
         case (true, a)  => -a

@@ -7,9 +7,10 @@ import cats.Eq
 import cats.Order
 import cats.data.NonEmptyMap
 import cats.implicits._
-import coulomb._
-import coulomb.cats.implicits._
-import coulomb.si.Kelvin
+import coulomb.*
+import coulomb.ops.algebra.cats.all.given
+import coulomb.syntax.*
+import coulomb.units.si.Kelvin
 import eu.timepit.refined.cats._
 import eu.timepit.refined.types.numeric.PosBigDecimal
 import eu.timepit.refined.types.numeric.PosInt

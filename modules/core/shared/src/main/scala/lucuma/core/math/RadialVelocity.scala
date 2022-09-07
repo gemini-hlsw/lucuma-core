@@ -4,9 +4,11 @@
 package lucuma.core.math
 
 import cats._
-import coulomb._
-import coulomb.cats.implicits._
-import coulomb.si._
+import coulomb.*
+import coulomb.ops.algebra.cats.all.given
+import coulomb.policy.spire.standard.given
+import coulomb.syntax.*
+import coulomb.units.si.{_, given}
 import lucuma.core.math.Constants.SpeedOfLight
 import lucuma.core.math.units._
 import lucuma.core.optics.Format
@@ -38,7 +40,7 @@ final case class RadialVelocity private (rv: Quantity[BigDecimal, MetersPerSecon
     } else None
 
   override def toString =
-    s"RadialVelocity(${rv.to[Double, KilometersPerSecond].show})"
+    s"RadialVelocity(${rv.toUnit[KilometersPerSecond].toValue[Double].show})"
 }
 
 object RadialVelocity {
@@ -54,7 +56,7 @@ object RadialVelocity {
     Format[BigDecimal, RadialVelocity](
       b =>
         Some(b)
-          .filter(_.abs <= SpeedOfLight.to[BigDecimal, KilometersPerSecond].value)
+          .filter(_.abs <= SpeedOfLight.toValue[BigDecimal].toUnit[KilometersPerSecond].value)
           .flatMap(v => RadialVelocity(v.withUnit[KilometersPerSecond])),
       rv => rv.rv.toUnit[KilometersPerSecond].value
     )

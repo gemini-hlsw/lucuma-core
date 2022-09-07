@@ -23,7 +23,7 @@ final class SolverSuite extends munit.DisciplineSuite with IntervalGens {
     ): Boolean = f(i)
   }
 
-  implicit val testValueRounder = new SampleRounder[Closest, Unit] {
+  implicit val testValueRounder: SampleRounder[Closest, Unit] = new SampleRounder[Closest, Unit] {
     def round(
       leftI:  Instant,
       leftV:  Unit,

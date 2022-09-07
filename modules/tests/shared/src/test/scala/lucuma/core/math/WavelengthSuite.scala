@@ -8,18 +8,20 @@ import cats.Order
 import cats.Show
 import cats.kernel.laws.discipline._
 import cats.syntax.all._
-import coulomb.Quantity
-import coulomb.refined._
+import coulomb.*
+import coulomb.policy.spire.standard.given
+import coulomb.syntax.*
 import eu.timepit.refined.auto._
 import eu.timepit.refined.cats._
 import eu.timepit.refined.numeric._
 import eu.timepit.refined.scalacheck.numeric._
 import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.math.arb._
-import lucuma.core.math.units._
+import lucuma.core.math.units.{_, given}
 import lucuma.core.optics.Format
 import lucuma.core.optics.laws.discipline.FormatTests
 import monocle.law.discipline._
+import org.scalacheck.Prop
 import org.scalacheck.Prop._
 import spire.math.Rational
 
@@ -27,6 +29,11 @@ import java.math.RoundingMode
 
 final class WavelengthSuite extends munit.DisciplineSuite {
   import ArbWavelength._
+
+  // Override to remove implicit modifier
+  override def unitToProp = super.unitToProp
+  // Scala 3 likes this better
+  implicit def saneUnitToProp(unit: Unit): Prop = unitToProp(unit)
 
   // Laws
   checkAll("Wavelength", OrderTests[Wavelength].order)
@@ -100,7 +107,7 @@ final class WavelengthSuite extends munit.DisciplineSuite {
     }
 
   test("picometer decimal format") {
-    testFormat(1, Wavelength.decimalPicometers)(_.toPicometers.to[Rational, Picometer])
+    testFormat(1, Wavelength.decimalPicometers)(_.toPicometers.toValue[Rational])
   }
 
   test("angstrom decimal format") {

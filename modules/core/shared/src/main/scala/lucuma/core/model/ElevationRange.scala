@@ -6,6 +6,7 @@ package lucuma.core.model
 import cats._
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.api.RefinedTypeOps
+import eu.timepit.refined.internal.WitnessAs
 import eu.timepit.refined.numeric.Interval
 import lucuma.core.optics.SplitEpi
 import monocle.Focus
@@ -27,8 +28,12 @@ object ElevationRange {
   ) extends ElevationRange
 
   object AirMass {
+    // manually create witnesses, since refined macro not working in scala 3
+    // these are necessary to implement RefinedTypeOps
     val MinValue = BigDecimal(1.0)
+    given WitnessAs[MinValue.type, BigDecimal] = WitnessAs(MinValue, MinValue)
     val MaxValue = BigDecimal(3.0)
+    given WitnessAs[MaxValue.type, BigDecimal] = WitnessAs(MaxValue, MaxValue)
 
     type Value        = Interval.Closed[MinValue.type, MaxValue.type]
     type DecimalValue = BigDecimal Refined Value
@@ -68,7 +73,9 @@ object ElevationRange {
 
   object HourAngle {
     val MinHour = BigDecimal(-5.0)
+    given WitnessAs[MinHour.type, BigDecimal] = WitnessAs(MinHour, MinHour)
     val MaxHour = BigDecimal(5.0)
+    given WitnessAs[MaxHour.type, BigDecimal] = WitnessAs(MaxHour, MaxHour)
 
     type Hour        = Interval.Closed[MinHour.type, MaxHour.type]
     type DecimalHour = BigDecimal Refined Hour

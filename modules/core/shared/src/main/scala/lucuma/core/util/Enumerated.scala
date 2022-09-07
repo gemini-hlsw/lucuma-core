@@ -7,10 +7,12 @@ package util
 
 import cats.Order
 import cats.data.NonEmptyList
-import cats.syntax.all._
-import io.circe._
-import lucuma.core.syntax.string._
+import cats.syntax.all.*
+import io.circe.*
+import lucuma.core.syntax.string.*
 import monocle.Prism
+
+import scala.quoted.*
 
 /**
  * Typeclass for an enumerated type with unique string tags and a canonical ordering.
@@ -56,10 +58,10 @@ object Enumerated {
   def apply[A](implicit ev: Enumerated[A]): ev.type = ev
 
   @inline
-  def from[A](a: A, as: A*): Applied[A] = new Applied(a :: as.toList)
-  def fromNEL[A](as: NonEmptyList[A]): Applied[A]   = new Applied(as.toList)
+  def from[A](a: A, as: A*): Applied[A]           = new Applied(a :: as.toList)
+  def fromNEL[A](as: NonEmptyList[A]): Applied[A] = new Applied(as.toList)
 
-  class Applied[A] private[Enumerated] (val as: List[A]) extends AnyVal {
+  class Applied[A] private[Enumerated] (private val as: List[A]) extends AnyVal {
     def withTag(f: A => String): Enumerated[A] =
       new Enumerated[A] {
         def all: List[A]      = as
@@ -70,6 +72,23 @@ object Enumerated {
   def fromTag[A](implicit ev: Enumerated[A]): Prism[String, A] =
     Prism[String, A](ev.fromTag)(e => ev.tag(e))
 
+  private def enumValuesImpl[E: Type](using Quotes): Expr[Array[E]] =
+    import quotes.reflect.*
+    val companion = Ref(TypeRepr.of[E].typeSymbol.companionModule)
+    Select.unique(companion, "values").asExprOf[Array[E]]
+
+  private def tagImpl[E](x: Expr[E])(using Quotes): Expr[String] =
+    import quotes.reflect.*
+    Select.unique(x.asTerm, "tag").asExprOf[String]
+
+  private def enumeratedImpl[E: Type](using Quotes): Expr[Enumerated[E]] =
+    '{
+      Enumerated
+        .fromNEL(NonEmptyList.fromList(${ enumValuesImpl[E] }.toList).get)
+        .withTag(x => ${ tagImpl[E]('x) })
+    }
+
+  inline def derived[E]: Enumerated[E] = ${ enumeratedImpl[E] }
 }
 
 /** @group Typeclasses */

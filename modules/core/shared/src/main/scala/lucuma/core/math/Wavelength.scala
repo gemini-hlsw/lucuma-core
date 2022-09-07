@@ -5,20 +5,23 @@ package lucuma.core.math
 
 import cats.Order
 import cats.Show
-import coulomb._
-import coulomb.cats.implicits._
+import coulomb.*
+import coulomb.ops.algebra.cats.all.given
+import coulomb.policy.spire.standard.given
+import coulomb.syntax.*
 import eu.timepit.refined._
 import eu.timepit.refined.auto._
 import eu.timepit.refined.cats._
 import eu.timepit.refined.numeric._
 import eu.timepit.refined.types.numeric.PosInt
-import lucuma.core.math.units._
+import lucuma.core.math.units.{_, given}
 import lucuma.core.optics.Format
 import monocle.Iso
 import monocle.Prism
 import spire.math.Rational
 
 import java.math.RoundingMode
+import scala.annotation.targetName
 import scala.util.Try
 
 /**
@@ -33,7 +36,7 @@ final case class Wavelength(toPicometers: Quantity[PosInt, Picometer]) {
    * represented as a Rational.
    */
   def µm: Quantity[Rational, Micrometer] =
-    toPicometers.to[Rational, Micrometer]
+    toPicometers.toValue[Rational].toUnit[Micrometer]
 
   /** Alias for `µm`. */
   def micrometer: Quantity[Rational, Micrometer] =
@@ -47,7 +50,7 @@ final case class Wavelength(toPicometers: Quantity[PosInt, Picometer]) {
     * Returns the wavelength value in nanometers
     * The exact nanometer value needs to be represented as a Rational
     */
-  def nm: Quantity[Rational, Nanometer] = toPicometers.to[Rational, Nanometer]
+  def nm: Quantity[Rational, Nanometer] = toPicometers.toValue[Rational].toUnit[Nanometer]
 
   def nanometer: Quantity[Rational, Nanometer] = nm
 
@@ -55,7 +58,7 @@ final case class Wavelength(toPicometers: Quantity[PosInt, Picometer]) {
     * Returns the wavelength value in angstrom
     * The exact angstrom value needs to be represented as a Rational
     */
-  def Å: Quantity[Rational, Angstrom] = toPicometers.to[Rational, Angstrom]
+  def Å: Quantity[Rational, Angstrom] = toPicometers.toValue[Rational].toUnit[Angstrom]
 
   def angstrom: Quantity[Rational, Angstrom] = Å
 
@@ -79,6 +82,7 @@ object Wavelength {
     * Construct a wavelength from a positive int
     * @group constructor
     */
+  @targetName("applyPicometers") // to distinguish from apply(Quantity[PosInt, Picometer])
   def apply(picometers: PosInt): Wavelength =
     new Wavelength(picometers.withUnit[Picometer])
 
@@ -104,27 +108,28 @@ object Wavelength {
    * Try to build a Wavelength with a value in nm in the range (0 .. 2147]
    * @group constructor
    */
-  def fromMicrometers(µm: Int): Option[Wavelength] =
-    refineV[Positive](µm).toOption.flatMap(µm =>
-      Option.when(µm.value <= MaxMicrometer)(Wavelength(µm.withUnit[Micrometer]))
-    )
+  def fromMicrometers(µm: Int): Option[Wavelength] = for {
+    q <- refineQV[Positive](µm.withUnit[Micrometer].tToUnit[Picometer]).toOption
+    if µm <= MaxMicrometer
+  } yield Wavelength(q)
 
   /**
    * Try to build a Wavelength with a value in nm in the range (0 .. 2147483]
    * @group constructor
    */
-  def fromNanometers(nm: Int): Option[Wavelength] =
-    refineV[Positive](nm).toOption.flatMap(nm =>
-      Option.when(nm.value <= MaxNanometer)(Wavelength(nm.withUnit[Nanometer]))
-    )
+  def fromNanometers(nm: Int): Option[Wavelength] = for {
+    q <- refineQV[Positive](nm.withUnit[Nanometer].tToUnit[Picometer]).toOption
+    if nm <= MaxNanometer
+  } yield Wavelength(q)
+
   /**
    * Try to build a Wavelength with a value in angstrom in the range (0 .. 21474836]
    * @group constructor
    */
-  def fromAngstroms(a: Int): Option[Wavelength] =
-    refineV[Positive](a).toOption.flatMap(a =>
-      Option.when(a.value <= MaxAngstrom)(Wavelength(a.withUnit[Angstrom]))
-    )
+  def fromAngstroms(a: Int): Option[Wavelength] = for {
+    q <- refineQV[Positive](a.withUnit[Angstrom].tToUnit[Picometer]).toOption
+    if a <= MaxAngstrom
+  } yield Wavelength(q)
 
   /**
    * Prism from Int in pm into Wavelength and back.

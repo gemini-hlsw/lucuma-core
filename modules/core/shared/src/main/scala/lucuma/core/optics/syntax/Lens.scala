@@ -7,7 +7,7 @@ import cats.data.State
 import lucuma.core.optics.state.all._
 import monocle.Lens
 
-final class LensOps[S, A](val self: Lens[S, A]) extends AnyVal {
+final class LensOps[S, A](private val self: Lens[S, A]) extends AnyVal {
   def edit(a: A): State[S, A] =
     self.assign(a)
 

@@ -28,14 +28,14 @@ class UnitSuite extends munit.DisciplineSuite {
   }
 
   test("Display[Units]") {
-    forAll { u: Units =>
+    forAll { (u: Units) =>
       assertEquals(u.longName, u.name)
       assertEquals(u.shortName, u.abbv)
     }
   }
 
   test("Display[Units Of Brightness[Integrated]]") {
-    forAll { u: Units Of Brightness[Integrated] =>
+    forAll { (u: Units Of Brightness[Integrated]) =>
       assertEquals(u.longName, u.name)
       assertEquals(u.shortName, u.abbv)
     }

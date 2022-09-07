@@ -7,6 +7,7 @@ import eu.timepit.refined.auto._
 import lucuma.core.model.ElevationRange
 import lucuma.core.optics.ValidSplitEpi
 import lucuma.core.validation._
+import lucuma.refined._
 
 object ModelValidators {
   private val airMassErrorMsg   =
@@ -16,7 +17,7 @@ object ModelValidators {
 
   val airMassElevationRangeValidWedge: InputValidWedge[ElevationRange.AirMass.DecimalValue] =
     InputValidWedge
-      .truncatedBigDecimal(decimals = 1)
+      .truncatedBigDecimal(decimals = 1.refined)
       .andThen(
         ValidSplitEpi
           .forRefined[String, BigDecimal, ElevationRange.AirMass.Value](airMassErrorMsg)
@@ -25,7 +26,7 @@ object ModelValidators {
 
   val hourAngleElevationRangeValidWedge: InputValidWedge[ElevationRange.HourAngle.DecimalHour] =
     InputValidWedge
-      .truncatedBigDecimal(decimals = 1)
+      .truncatedBigDecimal(decimals = 1.refined)
       .andThen(
         ValidSplitEpi
           .forRefined[String, BigDecimal, ElevationRange.HourAngle.Hour](hourAngleErrorMsg)

@@ -8,11 +8,13 @@ package enums
 import cats.Order
 import cats.syntax.all._
 import eu.timepit.refined.auto._
+import eu.timepit.refined.numeric.Positive
 import lucuma.core.math.BrightnessUnits._
 import lucuma.core.math.Wavelength
 import lucuma.core.math.dimensional._
 import lucuma.core.math.units._
 import lucuma.core.util.Enumerated
+import lucuma.refined._
 
 /**
  * Enumerated type for wavelength band.
@@ -78,9 +80,9 @@ object Band {
         "SloanU",
         "u",
         "UV",
-        Wavelength(333000),
-        Wavelength(356000),
-        Wavelength(379000)
+        Wavelength(333000.refined[Positive]),
+        Wavelength(356000.refined[Positive]),
+        Wavelength(379000.refined[Positive])
       )
 
   /** @group Constructors */
@@ -89,9 +91,9 @@ object Band {
         "SloanG",
         "g",
         "Green",
-        Wavelength(433000),
-        Wavelength(483000),
-        Wavelength(533000)
+        Wavelength(433000.refined[Positive]),
+        Wavelength(483000.refined[Positive]),
+        Wavelength(533000.refined[Positive])
       )
 
   /** @group Constructors */
@@ -100,9 +102,9 @@ object Band {
         "SloanR",
         "r",
         "Red",
-        Wavelength(578000),
-        Wavelength(626000),
-        Wavelength(674000)
+        Wavelength(578000.refined[Positive]),
+        Wavelength(626000.refined[Positive]),
+        Wavelength(674000.refined[Positive])
       )
 
   /** @group Constructors */
@@ -111,9 +113,9 @@ object Band {
         "SloanI",
         "i",
         "Far red",
-        Wavelength(714000),
-        Wavelength(767000),
-        Wavelength(820000)
+        Wavelength(714000.refined[Positive]),
+        Wavelength(767000.refined[Positive]),
+        Wavelength(820000.refined[Positive])
       )
 
   /** @group Constructors */
@@ -122,9 +124,9 @@ object Band {
         "SloanZ",
         "z",
         "Near infrared",
-        Wavelength(847000),
-        Wavelength(910000),
-        Wavelength(973000)
+        Wavelength(847000.refined[Positive]),
+        Wavelength(910000.refined[Positive]),
+        Wavelength(973000.refined[Positive])
       )
 
   /** @group Constructors */
@@ -133,9 +135,9 @@ object Band {
         "U",
         "U",
         "Ultraviolet",
-        Wavelength(322000),
-        Wavelength(360000),
-        Wavelength(398000)
+        Wavelength(322000.refined[Positive]),
+        Wavelength(360000.refined[Positive]),
+        Wavelength(398000.refined[Positive])
       )
 
   /** @group Constructors */
@@ -144,9 +146,9 @@ object Band {
         "B",
         "B",
         "Blue",
-        Wavelength(395000),
-        Wavelength(440000),
-        Wavelength(485000)
+        Wavelength(395000.refined[Positive]),
+        Wavelength(440000.refined[Positive]),
+        Wavelength(485000.refined[Positive])
       )
 
   /** @group Constructors */
@@ -155,9 +157,9 @@ object Band {
         "V",
         "V",
         "Visual",
-        Wavelength(507000),
-        Wavelength(550000),
-        Wavelength(593000)
+        Wavelength(507000.refined[Positive]),
+        Wavelength(550000.refined[Positive]),
+        Wavelength(593000.refined[Positive])
       )
 
   /** @group Constructors */
@@ -166,9 +168,9 @@ object Band {
         "R",
         "R",
         "Red",
-        Wavelength(620000),
-        Wavelength(670000),
-        Wavelength(720000)
+        Wavelength(620000.refined[Positive]),
+        Wavelength(670000.refined[Positive]),
+        Wavelength(720000.refined[Positive])
       )
 
   /** @group Constructors */
@@ -177,9 +179,9 @@ object Band {
         "I",
         "I",
         "Infrared",
-        Wavelength(820000),
-        Wavelength(870000),
-        Wavelength(920000)
+        Wavelength(820000.refined[Positive]),
+        Wavelength(870000.refined[Positive]),
+        Wavelength(920000.refined[Positive])
       )
 
   /** @group Constructors */
@@ -188,9 +190,9 @@ object Band {
         "Y",
         "Y",
         "Y",
-        Wavelength(960000),
-        Wavelength(1020000),
-        Wavelength(1080000)
+        Wavelength(960000.refined[Positive]),
+        Wavelength(1020000.refined[Positive]),
+        Wavelength(1080000.refined[Positive])
       )
 
   /** @group Constructors */
@@ -199,9 +201,9 @@ object Band {
         "J",
         "J",
         "J",
-        Wavelength(1130000),
-        Wavelength(1250000),
-        Wavelength(1370000)
+        Wavelength(1130000.refined[Positive]),
+        Wavelength(1250000.refined[Positive]),
+        Wavelength(1370000.refined[Positive])
       )
 
   /** @group Constructors */
@@ -210,9 +212,9 @@ object Band {
         "H",
         "H",
         "H",
-        Wavelength(1500000),
-        Wavelength(1650000),
-        Wavelength(1800000)
+        Wavelength(1500000.refined[Positive]),
+        Wavelength(1650000.refined[Positive]),
+        Wavelength(1800000.refined[Positive])
       )
 
   /** @group Constructors */
@@ -221,9 +223,9 @@ object Band {
         "K",
         "K",
         "K",
-        Wavelength(1995000),
-        Wavelength(2200000),
-        Wavelength(2405000)
+        Wavelength(1995000.refined[Positive]),
+        Wavelength(2200000.refined[Positive]),
+        Wavelength(2405000.refined[Positive])
       )
 
   /** @group Constructors */
@@ -232,9 +234,9 @@ object Band {
         "L",
         "L",
         "L",
-        Wavelength(3410000),
-        Wavelength(3760000),
-        Wavelength(4110000)
+        Wavelength(3410000.refined[Positive]),
+        Wavelength(3760000.refined[Positive]),
+        Wavelength(4110000.refined[Positive])
       )
 
   /** @group Constructors */
@@ -243,9 +245,9 @@ object Band {
         "M",
         "M",
         "M",
-        Wavelength(4650000),
-        Wavelength(4770000),
-        Wavelength(4890000)
+        Wavelength(4650000.refined[Positive]),
+        Wavelength(4770000.refined[Positive]),
+        Wavelength(4890000.refined[Positive])
       )
 
   /** @group Constructors */
@@ -254,9 +256,9 @@ object Band {
         "N",
         "N",
         "N",
-        Wavelength(7855000),
-        Wavelength(10470000),
-        Wavelength(13085000)
+        Wavelength(7855000.refined[Positive]),
+        Wavelength(10470000.refined[Positive]),
+        Wavelength(13085000.refined[Positive])
       )
 
   /** @group Constructors */
@@ -265,9 +267,9 @@ object Band {
         "Q",
         "Q",
         "Q",
-        Wavelength(19305000),
-        Wavelength(20130000),
-        Wavelength(20955000)
+        Wavelength(19305000.refined[Positive]),
+        Wavelength(20130000.refined[Positive]),
+        Wavelength(20955000.refined[Positive])
       )
 
   /** @group Constructors */
@@ -287,9 +289,9 @@ object Band {
         "Gaia",
         "G",
         "Gaia Pass Band",
-        Wavelength(330000),
-        Wavelength(641000),
-        Wavelength(1037000)
+        Wavelength(330000.refined[Positive]),
+        Wavelength(641000.refined[Positive]),
+        Wavelength(1037000.refined[Positive])
       )
 
   /** @group Constructors */
@@ -298,9 +300,9 @@ object Band {
         "GaiaBP",
         "G_BP",
         "Gaia Blue Pass Band",
-        Wavelength(328000),
-        Wavelength(513000),
-        Wavelength(671000)
+        Wavelength(328000.refined[Positive]),
+        Wavelength(513000.refined[Positive]),
+        Wavelength(671000.refined[Positive])
       )
 
   /** @group Constructors */
@@ -309,9 +311,9 @@ object Band {
         "GaiaRP",
         "G_RP",
         "Gaia Red Pass Band",
-        Wavelength(626000),
-        Wavelength(778000),
-        Wavelength(1051000)
+        Wavelength(626000.refined[Positive]),
+        Wavelength(778000.refined[Positive]),
+        Wavelength(1051000.refined[Positive])
       )
 
   /** All members of Band, in canonical order. */

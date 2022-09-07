@@ -15,7 +15,7 @@ trait ArbUnits {
         name       <- arbitrary[String]
         abbv       <- arbitrary[String]
         serialized <- arbitrary[String]
-      } yield UnitOfMeasure[Unitless](name, abbv, serialized)
+      } yield UnitOfMeasure[1](name, abbv, serialized)
     }
 
   implicit val cogenUnits: Cogen[Units] =

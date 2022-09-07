@@ -11,9 +11,9 @@ import monocle.Prism
 import monocle.macros.GenPrism
 
 sealed trait FutureExecutionConfig {
-  val static: StaticConfig
-  val acquisition: ExecutionSequence
-  val science: ExecutionSequence
+  def static: StaticConfig
+  def acquisition: ExecutionSequence
+  def science: ExecutionSequence
 }
 
 object FutureExecutionConfig {

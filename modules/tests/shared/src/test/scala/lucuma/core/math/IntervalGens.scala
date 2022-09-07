@@ -130,7 +130,7 @@ trait IntervalGens {
   def rateForInterval(interval: Bounded[Instant]): Gen[Duration] =
     for {
       samples <- Gen.choose(50L, 400L)
-      delta   <- Gen.choose(0, MaxDelta)
+      delta   <- Gen.choose(0L, MaxDelta)
     } yield (interval.duration / samples).plusNanos(delta)
 
   def distinctZip[A: Eq](gen1: Gen[A], gen2: Gen[A]): Gen[(A, A)] =

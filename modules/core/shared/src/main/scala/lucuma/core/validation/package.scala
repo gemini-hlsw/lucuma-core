@@ -11,6 +11,7 @@ import eu.timepit.refined.auto._
 import eu.timepit.refined.numeric.Interval
 import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.core.optics._
+import lucuma.refined._
 
 import scala.util.Try
 
@@ -33,34 +34,34 @@ package object validation {
   type ValidFormatNec[E, A, B] = ValidFormat[NonEmptyChain[E], A, B]
   type InputValidFormat[A]     = ValidFormatNec[NonEmptyString, String, A]
 
-  implicit class StringParseOps(val s: String) extends AnyVal {
+  implicit class StringParseOps(private val s: String) extends AnyVal {
 
     /** Try to parse as a `BigDecimal` */
     def toBigDecimalOption: Option[BigDecimal] =
       Try(BigDecimal(s)).toOption
   }
 
-  implicit class EitherStringOps[A](val e: Either[String, A]) extends AnyVal {
+  implicit class EitherStringOps[A](private val e: Either[String, A]) extends AnyVal {
 
     /** Convert an `Either[String, A]` to an `Either[Errors, A]` */
     def toEitherErrorsUnsafe: EitherErrors[A] =
       e.leftMap(s => NonEmptyChain(NonEmptyString.unsafeFrom(s)))
   }
 
-  implicit class EitherNESOps[A](val e: Either[NonEmptyString, A]) extends AnyVal {
+  implicit class EitherNESOps[A](private val e: Either[NonEmptyString, A]) extends AnyVal {
 
     /** Convert an `Either[NonEmptyString, A]` to an `Either[Errors, A]` */
     def toEitherErrors: EitherErrors[A] =
       e.leftMap(s => NonEmptyChain(s))
   }
 
-  implicit class NESValidSplitEpiOps[A, B](val self: ValidSplitEpi[NonEmptyString, A, B])
+  implicit class NESValidSplitEpiOps[A, B](private val self: ValidSplitEpi[NonEmptyString, A, B])
       extends AnyVal {
     def toErrorsValidSplitEpi: ValidSplitEpi[Errors, A, B] =
       ValidSplitEpi(self.getValid.andThen(_.leftMap(s => NonEmptyChain(s))), self.reverseGet)
   }
 
-  implicit class StringValidSplitEpiOps[A, B](val self: ValidSplitEpi[String, A, B])
+  implicit class StringValidSplitEpiOps[A, B](private val self: ValidSplitEpi[String, A, B])
       extends AnyVal {
     def toErrorsValidSplitEpiUnsafe: ValidSplitEpi[Errors, A, B] =
       ValidSplitEpi(
@@ -69,12 +70,14 @@ package object validation {
       )
   }
 
-  implicit class NESValidWedgeOps[A, B](val self: ValidWedge[NonEmptyString, A, B]) extends AnyVal {
+  implicit class NESValidWedgeOps[A, B](private val self: ValidWedge[NonEmptyString, A, B])
+      extends AnyVal {
     def toErrorsValidWedge: ValidWedge[Errors, A, B] =
       ValidWedge(self.getValid.andThen(_.leftMap(s => NonEmptyChain(s))), self.reverseGet)
   }
 
-  implicit class StringValidWedgeOps[A, B](val self: ValidWedge[String, A, B]) extends AnyVal {
+  implicit class StringValidWedgeOps[A, B](private val self: ValidWedge[String, A, B])
+      extends AnyVal {
     def toErrorsValidWedgeUnsafe: ValidWedge[Errors, A, B] =
       ValidWedge(
         self.getValid.andThen(_.leftMap(s => NonEmptyChain(NonEmptyString.unsafeFrom(s)))),
@@ -82,14 +85,14 @@ package object validation {
       )
   }
 
-  implicit class InputValidWedgeOps[A](val self: InputValidWedge[A]) extends AnyVal {
+  implicit class InputValidWedgeOps[A](private val self: InputValidWedge[A]) extends AnyVal {
     def withErrorMessage(msg: NonEmptyString): InputValidWedge[A] =
       self.withError(NonEmptyChain(msg))
 
     /**
      * Build an `InputValidWedge[NonEmptyList[A]]` given a `InputValidWedge[A]`
      */
-    def toNel(separator: NonEmptyString = ","): InputValidWedge[NonEmptyList[A]] =
+    def toNel(separator: NonEmptyString = ",".refined): InputValidWedge[NonEmptyList[A]] =
       InputValidWedge[NonEmptyList[A]](
         _.split(separator).toList.toNel
           .toRight("Must be defined")
@@ -99,14 +102,14 @@ package object validation {
       )
   }
 
-  implicit class InputValidSplitEpiOps[A](val self: InputValidSplitEpi[A]) extends AnyVal {
+  implicit class InputValidSplitEpiOps[A](private val self: InputValidSplitEpi[A]) extends AnyVal {
     def withErrorMessage(msg: NonEmptyString): InputValidSplitEpi[A] =
       self.withError(NonEmptyChain(msg))
 
     /**
      * Build an `InputValidSplitEpi[NonEmptyList[A]]` given a `InputValidSplitEpi[A]`
      */
-    def toNel(separator: NonEmptyString = ","): InputValidSplitEpi[NonEmptyList[A]] =
+    def toNel(separator: NonEmptyString = ",".refined): InputValidSplitEpi[NonEmptyList[A]] =
       InputValidSplitEpi[NonEmptyList[A]](
         _.split(separator).toList.toNel
           .toRight("Must be defined")

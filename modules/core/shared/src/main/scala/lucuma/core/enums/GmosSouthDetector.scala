@@ -7,13 +7,14 @@ package enums
 
 import cats.syntax.eq._
 import coulomb._
-import coulomb.refined._
 import eu.timepit.refined.auto._
 import eu.timepit.refined.numeric.Positive
 import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.math.Angle
 import lucuma.core.math.units.Pixels
+import lucuma.core.math.units._
 import lucuma.core.util.Enumerated
+import lucuma.refined._
 
 /**
  * Enumerated type for GMOS detector.
@@ -44,7 +45,7 @@ object GmosSouthDetector {
                                6144.withRefinedUnit[Positive, Pixels],
                                4608.withRefinedUnit[Positive, Pixels],
                                37.withRefinedUnit[Positive, Pixels],
-                               4
+                               4.refined
                              )
   /** @group Constructors */ case object Hamamatsu extends GmosSouthDetector(
                                "HAMAMATSU",
@@ -55,7 +56,7 @@ object GmosSouthDetector {
                                6255.withRefinedUnit[Positive, Pixels],
                                4176.withRefinedUnit[Positive, Pixels],
                                61.withRefinedUnit[Positive, Pixels],
-                               5
+                               5.refined
                              )
 
   /** All members of GmosSouthDetector, in canonical order. */

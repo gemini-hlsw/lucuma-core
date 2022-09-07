@@ -32,7 +32,7 @@ object ShapeExpression {
    *
    * @group Constructors
    */
-  final case object Empty extends ShapeExpression
+  case object Empty extends ShapeExpression
 
   /**
    * An shape representing a point

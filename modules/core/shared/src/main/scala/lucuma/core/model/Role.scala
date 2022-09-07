@@ -7,6 +7,7 @@ import cats.Eq
 import cats.implicits._
 import eu.timepit.refined.auto._
 import lucuma.core.util.WithGid
+import lucuma.refined._
 
 /**
  * Each user has a current `Role` and a set of other roles they may assume. A role has (at least) an
@@ -28,10 +29,10 @@ object Role {
 // Special roles
 
 /** `GuestRole` allows limited access to temporary programs. */
-final case object GuestRole extends Role(Access.Guest)
+case object GuestRole extends Role(Access.Guest)
 
 /** `ServiceRole` is used only for inter-service communication. */
-final case class ServiceRole(serviceName: String) extends Role(Access.Service, Some(serviceName))
+case class ServiceRole(serviceName: String) extends Role(Access.Service, Some(serviceName))
 
 object ServiceRole {
   implicit val eqServiceRole: Eq[ServiceRole] = Eq.by(_.serviceName)
@@ -42,7 +43,7 @@ sealed abstract class StandardRole(access: Access, elaboration: Option[String] =
     extends Role(access, elaboration) {
   def id: StandardRole.Id
 }
-object StandardRole extends WithGid('r') {
+object StandardRole extends WithGid('r'.refined) {
 
   /** The `Pi` role gives access to programs on which the user is a collaborator. */
   final case class Pi(id: StandardRole.Id) extends StandardRole(Access.Pi)

@@ -8,6 +8,7 @@ import cats.Eq
 import cats.implicits._
 import eu.timepit.refined.auto._
 import lucuma.core.util.WithGid
+import lucuma.refined._
 
 /** A user has [at least] an identity and a role. */
 sealed trait User extends Product with Serializable {
@@ -31,7 +32,7 @@ sealed trait User extends Product with Serializable {
 
 }
 
-object User extends WithGid('u') {
+object User extends WithGid('u'.refined) {
   implicit val eqUser: Eq[User] = Eq.instance {
     case (a: GuestUser, b: GuestUser)       => a === b
     case (a: ServiceUser, b: ServiceUser)   => a === b

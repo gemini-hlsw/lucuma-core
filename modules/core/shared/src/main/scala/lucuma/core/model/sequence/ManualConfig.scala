@@ -14,10 +14,10 @@ import org.typelevel.cats.time._
 import java.time.Duration
 
 sealed trait ManualConfig {
-  val static: StaticConfig
-  val setupTime: Duration
-  val acquisition: List[Atom]
-  val science: List[Atom]
+  def static: StaticConfig
+  def setupTime: Duration
+  def acquisition: List[Atom]
+  def science: List[Atom]
 }
 
 object ManualConfig {

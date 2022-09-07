@@ -6,7 +6,7 @@ package lucuma.core.optics.syntax
 import lucuma.core.optics.Format
 import monocle.Prism
 
-final class PrismOps[A, B](val self: Prism[A, B]) extends AnyVal {
+final class PrismOps[A, B](private val self: Prism[A, B]) extends AnyVal {
 
   /** Weaken to Format. */
   def asFormat: Format[A, B] =

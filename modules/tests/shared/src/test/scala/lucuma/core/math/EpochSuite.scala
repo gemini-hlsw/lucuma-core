@@ -13,6 +13,7 @@ import lucuma.core.math.arb._
 import lucuma.core.math.parser.EpochParsers._
 import lucuma.core.optics.laws.discipline._
 import lucuma.core.syntax.parser._
+import lucuma.refined._
 import monocle.law.discipline.PrismTests
 import org.scalacheck.Arbitrary
 import org.scalacheck.Prop._
@@ -24,7 +25,7 @@ final class EpochSuite extends munit.DisciplineSuite {
   import ArbTime._
 
   // provide an Arbitrary[String] for the Prism tests.
-  implicit val arbEpochString = Arbitrary(ArbEpoch.strings)
+  implicit val arbEpochString: Arbitrary[String] = Arbitrary(ArbEpoch.strings)
 
   // Laws
   checkAll("Epoch", OrderTests[Epoch].order)
@@ -69,20 +70,20 @@ final class EpochSuite extends munit.DisciplineSuite {
 
   test("epochLenientNoScheme") {
     assertEquals(epochLenientNoScheme.parseExact("2014.123"),
-                 Epoch.Julian.fromMilliyears(2014123).some
+                 Epoch.Julian.fromMilliyears(2014123.refined).some
     )
-    assertEquals(epochLenientNoScheme.parseExact("2014"), Epoch.Julian.fromMilliyears(2014000).some)
+    assertEquals(epochLenientNoScheme.parseExact("2014"), Epoch.Julian.fromMilliyears(2014000.refined).some)
     assertEquals(epochLenientNoScheme.parseExact("2014."),
-                 Epoch.Julian.fromMilliyears(2014000).some
+                 Epoch.Julian.fromMilliyears(2014000.refined).some
     )
     assertEquals(epochLenientNoScheme.parseExact("2014.1"),
-                 Epoch.Julian.fromMilliyears(2014100).some
+                 Epoch.Julian.fromMilliyears(2014100.refined).some
     )
     assertEquals(epochLenientNoScheme.parseExact("2014.092"),
-                 Epoch.Julian.fromMilliyears(2014092).some
+                 Epoch.Julian.fromMilliyears(2014092.refined).some
     )
     assertEquals(epochLenientNoScheme.parseExact("2014.002"),
-                 Epoch.Julian.fromMilliyears(2014002).some
+                 Epoch.Julian.fromMilliyears(2014002.refined).some
     )
     assertEquals(epochLenientNoScheme.parseExact("J2014.123"), None)
     assertEquals(epochLenientNoScheme.parseExact("J2014"), None)
@@ -95,20 +96,20 @@ final class EpochSuite extends munit.DisciplineSuite {
   }
 
   test("epochFormatNoScheme") {
-    assertEquals(Epoch.fromStringNoScheme.reverseGet(Epoch.Julian.fromMilliyears(2014123)),
+    assertEquals(Epoch.fromStringNoScheme.reverseGet(Epoch.Julian.fromMilliyears(2014123.refined)),
                  "2014.123"
     )
-    assertEquals(Epoch.fromStringNoScheme.reverseGet(Epoch.Julian.fromMilliyears(2014000)), "2014")
-    assertEquals(Epoch.fromStringNoScheme.reverseGet(Epoch.Julian.fromMilliyears(2014300)),
+    assertEquals(Epoch.fromStringNoScheme.reverseGet(Epoch.Julian.fromMilliyears(2014000.refined)), "2014")
+    assertEquals(Epoch.fromStringNoScheme.reverseGet(Epoch.Julian.fromMilliyears(2014300.refined)),
                  "2014.3"
     )
-    assertEquals(Epoch.fromStringNoScheme.reverseGet(Epoch.Julian.fromMilliyears(2014092)),
+    assertEquals(Epoch.fromStringNoScheme.reverseGet(Epoch.Julian.fromMilliyears(2014092.refined)),
                  "2014.092"
     )
-    assertEquals(Epoch.fromStringNoScheme.reverseGet(Epoch.Julian.fromMilliyears(2014002)),
+    assertEquals(Epoch.fromStringNoScheme.reverseGet(Epoch.Julian.fromMilliyears(2014002.refined)),
                  "2014.002"
     )
-    assertEquals(Epoch.fromStringNoScheme.reverseGet(Epoch.Julian.fromMilliyears(2014350)),
+    assertEquals(Epoch.fromStringNoScheme.reverseGet(Epoch.Julian.fromMilliyears(2014350.refined)),
                  "2014.35"
     )
   }

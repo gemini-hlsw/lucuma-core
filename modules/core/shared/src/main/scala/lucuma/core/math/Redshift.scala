@@ -4,7 +4,8 @@
 package lucuma.core.math
 
 import cats._
-import coulomb._
+import coulomb.*
+import coulomb.syntax.*
 import lucuma.core.math.Constants.SpeedOfLight
 import lucuma.core.math.units._
 import monocle.Iso

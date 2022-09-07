@@ -5,7 +5,8 @@ package lucuma.core.model
 
 import cats.Order._
 import cats.kernel.laws.discipline._
-import coulomb._
+import coulomb.*
+import coulomb.syntax.*
 import eu.timepit.refined.cats._
 import lucuma.core.enums.Band
 import lucuma.core.enums.StellarLibrarySpectrum

@@ -5,14 +5,14 @@ package lucuma.core.syntax
 
 import lucuma.core.util.Display
 
-final class DisplayOps[A](val value: A) extends AnyVal {
-  
+final class DisplayOps[A](private val value: A) extends AnyVal {
+
   def shortName(implicit d: Display[A]): String = d.shortName(value)
-  def longName(implicit d: Display[A]):  String = d.longName(value)
+  def longName(implicit d: Display[A]): String  = d.longName(value)
 }
 
 trait ToDisplayOps {
-  implicit def ToDisplayOps[A](value: A): DisplayOps[A] = 
+  implicit def ToDisplayOps[A](value: A): DisplayOps[A] =
     new DisplayOps[A](value)
 }
 

@@ -5,6 +5,7 @@ package lucuma.core.model
 
 import cats._
 import cats.syntax.all._
+import coulomb.policy.spire.standard.given
 import lucuma.core.math._
 import monocle.Focus
 import monocle.Lens
@@ -65,7 +66,7 @@ final case class SiderealTracking(
 }
 
 object SiderealTracking extends SiderealTrackingOptics {
-  import Constants.{ AstronomicalUnit, TwoPi }
+  import Constants.{AstronomicalUnit, TwoPi}
 
   def const(cs: Coordinates): SiderealTracking =
     SiderealTracking(cs, Epoch.J2000, none, none, none)
@@ -85,8 +86,7 @@ object SiderealTracking extends SiderealTrackingOptics {
    * @param elapsedYears
    *   elapsed time in epoch years
    * @return
-   *   Coordinates corrected for proper motion.
-   *   None for invalid Declination, e.g. +/-90
+   *   Coordinates corrected for proper motion. None for invalid Declination, e.g. +/-90
    */
   def coordinatesOn(
     baseCoordinates: Coordinates,
@@ -117,7 +117,7 @@ object SiderealTracking extends SiderealTrackingOptics {
   private type Vec3 = (Double, Double, Double)
 
   // |+| gives us addition for VecN, but we also need scalar multiplication
-  private implicit class Vec3Ops(val a: Vec3) extends AnyVal {
+  private implicit class Vec3Ops(private val a: Vec3) extends AnyVal {
     def *(d: Double): Vec3 =
       (a._1 * d, a._2 * d, a._3 * d)
   }
@@ -148,17 +148,17 @@ object SiderealTracking extends SiderealTrackingOptics {
     elapsedYears:    Double
   ): Option[Vec2] = {
     // Break out our components
-    val (ra, dec)   = baseCoordinates
+    val (ra, dec)    = baseCoordinates
     val (dRaʹ, dDec) = properMotion
-    val cosDec = cos(dec)
-    val cosRa = cos(ra)
-    val sinDec = sin(dec)
-    val sinRa = sin(ra)
+    val cosDec       = cos(dec)
+    val cosRa        = cos(ra)
+    val sinDec       = sin(dec)
+    val sinRa        = sin(ra)
 
     if (cosDec != 0) {
 
       // See: https://app.shortcut.com/lucuma/story/1388/proper-motion-calculation
-      val dRa  =  dRaʹ / cosDec
+      val dRa = dRaʹ / cosDec
 
       // Convert to cartesian
       val pos: Vec3 =

@@ -64,7 +64,7 @@ trait TimeParsers {
    * @param month parser for the month component
    * @param sep   parser for any separator between components
    */
-  def genYMD(month: Parser[Month], sep: Parser[_]): Parser[LocalDate] =
+  def genYMD(month: Parser[Month], sep: Parser[?]): Parser[LocalDate] =
     (for {
       y <- year4 <~ sep
       m <- month <~ sep
@@ -82,7 +82,7 @@ trait TimeParsers {
    *
    * @param sep parser for any separator between hours, minutes, and seconds
    */
-  def genLocalTime(sep: Parser[_]): Parser[LocalTime] = {
+  def genLocalTime(sep: Parser[?]): Parser[LocalTime] = {
     val nano: Parser[Int] =
       opt(dot ~> frac(9)).flatMap(o => ok(o.getOrElse(0))).namedOpaque("up to 9 digits nanoseconds")
 
