@@ -6,8 +6,8 @@ package arb
 
 import lucuma.core.arb.ArbTime
 import lucuma.core.util.Timestamp
-import org.scalacheck._
 import org.scalacheck.Arbitrary.arbitrary
+import org.scalacheck._
 
 import java.time._
 
