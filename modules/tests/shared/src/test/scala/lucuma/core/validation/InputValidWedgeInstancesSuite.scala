@@ -3,18 +3,16 @@
 
 package lucuma.core.validation
 
-import eu.timepit.refined.auto._
-import eu.timepit.refined.cats._
-import lucuma.core.math.arb.ArbRefined
+import eu.timepit.refined.auto.*
+import eu.timepit.refined.cats.*
+import lucuma.core.math.arb.ArbRefined.*
 import lucuma.core.optics.laws.discipline.ValidWedgeTests
-import lucuma.refined._
+import lucuma.refined.*
 import munit.DisciplineSuite
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
 
-final class InputValidWedgeInstancesSuite extends DisciplineSuite {
-  import ArbRefined._
-
+final class InputValidWedgeInstancesSuite extends DisciplineSuite:
   val genNumericString: Gen[String]      = arbitrary[BigDecimal].map(_.toString)
   val genMaybeNumericString: Gen[String] =
     Gen.frequency(5 -> genNumericString, 1 -> arbitrary[String])
@@ -28,5 +26,3 @@ final class InputValidWedgeInstancesSuite extends DisciplineSuite {
     "truncatedPosBigDecimal(2)",
     ValidWedgeTests(InputValidWedge.truncatedPosBigDecimal(2.refined)).validWedgeWith(genMaybeNumericString)
   )
-
-}

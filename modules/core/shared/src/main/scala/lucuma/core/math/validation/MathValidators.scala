@@ -30,7 +30,7 @@ trait MathValidators {
       a => (a.toMicroarcseconds / 1000000.0).toString
     )
 
-  private def trucateAngle(angle: Angle): Angle =
+  private def truncateAngle(angle: Angle): Angle =
     Angle.fromBigDecimalDegrees(
       (angle.toBigDecimalDegrees * 100)
         .setScale(0, scala.math.BigDecimal.RoundingMode.HALF_UP) / 100 + 0.0
@@ -40,17 +40,17 @@ trait MathValidators {
     InputValidWedge(
       _.toBigDecimalOption
         .map(Angle.fromBigDecimalDegrees)
-        .map(trucateAngle)
+        .map(truncateAngle)
         .toRight("Invalid Angle")
         .toEitherErrorsUnsafe,
-      a => f"${a.toBigDecimalDegrees}%.2f".replace("360.00", "0.00")
+      a => f"${truncateAngle(a).toBigDecimalDegrees}%.2f".replace("360.00", "0.00")
     )
 
   val truncatedAngleSignedDegrees: InputValidWedge[Angle] =
     InputValidWedge(
       truncatedAngleDegrees.getValid,
       a =>
-        f"${a.toSignedBigDecimalDegrees}%.2f"
+        f"${truncateAngle(a).toSignedBigDecimalDegrees}%.2f"
           .replace("-0.00", "0.00")
           .replace("180.00", "-180.00")
     )
@@ -73,7 +73,7 @@ trait MathValidators {
   val truncatedRA: InputValidWedge[RightAscension] =
     InputValidWedge(
       rightAscension.getValid.andThen(_.map(truncateRA)),
-      ra => RightAscension.fromStringHMS.reverseGet(ra).dropRight(3)
+      ra => RightAscension.fromStringHMS.reverseGet(truncateRA(ra)).dropRight(3)
     )
 
   val declination: InputValidSplitEpi[Declination] =
@@ -96,7 +96,7 @@ trait MathValidators {
       declination.getValid.andThen(_.map(truncateDec)),
       dec =>
         Declination.fromStringSignedDMS
-          .reverseGet(dec)
+          .reverseGet(truncateDec(dec))
           .dropRight(4)
           .replace("-00:00:00.00", "+00:00:00.00")
     )
