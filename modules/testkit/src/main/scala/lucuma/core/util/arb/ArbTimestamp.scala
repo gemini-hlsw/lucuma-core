@@ -6,6 +6,7 @@ package arb
 
 import lucuma.core.arb.ArbTime
 import lucuma.core.util.Timestamp
+import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck._
 
 import java.time._
@@ -19,11 +20,24 @@ trait ArbTimestamp {
       for {
         m <- Gen.choose(0L, Duration.between(Instant.EPOCH, Timestamp.Max.toInstant).toMillis)
         u <- Gen.choose(0L, 999L)
-      } yield Timestamp.Epoch.plusMillis(m).flatMap(_.plusMicros(u)).getOrElse(Timestamp.Epoch)
+      } yield Timestamp.Epoch.plusMillisOption(m).flatMap(_.plusMicrosOption(u)).getOrElse(Timestamp.Epoch)
     }
 
   implicit val cogTimestamp: Cogen[Timestamp] =
     Cogen[Instant].contramap(_.toInstant)
+
+  val genTimestampString: Gen[String] =
+    Gen.oneOf(
+      arbitrary[Timestamp].map(_.format),
+      arbitrary[Timestamp].map(_.format).map(s => s"${s}000"),
+      arbitrary[Timestamp].map(_.isoFormat),
+      arbitrary[(Timestamp, Int, Char)].map { case (t, i, c) =>
+        val cs = t.format.toCharArray
+        val in = (i % cs.size).abs
+        cs(in) = c
+        String.valueOf(cs)
+      }
+    )
 
 }
 

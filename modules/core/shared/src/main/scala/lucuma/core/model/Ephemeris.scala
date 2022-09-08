@@ -6,6 +6,7 @@ package lucuma.core.model
 import cats.Eq
 import cats.Foldable
 import cats.Monoid
+import cats.kernel.Order.catsKernelOrderingForOrder
 import cats.syntax.all._
 import lucuma.core.optics.SplitMono
 import lucuma.core.syntax.treemap._
