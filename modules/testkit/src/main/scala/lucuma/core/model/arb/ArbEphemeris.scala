@@ -4,6 +4,7 @@
 package lucuma.core.model
 package arb
 
+import cats.kernel.Order.catsKernelOrderingForOrder
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Offset
 import lucuma.core.math.arb.ArbCoordinates
