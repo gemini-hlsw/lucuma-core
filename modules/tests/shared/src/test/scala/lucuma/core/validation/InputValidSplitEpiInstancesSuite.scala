@@ -3,33 +3,14 @@
 
 package lucuma.core.validation
 
-import eu.timepit.refined.cats._
-import eu.timepit.refined.scalacheck.all._
+import eu.timepit.refined.cats.*
+import eu.timepit.refined.scalacheck.all.*
 import eu.timepit.refined.types.numeric.PosBigDecimal
 import lucuma.core.optics.laws.discipline.ValidSplitEpiTests
 import munit.DisciplineSuite
 import org.scalacheck.Arbitrary
 
-final class InputValidSplitEpiInstancesSuite extends DisciplineSuite {
-
-  // The scientific notation formatters use `java.text.DecimalFormat` which in Scala.js seems
-  // to have trouble formatting BigDecimals with very high absolute scale or precision.
-  // We therefore use these bounded arbitraries.
-  implicit lazy val arbBigDecimalLimitedPrecision: Arbitrary[BigDecimal] =
-    Arbitrary(
-      org.scalacheck.Arbitrary.arbBigDecimal.arbitrary.suchThat(x =>
-        x.scale.abs < 100 && x.precision <= 15
-      )
-    )
-
-  implicit lazy val arbPosBigDecimalLimitedPrecision: Arbitrary[PosBigDecimal] =
-    Arbitrary(
-      arbBigDecimalLimitedPrecision.arbitrary
-        .map(_.abs)
-        .suchThat(_ > 0)
-        .map(PosBigDecimal.unsafeFrom)
-    )
-
+final class InputValidSplitEpiInstancesSuite extends DisciplineSuite with LimitedBigDecimals:
   // Laws
   checkAll("nonEmptyString", ValidSplitEpiTests(InputValidSplitEpi.nonEmptyString).validSplitEpi)
   checkAll("int", ValidSplitEpiTests(InputValidSplitEpi.int).validSplitEpi)
@@ -44,4 +25,3 @@ final class InputValidSplitEpiInstancesSuite extends DisciplineSuite {
     "posBigDecimalWithScientificNotation",
     ValidSplitEpiTests(InputValidSplitEpi.posBigDecimalWithScientificNotation).validSplitEpi
   )
-}

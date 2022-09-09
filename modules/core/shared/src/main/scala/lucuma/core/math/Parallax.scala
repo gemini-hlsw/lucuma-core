@@ -18,6 +18,8 @@ import lucuma.core.optics._
 import spire.math.Rational
 import spire.std.long._
 
+import scala.math.BigDecimal.RoundingMode
+
 /**
  * Parallax stored as microarcseconds
  * Normally parallax is expressed in milliarcseconds but simbad reports them
@@ -80,8 +82,9 @@ sealed trait ParallaxOptics {
    */
   lazy val milliarcseconds: SplitMono[Parallax, BigDecimal] =
     microarcseconds
-      .imapB(_.underlying.movePointRight(3).longValue,
-             n => new java.math.BigDecimal(n).movePointLeft(3)
+      .imapB(
+        _.setScale(3, RoundingMode.HALF_UP).underlying.movePointRight(3).longValue,
+        n => new java.math.BigDecimal(n).movePointLeft(3)
       )
 
 }

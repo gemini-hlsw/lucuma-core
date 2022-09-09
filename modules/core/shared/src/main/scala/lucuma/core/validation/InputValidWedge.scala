@@ -14,6 +14,8 @@ import lucuma.refined._
 import monocle.Iso
 import monocle.Prism
 
+import scala.math.BigDecimal.RoundingMode
+
 /**
  * Convenience version of `ValidWedge` when the error type is `NonEmptyChain[NonEmptyString]` and
  * `T` is `String`.
@@ -70,10 +72,10 @@ object InputValidWedge {
   def truncatedBigDecimal(decimals: DigitCount): InputValidWedge[BigDecimal] =
     InputValidWedge(
       InputValidSplitEpi.bigDecimal.getValid
-        .andThen(_.map(_.setScale(decimals.value, scala.math.BigDecimal.RoundingMode.HALF_UP))),
-      bd =>
-        s"%.${decimals.value}f"
-          .format(bd)
+        .andThen(_.map(_.setScale(decimals.value, RoundingMode.HALF_UP))),
+        _.setScale(decimals.value, RoundingMode.HALF_UP)
+          .underlying
+          .toPlainString
           .replaceAll("^-0\\.(0+)$", "0.$1") // Remove negative 0
     )
 
