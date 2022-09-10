@@ -51,6 +51,7 @@ final class Gid[A](
 ) extends BoundedEnumerable[A]
     with Order[A]
     with Show[A]
+    with Display[A]
     with Encoder[A]
     with Decoder[A] {
 
@@ -109,6 +110,10 @@ final class Gid[A](
 
   // Show
   final override def show(a: A): String =
+    fromString.reverseGet(a)
+
+  // Display
+  final override def shortName(a: A): String = 
     fromString.reverseGet(a)
 
   // Decoder
