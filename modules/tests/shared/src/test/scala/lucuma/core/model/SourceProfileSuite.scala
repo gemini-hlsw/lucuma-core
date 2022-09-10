@@ -4,7 +4,9 @@
 package lucuma.core.model
 
 import cats.Order._
+import cats.data.NonEmptyMap
 import cats.kernel.laws.discipline._
+import cats.laws.discipline.arbitrary.*
 import coulomb.*
 import coulomb.syntax.*
 import eu.timepit.refined.cats._
@@ -21,6 +23,8 @@ import lucuma.core.math.units._
 import lucuma.core.model.arb._
 import lucuma.core.util.arb.ArbCollection
 import lucuma.core.util.arb.ArbEnumerated
+import lucuma.core.util.arb.ArbTimestamp
+import lucuma.core.util.Timestamp
 import monocle.law.discipline._
 import munit._
 
@@ -30,6 +34,7 @@ final class SourceProfileSuite extends DisciplineSuite {
   import ArbAngle._
   import ArbEmissionLine._
   import ArbEnumerated._
+  import ArbTimestamp._
   import ArbMeasure._
   import ArbRefined._
   import ArbSourceProfile._
@@ -43,7 +48,7 @@ final class SourceProfileSuite extends DisciplineSuite {
     SpectralDefinition.BandNormalized(
       UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.A0I),
       SortedMap(
-        Band.R -> Band.R.defaultUnits[Integrated].withValueTagged(BigDecimal(10.0))
+        Band.R -> NonEmptyMap.of(Timestamp.Min -> Band.R.defaultUnits[Integrated].withValueTagged(BigDecimal(10.0)))
       )
     )
 
@@ -51,7 +56,7 @@ final class SourceProfileSuite extends DisciplineSuite {
     SpectralDefinition.BandNormalized(
       UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.A0I),
       SortedMap(
-        Band.R -> Band.R.defaultUnits[Surface].withValueTagged(BigDecimal(10.0))
+        Band.R -> NonEmptyMap.of(Timestamp.Min -> Band.R.defaultUnits[Surface].withValueTagged(BigDecimal(10.0)))
       )
     )
 

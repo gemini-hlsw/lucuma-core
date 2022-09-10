@@ -5,6 +5,8 @@ package lucuma.core.model.arb
 
 import cats.Order._
 import cats.syntax.all._
+import cats.data.NonEmptyMap
+import cats.laws.discipline.arbitrary.*
 import eu.timepit.refined.types.numeric.PosBigDecimal
 import lucuma.core.enums.Band
 import lucuma.core.math.BrightnessUnits
@@ -17,7 +19,9 @@ import lucuma.core.model.EmissionLine
 import lucuma.core.model.SpectralDefinition
 import lucuma.core.model.UnnormalizedSED
 import lucuma.core.util.arb.ArbEnumerated
+import lucuma.core.util.arb.ArbTimestamp
 import org.scalacheck.Arbitrary.arbitrary
+import org.scalacheck.Arbitrary._
 import org.scalacheck._
 
 import scala.collection.immutable.SortedMap
@@ -31,6 +35,10 @@ trait ArbSpectralDefinition {
   import ArbEmissionLine._
   import ArbRefined._
   import ArbWavelength._
+  import ArbTimestamp._
+
+  implicit def cogBrightnessMeasureOverTime[K: Cogen: Ordering, V: Cogen]: Cogen[NonEmptyMap[K, V]] =
+    Cogen[Map[K, V]].contramap(_.toSortedMap.toMap)
 
   implicit def arbBandNormalizedSpectralDefinition[T](implicit
     arbUnit: Arbitrary[Units Of Brightness[T]]
@@ -38,12 +46,12 @@ trait ArbSpectralDefinition {
     Arbitrary {
       for {
         s <- arbitrary[UnnormalizedSED]
-        b <- arbitrary[SortedMap[Band, BrightnessMeasure[T]]]
+        b <- arbitrary[SortedMap[Band, BrightnessMeasureOverTime[T]]]
       } yield BandNormalized(s, b)
     }
 
   implicit def cogBandNormalizedSpectralDefinition[T]: Cogen[BandNormalized[T]] =
-    Cogen[(UnnormalizedSED, Map[Band, BrightnessMeasure[T]])].contramap(x =>
+    Cogen[(UnnormalizedSED, Map[Band, BrightnessMeasureOverTime[T]])].contramap(x =>
       (x.sed, x.brightnesses)
     )
 

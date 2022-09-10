@@ -4,7 +4,9 @@
 package lucuma.core.model
 
 import cats.Order._
+import cats.data.NonEmptyMap
 import cats.kernel.laws.discipline._
+import cats.laws.discipline.arbitrary.*
 import eu.timepit.refined.cats._
 import eu.timepit.refined.scalacheck.string._
 import lucuma.core.arb._
@@ -25,6 +27,7 @@ final class TargetSuite extends DisciplineSuite {
   import ArbEphemerisKey._
   import ArbParallax._
   import ArbEnumerated._
+  import ArbTimestamp._
   import ArbCoordinates._
   import ArbRightAscension._
   import ArbDeclination._
