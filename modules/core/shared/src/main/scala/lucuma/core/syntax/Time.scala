@@ -6,6 +6,7 @@ package lucuma.core.syntax
 import cats.syntax.all._
 import lucuma.core.optics.Spire
 import lucuma.core.syntax.boundedInterval._
+import lucuma.core.util.Timestamp
 import org.typelevel.cats.time._
 import spire.math.Bounded
 import spire.math.Empty
@@ -38,7 +39,10 @@ trait ToInstantOps {
     new InstantOps(i)
 }
 
-object instant extends ToInstantOps
+object instant extends ToInstantOps {
+  extension(i: Instant)
+    def toTimestamp: Option[Timestamp] = Timestamp.fromInstant(i)
+}
 
 final class ZonedDateTimeOps(private val self: ZonedDateTime) extends AnyVal {
 

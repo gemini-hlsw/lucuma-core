@@ -3,10 +3,23 @@
 
 package lucuma.core.model
 
-import cats._
-import lucuma.core.math._
+import cats.Eq
+import cats.Show
+import lucuma.core.math.*
+import lucuma.core.util.Timestamp
 import monocle.Focus
 import monocle.Lens
+
+/** A coordinate along with a rate of change in RA and Dec for some time unit
+  *
+  * @param coord coordinates
+  * @param delta rate of change in RA and dec, where the delta(RA)/time has been
+  *              multiplied by the cosine of the dec
+  */
+sealed trait TrackedCoordinates {
+  def coord: Coordinates
+  def delta: Offset /* per time unit */
+}
 
 /** A coordinate along with a rate of change in RA and Dec for some time unit,
   * expressed as an offset in p and q.  In reality the velocity information
@@ -16,9 +29,10 @@ import monocle.Lens
   * @param delta rate of change in RA and dec, where the delta(RA)/time has been
   *              multiplied by the cosine of the dec
   */
-final case class EphemerisCoordinates(
-                   coord: Coordinates,
-                   delta: Offset /* per time unit */) {
+case class EphemerisCoordinates(
+                   override val coord: Coordinates,
+                   override val delta: Offset /* per time unit */)
+    extends TrackedCoordinates {
 
   /** Interpolates the position and rate of change at a point between this
     * coordinate and the given coordinate.
@@ -80,3 +94,33 @@ trait EphemerisCoordinatesOptics {
     delta.andThen(Offset.q)
 
 }
+
+case class SiderealCoordinates(override val coord: Coordinates) extends TrackedCoordinates {
+  override val delta: Offset =  Offset.Zero
+}
+
+object SiderealCoordinates extends SiderealCoordinatesOptics {
+  given Eq[SiderealCoordinates] = Eq.by(_.coord)
+}
+
+trait SiderealCoordinatesOptics {
+  /** @group Optics */
+  val coordinates: Lens[SiderealCoordinates, Coordinates] =
+    Focus[SiderealCoordinates](_.coord)
+
+  /** @group Optics */
+  val rightAscension: Lens[SiderealCoordinates, RightAscension] =
+    coordinates.andThen(Coordinates.rightAscension)
+
+  /** @group Optics */
+  val declination: Lens[SiderealCoordinates, Declination] =
+    coordinates.andThen(Coordinates.declination)
+}
+
+/**
+ * Implementors can calculate the coordinates for a given object at a certain timestamp
+ */
+trait Tracking {
+  def at(i: Timestamp): Option[TrackedCoordinates]
+}
+

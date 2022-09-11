@@ -11,6 +11,8 @@ import lucuma.core.math.Parallax
 import lucuma.core.math.ProperMotion
 import lucuma.core.math.arb._
 import lucuma.core.model.arb._
+import lucuma.core.syntax.instant.*
+import lucuma.core.util.Timestamp
 import monocle.law.discipline._
 import munit.DisciplineSuite
 import org.scalacheck.Prop.forAll
@@ -50,8 +52,8 @@ final class SiderealTrackingSuite extends DisciplineSuite {
     val pmra = ProperMotion.RA.milliarcsecondsPerYear.reverseGet(BigDecimal(-4406.469))
     val pmdec = ProperMotion.Dec.milliarcsecondsPerYear.reverseGet(BigDecimal(938.527))
     val tracking = SiderealTracking(coord, Epoch.J2000, ProperMotion(pmra, pmdec).some, none, Parallax.fromMicroarcseconds(203887).some)
-    val refEpoch = Instant.ofEpochSecond(4102444800L)
-    assertEquals(tracking.at(refEpoch), Coordinates.fromHmsDms.getOption("11 04 48.043284 +43 33 09.795210"))
+    val refEpoch = Instant.ofEpochSecond(4102444800L).toTimestamp
+    assertEquals(refEpoch.flatMap(tracking.at), Coordinates.fromHmsDms.getOption("11 04 48.043284 +43 33 09.795210"))
   }
 
   test("coordinatesOn corrected by cos(dec) case 2") {
@@ -59,8 +61,8 @@ final class SiderealTrackingSuite extends DisciplineSuite {
     val pmra = ProperMotion.RA.milliarcsecondsPerYear.reverseGet(BigDecimal(-3781.741))
     val pmdec = ProperMotion.Dec.milliarcsecondsPerYear.reverseGet(BigDecimal(769.465))
     val tracking = SiderealTracking(coord, Epoch.J2000, ProperMotion(pmra, pmdec).some, none, Parallax.fromMicroarcseconds(768465).some)
-    val refEpoch = Instant.ofEpochSecond(4102444800L)
-    assertEquals(tracking.at(refEpoch), Coordinates.fromHmsDms.getOption("14 28 48.054809 -62 39 28.543030"))
+    val refEpoch = Instant.ofEpochSecond(4102444800L).toTimestamp
+    assertEquals(refEpoch.flatMap(tracking.at), Coordinates.fromHmsDms.getOption("14 28 48.054809 -62 39 28.543030"))
   }
 
 }

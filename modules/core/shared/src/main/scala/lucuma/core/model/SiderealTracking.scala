@@ -7,6 +7,7 @@ import cats._
 import cats.syntax.all._
 import coulomb.policy.spire.standard.given
 import lucuma.core.math._
+import lucuma.core.util.Timestamp
 import monocle.Focus
 import monocle.Lens
 
@@ -50,8 +51,8 @@ final case class SiderealTracking(
   parallax:        Option[Parallax]
 ) {
 
-  def at(i: Instant): Option[Coordinates] =
-    plusYears(epoch.untilInstant(i))
+  def at(i: Timestamp): Option[Coordinates] =
+    plusYears(epoch.untilInstant(i.toInstant))
 
   /** Coordinates `elapsedYears` fractional epoch-years after `epoch`. */
   def plusYears(elapsedYears: Double): Option[Coordinates] =

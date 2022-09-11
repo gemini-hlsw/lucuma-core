@@ -13,6 +13,7 @@ import lucuma.core.enums.Band
 import lucuma.core.math.BrightnessUnits._
 import lucuma.core.math._
 import lucuma.core.math.dimensional._
+import lucuma.core.util.Timestamp
 import lucuma.core.util.WithGid
 import lucuma.refined._
 import monocle.Focus
@@ -25,7 +26,7 @@ import monocle.macros.GenPrism
 import scala.collection.immutable.SortedMap
 
 /** A target of observation. */
-sealed trait Target extends Product with Serializable {
+sealed trait Target extends Tracking with Product with Serializable {
   def name: NonEmptyString
   def sourceProfile: SourceProfile
 }
@@ -37,7 +38,9 @@ object Target extends WithGid('t'.refined) with TargetOptics {
     tracking:      SiderealTracking,
     sourceProfile: SourceProfile,
     catalogInfo:   Option[CatalogInfo]
-  ) extends Target
+  ) extends Target {
+    def at(i: Timestamp) = tracking.at(i).map(SiderealCoordinates.apply)
+  }
 
   object Sidereal extends SiderealOptics {
     implicit val eqSidereal: Eq[Sidereal] =
@@ -63,7 +66,9 @@ object Target extends WithGid('t'.refined) with TargetOptics {
     name:          NonEmptyString,
     ephemerisKey:  EphemerisKey,
     sourceProfile: SourceProfile
-  ) extends Target
+  ) extends Target {
+    def at(i: Timestamp) = none
+  }
 
   object Nonsidereal extends NonsiderealOptics {
     implicit val eqNonsidereal: Eq[Nonsidereal] =
