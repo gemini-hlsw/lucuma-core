@@ -4,9 +4,9 @@
 package lucuma.core.model.arb
 
 import cats.Order._
-import cats.syntax.all._
 import cats.data.NonEmptyMap
 import cats.laws.discipline.arbitrary.*
+import cats.syntax.all._
 import eu.timepit.refined.types.numeric.PosBigDecimal
 import lucuma.core.enums.Band
 import lucuma.core.math.BrightnessUnits
@@ -20,8 +20,8 @@ import lucuma.core.model.SpectralDefinition
 import lucuma.core.model.UnnormalizedSED
 import lucuma.core.util.arb.ArbEnumerated
 import lucuma.core.util.arb.ArbTimestamp
-import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Arbitrary._
+import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck._
 
 import scala.collection.immutable.SortedMap

@@ -4,9 +4,9 @@
 package lucuma.core.model.arb
 
 import cats.Order._
+import cats.laws.discipline.arbitrary.*
 import coulomb.*
 import coulomb.syntax.*
-import cats.laws.discipline.arbitrary.*
 import eu.timepit.refined.types.numeric.PosBigDecimal
 import lucuma.core.math.BrightnessUnits
 import lucuma.core.math.arb.ArbRefined

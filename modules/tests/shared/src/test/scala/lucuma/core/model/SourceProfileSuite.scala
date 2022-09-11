@@ -21,10 +21,10 @@ import lucuma.core.math.arb.ArbWavelength
 import lucuma.core.math.dimensional.arb.ArbMeasure
 import lucuma.core.math.units._
 import lucuma.core.model.arb._
+import lucuma.core.util.Timestamp
 import lucuma.core.util.arb.ArbCollection
 import lucuma.core.util.arb.ArbEnumerated
 import lucuma.core.util.arb.ArbTimestamp
-import lucuma.core.util.Timestamp
 import monocle.law.discipline._
 import munit._
 

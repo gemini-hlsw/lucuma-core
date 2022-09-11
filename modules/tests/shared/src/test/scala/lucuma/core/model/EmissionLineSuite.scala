@@ -5,8 +5,8 @@ package lucuma.core.model
 
 import cats.data.NonEmptyMap
 import cats.implicits._
-import cats.laws.discipline.arbitrary.*
 import cats.kernel.laws.discipline._
+import cats.laws.discipline.arbitrary.*
 import coulomb.*
 import coulomb.ops.algebra.cats.all.given
 import coulomb.syntax.*
@@ -17,9 +17,9 @@ import lucuma.core.math.dimensional.arb.ArbMeasure
 import lucuma.core.math.units._
 import lucuma.core.model.arb.ArbEmissionLine
 import lucuma.core.model.arb.ArbSpectralDefinition
+import lucuma.core.util.Timestamp
 import lucuma.core.util.arb.ArbEnumerated
 import lucuma.core.util.arb.ArbTimestamp
-import lucuma.core.util.Timestamp
 import monocle.law.discipline.LensTests
 import munit._
 
