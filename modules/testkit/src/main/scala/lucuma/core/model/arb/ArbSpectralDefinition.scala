@@ -37,7 +37,7 @@ trait ArbSpectralDefinition {
   import ArbWavelength._
   import ArbTimestamp._
 
-  implicit def cogBrightnessMeasureOverTime[K: Cogen: Ordering, V: Cogen]: Cogen[NonEmptyMap[K, V]] =
+  implicit def cogNonEmptyMap[K: Cogen: Ordering, V: Cogen]: Cogen[NonEmptyMap[K, V]] =
     Cogen[Map[K, V]].contramap(_.toSortedMap.toMap)
 
   implicit def arbBandNormalizedSpectralDefinition[T](implicit

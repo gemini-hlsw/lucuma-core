@@ -3,7 +3,9 @@
 
 package lucuma.core.model
 
+import cats.data.NonEmptyMap
 import cats.implicits._
+import cats.laws.discipline.arbitrary.*
 import cats.kernel.laws.discipline._
 import coulomb.*
 import coulomb.ops.algebra.cats.all.given
@@ -14,27 +16,32 @@ import lucuma.core.math.arb._
 import lucuma.core.math.dimensional.arb.ArbMeasure
 import lucuma.core.math.units._
 import lucuma.core.model.arb.ArbEmissionLine
+import lucuma.core.model.arb.ArbSpectralDefinition
 import lucuma.core.util.arb.ArbEnumerated
+import lucuma.core.util.arb.ArbTimestamp
+import lucuma.core.util.Timestamp
 import monocle.law.discipline.LensTests
 import munit._
 
 final class EmissionLineSuite extends DisciplineSuite {
   import ArbEnumerated._
+  import ArbTimestamp._
   import ArbEmissionLine._
   import ArbRefined._
   import ArbMeasure._
+  import ArbSpectralDefinition.*
   import ArbQuantity.given
 
   // Brightness type conversions
   val e1Integrated: EmissionLine[Integrated] =
     EmissionLine(
       PosBigDecimalOne.withUnit[KilometersPerSecond],
-      WattsPerMeter2IsIntegratedLineFluxUnit.unit.withValueTagged(PosBigDecimalOne)
+      NonEmptyMap.of(Timestamp.Min -> WattsPerMeter2IsIntegratedLineFluxUnit.unit.withValueTagged(PosBigDecimalOne))
     )
   val e1Surface: EmissionLine[Surface]       =
     EmissionLine(
       PosBigDecimalOne.withUnit[KilometersPerSecond],
-      WattsPerMeter2Arcsec2IsSurfaceLineFluxUnit.unit.withValueTagged(PosBigDecimalOne)
+      NonEmptyMap.of(Timestamp.Min -> WattsPerMeter2Arcsec2IsSurfaceLineFluxUnit.unit.withValueTagged(PosBigDecimalOne))
     )
   test("Brightness type conversion Integrated -> Surface") {
     assertEquals(e1Integrated.to[Surface], e1Surface)

@@ -65,7 +65,7 @@ final class SourceProfileSuite extends DisciplineSuite {
       SortedMap(
         Wavelength.Min -> EmissionLine(
           PosBigDecimalOne.withUnit[KilometersPerSecond],
-          WattsPerMeter2IsIntegratedLineFluxUnit.unit.withValueTagged(PosBigDecimalOne)
+          NonEmptyMap.of(Timestamp.Min -> WattsPerMeter2IsIntegratedLineFluxUnit.unit.withValueTagged(PosBigDecimalOne))
         )
       ),
       WattsPerMeter2MicrometerIsIntegratedFluxDensityContinuumUnit.unit
@@ -77,7 +77,7 @@ final class SourceProfileSuite extends DisciplineSuite {
       SortedMap(
         Wavelength.Min -> EmissionLine(
           PosBigDecimalOne.withUnit[KilometersPerSecond],
-          WattsPerMeter2Arcsec2IsSurfaceLineFluxUnit.unit.withValueTagged(PosBigDecimalOne)
+          NonEmptyMap.of(Timestamp.Min -> WattsPerMeter2Arcsec2IsSurfaceLineFluxUnit.unit.withValueTagged(PosBigDecimalOne))
         )
       ),
       WattsPerMeter2MicrometerArcsec2IsSurfaceFluxDensityContinuumUnit.unit
