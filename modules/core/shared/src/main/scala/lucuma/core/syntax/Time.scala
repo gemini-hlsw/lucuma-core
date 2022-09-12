@@ -41,7 +41,7 @@ trait ToInstantOps {
 
 object instant extends ToInstantOps {
   extension(i: Instant)
-    def toTimestamp: Option[Timestamp] = Timestamp.fromInstant(i)
+    def toTimestamp: Option[Timestamp] = Timestamp.fromInstantTruncated(i)
 }
 
 final class ZonedDateTimeOps(private val self: ZonedDateTime) extends AnyVal {

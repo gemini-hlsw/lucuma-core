@@ -23,6 +23,7 @@ import monocle.Prism
 import monocle.Traversal
 import monocle.macros.GenPrism
 
+import java.time.Instant
 import scala.collection.immutable.SortedMap
 
 /** A target of observation. */
@@ -39,7 +40,7 @@ object Target extends WithGid('t'.refined) with TargetOptics {
     sourceProfile: SourceProfile,
     catalogInfo:   Option[CatalogInfo]
   ) extends Target {
-    def at(i: Timestamp) = tracking.at(i).map(SiderealCoordinates.apply)
+    def at(i: Instant) = tracking.at(i).map(SiderealCoordinates.apply)
   }
 
   object Sidereal extends SiderealOptics {
@@ -67,7 +68,7 @@ object Target extends WithGid('t'.refined) with TargetOptics {
     ephemerisKey:  EphemerisKey,
     sourceProfile: SourceProfile
   ) extends Target {
-    def at(i: Timestamp) = none
+    def at(i: Instant) = none
   }
 
   object Nonsidereal extends NonsiderealOptics {

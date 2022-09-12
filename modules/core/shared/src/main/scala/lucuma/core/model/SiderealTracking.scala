@@ -51,8 +51,8 @@ final case class SiderealTracking(
   parallax:        Option[Parallax]
 ) {
 
-  def at(i: Timestamp): Option[Coordinates] =
-    plusYears(epoch.untilInstant(i.toInstant))
+  def at(i: Instant): Option[Coordinates] =
+    plusYears(epoch.untilInstant(i))
 
   /** Coordinates `elapsedYears` fractional epoch-years after `epoch`. */
   def plusYears(elapsedYears: Double): Option[Coordinates] =

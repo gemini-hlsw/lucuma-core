@@ -10,6 +10,8 @@ import lucuma.core.util.Timestamp
 import monocle.Focus
 import monocle.Lens
 
+import java.time.Instant
+
 /** A coordinate along with a rate of change in RA and Dec for some time unit
   *
   * @param coord coordinates
@@ -18,7 +20,6 @@ import monocle.Lens
   */
 sealed trait TrackedCoordinates {
   def coord: Coordinates
-  def delta: Offset /* per time unit */
 }
 
 /** A coordinate along with a rate of change in RA and Dec for some time unit,
@@ -31,7 +32,7 @@ sealed trait TrackedCoordinates {
   */
 case class EphemerisCoordinates(
                    override val coord: Coordinates,
-                   override val delta: Offset /* per time unit */)
+                   val delta: Offset /* per time unit */)
     extends TrackedCoordinates {
 
   /** Interpolates the position and rate of change at a point between this
@@ -95,9 +96,7 @@ trait EphemerisCoordinatesOptics {
 
 }
 
-case class SiderealCoordinates(override val coord: Coordinates) extends TrackedCoordinates {
-  override val delta: Offset =  Offset.Zero
-}
+case class SiderealCoordinates(override val coord: Coordinates) extends TrackedCoordinates
 
 object SiderealCoordinates extends SiderealCoordinatesOptics {
   given Eq[SiderealCoordinates] = Eq.by(_.coord)
@@ -121,6 +120,6 @@ trait SiderealCoordinatesOptics {
  * Implementors can calculate the coordinates for a given object at a certain timestamp
  */
 trait Tracking {
-  def at(i: Timestamp): Option[TrackedCoordinates]
+  def at(i: Instant): Option[TrackedCoordinates]
 }
 
