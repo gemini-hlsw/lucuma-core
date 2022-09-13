@@ -121,5 +121,12 @@ trait SiderealCoordinatesOptics {
  */
 trait Tracking {
   def at(i: Instant): Option[TrackedCoordinates]
+  def atEpoch: TrackedCoordinates
 }
 
+object Tracking {
+  def const(coord: Coordinates): Tracking = new Tracking {
+    def at(i: Instant): Option[TrackedCoordinates] = Some(SiderealCoordinates(coord))
+    def atEpoch: TrackedCoordinates = SiderealCoordinates(coord)
+  }
+}

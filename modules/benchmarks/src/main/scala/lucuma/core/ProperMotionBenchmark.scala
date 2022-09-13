@@ -26,7 +26,7 @@ class ProperMotionBenchmark {
     Some(Parallax.fromMicroarcseconds(10000000L))
   )
 
-  val instant = Instant.now()
+  val instant: Instant = Instant.now()
 
   @Benchmark
   def simpleRun: Unit = {

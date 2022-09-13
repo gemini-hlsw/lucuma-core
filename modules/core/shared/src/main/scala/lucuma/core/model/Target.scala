@@ -41,6 +41,7 @@ object Target extends WithGid('t'.refined) with TargetOptics {
     catalogInfo:   Option[CatalogInfo]
   ) extends Target {
     def at(i: Instant) = tracking.at(i).map(SiderealCoordinates.apply)
+    def atEpoch = SiderealCoordinates(tracking.baseCoordinates)
   }
 
   object Sidereal extends SiderealOptics {
@@ -69,6 +70,7 @@ object Target extends WithGid('t'.refined) with TargetOptics {
     sourceProfile: SourceProfile
   ) extends Target {
     def at(i: Instant) = none
+    def atEpoch = EphemerisCoordinates(Coordinates.Zero, Offset.Zero)
   }
 
   object Nonsidereal extends NonsiderealOptics {
