@@ -55,6 +55,9 @@ object GiapiStatusApply {
   /** @group Constructors */ case object GpiIFSEndY extends GiapiStatusApply("GpiIFSEndY", Instrument.Gpi, GiapiType.Int, "gpi:currentEndY", "gpi:gpi:configIfs.endy", Option.empty[BigDecimal])
   /** @group Constructors */ case object GpiPolarizerAngle extends GiapiStatusApply("GpiPolarizerAngle", Instrument.Gpi, GiapiType.Float, "gpi:polarizerAngle", "gpi:configPolarizer.angle", Some(1.0000))
 
+  /** @group Constructors */ case object GhostAdc1 extends GiapiStatusApply("GhostAdc1", Instrument.Ghost, GiapiType.String, "ghost:cc:cu:adc1.type", "ghost:cc:cu:adc1.type", None)
+  /** @group Constructors */ case object GhostAdc2 extends GiapiStatusApply("GhostAdc2", Instrument.Ghost, GiapiType.String, "ghost:cc:cu:adc2.type", "ghost:cc:cu:adc2.type", None)
+
   /** @group Constructors */ case object GhostFiberAgitator1 extends GiapiStatusApply("GhostFiberAgitator1", Instrument.Ghost, GiapiType.Int, "ghost:sad:cc:slu:fa1.active", "ghost:cc:slu:fa1.type", Option.empty[BigDecimal])
   /** @group Constructors */ case object GhostFiberAgitator2 extends GiapiStatusApply("GhostFiberAgitator2", Instrument.Ghost, GiapiType.Int, "ghost:sad:cc:slu:fa2.active", "ghost:cc:slu:fa2.type", Option.empty[BigDecimal])
 
@@ -168,6 +171,8 @@ object GiapiStatusApply {
       GpiIFSEndX,
       GpiIFSEndY,
       GpiPolarizerAngle,
+      GhostAdc1,
+      GhostAdc2,
       GhostFiberAgitator1,
       GhostFiberAgitator2,
       GhostRedExposureTime,
