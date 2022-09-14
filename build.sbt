@@ -24,7 +24,7 @@ lazy val lucumaRefinedVersion  = "0.1.1"
 lazy val catsTimeVersion       = "0.5.0"
 lazy val circeVersion          = "0.14.2"
 lazy val catsScalacheckVersion = "0.3.1"
-lazy val shapelessVersion      = "2.3.10"
+lazy val shapelessVersion      = "2.3.9"
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
