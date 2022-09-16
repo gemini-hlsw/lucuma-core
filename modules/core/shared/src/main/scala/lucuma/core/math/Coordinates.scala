@@ -3,16 +3,15 @@
 
 package lucuma.core.math
 
-import cats._
-import cats.data.NonEmptyList
-import cats.syntax.all._
+import cats.*
+import cats.syntax.all.*
 import lucuma.core.math.parser.CoordinateParsers
 import lucuma.core.optics.Format
-import lucuma.core.syntax.all._
+import lucuma.core.syntax.all.*
 import monocle.Focus
 import monocle.Lens
 
-import scala.math._
+import scala.math.*
 
 /** A point in the sky, given right ascension and declination. */
 final case class Coordinates(ra: RightAscension, dec: Declination) {
@@ -188,14 +187,13 @@ object Coordinates extends CoordinatesOptics {
   * Hyp = sqrt(x * x + y * y)
   * Lat = atan2(z, hyp)
   */
-  def centerOf(coords: NonEmptyList[Coordinates]): Coordinates =
-    val (x0, y0, z0) = coords.map { case Coordinates(ra, dec) =>
+  def centerOf[F[_]: Foldable](coords: F[Coordinates]): Coordinates =
+    val (x0, y0, z0) = coords.foldMap { case Coordinates(ra, dec) =>
       (cos(dec.toRadians) * cos(ra.toRadians),
       cos(dec.toRadians) * sin(ra.toRadians),
-      sin(dec.toRadians)
-      )
-    }.combineAll
-    val count        = coords.length
+      sin(dec.toRadians))
+    }
+    val count        = coords.size
     val (x, y, z)    = (x0 / count, y0 / count, z0 / count)
 
     val ra  = atan2(y, x)

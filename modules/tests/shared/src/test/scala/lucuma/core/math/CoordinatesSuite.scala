@@ -180,6 +180,7 @@ final class CoordinatesSuite extends munit.DisciplineSuite {
       assertCoordsEquals(centerOf(NonEmptyList.of(a, b)), b.interpolate(a, 0.5))
     }
   }
+
   test("centerOf should be independent of order") {
     forAll { (coords: NonEmptyList[Coordinates]) =>
       assertCoordsEquals(centerOf(coords), centerOf(coords.reverse))
