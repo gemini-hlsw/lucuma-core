@@ -17,7 +17,7 @@ import monocle.Iso
   * type Name = Name.Type
   * ```
   */
-abstract class NewType[Wrapped]:
+trait NewType[Wrapped]:
   opaque type Type = Wrapped
 
   def apply(w: Wrapped): Type = w
@@ -32,4 +32,3 @@ abstract class NewType[Wrapped]:
   given (using dec: Decoder[Wrapped]): Decoder[Type]             = dec
   given (using disp: Display[Wrapped]): Display[Type]            = disp
   given (using m: Monoid[Wrapped]): Monoid[Type]                 = m
-  
