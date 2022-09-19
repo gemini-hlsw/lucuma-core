@@ -3,11 +3,11 @@
 
 package lucuma.core.util
 
-import io.circe.Encoder
-import io.circe.Decoder
-import lucuma.core.util.Display
 import cats.Eq
 import cats.Monoid
+import io.circe.Decoder
+import io.circe.Encoder
+import lucuma.core.util.Display
 import monocle.Iso
 
 /**
