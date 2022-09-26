@@ -20,11 +20,11 @@ import monocle.Iso
 trait NewType[Wrapped]:
   opaque type Type = Wrapped
 
-  def apply(w: Wrapped): Type = w
+  inline def apply(w: Wrapped): Type = w
 
   extension (t: Type) inline def value: Wrapped = t
 
-  val value: Iso[Type, Wrapped] = Iso[Type, Wrapped](_.value)(apply)
+  val value: Iso[Type, Wrapped] = Iso[Type, Wrapped](_.value)(w => apply(w))
 
   given (using CanEqual[Wrapped, Wrapped]): CanEqual[Type, Type] = CanEqual.derived
   given (using eq: Eq[Wrapped]): Eq[Type]                        = eq
