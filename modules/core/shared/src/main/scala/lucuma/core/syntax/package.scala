@@ -25,4 +25,5 @@ package object syntax {
       with ToTreeMapCompanionOps
       with ToTreeMapOps
       with ToTreeSetCompanionOps
+      with IterableOps
 }
