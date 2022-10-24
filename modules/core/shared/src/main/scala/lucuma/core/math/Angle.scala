@@ -7,10 +7,10 @@ import cats.Eq
 import cats.Order
 import cats.Show
 import cats.kernel.CommutativeGroup
-import cats.syntax.eq._
+import cats.syntax.eq.*
 import lucuma.core.math.parser.AngleParsers
-import lucuma.core.optics._
-import lucuma.core.syntax.parser._
+import lucuma.core.optics.*
+import lucuma.core.syntax.parser.*
 import monocle.Iso
 import monocle.Prism
 
@@ -355,7 +355,7 @@ object Angle extends AngleOptics {
    * you get the minimal angle in the range [0 .. π]
    */
   def difference(α: Angle, ϐ: Angle): Angle = {
-    import cats.syntax.all._ // To get order syntax
+    import cats.syntax.all.* // To get order syntax
     implicit val order: Order[Angle] = AngleOrder
 
     val δ: Angle = α - ϐ
@@ -461,7 +461,7 @@ trait AngleOptics extends OpticsHelpers { this: Angle.type =>
    * @group Optics
    */
   lazy val fromStringDMS: Format[String, Angle] =
-    Format(AngleParsers.dms.parseExact, dms.get(_).format)
+    Format(AngleParsers.dms.parseAll(_).toOption, dms.get(_).format)
 
   /**
    * String parsed as signed DMS.
@@ -700,7 +700,7 @@ trait HourAngleOptics extends OpticsHelpers { this: HourAngle.type =>
    * @group Optics
    */
   lazy val fromStringHMS: Format[String, HourAngle] =
-    Format(AngleParsers.hms.parseExact, HMS(_).format)
+    Format(AngleParsers.hms.parseAll(_).toOption, HMS(_).format)
 
 }
 

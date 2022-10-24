@@ -5,16 +5,16 @@ package lucuma.core.math
 
 import cats.Eq
 import cats.Show
-import cats.kernel.laws.discipline._
-import cats.syntax.all._
-import lucuma.core.math.arb._
-import lucuma.core.optics.laws.discipline._
-import monocle.law.discipline._
-import org.scalacheck.Prop._
+import cats.kernel.laws.discipline.*
+import cats.syntax.all.*
+import lucuma.core.math.arb.*
+import lucuma.core.optics.laws.discipline.*
+import monocle.law.discipline.*
+import org.scalacheck.Prop.*
 
 final class DeclinationSuite extends munit.DisciplineSuite {
-  import ArbDeclination._
-  import ArbAngle._
+  import ArbDeclination.*
+  import ArbAngle.*
 
   // Laws
   checkAll("Declination", OrderTests[Declination].order)
@@ -22,6 +22,7 @@ final class DeclinationSuite extends munit.DisciplineSuite {
   checkAll("fromStringHMS",
            FormatTests(Declination.fromStringSignedDMS).formatWith(ArbAngle.stringsDMS)
   )
+  checkAll("lenientFromStringDMS", FormatTests(Declination.lenientFromStringDMS).formatWith(ArbAngle.stringsDMS))
 
   test("Equality must be natural") {
     forAll { (a: Declination, b: Declination) =>
