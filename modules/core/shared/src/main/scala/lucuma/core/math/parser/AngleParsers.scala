@@ -17,19 +17,20 @@ import lucuma.core.optics.Format
 trait AngleParsers:
   val colon: Parser[Unit]        = char(':')
   val colonOrSpace: Parser[Unit] = (char(':') | sp).void
-  val neg: Parser0[Boolean]      = char('-').map(_ => true).backtrack | char('+').?.map(_ => false)
+  val neg: Parser0[Boolean]      =
+    char('-').map(_ => true).backtrack | char('+').map(_ => false).backtrack | Parser.pure(false)
 
-  val hours: Parser0[Int] = (char('1') ~ digit).backtrack // 10-19
+  val hours: Parser[Int] = (char('1') ~ digit).backtrack // 10-19
     .orElse(char('2') ~ charIn('0' to '4')) // 20-24
     .backtrack
-    .orElse(char('0').? *> digit)           // 00 - 09
+    .orElse(char('0').?.with1 *> digit)     // 00 - 09
     .backtrack
     .orElse(char('0'))                      // plain 0
     .string
     .map(_.toInt)
     .withContext("hours")
 
-  val minutes: Parser0[Int] = (charIn('0' to '5') ~ digit).backtrack // 10-19
+  val minutes: Parser[Int] = (charIn('0' to '5') ~ digit).backtrack // 10-19
     .orElse(char('5') ~ digit)          // 20-24
     .backtrack
     .orElse(char('0').?.with1 *> digit) // 00 - 09
@@ -61,38 +62,38 @@ trait AngleParsers:
         HourAngle.fromHMS(h, m, s, ms, µs)
       }
 
-  val hms: Parser0[HourAngle] = (hmsParser1.backtrack | hmsParser2)
+  val hms: Parser[HourAngle] = (hmsParser1.backtrack | hmsParser2)
     .withContext("hms")
 
-  val degrees =
+  val degrees: Parser[Int] =
     (char('3') ~ charIn('0' to '5') ~ digit)      // 300-359
       .backtrack
       .orElse(charIn('1' to '2') ~ digit ~ digit) // 100-299
       .backtrack
       .orElse(charIn('0' to '9') ~ digit)         // 10-99
       .backtrack
-      .orElse(char('0').? *> digit)               // 00 - 09
+      .orElse(char('0').?.with1 *> digit)         // 00 - 09
       .backtrack
       .orElse(char('0'))                          // plain 0
       .string
       .map(_.toInt)
 
-  private val dmsParser1 =
-    (neg ~ degrees ~ colonOrSpace ~ minutes ~ colonOrSpace ~ seconds).map {
+  private val dmsParser1: Parser[Angle] =
+    (neg.with1 ~ degrees ~ colonOrSpace ~ minutes ~ colonOrSpace ~ seconds).map {
       case (((((neg, d), _), m), _), (s, ms, µs)) =>
         val r = Angle.fromDMS(d, m, s, ms, µs)
         if (neg) -r else r
     }
 
-  private val dmsParser2 =
-    (neg ~ degrees ~ (char('°') ~ sp.?).void ~
+  private val dmsParser2: Parser[Angle] =
+    (neg.with1 ~ degrees ~ (char('°') ~ sp.?).void ~
       minutes ~ (char('′') ~ sp.?).void ~
       seconds ~ char('″').void).map { case ((((((neg, h), _), m), _), (s, ms, µs)), _) =>
       val r = Angle.fromDMS(h, m, s, ms, µs)
       if (neg) -r else r
     }
 
-  val dms: Parser0[Angle] = (dmsParser1.backtrack | dmsParser2)
+  val dms: Parser[Angle] = (dmsParser1.backtrack | dmsParser2)
     .withContext("dms")
 
 object AngleParsers extends AngleParsers
