@@ -6,15 +6,15 @@ package lucuma.core.math
 import cats.Eq
 import cats.Order
 import cats.Show
-import cats.kernel.laws.discipline._
-import lucuma.core.math.arb._
-import lucuma.core.optics.laws.discipline._
-import monocle.law.discipline._
-import org.scalacheck.Prop._
+import cats.kernel.laws.discipline.*
+import lucuma.core.math.arb.*
+import lucuma.core.optics.laws.discipline.*
+import monocle.law.discipline.*
+import org.scalacheck.Prop.*
 
 final class RightAscensionSuite extends munit.DisciplineSuite {
-  import ArbRightAscension._
-  import ArbAngle._
+  import ArbRightAscension.*
+  import ArbAngle.*
 
   // Laws
   checkAll("RightAscension", OrderTests[RightAscension].order)
@@ -23,6 +23,10 @@ final class RightAscensionSuite extends munit.DisciplineSuite {
   checkAll("fromStringHMS",
            FormatTests(RightAscension.fromStringHMS).formatWith(ArbAngle.stringsHMS)
   )
+  checkAll("lenientFromStringHMS",
+           FormatTests(RightAscension.lenientFromStringHMS).formatWith(ArbAngle.stringsHMS)
+  )
+
 
   test("Equality must be natural") {
     forAll { (a: RightAscension, b: RightAscension) =>

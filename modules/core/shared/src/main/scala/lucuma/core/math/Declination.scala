@@ -5,8 +5,9 @@ package lucuma.core.math
 
 import cats.Order
 import cats.Show
+import lucuma.core.math.parser.AngleParsers
 import lucuma.core.optics.Format
-import lucuma.core.syntax.all._
+import lucuma.core.syntax.all.*
 import monocle.Prism
 
 /**
@@ -102,5 +103,11 @@ trait DeclinationOptics { this: Declination.type =>
 
   val fromStringSignedDMS: Format[String, Declination] =
     Angle.fromStringSignedDMS.andThen(fromAngle)
+
+  val lenientFromStringDMS: Format[String, Declination] =
+    Format[String, Declination](
+      AngleParsers.dms.parseAll(_).toOption.flatMap(Declination.fromAngle.getOption),
+      Declination.fromStringSignedDMS.reverseGet
+    )
 
 }

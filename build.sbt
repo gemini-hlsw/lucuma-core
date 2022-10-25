@@ -1,4 +1,4 @@
-ThisBuild / tlBaseVersion                         := "0.57"
+ThisBuild / tlBaseVersion                         := "0.58"
 ThisBuild / tlCiReleaseBranches                   := Seq("master")
 ThisBuild / githubWorkflowEnv += "MUNIT_FLAKY_OK" -> "true"
 
@@ -25,6 +25,7 @@ lazy val catsTimeVersion       = "0.5.0"
 lazy val circeVersion          = "0.14.3"
 lazy val catsScalacheckVersion = "0.3.2"
 lazy val shapelessVersion      = "2.3.10"
+lazy val catsParseVersion      = "0.3.7"
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
@@ -38,6 +39,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
     libraryDependencies ++= Seq(
       "org.tpolecat"   %%% "atto-core"                  % attoVersion,
       "org.tpolecat"   %%% "atto-refined"               % attoVersion,
+      "org.typelevel"  %%% "cats-parse"                 % catsParseVersion,
       "org.typelevel"  %%% "cats-core"                  % catsVersion,
       "dev.optics"     %%% "monocle-core"               % monocleVersion,
       "dev.optics"     %%% "monocle-macro"              % monocleVersion,

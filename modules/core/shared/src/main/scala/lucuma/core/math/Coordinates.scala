@@ -218,7 +218,7 @@ trait CoordinatesOptics { this: Coordinates.type =>
    * @group Optics
    */
   val fromHmsDms: Format[String, Coordinates] = Format(
-    CoordinateParsers.coordinates.parseExact,
+    CoordinateParsers.coordinates.parseAll(_).toOption,
     cs =>
       s"${RightAscension.fromStringHMS.reverseGet(cs.ra)} ${Declination.fromStringSignedDMS
         .reverseGet(cs.dec)}"

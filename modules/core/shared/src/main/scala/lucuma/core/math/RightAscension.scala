@@ -5,8 +5,9 @@ package lucuma.core.math
 
 import cats.Order
 import cats.Show
+import lucuma.core.math.parser.AngleParsers
 import lucuma.core.optics.Format
-import monocle._
+import monocle.*
 
 /**
  * Celestial longitude, measured eastward along the celestial equator from the vernal equinox to the
@@ -90,5 +91,11 @@ trait RightAscensionOptics { this: RightAscension.type =>
 
   val fromAngleExact: Prism[Angle, RightAscension] =
     Angle.hourAngleExact.andThen(fromHourAngle)
+
+  val lenientFromStringHMS: Format[String, RightAscension] =
+    Format[String, RightAscension](
+      AngleParsers.hms.parseAll(_).toOption.map(RightAscension.fromHourAngle.get),
+      RightAscension.fromStringHMS.reverseGet
+    )
 
 }
