@@ -266,7 +266,7 @@ object Angle extends AngleOptics {
    * Angle forms a commutative group.
    * @group Typeclass Instances
    */
-  implicit val AngleCommutativeGroup: CommutativeGroup[Angle] =
+  given CommutativeGroup[Angle] =
     new CommutativeGroup[Angle] {
       val empty: Angle                       = Angle0
       def combine(a: Angle, b: Angle): Angle = a + b
@@ -274,14 +274,14 @@ object Angle extends AngleOptics {
     }
 
   /** @group Typeclass Instances */
-  implicit val AngleShow: Show[Angle] =
+  given Show[Angle] =
     Show.fromToString
 
   /**
    * Angles are equal if their magnitudes are equal.
    * @group Typeclass Instances
    */
-  implicit val AngleEqual: Eq[Angle] =
+  given Eq[Angle] =
     Eq.fromUniversalEquals
 
   /**
@@ -326,7 +326,7 @@ object Angle extends AngleOptics {
   }
 
   object DMS {
-    implicit val eqDMS: Eq[DMS] =
+    given Eq[DMS] =
       Eq.by(_.toAngle)
   }
 
@@ -356,7 +356,7 @@ object Angle extends AngleOptics {
    */
   def difference(α: Angle, ϐ: Angle): Angle = {
     import cats.syntax.all.* // To get order syntax
-    implicit val order: Order[Angle] = AngleOrder
+    given Order[Angle] = AngleOrder
 
     val δ: Angle = α - ϐ
     if (δ > Angle.Angle180) δ.mirrorBy(Angle.Angle180) else δ
@@ -603,7 +603,7 @@ object HourAngle extends HourAngleOptics {
    * HourAngle forms a commutative group.
    * @group Typeclass Instances
    */
-  implicit val AngleCommutativeGroup: CommutativeGroup[HourAngle] =
+  given CommutativeGroup[HourAngle] =
     new CommutativeGroup[HourAngle] {
       val empty: HourAngle                               = HourAngle0
       def combine(a: HourAngle, b: HourAngle): HourAngle = a + b
@@ -611,14 +611,14 @@ object HourAngle extends HourAngleOptics {
     }
 
   /** @group Typeclass Instances */
-  implicit val HourAngleShow: Show[HourAngle] =
+  given Show[HourAngle] =
     Show.fromToString
 
   /**
    * Angles are equal if their magnitudes are equal.
    * @group Typeclass Instances
    */
-  implicit val HourAngleEqual: Eq[HourAngle] =
+  given Eq[HourAngle] =
     Eq.by(_.toMicroarcseconds)
 
   /**
@@ -639,8 +639,7 @@ object HourAngle extends HourAngleOptics {
   }
 
   object HMS {
-    implicit val eqHMS: Eq[HMS] =
-      Eq.by(_.toHourAngle)
+    given Eq[HMS] = Eq.by(_.toHourAngle)
   }
 
 }
@@ -707,14 +706,13 @@ trait HourAngleOptics extends OpticsHelpers { this: HourAngle.type =>
 trait OpticsHelpers {
 
   // Syntax to scale down and squeeze into Int
-  protected implicit class SplitMonoOps[A](self: SplitMono[A, Long]) {
+  extension[A](self: SplitMono[A, Long])
 
-    private val longToInt: SplitEpi[Long, Int] =
-      SplitEpi(_.toInt, _.toLong)
 
-    def scaled(n: Long): Wedge[A, Int] =
+    def scaled(n: Long): Wedge[A, Int] = {
+      val longToInt: SplitEpi[Long, Int] =
+        SplitEpi(_.toInt, _.toLong)
       self.imapB[Long](_ * n, _ / n).andThen(longToInt)
-
-  }
+    }
 
 }

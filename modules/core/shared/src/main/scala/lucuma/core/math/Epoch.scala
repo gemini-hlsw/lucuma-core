@@ -5,21 +5,21 @@ package lucuma.core.math
 
 import cats.Order
 import cats.Show
-import cats.syntax.all._
-import eu.timepit.refined._
+import cats.syntax.all.*
+import eu.timepit.refined.*
 import eu.timepit.refined.api.Refined
-import eu.timepit.refined.auto._
-import eu.timepit.refined.cats._
+import eu.timepit.refined.auto.*
+import eu.timepit.refined.cats.*
 import eu.timepit.refined.numeric.{ Interval => RefinedInterval }
 import eu.timepit.refined.refineV
 import lucuma.core.math.parser.EpochParsers
 import lucuma.core.optics.Format
-import lucuma.core.optics.syntax.all._
-import lucuma.core.syntax.parser._
-import lucuma.refined._
+import lucuma.core.optics.syntax.all.*
+import lucuma.core.syntax.parser.*
+import lucuma.refined.*
 import monocle.Prism
 
-import java.time._
+import java.time.*
 
 /**
   * An epoch, the astronomer's equivalent of `Instant`, based on a fractional year in some temporal
@@ -125,6 +125,7 @@ object Epoch extends EpochOptics {
     def fromJulianDayToEpochYears(jd: Double): Double =
       yearBasis + (jd - julianBasis) / lengthOfYear
   }
+
   object Scheme {
 
     /**
@@ -154,10 +155,10 @@ object Epoch extends EpochOptics {
     */
   case object Julian extends Scheme('J', 2000.0, 2451545.0, 365.25)
 
-  implicit val EpochOrder: Order[Epoch] =
+  given Order[Epoch] =
     Order.by(e => (e.scheme, e.toMilliyears.value))
 
-  implicit val EpochShow: Show[Epoch] =
+  given Show[Epoch] =
     Show.fromToString
 
 }
@@ -165,13 +166,13 @@ object Epoch extends EpochOptics {
 trait EpochOptics { this: Epoch.type =>
 
   val fromString: Prism[String, Epoch] =
-    Prism[String, Epoch](s => EpochParsers.epoch.parseExact(s))(e =>
+    Prism[String, Epoch](s => EpochParsers.epoch.parseAll(s).toOption)(e =>
       f"${e.scheme.prefix}%s${e.toMilliyears.value / 1000}%d.${e.toMilliyears.value % 1000}%03d"
     )
 
   val fromStringNoScheme: Format[String, Epoch] =
     Format(
-      s => EpochParsers.epochLenientNoScheme.parseExact(s),
+      s => EpochParsers.epochLenientNoScheme.parseAll(s).toOption,
       {
         case e if e.toMilliyears.value % 1000 === 0 =>
           f"${e.toMilliyears.value / 1000}%d"
