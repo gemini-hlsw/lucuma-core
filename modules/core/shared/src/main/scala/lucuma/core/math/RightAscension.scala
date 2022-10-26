@@ -72,11 +72,11 @@ object RightAscension extends RightAscensionOptics {
    * Unlike arbitrary angles, it is common to order right asensions starting at zero hours.
    * @group Typeclass Instances
    */
-  implicit val RightAscensionOrder: Order[RightAscension] =
+  given Order[RightAscension] =
     Order.by(_.toHourAngle.toMicroseconds)
 
   /* @group Typeclass Instances */
-  implicit val RightAscensionShow: Show[RightAscension] =
+  given Show[RightAscension] =
     Show.fromToString
 
 }

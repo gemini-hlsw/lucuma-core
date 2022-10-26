@@ -5,27 +5,27 @@ package lucuma.core.math
 
 import cats.Eq
 import cats.Show
-import cats.implicits._
-import cats.kernel.laws.discipline._
-import eu.timepit.refined.auto._
+import cats.implicits.*
+import cats.kernel.laws.discipline.*
+import eu.timepit.refined.auto.*
 import lucuma.core.arb.ArbTime
-import lucuma.core.math.arb._
-import lucuma.core.math.parser.EpochParsers._
-import lucuma.core.optics.laws.discipline._
-import lucuma.core.syntax.parser._
-import lucuma.refined._
+import lucuma.core.math.arb.*
+import lucuma.core.math.parser.EpochParsers.*
+import lucuma.core.optics.laws.discipline.*
+import lucuma.core.syntax.parser.*
+import lucuma.refined.*
 import monocle.law.discipline.PrismTests
 import org.scalacheck.Arbitrary
-import org.scalacheck.Prop._
+import org.scalacheck.Prop.*
 
 import java.time.LocalDateTime
 
 final class EpochSuite extends munit.DisciplineSuite {
-  import ArbEpoch._
-  import ArbTime._
+  import ArbEpoch.*
+  import ArbTime.*
 
   // provide an Arbitrary[String] for the Prism tests.
-  implicit val arbEpochString: Arbitrary[String] = Arbitrary(ArbEpoch.strings)
+  given Arbitrary[String] = Arbitrary(ArbEpoch.strings)
 
   // Laws
   checkAll("Epoch", OrderTests[Epoch].order)
@@ -69,30 +69,30 @@ final class EpochSuite extends munit.DisciplineSuite {
   }
 
   test("epochLenientNoScheme") {
-    assertEquals(epochLenientNoScheme.parseExact("2014.123"),
+    assertEquals(epochLenientNoScheme.parseAll("2014.123").toOption,
                  Epoch.Julian.fromMilliyears(2014123.refined).some
     )
-    assertEquals(epochLenientNoScheme.parseExact("2014"), Epoch.Julian.fromMilliyears(2014000.refined).some)
-    assertEquals(epochLenientNoScheme.parseExact("2014."),
+    assertEquals(epochLenientNoScheme.parseAll("2014").toOption, Epoch.Julian.fromMilliyears(2014000.refined).some)
+    assertEquals(epochLenientNoScheme.parseAll("2014.").toOption,
                  Epoch.Julian.fromMilliyears(2014000.refined).some
     )
-    assertEquals(epochLenientNoScheme.parseExact("2014.1"),
+    assertEquals(epochLenientNoScheme.parseAll("2014.1").toOption,
                  Epoch.Julian.fromMilliyears(2014100.refined).some
     )
-    assertEquals(epochLenientNoScheme.parseExact("2014.092"),
+    assertEquals(epochLenientNoScheme.parseAll("2014.092").toOption,
                  Epoch.Julian.fromMilliyears(2014092.refined).some
     )
-    assertEquals(epochLenientNoScheme.parseExact("2014.002"),
+    assertEquals(epochLenientNoScheme.parseAll("2014.002").toOption,
                  Epoch.Julian.fromMilliyears(2014002.refined).some
     )
-    assertEquals(epochLenientNoScheme.parseExact("J2014.123"), None)
-    assertEquals(epochLenientNoScheme.parseExact("J2014"), None)
-    assertEquals(epochLenientNoScheme.parseExact("J2014."), None)
-    assertEquals(epochLenientNoScheme.parseExact("J2014.1"), None)
-    assertEquals(epochLenientNoScheme.parseExact("B2014.123"), None)
-    assertEquals(epochLenientNoScheme.parseExact("B2014"), None)
-    assertEquals(epochLenientNoScheme.parseExact("B2014."), None)
-    assertEquals(epochLenientNoScheme.parseExact("B2014.1"), None)
+    assertEquals(epochLenientNoScheme.parseAll("J2014.123").toOption, None)
+    assertEquals(epochLenientNoScheme.parseAll("J2014").toOption, None)
+    assertEquals(epochLenientNoScheme.parseAll("J2014.").toOption, None)
+    assertEquals(epochLenientNoScheme.parseAll("J2014.1").toOption, None)
+    assertEquals(epochLenientNoScheme.parseAll("B2014.123").toOption, None)
+    assertEquals(epochLenientNoScheme.parseAll("B2014").toOption, None)
+    assertEquals(epochLenientNoScheme.parseAll("B2014.").toOption, None)
+    assertEquals(epochLenientNoScheme.parseAll("B2014.1").toOption, None)
   }
 
   test("epochFormatNoScheme") {
