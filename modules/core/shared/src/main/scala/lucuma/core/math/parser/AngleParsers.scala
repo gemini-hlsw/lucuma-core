@@ -3,22 +3,23 @@
 
 package lucuma.core.math.parser
 
+import cats.parse.Numbers.digit
 import cats.parse.Parser.char
 import cats.parse.Parser.charIn
 import cats.parse.Parser.string
-import cats.parse.Rfc5234.*
+import cats.parse.Rfc5234.sp
 import cats.parse.*
 import lucuma.core.math.Angle
 import lucuma.core.math.Declination
 import lucuma.core.math.HourAngle
 import lucuma.core.math.RightAscension
 import lucuma.core.optics.Format
+import lucuma.core.parser.MiscParsers
 
 trait AngleParsers:
-  val colon: Parser[Unit]        = char(':')
-  val colonOrSpace: Parser[Unit] = (char(':') | sp).void
-  val neg: Parser0[Boolean]      =
-    char('-').map(_ => true).backtrack | char('+').map(_ => false).backtrack | Parser.pure(false)
+  import MiscParsers.{neg, colon}
+
+  val colonOrSpace: Parser[Unit] = colon | sp
 
   val hours: Parser[Int] = (char('1') ~ digit).backtrack // 10-19
     .orElse(char('2') ~ charIn('0' to '4')) // 20-24

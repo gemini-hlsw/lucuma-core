@@ -3,18 +3,15 @@
 
 package lucuma.core.math.parser
 
-import atto._
 import lucuma.core.math.Index
 import lucuma.core.parser.MiscParsers.index
-import org.scalacheck.Prop._
+import org.scalacheck.Prop.*
 
-import Atto._
-
-final class MiscParsersSuite extends munit.DisciplineSuite {
+class MiscParsersSuite extends munit.DisciplineSuite {
 
   test("index parser must be consistent with Index.fromShort") {
     forAll { (s: Short) =>
-      assertEquals(index.parseOnly(s.toString).option,  Index.fromShort.getOption(s))
+      assertEquals(index.parseAll(s.toString).toOption,  Index.fromShort.getOption(s))
     }
   }
 

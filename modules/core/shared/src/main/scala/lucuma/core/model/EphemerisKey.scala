@@ -5,12 +5,11 @@ package lucuma.core.model
 
 import cats.Order
 import cats.Show
-import io.circe._
+import io.circe.*
 import lucuma.core.enums.EphemerisKeyType
 import lucuma.core.model.parser.EphemerisKeyParsers
 import lucuma.core.optics.Format
-import lucuma.core.syntax.parser._
-import lucuma.core.syntax.string._
+import lucuma.core.syntax.string.*
 import monocle.Focus
 import monocle.Lens
 
@@ -114,10 +113,10 @@ object EphemerisKey extends EphemerisOptics with EphemerisJson {
     val id: Lens[UserSupplied, Int] = Focus[UserSupplied](_.id)
   }
 
-  implicit val ShowEphemerisKey: Show[EphemerisKey] =
+  given Show[EphemerisKey] =
     Show.fromToString
 
-  implicit val OrderEphemerisKey: Order[EphemerisKey] =
+  given Order[EphemerisKey] =
     Order.by(fromString.reverseGet)
 }
 
@@ -125,7 +124,7 @@ trait EphemerisOptics { this: EphemerisKey.type =>
 
   val fromString: Format[String, EphemerisKey] =
     Format(
-      EphemerisKeyParsers.ephemerisKey.parseExact,
+      EphemerisKeyParsers.ephemerisKey.parseAll(_).toOption,
       k => {
         val (keyType, des) = fromTypeAndDes.reverseGet(k)
         s"${keyType.tag}_${des}"
@@ -148,9 +147,9 @@ trait EphemerisOptics { this: EphemerisKey.type =>
 }
 
 trait EphemerisJson { this: EphemerisOptics & EphemerisKey.type =>
-  implicit val encoder: Encoder[EphemerisKey] =
+  given Encoder[EphemerisKey] =
     Encoder[String].contramap(fromString.reverseGet)
 
-  implicit val decoder: Decoder[EphemerisKey] =
+  given Decoder[EphemerisKey] =
     Decoder[String].emap(s => fromString.getOption(s).toRight(s"Invalid EphemerisKey value: [$s]"))
 }

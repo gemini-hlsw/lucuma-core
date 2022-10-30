@@ -15,7 +15,6 @@ import eu.timepit.refined.refineV
 import lucuma.core.math.parser.EpochParsers
 import lucuma.core.optics.Format
 import lucuma.core.optics.syntax.all.*
-import lucuma.core.syntax.parser.*
 import lucuma.refined.*
 import monocle.Prism
 
