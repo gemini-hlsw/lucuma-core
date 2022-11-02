@@ -11,6 +11,7 @@ import lucuma.core.math.HourAngle
 import lucuma.core.math.arb.ArbAngle
 import lucuma.core.math.arb.ArbRightAscension.*
 import lucuma.core.optics.laws.discipline.FormatTests
+import lucuma.core.parser.MiscParsers.neg
 import munit.*
 
 class AngleParsersSuite extends DisciplineSuite with AngleParsers:

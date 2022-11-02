@@ -10,7 +10,6 @@ import cats.kernel.CommutativeGroup
 import cats.syntax.eq.*
 import lucuma.core.math.parser.AngleParsers
 import lucuma.core.optics.*
-import lucuma.core.syntax.parser.*
 import monocle.Iso
 import monocle.Prism
 

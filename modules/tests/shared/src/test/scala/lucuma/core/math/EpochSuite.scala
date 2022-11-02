@@ -12,7 +12,6 @@ import lucuma.core.arb.ArbTime
 import lucuma.core.math.arb.*
 import lucuma.core.math.parser.EpochParsers.*
 import lucuma.core.optics.laws.discipline.*
-import lucuma.core.syntax.parser.*
 import lucuma.refined.*
 import monocle.law.discipline.PrismTests
 import org.scalacheck.Arbitrary

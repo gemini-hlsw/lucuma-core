@@ -9,7 +9,6 @@ Global / concurrentRestrictions += Tags.limit(Tags.Compile, 1)
 ThisBuild / crossScalaVersions := Seq("3.2.0")
 ThisBuild / scalacOptions += "-language:implicitConversions" // TODO
 
-lazy val attoVersion           = "0.9.5"
 lazy val catsVersion           = "2.8.0"
 lazy val kindProjectorVersion  = "0.13.2"
 lazy val monocleVersion        = "3.1.0"
@@ -37,8 +36,6 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
   .settings(
     name := "lucuma-core",
     libraryDependencies ++= Seq(
-      "org.tpolecat"   %%% "atto-core"                  % attoVersion,
-      "org.tpolecat"   %%% "atto-refined"               % attoVersion,
       "org.typelevel"  %%% "cats-parse"                 % catsParseVersion,
       "org.typelevel"  %%% "cats-core"                  % catsVersion,
       "dev.optics"     %%% "monocle-core"               % monocleVersion,
