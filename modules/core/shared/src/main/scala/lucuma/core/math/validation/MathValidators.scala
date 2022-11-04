@@ -3,14 +3,15 @@
 
 package lucuma.core.math.validation
 
-import eu.timepit.refined.auto._
+import eu.timepit.refined.auto.*
 import lucuma.core.math.Angle
 import lucuma.core.math.Declination
 import lucuma.core.math.Epoch
 import lucuma.core.math.HourAngle
 import lucuma.core.math.RightAscension
-import lucuma.core.validation._
-import lucuma.refined._
+import lucuma.core.syntax.string.*
+import lucuma.core.validation.*
+import lucuma.refined.*
 import spire.math.Rational
 
 trait MathValidators {
@@ -18,12 +19,12 @@ trait MathValidators {
   val epoch: InputValidSplitEpi[Epoch] =
     InputValidSplitEpi.fromPrism(Epoch.fromString, "Invalid epoch".refined)
 
-  val epochNoScheme:InputValidWedge[Epoch] = 
+  val epochNoScheme:InputValidWedge[Epoch] =
     InputValidWedge.fromFormat(Epoch.fromStringNoScheme, "Invalid epoch".refined)
 
   val angleArcSec: InputValidSplitEpi[Angle] =
     InputValidSplitEpi(
-      _.toBigDecimalOption
+      _.parseBigDecimalOption
         .map(Angle.fromBigDecimalArcseconds)
         .toRight("Invalid Angle")
         .toEitherErrorsUnsafe,
@@ -38,7 +39,7 @@ trait MathValidators {
 
   val truncatedAngleDegrees: InputValidWedge[Angle] =
     InputValidWedge(
-      _.toBigDecimalOption
+      _.parseBigDecimalOption
         .map(Angle.fromBigDecimalDegrees)
         .map(truncateAngle)
         .toRight("Invalid Angle")
