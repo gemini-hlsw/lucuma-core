@@ -4,12 +4,12 @@
 package lucuma.core.model
 
 import cats.Eq
-import cats.syntax.all._
-import eu.timepit.refined.cats._
+import cats.syntax.all.*
+import eu.timepit.refined.cats.*
 import eu.timepit.refined.types.numeric.NonNegInt
 import eu.timepit.refined.types.numeric.PosBigDecimal
 import lucuma.core.model.NonNegDuration
-import lucuma.core.model.implicits._
+import lucuma.core.model.given
 import monocle.Focus
 import monocle.Lens
 import monocle.Optional
@@ -23,7 +23,7 @@ object ExposureTimeMode {
   final case class SignalToNoise(value: PosBigDecimal)                   extends ExposureTimeMode
   final case class FixedExposure(count: NonNegInt, time: NonNegDuration) extends ExposureTimeMode
 
-  implicit val EqExposureMode: Eq[ExposureTimeMode] =
+  given Eq[ExposureTimeMode] =
     Eq.instance {
       case (SignalToNoise(a), SignalToNoise(b))           => a === b
       case (FixedExposure(ac, ad), FixedExposure(bc, bd)) => ac === bc && ad === bd
@@ -72,13 +72,13 @@ object ExposureTimeMode {
   object SignalToNoise {
     val value: Lens[SignalToNoise, PosBigDecimal] = Focus[SignalToNoise](_.value)
 
-    implicit val eqSignalToNoise: Eq[SignalToNoise] = Eq.by(_.value)
+    given Eq[SignalToNoise] = Eq.by(_.value)
   }
 
   object FixedExposure {
     val count: Lens[FixedExposure, NonNegInt]     = Focus[FixedExposure](_.count)
     val time: Lens[FixedExposure, NonNegDuration] = Focus[FixedExposure](_.time)
 
-    implicit val eqFixedExposure: Eq[FixedExposure] = Eq.by(f => (f.count, f.time))
+    given Eq[FixedExposure] = Eq.by(f => (f.count, f.time))
   }
 }

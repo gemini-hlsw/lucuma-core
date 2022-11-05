@@ -7,22 +7,19 @@ import eu.timepit.refined.types.all.NonNegInt
 import eu.timepit.refined.types.all.NonNegLong
 import lucuma.core.model.NonNegDuration
 
-final class NonNegDurationOps(self: NonNegDuration) {
-
-  def toNanos: NonNegLong =
-    NonNegLong.unsafeFrom(self.value.toNanos)
-
-  def +(that: NonNegDuration): NonNegDuration =
-    NonNegDuration.unsafeFrom(self.value.plus(that.value))
-
-  def *(that: NonNegInt): NonNegDuration =
-    NonNegDuration.unsafeFrom(self.value.multipliedBy(that.value.toLong))
-
-}
 
 trait ToNonNegDurationOps {
-  implicit def toNonNegDurationOps(s: NonNegDuration): NonNegDurationOps =
-    new NonNegDurationOps(s)
+  extension(self: NonNegDuration)
+
+    def toNanos: NonNegLong =
+      NonNegLong.unsafeFrom(self.value.toNanos)
+
+    def +(that: NonNegDuration): NonNegDuration =
+      NonNegDuration.unsafeFrom(self.value.plus(that.value))
+
+    def *(that: NonNegInt): NonNegDuration =
+      NonNegDuration.unsafeFrom(self.value.multipliedBy(that.value.toLong))
+
 }
 
 object nonnegduration extends ToNonNegDurationOps
