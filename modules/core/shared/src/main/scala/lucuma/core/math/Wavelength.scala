@@ -9,10 +9,10 @@ import coulomb.*
 import coulomb.ops.algebra.cats.all.given
 import coulomb.policy.spire.standard.given
 import coulomb.syntax.*
-import eu.timepit.refined._
-import eu.timepit.refined.auto._
-import eu.timepit.refined.cats._
-import eu.timepit.refined.numeric._
+import eu.timepit.refined.*
+import eu.timepit.refined.auto.*
+import eu.timepit.refined.cats.*
+import eu.timepit.refined.numeric.*
 import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.math.units.{_, given}
 import lucuma.core.optics.Format
@@ -87,11 +87,11 @@ object Wavelength {
     new Wavelength(picometers.withUnit[Picometer])
 
   /** @group Typeclass Instances */
-  implicit val WavelengthShow: Show[Wavelength] =
+  given Show[Wavelength] =
     Show.fromToString
 
   /** @group Typeclass Instances */
-  implicit val WavelengthOrd: Order[Wavelength] =
+  given Order[Wavelength] =
     Order.by(_.toPicometers)
 
   /**

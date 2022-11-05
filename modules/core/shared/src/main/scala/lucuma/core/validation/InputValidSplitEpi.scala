@@ -4,17 +4,18 @@
 package lucuma.core.validation
 
 import cats.data.NonEmptyChain
-import cats.syntax.all._
+import cats.syntax.all.*
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.api.{Validate => RefinedValidate}
-import eu.timepit.refined.auto._
+import eu.timepit.refined.auto.*
 import eu.timepit.refined.collection.NonEmpty
 import eu.timepit.refined.numeric.Positive
 import eu.timepit.refined.types.numeric.PosBigDecimal
 import eu.timepit.refined.types.numeric.PosInt
 import eu.timepit.refined.types.string.NonEmptyString
-import lucuma.core.optics._
-import lucuma.refined._
+import lucuma.core.optics.*
+import lucuma.core.syntax.string.*
+import lucuma.refined.*
 import monocle.Iso
 import monocle.Prism
 
@@ -115,7 +116,7 @@ object InputValidSplitEpi {
    */
   val bigDecimal: InputValidSplitEpi[BigDecimal] =
     InputValidSplitEpi(
-      s => fixDecimalString(s).toBigDecimalOption.toRight(NonEmptyChain("Must be a number".refined)),
+      s => fixDecimalString(s).parseBigDecimalOption.toRight(NonEmptyChain("Must be a number".refined)),
       _.toString.toLowerCase.replace("+", "") // Strip + sign from exponent.
     )
 
