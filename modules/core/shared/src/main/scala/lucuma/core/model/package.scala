@@ -54,7 +54,6 @@ package object model {
   given Eq[NonNegDuration] =
     Eq.instance { case (a, b) => a.value === b.value }
 
-  // Has to be a def or else there are initialization issues.
   given Monoid[NonNegDuration] =
     Monoid.instance(
       NonNegDuration.zero,
