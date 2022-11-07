@@ -3,8 +3,8 @@
 
 package lucuma.core.model.arb
 
-import cats.implicits._
-import eu.timepit.refined.scalacheck.all._
+import cats.implicits.*
+import eu.timepit.refined.scalacheck.all.*
 import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.core.enums.TacCategory
 import lucuma.core.enums.ToOActivation
@@ -15,17 +15,17 @@ import lucuma.core.model.ProposalClass
 import lucuma.core.util.arb.ArbCollection
 import lucuma.core.util.arb.ArbEnumerated
 import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.Cogen._
-import org.scalacheck._
+import org.scalacheck.Cogen.*
+import org.scalacheck.*
 
 import scala.collection.immutable.SortedMap
 
 trait ArbProposal {
-  import ArbCollection._
-  import ArbEnumerated._
-  import ArbProposalClass._
+  import ArbCollection.*
+  import ArbEnumerated.*
+  import ArbProposalClass.given
 
-  implicit val arbProposal: Arbitrary[Proposal] =
+  given Arbitrary[Proposal] =
     Arbitrary {
       for {
         title    <- arbitrary[Option[NonEmptyString]]
@@ -37,7 +37,7 @@ trait ArbProposal {
       } yield Proposal(title, pClass, category, too, abstrakt, splits)
     }
 
-  implicit val cogProposal: Cogen[Proposal] =
+  given Cogen[Proposal] =
     Cogen[
       (Option[NonEmptyString],
        ProposalClass,
