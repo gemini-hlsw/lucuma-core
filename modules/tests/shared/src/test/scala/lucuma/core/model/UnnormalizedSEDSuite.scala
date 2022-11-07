@@ -3,23 +3,23 @@
 
 package lucuma.core.model
 
-import cats.kernel.laws.discipline._
+import cats.kernel.laws.discipline.*
 import coulomb.ops.algebra.cats.all.given
-import eu.timepit.refined.cats._
-import eu.timepit.refined.scalacheck.numeric._
-import lucuma.core.math.arb._
-import lucuma.core.model.arb._
+import eu.timepit.refined.cats.*
+import eu.timepit.refined.scalacheck.numeric.*
+import lucuma.core.math.arb.*
+import lucuma.core.model.arb.*
 import lucuma.core.util.arb.ArbEnumerated
 import monocle.law.discipline.LensTests
 import monocle.law.discipline.PrismTests
-import munit._
+import munit.*
 
 final class UnnormalizedSEDSuite extends DisciplineSuite {
-  import UnnormalizedSED._
-  import ArbUnnormalizedSED._
-  import ArbEnumerated._
+  import UnnormalizedSED.*
+  import ArbUnnormalizedSED.*
+  import ArbEnumerated.*
   import ArbQuantity.given
-  import ArbRefined._
+  import ArbRefined.*
 
   // Laws
   checkAll("Order[CoolStarModel]", OrderTests[CoolStarModel].order)

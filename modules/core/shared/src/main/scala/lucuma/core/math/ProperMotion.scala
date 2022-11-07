@@ -4,15 +4,15 @@
 package lucuma.core.math
 
 import algebra.instances.all.given
-import cats._
-import cats.syntax.all._
+import cats.*
+import cats.syntax.all.*
 import coulomb.*
 import coulomb.ops.algebra.cats.all.given
 import coulomb.policy.spire.standard.given
 import coulomb.syntax.*
-import coulomb.units.accepted._
+import coulomb.units.accepted.*
 import lucuma.core.math.ProperMotion.AngularVelocityComponent
-import lucuma.core.math.units._
+import lucuma.core.math.units.*
 import lucuma.core.optics.SplitMono
 import monocle.Focus
 import monocle.Iso
@@ -32,36 +32,40 @@ final case class ProperMotion(
   dec: ProperMotion.AngularVelocityComponent[VelocityAxis.Dec]
 ) {
   // Return the ra/dec components in radians, first converting to degrees/y
-  def toRadians: (Double, Double) =
+  inline def toRadians: (Double, Double) =
     (ra.toRadians, dec.toRadians)
 
 }
 
 object ProperMotion extends ProperMotionOptics {
-  final case class AngularVelocityComponent[A](μasy: Quantity[Long, MicroArcSecondPerYear]) {
+  opaque type AngularVelocityComponent[A] = Quantity[Long, MicroArcSecondPerYear]
+  extension[A](self: AngularVelocityComponent[A])
+    inline def μasy: Quantity[Long, MicroArcSecondPerYear] = self
+
     // Direct conversion via coulomb turns to be too slow
-    def toRadians: Double = (μasy.value.toDouble / (3600 * 1e6)).toRadians
+    inline def toRadians: Double = (μasy.value.toDouble / (3600 * 1e6)).toRadians
 
-    val masy: Quantity[Rational, MilliArcSecondPerYear] = μasy.toValue[Rational].toUnit[MilliArcSecondPerYear]
+    def masy: Quantity[Rational, MilliArcSecondPerYear] = μasy.toValue[Rational].toUnit[MilliArcSecondPerYear]
 
-    override def toString =
+    def toString: String =
       s"AngularVelocityComponent(${masy.show})"
-  }
 
   object AngularVelocityComponent extends AngularVelocityComponentOptics {
+    inline def apply[A](w: AngularVelocityComponent[A]): AngularVelocityComponent[A] = w
+
     def Zero[A]: AngularVelocityComponent[A] =
       AngularVelocityComponent(0.withUnit[MicroArcSecondPerYear])
 
     /** @group Typeclass Instances */
-    implicit def orderAngularVelocity[A]: Order[AngularVelocityComponent[A]] =
-      Order.by(_.μasy)
+    given orderAngularVelocity[A]: Order[AngularVelocityComponent[A]] =
+      Order.by(_.μasy.value)
 
     /** @group Typeclass Instances */
-    implicit def monoidAngularVelocity[A]: Monoid[AngularVelocityComponent[A]] =
+    given monoidAngularVelocity[A]: Monoid[AngularVelocityComponent[A]] =
       Monoid.instance(Zero[A], (a, b) => AngularVelocityComponent[A](a.μasy + b.μasy))
 
     /** @group Typeclass Instances */
-    implicit def showAngularVelocity[A]: Show[AngularVelocityComponent[A]] =
+    given showAngularVelocity[A]: Show[AngularVelocityComponent[A]] =
       Show.fromToString
 
   }
@@ -120,11 +124,11 @@ object ProperMotion extends ProperMotionOptics {
     )
 
   /** @group Typeclass Instances */
-  implicit val orderProperVelocity: Order[ProperMotion] =
+  given Order[ProperMotion] =
     Order.by(x => (x.ra, x.dec))
 
   /** @group Typeclass Instances */
-  implicit val monoidProperVelocity: Monoid[ProperMotion] =
+  given Monoid[ProperMotion] =
     Monoid.instance(Zero, (a, b) => ProperMotion(a.ra |+| b.ra, a.dec |+| b.dec))
 
 }

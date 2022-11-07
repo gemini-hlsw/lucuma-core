@@ -16,6 +16,10 @@ final class ProperMotionSuite extends DisciplineSuite {
   // Laws
   checkAll("Order[ProperMotion]", OrderTests[ProperMotion].order)
   checkAll("Monoid[ProperMotion]", MonoidTests[ProperMotion].monoid)
+  checkAll("Order[AngularVelocityComponent]", OrderTests[ProperMotion.AngularVelocityComponent[VelocityAxis.RA]].order)
+  checkAll("Monoid[AngularVelocityComponent]", MonoidTests[ProperMotion.AngularVelocityComponent[VelocityAxis.RA]].monoid)
+  checkAll("Order[AngularVelocityComponent]", OrderTests[ProperMotion.AngularVelocityComponent[VelocityAxis.Dec]].order)
+  checkAll("Monoid[AngularVelocityComponent]", MonoidTests[ProperMotion.AngularVelocityComponent[VelocityAxis.Dec]].monoid)
 
   checkAll("milliarcsecondsPerYear", SplitMonoTests(ProperMotion.milliarcsecondsPerYear).splitMono)
 
