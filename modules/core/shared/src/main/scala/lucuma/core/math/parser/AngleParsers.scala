@@ -17,9 +17,7 @@ import lucuma.core.optics.Format
 import lucuma.core.parser.MiscParsers
 
 trait AngleParsers:
-  import MiscParsers.{neg, colon}
-
-  val colonOrSpace: Parser[Unit] = colon | sp
+  import MiscParsers.{neg, colon, colonOrSpace}
 
   val hours: Parser[Int] = (char('1') ~ digit).backtrack // 10-19
     .orElse(char('2') ~ charIn('0' to '4')) // 20-24
@@ -41,7 +39,7 @@ trait AngleParsers:
     .map(_.toInt)
     .withContext("minutes")
 
-  private[parser] val seconds =
+  val seconds =
     // allow any amount of decimals but only use 6
     (minutes ~ char('.').? ~ digit.rep(1, 3).?.string ~ digit.rep(1, 3).?.string ~ digit.rep.?)
       .map { case ((((s, _), d1), d2), _) =>

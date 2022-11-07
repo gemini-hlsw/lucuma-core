@@ -6,6 +6,7 @@ package lucuma.core.parser
 import cats.parse.Numbers.digit
 import cats.parse.Numbers.nonZeroDigit
 import cats.parse.Parser.*
+import cats.parse.Rfc5234.sp
 import cats.parse.*
 import lucuma.core.math.Index
 import lucuma.core.optics.syntax.prism.*
@@ -15,7 +16,6 @@ import scala.annotation.tailrec
 /** General-purpose parsers and combinators that aren't provided by cats-parse. */
 trait MiscParsers {
 
-
   /** Creates a Parser that consumes the given character. */
   private def matchChar(c: Char, n: String): Parser[Unit] =
     char(c).void.withContext(n)
@@ -23,6 +23,8 @@ trait MiscParsers {
   /** Parser for a colon. */
   val colon: Parser[Unit] =
     matchChar(':', "colon")
+
+  val colonOrSpace: Parser[Unit] = colon | sp
 
   /** Catch a `NumberFormatException`, useful for flatMap. */
   def catchNFE[A, B](f: A => B): A => Option[B] =
