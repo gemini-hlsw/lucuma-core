@@ -39,7 +39,8 @@ trait AngleParsers:
     .map(_.toInt)
     .withContext("minutes")
 
-  val seconds =
+  // seconds as the integer part, the milliseconds (up to 3 digits), and the rest
+  val seconds: Parser[(Int, Int, Int)] =
     // allow any amount of decimals but only use 6
     (minutes ~ char('.').? ~ digit.rep(1, 3).?.string ~ digit.rep(1, 3).?.string ~ digit.rep.?)
       .map { case ((((s, _), d1), d2), _) =>
