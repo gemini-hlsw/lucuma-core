@@ -11,9 +11,11 @@ import coulomb.ops.algebra.cats.all.given
 import coulomb.policy.spire.standard.given
 import coulomb.syntax.*
 import coulomb.units.accepted.*
-import lucuma.core.math.ProperMotion.AngularVelocityComponent
+import lucuma.core.math.ProperMotion.AngularVelocity
+import lucuma.core.math.dimensional.*
 import lucuma.core.math.units.*
 import lucuma.core.optics.SplitMono
+import lucuma.core.util.NewType
 import monocle.Focus
 import monocle.Iso
 import monocle.Lens
@@ -27,10 +29,7 @@ object VelocityAxis {
 /**
   * ProperMotion contains Ra/Dec angular velocities
   */
-final case class ProperMotion(
-  ra:  ProperMotion.AngularVelocityComponent[VelocityAxis.RA],
-  dec: ProperMotion.AngularVelocityComponent[VelocityAxis.Dec]
-) {
+case class ProperMotion( ra:  ProperMotion.RA, dec: ProperMotion.Dec) {
   // Return the ra/dec components in radians, first converting to degrees/y
   inline def toRadians: (Double, Double) =
     (ra.toRadians, dec.toRadians)
@@ -38,9 +37,41 @@ final case class ProperMotion(
 }
 
 object ProperMotion extends ProperMotionOptics {
-  opaque type AngularVelocityComponent[A] = Quantity[Long, MicroArcSecondPerYear]
-  extension[A](self: AngularVelocityComponent[A])
-    inline def μasy: Quantity[Long, MicroArcSecondPerYear] = self
+  type AngularVelocity = AngularVelocity.Type
+
+  object AngularVelocity extends NewType[Quantity[Long, MicroArcSecondPerYear]] with AngularVelocityComponentOptics {
+
+    def Zero: AngularVelocity =
+      AngularVelocity(0.withUnit[MicroArcSecondPerYear])
+
+    def zeroOf[A]: AngularVelocity Of A = tag[A](Zero)
+    val ZeroRA: AngularVelocity Of VelocityAxis.RA = zeroOf[VelocityAxis.RA]
+    val ZeroDec: AngularVelocity Of VelocityAxis.Dec = zeroOf[VelocityAxis.Dec]
+
+    /** @group Typeclass Instances */
+    given Order[AngularVelocity] =
+      Order.by(_.μasy.value)
+
+    /** @group Typeclass Instances */
+    def orderVelocityOf[A]: Order[AngularVelocity Of A] =
+      Order.by(_.μasy.value)
+
+    /** @group Typeclass Instances */
+    given Monoid[AngularVelocity] =
+      Monoid.instance(Zero, (a, b) => AngularVelocity(a.μasy + b.μasy))
+
+    /** @group Typeclass Instances */
+    def monoidVelocityOf[A]: Monoid[AngularVelocity Of A] =
+      Monoid.instance(zeroOf[A], (a, b) => tag[A](AngularVelocity(a.μasy + b.μasy)))
+
+    /** @group Typeclass Instances */
+    given Show[AngularVelocity] =
+      Show.fromToString
+  }
+
+  // opaque type AngularVelocity[A] = Quantity[Long, MicroArcSecondPerYear]
+  extension[A](self: AngularVelocity)
+    inline def μasy: Quantity[Long, MicroArcSecondPerYear] = self.value
 
     // Direct conversion via coulomb turns to be too slow
     inline def toRadians: Double = (μasy.value.toDouble / (3600 * 1e6)).toRadians
@@ -48,80 +79,42 @@ object ProperMotion extends ProperMotionOptics {
     def masy: Quantity[Rational, MilliArcSecondPerYear] = μasy.toValue[Rational].toUnit[MilliArcSecondPerYear]
 
     def toString: String =
-      s"AngularVelocityComponent(${masy.show})"
-
-  object AngularVelocityComponent extends AngularVelocityComponentOptics {
-    inline def apply[A](w: AngularVelocityComponent[A]): AngularVelocityComponent[A] = w
-
-    def Zero[A]: AngularVelocityComponent[A] =
-      AngularVelocityComponent(0.withUnit[MicroArcSecondPerYear])
-
-    /** @group Typeclass Instances */
-    given orderAngularVelocity[A]: Order[AngularVelocityComponent[A]] =
-      Order.by(_.μasy.value)
-
-    /** @group Typeclass Instances */
-    given monoidAngularVelocity[A]: Monoid[AngularVelocityComponent[A]] =
-      Monoid.instance(Zero[A], (a, b) => AngularVelocityComponent[A](a.μasy + b.μasy))
-
-    /** @group Typeclass Instances */
-    given showAngularVelocity[A]: Show[AngularVelocityComponent[A]] =
-      Show.fromToString
-
-  }
+      s"AngularVelocity(${masy.show})"
 
   sealed trait AngularVelocityComponentOptics {
 
-    def μasy[A]: Iso[Long, AngularVelocityComponent[A]] =
-      Iso[Long, AngularVelocityComponent[A]](v =>
-        AngularVelocityComponent(v.withUnit[MicroArcSecondPerYear])
+    def μasy[A]: Iso[Long, AngularVelocity Of A] =
+      Iso[Long, AngularVelocity Of A](v =>
+        tag[A](AngularVelocity(v.withUnit[MicroArcSecondPerYear]))
       )(_.μasy.value)
 
-    def microarcsecondsPerYear[A]: Iso[Long, AngularVelocityComponent[A]] = μasy
+    def microarcsecondsPerYear[A]: Iso[Long, AngularVelocity Of A] = μasy
 
     /**
-      * This `AngularVelocityComponent` as signed decimal milliseconds.
+      * This `AngularVelocity` as signed decimal milliseconds.
       */
-    def milliarcsecondsPerYear[A]: SplitMono[AngularVelocityComponent[A], BigDecimal] =
+    def milliarcsecondsPerYear[A]: SplitMono[AngularVelocity Of A, BigDecimal] =
       SplitMono
-        .fromIso[AngularVelocityComponent[A], Long](microarcsecondsPerYear.reverse)
+        .fromIso[AngularVelocity Of A, Long](microarcsecondsPerYear.reverse)
         .imapB(_.underlying.movePointRight(3).longValue,
                n => new java.math.BigDecimal(n).movePointLeft(3)
         )
   }
 
-  type RA  = AngularVelocityComponent[VelocityAxis.RA]
+  type RA  = AngularVelocity Of VelocityAxis.RA
+  type Dec = AngularVelocity Of VelocityAxis.Dec
 
-  type Dec = AngularVelocityComponent[VelocityAxis.Dec]
-
-  trait AngularVelocityComponentCompanion[A] {
-
-    def apply(μasy: Quantity[Long, MicroArcSecondPerYear]): AngularVelocityComponent[A] =
-      AngularVelocityComponent[A](μasy)
-
-    val Zero: AngularVelocityComponent[A] =
-      AngularVelocityComponent.Zero[A]
-
-    val microarcsecondsPerYear: Iso[AngularVelocityComponent[A], Long] =
-      AngularVelocityComponent.microarcsecondsPerYear[A].reverse
-
-    val milliarcsecondsPerYear: SplitMono[AngularVelocityComponent[A], BigDecimal] =
-      AngularVelocityComponent.milliarcsecondsPerYear[A]
-
-  }
-
-  object RA extends AngularVelocityComponentCompanion[VelocityAxis.RA]
-
-  object Dec extends AngularVelocityComponentCompanion[VelocityAxis.Dec]
+  given Order[RA] = AngularVelocity.orderVelocityOf[VelocityAxis.RA]
+  given Monoid[RA] = AngularVelocity.monoidVelocityOf[VelocityAxis.RA]
+  given Order[Dec] = AngularVelocity.orderVelocityOf[VelocityAxis.Dec]
+  given Monoid[Dec] = AngularVelocity.monoidVelocityOf[VelocityAxis.Dec]
 
   /**
     * The `No parallax`
     * @group Constructors
     */
   val Zero: ProperMotion =
-    ProperMotion(AngularVelocityComponent.Zero[VelocityAxis.RA],
-                   AngularVelocityComponent.Zero[VelocityAxis.Dec]
-    )
+    ProperMotion(AngularVelocity.ZeroRA, AngularVelocity.ZeroDec)
 
   /** @group Typeclass Instances */
   given Order[ProperMotion] =
@@ -136,16 +129,16 @@ object ProperMotion extends ProperMotionOptics {
 sealed trait ProperMotionOptics {
 
   /** @group Optics */
-  val ra: Lens[ProperMotion, AngularVelocityComponent[VelocityAxis.RA]] =
+  val ra: Lens[ProperMotion, ProperMotion.RA] =
     Focus[ProperMotion](_.ra)
 
   /** @group Optics */
-  val dec: Lens[ProperMotion, AngularVelocityComponent[VelocityAxis.Dec]] =
+  val dec: Lens[ProperMotion, ProperMotion.Dec] =
     Focus[ProperMotion](_.dec)
 
   private def splitMonoFromComponents[A](
-    raMono:  SplitMono[AngularVelocityComponent[VelocityAxis.RA], A],
-    decMono: SplitMono[AngularVelocityComponent[VelocityAxis.Dec], A]
+    raMono:  SplitMono[ProperMotion.RA, A],
+    decMono: SplitMono[ProperMotion.Dec, A]
   ): SplitMono[ProperMotion, (A, A)] =
     SplitMono(
       v => (raMono.get(v.ra), decMono.get(v.dec)),
@@ -155,8 +148,8 @@ sealed trait ProperMotionOptics {
   /** @group Optics */
   val milliarcsecondsPerYear: SplitMono[ProperMotion, (BigDecimal, BigDecimal)] =
     splitMonoFromComponents(
-      ProperMotion.RA.milliarcsecondsPerYear,
-      ProperMotion.Dec.milliarcsecondsPerYear
+      AngularVelocity.milliarcsecondsPerYear[VelocityAxis.RA],
+      AngularVelocity.milliarcsecondsPerYear[VelocityAxis.Dec]
     )
 
 }

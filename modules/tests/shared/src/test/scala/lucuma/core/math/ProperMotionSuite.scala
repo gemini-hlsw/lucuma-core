@@ -3,8 +3,9 @@
 
 package lucuma.core.math
 
-import cats.kernel.laws.discipline._
-import lucuma.core.math.arb.ArbProperMotion._
+import cats.kernel.laws.discipline.*
+import lucuma.core.math.arb.ArbProperMotion.given
+import lucuma.core.math.dimensional.*
 import lucuma.core.model.SiderealTracking
 import lucuma.core.optics.laws.discipline.SplitMonoTests
 import munit.DisciplineSuite
@@ -16,10 +17,10 @@ final class ProperMotionSuite extends DisciplineSuite {
   // Laws
   checkAll("Order[ProperMotion]", OrderTests[ProperMotion].order)
   checkAll("Monoid[ProperMotion]", MonoidTests[ProperMotion].monoid)
-  checkAll("Order[AngularVelocityComponent]", OrderTests[ProperMotion.AngularVelocityComponent[VelocityAxis.RA]].order)
-  checkAll("Monoid[AngularVelocityComponent]", MonoidTests[ProperMotion.AngularVelocityComponent[VelocityAxis.RA]].monoid)
-  checkAll("Order[AngularVelocityComponent]", OrderTests[ProperMotion.AngularVelocityComponent[VelocityAxis.Dec]].order)
-  checkAll("Monoid[AngularVelocityComponent]", MonoidTests[ProperMotion.AngularVelocityComponent[VelocityAxis.Dec]].monoid)
+  checkAll("Order[AngularVelocityComponent]", OrderTests[ProperMotion.RA].order)
+  checkAll("Monoid[AngularVelocityComponent]", MonoidTests[ProperMotion.RA].monoid)
+  checkAll("Order[AngularVelocityComponent]", OrderTests[ProperMotion.Dec].order)
+  checkAll("Monoid[AngularVelocityComponent]", MonoidTests[ProperMotion.Dec].monoid)
 
   checkAll("milliarcsecondsPerYear", SplitMonoTests(ProperMotion.milliarcsecondsPerYear).splitMono)
 

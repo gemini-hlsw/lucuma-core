@@ -4,15 +4,15 @@
 package lucuma.core.math.dimensional
 
 import cats.Eq
-import cats.kernel.laws.discipline._
-import lucuma.core.math.BrightnessUnits._
+import cats.kernel.laws.discipline.*
+import lucuma.core.math.BrightnessUnits.*
 import lucuma.core.math.dimensional.arb.ArbUnits
-import lucuma.core.syntax.display._
-import lucuma.core.util.arb.ArbEnumerated._
-import org.scalacheck.Prop._
+import lucuma.core.syntax.display.*
+import lucuma.core.util.arb.ArbEnumerated.*
+import org.scalacheck.Prop.*
 
 class UnitSuite extends munit.DisciplineSuite {
-  import ArbUnits._
+  import ArbUnits.*
 
   // Laws
   checkAll("Units", EqTests[Units].eqv)

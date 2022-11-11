@@ -3,45 +3,45 @@
 
 package lucuma.core.model
 
-import cats.Order._
-import cats.kernel.laws.discipline._
-import eu.timepit.refined.cats._
-import eu.timepit.refined.scalacheck.string._
-import lucuma.core.arb._
+import cats.Order.*
+import cats.kernel.laws.discipline.*
+import eu.timepit.refined.cats.*
+import eu.timepit.refined.scalacheck.string.*
+import lucuma.core.arb.*
 import lucuma.core.enums.Band
-import lucuma.core.math.arb._
+import lucuma.core.math.arb.*
 import lucuma.core.math.dimensional.arb.ArbMeasure
-import lucuma.core.model.arb._
+import lucuma.core.model.arb.*
 import lucuma.core.util.arb.ArbCollection
-import lucuma.core.util.arb._
+import lucuma.core.util.arb.*
 import lucuma.core.util.laws.GidTests
-import monocle.law.discipline._
-import munit._
+import monocle.law.discipline.*
+import munit.*
 
 final class TargetSuite extends DisciplineSuite {
-  import ArbTarget._
-  import ArbSourceProfile._
-  import ArbSiderealTracking._
-  import ArbEphemerisKey._
-  import ArbParallax._
-  import ArbEnumerated._
-  import ArbCoordinates._
-  import ArbRightAscension._
-  import ArbDeclination._
-  import ArbProperMotion._
-  import ArbRadialVelocity._
-  import ArbGid._
-  import ArbEpoch._
-  import ArbCatalogInfo._
-  import Target._
-  import ArbEmissionLine._
-  import ArbSpectralDefinition._
-  import ArbAngle._
-  import ArbUnnormalizedSED._
-  import ArbRefined._
-  import ArbMeasure._
-  import ArbCollection._
-  import ArbWavelength._
+  import ArbTarget.given
+  import ArbSourceProfile.*
+  import ArbSiderealTracking.given
+  import ArbEphemerisKey.*
+  import ArbParallax.*
+  import ArbEnumerated.*
+  import ArbCoordinates.*
+  import ArbRightAscension.*
+  import ArbDeclination.*
+  import ArbProperMotion.given
+  import ArbRadialVelocity.given
+  import ArbGid.*
+  import ArbEpoch.*
+  import ArbCatalogInfo.*
+  import Target.*
+  import ArbEmissionLine.*
+  import ArbSpectralDefinition.*
+  import ArbAngle.*
+  import ArbUnnormalizedSED.*
+  import ArbRefined.*
+  import ArbMeasure.*
+  import ArbCollection.*
+  import ArbWavelength.*
 
   // Laws for Target.Sidereal
   checkAll("Eq[Target.Sidereal]", EqTests[Target.Sidereal].eqv)

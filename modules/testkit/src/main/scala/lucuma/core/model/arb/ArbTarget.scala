@@ -4,23 +4,23 @@
 package lucuma.core.model
 package arb
 
-import cats.syntax.all._
-import eu.timepit.refined.scalacheck.string._
+import cats.syntax.all.*
+import eu.timepit.refined.scalacheck.string.*
 import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.core.util.arb.ArbEnumerated
 import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.Cogen._
-import org.scalacheck._
+import org.scalacheck.Cogen.*
+import org.scalacheck.*
 
 trait ArbTarget {
 
-  import ArbEphemerisKey._
-  import ArbSiderealTracking._
-  import ArbEnumerated._
-  import ArbSourceProfile._
-  import ArbCatalogInfo._
+  import ArbEphemerisKey.*
+  import ArbSiderealTracking.given
+  import ArbEnumerated.*
+  import ArbSourceProfile.*
+  import ArbCatalogInfo.*
 
-  implicit val ArbSiderealTarget: Arbitrary[Target.Sidereal] =
+  given Arbitrary[Target.Sidereal] =
     Arbitrary {
       for {
         n <- arbitrary[NonEmptyString]
@@ -30,7 +30,7 @@ trait ArbTarget {
       } yield Target.Sidereal(n, t, b, c)
     }
 
-  implicit val arbNonsiderealTarget: Arbitrary[Target.Nonsidereal] =
+  given Arbitrary[Target.Nonsidereal] =
     Arbitrary {
       for {
         n <- arbitrary[NonEmptyString]
@@ -39,19 +39,19 @@ trait ArbTarget {
       } yield Target.Nonsidereal(n, t, b)
     }
 
-  implicit val arbTarget: Arbitrary[Target] = Arbitrary(
+  given Arbitrary[Target] = Arbitrary(
     Gen.oneOf(arbitrary[Target.Sidereal], arbitrary[Target.Nonsidereal])
   )
 
-  implicit val cogSiderealTarget: Cogen[Target.Sidereal] =
+  given Cogen[Target.Sidereal] =
     Cogen[(String, SiderealTracking, SourceProfile, Option[CatalogInfo])]
       .contramap(t => (t.name.value, t.tracking, t.sourceProfile, t.catalogInfo))
 
-  implicit val cogNonsiderealTarget: Cogen[Target.Nonsidereal] =
+  given Cogen[Target.Nonsidereal] =
     Cogen[(String, EphemerisKey, SourceProfile)]
       .contramap(t => (t.name.value, t.ephemerisKey, t.sourceProfile))
 
-  implicit val cogTarget: Cogen[Target] =
+  given Cogen[Target] =
     Cogen[Either[Target.Sidereal, Target.Nonsidereal]]
       .contramap {
         case t @ Target.Sidereal(_, _, _, _) => t.asLeft
