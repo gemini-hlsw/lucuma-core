@@ -7,10 +7,9 @@ import cats.Eq
 import cats.Order
 import cats.Show
 import cats.kernel.CommutativeGroup
-import cats.syntax.eq._
+import cats.syntax.eq.*
 import lucuma.core.math.parser.AngleParsers
-import lucuma.core.optics._
-import lucuma.core.syntax.parser._
+import lucuma.core.optics.*
 import monocle.Iso
 import monocle.Prism
 
@@ -266,7 +265,7 @@ object Angle extends AngleOptics {
    * Angle forms a commutative group.
    * @group Typeclass Instances
    */
-  implicit val AngleCommutativeGroup: CommutativeGroup[Angle] =
+  given CommutativeGroup[Angle] =
     new CommutativeGroup[Angle] {
       val empty: Angle                       = Angle0
       def combine(a: Angle, b: Angle): Angle = a + b
@@ -274,14 +273,14 @@ object Angle extends AngleOptics {
     }
 
   /** @group Typeclass Instances */
-  implicit val AngleShow: Show[Angle] =
+  given Show[Angle] =
     Show.fromToString
 
   /**
    * Angles are equal if their magnitudes are equal.
    * @group Typeclass Instances
    */
-  implicit val AngleEqual: Eq[Angle] =
+  given Eq[Angle] =
     Eq.fromUniversalEquals
 
   /**
@@ -326,7 +325,7 @@ object Angle extends AngleOptics {
   }
 
   object DMS {
-    implicit val eqDMS: Eq[DMS] =
+    given Eq[DMS] =
       Eq.by(_.toAngle)
   }
 
@@ -355,8 +354,8 @@ object Angle extends AngleOptics {
    * you get the minimal angle in the range [0 .. π]
    */
   def difference(α: Angle, ϐ: Angle): Angle = {
-    import cats.syntax.all._ // To get order syntax
-    implicit val order: Order[Angle] = AngleOrder
+    import cats.syntax.all.* // To get order syntax
+    given Order[Angle] = AngleOrder
 
     val δ: Angle = α - ϐ
     if (δ > Angle.Angle180) δ.mirrorBy(Angle.Angle180) else δ
@@ -461,7 +460,7 @@ trait AngleOptics extends OpticsHelpers { this: Angle.type =>
    * @group Optics
    */
   lazy val fromStringDMS: Format[String, Angle] =
-    Format(AngleParsers.dms.parseExact, dms.get(_).format)
+    Format(AngleParsers.dms.parseAll(_).toOption, dms.get(_).format)
 
   /**
    * String parsed as signed DMS.
@@ -603,7 +602,7 @@ object HourAngle extends HourAngleOptics {
    * HourAngle forms a commutative group.
    * @group Typeclass Instances
    */
-  implicit val AngleCommutativeGroup: CommutativeGroup[HourAngle] =
+  given CommutativeGroup[HourAngle] =
     new CommutativeGroup[HourAngle] {
       val empty: HourAngle                               = HourAngle0
       def combine(a: HourAngle, b: HourAngle): HourAngle = a + b
@@ -611,14 +610,14 @@ object HourAngle extends HourAngleOptics {
     }
 
   /** @group Typeclass Instances */
-  implicit val HourAngleShow: Show[HourAngle] =
+  given Show[HourAngle] =
     Show.fromToString
 
   /**
    * Angles are equal if their magnitudes are equal.
    * @group Typeclass Instances
    */
-  implicit val HourAngleEqual: Eq[HourAngle] =
+  given Eq[HourAngle] =
     Eq.by(_.toMicroarcseconds)
 
   /**
@@ -639,8 +638,7 @@ object HourAngle extends HourAngleOptics {
   }
 
   object HMS {
-    implicit val eqHMS: Eq[HMS] =
-      Eq.by(_.toHourAngle)
+    given Eq[HMS] = Eq.by(_.toHourAngle)
   }
 
 }
@@ -700,21 +698,20 @@ trait HourAngleOptics extends OpticsHelpers { this: HourAngle.type =>
    * @group Optics
    */
   lazy val fromStringHMS: Format[String, HourAngle] =
-    Format(AngleParsers.hms.parseExact, HMS(_).format)
+    Format(AngleParsers.hms.parseAll(_).toOption, HMS(_).format)
 
 }
 
 trait OpticsHelpers {
 
   // Syntax to scale down and squeeze into Int
-  protected implicit class SplitMonoOps[A](self: SplitMono[A, Long]) {
+  extension[A](self: SplitMono[A, Long])
 
-    private val longToInt: SplitEpi[Long, Int] =
-      SplitEpi(_.toInt, _.toLong)
 
-    def scaled(n: Long): Wedge[A, Int] =
+    def scaled(n: Long): Wedge[A, Int] = {
+      val longToInt: SplitEpi[Long, Int] =
+        SplitEpi(_.toInt, _.toLong)
       self.imapB[Long](_ * n, _ / n).andThen(longToInt)
-
-  }
+    }
 
 }

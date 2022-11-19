@@ -3,24 +3,24 @@
 
 package lucuma.core.util
 
-import cats.kernel.laws.discipline._
-import cats.syntax.either._
-import cats.syntax.option._
-import lucuma.core.arb.ArbTime._
-import lucuma.core.optics.laws.discipline._
-import lucuma.core.util.arb.ArbTimestamp._
+import cats.kernel.laws.discipline.*
+import cats.syntax.either.*
+import cats.syntax.option.*
+import lucuma.core.arb.ArbTime.*
+import lucuma.core.optics.laws.discipline.*
+import lucuma.core.util.arb.ArbTimestamp.*
 import monocle.law.discipline.PrismTests
-import munit._
+import munit.*
 import org.scalacheck.Arbitrary
 import org.scalacheck.Gen
-import org.scalacheck.Prop._
-import org.typelevel.cats.time._
+import org.scalacheck.Prop.*
+import org.typelevel.cats.time.*
 
 import java.time.Instant
 import java.time.ZoneOffset.UTC
 import java.time.ZonedDateTime
 
-final class TimestampSuite extends DisciplineSuite {
+class TimestampSuite extends DisciplineSuite {
 
   // Laws
   checkAll("Timestamp", OrderTests[Timestamp].order)

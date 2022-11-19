@@ -12,7 +12,7 @@ import java.time.Duration
 
 trait ArbNonNegDuration {
 
-  implicit val arbNonNegDuration: Arbitrary[NonNegDuration] =
+  given Arbitrary[NonNegDuration] =
     Arbitrary {
       for {
         s <- Gen.chooseNum(0L, Long.MaxValue / ArbNonNegDuration.NANOS_PER_SECOND - 1)
@@ -20,7 +20,7 @@ trait ArbNonNegDuration {
       } yield NonNegDuration.unsafeFrom(Duration.ofSeconds(s, n))
     }
 
-  implicit val cogNonNegDuration: Cogen[NonNegDuration] =
+  given Cogen[NonNegDuration] =
     Cogen[(Long, Int)].contramap(a => (a.value.getSeconds, a.value.getNano))
 
 }

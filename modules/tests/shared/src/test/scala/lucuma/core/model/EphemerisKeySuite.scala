@@ -5,19 +5,19 @@ package lucuma.core.model
 
 import cats.Eq
 import cats.Show
-import cats.kernel.laws.discipline._
+import cats.kernel.laws.discipline.*
 import io.circe.testing.CodecTests
-import io.circe.testing.instances._
-import lucuma.core.model.arb._
-import lucuma.core.optics.laws.discipline._
-import lucuma.core.util.arb._
-import munit._
-import org.scalacheck.Prop._
+import io.circe.testing.instances.*
+import lucuma.core.model.arb.*
+import lucuma.core.optics.laws.discipline.*
+import lucuma.core.util.arb.*
+import munit.*
+import org.scalacheck.Prop.*
 
 final class EphemerisKeySuite extends DisciplineSuite {
 
-  import ArbEphemerisKey._
-  import ArbEnumerated._
+  import ArbEphemerisKey.*
+  import ArbEnumerated.*
 
   // Laws
   checkAll("EphemerisKey", OrderTests[EphemerisKey].order)

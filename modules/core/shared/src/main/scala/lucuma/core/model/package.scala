@@ -5,7 +5,7 @@ package lucuma.core
 
 import cats.Eq
 import cats.Monoid
-import cats.syntax.all._
+import cats.syntax.all.*
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.api.RefinedTypeOps
 import eu.timepit.refined.api.Validate
@@ -15,7 +15,7 @@ import eu.timepit.refined.numeric.GreaterEqual
 import eu.timepit.refined.numeric.Interval
 import eu.timepit.refined.numeric.Less
 import eu.timepit.refined.numeric.NonNegative
-import org.typelevel.cats.time.instances.duration._
+import org.typelevel.cats.time.instances.duration.*
 import shapeless.Nat._0
 
 import java.time.Duration
@@ -30,7 +30,7 @@ package object model {
   object IntPercent extends RefinedTypeOps[IntPercent, Int]
 
   // Non negative duration
-  implicit val nonNegDurationValidate: Plain[Duration, GreaterEqual[_0]] =
+  given Plain[Duration, GreaterEqual[_0]] =
     Validate.fromPredicate(
       (d: Duration) => d.toNanos >= 0L,
       (d: Duration) => s"$d is not negative",
@@ -50,17 +50,13 @@ package object model {
         .getOrElse(zero)
   }
 
-  object implicits {
-    // Unfortunately, you need to `import lucuma.core.model.implicits._` to get these implicits
-    // because type aliases don't really have companion types so they couldn't go there.
-    implicit val eqNonNegDuration: Eq[NonNegDuration] =
-      Eq.instance { case (a, b) => a.value === b.value }
+  // You need to `import lucuma.core.model.given` to get these implicits
+  given Eq[NonNegDuration] =
+    Eq.instance { case (a, b) => a.value === b.value }
 
-    // Has to be a def or else there are initialization issues.
-    implicit def nonNegDurationMonoid: Monoid[NonNegDuration] =
-      Monoid.instance(
-        NonNegDuration.zero,
-        (a, b) => NonNegDuration.unsafeFrom(a.value |+| b.value)
-      )
-  }
+  given Monoid[NonNegDuration] =
+    Monoid.instance(
+      NonNegDuration.zero,
+      (a, b) => NonNegDuration.unsafeFrom(a.value |+| b.value)
+    )
 }

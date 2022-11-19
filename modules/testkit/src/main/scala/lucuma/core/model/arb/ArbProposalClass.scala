@@ -3,67 +3,67 @@
 
 package lucuma.core.model.arb
 
-import eu.timepit.refined.scalacheck.all._
+import eu.timepit.refined.scalacheck.all.*
 import lucuma.core.model.IntPercent
 import lucuma.core.model.NonNegDuration
 import lucuma.core.model.ProposalClass
-import lucuma.core.model.ProposalClass._
+import lucuma.core.model.ProposalClass.*
 import lucuma.core.model.arb.ArbNonNegDuration
 import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck._
+import org.scalacheck.*
 
 trait ArbProposalClass {
-  import ArbNonNegDuration._
+  import ArbNonNegDuration.given
 
-  implicit val arbClassical: Arbitrary[Classical] =
+  given Arbitrary[Classical] =
     Arbitrary(arbitrary[IntPercent].map(Classical(_)))
 
-  implicit val cogClassical: Cogen[Classical] =
+  given Cogen[Classical] =
     Cogen[IntPercent].contramap(_.minPercentTime)
 
-  implicit val arbDemoScience: Arbitrary[DemoScience] =
+  given Arbitrary[DemoScience] =
     Arbitrary(arbitrary[IntPercent].map(DemoScience(_)))
 
-  implicit val cogDemoScience: Cogen[DemoScience] =
+  given Cogen[DemoScience] =
     Cogen[IntPercent].contramap(_.minPercentTime)
 
-  implicit val arbDirectorsTime: Arbitrary[DirectorsTime] =
+  given Arbitrary[DirectorsTime] =
     Arbitrary(arbitrary[IntPercent].map(DirectorsTime(_)))
 
-  implicit val cogDirectorsTime: Cogen[DirectorsTime] =
+  given Cogen[DirectorsTime] =
     Cogen[IntPercent].contramap(_.minPercentTime)
 
-  implicit val arbExchange: Arbitrary[Exchange] =
+  given Arbitrary[Exchange] =
     Arbitrary(arbitrary[IntPercent].map(Exchange(_)))
 
-  implicit val cogExchange: Cogen[Exchange] =
+  given Cogen[Exchange] =
     Cogen[IntPercent].contramap(_.minPercentTime)
 
-  implicit val arbFastTurnaround: Arbitrary[FastTurnaround] =
+  given Arbitrary[FastTurnaround] =
     Arbitrary(arbitrary[IntPercent].map(FastTurnaround(_)))
 
-  implicit val cogFastTurnaround: Cogen[FastTurnaround] =
+  given Cogen[FastTurnaround] =
     Cogen[IntPercent].contramap(_.minPercentTime)
 
-  implicit val arbPoorWeather: Arbitrary[PoorWeather] =
+  given Arbitrary[PoorWeather] =
     Arbitrary(arbitrary[IntPercent].map(PoorWeather(_)))
 
-  implicit val cogPoorWeather: Cogen[PoorWeather] =
+  given Cogen[PoorWeather] =
     Cogen[IntPercent].contramap(_.minPercentTime)
 
-  implicit val arbQueue: Arbitrary[Queue] =
+  given Arbitrary[Queue] =
     Arbitrary(arbitrary[IntPercent].map(Queue(_)))
 
-  implicit val cogQueue: Cogen[Queue] =
+  given Cogen[Queue] =
     Cogen[IntPercent].contramap(_.minPercentTime)
 
-  implicit val arbSystemVerification: Arbitrary[SystemVerification] =
+  given Arbitrary[SystemVerification] =
     Arbitrary(arbitrary[IntPercent].map(SystemVerification(_)))
 
-  implicit val cogSystemVerification: Cogen[SystemVerification] =
+  given Cogen[SystemVerification] =
     Cogen[IntPercent].contramap(_.minPercentTime)
 
-  implicit val arbLargeProgram: Arbitrary[LargeProgram] =
+  given Arbitrary[LargeProgram] =
     Arbitrary {
       for {
         minPct    <- arbitrary[IntPercent]
@@ -72,12 +72,12 @@ trait ArbProposalClass {
       } yield LargeProgram(minPct, minTotPct, totalTime)
     }
 
-  implicit val cogLargeProgram: Cogen[LargeProgram] =
+  given Cogen[LargeProgram] =
     Cogen[(IntPercent, IntPercent, NonNegDuration)].contramap(p =>
       (p.minPercentTime, p.minPercentTotalTime, p.totalTime)
     )
 
-  implicit val arbIntensive: Arbitrary[Intensive] =
+  given Arbitrary[Intensive] =
     Arbitrary {
       for {
         minPct    <- arbitrary[IntPercent]
@@ -86,12 +86,12 @@ trait ArbProposalClass {
       } yield Intensive(minPct, minTotPct, totalTime)
     }
 
-  implicit val cogIntensive: Cogen[Intensive] =
+  given Cogen[Intensive] =
     Cogen[(IntPercent, IntPercent, NonNegDuration)].contramap(p =>
       (p.minPercentTime, p.minPercentTotalTime, p.totalTime)
     )
 
-  implicit val arbProposalClass: Arbitrary[ProposalClass] =
+  given Arbitrary[ProposalClass] =
     Arbitrary(
       Gen.oneOf(
         arbitrary[Classical],
@@ -107,7 +107,7 @@ trait ArbProposalClass {
       )
     )
 
-  implicit val cogProposalClass: Cogen[ProposalClass] =
+  given Cogen[ProposalClass] =
     Cogen[
       (
         Option[Classical],

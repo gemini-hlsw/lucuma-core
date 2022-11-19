@@ -4,11 +4,11 @@
 package lucuma.core.model
 
 import cats.Eq
-import cats.syntax.all._
-import eu.timepit.refined.cats._
+import cats.syntax.all.*
+import eu.timepit.refined.cats.*
 import lucuma.core.model.IntPercent
 import lucuma.core.model.NonNegDuration
-import lucuma.core.model.implicits._
+import lucuma.core.model.given
 import monocle.Focus
 import monocle.Lens
 import monocle.Optional

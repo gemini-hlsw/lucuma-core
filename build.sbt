@@ -1,4 +1,4 @@
-ThisBuild / tlBaseVersion                         := "0.58"
+ThisBuild / tlBaseVersion                         := "0.59"
 ThisBuild / tlCiReleaseBranches                   := Seq("master")
 ThisBuild / githubWorkflowEnv += "MUNIT_FLAKY_OK" -> "true"
 
@@ -6,25 +6,25 @@ ThisBuild / tlCiReleaseBranches += "topic/scala3"
 
 Global / concurrentRestrictions += Tags.limit(Tags.Compile, 1)
 
-ThisBuild / crossScalaVersions := Seq("3.2.0")
+ThisBuild / crossScalaVersions := Seq("3.2.1")
 ThisBuild / scalacOptions += "-language:implicitConversions" // TODO
 
-lazy val attoVersion           = "0.9.5"
-lazy val catsVersion           = "2.8.0"
+lazy val catsVersion           = "2.9.0"
 lazy val kindProjectorVersion  = "0.13.2"
 lazy val monocleVersion        = "3.1.0"
 lazy val scalaJavaTimeVersion  = "2.4.0"
 lazy val geminiLocalesVersion  = "0.7.0"
 lazy val jtsVersion            = "0.3.0"
-lazy val coulombVersion        = "0.6.0-RC1"
+lazy val coulombVersion        = "0.7.0"
 lazy val spireVersion          = "0.18.0"
 lazy val singletonOpsVersion   = "0.5.2"
 lazy val refinedVersion        = "0.10.1"
 lazy val lucumaRefinedVersion  = "0.1.1"
-lazy val catsTimeVersion       = "0.5.0"
+lazy val catsTimeVersion       = "0.5.1"
 lazy val circeVersion          = "0.14.3"
 lazy val catsScalacheckVersion = "0.3.2"
 lazy val shapelessVersion      = "2.3.10"
+lazy val catsParseVersion      = "0.3.8"
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
@@ -36,8 +36,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
   .settings(
     name := "lucuma-core",
     libraryDependencies ++= Seq(
-      "org.tpolecat"   %%% "atto-core"                  % attoVersion,
-      "org.tpolecat"   %%% "atto-refined"               % attoVersion,
+      "org.typelevel"  %%% "cats-parse"                 % catsParseVersion,
       "org.typelevel"  %%% "cats-core"                  % catsVersion,
       "dev.optics"     %%% "monocle-core"               % monocleVersion,
       "dev.optics"     %%% "monocle-macro"              % monocleVersion,
