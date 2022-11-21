@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.math
@@ -8,38 +8,72 @@ import cats.syntax.all._
 import lucuma.core.math.parser.CoordinateParsers
 import lucuma.core.optics.Format
 import lucuma.core.syntax.all._
+import monocle.Focus
 import monocle.Lens
-import monocle.macros._
-import scala.math.{ atan2, cos, sin, sqrt }
+
+import scala.math._
 
 /** A point in the sky, given right ascension and declination. */
 final case class Coordinates(ra: RightAscension, dec: Declination) {
-
   /**
-   * Offset these `Coordinates` by the given deltas, and indicate whether the declination crossed
+   * Shift these `Coordinates` by the given deltas, and indicate whether the declination crossed
    * a pole; if so the right ascension will have been flipped 180°.
    * @group Operations
    */
-  def offsetWithCarry(dRA: HourAngle, dDec: Angle): (Coordinates, Boolean) =
+  def shiftWithCarry(dRA: HourAngle, dDec: Angle): (Coordinates, Boolean) =
     dec.offset(dDec) match {
       case (decʹ, false) => (Coordinates(ra.offset(dRA), decʹ), false)
       case (decʹ, true)  => (Coordinates(ra.flip.offset(dRA), decʹ), true)
     }
 
   /**
-   * Offset these `Coordinates` by the given deltas. If the declination crossed a pole the right
+   * Shift these `Coordinates` by the given deltas. If the declination crossed a pole the right
    * ascension will have been flipped 180°.
    * @group Operations
    */
-  def offset(dRA: HourAngle, dDec: Angle): Coordinates =
-    offsetWithCarry(dRA, dDec)._1
+  def shift(dRA: HourAngle, dDec: Angle): Coordinates =
+    shiftWithCarry(dRA, dDec)._1
 
   /**
-   * Compute the offset between points, such that `a offset (a diff b) = b`.
+   * Calculates the offset, posAngle and distance to another coordinate
+   * Taken from the OT calculations.
+   * (Based on the C version from A. P. Martinez)
    * @group Operations
    */
-  def diff(c: Coordinates): (HourAngle, Angle) =
-    (c.ra.toHourAngle - ra.toHourAngle, c.dec.toAngle - dec.toAngle)
+  def diff(x: Coordinates): CoordinatesDiff = {
+    val alf           = x.ra.toRadians
+    val alf0          = ra.toRadians
+    val limitDistance = 0.0000004
+
+    val sd0           = dec.toAngle.sin
+    val sd            = x.dec.toAngle.sin
+    val cd0           = dec.toAngle.cos
+    val cd            = x.dec.toAngle.cos
+    val cosda         = (x.ra.toAngle - ra.toAngle).cos
+    val cosd          = sd0 * sd + cd0 * cd * cosda
+
+    val dist = {
+      val acosValue = acos(cosd)
+      if (acosValue.isNaN) 0.0 else acosValue
+    }
+
+    val phi = if (dist > limitDistance) {
+      val sind   = sin(dist)
+      val pcospa = (sd * cd0 - cd * sd0 * cosda) / sind
+      val cospa  = {
+        val absValue = abs(pcospa)
+        if (absValue > 1.0) pcospa / absValue else pcospa
+      }
+      val sinpa  = cd * sin(alf - alf0) / sind
+      val pphi   = acos(cospa)
+
+      if (sinpa < 0.0) (Pi * 2) - pphi else pphi
+    } else {
+      0
+    }
+
+    CoordinatesDiff(Angle.fromDoubleDegrees(phi * 180.0 / Pi), Angle.fromDoubleDegrees(dist * 180.0 / Pi))
+  }
 
   /**
    * Angular distance from `this` to `that`, always a positive angle in [0, 180]). Approximate.
@@ -83,6 +117,30 @@ final case class Coordinates(ra: RightAscension, dec: Declination) {
       )
     }
   }
+
+  /**
+   * Offset the coordinates on the posAngl axis a given offset. Approximate
+   * This operation is undefined at Dec +/-90
+   * @return the coordinates offseted on the posAngle axis.
+   */
+  def offsetBy(posAngle: Angle, offset: Offset): Option[Coordinates] =
+    if (offset =!= Offset.Zero) {
+      val paCos  = posAngle.cos
+      val paSin  = posAngle.sin
+      val pDeg   = offset.p.toAngle.toSignedDoubleDegrees
+      val qDeg   = offset.q.toAngle.toSignedDoubleDegrees
+      val dRa    = pDeg * paCos + qDeg * paSin
+      val dDec   = -pDeg * paSin + qDeg * paCos
+      val decCos = dec.toAngle.cos
+
+      Declination
+        .fromDoubleDegrees(dec.toAngle.toSignedDoubleDegrees + dDec)
+        .filter(_ => decCos != 0)
+        .map { dec =>
+          val newRa = RightAscension.fromDoubleDegrees(ra.toAngle.toDoubleDegrees + dRa / decCos)
+          Coordinates(newRa, dec)
+        }
+    } else this.some // Return itself on no offset
 
   /** These coordinates in radians, [0 .. 2π) and [-π/2 .. π/2]. */
   def toRadians: (Double, Double) =
@@ -133,10 +191,10 @@ trait CoordinatesOptics { this: Coordinates.type =>
 
   /** @group Optics */
   val rightAscension: Lens[Coordinates, RightAscension] =
-    GenLens[Coordinates](_.ra)
+    Focus[Coordinates](_.ra)
 
   /** @group Optics */
   val declination: Lens[Coordinates, Declination] =
-    GenLens[Coordinates](_.dec)
+    Focus[Coordinates](_.dec)
 
 }

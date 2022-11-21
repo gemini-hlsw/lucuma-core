@@ -1,12 +1,13 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.model
 
-import cats.Eq
 import cats.ApplicativeError
+import cats.Eq
 import cats.implicits._
 import eu.timepit.refined.auto._
+import lucuma.core.util.WithGid
 
 /** A user has [at least] an identity and a role. */
 sealed trait User extends Product with Serializable {
@@ -25,14 +26,12 @@ sealed trait User extends Product with Serializable {
     access:      Access
   )(implicit ev: ApplicativeError[F, Throwable]): F[Unit] =
     ev.raiseError(
-      new RuntimeException(
-        s"$displayName (User ${id.value}, $role) does not have required access $access."
-      )
+      AccessControlException(displayName, id, role, access)
     ).whenA(role.access < access)
 
 }
 
-object User extends WithId('u') {
+object User extends WithGid('u') {
   implicit val eqUser: Eq[User] = Eq.instance {
     case (a: GuestUser, b: GuestUser)       => a === b
     case (a: ServiceUser, b: ServiceUser)   => a === b

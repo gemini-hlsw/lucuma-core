@@ -1,20 +1,22 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.util
 
 import cats._
-import cats.kernel.BoundedEnumerable
 import cats.implicits._
-import monocle.{ Iso, Prism }
-import scala.util.matching.Regex
-import eu.timepit.refined.char.Letter
-import eu.timepit.refined.types.numeric.PosLong
-import eu.timepit.refined.numeric.Positive
+import cats.kernel.BoundedEnumerable
 import eu.timepit.refined._
 import eu.timepit.refined.api.Refined
+import eu.timepit.refined.char.Letter
+import eu.timepit.refined.numeric.Positive
+import eu.timepit.refined.types.numeric.PosLong
 import io.circe._
 import io.circe.syntax._
+import monocle.Iso
+import monocle.Prism
+
+import scala.util.matching.Regex
 
 /**
  * A typeclass for Lucuma identifiers, which are of the form T-26fd21b3 where T is a constant,
@@ -121,10 +123,35 @@ final class Gid[A](
 }
 
 object Gid {
-
   def apply[A](implicit ev: Gid[A]): ev.type = ev
 
   def instance[A](tag: Char Refined Letter, toLong: A => PosLong, fromLong: PosLong => A): Gid[A] =
     new Gid[A](tag, Iso(toLong)(fromLong))
+}
 
+/**
+ * Defines `<Entity>.Id` class, its `Gid` instance, and convenience methods.
+ */
+class WithGid(idTag: Char Refined Letter) {
+
+  /** Id class for `<Entity>` */
+  case class Id(value: PosLong) {
+    override def toString: String =
+      Gid[Id].show(this)
+  }
+
+  object Id {
+
+    /** @group Typeclass Instances */
+    implicit val GidId: Gid[Id] = Gid.instance(idTag, _.value, apply)
+
+    /** Convenience method to construct from a Long */
+    def fromLong(l: Long): Option[Id] = GidId.fromLong.getOption(l)
+
+    /** Convenience method to construct from a String */
+    def parse(s: String): Option[Id] = GidId.fromString.getOption(s)
+
+    /** Allow pattern match style parsing */
+    def unapply[T](s: String): Option[Id] = parse(s)
+  }
 }

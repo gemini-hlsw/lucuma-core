@@ -1,20 +1,21 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.math.skycalc.solver
 
 import cats.Eq
+import cats.laws.discipline.InvariantSemigroupalTests
 import cats.syntax.all._
-import java.time.Duration
-import java.time.Instant
+import lucuma.core.arb.ArbTime
+import lucuma.core.syntax.time._
 import org.scalacheck.Arbitrary
 import org.scalacheck.Gen
 import org.scalacheck.Prop
 import org.scalacheck.Prop._
-import lucuma.core.arb.ArbTime
-import lucuma.core.syntax.time._
-import io.chrisdavenport.cats.time._
-import cats.laws.discipline.InvariantSemigroupalTests
+import org.typelevel.cats.time._
+
+import java.time.Duration
+import java.time.Instant
 
 final class SampleRounderSuite extends munit.DisciplineSuite {
   import ArbTime._

@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma
@@ -8,10 +8,11 @@ package arb
 
 import lucuma.core.data.EnumZipper
 import lucuma.core.util.Enumerated
-import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.{ Arbitrary, Cogen }
-import org.scalacheck.Gen._
 import lucuma.core.util.arb.ArbEnumerated._
+import org.scalacheck.Arbitrary
+import org.scalacheck.Arbitrary.arbitrary
+import org.scalacheck.Cogen
+import org.scalacheck.Gen._
 
 trait ArbEnumZipper {
   implicit def arbEnumZipper[A: Enumerated]: Arbitrary[EnumZipper[A]] =

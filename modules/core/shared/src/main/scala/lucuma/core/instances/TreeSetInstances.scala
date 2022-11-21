@@ -1,13 +1,16 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.instances
 
 import cats._
-import cats.kernel.{ BoundedSemilattice, Hash, Order }
-import scala.collection.immutable.TreeSet
-import scala.annotation.tailrec
+import cats.kernel.BoundedSemilattice
+import cats.kernel.Hash
+import cats.kernel.Order
 import cats.syntax.all._
+
+import scala.annotation.tailrec
+import scala.collection.immutable.TreeSet
 
 trait TreeSetInstances extends TreeSetInstances1 {
 

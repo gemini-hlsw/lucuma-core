@@ -1,16 +1,17 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.math.skycalc
 
 import lucuma.core.math.Constants._
 import lucuma.core.math.JulianDate.J2000
+import spire.std.double._
+
 import java.time.Instant
 import java.time.LocalTime
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import scala.annotation.unused
-import spire.std.double._
 
 trait ImprovedSkyCalcMethods {
 
@@ -34,8 +35,8 @@ trait ImprovedSkyCalcMethods {
   }
 
   /**
-    * Return the LST time as a ZonedDateTime object for the given instant.
-    */
+   * Return the LST time as a ZonedDateTime object for the given instant.
+   */
   protected def getLst(lstHours: Double, instant: Instant): ZonedDateTime = {
     val zdt     = instant.atZone(ZoneOffset.UTC)
     val h       = zdt.getHour
@@ -59,24 +60,23 @@ trait ImprovedSkyCalcMethods {
   }
 
   /**
-    * Return the airmass for the given altitude in degrees.
-    */
+   * Return the airmass for the given altitude in degrees.
+   */
   def getAirmass(alt: Double): Double = {
     val secz = secant_z(alt)
-    if (secz >= 0.0)
-      if (secz < 12.0) return true_airmass(secz)
-      else if (secz <= 99.0) return secz
-    0.0
+    if (secz < 0.0) 0.0
+    else if (secz < 12.0) true_airmass(secz)
+    else secz
   }
 
   /**
-    * This takes the date (which contains the time), and the site parameters,
-    * and prints out a banner giving the various dates and times; also
-    * computes and returns various jd's, the sidereal time, and the epoch.
-    * Returns negative number to signal error if date is out of range of
-    * validity of algorithms, or if you specify a bad time during daylight-time
-    * change; returns zero if successful.
-    */
+   * This takes the date (which contains the time), and the site parameters,
+   * and prints out a banner giving the various dates and times; also
+   * computes and returns various jd's, the sidereal time, and the epoch.
+   * Returns negative number to signal error if date is out of range of
+   * validity of algorithms, or if you specify a bad time during daylight-time
+   * change; returns zero if successful.
+   */
   protected def setup_time_place(
     instant:  Instant,
     longit:   Double,
@@ -259,14 +259,14 @@ trait ImprovedSkyCalcMethods {
   }
 
   /**
-    * computes the nutation parameters delta psi and
-    * delta epsilon at julian epoch (in years) using approximate
-    * formulae given by Jean Meeus, Astronomical Formulae for
-    * Calculators, Willman-Bell, 1985, pp. 69-70. Accuracy
-    * appears to be a few hundredths of an arcsec or better
-    * and numerics have been checked against his example.
-    * Nutation parameters are returned in radians.
-    */
+   * computes the nutation parameters delta psi and
+   * delta epsilon at julian epoch (in years) using approximate
+   * formulae given by Jean Meeus, Astronomical Formulae for
+   * Calculators, Willman-Bell, 1985, pp. 69-70. Accuracy
+   * appears to be a few hundredths of an arcsec or better
+   * and numerics have been checked against his example.
+   * Nutation parameters are returned in radians.
+   */
   protected def nutation_params(
     date_epoch: Double,
     del_psi:    DoubleRef,
@@ -306,23 +306,22 @@ trait ImprovedSkyCalcMethods {
     ) + 0.0124 * Math.sin(2 * L - Omega) + 0.0114 * Math.sin(
       2 * Lprime - Mprime
     )
-    del_ep.d =
-      (9.2100 + 0.00091 * T) * Math.cos(Omega) + (0.5522 - 0.00029 * T) * Math
-        .cos(2 * L) - 0.0904 * Math.cos(2 * Omega) + 0.0884 * Math.cos(
-        2.0 * Lprime
-      ) + 0.0216 * Math.cos(2 * L + M) + 0.0183 * Math.cos(
-        2 * Lprime - Omega
-      ) + 0.0113 * Math.cos(2 * Lprime + Mprime) - 0.0093 * Math.cos(
-        2 * L - M
-      ) - 0.0066 * Math.cos(2 * L - Omega)
+    del_ep.d = (9.2100 + 0.00091 * T) * Math.cos(Omega) + (0.5522 - 0.00029 * T) * Math
+      .cos(2 * L) - 0.0904 * Math.cos(2 * Omega) + 0.0884 * Math.cos(
+      2.0 * Lprime
+    ) + 0.0216 * Math.cos(2 * L + M) + 0.0183 * Math.cos(
+      2 * Lprime - Omega
+    ) + 0.0113 * Math.cos(2 * Lprime + Mprime) - 0.0093 * Math.cos(
+      2 * L - M
+    ) - 0.0066 * Math.cos(2 * L - Omega)
     del_psi.d = del_psi.d / ArcsecsInRadian
     del_ep.d = del_ep.d / ArcsecsInRadian
   }
 
   /**
-    * A much cleaner rewrite of the original skycalc code for this,
-    * which was transcribed from a PL/I routine ....
-    */
+   * A much cleaner rewrite of the original skycalc code for this,
+   * which was transcribed from a PL/I routine ....
+   */
   protected def xyz_cel(
     x0:  Double,
     y0:  Double,
@@ -370,10 +369,10 @@ trait ImprovedSkyCalcMethods {
   }
 
   /**
-    * corrects celestial unit vector for aberration due to earth's motion.
-    * Uses accurate sun position ... replace with crude one for more speed if
-    * needed.
-    */
+   * corrects celestial unit vector for aberration due to earth's motion.
+   * Uses accurate sun position ... replace with crude one for more speed if
+   * needed.
+   */
   protected def aberrate(
     epoch:    Double,
     vec:      Array[Double],
@@ -426,34 +425,35 @@ trait ImprovedSkyCalcMethods {
   }
 
   /**
-    * returns radian angle 0 to 2pi for coords x, y --
-    * get that quadrant right !!
-    */
+   * returns radian angle 0 to 2pi for coords x, y --
+   * get that quadrant right !!
+   */
   protected def atan_circ(x: Double, y: Double): Double = {
-    var theta = .0
-    if ((x == 0.0) && (y == 0.0)) return 0.0 /* guard ... */
-    theta = Math.atan2(y, x)
-    while (theta < 0.0) theta += TwoPi
-    theta
+    var theta = 0.0
+    if ((x != 0.0) || (y != 0.0)) {
+      theta = Math.atan2(y, x)
+      while (theta < 0.0) theta += TwoPi
+      theta
+    } else 0.0
   }
 
   /**
-    * implemenataion of Jean Meeus' more accurate solar
-    * ephemeris.  For ultimate use in helio correction! From
-    * Astronomical Formulae for Calculators, pp. 79 ff.  This
-    * gives sun's position wrt *mean* equinox of date, not
-    * apparent*.  Accuracy is << 1 arcmin.  Positions given are
-    * geocentric ... parallax due to observer's position on earth is
-    * ignored. This is up to 8 arcsec; routine is usually a little
-    * better than that.
-    * // -- topocentric correction *is* included now. -- //
-    * Light travel time is apparently taken into
-    * account for the ra and dec, but I don't know if aberration is
-    * and I don't know if distance is simlarly antedated.
-    * <p/>
-    * x, y, and z are heliocentric equatorial coordinates of the
-    * EARTH, referred to mean equator and equinox of date.
-    */
+   * implemenataion of Jean Meeus' more accurate solar
+   * ephemeris.  For ultimate use in helio correction! From
+   * Astronomical Formulae for Calculators, pp. 79 ff.  This
+   * gives sun's position wrt *mean* equinox of date, not
+   * apparent*.  Accuracy is << 1 arcmin.  Positions given are
+   * geocentric ... parallax due to observer's position on earth is
+   * ignored. This is up to 8 arcsec; routine is usually a little
+   * better than that.
+   * // -- topocentric correction *is* included now. -- //
+   * Light travel time is apparently taken into
+   * account for the ra and dec, but I don't know if aberration is
+   * and I don't know if distance is simlarly antedated.
+   * <p/>
+   * x, y, and z are heliocentric equatorial coordinates of the
+   * EARTH, referred to mean equator and equinox of date.
+   */
   protected def accusun(
     jd0:     Double,
     lst:     Double,
@@ -562,24 +562,24 @@ trait ImprovedSkyCalcMethods {
   }
 
   /**
-    * Given a julian date in 1900-2100, returns the correction
-    * delta t which is:
-    * TDT - UT (after 1983 and before 1998)
-    * ET - UT (before 1983)
-    * an extrapolated guess  (after 1998).
-    * <p/>
-    * For dates in the past (<= 1998 and after 1900) the value is linearly
-    * interpolated on 5-year intervals; for dates after the present,
-    * an extrapolation is used, because the true value of delta t
-    * cannot be predicted precisely.  Note that TDT is essentially the
-    * modern version of ephemeris time with a slightly cleaner
-    * definition.
-    * <p/>
-    * Where the algorithm shifts there is an approximately 0.1 second
-    * discontinuity.  Also, the 5-year linear interpolation scheme can
-    * lead to errors as large as 0.5 seconds in some cases, though
-    * usually rather smaller.
-    */
+   * Given a julian date in 1900-2100, returns the correction
+   * delta t which is:
+   * TDT - UT (after 1983 and before 1998)
+   * ET - UT (before 1983)
+   * an extrapolated guess  (after 1998).
+   * <p/>
+   * For dates in the past (<= 1998 and after 1900) the value is linearly
+   * interpolated on 5-year intervals; for dates after the present,
+   * an extrapolation is used, because the true value of delta t
+   * cannot be predicted precisely.  Note that TDT is essentially the
+   * modern version of ephemeris time with a slightly cleaner
+   * definition.
+   * <p/>
+   * Where the algorithm shifts there is an approximately 0.1 second
+   * discontinuity.  Also, the 5-year linear interpolation scheme can
+   * lead to errors as large as 0.5 seconds in some cases, though
+   * usually rather smaller.
+   */
   protected def etcorr(jd: Double): Double = {
     val dates = new Array[Double](22)
     var year  = .0
@@ -614,18 +614,18 @@ trait ImprovedSkyCalcMethods {
   }
 
   /**
-    * assuming x is an angle in degrees, returns
-    * modulo 360 degrees.
-    */
+   * assuming x is an angle in degrees, returns
+   * modulo 360 degrees.
+   */
   protected def circulo(x: Double): Double = {
     val n = (x / 360.0).toInt
     x - 360.0 * n
   }
 
   /**
-    * rotates ecliptic rectangular coords x, y, z to
-    * equatorial (all assumed of date.)
-    */
+   * rotates ecliptic rectangular coords x, y, z to
+   * equatorial (all assumed of date.)
+   */
   protected def eclrot(jd: Double, y: DoubleRef, z: DoubleRef): Unit = {
     var incl = .0
     //        double xpr;
@@ -662,12 +662,12 @@ trait ImprovedSkyCalcMethods {
   }
 
   /**
-    * computes the geocentric coordinates from the geodetic
-    * (standard map-type) longitude, latitude, and height.
-    * These are assumed to be in decimal hours, decimal degrees, and
-    * meters respectively.  Notation generally follows 1992 Astr Almanac,
-    * p. K11
-    */
+   * computes the geocentric coordinates from the geodetic
+   * (standard map-type) longitude, latitude, and height.
+   * These are assumed to be in decimal hours, decimal degrees, and
+   * meters respectively.  Notation generally follows 1992 Astr Almanac,
+   * p. K11
+   */
   protected def geocent(
     geolong0: Double,
     geolat0:  Double,
@@ -696,9 +696,9 @@ trait ImprovedSkyCalcMethods {
   }
 
   /**
-    * adjusts a time (decimal hours) to be between -12 and 12,
-    * generally used for hour angles.
-    */
+   * adjusts a time (decimal hours) to be between -12 and 12,
+   * generally used for hour angles.
+   */
   protected def adj_time(x0: Double): Double = {
     var x = x0
     if (Math.abs(x) < 100000.0) {
@@ -710,16 +710,16 @@ trait ImprovedSkyCalcMethods {
   }
 
   /**
-    * returns altitude(degr) for dec, ha, lat (decimal degr, hr, degr);
-    * also computes and returns azimuth through pointer argument,
-    * and as an extra added bonus returns parallactic angle (decimal degr)
-    * through another pointer argument.
-    *
-    * @param dec target declination in degrees
-    * @param ha  the hour angle in hours
-    * @param lat the observer's latitude in radians
-    * @return the parallactic angle in degrees
-    */
+   * returns altitude(degr) for dec, ha, lat (decimal degr, hr, degr);
+   * also computes and returns azimuth through pointer argument,
+   * and as an extra added bonus returns parallactic angle (decimal degr)
+   * through another pointer argument.
+   *
+   * @param dec target declination in degrees
+   * @param ha  the hour angle in hours
+   * @param lat the observer's latitude in radians
+   * @return the parallactic angle in degrees
+   */
   protected def altit(
     dec0:   Double,
     ha0:    Double,
@@ -782,11 +782,11 @@ trait ImprovedSkyCalcMethods {
   }
 
   /**
-    * Computes the secant of z, assuming the object is not
-    * too low to the horizon; returns 100. if the object is
-    * low but above the horizon, -100. if the object is just
-    * below the horizon.
-    */
+   * Computes the secant of z, assuming the object is not
+   * too low to the horizon; returns 100. if the object is
+   * low but above the horizon, -100. if the object is just
+   * below the horizon.
+   */
   protected def secant_z(alt: Double): Double = {
     var secz = .0
     if (alt != 0) secz = 1.0 / Math.sin(alt / DegsInRadian)
@@ -797,20 +797,20 @@ trait ImprovedSkyCalcMethods {
   }
 
   /**
-    * returns the true airmass for a given secant z.
-    * The expression used is based on a tabulation of the mean KPNO
-    * atmosphere given by C. M. Snell & A. M. Heiser, 1968,
-    * PASP, 80, 336.  They tabulated the airmass at 5 degr
-    * intervals from z = 60 to 85 degrees; I fit the data with
-    * a fourth order poly for (secz - airmass) as a function of
-    * (secz - 1) using the IRAF curfit routine, then adjusted the
-    * zeroth order term to force (secz - airmass) to zero at
-    * z = 0.  The poly fit is very close to the tabulated points
-    * (largest difference is 3.2e-4) and appears smooth.
-    * This 85-degree point is at secz = 11.47, so for secz > 12
-    * I just return secz - 1.5 ... about the largest offset
-    * properly determined.
-    */
+   * returns the true airmass for a given secant z.
+   * The expression used is based on a tabulation of the mean KPNO
+   * atmosphere given by C. M. Snell & A. M. Heiser, 1968,
+   * PASP, 80, 336.  They tabulated the airmass at 5 degr
+   * intervals from z = 60 to 85 degrees; I fit the data with
+   * a fourth order poly for (secz - airmass) as a function of
+   * (secz - 1) using the IRAF curfit routine, then adjusted the
+   * zeroth order term to force (secz - airmass) to zero at
+   * z = 0.  The poly fit is very close to the tabulated points
+   * (largest difference is 3.2e-4) and appears smooth.
+   * This 85-degree point is at secz = 11.47, so for secz > 12
+   * I just return secz - 1.5 ... about the largest offset
+   * properly determined.
+   */
   protected def true_airmass(secz: Double): Double = {
     var seczmin1 = .0
     var i        = 0
@@ -822,19 +822,19 @@ trait ImprovedSkyCalcMethods {
     coef(2) = 3.033104e-3
     coef(3) = 1.351167e-3
     coef(4) = -4.716679e-5
-    if (secz < 0.0) return -1.0 /* out of range. */
-    if (secz > 12) return secz - 1.5 /* shouldn't happen .... */
-    seczmin1 = secz - 1.0
-    /* evaluate polynomial ... */
-    i = ord
-    while (i > 0) {
-      result = (result + coef(i)) * seczmin1
-
-      i -= 1
+    if (secz < 0.0) -1.0 /* out of range. */
+    else if (secz > 12) secz - 1.5 /* shouldn't happen .... */
+    else {
+      seczmin1 = secz - 1.0
+      /* evaluate polynomial ... */
+      i = ord
+      while (i > 0) {
+        result = (result + coef(i)) * seczmin1
+        i -= 1
+      }
+      /* no zeroth order term. */
+      secz - result
     }
-    /* no zeroth order term. */
-    result = secz - result
-    result
   }
 
   protected def instant_to_jd(instant: Instant): Double = {
@@ -872,13 +872,13 @@ trait ImprovedSkyCalcMethods {
   }
 
   /**
-    * returns the local MEAN sidereal time (dec hrs) at julian date jd
-    * at west longitude long (decimal hours).  Follows
-    * definitions in 1992 Astronomical Almanac, pp. B7 and L2.
-    * Expression for GMST at 0h ut referenced to Aoki et al, A&A 105,
-    * p.359, 1982.  On workstations, accuracy (numerical only!)
-    * is about a millisecond in the 1990s.
-    */
+   * returns the local MEAN sidereal time (dec hrs) at julian date jd
+   * at west longitude long (decimal hours).  Follows
+   * definitions in 1992 Astronomical Almanac, pp. B7 and L2.
+   * Expression for GMST at 0h ut referenced to Aoki et al, A&A 105,
+   * p.359, 1982.  On workstations, accuracy (numerical only!)
+   * is about a millisecond in the 1990s.
+   */
   protected def lst(jd: Double, longit: Double): Double = {
     var t       = .0
     var ut      = .0
@@ -900,8 +900,7 @@ trait ImprovedSkyCalcMethods {
       ut = jdfrac - 0.5
     }
     t = (jdmid - J2000.toDouble) / 36525
-    sid_g =
-      (24110.54841 + 8640184.812866 * t + 0.093104 * t * t - 6.2e-6 * t * t * t) / SecsInDay
+    sid_g = (24110.54841 + 8640184.812866 * t + 0.093104 * t * t - 6.2e-6 * t * t * t) / SecsInDay
     sid_int = sid_g.toLong
     sid_g = sid_g - sid_int
     sid_g = sid_g + 1.0027379093 * ut - longit / 24.0
@@ -914,68 +913,73 @@ trait ImprovedSkyCalcMethods {
   }
 
   /**
-    * @param mpa   moon phase angle in degrees
-    * @param mdist moon/object distance in degreee
-    * @param mZD   moon zenith distance [deg]
-    * @param ZD    object zenith distance [deg]
-    * @param sZD   Sun zenith distance [deg]
-    */
+   * @param mpa   moon phase angle (alpha in lunskybright)
+   * @param mdist Moon target distance (rho in lunskybright)
+   * @param mZD   moon zenith distance
+   * @param ZD    object zenith distance
+   * @param sZD   Sun zenith distance
+   * @param moondist  Moon-Earth distance
+   */
   protected def sb(
-    mpa:   Double,
-    mdist: Double,
-    mZD:   Double,
-    ZD:    Double,
-    sZD:   Double
-  ): Double = {
-    val degrad = 57.2957795130823d
-    val k      = 0.172d      // ; mag/airmass for Hale Pohaku
-    val a      = 2.51189d
-    val Q      = 27.78151d
-    val saltit = 90.0d - sZD // ; Sun's altitude
+    mpa:       Double,
+    mdist:     Double,
+    mZD:       Double,
+    ZD:        Double,
+    sZD:       Double,
+    moondist0: Double
+  ) = {
+    var moondist = moondist0
+    val degrad   = 57.2957795130823d
+    val k        = 0.172d      // ; mag/airmass for Hale Pohaku
+    val a        = 2.51189d
+    val Q        = 27.78151d
+    val saltit   = 90.0d - sZD // ; Sun's altitude
     //    ; Dark sky zenith V surface brightness
     //    Vzen = dblarr(n_elements(ZD))
     //    Vzen[*] = 21.587d
-    var Vzen   = 21.587d
+    var Vzen     = 21.587d
     //    ; Correct for brightening due to twilight
     //    ii = where(saltit gt -18.5)
     //    if (ii[0] ne -1) then Vzen[ii] = Vzen[ii] - ztwilight(saltit[ii])
     if (saltit > -18.5) Vzen -= ztwilight(saltit)
     //     Bzen = 0.263d *          a^(Q-Vzen)     ; zenith sky brightness
-    val Bzen   = 0.263d * Math.pow(a, Q - Vzen)
+    val Bzen     = 0.263d * Math.pow(a, Q - Vzen)
     // ; sky constribution
     //     Bsky =Bzen*xair(ZD)*          10.^(-0.4d*k*(xair(ZD)-1.0d))
-    val Bsky   = Bzen * xair(ZD) * Math.pow(10, -0.4d * k * (xair(ZD) - 1.0d))
+    val Bsky     = Bzen * xair(ZD) * Math.pow(10, -0.4d * k * (xair(ZD) - 1.0d))
     // ; moon contribution
     // n=n_elements(Bsky)
     //     istar=0.0d & fp=0.0d & Bmoon=dblarr(n)
-    var istar  = 0.0d
-    var fp     = 0.0d
-    var Bmoon  = 0.0
-    if (mZD <= 90.8) { //      istar=         10^ (-0.4d*(3.84d + 0.026d*abs(mpa) + (4.d-9)*          mpa^ 4))
-      istar = Math.pow(
-        10,
-        -0.4d * (3.84d + 0.026d * Math.abs(mpa) + 4.0e-9 * Math.pow(mpa, 4))
-      )
-      if (
-        mdist >= 10.0
-      )                //        fp=(1.06d +          cos(mdist[j]/degrad)^ 2) *         10^ 5.36d  +          10^ (6.15d - mdist[j]/40.0d) $
-        fp = (1.06d + Math.pow(Math.cos(mdist / degrad), 2)) * Math.pow(
-          10,
-          5.36d
-        ) + Math.pow(10, 6.15d - mdist / 40.0d)
-      else             //          fp=6.2d7/         mdist^ 2;
-        fp = 6.2e7 / Math.pow(mdist, 2)
-      //      Bmoon[j]=fp*istar*         10^ (-0.4d*k*xair(mZD[j]))*(1.0d -          10^ (-0.4d*k*xair(ZD[j])))
-      Bmoon = fp * istar * Math.pow(10, -0.4d * k * xair(mZD)) * (1.0d - Math
-        .pow(10, -0.4d * k * xair(ZD)))
+    var istar    = 0.0d
+    var fp       = 0.0d
+    var Bmoon    = 0.0d
+    var frho     = 0.0d
+    if (mZD <= 90.8) {
+      moondist = moondist / 60.27 /* divide by mean distance */
+      istar = -0.4 * (3.84 + 0.026 * Math.abs(mpa) + 4.0e-9 * Math.pow(mpa, 4.0)) /*eqn 20*/
+      istar = Math.pow(10.0, istar) / (moondist * moondist)
+      if (Math.abs(mpa) < 7.0) /* crude accounting for opposition effect */
+        istar = istar * (1.35 - 0.05 * Math.abs(mpa))
+      /* 35 per cent brighter at full, effect tapering linearly to
+              	zero at 7 degrees away from full. mentioned peripherally in
+              	Krisciunas and Scheafer, p. 1035. */
+      frho = 229087.*(1.06 + Math.cos(mdist / degrad) * Math.cos(mdist / degrad))
+      if (mdist >= 10.0) { //        fp=(1.06d + cos(mdist[j]/degrad)^ 2) *  10^ 5.36d + 10^ (6.15d - mdist[j]/40.0d) $
+        fp = frho + Math.pow(10, 6.15d - mdist / 40.0d)
+      } else if (Math.abs(mdist) > 0.25) { //          fp=frho + 6.2d7/mdist^ 2;
+        fp = frho + 6.2e7 / Math.pow(mdist, 2)
+      } else fp = frho + 9.9e8
     }
+    //      Bmoon[j]=fp*istar*10^(-0.4d*k*xair(mZD[j]))*(1.0d - 10^(-0.4d*k*xair(ZD[j])))
+    Bmoon =
+      fp * istar * Math.pow(10, -0.4d * k * xair(mZD)) * (1.0d - Math.pow(10, -0.4d * k * xair(ZD)))
+
     //    ;print,istar,fp,Bmoon,Bsky
     //    ;print,Q-alog10((Bsky)/0.263)/alog10(a),Q-alog10((Bmoon)/0.263)/alog10(a)
     //    ; sky brightness in Vmag/arcsec^2
-    //  return Q-    alog10((Bmoon+Bsky)/0.263)/    alog10(a);
-    val ret    = Q - Math.log10((Bmoon + Bsky) / 0.263) / Math.log10(a)
+    //  return Q - alog10((Bmoon+Bsky)/0.263)/    alog10(a);
+    Q - Math.log10((Bmoon + Bsky) / 0.263) / Math.log10(a)
     //    System.out.printf("sb(%1.2f, %1.2f, %1.2f, %1.2f, %1.2f) => %1.3f\n", mpa, mdist, mZD, ZD, sZD, ret);
-    ret
   }
 
   protected def xair(z: Double): Double = { //    ;degrad=180.0d/!PI
@@ -987,11 +991,11 @@ trait ImprovedSkyCalcMethods {
   protected def lunskybright(
     alpha0:    Double,
     rho:       Double,
-    KZen:      Double,
+    kzen:      Double,
     altmoon:   Double,
     alt:       Double,
     moondist0: Double
-  ): Double = {
+  ) = {
     var alpha    = alpha0
     var moondist = moondist0
     var istar    = .0
@@ -1006,32 +1010,28 @@ trait ImprovedSkyCalcMethods {
     alpha = 180.0 - alpha
     Zmoon = (90.0 - altmoon) / DegsInRadian
     Z = (90.0 - alt) / DegsInRadian
-    moondist = moondist / 60.27 /* divide by mean distance */
-    istar = -0.4 * (3.84 + 0.026 * Math
-      .abs(alpha) + 4.0e-9 * Math.pow(alpha, 4.0)) /*eqn 20*/
+    moondist = moondist / 60.27
+    istar = -0.4 * (3.84 + 0.026 * Math.abs(alpha) + 4.0e-9 * Math.pow(alpha, 4.0))
     istar = Math.pow(10.0, istar) / (moondist * moondist)
-    if (Math.abs(alpha) < 7.0)
-      /* crude accounting for opposition effect */ istar =
-        istar * (1.35 - 0.05 * Math.abs(istar))
+    if (Math.abs(alpha) < 7.0) istar = istar * (1.35 - 0.05 * Math.abs(alpha))
+    //         istar = istar * (1.35 - 0.05 * abs(istar)); /* old, bug */
     /* 35 per cent brighter at full, effect tapering linearly to
-               zero at 7 degrees away from full. mentioned peripherally in
-               Krisciunas and Scheafer, p. 1035. */
-    fofrho = 229087.0 * (1.06 + Math.cos(rho_rad) * Math.cos(rho_rad))
-    if (Math.abs(rho) > 10.0)
-      fofrho = fofrho + Math.pow(10.0, 6.15 - rho / 40.0) /* eqn 21 */
-    else if (Math.abs(rho) > 0.25)
-      fofrho = fofrho + 6.2e7 / (rho * rho) /* eqn 19 */
+             zero at 7 degrees away from full. mentioned peripherally in
+             Krisciunas and Scheafer, p. 1035. */
+    fofrho = 229087.*(1.06 + Math.cos(rho_rad) * Math.cos(rho_rad))
+    if (Math.abs(rho) > 10.0) fofrho = fofrho + Math.pow(10.0, 6.15 - rho / 40.0) /* eqn 21 */
+    else if (Math.abs(rho) > 0.25) fofrho = fofrho + 6.2e7 / (rho * rho) /* eqn 19 */
     else fofrho = fofrho + 9.9e8 /*for 1/4 degree -- radius of moon! */
     Xzm = Math.sqrt(1.0 - 0.96 * Math.sin(Zmoon) * Math.sin(Zmoon))
     if (Xzm != 0.0) Xzm = 1.0 / Xzm
     else Xzm = 10000.0
     Xo = Math.sqrt(1.0 - 0.96 * Math.sin(Z) * Math.sin(Z))
     if (Xo != 0.0) Xo = 1.0 / Xo
-    else Xo = 10000.0
-    Bmoon = fofrho * istar * Math.pow(10.0, -0.4 * KZen * Xzm) * (1.0 - Math
-      .pow(10.0, -0.4 * KZen * Xo)) /* nanoLamberts */
-    if (Bmoon > 0.001)
-      22.50 - 1.08574 * Math.log(Bmoon / 34.08) /* V mag per sq arcs-eqn 1 */
+    else
+      Xo = 10000.0
+    Bmoon = fofrho * istar * Math
+      .pow(10.0, -0.4 * kzen * Xzm) * (1.0 - Math.pow(10.0, -0.4 * kzen * Xo)) /* nanoLamberts */
+    if (Bmoon > 0.001) 22.50 - 1.08574 * Math.log(Bmoon / 34.08) /* V mag per sq arcs-eqn 1 */
     else 99.0
   }
 
@@ -1099,10 +1099,9 @@ trait ImprovedSkyCalcMethods {
     M = M - 0.001778 * sinx
     Mpr = Mpr + 0.000817 * sinx
     D = D + 0.002011 * sinx
-    sinx =
-      0.003964 * Math.sin(
-        (346.560 + 132.870 * T - 0.0091731 * Tsq) / DegsInRadian
-      )
+    sinx = 0.003964 * Math.sin(
+      (346.560 + 132.870 * T - 0.0091731 * Tsq) / DegsInRadian
+    )
     Lpr = Lpr + sinx
     Mpr = Mpr + sinx
     D = D + sinx
@@ -1118,32 +1117,31 @@ trait ImprovedSkyCalcMethods {
     Mpr = Mpr / DegsInRadian
     D = D / DegsInRadian
     F = F / DegsInRadian
-    lambda =
-      Lpr + 6.288750 * Math.sin(Mpr) + 1.274018 * Math.sin(
-        2 * D - Mpr
-      ) + 0.658309 * Math.sin(
-        2 * D
-      ) + 0.213616 * Math.sin(2 * Mpr) - e * 0.185596 * Math.sin(
-        M
-      ) - 0.114336 * Math.sin(
-        2 * F
-      ) + 0.058793 * Math.sin(2 * D - 2 * Mpr) + e * 0.057212 * Math.sin(
-        2 * D - M - Mpr
-      ) + 0.053320 * Math.sin(2 * D + Mpr) + e * 0.045874 * Math.sin(
-        2 * D - M
-      ) + e * 0.041024 * Math.sin(Mpr - M) - 0.034718 * Math.sin(
-        D
-      ) - e * 0.030465 * Math.sin(
-        M + Mpr
-      ) + 0.015326 * Math.sin(2 * D - 2 * F) - 0.012528 * Math.sin(
-        2 * F + Mpr
-      ) - 0.010980 * Math.sin(2 * F - Mpr) + 0.010674 * Math.sin(
-        4 * D - Mpr
-      ) + 0.010034 * Math.sin(3 * Mpr) + 0.008548 * Math.sin(
-        4 * D - 2 * Mpr
-      ) - e * 0.007910 * Math.sin(M - Mpr + 2 * D) - e * 0.006783 * Math.sin(
-        2 * D + M
-      ) + 0.005162 * Math.sin(Mpr - D)
+    lambda = Lpr + 6.288750 * Math.sin(Mpr) + 1.274018 * Math.sin(
+      2 * D - Mpr
+    ) + 0.658309 * Math.sin(
+      2 * D
+    ) + 0.213616 * Math.sin(2 * Mpr) - e * 0.185596 * Math.sin(
+      M
+    ) - 0.114336 * Math.sin(
+      2 * F
+    ) + 0.058793 * Math.sin(2 * D - 2 * Mpr) + e * 0.057212 * Math.sin(
+      2 * D - M - Mpr
+    ) + 0.053320 * Math.sin(2 * D + Mpr) + e * 0.045874 * Math.sin(
+      2 * D - M
+    ) + e * 0.041024 * Math.sin(Mpr - M) - 0.034718 * Math.sin(
+      D
+    ) - e * 0.030465 * Math.sin(
+      M + Mpr
+    ) + 0.015326 * Math.sin(2 * D - 2 * F) - 0.012528 * Math.sin(
+      2 * F + Mpr
+    ) - 0.010980 * Math.sin(2 * F - Mpr) + 0.010674 * Math.sin(
+      4 * D - Mpr
+    ) + 0.010034 * Math.sin(3 * Mpr) + 0.008548 * Math.sin(
+      4 * D - 2 * Mpr
+    ) - e * 0.007910 * Math.sin(M - Mpr + 2 * D) - e * 0.006783 * Math.sin(
+      2 * D + M
+    ) + 0.005162 * Math.sin(Mpr - D)
     /* And furthermore.....*/
     lambda = lambda + e * 0.005000 * Math.sin(M + D) + e * 0.004049 * Math.sin(
       Mpr - M + 2 * D

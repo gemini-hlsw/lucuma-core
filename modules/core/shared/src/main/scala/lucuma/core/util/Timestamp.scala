@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.util
@@ -6,8 +6,10 @@ package lucuma.core.util
 import cats._
 import cats.syntax.all._
 import lucuma.core.optics.Format
-import java.time.{ Instant, ZonedDateTime }
+
+import java.time.Instant
 import java.time.ZoneOffset.UTC
+import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit.MICROS
 
 /** Timestamp wraps a `java.util.Instant` that is truncated to microsecond

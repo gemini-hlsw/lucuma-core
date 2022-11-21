@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.math
@@ -11,9 +11,9 @@ import coulomb.cats.implicits._
 import lucuma.core.math.ProperMotion.AngularVelocityComponent
 import lucuma.core.math.units._
 import lucuma.core.optics.SplitMono
+import monocle.Focus
 import monocle.Iso
 import monocle.Lens
-import monocle.macros.GenLens
 import spire.math.Rational
 
 object VelocityAxis {
@@ -36,7 +36,8 @@ final case class ProperMotion(
 
 object ProperMotion extends ProperMotionOptics {
   final case class AngularVelocityComponent[A](μasy: Quantity[Long, MicroArcSecondPerYear]) {
-    def toRadians: Double = μasy.to[Double, Degree %/ Year].value.toRadians
+    // Direct conversion via coulomb turns to be too slow
+    def toRadians: Double = (μasy.value.toDouble / (3600 * 1e6)).toRadians
 
     val masy: Quantity[Rational, MilliArcSecondPerYear] = μasy.to[Rational, MilliArcSecondPerYear]
 
@@ -129,11 +130,11 @@ sealed trait ProperMotionOptics {
 
   /** @group Optics */
   val ra: Lens[ProperMotion, AngularVelocityComponent[VelocityAxis.RA]] =
-    GenLens[ProperMotion](_.ra)
+    Focus[ProperMotion](_.ra)
 
   /** @group Optics */
   val dec: Lens[ProperMotion, AngularVelocityComponent[VelocityAxis.Dec]] =
-    GenLens[ProperMotion](_.dec)
+    Focus[ProperMotion](_.dec)
 
   private def splitMonoFromComponents[A](
     raMono:  SplitMono[AngularVelocityComponent[VelocityAxis.RA], A],

@@ -1,19 +1,23 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.math.arb
 
-import lucuma.core.math.{Angle, Axis, Offset}
-import org.scalacheck._
+import lucuma.core.math.Angle
+import lucuma.core.math.Axis
+import lucuma.core.math.Offset
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Cogen._
+import org.scalacheck._
 
 trait ArbOffset {
   import ArbAngle._
 
   implicit def arbOffsetComponent[A]: Arbitrary[Offset.Component[A]] =
     Arbitrary(
-      Gen.chooseNum(-10000, 10000).map(mas => Offset.Component[A](Angle.milliarcseconds.reverseGet(mas)))
+      Gen
+        .chooseNum(-10000, 10000)
+        .map(mas => Offset.Component[A](Angle.milliarcseconds.reverseGet(mas)))
     )
 
   implicit val arbOffsetP: Arbitrary[Offset.Component[Axis.P]] = arbOffsetComponent[Axis.P]

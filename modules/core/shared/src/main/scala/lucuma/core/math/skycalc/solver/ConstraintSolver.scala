@@ -1,37 +1,41 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.math.skycalc.solver
 
-import java.time.Duration
 import lucuma.core.math.Declination
 import lucuma.core.math.HourAngle
-import lucuma.core.math.Interval
-import lucuma.core.math.Schedule
 import lucuma.core.math.skycalc.SkyCalcResults
+import spire.math.Bounded
+import spire.math.extras.interval.IntervalSeq
+
+import java.time.Duration
+import java.time.Instant
 
 /**
-  * Convenience class to find a [[lucuma.core.math.Schedule]] meeting a [[Constraint]]
-  * from [[Samples]] at a given [[lucuma.core.math.Interval]].
-  *
-  * @tparam S [[SolverStrategy]] to use
-  * @tparam R [[RoundStrategy]] to use
-  * @tparam T the type of results held by the [[Samples]]
-  * @tparam A the type on which the [[Constraint]] is checked (usually obtainable from <code>T</code>)
-  */
+ * Convenience class to find a `IntervalSeq[Instant]` meeting a [[Constraint]]
+ * from [[Samples]] within a given `Bounded[Instant]`.
+ *
+ * @tparam S [[SolverStrategy]] to use
+ * @tparam R [[RoundStrategy]] to use
+ * @tparam T the type of results held by the [[Samples]]
+ * @tparam A the type on which the [[Constraint]] is checked (usually obtainable from <code>T</code>)
+ */
 class ConstraintSolver[S, R, T, A](
   constraint:      Constraint[T, A],
   tolerance:       Duration = Duration.ofSeconds(30)
 )(implicit solver: Solver[S]) {
-  def solve(calc: Samples[T])(interval: Interval)(implicit rounder: SampleRounder[R, A]): Schedule =
+  def solve(calc: Samples[T])(interval: Bounded[Instant])(implicit
+    rounder:      SampleRounder[R, A]
+  ): IntervalSeq[Instant] =
     solver.solve(constraint.metAt[R](calc))(interval, tolerance)
 }
 
 object ConstraintSolver {
 
   /**
-    * Convenience method to build a [[ConstraintSolver]] by inferring <code>T</code> and <code>A</code> from the [[Constraint]].
-    */
+   * Convenience method to build a [[ConstraintSolver]] by inferring <code>T</code> and <code>A</code> from the [[Constraint]].
+   */
   def apply[S, G]: WithStrategies[S, G] = new WithStrategies[S, G]
 
   protected class WithStrategies[S, G] {

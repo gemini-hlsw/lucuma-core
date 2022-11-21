@@ -1,14 +1,16 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.math
 
-import cats.{ Order, Show }
+import cats.Order
+import cats.Show
 
-import java.time.{ Instant, LocalDateTime }
+import java.time.Instant
+import java.time.LocalDateTime
 import java.time.ZoneOffset.UTC
-import java.time.temporal.ChronoUnit
 import java.time.ZonedDateTime
+import java.time.temporal.ChronoUnit
 
 /** Astronomical time representation of continuous days since noon, November 24,
   * 4714 BC.

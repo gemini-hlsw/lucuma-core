@@ -1,11 +1,19 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.instances
 
-import cats.{ Always, Applicative, Eval, FlatMap, Foldable, Monoid, Show, Traverse }
+import cats.Always
+import cats.Applicative
+import cats.Eval
+import cats.FlatMap
+import cats.Foldable
+import cats.Monoid
+import cats.Show
+import cats.Traverse
 import cats.kernel._
 import cats.kernel.instances.StaticMethods
+
 import scala.annotation.tailrec
 import scala.collection.immutable.TreeMap
 

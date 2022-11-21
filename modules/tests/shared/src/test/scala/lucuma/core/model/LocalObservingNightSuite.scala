@@ -1,18 +1,19 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package gem.math
 
-import munit._
-import org.scalacheck.Prop._
-import cats.{ Eq, Show }
-import lucuma.core.model.LocalObservingNight
+import cats.Eq
+import cats.Show
+import cats.kernel.laws.discipline._
 import lucuma.core.arb.ArbTime._
+import lucuma.core.model.LocalObservingNight
 import lucuma.core.model.arb.ArbObservingNight._
 import lucuma.core.util.arb.ArbEnumerated._
-import cats.kernel.laws.discipline._
 import monocle.law.discipline._
-import io.chrisdavenport.cats.time._
+import munit._
+import org.scalacheck.Prop._
+import org.typelevel.cats.time._
 
 final class LocalObservingNightSuite extends DisciplineSuite {
 

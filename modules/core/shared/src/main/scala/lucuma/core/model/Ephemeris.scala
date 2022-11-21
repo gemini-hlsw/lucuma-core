@@ -1,14 +1,15 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.model
 
-import lucuma.core.util.Timestamp
+import cats.Eq
+import cats.Foldable
+import cats.Monoid
+import cats.syntax.all._
 import lucuma.core.optics.SplitMono
 import lucuma.core.syntax.treemap._
-
-import cats.{ Eq, Foldable, Monoid }
-import cats.syntax.all._
+import lucuma.core.util.Timestamp
 
 import scala.collection.immutable.TreeMap
 

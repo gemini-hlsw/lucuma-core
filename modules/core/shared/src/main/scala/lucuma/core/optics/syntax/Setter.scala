@@ -1,11 +1,11 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.optics.syntax
 
 import cats.data.State
+import lucuma.core.optics.state.all._
 import monocle.Setter
-import monocle.state.all._
 
 final class SetterOps[S, A](val self: Setter[S, A]) extends AnyVal {
 

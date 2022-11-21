@@ -1,15 +1,16 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.geom
 package arb
 
 import lucuma.core.geom.syntax.all._
-import lucuma.core.math.syntax.int._
-import lucuma.core.math.{ Angle, Offset }
+import lucuma.core.math.Angle
+import lucuma.core.math.Offset
 import lucuma.core.math.arb._
-import org.scalacheck._
+import lucuma.core.math.syntax.int._
 import org.scalacheck.Arbitrary._
+import org.scalacheck._
 
 trait ArbShapeExpression {
 
@@ -48,6 +49,9 @@ trait ArbShapeExpression {
       s <- g(r)
     } yield s
 
+  val genOffsetedPoint: Gen[ShapeExpression] =
+    arbitrary[Offset].map(ShapeExpression.point)
+
   val genCenteredEllipse: Gen[ShapeExpression] =
     withArbitraryRadius(genCenteredEllipseOf)
 
@@ -79,8 +83,11 @@ trait ArbShapeExpression {
   val genRectangle: Gen[ShapeExpression] =
     withPerturbation(genCenteredRectangle)
 
+  val genPoint: Gen[ShapeExpression] =
+    withPerturbation(genOffsetedPoint)
+
   val genShape: Gen[ShapeExpression] =
-    Gen.oneOf(genEmpty, genEllipse, genPolygon, genRectangle)
+    Gen.oneOf(genEmpty, genEllipse, genPolygon, genRectangle, genPoint)
 
   // Not implicit.  This is a single arbitrary shape, not in any way a
   // combination of shapes, so it isn't really an "arbitrary ShapeExpression".

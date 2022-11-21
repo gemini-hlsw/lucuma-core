@@ -1,15 +1,18 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.model
 
-import cats.{ Order, Show }
-import lucuma.core.enum.{ Half, Site }
+import cats.Order
+import cats.Show
+import lucuma.core.enums.Half
+import lucuma.core.enums.Site
 import lucuma.core.model.parser.SemesterParsers
 import lucuma.core.syntax.parser._
-import java.time._
+import org.typelevel.cats.time._
+
 import java.time.Month._
-import io.chrisdavenport.cats.time._
+import java.time._
 
 /**
  * A (Year, Half) pair.

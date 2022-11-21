@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.math
@@ -6,8 +6,8 @@ package lucuma.core.math
 import cats._
 import coulomb._
 import coulomb.cats.implicits._
-import lucuma.core.math.units._
 import lucuma.core.math.Constants.SpeedOfLight
+import lucuma.core.math.units._
 import lucuma.core.optics.Wedge
 import monocle.Iso
 import spire.std.bigDecimal._

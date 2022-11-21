@@ -1,11 +1,11 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.optics.syntax
 
 import cats.data.State
+import lucuma.core.optics.state.all._
 import monocle.Optional
-import monocle.state.all._
 
 final class OptionalOps[S, A](val self: Optional[S, A]) extends AnyVal {
 

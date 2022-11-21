@@ -1,15 +1,17 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.optics.laws
 package discipline
 
 import cats.Eq
+import cats.laws.discipline._
 import lucuma.core.optics.Wedge
-import org.scalacheck.{ Arbitrary, Gen }
+import org.scalacheck.Arbitrary
+import org.scalacheck.Gen
+import org.scalacheck.Prop
 import org.scalacheck.Prop._
 import org.typelevel.discipline.Laws
-import org.scalacheck.Prop
 
 trait WedgeTests[A, B] extends Laws {
   val wedgeProps: WedgeProps[A, B]
@@ -47,10 +49,10 @@ trait WedgeTests[A, B] extends Laws {
     new SimpleRuleSet("Wedge", allProps: _*)
 
   /** Convenience constructor that allows passing an explicit generator for input values. */
-  def splitMonoWith(ga: Gen[A])(implicit
-    ea:                 Eq[A],
-    ab:                 Arbitrary[B],
-    eb:                 Eq[B]
+  def wedgeWith(ga: Gen[A])(implicit
+    ea:             Eq[A],
+    ab:             Arbitrary[B],
+    eb:             Eq[B]
   ): RuleSet =
     wedge(Arbitrary(ga), ea, ab, eb)
 

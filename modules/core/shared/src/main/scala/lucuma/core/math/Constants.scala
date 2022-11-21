@@ -1,9 +1,7 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.math
-
-import java.time.Duration
 
 import coulomb._
 import coulomb.define.DerivedUnit
@@ -12,6 +10,8 @@ import coulomb.physicalconstants.infra.PhysicalConstantQuantity
 import coulomb.si.Meter
 import lucuma.core.math.units.MetersPerSecond
 import spire.math.Rational
+
+import java.time.Duration
 
 object Constants {
   private object infra {

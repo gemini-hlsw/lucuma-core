@@ -1,18 +1,23 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.model
 
-import lucuma.core.model.arb.ArbEphemeris
-import lucuma.core.math.{ Angle, Offset }
-import lucuma.core.math.arb.{ ArbCoordinates, ArbDeclination, ArbOffset, ArbRightAscension }
-
-import cats.{ Eq, Show }
+import cats.Eq
+import cats.Show
 import cats.kernel.laws.discipline._
+import lucuma.core.math.Angle
+import lucuma.core.math.Offset
+import lucuma.core.math.arb.ArbCoordinates
+import lucuma.core.math.arb.ArbDeclination
+import lucuma.core.math.arb.ArbOffset
+import lucuma.core.math.arb.ArbRightAscension
+import lucuma.core.model.arb.ArbEphemeris
 import monocle.law.discipline._
-import org.scalacheck.{ Arbitrary, Gen }
-import org.scalacheck.Prop._
 import munit._
+import org.scalacheck.Arbitrary
+import org.scalacheck.Gen
+import org.scalacheck.Prop._
 
 final class EphemerisCoordinatesSuite extends DisciplineSuite {
   import ArbCoordinates._

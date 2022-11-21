@@ -1,19 +1,18 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.math.skycalc
 
+import lucuma.core.enums.Site
+import lucuma.core.math.Coordinates
 import munit.FunSuite
 
 import java.time._
-import lucuma.core.math.Coordinates
-import lucuma.core.enum.Site
-import org.scalactic.Tolerance
 
 // This is just a basic case, mostly to test linking in JS.
 // Property based testing is in ImprovedSkyCalcSpecJVM, where output
 // is compared to the one from {edu.gemini.skycalc} in Java.
-final class ImprovedSkyCalcSuite extends FunSuite with Tolerance {
+final class ImprovedSkyCalcSuite extends FunSuite {
 
   private val NanosPerMillis: Int = 1_000_000
 
@@ -41,7 +40,7 @@ final class ImprovedSkyCalcSuite extends FunSuite with Tolerance {
         val calc    = ImprovedSkyCalc(site.place)
         val results = calc.calculate(coords, instant, false)
         // We use constants with more precision
-        assert((results.altitudeRaw +- 1e-12).isWithin(elevation))
+        assertEqualsDouble(results.altitudeRaw, elevation, 1e-12)
     }
   }
 }

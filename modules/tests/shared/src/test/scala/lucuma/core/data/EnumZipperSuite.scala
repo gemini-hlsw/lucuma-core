@@ -1,16 +1,17 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma
 package core
 package data
 
-import cats.syntax.all._
-import lucuma.core.enum.StepType
-import lucuma.core.enum.StepType._
-import lucuma.core.util.arb.ArbEnumerated._
-import arb.ArbEnumZipper._
 import cats.kernel.laws.discipline.EqTests
+import cats.syntax.all._
+import lucuma.core.enums.StepType
+import lucuma.core.enums.StepType._
+import lucuma.core.util.arb.ArbEnumerated._
+
+import arb.ArbEnumZipper._
 
 final class EnumZipperSuite extends munit.DisciplineSuite {
   test("withFocus on focus") {

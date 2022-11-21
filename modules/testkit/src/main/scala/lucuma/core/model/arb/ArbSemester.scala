@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma
@@ -6,12 +6,13 @@ package core
 package model
 package arb
 
-import java.time.Year
-import lucuma.core.enum.Half
 import lucuma.core.arb.ArbTime
+import lucuma.core.enums.Half
 import lucuma.core.util.arb.ArbEnumerated
-import org.scalacheck._
 import org.scalacheck.Arbitrary._
+import org.scalacheck._
+
+import java.time.Year
 
 trait ArbSemester {
   import ArbEnumerated._

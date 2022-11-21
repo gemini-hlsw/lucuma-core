@@ -1,18 +1,19 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.math
 import cats.Eq
 import cats.Show
-import java.time.ZoneId
 import coulomb.Quantity
-import coulomb.si.Meter
-import eu.timepit.refined.types.numeric.NonNegInt
-import monocle.Lens
-import monocle.macros.GenLens
-import io.chrisdavenport.cats.time._
 import coulomb.cats.implicits._
+import coulomb.si.Meter
 import eu.timepit.refined.cats._
+import eu.timepit.refined.types.numeric.NonNegInt
+import monocle.Focus
+import monocle.Lens
+import org.typelevel.cats.time._
+
+import java.time.ZoneId
 
 /** A point on Earth, given latitude, longitude and altitude in m above sea level. */
 final case class Place(
@@ -36,17 +37,17 @@ object Place {
 
   /** @group Optics */
   val latitude: Lens[Place, Lat] =
-    GenLens[Place](_.latitude)
+    Focus[Place](_.latitude)
 
   /** @group Optics */
   val longitude: Lens[Place, Lon] =
-    GenLens[Place](_.longitude)
+    Focus[Place](_.longitude)
 
   /** @group Optics */
   val altitude: Lens[Place, Quantity[NonNegInt, Meter]] =
-    GenLens[Place](_.altitude)
+    Focus[Place](_.altitude)
 
   /** @group Optics */
   val timezone: Lens[Place, ZoneId] =
-    GenLens[Place](_.timezone)
+    Focus[Place](_.timezone)
 }

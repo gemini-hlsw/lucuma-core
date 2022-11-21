@@ -1,12 +1,15 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.math.parser
 
-import atto._, Atto._
+import atto._
 import cats.syntax.all._
-import lucuma.core.math.{ Angle, HourAngle }
+import lucuma.core.math.Angle
+import lucuma.core.math.HourAngle
 import lucuma.core.parser.MiscParsers._
+
+import Atto._
 
 /** Parsers for `[[lucuma.core.math.Angle]].` */
 trait AngleParsers {

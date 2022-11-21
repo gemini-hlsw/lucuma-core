@@ -1,16 +1,15 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.model
 package arb
 
-import lucuma.core.model.EphemerisKey._
-import lucuma.core.enum.EphemerisKeyType
-import lucuma.core.util.arb.ArbEnumerated
 import lucuma.core.arb._
-
-import org.scalacheck._
+import lucuma.core.enums.EphemerisKeyType
+import lucuma.core.model.EphemerisKey._
+import lucuma.core.util.arb.ArbEnumerated
 import org.scalacheck.Arbitrary._
+import org.scalacheck._
 
 trait ArbEphemerisKey {
   import ArbEnumerated._

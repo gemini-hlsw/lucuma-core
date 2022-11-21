@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma
@@ -7,8 +7,8 @@ package util
 package arb
 
 import lucuma.core.util.Enumerated
-import org.scalacheck._
 import org.scalacheck.Gen._
+import org.scalacheck._
 
 trait ArbEnumerated {
 

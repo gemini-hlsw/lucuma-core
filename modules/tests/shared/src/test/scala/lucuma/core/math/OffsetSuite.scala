@@ -1,13 +1,14 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.math
 
-import cats.{ Eq, Show }
+import cats.Eq
+import cats.Show
 import cats.kernel.laws.discipline._
 import lucuma.core.math.arb._
-import lucuma.core.optics.laws.discipline.SplitMonoTests
 import lucuma.core.math.syntax.int._
+import lucuma.core.optics.laws.discipline.SplitMonoTests
 import monocle.law.discipline._
 import org.scalacheck.Prop._
 

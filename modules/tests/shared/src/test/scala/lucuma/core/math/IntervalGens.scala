@@ -1,24 +1,37 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.math
 
-import cats.syntax.all._
 import cats.Eq
-import java.time.Duration
-import java.time.Instant
+import cats.syntax.all._
+import lucuma.core.arb.ArbTime
+import lucuma.core.optics.Spire
+import lucuma.core.syntax.boundedInterval._
+import lucuma.core.syntax.time._
+import org.scalacheck.Arbitrary._
 import org.scalacheck.Gen
 import org.scalacheck.Gen.Choose
-import org.scalacheck.Arbitrary._
-import lucuma.core.syntax.time._
-import lucuma.core.arb.ArbTime._
-import io.chrisdavenport.cats.time._
+import org.typelevel.cats.time._
+import spire.math.Bounded
+import spire.math.Interval
+import spire.math.extras.interval.IntervalSeq
+import spire.math.interval.Closed
+import spire.math.interval.EmptyBound
+import spire.math.interval.Open
+import spire.math.interval.Unbound
+import spire.math.interval.ValueBound
+
+import java.time.Duration
+import java.time.Instant
 
 trait IntervalGens {
+  import ArbTime._
+
   private val MaxDelta: Long = Duration.ofMinutes(10).toNanos
 
-  def buildInterval(start: Int, end: Int): Interval =
-    Interval.unsafe(Instant.ofEpochMilli(start.toLong), Instant.ofEpochMilli(end.toLong))
+  def buildInterval(start: Int, end: Int): Bounded[Instant] =
+    Bounded.unsafeOpenUpper(Instant.ofEpochMilli(start.toLong), Instant.ofEpochMilli(end.toLong))
 
   implicit val chooseInstant: Choose[Instant] = new Choose[Instant] {
     def choose(min: Instant, max: Instant): Gen[Instant] =
@@ -32,77 +45,89 @@ trait IntervalGens {
   }
 
   def instantInInterval(
-    interval:     Interval,
-    includeStart: Boolean = true,
-    includeEnd:   Boolean = false,
-    specials:     List[Instant] = List.empty
+    interval: Interval[Instant],
+    specials: List[Instant] = List.empty
+  ): Gen[Instant] = {
+    val lowerBound: Option[ValueBound[Instant]] = interval.lowerBound match {
+      case Unbound()    => Closed(Instant.MIN).some
+      case EmptyBound() => none
+      case Open(a)      => Open(a).some
+      case Closed(a)    => Closed(a).some
+    }
+    val upperBound: Option[ValueBound[Instant]] = interval.upperBound match {
+      case Unbound()    => Closed(Instant.MAX).some
+      case EmptyBound() => none
+      case Open(a)      => Open(a).some
+      case Closed(a)    => Closed(a).some
+    }
+    (lowerBound, upperBound)
+      .mapN((lower, upper) =>
+        instantInBounded(Interval.fromBounds(lower, upper).asInstanceOf[Bounded[Instant]], specials)
+      )
+      .getOrElse(Gen.fail)
+  }
+
+  def instantInBounded(
+    interval: Bounded[Instant],
+    specials: List[Instant] = List.empty
   ): Gen[Instant] = {
     val basics            = List(Instant.MIN, Instant.MAX)
     val basicsAndSpecials =
       (basics ++ specials)
-        .filter(i => i > interval.start || (i === interval.start && includeStart))
-        .filter(i => i < interval.end || (i === interval.end && includeEnd))
+        .filter(i => i > interval.lower || (i === interval.lower && interval.lowerBound.isClosed))
+        .filter(i => i < interval.upper || (i === interval.upper && interval.upperBound.isClosed))
     val freqs             =
-      basicsAndSpecials.map(v => (1, Gen.const(v))) :+ ((15 + basicsAndSpecials.length,
-                                                         Gen
-                                                           .choose(interval.start, interval.end)
-                                                        )
+      basicsAndSpecials.map(v => (1, Gen.const(v))) :+ (
+        (
+          15 + basicsAndSpecials.length,
+          Gen.choose(interval.lower, interval.upper)
+        )
       )
 
     Gen
       .frequency(freqs: _*)
-      .suchThat(_ > interval.start || includeStart)
-      .suchThat(_ < interval.end || includeEnd)
+      .suchThat(_ > interval.lower || interval.lowerBound.isClosed)
+      .suchThat(_ < interval.upper || interval.upperBound.isClosed)
   }
 
   // There might not be instants outside the interval if the interval is (Instant.MIN, Instant.MAX).
-  def instantBeforeInterval(
-    interval:     Interval,
-    includeStart: Boolean = false
-  ): Gen[Option[Instant]] =
-    Interval(Instant.MIN, interval.start).fold(
-      Gen.const(if (includeStart) interval.start.some else none)
-    )(before =>
-      Gen.some(
-        instantInInterval(before, includeEnd = includeStart, specials = List(interval.start))
-      )
+  def instantBeforeInterval(interval: Bounded[Instant]): Gen[Option[Instant]] =
+    interval.lowerBound match {
+      case Closed(Instant.MIN) => Gen.const(none)
+      case Closed(a)           => instantInInterval(Interval.below(a)).map(_.some)
+      case Open(a)             => instantInInterval(Interval.atOrBelow(a)).map(_.some)
+    }
+
+  def instantAfterInterval(interval: Bounded[Instant]): Gen[Option[Instant]] =
+    interval.upperBound match {
+      case Closed(Instant.MAX) => Gen.const(none)
+      case Closed(a)           => instantInInterval(Interval.above(a)).map(_.some)
+      case Open(a)             => instantInInterval(Interval.atOrAbove(a)).map(_.some)
+    }
+
+  def instantOutsideInterval(interval: Bounded[Instant]): Gen[Option[Instant]] =
+    Gen.oneOf(instantBeforeInterval(interval), instantAfterInterval(interval))
+
+  def instantWithSpecialInterval(interval: Bounded[Instant]): Gen[Instant] =
+    Gen.frequency(
+      (1, Gen.const(interval.lower)),
+      (1, Gen.const(interval.upper)),
+      (18, arbitrary[Instant])
     )
 
-  def instantAfterInterval(interval: Interval, includeEnd: Boolean = true): Gen[Option[Instant]] =
-    Interval(interval.end, Instant.MAX)
-      .fold(Gen.const(if (includeEnd) interval.end.some else none))(after =>
-        Gen.some(instantInInterval(after, includeStart = includeEnd, specials = List(interval.end)))
-      )
-
-  def instantOutsideInterval(
-    interval:     Interval,
-    includeStart: Boolean = false,
-    includeEnd:   Boolean = true
-  ): Gen[Option[Instant]] =
-    Gen.oneOf(
-      instantBeforeInterval(interval, includeStart),
-      instantAfterInterval(interval, includeEnd)
+  def instantUntilEndOfInterval(interval: Bounded[Instant]): Gen[Instant] =
+    instantInInterval(
+      Interval.fromBounds(Unbound(), interval.upperBound),
+      specials = List(interval.lower, interval.upper)
     )
 
-  def instantWithSpecialInterval(interval: Interval): Gen[Instant] =
-    Gen.frequency((1, Gen.const(interval.start)),
-                  (1, Gen.const(interval.end)),
-                  (18, arbitrary[Instant])
+  def instantFromStartOfInterval(interval: Bounded[Instant]): Gen[Instant] =
+    instantInInterval(
+      Interval.fromBounds(interval.lowerBound, Unbound()),
+      specials = List(interval.lower, interval.upper)
     )
 
-  def instantUntilEndOfInterval(interval: Interval, includeEnd: Boolean = false): Gen[Instant] =
-    instantInInterval(Interval.unsafe(Instant.MIN, interval.end),
-                      includeEnd,
-                      specials = List(interval.start, interval.end)
-    )
-
-  def instantFromStartOfInterval(interval: Interval, includeStart: Boolean = true): Gen[Instant] =
-    instantInInterval(Interval.unsafe(interval.start, Instant.MAX),
-                      includeStart,
-                      specials = List(interval.start, interval.end)
-    )
-
-  def rateForInterval(interval: Interval): Gen[Duration] =
+  def rateForInterval(interval: Bounded[Instant]): Gen[Duration] =
     for {
       samples <- Gen.choose(50L, 400L)
       delta   <- Gen.choose(0, MaxDelta)
@@ -115,37 +140,18 @@ trait IntervalGens {
     Gen.zip(gen1, gen2).map(_.tupled).suchThat(_.forall(t => t._1 =!= t._2))
 
   // Schedule may be empty
-  def instantInSchedule(
-    schedule:      Schedule,
-    includeStarts: Boolean = true,
-    includeEnds:   Boolean = false
-  ): Gen[Option[Instant]] =
+  def instantInSchedule(schedule: IntervalSeq[Instant]): Gen[Option[Instant]] =
     if (schedule.isEmpty)
       Gen.const(none)
     else
       Gen
-        .oneOf(schedule.intervals)
-        .flatMap(i => instantInInterval(i, includeStarts, includeEnds).map(_.some))
+        .oneOf(schedule.intervals.toList)
+        .flatMap(i => instantInInterval(i).map(_.some))
 
-  def instantOutsideSchedule(
-    schedule:      Schedule,
-    includeStarts: Boolean = false,
-    includeEnds:   Boolean = true
-  ): Gen[Option[Instant]] =
-    if (schedule.isEmpty)
-      arbitrary[Instant].map(_.some)
-    else {
-      val gaps = schedule.gaps
-      Gen.frequency(
-        (1, instantBeforeInterval(schedule.intervals.head, includeStart = includeStarts)),
-        (1, instantAfterInterval(schedule.intervals.last, includeEnd = includeEnds)),
-        (gaps.intervals.length,
-         instantInSchedule(gaps, includeStarts = includeEnds, includeEnds = includeStarts)
-        )
-      )
-    }
+  def instantOutsideSchedule(schedule: IntervalSeq[Instant]): Gen[Option[Instant]] =
+    instantInSchedule(~schedule)
 
-  def intervalInSchedule(schedule: Schedule): Gen[Option[Interval]] =
+  def intervalInSchedule(schedule: IntervalSeq[Instant]): Gen[Option[Interval[Instant]]] =
     if (schedule.isEmpty)
       Gen.const(none)
     else
@@ -153,14 +159,13 @@ trait IntervalGens {
         .oneOf(schedule.intervals)
         .flatMap(i =>
           distinctZip(instantInInterval(i), instantInInterval(i))
-            .map(Interval.fromInstants.getOption)
+            .map(Spire.openUpperIntervalFromTuple[Instant].getOption)
         )
 
   // We define a "section" as a maximal interval either outside or inside the Schedule.
-  def sectionInSchedule(schedule: Schedule): Gen[Interval] = {
-    val breaks = ((Instant.MIN +: schedule.intervals.flatMap(i =>
-      List(i.start, i.end)
-    )) :+ Instant.MAX).distinct
-    Gen.oneOf(breaks.zip(breaks.tail).map { case (s, e) => Interval.unsafe(s, e) }.toList)
-  }
+  def sectionInSchedule(schedule: IntervalSeq[Instant]): Gen[Interval[Instant]] =
+    Gen.oneOf(
+      intervalInSchedule(schedule).flatMap(_.map(Gen.const).getOrElse(Gen.fail)),
+      intervalInSchedule(~schedule).flatMap(_.map(Gen.const).getOrElse(Gen.fail))
+    )
 }

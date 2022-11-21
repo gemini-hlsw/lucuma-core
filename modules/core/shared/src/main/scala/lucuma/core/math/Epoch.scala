@@ -1,13 +1,12 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.math
 
-import java.time._
-
 import cats.Order
 import cats.Show
 import cats.syntax.all._
+import eu.timepit.refined._
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.auto._
 import eu.timepit.refined.cats._
@@ -18,6 +17,8 @@ import lucuma.core.optics.Format
 import lucuma.core.optics.syntax.all._
 import lucuma.core.syntax.parser._
 import monocle.Prism
+
+import java.time._
 
 /**
   * An epoch, the astronomer's equivalent of `Instant`, based on a fractional year in some temporal
@@ -77,13 +78,13 @@ object Epoch extends EpochOptics {
     * Standard epoch.
     * @group Constructors
     */
-  val J2000: Epoch = Julian.fromIntegralYears(2000)
+  val J2000: Epoch = Julian.fromIntegralYears(refineMV[Year](2000))
 
   /**
     * Standard epoch prior to J2000. Obsolete but still in use.
     * @group Constructors
     */
-  val B1950: Epoch = Besselian.fromIntegralYears(1950)
+  val B1950: Epoch = Besselian.fromIntegralYears(refineMV[Year](1950))
 
   /**
     * The scheme defines year zero and length of a year in terms of Julian days. There are two

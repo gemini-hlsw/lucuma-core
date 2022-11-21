@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma
@@ -6,9 +6,10 @@ package core
 package data
 
 import cats._
-import cats.syntax.all._
 import cats.data.NonEmptyList
-import monocle.{ Prism, Traversal }
+import cats.syntax.all._
+import monocle.Prism
+import monocle.Traversal
 
 /**
   * Minimal zipper based on scalaz's implementation
@@ -171,7 +172,7 @@ object Zipper extends ZipperFactory[Zipper] {
     */
   def unsafeSelect[A](predicate: A => Boolean): Traversal[Zipper[A], A] =
     new Traversal[Zipper[A], A] {
-      override def modifyF[F[_]: Applicative](f: A => F[A])(s: Zipper[A]): F[Zipper[A]] = {
+      override def modifyA[F[_]: Applicative](f: A => F[A])(s: Zipper[A]): F[Zipper[A]] = {
         val lefts: F[List[A]]  = s.lefts.traverse {
           case x if predicate(x) => f(x)
           case x                 => x.pure[F]

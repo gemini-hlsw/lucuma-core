@@ -1,12 +1,15 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.parser
 
-import atto._, Atto._
+import atto._
 import lucuma.core.math.Index
 import lucuma.core.optics.syntax.prism._
+
 import scala.annotation.tailrec
+
+import Atto._
 
 /** General-purpose parsers and combinators that aren't provided by atto. */
 trait MiscParsers {

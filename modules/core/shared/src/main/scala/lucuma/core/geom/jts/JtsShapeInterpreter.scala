@@ -1,18 +1,18 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.geom
 package jts
 
-import java.util.Collections
-
 import cats.syntax.all._
-import lucuma.core.math.Offset
 import lucuma.core.geom.ShapeExpression._
 import lucuma.core.geom.jts.syntax.all._
+import lucuma.core.math.Offset
 import org.locationtech.jts.geom.Geometry
 import org.locationtech.jts.geom.util.AffineTransformation
 import org.locationtech.jts.util.GeometricShapeFactory
+
+import java.util.Collections
 
 /**
  * JTS shape interpreter.
@@ -48,6 +48,10 @@ object JtsShapeInterpreter extends ShapeInterpreter {
       case Ellipse(a, b)   => safeRectangularBoundedShape(a, b)(_.createEllipse)
       case Polygon(os)     => safePolygon(os)
       case Rectangle(a, b) => safeRectangularBoundedShape(a, b)(_.createRectangle)
+      case Point(a)        => a.point
+      case BoundingBox(e) =>
+        val (a, b) = Jts.boundingOffsets(toGeometry(e))
+        safeRectangularBoundedShape(a, b)(_.createRectangle)
 
       // Combinations
       case Difference(a, b)   => toGeometry(a).difference(toGeometry(b))

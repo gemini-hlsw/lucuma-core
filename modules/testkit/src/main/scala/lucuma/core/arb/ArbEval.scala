@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.arb
@@ -6,8 +6,8 @@ package lucuma.core.arb
 import cats.Eval
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary._
-import org.scalacheck.Gen
 import org.scalacheck.Cogen
+import org.scalacheck.Gen
 
 trait ArbEval {
   def genSampleValue[A: Arbitrary]: Gen[Eval[A]] =

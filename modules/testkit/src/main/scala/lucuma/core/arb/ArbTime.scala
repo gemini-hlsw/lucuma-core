@@ -1,17 +1,18 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.arb
 
 import cats.syntax.all._
-import org.scalacheck._
-import org.scalacheck.Gen._
-import org.scalacheck.Arbitrary.arbitrary
 import lucuma.core.syntax.time._
-import scala.jdk.CollectionConverters._
-import scala.concurrent.duration.{ Duration => SDuration }
+import org.scalacheck.Arbitrary.arbitrary
+import org.scalacheck.Gen._
+import org.scalacheck._
+import org.typelevel.cats.time._
+
 import java.time._
-import io.chrisdavenport.cats.time._
+import scala.concurrent.duration.{ Duration => SDuration }
+import scala.jdk.CollectionConverters._
 
 // Arbitrary but reasonable dates and times.
 trait ArbTime {

@@ -1,17 +1,18 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma
 package core
 package data
 
-import cats.syntax.all._
 import cats.data.NonEmptyList
 import cats.kernel.laws.discipline.EqTests
-import cats.laws.discipline.{ FunctorTests, TraverseTests }
+import cats.laws.discipline.FunctorTests
+import cats.laws.discipline.TraverseTests
 import cats.laws.discipline.arbitrary._
-import monocle.law.discipline.TraversalTests
+import cats.syntax.all._
 import lucuma.core.data.arb.ArbZipper._
+import monocle.law.discipline.TraversalTests
 import org.scalacheck.Prop._
 
 /**

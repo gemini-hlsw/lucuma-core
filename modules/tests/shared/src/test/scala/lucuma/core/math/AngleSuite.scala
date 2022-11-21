@@ -1,11 +1,13 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.math
 
-import cats.{ Eq, Order, Show }
-import cats.syntax.all._
+import cats.Eq
+import cats.Order
+import cats.Show
 import cats.kernel.laws.discipline._
+import cats.syntax.all._
 import lucuma.core.math.arb._
 import lucuma.core.optics.laws.discipline._
 import monocle.law.discipline._
@@ -168,6 +170,15 @@ final class AngleSuite extends munit.DisciplineSuite {
     forAll { (a: Angle) =>
       val b = (a + a).bisect
       assert(a === b || a.flip === b)
+    }
+  }
+
+  test("Trigonometric functions") {
+    forAll { (a: Angle) =>
+      // Trivial checks
+      assertEquals(a.sin, scala.math.sin(a.toDoubleRadians))
+      assertEquals(a.cos, scala.math.cos(a.toDoubleRadians))
+      assertEquals(a.tan, scala.math.tan(a.toDoubleRadians))
     }
   }
 }

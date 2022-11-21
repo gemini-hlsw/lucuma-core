@@ -1,12 +1,14 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.math.parser
 
+import atto._
 import cats.syntax.all._
-import atto._, Atto._
 import lucuma.core.math._
 import lucuma.core.parser.MiscParsers
+
+import Atto._
 
 /** Parsers for [[lucuma.core.math.Coordinates]] and related types. */
 trait CoordinateParsers {

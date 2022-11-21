@@ -1,12 +1,13 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.geom
 package syntax
 
-import ShapeExpression._
+import lucuma.core.math.Angle
+import lucuma.core.math.Offset
 
-import lucuma.core.math.{ Angle, Offset }
+import ShapeExpression._
 
 final class ShapeExpressionOps(val self: ShapeExpression) extends AnyVal {
 
@@ -53,6 +54,12 @@ final class ShapeExpressionOps(val self: ShapeExpression) extends AnyVal {
     union(that)
 
   /**
+   * Creates a bounding box for an expression
+   */
+  def boundingBox: ShapeExpression =
+    BoundingBox(self)
+
+  /**
    * Promotes `Shape.contains` through evaluation.
    */
   def contains(o: Offset)(implicit ev: ShapeInterpreter): Boolean =
@@ -69,6 +76,13 @@ final class ShapeExpressionOps(val self: ShapeExpression) extends AnyVal {
    */
   def µasSquared(implicit ev: ShapeInterpreter): Long =
     area.toMicroarcsecondsSquared
+
+  /**
+   * Promotes `Shape.boundingOffsets.maxSide` through evaluation and produces an Angle
+   */
+  def maxSide(implicit ev: ShapeInterpreter): Angle =
+    self.eval.boundingOffsets.maxSide
+
 }
 
 trait ToShapeExpressionOps {
@@ -83,6 +97,12 @@ final class ShapeExpressionCompanionOps(val self: ShapeExpression.type) extends 
    */
   def empty: ShapeExpression =
     ShapeExpression.Empty
+
+  /**
+   * An single point `ShapeExpression`
+   */
+  def point(a: Offset): ShapeExpression =
+    ShapeExpression.Point(a)
 
   /**
    * Constructs an ellipse bound by the rectangle defined by the given

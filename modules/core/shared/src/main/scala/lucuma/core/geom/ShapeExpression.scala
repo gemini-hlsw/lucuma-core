@@ -1,9 +1,10 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.geom
 
-import lucuma.core.math.{ Angle, Offset }
+import lucuma.core.math.Angle
+import lucuma.core.math.Offset
 
 /**
  * Describes a `Shape`, which is produced by evaluating the expression using
@@ -32,6 +33,13 @@ object ShapeExpression {
    * @group Constructors
    */
   final case object Empty extends ShapeExpression
+
+  /**
+   * An shape representing a point
+   *
+   * @group Constructors
+   */
+  final case class Point(x: Offset) extends ShapeExpression
 
   /**
    * Ellipse contained in the rectangle defined by the two positions.
@@ -82,6 +90,11 @@ object ShapeExpression {
    */
   final case class RotateAroundOffset(e: ShapeExpression, a: Angle, o: Offset)
       extends ShapeExpression
+
+  /**
+   * @group Transformations
+   */
+  final case class BoundingBox(e: ShapeExpression) extends ShapeExpression
 
   /**
    * Flips the provided ShapeExpression around the y axis (ie, horizontally).

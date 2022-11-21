@@ -1,120 +1,566 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.model
-
-import scala.collection.immutable.SortedMap
 
 import cats._
 import cats.implicits._
 import eu.timepit.refined.auto._
 import eu.timepit.refined.cats._
+import eu.timepit.refined.types.numeric.PosBigDecimal
 import eu.timepit.refined.types.string.NonEmptyString
-import lucuma.core.enum.MagnitudeBand
+import lucuma.core.enums.Band
+import lucuma.core.math.BrightnessUnits._
 import lucuma.core.math._
+import lucuma.core.math.dimensional._
+import lucuma.core.util.WithGid
+import monocle.Focus
 import monocle.Lens
 import monocle.Optional
+import monocle.Prism
 import monocle.Traversal
-import monocle.function.Each.mapEach
-import monocle.function.FilterIndex
-import monocle.macros.GenLens
-import monocle.std.either._
-import monocle.std.option
+import monocle.macros.GenPrism
+
+import scala.collection.immutable.SortedMap
 
 /** A target of observation. */
-final case class Target(
-  name:       NonEmptyString,
-  track:      Either[EphemerisKey, SiderealTracking],
-  magnitudes: SortedMap[MagnitudeBand, Magnitude]
-)
+sealed trait Target extends Product with Serializable {
+  def name: NonEmptyString
+  def sourceProfile: SourceProfile
+}
 
-object Target extends WithId('t') with TargetOptics {
-  implicit val TargetEq: Eq[Target] =
-    Eq.by(x => (x.name, x.track, x.magnitudes))
+object Target extends WithGid('t') with TargetOptics {
+
+  final case class Sidereal(
+    name:          NonEmptyString,
+    tracking:      SiderealTracking,
+    sourceProfile: SourceProfile,
+    catalogInfo:   Option[CatalogInfo]
+  ) extends Target
+
+  object Sidereal extends SiderealOptics {
+    implicit val eqSidereal: Eq[Sidereal] =
+      Eq.by(x => (x.name, x.tracking, x.sourceProfile, x.catalogInfo))
+
+    /**
+     * A sidereal target order based on tracking information, which roughly means by base coordinate
+     * without applying proper motion.
+     *
+     * Not implicit.
+     */
+    val TrackOrder: Order[Sidereal] = Order.by(x => (x.tracking, x.name))
+
+    /**
+     * Sidereal targets ordered by name first and then tracking information.
+     *
+     * Not implicit.
+     */
+    val NameOrder: Order[Sidereal] = Order.by(x => (x.name, x.tracking))
+  }
+
+  final case class Nonsidereal(
+    name:          NonEmptyString,
+    ephemerisKey:  EphemerisKey,
+    sourceProfile: SourceProfile
+  ) extends Target
+
+  object Nonsidereal extends NonsiderealOptics {
+    implicit val eqNonsidereal: Eq[Nonsidereal] =
+      Eq.by(x => (x.name, x.ephemerisKey, x.sourceProfile))
+
+    /**
+     * A nonsidereal target order based on ephemeris key.
+     *
+     * Not implicit.
+     */
+    val TrackOrder: Order[Nonsidereal] = Order.by(x => (x.ephemerisKey, x.name))
+
+    /**
+     * Nonsidereal targets ordered by name first and then ephemeris key.
+     *
+     * Not implicit.
+     */
+    val NameOrder: Order[Nonsidereal] = Order.by(x => (x.name, x.ephemerisKey))
+  }
+
+  implicit val TargetEq: Eq[Target] = Eq.instance {
+    case (a @ Sidereal(_, _, _, _), b @ Sidereal(_, _, _, _)) => a === b
+    case (a @ Nonsidereal(_, _, _), b @ Nonsidereal(_, _, _)) => a === b
+    case _                                                    => false
+  }
 
   /**
-   * A target order based on tracking information.  For sidereal targets this
-   * roughly means by base coordinate without applying proper motion.  For
-   * non-sidereal this means by `EphemerisKey`.
+   * A target order based on tracking information. For sidereal targets this roughly means by base
+   * coordinate without applying proper motion. For non-sidereal this means by `EphemerisKey`.
    *
    * Not implicit.
    */
-  val TargetTrackOrder: Order[Target] =
-    Order.by(t => (t.track, t.name))
+  val TrackOrder: Order[Target] =
+    Order.from {
+      case (a @ Sidereal(_, _, _, _), b @ Sidereal(_, _, _, _)) =>
+        Sidereal.TrackOrder.compare(a, b)
+      case (a @ Nonsidereal(_, _, _), b @ Nonsidereal(_, _, _)) =>
+        Nonsidereal.TrackOrder.compare(a, b)
+      case (Nonsidereal(_, _, _), _)                            => -1
+      case _                                                    => 1
+    }
 
   /**
    * Targets ordered by name first and then tracking information.
    *
    * Not implicit.
    */
-  val TargetNameOrder: Order[Target] =
-    Order.by(t => (t.name.value, t.track))
+  val NameOrder: Order[Target] =
+    Order.from {
+      case (a @ Sidereal(_, _, _, _), b @ Sidereal(_, _, _, _)) =>
+        Sidereal.NameOrder.compare(a, b)
+      case (a @ Nonsidereal(_, _, _), b @ Nonsidereal(_, _, _)) =>
+        Nonsidereal.NameOrder.compare(a, b)
+      case (Nonsidereal(_, _, _), _)                            => -1
+      case _                                                    => 1
+    }
 
+  trait SiderealOptics { this: Sidereal.type =>
+
+    /** @group Optics */
+    val name: Lens[Sidereal, NonEmptyString] =
+      Focus[Sidereal](_.name)
+
+    /** @group Optics */
+    val tracking: Lens[Sidereal, SiderealTracking] =
+      Focus[Sidereal](_.tracking)
+
+    /** @group Optics */
+    val parallax: Lens[Sidereal, Option[Parallax]] =
+      tracking.andThen(SiderealTracking.parallax)
+
+    /** @group Optics */
+    val radialVelocity: Lens[Sidereal, Option[RadialVelocity]] =
+      tracking.andThen(SiderealTracking.radialVelocity)
+
+    /** @group Optics */
+    val baseCoordinates: Lens[Sidereal, Coordinates] =
+      tracking.andThen(SiderealTracking.baseCoordinates)
+
+    /** @group Optics */
+    val baseRA: Lens[Sidereal, RightAscension] =
+      tracking.andThen(SiderealTracking.baseRa)
+
+    /** @group Optics */
+    val baseDec: Lens[Sidereal, Declination] =
+      tracking.andThen(SiderealTracking.baseDec)
+
+    /** @group Optics */
+    val epoch: Lens[Sidereal, Epoch] =
+      tracking.andThen(SiderealTracking.epoch)
+
+    /** @group Optics */
+    val properMotion: Lens[Sidereal, Option[ProperMotion]] =
+      tracking.andThen(SiderealTracking.properMotion)
+
+    /** @group Optics */
+    val properMotionRA: Optional[Sidereal, ProperMotion.RA] =
+      properMotion.some.andThen(ProperMotion.ra)
+
+    /** @group Optics */
+    val properMotionDec: Optional[Sidereal, ProperMotion.Dec] =
+      properMotion.some.andThen(ProperMotion.dec)
+
+    /** @group Optics */
+    val sourceProfile: Lens[Sidereal, SourceProfile] =
+      Focus[Sidereal](_.sourceProfile)
+
+    /** @group Optics */
+    val integratedSpectralDefinition: Optional[Sidereal, SpectralDefinition[Integrated]] =
+      sourceProfile.andThen(SourceProfile.integratedSpectralDefinition)
+
+    /** @group Optics */
+    val surfaceSpectralDefinition: Optional[Sidereal, SpectralDefinition[Surface]] =
+      sourceProfile.andThen(SourceProfile.surfaceSpectralDefinition)
+
+    /** @group Optics */
+    val fwhm: Optional[Sidereal, Angle] =
+      sourceProfile.andThen(SourceProfile.fwhm)
+
+    /** @group Optics */
+    val integratedBandNormalizedSpectralDefinition
+      : Optional[Sidereal, SpectralDefinition.BandNormalized[Integrated]] =
+      sourceProfile.andThen(SourceProfile.integratedBandNormalizedSpectralDefinition)
+
+    /** @group Optics */
+    val surfaceBandNormalizedSpectralDefinition
+      : Optional[Sidereal, SpectralDefinition.BandNormalized[Surface]] =
+      sourceProfile.andThen(SourceProfile.surfaceBandNormalizedSpectralDefinition)
+
+    /** @group Optics */
+    val integratedEmissionLinesSpectralDefinition
+      : Optional[Sidereal, SpectralDefinition.EmissionLines[Integrated]] =
+      sourceProfile.andThen(SourceProfile.integratedEmissionLinesSpectralDefinition)
+
+    /** @group Optics */
+    val surfaceEmissionLinesSpectralDefinition
+      : Optional[Sidereal, SpectralDefinition.EmissionLines[Surface]] =
+      sourceProfile.andThen(SourceProfile.surfaceEmissionLinesSpectralDefinition)
+
+    /** @group Optics */
+    val unnormalizedSED: Optional[Sidereal, UnnormalizedSED] =
+      sourceProfile.andThen(SourceProfile.unnormalizedSED)
+
+    /** @group Optics */
+    val integratedBrightnesses: Optional[Sidereal, SortedMap[Band, BrightnessMeasure[Integrated]]] =
+      sourceProfile.andThen(SourceProfile.integratedBrightnesses)
+
+    /** @group Optics */
+    val surfaceBrightnesses: Optional[Sidereal, SortedMap[Band, BrightnessMeasure[Surface]]] =
+      sourceProfile.andThen(SourceProfile.surfaceBrightnesses)
+
+    /** @group Optics */
+    val integratedBrightnessesT: Traversal[Sidereal, BrightnessMeasure[Integrated]] =
+      sourceProfile.andThen(SourceProfile.integratedBrightnessesT)
+
+    /** @group Optics */
+    val surfaceBrightnessesT: Traversal[Sidereal, BrightnessMeasure[Surface]] =
+      sourceProfile.andThen(SourceProfile.surfaceBrightnessesT)
+
+    /** @group Optics */
+    def integratedBrightnessIn[T](
+      b: Band
+    ): Traversal[Sidereal, BrightnessMeasure[Integrated]] =
+      sourceProfile.andThen(SourceProfile.integratedBrightnessIn(b))
+
+    /** @group Optics */
+    def surfaceBrightnessIn[T](b: Band): Traversal[Sidereal, BrightnessMeasure[Surface]] =
+      sourceProfile.andThen(SourceProfile.surfaceBrightnessIn(b))
+
+    /** @group Optics */
+    val integratedWavelengthLines
+      : Optional[Sidereal, SortedMap[Wavelength, EmissionLine[Integrated]]] =
+      sourceProfile.andThen(SourceProfile.integratedWavelengthLines)
+
+    /** @group Optics */
+    val surfaceWavelengthLines: Optional[Sidereal, SortedMap[Wavelength, EmissionLine[Surface]]] =
+      sourceProfile.andThen(SourceProfile.surfaceWavelengthLines)
+
+    /** @group Optics */
+    val integratedWavelengthLinesT: Traversal[Sidereal, EmissionLine[Integrated]] =
+      sourceProfile.andThen(SourceProfile.integratedWavelengthLinesT)
+
+    /** @group Optics */
+    val surfaceWavelengthLinesT: Traversal[Sidereal, EmissionLine[Surface]] =
+      sourceProfile.andThen(SourceProfile.surfaceWavelengthLinesT)
+
+    /** @group Optics */
+    def integratedWavelengthLineIn(
+      w: Wavelength
+    ): Traversal[Sidereal, EmissionLine[Integrated]] =
+      sourceProfile.andThen(SourceProfile.integratedWavelengthLineIn(w))
+
+    /** @group Optics */
+    def surfaceWavelengthLineIn[T](w: Wavelength): Traversal[Sidereal, EmissionLine[Surface]] =
+      sourceProfile.andThen(SourceProfile.surfaceWavelengthLineIn(w))
+
+    /** @group Optics */
+    val integratedFluxDensityContinuum: Optional[
+      Sidereal,
+      Measure[PosBigDecimal] Of FluxDensityContinuum[Integrated]
+    ] = sourceProfile.andThen(SourceProfile.integratedFluxDensityContinuum)
+
+    /** @group Optics */
+    val surfaceFluxDensityContinuum: Optional[
+      Sidereal,
+      Measure[PosBigDecimal] Of FluxDensityContinuum[Surface]
+    ] = sourceProfile.andThen(SourceProfile.surfaceFluxDensityContinuum)
+
+    /** @group Optics */
+    val catalogInfo: Lens[Sidereal, Option[CatalogInfo]] =
+      Focus[Sidereal](_.catalogInfo)
+  }
+
+  trait NonsiderealOptics { this: Nonsidereal.type =>
+
+    /** @group Optics */
+    val name: Lens[Nonsidereal, NonEmptyString] =
+      Focus[Nonsidereal](_.name)
+
+    /** @group Optics */
+    val ephemerisKey: Lens[Nonsidereal, EphemerisKey] =
+      Focus[Nonsidereal](_.ephemerisKey)
+
+    val sourceProfile: Lens[Nonsidereal, SourceProfile] =
+      Focus[Nonsidereal](_.sourceProfile)
+
+    /** @group Optics */
+    val integratedSpectralDefinition: Optional[Nonsidereal, SpectralDefinition[Integrated]] =
+      sourceProfile.andThen(SourceProfile.integratedSpectralDefinition)
+
+    /** @group Optics */
+    val surfaceSpectralDefinition: Optional[Nonsidereal, SpectralDefinition[Surface]] =
+      sourceProfile.andThen(SourceProfile.surfaceSpectralDefinition)
+
+    /** @group Optics */
+    val fwhm: Optional[Nonsidereal, Angle] =
+      sourceProfile.andThen(SourceProfile.fwhm)
+
+    /** @group Optics */
+    val integratedBandNormalizedSpectralDefinition
+      : Optional[Nonsidereal, SpectralDefinition.BandNormalized[Integrated]] =
+      sourceProfile.andThen(SourceProfile.integratedBandNormalizedSpectralDefinition)
+
+    /** @group Optics */
+    val surfaceBandNormalizedSpectralDefinition
+      : Optional[Nonsidereal, SpectralDefinition.BandNormalized[Surface]] =
+      sourceProfile.andThen(SourceProfile.surfaceBandNormalizedSpectralDefinition)
+
+    /** @group Optics */
+    val integratedEmissionLinesSpectralDefinition
+      : Optional[Nonsidereal, SpectralDefinition.EmissionLines[Integrated]] =
+      sourceProfile.andThen(SourceProfile.integratedEmissionLinesSpectralDefinition)
+
+    /** @group Optics */
+    val surfaceEmissionLinesSpectralDefinition
+      : Optional[Nonsidereal, SpectralDefinition.EmissionLines[Surface]] =
+      sourceProfile.andThen(SourceProfile.surfaceEmissionLinesSpectralDefinition)
+
+    /** @group Optics */
+    val unnormalizedSED: Optional[Nonsidereal, UnnormalizedSED] =
+      sourceProfile.andThen(SourceProfile.unnormalizedSED)
+
+    /** @group Optics */
+    val integratedBrightnesses
+      : Optional[Nonsidereal, SortedMap[Band, BrightnessMeasure[Integrated]]] =
+      sourceProfile.andThen(SourceProfile.integratedBrightnesses)
+
+    /** @group Optics */
+    val surfaceBrightnesses: Optional[Nonsidereal, SortedMap[Band, BrightnessMeasure[Surface]]] =
+      sourceProfile.andThen(SourceProfile.surfaceBrightnesses)
+
+    /** @group Optics */
+    val integratedBrightnessesT: Traversal[Nonsidereal, BrightnessMeasure[Integrated]] =
+      sourceProfile.andThen(SourceProfile.integratedBrightnessesT)
+
+    /** @group Optics */
+    val surfaceBrightnessesT: Traversal[Nonsidereal, BrightnessMeasure[Surface]] =
+      sourceProfile.andThen(SourceProfile.surfaceBrightnessesT)
+
+    /** @group Optics */
+    def integratedBrightnessIn[T](
+      b: Band
+    ): Traversal[Nonsidereal, BrightnessMeasure[Integrated]] =
+      sourceProfile.andThen(SourceProfile.integratedBrightnessIn(b))
+
+    /** @group Optics */
+    def surfaceBrightnessIn[T](b: Band): Traversal[Nonsidereal, BrightnessMeasure[Surface]] =
+      sourceProfile.andThen(SourceProfile.surfaceBrightnessIn(b))
+
+    /** @group Optics */
+    val integratedWavelengthLines
+      : Optional[Nonsidereal, SortedMap[Wavelength, EmissionLine[Integrated]]] =
+      sourceProfile.andThen(SourceProfile.integratedWavelengthLines)
+
+    /** @group Optics */
+    val surfaceWavelengthLines
+      : Optional[Nonsidereal, SortedMap[Wavelength, EmissionLine[Surface]]] =
+      sourceProfile.andThen(SourceProfile.surfaceWavelengthLines)
+
+    /** @group Optics */
+    val integratedWavelengthLinesT: Traversal[Nonsidereal, EmissionLine[Integrated]] =
+      sourceProfile.andThen(SourceProfile.integratedWavelengthLinesT)
+
+    /** @group Optics */
+    val surfaceWavelengthLinesT: Traversal[Nonsidereal, EmissionLine[Surface]] =
+      sourceProfile.andThen(SourceProfile.surfaceWavelengthLinesT)
+
+    /** @group Optics */
+    def integratedWavelengthLineIn(
+      w: Wavelength
+    ): Traversal[Nonsidereal, EmissionLine[Integrated]] =
+      sourceProfile.andThen(SourceProfile.integratedWavelengthLineIn(w))
+
+    /** @group Optics */
+    def surfaceWavelengthLineIn[T](w: Wavelength): Traversal[Nonsidereal, EmissionLine[Surface]] =
+      sourceProfile.andThen(SourceProfile.surfaceWavelengthLineIn(w))
+
+    /** @group Optics */
+    val integratedFluxDensityContinuum: Optional[
+      Nonsidereal,
+      Measure[PosBigDecimal] Of FluxDensityContinuum[Integrated]
+    ] = sourceProfile.andThen(SourceProfile.integratedFluxDensityContinuum)
+
+    /** @group Optics */
+    val surfaceFluxDensityContinuum: Optional[
+      Nonsidereal,
+      Measure[PosBigDecimal] Of FluxDensityContinuum[Surface]
+    ] = sourceProfile.andThen(SourceProfile.surfaceFluxDensityContinuum)
+  }
 }
 
-trait TargetOptics {
+trait TargetOptics { this: Target.type =>
 
   /** @group Optics */
-  lazy val name: Lens[Target, NonEmptyString] =
-    GenLens[Target](_.name)
+  val sidereal: Prism[Target, Target.Sidereal] = GenPrism[Target, Target.Sidereal]
 
   /** @group Optics */
-  lazy val track: Lens[Target, Either[EphemerisKey, SiderealTracking]] =
-    GenLens[Target](_.track)
+  val nonsidereal: Prism[Target, Target.Nonsidereal] = GenPrism[Target, Target.Nonsidereal]
 
   /** @group Optics */
-  lazy val ephemerisKey: Optional[Target, EphemerisKey] =
-    track.composePrism(stdLeft)
+  val name: Lens[Target, NonEmptyString] =
+    Lens[Target, NonEmptyString](_.name)(v => {
+      case t @ Target.Sidereal(_, _, _, _) => Target.Sidereal.name.replace(v)(t)
+      case t @ Target.Nonsidereal(_, _, _) => Target.Nonsidereal.name.replace(v)(t)
+    })
 
   /** @group Optics */
-  lazy val siderealTracking: Optional[Target, SiderealTracking] =
-    track.composePrism(stdRight)
+  val ephemerisKey: Optional[Target, EphemerisKey] =
+    nonsidereal.andThen(Nonsidereal.ephemerisKey)
 
   /** @group Optics */
-  lazy val magnitudes: Lens[Target, SortedMap[MagnitudeBand, Magnitude]] =
-    GenLens[Target](_.magnitudes)
+  val siderealTracking: Optional[Target, SiderealTracking] =
+    sidereal.andThen(Sidereal.tracking)
 
   /** @group Optics */
-  lazy val magnitudesT: Traversal[Target, Magnitude] =
-    magnitudes.composeTraversal(mapEach(Order[MagnitudeBand]).each)
+  val sourceProfile: Lens[Target, SourceProfile] =
+    Lens[Target, SourceProfile](_.sourceProfile)(v => {
+      case t @ Target.Sidereal(_, _, _, _) => Target.Sidereal.sourceProfile.replace(v)(t)
+      case t @ Target.Nonsidereal(_, _, _) => Target.Nonsidereal.sourceProfile.replace(v)(t)
+    })
 
   /** @group Optics */
-  def magnitudeIn(b: MagnitudeBand): Traversal[Target, Magnitude] =
-    magnitudes
-      .composeTraversal(
-        FilterIndex
-          .sortedMapFilterIndex(Order[MagnitudeBand])
-          .filterIndex(_ === b)
-      )
+  val integratedSpectralDefinition: Optional[Target, SpectralDefinition[Integrated]] =
+    sourceProfile.andThen(SourceProfile.integratedSpectralDefinition)
 
   /** @group Optics */
-  lazy val parallax: Optional[Target, Option[Parallax]] =
-    siderealTracking.composeLens(SiderealTracking.parallax)
+  val surfaceSpectralDefinition: Optional[Target, SpectralDefinition[Surface]] =
+    sourceProfile.andThen(SourceProfile.surfaceSpectralDefinition)
 
   /** @group Optics */
-  lazy val radialVelocity: Optional[Target, Option[RadialVelocity]] =
-    siderealTracking.composeLens(SiderealTracking.radialVelocity)
+  val fwhm: Optional[Target, Angle] =
+    sourceProfile.andThen(SourceProfile.fwhm)
 
   /** @group Optics */
-  lazy val baseCoordinates: Optional[Target, Coordinates] =
-    siderealTracking.composeLens(SiderealTracking.baseCoordinates)
+  val integratedBandNormalizedSpectralDefinition
+    : Optional[Target, SpectralDefinition.BandNormalized[Integrated]] =
+    sourceProfile.andThen(SourceProfile.integratedBandNormalizedSpectralDefinition)
 
   /** @group Optics */
-  lazy val baseRA: Optional[Target, RightAscension] =
-    baseCoordinates.composeLens(Coordinates.rightAscension)
+  val surfaceBandNormalizedSpectralDefinition
+    : Optional[Target, SpectralDefinition.BandNormalized[Surface]] =
+    sourceProfile.andThen(SourceProfile.surfaceBandNormalizedSpectralDefinition)
 
   /** @group Optics */
-  lazy val baseDec: Optional[Target, Declination] =
-    baseCoordinates.composeLens(Coordinates.declination)
+  val integratedEmissionLinesSpectralDefinition
+    : Optional[Target, SpectralDefinition.EmissionLines[Integrated]] =
+    sourceProfile.andThen(SourceProfile.integratedEmissionLinesSpectralDefinition)
 
   /** @group Optics */
-  lazy val properMotion =
-    siderealTracking.composeOptional(SiderealTracking.properMotion.composePrism(option.some))
+  val surfaceEmissionLinesSpectralDefinition
+    : Optional[Target, SpectralDefinition.EmissionLines[Surface]] =
+    sourceProfile.andThen(SourceProfile.surfaceEmissionLinesSpectralDefinition)
 
   /** @group Optics */
-  lazy val properMotionRA = properMotion.composeLens(ProperMotion.ra)
+  val unnormalizedSED: Optional[Target, UnnormalizedSED] =
+    sourceProfile.andThen(SourceProfile.unnormalizedSED)
 
   /** @group Optics */
-  lazy val properMotionDec = properMotion.composeLens(ProperMotion.dec)
+  val integratedBrightnesses: Optional[Target, SortedMap[Band, BrightnessMeasure[Integrated]]] =
+    sourceProfile.andThen(SourceProfile.integratedBrightnesses)
 
+  /** @group Optics */
+  val surfaceBrightnesses: Optional[Target, SortedMap[Band, BrightnessMeasure[Surface]]] =
+    sourceProfile.andThen(SourceProfile.surfaceBrightnesses)
+
+  /** @group Optics */
+  val integratedBrightnessesT: Traversal[Target, BrightnessMeasure[Integrated]] =
+    sourceProfile.andThen(SourceProfile.integratedBrightnessesT)
+
+  /** @group Optics */
+  val surfaceBrightnessesT: Traversal[Target, BrightnessMeasure[Surface]] =
+    sourceProfile.andThen(SourceProfile.surfaceBrightnessesT)
+
+  /** @group Optics */
+  def integratedBrightnessIn[T](
+    b: Band
+  ): Traversal[Target, BrightnessMeasure[Integrated]] =
+    sourceProfile.andThen(SourceProfile.integratedBrightnessIn(b))
+
+  /** @group Optics */
+  def surfaceBrightnessIn[T](b: Band): Traversal[Target, BrightnessMeasure[Surface]] =
+    sourceProfile.andThen(SourceProfile.surfaceBrightnessIn(b))
+
+  /** @group Optics */
+  val integratedWavelengthLines: Optional[Target, SortedMap[Wavelength, EmissionLine[Integrated]]] =
+    sourceProfile.andThen(SourceProfile.integratedWavelengthLines)
+
+  /** @group Optics */
+  val surfaceWavelengthLines: Optional[Target, SortedMap[Wavelength, EmissionLine[Surface]]] =
+    sourceProfile.andThen(SourceProfile.surfaceWavelengthLines)
+
+  /** @group Optics */
+  val integratedWavelengthLinesT: Traversal[Target, EmissionLine[Integrated]] =
+    sourceProfile.andThen(SourceProfile.integratedWavelengthLinesT)
+
+  /** @group Optics */
+  val surfaceWavelengthLinesT: Traversal[Target, EmissionLine[Surface]] =
+    sourceProfile.andThen(SourceProfile.surfaceWavelengthLinesT)
+
+  /** @group Optics */
+  def integratedWavelengthLineIn(
+    w: Wavelength
+  ): Traversal[Target, EmissionLine[Integrated]] =
+    sourceProfile.andThen(SourceProfile.integratedWavelengthLineIn(w))
+
+  /** @group Optics */
+  def surfaceWavelengthLineIn[T](w: Wavelength): Traversal[Target, EmissionLine[Surface]] =
+    sourceProfile.andThen(SourceProfile.surfaceWavelengthLineIn(w))
+
+  /** @group Optics */
+  val integratedFluxDensityContinuum: Optional[
+    Target,
+    Measure[PosBigDecimal] Of FluxDensityContinuum[Integrated]
+  ] = sourceProfile.andThen(SourceProfile.integratedFluxDensityContinuum)
+
+  /** @group Optics */
+  val surfaceFluxDensityContinuum: Optional[
+    Target,
+    Measure[PosBigDecimal] Of FluxDensityContinuum[Surface]
+  ] = sourceProfile.andThen(SourceProfile.surfaceFluxDensityContinuum)
+
+  /** @group Optics */
+  val parallax: Optional[Target, Option[Parallax]] =
+    siderealTracking.andThen(SiderealTracking.parallax)
+
+  /** @group Optics */
+  val radialVelocity: Optional[Target, Option[RadialVelocity]] =
+    siderealTracking.andThen(SiderealTracking.radialVelocity)
+
+  /** @group Optics */
+  val baseCoordinates: Optional[Target, Coordinates] =
+    siderealTracking.andThen(SiderealTracking.baseCoordinates)
+
+  /** @group Optics */
+  val baseRA: Optional[Target, RightAscension] =
+    siderealTracking.andThen(SiderealTracking.baseRa)
+
+  /** @group Optics */
+  val baseDec: Optional[Target, Declination] =
+    siderealTracking.andThen(SiderealTracking.baseDec)
+
+  /** @group Optics */
+  val epoch: Optional[Target, Epoch] =
+    sidereal.andThen(Sidereal.epoch)
+
+  /** @group Optics */
+  val properMotion: Optional[Target, Option[ProperMotion]] =
+    sidereal.andThen(Sidereal.properMotion)
+
+  /** @group Optics */
+  val properMotionRA: Optional[Target, ProperMotion.RA] =
+    sidereal.andThen(Sidereal.properMotionRA)
+
+  /** @group Optics */
+  val properMotionDec: Optional[Target, ProperMotion.Dec] =
+    sidereal.andThen(Sidereal.properMotionDec)
+
+  /** @group Optics */
+  val catalogInfo: Optional[Target, Option[CatalogInfo]] =
+    sidereal.andThen(Sidereal.catalogInfo)
 }

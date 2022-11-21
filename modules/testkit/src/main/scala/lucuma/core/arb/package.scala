@@ -1,14 +1,14 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core
-
-import scala.collection.immutable.TreeMap
 
 import cats.Applicative
 import eu.timepit.refined.types.numeric.NonNegInt
 import eu.timepit.refined.types.string.NonEmptyString
 import org.scalacheck._
+
+import scala.collection.immutable.TreeMap
 
 package object arb {
 

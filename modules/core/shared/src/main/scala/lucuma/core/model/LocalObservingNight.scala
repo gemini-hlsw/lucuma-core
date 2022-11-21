@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.model
@@ -6,12 +6,13 @@ package lucuma.core.model
 import cats._
 import cats.data.Validated
 import cats.syntax.all._
-import lucuma.core.enum.Site
-import java.time._
-import java.time.format.DateTimeFormatter
+import lucuma.core.enums.Site
 import monocle.Iso
 import monocle.macros.GenIso
-import io.chrisdavenport.cats.time._
+import org.typelevel.cats.time._
+
+import java.time._
+import java.time.format.DateTimeFormatter
 
 /**
  * A local observing night is defined as the period of time starting at 14:00

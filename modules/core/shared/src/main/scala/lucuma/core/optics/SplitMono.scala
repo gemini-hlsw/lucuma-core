@@ -1,11 +1,13 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.optics
 
 import cats.Functor
 import cats.arrow.Category
-import monocle.{ Fold, Getter, Iso }
+import monocle.Fold
+import monocle.Getter
+import monocle.Iso
 
 /**
  * A split monomorphism, which we can think of as a weaker `Iso[A, B]` where `A` is a ''smaller''
@@ -36,15 +38,15 @@ final case class SplitMono[A, B](get: A => B, reverseGet: B => A) {
     SplitEpi(reverseGet, get)
 
   /** Compose with another SplitMono. */
-  def composeSplitMono[C](f: SplitMono[B, C]): SplitMono[A, C] =
+  def andThen[C](f: SplitMono[B, C]): SplitMono[A, C] =
     SplitMono(get.andThen(f.get), reverseGet.compose(f.reverseGet))
 
   /** Compose with another SplitEpi. */
-  def composeSplitEpi[C](f: SplitEpi[B, C]): Wedge[A, C] =
+  def andThen[C](f: SplitEpi[B, C]): Wedge[A, C] =
     Wedge(get.andThen(f.get), reverseGet.compose(f.reverseGet))
 
   /** Compose with an Iso. */
-  def composeIso[C](f: Iso[B, C]): SplitMono[A, C] =
+  def andThen[C](f: Iso[B, C]): SplitMono[A, C] =
     SplitMono(get.andThen(f.get), reverseGet.compose(f.reverseGet))
 
   /** View this SplitEpi as a Fold. */
@@ -58,14 +60,6 @@ final case class SplitMono[A, B](get: A => B, reverseGet: B => A) {
   /** View this SplitMono as a Wedge. */
   def asWedge: Wedge[A, B] =
     Wedge(get, reverseGet)
-
-  /** Alias to composeSplitMono. */
-  def ^<-![C](f: SplitMono[B, C]): SplitMono[A, C] =
-    composeSplitMono(f)
-
-  /** Alias to composeIso. */
-  def ^<->[C](f: Iso[B, C]): SplitMono[A, C] =
-    composeIso(f)
 
   /** SplitMono is an invariant functor over A. */
   def imapA[C](f: A => C, g: C => A): SplitMono[C, B] =
@@ -94,7 +88,7 @@ object SplitMono {
   implicit def SplitMonoCategory: Category[SplitMono] =
     new Category[SplitMono] {
       def id[A]: SplitMono[A, A] = SplitMono(identity, identity)
-      def compose[A, B, C](f: SplitMono[B, C], g: SplitMono[A, B]): SplitMono[A, C] = g ^<-! f
+      def compose[A, B, C](f: SplitMono[B, C], g: SplitMono[A, B]): SplitMono[A, C] = g.andThen(f)
     }
 
 }

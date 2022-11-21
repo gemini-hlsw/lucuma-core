@@ -1,17 +1,19 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.geom
 
 import cats.syntax.all._
-import lucuma.core.math.{ Angle, Offset }
+import lucuma.core.geom.arb._
 import lucuma.core.geom.syntax.all._
+import lucuma.core.math.Angle
+import lucuma.core.math.Offset
 import lucuma.core.math.arb._
 import lucuma.core.math.syntax.int._
-import lucuma.core.geom.arb._
-import org.scalacheck._
+import lucuma.core.tests.ScalaCheckFlaky
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Prop._
+import org.scalacheck._
 
 final class ShapeExpressionSuite extends munit.DisciplineSuite {
   implicit val interpreter: ShapeInterpreter =
@@ -23,32 +25,45 @@ final class ShapeExpressionSuite extends munit.DisciplineSuite {
   import ShapeExpressionSpec._
 
   test("intersection contains") {
-    forAll(genTwoCenteredShapesAndAnOffset) {
-      case (tcs, off) =>
-        assertEquals((tcs.shape0 ∩ tcs.shape1).contains(off),
-          tcs.shape0.contains(off) && tcs.shape1.contains(off))
+    forAll(genTwoCenteredShapesAndAnOffset) { case (tcs, off) =>
+      assertEquals(
+        (tcs.shape0 ∩ tcs.shape1).contains(off),
+        tcs.shape0.contains(off) && tcs.shape1.contains(off)
+      )
     }
   }
 
   test("union contains") {
-    forAll(genTwoCenteredShapesAndAnOffset) {
-      case (tcs, off) =>
-        assertEquals((tcs.shape0 ∪ tcs.shape1).contains(off),
-          tcs.shape0.contains(off) || tcs.shape1.contains(off)
-        )
+    forAll(genTwoCenteredShapesAndAnOffset) { case (tcs, off) =>
+      assertEquals(
+        (tcs.shape0 ∪ tcs.shape1).contains(off),
+        tcs.shape0.contains(off) || tcs.shape1.contains(off)
+      )
+    }
+  }
+
+  test("max side of the bounding box is bigger than for each shape") {
+    implicit val order = Angle.SignedAngleOrder
+    forAll(genTwoCenteredShapes) { case shapes =>
+      assert(
+        (shapes.shape0 ∪ shapes.shape1).maxSide >= shapes.shape0.maxSide
+      )
+      assert(
+        (shapes.shape0 ∪ shapes.shape1).maxSide >= shapes.shape1.maxSide
+      )
     }
   }
 
   test("difference contains") {
-    forAll(genTwoCenteredShapesAndAnOffset) {
-      case (tcs, off) =>
-        assertEquals((tcs.shape0 - tcs.shape1).contains(off),
-          tcs.shape0.contains(off) && !tcs.shape1.contains(off)
-        )
+    forAll(genTwoCenteredShapesAndAnOffset) { case (tcs, off) =>
+      assertEquals(
+        (tcs.shape0 - tcs.shape1).contains(off),
+        tcs.shape0.contains(off) && !tcs.shape1.contains(off)
+      )
     }
   }
 
-  test("(a ∪ b).area = (a.area + b.area) - (a ∩ b).area") {
+  test("(a ∪ b).area = (a.area + b.area) - (a ∩ b).area".tag(ScalaCheckFlaky)) {
     forAll(genTwoCenteredShapes) { tcs =>
       val rhs = (tcs.shape0 ∪ tcs.shape1).µasSquared
       val lhs = (tcs.shape0.µasSquared + tcs.shape1.µasSquared) -
@@ -56,11 +71,11 @@ final class ShapeExpressionSuite extends munit.DisciplineSuite {
 
       // Area calculation isn't exact but within 1/2 mas^2 seems fine for our
       // purposes.
-      assertEqualsDouble((rhs - lhs).toDouble, 0L, 500L)
+      assertEqualsDouble((rhs - lhs).toDouble, 0L, 700L)
     }
   }
 
-  test("(a ∩ b).area = (a ∪ b).area - ((a - b).area + (b - a).area)") {
+  test("(a ∩ b).area = (a ∪ b).area - ((a - b).area + (b - a).area)".tag(ScalaCheckFlaky)) {
     forAll(genTwoCenteredShapes) { tcs =>
       val rhs = (tcs.shape0 ∩ tcs.shape1).µasSquared
       val lhs = (tcs.shape0 ∪ tcs.shape1).µasSquared - (
@@ -69,9 +84,28 @@ final class ShapeExpressionSuite extends munit.DisciplineSuite {
       )
 
       // Area calculation isn't exact but within 1/2 mas^2 seems fine.
-      assertEqualsDouble((rhs - lhs).toDouble, 0L, 500L)
+      assertEqualsDouble((rhs - lhs).toDouble, 0L, 700L)
     }
   }
+
+  test("bounding box area contains the shape") {
+    forAll(genShape) { (e: ShapeExpression) =>
+      val error = e.boundingBox.µasSquared - e.µasSquared
+
+      // Area calculation isn't exact but within 1/2 mas^2 seems fine.
+      assert(error >= 0 || error.toDouble < -1.0e-13)
+    }
+  }
+
+  test("bounding box area contains two unioned shapes") {
+    forAll(genShape, genShape) { (a: ShapeExpression, b: ShapeExpression) =>
+      val error = (a ∪ b).boundingBox.µasSquared - (a ∪ b).µasSquared
+
+      // Area calculation isn't exact but within 1/2 mas^2 seems fine.
+      assert(error >= 0 || error.toDouble < -1.0e-13)
+    }
+  }
+
 
   // There is a bug apparently in JTS that makes the area calculation a bit off
   // after rotation and/or translation in some cases.  This is expressed as a

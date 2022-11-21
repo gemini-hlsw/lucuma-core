@@ -1,16 +1,18 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.model
 
-import lucuma.core.enum.Site
-import lucuma.core.math.Interval
-import lucuma.core.enum.TwilightType
-
 import cats._
-import java.time._
+import lucuma.core.enums.Site
+import lucuma.core.enums.TwilightType
+import lucuma.core.syntax.boundedInterval._
+import monocle.Focus
 import monocle.Lens
-import monocle.macros.GenLens
+import org.typelevel.cats.time._
+import spire.math.Bounded
+
+import java.time._
 
 /**
  * An observing night is defined as the period of time from 14:00 on one day
@@ -25,28 +27,29 @@ final case class ObservingNight(site: Site, toLocalObservingNight: LocalObservin
 
   /**
    * Constructs a [[TwilightBoundedNight]] for this observing night
-   * according to the specified [[lucuma.core.enum.TwilightType]].
+   * according to the specified [[lucuma.core.enums.TwilightType]].
    *
    * Returns None if there's no sunset or sunrise for the specified
-   * [[lucuma.core.enum.TwilightType]].
+   * [[lucuma.core.enums.TwilightType]].
    */
   def twilightBounded(twilightType: TwilightType): Option[TwilightBoundedNight] =
     TwilightBoundedNight.fromTwilightTypeAndObservingNight(twilightType, this)
 
   /**
    * Constructs a [[TwilightBoundedNight]] for this observing night
-   * according to the specified [[lucuma.core.enum.TwilightType]].
+   * according to the specified [[lucuma.core.enums.TwilightType]].
    *
    * Throws and exeception if there's no sunset or sunrise for the specified
-   * [[lucuma.core.enum.TwilightType]].
+   * [[lucuma.core.enums.TwilightType]].
    */
   def twilightBoundedUnsafe(twilightType: TwilightType): TwilightBoundedNight =
     twilightBounded(twilightType).get
 
   /** The `Interval`for the the observing night at the associated site. */
-  override lazy val interval: Interval =
-    Interval.unsafe(toLocalObservingNight.start.atZone(site.timezone).toInstant,
-                    toLocalObservingNight.end.atZone(site.timezone).toInstant
+  override lazy val interval: Bounded[Instant] =
+    Bounded.unsafeOpenUpper(
+      toLocalObservingNight.start.atZone(site.timezone).toInstant,
+      toLocalObservingNight.end.atZone(site.timezone).toInstant
     )
 
   /** The previous observing night. */
@@ -108,14 +111,14 @@ trait ObservingNightOptics {
 
   /** @group Optics */
   val site: Lens[ObservingNight, Site] =
-    GenLens[ObservingNight](_.site)
+    Focus[ObservingNight](_.site)
 
   /** @group Optics */
   val localObservingNight: Lens[ObservingNight, LocalObservingNight] =
-    GenLens[ObservingNight](_.toLocalObservingNight)
+    Focus[ObservingNight](_.toLocalObservingNight)
 
   /** @group Optics */
   val localDate: Lens[ObservingNight, LocalDate] =
-    localObservingNight.composeIso(LocalObservingNight.localDate)
+    localObservingNight.andThen(LocalObservingNight.localDate)
 
 }

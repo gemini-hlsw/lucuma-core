@@ -1,23 +1,21 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.util
 
-import lucuma.core.util.Timestamp
-import lucuma.core.util.arb.ArbTimestamp._
+import cats.kernel.laws.discipline._
 import lucuma.core.arb.ArbTime._
 import lucuma.core.optics.laws.discipline._
-import cats.kernel.laws.discipline._
-import io.chrisdavenport.cats.time._
-
-import java.time.ZonedDateTime
-import java.time.ZoneOffset.UTC
-
-import org.scalacheck.Prop._
-import org.scalacheck.Gen
-import org.scalacheck.Arbitrary
-
+import lucuma.core.util.Timestamp
+import lucuma.core.util.arb.ArbTimestamp._
 import munit._
+import org.scalacheck.Arbitrary
+import org.scalacheck.Gen
+import org.scalacheck.Prop._
+import org.typelevel.cats.time._
+
+import java.time.ZoneOffset.UTC
+import java.time.ZonedDateTime
 
 final class TimestampSuite extends DisciplineSuite {
 

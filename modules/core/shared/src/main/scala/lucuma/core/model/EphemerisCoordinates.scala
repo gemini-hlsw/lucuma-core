@@ -1,13 +1,12 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.model
 
-import lucuma.core.math._
-
 import cats._
+import lucuma.core.math._
+import monocle.Focus
 import monocle.Lens
-import monocle.macros.GenLens
 
 /** A coordinate along with a rate of change in RA and Dec for some time unit,
   * expressed as an offset in p and q.  In reality the velocity information
@@ -27,7 +26,7 @@ final case class EphemerisCoordinates(
   def interpolate(that: EphemerisCoordinates, f: Double): EphemerisCoordinates = {
     def interpolateAngle(a: Angle, b: Angle): Angle =
       Angle.fromMicroarcseconds(
-        (Angle.signedMicroarcseconds.get(a).toDouble * (1 - f) + Angle.signedMicroarcseconds.get(b) * f).round
+        (Angle.signedMicroarcseconds.get(a).toDouble * (1 - f) + Angle.signedMicroarcseconds.get( b) * f).round
       )
 
     val coordʹ = coord.interpolate(that.coord, f)
@@ -58,26 +57,26 @@ trait EphemerisCoordinatesOptics {
 
   /** @group Optics */
   val coordinates: Lens[EphemerisCoordinates, Coordinates] =
-    GenLens[EphemerisCoordinates](_.coord)
+    Focus[EphemerisCoordinates](_.coord)
 
   /** @group Optics */
   val delta: Lens[EphemerisCoordinates, Offset] =
-    GenLens[EphemerisCoordinates](_.delta)
+    Focus[EphemerisCoordinates](_.delta)
 
   /** @group Optics */
   val rightAscension: Lens[EphemerisCoordinates, RightAscension] =
-    coordinates composeLens Coordinates.rightAscension
+    coordinates.andThen(Coordinates.rightAscension)
 
   /** @group Optics */
   val declination: Lens[EphemerisCoordinates, Declination] =
-    coordinates composeLens Coordinates.declination
+    coordinates.andThen(Coordinates.declination)
 
   /** @group Optics */
   val deltaP: Lens[EphemerisCoordinates, Offset.P] =
-    delta composeLens Offset.p
+    delta.andThen(Offset.p)
 
   /** @group Optics */
   val deltaQ: Lens[EphemerisCoordinates, Offset.Q] =
-    delta composeLens Offset.q
+    delta.andThen(Offset.q)
 
 }

@@ -1,23 +1,24 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.math.skycalc.solver
 
+import cats.InvariantSemigroupal
 import cats.syntax.all._
-import java.time.Duration
-import java.time.Instant
-import lucuma.core.math.Declination
 import lucuma.core.math.Angle
+import lucuma.core.math.Declination
 import lucuma.core.math.HourAngle
-import lucuma.core.optics.Wedge
+import lucuma.core.optics.Spire._
 import lucuma.core.optics.SplitEpi
 import lucuma.core.optics.SplitMono
+import lucuma.core.optics.Wedge
+import monocle.Iso
+import org.typelevel.cats.time._
 import spire.math.Number
 import spire.math.Rational
-import monocle.Iso
-import lucuma.core.optics.Spire._
-import io.chrisdavenport.cats.time._
-import cats.InvariantSemigroupal
+
+import java.time.Duration
+import java.time.Instant
 
 object RoundStrategy {
   type Closest

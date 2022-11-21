@@ -1,19 +1,20 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.math.skycalc
 
+import lucuma.core.math.Constants._
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Place
-import lucuma.core.math.Constants._
+
 import java.time.Instant
 import java.time.ZonedDateTime
 
 /**
-  * Improved version of SkyCalc that supports lunar calculations. All instance stuff is here;
-  * the trait is exclusively static stuff.
-  * @author brighton, rnorris
-  */
+ * Improved version of SkyCalc that supports lunar calculations. All instance stuff is here;
+ * the trait is exclusively static stuff.
+ * @author brighton, rnorris
+ */
 case class ImprovedSkyCalc(place: Place) extends ImprovedSkyCalcMethods {
   val degreesLatitude = place.latitude.toAngle.toSignedDoubleDegrees
   val hoursLongitude  = -place.longitude.toSignedDoubleDegrees / 15
@@ -146,10 +147,8 @@ case class ImprovedSkyCalc(place: Place) extends ImprovedSkyCalcMethods {
       lunarElevation = altit(decmoon.d, sid - ramoon.d, degreesLatitude, az, new DoubleRef)
       // Sky brightness
       lunarSkyBrightness = null
-      lunarDistance =
-        DegsInRadian * subtend(ramoon.d, decmoon.d, objra, objdec)
-      lunarPhaseAngle =
-        DegsInRadian * subtend(ramoon.d, decmoon.d, toporasun.d, topodecsun.d)
+      lunarDistance = DegsInRadian * subtend(ramoon.d, decmoon.d, objra, objdec)
+      lunarPhaseAngle = DegsInRadian * subtend(ramoon.d, decmoon.d, toporasun.d, topodecsun.d)
       if (lunarElevation > -2.0)
         if ((lunarElevation > 0.0) && (altitude > 0.5) && (sunAltitude < -9.0))
           lunarSkyBrightness = lunskybright(
@@ -165,7 +164,8 @@ case class ImprovedSkyCalc(place: Place) extends ImprovedSkyCalcMethods {
         lunarDistance,
         90.0 - lunarElevation,
         90.0 - altitude,
-        90.0 - sunAltitude
+        90.0 - sunAltitude,
+        distmoon.d
       )
       lunarIlluminatedFraction = (0.5 * (1.0 - Math.cos(
         subtend(ramoon.d, decmoon.d, rasun.d, decsun.d)
@@ -191,11 +191,18 @@ case class ImprovedSkyCalc(place: Place) extends ImprovedSkyCalcMethods {
   }
 
   /**
-    * Return the LST time for the given instant at the given site.
-    */
+   * Return the sidereal time for the given instant at the given site, in decimal hours.
+   */
+  def getSiderealTime(instant: Instant): Double = {
+    val jd = instant_to_jd(instant)
+    lst(jd, hoursLongitude)
+  }
+
+  /**
+   * Return the LST time for the given instant at the given site.
+   */
   def getLst(instant: Instant): ZonedDateTime = {
-    val jd       = instant_to_jd(instant)
-    val lstHours = lst(jd, hoursLongitude)
+    val lstHours = getSiderealTime(instant)
     getLst(lstHours, instant)
   }
 }

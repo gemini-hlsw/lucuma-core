@@ -1,18 +1,19 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.math.arb
 
 import cats.Eval
-import java.time.Instant
-import org.scalacheck.Gen
-import org.scalacheck.Arbitrary
-import org.scalacheck.Arbitrary._
-import lucuma.core.math.skycalc.solver.Samples
-import scala.collection.immutable.TreeMap
 import lucuma.core.arb.ArbEval
 import lucuma.core.arb.ArbTime
+import lucuma.core.math.skycalc.solver.Samples
+import org.scalacheck.Arbitrary
+import org.scalacheck.Arbitrary._
 import org.scalacheck.Cogen
+import org.scalacheck.Gen
+
+import java.time.Instant
+import scala.collection.immutable.TreeMap
 
 trait ArbSamples {
   import ArbEval._

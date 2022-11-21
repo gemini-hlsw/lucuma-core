@@ -1,16 +1,20 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.math
 
-import cats.{ Order, Show }
+import cats.Order
+import cats.Show
 import cats.kernel.CommutativeGroup
 import cats.syntax.all._
 import lucuma.core.optics.SplitMono
-import monocle.{ Iso, Lens }
-import monocle.macros.{ GenIso, GenLens }
+import monocle.Focus
+import monocle.Iso
+import monocle.Lens
+import monocle.macros.GenIso
 
-import scala.math.{ cos, sin }
+import scala.math.cos
+import scala.math.sin
 
 object Axis {
   type P
@@ -173,19 +177,19 @@ trait OffsetOptics {
 
   /** @group Optics */
   val p: Lens[Offset, Offset.Component[Axis.P]] =
-    GenLens[Offset](_.p)
+    Focus[Offset](_.p)
 
   /** @group Optics */
   val q: Lens[Offset, Offset.Component[Axis.Q]] =
-    GenLens[Offset](_.q)
+    Focus[Offset](_.q)
 
   /** @group Optics */
   val pAngle: Lens[Offset, Angle] =
-    p.composeIso(Offset.Component.angle[Axis.P])
+    p.andThen(Offset.Component.angle[Axis.P])
 
   /** @group Optics */
   val qAngle: Lens[Offset, Angle] =
-    q.composeIso(Offset.Component.angle[Axis.Q])
+    q.andThen(Offset.Component.angle[Axis.Q])
 
   private def splitMonoFromAngleSplitMono[A](m: SplitMono[Angle, A]): SplitMono[Offset, (A, A)] =
     SplitMono(

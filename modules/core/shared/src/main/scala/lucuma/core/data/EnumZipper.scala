@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma
@@ -6,8 +6,8 @@ package core
 package data
 
 import cats.kernel.Eq
-import lucuma.core.util.Enumerated
 import cats.syntax.all._
+import lucuma.core.util.Enumerated
 
 class EnumZipper[A] private (lefts: List[A], focus: A, rights: List[A])
     extends Zipper[A](lefts: List[A], focus: A, rights: List[A])

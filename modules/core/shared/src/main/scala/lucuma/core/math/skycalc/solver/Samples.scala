@@ -1,17 +1,25 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.math.skycalc
 package solver
 
+import cats.Eq
+import cats.Eval
+import cats.Functor
+import cats.MonoidK
 import cats.syntax.all._
-import cats.{ Eq, Eval, Functor, MonoidK }
-import java.time.{ Duration, Instant }
-import lucuma.core.math.{ Coordinates, Interval, Place }
+import lucuma.core.math.Coordinates
+import lucuma.core.math.Place
+import lucuma.core.optics.Spire
 import lucuma.core.syntax.time._
-import scala.collection.immutable.TreeMap
 import monocle.Iso
-import io.chrisdavenport.cats.time._
+import org.typelevel.cats.time._
+import spire.math.Bounded
+
+import java.time.Duration
+import java.time.Instant
+import scala.collection.immutable.TreeMap
 
 /**
  * A set of samples, keyed by `Instant`. Samples are lazy and must be forced by the user, and
@@ -29,11 +37,11 @@ trait Samples[A] { outer =>
   protected val data: TreeMap[Instant, Eval[P]]
   protected val k: (Instant, P) => Eval[A]
 
-  /** The [[Interval]] covered by the samples. Note: change this to a closed Interval when we switch to Spire. */
-  def interval: Option[Interval] =
+  /** The `Bounded[Instant]` covered by the samples. */
+  def interval: Option[Bounded[Instant]] =
     (data.headOption, data.lastOption)
       .bimap(_.map(_._1), _.map(_._1))
-      .mapN(Interval.apply)
+      .mapN(Function.untupled(Spire.closedIntervalFromTuple[Instant].getOption))
       .flatten
 
   /** The value at `i`, if any. */
@@ -46,6 +54,13 @@ trait Samples[A] { outer =>
    */
   lazy val toMap: TreeMap[Instant, Eval[A]] =
     data.map { case (i, ep) => (i, ep.flatMap(k(i, _))) }
+
+  /**
+   * Iterator for samples, which are computed dynamically while the iterator is traversed.
+   */
+  def iterator: Iterator[(Instant, A)]      = data.iterator.map { case (i, ep) =>
+    (i, ep.flatMap(k(i, _)).value)
+  }
 
   /**
    * Split the samples at `i`, yielding a `Lookup` containing the matching sample, if any, and all
@@ -149,15 +164,15 @@ object Samples extends SamplesOptics {
     }
 
   /** Construct a `Samples` with a single sample. */
-  def single[A](instant:       Instant, value: => A): Samples[A] =
+  def single[A](instant:       Instant, value:         => A): Samples[A] =
     fromMap(TreeMap(instant -> Eval.later(value)))
 
   /** Construct a `Samples` across an interval, sampled at the given rate. */
-  def atFixedRate[A](interval: Interval, rate: Duration)(f: Instant => A): Samples[A] =
+  def atFixedRate[A](interval: Bounded[Instant], rate: Duration)(f: Instant => A): Samples[A] =
     fromMap(
       Iterator
-        .iterate(interval.start)(_ + rate)
-        .takeWhile(_ < interval.end + rate)
+        .iterate(interval.lower)(_ + rate)
+        .takeWhile(_ < interval.upper + rate)
         .map(i => (i, Eval.later(f(i))))
         .to(TreeMap)
     )

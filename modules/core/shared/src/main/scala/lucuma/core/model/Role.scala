@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.model
@@ -6,10 +6,11 @@ package lucuma.core.model
 import cats.Eq
 import cats.implicits._
 import eu.timepit.refined.auto._
+import lucuma.core.util.WithGid
 
 /**
- * Each user has a current `Role` and a set of other roles they may assume. A role has (at least)
- * an `Access` level.
+ * Each user has a current `Role` and a set of other roles they may assume. A role has (at least) an
+ * `Access` level.
  */
 sealed abstract class Role(val access: Access, elaboration: Option[String] = None) {
   final def name = elaboration.foldLeft(access.name)((n, e) => s"$n ($e)")
@@ -41,12 +42,15 @@ sealed abstract class StandardRole(access: Access, elaboration: Option[String] =
     extends Role(access, elaboration) {
   def id: StandardRole.Id
 }
-object StandardRole extends WithId('r') {
+object StandardRole extends WithGid('r') {
 
   /** The `Pi` role gives access to programs on which the user is a collaborator. */
   final case class Pi(id: StandardRole.Id) extends StandardRole(Access.Pi)
 
-  /** The `Ngo` role is associated with a `Partner` and gives access to programs with affiliated users. */
+  /**
+   * The `Ngo` role is associated with a `Partner` and gives access to programs with affiliated
+   * users.
+   */
   final case class Ngo(id: StandardRole.Id, partner: Partner)
       extends StandardRole(Access.Ngo, Some(partner.name))
 

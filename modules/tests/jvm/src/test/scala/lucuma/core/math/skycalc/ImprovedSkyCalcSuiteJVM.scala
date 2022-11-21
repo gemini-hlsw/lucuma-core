@@ -1,25 +1,25 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.math.skycalc
 
-import munit.ScalaCheckSuite
-import org.scalacheck.Prop._
-
+import com.fortysevendeg.scalacheck.datetime.GenDateTime.genDateTimeWithinRange
+import com.fortysevendeg.scalacheck.datetime.instances.jdk8._
 import edu.gemini.skycalc.ImprovedSkyCalcTest
+import jsky.coords.WorldCoords
 import lucuma.core.math.Coordinates
+import lucuma.core.math.Place
 import lucuma.core.math.arb.ArbCoordinates._
 import lucuma.core.math.arb.ArbPlace._
-import com.fortysevendeg.scalacheck.datetime.instances.jdk8._
-import com.fortysevendeg.scalacheck.datetime.GenDateTime.genDateTimeWithinRange
-import java.time._
-import lucuma.core.math.Place
-import jsky.coords.WorldCoords
-import java.{ util => ju }
-import org.scalacheck.{ Test => ScalaCheckTest }
-import org.scalactic.Tolerance
+import lucuma.core.tests.ScalaCheckFlaky
+import munit.ScalaCheckSuite
+import org.scalacheck.Prop._
+import org.scalacheck.{Test => ScalaCheckTest}
 
-final class ImprovedSkyCalcSuiteJVM extends ScalaCheckSuite with Tolerance {
+import java.time._
+import java.{util => ju}
+
+final class ImprovedSkyCalcSuiteJVM extends ScalaCheckSuite {
 
   override protected val scalaCheckTestParameters = {
     val old = ScalaCheckTest.Parameters.default
@@ -33,7 +33,7 @@ final class ImprovedSkyCalcSuiteJVM extends ScalaCheckSuite with Tolerance {
   )
   private val zdtRange = Duration.ofDays(Period.ofYears(1000).getDays.toLong)
 
-  test("Arbitrary sky calculations") {
+  test("Arbitrary sky calculations".tag(ScalaCheckFlaky)) {
     forAll { place: Place =>
       // This SkyCalc should be thread safe, but Java's isn't.
       val calc = ImprovedSkyCalc(place)
@@ -57,21 +57,17 @@ final class ImprovedSkyCalcSuiteJVM extends ScalaCheckSuite with Tolerance {
           )
 
           // We use constants with more precision
-          assert((results.altitudeRaw +- 1e-12).isWithin(javaCalc.getAltitude))
-          assert((results.azimuthRaw +- 1e-12).isWithin(javaCalc.getAzimuth))
-          assert((results.parallacticAngleRaw +- 1e-12).isWithin(javaCalc.getParallacticAngle))
-          assert((results.hourAngleRaw +- 1e-12).isWithin(javaCalc.getHourAngle))
-          assert(
-            (results.lunarIlluminatedFraction.toDouble +- 1e-12).isWithin(
-              javaCalc.getLunarIlluminatedFraction.toDouble
-            )
-          )
-          assert((results.lunarSkyBrightness +- 1e-12).isWithin(javaCalc.getLunarSkyBrightness))
-          assert((results.totalSkyBrightness +- 1e-12).isWithin(javaCalc.getTotalSkyBrightness))
-          assert((results.lunarPhaseAngleRaw +- 1e-12).isWithin(javaCalc.getLunarPhaseAngle))
-          assert((results.sunAltitudeRaw +- 1e-12).isWithin(javaCalc.getSunAltitude))
-          assert((results.lunarDistance +- 1e-12).isWithin(javaCalc.getLunarDistance))
-          assert((results.lunarElevationRaw +- 1e-12).isWithin(javaCalc.getLunarElevation))
+          assertEqualsDouble(results.altitudeRaw, javaCalc.getAltitude,  1e-12)
+          assertEqualsDouble(results.azimuthRaw, javaCalc.getAzimuth, 1e-12)
+          assertEqualsDouble(results.parallacticAngleRaw, javaCalc.getParallacticAngle, 1e-12)
+          assertEqualsDouble(results.hourAngleRaw, javaCalc.getHourAngle, 1e-12)
+          assertEqualsDouble( results.lunarIlluminatedFraction.toDouble, javaCalc.getLunarIlluminatedFraction.toDouble, 1e-12)
+          assertEqualsDouble(results.lunarSkyBrightness, javaCalc.getLunarSkyBrightness, 1e-12)
+          assertEqualsDouble(results.totalSkyBrightness, javaCalc.getTotalSkyBrightness, 1e-12)
+          assertEqualsDouble(results.lunarPhaseAngleRaw, javaCalc.getLunarPhaseAngle, 1e-12)
+          assertEqualsDouble(results.sunAltitudeRaw, javaCalc.getSunAltitude, 1e-12)
+          assertEqualsDouble(results.lunarDistance, javaCalc.getLunarDistance, 1e-12)
+          assertEqualsDouble(results.lunarElevationRaw, javaCalc.getLunarElevation, 1e-12)
         }
       }
     }

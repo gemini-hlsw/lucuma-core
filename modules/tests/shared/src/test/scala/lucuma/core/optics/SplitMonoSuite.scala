@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.optics
@@ -16,7 +16,7 @@ final class SplitMonoSuite extends munit.DisciplineSuite {
   // Laws
   checkAll("Byte < Int", SplitMonoTests(ex1).splitMono)
   checkAll("Int < Long", SplitMonoTests(ex2).splitMono)
-  checkAll("Byte < Int < Long", SplitMonoTests(ex1.composeSplitMono(ex2)).splitMono)
+  checkAll("Byte < Int < Long", SplitMonoTests(ex1.andThen(ex2)).splitMono)
 
   test("modify") {
     assertEquals(ex1.modify(_ + 1)(Byte.MaxValue),  Byte.MinValue)

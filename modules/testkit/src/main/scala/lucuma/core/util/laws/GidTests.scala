@@ -1,25 +1,30 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.util.laws
 
 import cats.kernel._
 import cats.kernel.laws.BoundedEnumerableLaws
-import cats.kernel.laws.discipline.{ BoundedEnumerableTests, OrderTests }
 import cats.kernel.laws.OrderLaws
+import cats.kernel.laws.discipline.BoundedEnumerableTests
+import cats.kernel.laws.discipline.OrderTests
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.cats._
 import eu.timepit.refined.char.Letter
 import eu.timepit.refined.scalacheck.all._
 import eu.timepit.refined.types.numeric.PosLong
-import io.circe.{ Decoder, Encoder }
-import io.circe.testing.{ CodecLaws, CodecTests }
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.testing.CodecLaws
+import io.circe.testing.CodecTests
 import io.circe.testing.instances.arbitraryJson
 import lucuma.core.util.Gid
-import monocle.law.discipline.{ IsoTests, PrismTests }
-import org.scalacheck._
-import org.scalacheck.Gen
+import monocle.law.discipline.IsoTests
+import monocle.law.discipline.PrismTests
 import org.scalacheck.Arbitrary.arbitrary
+import org.scalacheck.Gen
+import org.scalacheck._
+
 import scala.util.matching.Regex
 
 trait GidLaws[A] extends CodecLaws[A] with OrderLaws[A] with BoundedEnumerableLaws[A] {

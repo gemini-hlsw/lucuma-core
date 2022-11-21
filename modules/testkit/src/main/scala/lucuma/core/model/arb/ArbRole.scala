@@ -1,16 +1,16 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.model.arb
 
+import lucuma.core.model.GuestRole
 import lucuma.core.model.Partner
+import lucuma.core.model.Role
+import lucuma.core.model.ServiceRole
 import lucuma.core.model.StandardRole
 import lucuma.core.util.arb._
-import org.scalacheck._
 import org.scalacheck.Arbitrary._
-import lucuma.core.model.ServiceRole
-import lucuma.core.model.GuestRole
-import lucuma.core.model.Role
+import org.scalacheck._
 
 trait ArbRole {
   import ArbGid._

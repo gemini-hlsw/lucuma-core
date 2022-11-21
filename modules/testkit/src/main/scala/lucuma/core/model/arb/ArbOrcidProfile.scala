@@ -1,12 +1,12 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.model.arb
 
 import lucuma.core.model.OrcidId
 import lucuma.core.model.OrcidProfile
-import org.scalacheck._
 import org.scalacheck.Arbitrary._
+import org.scalacheck._
 
 trait ArbOrcidProfile {
   import ArbOrcidId._

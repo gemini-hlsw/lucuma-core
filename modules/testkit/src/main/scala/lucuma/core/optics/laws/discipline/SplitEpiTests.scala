@@ -1,15 +1,17 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.optics.laws
 package discipline
 
 import cats.Eq
+import cats.laws.discipline._
 import lucuma.core.optics.SplitEpi
-import org.scalacheck.{ Arbitrary, Gen }
+import org.scalacheck.Arbitrary
+import org.scalacheck.Gen
+import org.scalacheck.Prop
 import org.scalacheck.Prop._
 import org.typelevel.discipline.Laws
-import org.scalacheck.Prop
 
 trait SplitEpiTests[A, B] extends FormatTests[A, B] {
   val splitEpiProps: SplitEpiProps[A, B]

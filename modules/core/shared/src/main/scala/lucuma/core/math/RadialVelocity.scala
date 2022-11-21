@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.math
@@ -7,11 +7,11 @@ import cats._
 import coulomb._
 import coulomb.cats.implicits._
 import coulomb.si._
-import lucuma.core.math.units._
 import lucuma.core.math.Constants.SpeedOfLight
+import lucuma.core.math.units._
+import lucuma.core.optics.Format
 import monocle.Prism
 import spire.std.bigDecimal._
-import lucuma.core.optics.Format
 
 /**
   * Representation of a radial velocity in meters per second
@@ -23,7 +23,8 @@ import lucuma.core.optics.Format
   */
 final case class RadialVelocity private (rv: Quantity[BigDecimal, MetersPerSecond]) {
 
-  def toDoubleKilometersPerSecond: Double = rv.to[Double, KilometersPerSecond].value
+  // Direct conversion via coulomb turns to be too slow
+  def toDoubleKilometersPerSecond: Double = rv.value.toDouble / 1000
 
   /**
     * Converts the radial velocity to a Redshift, approximate

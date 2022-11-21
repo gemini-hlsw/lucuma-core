@@ -1,20 +1,21 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.math
 
-import cats.syntax.all._
-import cats.{ Eq, Show }
+import cats.Eq
+import cats.Show
 import cats.kernel.laws.discipline._
-
-import lucuma.core.math.arb._
-
-import java.time.LocalDateTime
-import java.time.Instant
-import org.scalacheck.Gen._
-import org.scalacheck.Arbitrary
-import org.scalacheck.Prop._
+import cats.syntax.all._
 import lucuma.core.arb.ArbTime
+import lucuma.core.math.arb._
+import org.scalacheck.Arbitrary
+import org.scalacheck.Gen._
+import org.scalacheck.Prop._
+import org.typelevel.cats.time._
+
+import java.time.Instant
+import java.time.LocalDateTime
 
 final class JulianDateSuute extends munit.DisciplineSuite {
   import ArbJulianDate._
@@ -25,13 +26,13 @@ final class JulianDateSuute extends munit.DisciplineSuite {
 
   test("JulianDate.eq.natural") {
     forAll { (a: JulianDate, b: JulianDate) =>
-      assertEquals(a.equals(b),  Eq[JulianDate].eqv(a, b))
+      assertEquals(a.equals(b), Eq[JulianDate].eqv(a, b))
     }
   }
 
   test("JulianDate.show.natural") {
     forAll { (a: JulianDate) =>
-      assertEquals(a.toString,  Show[JulianDate].show(a))
+      assertEquals(a.toString, Show[JulianDate].show(a))
     }
   }
 
@@ -56,7 +57,7 @@ final class JulianDateSuute extends munit.DisciplineSuite {
       val jd0 = oldEpochSchemeJulianDate(ldt)
       val jd1 = JulianDate.ofLocalDateTime(ldt).dayNumber.toDouble
 
-      assertEquals(jd0,  jd1)
+      assertEquals(jd0, jd1)
     }
   }
 
@@ -70,10 +71,9 @@ final class JulianDateSuute extends munit.DisciplineSuite {
       (LocalDateTime.of(2345, 6, 7, 12, 0, 0), 2577711.000000)
     )
 
-    tests.foreach {
-      case (ldt, expected) =>
-        val jd = JulianDate.ofLocalDateTime(ldt)
-        assert((expected - jd.toDouble).abs <= 0.000001)
+    tests.foreach { case (ldt, expected) =>
+      val jd = JulianDate.ofLocalDateTime(ldt)
+      assert((expected - jd.toDouble).abs <= 0.000001)
     }
   }
 
@@ -84,8 +84,6 @@ final class JulianDateSuute extends munit.DisciplineSuite {
   }
 
   test("JulianDate.ofInstant(instant).toInstant === instant") {
-    implicit val InstantEq: Eq[Instant] = Eq.fromUniversalEquals
-
     val positiveJDInstant =
       implicitly[Arbitrary[Instant]].arbitrary.suchThat(i => !(i.isBefore(JulianDate.Epoch)))
 

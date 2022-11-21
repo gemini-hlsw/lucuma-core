@@ -1,75 +1,152 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.math
 
 import coulomb._
 import coulomb.accepted._
-import coulomb.define.DerivedUnit
+import coulomb.define._
+import coulomb.mks._
 import coulomb.si._
 import coulomb.siprefix._
 import coulomb.time._
-import coulomb.unitops.ConvertableUnits
-import coulomb.unitops.UnitConverter
+import coulomb.unitops._
 import eu.timepit.refined._
 import eu.timepit.refined.auto._
 import eu.timepit.refined.numeric._
 import eu.timepit.refined.types.numeric.PosInt
+import lucuma.core.math.dimensional._
 import spire.math._
 
 trait units {
+
+  type Electron
+  implicit val defineUnitElectron = BaseUnit[Electron](abbv = "e-")
+
+  type Pixels
+  implicit val defineUnitPixels = BaseUnit[Pixels](abbv = "px")
+
   // Wavelength units
   type Picometer  = Pico %* Meter
   type Nanometer  = Nano %* Meter
-  type Angstrom   = Hecto %* Picometer
   type Micrometer = Micro %* Meter
+  type Angstrom
+  implicit val defineAngstrom =
+    DerivedUnit[Angstrom, Hecto %* Picometer](Rational.one, abbv = "Å")
 
-  trait CentimetersPerSecond
-  implicit val defineUnitCentimetersPerSecond =
-    DerivedUnit[CentimetersPerSecond, (Centi %* Meter) %/ Second](Rational.one, abbv = "cm/s")
+  type NanometersPerPixel = Nanometer %/ Pixels
+  type PicometersPerPixel = Picometer %/ Pixels
 
-  trait MetersPerSecond
-  implicit val defineUnitMetersPerSecond =
-    DerivedUnit[MetersPerSecond, Meter %/ Second](Rational(1), abbv = "m/s")
+  type MetersPerSecond      = Meter %/ Second
+  type CentimetersPerSecond = (Centi %* Meter) %/ Second
+  type KilometersPerSecond  = (Kilo %* Meter) %/ Second
 
-  trait KilometersPerSecond
-  implicit val defineUnitKilometerPerSecond =
-    DerivedUnit[KilometersPerSecond, Meter %/ Second](Rational(1000), abbv = "km/s")
-
-  trait Year
+  type Year
   implicit val defineUnitYear =
     DerivedUnit[Year, Day](Rational(365), abbv = "y")
 
-  private val DeciArcSecondsPerDegree: SafeLong  = 3600 * 10L
-  private val MiliArcSecondsPerDegree: SafeLong  = 3600 * 1000L
-  private val MicroArcSecondsPerDegree: SafeLong = 3600 * 1000000L
+  private val ArcSecondsPerDegree: SafeLong = 3600
 
-  trait DeciArcSecond
-  implicit val defineUnitDeciArcSecond =
-    DerivedUnit[DeciArcSecond, Degree](Rational(1, DeciArcSecondsPerDegree), abbv = "das")
+  type ArcSecond
+  implicit val defineUnitArcSecond =
+    DerivedUnit[ArcSecond, Degree](Rational(1, ArcSecondsPerDegree), abbv = "arcsec")
 
-  trait MilliArcSecond
-  implicit val defineUnitMilliArcSecond =
-    DerivedUnit[MilliArcSecond, Degree](Rational(1, MiliArcSecondsPerDegree), abbv = "mas")
+  type DeciArcSecond  = Deci %* ArcSecond
+  type MilliArcSecond = Milli %* ArcSecond
+  type MicroArcSecond = Micro %* ArcSecond
 
-  trait MicroArcSecond
-  implicit val defineUnitMicroArcSecond =
-    DerivedUnit[MicroArcSecond, Degree](Rational(1, MicroArcSecondsPerDegree), abbv = "μas")
+  type MilliArcSecondPerYear = MilliArcSecond %/ Year
+  type MicroArcSecondPerYear = MicroArcSecond %/ Year
 
-  private val DaysPerYear: SafeLong = 365 * 8640L
+  // Integrated Brightness units
+  type VegaMagnitude
+  implicit val defineVegaMagnitude =
+    BaseUnitDef[VegaMagnitude]("Vega magnitude", "Vega mag", "VEGA_MAGNITUDE")
 
-  trait MilliArcSecondPerYear
-  implicit val defineUnitMilliArcSecondPerYear =
-    DerivedUnit[MilliArcSecondPerYear, Degree %/ Second](
-      Rational(1, DaysPerYear * MiliArcSecondsPerDegree),
-      abbv = "mas/y"
+  type ABMagnitude
+  implicit val defineABMagnitude =
+    BaseUnitDef[ABMagnitude]("AB magnitude", "AB mag", "AB_MAGNITUDE")
+
+  private val JanskysPerWattMeter2Hertz: SafeLong = SafeLong(10).pow(26)
+  type Jansky
+  implicit val defineJansky                       =
+    DerivedUnitDef[Jansky, Watt %/ ((Meter %^ 2) %* (Hertz %^ -1))](
+      Rational(1, JanskysPerWattMeter2Hertz),
+      abbv = "Jy",
+      serialized = "JANSKY"
     )
 
-  trait MicroArcSecondPerYear
-  implicit val defineUnitMicroArcSecondPerYear =
-    DerivedUnit[MicroArcSecondPerYear, Degree %/ Second](
-      Rational(1L, DaysPerYear * MicroArcSecondsPerDegree),
-      abbv = "μas/y"
+  type WattsPerMeter2Micrometer = Watt %/ ((Meter %^ 2) %* Micrometer)
+  implicit val strWattsPerMeter2Micrometer =
+    UnitStringDef[WattsPerMeter2Micrometer]("W/m²/µm", "W_PER_M_SQUARED_PER_UM")
+
+  private val ErgsPerJoule: SafeLong = SafeLong(10).pow(7)
+  type Erg
+  implicit val defineErg             =
+    DerivedUnit[Erg, Joule](Rational(1, ErgsPerJoule), abbv = "erg")
+
+  type ErgsPerSecondCentimeter2Angstrom = Erg %/ (Second %* (Centimeter %^ 2) %* Angstrom)
+  implicit val strErgsPerSecondCentimeter2Angstrom =
+    UnitStringDef[ErgsPerSecondCentimeter2Angstrom]("erg/s/cm²/Å", "ERG_PER_S_PER_CM_SQUARED_PER_A")
+
+  type ErgsPerSecondCentimeter2Hertz = Erg %/ (Second %* (Centimeter %^ 2) %* Hertz)
+  implicit val strErgsPerSecondCentimeter2Hertz =
+    UnitStringDef[ErgsPerSecondCentimeter2Hertz]("erg/s/cm²/Hz", "ERG_PER_S_PER_CM_SQUARED_PER_HZ")
+
+  // Surface Brightness units
+  type VegaMagnitudePerArcsec2 = VegaMagnitude %/ (ArcSecond %^ 2)
+  implicit val strVegaMagnitudePerArcsec2 =
+    UnitStringDef[VegaMagnitudePerArcsec2]("Vega mag/arcsec²", "VEGA_MAG_PER_ARCSEC_SQUARED")
+
+  type ABMagnitudePerArcsec2 = ABMagnitude %/ (ArcSecond %^ 2)
+  implicit val strABMagnitudePerArcsec2 =
+    UnitStringDef[ABMagnitudePerArcsec2]("AB mag/arcsec²", "AB_MAG_PER_ARCSEC_SQUARED")
+
+  type JanskyPerArcsec2 = Jansky %/ (ArcSecond %^ 2)
+  implicit val strJanskyPerArcsec2 =
+    UnitStringDef[JanskyPerArcsec2]("Jy/arcsec²", "JY_PER_ARCSEC_SQUARED")
+
+  type WattsPerMeter2MicrometerArcsec2 = WattsPerMeter2Micrometer %/ (ArcSecond %^ 2)
+  implicit val strWattsPerMeter2MicrometerArcsec2 =
+    UnitStringDef[WattsPerMeter2MicrometerArcsec2](
+      "W/m²/µm/arcsec²",
+      "W_PER_M_SQUARED_PER_UM_PER_ARCSEC_SQUARED"
+    )
+
+  type ErgsPerSecondCentimeter2AngstromArcsec2 =
+    ErgsPerSecondCentimeter2Angstrom %/ (ArcSecond %^ 2)
+  implicit val strErgsPerSecondCentimeter2AngstromArcsec2 =
+    UnitStringDef[ErgsPerSecondCentimeter2AngstromArcsec2](
+      "erg/s/cm²/Å/arcsec²",
+      "ERG_PER_S_PER_CM_SQUARED_PER_A_PER_ARCSEC_SQUARED"
+    )
+
+  type ErgsPerSecondCentimeter2HertzArcsec2 = ErgsPerSecondCentimeter2Hertz %/ (ArcSecond %^ 2)
+  implicit val strErgsPerSecondCentimeter2HertzArcsec2 =
+    UnitStringDef[ErgsPerSecondCentimeter2HertzArcsec2](
+      "erg/s/cm²/Hz/arcsec²",
+      "ERG_PER_S_PER_CM_SQUARED_PER_HZ_PER_ARCSEC_SQUARED"
+    )
+
+  // Integrated Line Flux units
+  type WattsPerMeter2 = Watt %/ (Meter %^ 2)
+  implicit val strWattsPerMeter2 =
+    UnitStringDef[WattsPerMeter2]("W/m²", "W_PER_M_SQUARED")
+
+  type ErgsPerSecondCentimeter2 = Erg %/ (Second %* (Centimeter %^ 2))
+  implicit val strErgsPerSecondCentimeter2 =
+    UnitStringDef[ErgsPerSecondCentimeter2]("erg/s/cm²", "ERG_PER_S_PER_CM_SQUARED")
+
+  // Surface Line Flux units
+  type WattsPerMeter2Arcsec2 = WattsPerMeter2 %/ (ArcSecond %^ 2)
+  implicit val strWattsPerMeter2Arcsec2 =
+    UnitStringDef[WattsPerMeter2Arcsec2]("W/m²/arcsec²", "W_PER_M_SQUARED_PER_ARCSEC_SQUARED")
+
+  type ErgsPerSecondCentimeter2Arcsec2 = ErgsPerSecondCentimeter2 %/ (ArcSecond %^ 2)
+  implicit val strErgsPerSecondCentimeter2Arcsec2 =
+    UnitStringDef[ErgsPerSecondCentimeter2Arcsec2](
+      "erg/s/cm²/arcsec²",
+      "ERG_PER_S_PER_CM_SQUARED_PER_ARCSEC_SQUARED"
     )
 
   // PosInt can be converted to Rational exactly

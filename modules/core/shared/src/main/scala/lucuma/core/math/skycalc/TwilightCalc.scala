@@ -1,43 +1,45 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.math.skycalc
 
 import cats.syntax.all._
 import coulomb.refined._
-import java.time.Instant
-import java.time.LocalDate
-import lucuma.core.enum.TwilightType
-import lucuma.core.math.Interval
+import lucuma.core.enums.TwilightType
+import lucuma.core.math.Constants._
 import lucuma.core.math.JulianDate
 import lucuma.core.math.Place
-import lucuma.core.math.Schedule
-import lucuma.core.math.Constants._
-import io.chrisdavenport.cats.time._
+import lucuma.core.optics.Spire
+import org.typelevel.cats.time._
+import spire.math.Bounded
+import spire.math.extras.interval.IntervalSeq
 import spire.std.double._
+
+import java.time.Instant
+import java.time.LocalDate
 
 trait TwilightCalc extends SunCalc {
 
   /**
-    * Compute start and end of night for a particular date and place.
-    *
-    * The night will be bounded by twilight as defined by
-    * [[lucuma.core.enum.TwilightType]]. It will be the night that starts
-    * on the given date and ends on the following day.
-    *
-    * @param twilightType twilight bound type to use
-    * @param date date when the night starts
-    * @param place place on Earth
-    *
-    * @return A tuple of [[java.time.Instant]]s containing sunset and sunrise
-    * respectively, or None if there's no sunset or sunrise for the
-    * provided parameters.
-    */
+   * Compute start and end of night for a particular date and place.
+   *
+   * The night will be bounded by twilight as defined by
+   * [[lucuma.core.enums.TwilightType]]. It will be the night that starts
+   * on the given date and ends on the following day.
+   *
+   * @param twilightType twilight bound type to use
+   * @param date date when the night starts
+   * @param place place on Earth
+   *
+   * @return A tuple of [[java.time.Instant]]s containing sunset and sunrise
+   * respectively, or None if there's no sunset or sunrise for the
+   * provided parameters.
+   */
   def forDate(
     twilightType: TwilightType,
     date:         LocalDate,
     place:        Place
-  ): Option[Interval] = {
+  ): Option[Bounded[Instant]] = {
     val nextMidnight = date.atStartOfDay(place.timezone).plusDays(1)
     val jdmid        = JulianDate.ofInstant(nextMidnight.toInstant)
 
@@ -57,20 +59,21 @@ trait TwilightCalc extends SunCalc {
       case _                     => twilightType.horizonAngle.toAngle.toSignedDoubleDegrees
     }
 
-    calcTimes(angle, jdmid, place).flatMap(Interval.fromInstants.getOption)
+    calcTimes(angle, jdmid, place).flatMap(Spire.openUpperIntervalFromTuple[Instant].getOption)
   }
 
-  def forInterval(
+  def forBoundedInterval(
     twilightType: TwilightType,
-    interval:     Interval,
+    interval:     Bounded[Instant],
     place:        Place
-  ): Schedule = {
-    val startDate         = interval.start.atZone(place.timezone).toLocalDate
-    val endDate           = interval.end.atZone(place.timezone).toLocalDate
+  ): IntervalSeq[Instant] = {
+    val (start, end)      = Spire.openUpperIntervalFromTuple[Instant].reverseGet(interval)
+    val startDate         = start.atZone(place.timezone).toLocalDate
+    val endDate           = end.atZone(place.timezone).toLocalDate
     val dates             =
       List.unfold(startDate)(date => if (date <= endDate) (date, date.plusDays(1)).some else none)
     val twilightIntervals = dates.flatMap(d => forDate(twilightType, d, place))
-    Schedule.fromIntervals.get(twilightIntervals).intersection(interval)
+    Spire.intervalListUnion[Instant].get(twilightIntervals) & interval
   }
 
   private def calcTimes(

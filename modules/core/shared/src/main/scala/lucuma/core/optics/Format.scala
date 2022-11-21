@@ -1,10 +1,11 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.optics
 
 import cats.arrow._
-import monocle.{ Iso, Prism }
+import monocle.Iso
+import monocle.Prism
 
 /**
   * A normalizing optic, isomorphic to Prism but with different laws, specifically `getOption`
@@ -21,32 +22,20 @@ final case class Format[A, B](getOption: A => Option[B], reverseGet: B => A) {
     }
 
   /** Compose with another Format. */
-  def composeFormat[C](f: Format[B, C]): Format[A, C] =
+  def andThen[C](f: Format[B, C]): Format[A, C] =
     Format(getOption(_).flatMap(f.getOption), reverseGet.compose(f.reverseGet))
 
   /** Compose with a Prism. */
-  def composePrism[C](f: Prism[B, C]): Format[A, C] =
+  def andThen[C](f: Prism[B, C]): Format[A, C] =
     Format(getOption(_).flatMap(f.getOption), reverseGet.compose(f.reverseGet))
 
   /** Compose with an Iso. */
-  def composeIso[C](f: Iso[B, C]): Format[A, C] =
+  def andThen[C](f: Iso[B, C]): Format[A, C] =
     Format(getOption(_).map(f.get), reverseGet.compose(f.reverseGet))
 
   /** Compose with a SplitEpi. */
   def composeSplitEpi[C](f: SplitEpi[B, C]): Format[A, C] =
-    composeFormat(f.asFormat)
-
-  /** Alias to composeFormat. */
-  def ^<-*[C](f: Format[B, C]): Format[A, C] =
-    composeFormat(f)
-
-  /** Alias to composePrism. */
-  def ^<-?[C](f: Prism[B, C]): Format[A, C] =
-    composePrism(f)
-
-  /** Alias to composeIso. */
-  def ^<->[C](f: Iso[B, C]): Format[A, C] =
-    composeIso(f)
+    andThen(f.asFormat)
 
   /** Format is an invariant functor over B. */
   def imapB[C](f: C => B, g: B => C): Format[A, C] =
@@ -99,7 +88,7 @@ object Format {
   implicit def FormatCategory: Category[Format] =
     new Category[Format] {
       def id[A]: Format[A, A] = Format(Some(_), identity)
-      def compose[A, B, C](f: Format[B, C], g: Format[A, B]): Format[A, C] = g ^<-* f
+      def compose[A, B, C](f: Format[B, C], g: Format[A, B]): Format[A, C] = g.andThen(f)
     }
 
 }

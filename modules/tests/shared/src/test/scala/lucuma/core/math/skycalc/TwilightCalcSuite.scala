@@ -1,15 +1,15 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.math.skycalc
 
+import lucuma.core.enums.Site
+import lucuma.core.enums.TwilightType
 import munit.FunSuite
-import lucuma.core.enum.Site
-import lucuma.core.enum.TwilightType
-import java.time.LocalDate
-import org.scalactic.Tolerance
 
-final class TwilightCalcSuite extends FunSuite with Tolerance {
+import java.time.LocalDate
+
+final class TwilightCalcSuite extends FunSuite {
   private val Date = LocalDate.of(2000, 1, 1)
 
   // Known results with OCS
@@ -26,13 +26,12 @@ final class TwilightCalcSuite extends FunSuite with Tolerance {
     )
 
   test("TwilightCalcSpec: Sunrise and sunset on 2000-01-01") {
-    expected.foreach {
-      case ((site, tbType, date), (s, e)) =>
-        val interval = TwilightCalc.forDate(tbType, date, site.place).get
-        // The use of a different JulianDate throughout the calculations produces a very slight difference,
-        // therefore we allow a couple of milliseconds of tolerance.
-        assert((interval.start.toEpochMilli +- 2).isWithin(s))
-        assert((interval.end.toEpochMilli +- 2).isWithin(e))
+    expected.foreach { case ((site, tbType, date), (s, e)) =>
+      val interval = TwilightCalc.forDate(tbType, date, site.place).get
+      // The use of a different JulianDate throughout the calculations produces a very slight difference,
+      // therefore we allow a couple of milliseconds of tolerance.
+      assertEqualsDouble(interval.lower.toEpochMilli.toDouble, s.toDouble, 2)
+      assertEqualsDouble(interval.upper.toEpochMilli.toDouble, e.toDouble, 2)
     }
   }
 }

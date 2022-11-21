@@ -1,17 +1,17 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.geom.jts.syntax
 
 import lucuma.core.geom.jts.Jts.geometryFactory
+import lucuma.core.math.Offset
+import org.locationtech.jts.geom.Coordinate
+import org.locationtech.jts.geom.Envelope
+import org.locationtech.jts.geom.Geometry
+import org.locationtech.jts.util.GeometricShapeFactory
 
 import angle._
 import offset._
-
-import lucuma.core.math.Offset
-
-import org.locationtech.jts.geom.{ Coordinate, Envelope, Geometry }
-import org.locationtech.jts.util.GeometricShapeFactory
 
 // Syntax used in the JTS implementation only.
 

@@ -1,20 +1,22 @@
-// Copyright (c) 2016-2021 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package lucuma.core.model
 
-import munit._
-import org.scalacheck.Prop._
+import cats.Eq
+import cats.Show
+import cats.kernel.laws.discipline._
 import cats.syntax.all._
-import cats.{ Eq, Show }
-import java.time._
-import lucuma.core.enum.Site
-import lucuma.core.enum.TwilightType
 import lucuma.core.arb.ArbTime._
+import lucuma.core.enums.Site
+import lucuma.core.enums.TwilightType
 import lucuma.core.model.arb.ArbTwilightBoundedNight._
 import lucuma.core.util.arb.ArbEnumerated._
-import cats.kernel.laws.discipline._
-import io.chrisdavenport.cats.time._
+import munit._
+import org.scalacheck.Prop._
+import org.typelevel.cats.time._
+
+import java.time._
 
 final class TwilightBoundedNightSuite extends DisciplineSuite {
   checkAll("TwilightBoundedNight", OrderTests[TwilightBoundedNight].order)
