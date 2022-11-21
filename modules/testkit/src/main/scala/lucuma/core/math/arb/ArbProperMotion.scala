@@ -5,34 +5,35 @@ package lucuma.core.math
 package arb
 
 import lucuma.core.math.ProperMotion
+import lucuma.core.math.dimensional.*
 import org.scalacheck.Arbitrary
-import org.scalacheck.Arbitrary._
+import org.scalacheck.Arbitrary.*
 import org.scalacheck.Cogen
 
 trait ArbProperMotion {
-  import ProperMotion._
+  import ProperMotion.*
 
-  implicit def arbAngularVelocityComponent[A]: Arbitrary[AngularVelocityComponent[A]] =
+  given arbAngularVelocityComponent[A]: Arbitrary[AngularVelocity Of A] =
     Arbitrary {
-      arbitrary[Long].map(AngularVelocityComponent.μasy[A].get)
+      arbitrary[Long].map(AngularVelocity.μasy[A].get)
     }
 
-  implicit def cogAngularVelocity[A]: Cogen[AngularVelocityComponent[A]] =
+  given cogAngularVelocity[A]: Cogen[AngularVelocity Of A] =
     Cogen[Long].contramap(_.μasy.value)
 
-  implicit val arbProperMotion: Arbitrary[ProperMotion] =
+  given Arbitrary[ProperMotion] =
     Arbitrary {
       for {
-        ra  <- arbitrary[AngularVelocityComponent[VelocityAxis.RA]]
-        dec <- arbitrary[AngularVelocityComponent[VelocityAxis.Dec]]
+        ra  <- arbitrary[AngularVelocity Of VelocityAxis.RA]
+        dec <- arbitrary[AngularVelocity Of VelocityAxis.Dec]
       } yield ProperMotion(ra, dec)
     }
 
-  implicit val cogProperMotion: Cogen[ProperMotion] =
+  given Cogen[ProperMotion] =
     Cogen[
       (
-        AngularVelocityComponent[VelocityAxis.RA],
-        AngularVelocityComponent[VelocityAxis.Dec]
+        AngularVelocity Of VelocityAxis.RA,
+        AngularVelocity Of VelocityAxis.Dec
       )
     ].contramap(x => (x.ra, x.dec))
 }
