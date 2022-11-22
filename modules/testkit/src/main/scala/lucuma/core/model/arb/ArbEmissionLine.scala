@@ -5,7 +5,6 @@ package lucuma.core.model.arb
 
 import cats.Order.*
 import cats.laws.discipline.arbitrary.*
-import org.typelevel.cats.time.instantInstances
 import coulomb.*
 import coulomb.syntax.*
 import eu.timepit.refined.types.numeric.PosBigDecimal
@@ -20,16 +19,17 @@ import lucuma.core.util.arb.ArbEnumerated
 import lucuma.core.util.arb.ArbTimestamp
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.*
+import org.typelevel.cats.time.instantInstances
 
 trait ArbEmissionLine {
   import ArbEnumerated.*
   import ArbTimestamp.*
   import BrightnessUnits.*
-  import ArbMeasure.*
+  import ArbMeasure.given
   import ArbRefined.*
   import ArbSpectralDefinition.*
 
-  implicit def arbEmissionLine[T](implicit
+  given arbEmissionLine[T](using
     arbLineFluxUnit: Arbitrary[Units Of LineFlux[T]]
   ): Arbitrary[EmissionLine[T]] =
     Arbitrary(
@@ -39,7 +39,7 @@ trait ArbEmissionLine {
       } yield EmissionLine[T](lw.withUnit[KilometersPerSecond], lf)
     )
 
-  implicit def cogEmissionLine[T]: Cogen[EmissionLine[T]] =
+  given cogEmissionLine[T]: Cogen[EmissionLine[T]] =
     Cogen[(PosBigDecimal, EmissionLine.LineFluxOverTime[T])]
       .contramap(x => (x.lineWidth.value, x.lineFlux))
 }

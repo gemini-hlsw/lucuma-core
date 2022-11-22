@@ -7,7 +7,6 @@ import cats.Order.*
 import cats.data.NonEmptyMap
 import cats.kernel.laws.discipline.*
 import cats.laws.discipline.arbitrary.*
-import org.typelevel.cats.time.instantInstances
 import coulomb.*
 import coulomb.syntax.*
 import eu.timepit.refined.cats.*
@@ -25,18 +24,19 @@ import lucuma.core.util.arb.ArbCollection
 import lucuma.core.util.arb.ArbEnumerated
 import monocle.law.discipline.*
 import munit.*
+import org.typelevel.cats.time.instantInstances
 
-import scala.collection.immutable.SortedMap
 import java.time.Instant
+import scala.collection.immutable.SortedMap
 
 final class SpectralDefinitionSuite extends DisciplineSuite {
-  import ArbUnnormalizedSED.*
+  import ArbUnnormalizedSED.given
   import ArbEnumerated.*
   import BrightnessUnits.*
-  import ArbSpectralDefinition.*
+  import ArbSpectralDefinition.given
   import ArbRefined.*
-  import ArbMeasure.*
-  import ArbEmissionLine.*
+  import ArbMeasure.given
+  import ArbEmissionLine.given
   import ArbCollection.*
   import ArbWavelength.*
 

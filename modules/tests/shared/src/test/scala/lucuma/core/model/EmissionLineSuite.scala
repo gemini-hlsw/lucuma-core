@@ -7,7 +7,6 @@ import cats.data.NonEmptyMap
 import cats.implicits.*
 import cats.kernel.laws.discipline.*
 import cats.laws.discipline.arbitrary.*
-import org.typelevel.cats.time.instantInstances
 import coulomb.*
 import coulomb.ops.algebra.cats.all.given
 import coulomb.syntax.*
@@ -21,13 +20,15 @@ import lucuma.core.model.arb.ArbSpectralDefinition
 import lucuma.core.util.arb.ArbEnumerated
 import monocle.law.discipline.LensTests
 import munit.*
+import org.typelevel.cats.time.instantInstances
+
 import java.time.Instant
 
 final class EmissionLineSuite extends DisciplineSuite {
   import ArbEnumerated.*
-  import ArbEmissionLine.*
+  import ArbEmissionLine.given
   import ArbRefined.*
-  import ArbMeasure.*
+  import ArbMeasure.given
   import ArbSpectralDefinition.*
   import ArbQuantity.given
 

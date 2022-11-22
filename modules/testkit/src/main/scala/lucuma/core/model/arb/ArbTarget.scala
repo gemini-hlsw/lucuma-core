@@ -17,7 +17,7 @@ trait ArbTarget {
   import ArbEphemerisKey.*
   import ArbSiderealTracking.given
   import ArbEnumerated.*
-  import ArbSourceProfile.*
+  import ArbSourceProfile.given
   import ArbCatalogInfo.*
 
   given Arbitrary[Target.Sidereal] =

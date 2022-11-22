@@ -10,6 +10,7 @@ import cats.data.NonEmptyMap
 import lucuma.core.math.dimensional.*
 import lucuma.core.math.units.*
 import lucuma.core.util.Enumerated
+
 import java.time.Instant
 
 object BrightnessUnits {

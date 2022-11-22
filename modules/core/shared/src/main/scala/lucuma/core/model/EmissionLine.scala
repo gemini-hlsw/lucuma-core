@@ -16,6 +16,7 @@ import lucuma.core.math.dimensional.*
 import lucuma.core.math.units.*
 import monocle.Focus
 import monocle.Lens
+
 import java.time.Instant
 
 final case class EmissionLine[T](
@@ -36,7 +37,7 @@ final case class EmissionLine[T](
 object EmissionLine {
   type LineFluxOverTime[T] = NonEmptyMap[Instant, Measure[PosBigDecimal] Of LineFlux[T]]
 
-  implicit def eqEmissionLine[T]: Eq[EmissionLine[T]] =
+  given eqEmissionLine[T]: Eq[EmissionLine[T]] =
     Eq.by(x => (x.lineWidth, x.lineFlux))
 
   /** @group Optics */

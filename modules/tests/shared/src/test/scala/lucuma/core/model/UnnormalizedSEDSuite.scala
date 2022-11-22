@@ -16,7 +16,7 @@ import munit.*
 
 final class UnnormalizedSEDSuite extends DisciplineSuite {
   import UnnormalizedSED.*
-  import ArbUnnormalizedSED.*
+  import ArbUnnormalizedSED.given
   import ArbEnumerated.*
   import ArbQuantity.given
   import ArbRefined.*
