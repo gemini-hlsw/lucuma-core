@@ -4,14 +4,14 @@
 package lucuma.core.model
 
 import cats.Eq
-import cats.Order._
-import cats.syntax.all._
-import eu.timepit.refined.cats._
+import cats.Order.*
+import cats.syntax.all.*
+import eu.timepit.refined.cats.*
 import eu.timepit.refined.types.numeric.PosBigDecimal
 import lucuma.core.enums.Band
-import lucuma.core.math.BrightnessUnits._
+import lucuma.core.math.BrightnessUnits.*
 import lucuma.core.math.Wavelength
-import lucuma.core.math.dimensional._
+import lucuma.core.math.dimensional.*
 import monocle.Focus
 import monocle.Lens
 import monocle.Optional

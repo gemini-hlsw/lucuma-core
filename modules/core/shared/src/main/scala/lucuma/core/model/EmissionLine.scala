@@ -5,18 +5,18 @@ package lucuma.core.model
 
 import cats.Eq
 import cats.data.NonEmptyMap
-import cats.implicits._
+import cats.implicits.*
 import coulomb.*
 import coulomb.ops.algebra.cats.all.given
 import coulomb.syntax.*
-import eu.timepit.refined.cats._
+import eu.timepit.refined.cats.*
 import eu.timepit.refined.types.numeric.PosBigDecimal
-import lucuma.core.math.BrightnessUnits._
-import lucuma.core.math.dimensional._
-import lucuma.core.math.units._
-import lucuma.core.util.Timestamp
+import lucuma.core.math.BrightnessUnits.*
+import lucuma.core.math.dimensional.*
+import lucuma.core.math.units.*
 import monocle.Focus
 import monocle.Lens
+import java.time.Instant
 
 final case class EmissionLine[T](
   lineWidth: Quantity[PosBigDecimal, KilometersPerSecond],
@@ -34,7 +34,8 @@ final case class EmissionLine[T](
 }
 
 object EmissionLine {
-  type LineFluxOverTime[T] = NonEmptyMap[Timestamp, Measure[PosBigDecimal] Of LineFlux[T]]
+  type LineFluxOverTime[T] = NonEmptyMap[Instant, Measure[PosBigDecimal] Of LineFlux[T]]
+
   implicit def eqEmissionLine[T]: Eq[EmissionLine[T]] =
     Eq.by(x => (x.lineWidth, x.lineFlux))
 
@@ -43,6 +44,6 @@ object EmissionLine {
     Focus[EmissionLine[T]](_.lineWidth)
 
   /** @group Optics */
-  def lineFlux[T]: Lens[EmissionLine[T], NonEmptyMap[Timestamp, Measure[PosBigDecimal] Of LineFlux[T]]] =
+  def lineFlux[T]: Lens[EmissionLine[T], NonEmptyMap[Instant, Measure[PosBigDecimal] Of LineFlux[T]]] =
     Focus[EmissionLine[T]](_.lineFlux)
 }

@@ -3,12 +3,12 @@
 
 package lucuma.core.math.dimensional.arb
 
-import lucuma.core.math.dimensional._
-import org.scalacheck.Arbitrary._
-import org.scalacheck._
+import lucuma.core.math.dimensional.*
+import org.scalacheck.Arbitrary.*
+import org.scalacheck.*
 
 trait ArbMeasure {
-  import ArbUnits._
+  import ArbUnits.*
 
   implicit def arbMeasure[N: Arbitrary]: Arbitrary[Measure[N]] =
     Arbitrary {

@@ -7,10 +7,10 @@ package math
 
 import cats.data.NonEmptyList
 import cats.data.NonEmptyMap
-import lucuma.core.math.dimensional._
-import lucuma.core.math.units._
+import lucuma.core.math.dimensional.*
+import lucuma.core.math.units.*
 import lucuma.core.util.Enumerated
-import lucuma.core.util.Timestamp
+import java.time.Instant
 
 object BrightnessUnits {
   type Integrated
@@ -21,7 +21,7 @@ object BrightnessUnits {
   trait FluxDensityContinuum[+T]
 
   type BrightnessMeasure[T] = Measure[BigDecimal] Of Brightness[T]
-  type BrightnessMeasureOverTime[T] = NonEmptyMap[Timestamp, Measure[BigDecimal] Of Brightness[T]]
+  type BrightnessMeasureOverTime[T] = NonEmptyMap[Instant, Measure[BigDecimal] Of Brightness[T]]
 
   // Brightness Integrated
   implicit object VegaMagnitudeIsIntegratedBrightnessUnit

@@ -7,6 +7,7 @@ import cats.Order.*
 import cats.data.NonEmptyMap
 import cats.laws.discipline.arbitrary.*
 import cats.kernel.laws.discipline.*
+import org.typelevel.cats.time.instantInstances
 import coulomb.*
 import coulomb.syntax.*
 import eu.timepit.refined.cats.*
@@ -27,6 +28,7 @@ import monocle.law.discipline.*
 import munit.*
 
 import scala.collection.immutable.SortedMap
+import java.time.Instant
 
 final class SourceProfileSuite extends DisciplineSuite {
   import ArbAngle.*
@@ -45,7 +47,7 @@ final class SourceProfileSuite extends DisciplineSuite {
     SpectralDefinition.BandNormalized(
       UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.A0I),
       SortedMap(
-        Band.R -> NonEmptyMap.of(Timestamp.Min -> Band.R.defaultUnits[Integrated].withValueTagged(BigDecimal(10.0)))
+        Band.R -> NonEmptyMap.of(Instant.MIN -> Band.R.defaultUnits[Integrated].withValueTagged(BigDecimal(10.0)))
       )
     )
 
@@ -53,7 +55,7 @@ final class SourceProfileSuite extends DisciplineSuite {
     SpectralDefinition.BandNormalized(
       UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.A0I),
       SortedMap(
-        Band.R -> NonEmptyMap.of(Timestamp.Min -> Band.R.defaultUnits[Surface].withValueTagged(BigDecimal(10.0)))
+        Band.R -> NonEmptyMap.of(Instant.MIN -> Band.R.defaultUnits[Surface].withValueTagged(BigDecimal(10.0)))
       )
     )
 
@@ -62,7 +64,7 @@ final class SourceProfileSuite extends DisciplineSuite {
       SortedMap(
         Wavelength.Min -> EmissionLine(
           PosBigDecimalOne.withUnit[KilometersPerSecond],
-          NonEmptyMap.of(Timestamp.Min -> WattsPerMeter2IsIntegratedLineFluxUnit.unit.withValueTagged(PosBigDecimalOne))
+          NonEmptyMap.of(Instant.MIN -> WattsPerMeter2IsIntegratedLineFluxUnit.unit.withValueTagged(PosBigDecimalOne))
         )
       ),
       WattsPerMeter2MicrometerIsIntegratedFluxDensityContinuumUnit.unit
@@ -74,7 +76,7 @@ final class SourceProfileSuite extends DisciplineSuite {
       SortedMap(
         Wavelength.Min -> EmissionLine(
           PosBigDecimalOne.withUnit[KilometersPerSecond],
-          NonEmptyMap.of(Timestamp.Min -> WattsPerMeter2Arcsec2IsSurfaceLineFluxUnit.unit.withValueTagged(PosBigDecimalOne))
+          NonEmptyMap.of(Instant.MIN -> WattsPerMeter2Arcsec2IsSurfaceLineFluxUnit.unit.withValueTagged(PosBigDecimalOne))
         )
       ),
       WattsPerMeter2MicrometerArcsec2IsSurfaceFluxDensityContinuumUnit.unit

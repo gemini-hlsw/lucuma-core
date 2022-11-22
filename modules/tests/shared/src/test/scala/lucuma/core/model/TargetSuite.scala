@@ -5,8 +5,9 @@ package lucuma.core.model
 
 import cats.Order.*
 import cats.data.NonEmptyMap
-import cats.kernel.laws.discipline.arbitrary.*
+import cats.laws.discipline.arbitrary.*
 import eu.timepit.refined.cats.*
+import org.typelevel.cats.time.instantInstances
 import eu.timepit.refined.scalacheck.string.*
 import lucuma.core.arb.*
 import lucuma.core.enums.Band
@@ -18,6 +19,7 @@ import lucuma.core.util.arb.*
 import lucuma.core.util.laws.GidTests
 import monocle.law.discipline.*
 import munit.*
+import cats.kernel.laws.discipline.*
 
 final class TargetSuite extends DisciplineSuite {
   import ArbTarget.given

@@ -3,30 +3,31 @@
 
 package lucuma.core.model.arb
 
-import cats.Order._
+import cats.Order.*
 import cats.laws.discipline.arbitrary.*
+import org.typelevel.cats.time.instantInstances
 import coulomb.*
 import coulomb.syntax.*
 import eu.timepit.refined.types.numeric.PosBigDecimal
 import lucuma.core.math.BrightnessUnits
 import lucuma.core.math.arb.ArbRefined
-import lucuma.core.math.dimensional._
+import lucuma.core.math.dimensional.*
 import lucuma.core.math.dimensional.arb.ArbMeasure
-import lucuma.core.math.units._
+import lucuma.core.math.units.*
 import lucuma.core.model.EmissionLine
 import lucuma.core.model.SpectralDefinition.EmissionLines
 import lucuma.core.util.arb.ArbEnumerated
 import lucuma.core.util.arb.ArbTimestamp
 import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck._
+import org.scalacheck.*
 
 trait ArbEmissionLine {
-  import ArbEnumerated._
-  import ArbTimestamp._
-  import BrightnessUnits._
-  import ArbMeasure._
-  import ArbRefined._
-  import ArbSpectralDefinition._
+  import ArbEnumerated.*
+  import ArbTimestamp.*
+  import BrightnessUnits.*
+  import ArbMeasure.*
+  import ArbRefined.*
+  import ArbSpectralDefinition.*
 
   implicit def arbEmissionLine[T](implicit
     arbLineFluxUnit: Arbitrary[Units Of LineFlux[T]]

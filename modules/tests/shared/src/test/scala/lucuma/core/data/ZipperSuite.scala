@@ -9,11 +9,11 @@ import cats.data.NonEmptyList
 import cats.kernel.laws.discipline.EqTests
 import cats.laws.discipline.FunctorTests
 import cats.laws.discipline.TraverseTests
-import cats.laws.discipline.arbitrary._
-import cats.syntax.all._
-import lucuma.core.data.arb.ArbZipper._
+import cats.laws.discipline.arbitrary.*
+import cats.syntax.all.*
+import lucuma.core.data.arb.ArbZipper.*
 import monocle.law.discipline.TraversalTests
-import org.scalacheck.Prop._
+import org.scalacheck.Prop.*
 
 /**
   * Tests the Zipper typeclasses

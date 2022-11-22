@@ -3,39 +3,38 @@
 
 package lucuma.core.model.arb
 
-import cats.Order._
+import cats.Order.*
 import cats.data.NonEmptyMap
 import cats.laws.discipline.arbitrary.*
-import cats.syntax.all._
+import cats.syntax.all.*
+import org.typelevel.cats.time.instantInstances
 import eu.timepit.refined.types.numeric.PosBigDecimal
 import lucuma.core.enums.Band
 import lucuma.core.math.BrightnessUnits
 import lucuma.core.math.Wavelength
 import lucuma.core.math.arb.ArbRefined
 import lucuma.core.math.arb.ArbWavelength
-import lucuma.core.math.dimensional._
+import lucuma.core.math.dimensional.*
 import lucuma.core.math.dimensional.arb.ArbMeasure
 import lucuma.core.model.EmissionLine
 import lucuma.core.model.SpectralDefinition
 import lucuma.core.model.UnnormalizedSED
 import lucuma.core.util.arb.ArbEnumerated
-import lucuma.core.util.arb.ArbTimestamp
-import org.scalacheck.Arbitrary._
+import org.scalacheck.Arbitrary.*
 import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck._
+import org.scalacheck.*
 
 import scala.collection.immutable.SortedMap
 
 trait ArbSpectralDefinition {
-  import ArbUnnormalizedSED._
-  import ArbEnumerated._
-  import SpectralDefinition._
-  import BrightnessUnits._
-  import ArbMeasure._
-  import ArbEmissionLine._
-  import ArbRefined._
-  import ArbWavelength._
-  import ArbTimestamp._
+  import ArbUnnormalizedSED.*
+  import ArbEnumerated.*
+  import SpectralDefinition.*
+  import BrightnessUnits.*
+  import ArbMeasure.*
+  import ArbEmissionLine.*
+  import ArbRefined.*
+  import ArbWavelength.*
 
   implicit def cogNonEmptyMap[K: Cogen: Ordering, V: Cogen]: Cogen[NonEmptyMap[K, V]] =
     Cogen[Map[K, V]].contramap(_.toSortedMap.toMap)
