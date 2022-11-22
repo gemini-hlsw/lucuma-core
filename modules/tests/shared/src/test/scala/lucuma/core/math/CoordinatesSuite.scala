@@ -5,20 +5,23 @@ package lucuma.core.math
 
 import cats.Eq
 import cats.Show
-import cats.kernel.laws.discipline._
-import cats.syntax.all._
-import lucuma.core.math.arb._
-import lucuma.core.optics.laws.discipline._
+import cats.data.NonEmptyList
+import cats.kernel.laws.discipline.*
+import cats.laws.discipline.arbitrary.*
+import cats.syntax.all.*
+import lucuma.core.math.Coordinates.centerOf
+import lucuma.core.math.arb.*
+import lucuma.core.optics.laws.discipline.*
 import lucuma.core.tests.ScalaCheckFlaky
-import monocle.law.discipline._
-import org.scalacheck.Prop._
+import monocle.law.discipline.*
+import org.scalacheck.Prop.*
 
 final class CoordinatesSuite extends munit.DisciplineSuite {
-  import ArbCoordinates._
-  import ArbRightAscension._
-  import ArbDeclination._
-  import ArbAngle._
-  import ArbOffset._
+  import ArbCoordinates.*
+  import ArbRightAscension.*
+  import ArbDeclination.*
+  import ArbAngle.*
+  import ArbOffset.*
 
   // Laws
   checkAll("Coordinates", OrderTests[Coordinates].order)
@@ -151,6 +154,39 @@ final class CoordinatesSuite extends munit.DisciplineSuite {
       val b = a.offsetBy(posAngle, offset)
       val c = b.flatMap(_.offsetBy(posAngle, -offset))
       assertEqualsDouble((b, c).mapN(_.angularDistance(_).toDoubleDegrees).getOrElse(Double.MaxValue), 0, 0.01)
+    }
+  }
+
+  def assertCoordsEquals(a: Coordinates, b: Coordinates) = {
+    assertEqualsDouble(a.ra.toRadians, b.ra.toRadians, 1e-10)
+    assertEqualsDouble(a.dec.toRadians, b.dec.toRadians, 1e-10)
+  }
+
+  test("center of same is same") {
+    forAll { (coord: Coordinates) =>
+      assertCoordsEquals(centerOf(NonEmptyList.of(coord, coord)), coord)
+    }
+  }
+
+  test("centerOf is commutative") {
+    forAll { (a: Coordinates, b: Coordinates) =>
+      assertCoordsEquals(centerOf(NonEmptyList.of(a, b)), centerOf(NonEmptyList.of(b, a)))
+    }
+  }
+
+  test("centerOf is approximately interpolate") {
+    forAll { (a: Coordinates, b: Coordinates) =>
+      assertCoordsEquals(centerOf(NonEmptyList.of(a, b)), a.interpolate(b, 0.5))
+      assertCoordsEquals(centerOf(NonEmptyList.of(a, b)), b.interpolate(a, 0.5))
+    }
+  }
+
+  test("centerOf should be independent of order") {
+    forAll { (coords: NonEmptyList[Coordinates]) =>
+      assertCoordsEquals(centerOf(coords), centerOf(coords.reverse))
+      assertCoordsEquals(centerOf(coords),
+                         centerOf(NonEmptyList.ofInitLast(coords.tail, coords.head))
+      )
     }
   }
 

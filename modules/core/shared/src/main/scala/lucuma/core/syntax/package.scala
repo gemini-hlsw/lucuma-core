@@ -19,7 +19,6 @@ package object syntax {
       with ToEnumeratedOps
       with ToInstantOps
       with ToIntOps
-      with ToParserOps
       with ToPrismOps
       with ToStringOps
       with ToTreeMapCompanionOps

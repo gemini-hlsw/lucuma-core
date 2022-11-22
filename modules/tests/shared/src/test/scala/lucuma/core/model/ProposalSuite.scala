@@ -3,23 +3,23 @@
 
 package lucuma.core.model
 
-import cats.Order._
-import cats.kernel.laws.discipline._
-import eu.timepit.refined.cats._
-import eu.timepit.refined.scalacheck.all._
+import cats.Order.*
+import cats.kernel.laws.discipline.*
+import eu.timepit.refined.cats.*
+import eu.timepit.refined.scalacheck.all.*
 import lucuma.core.model.Proposal
-import lucuma.core.model.arb._
+import lucuma.core.model.arb.*
 import lucuma.core.util.arb.ArbCollection
 import lucuma.core.util.arb.ArbEnumerated
-import monocle.law.discipline._
-import munit._
-import org.scalacheck.Cogen._
+import monocle.law.discipline.*
+import munit.*
+import org.scalacheck.Cogen.*
 
 class ProposalSuite extends DisciplineSuite {
-  import ArbCollection._
-  import ArbEnumerated._
-  import ArbProposal._
-  import ArbProposalClass._
+  import ArbCollection.*
+  import ArbEnumerated.*
+  import ArbProposal.given
+  import ArbProposalClass.given
 
   checkAll("Eq[Proposal]", EqTests[Proposal].eqv)
 

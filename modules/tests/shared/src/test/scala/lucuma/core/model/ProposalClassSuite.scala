@@ -3,19 +3,19 @@
 
 package lucuma.core.model
 
-import cats.kernel.laws.discipline._
-import eu.timepit.refined.cats._
-import eu.timepit.refined.scalacheck.all._
+import cats.kernel.laws.discipline.*
+import eu.timepit.refined.cats.*
+import eu.timepit.refined.scalacheck.all.*
 import lucuma.core.model.ProposalClass
-import lucuma.core.model.ProposalClass._
-import lucuma.core.model.arb._
-import lucuma.core.model.implicits._
-import monocle.law.discipline._
-import munit._
+import lucuma.core.model.ProposalClass.*
+import lucuma.core.model.arb.*
+import lucuma.core.model.given
+import monocle.law.discipline.*
+import munit.*
 
 class ProposalClassSuite extends DisciplineSuite {
-  import ArbNonNegDuration._
-  import ArbProposalClass._
+  import ArbNonNegDuration.given
+  import ArbProposalClass.given
 
   // Laws for instances
   checkAll("Eq[Classical]", EqTests[Classical].eqv)

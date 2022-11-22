@@ -3,45 +3,42 @@
 
 package lucuma.core.model
 
-import cats.Order._
+import cats.Order.*
 import cats.data.NonEmptyMap
-import cats.kernel.laws.discipline._
 import cats.laws.discipline.arbitrary.*
+import cats.kernel.laws.discipline.*
 import coulomb.*
 import coulomb.syntax.*
-import eu.timepit.refined.cats._
+import eu.timepit.refined.cats.*
 import lucuma.core.enums.Band
 import lucuma.core.enums.StellarLibrarySpectrum
 import lucuma.core.math.Angle
-import lucuma.core.math.BrightnessUnits._
+import lucuma.core.math.BrightnessUnits.*
 import lucuma.core.math.Wavelength
 import lucuma.core.math.arb.ArbAngle
 import lucuma.core.math.arb.ArbRefined
 import lucuma.core.math.arb.ArbWavelength
 import lucuma.core.math.dimensional.arb.ArbMeasure
-import lucuma.core.math.units._
-import lucuma.core.model.arb._
-import lucuma.core.util.Timestamp
+import lucuma.core.math.units.*
+import lucuma.core.model.arb.*
 import lucuma.core.util.arb.ArbCollection
 import lucuma.core.util.arb.ArbEnumerated
-import lucuma.core.util.arb.ArbTimestamp
-import monocle.law.discipline._
-import munit._
+import monocle.law.discipline.*
+import munit.*
 
 import scala.collection.immutable.SortedMap
 
 final class SourceProfileSuite extends DisciplineSuite {
-  import ArbAngle._
-  import ArbEmissionLine._
-  import ArbEnumerated._
-  import ArbTimestamp._
-  import ArbMeasure._
-  import ArbRefined._
-  import ArbSourceProfile._
-  import ArbSpectralDefinition._
-  import ArbUnnormalizedSED._
-  import ArbWavelength._
-  import ArbCollection._
+  import ArbAngle.*
+  import ArbEmissionLine.*
+  import ArbEnumerated.*
+  import ArbMeasure.*
+  import ArbRefined.*
+  import ArbSourceProfile.*
+  import ArbSpectralDefinition.*
+  import ArbUnnormalizedSED.*
+  import ArbWavelength.*
+  import ArbCollection.*
 
   // Conversions
   val sd1Integrated: SpectralDefinition[Integrated] =

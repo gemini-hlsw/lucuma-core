@@ -6,7 +6,7 @@ package lucuma.core.math
 import cats.Order
 import cats.Show
 import lucuma.core.parser.MiscParsers
-import lucuma.core.syntax.all._
+import lucuma.core.syntax.all.*
 import monocle.Prism
 
 /** A positive, non-zero value for numbered identifiers. */
@@ -35,6 +35,6 @@ trait IndexOptics {
 
   /** @group Optics */
   val fromString: Prism[String, Index] =
-    Prism(MiscParsers.index.parseExact)(_.toShort.toString)
+    Prism[String, Index](MiscParsers.index.parseAll(_).toOption)(_.toShort.toString)
 
 }

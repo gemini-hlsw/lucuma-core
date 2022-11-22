@@ -4,15 +4,15 @@
 package lucuma.core.model
 package arb
 
-import lucuma.core.arb._
+import lucuma.core.arb.*
 import lucuma.core.enums.EphemerisKeyType
-import lucuma.core.model.EphemerisKey._
+import lucuma.core.model.EphemerisKey.*
 import lucuma.core.util.arb.ArbEnumerated
-import org.scalacheck.Arbitrary._
-import org.scalacheck._
+import org.scalacheck.Arbitrary.*
+import org.scalacheck.*
 
 trait ArbEphemerisKey {
-  import ArbEnumerated._
+  import ArbEnumerated.*
 
   private def genStringDes[A](f: String => A): Gen[A] =
     Gen.alphaNumStr.map(s => f(s.take(10)))

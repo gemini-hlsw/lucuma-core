@@ -8,11 +8,10 @@ import cats.Show
 import lucuma.core.enums.Half
 import lucuma.core.enums.Site
 import lucuma.core.model.parser.SemesterParsers
-import lucuma.core.syntax.parser._
-import org.typelevel.cats.time._
+import org.typelevel.cats.time.*
 
-import java.time.Month._
-import java.time._
+import java.time.Month.*
+import java.time.*
 
 /**
  * A (Year, Half) pair.
@@ -124,7 +123,7 @@ object Semester {
 
   /** Parse a full-year Semester like `2009A` from a String, if possible. */
   def fromString(s: String): Option[Semester] =
-    SemesterParsers.semester.parseExact(s)
+    SemesterParsers.semester.parseAll(s).toOption
 
   /** Parse a full-year Semester like `2009A` from a String, throwing on failure. */
   def unsafeFromString(s: String): Semester =

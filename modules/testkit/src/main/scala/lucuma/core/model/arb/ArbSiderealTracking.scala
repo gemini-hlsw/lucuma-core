@@ -3,21 +3,21 @@
 
 package lucuma.core.model.arb
 
-import lucuma.core.math._
-import lucuma.core.math.arb._
-import lucuma.core.model._
-import org.scalacheck.Arbitrary._
-import org.scalacheck.Cogen._
-import org.scalacheck._
+import lucuma.core.math.*
+import lucuma.core.math.arb.*
+import lucuma.core.model.*
+import org.scalacheck.Arbitrary.*
+import org.scalacheck.Cogen.*
+import org.scalacheck.*
 
 trait ArbSiderealTracking {
-  import ArbEpoch._
-  import ArbCoordinates._
-  import ArbProperMotion._
-  import ArbRadialVelocity._
-  import ArbParallax._
+  import ArbEpoch.*
+  import ArbCoordinates.*
+  import ArbProperMotion.given
+  import ArbRadialVelocity.*
+  import ArbParallax.*
 
-  implicit val arbSiderealTracking: Arbitrary[SiderealTracking] =
+  given Arbitrary[SiderealTracking] =
     Arbitrary {
       for {
         cs <- arbitrary[Coordinates]
@@ -28,7 +28,7 @@ trait ArbSiderealTracking {
       } yield SiderealTracking(cs, ap, pv, rv, px)
     }
 
-  implicit val cogSiderealTracking: Cogen[SiderealTracking] =
+  given Cogen[SiderealTracking] =
     Cogen[
       (
         Coordinates,

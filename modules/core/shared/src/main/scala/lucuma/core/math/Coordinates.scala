@@ -3,15 +3,15 @@
 
 package lucuma.core.math
 
-import cats._
-import cats.syntax.all._
+import cats.*
+import cats.syntax.all.*
 import lucuma.core.math.parser.CoordinateParsers
 import lucuma.core.optics.Format
-import lucuma.core.syntax.all._
+import lucuma.core.syntax.all.*
 import monocle.Focus
 import monocle.Lens
 
-import scala.math._
+import scala.math.*
 
 /** A point in the sky, given right ascension and declination. */
 final case class Coordinates(ra: RightAscension, dec: Declination) {
@@ -166,6 +166,41 @@ object Coordinates extends CoordinatesOptics {
   def unsafeFromRadians(ra: Double, dec: Double): Coordinates =
     Coordinates(RA.fromRadians(ra), Declination.unsafeFromRadians(dec))
 
+  /**
+  * Taken from
+  * https://www.geomidpoint.com/calculation.html
+  * and
+  * https://stackoverflow.com/questions/6671183/calculate-the-center-point-of-multiple-latitude-longitude-coordinate-pairs
+  *
+  * Convert dec/ra (must be in radians) to Cartesian coordinates for each location.
+  * X = cos(dec) * cos(ra)
+  * Y = cos(dec) * sin(ra)
+  * Z = sin(dec)
+  *
+  * Compute average x, y and z coordinates.
+  * x = (x1 + x2 + ... + xn) / n
+  * y = (y1 + y2 + ... + yn) / n
+  * z = (z1 + z2 + ... + zn) / n
+  *
+  * Convert average x, y, z coordinate to latitude and longitude.
+  * Lon = atan2(y, x)
+  * Hyp = sqrt(x * x + y * y)
+  * Lat = atan2(z, hyp)
+  */
+  def centerOf[F[_]: Foldable](coords: F[Coordinates]): Coordinates =
+    val (x0, y0, z0) = coords.foldMap { case Coordinates(ra, dec) =>
+      (cos(dec.toRadians) * cos(ra.toRadians),
+      cos(dec.toRadians) * sin(ra.toRadians),
+      sin(dec.toRadians))
+    }
+    val count        = coords.size
+    val (x, y, z)    = (x0 / count, y0 / count, z0 / count)
+
+    val ra  = atan2(y, x)
+    val hyp = hypot(x, y)
+    val dec = atan2(z, hyp)
+    Coordinates(RightAscension.fromRadians(ra), Declination.unsafeFromRadians(dec))
+
   /** @group Typeclass Instances */
   implicit val CoordinatesOrder: Order[Coordinates] =
     Order.by(c => (c.ra, c.dec))
@@ -183,7 +218,7 @@ trait CoordinatesOptics { this: Coordinates.type =>
    * @group Optics
    */
   val fromHmsDms: Format[String, Coordinates] = Format(
-    CoordinateParsers.coordinates.parseExact,
+    CoordinateParsers.coordinates.parseAll(_).toOption,
     cs =>
       s"${RightAscension.fromStringHMS.reverseGet(cs.ra)} ${Declination.fromStringSignedDMS
         .reverseGet(cs.dec)}"
