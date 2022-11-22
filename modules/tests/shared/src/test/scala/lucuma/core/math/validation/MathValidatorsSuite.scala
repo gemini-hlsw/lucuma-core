@@ -3,21 +3,21 @@
 
 package lucuma.core.math.validation
 
-import eu.timepit.refined.cats._
+import eu.timepit.refined.cats.*
 import lucuma.core.math.Declination
 import lucuma.core.math.HourAngle
-import lucuma.core.math.arb._
+import lucuma.core.math.arb.*
 import lucuma.core.optics.laws.discipline.ValidSplitEpiTests
 import lucuma.core.optics.laws.discipline.ValidWedgeTests
 import munit.DisciplineSuite
-import org.scalacheck.Arbitrary._
+import org.scalacheck.Arbitrary.*
 import org.scalacheck.Gen
 
 final class MathValidatorsSuite extends DisciplineSuite {
-  import ArbAngle._
-  import ArbDeclination._
-  import ArbEpoch._
-  import ArbRightAscension._
+  import ArbAngle.*
+  import ArbDeclination.*
+  import ArbEpoch.*
+  import ArbRightAscension.*
 
   val genNumericString      = arbitrary[BigDecimal].map(_.toString)
   val genMaybeNumericString = Gen.frequency(5 -> genNumericString, 1 -> arbitrary[String])
