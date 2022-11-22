@@ -53,7 +53,7 @@ trait MathValidators {
       a =>
         f"${truncateAngle(a).toSignedBigDecimalDegrees}%.2f"
           .replace("-0.00", "0.00")
-          .replace("$180.00", "-180.00")
+          .replaceAll("^180.00", "-180.00")
     )
 
   val rightAscension: InputValidSplitEpi[RightAscension] =
