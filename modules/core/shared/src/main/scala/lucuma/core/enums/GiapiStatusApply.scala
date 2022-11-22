@@ -137,6 +137,21 @@ object GiapiStatusApply {
   /** @group Constructors */ case object GhostUserTarget8CoordsDecDeg extends GiapiStatusApply("GhostUserTarget8CoordsDecDeg", Instrument.Ghost, GiapiType.Double, "ghost:cc:cu:targets.target8_dec", "ghost:cc:cu:targets.target8_dec", Option.empty[BigDecimal])
   /** @group Constructors */ case object GhostUserTargetCount extends GiapiStatusApply("GhostUserTargetCount", Instrument.Ghost, GiapiType.Int, "ghost:cc:cu:targets.targets.n_targets", "ghost:cc:cu:targets.targets.n_targets", Option.empty[BigDecimal])
 
+  /** @group Constructors */ case object GhostSVCcdRequestType extends GiapiStatusApply("GhostSVCcdRequestType", Instrument.Ghost, GiapiType.String, "ghost:sad:dc:sv.ccd_request_type", "ghost:dc:sv.ccd_request_type", None)
+  /** @group Constructors */ case object GhostSVRequestType extends GiapiStatusApply("GhostSVRequestType", Instrument.Ghost, GiapiType.String, "ghost:sad:dc:sv.request_type", "ghost:dc:sv.request_type", None)
+  /** @group Constructors */ case object GhostSVRepeat extends GiapiStatusApply("GhostSVRepeat", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:sv.repeat", "ghost:dc:sv.repeat", None)
+  /** @group Constructors */ case object GhostSVRunNumber extends GiapiStatusApply("GhostSVRunNumber", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:sv.run_number", "ghost:dc:sv.run_number", None)
+  /** @group Constructors */ case object GhostSVDuration extends GiapiStatusApply("GhostSVDuration", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:sv.duration", "ghost:dc:sv.duration", None)
+  /** @group Constructors */ case object GhostSVUnit extends GiapiStatusApply("GhostSVUnit", Instrument.Ghost, GiapiType.Double, "ghost:sad:dc:sv.unit", "ghost:dc:sv.unit", None)
+
+ghost:dc:sv.ccd_request_type=CCD_CAMERA_SET 
+ghost:dc:sv.request_type=HARDWARE 
+ghost:dc:sv.repeat=1 
+ghost:dc:sv.run_number=0 
+ghost:dc:sv.duration=50 
+ghost:dc:sv.unit=0.1 
+ghost:dc:sv.do_save=0 ghost:dc:sv.do_display=1 ghost:dc:sv.nregions=1 ghost:dc:sv.rcf=1 ghost:dc:sv.ccf=1 ghost:dc:sv.imagetyp=Object ghost:dc:sv.nregions=1 ghost:dc:sv.xo=0 ghost:dc:sv.yo=0 ghost:dc:sv.width=1928 ghost:dc:sv.height=1452 ghost:dc:sv.ifu1bluethreshold=5.0E7 ghost:dc:sv.ifu1bluethreshold_enabled=1 ghost:dc:sv.ifu1redthreshold=0 ghost:dc:sv.ifu1redthreshold_enabled=0 ghost:dc:sv.ifu2bluethreshold=0 ghost:dc:sv.ifu2bluethreshold_enabled=0 ghost:dc:sv.ifu2redthreshold=0 ghost:dc:sv.ifu2redthreshold_enabled=0 ghost:dc:sv.hibluethreshold=0 ghost:dc:sv.hibluethreshold_enabled=0 ghost:dc:sv.hiredthreshold=0 ghost:dc:sv.hiredthreshold_enabled=0 ghost:dc:sv.zero_accumulated_flux=1 ghost:dc:sv.do_continuous=1
+
   /** All members of GiapiStatusApply, in canonical order. */
   val all: List[GiapiStatusApply] =
     List(GpiAdc,
