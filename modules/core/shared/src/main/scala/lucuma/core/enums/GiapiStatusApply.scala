@@ -143,14 +143,30 @@ object GiapiStatusApply {
   /** @group Constructors */ case object GhostSVRunNumber extends GiapiStatusApply("GhostSVRunNumber", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:sv.run_number", "ghost:dc:sv.run_number", None)
   /** @group Constructors */ case object GhostSVDuration extends GiapiStatusApply("GhostSVDuration", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:sv.duration", "ghost:dc:sv.duration", None)
   /** @group Constructors */ case object GhostSVUnit extends GiapiStatusApply("GhostSVUnit", Instrument.Ghost, GiapiType.Double, "ghost:sad:dc:sv.unit", "ghost:dc:sv.unit", None)
-
-ghost:dc:sv.ccd_request_type=CCD_CAMERA_SET 
-ghost:dc:sv.request_type=HARDWARE 
-ghost:dc:sv.repeat=1 
-ghost:dc:sv.run_number=0 
-ghost:dc:sv.duration=50 
-ghost:dc:sv.unit=0.1 
-ghost:dc:sv.do_save=0 ghost:dc:sv.do_display=1 ghost:dc:sv.nregions=1 ghost:dc:sv.rcf=1 ghost:dc:sv.ccf=1 ghost:dc:sv.imagetyp=Object ghost:dc:sv.nregions=1 ghost:dc:sv.xo=0 ghost:dc:sv.yo=0 ghost:dc:sv.width=1928 ghost:dc:sv.height=1452 ghost:dc:sv.ifu1bluethreshold=5.0E7 ghost:dc:sv.ifu1bluethreshold_enabled=1 ghost:dc:sv.ifu1redthreshold=0 ghost:dc:sv.ifu1redthreshold_enabled=0 ghost:dc:sv.ifu2bluethreshold=0 ghost:dc:sv.ifu2bluethreshold_enabled=0 ghost:dc:sv.ifu2redthreshold=0 ghost:dc:sv.ifu2redthreshold_enabled=0 ghost:dc:sv.hibluethreshold=0 ghost:dc:sv.hibluethreshold_enabled=0 ghost:dc:sv.hiredthreshold=0 ghost:dc:sv.hiredthreshold_enabled=0 ghost:dc:sv.zero_accumulated_flux=1 ghost:dc:sv.do_continuous=1
+  /** @group Constructors */ case object GhostSVDoSave extends GiapiStatusApply("GhostSVDoSave", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:sv.do_save", "ghost:dc:sv.do_save", None)
+  /** @group Constructors */ case object GhostSVDoDisplay extends GiapiStatusApply("GhostSVDoDisplay", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:sv.do_display", "ghost:dc:sv.do_display", None)
+  /** @group Constructors */ case object GhostSVRcf extends GiapiStatusApply("GhostSVRcf", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:sv.rcf", "ghost:dc:sv.rcf", None)
+  /** @group Constructors */ case object GhostSVCcf extends GiapiStatusApply("GhostSVCcf", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:sv.ccf", "ghost:dc:sv.ccf", None)
+  /** @group Constructors */ case object GhostSVImageType extends GiapiStatusApply("GhostSVImageType", Instrument.Ghost, GiapiType.String, "ghost:sad:dc:sv.imagetyp", "ghost:dc:sv.imagetyp", None)
+  /** @group Constructors */ case object GhostSVNRegions extends GiapiStatusApply("GhostSVNRegions", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:sv.nregions", "ghost:dc:sv.nregions", None)
+  /** @group Constructors */ case object GhostSVXO extends GiapiStatusApply("GhostSVXO", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:sv.xo", "ghost:dc:sv.xo", None)
+  /** @group Constructors */ case object GhostSVYO extends GiapiStatusApply("GhostSVYO", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:sv.yo", "ghost:dc:sv.yo", None)
+  /** @group Constructors */ case object GhostSVWidth extends GiapiStatusApply("GhostSVWidth", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:sv.width", "ghost:dc:sv.width", None)
+  /** @group Constructors */ case object GhostSVHeigth extends GiapiStatusApply("GhostSVHeight", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:sv.height", "ghost:dc:sv.height", None)
+  /** @group Constructors */ case object GhostSVIFU1BlueThreshold extends GiapiStatusApply("GhostSVIFU1BlueThreshold", Instrument.Ghost, GiapiType.Double, "ghost:sad:dc:sv.ifu1bluethreshold", "ghost:dc:sv.ifu1bluethreshold", None)
+  /** @group Constructors */ case object GhostSVIFU1BlueThresholdEnabled extends GiapiStatusApply("GhostSVIFU1BlueThresholdEnabled", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:sv.ifu1bluethreshold_enabled", "ghost:dc:sv.ifu1bluethreshold_enabled", None)
+  /** @group Constructors */ case object GhostSVIFU1RedThreshold extends GiapiStatusApply("GhostSVIFU1RedThreshold", Instrument.Ghost, GiapiType.Double, "ghost:sad:dc:sv.ifu1redthreshold", "ghost:dc:sv.ifu1redthreshold", None)
+  /** @group Constructors */ case object GhostSVIFU1RedThresholdEnabled extends GiapiStatusApply("GhostSVIFU1RedThresholdEnabled", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:sv.ifu1redthreshold_enabled", "ghost:dc:sv.ifu1redthreshold_enabled", None)
+  /** @group Constructors */ case object GhostSVIFU2BlueThreshold extends GiapiStatusApply("GhostSVIFU2BlueThreshold", Instrument.Ghost, GiapiType.Double, "ghost:sad:dc:sv.ifu2bluethreshold", "ghost:dc:sv.ifu2bluethreshold", None)
+  /** @group Constructors */ case object GhostSVIFU2BlueThresholdEnabled extends GiapiStatusApply("GhostSVIFU2BlueThresholdEnabled", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:sv.ifu2bluethreshold_enabled", "ghost:dc:sv.ifu2bluethreshold_enabled", None)
+  /** @group Constructors */ case object GhostSVIFU2RedThreshold extends GiapiStatusApply("GhostSVIFU2RedThreshold", Instrument.Ghost, GiapiType.Double, "ghost:sad:dc:sv.ifu2redthreshold", "ghost:dc:sv.ifu2redthreshold", None)
+  /** @group Constructors */ case object GhostSVIFU2RedThresholdEnabled extends GiapiStatusApply("GhostSVIFU2RedThresholdEnabled", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:sv.ifu2redthreshold_enabled", "ghost:dc:sv.ifu2redthreshold_enabled", None)
+  /** @group Constructors */ case object GhostSVHIBlueThreshold extends GiapiStatusApply("GhostSVHIBlueThreshold", Instrument.Ghost, GiapiType.Double, "ghost:sad:dc:sv.hibluethreshold", "ghost:dc:sv.hibluethreshold", None)
+  /** @group Constructors */ case object GhostSVHIBlueThresholdEnabled extends GiapiStatusApply("GhostSVHIBlueThresholdEnabled", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:sv.hibluethreshold_enabled", "ghost:dc:sv.hibluethreshold_enabled", None)
+  /** @group Constructors */ case object GhostSVHIRedThreshold extends GiapiStatusApply("GhostSVHIRedThreshold", Instrument.Ghost, GiapiType.Double, "ghost:sad:dc:sv.hiredthreshold", "ghost:dc:sv.hiredthreshold", None)
+  /** @group Constructors */ case object GhostSVHIRedThresholdEnabled extends GiapiStatusApply("GhostSVHIRedThresholdEnabled", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:sv.hiredthreshold_enabled", "ghost:dc:sv.hiredthreshold_enabled", None)
+  /** @group Constructors */ case object GhostSVZeroAccumulatedFlux extends GiapiStatusApply("GhostSVZeroAccumulatedFlux", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:sv.zero_accumulated_flux", "ghost:dc:sv.zero_accumulated_flux", None)
+  /** @group Constructors */ case object GhostSVDoContinuous extends GiapiStatusApply("GhostSVDoContinuous", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:sv.do_continuous", "ghost:dc:sv.do_continuous", None)
 
   /** All members of GiapiStatusApply, in canonical order. */
   val all: List[GiapiStatusApply] =
@@ -264,7 +280,38 @@ ghost:dc:sv.do_save=0 ghost:dc:sv.do_display=1 ghost:dc:sv.nregions=1 ghost:dc:s
       GhostUserTarget8Name,
       GhostUserTarget8CoordsRADeg,
       GhostUserTarget8CoordsDecDeg,
-      GhostUserTargetCount)
+      GhostUserTargetCount,
+      GhostSVCcdRequestType,
+      GhostSVRequestType,
+      GhostSVRepeat,
+      GhostSVRunNumber,
+      GhostSVDuration,
+      GhostSVUnit,
+      GhostSVDoSave,
+      GhostSVDoDisplay,
+      GhostSVRcf,
+      GhostSVCcf,
+      GhostSVImageType,
+      GhostSVNRegions,
+      GhostSVXO,
+      GhostSVYO,
+      GhostSVWidth,
+      GhostSVHeigth,
+      GhostSVIFU1BlueThreshold,
+      GhostSVIFU1BlueThresholdEnabled,
+      GhostSVIFU1RedThreshold,
+      GhostSVIFU1RedThresholdEnabled,
+      GhostSVIFU2BlueThreshold,
+      GhostSVIFU2BlueThresholdEnabled,
+      GhostSVIFU2RedThreshold,
+      GhostSVIFU2RedThresholdEnabled,
+      GhostSVHIBlueThreshold,
+      GhostSVHIBlueThresholdEnabled,
+      GhostSVHIRedThreshold,
+      GhostSVHIRedThresholdEnabled,
+      GhostSVZeroAccumulatedFlux,
+      GhostSVDoContinuous
+    )
 
   /** Select the member of GiapiStatusApply with the given tag, if any. */
   def fromTag(s: String): Option[GiapiStatusApply] =
