@@ -137,6 +137,7 @@ object GiapiStatusApply {
   /** @group Constructors */ case object GhostUserTarget8CoordsDecDeg extends GiapiStatusApply("GhostUserTarget8CoordsDecDeg", Instrument.Ghost, GiapiType.Double, "ghost:cc:cu:targets.target8_dec", "ghost:cc:cu:targets.target8_dec", Option.empty[BigDecimal])
   /** @group Constructors */ case object GhostUserTargetCount extends GiapiStatusApply("GhostUserTargetCount", Instrument.Ghost, GiapiType.Int, "ghost:cc:cu:targets.targets.n_targets", "ghost:cc:cu:targets.targets.n_targets", Option.empty[BigDecimal])
 
+  // SlitViemw
   /** @group Constructors */ case object GhostSVCcdRequestType extends GiapiStatusApply("GhostSVCcdRequestType", Instrument.Ghost, GiapiType.String, "ghost:sad:dc:sv.ccd_request_type", "ghost:dc:sv.ccd_request_type", None)
   /** @group Constructors */ case object GhostSVRequestType extends GiapiStatusApply("GhostSVRequestType", Instrument.Ghost, GiapiType.String, "ghost:sad:dc:sv.request_type", "ghost:dc:sv.request_type", None)
   /** @group Constructors */ case object GhostSVRepeat extends GiapiStatusApply("GhostSVRepeat", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:sv.repeat", "ghost:dc:sv.repeat", None)
@@ -167,6 +168,25 @@ object GiapiStatusApply {
   /** @group Constructors */ case object GhostSVHIRedThresholdEnabled extends GiapiStatusApply("GhostSVHIRedThresholdEnabled", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:sv.hiredthreshold_enabled", "ghost:dc:sv.hiredthreshold_enabled", None)
   /** @group Constructors */ case object GhostSVZeroAccumulatedFlux extends GiapiStatusApply("GhostSVZeroAccumulatedFlux", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:sv.zero_accumulated_flux", "ghost:dc:sv.zero_accumulated_flux", None)
   /** @group Constructors */ case object GhostSVDoContinuous extends GiapiStatusApply("GhostSVDoContinuous", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:sv.do_continuous", "ghost:dc:sv.do_continuous", None)
+
+  // Guiding Camera
+  /** @group Constructors */ case object GhostAGCcdRequestType extends GiapiStatusApply("GhostAGCcdRequestType", Instrument.Ghost, GiapiType.String, "ghost:sad:dc:sv.ccd_request_type", "ghost:dc:sv.ccd_request_type", None)
+  /** @group Constructors */ case object GhostAGRequestType extends GiapiStatusApply("GhostAGRequestType", Instrument.Ghost, GiapiType.String, "ghost:sad:dc:ag.request_type", "ghost:dc:ag.request_type", None)
+  /** @group Constructors */ case object GhostAGRepeat extends GiapiStatusApply("GhostAGRepeat", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:ag.repeat", "ghost:dc:ag.repeat", None)
+  /** @group Constructors */ case object GhostAGDuration extends GiapiStatusApply("GhostAGDuration", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:ag.duration", "ghost:dc:ag.duration", None)
+  /** @group Constructors */ case object GhostAGUnit extends GiapiStatusApply("GhostAGUnit", Instrument.Ghost, GiapiType.Double, "ghost:sad:dc:ag.unit", "ghost:dc:ag.unit", None)
+  /** @group Constructors */ case object GhostAGDoSave extends GiapiStatusApply("GhostAGDoSave", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:ag.do_save", "ghost:dc:ag.do_save", None)
+  /** @group Constructors */ case object GhostAGDoDisplay extends GiapiStatusApply("GhostAGDoDisplay", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:ag.do_display", "ghost:dc:ag.do_display", None)
+  /** @group Constructors */ case object GhostAGRcf extends GiapiStatusApply("GhostAGRcf", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:ag.rcf", "ghost:dc:ag.rcf", None)
+  /** @group Constructors */ case object GhostAGCcf extends GiapiStatusApply("GhostAGCcf", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:ag.ccf", "ghost:dc:ag.ccf", None)
+  /** @group Constructors */ case object GhostAGXO extends GiapiStatusApply("GhostAGXO", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:ag.xo", "ghost:dc:ag.xo", None)
+  /** @group Constructors */ case object GhostAGYO extends GiapiStatusApply("GhostAGYO", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:ag.yo", "ghost:dc:ag.yo", None)
+  /** @group Constructors */ case object GhostAGWidth extends GiapiStatusApply("GhostAGWidth", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:ag.width", "ghost:dc:ag.width", None)
+  /** @group Constructors */ case object GhostAGHeigth extends GiapiStatusApply("GhostAGHeight", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:ag.height", "ghost:dc:ag.height", None)
+  /** @group Constructors */ case object GhostAGEnableGuide extends GiapiStatusApply("GhostAGEnableGuide", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:ag.enable_guide", "ghost:dc:ag.enable_guide", None)
+  /** @group Constructors */ case object GhostAGBackground extends GiapiStatusApply("GhostAGBackground", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:ag.background", "ghost:dc:ag.background", None)
+  /** @group Constructors */ case object GhostAGSimulateFlux extends GiapiStatusApply("GhostAGSimulateFlux", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:ag.simulate_flux", "ghost:dc:ag.simulate_flux", None)
+  /** @group Constructors */ case object GhostAGDoContinuous extends GiapiStatusApply("GhostAGDoContinuous", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:ag.do_continuous", "ghost:dc:ag.do_continuous", None)
 
   /** All members of GiapiStatusApply, in canonical order. */
   val all: List[GiapiStatusApply] =
@@ -310,7 +330,24 @@ object GiapiStatusApply {
       GhostSVHIRedThreshold,
       GhostSVHIRedThresholdEnabled,
       GhostSVZeroAccumulatedFlux,
-      GhostSVDoContinuous
+      GhostSVDoContinuous,
+      GhostAGCcdRequestType,
+      GhostAGRequestType,
+      GhostAGRepeat,
+      GhostAGDuration,
+      GhostAGUnit,
+      GhostAGDoSave,
+      GhostAGDoDisplay,
+      GhostAGRcf,
+      GhostAGCcf,
+      GhostAGXO,
+      GhostAGYO,
+      GhostAGWidth,
+      GhostAGHeigth,
+      GhostAGEnableGuide,
+      GhostAGBackground,
+      GhostAGSimulateFlux,
+      GhostAGDoContinuous,
     )
 
   /** Select the member of GiapiStatusApply with the given tag, if any. */
