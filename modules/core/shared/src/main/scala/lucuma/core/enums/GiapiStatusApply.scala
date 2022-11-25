@@ -100,9 +100,11 @@ object GiapiStatusApply {
   /** @group Constructors */ case object GhostIFU1Type extends GiapiStatusApply("GhostIFU1Type", Instrument.Ghost, GiapiType.Int, "ghost:sad:cc:cu:ifu1.type", "ghost:cc:cu:ifu1.type", Option.empty[BigDecimal])
   /** @group Constructors */ case object GhostIFU1X extends GiapiStatusApply("GhostIFU1X", Instrument.Ghost, GiapiType.Double, "ghost:sad:cc:cu:ifu1.fpx", "ghost:cc:cu:ifu1.fpx", Option.empty[BigDecimal])
   /** @group Constructors */ case object GhostIFU1Y extends GiapiStatusApply("GhostIFU1Y", Instrument.Ghost, GiapiType.Double, "ghost:sad:cc:cu:ifu1.fpy", "ghost:cc:cu:ifu1.fpy", Option.empty[BigDecimal])
+  /** @group Constructors */ case object GhostIFU1MoveMode extends GiapiStatusApply("GhostIFU1MoveMode", Instrument.Ghost, GiapiType.Double, "ghost:sad:cc:cu:ifu1.move_mode", "ghost:cc:cu:ifu1.move_mode", Option.empty[BigDecimal])
   /** @group Constructors */ case object GhostIFU2Type extends GiapiStatusApply("GhostIFU2Type", Instrument.Ghost, GiapiType.Int, "ghost:sad:cc:cu:ifu2.type", "ghost:cc:cu:ifu2.type", Option.empty[BigDecimal])
   /** @group Constructors */ case object GhostIFU2X extends GiapiStatusApply("GhostIFU2X", Instrument.Ghost, GiapiType.Double, "ghost:sad:cc:cu:ifu2.fpx", "ghost:cc:cu:ifu2.fpx", Option.empty[BigDecimal])
   /** @group Constructors */ case object GhostIFU2Y extends GiapiStatusApply("GhostIFU2Y", Instrument.Ghost, GiapiType.Double, "ghost:sad:cc:cu:ifu2.fpy", "ghost:cc:cu:ifu2.fpy", Option.empty[BigDecimal])
+  /** @group Constructors */ case object GhostIFU2MoveMode extends GiapiStatusApply("GhostIFU2MoveMode", Instrument.Ghost, GiapiType.Double, "ghost:sad:cc:cu:ifu2.move_mode", "ghost:cc:cu:ifu2.move_mode", Option.empty[BigDecimal])
   /** @group Constructors */ case object GhostIFU1Target extends GiapiStatusApply("GhostIFU1Target", Instrument.Ghost, GiapiType.Int, "ghost:sad:cc:cu:ifu1.target", "ghost:cc:cu:ifu1.target", Option.empty[BigDecimal])
   /** @group Constructors */ case object GhostIFU2Target extends GiapiStatusApply("GhostIFU2Target", Instrument.Ghost, GiapiType.Int, "ghost:sad:cc:cu:ifu2.target", "ghost:cc:cu:ifu2.target", Option.empty[BigDecimal])
   /** @group Constructors */ case object GhostIFU1Bundle extends GiapiStatusApply("GhostIFU1Bundle", Instrument.Ghost, GiapiType.Int, "ghost:sad:cc:cu:ifu1.bundle", "ghost:cc:cu:ifu1.bundle", Option.empty[BigDecimal])
@@ -269,9 +271,11 @@ object GiapiStatusApply {
       GhostIFU1Type,
       GhostIFU1X,
       GhostIFU1Y,
+      GhostIFU1MoveMode,
       GhostIFU2Type,
       GhostIFU2X,
       GhostIFU2Y,
+      GhostIFU2MoveMode,
       GhostIFU1Target,
       GhostIFU2Target,
       GhostIFU1Bundle,
