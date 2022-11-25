@@ -170,7 +170,7 @@ object GiapiStatusApply {
   /** @group Constructors */ case object GhostSVDoContinuous extends GiapiStatusApply("GhostSVDoContinuous", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:sv.do_continuous", "ghost:dc:sv.do_continuous", None)
 
   // Guiding Camera
-  /** @group Constructors */ case object GhostAGCcdRequestType extends GiapiStatusApply("GhostAGCcdRequestType", Instrument.Ghost, GiapiType.String, "ghost:sad:dc:sv.ccd_request_type", "ghost:dc:sv.ccd_request_type", None)
+  /** @group Constructors */ case object GhostAGCcdRequestType extends GiapiStatusApply("GhostAGCcdRequestType", Instrument.Ghost, GiapiType.String, "ghost:sad:dc:ag.ccd_request_type", "ghost:dc:ag.ccd_request_type", None)
   /** @group Constructors */ case object GhostAGRequestType extends GiapiStatusApply("GhostAGRequestType", Instrument.Ghost, GiapiType.String, "ghost:sad:dc:ag.request_type", "ghost:dc:ag.request_type", None)
   /** @group Constructors */ case object GhostAGRepeat extends GiapiStatusApply("GhostAGRepeat", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:ag.repeat", "ghost:dc:ag.repeat", None)
   /** @group Constructors */ case object GhostAGDuration extends GiapiStatusApply("GhostAGDuration", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:ag.duration", "ghost:dc:ag.duration", None)
