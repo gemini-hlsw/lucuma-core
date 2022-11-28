@@ -3,8 +3,8 @@
 
 package lucuma.core.math.skycalc
 
-import cats._
-import cats.syntax.all._
+import cats.*
+import cats.syntax.all.*
 import edu.gemini.skycalc.TwilightBoundedNightTest
 import lucuma.core.arb.ArbTime
 import lucuma.core.enums.Site
@@ -13,15 +13,15 @@ import lucuma.core.math.skycalc.TwilightCalc
 import lucuma.core.optics.Spire
 import lucuma.core.util.arb.ArbEnumerated
 import munit.ScalaCheckSuite
-import org.scalacheck.Prop._
-import org.typelevel.cats.time._
+import org.scalacheck.Prop.*
+import org.typelevel.cats.time.*
 
 import java.time.Instant
 import java.time.LocalDate
 
 final class TwilightCalcSuiteJVM extends ScalaCheckSuite {
-  import ArbEnumerated._
-  import ArbTime._
+  import ArbEnumerated.*
+  import ArbTime.*
 
   implicit val showLocalDate: Show[LocalDate] = Show.fromToString
   implicit val InstantEq: Eq[Instant]         = Eq.fromUniversalEquals
