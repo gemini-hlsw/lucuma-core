@@ -194,6 +194,8 @@ object GiapiStatusApply {
   /** @group Constructors */ case object GhostAGSimulateFlux extends GiapiStatusApply("GhostAGSimulateFlux", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:ag.simulate_flux", "ghost:dc:ag.simulate_flux", None)
   /** @group Constructors */ case object GhostAGDoContinuous extends GiapiStatusApply("GhostAGDoContinuous", Instrument.Ghost, GiapiType.Int, "ghost:sad:dc:ag.do_continuous", "ghost:dc:ag.do_continuous", None)
 
+  /** @group Constructors */ case object GhostThXeLamp extends GiapiStatusApply("GhostThXeLamp", Instrument.Ghost, GiapiType.Int, "sad:cc:slu:hclPower.value", "cc:slu:ins.hclPowerCtl", None)
+
   /** All members of GiapiStatusApply, in canonical order. */
   val all: List[GiapiStatusApply] =
     List(GpiAdc,
@@ -360,6 +362,7 @@ object GiapiStatusApply {
       GhostAGBackground,
       GhostAGSimulateFlux,
       GhostAGDoContinuous,
+      GhostThXeLamp
     )
 
   /** Select the member of GiapiStatusApply with the given tag, if any. */
