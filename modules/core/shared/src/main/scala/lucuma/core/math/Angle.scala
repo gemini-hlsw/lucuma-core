@@ -31,7 +31,11 @@ import scala.math
 opaque type Angle = Long
 
 object Angle extends AngleOptics {
-  inline private def apply(w: Long): Angle = w
+  inline private def apply(µas: Long): Angle = {
+    assert(µas >= 0, s"Invariant violated. $µas is negative.")
+    assert(µas < Angle.µasPer360, s"Invariant violated. $µas is >= 360°.")
+    µas
+  }
 
   type Angle180µas = 648000000000L  // 180 * µasPerDegree
   type Angle360µas = 1296000000000L // 360 * µasPerDegree
@@ -151,7 +155,7 @@ object Angle extends AngleOptics {
    * Integral angle represented as a sum of degrees, arcminutes, arcseconds, milliarcseconds and
    * microarcseconds. This type is exact and isomorphic to Angle.
    */
-  final case class DMS(toAngle: Angle) {
+  case class DMS(toAngle: Angle) {
     val (
       degrees: Int,
       arcminutes: Int,
@@ -488,7 +492,11 @@ trait AngleOptics extends OpticsHelpers { this: Angle.type =>
 opaque type HourAngle <: Angle = Long
 
 object HourAngle extends HourAngleOptics {
-  private inline def apply(w: Long): HourAngle = w
+  private inline def apply(µas: Long): HourAngle = {
+    // Sanity checks … should be correct via the companion constructor.
+    assert(µas % 15 === 0, s"Invariant violated. $µas isn't divisible by 15.")
+    µas
+  }
 
   private [math] val µsPerHour: Long = 60L * 60L * 1000L * 1000L
 
