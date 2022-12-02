@@ -161,13 +161,24 @@ public final class TwilightBoundedNightTest {
         _calcTimes(angle, jdmid, place);
     }
 
+    private double mas2SignedDoubleDegrees(Long mas) {
+      // 360 degrees in MAS
+      long mas180 = 648000000000L;
+      long mas360 = mas180 * 2L;
+      long normalizedMas = mas;
+      if (mas >= mas180) {
+        normalizedMas = mas - mas360;
+      }
+      return normalizedMas / (60 * 60 * 1e6);
+    }
+
     private void _calcTimes(double angle, JulianDate jdmid, Place place) {
         Coordinates sun = ImprovedSkyCalcMethods.lpsun(jdmid);
         double rasun  = sun.getRaDeg();
         double decsun = sun.getDecDeg();
 
-        double lat    =   place.latitude().toAngle().toSignedDoubleDegrees();
-        double longit = -(place.longitude().toSignedDoubleDegrees() / 15.0); // skycalc wants hours
+        double lat    =   mas2SignedDoubleDegrees(place.latitude().toAngle());
+        double longit = -(mas2SignedDoubleDegrees(place.longitude()) / 15.0); // skycalc wants hours
 
         double hasunset = ImprovedSkyCalcMethods.ha_alt(decsun, lat, -angle);
 

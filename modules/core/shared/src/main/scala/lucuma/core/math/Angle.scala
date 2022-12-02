@@ -13,6 +13,7 @@ import lucuma.core.optics.*
 import monocle.Iso
 import monocle.Prism
 
+import scala.annotation.targetName
 import scala.math
 
 /**
@@ -23,175 +24,19 @@ import scala.math
  *
  * Lawful conversion to and from other types/scales is provided by optics defined on the companion
  * object. Floating-point conversions are provided directly
- * @param toMicroarcseconds
+ *
+ * @param
  *   This angle in microarcseconds. Exact.
  */
-sealed class Angle protected (val toMicroarcseconds: Long) {
-
-  // Sanity checks … should be correct via the companion constructor.
-  assert(toMicroarcseconds >= 0, s"Invariant violated. $toMicroarcseconds is negative.")
-  assert(toMicroarcseconds < Angle.µasPer360, s"Invariant violated. $toMicroarcseconds is >= 360°.")
-
-  /**
-   * Flip this angle 180°. Equivalent to `mirrorBy(this + Angle90)`. Exact, invertible.
-   * @group Transformations
-   */
-  def flip: Angle =
-    this + Angle.Angle180
-
-  /**
-   * Additive inverse of this angle, equivalent to `mirrorBy Angle0`. Exact, invertible.
-   * @group Transformations
-   */
-  def unary_- : Angle =
-    Angle.fromMicroarcseconds(-toMicroarcseconds.toLong)
-
-  /**
-   * Mirror image of this angle, when the mirror stands at angle `a`; or picture picking up the
-   * circle and flipping it over, around a line drawn from the center going off in direction `a`. So
-   * `(88° mirrorBy 90°) = 92°` for instance, as is `88° mirrorBy 270°` since it's the same line.
-   * This operation is specified completely by the identity `b - a = (a mirrorBy b) - b`.
-   * @group Transformations
-   */
-  def mirrorBy(a: Angle): Angle = {
-    val Δ = a.toMicroarcseconds - toMicroarcseconds
-    Angle.fromMicroarcseconds(toMicroarcseconds + Δ * 2L)
-  }
-
-  /**
-   * Angle corresponding to the bisection of this Angle. Approximate, non-invertible.
-   * @group Transformations
-   */
-  def bisect: Angle =
-    Angle.fromMicroarcseconds(toMicroarcseconds / 2L)
-
-  /**
-   * This angle in decimal degrees. Approximate, non-invertible.
-   * @group Conversions
-   */
-  def toDoubleDegrees: Double =
-    toMicroarcseconds.toDouble / Angle.µasPerDegree.toDouble
-
-  /**
-   * This angle in decimal degrees. Approximate, non-invertible
-   * @group Conversions
-   */
-  def toBigDecimalDegrees: BigDecimal =
-    BigDecimal(toMicroarcseconds) / Angle.µasPerDegree
-
-  /**
-   * This angle in signed decimal degrees. Approximate, non-invertible
-   * @group Conversions
-   */
-  def toSignedDoubleDegrees: Double =
-    Angle.signedMicroarcseconds.get(this).toDouble / Angle.µasPerDegree.toDouble
-
-  /**
-   * This angle in signed decimal degrees. Approximate, non-invertible
-   * @group Conversions
-   */
-  def toSignedBigDecimalDegrees: BigDecimal =
-    BigDecimal(Angle.signedMicroarcseconds.get(this)) / Angle.µasPerDegree
-
-  /**
-   * This angle in decimal radian, [0 .. 2π) Approximate, non-invertible
-   * @group Conversions
-   */
-  def toDoubleRadians: Double =
-    toDoubleDegrees.toRadians
-
-  /**
-   * This angle in signed decimal radians, [-π .. π) Approximate, non-invertible
-   * @group Conversions
-   */
-  def toSignedDoubleRadians: Double =
-    toSignedDoubleDegrees.toRadians
-
-  /**
-   * Sum of this angle and `a`. Exact, commutative, invertible.
-   * @group Operations
-   */
-  def +(a: Angle): Angle =
-    Angle.fromMicroarcseconds(toMicroarcseconds + a.toMicroarcseconds)
-
-  /**
-   * Difference of this angle and `a`. Exact, invertible.
-   * @group Operations
-   */
-  def -(a: Angle): Angle =
-    Angle.fromMicroarcseconds(toMicroarcseconds - a.toMicroarcseconds)
-
-  /**
-   * This angle as an Offset.P. Exact, invertible.
-   *
-   * @group Conversions
-   */
-  def p: Offset.P =
-    Offset.P(this)
-
-  /**
-   * This angle as an Offset.Q. Exact, invertible.
-   *
-   * @group Conversions
-   */
-  def q: Offset.Q =
-    Offset.Q(this)
-
-  /**
-   * This angle as an offset in p. Exact, invertible.
-   *
-   * @group Conversions
-   */
-  def offsetInP: Offset =
-    Offset(p, Offset.Q.Zero)
-
-  /**
-   * This angle as an offset in q. Exact, invertible.
-   *
-   * @group Conversions
-   */
-  def offsetInQ: Offset =
-    Offset(Offset.P.Zero, q)
-
-  /**
-   * Trigonometric sine of the angle.
-   */
-  def sin: Double = math.sin(toDoubleRadians)
-
-  /**
-   * Trigonometric cosine of the angle.
-   */
-  def cos: Double = math.cos(toDoubleRadians)
-
-  /**
-   * Trigonometric tangent of the angle.
-   */
-  def tan: Double = math.tan(toDoubleRadians)
-
-  /** String representation of this Angle, for debugging purposes only. */
-  override def toString: String = {
-    val dms = Angle.dms.get(this)
-    s"Angle.fromDMS(${dms.degrees},${dms.arcminutes},${dms.arcseconds},${dms.milliarcseconds},${dms.microarcseconds})"
-  }
-
-  /** Angles are equal if their magnitudes are equal. Exact. */
-  override final def equals(a: Any): Boolean =
-    a match {
-      case a: Angle => a.toMicroarcseconds === toMicroarcseconds
-      case _        => false
-    }
-
-  override final def hashCode: Int =
-    toMicroarcseconds.toInt
-
-  /**
-   * angle difference or separation between two angles in the range [0 .. π]
-   */
-  def difference(a: Angle): Angle =
-    Angle.difference(this, a)
-}
+opaque type Angle = Long
 
 object Angle extends AngleOptics {
+  inline private def apply(µas: Long): Angle = {
+    assert(µas >= 0, s"Invariant violated. $µas is negative.")
+    assert(µas < Angle.µasPer360, s"Invariant violated. $µas is >= 360°.")
+    µas
+  }
+
   type Angle180µas = 648000000000L  // 180 * µasPerDegree
   type Angle360µas = 1296000000000L // 360 * µasPerDegree
 
@@ -220,7 +65,7 @@ object Angle extends AngleOptics {
    */
   def fromMicroarcseconds(µas: Long): Angle = {
     val µasʹ = ((µas % µasPer360) + µasPer360) % µasPer360
-    new Angle(µasʹ)
+    Angle(µasʹ)
   }
 
   /**
@@ -280,8 +125,7 @@ object Angle extends AngleOptics {
    * Angles are equal if their magnitudes are equal.
    * @group Typeclass Instances
    */
-  given Eq[Angle] =
-    Eq.fromUniversalEquals
+  given (using eq: Eq[Long]): Eq[Angle] = eq
 
   /**
    * Sorts Angle by magnitude [0, 360) degrees. Not implicit.
@@ -311,7 +155,7 @@ object Angle extends AngleOptics {
    * Integral angle represented as a sum of degrees, arcminutes, arcseconds, milliarcseconds and
    * microarcseconds. This type is exact and isomorphic to Angle.
    */
-  final case class DMS(toAngle: Angle) {
+  case class DMS(toAngle: Angle) {
     val (
       degrees: Int,
       arcminutes: Int,
@@ -357,9 +201,167 @@ object Angle extends AngleOptics {
     import cats.syntax.all.* // To get order syntax
     given Order[Angle] = AngleOrder
 
-    val δ: Angle = α - ϐ
+    val δ: Angle =
+      Angle.fromMicroarcseconds(α - ϐ)
     if (δ > Angle.Angle180) δ.mirrorBy(Angle.Angle180) else δ
   }
+
+  extension (angle: Angle)
+    inline def toMicroarcseconds: Long = angle
+
+    /**
+    * Flip this angle 180°. Equivalent to `mirrorBy(this + Angle90)`. Exact, invertible.
+    * @group Transformations
+    */
+    @targetName("flipAngle") // to distinguish from flip HourAngle
+    def flip: Angle =
+      Angle.fromMicroarcseconds(toMicroarcseconds + Angle.Angle180)
+
+    /**
+    * Additive inverse of this angle, equivalent to `mirrorBy Angle0`. Exact, invertible.
+    * @group Transformations
+    */
+    @targetName("unaryAngle")
+    def unary_- : Angle =
+      Angle.fromMicroarcseconds(-toMicroarcseconds)
+
+    /**
+    * Mirror image of this angle, when the mirror stands at angle `a`; or picture picking up the
+    * circle and flipping it over, around a line drawn from the center going off in direction `a`. So
+    * `(88° mirrorBy 90°) = 92°` for instance, as is `88° mirrorBy 270°` since it's the same line.
+    * This operation is specified completely by the identity `b - a = (a mirrorBy b) - b`.
+    * @group Transformations
+    */
+    def mirrorBy(a: Angle): Angle = {
+      val Δ = a.toMicroarcseconds - toMicroarcseconds
+      Angle.fromMicroarcseconds(toMicroarcseconds + Δ * 2L)
+    }
+
+    /**
+    * Angle corresponding to the bisection of this Angle. Approximate, non-invertible.
+    * @group Transformations
+    */
+    inline def bisect: Angle =
+      Angle.fromMicroarcseconds(toMicroarcseconds / 2L)
+
+    /**
+    * This angle in decimal degrees. Approximate, non-invertible.
+    * @group Conversions
+    */
+    def toDoubleDegrees: Double =
+      toMicroarcseconds.toDouble / Angle.µasPerDegree.toDouble
+
+    /**
+    * This angle in decimal degrees. Approximate, non-invertible
+    * @group Conversions
+    */
+    def toBigDecimalDegrees: BigDecimal =
+      BigDecimal(toMicroarcseconds) / Angle.µasPerDegree
+
+    /**
+    * This angle in signed decimal degrees. Approximate, non-invertible
+    * @group Conversions
+    */
+    def toSignedDoubleDegrees: Double =
+      Angle.signedMicroarcseconds.get(angle).toDouble / Angle.µasPerDegree.toDouble
+
+    /**
+    * This angle in signed decimal degrees. Approximate, non-invertible
+    * @group Conversions
+    */
+    def toSignedBigDecimalDegrees: BigDecimal =
+      BigDecimal(Angle.signedMicroarcseconds.get(angle)) / Angle.µasPerDegree
+
+    /**
+    * This angle in decimal radian, [0 .. 2π) Approximate, non-invertible
+    * @group Conversions
+    */
+    inline def toDoubleRadians: Double =
+      toDoubleDegrees.toRadians
+
+    /**
+    * This angle in signed decimal radians, [-π .. π) Approximate, non-invertible
+    * @group Conversions
+    */
+    inline def toSignedDoubleRadians: Double =
+      toSignedDoubleDegrees.toRadians
+
+  /**
+    * Sum of this angle and `a`. Exact, commutative, invertible.
+    * @group Operations
+    */
+    @targetName("plusAngle")
+    def +(a: Angle): Angle =
+      Angle.fromMicroarcseconds(toMicroarcseconds + a.toMicroarcseconds)
+
+    /**
+    * Difference of this angle and `a`. Exact, invertible.
+    * @group Operations
+    */
+    @targetName("minusAngle")
+    def -(a: Angle): Angle =
+      Angle.fromMicroarcseconds(toMicroarcseconds - a.toMicroarcseconds)
+
+    /**
+    * This angle as an Offset.P. Exact, invertible.
+    *
+    * @group Conversions
+    */
+    inline def p: Offset.P =
+      Offset.P(angle)
+
+    /**
+    * This angle as an Offset.Q. Exact, invertible.
+    *
+    * @group Conversions
+    */
+    inline def q: Offset.Q =
+      Offset.Q(angle)
+
+    /**
+    * This angle as an offset in p. Exact, invertible.
+    *
+    * @group Conversions
+    */
+    inline def offsetInP: Offset =
+      Offset(p, Offset.Q.Zero)
+
+    /**
+    * This angle as an offset in q. Exact, invertible.
+    *
+    * @group Conversions
+    */
+    inline def offsetInQ: Offset =
+      Offset(Offset.P.Zero, q)
+
+    /**
+    * Trigonometric sine of the angle.
+    */
+    inline def sin: Double = math.sin(toDoubleRadians)
+
+    /**
+    * Trigonometric cosine of the angle.
+    */
+    inline def cos: Double = math.cos(toDoubleRadians)
+
+    /**
+    * Trigonometric tangent of the angle.
+    */
+    inline def tan: Double = math.tan(toDoubleRadians)
+
+    /** String representation of this Angle, for debugging purposes only. */
+    @targetName("toStringAngle")
+    def toString: String = {
+      val dms = Angle.dms.get(angle)
+      s"Angle.fromDMS(${dms.degrees},${dms.arcminutes},${dms.arcseconds},${dms.milliarcseconds},${dms.microarcseconds})"
+    }
+
+    /**
+    * angle difference or separation between two angles in the range [0 .. π]
+    */
+    @targetName("differenceAngle")
+    inline def difference(a: Angle): Angle =
+      Angle.difference(angle, a)
 }
 
 trait AngleOptics extends OpticsHelpers { this: Angle.type =>
@@ -376,7 +378,7 @@ trait AngleOptics extends OpticsHelpers { this: Angle.type =>
    * @group Optics
    */
   lazy val signedMicroarcseconds: SplitMono[Angle, Long] = {
-    lazy val µas360 = Angle.Angle180.toMicroarcseconds * 2L
+    lazy val µas360: Long = Angle.Angle180.toMicroarcseconds * 2L
     microarcseconds.imapB[Long](
       identity,
       µas => if (µas >= Angle.Angle180.toMicroarcseconds) µas - µas360 else µas
@@ -451,7 +453,7 @@ trait AngleOptics extends OpticsHelpers { this: Angle.type =>
    * @group Optics
    */
   lazy val dms: Iso[Angle, Angle.DMS] =
-    Iso(DMS(_))(_.toAngle)
+    Iso[Angle, Angle.DMS](DMS(_))(_.toAngle)
 
   /**
    * String parsed as unsigned DMS.
@@ -487,65 +489,16 @@ trait AngleOptics extends OpticsHelpers { this: Angle.type =>
  * @see
  *   The helpful [[https://en.wikipedia.org/wiki/Hour_angle Wikipedia]] article.
  */
-final class HourAngle private (µas: Long) extends Angle(µas) {
-
-  // Sanity checks … should be correct via the companion constructor.
-  assert(toMicroarcseconds % 15 === 0, s"Invariant violated. $µas isn't divisible by 15.")
-
-  /**
-   * Flip this HourAngle by 12h. This is logically identical to the superclass implementation and
-   * serves only to refine the return type. Exact, invertible.
-   * @group Transformations
-   */
-  override def flip: HourAngle =
-    this + HourAngle.HourAngle12
-
-  /**
-   * Additive inverse of this HourAngle (by mirroring around the 0-12h axis). This is logically
-   * identical to the superclass implementation and serves only to refine the return type. Exact,
-   * invertible.
-   * @group Transformations
-   */
-  override def unary_- : HourAngle =
-    HourAngle.fromMicroseconds(-toMicroseconds)
-
-  /**
-   * This `HourAngle` in microseconds. Exact.
-   * @group Conversions
-   */
-  def toMicroseconds: Long =
-    toMicroarcseconds / 15
-
-  /**
-   * This `HourAngle` in decimal hours. Approximate.
-   * @group Conversions
-   */
-  def toDoubleHours: Double =
-    toMicroseconds.toDouble / HourAngle.µsPerHour
-
-  /**
-   * Sum of this HourAngle and `ha`. Exact, commutative, invertible.
-   * @group Operations
-   */
-  def +(ha: HourAngle): HourAngle =
-    HourAngle.fromMicroseconds(toMicroseconds + ha.toMicroseconds)
-
-  /**
-   * Difference of this HourAngle and `ha`. Exact, invertible.
-   * @group Operations
-   */
-  def -(ha: HourAngle): HourAngle =
-    HourAngle.fromMicroseconds(toMicroseconds - ha.toMicroseconds)
-
-  /** String representation of this HourAngle, for debugging purposes only. */
-  override def toString: String =
-    HourAngle.fromStringHMS.taggedToString("HourAngle", this)
-
-}
+opaque type HourAngle <: Angle = Long
 
 object HourAngle extends HourAngleOptics {
+  private inline def apply(µas: Long): HourAngle = {
+    // Sanity checks … should be correct via the companion constructor.
+    assert(µas % 15 === 0, s"Invariant violated. $µas isn't divisible by 15.")
+    µas
+  }
 
-  private val µsPerHour: Long = 60L * 60L * 1000L * 1000L
+  private [math] val µsPerHour: Long = 60L * 60L * 1000L * 1000L
 
   /** @group Constants */
   lazy val HourAngle0: HourAngle = microseconds.reverseGet(0)
@@ -560,7 +513,7 @@ object HourAngle extends HourAngleOptics {
   def fromMicroseconds(µs: Long): HourAngle = {
     val µsPer24 = 24L * µsPerHour
     val µsʹ     = ((µs % µsPer24) + µsPer24) % µsPer24
-    new HourAngle(µsʹ * 15L)
+    HourAngle(µsʹ * 15L)
   }
 
   /**
@@ -617,14 +570,13 @@ object HourAngle extends HourAngleOptics {
    * Angles are equal if their magnitudes are equal.
    * @group Typeclass Instances
    */
-  given Eq[HourAngle] =
-    Eq.by(_.toMicroarcseconds)
+  given (using eq: Eq[Long]): Eq[HourAngle] = eq
 
   /**
    * Integral hour angle represented as a sum of hours, minutes, seconds, milliseconds, and
    * microseconds. This type is exact and isomorphic to HourAngle.
    */
-  final case class HMS(toHourAngle: HourAngle) {
+  case class HMS(toHourAngle: HourAngle) {
     def toAngle: Angle            = toHourAngle // forget it's an hour angle
     val (
       hours: Int,
@@ -641,7 +593,63 @@ object HourAngle extends HourAngleOptics {
     given Eq[HMS] = Eq.by(_.toHourAngle)
   }
 
-}
+  extension(hourAngle: HourAngle)
+
+    /**
+    * Flip this HourAngle by 12h. This is logically identical to the superclass implementation and
+    * serves only to refine the return type. Exact, invertible.
+    * @group Transformations
+    */
+    @targetName("flipHourAngle") // to distinguish from flip Angle
+    def flip: HourAngle =
+      HourAngle.fromMicroseconds(toMicroseconds + HourAngle.HourAngle12)
+
+    /**
+    * Additive inverse of this HourAngle (by mirroring around the 0-12h axis). This is logically
+    * identical to the superclass implementation and serves only to refine the return type. Exact,
+    * invertible.
+    * @group Transformations
+    */
+    @targetName("unaryHourAngle") // to distinguish from flip Angle
+    def unary_- : HourAngle =
+      HourAngle.fromMicroseconds(-toMicroseconds)
+
+    /**
+    * This `HourAngle` in microseconds. Exact.
+    * @group Conversions
+    */
+    def toMicroseconds: Long =
+      hourAngle / 15
+
+    /**
+    * This `HourAngle` in decimal hours. Approximate.
+    * @group Conversions
+    */
+    def toDoubleHours: Double =
+      toMicroseconds.toDouble / HourAngle.µsPerHour
+
+    /**
+    * Sum of this HourAngle and `ha`. Exact, commutative, invertible.
+    * @group Operations
+    */
+    @targetName("plusHourAngle")
+    def +(ha: HourAngle): HourAngle =
+      HourAngle.fromMicroseconds(toMicroseconds + ha.toMicroseconds)
+
+    /**
+    * Difference of this HourAngle and `ha`. Exact, invertible.
+    * @group Operations
+    */
+    @targetName("minusHourAngle")
+    def -(ha: HourAngle): HourAngle =
+      HourAngle.fromMicroseconds(toMicroseconds - ha.toMicroseconds)
+
+    /** String representation of this HourAngle, for debugging purposes only. */
+    @targetName("toStringHourAngle")
+    def toString: String =
+      HourAngle.fromStringHMS.taggedToString("HourAngle", hourAngle)
+
+  }
 
 trait HourAngleOptics extends OpticsHelpers { this: HourAngle.type =>
 
@@ -691,7 +699,7 @@ trait HourAngleOptics extends OpticsHelpers { this: HourAngle.type =>
    * @group Optics
    */
   lazy val hms: Iso[HourAngle, HourAngle.HMS] =
-    Iso(HMS(_))(_.toHourAngle)
+    Iso[HourAngle, HourAngle.HMS](HMS(_))(_.toHourAngle)
 
   /**
    * String in HMS as an `HourAngle`/
@@ -702,11 +710,10 @@ trait HourAngleOptics extends OpticsHelpers { this: HourAngle.type =>
 
 }
 
-trait OpticsHelpers {
+trait OpticsHelpers:
 
   // Syntax to scale down and squeeze into Int
   extension[A](self: SplitMono[A, Long])
-
 
     def scaled(n: Long): Wedge[A, Int] = {
       val longToInt: SplitEpi[Long, Int] =
@@ -714,4 +721,4 @@ trait OpticsHelpers {
       self.imapB[Long](_ * n, _ / n).andThen(longToInt)
     }
 
-}
+

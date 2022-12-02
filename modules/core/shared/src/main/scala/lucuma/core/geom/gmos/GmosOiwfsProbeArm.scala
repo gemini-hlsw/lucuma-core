@@ -3,15 +3,15 @@
 
 package lucuma.core.geom.gmos
 
-import cats.syntax.all._
+import cats.syntax.all.*
 import lucuma.core.enums.GmosNorthFpu
 import lucuma.core.enums.GmosSouthFpu
 import lucuma.core.enums.PortDisposition
 import lucuma.core.geom.ShapeExpression
-import lucuma.core.geom.syntax.all._
+import lucuma.core.geom.syntax.all.*
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
-import lucuma.core.math.syntax.int._
+import lucuma.core.math.syntax.int.*
 
 import scala.math.Pi
 import scala.math.asin
