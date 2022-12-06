@@ -4,7 +4,9 @@
 package lucuma.core.model
 
 import cats.Order.*
+import cats.data.NonEmptyMap
 import cats.kernel.laws.discipline.*
+import cats.laws.discipline.arbitrary.*
 import coulomb.*
 import coulomb.syntax.*
 import eu.timepit.refined.cats.*
@@ -23,18 +25,20 @@ import lucuma.core.util.arb.ArbCollection
 import lucuma.core.util.arb.ArbEnumerated
 import monocle.law.discipline.*
 import munit.*
+import org.typelevel.cats.time.instantInstances
 
+import java.time.Instant
 import scala.collection.immutable.SortedMap
 
 final class SourceProfileSuite extends DisciplineSuite {
   import ArbAngle.*
-  import ArbEmissionLine.*
+  import ArbEmissionLine.given
   import ArbEnumerated.*
-  import ArbMeasure.*
+  import ArbMeasure.given
   import ArbRefined.*
-  import ArbSourceProfile.*
-  import ArbSpectralDefinition.*
-  import ArbUnnormalizedSED.*
+  import ArbSourceProfile.given
+  import ArbSpectralDefinition.given
+  import ArbUnnormalizedSED.given
   import ArbWavelength.*
   import ArbCollection.*
 
@@ -43,7 +47,7 @@ final class SourceProfileSuite extends DisciplineSuite {
     SpectralDefinition.BandNormalized(
       UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.A0I),
       SortedMap(
-        Band.R -> Band.R.defaultUnits[Integrated].withValueTagged(BigDecimal(10.0))
+        Band.R -> NonEmptyMap.of(Instant.MIN -> Band.R.defaultUnits[Integrated].withValueTagged(BigDecimal(10.0)))
       )
     )
 
@@ -51,7 +55,7 @@ final class SourceProfileSuite extends DisciplineSuite {
     SpectralDefinition.BandNormalized(
       UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.A0I),
       SortedMap(
-        Band.R -> Band.R.defaultUnits[Surface].withValueTagged(BigDecimal(10.0))
+        Band.R -> NonEmptyMap.of(Instant.MIN -> Band.R.defaultUnits[Surface].withValueTagged(BigDecimal(10.0)))
       )
     )
 
@@ -60,7 +64,7 @@ final class SourceProfileSuite extends DisciplineSuite {
       SortedMap(
         Wavelength.Min -> EmissionLine(
           PosBigDecimalOne.withUnit[KilometersPerSecond],
-          WattsPerMeter2IsIntegratedLineFluxUnit.unit.withValueTagged(PosBigDecimalOne)
+          NonEmptyMap.of(Instant.MIN -> WattsPerMeter2IsIntegratedLineFluxUnit.unit.withValueTagged(PosBigDecimalOne))
         )
       ),
       WattsPerMeter2MicrometerIsIntegratedFluxDensityContinuumUnit.unit
@@ -72,7 +76,7 @@ final class SourceProfileSuite extends DisciplineSuite {
       SortedMap(
         Wavelength.Min -> EmissionLine(
           PosBigDecimalOne.withUnit[KilometersPerSecond],
-          WattsPerMeter2Arcsec2IsSurfaceLineFluxUnit.unit.withValueTagged(PosBigDecimalOne)
+          NonEmptyMap.of(Instant.MIN -> WattsPerMeter2Arcsec2IsSurfaceLineFluxUnit.unit.withValueTagged(PosBigDecimalOne))
         )
       ),
       WattsPerMeter2MicrometerArcsec2IsSurfaceFluxDensityContinuumUnit.unit

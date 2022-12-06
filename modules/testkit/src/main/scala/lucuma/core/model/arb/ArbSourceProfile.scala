@@ -4,31 +4,31 @@
 package lucuma.core.model
 package arb
 
-import cats.syntax.all._
+import cats.syntax.all.*
 import lucuma.core.math.Angle
 import lucuma.core.math.BrightnessUnits
 import lucuma.core.math.arb.ArbAngle
 import lucuma.core.util.arb.ArbEnumerated
 import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck._
+import org.scalacheck.*
 
 trait ArbSourceProfile {
-  import ArbAngle._
-  import ArbEnumerated._
-  import BrightnessUnits._
-  import ArbSpectralDefinition._
+  import ArbAngle.*
+  import ArbEnumerated.*
+  import BrightnessUnits.*
+  import ArbSpectralDefinition.given
 
-  implicit val arbPointSourceProfile: Arbitrary[SourceProfile.Point] =
+  given Arbitrary[SourceProfile.Point] =
     Arbitrary(
       arbitrary[SpectralDefinition[Integrated]].map(SourceProfile.Point(_))
     )
 
-  implicit val arbUniformSourceProfile: Arbitrary[SourceProfile.Uniform] =
+  given Arbitrary[SourceProfile.Uniform] =
     Arbitrary(
       arbitrary[SpectralDefinition[Surface]].map(SourceProfile.Uniform(_))
     )
 
-  implicit val arbGaussianSourceProfile: Arbitrary[SourceProfile.Gaussian] =
+  given Arbitrary[SourceProfile.Gaussian] =
     Arbitrary {
       for {
         a <- arbitrary[Angle]
@@ -36,7 +36,7 @@ trait ArbSourceProfile {
       } yield SourceProfile.Gaussian(a, d)
     }
 
-  implicit val arbSourceProfile: Arbitrary[SourceProfile] =
+  given Arbitrary[SourceProfile] =
     Arbitrary {
       Gen.oneOf(
         arbitrary[SourceProfile.Point],
@@ -45,16 +45,16 @@ trait ArbSourceProfile {
       )
     }
 
-  implicit val cogPointSourceProfile: Cogen[SourceProfile.Point] =
+  given Cogen[SourceProfile.Point] =
     Cogen[SpectralDefinition[Integrated]].contramap(_.spectralDefinition)
 
-  implicit val cogUniformSourceProfile: Cogen[SourceProfile.Uniform] =
+  given Cogen[SourceProfile.Uniform] =
     Cogen[SpectralDefinition[Surface]].contramap(_.spectralDefinition)
 
-  implicit val cogenGaussianSourceProfile: Cogen[SourceProfile.Gaussian] =
+  given Cogen[SourceProfile.Gaussian] =
     Cogen[(Angle, SpectralDefinition[Integrated])].contramap(x => (x.fwhm, x.spectralDefinition))
 
-  implicit val cogSourceProfile: Cogen[SourceProfile] =
+  given Cogen[SourceProfile] =
     Cogen[
       Either[SourceProfile.Point, Either[SourceProfile.Uniform, SourceProfile.Gaussian]]
     ]

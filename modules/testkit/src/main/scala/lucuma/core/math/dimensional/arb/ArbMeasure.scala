@@ -3,14 +3,14 @@
 
 package lucuma.core.math.dimensional.arb
 
-import lucuma.core.math.dimensional._
-import org.scalacheck.Arbitrary._
-import org.scalacheck._
+import lucuma.core.math.dimensional.*
+import org.scalacheck.Arbitrary.*
+import org.scalacheck.*
 
 trait ArbMeasure {
-  import ArbUnits._
+  import ArbUnits.*
 
-  implicit def arbMeasure[N: Arbitrary]: Arbitrary[Measure[N]] =
+  given arbMeasure[N: Arbitrary]: Arbitrary[Measure[N]] =
     Arbitrary {
       for {
         n <- arbitrary[N]
@@ -19,10 +19,10 @@ trait ArbMeasure {
       } yield u.withValue(n, e)
     }
 
-  implicit def cogenMeasure[N: Cogen]: Cogen[Measure[N]] =
+  given cogenMeasure[N: Cogen]: Cogen[Measure[N]] =
     Cogen[(N, Units, Option[N])].contramap(m => (m.value, m.units, m.error))
 
-  implicit def arbTaggedMeasure[N: Arbitrary, Tag](implicit
+  given arbTaggedMeasure[N: Arbitrary, Tag](using
     arbUnit: Arbitrary[Units Of Tag]
   ): Arbitrary[Measure[N] Of Tag] =
     Arbitrary {
@@ -33,7 +33,7 @@ trait ArbMeasure {
       } yield u.withValueTagged(n, e)
     }
 
-  implicit def cogenTaggedMeasure[N: Cogen, Tag]: Cogen[Measure[N] Of Tag] =
+  given cogenTaggedMeasure[N: Cogen, Tag]: Cogen[Measure[N] Of Tag] =
     Cogen[(N, Units, Option[N])].contramap(m => (m.value, m.units, m.error))
 }
 

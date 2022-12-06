@@ -209,27 +209,27 @@ object SourceProfile {
 
   /** @group Optics */
   val integratedBrightnesses
-    : Optional[SourceProfile, SortedMap[Band, BrightnessMeasure[Integrated]]] =
+    : Optional[SourceProfile, SortedMap[Band, BrightnessMeasureOverTime[Integrated]]] =
     integratedSpectralDefinition.andThen(SpectralDefinition.brightnesses[Integrated])
 
   /** @group Optics */
-  val surfaceBrightnesses: Optional[SourceProfile, SortedMap[Band, BrightnessMeasure[Surface]]] =
+  val surfaceBrightnesses: Optional[SourceProfile, SortedMap[Band, BrightnessMeasureOverTime[Surface]]] =
     surfaceSpectralDefinition.andThen(SpectralDefinition.brightnesses[Surface])
 
   /** @group Optics */
-  val integratedBrightnessesT: Traversal[SourceProfile, BrightnessMeasure[Integrated]] =
+  val integratedBrightnessesT: Traversal[SourceProfile, BrightnessMeasureOverTime[Integrated]] =
     integratedSpectralDefinition.andThen(SpectralDefinition.brightnessesT[Integrated])
 
   /** @group Optics */
-  val surfaceBrightnessesT: Traversal[SourceProfile, BrightnessMeasure[Surface]] =
+  val surfaceBrightnessesT: Traversal[SourceProfile, BrightnessMeasureOverTime[Surface]] =
     surfaceSpectralDefinition.andThen(SpectralDefinition.brightnessesT[Surface])
 
   /** @group Optics */
-  def integratedBrightnessIn[T](b: Band): Traversal[SourceProfile, BrightnessMeasure[Integrated]] =
+  def integratedBrightnessIn[T](b: Band): Traversal[SourceProfile, BrightnessMeasureOverTime[Integrated]] =
     integratedSpectralDefinition.andThen(SpectralDefinition.brightnessIn[Integrated](b))
 
   /** @group Optics */
-  def surfaceBrightnessIn[T](b: Band): Traversal[SourceProfile, BrightnessMeasure[Surface]] =
+  def surfaceBrightnessIn[T](b: Band): Traversal[SourceProfile, BrightnessMeasureOverTime[Surface]] =
     surfaceSpectralDefinition.andThen(SpectralDefinition.brightnessIn[Surface](b))
 
   /** @group Optics */

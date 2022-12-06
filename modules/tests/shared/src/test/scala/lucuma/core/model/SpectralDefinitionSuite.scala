@@ -3,11 +3,13 @@
 
 package lucuma.core.model
 
-import cats.Order._
-import cats.kernel.laws.discipline._
+import cats.Order.*
+import cats.data.NonEmptyMap
+import cats.kernel.laws.discipline.*
+import cats.laws.discipline.arbitrary.*
 import coulomb.*
 import coulomb.syntax.*
-import eu.timepit.refined.cats._
+import eu.timepit.refined.cats.*
 import lucuma.core.enums.Band
 import lucuma.core.enums.StellarLibrarySpectrum
 import lucuma.core.math.BrightnessUnits
@@ -15,32 +17,35 @@ import lucuma.core.math.Wavelength
 import lucuma.core.math.arb.ArbRefined
 import lucuma.core.math.arb.ArbWavelength
 import lucuma.core.math.dimensional.arb.ArbMeasure
-import lucuma.core.math.units._
-import lucuma.core.model.arb._
+import lucuma.core.math.units.*
+import lucuma.core.model.arb.*
+import lucuma.core.util.Timestamp
 import lucuma.core.util.arb.ArbCollection
 import lucuma.core.util.arb.ArbEnumerated
-import monocle.law.discipline._
-import munit._
+import monocle.law.discipline.*
+import munit.*
+import org.typelevel.cats.time.instantInstances
 
+import java.time.Instant
 import scala.collection.immutable.SortedMap
 
 final class SpectralDefinitionSuite extends DisciplineSuite {
-  import ArbUnnormalizedSED._
-  import ArbEnumerated._
-  import BrightnessUnits._
-  import ArbSpectralDefinition._
-  import ArbRefined._
-  import ArbMeasure._
-  import ArbEmissionLine._
-  import ArbCollection._
-  import ArbWavelength._
+  import ArbUnnormalizedSED.given
+  import ArbEnumerated.*
+  import BrightnessUnits.*
+  import ArbSpectralDefinition.given
+  import ArbRefined.*
+  import ArbMeasure.given
+  import ArbEmissionLine.given
+  import ArbCollection.*
+  import ArbWavelength.*
 
   // Brightness type conversions
   val sd1Integrated: SpectralDefinition[Integrated] =
     SpectralDefinition.BandNormalized(
       UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.A0I),
       SortedMap(
-        Band.R -> Band.R.defaultUnits[Integrated].withValueTagged(BigDecimal(10.0))
+        Band.R -> NonEmptyMap.of(Instant.MIN -> Band.R.defaultUnits[Integrated].withValueTagged(BigDecimal(10.0)))
       )
     )
 
@@ -48,7 +53,7 @@ final class SpectralDefinitionSuite extends DisciplineSuite {
     SpectralDefinition.BandNormalized(
       UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.A0I),
       SortedMap(
-        Band.R -> Band.R.defaultUnits[Surface].withValueTagged(BigDecimal(10.0))
+        Band.R -> NonEmptyMap.of(Instant.MIN -> Band.R.defaultUnits[Surface].withValueTagged(BigDecimal(10.0)))
       )
     )
 
@@ -57,7 +62,7 @@ final class SpectralDefinitionSuite extends DisciplineSuite {
       SortedMap(
         Wavelength.Min -> EmissionLine(
           PosBigDecimalOne.withUnit[KilometersPerSecond],
-          ErgsPerSecondCentimeter2IsIntegratedLineFluxUnit.unit.withValueTagged(PosBigDecimalOne)
+          NonEmptyMap.of(Instant.MIN -> ErgsPerSecondCentimeter2IsIntegratedLineFluxUnit.unit.withValueTagged(PosBigDecimalOne))
         )
       ),
       WattsPerMeter2MicrometerIsIntegratedFluxDensityContinuumUnit.unit.withValueTagged(
@@ -70,9 +75,8 @@ final class SpectralDefinitionSuite extends DisciplineSuite {
       SortedMap(
         Wavelength.Min -> EmissionLine(
           PosBigDecimalOne.withUnit[KilometersPerSecond],
-          ErgsPerSecondCentimeter2Arcsec2IsSurfaceLineFluxUnit.unit.withValueTagged(
-            PosBigDecimalOne
-          )
+          NonEmptyMap.of(Instant.MIN ->
+            ErgsPerSecondCentimeter2Arcsec2IsSurfaceLineFluxUnit.unit.withValueTagged(PosBigDecimalOne))
         )
       ),
       WattsPerMeter2MicrometerArcsec2IsSurfaceFluxDensityContinuumUnit.unit.withValueTagged(

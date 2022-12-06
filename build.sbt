@@ -83,6 +83,7 @@ lazy val testkit = crossProject(JVMPlatform, JSPlatform)
       "org.typelevel"     %%% "spire-laws"         % spireVersion,
       "eu.timepit"        %%% "refined-scalacheck" % refinedVersion,
       "io.circe"          %%% "circe-testing"      % circeVersion,
+      "org.typelevel"     %%% "cats-time-testkit"  % catsTimeVersion,
       "io.chrisdavenport" %%% "cats-scalacheck"    % catsScalacheckVersion
     )
   )

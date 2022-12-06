@@ -4,7 +4,9 @@
 package lucuma.core.model
 
 import cats.Order.*
+import cats.data.NonEmptyMap
 import cats.kernel.laws.discipline.*
+import cats.laws.discipline.arbitrary.*
 import eu.timepit.refined.cats.*
 import eu.timepit.refined.scalacheck.string.*
 import lucuma.core.arb.*
@@ -17,10 +19,11 @@ import lucuma.core.util.arb.*
 import lucuma.core.util.laws.GidTests
 import monocle.law.discipline.*
 import munit.*
+import org.typelevel.cats.time.instantInstances
 
 final class TargetSuite extends DisciplineSuite {
   import ArbTarget.given
-  import ArbSourceProfile.*
+  import ArbSourceProfile.given
   import ArbSiderealTracking.given
   import ArbEphemerisKey.*
   import ArbParallax.*
@@ -34,12 +37,12 @@ final class TargetSuite extends DisciplineSuite {
   import ArbEpoch.*
   import ArbCatalogInfo.*
   import Target.*
-  import ArbEmissionLine.*
-  import ArbSpectralDefinition.*
+  import ArbEmissionLine.given
+  import ArbSpectralDefinition.given
   import ArbAngle.*
-  import ArbUnnormalizedSED.*
+  import ArbUnnormalizedSED.given
   import ArbRefined.*
-  import ArbMeasure.*
+  import ArbMeasure.given
   import ArbCollection.*
   import ArbWavelength.*
 

@@ -3,38 +3,45 @@
 
 package lucuma.core.model
 
-import cats.implicits._
-import cats.kernel.laws.discipline._
+import cats.data.NonEmptyMap
+import cats.implicits.*
+import cats.kernel.laws.discipline.*
+import cats.laws.discipline.arbitrary.*
 import coulomb.*
 import coulomb.ops.algebra.cats.all.given
 import coulomb.syntax.*
-import eu.timepit.refined.cats._
-import lucuma.core.math.BrightnessUnits._
-import lucuma.core.math.arb._
+import eu.timepit.refined.cats.*
+import lucuma.core.math.BrightnessUnits.*
+import lucuma.core.math.arb.*
 import lucuma.core.math.dimensional.arb.ArbMeasure
-import lucuma.core.math.units._
+import lucuma.core.math.units.*
 import lucuma.core.model.arb.ArbEmissionLine
+import lucuma.core.model.arb.ArbSpectralDefinition
 import lucuma.core.util.arb.ArbEnumerated
 import monocle.law.discipline.LensTests
-import munit._
+import munit.*
+import org.typelevel.cats.time.instantInstances
+
+import java.time.Instant
 
 final class EmissionLineSuite extends DisciplineSuite {
-  import ArbEnumerated._
-  import ArbEmissionLine._
-  import ArbRefined._
-  import ArbMeasure._
+  import ArbEnumerated.*
+  import ArbEmissionLine.given
+  import ArbRefined.*
+  import ArbMeasure.given
+  import ArbSpectralDefinition.*
   import ArbQuantity.given
 
   // Brightness type conversions
   val e1Integrated: EmissionLine[Integrated] =
     EmissionLine(
       PosBigDecimalOne.withUnit[KilometersPerSecond],
-      WattsPerMeter2IsIntegratedLineFluxUnit.unit.withValueTagged(PosBigDecimalOne)
+      NonEmptyMap.of(Instant.MIN -> WattsPerMeter2IsIntegratedLineFluxUnit.unit.withValueTagged(PosBigDecimalOne))
     )
   val e1Surface: EmissionLine[Surface]       =
     EmissionLine(
       PosBigDecimalOne.withUnit[KilometersPerSecond],
-      WattsPerMeter2Arcsec2IsSurfaceLineFluxUnit.unit.withValueTagged(PosBigDecimalOne)
+      NonEmptyMap.of(Instant.MIN -> WattsPerMeter2Arcsec2IsSurfaceLineFluxUnit.unit.withValueTagged(PosBigDecimalOne))
     )
   test("Brightness type conversion Integrated -> Surface") {
     assertEquals(e1Integrated.to[Surface], e1Surface)

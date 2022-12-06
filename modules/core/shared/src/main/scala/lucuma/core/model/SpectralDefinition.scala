@@ -4,14 +4,14 @@
 package lucuma.core.model
 
 import cats.Eq
-import cats.Order._
-import cats.syntax.all._
-import eu.timepit.refined.cats._
+import cats.Order.*
+import cats.syntax.all.*
+import eu.timepit.refined.cats.*
 import eu.timepit.refined.types.numeric.PosBigDecimal
 import lucuma.core.enums.Band
-import lucuma.core.math.BrightnessUnits._
+import lucuma.core.math.BrightnessUnits.*
 import lucuma.core.math.Wavelength
-import lucuma.core.math.dimensional._
+import lucuma.core.math.dimensional.*
 import monocle.Focus
 import monocle.Lens
 import monocle.Optional
@@ -44,7 +44,7 @@ object SpectralDefinition {
 
   final case class BandNormalized[T](
     sed:          UnnormalizedSED,
-    brightnesses: SortedMap[Band, BrightnessMeasure[T]]
+    brightnesses: SortedMap[Band, BrightnessMeasureOverTime[T]]
   ) extends SpectralDefinition[T] {
     lazy val bands: List[Band] = brightnesses.keys.toList
 
@@ -59,7 +59,7 @@ object SpectralDefinition {
     ): BandNormalized[T0] =
       BandNormalized(
         sed,
-        brightnesses.map { case (band, brightness) => band -> brightness.toTag[Brightness[T0]] }
+        brightnesses.map { case (band, brightnesses) => band -> brightnesses.map(_.toTag[Brightness[T0]]) }
       )
   }
 
@@ -74,15 +74,15 @@ object SpectralDefinition {
       Focus[BandNormalized[T]](_.sed)
 
     /** @group Optics */
-    def brightnesses[T]: Lens[BandNormalized[T], SortedMap[Band, BrightnessMeasure[T]]] =
+    def brightnesses[T]: Lens[BandNormalized[T], SortedMap[Band, BrightnessMeasureOverTime[T]]] =
       Focus[BandNormalized[T]](_.brightnesses)
 
     /** @group Optics */
-    def brightnessesT[T]: Traversal[BandNormalized[T], BrightnessMeasure[T]] =
+    def brightnessesT[T]: Traversal[BandNormalized[T], BrightnessMeasureOverTime[T]] =
       brightnesses.each
 
     /** @group Optics */
-    def brightnessIn[T](b: Band): Traversal[BandNormalized[T], BrightnessMeasure[T]] =
+    def brightnessIn[T](b: Band): Traversal[BandNormalized[T], BrightnessMeasureOverTime[T]] =
       brightnesses.filterIndex((a: Band) => a === b)
   }
 
@@ -152,15 +152,15 @@ object SpectralDefinition {
     bandNormalized.andThen(BandNormalized.sed[T])
 
   /** @group Optics */
-  def brightnesses[T]: Optional[SpectralDefinition[T], SortedMap[Band, BrightnessMeasure[T]]] =
+  def brightnesses[T]: Optional[SpectralDefinition[T], SortedMap[Band, BrightnessMeasureOverTime[T]]] =
     bandNormalized.andThen(BandNormalized.brightnesses[T])
 
   /** @group Optics */
-  def brightnessesT[T]: Traversal[SpectralDefinition[T], BrightnessMeasure[T]] =
+  def brightnessesT[T]: Traversal[SpectralDefinition[T], BrightnessMeasureOverTime[T]] =
     bandNormalized.andThen(BandNormalized.brightnessesT[T])
 
   /** @group Optics */
-  def brightnessIn[T](b: Band): Traversal[SpectralDefinition[T], BrightnessMeasure[T]] =
+  def brightnessIn[T](b: Band): Traversal[SpectralDefinition[T], BrightnessMeasureOverTime[T]] =
     bandNormalized.andThen(BandNormalized.brightnessIn[T](b))
 
   /** @group Optics */

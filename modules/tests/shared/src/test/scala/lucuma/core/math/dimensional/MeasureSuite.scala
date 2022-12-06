@@ -4,18 +4,18 @@
 package lucuma.core.math.dimensional
 
 import cats.Eq
-import cats.kernel.laws.discipline._
-import cats.syntax.all._
-import lucuma.core.math.BrightnessUnits._
+import cats.kernel.laws.discipline.*
+import cats.syntax.all.*
+import lucuma.core.math.BrightnessUnits.*
 import lucuma.core.math.dimensional.arb.ArbMeasure
 import lucuma.core.math.dimensional.arb.ArbUnits
-import lucuma.core.util.arb.ArbEnumerated._
-import monocle.law.discipline._
-import org.scalacheck.Prop._
+import lucuma.core.util.arb.ArbEnumerated.*
+import monocle.law.discipline.*
+import org.scalacheck.Prop.*
 
 class MeasureSuite extends munit.DisciplineSuite {
-  import ArbMeasure._
-  import ArbUnits._
+  import ArbMeasure.given
+  import ArbUnits.*
 
   // Laws
   checkAll("Measure[BigDecimal]", EqTests[Measure[BigDecimal]].eqv)
@@ -31,9 +31,9 @@ class MeasureSuite extends munit.DisciplineSuite {
   }
 
   test("Derived Display") {
-    import lucuma.core.math.units._
+    import lucuma.core.math.units.*
     import lucuma.core.util.Display
-    import lucuma.core.syntax.display._
+    import lucuma.core.syntax.display.*
 
     val m = UnitOfMeasure[ABMagnitude].withValue(BigDecimal(1.235))
 
