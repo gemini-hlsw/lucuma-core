@@ -3,18 +3,18 @@
 
 package lucuma.core.model
 
-import cats._
-import cats.implicits._
-import eu.timepit.refined.auto._
-import eu.timepit.refined.cats._
+import cats.*
+import cats.implicits.*
+import eu.timepit.refined.auto.*
+import eu.timepit.refined.cats.*
 import eu.timepit.refined.types.numeric.PosBigDecimal
 import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.core.enums.Band
-import lucuma.core.math.BrightnessUnits._
-import lucuma.core.math._
-import lucuma.core.math.dimensional._
+import lucuma.core.math.BrightnessUnits.*
+import lucuma.core.math.*
+import lucuma.core.math.dimensional.*
 import lucuma.core.util.WithGid
-import lucuma.refined._
+import lucuma.refined.*
 import monocle.Focus
 import monocle.Lens
 import monocle.Optional
@@ -32,7 +32,7 @@ sealed trait Target extends Product with Serializable {
 
 object Target extends WithGid('t'.refined) with TargetOptics {
 
-  final case class Sidereal(
+  case class Sidereal(
     name:          NonEmptyString,
     tracking:      SiderealTracking,
     sourceProfile: SourceProfile,
@@ -40,7 +40,7 @@ object Target extends WithGid('t'.refined) with TargetOptics {
   ) extends Target
 
   object Sidereal extends SiderealOptics {
-    implicit val eqSidereal: Eq[Sidereal] =
+    given Eq[Sidereal] =
       Eq.by(x => (x.name, x.tracking, x.sourceProfile, x.catalogInfo))
 
     /**
@@ -59,14 +59,14 @@ object Target extends WithGid('t'.refined) with TargetOptics {
     val NameOrder: Order[Sidereal] = Order.by(x => (x.name, x.tracking))
   }
 
-  final case class Nonsidereal(
+  case class Nonsidereal(
     name:          NonEmptyString,
     ephemerisKey:  EphemerisKey,
     sourceProfile: SourceProfile
   ) extends Target
 
   object Nonsidereal extends NonsiderealOptics {
-    implicit val eqNonsidereal: Eq[Nonsidereal] =
+    given Eq[Nonsidereal] =
       Eq.by(x => (x.name, x.ephemerisKey, x.sourceProfile))
 
     /**
@@ -84,7 +84,7 @@ object Target extends WithGid('t'.refined) with TargetOptics {
     val NameOrder: Order[Nonsidereal] = Order.by(x => (x.name, x.ephemerisKey))
   }
 
-  implicit val TargetEq: Eq[Target] = Eq.instance {
+  given Eq[Target] = Eq.instance {
     case (a @ Sidereal(_, _, _, _), b @ Sidereal(_, _, _, _)) => a === b
     case (a @ Nonsidereal(_, _, _), b @ Nonsidereal(_, _, _)) => a === b
     case _                                                    => false
@@ -204,7 +204,7 @@ object Target extends WithGid('t'.refined) with TargetOptics {
       sourceProfile.andThen(SourceProfile.surfaceEmissionLinesSpectralDefinition)
 
     /** @group Optics */
-    val unnormalizedSED: Optional[Sidereal, UnnormalizedSED] =
+    val unnormalizedSED: Optional[Sidereal, Option[UnnormalizedSED]] =
       sourceProfile.andThen(SourceProfile.unnormalizedSED)
 
     /** @group Optics */
@@ -323,7 +323,7 @@ object Target extends WithGid('t'.refined) with TargetOptics {
       sourceProfile.andThen(SourceProfile.surfaceEmissionLinesSpectralDefinition)
 
     /** @group Optics */
-    val unnormalizedSED: Optional[Nonsidereal, UnnormalizedSED] =
+    val unnormalizedSED: Optional[Nonsidereal, Option[UnnormalizedSED]] =
       sourceProfile.andThen(SourceProfile.unnormalizedSED)
 
     /** @group Optics */
@@ -458,7 +458,7 @@ trait TargetOptics { this: Target.type =>
     sourceProfile.andThen(SourceProfile.surfaceEmissionLinesSpectralDefinition)
 
   /** @group Optics */
-  val unnormalizedSED: Optional[Target, UnnormalizedSED] =
+  val unnormalizedSED: Optional[Target, Option[UnnormalizedSED]] =
     sourceProfile.andThen(SourceProfile.unnormalizedSED)
 
   /** @group Optics */

@@ -5,97 +5,97 @@ package lucuma.core.model
 package arb
 
 import cats.data.NonEmptyMap
-import cats.implicits._
-import cats.laws.discipline.arbitrary._
+import cats.implicits.*
+import cats.laws.discipline.arbitrary.*
 import coulomb.*
 import coulomb.syntax.*
 import coulomb.units.si.Kelvin
 import eu.timepit.refined.numeric.Positive
 import eu.timepit.refined.refineV
 import eu.timepit.refined.types.numeric.PosBigDecimal
-import lucuma.core.enums._
+import lucuma.core.enums.*
 import lucuma.core.math.Wavelength
 import lucuma.core.math.arb.ArbRefined
 import lucuma.core.math.arb.ArbWavelength
-import lucuma.core.math.units._
+import lucuma.core.math.units.*
 import lucuma.core.util.arb.ArbEnumerated
-import lucuma.refined._
+import lucuma.refined.*
 import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck._
+import org.scalacheck.*
 
 trait ArbUnnormalizedSED {
-  import ArbEnumerated._
-  import UnnormalizedSED._
-  import ArbRefined._
-  import ArbWavelength._
+  import ArbEnumerated.*
+  import UnnormalizedSED.*
+  import ArbRefined.*
+  import ArbWavelength.*
 
-  implicit val arbStellarLibrary: Arbitrary[StellarLibrary] =
+  given Arbitrary[StellarLibrary] =
     Arbitrary(arbitrary[StellarLibrarySpectrum].map(StellarLibrary(_)))
 
-  implicit val cogStellarLibrary: Cogen[StellarLibrary] =
+  given Cogen[StellarLibrary] =
     Cogen[StellarLibrarySpectrum].contramap(_.librarySpectrum)
 
-  implicit val arbCoolStarModel: Arbitrary[CoolStarModel] =
+  given Arbitrary[CoolStarModel] =
     Arbitrary(arbitrary[CoolStarTemperature].map(CoolStarModel(_)))
 
-  implicit val cogCoolStarModel: Cogen[CoolStarModel] =
+  given Cogen[CoolStarModel] =
     Cogen[BigDecimal].contramap(_.temperature.temperature.value.value)
 
-  implicit val arbGalaxy: Arbitrary[Galaxy] =
+  given Arbitrary[Galaxy] =
     Arbitrary(arbitrary[GalaxySpectrum].map(Galaxy(_)))
 
-  implicit val cogGalaxy: Cogen[Galaxy] =
+  given Cogen[Galaxy] =
     Cogen[GalaxySpectrum].contramap(_.galaxySpectrum)
 
-  implicit val arbPlanet: Arbitrary[Planet] =
+  given Arbitrary[Planet] =
     Arbitrary(arbitrary[PlanetSpectrum].map(Planet(_)))
 
-  implicit val cogPlanet: Cogen[Planet] =
+  given Cogen[Planet] =
     Cogen[PlanetSpectrum].contramap(_.planetSpectrum)
 
-  implicit val arbQuasar: Arbitrary[Quasar] =
+  given Arbitrary[Quasar] =
     Arbitrary(arbitrary[QuasarSpectrum].map(Quasar(_)))
 
-  implicit val cogQuasar: Cogen[Quasar] =
+  given Cogen[Quasar] =
     Cogen[QuasarSpectrum].contramap(_.quasarSpectrum)
 
-  implicit val arbHIIRegion: Arbitrary[HIIRegion] =
+  given Arbitrary[HIIRegion] =
     Arbitrary(arbitrary[HIIRegionSpectrum].map(HIIRegion(_)))
 
-  implicit val cogHIIRegion: Cogen[HIIRegion] =
+  given Cogen[HIIRegion] =
     Cogen[HIIRegionSpectrum].contramap(_.hiiRegionSpectrum)
 
-  implicit val arbPlanetaryNebula: Arbitrary[PlanetaryNebula] =
+  given Arbitrary[PlanetaryNebula] =
     Arbitrary(arbitrary[PlanetaryNebulaSpectrum].map(PlanetaryNebula(_)))
 
-  implicit val cogPlanetaryNebula: Cogen[PlanetaryNebula] =
+  given Cogen[PlanetaryNebula] =
     Cogen[PlanetaryNebulaSpectrum].contramap(_.planetaryNebulaSpectrum)
 
-  implicit val arbPowerLaw: Arbitrary[PowerLaw] =
+  given Arbitrary[PowerLaw] =
     Arbitrary(arbitrary[BigDecimal].map(PowerLaw(_)))
 
-  implicit val cogPowerLaw: Cogen[PowerLaw] =
+  given Cogen[PowerLaw] =
     Cogen[BigDecimal].contramap(_.index)
 
-  implicit val arbBlackBody: Arbitrary[BlackBody] =
+  given Arbitrary[BlackBody] =
     Arbitrary(
       Gen
         .choose(1, 10000)
         .map(a => BlackBody(refineV[Positive](a).toOption.get.withUnit[Kelvin]))
     )
 
-  implicit val cogBlackBody: Cogen[BlackBody] =
+  given Cogen[BlackBody] =
     Cogen[BigDecimal].contramap(_.temperature.value.value)
 
-  implicit val arbUserDefined: Arbitrary[UserDefined] =
+  given Arbitrary[UserDefined] =
     Arbitrary(
       arbitrary[NonEmptyMap[Wavelength, PosBigDecimal]].map(UserDefined(_))
     )
 
-  implicit val cogUserDefined: Cogen[UserDefined] =
+  given Cogen[UserDefined] =
     Cogen[Map[Wavelength, PosBigDecimal]].contramap(_.fluxDensities.toSortedMap)
 
-  implicit def arbSpectralDistribution[T]: Arbitrary[UnnormalizedSED] =
+  given Arbitrary[UnnormalizedSED] =
     Arbitrary(
       Gen.oneOf(
         arbitrary[StellarLibrary],
@@ -111,7 +111,7 @@ trait ArbUnnormalizedSED {
       )
     )
 
-  implicit def cogSpectralDistribution[T]: Cogen[UnnormalizedSED] =
+  given Cogen[UnnormalizedSED] =
     Cogen[Either[
       StellarLibrary,
       Either[

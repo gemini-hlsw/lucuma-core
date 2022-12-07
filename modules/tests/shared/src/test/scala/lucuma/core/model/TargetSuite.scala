@@ -20,7 +20,7 @@ import munit.*
 
 final class TargetSuite extends DisciplineSuite {
   import ArbTarget.given
-  import ArbSourceProfile.*
+  import ArbSourceProfile.given
   import ArbSiderealTracking.given
   import ArbEphemerisKey.*
   import ArbParallax.*
@@ -35,9 +35,9 @@ final class TargetSuite extends DisciplineSuite {
   import ArbCatalogInfo.*
   import Target.*
   import ArbEmissionLine.*
-  import ArbSpectralDefinition.*
+  import ArbSpectralDefinition.given
   import ArbAngle.*
-  import ArbUnnormalizedSED.*
+  import ArbUnnormalizedSED.given
   import ArbRefined.*
   import ArbMeasure.*
   import ArbCollection.*

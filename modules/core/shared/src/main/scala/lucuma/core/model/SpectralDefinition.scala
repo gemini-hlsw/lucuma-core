@@ -4,14 +4,14 @@
 package lucuma.core.model
 
 import cats.Eq
-import cats.Order._
-import cats.syntax.all._
-import eu.timepit.refined.cats._
+import cats.Order.*
+import cats.syntax.all.*
+import eu.timepit.refined.cats.*
 import eu.timepit.refined.types.numeric.PosBigDecimal
 import lucuma.core.enums.Band
-import lucuma.core.math.BrightnessUnits._
+import lucuma.core.math.BrightnessUnits.*
 import lucuma.core.math.Wavelength
-import lucuma.core.math.dimensional._
+import lucuma.core.math.dimensional.*
 import monocle.Focus
 import monocle.Lens
 import monocle.Optional
@@ -43,7 +43,7 @@ sealed trait SpectralDefinition[T] {
 object SpectralDefinition {
 
   final case class BandNormalized[T](
-    sed:          UnnormalizedSED,
+    sed:          Option[UnnormalizedSED],
     brightnesses: SortedMap[Band, BrightnessMeasure[T]]
   ) extends SpectralDefinition[T] {
     lazy val bands: List[Band] = brightnesses.keys.toList
@@ -70,7 +70,7 @@ object SpectralDefinition {
       Eq.by(x => (x.sed, x.brightnesses))
 
     /** @group Optics */
-    def sed[T]: Lens[BandNormalized[T], UnnormalizedSED] =
+    def sed[T]: Lens[BandNormalized[T], Option[UnnormalizedSED]] =
       Focus[BandNormalized[T]](_.sed)
 
     /** @group Optics */
@@ -148,7 +148,7 @@ object SpectralDefinition {
     GenPrism[SpectralDefinition[T], EmissionLines[T]]
 
   /** @group Optics */
-  def unnormalizedSED[T]: Optional[SpectralDefinition[T], UnnormalizedSED] =
+  def unnormalizedSED[T]: Optional[SpectralDefinition[T], Option[UnnormalizedSED]] =
     bandNormalized.andThen(BandNormalized.sed[T])
 
   /** @group Optics */
