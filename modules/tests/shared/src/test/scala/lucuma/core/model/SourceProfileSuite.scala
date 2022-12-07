@@ -5,6 +5,7 @@ package lucuma.core.model
 
 import cats.Order.*
 import cats.kernel.laws.discipline.*
+import cats.syntax.all.*
 import coulomb.*
 import coulomb.syntax.*
 import eu.timepit.refined.cats.*
@@ -32,16 +33,16 @@ final class SourceProfileSuite extends DisciplineSuite {
   import ArbEnumerated.*
   import ArbMeasure.*
   import ArbRefined.*
-  import ArbSourceProfile.*
-  import ArbSpectralDefinition.*
-  import ArbUnnormalizedSED.*
+  import ArbSourceProfile.given
+  import ArbSpectralDefinition.given
+  import ArbUnnormalizedSED.given
   import ArbWavelength.*
   import ArbCollection.*
 
   // Conversions
   val sd1Integrated: SpectralDefinition[Integrated] =
     SpectralDefinition.BandNormalized(
-      UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.A0I),
+      UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.A0I).some,
       SortedMap(
         Band.R -> Band.R.defaultUnits[Integrated].withValueTagged(BigDecimal(10.0))
       )
@@ -49,7 +50,7 @@ final class SourceProfileSuite extends DisciplineSuite {
 
   val sd1Surface: SpectralDefinition[Surface] =
     SpectralDefinition.BandNormalized(
-      UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.A0I),
+      UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.A0I).some,
       SortedMap(
         Band.R -> Band.R.defaultUnits[Surface].withValueTagged(BigDecimal(10.0))
       )
