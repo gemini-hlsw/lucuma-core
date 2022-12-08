@@ -106,7 +106,7 @@ object ProperMotion extends ProperMotionOptics {
   val ZeroRAVelocity: RA = AngularVelocity.zeroOf[VelocityAxis.RA]
   val ZeroDecVelocity: Dec = AngularVelocity.zeroOf[VelocityAxis.Dec]
 
-  private [math] def μasyVelocity[A](μasy: Long): AngularVelocity Of A =
+  def μasyVelocity[A](μasy: Long): AngularVelocity Of A =
     AngularVelocity(μasy.withUnit[MicroArcSecondPerYear]).tag[A]
   def μasyRA(μasy: Long): AngularVelocity Of VelocityAxis.RA =
     μasyVelocity[VelocityAxis.RA](μasy)
