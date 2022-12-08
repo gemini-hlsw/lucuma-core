@@ -4,15 +4,16 @@
 package lucuma.core.math
 
 import lucuma.core.math.BrightnessUnits
-import lucuma.core.math.dimensional._
+import lucuma.core.math.dimensional.*
 import lucuma.core.util.Enumerated
+import lucuma.core.util.*
 import lucuma.core.util.arb.ArbEnumerated
 import lucuma.core.util.laws.EnumeratedTests
 import munit.DisciplineSuite
 
 final class BrightnessUnitsSuite extends DisciplineSuite {
-  import ArbEnumerated._
-  import BrightnessUnits._
+  import ArbEnumerated.*
+  import BrightnessUnits.*
 
   // Typeclasses
   checkAll(

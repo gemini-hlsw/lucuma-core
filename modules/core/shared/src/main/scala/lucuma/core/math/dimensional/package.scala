@@ -1,33 +1,23 @@
 // Copyright (c) 2016-2022 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package lucuma.core.math
+package lucuma.core.math.dimensional
 
 import coulomb.Quantity
 import coulomb.ops.ShowUnit
-import lucuma.core.util.TypeString
+import lucuma.core.util.*
 
-package object dimensional {
-  opaque infix type Of[+T, U] <: T = T
-  inline def tag[U]: Tagger[U] = Tagger()
-  final class Tagger[U] {
-    inline def apply[T](t: T): T Of U = t
+extension[N, U](quantity: Quantity[N, U])
+
+  /**
+  * Convert a coulomb `Quantity` to a `Measure` with runtime unit representation.
+  */
+  def toMeasure(using unit: UnitOfMeasure[U]): Measure[N] = Measure(quantity.value, unit)
+
+  /**
+  * Convert a coulomb `Quantity` to a `Measure` with runtime unit representation and tag `Tag`.
+  */
+  def toMeasureTagged[T](using ev: TaggedUnit[U, T]): Measure[N] Of T = {
+    val tagged: Measure[N] Of T = tag[T](Measure(quantity.value, ev.unit))
+    tagged
   }
-
-  implicit class QuantityOps[N, U](quantity: Quantity[N, U]) {
-
-    /**
-     * Convert a coulomb `Quantity` to a `Measure` with runtime unit representation.
-     */
-    def toMeasure(implicit unit: UnitOfMeasure[U]): Measure[N] = Measure(quantity.value, unit)
-
-    /**
-     * Convert a coulomb `Quantity` to a `Measure` with runtime unit representation and tag `Tag`.
-     */
-    def toMeasureTagged[T](implicit ev: TaggedUnit[U, T]): Measure[N] Of T = {
-      val tagged: Measure[N] Of T = tag[T](Measure(quantity.value, ev.unit))
-      tagged
-    }
-  }
-
-}

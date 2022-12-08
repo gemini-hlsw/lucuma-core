@@ -15,7 +15,7 @@ import lucuma.core.math.ProperMotion.AngularVelocity
 import lucuma.core.math.dimensional.*
 import lucuma.core.math.units.*
 import lucuma.core.optics.SplitMono
-import lucuma.core.util.NewType
+import lucuma.core.util.*
 import monocle.Focus
 import monocle.Iso
 import monocle.Lens
@@ -41,12 +41,10 @@ object ProperMotion extends ProperMotionOptics {
 
   object AngularVelocity extends NewType[Quantity[Long, MicroArcSecondPerYear]] with AngularVelocityComponentOptics {
 
-    def Zero: AngularVelocity =
+    private val Zero: AngularVelocity =
       AngularVelocity(0.withUnit[MicroArcSecondPerYear])
 
-    def zeroOf[A]: AngularVelocity Of A = tag[A](Zero)
-    val ZeroRA: AngularVelocity Of VelocityAxis.RA = zeroOf[VelocityAxis.RA]
-    val ZeroDec: AngularVelocity Of VelocityAxis.Dec = zeroOf[VelocityAxis.Dec]
+    def zeroOf[A]: AngularVelocity Of A = Zero.tag[A]
 
     /** @group Typeclass Instances */
     given Order[AngularVelocity] =
@@ -69,7 +67,6 @@ object ProperMotion extends ProperMotionOptics {
       Show.fromToString
   }
 
-  // opaque type AngularVelocity[A] = Quantity[Long, MicroArcSecondPerYear]
   extension[A](self: AngularVelocity)
     inline def μasy: Quantity[Long, MicroArcSecondPerYear] = self.value
 
@@ -104,6 +101,14 @@ object ProperMotion extends ProperMotionOptics {
   type RA  = AngularVelocity Of VelocityAxis.RA
   type Dec = AngularVelocity Of VelocityAxis.Dec
 
+  val ZeroRAVelocity: RA = AngularVelocity.zeroOf[VelocityAxis.RA]
+  val ZeroDecVelocity: Dec = AngularVelocity.zeroOf[VelocityAxis.Dec]
+
+  def μasyRA(μasy: Long): AngularVelocity Of VelocityAxis.RA =
+    AngularVelocity(μasy.withUnit[MicroArcSecondPerYear]).tag[VelocityAxis.RA]
+  def μasyDec(μasy: Long): AngularVelocity Of VelocityAxis.Dec =
+    AngularVelocity(μasy.withUnit[MicroArcSecondPerYear]).tag[VelocityAxis.Dec]
+
   given Order[RA] = AngularVelocity.orderVelocityOf[VelocityAxis.RA]
   given Monoid[RA] = AngularVelocity.monoidVelocityOf[VelocityAxis.RA]
   given Order[Dec] = AngularVelocity.orderVelocityOf[VelocityAxis.Dec]
@@ -114,7 +119,7 @@ object ProperMotion extends ProperMotionOptics {
     * @group Constructors
     */
   val Zero: ProperMotion =
-    ProperMotion(AngularVelocity.ZeroRA, AngularVelocity.ZeroDec)
+    ProperMotion(ZeroRAVelocity, ZeroDecVelocity)
 
   /** @group Typeclass Instances */
   given Order[ProperMotion] =

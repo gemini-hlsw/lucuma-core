@@ -6,9 +6,9 @@ package core
 package math
 
 import cats.data.NonEmptyList
-import lucuma.core.math.dimensional._
-import lucuma.core.math.units._
-import lucuma.core.util.Enumerated
+import lucuma.core.math.dimensional.*
+import lucuma.core.math.units.*
+import lucuma.core.util.*
 
 object BrightnessUnits {
   type Integrated

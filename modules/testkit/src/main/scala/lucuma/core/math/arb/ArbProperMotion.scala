@@ -6,6 +6,7 @@ package arb
 
 import lucuma.core.math.ProperMotion
 import lucuma.core.math.dimensional.*
+import lucuma.core.util.*
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.*
 import org.scalacheck.Cogen

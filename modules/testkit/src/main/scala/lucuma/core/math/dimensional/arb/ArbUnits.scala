@@ -4,12 +4,12 @@
 package lucuma.core.math.dimensional.arb
 
 import coulomb.Unitless
-import lucuma.core.math.dimensional._
-import org.scalacheck.Arbitrary._
-import org.scalacheck._
+import lucuma.core.math.dimensional.*
+import org.scalacheck.Arbitrary.*
+import org.scalacheck.*
 
 trait ArbUnits {
-  implicit val arbUnits: Arbitrary[Units] =
+  given Arbitrary[Units] =
     Arbitrary {
       for {
         name       <- arbitrary[String]
@@ -18,7 +18,7 @@ trait ArbUnits {
       } yield UnitOfMeasure[1](name, abbv, serialized)
     }
 
-  implicit val cogenUnits: Cogen[Units] =
+  given Cogen[Units] =
     Cogen[(String, String, String)].contramap(x => (x.name, x.abbv, x.serialized))
 }
 

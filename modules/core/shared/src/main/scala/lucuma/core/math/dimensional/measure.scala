@@ -4,14 +4,16 @@
 package lucuma.core.math.dimensional
 
 import cats.Eq
-import cats.syntax.contravariant._
-import cats.syntax.option._
+import cats.syntax.contravariant.*
+import cats.syntax.option.*
 import coulomb.*
 import coulomb.syntax.*
-import lucuma.core.syntax.display._
-import lucuma.core.util.Display
+import lucuma.core.syntax.display.*
+import lucuma.core.util.*
 import monocle.Focus
 import monocle.Lens
+
+import scala.annotation.targetName
 
 /**
  * A magnitude of type `N` and a runtime representation of a physical unit.
@@ -33,9 +35,9 @@ final case class Measure[N](value: N, units: Units, error: Option[N] = none) { s
 }
 
 object Measure extends MeasureLowPriority {
-  implicit def eqMeasure[N: Eq]: Eq[Measure[N]] = Eq.by(x => (x.value, x.units, x.error))
+  given eqMeasure[N: Eq]: Eq[Measure[N]] = Eq.by(x => (x.value, x.units, x.error))
 
-  implicit def displayMeasure[N: Display]: Display[Measure[N]] =
+  given displayMeasure[N: Display]: Display[Measure[N]] =
     Display.by(
       m =>
         s"${m.value.shortName}${m.error.map(e => f" ± ${e.shortName}").orEmpty} ${m.units.shortName}",
@@ -43,7 +45,7 @@ object Measure extends MeasureLowPriority {
         s"${m.value.longName}${m.error.map(e => f" ± ${e.longName}").orEmpty} ${m.units.longName}"
     )
 
-  implicit def displayTaggedMeasure[N: Display, T]: Display[Measure[N] Of T] =
+  given displayTaggedMeasure[N: Display, T]: Display[Measure[N] Of T] =
     Display[Measure[N]].narrow
 
   /** @group Optics */
@@ -79,27 +81,29 @@ object Measure extends MeasureLowPriority {
       tagged
     }
 
-  implicit class TaggedMeasureOps[N, T](private val measure: Measure[N] Of T) extends AnyVal {
+  extension[N, T](measure: Measure[N] Of T)
+    @targetName("withError_of_t")
     def withError(error: N): Measure[N] Of T = Measure.errorTagged.replace(error.some)(measure)
+    @targetName("exact_of_t")
     def exact: Measure[N] Of T               = Measure.errorTagged.replace(none)(measure)
-  }
 
-  implicit class MeasureOps[N](private val measure: Measure[N]) extends AnyVal {
+  extension[N](measure: Measure[N])
 
     /** Add an error value. */
+    @targetName("withError")
     def withError(error: N): Measure[N] = Measure.error.replace(error.some)(measure)
 
     /** Remove error value. */
+    @targetName("exact")
     def exact: Measure[N] = Measure.error.replace(none)(measure)
 
     /** Display measure without the uncertainty */
     def displayWithoutError(implicit d: Display[N]): String =
       s"${measure.value.shortName} ${measure.units.shortName}"
-  }
 
 }
 
 private class MeasureLowPriority {
-  implicit def eqTaggedMeasure[N: Eq, T]: Eq[Measure[N] Of T] =
+  given eqTaggedMeasure[N: Eq, T]: Eq[Measure[N] Of T] =
     Eq.by(x => (x.value, x.units, x.error))
 }
