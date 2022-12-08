@@ -3,26 +3,26 @@
 
 package lucuma.core.model
 
-import cats.implicits._
-import cats.kernel.laws.discipline._
+import cats.implicits.*
+import cats.kernel.laws.discipline.*
 import coulomb.*
 import coulomb.ops.algebra.cats.all.given
 import coulomb.syntax.*
-import eu.timepit.refined.cats._
-import lucuma.core.math.BrightnessUnits._
-import lucuma.core.math.arb._
+import eu.timepit.refined.cats.*
+import lucuma.core.math.BrightnessUnits.*
+import lucuma.core.math.arb.*
 import lucuma.core.math.dimensional.arb.ArbMeasure
-import lucuma.core.math.units._
+import lucuma.core.math.units.*
 import lucuma.core.model.arb.ArbEmissionLine
 import lucuma.core.util.arb.ArbEnumerated
 import monocle.law.discipline.LensTests
-import munit._
+import munit.*
 
 final class EmissionLineSuite extends DisciplineSuite {
-  import ArbEnumerated._
-  import ArbEmissionLine._
-  import ArbRefined._
-  import ArbMeasure._
+  import ArbEnumerated.*
+  import ArbEmissionLine.given
+  import ArbRefined.*
+  import ArbMeasure.given
   import ArbQuantity.given
 
   // Brightness type conversions

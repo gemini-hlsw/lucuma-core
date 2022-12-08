@@ -4,12 +4,10 @@
 package lucuma.core.math.dimensional
 
 import cats.Eq
-import cats.syntax.all._
+import cats.syntax.all.*
 import coulomb.ops.ShowUnit
 import coulomb.ops.ShowUnitFull
-import lucuma.core.util.Display
-import lucuma.core.util.Tag
-import lucuma.core.util.TypeString
+import lucuma.core.util.*
 
 import java.util.Objects
 
@@ -56,14 +54,14 @@ trait Units { self =>
 }
 
 object Units {
-  implicit val eqUnits: Eq[Units] = Eq.fromUniversalEquals
+  given Eq[Units] = Eq.fromUniversalEquals
 
-  implicit val displayUnits: Display[Units] = Display.by(_.abbv, _.name)
+  given Display[Units] = Display.by(_.abbv, _.name)
 
-  implicit def displayTaggedUnits[T]: Display[Units Of T] =
+  given displayTaggedUnits[T]: Display[Units Of T] =
     Display[Units].narrow
 
-  implicit class TaggedUnitsOps[T](private val units: Units Of T) extends AnyVal {
+  extension[T](units: Units Of T)
 
     /**
      * Create a `Measure` with the specified value, keeping the runtime represantation of the units,
@@ -73,7 +71,6 @@ object Units {
       val tagged = tag[T](Measure[N](value, units, error))
       tagged
     }
-  }
 }
 
 /**
@@ -89,22 +86,22 @@ final case class UnitOfMeasure[U](name: String, abbv: String, serialized: String
 }
 
 object UnitOfMeasure {
-  def apply[U: UnitOfMeasure]: UnitOfMeasure[U] = implicitly[UnitOfMeasure[U]]
+  def apply[U: UnitOfMeasure]: UnitOfMeasure[U] = summon[UnitOfMeasure[U]]
 
-  implicit def unitOfMeasureFromUnitString[U](implicit
+  given unitOfMeasureFromUnitString[U](using
     full: ShowUnitFull[U],
     abbv: ShowUnit[U],
     s:    TypeString[U]
   ): UnitOfMeasure[U] =
     UnitOfMeasure(full.value, abbv.value, s.serialized)
 
-  implicit def eqUnitOfMeasure[U]: Eq[UnitOfMeasure[U]] = Eq.fromUniversalEquals
+  given eqUnitOfMeasure[U]: Eq[UnitOfMeasure[U]] = Eq.fromUniversalEquals
 }
 
 /**
  * Typeclass placing a `Tag` on a unit of measure.
  */
-class TaggedUnit[U, T](implicit ev: UnitOfMeasure[U]) extends Tag[UnitOfMeasure[U], T] {
+class TaggedUnit[U, T](using ev: UnitOfMeasure[U]) {
   def unit: UnitOfMeasure[U] Of T = {
     val tagged = tag[T](ev)
     tagged

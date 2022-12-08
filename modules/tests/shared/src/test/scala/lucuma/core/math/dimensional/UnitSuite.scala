@@ -8,11 +8,12 @@ import cats.kernel.laws.discipline.*
 import lucuma.core.math.BrightnessUnits.*
 import lucuma.core.math.dimensional.arb.ArbUnits
 import lucuma.core.syntax.display.*
+import lucuma.core.util.*
 import lucuma.core.util.arb.ArbEnumerated.*
 import org.scalacheck.Prop.*
 
 class UnitSuite extends munit.DisciplineSuite {
-  import ArbUnits.*
+  import ArbUnits.given
 
   // Laws
   checkAll("Units", EqTests[Units].eqv)

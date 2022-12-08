@@ -16,6 +16,7 @@ import lucuma.core.math.dimensional.arb.ArbMeasure
 import lucuma.core.model.EmissionLine
 import lucuma.core.model.SpectralDefinition
 import lucuma.core.model.UnnormalizedSED
+import lucuma.core.util.*
 import lucuma.core.util.arb.ArbEnumerated
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.*
@@ -27,8 +28,8 @@ trait ArbSpectralDefinition {
   import ArbEnumerated.*
   import SpectralDefinition.*
   import BrightnessUnits.*
-  import ArbMeasure.*
-  import ArbEmissionLine.*
+  import ArbMeasure.given
+  import ArbEmissionLine.given
   import ArbRefined.*
   import ArbWavelength.*
 

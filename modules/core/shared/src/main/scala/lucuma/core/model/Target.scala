@@ -13,7 +13,7 @@ import lucuma.core.enums.Band
 import lucuma.core.math.BrightnessUnits.*
 import lucuma.core.math.*
 import lucuma.core.math.dimensional.*
-import lucuma.core.util.WithGid
+import lucuma.core.util.*
 import lucuma.refined.*
 import monocle.Focus
 import monocle.Lens

@@ -29,9 +29,9 @@ import scala.collection.immutable.SortedMap
 
 final class SourceProfileSuite extends DisciplineSuite {
   import ArbAngle.*
-  import ArbEmissionLine.*
+  import ArbEmissionLine.given
   import ArbEnumerated.*
-  import ArbMeasure.*
+  import ArbMeasure.given
   import ArbRefined.*
   import ArbSourceProfile.given
   import ArbSpectralDefinition.given

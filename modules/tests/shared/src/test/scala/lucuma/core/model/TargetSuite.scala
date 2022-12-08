@@ -18,7 +18,7 @@ import lucuma.core.util.laws.GidTests
 import monocle.law.discipline.*
 import munit.*
 
-final class TargetSuite extends DisciplineSuite {
+class TargetSuite extends DisciplineSuite {
   import ArbTarget.given
   import ArbSourceProfile.given
   import ArbSiderealTracking.given
@@ -34,12 +34,12 @@ final class TargetSuite extends DisciplineSuite {
   import ArbEpoch.*
   import ArbCatalogInfo.*
   import Target.*
-  import ArbEmissionLine.*
+  import ArbEmissionLine.given
   import ArbSpectralDefinition.given
   import ArbAngle.*
   import ArbUnnormalizedSED.given
   import ArbRefined.*
-  import ArbMeasure.*
+  import ArbMeasure.given
   import ArbCollection.*
   import ArbWavelength.*
 

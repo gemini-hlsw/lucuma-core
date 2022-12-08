@@ -4,15 +4,16 @@
 package lucuma.core.model
 
 import cats.Eq
-import cats.implicits._
+import cats.implicits.*
 import coulomb.*
 import coulomb.ops.algebra.cats.all.given
 import coulomb.syntax.*
-import eu.timepit.refined.cats._
+import eu.timepit.refined.cats.*
 import eu.timepit.refined.types.numeric.PosBigDecimal
-import lucuma.core.math.BrightnessUnits._
-import lucuma.core.math.dimensional._
-import lucuma.core.math.units._
+import lucuma.core.math.BrightnessUnits.*
+import lucuma.core.math.dimensional.*
+import lucuma.core.math.units.*
+import lucuma.core.util.*
 import monocle.Focus
 import monocle.Lens
 
@@ -27,12 +28,12 @@ final case class EmissionLine[T](
    * @tparam `T0`
    *   `Integrated` or `Surface`
    */
-  def to[T0](implicit conv: TagConverter[LineFlux[T], LineFlux[T0]]): EmissionLine[T0] =
+  def to[T0](using conv: TagConverter[LineFlux[T], LineFlux[T0]]): EmissionLine[T0] =
     EmissionLine[T0](lineWidth, lineFlux.toTag[LineFlux[T0]])
 }
 
 object EmissionLine {
-  implicit def eqEmissionLine[T]: Eq[EmissionLine[T]] =
+  given eqEmissionLine[T]: Eq[EmissionLine[T]] =
     Eq.by(x => (x.lineWidth, x.lineFlux))
 
   /** @group Optics */

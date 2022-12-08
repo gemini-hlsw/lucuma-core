@@ -6,15 +6,15 @@ package core
 package enums
 
 import cats.Order
-import cats.syntax.all._
-import eu.timepit.refined.auto._
+import cats.syntax.all.*
+import eu.timepit.refined.auto.*
 import eu.timepit.refined.numeric.Positive
-import lucuma.core.math.BrightnessUnits._
+import lucuma.core.math.BrightnessUnits.*
 import lucuma.core.math.Wavelength
-import lucuma.core.math.dimensional._
-import lucuma.core.math.units._
-import lucuma.core.util.Enumerated
-import lucuma.refined._
+import lucuma.core.math.dimensional.*
+import lucuma.core.math.units.*
+import lucuma.core.util.*
+import lucuma.refined.*
 
 /**
  * Enumerated type for wavelength band.
@@ -36,7 +36,7 @@ sealed abstract class Band(
   type DefaultSurfaceUnits
 
   // These implicits here allow resolving the default units at the type level, allowing use of
-  // `defaultUnits[T]`; and also in runtime (used eg when parsing) by using `import band._`.
+  // `defaultUnits[T]`; and also in runtime (used eg when parsing) by using `import band.*`.
   implicit def defaultIntegrated: Band.DefaultUnits[self.type, Integrated]
   implicit def defaultSurface: Band.DefaultUnits[self.type, Surface]
 
