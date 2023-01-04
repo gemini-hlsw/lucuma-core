@@ -24,7 +24,7 @@ lazy val catsTimeVersion       = "0.5.1"
 lazy val circeVersion          = "0.14.3"
 lazy val catsScalacheckVersion = "0.3.2"
 lazy val shapelessVersion      = "2.3.10"
-lazy val catsParseVersion      = "0.3.8"
+lazy val catsParseVersion      = "0.3.9"
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
