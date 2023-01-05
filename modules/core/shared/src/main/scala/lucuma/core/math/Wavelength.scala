@@ -31,6 +31,12 @@ import scala.util.Try
   */
 final case class Wavelength(toPicometers: Quantity[PosInt, Picometer]) {
 
+  /**
+   * Alias for `toPicometers`.
+   */
+  def pm: Quantity[PosInt, Picometer] =
+    toPicometers
+
   // Conversion between units is guaranteed to be positive since the Wavelength in pm is positive.
   // The value can always be exactly represented as a (Pos)BigDecimal since sub-pm fractions cannot be
   // represented.
@@ -40,34 +46,36 @@ final case class Wavelength(toPicometers: Quantity[PosInt, Picometer]) {
   /**
    * Returns the wavelength value in microns.
    */
-  def µm: Quantity[PosBigDecimal, Micrometer] =
+  def toMicrometers: Quantity[PosBigDecimal, Micrometer] =
     to[Micrometer](6)
 
-  /** Alias for `µm`. */
-  def micrometer: Quantity[PosBigDecimal, Micrometer] =
-    µm
-
-  /** Alias for `µm`. */
-  def micron: Quantity[PosBigDecimal, Micrometer] =
-    µm
+  /** Alias for `toMicrometers`. */
+  def µm: Quantity[PosBigDecimal, Micrometer] =
+    toMicrometers
 
   /**
    * Returns the wavelength value in nanometers.
    */
-  def nm: Quantity[PosBigDecimal, Nanometer] =
+  def toNanometers: Quantity[PosBigDecimal, Nanometer] =
     to[Nanometer](3)
 
-  def nanometer: Quantity[PosBigDecimal, Nanometer] =
-    nm
+  /**
+   * Alias for `toNanometers`.
+   */
+  def nm: Quantity[PosBigDecimal, Nanometer] =
+    toNanometers
 
   /**
    * Returns the wavelength value in angstroms.
    */
-  def Å: Quantity[PosBigDecimal, Angstrom] =
+  def toAngstroms: Quantity[PosBigDecimal, Angstrom] =
     to[Angstrom](2)
 
-  def angstrom: Quantity[PosBigDecimal, Angstrom] =
-    Å
+  /**
+   * Alias for `toAngstroms`.
+   */
+  def Å: Quantity[PosBigDecimal, Angstrom] =
+    toAngstroms
 
   override def toString: String =
     s"Wavelength(${toPicometers.show})"

@@ -117,22 +117,22 @@ final class WavelengthSuite extends munit.DisciplineSuite {
   }
 
   test("angstrom decimal format") {
-    testFormat(Wavelength.decimalAngstroms)(_.angstrom)
+    testFormat(Wavelength.decimalAngstroms)(_.toAngstroms)
   }
 
   test("nanometers decimal format") {
-    testFormat(Wavelength.decimalNanometers)(_.nanometer)
+    testFormat(Wavelength.decimalNanometers)(_.toNanometers)
   }
 
   test("micrometers decimal format") {
-    testFormat(Wavelength.decimalMicrometers)(_.micrometer)
+    testFormat(Wavelength.decimalMicrometers)(_.toMicrometers)
   }
 
   test("toAngstrom") {
     forAll { (a: PosInt) =>
       (a.value <= Wavelength.MaxAngstrom) ==> {
-        assertEquals(Wavelength.fromAngstroms(a).map(_.angstrom.value.isWhole),  true.some)
-        assertEquals(Wavelength.fromAngstroms(a).map(_.angstrom.value), PosBigDecimal.unsafeFrom(a.value).some)
+        assertEquals(Wavelength.fromAngstroms(a).map(_.toAngstroms.value.isWhole),  true.some)
+        assertEquals(Wavelength.fromAngstroms(a).map(_.toAngstroms.value), PosBigDecimal.unsafeFrom(a.value).some)
       }
     }
   }
@@ -140,8 +140,8 @@ final class WavelengthSuite extends munit.DisciplineSuite {
   test("toNanometers") {
     forAll { (a: PosInt) =>
       (a.value <= Wavelength.MaxNanometer) ==> {
-        assertEquals(Wavelength.fromNanometers(a).map(_.angstrom.value.isWhole),  true.some)
-        assertEquals(Wavelength.fromNanometers(a).map(_.nm.value), PosBigDecimal.unsafeFrom(a.value).some)
+        assertEquals(Wavelength.fromNanometers(a).map(_.toAngstroms.value.isWhole),  true.some)
+        assertEquals(Wavelength.fromNanometers(a).map(_.toNanometers.value), PosBigDecimal.unsafeFrom(a.value).some)
       }
     }
   }
@@ -149,9 +149,9 @@ final class WavelengthSuite extends munit.DisciplineSuite {
   test("toMicrons") {
     forAll { (a: PosInt) =>
       (a.value <= Wavelength.MaxMicrometer) ==> {
-        assertEquals(Wavelength.fromMicrometers(a).map(_.angstrom.value.isWhole),  true.some)
-        assertEquals(Wavelength.fromMicrometers(a).map(_.nm.value.isWhole),  true.some)
-        assertEquals(Wavelength.fromMicrometers(a).map(_.µm.value), PosBigDecimal.unsafeFrom(a.value).some)
+        assertEquals(Wavelength.fromMicrometers(a).map(_.toAngstroms.value.isWhole),  true.some)
+        assertEquals(Wavelength.fromMicrometers(a).map(_.toNanometers.value.isWhole),  true.some)
+        assertEquals(Wavelength.fromMicrometers(a).map(_.toMicrometers.value), PosBigDecimal.unsafeFrom(a.value).some)
       }
     }
   }
