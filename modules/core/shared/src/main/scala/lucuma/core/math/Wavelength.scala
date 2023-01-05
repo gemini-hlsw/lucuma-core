@@ -13,12 +13,12 @@ import eu.timepit.refined.*
 import eu.timepit.refined.auto.*
 import eu.timepit.refined.cats.*
 import eu.timepit.refined.numeric.*
+import eu.timepit.refined.types.numeric.PosBigDecimal
 import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.math.units.{_, given}
 import lucuma.core.optics.Format
 import monocle.Iso
 import monocle.Prism
-import spire.math.Rational
 
 import java.math.RoundingMode
 import scala.annotation.targetName
@@ -31,36 +31,43 @@ import scala.util.Try
   */
 final case class Wavelength(toPicometers: Quantity[PosInt, Picometer]) {
 
+  // Conversion between units is guaranteed to be positive since the Wavelength in pm is positive.
+  // The value can always be exactly represented as a (Pos)BigDecimal since sub-pm fractions cannot be
+  // represented.
+  private def to[U](scale: Int): Quantity[PosBigDecimal, U] =
+    Quantity[U](PosBigDecimal.unsafeFrom(BigDecimal(toPicometers.value.value, scale)))
+
   /**
-   * Returns the wavelength value in microns. The exact microns value must be
-   * represented as a Rational.
+   * Returns the wavelength value in microns.
    */
-  def µm: Quantity[Rational, Micrometer] =
-    toPicometers.toValue[Rational].toUnit[Micrometer]
+  def µm: Quantity[PosBigDecimal, Micrometer] =
+    to[Micrometer](6)
 
   /** Alias for `µm`. */
-  def micrometer: Quantity[Rational, Micrometer] =
+  def micrometer: Quantity[PosBigDecimal, Micrometer] =
     µm
 
   /** Alias for `µm`. */
-  def micron: Quantity[Rational, Micrometer] =
+  def micron: Quantity[PosBigDecimal, Micrometer] =
     µm
 
   /**
-    * Returns the wavelength value in nanometers
-    * The exact nanometer value needs to be represented as a Rational
-    */
-  def nm: Quantity[Rational, Nanometer] = toPicometers.toValue[Rational].toUnit[Nanometer]
+   * Returns the wavelength value in nanometers.
+   */
+  def nm: Quantity[PosBigDecimal, Nanometer] =
+    to[Nanometer](3)
 
-  def nanometer: Quantity[Rational, Nanometer] = nm
+  def nanometer: Quantity[PosBigDecimal, Nanometer] =
+    nm
 
   /**
-    * Returns the wavelength value in angstrom
-    * The exact angstrom value needs to be represented as a Rational
-    */
-  def Å: Quantity[Rational, Angstrom] = toPicometers.toValue[Rational].toUnit[Angstrom]
+   * Returns the wavelength value in angstroms.
+   */
+  def Å: Quantity[PosBigDecimal, Angstrom] =
+    to[Angstrom](2)
 
-  def angstrom: Quantity[Rational, Angstrom] = Å
+  def angstrom: Quantity[PosBigDecimal, Angstrom] =
+    Å
 
   override def toString: String =
     s"Wavelength(${toPicometers.show})"

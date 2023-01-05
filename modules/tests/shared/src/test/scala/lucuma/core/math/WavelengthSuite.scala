@@ -15,6 +15,7 @@ import eu.timepit.refined.auto._
 import eu.timepit.refined.cats._
 import eu.timepit.refined.numeric._
 import eu.timepit.refined.scalacheck.numeric._
+import eu.timepit.refined.types.numeric.PosBigDecimal
 import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.math.arb._
 import lucuma.core.math.units.{_, given}
@@ -101,32 +102,37 @@ final class WavelengthSuite extends munit.DisciplineSuite {
     assertEquals(Wavelength.fromAngstroms(Wavelength.MaxAngstrom + 1),  none)
   }
 
-  private def testFormat[U](scale: Int, format: Format[BigDecimal, Wavelength])(toRational: Wavelength => Quantity[Rational, U]) =
+  private def testFormat[U](format: Format[BigDecimal, Wavelength])(toPosBigDecimal: Wavelength => Quantity[PosBigDecimal, U]) =
     forAll { (w: Wavelength) =>
-      assertEquals(format.getOption(toRational(w).value.toBigDecimal(scale, RoundingMode.HALF_UP)),  w.some)
+      assertEquals(
+        format.getOption(toPosBigDecimal(w).value.value),
+        w.some
+      )
     }
 
   test("picometer decimal format") {
-    testFormat(1, Wavelength.decimalPicometers)(_.toPicometers.toValue[Rational])
+    testFormat(Wavelength.decimalPicometers) { w =>
+      Quantity[Picometer](PosBigDecimal.unsafeFrom(BigDecimal(w.toPicometers.value.value)))
+    }
   }
 
   test("angstrom decimal format") {
-    testFormat(3, Wavelength.decimalAngstroms)(_.angstrom)
+    testFormat(Wavelength.decimalAngstroms)(_.angstrom)
   }
 
   test("nanometers decimal format") {
-    testFormat(4, Wavelength.decimalNanometers)(_.nanometer)
+    testFormat(Wavelength.decimalNanometers)(_.nanometer)
   }
 
   test("micrometers decimal format") {
-    testFormat(7, Wavelength.decimalMicrometers)(_.micrometer)
+    testFormat(Wavelength.decimalMicrometers)(_.micrometer)
   }
 
   test("toAngstrom") {
     forAll { (a: PosInt) =>
       (a.value <= Wavelength.MaxAngstrom) ==> {
         assertEquals(Wavelength.fromAngstroms(a).map(_.angstrom.value.isWhole),  true.some)
-        assertEquals(Wavelength.fromAngstroms(a).map(_.angstrom.value),  Rational(a.value).some)
+        assertEquals(Wavelength.fromAngstroms(a).map(_.angstrom.value), PosBigDecimal.unsafeFrom(a.value).some)
       }
     }
   }
@@ -135,7 +141,7 @@ final class WavelengthSuite extends munit.DisciplineSuite {
     forAll { (a: PosInt) =>
       (a.value <= Wavelength.MaxNanometer) ==> {
         assertEquals(Wavelength.fromNanometers(a).map(_.angstrom.value.isWhole),  true.some)
-        assertEquals(Wavelength.fromNanometers(a).map(_.nm.value),  Rational(a.value).some)
+        assertEquals(Wavelength.fromNanometers(a).map(_.nm.value), PosBigDecimal.unsafeFrom(a.value).some)
       }
     }
   }
@@ -145,7 +151,7 @@ final class WavelengthSuite extends munit.DisciplineSuite {
       (a.value <= Wavelength.MaxMicrometer) ==> {
         assertEquals(Wavelength.fromMicrometers(a).map(_.angstrom.value.isWhole),  true.some)
         assertEquals(Wavelength.fromMicrometers(a).map(_.nm.value.isWhole),  true.some)
-        assertEquals(Wavelength.fromMicrometers(a).map(_.µm.value),  Rational(a.value).some)
+        assertEquals(Wavelength.fromMicrometers(a).map(_.µm.value), PosBigDecimal.unsafeFrom(a.value).some)
       }
     }
   }
