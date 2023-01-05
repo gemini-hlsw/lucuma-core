@@ -29,60 +29,10 @@ import scala.util.Try
   * which means the largest representable wavelength is 2.147483647 mm.
   * @param toPicometers This wavelength in positive integral picometers (10^-12^ of a meter).
   */
-final case class Wavelength(toPicometers: Quantity[PosInt, Picometer]) {
-
-  /**
-   * Alias for `toPicometers`.
-   */
-  def pm: Quantity[PosInt, Picometer] =
-    toPicometers
-
-  // Conversion between units is guaranteed to be positive since the Wavelength in pm is positive.
-  // The value can always be exactly represented as a (Pos)BigDecimal since sub-pm fractions cannot be
-  // represented.
-  private def to[U](scale: Int): Quantity[PosBigDecimal, U] =
-    Quantity[U](PosBigDecimal.unsafeFrom(BigDecimal(toPicometers.value.value, scale)))
-
-  /**
-   * Returns the wavelength value in microns.
-   */
-  def toMicrometers: Quantity[PosBigDecimal, Micrometer] =
-    to[Micrometer](6)
-
-  /** Alias for `toMicrometers`. */
-  def µm: Quantity[PosBigDecimal, Micrometer] =
-    toMicrometers
-
-  /**
-   * Returns the wavelength value in nanometers.
-   */
-  def toNanometers: Quantity[PosBigDecimal, Nanometer] =
-    to[Nanometer](3)
-
-  /**
-   * Alias for `toNanometers`.
-   */
-  def nm: Quantity[PosBigDecimal, Nanometer] =
-    toNanometers
-
-  /**
-   * Returns the wavelength value in angstroms.
-   */
-  def toAngstroms: Quantity[PosBigDecimal, Angstrom] =
-    to[Angstrom](2)
-
-  /**
-   * Alias for `toAngstroms`.
-   */
-  def Å: Quantity[PosBigDecimal, Angstrom] =
-    toAngstroms
-
-  override def toString: String =
-    s"Wavelength(${toPicometers.show})"
-
-}
+opaque type Wavelength = Quantity[PosInt, Picometer]
 
 object Wavelength {
+
   lazy val Min: Wavelength   = unsafeFromInt(1)
   lazy val Max: Wavelength   = unsafeFromInt(Int.MaxValue)
 
@@ -93,13 +43,72 @@ object Wavelength {
   // Max allowed value in angstrom
   lazy val MaxAngstrom: Int  = Int.MaxValue / BigInt(10).pow(2).toInt
 
+  extension (w: Wavelength) {
+
+    def toPicometers: Quantity[PosInt, Picometer] =
+      w
+
+    /**
+     * Alias for `toPicometers`.
+     */
+    def pm: Quantity[PosInt, Picometer] =
+      toPicometers
+
+    // Conversion between units is guaranteed to be positive since the Wavelength in pm is positive.
+    // The value can always be exactly represented as a (Pos)BigDecimal since sub-pm fractions cannot be
+    // represented.
+    private def to[U](scale: Int): Quantity[PosBigDecimal, U] =
+      Quantity[U](PosBigDecimal.unsafeFrom(BigDecimal(toPicometers.value.value, scale)))
+
+    /**
+     * Returns the wavelength value in microns.
+     */
+    def toMicrometers: Quantity[PosBigDecimal, Micrometer] =
+      to[Micrometer](6)
+
+    /** Alias for `toMicrometers`. */
+    def µm: Quantity[PosBigDecimal, Micrometer] =
+      toMicrometers
+
+    /**
+     * Returns the wavelength value in nanometers.
+     */
+    def toNanometers: Quantity[PosBigDecimal, Nanometer] =
+      to[Nanometer](3)
+
+    /**
+     * Alias for `toNanometers`.
+     */
+    def nm: Quantity[PosBigDecimal, Nanometer] =
+      toNanometers
+
+    /**
+     * Returns the wavelength value in angstroms.
+     */
+    def toAngstroms: Quantity[PosBigDecimal, Angstrom] =
+      to[Angstrom](2)
+
+    /**
+     * Alias for `toAngstroms`.
+     */
+    def Å: Quantity[PosBigDecimal, Angstrom] =
+      toAngstroms
+
+//    def toString: String =
+//      s"Wavelength(${toPicometers.show})"
+
+  }
+
+  def apply(pm: Quantity[PosInt, Picometer]): Wavelength =
+    pm
+
   /**
     * Construct a wavelength from a positive int
     * @group constructor
     */
   @targetName("applyPicometers") // to distinguish from apply(Quantity[PosInt, Picometer])
   def apply(picometers: PosInt): Wavelength =
-    new Wavelength(picometers.withUnit[Picometer])
+    picometers.withUnit[Picometer]
 
   /** @group Typeclass Instances */
   given Show[Wavelength] =
@@ -107,7 +116,7 @@ object Wavelength {
 
   /** @group Typeclass Instances */
   given Order[Wavelength] =
-    Order.by(_.toPicometers)
+    Order.by(_.toPicometers.value)
 
   /**
     * Try to build a Wavelength from a plain Int. Negatives and Zero will produce a None
@@ -126,7 +135,7 @@ object Wavelength {
   def fromMicrometers(µm: Int): Option[Wavelength] = for {
     q <- refineQV[Positive](µm.withUnit[Micrometer].tToUnit[Picometer]).toOption
     if µm <= MaxMicrometer
-  } yield Wavelength(q)
+  } yield q
 
   /**
    * Try to build a Wavelength with a value in nm in the range (0 .. 2147483]
@@ -135,7 +144,7 @@ object Wavelength {
   def fromNanometers(nm: Int): Option[Wavelength] = for {
     q <- refineQV[Positive](nm.withUnit[Nanometer].tToUnit[Picometer]).toOption
     if nm <= MaxNanometer
-  } yield Wavelength(q)
+  } yield q
 
   /**
    * Try to build a Wavelength with a value in angstrom in the range (0 .. 21474836]
@@ -144,7 +153,7 @@ object Wavelength {
   def fromAngstroms(a: Int): Option[Wavelength] = for {
     q <- refineQV[Positive](a.withUnit[Angstrom].tToUnit[Picometer]).toOption
     if a <= MaxAngstrom
-  } yield Wavelength(q)
+  } yield q
 
   /**
    * Prism from Int in pm into Wavelength and back.
@@ -152,7 +161,7 @@ object Wavelength {
    */
   val fromPicometers: Prism[Int, Wavelength] =
     Prism[Int, Wavelength](pm =>
-      refineV[Positive](pm).toOption.map(v => Wavelength(v.withUnit[Picometer]))
+      refineV[Positive](pm).toOption.map(_.withUnit[Picometer])
     )(_.toPicometers.value)
 
   /**
@@ -160,7 +169,7 @@ object Wavelength {
    * @group Optics
    */
   val picometers: Iso[PosInt, Wavelength] =
-    Iso[PosInt, Wavelength](i => Wavelength(i.withUnit[Picometer]))(_.toPicometers.value)
+    Iso[PosInt, Wavelength](_.withUnit[Picometer])(_.toPicometers.value)
 
   private def scalingFormat(move: Int): Format[BigDecimal, Wavelength] =
     Format[BigDecimal, Int](
