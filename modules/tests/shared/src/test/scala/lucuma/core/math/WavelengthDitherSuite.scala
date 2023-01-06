@@ -5,6 +5,7 @@ package lucuma.core.math
 
 import cats.Eq
 import coulomb.*
+import lucuma.core.math.arb.*
 import lucuma.core.optics.laws.discipline.FormatTests
 import monocle.law.discipline.*
 import munit.DisciplineSuite
@@ -14,7 +15,7 @@ import org.scalacheck.Prop.*
 
 class WavelengthDitherSuite extends DisciplineSuite {
 
-  import arb.ArbWavelengthDither.given
+  import ArbWavelengthDither.given
 
   implicit def arbQuantityPbd[V: Arbitrary, U]: Arbitrary[Quantity[V, U]] =
     Arbitrary(arbitrary[V].map(Quantity[U](_)))

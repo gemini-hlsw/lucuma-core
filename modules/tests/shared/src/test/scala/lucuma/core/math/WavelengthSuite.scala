@@ -33,7 +33,8 @@ import scala.language.implicitConversions
 final class WavelengthSuite extends munit.DisciplineSuite {
   //  import ArbQuantity._   Why won't this work?
   import ArbRefined._
-  import ArbWavelength._
+  import ArbWavelength.*
+  import ArbWavelengthDither.given
 
   implicit def arbQuantityPbd[U]: Arbitrary[Quantity[PosBigDecimal, U]] =
     Arbitrary(arbitrary[PosBigDecimal].map(Quantity[U](_)))
@@ -166,4 +167,14 @@ final class WavelengthSuite extends munit.DisciplineSuite {
       }
     }
   }
+
+  property("offset") {
+    forAll { (w: Wavelength, d: WavelengthDither) =>
+      assertEquals(
+        w.offset(d),
+        Wavelength.intPicometers.getOption(w.toPicometers.value.value + d.toPicometers.value)
+      )
+    }
+  }
+
 }

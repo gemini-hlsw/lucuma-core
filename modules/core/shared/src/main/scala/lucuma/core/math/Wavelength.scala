@@ -96,6 +96,17 @@ object Wavelength {
     /** Alias for `toMicrometers`. */
     def µm: Quantity[PosBigDecimal, Micrometer] =
       toMicrometers
+
+    /**
+     * Adds the given offset to this wavelength.
+     */
+    def offset(wd: WavelengthDither): Option[Wavelength] =
+      intPicometers.getOption(
+        w.toPicometers.value.value + wd.toPicometers.value
+      )
+
+    def unsafeOffset(wd: WavelengthDither): Wavelength =
+      offset(wd).get
   }
 
   def apply(pm: Quantity[PosInt, Picometer]): Wavelength =
