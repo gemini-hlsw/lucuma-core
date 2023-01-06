@@ -9,7 +9,6 @@ import cats.Show
 import cats.kernel.laws.discipline.*
 import cats.syntax.all.*
 import coulomb.*
-import coulomb.policy.spire.standard.given
 import coulomb.syntax.*
 import eu.timepit.refined.auto.*
 import eu.timepit.refined.cats.*

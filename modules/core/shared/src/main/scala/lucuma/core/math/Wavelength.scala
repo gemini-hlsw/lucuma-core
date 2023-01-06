@@ -64,14 +64,16 @@ object Wavelength {
       Quantity[U](PosBigDecimal.unsafeFrom(BigDecimal(toPicometers.value.value, scale)))
 
     /**
-     * Returns the wavelength value in microns.
+     * Returns the wavelength value in angstroms.
      */
-    def toMicrometers: Quantity[PosBigDecimal, Micrometer] =
-      to[Micrometer](6)
+    def toAngstroms: Quantity[PosBigDecimal, Angstrom] =
+      to[Angstrom](2)
 
-    /** Alias for `toMicrometers`. */
-    def µm: Quantity[PosBigDecimal, Micrometer] =
-      toMicrometers
+    /**
+     * Alias for `toAngstroms`.
+     */
+    def Å: Quantity[PosBigDecimal, Angstrom] =
+      toAngstroms
 
     /**
      * Returns the wavelength value in nanometers.
@@ -86,17 +88,14 @@ object Wavelength {
       toNanometers
 
     /**
-     * Returns the wavelength value in angstroms.
+     * Returns the wavelength value in microns.
      */
-    def toAngstroms: Quantity[PosBigDecimal, Angstrom] =
-      to[Angstrom](2)
+    def toMicrometers: Quantity[PosBigDecimal, Micrometer] =
+      to[Micrometer](6)
 
-    /**
-     * Alias for `toAngstroms`.
-     */
-    def Å: Quantity[PosBigDecimal, Angstrom] =
-      toAngstroms
-
+    /** Alias for `toMicrometers`. */
+    def µm: Quantity[PosBigDecimal, Micrometer] =
+      toMicrometers
   }
 
   def apply(pm: Quantity[PosInt, Picometer]): Wavelength =
