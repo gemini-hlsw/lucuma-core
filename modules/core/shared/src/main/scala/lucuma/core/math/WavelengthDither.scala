@@ -5,13 +5,14 @@ package lucuma.core.math
 
 import cats.Order
 import coulomb.Quantity
-import java.math.RoundingMode
 import lucuma.core.math.units.Angstrom
 import lucuma.core.math.units.Micrometer
 import lucuma.core.math.units.Nanometer
 import lucuma.core.math.units.Picometer
 import lucuma.core.optics.Format
 import monocle.Iso
+
+import java.math.RoundingMode
 
 
 /**

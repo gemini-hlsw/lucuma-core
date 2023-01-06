@@ -17,7 +17,7 @@ import eu.timepit.refined.scalacheck.numeric.*
 import eu.timepit.refined.types.numeric.PosBigDecimal
 import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.math.arb.*
-import lucuma.core.math.units.{*, given}
+import lucuma.core.math.units.{_, given}
 import lucuma.core.optics.Format
 import lucuma.core.optics.laws.discipline.FormatTests
 import monocle.law.discipline.*
