@@ -43,11 +43,11 @@ sealed abstract class GmosNorthGrating(
    * @see http://hyperphysics.phy-astr.gsu.edu/hbase/phyopt/gratres.html
    */
   private def Δλ: Double =
-    blazeWavelength.nm.value.toDouble / referenceResolution.value.toDouble
+    blazeWavelength.nm.value.value.doubleValue / referenceResolution.value.toDouble
 
   /** Resolution at λ with the specified slit width. */
   def resolution(λ: Wavelength, slitWidth: Angle): Int =
-    ((λ.nm.value.toDouble / Δλ) * (0.5 / Angle.signedDecimalArcseconds.get(slitWidth).toDouble)).toInt
+    ((λ.nm.value.value.doubleValue / Δλ) * (0.5 / Angle.signedDecimalArcseconds.get(slitWidth).toDouble)).toInt
 
   /** Resolution at λ with the effective slit width of the given FPU. */
   def resolution(λ: Wavelength, fpu: GmosNorthFpu): Int =
@@ -64,7 +64,7 @@ object GmosNorthGrating {
     PosInt.unsafeFrom(value).withUnit[Nanometer]
 
   private def blazeNm(value: Int): Wavelength =
-    Wavelength.fromNanometers(value).get
+    Wavelength.fromIntNanometers(value).get
 
   private def resolution(value: Int): PosInt =
     PosInt.unsafeFrom(value)

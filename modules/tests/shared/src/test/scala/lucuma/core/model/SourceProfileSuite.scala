@@ -209,13 +209,13 @@ final class SourceProfileSuite extends DisciplineSuite {
   checkAll(
     "SourceProfile.integratedWavelengthLineIn",
     TraversalTests(
-      SourceProfile.integratedWavelengthLineIn(Wavelength.fromPicometers.getOption(620000).get)
+      SourceProfile.integratedWavelengthLineIn(Wavelength.intPicometers.getOption(620000).get)
     )
   )
   checkAll(
     "SourceProfile.surfaceWavelengthLineIn",
     TraversalTests(
-      SourceProfile.surfaceWavelengthLineIn(Wavelength.fromPicometers.getOption(620000).get)
+      SourceProfile.surfaceWavelengthLineIn(Wavelength.intPicometers.getOption(620000).get)
     )
   )
   checkAll(
