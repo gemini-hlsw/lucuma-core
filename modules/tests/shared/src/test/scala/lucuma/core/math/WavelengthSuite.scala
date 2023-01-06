@@ -31,7 +31,6 @@ import java.math.RoundingMode
 import scala.language.implicitConversions
 
 final class WavelengthSuite extends munit.DisciplineSuite {
-  //  import ArbQuantity._   Why won't this work?
   import ArbRefined._
   import ArbWavelength.*
   import ArbWavelengthDither.given
