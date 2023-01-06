@@ -64,7 +64,7 @@ object GmosSouthGrating {
     PosInt.unsafeFrom(value).withUnit[Nanometer]
 
   private def blazeNm(value: Int): Wavelength =
-    Wavelength.fromNanometers(value).get
+    Wavelength.fromIntNanometers(value).get
 
   private def resolution(value: Int): PosInt =
     PosInt.unsafeFrom(value)

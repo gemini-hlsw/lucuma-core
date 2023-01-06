@@ -68,8 +68,8 @@ object Coverage {
     // ints, with a magic, un-discoverable combination of imports.
     val centPm = central.toPicometers.value.value
     val halfPm = width.value.value / 2
-    val min    = Wavelength.unsafeFromInt(centPm - halfPm)
-    val max    = Wavelength.unsafeFromInt(centPm + halfPm)
+    val min    = Wavelength.unsafeFromIntPicometers(centPm - halfPm)
+    val max    = Wavelength.unsafeFromIntPicometers(centPm + halfPm)
     apply(min, max)
   }
 

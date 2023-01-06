@@ -35,10 +35,10 @@ object GnirsDisperserOrder {
         "1",
         "One",
         1,
-        Wavelength.unsafeFromInt(4850000),
-        Wavelength.unsafeFromInt(4300000),
-        Wavelength.unsafeFromInt(6000000),
-        Wavelength.unsafeFromInt(0),
+        Wavelength.unsafeFromIntPicometers(4850000),
+        Wavelength.unsafeFromIntPicometers(4300000),
+        Wavelength.unsafeFromIntPicometers(6000000),
+        Wavelength.unsafeFromIntPicometers(0),
         Some(Band.M),
         false
       )
@@ -50,10 +50,10 @@ object GnirsDisperserOrder {
         "2",
         "Two",
         2,
-        Wavelength.unsafeFromInt(3400000),
-        Wavelength.unsafeFromInt(2700000),
-        Wavelength.unsafeFromInt(4300000),
-        Wavelength.unsafeFromInt(0),
+        Wavelength.unsafeFromIntPicometers(3400000),
+        Wavelength.unsafeFromIntPicometers(2700000),
+        Wavelength.unsafeFromIntPicometers(4300000),
+        Wavelength.unsafeFromIntPicometers(0),
         Some(Band.L),
         false
       )
@@ -65,10 +65,10 @@ object GnirsDisperserOrder {
         "3",
         "Three",
         3,
-        Wavelength.unsafeFromInt(2220000),
-        Wavelength.unsafeFromInt(1860000),
-        Wavelength.unsafeFromInt(2700000),
-        Wavelength.unsafeFromInt(647),
+        Wavelength.unsafeFromIntPicometers(2220000),
+        Wavelength.unsafeFromIntPicometers(1860000),
+        Wavelength.unsafeFromIntPicometers(2700000),
+        Wavelength.unsafeFromIntPicometers(647),
         Some(Band.K),
         true
       )
@@ -80,10 +80,10 @@ object GnirsDisperserOrder {
         "4XD",
         "FourXD",
         4,
-        Wavelength.unsafeFromInt(1650000),
-        Wavelength.unsafeFromInt(1420000),
-        Wavelength.unsafeFromInt(1860000),
-        Wavelength.unsafeFromInt(482),
+        Wavelength.unsafeFromIntPicometers(1650000),
+        Wavelength.unsafeFromIntPicometers(1420000),
+        Wavelength.unsafeFromIntPicometers(1860000),
+        Wavelength.unsafeFromIntPicometers(482),
         Some(Band.H),
         true
       )
@@ -95,10 +95,10 @@ object GnirsDisperserOrder {
         "4",
         "Four",
         4,
-        Wavelength.unsafeFromInt(1630000),
-        Wavelength.unsafeFromInt(1420000),
-        Wavelength.unsafeFromInt(1860000),
-        Wavelength.unsafeFromInt(485),
+        Wavelength.unsafeFromIntPicometers(1630000),
+        Wavelength.unsafeFromIntPicometers(1420000),
+        Wavelength.unsafeFromIntPicometers(1860000),
+        Wavelength.unsafeFromIntPicometers(485),
         Some(Band.H),
         true
       )
@@ -110,10 +110,10 @@ object GnirsDisperserOrder {
         "5",
         "Five",
         5,
-        Wavelength.unsafeFromInt(1250000),
-        Wavelength.unsafeFromInt(1170000),
-        Wavelength.unsafeFromInt(1420000),
-        Wavelength.unsafeFromInt(388),
+        Wavelength.unsafeFromIntPicometers(1250000),
+        Wavelength.unsafeFromIntPicometers(1170000),
+        Wavelength.unsafeFromIntPicometers(1420000),
+        Wavelength.unsafeFromIntPicometers(388),
         Some(Band.J),
         true
       )
@@ -125,10 +125,10 @@ object GnirsDisperserOrder {
         "6",
         "Six",
         6,
-        Wavelength.unsafeFromInt(1100000),
-        Wavelength.unsafeFromInt(1030000),
-        Wavelength.unsafeFromInt(1170000),
-        Wavelength.unsafeFromInt(323),
+        Wavelength.unsafeFromIntPicometers(1100000),
+        Wavelength.unsafeFromIntPicometers(1030000),
+        Wavelength.unsafeFromIntPicometers(1170000),
+        Wavelength.unsafeFromIntPicometers(323),
         None,
         true
       )
@@ -140,10 +140,10 @@ object GnirsDisperserOrder {
         "7",
         "Seven",
         7,
-        Wavelength.unsafeFromInt(951000),
-        Wavelength.unsafeFromInt(880000),
-        Wavelength.unsafeFromInt(1030000),
-        Wavelength.unsafeFromInt(276),
+        Wavelength.unsafeFromIntPicometers(951000),
+        Wavelength.unsafeFromIntPicometers(880000),
+        Wavelength.unsafeFromIntPicometers(1030000),
+        Wavelength.unsafeFromIntPicometers(276),
         None,
         true
       )
@@ -155,10 +155,10 @@ object GnirsDisperserOrder {
         "8",
         "Eight",
         8,
-        Wavelength.unsafeFromInt(832000),
-        Wavelength.unsafeFromInt(780000),
-        Wavelength.unsafeFromInt(880000),
-        Wavelength.unsafeFromInt(241),
+        Wavelength.unsafeFromIntPicometers(832000),
+        Wavelength.unsafeFromIntPicometers(780000),
+        Wavelength.unsafeFromIntPicometers(880000),
+        Wavelength.unsafeFromIntPicometers(241),
         None,
         true
       )
