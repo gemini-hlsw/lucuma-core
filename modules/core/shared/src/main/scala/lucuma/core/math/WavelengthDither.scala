@@ -5,6 +5,7 @@ package lucuma.core.math
 
 import cats.Order
 import coulomb.Quantity
+import coulomb.syntax.*
 import lucuma.core.math.units.Angstrom
 import lucuma.core.math.units.Micrometer
 import lucuma.core.math.units.Nanometer
@@ -55,6 +56,9 @@ object WavelengthDither {
 
     def toMicrometers: Quantity[BigDecimal, Micrometer] =
       to[Micrometer](scale = 6)
+
+    def abs: WavelengthDither =
+      w.value.abs.withUnit[Picometer]
 
     /** Alias for `toMicrometers`. */
     def µm: Quantity[BigDecimal, Micrometer] =

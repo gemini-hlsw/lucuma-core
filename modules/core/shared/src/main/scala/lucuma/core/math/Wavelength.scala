@@ -107,6 +107,12 @@ object Wavelength {
 
     def unsafeOffset(wd: WavelengthDither): Wavelength =
       offset(wd).get
+
+    /**
+     * Calculates the difference to another wavelength
+     */
+    def diff(o: Wavelength): WavelengthDither =
+      WavelengthDither((w.value.value - o.value.value).withUnit[Picometer])
   }
 
   def apply(pm: Quantity[PosInt, Picometer]): Wavelength =
