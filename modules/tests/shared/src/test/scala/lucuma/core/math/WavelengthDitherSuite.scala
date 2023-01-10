@@ -4,8 +4,11 @@
 package lucuma.core.math
 
 import cats.Eq
+import cats.syntax.all.*
 import coulomb.*
+import coulomb.syntax.*
 import lucuma.core.math.arb.*
+import lucuma.core.math.units.Picometer
 import lucuma.core.optics.laws.discipline.FormatTests
 import monocle.law.discipline.*
 import munit.DisciplineSuite
@@ -17,10 +20,10 @@ class WavelengthDitherSuite extends DisciplineSuite {
 
   import ArbWavelengthDither.given
 
-  implicit def arbQuantityPbd[V: Arbitrary, U]: Arbitrary[Quantity[V, U]] =
+  given arbQuantityPbd[V: Arbitrary, U]: Arbitrary[Quantity[V, U]] =
     Arbitrary(arbitrary[V].map(Quantity[U](_)))
 
-  implicit def eqQuantity[V: Eq, U]: Eq[Quantity[V, U]] =
+  given eqQuantity[V: Eq, U]: Eq[Quantity[V, U]] =
     Eq.by(_.value)
 
   checkAll("picometers",  IsoTests(WavelengthDither.picometers))
@@ -57,6 +60,13 @@ class WavelengthDitherSuite extends DisciplineSuite {
         wd.toPicometers.value,
         (wd.toMicrometers.value * 1_000_000).bigDecimal.intValueExact
       )
+    }
+  }
+
+  property("abs") {
+    forAll { (wd: WavelengthDither) =>
+      if (wd > WavelengthDither.Zero) assertEquals(wd, wd.abs)
+      else assertEquals(WavelengthDither(wd.toPicometers.value.abs.withUnit[Picometer]), wd.abs)
     }
   }
 }

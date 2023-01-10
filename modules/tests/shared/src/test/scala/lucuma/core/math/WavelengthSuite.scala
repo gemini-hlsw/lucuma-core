@@ -176,4 +176,11 @@ final class WavelengthSuite extends munit.DisciplineSuite {
     }
   }
 
+  test("difference") {
+    forAll { (a: Wavelength, b: Wavelength) =>
+      assertEquals(a.diff(a), WavelengthDither.Zero)
+      assertEquals(a.diff(b).abs, b.diff(a).abs)
+    }
+  }
+
 }
