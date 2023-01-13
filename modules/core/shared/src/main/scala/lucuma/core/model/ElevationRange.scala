@@ -37,7 +37,7 @@ object ElevationRange {
 
     type Value        = Interval.Closed[MinValue.type, MaxValue.type]
     type DecimalValue = BigDecimal Refined Value
-    object DecimalValue extends RefinedTypeOps[DecimalValue, BigDecimal]
+    val DecimalValue = new RefinedTypeOps[DecimalValue, BigDecimal]
 
     val DefaultMin: DecimalValue = DecimalValue.unsafeFrom(BigDecimal(1.0))
     val DefaultMax: DecimalValue = DecimalValue.unsafeFrom(BigDecimal(2.0))
