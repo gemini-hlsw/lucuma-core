@@ -6,6 +6,7 @@ package lucuma.core.syntax
 import cats.syntax.all._
 import lucuma.core.optics.Spire
 import lucuma.core.syntax.boundedInterval._
+import lucuma.core.util.Interval
 import org.typelevel.cats.time._
 import spire.math.Bounded
 import spire.math.Empty
@@ -85,17 +86,39 @@ final class LongDurationOps(val self: Long) extends AnyVal {
   def nanoseconds: Duration =
     Duration.ofNanos(self)
 
+  private def unsafeInterval(d: Duration): Interval =
+    Interval
+      .FromDuration
+      .getOption(d)
+      .getOrElse(sys.error(s"Invalid Interval ${d.toString}"))
+
+  def unsafeNanosecondInterval: Interval =
+    unsafeInterval(nanoseconds)
+
   def microseconds: Duration =
     Duration.ofNanos(self * 1000)
+
+  def unsafeMicrosecondInterval: Interval =
+    unsafeInterval(microseconds)
 
   def milliseconds: Duration =
     Duration.ofMillis(self)
 
+  def unsafeMillisecondInterval: Interval =
+    unsafeInterval(milliseconds)
+
   def seconds: Duration =
     Duration.ofSeconds(self)
 
+  def unsafeSecondInterval: Interval =
+    unsafeInterval(seconds)
+
   def minutes: Duration =
     Duration.ofMinutes(self)
+
+  def unsafeMinuteInterval: Interval =
+    unsafeInterval(minutes)
+
 }
 
 trait ToLongDurationOps {
