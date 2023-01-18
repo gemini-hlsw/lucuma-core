@@ -201,12 +201,15 @@ object Coordinates extends CoordinatesOptics {
     val dec = atan2(z, hyp)
     Coordinates(RightAscension.fromRadians(ra), Declination.unsafeFromRadians(dec))
 
+  extension[F[_]:Foldable](coords: F[Coordinates])
+    def center: Coordinates = centerOf(coords)
+
   /** @group Typeclass Instances */
-  implicit val CoordinatesOrder: Order[Coordinates] =
+  given Order[Coordinates] =
     Order.by(c => (c.ra, c.dec))
 
   /** @group Typeclass Instances. */
-  implicit val ShowCoordinates: Show[Coordinates] =
+  given Show[Coordinates] =
     Show.fromToString
 
 }

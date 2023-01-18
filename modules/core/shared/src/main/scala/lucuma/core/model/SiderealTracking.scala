@@ -3,10 +3,10 @@
 
 package lucuma.core.model
 
-import cats._
-import cats.syntax.all._
+import cats.*
+import cats.syntax.all.*
 import coulomb.policy.spire.standard.given
-import lucuma.core.math._
+import lucuma.core.math.*
 import monocle.Focus
 import monocle.Lens
 
@@ -117,10 +117,9 @@ object SiderealTracking extends SiderealTrackingOptics {
   private type Vec3 = (Double, Double, Double)
 
   // |+| gives us addition for VecN, but we also need scalar multiplication
-  private implicit class Vec3Ops(private val a: Vec3) extends AnyVal {
+  extension (a: Vec3)
     def *(d: Double): Vec3 =
       (a._1 * d, a._2 * d, a._3 * d)
-  }
 
   /**
    * Coordinates corrected for proper motion
@@ -200,9 +199,9 @@ object SiderealTracking extends SiderealTrackingOptics {
     } else none
   }
 
-  implicit val OrderSiderealTracking: Order[SiderealTracking] = {
+  given Order[SiderealTracking] = {
 
-    implicit val MonoidOrder: Monoid[Order[SiderealTracking]] =
+    given Monoid[Order[SiderealTracking]] =
       Order.whenEqualMonoid[SiderealTracking]
 
     def order[A: Order](f: SiderealTracking => A): Order[SiderealTracking] =
