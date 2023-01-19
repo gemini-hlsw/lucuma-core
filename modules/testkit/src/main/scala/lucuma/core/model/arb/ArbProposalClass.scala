@@ -8,12 +8,13 @@ import lucuma.core.model.IntPercent
 import lucuma.core.model.NonNegDuration
 import lucuma.core.model.ProposalClass
 import lucuma.core.model.ProposalClass.*
-import lucuma.core.model.arb.ArbNonNegDuration
+import lucuma.core.util.Interval
+import lucuma.core.util.arb.ArbInterval
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.*
 
 trait ArbProposalClass {
-  import ArbNonNegDuration.given
+  import ArbInterval.given
 
   given Arbitrary[Classical] =
     Arbitrary(arbitrary[IntPercent].map(Classical(_)))
@@ -68,12 +69,12 @@ trait ArbProposalClass {
       for {
         minPct    <- arbitrary[IntPercent]
         minTotPct <- arbitrary[IntPercent]
-        totalTime <- arbitrary[NonNegDuration]
+        totalTime <- arbitrary[Interval]
       } yield LargeProgram(minPct, minTotPct, totalTime)
     }
 
   given Cogen[LargeProgram] =
-    Cogen[(IntPercent, IntPercent, NonNegDuration)].contramap(p =>
+    Cogen[(IntPercent, IntPercent, Interval)].contramap(p =>
       (p.minPercentTime, p.minPercentTotalTime, p.totalTime)
     )
 
@@ -82,12 +83,12 @@ trait ArbProposalClass {
       for {
         minPct    <- arbitrary[IntPercent]
         minTotPct <- arbitrary[IntPercent]
-        totalTime <- arbitrary[NonNegDuration]
+        totalTime <- arbitrary[Interval]
       } yield Intensive(minPct, minTotPct, totalTime)
     }
 
   given Cogen[Intensive] =
-    Cogen[(IntPercent, IntPercent, NonNegDuration)].contramap(p =>
+    Cogen[(IntPercent, IntPercent, Interval)].contramap(p =>
       (p.minPercentTime, p.minPercentTotalTime, p.totalTime)
     )
 

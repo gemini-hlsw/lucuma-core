@@ -10,12 +10,14 @@ import eu.timepit.refined.types.all.PosBigDecimal
 import lucuma.core.math.arb.ArbRefined
 import lucuma.core.model.NonNegDuration
 import lucuma.core.model.arb.ArbNonNegDuration
+import lucuma.core.util.Interval
+import lucuma.core.util.arb.ArbInterval
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.*
 
 trait ArbExposureTimeMode {
   import ExposureTimeMode.*
-  import ArbNonNegDuration.given
+  import ArbInterval.given
   import ArbRefined.*
 
   given Arbitrary[SignalToNoise] =
@@ -30,7 +32,7 @@ trait ArbExposureTimeMode {
     Arbitrary {
       for {
         c <- arbitrary[NonNegInt]
-        t <- arbitrary[NonNegDuration]
+        t <- arbitrary[Interval]
       } yield FixedExposure(c, t)
     }
 
@@ -38,7 +40,7 @@ trait ArbExposureTimeMode {
     Cogen[
       (
         NonNegInt,
-        NonNegDuration
+        Interval
       )
     ].contramap { in =>
       (

@@ -6,16 +6,17 @@ package lucuma.core.model.sequence.arb
 import cats.syntax.all._
 import lucuma.core.arb.ArbTime
 import lucuma.core.model.sequence._
+import lucuma.core.util.Interval
 import lucuma.core.util.arb.ArbUid
+import lucuma.core.util.arb.ArbInterval
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Cogen
 import org.scalacheck.Gen
 
-import java.time.Duration
-
 trait ArbManualConfig {
   import ArbAtom._
+  import ArbInterval.given
   import ArbStaticConfig._
   import ArbTime._
   import ArbUid._
@@ -23,28 +24,28 @@ trait ArbManualConfig {
   implicit val arbManualConfigGmosNorth: Arbitrary[ManualConfig.GmosNorth] = Arbitrary(
     for {
       static      <- arbitrary[StaticConfig.GmosNorth]
-      setupTime   <- arbitrary[Duration]
+      setupTime   <- arbitrary[Interval]
       acquisition <- arbitrary[List[Atom.GmosNorth]]
       science     <- arbitrary[List[Atom.GmosNorth]]
     } yield ManualConfig.GmosNorth(static, setupTime, acquisition, science)
   )
 
   implicit val cogManualConfigGmosNorth: Cogen[ManualConfig.GmosNorth] =
-    Cogen[(StaticConfig.GmosNorth, Duration, List[Atom.GmosNorth], List[Atom.GmosNorth])].contramap(
+    Cogen[(StaticConfig.GmosNorth, Interval, List[Atom.GmosNorth], List[Atom.GmosNorth])].contramap(
       c => (c.static, c.setupTime, c.acquisition, c.science)
     )
 
   implicit val arbManualConfigGmosSouth: Arbitrary[ManualConfig.GmosSouth] = Arbitrary(
     for {
       static      <- arbitrary[StaticConfig.GmosSouth]
-      setupTime   <- arbitrary[Duration]
+      setupTime   <- arbitrary[Interval]
       acquisition <- arbitrary[List[Atom.GmosSouth]]
       science     <- arbitrary[List[Atom.GmosSouth]]
     } yield ManualConfig.GmosSouth(static, setupTime, acquisition, science)
   )
 
   implicit val cogManualConfigGmosSouth: Cogen[ManualConfig.GmosSouth] =
-    Cogen[(StaticConfig.GmosSouth, Duration, List[Atom.GmosSouth], List[Atom.GmosSouth])].contramap(
+    Cogen[(StaticConfig.GmosSouth, Interval, List[Atom.GmosSouth], List[Atom.GmosSouth])].contramap(
       c => (c.static, c.setupTime, c.acquisition, c.science)
     )
 

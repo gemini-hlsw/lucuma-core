@@ -4,18 +4,17 @@
 package lucuma.core.model.sequence
 
 import cats.Eq
+import lucuma.core.util.Interval
 import monocle.Focus
 import monocle.Lens
 import org.typelevel.cats.time._
 
-import java.time.Duration
-
 final case class StepTime(
-  configChange: Duration,
-  exposure:     Duration,
-  readout:      Duration,
-  write:        Duration,
-  total:        Duration
+  configChange: Interval,
+  exposure:     Interval,
+  readout:      Interval,
+  write:        Interval,
+  total:        Interval
 )
 
 object StepTime {
@@ -23,22 +22,22 @@ object StepTime {
     Eq.by(x => (x.configChange, x.exposure, x.readout, x.write, x.total))
 
   /** @group Optics */
-  val configChange: Lens[StepTime, Duration] =
+  val configChange: Lens[StepTime, Interval] =
     Focus[StepTime](_.configChange)
 
   /** @group Optics */
-  val exposure: Lens[StepTime, Duration] =
+  val exposure: Lens[StepTime, Interval] =
     Focus[StepTime](_.exposure)
 
   /** @group Optics */
-  val readout: Lens[StepTime, Duration] =
+  val readout: Lens[StepTime, Interval] =
     Focus[StepTime](_.readout)
 
   /** @group Optics */
-  val write: Lens[StepTime, Duration] =
+  val write: Lens[StepTime, Interval] =
     Focus[StepTime](_.write)
 
   /** @group Optics */
-  val total: Lens[StepTime, Duration] =
+  val total: Lens[StepTime, Interval] =
     Focus[StepTime](_.total)
 }

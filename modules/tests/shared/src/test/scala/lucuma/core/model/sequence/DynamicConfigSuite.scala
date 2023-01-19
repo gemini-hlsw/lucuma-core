@@ -14,10 +14,11 @@ import org.typelevel.cats.time._
 final class DynamicConfigSuite extends DisciplineSuite {
   import ArbDynamicConfig._
   import ArbEnumerated._
-  import ArbTime._
+  import ArbInterval.given
   import ArbGmosCcdMode._
   import ArbGmosGratingConfig._
   import ArbGmosFpuMask._
+  import ArbTime._
 
   checkAll("Eq[DynamicConfig.GmosNorth]", EqTests[DynamicConfig.GmosNorth].eqv)
   checkAll("DynamicConfig.GmosNorth.exposure", LensTests(DynamicConfig.GmosNorth.exposure))

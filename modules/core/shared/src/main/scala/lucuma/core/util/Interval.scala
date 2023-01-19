@@ -23,7 +23,7 @@ import scala.util.Try
  * to positive microseconds. This corresponds with the ODB GraphQL schema
  * duration, which allows setting and displaying times in Long microseconds
  * and fractional milliseconds, seconds, minutes, and hours.
-  */
+ */
 opaque type Interval = NonNegLong
 
 object Interval {

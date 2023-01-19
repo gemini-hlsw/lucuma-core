@@ -5,27 +5,29 @@ package lucuma.core.model.sequence.arb
 
 import lucuma.core.arb.ArbTime
 import lucuma.core.model.sequence.StepTime
+import lucuma.core.util.Interval
+import lucuma.core.util.arb.ArbInterval
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Cogen
 
-import java.time.Duration
 
 trait ArbStepTime {
+  import ArbInterval.given
   import ArbTime._
 
   implicit val arbStepTime: Arbitrary[StepTime] = Arbitrary(
     for {
-      configChange <- arbitrary[Duration]
-      exposure     <- arbitrary[Duration]
-      readout      <- arbitrary[Duration]
-      write        <- arbitrary[Duration]
-      total        <- arbitrary[Duration]
+      configChange <- arbitrary[Interval]
+      exposure     <- arbitrary[Interval]
+      readout      <- arbitrary[Interval]
+      write        <- arbitrary[Interval]
+      total        <- arbitrary[Interval]
     } yield StepTime(configChange, exposure, readout, write, total)
   )
 
   implicit val cogStepTime: Cogen[StepTime] =
-    Cogen[(Duration, Duration, Duration, Duration, Duration)].contramap(t =>
+    Cogen[(Interval, Interval, Interval, Interval, Interval)].contramap(t =>
       (t.configChange, t.exposure, t.readout, t.write, t.total)
     )
 }

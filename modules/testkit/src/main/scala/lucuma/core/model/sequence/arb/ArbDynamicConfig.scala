@@ -8,24 +8,25 @@ import lucuma.core.arb.ArbTime
 import lucuma.core.enums._
 import lucuma.core.model.sequence.DynamicConfig
 import lucuma.core.model.sequence._
+import lucuma.core.util.Interval
 import lucuma.core.util.arb.ArbEnumerated
+import lucuma.core.util.arb.ArbInterval
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Cogen
 import org.scalacheck.Gen
 
-import java.time.Duration
-
 trait ArbDynamicConfig {
   import ArbGmosCcdMode._
   import ArbEnumerated._
+  import ArbInterval.given
   import ArbGmosGratingConfig._
   import ArbGmosFpuMask._
   import ArbTime._
 
   implicit val arbDynamicConfigGmosNorth: Arbitrary[DynamicConfig.GmosNorth] = Arbitrary(
     for {
-      exposure      <- arbitrary[Duration]
+      exposure      <- arbitrary[Interval]
       readout       <- arbitrary[GmosCcdMode]
       dtax          <- arbitrary[GmosDtax]
       roi           <- arbitrary[GmosRoi]
@@ -37,7 +38,7 @@ trait ArbDynamicConfig {
 
   implicit val cogDynamicConfigGmosNorth: Cogen[DynamicConfig.GmosNorth] =
     Cogen[
-      (Duration,
+      (Interval,
        GmosCcdMode,
        GmosDtax,
        GmosRoi,
@@ -49,7 +50,7 @@ trait ArbDynamicConfig {
 
   implicit val arbDynamicConfigGmosSouth: Arbitrary[DynamicConfig.GmosSouth] = Arbitrary(
     for {
-      exposure      <- arbitrary[Duration]
+      exposure      <- arbitrary[Interval]
       readout       <- arbitrary[GmosCcdMode]
       dtax          <- arbitrary[GmosDtax]
       roi           <- arbitrary[GmosRoi]
@@ -60,7 +61,7 @@ trait ArbDynamicConfig {
   )
 
   implicit val cogDynamicConfigGmosSouth: Cogen[DynamicConfig.GmosSouth] = Cogen[
-    (Duration,
+    (Interval,
      GmosCcdMode,
      GmosDtax,
      GmosRoi,

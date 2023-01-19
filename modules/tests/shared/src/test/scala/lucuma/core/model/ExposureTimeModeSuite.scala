@@ -8,15 +8,15 @@ import eu.timepit.refined.cats.*
 import eu.timepit.refined.scalacheck.all.*
 import lucuma.core.math.arb.ArbRefined
 import lucuma.core.model.arb.ArbExposureTimeMode
-import lucuma.core.model.arb.ArbNonNegDuration
 import lucuma.core.model.given
+import lucuma.core.util.arb.ArbInterval
 import monocle.law.discipline.LensTests
 import monocle.law.discipline.OptionalTests
 import monocle.law.discipline.PrismTests
 import munit.DisciplineSuite
 
 class ExposureTimeModeSuite extends DisciplineSuite {
-  import ArbNonNegDuration.given
+  import ArbInterval.given
   import ArbExposureTimeMode.given
   import ArbRefined.*
 

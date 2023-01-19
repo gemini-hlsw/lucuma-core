@@ -6,18 +6,17 @@ package lucuma.core.model.sequence
 import cats.Eq
 import cats.syntax.all._
 import lucuma.core.enums._
+import lucuma.core.util.Interval
 import monocle.Focus
 import monocle.Lens
 import monocle.Prism
 import monocle.macros.GenPrism
 import org.typelevel.cats.time._
 
-import java.time.Duration
-
 sealed trait DynamicConfig
 object DynamicConfig {
   final case class GmosNorth(
-    exposure:      Duration,
+    exposure:      Interval,
     readout:       GmosCcdMode,
     dtax:          GmosDtax,
     roi:           GmosRoi,
@@ -30,7 +29,7 @@ object DynamicConfig {
       Eq.by(x => (x.exposure, x.readout, x.dtax, x.roi, x.gratingConfig, x.filter, x.fpu))
 
     /** @group Optics */
-    val exposure: Lens[GmosNorth, Duration] =
+    val exposure: Lens[GmosNorth, Interval] =
       Focus[GmosNorth](_.exposure)
 
     /** @group Optics */
@@ -59,7 +58,7 @@ object DynamicConfig {
   }
 
   final case class GmosSouth(
-    exposure:      Duration,
+    exposure:      Interval,
     readout:       GmosCcdMode,
     dtax:          GmosDtax,
     roi:           GmosRoi,
@@ -72,7 +71,7 @@ object DynamicConfig {
       Eq.by(x => (x.exposure, x.readout, x.dtax, x.roi, x.gratingConfig, x.filter, x.fpu))
 
     /** @group Optics */
-    val exposure: Lens[GmosSouth, Duration] =
+    val exposure: Lens[GmosSouth, Interval] =
       Focus[GmosSouth](_.exposure)
 
     /** @group Optics */
