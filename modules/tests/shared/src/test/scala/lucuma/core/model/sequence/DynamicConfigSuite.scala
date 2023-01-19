@@ -14,7 +14,7 @@ import org.typelevel.cats.time._
 final class DynamicConfigSuite extends DisciplineSuite {
   import ArbDynamicConfig._
   import ArbEnumerated._
-  import ArbInterval.given
+  import ArbTimeSpan.given
   import ArbGmosCcdMode._
   import ArbGmosGratingConfig._
   import ArbGmosFpuMask._

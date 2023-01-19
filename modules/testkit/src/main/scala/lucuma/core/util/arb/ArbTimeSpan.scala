@@ -12,14 +12,14 @@ import org.scalacheck._
 import java.time.Duration
 import scala.util.Try
 
-trait ArbInterval {
+trait ArbTimeSpan {
 
-  given Arbitrary[Interval] =
+  given Arbitrary[TimeSpan] =
     Arbitrary {
-      arbitrary[NonNegLong].map(Interval.fromNonNegMicroseconds)
+      arbitrary[NonNegLong].map(TimeSpan.fromNonNegMicroseconds)
     }
 
-  given Cogen[Interval] =
+  given Cogen[TimeSpan] =
     Cogen[Long].contramap(_.toMicroseconds)
 
   val genDuration: Gen[Duration] =
@@ -29,16 +29,16 @@ trait ArbInterval {
     } yield Try(Duration.ofSeconds(s, ns)).getOrElse(Duration.ofSeconds(s))
 
 
-  val genIntervalString: Gen[String] =
+  val genTimeSpanString: Gen[String] =
     Gen.oneOf(
       // Normal ISO 8601 duration string
-      arbitrary[Interval].map(_.format),
+      arbitrary[TimeSpan].map(_.format),
       // For the coverage test, prepend a 0 to a time value every now and then
-      arbitrary[Interval].map(_.format).map { s =>
+      arbitrary[TimeSpan].map(_.format).map { s =>
         s.replaceFirst("([0-9]+)([DHMS])", "0$1$2")
       },
       // Make some invalid strings sometimes
-      arbitrary[(Interval, Int, Char)].map { case (n, i, c) =>
+      arbitrary[(TimeSpan, Int, Char)].map { case (n, i, c) =>
         val cs = n.format.toCharArray
         val in = (i % cs.size).abs
         cs(in) = c
@@ -47,4 +47,4 @@ trait ArbInterval {
     )
 }
 
-object ArbInterval extends ArbInterval
+object ArbTimeSpan extends ArbTimeSpan

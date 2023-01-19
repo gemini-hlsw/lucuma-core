@@ -10,12 +10,12 @@ import lucuma.core.model.ProposalClass
 import lucuma.core.model.ProposalClass.*
 import lucuma.core.model.arb.*
 import lucuma.core.model.given
-import lucuma.core.util.arb.ArbInterval
+import lucuma.core.util.arb.ArbTimeSpan
 import monocle.law.discipline.*
 import munit.*
 
 class ProposalClassSuite extends DisciplineSuite {
-  import ArbInterval.given
+  import ArbTimeSpan.given
   import ArbProposalClass.given
 
   // Laws for instances

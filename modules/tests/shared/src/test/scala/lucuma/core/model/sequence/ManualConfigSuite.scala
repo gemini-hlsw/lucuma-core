@@ -14,7 +14,7 @@ import org.typelevel.cats.time._
 final class ManualConfigSuite extends DisciplineSuite {
   import ArbAtom._
   import ArbEnumerated._
-  import ArbInterval.given
+  import ArbTimeSpan.given
   import ArbManualConfig._
   import ArbStaticConfig._
   import ArbUid._

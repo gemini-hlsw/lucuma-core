@@ -18,40 +18,40 @@ import java.time.temporal.ChronoUnit.MICROS
 import scala.util.Try
 
 /**
- * Interval is a time span, similar to a `FiniteDuration` in that it is a
+ * TimeSpan is a time span, similar to a `FiniteDuration` in that it is a
  * single `Long` value representing an amount of time, but in this case fixed
  * to positive microseconds. This corresponds with the ODB GraphQL schema
  * duration, which allows setting and displaying times in Long microseconds
  * and fractional milliseconds, seconds, minutes, and hours.
  */
-opaque type Interval = NonNegLong
+opaque type TimeSpan = NonNegLong
 
-object Interval {
+object TimeSpan {
 
-  val Min: Interval =
+  val Min: TimeSpan =
     NonNegLong.MinValue
 
-  val Max: Interval =
+  val Max: TimeSpan =
     NonNegLong.MaxValue
 
   /**
-   * Constructs an Interval from the given number of microseconds, if it is
+   * Constructs a TimeSpan from the given number of microseconds, if it is
    * non-negative.
    */
-  def fromMicroseconds(µs: Long): Option[Interval] =
+  def fromMicroseconds(µs: Long): Option[TimeSpan] =
     NonNegLong.from(µs).toOption
 
-  def unsafeFromMicroseconds(µs: Long): Interval =
+  def unsafeFromMicroseconds(µs: Long): TimeSpan =
     fromMicroseconds(µs).getOrElse(sys.error(s"The µs value ($µs) must be non-negative."))
 
-  def fromNonNegMicroseconds(µs: NonNegLong): Interval =
+  def fromNonNegMicroseconds(µs: NonNegLong): TimeSpan =
     µs
 
   /**
-   * Converts the Duration into an Interval if it is in range, discarding any
+   * Converts the Duration into a TimeSpan if it is in range, discarding any
    * sub-microsecond value.
    */
-  def fromDuration(value: Duration): Option[Interval] = {
+  def fromDuration(value: Duration): Option[TimeSpan] = {
     val µs = BigInt(value.getSeconds) * BigInt(10).pow(6) + value.getNano/1000L
 
     // would like to call µs.bigInteger.longValueExact but is not
@@ -63,52 +63,52 @@ object Interval {
   }
 
   /**
-   * Converts the given amount of time in milliseconds into an Interval,
+   * Converts the given amount of time in milliseconds into a TimeSpan,
    * rounding any sub-microsecond value to the nearest microsecond (half-up).
    * If the value is too big to be represented in a Long as
    */
-  def fromMilliseconds(ms: BigDecimal): Option[Interval] =
+  def fromMilliseconds(ms: BigDecimal): Option[TimeSpan] =
     Try(ms.bigDecimal.movePointRight(3).setScale(0, HALF_UP).longValueExact)
       .toOption
       .flatMap(fromMicroseconds)
 
   /**
-   * Converts the given amount of time in seconds into an Interval,
+   * Converts the given amount of time in seconds into a TimeSpan,
    * rounding any sub-microsecond value to the nearest microsecond (half-up).
    */
-  def fromSeconds(s: BigDecimal): Option[Interval] =
+  def fromSeconds(s: BigDecimal): Option[TimeSpan] =
     fromMilliseconds(s.bigDecimal.movePointRight(3))
 
   /**
-   * Converts the given amount of time in minutes into an Interval,
+   * Converts the given amount of time in minutes into a TimeSpan,
    * rounding any sub-microsecond value to the nearest microsecond (half-up).
    */
-  def fromMinutes(m: BigDecimal): Option[Interval] =
+  def fromMinutes(m: BigDecimal): Option[TimeSpan] =
     fromSeconds(m * 60L)
 
   /**
-   * Converts the given amount of time in hours into an Interval,
+   * Converts the given amount of time in hours into a TimeSpan,
    * rounding any sub-microsecond value to the nearest microsecond (half-up).
    */
-  def fromHours(h: BigDecimal): Option[Interval] =
+  def fromHours(h: BigDecimal): Option[TimeSpan] =
     fromSeconds(h * 3_600L)
 
   /**
-   * Parses the string into an Interval according to ISO-8601 standard, if possible.
+   * Parses the string into a TimeSpan according to ISO-8601 standard, if possible.
    */
-  def parse(iso: String): Either[String, Interval] =
+  def parse(iso: String): Either[String, TimeSpan] =
       Try(Duration.parse(iso))
         .toOption
         .flatMap(fromDuration)
-        .toRight(s"Cannot parse `$iso` as an Interval")
+        .toRight(s"Cannot parse `$iso` as a TimeSpan")
 
-  extension (interval: Interval) {
+  extension (timeSpan: TimeSpan) {
 
     def toMicroseconds: Long =
-      interval.value
+      timeSpan.value
 
     def toNonNegMicroseconds: NonNegLong =
-      interval
+      timeSpan
 
     def toMilliseconds: BigDecimal =
       BigDecimal(toMicroseconds).bigDecimal.movePointLeft(3)
@@ -123,10 +123,10 @@ object Interval {
       toSeconds / 3_600
 
     def toDuration: Duration =
-      Duration.of(interval.value, MICROS)
+      Duration.of(timeSpan.value, MICROS)
 
     /**
-     * Formats this Interval using the ISO-8601 standard.
+     * Formats this TimeSpan using the ISO-8601 standard.
      */
     def format: String =
       toDuration.toString
@@ -134,38 +134,38 @@ object Interval {
   }
 
   /**
-   * Obtains the absolute (i.e., positive regardless of order) time interval between two Timestamp, if in range.
+   * Obtains the absolute (i.e., positive regardless of order) time span between two Timestamp, if in range.
    */
-  def between(t0: Timestamp, t1: Timestamp): Option[Interval] =
+  def between(t0: Timestamp, t1: Timestamp): Option[TimeSpan] =
     fromDuration(
       Duration.between(t0.toInstant, t1.toInstant).abs
     )
 
-  val NonNegMicroseconds: Iso[NonNegLong, Interval] =
-    Iso[NonNegLong, Interval](fromNonNegMicroseconds)(toNonNegMicroseconds)
+  val NonNegMicroseconds: Iso[NonNegLong, TimeSpan] =
+    Iso[NonNegLong, TimeSpan](fromNonNegMicroseconds)(toNonNegMicroseconds)
 
-  val FromMicroseconds: Prism[Long, Interval] =
+  val FromMicroseconds: Prism[Long, TimeSpan] =
     Prism(fromMicroseconds)(toMicroseconds)
 
-  val FromMilliseconds: Format[BigDecimal, Interval] =
+  val FromMilliseconds: Format[BigDecimal, TimeSpan] =
     Format(fromMilliseconds, toMilliseconds)
 
-  val FromSeconds: Format[BigDecimal, Interval] =
+  val FromSeconds: Format[BigDecimal, TimeSpan] =
     Format(fromSeconds, toSeconds)
 
-  val FromMinutes: Format[BigDecimal, Interval] =
+  val FromMinutes: Format[BigDecimal, TimeSpan] =
     Format(fromMinutes, toMinutes)
 
-  val FromHours: Format[BigDecimal, Interval] =
+  val FromHours: Format[BigDecimal, TimeSpan] =
     Format(fromHours, toHours)
 
-  val FromDuration: Format[Duration, Interval] =
+  val FromDuration: Format[Duration, TimeSpan] =
     Format(fromDuration, toDuration)
 
-  val FromString: Format[String, Interval] =
+  val FromString: Format[String, TimeSpan] =
     Format(parse(_).toOption, format)
 
-  given orderInterval: Order[Interval] =
+  given orderTimeSpan: Order[TimeSpan] =
     Order.by(_.value)
 
 }

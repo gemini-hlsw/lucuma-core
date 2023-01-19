@@ -10,7 +10,7 @@ import eu.timepit.refined.types.numeric.NonNegInt
 import eu.timepit.refined.types.numeric.PosBigDecimal
 import lucuma.core.model.NonNegDuration
 import lucuma.core.model.given
-import lucuma.core.util.Interval
+import lucuma.core.util.TimeSpan
 import monocle.Focus
 import monocle.Lens
 import monocle.Optional
@@ -22,7 +22,7 @@ sealed trait ExposureTimeMode extends Product with Serializable
 object ExposureTimeMode {
 
   final case class SignalToNoise(value: PosBigDecimal)             extends ExposureTimeMode
-  final case class FixedExposure(count: NonNegInt, time: Interval) extends ExposureTimeMode
+  final case class FixedExposure(count: NonNegInt, time: TimeSpan) extends ExposureTimeMode
 
   given Eq[ExposureTimeMode] =
     Eq.instance {
@@ -59,8 +59,8 @@ object ExposureTimeMode {
       }
     }
 
-  val exposureTime: Optional[ExposureTimeMode, Interval] =
-    Optional[ExposureTimeMode, Interval] {
+  val exposureTime: Optional[ExposureTimeMode, TimeSpan] =
+    Optional[ExposureTimeMode, TimeSpan] {
       case FixedExposure(_, time) => time.some
       case SignalToNoise(_)       => none
     } { pbd =>
@@ -78,7 +78,7 @@ object ExposureTimeMode {
 
   object FixedExposure {
     val count: Lens[FixedExposure, NonNegInt] = Focus[FixedExposure](_.count)
-    val time: Lens[FixedExposure, Interval]   = Focus[FixedExposure](_.time)
+    val time: Lens[FixedExposure, TimeSpan]   = Focus[FixedExposure](_.time)
 
     given Eq[FixedExposure] = Eq.by(f => (f.count, f.time))
   }

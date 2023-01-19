@@ -9,14 +9,14 @@ import eu.timepit.refined.scalacheck.all.*
 import lucuma.core.math.arb.ArbRefined
 import lucuma.core.model.arb.ArbExposureTimeMode
 import lucuma.core.model.given
-import lucuma.core.util.arb.ArbInterval
+import lucuma.core.util.arb.ArbTimeSpan
 import monocle.law.discipline.LensTests
 import monocle.law.discipline.OptionalTests
 import monocle.law.discipline.PrismTests
 import munit.DisciplineSuite
 
 class ExposureTimeModeSuite extends DisciplineSuite {
-  import ArbInterval.given
+  import ArbTimeSpan.given
   import ArbExposureTimeMode.given
   import ArbRefined.*
 

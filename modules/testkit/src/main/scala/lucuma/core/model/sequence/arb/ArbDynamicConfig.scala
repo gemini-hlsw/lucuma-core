@@ -8,9 +8,9 @@ import lucuma.core.arb.ArbTime
 import lucuma.core.enums._
 import lucuma.core.model.sequence.DynamicConfig
 import lucuma.core.model.sequence._
-import lucuma.core.util.Interval
+import lucuma.core.util.TimeSpan
 import lucuma.core.util.arb.ArbEnumerated
-import lucuma.core.util.arb.ArbInterval
+import lucuma.core.util.arb.ArbTimeSpan
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Cogen
@@ -19,14 +19,14 @@ import org.scalacheck.Gen
 trait ArbDynamicConfig {
   import ArbGmosCcdMode._
   import ArbEnumerated._
-  import ArbInterval.given
+  import ArbTimeSpan.given
   import ArbGmosGratingConfig._
   import ArbGmosFpuMask._
   import ArbTime._
 
   implicit val arbDynamicConfigGmosNorth: Arbitrary[DynamicConfig.GmosNorth] = Arbitrary(
     for {
-      exposure      <- arbitrary[Interval]
+      exposure      <- arbitrary[TimeSpan]
       readout       <- arbitrary[GmosCcdMode]
       dtax          <- arbitrary[GmosDtax]
       roi           <- arbitrary[GmosRoi]
@@ -38,7 +38,7 @@ trait ArbDynamicConfig {
 
   implicit val cogDynamicConfigGmosNorth: Cogen[DynamicConfig.GmosNorth] =
     Cogen[
-      (Interval,
+      (TimeSpan,
        GmosCcdMode,
        GmosDtax,
        GmosRoi,
@@ -50,7 +50,7 @@ trait ArbDynamicConfig {
 
   implicit val arbDynamicConfigGmosSouth: Arbitrary[DynamicConfig.GmosSouth] = Arbitrary(
     for {
-      exposure      <- arbitrary[Interval]
+      exposure      <- arbitrary[TimeSpan]
       readout       <- arbitrary[GmosCcdMode]
       dtax          <- arbitrary[GmosDtax]
       roi           <- arbitrary[GmosRoi]
@@ -61,7 +61,7 @@ trait ArbDynamicConfig {
   )
 
   implicit val cogDynamicConfigGmosSouth: Cogen[DynamicConfig.GmosSouth] = Cogen[
-    (Interval,
+    (TimeSpan,
      GmosCcdMode,
      GmosDtax,
      GmosRoi,

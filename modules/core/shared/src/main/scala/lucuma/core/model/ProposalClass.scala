@@ -8,7 +8,7 @@ import cats.syntax.all.*
 import eu.timepit.refined.cats.*
 import lucuma.core.model.IntPercent
 import lucuma.core.model.given
-import lucuma.core.util.Interval
+import lucuma.core.util.TimeSpan
 import monocle.Focus
 import monocle.Lens
 import monocle.Optional
@@ -31,13 +31,13 @@ object ProposalClass {
   final case class LargeProgram(
     minPercentTime:      IntPercent,
     minPercentTotalTime: IntPercent,
-    totalTime:           Interval
+    totalTime:           TimeSpan
   ) extends ProposalClass
 
   final case class Intensive(
     minPercentTime:      IntPercent,
     minPercentTotalTime: IntPercent,
-    totalTime:           Interval
+    totalTime:           TimeSpan
   ) extends ProposalClass
 
   val classical: Prism[ProposalClass, Classical]                   = GenPrism[ProposalClass, Classical]
@@ -81,15 +81,15 @@ object ProposalClass {
       }
     }
 
-  val totalTime: Optional[ProposalClass, Interval] =
-    Optional[ProposalClass, Interval] {
+  val totalTime: Optional[ProposalClass, TimeSpan] =
+    Optional[ProposalClass, TimeSpan] {
       case LargeProgram(_, _, totalTime) => totalTime.some
       case Intensive(_, _, totalTime)    => totalTime.some
       case _                             => none
-    } { interval =>
+    } { timeSpan =>
       {
-        case p @ LargeProgram(_, _, _) => LargeProgram.totalTime.replace(interval)(p)
-        case p @ Intensive(_, _, _)    => Intensive.totalTime.replace(interval)(p)
+        case p @ LargeProgram(_, _, _) => LargeProgram.totalTime.replace(timeSpan)(p)
+        case p @ Intensive(_, _, _)    => Intensive.totalTime.replace(timeSpan)(p)
         case p @ _                     => p
       }
     }
@@ -147,7 +147,7 @@ object ProposalClass {
     val minPercentTime: Lens[LargeProgram, IntPercent] = Focus[LargeProgram](_.minPercentTime)
     val minPercentTotalTime: Lens[LargeProgram, IntPercent] =
       Focus[LargeProgram](_.minPercentTotalTime)
-    val totalTime: Lens[LargeProgram, Interval]        = Focus[LargeProgram](_.totalTime)
+    val totalTime: Lens[LargeProgram, TimeSpan]        = Focus[LargeProgram](_.totalTime)
 
     implicit val eqLargeProgram: Eq[LargeProgram] =
       Eq.by(p => (p.minPercentTime, p.minPercentTotalTime, p.totalTime))
@@ -156,7 +156,7 @@ object ProposalClass {
   object Intensive {
     val minPercentTime: Lens[Intensive, IntPercent]      = Focus[Intensive](_.minPercentTime)
     val minPercentTotalTime: Lens[Intensive, IntPercent] = Focus[Intensive](_.minPercentTotalTime)
-    val totalTime: Lens[Intensive, Interval]             = Focus[Intensive](_.totalTime)
+    val totalTime: Lens[Intensive, TimeSpan]             = Focus[Intensive](_.totalTime)
 
     implicit val eqIntensive: Eq[Intensive] =
       Eq.by(p => (p.minPercentTime, p.minPercentTotalTime, p.totalTime))
