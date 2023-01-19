@@ -7,8 +7,8 @@ import cats.syntax.all._
 import lucuma.core.arb.ArbTime
 import lucuma.core.model.sequence._
 import lucuma.core.util.TimeSpan
-import lucuma.core.util.arb.ArbUid
 import lucuma.core.util.arb.ArbTimeSpan
+import lucuma.core.util.arb.ArbUid
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Cogen
