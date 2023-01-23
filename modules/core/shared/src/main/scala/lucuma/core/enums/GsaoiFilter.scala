@@ -6,9 +6,10 @@ package core
 package enums
 import cats.syntax.eq._
 import lucuma.core.math.Wavelength
+import lucuma.core.syntax.timespan._
 import lucuma.core.util.Enumerated
+import lucuma.core.util.TimeSpan
 
-import scala.concurrent.duration._
 
 /**
  * Enumerated type for GSAOI Filter.
@@ -20,8 +21,8 @@ sealed abstract class GsaoiFilter(
   val longName:             String,
   val wavelength:           Wavelength,
   val readMode:             GsaoiReadMode,
-  val exposureTime5050:     FiniteDuration,
-  val exposureTimeHalfWell: FiniteDuration,
+  val exposureTime5050:     TimeSpan,
+  val exposureTimeHalfWell: TimeSpan,
   val band:                 Option[Band]
 ) extends Product
     with Serializable
@@ -36,8 +37,8 @@ object GsaoiFilter {
         "Z (1.015 um)",
         Wavelength.unsafeFromIntPicometers(1020000),
         GsaoiReadMode.Faint,
-        26000.millis,
-        4619000.millis,
+        26000.msTimeSpan,
+        4619.secTimeSpan,
         Some(Band.J)
       )
 
@@ -49,8 +50,8 @@ object GsaoiFilter {
         "HeI (1.083 um)",
         Wavelength.unsafeFromIntPicometers(1080000),
         GsaoiReadMode.VeryFaint,
-        72600.millis,
-        21792000.millis,
+        72600.msTimeSpan,
+        21792.secTimeSpan,
         Some(Band.J)
       )
 
@@ -62,8 +63,8 @@ object GsaoiFilter {
         "Pa(gamma) (1.094 um)",
         Wavelength.unsafeFromIntPicometers(1090000),
         GsaoiReadMode.VeryFaint,
-        122000.millis,
-        36585000.millis,
+        122000.msTimeSpan,
+        36585.secTimeSpan,
         Some(Band.J)
       )
 
@@ -75,8 +76,8 @@ object GsaoiFilter {
         "J-continuum (1.207 um)",
         Wavelength.unsafeFromIntPicometers(1210000),
         GsaoiReadMode.VeryFaint,
-        32600.millis,
-        9793000.millis,
+        32600.msTimeSpan,
+        9793.secTimeSpan,
         Some(Band.J)
       )
 
@@ -88,8 +89,8 @@ object GsaoiFilter {
         "J (1.250 um)",
         Wavelength.unsafeFromIntPicometers(1250000),
         GsaoiReadMode.Faint,
-        5700.millis,
-        1004000.millis,
+        5700.msTimeSpan,
+        1004.secTimeSpan,
         Some(Band.J)
       )
 
@@ -101,8 +102,8 @@ object GsaoiFilter {
         "H (1.635 um)",
         Wavelength.unsafeFromIntPicometers(1640000),
         GsaoiReadMode.Bright,
-        12000.millis,
-        460000.millis,
+        12000.msTimeSpan,
+        460.secTimeSpan,
         Some(Band.H)
       )
 
@@ -114,8 +115,8 @@ object GsaoiFilter {
         "Pa(beta) (1.282 um)",
         Wavelength.unsafeFromIntPicometers(1280000),
         GsaoiReadMode.Faint,
-        21800.millis,
-        3879000.millis,
+        21800.msTimeSpan,
+        3879.secTimeSpan,
         Some(Band.J)
       )
 
@@ -127,8 +128,8 @@ object GsaoiFilter {
         "H-continuum (1.570 um)",
         Wavelength.unsafeFromIntPicometers(1570000),
         GsaoiReadMode.Faint,
-        31200.millis,
-        5545000.millis,
+        31200.msTimeSpan,
+        5545.secTimeSpan,
         Some(Band.H)
       )
 
@@ -140,8 +141,8 @@ object GsaoiFilter {
         "CH4(short) (1.580 um)",
         Wavelength.unsafeFromIntPicometers(1580000),
         GsaoiReadMode.Faint,
-        6600.millis,
-        1174000.millis,
+        6600.msTimeSpan,
+        1174.secTimeSpan,
         Some(Band.H)
       )
 
@@ -153,8 +154,8 @@ object GsaoiFilter {
         "[Fe II] (1.644 um)",
         Wavelength.unsafeFromIntPicometers(1640000),
         GsaoiReadMode.Faint,
-        24900.millis,
-        4416000.millis,
+        24900.msTimeSpan,
+        4416.secTimeSpan,
         Some(Band.H)
       )
 
@@ -166,8 +167,8 @@ object GsaoiFilter {
         "CH4(long) (1.690 um)",
         Wavelength.unsafeFromIntPicometers(1690000),
         GsaoiReadMode.Faint,
-        6800.millis,
-        1202000.millis,
+        6800.msTimeSpan,
+        1202.secTimeSpan,
         Some(Band.H)
       )
 
@@ -179,8 +180,8 @@ object GsaoiFilter {
         "H20 ice (2.000 um)",
         Wavelength.unsafeFromIntPicometers(2000000),
         GsaoiReadMode.Faint,
-        19100.millis,
-        3395000.millis,
+        19100.msTimeSpan,
+        3395.secTimeSpan,
         Some(Band.K)
       )
 
@@ -192,8 +193,8 @@ object GsaoiFilter {
         "HeI (2p2s) (2.058 um)",
         Wavelength.unsafeFromIntPicometers(2060000),
         GsaoiReadMode.Faint,
-        28300.millis,
-        5032000.millis,
+        28300.msTimeSpan,
+        5032.secTimeSpan,
         Some(Band.K)
       )
 
@@ -205,8 +206,8 @@ object GsaoiFilter {
         "Ks-continuum (2.093 um)",
         Wavelength.unsafeFromIntPicometers(2090000),
         GsaoiReadMode.Faint,
-        7800.millis,
-        6069000.millis,
+        7800.msTimeSpan,
+        6069.secTimeSpan,
         Some(Band.K)
       )
 
@@ -218,8 +219,8 @@ object GsaoiFilter {
         "Br(gamma) (2.166 um)",
         Wavelength.unsafeFromIntPicometers(2170000),
         GsaoiReadMode.Faint,
-        31000.millis,
-        5496000.millis,
+        31000.msTimeSpan,
+        5496.secTimeSpan,
         Some(Band.K)
       )
 
@@ -231,8 +232,8 @@ object GsaoiFilter {
         "Kl-continuum (2.270 um)",
         Wavelength.unsafeFromIntPicometers(2270000),
         GsaoiReadMode.Faint,
-        33300.millis,
-        5911000.millis,
+        33300.msTimeSpan,
+        5911.secTimeSpan,
         Some(Band.K)
       )
 
@@ -244,8 +245,8 @@ object GsaoiFilter {
         "K(prime) (2.120 um)",
         Wavelength.unsafeFromIntPicometers(2120000),
         GsaoiReadMode.Bright,
-        14800.millis,
-        566000.millis,
+        14800.msTimeSpan,
+        566.secTimeSpan,
         Some(Band.K)
       )
 
@@ -257,8 +258,8 @@ object GsaoiFilter {
         "H2 1-0 S(1) (2.122 um)",
         Wavelength.unsafeFromIntPicometers(2120000),
         GsaoiReadMode.Faint,
-        27500.millis,
-        5400000.millis,
+        27500.msTimeSpan,
+        5400.secTimeSpan,
         Some(Band.K)
       )
 
@@ -270,8 +271,8 @@ object GsaoiFilter {
         "K(short) (2.150 um)",
         Wavelength.unsafeFromIntPicometers(2150000),
         GsaoiReadMode.Bright,
-        14400.millis,
-        551000.millis,
+        14400.msTimeSpan,
+        551.secTimeSpan,
         Some(Band.K)
       )
 
@@ -283,8 +284,8 @@ object GsaoiFilter {
         "K (2.200 um)",
         Wavelength.unsafeFromIntPicometers(2200000),
         GsaoiReadMode.Bright,
-        12300.millis,
-        470000.millis,
+        12300.msTimeSpan,
+        470.secTimeSpan,
         Some(Band.K)
       )
 
@@ -296,8 +297,8 @@ object GsaoiFilter {
         "H2 2-1 S(1) (2.248 um)",
         Wavelength.unsafeFromIntPicometers(2250000),
         GsaoiReadMode.Faint,
-        32600.millis,
-        5784000.millis,
+        32600.msTimeSpan,
+        5784.secTimeSpan,
         Some(Band.K)
       )
 
@@ -309,8 +310,8 @@ object GsaoiFilter {
         "CO (2.360 um)",
         Wavelength.unsafeFromIntPicometers(2360000),
         GsaoiReadMode.Faint,
-        7700.millis,
-        1370000.millis,
+        7700.msTimeSpan,
+        1370.secTimeSpan,
         Some(Band.K)
       )
 
@@ -322,8 +323,8 @@ object GsaoiFilter {
         "Diffuser1",
         Wavelength.unsafeFromIntPicometers(0),
         GsaoiReadMode.Bright,
-        0.millis,
-        0.millis,
+        0.msTimeSpan,
+        0.secTimeSpan,
         Option.empty[Band]
       )
 
@@ -335,8 +336,8 @@ object GsaoiFilter {
         "Diffuser2",
         Wavelength.unsafeFromIntPicometers(0),
         GsaoiReadMode.Bright,
-        0.millis,
-        0.millis,
+        0.msTimeSpan,
+        0.secTimeSpan,
         Option.empty[Band]
       )
 
@@ -348,8 +349,8 @@ object GsaoiFilter {
         "Blocked",
         Wavelength.unsafeFromIntPicometers(0),
         GsaoiReadMode.Bright,
-        0.millis,
-        0.millis,
+        0.msTimeSpan,
+        0.secTimeSpan,
         Option.empty[Band]
       )
 

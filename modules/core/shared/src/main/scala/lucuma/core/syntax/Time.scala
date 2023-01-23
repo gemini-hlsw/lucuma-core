@@ -86,38 +86,17 @@ final class LongDurationOps(val self: Long) extends AnyVal {
   def nanoseconds: Duration =
     Duration.ofNanos(self)
 
-  private def unsafeTimeSpan(d: Duration): TimeSpan =
-    TimeSpan
-      .FromDuration
-      .getOption(d)
-      .getOrElse(sys.error(s"Invalid TimeSpan ${d.toString}"))
-
-  def unsafeNanosecondTimeSpan: TimeSpan =
-    unsafeTimeSpan(nanoseconds)
-
   def microseconds: Duration =
     Duration.ofNanos(self * 1000)
-
-  def unsafeMicrosecondTimeSpan: TimeSpan =
-    unsafeTimeSpan(microseconds)
 
   def milliseconds: Duration =
     Duration.ofMillis(self)
 
-  def unsafeMillisecondTimeSpan: TimeSpan =
-    unsafeTimeSpan(milliseconds)
-
   def seconds: Duration =
     Duration.ofSeconds(self)
 
-  def unsafeSecondTimeSpan: TimeSpan =
-    unsafeTimeSpan(seconds)
-
   def minutes: Duration =
     Duration.ofMinutes(self)
-
-  def unsafeMinuteTimeSpan: TimeSpan =
-    unsafeTimeSpan(minutes)
 
 }
 

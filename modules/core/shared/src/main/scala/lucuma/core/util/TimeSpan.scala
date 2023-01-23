@@ -65,7 +65,6 @@ object TimeSpan {
   /**
    * Converts the given amount of time in milliseconds into a TimeSpan,
    * rounding any sub-microsecond value to the nearest microsecond (half-up).
-   * If the value is too big to be represented in a Long as
    */
   def fromMilliseconds(ms: BigDecimal): Option[TimeSpan] =
     Try(ms.bigDecimal.movePointRight(3).setScale(0, HALF_UP).longValueExact)

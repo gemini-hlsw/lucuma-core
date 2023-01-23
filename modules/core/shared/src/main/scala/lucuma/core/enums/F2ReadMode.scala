@@ -5,9 +5,10 @@ package lucuma
 package core
 package enums
 import cats.syntax.eq._
+import lucuma.core.syntax.timespan._
 import lucuma.core.util.Enumerated
+import lucuma.core.util.TimeSpan
 
-import scala.concurrent.duration._
 
 /**
  * Enumerated type for Flamingos2 read modes.
@@ -18,18 +19,18 @@ sealed abstract class F2ReadMode(
   val shortName: String,
   val longName: String,
   val description: String,
-  val minimumExposureTime: FiniteDuration,
-  val recommendedExposureTime: FiniteDuration,
-  val readoutTime: FiniteDuration,
+  val minimumExposureTime: TimeSpan,
+  val recommendedExposureTime: TimeSpan,
+  val readoutTime: TimeSpan,
   val readCount: Int,
   val readNoise: Double
 ) extends Product with Serializable
 
 object F2ReadMode {
 
-  /** @group Constructors */ case object Bright extends F2ReadMode("Bright", "bright", "Bright Object", "Strong Source", 1500.millis, 5000.millis, 8000.millis, 1, 11.7)
-  /** @group Constructors */ case object Medium extends F2ReadMode("Medium", "medium", "Medium Object", "Medium Source", 6000.millis, 21000.millis, 14000.millis, 4, 6.0)
-  /** @group Constructors */ case object Faint extends F2ReadMode("Faint", "faint", "Faint Object", "Weak Source", 12000.millis, 85000.millis, 20000.millis, 8, 5.0)
+  /** @group Constructors */ case object Bright extends F2ReadMode("Bright", "bright", "Bright Object", "Strong Source", 1500.msTimeSpan, 5000.msTimeSpan, 8000.msTimeSpan, 1, 11.7)
+  /** @group Constructors */ case object Medium extends F2ReadMode("Medium", "medium", "Medium Object", "Medium Source", 6.secTimeSpan, 21.secTimeSpan, 14.secTimeSpan, 4, 6.0)
+  /** @group Constructors */ case object Faint extends F2ReadMode("Faint", "faint", "Faint Object", "Weak Source", 12.secTimeSpan, 85.secTimeSpan, 20.secTimeSpan, 8, 5.0)
 
   /** All members of F2ReadMode, in canonical order. */
   val all: List[F2ReadMode] =
