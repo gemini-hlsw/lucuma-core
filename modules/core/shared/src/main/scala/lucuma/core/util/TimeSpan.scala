@@ -44,6 +44,12 @@ object TimeSpan {
   def unsafeFromMicroseconds(µs: Long): TimeSpan =
     fromMicroseconds(µs).getOrElse(sys.error(s"The µs value ($µs) must be non-negative."))
 
+  /**
+   * Constructs a TimeSpan from a `NonNegLong` value in microseconds.
+   */
+  def apply(µs: NonNegLong): TimeSpan =
+    fromNonNegMicroseconds(µs)
+
   def fromNonNegMicroseconds(µs: NonNegLong): TimeSpan =
     µs
 
