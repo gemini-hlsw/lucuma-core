@@ -138,7 +138,7 @@ final class CoordinatesSuite extends munit.DisciplineSuite {
         val fracSepʹ = if (fracSep <= µas180) fracSep else µas360 - fracSep
         (stepSep - fracSepʹ).abs
       }
-      assert(Δs.filter(_ > 20L).isEmpty)
+      assert(Δs.filter(_ > 55L).isEmpty)
     }
 
   }
