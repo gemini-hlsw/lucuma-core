@@ -5,17 +5,16 @@ package lucuma.core.model.sequence
 
 import cats.Eq
 import cats.syntax.all._
+import lucuma.core.util.TimeSpan
 import monocle.Focus
 import monocle.Lens
 import monocle.Prism
 import monocle.macros.GenPrism
 import org.typelevel.cats.time._
 
-import java.time.Duration
-
 sealed trait ManualConfig {
   def static: StaticConfig
-  def setupTime: Duration
+  def setupTime: TimeSpan
   def acquisition: List[Atom]
   def science: List[Atom]
 }
@@ -23,7 +22,7 @@ sealed trait ManualConfig {
 object ManualConfig {
   final case class GmosNorth(
     static:      StaticConfig.GmosNorth,
-    setupTime:   Duration,
+    setupTime:   TimeSpan,
     acquisition: List[Atom.GmosNorth],
     science:     List[Atom.GmosNorth]
   ) extends ManualConfig
@@ -36,7 +35,7 @@ object ManualConfig {
       Focus[GmosNorth](_.static)
 
     /** @group Optics */
-    val setupTime: Lens[GmosNorth, Duration] =
+    val setupTime: Lens[GmosNorth, TimeSpan] =
       Focus[GmosNorth](_.setupTime)
 
     /** @group Optics */
@@ -50,7 +49,7 @@ object ManualConfig {
 
   final case class GmosSouth(
     static:      StaticConfig.GmosSouth,
-    setupTime:   Duration,
+    setupTime:   TimeSpan,
     acquisition: List[Atom.GmosSouth],
     science:     List[Atom.GmosSouth]
   ) extends ManualConfig
@@ -63,7 +62,7 @@ object ManualConfig {
       Focus[GmosSouth](_.static)
 
     /** @group Optics */
-    val setupTime: Lens[GmosSouth, Duration] =
+    val setupTime: Lens[GmosSouth, TimeSpan] =
       Focus[GmosSouth](_.setupTime)
 
     /** @group Optics */

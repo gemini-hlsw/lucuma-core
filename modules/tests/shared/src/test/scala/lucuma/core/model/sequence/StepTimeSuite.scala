@@ -4,15 +4,15 @@
 package lucuma.core.model.sequence
 
 import cats.kernel.laws.discipline._
-import lucuma.core.arb.ArbTime
 import lucuma.core.model.sequence.arb._
+import lucuma.core.util.arb.ArbTimeSpan
 import monocle.law.discipline._
 import munit._
 import org.typelevel.cats.time._
 
 final class StepTimeSuite extends DisciplineSuite {
   import ArbStepTime._
-  import ArbTime._
+  import ArbTimeSpan.given
 
   checkAll("Eq[StepTime]", EqTests[StepTime].eqv)
   checkAll("StepTime.configChange", LensTests(StepTime.configChange))

@@ -4,7 +4,6 @@
 package lucuma.core.model.sequence
 
 import cats.kernel.laws.discipline._
-import lucuma.core.arb.ArbTime
 import lucuma.core.model.sequence.arb._
 import lucuma.core.util.arb._
 import monocle.law.discipline._
@@ -15,9 +14,9 @@ import org.typelevel.cats.time._
 final class ManualConfigSuite extends DisciplineSuite {
   import ArbAtom._
   import ArbEnumerated._
+  import ArbTimeSpan.given
   import ArbManualConfig._
   import ArbStaticConfig._
-  import ArbTime._
   import ArbUid._
 
   override val scalaCheckTestParameters = Test.Parameters.default.withMaxSize(10)

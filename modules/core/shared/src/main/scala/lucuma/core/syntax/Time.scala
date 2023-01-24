@@ -6,6 +6,7 @@ package lucuma.core.syntax
 import cats.syntax.all._
 import lucuma.core.optics.Spire
 import lucuma.core.syntax.boundedInterval._
+import lucuma.core.util.TimeSpan
 import org.typelevel.cats.time._
 import spire.math.Bounded
 import spire.math.Empty
@@ -96,6 +97,7 @@ final class LongDurationOps(val self: Long) extends AnyVal {
 
   def minutes: Duration =
     Duration.ofMinutes(self)
+
 }
 
 trait ToLongDurationOps {
