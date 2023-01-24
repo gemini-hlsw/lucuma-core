@@ -21,6 +21,22 @@ sealed trait PosAngleConstraint extends Product with Serializable
 object PosAngleConstraint extends PosAngleConstraintOptics {
 
   /**
+   * Specifies that the there is no constraint on the position angle.
+   * It may be set to any angle for this observation.
+   */
+  case object Unbounded extends PosAngleConstraint {
+    override def toString: String = "Unbounded"
+  }
+
+  /**
+   * Constructs an `Unbounded` instance with a wider `PosAngle` type.
+   *
+   *  @group Constructors
+   */
+  val unbounded: PosAngleConstraint =
+    Unbounded
+
+  /**
    * Specifies that the position angle must be set to the specified angle.
    */
   final case class Fixed(angle: Angle) extends PosAngleConstraint {
@@ -102,6 +118,7 @@ object PosAngleConstraint extends PosAngleConstraintOptics {
     case (AllowFlip(a), AllowFlip(b))                     => a === b
     case (AverageParallactic, AverageParallactic)         => true
     case (ParallacticOverride(a), ParallacticOverride(b)) => a === b
+    case (Unbounded, Unbounded)                           => true
     case _                                                => false
   }
 
@@ -121,11 +138,13 @@ sealed trait PosAngleConstraintOptics { self: PosAngleConstraint.type =>
       case PosAngleConstraint.AllowFlip(angle)           => angle.some
       case PosAngleConstraint.AverageParallactic         => none
       case PosAngleConstraint.ParallacticOverride(angle) => angle.some
+      case PosAngleConstraint.Unbounded                  => none
     })({ a => {
       case PosAngleConstraint.Fixed(_)                   => PosAngleConstraint.Fixed(a)
       case PosAngleConstraint.AllowFlip(_)               => PosAngleConstraint.AllowFlip(a)
       case PosAngleConstraint.AverageParallactic         => PosAngleConstraint.AverageParallactic
       case PosAngleConstraint.ParallacticOverride(_)     => PosAngleConstraint.ParallacticOverride(a)
+      case PosAngleConstraint.Unbounded                  => PosAngleConstraint.Unbounded
     }})
 
   /**
