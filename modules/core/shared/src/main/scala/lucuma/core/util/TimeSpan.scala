@@ -34,6 +34,8 @@ object TimeSpan {
   val Max: TimeSpan =
     NonNegLong.MaxValue
 
+  inline def Zero: TimeSpan = Min
+
   /**
    * Constructs a TimeSpan from the given number of microseconds, if it is
    * non-negative.
@@ -67,6 +69,9 @@ object TimeSpan {
       .toOption
       .flatMap(fromMicroseconds)
   }
+
+  def unsafeFromDuration(value: Duration): TimeSpan = 
+    fromDuration(value).getOrElse(sys.error(s"The duration value ($value) must be non-negative."))
 
   /**
    * Converts the given amount of time in milliseconds into a TimeSpan,
