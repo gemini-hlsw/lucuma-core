@@ -34,8 +34,7 @@ object TimeSpan {
   val Max: TimeSpan =
     NonNegLong.MaxValue
 
-  val Zero: TimeSpan =
-    unsafeFromMicroseconds(0L)
+  inline def Zero: TimeSpan = Min
 
   /**
    * Constructs a TimeSpan from the given number of microseconds, if it is
