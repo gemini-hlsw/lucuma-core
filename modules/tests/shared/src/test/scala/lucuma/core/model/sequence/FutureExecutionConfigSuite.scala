@@ -8,7 +8,6 @@ import lucuma.core.model.sequence.arb._
 import lucuma.core.util.arb._
 import monocle.law.discipline._
 import munit._
-import org.scalacheck.Test
 
 final class FutureExecutionConfigSuite extends DisciplineSuite {
   import ArbEnumerated._
@@ -16,8 +15,6 @@ final class FutureExecutionConfigSuite extends DisciplineSuite {
   import ArbStaticConfig._
   import ArbFutureExecutionConfig._
   import ArbExecutionSequence._
-
-  override val scalaCheckTestParameters = Test.Parameters.default.withMaxSize(10)
 
   checkAll("Eq[FutureExecutionConfig.GmosNorth]", EqTests[FutureExecutionConfig.GmosNorth].eqv)
   checkAll("FutureExecutionConfig.GmosNorth.static",
