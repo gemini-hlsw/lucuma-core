@@ -142,6 +142,8 @@ trait units {
 
   given ValueConversion[Parallax.LongParallaxμas, Rational] = Rational(_)
 
+  given refinedValueConversion[V, P]: ValueConversion[V Refined P, V] = _.value
+
   inline given [UF, UT]: TruncatingUnitConversion[PosInt, UF, UT] = v =>
     refineV[Positive](coulomb.conversion.standard.unit.ctx_TUC_Int(v))
       .getOrElse(1.refined[Positive])

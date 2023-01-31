@@ -88,7 +88,7 @@ object InputValidWedge {
   def truncatedPosBigDecimal(decimals: DigitCount): InputValidWedge[PosBigDecimal] = {
     val base     = truncatedBigDecimal(decimals).andThen(
       ValidWedge.forRefined[NonEmptyChain[NonEmptyString], BigDecimal, Positive](
-        NonEmptyChain("Invalid format".refined)
+        _ => NonEmptyChain("Invalid format".refined)
       )
     )
     val minValue = "0." + "0" * (decimals.value - 1) + "1"

@@ -79,13 +79,13 @@ object InputValidSplitEpi {
   def refinedString[P](implicit
     v: RefinedValidate[String, P]
   ): InputValidSplitEpi[String Refined P] =
-    id.refined[P](NonEmptyChain("Invalid value".refined))
+    id.refined[P](_ => NonEmptyChain("Invalid value".refined))
 
   /**
    * `InputValidSplitEpi` for `NonEmptyString`
    */
   val nonEmptyString: InputValidSplitEpi[NonEmptyString] =
-    refinedString[NonEmpty].withErrorMessage("Must be defined".refined)
+    refinedString[NonEmpty].withErrorMessage(_ => "Must be defined".refined)
 
   /**
    * `InputValidSplitEpi` for `Int`
@@ -100,7 +100,7 @@ object InputValidSplitEpi {
    * Build a `InputValidSplitEpi` for `Int Refined P`
    */
   def refinedInt[P](implicit v: RefinedValidate[Int, P]): InputValidSplitEpi[Int Refined P] =
-    int.refined[P](NonEmptyChain("Invalid format".refined))
+    int.refined[P](_ => NonEmptyChain("Invalid format".refined))
 
   /**
    * `InputValidSplitEpi` for `PosInt`
@@ -126,7 +126,7 @@ object InputValidSplitEpi {
   def refinedBigDecimal[P](implicit
     v: RefinedValidate[BigDecimal, P]
   ): InputValidSplitEpi[BigDecimal Refined P] =
-    bigDecimal.refined[P](NonEmptyChain("Invalid format".refined))
+    bigDecimal.refined[P](_ => NonEmptyChain("Invalid format".refined))
 
   /**
    * `InputValidSplitEpi` for `PosBigDecimal`
@@ -150,7 +150,7 @@ object InputValidSplitEpi {
   def refinedBigDecimalWithScientificNotation[P](implicit
     v: RefinedValidate[BigDecimal, P]
   ): InputValidSplitEpi[BigDecimal Refined P] =
-    bigDecimalWithScientificNotation.refined[P](NonEmptyChain("Invalid format".refined))
+    bigDecimalWithScientificNotation.refined[P](_ => NonEmptyChain("Invalid format".refined))
 
   /**
    * `InputValidSplitEpi` for `PosBigDecimal`, formatting with only one integer digit.

@@ -69,8 +69,8 @@ package object validation {
       )
 
   extension[A](self: InputValidWedge[A])
-    def withErrorMessage(msg: NonEmptyString): InputValidWedge[A] =
-      self.withError(NonEmptyChain(msg))
+    def withErrorMessage(msg: String => NonEmptyString): InputValidWedge[A] =
+      self.withError(str => NonEmptyChain(msg(str)))
 
     /**
      * Build an `InputValidWedge[NonEmptyList[A]]` given a `InputValidWedge[A]`
@@ -85,8 +85,8 @@ package object validation {
       )
 
   extension[A](self: InputValidSplitEpi[A])
-    def withErrorMessage(msg: NonEmptyString): InputValidSplitEpi[A] =
-      self.withError(NonEmptyChain(msg))
+    def withErrorMessage(msg: String => NonEmptyString): InputValidSplitEpi[A] =
+      self.withError(str => NonEmptyChain(msg(str)))
 
     /**
      * Build an `InputValidSplitEpi[NonEmptyList[A]]` given a `InputValidSplitEpi[A]`

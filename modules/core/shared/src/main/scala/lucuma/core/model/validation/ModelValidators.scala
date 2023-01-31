@@ -20,7 +20,7 @@ object ModelValidators {
       .truncatedBigDecimal(decimals = 1.refined)
       .andThen(
         ValidSplitEpi
-          .forRefined[String, BigDecimal, ElevationRange.AirMass.Value](airMassErrorMsg)
+          .forRefined[String, BigDecimal, ElevationRange.AirMass.Value](_ => airMassErrorMsg)
           .toErrorsValidSplitEpiUnsafe
       )
 
@@ -29,7 +29,7 @@ object ModelValidators {
       .truncatedBigDecimal(decimals = 1.refined)
       .andThen(
         ValidSplitEpi
-          .forRefined[String, BigDecimal, ElevationRange.HourAngle.Hour](hourAngleErrorMsg)
+          .forRefined[String, BigDecimal, ElevationRange.HourAngle.Hour](_ => hourAngleErrorMsg)
           .toErrorsValidSplitEpiUnsafe
       )
 }
