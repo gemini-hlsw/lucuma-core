@@ -3,10 +3,10 @@
 
 package lucuma.core.math.skycalc.solver
 
+import lucuma.core.math.BoundedInterval
 import lucuma.core.math.Declination
 import lucuma.core.math.HourAngle
 import lucuma.core.math.skycalc.SkyCalcResults
-import spire.math.Bounded
 import spire.math.extras.interval.IntervalSeq
 
 import java.time.Duration
@@ -14,7 +14,7 @@ import java.time.Instant
 
 /**
  * Convenience class to find a `IntervalSeq[Instant]` meeting a [[Constraint]]
- * from [[Samples]] within a given `Bounded[Instant]`.
+ * from [[Samples]] within a given `BoundedInterval[Instant]`.
  *
  * @tparam S [[SolverStrategy]] to use
  * @tparam R [[RoundStrategy]] to use
@@ -25,7 +25,7 @@ class ConstraintSolver[S, R, T, A](
   constraint:      Constraint[T, A],
   tolerance:       Duration = Duration.ofSeconds(30)
 )(implicit solver: Solver[S]) {
-  def solve(calc: Samples[T])(interval: Bounded[Instant])(implicit
+  def solve(calc: Samples[T])(interval: BoundedInterval[Instant])(implicit
     rounder:      SampleRounder[R, A]
   ): IntervalSeq[Instant] =
     solver.solve(constraint.metAt[R](calc))(interval, tolerance)

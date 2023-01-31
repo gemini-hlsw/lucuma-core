@@ -5,9 +5,10 @@ package lucuma.core.optics
 
 import cats.Order
 import cats.syntax.all._
+import lucuma.core.math.BoundedInterval
+import lucuma.core.math.BoundedInterval.*
 import lucuma.core.optics.Format
 import lucuma.core.optics.SplitEpi
-import lucuma.core.syntax.boundedInterval._
 import monocle.Iso
 import spire.math._
 import spire.math.extras.interval.IntervalSeq
@@ -53,11 +54,11 @@ object Spire {
    *
    * It's a Format to contemplate the case of tuple (a, a).
    */
-  def openUpperIntervalFromTuple[A: Order]: Format[(A, A), Bounded[A]] =
-    Format[(A, A), Bounded[A]](
+  def openUpperIntervalFromTuple[A: Order]: Format[(A, A), BoundedInterval[A]] =
+    Format[(A, A), BoundedInterval[A]](
       { case (start, end) =>
-        if (start < end)(Bounded.unsafeOpenUpper(start, end)).some
-        else if (start > end)(Bounded.unsafeOpenUpper(end, start)).some
+        if (start < end)(BoundedInterval.unsafeOpenUpper(start, end)).some
+        else if (start > end)(BoundedInterval.unsafeOpenUpper(end, start)).some
         else none
       },
       i => (i.lower, i.upper)
@@ -68,11 +69,11 @@ object Spire {
    *
    * It's a Format to contemplate the case of tuple (a, a).
    */
-  def closedIntervalFromTuple[A: Order]: Format[(A, A), Bounded[A]] =
-    Format[(A, A), Bounded[A]](
+  def closedIntervalFromTuple[A: Order]: Format[(A, A), BoundedInterval[A]] =
+    Format[(A, A), BoundedInterval[A]](
       { case (start, end) =>
-        if (start < end)(Bounded.unsafeClosed(start, end)).some
-        else if (start > end)(Bounded.unsafeClosed(end, start)).some
+        if (start < end)(BoundedInterval.unsafeClosed(start, end)).some
+        else if (start > end)(BoundedInterval.unsafeClosed(end, start)).some
         else none
       },
       i => (i.lower, i.upper)

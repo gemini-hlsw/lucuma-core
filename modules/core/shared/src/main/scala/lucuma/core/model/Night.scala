@@ -4,9 +4,10 @@
 package lucuma.core.model
 
 import lucuma.core.enums.Site
+import lucuma.core.math.BoundedInterval
+import lucuma.core.math.BoundedInterval.*
 import lucuma.core.syntax.time._
 import org.typelevel.cats.time._
-import spire.math.Bounded
 
 import java.time.Duration
 import java.time.Instant
@@ -22,7 +23,7 @@ trait Night {
   /** Location at which the times described by this night are valid. */
   def site: Site
 
-  def interval: Bounded[Instant]
+  def interval: BoundedInterval[Instant]
 
   /** Start instant of the night (inclusive). */
   lazy val start: Instant = interval.lower

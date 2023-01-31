@@ -3,11 +3,12 @@
 
 package lucuma.core.syntax
 
-import cats.syntax.all._
+import cats.syntax.all.*
+import lucuma.core.math.BoundedInterval
+import lucuma.core.math.BoundedInterval.*
 import lucuma.core.optics.Spire
-import lucuma.core.syntax.boundedInterval._
 import lucuma.core.util.TimeSpan
-import org.typelevel.cats.time._
+import org.typelevel.cats.time.*
 import spire.math.Bounded
 import spire.math.Empty
 import spire.math.Point
@@ -24,159 +25,124 @@ import java.time.temporal.TemporalAmount
 // A bit of syntax to make working with Java Instant and Duration a bit less
 // cumbersome / easier to read.
 
-final class InstantOps(private val self: Instant) extends AnyVal {
+trait InstantOps:
+  extension (self: Instant)
+    def +(t: TemporalAmount): Instant =
+      self.plus(t)
 
-  def +(t: TemporalAmount): Instant =
-    self.plus(t)
+    def -(t: TemporalAmount): Instant =
+      self.minus(t)
 
-  def -(t: TemporalAmount): Instant =
-    self.minus(t)
+object instant extends InstantOps
 
-}
+trait ZonedDateTimeOps:
+  extension (self: ZonedDateTime)
+    def +(t: TemporalAmount): ZonedDateTime =
+      self.plus(t)
 
-trait ToInstantOps {
-  implicit def ToInstantOps(i: Instant): InstantOps =
-    new InstantOps(i)
-}
+    def -(t: TemporalAmount): ZonedDateTime =
+      self.minus(t)
 
-object instant extends ToInstantOps
+object zonedDateTime extends ZonedDateTimeOps
 
-final class ZonedDateTimeOps(private val self: ZonedDateTime) extends AnyVal {
+trait DurationOps:
+  extension (self: Duration)
+    def +(that: Duration): Duration =
+      self.plus(that)
 
-  def +(t: TemporalAmount): ZonedDateTime =
-    self.plus(t)
+    def -(that: Duration): Duration =
+      self.minus(that)
 
-  def -(t: TemporalAmount): ZonedDateTime =
-    self.minus(t)
+    def *(m: Long): Duration =
+      self.multipliedBy(m)
 
-}
+    def /(d: Long): Duration =
+      self.dividedBy(d)
 
-trait ToZonedDateTimeOps {
-  implicit def ToZonedDateTimeOps(zdt: ZonedDateTime): ZonedDateTimeOps =
-    new ZonedDateTimeOps(zdt)
-}
+    def toMicros: Long = self.toNanos / 1000
 
-object zonedDateTime extends ToZonedDateTimeOps
+object duration extends DurationOps
 
-final class DurationOps(private val self: Duration) extends AnyVal {
+trait  LongDurationOps:
+  extension( self: Long)
+    def nanoseconds: Duration =
+      Duration.ofNanos(self)
 
-  def +(that: Duration): Duration =
-    self.plus(that)
+    def microseconds: Duration =
+      Duration.ofNanos(self * 1000)
 
-  def -(that: Duration): Duration =
-    self.minus(that)
+    def milliseconds: Duration =
+      Duration.ofMillis(self)
 
-  def *(m: Long): Duration =
-    self.multipliedBy(m)
+    def seconds: Duration =
+      Duration.ofSeconds(self)
 
-  def /(d: Long): Duration =
-    self.dividedBy(d)
+    def minutes: Duration =
+      Duration.ofMinutes(self)
 
-  def toMicros: Long = self.toNanos / 1000
-}
+object longDuration extends LongDurationOps
 
-trait ToDurationOps {
-  implicit def ToDurationOps(d: Duration): DurationOps =
-    new DurationOps(d)
-}
+trait InstantBoundedIntervalOps:
+  extension (self: BoundedInterval[Instant])
+    /**
+     * Convert to the minimal full-day interval that includes this interval.
+     *
+     * Hours in interval may not be a multiple of 24 if there's a DST transition in the resulting
+     * interval.
+     *
+     * @param zone
+     *   the timezone where the start of the day should be computed
+     * @param startOfDay
+     *   time at which the day starts
+     */
+    def toFullDays(zone: ZoneId, startOfDay: LocalTime): BoundedInterval[Instant] = {
+      val fullDayStart = {
+        val startAtZone = self.lower.atZone(zone)
+        val newStart    = startAtZone.`with`(startOfDay)
+        if (newStart <= startAtZone) newStart.toInstant
+        else newStart.minusDays(1).`with`(startOfDay).toInstant
+      }
 
-object duration extends ToDurationOps
+      val fullDayEnd = {
+        val endAtZone = self.upper.atZone(zone)
+        val newEnd    = endAtZone.`with`(startOfDay)
+        if (newEnd >= endAtZone) newEnd.toInstant
+        else newEnd.plusDays(1).`with`(startOfDay).toInstant
+      }
 
-final class LongDurationOps(val self: Long) extends AnyVal {
-  def nanoseconds: Duration =
-    Duration.ofNanos(self)
-
-  def microseconds: Duration =
-    Duration.ofNanos(self * 1000)
-
-  def milliseconds: Duration =
-    Duration.ofMillis(self)
-
-  def seconds: Duration =
-    Duration.ofSeconds(self)
-
-  def minutes: Duration =
-    Duration.ofMinutes(self)
-
-}
-
-trait ToLongDurationOps {
-  implicit def ToLongDurationOps(l: Long): LongDurationOps = new LongDurationOps(l)
-}
-
-object longDuration extends ToLongDurationOps
-
-final class InstantBoundedOps(private val self: Bounded[Instant]) extends AnyVal {
-
-  /**
-   * Convert to the minimal full-day interval that includes this interval.
-   *
-   * Hours in interval may not be a multiple of 24 if there's a DST transition in the resulting
-   * interval.
-   *
-   * @param zone
-   *   the timezone where the start of the day should be computed
-   * @param startOfDay
-   *   time at which the day starts
-   */
-  def toFullDays(zone: ZoneId, startOfDay: LocalTime): Bounded[Instant] = {
-    val fullDayStart = {
-      val startAtZone = self.lower.atZone(zone)
-      val newStart    = startAtZone.`with`(startOfDay)
-      if (newStart <= startAtZone) newStart.toInstant
-      else newStart.minusDays(1).`with`(startOfDay).toInstant
+      BoundedInterval.unsafeOpenUpper(fullDayStart, fullDayEnd)
     }
 
-    val fullDayEnd = {
-      val endAtZone = self.upper.atZone(zone)
-      val newEnd    = endAtZone.`with`(startOfDay)
-      if (newEnd >= endAtZone) newEnd.toInstant
-      else newEnd.plusDays(1).`with`(startOfDay).toInstant
+    def duration: Duration = {
+      val (start, end) = Spire.openUpperIntervalFromTuple[Instant].reverseGet(self)
+      Duration.between(start, end)
     }
 
-    Bounded.unsafeOpenUpper(fullDayStart, fullDayEnd)
-  }
+object instantBoundedInterval extends InstantBoundedIntervalOps
 
-  def duration: Duration = {
-    val (start, end) = Spire.openUpperIntervalFromTuple[Instant].reverseGet(self)
-    Duration.between(start, end)
-  }
-}
+trait InstantIntervalSeqOps extends InstantBoundedIntervalOps:
 
-trait ToInstantBoundedOps {
-  implicit def ToInstantIntervalOps(i: Bounded[Instant]): InstantBoundedOps =
-    new InstantBoundedOps(i)
-}
+  extension (self: IntervalSeq[Instant])
+    def duration: Duration =
+      self.intervals
+        .foldLeft(Duration.ZERO.some)((d, i) =>
+          i match {
+            case b @ Bounded(_, _, _) => d.map(_.plus(b.duration))
+            case Point(_)             => d
+            case Empty()              => d
+            case _                    => none
+          }
+        )
+        .getOrElse(ChronoUnit.FOREVER.getDuration)
 
-object instantBoundedInterval extends ToInstantBoundedOps
 
-final class InstantIntervalSeqOps(private val self: IntervalSeq[Instant]) extends AnyVal {
-  import instantBoundedInterval._
+object instantInterval extends InstantIntervalSeqOps
 
-  def duration: Duration =
-    self.intervals
-      .foldLeft(Duration.ZERO.some)((d, i) =>
-        i match {
-          case b @ Bounded(_, _, _) => d.map(_.plus(b.duration))
-          case Point(_)             => d
-          case Empty()              => d
-          case _                    => none
-        }
-      )
-      .getOrElse(ChronoUnit.FOREVER.getDuration)
-}
-
-trait ToInstantIntervalSeqOps {
-  implicit def ToInstantIntervalSeqOps(s: IntervalSeq[Instant]): InstantIntervalSeqOps =
-    new InstantIntervalSeqOps(s)
-}
-
-object instantInterval extends ToInstantIntervalSeqOps
-
-object time
-    extends ToInstantOps
-    with ToDurationOps
-    with ToLongDurationOps
-    with ToZonedDateTimeOps
-    with ToInstantBoundedOps
-    with ToInstantIntervalSeqOps
+trait TimeOps
+    extends InstantOps
+    with DurationOps
+    with LongDurationOps
+    with ZonedDateTimeOps
+    with InstantIntervalSeqOps
+    
+object time extends TimeOps

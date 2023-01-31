@@ -3,20 +3,20 @@
 
 package lucuma.core.math.skycalc
 
-import cats.syntax.all._
+import cats.syntax.all.*
 import coulomb.*
 import coulomb.policy.spire.standard.given
 import coulomb.syntax.*
 import lucuma.core.enums.TwilightType
-import lucuma.core.math.Constants._
+import lucuma.core.math.BoundedInterval
+import lucuma.core.math.Constants.*
 import lucuma.core.math.JulianDate
 import lucuma.core.math.Place
 import lucuma.core.math.units.given
 import lucuma.core.optics.Spire
-import org.typelevel.cats.time._
-import spire.math.Bounded
+import org.typelevel.cats.time.*
 import spire.math.extras.interval.IntervalSeq
-import spire.std.double._
+import spire.std.double.*
 
 import java.time.Instant
 import java.time.LocalDate
@@ -42,7 +42,7 @@ trait TwilightCalc extends SunCalc {
     twilightType: TwilightType,
     date:         LocalDate,
     place:        Place
-  ): Option[Bounded[Instant]] = {
+  ): Option[BoundedInterval[Instant]] = {
     val nextMidnight = date.atStartOfDay(place.timezone).plusDays(1)
     val jdmid        = JulianDate.ofInstant(nextMidnight.toInstant)
 
@@ -67,7 +67,7 @@ trait TwilightCalc extends SunCalc {
 
   def forBoundedInterval(
     twilightType: TwilightType,
-    interval:     Bounded[Instant],
+    interval:     BoundedInterval[Instant],
     place:        Place
   ): IntervalSeq[Instant] = {
     val (start, end)      = Spire.openUpperIntervalFromTuple[Instant].reverseGet(interval)

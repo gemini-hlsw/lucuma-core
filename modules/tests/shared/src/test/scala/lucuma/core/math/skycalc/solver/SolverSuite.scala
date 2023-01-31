@@ -3,11 +3,11 @@
 
 package lucuma.core.math.skycalc.solver
 
-import cats.syntax.all._
+import cats.syntax.all.*
 import lucuma.core.math.IntervalGens
-import lucuma.core.math.skycalc.solver.RoundStrategy._
-import lucuma.core.math.skycalc.solver.SolverStrategy._
-import org.typelevel.cats.time._
+import lucuma.core.math.skycalc.solver.RoundStrategy.*
+import lucuma.core.math.skycalc.solver.SolverStrategy.*
+import org.typelevel.cats.time.*
 import spire.math.extras.interval.IntervalSeq
 
 import java.time.Duration

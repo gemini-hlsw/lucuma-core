@@ -8,30 +8,31 @@ import cats.Eval
 import cats.kernel.laws.discipline.EqTests
 import cats.laws.discipline.FunctorTests
 import cats.laws.discipline.MonoidKTests
-import cats.syntax.all._
+import cats.syntax.all.*
 import lucuma.core.arb.ArbEval
 import lucuma.core.arb.ArbTime
-import lucuma.core.arb._
+import lucuma.core.arb.*
+import lucuma.core.math.BoundedInterval
+import lucuma.core.math.BoundedInterval.*
 import lucuma.core.math.IntervalGens
-import lucuma.core.math.arb._
+import lucuma.core.math.arb.ArbInterval
+import lucuma.core.math.arb.*
 import lucuma.core.math.skycalc.solver.Samples.Bracket
-import lucuma.core.syntax.time._
+import lucuma.core.syntax.time.*
 import monocle.law.discipline.IsoTests
-import org.scalacheck.Arbitrary._
-import org.scalacheck.Gen._
-import org.scalacheck.Prop._
-import org.typelevel.cats.time._
-import spire.math.Bounded
+import org.scalacheck.Arbitrary.*
+import org.scalacheck.Gen.*
+import org.scalacheck.Prop.*
+import org.typelevel.cats.time.*
 
 import java.time.Duration
 import java.time.Instant
 import scala.collection.immutable.TreeMap
-
 final class SamplesSuite extends munit.DisciplineSuite with IntervalGens {
-  import ArbEval._
-  import ArbInterval._
-  import ArbSamples._
-  import ArbTime._
+  import ArbEval.*
+  import ArbInterval.given
+  import ArbSamples.*
+  import ArbTime.*
 
   // Laws
   checkAll("Eq", EqTests[Samples[Int]].eqv)
@@ -45,7 +46,7 @@ final class SamplesSuite extends munit.DisciplineSuite with IntervalGens {
   checkAll("data", IsoTests(Samples.data[Int]))
 
   test("Fixed Rate Instants") {
-    forAll { (interval: Bounded[Instant]) =>
+    forAll { (interval: BoundedInterval[Instant]) =>
       forAll(rateForInterval(interval)) { (duration: Duration) =>
         val fixedRateSamples = Samples.atFixedRate(interval, duration)(_ => Eval.now(()))
         val instants         = fixedRateSamples.toMap.keys.toList
