@@ -26,13 +26,25 @@ object BoundedInterval:
   def unsafeClosed[A: Order](lower: A, upper: A): BoundedInterval[A] = 
     closed(lower, upper).getOrElse(sys.error(s"Could not build a bounded closed interval with lower bound [$lower] and upper bound [$upper]."))
 
+  def open[A: Order](lower: A, upper: A): Option[BoundedInterval[A]] = 
+    Interval.open(lower, upper).some.filterNot(_.isEmpty).map(_.asInstanceOf[BoundedInterval[A]])
+
+  def unsafeOpen[A: Order](lower: A, upper: A): BoundedInterval[A] = 
+    open(lower, upper).getOrElse(sys.error(s"Could not build a bounded open interval with lower bound [$lower] and upper bound [$upper]."))
+
+  def openLower[A: Order](lower: A, upper: A): Option[BoundedInterval[A]] = 
+    Interval.openLower(lower, upper).some.filterNot(_.isEmpty).map(_.asInstanceOf[BoundedInterval[A]])
+
+  def unsafeOpenLower[A: Order](lower: A, upper: A): BoundedInterval[A] =
+    openLower(lower, upper).getOrElse(sys.error(s"Could not build a bounded open lower interval with lower bound [$lower] and upper bound [$upper]."))
+
   def openUpper[A: Order](lower: A, upper: A): Option[BoundedInterval[A]] = 
     Interval.openUpper(lower, upper).some.filterNot(_.isEmpty).map(_.asInstanceOf[BoundedInterval[A]])
 
   def unsafeOpenUpper[A: Order](lower: A, upper: A): BoundedInterval[A] =
     openUpper(lower, upper).getOrElse(sys.error(s"Could not build a bounded open upper interval with lower bound [$lower] and upper bound [$upper]."))
 
-  given [A: Eq]: Eq[BoundedInterval[A]] = Interval.eq[A].contramap(identity)
+  given [A: Eq]: Eq[BoundedInterval[A]] = Interval.eq[A].contramap(identity) // contramap needed to fix the type
 
   extension [A](self: BoundedInterval[A])
     def lowerValueBound: ValueBound[A] = self match
