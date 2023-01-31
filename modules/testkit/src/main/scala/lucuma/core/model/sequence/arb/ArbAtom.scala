@@ -16,22 +16,26 @@ trait ArbAtom {
   import ArbUid._
   import ArbStep._
 
-  implicit val arbAtomGmosNorth: Arbitrary[Atom.GmosNorth] = Arbitrary(
+  private def genBoundedAtom[A: Arbitrary, B](limit: Int, f: (Atom.Id, List[A]) => B): Gen[B] =
     for {
       id    <- arbitrary[Atom.Id]
-      steps <- arbitrary[List[Step.GmosNorth]]
-    } yield Atom.GmosNorth(id, steps)
-  )
+      steps <- genBoundedList[A](limit)
+    } yield f(id, steps)
+
+  def genBoundedAtomGmosNorth(limit: Int): Gen[Atom.GmosNorth] =
+    genBoundedAtom[Step.GmosNorth, Atom.GmosNorth](limit, Atom.GmosNorth.apply)
+
+  implicit val arbAtomGmosNorth: Arbitrary[Atom.GmosNorth] =
+    Arbitrary(genBoundedAtomGmosNorth(10))
 
   implicit val cogAtomGmosNorth: Cogen[Atom.GmosNorth] =
     Cogen[(Atom.Id, List[Step.GmosNorth])].contramap(a => (a.id, a.steps))
 
-  implicit val arbAtomGmosSouth: Arbitrary[Atom.GmosSouth] = Arbitrary(
-    for {
-      id    <- arbitrary[Atom.Id]
-      steps <- arbitrary[List[Step.GmosSouth]]
-    } yield Atom.GmosSouth(id, steps)
-  )
+  def genBoundedAtomGmosSouth(limit: Int): Gen[Atom.GmosSouth] =
+    genBoundedAtom[Step.GmosSouth, Atom.GmosSouth](limit, Atom.GmosSouth.apply)
+
+  implicit val arbAtomGmosSouth: Arbitrary[Atom.GmosSouth] =
+    Arbitrary(genBoundedAtomGmosSouth(10))
 
   implicit val cogAtomGmosSouth: Cogen[Atom.GmosSouth] =
     Cogen[(Atom.Id, List[Step.GmosSouth])].contramap(a => (a.id, a.steps))
