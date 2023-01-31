@@ -44,6 +44,12 @@ object BoundedInterval:
   def unsafeOpenUpper[A: Order](lower: A, upper: A): BoundedInterval[A] =
     openUpper(lower, upper).getOrElse(sys.error(s"Could not build a bounded open upper interval with lower bound [$lower] and upper bound [$upper]."))
 
+  def fromBounds[A: Order](lower: ValueBound[A], upper: ValueBound[A]): Option[BoundedInterval[A]] =
+    Interval.fromBounds(lower, upper).some.filterNot(_.isEmpty).map(_.asInstanceOf[BoundedInterval[A]])
+
+  def unsafeFromBounds[A: Order](lower: ValueBound[A], upper: ValueBound[A]): BoundedInterval[A] =
+    fromBounds(lower, upper).getOrElse(sys.error(s"Could not build a bounded interval with lower bound [$lower] and upper bound [$upper]."))
+
   given [A: Eq]: Eq[BoundedInterval[A]] = Interval.eq[A].contramap(identity) // contramap needed to fix the type
 
   extension [A](self: BoundedInterval[A])
