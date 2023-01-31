@@ -9,6 +9,7 @@ import eu.timepit.refined.types.numeric.PosBigDecimal
 import lucuma.core.enums.Band
 import lucuma.core.math.BrightnessUnits
 import lucuma.core.math.Wavelength
+import lucuma.core.math.arb.ArbBrightnessValue
 import lucuma.core.math.arb.ArbRefined
 import lucuma.core.math.arb.ArbWavelength
 import lucuma.core.math.dimensional.*
@@ -24,14 +25,15 @@ import org.scalacheck.*
 import scala.collection.immutable.SortedMap
 
 trait ArbSpectralDefinition {
-  import ArbUnnormalizedSED.given
-  import ArbEnumerated.*
-  import SpectralDefinition.*
-  import BrightnessUnits.*
-  import ArbMeasure.given
+  import ArbBrightnessValue.given
   import ArbEmissionLine.given
+  import ArbEnumerated.*
+  import ArbMeasure.given
   import ArbRefined.*
+  import ArbUnnormalizedSED.given
   import ArbWavelength.*
+  import BrightnessUnits.*
+  import SpectralDefinition.*
 
   given arbBandNormalizedSpectralDefinition[T](using
     arbUnit: Arbitrary[Units Of Brightness[T]]

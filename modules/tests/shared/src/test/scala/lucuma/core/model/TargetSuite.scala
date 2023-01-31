@@ -19,29 +19,30 @@ import monocle.law.discipline.*
 import munit.*
 
 class TargetSuite extends DisciplineSuite {
-  import ArbTarget.given
-  import ArbSourceProfile.given
-  import ArbSiderealTracking.given
-  import ArbEphemerisKey.*
-  import ArbParallax.*
-  import ArbEnumerated.*
+  import ArbAngle.*
+  import ArbBrightnessValue.given
+  import ArbCatalogInfo.*
+  import ArbCollection.*
   import ArbCoordinates.*
-  import ArbRightAscension.*
   import ArbDeclination.*
+  import ArbEnumerated.*
+  import ArbEpoch.*
+  import ArbEphemerisKey.*
+  import ArbEmissionLine.given
+  import ArbGid.*
+  import ArbMeasure.given
+  import ArbParallax.*
   import ArbProperMotion.given
   import ArbRadialVelocity.given
-  import ArbGid.*
-  import ArbEpoch.*
-  import ArbCatalogInfo.*
-  import Target.*
-  import ArbEmissionLine.given
-  import ArbSpectralDefinition.given
-  import ArbAngle.*
-  import ArbUnnormalizedSED.given
   import ArbRefined.*
-  import ArbMeasure.given
-  import ArbCollection.*
+  import ArbRightAscension.*
+  import ArbSiderealTracking.given
+  import ArbSourceProfile.given
+  import ArbSpectralDefinition.given
+  import ArbTarget.given
+  import ArbUnnormalizedSED.given
   import ArbWavelength.*
+  import Target.*
 
   // Laws for Target.Sidereal
   checkAll("Eq[Target.Sidereal]", EqTests[Target.Sidereal].eqv)

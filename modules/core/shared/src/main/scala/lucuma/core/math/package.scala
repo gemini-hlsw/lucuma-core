@@ -3,20 +3,22 @@
 
 package lucuma
 package core
+package math
+
+import lucuma.core.util.NewType
 
 /** Mathematical data types for general use, not specific to the Gem model. */
-package object math {
+type RA = RightAscension
+val RA: RightAscension.type = RightAscension
 
-  type RA = RightAscension
-  val RA: RightAscension.type = RightAscension
+type Dec = Declination
+val Dec: Declination.type = Declination
 
-  type Dec = Declination
-  val Dec: Declination.type = Declination
+type Lat = Declination
+val Lat: Declination.type = Declination
 
-  type Lat = Declination
-  val Lat: Declination.type = Declination
+type Lon = Angle
+val Lon: Angle.type = Angle
 
-  type Lon = Angle
-  val Lon: Angle.type = Angle
-
-}
+object BrightnessValue extends NewType[BigDecimal]
+type BrightnessValue = BrightnessValue.Type
