@@ -5,6 +5,7 @@ package lucuma.core.util
 
 import cats.Eq
 import cats.Monoid
+import cats.Order
 import io.circe.Decoder
 import io.circe.Encoder
 import lucuma.core.util.Display
@@ -32,3 +33,5 @@ trait NewType[Wrapped]:
   given (using dec: Decoder[Wrapped]): Decoder[Type]             = dec
   given (using disp: Display[Wrapped]): Display[Type]            = disp
   given (using m: Monoid[Wrapped]): Monoid[Type]                 = m
+  given (using ord: Order[Wrapped]): Order[Type]                 = ord
+  given (using ord: Ordering[Wrapped]): Ordering[Type]           = ord

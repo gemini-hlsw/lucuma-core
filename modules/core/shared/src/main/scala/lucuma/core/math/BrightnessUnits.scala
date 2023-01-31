@@ -18,7 +18,7 @@ object BrightnessUnits {
   trait LineFlux[+T]
   trait FluxDensityContinuum[+T]
 
-  type BrightnessMeasure[T] = Measure[BigDecimal] Of Brightness[T]
+  type BrightnessMeasure[T] = Measure[BrightnessValue] Of Brightness[T]
 
   // Brightness Integrated
   implicit object VegaMagnitudeIsIntegratedBrightnessUnit

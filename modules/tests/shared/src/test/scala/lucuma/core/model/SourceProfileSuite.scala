@@ -13,8 +13,10 @@ import lucuma.core.enums.Band
 import lucuma.core.enums.StellarLibrarySpectrum
 import lucuma.core.math.Angle
 import lucuma.core.math.BrightnessUnits.*
+import lucuma.core.math.BrightnessValue
 import lucuma.core.math.Wavelength
 import lucuma.core.math.arb.ArbAngle
+import lucuma.core.math.arb.ArbBrightnessValue
 import lucuma.core.math.arb.ArbRefined
 import lucuma.core.math.arb.ArbWavelength
 import lucuma.core.math.dimensional.arb.ArbMeasure
@@ -29,6 +31,7 @@ import scala.collection.immutable.SortedMap
 
 final class SourceProfileSuite extends DisciplineSuite {
   import ArbAngle.*
+  import ArbBrightnessValue.given
   import ArbEmissionLine.given
   import ArbEnumerated.*
   import ArbMeasure.given
@@ -44,7 +47,7 @@ final class SourceProfileSuite extends DisciplineSuite {
     SpectralDefinition.BandNormalized(
       UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.A0I).some,
       SortedMap(
-        Band.R -> Band.R.defaultUnits[Integrated].withValueTagged(BigDecimal(10.0))
+        Band.R -> Band.R.defaultUnits[Integrated].withValueTagged(BrightnessValue(BigDecimal(10.0)))
       )
     )
 
@@ -52,7 +55,7 @@ final class SourceProfileSuite extends DisciplineSuite {
     SpectralDefinition.BandNormalized(
       UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.A0I).some,
       SortedMap(
-        Band.R -> Band.R.defaultUnits[Surface].withValueTagged(BigDecimal(10.0))
+        Band.R -> Band.R.defaultUnits[Surface].withValueTagged(BrightnessValue(BigDecimal(10.0)))
       )
     )
 

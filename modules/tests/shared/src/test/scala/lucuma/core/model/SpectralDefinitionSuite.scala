@@ -12,7 +12,9 @@ import eu.timepit.refined.cats.*
 import lucuma.core.enums.Band
 import lucuma.core.enums.StellarLibrarySpectrum
 import lucuma.core.math.BrightnessUnits
+import lucuma.core.math.BrightnessValue
 import lucuma.core.math.Wavelength
+import lucuma.core.math.arb.ArbBrightnessValue
 import lucuma.core.math.arb.ArbRefined
 import lucuma.core.math.arb.ArbWavelength
 import lucuma.core.math.dimensional.arb.ArbMeasure
@@ -26,22 +28,23 @@ import munit.*
 import scala.collection.immutable.SortedMap
 
 final class SpectralDefinitionSuite extends DisciplineSuite {
-  import ArbUnnormalizedSED.given
-  import ArbEnumerated.*
-  import BrightnessUnits.*
-  import ArbSpectralDefinition.given
-  import ArbRefined.*
-  import ArbMeasure.given
-  import ArbEmissionLine.given
+  import ArbBrightnessValue.given
   import ArbCollection.*
+  import ArbEmissionLine.given
+  import ArbEnumerated.*
+  import ArbMeasure.given
+  import ArbRefined.*
+  import ArbSpectralDefinition.given
+  import ArbUnnormalizedSED.given
   import ArbWavelength.*
+  import BrightnessUnits.*
 
   // Brightness type conversions
   val sd1Integrated: SpectralDefinition[Integrated] =
     SpectralDefinition.BandNormalized(
       UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.A0I).some,
       SortedMap(
-        Band.R -> Band.R.defaultUnits[Integrated].withValueTagged(BigDecimal(10.0))
+        Band.R -> Band.R.defaultUnits[Integrated].withValueTagged(BrightnessValue(BigDecimal(10.0)))
       )
     )
 
@@ -49,7 +52,7 @@ final class SpectralDefinitionSuite extends DisciplineSuite {
     SpectralDefinition.BandNormalized(
       UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.A0I).some,
       SortedMap(
-        Band.R -> Band.R.defaultUnits[Surface].withValueTagged(BigDecimal(10.0))
+        Band.R -> Band.R.defaultUnits[Surface].withValueTagged(BrightnessValue(BigDecimal(10.0)))
       )
     )
 
