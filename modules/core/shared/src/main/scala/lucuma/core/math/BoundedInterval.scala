@@ -70,11 +70,11 @@ object BoundedInterval:
 
     def lower: A = self match
       case b @ Bounded(_, _, _) => b.lower
-      case p @ Point(_) => p.lower
+      case p @ Point(_) => p.value
 
     def upper: A = self match
       case b @ Bounded(_, _, _) => b.upper
-      case p @ Point(_) => p.upper
+      case p @ Point(_) => p.value
 
     inline def isPoint: Boolean = self.isPoint
 

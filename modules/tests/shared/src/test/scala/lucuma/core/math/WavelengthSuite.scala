@@ -9,6 +9,7 @@ import cats.Show
 import cats.kernel.laws.discipline.*
 import cats.syntax.all.*
 import coulomb.*
+import coulomb.ops.algebra.cats.quantity.given
 import coulomb.syntax.*
 import eu.timepit.refined.auto.*
 import eu.timepit.refined.cats.*
@@ -16,6 +17,7 @@ import eu.timepit.refined.numeric.*
 import eu.timepit.refined.scalacheck.numeric.*
 import eu.timepit.refined.types.numeric.PosBigDecimal
 import eu.timepit.refined.types.numeric.PosInt
+import lucuma.core.math.arb.ArbWavelength
 import lucuma.core.math.arb.*
 import lucuma.core.math.units.{_, given}
 import lucuma.core.optics.Format
@@ -28,24 +30,14 @@ import org.scalacheck.Prop.*
 import spire.math.Rational
 
 import java.math.RoundingMode
-import scala.language.implicitConversions
 
 final class WavelengthSuite extends munit.DisciplineSuite {
-  import ArbRefined._
+  import ArbQuantity.given
+  import ArbRefined.*
   import ArbWavelength.*
   import ArbWavelengthDither.given
 
-  implicit def arbQuantityPbd[U]: Arbitrary[Quantity[PosBigDecimal, U]] =
-    Arbitrary(arbitrary[PosBigDecimal].map(Quantity[U](_)))
-
-  implicit def eqQuantityPdb[U]: Eq[Quantity[PosBigDecimal, U]] =
-    Eq.by(_.value.value)
-
-  // Override to remove implicit modifier
-  override def unitToProp: Unit => Prop = super.unitToProp
-
-  // Scala 3 likes this better
-  implicit def saneUnitToProp(unit: Unit): Prop = unitToProp(unit)
+  given Conversion[Unit, Prop] = unitToProp(_)
 
   // Laws
   checkAll("Wavelength", OrderTests[Wavelength].order)
