@@ -16,22 +16,26 @@ trait ArbExecutionSequence {
   import ArbUid._
   import ArbAtom._
 
-  implicit val arbExecutionSequenceGmosNorth: Arbitrary[ExecutionSequence.GmosNorth] = Arbitrary(
+  private def genBoundedExecutionSequence[A: Arbitrary, B](limit: Int, f: (A, List[A]) => B): Gen[B] =
     for {
-      nextAtom       <- arbitrary[Atom.GmosNorth]
-      possibleFuture <- arbitrary[List[Atom.GmosNorth]]
-    } yield ExecutionSequence.GmosNorth(nextAtom, possibleFuture)
-  )
+      nextAtom       <- arbitrary[A]
+      possibleFuture <- genBoundedList[A](limit)
+    } yield f(nextAtom, possibleFuture)
+
+  def genBoundedExecutionSequenceGmosNorth(limit: Int): Gen[ExecutionSequence.GmosNorth] =
+    genBoundedExecutionSequence[Atom.GmosNorth, ExecutionSequence.GmosNorth](limit, ExecutionSequence.GmosNorth.apply)
+
+  implicit val arbExecutionSequenceGmosNorth: Arbitrary[ExecutionSequence.GmosNorth] =
+    Arbitrary(genBoundedExecutionSequenceGmosNorth(10))
 
   implicit val cogExecutionSequenceGmosNorth: Cogen[ExecutionSequence.GmosNorth] =
     Cogen[(Atom.GmosNorth, List[Atom.GmosNorth])].contramap(s => (s.nextAtom, s.possibleFuture))
 
-  implicit val arbExecutionSequenceGmosSouth: Arbitrary[ExecutionSequence.GmosSouth] = Arbitrary(
-    for {
-      nextAtom       <- arbitrary[Atom.GmosSouth]
-      possibleFuture <- arbitrary[List[Atom.GmosSouth]]
-    } yield ExecutionSequence.GmosSouth(nextAtom, possibleFuture)
-  )
+  def genBoundedExecutionSequenceGmosSouth(limit: Int): Gen[ExecutionSequence.GmosSouth] =
+    genBoundedExecutionSequence[Atom.GmosSouth, ExecutionSequence.GmosSouth](limit, ExecutionSequence.GmosSouth.apply)
+
+  implicit val arbExecutionSequenceGmosSouth: Arbitrary[ExecutionSequence.GmosSouth] =
+    Arbitrary(genBoundedExecutionSequenceGmosSouth(10))
 
   implicit val cogExecutionSequenceGmosSouth: Cogen[ExecutionSequence.GmosSouth] =
     Cogen[(Atom.GmosSouth, List[Atom.GmosSouth])].contramap(s => (s.nextAtom, s.possibleFuture))

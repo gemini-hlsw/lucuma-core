@@ -7,13 +7,10 @@ import cats.kernel.laws.discipline._
 import lucuma.core.model.sequence.arb._
 import monocle.law.discipline._
 import munit._
-import org.scalacheck.Test
 
 final class ExecutionSequenceSuite extends DisciplineSuite {
   import ArbAtom._
   import ArbExecutionSequence._
-
-  override val scalaCheckTestParameters = Test.Parameters.default.withMaxSize(10)
 
   checkAll("Eq[ExecutionSequence.GmosNorth]", EqTests[ExecutionSequence.GmosNorth].eqv)
   checkAll("ExecutionSequence.GmosNorth.nextAtom", LensTests(ExecutionSequence.GmosNorth.nextAtom))

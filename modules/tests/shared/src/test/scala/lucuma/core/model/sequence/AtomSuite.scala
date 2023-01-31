@@ -9,15 +9,12 @@ import lucuma.core.util.arb._
 import lucuma.core.util.laws.UidTests
 import monocle.law.discipline._
 import munit._
-import org.scalacheck.Test
 
 final class AtomSuite extends DisciplineSuite {
   import ArbStep._
   import ArbEnumerated._
   import ArbUid._
   import ArbAtom._
-
-  override val scalaCheckTestParameters = Test.Parameters.default.withMaxSize(20)
 
   checkAll("Eq[Atom.GmosNorth]", EqTests[Atom.GmosNorth].eqv)
   checkAll("Atom.GmosNorth.id", LensTests(Atom.GmosNorth.id))
