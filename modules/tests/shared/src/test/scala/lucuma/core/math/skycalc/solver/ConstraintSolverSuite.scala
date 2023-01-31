@@ -12,6 +12,7 @@ import lucuma.core.math.IntervalGens
 import lucuma.core.math.skycalc.SkyCalcResults
 import org.typelevel.cats.time._
 import spire.math.extras.interval.IntervalSeq
+import lucuma.core.math.BoundedInterval.*
 
 import java.time.Duration
 

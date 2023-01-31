@@ -50,7 +50,7 @@ final class SolverSuite extends munit.DisciplineSuite with IntervalGens {
     assertEquals(IntervalSeq(buildInterval(250, 400)), solve(buildInterval(200, 400)))
     assertEquals(IntervalSeq(buildInterval(250, 450)), solve(buildInterval(200, 500)))
     assertEquals(
-      IntervalSeq(buildInterval(0, 150)) | buildInterval(250, 400),
+      IntervalSeq(buildInterval(0, 150)) | buildInterval(250, 400).toInterval,
       solve(buildInterval(0, 400))
     )
   }
@@ -63,7 +63,7 @@ final class SolverSuite extends munit.DisciplineSuite with IntervalGens {
     assertEquals(IntervalSeq(buildInterval(250, 400)), solve(buildInterval(200, 400)))
     assertEquals(IntervalSeq(buildInterval(250, 450)), solve(buildInterval(200, 500)))
     assertEquals(
-      IntervalSeq(buildInterval(0, 150)) | buildInterval(250, 400),
+      IntervalSeq(buildInterval(0, 150)) | buildInterval(250, 400).toInterval,
       solve(buildInterval(0, 400))
     )
   }

@@ -65,7 +65,7 @@ final class SamplesSuite extends munit.DisciplineSuite with IntervalGens {
   test("Bracket") {
     forAll(arbitrary[Samples[Unit]].suchThat(_.interval.isDefined)) { samples =>
       val interval = samples.interval.get
-      forAll(instantInInterval(interval)) { i =>
+      forAll(instantInInterval(interval.toInterval)) { i =>
         samples.bracket(i) match {
           case Bracket(Some((i0, _)), Some((i1, _)), Some((i2, _))) =>
             assert(i0 >= interval.lower)

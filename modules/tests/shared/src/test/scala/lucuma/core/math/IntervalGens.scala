@@ -75,8 +75,8 @@ trait IntervalGens {
     val basics            = List(Instant.MIN, Instant.MAX)
     val basicsAndSpecials =
       (basics ++ specials)
-        .filter(i => i > interval.lower || (i === interval.lower && interval.lowerValueBound.isClosed))
-        .filter(i => i < interval.upper || (i === interval.upper && interval.upperValueBound.isClosed))
+        .filter(i => i > interval.lower || (i === interval.lower && interval.lowerBound.isClosed))
+        .filter(i => i < interval.upper || (i === interval.upper && interval.upperBound.isClosed))
     val freqs             =
       basicsAndSpecials.map(v => (1, Gen.const(v))) :+ (
         (
@@ -87,20 +87,20 @@ trait IntervalGens {
 
     Gen
       .frequency(freqs: _*)
-      .suchThat(_ > interval.lower || interval.lowerValueBound.isClosed)
-      .suchThat(_ < interval.upper || interval.upperValueBound.isClosed)
+      .suchThat(_ > interval.lower || interval.lowerBound.isClosed)
+      .suchThat(_ < interval.upper || interval.upperBound.isClosed)
   }
 
   // There might not be instants outside the interval if the interval is (Instant.MIN, Instant.MAX).
   def instantBeforeInterval(interval: BoundedInterval[Instant]): Gen[Option[Instant]] =
-    interval.lowerValueBound match {
+    interval.lowerBound match {
       case Closed(Instant.MIN) => Gen.const(none)
       case Closed(a)           => instantInInterval(Interval.below(a)).map(_.some)
       case Open(a)             => instantInInterval(Interval.atOrBelow(a)).map(_.some)
     }
 
   def instantAfterInterval(interval: BoundedInterval[Instant]): Gen[Option[Instant]] =
-    interval.upperValueBound match {
+    interval.upperBound match {
       case Closed(Instant.MAX) => Gen.const(none)
       case Closed(a)           => instantInInterval(Interval.above(a)).map(_.some)
       case Open(a)             => instantInInterval(Interval.atOrAbove(a)).map(_.some)
@@ -152,7 +152,7 @@ trait IntervalGens {
   def instantOutsideSchedule(schedule: IntervalSeq[Instant]): Gen[Option[Instant]] =
     instantInSchedule(~schedule)
 
-  def intervalInSchedule(schedule: IntervalSeq[Instant]): Gen[Option[Interval[Instant]]] =
+  def intervalInSchedule(schedule: IntervalSeq[Instant]): Gen[Option[BoundedInterval[Instant]]] =
     if (schedule.isEmpty)
       Gen.const(none)
     else
@@ -164,7 +164,7 @@ trait IntervalGens {
         )
 
   // We define a "section" as a maximal interval either outside or inside the Schedule.
-  def sectionInSchedule(schedule: IntervalSeq[Instant]): Gen[Interval[Instant]] =
+  def sectionInSchedule(schedule: IntervalSeq[Instant]): Gen[BoundedInterval[Instant]] =
     Gen.oneOf(
       intervalInSchedule(schedule).flatMap(_.map(Gen.const).getOrElse(Gen.fail)),
       intervalInSchedule(~schedule).flatMap(_.map(Gen.const).getOrElse(Gen.fail))

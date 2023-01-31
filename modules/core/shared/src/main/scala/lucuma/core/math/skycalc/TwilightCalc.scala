@@ -75,8 +75,8 @@ trait TwilightCalc extends SunCalc {
     val endDate           = end.atZone(place.timezone).toLocalDate
     val dates             =
       List.unfold(startDate)(date => if (date <= endDate) (date, date.plusDays(1)).some else none)
-    val twilightIntervals = dates.flatMap(d => forDate(twilightType, d, place))
-    Spire.intervalListUnion[Instant].get(twilightIntervals) & interval
+    val twilightIntervals = dates.map(d => forDate(twilightType, d, place)).flattenOption
+    Spire.intervalListUnion[Instant].get(twilightIntervals.map(_.toInterval)) & interval.toInterval
   }
 
   private def calcTimes(

@@ -13,6 +13,7 @@ import spire.math.extras.interval.IntervalSeq
 import java.time.Duration
 import java.time.Instant
 import scala.annotation.tailrec
+import spire.math.Interval
 
 object SolverStrategy {
   type Default
@@ -54,7 +55,7 @@ trait SolverInstances {
       ): IntervalSeq[Instant] =
         if (i >= interval.upper)
           if (curState)
-            accum | (BoundedInterval.unsafeOpenUpper(curStart, interval.upper))
+            accum | Interval.openUpper(curStart, interval.upper)
           else
             accum
         else if (metAt(i) == curState)
@@ -64,7 +65,7 @@ trait SolverInstances {
             i,
             curState = false,
             i + step,
-            accum | (BoundedInterval.unsafeOpenUpper(curStart, i))
+            accum | Interval.openUpper(curStart, i)
           )
         else
           solve(i, curState = true, i + step, accum)
@@ -92,15 +93,15 @@ trait SolverInstances {
             case (false, false, true)  => solve(m, fm, e, fe)
             case (false, true, false)  => solve(s, fs, m, fm) | (solve(m, fm, e, fe))
             case (false, true, true)   =>
-              solve(s, fs, m, fm) | IntervalSeq(BoundedInterval.unsafeOpenUpper(m, e))
+              solve(s, fs, m, fm) | IntervalSeq(Interval.openUpper(m, e))
             case (true, false, false)  => solve(s, fs, m, fm)
             case (true, false, true)   => solve(s, fs, m, fm) | (solve(m, fm, e, fe))
             case (true, true, false)   =>
-              IntervalSeq(BoundedInterval.unsafeOpenUpper(s, m)) | (solve(m, fm, e, fe))
+              IntervalSeq(Interval.openUpper(s, m)) | (solve(m, fm, e, fe))
             case (true, true, true)    => solve(s, fs, m, fm) | (solve(m, fm, e, fe))
           }
         else if (fm)
-          IntervalSeq[Instant](BoundedInterval.unsafeOpenUpper(s, e))
+          IntervalSeq[Instant](Interval.openUpper(s, e))
         else
           IntervalSeq.empty[Instant]
       }
