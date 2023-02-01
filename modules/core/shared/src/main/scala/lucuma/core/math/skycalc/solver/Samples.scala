@@ -9,6 +9,8 @@ import cats.Eval
 import cats.Functor
 import cats.MonoidK
 import cats.syntax.all._
+import lucuma.core.math.BoundedInterval
+import lucuma.core.math.BoundedInterval.*
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Place
 import lucuma.core.optics.Spire
@@ -37,8 +39,8 @@ trait Samples[A] { outer =>
   protected val data: TreeMap[Instant, Eval[P]]
   protected val k: (Instant, P) => Eval[A]
 
-  /** The `Bounded[Instant]` covered by the samples. */
-  def interval: Option[Bounded[Instant]] =
+  /** The `BoundedInterval[Instant]` covered by the samples. */
+  def interval: Option[BoundedInterval[Instant]] =
     (data.headOption, data.lastOption)
       .bimap(_.map(_._1), _.map(_._1))
       .mapN(Function.untupled(Spire.closedIntervalFromTuple[Instant].getOption))
@@ -168,7 +170,7 @@ object Samples extends SamplesOptics {
     fromMap(TreeMap(instant -> Eval.later(value)))
 
   /** Construct a `Samples` across an interval, sampled at the given rate. */
-  def atFixedRate[A](interval: Bounded[Instant], rate: Duration)(f: Instant => A): Samples[A] =
+  def atFixedRate[A](interval: BoundedInterval[Instant], rate: Duration)(f: Instant => A): Samples[A] =
     fromMap(
       Iterator
         .iterate(interval.lower)(_ + rate)

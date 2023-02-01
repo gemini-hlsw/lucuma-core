@@ -4,15 +4,16 @@
 package lucuma.core.math
 
 import cats.Eq
-import cats.syntax.all._
+import cats.syntax.all.*
 import lucuma.core.arb.ArbTime
+import lucuma.core.math.BoundedInterval
+import lucuma.core.math.BoundedInterval.*
 import lucuma.core.optics.Spire
-import lucuma.core.syntax.boundedInterval._
-import lucuma.core.syntax.time._
-import org.scalacheck.Arbitrary._
+import lucuma.core.syntax.time.*
+import org.scalacheck.Arbitrary.*
 import org.scalacheck.Gen
 import org.scalacheck.Gen.Choose
-import org.typelevel.cats.time._
+import org.typelevel.cats.time.*
 import spire.math.Bounded
 import spire.math.Interval
 import spire.math.extras.interval.IntervalSeq
@@ -26,12 +27,12 @@ import java.time.Duration
 import java.time.Instant
 
 trait IntervalGens {
-  import ArbTime._
+  import ArbTime.*
 
   private val MaxDelta: Long = Duration.ofMinutes(10).toNanos
 
-  def buildInterval(start: Int, end: Int): Bounded[Instant] =
-    Bounded.unsafeOpenUpper(Instant.ofEpochMilli(start.toLong), Instant.ofEpochMilli(end.toLong))
+  def buildInterval(start: Int, end: Int): BoundedInterval[Instant] =
+    BoundedInterval.unsafeOpenUpper(Instant.ofEpochMilli(start.toLong), Instant.ofEpochMilli(end.toLong))
 
   implicit val chooseInstant: Choose[Instant] = new Choose[Instant] {
     def choose(min: Instant, max: Instant): Gen[Instant] =
@@ -62,13 +63,13 @@ trait IntervalGens {
     }
     (lowerBound, upperBound)
       .mapN((lower, upper) =>
-        instantInBounded(Interval.fromBounds(lower, upper).asInstanceOf[Bounded[Instant]], specials)
+        instantInBounded(Interval.fromBounds(lower, upper).asInstanceOf[BoundedInterval[Instant]], specials)
       )
       .getOrElse(Gen.fail)
   }
 
   def instantInBounded(
-    interval: Bounded[Instant],
+    interval: BoundedInterval[Instant],
     specials: List[Instant] = List.empty
   ): Gen[Instant] = {
     val basics            = List(Instant.MIN, Instant.MAX)
@@ -91,43 +92,43 @@ trait IntervalGens {
   }
 
   // There might not be instants outside the interval if the interval is (Instant.MIN, Instant.MAX).
-  def instantBeforeInterval(interval: Bounded[Instant]): Gen[Option[Instant]] =
+  def instantBeforeInterval(interval: BoundedInterval[Instant]): Gen[Option[Instant]] =
     interval.lowerBound match {
       case Closed(Instant.MIN) => Gen.const(none)
       case Closed(a)           => instantInInterval(Interval.below(a)).map(_.some)
       case Open(a)             => instantInInterval(Interval.atOrBelow(a)).map(_.some)
     }
 
-  def instantAfterInterval(interval: Bounded[Instant]): Gen[Option[Instant]] =
+  def instantAfterInterval(interval: BoundedInterval[Instant]): Gen[Option[Instant]] =
     interval.upperBound match {
       case Closed(Instant.MAX) => Gen.const(none)
       case Closed(a)           => instantInInterval(Interval.above(a)).map(_.some)
       case Open(a)             => instantInInterval(Interval.atOrAbove(a)).map(_.some)
     }
 
-  def instantOutsideInterval(interval: Bounded[Instant]): Gen[Option[Instant]] =
+  def instantOutsideInterval(interval: BoundedInterval[Instant]): Gen[Option[Instant]] =
     Gen.oneOf(instantBeforeInterval(interval), instantAfterInterval(interval))
 
-  def instantWithSpecialInterval(interval: Bounded[Instant]): Gen[Instant] =
+  def instantWithSpecialInterval(interval: BoundedInterval[Instant]): Gen[Instant] =
     Gen.frequency(
       (1, Gen.const(interval.lower)),
       (1, Gen.const(interval.upper)),
       (18, arbitrary[Instant])
     )
 
-  def instantUntilEndOfInterval(interval: Bounded[Instant]): Gen[Instant] =
+  def instantUntilEndOfInterval(interval: BoundedInterval[Instant]): Gen[Instant] =
     instantInInterval(
       Interval.fromBounds(Unbound(), interval.upperBound),
       specials = List(interval.lower, interval.upper)
     )
 
-  def instantFromStartOfInterval(interval: Bounded[Instant]): Gen[Instant] =
+  def instantFromStartOfInterval(interval: BoundedInterval[Instant]): Gen[Instant] =
     instantInInterval(
       Interval.fromBounds(interval.lowerBound, Unbound()),
       specials = List(interval.lower, interval.upper)
     )
 
-  def rateForInterval(interval: Bounded[Instant]): Gen[Duration] =
+  def rateForInterval(interval: BoundedInterval[Instant]): Gen[Duration] =
     for {
       samples <- Gen.choose(50L, 400L)
       delta   <- Gen.choose(0L, MaxDelta)
@@ -151,7 +152,7 @@ trait IntervalGens {
   def instantOutsideSchedule(schedule: IntervalSeq[Instant]): Gen[Option[Instant]] =
     instantInSchedule(~schedule)
 
-  def intervalInSchedule(schedule: IntervalSeq[Instant]): Gen[Option[Interval[Instant]]] =
+  def intervalInSchedule(schedule: IntervalSeq[Instant]): Gen[Option[BoundedInterval[Instant]]] =
     if (schedule.isEmpty)
       Gen.const(none)
     else
@@ -163,7 +164,7 @@ trait IntervalGens {
         )
 
   // We define a "section" as a maximal interval either outside or inside the Schedule.
-  def sectionInSchedule(schedule: IntervalSeq[Instant]): Gen[Interval[Instant]] =
+  def sectionInSchedule(schedule: IntervalSeq[Instant]): Gen[BoundedInterval[Instant]] =
     Gen.oneOf(
       intervalInSchedule(schedule).flatMap(_.map(Gen.const).getOrElse(Gen.fail)),
       intervalInSchedule(~schedule).flatMap(_.map(Gen.const).getOrElse(Gen.fail))

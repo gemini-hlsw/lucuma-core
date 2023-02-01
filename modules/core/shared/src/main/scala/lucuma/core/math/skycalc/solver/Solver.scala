@@ -3,11 +3,12 @@
 
 package lucuma.core.math.skycalc.solver
 
-import cats.syntax.all._
-import lucuma.core.syntax.boundedInterval._
-import lucuma.core.syntax.time._
-import org.typelevel.cats.time._
-import spire.math.Bounded
+import cats.syntax.all.*
+import lucuma.core.math.BoundedInterval
+import lucuma.core.math.BoundedInterval.*
+import lucuma.core.syntax.time.*
+import org.typelevel.cats.time.*
+import spire.math.Interval
 import spire.math.extras.interval.IntervalSeq
 
 import java.time.Duration
@@ -28,7 +29,7 @@ object SolverStrategy {
 trait Solver[S] {
   def solve(
     metAt:    Instant => Boolean
-  )(interval: Bounded[Instant], step: Duration = Duration.ofSeconds(30)): IntervalSeq[Instant]
+  )(interval: BoundedInterval[Instant], step: Duration = Duration.ofSeconds(30)): IntervalSeq[Instant]
 }
 
 trait SolverInstances {
@@ -42,7 +43,7 @@ trait SolverInstances {
   implicit object DefaultSolver extends Solver[SolverStrategy.Default] {
     def solve(
       metAt:    Instant => Boolean
-    )(interval: Bounded[Instant], step: Duration): IntervalSeq[Instant] = {
+    )(interval: BoundedInterval[Instant], step: Duration): IntervalSeq[Instant] = {
       require(step > Duration.ZERO)
 
       @tailrec
@@ -54,7 +55,7 @@ trait SolverInstances {
       ): IntervalSeq[Instant] =
         if (i >= interval.upper)
           if (curState)
-            accum | (Bounded.unsafeOpenUpper(curStart, interval.upper))
+            accum | Interval.openUpper(curStart, interval.upper)
           else
             accum
         else if (metAt(i) == curState)
@@ -64,7 +65,7 @@ trait SolverInstances {
             i,
             curState = false,
             i + step,
-            accum | (Bounded.unsafeOpenUpper(curStart, i))
+            accum | Interval.openUpper(curStart, i)
           )
         else
           solve(i, curState = true, i + step, accum)
@@ -80,27 +81,27 @@ trait SolverInstances {
   implicit object ParabolaSolver extends Solver[SolverStrategy.Parabola] {
     def solve(
       metAt:    Instant => Boolean
-    )(interval: Bounded[Instant], step: Duration): IntervalSeq[Instant] = {
+    )(interval: BoundedInterval[Instant], step: Duration): IntervalSeq[Instant] = {
       require(step > Duration.ZERO)
 
       def solve(s: Instant, fs: Boolean, e: Instant, fe: Boolean): IntervalSeq[Instant] = {
         val m  = Instant.ofEpochMilli((s.toEpochMilli + e.toEpochMilli) / 2)
         val fm = metAt(m)
-        if (Bounded.unsafeOpenUpper(s, e).duration > step)
+        if (BoundedInterval.unsafeOpenUpper(s, e).duration > step)
           (fs, fm, fe) match {
             case (false, false, false) => solve(s, fs, m, fm) | (solve(m, fm, e, fe))
             case (false, false, true)  => solve(m, fm, e, fe)
             case (false, true, false)  => solve(s, fs, m, fm) | (solve(m, fm, e, fe))
             case (false, true, true)   =>
-              solve(s, fs, m, fm) | IntervalSeq(Bounded.unsafeOpenUpper(m, e))
+              solve(s, fs, m, fm) | IntervalSeq(Interval.openUpper(m, e))
             case (true, false, false)  => solve(s, fs, m, fm)
             case (true, false, true)   => solve(s, fs, m, fm) | (solve(m, fm, e, fe))
             case (true, true, false)   =>
-              IntervalSeq(Bounded.unsafeOpenUpper(s, m)) | (solve(m, fm, e, fe))
+              IntervalSeq(Interval.openUpper(s, m)) | (solve(m, fm, e, fe))
             case (true, true, true)    => solve(s, fs, m, fm) | (solve(m, fm, e, fe))
           }
         else if (fm)
-          IntervalSeq[Instant](Bounded.unsafeOpenUpper(s, e))
+          IntervalSeq[Instant](Interval.openUpper(s, e))
         else
           IntervalSeq.empty[Instant]
       }

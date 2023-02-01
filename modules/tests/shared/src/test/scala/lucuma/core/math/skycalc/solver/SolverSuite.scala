@@ -3,11 +3,11 @@
 
 package lucuma.core.math.skycalc.solver
 
-import cats.syntax.all._
+import cats.syntax.all.*
 import lucuma.core.math.IntervalGens
-import lucuma.core.math.skycalc.solver.RoundStrategy._
-import lucuma.core.math.skycalc.solver.SolverStrategy._
-import org.typelevel.cats.time._
+import lucuma.core.math.skycalc.solver.RoundStrategy.*
+import lucuma.core.math.skycalc.solver.SolverStrategy.*
+import org.typelevel.cats.time.*
 import spire.math.extras.interval.IntervalSeq
 
 import java.time.Duration
@@ -50,7 +50,7 @@ final class SolverSuite extends munit.DisciplineSuite with IntervalGens {
     assertEquals(IntervalSeq(buildInterval(250, 400)), solve(buildInterval(200, 400)))
     assertEquals(IntervalSeq(buildInterval(250, 450)), solve(buildInterval(200, 500)))
     assertEquals(
-      IntervalSeq(buildInterval(0, 150)) | buildInterval(250, 400),
+      IntervalSeq(buildInterval(0, 150)) | buildInterval(250, 400).toInterval,
       solve(buildInterval(0, 400))
     )
   }
@@ -63,7 +63,7 @@ final class SolverSuite extends munit.DisciplineSuite with IntervalGens {
     assertEquals(IntervalSeq(buildInterval(250, 400)), solve(buildInterval(200, 400)))
     assertEquals(IntervalSeq(buildInterval(250, 450)), solve(buildInterval(200, 500)))
     assertEquals(
-      IntervalSeq(buildInterval(0, 150)) | buildInterval(250, 400),
+      IntervalSeq(buildInterval(0, 150)) | buildInterval(250, 400).toInterval,
       solve(buildInterval(0, 400))
     )
   }
