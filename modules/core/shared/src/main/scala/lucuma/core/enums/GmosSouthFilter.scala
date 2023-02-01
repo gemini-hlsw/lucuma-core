@@ -5,6 +5,7 @@ package lucuma
 package core
 package enums
 
+import cats.data.NonEmptyList
 import cats.syntax.all._
 import lucuma.core.math.Wavelength
 import lucuma.core.util.Enumerated
@@ -58,6 +59,10 @@ object GmosSouthFilter {
   /** All members of GmosSouthFilter, in canonical order. */
   val all: List[GmosSouthFilter] =
     List(UPrime, GPrime, RPrime, IPrime, ZPrime, Z, Y, GG455, OG515, RG610, RG780, CaT, HartmannA_RPrime, HartmannB_RPrime, GPrime_GG455, GPrime_OG515, RPrime_RG610, IPrime_RG780, IPrime_CaT, ZPrime_CaT, Ha, SII, HaC, OIII, OIIIC, HeII, HeIIC, Lya395)
+
+  /** Acquisition filter options. */
+  val acquisition: NonEmptyList[GmosSouthFilter] =
+    NonEmptyList.of(UPrime, GPrime, RPrime, IPrime, ZPrime)
 
   /** Select the member of GmosSouthFilter with the given tag, if any. */
   def fromTag(s: String): Option[GmosSouthFilter] =
