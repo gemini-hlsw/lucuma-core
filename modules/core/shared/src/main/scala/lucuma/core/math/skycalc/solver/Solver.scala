@@ -8,12 +8,12 @@ import lucuma.core.math.BoundedInterval
 import lucuma.core.math.BoundedInterval.*
 import lucuma.core.syntax.time.*
 import org.typelevel.cats.time.*
+import spire.math.Interval
 import spire.math.extras.interval.IntervalSeq
 
 import java.time.Duration
 import java.time.Instant
 import scala.annotation.tailrec
-import spire.math.Interval
 
 object SolverStrategy {
   type Default

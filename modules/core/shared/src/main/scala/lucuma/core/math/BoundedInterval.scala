@@ -3,6 +3,7 @@
 
 package lucuma.core.math
 
+import algebra.ring.AdditiveMonoid
 import cats.Eq
 import cats.Order
 import cats.syntax.all.*
@@ -10,9 +11,8 @@ import spire.math.Bounded
 import spire.math.Empty
 import spire.math.Interval
 import spire.math.Point
-import spire.math.interval.ValueBound
-import algebra.ring.AdditiveMonoid
 import spire.math.extras.interval.IntervalSeq
+import spire.math.interval.ValueBound
 
 /**
   * A `BoundedInterval` is a `spire.math.Interval` but with both bounds defined.
