@@ -13,8 +13,7 @@ import lucuma.core.optics.syntax.ToPrismOps
  */
 package object syntax {
   object all
-      extends NonEmptyOps
-      with ToDisplayOps
+      extends ToDisplayOps
       with TimeOps
       with ToEnumeratedOps
       with ToIntOps
