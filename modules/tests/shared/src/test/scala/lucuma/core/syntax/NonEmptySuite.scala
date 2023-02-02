@@ -15,7 +15,7 @@ class NonEmptySuite extends munit.ScalaCheckSuite {
   test("focusMax") {
     forAll { (h: Int, t: List[Int]) =>
       val nel = NonEmptyList(h, t)
-      val z   = nel.focusMax
+      val z   = nel.toZipperMax
       assertEquals(z.focus, nel.toList.max)
       assertEquals(z.toNel, nel)
     }
@@ -24,7 +24,7 @@ class NonEmptySuite extends munit.ScalaCheckSuite {
   test("focusMin") {
     forAll { (h: Int, t: List[Int]) =>
       val nel = NonEmptyList(h, t)
-      val z   = nel.focusMin
+      val z   = nel.toZipperMin
       assertEquals(z.focus, nel.toList.min)
       assertEquals(z.toNel, nel)
     }
