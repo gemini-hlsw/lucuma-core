@@ -12,7 +12,7 @@ import nonempty.*
 
 class NonEmptySuite extends munit.ScalaCheckSuite {
 
-  test("focusMax") {
+  test("toZipperMax") {
     forAll { (h: Int, t: List[Int]) =>
       val nel = NonEmptyList(h, t)
       val z   = nel.toZipperMax
@@ -21,7 +21,7 @@ class NonEmptySuite extends munit.ScalaCheckSuite {
     }
   }
 
-  test("focusMin") {
+  test("toZipperMin") {
     forAll { (h: Int, t: List[Int]) =>
       val nel = NonEmptyList(h, t)
       val z   = nel.toZipperMin
