@@ -140,6 +140,29 @@ final class ZipperSuite extends munit.DisciplineSuite {
       assert(m)
     }
   }
+  test("focusFirst") {
+    forAll { (left: List[Int], focus: Int, right: List[Int]) =>
+      val orig  = Zipper(left, focus, right)
+      val first = orig.focusFirst
+      assertEquals(first.toNel, orig.toNel)
+      assertEquals(first.focus, left.lastOption.getOrElse(focus))
+    }
+  }
+  test("focusMax") {
+    forAll { (nel: NonEmptyList[Int]) =>
+      val z = Zipper.fromNel(nel).focusMax
+      assertEquals(z.focus, nel.toList.max)
+      assertEquals(z.toNel, nel)
+    }
+  }
+  test("focusMin") {
+    forAll { (nel: NonEmptyList[Int]) =>
+      val z = Zipper.fromNel(nel).focusMin
+      assertEquals(z.focus, nel.toList.min)
+      assertEquals(z.toNel, nel)
+    }
+  }
+
   checkAll("Functor[Zipper]", FunctorTests[Zipper].functor[Int, Int, Int])
   checkAll("Traversable[Zipper]",
            TraverseTests[Zipper].traverse[Int, Int, Int, Int, Option, Option]

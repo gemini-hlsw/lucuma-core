@@ -11,6 +11,8 @@ import cats.syntax.all._
 import monocle.Prism
 import monocle.Traversal
 
+import scala.annotation.tailrec
+
 /**
   * Minimal zipper based on scalaz's implementation
   * This is only meant for small collections. performance has not been optimized
@@ -60,6 +62,47 @@ protected[data] trait ZipperOps[A, +Z] {
             unmodified
         }).some
     }
+
+  def focusFirst: Z = {
+    val h :: t = toList : @unchecked
+    build(Nil, h, t)
+  }
+
+  /**
+   * Focuses on the first element (left to right) which is a maximum element
+   * in the zipper according to Order[A].
+   */
+  def focusMax(implicit ev: Order[A]): Z =
+    focusCompare(_ > _)
+
+  /**
+   * Focuses on the first element (left to right) which is a minimum element
+   * in the zipper according to Order[A].
+   */
+  def focusMin(implicit ev: Order[A]): Z =
+    focusCompare(_ < _)
+
+  private def focusCompare(f: (A, A) => Boolean): Z = {
+
+    @tailrec
+    def go(
+      cur: (List[A], A, List[A]),
+      res: (List[A], A, List[A])
+    ): (List[A], A, List[A]) =
+      cur._3 match {
+        case Nil              =>
+          res
+        case hRight :: tRight =>
+          val next = (cur._2 :: cur._1, hRight, tRight)
+          if (f(hRight, res._2)) go(next, next) else go(next, res)
+      }
+
+    // focus first
+    val h :: t = toList : @unchecked
+    val init   = (List.empty[A], h, t)
+
+    build.tupled(go(init, init))
+  }
 
   def exists(p: A => Boolean): Boolean =
     if (p(focus))
