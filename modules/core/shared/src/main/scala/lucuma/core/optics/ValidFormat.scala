@@ -13,4 +13,10 @@ trait ValidFormat[E, A, B] {
   val getValid: A => Either[E, B]
 
   val reverseGet: B => A
+
+  /** Like getValid, but throws IllegalArgumentException when Invalid. */
+  def unsafeGet(a: A): B =
+    getValid(a).getOrElse {
+      throw new IllegalArgumentException(s"unsafeGet failed: $a")
+    }
 }

@@ -31,16 +31,10 @@ abstract class ValidWedge[E, A, B] extends ValidFormat[E, A, B] with Serializabl
   def normalizeB(b: B): Either[E, B] =
     getValid.compose(reverseGet)(b)
 
-  /** Like getValid, but throws IllegalArgumentException when Invalid. */
-  def unsafeGet(a: A): B =
-    getValid(a).getOrElse {
-      throw new IllegalArgumentException(s"unsafeGet failed: $a")
-    }
-
-  /** Always return a single instance of `E` in case of an invalid `T`. */
-  def withError(e: E): ValidWedge[E, A, B] =
+  /** Override `E` in case of an invalid `T`. */
+  def withError(error: A => E): ValidWedge[E, A, B] =
     ValidWedge(
-      getValid.andThen(_.leftMap(_ => e)),
+      a => getValid(a).leftMap(_ => error(a)),
       reverseGet
     )
 
@@ -56,11 +50,11 @@ abstract class ValidWedge[E, A, B] extends ValidFormat[E, A, B] with Serializabl
     andThen(f.asValidWedge)
 
   /** Compose with a `Format`. */
-  def andThen[C](f: Format[B, C], error: E): ValidWedge[E, A, C] =
+  def andThen[C](f: Format[B, C], error: B => E): ValidWedge[E, A, C] =
     andThen(ValidWedge.fromFormat(f, error))
 
   /** Compose with a `Prism`. */
-  def andThen[C](f: Prism[B, C], error: E): ValidWedge[E, A, C] =
+  def andThen[C](f: Prism[B, C], error: B => E): ValidWedge[E, A, C] =
     andThen(ValidWedge.fromPrism(f, error))
 
   /** Compose with an `Iso`. */
@@ -71,7 +65,7 @@ abstract class ValidWedge[E, A, B] extends ValidFormat[E, A, B] with Serializabl
     )
 
   /** Compose with a `SplitEpi`. */
-  def andThen[C](f: SplitEpi[B, C], error: E): ValidWedge[E, A, C] =
+  def andThen[C](f: SplitEpi[B, C], error: B => E): ValidWedge[E, A, C] =
     andThen(ValidWedge.fromFormat(f.asFormat, error))
 
   /** Compose with a `SplitMono`. */
@@ -132,16 +126,16 @@ object ValidWedge {
   /**
    * Build `ValidWedge` from a `Format`
    */
-  def fromFormat[E, A, B](format: Format[A, B], error: E): ValidWedge[E, A, B] =
+  def fromFormat[E, A, B](format: Format[A, B], error: A => E): ValidWedge[E, A, B] =
     ValidWedge(
-      format.getOption.andThen(o => Either.fromOption(o, error)),
+      a => format.getOption(a).toRight(error(a)),
       format.reverseGet
     )
 
   /**
    * Build `ValidWedge` from a `Prism`
    */
-  def fromPrism[E, A, B](prism: Prism[A, B], error: E): ValidWedge[E, A, B] =
+  def fromPrism[E, A, B](prism: Prism[A, B], error: A => E): ValidWedge[E, A, B] =
     fromFormat(Format.fromPrism(prism), error)
 
   /**
@@ -156,7 +150,7 @@ object ValidWedge {
   /**
    * Build `ValidWedge` for a `Refined` predicate
    */
-  def forRefined[E, A, P](error: E)(implicit
+  def forRefined[E, A, P](error: A => E)(implicit
     v:                           RefinedValidate[A, P]
   ): ValidWedge[E, A, A Refined P] =
     fromPrism(refinedPrism[A, P], error)

@@ -34,16 +34,10 @@ abstract class ValidSplitEpi[E, A, B] extends ValidFormat[E, A, B] with Serializ
   def normalize(a: A): Either[E, A] =
     getValid(a).map(reverseGet)
 
-  /** Like getValid, but throws IllegalArgumentException when Invalid. */
-  def unsafeGet(a: A): B =
-    getValid(a).getOrElse {
-      throw new IllegalArgumentException(s"unsafeGet failed: $a")
-    }
-
-  /** Always return a single instance of `E` in case of an invalid `T`. */
-  def withError(e: E): ValidSplitEpi[E, A, B] =
+  /** Override `E` in case of an invalid `T`. */
+  def withError(error: A => E): ValidSplitEpi[E, A, B] =
     ValidSplitEpi(
-      getValid.andThen(_.leftMap(_ => e)),
+      a => getValid(a).leftMap(_ => error(a)),
       reverseGet
     )
 
@@ -66,12 +60,16 @@ abstract class ValidSplitEpi[E, A, B] extends ValidFormat[E, A, B] with Serializ
   def andThen[C](f: ValidWedge[E, B, C]): ValidWedge[E, A, C] =
     asValidWedge.andThen(f)
 
+  /** Compose with a `ValidSplitEpi`. */
+  def andThen(f: ValidFilter[E, B]): ValidSplitEpi[E, A, B] =
+    andThen(f.asValidSplitEpi)
+
   /** Compose with a `Format`. */
-  def andThen[C](f: Format[B, C], error: E): ValidSplitEpi[E, A, C] =
+  def andThen[C](f: Format[B, C], error: B => E): ValidSplitEpi[E, A, C] =
     andThen(ValidSplitEpi.fromFormat(f, error))
 
   /** Compose with a `Prism`. */
-  def andThen[C](f: Prism[B, C], error: E): ValidSplitEpi[E, A, C] =
+  def andThen[C](f: Prism[B, C], error: B => E): ValidSplitEpi[E, A, C] =
     andThen(ValidSplitEpi.fromPrism(f, error))
 
   /** Compose with an `Iso`. */
@@ -82,7 +80,7 @@ abstract class ValidSplitEpi[E, A, B] extends ValidFormat[E, A, B] with Serializ
     )
 
   /** Compose with a `SplitEpi`. */
-  def andThen[C](f: SplitEpi[B, C], error: E): ValidSplitEpi[E, A, C] =
+  def andThen[C](f: SplitEpi[B, C], error: B => E): ValidSplitEpi[E, A, C] =
     andThen(ValidSplitEpi.fromFormat(f.asFormat, error))
 
   /** Compose with a `SplitMono`. */
@@ -123,7 +121,7 @@ abstract class ValidSplitEpi[E, A, B] extends ValidFormat[E, A, B] with Serializ
   /**
    * Build `ValidSplitEpi` from another one, refining the return type with predicate `P`.
    */
-  def refined[P](error: E)(implicit ev: RefinedValidate[B, P]): ValidSplitEpi[E, A, Refined[B, P]] =
+  def refined[P](error: B => E)(implicit ev: RefinedValidate[B, P]): ValidSplitEpi[E, A, Refined[B, P]] =
     this.andThen(ValidSplitEpi.forRefined[E, B, P](error))
 }
 
@@ -149,16 +147,16 @@ object ValidSplitEpi {
   /**
    * Build optic from a Format
    */
-  def fromFormat[E, A, B](format: Format[A, B], error: E): ValidSplitEpi[E, A, B] =
+  def fromFormat[E, A, B](format: Format[A, B], error: A => E): ValidSplitEpi[E, A, B] =
     ValidSplitEpi(
-      format.getOption.andThen(o => Either.fromOption(o, error)),
+      a => format.getOption(a).toRight(error(a)),
       format.reverseGet
     )
 
   /**
    * Build optic from a Prism
    */
-  def fromPrism[E, A, B](prism: Prism[A, B], error: E): ValidSplitEpi[E, A, B] =
+  def fromPrism[E, A, B](prism: Prism[A, B], error: A => E): ValidSplitEpi[E, A, B] =
     fromFormat(Format.fromPrism(prism), error)
 
   /**
@@ -173,7 +171,7 @@ object ValidSplitEpi {
   /**
    * Build optic for a Refined predicate
    */
-  def forRefined[E, A, P](error: E)(implicit
+  def forRefined[E, A, P](error: A => E)(implicit
     v:                           RefinedValidate[A, P]
   ): ValidSplitEpi[E, A, A Refined P] =
     fromPrism(refinedPrism[A, P], error)
