@@ -4,12 +4,12 @@
 package lucuma.core.model.sequence
 
 import cats.kernel.laws.discipline._
+import lucuma.core.math.arb.ArbWavelength
 import lucuma.core.math.arb._
 import lucuma.core.model.sequence.arb._
 import lucuma.core.util.arb._
 import monocle.law.discipline._
 import munit._
-
 final class GmosGratingConfigSuite extends DisciplineSuite {
   import ArbGmosGratingConfig._
   import ArbEnumerated._

@@ -69,5 +69,3 @@ object ValidFilter:
 
     def lte[A: Order](bound: A, error: A => E): ValidFilter[E, A] =
       ValidFilter[E, A](_ <= bound, error)
-
-    

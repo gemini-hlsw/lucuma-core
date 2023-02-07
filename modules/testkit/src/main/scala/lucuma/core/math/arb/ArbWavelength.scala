@@ -6,11 +6,11 @@ package arb
 
 import eu.timepit.refined.scalacheck.numeric._
 import eu.timepit.refined.types.numeric.PosInt
+import lucuma.core.math.arb.ArbWavelength
 import lucuma.refined._
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Cogen._
 import org.scalacheck._
-
 trait ArbWavelength {
   val RedWavelength: Wavelength = Wavelength.picometers.get(620000.refined)
 

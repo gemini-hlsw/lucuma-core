@@ -6,6 +6,7 @@ package lucuma.core.math
 import cats.Eq
 import cats.syntax.all.*
 import coulomb.*
+import coulomb.ops.algebra.cats.quantity.given
 import coulomb.syntax.*
 import lucuma.core.math.arb.*
 import lucuma.core.math.units.Picometer
@@ -17,14 +18,9 @@ import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Prop.*
 
 class WavelengthDitherSuite extends DisciplineSuite {
-
+  import ArbQuantity.given
+  import ArbRefined.*
   import ArbWavelengthDither.given
-
-  given arbQuantityPbd[V: Arbitrary, U]: Arbitrary[Quantity[V, U]] =
-    Arbitrary(arbitrary[V].map(Quantity[U](_)))
-
-  given eqQuantity[V: Eq, U]: Eq[Quantity[V, U]] =
-    Eq.by(_.value)
 
   checkAll("picometers",  IsoTests(WavelengthDither.picometers))
   checkAll("angstroms",   FormatTests(WavelengthDither.angstroms).format)
