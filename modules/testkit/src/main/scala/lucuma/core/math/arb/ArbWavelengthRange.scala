@@ -4,19 +4,19 @@
 package lucuma.core.math
 package arb
 
-import eu.timepit.refined.scalacheck.numeric._
+import eu.timepit.refined.scalacheck.numeric.*
 import eu.timepit.refined.types.numeric.PosInt
-import lucuma.refined._
+import lucuma.refined.*
 import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.Cogen._
-import org.scalacheck._
+import org.scalacheck.Cogen.*
+import org.scalacheck.*
 
-trait ArbWavelengthCoverage:
-  given Arbitrary[WavelengthCoverage] = Arbitrary(
-    arbitrary[PosInt].map(WavelengthCoverage(_))
+trait ArbWavelengthRange:
+  given Arbitrary[WavelengthRange] = Arbitrary(
+    arbitrary[PosInt].map(WavelengthRange(_))
   )
 
-  given Cogen[WavelengthCoverage] =
+  given Cogen[WavelengthRange] =
     Cogen[Int].contramap(_.toPicometers.value.value)
 
-object ArbWavelengthCoverage extends ArbWavelengthCoverage
+object ArbWavelengthRange extends ArbWavelengthRange

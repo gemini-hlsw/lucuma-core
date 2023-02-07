@@ -13,7 +13,7 @@ import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.math.Angle
 import lucuma.core.math.BoundedInterval
 import lucuma.core.math.Wavelength
-import lucuma.core.math.WavelengthCoverage
+import lucuma.core.math.WavelengthRange
 import lucuma.core.math.units.{_, given}
 import lucuma.core.util.Enumerated
 import spire.math.Rational
@@ -29,7 +29,7 @@ sealed abstract class GmosSouthGrating(
   val longName:             String,
   val rulingDensity:        Int,
   val dispersion:           Quantity[Rational, NanometersPerPixel],
-  val simultaneousCoverage: WavelengthCoverage,
+  val simultaneousCoverage: WavelengthRange,
   val blazeWavelength:      Wavelength,
   val referenceResolution:  PosInt,
   val obsolete:             Boolean
@@ -61,8 +61,8 @@ object GmosSouthGrating {
   private def pmToDispersion(pm: Int): Quantity[Rational, NanometersPerPixel] =
     PosInt.unsafeFrom(pm).withUnit[PicometersPerPixel].toValue[Rational].toUnit[NanometersPerPixel]
 
-  private def nmToWavelengthCoverage(value: Int): WavelengthCoverage =
-    WavelengthCoverage.fromIntNanometers(value).get
+  private def nmToWavelengthRange(value: Int): WavelengthRange =
+    WavelengthRange.fromIntNanometers(value).get
 
   private def blazeNm(value: Int): Wavelength =
     Wavelength.fromIntNanometers(value).get
@@ -77,7 +77,7 @@ object GmosSouthGrating {
     longName             = "B1200_G5321",
     rulingDensity        = 1200,
     dispersion           = pmToDispersion( 26),
-    simultaneousCoverage = nmToWavelengthCoverage( 159),
+    simultaneousCoverage = nmToWavelengthRange( 159),
     blazeWavelength      = blazeNm( 463),
     referenceResolution  = resolution(3744),
     obsolete             = false
@@ -90,7 +90,7 @@ object GmosSouthGrating {
     longName             = "R831_G5322",
     rulingDensity        = 831,
     dispersion           = pmToDispersion( 38),
-    simultaneousCoverage = nmToWavelengthCoverage( 230),
+    simultaneousCoverage = nmToWavelengthRange( 230),
     blazeWavelength      = blazeNm(757),
     referenceResolution  = resolution(4396),
     obsolete             = false
@@ -103,7 +103,7 @@ object GmosSouthGrating {
     longName             = "B600_G5323",
     rulingDensity        = 600,
     dispersion           = pmToDispersion( 50),
-    simultaneousCoverage = nmToWavelengthCoverage( 307),
+    simultaneousCoverage = nmToWavelengthRange( 307),
     blazeWavelength      = blazeNm( 461),
     referenceResolution  = resolution(1688),
     obsolete             = false
@@ -116,7 +116,7 @@ object GmosSouthGrating {
     longName             = "R600_G5324",
     rulingDensity        = 600,
     dispersion           = pmToDispersion( 52),
-    simultaneousCoverage = nmToWavelengthCoverage( 318),
+    simultaneousCoverage = nmToWavelengthRange( 318),
     blazeWavelength      = blazeNm( 926),
     referenceResolution  = resolution(3744),
     obsolete             = false
@@ -129,7 +129,7 @@ object GmosSouthGrating {
     longName             = "B480_G5327",
     rulingDensity        = 480,
     dispersion           = pmToDispersion( 62),
-    simultaneousCoverage = nmToWavelengthCoverage( 390),
+    simultaneousCoverage = nmToWavelengthRange( 390),
     blazeWavelength      = blazeNm( 422),
     referenceResolution  = resolution(1520),
     obsolete             = false
@@ -142,7 +142,7 @@ object GmosSouthGrating {
     longName             = "R400_G5325",
     rulingDensity        = 400,
     dispersion           = pmToDispersion( 74),
-    simultaneousCoverage = nmToWavelengthCoverage( 462),
+    simultaneousCoverage = nmToWavelengthRange( 462),
     blazeWavelength      = blazeNm( 764),
     referenceResolution  = resolution(1918),
     obsolete             = false
@@ -155,7 +155,7 @@ object GmosSouthGrating {
     longName             = "R150_G5326",
     rulingDensity        = 150,
     dispersion           = pmToDispersion(193),
-    simultaneousCoverage = nmToWavelengthCoverage(1190),
+    simultaneousCoverage = nmToWavelengthRange(1190),
     blazeWavelength      = blazeNm( 717),
     referenceResolution  = resolution(631),
     obsolete             = false
