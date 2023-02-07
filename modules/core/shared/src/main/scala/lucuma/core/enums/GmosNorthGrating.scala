@@ -13,7 +13,7 @@ import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.math.Angle
 import lucuma.core.math.BoundedInterval
 import lucuma.core.math.Wavelength
-import lucuma.core.math.WavelengthCoverage
+import lucuma.core.math.WavelengthRange
 import lucuma.core.math.units.{_, given}
 import lucuma.core.util.Enumerated
 import spire.math.Rational
@@ -29,7 +29,7 @@ sealed abstract class GmosNorthGrating(
   val longName:             String,
   val rulingDensity:        Int,
   val dispersion:           Quantity[Rational, NanometersPerPixel],
-  val simultaneousCoverage: WavelengthCoverage,
+  val simultaneousCoverage: WavelengthRange,
   val blazeWavelength:      Wavelength,
   val referenceResolution:  PosInt,
   val obsolete:             Boolean
@@ -61,8 +61,8 @@ object GmosNorthGrating {
   private def pmToDispersion(pm: Int): Quantity[Rational, NanometersPerPixel] =
     PosInt.unsafeFrom(pm).withUnit[PicometersPerPixel].toValue[Rational].toUnit[NanometersPerPixel]
 
-  private def nmToWavelengthCoverage(value: Int): WavelengthCoverage =
-    WavelengthCoverage.fromIntNanometers(value).get
+  private def nmToWavelengthRange(value: Int): WavelengthRange =
+    WavelengthRange.fromIntNanometers(value).get
 
   private def blazeNm(value: Int): Wavelength =
     Wavelength.fromIntNanometers(value).get
@@ -77,7 +77,7 @@ object GmosNorthGrating {
     longName             = "B1200_G5301",
     rulingDensity        = 1200,
     dispersion           = pmToDispersion( 26),
-    simultaneousCoverage = nmToWavelengthCoverage( 164),
+    simultaneousCoverage = nmToWavelengthRange( 164),
     blazeWavelength      = blazeNm( 463),
     referenceResolution  = resolution(3744),
     obsolete             = false
@@ -90,7 +90,7 @@ object GmosNorthGrating {
     longName             = "R831_G5302",
     rulingDensity        = 831,
     dispersion           = pmToDispersion( 38),
-    simultaneousCoverage = nmToWavelengthCoverage( 235),
+    simultaneousCoverage = nmToWavelengthRange( 235),
     blazeWavelength      = blazeNm(757),
     referenceResolution  = resolution(4396),
     obsolete             = false
@@ -103,7 +103,7 @@ object GmosNorthGrating {
     longName             = "B600_G5303",
     rulingDensity        = 600,
     dispersion           = pmToDispersion( 45),
-    simultaneousCoverage = nmToWavelengthCoverage( 276),
+    simultaneousCoverage = nmToWavelengthRange( 276),
     blazeWavelength      = blazeNm( 461),
     referenceResolution  = resolution(1688),
     obsolete             = true
@@ -116,7 +116,7 @@ object GmosNorthGrating {
     longName             = "B600_G5307",
     rulingDensity        = 600,
     dispersion           = pmToDispersion( 50),
-    simultaneousCoverage = nmToWavelengthCoverage( 317),
+    simultaneousCoverage = nmToWavelengthRange( 317),
     blazeWavelength      = blazeNm( 461),
     referenceResolution  = resolution(1688),
     obsolete             = false
@@ -129,7 +129,7 @@ object GmosNorthGrating {
     longName             = "R600_G5304",
     rulingDensity        = 600,
     dispersion           = pmToDispersion( 52),
-    simultaneousCoverage = nmToWavelengthCoverage( 328),
+    simultaneousCoverage = nmToWavelengthRange( 328),
     blazeWavelength      = blazeNm( 926),
     referenceResolution  = resolution(3744),
     obsolete             = false
@@ -142,7 +142,7 @@ object GmosNorthGrating {
     longName             = "B480_G5309",
     rulingDensity        = 480,
     dispersion           = pmToDispersion( 62),
-    simultaneousCoverage = nmToWavelengthCoverage( 390),
+    simultaneousCoverage = nmToWavelengthRange( 390),
     blazeWavelength      = blazeNm( 422),
     referenceResolution  = resolution(1520),
     obsolete             = false
@@ -155,7 +155,7 @@ object GmosNorthGrating {
     longName             = "R400_G5305",
     rulingDensity        = 400,
     dispersion           = pmToDispersion( 74),
-    simultaneousCoverage = nmToWavelengthCoverage( 472),
+    simultaneousCoverage = nmToWavelengthRange( 472),
     blazeWavelength      = blazeNm( 764),
     referenceResolution  = resolution(1918),
     obsolete             = false
@@ -168,7 +168,7 @@ object GmosNorthGrating {
     longName             = "R150_G5306",
     rulingDensity        = 150,
     dispersion           = pmToDispersion(174),
-    simultaneousCoverage = nmToWavelengthCoverage(1071),
+    simultaneousCoverage = nmToWavelengthRange(1071),
     blazeWavelength      = blazeNm( 717),
     referenceResolution  = resolution(631),
     obsolete             = true
@@ -181,7 +181,7 @@ object GmosNorthGrating {
     longName             = "R150_G5308",
     rulingDensity        = 150,
     dispersion           = pmToDispersion(193),
-    simultaneousCoverage = nmToWavelengthCoverage(1219),
+    simultaneousCoverage = nmToWavelengthRange(1219),
     blazeWavelength      = blazeNm( 717),
     referenceResolution  = resolution(631),
     obsolete             = false

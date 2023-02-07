@@ -30,10 +30,10 @@ import scala.annotation.targetName
  * central `Wavelength`, which results in a wavelength interval (ie: a 
  * `BoundedInterval[Wavelength]`).
  */
-opaque type WavelengthCoverage = Quantity[PosInt, Picometer]
+opaque type WavelengthRange = Quantity[PosInt, Picometer]
 
-object WavelengthCoverage:
-  extension (w: WavelengthCoverage) {
+object WavelengthRange:
+  extension (w: WavelengthRange) {
     def toPicometers: Quantity[PosInt, Picometer] =
       w
 
@@ -112,30 +112,30 @@ object WavelengthCoverage:
       toMicrometers
   }
 
-  def apply(pm: Quantity[PosInt, Picometer]): WavelengthCoverage =
+  def apply(pm: Quantity[PosInt, Picometer]): WavelengthRange =
     pm
 
   /**
-    * Construct a wavelength coverage from a positive int
+    * Construct a wavelength range from a positive int
     * @group constructor
     */
   @targetName("applyPicometers") // to distinguish from apply(Quantity[PosInt, Picometer])
-  def apply(picometers: PosInt): WavelengthCoverage =
+  def apply(picometers: PosInt): WavelengthRange =
     picometers.withUnit[Picometer]
 
   /** @group Typeclass Instances */
-  given Show[WavelengthCoverage] =
+  given Show[WavelengthRange] =
     Show.fromToString
 
   /** @group Typeclass Instances */
-  given Order[WavelengthCoverage] =
+  given Order[WavelengthRange] =
     Order.by(_.value)
 
-  val picometers: Iso[PosInt, WavelengthCoverage] =
-    Iso[PosInt, WavelengthCoverage](_.withUnit[Picometer])(_.toPicometers.value)
+  val picometers: Iso[PosInt, WavelengthRange] =
+    Iso[PosInt, WavelengthRange](_.withUnit[Picometer])(_.toPicometers.value)
 
-  def pbdFormat[U](right: Int)(to: WavelengthCoverage => Quantity[PosBigDecimal, U]): Format[Quantity[PosBigDecimal, U], WavelengthCoverage] = {
-    def from(v: Quantity[PosBigDecimal, U]): Option[WavelengthCoverage] =
+  def pbdFormat[U](right: Int)(to: WavelengthRange => Quantity[PosBigDecimal, U]): Format[Quantity[PosBigDecimal, U], WavelengthRange] = {
+    def from(v: Quantity[PosBigDecimal, U]): Option[WavelengthRange] =
       (scala.util.control.Exception.catching(classOf[ArithmeticException]) opt
         v.value
          .bigDecimal
@@ -144,20 +144,20 @@ object WavelengthCoverage:
          .intValueExact
       ).flatMap(i => PosInt.from(i).toOption).map(Quantity[Picometer](_))
 
-    Format[Quantity[PosBigDecimal, U], WavelengthCoverage](from, to)
+    Format[Quantity[PosBigDecimal, U], WavelengthRange](from, to)
   }
 
-  val angstroms: Format[Quantity[PosBigDecimal, Angstrom], WavelengthCoverage] =
+  val angstroms: Format[Quantity[PosBigDecimal, Angstrom], WavelengthRange] =
     pbdFormat(2)(_.toAngstroms)
 
-  val nanometers: Format[Quantity[PosBigDecimal, Nanometer], WavelengthCoverage] =
+  val nanometers: Format[Quantity[PosBigDecimal, Nanometer], WavelengthRange] =
     pbdFormat(3)(_.toNanometers)
 
-  val micrometers: Format[Quantity[PosBigDecimal, Micrometer], WavelengthCoverage] =
+  val micrometers: Format[Quantity[PosBigDecimal, Micrometer], WavelengthRange] =
     pbdFormat(6)(_.toMicrometers)
 
-  val intPicometers: Prism[Int, WavelengthCoverage] =
-    Prism[Int, WavelengthCoverage](pm =>
+  val intPicometers: Prism[Int, WavelengthRange] =
+    Prism[Int, WavelengthRange](pm =>
       PosInt.from(pm).toOption.map(_.withUnit[Picometer])
     )(_.value.value)
 
@@ -165,39 +165,39 @@ object WavelengthCoverage:
    * Try to build a Wavelength from a plain Int. Negatives and Zero will produce a None.
    * @group constructor
    */
-  def fromIntPicometers(i: Int): Option[WavelengthCoverage] =
+  def fromIntPicometers(i: Int): Option[WavelengthRange] =
     intPicometers.getOption(i)
 
-  def unsafeFromIntPicometers(i: Int): WavelengthCoverage =
-    fromIntPicometers(i).getOrElse(sys.error(s"Cannot build a WavelengthCoverage with value $i"))
+  def unsafeFromIntPicometers(i: Int): WavelengthRange =
+    fromIntPicometers(i).getOrElse(sys.error(s"Cannot build a WavelengthRange with value $i"))
 
-  private def fromInt(max: Int, mult: Int): Int => Option[WavelengthCoverage] =
+  private def fromInt(max: Int, mult: Int): Int => Option[WavelengthRange] =
     i => Option.when((i > 0) && (i <= max))(i * mult).flatMap(fromIntPicometers)
 
-  def fromIntAngstroms(i: Int): Option[WavelengthCoverage] =
+  def fromIntAngstroms(i: Int): Option[WavelengthRange] =
     fromInt(Wavelength.MaxAngstrom, 100)(i)
 
-  def fromIntNanometers(i: Int): Option[WavelengthCoverage] =
+  def fromIntNanometers(i: Int): Option[WavelengthRange] =
     fromInt(Wavelength.MaxNanometer, 1_000)(i)
 
-  def fromIntMicrometers(i: Int): Option[WavelengthCoverage] =
+  def fromIntMicrometers(i: Int): Option[WavelengthRange] =
     fromInt(Wavelength.MaxMicrometer, 1_000_000)(i)
 
-  private def scalingFormat(move: Int): Format[BigDecimal, WavelengthCoverage] =
+  private def scalingFormat(move: Int): Format[BigDecimal, WavelengthRange] =
     Format[BigDecimal, Int](
       bd => scala.util.control.Exception.catching(classOf[ArithmeticException]) opt
         bd.bigDecimal.movePointRight(move).setScale(0, RoundingMode.HALF_UP).intValueExact,
       i  => BigDecimal(new java.math.BigDecimal(i).movePointLeft(move))
     ).andThen(intPicometers)
 
-  val decimalPicometers: Format[BigDecimal, WavelengthCoverage] =
+  val decimalPicometers: Format[BigDecimal, WavelengthRange] =
     scalingFormat(0)
 
-  val decimalAngstroms: Format[BigDecimal, WavelengthCoverage] =
+  val decimalAngstroms: Format[BigDecimal, WavelengthRange] =
     scalingFormat(2)
 
-  val decimalNanometers: Format[BigDecimal, WavelengthCoverage] =
+  val decimalNanometers: Format[BigDecimal, WavelengthRange] =
     scalingFormat(3)
 
-  val decimalMicrometers: Format[BigDecimal, WavelengthCoverage] =
+  val decimalMicrometers: Format[BigDecimal, WavelengthRange] =
     scalingFormat(6)
