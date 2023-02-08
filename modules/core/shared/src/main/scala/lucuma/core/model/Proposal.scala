@@ -21,7 +21,7 @@ final case class Proposal(
   title:         Option[NonEmptyString],
   proposalClass: ProposalClass,
   category:      Option[TacCategory],
-  toOActivation: ToOActivation,
+  toOActivation: Option[ToOActivation],
   abstrakt:      Option[NonEmptyString],
   partnerSplits: SortedMap[Partner, IntPercent]
 )
@@ -35,7 +35,7 @@ object Proposal {
   val partnerSplits = Focus[Proposal](_.partnerSplits)
 
   val Default: Proposal =
-    Proposal(None, ProposalClass.Queue(80.refined), None, ToOActivation.None, None, SortedMap.empty)
+    Proposal(None, ProposalClass.Queue(80.refined), None, ToOActivation.None.some, None, SortedMap.empty)
 
   implicit val eqProposal: Eq[Proposal] = Eq.instance {
     case (Proposal(t1, pc1, c1, to1, a1, ps1), Proposal(t2, pc2, c2, to2, a2, ps2)) =>

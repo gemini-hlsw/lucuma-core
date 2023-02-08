@@ -31,7 +31,7 @@ trait ArbProposal {
         title    <- arbitrary[Option[NonEmptyString]]
         pClass   <- arbitrary[ProposalClass]
         category <- arbitrary[Option[TacCategory]]
-        too      <- arbitrary[ToOActivation]
+        too      <- arbitrary[Option[ToOActivation]]
         abstrakt <- arbitrary[Option[NonEmptyString]]
         splits   <- arbitrary[SortedMap[Partner, IntPercent]]
       } yield Proposal(title, pClass, category, too, abstrakt, splits)
@@ -42,7 +42,7 @@ trait ArbProposal {
       (Option[NonEmptyString],
        ProposalClass,
        Option[TacCategory],
-       ToOActivation,
+       Option[ToOActivation],
        Option[NonEmptyString],
        SortedMap[Partner, IntPercent]
       )
