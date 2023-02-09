@@ -11,12 +11,13 @@ import org.scalacheck.Arbitrary._
 import org.scalacheck.Cogen
 
 trait ArbRefined {
-  val BigDecimalZero: BigDecimal      = BigDecimal(0)
-  val PosBigDecimalOne: PosBigDecimal = BigDecimal(1).refined
+  val BigDecimalZero: BigDecimal      = BigDecimal(java.math.BigDecimal.ZERO)
+  val BigDecimalOne: BigDecimal      = BigDecimal(java.math.BigDecimal.ONE)
+  val PosBigDecimalOne: PosBigDecimal = PosBigDecimal.unsafeFrom(BigDecimalOne)
 
   // Refined does not derive this arbitrary. Generally deriving `Arbitrary` instances for `Pos`
   // numbers requires instances of `Adjacent` and `Max`, which don't exist for `BigDecimal`.
-  implicit val arbPosBigDecimal: Arbitrary[PosBigDecimal] =
+  given Arbitrary[PosBigDecimal] =
     Arbitrary(
       arbitrary[BigDecimal]
         .map {
@@ -25,7 +26,7 @@ trait ArbRefined {
         }
     )
 
-  implicit def cogenRefined[A: Cogen, P]: Cogen[A Refined P] =
+  given cogenRefined[A: Cogen, P]: Cogen[A Refined P] =
     Cogen[A].contramap(_.value)
 }
 

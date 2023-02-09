@@ -3,8 +3,10 @@
 
 package lucuma.core.math.arb
 
+import eu.timepit.refined.scalacheck.numeric.*
 import lucuma.core.arb.*
 import lucuma.core.math.BrightnessValue
+import lucuma.core.math.arb.ArbRefined.given
 import org.scalacheck.Arbitrary
 import org.scalacheck.Cogen
 

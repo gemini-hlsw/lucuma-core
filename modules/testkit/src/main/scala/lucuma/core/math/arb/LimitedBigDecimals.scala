@@ -1,14 +1,14 @@
 // Copyright (c) 2016-2023 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package lucuma.core.validation
+package lucuma.core.math.arb
 
 import eu.timepit.refined.types.numeric.PosBigDecimal
-import org.scalacheck.Arbitrary
+import org.scalacheck.Arbitrary.arbitrary
+import org.scalacheck.*
 
 trait LimitedBigDecimals:
-  // The scientific notation formatters use `java.text.DecimalFormat` which in Scala.js seems
-  // to have trouble formatting BigDecimals with very high absolute scale or precision.
+  // Scala.js seems to have trouble formatting BigDecimals with very high absolute scale or precision.
   // We therefore use these bounded arbitraries.
   implicit lazy val arbBigDecimalLimitedPrecision: Arbitrary[BigDecimal] =
     Arbitrary(
@@ -17,7 +17,7 @@ trait LimitedBigDecimals:
       )
     )
 
-  implicit lazy val arbPosBigDecimalLimitedPrecision: Arbitrary[PosBigDecimal] =
+  implicit protected lazy val arbPosBigDecimalLimitedPrecision: Arbitrary[PosBigDecimal] =
     Arbitrary(
       arbBigDecimalLimitedPrecision.arbitrary
         .map(_.abs)

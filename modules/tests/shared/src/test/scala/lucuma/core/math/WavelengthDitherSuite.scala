@@ -19,7 +19,7 @@ import org.scalacheck.Prop.*
 
 class WavelengthDitherSuite extends DisciplineSuite {
   import ArbQuantity.given
-  import ArbRefined.*
+  import ArbRefined.given
   import ArbWavelengthDither.given
 
   checkAll("picometers",  IsoTests(WavelengthDither.picometers))

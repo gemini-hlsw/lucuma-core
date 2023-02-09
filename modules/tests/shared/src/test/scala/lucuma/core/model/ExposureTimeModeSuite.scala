@@ -18,7 +18,7 @@ import munit.DisciplineSuite
 class ExposureTimeModeSuite extends DisciplineSuite {
   import ArbTimeSpan.given
   import ArbExposureTimeMode.given
-  import ArbRefined.*
+  import ArbRefined.given
 
   checkAll("Eq[ExposureTimeMode]", EqTests[ExposureTimeMode].eqv)
   checkAll("ExposureTimeMode.signalToNoise", PrismTests(ExposureTimeMode.signalToNoise))

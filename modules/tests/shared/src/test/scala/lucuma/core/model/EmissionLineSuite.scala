@@ -21,7 +21,7 @@ import munit.*
 final class EmissionLineSuite extends DisciplineSuite {
   import ArbEnumerated.*
   import ArbEmissionLine.given
-  import ArbRefined.*
+  import ArbRefined.{*, given}
   import ArbMeasure.given
   import ArbQuantity.given
 

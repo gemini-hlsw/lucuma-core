@@ -33,7 +33,7 @@ final class SpectralDefinitionSuite extends DisciplineSuite {
   import ArbEmissionLine.given
   import ArbEnumerated.*
   import ArbMeasure.given
-  import ArbRefined.*
+  import ArbRefined.{*, given}
   import ArbSpectralDefinition.given
   import ArbUnnormalizedSED.given
   import ArbWavelength.*
@@ -44,7 +44,7 @@ final class SpectralDefinitionSuite extends DisciplineSuite {
     SpectralDefinition.BandNormalized(
       UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.A0I).some,
       SortedMap(
-        Band.R -> Band.R.defaultUnits[Integrated].withValueTagged(BrightnessValue(BigDecimal(10.0)))
+        Band.R -> Band.R.defaultUnits[Integrated].withValueTagged(BrightnessValue.unsafeFrom(10.0))
       )
     )
 
@@ -52,7 +52,7 @@ final class SpectralDefinitionSuite extends DisciplineSuite {
     SpectralDefinition.BandNormalized(
       UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.A0I).some,
       SortedMap(
-        Band.R -> Band.R.defaultUnits[Surface].withValueTagged(BrightnessValue(BigDecimal(10.0)))
+        Band.R -> Band.R.defaultUnits[Surface].withValueTagged(BrightnessValue.unsafeFrom(10.0))
       )
     )
 

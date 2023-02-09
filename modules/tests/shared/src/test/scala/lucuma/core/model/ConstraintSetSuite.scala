@@ -16,7 +16,7 @@ final class ConstraintSetSuite extends DisciplineSuite {
   import ArbConstraintSet._
   import ArbElevationRange._
   import ArbEnumerated._
-  import ArbRefined._
+  import ArbRefined.given
 
   // Laws
   checkAll("Eq[ConstraintSet]", EqTests[ConstraintSet].eqv)

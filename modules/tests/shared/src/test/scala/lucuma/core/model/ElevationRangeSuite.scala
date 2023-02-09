@@ -16,7 +16,7 @@ import munit._
 final class ElevationRangeSuite extends DisciplineSuite {
   import ArbElevationRange._
   import ArbEnumerated._
-  import ArbRefined._
+  import ArbRefined.given
 
   // Laws
   checkAll("Eq[ElevationRange.AirMass]", EqTests[ElevationRange.AirMass].eqv)

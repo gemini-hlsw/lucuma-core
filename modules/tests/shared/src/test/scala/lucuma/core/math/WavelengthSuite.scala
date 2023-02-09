@@ -33,7 +33,7 @@ import java.math.RoundingMode
 
 final class WavelengthSuite extends munit.DisciplineSuite {
   import ArbQuantity.given
-  import ArbRefined.*
+  import ArbRefined.given
   import ArbWavelength.*
   import ArbWavelengthDither.given
 

@@ -19,7 +19,7 @@ final class UnnormalizedSEDSuite extends DisciplineSuite {
   import ArbUnnormalizedSED.given
   import ArbEnumerated.*
   import ArbQuantity.given
-  import ArbRefined.*
+  import ArbRefined.given
 
   // Laws
   checkAll("Order[CoolStarModel]", OrderTests[CoolStarModel].order)

@@ -17,7 +17,7 @@ final class GmosNodAndShuffleSuite extends DisciplineSuite {
   import ArbGmosNodAndShuffle._
   import ArbOffset._
   import ArbEnumerated._
-  import ArbRefined._
+  import ArbRefined.given
 
   checkAll("Eq[GmosNodAndShuffle]", EqTests[GmosNodAndShuffle].eqv)
   checkAll("GmosNodAndShuffle.posA", LensTests(GmosNodAndShuffle.posA))
