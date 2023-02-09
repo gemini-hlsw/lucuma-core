@@ -8,7 +8,7 @@ import lucuma.core.math.BrightnessValue
 import org.scalacheck.Arbitrary
 import org.scalacheck.Cogen
 
-trait ArbBrightnessValue:
+trait ArbBrightnessValue extends LimitedBigDecimals:
   given Arbitrary[BrightnessValue] = newTypeArbitrary(BrightnessValue)
   given Cogen[BrightnessValue] = newTypeCogen(BrightnessValue)
 

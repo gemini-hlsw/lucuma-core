@@ -6,6 +6,7 @@ package lucuma.core.validation
 import eu.timepit.refined.cats.*
 import eu.timepit.refined.scalacheck.all.*
 import eu.timepit.refined.types.numeric.PosBigDecimal
+import lucuma.core.math.arb.LimitedBigDecimals
 import lucuma.core.optics.laws.discipline.ValidSplitEpiTests
 import munit.DisciplineSuite
 import org.scalacheck.Arbitrary
