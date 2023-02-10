@@ -17,7 +17,7 @@ import munit._
 final class GmosFpuMaskSuite extends DisciplineSuite {
   import ArbGmosFpuMask._
   import ArbEnumerated._
-  import ArbRefined._
+  import ArbRefined.given
 
   checkAll(
     "Eq[GmosFpuMask.Builtin[GmosNorthGrating]]",

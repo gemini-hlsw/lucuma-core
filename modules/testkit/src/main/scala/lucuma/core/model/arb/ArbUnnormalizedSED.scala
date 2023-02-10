@@ -26,7 +26,7 @@ import org.scalacheck.*
 trait ArbUnnormalizedSED {
   import ArbEnumerated.*
   import UnnormalizedSED.*
-  import ArbRefined.*
+  import ArbRefined.given
   import ArbWavelength.*
 
   given Arbitrary[StellarLibrary] =

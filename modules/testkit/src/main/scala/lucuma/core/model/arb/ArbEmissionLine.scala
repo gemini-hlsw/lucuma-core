@@ -21,7 +21,7 @@ trait ArbEmissionLine {
   import ArbEnumerated.*
   import BrightnessUnits.*
   import ArbMeasure.given
-  import ArbRefined.*
+  import ArbRefined.given
 
   given arbEmissionLine[T](using
     arbLineFluxUnit: Arbitrary[Units Of LineFlux[T]]

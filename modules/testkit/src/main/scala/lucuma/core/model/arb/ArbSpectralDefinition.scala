@@ -29,7 +29,7 @@ trait ArbSpectralDefinition {
   import ArbEmissionLine.given
   import ArbEnumerated.*
   import ArbMeasure.given
-  import ArbRefined.*
+  import ArbRefined.given
   import ArbUnnormalizedSED.given
   import ArbWavelength.*
   import BrightnessUnits.*

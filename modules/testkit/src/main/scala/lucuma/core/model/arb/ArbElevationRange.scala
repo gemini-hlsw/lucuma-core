@@ -4,16 +4,16 @@
 package lucuma.core.model
 package arb
 
-import eu.timepit.refined.scalacheck.numeric._
+import eu.timepit.refined.scalacheck.numeric.*
 import lucuma.core.math.arb.ArbRefined
 import lucuma.core.util.arb.ArbEnumerated
 import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.Cogen._
-import org.scalacheck._
+import org.scalacheck.Cogen.*
+import org.scalacheck.*
 
 trait ArbElevationRange {
-  import ArbEnumerated._
-  import ArbRefined._
+  import ArbEnumerated.*
+  import ArbRefined.given
 
   implicit val arbAirMassRange: Arbitrary[ElevationRange.AirMass] =
     Arbitrary {

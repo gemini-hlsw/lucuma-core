@@ -18,7 +18,7 @@ import org.scalacheck.*
 trait ArbExposureTimeMode {
   import ExposureTimeMode.*
   import ArbTimeSpan.given
-  import ArbRefined.*
+  import ArbRefined.given
 
   given Arbitrary[SignalToNoise] =
     Arbitrary {

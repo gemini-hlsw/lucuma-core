@@ -17,7 +17,7 @@ import monocle.law.discipline.PrismTests
 import munit.DisciplineSuite
 
 class OpticsSpec extends DisciplineSuite {
-  import ArbRefined._
+  import ArbRefined.given
   import ArbQuantity.given // This import has to be last.
   
   checkAll("refinedPrism[String, NonEmpty]", PrismTests(refinedPrism[String, NonEmpty]))

@@ -34,7 +34,7 @@ class TargetSuite extends DisciplineSuite {
   import ArbParallax.*
   import ArbProperMotion.given
   import ArbRadialVelocity.given
-  import ArbRefined.*
+  import ArbRefined.given
   import ArbRightAscension.*
   import ArbSiderealTracking.given
   import ArbSourceProfile.given

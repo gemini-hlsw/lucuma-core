@@ -5,6 +5,7 @@ package lucuma.core.model
 
 import cats.Eq
 import cats.syntax.all.*
+import eu.timepit.refined.cats.given
 import eu.timepit.refined.types.numeric.PosBigDecimal
 import lucuma.core.enums.Band
 import lucuma.core.math.Angle

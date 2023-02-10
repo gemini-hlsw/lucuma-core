@@ -15,7 +15,7 @@ import org.scalacheck._
 
 trait ArbGmosFpuMask {
   import ArbEnumerated._
-  import ArbRefined._
+  import ArbRefined.given
 
   implicit def arbGmosBuiltinFpuMask[T: Arbitrary]: Arbitrary[GmosFpuMask.Builtin[T]] =
     Arbitrary(arbitrary[T].map(GmosFpuMask.Builtin.apply))
