@@ -22,7 +22,8 @@ val Lat: Declination.type = Declination
 type Lon = Angle
 val Lon: Angle.type = Angle
 
-type BrightnessValueRefinement = Interval.Closed[-100, 100]
+// The sun is -27 magnitudes. Maximum in Janskys is 1e8.
+type BrightnessValueRefinement = Interval.Closed[-30, 100_000_000]
 type BrightnessValueType = BigDecimal Refined BrightnessValueRefinement
 object BrightnessValueType extends RefinedTypeOps[BrightnessValueType, BigDecimal]
 
