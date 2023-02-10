@@ -196,6 +196,7 @@ object GiapiStatusApply {
 
   /** @group Constructors */ case object GhostThXeLamp extends GiapiStatusApply("GhostThXeLamp", Instrument.Ghost, GiapiType.Int, "ghost:sad:cc:slu:hclPower.value", "ghost:cc:slu:ins.hclPowerCtl", None)
   /** @group Constructors */ case object GhostSlitMaskPositioner extends GiapiStatusApply("GhostSlitMaskPositioner", Instrument.Ghost, GiapiType.String, "ghost:cc:slu:smp.value", "ghost:cc:slu:smp", None)
+  /** @group Constructors */ case object GhostSlitMaskPositionerType extends GiapiStatusApply("GhostSlitMaskPositionerType", Instrument.Ghost, GiapiType.String, "ghost:cc:slu:smp.type", "ghost:cc:slu:smp.type", None)
 
   /** All members of GiapiStatusApply, in canonical order. */
   val all: List[GiapiStatusApply] =
@@ -364,7 +365,8 @@ object GiapiStatusApply {
       GhostAGSimulateFlux,
       GhostAGDoContinuous,
       GhostThXeLamp,
-      GhostSlitMaskPositioner
+      GhostSlitMaskPositioner,
+      GhostSlitMaskPositionerType
     )
 
   /** Select the member of GiapiStatusApply with the given tag, if any. */
