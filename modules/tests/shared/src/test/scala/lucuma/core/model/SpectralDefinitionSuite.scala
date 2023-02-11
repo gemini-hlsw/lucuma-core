@@ -13,8 +13,12 @@ import lucuma.core.enums.Band
 import lucuma.core.enums.StellarLibrarySpectrum
 import lucuma.core.math.BrightnessUnits
 import lucuma.core.math.BrightnessValue
+import lucuma.core.math.FluxDensityContinuumValue
+import lucuma.core.math.LineFluxValue
+import lucuma.core.math.LineWidthValue
 import lucuma.core.math.Wavelength
 import lucuma.core.math.arb.ArbBrightnessValue
+import lucuma.core.math.arb.ArbFluxDensityContinuumValue
 import lucuma.core.math.arb.ArbRefined
 import lucuma.core.math.arb.ArbWavelength
 import lucuma.core.math.dimensional.arb.ArbMeasure
@@ -32,6 +36,7 @@ final class SpectralDefinitionSuite extends DisciplineSuite {
   import ArbCollection.*
   import ArbEmissionLine.given
   import ArbEnumerated.*
+  import ArbFluxDensityContinuumValue.given
   import ArbMeasure.given
   import ArbRefined.{*, given}
   import ArbSpectralDefinition.given
@@ -60,12 +65,12 @@ final class SpectralDefinitionSuite extends DisciplineSuite {
     SpectralDefinition.EmissionLines(
       SortedMap(
         Wavelength.Min -> EmissionLine(
-          PosBigDecimalOne.withUnit[KilometersPerSecond],
-          ErgsPerSecondCentimeter2IsIntegratedLineFluxUnit.unit.withValueTagged(PosBigDecimalOne)
+          LineWidthValue.unsafeFrom(1).withUnit[KilometersPerSecond],
+          ErgsPerSecondCentimeter2IsIntegratedLineFluxUnit.unit.withValueTagged(LineFluxValue.unsafeFrom(1))
         )
       ),
       WattsPerMeter2MicrometerIsIntegratedFluxDensityContinuumUnit.unit.withValueTagged(
-        PosBigDecimalOne
+        FluxDensityContinuumValue.unsafeFrom(1)
       )
     )
 
@@ -73,14 +78,14 @@ final class SpectralDefinitionSuite extends DisciplineSuite {
     SpectralDefinition.EmissionLines(
       SortedMap(
         Wavelength.Min -> EmissionLine(
-          PosBigDecimalOne.withUnit[KilometersPerSecond],
+          LineWidthValue.unsafeFrom(1).withUnit[KilometersPerSecond],
           ErgsPerSecondCentimeter2Arcsec2IsSurfaceLineFluxUnit.unit.withValueTagged(
-            PosBigDecimalOne
+            LineFluxValue.unsafeFrom(1)
           )
         )
       ),
       WattsPerMeter2MicrometerArcsec2IsSurfaceFluxDensityContinuumUnit.unit.withValueTagged(
-        PosBigDecimalOne
+        FluxDensityContinuumValue.unsafeFrom(1)
       )
     )
 

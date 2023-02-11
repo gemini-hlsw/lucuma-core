@@ -10,6 +10,8 @@ import coulomb.ops.algebra.cats.all.given
 import coulomb.syntax.*
 import eu.timepit.refined.cats.*
 import lucuma.core.math.BrightnessUnits.*
+import lucuma.core.math.LineFluxValue
+import lucuma.core.math.LineWidthValue
 import lucuma.core.math.arb.*
 import lucuma.core.math.dimensional.arb.ArbMeasure
 import lucuma.core.math.units.*
@@ -21,6 +23,8 @@ import munit.*
 final class EmissionLineSuite extends DisciplineSuite {
   import ArbEnumerated.*
   import ArbEmissionLine.given
+  import ArbLineFluxValue.given
+  import ArbLineWidthValue.given
   import ArbRefined.{*, given}
   import ArbMeasure.given
   import ArbQuantity.given
@@ -28,13 +32,13 @@ final class EmissionLineSuite extends DisciplineSuite {
   // Brightness type conversions
   val e1Integrated: EmissionLine[Integrated] =
     EmissionLine(
-      PosBigDecimalOne.withUnit[KilometersPerSecond],
-      WattsPerMeter2IsIntegratedLineFluxUnit.unit.withValueTagged(PosBigDecimalOne)
+      LineWidthValue.unsafeFrom(1).withUnit[KilometersPerSecond],
+      WattsPerMeter2IsIntegratedLineFluxUnit.unit.withValueTagged(LineFluxValue.unsafeFrom(1))
     )
   val e1Surface: EmissionLine[Surface]       =
     EmissionLine(
-      PosBigDecimalOne.withUnit[KilometersPerSecond],
-      WattsPerMeter2Arcsec2IsSurfaceLineFluxUnit.unit.withValueTagged(PosBigDecimalOne)
+      LineWidthValue.unsafeFrom(1).withUnit[KilometersPerSecond],
+      WattsPerMeter2Arcsec2IsSurfaceLineFluxUnit.unit.withValueTagged(LineFluxValue.unsafeFrom(1))
     )
   test("Brightness type conversion Integrated -> Surface") {
     assertEquals(e1Integrated.to[Surface], e1Surface)

@@ -6,6 +6,7 @@ package core
 package math
 
 import cats.data.NonEmptyList
+import coulomb.*
 import lucuma.core.math.dimensional.*
 import lucuma.core.math.units.*
 import lucuma.core.util.*
@@ -19,6 +20,9 @@ object BrightnessUnits {
   trait FluxDensityContinuum[+T]
 
   type BrightnessMeasure[T] = Measure[BrightnessValue] Of Brightness[T]
+  type LineWidthQuantity = Quantity[LineWidthValue, KilometersPerSecond]
+  type LineFluxMeasure[T] = Measure[LineFluxValue] Of LineFlux[T]
+  type FluxDensityContinuumMeasure[T] = Measure[FluxDensityContinuumValue] Of FluxDensityContinuum[T]
 
   // Brightness Integrated
   implicit object VegaMagnitudeIsIntegratedBrightnessUnit

@@ -89,7 +89,7 @@ object SpectralDefinition {
 
   final case class EmissionLines[T](
     lines:                SortedMap[Wavelength, EmissionLine[T]],
-    fluxDensityContinuum: Measure[PosBigDecimal] Of FluxDensityContinuum[T]
+    fluxDensityContinuum: FluxDensityContinuumMeasure[T]
   ) extends SpectralDefinition[T] {
     lazy val wavelengths: List[Wavelength] = lines.keys.toList
 
@@ -126,10 +126,8 @@ object SpectralDefinition {
       lines.filterIndex((a: Wavelength) => a === w)
 
     /** @group Optics */
-    def fluxDensityContinuum[T]: Lens[
-      EmissionLines[T],
-      Measure[PosBigDecimal] Of FluxDensityContinuum[T]
-    ] = Focus[EmissionLines[T]](_.fluxDensityContinuum)
+    def fluxDensityContinuum[T]: Lens[EmissionLines[T], FluxDensityContinuumMeasure[T]] =
+      Focus[EmissionLines[T]](_.fluxDensityContinuum)
   }
 
   implicit def eqSpectralDefinition[T](implicit
@@ -177,8 +175,6 @@ object SpectralDefinition {
     emissionLines.andThen(EmissionLines.lineIn[T](w))
 
   /** @group Optics */
-  def fluxDensityContinuum[T]: Optional[
-    SpectralDefinition[T],
-    Measure[PosBigDecimal] Of FluxDensityContinuum[T]
-  ] = emissionLines.andThen(EmissionLines.fluxDensityContinuum[T])
+  def fluxDensityContinuum[T]: Optional[SpectralDefinition[T], FluxDensityContinuumMeasure[T]] =
+    emissionLines.andThen(EmissionLines.fluxDensityContinuum[T])
 }

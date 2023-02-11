@@ -29,6 +29,7 @@ class TargetSuite extends DisciplineSuite {
   import ArbEpoch.*
   import ArbEphemerisKey.*
   import ArbEmissionLine.given
+  import ArbFluxDensityContinuumValue.given
   import ArbGid.*
   import ArbMeasure.given
   import ArbParallax.*
