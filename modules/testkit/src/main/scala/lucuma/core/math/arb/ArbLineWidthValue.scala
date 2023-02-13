@@ -8,7 +8,6 @@ import eu.timepit.refined.scalacheck.numeric.*
 import eu.timepit.refined.types.numeric.PosBigDecimal
 import lucuma.core.arb.*
 import lucuma.core.math.LineWidthValue
-import lucuma.core.math.LineWidthValueType
 import lucuma.core.math.arb.ArbRefined.given
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
