@@ -27,6 +27,11 @@ final class MathValidatorsSuite extends DisciplineSuite {
   checkAll("angleArcSec", ValidSplitEpiTests(MathValidators.angleArcSec).validSplitEpiLaws)
 
   checkAll(
+    "truncatedAngleSignedArcSec",
+    ValidWedgeTests(MathValidators.truncatedAngleSignedArcSec).validWedgeWith(genNumericString)
+  )
+
+  checkAll(
     "truncatedAngleDegrees",
     ValidWedgeTests(MathValidators.truncatedAngleDegrees).validWedgeWith(genNumericString)
   )

@@ -31,7 +31,21 @@ trait MathValidators {
       a => (a.toMicroarcseconds / 1000000.0).toString
     )
 
-  private def truncateAngle(angle: Angle): Angle =
+  private def truncateAngleSignedArcSec(angle: Angle): Angle =
+    Angle.signedDecimalArcseconds.reverseGet(
+      (Angle.signedDecimalArcseconds.get(angle) * 100)
+        .setScale(0, scala.math.BigDecimal.RoundingMode.HALF_UP) / 100 + 0.0
+    )
+  
+  val truncatedAngleSignedArcSec: InputValidWedge[Angle] =
+    InputValidWedge(
+      _.parseBigDecimalOption.map(Angle.signedDecimalArcseconds.reverseGet).map(truncateAngleSignedArcSec)
+      .toRight("Invalid Angle")
+      .toEitherErrorsUnsafe,
+      a => f"${Angle.signedDecimalArcseconds.get(truncateAngleSignedArcSec(a))}%.2f".replace("-0.00", "0.00")
+    )
+
+  private def truncateDegrees(angle: Angle): Angle =
     Angle.fromBigDecimalDegrees(
       (angle.toBigDecimalDegrees * 100)
         .setScale(0, scala.math.BigDecimal.RoundingMode.HALF_UP) / 100 + 0.0
@@ -41,17 +55,17 @@ trait MathValidators {
     InputValidWedge(
       _.parseBigDecimalOption
         .map(Angle.fromBigDecimalDegrees)
-        .map(truncateAngle)
+        .map(truncateDegrees)
         .toRight("Invalid Angle")
         .toEitherErrorsUnsafe,
-      a => f"${truncateAngle(a).toBigDecimalDegrees}%.2f".replace("360.00", "0.00")
+      a => f"${truncateDegrees(a).toBigDecimalDegrees}%.2f".replace("360.00", "0.00")
     )
 
   val truncatedAngleSignedDegrees: InputValidWedge[Angle] =
     InputValidWedge(
       truncatedAngleDegrees.getValid,
       a =>
-        f"${truncateAngle(a).toSignedBigDecimalDegrees}%.2f"
+        f"${truncateDegrees(a).toSignedBigDecimalDegrees}%.2f"
           .replace("-0.00", "0.00")
           .replaceAll("^180.00", "-180.00")
     )
