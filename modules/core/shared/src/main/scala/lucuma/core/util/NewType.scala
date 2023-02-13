@@ -6,6 +6,7 @@ package lucuma.core.util
 import cats.Eq
 import cats.Monoid
 import cats.Order
+import eu.timepit.refined.api.*
 import io.circe.Decoder
 import io.circe.Encoder
 import lucuma.core.util.Display
@@ -35,3 +36,8 @@ trait NewType[Wrapped]:
   given (using m: Monoid[Wrapped]): Monoid[Type]                 = m
   given (using ord: Order[Wrapped]): Order[Type]                 = ord
   given (using ord: Ordering[Wrapped]): Ordering[Type]           = ord
+
+trait RefinedNewType[T, P](using RefinedType.AuxT[T Refined P, T]) extends NewType[T Refined P]:
+  private val TypeOps = new RefinedTypeOps[T Refined P, T]
+  def from(t: T): Either[String, Type] = TypeOps.from(t).map(apply(_))
+  def unsafeFrom(x: T): Type = apply(TypeOps.unsafeFrom(x))

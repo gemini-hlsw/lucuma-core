@@ -17,11 +17,7 @@ import lucuma.core.util.*
 import monocle.Focus
 import monocle.Lens
 
-final case class EmissionLine[T](
-  lineWidth: Quantity[PosBigDecimal, KilometersPerSecond],
-  lineFlux:  Measure[PosBigDecimal] Of LineFlux[T]
-) {
-
+final case class EmissionLine[T](lineWidth: LineWidthQuantity, lineFlux: LineFluxMeasure[T]) {
   /**
    * Convert units to `T0` brightness type.
    *
@@ -37,10 +33,10 @@ object EmissionLine {
     Eq.by(x => (x.lineWidth, x.lineFlux))
 
   /** @group Optics */
-  def lineWidth[T]: Lens[EmissionLine[T], Quantity[PosBigDecimal, KilometersPerSecond]] =
+  def lineWidth[T]: Lens[EmissionLine[T], LineWidthQuantity] =
     Focus[EmissionLine[T]](_.lineWidth)
 
   /** @group Optics */
-  def lineFlux[T]: Lens[EmissionLine[T], Measure[PosBigDecimal] Of LineFlux[T]] =
+  def lineFlux[T]: Lens[EmissionLine[T], LineFluxMeasure[T]] =
     Focus[EmissionLine[T]](_.lineFlux)
 }

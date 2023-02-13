@@ -14,9 +14,13 @@ import lucuma.core.enums.StellarLibrarySpectrum
 import lucuma.core.math.Angle
 import lucuma.core.math.BrightnessUnits.*
 import lucuma.core.math.BrightnessValue
+import lucuma.core.math.FluxDensityContinuumValue
+import lucuma.core.math.LineFluxValue
+import lucuma.core.math.LineWidthValue
 import lucuma.core.math.Wavelength
 import lucuma.core.math.arb.ArbAngle
 import lucuma.core.math.arb.ArbBrightnessValue
+import lucuma.core.math.arb.ArbFluxDensityContinuumValue
 import lucuma.core.math.arb.ArbRefined
 import lucuma.core.math.arb.ArbWavelength
 import lucuma.core.math.dimensional.arb.ArbMeasure
@@ -34,6 +38,7 @@ final class SourceProfileSuite extends DisciplineSuite {
   import ArbBrightnessValue.given
   import ArbEmissionLine.given
   import ArbEnumerated.*
+  import ArbFluxDensityContinuumValue.given
   import ArbMeasure.given
   import ArbRefined.{*, given}
   import ArbSourceProfile.given
@@ -63,24 +68,24 @@ final class SourceProfileSuite extends DisciplineSuite {
     SpectralDefinition.EmissionLines(
       SortedMap(
         Wavelength.Min -> EmissionLine(
-          PosBigDecimalOne.withUnit[KilometersPerSecond],
-          WattsPerMeter2IsIntegratedLineFluxUnit.unit.withValueTagged(PosBigDecimalOne)
+          LineWidthValue.unsafeFrom(1).withUnit[KilometersPerSecond],
+          WattsPerMeter2IsIntegratedLineFluxUnit.unit.withValueTagged(LineFluxValue.unsafeFrom(1))
         )
       ),
       WattsPerMeter2MicrometerIsIntegratedFluxDensityContinuumUnit.unit
-        .withValueTagged(PosBigDecimalOne)
+        .withValueTagged(FluxDensityContinuumValue.unsafeFrom(1))
     )
 
   val sd2Surface: SpectralDefinition[Surface] =
     SpectralDefinition.EmissionLines(
       SortedMap(
         Wavelength.Min -> EmissionLine(
-          PosBigDecimalOne.withUnit[KilometersPerSecond],
-          WattsPerMeter2Arcsec2IsSurfaceLineFluxUnit.unit.withValueTagged(PosBigDecimalOne)
+          LineWidthValue.unsafeFrom(1).withUnit[KilometersPerSecond],
+          WattsPerMeter2Arcsec2IsSurfaceLineFluxUnit.unit.withValueTagged(LineFluxValue.unsafeFrom(1))
         )
       ),
       WattsPerMeter2MicrometerArcsec2IsSurfaceFluxDensityContinuumUnit.unit
-        .withValueTagged(PosBigDecimalOne)
+        .withValueTagged(FluxDensityContinuumValue.unsafeFrom(1))
     )
 
   val point1    = SourceProfile.Point(sd1Integrated)

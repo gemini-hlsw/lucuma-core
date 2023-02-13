@@ -263,14 +263,10 @@ object SourceProfile {
     surfaceSpectralDefinition.andThen(SpectralDefinition.wavelengthLineIn[Surface](w))
 
   /** @group Optics */
-  val integratedFluxDensityContinuum: Optional[
-    SourceProfile,
-    Measure[PosBigDecimal] Of FluxDensityContinuum[Integrated]
-  ] = integratedSpectralDefinition.andThen(SpectralDefinition.fluxDensityContinuum[Integrated])
+  val integratedFluxDensityContinuum: Optional[SourceProfile, FluxDensityContinuumMeasure[Integrated]] =
+    integratedSpectralDefinition.andThen(SpectralDefinition.fluxDensityContinuum[Integrated])
 
   /** @group Optics */
-  val surfaceFluxDensityContinuum: Optional[
-    SourceProfile,
-    Measure[PosBigDecimal] Of FluxDensityContinuum[Surface]
-  ] = surfaceSpectralDefinition.andThen(SpectralDefinition.fluxDensityContinuum[Surface])
+  val surfaceFluxDensityContinuum: Optional[SourceProfile, FluxDensityContinuumMeasure[Surface]] =
+    surfaceSpectralDefinition.andThen(SpectralDefinition.fluxDensityContinuum[Surface])
 }

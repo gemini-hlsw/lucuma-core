@@ -261,16 +261,12 @@ object Target extends WithGid('t'.refined) with TargetOptics {
       sourceProfile.andThen(SourceProfile.surfaceWavelengthLineIn(w))
 
     /** @group Optics */
-    val integratedFluxDensityContinuum: Optional[
-      Sidereal,
-      Measure[PosBigDecimal] Of FluxDensityContinuum[Integrated]
-    ] = sourceProfile.andThen(SourceProfile.integratedFluxDensityContinuum)
+    val integratedFluxDensityContinuum: Optional[Sidereal, FluxDensityContinuumMeasure[Integrated]] =
+      sourceProfile.andThen(SourceProfile.integratedFluxDensityContinuum)
 
     /** @group Optics */
-    val surfaceFluxDensityContinuum: Optional[
-      Sidereal,
-      Measure[PosBigDecimal] Of FluxDensityContinuum[Surface]
-    ] = sourceProfile.andThen(SourceProfile.surfaceFluxDensityContinuum)
+    val surfaceFluxDensityContinuum: Optional[Sidereal, FluxDensityContinuumMeasure[Surface]] =
+      sourceProfile.andThen(SourceProfile.surfaceFluxDensityContinuum)
 
     /** @group Optics */
     val catalogInfo: Lens[Sidereal, Option[CatalogInfo]] =
@@ -382,16 +378,12 @@ object Target extends WithGid('t'.refined) with TargetOptics {
       sourceProfile.andThen(SourceProfile.surfaceWavelengthLineIn(w))
 
     /** @group Optics */
-    val integratedFluxDensityContinuum: Optional[
-      Nonsidereal,
-      Measure[PosBigDecimal] Of FluxDensityContinuum[Integrated]
-    ] = sourceProfile.andThen(SourceProfile.integratedFluxDensityContinuum)
+    val integratedFluxDensityContinuum: Optional[Nonsidereal, FluxDensityContinuumMeasure[Integrated]] =
+      sourceProfile.andThen(SourceProfile.integratedFluxDensityContinuum)
 
     /** @group Optics */
-    val surfaceFluxDensityContinuum: Optional[
-      Nonsidereal,
-      Measure[PosBigDecimal] Of FluxDensityContinuum[Surface]
-    ] = sourceProfile.andThen(SourceProfile.surfaceFluxDensityContinuum)
+    val surfaceFluxDensityContinuum: Optional[Nonsidereal, FluxDensityContinuumMeasure[Surface]] =
+      sourceProfile.andThen(SourceProfile.surfaceFluxDensityContinuum)
   }
 }
 
@@ -514,16 +506,12 @@ trait TargetOptics { this: Target.type =>
     sourceProfile.andThen(SourceProfile.surfaceWavelengthLineIn(w))
 
   /** @group Optics */
-  val integratedFluxDensityContinuum: Optional[
-    Target,
-    Measure[PosBigDecimal] Of FluxDensityContinuum[Integrated]
-  ] = sourceProfile.andThen(SourceProfile.integratedFluxDensityContinuum)
+  val integratedFluxDensityContinuum: Optional[Target, FluxDensityContinuumMeasure[Integrated]] =
+    sourceProfile.andThen(SourceProfile.integratedFluxDensityContinuum)
 
   /** @group Optics */
-  val surfaceFluxDensityContinuum: Optional[
-    Target,
-    Measure[PosBigDecimal] Of FluxDensityContinuum[Surface]
-  ] = sourceProfile.andThen(SourceProfile.surfaceFluxDensityContinuum)
+  val surfaceFluxDensityContinuum: Optional[Target, FluxDensityContinuumMeasure[Surface]] =
+    sourceProfile.andThen(SourceProfile.surfaceFluxDensityContinuum)
 
   /** @group Optics */
   val parallax: Optional[Target, Option[Parallax]] =
