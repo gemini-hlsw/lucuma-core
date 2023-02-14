@@ -30,10 +30,10 @@ import scala.annotation.targetName
  * central `Wavelength`, which results in a wavelength interval (ie: a 
  * `BoundedInterval[Wavelength]`).
  */
-opaque type WavelengthRange = Quantity[PosInt, Picometer]
+opaque type WavelengthDelta = Quantity[PosInt, Picometer]
 
-object WavelengthRange:
-  extension (w: WavelengthRange) {
+object WavelengthDelta:
+  extension (w: WavelengthDelta) {
     def toPicometers: Quantity[PosInt, Picometer] =
       w
 
@@ -112,7 +112,7 @@ object WavelengthRange:
       toMicrometers
   }
 
-  def apply(pm: Quantity[PosInt, Picometer]): WavelengthRange =
+  def apply(pm: Quantity[PosInt, Picometer]): WavelengthDelta =
     pm
 
   /**
@@ -120,22 +120,22 @@ object WavelengthRange:
     * @group constructor
     */
   @targetName("applyPicometers") // to distinguish from apply(Quantity[PosInt, Picometer])
-  def apply(picometers: PosInt): WavelengthRange =
+  def apply(picometers: PosInt): WavelengthDelta =
     picometers.withUnit[Picometer]
 
   /** @group Typeclass Instances */
-  given Show[WavelengthRange] =
+  given Show[WavelengthDelta] =
     Show.fromToString
 
   /** @group Typeclass Instances */
-  given Order[WavelengthRange] =
+  given Order[WavelengthDelta] =
     Order.by(_.value)
 
-  val picometers: Iso[PosInt, WavelengthRange] =
-    Iso[PosInt, WavelengthRange](_.withUnit[Picometer])(_.toPicometers.value)
+  val picometers: Iso[PosInt, WavelengthDelta] =
+    Iso[PosInt, WavelengthDelta](_.withUnit[Picometer])(_.toPicometers.value)
 
-  def pbdFormat[U](right: Int)(to: WavelengthRange => Quantity[PosBigDecimal, U]): Format[Quantity[PosBigDecimal, U], WavelengthRange] = {
-    def from(v: Quantity[PosBigDecimal, U]): Option[WavelengthRange] =
+  def pbdFormat[U](right: Int)(to: WavelengthDelta => Quantity[PosBigDecimal, U]): Format[Quantity[PosBigDecimal, U], WavelengthDelta] = {
+    def from(v: Quantity[PosBigDecimal, U]): Option[WavelengthDelta] =
       (scala.util.control.Exception.catching(classOf[ArithmeticException]) opt
         v.value
          .bigDecimal
@@ -144,20 +144,20 @@ object WavelengthRange:
          .intValueExact
       ).flatMap(i => PosInt.from(i).toOption).map(Quantity[Picometer](_))
 
-    Format[Quantity[PosBigDecimal, U], WavelengthRange](from, to)
+    Format[Quantity[PosBigDecimal, U], WavelengthDelta](from, to)
   }
 
-  val angstroms: Format[Quantity[PosBigDecimal, Angstrom], WavelengthRange] =
+  val angstroms: Format[Quantity[PosBigDecimal, Angstrom], WavelengthDelta] =
     pbdFormat(2)(_.toAngstroms)
 
-  val nanometers: Format[Quantity[PosBigDecimal, Nanometer], WavelengthRange] =
+  val nanometers: Format[Quantity[PosBigDecimal, Nanometer], WavelengthDelta] =
     pbdFormat(3)(_.toNanometers)
 
-  val micrometers: Format[Quantity[PosBigDecimal, Micrometer], WavelengthRange] =
+  val micrometers: Format[Quantity[PosBigDecimal, Micrometer], WavelengthDelta] =
     pbdFormat(6)(_.toMicrometers)
 
-  val intPicometers: Prism[Int, WavelengthRange] =
-    Prism[Int, WavelengthRange](pm =>
+  val intPicometers: Prism[Int, WavelengthDelta] =
+    Prism[Int, WavelengthDelta](pm =>
       PosInt.from(pm).toOption.map(_.withUnit[Picometer])
     )(_.value.value)
 
@@ -165,39 +165,39 @@ object WavelengthRange:
    * Try to build a Wavelength from a plain Int. Negatives and Zero will produce a None.
    * @group constructor
    */
-  def fromIntPicometers(i: Int): Option[WavelengthRange] =
+  def fromIntPicometers(i: Int): Option[WavelengthDelta] =
     intPicometers.getOption(i)
 
-  def unsafeFromIntPicometers(i: Int): WavelengthRange =
-    fromIntPicometers(i).getOrElse(sys.error(s"Cannot build a WavelengthRange with value $i"))
+  def unsafeFromIntPicometers(i: Int): WavelengthDelta =
+    fromIntPicometers(i).getOrElse(sys.error(s"Cannot build a WavelengthDelta with value $i"))
 
-  private def fromInt(max: Int, mult: Int): Int => Option[WavelengthRange] =
+  private def fromInt(max: Int, mult: Int): Int => Option[WavelengthDelta] =
     i => Option.when((i > 0) && (i <= max))(i * mult).flatMap(fromIntPicometers)
 
-  def fromIntAngstroms(i: Int): Option[WavelengthRange] =
+  def fromIntAngstroms(i: Int): Option[WavelengthDelta] =
     fromInt(Wavelength.MaxAngstrom, 100)(i)
 
-  def fromIntNanometers(i: Int): Option[WavelengthRange] =
+  def fromIntNanometers(i: Int): Option[WavelengthDelta] =
     fromInt(Wavelength.MaxNanometer, 1_000)(i)
 
-  def fromIntMicrometers(i: Int): Option[WavelengthRange] =
+  def fromIntMicrometers(i: Int): Option[WavelengthDelta] =
     fromInt(Wavelength.MaxMicrometer, 1_000_000)(i)
 
-  private def scalingFormat(move: Int): Format[BigDecimal, WavelengthRange] =
+  private def scalingFormat(move: Int): Format[BigDecimal, WavelengthDelta] =
     Format[BigDecimal, Int](
       bd => scala.util.control.Exception.catching(classOf[ArithmeticException]) opt
         bd.bigDecimal.movePointRight(move).setScale(0, RoundingMode.HALF_UP).intValueExact,
       i  => BigDecimal(new java.math.BigDecimal(i).movePointLeft(move))
     ).andThen(intPicometers)
 
-  val decimalPicometers: Format[BigDecimal, WavelengthRange] =
+  val decimalPicometers: Format[BigDecimal, WavelengthDelta] =
     scalingFormat(0)
 
-  val decimalAngstroms: Format[BigDecimal, WavelengthRange] =
+  val decimalAngstroms: Format[BigDecimal, WavelengthDelta] =
     scalingFormat(2)
 
-  val decimalNanometers: Format[BigDecimal, WavelengthRange] =
+  val decimalNanometers: Format[BigDecimal, WavelengthDelta] =
     scalingFormat(3)
 
-  val decimalMicrometers: Format[BigDecimal, WavelengthRange] =
+  val decimalMicrometers: Format[BigDecimal, WavelengthDelta] =
     scalingFormat(6)
