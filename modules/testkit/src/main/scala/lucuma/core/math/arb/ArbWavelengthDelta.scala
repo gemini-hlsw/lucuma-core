@@ -11,12 +11,12 @@ import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Cogen.*
 import org.scalacheck.*
 
-trait ArbWavelengthRange:
-  given Arbitrary[WavelengthRange] = Arbitrary(
-    arbitrary[PosInt].map(WavelengthRange(_))
+trait ArbWavelengthDelta:
+  given Arbitrary[WavelengthDelta] = Arbitrary(
+    arbitrary[PosInt].map(WavelengthDelta(_))
   )
 
-  given Cogen[WavelengthRange] =
+  given Cogen[WavelengthDelta] =
     Cogen[Int].contramap(_.toPicometers.value.value)
 
-object ArbWavelengthRange extends ArbWavelengthRange
+object ArbWavelengthDelta extends ArbWavelengthDelta
