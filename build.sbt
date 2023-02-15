@@ -115,7 +115,7 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform)
     ),
     libraryDependencies ++= Seq(
       "edu.gemini.ocs" %% "edu-gemini-util-skycalc"     % "2020001.1.7" % Test cross CrossVersion.for3Use2_13 exclude("org.scala-lang.modules", "scala-xml_2.13"),
-      "com.47deg"      %% "scalacheck-toolbox-datetime" % "0.6.0"       % Test
+      "com.47deg"      %% "scalacheck-toolbox-datetime" % "0.7.0"       % Test
     )
   )
 
