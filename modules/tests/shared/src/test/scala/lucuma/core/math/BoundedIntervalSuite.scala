@@ -4,12 +4,13 @@
 package lucuma.core.math
 
 import cats.syntax.all.*
+import eu.timepit.refined.cats.*
 import lucuma.core.arb.ArbTime
 import lucuma.core.math.BoundedInterval
 import lucuma.core.math.arb.ArbInterval
 import lucuma.core.optics.Spire
-import lucuma.core.optics.laws.discipline.FormatTests
-import lucuma.core.optics.laws.discipline.SplitEpiTests
+import lucuma.core.optics.laws.discipline.ValidSplitEpiTests
+import lucuma.core.optics.laws.discipline.WedgeTests
 import lucuma.core.syntax.time.*
 import lucuma.core.tests.ScalaCheckFlaky
 import org.scalacheck.Arbitrary.arbitrary
@@ -147,11 +148,11 @@ class BoundedIntervalSuite  extends munit.DisciplineSuite with IntervalGens {
   // Optics
   checkAll(
     "BoundedInterval.openUpperFromTuple",
-    FormatTests(BoundedInterval.openUpperFromTuple[Int]).format
+    ValidSplitEpiTests(BoundedInterval.openUpperFromTuple[Int]).validSplitEpi
   )
 
   checkAll(
     "BoundedInterval.closedFromTuple",
-    FormatTests(BoundedInterval.closedFromTuple[Int]).format
+    WedgeTests(BoundedInterval.closedFromTuple[Int]).wedge
   )
 }

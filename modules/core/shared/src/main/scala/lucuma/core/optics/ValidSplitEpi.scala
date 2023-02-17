@@ -27,6 +27,8 @@ abstract class ValidSplitEpi[E, A, B] extends ValidFormat[E, A, B] with Serializ
 
   val reverseGet: B => A
 
+  def getOption: A => Option[B] = getValid.andThen(_.toOption)
+
   /**
    * getValid and reverseGet, yielding a normalized formatted value if valid. Subsequent
    * getValid/reverseGet cycles are idempotent.
