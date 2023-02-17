@@ -7,7 +7,6 @@ import cats._
 import lucuma.core.enums.Site
 import lucuma.core.enums.TwilightType
 import lucuma.core.math.BoundedInterval
-import lucuma.core.math.BoundedInterval.*
 import monocle.Focus
 import monocle.Lens
 import org.typelevel.cats.time.*

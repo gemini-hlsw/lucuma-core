@@ -7,6 +7,7 @@ import algebra.ring.AdditiveMonoid
 import cats.Eq
 import cats.Order
 import cats.syntax.all.*
+import lucuma.core.optics.Format
 import spire.math.Bounded
 import spire.math.Empty
 import spire.math.Interval
@@ -163,3 +164,33 @@ object BoundedInterval:
   extension (self: IntervalSeq.type)
     def apply[T: Order](i: BoundedInterval[T]): IntervalSeq[T] =
       self(i.toInterval)
+
+   /**
+   * Makes a best-effort attempt to convert the tuple (a, b) into interval [a, b) or [b, a).
+   *
+   * It's a Format to contemplate the case of tuple (a, a).
+   */
+  def openUpperFromTuple[A: Order]: Format[(A, A), BoundedInterval[A]] =
+    Format[(A, A), BoundedInterval[A]](
+      { case (start, end) =>
+        if (start < end)(BoundedInterval.unsafeOpenUpper(start, end)).some
+        else if (start > end)(BoundedInterval.unsafeOpenUpper(end, start)).some
+        else none
+      },
+      i => (i.lower, i.upper)
+    )
+
+  /**
+   * Makes a best-effort attempt to convert the tuple (a, b) into interval [a, b] or [b, a].
+   *
+   * It's a Format to contemplate the case of tuple (a, a).
+   */
+  def closedFromTuple[A: Order]: Format[(A, A), BoundedInterval[A]] =
+    Format[(A, A), BoundedInterval[A]](
+      { case (start, end) =>
+        if (start < end)(BoundedInterval.unsafeClosed(start, end)).some
+        else if (start > end)(BoundedInterval.unsafeClosed(end, start)).some
+        else none
+      },
+      i => (i.lower, i.upper)
+    )

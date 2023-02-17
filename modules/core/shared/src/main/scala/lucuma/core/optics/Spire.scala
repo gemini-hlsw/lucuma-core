@@ -5,8 +5,6 @@ package lucuma.core.optics
 
 import cats.Order
 import cats.syntax.all._
-import lucuma.core.math.BoundedInterval
-import lucuma.core.math.BoundedInterval.*
 import lucuma.core.optics.Format
 import lucuma.core.optics.SplitEpi
 import monocle.Iso
@@ -48,36 +46,6 @@ object Spire {
 
   val numberNatural: Format[Number, Natural] =
     Format(n => Try(Natural(n.toBigInt)).toOption, Number.apply)
-
-  /**
-   * Makes a best-effort attempt to convert the tuple (a, b) into interval [a, b) or [b, a).
-   *
-   * It's a Format to contemplate the case of tuple (a, a).
-   */
-  def openUpperIntervalFromTuple[A: Order]: Format[(A, A), BoundedInterval[A]] =
-    Format[(A, A), BoundedInterval[A]](
-      { case (start, end) =>
-        if (start < end)(BoundedInterval.unsafeOpenUpper(start, end)).some
-        else if (start > end)(BoundedInterval.unsafeOpenUpper(end, start)).some
-        else none
-      },
-      i => (i.lower, i.upper)
-    )
-
-  /**
-   * Makes a best-effort attempt to convert the tuple (a, b) into interval [a, b] or [b, a].
-   *
-   * It's a Format to contemplate the case of tuple (a, a).
-   */
-  def closedIntervalFromTuple[A: Order]: Format[(A, A), BoundedInterval[A]] =
-    Format[(A, A), BoundedInterval[A]](
-      { case (start, end) =>
-        if (start < end)(BoundedInterval.unsafeClosed(start, end)).some
-        else if (start > end)(BoundedInterval.unsafeClosed(end, start)).some
-        else none
-      },
-      i => (i.lower, i.upper)
-    )
 
   /**
    * The union of any list of `Interval[A]`.

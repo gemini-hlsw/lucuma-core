@@ -62,7 +62,7 @@ trait TwilightCalc extends SunCalc {
       case _                     => twilightType.horizonAngle.toAngle.toSignedDoubleDegrees
     }
 
-    calcTimes(angle, jdmid, place).flatMap(Spire.openUpperIntervalFromTuple[Instant].getOption)
+    calcTimes(angle, jdmid, place).flatMap(BoundedInterval.openUpperFromTuple[Instant].getOption)
   }
 
   def forBoundedInterval(
@@ -70,9 +70,8 @@ trait TwilightCalc extends SunCalc {
     interval:     BoundedInterval[Instant],
     place:        Place
   ): IntervalSeq[Instant] = {
-    val (start, end)      = Spire.openUpperIntervalFromTuple[Instant].reverseGet(interval)
-    val startDate         = start.atZone(place.timezone).toLocalDate
-    val endDate           = end.atZone(place.timezone).toLocalDate
+    val startDate         = interval.lower.atZone(place.timezone).toLocalDate
+    val endDate           = interval.upper.atZone(place.timezone).toLocalDate
     val dates             =
       List.unfold(startDate)(date => if (date <= endDate) (date, date.plusDays(1)).some else none)
     val twilightIntervals = dates.map(d => forDate(twilightType, d, place)).flattenOption

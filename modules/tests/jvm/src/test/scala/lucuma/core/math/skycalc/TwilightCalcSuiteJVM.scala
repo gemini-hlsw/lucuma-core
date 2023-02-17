@@ -32,7 +32,7 @@ final class TwilightCalcSuiteJVM extends ScalaCheckSuite {
     forAll { (twilightType: TwilightType, localDate: LocalDate, site: Site) =>
       val (start, end) = TwilightCalc
         .forDate(twilightType, localDate, site.place)
-        .map(Spire.openUpperIntervalFromTuple[Instant].reverseGet.andThen(_.bimap(_.toEpochMilli, _.toEpochMilli)))
+        .map(boundedInterval => (boundedInterval.lower.toEpochMilli, boundedInterval.upper.toEpochMilli))
         .getOrElse((0L, 0L))
       val tbn          =
         TwilightBoundedNightTest.forDate(TwilightTypeJVM(twilightType),

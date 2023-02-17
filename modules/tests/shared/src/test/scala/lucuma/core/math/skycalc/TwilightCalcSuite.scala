@@ -5,7 +5,6 @@ package lucuma.core.math.skycalc
 
 import lucuma.core.enums.Site
 import lucuma.core.enums.TwilightType
-import lucuma.core.math.BoundedInterval.*
 import munit.FunSuite
 
 import java.time.LocalDate

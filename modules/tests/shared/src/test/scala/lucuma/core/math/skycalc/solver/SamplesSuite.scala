@@ -13,7 +13,6 @@ import lucuma.core.arb.ArbEval
 import lucuma.core.arb.ArbTime
 import lucuma.core.arb.*
 import lucuma.core.math.BoundedInterval
-import lucuma.core.math.BoundedInterval.*
 import lucuma.core.math.IntervalGens
 import lucuma.core.math.arb.ArbInterval
 import lucuma.core.math.arb.*
