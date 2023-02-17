@@ -23,7 +23,7 @@ opaque type BoundedInterval[A] = Bounded[A] | Point[A]
 
 object BoundedInterval:
   def fromInterval[A: Order](interval: Interval[A]): Option[BoundedInterval[A]] =
-    interval.some.filterNot(_.isEmpty).map(_.asInstanceOf[BoundedInterval[A]])
+    interval.some.filterNot(_.isEmpty).filter(_.isBounded).map(_.asInstanceOf[BoundedInterval[A]])
 
   def closed[A: Order](lower: A, upper: A): Option[BoundedInterval[A]] = 
     fromInterval(Interval.closed(lower, upper))
