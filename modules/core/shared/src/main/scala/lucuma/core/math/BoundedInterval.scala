@@ -7,6 +7,12 @@ import algebra.ring.AdditiveMonoid
 import cats.Eq
 import cats.Order
 import cats.syntax.all.*
+import eu.timepit.refined.collection.NonEmpty
+import eu.timepit.refined.types.string.NonEmptyString
+import lucuma.core.optics.SplitEpi
+import lucuma.core.optics.ValidSplitEpi
+import lucuma.core.optics.Wedge
+import lucuma.refined.*
 import spire.math.Bounded
 import spire.math.Empty
 import spire.math.Interval
@@ -23,7 +29,7 @@ opaque type BoundedInterval[A] = Bounded[A] | Point[A]
 
 object BoundedInterval:
   def fromInterval[A: Order](interval: Interval[A]): Option[BoundedInterval[A]] =
-    interval.some.filterNot(_.isEmpty).map(_.asInstanceOf[BoundedInterval[A]])
+    interval.some.filterNot(_.isEmpty).filter(_.isBounded).map(_.asInstanceOf[BoundedInterval[A]])
 
   def closed[A: Order](lower: A, upper: A): Option[BoundedInterval[A]] = 
     fromInterval(Interval.closed(lower, upper))
@@ -163,3 +169,32 @@ object BoundedInterval:
   extension (self: IntervalSeq.type)
     def apply[T: Order](i: BoundedInterval[T]): IntervalSeq[T] =
       self(i.toInterval)
+
+   /**
+   * Makes a best-effort attempt to convert the tuple (a, b) into interval [a, b) or [b, a).
+   * 
+   * Normalizes insto open upper intervals. Tuple values must be different.
+   */
+  def openUpperFromTuple[A: Order]: ValidSplitEpi[NonEmptyString, (A, A), BoundedInterval[A]] =
+    ValidSplitEpi[NonEmptyString, (A, A), BoundedInterval[A]](
+      { case (start, end) =>
+        if (start < end)(BoundedInterval.unsafeOpenUpper(start, end)).asRight
+        else if (start > end)(BoundedInterval.unsafeOpenUpper(end, start)).asRight
+        else "Bounds must be different in order to build an open upper interval".refined[NonEmpty].asLeft
+      },
+      i => (i.lower, i.upper)
+    )
+
+  /**
+   * Makes a best-effort attempt to convert the tuple (a, b) into interval [a, b] or [b, a].
+   *
+   * Normalizes both ways: closes intervals and sorts tuples.
+   */
+  def closedFromTuple[A: Order]: Wedge[(A, A), BoundedInterval[A]] =
+    Wedge[(A, A), BoundedInterval[A]](
+      { case (start, end) =>
+        if (start <= end) BoundedInterval.unsafeClosed(start, end)
+        else BoundedInterval.unsafeClosed(end, start)
+      },
+      i => (i.lower, i.upper)
+    )

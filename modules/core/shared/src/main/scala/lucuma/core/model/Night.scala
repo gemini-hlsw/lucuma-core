@@ -5,7 +5,6 @@ package lucuma.core.model
 
 import lucuma.core.enums.Site
 import lucuma.core.math.BoundedInterval
-import lucuma.core.math.BoundedInterval.*
 import lucuma.core.syntax.time._
 import org.typelevel.cats.time._
 

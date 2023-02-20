@@ -7,7 +7,6 @@ import cats.Eq
 import cats.syntax.all.*
 import lucuma.core.arb.ArbTime
 import lucuma.core.math.BoundedInterval
-import lucuma.core.math.BoundedInterval.*
 import lucuma.core.optics.Spire
 import lucuma.core.syntax.time.*
 import org.scalacheck.Arbitrary.*
@@ -160,7 +159,7 @@ trait IntervalGens {
         .oneOf(schedule.intervals)
         .flatMap(i =>
           distinctZip(instantInInterval(i), instantInInterval(i))
-            .map(Spire.openUpperIntervalFromTuple[Instant].getOption)
+            .map(BoundedInterval.openUpperFromTuple[Instant].getOption)
         )
 
   // We define a "section" as a maximal interval either outside or inside the Schedule.

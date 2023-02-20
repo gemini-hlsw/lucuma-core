@@ -23,6 +23,8 @@ abstract class ValidWedge[E, A, B] extends ValidFormat[E, A, B] with Serializabl
 
   val reverseGet: B => A
 
+  def getOption: A => Option[B] = getValid.andThen(_.toOption)
+
   /** Normalize A via a round-trip through B. */
   def normalizeValidA(a: A): Either[E, A] =
     getValid.andThen(_.map(reverseGet))(a)

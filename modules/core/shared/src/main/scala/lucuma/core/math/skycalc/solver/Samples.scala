@@ -10,7 +10,6 @@ import cats.Functor
 import cats.MonoidK
 import cats.syntax.all._
 import lucuma.core.math.BoundedInterval
-import lucuma.core.math.BoundedInterval.*
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Place
 import lucuma.core.optics.Spire
@@ -43,8 +42,7 @@ trait Samples[A] { outer =>
   def interval: Option[BoundedInterval[Instant]] =
     (data.headOption, data.lastOption)
       .bimap(_.map(_._1), _.map(_._1))
-      .mapN(Function.untupled(Spire.closedIntervalFromTuple[Instant].getOption))
-      .flatten
+      .mapN(Function.untupled(BoundedInterval.closedFromTuple[Instant].get))
 
   /** The value at `i`, if any. */
   def get(i: Instant): Option[Eval[A]] =

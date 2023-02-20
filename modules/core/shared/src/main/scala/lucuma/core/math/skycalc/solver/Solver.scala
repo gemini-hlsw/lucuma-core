@@ -5,7 +5,6 @@ package lucuma.core.math.skycalc.solver
 
 import cats.syntax.all.*
 import lucuma.core.math.BoundedInterval
-import lucuma.core.math.BoundedInterval.*
 import lucuma.core.syntax.time.*
 import org.typelevel.cats.time.*
 import spire.math.Interval

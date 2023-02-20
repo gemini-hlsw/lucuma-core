@@ -5,7 +5,6 @@ package lucuma.core.math.skycalc
 package solver
 
 import lucuma.core.enums.Site.GN
-import lucuma.core.math.BoundedInterval.*
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Declination
 import lucuma.core.math.HourAngle

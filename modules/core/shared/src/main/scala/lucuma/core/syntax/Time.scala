@@ -5,7 +5,6 @@ package lucuma.core.syntax
 
 import cats.syntax.all.*
 import lucuma.core.math.BoundedInterval
-import lucuma.core.math.BoundedInterval.*
 import lucuma.core.optics.Spire
 import lucuma.core.util.TimeSpan
 import org.typelevel.cats.time.*
@@ -113,10 +112,7 @@ trait InstantBoundedIntervalOps:
       BoundedInterval.unsafeOpenUpper(fullDayStart, fullDayEnd)
     }
 
-    def duration: Duration = {
-      val (start, end) = Spire.openUpperIntervalFromTuple[Instant].reverseGet(self)
-      Duration.between(start, end)
-    }
+    def duration: Duration = Duration.between(self.lower, self.upper)
 
 object instantBoundedInterval extends InstantBoundedIntervalOps
 
@@ -125,16 +121,11 @@ trait InstantIntervalSeqOps extends InstantBoundedIntervalOps:
   extension (self: IntervalSeq[Instant])
     def duration: Duration =
       self.intervals
-        .foldLeft(Duration.ZERO.some)((d, i) =>
-          i match {
-            case b @ Bounded(_, _, _) => d.map(_.plus(b.duration))
-            case Point(_)             => d
-            case Empty()              => d
-            case _                    => none
-          }
+        .foldLeft(Duration.ZERO)((d, i) =>
+          d.plus(
+            BoundedInterval.fromInterval(i).map(_.duration).getOrElse(ChronoUnit.FOREVER.getDuration)
+          )
         )
-        .getOrElse(ChronoUnit.FOREVER.getDuration)
-
 
 object instantInterval extends InstantIntervalSeqOps
 
