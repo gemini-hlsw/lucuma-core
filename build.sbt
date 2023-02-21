@@ -15,7 +15,7 @@ lazy val monocleVersion        = "3.2.0"
 lazy val scalaJavaTimeVersion  = "2.5.0"
 lazy val geminiLocalesVersion  = "0.7.0"
 lazy val jtsVersion            = "0.3.0"
-lazy val coulombVersion        = "0.7.2"
+lazy val coulombVersion        = "0.7.3"
 lazy val spireVersion          = "0.18.0"
 lazy val singletonOpsVersion   = "0.5.2"
 lazy val refinedVersion        = "0.10.1"
@@ -25,6 +25,7 @@ lazy val circeVersion          = "0.14.3"
 lazy val catsScalacheckVersion = "0.3.2"
 lazy val shapelessVersion      = "2.3.10"
 lazy val catsParseVersion      = "0.3.9"
+lazy val kittensVersion        = "3.0.0"
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
@@ -52,6 +53,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
       "eu.timepit"     %%% "refined-cats"               % refinedVersion,
       "edu.gemini"     %%% "lucuma-refined"             % lucumaRefinedVersion,
       "org.typelevel"  %%% "cats-time"                  % catsTimeVersion,
+      "org.typelevel"  %%% "kittens"                    % kittensVersion,
       "io.circe"       %%% "circe-core"                 % circeVersion,
       "io.circe"       %%% "circe-generic"              % circeVersion,
       "io.circe"       %%% "circe-refined"              % circeVersion,
