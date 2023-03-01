@@ -13,15 +13,24 @@ import lucuma.core.enums.CatalogName
 import monocle.Focus
 import monocle.Lens
 
+import java.net.URI
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
+import scala.util.Try
+
 final case class CatalogInfo(
   catalog:    CatalogName,
   id:         NonEmptyString,
   objectType: Option[NonEmptyString]
-)
+):
+  val objectUrl: Option[URI] = catalog match
+    case CatalogName.Simbad => 
+      Try(URI(s"https://simbad.cds.unistra.fr/simbad/sim-id?Ident=${URLEncoder.encode(id.value, StandardCharsets.UTF_8)}")).toOption
+    case _ => none
+  
 
 object CatalogInfo {
-  implicit val orderCatalogInfo: Order[CatalogInfo] =
-    Order.by(x => (x.catalog, x.id, x.objectType))
+  given Order[CatalogInfo] = Order.by(x => (x.catalog, x.id, x.objectType))
 
   def apply(
     catalog:    CatalogName,
