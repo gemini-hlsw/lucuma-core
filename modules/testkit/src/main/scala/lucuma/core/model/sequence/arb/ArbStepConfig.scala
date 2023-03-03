@@ -3,6 +3,7 @@
 
 package lucuma.core.model.sequence.arb
 
+import cats.data.NonEmptySet
 import cats.syntax.all._
 import lucuma.core.enums._
 import lucuma.core.math.Offset
@@ -13,30 +14,61 @@ import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Cogen
 import org.scalacheck.Gen
+import org.scalacheck.cats.implicits.*
 
 trait ArbStepConfig {
   import ArbEnumerated._
   import ArbOffset._
 
+  implicit val arbGcalArcs: Arbitrary[NonEmptySet[GcalArc]] =
+    Arbitrary(
+      for {
+        a  <- arbitrary[GcalArc]
+        as <- arbitrary[List[GcalArc]]
+      } yield NonEmptySet.of(a, as*)
+    )
+
+  implicit val cogGcalArcs: Cogen[NonEmptySet[GcalArc]] =
+    Cogen[(GcalArc, List[GcalArc])].contramap { a =>
+      (a.head, a.tail.toList)
+    }
+
+  implicit val arbGcalLamp: Arbitrary[StepConfig.Gcal.Lamp] =
+    Arbitrary(
+      Gen.oneOf(
+        arbitrary[GcalContinuum].map(_.asLeft[NonEmptySet[GcalArc]]),
+        arbitrary[NonEmptySet[GcalArc]].map(_.asRight[GcalContinuum])
+      ).map(StepConfig.Gcal.Lamp.fromEither(_))
+    )
+
+  implicit val cogGcalLamp: Cogen[StepConfig.Gcal.Lamp] =
+    Cogen[(Either[GcalContinuum, NonEmptySet[GcalArc]])].contramap(_.toEither)
+
   implicit val arbStepConfigGcal: Arbitrary[StepConfig.Gcal] = Arbitrary(
     for {
-      continuum <- arbitrary[Option[GcalContinuum]]
-      arcs      <- arbitrary[List[GcalArc]]
+      lamp      <- arbitrary[StepConfig.Gcal.Lamp]
       filter    <- arbitrary[GcalFilter]
       diffuser  <- arbitrary[GcalDiffuser]
       shutter   <- arbitrary[GcalShutter]
-    } yield StepConfig.Gcal(continuum, arcs, filter, diffuser, shutter)
+    } yield StepConfig.Gcal(lamp, filter, diffuser, shutter)
   )
 
   implicit val cogStepConfigGcal: Cogen[StepConfig.Gcal] =
-    Cogen[(Option[GcalContinuum], List[GcalArc], GcalFilter, GcalDiffuser, GcalShutter)].contramap(
-      c => (c.continuum, c.arcs, c.filter, c.diffuser, c.shutter)
+    Cogen[(StepConfig.Gcal.Lamp, GcalFilter, GcalDiffuser, GcalShutter)].contramap(
+      c => (c.lamp, c.filter, c.diffuser, c.shutter)
     )
 
   implicit val arbStepConfigScience: Arbitrary[StepConfig.Science] =
     Arbitrary(arbitrary[Offset].map(StepConfig.Science.apply))
 
-  implicit val cogStepConfigScience: Cogen[StepConfig.Science] = Cogen[Offset].contramap(_.offset)
+  implicit val cogStepConfigScience: Cogen[StepConfig.Science] =
+    Cogen[Offset].contramap(_.offset)
+
+  implicit val arbStepConfigSmartGcal: Arbitrary[StepConfig.SmartGcal] =
+    Arbitrary(arbitrary[SmartGcalType].map(StepConfig.SmartGcal.apply))
+
+  implicit val cogStepConfigSmartGcal: Cogen[StepConfig.SmartGcal] =
+    Cogen[SmartGcalType].contramap(_.smartGcalType)
 
   implicit val arbStepConfig: Arbitrary[StepConfig] =
     Arbitrary(
@@ -44,16 +76,18 @@ trait ArbStepConfig {
         Gen.const(StepConfig.Bias),
         Gen.const(StepConfig.Dark),
         arbitrary[StepConfig.Gcal],
-        arbitrary[StepConfig.Science]
+        arbitrary[StepConfig.Science],
+        arbitrary[StepConfig.SmartGcal]
       )
     )
 
   implicit val cogStepConfig: Cogen[StepConfig] =
-    Cogen[Either[Unit, Either[Unit, Either[StepConfig.Gcal, StepConfig.Science]]]].contramap {
-      case StepConfig.Bias                    => ().asLeft
-      case StepConfig.Dark                    => ().asLeft.asRight
-      case g @ StepConfig.Gcal(_, _, _, _, _) => g.asLeft.asRight.asRight
-      case s @ StepConfig.Science(_)          => s.asRight.asRight.asRight
+    Cogen[Either[Unit, Either[Unit, Either[StepConfig.Gcal, Either[StepConfig.Science, StepConfig.SmartGcal]]]]].contramap {
+      case StepConfig.Bias                 => ().asLeft
+      case StepConfig.Dark                 => ().asLeft.asRight
+      case g @ StepConfig.Gcal(_, _, _, _) => g.asLeft.asRight.asRight
+      case s @ StepConfig.Science(_)       => s.asLeft.asRight.asRight.asRight
+      case m @ StepConfig.SmartGcal(_)     => m.asRight.asRight.asRight.asRight
     }
 }
 

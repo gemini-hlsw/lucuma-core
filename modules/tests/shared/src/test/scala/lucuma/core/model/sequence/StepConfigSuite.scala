@@ -16,8 +16,9 @@ final class StepConfigSuite extends DisciplineSuite {
   import ArbOffset._
 
   checkAll("Eq[StepConfig.Gcal]", EqTests[StepConfig.Gcal].eqv)
-  checkAll("StepConfig.Gcal.continuum", LensTests(StepConfig.Gcal.continuum))
-  checkAll("StepConfig.Gcal.arcs", LensTests(StepConfig.Gcal.arcs))
+  checkAll("StepConfig.Gcal.lamp", LensTests(StepConfig.Gcal.lamp))
+  checkAll("StepConfig.Gcal.continuum", OptionalTests(StepConfig.Gcal.continuum))
+  checkAll("StepConfig.Gcal.arcs", OptionalTests(StepConfig.Gcal.arcs))
   checkAll("StepConfig.Gcal.filter", LensTests(StepConfig.Gcal.filter))
   checkAll("StepConfig.Gcal.diffuser", LensTests(StepConfig.Gcal.diffuser))
   checkAll("StepConfig.Gcal.shutter", LensTests(StepConfig.Gcal.shutter))
