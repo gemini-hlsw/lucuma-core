@@ -22,11 +22,12 @@ object GcalContinuum {
 
   /** @group Constructors */ case object IrGreyBodyLow extends GcalContinuum("IrGreyBodyLow", "IR grey body - low", "IR grey body - low", false)
   /** @group Constructors */ case object IrGreyBodyHigh extends GcalContinuum("IrGreyBodyHigh", "IR grey body - high", "IR grey body - high", false)
-  /** @group Constructors */ case object QuartzHalogen extends GcalContinuum("QuartzHalogen", "Quartz Halogen", "Quartz Halogen", false)
+  /** @group Constructors */ case object QuartzHalogen5W extends GcalContinuum("QuartzHalogen5", "5W Quartz Halogen", "5W Quartz Halogen", false)
+  /** @group Constructors */ case object QuartzHalogen100W extends GcalContinuum("QuartzHalogen100", "100W Quartz Halogen", "100W Quartz Halogen", false)
 
   /** All members of GcalContinuum, in canonical order. */
   val all: List[GcalContinuum] =
-    List(IrGreyBodyLow, IrGreyBodyHigh, QuartzHalogen)
+    List(IrGreyBodyLow, IrGreyBodyHigh, QuartzHalogen5W, QuartzHalogen100W)
 
   /** Select the member of GcalContinuum with the given tag, if any. */
   def fromTag(s: String): Option[GcalContinuum] =
