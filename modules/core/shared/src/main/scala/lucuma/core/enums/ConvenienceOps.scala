@@ -11,7 +11,7 @@ private[enums] trait ConvenienceOps {
     def pm: Wavelength =
       Wavelength.unsafeFromIntPicometers(i)
 
-    def pmRange: BoundedInterval[Wavelength] =
+    def gePmRange: BoundedInterval[Wavelength] =
       // This is open upper (instead of closed) because of a limitation in postgres int4range
       BoundedInterval.unsafeOpenUpper(i.pm, Wavelength.Max)
   }
