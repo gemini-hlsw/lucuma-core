@@ -30,6 +30,7 @@ object Instrument {
   /** @group Constructors */ case object Gnirs      extends Instrument("Gnirs", "GNIRS", "GNIRS", false)
   /** @group Constructors */ case object Gpi        extends Instrument("Gpi", "GPI", "GPI", false)
   /** @group Constructors */ case object Gsaoi      extends Instrument("Gsaoi", "GSAOI", "GSAOI", false)
+  /** @group Constructors */ case object Igrins2    extends Instrument("Igrins2", "IGRINS2", "IGRINS2", false)
   /** @group Constructors */ case object Michelle   extends Instrument("Michelle", "Michelle", "Michelle", false)
   /** @group Constructors */ case object Nici       extends Instrument("Nici", "NICI", "NICI", false)
   /** @group Constructors */ case object Nifs       extends Instrument("Nifs", "NIFS", "NIFS", false)
@@ -53,6 +54,7 @@ object Instrument {
       Gnirs,
       Gpi,
       Gsaoi,
+      Igrins2,
       Michelle,
       Nici,
       Nifs,
