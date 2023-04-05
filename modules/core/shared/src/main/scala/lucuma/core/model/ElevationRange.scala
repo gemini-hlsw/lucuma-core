@@ -79,7 +79,8 @@ object ElevationRange {
 
     type Hour        = Interval.Closed[MinHour.type, MaxHour.type]
     type DecimalHour = BigDecimal Refined Hour
-    object DecimalHour extends RefinedTypeOps[DecimalHour, BigDecimal]
+    // An object here seems to confuse the 3.2.2 compiler, resulting in a null in runtime.
+    lazy val DecimalHour = new RefinedTypeOps[DecimalHour, BigDecimal]
 
     val DefaultMin = DecimalHour.unsafeFrom(MinHour)
     val DefaultMax = DecimalHour.unsafeFrom(MaxHour)
