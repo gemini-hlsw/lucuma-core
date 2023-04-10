@@ -7,7 +7,7 @@ import cats.Eq
 import cats.syntax.all.*
 import eu.timepit.refined.cats.*
 import eu.timepit.refined.types.numeric.NonNegInt
-import eu.timepit.refined.types.numeric.PosBigDecimal
+import lucuma.core.math.SignalToNoise
 import lucuma.core.model.NonNegDuration
 import lucuma.core.model.given
 import lucuma.core.util.TimeSpan
@@ -21,65 +21,65 @@ sealed trait ExposureTimeMode extends Product with Serializable
 
 object ExposureTimeMode {
 
-  final case class SignalToNoise(value: PosBigDecimal)             extends ExposureTimeMode
-  final case class FixedExposure(count: NonNegInt, time: TimeSpan) extends ExposureTimeMode
+  final case class SignalToNoiseMode(value: SignalToNoise)             extends ExposureTimeMode
+  final case class FixedExposureMode(count: NonNegInt, time: TimeSpan) extends ExposureTimeMode
 
   given Eq[ExposureTimeMode] =
     Eq.instance {
-      case (SignalToNoise(a), SignalToNoise(b))           => a === b
-      case (FixedExposure(ac, ad), FixedExposure(bc, bd)) => ac === bc && ad === bd
+      case (SignalToNoiseMode(a), SignalToNoiseMode(b))           => a === b
+      case (FixedExposureMode(ac, ad), FixedExposureMode(bc, bd)) => ac === bc && ad === bd
       case _                                              => false
     }
 
-  val signalToNoise: Prism[ExposureTimeMode, SignalToNoise] =
-    GenPrism[ExposureTimeMode, SignalToNoise]
+  val signalToNoise: Prism[ExposureTimeMode, SignalToNoiseMode] =
+    GenPrism[ExposureTimeMode, SignalToNoiseMode]
 
-  val fixedExposure: Prism[ExposureTimeMode, FixedExposure] =
-    GenPrism[ExposureTimeMode, FixedExposure]
+  val fixedExposure: Prism[ExposureTimeMode, FixedExposureMode] =
+    GenPrism[ExposureTimeMode, FixedExposureMode]
 
-  val signalToNoiseValue: Optional[ExposureTimeMode, PosBigDecimal] =
-    Optional[ExposureTimeMode, PosBigDecimal] {
-      case SignalToNoise(value) => value.some
-      case FixedExposure(_, _)  => none
+  val signalToNoiseValue: Optional[ExposureTimeMode, SignalToNoise] =
+    Optional[ExposureTimeMode, SignalToNoise] {
+      case SignalToNoiseMode(value) => value.some
+      case FixedExposureMode(_, _)  => none
     } { nnd =>
       {
-        case s @ SignalToNoise(_)    => SignalToNoise.value.replace(nnd)(s)
-        case f @ FixedExposure(_, _) => f
+        case s @ SignalToNoiseMode(_)    => SignalToNoiseMode.value.replace(nnd)(s)
+        case f @ FixedExposureMode(_, _) => f
       }
     }
 
   val exposureCount: Optional[ExposureTimeMode, NonNegInt] =
     Optional[ExposureTimeMode, NonNegInt] {
-      case FixedExposure(count, _) => count.some
-      case SignalToNoise(_)        => none
+      case FixedExposureMode(count, _) => count.some
+      case SignalToNoiseMode(_)        => none
     } { nni =>
       {
-        case f @ FixedExposure(_, _) => FixedExposure.count.replace(nni)(f)
-        case s @ SignalToNoise(_)    => s
+        case f @ FixedExposureMode(_, _) => FixedExposureMode.count.replace(nni)(f)
+        case s @ SignalToNoiseMode(_)    => s
       }
     }
 
   val exposureTime: Optional[ExposureTimeMode, TimeSpan] =
     Optional[ExposureTimeMode, TimeSpan] {
-      case FixedExposure(_, time) => time.some
-      case SignalToNoise(_)       => none
+      case FixedExposureMode(_, time) => time.some
+      case SignalToNoiseMode(_)       => none
     } { pbd =>
       {
-        case f @ FixedExposure(_, _) => FixedExposure.time.replace(pbd)(f)
-        case s @ SignalToNoise(_)    => s
+        case f @ FixedExposureMode(_, _) => FixedExposureMode.time.replace(pbd)(f)
+        case s @ SignalToNoiseMode(_)    => s
       }
     }
 
-  object SignalToNoise {
-    val value: Lens[SignalToNoise, PosBigDecimal] = Focus[SignalToNoise](_.value)
+  object SignalToNoiseMode {
+    val value: Lens[SignalToNoiseMode, SignalToNoise] = Focus[SignalToNoiseMode](_.value)
 
-    given Eq[SignalToNoise] = Eq.by(_.value)
+    given Eq[SignalToNoiseMode] = Eq.by(_.value)
   }
 
-  object FixedExposure {
-    val count: Lens[FixedExposure, NonNegInt] = Focus[FixedExposure](_.count)
-    val time: Lens[FixedExposure, TimeSpan]   = Focus[FixedExposure](_.time)
+  object FixedExposureMode {
+    val count: Lens[FixedExposureMode, NonNegInt] = Focus[FixedExposureMode](_.count)
+    val time: Lens[FixedExposureMode, TimeSpan]   = Focus[FixedExposureMode](_.time)
 
-    given Eq[FixedExposure] = Eq.by(f => (f.count, f.time))
+    given Eq[FixedExposureMode] = Eq.by(f => (f.count, f.time))
   }
 }

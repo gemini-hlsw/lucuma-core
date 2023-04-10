@@ -7,6 +7,7 @@ import cats.kernel.laws.discipline.EqTests
 import eu.timepit.refined.cats.*
 import eu.timepit.refined.scalacheck.all.*
 import lucuma.core.math.arb.ArbRefined
+import lucuma.core.math.arb.ArbSignalToNoise
 import lucuma.core.model.arb.ArbExposureTimeMode
 import lucuma.core.model.given
 import lucuma.core.util.arb.ArbTimeSpan
@@ -16,9 +17,10 @@ import monocle.law.discipline.PrismTests
 import munit.DisciplineSuite
 
 class ExposureTimeModeSuite extends DisciplineSuite {
-  import ArbTimeSpan.given
   import ArbExposureTimeMode.given
   import ArbRefined.given
+  import ArbSignalToNoise.given
+  import ArbTimeSpan.given
 
   checkAll("Eq[ExposureTimeMode]", EqTests[ExposureTimeMode].eqv)
   checkAll("ExposureTimeMode.signalToNoise", PrismTests(ExposureTimeMode.signalToNoise))
@@ -29,10 +31,10 @@ class ExposureTimeModeSuite extends DisciplineSuite {
   checkAll("ExposureTimeMode.exposureCount", OptionalTests(ExposureTimeMode.exposureCount))
   checkAll("ExposureTimeMode.exposureTime", OptionalTests(ExposureTimeMode.exposureTime))
 
-  checkAll("Eq[SignalToNoise]", EqTests[ExposureTimeMode.SignalToNoise].eqv)
-  checkAll("SignalToNoise.value", LensTests(ExposureTimeMode.SignalToNoise.value))
+  checkAll("Eq[SignalToNoise]", EqTests[ExposureTimeMode.SignalToNoiseMode].eqv)
+  checkAll("SignalToNoise.value", LensTests(ExposureTimeMode.SignalToNoiseMode.value))
 
-  checkAll("Eq[FixedExposure]", EqTests[ExposureTimeMode.FixedExposure].eqv)
-  checkAll("FixedExposure.count", LensTests(ExposureTimeMode.FixedExposure.count))
-  checkAll("FixedExposure.time", LensTests(ExposureTimeMode.FixedExposure.time))
+  checkAll("Eq[FixedExposure]", EqTests[ExposureTimeMode.FixedExposureMode].eqv)
+  checkAll("FixedExposure.count", LensTests(ExposureTimeMode.FixedExposureMode.count))
+  checkAll("FixedExposure.time", LensTests(ExposureTimeMode.FixedExposureMode.time))
 }
