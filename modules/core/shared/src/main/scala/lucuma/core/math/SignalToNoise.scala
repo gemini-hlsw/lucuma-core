@@ -3,6 +3,7 @@
 
 package lucuma.core.math
 
+import algebra.ring.AdditiveCommutativeSemigroup
 import cats.Order
 import cats.Show
 import eu.timepit.refined.types.numeric.PosBigDecimal
@@ -72,6 +73,17 @@ object SignalToNoise {
     Prism[BigDecimal, SignalToNoise](bd => fromMilliDecimal(bd * 1000))(_.toBigDecimal)
 
   /**
+   * Creates a `SignalToNoise` value assuming from a PosBigDecimal that is in
+   * range [Min, Max] and does not have a finer scale than milli-sn.
+   *
+   * @group Optics
+   */
+  val FromPosBigDecimalExact: Prism[PosBigDecimal, SignalToNoise] =
+    Prism[PosBigDecimal, SignalToNoise](bd =>
+      SignalToNoise.FromBigDecimalExact.getOption(bd.value)
+    )(_.toPosBigDecimal)
+
+  /**
    * Creates a `SignalToNoise` value assuming that the given BigDecimal is in
    * range [Min, Max].  Rounds finer scale values to milli-sn.
    *
@@ -80,6 +92,14 @@ object SignalToNoise {
   val FromBigDecimalRounding: Format[BigDecimal, SignalToNoise] =
     Format(bd => fromMilliDecimal((bd * 1000).setScale(0, BigDecimal.RoundingMode.HALF_UP)), _.toBigDecimal)
 
+  /**
+   * Creates a `SignalToNoise` value assuming that the given PosBigDecimal is in
+   * range [Min, Max].  Rounds finer scale values to milli-sn.
+   *
+   * @group Optics
+   */
+  val FromPosBigDecimalRounding: Format[PosBigDecimal, SignalToNoise] =
+    Format(bd => fromMilliDecimal((bd.value * 1000).setScale(0, BigDecimal.RoundingMode.HALF_UP)), _.toPosBigDecimal)
   /**
    * Formats to the canonical String representation for SignalToNoise.
    *
@@ -111,6 +131,10 @@ object SignalToNoise {
 
   given Order[SignalToNoise] =
     Order.fromLessThan(_ < _)
+
+  given AdditiveCommutativeSemigroup[SignalToNoise] = new AdditiveCommutativeSemigroup[SignalToNoise] {
+    def plus(x: SignalToNoise, y: SignalToNoise): SignalToNoise = (x + y)
+  }
 
   given Decoder[SignalToNoise] =
     Decoder.decodeJsonNumber.emap { jNum =>
