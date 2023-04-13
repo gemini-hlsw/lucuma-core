@@ -5,11 +5,13 @@ package lucuma.core.math
 
 import cats.Order
 import cats.Show
+import cats.syntax.all.*
 import eu.timepit.refined.types.numeric.PosBigDecimal
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.JsonNumber
 import lucuma.core.optics.Format
+import lucuma.core.validation.ValidSplitEpiNec
 import monocle.Prism
 
 import scala.util.control.Exception.catching
@@ -72,14 +74,44 @@ object SignalToNoise {
     Prism[BigDecimal, SignalToNoise](bd => fromMilliDecimal(bd * 1000))(_.toBigDecimal)
 
   /**
+   * Creates a `SignalToNoise` value assuming from a PosBigDecimal that is in
+   * range [Min, Max] and does not have a finer scale than milli-sn.
+   *
+   * @group Optics
+   */
+  val FromPosBigDecimalExact: Prism[PosBigDecimal, SignalToNoise] =
+    Prism[PosBigDecimal, SignalToNoise](bd =>
+      SignalToNoise.FromBigDecimalExact.getOption(bd.value)
+    )(_.toPosBigDecimal)
+
+  /**
    * Creates a `SignalToNoise` value assuming that the given BigDecimal is in
    * range [Min, Max].  Rounds finer scale values to milli-sn.
    *
    * @group Optics
    */
-  val FromBigDecimalRounding: Format[BigDecimal, SignalToNoise] =
-    Format(bd => fromMilliDecimal((bd * 1000).setScale(0, BigDecimal.RoundingMode.HALF_UP)), _.toBigDecimal)
+  val FromBigDecimalRounding: ValidSplitEpiNec[String, BigDecimal, SignalToNoise] =
+    ValidSplitEpiNec(
+      bd =>
+        fromMilliDecimal((bd * 1000)
+          .setScale(0, BigDecimal.RoundingMode.HALF_UP))
+          .toRightNec("Invalid SignalToNoise value $bd"),
+      _.toBigDecimal,
+    )
 
+  /**
+   * Creates a `SignalToNoise` value assuming that the given PosBigDecimal is in
+   * range [Min, Max].  Rounds finer scale values to milli-sn.
+   *
+   * @group Optics
+   */
+  val FromPosBigDecimalRounding: ValidSplitEpiNec[String, PosBigDecimal, SignalToNoise] =
+    ValidSplitEpiNec(
+      bd =>
+        fromMilliDecimal((bd.value * 1000)
+          .setScale(0, BigDecimal.RoundingMode.HALF_UP))
+          .toRightNec("Invalid SignalToNoise value $bd"),
+      _.toPosBigDecimal)
   /**
    * Formats to the canonical String representation for SignalToNoise.
    *
