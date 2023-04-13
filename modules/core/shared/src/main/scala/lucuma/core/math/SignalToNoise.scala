@@ -3,14 +3,15 @@
 
 package lucuma.core.math
 
-import algebra.ring.AdditiveCommutativeSemigroup
 import cats.Order
 import cats.Show
+import cats.syntax.all.*
 import eu.timepit.refined.types.numeric.PosBigDecimal
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.JsonNumber
 import lucuma.core.optics.Format
+import lucuma.core.validation.ValidSplitEpiNec
 import monocle.Prism
 
 import scala.util.control.Exception.catching
@@ -89,8 +90,14 @@ object SignalToNoise {
    *
    * @group Optics
    */
-  val FromBigDecimalRounding: Format[BigDecimal, SignalToNoise] =
-    Format(bd => fromMilliDecimal((bd * 1000).setScale(0, BigDecimal.RoundingMode.HALF_UP)), _.toBigDecimal)
+  val FromBigDecimalRounding: ValidSplitEpiNec[String, BigDecimal, SignalToNoise] =
+    ValidSplitEpiNec(
+      bd =>
+        fromMilliDecimal((bd * 1000)
+          .setScale(0, BigDecimal.RoundingMode.HALF_UP))
+          .toRightNec("Invalid SignalToNoise value $bd"),
+      _.toBigDecimal,
+    )
 
   /**
    * Creates a `SignalToNoise` value assuming that the given PosBigDecimal is in
@@ -98,8 +105,13 @@ object SignalToNoise {
    *
    * @group Optics
    */
-  val FromPosBigDecimalRounding: Format[PosBigDecimal, SignalToNoise] =
-    Format(bd => fromMilliDecimal((bd.value * 1000).setScale(0, BigDecimal.RoundingMode.HALF_UP)), _.toPosBigDecimal)
+  val FromPosBigDecimalRounding: ValidSplitEpiNec[String, PosBigDecimal, SignalToNoise] =
+    ValidSplitEpiNec(
+      bd =>
+        fromMilliDecimal((bd.value * 1000)
+          .setScale(0, BigDecimal.RoundingMode.HALF_UP))
+          .toRightNec("Invalid SignalToNoise value $bd"),
+      _.toPosBigDecimal)
   /**
    * Formats to the canonical String representation for SignalToNoise.
    *
@@ -131,10 +143,6 @@ object SignalToNoise {
 
   given Order[SignalToNoise] =
     Order.fromLessThan(_ < _)
-
-  given AdditiveCommutativeSemigroup[SignalToNoise] = new AdditiveCommutativeSemigroup[SignalToNoise] {
-    def plus(x: SignalToNoise, y: SignalToNoise): SignalToNoise = (x + y)
-  }
 
   given Decoder[SignalToNoise] =
     Decoder.decodeJsonNumber.emap { jNum =>
