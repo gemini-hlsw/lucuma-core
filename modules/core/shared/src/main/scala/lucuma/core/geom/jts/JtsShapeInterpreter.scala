@@ -20,7 +20,7 @@ import java.util.Collections
 object JtsShapeInterpreter extends ShapeInterpreter {
 
   private val EmptyGeometry: Geometry =
-    Jts.geometryFactory.buildGeometry(Collections.emptyList[Geometry])
+    Jts.geometryFactory.createPoint
 
   private def toGeometry(e: ShapeExpression): Geometry = {
     // The Geometry that comes out of this must have non-zero area or else
@@ -94,7 +94,6 @@ object JtsShapeInterpreter extends ShapeInterpreter {
 
 object interpreter {
 
-  implicit val value: ShapeInterpreter =
-    JtsShapeInterpreter
+  given ShapeInterpreter = JtsShapeInterpreter
 
 }

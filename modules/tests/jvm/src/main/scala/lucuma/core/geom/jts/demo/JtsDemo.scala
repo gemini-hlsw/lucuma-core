@@ -8,17 +8,17 @@ import lucuma.core.enums.GmosNorthFpu
 import lucuma.core.enums.GmosSouthFpu
 import lucuma.core.enums.PortDisposition
 import lucuma.core.geom.ShapeExpression
-import lucuma.core.geom.gmos._
-import lucuma.core.geom.jts.interpreter._
-import lucuma.core.geom.jts.jvm.syntax.awt._
-import lucuma.core.geom.syntax.all._
+import lucuma.core.geom.gmos.*
+import lucuma.core.geom.jts.interpreter.given
+import lucuma.core.geom.jts.jvm.syntax.awt.*
+import lucuma.core.geom.syntax.all.*
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
-import lucuma.core.math.syntax.int._
+import lucuma.core.math.syntax.int.*
 
-import java.awt.event._
+import java.awt.event.*
 import java.awt.{List => _, _}
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 /**
  * Throwaway demo code to visualize a shape created using `ShapeExpression`s.
