@@ -94,6 +94,7 @@ object JtsShapeInterpreter extends ShapeInterpreter {
 
 object interpreter {
 
+  val value: ShapeInterpreter = JtsShapeInterpreter
   given ShapeInterpreter = JtsShapeInterpreter
 
 }
