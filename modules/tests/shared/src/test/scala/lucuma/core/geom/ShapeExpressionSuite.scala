@@ -3,17 +3,20 @@
 
 package lucuma.core.geom
 
-import cats.syntax.all._
-import lucuma.core.geom.arb._
-import lucuma.core.geom.syntax.all._
+import cats.syntax.all.*
+import lucuma.core.geom.ShapeExpression.*
+import lucuma.core.geom.arb.*
+import lucuma.core.geom.jts.interpreter.given
+import lucuma.core.geom.syntax.all.*
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
-import lucuma.core.math.arb._
-import lucuma.core.math.syntax.int._
+import lucuma.core.math.Offset.Component
+import lucuma.core.math.arb.*
+import lucuma.core.math.syntax.int.*
 import lucuma.core.tests.ScalaCheckFlaky
-import org.scalacheck.Arbitrary._
-import org.scalacheck.Prop._
-import org.scalacheck._
+import org.scalacheck.Arbitrary.*
+import org.scalacheck.Prop.*
+import org.scalacheck.*
 
 final class ShapeExpressionSuite extends munit.DisciplineSuite {
 
@@ -22,13 +25,10 @@ final class ShapeExpressionSuite extends munit.DisciplineSuite {
   // Scala 3 likes this better
   implicit def saneUnitToProp(unit: Unit): Prop = unitToProp(unit)
 
-  implicit val interpreter: ShapeInterpreter =
-    lucuma.core.geom.jts.interpreter.value
-
-  import ArbAngle._
-  import ArbOffset._
-  import ArbShapeExpression._
-  import ShapeExpressionSpec._
+  import ArbAngle.*
+  import ArbOffset.*
+  import ArbShapeExpression.*
+  import ShapeExpressionSpec.*
 
   test("intersection contains") {
     forAll(genTwoCenteredShapesAndAnOffset) { case (tcs, off) =>
@@ -141,7 +141,10 @@ final class ShapeExpressionSuite extends munit.DisciplineSuite {
       val p1 = ShapeExpression.regularPolygon(r1.arcsec, s)
       val p  = if (r0 <= r1) p0 else p1
 
-      assertEquals(p.area, (p0 ∩ p1).area)
+      val nominal = p.area.toMicroarcsecondsSquared
+      val intersected = (p0 ∩ p1).area.toMicroarcsecondsSquared
+      val error   = if (nominal === 0L) 0.0 else (nominal - intersected).toDouble / nominal.toDouble
+      assertEqualsDouble(error, 0.0, 1.0e-13)
     }
   }
 
@@ -151,7 +154,10 @@ final class ShapeExpressionSuite extends munit.DisciplineSuite {
       val p1 = ShapeExpression.regularPolygon(r1.arcsec, s)
       val p  = if (r0 >= r1) p0 else p1
 
-      assertEquals(p.area, (p0 ∪ p1).area)
+      val nominal = p.area.toMicroarcsecondsSquared
+      val united = (p0 ∪ p1).area.toMicroarcsecondsSquared
+      val error   = if (nominal === 0L) 0.0 else (nominal - united).toDouble / nominal.toDouble
+      assertEqualsDouble(error, 0.0, 1.0e-13)
     }
   }
 
@@ -165,6 +171,85 @@ final class ShapeExpressionSuite extends munit.DisciplineSuite {
         assertEquals((p0.µasSquared - p1.µasSquared).abs, p.µasSquared)
       }
     }
+  }
+
+  test("Regression test") {
+    val l = List[ShapeExpression](
+      Rotate(
+        e = Translate(
+          e = FlipQ(
+            e = Translate(
+              e = Translate(
+                e = Rectangle(
+                  a = Offset(p = Component(Angle.fromMicroarcseconds(0L)), q = Component(Angle.fromMicroarcseconds(0L))),
+                  b = Offset(p = Component(Angle.fromMicroarcseconds(212700000L)), q = Component(Angle.fromMicroarcseconds(249600000L)))
+                ),
+                o = Offset(
+                  p = Component(Angle.fromMicroarcseconds(1295893650000L)),
+                  q = Component(Angle.fromMicroarcseconds(1295875200000L))
+                )
+              ),
+              o = Offset(
+                p = Component(Angle.fromMicroarcseconds(1295905050000L)),
+                q = Component(Angle.fromMicroarcseconds(1295910120000L))
+              )
+            )
+          ),
+          o = Offset(p = Component(Angle.fromMicroarcseconds(0L)), q = Component(Angle.fromMicroarcseconds(0L)))
+        ),
+        a = Angle.fromMicroarcseconds(288000000000L)
+      ),
+      Rotate(
+        e = Translate(
+          e = FlipQ(
+            e = Translate(
+              e = Translate(
+                e = Rectangle(
+                  a = Offset(p = Component(Angle.fromMicroarcseconds(0L)), q = Component(Angle.fromMicroarcseconds(0L))),
+                  b = Offset(p = Component(Angle.fromMicroarcseconds(212700000L)), q = Component(Angle.fromMicroarcseconds(249600000L)))
+                ),
+                o = Offset(
+                  p = Component(Angle.fromMicroarcseconds(1295893650000L)),
+                  q = Component(Angle.fromMicroarcseconds(1295875200000L))
+                )
+              ),
+              o = Offset(
+                p = Component(Angle.fromMicroarcseconds(1295905050000L)),
+                q = Component(Angle.fromMicroarcseconds(1295910120000L))
+              )
+            )
+          ),
+          o = Offset(p = Component(Angle.fromMicroarcseconds(0L)), q = Component(Angle.fromMicroarcseconds(15000000L)))
+        ),
+        a = Angle.fromMicroarcseconds(288000000000L)
+      ),
+      Rotate(
+        e = Translate(
+          e = FlipQ(
+            e = Translate(
+              e = Translate(
+                e = Rectangle(
+                  a = Offset(p = Component(Angle.fromMicroarcseconds(0L)), q = Component(Angle.fromMicroarcseconds(0L))),
+                  b = Offset(p = Component(Angle.fromMicroarcseconds(212700000L)), q = Component(Angle.fromMicroarcseconds(249600000L)))
+                ),
+                o = Offset(
+                  p = Component(Angle.fromMicroarcseconds(1295893650000L)),
+                  q = Component(Angle.fromMicroarcseconds(1295875200000L))
+                )
+              ),
+              o = Offset(
+                p = Component(Angle.fromMicroarcseconds(1295905050000L)),
+                q = Component(Angle.fromMicroarcseconds(1295910120000L))
+              )
+            )
+          ),
+          o = Offset(p = Component(Angle.fromMicroarcseconds(10000000L)), q = Component(Angle.fromMicroarcseconds(0L)))
+        ),
+        a = Angle.fromMicroarcseconds(288000000000L)
+      )
+    )
+    // This operation was failing with the previous JTS library port
+    assert(l.reduce(_ ∩ _).eval != null)
   }
 }
 
