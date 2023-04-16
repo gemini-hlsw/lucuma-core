@@ -8,10 +8,10 @@ import lucuma.core.util.WithGid
 import lucuma.core.util.WithUid
 import lucuma.refined._
 
-object Attachment     extends WithGid('a'.refined)
 object Configuration  extends WithGid('c'.refined)
 object Dataset        extends WithGid('d'.refined)
 object ExecutionEvent extends WithGid('e'.refined)
+object ObsAttachment  extends WithGid('a'.refined)
 object Observation    extends WithGid('o'.refined)
 object Program        extends WithGid('p'.refined)
 object Visit          extends WithUid('v'.refined)
