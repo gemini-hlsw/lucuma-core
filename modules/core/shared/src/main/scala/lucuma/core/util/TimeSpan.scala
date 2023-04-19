@@ -174,7 +174,7 @@ object TimeSpan {
     /**
      * Divides a TimeSpan by a non-negative integer, via integer division.
      */
-    @targetName("divide")
+    @targetName("boundedDivide")
     def /|(divisor: NonZeroInt): TimeSpan =
       TimeSpan.fromMicroseconds(timeSpan.toMicroseconds / divisor.value).getOrElse(Min)
 
