@@ -5,6 +5,7 @@ package lucuma.core.model.sequence
 
 import cats.kernel.laws.discipline.*
 import cats.laws.discipline.arbitrary.*
+import lucuma.core.data.arb.ArbZipper
 import lucuma.core.model.sequence.arb.*
 import lucuma.core.model.sequence.gmos.DynamicConfig.GmosNorth
 import lucuma.core.model.sequence.gmos.arb.*
@@ -17,20 +18,18 @@ import org.scalacheck.Cogen
 import org.scalacheck.Test
 
 
-final class AtomSuite extends DisciplineSuite {
+final class SequenceSuite extends DisciplineSuite {
   import ArbAtom.given
   import ArbBoundedCollection.given
-  import ArbDynamicConfig._
-  import ArbEnumerated._
-  import ArbStep.given
-  import ArbUid._
+  import ArbDynamicConfig.*
+  import ArbEnumerated.*
+  import ArbSequence.given
+  import ArbUid.*
 
-  override val scalaCheckTestParameters = Test.Parameters.default.withMaxSize(10)
+  override val scalaCheckTestParameters = Test.Parameters.default.withMaxSize(4)
 
-  checkAll("Atom.Id", UidTests[Atom.Id].uid)
+  checkAll("Eq[Sequence[GmosNorth]]", EqTests[Sequence[GmosNorth]].eqv)
+  checkAll("Sequence.atoms",          LensTests(Sequence.atoms[GmosNorth]))
 
-  checkAll("Eq[Atom[GmosNorth]]", EqTests[Atom[GmosNorth]].eqv)
-  checkAll("Atom.id",             LensTests(Atom.id[GmosNorth]))
-  checkAll("Atom.steps",          LensTests(Atom.steps[GmosNorth]))
 
 }

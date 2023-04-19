@@ -125,4 +125,5 @@ class TimeSpanSuite extends DisciplineSuite {
   test("divide by small is Max") {
     assertEquals(TimeSpan.unsafeFromMicroseconds(4294967299L) /| NonZeroBigDecimal.unsafeFrom(BigDecimal(1) / Int.MaxValue), TimeSpan.Max)
   }
+
 }

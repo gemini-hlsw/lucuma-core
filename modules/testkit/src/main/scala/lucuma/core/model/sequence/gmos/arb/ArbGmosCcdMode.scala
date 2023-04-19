@@ -1,13 +1,13 @@
 // Copyright (c) 2016-2023 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package lucuma.core.model.sequence.arb
+package lucuma.core.model.sequence.gmos
+package arb
 
-import lucuma.core.enums._
-import lucuma.core.model.sequence.GmosCcdMode
+import lucuma.core.enums.*
 import lucuma.core.util.arb.ArbEnumerated
-import org.scalacheck.Arbitrary._
-import org.scalacheck._
+import org.scalacheck.Arbitrary.*
+import org.scalacheck.*
 
 trait ArbGmosCcdMode {
   import ArbEnumerated._

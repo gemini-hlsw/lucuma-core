@@ -4,6 +4,7 @@
 package lucuma.core.model.sequence
 package arb
 
+import cats.data.NonEmptyList
 import cats.syntax.all._
 import lucuma.core.data.Zipper
 import lucuma.core.util.arb.ArbBoundedCollection
@@ -13,25 +14,19 @@ import org.scalacheck.Arbitrary._
 import org.scalacheck.Cogen
 import org.scalacheck.Gen
 
-trait ArbAtom {
+trait ArbSequence {
+  import ArbAtom.given
   import ArbBoundedCollection.*
-  import ArbStep.given
   import ArbUid._
 
-  given [D: Arbitrary]: Arbitrary[Atom[D]] =
+  given [D: Arbitrary]: Arbitrary[Sequence[D]] =
     Arbitrary {
-      for {
-        i <- arbitrary[Atom.Id]
-        d <- arbitrary[Option[String]]
-        s <- genBoundedNonEmptyList[Step[D]](BoundedCollectionLimit)
-      } yield Atom(i, d, s)
+      genBoundedNonEmptyList[Atom[D]](BoundedCollectionLimit).map(Sequence(_))
     }
 
-  given [D: Cogen]: Cogen[Atom[D]] =
-    Cogen[(Atom.Id, Option[String], List[Step[D]])].contramap { a =>
-      (a.id, a.description, a.steps.toList)
-    }
+  given [D: Cogen]: Cogen[Sequence[D]] =
+    Cogen[List[Atom[D]]].contramap(_.atoms.toList)
 
 }
 
-object ArbAtom extends ArbAtom
+object ArbSequence extends ArbSequence

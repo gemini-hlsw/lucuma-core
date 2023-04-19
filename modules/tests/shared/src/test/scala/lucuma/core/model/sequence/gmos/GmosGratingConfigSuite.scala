@@ -1,19 +1,20 @@
 // Copyright (c) 2016-2023 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package lucuma.core.model.sequence
+package lucuma.core.model.sequence.gmos
 
-import cats.kernel.laws.discipline._
+import cats.kernel.laws.discipline.*
 import lucuma.core.math.arb.ArbWavelength
-import lucuma.core.math.arb._
-import lucuma.core.model.sequence.arb._
-import lucuma.core.util.arb._
-import monocle.law.discipline._
-import munit._
+import lucuma.core.math.arb.*
+import lucuma.core.model.sequence.arb.*
+import lucuma.core.model.sequence.gmos.GmosGratingConfig
+import lucuma.core.util.arb.*
+import monocle.law.discipline.*
+import munit.*
 final class GmosGratingConfigSuite extends DisciplineSuite {
-  import ArbGmosGratingConfig._
-  import ArbEnumerated._
-  import ArbWavelength._
+  import ArbEnumerated.*
+  import ArbWavelength.*
+  import lucuma.core.model.sequence.gmos.arb.ArbGmosGratingConfig.*
 
   checkAll("Eq[GmosGratingConfig.North]", EqTests[GmosGratingConfig.North].eqv)
   checkAll("GmosGratingConfig.North.grating", LensTests(GmosGratingConfig.North.grating))

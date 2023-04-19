@@ -1,18 +1,18 @@
 // Copyright (c) 2016-2023 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package lucuma.core.model.sequence.arb
+package lucuma.core.model.sequence.gmos
+package arb
 
-import cats.syntax.all._
+import cats.syntax.all.*
 import lucuma.core.enums.GmosGratingOrder
 import lucuma.core.enums.GmosNorthGrating
 import lucuma.core.enums.GmosSouthGrating
 import lucuma.core.math.Wavelength
 import lucuma.core.math.arb.ArbWavelength
-import lucuma.core.model.sequence.GmosGratingConfig
 import lucuma.core.util.arb.ArbEnumerated
-import org.scalacheck.Arbitrary._
-import org.scalacheck._
+import org.scalacheck.Arbitrary.*
+import org.scalacheck.*
 
 trait ArbGmosGratingConfig {
   import ArbEnumerated._

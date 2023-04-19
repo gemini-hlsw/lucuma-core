@@ -1,24 +1,27 @@
 // Copyright (c) 2016-2023 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package lucuma.core.model.sequence
+package lucuma.core.model.sequence.gmos
 
 import cats.Eq
-import cats.syntax.all._
-import lucuma.core.enums._
+import cats.syntax.all.*
+import lucuma.core.enums.*
 import monocle.Focus
 import monocle.Lens
 import monocle.Prism
 import monocle.macros.GenPrism
 
 sealed trait StaticConfig
+
 object StaticConfig {
+
   final case class GmosNorth(
     stageMode:     GmosNorthStageMode,
     detector:      GmosNorthDetector,
     mosPreImaging: MosPreImaging,
     nodAndShuffle: Option[GmosNodAndShuffle]
   ) extends StaticConfig
+
   object GmosNorth {
     implicit val eqStaticConfigGmosNorth: Eq[GmosNorth] =
       Eq.by(x => (x.stageMode, x.detector, x.mosPreImaging, x.nodAndShuffle))
@@ -46,6 +49,7 @@ object StaticConfig {
     mosPreImaging: MosPreImaging,
     nodAndShuffle: Option[GmosNodAndShuffle]
   ) extends StaticConfig
+
   object GmosSouth {
     implicit val eqStaticConfigGmosSouth: Eq[GmosSouth] =
       Eq.by(x => (x.stageMode, x.detector, x.mosPreImaging, x.nodAndShuffle))

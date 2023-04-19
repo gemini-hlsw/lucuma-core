@@ -6,7 +6,10 @@ package lucuma.core.model.sequence
 import cats.Eq
 import cats.syntax.all._
 import eu.timepit.refined.auto._
+import lucuma.core.data.Zipper
 import lucuma.core.enums.Breakpoint
+import lucuma.core.enums.ObserveClass
+import lucuma.core.util.TimeSpan
 import lucuma.core.util.WithUid
 import lucuma.refined._
 import monocle.Focus
@@ -14,90 +17,59 @@ import monocle.Lens
 import monocle.Prism
 import monocle.macros.GenPrism
 
-sealed trait Step {
-  def id: Step.Id
-  def instrumentConfig: DynamicConfig
-  def stepConfig: StepConfig
-  def time: StepTime
-  def breakpoint: Breakpoint
+/**
+ * Complete step configuration for a particular instrument's dynamic config.
+ *
+ * @tparam D dynamic config type (e.g., DynamicConfig.GmosNorth)
+ */
+case class Step[D](
+  id:                Step.Id,
+  instrumentConfig:  D,
+  stepConfig:        StepConfig,
+  estimate:          StepEstimate,
+  observeClass:      ObserveClass = ObserveClass.Science,
+  breakpoint:        Breakpoint = Breakpoint.Disabled,
+) {
+
+  lazy val plannedTime: PlannedTime =
+    PlannedTime(observeClass.chargeClass -> estimate.total)
+
 }
 
 object Step extends WithUid('s'.refined) {
-  final case class GmosNorth(
-    id:               Step.Id,
-    instrumentConfig: DynamicConfig.GmosNorth,
-    stepConfig:       StepConfig,
-    time:             StepTime,
-    breakpoint:       Breakpoint
-  ) extends Step
-  object GmosNorth {
-    implicit val eqStepGmosNorth: Eq[GmosNorth] =
-      Eq.by(x => (x.id, x.instrumentConfig, x.stepConfig, x.time, x.breakpoint))
-
-    /** @group Optics */
-    val id: Lens[GmosNorth, Step.Id] =
-      Focus[GmosNorth](_.id)
-
-    /** @group Optics */
-    val instrumentConfig: Lens[GmosNorth, DynamicConfig.GmosNorth] =
-      Focus[GmosNorth](_.instrumentConfig)
-
-    /** @group Optics */
-    val stepConfig: Lens[GmosNorth, StepConfig] =
-      Focus[GmosNorth](_.stepConfig)
-
-    /** @group Optics */
-    val time: Lens[GmosNorth, StepTime] =
-      Focus[GmosNorth](_.time)
-
-    /** @group Optics */
-    val breakpoint: Lens[GmosNorth, Breakpoint] =
-      Focus[GmosNorth](_.breakpoint)
-  }
-
-  final case class GmosSouth(
-    id:               Step.Id,
-    instrumentConfig: DynamicConfig.GmosSouth,
-    stepConfig:       StepConfig,
-    time:             StepTime,
-    breakpoint:       Breakpoint
-  ) extends Step
-  object GmosSouth {
-    implicit val eqStepGmosSouth: Eq[GmosSouth] =
-      Eq.by(x => (x.id, x.instrumentConfig, x.stepConfig, x.time, x.breakpoint))
-
-    /** @group Optics */
-    val id: Lens[GmosSouth, Step.Id] =
-      Focus[GmosSouth](_.id)
-
-    /** @group Optics */
-    val instrumentConfig: Lens[GmosSouth, DynamicConfig.GmosSouth] =
-      Focus[GmosSouth](_.instrumentConfig)
-
-    /** @group Optics */
-    val stepConfig: Lens[GmosSouth, StepConfig] =
-      Focus[GmosSouth](_.stepConfig)
-
-    /** @group Optics */
-    val time: Lens[GmosSouth, StepTime] =
-      Focus[GmosSouth](_.time)
-
-    /** @group Optics */
-    val breakpoint: Lens[GmosSouth, Breakpoint] =
-      Focus[GmosSouth](_.breakpoint)
-  }
-
-  implicit val eqStep: Eq[Step] = Eq.instance {
-    case (a @ GmosNorth(_, _, _, _, _), b @ GmosNorth(_, _, _, _, _)) => a === b
-    case (a @ GmosSouth(_, _, _, _, _), b @ GmosSouth(_, _, _, _, _)) => a === b
-    case _                                                            => false
-  }
 
   /** @group Optics */
-  val gmosNorth: Prism[Step, GmosNorth] =
-    GenPrism[Step, GmosNorth]
+  def id[D]: Lens[Step[D], Step.Id] =
+    Focus[Step[D]](_.id)
 
   /** @group Optics */
-  val gmosSouth: Prism[Step, GmosSouth] =
-    GenPrism[Step, GmosSouth]
+  def instrumentConfig[D]: Lens[Step[D], D] =
+    Focus[Step[D]](_.instrumentConfig)
+
+  /** @group Optics */
+  def stepConfig[D]: Lens[Step[D], StepConfig] =
+    Focus[Step[D]](_.stepConfig)
+
+  /** @group Optics */
+  def estimate[D]: Lens[Step[D], StepEstimate] =
+    Focus[Step[D]](_.estimate)
+
+  /** @group Optics */
+  def observeClass[D]: Lens[Step[D], ObserveClass] =
+    Focus[Step[D]](_.observeClass)
+
+    /** @group Optics */
+  def breakpoint[D]: Lens[Step[D], Breakpoint] =
+    Focus[Step[D]](_.breakpoint)
+
+  given [D](using Eq[D]): Eq[Step[D]] =
+    Eq.by { x => (
+      x.id,
+      x.instrumentConfig,
+      x.stepConfig,
+      x.estimate,
+      x.observeClass,
+      x.breakpoint
+    )}
+
 }

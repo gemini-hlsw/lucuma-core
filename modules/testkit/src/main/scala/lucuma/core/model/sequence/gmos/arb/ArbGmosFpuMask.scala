@@ -1,17 +1,17 @@
 // Copyright (c) 2016-2023 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package lucuma.core.model.sequence.arb
+package lucuma.core.model.sequence.gmos
+package arb
 
-import cats.syntax.all._
-import eu.timepit.refined.scalacheck.string._
+import cats.syntax.all.*
+import eu.timepit.refined.scalacheck.string.*
 import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.core.enums.GmosCustomSlitWidth
 import lucuma.core.math.arb.ArbRefined
-import lucuma.core.model.sequence.GmosFpuMask
 import lucuma.core.util.arb.ArbEnumerated
 import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck._
+import org.scalacheck.*
 
 trait ArbGmosFpuMask {
   import ArbEnumerated._

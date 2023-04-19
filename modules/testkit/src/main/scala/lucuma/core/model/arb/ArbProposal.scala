@@ -21,7 +21,7 @@ import org.scalacheck.*
 import scala.collection.immutable.SortedMap
 
 trait ArbProposal {
-  import ArbCollection.*
+  import ArbCollection.given
   import ArbEnumerated.*
   import ArbProposalClass.given
 

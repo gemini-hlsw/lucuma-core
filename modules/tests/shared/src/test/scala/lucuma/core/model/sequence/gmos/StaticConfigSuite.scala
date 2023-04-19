@@ -1,18 +1,19 @@
 // Copyright (c) 2016-2023 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package lucuma.core.model.sequence
+package lucuma.core.model.sequence.gmos
 
-import cats.kernel.laws.discipline._
-import lucuma.core.model.sequence.arb._
-import lucuma.core.util.arb._
-import monocle.law.discipline._
-import munit._
+import cats.kernel.laws.discipline.*
+import lucuma.core.model.sequence.arb.*
+import lucuma.core.model.sequence.gmos.StaticConfig
+import lucuma.core.util.arb.*
+import monocle.law.discipline.*
+import munit.*
 
 final class StaticConfigSuite extends DisciplineSuite {
-  import ArbStaticConfig._
-  import ArbEnumerated._
-  import ArbGmosNodAndShuffle._
+  import ArbEnumerated.*
+  import lucuma.core.model.sequence.gmos.arb.ArbGmosNodAndShuffle.*
+  import lucuma.core.model.sequence.gmos.arb.ArbStaticConfig.*
 
   checkAll("Eq[StaticConfig.GmosNorth]", EqTests[StaticConfig.GmosNorth].eqv)
   checkAll("StaticConfig.GmosNorth.stageMode", LensTests(StaticConfig.GmosNorth.stageMode))

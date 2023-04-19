@@ -1,10 +1,10 @@
 // Copyright (c) 2016-2023 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package lucuma.core.model.sequence
+package lucuma.core.model.sequence.gmos
 
 import cats.Eq
-import eu.timepit.refined.cats._
+import eu.timepit.refined.cats.*
 import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.enums.GmosEOffsetting
 import lucuma.core.math.Offset
