@@ -11,6 +11,7 @@ import cats.syntax.order.*
 import eu.timepit.refined.types.numeric.NonNegLong
 import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.optics.Format
+import lucuma.core.refined.numeric.NonZeroInt
 import monocle.Iso
 import monocle.Prism
 
@@ -174,8 +175,8 @@ object TimeSpan {
      * Divides a TimeSpan by a non-negative integer, via integer division.
      */
     @targetName("divide")
-    def /(divisor: PosInt): TimeSpan =
-      TimeSpan.unsafeFromMicroseconds(timeSpan.toMicroseconds / divisor.value)
+    def /|(divisor: NonZeroInt): TimeSpan =
+      TimeSpan.fromMicroseconds(timeSpan.toMicroseconds / divisor.value).getOrElse(Min)
 
   }
 

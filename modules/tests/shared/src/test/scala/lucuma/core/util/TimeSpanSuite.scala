@@ -6,11 +6,13 @@ package lucuma.core.util
 import cats.kernel.laws.discipline.*
 import cats.syntax.either.*
 import cats.syntax.option.*
+import cats.syntax.order.*
 import eu.timepit.refined.cats._
 import eu.timepit.refined.scalacheck.numeric._
 import eu.timepit.refined.types.numeric.NonNegInt
 import lucuma.core.arb.ArbTime.arbDuration
 import lucuma.core.optics.laws.discipline.*
+import lucuma.core.refined.numeric.NonZeroInt
 import lucuma.core.util.arb.ArbTimeSpan
 import lucuma.core.util.arb.ArbTimeSpan.genDuration
 import lucuma.core.util.arb.ArbTimeSpan.genTimeSpanString
@@ -78,6 +80,19 @@ class TimeSpanSuite extends DisciplineSuite {
       val big    = BigInt(t0.toMicroseconds) - BigInt(t1.toMicroseconds)
       val expect = Option.when(big >= BigInt(0))(TimeSpan.unsafeFromMicroseconds(big.longValue)).getOrElse(TimeSpan.Min)
       assertEquals(t0 -| t1, expect)
+    }
+  }
+
+  test("bounded division") {
+    forAll { (t0: TimeSpan, i: Int) =>
+      NonZeroInt.from(i).forall { nzi =>
+        val res = t0 /| nzi
+        if (nzi.value < 0) res === TimeSpan.Zero
+        else {
+          val diff = t0 -| res *| nzi.value
+          TimeSpan.Zero <= diff && diff < TimeSpan.unsafeFromMicroseconds(nzi.value.toLong)
+        }
+      }
     }
   }
 
