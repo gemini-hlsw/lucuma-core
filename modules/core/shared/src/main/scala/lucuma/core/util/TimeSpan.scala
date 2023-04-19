@@ -175,8 +175,8 @@ object TimeSpan {
     /**
      * Divides a TimeSpan by a non-negative integer, via integer division.
      */
-    @targetName("boundedDivide")
-    def /|(divisor: PosInt): TimeSpan =
+    @targetName("divide")
+    def /(divisor: PosInt): TimeSpan =
       TimeSpan.unsafeFromMicroseconds(timeSpan.toMicroseconds / divisor.value)
 
   }
