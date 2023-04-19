@@ -8,7 +8,6 @@ import cats.Order
 import cats.Order.catsKernelOrderingForOrder
 import cats.syntax.option.*
 import cats.syntax.order.*
-import eu.timepit.refined.types.numeric.NonNegInt
 import eu.timepit.refined.types.numeric.NonNegLong
 import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.optics.Format
@@ -160,16 +159,15 @@ object TimeSpan {
       fromMicroseconds(timeSpan.toMicroseconds - other.toMicroseconds).getOrElse(Min)
 
     /**
-     * Multiplies a TimeSpan by a non-negative integer, capping the resulting
-     * value at `Max`.
+     * Multiplies a TimeSpan by an integer, limiting the resulting value to the
+     * range (`Min`, `Max`).
      */
     @targetName("boundedMultiply")
-    def *|(multiplier: NonNegInt): TimeSpan = {
-      val big = BigInt(timeSpan.toMicroseconds) * multiplier.value
-      Option
-        .when(big <= Max.toMicroseconds)(fromMicroseconds(big.longValue))
-        .flatten
-        .getOrElse(Max)
+    def *|(multiplier: Int): TimeSpan = {
+      val big = BigInt(timeSpan.toMicroseconds) * multiplier
+      if (big < Min.toMicroseconds) Min
+      else if (big > Max.toMicroseconds) Max
+      else unsafeFromMicroseconds(big.longValue)
     }
 
     /**
