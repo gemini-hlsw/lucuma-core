@@ -3,11 +3,14 @@
 
 package lucuma.core.util
 
+import cats.Monoid
 import cats.Order
 import cats.Order.catsKernelOrderingForOrder
 import cats.syntax.option.*
 import cats.syntax.order.*
+import eu.timepit.refined.types.numeric.NonNegInt
 import eu.timepit.refined.types.numeric.NonNegLong
+import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.optics.Format
 import monocle.Iso
 import monocle.Prism
@@ -15,6 +18,7 @@ import monocle.Prism
 import java.math.RoundingMode.HALF_UP
 import java.time.Duration
 import java.time.temporal.ChronoUnit.MICROS
+import scala.annotation.targetName
 import scala.util.Try
 
 /**
@@ -141,6 +145,40 @@ object TimeSpan {
     def format: String =
       toDuration.toString
 
+    /**
+     * Adds two TimeSpan values, capping the resulting value at `Max`.
+     */
+    @targetName("boundedAdd")
+    def +|(other: TimeSpan): TimeSpan =
+      fromMicroseconds(timeSpan.toMicroseconds + other.toMicroseconds).getOrElse(Max)
+
+    /**
+     * Subtracts a TimeSpan value, with a floor of `Min` on the resulting value.
+     */
+    @targetName("boundedSubtract")
+    def -|(other: TimeSpan): TimeSpan =
+      fromMicroseconds(timeSpan.toMicroseconds - other.toMicroseconds).getOrElse(Min)
+
+    /**
+     * Multiplies a TimeSpan by a non-negative integer, capping the resulting
+     * value at `Max`.
+     */
+    @targetName("boundedMultiply")
+    def *|(multiplier: NonNegInt): TimeSpan = {
+      val big = BigInt(timeSpan.toMicroseconds) * multiplier.value
+      Option
+        .when(big <= Max.toMicroseconds)(fromMicroseconds(big.longValue))
+        .flatten
+        .getOrElse(Max)
+    }
+
+    /**
+     * Divides a TimeSpan by a non-negative integer, via integer division.
+     */
+    @targetName("boundedDivide")
+    def /|(divisor: PosInt): TimeSpan =
+      TimeSpan.unsafeFromMicroseconds(timeSpan.toMicroseconds / divisor.value)
+
   }
 
   /**
@@ -177,5 +215,11 @@ object TimeSpan {
 
   given orderTimeSpan: Order[TimeSpan] =
     Order.by(_.value)
+
+  /**
+   * TimeSpan forms a monoid under the bounded add operation.
+   */
+  given Monoid[TimeSpan] =
+    Monoid.instance(TimeSpan.Zero, _ +| _)
 
 }

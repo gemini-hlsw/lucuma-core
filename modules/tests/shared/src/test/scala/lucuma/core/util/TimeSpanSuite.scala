@@ -8,6 +8,7 @@ import cats.syntax.either.*
 import cats.syntax.option.*
 import eu.timepit.refined.cats._
 import eu.timepit.refined.scalacheck.numeric._
+import eu.timepit.refined.types.numeric.NonNegInt
 import lucuma.core.arb.ArbTime.arbDuration
 import lucuma.core.optics.laws.discipline.*
 import lucuma.core.util.arb.ArbTimeSpan
@@ -37,6 +38,7 @@ class TimeSpanSuite extends DisciplineSuite {
   checkAll("TimeSpan.FromDuration",       FormatTests(TimeSpan.FromDuration).formatWith(genDuration))
   checkAll("TimeSpan.FromString",         FormatTests(TimeSpan.FromString).formatWith(genTimeSpanString))
   checkAll("TimeSpan.Order",              OrderTests[TimeSpan].order)
+  checkAll("TimeSpan.Monoid",             MonoidTests[TimeSpan].monoid)
 
   import lucuma.core.syntax.timespan.*
 
@@ -62,4 +64,21 @@ class TimeSpanSuite extends DisciplineSuite {
       TimeSpan.fromHours(BigDecimal(2562047789L)).get
     }
   }
+
+  test("bounded addition") {
+    forAll { (t0: TimeSpan, t1: TimeSpan) =>
+      val big    = BigInt(t0.toMicroseconds) + BigInt(t1.toMicroseconds)
+      val expect = Option.when(big.isValidLong)(TimeSpan.unsafeFromMicroseconds(big.longValue)).getOrElse(TimeSpan.Max)
+      assertEquals(t0 +| t1, expect)
+    }
+  }
+
+  test("bounded subtraction") {
+    forAll { (t0: TimeSpan, t1: TimeSpan) =>
+      val big    = BigInt(t0.toMicroseconds) - BigInt(t1.toMicroseconds)
+      val expect = Option.when(big >= BigInt(0))(TimeSpan.unsafeFromMicroseconds(big.longValue)).getOrElse(TimeSpan.Min)
+      assertEquals(t0 -| t1, expect)
+    }
+  }
+
 }
