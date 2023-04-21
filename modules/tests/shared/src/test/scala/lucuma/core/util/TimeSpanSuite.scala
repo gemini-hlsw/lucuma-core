@@ -6,10 +6,14 @@ package lucuma.core.util
 import cats.kernel.laws.discipline.*
 import cats.syntax.either.*
 import cats.syntax.option.*
+import cats.syntax.order.*
 import eu.timepit.refined.cats._
 import eu.timepit.refined.scalacheck.numeric._
+import eu.timepit.refined.types.numeric.NonNegInt
 import lucuma.core.arb.ArbTime.arbDuration
 import lucuma.core.optics.laws.discipline.*
+import lucuma.core.refined.numeric.NonZeroBigDecimal
+import lucuma.core.refined.numeric.NonZeroInt
 import lucuma.core.util.arb.ArbTimeSpan
 import lucuma.core.util.arb.ArbTimeSpan.genDuration
 import lucuma.core.util.arb.ArbTimeSpan.genTimeSpanString
@@ -37,6 +41,7 @@ class TimeSpanSuite extends DisciplineSuite {
   checkAll("TimeSpan.FromDuration",       FormatTests(TimeSpan.FromDuration).formatWith(genDuration))
   checkAll("TimeSpan.FromString",         FormatTests(TimeSpan.FromString).formatWith(genTimeSpanString))
   checkAll("TimeSpan.Order",              OrderTests[TimeSpan].order)
+  checkAll("TimeSpan.Monoid",             MonoidTests[TimeSpan].monoid)
 
   import lucuma.core.syntax.timespan.*
 
@@ -61,5 +66,63 @@ class TimeSpanSuite extends DisciplineSuite {
     intercept[NoSuchElementException] {
       TimeSpan.fromHours(BigDecimal(2562047789L)).get
     }
+  }
+
+  test("bounded addition") {
+    forAll { (t0: TimeSpan, t1: TimeSpan) =>
+      val big    = BigInt(t0.toMicroseconds) + BigInt(t1.toMicroseconds)
+      val expect = Option.when(big.isValidLong)(TimeSpan.unsafeFromMicroseconds(big.longValue)).getOrElse(TimeSpan.Max)
+      assertEquals(t0 +| t1, expect)
+    }
+  }
+
+  test("bounded subtraction") {
+    forAll { (t0: TimeSpan, t1: TimeSpan) =>
+      val big    = BigInt(t0.toMicroseconds) - BigInt(t1.toMicroseconds)
+      val expect = Option.when(big >= BigInt(0))(TimeSpan.unsafeFromMicroseconds(big.longValue)).getOrElse(TimeSpan.Min)
+      assertEquals(t0 -| t1, expect)
+    }
+  }
+
+  test("bounded int division") {
+    forAll { (t0: TimeSpan, i: Int) =>
+      NonZeroInt.from(i).forall { nz =>
+        val res = t0 /| nz
+        if (nz.value < 0) res === TimeSpan.Zero
+        else {
+          val diff = t0 -| res *| nz.value
+          TimeSpan.Zero <= diff && diff < TimeSpan.unsafeFromMicroseconds(nz.value.toLong)
+        }
+      }
+    }
+  }
+
+  test("multiply by 0.5 is divide by 2") {
+    forAll { (t: TimeSpan) =>
+      assertEquals(t *| BigDecimal(0.5), t /| NonZeroBigDecimal.unsafeFrom(2.0))
+    }
+  }
+
+  test("multiply by negative is Zero") {
+    forAll { (t: TimeSpan) =>
+      assertEquals(t *| -1, TimeSpan.Zero)
+      assertEquals(t *| BigDecimal(-1), TimeSpan.Zero)
+    }
+  }
+
+  test("divide by negative is Zero") {
+    forAll { (t: TimeSpan) =>
+      assertEquals(t /| NonZeroInt.unsafeFrom(-1), TimeSpan.Zero)
+      assertEquals(t /| NonZeroBigDecimal.unsafeFrom(-1.0), TimeSpan.Zero)
+    }
+  }
+
+  test("multiply by big is Max") {
+    assertEquals(TimeSpan.unsafeFromMicroseconds(4294967299L) *| Int.MaxValue, TimeSpan.Max)
+    assertEquals(TimeSpan.unsafeFromMicroseconds(4294967299L) *| BigDecimal(Int.MaxValue), TimeSpan.Max)
+  }
+
+  test("divide by small is Max") {
+    assertEquals(TimeSpan.unsafeFromMicroseconds(4294967299L) /| NonZeroBigDecimal.unsafeFrom(BigDecimal(1) / Int.MaxValue), TimeSpan.Max)
   }
 }
