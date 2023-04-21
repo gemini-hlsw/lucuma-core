@@ -127,7 +127,7 @@ lazy val benchmarks = project
   .settings(name := "lucuma-core-benchmarks")
   .enablePlugins(NoPublishPlugin, JmhPlugin)
 
-// for publishing CSS to npm
+// for publishing to npm
 lazy val npmPublish = taskKey[Unit]("Run npm publish")
 lazy val npm        = project
   .in(file("modules/npm"))
