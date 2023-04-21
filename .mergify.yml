@@ -33,6 +33,14 @@ pull_request_rules:
       add:
       - core
       remove: []
+- name: Label npm PRs
+  conditions:
+  - files~=^modules/npm/
+  actions:
+    label:
+      add:
+      - npm
+      remove: []
 - name: Label testkit PRs
   conditions:
   - files~=^modules/testkit/

@@ -126,3 +126,46 @@ lazy val benchmarks = project
   .dependsOn(core.jvm)
   .settings(name := "lucuma-core-benchmarks")
   .enablePlugins(NoPublishPlugin, JmhPlugin)
+
+// for publishing CSS to npm
+lazy val npmPublish = taskKey[Unit]("Run npm publish")
+lazy val npm        = project
+  .in(file("modules/npm"))
+  .dependsOn(core.js)
+  .enablePlugins(ScalaJSPlugin, NoPublishPlugin)
+  .settings(
+    scalaJSLinkerConfig ~= (_.withModuleKind(ModuleKind.ESModule)),
+    npmPublish := {
+      import scala.sys.process._
+      val _      = (Compile / fullLinkJS).value
+      val outDir = (Compile / fullLinkJS / scalaJSLinkerOutputDirectory).value
+      IO.write(
+        outDir / "package.json",
+        s"""|{
+            |  "name": "lucuma-core",
+            |  "version": "${version.value}",
+            |  "license": "${licenses.value.head._1}",
+            |  "main": "main.js",
+            |  "type": "module"
+            |}
+            |""".stripMargin
+      )
+      Process(List("npm", "publish"), outDir).!!
+    }
+  )
+
+ThisBuild / githubWorkflowPublishPreamble +=
+  WorkflowStep.Use(
+    UseRef.Public("actions", "setup-node", "v3"),
+    Map(
+      "node-version" -> "18",
+      "registry-url" -> "https://registry.npmjs.org"
+    )
+  )
+
+ThisBuild / githubWorkflowPublish ++= Seq(
+  WorkflowStep.Sbt(List("npm/npmPublish"),
+                   name = Some("NPM Publish"),
+                   env = Map("NODE_AUTH_TOKEN" -> s"$${{ secrets.NPM_REPO_TOKEN }}")
+  )
+)
