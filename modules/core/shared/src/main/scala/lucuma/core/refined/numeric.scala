@@ -10,8 +10,13 @@ import eu.timepit.refined.generic.Equal
 import shapeless.nat._0
 
 object numeric {
-  type NonZeroInt  = Int Refined Not[Equal[_0]]
+  type NonZero = Not[Equal[_0]]
+
+  type NonZeroInt  = Int Refined NonZero
   object NonZeroInt extends RefinedTypeOps.Numeric[NonZeroInt, Int]
+
+  type NonZeroBigDecimal = BigDecimal Refined NonZero
+  object NonZeroBigDecimal extends RefinedTypeOps[NonZeroBigDecimal, BigDecimal]
 }
 
 

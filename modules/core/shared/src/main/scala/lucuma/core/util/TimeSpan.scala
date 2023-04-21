@@ -11,11 +11,11 @@ import cats.syntax.order.*
 import eu.timepit.refined.types.numeric.NonNegLong
 import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.optics.Format
+import lucuma.core.refined.numeric.NonZeroBigDecimal
 import lucuma.core.refined.numeric.NonZeroInt
 import monocle.Iso
 import monocle.Prism
 
-import java.math.RoundingMode.HALF_UP
 import java.time.Duration
 import java.time.temporal.ChronoUnit.MICROS
 import scala.annotation.targetName
@@ -51,6 +51,18 @@ object TimeSpan {
     fromMicroseconds(µs).getOrElse(sys.error(s"The µs value ($µs) must be non-negative."))
 
   /**
+   * Constructs a TimeSpan from the given amount of microseconds, rounding
+   * the nearest microsecond and capping the lower value to Min and the
+   * upper value to Max.
+   */
+  def fromMicrosecondsBounded(µs: BigDecimal): TimeSpan =
+    µs.setScale(0, BigDecimal.RoundingMode.HALF_UP) match {
+      case µsʹ if µsʹ < Min.toMicroseconds => Min
+      case µsʹ if µsʹ > Max.toMicroseconds => Max
+      case µsʹ                             => unsafeFromMicroseconds(µsʹ.longValue)
+    }
+
+  /**
    * Constructs a TimeSpan from a `NonNegLong` value in microseconds.
    */
   def apply(µs: NonNegLong): TimeSpan =
@@ -82,7 +94,7 @@ object TimeSpan {
    * rounding any sub-microsecond value to the nearest microsecond (half-up).
    */
   def fromMilliseconds(ms: BigDecimal): Option[TimeSpan] =
-    Try(ms.bigDecimal.movePointRight(3).setScale(0, HALF_UP).longValueExact)
+    Try(ms.bigDecimal.movePointRight(3).setScale(0, java.math.RoundingMode.HALF_UP).longValueExact)
       .toOption
       .flatMap(fromMicroseconds)
 
@@ -164,12 +176,12 @@ object TimeSpan {
      * range (`Min`, `Max`).
      */
     @targetName("boundedMultiply")
-    def *|(multiplier: Int): TimeSpan = {
-      val big = BigInt(timeSpan.toMicroseconds) * multiplier
-      if (big < Min.toMicroseconds) Min
-      else if (big > Max.toMicroseconds) Max
-      else unsafeFromMicroseconds(big.longValue)
-    }
+    def *|(multiplier: Int): TimeSpan =
+      fromMicrosecondsBounded(BigDecimal(timeSpan.toMicroseconds) * multiplier)
+
+    @targetName("boundedMultiply")
+    def *|(multiplier: BigDecimal): TimeSpan =
+      fromMicrosecondsBounded(timeSpan.toMicroseconds * multiplier)
 
     /**
      * Divides a TimeSpan by a non-negative integer, via integer division.
@@ -177,6 +189,10 @@ object TimeSpan {
     @targetName("boundedDivide")
     def /|(divisor: NonZeroInt): TimeSpan =
       TimeSpan.fromMicroseconds(timeSpan.toMicroseconds / divisor.value).getOrElse(Min)
+
+    @targetName("boundedDivide")
+    def /|(divisor: NonZeroBigDecimal): TimeSpan =
+      fromMicrosecondsBounded(timeSpan.toMicroseconds / divisor.value)
 
   }
 

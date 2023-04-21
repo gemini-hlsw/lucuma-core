@@ -12,6 +12,7 @@ import eu.timepit.refined.scalacheck.numeric._
 import eu.timepit.refined.types.numeric.NonNegInt
 import lucuma.core.arb.ArbTime.arbDuration
 import lucuma.core.optics.laws.discipline.*
+import lucuma.core.refined.numeric.NonZeroBigDecimal
 import lucuma.core.refined.numeric.NonZeroInt
 import lucuma.core.util.arb.ArbTimeSpan
 import lucuma.core.util.arb.ArbTimeSpan.genDuration
@@ -83,17 +84,45 @@ class TimeSpanSuite extends DisciplineSuite {
     }
   }
 
-  test("bounded division") {
+  test("bounded int division") {
     forAll { (t0: TimeSpan, i: Int) =>
-      NonZeroInt.from(i).forall { nzi =>
-        val res = t0 /| nzi
-        if (nzi.value < 0) res === TimeSpan.Zero
+      NonZeroInt.from(i).forall { nz =>
+        val res = t0 /| nz
+        if (nz.value < 0) res === TimeSpan.Zero
         else {
-          val diff = t0 -| res *| nzi.value
-          TimeSpan.Zero <= diff && diff < TimeSpan.unsafeFromMicroseconds(nzi.value.toLong)
+          val diff = t0 -| res *| nz.value
+          TimeSpan.Zero <= diff && diff < TimeSpan.unsafeFromMicroseconds(nz.value.toLong)
         }
       }
     }
   }
 
+  test("multiply by 0.5 is divide by 2") {
+    forAll { (t: TimeSpan) =>
+      assertEquals(t *| BigDecimal(0.5), t /| NonZeroBigDecimal.unsafeFrom(2.0))
+    }
+  }
+
+  test("multiply by negative is Zero") {
+    forAll { (t: TimeSpan) =>
+      assertEquals(t *| -1, TimeSpan.Zero)
+      assertEquals(t *| BigDecimal(-1), TimeSpan.Zero)
+    }
+  }
+
+  test("divide by negative is Zero") {
+    forAll { (t: TimeSpan) =>
+      assertEquals(t /| NonZeroInt.unsafeFrom(-1), TimeSpan.Zero)
+      assertEquals(t /| NonZeroBigDecimal.unsafeFrom(-1.0), TimeSpan.Zero)
+    }
+  }
+
+  test("multiply by big is Max") {
+    assertEquals(TimeSpan.unsafeFromMicroseconds(4294967299L) *| Int.MaxValue, TimeSpan.Max)
+    assertEquals(TimeSpan.unsafeFromMicroseconds(4294967299L) *| BigDecimal(Int.MaxValue), TimeSpan.Max)
+  }
+
+  test("divide by small is Max") {
+    assertEquals(TimeSpan.unsafeFromMicroseconds(4294967299L) /| NonZeroBigDecimal.unsafeFrom(BigDecimal(1) / Int.MaxValue), TimeSpan.Max)
+  }
 }
