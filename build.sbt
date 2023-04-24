@@ -128,6 +128,7 @@ lazy val benchmarks = project
   .enablePlugins(NoPublishPlugin, JmhPlugin)
 
 // for publishing to npm
+lazy val npmPackage = taskKey[File]("Prepare the npm package")
 lazy val npmPublish = taskKey[Unit]("Run npm publish")
 lazy val npm        = project
   .in(file("modules/npm"))
@@ -135,8 +136,7 @@ lazy val npm        = project
   .enablePlugins(ScalaJSPlugin, NoPublishPlugin)
   .settings(
     scalaJSLinkerConfig ~= (_.withModuleKind(ModuleKind.ESModule)),
-    npmPublish := {
-      import scala.sys.process._
+    npmPackage := {
       val _      = (Compile / fullLinkJS).value
       val outDir = (Compile / fullLinkJS / scalaJSLinkerOutputDirectory).value
       IO.write(
@@ -150,6 +150,11 @@ lazy val npm        = project
             |}
             |""".stripMargin
       )
+      outDir
+    },
+    npmPublish := {
+      import scala.sys.process._
+      val outDir = npmPackage.value
       Process(List("npm", "publish"), outDir).!!
     }
   )
