@@ -39,8 +39,8 @@ final class SignalToNoiseSuite extends munit.DisciplineSuite {
   checkAll("FromBigDecimalExact",       PrismTests(SignalToNoise.FromBigDecimalExact))
   checkAll("FromBigDecimalRounding",
     ValidSplitEpiTests(SignalToNoise.FromBigDecimalRounding).validSplitEpiWith(bigDecimalSignalToNoise))
-  checkAll("FromPosBigDecimalExact",    PrismTests(SignalToNoise.FromNonNegBigDecimalExact))
-  checkAll("FromPosBigDecimalRounding",
+  checkAll("FromNonNegBigDecimalExact", PrismTests(SignalToNoise.FromNonNegBigDecimalExact))
+  checkAll("FromNonNegBigDecimalRounding",
     ValidSplitEpiTests(SignalToNoise.FromNonNegBigDecimalRounding).validSplitEpiWith(nonNegBigDecimalSignalToNoise)
   )
   checkAll("FromString",                FormatTests(SignalToNoise.FromString).formatWith(stringSignalToNoise))
