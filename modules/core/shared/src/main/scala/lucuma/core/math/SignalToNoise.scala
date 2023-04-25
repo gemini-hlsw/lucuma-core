@@ -6,7 +6,7 @@ package lucuma.core.math
 import cats.Order
 import cats.Show
 import cats.syntax.all.*
-import eu.timepit.refined.types.numeric.PosBigDecimal
+import eu.timepit.refined.types.numeric.NonNegBigDecimal
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.JsonNumber
@@ -30,10 +30,10 @@ object SignalToNoise {
     9_999_999_999L
 
   /**
-   * Minimum supported signal-to-noise value: 0.001.
+   * Minimum supported signal-to-noise value: 0.000.
    */
   val Min: SignalToNoise =
-    1L
+    0L
 
   extension (s2n: SignalToNoise) {
 
@@ -45,10 +45,10 @@ object SignalToNoise {
       BigDecimal(s2n, 3)
 
     /**
-     * Converts this SignalToNoise value to a `PosBigDecimal`.
+     * Converts this SignalToNoise value to a `NonNegBigDecimal`.
      */
-    def toPosBigDecimal: PosBigDecimal =
-      PosBigDecimal.unsafeFrom(toBigDecimal)
+    def toNonNegBigDecimal: NonNegBigDecimal =
+      NonNegBigDecimal.unsafeFrom(toBigDecimal)
 
   }
 
@@ -74,15 +74,15 @@ object SignalToNoise {
     Prism[BigDecimal, SignalToNoise](bd => fromMilliDecimal(bd * 1000))(_.toBigDecimal)
 
   /**
-   * Creates a `SignalToNoise` value assuming from a PosBigDecimal that is in
+   * Creates a `SignalToNoise` value assuming from a NonNegBigDecimal that is in
    * range [Min, Max] and does not have a finer scale than milli-sn.
    *
    * @group Optics
    */
-  val FromPosBigDecimalExact: Prism[PosBigDecimal, SignalToNoise] =
-    Prism[PosBigDecimal, SignalToNoise](bd =>
+  val FromNonNegBigDecimalExact: Prism[NonNegBigDecimal, SignalToNoise] =
+    Prism[NonNegBigDecimal, SignalToNoise](bd =>
       SignalToNoise.FromBigDecimalExact.getOption(bd.value)
-    )(_.toPosBigDecimal)
+    )(_.toNonNegBigDecimal)
 
   /**
    * Creates a `SignalToNoise` value assuming that the given BigDecimal is in
@@ -100,18 +100,18 @@ object SignalToNoise {
     )
 
   /**
-   * Creates a `SignalToNoise` value assuming that the given PosBigDecimal is in
+   * Creates a `SignalToNoise` value assuming that the given NonNegBigDecimal is in
    * range [Min, Max].  Rounds finer scale values to milli-sn.
    *
    * @group Optics
    */
-  val FromPosBigDecimalRounding: ValidSplitEpiNec[String, PosBigDecimal, SignalToNoise] =
+  val FromNonNegBigDecimalRounding: ValidSplitEpiNec[String, NonNegBigDecimal, SignalToNoise] =
     ValidSplitEpiNec(
       bd =>
         fromMilliDecimal((bd.value * 1000)
           .setScale(0, BigDecimal.RoundingMode.HALF_UP))
           .toRightNec("Invalid SignalToNoise value $bd"),
-      _.toPosBigDecimal)
+      _.toNonNegBigDecimal)
   /**
    * Formats to the canonical String representation for SignalToNoise.
    *
