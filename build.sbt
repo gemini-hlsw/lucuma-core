@@ -150,6 +150,7 @@ lazy val npm        = project
             |}
             |""".stripMargin
       )
+      IO.copyDirectory((Compile / sourceDirectory).value / "typescript", outDir)
       outDir
     },
     npmPublish := {
