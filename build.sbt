@@ -1,4 +1,4 @@
-ThisBuild / tlBaseVersion                         := "0.74"
+ThisBuild / tlBaseVersion                         := "0.75"
 ThisBuild / tlCiReleaseBranches                   := Seq("master")
 ThisBuild / githubWorkflowEnv += "MUNIT_FLAKY_OK" -> "true"
 
@@ -84,7 +84,7 @@ lazy val testkit = crossProject(JVMPlatform, JSPlatform)
       "dev.optics"        %%% "monocle-law"        % monocleVersion,
       "org.typelevel"     %%% "spire-laws"         % spireVersion,
       "eu.timepit"        %%% "refined-scalacheck" % refinedVersion,
-      "io.circe"          %%% "circe-testing"      % circeVersion,
+      "io.circe"          %%% "circe-testing"      % circeVersion,  
       "io.chrisdavenport" %%% "cats-scalacheck"    % catsScalacheckVersion
     )
   )

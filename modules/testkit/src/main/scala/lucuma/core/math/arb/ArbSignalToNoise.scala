@@ -4,9 +4,9 @@
 package lucuma.core.math
 package arb
 
-import eu.timepit.refined.numeric.Positive
+import eu.timepit.refined.numeric.NonNegative
 import eu.timepit.refined.refineV
-import eu.timepit.refined.types.numeric.PosBigDecimal
+import eu.timepit.refined.types.numeric.NonNegBigDecimal
 import lucuma.core.math.arb.ArbRefined.given
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.*
@@ -23,25 +23,25 @@ trait ArbSignalToNoise {
 
   private val validBigDecimalSignalToNoise: Gen[BigDecimal] =
     Gen
-      .choose(1L, 9_999_999_999L)
+      .choose(0L, 9_999_999_999L)
       .map(BigDecimal(_, 3))
 
-  private val validPosBigDecimalSignalToNoise: Gen[PosBigDecimal] =
-    validBigDecimalSignalToNoise.map(refineV[Positive](_).getOrElse(throw new RuntimeException))
+  private val validNonNegBigDecimalSignalToNoise: Gen[NonNegBigDecimal] =
+    validBigDecimalSignalToNoise.map(refineV[NonNegative](_).getOrElse(throw new RuntimeException))
 
   private val coverageExamples: Gen[BigDecimal] =
     Gen
-      .choose(1L, 9_999_999_999_999L)
+      .choose(0L, 9_999_999_999_999L)
       .map(BigDecimal(_, 6))
 
-  private val coverageExamplesPosBigDecimal: Gen[PosBigDecimal] =
-    coverageExamples.map(refineV[Positive](_).getOrElse(throw new RuntimeException))
+  private val coverageExamplesNonNegBigDecimal: Gen[NonNegBigDecimal] =
+    coverageExamples.map(refineV[NonNegative](_).getOrElse(throw new RuntimeException))
 
   val bigDecimalSignalToNoise: Gen[BigDecimal] =
     Gen.oneOf(validBigDecimalSignalToNoise, coverageExamples, arbitrary[BigDecimal])
 
-  val posBigDecimalSignalToNoise: Gen[PosBigDecimal] =
-    Gen.oneOf(validPosBigDecimalSignalToNoise, coverageExamplesPosBigDecimal, arbitrary[PosBigDecimal])
+  val nonNegBigDecimalSignalToNoise: Gen[NonNegBigDecimal] =
+    Gen.oneOf(validNonNegBigDecimalSignalToNoise, coverageExamplesNonNegBigDecimal, validNonNegBigDecimalSignalToNoise)
 
   val stringSignalToNoise: Gen[String] = {
     val v = validBigDecimalSignalToNoise.map(_.toString)
