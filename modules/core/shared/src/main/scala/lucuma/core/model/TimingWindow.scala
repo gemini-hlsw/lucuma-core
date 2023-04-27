@@ -5,19 +5,19 @@ package lucuma.core.model
 
 import cats.Eq
 import cats.derived.*
-import lucuma.core.util.TimeSpan
-import eu.timepit.refined.types.numeric.PosInt
 import eu.timepit.refined.cats.given
-import monocle.Lens
-import monocle.Focus
-import lucuma.core.util.WithGid
-import lucuma.refined.*
-import java.time.Duration
-import org.typelevel.cats.time.given
-import lucuma.core.util.Timestamp
+import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.enums.TimingWindowInclusion
-import monocle.macros.GenPrism
+import lucuma.core.util.TimeSpan
+import lucuma.core.util.Timestamp
+import lucuma.refined.*
+import monocle.Focus
+import monocle.Lens
 import monocle.Prism
+import monocle.macros.GenPrism
+import org.typelevel.cats.time.given
+
+import java.time.Duration
 
 /** A repetition period for timing windows, with optional repetition times * */
 case class TimingWindowRepeat(period: TimeSpan, times: Option[PosInt]) derives Eq
@@ -29,7 +29,7 @@ object TimingWindowRepeat:
   val times: Lens[TimingWindowRepeat, Option[PosInt]] = Focus[TimingWindowRepeat](_.times)
 
 /**
- * End a timing window at a specific point in time, or after a specified duration with optional
+ * End of a timing window at a specific point in time, or after a specified duration with optional
  * repetition. *
  */
 enum TimingWindowEnd derives Eq:
@@ -39,17 +39,14 @@ enum TimingWindowEnd derives Eq:
   val at: Prism[TimingWindowEnd, At]       = GenPrism[TimingWindowEnd, At]
   val times: Prism[TimingWindowEnd, After] = GenPrism[TimingWindowEnd, After]
 
-/** End a timing window at a specific point in time or after a specified duration. * */
+/** Timing window definition. * */
 final case class TimingWindow(
-  id:        TimingWindow.Id,
   inclusion: TimingWindowInclusion,
   start:     Timestamp,
   end:       Option[TimingWindowEnd]
 ) derives Eq
 
-/** Timing window definition. * */
-object TimingWindow extends WithGid('w'.refined):
-  val id: Lens[TimingWindow, TimingWindow.Id]              = Focus[TimingWindow](_.id)
+object TimingWindow:
   val inclusion: Lens[TimingWindow, TimingWindowInclusion] = Focus[TimingWindow](_.inclusion)
   val start: Lens[TimingWindow, Timestamp]                 = Focus[TimingWindow](_.start)
   val end: Lens[TimingWindow, Option[TimingWindowEnd]]     = Focus[TimingWindow](_.end)

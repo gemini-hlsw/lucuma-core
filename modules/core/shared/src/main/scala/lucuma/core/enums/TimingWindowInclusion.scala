@@ -3,22 +3,25 @@
 
 package lucuma.core.enums
 
-import lucuma.core.util.Enumerated
 import lucuma.core.syntax.display.*
 import lucuma.core.util.Display
+import lucuma.core.util.Enumerated
+import monocle.Iso
 
 enum TimingWindowInclusion derives Enumerated:
   case Include, Exclude
-
-  def toBooleanInclude: Boolean = this == Include
 
   def tag: String = this match
     case Include => "include"
     case Exclude => "exclude"
 
 object TimingWindowInclusion:
-  def fromBooleanInclude(include: Boolean): TimingWindowInclusion =
-    if (include) Include else Exclude
+  val toBooleanInclude: Iso[TimingWindowInclusion, Boolean] =
+    Iso[TimingWindowInclusion, Boolean](
+      _ == TimingWindowInclusion.Include
+    )(
+      if (_) Include else Exclude
+    )
 
   given Display[TimingWindowInclusion] = Display.byShortName {
     case Include => "Include"
