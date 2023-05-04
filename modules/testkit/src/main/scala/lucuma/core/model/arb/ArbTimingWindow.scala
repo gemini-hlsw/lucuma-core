@@ -5,18 +5,18 @@ package lucuma.core.model
 package arb
 
 import cats.syntax.either.*
+import eu.timepit.refined.scalacheck.numeric.given
+import eu.timepit.refined.types.numeric.PosInt
+import lucuma.core.enums.TimingWindowInclusion
+import lucuma.core.math.arb.ArbRefined
+import lucuma.core.util.TimeSpan
+import lucuma.core.util.Timestamp
 import lucuma.core.util.arb.ArbEnumerated
+import lucuma.core.util.arb.ArbTimeSpan
+import lucuma.core.util.arb.ArbTimestamp
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Cogen.given
 import org.scalacheck.*
-import lucuma.core.enums.TimingWindowInclusion
-import lucuma.core.util.Timestamp
-import lucuma.core.util.arb.ArbTimestamp
-import lucuma.core.util.arb.ArbTimeSpan
-import lucuma.core.util.TimeSpan
-import eu.timepit.refined.types.numeric.PosInt
-import eu.timepit.refined.scalacheck.numeric.given
-import lucuma.core.math.arb.ArbRefined
 
 trait ArbTimingWindow {
   import ArbEnumerated.given
