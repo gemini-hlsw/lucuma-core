@@ -39,6 +39,7 @@ sealed abstract class Site(
   val timezone: ZoneId                     = place.timezone
 }
 
+@JSExportTopLevel("Site")
 object Site {
 
   /** @group Constructors */

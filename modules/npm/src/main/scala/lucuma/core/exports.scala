@@ -23,8 +23,8 @@ import scala.scalajs.js.JSConverters.*
  * JS facade to plot points calculated with the method `nightPlot`.
  */
 @JSExportTopLevel("PlotPoint")
-class PlotPoint(val instant: js.Date, val airmass: Double, val altitude: Double) extends js.Object {
-  override def toString(): String = s"PlotPoint($instant, $airmass, $altitude)"
+class PlotPoint(@JSExport val instant: js.Date, @JSExport val airmass: Double, @JSExport val altitude: Double) {
+  override def toString(): String = s"PlotPoin($instant, $airmass, $altitude)"
 }
 
 object NightPlot:
@@ -32,6 +32,7 @@ object NightPlot:
 
   /**
     * JS facade to call `nightPlot` from JavaScript.
+    *
     *
     * @param site Site, either GS or GN
     * @param jsDate, reference date
