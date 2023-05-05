@@ -1,8 +1,8 @@
 declare class PlotPoint {
-  constructor(instant: Date, airmass: Number, altitude: Number);
-  airmass: Number;
-  altitude: Number;
+  constructor(instant: Date, airmass: number, altitude: number);
+  airmass: number;
+  altitude: number;
   instant: Date;
 }
 
-declare function nightPlot(site: Site, start: Date, coords: String): PlotPoint[];
+declare function nightPlot(site: Site, start: Date, coords: string): PlotPoint[];
