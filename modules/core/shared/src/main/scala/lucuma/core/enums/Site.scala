@@ -19,6 +19,7 @@ import lucuma.core.math.units._
 import lucuma.core.util.Enumerated
 
 import java.time.ZoneId
+import scala.scalajs.js.annotation.JSExportTopLevel
 
 /**
   * Enumerated type for Gemini observing sites.
@@ -41,6 +42,7 @@ sealed abstract class Site(
 object Site {
 
   /** @group Constructors */
+  @JSExportTopLevel("GN")
   case object GN
       extends Site("GN",
                    "GN",
@@ -55,6 +57,7 @@ object Site {
       )
 
   /** @group Constructors */
+  @JSExportTopLevel("GS")
   case object GS
       extends Site("GS",
                    "GS",

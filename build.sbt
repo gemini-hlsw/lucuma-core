@@ -26,6 +26,7 @@ lazy val catsScalacheckVersion = "0.3.2"
 lazy val shapelessVersion      = "2.3.10"
 lazy val catsParseVersion      = "0.3.9"
 lazy val kittensVersion        = "3.0.0"
+lazy val scalajsStubVersion    = "1.1.0"
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
@@ -63,7 +64,8 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
   .jvmConfigure(_.enablePlugins(AutomateHeaderPlugin))
   .jvmSettings(
     libraryDependencies ++= Seq(
-      "edu.gemini" %%% "lucuma-jts-awt" % jtsVersion
+      "edu.gemini"   %% "lucuma-jts-awt" % jtsVersion,
+      "org.scala-js" %% "scalajs-stubs"  % scalajsStubVersion
     )
   )
   .jsSettings(
