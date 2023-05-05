@@ -148,6 +148,7 @@ lazy val npm        = project
             |  "version": "${version.value}",
             |  "license": "${licenses.value.head._1}",
             |  "main": "main.js",
+            |  "types": "main.d.ts",
             |  "type": "module"
             |}
             |""".stripMargin
