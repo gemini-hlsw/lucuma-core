@@ -23,7 +23,7 @@ import scala.scalajs.js.JSConverters.*
  * JS facade to plot points calculated with the method `nightPlot`.
  */
 @JSExportTopLevel("PlotPoint")
-class PlotPoint(@JSExport val instant: js.Date, @JSExport val airmass: Double, @JSExport val altitude: Double) {
+class PlotPoint(val instant: js.Date, val airmass: Double, val altitude: Double) extends js.Object {
   override def toString(): String = s"PlotPoin($instant, $airmass, $altitude)"
 }
 
