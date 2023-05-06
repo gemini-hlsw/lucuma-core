@@ -1,4 +1,4 @@
-ThisBuild / tlBaseVersion                         := "0.75"
+ThisBuild / tlBaseVersion                         := "0.76"
 ThisBuild / tlCiReleaseBranches                   := Seq("master")
 ThisBuild / githubWorkflowEnv += "MUNIT_FLAKY_OK" -> "true"
 
@@ -38,27 +38,27 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
   .settings(
     name := "lucuma-core",
     libraryDependencies ++= Seq(
-      "org.typelevel"  %%% "cats-parse"                 % catsParseVersion,
-      "org.typelevel"  %%% "cats-core"                  % catsVersion,
-      "dev.optics"     %%% "monocle-core"               % monocleVersion,
-      "dev.optics"     %%% "monocle-macro"              % monocleVersion,
-      "dev.optics"     %%% "monocle-state"              % monocleVersion,
-      "edu.gemini"     %%% "lucuma-jts"                 % jtsVersion,
-      "com.manyangled" %%% "coulomb-core"               % coulombVersion,
-      "com.manyangled" %%% "coulomb-spire"              % coulombVersion,
-      "com.manyangled" %%% "coulomb-units"              % coulombVersion,
-      "org.typelevel"  %%% "spire"                      % spireVersion,
-      "org.typelevel"  %%% "spire-extras"               % spireVersion,
-      "eu.timepit"     %%% "singleton-ops"              % singletonOpsVersion cross CrossVersion.for3Use2_13,
-      "eu.timepit"     %%% "refined"                    % refinedVersion,
-      "eu.timepit"     %%% "refined-cats"               % refinedVersion,
-      "edu.gemini"     %%% "lucuma-refined"             % lucumaRefinedVersion,
-      "org.typelevel"  %%% "cats-time"                  % catsTimeVersion,
-      "org.typelevel"  %%% "kittens"                    % kittensVersion,
-      "io.circe"       %%% "circe-core"                 % circeVersion,
-      "io.circe"       %%% "circe-generic"              % circeVersion,
-      "io.circe"       %%% "circe-refined"              % circeVersion,
-      "com.chuusai"    %%% "shapeless"                  % shapelessVersion cross CrossVersion.for3Use2_13
+      "org.typelevel"  %%% "cats-parse"     % catsParseVersion,
+      "org.typelevel"  %%% "cats-core"      % catsVersion,
+      "dev.optics"     %%% "monocle-core"   % monocleVersion,
+      "dev.optics"     %%% "monocle-macro"  % monocleVersion,
+      "dev.optics"     %%% "monocle-state"  % monocleVersion,
+      "edu.gemini"     %%% "lucuma-jts"     % jtsVersion,
+      "com.manyangled" %%% "coulomb-core"   % coulombVersion,
+      "com.manyangled" %%% "coulomb-spire"  % coulombVersion,
+      "com.manyangled" %%% "coulomb-units"  % coulombVersion,
+      "org.typelevel"  %%% "spire"          % spireVersion,
+      "org.typelevel"  %%% "spire-extras"   % spireVersion,
+      ("eu.timepit"    %%% "singleton-ops"  % singletonOpsVersion).cross(CrossVersion.for3Use2_13),
+      "eu.timepit"     %%% "refined"        % refinedVersion,
+      "eu.timepit"     %%% "refined-cats"   % refinedVersion,
+      "edu.gemini"     %%% "lucuma-refined" % lucumaRefinedVersion,
+      "org.typelevel"  %%% "cats-time"      % catsTimeVersion,
+      "org.typelevel"  %%% "kittens"        % kittensVersion,
+      "io.circe"       %%% "circe-core"     % circeVersion,
+      "io.circe"       %%% "circe-generic"  % circeVersion,
+      "io.circe"       %%% "circe-refined"  % circeVersion,
+      ("com.chuusai"   %%% "shapeless"      % shapelessVersion).cross(CrossVersion.for3Use2_13)
     )
   )
   .jvmConfigure(_.enablePlugins(AutomateHeaderPlugin))
@@ -86,7 +86,7 @@ lazy val testkit = crossProject(JVMPlatform, JSPlatform)
       "dev.optics"        %%% "monocle-law"        % monocleVersion,
       "org.typelevel"     %%% "spire-laws"         % spireVersion,
       "eu.timepit"        %%% "refined-scalacheck" % refinedVersion,
-      "io.circe"          %%% "circe-testing"      % circeVersion,  
+      "io.circe"          %%% "circe-testing"      % circeVersion,
       "io.chrisdavenport" %%% "cats-scalacheck"    % catsScalacheckVersion
     )
   )
@@ -106,8 +106,8 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform)
   .settings(
     name := "lucuma-core-tests",
     libraryDependencies ++= Seq(
-      "org.scalameta"  %%% "munit"            % "0.7.29" % Test,
-      "org.typelevel"  %%% "discipline-munit" % "1.0.9"  % Test
+      "org.scalameta" %%% "munit"            % "0.7.29" % Test,
+      "org.typelevel" %%% "discipline-munit" % "1.0.9"  % Test
     ),
     testFrameworks += MUnitFramework,
     testOptions += MUnitFlakyOK
@@ -118,8 +118,10 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform)
       "https://github.com/gemini-hlsw/maven-repo/raw/master/releases"
     ),
     libraryDependencies ++= Seq(
-      "edu.gemini.ocs" %% "edu-gemini-util-skycalc"     % "2020001.1.7" % Test cross CrossVersion.for3Use2_13 exclude("org.scala-lang.modules", "scala-xml_2.13"),
-      "com.47deg"      %% "scalacheck-toolbox-datetime" % "0.7.0"       % Test
+      ("edu.gemini.ocs" %% "edu-gemini-util-skycalc"     % "2020001.1.7" % Test)
+        .cross(CrossVersion.for3Use2_13)
+        .exclude("org.scala-lang.modules", "scala-xml_2.13"),
+      "com.47deg"       %% "scalacheck-toolbox-datetime" % "0.7.0"       % Test
     )
   )
 

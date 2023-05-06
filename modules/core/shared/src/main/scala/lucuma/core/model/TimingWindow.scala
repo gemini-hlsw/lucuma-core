@@ -33,11 +33,19 @@ object TimingWindowRepeat:
  * repetition. *
  */
 enum TimingWindowEnd derives Eq:
-  case At(endAt: Timestamp)                                          extends TimingWindowEnd
-  case After(endAfter: Duration, repeat: Option[TimingWindowRepeat]) extends TimingWindowEnd
+  case At(instant: Timestamp)                                        extends TimingWindowEnd
+  case After(duration: TimeSpan, repeat: Option[TimingWindowRepeat]) extends TimingWindowEnd
+
+object TimingWindowEnd:
+  object At:
+    val instant: Lens[At, Timestamp] = Focus[At](_.instant)
+
+  object After:
+    val duration: Lens[After, TimeSpan]                 = Focus[After](_.duration)
+    val repeat: Lens[After, Option[TimingWindowRepeat]] = Focus[After](_.repeat)
 
   val at: Prism[TimingWindowEnd, At]       = GenPrism[TimingWindowEnd, At]
-  val times: Prism[TimingWindowEnd, After] = GenPrism[TimingWindowEnd, After]
+  val after: Prism[TimingWindowEnd, After] = GenPrism[TimingWindowEnd, After]
 
 /** Timing window definition. * */
 final case class TimingWindow(
