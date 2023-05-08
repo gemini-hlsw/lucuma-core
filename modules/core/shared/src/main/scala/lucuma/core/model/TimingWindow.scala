@@ -5,9 +5,11 @@ package lucuma.core.model
 
 import cats.Eq
 import cats.derived.*
+import cats.syntax.all.*
 import eu.timepit.refined.cats.given
 import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.enums.TimingWindowInclusion
+import lucuma.core.math.BoundedInterval
 import lucuma.core.util.TimeSpan
 import lucuma.core.util.Timestamp
 import lucuma.refined.*
@@ -16,8 +18,11 @@ import monocle.Lens
 import monocle.Prism
 import monocle.macros.GenPrism
 import org.typelevel.cats.time.given
+import spire.math.Interval
+import spire.math.extras.interval.IntervalSeq
 
 import java.time.Duration
+import java.time.Instant
 
 /** A repetition period for timing windows, with optional repetition times * */
 case class TimingWindowRepeat(period: TimeSpan, times: Option[PosInt]) derives Eq
@@ -52,7 +57,74 @@ final case class TimingWindow(
   inclusion: TimingWindowInclusion,
   start:     Timestamp,
   end:       Option[TimingWindowEnd]
-) derives Eq
+) derives Eq:
+
+  /**
+   * The windows defined by this TimingWindow defintion, capped to the provided `within` interval.
+   *
+   * The result is provided as a (spire's) `IntervalSeq[Instant]`.
+   */
+  def toIntervalSeq(within: BoundedInterval[Instant]): IntervalSeq[Instant] = {
+    // Builds a bunch of single-interval `IntervalSeq`s, for each of the `starts` provided, each lasting `duration`.
+    // Returns the union of all of them.
+    def intervalsForStarts(starts: List[Instant], duration: Duration): IntervalSeq[Instant] =
+      starts
+        .map(start => IntervalSeq(Interval(start, start.plus(duration))))
+        .foldLeft(IntervalSeq.empty[Instant])(_ | _)
+
+    val windowStart = start.toInstant
+
+    // find the start of a repeat window nearest to the start of `within`
+    def windowStartForPeriod(period: TimeSpan) =
+      windowStart
+        .plusMillis(
+          period.toDuration
+            .multipliedBy(
+              Duration.between(windowStart, within.lower).toMillis() / period.toDuration
+                .toMillis()
+            )
+            .toMillis()
+        )
+        .max(windowStart) // window start could be set after `within`
+
+    val intervals =
+      end match {
+        case None                                                                                 =>
+          IntervalSeq.atOrAbove(windowStart)
+        case Some(TimingWindowEnd.At(instant))                                                    =>
+          IntervalSeq(Interval(windowStart, instant.toInstant))
+        // No repetition
+        case Some(TimingWindowEnd.After(duration, None))                                          =>
+          IntervalSeq(Interval(windowStart, windowStart.plus(duration.toDuration)))
+        // Repeat period n times
+        case Some(TimingWindowEnd.After(duration, Some(TimingWindowRepeat(period, Some(times))))) =>
+          val nearestStart = windowStartForPeriod(period)
+          intervalsForStarts(
+            List.unfold((0, nearestStart))(
+              _.some
+                .filter(_._1 <= times.value)
+                .filter(_._2 <= within.upper)
+                .map((iter, start) => (start, (iter + 1, start.plus(period.toDuration))))
+            ),
+            duration.toDuration
+          )
+        // Repeat period for ever
+        case Some(TimingWindowEnd.After(duration, Some(TimingWindowRepeat(period, None))))        =>
+          val nearestStart = windowStartForPeriod(period)
+          intervalsForStarts(
+            List.unfold(nearestStart)(
+              _.some
+                .filter(i => i <= within.upper)
+                .map(start => (start, start.plus(period.toDuration)))
+            ),
+            duration.toDuration
+          )
+      }
+
+    intervals & IntervalSeq(within)
+  }
+
+end TimingWindow
 
 object TimingWindow:
   val inclusion: Lens[TimingWindow, TimingWindowInclusion] = Focus[TimingWindow](_.inclusion)
