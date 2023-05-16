@@ -69,6 +69,44 @@ protected[data] trait ZipperOps[A, +Z] {
   }
 
   /**
+   * Returns the index of the focused element.  In other words, the index of
+   * the focused element if the Zipper were exported `toList`.
+   */
+  def indexOfFocus: Int =
+    lefts.size
+
+  /**
+   * Focuses on the given element index, if in range.
+   * @param index index of the element to focus
+   * @return a Some(Zipper) which is the same as this Zipper but with the
+   *         indicated element as the focus, or else None if the index is out
+   *         of range
+   */
+  def focusIndex(index: Int): Option[Z] = {
+    val leftLen  = lefts.length
+    val rightLen = rights.length
+
+    if (index < 0) {
+      none
+
+    } else if (index < leftLen) {
+      val (x, newLeft) = lefts.splitAt(leftLen - index)
+      val newFocus :: newRight = (focus :: x).reverse ::: rights : @unchecked
+      build(newLeft, newFocus, newRight).some
+
+    } else if (index === leftLen) {
+      unmodified.some
+
+    } else if (index < (leftLen + 1 + rightLen)) {
+      val (x, newFocus :: newRight) = rights.splitAt(index - leftLen - 1) : @unchecked
+      build((focus :: x).reverse ::: lefts, newFocus, newRight).some
+
+    } else {
+      none
+    }
+  }
+
+  /**
    * Focuses on the first element (left to right) which is a maximum element
    * in the zipper according to Order[A].
    */
@@ -134,6 +172,9 @@ protected[data] trait ZipperOps[A, +Z] {
   def toList: List[A] = lefts.reverse ::: (focus :: rights)
 
   def toNel: NonEmptyList[A] = NonEmptyList.fromListUnsafe(toList)
+
+  override def toString: String =
+    s"Zipper(${lefts.mkString("(", ", ", ")")}, $focus, ${rights.mkString("(", ", ", ")")})"
 }
 
 class Zipper[A] protected (val lefts: List[A], val focus: A, val rights: List[A])
@@ -154,6 +195,20 @@ class Zipper[A] protected (val lefts: List[A], val focus: A, val rights: List[A]
     */
   def modifyP(p: Prism[A, A]): Zipper[A] =
     p.getOption(focus).map(f => build(lefts, f, rights)).getOrElse(unmodified)
+
+  protected def canEqual(other: Any): Boolean = other.isInstanceOf[Zipper[?]]
+
+  override def equals(other: Any): Boolean = other match
+    case that: Zipper[?] =>
+      that.canEqual(this) &&
+        lefts == that.lefts &&
+        focus == that.focus &&
+        rights == that.rights
+    case _ => false
+
+  override def hashCode(): Int =
+    val state = Seq(lefts, focus, rights)
+    state.map(_.hashCode()).foldLeft(0)((a, b) => 31 * a + b)
 }
 
 object Zipper extends ZipperFactory[Zipper] {
@@ -162,8 +217,15 @@ object Zipper extends ZipperFactory[Zipper] {
     new Zipper(lefts, focus, rights)
 
   /**
-    * Builds a Zipper from NonEmptyList. The head of the list becomes the focus
-    */
+   * Builds a Zipper from a List, if it is non-empty.  The head (if any)
+   * becomes the focus.
+   */
+  def fromList[A](as: List[A]): Option[Zipper[A]] =
+    NonEmptyList.fromList(as).map(fromNel)
+
+  /**
+   * Builds a Zipper from NonEmptyList. The head of the list becomes the focus
+   */
   def fromNel[A](ne: NonEmptyList[A]): Zipper[A] =
     apply(Nil, ne.head, ne.tail)
 
@@ -173,13 +235,19 @@ object Zipper extends ZipperFactory[Zipper] {
   def of[A](a: A, as: A*): Zipper[A] =
     apply(Nil, a, as.toList)
 
+  /**
+   * Builds a Zipper with only one element, which of course is focused.
+   */
+  def one[A](a: A): Zipper[A] =
+    apply(Nil, a, Nil)
+
   protected def build[A](lefts: List[A], focus: A, rights: List[A]): Zipper[A] =
     apply(lefts, focus, rights)
 
   /**
-    * Based on traverse implementation for List
-    * @group Typeclass Instances
-    */
+   * Based on traverse implementation for List
+   * @group Typeclass Instances
+   */
   implicit val traverse: Traverse[Zipper] = new Traverse[Zipper] {
     override def traverse[G[_], A, B](
       fa: Zipper[A]

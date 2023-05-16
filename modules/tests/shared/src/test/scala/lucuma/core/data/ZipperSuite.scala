@@ -11,7 +11,7 @@ import cats.laws.discipline.FunctorTests
 import cats.laws.discipline.TraverseTests
 import cats.laws.discipline.arbitrary._
 import cats.syntax.all._
-import lucuma.core.data.arb.ArbZipper._
+import lucuma.core.data.arb.ArbZipper
 import monocle.law.discipline.TraversalTests
 import org.scalacheck.Prop._
 
@@ -19,6 +19,9 @@ import org.scalacheck.Prop._
   * Tests the Zipper typeclasses
   */
 final class ZipperSuite extends munit.DisciplineSuite {
+
+  import ArbZipper.given
+
   test("support modify") {
     forAll { (l: List[Int]) =>
       val z = Zipper.fromNel(NonEmptyList(0, l))
@@ -160,6 +163,30 @@ final class ZipperSuite extends munit.DisciplineSuite {
       val z = Zipper.fromNel(nel).focusMin
       assertEquals(z.focus, nel.toList.min)
       assertEquals(z.toNel, nel)
+    }
+  }
+  test("focusIndex") {
+    forAll { (nel: NonEmptyList[Int], index: Int) =>
+      val z = Zipper.fromNel(nel).focusMax
+      if ((index < 0) || index >= nel.length) {
+        assertEquals(z.focusIndex(index), none)
+      } else {
+        val (prefix, h :: t) = nel.toList.splitAt(index) : @unchecked
+        assertEquals(z.focusIndex(index), Zipper(prefix.reverse, h, t).some)
+      }
+    }
+  }
+  test("focusIndex 2") {
+    forAll { (nel: NonEmptyList[Int]) =>
+      val z = Zipper.fromNel(nel).focusMax
+      val i = z.indexOfFocus
+      assertEquals(z.focusMin.focusIndex(i), z.some)
+    }
+  }
+  test("indexOfFocus") {
+    forAll { (nel: NonEmptyList[Int]) =>
+      val z = Zipper.fromNel(nel).focusMax
+      assertEquals(z.withFocus.toList.indexWhere(_._2), z.indexOfFocus)
     }
   }
 
