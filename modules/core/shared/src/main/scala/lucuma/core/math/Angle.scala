@@ -385,18 +385,39 @@ trait AngleOptics extends OpticsHelpers { this: Angle.type =>
     )
   }
 
-  // Exact signed angles, scaled by moving the decimal point `scale` digits to the left
-  private def signedDecimalMicroarcsecondsScaled(scale: Int): SplitMono[Angle, BigDecimal] =
-    signedMicroarcseconds.imapB(_.underlying.movePointRight(scale).longValue,
-                                n => new java.math.BigDecimal(n).movePointLeft(scale)
+  private def decimalMicroarcsecondsScaled(µas: SplitMono[Angle, Long], scale: Int): SplitMono[Angle, BigDecimal] =
+    µas.imapB(
+      _.underlying.movePointRight(scale).longValue,
+      n => new java.math.BigDecimal(n).movePointLeft(scale)
     )
 
+
+  private def unsignedDecimalMicroarcsecondsScaled(scale: Int): SplitMono[Angle, BigDecimal] =
+    decimalMicroarcsecondsScaled(microarcseconds, scale)
+
+  // Exact signed angles, scaled by moving the decimal point `scale` digits to the left
+  private def signedDecimalMicroarcsecondsScaled(scale: Int): SplitMono[Angle, BigDecimal] =
+    decimalMicroarcsecondsScaled(signedMicroarcseconds, scale)
+
+  /**
+   * Unsigned decimal milliarcseconds, exact, in [0°, 360°).
+   * @group Optics
+   */
+  lazy val decimalMilliarcseconds: SplitMono[Angle, BigDecimal] =
+    unsignedDecimalMicroarcsecondsScaled(3)
   /**
    * Signed decimal milliarcseconds, exact, in [-180°, 180°).
    * @group Optics
    */
   lazy val signedDecimalMilliarcseconds: SplitMono[Angle, BigDecimal] =
     signedDecimalMicroarcsecondsScaled(3)
+
+  /**
+   * Unsigned decimal arcseconds, exact, in [0°, 360°).
+   * @group Optics
+   */
+  lazy val decimalArcseconds: SplitMono[Angle, BigDecimal] =
+    unsignedDecimalMicroarcsecondsScaled(6)
 
   /**
    * Signed decimal arcseconds, exact, in [-180°, 180°).

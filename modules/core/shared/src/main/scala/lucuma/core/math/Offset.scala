@@ -51,6 +51,16 @@ final case class Offset(p: Offset.Component[Axis.P], q: Offset.Component[Axis.Q]
   def rotate(θ: Angle): Offset =
     Offset.rotateBy(θ)(this)
 
+  /**
+   * Angular separation between two offset positions.
+   */
+  def distance(o: Offset): Angle = {
+    val µas = Angle.signedMicroarcseconds.get
+    val pd  = µas(p.toAngle) - µas(o.p.toAngle)
+    val qd  = µas(q.toAngle) - µas(o.q.toAngle)
+    Angle.fromMicroarcseconds(Math.sqrt((pd*pd + qd*qd).toDouble).round)
+  }
+
   /** This offset pair in radians. */
   def toSignedDoubleRadians: (Double, Double) =
     (p.toSignedDoubleRadians, q.toSignedDoubleRadians)
