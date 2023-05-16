@@ -23,12 +23,13 @@ final class AngleSuite extends munit.DisciplineSuite {
   checkAll("SignedAngle", OrderTests[Angle](Angle.SignedAngleOrder).order)
 
   // Optics
-  checkAll("microarcseconds", SplitMonoTests(Angle.microarcseconds).splitMono)
-  checkAll("signedMicroarcseconds", SplitMonoTests(Angle.signedMicroarcseconds).splitMono)
-  checkAll("signedDecimalMilliarcseconds",
-           SplitMonoTests(Angle.signedDecimalMilliarcseconds).splitMono
-  )
-  checkAll("signedDecimalArcseconds", SplitMonoTests(Angle.signedDecimalArcseconds).splitMono)
+  checkAll("microarcseconds",              SplitMonoTests(Angle.microarcseconds).splitMono)
+  checkAll("signedMicroarcseconds",        SplitMonoTests(Angle.signedMicroarcseconds).splitMono)
+  checkAll("decimalMilliarcseconds",       SplitMonoTests(Angle.decimalMilliarcseconds).splitMono)
+  checkAll("signedDecimalMilliarcseconds", SplitMonoTests(Angle.signedDecimalMilliarcseconds).splitMono)
+  checkAll("decimalArcseconds",            SplitMonoTests(Angle.decimalArcseconds).splitMono)
+  checkAll("signedDecimalArcseconds",      SplitMonoTests(Angle.signedDecimalArcseconds).splitMono)
+
   checkAll("milliarcseconds", WedgeTests(Angle.milliarcseconds).wedge)
   checkAll("arcseconds", WedgeTests(Angle.arcseconds).wedge)
   checkAll("arcminutes", WedgeTests(Angle.arcminutes).wedge)

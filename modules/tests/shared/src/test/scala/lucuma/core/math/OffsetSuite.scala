@@ -109,4 +109,32 @@ final class OffsetSuite extends munit.DisciplineSuite {
       )
     }
   }
+
+  test("Distance is commutative") {
+    forAll { (a: Offset, b: Offset) =>
+      assertEquals(a.distance(b), b.distance(a))
+    }
+  }
+
+  test("Distance is never greater than 180º") {
+    forAll { (a: Offset, b: Offset) =>
+      assert(a.distance(b).toMicroarcseconds <= Angle.µasPer180)
+    }
+  }
+
+  test("Distance tests") {
+    val examples = List(
+      ((  0L,  0L), ( 0L,  0L)) ->  0L,
+      ((  0L, 10L), ( 0L,  0L)) -> 10L,
+      ((-10L,  0L), ( 0L,  0L)) -> 10L,
+      ((  3L,  4L), (-3L, -4L)) -> 10L
+    )
+
+    def toOffset(µas: (Long, Long)): Offset =
+      Offset.microarcseconds.reverseGet(µas)
+
+    examples.foreach { case ((a, b), result) =>
+      assertEquals(toOffset(a).distance(toOffset(b)).toMicroarcseconds, result)
+    }
+  }
 }
