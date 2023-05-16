@@ -21,6 +21,9 @@ class EnumZipper[A] private (lefts: List[A], focus: A, rights: List[A])
   def withFocus(a: A)(implicit eq: Eq[A]): EnumZipper[A] =
     findFocus(_ === a)
       .getOrElse(unmodified) // This shouldn't happen. An EnumZipper contains all elements.
+
+  override protected def canEqual(other: Any): Boolean = other.isInstanceOf[EnumZipper[?]]
+
 }
 
 object EnumZipper extends ZipperFactory[EnumZipper] {

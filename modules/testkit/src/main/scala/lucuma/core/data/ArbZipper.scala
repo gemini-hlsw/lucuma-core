@@ -13,20 +13,22 @@ import org.scalacheck.Cogen
 import org.scalacheck.Gen
 
 trait ArbZipper {
-  implicit def arbZipper[A: Arbitrary]: Arbitrary[Zipper[A]] =
-    Arbitrary {
-      val MaxSideLength = 100
 
+  def arbZipper[A: Arbitrary](limit: Int): Arbitrary[Zipper[A]] =
+    Arbitrary {
       for {
         f  <- arbitrary[A]
-        ll <- Gen.choose(0, MaxSideLength)
+        ll <- Gen.choose(0, limit)
         l  <- Gen.listOfN(ll, arbitrary[A])
-        rl <- Gen.choose(0, MaxSideLength)
+        rl <- Gen.choose(0, limit)
         r  <- Gen.listOfN(rl, arbitrary[A])
       } yield Zipper(l, f, r)
     }
 
-  implicit def zipperCogen[A: Cogen]: Cogen[Zipper[A]] =
+  given[A: Arbitrary]: Arbitrary[Zipper[A]] =
+    arbZipper(100)
+
+  given[A: Cogen]: Cogen[Zipper[A]] =
     Cogen[(List[A], A, List[A])].contramap(z => (z.lefts, z.focus, z.rights))
 
 }
