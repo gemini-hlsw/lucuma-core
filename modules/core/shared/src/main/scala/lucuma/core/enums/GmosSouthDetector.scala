@@ -5,6 +5,7 @@ package lucuma
 package core
 package enums
 
+import cats.data.NonEmptySet
 import cats.syntax.eq._
 import coulomb._
 import eu.timepit.refined.auto._
@@ -30,34 +31,36 @@ sealed abstract class GmosSouthDetector(
   val xSize: Quantity[PosInt, Pixels],
   val ySize: Quantity[PosInt, Pixels],
   val gapSize: Quantity[PosInt, Pixels],
-  val maxRois: PosInt
-) extends Product with Serializable {
-}
+  val maxRois: PosInt,
+  val ampCounts: NonEmptySet[GmosAmpCount]
+) extends Product with Serializable
 
 object GmosSouthDetector {
 
-  /** @group Constructors */ case object E2V extends GmosSouthDetector(
-                               "E2V",
-                               "E2V",
-                               "E2V",
-                               Angle.fromMicroarcseconds(73000),
-                               1536.withRefinedUnit[Positive, Pixels],
-                               6144.withRefinedUnit[Positive, Pixels],
-                               4608.withRefinedUnit[Positive, Pixels],
-                               37.withRefinedUnit[Positive, Pixels],
-                               4.refined
-                             )
-  /** @group Constructors */ case object Hamamatsu extends GmosSouthDetector(
-                               "HAMAMATSU",
-                               "Hamamatsu",
-                               "Hamamatsu",
-                               Angle.fromMicroarcseconds(80000),
-                               1392.withRefinedUnit[Positive, Pixels],
-                               6255.withRefinedUnit[Positive, Pixels],
-                               4176.withRefinedUnit[Positive, Pixels],
-                               61.withRefinedUnit[Positive, Pixels],
-                               5.refined
-                             )
+  case object E2V extends GmosSouthDetector(
+    "E2V",
+    "E2V",
+    "E2V",
+    Angle.fromMicroarcseconds(73000),
+    1536.withRefinedUnit[Positive, Pixels],
+    6144.withRefinedUnit[Positive, Pixels],
+    4608.withRefinedUnit[Positive, Pixels],
+    37.withRefinedUnit[Positive, Pixels],
+    4.refined,
+    NonEmptySet.of(GmosAmpCount.Three, GmosAmpCount.Six)
+  )
+  case object Hamamatsu extends GmosSouthDetector(
+    "HAMAMATSU",
+    "Hamamatsu",
+    "Hamamatsu",
+    Angle.fromMicroarcseconds(80000),
+    1392.withRefinedUnit[Positive, Pixels],
+    6255.withRefinedUnit[Positive, Pixels],
+    4176.withRefinedUnit[Positive, Pixels],
+    61.withRefinedUnit[Positive, Pixels],
+    5.refined,
+    NonEmptySet.of(GmosAmpCount.Six, GmosAmpCount.Twelve)
+  )
 
   /** All members of GmosSouthDetector, in canonical order. */
   val all: List[GmosSouthDetector] =
