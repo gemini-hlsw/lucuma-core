@@ -21,7 +21,7 @@ final class ExecutionConfigSuite extends DisciplineSuite {
 
   import ArbDynamicConfig.*
   import ArbExecutionConfig.given
-  import ArbSequence.given
+  import ArbExecutionSequence.given
   import ArbSetupTime.given
   import ArbStaticConfig.*
 

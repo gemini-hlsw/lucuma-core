@@ -18,18 +18,18 @@ import org.scalacheck.Cogen
 import org.scalacheck.Test
 
 
-final class SequenceSuite extends DisciplineSuite {
+final class ExecutionSequenceSuite extends DisciplineSuite {
   import ArbAtom.given
   import ArbBoundedCollection.given
   import ArbDynamicConfig.*
   import ArbEnumerated.*
-  import ArbSequence.given
+  import ArbExecutionSequence.given
   import ArbUid.*
 
   override val scalaCheckTestParameters = Test.Parameters.default.withMaxSize(4)
 
-  checkAll("Eq[Sequence[GmosNorth]]", EqTests[Sequence[GmosNorth]].eqv)
-  checkAll("Sequence.atoms",          LensTests(Sequence.atoms[GmosNorth]))
-
+  checkAll("Eq[Sequence[GmosNorth]]", EqTests[ExecutionSequence[GmosNorth]].eqv)
+  checkAll("Sequence.nextAtom",       LensTests(ExecutionSequence.nextAtom[GmosNorth]))
+  checkAll("Sequence.possibleFuture", LensTests(ExecutionSequence.possibleFuture[GmosNorth]))
 
 }

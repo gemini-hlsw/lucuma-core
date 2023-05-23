@@ -20,7 +20,7 @@ import org.scalacheck.Gen
 trait ArbExecutionConfig {
   import ArbAtom.given
   import ArbEnumerated.given
-  import ArbSequence.given
+  import ArbExecutionSequence.given
   import ArbSetupTime.given
   import ArbTimeSpan.given
 
@@ -28,14 +28,14 @@ trait ArbExecutionConfig {
     Arbitrary {
       for {
         s <- arbitrary[S]
-        a <- arbitrary[Option[Sequence[D]]]
-        n <- arbitrary[Option[Sequence[D]]]
+        a <- arbitrary[Option[ExecutionSequence[D]]]
+        n <- arbitrary[Option[ExecutionSequence[D]]]
         t <- arbitrary[SetupTime]
       } yield ExecutionConfig(s, a, n, t)
     }
 
   given [S: Cogen, D: Cogen]: Cogen[ExecutionConfig[S, D]] =
-    Cogen[(S, Option[Sequence[D]], Option[Sequence[D]], SetupTime)].contramap { a =>
+    Cogen[(S, Option[ExecutionSequence[D]], Option[ExecutionSequence[D]], SetupTime)].contramap { a =>
       (a.static, a.acquisition, a.science, a.setup)
     }
 

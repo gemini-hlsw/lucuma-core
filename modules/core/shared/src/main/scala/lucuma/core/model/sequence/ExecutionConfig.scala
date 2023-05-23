@@ -20,8 +20,8 @@ import monocle.Lens
  */
 case class ExecutionConfig[S, D](
   static:        S,
-  acquisition:   Option[Sequence[D]],
-  science:       Option[Sequence[D]],
+  acquisition:   Option[ExecutionSequence[D]],
+  science:       Option[ExecutionSequence[D]],
   setup:         SetupTime
 ) {
 
@@ -29,21 +29,24 @@ case class ExecutionConfig[S, D](
    * ObserveClass computed from the ObserveClass of the science sequence atoms.
    */
   lazy val observeClass: ObserveClass =
-    science.fold(ObserveClass.Science)(_.observeClass)
+    science.fold(ObserveClass.Science)(_.digest.observeClass)
+
+  private def plannedTime(setup: TimeSpan): PlannedTime =
+    science.foldMap(_.digest.plannedTime).sumCharge(observeClass.chargeClass, setup)
 
   /**
    * Planned time for the observation, including the science sequence and a
    * full setup time.
    */
   lazy val fullPlannedTime: PlannedTime =
-    science.foldMap(_.plannedTime).sumCharge(observeClass.chargeClass, setup.full)
+    plannedTime(setup.full)
 
   /**
    * Planned time for the observation, including the science sequence but only
    * a reacquisition cost instead of the full setup time.
    */
   lazy val reacquisitionPlannedTime: PlannedTime =
-    science.foldMap(_.plannedTime).sumCharge(observeClass.chargeClass, setup.reacquisition)
+    plannedTime(setup.reacquisition)
 
 }
 
@@ -62,11 +65,11 @@ object ExecutionConfig {
     Focus[ExecutionConfig[S, D]](_.static)
 
   /** @group Optics */
-  def acquisition[S, D]: Lens[ExecutionConfig[S, D], Option[Sequence[D]]] =
+  def acquisition[S, D]: Lens[ExecutionConfig[S, D], Option[ExecutionSequence[D]]] =
     Focus[ExecutionConfig[S, D]](_.acquisition)
 
   /** @group Optics */
-  def science[S, D]: Lens[ExecutionConfig[S, D], Option[Sequence[D]]] =
+  def science[S, D]: Lens[ExecutionConfig[S, D], Option[ExecutionSequence[D]]] =
     Focus[ExecutionConfig[S, D]](_.science)
 
   /** @group Optics */
