@@ -1,13 +1,12 @@
 // Copyright (c) 2016-2023 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package lucuma.core.model.sequence.arb
+package lucuma.core.model.sequence
+package gmos
+package arb
 
-import cats.syntax.all._
-import lucuma.core.arb.ArbTime
-import lucuma.core.enums._
-import lucuma.core.model.sequence.DynamicConfig
-import lucuma.core.model.sequence._
+import cats.syntax.all.*
+import lucuma.core.enums.*
 import lucuma.core.util.TimeSpan
 import lucuma.core.util.arb.ArbEnumerated
 import lucuma.core.util.arb.ArbTimeSpan
@@ -22,7 +21,6 @@ trait ArbDynamicConfig {
   import ArbTimeSpan.given
   import ArbGmosGratingConfig._
   import ArbGmosFpuMask._
-  import ArbTime._
 
   implicit val arbDynamicConfigGmosNorth: Arbitrary[DynamicConfig.GmosNorth] = Arbitrary(
     for {

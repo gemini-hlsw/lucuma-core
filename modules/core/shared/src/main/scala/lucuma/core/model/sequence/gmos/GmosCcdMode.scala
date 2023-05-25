@@ -1,9 +1,9 @@
 // Copyright (c) 2016-2023 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package lucuma.core.model.sequence
+package lucuma.core.model.sequence.gmos
 
-import cats.Eq
+import cats.Order
 import coulomb.*
 import coulomb.syntax.*
 import eu.timepit.refined.types.numeric.PosBigDecimal
@@ -51,8 +51,15 @@ final case class GmosCcdMode(
 }
 
 object GmosCcdMode {
-  implicit val eqGmosCcdMode: Eq[GmosCcdMode] =
-    Eq.by(x => (x.xBin, x.yBin, x.ampCount, x.ampGain, x.ampReadMode))
+
+  given Order[GmosCcdMode] =
+    Order.by { a => (
+      a.xBin,
+      a.yBin,
+      a.ampCount,
+      a.ampGain,
+      a.ampReadMode
+    )}
 
   /** @group Optics */
   val xBin: Lens[GmosCcdMode, GmosXBinning] =

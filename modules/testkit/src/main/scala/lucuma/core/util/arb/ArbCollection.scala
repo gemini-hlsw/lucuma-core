@@ -3,13 +3,17 @@
 
 package lucuma.core.util.arb
 
-import org.scalacheck._
+import org.scalacheck.Arbitrary
+import org.scalacheck.Arbitrary.arbitrary
+import org.scalacheck.Cogen
+import org.scalacheck.Gen
 
 import scala.collection.immutable.SortedMap
 
 trait ArbCollection {
-  implicit def cogenSortedMap[K: Cogen: Ordering, V: Cogen]: Cogen[SortedMap[K, V]] =
+  given  [K: Cogen: Ordering, V: Cogen]: Cogen[SortedMap[K, V]] =
     Cogen[Map[K, V]].contramap(identity)
+
 }
 
 object ArbCollection extends ArbCollection

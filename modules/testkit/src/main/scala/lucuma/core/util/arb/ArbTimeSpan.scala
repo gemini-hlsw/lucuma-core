@@ -16,7 +16,10 @@ trait ArbTimeSpan {
 
   given Arbitrary[TimeSpan] =
     Arbitrary {
-      arbitrary[NonNegLong].map(TimeSpan.fromNonNegMicroseconds)
+      Gen.frequency(
+        (  1, arbitrary[NonNegLong].map(TimeSpan.fromNonNegMicroseconds)),
+        (999, Gen.choose(0L, 2L * 60L * 60L).map(TimeSpan.unsafeFromMicroseconds))
+      )
     }
 
   given Cogen[TimeSpan] =

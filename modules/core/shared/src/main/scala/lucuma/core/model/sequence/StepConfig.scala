@@ -18,7 +18,10 @@ import monocle.std.either.*
 
 import scala.collection.immutable.SortedSet
 
-sealed abstract class StepConfig(val stepType: StepType)
+sealed abstract class StepConfig(val stepType: StepType) {
+  def usesGcalUnit: Boolean =
+    stepType === StepType.Gcal || stepType === StepType.SmartGcal
+}
 
 object StepConfig {
 

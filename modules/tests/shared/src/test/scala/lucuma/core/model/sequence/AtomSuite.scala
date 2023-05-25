@@ -3,29 +3,34 @@
 
 package lucuma.core.model.sequence
 
-import cats.kernel.laws.discipline._
-import lucuma.core.model.sequence.arb._
-import lucuma.core.util.arb._
+import cats.kernel.laws.discipline.*
+import cats.laws.discipline.arbitrary.*
+import lucuma.core.model.sequence.arb.*
+import lucuma.core.model.sequence.gmos.DynamicConfig.GmosNorth
+import lucuma.core.model.sequence.gmos.arb.*
+import lucuma.core.util.arb.*
 import lucuma.core.util.laws.UidTests
-import monocle.law.discipline._
-import munit._
+import monocle.law.discipline.*
+import munit.*
+import org.scalacheck.Arbitrary
+import org.scalacheck.Cogen
+import org.scalacheck.Test
+
 
 final class AtomSuite extends DisciplineSuite {
-  import ArbStep._
+  import ArbAtom.given
+  import ArbBoundedCollection.given
+  import ArbDynamicConfig._
   import ArbEnumerated._
+  import ArbStep.given
   import ArbUid._
-  import ArbAtom._
 
-  checkAll("Eq[Atom.GmosNorth]", EqTests[Atom.GmosNorth].eqv)
-  checkAll("Atom.GmosNorth.id", LensTests(Atom.GmosNorth.id))
-  checkAll("Atom.GmosNorth.steps", LensTests(Atom.GmosNorth.steps))
+  override val scalaCheckTestParameters = Test.Parameters.default.withMaxSize(10)
 
-  checkAll("Eq[Atom.GmosSouth]", EqTests[Atom.GmosSouth].eqv)
-  checkAll("Atom.GmosSouth.id", LensTests(Atom.GmosSouth.id))
-  checkAll("Atom.GmosSouth.steps", LensTests(Atom.GmosSouth.steps))
-
-  checkAll("Eq[Atom]", EqTests[Atom].eqv)
   checkAll("Atom.Id", UidTests[Atom.Id].uid)
-  checkAll("Atom.gmosNorth", PrismTests(Atom.gmosNorth))
-  checkAll("Atom.gmosSouth", PrismTests(Atom.gmosSouth))
+
+  checkAll("Eq[Atom[GmosNorth]]", EqTests[Atom[GmosNorth]].eqv)
+  checkAll("Atom.id",             LensTests(Atom.id[GmosNorth]))
+  checkAll("Atom.steps",          LensTests(Atom.steps[GmosNorth]))
+
 }

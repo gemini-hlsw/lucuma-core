@@ -1,20 +1,22 @@
 // Copyright (c) 2016-2023 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package lucuma.core.model.sequence
+package lucuma.core.model.sequence.gmos
 
 import cats.Eq
-import cats.syntax.all._
-import lucuma.core.enums._
+import cats.syntax.all.*
+import lucuma.core.enums.*
 import lucuma.core.util.TimeSpan
 import monocle.Focus
 import monocle.Lens
 import monocle.Prism
 import monocle.macros.GenPrism
-import org.typelevel.cats.time._
+import org.typelevel.cats.time.*
 
 sealed trait DynamicConfig
+
 object DynamicConfig {
+
   final case class GmosNorth(
     exposure:      TimeSpan,
     readout:       GmosCcdMode,
@@ -24,6 +26,7 @@ object DynamicConfig {
     filter:        Option[GmosNorthFilter],
     fpu:           Option[GmosFpuMask[GmosNorthFpu]]
   ) extends DynamicConfig
+
   object GmosNorth {
     implicit val eqInstrumentConfigGmosNorth: Eq[GmosNorth] =
       Eq.by(x => (x.exposure, x.readout, x.dtax, x.roi, x.gratingConfig, x.filter, x.fpu))
@@ -66,7 +69,9 @@ object DynamicConfig {
     filter:        Option[GmosSouthFilter],
     fpu:           Option[GmosFpuMask[GmosSouthFpu]]
   ) extends DynamicConfig
+
   object GmosSouth {
+
     implicit val eqInstrumentConfigGmosSouth: Eq[GmosSouth] =
       Eq.by(x => (x.exposure, x.readout, x.dtax, x.roi, x.gratingConfig, x.filter, x.fpu))
 

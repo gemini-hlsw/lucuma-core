@@ -33,7 +33,7 @@ import scala.collection.immutable.SortedMap
 
 final class SpectralDefinitionSuite extends DisciplineSuite {
   import ArbBrightnessValue.given
-  import ArbCollection.*
+  import ArbCollection.given
   import ArbEmissionLine.given
   import ArbEnumerated.*
   import ArbFluxDensityContinuumValue.given

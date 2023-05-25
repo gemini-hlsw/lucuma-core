@@ -4,8 +4,13 @@
 package lucuma.core.model.sequence
 
 import cats.Eq
+import cats.data.NonEmptyList
 import cats.syntax.all._
 import eu.timepit.refined.auto._
+import eu.timepit.refined.types.string.NonEmptyString
+import lucuma.core.data.Zipper
+import lucuma.core.enums.ObserveClass
+import lucuma.core.util.TimeSpan
 import lucuma.core.util.WithUid
 import lucuma.refined._
 import monocle.Focus
@@ -13,49 +18,45 @@ import monocle.Lens
 import monocle.Prism
 import monocle.macros.GenPrism
 
-sealed trait Atom {
-  def id: Atom.Id
-  def steps: List[Step]
+/**
+ * An Atom is a collection of steps that must be treated as indivisible
+ * at execution time.
+ *
+ * @tparam D dynamic config type (e.g., DynamicConfig.GmosNorth)
+ */
+case class Atom[D](
+  id:          Atom.Id,
+  description: Option[NonEmptyString],
+  steps:       NonEmptyList[Step[D]]
+) {
+
+  lazy val observeClass: ObserveClass =
+    steps.foldMap(_.observeClass)
+
+  lazy val plannedTime: PlannedTime =
+    steps.foldMap(_.plannedTime)
+
 }
 
 object Atom extends WithUid('a'.refined) {
-  final case class GmosNorth(id: Atom.Id, steps: List[Step.GmosNorth]) extends Atom
-  object GmosNorth {
-    implicit val eqAtomGmosNorth: Eq[GmosNorth] = Eq.by(a => (a.id, a.steps))
-
-    /** @group Optics */
-    val id: Lens[GmosNorth, Atom.Id] =
-      Focus[GmosNorth](_.id)
-
-    /** @group Optics */
-    val steps: Lens[GmosNorth, List[Step.GmosNorth]] =
-      Focus[GmosNorth](_.steps)
-  }
-
-  final case class GmosSouth(id: Atom.Id, steps: List[Step.GmosSouth]) extends Atom
-  object GmosSouth {
-    implicit val eqAtomGmosSouth: Eq[GmosSouth] = Eq.by(a => (a.id, a.steps))
-
-    /** @group Optics */
-    val id: Lens[GmosSouth, Atom.Id] =
-      Focus[GmosSouth](_.id)
-
-    /** @group Optics */
-    val steps: Lens[GmosSouth, List[Step.GmosSouth]] =
-      Focus[GmosSouth](_.steps)
-  }
-
-  implicit val eqAtom: Eq[Atom] = Eq.instance {
-    case (a @ GmosNorth(_, _), b @ GmosNorth(_, _)) => a === b
-    case (a @ GmosSouth(_, _), b @ GmosSouth(_, _)) => a === b
-    case _                                          => false
-  }
 
   /** @group Optics */
-  val gmosNorth: Prism[Atom, GmosNorth] =
-    GenPrism[Atom, GmosNorth]
+  def id[D]: Lens[Atom[D], Atom.Id] =
+    Focus[Atom[D]](_.id)
 
   /** @group Optics */
-  val gmosSouth: Prism[Atom, GmosSouth] =
-    GenPrism[Atom, GmosSouth]
+  def description[D]: Lens[Atom[D], Option[NonEmptyString]] =
+    Focus[Atom[D]](_.description)
+
+  /** @group Optics */
+  def steps[D]: Lens[Atom[D], NonEmptyList[Step[D]]] =
+    Focus[Atom[D]](_.steps)
+
+  given [D](using Eq[D]): Eq[Atom[D]] =
+    Eq.by { a => (
+      a.id,
+      a.description.map(_.value),
+      a.steps
+    )}
 }
+

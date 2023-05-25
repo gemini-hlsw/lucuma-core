@@ -45,7 +45,7 @@ final class SourceProfileSuite extends DisciplineSuite {
   import ArbSpectralDefinition.given
   import ArbUnnormalizedSED.given
   import ArbWavelength.*
-  import ArbCollection.*
+  import ArbCollection.given
 
   // Conversions
   val sd1Integrated: SpectralDefinition[Integrated] =

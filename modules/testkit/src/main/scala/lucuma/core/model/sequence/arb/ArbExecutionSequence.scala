@@ -1,11 +1,15 @@
 // Copyright (c) 2016-2023 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package lucuma.core.model.sequence.arb
+package lucuma.core.model.sequence
+package arb
 
+import cats.data.NonEmptyList
 import cats.syntax.all._
-import lucuma.core.model.sequence.Atom
-import lucuma.core.model.sequence.ExecutionSequence
+import eu.timepit.refined.types.numeric.PosInt
+import lucuma.core.data.Zipper
+import lucuma.core.math.Offset
+import lucuma.core.util.arb.ArbBoundedCollection
 import lucuma.core.util.arb.ArbUid
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary._
@@ -13,45 +17,36 @@ import org.scalacheck.Cogen
 import org.scalacheck.Gen
 
 trait ArbExecutionSequence {
+  import ArbAtom.given
+  import ArbBoundedCollection.*
+  import ArbSequenceDigest.given
   import ArbUid._
-  import ArbAtom._
 
-  private def genBoundedExecutionSequence[A: Arbitrary, B](limit: Int, f: (A, List[A]) => B): Gen[B] =
-    for {
-      nextAtom       <- arbitrary[A]
-      possibleFuture <- genBoundedList[A](limit)
-    } yield f(nextAtom, possibleFuture)
-
-  def genBoundedExecutionSequenceGmosNorth(limit: Int): Gen[ExecutionSequence.GmosNorth] =
-    genBoundedExecutionSequence[Atom.GmosNorth, ExecutionSequence.GmosNorth](limit, ExecutionSequence.GmosNorth.apply)
-
-  implicit val arbExecutionSequenceGmosNorth: Arbitrary[ExecutionSequence.GmosNorth] =
-    Arbitrary(genBoundedExecutionSequenceGmosNorth(10))
-
-  implicit val cogExecutionSequenceGmosNorth: Cogen[ExecutionSequence.GmosNorth] =
-    Cogen[(Atom.GmosNorth, List[Atom.GmosNorth])].contramap(s => (s.nextAtom, s.possibleFuture))
-
-  def genBoundedExecutionSequenceGmosSouth(limit: Int): Gen[ExecutionSequence.GmosSouth] =
-    genBoundedExecutionSequence[Atom.GmosSouth, ExecutionSequence.GmosSouth](limit, ExecutionSequence.GmosSouth.apply)
-
-  implicit val arbExecutionSequenceGmosSouth: Arbitrary[ExecutionSequence.GmosSouth] =
-    Arbitrary(genBoundedExecutionSequenceGmosSouth(10))
-
-  implicit val cogExecutionSequenceGmosSouth: Cogen[ExecutionSequence.GmosSouth] =
-    Cogen[(Atom.GmosSouth, List[Atom.GmosSouth])].contramap(s => (s.nextAtom, s.possibleFuture))
-
-  implicit val arbExecutionSequence: Arbitrary[ExecutionSequence] = Arbitrary(
-    Gen.oneOf(
-      arbitrary[ExecutionSequence.GmosNorth],
-      arbitrary[ExecutionSequence.GmosSouth]
-    )
-  )
-
-  implicit val cogExecutionSequence: Cogen[ExecutionSequence] =
-    Cogen[Either[ExecutionSequence.GmosNorth, ExecutionSequence.GmosSouth]].contramap {
-      case s @ ExecutionSequence.GmosNorth(_, _) => s.asLeft
-      case s @ ExecutionSequence.GmosSouth(_, _) => s.asRight
+  given [D: Arbitrary]: Arbitrary[ExecutionSequence[D]] =
+    Arbitrary {
+      for {
+        as <- genBoundedNonEmptyList[Atom[D]](BoundedCollectionLimit)
+        m  <- arbitrary[Boolean]
+        n  <- Gen.posNum[Int].map(_ max as.length).map(PosInt.unsafeFrom)
+        d  <- arbitrary[SequenceDigest]
+      } yield ExecutionSequence(as.head, as.tail, m, n, d)
     }
+
+  given [D: Cogen]: Cogen[ExecutionSequence[D]] =
+    Cogen[(
+      Atom[D],
+      List[Atom[D]],
+      Boolean,
+      Int,
+      SequenceDigest
+    )].contramap { a => (
+      a.nextAtom,
+      a.possibleFuture,
+      a.hasMore,
+      a.atomCount.value,
+      a.digest
+    )}
+
 }
 
 object ArbExecutionSequence extends ArbExecutionSequence

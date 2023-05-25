@@ -22,7 +22,7 @@ class TargetSuite extends DisciplineSuite {
   import ArbAngle.*
   import ArbBrightnessValue.given
   import ArbCatalogInfo.*
-  import ArbCollection.*
+  import ArbCollection.given
   import ArbCoordinates.*
   import ArbDeclination.*
   import ArbEnumerated.*

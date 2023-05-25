@@ -4,59 +4,75 @@
 package lucuma.core.model.sequence
 
 import cats.Eq
+import cats.data.NonEmptyList
 import cats.syntax.all._
+import eu.timepit.refined.types.numeric.PosInt
+import lucuma.core.data.Zipper
+import lucuma.core.util.TimeSpan
 import monocle.Focus
 import monocle.Lens
 import monocle.Prism
 import monocle.macros.GenPrism
 
-sealed trait ExecutionSequence {
-  val nextAtom: Atom
-  val possibleFuture: List[Atom]
-}
+/**
+ * An ExecutionSequence is a logically a list of Atom.  It includes a concrete
+ * `nextAtom` that should be executed and a `possibleFuture` list of atoms
+ * which may be generated in the future.  It is important to note that the
+ * `possibleFuture` may not be complete.  Lengthy future atom lists are
+ * truncated to a reasonably small size.
+ *
+ * @tparam D dynamic config type
+ *
+ * @param nextAtom       next atom to be executed
+ * @param possibleFuture initial atoms that may appear in the future (this may
+ *                       not include all potential future atoms that are known
+ *                       at the time of creation)
+ * @param hasMore        whether the `possibleFuture` is incomplete
+ * @param atomCount      number of atoms that we may expect, including the next
+ *                       atom, the possible future, and any that haven't been
+ *                       included in the possible future
+ * @param digest         compilation of attributes about the sequence as a
+ *                       whole, including `possibleFuture` and all expected
+ *                       subsequent atoms
+ */
+case class ExecutionSequence[D](
+  nextAtom:       Atom[D],
+  possibleFuture: List[Atom[D]],
+  hasMore:        Boolean,
+  atomCount:      PosInt,
+  digest:         SequenceDigest
+)
 
 object ExecutionSequence {
-  final case class GmosNorth(nextAtom: Atom.GmosNorth, possibleFuture: List[Atom.GmosNorth])
-      extends ExecutionSequence
-  object GmosNorth {
-    implicit val eqExecutionSequenceGmosNorth: Eq[GmosNorth] =
-      Eq.by(x => (x.nextAtom, x.possibleFuture))
-
-    /** @group Optics */
-    val nextAtom: Lens[GmosNorth, Atom.GmosNorth] =
-      Focus[GmosNorth](_.nextAtom)
-
-    /** @group Optics */
-    val possibleFuture: Lens[GmosNorth, List[Atom.GmosNorth]] =
-      Focus[GmosNorth](_.possibleFuture)
-  }
-
-  final case class GmosSouth(nextAtom: Atom.GmosSouth, possibleFuture: List[Atom.GmosSouth])
-      extends ExecutionSequence
-  object GmosSouth {
-    implicit val eqExecutionSequenceGmosSouth: Eq[GmosSouth] =
-      Eq.by(x => (x.nextAtom, x.possibleFuture))
-
-    /** @group Optics */
-    val nextAtom: Lens[GmosSouth, Atom.GmosSouth] =
-      Focus[GmosSouth](_.nextAtom)
-
-    /** @group Optics */
-    val possibleFuture: Lens[GmosSouth, List[Atom.GmosSouth]] =
-      Focus[GmosSouth](_.possibleFuture)
-  }
-
-  implicit val eqExecutionSequence: Eq[ExecutionSequence] = Eq.instance {
-    case (a @ GmosNorth(_, _), b @ GmosNorth(_, _)) => a === b
-    case (a @ GmosSouth(_, _), b @ GmosSouth(_, _)) => a === b
-    case _                                          => false
-  }
 
   /** @group Optics */
-  val gmosNorth: Prism[ExecutionSequence, GmosNorth] =
-    GenPrism[ExecutionSequence, GmosNorth]
+  def nextAtom[D]: Lens[ExecutionSequence[D], Atom[D]] =
+    Focus[ExecutionSequence[D]](_.nextAtom)
 
   /** @group Optics */
-  val gmosSouth: Prism[ExecutionSequence, GmosSouth] =
-    GenPrism[ExecutionSequence, GmosSouth]
+  def possibleFuture[D]: Lens[ExecutionSequence[D], List[Atom[D]]] =
+    Focus[ExecutionSequence[D]](_.possibleFuture)
+
+  /** @group Optics */
+  def hasMore[D]: Lens[ExecutionSequence[D], Boolean] =
+    Focus[ExecutionSequence[D]](_.hasMore)
+
+  /** @group Optics */
+  def atomCount[D]: Lens[ExecutionSequence[D], PosInt] =
+    Focus[ExecutionSequence[D]](_.atomCount)
+
+  /** @group Optics */
+  def digest[D]: Lens[ExecutionSequence[D], SequenceDigest] =
+    Focus[ExecutionSequence[D]](_.digest)
+
+  given [D](using Eq[D]): Eq[ExecutionSequence[D]] =
+    Eq.by { a => (
+      a.nextAtom,
+      a.possibleFuture,
+      a.hasMore,
+      a.atomCount.value,
+      a.digest
+    )}
+
 }
+

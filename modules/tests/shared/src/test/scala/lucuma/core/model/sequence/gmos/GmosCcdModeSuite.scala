@@ -1,19 +1,20 @@
 // Copyright (c) 2016-2023 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package lucuma.core.model.sequence
+package lucuma.core.model.sequence.gmos
 
-import cats.kernel.laws.discipline._
-import lucuma.core.model.sequence.arb._
-import lucuma.core.util.arb._
-import monocle.law.discipline._
-import munit._
+import cats.kernel.laws.discipline.*
+import lucuma.core.model.sequence.arb.*
+import lucuma.core.model.sequence.gmos.GmosCcdMode
+import lucuma.core.util.arb.*
+import monocle.law.discipline.*
+import munit.*
 
 final class GmosCcdModeSuite extends DisciplineSuite {
-  import ArbGmosCcdMode._
-  import ArbEnumerated._
+  import ArbEnumerated.*
+  import lucuma.core.model.sequence.gmos.arb.ArbGmosCcdMode.*
 
-  checkAll("Eq[GmosCcdMode]", EqTests[GmosCcdMode].eqv)
+  checkAll("Order[GmosCcdMode]", OrderTests[GmosCcdMode].order)
   checkAll("GmosCcdMode.xBin", LensTests(GmosCcdMode.xBin))
   checkAll("GmosCcdMode.yBin", LensTests(GmosCcdMode.yBin))
   checkAll("GmosCcdMode.ampCount", LensTests(GmosCcdMode.ampCount))
