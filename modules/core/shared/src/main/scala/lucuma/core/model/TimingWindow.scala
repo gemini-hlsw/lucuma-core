@@ -4,6 +4,7 @@
 package lucuma.core.model
 
 import cats.Eq
+import cats.Order
 import cats.derived.*
 import cats.syntax.all.*
 import eu.timepit.refined.cats.given
@@ -57,7 +58,12 @@ final case class TimingWindow(
   inclusion: TimingWindowInclusion,
   start:     Timestamp,
   end:       Option[TimingWindowEnd]
-) derives Eq:
+):
+  def duration: Option[TimeSpan] =
+    end.flatMap {
+      case TimingWindowEnd.At(ts)      => TimeSpan.between(start, ts)
+      case TimingWindowEnd.After(d, _) => d.some
+    }
 
   /**
    * The windows defined by this TimingWindow defintion, capped to the provided `within` interval.
@@ -130,3 +136,14 @@ object TimingWindow:
   val inclusion: Lens[TimingWindow, TimingWindowInclusion] = Focus[TimingWindow](_.inclusion)
   val start: Lens[TimingWindow, Timestamp]                 = Focus[TimingWindow](_.start)
   val end: Lens[TimingWindow, Option[TimingWindowEnd]]     = Focus[TimingWindow](_.end)
+
+  given Order[TimingWindow] = Order.by(tw =>
+    (tw.start,
+     tw.duration.getOrElse(TimeSpan.Max),
+     tw.end
+       .flatMap(TimingWindowEnd.after.getOption)
+       .flatMap(_.repeat)
+       .map(repeat => (repeat.period, repeat.times.map(_.value).orEmpty)),
+     tw.inclusion
+    )
+  )
