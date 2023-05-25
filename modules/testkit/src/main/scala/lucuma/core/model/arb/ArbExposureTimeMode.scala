@@ -5,8 +5,8 @@ package lucuma.core.model
 package arb
 
 import eu.timepit.refined.scalacheck.all.*
-import eu.timepit.refined.types.all.NonNegInt
 import eu.timepit.refined.types.all.PosBigDecimal
+import eu.timepit.refined.types.all.PosInt
 import lucuma.core.math.SignalToNoise
 import lucuma.core.math.arb.ArbRefined
 import lucuma.core.math.arb.ArbSignalToNoise
@@ -34,7 +34,7 @@ trait ArbExposureTimeMode {
   given Arbitrary[FixedExposureMode] =
     Arbitrary {
       for {
-        c <- arbitrary[NonNegInt]
+        c <- arbitrary[PosInt]
         t <- arbitrary[TimeSpan]
       } yield FixedExposureMode(c, t)
     }
@@ -42,7 +42,7 @@ trait ArbExposureTimeMode {
   given Cogen[FixedExposureMode] =
     Cogen[
       (
-        NonNegInt,
+        PosInt,
         TimeSpan
       )
     ].contramap { in =>
