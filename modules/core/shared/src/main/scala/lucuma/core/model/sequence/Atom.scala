@@ -7,6 +7,7 @@ import cats.Eq
 import cats.data.NonEmptyList
 import cats.syntax.all._
 import eu.timepit.refined.auto._
+import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.core.data.Zipper
 import lucuma.core.enums.ObserveClass
 import lucuma.core.util.TimeSpan
@@ -25,7 +26,7 @@ import monocle.macros.GenPrism
  */
 case class Atom[D](
   id:          Atom.Id,
-  description: Option[String],
+  description: Option[NonEmptyString],
   steps:       NonEmptyList[Step[D]]
 ) {
 
@@ -44,7 +45,7 @@ object Atom extends WithUid('a'.refined) {
     Focus[Atom[D]](_.id)
 
   /** @group Optics */
-  def description[D]: Lens[Atom[D], Option[String]] =
+  def description[D]: Lens[Atom[D], Option[NonEmptyString]] =
     Focus[Atom[D]](_.description)
 
   /** @group Optics */
@@ -54,7 +55,7 @@ object Atom extends WithUid('a'.refined) {
   given [D](using Eq[D]): Eq[Atom[D]] =
     Eq.by { a => (
       a.id,
-      a.description,
+      a.description.map(_.value),
       a.steps
     )}
 }

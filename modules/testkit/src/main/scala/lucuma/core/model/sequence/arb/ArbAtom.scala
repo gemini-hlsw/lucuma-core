@@ -5,6 +5,7 @@ package lucuma.core.model.sequence
 package arb
 
 import cats.syntax.all._
+import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.core.data.Zipper
 import lucuma.core.util.arb.ArbBoundedCollection
 import lucuma.core.util.arb.ArbUid
@@ -22,14 +23,14 @@ trait ArbAtom {
     Arbitrary {
       for {
         i <- arbitrary[Atom.Id]
-        d <- arbitrary[Option[String]]
+        d <- Gen.alphaStr.map(s => NonEmptyString.from(s).toOption)
         s <- genBoundedNonEmptyList[Step[D]](BoundedCollectionLimit)
       } yield Atom(i, d, s)
     }
 
   given [D: Cogen]: Cogen[Atom[D]] =
     Cogen[(Atom.Id, Option[String], List[Step[D]])].contramap { a =>
-      (a.id, a.description, a.steps.toList)
+      (a.id, a.description.map(_.value), a.steps.toList)
     }
 
 }
