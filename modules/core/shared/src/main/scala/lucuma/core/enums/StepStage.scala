@@ -5,23 +5,13 @@ package lucuma.core.enums
 
 import lucuma.core.util.Enumerated
 
-sealed abstract class StepStage(val tag: String) extends Product with Serializable
+enum StepStage(val tag: String, val name: String, val description: String) derives Enumerated {
 
-object StepStage {
-  /** @group Constructors */ case object EndConfigure extends StepStage("end_configure")
-  /** @group Constructors */ case object EndObserve extends StepStage("end_observe")
-  /** @group Constructors */ case object EndStep extends StepStage("end_step")
-  /** @group Constructors */ case object StartConfigure extends StepStage("start_configure")
-  /** @group Constructors */ case object StartObserve extends StepStage("start_observe")
-  /** @group Constructors */ case object StartStep extends StepStage("start_step")
+  case EndConfigure   extends StepStage("end_configure",   "End Configure",   "End of instrument configuration stage.")
+  case EndObserve     extends StepStage("end_observe",     "End Observe",     "End of data collection for all datasets produced by this step.")
+  case EndStep        extends StepStage("end_step",        "End Step",        "Step complete.")
+  case StartConfigure extends StepStage("start_configure", "Start Configure", "Start of instrument configuration stage.")
+  case StartObserve   extends StepStage("start_observe",   "Start Observe",   "Start of data collection for this step.")
+  case StartStep      extends StepStage("start_step",      "Start Step",      "Step started.")
 
-  implicit val StepStageEnumerated: Enumerated[StepStage] =
-    Enumerated.from(
-      EndConfigure,
-      EndObserve,
-      EndStep,
-      StartConfigure,
-      StartObserve,
-      StartStep
-    ).withTag(_.tag)
 }

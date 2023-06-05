@@ -5,24 +5,13 @@ package lucuma.core.enums
 
 import lucuma.core.util.Enumerated
 
-sealed abstract class DatasetStage(val tag: String) extends Product with Serializable
+enum DatasetStage(val tag: String, val name: String, val description: String) derives Enumerated {
 
-object DatasetStage {
-  /** @group Constructors */ case object EndObserve extends DatasetStage("end_observe")
-  /** @group Constructors */ case object EndReadout extends DatasetStage("end_readout")
-  /** @group Constructors */ case object EndWrite extends DatasetStage("end_write")
-  /** @group Constructors */ case object StartObserve extends DatasetStage("start_observe")
-  /** @group Constructors */ case object StartReadout extends DatasetStage("start_readout")
-  /** @group Constructors */ case object StartWrite extends DatasetStage("start_write")
-
-  implicit val DataStageEnumerated: Enumerated[DatasetStage] =
-    Enumerated.from(
-      EndObserve,
-      EndReadout,
-      EndWrite,
-      StartObserve,
-      StartReadout,
-      StartWrite
-    ).withTag(_.tag)
+  case EndObserve   extends DatasetStage("end_observe",   "End Observe",   "Marks the end of photon collection.")
+  case EndReadout   extends DatasetStage("end_readout",   "End Readout",   "Marks the end of detector readout.")
+  case EndWrite     extends DatasetStage("end_write",     "End Write",     "Marks the end of write to permanent store.")
+  case StartObserve extends DatasetStage("start_observe", "Start Observe", "Marks the start of photon collection.")
+  case StartReadout extends DatasetStage("start_readout", "Start Readout", "Marks the start of detector readout.")
+  case StartWrite   extends DatasetStage("start_write",   "Start Write",   "Marks the start of write to permanent store.")
 
 }

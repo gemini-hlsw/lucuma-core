@@ -11,7 +11,7 @@ import lucuma.refined._
 object Configuration  extends WithGid('c'.refined)
 object Dataset        extends WithGid('d'.refined)
 object Group          extends WithGid('g'.refined)
-object ExecutionEvent extends WithGid('e'.refined)
+object ExecutionEvent extends WithUid('e'.refined)
 object ObsAttachment  extends WithGid('a'.refined)
 object Observation    extends WithGid('o'.refined)
 object Program        extends WithGid('p'.refined)
