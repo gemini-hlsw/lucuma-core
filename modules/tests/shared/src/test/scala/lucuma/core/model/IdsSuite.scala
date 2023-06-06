@@ -14,8 +14,8 @@ final class IdsSuite extends DisciplineSuite {
 
   checkAll("Configuration.Id", GidTests[Configuration.Id].gid)
   checkAll("Dataset.Id", GidTests[Dataset.Id].gid)
-  checkAll("ExecutionEvent.Id", UidTests[ExecutionEvent.Id].uid)
+  checkAll("ExecutionEvent.Id", GidTests[ExecutionEvent.Id].gid)
   checkAll("Observation.Id", GidTests[Observation.Id].gid)
   checkAll("Program.Id", GidTests[Program.Id].gid)
-  checkAll("Visit.Id", UidTests[Visit.Id].uid)
+  checkAll("Visit.Id", GidTests[Visit.Id].gid)
 }
