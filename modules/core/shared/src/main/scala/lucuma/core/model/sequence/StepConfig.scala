@@ -121,14 +121,22 @@ object StepConfig {
       Focus[Gcal](_.shutter)
   }
 
-  final case class Science(offset: Offset) extends StepConfig(StepType.Science)
+  final case class Science(offset: Offset, guiding: GuideState) extends StepConfig(StepType.Science)
 
   object Science {
-    implicit val eqStepConfigScience: Eq[Science] = Eq.by(_.offset)
+    implicit val eqStepConfigScience: Eq[Science] =
+      Eq.by { a => (
+        a.offset,
+        a.guiding
+      )}
 
     /** @group Optics */
     val offset: Lens[Science, Offset] =
       Focus[Science](_.offset)
+
+    /** @group Optics */
+    val guiding: Lens[Science, GuideState] =
+      Focus[Science](_.guiding)
   }
 
   final case class SmartGcal(smartGcalType: SmartGcalType) extends StepConfig(StepType.SmartGcal)
@@ -147,7 +155,7 @@ object StepConfig {
     case (Bias, Bias)                                 => true
     case (Dark, Dark)                                 => true
     case (a @ Gcal(_, _, _, _), b @ Gcal(_, _, _, _)) => a === b
-    case (a @ Science(_), b @ Science(_))             => a === b
+    case (a @ Science(_, _), b @ Science(_, _))       => a === b
     case (a @ SmartGcal(_), b @ SmartGcal(_))         => a === b
     case _                                            => false
   }
