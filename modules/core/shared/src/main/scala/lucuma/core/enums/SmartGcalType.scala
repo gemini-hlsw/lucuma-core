@@ -17,10 +17,10 @@ enum SmartGcalType(val tag: String, val name: String) derives Enumerated {
 
   def fold[X](lamp: GcalLampType => X, baseline: GcalBaselineType => X): X =
     this match {
-      case SmartGcalType.Arc           => lamp(GcalLampType.Arc)
-      case SmartGcalType.Flat          => lamp(GcalLampType.Flat)
-      case SmartGcalType.DayBaseline   => baseline(GcalBaselineType.Day)
-      case SmartGcalType.NightBaseline => baseline(GcalBaselineType.Night)
+      case Arc           => lamp(GcalLampType.Arc)
+      case Flat          => lamp(GcalLampType.Flat)
+      case DayBaseline   => baseline(GcalBaselineType.Day)
+      case NightBaseline => baseline(GcalBaselineType.Night)
     }
 
 }
