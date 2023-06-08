@@ -59,10 +59,21 @@ trait ArbStepConfig {
     )
 
   implicit val arbStepConfigScience: Arbitrary[StepConfig.Science] =
-    Arbitrary(arbitrary[Offset].map(StepConfig.Science.apply))
+    Arbitrary {
+      for {
+        o <- arbitrary[Offset]
+        g <- arbitrary[GuideState]
+      } yield StepConfig.Science(o, g)
+    }
 
   implicit val cogStepConfigScience: Cogen[StepConfig.Science] =
-    Cogen[Offset].contramap(_.offset)
+    Cogen[(
+      Offset,
+      GuideState
+    )].contramap { a => (
+      a.offset,
+      a.guiding
+    )}
 
   implicit val arbStepConfigSmartGcal: Arbitrary[StepConfig.SmartGcal] =
     Arbitrary(arbitrary[SmartGcalType].map(StepConfig.SmartGcal.apply))
@@ -86,7 +97,7 @@ trait ArbStepConfig {
       case StepConfig.Bias                 => ().asLeft
       case StepConfig.Dark                 => ().asLeft.asRight
       case g @ StepConfig.Gcal(_, _, _, _) => g.asLeft.asRight.asRight
-      case s @ StepConfig.Science(_)       => s.asLeft.asRight.asRight.asRight
+      case s @ StepConfig.Science(_, _)    => s.asLeft.asRight.asRight.asRight
       case m @ StepConfig.SmartGcal(_)     => m.asRight.asRight.asRight.asRight
     }
 }
