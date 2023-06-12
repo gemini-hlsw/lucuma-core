@@ -14,9 +14,41 @@ import monocle.Lens
 import monocle.Prism
 import monocle.macros.GenPrism
 
-sealed trait GmosFpuMask[+T]
+sealed trait GmosFpuMask[+T] {
+
+  import GmosFpuMask.Builtin
+  import GmosFpuMask.Custom
+
+  def fold[A](
+    g: Builtin[T] => A,
+    f: Custom     => A
+  ): A =
+    this match {
+      case b @ Builtin(_)   => g(b)
+      case c @ Custom(_, _) => f(c)
+    }
+
+  def builtin: Option[Builtin[T]] =
+    fold(_.some, _ => none)
+
+  def builtinFpu: Option[T] =
+    builtin.map(_.value)
+
+  def custom: Option[Custom] =
+    fold(_ => none, _.some)
+
+  def customFilename: Option[NonEmptyString] =
+    custom.map(_.filename)
+
+  def customSlitWidth: Option[GmosCustomSlitWidth] =
+    custom.map(_.slitWidth)
+
+}
+
 object GmosFpuMask {
+
   final case class Builtin[+T](value: T) extends GmosFpuMask[T]
+
   object Builtin {
     implicit def eqGmosFpuMaskBuiltin[T: Eq]: Eq[Builtin[T]] =
       Eq.by(_.value)
@@ -26,8 +58,8 @@ object GmosFpuMask {
       Iso[Builtin[T], T](_.value)(Builtin.apply)
   }
 
-  final case class Custom(filename: NonEmptyString, slitWidth: GmosCustomSlitWidth)
-      extends GmosFpuMask[Nothing]
+  final case class Custom(filename: NonEmptyString, slitWidth: GmosCustomSlitWidth) extends GmosFpuMask[Nothing]
+
   object Custom {
     implicit val eqGmosFpuMaskCustom: Eq[Custom] = Eq.by(x => (x.filename, x.slitWidth))
 

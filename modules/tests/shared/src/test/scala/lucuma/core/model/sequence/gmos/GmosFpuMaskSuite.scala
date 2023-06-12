@@ -6,6 +6,8 @@ package lucuma.core.model.sequence.gmos
 import cats.kernel.laws.discipline.*
 import eu.timepit.refined.cats.*
 import eu.timepit.refined.scalacheck.string.*
+import eu.timepit.refined.types.string.NonEmptyString
+import lucuma.core.enums.GmosCustomSlitWidth
 import lucuma.core.enums.GmosNorthGrating
 import lucuma.core.enums.GmosSouthGrating
 import lucuma.core.math.arb.*
@@ -52,4 +54,12 @@ final class GmosFpuMaskSuite extends DisciplineSuite {
   )
   checkAll("GmosFpuMask.custom[GmosNorthGrating]", PrismTests(GmosFpuMask.custom[GmosNorthGrating]))
   checkAll("GmosFpuMask.custom[GmosSouthGrating]", PrismTests(GmosFpuMask.custom[GmosSouthGrating]))
+
+  test("GmosFpuMask.fold") {
+    val b: GmosFpuMask[Int] = GmosFpuMask.Builtin(1)
+    assertEquals(b.fold(_ => "builtin", _ => "custom"), "builtin")
+
+    val c: GmosFpuMask[Int] = GmosFpuMask.Custom(NonEmptyString.unsafeFrom("foo"), GmosCustomSlitWidth.CustomWidth_0_25)
+    assertEquals(c.fold(_ => "builtin", _ => "custom"), "custom")
+  }
 }
