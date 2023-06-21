@@ -4,13 +4,11 @@
 package lucuma.core.model.sequence
 package arb
 
-import cats.syntax.option.*
 import lucuma.core.data.Zipper
 import lucuma.core.data.arb.ArbZipper
 import org.scalacheck.Arbitrary
-import org.scalacheck.Arbitrary._
+import org.scalacheck.Arbitrary.*
 import org.scalacheck.Cogen
-import org.scalacheck.Gen
 
 trait ArbStepEstimate {
 

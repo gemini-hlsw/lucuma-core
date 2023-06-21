@@ -4,23 +4,21 @@
 package lucuma.core.optics
 
 import cats.Order
-import cats.data.Validated
 import cats.syntax.all.*
-import monocle.Iso
 import monocle.Prism
 
 /**
  * A validating one-way endomorphic optic. `getValid` wraps a function that validates a value
  * without modifying it. `reverseGet` is always `identity`.
- * 
+ *
  * No laws are necessary for this optic.
  */
 case class ValidFilter[E, A](filter: A => IsValid[E]) extends ValidFormat[E, A, A] with Serializable { self =>
-  final val getValid: A => Either[E, A] = 
+  final val getValid: A => Either[E, A] =
     a => filter(a) match
       case IsValid.Valid => a.asRight
       case IsValid.Invalid(e) => e.asLeft
-    
+
   final val reverseGet: A => A = identity
 
   /** Always return a single instance of `E` in case of an invalid `T`. */

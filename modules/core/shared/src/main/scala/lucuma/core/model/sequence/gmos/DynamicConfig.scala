@@ -11,7 +11,6 @@ import monocle.Focus
 import monocle.Lens
 import monocle.Prism
 import monocle.macros.GenPrism
-import org.typelevel.cats.time.*
 
 sealed trait DynamicConfig
 

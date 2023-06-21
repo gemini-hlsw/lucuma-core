@@ -16,7 +16,6 @@ import lucuma.core.math.skycalc.ImprovedSkyCalc
 import lucuma.core.model.ObservingNight
 import java.time.LocalDate
 import lucuma.core.enums.TwilightType
-import scala.scalajs.js.annotation.JSExport
 import scala.scalajs.js.JSConverters.*
 
 /**
@@ -63,7 +62,6 @@ object NightPlot:
   ): List[(Instant, SkyCalcResults)] =  {
     val observingNight  = ObservingNight.fromSiteAndLocalDate(site, localDate)
     val tbOfficialNight = observingNight.twilightBoundedUnsafe(TwilightType.Official)
-    val tbNauticalNight = observingNight.twilightBoundedUnsafe(TwilightType.Nautical)
 
     val start          = tbOfficialNight.start
     val end            = tbOfficialNight.end

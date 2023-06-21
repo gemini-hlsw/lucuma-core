@@ -3,14 +3,9 @@
 
 package lucuma.core.math.parser
 
-import cats.kernel.laws.discipline.*
 import cats.syntax.all.*
 import lucuma.core.math.Angle
-import lucuma.core.math.Declination
 import lucuma.core.math.HourAngle
-import lucuma.core.math.arb.ArbAngle
-import lucuma.core.math.arb.ArbRightAscension.*
-import lucuma.core.optics.laws.discipline.FormatTests
 import lucuma.core.parser.MiscParsers.neg
 import munit.*
 

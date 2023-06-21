@@ -3,10 +3,10 @@
 
 package lucuma.core.model
 
-import cats._
-import cats.syntax.all._
-import eu.timepit.refined._
-import eu.timepit.refined.cats._
+import cats.*
+import cats.syntax.all.*
+import eu.timepit.refined.*
+import eu.timepit.refined.cats.*
 import eu.timepit.refined.collection.NonEmpty
 import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.core.enums.CatalogName
@@ -24,10 +24,10 @@ final case class CatalogInfo(
   objectType: Option[NonEmptyString]
 ):
   val objectUrl: Option[URI] = catalog match
-    case CatalogName.Simbad => 
-      Try(URI(s"https://simbad.cds.unistra.fr/simbad/sim-id?Ident=${URLEncoder.encode(id.value, StandardCharsets.UTF_8)}")).toOption
+    case CatalogName.Simbad =>
+      Try(URI(s"https://simbad.cds.unistra.fr/simbad/sim-id?Ident=${URLEncoder.encode(id.value, StandardCharsets.UTF_8.name())}")).toOption
     case _ => none
-  
+
 
 object CatalogInfo {
   given Order[CatalogInfo] = Order.by(x => (x.catalog, x.id, x.objectType))

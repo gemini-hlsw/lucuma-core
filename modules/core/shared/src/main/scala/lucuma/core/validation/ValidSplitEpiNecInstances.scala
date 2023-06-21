@@ -5,8 +5,7 @@ package lucuma.core.validation
 
 import cats.Order
 import cats.data.NonEmptyChain
-import cats.syntax.all._
-import eu.timepit.refined.auto._
+import cats.syntax.all.*
 import eu.timepit.refined.types.string.NonEmptyString
 
 trait ValidSplitEpiNecInstances {

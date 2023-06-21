@@ -6,7 +6,6 @@ package core
 package data
 package arb
 
-import lucuma.core.data.Zipper
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Cogen

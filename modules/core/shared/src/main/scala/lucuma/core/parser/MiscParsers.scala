@@ -13,9 +13,7 @@ import cats.parse.*
 import eu.timepit.refined.types.numeric.PosBigDecimal
 import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.math.Index
-import lucuma.core.optics.syntax.prism.*
 
-import scala.annotation.tailrec
 import scala.util.control.Exception.allCatch
 import scala.util.control.Exception.catching
 

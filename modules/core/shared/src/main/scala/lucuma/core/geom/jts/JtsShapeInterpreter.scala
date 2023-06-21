@@ -12,8 +12,6 @@ import org.locationtech.jts.geom.Geometry
 import org.locationtech.jts.geom.util.AffineTransformation
 import org.locationtech.jts.util.GeometricShapeFactory
 
-import java.util.Collections
-
 /**
  * JTS shape interpreter.
  */

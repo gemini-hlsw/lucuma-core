@@ -8,15 +8,13 @@ import cats.Eq
 import cats.Eval
 import cats.Functor
 import cats.MonoidK
-import cats.syntax.all._
+import cats.syntax.all.*
 import lucuma.core.math.BoundedInterval
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Place
-import lucuma.core.optics.Spire
-import lucuma.core.syntax.time._
+import lucuma.core.syntax.time.*
 import monocle.Iso
-import org.typelevel.cats.time._
-import spire.math.Bounded
+import org.typelevel.cats.time.*
 
 import java.time.Duration
 import java.time.Instant

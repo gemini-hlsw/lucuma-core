@@ -11,8 +11,6 @@ import lucuma.core.enums.GmosCustomSlitWidth
 import lucuma.core.enums.GmosNorthGrating
 import lucuma.core.enums.GmosSouthGrating
 import lucuma.core.math.arb.*
-import lucuma.core.model.sequence.arb.*
-import lucuma.core.model.sequence.gmos.GmosFpuMask
 import lucuma.core.model.sequence.gmos.arb.*
 import lucuma.core.util.arb.*
 import monocle.law.discipline.*

@@ -3,14 +3,12 @@
 
 package lucuma.core.model
 
-import lucuma.core.util.arb._
+import lucuma.core.util.arb.*
 import lucuma.core.util.laws.GidTests
-import lucuma.core.util.laws.UidTests
 import munit.DisciplineSuite
 
 final class IdsSuite extends DisciplineSuite {
-  import ArbGid._
-  import ArbUid._
+  import ArbGid.*
 
   checkAll("Configuration.Id", GidTests[Configuration.Id].gid)
   checkAll("Dataset.Id", GidTests[Dataset.Id].gid)

@@ -6,7 +6,6 @@ package lucuma.core.model.sequence
 import cats.Eq
 import cats.syntax.eq.*
 import lucuma.core.enums.Instrument
-import lucuma.core.model.sequence.gmos
 import monocle.Prism
 import monocle.macros.GenPrism
 

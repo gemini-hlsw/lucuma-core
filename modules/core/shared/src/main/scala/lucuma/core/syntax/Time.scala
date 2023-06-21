@@ -5,12 +5,7 @@ package lucuma.core.syntax
 
 import cats.syntax.all.*
 import lucuma.core.math.BoundedInterval
-import lucuma.core.optics.Spire
-import lucuma.core.util.TimeSpan
 import org.typelevel.cats.time.*
-import spire.math.Bounded
-import spire.math.Empty
-import spire.math.Point
 import spire.math.extras.interval.IntervalSeq
 
 import java.time.Duration
@@ -135,5 +130,5 @@ trait TimeOps
     with LongDurationOps
     with ZonedDateTimeOps
     with InstantIntervalSeqOps
-    
+
 object time extends TimeOps

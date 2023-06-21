@@ -6,14 +6,12 @@ package core
 package util
 package arb
 
-import lucuma.core.util.Enumerated
-import org.scalacheck.Gen._
-import org.scalacheck._
+import org.scalacheck.*
 
 trait ArbEnumerated {
 
   implicit def arbEnumerated[A](implicit en: Enumerated[A]): Arbitrary[A] =
-    Arbitrary(oneOf(en.all))
+    Arbitrary(Gen.oneOf(en.all))
 
   implicit def cogEnumerated[A](implicit en: Enumerated[A]): Cogen[A] =
     Cogen[String].contramap(en.tag)

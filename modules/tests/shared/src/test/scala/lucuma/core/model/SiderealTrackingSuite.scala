@@ -9,8 +9,6 @@ import lucuma.core.math.Coordinates
 import lucuma.core.math.Epoch
 import lucuma.core.math.Parallax
 import lucuma.core.math.ProperMotion
-import lucuma.core.math.ProperMotion.AngularVelocity
-import lucuma.core.math.VelocityAxis
 import lucuma.core.math.arb.*
 import lucuma.core.model.arb.*
 import monocle.law.discipline.*

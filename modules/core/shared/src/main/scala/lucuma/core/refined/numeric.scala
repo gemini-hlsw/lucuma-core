@@ -7,10 +7,9 @@ import eu.timepit.refined.api.Refined
 import eu.timepit.refined.api.RefinedTypeOps
 import eu.timepit.refined.boolean.Not
 import eu.timepit.refined.generic.Equal
-import shapeless.nat._0
 
 object numeric {
-  type NonZero = Not[Equal[_0]]
+  type NonZero = Not[Equal[0]]
 
   type NonZeroInt  = Int Refined NonZero
   object NonZeroInt extends RefinedTypeOps.Numeric[NonZeroInt, Int]

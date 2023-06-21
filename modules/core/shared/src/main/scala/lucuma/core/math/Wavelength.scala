@@ -5,10 +5,7 @@ package lucuma.core.math
 
 import cats.Order
 import cats.Show
-import cats.syntax.option.*
 import coulomb.*
-import coulomb.ops.algebra.cats.all.given
-import coulomb.policy.spire.standard.given
 import coulomb.syntax.*
 import eu.timepit.refined.*
 import eu.timepit.refined.auto.*
@@ -16,14 +13,13 @@ import eu.timepit.refined.cats.*
 import eu.timepit.refined.numeric.*
 import eu.timepit.refined.types.numeric.PosBigDecimal
 import eu.timepit.refined.types.numeric.PosInt
-import lucuma.core.math.units.{_, given}
+import lucuma.core.math.units.*
 import lucuma.core.optics.Format
 import monocle.Iso
 import monocle.Prism
 
 import java.math.RoundingMode
 import scala.annotation.targetName
-import scala.util.Try
 
 /**
   * Exact wavelengths represented as positive integral picometers in the range (0 .. PosInt.MaxValue]

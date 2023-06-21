@@ -3,10 +3,8 @@
 
 package lucuma.core.model
 
-import eu.timepit.refined.auto._
 import lucuma.core.util.WithGid
-import lucuma.core.util.WithUid
-import lucuma.refined._
+import lucuma.refined.*
 
 object Configuration  extends WithGid('c'.refined)
 object Dataset        extends WithGid('d'.refined)

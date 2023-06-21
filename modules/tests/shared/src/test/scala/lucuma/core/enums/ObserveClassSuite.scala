@@ -4,12 +4,11 @@
 package lucuma.core.enums
 
 import cats.kernel.laws.discipline.MonoidTests
-import monocle.law.discipline.IsoTests
 import munit.DisciplineSuite
 
 final class ObserveClassSuite extends DisciplineSuite {
 
-  import lucuma.core.util.arb.ArbEnumerated._
+  import lucuma.core.util.arb.ArbEnumerated.*
 
   checkAll("Monoid[ObserveClass]", MonoidTests[ObserveClass].monoid)
 

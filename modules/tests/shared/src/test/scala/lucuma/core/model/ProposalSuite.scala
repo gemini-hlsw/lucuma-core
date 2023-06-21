@@ -7,7 +7,6 @@ import cats.Order.*
 import cats.kernel.laws.discipline.*
 import eu.timepit.refined.cats.*
 import eu.timepit.refined.scalacheck.all.*
-import lucuma.core.model.Proposal
 import lucuma.core.model.arb.*
 import lucuma.core.util.arb.ArbCollection
 import lucuma.core.util.arb.ArbEnumerated

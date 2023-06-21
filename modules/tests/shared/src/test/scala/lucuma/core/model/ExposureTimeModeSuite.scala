@@ -9,7 +9,6 @@ import eu.timepit.refined.scalacheck.all.*
 import lucuma.core.math.arb.ArbRefined
 import lucuma.core.math.arb.ArbSignalToNoise
 import lucuma.core.model.arb.ArbExposureTimeMode
-import lucuma.core.model.given
 import lucuma.core.util.arb.ArbTimeSpan
 import monocle.law.discipline.LensTests
 import monocle.law.discipline.OptionalTests

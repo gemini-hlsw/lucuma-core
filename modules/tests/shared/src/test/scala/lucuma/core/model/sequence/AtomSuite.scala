@@ -13,17 +13,13 @@ import lucuma.core.util.laws.UidTests
 import monocle.law.discipline.*
 import munit.*
 import org.scalacheck.Arbitrary
-import org.scalacheck.Cogen
 import org.scalacheck.Test
-
 
 final class AtomSuite extends DisciplineSuite {
   import ArbAtom.given
-  import ArbBoundedCollection.given
-  import ArbDynamicConfig._
-  import ArbEnumerated._
+  import ArbDynamicConfig.*
   import ArbStep.given
-  import ArbUid._
+  import ArbUid.*
 
   override val scalaCheckTestParameters = Test.Parameters.default.withMaxSize(10)
 

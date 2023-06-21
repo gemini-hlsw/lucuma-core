@@ -7,7 +7,6 @@ import cats.Order.*
 import cats.kernel.laws.discipline.*
 import eu.timepit.refined.cats.*
 import eu.timepit.refined.scalacheck.string.*
-import lucuma.core.arb.*
 import lucuma.core.enums.Band
 import lucuma.core.math.arb.ArbWavelength
 import lucuma.core.math.arb.*
@@ -18,6 +17,7 @@ import lucuma.core.util.arb.*
 import lucuma.core.util.laws.GidTests
 import monocle.law.discipline.*
 import munit.*
+
 class TargetSuite extends DisciplineSuite {
   import ArbAngle.*
   import ArbBrightnessValue.given

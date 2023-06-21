@@ -4,7 +4,6 @@
 package lucuma.core.math
 package arb
 
-import lucuma.core.math.Redshift
 import org.scalacheck.Arbitrary
 import org.scalacheck.Cogen
 import org.scalacheck.Gen

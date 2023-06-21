@@ -4,13 +4,9 @@
 package lucuma.core.model.sequence
 
 import cats.kernel.laws.discipline.*
-import cats.laws.discipline.arbitrary.*
-import lucuma.core.data.arb.ArbZipper
 import lucuma.core.model.sequence.arb.*
 import lucuma.core.model.sequence.gmos.DynamicConfig.GmosNorth
 import lucuma.core.model.sequence.gmos.arb.*
-import lucuma.core.util.arb.*
-import lucuma.core.util.laws.UidTests
 import monocle.law.discipline.*
 import munit.*
 import org.scalacheck.Arbitrary
@@ -20,11 +16,8 @@ import org.scalacheck.Test
 
 final class ExecutionSequenceSuite extends DisciplineSuite {
   import ArbAtom.given
-  import ArbBoundedCollection.given
   import ArbDynamicConfig.*
-  import ArbEnumerated.*
   import ArbExecutionSequence.given
-  import ArbUid.*
 
   override val scalaCheckTestParameters = Test.Parameters.default.withMaxSize(4)
 

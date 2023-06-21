@@ -4,7 +4,6 @@
 package lucuma.core.math.arb
 
 import eu.timepit.refined.types.numeric.PosBigDecimal
-import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.*
 
 trait LimitedBigDecimals:

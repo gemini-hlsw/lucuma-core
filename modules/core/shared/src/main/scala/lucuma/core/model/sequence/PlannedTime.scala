@@ -9,7 +9,6 @@ import cats.implicits.catsKernelOrderingForOrder
 import cats.syntax.eq.*
 import cats.syntax.foldable.*
 import cats.syntax.functor.*
-import cats.syntax.semigroup.*
 import lucuma.core.enums.ChargeClass
 import lucuma.core.enums.ObserveClass
 import lucuma.core.util.TimeSpan

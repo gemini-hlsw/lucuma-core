@@ -4,7 +4,6 @@
 package lucuma.core.math
 
 import cats.Order
-import cats.Show
 import cats.syntax.all.*
 import eu.timepit.refined.types.numeric.NonNegBigDecimal
 import io.circe.Decoder

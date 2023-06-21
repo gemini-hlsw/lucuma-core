@@ -7,13 +7,11 @@ import cats.Eq
 import cats.syntax.all.*
 import lucuma.core.arb.ArbTime
 import lucuma.core.math.BoundedInterval
-import lucuma.core.optics.Spire
 import lucuma.core.syntax.time.*
 import org.scalacheck.Arbitrary.*
 import org.scalacheck.Gen
 import org.scalacheck.Gen.Choose
 import org.typelevel.cats.time.*
-import spire.math.Bounded
 import spire.math.Interval
 import spire.math.extras.interval.IntervalSeq
 import spire.math.interval.Closed

@@ -6,23 +6,23 @@ package lucuma.core.math
 import coulomb.*
 import coulomb.conversion.TruncatingUnitConversion
 import coulomb.conversion.ValueConversion
-import coulomb.define._
+import coulomb.define.*
 import coulomb.syntax.*
-import coulomb.units.accepted._
-import coulomb.units.mks._
-import coulomb.units.si._
-import coulomb.units.si.prefixes._
-import coulomb.units.time._
-import eu.timepit.refined._
+import coulomb.units.accepted.*
+import coulomb.units.mks.*
+import coulomb.units.si.*
+import coulomb.units.si.prefixes.*
+import coulomb.units.time.*
+import eu.timepit.refined.*
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.api.Validate
-import eu.timepit.refined.auto._
-import eu.timepit.refined.numeric._
+import eu.timepit.refined.auto.*
+import eu.timepit.refined.numeric.*
 import eu.timepit.refined.types.numeric.NonNegInt
 import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.util.TypeString
-import lucuma.refined._
-import spire.math._
+import lucuma.refined.*
+import spire.math.*
 
 trait units {
 
@@ -48,8 +48,6 @@ trait units {
 
   type Year
   given DerivedUnit[Year, 365 * Day, "year", "y"] = DerivedUnit()
-
-  private val ArcSecondsPerDegree: SafeLong = 3600
 
   type ArcSecond
   given DerivedUnit[ArcSecond, Degree / 3600, "arc second", "arcsec"] = DerivedUnit()
@@ -150,7 +148,7 @@ trait units {
 
   extension [A](inline a: A)
     inline def withRefinedUnit[P, U](using inline p: Predicate[A, P]): Quantity[Refined[A, P], U] = refineMV(a).withUnit[U]
-      
+
   inline def refineQV[R]: RefineQV[R] = RefineQV()
 
   final class RefineQV[P] {

@@ -6,11 +6,10 @@ package lucuma.core.model.sequence.gmos
 import cats.kernel.laws.discipline.*
 import lucuma.core.math.arb.ArbWavelength
 import lucuma.core.math.arb.*
-import lucuma.core.model.sequence.arb.*
-import lucuma.core.model.sequence.gmos.GmosGratingConfig
 import lucuma.core.util.arb.*
 import monocle.law.discipline.*
 import munit.*
+
 final class GmosGratingConfigSuite extends DisciplineSuite {
   import ArbEnumerated.*
   import ArbWavelength.*

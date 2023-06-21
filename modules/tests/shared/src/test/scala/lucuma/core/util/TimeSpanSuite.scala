@@ -4,13 +4,9 @@
 package lucuma.core.util
 
 import cats.kernel.laws.discipline.*
-import cats.syntax.either.*
-import cats.syntax.option.*
 import cats.syntax.order.*
-import eu.timepit.refined.cats._
-import eu.timepit.refined.scalacheck.numeric._
-import eu.timepit.refined.types.numeric.NonNegInt
-import lucuma.core.arb.ArbTime.arbDuration
+import eu.timepit.refined.cats.*
+import eu.timepit.refined.scalacheck.numeric.*
 import lucuma.core.optics.laws.discipline.*
 import lucuma.core.refined.numeric.NonZeroBigDecimal
 import lucuma.core.refined.numeric.NonZeroInt
@@ -24,9 +20,6 @@ import org.scalacheck.Arbitrary
 import org.scalacheck.Gen
 import org.scalacheck.Prop.*
 import org.typelevel.cats.time.*
-
-import java.time.Duration
-
 
 class TimeSpanSuite extends DisciplineSuite {
 

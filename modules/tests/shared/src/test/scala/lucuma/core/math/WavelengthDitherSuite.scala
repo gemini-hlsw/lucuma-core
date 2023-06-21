@@ -14,12 +14,10 @@ import lucuma.core.optics.laws.discipline.FormatTests
 import monocle.law.discipline.*
 import munit.DisciplineSuite
 import org.scalacheck.Arbitrary
-import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Prop.*
 
 class WavelengthDitherSuite extends DisciplineSuite {
   import ArbQuantity.given
-  import ArbRefined.given
   import ArbWavelengthDither.given
 
   checkAll("picometers",  IsoTests(WavelengthDither.picometers))

@@ -5,7 +5,6 @@ package lucuma.core.model.arb
 
 import eu.timepit.refined.scalacheck.all.*
 import lucuma.core.model.IntPercent
-import lucuma.core.model.NonNegDuration
 import lucuma.core.model.ProposalClass
 import lucuma.core.model.ProposalClass.*
 import lucuma.core.util.TimeSpan

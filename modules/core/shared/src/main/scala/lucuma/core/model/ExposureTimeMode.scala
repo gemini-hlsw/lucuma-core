@@ -8,8 +8,6 @@ import cats.syntax.all.*
 import eu.timepit.refined.cats.*
 import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.math.SignalToNoise
-import lucuma.core.model.NonNegDuration
-import lucuma.core.model.given
 import lucuma.core.util.TimeSpan
 import monocle.Focus
 import monocle.Lens

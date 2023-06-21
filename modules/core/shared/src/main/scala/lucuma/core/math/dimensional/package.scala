@@ -4,7 +4,6 @@
 package lucuma.core.math.dimensional
 
 import coulomb.Quantity
-import coulomb.ops.ShowUnit
 import lucuma.core.util.*
 
 extension[N, U](quantity: Quantity[N, U])

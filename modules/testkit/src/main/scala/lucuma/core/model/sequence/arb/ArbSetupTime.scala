@@ -9,8 +9,6 @@ import lucuma.core.util.arb.ArbTimeSpan
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.*
 import org.scalacheck.Cogen
-import org.scalacheck.Gen
-
 
 trait ArbSetupTime {
 

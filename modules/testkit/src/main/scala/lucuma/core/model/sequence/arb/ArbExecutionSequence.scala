@@ -4,15 +4,11 @@
 package lucuma.core.model.sequence
 package arb
 
-import cats.data.NonEmptyList
-import cats.syntax.all._
+import cats.syntax.all.*
 import eu.timepit.refined.types.numeric.PosInt
-import lucuma.core.data.Zipper
-import lucuma.core.math.Offset
 import lucuma.core.util.arb.ArbBoundedCollection
-import lucuma.core.util.arb.ArbUid
 import org.scalacheck.Arbitrary
-import org.scalacheck.Arbitrary._
+import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Cogen
 import org.scalacheck.Gen
 
@@ -20,7 +16,6 @@ trait ArbExecutionSequence {
   import ArbAtom.given
   import ArbBoundedCollection.*
   import ArbSequenceDigest.given
-  import ArbUid._
 
   given [D: Arbitrary]: Arbitrary[ExecutionSequence[D]] =
     Arbitrary {

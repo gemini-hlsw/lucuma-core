@@ -4,7 +4,6 @@
 package lucuma.core.math.arb
 
 import eu.timepit.refined.auto.*
-import eu.timepit.refined.scalacheck.numeric.*
 import eu.timepit.refined.types.numeric.PosBigDecimal
 import lucuma.core.arb.*
 import lucuma.core.math.LineWidthValue

@@ -7,7 +7,6 @@ import cats.Eq
 import cats.syntax.all.*
 import eu.timepit.refined.cats.*
 import lucuma.core.model.IntPercent
-import lucuma.core.model.given
 import lucuma.core.util.TimeSpan
 import monocle.Focus
 import monocle.Lens

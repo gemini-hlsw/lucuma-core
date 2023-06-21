@@ -5,13 +5,12 @@ package lucuma
 package core
 package enums
 
-import cats.syntax.eq._
+import cats.syntax.eq.*
 import coulomb.*
 import coulomb.policy.spire.standard.given
 import coulomb.syntax.*
 import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.math.Angle
-import lucuma.core.math.BoundedInterval
 import lucuma.core.math.Wavelength
 import lucuma.core.math.WavelengthDelta
 import lucuma.core.math.units.{_, given}

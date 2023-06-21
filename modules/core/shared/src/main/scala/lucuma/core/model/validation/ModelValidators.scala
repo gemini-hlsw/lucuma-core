@@ -3,11 +3,10 @@
 
 package lucuma.core.model.validation
 
-import eu.timepit.refined.auto._
 import lucuma.core.model.ElevationRange
 import lucuma.core.optics.ValidSplitEpi
-import lucuma.core.validation._
-import lucuma.refined._
+import lucuma.core.validation.*
+import lucuma.refined.*
 
 object ModelValidators {
   private val airMassErrorMsg   =

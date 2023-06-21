@@ -4,25 +4,14 @@
 package lucuma.core.model.sequence
 package arb
 
-import cats.syntax.all.*
-import lucuma.core.arb.ArbTime
-import lucuma.core.enums.ObserveClass
 import lucuma.core.model.sequence.*
-import lucuma.core.util.TimeSpan
-import lucuma.core.util.arb.ArbEnumerated
-import lucuma.core.util.arb.ArbTimeSpan
-import lucuma.core.util.arb.ArbUid
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Cogen
-import org.scalacheck.Gen
 
 trait ArbExecutionConfig {
-  import ArbAtom.given
-  import ArbEnumerated.given
   import ArbExecutionSequence.given
   import ArbSetupTime.given
-  import ArbTimeSpan.given
 
   given [S: Arbitrary, D: Arbitrary]: Arbitrary[ExecutionConfig[S, D]] =
     Arbitrary {

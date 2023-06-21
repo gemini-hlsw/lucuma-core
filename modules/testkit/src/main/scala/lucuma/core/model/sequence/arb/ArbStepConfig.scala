@@ -4,21 +4,20 @@
 package lucuma.core.model.sequence.arb
 
 import cats.data.NonEmptySet
-import cats.syntax.all._
-import lucuma.core.enums._
+import cats.syntax.all.*
+import lucuma.core.enums.*
 import lucuma.core.math.Offset
 import lucuma.core.math.arb.ArbOffset
 import lucuma.core.model.sequence.StepConfig
 import lucuma.core.util.arb.ArbEnumerated
 import org.scalacheck.Arbitrary
-import org.scalacheck.Arbitrary._
+import org.scalacheck.Arbitrary.*
 import org.scalacheck.Cogen
 import org.scalacheck.Gen
-import org.scalacheck.cats.implicits.*
 
 trait ArbStepConfig {
-  import ArbEnumerated._
-  import ArbOffset._
+  import ArbEnumerated.*
+  import ArbOffset.*
 
   implicit val arbGcalArcs: Arbitrary[NonEmptySet[GcalArc]] =
     Arbitrary(

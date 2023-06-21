@@ -18,17 +18,13 @@ import eu.timepit.refined.scalacheck.numeric.*
 import eu.timepit.refined.types.numeric.PosBigDecimal
 import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.math.arb.*
-import lucuma.core.math.units.{_, given}
+import lucuma.core.math.units.*
 import lucuma.core.optics.Format
 import lucuma.core.optics.laws.discipline.FormatTests
 import monocle.law.discipline.*
 import org.scalacheck.Arbitrary
-import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Prop
 import org.scalacheck.Prop.*
-import spire.math.Rational
-
-import java.math.RoundingMode
 
 final class WavelengthDeltaSuite extends munit.DisciplineSuite {
   import ArbQuantity.given

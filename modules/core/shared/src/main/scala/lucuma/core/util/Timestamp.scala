@@ -9,16 +9,13 @@ import cats.syntax.order.*
 import io.circe.Decoder
 import io.circe.Encoder
 import lucuma.core.optics.Format
-import lucuma.core.optics.SplitEpi
 import monocle.Prism
-import org.typelevel.cats.time.instances.instant.*
 
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneOffset.UTC
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeFormatter.ISO_DATE_TIME
 import java.time.format.DateTimeFormatterBuilder
 import java.time.format.DateTimeParseException
 import java.time.temporal.ChronoField

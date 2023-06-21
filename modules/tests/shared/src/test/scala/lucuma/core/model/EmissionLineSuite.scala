@@ -25,7 +25,6 @@ final class EmissionLineSuite extends DisciplineSuite {
   import ArbEmissionLine.given
   import ArbLineFluxValue.given
   import ArbLineWidthValue.given
-  import ArbRefined.{*, given}
   import ArbMeasure.given
   import ArbQuantity.given
 

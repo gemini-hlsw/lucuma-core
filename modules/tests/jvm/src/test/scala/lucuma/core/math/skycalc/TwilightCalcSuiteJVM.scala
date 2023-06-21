@@ -4,17 +4,13 @@
 package lucuma.core.math.skycalc
 
 import cats.*
-import cats.syntax.all.*
 import edu.gemini.skycalc.TwilightBoundedNightTest
 import lucuma.core.arb.ArbTime
 import lucuma.core.enums.Site
 import lucuma.core.enums.TwilightType
-import lucuma.core.math.skycalc.TwilightCalc
-import lucuma.core.optics.Spire
 import lucuma.core.util.arb.ArbEnumerated
 import munit.ScalaCheckSuite
 import org.scalacheck.Prop.*
-import org.typelevel.cats.time.*
 
 import java.time.Instant
 import java.time.LocalDate

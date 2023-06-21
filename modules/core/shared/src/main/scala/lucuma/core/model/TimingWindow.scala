@@ -13,7 +13,6 @@ import lucuma.core.enums.TimingWindowInclusion
 import lucuma.core.math.BoundedInterval
 import lucuma.core.util.TimeSpan
 import lucuma.core.util.Timestamp
-import lucuma.refined.*
 import monocle.Focus
 import monocle.Lens
 import monocle.Prism

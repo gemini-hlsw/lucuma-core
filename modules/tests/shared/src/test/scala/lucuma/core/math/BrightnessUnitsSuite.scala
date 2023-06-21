@@ -3,7 +3,6 @@
 
 package lucuma.core.math
 
-import lucuma.core.math.BrightnessUnits
 import lucuma.core.math.dimensional.*
 import lucuma.core.util.Enumerated
 import lucuma.core.util.*
