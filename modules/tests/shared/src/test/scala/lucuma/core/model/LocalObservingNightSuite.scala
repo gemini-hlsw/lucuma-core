@@ -5,15 +5,14 @@ package gem.math
 
 import cats.Eq
 import cats.Show
-import cats.kernel.laws.discipline._
-import lucuma.core.arb.ArbTime._
+import cats.kernel.laws.discipline.*
+import lucuma.core.arb.ArbTime.*
 import lucuma.core.model.LocalObservingNight
-import lucuma.core.model.arb.ArbObservingNight._
-import lucuma.core.util.arb.ArbEnumerated._
-import monocle.law.discipline._
-import munit._
-import org.scalacheck.Prop._
-import org.typelevel.cats.time._
+import lucuma.core.model.arb.ArbObservingNight.*
+import monocle.law.discipline.*
+import munit.*
+import org.scalacheck.Prop.*
+import org.typelevel.cats.time.*
 
 final class LocalObservingNightSuite extends DisciplineSuite {
 

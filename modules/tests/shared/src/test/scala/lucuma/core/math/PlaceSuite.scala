@@ -6,22 +6,21 @@ package lucuma.core.math
 import cats.Show
 import cats.kernel.laws.discipline.EqTests
 import coulomb.ops.algebra.cats.all.given
-import eu.timepit.refined.auto._
-import eu.timepit.refined.cats._
-import eu.timepit.refined.scalacheck.numeric._
+import eu.timepit.refined.cats.*
+import eu.timepit.refined.scalacheck.numeric.*
 import lucuma.core.arb.ArbTime
-import lucuma.core.arb._
-import lucuma.core.math.arb._
-import monocle.law.discipline._
+import lucuma.core.arb.*
+import lucuma.core.math.arb.*
+import monocle.law.discipline.*
 import munit.DisciplineSuite
-import org.scalacheck.Prop._
-import org.typelevel.cats.time._
+import org.scalacheck.Prop.*
+import org.typelevel.cats.time.*
 
 final class PlaceSuite extends DisciplineSuite {
-  import ArbPlace._
-  import ArbDeclination._
-  import ArbAngle._
-  import ArbTime._
+  import ArbPlace.*
+  import ArbDeclination.*
+  import ArbAngle.*
+  import ArbTime.*
   import ArbRefined.given
   import ArbQuantity.given
 

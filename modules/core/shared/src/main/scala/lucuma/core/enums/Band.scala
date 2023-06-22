@@ -7,7 +7,6 @@ package enums
 
 import cats.Order
 import cats.syntax.all.*
-import eu.timepit.refined.auto.*
 import eu.timepit.refined.numeric.Positive
 import lucuma.core.math.BrightnessUnits.*
 import lucuma.core.math.Wavelength

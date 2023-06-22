@@ -15,13 +15,13 @@ on:
     tags: [v*]
 
 env:
-  PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
-  SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
-  MUNIT_FLAKY_OK: true
-  SONATYPE_CREDENTIAL_HOST: ${{ secrets.SONATYPE_CREDENTIAL_HOST }}
-  SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
-  PGP_SECRET: ${{ secrets.PGP_SECRET }}
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  MUNIT_FLAKY_OK: true
+
+
+concurrency:
+  group: ${{ github.workflow }} @ ${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -29,43 +29,29 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        scala: [3.2.2]
+        scala: [3]
         java: [temurin@17]
         project: [rootJS, rootJVM]
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
     steps:
       - name: Checkout current branch (full)
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
-      - name: Download Java (temurin@17)
-        id: download-java-temurin-17
-        if: matrix.java == 'temurin@17'
-        uses: typelevel/download-java@v2
-        with:
-          distribution: temurin
-          java-version: 17
-
       - name: Setup Java (temurin@17)
+        id: setup-java-temurin-17
         if: matrix.java == 'temurin@17'
         uses: actions/setup-java@v3
         with:
-          distribution: jdkfile
+          distribution: temurin
           java-version: 17
-          jdkFile: ${{ steps.download-java-temurin-17.outputs.jdkFile }}
+          cache: sbt
 
-      - name: Cache sbt
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.sbt
-            ~/.ivy2/cache
-            ~/.coursier/cache/v1
-            ~/.cache/coursier/v1
-            ~/AppData/Local/Coursier/Cache/v1
-            ~/Library/Caches/Coursier/v1
-          key: ${{ runner.os }}-sbt-cache-v2-${{ hashFiles('**/*.sbt') }}-${{ hashFiles('project/build.properties') }}
+      - name: sbt update
+        if: matrix.java == 'temurin@17' && steps.setup-java-temurin-17.outputs.cache-hit == 'false'
+        run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' reload +update
 
       - name: Check that workflows are up to date
         run: sbt githubWorkflowCheck
@@ -74,6 +60,10 @@ jobs:
         if: matrix.java == 'temurin@17'
         run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' headerCheckAll scalafmtCheckAll 'project /' scalafmtSbtCheck lucumaScalafmtCheck lucumaScalafixCheck
 
+      - name: Check scalafix lints
+        if: matrix.java == 'temurin@17' && matrix.os == 'ubuntu-latest'
+        run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' 'scalafixAll --check'
+
       - name: scalaJSLink
         if: matrix.project == 'rootJS'
         run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' Test/scalaJSLinkerResult
@@ -81,13 +71,13 @@ jobs:
       - name: Test
         run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' test
 
-      - name: Check scalafix lints
-        if: matrix.java == 'temurin@17' && matrix.os == 'ubuntu-latest'
-        run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' 'scalafixAll --check'
-
       - name: Check binary compatibility
         if: matrix.java == 'temurin@17' && matrix.os == 'ubuntu-latest'
         run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' mimaReportBinaryIssues
+
+      - name: Generate API documentation
+        if: matrix.java == 'temurin@17' && matrix.os == 'ubuntu-latest'
+        run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' doc
 
       - name: Aggregate coverage reports
         run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' coverageReport coverageAggregate
@@ -102,7 +92,6 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        scala: [3.2.2]
         java: [temurin@17]
     runs-on: ${{ matrix.os }}
     steps:
@@ -111,40 +100,31 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Download Java (temurin@17)
-        id: download-java-temurin-17
-        if: matrix.java == 'temurin@17'
-        uses: typelevel/download-java@v2
-        with:
-          distribution: temurin
-          java-version: 17
-
       - name: Setup Java (temurin@17)
+        id: setup-java-temurin-17
         if: matrix.java == 'temurin@17'
         uses: actions/setup-java@v3
         with:
-          distribution: jdkfile
+          distribution: temurin
           java-version: 17
-          jdkFile: ${{ steps.download-java-temurin-17.outputs.jdkFile }}
+          cache: sbt
 
-      - name: Cache sbt
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.sbt
-            ~/.ivy2/cache
-            ~/.coursier/cache/v1
-            ~/.cache/coursier/v1
-            ~/AppData/Local/Coursier/Cache/v1
-            ~/Library/Caches/Coursier/v1
-          key: ${{ runner.os }}-sbt-cache-v2-${{ hashFiles('**/*.sbt') }}-${{ hashFiles('project/build.properties') }}
+      - name: sbt update
+        if: matrix.java == 'temurin@17' && steps.setup-java-temurin-17.outputs.cache-hit == 'false'
+        run: sbt reload +update
 
       - name: Import signing key
         if: env.PGP_SECRET != '' && env.PGP_PASSPHRASE == ''
+        env:
+          PGP_SECRET: ${{ secrets.PGP_SECRET }}
+          PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
         run: echo $PGP_SECRET | base64 -di | gpg --import
 
       - name: Import signing key and strip passphrase
         if: env.PGP_SECRET != '' && env.PGP_PASSPHRASE != ''
+        env:
+          PGP_SECRET: ${{ secrets.PGP_SECRET }}
+          PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
         run: |
           echo "$PGP_SECRET" | base64 -di > /tmp/signing-key.gpg
           echo "$PGP_PASSPHRASE" | gpg --pinentry-mode loopback --passphrase-fd 0 --import /tmp/signing-key.gpg
@@ -156,9 +136,46 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
 
       - name: Publish
-        run: sbt '++ ${{ matrix.scala }}' tlCiRelease
+        env:
+          SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+          SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
+          SONATYPE_CREDENTIAL_HOST: ${{ secrets.SONATYPE_CREDENTIAL_HOST }}
+        run: sbt tlCiRelease
 
       - name: NPM Publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_REPO_TOKEN }}
-        run: sbt '++ ${{ matrix.scala }}' npm/npmPublish
+        run: sbt npm/npmPublish
+
+  dependency-submission:
+    name: Submit Dependencies
+    if: github.event_name != 'pull_request'
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        java: [temurin@17]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout current branch (full)
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup Java (temurin@17)
+        id: setup-java-temurin-17
+        if: matrix.java == 'temurin@17'
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: sbt
+
+      - name: sbt update
+        if: matrix.java == 'temurin@17' && steps.setup-java-temurin-17.outputs.cache-hit == 'false'
+        run: sbt '++ ${{ matrix.scala }}' reload +update
+
+      - name: Submit Dependencies
+        uses: scalacenter/sbt-dependency-submission@v2
+        with:
+          modules-ignore: benchmarks root rootJS testsJS rootJVM rootNative npm testsJVM
+          configs-ignore: test scala-tool scala-doc-tool

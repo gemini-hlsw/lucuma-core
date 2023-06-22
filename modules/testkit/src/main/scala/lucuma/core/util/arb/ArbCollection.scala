@@ -3,10 +3,7 @@
 
 package lucuma.core.util.arb
 
-import org.scalacheck.Arbitrary
-import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Cogen
-import org.scalacheck.Gen
 
 import scala.collection.immutable.SortedMap
 

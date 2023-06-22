@@ -10,14 +10,12 @@ import io.circe.testing.CodecTests
 import io.circe.testing.instances.*
 import lucuma.core.model.arb.*
 import lucuma.core.optics.laws.discipline.*
-import lucuma.core.util.arb.*
 import munit.*
 import org.scalacheck.Prop.*
 
 final class EphemerisKeySuite extends DisciplineSuite {
 
   import ArbEphemerisKey.*
-  import ArbEnumerated.*
 
   // Laws
   checkAll("EphemerisKey", OrderTests[EphemerisKey].order)

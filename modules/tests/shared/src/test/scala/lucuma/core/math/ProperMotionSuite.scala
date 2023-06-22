@@ -5,7 +5,6 @@ package lucuma.core.math
 
 import cats.kernel.laws.discipline.*
 import lucuma.core.math.arb.ArbProperMotion.given
-import lucuma.core.math.dimensional.*
 import lucuma.core.model.SiderealTracking
 import lucuma.core.optics.laws.discipline.SplitMonoTests
 import munit.DisciplineSuite

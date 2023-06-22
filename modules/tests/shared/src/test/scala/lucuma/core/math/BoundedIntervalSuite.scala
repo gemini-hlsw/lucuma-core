@@ -8,7 +8,6 @@ import eu.timepit.refined.cats.*
 import lucuma.core.arb.ArbTime
 import lucuma.core.math.BoundedInterval
 import lucuma.core.math.arb.ArbInterval
-import lucuma.core.optics.Spire
 import lucuma.core.optics.laws.discipline.ValidSplitEpiTests
 import lucuma.core.optics.laws.discipline.WedgeTests
 import lucuma.core.syntax.time.*

@@ -7,13 +7,12 @@ import cats.Eq
 import cats.Show
 import coulomb.*
 import coulomb.ops.algebra.cats.all.given
-import coulomb.syntax.*
 import coulomb.units.si.Meter
-import eu.timepit.refined.cats._
+import eu.timepit.refined.cats.*
 import eu.timepit.refined.types.numeric.NonNegInt
 import monocle.Focus
 import monocle.Lens
-import org.typelevel.cats.time._
+import org.typelevel.cats.time.*
 
 import java.time.ZoneId
 

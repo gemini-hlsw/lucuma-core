@@ -8,7 +8,7 @@ import coulomb.conversion.ValueConversion
 import coulomb.define.DerivedUnit
 import coulomb.policy.spire.standard.given
 import coulomb.syntax.*
-import coulomb.units.constants.{_, given}
+import coulomb.units.constants.*
 import coulomb.units.si.Meter
 import lucuma.core.math.units.MetersPerSecond
 import spire.math.Rational

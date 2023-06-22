@@ -5,14 +5,9 @@ package lucuma.core.math
 package arb
 
 
-import cats.Eq
 import coulomb.Quantity
-import lucuma.core.math.units.Angstrom
-import lucuma.core.math.units.Micrometer
-import lucuma.core.math.units.Nanometer
-import lucuma.core.math.units.Picometer
 import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck._
+import org.scalacheck.*
 
 object ArbWavelengthDither {
 

@@ -6,10 +6,8 @@ package lucuma.core.model
 import cats.kernel.laws.discipline.*
 import eu.timepit.refined.cats.*
 import eu.timepit.refined.scalacheck.all.*
-import lucuma.core.model.ProposalClass
 import lucuma.core.model.ProposalClass.*
 import lucuma.core.model.arb.*
-import lucuma.core.model.given
 import lucuma.core.util.arb.ArbTimeSpan
 import monocle.law.discipline.*
 import munit.*

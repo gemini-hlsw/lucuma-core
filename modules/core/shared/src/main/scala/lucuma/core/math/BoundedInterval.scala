@@ -9,12 +9,10 @@ import cats.Order
 import cats.syntax.all.*
 import eu.timepit.refined.collection.NonEmpty
 import eu.timepit.refined.types.string.NonEmptyString
-import lucuma.core.optics.SplitEpi
 import lucuma.core.optics.ValidSplitEpi
 import lucuma.core.optics.Wedge
 import lucuma.refined.*
 import spire.math.Bounded
-import spire.math.Empty
 import spire.math.Interval
 import spire.math.Point
 import spire.math.extras.interval.IntervalSeq
@@ -31,25 +29,25 @@ object BoundedInterval:
   def fromInterval[A: Order](interval: Interval[A]): Option[BoundedInterval[A]] =
     interval.some.filterNot(_.isEmpty).filter(_.isBounded).map(_.asInstanceOf[BoundedInterval[A]])
 
-  def closed[A: Order](lower: A, upper: A): Option[BoundedInterval[A]] = 
+  def closed[A: Order](lower: A, upper: A): Option[BoundedInterval[A]] =
     fromInterval(Interval.closed(lower, upper))
 
-  def unsafeClosed[A: Order](lower: A, upper: A): BoundedInterval[A] = 
+  def unsafeClosed[A: Order](lower: A, upper: A): BoundedInterval[A] =
     closed(lower, upper).getOrElse(sys.error(s"Could not build a bounded closed interval with lower bound [$lower] and upper bound [$upper]."))
 
-  def open[A: Order](lower: A, upper: A): Option[BoundedInterval[A]] = 
+  def open[A: Order](lower: A, upper: A): Option[BoundedInterval[A]] =
     fromInterval(Interval.open(lower, upper))
 
-  def unsafeOpen[A: Order](lower: A, upper: A): BoundedInterval[A] = 
+  def unsafeOpen[A: Order](lower: A, upper: A): BoundedInterval[A] =
     open(lower, upper).getOrElse(sys.error(s"Could not build a bounded open interval with lower bound [$lower] and upper bound [$upper]."))
 
-  def openLower[A: Order](lower: A, upper: A): Option[BoundedInterval[A]] = 
+  def openLower[A: Order](lower: A, upper: A): Option[BoundedInterval[A]] =
     fromInterval(Interval.openLower(lower, upper))
 
   def unsafeOpenLower[A: Order](lower: A, upper: A): BoundedInterval[A] =
     openLower(lower, upper).getOrElse(sys.error(s"Could not build a bounded open lower interval with lower bound [$lower] and upper bound [$upper]."))
 
-  def openUpper[A: Order](lower: A, upper: A): Option[BoundedInterval[A]] = 
+  def openUpper[A: Order](lower: A, upper: A): Option[BoundedInterval[A]] =
     fromInterval(Interval.openUpper(lower, upper))
 
   def unsafeOpenUpper[A: Order](lower: A, upper: A): BoundedInterval[A] =
@@ -69,7 +67,7 @@ object BoundedInterval:
     def lowerBound: ValueBound[A] = self match
       case b @ Bounded(_, _, _) => b.lowerBound
       case p @ Point(_) => p.lowerBound
-    
+
     def upperBound: ValueBound[A] = self match
          case b @ Bounded(_, _, _) => b.upperBound
          case p @ Point(_) => p.upperBound
@@ -110,10 +108,10 @@ object BoundedInterval:
 
     inline def intersects(rhs: BoundedInterval[A])(implicit o: Order[A]): Boolean = self.intersects(rhs)
     inline def intersects(rhs: Interval[A])(implicit o: Order[A]): Boolean = self.intersects(rhs)
-    
-    inline def &(rhs: BoundedInterval[A])(implicit o: Order[A]): Option[BoundedInterval[A]] = 
+
+    inline def &(rhs: BoundedInterval[A])(implicit o: Order[A]): Option[BoundedInterval[A]] =
       BoundedInterval.fromInterval(&(rhs))
-    inline def &(rhs: Interval[A])(implicit o: Order[A]): Option[BoundedInterval[A]] = 
+    inline def &(rhs: Interval[A])(implicit o: Order[A]): Option[BoundedInterval[A]] =
       BoundedInterval.fromInterval(&(rhs))
 
     inline def intersect(rhs: BoundedInterval[A])(implicit o: Order[A]): Option[BoundedInterval[A]] =
@@ -127,7 +125,7 @@ object BoundedInterval:
       self.--(rhs).map(_.asInstanceOf[BoundedInterval[A]])
     inline def --(rhs: Interval[A])(implicit o: Order[A]): List[BoundedInterval[A]] =
       self.--(rhs).map(_.asInstanceOf[BoundedInterval[A]])
-          
+
     inline def split(t: A)(implicit o: Order[A]): (Option[BoundedInterval[A]], Option[BoundedInterval[A]]) =
       val (a, b) = self.split(t)
       (BoundedInterval.fromInterval(a), BoundedInterval.fromInterval(b))
@@ -172,7 +170,7 @@ object BoundedInterval:
 
    /**
    * Makes a best-effort attempt to convert the tuple (a, b) into interval [a, b) or [b, a).
-   * 
+   *
    * Normalizes insto open upper intervals. Tuple values must be different.
    */
   def openUpperFromTuple[A: Order]: ValidSplitEpi[NonEmptyString, (A, A), BoundedInterval[A]] =

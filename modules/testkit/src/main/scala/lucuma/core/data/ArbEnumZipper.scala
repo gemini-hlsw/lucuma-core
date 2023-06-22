@@ -6,13 +6,12 @@ package core
 package data
 package arb
 
-import lucuma.core.data.EnumZipper
 import lucuma.core.util.Enumerated
-import lucuma.core.util.arb.ArbEnumerated._
+import lucuma.core.util.arb.ArbEnumerated.*
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Cogen
-import org.scalacheck.Gen._
+import org.scalacheck.Gen.*
 
 trait ArbEnumZipper {
   implicit def arbEnumZipper[A: Enumerated]: Arbitrary[EnumZipper[A]] =

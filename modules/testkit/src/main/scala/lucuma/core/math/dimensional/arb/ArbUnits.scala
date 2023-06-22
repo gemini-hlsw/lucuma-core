@@ -3,7 +3,6 @@
 
 package lucuma.core.math.dimensional.arb
 
-import coulomb.Unitless
 import lucuma.core.math.dimensional.*
 import org.scalacheck.Arbitrary.*
 import org.scalacheck.*

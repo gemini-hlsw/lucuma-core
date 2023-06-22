@@ -4,13 +4,10 @@
 package lucuma.core.model.sequence
 
 import cats.kernel.laws.discipline.*
-import cats.laws.discipline.arbitrary.*
 import lucuma.core.model.sequence.arb.*
 import lucuma.core.model.sequence.gmos.DynamicConfig
 import lucuma.core.model.sequence.gmos.StaticConfig
 import lucuma.core.model.sequence.gmos.arb.*
-import lucuma.core.util.arb.*
-import lucuma.core.util.laws.UidTests
 import monocle.law.discipline.*
 import munit.*
 import org.scalacheck.Arbitrary

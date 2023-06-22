@@ -3,19 +3,17 @@
 
 package lucuma.core.model
 
-import cats.kernel.laws.discipline._
-import eu.timepit.refined.cats._
-import eu.timepit.refined.scalacheck.numeric._
-import lucuma.core.math.arb._
-import lucuma.core.model.arb._
+import cats.kernel.laws.discipline.*
+import eu.timepit.refined.cats.*
+import eu.timepit.refined.scalacheck.numeric.*
+import lucuma.core.math.arb.*
+import lucuma.core.model.arb.*
 import lucuma.core.optics.laws.discipline.SplitEpiTests
-import lucuma.core.util.arb._
-import monocle.law.discipline._
-import munit._
+import monocle.law.discipline.*
+import munit.*
 
 final class ElevationRangeSuite extends DisciplineSuite {
-  import ArbElevationRange._
-  import ArbEnumerated._
+  import ArbElevationRange.*
   import ArbRefined.given
 
   // Laws

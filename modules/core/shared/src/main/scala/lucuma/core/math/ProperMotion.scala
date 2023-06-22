@@ -7,12 +7,9 @@ import algebra.instances.all.given
 import cats.*
 import cats.syntax.all.*
 import coulomb.*
-import coulomb.ops.algebra.cats.all.given
 import coulomb.policy.spire.standard.given
 import coulomb.syntax.*
-import coulomb.units.accepted.*
 import lucuma.core.math.ProperMotion.AngularVelocity
-import lucuma.core.math.dimensional.*
 import lucuma.core.math.units.*
 import lucuma.core.optics.SplitMono
 import lucuma.core.util.*

@@ -9,8 +9,7 @@ import lucuma.core.math.Coordinates
 import lucuma.core.math.Declination
 import lucuma.core.math.HourAngle
 import lucuma.core.math.IntervalGens
-import lucuma.core.math.skycalc.SkyCalcResults
-import org.typelevel.cats.time._
+import org.typelevel.cats.time.*
 import spire.math.extras.interval.IntervalSeq
 
 import java.time.Duration

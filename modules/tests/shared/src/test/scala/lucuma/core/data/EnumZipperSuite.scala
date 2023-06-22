@@ -6,12 +6,11 @@ package core
 package data
 
 import cats.kernel.laws.discipline.EqTests
-import cats.syntax.all._
+import cats.syntax.all.*
 import lucuma.core.enums.StepType
-import lucuma.core.enums.StepType._
-import lucuma.core.util.arb.ArbEnumerated._
+import lucuma.core.enums.StepType.*
 
-import arb.ArbEnumZipper._
+import arb.ArbEnumZipper.*
 
 final class EnumZipperSuite extends munit.DisciplineSuite {
   test("withFocus on focus") {

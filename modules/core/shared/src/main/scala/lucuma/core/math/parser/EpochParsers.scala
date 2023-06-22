@@ -3,18 +3,12 @@
 
 package lucuma.core.math.parser
 
-import cats.parse.Numbers.digits
 import cats.parse.Parser.char
 import cats.parse.Parser.charIn
-import cats.parse.Parser.string
 import cats.parse.Rfc5234.*
 import cats.parse.*
-import cats.syntax.all.*
-import eu.timepit.refined.*
 import lucuma.core.math.Epoch
 import lucuma.core.math.Epoch.Julian
-import lucuma.core.parser.MiscParsers
-import lucuma.refined.*
 
 /** Parser for [[lucuma.core.math.Epoch]]. */
 trait EpochParsers {

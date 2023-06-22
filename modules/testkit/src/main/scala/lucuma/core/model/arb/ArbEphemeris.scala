@@ -9,18 +9,16 @@ import lucuma.core.math.Coordinates
 import lucuma.core.math.Offset
 import lucuma.core.math.arb.ArbCoordinates
 import lucuma.core.math.arb.ArbOffset
-import lucuma.core.model.Ephemeris
-import lucuma.core.model.EphemerisCoordinates
 import lucuma.core.util.Timestamp
 import lucuma.core.util.arb.ArbTimestamp
-import org.scalacheck.Arbitrary._
-import org.scalacheck.Gen._
-import org.scalacheck._
+import org.scalacheck.Arbitrary.*
+import org.scalacheck.Gen.*
+import org.scalacheck.*
 
 trait ArbEphemeris {
-  import ArbCoordinates._
-  import ArbOffset._
-  import ArbTimestamp._
+  import ArbCoordinates.*
+  import ArbOffset.*
+  import ArbTimestamp.*
   import Ephemeris.Element
 
   implicit val arbEphemerisCoordinates: Arbitrary[EphemerisCoordinates] =

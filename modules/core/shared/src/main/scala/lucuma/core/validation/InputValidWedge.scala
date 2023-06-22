@@ -4,13 +4,12 @@
 package lucuma.core.validation
 
 import cats.data.NonEmptyChain
-import cats.syntax.all._
-import eu.timepit.refined.auto._
+import cats.syntax.all.*
 import eu.timepit.refined.numeric.Positive
 import eu.timepit.refined.types.numeric.PosBigDecimal
 import eu.timepit.refined.types.string.NonEmptyString
-import lucuma.core.optics._
-import lucuma.refined._
+import lucuma.core.optics.*
+import lucuma.refined.*
 import monocle.Iso
 import monocle.Prism
 

@@ -36,8 +36,6 @@ def averageParallacticAngle(site: Site, tracking: ObjectTracking, vizTime: Insta
     Vector(ts: _*)
   }
 
-  val samples = times.size
-
   def calculate(site: Site, tracking: ObjectTracking): Vector[SkyCalcResults] = {
     val skycalc = new ImprovedSkyCalc(site.place)
 

@@ -4,8 +4,6 @@
 package lucuma.core.model.sequence
 
 import cats.kernel.laws.discipline.*
-import cats.laws.discipline.arbitrary.*
-import cats.syntax.monoid.*
 import lucuma.core.model.sequence.arb.ArbSequenceDigest
 import munit.*
 

@@ -19,7 +19,6 @@ import lucuma.core.math.LineWidthValue
 import lucuma.core.math.Wavelength
 import lucuma.core.math.arb.ArbBrightnessValue
 import lucuma.core.math.arb.ArbFluxDensityContinuumValue
-import lucuma.core.math.arb.ArbRefined
 import lucuma.core.math.arb.ArbWavelength
 import lucuma.core.math.dimensional.arb.ArbMeasure
 import lucuma.core.math.units.*
@@ -38,7 +37,6 @@ final class SpectralDefinitionSuite extends DisciplineSuite {
   import ArbEnumerated.*
   import ArbFluxDensityContinuumValue.given
   import ArbMeasure.given
-  import ArbRefined.{*, given}
   import ArbSpectralDefinition.given
   import ArbUnnormalizedSED.given
   import ArbWavelength.*

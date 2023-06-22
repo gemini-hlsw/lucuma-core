@@ -8,17 +8,15 @@ package arb
 
 import lucuma.core.arb.ArbTime
 import lucuma.core.enums.Site
-import lucuma.core.model.LocalObservingNight
-import lucuma.core.model.ObservingNight
 import lucuma.core.util.arb.ArbEnumerated
-import org.scalacheck.Arbitrary._
-import org.scalacheck._
+import org.scalacheck.Arbitrary.*
+import org.scalacheck.*
 
 import java.time.LocalDate
 
 trait ArbObservingNight {
-  import ArbEnumerated._
-  import ArbTime._
+  import ArbEnumerated.*
+  import ArbTime.*
 
   implicit val arbLocalObservingNight: Arbitrary[LocalObservingNight] =
     Arbitrary {

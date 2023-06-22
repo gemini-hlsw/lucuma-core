@@ -6,7 +6,7 @@ ThisBuild / tlCiReleaseBranches += "topic/scala3"
 
 Global / concurrentRestrictions += Tags.limit(Tags.Compile, 1)
 
-ThisBuild / crossScalaVersions := Seq("3.2.2")
+ThisBuild / crossScalaVersions := Seq("3.3.0")
 ThisBuild / scalacOptions += "-language:implicitConversions" // TODO
 
 lazy val catsVersion           = "2.9.0"
@@ -18,8 +18,8 @@ lazy val jtsVersion            = "0.4.0"
 lazy val coulombVersion        = "0.7.3"
 lazy val spireVersion          = "0.18.0"
 lazy val singletonOpsVersion   = "0.5.2"
-lazy val refinedVersion        = "0.10.3"
-lazy val lucumaRefinedVersion  = "0.1.1"
+lazy val refinedVersion        = "0.11.0"
+lazy val lucumaRefinedVersion  = "0.1.2"
 lazy val catsTimeVersion       = "0.5.1"
 lazy val circeVersion          = "0.14.5"
 lazy val catsScalacheckVersion = "0.3.2"

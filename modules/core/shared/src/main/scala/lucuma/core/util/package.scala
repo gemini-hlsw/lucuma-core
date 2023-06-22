@@ -3,11 +3,6 @@
 
 package lucuma.core
 
-import coulomb.Quantity
-import coulomb.ops.ShowUnit
-import lucuma.core.math.dimensional.*
-import lucuma.core.util.TypeString
-
 package object util {
   opaque infix type Of[+T, U] <: T = T
   inline def tag[U]: Tagger[U] = Tagger()

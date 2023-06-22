@@ -7,13 +7,10 @@ import cats.Eq
 import cats.implicits.*
 import coulomb.*
 import coulomb.ops.algebra.cats.all.given
-import coulomb.syntax.*
 import eu.timepit.refined.cats.*
-import eu.timepit.refined.types.numeric.PosBigDecimal
 import lucuma.core.math.BrightnessUnits.*
 import lucuma.core.math.dimensional.*
 import lucuma.core.math.units.*
-import lucuma.core.util.*
 import monocle.Focus
 import monocle.Lens
 

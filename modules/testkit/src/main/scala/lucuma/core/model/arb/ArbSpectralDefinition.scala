@@ -5,14 +5,12 @@ package lucuma.core.model.arb
 
 import cats.Order.*
 import cats.syntax.all.*
-import eu.timepit.refined.types.numeric.PosBigDecimal
 import lucuma.core.enums.Band
 import lucuma.core.math.BrightnessUnits
 import lucuma.core.math.FluxDensityContinuumValue
 import lucuma.core.math.Wavelength
 import lucuma.core.math.arb.ArbBrightnessValue
 import lucuma.core.math.arb.ArbFluxDensityContinuumValue
-import lucuma.core.math.arb.ArbRefined
 import lucuma.core.math.arb.ArbWavelength
 import lucuma.core.math.dimensional.*
 import lucuma.core.math.dimensional.arb.ArbMeasure
@@ -32,7 +30,6 @@ trait ArbSpectralDefinition {
   import ArbEnumerated.*
   import ArbFluxDensityContinuumValue.given
   import ArbMeasure.given
-  import ArbRefined.given
   import ArbUnnormalizedSED.given
   import ArbWavelength.*
   import BrightnessUnits.*

@@ -9,7 +9,6 @@ import cats.Order
 import eu.timepit.refined.api.*
 import io.circe.Decoder
 import io.circe.Encoder
-import lucuma.core.util.Display
 import monocle.Iso
 
 /**

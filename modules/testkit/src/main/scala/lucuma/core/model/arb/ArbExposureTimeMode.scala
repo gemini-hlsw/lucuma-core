@@ -5,13 +5,10 @@ package lucuma.core.model
 package arb
 
 import eu.timepit.refined.scalacheck.all.*
-import eu.timepit.refined.types.all.PosBigDecimal
 import eu.timepit.refined.types.all.PosInt
 import lucuma.core.math.SignalToNoise
 import lucuma.core.math.arb.ArbRefined
 import lucuma.core.math.arb.ArbSignalToNoise
-import lucuma.core.model.NonNegDuration
-import lucuma.core.model.arb.ArbNonNegDuration
 import lucuma.core.util.TimeSpan
 import lucuma.core.util.arb.ArbTimeSpan
 import org.scalacheck.Arbitrary.arbitrary

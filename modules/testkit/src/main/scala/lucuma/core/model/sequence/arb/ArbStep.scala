@@ -4,9 +4,6 @@
 package lucuma.core.model.sequence
 package arb
 
-import cats.data.NonEmptyList
-import cats.syntax.all.*
-import lucuma.core.data.Zipper
 import lucuma.core.enums.Breakpoint
 import lucuma.core.enums.ObserveClass
 import lucuma.core.util.arb.ArbEnumerated
@@ -14,13 +11,12 @@ import lucuma.core.util.arb.ArbUid
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.*
 import org.scalacheck.Cogen
-import org.scalacheck.Gen
 
 trait ArbStep {
-  import ArbEnumerated._
+  import ArbEnumerated.*
   import ArbStepEstimate.given
-  import ArbStepConfig._
-  import ArbUid._
+  import ArbStepConfig.*
+  import ArbUid.*
 
   given [D: Arbitrary]: Arbitrary[Step[D]] =
     Arbitrary {

@@ -4,11 +4,8 @@
 package lucuma.core.optics
 
 import cats.Order
-import cats.syntax.all._
-import lucuma.core.optics.Format
-import lucuma.core.optics.SplitEpi
 import monocle.Iso
-import spire.math._
+import spire.math.*
 import spire.math.extras.interval.IntervalSeq
 
 import scala.util.Try

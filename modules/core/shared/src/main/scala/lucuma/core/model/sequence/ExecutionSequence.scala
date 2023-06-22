@@ -4,15 +4,10 @@
 package lucuma.core.model.sequence
 
 import cats.Eq
-import cats.data.NonEmptyList
-import cats.syntax.all._
+import cats.syntax.all.*
 import eu.timepit.refined.types.numeric.PosInt
-import lucuma.core.data.Zipper
-import lucuma.core.util.TimeSpan
 import monocle.Focus
 import monocle.Lens
-import monocle.Prism
-import monocle.macros.GenPrism
 
 /**
  * An ExecutionSequence is a logically a list of Atom.  It includes a concrete

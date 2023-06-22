@@ -5,7 +5,6 @@ package lucuma.core.enums.parser
 
 import cats.parse.Parser.*
 import cats.parse.*
-import cats.syntax.all.*
 import lucuma.core.enums.*
 import lucuma.core.util.Enumerated
 

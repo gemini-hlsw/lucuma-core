@@ -7,7 +7,6 @@ package arb
 import cats.syntax.all.*
 import eu.timepit.refined.scalacheck.string.*
 import eu.timepit.refined.types.string.NonEmptyString
-import lucuma.core.util.arb.ArbEnumerated
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Cogen.*
 import org.scalacheck.*
@@ -16,7 +15,6 @@ trait ArbTarget {
 
   import ArbEphemerisKey.*
   import ArbSiderealTracking.given
-  import ArbEnumerated.*
   import ArbSourceProfile.given
   import ArbCatalogInfo.*
 

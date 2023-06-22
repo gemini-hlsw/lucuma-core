@@ -4,12 +4,10 @@
 package lucuma.core.model.sequence.gmos
 
 import cats.kernel.laws.discipline.*
-import lucuma.core.model.sequence.arb.*
 import lucuma.core.model.sequence.gmos.arb.*
 import lucuma.core.util.arb.*
 import monocle.law.discipline.*
 import munit.*
-import org.typelevel.cats.time.*
 
 final class DynamicConfigSuite extends DisciplineSuite {
 

@@ -6,18 +6,14 @@ package lucuma.core.math.parser
 import cats.parse.Numbers.digit
 import cats.parse.Parser.char
 import cats.parse.Parser.charIn
-import cats.parse.Parser.string
 import cats.parse.Rfc5234.sp
 import cats.parse.*
 import lucuma.core.math.Angle
-import lucuma.core.math.Declination
 import lucuma.core.math.HourAngle
-import lucuma.core.math.RightAscension
-import lucuma.core.optics.Format
 import lucuma.core.parser.MiscParsers
 
 trait AngleParsers:
-  import MiscParsers.{neg, colon, colonOrSpace}
+  import MiscParsers.{neg, colonOrSpace}
 
   val hours: Parser[Int] = (char('1') ~ digit).backtrack // 10-19
     .orElse(char('2') ~ charIn('0' to '4')) // 20-24

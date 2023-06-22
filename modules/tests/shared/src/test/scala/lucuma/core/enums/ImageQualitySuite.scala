@@ -3,16 +3,15 @@
 
 package lucuma.core.enums
 
-import coulomb.policy.spire.standard.given
 import eu.timepit.refined.types.numeric.PosInt
-import lucuma.core.math.units.{_, given}
+import lucuma.core.math.units.{*, given}
 import lucuma.core.util.arb.ArbEnumerated
 import munit.DisciplineSuite
-import org.scalacheck.Prop._
+import org.scalacheck.Prop.*
 
 final class ImageQualitySuite extends DisciplineSuite {
 
-  import ArbEnumerated._
+  import ArbEnumerated.*
 
   test("toAngle") {
     forAll { (a: ImageQuality) =>

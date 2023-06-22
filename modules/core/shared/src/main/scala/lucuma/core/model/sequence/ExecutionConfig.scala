@@ -5,7 +5,6 @@ package lucuma.core.model.sequence
 
 import cats.Eq
 import cats.syntax.foldable.*
-import cats.syntax.monoid.*
 import lucuma.core.enums.ObserveClass
 import lucuma.core.util.TimeSpan
 import monocle.Focus

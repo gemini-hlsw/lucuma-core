@@ -6,9 +6,8 @@ package arb
 
 import coulomb.*
 import coulomb.syntax.*
-import eu.timepit.refined.scalacheck.numeric._
-import lucuma.core.math.Parallax
-import lucuma.core.math.units._
+import eu.timepit.refined.scalacheck.numeric.*
+import lucuma.core.math.units.*
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Cogen

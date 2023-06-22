@@ -3,16 +3,17 @@
 
 package lucuma.core.math
 
-import cats._
+import cats.*
 import coulomb.*
 import coulomb.ops.algebra.cats.all.given
 import coulomb.policy.spire.standard.given
 import coulomb.syntax.*
-import coulomb.units.constants.{_, given}
-import lucuma.core.math.units._
+import coulomb.units.constants.SpeedOfLight
+import coulomb.units.constants.constant
+import lucuma.core.math.units.*
 import lucuma.core.optics.Wedge
 import monocle.Iso
-import spire.std.bigDecimal._
+import spire.std.bigDecimal.*
 
 /**
   * Representation of a radial velocity in meters per second

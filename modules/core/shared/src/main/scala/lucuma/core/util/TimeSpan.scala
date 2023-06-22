@@ -5,11 +5,8 @@ package lucuma.core.util
 
 import cats.Monoid
 import cats.Order
-import cats.Order.catsKernelOrderingForOrder
-import cats.syntax.option.*
 import cats.syntax.order.*
 import eu.timepit.refined.types.numeric.NonNegLong
-import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.optics.Format
 import lucuma.core.refined.numeric.NonZeroBigDecimal
 import lucuma.core.refined.numeric.NonZeroInt
@@ -86,7 +83,7 @@ object TimeSpan {
       .flatMap(fromMicroseconds)
   }
 
-  def unsafeFromDuration(value: Duration): TimeSpan = 
+  def unsafeFromDuration(value: Duration): TimeSpan =
     fromDuration(value).getOrElse(sys.error(s"The duration value ($value) must be non-negative."))
 
   /**

@@ -16,7 +16,6 @@ import eu.timepit.refined.numeric.Interval
 import eu.timepit.refined.numeric.Less
 import eu.timepit.refined.numeric.NonNegative
 import org.typelevel.cats.time.instances.duration.*
-import shapeless.Nat._0
 
 import java.time.Duration
 import java.time.temporal.Temporal
@@ -30,11 +29,11 @@ package object model {
   object IntPercent extends RefinedTypeOps[IntPercent, Int]
 
   // Non negative duration
-  given Plain[Duration, GreaterEqual[_0]] =
+  given Plain[Duration, GreaterEqual[0]] =
     Validate.fromPredicate(
       (d: Duration) => d.toNanos >= 0L,
       (d: Duration) => s"$d is not negative",
-      Not(Less(shapeless.nat._0))
+      Not(Less(0))
     )
 
   type NonNegDuration = Duration Refined NonNegative

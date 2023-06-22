@@ -4,8 +4,6 @@
 package lucuma.core.model.sequence.gmos
 
 import cats.kernel.laws.discipline.*
-import lucuma.core.model.sequence.arb.*
-import lucuma.core.model.sequence.gmos.StaticConfig
 import lucuma.core.util.arb.*
 import monocle.law.discipline.*
 import munit.*

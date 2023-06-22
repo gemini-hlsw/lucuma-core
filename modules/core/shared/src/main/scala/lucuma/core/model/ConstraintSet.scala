@@ -6,8 +6,7 @@
 
 package lucuma.core.model
 
-import cats._
-import eu.timepit.refined.cats._
+import cats.*
 import lucuma.core.enums.CloudExtinction
 import lucuma.core.enums.ImageQuality
 import lucuma.core.enums.SkyBackground

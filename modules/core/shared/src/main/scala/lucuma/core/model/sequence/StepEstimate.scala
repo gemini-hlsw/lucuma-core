@@ -4,7 +4,6 @@
 package lucuma.core.model.sequence
 
 import cats.Eq
-import cats.data.NonEmptyList
 import cats.syntax.foldable.*
 import cats.syntax.monoid.*
 import lucuma.core.data.Zipper

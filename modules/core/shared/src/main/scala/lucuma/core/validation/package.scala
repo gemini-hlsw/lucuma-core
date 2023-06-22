@@ -11,9 +11,6 @@ import eu.timepit.refined.auto.*
 import eu.timepit.refined.numeric.Interval
 import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.core.optics.*
-import lucuma.refined.*
-
-import scala.util.Try
 
 package object validation {
   type DigitCount = Int Refined Interval.Closed[0, 1000]

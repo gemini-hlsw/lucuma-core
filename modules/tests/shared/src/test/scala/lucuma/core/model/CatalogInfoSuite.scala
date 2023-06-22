@@ -3,20 +3,19 @@
 
 package lucuma.core.model
 
-import cats.kernel.laws.discipline._
-import eu.timepit.refined.cats._
-import eu.timepit.refined.scalacheck.string._
-import lucuma.core.arb._
-import lucuma.core.model.arb._
+import cats.kernel.laws.discipline.*
+import eu.timepit.refined.cats.*
+import eu.timepit.refined.scalacheck.string.*
+import lucuma.core.arb.*
+import lucuma.core.model.arb.*
 import lucuma.core.util.arb.ArbEnumerated
-import lucuma.core.util.arb._
+import lucuma.core.util.arb.*
 import monocle.law.discipline.LensTests
-import munit._
+import munit.*
 
 final class CatalogInfoSuite extends DisciplineSuite {
-  import ArbEnumerated._
-  import ArbGid._
-  import ArbCatalogInfo._
+  import ArbEnumerated.*
+  import ArbCatalogInfo.*
 
   // Laws
   checkAll("Order[CatalogInfo]", OrderTests[CatalogInfo].order)

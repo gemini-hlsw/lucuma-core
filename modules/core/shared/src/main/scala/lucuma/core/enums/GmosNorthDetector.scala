@@ -6,15 +6,14 @@ package core
 package enums
 
 import cats.data.NonEmptySet
-import cats.syntax.eq._
-import coulomb._
-import eu.timepit.refined.auto._
+import cats.syntax.eq.*
+import coulomb.*
 import eu.timepit.refined.numeric.Positive
 import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.math.Angle
-import lucuma.core.math.units._
+import lucuma.core.math.units.*
 import lucuma.core.util.Enumerated
-import lucuma.refined._
+import lucuma.refined.*
 
 /**
  * Enumerated type for GMOS detector.

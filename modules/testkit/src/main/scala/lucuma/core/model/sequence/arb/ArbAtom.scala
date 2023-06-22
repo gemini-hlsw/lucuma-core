@@ -4,20 +4,18 @@
 package lucuma.core.model.sequence
 package arb
 
-import cats.syntax.all._
 import eu.timepit.refined.types.string.NonEmptyString
-import lucuma.core.data.Zipper
 import lucuma.core.util.arb.ArbBoundedCollection
 import lucuma.core.util.arb.ArbUid
 import org.scalacheck.Arbitrary
-import org.scalacheck.Arbitrary._
+import org.scalacheck.Arbitrary.*
 import org.scalacheck.Cogen
 import org.scalacheck.Gen
 
 trait ArbAtom {
   import ArbBoundedCollection.*
   import ArbStep.given
-  import ArbUid._
+  import ArbUid.*
 
   given [D: Arbitrary]: Arbitrary[Atom[D]] =
     Arbitrary {

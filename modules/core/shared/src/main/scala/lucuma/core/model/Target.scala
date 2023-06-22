@@ -5,14 +5,11 @@ package lucuma.core.model
 
 import cats.*
 import cats.implicits.*
-import eu.timepit.refined.auto.*
 import eu.timepit.refined.cats.*
-import eu.timepit.refined.types.numeric.PosBigDecimal
 import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.core.enums.Band
 import lucuma.core.math.BrightnessUnits.*
 import lucuma.core.math.*
-import lucuma.core.math.dimensional.*
 import lucuma.core.util.*
 import lucuma.refined.*
 import monocle.Focus

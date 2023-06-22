@@ -7,7 +7,6 @@ import cats.Eq
 import cats.Show
 import cats.implicits.*
 import cats.kernel.laws.discipline.*
-import eu.timepit.refined.auto.*
 import lucuma.core.arb.ArbTime
 import lucuma.core.math.arb.*
 import lucuma.core.math.parser.EpochParsers.*

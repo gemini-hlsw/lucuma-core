@@ -4,18 +4,14 @@
 package lucuma.core.model.sequence
 
 import cats.Eq
-import cats.syntax.all._
-import eu.timepit.refined.auto._
-import lucuma.core.data.Zipper
+import cats.syntax.all.*
 import lucuma.core.enums.Breakpoint
 import lucuma.core.enums.ObserveClass
 import lucuma.core.util.TimeSpan
 import lucuma.core.util.WithUid
-import lucuma.refined._
+import lucuma.refined.*
 import monocle.Focus
 import monocle.Lens
-import monocle.Prism
-import monocle.macros.GenPrism
 
 /**
  * Complete step configuration for a particular instrument's dynamic config.

@@ -6,10 +6,8 @@ package lucuma.core.math
 import coulomb.*
 import coulomb.policy.spire.standard.given
 import coulomb.syntax.*
-import coulomb.units.mks.{_, given}
-import coulomb.units.si.{_, given}
-import lucuma.core.math.units.{_, given}
-import lucuma.core.util.*
+import coulomb.units.mks.*
+import lucuma.core.math.units.*
 import munit.FunSuite
 import spire.math.Rational
 import spire.math.SafeLong

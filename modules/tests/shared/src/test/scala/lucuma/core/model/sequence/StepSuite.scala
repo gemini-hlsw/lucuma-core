@@ -13,17 +13,16 @@ import monocle.law.discipline.*
 import munit.*
 
 final class StepSuite extends DisciplineSuite {
-  
-  import ArbDetectorEstimate.given
-  import ArbDynamicConfig._
-  import ArbEnumerated._
+
+  import ArbDynamicConfig.*
+  import ArbEnumerated.*
   import ArbStep.given
-  import ArbStepConfig._
+  import ArbStepConfig.*
   import ArbStepEstimate.given
-  import ArbUid._
+  import ArbUid.*
 
   checkAll("Step.Id", UidTests[Step.Id].uid)
-  
+
   checkAll("Eq[Step[GmosNorth]]",    EqTests[Step[GmosNorth]].eqv)
   checkAll("Step.id",                LensTests(Step.id[GmosNorth]))
   checkAll("Step.instrumentConfig",  LensTests(Step.instrumentConfig[GmosNorth]))

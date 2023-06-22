@@ -4,7 +4,6 @@
 package lucuma.core.model.sequence
 
 import cats.kernel.laws.discipline.*
-import cats.laws.discipline.arbitrary.*
 import lucuma.core.model.sequence.arb.ArbConfigChangeEstimate
 import munit.*
 

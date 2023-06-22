@@ -3,16 +3,15 @@
 
 package lucuma.core.model.arb
 
-import lucuma.core.model._
-import lucuma.core.util.arb._
-import org.scalacheck.Arbitrary._
-import org.scalacheck._
+import lucuma.core.model.*
+import lucuma.core.util.arb.*
+import org.scalacheck.Arbitrary.*
+import org.scalacheck.*
 
 trait ArbUser {
-  import ArbGid._
-  import ArbEnumerated._
-  import ArbRole._
-  import ArbOrcidProfile._
+  import ArbGid.*
+  import ArbRole.*
+  import ArbOrcidProfile.*
 
   implicit val ArbGuestUser: Arbitrary[GuestUser] =
     Arbitrary(arbitrary[User.Id].map(GuestUser(_)))

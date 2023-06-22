@@ -7,7 +7,6 @@ package arb
 import eu.timepit.refined.numeric.NonNegative
 import eu.timepit.refined.refineV
 import eu.timepit.refined.types.numeric.NonNegBigDecimal
-import lucuma.core.math.arb.ArbRefined.given
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.*
 

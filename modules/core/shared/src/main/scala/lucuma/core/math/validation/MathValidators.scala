@@ -3,7 +3,6 @@
 
 package lucuma.core.math.validation
 
-import eu.timepit.refined.auto.*
 import lucuma.core.math.Angle
 import lucuma.core.math.Declination
 import lucuma.core.math.Epoch

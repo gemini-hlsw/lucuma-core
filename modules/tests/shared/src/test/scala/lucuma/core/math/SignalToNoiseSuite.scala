@@ -3,25 +3,19 @@
 
 package lucuma.core.math
 
-import cats.Order
 import cats.kernel.laws.discipline.OrderTests
 import eu.timepit.refined.cats.*
 import eu.timepit.refined.numeric.NonNegative
 import eu.timepit.refined.refineV
-import eu.timepit.refined.scalacheck.numeric.*
 import eu.timepit.refined.types.numeric.NonNegBigDecimal
 import io.circe.testing.CodecTests
 import io.circe.testing.instances.*
-import lucuma.core.math.arb.ArbRefined.given
 import lucuma.core.math.arb.ArbSignalToNoise
-import lucuma.core.optics.Format
 import lucuma.core.optics.laws.discipline.FormatTests
 import lucuma.core.optics.laws.discipline.ValidSplitEpiTests
 import monocle.law.discipline.*
 import org.scalacheck.Arbitrary
 import org.scalacheck.Gen
-import org.scalacheck.Prop.*
-
 
 final class SignalToNoiseSuite extends munit.DisciplineSuite {
 

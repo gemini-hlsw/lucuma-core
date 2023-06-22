@@ -20,13 +20,13 @@ import lucuma.core.math.skycalc.solver.Samples.Bracket
 import lucuma.core.syntax.time.*
 import monocle.law.discipline.IsoTests
 import org.scalacheck.Arbitrary.*
-import org.scalacheck.Gen.*
 import org.scalacheck.Prop.*
 import org.typelevel.cats.time.*
 
 import java.time.Duration
 import java.time.Instant
 import scala.collection.immutable.TreeMap
+
 final class SamplesSuite extends munit.DisciplineSuite with IntervalGens {
   import ArbEval.*
   import ArbInterval.given

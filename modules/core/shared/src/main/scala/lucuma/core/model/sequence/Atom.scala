@@ -5,18 +5,13 @@ package lucuma.core.model.sequence
 
 import cats.Eq
 import cats.data.NonEmptyList
-import cats.syntax.all._
-import eu.timepit.refined.auto._
+import cats.syntax.all.*
 import eu.timepit.refined.types.string.NonEmptyString
-import lucuma.core.data.Zipper
 import lucuma.core.enums.ObserveClass
-import lucuma.core.util.TimeSpan
 import lucuma.core.util.WithUid
-import lucuma.refined._
+import lucuma.refined.*
 import monocle.Focus
 import monocle.Lens
-import monocle.Prism
-import monocle.macros.GenPrism
 
 /**
  * An Atom is a collection of steps that must be treated as indivisible
