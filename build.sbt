@@ -17,13 +17,11 @@ lazy val geminiLocalesVersion  = "0.7.0"
 lazy val jtsVersion            = "0.4.0"
 lazy val coulombVersion        = "0.7.3"
 lazy val spireVersion          = "0.18.0"
-lazy val singletonOpsVersion   = "0.5.2"
 lazy val refinedVersion        = "0.11.0"
 lazy val lucumaRefinedVersion  = "0.1.2"
 lazy val catsTimeVersion       = "0.5.1"
 lazy val circeVersion          = "0.14.5"
 lazy val catsScalacheckVersion = "0.3.2"
-lazy val shapelessVersion      = "2.3.10"
 lazy val catsParseVersion      = "0.3.9"
 lazy val kittensVersion        = "3.0.0"
 lazy val scalajsStubVersion    = "1.1.0"
@@ -49,16 +47,12 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
       "com.manyangled" %%% "coulomb-units"  % coulombVersion,
       "org.typelevel"  %%% "spire"          % spireVersion,
       "org.typelevel"  %%% "spire-extras"   % spireVersion,
-      ("eu.timepit"    %%% "singleton-ops"  % singletonOpsVersion).cross(CrossVersion.for3Use2_13),
       "eu.timepit"     %%% "refined"        % refinedVersion,
       "eu.timepit"     %%% "refined-cats"   % refinedVersion,
       "edu.gemini"     %%% "lucuma-refined" % lucumaRefinedVersion,
       "org.typelevel"  %%% "cats-time"      % catsTimeVersion,
       "org.typelevel"  %%% "kittens"        % kittensVersion,
-      "io.circe"       %%% "circe-core"     % circeVersion,
-      "io.circe"       %%% "circe-generic"  % circeVersion,
-      "io.circe"       %%% "circe-refined"  % circeVersion,
-      ("com.chuusai"   %%% "shapeless"      % shapelessVersion).cross(CrossVersion.for3Use2_13)
+      "io.circe"       %%% "circe-core"     % circeVersion
     )
   )
   .jvmConfigure(_.enablePlugins(AutomateHeaderPlugin))
