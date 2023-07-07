@@ -24,20 +24,20 @@ object Extinction:
   val FromMillimags: Prism[Short, Extinction] =
     Prism((s: Short) => NonNegShort.from(s).toOption)(_.value)
 
-  val FromMags: Format[Double, Extinction] =
+  val FromMags: Format[BigDecimal, Extinction] =
     Format(
-      d => if d.isNaN || d.isInfinite then None else FromMillimags.getOption(BigDecimal(d).bigDecimal.movePointRight(2).shortValue),
-      e => BigDecimal(FromMillimags.reverseGet(e)).bigDecimal.movePointLeft(2).doubleValue 
+      d => FromMillimags.getOption(d.bigDecimal.movePointRight(2).shortValue),
+      e => BigDecimal(FromMillimags.reverseGet(e)).bigDecimal.movePointLeft(2) 
     )
 
   given Order[Extinction] =
     Order.by(_.value)
 
   given Encoder[Extinction] =
-    Encoder[Double].contramap(FromMags.reverseGet)
+    Encoder[BigDecimal].contramap(FromMags.reverseGet)
 
   given Decoder[Extinction] =
-    Decoder[Double].emap(d => FromMags.getOption(d).toRight(s"Invalid extinction: $d"))
+    Decoder[BigDecimal].emap(d => FromMags.getOption(d).toRight(s"Invalid extinction: $d"))
 
   extension (e: Extinction)
     def underlying: NonNegShort = e
