@@ -198,6 +198,7 @@ object Angle extends AngleOptics {
    * you get the minimal angle in the range [0 .. π]
    */
   def difference(α: Angle, ϐ: Angle): Angle = {
+
     val δ: Angle =
       Angle.fromMicroarcseconds(α - ϐ)
     if (δ > Angle.Angle180) δ.mirrorBy(Angle.Angle180) else δ

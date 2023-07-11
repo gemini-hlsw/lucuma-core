@@ -11,10 +11,9 @@ import lucuma.core.optics.SplitMono
 import monocle.Focus
 import monocle.Iso
 import monocle.Lens
-import monocle.macros.GenIso
 
-import scala.math.cos
-import scala.math.sin
+import java.lang.Math.cos
+import java.lang.Math.sin
 
 object Axis {
   type P
@@ -77,70 +76,74 @@ object Offset extends OffsetOptics {
     Offset(Component.Zero[Axis.P], Component.Zero[Axis.Q])
 
   /** Offset forms a commutative group. */
-  implicit val CommutativeGroupOffset: CommutativeGroup[Offset] =
+  given CommutativeGroup[Offset] =
     new CommutativeGroup[Offset] {
       val empty: Offset = Zero
       def combine(a: Offset, b: Offset): Offset = a + b
       def inverse(a: Offset): Offset = -a
     }
 
-  implicit val ShowOffset: Show[Offset] =
+  given Show[Offset] =
     Show.fromToString
 
   /** Offsets are ordered by p, then q. */
-  implicit val OrderOffset: Order[Offset] =
+  given Order[Offset] =
     Order.by(o => (o.p, o.q))
 
   /** Component of an angular offset. */
-  final case class Component[A](toAngle: Angle) {
-
-    /** This component, reflected around the 0 .. 180° axis. Exact, invertable. */
-    def unary_- : Component[A] =
-      Component[A](-toAngle)
-
-    /** Sum of this component and `o` of the same type. Exact. */
-    def +(o: Component[A]): Component[A] =
-      Component[A](toAngle + o.toAngle)
-
-    /** Difference of this component and `o` of the same type. Exact. */
-    def -(o: Component[A]): Component[A] =
-      Component[A](toAngle - o.toAngle)
-
-    /** This component in signed radians. */
-    def toSignedDoubleRadians: Double =
-      toAngle.toSignedDoubleRadians
-  }
+  opaque type Component[A] = Long
 
   object Component extends ComponentOptics {
+    inline def apply[A](toAngle: Angle): Component[A] = toAngle.toMicroarcseconds
+
+    extension[A](component: Component[A])
+      inline def toAngle: Angle = Angle.fromMicroarcseconds(component)
+
+      /** This component, reflected around the 0 .. 180° axis. Exact, invertable. */
+      inline def unary_- : Component[A] =
+        -toAngle.toMicroarcseconds
+
+      /** Sum of this component and `o` of the same type. Exact. */
+      inline def +(o: Component[A]): Component[A] =
+        Angle.fromMicroarcseconds(toAngle.toMicroarcseconds + o).toMicroarcseconds
+
+      /** Difference of this component and `o` of the same type. Exact. */
+      inline def -(o: Component[A]): Component[A] =
+        Angle.fromMicroarcseconds(toAngle.toMicroarcseconds - o).toMicroarcseconds
+
+      /** This component in signed radians. */
+      inline def toSignedDoubleRadians: Double =
+        toAngle.toSignedDoubleRadians
 
     /** The zero [A] component. */
-    def Zero[A]: Component[A] =
-      Component[A](Angle.Angle0)
+    inline def Zero[A]: Component[A] =
+      Angle.Angle0.toMicroarcseconds
 
     /** Component[A] forms a commutative group. */
-    implicit def CommutativeGroupComponent[A]: CommutativeGroup[Component[A]] =
+    given commutativeGroup[A]: CommutativeGroup[Component[A]] =
       new CommutativeGroup[Component[A]] {
         val empty: Component[A] = Zero[A]
         def combine(a: Component[A], b: Component[A]): Component[A] = a + b
         def inverse(a: Component[A]): Component[A] = -a
       }
 
-    implicit def ShowComponent[A]: Show[Component[A]] =
+    given showComponent[A]: Show[Component[A]] =
       Show.fromToString
 
     /** Components are by signed angle. */
-    implicit def OrderComponent[A]: Order[Component[A]] =
+    given orderComponent[A]: Order[Component[A]] =
       Angle.SignedAngleOrder.contramap(_.toAngle)
   }
 
   trait ComponentOptics {
+    import Component.*
 
     /** @group Optics */
     def angle[A]: Iso[Component[A], Angle] =
-      GenIso[Component[A], Angle]
+      Iso[Component[A], Angle](_.toAngle)(w => Component.apply[A](w))
 
     def signedDecimalArcseconds[A]: SplitMono[Component[A], BigDecimal] =
-      Angle.signedDecimalArcseconds.imapA(Component[A], _.toAngle)
+      Angle.signedDecimalArcseconds.imapA(Component.apply[A](_), _.toAngle)
   }
 
   // P, Q types and objects defined for convenience.
@@ -149,7 +152,6 @@ object Offset extends OffsetOptics {
   type Q = Component[Axis.Q]
 
   protected trait ComponentCompanion[A] {
-    def apply(toAngle: Angle): Component[A] = Component[A](toAngle)
 
     val Zero: Component[A] = Component.Zero[A]
 
@@ -159,9 +161,13 @@ object Offset extends OffsetOptics {
       Component.signedDecimalArcseconds[A]
   }
 
-  object P extends ComponentCompanion[Axis.P]
+  object P extends ComponentCompanion[Axis.P] {
+    def apply(toAngle: Angle): Component[Axis.P] = Component[Axis.P](toAngle)
+  }
 
-  object Q extends ComponentCompanion[Axis.Q]
+  object Q extends ComponentCompanion[Axis.Q] {
+    def apply(toAngle: Angle): Component[Axis.Q] = Component[Axis.Q](toAngle)
+  }
 
   /**
    * Produces a function that will calculate `Offset` positions rotated by

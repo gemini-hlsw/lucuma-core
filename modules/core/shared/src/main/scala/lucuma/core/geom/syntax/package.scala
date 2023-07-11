@@ -7,6 +7,6 @@ package object syntax {
 
   // Syntax used in the JTS / JVM implementation only.
 
-  object all extends ToShapeExpressionOps with ToShapeExpressionCompanionOps
+  object all extends shapeexpression
 
 }

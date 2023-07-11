@@ -4,9 +4,9 @@
 package lucuma.core.geom
 package jts
 
-import cats.syntax.all._
-import lucuma.core.geom.ShapeExpression._
-import lucuma.core.geom.jts.syntax.all._
+import cats.syntax.all.*
+import lucuma.core.geom.ShapeExpression.*
+import lucuma.core.geom.jts.syntax.all.*
 import lucuma.core.math.Offset
 import org.locationtech.jts.geom.Geometry
 import org.locationtech.jts.geom.util.AffineTransformation
