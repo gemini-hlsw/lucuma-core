@@ -7,8 +7,8 @@ import lucuma.core.geom.jts.Jts.geometryFactory
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 import org.locationtech.jts.geom.Coordinate
-import org.locationtech.jts.geom.Geometry
 import org.locationtech.jts.geom.Envelope
+import org.locationtech.jts.geom.Geometry
 import org.locationtech.jts.util.GeometricShapeFactory
 
 object syntax {

@@ -36,7 +36,7 @@ final case class RadialVelocity private (rv: Quantity[BigDecimal, MetersPerSecon
     if (rv.value.abs < SpeedOfLight.value) {
       val i = (rv / SpeedOfLight).value
       val t = (1 + i) / (1 - i)
-      Some(Redshift(BigDecimal.decimal(scala.math.sqrt(t.toDouble) - 1).round(rv.value.mc)))
+      Some(Redshift(BigDecimal.decimal(java.lang.Math.sqrt(t.toDouble) - 1).round(rv.value.mc)))
     } else None
 
   override def toString =

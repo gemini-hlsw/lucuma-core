@@ -13,8 +13,8 @@ import lucuma.core.optics.*
 import monocle.Iso
 import monocle.Prism
 
+import java.lang.Math
 import scala.annotation.targetName
-import scala.math
 
 /**
  * Exact angles represented as integral microarcseconds. These values form a commutative group over
@@ -335,17 +335,17 @@ object Angle extends AngleOptics {
     /**
     * Trigonometric sine of the angle.
     */
-    inline def sin: Double = math.sin(toDoubleRadians)
+    inline def sin: Double = Math.sin(toDoubleRadians)
 
     /**
     * Trigonometric cosine of the angle.
     */
-    inline def cos: Double = math.cos(toDoubleRadians)
+    inline def cos: Double = Math.cos(toDoubleRadians)
 
     /**
     * Trigonometric tangent of the angle.
     */
-    inline def tan: Double = math.tan(toDoubleRadians)
+    inline def tan: Double = Math.tan(toDoubleRadians)
 
     /** String representation of this Angle, for debugging purposes only. */
     @targetName("toStringAngle")

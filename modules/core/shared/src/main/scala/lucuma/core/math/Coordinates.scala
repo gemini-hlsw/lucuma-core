@@ -11,7 +11,7 @@ import lucuma.core.syntax.all.*
 import monocle.Focus
 import monocle.Lens
 
-import scala.math.*
+import java.lang.Math.*
 
 /** A point in the sky, given right ascension and declination. */
 final case class Coordinates(ra: RightAscension, dec: Declination) {
@@ -67,12 +67,12 @@ final case class Coordinates(ra: RightAscension, dec: Declination) {
       val sinpa  = cd * sin(alf - alf0) / sind
       val pphi   = acos(cospa)
 
-      if (sinpa < 0.0) (Pi * 2) - pphi else pphi
+      if (sinpa < 0.0) (PI * 2) - pphi else pphi
     } else {
       0
     }
 
-    CoordinatesDiff(Angle.fromDoubleDegrees(phi * 180.0 / Pi), Angle.fromDoubleDegrees(dist * 180.0 / Pi))
+    CoordinatesDiff(Angle.fromDoubleDegrees(phi * 180.0 / PI), Angle.fromDoubleDegrees(dist * 180.0 / PI))
   }
 
   /**
