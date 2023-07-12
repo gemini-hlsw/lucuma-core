@@ -4,7 +4,7 @@
 package lucuma.core.geom
 package jts
 
-import lucuma.core.geom.jts.syntax.offset._
+import lucuma.core.geom.jts.syntax.all.*
 import lucuma.core.math.Offset
 import org.locationtech.jts.geom.Geometry
 

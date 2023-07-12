@@ -13,11 +13,11 @@ import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 import lucuma.core.math.syntax.int.*
 
-import scala.math.Pi
-import scala.math.asin
-import scala.math.atan2
-import scala.math.hypot
-import scala.math.sin
+import java.lang.Math.PI
+import java.lang.Math.asin
+import java.lang.Math.atan2
+import java.lang.Math.hypot
+import java.lang.Math.sin
 
 /**
   * Description of the GMOS OIWFS probe arm geometry.
@@ -121,10 +121,10 @@ trait GmosOiwfsProbeArm {
 
     val θ = {
       val θʹ = asin((mx / r) * sin(φ))
-      if (mxᒾ > (rᒾ + bxᒾ)) Pi - θʹ else θʹ
+      if (mxᒾ > (rᒾ + bxᒾ)) PI - θʹ else θʹ
     }
 
-    Angle.fromDoubleRadians(-φ + θ + α + Pi / 2.0)
+    Angle.fromDoubleRadians(-φ + θ + α + PI / 2.0)
   }
 
   /**

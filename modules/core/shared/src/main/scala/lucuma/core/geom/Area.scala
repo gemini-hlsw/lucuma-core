@@ -4,7 +4,6 @@
 package lucuma.core.geom
 
 import cats.Order
-import cats.syntax.eq._
 import monocle.Prism
 
 /**
@@ -14,43 +13,25 @@ import monocle.Prism
  *
  * @param toMicroarcsecondsSquared area in µas^2^
  */
-sealed class Area protected (val toMicroarcsecondsSquared: Long) {
-
-  // Sanity check ... should be correct via the companion constructor
-  assert(toMicroarcsecondsSquared >= 0,
-         s"Invariant violated. $toMicroarcsecondsSquared is negative"
-  )
-
-  /** String representation of this Area, for debugging purposes only. */
-  override final def toString =
-    f"Area($toMicroarcsecondsSquared µas^2)"
-
-  /** Areas are equal if their size is equal. */
-  override final def equals(a: Any): Boolean =
-    a match {
-      case a: Area => a.toMicroarcsecondsSquared === toMicroarcsecondsSquared
-      case _       => false
-    }
-
-  override final def hashCode: Int =
-    toMicroarcsecondsSquared.hashCode
-
-}
+opaque type Area = Long
 
 object Area {
+  /** @group Constants */
+  lazy val MinArea: Area = 0L
 
   /** @group Constants */
-  lazy val MinArea: Area = new Area(0L) {}
+  lazy val MaxArea: Area = Long.MaxValue
 
-  /** @group Constants */
-  lazy val MaxArea: Area = new Area(Long.MaxValue) {}
+  extension (a: Area)
+    inline def toMicroarcsecondsSquared: Long = a
+
 
   /**
    * Prism from Long in µas^2^ into Area and back.
    * @group Optics
    */
   val fromMicroarcsecondsSquared: Prism[Long, Area] =
-    Prism((n: Long) => Some(n).filter(_ >= 0).map(new Area(_) {}))(_.toMicroarcsecondsSquared)
+    Prism((n: Long) => Some(n).filter(_ >= 0))(_.toMicroarcsecondsSquared)
 
   /**
    * Sorts Area by size, ascending. This may be used, for example, to select a
@@ -59,7 +40,6 @@ object Area {
    *
    * @group Typeclass Instances
    */
-  implicit val AreaOrder: Order[Area]               =
-    Order.by(_.toMicroarcsecondsSquared)
+  given (using o: Order[Long]): Order[Area] =  o
 
 }

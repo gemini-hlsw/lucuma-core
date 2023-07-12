@@ -4,10 +4,10 @@
 package lucuma.core.geom.gmos
 
 import lucuma.core.geom.ShapeExpression
-import lucuma.core.geom.syntax.all._
+import lucuma.core.geom.syntax.all.*
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
-import lucuma.core.math.syntax.int._
+import lucuma.core.math.syntax.int.*
 
 /**
   * GMOS area that could be reachable by the patrol arm
