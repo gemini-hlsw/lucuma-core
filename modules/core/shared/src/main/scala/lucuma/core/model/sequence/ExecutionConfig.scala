@@ -5,8 +5,6 @@ package lucuma.core.model.sequence
 
 import cats.Eq
 import cats.syntax.foldable.*
-import lucuma.core.enums.ObserveClass
-import lucuma.core.util.TimeSpan
 import monocle.Focus
 import monocle.Lens
 
@@ -25,28 +23,14 @@ case class ExecutionConfig[S, D](
 ) {
 
   /**
-   * ObserveClass computed from the ObserveClass of the science sequence atoms.
+   * Execution summary computed from the sequences.
    */
-  lazy val observeClass: ObserveClass =
-    science.fold(ObserveClass.Science)(_.digest.observeClass)
-
-  private def plannedTime(setup: TimeSpan): PlannedTime =
-    science.foldMap(_.digest.plannedTime).sumCharge(observeClass.chargeClass, setup)
-
-  /**
-   * Planned time for the observation, including the science sequence and a
-   * full setup time.
-   */
-  lazy val fullPlannedTime: PlannedTime =
-    plannedTime(setup.full)
-
-  /**
-   * Planned time for the observation, including the science sequence but only
-   * a reacquisition cost instead of the full setup time.
-   */
-  lazy val reacquisitionPlannedTime: PlannedTime =
-    plannedTime(setup.reacquisition)
-
+  def executionDigest: ExecutionDigest =
+    ExecutionDigest(
+      setup,
+      acquisition.fold(SequenceDigest.Zero)(_.digest),
+      science.fold(SequenceDigest.Zero)(_.digest)
+    )
 }
 
 object ExecutionConfig {

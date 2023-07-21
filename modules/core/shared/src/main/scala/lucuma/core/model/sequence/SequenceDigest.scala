@@ -56,15 +56,15 @@ object SequenceDigest {
     )
 
   /** @group Optics */
-  def observeClass: Lens[SequenceDigest, ObserveClass] =
+  val observeClass: Lens[SequenceDigest, ObserveClass] =
     Focus[SequenceDigest](_.observeClass)
 
   /** @group Optics */
-  def plannedTime: Lens[SequenceDigest, PlannedTime] =
+  val plannedTime: Lens[SequenceDigest, PlannedTime] =
     Focus[SequenceDigest](_.plannedTime)
 
   /** @group Optics */
-  def offsets: Lens[SequenceDigest, SortedSet[Offset]] =
+  val offsets: Lens[SequenceDigest, SortedSet[Offset]] =
     Focus[SequenceDigest](_.offsets)
 
   given Monoid[SequenceDigest] with {
