@@ -14,7 +14,6 @@ import monocle.macros.GenPrism
  */
 sealed trait InstrumentExecutionConfig {
   def instrument: Instrument
-  def executionDigest: ExecutionDigest
 }
 
 object InstrumentExecutionConfig {
@@ -24,9 +23,6 @@ object InstrumentExecutionConfig {
   ) extends InstrumentExecutionConfig {
     def instrument: Instrument =
       Instrument.GmosNorth
-
-    def executionDigest: ExecutionDigest =
-      executionConfig.executionDigest
   }
 
   object GmosNorth {
@@ -42,9 +38,6 @@ object InstrumentExecutionConfig {
   ) extends InstrumentExecutionConfig {
     def instrument: Instrument =
       Instrument.GmosSouth
-
-    def executionDigest: ExecutionDigest =
-      executionConfig.executionDigest
   }
 
   object GmosSouth {

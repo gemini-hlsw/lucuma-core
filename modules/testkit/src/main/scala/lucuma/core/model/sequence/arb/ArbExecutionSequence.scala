@@ -15,7 +15,6 @@ import org.scalacheck.Gen
 trait ArbExecutionSequence {
   import ArbAtom.given
   import ArbBoundedCollection.*
-  import ArbSequenceDigest.given
 
   given [D: Arbitrary]: Arbitrary[ExecutionSequence[D]] =
     Arbitrary {
@@ -23,8 +22,7 @@ trait ArbExecutionSequence {
         as <- genBoundedNonEmptyList[Atom[D]](BoundedCollectionLimit)
         m  <- arbitrary[Boolean]
         n  <- Gen.posNum[Int].map(_ max as.length).map(PosInt.unsafeFrom)
-        d  <- arbitrary[SequenceDigest]
-      } yield ExecutionSequence(as.head, as.tail, m, n, d)
+      } yield ExecutionSequence(as.head, as.tail, m, n)
     }
 
   given [D: Cogen]: Cogen[ExecutionSequence[D]] =
@@ -32,14 +30,12 @@ trait ArbExecutionSequence {
       Atom[D],
       List[Atom[D]],
       Boolean,
-      Int,
-      SequenceDigest
+      Int
     )].contramap { a => (
       a.nextAtom,
       a.possibleFuture,
       a.hasMore,
-      a.atomCount.value,
-      a.digest
+      a.atomCount.value
     )}
 
 }

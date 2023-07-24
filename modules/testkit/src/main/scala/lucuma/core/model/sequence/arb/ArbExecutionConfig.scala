@@ -11,7 +11,6 @@ import org.scalacheck.Cogen
 
 trait ArbExecutionConfig {
   import ArbExecutionSequence.given
-  import ArbSetupTime.given
 
   given [S: Arbitrary, D: Arbitrary]: Arbitrary[ExecutionConfig[S, D]] =
     Arbitrary {
@@ -19,13 +18,12 @@ trait ArbExecutionConfig {
         s <- arbitrary[S]
         a <- arbitrary[Option[ExecutionSequence[D]]]
         n <- arbitrary[Option[ExecutionSequence[D]]]
-        t <- arbitrary[SetupTime]
-      } yield ExecutionConfig(s, a, n, t)
+      } yield ExecutionConfig(s, a, n)
     }
 
   given [S: Cogen, D: Cogen]: Cogen[ExecutionConfig[S, D]] =
-    Cogen[(S, Option[ExecutionSequence[D]], Option[ExecutionSequence[D]], SetupTime)].contramap { a =>
-      (a.static, a.acquisition, a.science, a.setup)
+    Cogen[(S, Option[ExecutionSequence[D]], Option[ExecutionSequence[D]])].contramap { a =>
+      (a.static, a.acquisition, a.science)
     }
 
 }
