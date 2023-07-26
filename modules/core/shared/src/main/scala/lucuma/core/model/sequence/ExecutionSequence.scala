@@ -5,7 +5,6 @@ package lucuma.core.model.sequence
 
 import cats.Eq
 import cats.syntax.all.*
-import eu.timepit.refined.types.numeric.PosInt
 import monocle.Focus
 import monocle.Lens
 
@@ -23,19 +22,11 @@ import monocle.Lens
  *                       not include all potential future atoms that are known
  *                       at the time of creation)
  * @param hasMore        whether the `possibleFuture` is incomplete
- * @param atomCount      number of atoms that we may expect, including the next
- *                       atom, the possible future, and any that haven't been
- *                       included in the possible future
- * @param digest         compilation of attributes about the sequence as a
- *                       whole, including `possibleFuture` and all expected
- *                       subsequent atoms
  */
 case class ExecutionSequence[D](
   nextAtom:       Atom[D],
   possibleFuture: List[Atom[D]],
-  hasMore:        Boolean,
-  atomCount:      PosInt,
-  digest:         SequenceDigest
+  hasMore:        Boolean
 )
 
 object ExecutionSequence {
@@ -52,21 +43,11 @@ object ExecutionSequence {
   def hasMore[D]: Lens[ExecutionSequence[D], Boolean] =
     Focus[ExecutionSequence[D]](_.hasMore)
 
-  /** @group Optics */
-  def atomCount[D]: Lens[ExecutionSequence[D], PosInt] =
-    Focus[ExecutionSequence[D]](_.atomCount)
-
-  /** @group Optics */
-  def digest[D]: Lens[ExecutionSequence[D], SequenceDigest] =
-    Focus[ExecutionSequence[D]](_.digest)
-
   given [D](using Eq[D]): Eq[ExecutionSequence[D]] =
     Eq.by { a => (
       a.nextAtom,
       a.possibleFuture,
-      a.hasMore,
-      a.atomCount.value,
-      a.digest
+      a.hasMore
     )}
 
 }

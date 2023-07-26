@@ -5,6 +5,8 @@ package lucuma.core.model.sequence
 package arb
 
 import cats.Order.catsKernelOrderingForOrder
+import eu.timepit.refined.scalacheck.all.*
+import eu.timepit.refined.types.numeric.NonNegInt
 import lucuma.core.enums.ObserveClass
 import lucuma.core.math.Offset
 import lucuma.core.math.arb.ArbOffset
@@ -26,18 +28,21 @@ trait ArbSequenceDigest {
         c  <- arbitrary[ObserveClass]
         t  <- arbitrary[PlannedTime]
         o  <- arbitrary[SortedSet[Offset]]
-      } yield SequenceDigest(c, t, o)
+        n  <- arbitrary[NonNegInt]
+      } yield SequenceDigest(c, t, o, n)
     }
 
   given Cogen[SequenceDigest] =
     Cogen[(
       ObserveClass,
       PlannedTime,
-      Set[Offset]
+      Set[Offset],
+      NonNegInt
     )].contramap { a => (
       a.observeClass,
       a.plannedTime,
-      a.offsets
+      a.offsets,
+      a.atomCount
     )}
 
 }

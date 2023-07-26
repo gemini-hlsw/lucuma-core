@@ -7,6 +7,8 @@ import cats.Eq
 import cats.Monoid
 import cats.Order.catsKernelOrderingForOrder
 import cats.syntax.monoid.*
+import eu.timepit.refined.cats.*
+import eu.timepit.refined.types.numeric.NonNegInt
 import lucuma.core.enums.ObserveClass
 import lucuma.core.math.Offset
 import monocle.Focus
@@ -21,11 +23,13 @@ import scala.collection.immutable.SortedSet
  * @param plannedTime  expected execution time for the sequence
  * @param offsets      set of offsets that are expected over the course of the
  *                     sequence execution
+ * @param atomCount    number of atoms in the sequence
  */
 case class SequenceDigest(
   observeClass: ObserveClass,
   plannedTime:  PlannedTime,
-  offsets:      SortedSet[Offset]
+  offsets:      SortedSet[Offset],
+  atomCount:    NonNegInt
 ) {
 
   def add(o: ObserveClass): SequenceDigest =
@@ -37,12 +41,13 @@ case class SequenceDigest(
   def add(o: Offset): SequenceDigest =
     SequenceDigest.offsets.modify(_ + o)(this)
 
-  def add(d: SequenceDigest): SequenceDigest =
-    SequenceDigest(
-      observeClass |+| d.observeClass,
-      plannedTime  |+| d.plannedTime,
-      offsets.union(d.offsets)
-    )
+  def incrementAtomCount: Option[SequenceDigest] =
+    NonNegInt
+      .from(atomCount.value + 1)
+      .toOption
+      .map { ac =>
+        SequenceDigest.atomCount.replace(ac)(this)
+      }
 
 }
 
@@ -52,7 +57,8 @@ object SequenceDigest {
     SequenceDigest(
       Monoid[ObserveClass].empty,
       PlannedTime.Zero,
-      SortedSet.empty
+      SortedSet.empty,
+      NonNegInt.unsafeFrom(0)
     )
 
   /** @group Optics */
@@ -67,19 +73,16 @@ object SequenceDigest {
   val offsets: Lens[SequenceDigest, SortedSet[Offset]] =
     Focus[SequenceDigest](_.offsets)
 
-  given Monoid[SequenceDigest] with {
-    def empty: SequenceDigest =
-      Zero
-
-    def combine(a: SequenceDigest, b: SequenceDigest): SequenceDigest =
-      a.add(b)
-  }
+  /** @group Optics */
+  val atomCount: Lens[SequenceDigest, NonNegInt] =
+    Focus[SequenceDigest](_.atomCount)
 
   given Eq[SequenceDigest] =
     Eq.by { a => (
       a.observeClass,
       a.plannedTime,
-      a.offsets
+      a.offsets,
+      a.atomCount
     )}
 
 }

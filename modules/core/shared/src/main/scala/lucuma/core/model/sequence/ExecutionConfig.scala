@@ -18,20 +18,8 @@ import monocle.Lens
 case class ExecutionConfig[S, D](
   static:        S,
   acquisition:   Option[ExecutionSequence[D]],
-  science:       Option[ExecutionSequence[D]],
-  setup:         SetupTime
-) {
-
-  /**
-   * Execution summary computed from the sequences.
-   */
-  def executionDigest: ExecutionDigest =
-    ExecutionDigest(
-      setup,
-      acquisition.fold(SequenceDigest.Zero)(_.digest),
-      science.fold(SequenceDigest.Zero)(_.digest)
-    )
-}
+  science:       Option[ExecutionSequence[D]]
+)
 
 object ExecutionConfig {
 
@@ -39,8 +27,7 @@ object ExecutionConfig {
     Eq.by { a => (
       a.static,
       a.acquisition,
-      a.science,
-      a.setup
+      a.science
     )}
 
   /** @group Optics */
@@ -54,9 +41,5 @@ object ExecutionConfig {
   /** @group Optics */
   def science[S, D]: Lens[ExecutionConfig[S, D], Option[ExecutionSequence[D]]] =
     Focus[ExecutionConfig[S, D]](_.science)
-
-  /** @group Optics */
-  def setup[S, D]: Lens[ExecutionConfig[S, D], SetupTime] =
-    Focus[ExecutionConfig[S, D]](_.setup)
 
 }
