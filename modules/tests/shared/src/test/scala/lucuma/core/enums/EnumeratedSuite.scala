@@ -27,7 +27,6 @@ final class EnumeratedSuite extends DisciplineSuite {
   checkEnumLaws[Site]
   checkEnumLaws[TwilightType]
   checkEnumLaws[EventType]
-  checkEnumLaws[KeywordName]
 
   // Derivation
   checkEnumLaws[Theme]
