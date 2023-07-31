@@ -14,7 +14,7 @@ final class PlannedTimeSuite extends DisciplineSuite {
 
   import ArbPlannedTime.given
 
-  checkAll("Eq[PlannedTime]",     EqTests[PlannedTime].eqv)
+  checkAll("Order[PlannedTime]",  OrderTests[PlannedTime].order)
   checkAll("Monoid[PlannedTime]", MonoidTests[PlannedTime].monoid)
 
   test("monoid") {
