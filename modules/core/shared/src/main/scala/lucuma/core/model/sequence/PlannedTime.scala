@@ -3,12 +3,12 @@
 
 package lucuma.core.model.sequence
 
-import cats.Eq
 import cats.Monoid
+import cats.Order
 import cats.implicits.catsKernelOrderingForOrder
-import cats.syntax.eq.*
 import cats.syntax.foldable.*
 import cats.syntax.functor.*
+import cats.syntax.order.*
 import lucuma.core.enums.ChargeClass
 import lucuma.core.enums.ObserveClass
 import lucuma.core.util.TimeSpan
@@ -109,7 +109,16 @@ object PlannedTime {
   given Monoid[PlannedTime] =
     Monoid.instance(Zero, _ +| _)
 
-  given Eq[PlannedTime] =
-    Eq.by(_.charges)
+  /**
+   * Order by the sum of charges, then by program then partner.
+   */
+  given Order[PlannedTime] =
+    Order.whenEqual[PlannedTime](
+      Order.by(pt => ChargeClass.values.toList.foldMap(pt.getOrZero)),  // Order.by(_.sum) picks up Map's sum :-/
+      Order.whenEqual(
+        Order.by(_.getOrZero(ChargeClass.Program)),
+        Order.by(_.getOrZero(ChargeClass.Partner))
+      )
+    )
 
 }
