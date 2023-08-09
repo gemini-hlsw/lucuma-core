@@ -67,7 +67,7 @@ object Dataset {
       Option.when(localDate.getYear >= 0 && localDate.getYear <= 9999)(Filename(site, localDate, index))
 
     private val DateFormatter: DateTimeFormatter =
-      DateTimeFormatter.ofPattern("yyyyMMdd")
+      DateTimeFormatter.ofPattern("uuuuMMdd")
 
     private val parseSiteChar: Site => Char = {
       case Site.GN => 'N'
