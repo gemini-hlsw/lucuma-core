@@ -4,5 +4,5 @@
 package lucuma.core.model
 
 package object syntax {
-  object all extends ToNonNegDurationOps
+  object all extends ToNonNegDurationOps with ToTrackingOps
 }

@@ -4,9 +4,11 @@
 package lucuma.core.model
 
 import cats.Eq
+import cats.data.NonEmptyList
 import cats.derived.*
 import cats.syntax.all.*
 import lucuma.core.math.Coordinates
+import lucuma.core.model.syntax.tracking.*
 import lucuma.core.util.NewType
 
 import java.time.Instant
@@ -24,17 +26,24 @@ sealed trait ObjectTracking derives Eq:
   def baseCoordinates: Coordinates
 
 object ObjectTracking:
-  case class ConstantTracking(coord: Coordinates) extends ObjectTracking derives Eq:
-    def at(i: Instant): Option[CoordinatesAtVizTime] = CoordinatesAtVizTime(coord).some
-    def baseCoordinates: Coordinates = coord
 
   case class SiderealObjectTracking(tracking: SiderealTracking) extends ObjectTracking derives Eq:
     def at(i: Instant): Option[CoordinatesAtVizTime] =
       tracking.at(i).map(CoordinatesAtVizTime(_))
     def baseCoordinates: Coordinates                 = tracking.baseCoordinates
 
-  def const(coord: Coordinates): ObjectTracking = ConstantTracking(coord)
+  case class SiderealAsterismTracking(trackings : NonEmptyList[SiderealTracking]) extends ObjectTracking derives Eq:
+    def at(i: Instant): Option[CoordinatesAtVizTime] =
+      trackings.centerOfAt(i).map(CoordinatesAtVizTime(_))
+    def baseCoordinates: Coordinates                 = trackings.centerOf
 
   def fromTarget(target: Target): ObjectTracking = target match
     case t: Target.Sidereal => SiderealObjectTracking(t.tracking)
     case _                  => sys.error("Only sidereal targets supported")
+
+  def fromAsterism(targets: NonEmptyList[Target]): ObjectTracking = 
+    val trackingList = targets.toList.traverse(Target.sidereal.getOption).flatMap(NonEmptyList.fromList)
+    trackingList.fold(sys.error("Only sidereal targets supported")) { sidereals =>
+      if (sidereals.length === 1) SiderealObjectTracking(sidereals.head.tracking)
+      else SiderealAsterismTracking(sidereals.map(_.tracking))
+    }
