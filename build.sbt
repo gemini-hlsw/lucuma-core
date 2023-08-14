@@ -9,7 +9,7 @@ Global / concurrentRestrictions += Tags.limit(Tags.Compile, 1)
 ThisBuild / crossScalaVersions := Seq("3.3.1-RC4")
 ThisBuild / scalacOptions += "-language:implicitConversions" // TODO
 
-lazy val catsVersion           = "2.9.0"
+lazy val catsVersion           = "2.10.0"
 lazy val kindProjectorVersion  = "0.13.2"
 lazy val monocleVersion        = "3.2.0"
 lazy val scalaJavaTimeVersion  = "2.5.0"
