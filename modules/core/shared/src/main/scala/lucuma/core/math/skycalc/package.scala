@@ -17,6 +17,17 @@ extension (r: TimeRange)
   def start: Long    = r._1
   def end: Long      = r._2
 
+// Calculate the parallactic angle for the given object at the given time.
+def parallacticAngle(site: Site, tracking: ObjectTracking, vizTime: Instant): Angle = {
+  val skycalc = new ImprovedSkyCalc(site.place)
+
+  val c = tracking
+    .at(vizTime)
+    .map(_.value)
+    .getOrElse(tracking.baseCoordinates)
+  skycalc.calculate(c, vizTime, false).parallacticAngle
+}
+
 def averageParallacticAngle(site: Site, tracking: ObjectTracking, vizTime: Instant): Option[Angle] =
   val defined: TimeRange = (vizTime.toEpochMilli(), vizTime.toEpochMilli() + 1.hour.toMillis)
   val rate: Long         = 30.seconds.toMillis
