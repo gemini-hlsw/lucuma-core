@@ -56,12 +56,23 @@ object GmosSouthFpu {
     fromTag(s).getOrElse(throw new NoSuchElementException(s"GmosSouthFpu: Invalid tag: '$s'"))
 
   /** @group Typeclass Instances */
-  implicit val GmosSouthFpuEnumerated: Enumerated[GmosSouthFpu] =
+  given Enumerated[GmosSouthFpu] =
     new Enumerated[GmosSouthFpu] {
       def all: List[GmosSouthFpu] = GmosSouthFpu.all
       def tag(a: GmosSouthFpu): String = a.tag
       override def unsafeFromTag(s: String): GmosSouthFpu =
         GmosSouthFpu.unsafeFromTag(s)
+    }
+
+  extension (f: GmosSouthFpu)
+    def isIFU: Boolean = f match {
+      case Ifu2Slits |
+           IfuBlue |
+           IfuRed |
+           IfuNS2Slits |
+           IfuNSBlue |
+           IfuNSRed      => true
+      case _             => false
     }
 
 }
