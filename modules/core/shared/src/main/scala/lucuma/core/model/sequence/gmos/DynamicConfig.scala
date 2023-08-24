@@ -6,6 +6,7 @@ package lucuma.core.model.sequence.gmos
 import cats.Eq
 import cats.syntax.all.*
 import lucuma.core.enums.*
+import lucuma.core.math.Wavelength
 import lucuma.core.util.TimeSpan
 import monocle.Focus
 import monocle.Lens
@@ -24,7 +25,10 @@ object DynamicConfig {
     gratingConfig: Option[GmosGratingConfig.North],
     filter:        Option[GmosNorthFilter],
     fpu:           Option[GmosFpuMask[GmosNorthFpu]]
-  ) extends DynamicConfig
+  ) extends DynamicConfig {
+    val centralWavelength: Option[Wavelength] =
+      gratingConfig.fold(filter.map(_.wavelength))(_.wavelength.some)
+  }
 
   object GmosNorth {
     implicit val eqInstrumentConfigGmosNorth: Eq[GmosNorth] =
@@ -67,7 +71,10 @@ object DynamicConfig {
     gratingConfig: Option[GmosGratingConfig.South],
     filter:        Option[GmosSouthFilter],
     fpu:           Option[GmosFpuMask[GmosSouthFpu]]
-  ) extends DynamicConfig
+  ) extends DynamicConfig{
+    val centralWavelength: Option[Wavelength] =
+      gratingConfig.fold(filter.map(_.wavelength))(_.wavelength.some)
+  }
 
   object GmosSouth {
 
