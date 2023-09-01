@@ -29,10 +29,10 @@ sealed trait SpectralDefinition[T] {
    * @tparam `T0`
    *   `Integrated` or `Surface`
    */
-  def to[T0](implicit
-    convBrightness: TagConverter[Brightness[T], Brightness[T0]],
-    convLine:       TagConverter[LineFlux[T], LineFlux[T0]],
-    convContinuum:  TagConverter[FluxDensityContinuum[T], FluxDensityContinuum[T0]]
+  def to[T0](using
+    TagConverter[Brightness[T], Brightness[T0]],
+    TagConverter[LineFlux[T], LineFlux[T0]],
+    TagConverter[FluxDensityContinuum[T], FluxDensityContinuum[T0]]
   ): SpectralDefinition[T0] = this match {
     case a @ SpectralDefinition.BandNormalized(_, _) => a.to[T0]
     case a @ SpectralDefinition.EmissionLines(_, _)  => a.to[T0]
@@ -53,8 +53,7 @@ object SpectralDefinition {
      * @tparam `T0`
      *   `Integrated` or `Surface`
      */
-    def to[T0](implicit
-      conv: TagConverter[Brightness[T], Brightness[T0]]
+    def to[T0](using TagConverter[Brightness[T], Brightness[T0]]
     ): BandNormalized[T0] =
       BandNormalized(
         sed,
@@ -63,9 +62,7 @@ object SpectralDefinition {
   }
 
   object BandNormalized {
-    implicit def eqBandNormalized[T](implicit
-      bbeq: Eq[BrightnessMeasure[T]]
-    ): Eq[BandNormalized[T]] =
+    given eqBandNormalized[T](using Eq[BrightnessMeasure[T]]): Eq[BandNormalized[T]] =
       Eq.by(x => (x.sed, x.brightnesses))
 
     /** @group Optics */
@@ -97,9 +94,9 @@ object SpectralDefinition {
      * @tparam `T0`
      *   `Integrated` or `Surface`
      */
-    def to[T0](implicit
-      convLine:      TagConverter[LineFlux[T], LineFlux[T0]],
-      convContinuum: TagConverter[FluxDensityContinuum[T], FluxDensityContinuum[T0]]
+    def to[T0](using
+      TagConverter[LineFlux[T], LineFlux[T0]],
+      TagConverter[FluxDensityContinuum[T], FluxDensityContinuum[T0]]
     ): EmissionLines[T0] =
       EmissionLines(
         lines.map { case (wavelength, line) => wavelength -> line.to[T0] },
@@ -108,7 +105,7 @@ object SpectralDefinition {
   }
 
   object EmissionLines {
-    implicit def eqEmissionLineSpectralDefinition[T]: Eq[EmissionLines[T]] =
+    given eqEmissionLineSpectralDefinition[T]: Eq[EmissionLines[T]] =
       Eq.by(x => (x.lines, x.fluxDensityContinuum))
 
     /** @group Optics */
@@ -128,13 +125,12 @@ object SpectralDefinition {
       Focus[EmissionLines[T]](_.fluxDensityContinuum)
   }
 
-  implicit def eqSpectralDefinition[T](implicit
-    tbeq: Eq[BrightnessMeasure[T]]
-  ): Eq[SpectralDefinition[T]] = Eq.instance {
-    case (a @ BandNormalized(_, _), b @ BandNormalized(_, _)) => a === b
-    case (a @ EmissionLines(_, _), b @ EmissionLines(_, _))   => a === b
-    case _                                                    => false
-  }
+  given eqSpectralDefinition[T](using Eq[BrightnessMeasure[T]]): Eq[SpectralDefinition[T]] =
+    Eq.instance {
+      case (a @ BandNormalized(_, _), b @ BandNormalized(_, _)) => a === b
+      case (a @ EmissionLines(_, _), b @ EmissionLines(_, _))   => a === b
+      case _                                                    => false
+    }
 
   /** @group Optics */
   def bandNormalized[T]: Prism[SpectralDefinition[T], BandNormalized[T]] =

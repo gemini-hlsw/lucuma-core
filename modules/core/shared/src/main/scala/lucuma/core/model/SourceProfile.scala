@@ -4,13 +4,17 @@
 package lucuma.core.model
 
 import cats.Eq
+import cats.Foldable
+import cats.Functor
 import cats.syntax.all.*
 import eu.timepit.refined.cats.given
 import lucuma.core.enums.Band
 import lucuma.core.math.Angle
 import lucuma.core.math.BrightnessUnits.*
+import lucuma.core.math.BrightnessValue
 import lucuma.core.math.Wavelength
 import lucuma.core.math.dimensional.*
+import lucuma.core.model.SpectralDefinition.BandNormalized
 import monocle.Focus
 import monocle.Lens
 import monocle.Optional
@@ -60,7 +64,7 @@ object SourceProfile {
   }
 
   object Point {
-    implicit val eqPoint: Eq[Point] = Eq.by(_.spectralDefinition)
+    given Eq[Point] = Eq.by(_.spectralDefinition)
 
     /** @group Optics */
     val spectralDefinition: Lens[Point, SpectralDefinition[Integrated]] =
@@ -84,8 +88,9 @@ object SourceProfile {
       Gaussian(Angle.Angle0, spectralDefinition.to[Integrated])
 
   }
+
   object Uniform {
-    implicit val eqUniform: Eq[Uniform] = Eq.by(_.spectralDefinition)
+    given Eq[Uniform] = Eq.by(_.spectralDefinition)
 
     /** @group Optics */
     val spectralDefinition: Lens[Uniform, SpectralDefinition[Surface]] =
@@ -113,9 +118,10 @@ object SourceProfile {
     override def toGaussian: Gaussian = this
 
   }
+
   object Gaussian {
 
-    implicit val eqGaussian: Eq[Gaussian] = Eq.by(x => (x.fwhm, x.spectralDefinition))
+    given Eq[Gaussian] = Eq.by(x => (x.fwhm, x.spectralDefinition))
 
     /** @group Optics */
     val fwhm: Lens[Gaussian, Angle] =
@@ -126,7 +132,7 @@ object SourceProfile {
       Focus[Gaussian](_.spectralDefinition)
   }
 
-  implicit val eqSourceProfile: Eq[SourceProfile] = Eq.instance {
+  given Eq[SourceProfile] = Eq.instance {
     case (a @ Point(_), b @ Point(_))             => a === b
     case (a @ Uniform(_), b @ Uniform(_))         => a === b
     case (a @ Gaussian(_, _), b @ Gaussian(_, _)) => a === b
@@ -267,4 +273,74 @@ object SourceProfile {
   /** @group Optics */
   val surfaceFluxDensityContinuum: Optional[SourceProfile, FluxDensityContinuumMeasure[Surface]] =
     surfaceSpectralDefinition.andThen(SpectralDefinition.fluxDensityContinuum[Surface])
-}
+
+  /**
+   * Returns the band and brightness value for the band closest to the given wavelength.
+   */
+  def extractBand[T](w: Wavelength, bMap: SortedMap[Band, BrightnessMeasure[T]]): Option[(Band, BrightnessValue, Units)] =
+    bMap.minByOption { case (b, _) =>
+      (w.toPicometers.value.value - b.center.toPicometers.value.value).abs
+    }.map(x => (x._1, x._2.value, x._2.units))
+
+  extension(sp: SourceProfile)
+    /**
+     * Returns the band and brightness of a source profile for the band closest to the given wavelength.
+     * It is only valid for source profiles with integrated or surface brightnesses.
+     * (Emission lines not supported)
+     */
+    def nearestBand(wavelength: Wavelength): Option[(Band, BrightnessValue, Units)] =
+      SourceProfile
+        .integratedBrightnesses
+        .getOption(sp)
+        .flatMap(bMap => extractBand[Integrated](wavelength, bMap))
+        .orElse(
+          SourceProfile
+            .surfaceBrightnesses
+            .getOption(sp)
+            .flatMap(bMap => extractBand[Surface](wavelength, bMap))
+        )
+
+    /**
+     * Can I compare the brightnesses of this source profile to the brightnesses of the given source profile?
+     */
+    def canCompareBrightnessesTo(sp2: SourceProfile): Boolean =
+      (sp, sp2) match {
+        case (Point(BandNormalized(_, _)), Point(BandNormalized(_, _)))             => true
+        case (Gaussian(_, BandNormalized(_, _)), Gaussian(_, BandNormalized(_, _))) => true
+        case (Uniform(BandNormalized(_, _)), Uniform(BandNormalized(_, _)))         => true
+        case _                                                                      => false
+      }
+
+  extension[G[_]: Foldable](e: G[SourceProfile])
+    /**
+     * Can I compare the brightnesses of a collection of source profiles
+     */
+    def canCompareBrightnesses: Boolean =
+      e.sliding2.map(_.canCompareBrightnessesTo(_)).forall(identity)
+
+    /**
+     * Attempt to find the brightest target at a given wavelength.
+     *
+     * Deterimining the brightest target is a little tricky, as targets may have different
+     * magnitudes in different bands. They also can have different profiles and SED
+     *
+     * This method attempts to find the brightest target at a given wavelength by finding
+     * the nearest band to the given wavelength for each target, and then comparing them
+     *
+     * Only source profiles that can be compared will give aa result. e.g. targets with a Point Source
+     * and a Gaussian profile cannot be compared.
+     *
+     * Even with this limitations this method is useful for finding the brightest target in an asterism, though in general the user may need to override it.
+     *
+     * A more advanced version could also take into account the SED of the target, but this is not currently implemented.
+     */
+    def brightestAt(w: Wavelength): Option[SourceProfile] =
+      if (e.isEmpty || !canCompareBrightnesses) None
+      else e.minimumByOption(_.nearestBand(w).map(_._2.value)) }
+
+  /**
+   * This method is used to find the brightest target in an colllection of something (e.g. asterism.)
+   */
+  extension[A, G[_]: Functor: Foldable](e: G[A])
+    def brightestProfileAt(fn: A => SourceProfile)(w: Wavelength): Option[A] =
+      e.map(a => (a, fn(a).nearestBand(w).map(_._2.value))).minimumByOption(_._2).map(_._1)
