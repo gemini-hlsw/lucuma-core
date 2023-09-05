@@ -9,6 +9,7 @@ import cats.syntax.all.*
 import coulomb.*
 import coulomb.syntax.*
 import eu.timepit.refined.cats.*
+import eu.timepit.refined.numeric.Positive
 import lucuma.core.enums.Band
 import lucuma.core.enums.StellarLibrarySpectrum
 import lucuma.core.math.Angle
@@ -27,6 +28,7 @@ import lucuma.core.math.units.*
 import lucuma.core.model.arb.*
 import lucuma.core.util.arb.ArbCollection
 import lucuma.core.util.arb.ArbEnumerated
+import lucuma.refined.*
 import monocle.law.discipline.*
 import munit.*
 
@@ -45,13 +47,19 @@ final class SourceProfileSuite extends DisciplineSuite {
   import ArbWavelength.*
   import ArbCollection.given
 
+  val sd1Brightnesses = SortedMap[Band, BrightnessMeasure[Integrated]](
+      Band.R -> Band.R.defaultUnits[Integrated].withValueTagged(BrightnessValue.unsafeFrom(10.0))
+    )
+
+  val sd1BrightnessesB = sd1Brightnesses ++ SortedMap[Band, BrightnessMeasure[Integrated]](
+      Band.SloanR -> Band.U.defaultUnits[Integrated].withValueTagged(BrightnessValue.unsafeFrom(12.0))
+    )
+
   // Conversions
   val sd1Integrated: SpectralDefinition[Integrated] =
     SpectralDefinition.BandNormalized(
       UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.A0I).some,
-      SortedMap(
-        Band.R -> Band.R.defaultUnits[Integrated].withValueTagged(BrightnessValue.unsafeFrom(10.0))
-      )
+      sd1Brightnesses
     )
 
   val sd1Surface: SpectralDefinition[Surface] =
@@ -118,6 +126,71 @@ final class SourceProfileSuite extends DisciplineSuite {
     assertEquals(uniform2.toGaussian, gaussian2)
     assertEquals(gaussian1.toGaussian, gaussian1)
     assertEquals(gaussian2.toGaussian, gaussian2)
+  }
+
+  test("extractBand") {
+    val wv = Wavelength(578000.refined[Positive])
+    assert(SourceProfile.extractBand(wv, SortedMap.empty).isEmpty)
+    assert(SourceProfile.extractBand(wv, sd1Brightnesses).exists(_._1 === Band.R))
+    assert(SourceProfile.extractBand(wv, sd1BrightnessesB).exists(_._1 === Band.SloanR))
+  }
+
+  test("nearestBand") {
+    val wv = Wavelength(578000.refined[Positive])
+    assert(point1.nearestBand(wv).exists(_._1 === Band.R))
+    assert(point2.nearestBand(wv).isEmpty) // Emission lines not supported
+    assert(uniform1.nearestBand(wv).exists(_._1 === Band.R))
+    assert(uniform2.nearestBand(wv).isEmpty) // Emission lines not supported
+    assert(gaussian1.nearestBand(wv).exists(_._1 === Band.R))
+    assert(gaussian2.nearestBand(wv).isEmpty) // Emission lines not supported
+  }
+
+  test("canCompareBrightnessesTo") {
+    assert(point1.canCompareBrightnessesTo(point1))
+    assert(!point1.canCompareBrightnessesTo(point2))
+    assert(!point1.canCompareBrightnessesTo(uniform1))
+    assert(!point1.canCompareBrightnessesTo(uniform2))
+    assert(!point1.canCompareBrightnessesTo(gaussian1))
+    assert(!point1.canCompareBrightnessesTo(gaussian2))
+
+    assert(uniform1.canCompareBrightnessesTo(uniform1))
+
+    assert(!uniform2.canCompareBrightnessesTo(uniform2))
+    assert(!uniform2.canCompareBrightnessesTo(point1))
+    assert(!uniform2.canCompareBrightnessesTo(point2))
+    assert(!uniform2.canCompareBrightnessesTo(uniform1))
+    assert(!uniform2.canCompareBrightnessesTo(gaussian1))
+    assert(!uniform2.canCompareBrightnessesTo(gaussian2))
+  }
+
+  test("canCompareBrightnesses") {
+    assert(List.empty[SourceProfile].canCompareBrightnesses)
+    assert(List(point1).canCompareBrightnesses)
+    assert(List(point1, point1).canCompareBrightnesses)
+    assert(!List(point1, point2).canCompareBrightnesses)
+    assert(!List(point1, gaussian2).canCompareBrightnesses)
+    assert(!List(point2, gaussian1).canCompareBrightnesses)
+    assert(!List(uniform1, gaussian2).canCompareBrightnesses)
+  }
+
+  test("canCompareBrightnesses") {
+    val wv = Wavelength(578000.refined[Positive])
+    assert(List.empty[SourceProfile].brightestAt(wv).isEmpty)
+    assert(List(point1).brightestAt(wv).exists(_ === point1))
+
+    val sd2Brightnesses = SortedMap[Band, BrightnessMeasure[Integrated]](
+      Band.R -> Band.R.defaultUnits[Integrated].withValueTagged(BrightnessValue.unsafeFrom(5.0))
+    )
+
+    val sd2Integrated: SpectralDefinition[Integrated] =
+      SpectralDefinition.BandNormalized(
+        UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.A0I).some,
+        sd2Brightnesses
+      )
+
+    val point3 = SourceProfile.Point(sd2Integrated)
+
+    assert(List(point1, point3).brightestAt(wv).exists(_ === point3))
   }
 
   // Laws for SourceProfile.Point
