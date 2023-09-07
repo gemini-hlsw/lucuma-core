@@ -13,8 +13,8 @@ import cats.laws.discipline.arbitrary.*
 import cats.syntax.all.*
 import io.circe.testing.CodecTests
 import io.circe.testing.instances.arbitraryJson
-import lucuma.core.data.arb.ArbZipper
 import lucuma.core.data.ZipperCodec.given
+import lucuma.core.data.arb.ArbZipper
 import monocle.law.discipline.TraversalTests
 import org.scalacheck.Prop.*
 
