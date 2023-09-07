@@ -216,7 +216,7 @@ class Zipper[A] protected (val lefts: List[A], val focus: A, val rights: List[A]
     state.map(_.hashCode()).foldLeft(0)((a, b) => 31 * a + b)
 }
 
-object Zipper extends ZipperFactory[Zipper] with ZipperCodec {
+object Zipper extends ZipperFactory[Zipper] {
 
   def apply[A](lefts: List[A], focus: A, rights: List[A]): Zipper[A] =
     new Zipper(lefts, focus, rights)
@@ -343,3 +343,4 @@ trait ZipperCodec {
 
 }
 
+object ZipperCodec extends ZipperCodec
