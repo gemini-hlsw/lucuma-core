@@ -5,9 +5,14 @@ package lucuma
 package core
 package data
 
-import cats._
+import cats.*
 import cats.data.NonEmptyList
-import cats.syntax.all._
+import cats.syntax.all.*
+import io.circe.Decoder
+import io.circe.DecodingFailure
+import io.circe.Encoder
+import io.circe.Json
+import io.circe.syntax.*
 import monocle.Prism
 import monocle.Traversal
 
@@ -110,14 +115,14 @@ protected[data] trait ZipperOps[A, +Z] {
    * Focuses on the first element (left to right) which is a maximum element
    * in the zipper according to Order[A].
    */
-  def focusMax(implicit ev: Order[A]): Z =
+  def focusMax(using Order[A]): Z =
     focusCompare(_ > _)
 
   /**
    * Focuses on the first element (left to right) which is a minimum element
    * in the zipper according to Order[A].
    */
-  def focusMin(implicit ev: Order[A]): Z =
+  def focusMin(using Order[A]): Z =
     focusCompare(_ < _)
 
   private def focusCompare(f: (A, A) => Boolean): Z = {
@@ -248,10 +253,10 @@ object Zipper extends ZipperFactory[Zipper] {
    * Based on traverse implementation for List
    * @group Typeclass Instances
    */
-  implicit val traverse: Traverse[Zipper] = new Traverse[Zipper] {
+  given Traverse[Zipper] = new Traverse[Zipper] {
     override def traverse[G[_], A, B](
       fa: Zipper[A]
-    )(f:  A => G[B])(implicit G: Applicative[G]): G[Zipper[B]] =
+    )(f:  A => G[B])(using Applicative[G]): G[Zipper[B]] =
       (fa.lefts.traverse(f), f(fa.focus), fa.rights.traverse(f)).mapN {
         case (l, f, r) => build(l, f, r)
       }
@@ -300,3 +305,42 @@ object Zipper extends ZipperFactory[Zipper] {
       }
     }
 }
+
+// Where a Zipper is represented as a type with `selected: A` and `all: [A!]!`
+// fields.
+
+trait ZipperCodec {
+
+  given [A: Decoder : Eq]: Decoder[Zipper[A]] =
+    Decoder.instance { c =>
+      for
+        list   <- c.downField("all").as[List[A]]
+        idx    <- c.downField("index").as[Int] orElse
+                    c.downField("selected").as[A].flatMap(a =>
+                      list
+                        .indexWhere(_ === a)
+                        .some
+                        .filter(_ >= 0)
+                        .toRight(DecodingFailure("The `selected` item is not a member of the `all` list of items.", c.history))
+                      )
+        zipper <- Zipper.fromList(list)
+                    .toRight(DecodingFailure("The `all` list of items must be non-empty.", c.history))
+                    .flatMap(
+                      _.focusIndex(idx)
+                        .toRight(DecodingFailure("The `index` value is out of bounds.", c.history))
+                    )
+      yield zipper
+    }
+
+  given [A: Encoder]: Encoder[Zipper[A]] =
+    Encoder.instance { (a: Zipper[A]) =>
+      Json.obj(
+        "selected" -> a.focus.asJson,
+        "index"    -> a.indexOfFocus.asJson,
+        "all"      -> a.toList.asJson
+      )
+    }
+
+}
+
+object ZipperCodec extends ZipperCodec

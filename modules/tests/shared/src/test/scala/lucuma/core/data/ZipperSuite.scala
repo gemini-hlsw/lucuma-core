@@ -9,11 +9,14 @@ import cats.data.NonEmptyList
 import cats.kernel.laws.discipline.EqTests
 import cats.laws.discipline.FunctorTests
 import cats.laws.discipline.TraverseTests
-import cats.laws.discipline.arbitrary._
-import cats.syntax.all._
+import cats.laws.discipline.arbitrary.*
+import cats.syntax.all.*
+import io.circe.testing.CodecTests
+import io.circe.testing.instances.arbitraryJson
+import lucuma.core.data.ZipperCodec.given
 import lucuma.core.data.arb.ArbZipper
 import monocle.law.discipline.TraversalTests
-import org.scalacheck.Prop._
+import org.scalacheck.Prop.*
 
 /**
   * Tests the Zipper typeclasses
@@ -196,4 +199,5 @@ final class ZipperSuite extends munit.DisciplineSuite {
   )
   checkAll("Eq[Zipper]", EqTests[Zipper[Int]].eqv)
   checkAll("Zipper.zipperT", TraversalTests(Zipper.zipperT[Int]))
+  checkAll("Codec[Zipper]", CodecTests[Zipper[Int]].codec)
 }
