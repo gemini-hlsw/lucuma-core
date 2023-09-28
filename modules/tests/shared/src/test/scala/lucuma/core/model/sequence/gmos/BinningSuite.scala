@@ -1,0 +1,75 @@
+// Copyright (c) 2016-2023 Association of Universities for Research in Astronomy, Inc. (AURA)
+// For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
+
+package lucuma.core.model.sequence.gmos
+
+import cats.syntax.option.*
+import lucuma.core.enums.GmosNorthFpu
+import lucuma.core.enums.GmosNorthGrating
+import lucuma.core.enums.GmosXBinning
+import lucuma.core.enums.GmosYBinning
+import lucuma.core.enums.ImageQuality
+import lucuma.core.math.Angle
+import lucuma.core.math.BrightnessUnits.Integrated
+import lucuma.core.model.SourceProfile
+import lucuma.core.model.SpectralDefinition.BandNormalized
+import munit.FunSuite
+
+import scala.collection.immutable.SortedMap
+
+final class BinningSuite extends FunSuite {
+
+  val bandNormalized: BandNormalized[Integrated] =
+    BandNormalized(none, SortedMap.empty)
+
+  //  Examples with B600
+  //  slit=0.50, fwhm=0.6: 2 2
+  //  slit=0.75, fwhm=1.0: 2 4
+  //  slit=1.00, fwhm=1.5: 4 4
+
+  private def testLongslit(
+    fpu:        GmosNorthFpu,
+    srcProfile: SourceProfile,
+    iq:         ImageQuality,
+    grating:    GmosNorthGrating,
+    expectX:    GmosXBinning,
+    expectY:    GmosYBinning
+  ): Unit = {
+    val xy = longslit.northBinning(fpu, srcProfile, iq, grating)
+    assertEquals(xy, (expectX, expectY))
+  }
+
+  test("longslit, B600, slit=0.50, fwhm=0.6: 2 2") {
+    testLongslit(
+      GmosNorthFpu.LongSlit_0_50,
+      SourceProfile.Gaussian(Angle.microarcseconds.reverseGet(600_000L), bandNormalized),
+      ImageQuality.PointOne,
+      GmosNorthGrating.B600_G5307,
+      GmosXBinning.Two,
+      GmosYBinning.Two
+    )
+  }
+
+  test("longslit, B600, slit=0.75, fwhm=1.0: 2 4") {
+    testLongslit(
+      GmosNorthFpu.LongSlit_0_75,
+      SourceProfile.Gaussian(Angle.microarcseconds.reverseGet(1_000_000L), bandNormalized),
+      ImageQuality.PointOne,
+      GmosNorthGrating.B600_G5307,
+      GmosXBinning.Two,
+      GmosYBinning.Four
+    )
+  }
+
+  test("longslit, B600, slit=1.00, fwhm=1.5: 4 4") {
+    testLongslit(
+      GmosNorthFpu.LongSlit_1_00,
+      SourceProfile.Gaussian(Angle.microarcseconds.reverseGet(1_500_000L), bandNormalized),
+      ImageQuality.PointOne,
+      GmosNorthGrating.B600_G5307,
+      GmosXBinning.Four,
+      GmosYBinning.Four
+    )
+  }
+
+}
