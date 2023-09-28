@@ -10,7 +10,6 @@ import lucuma.core.enums.GmosXBinning
 import lucuma.core.enums.GmosYBinning
 import lucuma.core.enums.ImageQuality
 import lucuma.core.math.Angle
-import lucuma.core.math.BrightnessUnits.Integrated
 import lucuma.core.model.SourceProfile
 import lucuma.core.model.SpectralDefinition.BandNormalized
 import munit.FunSuite
@@ -19,7 +18,7 @@ import scala.collection.immutable.SortedMap
 
 final class BinningSuite extends FunSuite {
 
-  val bandNormalized: BandNormalized[Integrated] =
+  def bandNormalized[T]: BandNormalized[T] =
     BandNormalized(none, SortedMap.empty)
 
   //  Examples with B600
@@ -68,6 +67,17 @@ final class BinningSuite extends FunSuite {
       ImageQuality.PointOne,
       GmosNorthGrating.B600_G5307,
       GmosXBinning.Four,
+      GmosYBinning.Four
+    )
+  }
+
+  test("longslit, B600, slit=0.50, Uniform:  2 4") {
+    testLongslit(
+      GmosNorthFpu.LongSlit_0_50,
+      SourceProfile.Uniform(bandNormalized),
+      ImageQuality.PointOne,
+      GmosNorthGrating.B600_G5307,
+      GmosXBinning.Two,
       GmosYBinning.Four
     )
   }

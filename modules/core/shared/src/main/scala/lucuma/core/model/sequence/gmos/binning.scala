@@ -114,7 +114,7 @@ object binning {
 
     // The maximum binning that gives the required sampling (<npix)
     GmosYBinning.all.tail.reverse.find { bin =>
-      (bin.count - npix) <= 0.0
+      bin.count <= npix
     }.getOrElse(GmosYBinning.One)
   }
 
