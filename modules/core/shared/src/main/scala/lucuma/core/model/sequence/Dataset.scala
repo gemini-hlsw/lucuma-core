@@ -8,8 +8,8 @@ import cats.Show
 import cats.syntax.option.*
 import cats.syntax.show.*
 import eu.timepit.refined.cats.*
-import eu.timepit.refined.types.numeric.PosShort
 import eu.timepit.refined.types.numeric.PosInt
+import eu.timepit.refined.types.numeric.PosShort
 import lucuma.core.enums.Site
 import monocle.Prism
 import org.typelevel.cats.time.*

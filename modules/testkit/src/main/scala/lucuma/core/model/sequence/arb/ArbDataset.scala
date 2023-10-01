@@ -5,8 +5,8 @@ package lucuma.core.model.sequence
 package arb
 
 import eu.timepit.refined.scalacheck.all.*
-import eu.timepit.refined.types.numeric.PosShort
 import eu.timepit.refined.types.numeric.PosInt
+import eu.timepit.refined.types.numeric.PosShort
 import lucuma.core.enums.Site
 import lucuma.core.util.arb.ArbEnumerated
 import lucuma.core.util.arb.ArbUid
