@@ -5,8 +5,8 @@ package lucuma.core.model.sequence
 package arb
 
 import eu.timepit.refined.scalacheck.all.*
-import eu.timepit.refined.types.numeric.NonNegShort
 import eu.timepit.refined.types.numeric.PosInt
+import eu.timepit.refined.types.numeric.PosShort
 import lucuma.core.enums.Site
 import lucuma.core.util.arb.ArbEnumerated
 import lucuma.core.util.arb.ArbUid
@@ -27,12 +27,12 @@ trait ArbDataset {
     Arbitrary {
       for {
         s <- arbitrary[Step.Id]
-        i <- arbitrary[NonNegShort]
+        i <- arbitrary[PosShort]
       } yield Dataset.Id(s, i)
     }
 
   given Cogen[Dataset.Id] =
-    Cogen[(Step.Id, NonNegShort)].contramap { a => (
+    Cogen[(Step.Id, PosShort)].contramap { a => (
       a.stepId,
       a.index
     )}
