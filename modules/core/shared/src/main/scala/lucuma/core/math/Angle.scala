@@ -301,6 +301,20 @@ object Angle extends AngleOptics {
       Angle.fromMicroarcseconds(toMicroarcseconds - a.toMicroarcseconds)
 
     /**
+    * Scalar multiplication of this angle and and natural number `a`. Exact
+    * @group Operations
+    */
+    def *(a: Long): Angle =
+      Angle.fromMicroarcseconds(toMicroarcseconds * a)
+
+    /**
+    * Scalar multiplication of this angle and double precission number `a`. Approximate
+    * @group Operations
+    */
+    def *?(a: Double): Angle =
+      Angle.fromMicroarcseconds((toMicroarcseconds * a).toLong)
+
+    /**
     * This angle as an Offset.P. Exact, invertible.
     *
     * @group Conversions
