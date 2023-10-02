@@ -15,6 +15,7 @@ import monocle.Prism
 
 import java.time.Duration
 import java.time.temporal.ChronoUnit.MICROS
+import java.time.temporal.TemporalUnit
 import scala.annotation.targetName
 import scala.util.Try
 
@@ -83,8 +84,18 @@ object TimeSpan {
       .flatMap(fromMicroseconds)
   }
 
+  /**
+   * Builds a Duration from the specified amount and unit and converts it 
+   * into a TimeSpan if it is in range, discarding any sub-microsecond value.
+   */
+  def fromDuration(amount: Long, unit: TemporalUnit): Option[TimeSpan] = 
+    fromDuration(Duration.of(amount, unit))
+
   def unsafeFromDuration(value: Duration): TimeSpan =
     fromDuration(value).getOrElse(sys.error(s"The duration value ($value) must be non-negative."))
+
+  def unsafeFromDuration(amount: Long, unit: TemporalUnit): TimeSpan =
+    unsafeFromDuration(Duration.of(amount, unit))
 
   /**
    * Converts the given amount of time in milliseconds into a TimeSpan,
