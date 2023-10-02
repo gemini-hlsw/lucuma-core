@@ -189,16 +189,20 @@ final class AngleSuite extends munit.DisciplineSuite {
     assertEquals(Angle.Angle90 * 4, Angle.Angle0)
     assertEquals(Angle.Angle90 * -2, Angle.Angle180)
     assertEquals(Angle.Angle90 * 10, Angle.Angle180)
+    assertEquals(Angle.Angle90 * 4000000, Angle.Angle0)
+    // Check overflow
+    assertEquals(Angle.Angle90 * 40000000, Angle.Angle0)
   }
 
   test("Scalar double multiplication") {
-    assertEquals(Angle.Angle0 *? 2, Angle.Angle0)
-    assertEquals(Angle.Angle90 *? 2, Angle.Angle180)
-    assertEquals(Angle.Angle90 *? 4, Angle.Angle0)
-    assertEquals(Angle.Angle90 *? -2, Angle.Angle180)
-    assertEquals(Angle.Angle90 *? 10, Angle.Angle180)
-    assertEquals(Angle.Angle180 *? 0.5, Angle.Angle90)
-    assert(((Angle.Angle180 *? 0.001) - Angle.fromDoubleDegrees(0.18)).toMicroarcseconds < 1000)
-    assert(((Angle.Angle180 *? -0.001) - Angle.fromDoubleDegrees(359.82)).toMicroarcseconds < 1000)
+    assertEquals(Angle.Angle0 * 2.0, Angle.Angle0)
+    assertEquals(Angle.Angle90 * 2.0, Angle.Angle180)
+    assertEquals(Angle.Angle90 * 4.0, Angle.Angle0)
+    assertEquals(Angle.Angle90 * -2.0, Angle.Angle180)
+    assertEquals(Angle.Angle90 * 10.0, Angle.Angle180)
+    assertEquals(Angle.Angle180 * 0.5, Angle.Angle90)
+    assertEquals(Angle.Angle90 * 40000000.0, Angle.Angle0)
+    assert(((Angle.Angle180 * 0.001) - Angle.fromDoubleDegrees(0.18)).toMicroarcseconds < 1000)
+    assert(((Angle.Angle180 * -0.001) - Angle.fromDoubleDegrees(359.82)).toMicroarcseconds < 1000)
   }
 }
