@@ -30,8 +30,7 @@ def parallacticAngle(site: Site, tracking: ObjectTracking, vizTime: Instant): An
 }
 
 def averageParallacticAngle(site: Site, tracking: ObjectTracking, vizTime: Instant, duration: Duration): Option[Angle] =
-  val end = vizTime.toEpochMilli() + duration.toMillis()
-  val defined: TimeRange = (vizTime.toEpochMilli(), end)
+  val defined: TimeRange = (vizTime.toEpochMilli(), vizTime.plus(duration).toEpochMilli())
   val rate: Long         = 30.seconds.toMillis
 
   // the number of samples we need to have a sampling rate >= than expected
