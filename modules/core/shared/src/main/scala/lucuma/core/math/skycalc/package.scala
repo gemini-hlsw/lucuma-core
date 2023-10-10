@@ -8,6 +8,7 @@ import lucuma.core.enums.Site
 import lucuma.core.math.Angle
 import lucuma.core.model.ObjectTracking
 
+import java.time.Duration
 import java.time.Instant
 import scala.concurrent.duration.*
 
@@ -28,8 +29,8 @@ def parallacticAngle(site: Site, tracking: ObjectTracking, vizTime: Instant): An
   skycalc.calculate(c, vizTime, false).parallacticAngle
 }
 
-def averageParallacticAngle(site: Site, tracking: ObjectTracking, vizTime: Instant): Option[Angle] =
-  val defined: TimeRange = (vizTime.toEpochMilli(), vizTime.toEpochMilli() + 1.hour.toMillis)
+def averageParallacticAngle(site: Site, tracking: ObjectTracking, vizTime: Instant, duration: Duration): Option[Angle] =
+  val defined: TimeRange = (vizTime.toEpochMilli(), vizTime.plus(duration).toEpochMilli())
   val rate: Long         = 30.seconds.toMillis
 
   // the number of samples we need to have a sampling rate >= than expected
