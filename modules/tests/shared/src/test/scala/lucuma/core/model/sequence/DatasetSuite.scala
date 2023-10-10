@@ -6,11 +6,13 @@ package lucuma.core.model.sequence
 import cats.kernel.laws.discipline.*
 import cats.syntax.option.*
 import lucuma.core.model.sequence.arb.*
+import lucuma.core.util.arb.ArbGid
 import monocle.law.discipline.*
 import munit.*
 
 final class DatasetSuite extends DisciplineSuite {
   import ArbDataset.given
+  import ArbGid.*
 
   checkAll("Order[Dataset.Id]",       OrderTests[Dataset.Id].order)
   checkAll("Order[Dataset.Filename]", OrderTests[Dataset.Filename].order)
