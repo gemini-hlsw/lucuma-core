@@ -6,10 +6,8 @@ package arb
 
 import eu.timepit.refined.scalacheck.all.*
 import eu.timepit.refined.types.numeric.PosInt
-import eu.timepit.refined.types.numeric.PosShort
 import lucuma.core.enums.Site
 import lucuma.core.util.arb.ArbEnumerated
-import lucuma.core.util.arb.ArbUid
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.*
 import org.scalacheck.Cogen
@@ -21,21 +19,6 @@ import scala.util.control.Exception.allCatch
 
 trait ArbDataset {
   import ArbEnumerated.*
-  import ArbUid.*
-
-  given Arbitrary[Dataset.Id] =
-    Arbitrary {
-      for {
-        s <- arbitrary[Step.Id]
-        i <- arbitrary[PosShort]
-      } yield Dataset.Id(s, i)
-    }
-
-  given Cogen[Dataset.Id] =
-    Cogen[(Step.Id, PosShort)].contramap { a => (
-      a.stepId,
-      a.index
-    )}
 
   given Arbitrary[Dataset.Filename] =
     Arbitrary {

@@ -3,6 +3,7 @@
 
 package lucuma.core.model
 
+import lucuma.core.model.sequence.Dataset
 import lucuma.core.util.arb.*
 import lucuma.core.util.laws.GidTests
 import munit.DisciplineSuite

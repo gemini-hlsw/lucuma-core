@@ -6,11 +6,11 @@ package lucuma.core.model.sequence
 import cats.Order
 import cats.Show
 import cats.syntax.option.*
-import cats.syntax.show.*
 import eu.timepit.refined.cats.*
 import eu.timepit.refined.types.numeric.PosInt
-import eu.timepit.refined.types.numeric.PosShort
 import lucuma.core.enums.Site
+import lucuma.core.util.WithGid
+import lucuma.refined.*
 import monocle.Prism
 import org.typelevel.cats.time.*
 
@@ -19,26 +19,7 @@ import java.time.format.DateTimeFormatter
 import scala.util.control.Exception.allCatch
 import scala.util.matching.Regex
 
-object Dataset {
-
-  /**
-   * Dataset ID, identifying the corresponding step and an index within the
-   * step.
-   */
-  case class Id(
-    stepId: Step.Id,
-    index:  PosShort
-  )
-
-  object Id {
-    given Order[Id] =
-      Order.by(a => (a.stepId, a.index))
-
-    given Show[Id] with {
-      def show(id: Id): String =
-        s"(${id.stepId.show}, ${id.index.value})"
-    }
-  }
+object Dataset extends WithGid('d'.refined) {
 
   // N.B., This conforms to today's filename but I'm not confident it will
   // remain unchanged.
