@@ -5,7 +5,6 @@ package lucuma.core.util
 package arb
 
 import lucuma.core.arb.ArbTime
-import lucuma.core.util.Timestamp
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck._
 
