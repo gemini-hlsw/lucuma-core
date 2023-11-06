@@ -37,6 +37,11 @@ object ObjectTracking:
       trackings.centerOfAt(i).map(CoordinatesAtVizTime(_))
     def baseCoordinates: Coordinates                 = trackings.centerOf
 
+  case class ConstantTracking(coordinates: Coordinates) extends ObjectTracking derives Eq:
+    def at(i: Instant): Option[CoordinatesAtVizTime] = CoordinatesAtVizTime(coordinates).some
+    def baseCoordinates: Coordinates = coordinates
+
+
   def fromTarget(target: Target): ObjectTracking = target match
     case t: Target.Sidereal => SiderealObjectTracking(t.tracking)
     case _                  => sys.error("Only sidereal targets supported")
@@ -47,3 +52,6 @@ object ObjectTracking:
       if (sidereals.length === 1) SiderealObjectTracking(sidereals.head.tracking)
       else SiderealAsterismTracking(sidereals.map(_.tracking))
     }
+
+  def constant(coordinates: Coordinates): ObjectTracking =
+    ConstantTracking(coordinates)
