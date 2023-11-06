@@ -125,9 +125,6 @@ final class Gid[A](
   final override def apply(a: A): Json =
     fromString.reverseGet(a).asJson
 
-  given KeyDecoder[A] = KeyDecoder.instance(fromString.getOption)
-
-  given KeyEncoder[A] = KeyEncoder.instance(fromString.reverseGet)
 }
 
 object Gid {
