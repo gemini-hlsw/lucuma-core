@@ -22,7 +22,7 @@ lazy val lucumaRefinedVersion  = "0.1.2"
 lazy val catsTimeVersion       = "0.5.1"
 lazy val circeVersion          = "0.14.6"
 lazy val catsScalacheckVersion = "0.3.2"
-lazy val catsParseVersion      = "0.3.10"
+lazy val catsParseVersion      = "1.0.0"
 lazy val kittensVersion        = "3.1.0"
 lazy val scalajsStubVersion    = "1.1.0"
 
