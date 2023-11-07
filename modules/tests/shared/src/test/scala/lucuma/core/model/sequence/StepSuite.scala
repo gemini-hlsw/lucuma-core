@@ -4,6 +4,7 @@
 package lucuma.core.model.sequence
 
 import cats.kernel.laws.discipline.*
+import io.circe.testing.KeyCodecTests
 import lucuma.core.model.sequence.arb.*
 import lucuma.core.model.sequence.gmos.DynamicConfig.GmosNorth
 import lucuma.core.model.sequence.gmos.arb.*
@@ -21,7 +22,8 @@ final class StepSuite extends DisciplineSuite {
   import ArbStepEstimate.given
   import ArbUid.*
 
-  checkAll("Step.Id", UidTests[Step.Id].uid)
+  checkAll("Uid[Step.Id]", UidTests[Step.Id].uid)
+  checkAll("KeyCodec[Step.Id]", KeyCodecTests[Step.Id].keyCodec)
 
   checkAll("Eq[Step[GmosNorth]]",    EqTests[Step[GmosNorth]].eqv)
   checkAll("Step.id",                LensTests(Step.id[GmosNorth]))

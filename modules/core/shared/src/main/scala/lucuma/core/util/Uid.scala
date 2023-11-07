@@ -104,6 +104,10 @@ class WithUid(idTag: Char Refined Letter) {
 
     def unapply[T](s: String): Option[Id] =
       parse(s)
+
+    given KeyDecoder[Id] = KeyDecoder.instance(UidId.fromString.getOption)
+
+    given KeyEncoder[Id] = KeyEncoder.instance(UidId.fromString.reverseGet)
   }
 
 }

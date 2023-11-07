@@ -158,5 +158,9 @@ class WithGid(idTag: Char Refined Letter) {
 
     /** Allow pattern match style parsing */
     def unapply[T](s: String): Option[Id] = parse(s)
+
+    given KeyDecoder[Id] = KeyDecoder.instance(GidId.fromString.getOption)
+
+    given KeyEncoder[Id] = KeyEncoder.instance(GidId.fromString.reverseGet)
   }
 }

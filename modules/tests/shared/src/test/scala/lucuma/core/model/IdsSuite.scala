@@ -3,6 +3,7 @@
 
 package lucuma.core.model
 
+import io.circe.testing.KeyCodecTests
 import lucuma.core.model.sequence.Dataset
 import lucuma.core.util.arb.*
 import lucuma.core.util.laws.GidTests
@@ -11,10 +12,17 @@ import munit.DisciplineSuite
 final class IdsSuite extends DisciplineSuite {
   import ArbGid.*
 
-  checkAll("Configuration.Id", GidTests[Configuration.Id].gid)
-  checkAll("Dataset.Id", GidTests[Dataset.Id].gid)
-  checkAll("ExecutionEvent.Id", GidTests[ExecutionEvent.Id].gid)
-  checkAll("Observation.Id", GidTests[Observation.Id].gid)
-  checkAll("Program.Id", GidTests[Program.Id].gid)
-  checkAll("Visit.Id", GidTests[Visit.Id].gid)
+  checkAll("Gid[Configuration.Id]", GidTests[Configuration.Id].gid)
+  checkAll("Gid[Dataset.Id]", GidTests[Dataset.Id].gid)
+  checkAll("Gid[ExecutionEvent.Id]", GidTests[ExecutionEvent.Id].gid)
+  checkAll("Gid[Observation.Id]", GidTests[Observation.Id].gid)
+  checkAll("Gid[Program.Id]", GidTests[Program.Id].gid)
+  checkAll("Gid[Visit.Id]", GidTests[Visit.Id].gid)
+  
+  checkAll("KeyCodec[Configuration.Id]", KeyCodecTests[Configuration.Id].keyCodec)
+  checkAll("KeyCodec[Dataset.Id]", KeyCodecTests[Dataset.Id].keyCodec)
+  checkAll("KeyCodec[ExecutionEvent.Id]", KeyCodecTests[ExecutionEvent.Id].keyCodec)
+  checkAll("KeyCodec[Observation.Id]", KeyCodecTests[Observation.Id].keyCodec)
+  checkAll("KeyCodec[Program.Id]", KeyCodecTests[Program.Id].keyCodec)
+  checkAll("KeyCodec[Visit.Id]", KeyCodecTests[Visit.Id].keyCodec)
 }
