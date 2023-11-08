@@ -9,6 +9,7 @@ import lucuma.core.math.Coordinates
 import lucuma.core.math.Epoch
 import lucuma.core.math.Parallax
 import lucuma.core.math.ProperMotion
+import lucuma.core.math.RadialVelocity
 import lucuma.core.math.arb.*
 import lucuma.core.model.arb.*
 import monocle.law.discipline.*
@@ -61,6 +62,24 @@ final class SiderealTrackingSuite extends DisciplineSuite {
     val tracking = SiderealTracking(coord, Epoch.J2000, ProperMotion(pmra, pmdec).some, none, Parallax.fromMicroarcseconds(768465).some)
     val refEpoch = Instant.ofEpochSecond(4102444800L)
     assertEquals(tracking.at(refEpoch), Coordinates.fromHmsDms.getOption("14 28 48.054809 -62 39 28.543030"))
+  }
+
+  test("SiderealTracking.constant") {
+    forAll { (coords: Coordinates, years: Double) =>
+      val tracking = SiderealTracking.const(coords)
+      assert(tracking.plusYears(years).exists(_ === coords))
+    }
+  }
+
+  test("Unmoving SiderealTracking") {
+    forAll { (coords: Coordinates, years: Double, epoch: Epoch, pmz: Boolean, rvz: Boolean, pz: Boolean) =>
+      val pm = if (pmz) ProperMotion.Zero.some else none
+      val rv = if (rvz) RadialVelocity.Zero.some else none
+      val p  = if (pz) Parallax.Zero.some else none
+
+      val tracking = SiderealTracking(coords, epoch, pm, rv, p)
+      assert(tracking.plusYears(years).exists(_ === coords))
+    }
   }
 
 }
