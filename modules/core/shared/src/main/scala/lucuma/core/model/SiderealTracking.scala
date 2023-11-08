@@ -55,14 +55,21 @@ final case class SiderealTracking(
 
   /** Coordinates `elapsedYears` fractional epoch-years after `epoch`. */
   def plusYears(elapsedYears: Double): Option[Coordinates] =
-    SiderealTracking.coordinatesOn(
-      baseCoordinates,
-      epoch,
-      properMotion.orEmpty,
-      radialVelocity.getOrElse(RadialVelocity.Zero).toDoubleKilometersPerSecond,
-      parallax.getOrElse(Parallax.Zero),
-      elapsedYears
-    )
+    if (isConstant) baseCoordinates.some
+    else
+      SiderealTracking.coordinatesOn(
+        baseCoordinates,
+        epoch,
+        properMotion.orEmpty,
+        radialVelocity.getOrElse(RadialVelocity.Zero).toDoubleKilometersPerSecond,
+        parallax.getOrElse(Parallax.Zero),
+        elapsedYears
+      )
+
+  def isConstant: Boolean = 
+    properMotion.forall(_ === ProperMotion.Zero) && 
+      radialVelocity.forall(_ === RadialVelocity.Zero) && 
+      parallax.forall(_ === Parallax.Zero)
 }
 
 object SiderealTracking extends SiderealTrackingOptics {
