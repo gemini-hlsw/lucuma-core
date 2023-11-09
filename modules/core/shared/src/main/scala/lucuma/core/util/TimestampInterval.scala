@@ -12,10 +12,6 @@ import org.typelevel.cats.time.*
 
 import java.time.Instant
 
-// Open/closed bounds complication.  Always want [start, end).
-// Type parameter instead of int value, allows floating point, rational etc.
-// 'Point' unnecessary.
-
 /**
  * A TimestampInterval represents a period of time with a fixed starting point
  * 'start' (inclusive) and an fixed ending point 'end' (exclusive).  In other
@@ -61,12 +57,31 @@ sealed class TimestampInterval private (val start: Timestamp, val end: Timestamp
   def span(other: TimestampInterval): TimestampInterval =
     between(start min other.start, end max other.end)
 
+  /**
+   * Merges this interval with the given interval if they overlap or abut,
+   * returns the two individual intervals otherwise.
+   */
   def plus(other: TimestampInterval): List[TimestampInterval] =
     overlap(other) match {
       case Overlap.None if !abuts(other) => List(this, other).sorted
       case _                             => List(span(other))
     }
 
+  /**
+   * Subtracts `other` from this interval returning the `List` of intervals
+   * that remain.  For example,
+   *
+   * <ul>
+   * <li>if this interval is a subset of `other`: an empty `List`</li>
+   *
+   * <li>if this interval overlaps either end of `other`: a singleton
+   * containing this interval clipped by `other`</li>
+   *
+   * <li>if this interval is a proper superset of `other`: an interval
+   * containing only points in this interval that are to the left of `other`
+   * and another interval containing only points to the right of `other.</li>
+   * </ul>
+   */
   def minus(other: TimestampInterval): List[TimestampInterval] =
     overlap(other) match {
       case Overlap.LowerPartial   => List(between(start, other.start))

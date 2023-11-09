@@ -85,11 +85,20 @@ sealed class TimestampUnion private (val intervals: SortedSet[TimestampInterval]
   def contains(timestamp: Timestamp): Boolean =
     intervals.exists(_.contains(timestamp))
 
+  /**
+   * Sums the time spanned by all the intervals in this union, assuming the
+   * result fits in a `TimeSpan`.
+   */
   def sum: Option[TimeSpan] =
     intervals.toList.traverse(_.timeSpan).flatMap { ts =>
       ts.foldLeft(TimeSpan.Zero.some) { case (s, t) => s.flatMap(_.add(t)) }
     }
 
+  /**
+   * Sums the time spanned by all the intervals in this union, capping the
+   * result at `TimeSpan.Max`.  This is sufficient for most uses and more
+   * convenient than `sum`.
+   */
   def boundedSum: TimeSpan =
     intervals.foldMap(_.boundedTimeSpan)
 
@@ -112,6 +121,9 @@ sealed class TimestampUnion private (val intervals: SortedSet[TimestampInterval]
 
 object TimestampUnion {
 
+  /**
+   * The empty TimestampUnion.
+   */
   val Empty: TimestampUnion =
     new TimestampUnion(SortedSet.empty)
 
