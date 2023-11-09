@@ -3,8 +3,8 @@
 
 package lucuma.core.util
 
-import cats.kernel.laws.discipline.*
 import cats.Order.catsKernelOrderingForOrder
+import cats.kernel.laws.discipline.*
 import cats.syntax.foldable.*
 import munit.DisciplineSuite
 import org.scalacheck.Prop.forAll
