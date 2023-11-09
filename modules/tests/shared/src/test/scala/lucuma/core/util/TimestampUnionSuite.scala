@@ -16,6 +16,7 @@ class TimestampUnionSuite extends DisciplineSuite {
   import arb.ArbTimestampUnion.given
 
   checkAll("Eq", EqTests[TimestampUnion].eqv)
+  checkAll("BoundedSemilattice", BoundedSemilatticeTests[TimestampUnion].boundedSemilattice)
 
   private def timestamp(epochMilli: Long): Timestamp =
     Timestamp.ofEpochMilli(epochMilli).get

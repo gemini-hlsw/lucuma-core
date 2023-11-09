@@ -5,6 +5,7 @@ package lucuma.core.util
 
 import cats.Eq
 import cats.Order.catsKernelOrderingForOrder
+import cats.kernel.BoundedSemilattice
 import cats.syntax.eq.*
 import cats.syntax.foldable.*
 import cats.syntax.option.*
@@ -135,5 +136,8 @@ object TimestampUnion {
 
   given Eq[TimestampUnion] =
     Eq.by(_.intervals)
+
+  given BoundedSemilattice[TimestampUnion] =
+    BoundedSemilattice.instance(Empty, _ ++ _)
 
 }
