@@ -3,12 +3,15 @@
 
 package lucuma.core.util
 
+import cats.kernel.laws.discipline.*
 import munit.DisciplineSuite
 import org.scalacheck.Prop.forAll
 
 class TimestampIntervalSuite extends DisciplineSuite {
 
   import arb.ArbTimestampInterval.given
+
+  checkAll("Order", OrderTests[TimestampInterval].order)
 
   import TimestampInterval.Overlap
 

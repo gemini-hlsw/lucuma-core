@@ -3,6 +3,7 @@
 
 package lucuma.core.util
 
+import cats.kernel.laws.discipline.*
 import cats.Order.catsKernelOrderingForOrder
 import cats.syntax.foldable.*
 import munit.DisciplineSuite
@@ -10,11 +11,11 @@ import org.scalacheck.Prop.forAll
 
 class TimestampUnionSuite extends DisciplineSuite {
 
-  override val scalaCheckInitialSeed = "_02WNmmy0BdvWpczJPELqOuF8vAb3JpSKcmglRbAVWE="
-
   import arb.ArbTimestamp.*
   import arb.ArbTimestampInterval.given
   import arb.ArbTimestampUnion.given
+
+  checkAll("Eq", EqTests[TimestampUnion].eqv)
 
   private def timestamp(epochMilli: Long): Timestamp =
     Timestamp.ofEpochMilli(epochMilli).get
