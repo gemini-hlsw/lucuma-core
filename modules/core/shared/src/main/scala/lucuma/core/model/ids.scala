@@ -8,7 +8,6 @@ import lucuma.refined.*
 
 object Configuration  extends WithGid('c'.refined)
 object Group          extends WithGid('g'.refined)
-object ExecutionEvent extends WithGid('e'.refined)
 object ObsAttachment  extends WithGid('a'.refined)
 object Observation    extends WithGid('o'.refined)
 object Program        extends WithGid('p'.refined)
