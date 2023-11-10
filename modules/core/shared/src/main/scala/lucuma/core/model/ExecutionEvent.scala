@@ -10,10 +10,9 @@ import lucuma.core.enums.SequenceCommand
 import lucuma.core.enums.StepStage
 import lucuma.core.model.sequence.Dataset
 import lucuma.core.model.sequence.Step
-import lucuma.core.util.WithGid
 import lucuma.core.util.Timestamp
+import lucuma.core.util.WithGid
 import lucuma.refined.*
-
 import monocle.Prism
 import monocle.macros.GenPrism
 
