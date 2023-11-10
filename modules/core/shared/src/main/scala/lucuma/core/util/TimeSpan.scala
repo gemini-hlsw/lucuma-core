@@ -166,18 +166,30 @@ object TimeSpan {
       toDuration.toString
 
     /**
+     * Adds two TimeSpan values, if the resulting value is in range.
+     */
+    def add(other: TimeSpan): Option[TimeSpan] =
+      fromMicroseconds(timeSpan.toMicroseconds + other.toMicroseconds)
+
+    /**
      * Adds two TimeSpan values, capping the resulting value at `Max`.
      */
     @targetName("boundedAdd")
     def +|(other: TimeSpan): TimeSpan =
-      fromMicroseconds(timeSpan.toMicroseconds + other.toMicroseconds).getOrElse(Max)
+      add(other).getOrElse(Max)
+
+    /**
+     * Subtracts two TimeSpan values, if the resulting value is in range.
+     */
+    def subtract(other: TimeSpan): Option[TimeSpan] =
+      fromMicroseconds(timeSpan.toMicroseconds - other.toMicroseconds)
 
     /**
      * Subtracts a TimeSpan value, with a floor of `Min` on the resulting value.
      */
     @targetName("boundedSubtract")
     def -|(other: TimeSpan): TimeSpan =
-      fromMicroseconds(timeSpan.toMicroseconds - other.toMicroseconds).getOrElse(Min)
+      subtract(other).getOrElse(Min)
 
     /**
      * Multiplies a TimeSpan by an integer, limiting the resulting value to the
