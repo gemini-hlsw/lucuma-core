@@ -21,6 +21,9 @@ class TimestampIntervalSuite extends DisciplineSuite {
   private def interval(epochMilli0: Long, epochMilli1: Long): TimestampInterval =
     TimestampInterval.between(timestamp(epochMilli0), timestamp(epochMilli1))
 
+  private def timeSpan(milli: Long): TimeSpan =
+    TimeSpan.unsafeFromMicroseconds(milli * 1000)
+
   private def testOverlap(ex: Overlap, ts: (TimestampInterval, TimestampInterval)*): Unit =
     ts.foreach { case (a, b) => assertEquals(a.overlap(b), ex) }
 
@@ -132,6 +135,63 @@ class TimestampIntervalSuite extends DisciplineSuite {
 
     // Equal
     assertEquals(interval(0, 10).minus(interval(0, 10)), Nil)
+  }
+
+  test("intersection") {
+    // Lower Partial
+    assertEquals(interval(1, 10).intersection(interval(0,  2)), Some(interval(1, 2)))
+
+    // Upper Partial
+    assertEquals(interval(1, 10).intersection(interval(9, 11)), Some(interval(9, 10)))
+
+    // Proper Superset
+    assertEquals(interval(0, 10).intersection(interval(3,  6)), Some(interval(3, 6)))
+
+    // None
+    assertEquals(interval(0, 10).intersection(interval(10, 20)), None)
+
+    // Proper Subset
+    assertEquals(interval(3, 6).intersection(interval(0, 10)), Some(interval(3, 6)))
+
+    // Equal
+    assertEquals(interval(0, 10).intersection(interval(0, 10)), Some(interval(0, 10)))
+  }
+
+  test("timeBetween") {
+    // Lower Partial
+    assertEquals(interval(1, 10).timeBetween(interval(0,  2)), Some(TimeSpan.Zero))
+
+    // Upper Partial
+    assertEquals(interval(1, 10).timeBetween(interval(9, 11)), Some(TimeSpan.Zero))
+
+    // Proper Superset
+    assertEquals(interval(0, 10).timeBetween(interval(3,  6)), Some(TimeSpan.Zero))
+
+    // Proper Subset
+    assertEquals(interval(3, 6).timeBetween(interval(0, 10)), Some(TimeSpan.Zero))
+
+    // Equal
+    assertEquals(interval(0, 10).timeBetween(interval(0, 10)), Some(TimeSpan.Zero))
+
+    // Abuts, in order
+    assertEquals(interval(0, 10).timeBetween(interval(10, 20)), Some(TimeSpan.Zero))
+
+    // Abuts, out of order
+    assertEquals(interval(10, 20).timeBetween(interval(0, 10)), Some(TimeSpan.Zero))
+
+    // Disjoint, in order
+    assertEquals(interval(0, 10).timeBetween(interval(15, 20)), Some(timeSpan(5)))
+
+    // Disjoint, out of order
+    assertEquals(interval(29, 30).timeBetween(interval(0, 10)), Some(timeSpan(19)))
+
+    val oor = TimestampInterval.between(Timestamp.Max, Timestamp.Max)
+
+    // Out of range, in order
+    assertEquals(interval(0, 1).timeBetween(oor), None)
+
+    // Out of range, out of order
+    assertEquals(oor.timeBetween(interval(0, 10)), None)
   }
 
 }
