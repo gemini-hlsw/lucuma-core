@@ -134,11 +134,11 @@ sealed class TimestampInterval private (val start: Timestamp, val end: Timestamp
    */
   def intersection(other: TimestampInterval): Option[TimestampInterval] =
     overlap(other) match
-      case Overlap.None => None
-      case Overlap.LowerPartial => TimestampInterval.between(other.start, end).some
-      case Overlap.UpperPartial => TimestampInterval.between(start, other.end).some
-      case Overlap.Equal => this.some
-      case Overlap.ProperSubset => this.some
+      case Overlap.None           => None
+      case Overlap.LowerPartial   => TimestampInterval.between(other.start, end).some
+      case Overlap.UpperPartial   => TimestampInterval.between(start, other.end).some
+      case Overlap.Equal          => this.some
+      case Overlap.ProperSubset   => this.some
       case Overlap.ProperSuperset => other.some
       
   /**
