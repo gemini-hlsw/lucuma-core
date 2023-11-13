@@ -7,6 +7,7 @@ import cats.Comparison
 import cats.Eq
 import cats.Order
 import cats.Order.catsKernelOrderingForOrder
+import cats.syntax.option.*
 import cats.syntax.order.*
 import org.typelevel.cats.time.*
 
@@ -126,6 +127,35 @@ sealed class TimestampInterval private (val start: Timestamp, val end: Timestamp
    */
   def intersects(other: TimestampInterval): Boolean =
     overlap(other).intersects
+
+  /**
+   * Determine the intersection between 2 intervals, or None if they don't
+   * intersect.
+   */
+  def intersection(other: TimestampInterval): Option[TimestampInterval] =
+    overlap(other) match
+      case Overlap.None => None
+      case Overlap.LowerPartial => TimestampInterval.between(other.start, end).some
+      case Overlap.UpperPartial => TimestampInterval.between(start, other.end).some
+      case Overlap.Equal => this.some
+      case Overlap.ProperSubset => this.some
+      case Overlap.ProperSuperset => other.some
+      
+  /**
+   * Determine the time between the end of the earlier interval and the
+   * start of the later (None if it doesn't fit in a TimeSpan), or 
+   * TimeSpan.Zero if they intersect or abut.
+   */
+  def timeBetween(other: TimestampInterval): Option[TimeSpan] = 
+    if (intersects(other)) TimeSpan.Zero.some
+    else if (this < other) TimeSpan.between(end, other.start)
+    else TimeSpan.between(other.end, start)
+
+  /**
+   * `timeBetween` but capped at TimeSpan.Max.
+   */
+  def boundedTimeBetween(other: TimestampInterval): TimeSpan = 
+    timeBetween(other).getOrElse(TimeSpan.Max) 
 
   override def equals(that: Any): Boolean =
     that match {
