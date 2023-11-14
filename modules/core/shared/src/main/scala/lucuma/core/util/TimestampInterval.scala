@@ -85,12 +85,15 @@ sealed class TimestampInterval private (val start: Timestamp, val end: Timestamp
    */
   def minus(other: TimestampInterval): List[TimestampInterval] =
     overlap(other) match {
-      case Overlap.LowerPartial   => List(between(start, other.start))
-      case Overlap.UpperPartial   => List(between(other.end, end))
-      case Overlap.ProperSuperset => List(between(start, other.start), between(other.end, end))
-      case Overlap.None           => List(this)
+      case Overlap.LowerPartial                                  => List(between(start, other.start))
+      case Overlap.UpperPartial                                  => List(between(other.end, end))
+      case Overlap.ProperSuperset if (other.start === other.end) => List(this)
+      case Overlap.ProperSuperset if (start === other.start)     => List(between(other.end, end))
+      case Overlap.ProperSuperset if (end === other.end)         => List(between(start, other.start))
+      case Overlap.ProperSuperset                                => List(between(start, other.start), between(other.end, end))
+      case Overlap.None                                          => List(this)
       case Overlap.ProperSubset |
-           Overlap.Equal          => Nil
+           Overlap.Equal                                         => Nil
     }
 
   /**

@@ -125,16 +125,29 @@ class TimestampIntervalSuite extends DisciplineSuite {
     assertEquals(interval(1, 10).minus(interval(9, 11)), List(interval(1, 9)))
 
     // Proper Superset
-    assertEquals(interval(0, 10).minus(interval(3,  6)), List(interval(0, 3), interval(6, 10)))
+    assertEquals(interval(0, 10).minus(interval(3, 6)), List(interval(0, 3), interval(6, 10)))
+    assertEquals(interval(0, 10).minus(interval(0, 6)), List(interval(6, 10)))
+    assertEquals(interval(0, 10).minus(interval(3, 10)), List(interval(0, 3)))
+    // with empty intervals 
+    assertEquals(interval(0, 10).minus(interval(0, 0)), List(interval(0, 10)))
+    assertEquals(interval(0, 10).minus(interval(3, 3)), List(interval(0, 10)))
 
     // None
     assertEquals(interval(0, 10).minus(interval(10, 20)), List(interval(0, 10)))
+    // with empty intervals
+    assertEquals(interval(10, 10).minus(interval(0, 10)), List(interval(10, 10)))
+    assertEquals(interval(0, 10).minus(interval(10, 10)), List(interval(0, 10)))
+
 
     // Proper Subset
     assertEquals(interval(3, 6).minus(interval(0, 10)), Nil)
+    // with empty intervals
+    assertEquals(interval(0, 0).minus(interval(0, 10)), Nil)
+    assertEquals(interval(3, 3).minus(interval(0, 10)), Nil)
 
     // Equal
     assertEquals(interval(0, 10).minus(interval(0, 10)), Nil)
+    assertEquals(interval(1, 1).minus(interval(1, 1)), Nil)
   }
 
   test("intersection") {
