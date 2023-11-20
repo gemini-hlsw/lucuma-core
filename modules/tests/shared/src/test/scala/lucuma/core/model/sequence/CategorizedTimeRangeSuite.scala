@@ -6,21 +6,17 @@ package lucuma.core.model.sequence
 import cats.kernel.laws.discipline.*
 import cats.syntax.order.*
 import lucuma.core.model.sequence.arb.ArbCategorizedTimeRange
-import lucuma.core.model.sequence.arb.ArbPlannedTimeRange
-import monocle.law.discipline.*
 import munit.*
 import org.scalacheck.Prop.forAll
 
-final class PlannedTimeRangeSuite extends DisciplineSuite {
+final class CategorizedTimeRangeSuite extends DisciplineSuite {
 
-  import ArbPlannedTimeRange.given
   import ArbCategorizedTimeRange.given
 
-  checkAll("Eq[PlannedTimeRange]", EqTests[PlannedTimeRange].eqv)
-  checkAll("ToCategorizedTimeRange", IsoTests(PlannedTimeRange.ToCategorizedTimeRange))
+  checkAll("Eq[CategorizedTimeEstimate]", EqTests[CategorizedTimeRange].eqv)
 
   test("min <= max") {
-    forAll { (a: PlannedTimeRange) => assert(a.min <= a.max) }
+    forAll { (a: CategorizedTimeRange) => assert(a.min <= a.max) }
   }
 
 }

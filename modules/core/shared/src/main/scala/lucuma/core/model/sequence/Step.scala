@@ -27,8 +27,8 @@ case class Step[D](
   breakpoint:        Breakpoint = Breakpoint.Disabled,
 ) {
 
-  lazy val plannedTime: PlannedTime =
-    PlannedTime(observeClass.chargeClass -> estimate.total)
+  lazy val timeEstimate: CategorizedTime =
+    CategorizedTime(observeClass.chargeClass -> estimate.total)
 
 }
 

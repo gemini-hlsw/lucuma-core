@@ -7,22 +7,23 @@ import cats.kernel.laws.discipline.*
 import cats.syntax.monoid.*
 import lucuma.core.enums.ChargeClass
 import lucuma.core.model.sequence.arb.ArbCategorizedTime
-import lucuma.core.model.sequence.arb.ArbPlannedTime
-import monocle.law.discipline.*
+import lucuma.core.util.TimeSpan
+import lucuma.core.util.arb.ArbEnumerated
+import lucuma.core.util.arb.ArbTimeSpan
 import munit.*
 import org.scalacheck.Prop.forAll
 
-final class PlannedTimeSuite extends DisciplineSuite {
+final class CategorizedTimeSuite extends DisciplineSuite {
 
-  import ArbPlannedTime.given
+  import ArbEnumerated.*
   import ArbCategorizedTime.given
+  import ArbTimeSpan.given
 
-  checkAll("Order[PlannedTime]",  OrderTests[PlannedTime].order)
-  checkAll("Monoid[PlannedTime]", MonoidTests[PlannedTime].monoid)
-  checkAll("ToCategorizedTime", IsoTests(PlannedTime.ToCategorizedTime))
+  checkAll("Order[CategorizedTime]",  OrderTests[CategorizedTime].order)
+  checkAll("Monoid[CategorizedTime]", CommutativeMonoidTests[CategorizedTime].commutativeMonoid)
 
   test("monoid") {
-    forAll { (a: PlannedTime, b: PlannedTime) =>
+    forAll { (a: CategorizedTime, b: CategorizedTime) =>
       val c = a |+| b
       val d = a.charges.foldLeft(b) { case (r, (cc, ts)) =>
         r.sumCharge(cc, ts)
@@ -31,8 +32,15 @@ final class PlannedTimeSuite extends DisciplineSuite {
     }
   }
 
+  test("modify") {
+    forAll { (tc: CategorizedTime, c: ChargeClass, s: TimeSpan) =>
+      assertEquals(tc.modify(c, _ +| s)(c), tc(c) +| s)
+      assertEquals(tc.modify(c, _ -| s)(c), tc(c) -| s)
+    }
+  }
+
   test("apply") {
-    forAll { (a: PlannedTime) =>
+    forAll { (a: CategorizedTime) =>
       assertEquals(a(ChargeClass.Program), a.getOrZero(ChargeClass.Program))
     }
   }
