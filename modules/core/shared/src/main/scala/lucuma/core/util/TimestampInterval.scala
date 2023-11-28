@@ -51,6 +51,12 @@ sealed class TimestampInterval private (val start: Timestamp, val end: Timestamp
   def containsInstant(time: Instant): Boolean =
     start.toInstant <= time && time < end.toInstant
 
+  def isEmpty: Boolean =
+    start === end
+
+  def nonEmpty: Boolean =
+    !isEmpty
+
   /**
    * The interval that includes both this and 'other' interval along with all
    * timestamps in between.
@@ -85,15 +91,12 @@ sealed class TimestampInterval private (val start: Timestamp, val end: Timestamp
    */
   def minus(other: TimestampInterval): List[TimestampInterval] =
     overlap(other) match {
-      case Overlap.LowerPartial                                  => List(between(start, other.start))
-      case Overlap.UpperPartial                                  => List(between(other.end, end))
-      case Overlap.ProperSuperset if (other.start === other.end) => List(this)
-      case Overlap.ProperSuperset if (start === other.start)     => List(between(other.end, end))
-      case Overlap.ProperSuperset if (end === other.end)         => List(between(start, other.start))
-      case Overlap.ProperSuperset                                => List(between(start, other.start), between(other.end, end))
-      case Overlap.None                                          => List(this)
+      case Overlap.LowerPartial    => List(between(start, other.start))
+      case Overlap.UpperPartial    => List(between(other.end, end))
+      case Overlap.ProperSuperset  => if (other.isEmpty) List(this) else List(between(start, other.start), between(other.end, end)).filter(!_.isEmpty)
+      case Overlap.None            => List(this)
       case Overlap.ProperSubset |
-           Overlap.Equal                                         => Nil
+           Overlap.Equal           => Nil
     }
 
   /**
@@ -178,6 +181,12 @@ object TimestampInterval {
 
   def between(t0: Timestamp, t1: Timestamp): TimestampInterval =
     if (t0 <= t1) new TimestampInterval(t0, t1) else new TimestampInterval(t1, t0)
+
+  /**
+   * Creates an empty interval with a start and end at the given timestamp.
+   */
+  def empty(at: Timestamp): TimestampInterval =
+    TimestampInterval(at, at)
 
   given Order[TimestampInterval] =
     Order.whenEqual(Order.by(_.start), Order.by(_.end))
