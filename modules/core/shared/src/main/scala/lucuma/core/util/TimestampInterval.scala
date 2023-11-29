@@ -188,6 +188,18 @@ object TimestampInterval {
   def empty(at: Timestamp): TimestampInterval =
     TimestampInterval(at, at)
 
+  /**
+   * Creates an interval [t, Max).
+   */
+  def from(t: Timestamp): TimestampInterval =
+    TimestampInterval.between(t, Timestamp.Max)
+
+  /**
+   * Creates an interval [Min, t).
+   */
+  def until(t: Timestamp): TimestampInterval =
+    TimestampInterval.between(Timestamp.Min, t)
+
   given Order[TimestampInterval] =
     Order.whenEqual(Order.by(_.start), Order.by(_.end))
 
