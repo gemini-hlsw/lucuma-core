@@ -4,12 +4,13 @@
 package lucuma.core.util
 
 import cats.kernel.laws.discipline.*
+import cats.syntax.option.*
+import lucuma.core.util.arb.ArbTimestamp.given
+import lucuma.core.util.arb.ArbTimestampInterval.given
 import munit.DisciplineSuite
 import org.scalacheck.Prop.forAll
 
 class TimestampIntervalSuite extends DisciplineSuite {
-
-  import arb.ArbTimestampInterval.given
 
   checkAll("Order", OrderTests[TimestampInterval].order)
 
@@ -207,4 +208,60 @@ class TimestampIntervalSuite extends DisciplineSuite {
     assertEquals(oor.timeBetween(interval(0, 10)), None)
   }
 
+  test("until abuts from") {
+    forAll { (t: Timestamp) =>
+      assert(TimestampInterval.until(t).abuts(TimestampInterval.from(t)))
+    }
+  }
+
+  test("until + from = All") {
+    forAll { (t: Timestamp) =>
+      assertEquals(
+        TimestampInterval.until(t).span(TimestampInterval.from(t)),
+        TimestampInterval.All
+      )
+    }
+  }
+
+  test("between works in either order") {
+    forAll { (t0: Timestamp, t1: Timestamp) =>
+      assertEquals(
+        TimestampInterval.between(t0, t1),
+        TimestampInterval.between(t1, t0)
+      )
+    }
+  }
+
+  test("All ∩ any = any") {
+    forAll { (i: TimestampInterval) =>
+      assertEquals(
+        TimestampInterval.All.intersection(i),
+        i.some
+      )
+    }
+  }
+
+  test("interval = from(start) ∩ until(end)") {
+    forAll { (i: TimestampInterval) =>
+      assertEquals(
+        TimestampInterval.from(i.start).intersection(TimestampInterval.until(i.end)),
+        i.some
+      )
+    }
+  }
+
+  test("All - any = until(start), from(end)") {
+    forAll { (i: TimestampInterval) =>
+      val first    = TimestampInterval.until(i.start)
+      val last     = TimestampInterval.from(i.end)
+      val expected =
+        if (first.abuts(last)) List(TimestampInterval.All)
+        else List(first, last).filter(_.nonEmpty)
+
+      assertEquals(
+        TimestampInterval.All.minus(i),
+        expected
+      )
+    }
+  }
 }

@@ -179,6 +179,17 @@ sealed class TimestampInterval private (val start: Timestamp, val end: Timestamp
 
 object TimestampInterval {
 
+  /**
+   * An interval covering all time (that can be expressed in a Timestamp).
+   */
+  val All: TimestampInterval =
+    between(Timestamp.Min, Timestamp.Max)
+
+  /**
+   * Creates an interval between the two timestamps, swapping the order if
+   * necessary.  If t0 comes before t1, the interval is [t0, t1).  Otherwise
+   * it is [t1, t0).
+   */
   def between(t0: Timestamp, t1: Timestamp): TimestampInterval =
     if (t0 <= t1) new TimestampInterval(t0, t1) else new TimestampInterval(t1, t0)
 
