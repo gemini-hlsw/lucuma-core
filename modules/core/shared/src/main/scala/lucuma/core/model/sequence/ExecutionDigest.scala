@@ -24,15 +24,15 @@ case class ExecutionDigest(
    * Planned time for the observation, including the science sequence but only
    * a reacquisition cost instead of the full setup time.
    */
-  def reacquisitionPlannedTime: PlannedTime =
-    science.plannedTime.sumCharge(science.observeClass.chargeClass, setup.reacquisition)
+  def reacquisitionTimeEstimate: CategorizedTime =
+    science.timeEstimate.sumCharge(science.observeClass.chargeClass, setup.reacquisition)
 
   /**
    * Planned time for the observation, including the science sequence and a
    * full setup time.
    */
-  def fullPlannedTime: PlannedTime =
-    science.plannedTime.sumCharge(science.observeClass.chargeClass, setup.full)
+  def fullTimeEstimate: CategorizedTime =
+    science.timeEstimate.sumCharge(science.observeClass.chargeClass, setup.full)
 
 }
 

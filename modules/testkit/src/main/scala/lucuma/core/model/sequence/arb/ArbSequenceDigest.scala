@@ -19,14 +19,14 @@ import scala.collection.immutable.SortedSet
 
 trait ArbSequenceDigest {
   import ArbEnumerated.*
-  import ArbPlannedTime.given
+  import ArbCategorizedTime.given
   import ArbOffset.*
 
   given Arbitrary[SequenceDigest] =
     Arbitrary {
       for {
         c  <- arbitrary[ObserveClass]
-        t  <- arbitrary[PlannedTime]
+        t  <- arbitrary[CategorizedTime]
         o  <- arbitrary[SortedSet[Offset]]
         n  <- arbitrary[NonNegInt]
       } yield SequenceDigest(c, t, o, n)
@@ -35,12 +35,12 @@ trait ArbSequenceDigest {
   given Cogen[SequenceDigest] =
     Cogen[(
       ObserveClass,
-      PlannedTime,
+      CategorizedTime,
       Set[Offset],
       NonNegInt
     )].contramap { a => (
       a.observeClass,
-      a.plannedTime,
+      a.timeEstimate,
       a.offsets,
       a.atomCount
     )}

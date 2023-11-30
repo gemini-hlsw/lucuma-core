@@ -28,8 +28,8 @@ case class Atom[D](
   lazy val observeClass: ObserveClass =
     steps.foldMap(_.observeClass)
 
-  lazy val plannedTime: PlannedTime =
-    steps.foldMap(_.plannedTime)
+  lazy val timeEstimate: CategorizedTime =
+    steps.foldMap(_.timeEstimate)
 
 }
 

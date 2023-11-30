@@ -27,7 +27,7 @@ import scala.collection.immutable.SortedSet
  */
 case class SequenceDigest(
   observeClass: ObserveClass,
-  plannedTime:  PlannedTime,
+  timeEstimate: CategorizedTime,
   offsets:      SortedSet[Offset],
   atomCount:    NonNegInt
 ) {
@@ -35,8 +35,8 @@ case class SequenceDigest(
   def add(o: ObserveClass): SequenceDigest =
     SequenceDigest.observeClass.modify(_ |+| o)(this)
 
-  def add(p: PlannedTime): SequenceDigest =
-    SequenceDigest.plannedTime.modify(_ |+| p)(this)
+  def add(p: CategorizedTime): SequenceDigest =
+    SequenceDigest.timeEstimate.modify(_ |+| p)(this)
 
   def add(o: Offset): SequenceDigest =
     SequenceDigest.offsets.modify(_ + o)(this)
@@ -56,7 +56,7 @@ object SequenceDigest {
   val Zero: SequenceDigest =
     SequenceDigest(
       Monoid[ObserveClass].empty,
-      PlannedTime.Zero,
+      CategorizedTime.Zero,
       SortedSet.empty,
       NonNegInt.unsafeFrom(0)
     )
@@ -66,8 +66,8 @@ object SequenceDigest {
     Focus[SequenceDigest](_.observeClass)
 
   /** @group Optics */
-  val plannedTime: Lens[SequenceDigest, PlannedTime] =
-    Focus[SequenceDigest](_.plannedTime)
+  val timeEstimate: Lens[SequenceDigest, CategorizedTime] =
+    Focus[SequenceDigest](_.timeEstimate)
 
   /** @group Optics */
   val offsets: Lens[SequenceDigest, SortedSet[Offset]] =
@@ -80,7 +80,7 @@ object SequenceDigest {
   given Eq[SequenceDigest] =
     Eq.by { a => (
       a.observeClass,
-      a.plannedTime,
+      a.timeEstimate,
       a.offsets,
       a.atomCount
     )}

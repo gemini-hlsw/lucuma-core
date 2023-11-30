@@ -3,45 +3,43 @@
 
 package lucuma.core.model.sequence
 
-import cats.Monoid
 import cats.Order
 import cats.implicits.catsKernelOrderingForOrder
+import cats.kernel.CommutativeMonoid
 import cats.syntax.foldable.*
 import cats.syntax.functor.*
 import cats.syntax.order.*
 import lucuma.core.enums.ChargeClass
 import lucuma.core.enums.ObserveClass
 import lucuma.core.util.TimeSpan
-import monocle.Iso
 
 import scala.annotation.targetName
 import scala.collection.immutable.SortedMap
 
-opaque type PlannedTime = SortedMap[ChargeClass, TimeSpan]
-
 /**
- * Planned time broken down by charge class.
- * @deprecated("replaced by CategorizedTime", "0.90.0")
+ * Time charge broken down by charge class.
  */
-object PlannedTime {
+opaque type CategorizedTime = SortedMap[ChargeClass, TimeSpan]
 
-  val Zero: PlannedTime =
+object CategorizedTime {
+
+  val Zero: CategorizedTime =
     SortedMap.empty
 
-  def apply(charges: (ChargeClass, TimeSpan)*): PlannedTime =
+  def apply(charges: (ChargeClass, TimeSpan)*): CategorizedTime =
     SortedMap(charges*)
 
-  def from(it: IterableOnce[(ChargeClass, TimeSpan)]): PlannedTime =
+  def from(it: IterableOnce[(ChargeClass, TimeSpan)]): CategorizedTime =
     SortedMap.from(it)
 
   /**
-   * Creates a `PlannedTime` instance where the entirety of the step estimate
+   * Creates a `CategorizedTime` instance where the entirety of the step estimate
    * is associated with the `ObserveClass`'s `ChargeClass`.
    */
-  def fromStep(observeClass: ObserveClass, stepEstimate: StepEstimate): PlannedTime =
+  def fromStep(observeClass: ObserveClass, stepEstimate: StepEstimate): CategorizedTime =
     apply(observeClass.chargeClass -> stepEstimate.total)
 
-  extension (pt: PlannedTime) {
+  extension (self: CategorizedTime) {
 
     /**
      * Gets the time charged for the given charge class (or TimeSpan.Zero if no
@@ -54,37 +52,55 @@ object PlannedTime {
     // find the Map apply :-/ For that reason I added `getOrZero`.
 
     /**
+     * Adjusts this `CategorizedTime` instance according to the supplied
+     * correction, adding or subtracting time associated its charge class but
+     * bounded by the min and max `TimeSpan` values.
+     */
+    def correct(c: TimeChargeCorrection): CategorizedTime =
+      c.op match {
+        case TimeChargeCorrection.Op.Add      => modify(c.chargeClass, _ +| c.amount)
+        case TimeChargeCorrection.Op.Subtract => modify(c.chargeClass, _ -| c.amount)
+      }
+
+    /**
      * Gets the time charged for the given charge class (or TimeSpan.Zero if no
      * charge is recorded).
      */
     def getOrZero(chargeClass: ChargeClass): TimeSpan =
-      pt.getOrElse(chargeClass, TimeSpan.Zero)
+      self.getOrElse(chargeClass, TimeSpan.Zero)
 
     /**
      * Returns `true` if there are no charges for any charge class.
      */
     def isZero: Boolean =
-      pt.forall(_._2.toMicroseconds === 0)
+      self.forall(_._2.toMicroseconds === 0)
 
     /**
-     * Returns `true` if there are is a charge for at least one charge class.
+     * Returns `true` if there is a charge for at least one charge class.
      */
     def nonZero: Boolean =
       !isZero
 
     /**
-     * Returns an updated PlannedTime value, changing the charge associated
+     * Returns an updated CategorizedTime value, changing the charge associated
      * with `chargeClass` to `time`.
      */
-    def updated(chargeClass: ChargeClass, time: TimeSpan): PlannedTime =
-      pt.updated(chargeClass, time)
+    def updated(chargeClass: ChargeClass, time: TimeSpan): CategorizedTime =
+      self.updated(chargeClass, time)
+
+    /**
+     * Modifies the amount associated with the given charge class using the
+     * provided operation.
+     */
+    def modify(chargeClass: ChargeClass, op: TimeSpan => TimeSpan): CategorizedTime =
+      self.updated(chargeClass, op(getOrZero(chargeClass)))
 
     /**
      * Sums the current charge associated with `chargeClass` with the given
-     * `time`, returning a new PlannedTime value.
+     * `time`, returning a new CategorizedTime value.
      */
-    def sumCharge(chargeClass: ChargeClass, time: TimeSpan): PlannedTime =
-      pt.updated(chargeClass, getOrZero(chargeClass) +| time)
+    def sumCharge(chargeClass: ChargeClass, time: TimeSpan): CategorizedTime =
+      modify(chargeClass, _ +| time)
 
     /**
      * Sums all the charges regardless of charge class.
@@ -99,36 +115,28 @@ object PlannedTime {
       ChargeClass.values.toList.fproduct(getOrZero)
 
     /**
-     * Adds the corresponding charges for two PlannedTime values.
+     * Adds the corresponding charges for two CategorizedTime values.
      */
     @targetName("boundedAdd")
-    def +|(other: PlannedTime): PlannedTime =
-      other.charges.foldLeft(pt) { case (res, (chargeClass, time)) =>
+    def +|(other: CategorizedTime): CategorizedTime =
+      other.charges.foldLeft(self) { case (res, (chargeClass, time)) =>
         res.sumCharge(chargeClass, time)
       }
-
   }
 
-  given Monoid[PlannedTime] =
-    Monoid.instance(Zero, _ +| _)
+  given CommutativeMonoid[CategorizedTime] =
+    CommutativeMonoid.instance(Zero, _ +| _)
 
   /**
    * Order by the sum of charges, then by program then partner.
    */
-  given Order[PlannedTime] =
-    Order.whenEqual[PlannedTime](
+  given Order[CategorizedTime] =
+    Order.whenEqual[CategorizedTime](
       Order.by(pt => ChargeClass.values.toList.foldMap(pt.getOrZero)),  // Order.by(_.sum) picks up Map's sum :-/
       Order.whenEqual(
         Order.by(_.getOrZero(ChargeClass.Program)),
         Order.by(_.getOrZero(ChargeClass.Partner))
       )
     )
-
-  val ToCategorizedTime: Iso[PlannedTime, CategorizedTime] =
-    Iso[PlannedTime, CategorizedTime] { pt =>
-      CategorizedTime.from(pt.charges)
-    } { tc =>
-      PlannedTime.from(tc.charges)
-    }
 
 }

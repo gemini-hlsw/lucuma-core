@@ -51,6 +51,12 @@ sealed class TimestampInterval private (val start: Timestamp, val end: Timestamp
   def containsInstant(time: Instant): Boolean =
     start.toInstant <= time && time < end.toInstant
 
+  def isEmpty: Boolean =
+    start === end
+
+  def nonEmpty: Boolean =
+    !isEmpty
+
   /**
    * The interval that includes both this and 'other' interval along with all
    * timestamps in between.
@@ -85,15 +91,12 @@ sealed class TimestampInterval private (val start: Timestamp, val end: Timestamp
    */
   def minus(other: TimestampInterval): List[TimestampInterval] =
     overlap(other) match {
-      case Overlap.LowerPartial                                  => List(between(start, other.start))
-      case Overlap.UpperPartial                                  => List(between(other.end, end))
-      case Overlap.ProperSuperset if (other.start === other.end) => List(this)
-      case Overlap.ProperSuperset if (start === other.start)     => List(between(other.end, end))
-      case Overlap.ProperSuperset if (end === other.end)         => List(between(start, other.start))
-      case Overlap.ProperSuperset                                => List(between(start, other.start), between(other.end, end))
-      case Overlap.None                                          => List(this)
+      case Overlap.LowerPartial    => List(between(start, other.start))
+      case Overlap.UpperPartial    => List(between(other.end, end))
+      case Overlap.ProperSuperset  => if (other.isEmpty) List(this) else List(between(start, other.start), between(other.end, end)).filter(!_.isEmpty)
+      case Overlap.None            => List(this)
       case Overlap.ProperSubset |
-           Overlap.Equal                                         => Nil
+           Overlap.Equal           => Nil
     }
 
   /**
@@ -176,8 +179,37 @@ sealed class TimestampInterval private (val start: Timestamp, val end: Timestamp
 
 object TimestampInterval {
 
+  /**
+   * An interval covering all time (that can be expressed in a Timestamp).
+   */
+  val All: TimestampInterval =
+    between(Timestamp.Min, Timestamp.Max)
+
+  /**
+   * Creates an interval between the two timestamps, swapping the order if
+   * necessary.  If t0 comes before t1, the interval is [t0, t1).  Otherwise
+   * it is [t1, t0).
+   */
   def between(t0: Timestamp, t1: Timestamp): TimestampInterval =
     if (t0 <= t1) new TimestampInterval(t0, t1) else new TimestampInterval(t1, t0)
+
+  /**
+   * Creates an empty interval with a start and end at the given timestamp.
+   */
+  def empty(at: Timestamp): TimestampInterval =
+    TimestampInterval(at, at)
+
+  /**
+   * Creates an interval [t, Max).
+   */
+  def from(t: Timestamp): TimestampInterval =
+    TimestampInterval.between(t, Timestamp.Max)
+
+  /**
+   * Creates an interval [Min, t).
+   */
+  def until(t: Timestamp): TimestampInterval =
+    TimestampInterval.between(Timestamp.Min, t)
 
   given Order[TimestampInterval] =
     Order.whenEqual(Order.by(_.start), Order.by(_.end))
