@@ -33,10 +33,11 @@ object LightSinkName {
   /** @group Constructors */ case object Phoenix extends LightSinkName("Phoenix", "phoenix")
   /** @group Constructors */ case object Gpi extends LightSinkName("Gpi", "gpi")
   /** @group Constructors */ case object Ghost extends LightSinkName("Ghost", "ghost")
+  /** @group Constructors */ case object Igrins2 extends LightSinkName("Igrins2", "igrins2")
 
   /** All members of LightSinkName, in canonical order. */
   val all: List[LightSinkName] =
-    List(Gmos, Niri_f6, Niri_f14, Niri_f32, Ac, Hr, Nifs, Gmos_Ifu, Gnirs, Visitor, F2, Gsaoi, Phoenix, Gpi, Ghost)
+    List(Gmos, Niri_f6, Niri_f14, Niri_f32, Ac, Hr, Nifs, Gmos_Ifu, Gnirs, Visitor, F2, Gsaoi, Phoenix, Gpi, Ghost, Igrins2)
 
   /** Select the member of LightSinkName with the given tag, if any. */
   def fromTag(s: String): Option[LightSinkName] =
