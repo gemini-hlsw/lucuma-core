@@ -43,7 +43,7 @@ jobs:
       - name: Setup Java (temurin@17)
         id: setup-java-temurin-17
         if: matrix.java == 'temurin@17'
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
@@ -57,7 +57,7 @@ jobs:
         run: sbt githubWorkflowCheck
 
       - name: Check headers and formatting
-        if: matrix.java == 'temurin@17'
+        if: matrix.java == 'temurin@17' && matrix.os == 'ubuntu-latest'
         run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' headerCheckAll scalafmtCheckAll 'project /' scalafmtSbtCheck lucumaScalafmtCheck lucumaScalafixCheck
 
       - name: Check scalafix lints
@@ -103,7 +103,7 @@ jobs:
       - name: Setup Java (temurin@17)
         id: setup-java-temurin-17
         if: matrix.java == 'temurin@17'
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
