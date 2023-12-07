@@ -38,15 +38,29 @@ final class CategorizedTimeSuite extends DisciplineSuite {
   }
 
   test("modify") {
-    forAll { (tc: CategorizedTime, c: ChargeClass, s: TimeSpan) =>
-      assertEquals(tc.modify(c, _ +| s)(c), tc(c) +| s)
-      assertEquals(tc.modify(c, _ -| s)(c), tc(c) -| s)
+    forAll { (a: CategorizedTime, c: ChargeClass, s: TimeSpan) =>
+      assertEquals(a.modify(c, _ +| s)(c), a(c) +| s)
+      assertEquals(a.modify(c, _ -| s)(c), a(c) -| s)
     }
   }
 
   test("apply") {
     forAll { (a: CategorizedTime) =>
-      assertEquals(a(ChargeClass.Program), a.getOrZero(ChargeClass.Program))
+      assertEquals(a(ChargeClass.Program), a.programTime)
+      assertEquals(a(ChargeClass.Partner), a.partnerTime)
+      assertEquals(a(ChargeClass.NonCharged), a.nonCharged)
+    }
+  }
+
+  test("sumCharge") {
+    forAll { (a: CategorizedTime, t: TimeSpan, c: ChargeClass) =>
+      assertEquals(a.sumCharge(c, t)(c), a(c) +| t)
+    }
+  }
+
+  test("sum") {
+    forAll { (a: CategorizedTime) =>
+      assertEquals(a.sum, a(ChargeClass.Program) +| a(ChargeClass.Partner) +| a(ChargeClass.NonCharged))
     }
   }
 
