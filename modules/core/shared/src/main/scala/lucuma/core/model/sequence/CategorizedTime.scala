@@ -8,7 +8,6 @@ import cats.implicits.catsKernelOrderingForOrder
 import cats.kernel.CommutativeMonoid
 import cats.syntax.foldable.*
 import cats.syntax.functor.*
-import cats.syntax.order.*
 import lucuma.core.enums.ChargeClass
 import lucuma.core.enums.ObserveClass
 import lucuma.core.util.TimeSpan
@@ -27,10 +26,10 @@ object CategorizedTime {
     SortedMap.empty
 
   def apply(charges: (ChargeClass, TimeSpan)*): CategorizedTime =
-    SortedMap(charges*)
+    from(charges)
 
   def from(it: IterableOnce[(ChargeClass, TimeSpan)]): CategorizedTime =
-    SortedMap.from(it)
+    SortedMap.from(it.iterator.filter { (_, t) => t.nonZero })
 
   /**
    * Creates a `CategorizedTime` instance where the entirety of the step estimate
@@ -73,7 +72,7 @@ object CategorizedTime {
      * Returns `true` if there are no charges for any charge class.
      */
     def isZero: Boolean =
-      self.forall(_._2.toMicroseconds === 0)
+      self.isEmpty
 
     /**
      * Returns `true` if there is a charge for at least one charge class.
@@ -81,19 +80,25 @@ object CategorizedTime {
     def nonZero: Boolean =
       !isZero
 
+    // An updated implementation used internally to remove Zero TimeSpan
+    // charges.  Named _updated to distinguish with self.updated.
+    private def _updated(chargeClass: ChargeClass, time: TimeSpan): CategorizedTime =
+      if (time.isZero) self.removed(chargeClass)
+      else self.updated(chargeClass, time)
+
     /**
      * Returns an updated CategorizedTime value, changing the charge associated
      * with `chargeClass` to `time`.
      */
     def updated(chargeClass: ChargeClass, time: TimeSpan): CategorizedTime =
-      self.updated(chargeClass, time)
+      _updated(chargeClass, time)
 
     /**
      * Modifies the amount associated with the given charge class using the
      * provided operation.
      */
     def modify(chargeClass: ChargeClass, op: TimeSpan => TimeSpan): CategorizedTime =
-      self.updated(chargeClass, op(getOrZero(chargeClass)))
+      _updated(chargeClass, op(getOrZero(chargeClass)))
 
     /**
      * Sums the current charge associated with `chargeClass` with the given

@@ -138,6 +138,12 @@ object TimeSpan {
 
   extension (timeSpan: TimeSpan) {
 
+    def isZero: Boolean =
+      toMicroseconds === 0
+
+    def nonZero: Boolean =
+      !isZero
+
     def toMicroseconds: Long =
       timeSpan.value
 
