@@ -7,10 +7,10 @@ import lucuma.core.util.Enumerated
 
 enum DatasetStage(val tag: String, val name: String, val description: String) derives Enumerated {
 
-  case EndObserve   extends DatasetStage("end_observe",   "End Observe",   "Marks the end of photon collection.")
+  case EndExpose    extends DatasetStage("end_expose",    "End Expose",    "Marks the end of photon collection.")
   case EndReadout   extends DatasetStage("end_readout",   "End Readout",   "Marks the end of detector readout.")
   case EndWrite     extends DatasetStage("end_write",     "End Write",     "Marks the end of write to permanent store.")
-  case StartObserve extends DatasetStage("start_observe", "Start Observe", "Marks the start of photon collection.")
+  case StartExpose  extends DatasetStage("start_expose",  "Start Expose",  "Marks the start of photon collection.")
   case StartReadout extends DatasetStage("start_readout", "Start Readout", "Marks the start of detector readout.")
   case StartWrite   extends DatasetStage("start_write",   "Start Write",   "Marks the start of write to permanent store.")
 
