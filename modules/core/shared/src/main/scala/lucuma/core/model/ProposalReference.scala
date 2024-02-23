@@ -25,6 +25,7 @@ object ProposalReference {
   object parse {
 
     import parser.ReferenceParsers.*
+    import Semester.parse.semester
 
     val proposal: Parser[ProposalReference] =
       (semester.between(string("G-"), dash) ~ index).map { (semester, index) =>
