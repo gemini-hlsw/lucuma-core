@@ -24,7 +24,7 @@ trait ArbWavelength {
   implicit val cogWavelength: Cogen[Wavelength] =
     Cogen[Int].contramap(_.toPicometers.value.value)
 
-  private[this] val intBoundedBigDecimals: Gen[BigDecimal] =
+  private val intBoundedBigDecimals: Gen[BigDecimal] =
     for {
       s  <- Gen.choose(0, 10)
       bd <- arbitrary[Int].map(BigDecimal(_))

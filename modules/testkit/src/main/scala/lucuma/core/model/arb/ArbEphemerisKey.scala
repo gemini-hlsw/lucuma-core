@@ -44,14 +44,14 @@ trait ArbEphemerisKey {
   val keyAndDes: Gen[(EphemerisKeyType, String)] =
     for {
       k <- arbitrary[EphemerisKeyType]
-      d <- arbitrary[Int].map(_.abs.toString).flatMapOneOf(Gen.const, perturbations: _*)
+      d <- arbitrary[Int].map(_.abs.toString).flatMapOneOf(Gen.const, perturbations*)
     } yield (k, d)
 
   // Strings that are often parsable
   val strings: Gen[String] =
     arbitrary[EphemerisKey]
       .map(EphemerisKey.fromString.reverseGet)
-      .flatMapOneOf(Gen.const, perturbations: _*)
+      .flatMapOneOf(Gen.const, perturbations*)
 
 }
 

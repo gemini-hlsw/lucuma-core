@@ -83,7 +83,7 @@ trait IntervalGens {
       )
 
     Gen
-      .frequency(freqs: _*)
+      .frequency(freqs*)
       .suchThat(_ > interval.lower || interval.lowerBound.isClosed)
       .suchThat(_ < interval.upper || interval.upperBound.isClosed)
   }

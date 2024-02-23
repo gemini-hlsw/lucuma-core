@@ -42,7 +42,7 @@ trait FormatTests[A, B] extends Laws {
     ab: Arbitrary[B],
     eb: Eq[B]
   ): RuleSet =
-    new SimpleRuleSet("format", allProps: _*)
+    new SimpleRuleSet("format", allProps*)
 
   /** Convenience constructor that allows passing an explicit generator for input values. */
   def formatWith(ga: Gen[A])(implicit
@@ -58,7 +58,7 @@ trait FormatTests[A, B] extends Laws {
     ab: Arbitrary[B],
     eb: Eq[B]
   ): RuleSet =
-    new SimpleRuleSet("format", lawsProps: _*)
+    new SimpleRuleSet("format", lawsProps*)
 
   /** Convenience constructor that allows passing an explicit generator for input values. */
   def formatLawsWith(ga: Gen[A])(implicit

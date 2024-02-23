@@ -14,7 +14,7 @@ import scala.collection.immutable.TreeSet
 
 trait TreeSetInstances extends TreeSetInstances1 {
 
-  implicit val catsStdInstancesForTreeSet: Foldable[TreeSet] with SemigroupK[TreeSet] =
+  implicit val catsStdInstancesForTreeSet: Foldable[TreeSet] & SemigroupK[TreeSet] =
     new Foldable[TreeSet] with SemigroupK[TreeSet] {
 
       def combineK[A](x: TreeSet[A], y: TreeSet[A]): TreeSet[A] = x | y

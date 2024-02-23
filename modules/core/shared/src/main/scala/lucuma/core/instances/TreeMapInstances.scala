@@ -41,7 +41,7 @@ trait TreeMapInstances extends TreeMapInstances2 {
     }
 
   implicit def catsStdInstancesForTreeMap[K: Order]
-    : Traverse[TreeMap[K, *]] with FlatMap[TreeMap[K, *]] =
+    : Traverse[TreeMap[K, *]] & FlatMap[TreeMap[K, *]] =
     new Traverse[TreeMap[K, *]] with FlatMap[TreeMap[K, *]] {
 
       implicit val orderingK: Ordering[K] = Order[K].toOrdering

@@ -61,7 +61,7 @@ object InputValidWedge {
    */
   def fromIso[A](iso: Iso[String, A]): InputValidWedge[A] =
     ValidWedge(
-      (iso.get _).andThen(_.asRight),
+      (iso.get).andThen(_.asRight),
       iso.reverseGet
     )
 

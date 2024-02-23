@@ -42,7 +42,7 @@ trait ArbEphemeris {
       for {
         len <- choose(0, 10)
         es  <- listOfN(len, arbitrary[Element])
-      } yield Ephemeris(es: _*)
+      } yield Ephemeris(es*)
     }
 
   implicit val cogEphemerisCoordinates: Cogen[EphemerisCoordinates] =

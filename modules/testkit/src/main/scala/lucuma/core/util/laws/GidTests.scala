@@ -33,13 +33,13 @@ trait GidLaws[A] extends CodecLaws[A] with OrderLaws[A] with BoundedEnumerableLa
 
 object GidLaws {
   def apply[A](implicit ev: Gid[A]): GidLaws[A] = new GidLaws[A] {
-    val gidA                                             = ev
-    val decode: Decoder[A]                               = ev
-    val encode: Encoder[A]                               = ev
-    val E: Order[A]                                      = ev
-    override def B: LowerBounded[A] with UpperBounded[A] = ev
-    implicit def N: PartialNext[A]                       = ev
-    implicit def P: PartialPrevious[A]                   = ev
+    val gidA                                          = ev
+    val decode: Decoder[A]                            = ev
+    val encode: Encoder[A]                            = ev
+    val E: Order[A]                                   = ev
+    override def B: LowerBounded[A] & UpperBounded[A] = ev
+    implicit def N: PartialNext[A]                    = ev
+    implicit def P: PartialPrevious[A]                = ev
   }
 }
 
@@ -63,9 +63,9 @@ trait GidTests[A] extends CodecTests[A] with OrderTests[A] with BoundedEnumerabl
     new RuleSet {
       val name: String                  = "Gid"
       val bases: Seq[(String, RuleSet)] = Seq(
-        "fromString" -> new SimpleRuleSet("Prism", PrismTests(laws.gidA.fromString).props: _*),
-        "isoPosLong" -> new SimpleRuleSet("Iso", IsoTests(laws.gidA.isoPosLong).props: _*),
-        "fromLong"   -> new SimpleRuleSet("Prism", PrismTests(laws.gidA.fromLong).props: _*)
+        "fromString" -> new SimpleRuleSet("Prism", PrismTests(laws.gidA.fromString).props*),
+        "isoPosLong" -> new SimpleRuleSet("Iso", IsoTests(laws.gidA.isoPosLong).props*),
+        "fromLong"   -> new SimpleRuleSet("Prism", PrismTests(laws.gidA.fromLong).props*)
       )
       val parents: Seq[RuleSet]         = Seq(
         unserializableCodec,

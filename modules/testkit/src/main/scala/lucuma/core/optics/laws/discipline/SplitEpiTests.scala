@@ -42,7 +42,7 @@ trait SplitEpiTests[A, B] extends FormatTests[A, B] {
     ab: Arbitrary[B],
     eb: Eq[B]
   ): RuleSet =
-    new DefaultRuleSet("SplitEpi", Some(format), allProps: _*)
+    new DefaultRuleSet("SplitEpi", Some(format), allProps*)
 
   /** Convenience constructor that allows passing an explicit generator for input values. */
   def splitEpiWith(ga: Gen[A])(implicit
@@ -58,7 +58,7 @@ trait SplitEpiTests[A, B] extends FormatTests[A, B] {
     ab: Arbitrary[B],
     eb: Eq[B]
   ): RuleSet =
-    new DefaultRuleSet("SplitEpi", Some(formatLaws), lawsProps: _*)
+    new DefaultRuleSet("SplitEpi", Some(formatLaws), lawsProps*)
 
   /** Convenience constructor that allows passing an explicit generator for input values. */
   def splitEpiLawsWith(ga: Gen[A])(implicit
