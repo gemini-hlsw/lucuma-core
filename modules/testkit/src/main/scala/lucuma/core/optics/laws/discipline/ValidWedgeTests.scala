@@ -51,7 +51,7 @@ trait ValidWedgeTests[E, A, B] extends Laws {
     ab: Arbitrary[B],
     eb: Eq[B]
   ): RuleSet =
-    new SimpleRuleSet("ValidWedge", allProps: _*)
+    new SimpleRuleSet("ValidWedge", allProps*)
 
   /** Convenience constructor that allows passing an explicit generator for input values. */
   def validWedgeWith(ga: Gen[A])(implicit
@@ -69,7 +69,7 @@ trait ValidWedgeTests[E, A, B] extends Laws {
     ab: Arbitrary[B],
     eb: Eq[B]
   ): RuleSet =
-    new SimpleRuleSet("ValidWedge", lawsProps: _*)
+    new SimpleRuleSet("ValidWedge", lawsProps*)
 
   /** Convenience constructor that allows passing an explicit generator for input values. */
   def validWedgeLawsWith(ga: Gen[A])(implicit

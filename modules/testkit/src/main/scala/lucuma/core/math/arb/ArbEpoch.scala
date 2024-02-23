@@ -45,12 +45,12 @@ trait ArbEpoch {
   val strings: Gen[String] =
     arbitrary[Epoch]
       .map(Epoch.fromString.reverseGet)
-      .flatMapOneOf(Gen.const, perturbations: _*) // include random strings
+      .flatMapOneOf(Gen.const, perturbations*) // include random strings
 
   val stringsNoScheme: Gen[String] =
     arbitrary[Epoch]
       .map(Epoch.fromStringNoScheme.reverseGet)
-      .flatMapOneOf(Gen.const, noSchemePerturbations: _*)
+      .flatMapOneOf(Gen.const, noSchemePerturbations*)
 
   val arbJulianEpoch: Arbitrary[Epoch] =
     Arbitrary {

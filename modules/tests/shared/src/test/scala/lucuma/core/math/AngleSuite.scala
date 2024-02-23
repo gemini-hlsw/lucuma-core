@@ -19,8 +19,8 @@ final class AngleSuite extends munit.DisciplineSuite {
   // Laws
   checkAll("Angle", CommutativeGroupTests[Angle].commutativeGroup)
   checkAll("Angle", EqTests[Angle].eqv)
-  checkAll("Angle", OrderTests[Angle](Angle.AngleOrder).order)
-  checkAll("SignedAngle", OrderTests[Angle](Angle.SignedAngleOrder).order)
+  checkAll("Angle", OrderTests[Angle](using Angle.AngleOrder).order)
+  checkAll("SignedAngle", OrderTests[Angle](using Angle.SignedAngleOrder).order)
 
   // Optics
   checkAll("microarcseconds",              SplitMonoTests(Angle.microarcseconds).splitMono)

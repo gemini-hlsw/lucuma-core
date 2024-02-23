@@ -59,7 +59,7 @@ final class SampleRounderSuite extends munit.DisciplineSuite {
 
   test("SampleRounder[Closest, LinearInterpolating]") {
     val rounder = implicitly[SampleRounder[RoundStrategy.LinearInterpolating, Long]]
-      .imap(Instant.ofEpochMilli _)(_.toEpochMilli)
+      .imap(Instant.ofEpochMilli)(_.toEpochMilli)
     forAll { (i0: Instant, i1: Instant, i2: Instant) =>
       val i       = List(i0, i1, i2).sorted
       val rounded = rounder.round(i(0), i(0), i(2), i(2), i(1))

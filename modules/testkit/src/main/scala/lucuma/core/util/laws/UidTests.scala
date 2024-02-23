@@ -56,8 +56,8 @@ trait UidTests[A] extends CodecTests[A] with OrderTests[A] {
     new RuleSet {
       val name: String                  = "Uid"
       val bases: Seq[(String, RuleSet)] = Seq(
-        "fromString" -> new SimpleRuleSet("Prism", PrismTests(laws.uidA.fromString).props: _*),
-        "isoUuid"    -> new SimpleRuleSet("Iso", IsoTests(laws.uidA.isoUuid).props: _*)
+        "fromString" -> new SimpleRuleSet("Prism", PrismTests(laws.uidA.fromString).props*),
+        "isoUuid"    -> new SimpleRuleSet("Iso", IsoTests(laws.uidA.isoUuid).props*)
       )
       val parents: Seq[RuleSet]         = Seq(
         unserializableCodec,

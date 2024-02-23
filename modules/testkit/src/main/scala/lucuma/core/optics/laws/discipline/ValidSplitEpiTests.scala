@@ -50,7 +50,7 @@ trait ValidSplitEpiTests[E, A, B] extends Laws {
       (validSplitEpiLaws.props :+
         "coverage" -> exists((a: A) =>
           validSplitEpiProps.ensureValidationOrNormalizationCheck(a)
-        )): _*
+        ))*
     )
 
   /** Convenience constructor that allows passing an explicit generator for input values. */

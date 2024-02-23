@@ -161,7 +161,7 @@ trait SampleRounderInstances {
     interpolatedLongRounder.imap(Angle.microarcseconds.reverse)
 
   implicit val interpolatedDeclinationRounder: SampleRounder[LinearInterpolating, Declination] =
-    interpolatedAngleRounder.imap((Declination.fromAngleWithCarry _).andThen(_._1))(_.toAngle)
+    interpolatedAngleRounder.imap((Declination.fromAngleWithCarry).andThen(_._1))(_.toAngle)
 
   implicit val interpolatedHourAngleRounder: SampleRounder[LinearInterpolating, HourAngle] =
     interpolatedAngleRounder.imap(HourAngle.angle.reverse)

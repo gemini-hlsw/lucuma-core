@@ -44,7 +44,7 @@ trait SplitMonoTests[A, B] extends Laws {
     ab: Arbitrary[B],
     eb: Eq[B]
   ): RuleSet =
-    new SimpleRuleSet("SplitMono", allProps: _*)
+    new SimpleRuleSet("SplitMono", allProps*)
 
   /** Convenience constructor that allows passing an explicit generator for input values. */
   def splitMonoWith(ga: Gen[A])(implicit
@@ -60,7 +60,7 @@ trait SplitMonoTests[A, B] extends Laws {
     ab: Arbitrary[B],
     eb: Eq[B]
   ): RuleSet =
-    new SimpleRuleSet("SplitMono", lawsProps: _*)
+    new SimpleRuleSet("SplitMono", lawsProps*)
 
   /** Convenience constructor that allows passing an explicit generator for input values. */
   def splitMonoLawsWith(ga: Gen[A])(implicit

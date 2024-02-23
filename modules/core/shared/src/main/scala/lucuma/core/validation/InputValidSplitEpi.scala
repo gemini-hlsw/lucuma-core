@@ -68,7 +68,7 @@ object InputValidSplitEpi {
    */
   def fromIso[A](iso: Iso[String, A]): InputValidSplitEpi[A] =
     ValidSplitEpi(
-      (iso.get _).andThen(_.asRight),
+      (iso.get).andThen(_.asRight),
       iso.reverseGet
     )
 

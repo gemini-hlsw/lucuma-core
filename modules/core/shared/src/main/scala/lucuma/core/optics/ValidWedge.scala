@@ -145,7 +145,7 @@ object ValidWedge {
    */
   def fromIso[E, A, B](iso: Iso[A, B]): ValidWedge[E, A, B] =
     ValidWedge(
-      (iso.get _).andThen(_.asRight),
+      (iso.get).andThen(_.asRight),
       iso.reverseGet
     )
 

@@ -44,7 +44,7 @@ final class SolverSuite extends munit.DisciplineSuite with IntervalGens {
 
   test("Check Default Solver") {
     val solver = constraintSolver[Default](f1)
-    val solve  = solver.solve(TestCalculator) _
+    val solve  = solver.solve(TestCalculator)
 
     assertEquals(IntervalSeq(buildInterval(0, 150)), solve(buildInterval(0, 200)))
     assertEquals(IntervalSeq(buildInterval(250, 400)), solve(buildInterval(200, 400)))
@@ -57,7 +57,7 @@ final class SolverSuite extends munit.DisciplineSuite with IntervalGens {
 
   test("Check Parabola Solver") {
     val solver = constraintSolver[Parabola](f1)
-    val solve  = solver.solve(TestCalculator) _
+    val solve  = solver.solve(TestCalculator)
 
     assertEquals(IntervalSeq(buildInterval(0, 150)), solve(buildInterval(0, 200)))
     assertEquals(IntervalSeq(buildInterval(250, 400)), solve(buildInterval(200, 400)))
@@ -74,7 +74,7 @@ final class SolverSuite extends munit.DisciplineSuite with IntervalGens {
 
   test("Check Parabola Solver 2") {
     val solver = constraintSolver[Parabola](f2)
-    val solve  = solver.solve(TestCalculator) _
+    val solve  = solver.solve(TestCalculator)
 
     assert(
       (IntervalSeq(buildInterval(5000, 6000)) === solve(buildInterval(0, 10000)))

@@ -49,11 +49,11 @@ class TargetSuite extends DisciplineSuite {
   checkAll("Eq[Target.Sidereal]", EqTests[Target.Sidereal].eqv)
   checkAll(
     "Target.Sidereal.TrackOrder",
-    OrderTests[Target.Sidereal](Target.Sidereal.TrackOrder).order
+    OrderTests[Target.Sidereal](using Target.Sidereal.TrackOrder).order
   )
   checkAll(
     "Target.Sidereal.NameOrder",
-    OrderTests[Target.Sidereal](Target.Sidereal.NameOrder).order
+    OrderTests[Target.Sidereal](using Target.Sidereal.NameOrder).order
   )
   checkAll("Target.Sidereal.name", LensTests(Target.Sidereal.name))
   checkAll("Target.Sidereal.tracking", LensTests(Target.Sidereal.tracking))
@@ -163,11 +163,11 @@ class TargetSuite extends DisciplineSuite {
   checkAll("Eq[Target.Nonsidereal]", EqTests[Target.Nonsidereal].eqv)
   checkAll(
     "Target.Nonsidereal.TrackOrder",
-    OrderTests[Target.Nonsidereal](Target.Nonsidereal.TrackOrder).order
+    OrderTests[Target.Nonsidereal](using Target.Nonsidereal.TrackOrder).order
   )
   checkAll(
     "Target.Nonsidereal.NameOrder",
-    OrderTests[Target.Nonsidereal](Target.Nonsidereal.NameOrder).order
+    OrderTests[Target.Nonsidereal](using Target.Nonsidereal.NameOrder).order
   )
   checkAll("Target.Nonsidereal.name", LensTests(Target.Nonsidereal.name))
   checkAll("Target.Nonsidereal.ephemerisKey", LensTests(Target.Nonsidereal.ephemerisKey))
@@ -265,8 +265,8 @@ class TargetSuite extends DisciplineSuite {
   // Laws for Target
   checkAll("Target.Id", GidTests[Target.Id].gid)
   checkAll("Eq[Target]", EqTests[Target].eqv)
-  checkAll("Target.TrackOrder", OrderTests[Target](Target.TrackOrder).order)
-  checkAll("Target.NameOrder", OrderTests[Target](Target.NameOrder).order)
+  checkAll("Target.TrackOrder", OrderTests[Target](using Target.TrackOrder).order)
+  checkAll("Target.NameOrder", OrderTests[Target](using Target.NameOrder).order)
   checkAll("Target.sidereal", PrismTests(Target.sidereal))
   checkAll("Target.nonsidereal", PrismTests(Target.nonsidereal))
   checkAll("Target.name", LensTests(Target.name))

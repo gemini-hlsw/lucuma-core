@@ -68,7 +68,7 @@ final class ZipperSuite extends munit.DisciplineSuite {
   }
   test("of") {
     forAll { (nel: NonEmptyList[Int]) =>
-      assert(Zipper.of(nel.head, nel.tail: _*) === Zipper.fromNel(nel))
+      assert(Zipper.of(nel.head, nel.tail*) === Zipper.fromNel(nel))
     }
   }
   test("toNel") {

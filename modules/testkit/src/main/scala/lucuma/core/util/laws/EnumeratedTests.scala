@@ -49,7 +49,7 @@ trait EnumeratedTests[A] extends CodecTests[A] with OrderTests[A] {
       val bases: Seq[(String, RuleSet)] = Nil
       val parents: Seq[RuleSet] = Seq(unserializableCodec, order)
       val props: Seq[(String, Prop)] = Seq(
-        "tag round-trip" -> Prop.forAll(laws.tagRoundTrip _),
+        "tag round-trip" -> Prop.forAll(laws.tagRoundTrip),
       )
     }
 

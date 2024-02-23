@@ -45,7 +45,7 @@ def averageParallacticAngle(site: Site, tracking: ObjectTracking, vizTime: Insta
     } yield Math.ceil(defined.start + i * preciseRate).toLong // always round up
     require(ts.head == defined.start)
     require(ts.last >= defined.end)
-    Vector(ts: _*)
+    Vector(ts*)
   }
 
   def calculate(site: Site, tracking: ObjectTracking): Vector[SkyCalcResults] = {

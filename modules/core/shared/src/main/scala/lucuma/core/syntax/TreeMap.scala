@@ -14,7 +14,7 @@ final class TreeMapCompanionOps(private val self: TreeMap.type) extends AnyVal {
    * Creates a `TreeMap` from a `List[(A, B)]`, provided an `Ordering[A]` is available.
    */
   def fromList[A: Ordering, B](lst: List[(A, B)]): TreeMap[A, B] =
-    TreeMap(lst: _*)
+    TreeMap(lst*)
 
   /**
    * Creates a `TreeMap` from a `Foldable[(A, B)]`, provided an `Ordering[A]` is available.

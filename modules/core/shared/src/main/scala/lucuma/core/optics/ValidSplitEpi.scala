@@ -166,7 +166,7 @@ object ValidSplitEpi {
    */
   def fromIso[E, A, B](iso: Iso[A, B]): ValidSplitEpi[E, A, B] =
     ValidSplitEpi(
-      (iso.get _).andThen(_.asRight),
+      (iso.get).andThen(_.asRight),
       iso.reverseGet
     )
 
