@@ -14,10 +14,12 @@ import io.circe.Encoder
 import io.circe.syntax.*
 import lucuma.core.optics.Format
 
-
 case class ProposalReference(semester: Semester, index: PosInt) {
+
+  /** Formatted proposal reference String. */
   def label: String =
     f"G-${semester.format}-$index%04d"
+
 }
 
 object ProposalReference {
@@ -36,6 +38,9 @@ object ProposalReference {
 
   given Order[ProposalReference] =
     Order.by { a => (a.semester, a.index.value) }
+
+  given Ordering[ProposalReference] =
+    Order[ProposalReference].toOrdering
 
   val fromString: Format[String, ProposalReference] =
     Format(s => parse.proposal.parseAll(s).toOption, _.label)

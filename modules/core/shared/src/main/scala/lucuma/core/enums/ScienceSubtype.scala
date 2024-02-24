@@ -25,6 +25,6 @@ object ScienceSubtype {
     values.find(_.letter === c)
 
   given Ordering[ProgramType] =
-    Order.catsKernelOrderingForOrder
+    Order[ProgramType].toOrdering
 
 }

@@ -23,6 +23,6 @@ object ProgramType {
     values.find(_.abbreviation === a)
 
   given Ordering[ProgramType] =
-    Order.catsKernelOrderingForOrder
+    Order[ProgramType].toOrdering
 
 }
