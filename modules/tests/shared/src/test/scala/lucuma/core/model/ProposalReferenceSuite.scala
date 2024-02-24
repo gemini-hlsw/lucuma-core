@@ -4,8 +4,8 @@
 package lucuma.core.model
 
 import cats.kernel.laws.discipline.*
-import lucuma.core.optics.laws.discipline.*
 import lucuma.core.model.arb.ArbProposalReference
+import lucuma.core.optics.laws.discipline.*
 
 final class ProposalReferenceSuite extends munit.DisciplineSuite {
 
