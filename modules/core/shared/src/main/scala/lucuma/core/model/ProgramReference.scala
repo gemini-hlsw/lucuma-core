@@ -48,7 +48,7 @@ object ProgramReference {
       ProgramType.Calibration
 
     override def label: String =
-      f"G-${semester.format}-${programType.abbreviation}-${instrument.tag}-$index%02d"
+      f"G-${semester.format}-${programType.abbreviation}-${instrument.referenceName}-$index%02d"
   }
 
   object Calibration {
@@ -66,7 +66,7 @@ object ProgramReference {
       ProgramType.Engineering
 
     override def label: String =
-      f"G-${semester.format}-${programType.abbreviation}-${instrument.tag}-$index%02d"
+      f"G-${semester.format}-${programType.abbreviation}-${instrument.referenceName}-$index%02d"
   }
 
   object Engineering {
@@ -84,7 +84,7 @@ object ProgramReference {
       ProgramType.Example
 
     override def label: String =
-      s"G-${programType.abbreviation}-${instrument.tag}"
+      s"G-${programType.abbreviation}-${instrument.referenceName}"
   }
 
   object Example {
@@ -102,7 +102,7 @@ object ProgramReference {
       ProgramType.Library
 
     override def label: String =
-      s"G-${programType.abbreviation}-${instrument.tag}-${description.value}"
+      s"G-${programType.abbreviation}-${instrument.referenceName}-${description.value}"
   }
 
   object Library {
@@ -134,7 +134,6 @@ object ProgramReference {
 
   object parse {
 
-    import lucuma.core.enums.parser.EnumParsers.instrument
     import lucuma.core.enums.parser.EnumParsers.scienceSubtype
     import parser.ReferenceParsers.*
     import Semester.parse.semester
@@ -144,7 +143,7 @@ object ProgramReference {
         .mapFilter(s => Description.from(s).toOption)
 
     def semesterInstrumentIndex[A](abbr: String)(f: (Semester, Instrument, PosInt) => A): Parser[A] =
-      (semester.surroundedBy(dash).between(G, string(abbr)) ~ instrument.surroundedBy(dash) ~ index)
+      (semester.surroundedBy(dash).between(G, string(abbr)) ~ instrumentByReferenceName.surroundedBy(dash) ~ index)
         .map { case ((semester, instrument), index) => f(semester, instrument, index) }
 
     val calibration: Parser[Calibration] =
@@ -154,12 +153,12 @@ object ProgramReference {
       semesterInstrumentIndex(ProgramType.Engineering.abbreviation)(Engineering.apply)
 
     val example: Parser[Example] =
-      (string(s"G-${ProgramType.Example.abbreviation}-") *> instrument).map { instrument =>
+      (string(s"G-${ProgramType.Example.abbreviation}-") *> instrumentByReferenceName).map { instrument =>
         Example(instrument)
       }
 
     val library: Parser[Library] =
-      (instrument.between(string(s"G-${ProgramType.Library.abbreviation}-"), dash) ~ description)
+      (instrumentByReferenceName.between(string(s"G-${ProgramType.Library.abbreviation}-"), dash) ~ description)
         .map { case (instrument, description) => Library(instrument, description) }
 
     val program: Parser[Science] =
