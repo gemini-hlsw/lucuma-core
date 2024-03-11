@@ -49,8 +49,8 @@ implicit val cogenNonNegativeInt: Cogen[NonNegInt] = Cogen[Int].contramap(_.valu
 
 implicit val cogenNonEmptyString: Cogen[NonEmptyString] = Cogen[String].contramap(_.value)
 
-def newTypeArbitrary[T: Arbitrary](base: NewType[T]): Arbitrary[base.Type] = 
+def newTypeArbitrary[T: Arbitrary](base: NewType[T]): Arbitrary[base.Type] =
   Arbitrary(arbitrary[T].map(base.apply(_)))
 
-def newTypeCogen[T: Cogen](base: NewType[T]): Cogen[base.Type] = 
+def newTypeCogen[T: Cogen](base: NewType[T]): Cogen[base.Type] =
   Cogen[T].contramap(_.value)

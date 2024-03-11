@@ -121,7 +121,7 @@ object StepConfig {
       Focus[Gcal](_.shutter)
   }
 
-  final case class Science(offset: Offset, guiding: GuideState) extends StepConfig(StepType.Science)
+  final case class Science(offset: Offset, guiding: StepGuideState) extends StepConfig(StepType.Science)
 
   object Science {
     implicit val eqStepConfigScience: Eq[Science] =
@@ -135,7 +135,7 @@ object StepConfig {
       Focus[Science](_.offset)
 
     /** @group Optics */
-    val guiding: Lens[Science, GuideState] =
+    val guiding: Lens[Science, StepGuideState] =
       Focus[Science](_.guiding)
   }
 
