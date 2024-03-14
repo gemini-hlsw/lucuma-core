@@ -8,6 +8,7 @@ import cats.derived.*
 import cats.syntax.eq.*
 import lucuma.core.enums.DatasetStage
 import lucuma.core.enums.SequenceCommand
+import lucuma.core.enums.SlewStage
 import lucuma.core.enums.StepStage
 import lucuma.core.model.sequence.Dataset
 import lucuma.core.model.sequence.Step
@@ -27,11 +28,13 @@ sealed trait ExecutionEvent derives Eq {
   import ExecutionEvent.*
 
   def fold[A](
+    slewEvent:     SlewEvent     => A,
     sequenceEvent: SequenceEvent => A,
     stepEvent:     StepEvent     => A,
     datasetEvent:  DatasetEvent  => A
   ): A =
     this match {
+      case e@SlewEvent(_, _, _, _, _)          => slewEvent(e)
       case e@SequenceEvent(_, _, _, _, _)      => sequenceEvent(e)
       case e@StepEvent(_, _, _, _, _, _)       => stepEvent(e)
       case e@DatasetEvent(_, _, _, _, _, _, _) => datasetEvent(e)
@@ -40,6 +43,14 @@ sealed trait ExecutionEvent derives Eq {
 }
 
 object ExecutionEvent extends WithGid('e'.refined) {
+
+  case class SlewEvent(
+    id:            ExecutionEvent.Id,
+    received:      Timestamp,
+    observationId: Observation.Id,
+    visitId:       Visit.Id,
+    stage:         SlewStage
+  ) extends ExecutionEvent derives Eq
 
   case class SequenceEvent(
     id:            ExecutionEvent.Id,
@@ -73,6 +84,9 @@ object ExecutionEvent extends WithGid('e'.refined) {
 
   val sequenceEvent: Prism[ExecutionEvent, SequenceEvent] =
     GenPrism[ExecutionEvent, SequenceEvent]
+
+  val slewEvent: Prism[ExecutionEvent, SlewEvent] =
+    GenPrism[ExecutionEvent, SlewEvent]
 
   val stepEvent: Prism[ExecutionEvent, StepEvent] =
     GenPrism[ExecutionEvent, StepEvent]
