@@ -22,10 +22,12 @@ trait NewType[Wrapped]:
   opaque type Type = Wrapped
 
   inline def apply(w: Wrapped): Type = w
+  
+  val value: Iso[Type, Wrapped] = Iso[Type, Wrapped](_.value)(apply)
 
-  extension (t: Type) inline def value: Wrapped = t
-
-  val value: Iso[Type, Wrapped] = Iso[Type, Wrapped](_.value)(w => apply(w))
+  extension (t: Type)
+    inline def value: Wrapped = t
+    inline def modifyValue(f: Wrapped => Wrapped): Type = apply(f(value))
 
   given (using CanEqual[Wrapped, Wrapped]): CanEqual[Type, Type] = CanEqual.derived
   given (using eq: Eq[Wrapped]): Eq[Type]                        = eq
