@@ -3,8 +3,10 @@
 
 package lucuma.core.enums
 
+import io.circe.testing.CodecTests
+import io.circe.testing.instances.arbitraryJson
 import lucuma.core.util.Enumerated
-import lucuma.core.util.arb.ArbEnumerated.*
+import lucuma.core.util.arb.ArbEnumerated.given
 import lucuma.core.util.laws.EnumeratedTests
 import monocle.law.discipline.PrismTests
 import munit.*
@@ -15,12 +17,13 @@ enum Theme(val tag: String) derives Enumerated:
    case Light extends Theme("light")
    case Dark extends Theme("dark")
 
-final class EnumeratedSuite extends DisciplineSuite {
+class EnumeratedSuite extends DisciplineSuite {
 
   def checkEnumLaws[A: Enumerated](implicit ct: ClassTag[A]) = {
     val className = ct.runtimeClass.getSimpleName
     checkAll(s"Enumerated[$className]", EnumeratedTests[A].enumerated)
     checkAll(s"Prism[String, $className]", PrismTests(Enumerated.fromTag[A]))
+    checkAll(s"Codec[$className]", CodecTests[A].unserializableCodec)
   }
 
   // Check some Enumerateds

@@ -6,15 +6,14 @@ package core
 package model
 package arb
 
-import eu.timepit.refined.scalacheck.string._
-import eu.timepit.refined.types.string._
+import eu.timepit.refined.scalacheck.string.*
+import eu.timepit.refined.types.string.*
 import lucuma.core.enums.CatalogName
-import lucuma.core.util.arb.ArbEnumerated
+import lucuma.core.util.arb.ArbEnumerated.given
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck._
 
 trait ArbCatalogInfo {
-  import ArbEnumerated._
 
   implicit val arbCatalogInfo: Arbitrary[CatalogInfo] =
     Arbitrary {

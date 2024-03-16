@@ -9,7 +9,7 @@ import monocle.law.discipline.*
 import munit.*
 
 final class GmosCcdModeSuite extends DisciplineSuite {
-  import ArbEnumerated.*
+  import ArbEnumerated.given
   import lucuma.core.model.sequence.gmos.arb.ArbGmosCcdMode.*
 
   checkAll("Order[GmosCcdMode]", OrderTests[GmosCcdMode].order)

@@ -9,7 +9,7 @@ import munit.DisciplineSuite
 
 final class ObsActiveSuite extends DisciplineSuite {
 
-  import lucuma.core.util.arb.ArbEnumerated._
+  import lucuma.core.util.arb.ArbEnumerated.given
 
   checkAll("Order[ObsActiveStatus]", OrderTests[ObsActiveStatus].order)
   checkAll("Iso[ObsActiveStatus]", IsoTests(ObsActiveStatus.FromBoolean))

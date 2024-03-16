@@ -13,7 +13,7 @@ import org.scalacheck.Arbitrary.*
 import org.scalacheck.Cogen
 
 trait ArbStep {
-  import ArbEnumerated.*
+  import ArbEnumerated.given
   import ArbStepEstimate.given
   import ArbStepConfig.*
   import ArbUid.*

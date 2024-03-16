@@ -21,7 +21,7 @@ import monocle.law.discipline.LensTests
 import munit.*
 
 final class EmissionLineSuite extends DisciplineSuite {
-  import ArbEnumerated.*
+  import ArbEnumerated.given
   import ArbEmissionLine.given
   import ArbLineFluxValue.given
   import ArbLineWidthValue.given

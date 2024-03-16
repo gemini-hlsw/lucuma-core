@@ -15,8 +15,8 @@ import org.scalacheck.Arbitrary.*
 import org.scalacheck.*
 
 trait ArbGmosGratingConfig {
-  import ArbEnumerated._
-  import ArbWavelength._
+  import ArbEnumerated.given
+  import ArbWavelength.*
 
   implicit val arbGmosNorthGratingConfig: Arbitrary[GmosGratingConfig.North] =
     Arbitrary {

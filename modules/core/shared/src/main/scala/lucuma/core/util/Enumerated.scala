@@ -55,7 +55,7 @@ trait Enumerated[A] extends Order[A] with Encoder[A] with Decoder[A] {
 
 object Enumerated {
 
-  def apply[A](implicit ev: Enumerated[A]): ev.type = ev
+  def apply[A](using ev: Enumerated[A]): ev.type = ev
 
   @inline
   def from[A](a: A, as: A*): Applied[A]           = new Applied(a :: as.toList)
@@ -69,7 +69,7 @@ object Enumerated {
       }
   }
 
-  def fromTag[A](implicit ev: Enumerated[A]): Prism[String, A] =
+  def fromTag[A](using ev: Enumerated[A]): Prism[String, A] =
     Prism[String, A](ev.fromTag)(e => ev.tag(e))
 
   private def enumValuesImpl[E: Type](using Quotes): Expr[Array[E]] =

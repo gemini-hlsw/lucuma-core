@@ -20,7 +20,7 @@ import org.scalacheck.Prop.forAll
 
 final class CategorizedTimeSuite extends DisciplineSuite {
 
-  import ArbEnumerated.*
+  import ArbEnumerated.given
   import ArbCategorizedTime.given
   import ArbTimeSpan.given
 

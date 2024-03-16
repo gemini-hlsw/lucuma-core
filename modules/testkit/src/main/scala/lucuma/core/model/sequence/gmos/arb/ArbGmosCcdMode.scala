@@ -10,7 +10,7 @@ import org.scalacheck.Arbitrary.*
 import org.scalacheck.*
 
 trait ArbGmosCcdMode {
-  import ArbEnumerated._
+  import ArbEnumerated.given
 
   implicit val arbGmosCcdMode: Arbitrary[GmosCcdMode] =
     Arbitrary(

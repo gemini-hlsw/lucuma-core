@@ -19,7 +19,7 @@ import org.scalacheck.*
 
 trait ArbExecutionEvent {
 
-  import ArbEnumerated.*
+  import ArbEnumerated.given
   import ArbGid.*
   import ArbTimestamp.*
   import ArbUid.*

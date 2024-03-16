@@ -38,7 +38,7 @@ final class SourceProfileSuite extends DisciplineSuite {
   import ArbAngle.*
   import ArbBrightnessValue.given
   import ArbEmissionLine.given
-  import ArbEnumerated.*
+  import ArbEnumerated.given
   import ArbFluxDensityContinuumValue.given
   import ArbMeasure.given
   import ArbSourceProfile.given

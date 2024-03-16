@@ -13,8 +13,8 @@ import org.scalacheck.Cogen
 import org.scalacheck.Gen
 
 trait ArbStaticConfig {
-  import ArbEnumerated._
-  import ArbGmosNodAndShuffle._
+  import ArbEnumerated.given
+  import ArbGmosNodAndShuffle.*
 
   implicit val arbStaticConfigGmosNorth: Arbitrary[StaticConfig.GmosNorth] = Arbitrary(
     for {

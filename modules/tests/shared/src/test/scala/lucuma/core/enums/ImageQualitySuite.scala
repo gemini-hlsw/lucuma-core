@@ -11,7 +11,7 @@ import org.scalacheck.Prop.*
 
 final class ImageQualitySuite extends DisciplineSuite {
 
-  import ArbEnumerated.*
+  import ArbEnumerated.given
 
   test("toAngle") {
     forAll { (a: ImageQuality) =>

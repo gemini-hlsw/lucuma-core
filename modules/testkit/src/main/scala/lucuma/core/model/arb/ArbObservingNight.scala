@@ -15,7 +15,7 @@ import org.scalacheck.*
 import java.time.LocalDate
 
 trait ArbObservingNight {
-  import ArbEnumerated.*
+  import ArbEnumerated.given
   import ArbTime.*
 
   implicit val arbLocalObservingNight: Arbitrary[LocalObservingNight] =

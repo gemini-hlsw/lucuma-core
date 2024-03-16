@@ -16,7 +16,7 @@ import org.scalacheck.Cogen.*
 
 class ProposalSuite extends DisciplineSuite {
   import ArbCollection.given
-  import ArbEnumerated.*
+  import ArbEnumerated.given
   import ArbProposal.given
   import ArbProposalClass.given
 

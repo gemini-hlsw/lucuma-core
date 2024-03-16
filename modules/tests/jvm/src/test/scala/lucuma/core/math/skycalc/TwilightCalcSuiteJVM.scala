@@ -16,7 +16,7 @@ import java.time.Instant
 import java.time.LocalDate
 
 final class TwilightCalcSuiteJVM extends ScalaCheckSuite {
-  import ArbEnumerated.*
+  import ArbEnumerated.given
   import ArbTime.*
 
   implicit val showLocalDate: Show[LocalDate] = Show.fromToString

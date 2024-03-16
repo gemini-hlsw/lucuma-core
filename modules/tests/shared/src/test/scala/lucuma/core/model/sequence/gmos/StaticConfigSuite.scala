@@ -9,7 +9,7 @@ import monocle.law.discipline.*
 import munit.*
 
 final class StaticConfigSuite extends DisciplineSuite {
-  import ArbEnumerated.*
+  import ArbEnumerated.given
   import lucuma.core.model.sequence.gmos.arb.ArbGmosNodAndShuffle.*
   import lucuma.core.model.sequence.gmos.arb.ArbStaticConfig.*
 

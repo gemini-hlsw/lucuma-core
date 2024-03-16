@@ -11,7 +11,7 @@ import monocle.law.discipline.*
 import munit.*
 
 final class GmosGratingConfigSuite extends DisciplineSuite {
-  import ArbEnumerated.*
+  import ArbEnumerated.given
   import ArbWavelength.*
   import lucuma.core.model.sequence.gmos.arb.ArbGmosGratingConfig.*
 

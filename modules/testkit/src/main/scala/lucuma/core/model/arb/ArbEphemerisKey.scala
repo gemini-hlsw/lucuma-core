@@ -7,12 +7,11 @@ package arb
 import lucuma.core.arb.*
 import lucuma.core.enums.EphemerisKeyType
 import lucuma.core.model.EphemerisKey.*
-import lucuma.core.util.arb.ArbEnumerated
+import lucuma.core.util.arb.ArbEnumerated.given
 import org.scalacheck.Arbitrary.*
 import org.scalacheck.*
 
 trait ArbEphemerisKey {
-  import ArbEnumerated.*
 
   private def genStringDes[A](f: String => A): Gen[A] =
     Gen.alphaNumStr.map(s => f(s.take(10)))

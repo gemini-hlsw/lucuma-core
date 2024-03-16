@@ -16,7 +16,7 @@ import org.scalacheck.Cogen
 import org.scalacheck.Gen
 
 trait ArbStepConfig {
-  import ArbEnumerated.*
+  import ArbEnumerated.given
   import ArbOffset.*
 
   implicit val arbGcalArcs: Arbitrary[NonEmptySet[GcalArc]] =

@@ -34,7 +34,7 @@ final class SpectralDefinitionSuite extends DisciplineSuite {
   import ArbBrightnessValue.given
   import ArbCollection.given
   import ArbEmissionLine.given
-  import ArbEnumerated.*
+  import ArbEnumerated.given
   import ArbFluxDensityContinuumValue.given
   import ArbMeasure.given
   import ArbSpectralDefinition.given

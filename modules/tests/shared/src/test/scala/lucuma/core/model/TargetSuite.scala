@@ -25,7 +25,7 @@ class TargetSuite extends DisciplineSuite {
   import ArbCollection.given
   import ArbCoordinates.*
   import ArbDeclination.*
-  import ArbEnumerated.*
+  import ArbEnumerated.given
   import ArbEpoch.*
   import ArbEphemerisKey.*
   import ArbEmissionLine.given

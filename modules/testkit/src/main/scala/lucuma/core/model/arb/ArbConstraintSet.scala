@@ -8,14 +8,13 @@ import lucuma.core.enums.CloudExtinction
 import lucuma.core.enums.ImageQuality
 import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.WaterVapor
-import lucuma.core.util.arb.ArbEnumerated
+import lucuma.core.util.arb.ArbEnumerated.given
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Cogen._
 import org.scalacheck._
 
 trait ArbConstraintSet {
-  import ArbEnumerated._
-  import ArbElevationRange._
+  import ArbElevationRange.*
 
   implicit val arbConstraintSet: Arbitrary[ConstraintSet] =
     Arbitrary {

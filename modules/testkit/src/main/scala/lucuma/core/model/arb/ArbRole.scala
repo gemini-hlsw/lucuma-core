@@ -8,13 +8,13 @@ import lucuma.core.model.Partner
 import lucuma.core.model.Role
 import lucuma.core.model.ServiceRole
 import lucuma.core.model.StandardRole
-import lucuma.core.util.arb._
-import org.scalacheck.Arbitrary._
-import org.scalacheck._
+import lucuma.core.util.arb.*
+import org.scalacheck.Arbitrary.*
+import org.scalacheck.*
 
 trait ArbRole {
-  import ArbGid._
-  import ArbEnumerated._
+  import ArbGid.*
+  import ArbEnumerated.given
 
   implicit val ArbServiceRole: Arbitrary[ServiceRole] =
     Arbitrary(arbitrary[String].map(ServiceRole(_)))

@@ -22,7 +22,7 @@ import scala.collection.immutable.SortedMap
 
 trait ArbProposal {
   import ArbCollection.given
-  import ArbEnumerated.*
+  import ArbEnumerated.given
   import ArbProposalClass.given
 
   given Arbitrary[Proposal] =

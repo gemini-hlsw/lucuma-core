@@ -18,7 +18,7 @@ import org.scalacheck.Cogen
 import scala.collection.immutable.SortedSet
 
 trait ArbSequenceDigest {
-  import ArbEnumerated.*
+  import ArbEnumerated.given
   import ArbCategorizedTime.given
   import ArbOffset.*
 
