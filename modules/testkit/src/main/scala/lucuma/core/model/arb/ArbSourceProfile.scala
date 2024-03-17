@@ -14,7 +14,7 @@ import org.scalacheck.*
 
 trait ArbSourceProfile {
   import ArbAngle.*
-  import ArbEnumerated.*
+  import ArbEnumerated.given
   import BrightnessUnits.*
   import ArbSpectralDefinition.given
 

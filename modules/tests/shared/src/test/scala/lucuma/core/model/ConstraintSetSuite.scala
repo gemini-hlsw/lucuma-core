@@ -3,19 +3,19 @@
 
 package lucuma.core.model
 
-import cats.kernel.laws.discipline._
-import eu.timepit.refined.cats._
-import eu.timepit.refined.scalacheck.numeric._
-import lucuma.core.math.arb._
-import lucuma.core.model.arb._
-import lucuma.core.util.arb._
-import monocle.law.discipline._
+import cats.kernel.laws.discipline.*
+import eu.timepit.refined.cats.*
+import eu.timepit.refined.scalacheck.numeric.*
+import lucuma.core.math.arb.*
+import lucuma.core.model.arb.*
+import lucuma.core.util.arb.*
+import monocle.law.discipline.*
 import munit._
 
 final class ConstraintSetSuite extends DisciplineSuite {
-  import ArbConstraintSet._
-  import ArbElevationRange._
-  import ArbEnumerated._
+  import ArbConstraintSet.*
+  import ArbElevationRange.*
+  import ArbEnumerated.given
   import ArbRefined.given
 
   // Laws

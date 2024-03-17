@@ -14,7 +14,7 @@ import monocle.law.discipline.*
 import munit.*
 
 final class GmosNodAndShuffleSuite extends DisciplineSuite {
-  import ArbEnumerated.*
+  import ArbEnumerated.given
   import ArbOffset.*
   import ArbGmosNodAndShuffle.*
   import ArbRefined.given

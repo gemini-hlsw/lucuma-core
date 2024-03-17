@@ -14,7 +14,7 @@ import munit.*
 
 final class SequenceDigestSuite extends DisciplineSuite {
 
-  import ArbEnumerated.*
+  import ArbEnumerated.given
   import ArbSequenceDigest.given
   import ArbCategorizedTime.given
 

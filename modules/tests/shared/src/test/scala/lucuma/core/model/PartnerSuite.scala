@@ -3,12 +3,12 @@
 
 package lucuma.core.model
 
-import lucuma.core.util.arb._
+import lucuma.core.util.arb.*
 import lucuma.core.util.laws.EnumeratedTests
 import munit._
 
 final class PartnerSuite extends DisciplineSuite {
-  import ArbEnumerated._
+  import ArbEnumerated.given
 
   // Laws
   checkAll("Partner", EnumeratedTests[Partner].enumerated)

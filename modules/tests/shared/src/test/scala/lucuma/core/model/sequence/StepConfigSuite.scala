@@ -3,17 +3,17 @@
 
 package lucuma.core.model.sequence
 
-import cats.kernel.laws.discipline._
-import lucuma.core.math.arb._
-import lucuma.core.model.sequence.arb._
-import lucuma.core.util.arb._
-import monocle.law.discipline._
-import munit._
+import cats.kernel.laws.discipline.*
+import lucuma.core.math.arb.*
+import lucuma.core.model.sequence.arb.*
+import lucuma.core.util.arb.*
+import monocle.law.discipline.*
+import munit.*
 
 final class StepConfigSuite extends DisciplineSuite {
-  import ArbStepConfig._
-  import ArbEnumerated._
-  import ArbOffset._
+  import ArbStepConfig.*
+  import ArbEnumerated.given
+  import ArbOffset.*
 
   checkAll("Eq[StepConfig.Gcal]", EqTests[StepConfig.Gcal].eqv)
   checkAll("StepConfig.Gcal.lamp", LensTests(StepConfig.Gcal.lamp))

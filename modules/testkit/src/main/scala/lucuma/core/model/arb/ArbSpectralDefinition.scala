@@ -27,7 +27,7 @@ import scala.collection.immutable.SortedMap
 trait ArbSpectralDefinition {
   import ArbBrightnessValue.given
   import ArbEmissionLine.given
-  import ArbEnumerated.*
+  import ArbEnumerated.given
   import ArbFluxDensityContinuumValue.given
   import ArbMeasure.given
   import ArbUnnormalizedSED.given

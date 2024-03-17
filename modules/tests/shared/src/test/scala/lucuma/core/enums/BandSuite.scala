@@ -12,7 +12,7 @@ import lucuma.core.util.laws.EnumeratedTests
 import munit.DisciplineSuite
 
 class BandSuite extends DisciplineSuite {
-  import ArbEnumerated.*
+  import ArbEnumerated.given
 
   test("default units") {
     assertEquals(

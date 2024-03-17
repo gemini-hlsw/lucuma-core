@@ -14,7 +14,7 @@ import org.scalacheck.Cogen
 
 trait ArbCategorizedTime {
 
-  import ArbEnumerated.*
+  import ArbEnumerated.given
   import ArbTimeSpan.given
 
   given Arbitrary[CategorizedTime] =

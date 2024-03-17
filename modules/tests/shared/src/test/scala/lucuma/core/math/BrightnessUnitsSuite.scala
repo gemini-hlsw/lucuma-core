@@ -11,7 +11,7 @@ import lucuma.core.util.laws.EnumeratedTests
 import munit.DisciplineSuite
 
 final class BrightnessUnitsSuite extends DisciplineSuite {
-  import ArbEnumerated.*
+  import ArbEnumerated.given
   import BrightnessUnits.*
 
   // Typeclasses

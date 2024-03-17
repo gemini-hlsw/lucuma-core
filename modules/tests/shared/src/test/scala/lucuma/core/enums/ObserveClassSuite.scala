@@ -8,7 +8,7 @@ import munit.DisciplineSuite
 
 final class ObserveClassSuite extends DisciplineSuite {
 
-  import lucuma.core.util.arb.ArbEnumerated.*
+  import lucuma.core.util.arb.ArbEnumerated.given
 
   checkAll("Monoid[ObserveClass]", MonoidTests[ObserveClass].monoid)
 

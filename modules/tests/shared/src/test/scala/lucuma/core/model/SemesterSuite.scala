@@ -12,7 +12,7 @@ import lucuma.core.arb.ArbTime.*
 import lucuma.core.enums.Half
 import lucuma.core.enums.Site
 import lucuma.core.model.arb.ArbSemester.given
-import lucuma.core.util.arb.ArbEnumerated.*
+import lucuma.core.util.arb.ArbEnumerated.given
 import monocle.law.discipline.*
 import org.scalacheck.Prop.*
 import org.typelevel.cats.time.*

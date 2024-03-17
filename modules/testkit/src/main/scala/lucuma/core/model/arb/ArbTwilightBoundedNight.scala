@@ -8,7 +8,7 @@ package arb
 
 import lucuma.core.enums.TwilightType
 import lucuma.core.model.arb.ArbObservingNight.*
-import lucuma.core.util.arb.ArbEnumerated.*
+import lucuma.core.util.arb.ArbEnumerated.given
 import org.scalacheck.Arbitrary.*
 import org.scalacheck.*
 

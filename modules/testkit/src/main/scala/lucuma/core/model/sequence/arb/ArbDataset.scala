@@ -18,7 +18,7 @@ import scala.util.control.Exception.allCatch
 
 
 trait ArbDataset {
-  import ArbEnumerated.*
+  import ArbEnumerated.given
 
   given Arbitrary[Dataset.Filename] =
     Arbitrary {

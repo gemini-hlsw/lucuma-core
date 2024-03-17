@@ -16,7 +16,7 @@ import org.scalacheck.Gen
 
 trait ArbProgramReference extends ArbReference {
 
-  import ArbEnumerated.*
+  import ArbEnumerated.given
   import ArbSemester.given
   import ArbProposalReference.given
 

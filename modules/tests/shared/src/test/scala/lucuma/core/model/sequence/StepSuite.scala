@@ -16,7 +16,7 @@ import munit.*
 final class StepSuite extends DisciplineSuite {
 
   import ArbDynamicConfig.*
-  import ArbEnumerated.*
+  import ArbEnumerated.given
   import ArbStep.given
   import ArbStepConfig.*
   import ArbStepEstimate.given

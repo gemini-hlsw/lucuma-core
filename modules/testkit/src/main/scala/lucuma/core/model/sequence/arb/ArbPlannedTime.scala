@@ -15,7 +15,7 @@ import org.scalacheck.Cogen
 trait ArbPlannedTime {
 
   import ArbTimeSpan.given
-  import ArbEnumerated.*
+  import ArbEnumerated.given
 
   given Arbitrary[PlannedTime] =
     Arbitrary {

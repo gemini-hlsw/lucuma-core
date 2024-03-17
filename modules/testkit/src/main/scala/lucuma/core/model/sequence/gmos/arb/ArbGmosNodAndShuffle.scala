@@ -17,7 +17,7 @@ import org.scalacheck.*
 
 trait ArbGmosNodAndShuffle {
   import ArbOffset.*
-  import ArbEnumerated.*
+  import ArbEnumerated.given
   import ArbRefined.given
 
   implicit val arbGmosNodAndShuffle: Arbitrary[GmosNodAndShuffle] = Arbitrary(

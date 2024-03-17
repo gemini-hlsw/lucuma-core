@@ -22,7 +22,7 @@ import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.*
 
 trait ArbUnnormalizedSED {
-  import ArbEnumerated.*
+  import ArbEnumerated.given
   import UnnormalizedSED.*
   import ArbRefined.given
   import ArbWavelength.*

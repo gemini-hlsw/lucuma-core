@@ -20,7 +20,7 @@ trait ArbTimeChargeCorrection {
 
   import TimeChargeCorrection.Op
 
-  import ArbEnumerated.*
+  import ArbEnumerated.given
   import ArbTimestamp.given
   import ArbTimeSpan.given
   import ArbUser.*

@@ -6,17 +6,17 @@ package lucuma.core.model
 import cats.Eq
 import cats.Show
 import cats.kernel.laws.discipline._
-import cats.syntax.all._
-import lucuma.core.arb.ArbTime._
+import cats.syntax.all.*
+import lucuma.core.arb.ArbTime.*
 import lucuma.core.enums.Site
 import lucuma.core.enums.TwilightType
-import lucuma.core.model.arb.ArbTwilightBoundedNight._
-import lucuma.core.util.arb.ArbEnumerated._
-import munit._
-import org.scalacheck.Prop._
-import org.typelevel.cats.time._
+import lucuma.core.model.arb.ArbTwilightBoundedNight.*
+import lucuma.core.util.arb.ArbEnumerated.given
+import munit.*
+import org.scalacheck.Prop.*
+import org.typelevel.cats.time.*
 
-import java.time._
+import java.time.*
 
 final class TwilightBoundedNightSuite extends DisciplineSuite {
   checkAll("TwilightBoundedNight", OrderTests[TwilightBoundedNight].order)

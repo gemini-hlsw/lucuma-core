@@ -12,7 +12,7 @@ import munit.*
 final class DynamicConfigSuite extends DisciplineSuite {
 
   import ArbDynamicConfig.*
-  import ArbEnumerated.*
+  import ArbEnumerated.given
   import ArbGmosCcdMode.*
   import ArbGmosFpuMask.*
   import ArbGmosGratingConfig.*

@@ -16,11 +16,11 @@ import org.scalacheck.Cogen
 import org.scalacheck.Gen
 
 trait ArbDynamicConfig {
-  import ArbGmosCcdMode._
-  import ArbEnumerated._
+  import ArbGmosCcdMode.*
+  import ArbEnumerated.given
   import ArbTimeSpan.given
-  import ArbGmosGratingConfig._
-  import ArbGmosFpuMask._
+  import ArbGmosGratingConfig.*
+  import ArbGmosFpuMask.*
 
   implicit val arbDynamicConfigGmosNorth: Arbitrary[DynamicConfig.GmosNorth] = Arbitrary(
     for {

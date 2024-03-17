@@ -17,7 +17,7 @@ import monocle.law.discipline.*
 import munit.*
 
 final class GmosFpuMaskSuite extends DisciplineSuite {
-  import ArbEnumerated.*
+  import ArbEnumerated.given
   import ArbGmosFpuMask.*
   import ArbRefined.given
 

@@ -10,7 +10,7 @@ import lucuma.core.math.BrightnessUnits.*
 import lucuma.core.math.dimensional.arb.ArbMeasure
 import lucuma.core.math.dimensional.arb.ArbUnits
 import lucuma.core.util.*
-import lucuma.core.util.arb.ArbEnumerated.*
+import lucuma.core.util.arb.ArbEnumerated.given
 import monocle.law.discipline.*
 import org.scalacheck.Prop.*
 

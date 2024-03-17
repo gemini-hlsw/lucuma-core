@@ -9,7 +9,7 @@ import lucuma.core.math.BrightnessUnits.*
 import lucuma.core.math.dimensional.arb.ArbUnits
 import lucuma.core.syntax.display.*
 import lucuma.core.util.*
-import lucuma.core.util.arb.ArbEnumerated.*
+import lucuma.core.util.arb.ArbEnumerated.given
 import org.scalacheck.Prop.*
 
 class UnitSuite extends munit.DisciplineSuite {
