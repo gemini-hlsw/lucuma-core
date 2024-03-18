@@ -6,6 +6,7 @@ package arb
 
 import lucuma.core.enums.DatasetStage
 import lucuma.core.enums.SequenceCommand
+import lucuma.core.enums.SlewStage
 import lucuma.core.enums.StepStage
 import lucuma.core.model.sequence.Dataset
 import lucuma.core.model.sequence.Step
@@ -82,6 +83,32 @@ trait ArbExecutionEvent {
       a.command
     )}
 
+  given Arbitrary[ExecutionEvent.SlewEvent] =
+    Arbitrary {
+      for {
+        eid <- arbitrary[ExecutionEvent.Id]
+        rec <- arbitrary[Timestamp]
+        oid <- arbitrary[Observation.Id]
+        vid <- arbitrary[Visit.Id]
+        stg <- arbitrary[SlewStage]
+      } yield ExecutionEvent.SlewEvent(eid, rec, oid, vid, stg)
+    }
+
+  given Cogen[ExecutionEvent.SlewEvent] =
+    Cogen[(
+      ExecutionEvent.Id,
+      Timestamp,
+      Observation.Id,
+      Visit.Id,
+      SlewStage
+    )].contramap { a => (
+      a.id,
+      a.received,
+      a.observationId,
+      a.visitId,
+      a.stage
+    )}
+
   given Arbitrary[ExecutionEvent.StepEvent] =
     Arbitrary {
       for {
@@ -116,6 +143,7 @@ trait ArbExecutionEvent {
       Gen.oneOf[ExecutionEvent](
         arbitrary[ExecutionEvent.DatasetEvent],
         arbitrary[ExecutionEvent.SequenceEvent],
+        arbitrary[ExecutionEvent.SlewEvent],
         arbitrary[ExecutionEvent.StepEvent]
       )
     }
@@ -124,10 +152,12 @@ trait ArbExecutionEvent {
     Cogen[(
       Option[ExecutionEvent.DatasetEvent],
       Option[ExecutionEvent.SequenceEvent],
+      Option[ExecutionEvent.SlewEvent],
       Option[ExecutionEvent.StepEvent]
     )].contramap { a => (
       ExecutionEvent.datasetEvent.getOption(a),
       ExecutionEvent.sequenceEvent.getOption(a),
+      ExecutionEvent.slewEvent.getOption(a),
       ExecutionEvent.stepEvent.getOption(a)
     )}
 }

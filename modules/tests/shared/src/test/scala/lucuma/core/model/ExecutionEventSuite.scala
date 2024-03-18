@@ -14,6 +14,7 @@ class ExecutionEventSuite extends DisciplineSuite {
   checkAll("Eq[ExecutionEvent]", EqTests[ExecutionEvent].eqv)
   checkAll("ExecutionEvent.datasetEvent", PrismTests(ExecutionEvent.datasetEvent))
   checkAll("ExecutionEvent.sequenceEvent", PrismTests(ExecutionEvent.sequenceEvent))
+  checkAll("ExecutionEvent.slewEvent", PrismTests(ExecutionEvent.slewEvent))
   checkAll("ExecutionEvent.stepEvent", PrismTests(ExecutionEvent.sequenceEvent))
 
 }
