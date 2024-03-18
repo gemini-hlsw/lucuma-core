@@ -7,7 +7,7 @@ import lucuma.core.util.Enumerated
 
 enum SlewStage(val tag: String, val name: String, val description: String) derives Enumerated {
 
-  case Start extends SlewStage("start", "Slew Start", "Slew started.")
-  case End   extends SlewStage("stop",  "Stop Stop",  "Slew stopped.")
+  case Start extends SlewStage("start_slew", "Start Slew", "Slew started.")
+  case End   extends SlewStage("end_slew",   "End Slew",   "Slew ended.")
 
 }
