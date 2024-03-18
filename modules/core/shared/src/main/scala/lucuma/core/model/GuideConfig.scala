@@ -40,15 +40,14 @@ import monocle.std.option
 
 case class GuideConfig(
   tcsGuide:      TelescopeGuideConfig,
-  gaosGuide:     Option[Either[AltairConfig, GemsConfig]],
-  gemsSkyPaused: Boolean
+  gaosGuide:     Option[Either[AltairConfig, GemsConfig]]
 ) derives Eq
 
 object GuideConfig {
-  val tcsGuide: Lens[GuideConfig, TelescopeGuideConfig]                      = Focus[GuideConfig](_.tcsGuide)
+  val tcsGuide: Lens[GuideConfig, TelescopeGuideConfig]                      =
+    Focus[GuideConfig](_.tcsGuide)
   val gaosGuide: Lens[GuideConfig, Option[Either[AltairConfig, GemsConfig]]] =
     Focus[GuideConfig](_.gaosGuide)
-  val gemsSkyPaused: Lens[GuideConfig, Boolean]                              = Focus[GuideConfig](_.gemsSkyPaused)
   val altairGuide: Optional[GuideConfig, AltairConfig]                       =
     gaosGuide.andThen(option.some).andThen(either.stdLeft)
   val gemsGuide: Optional[GuideConfig, GemsConfig]                           =
@@ -63,7 +62,6 @@ object GuideConfig {
         false,
         None),
       None,
-      false
     )
 
   given Decoder[AltairConfig] = Decoder.instance[AltairConfig] { c =>
@@ -251,13 +249,12 @@ object GuideConfig {
 
   given Decoder[GuideConfig] =
     Decoder
-      .forProduct3[GuideConfig, TelescopeGuideConfig, Option[Either[AltairConfig, GemsConfig]], Boolean](
+      .forProduct2[GuideConfig, TelescopeGuideConfig, Option[Either[AltairConfig, GemsConfig]]](
         "tcsGuide",
-        "gaosGuide",
-        "gemsSkyPaused"
-      )(GuideConfig(_, _, _))
+        "gaosGuide"
+      )(GuideConfig(_, _))
 
   given Encoder[GuideConfig] =
-    Encoder.forProduct3("tcsGuide", "gaosGuide", "gemsSkyPaused")(u => (u.tcsGuide, u.gaosGuide, u.gemsSkyPaused))
+    Encoder.forProduct2("tcsGuide", "gaosGuide")(u => (u.tcsGuide, u.gaosGuide))
 }
 

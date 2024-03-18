@@ -19,16 +19,14 @@ trait ArbGuideConfig {
     for {
       tg <- arbitrary[TelescopeGuideConfig]
       gc <- arbitrary[Option[Either[AltairConfig, GemsConfig]]]
-      p  <- arbitrary[Boolean]
-    } yield GuideConfig(tg, gc, p)
+    } yield GuideConfig(tg, gc)
   }
 
-  given Cogen[GuideConfig] = 
+  given Cogen[GuideConfig] =
     Cogen[(
-      TelescopeGuideConfig, 
-      Option[Either[AltairConfig, GemsConfig]], 
-      Boolean
-    )].contramap(x => (x.tcsGuide, x.gaosGuide, x.gemsSkyPaused))
+      TelescopeGuideConfig,
+      Option[Either[AltairConfig, GemsConfig]],
+    )].contramap(x => (x.tcsGuide, x.gaosGuide))
 }
 
 object ArbGuideConfig extends ArbGuideConfig
