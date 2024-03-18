@@ -8,9 +8,9 @@ import lucuma.core.util.Enumerated
 /**
  * An enumeration whose value determines whether guiding is enabled for a particular step.
  */
-enum GuideState(val tag: String, val name: String, val description: String) derives Enumerated {
+enum StepGuideState(val tag: String, val name: String, val description: String) derives Enumerated {
 
-  case Enabled  extends GuideState("enabled",  "Enabled",  "Guiding is enabled.")
-  case Disabled extends GuideState("disabled", "Disabled", "Guiding is disabled.")
+  case Enabled  extends StepGuideState("enabled",  "Enabled",  "Guiding is enabled.")
+  case Disabled extends StepGuideState("disabled", "Disabled", "Guiding is disabled.")
 
 }

@@ -61,14 +61,14 @@ trait ArbStepConfig {
     Arbitrary {
       for {
         o <- arbitrary[Offset]
-        g <- arbitrary[GuideState]
+        g <- arbitrary[StepGuideState]
       } yield StepConfig.Science(o, g)
     }
 
   implicit val cogStepConfigScience: Cogen[StepConfig.Science] =
     Cogen[(
       Offset,
-      GuideState
+      StepGuideState
     )].contramap { a => (
       a.offset,
       a.guiding

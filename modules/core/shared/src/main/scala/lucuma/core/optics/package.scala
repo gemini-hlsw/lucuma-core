@@ -24,6 +24,6 @@ sealed trait IsValid[+E]:
 object IsValid:
   case object Valid extends IsValid[Nothing]:
     override def mapError[E0](f: Nothing => E0): IsValid[E0] = this
-    
+
   case class Invalid[E](error: E) extends IsValid[E]:
     override def mapError[E0](f: E => E0): IsValid[E0] = Invalid(f(error))

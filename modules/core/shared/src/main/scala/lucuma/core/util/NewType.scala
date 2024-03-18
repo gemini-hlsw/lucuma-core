@@ -22,7 +22,7 @@ trait NewType[Wrapped]:
   opaque type Type = Wrapped
 
   inline def apply(w: Wrapped): Type = w
-  
+
   val value: Iso[Type, Wrapped] = Iso[Type, Wrapped](_.value)(apply)
 
   extension (t: Type)
