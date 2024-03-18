@@ -3,37 +3,37 @@
 
 package lucuma.core.math.arb
 
-import lucuma.core.arb._
+import lucuma.core.arb.*
 import lucuma.core.math.Angle
 import lucuma.core.math.HourAngle
-import org.scalacheck.Arbitrary._
-import org.scalacheck.Cogen._
-import org.scalacheck._
+import org.scalacheck.Arbitrary.*
+import org.scalacheck.Cogen.*
+import org.scalacheck.*
 
 trait ArbAngle {
 
-  implicit def arbAngle: Arbitrary[Angle] =
+  given Arbitrary[Angle] =
     Arbitrary(arbitrary[Double].map(Angle.fromDoubleDegrees))
 
-  implicit def arbHourAngle: Arbitrary[HourAngle] =
+  given Arbitrary[HourAngle] =
     Arbitrary(arbitrary[Double].map(HourAngle.fromDoubleHours))
 
-  implicit def arbDMS: Arbitrary[Angle.DMS] =
+  given Arbitrary[Angle.DMS] =
     Arbitrary(arbitrary[Angle].map(Angle.dms.get))
 
-  implicit def arbHMS: Arbitrary[HourAngle.HMS] =
+  given Arbitrary[HourAngle.HMS] =
     Arbitrary(arbitrary[HourAngle].map(HourAngle.hms.get))
 
-  implicit def cogAngle: Cogen[Angle] =
+  given Cogen[Angle] =
     Cogen[Double].contramap(_.toDoubleDegrees)
 
-  implicit def cogHourAngle: Cogen[HourAngle] =
+  given Cogen[HourAngle] =
     Cogen[Double].contramap(_.toDoubleDegrees)
 
-  implicit def cogDMS: Cogen[Angle.DMS] =
+  given Cogen[Angle.DMS] =
     Cogen[Angle].contramap(_.toAngle)
 
-  implicit def cogHMS: Cogen[HourAngle.HMS] =
+  given Cogen[HourAngle.HMS] =
     Cogen[HourAngle].contramap(_.toHourAngle)
 
   private val perturbations: List[String => Gen[String]] =

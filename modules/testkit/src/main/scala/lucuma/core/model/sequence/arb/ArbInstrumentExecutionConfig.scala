@@ -15,9 +15,9 @@ import org.scalacheck.Gen
 
 trait ArbInstrumentExecutionConfig {
 
-  import ArbDynamicConfig._
+  import ArbDynamicConfig.given
   import ArbExecutionConfig.given
-  import ArbStaticConfig._
+  import ArbStaticConfig.given
 
   given Arbitrary[InstrumentExecutionConfig.GmosNorth] =
     Arbitrary {

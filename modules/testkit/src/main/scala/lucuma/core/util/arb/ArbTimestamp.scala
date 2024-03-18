@@ -6,15 +6,15 @@ package arb
 
 import lucuma.core.arb.ArbTime
 import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck._
+import org.scalacheck.*
 
-import java.time._
+import java.time.*
 
 // Arbitrary but reasonable Timestamp
 trait ArbTimestamp {
-  import ArbTime.cogInstant
+  import ArbTime.given
 
-  implicit val arbTimestamp: Arbitrary[Timestamp] =
+  given Arbitrary[Timestamp] =
     Arbitrary {
       for {
         m <- Gen.choose(0L, Duration.between(Instant.EPOCH, Timestamp.Max.toInstant).toMillis)
@@ -22,7 +22,7 @@ trait ArbTimestamp {
       } yield Timestamp.Epoch.plusMillisOption(m).flatMap(_.plusMicrosOption(u)).getOrElse(Timestamp.Epoch)
     }
 
-  implicit val cogTimestamp: Cogen[Timestamp] =
+  given Cogen[Timestamp] =
     Cogen[Instant].contramap(_.toInstant)
 
   val genTimestampString: Gen[String] =

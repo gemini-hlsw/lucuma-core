@@ -13,22 +13,22 @@ import org.scalacheck.Arbitrary.*
 import org.scalacheck.*
 
 trait ArbRole {
-  import ArbGid.*
+  import ArbGid.given
   import ArbEnumerated.given
 
-  implicit val ArbServiceRole: Arbitrary[ServiceRole] =
+  given Arbitrary[ServiceRole] =
     Arbitrary(arbitrary[String].map(ServiceRole(_)))
 
-  implicit val CogServiceRole: Cogen[ServiceRole] =
+  given  Cogen[ServiceRole] =
     Cogen[String].contramap(_.serviceName)
 
-  implicit val ArbStandardRolePi: Arbitrary[StandardRole.Pi] =
+  given Arbitrary[StandardRole.Pi] =
     Arbitrary(arbitrary[StandardRole.Id].map(StandardRole.Pi(_)))
 
-  implicit val CogStandardRolePi: Cogen[StandardRole.Pi] =
+  given Cogen[StandardRole.Pi] =
     Cogen[StandardRole.Id].contramap(_.id)
 
-  implicit val ArbStandardRoleNgo: Arbitrary[StandardRole.Ngo] =
+  given Arbitrary[StandardRole.Ngo] =
     Arbitrary {
       for {
         id <- arbitrary[StandardRole.Id]
@@ -36,22 +36,22 @@ trait ArbRole {
       } yield StandardRole.Ngo(id, p)
     }
 
-  implicit val CogStandardRoleNgo: Cogen[StandardRole.Ngo] =
+  given Cogen[StandardRole.Ngo] =
     Cogen[(StandardRole.Id, Partner)].contramap(x => (x.id, x.partner))
 
-  implicit val ArbStandardRoleStaff: Arbitrary[StandardRole.Staff] =
+  given Arbitrary[StandardRole.Staff] =
     Arbitrary(arbitrary[StandardRole.Id].map(StandardRole.Staff(_)))
 
-  implicit val CogStandardRoleStaff: Cogen[StandardRole.Staff] =
+  given Cogen[StandardRole.Staff] =
     Cogen[StandardRole.Id].contramap(_.id)
 
-  implicit val ArbStandardRoleAdmin: Arbitrary[StandardRole.Admin] =
+  given Arbitrary[StandardRole.Admin] =
     Arbitrary(arbitrary[StandardRole.Id].map(StandardRole.Admin(_)))
 
-  implicit val CogStandardRoleAdmin: Cogen[StandardRole.Admin] =
+  given Cogen[StandardRole.Admin] =
     Cogen[StandardRole.Id].contramap(_.id)
 
-  implicit val ArbStandardRole: Arbitrary[StandardRole] =
+  given Arbitrary[StandardRole] =
     Arbitrary {
       for {
         pi    <- arbitrary[StandardRole.Pi]
@@ -62,7 +62,7 @@ trait ArbRole {
       } yield role
     }
 
-  implicit val CogStandardRole: Cogen[StandardRole] =
+  given Cogen[StandardRole] =
     Cogen[Either[
       StandardRole.Pi,
       Either[StandardRole.Ngo, Either[StandardRole.Staff, StandardRole.Admin]]
@@ -73,7 +73,7 @@ trait ArbRole {
       case admin: StandardRole.Admin => Right(Right(Right(admin)))
     }
 
-  implicit val ArbRole: Arbitrary[Role] =
+  given Arbitrary[Role] =
     Arbitrary {
       for {
         guest    <- Gen.const(GuestRole)
@@ -83,7 +83,7 @@ trait ArbRole {
       } yield role
     }
 
-  implicit val CogRole: Cogen[Role] =
+  given Cogen[Role] =
     Cogen[Option[Either[ServiceRole, StandardRole]]].contramap {
       case GuestRole              => None
       case service: ServiceRole   => Some(Left(service))

@@ -12,7 +12,7 @@ import munit.*
 
 final class DatasetSuite extends DisciplineSuite {
   import ArbDataset.given
-  import ArbGid.*
+  import ArbGid.given
 
   checkAll("Order[Dataset.Id]",       OrderTests[Dataset.Id].order)
   checkAll("Order[Dataset.Filename]", OrderTests[Dataset.Filename].order)

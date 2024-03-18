@@ -19,29 +19,30 @@ import monocle.law.discipline.*
 import munit.*
 
 class TargetSuite extends DisciplineSuite {
-  import ArbAngle.*
+  import ArbAngle.given
   import ArbBrightnessValue.given
-  import ArbCatalogInfo.*
+  import ArbCatalogInfo.given
   import ArbCollection.given
-  import ArbCoordinates.*
-  import ArbDeclination.*
+  import ArbCoordinates.given
+  import ArbDeclination.given
   import ArbEnumerated.given
-  import ArbEpoch.*
-  import ArbEphemerisKey.*
+  import ArbEpoch.given
+  import ArbEphemerisKey.given
   import ArbEmissionLine.given
   import ArbFluxDensityContinuumValue.given
-  import ArbGid.*
+  import ArbGid.given
   import ArbMeasure.given
-  import ArbParallax.*
+  import ArbParallax.given
   import ArbProperMotion.given
   import ArbRadialVelocity.given
   import ArbRefined.given
-  import ArbRightAscension.*
+  import ArbRightAscension.given
   import ArbSiderealTracking.given
   import ArbSourceProfile.given
   import ArbSpectralDefinition.given
   import ArbTarget.given
   import ArbUnnormalizedSED.given
+  import ArbWavelength.given
   import ArbWavelength.*
   import Target.*
 

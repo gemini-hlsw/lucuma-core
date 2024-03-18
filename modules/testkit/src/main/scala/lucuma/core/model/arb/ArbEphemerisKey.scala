@@ -19,7 +19,7 @@ trait ArbEphemerisKey {
   private def genIntDes[A](f: Int => A): Gen[A] =
     arbitrary[Int].map(f)
 
-  implicit val arbEphemerisKey: Arbitrary[EphemerisKey] =
+  given Arbitrary[EphemerisKey] =
     Arbitrary {
       Gen.oneOf[EphemerisKey](
         genStringDes(Comet.apply),
@@ -30,7 +30,7 @@ trait ArbEphemerisKey {
       )
     }
 
-  implicit val CogenEphemerisKey: Cogen[EphemerisKey] =
+  given Cogen[EphemerisKey] =
     Cogen[String].contramap(EphemerisKey.fromString.reverseGet)
 
   private val perturbations: List[String => Gen[String]] =

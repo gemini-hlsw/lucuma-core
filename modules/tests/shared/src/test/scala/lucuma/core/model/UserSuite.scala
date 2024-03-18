@@ -4,14 +4,14 @@
 package lucuma.core.model
 
 import cats.kernel.laws.discipline.EqTests
-import lucuma.core.model.arb._
-import lucuma.core.util.arb._
+import lucuma.core.model.arb.*
+import lucuma.core.util.arb.*
 import lucuma.core.util.laws.GidTests
-import munit._
+import munit.*
 
 final class UserSuite extends DisciplineSuite {
-  import ArbGid._
-  import ArbUser._
+  import ArbGid.given
+  import ArbUser.given
 
   // Laws
   checkAll("User.Id", GidTests[User.Id].gid)

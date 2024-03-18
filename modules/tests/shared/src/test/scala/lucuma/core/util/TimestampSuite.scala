@@ -6,9 +6,10 @@ package lucuma.core.util
 import cats.kernel.laws.discipline.*
 import cats.syntax.either.*
 import cats.syntax.option.*
-import lucuma.core.arb.ArbTime.*
+import lucuma.core.arb.ArbTime.given
 import lucuma.core.optics.laws.discipline.*
-import lucuma.core.util.arb.ArbTimestamp.*
+import lucuma.core.util.arb.ArbTimestamp
+import lucuma.core.util.arb.ArbTimestamp.given
 import monocle.law.discipline.PrismTests
 import munit.*
 import org.scalacheck.Arbitrary
@@ -24,7 +25,7 @@ class TimestampSuite extends DisciplineSuite {
 
   // Laws
   checkAll("Timestamp", OrderTests[Timestamp].order)
-  checkAll("Timestamp.FromString", FormatTests(Timestamp.FromString).formatWith(genTimestampString))
+  checkAll("Timestamp.FromString", FormatTests(Timestamp.FromString).formatWith(ArbTimestamp.genTimestampString))
   checkAll("Timestamp.FromInstant", PrismTests(Timestamp.FromInstant))
   checkAll("Timestamp.FromLocalDateTime", PrismTests(Timestamp.FromLocalDateTime))
 

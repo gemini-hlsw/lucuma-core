@@ -13,10 +13,10 @@ import org.scalacheck.*
 
 trait ArbTarget {
 
-  import ArbEphemerisKey.*
+  import ArbEphemerisKey.given
   import ArbSiderealTracking.given
   import ArbSourceProfile.given
-  import ArbCatalogInfo.*
+  import ArbCatalogInfo.given
 
   given Arbitrary[Target.Sidereal] =
     Arbitrary {

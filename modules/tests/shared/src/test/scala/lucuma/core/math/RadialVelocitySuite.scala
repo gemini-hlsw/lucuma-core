@@ -3,15 +3,15 @@
 
 package lucuma.core.math
 
-import cats._
-import lucuma.core.math.arb._
+import cats.*
+import lucuma.core.math.arb.*
 import lucuma.core.optics.laws.discipline.FormatTests
-import monocle.law.discipline._
+import monocle.law.discipline.*
 import munit.DisciplineSuite
-import org.scalacheck.Prop._
+import org.scalacheck.Prop.*
 
 final class RadialVelocitySuite extends DisciplineSuite {
-  import ArbRadialVelocity._
+  import ArbRadialVelocity.given
 
   // Laws
   checkAll("meterspersecond", PrismTests(RadialVelocity.fromMetersPerSecond))

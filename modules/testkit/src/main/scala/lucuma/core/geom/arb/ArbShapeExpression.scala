@@ -4,18 +4,18 @@
 package lucuma.core.geom
 package arb
 
-import lucuma.core.geom.syntax.all._
+import lucuma.core.geom.syntax.all.*
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
-import lucuma.core.math.arb._
-import lucuma.core.math.syntax.int._
-import org.scalacheck.Arbitrary._
-import org.scalacheck._
+import lucuma.core.math.arb.*
+import lucuma.core.math.syntax.int.*
+import org.scalacheck.Arbitrary.*
+import org.scalacheck.*
 
 trait ArbShapeExpression {
 
-  import ArbAngle._
-  import ArbOffset._
+  import ArbAngle.given
+  import ArbOffset.given
 
   // Generates arbitrary width and height of a rectangle contained in a circle
   // with the given radius.

@@ -15,8 +15,8 @@ import munit.*
 
 final class GmosNodAndShuffleSuite extends DisciplineSuite {
   import ArbEnumerated.given
-  import ArbOffset.*
-  import ArbGmosNodAndShuffle.*
+  import ArbOffset.given
+  import ArbGmosNodAndShuffle.given
   import ArbRefined.given
 
   checkAll("Eq[GmosNodAndShuffle]",           EqTests[GmosNodAndShuffle].eqv)

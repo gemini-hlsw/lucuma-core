@@ -5,11 +5,11 @@ package lucuma.core.util
 package arb
 
 import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck._
+import org.scalacheck.*
 
 trait ArbTimestampInterval {
 
-  import ArbTimestamp.*
+  import ArbTimestamp.given
 
   given Arbitrary[TimestampInterval] =
     Arbitrary {

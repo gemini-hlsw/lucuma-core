@@ -15,14 +15,14 @@ import org.scalacheck.Gen
 
 trait ArbRadialVelocity {
 
-  implicit val arbRadialVelocity: Arbitrary[RadialVelocity] =
+  given Arbitrary[RadialVelocity] =
     Arbitrary {
       for {
         rv <- Gen.chooseNum(-SpeedOfLight.value + 1, SpeedOfLight.value - 1)
       } yield RadialVelocity.unsafeFromQuantity(rv.withUnit[MetersPerSecond].toValue[BigDecimal])
     }
 
-  implicit val cogRadialVelocity: Cogen[RadialVelocity] =
+  given Cogen[RadialVelocity] =
     Cogen[BigDecimal].contramap(_.rv.value)
 }
 

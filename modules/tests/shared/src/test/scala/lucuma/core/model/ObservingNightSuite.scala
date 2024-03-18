@@ -6,9 +6,9 @@ package lucuma.core.model
 import cats.Eq
 import cats.Show
 import cats.kernel.laws.discipline.*
-import lucuma.core.arb.ArbTime.*
+import lucuma.core.arb.ArbTime.given
 import lucuma.core.enums.Site
-import lucuma.core.model.arb.ArbObservingNight.*
+import lucuma.core.model.arb.ArbObservingNight.given
 import lucuma.core.util.arb.ArbEnumerated.given
 import monocle.law.discipline.*
 import munit.*

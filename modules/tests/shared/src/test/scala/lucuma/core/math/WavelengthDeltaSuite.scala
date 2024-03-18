@@ -29,7 +29,7 @@ import org.scalacheck.Prop.*
 final class WavelengthDeltaSuite extends munit.DisciplineSuite {
   import ArbQuantity.given
   import ArbRefined.given
-  import ArbWavelength.*
+  import ArbWavelength.given
   import ArbWavelengthDelta.given
 
   given Conversion[Unit, Prop] = unitToProp(_)
@@ -43,10 +43,10 @@ final class WavelengthDeltaSuite extends munit.DisciplineSuite {
   checkAll("micrometers", FormatTests(WavelengthDelta.micrometers).format)
 
   checkAll("intPicometers",      PrismTests(WavelengthDelta.intPicometers))
-  checkAll("decimalPicometers",  FormatTests(WavelengthDelta.decimalPicometers).formatWith(bigDecimalWavelengths))
-  checkAll("decimalAngstroms",   FormatTests(WavelengthDelta.decimalAngstroms).formatWith(bigDecimalWavelengths))
-  checkAll("decimalNanometers",  FormatTests(WavelengthDelta.decimalNanometers).formatWith(bigDecimalWavelengths))
-  checkAll("decimalMicrometers", FormatTests(WavelengthDelta.decimalMicrometers).formatWith(bigDecimalWavelengths))
+  checkAll("decimalPicometers",  FormatTests(WavelengthDelta.decimalPicometers).formatWith(ArbWavelength.bigDecimalWavelengths))
+  checkAll("decimalAngstroms",   FormatTests(WavelengthDelta.decimalAngstroms).formatWith(ArbWavelength.bigDecimalWavelengths))
+  checkAll("decimalNanometers",  FormatTests(WavelengthDelta.decimalNanometers).formatWith(ArbWavelength.bigDecimalWavelengths))
+  checkAll("decimalMicrometers", FormatTests(WavelengthDelta.decimalMicrometers).formatWith(ArbWavelength.bigDecimalWavelengths))
 
   test("Equality must be natural") {
     forAll { (a: WavelengthDelta, b: WavelengthDelta) =>

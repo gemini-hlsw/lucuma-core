@@ -8,7 +8,7 @@ import cats.Show
 import cats.kernel.laws.discipline.*
 import cats.syntax.eq.*
 import cats.syntax.option.*
-import lucuma.core.arb.ArbTime.*
+import lucuma.core.arb.ArbTime.given
 import lucuma.core.enums.Half
 import lucuma.core.enums.Site
 import lucuma.core.model.arb.ArbSemester.given

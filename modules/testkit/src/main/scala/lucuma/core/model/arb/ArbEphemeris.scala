@@ -16,12 +16,12 @@ import org.scalacheck.Gen.*
 import org.scalacheck.*
 
 trait ArbEphemeris {
-  import ArbCoordinates.*
-  import ArbOffset.*
-  import ArbTimestamp.*
+  import ArbCoordinates.given
+  import ArbOffset.given
+  import ArbTimestamp.given
   import Ephemeris.Element
 
-  implicit val arbEphemerisCoordinates: Arbitrary[EphemerisCoordinates] =
+  given Arbitrary[EphemerisCoordinates] =
     Arbitrary {
       for {
         c <- arbitrary[Coordinates]
@@ -29,7 +29,7 @@ trait ArbEphemeris {
       } yield EphemerisCoordinates(c, o)
     }
 
-  implicit val arbElement: Arbitrary[Element] =
+  given Arbitrary[Element] =
     Arbitrary {
       for {
         t <- arbitrary[Timestamp]
@@ -37,7 +37,7 @@ trait ArbEphemeris {
       } yield (t, c)
     }
 
-  implicit val arbEphemeris: Arbitrary[Ephemeris] =
+  given Arbitrary[Ephemeris] =
     Arbitrary {
       for {
         len <- choose(0, 10)
@@ -45,10 +45,10 @@ trait ArbEphemeris {
       } yield Ephemeris(es*)
     }
 
-  implicit val cogEphemerisCoordinates: Cogen[EphemerisCoordinates] =
+  given Cogen[EphemerisCoordinates] =
     Cogen[(Coordinates, Offset)].contramap(co => (co.coord, co.delta))
 
-  implicit val cogEphemeris: Cogen[Ephemeris] =
+  given Cogen[Ephemeris] =
     Cogen[Map[Timestamp, EphemerisCoordinates]].contramap(_.toMap)
 
 }

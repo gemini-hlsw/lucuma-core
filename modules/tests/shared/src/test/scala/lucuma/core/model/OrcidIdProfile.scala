@@ -4,11 +4,11 @@
 package lucuma.core.model
 
 import cats.kernel.laws.discipline.EqTests
-import lucuma.core.model.arb._
-import munit._
+import lucuma.core.model.arb.*
+import munit.*
 
 final class OrcidProfileSuite extends DisciplineSuite {
-  import ArbOrcidProfile._
+  import ArbOrcidProfile.given
 
   // Laws
   checkAll("OrcidProfile", EqTests[OrcidProfile].eqv)

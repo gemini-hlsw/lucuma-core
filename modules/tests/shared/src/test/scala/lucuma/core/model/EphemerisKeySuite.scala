@@ -15,7 +15,7 @@ import org.scalacheck.Prop.*
 
 final class EphemerisKeySuite extends DisciplineSuite {
 
-  import ArbEphemerisKey.*
+  import ArbEphemerisKey.given
 
   // Laws
   checkAll("EphemerisKey", OrderTests[EphemerisKey].order)

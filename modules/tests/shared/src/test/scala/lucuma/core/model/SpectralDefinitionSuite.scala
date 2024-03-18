@@ -39,6 +39,7 @@ final class SpectralDefinitionSuite extends DisciplineSuite {
   import ArbMeasure.given
   import ArbSpectralDefinition.given
   import ArbUnnormalizedSED.given
+  import ArbWavelength.given
   import ArbWavelength.*
   import BrightnessUnits.*
 

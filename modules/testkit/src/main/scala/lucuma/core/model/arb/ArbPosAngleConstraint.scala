@@ -4,46 +4,46 @@
 package lucuma.core.model.arb
 
 import lucuma.core.math.Angle
-import lucuma.core.math.arb.ArbAngle._
+import lucuma.core.math.arb.ArbAngle.given
 import lucuma.core.model.PosAngleConstraint
 import org.scalacheck.Arbitrary
-import org.scalacheck.Arbitrary._
+import org.scalacheck.Arbitrary.*
 import org.scalacheck.Cogen
 import org.scalacheck.Gen
 
 trait ArbPosAngleConstraint {
 
-  implicit val fixedPosAngleArb: Arbitrary[PosAngleConstraint.Fixed] =
+  given Arbitrary[PosAngleConstraint.Fixed] =
     Arbitrary {
       for {
         a <- arbitrary[Angle]
       } yield PosAngleConstraint.Fixed(a)
     }
 
-  implicit def fixedPosAngleCogen: Cogen[PosAngleConstraint.Fixed] =
+  given Cogen[PosAngleConstraint.Fixed] =
     Cogen[Angle].contramap(_.angle)
 
-  implicit val allowFlipPosAngleArb: Arbitrary[PosAngleConstraint.AllowFlip] =
+  given Arbitrary[PosAngleConstraint.AllowFlip] =
     Arbitrary {
       for {
         a <- arbitrary[Angle]
       } yield PosAngleConstraint.AllowFlip(a)
     }
 
-  implicit def allowFlipCogen: Cogen[PosAngleConstraint.AllowFlip] =
+  given Cogen[PosAngleConstraint.AllowFlip] =
     Cogen[Angle].contramap(_.angle)
 
-  implicit val parallacticOverridePosAngleArb: Arbitrary[PosAngleConstraint.ParallacticOverride] =
+  given Arbitrary[PosAngleConstraint.ParallacticOverride] =
     Arbitrary {
       for {
         a <- arbitrary[Angle]
       } yield PosAngleConstraint.ParallacticOverride(a)
     }
 
-  implicit def parallacticOverridePosAngleCogen: Cogen[PosAngleConstraint.ParallacticOverride] =
+  given Cogen[PosAngleConstraint.ParallacticOverride] =
     Cogen[Angle].contramap(_.angle)
 
-  implicit val posAngleArb: Arbitrary[PosAngleConstraint] =
+  given Arbitrary[PosAngleConstraint] =
     Arbitrary {
       for {
         f <- arbitrary[PosAngleConstraint.Fixed]
@@ -55,7 +55,7 @@ trait ArbPosAngleConstraint {
       } yield a
     }
 
-  implicit def posAngleCogen: Cogen[PosAngleConstraint] =
+  given Cogen[PosAngleConstraint] =
     Cogen[Option[Option[Either[Angle, Either[Angle, Either[Angle, Angle]]]]]].contramap {
       case PosAngleConstraint.AverageParallactic     => None
       case PosAngleConstraint.Unbounded              => Some(None)

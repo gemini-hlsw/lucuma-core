@@ -14,14 +14,14 @@ import org.scalacheck.*
 trait ArbWavelength {
   val RedWavelength: Wavelength = Wavelength.picometers.get(620000.refined)
 
-  implicit val arbWavelength: Arbitrary[Wavelength] = Arbitrary(
+  given Arbitrary[Wavelength] = Arbitrary(
     Gen.frequency(
       1  -> RedWavelength,
       20 -> arbitrary[PosInt].map(Wavelength(_))
     )
   )
 
-  implicit val cogWavelength: Cogen[Wavelength] =
+  given Cogen[Wavelength] =
     Cogen[Int].contramap(_.toPicometers.value.value)
 
   private val intBoundedBigDecimals: Gen[BigDecimal] =

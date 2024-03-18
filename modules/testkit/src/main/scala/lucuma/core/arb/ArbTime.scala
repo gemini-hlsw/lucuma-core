@@ -17,17 +17,17 @@ import scala.jdk.CollectionConverters._
 // Arbitrary but reasonable dates and times.
 trait ArbTime {
 
-  implicit val arbZoneId: Arbitrary[ZoneId] =
+  given Arbitrary[ZoneId] =
     Arbitrary {
       oneOf(ZoneId.getAvailableZoneIds.asScala.toSeq).map(ZoneId.of)
     }
 
-  implicit val arbYear: Arbitrary[Year] =
+  given Arbitrary[Year] =
     Arbitrary {
       choose(2000, 2020).map(Year.of)
     }
 
-  implicit val arbLocalDate: Arbitrary[LocalDate] =
+  given Arbitrary[LocalDate] =
     Arbitrary {
       for {
         y <- arbitrary[Year]
@@ -35,7 +35,7 @@ trait ArbTime {
       } yield LocalDate.ofYearDay(y.getValue, d)
     }
 
-  implicit val arbLocalTime: Arbitrary[LocalTime] =
+  given Arbitrary[LocalTime] =
     Arbitrary {
       for {
         h <- choose(0, 23)
@@ -45,7 +45,7 @@ trait ArbTime {
       } yield LocalTime.of(h, m, s, n)
     }
 
-  implicit val arbLocalDateTime: Arbitrary[LocalDateTime] =
+  given Arbitrary[LocalDateTime] =
     Arbitrary {
       for {
         d <- arbitrary[LocalDate]
@@ -84,37 +84,37 @@ trait ArbTime {
       Gen.frequency((1, genTransitioningZDT(zid)), (9, genArbitraryZDT(zid)))
     )
 
-  implicit val arbZonedDateTime: Arbitrary[ZonedDateTime] =
+  given Arbitrary[ZonedDateTime] =
     Arbitrary(genZonedDateTime)
 
-  implicit val arbInstant: Arbitrary[Instant] =
+  given Arbitrary[Instant] =
     Arbitrary(arbitrary[ZonedDateTime].map(_.toInstant))
 
-  implicit val arbDuration: Arbitrary[Duration] =
+  given Arbitrary[Duration] =
     Arbitrary(Gen.posNum[Long].map(Duration.ofMillis))
 
-  implicit val arbSDuration: Arbitrary[SDuration] = Arbitrary {
+  given Arbitrary[SDuration] = Arbitrary {
     for {
       d <- arbitrary[Duration]
     } yield SDuration.fromNanos(d.getNano.toDouble)
   }
 
-  implicit val cogSDuration: Cogen[SDuration] =
+  given Cogen[SDuration] =
     Cogen[Long].contramap(_.toNanos)
 
-  implicit val cogInstant: Cogen[Instant] =
+  given Cogen[Instant] =
     Cogen[(Long, Int)].contramap(t => (t.getEpochSecond, t.getNano))
 
-  implicit val cogLocalDate: Cogen[LocalDate] =
+  given Cogen[LocalDate] =
     Cogen[(Int, Int)].contramap(d => (d.getYear, d.getDayOfYear))
 
-  implicit val cogDuration: Cogen[Duration] =
+  given Cogen[Duration] =
     Cogen[(Long, Int)].contramap(d => (d.getSeconds, d.getNano))
 
-  implicit val cogYear: Cogen[Year] =
+  given Cogen[Year] =
     Cogen[Int].contramap(_.getValue)
 
-  implicit val cogZoneId: Cogen[ZoneId] =
+  given Cogen[ZoneId] =
     Cogen[String].contramap(_.getId)
 }
 

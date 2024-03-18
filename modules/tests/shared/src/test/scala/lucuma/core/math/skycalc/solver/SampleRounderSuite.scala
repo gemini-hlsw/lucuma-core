@@ -5,20 +5,20 @@ package lucuma.core.math.skycalc.solver
 
 import cats.Eq
 import cats.laws.discipline.InvariantSemigroupalTests
-import cats.syntax.all._
+import cats.syntax.all.*
 import lucuma.core.arb.ArbTime
-import lucuma.core.syntax.time._
+import lucuma.core.syntax.time.*
 import org.scalacheck.Arbitrary
 import org.scalacheck.Gen
 import org.scalacheck.Prop
-import org.scalacheck.Prop._
-import org.typelevel.cats.time._
+import org.scalacheck.Prop.*
+import org.typelevel.cats.time.*
 
 import java.time.Duration
 import java.time.Instant
 
 final class SampleRounderSuite extends munit.DisciplineSuite {
-  import ArbTime._
+  import ArbTime.given
 
   implicit def arbRounder[R, A](implicit r: SampleRounder[R, A]): Arbitrary[SampleRounder[R, A]] =
     Arbitrary(Gen.const(r))

@@ -14,7 +14,7 @@ import monocle.law.discipline.*
 import org.scalacheck.Prop.*
 
 final class AngleSuite extends munit.DisciplineSuite {
-  import ArbAngle.*
+  import ArbAngle.given
 
   // Laws
   checkAll("Angle", CommutativeGroupTests[Angle].commutativeGroup)

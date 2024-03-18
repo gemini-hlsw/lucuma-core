@@ -11,7 +11,7 @@ import org.scalacheck.Prop.forAll
 
 class TimestampUnionSuite extends DisciplineSuite {
 
-  import arb.ArbTimestamp.*
+  import arb.ArbTimestamp.given
   import arb.ArbTimestampInterval.given
   import arb.ArbTimestampUnion.given
 

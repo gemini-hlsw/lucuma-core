@@ -6,16 +6,16 @@ package lucuma.core.math.arb
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Declination
 import lucuma.core.math.RightAscension
-import org.scalacheck.Arbitrary._
-import org.scalacheck.Cogen._
-import org.scalacheck._
+import org.scalacheck.Arbitrary.*
+import org.scalacheck.Cogen.*
+import org.scalacheck.*
 
 trait ArbCoordinates {
-  import ArbAngle._
-  import ArbRightAscension._
-  import ArbDeclination._
+  import ArbAngle.*
+  import ArbRightAscension.given
+  import ArbDeclination.given
 
-  implicit val arbCoordinates: Arbitrary[Coordinates] =
+  given Arbitrary[Coordinates] =
     Arbitrary {
       for {
         ra  <- arbitrary[RightAscension]
@@ -23,7 +23,7 @@ trait ArbCoordinates {
       } yield Coordinates(ra, dec)
     }
 
-  implicit val cogCoordinates: Cogen[Coordinates] =
+  given Cogen[Coordinates] =
     Cogen[(RightAscension, Declination)].contramap(cs => (cs.ra, cs.dec))
 
   // Strings that are often parsable as Coordinates

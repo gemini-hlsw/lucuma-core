@@ -9,17 +9,17 @@ import org.scalacheck.Arbitrary.*
 import org.scalacheck.*
 
 trait ArbUser {
-  import ArbGid.*
-  import ArbRole.*
-  import ArbOrcidProfile.*
+  import ArbGid.given
+  import ArbRole.given
+  import ArbOrcidProfile.given
 
-  implicit val ArbGuestUser: Arbitrary[GuestUser] =
+  given Arbitrary[GuestUser] =
     Arbitrary(arbitrary[User.Id].map(GuestUser(_)))
 
-  implicit val CogGuestUser: Cogen[GuestUser] =
+  given Cogen[GuestUser] =
     Cogen[User.Id].contramap(_.id)
 
-  implicit val ArbServiceUser: Arbitrary[ServiceUser] =
+  given Arbitrary[ServiceUser] =
     Arbitrary {
       for {
         id <- arbitrary[User.Id]
@@ -27,10 +27,10 @@ trait ArbUser {
       } yield ServiceUser(id, n)
     }
 
-  implicit val CogServiceUser: Cogen[ServiceUser] =
+  given Cogen[ServiceUser] =
     Cogen[(User.Id, String)].contramap(x => (x.id, x.name))
 
-  implicit val ArbStandardUser: Arbitrary[StandardUser] =
+  given Arbitrary[StandardUser] =
     Arbitrary {
       for {
         id <- arbitrary[User.Id]
@@ -40,12 +40,12 @@ trait ArbUser {
       } yield StandardUser(id, r, o, p)
     }
 
-  implicit val CogStandardUser: Cogen[StandardUser] =
+  given Cogen[StandardUser] =
     Cogen[(User.Id, StandardRole, List[StandardRole], OrcidProfile)].contramap(x =>
       (x.id, x.role, x.otherRoles, x.profile)
     )
 
-  implicit val ArbUser: Arbitrary[User] =
+  given Arbitrary[User] =
     Arbitrary {
       for {
         guest    <- arbitrary[GuestUser]
@@ -55,7 +55,7 @@ trait ArbUser {
       } yield user
     }
 
-  implicit val CogUser: Cogen[User] =
+  given Cogen[User] =
     Cogen[Either[GuestUser, Either[ServiceUser, StandardUser]]].contramap {
       case guest: GuestUser       => Left(guest)
       case service: ServiceUser   => Right(Left(service))

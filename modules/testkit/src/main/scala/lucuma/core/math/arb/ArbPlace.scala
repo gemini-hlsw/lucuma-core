@@ -21,9 +21,9 @@ import org.scalacheck.*
 import java.time.ZoneId
 
 trait ArbPlace {
-  import ArbAngle.*
-  import ArbDeclination.*
-  import ArbTime.*
+  import ArbAngle.given
+  import ArbDeclination.given
+  import ArbTime.given
 
   private val MinAltitude: Int = 0
   private val MaxAltitude: Int = 8000
@@ -45,10 +45,10 @@ trait ArbPlace {
       zoneId <- arbitrary[ZoneId]
     } yield Place(lat, lon, alt, zoneId)
 
-  implicit val arbPlace: Arbitrary[Place] =
+  given Arbitrary[Place] =
     Arbitrary(genPlace)
 
-  implicit val cogCoordinates: Cogen[Place] =
+  given Cogen[Place] =
     Cogen[(Lat, Angle, BigDecimal)].contramap(loc =>
       (loc.latitude, loc.longitude, loc.altitude.value.value)
     )

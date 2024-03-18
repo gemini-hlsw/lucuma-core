@@ -12,7 +12,7 @@ import org.scalacheck.*
 trait ArbGmosCcdMode {
   import ArbEnumerated.given
 
-  implicit val arbGmosCcdMode: Arbitrary[GmosCcdMode] =
+  given Arbitrary[GmosCcdMode] =
     Arbitrary(
       for {
         xBin        <- arbitrary[GmosXBinning]
@@ -23,7 +23,7 @@ trait ArbGmosCcdMode {
       } yield GmosCcdMode(xBin, yBin, ampCount, ampGain, ampReadMode)
     )
 
-  implicit val cogGmosCcdMode: Cogen[GmosCcdMode] =
+  given Cogen[GmosCcdMode] =
     Cogen[(GmosXBinning, GmosYBinning, GmosAmpCount, GmosAmpGain, GmosAmpReadMode)].contramap(c =>
       (c.xBin, c.yBin, c.ampCount, c.ampGain, c.ampReadMode)
     )

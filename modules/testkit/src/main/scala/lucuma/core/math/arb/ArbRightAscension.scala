@@ -5,16 +5,16 @@ package lucuma.core.math.arb
 
 import lucuma.core.math.HourAngle
 import lucuma.core.math.RightAscension
-import org.scalacheck.Arbitrary._
-import org.scalacheck._
+import org.scalacheck.Arbitrary.*
+import org.scalacheck.*
 
 trait ArbRightAscension {
-  import ArbAngle._
+  import ArbAngle.given
 
-  implicit val arbRightAscension: Arbitrary[RightAscension] =
+  given Arbitrary[RightAscension] =
     Arbitrary(arbitrary[HourAngle].map(RightAscension.fromHourAngle.get))
 
-  implicit val cogRightAscension: Cogen[RightAscension] =
+  given Cogen[RightAscension] =
     Cogen[HourAngle].contramap(RightAscension.fromHourAngle.reverseGet)
 
 }

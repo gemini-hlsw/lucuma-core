@@ -15,7 +15,7 @@ import org.scalacheck.Gen
 trait ArbAtom {
   import ArbBoundedCollection.*
   import ArbStep.given
-  import ArbUid.*
+  import ArbUid.given
 
   given [D: Arbitrary]: Arbitrary[Atom[D]] =
     Arbitrary {

@@ -14,9 +14,9 @@ import org.scalacheck.Gen
 
 trait ArbStaticConfig {
   import ArbEnumerated.given
-  import ArbGmosNodAndShuffle.*
+  import ArbGmosNodAndShuffle.given
 
-  implicit val arbStaticConfigGmosNorth: Arbitrary[StaticConfig.GmosNorth] = Arbitrary(
+  given Arbitrary[StaticConfig.GmosNorth] = Arbitrary(
     for {
       stageMode     <- arbitrary[GmosNorthStageMode]
       detector      <- arbitrary[GmosNorthDetector]
@@ -25,11 +25,11 @@ trait ArbStaticConfig {
     } yield StaticConfig.GmosNorth(stageMode, detector, mosPreImaging, nodAndShuffle)
   )
 
-  implicit val cogStaticConfigGmosNorth: Cogen[StaticConfig.GmosNorth] =
+  given Cogen[StaticConfig.GmosNorth] =
     Cogen[(GmosNorthStageMode, GmosNorthDetector, MosPreImaging, Option[GmosNodAndShuffle])]
       .contramap(s => (s.stageMode, s.detector, s.mosPreImaging, s.nodAndShuffle))
 
-  implicit val arbStaticConfigGmosSouth: Arbitrary[StaticConfig.GmosSouth] = Arbitrary(
+  given Arbitrary[StaticConfig.GmosSouth] = Arbitrary(
     for {
       stageMode     <- arbitrary[GmosSouthStageMode]
       detector      <- arbitrary[GmosSouthDetector]
@@ -38,18 +38,18 @@ trait ArbStaticConfig {
     } yield StaticConfig.GmosSouth(stageMode, detector, mosPreImaging, nodAndShuffle)
   )
 
-  implicit val cogStaticConfigGmosSouth: Cogen[StaticConfig.GmosSouth] =
+  given Cogen[StaticConfig.GmosSouth] =
     Cogen[(GmosSouthStageMode, GmosSouthDetector, MosPreImaging, Option[GmosNodAndShuffle])]
       .contramap(s => (s.stageMode, s.detector, s.mosPreImaging, s.nodAndShuffle))
 
-  implicit val arbStaticConfig: Arbitrary[StaticConfig] = Arbitrary(
+  given Arbitrary[StaticConfig] = Arbitrary(
     Gen.oneOf(
       arbitrary[StaticConfig.GmosNorth],
       arbitrary[StaticConfig.GmosSouth]
     )
   )
 
-  implicit val cogStaticConfig: Cogen[StaticConfig] =
+  given Cogen[StaticConfig] =
     Cogen[Either[StaticConfig.GmosNorth, StaticConfig.GmosSouth]]
       .contramap {
         case s @ StaticConfig.GmosNorth(_, _, _, _) => s.asLeft

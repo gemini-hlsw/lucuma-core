@@ -23,7 +23,7 @@ trait ArbTimeChargeCorrection {
   import ArbEnumerated.given
   import ArbTimestamp.given
   import ArbTimeSpan.given
-  import ArbUser.*
+  import ArbUser.given
 
   given Arbitrary[TimeChargeCorrection] =
     Arbitrary {

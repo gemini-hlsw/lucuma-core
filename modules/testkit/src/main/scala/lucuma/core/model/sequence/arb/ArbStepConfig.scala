@@ -17,9 +17,9 @@ import org.scalacheck.Gen
 
 trait ArbStepConfig {
   import ArbEnumerated.given
-  import ArbOffset.*
+  import ArbOffset.given
 
-  implicit val arbGcalArcs: Arbitrary[NonEmptySet[GcalArc]] =
+  given Arbitrary[NonEmptySet[GcalArc]] =
     Arbitrary(
       for {
         a  <- arbitrary[GcalArc]
@@ -27,12 +27,12 @@ trait ArbStepConfig {
       } yield NonEmptySet.of(a, as*)
     )
 
-  implicit val cogGcalArcs: Cogen[NonEmptySet[GcalArc]] =
+  given Cogen[NonEmptySet[GcalArc]] =
     Cogen[(GcalArc, List[GcalArc])].contramap { a =>
       (a.head, a.tail.toList)
     }
 
-  implicit val arbGcalLamp: Arbitrary[StepConfig.Gcal.Lamp] =
+  given Arbitrary[StepConfig.Gcal.Lamp] =
     Arbitrary(
       Gen.oneOf(
         arbitrary[GcalContinuum].map(_.asLeft[NonEmptySet[GcalArc]]),
@@ -40,10 +40,10 @@ trait ArbStepConfig {
       ).map(StepConfig.Gcal.Lamp.fromEither(_))
     )
 
-  implicit val cogGcalLamp: Cogen[StepConfig.Gcal.Lamp] =
+  given Cogen[StepConfig.Gcal.Lamp] =
     Cogen[(Either[GcalContinuum, NonEmptySet[GcalArc]])].contramap(_.toEither)
 
-  implicit val arbStepConfigGcal: Arbitrary[StepConfig.Gcal] = Arbitrary(
+  given Arbitrary[StepConfig.Gcal] = Arbitrary(
     for {
       lamp      <- arbitrary[StepConfig.Gcal.Lamp]
       filter    <- arbitrary[GcalFilter]
@@ -52,12 +52,12 @@ trait ArbStepConfig {
     } yield StepConfig.Gcal(lamp, filter, diffuser, shutter)
   )
 
-  implicit val cogStepConfigGcal: Cogen[StepConfig.Gcal] =
+  given Cogen[StepConfig.Gcal] =
     Cogen[(StepConfig.Gcal.Lamp, GcalFilter, GcalDiffuser, GcalShutter)].contramap(
       c => (c.lamp, c.filter, c.diffuser, c.shutter)
     )
 
-  implicit val arbStepConfigScience: Arbitrary[StepConfig.Science] =
+  given Arbitrary[StepConfig.Science] =
     Arbitrary {
       for {
         o <- arbitrary[Offset]
@@ -65,7 +65,7 @@ trait ArbStepConfig {
       } yield StepConfig.Science(o, g)
     }
 
-  implicit val cogStepConfigScience: Cogen[StepConfig.Science] =
+  given Cogen[StepConfig.Science] =
     Cogen[(
       Offset,
       StepGuideState
@@ -74,13 +74,13 @@ trait ArbStepConfig {
       a.guiding
     )}
 
-  implicit val arbStepConfigSmartGcal: Arbitrary[StepConfig.SmartGcal] =
+  given Arbitrary[StepConfig.SmartGcal] =
     Arbitrary(arbitrary[SmartGcalType].map(StepConfig.SmartGcal.apply))
 
-  implicit val cogStepConfigSmartGcal: Cogen[StepConfig.SmartGcal] =
+  given Cogen[StepConfig.SmartGcal] =
     Cogen[SmartGcalType].contramap(_.smartGcalType)
 
-  implicit val arbStepConfig: Arbitrary[StepConfig] =
+  given Arbitrary[StepConfig] =
     Arbitrary(
       Gen.oneOf(
         Gen.const(StepConfig.Bias),
@@ -91,7 +91,7 @@ trait ArbStepConfig {
       )
     )
 
-  implicit val cogStepConfig: Cogen[StepConfig] =
+  given Cogen[StepConfig] =
     Cogen[Either[Unit, Either[Unit, Either[StepConfig.Gcal, Either[StepConfig.Science, StepConfig.SmartGcal]]]]].contramap {
       case StepConfig.Bias                 => ().asLeft
       case StepConfig.Dark                 => ().asLeft.asRight

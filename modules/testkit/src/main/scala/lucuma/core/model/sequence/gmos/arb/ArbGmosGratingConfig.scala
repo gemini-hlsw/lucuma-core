@@ -16,9 +16,9 @@ import org.scalacheck.*
 
 trait ArbGmosGratingConfig {
   import ArbEnumerated.given
-  import ArbWavelength.*
+  import ArbWavelength.given
 
-  implicit val arbGmosNorthGratingConfig: Arbitrary[GmosGratingConfig.North] =
+  given Arbitrary[GmosGratingConfig.North] =
     Arbitrary {
       for {
         grating    <- arbitrary[GmosNorthGrating]
@@ -27,7 +27,7 @@ trait ArbGmosGratingConfig {
       } yield GmosGratingConfig.North(grating, order, wavelength)
     }
 
-  implicit val arbGmosSouthGratingConfig: Arbitrary[GmosGratingConfig.South] =
+  given Arbitrary[GmosGratingConfig.South] =
     Arbitrary {
       for {
         grating    <- arbitrary[GmosSouthGrating]
@@ -36,21 +36,21 @@ trait ArbGmosGratingConfig {
       } yield GmosGratingConfig.South(grating, order, wavelength)
     }
 
-  implicit val arbGmosGratingConfig: Arbitrary[GmosGratingConfig] = Arbitrary(
+  given Arbitrary[GmosGratingConfig] = Arbitrary(
     Gen.oneOf(arbitrary[GmosGratingConfig.North], arbitrary[GmosGratingConfig.South])
   )
 
-  implicit val cogGmosNorthGratingConfig: Cogen[GmosGratingConfig.North] =
+  given Cogen[GmosGratingConfig.North] =
     Cogen[(GmosNorthGrating, GmosGratingOrder, Wavelength)].contramap(g =>
       (g.grating, g.order, g.wavelength)
     )
 
-  implicit val cogGmosSouthGratingConfig: Cogen[GmosGratingConfig.South] =
+  given Cogen[GmosGratingConfig.South] =
     Cogen[(GmosSouthGrating, GmosGratingOrder, Wavelength)].contramap(g =>
       (g.grating, g.order, g.wavelength)
     )
 
-  implicit val cogGmosGratingConfig: Cogen[GmosGratingConfig] =
+  given Cogen[GmosGratingConfig] =
     Cogen[Either[GmosGratingConfig.North, GmosGratingConfig.South]]
       .contramap {
         case g @ GmosGratingConfig.North(_, _, _) => g.asLeft

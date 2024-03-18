@@ -10,7 +10,7 @@ import munit.*
 
 final class GmosCcdModeSuite extends DisciplineSuite {
   import ArbEnumerated.given
-  import lucuma.core.model.sequence.gmos.arb.ArbGmosCcdMode.*
+  import lucuma.core.model.sequence.gmos.arb.ArbGmosCcdMode.given
 
   checkAll("Order[GmosCcdMode]", OrderTests[GmosCcdMode].order)
   checkAll("GmosCcdMode.xBin", LensTests(GmosCcdMode.xBin))

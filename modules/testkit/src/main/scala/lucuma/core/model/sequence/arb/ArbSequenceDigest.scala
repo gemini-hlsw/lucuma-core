@@ -20,7 +20,7 @@ import scala.collection.immutable.SortedSet
 trait ArbSequenceDigest {
   import ArbEnumerated.given
   import ArbCategorizedTime.given
-  import ArbOffset.*
+  import ArbOffset.given
 
   given Arbitrary[SequenceDigest] =
     Arbitrary {

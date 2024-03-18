@@ -19,8 +19,8 @@ import org.scalacheck.Prop.*
 import java.time.LocalDateTime
 
 final class EpochSuite extends munit.DisciplineSuite {
-  import ArbEpoch.*
-  import ArbTime.*
+  import ArbEpoch.given
+  import ArbTime.given
 
   // provide an Arbitrary[String] for the Prism tests.
   given Arbitrary[String] = Arbitrary(ArbEpoch.strings)
@@ -30,7 +30,7 @@ final class EpochSuite extends munit.DisciplineSuite {
   checkAll("fromString", PrismTests(Epoch.fromString))
   checkAll("fromStringNoScheme",
            FormatTests(Epoch.fromStringNoScheme)
-             .formatWith(ArbEpoch.stringsNoScheme)(Eq[String], arbJulianEpoch, Eq[Epoch])
+             .formatWith(ArbEpoch.stringsNoScheme)(Eq[String], ArbEpoch.arbJulianEpoch, Eq[Epoch])
   )
 
   test("Epoch.eq.natural") {
