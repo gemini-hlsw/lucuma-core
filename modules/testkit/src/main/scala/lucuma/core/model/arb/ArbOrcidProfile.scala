@@ -11,7 +11,7 @@ import org.scalacheck._
 trait ArbOrcidProfile {
   import ArbOrcidId._
 
-  implicit val ArbOrcidProfile: Arbitrary[OrcidProfile] =
+  given Arbitrary[OrcidProfile] =
     Arbitrary {
       for {
         id           <- arbitrary[OrcidId]
@@ -22,7 +22,7 @@ trait ArbOrcidProfile {
       } yield OrcidProfile(id, givenName, familyName, creditName, primaryEmail)
     }
 
-  implicit val CogOrcidProfile: Cogen[OrcidProfile] =
+  given Cogen[OrcidProfile] =
     Cogen[(OrcidId, Option[String], Option[String], Option[String], Option[String])].contramap(x =>
       (x.orcidId, x.givenName, x.familyName, x.creditName, x.primaryEmail)
     )

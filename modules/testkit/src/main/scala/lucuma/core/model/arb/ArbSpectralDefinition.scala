@@ -31,7 +31,7 @@ trait ArbSpectralDefinition {
   import ArbFluxDensityContinuumValue.given
   import ArbMeasure.given
   import ArbUnnormalizedSED.given
-  import ArbWavelength.*
+  import ArbWavelength.given
   import BrightnessUnits.*
   import SpectralDefinition.*
 

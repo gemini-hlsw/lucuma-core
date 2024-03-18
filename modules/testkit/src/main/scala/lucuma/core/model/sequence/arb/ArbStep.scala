@@ -15,8 +15,8 @@ import org.scalacheck.Cogen
 trait ArbStep {
   import ArbEnumerated.given
   import ArbStepEstimate.given
-  import ArbStepConfig.*
-  import ArbUid.*
+  import ArbStepConfig.given
+  import ArbUid.given
 
   given [D: Arbitrary]: Arbitrary[Step[D]] =
     Arbitrary {

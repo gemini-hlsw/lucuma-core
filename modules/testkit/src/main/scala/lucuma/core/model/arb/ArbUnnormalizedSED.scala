@@ -25,7 +25,7 @@ trait ArbUnnormalizedSED {
   import ArbEnumerated.given
   import UnnormalizedSED.*
   import ArbRefined.given
-  import ArbWavelength.*
+  import ArbWavelength.given
 
   given Arbitrary[StellarLibrary] =
     Arbitrary(arbitrary[StellarLibrarySpectrum].map(StellarLibrary(_)))

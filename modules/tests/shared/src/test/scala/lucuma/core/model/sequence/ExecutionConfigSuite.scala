@@ -16,10 +16,10 @@ import org.scalacheck.Test
 
 final class ExecutionConfigSuite extends DisciplineSuite {
 
-  import ArbDynamicConfig.*
+  import ArbDynamicConfig.given
   import ArbExecutionConfig.given
   import ArbExecutionSequence.given
-  import ArbStaticConfig.*
+  import ArbStaticConfig.given
 
   override val scalaCheckTestParameters = Test.Parameters.default.withMaxSize(4)
 

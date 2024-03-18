@@ -6,9 +6,9 @@ package gem.math
 import cats.Eq
 import cats.Show
 import cats.kernel.laws.discipline.*
-import lucuma.core.arb.ArbTime.*
+import lucuma.core.arb.ArbTime.given
 import lucuma.core.model.LocalObservingNight
-import lucuma.core.model.arb.ArbObservingNight.*
+import lucuma.core.model.arb.ArbObservingNight.given
 import monocle.law.discipline.*
 import munit.*
 import org.scalacheck.Prop.*

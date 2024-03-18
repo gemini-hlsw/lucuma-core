@@ -15,12 +15,12 @@ import munit.*
 
 final class StepSuite extends DisciplineSuite {
 
-  import ArbDynamicConfig.*
+  import ArbDynamicConfig.given
   import ArbEnumerated.given
   import ArbStep.given
-  import ArbStepConfig.*
+  import ArbStepConfig.given
   import ArbStepEstimate.given
-  import ArbUid.*
+  import ArbUid.given
 
   checkAll("Uid[Step.Id]", UidTests[Step.Id].uid)
   checkAll("KeyCodec[Step.Id]", KeyCodecTests[Step.Id].keyCodec)

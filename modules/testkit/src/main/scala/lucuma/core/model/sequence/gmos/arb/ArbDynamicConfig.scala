@@ -16,13 +16,13 @@ import org.scalacheck.Cogen
 import org.scalacheck.Gen
 
 trait ArbDynamicConfig {
-  import ArbGmosCcdMode.*
+  import ArbGmosCcdMode.given
   import ArbEnumerated.given
   import ArbTimeSpan.given
-  import ArbGmosGratingConfig.*
-  import ArbGmosFpuMask.*
+  import ArbGmosGratingConfig.given
+  import ArbGmosFpuMask.given
 
-  implicit val arbDynamicConfigGmosNorth: Arbitrary[DynamicConfig.GmosNorth] = Arbitrary(
+  given Arbitrary[DynamicConfig.GmosNorth] = Arbitrary(
     for {
       exposure      <- arbitrary[TimeSpan]
       readout       <- arbitrary[GmosCcdMode]
@@ -34,7 +34,7 @@ trait ArbDynamicConfig {
     } yield DynamicConfig.GmosNorth(exposure, readout, dtax, roi, gratingConfig, filter, fpu)
   )
 
-  implicit val cogDynamicConfigGmosNorth: Cogen[DynamicConfig.GmosNorth] =
+  given Cogen[DynamicConfig.GmosNorth] =
     Cogen[
       (TimeSpan,
        GmosCcdMode,
@@ -46,7 +46,7 @@ trait ArbDynamicConfig {
       )
     ].contramap(c => (c.exposure, c.readout, c.dtax, c.roi, c.gratingConfig, c.filter, c.fpu))
 
-  implicit val arbDynamicConfigGmosSouth: Arbitrary[DynamicConfig.GmosSouth] = Arbitrary(
+  given Arbitrary[DynamicConfig.GmosSouth] = Arbitrary(
     for {
       exposure      <- arbitrary[TimeSpan]
       readout       <- arbitrary[GmosCcdMode]
@@ -58,7 +58,7 @@ trait ArbDynamicConfig {
     } yield DynamicConfig.GmosSouth(exposure, readout, dtax, roi, gratingConfig, filter, fpu)
   )
 
-  implicit val cogDynamicConfigGmosSouth: Cogen[DynamicConfig.GmosSouth] = Cogen[
+  given Cogen[DynamicConfig.GmosSouth] = Cogen[
     (TimeSpan,
      GmosCcdMode,
      GmosDtax,
@@ -69,14 +69,14 @@ trait ArbDynamicConfig {
     )
   ].contramap(c => (c.exposure, c.readout, c.dtax, c.roi, c.gratingConfig, c.filter, c.fpu))
 
-  implicit val arbDynamicConfig: Arbitrary[DynamicConfig] = Arbitrary(
+  given Arbitrary[DynamicConfig] = Arbitrary(
     Gen.oneOf(
       arbitrary[DynamicConfig.GmosNorth],
       arbitrary[DynamicConfig.GmosSouth]
     )
   )
 
-  implicit val cogDynamicConfig: Cogen[DynamicConfig] =
+  given Cogen[DynamicConfig] =
     Cogen[Either[DynamicConfig.GmosNorth, DynamicConfig.GmosSouth]].contramap {
       case c @ DynamicConfig.GmosNorth(_, _, _, _, _, _, _) => c.asLeft
       case c @ DynamicConfig.GmosSouth(_, _, _, _, _, _, _) => c.asRight

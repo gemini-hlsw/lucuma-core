@@ -7,10 +7,10 @@ import cats.Eq
 import cats.Show
 import cats.kernel.laws.discipline._
 import cats.syntax.all.*
-import lucuma.core.arb.ArbTime.*
+import lucuma.core.arb.ArbTime.given
 import lucuma.core.enums.Site
 import lucuma.core.enums.TwilightType
-import lucuma.core.model.arb.ArbTwilightBoundedNight.*
+import lucuma.core.model.arb.ArbTwilightBoundedNight.given
 import lucuma.core.util.arb.ArbEnumerated.given
 import munit.*
 import org.scalacheck.Prop.*

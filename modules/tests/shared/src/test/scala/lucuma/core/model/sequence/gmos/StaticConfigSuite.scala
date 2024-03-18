@@ -10,8 +10,8 @@ import munit.*
 
 final class StaticConfigSuite extends DisciplineSuite {
   import ArbEnumerated.given
-  import lucuma.core.model.sequence.gmos.arb.ArbGmosNodAndShuffle.*
-  import lucuma.core.model.sequence.gmos.arb.ArbStaticConfig.*
+  import lucuma.core.model.sequence.gmos.arb.ArbGmosNodAndShuffle.given
+  import lucuma.core.model.sequence.gmos.arb.ArbStaticConfig.given
 
   checkAll("Eq[StaticConfig.GmosNorth]", EqTests[StaticConfig.GmosNorth].eqv)
   checkAll("StaticConfig.GmosNorth.stageMode", LensTests(StaticConfig.GmosNorth.stageMode))

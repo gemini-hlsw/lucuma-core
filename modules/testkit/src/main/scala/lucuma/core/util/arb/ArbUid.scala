@@ -10,10 +10,10 @@ import org.scalacheck._
 import java.util.UUID
 
 trait ArbUid {
-  implicit def arbUid[A: Uid]: Arbitrary[A] =
+  given arbUid[A: Uid]: Arbitrary[A] =
     Arbitrary(arbitrary[UUID].map(Uid[A].isoUuid.reverseGet))
 
-  implicit def cogUid[A: Uid]: Cogen[A] =
+  given cogUid[A: Uid]: Cogen[A] =
     Cogen[UUID].contramap(Uid[A].isoUuid.get(_))
 }
 

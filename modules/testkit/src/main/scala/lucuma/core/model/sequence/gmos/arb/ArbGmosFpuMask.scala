@@ -17,10 +17,10 @@ trait ArbGmosFpuMask {
   import ArbEnumerated.given
   import ArbRefined.given
 
-  implicit def arbGmosBuiltinFpuMask[T: Arbitrary]: Arbitrary[GmosFpuMask.Builtin[T]] =
+  given arbGmosBuiltinFpuMask[T: Arbitrary]: Arbitrary[GmosFpuMask.Builtin[T]] =
     Arbitrary(arbitrary[T].map(GmosFpuMask.Builtin.apply))
 
-  implicit val arbGmosCustomFpuMask: Arbitrary[GmosFpuMask.Custom] =
+  given Arbitrary[GmosFpuMask.Custom] =
     Arbitrary(
       for {
         filename  <- arbitrary[NonEmptyString]
@@ -28,7 +28,7 @@ trait ArbGmosFpuMask {
       } yield GmosFpuMask.Custom(filename, slitWidth)
     )
 
-  implicit def arbGmosFpuMask[T: Arbitrary]: Arbitrary[GmosFpuMask[T]] =
+  given arbGmosFpuMask[T: Arbitrary]: Arbitrary[GmosFpuMask[T]] =
     Arbitrary(
       Gen.oneOf(
         arbitrary[GmosFpuMask.Builtin[T]],
@@ -36,13 +36,13 @@ trait ArbGmosFpuMask {
       )
     )
 
-  implicit def cogGmosBuiltinFpuMask[T: Cogen]: Cogen[GmosFpuMask.Builtin[T]] =
+  given cogGmosBuiltinFpuMask[T: Cogen]: Cogen[GmosFpuMask.Builtin[T]] =
     Cogen[T].contramap(_.value)
 
-  implicit val cogGmosCustomFpuMask: Cogen[GmosFpuMask.Custom] =
+  given Cogen[GmosFpuMask.Custom] =
     Cogen[(NonEmptyString, GmosCustomSlitWidth)].contramap(m => (m.filename, m.slitWidth))
 
-  implicit def cogGmosFpuMask[T: Cogen]: Cogen[GmosFpuMask[T]] =
+  given cogGmosFpuMask[T: Cogen]: Cogen[GmosFpuMask[T]] =
     Cogen[Either[GmosFpuMask.Builtin[T], GmosFpuMask.Custom]]
       .contramap {
         case m @ GmosFpuMask.Builtin(_)   => m.asLeft

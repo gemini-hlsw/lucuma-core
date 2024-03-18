@@ -19,14 +19,14 @@ import org.scalacheck.Prop.forAll
 import java.time.Instant
 
 final class SiderealTrackingSuite extends DisciplineSuite {
-  import ArbCoordinates.*
-  import ArbDeclination.*
-  import ArbEpoch.*
-  import ArbParallax.*
+  import ArbCoordinates.given
+  import ArbDeclination.given
+  import ArbEpoch.given
+  import ArbParallax.given
   import ArbProperMotion.given
-  import ArbRightAscension.*
+  import ArbRightAscension.given
   import ArbSiderealTracking.given
-  import ArbRadialVelocity.*
+  import ArbRadialVelocity.given
 
   // Laws
   checkAll("SiderealTracking", OrderTests[SiderealTracking].order)

@@ -13,8 +13,8 @@ import monocle.law.discipline.*
 import org.scalacheck.Prop.*
 
 final class DeclinationSuite extends munit.DisciplineSuite {
-  import ArbDeclination.*
-  import ArbAngle.*
+  import ArbDeclination.given
+  import ArbAngle.given
 
   // Laws
   checkAll("Declination", OrderTests[Declination].order)

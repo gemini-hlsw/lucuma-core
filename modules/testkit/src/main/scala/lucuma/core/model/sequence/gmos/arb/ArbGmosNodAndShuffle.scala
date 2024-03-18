@@ -16,11 +16,11 @@ import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.*
 
 trait ArbGmosNodAndShuffle {
-  import ArbOffset.*
+  import ArbOffset.given
   import ArbEnumerated.given
   import ArbRefined.given
 
-  implicit val arbGmosNodAndShuffle: Arbitrary[GmosNodAndShuffle] = Arbitrary(
+  given Arbitrary[GmosNodAndShuffle] = Arbitrary(
     for {
       posA          <- arbitrary[Offset]
       posB          <- arbitrary[Offset]
@@ -30,7 +30,7 @@ trait ArbGmosNodAndShuffle {
     } yield GmosNodAndShuffle(posA, posB, eOffset, shuffleOffset, shuffleCycles)
   )
 
-  implicit val cogGmosNodAndShuffle: Cogen[GmosNodAndShuffle] =
+  given Cogen[GmosNodAndShuffle] =
     Cogen[(Offset, Offset, GmosEOffsetting, PosInt, PosInt)].contramap(g =>
       (g.posA, g.posB, g.eOffset, g.shuffleOffset, g.shuffleCycles)
     )

@@ -11,9 +11,9 @@ import monocle.law.discipline.*
 import munit.*
 
 final class StepConfigSuite extends DisciplineSuite {
-  import ArbStepConfig.*
+  import ArbStepConfig.given
   import ArbEnumerated.given
-  import ArbOffset.*
+  import ArbOffset.given
 
   checkAll("Eq[StepConfig.Gcal]", EqTests[StepConfig.Gcal].eqv)
   checkAll("StepConfig.Gcal.lamp", LensTests(StepConfig.Gcal.lamp))

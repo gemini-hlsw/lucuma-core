@@ -21,9 +21,9 @@ import org.scalacheck.*
 trait ArbExecutionEvent {
 
   import ArbEnumerated.given
-  import ArbGid.*
-  import ArbTimestamp.*
-  import ArbUid.*
+  import ArbGid.given
+  import ArbTimestamp.given
+  import ArbUid.given
 
   given Arbitrary[ExecutionEvent.DatasetEvent] =
     Arbitrary {

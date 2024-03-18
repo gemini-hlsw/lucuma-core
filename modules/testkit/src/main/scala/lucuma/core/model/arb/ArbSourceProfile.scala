@@ -13,7 +13,7 @@ import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.*
 
 trait ArbSourceProfile {
-  import ArbAngle.*
+  import ArbAngle.given
   import ArbEnumerated.given
   import BrightnessUnits.*
   import ArbSpectralDefinition.given

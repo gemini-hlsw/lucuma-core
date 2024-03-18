@@ -8,7 +8,7 @@ import lucuma.core.arb.ArbEval
 import lucuma.core.arb.ArbTime
 import lucuma.core.math.skycalc.solver.Samples
 import org.scalacheck.Arbitrary
-import org.scalacheck.Arbitrary._
+import org.scalacheck.Arbitrary.*
 import org.scalacheck.Cogen
 import org.scalacheck.Gen
 
@@ -16,16 +16,16 @@ import java.time.Instant
 import scala.collection.immutable.TreeMap
 
 trait ArbSamples {
-  import ArbEval._
-  import ArbTime._
+  import ArbEval.given
+  import ArbTime.given
 
   def genSamples[A: Arbitrary]: Gen[Samples[A]] =
     arbitrary[TreeMap[Instant, Eval[A]]].map(Samples.fromMap)
 
-  implicit def arbSamples[A: Arbitrary]: Arbitrary[Samples[A]] =
+  given arbSamples[A: Arbitrary]: Arbitrary[Samples[A]] =
     Arbitrary(genSamples[A])
 
-  implicit def cogenSamples[A: Cogen]: Cogen[Samples[A]] =
+  given cogenSamples[A: Cogen]: Cogen[Samples[A]] =
     Cogen[Map[Instant, A]].contramap(_.toMap.view.mapValues(_.value).toMap)
 }
 

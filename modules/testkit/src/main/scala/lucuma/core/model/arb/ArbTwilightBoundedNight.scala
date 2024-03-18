@@ -7,14 +7,14 @@ package model
 package arb
 
 import lucuma.core.enums.TwilightType
-import lucuma.core.model.arb.ArbObservingNight.*
+import lucuma.core.model.arb.ArbObservingNight.given
 import lucuma.core.util.arb.ArbEnumerated.given
 import org.scalacheck.Arbitrary.*
 import org.scalacheck.*
 
 trait ArbTwilightBoundedNight {
 
-  implicit val arbTwilightBoundedNight: Arbitrary[TwilightBoundedNight] =
+  given Arbitrary[TwilightBoundedNight] =
     Arbitrary {
       (
         for {
@@ -24,7 +24,7 @@ trait ArbTwilightBoundedNight {
       ).suchThat(_.isDefined).map(_.get)
     }
 
-  implicit val cogTwilightBoundedNight: Cogen[TwilightBoundedNight] =
+  given Cogen[TwilightBoundedNight] =
     Cogen[(TwilightType, ObservingNight)].contramap(o => (o.twilightType, o.toObservingNight))
 }
 

@@ -3,17 +3,17 @@
 
 package lucuma.core.util.arb
 
-import eu.timepit.refined.scalacheck.numeric._
+import eu.timepit.refined.scalacheck.numeric.*
 import eu.timepit.refined.types.numeric.PosLong
 import lucuma.core.util.Gid
 import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck._
+import org.scalacheck.*
 
 trait ArbGid {
-  implicit def arbGid[A](implicit ev: Gid[A]): Arbitrary[A] =
+  given arbGid[A](using ev: Gid[A]): Arbitrary[A] =
     Arbitrary(arbitrary[PosLong].map(ev.isoPosLong.reverseGet))
 
-  implicit def cogGid[A](implicit ev: Gid[A]): Cogen[A] =
+  given cogGid[A](using ev: Gid[A]): Cogen[A] =
     Cogen[Long].contramap(ev.isoPosLong.get(_).value)
 }
 

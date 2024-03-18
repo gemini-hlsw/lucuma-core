@@ -28,10 +28,10 @@ import java.time.Instant
 import scala.collection.immutable.TreeMap
 
 final class SamplesSuite extends munit.DisciplineSuite with IntervalGens {
-  import ArbEval.*
+  import ArbEval.given
   import ArbInterval.given
-  import ArbSamples.*
-  import ArbTime.*
+  import ArbSamples.given
+  import ArbTime.given
 
   // Laws
   checkAll("Eq", EqTests[Samples[Int]].eqv)

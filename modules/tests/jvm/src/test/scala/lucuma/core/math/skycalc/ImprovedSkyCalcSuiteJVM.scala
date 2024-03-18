@@ -4,19 +4,19 @@
 package lucuma.core.math.skycalc
 
 import com.fortysevendeg.scalacheck.datetime.GenDateTime.genDateTimeWithinRange
-import com.fortysevendeg.scalacheck.datetime.instances.jdk8._
+import com.fortysevendeg.scalacheck.datetime.instances.jdk8.*
 import edu.gemini.skycalc.ImprovedSkyCalcTest
 import jsky.coords.WorldCoords
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Place
-import lucuma.core.math.arb.ArbCoordinates._
-import lucuma.core.math.arb.ArbPlace._
+import lucuma.core.math.arb.ArbCoordinates.given
+import lucuma.core.math.arb.ArbPlace.given
 import lucuma.core.tests.ScalaCheckFlaky
 import munit.ScalaCheckSuite
-import org.scalacheck.Prop._
+import org.scalacheck.Prop.*
 import org.scalacheck.{Test => ScalaCheckTest}
 
-import java.time._
+import java.time.*
 import java.{util => ju}
 
 final class ImprovedSkyCalcSuiteJVM extends ScalaCheckSuite {

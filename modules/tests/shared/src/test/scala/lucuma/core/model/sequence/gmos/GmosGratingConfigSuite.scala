@@ -12,8 +12,8 @@ import munit.*
 
 final class GmosGratingConfigSuite extends DisciplineSuite {
   import ArbEnumerated.given
-  import ArbWavelength.*
-  import lucuma.core.model.sequence.gmos.arb.ArbGmosGratingConfig.*
+  import ArbWavelength.given
+  import lucuma.core.model.sequence.gmos.arb.ArbGmosGratingConfig.given
 
   checkAll("Eq[GmosGratingConfig.North]", EqTests[GmosGratingConfig.North].eqv)
   checkAll("GmosGratingConfig.North.grating", LensTests(GmosGratingConfig.North.grating))

@@ -17,11 +17,11 @@ import monocle.law.discipline.*
 import org.scalacheck.Prop.*
 
 final class CoordinatesSuite extends munit.DisciplineSuite {
-  import ArbCoordinates.*
-  import ArbRightAscension.*
-  import ArbDeclination.*
-  import ArbAngle.*
-  import ArbOffset.*
+  import ArbCoordinates.given
+  import ArbRightAscension.given
+  import ArbDeclination.given
+  import ArbAngle.given
+  import ArbOffset.given
 
   // Laws
   checkAll("Coordinates", OrderTests[Coordinates].order)

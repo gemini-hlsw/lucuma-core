@@ -18,9 +18,9 @@ import org.scalacheck.Test
 
 final class AtomSuite extends DisciplineSuite {
   import ArbAtom.given
-  import ArbDynamicConfig.*
+  import ArbDynamicConfig.given
   import ArbStep.given
-  import ArbUid.*
+  import ArbUid.given
 
   override val scalaCheckTestParameters = Test.Parameters.default.withMaxSize(10)
 

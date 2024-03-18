@@ -14,12 +14,12 @@ import org.scalacheck.Cogen
 
 trait ArbParallax {
 
-  implicit val arbParallax: Arbitrary[Parallax] =
+  given Arbitrary[Parallax] =
     Arbitrary {
       arbitrary[Parallax.LongParallaxμas].map(μas => Parallax(μas.withUnit[MicroArcSecond]))
     }
 
-  implicit val cogParallax: Cogen[Parallax] =
+  given Cogen[Parallax] =
     Cogen[Long].contramap(_.μas.value.value)
 }
 

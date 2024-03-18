@@ -5,16 +5,16 @@ package lucuma.core.math.arb
 
 import lucuma.core.math.Angle
 import lucuma.core.math.Declination
-import org.scalacheck.Arbitrary._
-import org.scalacheck._
+import org.scalacheck.Arbitrary.*
+import org.scalacheck.*
 
 trait ArbDeclination {
-  import ArbAngle._
+  import ArbAngle.given
 
-  implicit val arbDeclination: Arbitrary[Declination] =
+  given Arbitrary[Declination] =
     Arbitrary(arbitrary[Angle].map(Declination.fromAngleWithCarry(_)._1))
 
-  implicit val cogDeclination: Cogen[Declination] =
+  given Cogen[Declination] =
     Cogen[Angle].contramap(_.toAngle)
 
 }

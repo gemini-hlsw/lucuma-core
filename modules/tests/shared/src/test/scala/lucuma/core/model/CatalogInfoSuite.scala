@@ -14,7 +14,7 @@ import monocle.law.discipline.LensTests
 import munit.*
 
 final class CatalogInfoSuite extends DisciplineSuite {
-  import ArbCatalogInfo.*
+  import ArbCatalogInfo.given
 
   // Laws
   checkAll("Order[CatalogInfo]", OrderTests[CatalogInfo].order)

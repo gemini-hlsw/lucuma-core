@@ -16,14 +16,14 @@ import java.time.LocalDate
 
 trait ArbObservingNight {
   import ArbEnumerated.given
-  import ArbTime.*
+  import ArbTime.given
 
-  implicit val arbLocalObservingNight: Arbitrary[LocalObservingNight] =
+  given Arbitrary[LocalObservingNight] =
     Arbitrary {
       arbitrary[LocalDate].map(LocalObservingNight(_))
     }
 
-  implicit val arbObservingNight: Arbitrary[ObservingNight] =
+  given Arbitrary[ObservingNight] =
     Arbitrary {
       for {
         n <- arbitrary[LocalObservingNight]
@@ -31,10 +31,10 @@ trait ArbObservingNight {
       } yield n.atSite(s)
     }
 
-  implicit val cogLocalObservingNight: Cogen[LocalObservingNight] =
+  given Cogen[LocalObservingNight] =
     Cogen[LocalDate].contramap(_.toLocalDate)
 
-  implicit val cogObservingNight: Cogen[ObservingNight] =
+  given Cogen[ObservingNight] =
     Cogen[(Site, LocalObservingNight)].contramap(o => (o.site, o.toLocalObservingNight))
 }
 

@@ -11,11 +11,11 @@ import munit.*
 
 final class DynamicConfigSuite extends DisciplineSuite {
 
-  import ArbDynamicConfig.*
+  import ArbDynamicConfig.given
   import ArbEnumerated.given
-  import ArbGmosCcdMode.*
-  import ArbGmosFpuMask.*
-  import ArbGmosGratingConfig.*
+  import ArbGmosCcdMode.given
+  import ArbGmosFpuMask.given
+  import ArbGmosGratingConfig.given
   import ArbTimeSpan.given
 
   checkAll("Eq[DynamicConfig.GmosNorth]",           EqTests[DynamicConfig.GmosNorth].eqv)

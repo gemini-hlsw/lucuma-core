@@ -5,16 +5,16 @@ package lucuma.core.math
 
 import cats.Eq
 import cats.Show
-import cats.kernel.laws.discipline._
-import lucuma.core.math.arb._
-import lucuma.core.math.syntax.int._
+import cats.kernel.laws.discipline.*
+import lucuma.core.math.arb.*
+import lucuma.core.math.syntax.int.*
 import lucuma.core.optics.laws.discipline.SplitMonoTests
-import monocle.law.discipline._
-import org.scalacheck.Prop._
+import monocle.law.discipline.*
+import org.scalacheck.Prop.*
 
 final class OffsetSuite extends munit.DisciplineSuite {
-  import ArbAngle._
-  import ArbOffset._
+  import ArbAngle.given
+  import ArbOffset.given
 
   // Laws
   checkAll("Offset", CommutativeGroupTests[Offset].commutativeGroup)

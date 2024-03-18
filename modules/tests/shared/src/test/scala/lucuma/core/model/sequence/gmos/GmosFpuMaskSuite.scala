@@ -18,7 +18,7 @@ import munit.*
 
 final class GmosFpuMaskSuite extends DisciplineSuite {
   import ArbEnumerated.given
-  import ArbGmosFpuMask.*
+  import ArbGmosFpuMask.given
   import ArbRefined.given
 
   checkAll(

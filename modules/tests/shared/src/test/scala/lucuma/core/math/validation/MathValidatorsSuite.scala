@@ -14,10 +14,10 @@ import org.scalacheck.Arbitrary.*
 import org.scalacheck.Gen
 
 final class MathValidatorsSuite extends DisciplineSuite {
-  import ArbAngle.*
-  import ArbDeclination.*
-  import ArbEpoch.*
-  import ArbRightAscension.*
+  import ArbAngle.given
+  import ArbDeclination.given
+  import ArbEpoch.given
+  import ArbRightAscension.given
 
   val genNumericString      = arbitrary[BigDecimal].map(_.toString)
   val genMaybeNumericString = Gen.frequency(5 -> genNumericString, 1 -> arbitrary[String])

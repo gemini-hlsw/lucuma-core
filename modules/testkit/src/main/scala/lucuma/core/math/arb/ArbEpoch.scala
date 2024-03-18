@@ -13,10 +13,10 @@ import org.scalacheck.Gen._
 import org.scalacheck._
 
 trait ArbEpoch {
-  implicit val arbScheme: Arbitrary[Epoch.Scheme] =
+  given Arbitrary[Epoch.Scheme] =
     Arbitrary(oneOf(Epoch.Julian, Epoch.Besselian))
 
-  implicit val arbEpoch: Arbitrary[Epoch] =
+  given Arbitrary[Epoch] =
     Arbitrary {
       for {
         sch <- arbitrary[Epoch.Scheme]
@@ -24,7 +24,7 @@ trait ArbEpoch {
       } yield sch.fromMilliyears(mys)
     }
 
-  implicit val cogEpoch: Cogen[Epoch] =
+  given Cogen[Epoch] =
     Cogen[String].contramap(Epoch.fromString.reverseGet)
 
   private val perturbations: List[String => Gen[String]] =

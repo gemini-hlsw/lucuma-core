@@ -15,7 +15,7 @@ import org.scalacheck._
 
 trait ArbCatalogInfo {
 
-  implicit val arbCatalogInfo: Arbitrary[CatalogInfo] =
+  given Arbitrary[CatalogInfo] =
     Arbitrary {
       for {
         name    <- arbitrary[CatalogName]
@@ -24,7 +24,7 @@ trait ArbCatalogInfo {
       } yield CatalogInfo(name, id, objType)
     }
 
-  implicit val cogSemester: Cogen[CatalogInfo] =
+  given Cogen[CatalogInfo] =
     Cogen[(CatalogName, String, Option[String])].contramap(s =>
       (s.catalog, s.id.value, s.objectType.map(_.value))
     )

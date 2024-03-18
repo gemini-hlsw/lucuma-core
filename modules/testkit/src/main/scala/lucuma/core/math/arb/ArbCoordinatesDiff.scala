@@ -5,12 +5,12 @@ package lucuma.core.math.arb
 
 import lucuma.core.math.Angle
 import lucuma.core.math.CoordinatesDiff
-import org.scalacheck.Arbitrary._
-import org.scalacheck.Cogen._
-import org.scalacheck._
+import org.scalacheck.Arbitrary.*
+import org.scalacheck.Cogen.*
+import org.scalacheck.*
 
 trait ArbCoordinatesDiff {
-  import ArbAngle._
+  import ArbAngle.given
 
   implicit val arbCoordinatesDiff: Arbitrary[CoordinatesDiff] =
     Arbitrary {

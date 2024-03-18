@@ -11,11 +11,11 @@ import org.scalacheck.Cogen.*
 import org.scalacheck.*
 
 trait ArbSiderealTracking {
-  import ArbEpoch.*
-  import ArbCoordinates.*
+  import ArbEpoch.given
+  import ArbCoordinates.given
   import ArbProperMotion.given
-  import ArbRadialVelocity.*
-  import ArbParallax.*
+  import ArbRadialVelocity.given
+  import ArbParallax.given
 
   given Arbitrary[SiderealTracking] =
     Arbitrary {

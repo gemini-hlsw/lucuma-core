@@ -13,8 +13,8 @@ import monocle.law.discipline.*
 import org.scalacheck.Prop.*
 
 final class RightAscensionSuite extends munit.DisciplineSuite {
-  import ArbRightAscension.*
-  import ArbAngle.*
+  import ArbRightAscension.given
+  import ArbAngle.given
 
   // Laws
   checkAll("RightAscension", OrderTests[RightAscension].order)

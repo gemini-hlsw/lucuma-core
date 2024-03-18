@@ -35,7 +35,7 @@ import munit.*
 import scala.collection.immutable.SortedMap
 
 final class SourceProfileSuite extends DisciplineSuite {
-  import ArbAngle.*
+  import ArbAngle.given
   import ArbBrightnessValue.given
   import ArbEmissionLine.given
   import ArbEnumerated.given
@@ -44,7 +44,7 @@ final class SourceProfileSuite extends DisciplineSuite {
   import ArbSourceProfile.given
   import ArbSpectralDefinition.given
   import ArbUnnormalizedSED.given
-  import ArbWavelength.*
+  import ArbWavelength.given
   import ArbCollection.given
 
   val sd1Brightnesses = SortedMap[Band, BrightnessMeasure[Integrated]](

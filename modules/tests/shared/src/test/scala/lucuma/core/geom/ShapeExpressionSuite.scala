@@ -25,8 +25,8 @@ final class ShapeExpressionSuite extends munit.DisciplineSuite {
   // Scala 3 likes this better
   implicit def saneUnitToProp(unit: Unit): Prop = unitToProp(unit)
 
-  import ArbAngle.*
-  import ArbOffset.*
+  import ArbAngle.given
+  import ArbOffset.given
   import ArbShapeExpression.*
   import ShapeExpressionSpec.*
 

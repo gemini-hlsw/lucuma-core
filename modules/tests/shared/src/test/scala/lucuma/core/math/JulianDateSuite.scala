@@ -5,21 +5,21 @@ package lucuma.core.math
 
 import cats.Eq
 import cats.Show
-import cats.kernel.laws.discipline._
-import cats.syntax.all._
+import cats.kernel.laws.discipline.*
+import cats.syntax.all.*
 import lucuma.core.arb.ArbTime
-import lucuma.core.math.arb._
+import lucuma.core.math.arb.*
 import org.scalacheck.Arbitrary
-import org.scalacheck.Gen._
-import org.scalacheck.Prop._
-import org.typelevel.cats.time._
+import org.scalacheck.Gen.*
+import org.scalacheck.Prop.*
+import org.typelevel.cats.time.*
 
 import java.time.Instant
 import java.time.LocalDateTime
 
 final class JulianDateSuute extends munit.DisciplineSuite {
-  import ArbJulianDate._
-  import ArbTime._
+  import ArbJulianDate.given
+  import ArbTime.given
 
   // Laws
   checkAll("JulianDate", OrderTests[JulianDate].order)

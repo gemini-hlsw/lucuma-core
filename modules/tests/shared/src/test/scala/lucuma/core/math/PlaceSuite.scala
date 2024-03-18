@@ -17,10 +17,10 @@ import org.scalacheck.Prop.*
 import org.typelevel.cats.time.*
 
 final class PlaceSuite extends DisciplineSuite {
-  import ArbPlace.*
-  import ArbDeclination.*
-  import ArbAngle.*
-  import ArbTime.*
+  import ArbPlace.given
+  import ArbDeclination.given
+  import ArbAngle.given
+  import ArbTime.given
   import ArbRefined.given
   import ArbQuantity.given
 

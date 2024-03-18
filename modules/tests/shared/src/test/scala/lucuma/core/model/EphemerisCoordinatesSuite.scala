@@ -20,12 +20,12 @@ import org.scalacheck.Gen
 import org.scalacheck.Prop._
 
 final class EphemerisCoordinatesSuite extends DisciplineSuite {
-  import ArbCoordinates._
-  import ArbEphemeris._
-  import ArbOffset._
-  import ArbRightAscension._
-  import ArbDeclination._
-  import EphemerisCoordinatesSuite._
+  import ArbCoordinates.given
+  import ArbEphemeris.given
+  import ArbOffset.given
+  import ArbRightAscension.given
+  import ArbDeclination.given
+  import EphemerisCoordinatesSuite.*
 
   // Laws
   checkAll("EphemerisCoordinates", EqTests[EphemerisCoordinates].eqv)

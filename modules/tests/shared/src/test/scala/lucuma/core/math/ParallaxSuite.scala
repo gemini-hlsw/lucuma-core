@@ -3,9 +3,9 @@
 
 package lucuma.core.math
 
-import cats.kernel.laws.discipline._
-import lucuma.core.math.arb.ArbParallax._
-import lucuma.core.optics.laws.discipline._
+import cats.kernel.laws.discipline.*
+import lucuma.core.math.arb.ArbParallax.given
+import lucuma.core.optics.laws.discipline.*
 import spire.math.Rational
 
 final class ParallaxSuite extends munit.DisciplineSuite {
