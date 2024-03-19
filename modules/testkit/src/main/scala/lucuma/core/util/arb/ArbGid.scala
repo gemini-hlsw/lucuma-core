@@ -6,8 +6,8 @@ package lucuma.core.util.arb
 import eu.timepit.refined.scalacheck.numeric.*
 import eu.timepit.refined.types.numeric.PosLong
 import lucuma.core.util.Gid
-import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.*
+import org.scalacheck.Arbitrary.arbitrary
 
 trait ArbGid {
   given arbGid[A](using ev: Gid[A]): Arbitrary[A] =

@@ -5,10 +5,10 @@ package lucuma.core.optics
 
 import cats.kernel.Eq
 import cats.kernel.Monoid
-import cats.syntax.all._
+import cats.syntax.all.*
 import eu.timepit.refined.api.Refined
-import eu.timepit.refined.api.{Validate => RefinedValidate}
-import lucuma.core.optics._
+import eu.timepit.refined.api.Validate as RefinedValidate
+import lucuma.core.optics.*
 import monocle.Iso
 import monocle.Prism
 

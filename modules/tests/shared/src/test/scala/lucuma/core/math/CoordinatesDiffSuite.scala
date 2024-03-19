@@ -3,10 +3,10 @@
 
 package lucuma.core.math
 
-import cats.kernel.laws.discipline._
-import lucuma.core.math.arb._
+import cats.kernel.laws.discipline.*
+import lucuma.core.math.arb.*
 
-import scala.math._
+import scala.math.*
 
 final class CoordinatesDiffSuite extends munit.DisciplineSuite {
   import ArbCoordinatesDiff._

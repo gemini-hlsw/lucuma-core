@@ -5,11 +5,11 @@ package lucuma.core.util
 
 import cats.Order
 import cats.Show
-import cats.syntax.either._
+import cats.syntax.either.*
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.char.Letter
-import io.circe._
-import io.circe.syntax._
+import io.circe.*
+import io.circe.syntax.*
 import monocle.Iso
 import monocle.Prism
 

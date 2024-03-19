@@ -10,7 +10,7 @@ import lucuma.core.math.arb.*
 import lucuma.core.model.arb.*
 import lucuma.core.util.arb.*
 import monocle.law.discipline.*
-import munit._
+import munit.*
 
 final class ConstraintSetSuite extends DisciplineSuite {
   import ArbConstraintSet.*

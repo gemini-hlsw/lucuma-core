@@ -4,8 +4,8 @@
 package lucuma.core.util
 package arb
 
-import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.*
+import org.scalacheck.Arbitrary.arbitrary
 
 trait ArbTimestampInterval {
 

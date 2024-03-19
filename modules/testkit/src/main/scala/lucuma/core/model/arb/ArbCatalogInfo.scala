@@ -10,8 +10,8 @@ import eu.timepit.refined.scalacheck.string.*
 import eu.timepit.refined.types.string.*
 import lucuma.core.enums.CatalogName
 import lucuma.core.util.arb.ArbEnumerated.given
+import org.scalacheck.*
 import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck._
 
 trait ArbCatalogInfo {
 

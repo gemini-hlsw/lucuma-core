@@ -3,15 +3,15 @@
 
 package lucuma.core.util.laws
 
-import cats.kernel._
+import cats.kernel.*
 import cats.kernel.laws.BoundedEnumerableLaws
 import cats.kernel.laws.OrderLaws
 import cats.kernel.laws.discipline.BoundedEnumerableTests
 import cats.kernel.laws.discipline.OrderTests
 import eu.timepit.refined.api.Refined
-import eu.timepit.refined.cats._
+import eu.timepit.refined.cats.*
 import eu.timepit.refined.char.Letter
-import eu.timepit.refined.scalacheck.all._
+import eu.timepit.refined.scalacheck.all.*
 import eu.timepit.refined.types.numeric.PosLong
 import io.circe.Decoder
 import io.circe.Encoder
@@ -21,9 +21,9 @@ import io.circe.testing.instances.arbitraryJson
 import lucuma.core.util.Gid
 import monocle.law.discipline.IsoTests
 import monocle.law.discipline.PrismTests
+import org.scalacheck.*
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
-import org.scalacheck._
 
 import scala.util.matching.Regex
 

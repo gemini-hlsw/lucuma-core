@@ -3,14 +3,14 @@
 
 package lucuma.core.math.arb
 
-import eu.timepit.refined.scalacheck.numeric._
-import lucuma.core.arb._
+import eu.timepit.refined.scalacheck.numeric.*
+import lucuma.core.arb.*
 import lucuma.core.math.Epoch
 import lucuma.core.math.Epoch.Besselian
 import lucuma.core.math.Epoch.Julian
+import org.scalacheck.*
 import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.Gen._
-import org.scalacheck._
+import org.scalacheck.Gen.*
 
 trait ArbEpoch {
   given Arbitrary[Epoch.Scheme] =

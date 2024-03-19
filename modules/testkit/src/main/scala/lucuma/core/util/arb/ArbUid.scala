@@ -4,8 +4,8 @@
 package lucuma.core.util.arb
 
 import lucuma.core.util.Uid
+import org.scalacheck.*
 import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck._
 
 import java.util.UUID
 

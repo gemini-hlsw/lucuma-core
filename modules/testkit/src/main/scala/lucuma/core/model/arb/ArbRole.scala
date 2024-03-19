@@ -9,8 +9,8 @@ import lucuma.core.model.Role
 import lucuma.core.model.ServiceRole
 import lucuma.core.model.StandardRole
 import lucuma.core.util.arb.*
-import org.scalacheck.Arbitrary.*
 import org.scalacheck.*
+import org.scalacheck.Arbitrary.*
 
 trait ArbRole {
   import ArbGid.given

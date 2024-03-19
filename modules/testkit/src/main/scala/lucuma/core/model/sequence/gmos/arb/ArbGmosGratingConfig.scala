@@ -11,8 +11,8 @@ import lucuma.core.enums.GmosSouthGrating
 import lucuma.core.math.Wavelength
 import lucuma.core.math.arb.ArbWavelength
 import lucuma.core.util.arb.ArbEnumerated
-import org.scalacheck.Arbitrary.*
 import org.scalacheck.*
+import org.scalacheck.Arbitrary.*
 
 trait ArbGmosGratingConfig {
   import ArbEnumerated.given

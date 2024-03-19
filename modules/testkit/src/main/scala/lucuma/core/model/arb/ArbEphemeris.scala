@@ -11,9 +11,9 @@ import lucuma.core.math.arb.ArbCoordinates
 import lucuma.core.math.arb.ArbOffset
 import lucuma.core.util.Timestamp
 import lucuma.core.util.arb.ArbTimestamp
+import org.scalacheck.*
 import org.scalacheck.Arbitrary.*
 import org.scalacheck.Gen.*
-import org.scalacheck.*
 
 trait ArbEphemeris {
   import ArbCoordinates.given

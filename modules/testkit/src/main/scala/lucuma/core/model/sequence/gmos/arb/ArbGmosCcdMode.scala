@@ -6,8 +6,8 @@ package arb
 
 import lucuma.core.enums.*
 import lucuma.core.util.arb.ArbEnumerated
-import org.scalacheck.Arbitrary.*
 import org.scalacheck.*
+import org.scalacheck.Arbitrary.*
 
 trait ArbGmosCcdMode {
   import ArbEnumerated.given

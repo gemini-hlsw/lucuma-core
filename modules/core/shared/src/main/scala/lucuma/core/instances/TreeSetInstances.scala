@@ -3,11 +3,11 @@
 
 package lucuma.core.instances
 
-import cats._
+import cats.*
 import cats.kernel.BoundedSemilattice
 import cats.kernel.Hash
 import cats.kernel.Order
-import cats.syntax.all._
+import cats.syntax.all.*
 
 import scala.annotation.tailrec
 import scala.collection.immutable.TreeSet

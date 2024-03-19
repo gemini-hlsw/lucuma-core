@@ -5,8 +5,8 @@ package lucuma.core.math.arb
 
 import lucuma.core.math.HourAngle
 import lucuma.core.math.RightAscension
-import org.scalacheck.Arbitrary.*
 import org.scalacheck.*
+import org.scalacheck.Arbitrary.*
 
 trait ArbRightAscension {
   import ArbAngle.given

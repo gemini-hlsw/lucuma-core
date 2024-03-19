@@ -8,8 +8,8 @@ import cats.kernel.laws.discipline.EqTests
 import coulomb.ops.algebra.cats.all.given
 import eu.timepit.refined.cats.*
 import eu.timepit.refined.scalacheck.numeric.*
-import lucuma.core.arb.ArbTime
 import lucuma.core.arb.*
+import lucuma.core.arb.ArbTime
 import lucuma.core.math.arb.*
 import monocle.law.discipline.*
 import munit.DisciplineSuite

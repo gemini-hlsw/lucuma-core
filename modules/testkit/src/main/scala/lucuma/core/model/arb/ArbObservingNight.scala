@@ -9,8 +9,8 @@ package arb
 import lucuma.core.arb.ArbTime
 import lucuma.core.enums.Site
 import lucuma.core.util.arb.ArbEnumerated
-import org.scalacheck.Arbitrary.*
 import org.scalacheck.*
+import org.scalacheck.Arbitrary.*
 
 import java.time.LocalDate
 

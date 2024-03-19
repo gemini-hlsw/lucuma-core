@@ -19,8 +19,8 @@ import lucuma.core.model.SpectralDefinition
 import lucuma.core.model.UnnormalizedSED
 import lucuma.core.util.*
 import lucuma.core.util.arb.ArbEnumerated
-import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.*
+import org.scalacheck.Arbitrary.arbitrary
 
 import scala.collection.immutable.SortedMap
 

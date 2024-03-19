@@ -7,8 +7,8 @@ package arb
 import coulomb.*
 import coulomb.policy.spire.standard.given
 import coulomb.syntax.*
-import lucuma.core.math.Constants._
-import lucuma.core.math.units._
+import lucuma.core.math.Constants.*
+import lucuma.core.math.units.*
 import org.scalacheck.Arbitrary
 import org.scalacheck.Cogen
 import org.scalacheck.Gen

@@ -8,8 +8,8 @@ import eu.timepit.refined.cats.*
 import eu.timepit.refined.scalacheck.string.*
 import lucuma.core.arb.*
 import lucuma.core.model.arb.*
-import lucuma.core.util.arb.ArbEnumerated.given
 import lucuma.core.util.arb.*
+import lucuma.core.util.arb.ArbEnumerated.given
 import monocle.law.discipline.LensTests
 import munit.*
 

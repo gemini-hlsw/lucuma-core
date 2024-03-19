@@ -14,9 +14,9 @@ import lucuma.core.math.Angle
 import lucuma.core.math.Lat
 import lucuma.core.math.Lon
 import lucuma.core.math.Place
+import org.scalacheck.*
 import org.scalacheck.Arbitrary.*
 import org.scalacheck.Cogen.*
-import org.scalacheck.*
 
 import java.time.ZoneId
 

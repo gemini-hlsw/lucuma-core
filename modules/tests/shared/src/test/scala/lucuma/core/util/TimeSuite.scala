@@ -4,14 +4,14 @@
 package lucuma.core.util
 
 import lucuma.core.util.time.*
-import munit.DisciplineSuite
 import munit.*
+import munit.DisciplineSuite
 import org.scalacheck.Arbitrary
 import org.scalacheck.Prop.*
 
 import java.time.*
-import java.time.temporal.ChronoUnit
 import java.time.temporal.*
+import java.time.temporal.ChronoUnit
 
 class TimeSuite extends DisciplineSuite:
   private val nanosList = List((0, false), (499999999, false), (500000000, true), (500000001, true), (999999999, true))

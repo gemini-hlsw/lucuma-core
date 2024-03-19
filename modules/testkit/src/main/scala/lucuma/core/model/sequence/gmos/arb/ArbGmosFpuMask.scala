@@ -10,8 +10,8 @@ import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.core.enums.GmosCustomSlitWidth
 import lucuma.core.math.arb.ArbRefined
 import lucuma.core.util.arb.ArbEnumerated
-import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.*
+import org.scalacheck.Arbitrary.arbitrary
 
 trait ArbGmosFpuMask {
   import ArbEnumerated.given

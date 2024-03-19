@@ -6,7 +6,7 @@ package lucuma.core.math
 import cats.Order
 import cats.Show
 import cats.kernel.CommutativeGroup
-import cats.syntax.all._
+import cats.syntax.all.*
 import lucuma.core.optics.SplitMono
 import monocle.Focus
 import monocle.Iso

@@ -5,7 +5,7 @@ package lucuma.core.model
 
 import lucuma.core.util.arb.*
 import lucuma.core.util.laws.EnumeratedTests
-import munit._
+import munit.*
 
 final class AccessSuite extends DisciplineSuite {
   import ArbEnumerated.given

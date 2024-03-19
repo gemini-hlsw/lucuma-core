@@ -6,9 +6,9 @@ package lucuma.core.math.arb
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Declination
 import lucuma.core.math.RightAscension
+import org.scalacheck.*
 import org.scalacheck.Arbitrary.*
 import org.scalacheck.Cogen.*
-import org.scalacheck.*
 
 trait ArbCoordinates {
   import ArbAngle.*

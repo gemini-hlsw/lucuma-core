@@ -8,6 +8,7 @@ import io.circe.testing.CodecTests
 import io.circe.testing.instances.arbitraryJson
 import lucuma.core.enums.GuideProbe
 import lucuma.core.model.GuideConfig.given
+import lucuma.core.model.arb.*
 import lucuma.core.model.arb.ArbAltairConfig.given
 import lucuma.core.model.arb.ArbGemsConfig.given
 import lucuma.core.model.arb.ArbGuideConfig.given
@@ -15,7 +16,6 @@ import lucuma.core.model.arb.ArbM1GuideConfig.given
 import lucuma.core.model.arb.ArbM2GuideConfig.given
 import lucuma.core.model.arb.ArbProbeGuide.given
 import lucuma.core.model.arb.ArbTelescopeGuideConfig.given
-import lucuma.core.model.arb.*
 import lucuma.core.util.arb.ArbEnumerated.given
 import munit.*
 
