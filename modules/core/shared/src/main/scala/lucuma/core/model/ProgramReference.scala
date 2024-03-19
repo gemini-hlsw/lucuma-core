@@ -34,6 +34,31 @@ sealed trait ProgramReference extends Product with Serializable {
   def label: String
 }
 
+/**
+ * Program references that are paticular to a specific instrument.
+ */
+sealed trait InstrumentProgramReference extends ProgramReference {
+  def instrument: Instrument
+}
+
+/**
+ * Program references associated with a particular semester.
+ */
+sealed trait SemesterlyProgramReference extends ProgramReference {
+  def semester: Semester
+}
+
+/**
+ * Semesterly program references tied to specific instruments.  These are all
+ * formatted in the sme way.
+ */
+sealed trait SemesterlyInstrumentProgramReference extends InstrumentProgramReference with SemesterlyProgramReference {
+  def index: PosInt
+
+  override def label: String =
+    f"G-${semester.format}-${programType.abbreviation}-${instrument.referenceName}-$index%02d"
+}
+
 object ProgramReference {
 
   /**
@@ -43,12 +68,8 @@ object ProgramReference {
   type Description = String Refined MatchesRegex["""^[A-Z0-9]+"""]
   object Description extends RefinedTypeOps[Description, String]
 
-  case class Calibration(semester: Semester, instrument: Instrument, index: PosInt) extends ProgramReference {
-    override def programType: ProgramType =
-      ProgramType.Calibration
-
-    override def label: String =
-      f"G-${semester.format}-${programType.abbreviation}-${instrument.referenceName}-$index%02d"
+  case class Calibration(semester: Semester, instrument: Instrument, index: PosInt) extends SemesterlyInstrumentProgramReference {
+    override def programType: ProgramType = ProgramType.Calibration
   }
 
   object Calibration {
@@ -61,12 +82,22 @@ object ProgramReference {
 
   }
 
-  case class Engineering(semester: Semester, instrument: Instrument, index: PosInt) extends ProgramReference {
-    override def programType: ProgramType =
-      ProgramType.Engineering
+  case class Commissioning(semester: Semester, instrument: Instrument, index: PosInt) extends SemesterlyInstrumentProgramReference {
+    override def programType: ProgramType = ProgramType.Commissioning
+  }
 
-    override def label: String =
-      f"G-${semester.format}-${programType.abbreviation}-${instrument.referenceName}-$index%02d"
+  object Commissioning {
+
+    given Order[Commissioning] =
+      Order.by { a => (a.semester, a.instrument, a.index) }
+
+    val fromString: Format[String, Commissioning] =
+      Format(s => parse.commissioning.parseAll(s).toOption, _.label)
+
+  }
+
+  case class Engineering(semester: Semester, instrument: Instrument, index: PosInt) extends SemesterlyInstrumentProgramReference {
+    override def programType: ProgramType = ProgramType.Engineering
   }
 
   object Engineering {
@@ -79,9 +110,8 @@ object ProgramReference {
 
   }
 
-  case class Example(instrument: Instrument) extends ProgramReference {
-    override def programType: ProgramType =
-      ProgramType.Example
+  case class Example(instrument: Instrument) extends InstrumentProgramReference {
+    override def programType: ProgramType = ProgramType.Example
 
     override def label: String =
       s"G-${programType.abbreviation}-${instrument.referenceName}"
@@ -97,9 +127,8 @@ object ProgramReference {
 
   }
 
-  case class Library(instrument: Instrument, description: Description) extends ProgramReference {
-    override def programType: ProgramType =
-      ProgramType.Library
+  case class Library(instrument: Instrument, description: Description) extends InstrumentProgramReference {
+    override def programType: ProgramType = ProgramType.Library
 
     override def label: String =
       s"G-${programType.abbreviation}-${instrument.referenceName}-${description.value}"
@@ -115,9 +144,24 @@ object ProgramReference {
 
   }
 
-  case class Science(proposal: ProposalReference, scienceSubtype: ScienceSubtype) extends ProgramReference {
-    override def programType: ProgramType =
-      ProgramType.Science
+  case class Monitoring(semester: Semester, instrument: Instrument, index: PosInt) extends SemesterlyInstrumentProgramReference {
+    override def programType: ProgramType = ProgramType.Monitoring
+  }
+
+  object Monitoring {
+
+    given Order[Monitoring] =
+      Order.by { a => (a.semester, a.instrument, a.index) }
+
+    val fromString: Format[String, Monitoring] =
+      Format(s => parse.monitoring.parseAll(s).toOption, _.label)
+
+  }
+
+  case class Science(proposal: ProposalReference, scienceSubtype: ScienceSubtype) extends SemesterlyProgramReference {
+    override def programType: ProgramType = ProgramType.Science
+
+    override def semester: Semester = proposal.semester
 
     override def label: String =
       s"${proposal.label}-${scienceSubtype.letter}"
@@ -149,6 +193,9 @@ object ProgramReference {
     val calibration: Parser[Calibration] =
       semesterInstrumentIndex(ProgramType.Calibration.abbreviation)(Calibration.apply)
 
+    val commissioning: Parser[Commissioning] =
+      semesterInstrumentIndex(ProgramType.Commissioning.abbreviation)(Commissioning.apply)
+
     val engineering: Parser[Engineering] =
       semesterInstrumentIndex(ProgramType.Engineering.abbreviation)(Engineering.apply)
 
@@ -161,6 +208,9 @@ object ProgramReference {
       (instrumentByReferenceName.between(string(s"G-${ProgramType.Library.abbreviation}-"), dash) ~ description)
         .map { case (instrument, description) => Library(instrument, description) }
 
+    val monitoring: Parser[Monitoring] =
+      semesterInstrumentIndex(ProgramType.Monitoring.abbreviation)(Monitoring.apply)
+
     val program: Parser[Science] =
       ((ProposalReference.parse.proposal <* dash) ~ scienceSubtype).map { case (proposal, scienceSubtype) =>
         Science(proposal, scienceSubtype)
@@ -168,11 +218,13 @@ object ProgramReference {
 
     val programReference: Parser[ProgramReference] =
       oneOf(
-        parse.program.backtrack     ::
-        parse.calibration.backtrack ::
-        parse.engineering.backtrack ::
-        parse.example.backtrack     ::
-        parse.library               ::
+        parse.program.backtrack       ::
+        parse.calibration.backtrack   ::
+        parse.commissioning.backtrack ::
+        parse.engineering.backtrack   ::
+        parse.example.backtrack       ::
+        parse.library.backtrack       ::
+        parse.monitoring              ::
         Nil
       )
   }
@@ -192,11 +244,13 @@ object ProgramReference {
 
   given Order[ProgramReference] =
     Order.from {
-      case (a @ Calibration(_, _, _), b @ Calibration(_, _, _)) => Order.compare(a, b)
-      case (a @ Engineering(_, _, _), b @ Engineering(_, _, _)) => Order.compare(a, b)
-      case (a @ Example(_),           b @ Example(_))           => Order.compare(a, b)
-      case (a @ Library(_, _),        b @ Library(_, _))        => Order.compare(a, b)
-      case (a @ Science(_, _),        b @ Science(_, _))        => Order.compare(a, b)
+      case (a @ Calibration(_, _, _),   b @ Calibration(_, _, _))   => Order.compare(a, b)
+      case (a @ Commissioning(_, _, _), b @ Commissioning(_, _, _)) => Order.compare(a, b)
+      case (a @ Engineering(_, _, _),   b @ Engineering(_, _, _))   => Order.compare(a, b)
+      case (a @ Example(_),             b @ Example(_))             => Order.compare(a, b)
+      case (a @ Library(_, _),          b @ Library(_, _))          => Order.compare(a, b)
+      case (a @ Monitoring(_, _, _),    b @ Monitoring(_, _, _))    => Order.compare(a, b)
+      case (a @ Science(_, _),          b @ Science(_, _))          => Order.compare(a, b)
       case (a, b) => Order.compare(a.programType, b.programType)
     }
 

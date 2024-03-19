@@ -22,40 +22,47 @@ trait ArbProgramReference extends ArbReference {
 
   import ProgramReference.*
 
-  given Arbitrary[Calibration] =
+  private def arbSemesterlyInstrument[A](
+    f: (Semester, Instrument, PosInt) => A
+  ): Arbitrary[A] =
     Arbitrary {
       for {
         s <- arbitrary[Semester]
         i <- arbitrary[Instrument]
         n <- arbitraryIndex
-      } yield Calibration(s, i, PosInt.unsafeFrom(n))
+      } yield f(s, i, PosInt.unsafeFrom(n))
     }
 
-  given Cogen[Calibration] =
+  private def cogSemesterlyInstrument[A <: SemesterlyInstrumentProgramReference]: Cogen[A] =
     Cogen[(Semester, Instrument, Int)].contramap { a => (
       a.semester,
       a.instrument,
       a.index.value
     )}
+
+  given Arbitrary[Calibration] =
+    arbSemesterlyInstrument(Calibration.apply)
+
+  given Cogen[Calibration] =
+    cogSemesterlyInstrument[Calibration]
 
   val calibrationStrings: Gen[String] =
     referenceStrings[Calibration](_.label)
 
+  given Arbitrary[Commissioning] =
+    arbSemesterlyInstrument(Commissioning.apply)
+
+  given Cogen[Commissioning] =
+    cogSemesterlyInstrument[Commissioning]
+
+  val commissioningStrings: Gen[String] =
+    referenceStrings[Commissioning](_.label)
+
   given Arbitrary[Engineering] =
-    Arbitrary {
-      for {
-        s <- arbitrary[Semester]
-        i <- arbitrary[Instrument]
-        n <- arbitraryIndex
-      } yield Engineering(s, i, PosInt.unsafeFrom(n))
-    }
+    arbSemesterlyInstrument(Engineering.apply)
 
   given Cogen[Engineering] =
-    Cogen[(Semester, Instrument, Int)].contramap { a => (
-      a.semester,
-      a.instrument,
-      a.index.value
-    )}
+    cogSemesterlyInstrument[Engineering]
 
   val engineeringStrings: Gen[String] =
     referenceStrings[Engineering](_.label)
@@ -94,6 +101,15 @@ trait ArbProgramReference extends ArbReference {
       a.description
     )}
 
+  given Arbitrary[Monitoring] =
+    arbSemesterlyInstrument(Monitoring.apply)
+
+  given Cogen[Monitoring] =
+    cogSemesterlyInstrument[Monitoring]
+
+  val monitoringStrings: Gen[String] =
+    referenceStrings[Monitoring](_.label)
+
   given Arbitrary[Science] =
     Arbitrary {
       for {
@@ -115,9 +131,11 @@ trait ArbProgramReference extends ArbReference {
     Arbitrary {
       Gen.oneOf[ProgramReference](
         arbitrary[Calibration],
+        arbitrary[Commissioning],
         arbitrary[Engineering],
         arbitrary[Example],
         arbitrary[Library],
+        arbitrary[Monitoring],
         arbitrary[Science]
       )
     }
