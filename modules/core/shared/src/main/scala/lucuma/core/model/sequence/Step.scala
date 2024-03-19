@@ -18,7 +18,7 @@ import monocle.Lens
  *
  * @tparam D dynamic config type (e.g., DynamicConfig.GmosNorth)
  */
-case class Step[D](
+case class Step[+D](
   id:                Step.Id,
   instrumentConfig:  D,
   stepConfig:        StepConfig,
