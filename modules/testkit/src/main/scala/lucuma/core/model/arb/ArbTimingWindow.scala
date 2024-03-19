@@ -14,9 +14,9 @@ import lucuma.core.util.Timestamp
 import lucuma.core.util.arb.ArbEnumerated
 import lucuma.core.util.arb.ArbTimeSpan
 import lucuma.core.util.arb.ArbTimestamp
+import org.scalacheck.*
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Cogen.given
-import org.scalacheck.*
 
 trait ArbTimingWindow {
   import ArbEnumerated.given

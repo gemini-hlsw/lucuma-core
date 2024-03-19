@@ -3,12 +3,12 @@
 
 package edu.gemini.skycalc
 
-import edu.gemini.skycalc.ImprovedSkyCalcMethods._
+import edu.gemini.skycalc.ImprovedSkyCalcMethods.*
 import jsky.coords.WorldCoords
 
 import java.time.Instant
 import java.time.ZonedDateTime
-import java.{ util => ju }
+import java.util as ju
 
 /**
   * This class exists purely for testing purposes.

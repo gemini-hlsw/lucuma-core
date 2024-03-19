@@ -3,7 +3,7 @@
 
 package lucuma.core.optics
 
-import cats.arrow._
+import cats.arrow.*
 import monocle.Iso
 import monocle.Prism
 

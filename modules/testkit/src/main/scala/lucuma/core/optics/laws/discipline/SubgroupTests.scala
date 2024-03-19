@@ -4,10 +4,10 @@
 package lucuma.core.optics.laws
 package discipline
 
-import cats._
-import cats.laws.discipline._
+import cats.*
+import cats.laws.discipline.*
 import org.scalacheck.Arbitrary
-import org.scalacheck.Prop._
+import org.scalacheck.Prop.*
 import org.typelevel.discipline.Laws
 
 trait SubgroupTests[A, B] extends Laws {

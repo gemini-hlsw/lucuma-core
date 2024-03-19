@@ -6,7 +6,7 @@ package lucuma.core.optics.syntax
 import monocle.Setter
 import org.scalacheck.Arbitrary
 import org.scalacheck.Gen
-import org.scalacheck.Prop._
+import org.scalacheck.Prop.*
 
 final case class Person(
   name: String,

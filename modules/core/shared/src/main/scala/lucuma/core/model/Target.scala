@@ -8,8 +8,8 @@ import cats.implicits.*
 import eu.timepit.refined.cats.*
 import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.core.enums.Band
-import lucuma.core.math.BrightnessUnits.*
 import lucuma.core.math.*
+import lucuma.core.math.BrightnessUnits.*
 import lucuma.core.util.*
 import lucuma.refined.*
 import monocle.Focus

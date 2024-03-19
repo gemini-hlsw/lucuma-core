@@ -3,15 +3,15 @@
 
 package lucuma.core.model
 
-import cats._
+import cats.*
 import cats.data.Validated
-import cats.syntax.all._
+import cats.syntax.all.*
 import lucuma.core.enums.Site
 import monocle.Iso
 import monocle.macros.GenIso
-import org.typelevel.cats.time._
+import org.typelevel.cats.time.*
 
-import java.time._
+import java.time.*
 import java.time.format.DateTimeFormatter
 
 /**

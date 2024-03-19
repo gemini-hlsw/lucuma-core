@@ -7,9 +7,9 @@ import cats.Eq
 import cats.Foldable
 import cats.Monoid
 import cats.kernel.Order.catsKernelOrderingForOrder
-import cats.syntax.all._
+import cats.syntax.all.*
 import lucuma.core.optics.SplitMono
-import lucuma.core.syntax.treemap._
+import lucuma.core.syntax.treemap.*
 import lucuma.core.util.Timestamp
 
 import scala.collection.immutable.TreeMap

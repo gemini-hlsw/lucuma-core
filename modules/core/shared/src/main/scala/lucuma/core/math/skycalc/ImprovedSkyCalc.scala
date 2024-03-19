@@ -3,7 +3,7 @@
 
 package lucuma.core.math.skycalc
 
-import lucuma.core.math.Constants._
+import lucuma.core.math.Constants.*
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Place
 

@@ -3,9 +3,9 @@
 
 package lucuma.core.optics
 
-import cats.syntax.all._
-import lucuma.core.optics.laws.discipline._
-import org.scalacheck.Prop._
+import cats.syntax.all.*
+import lucuma.core.optics.laws.discipline.*
+import org.scalacheck.Prop.*
 
 final class FormatSuite extends munit.DisciplineSuite {
 

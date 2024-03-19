@@ -4,8 +4,8 @@
 package lucuma.core.math.dimensional.arb
 
 import lucuma.core.math.dimensional.*
-import org.scalacheck.Arbitrary.*
 import org.scalacheck.*
+import org.scalacheck.Arbitrary.*
 
 trait ArbUnits {
   given Arbitrary[Units] =

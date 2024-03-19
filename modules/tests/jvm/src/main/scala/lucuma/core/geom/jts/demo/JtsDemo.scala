@@ -17,7 +17,7 @@ import lucuma.core.math.Offset
 import lucuma.core.math.syntax.int.*
 
 import java.awt.event.*
-import java.awt.{List => _, _}
+import java.awt.{List as _, *}
 import scala.jdk.CollectionConverters.*
 
 /**

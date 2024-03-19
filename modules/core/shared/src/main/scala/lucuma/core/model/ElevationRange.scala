@@ -3,7 +3,7 @@
 
 package lucuma.core.model
 
-import cats._
+import cats.*
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.api.RefinedTypeOps
 import eu.timepit.refined.internal.WitnessAs

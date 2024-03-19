@@ -3,12 +3,12 @@
 
 package lucuma.core.model
 
-import cats.implicits._
+import cats.implicits.*
 import cats.kernel.laws.discipline.EqTests
 import io.circe.testing.CodecTests
 import io.circe.testing.instances.arbitraryJson
-import lucuma.core.model.arb._
-import munit._
+import lucuma.core.model.arb.*
+import munit.*
 import org.scalacheck.Prop
 
 final class OrcidIdSuite extends DisciplineSuite {

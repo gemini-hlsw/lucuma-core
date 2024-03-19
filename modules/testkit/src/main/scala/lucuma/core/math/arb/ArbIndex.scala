@@ -4,9 +4,9 @@
 package lucuma.core.math.arb
 
 import lucuma.core.math.Index
-import lucuma.core.optics.syntax.prism._
-import org.scalacheck.Gen._
-import org.scalacheck._
+import lucuma.core.optics.syntax.prism.*
+import org.scalacheck.*
+import org.scalacheck.Gen.*
 
 trait ArbIndex {
 

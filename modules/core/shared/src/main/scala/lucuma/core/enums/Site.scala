@@ -5,17 +5,17 @@ package lucuma
 package core
 package enums
 
-import cats.syntax.eq._
+import cats.syntax.eq.*
 import coulomb.*
 import coulomb.syntax.*
 import coulomb.units.si.Meter
-import eu.timepit.refined.numeric._
+import eu.timepit.refined.numeric.*
 import eu.timepit.refined.types.numeric.NonNegInt
 import lucuma.core.math.Angle
 import lucuma.core.math.Lat
 import lucuma.core.math.Lon
 import lucuma.core.math.Place
-import lucuma.core.math.units._
+import lucuma.core.math.units.*
 import lucuma.core.util.Enumerated
 
 import java.time.ZoneId

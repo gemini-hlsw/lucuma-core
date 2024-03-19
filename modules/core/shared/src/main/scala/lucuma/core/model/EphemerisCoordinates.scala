@@ -3,8 +3,8 @@
 
 package lucuma.core.model
 
-import cats._
-import lucuma.core.math._
+import cats.*
+import lucuma.core.math.*
 import monocle.Focus
 import monocle.Lens
 

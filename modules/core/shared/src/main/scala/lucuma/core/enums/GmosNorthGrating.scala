@@ -13,7 +13,7 @@ import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.math.Angle
 import lucuma.core.math.Wavelength
 import lucuma.core.math.WavelengthDelta
-import lucuma.core.math.units.{_, given}
+import lucuma.core.math.units.{*, given}
 import lucuma.core.util.Enumerated
 import spire.math.Rational
 

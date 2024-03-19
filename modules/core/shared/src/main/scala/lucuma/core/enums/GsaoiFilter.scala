@@ -4,9 +4,9 @@
 package lucuma
 package core
 package enums
-import cats.syntax.eq._
+import cats.syntax.eq.*
 import lucuma.core.math.Wavelength
-import lucuma.core.syntax.timespan._
+import lucuma.core.syntax.timespan.*
 import lucuma.core.util.Enumerated
 import lucuma.core.util.TimeSpan
 

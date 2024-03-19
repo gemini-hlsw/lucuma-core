@@ -3,8 +3,8 @@
 
 package lucuma.core.math.parser
 
-import cats.parse.Rfc5234.*
 import cats.parse.*
+import cats.parse.Rfc5234.*
 import lucuma.core.math.*
 
 /** Parsers for [[lucuma.core.math.Coordinates]] and related types. */

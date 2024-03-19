@@ -3,7 +3,7 @@
 
 package lucuma.core.model
 
-import cats._
+import cats.*
 import lucuma.core.enums.Site
 import lucuma.core.enums.TwilightType
 import lucuma.core.math.BoundedInterval
@@ -11,7 +11,7 @@ import monocle.Focus
 import monocle.Lens
 import org.typelevel.cats.time.*
 
-import java.time._
+import java.time.*
 
 /**
  * An observing night is defined as the period of time from 14:00 on one day

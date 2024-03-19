@@ -3,11 +3,11 @@
 
 package lucuma.core.math
 
-import cats._
+import cats.*
 import coulomb.*
 import coulomb.syntax.*
 import lucuma.core.math.Constants.SpeedOfLight
-import lucuma.core.math.units._
+import lucuma.core.math.units.*
 import monocle.Iso
 
 /**

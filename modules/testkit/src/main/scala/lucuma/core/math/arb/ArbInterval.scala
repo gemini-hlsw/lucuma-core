@@ -7,8 +7,8 @@ import cats.Order
 import cats.Order.*
 import cats.syntax.all.*
 import lucuma.core.math.BoundedInterval
-import org.scalacheck.Arbitrary._
-import org.scalacheck._
+import org.scalacheck.*
+import org.scalacheck.Arbitrary.*
 import spire.math.Bounded
 import spire.math.Interval
 import spire.math.extras.interval.IntervalSeq

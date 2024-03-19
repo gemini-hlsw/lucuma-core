@@ -3,10 +3,10 @@
 
 package lucuma.core.model.arb
 
-import cats.implicits._
+import cats.implicits.*
 import lucuma.core.model.OrcidId
-import org.scalacheck._
-import org.scalacheck.cats.implicits._
+import org.scalacheck.*
+import org.scalacheck.cats.implicits.*
 
 trait ArbOrcidId {
 

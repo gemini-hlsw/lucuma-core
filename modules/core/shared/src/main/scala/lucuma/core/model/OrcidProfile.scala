@@ -3,8 +3,8 @@
 
 package lucuma.core.model
 
-import cats._
-import cats.implicits._
+import cats.*
+import cats.implicits.*
 
 /** An ORCID profile is an OrcidId and a set of optional fields. */
 final case class OrcidProfile(

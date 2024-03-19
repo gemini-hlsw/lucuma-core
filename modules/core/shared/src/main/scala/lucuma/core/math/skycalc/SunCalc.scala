@@ -3,8 +3,8 @@
 
 package lucuma.core.math.skycalc
 
-import cats.syntax.all._
-import lucuma.core.math.Constants._
+import cats.syntax.all.*
+import lucuma.core.math.Constants.*
 import lucuma.core.math.JulianDate
 
 trait SunCalc extends ImprovedSkyCalcMethods {

@@ -4,9 +4,9 @@
 package lucuma.core.optics.laws
 
 import cats.Eq
-import cats.syntax.all._
+import cats.syntax.all.*
 import lucuma.core.optics.ValidSplitEpi
-import lucuma.core.optics.laws._
+import lucuma.core.optics.laws.*
 
 final case class ValidSplitEpiProps[E, A, B](validate: ValidSplitEpi[E, A, B]) {
 

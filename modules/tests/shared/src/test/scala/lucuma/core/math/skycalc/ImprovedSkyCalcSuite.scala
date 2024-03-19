@@ -7,7 +7,7 @@ import lucuma.core.enums.Site
 import lucuma.core.math.Coordinates
 import munit.FunSuite
 
-import java.time._
+import java.time.*
 
 // This is just a basic case, mostly to test linking in JS.
 // Property based testing is in ImprovedSkyCalcSpecJVM, where output

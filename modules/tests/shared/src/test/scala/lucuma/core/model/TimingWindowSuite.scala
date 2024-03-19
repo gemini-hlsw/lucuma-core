@@ -5,7 +5,7 @@ package lucuma.core.model
 
 import cats.kernel.laws.discipline.OrderTests
 import lucuma.core.model.arb.ArbTimingWindow
-import munit._
+import munit.*
 
 final class TimingWindowSuite extends DisciplineSuite {
   import ArbTimingWindow.given

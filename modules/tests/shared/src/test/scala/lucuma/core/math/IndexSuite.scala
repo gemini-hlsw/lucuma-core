@@ -3,9 +3,9 @@
 
 package lucuma.core.math
 
-import cats.kernel.laws.discipline._
-import lucuma.core.math.arb._
-import monocle.law.discipline._
+import cats.kernel.laws.discipline.*
+import lucuma.core.math.arb.*
+import monocle.law.discipline.*
 
 final class IndexSuite extends munit.DisciplineSuite {
   import ArbIndex._

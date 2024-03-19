@@ -6,8 +6,8 @@ package arb
 
 
 import coulomb.Quantity
-import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.*
+import org.scalacheck.Arbitrary.arbitrary
 
 object ArbWavelengthDither {
 

@@ -5,7 +5,7 @@ package lucuma
 package core
 package enums
 
-import cats.syntax.eq._
+import cats.syntax.eq.*
 import coulomb.*
 import coulomb.policy.spire.standard.given
 import coulomb.syntax.*
