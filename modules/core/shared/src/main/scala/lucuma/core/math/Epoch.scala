@@ -9,7 +9,7 @@ import cats.syntax.all.*
 import eu.timepit.refined.*
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.cats.*
-import eu.timepit.refined.numeric.{ Interval => RefinedInterval }
+import eu.timepit.refined.numeric.Interval as RefinedInterval
 import eu.timepit.refined.refineV
 import lucuma.core.math.parser.EpochParsers
 import lucuma.core.optics.Format

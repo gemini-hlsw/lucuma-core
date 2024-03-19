@@ -9,7 +9,7 @@ import lucuma.core.math.Coordinates
 import lucuma.core.math.Declination
 import lucuma.core.math.RightAscension
 import lucuma.core.math.skycalc.*
-import lucuma.core.math.skycalc.solver.RoundStrategy._
+import lucuma.core.math.skycalc.solver.RoundStrategy.*
 import org.typelevel.cats.time.*
 
 import java.time.Duration

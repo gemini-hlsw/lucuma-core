@@ -5,11 +5,11 @@ package lucuma
 package core
 package enums
 
-import cats.syntax.eq._
+import cats.syntax.eq.*
 import lucuma.core.util.Enumerated
 
 import java.time.Month
-import java.time.Month._
+import java.time.Month.*
 
 /**
  * Enumerated type for semester half.

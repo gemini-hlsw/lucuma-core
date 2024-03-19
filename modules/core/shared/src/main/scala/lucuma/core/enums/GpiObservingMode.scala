@@ -6,7 +6,7 @@ package core
 package enums
 
 import cats.Eval
-import cats.syntax.eq._
+import cats.syntax.eq.*
 import lucuma.core.util.Enumerated
 
 /**

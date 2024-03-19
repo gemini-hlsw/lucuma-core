@@ -5,8 +5,8 @@ package lucuma.core.math.dimensional.arb
 
 import lucuma.core.math.dimensional.*
 import lucuma.core.util.*
-import org.scalacheck.Arbitrary.*
 import org.scalacheck.*
+import org.scalacheck.Arbitrary.*
 
 trait ArbMeasure {
   import ArbUnits.given

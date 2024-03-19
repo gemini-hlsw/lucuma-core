@@ -4,8 +4,8 @@
 package lucuma.core
 package enums
 
-import cats.instances.string._
-import cats.syntax.eq._
+import cats.instances.string.*
+import cats.syntax.eq.*
 import lucuma.core.util.Enumerated
 
 /**

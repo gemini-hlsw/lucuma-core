@@ -4,8 +4,8 @@
 package lucuma.core.math
 
 import lucuma.core.math.dimensional.*
-import lucuma.core.util.Enumerated
 import lucuma.core.util.*
+import lucuma.core.util.Enumerated
 import lucuma.core.util.arb.ArbEnumerated
 import lucuma.core.util.laws.EnumeratedTests
 import munit.DisciplineSuite

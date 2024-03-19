@@ -5,8 +5,8 @@ package lucuma.core.model
 
 import lucuma.core.enums.Site
 import lucuma.core.math.BoundedInterval
-import lucuma.core.syntax.time._
-import org.typelevel.cats.time._
+import lucuma.core.syntax.time.*
+import org.typelevel.cats.time.*
 
 import java.time.Duration
 import java.time.Instant

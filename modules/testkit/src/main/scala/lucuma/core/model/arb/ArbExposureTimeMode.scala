@@ -11,8 +11,8 @@ import lucuma.core.math.arb.ArbRefined
 import lucuma.core.math.arb.ArbSignalToNoise
 import lucuma.core.util.TimeSpan
 import lucuma.core.util.arb.ArbTimeSpan
-import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.*
+import org.scalacheck.Arbitrary.arbitrary
 
 trait ArbExposureTimeMode {
   import ExposureTimeMode.*

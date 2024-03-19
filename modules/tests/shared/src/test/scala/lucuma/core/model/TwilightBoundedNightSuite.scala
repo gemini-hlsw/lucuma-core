@@ -5,7 +5,7 @@ package lucuma.core.model
 
 import cats.Eq
 import cats.Show
-import cats.kernel.laws.discipline._
+import cats.kernel.laws.discipline.*
 import cats.syntax.all.*
 import lucuma.core.arb.ArbTime.given
 import lucuma.core.enums.Site

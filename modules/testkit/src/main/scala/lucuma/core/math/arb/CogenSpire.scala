@@ -4,7 +4,7 @@
 package lucuma.core.math.arb
 
 import org.scalacheck.Cogen
-import spire.math._
+import spire.math.*
 
 trait CogenSpire {
   implicit val safeLongCogen: Cogen[SafeLong] =

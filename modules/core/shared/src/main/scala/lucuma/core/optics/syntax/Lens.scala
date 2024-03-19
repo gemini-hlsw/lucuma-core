@@ -4,7 +4,7 @@
 package lucuma.core.optics.syntax
 
 import cats.data.State
-import lucuma.core.optics.state.all._
+import lucuma.core.optics.state.all.*
 import monocle.Lens
 
 final class LensOps[S, A](private val self: Lens[S, A]) extends AnyVal {

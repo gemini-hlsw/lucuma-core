@@ -14,9 +14,9 @@ import lucuma.core.math.Offset.Component
 import lucuma.core.math.arb.*
 import lucuma.core.math.syntax.int.*
 import lucuma.core.tests.ScalaCheckFlaky
+import org.scalacheck.*
 import org.scalacheck.Arbitrary.*
 import org.scalacheck.Prop.*
-import org.scalacheck.*
 
 final class ShapeExpressionSuite extends munit.DisciplineSuite {
 

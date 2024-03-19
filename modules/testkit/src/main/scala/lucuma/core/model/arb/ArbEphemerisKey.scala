@@ -8,8 +8,8 @@ import lucuma.core.arb.*
 import lucuma.core.enums.EphemerisKeyType
 import lucuma.core.model.EphemerisKey.*
 import lucuma.core.util.arb.ArbEnumerated.given
-import org.scalacheck.Arbitrary.*
 import org.scalacheck.*
+import org.scalacheck.Arbitrary.*
 
 trait ArbEphemerisKey {
 

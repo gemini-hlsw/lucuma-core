@@ -9,8 +9,8 @@ import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 import lucuma.core.math.arb.*
 import lucuma.core.math.syntax.int.*
-import org.scalacheck.Arbitrary.*
 import org.scalacheck.*
+import org.scalacheck.Arbitrary.*
 
 trait ArbShapeExpression {
 

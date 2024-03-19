@@ -3,10 +3,10 @@
 
 package lucuma.core.math.parser
 
+import cats.parse.*
 import cats.parse.Parser.char
 import cats.parse.Parser.charIn
 import cats.parse.Rfc5234.*
-import cats.parse.*
 import lucuma.core.math.Epoch
 import lucuma.core.math.Epoch.Julian
 

@@ -4,7 +4,7 @@
 package lucuma.core.optics.laws
 
 import cats.Eq
-import cats.syntax.all._
+import cats.syntax.all.*
 import lucuma.core.optics.SplitMono
 
 final case class SplitMonoLaws[A, B](fab: SplitMono[A, B]) {

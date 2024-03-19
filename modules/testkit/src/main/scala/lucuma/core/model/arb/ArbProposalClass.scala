@@ -9,8 +9,8 @@ import lucuma.core.model.ProposalClass
 import lucuma.core.model.ProposalClass.*
 import lucuma.core.util.TimeSpan
 import lucuma.core.util.arb.ArbTimeSpan
-import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.*
+import org.scalacheck.Arbitrary.arbitrary
 
 trait ArbProposalClass {
   import ArbTimeSpan.given

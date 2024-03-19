@@ -6,8 +6,8 @@ package lucuma.core.model.sequence
 import cats.Eq
 import cats.Order.catsKernelOrderingForOrder
 import cats.data.NonEmptySet
-import cats.syntax.all._
-import lucuma.core.enums._
+import cats.syntax.all.*
+import lucuma.core.enums.*
 import lucuma.core.math.Offset
 import monocle.Focus
 import monocle.Lens

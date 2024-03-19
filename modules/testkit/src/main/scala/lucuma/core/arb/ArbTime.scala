@@ -3,16 +3,16 @@
 
 package lucuma.core.arb
 
-import cats.syntax.all._
-import lucuma.core.syntax.time._
+import cats.syntax.all.*
+import lucuma.core.syntax.time.*
+import org.scalacheck.*
 import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.Gen._
-import org.scalacheck._
-import org.typelevel.cats.time._
+import org.scalacheck.Gen.*
+import org.typelevel.cats.time.*
 
-import java.time._
-import scala.concurrent.duration.{ Duration => SDuration }
-import scala.jdk.CollectionConverters._
+import java.time.*
+import scala.concurrent.duration.Duration as SDuration
+import scala.jdk.CollectionConverters.*
 
 // Arbitrary but reasonable dates and times.
 trait ArbTime {

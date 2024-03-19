@@ -4,7 +4,7 @@
 package lucuma.core.optics.laws
 
 import cats.Eq
-import cats.syntax.all._
+import cats.syntax.all.*
 import lucuma.core.optics.Wedge
 
 final case class WedgeLaws[A, B](fab: Wedge[A, B]) {

@@ -4,7 +4,7 @@
 package lucuma.core.validation
 
 import cats.data.NonEmptyChain
-import cats.syntax.all._
+import cats.syntax.all.*
 import lucuma.core.optics.Format
 import lucuma.core.optics.ValidSplitEpi
 import monocle.Iso

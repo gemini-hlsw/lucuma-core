@@ -6,9 +6,9 @@ package lucuma.core.model.arb
 import lucuma.core.math.*
 import lucuma.core.math.arb.*
 import lucuma.core.model.*
+import org.scalacheck.*
 import org.scalacheck.Arbitrary.*
 import org.scalacheck.Cogen.*
-import org.scalacheck.*
 
 trait ArbSiderealTracking {
   import ArbEpoch.given

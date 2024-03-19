@@ -3,17 +3,17 @@
 
 package lucuma.core.util.laws
 
-import cats._
+import cats.*
 import cats.kernel.laws.OrderLaws
 import cats.kernel.laws.discipline.OrderTests
-import cats.laws.discipline._
+import cats.laws.discipline.*
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.testing.CodecLaws
 import io.circe.testing.CodecTests
 import io.circe.testing.instances.arbitraryJson
 import lucuma.core.util.Enumerated
-import org.scalacheck._
+import org.scalacheck.*
 
 trait EnumeratedLaws[A] extends CodecLaws[A] with OrderLaws[A] {
 

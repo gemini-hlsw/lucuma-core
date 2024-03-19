@@ -11,7 +11,7 @@ import cats.Foldable
 import cats.Monoid
 import cats.Show
 import cats.Traverse
-import cats.kernel._
+import cats.kernel.*
 import cats.kernel.instances.StaticMethods
 
 import scala.annotation.tailrec

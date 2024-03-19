@@ -3,10 +3,10 @@
 
 package lucuma.core.model.parser
 
+import cats.parse.*
 import cats.parse.Numbers.digits
 import cats.parse.Parser.anyChar
 import cats.parse.Parser.string
-import cats.parse.*
 import cats.syntax.all.*
 import lucuma.core.model.EphemerisKey
 import lucuma.core.model.EphemerisKey.*

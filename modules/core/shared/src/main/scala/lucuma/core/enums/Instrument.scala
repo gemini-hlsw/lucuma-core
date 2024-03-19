@@ -5,7 +5,7 @@ package lucuma
 package core
 package enums
 
-import cats.syntax.eq._
+import cats.syntax.eq.*
 import eu.timepit.refined.collection.NonEmpty
 import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.core.util.Enumerated

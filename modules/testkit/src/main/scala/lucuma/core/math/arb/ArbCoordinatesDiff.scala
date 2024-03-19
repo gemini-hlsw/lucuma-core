@@ -5,9 +5,9 @@ package lucuma.core.math.arb
 
 import lucuma.core.math.Angle
 import lucuma.core.math.CoordinatesDiff
+import org.scalacheck.*
 import org.scalacheck.Arbitrary.*
 import org.scalacheck.Cogen.*
-import org.scalacheck.*
 
 trait ArbCoordinatesDiff {
   import ArbAngle.given

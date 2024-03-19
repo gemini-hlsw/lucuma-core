@@ -5,8 +5,8 @@ package lucuma
 package core
 package data
 
-import cats._
-import cats.syntax.all._
+import cats.*
+import cats.syntax.all.*
 import monocle.Lens
 
 protected[data] trait ZipperFactory[Z[A] <: ZipperOps[A, Zipper[A]]] {

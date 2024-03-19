@@ -5,8 +5,8 @@ package lucuma.core.math.arb
 
 import lucuma.core.math.Angle
 import lucuma.core.math.Declination
-import org.scalacheck.Arbitrary.*
 import org.scalacheck.*
+import org.scalacheck.Arbitrary.*
 
 trait ArbDeclination {
   import ArbAngle.given

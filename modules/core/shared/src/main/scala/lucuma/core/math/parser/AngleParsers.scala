@@ -3,11 +3,11 @@
 
 package lucuma.core.math.parser
 
+import cats.parse.*
 import cats.parse.Numbers.digit
 import cats.parse.Parser.char
 import cats.parse.Parser.charIn
 import cats.parse.Rfc5234.sp
-import cats.parse.*
 import lucuma.core.math.Angle
 import lucuma.core.math.HourAngle
 import lucuma.core.parser.MiscParsers

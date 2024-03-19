@@ -14,10 +14,10 @@ import lucuma.core.math.arb.ArbPlace.given
 import lucuma.core.tests.ScalaCheckFlaky
 import munit.ScalaCheckSuite
 import org.scalacheck.Prop.*
-import org.scalacheck.{Test => ScalaCheckTest}
+import org.scalacheck.Test as ScalaCheckTest
 
 import java.time.*
-import java.{util => ju}
+import java.util as ju
 
 final class ImprovedSkyCalcSuiteJVM extends ScalaCheckSuite {
 

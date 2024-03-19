@@ -5,8 +5,8 @@ package lucuma.core.math.arb
 
 import lucuma.core.arb.ArbTime
 import lucuma.core.math.JulianDate
-import org.scalacheck.Arbitrary.*
 import org.scalacheck.*
+import org.scalacheck.Arbitrary.*
 
 import java.time.LocalDateTime
 

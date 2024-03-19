@@ -15,8 +15,8 @@ import lucuma.core.util.arb.ArbEnumerated
 import lucuma.core.util.arb.ArbGid
 import lucuma.core.util.arb.ArbTimestamp
 import lucuma.core.util.arb.ArbUid
-import org.scalacheck.Arbitrary.*
 import org.scalacheck.*
+import org.scalacheck.Arbitrary.*
 
 trait ArbExecutionEvent {
 

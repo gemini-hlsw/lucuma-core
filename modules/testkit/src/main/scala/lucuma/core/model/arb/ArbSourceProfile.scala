@@ -9,8 +9,8 @@ import lucuma.core.math.Angle
 import lucuma.core.math.BrightnessUnits
 import lucuma.core.math.arb.ArbAngle
 import lucuma.core.util.arb.ArbEnumerated
-import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.*
+import org.scalacheck.Arbitrary.arbitrary
 
 trait ArbSourceProfile {
   import ArbAngle.given

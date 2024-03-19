@@ -6,9 +6,9 @@ package arb
 
 import eu.timepit.refined.scalacheck.numeric.*
 import eu.timepit.refined.types.numeric.PosInt
+import org.scalacheck.*
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Cogen.*
-import org.scalacheck.*
 
 trait ArbWavelengthDelta:
   given Arbitrary[WavelengthDelta] = Arbitrary(

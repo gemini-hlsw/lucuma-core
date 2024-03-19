@@ -3,7 +3,7 @@
 
 package lucuma.core.optics
 
-import lucuma.core.optics.laws.discipline._
+import lucuma.core.optics.laws.discipline.*
 
 final class WedgeSuite extends munit.DisciplineSuite {
 

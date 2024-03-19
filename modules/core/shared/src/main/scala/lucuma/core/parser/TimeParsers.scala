@@ -3,10 +3,10 @@
 
 package lucuma.core.parser
 
+import cats.parse.*
 import cats.parse.Parser.oneOf
 import cats.parse.Parser.string
 import cats.parse.Rfc5234.sp
-import cats.parse.*
 import cats.syntax.all.*
 
 import java.time.DateTimeException

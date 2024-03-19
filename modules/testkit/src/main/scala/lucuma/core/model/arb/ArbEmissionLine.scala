@@ -14,8 +14,8 @@ import lucuma.core.math.dimensional.arb.ArbMeasure
 import lucuma.core.math.units.*
 import lucuma.core.model.EmissionLine
 import lucuma.core.util.*
-import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.*
+import org.scalacheck.Arbitrary.arbitrary
 
 trait ArbEmissionLine {
   import ArbLineFluxValue.given

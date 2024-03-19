@@ -5,11 +5,11 @@ package lucuma.core.optics.laws
 package discipline
 
 import cats.Eq
-import cats.laws.discipline._
+import cats.laws.discipline.*
 import lucuma.core.optics.ValidSplitEpi
 import org.scalacheck.Arbitrary
 import org.scalacheck.Gen
-import org.scalacheck.Prop._
+import org.scalacheck.Prop.*
 import org.typelevel.discipline.Laws
 
 trait ValidSplitEpiTests[E, A, B] extends Laws {

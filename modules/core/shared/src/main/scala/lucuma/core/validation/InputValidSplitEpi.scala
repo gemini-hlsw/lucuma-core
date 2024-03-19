@@ -6,7 +6,7 @@ package lucuma.core.validation
 import cats.data.NonEmptyChain
 import cats.syntax.all.*
 import eu.timepit.refined.api.Refined
-import eu.timepit.refined.api.{Validate => RefinedValidate}
+import eu.timepit.refined.api.Validate as RefinedValidate
 import eu.timepit.refined.collection.NonEmpty
 import eu.timepit.refined.numeric.Positive
 import eu.timepit.refined.types.numeric.PosBigDecimal

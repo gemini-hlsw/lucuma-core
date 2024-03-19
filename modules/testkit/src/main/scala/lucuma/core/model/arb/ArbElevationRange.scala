@@ -6,9 +6,9 @@ package arb
 
 import eu.timepit.refined.scalacheck.numeric.*
 import lucuma.core.math.arb.ArbRefined
+import org.scalacheck.*
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Cogen.*
-import org.scalacheck.*
 
 trait ArbElevationRange {
   import ArbRefined.given

@@ -4,8 +4,8 @@
 package lucuma.core.enums
 package parser
 
-import cats.parse.Parser.*
 import cats.parse.*
+import cats.parse.Parser.*
 import lucuma.core.util.Enumerated
 
 /** Parsers for `gem.enum` data types. */

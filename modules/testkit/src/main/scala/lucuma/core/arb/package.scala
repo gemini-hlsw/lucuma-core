@@ -7,8 +7,8 @@ import cats.Applicative
 import eu.timepit.refined.types.numeric.NonNegInt
 import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.core.util.NewType
-import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.*
+import org.scalacheck.Arbitrary.arbitrary
 
 import scala.collection.immutable.TreeMap
 

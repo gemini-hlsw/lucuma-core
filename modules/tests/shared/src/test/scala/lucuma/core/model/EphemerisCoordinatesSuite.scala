@@ -5,7 +5,7 @@ package lucuma.core.model
 
 import cats.Eq
 import cats.Show
-import cats.kernel.laws.discipline._
+import cats.kernel.laws.discipline.*
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 import lucuma.core.math.arb.ArbCoordinates
@@ -13,11 +13,11 @@ import lucuma.core.math.arb.ArbDeclination
 import lucuma.core.math.arb.ArbOffset
 import lucuma.core.math.arb.ArbRightAscension
 import lucuma.core.model.arb.ArbEphemeris
-import monocle.law.discipline._
-import munit._
+import monocle.law.discipline.*
+import munit.*
 import org.scalacheck.Arbitrary
 import org.scalacheck.Gen
-import org.scalacheck.Prop._
+import org.scalacheck.Prop.*
 
 final class EphemerisCoordinatesSuite extends DisciplineSuite {
   import ArbCoordinates.given

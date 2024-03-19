@@ -14,9 +14,9 @@ import lucuma.core.model.Proposal
 import lucuma.core.model.ProposalClass
 import lucuma.core.util.arb.ArbCollection
 import lucuma.core.util.arb.ArbEnumerated
+import org.scalacheck.*
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Cogen.*
-import org.scalacheck.*
 
 import scala.collection.immutable.SortedMap
 

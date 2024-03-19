@@ -6,9 +6,9 @@ package arb
 
 import coulomb.*
 import coulomb.syntax.*
-import lucuma.core.math.units._
+import lucuma.core.math.units.*
 import org.scalacheck.Arbitrary
-import org.scalacheck.Arbitrary._
+import org.scalacheck.Arbitrary.*
 import org.scalacheck.Cogen
 
 trait ArbApparentRadialVelocity {

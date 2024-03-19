@@ -4,16 +4,16 @@
 package lucuma.core.math.skycalc.solver
 
 import cats.InvariantSemigroupal
-import cats.syntax.all._
+import cats.syntax.all.*
 import lucuma.core.math.Angle
 import lucuma.core.math.Declination
 import lucuma.core.math.HourAngle
-import lucuma.core.optics.Spire._
+import lucuma.core.optics.Spire.*
 import lucuma.core.optics.SplitEpi
 import lucuma.core.optics.SplitMono
 import lucuma.core.optics.Wedge
 import monocle.Iso
-import org.typelevel.cats.time._
+import org.typelevel.cats.time.*
 import spire.math.Number
 import spire.math.Rational
 

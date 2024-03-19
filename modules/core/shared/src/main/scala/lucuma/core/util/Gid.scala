@@ -3,16 +3,16 @@
 
 package lucuma.core.util
 
-import cats._
-import cats.implicits._
+import cats.*
+import cats.implicits.*
 import cats.kernel.BoundedEnumerable
-import eu.timepit.refined._
+import eu.timepit.refined.*
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.char.Letter
 import eu.timepit.refined.numeric.Positive
 import eu.timepit.refined.types.numeric.PosLong
-import io.circe._
-import io.circe.syntax._
+import io.circe.*
+import io.circe.syntax.*
 import monocle.Iso
 import monocle.Prism
 

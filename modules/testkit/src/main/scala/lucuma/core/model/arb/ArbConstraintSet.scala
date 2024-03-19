@@ -9,9 +9,9 @@ import lucuma.core.enums.ImageQuality
 import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.WaterVapor
 import lucuma.core.util.arb.ArbEnumerated.given
+import org.scalacheck.*
 import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.Cogen._
-import org.scalacheck._
+import org.scalacheck.Cogen.*
 
 trait ArbConstraintSet {
   import ArbElevationRange.*

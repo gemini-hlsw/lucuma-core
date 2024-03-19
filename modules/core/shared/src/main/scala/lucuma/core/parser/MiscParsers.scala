@@ -3,13 +3,13 @@
 
 package lucuma.core.parser
 
+import cats.parse.*
 import cats.parse.Numbers
 import cats.parse.Numbers.digit
 import cats.parse.Numbers.nonZeroDigit
 import cats.parse.Parser.*
 import cats.parse.Rfc5234.sp
 import cats.parse.Rfc5234.wsp
-import cats.parse.*
 import eu.timepit.refined.types.numeric.PosBigDecimal
 import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.math.Index

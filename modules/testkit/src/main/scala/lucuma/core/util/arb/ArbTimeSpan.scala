@@ -4,10 +4,10 @@
 package lucuma.core.util
 package arb
 
-import eu.timepit.refined.scalacheck.numeric._
+import eu.timepit.refined.scalacheck.numeric.*
 import eu.timepit.refined.types.numeric.NonNegLong
+import org.scalacheck.*
 import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck._
 
 import java.time.Duration
 import scala.util.Try

@@ -3,18 +3,18 @@
 
 package lucuma.core.math
 
-import cats._
-import cats.kernel.laws.discipline._
+import cats.*
+import cats.kernel.laws.discipline.*
 import coulomb.*
 import coulomb.policy.spire.standard.given
 import coulomb.syntax.*
-import coulomb.units.si._
+import coulomb.units.si.*
 import lucuma.core.math.Constants.SpeedOfLight
-import lucuma.core.math.arb._
-import lucuma.core.math.units._
+import lucuma.core.math.arb.*
+import lucuma.core.math.units.*
 import lucuma.core.optics.laws.discipline.WedgeTests
 import monocle.law.discipline.IsoTests
-import org.scalacheck.Prop._
+import org.scalacheck.Prop.*
 
 import java.math.MathContext
 
