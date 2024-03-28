@@ -28,7 +28,7 @@ object Instrument {
 
   /** @group Constructors */ case object AcqCam     extends Instrument("AcqCam", "AcqCam", "Acquisition Camera", "ACQCAM".refined[NonEmpty], false)
   /** @group Constructors */ case object Bhros      extends Instrument("Bhros", "bHROS", "bHROS", "BHROS".refined[NonEmpty], true)
-  /** @group Constructors */ case object Flamingos2 extends Instrument("Flamingos2", "Flamingos2", "Flamingos 2", "FLAMINGOS2".refined[NonEmpty], false)
+  /** @group Constructors */ case object Flamingos2 extends Instrument("Flamingos2", "Flamingos2", "Flamingos 2", "F2".refined[NonEmpty], false)
   /** @group Constructors */ case object Ghost      extends Instrument("Ghost", "GHOST", "GHOST", "GHOST".refined[NonEmpty], false)
   /** @group Constructors */ case object GmosNorth  extends Instrument("GmosNorth", "GMOS-N", "GMOS North", "GMOSN".refined[NonEmpty], false)
   /** @group Constructors */ case object GmosSouth  extends Instrument("GmosSouth", "GMOS-S", "GMOS South", "GMOSS".refined[NonEmpty], false)

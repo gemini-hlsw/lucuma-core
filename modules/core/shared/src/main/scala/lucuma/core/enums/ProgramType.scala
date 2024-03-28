@@ -11,11 +11,13 @@ import lucuma.core.util.Enumerated
  * Broad program type categories.
  */
 enum ProgramType(val tag: String, val abbreviation: String) derives Enumerated:
-  case Calibration extends ProgramType("calibration", "CAL")
-  case Engineering extends ProgramType("engineering", "ENG")
-  case Example     extends ProgramType("example",     "XPL")
-  case Library     extends ProgramType("library",     "LIB")
-  case Science     extends ProgramType("science",     "SCI")
+  case Calibration   extends ProgramType("calibration",   "CAL")
+  case Commissioning extends ProgramType("commissioning", "COM")
+  case Engineering   extends ProgramType("engineering",   "ENG")
+  case Example       extends ProgramType("example",       "XPL")
+  case Library       extends ProgramType("library",       "LIB")
+  case Monitoring    extends ProgramType("monitoring",    "MON")
+  case Science       extends ProgramType("science",       "SCI")
 
 object ProgramType {
 
