@@ -22,6 +22,10 @@ case class ExecutionConfig[S, D](
 )
 
 object ExecutionConfig {
+  /** Shorthand type for GmosNorth. */
+  type GmosNorth = ExecutionConfig[gmos.StaticConfig.GmosNorth, gmos.DynamicConfig.GmosNorth]
+  /** Shorthand type for GmosSouth. */
+  type GmosSouth = ExecutionConfig[gmos.StaticConfig.GmosSouth, gmos.DynamicConfig.GmosSouth]
 
   given [S, D](using Eq[S], Eq[D]): Eq[ExecutionConfig[S, D]] =
     Eq.by { a => (
@@ -41,5 +45,4 @@ object ExecutionConfig {
   /** @group Optics */
   def science[S, D]: Lens[ExecutionConfig[S, D], Option[ExecutionSequence[D]]] =
     Focus[ExecutionConfig[S, D]](_.science)
-
 }

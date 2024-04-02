@@ -6,6 +6,8 @@ package lucuma.core.model.sequence
 import cats.Eq
 import cats.syntax.eq.*
 import lucuma.core.enums.Instrument
+import monocle.Focus
+import monocle.Lens
 import monocle.Prism
 import monocle.macros.GenPrism
 
@@ -28,6 +30,9 @@ object InstrumentExecutionConfig {
   object GmosNorth {
     given Eq[GmosNorth] =
       Eq.by(_.executionConfig)
+
+    val executionConfig: Lens[GmosNorth, ExecutionConfig[gmos.StaticConfig.GmosNorth, gmos.DynamicConfig.GmosNorth]] =
+      Focus[GmosNorth](_.executionConfig)
   }
 
   val gmosNorth: Prism[InstrumentExecutionConfig, GmosNorth] =
@@ -43,6 +48,9 @@ object InstrumentExecutionConfig {
   object GmosSouth {
     given Eq[GmosSouth] =
       Eq.by(_.executionConfig)
+
+    val executionConfig: Lens[GmosSouth, ExecutionConfig[gmos.StaticConfig.GmosSouth, gmos.DynamicConfig.GmosSouth]] =
+      Focus[GmosSouth](_.executionConfig)
   }
 
   val gmosSouth: Prism[InstrumentExecutionConfig, GmosSouth] =
