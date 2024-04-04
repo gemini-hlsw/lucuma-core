@@ -42,6 +42,6 @@ trait NewType[Wrapped]:
 
 trait RefinedNewType[T, P](using RefinedType.AuxT[T Refined P, T]) extends NewType[T Refined P]:
   private val TypeOps = new RefinedTypeOps[T Refined P, T]
-  def from: Prism[T, Type] = Prism[T, Type](from(_).toOption)(_.value.value)
+  def from(using Validate[T, P]): Prism[T, Type] = refinedPrism.andThen(value.reverse)
   def from(t: T): Either[String, Type] = TypeOps.from(t).map(apply(_))
   def unsafeFrom(x: T): Type = apply(TypeOps.unsafeFrom(x))
