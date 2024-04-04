@@ -11,6 +11,7 @@ import io.circe.refined.*
 import io.circe.testing.CodecTests
 import io.circe.testing.instances.arbitraryJson
 import lucuma.core.data.arb.ArbEmailAddress.given
+import monocle.law.discipline.PrismTests
 
 /**
   * Tests the EmailAddress typeclasses
@@ -20,5 +21,6 @@ class EmailAddressSuite extends munit.DisciplineSuite {
   test("typeclasses") {
     checkAll("EmailAddress", EqTests[EmailAddress].eqv)
     checkAll("EmailAddressCodec", CodecTests[EmailAddress].codec)
+    checkAll("EmailAddress.from", PrismTests(EmailAddress.from))
   }
 }
