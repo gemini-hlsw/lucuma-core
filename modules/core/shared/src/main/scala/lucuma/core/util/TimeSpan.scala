@@ -85,10 +85,10 @@ object TimeSpan {
   }
 
   /**
-   * Builds a Duration from the specified amount and unit and converts it 
+   * Builds a Duration from the specified amount and unit and converts it
    * into a TimeSpan if it is in range, discarding any sub-microsecond value.
    */
-  def fromDuration(amount: Long, unit: TemporalUnit): Option[TimeSpan] = 
+  def fromDuration(amount: Long, unit: TemporalUnit): Option[TimeSpan] =
     fromDuration(Duration.of(amount, unit))
 
   def unsafeFromDuration(value: Duration): TimeSpan =
@@ -164,6 +164,18 @@ object TimeSpan {
 
     def toDuration: Duration =
       Duration.of(timeSpan.value, MICROS)
+
+    def toSecondsPart: Int = 
+      (timeSpan.toSeconds.longValue % 60L).toInt
+
+    def toMinutesPart: Int = 
+      (timeSpan.toMinutes.longValue % 60L).toInt
+
+    def toHoursPart: Int = 
+      (timeSpan.toHours.longValue % 24L).toInt
+
+    def toMillisPart: Int = 
+      (timeSpan.toMilliseconds.longValue % 1000L).toInt
 
     /**
      * Formats this TimeSpan using the ISO-8601 standard.

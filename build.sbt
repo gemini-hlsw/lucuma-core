@@ -52,7 +52,8 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
       "edu.gemini"     %%% "lucuma-refined" % lucumaRefinedVersion,
       "org.typelevel"  %%% "cats-time"      % catsTimeVersion,
       "org.typelevel"  %%% "kittens"        % kittensVersion,
-      "io.circe"       %%% "circe-core"     % circeVersion
+      "io.circe"       %%% "circe-core"     % circeVersion,
+      "io.circe"       %%% "circe-refined"  % circeVersion
     )
   )
   .jvmConfigure(_.enablePlugins(AutomateHeaderPlugin))

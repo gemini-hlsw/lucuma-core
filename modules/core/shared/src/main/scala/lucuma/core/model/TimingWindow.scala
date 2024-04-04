@@ -64,6 +64,9 @@ final case class TimingWindow(
       case TimingWindowEnd.After(d, _) => d.some
     }
 
+  def isValid: Boolean =
+    end.flatMap(TimingWindowEnd.at.getOption).forall(_.instant > start)
+
   /**
    * The windows defined by this TimingWindow defintion, capped to the provided `within` interval.
    *
