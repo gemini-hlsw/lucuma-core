@@ -12,14 +12,14 @@ import munit.DisciplineSuite
 final class IdsSuite extends DisciplineSuite {
   import ArbGid.given
 
-  checkAll("Gid[Configuration.Id]", GidTests[Configuration.Id].gid)
+  checkAll("Gid[CallForProposals.Id]", GidTests[CallForProposals.Id].gid)
   checkAll("Gid[Dataset.Id]", GidTests[Dataset.Id].gid)
   checkAll("Gid[ExecutionEvent.Id]", GidTests[ExecutionEvent.Id].gid)
   checkAll("Gid[Observation.Id]", GidTests[Observation.Id].gid)
   checkAll("Gid[Program.Id]", GidTests[Program.Id].gid)
   checkAll("Gid[Visit.Id]", GidTests[Visit.Id].gid)
 
-  checkAll("KeyCodec[Configuration.Id]", KeyCodecTests[Configuration.Id].keyCodec)
+  checkAll("KeyCodec[CallForProposals.Id]", KeyCodecTests[CallForProposals.Id].keyCodec)
   checkAll("KeyCodec[Dataset.Id]", KeyCodecTests[Dataset.Id].keyCodec)
   checkAll("KeyCodec[ExecutionEvent.Id]", KeyCodecTests[ExecutionEvent.Id].keyCodec)
   checkAll("KeyCodec[Observation.Id]", KeyCodecTests[Observation.Id].keyCodec)
