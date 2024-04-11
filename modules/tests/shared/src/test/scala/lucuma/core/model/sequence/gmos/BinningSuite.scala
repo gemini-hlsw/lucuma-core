@@ -82,4 +82,16 @@ final class BinningSuite extends FunSuite {
     )
   }
 
+  // Testing explore-dev using GMOS-N with the R831 grating with a 1" slit and IQ=1.0" should yield binning = 2 x 4,
+  // however, the sequence displays 1 x 1.
+  test("shortcut-2772") {
+    testLongslit(
+      GmosNorthFpu.LongSlit_1_00,
+      SourceProfile.Point(bandNormalized),
+      ImageQuality.OnePointZero,
+      GmosNorthGrating.R831_G5302,
+      GmosXBinning.Two,
+      GmosYBinning.Four
+    )
+  }
 }
