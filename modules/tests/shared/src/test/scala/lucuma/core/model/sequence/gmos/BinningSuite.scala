@@ -87,7 +87,7 @@ final class BinningSuite extends FunSuite {
   test("shortcut-2772") {
     testLongslit(
       GmosNorthFpu.LongSlit_1_00,
-      SourceProfile.Uniform(bandNormalized),
+      SourceProfile.Point(bandNormalized),
       ImageQuality.OnePointZero,
       GmosNorthGrating.R831_G5302,
       GmosXBinning.Two,
