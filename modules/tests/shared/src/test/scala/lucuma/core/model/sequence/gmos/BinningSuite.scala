@@ -94,4 +94,16 @@ final class BinningSuite extends FunSuite {
       GmosYBinning.Four
     )
   }
+
+  test("longslit, B600, slit=0.50, fwhm=0.0: 1 1") {
+    testLongslit(
+      GmosNorthFpu.LongSlit_0_50,
+      SourceProfile.Gaussian(Angle.Angle0, bandNormalized),
+      ImageQuality.PointOne,
+      GmosNorthGrating.B600_G5307,
+      GmosXBinning.One,
+      GmosYBinning.One
+    )
+  }
+
 }
