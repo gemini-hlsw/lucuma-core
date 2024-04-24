@@ -40,9 +40,16 @@ object binning {
    */
   def objectSize(p: SourceProfile, iq: ImageQuality): Angle =
     p match {
-      case SourceProfile.Point(_)          => iq.toAngle
-      case SourceProfile.Uniform(_)        => Angle.Angle180
-      case SourceProfile.Gaussian(fwhm, _) => fwhm
+      case SourceProfile.Point(_)          =>
+        iq.toAngle
+
+      case SourceProfile.Uniform(_)        =>
+        Angle.Angle180
+
+      case SourceProfile.Gaussian(fwhm, _) =>
+        val a = fwhm.toSignedDoubleDegrees
+        val b = iq.toAngle.toSignedDoubleDegrees
+        Angle.fromDoubleDegrees(Math.sqrt(a*a + b*b))
     }
 
   extension (λ: Angle) {
