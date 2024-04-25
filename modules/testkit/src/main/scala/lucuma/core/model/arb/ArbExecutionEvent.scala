@@ -4,10 +4,12 @@
 package lucuma.core.model
 package arb
 
+import lucuma.core.enums.AtomStage
 import lucuma.core.enums.DatasetStage
 import lucuma.core.enums.SequenceCommand
 import lucuma.core.enums.SlewStage
 import lucuma.core.enums.StepStage
+import lucuma.core.model.sequence.Atom
 import lucuma.core.model.sequence.Dataset
 import lucuma.core.model.sequence.Step
 import lucuma.core.util.Timestamp
@@ -109,6 +111,35 @@ trait ArbExecutionEvent {
       a.stage
     )}
 
+  given Arbitrary[ExecutionEvent.AtomEvent] =
+    Arbitrary {
+      for {
+        eid <- arbitrary[ExecutionEvent.Id]
+        rec <- arbitrary[Timestamp]
+        oid <- arbitrary[Observation.Id]
+        vid <- arbitrary[Visit.Id]
+        aid <- arbitrary[Atom.Id]
+        stg <- arbitrary[AtomStage]
+      } yield ExecutionEvent.AtomEvent(eid, rec, oid, vid, aid, stg)
+    }
+
+  given Cogen[ExecutionEvent.AtomEvent] =
+    Cogen[(
+      ExecutionEvent.Id,
+      Timestamp,
+      Observation.Id,
+      Visit.Id,
+      Atom.Id,
+      AtomStage
+    )].contramap { a => (
+      a.id,
+      a.received,
+      a.observationId,
+      a.visitId,
+      a.atomId,
+      a.stage
+    )}
+
   given Arbitrary[ExecutionEvent.StepEvent] =
     Arbitrary {
       for {
@@ -143,6 +174,7 @@ trait ArbExecutionEvent {
       Gen.oneOf[ExecutionEvent](
         arbitrary[ExecutionEvent.DatasetEvent],
         arbitrary[ExecutionEvent.SequenceEvent],
+        arbitrary[ExecutionEvent.AtomEvent],
         arbitrary[ExecutionEvent.SlewEvent],
         arbitrary[ExecutionEvent.StepEvent]
       )
@@ -152,11 +184,13 @@ trait ArbExecutionEvent {
     Cogen[(
       Option[ExecutionEvent.DatasetEvent],
       Option[ExecutionEvent.SequenceEvent],
+      Option[ExecutionEvent.AtomEvent],
       Option[ExecutionEvent.SlewEvent],
       Option[ExecutionEvent.StepEvent]
     )].contramap { a => (
       ExecutionEvent.datasetEvent.getOption(a),
       ExecutionEvent.sequenceEvent.getOption(a),
+      ExecutionEvent.atomEvent.getOption(a),
       ExecutionEvent.slewEvent.getOption(a),
       ExecutionEvent.stepEvent.getOption(a)
     )}

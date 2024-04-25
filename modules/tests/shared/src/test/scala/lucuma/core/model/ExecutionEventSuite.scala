@@ -12,6 +12,7 @@ class ExecutionEventSuite extends DisciplineSuite {
   import ArbExecutionEvent.given
 
   checkAll("Eq[ExecutionEvent]", EqTests[ExecutionEvent].eqv)
+  checkAll("ExecutionEvent.atomEvent", PrismTests(ExecutionEvent.atomEvent))
   checkAll("ExecutionEvent.datasetEvent", PrismTests(ExecutionEvent.datasetEvent))
   checkAll("ExecutionEvent.sequenceEvent", PrismTests(ExecutionEvent.sequenceEvent))
   checkAll("ExecutionEvent.slewEvent", PrismTests(ExecutionEvent.slewEvent))
