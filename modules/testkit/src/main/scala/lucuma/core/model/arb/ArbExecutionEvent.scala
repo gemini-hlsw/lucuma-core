@@ -34,10 +34,11 @@ trait ArbExecutionEvent {
         rec <- arbitrary[Timestamp]
         oid <- arbitrary[Observation.Id]
         vid <- arbitrary[Visit.Id]
+        aid <- arbitrary[Atom.Id]
         sid <- arbitrary[Step.Id]
         did <- arbitrary[Dataset.Id]
         stg <- arbitrary[DatasetStage]
-      } yield ExecutionEvent.DatasetEvent(eid, rec, oid, vid, sid, did, stg)
+      } yield ExecutionEvent.DatasetEvent(eid, rec, oid, vid, aid, sid, did, stg)
     }
 
   given Cogen[ExecutionEvent.DatasetEvent] =
@@ -46,6 +47,7 @@ trait ArbExecutionEvent {
       Timestamp,
       Observation.Id,
       Visit.Id,
+      Atom.Id,
       Step.Id,
       Dataset.Id,
       DatasetStage
@@ -54,6 +56,7 @@ trait ArbExecutionEvent {
       a.received,
       a.observationId,
       a.visitId,
+      a.atomId,
       a.stepId,
       a.datasetId,
       a.stage
@@ -147,9 +150,10 @@ trait ArbExecutionEvent {
         rec <- arbitrary[Timestamp]
         oid <- arbitrary[Observation.Id]
         vid <- arbitrary[Visit.Id]
+        aid <- arbitrary[Atom.Id]
         sid <- arbitrary[Step.Id]
         stg <- arbitrary[StepStage]
-      } yield ExecutionEvent.StepEvent(eid, rec, oid, vid, sid, stg)
+      } yield ExecutionEvent.StepEvent(eid, rec, oid, vid, aid, sid, stg)
     }
 
   given Cogen[ExecutionEvent.StepEvent] =
@@ -158,6 +162,7 @@ trait ArbExecutionEvent {
       Timestamp,
       Observation.Id,
       Visit.Id,
+      Atom.Id,
       Step.Id,
       StepStage
     )].contramap { a => (
@@ -165,6 +170,7 @@ trait ArbExecutionEvent {
       a.received,
       a.observationId,
       a.visitId,
+      a.atomId,
       a.stepId,
       a.stage
     )}
