@@ -49,7 +49,7 @@ object UserInvitation {
   type Id = Id.Type
 
   extension(invitation: UserInvitation)
-    def token: String = s"${invitation.id}.${invitation.body}"
+    def token: String = fromString.reverseGet(invitation)
 
   private val R: Regex =
     raw"^([0-9a-f]{3,})\.([0-9a-f]{96})$$".r
