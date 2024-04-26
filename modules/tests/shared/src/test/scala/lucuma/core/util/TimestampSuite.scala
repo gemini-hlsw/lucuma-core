@@ -6,6 +6,7 @@ package lucuma.core.util
 import cats.kernel.laws.discipline.*
 import cats.syntax.either.*
 import cats.syntax.option.*
+import cats.syntax.order.*
 import lucuma.core.arb.ArbTime.given
 import lucuma.core.optics.laws.discipline.*
 import lucuma.core.util.arb.ArbTimestamp
@@ -89,4 +90,10 @@ class TimestampSuite extends DisciplineSuite {
     }
   }
 
+  property("intervalUntil") {
+    forAll { (t0: Timestamp, t1: Timestamp) =>
+      val ti = t0.intervalUntil(t1)
+      assert(t0 < t1 == ti.nonEmpty)
+    }
+  }
 }

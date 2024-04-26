@@ -137,6 +137,17 @@ object Timestamp {
 
     def plusSecondsOption(secondsToAdd: Long): Option[Timestamp] =
       fromInstant(timestamp.plusSeconds(secondsToAdd))
+
+    /**
+     * The timestamp interval between this timestamp and the given
+     * `endExclusive` timestamp.  If `endExclusive` comes before this
+     * timestamp, an empty interval at this timestamp is returned.
+     *
+     * @param endExclusive the end time of the TimestampInterval
+     */
+    def intervalUntil(endExclusive: Timestamp): TimestampInterval =
+      if (endExclusive <= timestamp) TimestampInterval.between(timestamp, timestamp)
+      else TimestampInterval.between(timestamp, endExclusive)
   }
 
   val FromString: Format[String, Timestamp] =
