@@ -6,6 +6,7 @@ package lucuma.core.model
 import cats.Order
 import cats.parse.Parser
 import cats.parse.Parser.*
+import cats.syntax.all.*
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.api.RefinedTypeOps
 import eu.timepit.refined.cats.given
@@ -18,6 +19,7 @@ import lucuma.core.enums.Instrument
 import lucuma.core.enums.ProgramType
 import lucuma.core.enums.ScienceSubtype
 import lucuma.core.optics.Format
+import monocle.Getter
 import monocle.Prism
 
 
@@ -180,14 +182,14 @@ object ProgramReference {
 
     import lucuma.core.enums.parser.EnumParsers.scienceSubtype
     import parser.ReferenceParsers.*
-    import Semester.parse.semester
+    import Semester.parse.semester as semesterParser
 
     val description: Parser[Description] =
       charsWhile { c => (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') }
         .mapFilter(s => Description.from(s).toOption)
 
     def semesterInstrumentIndex[A](abbr: String)(f: (Semester, Instrument, PosInt) => A): Parser[A] =
-      (semester.surroundedBy(dash).between(G, string(abbr)) ~ instrumentByReferenceName.surroundedBy(dash) ~ index)
+      (semesterParser.surroundedBy(dash).between(G, string(abbr)) ~ instrumentByReferenceName.surroundedBy(dash) ~ index)
         .map { case ((semester, instrument), index) => f(semester, instrument, index) }
 
     val calibration: Parser[Calibration] =
@@ -256,5 +258,27 @@ object ProgramReference {
 
   given Ordering[ProgramReference] =
     Order[ProgramReference].toOrdering
+
+  val semester: Getter[ProgramReference, Option[Semester]] =
+    Getter[ProgramReference, Option[Semester]] {
+      case Calibration(semester, _, _) => semester.some
+      case Commissioning(semester, _, _) => semester.some
+      case Engineering(semester, _, _) => semester.some
+      case Example(instrument) => none
+      case Library(_, _) => none
+      case Monitoring(semester, _, _) => none
+      case Science(proposal, _) => proposal.semester.some
+    }
+
+  val instrument: Getter[ProgramReference, Option[Instrument]] =
+    Getter[ProgramReference, Option[Instrument]] {
+      case Calibration(_, instrument, _) => instrument.some
+      case Commissioning(_, instrument, _) => instrument.some
+      case Engineering(_, instrument, _) => instrument.some
+      case Example(instrument) => instrument.some
+      case Library(instrument, _) => instrument.some
+      case Monitoring(_, instrument, _) => instrument.some
+      case Science(_, _) => none
+    }
 
 }
