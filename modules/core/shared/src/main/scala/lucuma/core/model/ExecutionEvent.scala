@@ -6,10 +6,12 @@ package lucuma.core.model
 import cats.Eq
 import cats.derived.*
 import cats.syntax.eq.*
+import lucuma.core.enums.AtomStage
 import lucuma.core.enums.DatasetStage
 import lucuma.core.enums.SequenceCommand
 import lucuma.core.enums.SlewStage
 import lucuma.core.enums.StepStage
+import lucuma.core.model.sequence.Atom
 import lucuma.core.model.sequence.Dataset
 import lucuma.core.model.sequence.Step
 import lucuma.core.util.Timestamp
@@ -30,14 +32,16 @@ sealed trait ExecutionEvent derives Eq {
   def fold[A](
     slewEvent:     SlewEvent     => A,
     sequenceEvent: SequenceEvent => A,
+    atomEvent:     AtomEvent     => A,
     stepEvent:     StepEvent     => A,
     datasetEvent:  DatasetEvent  => A
   ): A =
     this match {
-      case e@SlewEvent(_, _, _, _, _)          => slewEvent(e)
-      case e@SequenceEvent(_, _, _, _, _)      => sequenceEvent(e)
-      case e@StepEvent(_, _, _, _, _, _)       => stepEvent(e)
-      case e@DatasetEvent(_, _, _, _, _, _, _) => datasetEvent(e)
+      case e@SlewEvent(_, _, _, _, _)             => slewEvent(e)
+      case e@SequenceEvent(_, _, _, _, _)         => sequenceEvent(e)
+      case e@AtomEvent(_, _, _, _, _, _)          => atomEvent(e)
+      case e@StepEvent(_, _, _, _, _, _, _)       => stepEvent(e)
+      case e@DatasetEvent(_, _, _, _, _, _, _, _) => datasetEvent(e)
     }
 
 }
@@ -60,11 +64,21 @@ object ExecutionEvent extends WithGid('e'.refined) {
     command:       SequenceCommand
   ) extends ExecutionEvent derives Eq
 
+  case class AtomEvent(
+    id:            ExecutionEvent.Id,
+    received:      Timestamp,
+    observationId: Observation.Id,
+    visitId:       Visit.Id,
+    atomId:        Atom.Id,
+    stage:         AtomStage
+  ) extends ExecutionEvent derives Eq
+
   case class StepEvent(
     id:            ExecutionEvent.Id,
     received:      Timestamp,
     observationId: Observation.Id,
     visitId:       Visit.Id,
+    atomId:        Atom.Id,
     stepId:        Step.Id,
     stage:         StepStage
   ) extends ExecutionEvent derives Eq
@@ -74,10 +88,14 @@ object ExecutionEvent extends WithGid('e'.refined) {
     received:      Timestamp,
     observationId: Observation.Id,
     visitId:       Visit.Id,
+    atomId:        Atom.Id,
     stepId:        Step.Id,
     datasetId:     Dataset.Id,
     stage:         DatasetStage
   ) extends ExecutionEvent derives Eq
+
+  val atomEvent: Prism[ExecutionEvent, AtomEvent] =
+    GenPrism[ExecutionEvent, AtomEvent]
 
   val datasetEvent: Prism[ExecutionEvent, DatasetEvent] =
     GenPrism[ExecutionEvent, DatasetEvent]
