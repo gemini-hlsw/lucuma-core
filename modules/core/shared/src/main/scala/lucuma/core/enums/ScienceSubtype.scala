@@ -15,6 +15,7 @@ enum ScienceSubtype(val tag: String, val letter: Char) derives Enumerated:
   case DirectorsTime      extends ScienceSubtype("directors_time",      'D')
   case FastTurnaround     extends ScienceSubtype("fast_turnaround",     'F')
   case LargeProgram       extends ScienceSubtype("large_program",       'L')
+  case PoorWeather        extends ScienceSubtype("poor_weather",        'P')
   case Queue              extends ScienceSubtype("queue",               'Q')
   case DemoScience        extends ScienceSubtype("demo_science",        'S')
   case SystemVerification extends ScienceSubtype("system_verification", 'V')
