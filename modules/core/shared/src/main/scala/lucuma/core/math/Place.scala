@@ -30,11 +30,11 @@ final case class Place(
 object Place {
 
   /** @group Typeclass Instances */
-  implicit val PlaceEqual: Eq[Place] =
+  given Eq[Place] =
     Eq.by(x => (x.latitude, x.longitude, x.altitude, x.timezone))
 
   /** @group Typeclass Instances */
-  implicit val PlaceShow: Show[Place] = Show.fromToString
+  given Show[Place] = Show.fromToString
 
   /** @group Optics */
   val latitude: Lens[Place, Lat] =

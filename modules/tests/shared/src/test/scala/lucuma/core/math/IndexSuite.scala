@@ -8,7 +8,7 @@ import lucuma.core.math.arb.*
 import monocle.law.discipline.*
 
 final class IndexSuite extends munit.DisciplineSuite {
-  import ArbIndex._
+  import ArbIndex.given
 
   // Laws
   checkAll("Index", OrderTests[Index].order)

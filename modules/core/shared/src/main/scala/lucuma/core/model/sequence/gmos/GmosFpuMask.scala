@@ -50,7 +50,7 @@ object GmosFpuMask {
   final case class Builtin[+T](value: T) extends GmosFpuMask[T]
 
   object Builtin {
-    implicit def eqGmosFpuMaskBuiltin[T: Eq]: Eq[Builtin[T]] =
+    given [T: Eq]: Eq[Builtin[T]] =
       Eq.by(_.value)
 
     /** @group Optics */
@@ -61,7 +61,7 @@ object GmosFpuMask {
   final case class Custom(filename: NonEmptyString, slitWidth: GmosCustomSlitWidth) extends GmosFpuMask[Nothing]
 
   object Custom {
-    implicit val eqGmosFpuMaskCustom: Eq[Custom] = Eq.by(x => (x.filename, x.slitWidth))
+    given Eq[Custom] = Eq.by(x => (x.filename, x.slitWidth))
 
     /** @group Optics */
     val filename: Lens[Custom, NonEmptyString] =
@@ -72,7 +72,7 @@ object GmosFpuMask {
       Focus[Custom](_.slitWidth)
   }
 
-  implicit def eqGmosFpuMask[T: Eq]: Eq[GmosFpuMask[T]] = Eq.instance {
+  given [T: Eq]: Eq[GmosFpuMask[T]] = Eq.instance {
     case (a @ Builtin(_), b @ Builtin(_))     => a === b
     case (a @ Custom(_, _), b @ Custom(_, _)) => a === b
     case _                                    => false

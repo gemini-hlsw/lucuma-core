@@ -13,14 +13,14 @@ import org.scalacheck.Cogen
 
 trait ArbApparentRadialVelocity {
 
-  implicit val arbApparentRadialVelocity: Arbitrary[ApparentRadialVelocity] =
+  given Arbitrary[ApparentRadialVelocity] =
     Arbitrary {
       for {
         cz <- arbitrary[BigDecimal]
       } yield ApparentRadialVelocity(cz.withUnit[MetersPerSecond])
     }
 
-  implicit val cogApparentRadialVelocity: Cogen[ApparentRadialVelocity] =
+  given Cogen[ApparentRadialVelocity] =
     Cogen[BigDecimal].contramap(_.cz.value)
 }
 

@@ -4,7 +4,7 @@
 package lucuma.core.model
 package arb
 
-import lucuma.core.arb.MoreGenOps
+import lucuma.core.arb.*
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen

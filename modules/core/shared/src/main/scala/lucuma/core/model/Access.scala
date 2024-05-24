@@ -20,7 +20,7 @@ object Access {
   case object Admin   extends Access("Admin",   "admin")
   case object Service extends Access("Service", "service")
 
-  implicit val EnumeratedType: Enumerated[Access] =
+  given Enumerated[Access] =
     new Enumerated[Access] {
       def all: List[Access] = List(Guest, Pi, Ngo, Staff, Admin, Service) // ordered by increasing power
       def tag(a: Access): String = a.tag

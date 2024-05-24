@@ -31,7 +31,7 @@ object DynamicConfig {
   }
 
   object GmosNorth {
-    implicit val eqInstrumentConfigGmosNorth: Eq[GmosNorth] =
+    given Eq[GmosNorth] =
       Eq.by(x => (x.exposure, x.readout, x.dtax, x.roi, x.gratingConfig, x.filter, x.fpu))
 
     /** @group Optics */
@@ -78,7 +78,7 @@ object DynamicConfig {
 
   object GmosSouth {
 
-    implicit val eqInstrumentConfigGmosSouth: Eq[GmosSouth] =
+    given Eq[GmosSouth] =
       Eq.by(x => (x.exposure, x.readout, x.dtax, x.roi, x.gratingConfig, x.filter, x.fpu))
 
     /** @group Optics */
@@ -110,7 +110,7 @@ object DynamicConfig {
       Focus[GmosSouth](_.fpu)
   }
 
-  implicit val eqDynamicConfig: Eq[DynamicConfig] = Eq.instance {
+  given Eq[DynamicConfig] = Eq.instance {
     case (a @ GmosNorth(_, _, _, _, _, _, _), b @ GmosNorth(_, _, _, _, _, _, _)) => a === b
     case (a @ GmosSouth(_, _, _, _, _, _, _), b @ GmosSouth(_, _, _, _, _, _, _)) => a === b
     case _                                                                        => false

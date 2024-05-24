@@ -35,7 +35,7 @@ object ImageQuality {
   case object OnePointFive extends ImageQuality("one_point_five", 15.withRefinedUnit[Positive, DeciArcSecond])
   case object TwoPointZero extends ImageQuality("two_point_zero", 20.withRefinedUnit[Positive, DeciArcSecond])
 
-  implicit val ImageQualityEnumerated: Enumerated[ImageQuality] =
+  given Enumerated[ImageQuality] =
     Enumerated.from(
       PointOne,
       PointTwo,
@@ -48,6 +48,6 @@ object ImageQuality {
       TwoPointZero
     ).withTag(_.tag)
 
-  implicit val ImageQualityDisplay: Display[ImageQuality] =
+  given Display[ImageQuality] =
     Display.byShortName(_.label)
 }

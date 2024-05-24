@@ -13,7 +13,7 @@ import org.scalacheck.Cogen.*
 trait ArbElevationRange {
   import ArbRefined.given
 
-  implicit val arbAirMassRange: Arbitrary[ElevationRange.AirMass] =
+  given Arbitrary[ElevationRange.AirMass] =
     Arbitrary {
       for {
         min <- arbitrary[ElevationRange.AirMass.DecimalValue]
@@ -21,11 +21,11 @@ trait ArbElevationRange {
       } yield ElevationRange.AirMass.fromDecimalValues.get((min, max))
     }
 
-  implicit val cogAirMassRange: Cogen[ElevationRange.AirMass] =
+  given Cogen[ElevationRange.AirMass] =
     Cogen[(ElevationRange.AirMass.DecimalValue, ElevationRange.AirMass.DecimalValue)]
       .contramap(t => (t.min, t.max))
 
-  implicit val arbHourAngleRange: Arbitrary[ElevationRange.HourAngle] =
+  given Arbitrary[ElevationRange.HourAngle] =
     Arbitrary {
       for {
         min <- arbitrary[ElevationRange.HourAngle.DecimalHour]
@@ -33,16 +33,16 @@ trait ArbElevationRange {
       } yield ElevationRange.HourAngle.fromDecimalHours.get((min, max))
     }
 
-  implicit val cogHourAngleRange: Cogen[ElevationRange.HourAngle] =
+  given Cogen[ElevationRange.HourAngle] =
     Cogen[(ElevationRange.HourAngle.DecimalHour, ElevationRange.HourAngle.DecimalHour)]
       .contramap(t => (t.minHours, t.maxHours))
 
-  implicit val arbElevationRange: Arbitrary[ElevationRange] =
+  given Arbitrary[ElevationRange] =
     Arbitrary(
       Gen.oneOf(arbitrary[ElevationRange.AirMass], arbitrary[ElevationRange.HourAngle])
     )
 
-  implicit val cogElevationRange: Cogen[ElevationRange] =
+  given Cogen[ElevationRange] =
     Cogen[Either[ElevationRange.AirMass, ElevationRange.HourAngle]].contramap(_ match {
       case am @ ElevationRange.AirMass(_, _)   => Left(am)
       case ha @ ElevationRange.HourAngle(_, _) => Right(ha)

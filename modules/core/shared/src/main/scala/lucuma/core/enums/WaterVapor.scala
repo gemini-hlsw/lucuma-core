@@ -14,9 +14,9 @@ object WaterVapor {
   case object Median  extends WaterVapor("median", "Median")
   case object Wet     extends WaterVapor("wet", "Wet")
 
-  implicit val WaterVaporEnumerated: Enumerated[WaterVapor] =
+  given Enumerated[WaterVapor] =
     Enumerated.from(VeryDry, Dry, Median, Wet).withTag(_.tag)
 
-  implicit val WatorVaporDisplay: Display[WaterVapor] =
+  given Display[WaterVapor] =
     Display.byShortName(_.label)
 }

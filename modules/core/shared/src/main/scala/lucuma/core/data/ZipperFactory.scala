@@ -16,7 +16,7 @@ protected[data] trait ZipperFactory[Z[A] <: ZipperOps[A, Zipper[A]]] {
   /**
     * @group Typeclass Instances
     */
-  implicit def equal[A: Eq]: Eq[Z[A]] =
+  given [A: Eq]: Eq[Z[A]] =
     Eq.instance { (a, b) =>
       a.focus === b.focus && a.lefts === b.lefts && a.rights === b.rights
     }

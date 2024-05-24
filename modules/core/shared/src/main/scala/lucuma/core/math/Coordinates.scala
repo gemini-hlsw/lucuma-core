@@ -202,11 +202,11 @@ object Coordinates extends CoordinatesOptics {
     Coordinates(RightAscension.fromRadians(ra), Declination.unsafeFromRadians(dec))
 
   /** @group Typeclass Instances */
-  implicit val CoordinatesOrder: Order[Coordinates] =
+  given Order[Coordinates] =
     Order.by(c => (c.ra, c.dec))
 
   /** @group Typeclass Instances. */
-  implicit val ShowCoordinates: Show[Coordinates] =
+  given Show[Coordinates] =
     Show.fromToString
 
 }

@@ -85,7 +85,7 @@ object SplitMono {
     SplitMono(p.get, p.reverseGet)
 
   /** SplitMono forms a category. */
-  implicit def SplitMonoCategory: Category[SplitMono] =
+  given Category[SplitMono] =
     new Category[SplitMono] {
       def id[A]: SplitMono[A, A] = SplitMono(identity, identity)
       def compose[A, B, C](f: SplitMono[B, C], g: SplitMono[A, B]): SplitMono[A, C] = g.andThen(f)

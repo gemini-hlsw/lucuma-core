@@ -34,7 +34,7 @@ object UnnormalizedSED {
   final case class StellarLibrary(librarySpectrum: StellarLibrarySpectrum) extends UnnormalizedSED
 
   object StellarLibrary {
-    implicit val eqStellarLibrary: Eq[StellarLibrary] = Eq.by(_.librarySpectrum)
+    given Eq[StellarLibrary] = Eq.by(_.librarySpectrum)
 
     /** @group Optics */
     val librarySpectrum: Lens[StellarLibrary, StellarLibrarySpectrum] =
@@ -45,7 +45,7 @@ object UnnormalizedSED {
       extends UnnormalizedSED
 
   object CoolStarModel {
-    implicit val orderCoolStarModel: Order[CoolStarModel] = Order.by(_.temperature)
+    given Order[CoolStarModel] = Order.by(_.temperature)
 
     /** @group Optics */
     val temperature: Lens[CoolStarModel, CoolStarTemperature] =
@@ -55,7 +55,7 @@ object UnnormalizedSED {
   final case class Galaxy(galaxySpectrum: GalaxySpectrum) extends UnnormalizedSED
 
   object Galaxy {
-    implicit val eqGalaxy: Eq[Galaxy] = Eq.by(_.galaxySpectrum)
+    given Eq[Galaxy] = Eq.by(_.galaxySpectrum)
 
     /** @group Optics */
     val galaxySpectrum: Lens[Galaxy, GalaxySpectrum] =
@@ -65,7 +65,7 @@ object UnnormalizedSED {
   final case class Planet(planetSpectrum: PlanetSpectrum) extends UnnormalizedSED
 
   object Planet {
-    implicit val eqPlanet: Eq[Planet] = Eq.by(_.planetSpectrum)
+    given Eq[Planet] = Eq.by(_.planetSpectrum)
 
     /** @group Optics */
     val planetSpectrum: Lens[Planet, PlanetSpectrum] =
@@ -75,7 +75,7 @@ object UnnormalizedSED {
   final case class Quasar(quasarSpectrum: QuasarSpectrum) extends UnnormalizedSED
 
   object Quasar {
-    implicit val eqQuasar: Eq[Quasar] = Eq.by(_.quasarSpectrum)
+    given Eq[Quasar] = Eq.by(_.quasarSpectrum)
 
     /** @group Optics */
     val quasarSpectrum: Lens[Quasar, QuasarSpectrum] =
@@ -85,7 +85,7 @@ object UnnormalizedSED {
   final case class HIIRegion(hiiRegionSpectrum: HIIRegionSpectrum) extends UnnormalizedSED
 
   object HIIRegion {
-    implicit val eqHIIRegion: Eq[HIIRegion] = Eq.by(_.hiiRegionSpectrum)
+    given Eq[HIIRegion] = Eq.by(_.hiiRegionSpectrum)
 
     /** @group Optics */
     val hiiRegionSpectrum: Lens[HIIRegion, HIIRegionSpectrum] =
@@ -96,7 +96,7 @@ object UnnormalizedSED {
       extends UnnormalizedSED
 
   object PlanetaryNebula {
-    implicit val eqPlanetaryNebula: Eq[PlanetaryNebula] = Eq.by(_.planetaryNebulaSpectrum)
+    given Eq[PlanetaryNebula] = Eq.by(_.planetaryNebulaSpectrum)
 
     /** @group Optics */
     val planetaryNebulaSpectrum: Lens[PlanetaryNebula, PlanetaryNebulaSpectrum] =
@@ -107,7 +107,7 @@ object UnnormalizedSED {
   final case class PowerLaw(index: BigDecimal) extends UnnormalizedSED
 
   object PowerLaw {
-    implicit val orderPowerLaw: Order[PowerLaw] = Order.by(_.index)
+   given Order[PowerLaw] = Order.by(_.index)
 
     /** @group Optics */
     val index: Lens[PowerLaw, BigDecimal] = Focus[PowerLaw](_.index)
@@ -117,7 +117,7 @@ object UnnormalizedSED {
   final case class BlackBody(temperature: Quantity[PosInt, Kelvin]) extends UnnormalizedSED
 
   object BlackBody {
-    implicit val orderBlackBody: Order[BlackBody] = Order.by(_.temperature)
+    given Order[BlackBody] = Order.by(_.temperature)
 
     /** @group Optics */
     val temperature: Lens[BlackBody, Quantity[PosInt, Kelvin]] =
@@ -129,14 +129,14 @@ object UnnormalizedSED {
       extends UnnormalizedSED
 
   object UserDefined {
-    implicit val eqUserDefined: Eq[UserDefined] = Eq.by(_.fluxDensities)
+    given Eq[UserDefined] = Eq.by(_.fluxDensities)
 
     /** @group Optics */
     val fluxDensities: Lens[UserDefined, NonEmptyMap[Wavelength, PosBigDecimal]] =
       Focus[UserDefined](_.fluxDensities)
   }
 
-  implicit val eqSpectralDistribution: Eq[UnnormalizedSED] =
+  given Eq[UnnormalizedSED] =
     Eq.instance {
       case (a @ StellarLibrary(_), b @ StellarLibrary(_))   => a === b
       case (a @ CoolStarModel(_), b @ CoolStarModel(_))     => a === b

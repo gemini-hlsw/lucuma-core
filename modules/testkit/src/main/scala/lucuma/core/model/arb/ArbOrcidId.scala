@@ -13,7 +13,7 @@ trait ArbOrcidId {
   def digits(n: Int): Gen[String] =
     Gen.numChar.replicateA(n).map(_.mkString)
 
-  implicit val ArbOrcidId: Arbitrary[OrcidId] =
+  given Arbitrary[OrcidId] =
     Arbitrary {
       (digits(4), digits(4), digits(4), digits(3)).mapN { case (a, b, c, d) =>
         val x = OrcidId.checkDigit(a + b + c + d)
@@ -24,7 +24,7 @@ trait ArbOrcidId {
       }
     }
 
-  implicit val CogOrcidId: Cogen[OrcidId] =
+  given Cogen[OrcidId] =
     Cogen[String].contramap(_.value.toString)
 
 }

@@ -76,13 +76,13 @@ object Ephemeris {
     fromList(fa.toList)
 
   /** Ephemerides form a monoid, using `++` as the combining operation. */
-  implicit val MonoidEphemeris: Monoid[Ephemeris] =
+  given Monoid[Ephemeris] =
     new Monoid[Ephemeris] {
       val empty: Ephemeris = Ephemeris.empty
       def combine(a: Ephemeris, b: Ephemeris) = a ++ b
     }
 
-  implicit val EqEphemeris: Eq[Ephemeris] =
+  given Eq[Ephemeris] =
     Eq.fromUniversalEquals
 
   val elements: SplitMono[Ephemeris, List[Element]] =

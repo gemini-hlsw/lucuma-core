@@ -12,7 +12,7 @@ import org.scalacheck.Arbitrary.arbitrary
 
 import scala.collection.immutable.TreeMap
 
-implicit class MoreGenOps[A](g: Gen[A]) {
+extension[A](g: Gen[A]) {
 
   /** Like `retryUntil` but retries until the specified PartialFunction is defined. */
   def collectUntil[B](f: PartialFunction[A, B]): Gen[B] =
@@ -25,16 +25,16 @@ implicit class MoreGenOps[A](g: Gen[A]) {
 }
 
 // This isn't in scalacheck for whatever reason
-implicit def mapCogen[A: Cogen, B: Cogen]: Cogen[Map[A, B]] =
+given [A: Cogen, B: Cogen]: Cogen[Map[A, B]] =
   Cogen[List[(A, B)]].contramap(_.toList)
 
 // The above doesn't seem to match a TreeMap unless explicitly cast to a Map
-implicit def treeMapCogen[A: Cogen, B: Cogen]: Cogen[TreeMap[A, B]] =
+given [A: Cogen, B: Cogen]: Cogen[TreeMap[A, B]] =
   Cogen[Map[A, B]].contramap(_.toMap)
 
 // This doesn't seem to exist anywhere?  https://github.com/non/cats-check
 // would be useful.  All we need is `Applicative` for now though I suppose.
-implicit val applicativeGen: Applicative[Gen] = new Applicative[Gen] {
+given Applicative[Gen] = new Applicative[Gen] {
   def ap[A, B](gf: Gen[A => B])(ga: Gen[A]): Gen[B] =
     for {
       f <- gf
@@ -45,9 +45,9 @@ implicit val applicativeGen: Applicative[Gen] = new Applicative[Gen] {
     Gen.const(a)
 }
 
-implicit val cogenNonNegativeInt: Cogen[NonNegInt] = Cogen[Int].contramap(_.value)
+given Cogen[NonNegInt] = Cogen[Int].contramap(_.value)
 
-implicit val cogenNonEmptyString: Cogen[NonEmptyString] = Cogen[String].contramap(_.value)
+given Cogen[NonEmptyString] = Cogen[String].contramap(_.value)
 
 def newTypeArbitrary[T: Arbitrary](base: NewType[T]): Arbitrary[base.Type] =
   Arbitrary(arbitrary[T].map(base.apply(_)))

@@ -22,14 +22,14 @@ import scala.collection.immutable.TreeMap
 // TreeMap specifically. TBD.
 trait TreeMapInstances extends TreeMapInstances2 {
 
-  implicit def catsStdHashForTreeMap[K: Hash: Order, V: Hash]: Hash[TreeMap[K, V]] =
+  given [K: Hash: Order, V: Hash]: Hash[TreeMap[K, V]] =
     new TreeMapHash[K, V]
 
-  implicit def catsStdCommutativeMonoidForTreeMap[K: Order, V: CommutativeSemigroup]
+  given [K: Order, V: CommutativeSemigroup]
     : CommutativeMonoid[TreeMap[K, V]] =
     new TreeMapCommutativeMonoid[K, V]
 
-  implicit def catsStdShowForTreeMap[A, B](implicit
+  given [A, B](using
     showA: Show[A],
     showB: Show[B]
   ): Show[TreeMap[A, B]] =
@@ -40,15 +40,15 @@ trait TreeMapInstances extends TreeMapInstances2 {
           .mkString("TreeMap(", ", ", ")")
     }
 
-  implicit def catsStdInstancesForTreeMap[K: Order]
-    : Traverse[TreeMap[K, *]] & FlatMap[TreeMap[K, *]] =
+  private type TreeMapInstancesType[K] = Traverse[TreeMap[K, *]] & FlatMap[TreeMap[K, *]]
+  given [K: Order]: TreeMapInstancesType[K] =
     new Traverse[TreeMap[K, *]] with FlatMap[TreeMap[K, *]] {
 
-      implicit val orderingK: Ordering[K] = Order[K].toOrdering
+      given Ordering[K] = Order[K].toOrdering
 
       def traverse[G[_], A, B](
         fa: TreeMap[K, A]
-      )(f:  A => G[B])(implicit G: Applicative[G]): G[TreeMap[K, B]] = {
+      )(f:  A => G[B])(using G: Applicative[G]): G[TreeMap[K, B]] = {
         val gba: Eval[G[TreeMap[K, B]]] = Always(G.pure(TreeMap.empty(Order[K].toOrdering)))
         Foldable
           .iterateRight(fa, gba) { (kv, lbuf) =>
@@ -114,7 +114,7 @@ trait TreeMapInstances extends TreeMapInstances2 {
 
       override def isEmpty[A](fa: TreeMap[K, A]): Boolean = fa.isEmpty
 
-      override def fold[A](fa: TreeMap[K, A])(implicit A: Monoid[A]): A =
+      override def fold[A](fa: TreeMap[K, A])(using A: Monoid[A]): A =
         A.combineAll(fa.values)
 
       override def toList[A](fa: TreeMap[K, A]): List[A] = fa.values.toList
@@ -132,21 +132,21 @@ trait TreeMapInstances extends TreeMapInstances2 {
 }
 
 trait TreeMapInstances1 {
-  implicit def catsStdEqForTreeMap[K: Order, V: Eq]: Eq[TreeMap[K, V]] =
+  given [K: Order, V: Eq]: Eq[TreeMap[K, V]] =
     new TreeMapEq[K, V]
 }
 
 trait TreeMapInstances2 extends TreeMapInstances1 {
-  implicit def catsStdMonoidForTreeMap[K: Order, V: Semigroup]: Monoid[TreeMap[K, V]] =
+  given [K: Order, V: Semigroup]: Monoid[TreeMap[K, V]] =
     new TreeMapMonoid[K, V]
 }
 
-class TreeMapHash[K, V](implicit V: Hash[V], O: Order[K], K: Hash[K])
-    extends TreeMapEq[K, V]()(V, O)
+class TreeMapHash[K, V](using V: Hash[V], O: Order[K], K: Hash[K])
+    extends TreeMapEq[K, V]
     with Hash[TreeMap[K, V]] {
   // adapted from [[scala.util.hashing.MurmurHash3]],
   // but modified standard `Any#hashCode` to `ev.hash`.
-  import scala.util.hashing.MurmurHash3._
+  import scala.util.hashing.MurmurHash3.*
   def hash(x: TreeMap[K, V]): Int = {
     var a, b, n = 0
     var c       = 1;
@@ -166,7 +166,7 @@ class TreeMapHash[K, V](implicit V: Hash[V], O: Order[K], K: Hash[K])
   }
 }
 
-class TreeMapEq[K, V](implicit V: Eq[V], O: Order[K]) extends Eq[TreeMap[K, V]] {
+class TreeMapEq[K, V](using V: Eq[V], O: Order[K]) extends Eq[TreeMap[K, V]] {
   def eqv(x: TreeMap[K, V], y: TreeMap[K, V]): Boolean =
     if (x eq y) (O, true)._2
     else
@@ -179,11 +179,11 @@ class TreeMapEq[K, V](implicit V: Eq[V], O: Order[K]) extends Eq[TreeMap[K, V]] 
       }
 }
 
-class TreeMapCommutativeMonoid[K, V](implicit V: CommutativeSemigroup[V], O: Order[K])
+class TreeMapCommutativeMonoid[K, V](using V: CommutativeSemigroup[V], O: Order[K])
     extends TreeMapMonoid[K, V]
     with CommutativeMonoid[TreeMap[K, V]]
 
-class TreeMapMonoid[K, V](implicit V: Semigroup[V], O: Order[K]) extends Monoid[TreeMap[K, V]] {
+class TreeMapMonoid[K, V](using V: Semigroup[V], O: Order[K]) extends Monoid[TreeMap[K, V]] {
 
   def empty: TreeMap[K, V] = TreeMap.empty(O.toOrdering)
 

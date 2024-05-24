@@ -45,13 +45,13 @@ object OrcidId {
   def fromValue(s: String): Either[String, OrcidId] =
     parseWith(s, ValueRegex)
 
-  implicit val EqOrcid: Eq[OrcidId] =
+  given Eq[OrcidId] =
     Eq.by(_.value)
 
-  implicit val encoder: Encoder[OrcidId] =
+  given Encoder[OrcidId] =
     Encoder[String].contramap(_.value)
 
-  implicit val decoder: Decoder[OrcidId] =
+  given Decoder[OrcidId] =
     Decoder[String].emap(s => fromValue(s))
 
   // adapted from the code at the link above

@@ -128,10 +128,10 @@ object JulianDate {
       new JulianDate(day, wholeNanos)                  {}
   }
 
-  implicit val JulianDateOrder: Order[JulianDate] =
+  given Order[JulianDate] =
     Order.by(jd => (jd.dayNumber, jd.nanoAdjustment))
 
-  implicit val JulianDateShow: Show[JulianDate] =
+  given Show[JulianDate] =
     Show.fromToString
 
 }

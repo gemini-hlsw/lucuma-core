@@ -328,7 +328,7 @@ object Band {
     fromTag(s).getOrElse(throw new NoSuchElementException(s"Band: Invalid tag: '$s'"))
 
   /** @group Typeclass Instances */
-  implicit val BandEnumerated: Enumerated[Band] =
+  given Enumerated[Band] =
     new Enumerated[Band] {
       def all                                     = Band.all
       def tag(a: Band)                            = a.tag
@@ -341,7 +341,7 @@ object Band {
     Order.by(_.center)
 
   /** @group Typeclass Instances */
-  implicit val BandOrdering: Ordering[Band] =
-    BandEnumerated.toOrdering
+  given Ordering[Band] =
+    Enumerated[Band].toOrdering
 
 }

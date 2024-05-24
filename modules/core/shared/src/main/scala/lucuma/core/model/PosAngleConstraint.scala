@@ -113,7 +113,7 @@ object PosAngleConstraint extends PosAngleConstraintOptics {
 
   val Default: PosAngleConstraint = Fixed(Angle.Angle0)
 
-  implicit val eqPosAngle: Eq[PosAngleConstraint] = Eq.instance {
+  given Eq[PosAngleConstraint] = Eq.instance {
     case (Fixed(a), Fixed(b))                             => a === b
     case (AllowFlip(a), AllowFlip(b))                     => a === b
     case (AverageParallactic, AverageParallactic)         => true

@@ -27,7 +27,7 @@ final case class ConstraintSet(
 object ConstraintSet {
 
   /** @group Typeclass Instances */
-  implicit val eqConstraintsSet: Eq[ConstraintSet] = Eq.by(cs =>
+  given Eq[ConstraintSet] = Eq.by(cs =>
     (cs.imageQuality, cs.cloudExtinction, cs.skyBackground, cs.waterVapor, cs.elevationRange)
   )
 

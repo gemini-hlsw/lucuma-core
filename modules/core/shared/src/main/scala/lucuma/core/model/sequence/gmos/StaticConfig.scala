@@ -23,7 +23,7 @@ object StaticConfig {
   ) extends StaticConfig
 
   object GmosNorth {
-    implicit val eqStaticConfigGmosNorth: Eq[GmosNorth] =
+    given Eq[GmosNorth] =
       Eq.by(x => (x.stageMode, x.detector, x.mosPreImaging, x.nodAndShuffle))
 
     /** @group Optics */
@@ -51,7 +51,7 @@ object StaticConfig {
   ) extends StaticConfig
 
   object GmosSouth {
-    implicit val eqStaticConfigGmosSouth: Eq[GmosSouth] =
+    given Eq[GmosSouth] =
       Eq.by(x => (x.stageMode, x.detector, x.mosPreImaging, x.nodAndShuffle))
 
     /** @group Optics */
@@ -71,7 +71,7 @@ object StaticConfig {
       Focus[GmosSouth](_.nodAndShuffle)
   }
 
-  implicit val eqStaticConfig: Eq[StaticConfig] = Eq.instance {
+  given Eq[StaticConfig] = Eq.instance {
     case (a @ GmosNorth(_, _, _, _), b @ GmosNorth(_, _, _, _)) => a === b
     case (a @ GmosSouth(_, _, _, _), b @ GmosSouth(_, _, _, _)) => a === b
     case _                                                      => false

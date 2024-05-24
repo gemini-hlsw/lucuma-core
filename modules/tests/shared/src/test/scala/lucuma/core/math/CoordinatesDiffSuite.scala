@@ -9,7 +9,7 @@ import lucuma.core.math.arb.*
 import scala.math.*
 
 final class CoordinatesDiffSuite extends munit.DisciplineSuite {
-  import ArbCoordinatesDiff._
+  import ArbCoordinatesDiff.given
 
   // Laws
   checkAll("Eq[CoordinatesDiff]", EqTests[CoordinatesDiff].eqv)
@@ -44,7 +44,7 @@ final class CoordinatesDiffSuite extends munit.DisciplineSuite {
 
     assertCloseDifference(cd, a, Angle.fromDoubleDegrees(dist), delta)
   }
-  
+
 
   test("calculate on Z0") {
     val base     = Coordinates(RightAscension.Zero,

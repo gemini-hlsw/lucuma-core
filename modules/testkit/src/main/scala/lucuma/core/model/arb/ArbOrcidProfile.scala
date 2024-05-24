@@ -9,7 +9,7 @@ import org.scalacheck.*
 import org.scalacheck.Arbitrary.*
 
 trait ArbOrcidProfile {
-  import ArbOrcidId._
+  import ArbOrcidId.given
 
   given Arbitrary[OrcidProfile] =
     Arbitrary {

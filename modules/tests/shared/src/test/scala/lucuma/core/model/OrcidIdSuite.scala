@@ -12,7 +12,7 @@ import munit.*
 import org.scalacheck.Prop
 
 final class OrcidIdSuite extends DisciplineSuite {
-  import ArbOrcidId._
+  import ArbOrcidId.given
 
   // Laws
   checkAll("OrcidId", EqTests[OrcidId].eqv)

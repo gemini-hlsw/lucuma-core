@@ -51,11 +51,11 @@ object Redshift {
   val redshift: Iso[BigDecimal, Redshift] = Iso(Redshift.apply)(_.z)
 
   /** @group Typeclass Instances */
-  implicit val orderRedshift: Order[Redshift] =
+  given Order[Redshift] =
     Order.by(_.z)
 
   /** @group Typeclass Instances */
-  implicit val showRedshift: Show[Redshift] =
+  given Show[Redshift] =
     Show.fromToString
 
 }

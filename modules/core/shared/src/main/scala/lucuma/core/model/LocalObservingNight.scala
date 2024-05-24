@@ -130,7 +130,7 @@ object LocalObservingNight extends LocalObservingNightOptics {
     fromString(s).getOrElse(sys.error(s"Invalid night: $s"))
 
   /** @group Typeclass Instances. */
-  implicit val ShowLocalObservingNight: Show[LocalObservingNight] =
+  given Show[LocalObservingNight] =
     Show.fromToString
 
   /**
@@ -138,7 +138,7 @@ object LocalObservingNight extends LocalObservingNightOptics {
    *
    * @group Typeclass Instances
    */
-  implicit val OrderLocalObservingNight: Order[LocalObservingNight] =
+  given Order[LocalObservingNight] =
     Order.by(_.toLocalDate)
 }
 

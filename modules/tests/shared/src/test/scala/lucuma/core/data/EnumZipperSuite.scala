@@ -10,7 +10,7 @@ import cats.syntax.all.*
 import lucuma.core.enums.StepType
 import lucuma.core.enums.StepType.*
 
-import arb.ArbEnumZipper.*
+import arb.ArbEnumZipper.given
 
 final class EnumZipperSuite extends munit.DisciplineSuite {
   test("withFocus on focus") {

@@ -13,10 +13,10 @@ trait ArbIndex {
   val genIndex: Gen[Index] =
     choose[Short](1, Short.MaxValue).map(Index.fromShort.unsafeGet)
 
-  implicit val arbIndex: Arbitrary[Index] =
+  given Arbitrary[Index] =
     Arbitrary(genIndex)
 
-  implicit val cogIndex: Cogen[Index] =
+  given Cogen[Index] =
     Cogen[Short].contramap(_.toShort)
 
 }

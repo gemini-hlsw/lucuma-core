@@ -14,7 +14,7 @@ import org.scalacheck.Cogen
 import org.scalacheck.Gen.*
 
 trait ArbEnumZipper {
-  implicit def arbEnumZipper[A: Enumerated]: Arbitrary[EnumZipper[A]] =
+  given [A: Enumerated]: Arbitrary[EnumZipper[A]] =
     Arbitrary(
       for {
         z <- const(EnumZipper.of[A])
@@ -22,7 +22,7 @@ trait ArbEnumZipper {
       } yield z.withFocus(a)
     )
 
-  implicit def enumZipperCogen[A: Enumerated]: Cogen[EnumZipper[A]] =
+  given [A: Enumerated]: Cogen[EnumZipper[A]] =
     Cogen[A].contramap(_.focus)
 }
 

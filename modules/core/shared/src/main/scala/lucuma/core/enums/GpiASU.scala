@@ -36,7 +36,7 @@ object GpiASU {
     fromTag(s).getOrElse(throw new NoSuchElementException(s"GpiASU: Invalid tag: '$s'"))
 
   /** @group Typeclass Instances */
-  implicit val GpiASUEnumerated: Enumerated[GpiASU] =
+  given Enumerated[GpiASU] =
     new Enumerated[GpiASU] {
       def all = GpiASU.all
       def tag(a: GpiASU) = a.tag

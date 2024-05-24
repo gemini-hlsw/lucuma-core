@@ -42,7 +42,7 @@ object StepConfig {
   }
 
   object Gcal {
-    implicit val eqStepConfigGcal: Eq[Gcal] =
+    given Eq[Gcal] =
       Eq.by(x => (x.lamp, x.filter, x.diffuser, x.shutter))
 
     opaque type Lamp = Either[GcalContinuum, NonEmptySet[GcalArc]]
@@ -91,7 +91,7 @@ object StepConfig {
           case (_, a :: as)       => NonEmptySet.of(a, as*).asRight[GcalContinuum].asRight
         }
 
-      implicit val eqLamp: Eq[Lamp] =
+      given Eq[Lamp] =
         Eq.by { lamp => (lamp.continuum, lamp.arcs) }
 
     }
@@ -124,7 +124,7 @@ object StepConfig {
   final case class Science(offset: Offset, guiding: StepGuideState) extends StepConfig(StepType.Science)
 
   object Science {
-    implicit val eqStepConfigScience: Eq[Science] =
+    given Eq[Science] =
       Eq.by { a => (
         a.offset,
         a.guiding
@@ -143,7 +143,7 @@ object StepConfig {
 
   object SmartGcal {
 
-    implicit val EqSmartGcal: Eq[SmartGcal] =
+    given Eq[SmartGcal] =
       Eq.by(_.smartGcalType)
 
     val smartGcalType: Lens[SmartGcal, SmartGcalType] =
@@ -151,7 +151,7 @@ object StepConfig {
 
   }
 
-  implicit val eqStepConfig: Eq[StepConfig] = Eq.instance {
+  given Eq[StepConfig] = Eq.instance {
     case (Bias, Bias)                                 => true
     case (Dark, Dark)                                 => true
     case (a @ Gcal(_, _, _, _), b @ Gcal(_, _, _, _)) => a === b

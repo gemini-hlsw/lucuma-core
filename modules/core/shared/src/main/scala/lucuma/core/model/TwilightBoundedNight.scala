@@ -194,7 +194,7 @@ object TwilightBoundedNight extends TwilightBoundedNightOptics {
     fromTwilightTypeAndSiteAndInstant(twilightType, s, i).get
 
   /** @group Typeclass Instances. */
-  implicit val ShowTwilightBoundedNight: Show[TwilightBoundedNight] =
+  given Show[TwilightBoundedNight] =
     Show.fromToString
 
   /**
@@ -202,7 +202,7 @@ object TwilightBoundedNight extends TwilightBoundedNightOptics {
    *
    * @group Typeclass Instances
    */
-  implicit val OrderTwilightBoundedNight: Order[TwilightBoundedNight] =
+  given Order[TwilightBoundedNight] =
     Order.by(n => (n.toObservingNight, n.twilightType))
 
 }

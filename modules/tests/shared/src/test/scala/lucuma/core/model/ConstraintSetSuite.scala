@@ -13,8 +13,8 @@ import monocle.law.discipline.*
 import munit.*
 
 final class ConstraintSetSuite extends DisciplineSuite {
-  import ArbConstraintSet.*
-  import ArbElevationRange.*
+  import ArbConstraintSet.given
+  import ArbElevationRange.given
   import ArbEnumerated.given
   import ArbRefined.given
 

@@ -133,10 +133,10 @@ object Epoch extends EpochOptics {
     def toJulianDay(dt: LocalDateTime): Double =
       JulianDate.ofLocalDateTime(dt).dayNumber.toDouble
 
-    implicit val SchemeOrder: Order[Scheme] =
+    given Order[Scheme] =
       Order.by(s => (s.prefix, s.yearBasis, s.julianBasis, s.lengthOfYear))
 
-    implicit val SchemeShow: Show[Scheme] =
+    given Show[Scheme] =
       Show.fromToString
 
   }
