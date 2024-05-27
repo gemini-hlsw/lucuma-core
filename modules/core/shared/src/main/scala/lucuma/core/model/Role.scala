@@ -5,6 +5,7 @@ package lucuma.core.model
 
 import cats.Eq
 import cats.implicits.*
+import lucuma.core.enums.Partner
 import lucuma.core.util.WithGid
 import lucuma.refined.*
 
@@ -52,7 +53,7 @@ object StandardRole extends WithGid('r'.refined) {
    * users.
    */
   final case class Ngo(id: StandardRole.Id, partner: Partner)
-      extends StandardRole(Access.Ngo, Some(partner.name))
+      extends StandardRole(Access.Ngo, Some(partner.longName))
 
   /** The `Staff` role gives access to all programs, as well as telescope facilities. */
   final case class Staff(id: StandardRole.Id) extends StandardRole(Access.Staff)
