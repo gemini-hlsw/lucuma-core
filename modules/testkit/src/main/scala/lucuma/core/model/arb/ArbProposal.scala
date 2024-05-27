@@ -6,10 +6,10 @@ package lucuma.core.model.arb
 import cats.implicits.*
 import eu.timepit.refined.scalacheck.all.*
 import eu.timepit.refined.types.string.NonEmptyString
+import lucuma.core.enums.Partner
 import lucuma.core.enums.TacCategory
 import lucuma.core.enums.ToOActivation
 import lucuma.core.model.IntPercent
-import lucuma.core.model.Partner
 import lucuma.core.model.Proposal
 import lucuma.core.model.ProposalClass
 import lucuma.core.util.arb.ArbCollection

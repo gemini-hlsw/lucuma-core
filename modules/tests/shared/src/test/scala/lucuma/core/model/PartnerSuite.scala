@@ -3,6 +3,7 @@
 
 package lucuma.core.model
 
+import lucuma.core.enums.Partner
 import lucuma.core.util.arb.*
 import lucuma.core.util.laws.EnumeratedTests
 import munit.*
