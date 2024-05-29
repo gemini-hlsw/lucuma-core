@@ -7,8 +7,8 @@ import cats.*
 import cats.data.Validated
 import cats.syntax.all.*
 import lucuma.core.enums.Site
+import monocle.Focus
 import monocle.Iso
-import monocle.macros.GenIso
 import org.typelevel.cats.time.*
 
 import java.time.*
@@ -146,6 +146,6 @@ trait LocalObservingNightOptics {
 
   /** @group Optics */
   val localDate: Iso[LocalObservingNight, LocalDate] =
-    GenIso[LocalObservingNight, LocalDate]
+    Focus[LocalObservingNight](_.toLocalDate)
 
 }
