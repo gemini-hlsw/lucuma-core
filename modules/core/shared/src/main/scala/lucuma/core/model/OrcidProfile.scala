@@ -26,6 +26,6 @@ final case class OrcidProfile(
 }
 
 object OrcidProfile {
-  implicit val eqOrcidProfile: Eq[OrcidProfile] =
+  given Eq[OrcidProfile] =
     Eq.by(x => (x.orcidId, x.givenName, x.familyName, x.creditName, x.primaryEmail))
 }

@@ -22,7 +22,7 @@ object GmosGratingConfig {
     wavelength: Wavelength
   ) extends GmosGratingConfig
   object North {
-    implicit val eqGmosGratingNorth: Eq[North] = Eq.by(x => (x.grating, x.order, x.wavelength))
+    given Eq[North] = Eq.by(x => (x.grating, x.order, x.wavelength))
 
     /** @group Optics */
     val grating: Lens[North, GmosNorthGrating] =
@@ -43,7 +43,7 @@ object GmosGratingConfig {
     wavelength: Wavelength
   ) extends GmosGratingConfig
   object South {
-    implicit val eqGmosGratingSouth: Eq[South] = Eq.by(x => (x.grating, x.order, x.wavelength))
+    given Eq[South] = Eq.by(x => (x.grating, x.order, x.wavelength))
 
     /** @group Optics */
     val grating: Lens[South, GmosSouthGrating] =
@@ -58,7 +58,7 @@ object GmosGratingConfig {
       Focus[South](_.wavelength)
   }
 
-  implicit val eqGmosGrating: Eq[GmosGratingConfig] = Eq.instance {
+  given Eq[GmosGratingConfig] = Eq.instance {
     case (a @ North(_, _, _), b @ North(_, _, _)) => a === b
     case (a @ South(_, _, _), b @ South(_, _, _)) => a === b
     case _                                        => false

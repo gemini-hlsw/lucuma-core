@@ -12,7 +12,7 @@ import org.scalacheck.Cogen.*
 trait ArbCoordinatesDiff {
   import ArbAngle.given
 
-  implicit val arbCoordinatesDiff: Arbitrary[CoordinatesDiff] =
+  given Arbitrary[CoordinatesDiff] =
     Arbitrary {
       for {
         pa <- arbitrary[Angle]
@@ -20,7 +20,7 @@ trait ArbCoordinatesDiff {
       } yield CoordinatesDiff(pa, d)
     }
 
-  implicit val cogCoordinatesDiff: Cogen[CoordinatesDiff] =
+  given Cogen[CoordinatesDiff] =
     Cogen[(Angle, Angle)].contramap(cs => (cs.posAngle, cs.distance))
 
 }

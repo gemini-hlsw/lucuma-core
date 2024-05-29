@@ -44,7 +44,7 @@ object ElevationRange {
     val Default: AirMass         = apply(DefaultMin, DefaultMax)
 
     /** @group Typeclass Instances */
-    implicit val AirMassEq: Eq[AirMass] = Eq.by(ar => (ar.min.value, ar.max.value))
+    given Eq[AirMass] = Eq.by(ar => (ar.min.value, ar.max.value))
 
     /** @group Optics */
     val min = Focus[AirMass](_.min)
@@ -88,7 +88,7 @@ object ElevationRange {
     val Default = HourAngle(DefaultMin, DefaultMax)
 
     /** @group Typeclass Instances */
-    implicit val HourAngleEq: Eq[HourAngle] =
+    given Eq[HourAngle] =
       Eq.by(hr => (hr.minHours.value, hr.maxHours.value))
 
     /** @group Optics */
@@ -117,7 +117,7 @@ object ElevationRange {
   }
 
   /** @group Typeclass Instances */
-  implicit val ElevationRangeEq: Eq[ElevationRange] = Eq.fromUniversalEquals
+  given Eq[ElevationRange] = Eq.fromUniversalEquals
 
   /** @group Optics */
   val airMass: Prism[ElevationRange, AirMass] =

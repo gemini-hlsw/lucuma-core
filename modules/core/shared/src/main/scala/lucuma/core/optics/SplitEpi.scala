@@ -76,7 +76,7 @@ final case class SplitEpi[A, B](get: A => B, reverseGet: B => A) {
     reverseGet(get(a))
 
   /** If we can reverseGet a Product as a String we can implement a tagged toString like "Foo(stuff)". */
-  def productToString(b: B)(implicit
+  def productToString(b: B)(using
     as:                  A =:= String,
     bp:                  B <:< Product
   ): String =
@@ -86,7 +86,7 @@ final case class SplitEpi[A, B](get: A => B, reverseGet: B => A) {
    * If we provide a tag like "Foo" and reverseGet as a String we can implement a nice toString like
    * "Foo(stuff)".
    */
-  def taggedToString(tag: String, b: B)(implicit
+  def taggedToString(tag: String, b: B)(using
     as:                   A =:= String
   ): String =
     new StringBuilder(tag)
@@ -104,7 +104,7 @@ object SplitEpi {
     SplitEpi(p.get, p.reverseGet)
 
   /** SplitEpi forms a category. */
-  implicit def SplitEpiCategory: Category[SplitEpi] =
+  given Category[SplitEpi] =
     new Category[SplitEpi] {
       def id[A]: SplitEpi[A, A] = SplitEpi(identity, identity)
       def compose[A, B, C](f: SplitEpi[B, C], g: SplitEpi[A, B]): SplitEpi[A, C] = g.andThen(f)

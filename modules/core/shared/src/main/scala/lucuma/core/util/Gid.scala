@@ -113,7 +113,7 @@ final class Gid[A](
     fromString.reverseGet(a)
 
   // Display
-  final override def shortName(a: A): String = 
+  final override def shortName(a: A): String =
     fromString.reverseGet(a)
 
   // Decoder
@@ -128,7 +128,7 @@ final class Gid[A](
 }
 
 object Gid {
-  def apply[A](implicit ev: Gid[A]): ev.type = ev
+  def apply[A](using ev: Gid[A]): ev.type = ev
 
   def instance[A](tag: Char Refined Letter, toLong: A => PosLong, fromLong: PosLong => A): Gid[A] =
     new Gid[A](tag, Iso(toLong)(fromLong))
@@ -148,7 +148,7 @@ class WithGid(idTag: Char Refined Letter) {
   object Id {
 
     /** @group Typeclass Instances */
-    implicit val GidId: Gid[Id] = Gid.instance(idTag, _.value, apply)
+    given GidId: Gid[Id] = Gid.instance(idTag, _.value, apply)
 
     /** Convenience method to construct from a Long */
     def fromLong(l: Long): Option[Id] = GidId.fromLong.getOption(l)

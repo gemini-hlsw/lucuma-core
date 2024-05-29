@@ -44,11 +44,11 @@ object EphemerisCoordinates extends EphemerisCoordinatesOptics {
     EphemerisCoordinates(Coordinates.Zero, Offset.Zero)
 
   /** @group Typeclass Instances */
-  implicit val EphemerisCoordinatesEqual: Eq[EphemerisCoordinates] =
+  given Eq[EphemerisCoordinates] =
     Eq.fromUniversalEquals
 
   /** @group Typeclass Instances */
-  implicit val ShowEphemerisCoordinates: Show[EphemerisCoordinates] =
+  given Show[EphemerisCoordinates] =
     Show.fromToString
 
 }

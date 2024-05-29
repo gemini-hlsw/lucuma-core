@@ -48,10 +48,10 @@ final case class SkyCalcResults protected[skycalc] (
 object SkyCalcResults {
 
   /** @group Typeclass Instances */
-  implicit val SkyCalcResultsEqual: Eq[SkyCalcResults] = Eq.fromUniversalEquals
+  given Eq[SkyCalcResults] = Eq.fromUniversalEquals
 
   /** @group Typeclass Instances */
-  implicit val SkyCalcResultsShow: Show[SkyCalcResults] = Show.fromToString
+  given SkyCalcResultsShow: Show[SkyCalcResults] = Show.fromToString
 
   /** @group Optics */
   val altitude: Getter[SkyCalcResults, Declination] =

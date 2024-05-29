@@ -93,7 +93,7 @@ object ObservingNight extends ObservingNightOptics {
     ObservingNight(s, LocalObservingNight.fromSiteAndInstant(s, i))
 
   /** @group Typeclass Instances. */
-  implicit val ShowObservingNight: Show[ObservingNight] =
+  given Show[ObservingNight] =
     Show.fromToString
 
   /**
@@ -101,7 +101,7 @@ object ObservingNight extends ObservingNightOptics {
    *
    * @group Typeclass Instances
    */
-  implicit val OrderObservingNight: Order[ObservingNight] =
+  given Order[ObservingNight] =
     Order.by(n => (n.site, n.toLocalObservingNight))
 
 }

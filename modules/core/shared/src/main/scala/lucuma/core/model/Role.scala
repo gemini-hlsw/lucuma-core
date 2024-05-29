@@ -18,7 +18,7 @@ sealed abstract class Role(val access: Access, elaboration: Option[String] = Non
 }
 
 object Role {
-  implicit val eqRole: Eq[Role] = Eq.instance {
+  given Eq[Role] = Eq.instance {
     case (GuestRole, GuestRole)             => true
     case (a: ServiceRole, b: ServiceRole)   => a === b
     case (a: StandardRole, b: StandardRole) => a === b
@@ -35,7 +35,7 @@ case object GuestRole extends Role(Access.Guest)
 case class ServiceRole(serviceName: String) extends Role(Access.Service, Some(serviceName))
 
 object ServiceRole {
-  implicit val eqServiceRole: Eq[ServiceRole] = Eq.by(_.serviceName)
+  given Eq[ServiceRole] = Eq.by(_.serviceName)
 }
 
 /** The class of roles taken on by authenticated users. */
@@ -61,7 +61,7 @@ object StandardRole extends WithGid('r'.refined) {
   /** The `Admin` role is a superuser role that allows access to all functionality. */
   final case class Admin(id: StandardRole.Id) extends StandardRole(Access.Admin)
 
-  implicit val eqStandardRole: Eq[StandardRole] = Eq.instance {
+  given Eq[StandardRole] = Eq.instance {
     case (Pi(a), Pi(b))         => a === b
     case (Ngo(a, b), Ngo(c, d)) => a === c && b === d
     case (Staff(a), Staff(b))   => a === b

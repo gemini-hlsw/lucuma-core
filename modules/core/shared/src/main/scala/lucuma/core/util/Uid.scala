@@ -78,7 +78,7 @@ final class Uid[A](
  * Defines `<Entity>.Id` class, its `Gid` instance, and convenience methods.
  */
 object Uid {
-  def apply[A](implicit ev: Uid[A]): ev.type = ev
+  def apply[A](using ev: Uid[A]): ev.type = ev
 
   def instance[A](tag: Char Refined Letter, toUuid: A => UUID, fromUuid: UUID => A): Uid[A] =
     new Uid[A](tag, Iso(toUuid)(fromUuid))
@@ -93,7 +93,7 @@ class WithUid(idTag: Char Refined Letter) {
   }
 
   object Id {
-    implicit val UidId: Uid[Id] =
+    given UidId: Uid[Id] =
       Uid.instance(idTag, _.toUuid, apply)
 
     def fromUuid(u: UUID): Id =

@@ -14,7 +14,10 @@ import scala.collection.immutable.TreeSet
 
 trait TreeSetInstances extends TreeSetInstances1 {
 
-  implicit val catsStdInstancesForTreeSet: Foldable[TreeSet] & SemigroupK[TreeSet] =
+  // For some reason this type can't be inlined
+  private type TreeSetInstancesType = Foldable[TreeSet] & SemigroupK[TreeSet]
+
+  given TreeSetInstancesType =
     new Foldable[TreeSet] with SemigroupK[TreeSet] {
 
       def combineK[A](x: TreeSet[A], y: TreeSet[A]): TreeSet[A] = x | y
@@ -25,7 +28,7 @@ trait TreeSetInstances extends TreeSetInstances1 {
       def foldRight[A, B](fa: TreeSet[A], lb: Eval[B])(f: (A, Eval[B]) => Eval[B]): Eval[B] =
         Foldable.iterateRight(fa, lb)(f)
 
-      override def foldMap[A, B](fa: TreeSet[A])(f: A => B)(implicit B: Monoid[B]): B =
+      override def foldMap[A, B](fa: TreeSet[A])(f: A => B)(using B: Monoid[B]): B =
         B.combineAll(fa.iterator.map(f))
 
       override def get[A](fa: TreeSet[A])(idx: Long): Option[A] = {
@@ -51,7 +54,7 @@ trait TreeSetInstances extends TreeSetInstances1 {
 
       override def isEmpty[A](fa: TreeSet[A]): Boolean = fa.isEmpty
 
-      override def fold[A](fa: TreeSet[A])(implicit A: Monoid[A]): A = A.combineAll(fa)
+      override def fold[A](fa: TreeSet[A])(using A: Monoid[A]): A = A.combineAll(fa)
 
       override def toList[A](fa: TreeSet[A]): List[A] = fa.toList
 
@@ -67,21 +70,21 @@ trait TreeSetInstances extends TreeSetInstances1 {
         fa.collectFirst(Function.unlift(f))
     }
 
-  implicit def catsStdShowForTreeSet[A: Show]: Show[TreeSet[A]] =
+  given [A: Show]: Show[TreeSet[A]] =
     new Show[TreeSet[A]] {
       def show(fa: TreeSet[A]): String =
         fa.iterator.map(_.show).mkString("TreeSet(", ", ", ")")
     }
 
-  implicit def catsKernelStdOrderForTreeSet[A: Order]: Order[TreeSet[A]] =
+  given [A: Order]: Order[TreeSet[A]] =
     new TreeSetOrder[A]
 }
 
 trait TreeSetInstances1 {
-  implicit def catsKernelStdHashForTreeSet[A: Order: Hash]: Hash[TreeSet[A]] =
+  given [A: Order: Hash]: Hash[TreeSet[A]] =
     new TreeSetHash[A]
 
-  implicit def catsKernelStdSemilatticeForTreeSet[A: Order]: BoundedSemilattice[TreeSet[A]] =
+  given [A: Order]: BoundedSemilattice[TreeSet[A]] =
     new TreeSetSemilattice[A]
 }
 
@@ -124,7 +127,7 @@ class TreeSetHash[A: Order: Hash] extends Hash[TreeSet[A]] {
 }
 
 class TreeSetSemilattice[A: Order] extends BoundedSemilattice[TreeSet[A]] {
-  def empty: TreeSet[A] = TreeSet.empty(implicitly[Order[A]].toOrdering)
+  def empty: TreeSet[A] = TreeSet.empty(summon[Order[A]].toOrdering)
   def combine(x: TreeSet[A], y: TreeSet[A]): TreeSet[A] = x | y
 }
 

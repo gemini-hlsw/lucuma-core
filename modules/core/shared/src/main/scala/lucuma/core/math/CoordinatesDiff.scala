@@ -19,6 +19,6 @@ final case class CoordinatesDiff(posAngle: Angle, distance: Angle) {
 }
 
 object CoordinatesDiff {
-  implicit val eqCoordinatesDiff: Eq[CoordinatesDiff] =
+  given Eq[CoordinatesDiff] =
     Eq.by(x => (x.posAngle, x.distance))
 }

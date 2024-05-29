@@ -82,11 +82,11 @@ object RadialVelocity {
   val Zero: RadialVelocity = new RadialVelocity(0.withUnit[MetersPerSecond])
 
   /** @group Typeclass Instances */
-  implicit val orderRadialVelocity: Order[RadialVelocity] =
+  given Order[RadialVelocity] =
     Order.by(_.rv)
 
   /** @group Typeclass Instances */
-  implicit val showRadialVelocity: Show[RadialVelocity] =
+  given Show[RadialVelocity] =
     Show.fromToString
 
 }

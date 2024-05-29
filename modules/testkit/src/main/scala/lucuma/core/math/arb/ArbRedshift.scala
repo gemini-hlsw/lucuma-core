@@ -10,14 +10,14 @@ import org.scalacheck.Gen
 
 trait ArbRedshift {
 
-  implicit val arbRedshift: Arbitrary[Redshift] =
+  given Arbitrary[Redshift] =
     Arbitrary {
       for {
         rs <- Gen.chooseNum(-10.0, 10.0)
       } yield Redshift(rs)
     }
 
-  implicit val cogRedshift: Cogen[Redshift] =
+  given Cogen[Redshift] =
     Cogen[BigDecimal].contramap(_.z)
 }
 

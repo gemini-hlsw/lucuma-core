@@ -58,11 +58,11 @@ object ApparentRadialVelocity {
     )
 
   /** @group Typeclass Instances */
-  implicit val order: Order[ApparentRadialVelocity] =
+  given Order[ApparentRadialVelocity] =
     Order.by(_.cz)
 
   /** @group Typeclass Instances */
-  implicit val showRadialVelocity: Show[ApparentRadialVelocity] =
+  given Show[ApparentRadialVelocity] =
     Show.fromToString
 
 }

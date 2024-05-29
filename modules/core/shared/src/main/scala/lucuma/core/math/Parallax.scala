@@ -54,7 +54,7 @@ object Parallax extends ParallaxOptics {
     new Parallax(μas) {}
 
   /** @group Typeclass Instances */
-  implicit val orderParallax: Order[Parallax] =
+  given Order[Parallax] =
     Order.by(_.μas)
 
   /**

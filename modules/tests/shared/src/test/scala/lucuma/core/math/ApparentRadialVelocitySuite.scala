@@ -19,7 +19,7 @@ import org.scalacheck.Prop.*
 import java.math.MathContext
 
 final class ApparentRadialVelocitySuite extends munit.DisciplineSuite {
-  import ArbApparentRadialVelocity._
+  import ArbApparentRadialVelocity.given
 
   // Laws
   checkAll("ApparentRadialVelocity", EqTests[ApparentRadialVelocity].eqv)

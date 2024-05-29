@@ -7,16 +7,16 @@ import org.scalacheck.Cogen
 import spire.math.*
 
 trait CogenSpire {
-  implicit val safeLongCogen: Cogen[SafeLong] =
+  given Cogen[SafeLong] =
     Cogen[BigInt].contramap(_.toBigInt)
 
-  implicit val rationalCogen: Cogen[Rational] =
+  given Cogen[Rational] =
     Cogen[(SafeLong, SafeLong)].contramap(r => (r.numerator, r.denominator))
 
-  implicit val naturalCogen: Cogen[Natural] =
+  given Cogen[Natural] =
     Cogen[BigInt].contramap(_.toBigInt)
 
-  implicit val numberCogen: Cogen[Number] =
+  given Cogen[Number] =
     Cogen((s, n) =>
       if (n.isExact)
         Cogen[Rational].contramap[Number](_.toRational).perturb(s, n)

@@ -20,7 +20,7 @@ final case class GmosNodAndShuffle(
 )
 
 object GmosNodAndShuffle {
-  implicit val eqGmosNodAndShuffle: Eq[GmosNodAndShuffle] =
+  given Eq[GmosNodAndShuffle] =
     Eq.by(x => (x.posA, x.posB, x.eOffset, x.shuffleOffset, x.shuffleCycles))
 
   /** @group Optics */

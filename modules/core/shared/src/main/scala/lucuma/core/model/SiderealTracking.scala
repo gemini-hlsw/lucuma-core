@@ -66,9 +66,9 @@ final case class SiderealTracking(
         elapsedYears
       )
 
-  def isConstant: Boolean = 
-    properMotion.forall(_ === ProperMotion.Zero) && 
-      radialVelocity.forall(_ === RadialVelocity.Zero) && 
+  def isConstant: Boolean =
+    properMotion.forall(_ === ProperMotion.Zero) &&
+      radialVelocity.forall(_ === RadialVelocity.Zero) &&
       parallax.forall(_ === Parallax.Zero)
 }
 
@@ -207,9 +207,9 @@ object SiderealTracking extends SiderealTrackingOptics {
     } else none
   }
 
-  implicit val OrderSiderealTracking: Order[SiderealTracking] = {
+  given Order[SiderealTracking] = {
 
-    implicit val MonoidOrder: Monoid[Order[SiderealTracking]] =
+    given Monoid[Order[SiderealTracking]] =
       Order.whenEqualMonoid[SiderealTracking]
 
     def order[A: Order](f: SiderealTracking => A): Order[SiderealTracking] =

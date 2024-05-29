@@ -13,7 +13,7 @@ import monocle.law.discipline.*
 import munit.*
 
 final class ElevationRangeSuite extends DisciplineSuite {
-  import ArbElevationRange.*
+  import ArbElevationRange.given
   import ArbRefined.given
 
   // Laws

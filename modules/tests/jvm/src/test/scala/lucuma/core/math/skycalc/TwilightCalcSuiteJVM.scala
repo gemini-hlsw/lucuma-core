@@ -3,7 +3,6 @@
 
 package lucuma.core.math.skycalc
 
-import cats.*
 import edu.gemini.skycalc.TwilightBoundedNightTest
 import lucuma.core.arb.ArbTime
 import lucuma.core.enums.Site
@@ -12,15 +11,11 @@ import lucuma.core.util.arb.ArbEnumerated
 import munit.ScalaCheckSuite
 import org.scalacheck.Prop.*
 
-import java.time.Instant
 import java.time.LocalDate
 
 final class TwilightCalcSuiteJVM extends ScalaCheckSuite {
   import ArbEnumerated.given
   import ArbTime.given
-
-  implicit val showLocalDate: Show[LocalDate] = Show.fromToString
-  implicit val InstantEq: Eq[Instant]         = Eq.fromUniversalEquals
 
   test("TwilightCalcSpec: Arbitrary sky calculations") {
     // TwilightCalc returns sunrise before sunset in some cases if we use arbitrary Place.

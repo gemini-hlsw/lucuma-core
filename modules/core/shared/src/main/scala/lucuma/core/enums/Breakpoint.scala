@@ -11,7 +11,7 @@ object Breakpoint {
   /** @group Constructors */ case object Enabled extends Breakpoint("enabled")
   /** @group Constructors */ case object Disabled extends Breakpoint("disabled")
 
-  implicit val BreakpointEnumerated: Enumerated[Breakpoint] =
+  given Enumerated[Breakpoint] =
     Enumerated.from(Enabled, Disabled).withTag(_.tag)
 
 }

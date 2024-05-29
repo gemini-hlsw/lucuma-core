@@ -24,7 +24,7 @@ sealed trait User extends Product with Serializable {
   /** Verity that this user has access greater than or equal to `access`. */
   final def verifyAccess[F[_]](
     access:      Access
-  )(implicit ev: ApplicativeError[F, Throwable]): F[Unit] =
+  )(using ev: ApplicativeError[F, Throwable]): F[Unit] =
     ev.raiseError(
       AccessControlException(displayName, id, role, access)
     ).whenA(role.access < access)
@@ -32,7 +32,7 @@ sealed trait User extends Product with Serializable {
 }
 
 object User extends WithGid('u'.refined) {
-  implicit val eqUser: Eq[User] = Eq.instance {
+  given Eq[User] = Eq.instance {
     case (a: GuestUser, b: GuestUser)       => a === b
     case (a: ServiceUser, b: ServiceUser)   => a === b
     case (a: StandardUser, b: StandardUser) => a === b
@@ -48,7 +48,7 @@ final case class GuestUser(id: User.Id) extends User {
 }
 
 object GuestUser {
-  implicit val eqGuestUser: Eq[GuestUser] = Eq.by(_.id)
+  given Eq[GuestUser] = Eq.by(_.id)
 }
 
 /** Service users have the strongest `Role` and represent services themselves. */
@@ -58,7 +58,7 @@ final case class ServiceUser(id: User.Id, name: String) extends User {
 }
 
 object ServiceUser {
-  implicit val eqServiceUser: Eq[ServiceUser] = Eq.by(x => (x.id, x.name))
+  given Eq[ServiceUser] = Eq.by(x => (x.id, x.name))
 }
 
 /**
@@ -75,6 +75,6 @@ final case class StandardUser(
 }
 
 object StandardUser {
-  implicit val eqStandardUser: Eq[StandardUser] =
+  given Eq[StandardUser] =
     Eq.by(x => (x.id, x.role, x.otherRoles, x.profile))
 }

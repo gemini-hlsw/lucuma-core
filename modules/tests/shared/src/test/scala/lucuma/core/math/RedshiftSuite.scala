@@ -18,7 +18,7 @@ import org.scalacheck.Prop.*
 import java.math.MathContext
 
 final class RedshiftSuite extends munit.DisciplineSuite {
-  import ArbRedshift._
+  import ArbRedshift.given
 
   // Laws
   checkAll("Redshift", EqTests[Redshift].eqv)

@@ -15,7 +15,7 @@ trait Display[A] {
 }
 
 object Display {
-  def apply[A](implicit ev: Display[A]): ev.type = ev
+  def apply[A](using ev: Display[A]): ev.type = ev
 
   /**
    * Create an instance of `Display` using the provided functions.
@@ -43,7 +43,7 @@ object Display {
       def shortName(a: A) = toShortName(a)
     }
 
-  implicit val contravariantDisplay: Contravariant[Display] = new Contravariant[Display] {
+  given Contravariant[Display] = new Contravariant[Display] {
     def contramap[A, B](fa: Display[A])(f: B => A): Display[B] =
       new Display[B] {
         def shortName(b: B)         = fa.shortName(f(b))

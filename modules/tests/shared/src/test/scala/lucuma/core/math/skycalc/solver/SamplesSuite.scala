@@ -12,6 +12,7 @@ import cats.syntax.all.*
 import lucuma.core.arb.*
 import lucuma.core.arb.ArbEval
 import lucuma.core.arb.ArbTime
+import lucuma.core.arb.given
 import lucuma.core.math.BoundedInterval
 import lucuma.core.math.IntervalGens
 import lucuma.core.math.arb.*
@@ -39,7 +40,7 @@ final class SamplesSuite extends munit.DisciplineSuite with IntervalGens {
   checkAll("MonoidK", MonoidKTests[Samples].monoidK[Int])
 
   // The explicit cast to Map seems to be needed for implicit resolution.
-  implicit def treeMapEq[K, V: Eq]: Eq[TreeMap[K, V]] = Eq.by(_.toMap)
+  given [K, V: Eq]: Eq[TreeMap[K, V]] = Eq.by(_.toMap)
 
   // Optics
   checkAll("data", IsoTests(Samples.data[Int]))

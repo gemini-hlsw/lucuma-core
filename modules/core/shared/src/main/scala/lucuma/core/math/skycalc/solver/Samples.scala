@@ -85,7 +85,7 @@ trait Samples[A] { outer =>
   }
 
   /** Compute the value at `i`, using round strategy `R`. */
-  def valueAt[R](i: Instant)(implicit rounder: SampleRounder[R, A]): Option[A] =
+  def valueAt[R](i: Instant)(using rounder: SampleRounder[R, A]): Option[A] =
     bracket(i) match {
       // Simple cases, no decisions to make.
       case Bracket(_, Some((_, a)), _)                                 => a.value.some // Exact match
@@ -182,14 +182,14 @@ object Samples extends SamplesOptics {
   /**
    * @group Typeclass Instances
    */
-  implicit def eqSamples[A: Eq]: Eq[Samples[A]] =
+  given [A: Eq]: Eq[Samples[A]] =
     Eq.by(_.toMap.toMap)
 
   /**
    * Samples is a covariant functor.
    * @group Typeclass Instances
    */
-  implicit val FunctorSamples: Functor[Samples] =
+  given Functor[Samples] =
     new Functor[Samples] {
       def map[A, B](fa: Samples[A])(f: A => B) = fa.map(f)
     }
@@ -198,30 +198,29 @@ object Samples extends SamplesOptics {
    * `Samples` is a `MonoidK`.
    * @group Typeclass Instances
    */
-  implicit val MonoidKSamples: MonoidK[Samples] =
+  given MonoidK[Samples] =
     new MonoidK[Samples] {
       def combineK[A](x: Samples[A], y: Samples[A]) = x ++ y
       def empty[A] = Samples.empty
     }
 
   /** Convenience syntax for sampled `Coordinates`. */
-  implicit class CoordinateSamplesSyntax(self: Samples[Coordinates]) {
+  extension(self: Samples[Coordinates])
 
     /** Compute skycalc results at each instant. */
     def toSkyCalResultsAt(place: Place): Samples[SkyCalcResults] = {
       val skycalc = ImprovedSkyCalc(place)
       self.mapWithKeys { case (i, cs) => skycalc.calculate(cs, i, true) }
     }
-  }
 
   /** Convenience syntax for sampled `SkyCalcResults`. */
-  implicit class SkyCalcResultsSamplesSyntax(self: Samples[SkyCalcResults]) {
+  extension(self: Samples[SkyCalcResults])
 
     /**
      * Compute the weighted mean parallactic angle over this `Samples`, if the target is visible for
      * at least one sample.
      */
-    lazy val weightedMeanParallacticAngle: Eval[Option[Double]] =
+    def weightedMeanParallacticAngle: Eval[Option[Double]] =
       self
         .map { r =>
           val angle   = r.parallacticAngleRaw
@@ -251,7 +250,6 @@ object Samples extends SamplesOptics {
           if (weightedSum == 0) None
           else Some(weightedAngles.sum / weightedSum)
         }
-  }
 
 }
 

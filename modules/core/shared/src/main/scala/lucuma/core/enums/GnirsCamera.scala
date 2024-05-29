@@ -38,7 +38,7 @@ object GnirsCamera {
     fromTag(s).getOrElse(throw new NoSuchElementException(s"GnirsCamera: Invalid tag: '$s'"))
 
   /** @group Typeclass Instances */
-  implicit val GnirsCameraEnumerated: Enumerated[GnirsCamera] =
+  given Enumerated[GnirsCamera] =
     new Enumerated[GnirsCamera] {
       def all = GnirsCamera.all
       def tag(a: GnirsCamera) = a.tag

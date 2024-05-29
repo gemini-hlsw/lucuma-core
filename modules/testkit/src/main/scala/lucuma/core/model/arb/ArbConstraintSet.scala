@@ -14,9 +14,9 @@ import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Cogen.*
 
 trait ArbConstraintSet {
-  import ArbElevationRange.*
+  import ArbElevationRange.given
 
-  implicit val arbConstraintSet: Arbitrary[ConstraintSet] =
+  given Arbitrary[ConstraintSet] =
     Arbitrary {
       for {
         iq <- arbitrary[ImageQuality]
@@ -27,7 +27,7 @@ trait ArbConstraintSet {
       } yield ConstraintSet(iq, ce, sb, wv, er)
     }
 
-  implicit val cogConstraintSet: Cogen[ConstraintSet] =
+  given Cogen[ConstraintSet] =
     Cogen[(ImageQuality, CloudExtinction, SkyBackground, WaterVapor, ElevationRange)]
       .contramap(c => (c.imageQuality, c.cloudExtinction, c.skyBackground, c.waterVapor, c.elevationRange))
 }

@@ -16,13 +16,13 @@ object Index extends IndexOptics {
   val One: Index =
     fromShort.unsafeGet(1)
 
-  implicit val OrderIndex: Order[Index] =
+  given Order[Index] =
     Order.by(_.toShort)
 
-  implicit val OrderingIndex: scala.math.Ordering[Index] =
-    OrderIndex.toOrdering
+  given scala.math.Ordering[Index] =
+    summon[Order[Index]].toOrdering
 
-  implicit val showIndex: Show[Index] =
+  given Show[Index] =
     Show.fromToString
 
 }
