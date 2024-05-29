@@ -6,7 +6,7 @@ ThisBuild / tlCiReleaseBranches += "topic/scala3"
 
 Global / concurrentRestrictions += Tags.limit(Tags.Compile, 1)
 
-ThisBuild / crossScalaVersions := Seq("3.4.1")
+ThisBuild / crossScalaVersions := Seq("3.4.2")
 ThisBuild / scalacOptions += "-language:implicitConversions" // TODO
 
 lazy val catsVersion           = "2.12.0"
@@ -102,8 +102,8 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform)
   .settings(
     name := "lucuma-core-tests",
     libraryDependencies ++= Seq(
-      "org.scalameta" %%% "munit"            % "0.7.29" % Test,
-      "org.typelevel" %%% "discipline-munit" % "1.0.9"  % Test
+      "org.scalameta" %%% "munit"            % "1.0.0" % Test,
+      "org.typelevel" %%% "discipline-munit" % "2.0.0"  % Test
     ),
     testFrameworks += MUnitFramework,
     testOptions += MUnitFlakyOK

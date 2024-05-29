@@ -3,6 +3,7 @@
 
 package lucuma.core.geom
 
+import cats.Order
 import cats.syntax.all.*
 import lucuma.core.geom.ShapeExpression.*
 import lucuma.core.geom.arb.*
@@ -18,12 +19,9 @@ import org.scalacheck.*
 import org.scalacheck.Arbitrary.*
 import org.scalacheck.Prop.*
 
-final class ShapeExpressionSuite extends munit.DisciplineSuite {
+class ShapeExpressionSuite extends munit.DisciplineSuite {
 
-  // Override to remove implicit modifier
-  override def unitToProp = super.unitToProp
-  // Scala 3 likes this better
-  implicit def saneUnitToProp(unit: Unit): Prop = unitToProp(unit)
+  implicit def saneUnitToProp(unit: Unit): Prop = super.unitToProp(unit)
 
   import ArbAngle.given
   import ArbOffset.given
@@ -49,7 +47,7 @@ final class ShapeExpressionSuite extends munit.DisciplineSuite {
   }
 
   test("max side of the bounding box is bigger than for each shape") {
-    implicit val order = Angle.SignedAngleOrder
+    given Order[Angle] = Angle.SignedAngleOrder
     forAll(genTwoCenteredShapes) { case shapes =>
       assert(
         (shapes.shape0 ∪ shapes.shape1).maxSide >= shapes.shape0.maxSide
