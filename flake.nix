@@ -16,7 +16,7 @@
         };
         pkgs = import nixpkgs {
           inherit system;
-          overlays = [ typelevel-nix.overlay scala-cli-overlay];
+          overlays = [ typelevel-nix.overlays.default scala-cli-overlay];
         };
       in
       {
