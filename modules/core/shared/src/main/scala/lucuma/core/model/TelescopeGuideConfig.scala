@@ -14,7 +14,7 @@ case class TelescopeGuideConfig(
   mountGuide:  MountGuideOption,
   m1Guide:     M1GuideConfig,
   m2Guide:     M2GuideConfig,
-  dayTimeMode: Option[ Boolean ],
+  dayTimeMode: Option[Boolean], // This should not be an Option but we make it optional for backward compatibility with TCC
   probeGuide:  Option[ProbeGuide]
 ) derives Eq
 
