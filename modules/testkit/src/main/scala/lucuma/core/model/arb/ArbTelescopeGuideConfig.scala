@@ -27,13 +27,13 @@ trait ArbTelescopeGuideConfig {
         mo <- arbitrary[MountGuideOption]
         m1 <- arbitrary[M1GuideConfig]
         m2 <- arbitrary[M2GuideConfig]
-        m  <- arbitrary[Boolean]
+        m  <- arbitrary[Option[Boolean]]
         pg <- arbitrary[Option[ProbeGuide]]
       } yield TelescopeGuideConfig(mo, m1, m2, m, pg)
     }
 
   given Cogen[TelescopeGuideConfig] =
-    Cogen[(Boolean, M1GuideConfig, M2GuideConfig, Boolean, Option[ProbeGuide])]
+    Cogen[(Boolean, M1GuideConfig, M2GuideConfig, Option[Boolean], Option[ProbeGuide])]
       .contramap(x => (x.mountGuide.value, x.m1Guide, x.m2Guide, x.dayTimeMode, x.probeGuide))
 }
 

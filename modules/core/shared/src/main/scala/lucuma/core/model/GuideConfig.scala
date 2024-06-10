@@ -59,7 +59,7 @@ object GuideConfig {
         MountGuideOption.MountGuideOff,
         M1GuideOff,
         M2GuideOff,
-        false,
+        None,
         None),
       None,
     )
@@ -230,7 +230,7 @@ object GuideConfig {
   given Encoder[ProbeGuide] = Encoder.forProduct2("from", "to")(x => (x.from, x.to))
 
   given Decoder[TelescopeGuideConfig] =
-    Decoder.forProduct5[TelescopeGuideConfig, MountGuideOption, M1GuideConfig, M2GuideConfig, Boolean, Option[ProbeGuide]](
+    Decoder.forProduct5[TelescopeGuideConfig, MountGuideOption, M1GuideConfig, M2GuideConfig, Option[Boolean], Option[ProbeGuide]](
       "mountGuideOn",
       "m1Guide",
       "m2Guide",

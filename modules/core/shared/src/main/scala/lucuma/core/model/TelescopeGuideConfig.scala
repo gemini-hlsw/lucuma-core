@@ -14,7 +14,7 @@ case class TelescopeGuideConfig(
   mountGuide:  MountGuideOption,
   m1Guide:     M1GuideConfig,
   m2Guide:     M2GuideConfig,
-  dayTimeMode: Boolean,
+  dayTimeMode: Option[ Boolean ],
   probeGuide:  Option[ProbeGuide]
 ) derives Eq
 
@@ -28,7 +28,7 @@ object TelescopeGuideConfig {
   val m2Guide: Lens[TelescopeGuideConfig, M2GuideConfig] =
     Focus[TelescopeGuideConfig](_.m2Guide)
 
-  val dayTimeMode: Lens[TelescopeGuideConfig, Boolean] =
+  val dayTimeMode: Lens[TelescopeGuideConfig, Option[Boolean]] =
     Focus[TelescopeGuideConfig](_.dayTimeMode)
 
   val probeGuide: Lens[TelescopeGuideConfig, Option[ProbeGuide]] =
