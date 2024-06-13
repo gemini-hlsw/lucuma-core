@@ -3,14 +3,16 @@
 
 package lucuma.core.model
 
+import cats.Eq
 import cats.data.NonEmptyChain
+import cats.derived.*
 import io.circe.Codec
 import lucuma.core.enums.ObservationValidationCode
 
 case class ObservationValidation(
   code: ObservationValidationCode,
   messages: NonEmptyChain[String]
-) derives Codec
+) derives Codec, Eq
 
 object ObservationValidation:
   def fromMsgs(code: ObservationValidationCode, msg: String, moreMsgs: String*): ObservationValidation =
