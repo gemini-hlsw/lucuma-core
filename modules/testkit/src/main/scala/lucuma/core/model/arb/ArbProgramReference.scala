@@ -67,6 +67,9 @@ trait ArbProgramReference extends ArbReference {
   val engineeringStrings: Gen[String] =
     referenceStrings[Engineering](_.label)
 
+  val calibrationLibraryStrings: Gen[String] =
+    referenceStrings[System](_.label)
+
   given Arbitrary[Example] =
     Arbitrary {
       arbitrary[Instrument].map(Example.apply)
@@ -107,6 +110,12 @@ trait ArbProgramReference extends ArbReference {
   given Cogen[Monitoring] =
     cogSemesterlyInstrument[Monitoring]
 
+  given Arbitrary[System] =
+    Arbitrary(arbitrary[Description].map(System(_)))
+
+  given Cogen[System] =
+    Cogen[Description].contramap(_.description)
+
   val monitoringStrings: Gen[String] =
     referenceStrings[Monitoring](_.label)
 
@@ -136,7 +145,8 @@ trait ArbProgramReference extends ArbReference {
         arbitrary[Example],
         arbitrary[Library],
         arbitrary[Monitoring],
-        arbitrary[Science]
+        arbitrary[Science],
+        arbitrary[System]
       )
     }
 

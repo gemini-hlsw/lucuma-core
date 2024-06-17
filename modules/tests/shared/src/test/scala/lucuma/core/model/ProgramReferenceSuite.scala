@@ -21,6 +21,7 @@ final class ProgramReferenceSuite extends munit.DisciplineSuite {
   checkAll("Example.fromString",     PrismTests(Example.fromString))
   checkAll("Library.fromString",     PrismTests(Library.fromString))
   checkAll("Science.fromString",     FormatTests(Science.fromString).formatWith(scienceStrings))
+  checkAll("System.fromString",      PrismTests(System.fromString))
 
-  checkAll("ProgramReference", FormatTests(ProgramReference.fromString).formatWith(programReferenceStrings))
+  checkAll("ProgramReference",       FormatTests(ProgramReference.fromString).formatWith(programReferenceStrings))
 }
