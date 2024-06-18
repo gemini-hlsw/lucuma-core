@@ -18,6 +18,7 @@ enum ProgramType(val tag: String, val abbreviation: String) derives Enumerated:
   case Library       extends ProgramType("library",       "LIB")
   case Monitoring    extends ProgramType("monitoring",    "MON")
   case Science       extends ProgramType("science",       "SCI")
+  case System        extends ProgramType("system",        "SYS")
 
 object ProgramType {
 

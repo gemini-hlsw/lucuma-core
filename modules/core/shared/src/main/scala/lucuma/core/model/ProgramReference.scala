@@ -176,6 +176,23 @@ object ProgramReference {
       Format(s => parse.program.parseAll(s).toOption, _.label)
   }
 
+  case class System(description: Description) extends ProgramReference {
+    override def programType: ProgramType = ProgramType.System
+
+    override def label: String =
+      s"${programType.abbreviation}-${description.value}"
+  }
+
+  object System {
+
+    given Order[System] =
+      Order.by(_.description.value)
+
+    val fromString: Prism[String, System] =
+      Prism[String, System](s => parse.system.parseAll(s).toOption)(_.label)
+
+  }
+
   object parse {
 
     import lucuma.core.enums.parser.EnumParsers.scienceSubtype
@@ -216,6 +233,9 @@ object ProgramReference {
         Science(proposal, scienceSubtype)
       }
 
+    val system: Parser[System] =
+      (string(s"SYS-") *> description).map { description => System(description) }
+
     val programReference: Parser[ProgramReference] =
       oneOf(
         parse.program.backtrack       ::
@@ -224,7 +244,8 @@ object ProgramReference {
         parse.engineering.backtrack   ::
         parse.example.backtrack       ::
         parse.library.backtrack       ::
-        parse.monitoring              ::
+        parse.monitoring.backtrack    ::
+        parse.system                  ::
         Nil
       )
   }
@@ -251,7 +272,8 @@ object ProgramReference {
       case (a @ Library(_, _),          b @ Library(_, _))          => Order.compare(a, b)
       case (a @ Monitoring(_, _, _),    b @ Monitoring(_, _, _))    => Order.compare(a, b)
       case (a @ Science(_, _),          b @ Science(_, _))          => Order.compare(a, b)
-      case (a, b) => Order.compare(a.programType, b.programType)
+      case (a @ System(_),              b @ System(_))              => Order.compare(a, b)
+      case (a, b)                                                   => Order.compare(a.programType, b.programType)
     }
 
   given Ordering[ProgramReference] =
