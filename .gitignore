@@ -56,3 +56,5 @@ project/hydra.sbt
 
 gnupg*
 .direnv/
+
+.vscode/
