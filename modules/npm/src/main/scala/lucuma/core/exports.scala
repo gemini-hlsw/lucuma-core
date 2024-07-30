@@ -3,27 +3,31 @@
 
 package lucuma.core
 
-import scala.scalajs.js
 import cats.syntax.all.*
-import scala.scalajs.js.annotation.JSExportTopLevel
 import lucuma.core.enums.Site
-import java.time.Instant
-import lucuma.core.model.CoordinatesAtVizTime
-import java.time.Duration
-import lucuma.core.math.Coordinates
-import lucuma.core.math.skycalc.SkyCalcResults
-import lucuma.core.math.skycalc.ImprovedSkyCalc
-import lucuma.core.model.ObservingNight
-import java.time.LocalDate
 import lucuma.core.enums.TwilightType
+import lucuma.core.math.Angle
+import lucuma.core.math.Coordinates
+import lucuma.core.math.HourAngle
+import lucuma.core.math.parser.AngleParsers
+import lucuma.core.math.skycalc.ImprovedSkyCalc
+import lucuma.core.math.skycalc.SkyCalcResults
+import lucuma.core.model.CoordinatesAtVizTime
+import lucuma.core.model.ObservingNight
+
+import java.time.Duration
+import java.time.Instant
+import java.time.LocalDate
+import scala.scalajs.js
 import scala.scalajs.js.JSConverters.*
+import scala.scalajs.js.annotation.JSExportTopLevel
 
 /**
  * JS facade to plot points calculated with the method `nightPlot`.
  */
 @JSExportTopLevel("PlotPoint")
 class PlotPoint(val instant: js.Date, val airmass: Double, val altitude: Double) extends js.Object {
-  override def toString(): String = s"PlotPoin($instant, $airmass, $altitude)"
+  override def toString(): String = s"PlotPoint($instant, $airmass, $altitude)"
 }
 
 object NightPlot:
@@ -85,3 +89,22 @@ object NightPlot:
     }
   }
 
+@JSExportTopLevel("deg2hms")
+def deg2hms(deg: Double): String = 
+  HourAngle.fromStringHMS.reverseGet(HourAngle.fromDoubleDegrees(deg))
+
+@JSExportTopLevel("deg2dms")
+def deg2dms(deg: Double): String = 
+  Angle.fromStringSignedDMS.reverseGet(HourAngle.fromDoubleDegrees(deg))
+
+@JSExportTopLevel("hms2deg")
+def hms2deg(hms: String): Double = 
+  AngleParsers.hms.parseAll(hms) match
+    case Left(value) => throw new IllegalArgumentException(value.toString)
+    case Right(value) => value.toDoubleDegrees
+
+@JSExportTopLevel("dms2deg")
+def dms2deg(dms: String): Double = 
+  AngleParsers.dms.parseAll(dms) match
+    case Left(value) => throw new IllegalArgumentException(value.toString)
+    case Right(value) => value.toDoubleDegrees
