@@ -4,11 +4,11 @@
 package lucuma.core.math.skycalc
 
 import cats.syntax.all.*
-import lucuma.core.enums.Site
 import lucuma.core.math.Angle
+import lucuma.core.math.Place
 import lucuma.core.model.ObjectTracking
+import lucuma.core.util.TimeSpan
 
-import java.time.Duration
 import java.time.Instant
 import scala.concurrent.duration.*
 
@@ -19,8 +19,8 @@ extension (r: TimeRange)
   def end: Long      = r._2
 
 // Calculate the parallactic angle for the given object at the given time.
-def parallacticAngle(site: Site, tracking: ObjectTracking, vizTime: Instant): Angle = {
-  val skycalc = new ImprovedSkyCalc(site.place)
+def parallacticAngle(place: Place, tracking: ObjectTracking, vizTime: Instant): Angle = {
+  val skycalc = new ImprovedSkyCalc(place)
 
   val c = tracking
     .at(vizTime)
@@ -29,9 +29,25 @@ def parallacticAngle(site: Site, tracking: ObjectTracking, vizTime: Instant): An
   skycalc.calculate(c, vizTime, false).parallacticAngle
 }
 
-def averageParallacticAngle(site: Site, tracking: ObjectTracking, vizTime: Instant, duration: Duration): Option[Angle] =
-  val defined: TimeRange = (vizTime.toEpochMilli(), vizTime.plus(duration).toEpochMilli())
-  val rate: Long         = 30.seconds.toMillis
+/**
+  * Calculates the average parallactic angle for the given coordinates at a specific time over the given duration.
+  * @param place the coordinates of the place where the observation is taking place
+  * @param tracking object coordinates and motion for the object
+  * @param vizTime the time at which the observation is scheduled to start
+  * @param duration the duration of the observation
+  * @param fallbackAirmass the airmass to use when the airmass is not available
+  * @param samplingRate the rate at which to sample the parallactic angle
+  */
+def averageParallacticAngle(
+  place: Place,
+  tracking: ObjectTracking,
+  vizTime: Instant,
+  duration: TimeSpan,
+  fallbackAirmass: Double = 0.0,
+  samplingRate: TimeSpan = TimeSpan.unsafeFromMicroseconds(30.seconds.toMicros)
+): Option[Angle] = {
+  val defined: TimeRange = (vizTime.toEpochMilli(), vizTime.plus(duration.toDuration).toEpochMilli())
+  val rate: Long         = samplingRate.toMilliseconds.toLong
 
   // the number of samples we need to have a sampling rate >= than expected
   val cnt: Int            = math.ceil(defined.duration.toDouble / rate).toInt
@@ -48,8 +64,8 @@ def averageParallacticAngle(site: Site, tracking: ObjectTracking, vizTime: Insta
     Vector(ts*)
   }
 
-  def calculate(site: Site, tracking: ObjectTracking): Vector[SkyCalcResults] = {
-    val skycalc = new ImprovedSkyCalc(site.place)
+  def calculate: Vector[SkyCalcResults] = {
+    val skycalc = new ImprovedSkyCalc(place)
 
     times.traverse { t =>
       val at     = Instant.ofEpochMilli(t)
@@ -60,8 +76,8 @@ def averageParallacticAngle(site: Site, tracking: ObjectTracking, vizTime: Insta
 
   // If the target is visible during the scheduled time, return the weighted mean parallactic angle as Some(angle in degrees).
   // Otherwise, the target is not visible, so return None.
-  def weightedMeanParallacticAngle(site: Site, tracking: ObjectTracking): Option[Double] = {
-    val values                    = calculate(site, tracking)
+  def weightedMeanParallacticAngle: Option[Double] = {
+    val values = calculate
     val (weightedAngles, weights) = values
       .map(_.parallacticAngle.toSignedDoubleDegrees)
       .zip(times)
@@ -78,15 +94,14 @@ def averageParallacticAngle(site: Site, tracking: ObjectTracking, vizTime: Insta
                 .dec
                 .toAngle
                 .toSignedDoubleDegrees
-              if (dec - site.latitude.toAngle.toSignedDoubleDegrees < -10) 0
-              else if (dec - site.latitude.toAngle.toSignedDoubleDegrees < 10) 180
+              if (dec - place.latitude.toAngle.toSignedDoubleDegrees < -10) 0
+              else if (dec - place.latitude.toAngle.toSignedDoubleDegrees < 10) 180
               else 360
             }
             angle + normalizingFactor
           } else angle
 
-        // val weight = if (airmass <= 1.0) 0.0 else 1.6 * math.pow(airmass - 1.0, 0.6)
-        val weight = if (airmass <= 1.0) 0.0 else math.pow(airmass - 1.0, 1.3)
+        val weight = if (airmass <= 0.0) fallbackAirmass else math.pow(airmass - 1.0, 1.3)
         (normalizedAngle * weight, weight)
       }
       .unzip
@@ -96,5 +111,6 @@ def averageParallacticAngle(site: Site, tracking: ObjectTracking, vizTime: Insta
     else Some(weightedAngles.sum / weightedSum)
   }
 
-  weightedMeanParallacticAngle(site, tracking).map(Angle.fromDoubleDegrees)
+  weightedMeanParallacticAngle.map(Angle.fromDoubleDegrees)
+}
 
