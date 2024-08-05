@@ -35,7 +35,6 @@ def parallacticAngle(place: Place, tracking: ObjectTracking, vizTime: Instant): 
   * @param tracking object coordinates and motion for the object
   * @param vizTime the time at which the observation is scheduled to start
   * @param duration the duration of the observation
-  * @param fallbackAirmass the airmass to use when the airmass is not available
   * @param samplingRate the rate at which to sample the parallactic angle
   */
 def averageParallacticAngle(
@@ -43,7 +42,6 @@ def averageParallacticAngle(
   tracking: ObjectTracking,
   vizTime: Instant,
   duration: TimeSpan,
-  fallbackAirmass: Double = 0.0,
   samplingRate: TimeSpan = TimeSpan.unsafeFromMicroseconds(30.seconds.toMicros)
 ): Option[Angle] = {
   val defined: TimeRange = (vizTime.toEpochMilli(), vizTime.plus(duration.toDuration).toEpochMilli())
@@ -101,7 +99,7 @@ def averageParallacticAngle(
             angle + normalizingFactor
           } else angle
 
-        val weight = if (airmass <= 0.0) fallbackAirmass else math.pow(airmass - 1.0, 1.3)
+        val weight = if (airmass <= 0.0) 0.0 else math.pow(airmass - 1.0, 1.3)
         (normalizedAngle * weight, weight)
       }
       .unzip

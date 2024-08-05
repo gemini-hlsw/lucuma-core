@@ -3,7 +3,6 @@
 
 package lucuma.core.math.skycalc
 
-import cats.syntax.all.*
 import com.fortysevendeg.scalacheck.datetime.GenDateTime.genDateTimeWithinRange
 import com.fortysevendeg.scalacheck.datetime.instances.jdk8.*
 import edu.gemini.skycalc.ImprovedSkyCalcTest
@@ -38,7 +37,7 @@ final class ImprovedSkyCalcSuiteJVM extends ScalaCheckSuite {
   )
   private val zdtRange = Duration.ofDays(Period.ofYears(1000).getDays.toLong)
 
-  test("average parallactic angle no fallback") {
+  test("average parallactic angle no visible target") {
     val when = Instant.parse("2024-08-02T21:00:00Z")
     val coord = Coordinates.fromHmsDms.getOption("00:15:21.550600 +28:35:13.831766").get
     assert(averageParallacticAngle(
@@ -47,20 +46,6 @@ final class ImprovedSkyCalcSuiteJVM extends ScalaCheckSuite {
       when,
       TimeSpan.fromHours(1).get).isEmpty
     )
-
-  }
-
-  test("average parallactic angle with fallback") {
-    val when = Instant.parse("2024-08-02T21:00:00Z")
-    val coord = Coordinates.fromHmsDms.getOption("00:15:21.550600 +28:35:13.831766").get
-    assert(averageParallacticAngle(
-      Site.GN.place,
-      ObjectTracking.constant(coord),
-      when,
-      TimeSpan.fromHours(1).get,
-      100).exists(_ === Angle.fromMicroarcseconds(216766799171L))
-    )
-
   }
 
   test("Arbitrary sky calculations".tag(ScalaCheckFlaky)) {
