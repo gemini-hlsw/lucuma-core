@@ -27,11 +27,7 @@ trait ImprovedSkyCalcMethods {
     Array[Double](-2.72, 3.86, 10.46, 17.20, 21.16, 23.62, 24.02, 23.93, 24.33, 26.77, 29.15, 31.07,
       33.15, 35.73, 40.18, 45.48, 50.54, 54.34, 56.86, 60.78, 62.97)
 
-  final protected class DoubleRef(var d: Double) {
-    def this() = {
-      this(0.0)
-    }
-
+  final protected class DoubleRef(var d: Double = 0.0) {
     override def toString: String = d.toString
   }
 
@@ -84,12 +80,11 @@ trait ImprovedSkyCalcMethods {
     jdut:     DoubleRef,
     sid:      DoubleRef,
     curepoch: DoubleRef
-  ): Short = {
+  ): Unit = {
     val jd = instant_to_jd(instant)
     sid.d = lst(jd, longit)
     jdut.d = jd
     curepoch.d = 2000.0 + (jd - J2000.toDouble) / 365.25
-    0
   }
 
   protected def cooxform(

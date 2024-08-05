@@ -60,11 +60,6 @@ case class ImprovedSkyCalc(place: Place) extends ImprovedSkyCalcMethods {
     calculateMoon:   Boolean,
     coords:          Coordinates
   ): SkyCalcResults = {
-    var altitude                             = .0
-    var hourAngle                            = .0
-    var azimuth                              = .0
-    var parallacticAngle                     = .0
-    var airmass                              = .0
     var lunarSkyBrightness: java.lang.Double = .0
     var lunarDistance                        = .0
     var lunarIlluminatedFraction             = .0
@@ -73,8 +68,6 @@ case class ImprovedSkyCalc(place: Place) extends ImprovedSkyCalcMethods {
     var sunAltitude                          = .0
     var lunarElevation                       = .0
 
-    var ha     = .0
-    var alt    = .0
     val az     = new DoubleRef
     val par    = new DoubleRef
     val curra  = new DoubleRef
@@ -89,13 +82,13 @@ case class ImprovedSkyCalc(place: Place) extends ImprovedSkyCalcMethods {
       XFORM_JUSTPRE,
       XFORM_FROMSTD
     )
-    ha = adj_time(sid - curra.d)
-    alt = altit(curdec.d, ha, lat, az, par)
-    airmass = getAirmass(alt)
-    altitude = alt
-    azimuth = az.d
-    parallacticAngle = par.d
-    hourAngle = ha
+    val ha = adj_time(sid - curra.d)
+    val alt = altit(curdec.d, ha, lat, az, par)
+    val airmass = getAirmass(alt)
+    val altitude = alt
+    val azimuth = az.d
+    val parallacticAngle = par.d
+    val hourAngle = ha
     if (calculateMoon) {
       val ramoon      = new DoubleRef
       val decmoon     = new DoubleRef

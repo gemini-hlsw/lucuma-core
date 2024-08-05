@@ -213,44 +213,6 @@ object Samples extends SamplesOptics {
       self.mapWithKeys { case (i, cs) => skycalc.calculate(cs, i, true) }
     }
 
-  /** Convenience syntax for sampled `SkyCalcResults`. */
-  extension(self: Samples[SkyCalcResults])
-
-    /**
-     * Compute the weighted mean parallactic angle over this `Samples`, if the target is visible for
-     * at least one sample.
-     */
-    def weightedMeanParallacticAngle: Eval[Option[Double]] =
-      self
-        .map { r =>
-          val angle   = r.parallacticAngleRaw
-          val airmass = r.airmass
-          val normalizedAngle = {
-            if (angle < 0) {
-              val normalizingFactor = {
-                val dec = r.coordinates.dec.toAngle.toSignedDoubleDegrees
-                if (dec - r.place.latitude.toAngle.toSignedDoubleDegrees < -10) 0
-                else if (dec - r.place.latitude.toAngle.toSignedDoubleDegrees < 10) 180
-                else 360
-              }
-              angle + normalizingFactor
-            } else angle
-          }
-          val weight  = if (airmass <= 1.0) 0.0 else math.pow(airmass - 1.0, 1.3)
-          (normalizedAngle * weight, weight)
-
-        }
-        .toMap
-        .values
-        .toList
-        .sequence
-        .map { list =>
-          val (weightedAngles, weights) = list.unzip
-          val weightedSum               = weights.sum
-          if (weightedSum == 0) None
-          else Some(weightedAngles.sum / weightedSum)
-        }
-
 }
 
 trait SamplesOptics {
