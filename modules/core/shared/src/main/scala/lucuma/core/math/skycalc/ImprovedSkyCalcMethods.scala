@@ -902,10 +902,7 @@ trait ImprovedSkyCalcMethods {
     sid_g = sid_g + 1.0027379093 * ut - longit / 24.0
     sid_int = sid_g.toLong
     sid_g = (sid_g - sid_int) * 24.0
-    //        if (sid_g < 0.0) {
-    //            sid_g = sid_g + 24.0;
-    //        }
-    sid_g
+    if (sid_g < 0.0) sid_g + 24.0 else sid_g
   }
 
   /**
