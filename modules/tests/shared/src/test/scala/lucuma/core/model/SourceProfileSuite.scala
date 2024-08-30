@@ -145,54 +145,6 @@ final class SourceProfileSuite extends DisciplineSuite {
     assert(gaussian2.nearestBand(wv).isEmpty) // Emission lines not supported
   }
 
-  test("canCompareBrightnessesTo") {
-    assert(point1.canCompareBrightnessesTo(point1))
-    assert(!point1.canCompareBrightnessesTo(point2))
-    assert(!point1.canCompareBrightnessesTo(uniform1))
-    assert(!point1.canCompareBrightnessesTo(uniform2))
-    assert(!point1.canCompareBrightnessesTo(gaussian1))
-    assert(!point1.canCompareBrightnessesTo(gaussian2))
-
-    assert(uniform1.canCompareBrightnessesTo(uniform1))
-
-    assert(!uniform2.canCompareBrightnessesTo(uniform2))
-    assert(!uniform2.canCompareBrightnessesTo(point1))
-    assert(!uniform2.canCompareBrightnessesTo(point2))
-    assert(!uniform2.canCompareBrightnessesTo(uniform1))
-    assert(!uniform2.canCompareBrightnessesTo(gaussian1))
-    assert(!uniform2.canCompareBrightnessesTo(gaussian2))
-  }
-
-  test("canCompareBrightnesses") {
-    assert(List.empty[SourceProfile].canCompareBrightnesses)
-    assert(List(point1).canCompareBrightnesses)
-    assert(List(point1, point1).canCompareBrightnesses)
-    assert(!List(point1, point2).canCompareBrightnesses)
-    assert(!List(point1, gaussian2).canCompareBrightnesses)
-    assert(!List(point2, gaussian1).canCompareBrightnesses)
-    assert(!List(uniform1, gaussian2).canCompareBrightnesses)
-  }
-
-  test("canCompareBrightnesses") {
-    val wv = Wavelength(578000.refined[Positive])
-    assert(List.empty[SourceProfile].brightestAt(wv).isEmpty)
-    assert(List(point1).brightestAt(wv).exists(_ === point1))
-
-    val sd2Brightnesses = SortedMap[Band, BrightnessMeasure[Integrated]](
-      Band.R -> Band.R.defaultUnits[Integrated].withValueTagged(BrightnessValue.unsafeFrom(5.0))
-    )
-
-    val sd2Integrated: SpectralDefinition[Integrated] =
-      SpectralDefinition.BandNormalized(
-        UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.A0I).some,
-        sd2Brightnesses
-      )
-
-    val point3 = SourceProfile.Point(sd2Integrated)
-
-    assert(List(point1, point3).brightestAt(wv).exists(_ === point3))
-  }
-
   // Laws for SourceProfile.Point
   checkAll("Eq[SourceProfile.Point]", EqTests[SourceProfile.Point].eqv)
 

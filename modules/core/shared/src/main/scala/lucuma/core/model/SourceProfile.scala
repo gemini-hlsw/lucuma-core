@@ -4,8 +4,6 @@
 package lucuma.core.model
 
 import cats.Eq
-import cats.Foldable
-import cats.Functor
 import cats.syntax.all.*
 import eu.timepit.refined.cats.given
 import lucuma.core.enums.Band
@@ -299,48 +297,4 @@ object SourceProfile {
             .getOption(sp)
             .flatMap(bMap => extractBand[Surface](wavelength, bMap))
         )
-
-    /**
-     * Can I compare the brightnesses of this source profile to the brightnesses of the given source profile?
-     */
-    def canCompareBrightnessesTo(sp2: SourceProfile): Boolean =
-      (sp, sp2) match {
-        case (Point(BandNormalized(_, _)), Point(BandNormalized(_, _)))             => true
-        case (Gaussian(_, BandNormalized(_, _)), Gaussian(_, BandNormalized(_, _))) => true
-        case (Uniform(BandNormalized(_, _)), Uniform(BandNormalized(_, _)))         => true
-        case _                                                                      => false
-      }
-
-  extension[G[_]: Foldable](e: G[SourceProfile])
-    /**
-     * Can I compare the brightnesses of a collection of source profiles
-     */
-    def canCompareBrightnesses: Boolean =
-      e.sliding2.map(_.canCompareBrightnessesTo(_)).forall(identity)
-
-    /**
-     * Attempt to find the brightest target at a given wavelength.
-     *
-     * Deterimining the brightest target is a little tricky, as targets may have different
-     * magnitudes in different bands. They also can have different profiles and SED
-     *
-     * This method attempts to find the brightest target at a given wavelength by finding
-     * the nearest band to the given wavelength for each target, and then comparing them
-     *
-     * Only source profiles that can be compared will give aa result. e.g. targets with a Point Source
-     * and a Gaussian profile cannot be compared.
-     *
-     * Even with this limitations this method is useful for finding the brightest target in an asterism, though in general the user may need to override it.
-     *
-     * A more advanced version could also take into account the SED of the target, but this is not currently implemented.
-     */
-    def brightestAt(w: Wavelength): Option[SourceProfile] =
-      if (e.isEmpty || !canCompareBrightnesses) None
-      else e.minimumByOption(_.nearestBand(w).map(_._2.value)) }
-
-  /**
-   * This method is used to find the brightest target in an colllection of something (e.g. asterism.)
-   */
-  extension[A, G[_]: Functor: Foldable](e: G[A])
-    def brightestProfileAt(fn: A => SourceProfile)(w: Wavelength): Option[A] =
-      e.map(a => (a, fn(a).nearestBand(w).map(_._2.value))).minimumByOption(_._2).map(_._1)
+}
