@@ -23,3 +23,5 @@ object ObservationValidation:
     fromMsgs(ObservationValidationCode.CallForProposalsError, msg, moreMsgs*)
   def itc(msg: String, moreMsgs: String*): ObservationValidation =
     fromMsgs(ObservationValidationCode.ItcError, msg, moreMsgs*)
+  def configuration(msg: String, moreMsgs: String*): ObservationValidation =
+    fromMsgs(ObservationValidationCode.ConfigurationError, msg, moreMsgs*)
