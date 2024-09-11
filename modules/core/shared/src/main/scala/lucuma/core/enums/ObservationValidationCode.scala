@@ -13,4 +13,4 @@ enum ObservationValidationCode(
   case ConfigurationError extends ObservationValidationCode("configuration_error", "Configuration Error", "The observation is not configured correctly and cannot be executed")
   case CallForProposalsError extends ObservationValidationCode("cfp_error", "Call for Proposals Error", "Not valid for the selected Call for Proposals")
   case ItcError extends ObservationValidationCode("itc_error", "ITC Error", "Integration time is unavailable.")
-  case ConfigurationError extends ObservationValidationCode("configuration_error", "Configuration Error", "This observation's configuration is not approved for execution.")
+  case ConfigurationRequestError extends ObservationValidationCode("configuration_error", "Configuration Error", "This observation's configuration is not approved for execution.")
