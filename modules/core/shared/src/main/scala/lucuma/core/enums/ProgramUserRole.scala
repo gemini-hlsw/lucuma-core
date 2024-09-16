@@ -10,6 +10,7 @@ enum ProgramUserRole(val tag: String) derives Enumerated:
   case Pi      extends ProgramUserRole("pi")
   case Coi     extends ProgramUserRole("coi")
   case CoiRO   extends ProgramUserRole("coi_ro")
-  case Support extends ProgramUserRole("support")
+  case SupportPrimary extends ProgramUserRole("support_primary")
+  case SupportSecondary extends ProgramUserRole("support_secondary")
 
 end ProgramUserRole
