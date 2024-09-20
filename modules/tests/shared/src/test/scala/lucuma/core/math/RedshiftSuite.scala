@@ -8,7 +8,6 @@ import cats.kernel.laws.discipline.*
 import coulomb.*
 import coulomb.policy.spire.standard.given
 import coulomb.syntax.*
-import coulomb.units.si.*
 import lucuma.core.math.Constants.SpeedOfLight
 import lucuma.core.math.arb.*
 import lucuma.core.math.units.*

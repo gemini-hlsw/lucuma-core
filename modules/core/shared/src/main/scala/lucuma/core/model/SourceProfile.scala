@@ -12,7 +12,6 @@ import lucuma.core.math.BrightnessUnits.*
 import lucuma.core.math.BrightnessValue
 import lucuma.core.math.Wavelength
 import lucuma.core.math.dimensional.*
-import lucuma.core.model.SpectralDefinition.BandNormalized
 import monocle.Focus
 import monocle.Lens
 import monocle.Optional

@@ -6,7 +6,7 @@ ThisBuild / tlCiReleaseBranches += "topic/scala3"
 
 Global / concurrentRestrictions += Tags.limit(Tags.Compile, 1)
 
-ThisBuild / crossScalaVersions := Seq("3.4.3")
+ThisBuild / crossScalaVersions := Seq("3.5.1")
 ThisBuild / scalacOptions += "-language:implicitConversions" // TODO
 
 lazy val catsVersion           = "2.12.0"
@@ -20,7 +20,8 @@ lazy val spireVersion          = "0.18.0"
 lazy val refinedVersion        = "0.11.2"
 lazy val lucumaRefinedVersion  = "0.1.3"
 lazy val catsTimeVersion       = "0.5.1"
-lazy val circeVersion          = "0.14.9"
+lazy val circeVersion          = "0.14.10"
+lazy val circeRefinedVersion   = "0.15.1"
 lazy val catsScalacheckVersion = "0.3.2"
 lazy val catsParseVersion      = "1.0.0"
 lazy val kittensVersion        = "3.4.0"
@@ -53,7 +54,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
       "org.typelevel"  %%% "cats-time"      % catsTimeVersion,
       "org.typelevel"  %%% "kittens"        % kittensVersion,
       "io.circe"       %%% "circe-core"     % circeVersion,
-      "io.circe"       %%% "circe-refined"  % circeVersion
+      "io.circe"       %%% "circe-refined"  % circeRefinedVersion
     )
   )
   .jvmConfigure(_.enablePlugins(AutomateHeaderPlugin))
