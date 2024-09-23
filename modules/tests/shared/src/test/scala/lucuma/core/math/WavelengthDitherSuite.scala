@@ -3,7 +3,6 @@
 
 package lucuma.core.math
 
-import cats.Eq
 import cats.syntax.all.*
 import coulomb.*
 import coulomb.ops.algebra.cats.quantity.given

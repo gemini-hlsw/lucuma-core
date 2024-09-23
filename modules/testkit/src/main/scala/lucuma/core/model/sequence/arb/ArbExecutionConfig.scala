@@ -4,7 +4,6 @@
 package lucuma.core.model.sequence
 package arb
 
-import lucuma.core.model.sequence.*
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Cogen
