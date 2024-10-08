@@ -9,6 +9,7 @@ import cats.syntax.option.*
 import cats.syntax.order.*
 import lucuma.core.arb.ArbTime.given
 import lucuma.core.optics.laws.discipline.*
+import lucuma.core.util.arb.ArbTimeSpan.given
 import lucuma.core.util.arb.ArbTimestamp
 import lucuma.core.util.arb.ArbTimestamp.given
 import monocle.law.discipline.PrismTests
@@ -95,5 +96,15 @@ class TimestampSuite extends DisciplineSuite {
       val ti = t0.intervalUntil(t1)
       assert(t0 < t1 == ti.nonEmpty)
     }
+  }
+
+  property("boundedAdd") {
+    forAll: (t: Timestamp, ts: TimeSpan) =>
+      assertEquals(t +| ts, t.plusMicrosOption(ts.toMicroseconds).getOrElse(Timestamp.Max))
+  }
+
+  property("boundedSubtract") {
+    forAll: (t: Timestamp, ts: TimeSpan) =>
+      assertEquals(t -| ts, t.plusMicrosOption(- ts.toMicroseconds).getOrElse(Timestamp.Min))
   }
 }

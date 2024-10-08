@@ -21,6 +21,7 @@ import java.time.format.DateTimeParseException
 import java.time.temporal.ChronoField
 import java.time.temporal.ChronoUnit.MICROS
 import java.util.Locale
+import scala.annotation.targetName
 
 /**
  * Timestamp is an Instant truncated and limited to fit in a database
@@ -137,6 +138,22 @@ object Timestamp {
 
     def plusSecondsOption(secondsToAdd: Long): Option[Timestamp] =
       fromInstant(timestamp.plusSeconds(secondsToAdd))
+
+    /**
+     * Adds the given amount of time to the Timestamp, producing a new
+     * Timestamp that far in the future.  The value is capped at Timestamp.Max.
+     */
+    @targetName("boundedAdd")
+    def +|(time: TimeSpan): Timestamp =
+      plusMicrosOption(time.toMicroseconds).getOrElse(Timestamp.Max)
+
+    /**
+     * Subtracts the given amount of time from the Timestamp, producing a new
+     * Timestamp that far in the past.  The value is limited at Timestamp.Min.
+     */
+    @targetName("boundedSubtract")
+    def -|(time: TimeSpan): Timestamp =
+      plusMicrosOption(- time.toMicroseconds).getOrElse(Timestamp.Min)
 
     /**
      * The timestamp interval between this timestamp and the given
