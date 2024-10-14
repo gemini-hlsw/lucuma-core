@@ -8,24 +8,23 @@ import lucuma.core.model.*
 import org.scalacheck.*
 import org.scalacheck.Arbitrary.*
 
-trait ArbUserInvitation {
-
+trait ArbUserInvitation:
   val bodyGen: Gen[String] =
     Gen.stringOfN(96, Gen.oneOf(Gen.hexChar.map(_.toLower), Gen.numChar))
 
-  Gen.posNum[Long]
+  given Arbitrary[UserInvitation.Id] =
+    Arbitrary:
+      Gen.chooseNum[Long](256, Long.MaxValue).map: num =>
+        UserInvitation.Id(PosLong.unsafeFrom(num))
 
   given Arbitrary[UserInvitation] =
-    Arbitrary {
-      for {
-        id <- Gen.chooseNum[Long](256, Long.MaxValue)
+    Arbitrary:
+      for
+        id <- arbitrary[UserInvitation.Id]
         b  <- bodyGen
-      } yield UserInvitation(UserInvitation.Id(PosLong.unsafeFrom(id)), b)
-    }
+      yield UserInvitation(id, b)
 
   given Cogen[UserInvitation] =
     Cogen[(Long, String)].contramap(x => (x.id.value.value, x.body))
-
-}
 
 object ArbUserInvitation extends ArbUserInvitation
