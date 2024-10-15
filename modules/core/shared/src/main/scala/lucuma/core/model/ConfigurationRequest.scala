@@ -3,20 +3,14 @@
 
 package lucuma.core.model
 
-import lucuma.core.util.Enumerated
+import lucuma.core.enums.ConfigurationRequestStatus
 import lucuma.core.util.WithGid
 import lucuma.refined.*
 
 case class ConfigurationRequest(
   id: ConfigurationRequest.Id,
-  status: ConfigurationRequest.Status,
+  status: ConfigurationRequestStatus,
   configuration: Configuration
 )
 
-object ConfigurationRequest extends WithGid('x'.refined) {
-  enum Status(val tag: String) derives Enumerated:
-    case Requested extends Status("Requested")
-    case Approved  extends Status("Approved")
-    case Denied    extends Status("Denied")
-    case Withdrawn extends Status("Withdrawn")
-}
+object ConfigurationRequest extends WithGid('x'.refined)
