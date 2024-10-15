@@ -7,7 +7,7 @@ import lucuma.core.util.Enumerated
 
 
 enum ConfigurationRequestStatus(val tag: String) derives Enumerated:
-  case Requested extends ConfigurationRequestStatus("Requested")
-  case Approved  extends ConfigurationRequestStatus("Approved")
-  case Denied    extends ConfigurationRequestStatus("Denied")
-  case Withdrawn extends ConfigurationRequestStatus("Withdrawn")
+  case Requested extends ConfigurationRequestStatus("requested")
+  case Approved  extends ConfigurationRequestStatus("approved")
+  case Denied    extends ConfigurationRequestStatus("denied")
+  case Withdrawn extends ConfigurationRequestStatus("withdrawn")
