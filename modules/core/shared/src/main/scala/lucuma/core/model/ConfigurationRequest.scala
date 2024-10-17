@@ -3,6 +3,8 @@
 
 package lucuma.core.model
 
+import cats.Eq
+import cats.derived.*
 import lucuma.core.enums.ConfigurationRequestStatus
 import lucuma.core.util.WithGid
 import lucuma.refined.*
@@ -11,6 +13,6 @@ case class ConfigurationRequest(
   id: ConfigurationRequest.Id,
   status: ConfigurationRequestStatus,
   configuration: Configuration
-)
+) derives Eq
 
 object ConfigurationRequest extends WithGid('x'.refined)
