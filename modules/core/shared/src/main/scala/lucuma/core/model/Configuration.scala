@@ -4,6 +4,7 @@
 package lucuma.core.model
 
 import cats.Eq
+import cats.derived.*
 import cats.kernel.Order
 import cats.syntax.all.*
 import lucuma.core.enums.CloudExtinction
@@ -18,7 +19,7 @@ import lucuma.core.math.Coordinates
 import lucuma.core.model.Configuration.ObservingMode.GmosNorthLongSlit
 import lucuma.core.model.Configuration.ObservingMode.GmosSouthLongSlit
 
-case class Configuration(conditions: Configuration.Conditions, refererenceCoordinates: Coordinates, observingMode: Configuration.ObservingMode):
+case class Configuration(conditions: Configuration.Conditions, refererenceCoordinates: Coordinates, observingMode: Configuration.ObservingMode) derives Eq:
   def subsumes(other: Configuration): Boolean =
     conditions >= other.conditions &&
     observingMode.fov.toDoubleDegrees / 2.0 >= refererenceCoordinates.angularDistance(other.refererenceCoordinates).toDoubleDegrees &&
