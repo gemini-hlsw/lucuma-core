@@ -13,6 +13,8 @@ import lucuma.core.optics.refinedPrism
 import monocle.Iso
 import monocle.Prism
 
+import scala.util.NotGiven
+
 /**
   * Usage:
   * ```
@@ -32,7 +34,8 @@ trait NewType[Wrapped]:
     inline def modifyValue(f: Wrapped => Wrapped): Type = apply(f(value))
 
   given (using CanEqual[Wrapped, Wrapped]): CanEqual[Type, Type] = CanEqual.derived
-  given (using eq: Eq[Wrapped]): Eq[Type]                        = eq
+  // Only provide an Eq instance if it doesn't also provide Order
+  given (using eq: Eq[Wrapped], noOrder: NotGiven[Order[Wrapped]]): Eq[Type]                        = eq
   given (using enc: Encoder[Wrapped]): Encoder[Type]             = enc
   given (using dec: Decoder[Wrapped]): Decoder[Type]             = dec
   given (using disp: Display[Wrapped]): Display[Type]            = disp
