@@ -21,7 +21,7 @@ enum ObservationValidationCode(
     )
   case ConfigurationRequestNotRequested
     extends ObservationValidationCode(
-      "config_request_not_requested`", 
+      "config_request_not_requested", 
       "Configuration Request Not Requested", 
       ObservationValidationCode.ConfigurationRequestMsg.Unavailable
     )
