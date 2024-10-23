@@ -19,9 +19,12 @@ case class ExecutionConfig[S, D](
   static:        S,
   acquisition:   Option[ExecutionSequence[D]],
   science:       Option[ExecutionSequence[D]]
-)
+):
+  /** Returns `true` if there are no science steps to execute. */
+  def isComplete: Boolean =
+    science.isEmpty
 
-object ExecutionConfig {
+object ExecutionConfig:
   /** Shorthand type for GmosNorth. */
   type GmosNorth = ExecutionConfig[gmos.StaticConfig.GmosNorth, gmos.DynamicConfig.GmosNorth]
   /** Shorthand type for GmosSouth. */
@@ -45,4 +48,3 @@ object ExecutionConfig {
   /** @group Optics */
   def science[S, D]: Lens[ExecutionConfig[S, D], Option[ExecutionSequence[D]]] =
     Focus[ExecutionConfig[S, D]](_.science)
-}
