@@ -8,6 +8,7 @@ import cats.data.NonEmptyChain
 import cats.derived.*
 import io.circe.Codec
 import lucuma.core.enums.ObservationValidationCode
+import lucuma.core.enums.ObservationValidationCode.*
 
 case class ObservationValidation(
   code: ObservationValidationCode,
@@ -18,8 +19,16 @@ object ObservationValidation:
   def fromMsgs(code: ObservationValidationCode, msg: String, moreMsgs: String*): ObservationValidation =
     ObservationValidation(code, NonEmptyChain.of(msg, moreMsgs*))
   def configuration(msg: String, moreMsgs: String*): ObservationValidation =
-    fromMsgs(ObservationValidationCode.ConfigurationError, msg, moreMsgs*)
+    fromMsgs(ConfigurationError, msg, moreMsgs*)
   def callForProposals(msg: String, moreMsgs: String*): ObservationValidation =
-    fromMsgs(ObservationValidationCode.CallForProposalsError, msg, moreMsgs*)
+    fromMsgs(CallForProposalsError, msg, moreMsgs*)
   def itc(msg: String, moreMsgs: String*): ObservationValidation =
-    fromMsgs(ObservationValidationCode.ItcError, msg, moreMsgs*)
+    fromMsgs(ItcError, msg, moreMsgs*)
+  def configurationRequestUnavailable: ObservationValidation =
+    fromMsgs(ConfigurationRequestUnavailable, ConfigurationRequestUnavailable.description)
+  def configurationRequestNotRequested: ObservationValidation =
+    fromMsgs(ConfigurationRequestNotRequested, ConfigurationRequestNotRequested.description)
+  def configurationRequestDenied: ObservationValidation =
+    fromMsgs(ConfigurationRequestDenied, ConfigurationRequestDenied.description)
+  def configurationRequestPending: ObservationValidation =
+    fromMsgs(ConfigurationRequestPending, ConfigurationRequestPending.description)
