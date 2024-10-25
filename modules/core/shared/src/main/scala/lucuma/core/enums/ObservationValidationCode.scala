@@ -16,25 +16,25 @@ enum ObservationValidationCode(
   case ConfigurationRequestUnavailable 
     extends ObservationValidationCode(
       "config_request_unavailable", 
-      "Configuration Request Unavailable", 
+      "Unknown Approval Status", 
       ObservationValidationCode.ConfigurationRequestMsg.Unavailable
     )
   case ConfigurationRequestNotRequested
     extends ObservationValidationCode(
       "config_request_not_requested", 
-      "Configuration Request Not Requested", 
-      ObservationValidationCode.ConfigurationRequestMsg.Unavailable
+      "Needs Approval", 
+      ObservationValidationCode.ConfigurationRequestMsg.NotRequested
     )
   case ConfigurationRequestDenied
     extends ObservationValidationCode(
       "config_request_denied", 
-      "Configuration Request Denied", 
+      "Denied", 
       ObservationValidationCode.ConfigurationRequestMsg.Denied
     )
   case ConfigurationRequestPending
     extends ObservationValidationCode(
       "config_request_pending", 
-      "Configuration Request Pending", 
+      "Approval Pending", 
       ObservationValidationCode.ConfigurationRequestMsg.Pending
     )
 
