@@ -4,6 +4,7 @@
 package lucuma.core.model.sequence
 
 import cats.kernel.laws.discipline.*
+import lucuma.core.math.arb.ArbOffset
 import lucuma.core.model.sequence.arb.*
 import lucuma.core.util.arb.*
 import monocle.law.discipline.*
@@ -11,6 +12,7 @@ import munit.*
 
 final class StepConfigSuite extends DisciplineSuite {
   import ArbEnumerated.given
+  import ArbOffset.given
   import ArbStepConfig.given
   import ArbTelescopeConfig.given
 
@@ -31,6 +33,8 @@ final class StepConfigSuite extends DisciplineSuite {
   checkAll("StepConfig.SmartGcal.telescope", LensTests(StepConfig.SmartGcal.telescope))
 
   checkAll("Eq[StepConfig]", EqTests[StepConfig].eqv)
+  checkAll("StepConfig.offset", OptionalTests(StepConfig.offset))
+  checkAll("StepConfig.guiding", OptionalTests(StepConfig.guiding))
   checkAll("StepConfig.gcal", PrismTests(StepConfig.gcal))
   checkAll("StepConfig.science", PrismTests(StepConfig.science))
   checkAll("StepConfig.smartGcal", PrismTests(StepConfig.smartGcal))

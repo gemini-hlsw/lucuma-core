@@ -9,6 +9,7 @@ import cats.data.NonEmptySet
 import cats.derived.*
 import cats.syntax.all.*
 import lucuma.core.enums.*
+import lucuma.core.math.Offset
 import monocle.Focus
 import monocle.Lens
 import monocle.Optional
@@ -157,5 +158,21 @@ object StepConfig:
   val science: Prism[StepConfig, Science] =
     GenPrism[StepConfig, Science]
 
+  /** @group Optics */
   val smartGcal: Prism[StepConfig, SmartGcal] =
     GenPrism[StepConfig, SmartGcal]
+
+  /** @group Optics */
+  val telescope: Optional[StepConfig, TelescopeConfig] =
+    gcal
+      .andThen(Gcal.telescope)
+      .orElse(science.andThen(Science.telescope))
+      .orElse(smartGcal.andThen(SmartGcal.telescope))
+
+  /** @group Optics */
+  val offset: Optional[StepConfig, Offset] =
+    telescope.andThen(TelescopeConfig.offset)
+
+  /** @group Optics */
+  val guiding: Optional[StepConfig, StepGuideState] =
+    telescope.andThen(TelescopeConfig.guiding)
