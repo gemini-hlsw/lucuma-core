@@ -17,6 +17,9 @@ case class TelescopeConfig(
 
 object TelescopeConfig:
 
+  val Default: TelescopeConfig =
+    TelescopeConfig(Offset.Zero, StepGuideState.Enabled)
+
   /** @group Optics */
   val offset: Lens[TelescopeConfig, Offset] =
     Focus[TelescopeConfig](_.offset)
