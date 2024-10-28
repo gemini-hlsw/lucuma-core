@@ -15,7 +15,6 @@ import org.scalacheck.Gen
 
 trait ArbStepConfig:
   import ArbEnumerated.given
-  import ArbTelescopeConfig.given
 
   given Arbitrary[NonEmptySet[GcalArc]] =
     Arbitrary:
@@ -45,30 +44,18 @@ trait ArbStepConfig:
         filter    <- arbitrary[GcalFilter]
         diffuser  <- arbitrary[GcalDiffuser]
         shutter   <- arbitrary[GcalShutter]
-        telescope <- arbitrary[TelescopeConfig]
-      yield StepConfig.Gcal(lamp, filter, diffuser, shutter, telescope)
+      yield StepConfig.Gcal(lamp, filter, diffuser, shutter)
 
   given Cogen[StepConfig.Gcal] =
-    Cogen[(StepConfig.Gcal.Lamp, GcalFilter, GcalDiffuser, GcalShutter, TelescopeConfig)].contramap: a =>
-      (a.lamp, a.filter, a.diffuser, a.shutter, a.telescope)
-
-  given Arbitrary[StepConfig.Science] =
-    Arbitrary:
-      arbitrary[TelescopeConfig].map(StepConfig.Science.apply)
-
-  given Cogen[StepConfig.Science] =
-    Cogen[TelescopeConfig].contramap(_.telescope)
+    Cogen[(StepConfig.Gcal.Lamp, GcalFilter, GcalDiffuser, GcalShutter)].contramap: a =>
+      (a.lamp, a.filter, a.diffuser, a.shutter)
 
   given Arbitrary[StepConfig.SmartGcal] =
     Arbitrary:
-      for
-        s <- arbitrary[SmartGcalType]
-        t <- arbitrary[TelescopeConfig]
-      yield StepConfig.SmartGcal(s, t)
+      arbitrary[SmartGcalType].map(StepConfig.SmartGcal.apply)
 
   given Cogen[StepConfig.SmartGcal] =
-    Cogen[(SmartGcalType, TelescopeConfig)].contramap: a =>
-      (a.smartGcalType, a.telescope)
+    Cogen[SmartGcalType].contramap(_.smartGcalType)
 
   given Arbitrary[StepConfig] =
     Arbitrary:
@@ -76,17 +63,17 @@ trait ArbStepConfig:
         Gen.const(StepConfig.Bias),
         Gen.const(StepConfig.Dark),
         arbitrary[StepConfig.Gcal],
-        arbitrary[StepConfig.Science],
+        Gen.const(StepConfig.Science),
         arbitrary[StepConfig.SmartGcal]
       )
 
   given Cogen[StepConfig] =
-    Cogen[Either[Unit, Either[Unit, Either[StepConfig.Gcal, Either[StepConfig.Science, StepConfig.SmartGcal]]]]].contramap {
-      case StepConfig.Bias                    => ().asLeft
-      case StepConfig.Dark                    => ().asLeft.asRight
-      case g @ StepConfig.Gcal(_, _, _, _, _) => g.asLeft.asRight.asRight
-      case s @ StepConfig.Science(_)          => s.asLeft.asRight.asRight.asRight
-      case m @ StepConfig.SmartGcal(_, _)     => m.asRight.asRight.asRight.asRight
+    Cogen[Either[Unit, Either[Unit, Either[StepConfig.Gcal, Either[Unit, StepConfig.SmartGcal]]]]].contramap {
+      case StepConfig.Bias                 => ().asLeft
+      case StepConfig.Dark                 => ().asLeft.asRight
+      case g @ StepConfig.Gcal(_, _, _, _) => g.asLeft.asRight.asRight
+      case StepConfig.Science              => ().asLeft.asRight.asRight.asRight
+      case m @ StepConfig.SmartGcal(_)     => m.asRight.asRight.asRight.asRight
     }
 
 object ArbStepConfig extends ArbStepConfig

@@ -9,7 +9,6 @@ import cats.data.NonEmptySet
 import cats.derived.*
 import cats.syntax.all.*
 import lucuma.core.enums.*
-import lucuma.core.math.Offset
 import monocle.Focus
 import monocle.Lens
 import monocle.Optional
@@ -33,8 +32,7 @@ object StepConfig:
     lamp:      Gcal.Lamp,
     filter:    GcalFilter,
     diffuser:  GcalDiffuser,
-    shutter:   GcalShutter,
-    telescope: TelescopeConfig
+    shutter:   GcalShutter
   ) extends StepConfig(StepType.Gcal) derives Eq:
 
     def lampType: GcalLampType =
@@ -111,24 +109,12 @@ object StepConfig:
     /** @group Optics */
     val shutter: Lens[Gcal, GcalShutter] =
       Focus[Gcal](_.shutter)
-
-    /** @group Optics */
-    val telescope: Lens[Gcal, TelescopeConfig] =
-      Focus[Gcal](_.telescope)
   end Gcal
 
-  final case class Science(
-    telescope: TelescopeConfig
-  ) extends StepConfig(StepType.Science) derives Eq
-
-  object Science:
-    /** @group Optics */
-    val telescope: Lens[Science, TelescopeConfig] =
-      Focus[Science](_.telescope)
+  case object Science extends StepConfig(StepType.Science)
 
   final case class SmartGcal(
     smartGcalType: SmartGcalType,
-    telescope:     TelescopeConfig
   ) extends StepConfig(StepType.SmartGcal) derives Eq
 
   object SmartGcal:
@@ -137,17 +123,13 @@ object StepConfig:
     val smartGcalType: Lens[SmartGcal, SmartGcalType] =
       Focus[SmartGcal](_.smartGcalType)
 
-    /** @group Optics */
-    val telescope: Lens[SmartGcal, TelescopeConfig] =
-      Focus[SmartGcal](_.telescope)
-
   given Eq[StepConfig] = Eq.instance {
-    case (Bias, Bias)                                       => true
-    case (Dark, Dark)                                       => true
-    case (a @ Gcal(_, _, _, _, _), b @ Gcal(_, _, _, _, _)) => a === b
-    case (a @ Science(_), b @ Science(_))                   => a === b
-    case (a @ SmartGcal(_, _), b @ SmartGcal(_, _))         => a === b
-    case _                                                  => false
+    case (Bias, Bias)                                 => true
+    case (Dark, Dark)                                 => true
+    case (a @ Gcal(_, _, _, _), b @ Gcal(_, _, _, _)) => a === b
+    case (Science, Science)                           => true
+    case (a @ SmartGcal(_), b @ SmartGcal(_))         => a === b
+    case _                                            => false
   }
 
   /** @group Optics */
@@ -155,24 +137,5 @@ object StepConfig:
     GenPrism[StepConfig, Gcal]
 
   /** @group Optics */
-  val science: Prism[StepConfig, Science] =
-    GenPrism[StepConfig, Science]
-
-  /** @group Optics */
   val smartGcal: Prism[StepConfig, SmartGcal] =
     GenPrism[StepConfig, SmartGcal]
-
-  /** @group Optics */
-  val telescope: Optional[StepConfig, TelescopeConfig] =
-    gcal
-      .andThen(Gcal.telescope)
-      .orElse(science.andThen(Science.telescope))
-      .orElse(smartGcal.andThen(SmartGcal.telescope))
-
-  /** @group Optics */
-  val offset: Optional[StepConfig, Offset] =
-    telescope.andThen(TelescopeConfig.offset)
-
-  /** @group Optics */
-  val guiding: Optional[StepConfig, StepGuideState] =
-    telescope.andThen(TelescopeConfig.guiding)
