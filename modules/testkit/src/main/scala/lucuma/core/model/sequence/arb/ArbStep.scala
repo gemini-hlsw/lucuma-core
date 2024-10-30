@@ -16,6 +16,7 @@ trait ArbStep {
   import ArbEnumerated.given
   import ArbStepEstimate.given
   import ArbStepConfig.given
+  import ArbTelescopeConfig.given
   import ArbUid.given
 
   given [D: Arbitrary]: Arbitrary[Step[D]] =
@@ -24,10 +25,11 @@ trait ArbStep {
         i <- arbitrary[Step.Id]
         d <- arbitrary[D]
         c <- arbitrary[StepConfig]
+        t <- arbitrary[TelescopeConfig]
         e <- arbitrary[StepEstimate]
         o <- arbitrary[ObserveClass]
         b <- arbitrary[Breakpoint]
-      } yield Step(i, d, c, e, o, b)
+      } yield Step(i, d, c, t, e, o, b)
     }
 
   given [D: Cogen]: Cogen[Step[D]] =
@@ -35,12 +37,14 @@ trait ArbStep {
       Step.Id,
       D,
       StepConfig,
+      TelescopeConfig,
       StepEstimate,
       Breakpoint
     )].contramap { a =>
       (a.id,
        a.instrumentConfig,
        a.stepConfig,
+       a.telescopeConfig,
        a.estimate,
        a.breakpoint
       )

@@ -6,9 +6,9 @@ package lucuma.core.model.sequence
 import cats.Eq
 import cats.Order.catsKernelOrderingForOrder
 import cats.data.NonEmptySet
+import cats.derived.*
 import cats.syntax.all.*
 import lucuma.core.enums.*
-import lucuma.core.math.Offset
 import monocle.Focus
 import monocle.Lens
 import monocle.Optional
@@ -18,12 +18,11 @@ import monocle.std.either.*
 
 import scala.collection.immutable.SortedSet
 
-sealed abstract class StepConfig(val stepType: StepType) {
+sealed abstract class StepConfig(val stepType: StepType):
   def usesGcalUnit: Boolean =
     stepType === StepType.Gcal || stepType === StepType.SmartGcal
-}
 
-object StepConfig {
+object StepConfig:
 
   case object Bias extends StepConfig(StepType.Bias)
 
@@ -34,23 +33,16 @@ object StepConfig {
     filter:    GcalFilter,
     diffuser:  GcalDiffuser,
     shutter:   GcalShutter
-  ) extends StepConfig(StepType.Gcal) {
+  ) extends StepConfig(StepType.Gcal) derives Eq:
 
     def lampType: GcalLampType =
       lamp.lampType
 
-  }
-
-  object Gcal {
-    given Eq[Gcal] =
-      Eq.by(x => (x.lamp, x.filter, x.diffuser, x.shutter))
-
+  object Gcal:
     opaque type Lamp = Either[GcalContinuum, NonEmptySet[GcalArc]]
 
-    object Lamp {
-
-      extension (lamp: Lamp) {
-
+    object Lamp:
+      extension (lamp: Lamp)
         def toEither: Either[GcalContinuum, NonEmptySet[GcalArc]] =
           lamp
 
@@ -68,8 +60,6 @@ object StepConfig {
 
         def toArcsSortedSet: SortedSet[GcalArc] =
           arcs.fold(SortedSet.empty[GcalArc])(_.toSortedSet)
-
-      }
 
       def fromEither(e: Either[GcalContinuum, NonEmptySet[GcalArc]]): Lamp =
         e
@@ -94,7 +84,7 @@ object StepConfig {
       given Eq[Lamp] =
         Eq.by { lamp => (lamp.continuum, lamp.arcs) }
 
-    }
+    end Lamp
 
     /** @group Optics */
     val lamp: Lens[Gcal, Either[GcalContinuum, NonEmptySet[GcalArc]]] =
@@ -119,43 +109,25 @@ object StepConfig {
     /** @group Optics */
     val shutter: Lens[Gcal, GcalShutter] =
       Focus[Gcal](_.shutter)
-  }
+  end Gcal
 
-  final case class Science(offset: Offset, guiding: StepGuideState) extends StepConfig(StepType.Science)
+  case object Science extends StepConfig(StepType.Science)
 
-  object Science {
-    given Eq[Science] =
-      Eq.by { a => (
-        a.offset,
-        a.guiding
-      )}
+  final case class SmartGcal(
+    smartGcalType: SmartGcalType,
+  ) extends StepConfig(StepType.SmartGcal) derives Eq
 
-    /** @group Optics */
-    val offset: Lens[Science, Offset] =
-      Focus[Science](_.offset)
+  object SmartGcal:
 
     /** @group Optics */
-    val guiding: Lens[Science, StepGuideState] =
-      Focus[Science](_.guiding)
-  }
-
-  final case class SmartGcal(smartGcalType: SmartGcalType) extends StepConfig(StepType.SmartGcal)
-
-  object SmartGcal {
-
-    given Eq[SmartGcal] =
-      Eq.by(_.smartGcalType)
-
     val smartGcalType: Lens[SmartGcal, SmartGcalType] =
       Focus[SmartGcal](_.smartGcalType)
-
-  }
 
   given Eq[StepConfig] = Eq.instance {
     case (Bias, Bias)                                 => true
     case (Dark, Dark)                                 => true
     case (a @ Gcal(_, _, _, _), b @ Gcal(_, _, _, _)) => a === b
-    case (a @ Science(_, _), b @ Science(_, _))       => a === b
+    case (Science, Science)                           => true
     case (a @ SmartGcal(_), b @ SmartGcal(_))         => a === b
     case _                                            => false
   }
@@ -165,10 +137,5 @@ object StepConfig {
     GenPrism[StepConfig, Gcal]
 
   /** @group Optics */
-  val science: Prism[StepConfig, Science] =
-    GenPrism[StepConfig, Science]
-
   val smartGcal: Prism[StepConfig, SmartGcal] =
     GenPrism[StepConfig, SmartGcal]
-
-}
