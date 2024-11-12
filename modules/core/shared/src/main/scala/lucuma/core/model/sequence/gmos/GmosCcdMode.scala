@@ -4,11 +4,21 @@
 package lucuma.core.model.sequence.gmos
 
 import cats.Order
+import cats.data.NonEmptyList
+import cats.syntax.all.*
 import coulomb.*
 import coulomb.syntax.*
 import eu.timepit.refined.types.numeric.PosBigDecimal
 import lucuma.core.enums.*
+import lucuma.core.enums.GmosNorthFpu
+import lucuma.core.enums.GmosNorthGrating
+import lucuma.core.enums.GmosSouthFpu
+import lucuma.core.enums.GmosSouthGrating
+import lucuma.core.enums.GmosXBinning
+import lucuma.core.enums.GmosYBinning
+import lucuma.core.enums.ImageQuality
 import lucuma.core.math.units.Electron
+import lucuma.core.model.SourceProfile
 import monocle.Focus
 import monocle.Lens
 
@@ -51,6 +61,49 @@ final case class GmosCcdMode(
 }
 
 object GmosCcdMode {
+  // For multiple targets, we take the smallest binning for each axis.
+  // https://docs.google.com/document/d/1P8_pXLRVomUSvofyVkAniOyGROcAtiJ7EMYt9wWXB0o/edit?disco=AAAA32SmtD4
+  private def asterismBinning(bs: NonEmptyList[(GmosXBinning, GmosYBinning)]): (GmosXBinning, GmosYBinning) =
+    (bs.map(_._1).minimumBy(_.count), bs.map(_._2).minimumBy(_.count))
+
+  object Default {
+    object Longslit {
+      private def default(xBinning: GmosXBinning, yBinning: GmosYBinning): GmosCcdMode =
+        GmosCcdMode(
+          xBinning,
+          yBinning,
+          longslit.DefaultAmpCount,
+          longslit.DefaultAmpGain,
+          longslit.DefaultAmpReadMode
+        )
+
+      def gmosNorth(
+        profiles:     NonEmptyList[SourceProfile],
+        fpu:          GmosNorthFpu,
+        grating:      GmosNorthGrating,
+        imageQuality: ImageQuality
+      ): GmosCcdMode = {
+        val (defaultXBinning, defaultYBinning) =
+          if (fpu.isIFU) (GmosXBinning.One, GmosYBinning.One)
+          else asterismBinning(profiles.map(longslit.northBinning(fpu, _, imageQuality, grating)))
+
+        default(defaultXBinning, defaultYBinning)
+      }
+
+      def gmosSouth(
+        profiles:     NonEmptyList[SourceProfile],
+        fpu:          GmosSouthFpu,
+        grating:      GmosSouthGrating,
+        imageQuality: ImageQuality
+      ): GmosCcdMode = {
+        val (defaultXBinning, defaultYBinning) =
+          if (fpu.isIFU) (GmosXBinning.One, GmosYBinning.One)
+          else asterismBinning(profiles.map(longslit.southBinning(fpu, _, imageQuality, grating)))
+
+        default(defaultXBinning, defaultYBinning)
+      }
+    }
+  }
 
   given Order[GmosCcdMode] =
     Order.by { a => (
