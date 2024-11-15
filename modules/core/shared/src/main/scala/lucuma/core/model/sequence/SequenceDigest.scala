@@ -9,7 +9,7 @@ import cats.Order.catsKernelOrderingForOrder
 import cats.syntax.monoid.*
 import eu.timepit.refined.cats.*
 import eu.timepit.refined.types.numeric.NonNegInt
-import lucuma.core.enums.ObservationExecutionState
+import lucuma.core.enums.ExecutionState
 import lucuma.core.enums.ObserveClass
 import lucuma.core.math.Offset
 import monocle.Focus
@@ -32,7 +32,7 @@ case class SequenceDigest(
   timeEstimate:   CategorizedTime,
   offsets:        SortedSet[Offset],
   atomCount:      NonNegInt,
-  executionState: ObservationExecutionState
+  executionState: ExecutionState
 ):
 
   def add(o: ObserveClass): SequenceDigest =
@@ -60,7 +60,7 @@ object SequenceDigest:
       CategorizedTime.Zero,
       SortedSet.empty,
       NonNegInt.unsafeFrom(0),
-      ObservationExecutionState.NotStarted
+      ExecutionState.NotStarted
     )
 
   /** @group Optics */
@@ -80,7 +80,7 @@ object SequenceDigest:
     Focus[SequenceDigest](_.atomCount)
 
   /** @group Optics */
-  val executionState: Lens[SequenceDigest, ObservationExecutionState] =
+  val executionState: Lens[SequenceDigest, ExecutionState] =
     Focus[SequenceDigest](_.executionState)
 
   given Eq[SequenceDigest] =

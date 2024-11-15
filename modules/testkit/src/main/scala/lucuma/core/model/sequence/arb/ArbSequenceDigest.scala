@@ -7,7 +7,7 @@ package arb
 import cats.Order.catsKernelOrderingForOrder
 import eu.timepit.refined.scalacheck.all.*
 import eu.timepit.refined.types.numeric.NonNegInt
-import lucuma.core.enums.ObservationExecutionState
+import lucuma.core.enums.ExecutionState
 import lucuma.core.enums.ObserveClass
 import lucuma.core.math.Offset
 import lucuma.core.math.arb.ArbOffset
@@ -30,7 +30,7 @@ trait ArbSequenceDigest:
         t <- arbitrary[CategorizedTime]
         o <- arbitrary[SortedSet[Offset]]
         n <- arbitrary[NonNegInt]
-        s <- arbitrary[ObservationExecutionState]
+        s <- arbitrary[ExecutionState]
       yield SequenceDigest(c, t, o, n, s)
 
   given Cogen[SequenceDigest] =
@@ -39,7 +39,7 @@ trait ArbSequenceDigest:
       CategorizedTime,
       Set[Offset],
       NonNegInt,
-      ObservationExecutionState
+      ExecutionState
     )].contramap: a =>
       (
         a.observeClass,
