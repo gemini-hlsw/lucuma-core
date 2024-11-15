@@ -9,6 +9,7 @@ import cats.Order.catsKernelOrderingForOrder
 import cats.syntax.monoid.*
 import eu.timepit.refined.cats.*
 import eu.timepit.refined.types.numeric.NonNegInt
+import lucuma.core.enums.ExecutionState
 import lucuma.core.enums.ObserveClass
 import lucuma.core.math.Offset
 import monocle.Focus
@@ -19,18 +20,20 @@ import scala.collection.immutable.SortedSet
 /**
  * A compilation of attributes about a sequence computed from its atoms.
  *
- * @param observeClass ObserveClass of the sequence as a whole
- * @param plannedTime  expected execution time for the sequence
- * @param offsets      set of offsets that are expected over the course of the
- *                     sequence execution
- * @param atomCount    number of atoms in the sequence
+ * @param observeClass   ObserveClass of the sequence as a whole
+ * @param plannedTime    expected execution time for the sequence
+ * @param offsets        set of offsets that are expected over the course of the
+ *                       sequence execution
+ * @param atomCount      number of atoms in the sequence
+ * @param executionState completion state for this sequence
  */
 case class SequenceDigest(
-  observeClass: ObserveClass,
-  timeEstimate: CategorizedTime,
-  offsets:      SortedSet[Offset],
-  atomCount:    NonNegInt
-) {
+  observeClass:   ObserveClass,
+  timeEstimate:   CategorizedTime,
+  offsets:        SortedSet[Offset],
+  atomCount:      NonNegInt,
+  executionState: ExecutionState
+):
 
   def add(o: ObserveClass): SequenceDigest =
     SequenceDigest.observeClass.modify(_ |+| o)(this)
@@ -49,16 +52,15 @@ case class SequenceDigest(
         SequenceDigest.atomCount.replace(ac)(this)
       }
 
-}
-
-object SequenceDigest {
+object SequenceDigest:
 
   val Zero: SequenceDigest =
     SequenceDigest(
       Monoid[ObserveClass].empty,
       CategorizedTime.Zero,
       SortedSet.empty,
-      NonNegInt.unsafeFrom(0)
+      NonNegInt.unsafeFrom(0),
+      ExecutionState.NotStarted
     )
 
   /** @group Optics */
@@ -77,13 +79,16 @@ object SequenceDigest {
   val atomCount: Lens[SequenceDigest, NonNegInt] =
     Focus[SequenceDigest](_.atomCount)
 
+  /** @group Optics */
+  val executionState: Lens[SequenceDigest, ExecutionState] =
+    Focus[SequenceDigest](_.executionState)
+
   given Eq[SequenceDigest] =
-    Eq.by { a => (
-      a.observeClass,
-      a.timeEstimate,
-      a.offsets,
-      a.atomCount
-    )}
-
-}
-
+    Eq.by: a =>
+      (
+        a.observeClass,
+        a.timeEstimate,
+        a.offsets,
+        a.atomCount,
+        a.executionState
+      )

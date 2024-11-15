@@ -7,6 +7,7 @@ package arb
 import cats.Order.catsKernelOrderingForOrder
 import eu.timepit.refined.scalacheck.all.*
 import eu.timepit.refined.types.numeric.NonNegInt
+import lucuma.core.enums.ExecutionState
 import lucuma.core.enums.ObserveClass
 import lucuma.core.math.Offset
 import lucuma.core.math.arb.ArbOffset
@@ -17,34 +18,35 @@ import org.scalacheck.Cogen
 
 import scala.collection.immutable.SortedSet
 
-trait ArbSequenceDigest {
+trait ArbSequenceDigest:
   import ArbEnumerated.given
   import ArbCategorizedTime.given
   import ArbOffset.given
 
   given Arbitrary[SequenceDigest] =
-    Arbitrary {
-      for {
-        c  <- arbitrary[ObserveClass]
-        t  <- arbitrary[CategorizedTime]
-        o  <- arbitrary[SortedSet[Offset]]
-        n  <- arbitrary[NonNegInt]
-      } yield SequenceDigest(c, t, o, n)
-    }
+    Arbitrary:
+      for
+        c <- arbitrary[ObserveClass]
+        t <- arbitrary[CategorizedTime]
+        o <- arbitrary[SortedSet[Offset]]
+        n <- arbitrary[NonNegInt]
+        s <- arbitrary[ExecutionState]
+      yield SequenceDigest(c, t, o, n, s)
 
   given Cogen[SequenceDigest] =
     Cogen[(
       ObserveClass,
       CategorizedTime,
       Set[Offset],
-      NonNegInt
-    )].contramap { a => (
-      a.observeClass,
-      a.timeEstimate,
-      a.offsets,
-      a.atomCount
-    )}
-
-}
+      NonNegInt,
+      ExecutionState
+    )].contramap: a =>
+      (
+        a.observeClass,
+        a.timeEstimate,
+        a.offsets,
+        a.atomCount,
+        a.executionState
+      )
 
 object ArbSequenceDigest extends ArbSequenceDigest
