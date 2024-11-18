@@ -6,26 +6,25 @@ package lucuma.core.model
 import cats.*
 import cats.implicits.*
 
-/** An ORCID profile is an OrcidId and a set of optional fields. */
+/**
+ * An ORCID profile is an OrcidId and an ORCID user profile or else a fallback
+ * profile.
+ */
 final case class OrcidProfile(
-  orcidId:      OrcidId,
-  givenName:    Option[String],
-  familyName:   Option[String],
-  creditName:   Option[String],
-  primaryEmail: Option[String],
-) {
+  orcidId:  OrcidId,
+  primary:  UserProfile,
+  fallback: UserProfile
+):
 
   /** The best display name we can provide, based on available information. */
   def displayName: String = (
-    creditName                                       <+>
-    (givenName, familyName).mapN((g, f) => s"$g $f") <+>
-    familyName                                       <+>
-    givenName
-  ).getOrElse(orcidId.value.toString())
+    primary.displayName <+> fallback.displayName
+  ).getOrElse(orcidId.value.toString)
 
-}
+  /** The orcid primary email, or else the fallback email (if any). */
+  def email: Option[String] =
+    primary.email <+> fallback.email
 
-object OrcidProfile {
+object OrcidProfile:
   given Eq[OrcidProfile] =
-    Eq.by(x => (x.orcidId, x.givenName, x.familyName, x.creditName, x.primaryEmail))
-}
+    Eq.by(x => (x.orcidId, x.primary, x.fallback))

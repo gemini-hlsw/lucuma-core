@@ -5,28 +5,24 @@ package lucuma.core.model.arb
 
 import lucuma.core.model.OrcidId
 import lucuma.core.model.OrcidProfile
+import lucuma.core.model.UserProfile
 import org.scalacheck.*
 import org.scalacheck.Arbitrary.*
 
-trait ArbOrcidProfile {
+trait ArbOrcidProfile:
   import ArbOrcidId.given
+  import ArbUserProfile.given
 
   given Arbitrary[OrcidProfile] =
-    Arbitrary {
-      for {
-        id           <- arbitrary[OrcidId]
-        givenName    <- arbitrary[Option[String]]
-        familyName   <- arbitrary[Option[String]]
-        creditName   <- arbitrary[Option[String]]
-        primaryEmail <- arbitrary[Option[String]]
-      } yield OrcidProfile(id, givenName, familyName, creditName, primaryEmail)
-    }
+    Arbitrary:
+      for
+        id       <- arbitrary[OrcidId]
+        primary  <- arbitrary[UserProfile]
+        fallback <- arbitrary[UserProfile]
+      yield OrcidProfile(id, primary, fallback)
 
   given Cogen[OrcidProfile] =
-    Cogen[(OrcidId, Option[String], Option[String], Option[String], Option[String])].contramap(x =>
-      (x.orcidId, x.givenName, x.familyName, x.creditName, x.primaryEmail)
-    )
-
-}
+    Cogen[(OrcidId, UserProfile, UserProfile)].contramap: x =>
+      (x.orcidId, x.primary, x.fallback)
 
 object ArbOrcidProfile extends ArbOrcidProfile
