@@ -4,9 +4,11 @@
 package lucuma.core.model
 
 import cats.Eq
+import cats.syntax.eq.*
 import io.circe.*
 
 import java.net.URI
+import scala.util.Try
 import scala.util.matching.Regex
 
 /**
@@ -35,8 +37,8 @@ object OrcidId {
         if (checkDigit(a + b + c + d) == x)
           Right(new OrcidId(new URI(s"https://orcid.org/$a-$b-$c-$d$x")) {})
         else
-          Left(s"Invalid ORCID iD (bad checksum): $s")
-      case _ => Left(s"Invalid ORCID iD: $s")
+          Left(s"Invalid ORCID id (bad checksum): $s")
+      case _ => Left(s"Invalid ORCID id: $s")
     }
 
   def fromUri(uri: URI): Either[String, OrcidId] =
@@ -44,6 +46,15 @@ object OrcidId {
 
   def fromValue(s: String): Either[String, OrcidId] =
     parseWith(s, ValueRegex)
+
+  /**
+   * Parses the given String into an OrcidId, if possible, whether the String
+   * is in URI format or value format.
+   */
+  def parse(s: String): Either[String, OrcidId] =
+    Try(URI.create(s))
+      .filter(uri => uri.getScheme === "https" && uri.getHost === "orcid.org")
+      .fold(_ => fromValue(s), fromUri)
 
   given Eq[OrcidId] =
     Eq.by(_.value)
