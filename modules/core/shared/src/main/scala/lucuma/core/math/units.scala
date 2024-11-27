@@ -43,8 +43,16 @@ trait units {
   type PicometersPerPixel = Picometer / Pixels
 
   type MetersPerSecond      = Meter / Second
+  given DerivedUnit[MetersPerSecond, Meter / Second, "meters per second", "m/s"] = DerivedUnit()
+  given TypeString[MetersPerSecond] = TypeString("M_S")
+
   type CentimetersPerSecond = (Centi * Meter) / Second
-  type KilometersPerSecond  = (Kilo * Meter) / Second
+  given DerivedUnit[CentimetersPerSecond, (Centi * Meter) / Second, "centimeters per second", "cm/s"] = DerivedUnit()
+  given TypeString[CentimetersPerSecond] = TypeString("CM_S")
+
+  type KilometersPerSecond
+  given DerivedUnit[KilometersPerSecond, (Kilo * Meter) / Second, "kilometers per second", "km/s"] = DerivedUnit()
+  given TypeString[KilometersPerSecond] = TypeString("KM_S")
 
   type Year
   given DerivedUnit[Year, 365 * Day, "year", "y"] = DerivedUnit()

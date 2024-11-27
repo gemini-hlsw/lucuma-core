@@ -128,21 +128,24 @@ final class SourceProfileSuite extends DisciplineSuite {
     assertEquals(gaussian2.toGaussian, gaussian2)
   }
 
-  test("extractBand") {
-    val wv = Wavelength(578000.refined[Positive])
-    assert(SourceProfile.extractBand(wv, SortedMap.empty).isEmpty)
-    assert(SourceProfile.extractBand(wv, sd1Brightnesses).exists(_._1 === Band.R))
-    assert(SourceProfile.extractBand(wv, sd1BrightnessesB).exists(_._1 === Band.SloanR))
-  }
-
   test("nearestBand") {
     val wv = Wavelength(578000.refined[Positive])
-    assert(point1.nearestBand(wv).exists(_._1 === Band.R))
-    assert(point2.nearestBand(wv).isEmpty) // Emission lines not supported
-    assert(uniform1.nearestBand(wv).exists(_._1 === Band.R))
-    assert(uniform2.nearestBand(wv).isEmpty) // Emission lines not supported
-    assert(gaussian1.nearestBand(wv).exists(_._1 === Band.R))
-    assert(gaussian2.nearestBand(wv).isEmpty) // Emission lines not supported
+    assert(point1.nearestBand(wv).contains_(Band.R))
+    assert(point2.nearestBand(wv).isEmpty)
+    assert(uniform1.nearestBand(wv).contains_(Band.R))
+    assert(uniform2.nearestBand(wv).isEmpty)
+    assert(gaussian1.nearestBand(wv).contains_(Band.R))
+    assert(gaussian2.nearestBand(wv).isEmpty)
+  }
+
+  test("nearestLine") {
+    val wv = Wavelength(578000.refined[Positive])
+    assert(point1.nearestLine(wv).isEmpty)
+    assert(point2.nearestLine(wv).contains_(Wavelength.Min))
+    assert(uniform1.nearestLine(wv).isEmpty)
+    assert(uniform2.nearestLine(wv).contains_(Wavelength.Min))
+    assert(gaussian1.nearestLine(wv).isEmpty)
+    assert(gaussian2.nearestLine(wv).contains_(Wavelength.Min))
   }
 
   // Laws for SourceProfile.Point

@@ -4,6 +4,8 @@
 package lucuma.core.util
 
 import cats.Contravariant
+import cats.syntax.contravariant.*
+import eu.timepit.refined.api.*
 
 /**
  * Typeclass for things that can be shown in a user interface.
@@ -50,4 +52,8 @@ object Display {
         override def longName(b: B) = fa.longName(f(b))
       }
   }
+
+  given [T, P](using ev: Display[T]): Display[T Refined P] = ev.contramap(_.value)
+
+  given Display[BigDecimal] = byShortName(_.toString.toLowerCase) // Use lower case "e" for exponent
 }

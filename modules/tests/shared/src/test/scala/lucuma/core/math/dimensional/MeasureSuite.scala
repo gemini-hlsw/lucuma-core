@@ -38,9 +38,6 @@ class MeasureSuite extends munit.DisciplineSuite {
 
     val m = UnitOfMeasure[ABMagnitude].withValue(BigDecimal(1.235))
 
-    implicit val displayBigDecimal: Display[BigDecimal] =
-      Display.byShortName(_.toString)
-
     assertEquals(m.shortName, "1.235 AB mag")
     assertEquals(m.withError(BigDecimal(0.005)).shortName, "1.235 ± 0.005 AB mag")
     assertEquals(m.withError(BigDecimal(0.005)).displayWithoutError, "1.235 AB mag")
