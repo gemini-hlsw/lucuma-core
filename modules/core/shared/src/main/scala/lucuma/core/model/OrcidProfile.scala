@@ -3,28 +3,24 @@
 
 package lucuma.core.model
 
-import cats.*
-import cats.implicits.*
+import cats.Eq
 
 /**
- * An ORCID profile is an OrcidId and an ORCID user profile or else a fallback
- * profile.
+ * An ORCID profile is an OrcidId and a user profile.
  */
 final case class OrcidProfile(
-  orcidId:  OrcidId,
-  primary:  UserProfile,
-  fallback: UserProfile
+  orcidId: OrcidId,
+  profile: UserProfile
 ):
 
   /** The best display name we can provide, based on available information. */
-  def displayName: String = (
-    primary.displayName <+> fallback.displayName
-  ).getOrElse(orcidId.value.toString)
+  def displayName: String =
+    profile.displayName.getOrElse(orcidId.value.toString)
 
   /** The orcid primary email, or else the fallback email (if any). */
   def email: Option[String] =
-    primary.email <+> fallback.email
+    profile.email
 
 object OrcidProfile:
   given Eq[OrcidProfile] =
-    Eq.by(x => (x.orcidId, x.primary, x.fallback))
+    Eq.by(x => (x.orcidId, x.profile))

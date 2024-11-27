@@ -16,13 +16,12 @@ trait ArbOrcidProfile:
   given Arbitrary[OrcidProfile] =
     Arbitrary:
       for
-        id       <- arbitrary[OrcidId]
-        primary  <- arbitrary[UserProfile]
-        fallback <- arbitrary[UserProfile]
-      yield OrcidProfile(id, primary, fallback)
+        id      <- arbitrary[OrcidId]
+        profile <- arbitrary[UserProfile]
+      yield OrcidProfile(id, profile)
 
   given Cogen[OrcidProfile] =
-    Cogen[(OrcidId, UserProfile, UserProfile)].contramap: x =>
-      (x.orcidId, x.primary, x.fallback)
+    Cogen[(OrcidId, UserProfile)].contramap: a =>
+      (a.orcidId, a.profile)
 
 object ArbOrcidProfile extends ArbOrcidProfile
