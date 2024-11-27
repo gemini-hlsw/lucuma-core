@@ -9,6 +9,7 @@ import cats.syntax.all.*
 import coulomb.*
 import coulomb.syntax.*
 import eu.timepit.refined.cats.*
+import eu.timepit.refined.numeric.Positive
 import lucuma.core.enums.Band
 import lucuma.core.enums.StellarLibrarySpectrum
 import lucuma.core.math.BrightnessUnits
@@ -25,6 +26,7 @@ import lucuma.core.math.units.*
 import lucuma.core.model.arb.*
 import lucuma.core.util.arb.ArbCollection
 import lucuma.core.util.arb.ArbEnumerated
+import lucuma.refined.*
 import monocle.law.discipline.*
 import munit.*
 
@@ -44,7 +46,7 @@ final class SpectralDefinitionSuite extends DisciplineSuite {
   import BrightnessUnits.*
 
   // Brightness type conversions
-  val sd1Integrated: SpectralDefinition[Integrated] =
+  val sd1Integrated: SpectralDefinition.BandNormalized[Integrated] =
     SpectralDefinition.BandNormalized(
       UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.A0I).some,
       SortedMap(
@@ -52,7 +54,7 @@ final class SpectralDefinitionSuite extends DisciplineSuite {
       )
     )
 
-  val sd1Surface: SpectralDefinition[Surface] =
+  val sd1Surface: SpectralDefinition.BandNormalized[Surface] =
     SpectralDefinition.BandNormalized(
       UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.A0I).some,
       SortedMap(
@@ -60,7 +62,7 @@ final class SpectralDefinitionSuite extends DisciplineSuite {
       )
     )
 
-  val sd2Integrated: SpectralDefinition[Integrated] =
+  val sd2Integrated: SpectralDefinition.EmissionLines[Integrated] =
     SpectralDefinition.EmissionLines(
       SortedMap(
         Wavelength.Min -> EmissionLine(
@@ -73,7 +75,7 @@ final class SpectralDefinitionSuite extends DisciplineSuite {
       )
     )
 
-  val sd2Surface: SpectralDefinition[Surface] =
+  val sd2Surface: SpectralDefinition.EmissionLines[Surface] =
     SpectralDefinition.EmissionLines(
       SortedMap(
         Wavelength.Min -> EmissionLine(
@@ -101,6 +103,18 @@ final class SpectralDefinitionSuite extends DisciplineSuite {
   test("Brightness type conversion roundtrip") {
     assertEquals(sd1Surface.to[Integrated].to[Surface], sd1Surface)
     assertEquals(sd2Surface.to[Integrated].to[Surface], sd2Surface)
+  }
+
+  test("nearestBand") {
+    val wv = Wavelength(578000.refined[Positive])
+    assert(sd1Integrated.nearestBand(wv).contains_(Band.R))
+    assert(sd1Surface.nearestBand(wv).contains_(Band.R))
+  }
+
+  test("nearestLine") {
+    val wv = Wavelength(578000.refined[Positive])
+    assert(sd2Integrated.nearestLine(wv).contains_(Wavelength.Min))
+    assert(sd2Surface.nearestLine(wv).contains_(Wavelength.Min))
   }
 
   // Laws for SpectralDefinition.BandNormalized

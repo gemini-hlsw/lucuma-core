@@ -40,6 +40,25 @@ sealed trait SourceProfile extends Product with Serializable {
    * necessary.
    */
   def toGaussian: SourceProfile.Gaussian
+
+  /**
+    * Returns the band of a source profile closest to the given wavelength.
+    * It is only valid for source profiles with integrated or surface brightnesses.
+    */
+  def nearestBand(wavelength: Wavelength): Option[Band] =
+    SourceProfile.integratedBandNormalizedSpectralDefinition.getOption(this).orElse:
+      SourceProfile.surfaceBandNormalizedSpectralDefinition.getOption(this)
+    .flatMap(_.nearestBand(wavelength))
+
+  /**
+    * Returns the emission line of a source profile closest to the given wavelength.
+    * It is only valid for source profiles with integrated or surface emission lines.
+    */
+  def nearestLine(wavelength: Wavelength): Option[Wavelength] =
+    SourceProfile.integratedEmissionLinesSpectralDefinition.getOption(this).orElse:
+      SourceProfile.surfaceEmissionLinesSpectralDefinition.getOption(this)
+    .flatMap(_.nearestLine(wavelength))
+    
 }
 
 object SourceProfile {
@@ -270,30 +289,4 @@ object SourceProfile {
   /** @group Optics */
   val surfaceFluxDensityContinuum: Optional[SourceProfile, FluxDensityContinuumMeasure[Surface]] =
     surfaceSpectralDefinition.andThen(SpectralDefinition.fluxDensityContinuum[Surface])
-
-  /**
-   * Returns the band and brightness value for the band closest to the given wavelength.
-   */
-  def extractBand[T](w: Wavelength, bMap: SortedMap[Band, BrightnessMeasure[T]]): Option[(Band, BrightnessValue, Units)] =
-    bMap.minByOption { case (b, _) =>
-      (w.toPicometers.value.value - b.center.toPicometers.value.value).abs
-    }.map(x => (x._1, x._2.value, x._2.units))
-
-  extension(sp: SourceProfile)
-    /**
-     * Returns the band and brightness of a source profile for the band closest to the given wavelength.
-     * It is only valid for source profiles with integrated or surface brightnesses.
-     * (Emission lines not supported)
-     */
-    def nearestBand(wavelength: Wavelength): Option[(Band, BrightnessValue, Units)] =
-      SourceProfile
-        .integratedBrightnesses
-        .getOption(sp)
-        .flatMap(bMap => extractBand[Integrated](wavelength, bMap))
-        .orElse(
-          SourceProfile
-            .surfaceBrightnesses
-            .getOption(sp)
-            .flatMap(bMap => extractBand[Surface](wavelength, bMap))
-        )
 }

@@ -59,6 +59,13 @@ object SpectralDefinition {
         sed,
         brightnesses.map { case (band, brightness) => band -> brightness.toTag[Brightness[T0]] }
       )
+
+    /**
+     * Returns the defined band closest to the given wavelength.
+     */
+    def nearestBand(wavelength: Wavelength): Option[Band] =
+      brightnesses.keySet.minByOption: band =>
+        (wavelength.toPicometers.value.value - band.center.toPicometers.value.value).abs
   }
 
   object BandNormalized {
@@ -102,6 +109,13 @@ object SpectralDefinition {
         lines.map { case (wavelength, line) => wavelength -> line.to[T0] },
         fluxDensityContinuum.toTag[FluxDensityContinuum[T0]]
       )
+
+    /**
+     * Returns the defined line closest to the given wavelength.
+     */
+    def nearestLine(wavelength: Wavelength): Option[Wavelength] =
+      lines.keySet.minByOption: line =>
+        (wavelength.toPicometers.value.value - line.toPicometers.value.value).abs
   }
 
   object EmissionLines {
