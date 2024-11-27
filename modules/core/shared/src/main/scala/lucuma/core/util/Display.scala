@@ -55,5 +55,5 @@ object Display {
 
   given [T, P](using ev: Display[T]): Display[T Refined P] = ev.contramap(_.value)
 
-  given Display[BigDecimal] = byShortName(_.toString)
+  given Display[BigDecimal] = byShortName(_.toString.toLowerCase) // Use lower case "e" for exponent
 }
