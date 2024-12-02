@@ -6,9 +6,9 @@ package lucuma.core.model
 import lucuma.core.util.WithGid
 import lucuma.refined.*
 
+object Attachment       extends WithGid('a'.refined)
 object CallForProposals extends WithGid('c'.refined)
 object Group            extends WithGid('g'.refined)
-object ObsAttachment    extends WithGid('a'.refined)
 object Observation      extends WithGid('o'.refined)
 object Program          extends WithGid('p'.refined)
 object Visit            extends WithGid('v'.refined)
