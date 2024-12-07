@@ -1,4 +1,4 @@
-ThisBuild / tlBaseVersion                         := "0.110"
+ThisBuild / tlBaseVersion                         := "0.111"
 ThisBuild / tlCiReleaseBranches                   := Seq("master")
 ThisBuild / githubWorkflowEnv += "MUNIT_FLAKY_OK" -> "true"
 
@@ -104,7 +104,7 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform)
     name := "lucuma-core-tests",
     libraryDependencies ++= Seq(
       "org.scalameta" %%% "munit"            % "1.0.2" % Test,
-      "org.typelevel" %%% "discipline-munit" % "2.0.0"  % Test
+      "org.typelevel" %%% "discipline-munit" % "2.0.0" % Test
     ),
     testFrameworks += MUnitFramework,
     testOptions += MUnitFlakyOK
