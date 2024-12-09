@@ -20,7 +20,7 @@ case class SiteCoordinatesLimits(
     if (raStart < raEnd)
       raStart <= ra && ra <= raEnd
     else
-      raStart <= ra || (ra.toHourAngle.toDoubleDegrees >= 0 && ra <= raEnd)
+      raStart <= ra || ra <= raEnd
 
   def inDecLimits(dec: Declination): Boolean =
     val a = decStart.min(decEnd)
