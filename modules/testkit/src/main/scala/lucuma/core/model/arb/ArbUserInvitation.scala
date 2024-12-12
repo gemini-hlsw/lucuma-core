@@ -3,28 +3,25 @@
 
 package lucuma.core.model.arb
 
-import eu.timepit.refined.types.numeric.PosLong
 import lucuma.core.model.*
+import lucuma.core.util.arb.ArbGid
 import org.scalacheck.*
 import org.scalacheck.Arbitrary.*
 
 trait ArbUserInvitation:
+  import ArbGid.given
+
   val bodyGen: Gen[String] =
     Gen.stringOfN(96, Gen.oneOf(Gen.hexChar.map(_.toLower), Gen.numChar))
-
-  given Arbitrary[UserInvitation.Id] =
-    Arbitrary:
-      Gen.chooseNum[Long](256, Long.MaxValue).map: num =>
-        UserInvitation.Id(PosLong.unsafeFrom(num))
 
   given Arbitrary[UserInvitation] =
     Arbitrary:
       for
-        id <- arbitrary[UserInvitation.Id]
+        id <- arbitrary[ProgramUser.Id]
         b  <- bodyGen
       yield UserInvitation(id, b)
 
   given Cogen[UserInvitation] =
-    Cogen[(Long, String)].contramap(x => (x.id.value.value, x.body))
+    Cogen[(ProgramUser.Id, String)].contramap(x => (x.id, x.body))
 
 object ArbUserInvitation extends ArbUserInvitation
