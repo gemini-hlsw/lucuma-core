@@ -8,11 +8,18 @@ import cats.derived.*
 import lucuma.core.enums.ConfigurationRequestStatus
 import lucuma.core.util.WithGid
 import lucuma.refined.*
+import monocle.Focus
+import monocle.Lens
 
 case class ConfigurationRequest(
-  id: ConfigurationRequest.Id,
-  status: ConfigurationRequestStatus,
+  id:            ConfigurationRequest.Id,
+  status:        ConfigurationRequestStatus,
   configuration: Configuration
 ) derives Eq
 
-object ConfigurationRequest extends WithGid('x'.refined)
+object ConfigurationRequest extends WithGid('x'.refined):
+  val id: Lens[ConfigurationRequest, ConfigurationRequest.Id]        = Focus[ConfigurationRequest](_.id)
+  val status: Lens[ConfigurationRequest, ConfigurationRequestStatus] =
+    Focus[ConfigurationRequest](_.status)
+  val configuration: Lens[ConfigurationRequest, Configuration]       =
+    Focus[ConfigurationRequest](_.configuration)
