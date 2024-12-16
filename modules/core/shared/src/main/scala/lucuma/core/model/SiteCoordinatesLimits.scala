@@ -6,6 +6,7 @@ package lucuma.core.model
 import cats.Eq
 import cats.derived.*
 import cats.syntax.all.*
+import lucuma.core.enums.Site
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Declination
 import lucuma.core.math.RightAscension
@@ -30,3 +31,13 @@ case class SiteCoordinatesLimits(
   def inLimits(c: Coordinates): Boolean =
     inRaLimits(c.ra) && inDecLimits(c.dec)
 }
+
+case class CallCoordinatesLimits(
+  north: SiteCoordinatesLimits,
+  south: SiteCoordinatesLimits
+) derives Eq:
+  def siteLimits(at: Site): SiteCoordinatesLimits =
+    at match
+      case Site.GN => north
+      case Site.GS => south
+

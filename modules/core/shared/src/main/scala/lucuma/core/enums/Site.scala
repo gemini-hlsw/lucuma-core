@@ -16,8 +16,12 @@ import lucuma.core.math.Lat
 import lucuma.core.math.Lon
 import lucuma.core.math.Place
 import lucuma.core.math.units.*
+import lucuma.core.model.ObservingNight
+import lucuma.core.util.DateInterval
 import lucuma.core.util.Enumerated
 
+import java.time.Duration
+import java.time.Instant
 import java.time.ZoneId
 
 /**
@@ -36,6 +40,12 @@ sealed abstract class Site(
   val longitude: Lon                       = place.longitude
   val altitude: Quantity[NonNegInt, Meter] = place.altitude
   val timezone: ZoneId                     = place.timezone
+
+  def midpoint(active: DateInterval): Instant =
+    val start    = ObservingNight.fromSiteAndLocalDate(this, active.start).start
+    val end      = ObservingNight.fromSiteAndLocalDate(this, active.end).end
+    val duration = Duration.between(start, end)
+    start.plus(duration.dividedBy(2L))
 }
 
 object Site {
