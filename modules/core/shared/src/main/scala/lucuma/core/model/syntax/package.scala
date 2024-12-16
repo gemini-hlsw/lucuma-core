@@ -7,5 +7,4 @@ package object syntax {
   object all extends ToNightOps
                 with ToNonNegDurationOps
                 with ToTrackingOps
-                with SiteOps
 }
