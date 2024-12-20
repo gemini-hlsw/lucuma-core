@@ -3,8 +3,6 @@
 
 package lucuma.core.enums
 
-import cats.Eq
-import cats.derived.*
 import cats.syntax.all.*
 import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.core.util.Enumerated
@@ -17,8 +15,7 @@ enum AttachmentType(
   val longName:        String,
   val uniqueInProgram: Boolean,
   val fileExtensions:  Set[NonEmptyString] // empty set implies accepts anything
-) derives Enumerated,
-      Eq:
+) derives Enumerated:
 
   case Science
       extends AttachmentType(
