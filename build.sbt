@@ -166,7 +166,7 @@ ThisBuild / githubWorkflowPublishPreamble +=
   WorkflowStep.Use(
     UseRef.Public("actions", "setup-node", "v4"),
     Map(
-      "node-version" -> "20",
+      "node-version" -> "22",
       "registry-url" -> "https://registry.npmjs.org"
     )
   )
@@ -174,6 +174,7 @@ ThisBuild / githubWorkflowPublishPreamble +=
 ThisBuild / githubWorkflowPublish ++= Seq(
   WorkflowStep.Sbt(List("npm/npmPublish"),
                    name = Some("NPM Publish"),
-                   env = Map("NODE_AUTH_TOKEN" -> s"$${{ secrets.NPM_REPO_TOKEN }}")
+                   env = Map("NODE_AUTH_TOKEN" -> s"$${{ secrets.NPM_REPO_TOKEN }}"),
+                   cond = Some("startsWith(github.ref, 'refs/tags/v'")
   )
 )
