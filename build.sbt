@@ -175,6 +175,6 @@ ThisBuild / githubWorkflowPublish ++= Seq(
   WorkflowStep.Sbt(List("npm/npmPublish"),
                    name = Some("NPM Publish"),
                    env = Map("NODE_AUTH_TOKEN" -> s"$${{ secrets.NPM_REPO_TOKEN }}"),
-                   cond = Some("startsWith(github.ref, 'refs/tags/v'")
+                   cond = Some("startsWith(github.ref, 'refs/tags/v')")
   )
 )
