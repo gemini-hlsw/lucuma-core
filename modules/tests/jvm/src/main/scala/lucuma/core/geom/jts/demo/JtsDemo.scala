@@ -4,11 +4,13 @@
 package lucuma.core.geom.jts
 package demo
 
+import cats.syntax.all.*
+import lucuma.core.enums.F2Fpu
+import lucuma.core.enums.F2LyotWheel
 import lucuma.core.enums.GmosNorthFpu
 import lucuma.core.enums.GmosSouthFpu
 import lucuma.core.enums.PortDisposition
 import lucuma.core.geom.ShapeExpression
-import lucuma.core.geom.gmos.*
 import lucuma.core.geom.jts.interpreter.given
 import lucuma.core.geom.jts.jvm.syntax.awt.*
 import lucuma.core.geom.syntax.all.*
@@ -20,10 +22,11 @@ import java.awt.event.*
 import java.awt.{List as _, *}
 import scala.jdk.CollectionConverters.*
 
-/**
- * Throwaway demo code to visualize a shape created using `ShapeExpression`s.
- */
-object JtsDemo extends Frame("JTS Demo") {
+sealed trait InstrumentShapes:
+  val shapes: List[ShapeExpression]
+
+trait GmosLSShapes extends InstrumentShapes:
+  import lucuma.core.geom.gmos.*
 
   val posAngle: Angle =
     145.deg
@@ -49,6 +52,39 @@ object JtsDemo extends Frame("JTS Demo") {
       probeArm.candidatesAreaAt(posAngle, offsetPos)
     )
 
+trait F2LSShapes extends InstrumentShapes:
+  import lucuma.core.geom.f2.*
+
+  val posAngle: Angle = Angle.Angle0
+    // 30.deg
+    // 145.deg
+
+  val guideStarOffset: Offset =
+    Offset(170543999.µas.p, -24177003.µas.q)
+
+  val offsetPos: Offset = Offset.Zero
+    // Offset(-60.arcsec.p, 60.arcsec.q)
+
+  val fpu: Option[F2Fpu] = F2Fpu.LongSlit8.some
+  val lyot: F2LyotWheel = F2LyotWheel.F16
+
+  val port: PortDisposition =
+    PortDisposition.Side
+
+  val shapes: List[ShapeExpression] =
+    List(
+      // probeArm.shapeAt(posAngle, guideStarOffset, offsetPos, fpu, port),
+      patrolField.patrolFieldAt(posAngle, offsetPos, lyot, port),
+      scienceArea.shapeAt(posAngle, offsetPos, lyot, fpu),
+      // probeArm.candidatesAreaAt(posAngle, offsetPos)
+    )
+
+/**
+ * Throwaway demo code to visualize a shape created using `ShapeExpression`s.
+ */
+class JtsDemo extends Frame("JTS Demo") {
+  this: InstrumentShapes =>
+
   // Scale
   val arcsecPerPixel: Double =
     1.0
@@ -68,6 +104,13 @@ object JtsDemo extends Frame("JTS Demo") {
   def canvas(boundingBox: Boolean) = new Canvas {
     setBackground(Color.lightGray)
     setSize(canvasSize, canvasSize)
+    addKeyListener(new KeyAdapter() {
+      override def keyPressed(e: KeyEvent): Unit =
+        e.getKeyCode match {
+          case KeyEvent.VK_ESCAPE | KeyEvent.VK_Q => System.exit(0)
+          case _                                  =>
+        }
+    })
 
     override def paint(g: Graphics): Unit = {
       val halfCanvas = canvasSize / 2
@@ -164,8 +207,13 @@ object JtsDemo extends Frame("JTS Demo") {
         System.exit(0)
     })
 
-    add(BorderLayout.CENTER, canvas(args.contains("--boxes")))
+    // add(BorderLayout.CENTER, canvas(args.contains("--boxes")))
+    add(BorderLayout.CENTER, canvas(true)) //args.contains("--boxes")))
 
     setVisible(true)
   }
 }
+
+object JtsGmosLSDemo extends JtsDemo with GmosLSShapes
+
+object JtsF2LSDemo extends JtsDemo with F2LSShapes

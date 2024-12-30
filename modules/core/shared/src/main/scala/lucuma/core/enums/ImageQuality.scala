@@ -6,6 +6,7 @@ package lucuma.core.enums
 import coulomb.*
 import coulomb.policy.spire.standard.given
 import coulomb.syntax.*
+import coulomb.units.accepted.*
 import eu.timepit.refined.*
 import eu.timepit.refined.numeric.Positive
 import eu.timepit.refined.types.numeric.PosInt

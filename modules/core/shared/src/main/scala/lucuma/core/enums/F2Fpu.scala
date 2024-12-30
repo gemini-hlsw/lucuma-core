@@ -15,7 +15,7 @@ sealed abstract class F2Fpu(
   val tag: String,
   val shortName: String,
   val longName: String,
-  val slitWidth: Int,
+  val slitWidth: Int, // pixels
   val decker: String,
   val obsolete: Boolean
 ) extends Product with Serializable
