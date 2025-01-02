@@ -178,6 +178,22 @@ trait shapeexpression {
     */
     def centeredEllipse(w: Angle, h: Angle): ShapeExpression =
       Translate(ellipse(w, h), Offset(-w.bisect.p, -h.bisect.q))
+
+    /**
+    * Constructs a closed arc contained in a rectangle of width w and height h with a corner at (0,0) from angle a to angle b.
+    *
+    * @group Constructors
+    */
+    def closedArc(w: Angle, h: Angle, a: Angle, b: Angle): ShapeExpression =
+      ClosedArc(Offset.Zero, Offset(w.p, h.q), a, b)
+
+    /**
+    * Constructs a closed arc contained in a rectangle of width w and height h with a corner at (0,0) from angle a to angle b.
+    *
+    * @group Constructors
+    */
+    def centeredClosedArc(w: Angle, h: Angle, a: Angle, b: Angle): ShapeExpression =
+      Translate(ClosedArc(Offset.Zero, Offset(w.p, h.q), a, b), Offset(-w.bisect.p, -h.bisect.q))
 }
 
 object shapeexpression extends shapeexpression
