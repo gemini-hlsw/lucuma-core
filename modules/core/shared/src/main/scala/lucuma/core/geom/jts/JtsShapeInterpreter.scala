@@ -42,19 +42,20 @@ object JtsShapeInterpreter extends ShapeInterpreter {
 
     e match {
       // Constructors
-      case Empty           => EmptyGeometry
-      case Ellipse(a, b)   => safeRectangularBoundedShape(a, b)(_.createEllipse)
-      case Polygon(os)     => safePolygon(os)
-      case Rectangle(a, b) => safeRectangularBoundedShape(a, b)(_.createRectangle)
-      case Point(a)        => a.point
-      case BoundingBox(e) =>
+      case Empty                 => EmptyGeometry
+      case Ellipse(a, b)         => safeRectangularBoundedShape(a, b)(_.createEllipse)
+      case ClosedArc(a, b, c, d) => safeRectangularBoundedShape(a, b)(_.createArcPolygon(c.toDoubleRadians, d.toDoubleRadians))
+      case Polygon(os)           => safePolygon(os)
+      case Rectangle(a, b)       => safeRectangularBoundedShape(a, b)(_.createRectangle)
+      case Point(a)              => a.point
+      case BoundingBox(e)        =>
         val (a, b) = Jts.boundingOffsets(toGeometry(e))
         safeRectangularBoundedShape(a, b)(_.createRectangle)
 
       // Combinations
-      case Difference(a, b)   => toGeometry(a).difference(toGeometry(b))
-      case Intersection(a, b) => toGeometry(a).intersection(toGeometry(b))
-      case Union(a, b)        => toGeometry(a).union(toGeometry(b))
+      case Difference(a, b)      => toGeometry(a).difference(toGeometry(b))
+      case Intersection(a, b)    => toGeometry(a).intersection(toGeometry(b))
+      case Union(a, b)           => toGeometry(a).union(toGeometry(b))
 
       // Transformations
       case FlipP(e)                    =>

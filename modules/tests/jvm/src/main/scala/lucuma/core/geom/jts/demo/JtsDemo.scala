@@ -55,15 +55,14 @@ trait GmosLSShapes extends InstrumentShapes:
 trait F2LSShapes extends InstrumentShapes:
   import lucuma.core.geom.f2.*
 
-  val posAngle: Angle = Angle.Angle0
-    // 30.deg
-    // 145.deg
+  val posAngle: Angle =
+    145.deg
 
   val guideStarOffset: Offset =
     Offset(170543999.µas.p, -24177003.µas.q)
 
-  val offsetPos: Offset = Offset.Zero
-    // Offset(-60.arcsec.p, 60.arcsec.q)
+  val offsetPos: Offset =
+    Offset(-60.arcsec.p, 60.arcsec.q)
 
   val fpu: Option[F2Fpu] = F2Fpu.LongSlit8.some
   val lyot: F2LyotWheel = F2LyotWheel.F16
@@ -104,6 +103,7 @@ class JtsDemo extends Frame("JTS Demo") {
   def canvas(boundingBox: Boolean) = new Canvas {
     setBackground(Color.lightGray)
     setSize(canvasSize, canvasSize)
+    setFocusable(true)
     addKeyListener(new KeyAdapter() {
       override def keyPressed(e: KeyEvent): Unit =
         e.getKeyCode match {

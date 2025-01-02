@@ -49,6 +49,13 @@ object ShapeExpression {
   final case class Ellipse(a: Offset, b: Offset) extends ShapeExpression
 
   /**
+   * Arc contained in the rectangle defined by the two positions an the angles of start and end
+   *
+   * @group Constructors
+   */
+  final case class ClosedArc(a: Offset, b: Offset, c: Angle, d: Angle) extends ShapeExpression
+
+  /**
    * Polygon defined by a list of offset positions.
    *
    * @group Constructors
