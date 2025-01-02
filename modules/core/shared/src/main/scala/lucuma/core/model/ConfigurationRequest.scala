@@ -5,6 +5,8 @@ package lucuma.core.model
 
 import cats.Eq
 import cats.derived.*
+import eu.timepit.refined.cats.*
+import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.core.enums.ConfigurationRequestStatus
 import lucuma.core.util.WithGid
 import lucuma.refined.*
@@ -14,6 +16,7 @@ import monocle.Lens
 case class ConfigurationRequest(
   id:            ConfigurationRequest.Id,
   status:        ConfigurationRequestStatus,
+  justification: Option[NonEmptyString],
   configuration: Configuration
 ) derives Eq
 

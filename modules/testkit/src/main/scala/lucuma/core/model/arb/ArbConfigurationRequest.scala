@@ -4,6 +4,8 @@
 package lucuma.core.model
 package arb
 
+import eu.timepit.refined.scalacheck.all.*
+import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.core.enums.ConfigurationRequestStatus
 import lucuma.core.util.arb.ArbEnumerated.given
 import lucuma.core.util.arb.ArbGid.given
@@ -19,11 +21,12 @@ trait ArbConfigurationRequest:
       for
         id <- arbitrary[ConfigurationRequest.Id]
         st <- arbitrary[ConfigurationRequestStatus]
+        ju <- arbitrary[Option[NonEmptyString]]
         co <- arbitrary[Configuration]
-      yield ConfigurationRequest(id, st, co)
+      yield ConfigurationRequest(id, st, ju, co)
 
   given Cogen[ConfigurationRequest] = 
-    Cogen[(ConfigurationRequest.Id, ConfigurationRequestStatus, Configuration)]
-      .contramap(cr => (cr.id, cr.status, cr.configuration))
+    Cogen[(ConfigurationRequest.Id, ConfigurationRequestStatus, Option[NonEmptyString], Configuration)]
+      .contramap(cr => (cr.id, cr.status, cr.justification, cr.configuration))
 
 object ArbConfigurationRequest extends ArbConfigurationRequest
