@@ -72,10 +72,10 @@ trait F2LSShapes extends InstrumentShapes:
 
   val shapes: List[ShapeExpression] =
     List(
-      // probeArm.shapeAt(posAngle, guideStarOffset, offsetPos, fpu, port),
+      ShapeExpression.centeredRectangle(1.arcsec, 1.arcsec).translate(guideStarOffset),
+      probeArm.shapeAt(posAngle, guideStarOffset, offsetPos, lyot, port),
       patrolField.patrolFieldAt(posAngle, offsetPos, lyot, port),
       scienceArea.shapeAt(posAngle, offsetPos, lyot, fpu),
-      // probeArm.candidatesAreaAt(posAngle, offsetPos)
     )
 
 /**
@@ -207,8 +207,7 @@ class JtsDemo extends Frame("JTS Demo") {
         System.exit(0)
     })
 
-    // add(BorderLayout.CENTER, canvas(args.contains("--boxes")))
-    add(BorderLayout.CENTER, canvas(true)) //args.contains("--boxes")))
+    add(BorderLayout.CENTER, canvas(args.contains("--boxes")))
 
     setVisible(true)
   }

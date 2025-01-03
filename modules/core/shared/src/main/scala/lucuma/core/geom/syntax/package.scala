@@ -8,10 +8,12 @@ import coulomb.*
 import coulomb.conversion.UnitConversion
 import coulomb.policy.spire.standard.given
 import coulomb.units.accepted.*
+import coulomb.syntax.*
 import lucuma.core.geom.*
 import lucuma.core.math.Offset
 import lucuma.core.math.units.*
 import spire.std.bigDecimal.*
+import lucuma.core.math.Angle
 
 // import scala.language.implicitConversions
 
@@ -36,3 +38,6 @@ object all extends shapeexpression:
     def withPlateScaleOffset(ps: Quantity[BigDecimal, ArcSecondPerMillimeter]): Offset =
       Offset(q._1.withPlateScale(ps).toAngle.p, q._2.withPlateScale(ps).toAngle.q)
 
+  extension[U](o: Offset)
+    def toDoubleArcseconds: (Quantity[BigDecimal, ArcSecond], Quantity[BigDecimal, ArcSecond]) =
+      (Angle.signedDecimalArcseconds.get(o.p.toAngle).withUnit[ArcSecond], Angle.signedDecimalArcseconds.get(o.q.toAngle).withUnit[ArcSecond])

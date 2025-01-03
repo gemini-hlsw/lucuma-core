@@ -34,7 +34,7 @@ object PortDisposition {
     fromTag(s).getOrElse(throw new NoSuchElementException(s"PortDisposition: Invalid tag: '$s'"))
 
   /** @group Typeclass Instances */
-  implicit val PortDispositionEnumerated: Enumerated[PortDisposition] =
+  given Enumerated[PortDisposition] =
     new Enumerated[PortDisposition] {
       def all = PortDisposition.all
       def tag(a: PortDisposition) = a.tag
