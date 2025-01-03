@@ -10,14 +10,15 @@ import coulomb.units.accepted.*
 import coulomb.units.si.prefixes.*
 import lucuma.core.math.syntax.int.*
 import lucuma.core.math.units.Micrometer
+import lucuma.core.math.units.ArcSecondPerMillimeter
 import spire.std.bigDecimal.*
 
 // Size of probe arm components in mm.
-val PickoffMirrorSize          = 19.8
-val ProbePickoffArmTotalLength = 203.40
-val ProbeBaseArmLength         = 109.63
+val PickoffMirrorSize          = BigDecimal(19800).withUnit[Micrometer]
+val ProbePickoffArmTotalLength = BigDecimal(203400).withUnit[Micrometer]
+val ProbeBaseArmLength         = BigDecimal(109630).withUnit[Micrometer]
 val ProbePickoffArmLength      = ProbePickoffArmTotalLength - PickoffMirrorSize/2.0
-val ProbeArmOffset             = 256.87
+val ProbeArmOffset             = BigDecimal(256870).withUnit[Micrometer]
 
 // Width and length of tapered end of probe arm in arcsec.
 val ProbeArmTaperedWidth       = 15000.mas
@@ -41,6 +42,8 @@ val UpperPatrolAreaRadius = BigDecimal(191028.6).withUnit[Micrometer]
 val LowerPatrolAreaRadius = BigDecimal(268693.9).withUnit[Micrometer]
 // The high limit of the bounding box to the right
 val PatrolAreaHiLimit = BigDecimal(113000).withUnit[Micrometer]
+
+type F2PlateScale = Quantity[BigDecimal, ArcSecondPerMillimeter]
 
 object all extends F2ScienceAreaGeometry with F2PatrolField
 
