@@ -35,39 +35,39 @@ trait F2PatrolField:
     // -- use full circle for upper smaller one (using only half circle for upper part of figure can
     // -- end in two disjoint areas due to calculation imprecisions, we have to make sure areas overlap
     // -- properly to yield the figure we want).
-    val upperPAOffset = (-PickOffPivotPoint, ZeroM).withPlateScaleOffset(plateScale)
+    val upperPAOffset = (-PickOffPivotPoint, ZeroM) ⤇ plateScale
     val upperPA =
       ShapeExpression.centeredEllipse(
-        (UpperPatrolAreaRadius * Two).withPlateScale(plateScale).toAngle,
-        (UpperPatrolAreaRadius * Two).withPlateScale(plateScale).toAngle
-      )
+        ((UpperPatrolAreaRadius * Two) ⨱ plateScale).toAngle,
+        ((UpperPatrolAreaRadius * Two) ⨱ plateScale).toAngle
+      ) ↗ upperPAOffset
 
-    val lowerPAOffset = (-BasePivotPoint, ZeroM).withPlateScaleOffset(plateScale)
+    val lowerPAOffset = (-BasePivotPoint, ZeroM) ⤇ plateScale
     val lowerPA =
       ShapeExpression.centeredClosedArc(
-        (LowerPatrolAreaRadius * Two).withPlateScale(plateScale).toAngle,
-        (LowerPatrolAreaRadius * Two).withPlateScale(plateScale).toAngle,
+        ((LowerPatrolAreaRadius * Two) ⨱ plateScale).toAngle,
+        ((LowerPatrolAreaRadius * Two) ⨱ plateScale).toAngle,
         Angle.Angle0,
         Angle.Angle180
-      )
+      ) ↗ lowerPAOffset
 
     // define the two bounding shapes (one circle and a box)
     val ew =
       ShapeExpression.centeredEllipse(
-        (EntranceWindowRadius * Two).withPlateScale(plateScale).toAngle,
-        (EntranceWindowRadius * Two).withPlateScale(plateScale).toAngle
+        ((EntranceWindowRadius * Two) ⨱ plateScale).toAngle,
+        ((EntranceWindowRadius * Two) ⨱ plateScale).toAngle
       )
 
     val paLimitOffset =
-      ((EntranceWindowRadius-PatrolAreaHiLimit)/2, ZeroM).withPlateScaleOffset(plateScale)
+      ((EntranceWindowRadius-PatrolAreaHiLimit)/2, ZeroM) ⤇ plateScale
 
     val paLimit =
       ShapeExpression.centeredRectangle(
-        (EntranceWindowRadius + PatrolAreaHiLimit).withPlateScale(plateScale).toAngle,
-        (EntranceWindowRadius * Two).withPlateScale(plateScale).toAngle
-      )
+        ((EntranceWindowRadius + PatrolAreaHiLimit) ⨱ plateScale).toAngle,
+        ((EntranceWindowRadius * Two) ⨱ plateScale).toAngle
+      )↗  paLimitOffset
 
-    (((upperPA ↗ upperPAOffset) ∪ (lowerPA ↗ lowerPAOffset)) ∩ ew ) ∩ (paLimit ↗ paLimitOffset)
+    ((upperPA ∪ lowerPA) ∩ ew) ∩ paLimit
   }
 
   /**

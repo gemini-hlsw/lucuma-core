@@ -29,12 +29,22 @@ object all extends shapeexpression:
     def withPlateScale(ps: Quantity[BigDecimal, ArcSecondPerMillimeter]): Quantity[BigDecimal, ArcSecond] =
       q.toUnit[Millimeter] * ps
 
+    inline def ⨱(ps: Quantity[BigDecimal, ArcSecondPerMillimeter]): Quantity[BigDecimal, ArcSecond] =
+      withPlateScale(ps)
+
   extension[U](q: (Quantity[BigDecimal, U], Quantity[BigDecimal, U]))(using UnitConversion[BigDecimal, U, Millimeter])
     def withPlateScale(ps: Quantity[BigDecimal, ArcSecondPerMillimeter]): (Offset.P, Offset.Q) =
       (q._1.withPlateScale(ps).toAngle.p, q._2.withPlateScale(ps).toAngle.q)
 
-    def withPlateScaleOffset(ps: Quantity[BigDecimal, ArcSecondPerMillimeter]): Offset =
+    inline def ⨱(ps: Quantity[BigDecimal, ArcSecondPerMillimeter]): (Offset.P, Offset.Q) =
+      withPlateScale(ps)
+
+    def offsetWithPlateScale(ps: Quantity[BigDecimal, ArcSecondPerMillimeter]): Offset =
       Offset(q._1.withPlateScale(ps).toAngle.p, q._2.withPlateScale(ps).toAngle.q)
+
+    inline def ⤇(ps: Quantity[BigDecimal, ArcSecondPerMillimeter]): Offset =
+      offsetWithPlateScale(ps)
+
 
   extension[U](o: Offset)
     def toDoubleArcseconds: (BigDecimal, BigDecimal) =

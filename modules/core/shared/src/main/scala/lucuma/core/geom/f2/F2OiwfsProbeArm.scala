@@ -16,7 +16,6 @@ import lucuma.core.geom.syntax.all.*
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 import lucuma.core.math.units.*
-import spire.math.*
 import spire.std.bigDecimal.*
 
 /**
@@ -25,8 +24,8 @@ import spire.std.bigDecimal.*
 trait F2OiwfsProbeArm:
 
   private def arm(plateScale: F2PlateScale): ShapeExpression = {
-    val scaledLength = ProbePickoffArmLength.withPlateScale(plateScale).toAngle
-    val hm = (PickoffMirrorSize.withPlateScale(plateScale) / 2.0).toAngle
+    val scaledLength = (ProbePickoffArmLength ⨱ plateScale).toAngle
+    val hm = (PickoffMirrorSize ⨱ plateScale).toAngle.bisect
     val htw = ProbeArmTaperedWidth.bisect
 
     val (x0, y0) = (hm, -htw)
@@ -40,7 +39,7 @@ trait F2OiwfsProbeArm:
   }
 
   private def pickoff(plateScale: F2PlateScale): ShapeExpression =
-    val scaledMirrorSize = PickoffMirrorSize.withPlateScale(plateScale).toAngle
+    val scaledMirrorSize = (PickoffMirrorSize ⨱ plateScale).toAngle
     ShapeExpression.centeredRectangle(scaledMirrorSize, scaledMirrorSize)
 
   /**
@@ -84,7 +83,7 @@ trait F2OiwfsProbeArm:
     val Q = {
       val P = {
         val scaledFlippedPAO = {
-          val scaledPAO = ProbeArmOffset.withPlateScale(plateScale).value
+          val scaledPAO = (ProbeArmOffset ⨱ plateScale).value
           if (port === PortDisposition.Bottom) -scaledPAO else scaledPAO
         }
         val angle = -posAngle
@@ -94,8 +93,8 @@ trait F2OiwfsProbeArm:
       val guideStar = (gsOffset - offset.rotate(posAngle)).inverse().toDoubleArcseconds
       val D = ((guideStar._1 - P._1), (guideStar._2 - P._2))
 
-      val scaledPBAL = ProbeBaseArmLength.withPlateScale(plateScale).value
-      val scaledPPAL = ProbePickoffArmLength.withPlateScale(plateScale).value
+      val scaledPBAL = (ProbeBaseArmLength ⨱ plateScale).value
+      val scaledPPAL = (ProbePickoffArmLength ⨱ plateScale).value
       val distance   = BigDecimal(math.sqrt((D._1.pow(2) + D._2.pow(2)).toDouble)).min(scaledPBAL + scaledPPAL)
       val a = (scaledPBAL.pow(2) - scaledPPAL.pow(2) + distance.pow(2)) / (2 * distance)
       val h = (if (port === PortDisposition.Bottom) -1 else 1) *

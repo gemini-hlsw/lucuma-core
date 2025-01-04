@@ -34,11 +34,11 @@ trait F2ScienceAreaGeometry:
         val plateScale = BigDecimal(lyotWheel.plateScale).withUnit[ArcSecondPerMillimeter]
         fpu match
           case None | Some(F2Fpu.Pinhole) | Some(F2Fpu.SubPixPinhole) =>
-            val size = ImagingFOVSize.withPlateScale(plateScale)
+            val size = ImagingFOVSize ⨱ plateScale
             (size.toAngle, size.toAngle)
           case Some(fpu)                                              =>
             (Angle.fromBigDecimalArcseconds(fpu.slitWidth * pixelScale),
-             LongSlitFOVHeight.withPlateScale(plateScale).toAngle)
+              (LongSlitFOVHeight ⨱ plateScale).toAngle)
       case _                                                          =>
         (Angle.Angle0, Angle.Angle0)
 
@@ -62,7 +62,7 @@ trait F2ScienceAreaGeometry:
    * @return           a shape representing the FOV
    */
   private def imaging(plateScale: F2PlateScale): ShapeExpression =
-    val size = ImagingFOVSize.withPlateScale(plateScale)
+    val size = ImagingFOVSize ⨱ plateScale
     ShapeExpression.centeredEllipse(size.toAngle, size.toAngle)
 
   /**
@@ -93,8 +93,8 @@ trait F2ScienceAreaGeometry:
     plateScale: F2PlateScale,
     scienceAreaWidth: Angle
   ): ShapeExpression =
-    val slitHeight = LongSlitFOVHeight.withPlateScale(plateScale)
-    val y          = (-LongSlitFOVNorthPos / 2).withPlateScale(plateScale)
+    val slitHeight = LongSlitFOVHeight ⨱ plateScale
+    val y          = (-LongSlitFOVNorthPos / 2) ⨱ plateScale
 
     ShapeExpression.centeredRectangle(scienceAreaWidth, slitHeight.toAngle) ↗ Offset.Zero.copy(q = y.toAngle.q)
 
