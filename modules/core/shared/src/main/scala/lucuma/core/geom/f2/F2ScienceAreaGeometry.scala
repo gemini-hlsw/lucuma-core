@@ -21,28 +21,26 @@ import spire.std.bigDecimal.*
 /**
   * F2 science area geometry.
   */
-trait F2ScienceAreaGeometry {
+trait F2ScienceAreaGeometry:
 
   // base target
   def base: ShapeExpression =
     ShapeExpression.point(Offset.Zero)
 
-  def scienceAreaDimensions(lyotWheel: F2LyotWheel, fpu: Option[F2Fpu]):
-    (Angle, Angle) =
-    lyotWheel match {
+  def scienceAreaDimensions(lyotWheel: F2LyotWheel, fpu: Option[F2Fpu]): (Angle, Angle) =
+    lyotWheel match
       case F2LyotWheel.F16 | F2LyotWheel.F32High | F2LyotWheel.F32Low =>
         val pixelScale = lyotWheel.pixelScale
         val plateScale = BigDecimal(lyotWheel.plateScale).withUnit[ArcSecondPerMillimeter]
-        fpu match {
+        fpu match
           case None | Some(F2Fpu.Pinhole) | Some(F2Fpu.SubPixPinhole) =>
             val size = ImagingFOVSize.withPlateScale(plateScale)
             (size.toAngle, size.toAngle)
-          case Some(fpu) =>
+          case Some(fpu)                                              =>
             (Angle.fromBigDecimalArcseconds(fpu.slitWidth * pixelScale),
              LongSlitFOVHeight.withPlateScale(plateScale).toAngle)
-        }
-      case _ => (Angle.Angle0, Angle.Angle0)
-    }
+      case _                                                          => 
+        (Angle.Angle0, Angle.Angle0)
 
   def shapeAt(
     posAngle:  Angle,
@@ -52,11 +50,10 @@ trait F2ScienceAreaGeometry {
   ): ShapeExpression =
     val plateScale = BigDecimal(lyotWheel.plateScale).withUnit[ArcSecondPerMillimeter]
     val scienceAreaWidth = scienceAreaDimensions(lyotWheel, fpu)._1
-    val shape = fpu match {
-      case None => imaging(plateScale)
+    val shape = fpu match
+      case None      => imaging(plateScale)
       // case _    => mosFOV(plateScale) // TODO: handle MOS
-      case Some(fpu)    => longslit(plateScale, scienceAreaWidth)
-    }
+      case Some(fpu) => longslit(plateScale, scienceAreaWidth)
     shape ↗ offsetPos ⟲ posAngle
 
   /**
@@ -64,18 +61,16 @@ trait F2ScienceAreaGeometry {
    * @param plateScale the plate scale in arcsec/mm
    * @return           a shape representing the FOV
    */
-  private def imaging(plateScale: F2PlateScale): ShapeExpression = {
-    val size: Quantity[BigDecimal, ArcSecond]   = ImagingFOVSize.toUnit[Millimeter] * plateScale
-    val radius = size / 2.0
-    ShapeExpression.centeredEllipse(-radius.toAngle, size.toAngle)
-  }
+  private def imaging(plateScale: F2PlateScale): ShapeExpression =
+    val size = ImagingFOVSize.withPlateScale(plateScale)
+    ShapeExpression.centeredEllipse(size.toAngle, size.toAngle)
 
   /**
    * Create the F2 MOS field of view shape.
    * @param plateScale the plate scale in arcsec/mm
    * @return           a shape representing the FOV
    */
-  def mos(plateScale: F2PlateScale): ShapeExpression = {
+  def mos(plateScale: F2PlateScale): ShapeExpression =
     val width  = MOSFOVWidth * plateScale
     val height = ImagingFOVSize * plateScale
     val radius = height / 2.0
@@ -84,7 +79,6 @@ trait F2ScienceAreaGeometry {
     val circle = ShapeExpression.centeredEllipse(-radius.toAngle, height.toAngle)
     val rectangle = ShapeExpression.rectangleAt((-width.toAngle.bisect.p, -radius.toAngle.q), (width.toAngle.p, height.toAngle.q))
     circle ∩ rectangle
-  }
 
   /**
    * Create the F2 long slit field of view shape.
@@ -95,14 +89,11 @@ trait F2ScienceAreaGeometry {
   private def longslit(
     plateScale: F2PlateScale,
     scienceAreaWidth: Angle
-  ): ShapeExpression = {
+  ): ShapeExpression =
     val slitHeight = LongSlitFOVHeight.withPlateScale(plateScale)
     val y          = -LongSlitFOVNorthPos.withPlateScale(plateScale)
 
     ShapeExpression.centeredRectangle(scienceAreaWidth, slitHeight.toAngle) ↗ Offset.Zero.copy(q = y.toAngle.q)
-  }
-
-}
 
 object scienceArea extends F2ScienceAreaGeometry
 

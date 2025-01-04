@@ -13,7 +13,7 @@ import lucuma.core.math.syntax.int.*
   * GMOS area that could be reachable by the patrol arm
   * https://www.gemini.edu/instrumentation/gmos/capability#Guiding
   */
-trait GmosCandidatesArea {
+trait GmosCandidatesArea:
 
   /**
     * GMOS area where the probe arm can reach centered at 0
@@ -21,8 +21,9 @@ trait GmosCandidatesArea {
   def candidatesArea: ShapeExpression =
     // 4.9 arcmin radius
     // NOTE There is some debate on whether this should be 4.8
-    ShapeExpression.centeredEllipse((4.9 * 60 * 2).toInt.arcsec,
-                                    (4.9 * 60 * 2).toInt.arcsec
+    ShapeExpression.centeredEllipse(
+      (4.9 * 60 * 2).toInt.arcsec,
+      (4.9 * 60 * 2).toInt.arcsec
     )
 
   /**
@@ -38,6 +39,4 @@ trait GmosCandidatesArea {
     (for {
       a <- posAngles
       o <- offsetPositions
-    } yield candidatesAreaAt(a, o)).fold(ShapeExpression.Empty)(_ ∪ _)
-}
-
+    } yield candidatesAreaAt(a, o)).fold(ShapeExpression.Empty)(_ ∩ _)

@@ -4,7 +4,6 @@
 package lucuma.core.geom.jts
 package demo
 
-import cats.syntax.all.*
 import lucuma.core.enums.F2Fpu
 import lucuma.core.enums.F2LyotWheel
 import lucuma.core.enums.GmosNorthFpu
@@ -59,20 +58,20 @@ trait F2LSShapes extends InstrumentShapes:
     145.deg
 
   val guideStarOffset: Offset =
-    Offset(170543999.µas.p, -24177003.µas.q)
+    Offset(Angle.fromDoubleDegrees(0.03205404776434761).p, Angle.fromDoubleDegrees(359.995624807521).q)
 
   val offsetPos: Offset =
     Offset(-60.arcsec.p, 60.arcsec.q)
 
-  val fpu: Option[F2Fpu] = F2Fpu.LongSlit8.some
+  val fpu: Option[F2Fpu] = Some(F2Fpu.LongSlit8)
   val lyot: F2LyotWheel = F2LyotWheel.F16
 
   val port: PortDisposition =
-    PortDisposition.Side
+    PortDisposition.Bottom
 
   val shapes: List[ShapeExpression] =
     List(
-      ShapeExpression.centeredRectangle(1.arcsec, 1.arcsec).translate(guideStarOffset),
+      ShapeExpression.centeredRectangle(1.arcsec, 1.arcsec).translate(guideStarOffset), // guide star
       probeArm.shapeAt(posAngle, guideStarOffset, offsetPos, lyot, port),
       patrolField.patrolFieldAt(posAngle, offsetPos, lyot, port),
       scienceArea.shapeAt(posAngle, offsetPos, lyot, fpu),
