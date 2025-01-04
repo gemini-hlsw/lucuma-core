@@ -39,10 +39,9 @@ trait F2OiwfsProbeArm:
     ShapeExpression.polygonAt((x0.p, y0.q), (x1.p, y1.q), (x2.p, y2.q), (x3.p, y3.q), (x4.p, y4.q), (x5.p, y5.q))
   }
 
-  private def pickoff(plateScale: F2PlateScale): ShapeExpression = {
+  private def pickoff(plateScale: F2PlateScale): ShapeExpression =
     val scaledMirrorSize = PickoffMirrorSize.withPlateScale(plateScale).toAngle
     ShapeExpression.centeredRectangle(scaledMirrorSize, scaledMirrorSize)
-  }
 
   /**
     * Description of the F2 OIWFS probe arm with the pickoff mirror centered

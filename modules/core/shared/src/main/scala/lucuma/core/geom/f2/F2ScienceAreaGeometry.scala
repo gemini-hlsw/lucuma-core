@@ -39,7 +39,7 @@ trait F2ScienceAreaGeometry:
           case Some(fpu)                                              =>
             (Angle.fromBigDecimalArcseconds(fpu.slitWidth * pixelScale),
              LongSlitFOVHeight.withPlateScale(plateScale).toAngle)
-      case _                                                          => 
+      case _                                                          =>
         (Angle.Angle0, Angle.Angle0)
 
   def shapeAt(
@@ -70,15 +70,18 @@ trait F2ScienceAreaGeometry:
    * @param plateScale the plate scale in arcsec/mm
    * @return           a shape representing the FOV
    */
-  def mos(plateScale: F2PlateScale): ShapeExpression =
-    val width  = MOSFOVWidth * plateScale
-    val height = ImagingFOVSize * plateScale
-    val radius = height / 2.0
-
-    // The FOV is the intersection of a rectangle and a circle.
-    val circle = ShapeExpression.centeredEllipse(-radius.toAngle, height.toAngle)
-    val rectangle = ShapeExpression.rectangleAt((-width.toAngle.bisect.p, -radius.toAngle.q), (width.toAngle.p, height.toAngle.q))
-    circle ∩ rectangle
+  // def mos(plateScale: F2PlateScale): ShapeExpression = {
+  //   // TODO Implement, the logic comes from the ocs but there is no current way to set MOS in the model
+  //   https://github.com/gemini-hlsw/ocs/blob/develop/bundle/edu.gemini.pot/src/main/scala/edu/gemini/spModel/gemini/flamingos2/F2ScienceAreaGeometry.scala#L67
+  //   val width  = MOSFOVWidth * plateScale
+  //   val height = ImagingFOVSize * plateScale
+  //   val radius = height / 2.0
+  //
+  //   // The FOV is the intersection of a rectangle and a circle.
+  //   val circle = ShapeExpression.centeredEllipse(-radius.toAngle, height.toAngle)
+  //   val rectangle = ShapeExpression.rectangleAt((-width.toAngle.bisect.p, -radius.toAngle.q), (width.toAngle.p, height.toAngle.q))
+  //   circle ∩ rectangle
+  // }
 
   /**
    * Create the F2 long slit field of view shape.
@@ -91,7 +94,7 @@ trait F2ScienceAreaGeometry:
     scienceAreaWidth: Angle
   ): ShapeExpression =
     val slitHeight = LongSlitFOVHeight.withPlateScale(plateScale)
-    val y          = -LongSlitFOVNorthPos.withPlateScale(plateScale)
+    val y          = (-LongSlitFOVNorthPos / 2).withPlateScale(plateScale)
 
     ShapeExpression.centeredRectangle(scienceAreaWidth, slitHeight.toAngle) ↗ Offset.Zero.copy(q = y.toAngle.q)
 

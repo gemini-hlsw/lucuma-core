@@ -30,7 +30,7 @@ trait F2PatrolField:
   /**
     * F2 patrol field shape centered at the base position.
     */
-  def patrolField(plateScale: F2PlateScale): ShapeExpression =
+  def patrolField(plateScale: F2PlateScale): ShapeExpression = {
     // define the "upper" and "lower" half-circles defining the patrol are
     // -- use full circle for upper smaller one (using only half circle for upper part of figure can
     // -- end in two disjoint areas due to calculation imprecisions, we have to make sure areas overlap
@@ -68,6 +68,7 @@ trait F2PatrolField:
       )
 
     (((upperPA ↗ upperPAOffset) ∪ (lowerPA ↗ lowerPAOffset)) ∩ ew ) ∩ (paLimit ↗ paLimitOffset)
+  }
 
   /**
     * F2 patrol field shape, in context.
@@ -84,11 +85,10 @@ trait F2PatrolField:
     offsetPos: Offset,
     lyotWheel: F2LyotWheel,
     port:      PortDisposition
-  ): ShapeExpression = {
+  ): ShapeExpression =
     val plateScale = BigDecimal(lyotWheel.plateScale).withUnit[ArcSecondPerMillimeter]
     val pf = patrolField(plateScale)
     val s  = if (port === PortDisposition.Bottom) pf.flipP else pf
     s ↗ offsetPos ⟲ posAngle
-  }
 
 object patrolField extends F2PatrolField
