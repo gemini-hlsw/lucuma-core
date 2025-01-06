@@ -4,9 +4,9 @@
 package lucuma.core.model.sequence.f2
 
 import cats.kernel.laws.discipline.*
-import lucuma.core.model.sequence.f2.arb.ArbF2StaticConfig.given
+import lucuma.core.model.sequence.f2.arb.ArbF2DynamicConfig.given
 import munit.*
 
-class F2StaticConfigSuite extends DisciplineSuite:
+class F2DynamicConfigSuite extends DisciplineSuite:
 
-  checkAll("Eq[F2StaticConfig]", EqTests[F2StaticConfig].eqv)
+  checkAll("Eq[F2DynamicConfig]", EqTests[F2DynamicConfig].eqv)

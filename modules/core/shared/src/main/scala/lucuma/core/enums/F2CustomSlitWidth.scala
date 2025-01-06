@@ -19,5 +19,5 @@ enum F2CustomSlitWidth(val tag: String, val shortName: String, val longName: Str
   case CustomWidth_4_pix extends F2CustomSlitWidth("CustomWidth_4_pix", "4 pix", "CustomWidth 4 Pixel", F2Fpu.LongSlit4)
   case CustomWidth_6_pix extends F2CustomSlitWidth("CustomWidth_6_pix", "6 pix", "CustomWidth 6 Pixel", F2Fpu.LongSlit6)
   case CustomWidth_8_pix extends F2CustomSlitWidth("CustomWidth_8_pix", "8 pix", "CustomWidth 8 Pixel", F2Fpu.LongSlit8)
-  case Other             extends F2CustomSlitWidth("Other", "Other", "Other", F2Fpu.CustomMask)
+  case Other             extends F2CustomSlitWidth("Other",             "Other", "Other",               F2Fpu.CustomMask)
 

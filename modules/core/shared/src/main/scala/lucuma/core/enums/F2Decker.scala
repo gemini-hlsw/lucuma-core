@@ -13,6 +13,6 @@ import lucuma.core.util.Enumerated
 enum F2Decker(val tag: String, val shortName: String, val longName: String, val obsolete: Boolean)
   derives Enumerated:
 
-  case Imaging extends F2Decker("Imaging", "Imaging", "Imaging", false)
+  case Imaging  extends F2Decker("Imaging",  "Imaging",   "Imaging",  false)
   case LongSlit extends F2Decker("LongSlit", "Long Slit", "LongSlit", false)
-  case MOS extends F2Decker("MOS", "MOS", "MOS", false)
+  case MOS      extends F2Decker("MOS",      "MOS",       "MOS",      false)
