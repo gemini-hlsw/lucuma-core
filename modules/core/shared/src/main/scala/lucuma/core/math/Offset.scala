@@ -90,6 +90,9 @@ object Offset extends OffsetOptics {
   given Order[Offset] =
     Order.by(o => (o.p, o.q))
 
+  def symmetric(a: Angle): Offset =
+    Offset(Component(a), Component(a))
+
   /** Component of an angular offset. */
   opaque type Component[A] = Long
 

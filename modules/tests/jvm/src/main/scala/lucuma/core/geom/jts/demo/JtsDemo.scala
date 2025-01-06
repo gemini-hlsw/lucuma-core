@@ -58,7 +58,7 @@ trait F2LSShapes extends InstrumentShapes:
     145.deg
 
   val guideStarOffset: Offset =
-    Offset(Angle.fromDoubleDegrees(0.03205404776434761).p, Angle.fromDoubleDegrees(359.995624807521).q)
+    Offset(170543999.µas.p, -24177003.µas.q)
 
   val offsetPos: Offset =
     Offset(-60.arcsec.p, 60.arcsec.q)
