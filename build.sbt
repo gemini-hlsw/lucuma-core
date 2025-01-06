@@ -1,4 +1,4 @@
-ThisBuild / tlBaseVersion                         := "0.113"
+ThisBuild / tlBaseVersion                         := "0.114"
 ThisBuild / tlCiReleaseBranches                   := Seq("master")
 ThisBuild / githubWorkflowEnv += "MUNIT_FLAKY_OK" -> "true"
 
@@ -114,6 +114,7 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform)
     resolvers += "Gemini Repository".at(
       "https://github.com/gemini-hlsw/maven-repo/raw/master/releases"
     ),
+    run / fork := true,
     libraryDependencies ++= Seq(
       ("edu.gemini.ocs" %% "edu-gemini-util-skycalc"     % "2020001.1.7" % Test)
         .cross(CrossVersion.for3Use2_13)

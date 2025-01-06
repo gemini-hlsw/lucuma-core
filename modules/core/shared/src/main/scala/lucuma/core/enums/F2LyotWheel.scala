@@ -9,14 +9,20 @@ import lucuma.core.util.Enumerated
 
 /**
  * Enumerated type for Flamingos2 Lyot wheel.
+ *
+ * f/16:  plate scale = 1.61 arcsec/mm;  pixel scale=0.18 arcsec/pixel
+ * f/32:  plate scale = 0.805 arcsec/mm; pixel scale =0.09 arcsec/pixel
+ * If the Lyot wheel is set to HartmannA or HartmannB, the
+ * FOV should just be a point at the base position (this is not a
+ * scientifically useful option, but is used for focusing)
  * @group Enumerations (Generated)
  */
 sealed abstract class F2LyotWheel(
   val tag: String,
   val shortName: String,
   val longName: String,
-  val plateScale: Double,
-  val pixelScale: Double,
+  val plateScale: Double, // arcsec/mm
+  val pixelScale: Double, // arcsec/pixel
   val obsolete: Boolean
 ) extends Product with Serializable
 
@@ -44,7 +50,7 @@ object F2LyotWheel {
     fromTag(s).getOrElse(throw new NoSuchElementException(s"F2LyotWheel: Invalid tag: '$s'"))
 
   /** @group Typeclass Instances */
-  implicit val F2LyotWheelEnumerated: Enumerated[F2LyotWheel] =
+  given Enumerated[F2LyotWheel] =
     new Enumerated[F2LyotWheel] {
       def all = F2LyotWheel.all
       def tag(a: F2LyotWheel) = a.tag

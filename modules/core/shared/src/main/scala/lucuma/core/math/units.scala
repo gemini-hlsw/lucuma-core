@@ -57,15 +57,14 @@ trait units {
   type Year
   given DerivedUnit[Year, 365 * Day, "year", "y"] = DerivedUnit()
 
-  type ArcSecond
-  given DerivedUnit[ArcSecond, Degree / 3600, "arc second", "arcsec"] = DerivedUnit()
-
   type DeciArcSecond  = Deci * ArcSecond
   type MilliArcSecond = Milli * ArcSecond
   type MicroArcSecond = Micro * ArcSecond
 
   type MilliArcSecondPerYear = MilliArcSecond / Year
   type MicroArcSecondPerYear = MicroArcSecond / Year
+
+  type ArcSecondPerMillimeter = ArcSecond / Millimeter
 
   // Integrated Brightness units
   type VegaMagnitude
@@ -165,6 +164,11 @@ trait units {
     }
   }
 
+  extension (q: Quantity[BigDecimal, ArcSecond])
+    inline def toAngle: Angle = Angle.fromBigDecimalArcseconds(q.value)
+
+  extension (c: (Quantity[BigDecimal, ArcSecond], Quantity[BigDecimal, ArcSecond]))
+    inline def toOffset: Offset = Offset(c._1.toAngle.p, c._2.toAngle.q)
 }
 
 object units extends units
