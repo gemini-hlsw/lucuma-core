@@ -51,9 +51,9 @@ trait F2ScienceAreaGeometry:
     val plateScale = BigDecimal(lyotWheel.plateScale).withUnit[ArcSecondPerMillimeter]
     val scienceAreaWidth = scienceAreaDimensions(lyotWheel, fpu)._1
     val shape = fpu match
-      case None      => imaging(plateScale)
-      // case _    => mosFOV(plateScale) // TODO: handle MOS
-      case Some(fpu) => longslit(plateScale, scienceAreaWidth)
+      case None                   => imaging(plateScale)
+      case Some(F2Fpu.CustomMask) => mosFOV(plateScale)
+      case Some(fpu)              => longslit(plateScale, scienceAreaWidth)
     shape ↗ offsetPos ⟲ posAngle
 
   /**
@@ -70,18 +70,14 @@ trait F2ScienceAreaGeometry:
    * @param plateScale the plate scale in arcsec/mm
    * @return           a shape representing the FOV
    */
-  // def mos(plateScale: F2PlateScale): ShapeExpression = {
-  //   // TODO Implement, the logic comes from the ocs but there is no current way to set MOS in the model
-  //   https://github.com/gemini-hlsw/ocs/blob/develop/bundle/edu.gemini.pot/src/main/scala/edu/gemini/spModel/gemini/flamingos2/F2ScienceAreaGeometry.scala#L67
-  //   val width  = MOSFOVWidth * plateScale
-  //   val height = ImagingFOVSize * plateScale
-  //   val radius = height / 2.0
-  //
-  //   // The FOV is the intersection of a rectangle and a circle.
-  //   val circle = ShapeExpression.centeredEllipse(-radius.toAngle, height.toAngle)
-  //   val rectangle = ShapeExpression.rectangleAt((-width.toAngle.bisect.p, -radius.toAngle.q), (width.toAngle.p, height.toAngle.q))
-  //   circle ∩ rectangle
-  // }
+  private def mosFOV(plateScale: F2PlateScale): ShapeExpression =
+    val width  = (MOSFOVWidth ⨱ plateScale).toAngle
+    val height = (ImagingFOVSize ⨱ plateScale).toAngle
+
+    // The FOV is the intersection of a rectangle and a circle.
+    val circle = ShapeExpression.centeredEllipse(height, height)
+    val rectangle = ShapeExpression.centeredRectangle(width, height)
+    circle ∩ rectangle
 
   /**
    * Create the F2 long slit field of view shape.
