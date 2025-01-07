@@ -16,6 +16,7 @@ import lucuma.core.geom.syntax.all.*
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 import lucuma.core.math.syntax.int.*
+import lucuma.core.model.sequence.f2.F2FpuMask
 
 import java.awt.event.*
 import java.awt.{List as _, *}
@@ -63,7 +64,7 @@ trait F2LSShapes extends InstrumentShapes:
   val offsetPos: Offset =
     Offset(-60.arcsec.p, 60.arcsec.q)
 
-  val fpu: Option[F2Fpu] = Some(F2Fpu.LongSlit8)
+  val fpu: F2FpuMask = F2FpuMask.Builtin(F2Fpu.LongSlit8)
   val lyot: F2LyotWheel = F2LyotWheel.F16
 
   val port: PortDisposition =

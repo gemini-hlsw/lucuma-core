@@ -7,6 +7,6 @@ import cats.kernel.laws.discipline.*
 import lucuma.core.model.sequence.f2.arb.ArbF2StaticConfig.given
 import munit.*
 
-class StaticConfigSuite extends DisciplineSuite:
+class F2StaticConfigSuite extends DisciplineSuite:
 
   checkAll("Eq[F2StaticConfig]", EqTests[F2StaticConfig].eqv)

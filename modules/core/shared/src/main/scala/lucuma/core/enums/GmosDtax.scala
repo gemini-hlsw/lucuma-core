@@ -47,7 +47,7 @@ object GmosDtax {
     fromTag(s).getOrElse(throw new NoSuchElementException(s"GmosDtax: Invalid tag: '$s'"))
 
   /** @group Typeclass Instances */
-  implicit val GmosDtaxEnumerated: Enumerated[GmosDtax] =
+  given Enumerated[GmosDtax] =
     new Enumerated[GmosDtax] {
       def all = GmosDtax.all
       def tag(a: GmosDtax) = a.tag
