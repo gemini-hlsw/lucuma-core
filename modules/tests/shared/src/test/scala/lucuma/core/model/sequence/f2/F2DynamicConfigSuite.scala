@@ -5,8 +5,9 @@ package lucuma.core.model.sequence.f2
 
 import cats.kernel.laws.discipline.*
 import lucuma.core.model.sequence.f2.arb.ArbF2DynamicConfig.given
+import lucuma.core.model.sequence.f2.arb.ArbF2FpuMask.given
 import munit.*
 
 class F2DynamicConfigSuite extends DisciplineSuite:
-
+  checkAll("Eq[F2FpuMask]", EqTests[F2FpuMask].eqv)
   checkAll("Eq[F2DynamicConfig]", EqTests[F2DynamicConfig].eqv)

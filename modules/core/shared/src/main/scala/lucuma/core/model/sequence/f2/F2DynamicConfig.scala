@@ -16,14 +16,14 @@ case class F2DynamicConfig(
   filter:         F2Filter,
   readMode:       F2ReadMode,
   lyot:           F2LyotWheel,
-  fpu:            Option[F2Fpu],
+  fpu:            F2FpuMask,
   readoutMode:    Option[F2ReadoutMode], // engineering
   reads:          Option[F2Reads], // engineering
 ) {
-  val isImaging: Boolean       = fpu.isEmpty
-  val isMOS: Boolean           = fpu.exists(_ === F2Fpu.CustomMask)
-  val isLongSlit: Boolean      = fpu.exists(_ =!= F2Fpu.CustomMask)
-  val decker: Option[F2Decker] = fpu.map(_.decker)
+  val isImaging: Boolean       = fpu.isImaging
+  val isMOS: Boolean           = fpu.isMOS
+  val isLongSlit: Boolean      = fpu.isLongSlit
+  val decker: Option[F2Decker] = fpu.fold(none, _.value.decker.some, _ => none)
 }
 
 object F2DynamicConfig:
@@ -51,7 +51,7 @@ object F2DynamicConfig:
     Focus[F2DynamicConfig](_.lyot)
 
   /** @group Optics */
-  val fpu: Lens[F2DynamicConfig, Option[F2Fpu]] =
+  val fpu: Lens[F2DynamicConfig, F2FpuMask] =
     Focus[F2DynamicConfig](_.fpu)
 
   /** @group Optics */

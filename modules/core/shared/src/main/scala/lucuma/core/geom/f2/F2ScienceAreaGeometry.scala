@@ -15,6 +15,7 @@ import lucuma.core.geom.syntax.all.*
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 import lucuma.core.math.units.*
+import lucuma.core.model.sequence.f2.F2FpuMask
 import spire.math.*
 import spire.std.bigDecimal.*
 
@@ -27,17 +28,20 @@ trait F2ScienceAreaGeometry:
   def base: ShapeExpression =
     ShapeExpression.point(Offset.Zero)
 
-  def scienceAreaDimensions(lyotWheel: F2LyotWheel, fpu: Option[F2Fpu]): (Angle, Angle) =
+  def scienceAreaDimensions(lyotWheel: F2LyotWheel, fpu: F2FpuMask): (Angle, Angle) =
     lyotWheel match
       case F2LyotWheel.F16 | F2LyotWheel.F32High | F2LyotWheel.F32Low =>
         val pixelScale = lyotWheel.pixelScale
         val plateScale = BigDecimal(lyotWheel.plateScale).withUnit[ArcSecondPerMillimeter]
         fpu match
-          case None | Some(F2Fpu.Pinhole) | Some(F2Fpu.SubPixPinhole) =>
+          case F2FpuMask.Imaging | F2FpuMask.Builtin(F2Fpu.Pinhole) | F2FpuMask.Builtin(F2Fpu.SubPixPinhole) =>
             val size = ImagingFOVSize ⨱ plateScale
             (size.toAngle, size.toAngle)
-          case Some(fpu)                                              =>
+          case F2FpuMask.Builtin(fpu) =>
             (Angle.fromBigDecimalArcseconds(fpu.slitWidth * pixelScale),
+              (LongSlitFOVHeight ⨱ plateScale).toAngle)
+          case F2FpuMask.Custom(_, _) =>
+            ((MOSFOVWidth ⨱ plateScale).toAngle,
               (LongSlitFOVHeight ⨱ plateScale).toAngle)
       case _                                                          =>
         (Angle.Angle0, Angle.Angle0)
@@ -46,14 +50,16 @@ trait F2ScienceAreaGeometry:
     posAngle:  Angle,
     offsetPos: Offset,
     lyotWheel: F2LyotWheel,
-    fpu:       Option[F2Fpu]
+    fpu:       F2FpuMask
   ): ShapeExpression =
     val plateScale = BigDecimal(lyotWheel.plateScale).withUnit[ArcSecondPerMillimeter]
     val scienceAreaWidth = scienceAreaDimensions(lyotWheel, fpu)._1
-    val shape = fpu match
-      case None                   => imaging(plateScale)
-      case Some(F2Fpu.CustomMask) => mosFOV(plateScale)
-      case Some(fpu)              => longslit(plateScale, scienceAreaWidth)
+    val shape =
+      fpu.fold(
+        imaging(plateScale),
+        _ => longslit(plateScale, scienceAreaWidth),
+        _ => mosFOV(plateScale)
+      )
     shape ↗ offsetPos ⟲ posAngle
 
   /**

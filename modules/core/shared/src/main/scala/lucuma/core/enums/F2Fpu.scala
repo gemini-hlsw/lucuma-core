@@ -27,4 +27,3 @@ enum F2Fpu(
   case LongSlit4     extends F2Fpu("LongSlit4",     "Long Slit 4px",   "4-Pixel Long Slit",    4, F2Decker.LongSlit, false)
   case LongSlit6     extends F2Fpu("LongSlit6",     "Long Slit 6px",   "6-Pixel Long Slit",    6, F2Decker.LongSlit, false)
   case LongSlit8     extends F2Fpu("LongSlit8",     "Long Slit 8px",   "8-Pixel Long Slit",    8, F2Decker.LongSlit, false)
-  case CustomMask    extends F2Fpu("CustomMask",    "Custom Mask",     "Custom Mask",          0, F2Decker.MOS, false)
