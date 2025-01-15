@@ -8,8 +8,8 @@ import lucuma.core.util.Enumerated
 /**
  * Enumerated type for guide probe
  */
-enum GuideProbe(val tag: String) derives Enumerated {
+enum GuideProbe(val tag: String) derives Enumerated:
   case PWFS1     extends GuideProbe("Pwfs1")
   case PWFS2     extends GuideProbe("Pwfs2")
   case GmosOIWFS extends GuideProbe("GmosOiwfs")
-}
+  case F2OIWFS   extends GuideProbe("Flamingos2Oiwfs")
