@@ -6,7 +6,7 @@ ThisBuild / tlCiReleaseBranches += "topic/scala3"
 
 Global / concurrentRestrictions += Tags.limit(Tags.Compile, 1)
 
-ThisBuild / crossScalaVersions := Seq("3.5.2")
+ThisBuild / crossScalaVersions := Seq("3.6.3")
 ThisBuild / scalacOptions += "-language:implicitConversions" // TODO
 
 lazy val catsVersion           = "2.12.0"
