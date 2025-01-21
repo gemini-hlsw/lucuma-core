@@ -16,7 +16,7 @@ import monocle.Lens
 import monocle.Optional
 
 /** Constraints for an observation. */
-final case class ConstraintSet(
+case class ConstraintSet(
   imageQuality:    ImageQuality,
   cloudExtinction: CloudExtinction,
   skyBackground:   SkyBackground,
