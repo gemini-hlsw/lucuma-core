@@ -11,7 +11,7 @@ sealed abstract class CloudExtinction(val tag: String, val toDeciBrightness: Int
   def label: String        = f"< $toBrightness%.1f mag"
 }
 
-object CloudExtinction {
+object CloudExtinction:
   case object PointOne       extends CloudExtinction("point_one", 1)
   case object PointThree     extends CloudExtinction("point_three", 3)
   case object PointFive      extends CloudExtinction("point_five", 5)
@@ -20,7 +20,7 @@ object CloudExtinction {
   case object TwoPointZero   extends CloudExtinction("two_point_zero", 20)
   case object ThreePointZero extends CloudExtinction("three_point_zero", 30)
 
-  implicit val CloudExtinctionEnumerated: Enumerated[CloudExtinction] =
+  given Enumerated[CloudExtinction] =
     Enumerated.from(
       PointOne,
       PointThree,
@@ -31,6 +31,5 @@ object CloudExtinction {
       ThreePointZero
     ).withTag(_.tag)
 
-  implicit val CloudExtinctionDisplay: Display[CloudExtinction] =
+  given Display[CloudExtinction] =
     Display.byShortName(_.label)
-}
