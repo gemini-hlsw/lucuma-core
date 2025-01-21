@@ -12,6 +12,7 @@ import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.WaterVapor
 import lucuma.core.math.Declination
 import lucuma.core.math.Wavelength
+import lucuma.core.model.AirMassPredicate
 
 /**
   * Tests the likelihood calculations

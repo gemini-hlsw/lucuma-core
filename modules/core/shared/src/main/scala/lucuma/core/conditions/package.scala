@@ -8,7 +8,6 @@ import coulomb.units.accepted.*
 import eu.timepit.refined.*
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.boolean.Not
-import eu.timepit.refined.numeric.Interval as RefinedInterval
 import eu.timepit.refined.numeric.Less
 import lucuma.core.enums.CloudExtinction
 import lucuma.core.enums.Site
@@ -17,7 +16,9 @@ import lucuma.core.enums.WaterVapor
 import lucuma.core.math.Declination
 import lucuma.core.math.Wavelength
 import lucuma.core.math.erf
-import lucuma.core.util.RefinedNewType
+import lucuma.core.model.AirMassPredicate
+import lucuma.core.model.AirMassValue
+import lucuma.core.model.IntCentiPercent
 import lucuma.refined.*
 
 import scala.math.Pi
@@ -29,33 +30,6 @@ import scala.math.sin
 // Taken from:
 // https://github.com/andrewwstephens/pyexplore/blob/3edd50f6c41509752cda6ad493ccaadd5eb5ad82/test/percentile.py
 //
-// Store a percentage with two decimals of precision for a 0-100% range
-type CentiPercent    = RefinedInterval.Closed[0, 10000]
-object IntCentiPercent extends RefinedNewType[Int, CentiPercent]:
-  val Max = IntCentiPercent.unsafeFrom(10000)
-  val Min = IntCentiPercent.unsafeFrom(0)
-
-  /**
-    * Approximate a double to a IntCentiPercent
-    */
-  def fromDouble(d: Double): IntCentiPercent = IntCentiPercent.unsafeFrom((d * 100).toInt)
-
-  /**
-    * Approximate a BigDecimal to a IntCentiPercent
-    */
-  def fromBigDecimal(d: BigDecimal): IntCentiPercent = IntCentiPercent.unsafeFrom((d * 100).toInt)
-
-  extension(a: IntCentiPercent)
-    def toPercent: Double = a.value.value / 100.0
-    def *(b: IntCentiPercent): IntCentiPercent =
-      // Given a and b are in the range 0-1 the result is also in the range 0-1
-      IntCentiPercent.unsafeFrom((a.value.value * b.value.value) / 10000)
-    def round: IntCentiPercent = IntCentiPercent.unsafeFrom(100 * scala.math.round(a.value.value / 100.0f))
-
-type IntCentiPercent = IntCentiPercent.Type
-
-type AirMassPredicate = Not[Less[1]]
-type AirMassValue     = BigDecimal Refined AirMassPredicate
 
 /**
   * Return the minimum airmass at a certain declination at a site.
@@ -111,7 +85,8 @@ def percentileImageQuality(fwhm: Quantity[BigDecimal, ArcSecond], wavelength: Wa
 
   // model fit to QAP from 2004-2024:  (the extra +0.5 is to force 100% in the worst IQ)
   val c = Array(50.10221383, 0.87712202, 0.78467697, 16.10928544, 0.13778389, -15.8255612, 49.37405633 + 0.5)
-  IntCentiPercent.fromDouble(c(0) * erf(c(1) * pow(wavelength.toMicrometers.value.value.toDouble, c(2)) + c(3) * pow(zenithFwhm, c(4)) + c(5)) + c(6))
+  // The equation gives a number between 0 and 100
+  IntCentiPercent.fromBigDecimal.getOption(c(0) * erf(c(1) * pow(wavelength.toMicrometers.value.value.toDouble, c(2)) + c(3) * pow(zenithFwhm, c(4)) + c(5)) + c(6)).get
 
 def conditionsLikelihood(bg: SkyBackground, extinction: CloudExtinction, wv: WaterVapor, fwhm: Quantity[BigDecimal, ArcSecond], wavelength: Wavelength, dec: Declination, site: Site): IntCentiPercent =
     (percentileSkyBackground(bg) *
