@@ -5,67 +5,63 @@ package lucuma.core.model
 package arb
 
 import eu.timepit.refined.scalacheck.all.*
-import eu.timepit.refined.types.all.PosInt
+import eu.timepit.refined.types.all.NonNegInt
 import lucuma.core.math.SignalToNoise
+import lucuma.core.math.Wavelength
 import lucuma.core.math.arb.ArbRefined
 import lucuma.core.math.arb.ArbSignalToNoise
+import lucuma.core.math.arb.ArbWavelength
 import lucuma.core.util.TimeSpan
 import lucuma.core.util.arb.ArbTimeSpan
 import org.scalacheck.*
 import org.scalacheck.Arbitrary.arbitrary
 
-trait ArbExposureTimeMode {
+trait ArbExposureTimeMode:
   import ExposureTimeMode.*
   import ArbRefined.given
   import ArbSignalToNoise.given
   import ArbTimeSpan.given
+  import ArbWavelength.given
 
   given Arbitrary[SignalToNoiseMode] =
-    Arbitrary {
-      arbitrary[SignalToNoise].map(SignalToNoiseMode(_))
-    }
+    Arbitrary:
+      for
+        v <- arbitrary[SignalToNoise]
+        w <- arbitrary[Wavelength]
+      yield SignalToNoiseMode(v, w)
 
   given Cogen[SignalToNoiseMode] =
-    Cogen[SignalToNoise].contramap(_.value)
+    Cogen[(SignalToNoise, Wavelength)].contramap: a =>
+      (
+        a.value,
+        a.at
+      )
 
-  given Arbitrary[FixedExposureMode] =
-    Arbitrary {
-      for {
-        c <- arbitrary[PosInt]
+  given Arbitrary[TimeAndCountMode] =
+    Arbitrary:
+      for
         t <- arbitrary[TimeSpan]
-      } yield FixedExposureMode(c, t)
-    }
+        c <- arbitrary[NonNegInt]
+        w <- arbitrary[Wavelength]
+      yield TimeAndCountMode(t, c, w)
 
-  given Cogen[FixedExposureMode] =
-    Cogen[
+  given Cogen[TimeAndCountMode] =
+    Cogen[(TimeSpan, NonNegInt, Wavelength)].contramap: a =>
       (
-        PosInt,
-        TimeSpan
+        a.time,
+        a.count,
+        a.at
       )
-    ].contramap { in =>
-      (
-        in.count,
-        in.time
-      )
-    }
 
   given Arbitrary[ExposureTimeMode] =
-    Arbitrary {
-      Gen.oneOf(arbitrary[FixedExposureMode], arbitrary[FixedExposureMode])
-    }
+    Arbitrary:
+      Gen.oneOf(arbitrary[SignalToNoiseMode], arbitrary[TimeAndCountMode])
 
   given Cogen[ExposureTimeMode] =
-    Cogen[
+    Cogen[(Option[SignalToNoiseMode], Option[TimeAndCountMode])].contramap: a =>
       (
-        Option[SignalToNoiseMode],
-        Option[FixedExposureMode]
+        ExposureTimeMode.signalToNoise.getOption(a),
+        ExposureTimeMode.timeAndCount.getOption(a)
       )
-    ].contramap { in =>
-      (
-        ExposureTimeMode.signalToNoise.getOption(in),
-        ExposureTimeMode.fixedExposure.getOption(in)
-      )
-    }
-}
 
 object ArbExposureTimeMode extends ArbExposureTimeMode
