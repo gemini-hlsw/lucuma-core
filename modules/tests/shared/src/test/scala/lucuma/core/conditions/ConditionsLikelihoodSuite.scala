@@ -45,6 +45,7 @@ class ConditionsLikelihoodSuite extends munit.FunSuite:
     assertEqualsDouble(percentileImageQuality(BigDecimal(1.8).withUnit[ArcSecond], Wavelength.fromIntNanometers(630).get, refineV[AirMassPredicate](BigDecimal(1)).getOrElse(sys.error("Not possible"))).toPercent, 99.90, 0.00001)   // r IQany
     assertEqualsDouble(percentileImageQuality(BigDecimal(2.0).withUnit[ArcSecond], Wavelength.fromIntNanometers(2200).get, refineV[AirMassPredicate](BigDecimal(2)).getOrElse(sys.error("Not possible"))).toPercent, 99.95, 0.00001)
     assertEqualsDouble(percentileImageQuality(BigDecimal(0.5).withUnit[ArcSecond], Wavelength.fromIntNanometers(630).get, refineV[AirMassPredicate](BigDecimal(2)).getOrElse(sys.error("Not possible"))).toPercent, 2.25, 0.00001)
+    assertEqualsDouble(percentileImageQuality(BigDecimal(0.1).withUnit[ArcSecond], Wavelength.fromIntNanometers(630).get, refineV[AirMassPredicate](BigDecimal(2)).getOrElse(sys.error("Not possible"))).toPercent, 0.0, 0.00001)
 
   test("conditions likelyhood"):
     assertEquals(conditionsLikelihood(SkyBackground.Bright, CloudExtinction.ThreePointZero, WaterVapor.Wet, BigDecimal(3).withUnit[ArcSecond], Wavelength.fromIntNanometers(1000).get, Declination.fromDoubleDegrees(20).get, Site.GN).toPercent, 100.0)
