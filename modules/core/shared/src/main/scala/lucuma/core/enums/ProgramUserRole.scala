@@ -7,10 +7,11 @@ import lucuma.core.util.Enumerated
 
 enum ProgramUserRole(val tag: String) derives Enumerated:
 
-  case Pi      extends ProgramUserRole("pi")
-  case Coi     extends ProgramUserRole("coi")
-  case CoiRO   extends ProgramUserRole("coi_ro")
-  case SupportPrimary extends ProgramUserRole("support_primary")
+  case Pi               extends ProgramUserRole("pi")
+  case Coi              extends ProgramUserRole("coi")
+  case CoiRO            extends ProgramUserRole("coi_ro")
+  case External         extends ProgramUserRole("external")
+  case SupportPrimary   extends ProgramUserRole("support_primary")
   case SupportSecondary extends ProgramUserRole("support_secondary")
 
 end ProgramUserRole
