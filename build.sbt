@@ -1,3 +1,5 @@
+import org.scalajs.linker.interface.ESVersion
+
 ThisBuild / tlBaseVersion                         := "0.115"
 ThisBuild / tlCiReleaseBranches                   := Seq("master")
 ThisBuild / githubWorkflowEnv += "MUNIT_FLAKY_OK" -> "true"
@@ -137,7 +139,8 @@ lazy val npm        = project
   .dependsOn(core.js)
   .enablePlugins(ScalaJSPlugin, NoPublishPlugin)
   .settings(
-    scalaJSLinkerConfig ~= (_.withModuleKind(ModuleKind.ESModule)),
+    scalaJSLinkerConfig ~= (_.withModuleKind(ModuleKind.ESModule)
+      .withESFeatures(_.withESVersion(ESVersion.ES2021).withAvoidLetsAndConsts(false))),
     npmPackage := {
       val _      = (Compile / fullLinkJS).value
       val outDir = (Compile / fullLinkJS / scalaJSLinkerOutputDirectory).value
@@ -173,9 +176,10 @@ ThisBuild / githubWorkflowPublishPreamble +=
   )
 
 ThisBuild / githubWorkflowPublish ++= Seq(
-  WorkflowStep.Sbt(List("npm/npmPublish"),
-                   name = Some("NPM Publish"),
-                   env = Map("NODE_AUTH_TOKEN" -> s"$${{ secrets.NPM_REPO_TOKEN }}"),
-                   cond = Some("startsWith(github.ref, 'refs/tags/v')")
+  WorkflowStep.Sbt(
+    List("npm/npmPublish"),
+    name = Some("NPM Publish"),
+    env = Map("NODE_AUTH_TOKEN" -> s"$${{ secrets.NPM_REPO_TOKEN }}"),
+    cond = Some("startsWith(github.ref, 'refs/tags/v')")
   )
 )
