@@ -49,8 +49,12 @@ def averageParallacticAngle(
 
   // the number of samples we need to have a sampling rate >= than expected
   val cnt: Int            = math.ceil(defined.duration.toDouble / rate).toInt
+
   // the precise rate in milliseconds that corresponds to the expected rate
-  val preciseRate: Double = defined.duration.toDouble / cnt
+  val preciseRate: Double = 
+    if cnt != 0 
+      then defined.duration.toDouble / cnt
+      else 0.0 // arbitrary, just can't be NaN
 
   /** Calculates a vector with times that cover the given interval. */
   val times: Vector[Long] = {
