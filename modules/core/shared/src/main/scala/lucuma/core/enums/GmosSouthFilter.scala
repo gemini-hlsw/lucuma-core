@@ -66,7 +66,9 @@ object GmosSouthFilter {
 
   /** Acquisition filter options. */
   val acquisition: NonEmptyList[GmosSouthFilter] =
-    NonEmptyList.of(UPrime, GPrime, RPrime, IPrime, ZPrime)
+    NonEmptyList.fromListUnsafe(
+      List(UPrime, GPrime, RPrime, IPrime, ZPrime).filter(!_.obsolete)
+    )
 
   /** Select the member of GmosSouthFilter with the given tag, if any. */
   def fromTag(s: String): Option[GmosSouthFilter] =
