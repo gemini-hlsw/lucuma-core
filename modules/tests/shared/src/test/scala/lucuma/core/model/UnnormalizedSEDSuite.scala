@@ -85,4 +85,8 @@ final class UnnormalizedSEDSuite extends DisciplineSuite {
     "UnnormalizedSED.userDefined",
     PrismTests(UnnormalizedSED.userDefined)
   )
+  checkAll(
+    "UnnormalizedSED.userDefinedAttachment",
+    PrismTests(UnnormalizedSED.userDefinedAttachment)
+  )
 }
