@@ -16,7 +16,6 @@ import lucuma.core.geom.syntax.all.*
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 import lucuma.core.math.units.*
-import spire.std.bigDecimal.*
 
 /**
   * Description of the F2 OIWFS probe arm geometry.

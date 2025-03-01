@@ -5,118 +5,173 @@ package lucuma.core.enums
 
 import lucuma.core.util.Enumerated
 
-sealed abstract class StellarLibrarySpectrum(
-  val tag:         String,
-  val sedSpectrum: String
-) extends Product
-    with Serializable
-
-object StellarLibrarySpectrum {
-
-  case object O5V     extends StellarLibrarySpectrum("O5V", "O5V")
-  case object O8III   extends StellarLibrarySpectrum("O8III", "O8III")
-  case object B0V     extends StellarLibrarySpectrum("B0V", "B0V")
-  case object B5_7V   extends StellarLibrarySpectrum("B5_7V", "B5-7V")
-  case object B5III   extends StellarLibrarySpectrum("B5III", "B5III")
-  case object B5I     extends StellarLibrarySpectrum("B5I", "B5I")
-  case object A0V     extends StellarLibrarySpectrum("A0V", "A0V")
-  case object A0III   extends StellarLibrarySpectrum("A0III", "A0III")
-  case object A0I     extends StellarLibrarySpectrum("A0I", "A0I")
-  case object A5V     extends StellarLibrarySpectrum("A5V", "A5V")
-  case object A5III   extends StellarLibrarySpectrum("A5III", "A5III")
-  case object F0V     extends StellarLibrarySpectrum("F0V", "F0V")
-  case object F0III   extends StellarLibrarySpectrum("F0III", "F0III")
-  case object F0I     extends StellarLibrarySpectrum("F0I", "F0I")
-  case object F5V     extends StellarLibrarySpectrum("F5V", "F5V")
-  case object F5V_w   extends StellarLibrarySpectrum("F5V_w", "F5V-w")
-  case object F6V_r   extends StellarLibrarySpectrum("F6V_r", "F6V-r")
-  case object F5III   extends StellarLibrarySpectrum("F5III", "F5III")
-  case object F5I     extends StellarLibrarySpectrum("F5I", "F5I")
-  case object G0V     extends StellarLibrarySpectrum("G0V", "G0V")
-  case object G0V_w   extends StellarLibrarySpectrum("G0V_w", "G0V-w")
-  case object G0V_r   extends StellarLibrarySpectrum("G0V_r", "G0V-r")
-  case object G0III   extends StellarLibrarySpectrum("G0III", "G0III")
-  case object G0I     extends StellarLibrarySpectrum("G0I", "G0I")
-  case object G2V     extends StellarLibrarySpectrum("G2V", "G2V")
-  case object G5V     extends StellarLibrarySpectrum("G5V", "G5V")
-  case object G5V_w   extends StellarLibrarySpectrum("G5V_w", "G5V-w")
-  case object G5V_r   extends StellarLibrarySpectrum("G5V_r", "G5V-r")
-  case object G5III   extends StellarLibrarySpectrum("G5III", "G5III")
-  case object G5III_w extends StellarLibrarySpectrum("G5III_w", "G5III-w")
-  case object G5III_r extends StellarLibrarySpectrum("G5III_r", "G5III-r")
-  case object G5I     extends StellarLibrarySpectrum("G5I", "G5I")
-  case object K0V     extends StellarLibrarySpectrum("K0V", "K0V")
-  case object K0V_r   extends StellarLibrarySpectrum("K0V_r", "K0V-r")
-  case object K0III   extends StellarLibrarySpectrum("K0III", "K0III")
-  case object K0III_w extends StellarLibrarySpectrum("K0III_w", "K0III-w")
-  case object K0III_r extends StellarLibrarySpectrum("K0III_r", "K0III-r")
-  case object K0_1II  extends StellarLibrarySpectrum("K0_1II", "K0-1II")
-  case object K4V     extends StellarLibrarySpectrum("K4V", "K4V")
-  case object K4III   extends StellarLibrarySpectrum("K4III", "K4III")
-  case object K4III_w extends StellarLibrarySpectrum("K4III_w", "K4III-w")
-  case object K4III_r extends StellarLibrarySpectrum("K4III_r", "K4III-r")
-  case object K4I     extends StellarLibrarySpectrum("K4I", "K4I")
-  case object M0V     extends StellarLibrarySpectrum("M0V", "M0V")
-  case object M0III   extends StellarLibrarySpectrum("M0III", "M0III")
-  case object M3V     extends StellarLibrarySpectrum("M3V", "M3V")
-  case object M3III   extends StellarLibrarySpectrum("M3III", "M3III")
-  case object M6V     extends StellarLibrarySpectrum("M6V", "M6V")
-  case object M6III   extends StellarLibrarySpectrum("M6III", "M6III")
-  case object M9III   extends StellarLibrarySpectrum("M9III", "M9III")
-
-  /** @group Typeclass Instances */
-  implicit val StellarLibrarySpectrumEnumerated: Enumerated[StellarLibrarySpectrum] =
-    Enumerated.from(
-      O5V,
-      O8III,
-      B0V,
-      B5_7V,
-      B5III,
-      B5I,
-      A0V,
-      A0III,
-      A0I,
-      A5V,
-      A5III,
-      F0V,
-      F0III,
-      F0I,
-      F5V,
-      F5V_w,
-      F6V_r,
-      F5III,
-      F5I,
-      G0V,
-      G0V_w,
-      G0V_r,
-      G0III,
-      G0I,
-      G2V,
-      G5V,
-      G5V_w,
-      G5V_r,
-      G5III,
-      G5III_w,
-      G5III_r,
-      G5I,
-      K0V,
-      K0V_r,
-      K0III,
-      K0III_w,
-      K0III_r,
-      K0_1II,
-      K4V,
-      K4III,
-      K4III_w,
-      K4III_r,
-      K4I,
-      M0V,
-      M0III,
-      M3V,
-      M3III,
-      M6V,
-      M6III,
-      M9III
-    ).withTag(_.tag)
-
-}
+enum StellarLibrarySpectrum(val tag: String, val label: String, val sedSpectrum: String) derives Enumerated:
+  /** Known library stars. */
+  // O
+  case O5V        extends StellarLibrarySpectrum("O5V", "O5V (300nm-6.0um)", "O5V")
+  case O8III      extends StellarLibrarySpectrum("O8III", "O8III (300nm-6.0um)", "O8III")
+  case O9V        extends StellarLibrarySpectrum("O9V_calspec", "O9V (100nm-27um model)", "O9V_calspec")
+  case O95V       extends StellarLibrarySpectrum("O9.5V_calspec", "O9.5V (100nm-27um model)", "O9.5V_calspec")
+  // B
+  case B0V        extends StellarLibrarySpectrum("B0V", "B0V (300nm-6.0um)", "B0V")
+  case B05V       extends StellarLibrarySpectrum("B0.5V_calspec", "B0.5V (100nm-27um model)", "B0.5V_calspec")
+  case B3V        extends StellarLibrarySpectrum("B3V_calspec", "B3V (100nm-32um model)", "B3V_calspec")
+  case B5_7V      extends StellarLibrarySpectrum("B5-7V", "B5-7V (300nm-6.0um)", "B5-7V")
+  case B5III      extends StellarLibrarySpectrum("B5III", "B5III (300nm-6.0um)", "B5III")
+  case B5I        extends StellarLibrarySpectrum("B5I", "B5I (300nm-6.0um)", "B5I")
+  case B9III      extends StellarLibrarySpectrum("B9III_calspec", "B9III (100nm-32um model)", "B9III_calspec")
+  // A
+  case A0I        extends StellarLibrarySpectrum("A0I", "A0I (300nm-6.0um)", "A0I")
+  case A0III      extends StellarLibrarySpectrum("A0III", "A0III (300nm-6.0um)", "A0III")
+  case A0III_new  extends StellarLibrarySpectrum("A0III_calspec", "A0III (100nm-27um model)", "A0III_calspec")
+  case A0V        extends StellarLibrarySpectrum("A0V", "A0V (300nm-6.0um)", "A0V")
+  case A0V_new    extends StellarLibrarySpectrum("A0V_calspec", "A0V (100nm-32um model)", "A0V_calspec")
+  case A1V        extends StellarLibrarySpectrum("A1V_calspec", "A1V (100nm-32um model)", "A1V_calspec")
+  case A2V        extends StellarLibrarySpectrum("A2V_calspec", "A2V (100nm-27um model)", "A2V_calspec")
+  case A3V        extends StellarLibrarySpectrum("A3V_calspec", "A3V (100nm-27um model)", "A3V_calspec")
+  case A4V        extends StellarLibrarySpectrum("A4V_calspec", "A4V (100nm-27um model)", "A4V_calspec")
+  case A5III      extends StellarLibrarySpectrum("A5III", "A5III (300nm-6.0um)", "A5III")
+  case A5V        extends StellarLibrarySpectrum("A5V", "A5V (300nm-6.0um)", "A5V")
+  case A5V_new    extends StellarLibrarySpectrum("A5V_calspec", "A5V (100nm-27um model)", "A5V_calspec")
+  case A6V        extends StellarLibrarySpectrum("A6V_calspec", "A6V (100nm-32um model)", "A6V_calspec")
+  case A8III      extends StellarLibrarySpectrum("A8III_calspec", "A8III (100nm-27um model)", "A8III_calspec")
+  // F
+  case F0I        extends StellarLibrarySpectrum("F0I", "F0I (300nm-6.0um)", "F0I")
+  case F0I_new    extends StellarLibrarySpectrum("F0I_pickles_irtf", "F0I (115nm-4.15um)", "F0I_pickles_irtf")
+  case F0II       extends StellarLibrarySpectrum("F0II_pickles_irtf", "F0II (115nm-4.07um)", "F0II_pickles_irtf")
+  case F0III      extends StellarLibrarySpectrum("F0III", "F0III (300nm-6.0um)", "F0III")
+  case F0III_new  extends StellarLibrarySpectrum("F0III_pickles_irtf", "F0III (115nm-4.16um)", "F0III_pickles_irtf")
+  case F0IV       extends StellarLibrarySpectrum("F0IV_pickles_irtf", "F0IV (115nm-5.04um)", "F0IV_pickles_irtf")
+  case F0V        extends StellarLibrarySpectrum("F0V", "F0V (300nm-6.0um)", "F0V")
+  case F0V_new    extends StellarLibrarySpectrum("F0V_pickles_irtf", "F0V (115nm-4.16um)", "F0V_pickles_irtf")
+  case F2II       extends StellarLibrarySpectrum("F2II_pickles_irtf", "F2II (115nm-4.08um)", "F2II_pickles_irtf")
+  case F2III      extends StellarLibrarySpectrum("F2III_pickles_irtf", "F2III (115nm-5.00um)", "F2III_pickles_irtf")
+  case F2V        extends StellarLibrarySpectrum("F2V_pickles_irtf", "F2V (115nm-4.92um)", "F2V_pickles_irtf")
+  case F4V        extends StellarLibrarySpectrum("F4V_calspec", "F4V (100nm-27um)", "F4V_calspec")
+  case F5I        extends StellarLibrarySpectrum("F5I", "F5I (300nm-6.0um)", "F5I")
+  case F5I_new    extends StellarLibrarySpectrum("F5I_pickles_irtf", "F5I (115nm-5.0um)", "F5I_pickles_irtf")
+  case F5III      extends StellarLibrarySpectrum("F5III", "F5III (300nm-6.0um)", "F5III")
+  case F5III_new  extends StellarLibrarySpectrum("F5III_pickles_irtf", "F5III (115nm-5.41um)", "F5III_pickles_irtf")
+  case F5V        extends StellarLibrarySpectrum("F5V", "F5V (300nm-6.0um)", "F5V")
+  case F5V_new    extends StellarLibrarySpectrum("F5V_pickles_irtf", "F5V (115nm-5.01um)", "F5V_pickles_irtf")
+  case F5V_w      extends StellarLibrarySpectrum("F5V-w", "F5V-w (300nm-6.0um)", "F5V-w")
+  case F6V_r      extends StellarLibrarySpectrum("F6V-r", "F6V-r (300nm-6.0um)", "F6V-r")
+  case F7V        extends StellarLibrarySpectrum("F7V_calspec", "F7V (100nm-27um model)", "F7V_calspec")
+  case F8I        extends StellarLibrarySpectrum("F8I_pickles_irtf", "F8I (115nm-4.98um)", "F8I_pickles_irtf")
+  case F8IV       extends StellarLibrarySpectrum("F8IV_calspec", "F8IV (100nm-27um model)", "F8IV_calspec")
+  case F8V        extends StellarLibrarySpectrum("F8V_pickles_irtf", "F8V (115nm-5.41um)", "F8V_pickles_irtf")
+  // G
+  case G0I        extends StellarLibrarySpectrum("G0I", "G0I (300nm-6.0um)", "G0I")
+  case G0I_new    extends StellarLibrarySpectrum("G0I_pickles_irtf", "G0I (115nm-5.01um)", "G0I_pickles_irtf")
+  case G0III      extends StellarLibrarySpectrum("G0III", "G0III (300nm-6.0um)", "G0III")
+  case G0V        extends StellarLibrarySpectrum("G0V", "G0V (300nm-6.0um)", "G0V")
+  case G0V_new    extends StellarLibrarySpectrum("G0V_calspec", "G0V (100nm-27um model)", "G0V_calspec")
+  case G0V_w      extends StellarLibrarySpectrum("G0V-w", "G0V-w (300nm-6.0um)", "G0V-w")
+  case G0V_r      extends StellarLibrarySpectrum("G0V-r", "G0V-r (300nm-6.0um)", "G0V-r")
+  case G1V        extends StellarLibrarySpectrum("G1V_calspec", "G1V (100nm-32um model)", "G1V_calspec")
+  case G2I        extends StellarLibrarySpectrum("G2I_pickles_irtf", "G2I (115nm-5.03um)", "G2I_pickles_irtf")
+  case G2IV       extends StellarLibrarySpectrum("G2IV_pickles_irtf", "G2IV (115nm-5.08um)", "G2IV_pickles_irtf")
+  case G2V        extends StellarLibrarySpectrum("G2V", "G2V (300nm-6.0um)", "G2V")
+  case G2V_new    extends StellarLibrarySpectrum("G2V_calspec", "G2V (100nm-32um model)", "G2V_calspec")
+  case G3V        extends StellarLibrarySpectrum("G3V_calspec", "G3V (100nm-32um model)", "G3V_calspec")
+  case G5I        extends StellarLibrarySpectrum("G5I", "G5I (300nm-6.0um)", "G5I")
+  case G5I_new    extends StellarLibrarySpectrum("G5I_pickles_irtf", "G5I (115nm-4.11um)", "G5I_pickles_irtf")
+  case G5III      extends StellarLibrarySpectrum("G5III", "G5III (300nm-6.0um)", "G5III")
+  case G5III_new  extends StellarLibrarySpectrum("G5III_pickles_irtf", "G5III (115nm-5.01um)", "G5III_pickles_irtf")
+  case G5III_w    extends StellarLibrarySpectrum("G5III-w", "G5III-w (300nm-6.0um)", "G5III-w")
+  case G5III_r    extends StellarLibrarySpectrum("G5III-r", "G5III-r (300nm-6.0um)", "G5III-r")
+  case G5V        extends StellarLibrarySpectrum("G5V", "G5V (300nm-6.0um)", "G5V")
+  case G5V_new    extends StellarLibrarySpectrum("G5V_calspec", "G5V (100nm-27um model)", "G5V_calspec")
+  case G5V_w      extends StellarLibrarySpectrum("G5V-w", "G5V-w (300nm-6.0um)", "G5V-w")
+  case G5V_r      extends StellarLibrarySpectrum("G5V-r", "G5V-r (300nm-6.0um)", "G5V-r")
+  case G7III      extends StellarLibrarySpectrum("G7III_calspec", "G7III (100nm-27um model)", "G7III_calspec")
+  case G8I        extends StellarLibrarySpectrum("G8I_pickles_irtf", "G8I (115nm-4.05um)", "G8I_pickles_irtf")
+  case G8III      extends StellarLibrarySpectrum("G8III_pickles_irtf", "G8III (115nm-5.01um)", "G8III_pickles_irtf")
+  case G8V        extends StellarLibrarySpectrum("G8V_pickles_irtf", "G8V (115nm-4.93um)", "G8V_pickles_irtf")
+  // K
+  case K0III      extends StellarLibrarySpectrum("K0III", "K0III (300nm-6.0um)", "K0III")
+  case K0III_new  extends StellarLibrarySpectrum("K0III_pickles_irtf", "K0III (115nm-4.12um)", "K0III_pickles_irtf")
+  case K0III_w    extends StellarLibrarySpectrum("K0III-w", "K0III-w (300nm-6.0um)", "K0III-w")
+  case K0III_r    extends StellarLibrarySpectrum("K0III-r", "K0III-r (300nm-6.0um)", "K0III-r")
+  case K0IV       extends StellarLibrarySpectrum("K0IV_pickles_irtf", "K0IV (115nm-5.34um)", "K0IV_pickles_irtf")
+  case K0V        extends StellarLibrarySpectrum("K0V", "K0V (300nm-6.0um)", "K0V")
+  case K0V_new    extends StellarLibrarySpectrum("K0V_pickles_irtf", "K0V (115nm-4.99um)", "K0V_pickles_irtf")
+  case K0V_r      extends StellarLibrarySpectrum("K0V-r", "K0V-r (300nm-6.0um)", "K0V-r")
+  case K05III     extends StellarLibrarySpectrum("K0.5III_calspec", "K0.5III (100nm-27um model)", "K0.5III_calspec")
+  case K0_1II     extends StellarLibrarySpectrum("K0-1II", "K0-1II (300nm-6.0um)", "K0-1II")
+  case K15III     extends StellarLibrarySpectrum("K1.5III_calspec", "K1.5III (100nm-27um model)", "K1.5III_calspec")
+  case K2I        extends StellarLibrarySpectrum("K2I_pickles_irtf", "K2I (115nm-5.01um)", "K2I_pickles_irtf")
+  case K2III      extends StellarLibrarySpectrum("K2III_pickles_irtf", "K2III (115nm-4.94um)", "K2III_pickles_irtf")
+  case K2V        extends StellarLibrarySpectrum("K2V_pickles_irtf", "K2V (115nm-5.0um)", "K2V_pickles_irtf")
+  case K3II       extends StellarLibrarySpectrum("K3II_pickles_irtf", "K3II (115nm-5.03um)", "K3II_pickles_irtf")
+  case K3III      extends StellarLibrarySpectrum("K3III_pickles_irtf", "K3III (115nm-4.97um)", "K3III_pickles_irtf")
+  case K3V        extends StellarLibrarySpectrum("K3V_pickles_irtf", "K3V (115nm-4.93um)", "K3V_pickles_irtf")
+  case K4I        extends StellarLibrarySpectrum("K4I", "K4I (300nm-6.0um)", "K4I")
+  case K4I_new    extends StellarLibrarySpectrum("K4I_pickles_irtf", "K4I (115nm-4.08um)", "K4I_pickles_irtf")
+  case K4III      extends StellarLibrarySpectrum("K4III", "K4III (300nm-6.0um)", "K4III")
+  case K4III_new  extends StellarLibrarySpectrum("K4III_pickles_irtf", "K4III (115nm-5.02um)", "K4III_pickles_irtf")
+  case K4III_w    extends StellarLibrarySpectrum("K4III-w", "K4III-w (300nm-6.0um)", "K4III-w")
+  case K4III_r    extends StellarLibrarySpectrum("K4III-r", "K4III-r (300nm-6.0um)", "K4III-r")
+  case K4V        extends StellarLibrarySpectrum("K4V", "K4V (300nm-6.0um)", "K4V")
+  case K5III      extends StellarLibrarySpectrum("K5III_pickles_irtf", "K5III (115nm-5.0um)", "K5III_pickles_irtf")
+  case K5V        extends StellarLibrarySpectrum("K5V_pickles_irtf", "K5V (115nm-5.2um)", "K5V_pickles_irtf")
+  // M
+  case M0III      extends StellarLibrarySpectrum("M0III", "M0III (300nm-6.0um)", "M0III")
+  case M0III_new  extends StellarLibrarySpectrum("M0III_pickles_irtf", "M0III (115nm-5.07um)", "M0III_pickles_irtf")
+  case M0V        extends StellarLibrarySpectrum("M0V", "M0V (300nm-6.0um)", "M0V")
+  case M0V_new    extends StellarLibrarySpectrum("M0V_pickles_irtf", "M0V (115nm-5.41um)", "M0V_pickles_irtf")
+  case M1III      extends StellarLibrarySpectrum("M1III_pickles_irtf", "M1III (115nm-5.05um)", "M1III_pickles_irtf")
+  case M1V        extends StellarLibrarySpectrum("M1V_pickles_irtf", "M1V (115nm-4.91um)", "M1V_pickles_irtf")
+  case M2I        extends StellarLibrarySpectrum("M2I_pickles_irtf", "M2I (115nm-5.0um)", "M2I_pickles_irtf")
+  case M2III      extends StellarLibrarySpectrum("M2III_pickles_irtf", "M2III (115nm-4.95um)", "M2III_pickles_irtf")
+  case M2V        extends StellarLibrarySpectrum("M2V_pickles_irtf", "M2V (115nm-5.34um)", "M2V_pickles_irtf")
+  case M3III      extends StellarLibrarySpectrum("M3III", "M3III (300nm-6.0um)", "M3III")
+  case M3III_new  extends StellarLibrarySpectrum("M3III_pickles_irtf", "M3III (115nm-4.91um)", "M3III_pickles_irtf")
+  case M3V        extends StellarLibrarySpectrum("M3V", "M3V (300nm-6.0um)", "M3V")
+  case M3V_new    extends StellarLibrarySpectrum("M3V_pickles_irtf", "M3V (115nm-5.07um)", "M3V_pickles_irtf")
+  case M4III      extends StellarLibrarySpectrum("M4III_pickles_irtf", "M4III (115nm-5.02um)", "M4III_pickles_irtf")
+  case M4V        extends StellarLibrarySpectrum("M4V_pickles_irtf", "M4V (115nm-5.08um)", "M4V_pickles_irtf")
+  case M5V        extends StellarLibrarySpectrum("M5V_pickles_irtf", "M5V (115nm-4.18um)", "M5V_pickles_irtf")
+  case M6III      extends StellarLibrarySpectrum("M6III", "M6III (300nm-6.0um)", "M6III")
+  case M6III_new  extends StellarLibrarySpectrum("M6III_pickles_irtf", "M6III (115nm-5.02um)", "M6III_pickles_irtf")
+  case M6V        extends StellarLibrarySpectrum("M6V", "M6V (300nm-6.0um)", "M6V")
+  case M7III      extends StellarLibrarySpectrum("M7III_pickles_irtf", "M7III (115nm-5.02um)", "M7III_pickles_irtf")
+  case M8III      extends StellarLibrarySpectrum("M8III_pickles_irtf", "M8III (115nm-5.02um)", "M8III_pickles_irtf")
+  case M9III      extends StellarLibrarySpectrum("M9III", "M9III (300nm-6.0um)", "M9III")
+  // sub-dwarfs
+  case sdB        extends StellarLibrarySpectrum("sdB_calspec", "sdB (100nm-32um model)", "sdB_calspec")
+  case sdF8       extends StellarLibrarySpectrum("sdF8_calspec", "sdF8 (171nm-2.48um)", "sdF8_calspec")
+  case sdO        extends StellarLibrarySpectrum("sdO_calspec", "sdO (115nm-1.02um)", "sdO_calspec")
+  // white dwarfs
+  case DA08       extends StellarLibrarySpectrum("DA08_calspec", "DA.8 (100nm-32um model)", "DA08_calspec")
+  case DA09       extends StellarLibrarySpectrum("DA09_calspec", "DA.9 (100nm-30um model)", "DA09_calspec")
+  case DA12       extends StellarLibrarySpectrum("DA12_calspec", "DA1.2 (100nm-30um model)", "DA12_calspec")
+  case DA15       extends StellarLibrarySpectrum("DA15_calspec", "DA1.5 (100nm-30um model)", "DA15_calspec")
+  case DA18       extends StellarLibrarySpectrum("DA18_calspec", "DA1.8 (100nm-27um model)", "DA18_calspec")
+  case DA24       extends StellarLibrarySpectrum("DA24_calspec", "DA2.4 (100nm-32um model)", "DA24_calspec")
+  case DA28       extends StellarLibrarySpectrum("DA28_calspec", "DA2.8 (114nm-1.71um)", "DA28_calspec")
+  case DA30       extends StellarLibrarySpectrum("DA30_calspec", "DA3.0 (114nm-1.71um)", "DA30_calspec")
+  case DA31       extends StellarLibrarySpectrum("DA31_calspec", "DA3.1 (114nm-1.71um)", "DA31_calspec")
+  case DA33       extends StellarLibrarySpectrum("DA33_calspec", "DA3.3 (114nm-1.71um)", "DA33_calspec")
+  case DA36       extends StellarLibrarySpectrum("DA36_calspec", "DA3.6 (114nm-1.71um)", "DA36_calspec")
+  case DA38       extends StellarLibrarySpectrum("DA38_calspec", "DA3.8 (114nm-1.71um)", "DA38_calspec")
+  case DA48       extends StellarLibrarySpectrum("DA48_calspec", "DA4.8 (114nm-1.71um)", "DA48_calspec")
+  case DA57       extends StellarLibrarySpectrum("DA57_calspec", "DA5.7 (114nm-1.71um)", "DA57_calspec")
+  case DBQ40      extends StellarLibrarySpectrum("DBQ40_calspec", "DBQ4 (100nm-32um model)", "DBQ40_calspec")
+  case DBQA50     extends StellarLibrarySpectrum("DBQA50_calspec", "DBQA5 (100nm-32um model)", "DBQA50_calspec")
+  case DO20       extends StellarLibrarySpectrum("DO20_calspec", "DO2 (114nm-1.02um)", "DO20_calspec")
+  // cool star models
+  case T2800K     extends StellarLibrarySpectrum("T2800K", "T=2800K (300nm-6um model)", "T2800K")
+  case T2600K     extends StellarLibrarySpectrum("T2600K", "T=2600K (300nm-6um model)", "T2600K")
+  case T2400K     extends StellarLibrarySpectrum("T2400K", "T=2400K (300nm-6um model)", "T2400K")
+  case T2200K     extends StellarLibrarySpectrum("T2200K", "T=2200K (300nm-6um model)", "T2200K")
+  case T2000K     extends StellarLibrarySpectrum("T2000K", "T=2000K (300nm-6um model)", "T2000K")
+  case T1800K     extends StellarLibrarySpectrum("T1800K", "T=1800K (300nm-6um model)", "T1800K")
+  case T1600K     extends StellarLibrarySpectrum("T1600K", "T=1600K (300nm-6um model)", "T1600K")
+  case T1400K     extends StellarLibrarySpectrum("T1400K", "T=1400K (300nm-6um model)", "T1400K")
+  case T1200K     extends StellarLibrarySpectrum("T1200K", "T=1200K (300nm-6um model)", "T1200K")
+  case T1000K     extends StellarLibrarySpectrum("T1000K", "T=1000K (600nm-10um model)", "T1000K")
+  case T0900K     extends StellarLibrarySpectrum("T0900K", "T=900K (600nm-10um model)", "T0900K")
+  case T0800K     extends StellarLibrarySpectrum("T0800K", "T=800K (600nm-10um model)", "T0800K")
+  case T0600K     extends StellarLibrarySpectrum("T0600K", "T=600K (600nm-10um model)", "T0600K")
+  case T0400K     extends StellarLibrarySpectrum("T0400K", "T=400K (600nm-10um model)", "T0400K")

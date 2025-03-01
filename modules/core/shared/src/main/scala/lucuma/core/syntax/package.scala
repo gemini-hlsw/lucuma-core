@@ -15,7 +15,6 @@ package object syntax {
   object all
       extends ToDisplayOps
       with TimeOps
-      with ToEnumeratedOps
       with ToIntOps
       with ToPrismOps
       with ToStringOps
