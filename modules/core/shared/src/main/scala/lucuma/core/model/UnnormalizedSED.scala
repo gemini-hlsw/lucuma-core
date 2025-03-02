@@ -149,18 +149,18 @@ object UnnormalizedSED {
 
   given Eq[UnnormalizedSED] =
     Eq.instance {
-      case (a @ StellarLibrary(_), b @ StellarLibrary(_))   => a === b
-      case (a @ CoolStarModel(_), b @ CoolStarModel(_))     => a === b
-      case (a @ Galaxy(_), b @ Galaxy(_))                   => a === b
-      case (a @ Planet(_), b @ Planet(_))                   => a === b
-      case (a @ Quasar(_), b @ Quasar(_))                   => a === b
-      case (a @ HIIRegion(_), b @ HIIRegion(_))             => a === b
-      case (a @ PlanetaryNebula(_), b @ PlanetaryNebula(_)) => a === b
-      case (a @ PowerLaw(_), b @ PowerLaw(_))               => a === b
-      case (a @ BlackBody(_), b @ BlackBody(_))             => a === b
-      case (a @ UserDefined(_), b @ UserDefined(_))         => a === b
+      case (a @ StellarLibrary(_), b @ StellarLibrary(_))               => a === b
+      case (a @ CoolStarModel(_), b @ CoolStarModel(_))                 => a === b
+      case (a @ Galaxy(_), b @ Galaxy(_))                               => a === b
+      case (a @ Planet(_), b @ Planet(_))                               => a === b
+      case (a @ Quasar(_), b @ Quasar(_))                               => a === b
+      case (a @ HIIRegion(_), b @ HIIRegion(_))                         => a === b
+      case (a @ PlanetaryNebula(_), b @ PlanetaryNebula(_))             => a === b
+      case (a @ PowerLaw(_), b @ PowerLaw(_))                           => a === b
+      case (a @ BlackBody(_), b @ BlackBody(_))                         => a === b
+      case (a @ UserDefined(_), b @ UserDefined(_))                     => a === b
       case (a @ UserDefinedAttachment(_), b @ UserDefinedAttachment(_)) => a === b
-      case _                                                => false
+      case _                                                            => false
     }
 
   /** @group Optics */
