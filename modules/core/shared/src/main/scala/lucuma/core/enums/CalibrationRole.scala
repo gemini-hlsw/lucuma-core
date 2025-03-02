@@ -5,9 +5,8 @@ package lucuma.core.enums
 
 import lucuma.core.util.Enumerated
 
-enum CalibrationRole(val tag: String) derives Enumerated {
+enum CalibrationRole(val tag: String) derives Enumerated:
   case Twilight           extends CalibrationRole("twilight")
   case Photometric        extends CalibrationRole("photometric")
   case SpectroPhotometric extends CalibrationRole("spectrophotometric")
   case Telluric           extends CalibrationRole("telluric")
-}

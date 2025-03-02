@@ -5,8 +5,7 @@ package lucuma.core.enums
 
 import lucuma.core.util.Enumerated
 
-enum FieldLens(val tag: String) derives Enumerated {
+enum FieldLens(val tag: String) derives Enumerated:
   case In extends FieldLens("in")
   case Out extends FieldLens("out")
-}
 
