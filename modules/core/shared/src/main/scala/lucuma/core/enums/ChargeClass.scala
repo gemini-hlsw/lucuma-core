@@ -8,10 +8,7 @@ import lucuma.core.util.Enumerated
 /**
  * Indication of which entity (if any) is to be charged for program execution time.
  */
-enum ChargeClass(val tag: String, val name: String, val description: String) derives Enumerated {
-
+enum ChargeClass(val tag: String, val name: String, val description: String) derives Enumerated:
   case NonCharged extends ChargeClass("nonCharged", "Non Charged", "Time that is not charged.")
   case Partner    extends ChargeClass("partner",    "Partner",     "Time charged to a partner country / entity.")
   case Program    extends ChargeClass("program",    "Program",     "Time charged to the science program.")
-
-}

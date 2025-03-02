@@ -6,10 +6,9 @@ package lucuma.core.enums
 import lucuma.core.util.Enumerated
 
 /** Enumerated type for M1 Source. */
-enum M1Source(val tag: String) derives Enumerated {
+enum M1Source(val tag: String) derives Enumerated:
   case PWFS1 extends M1Source("Pwfs1")
   case PWFS2 extends M1Source("Pwfs2")
   case OIWFS extends M1Source("Oiwfs")
   case GAOS  extends M1Source("Gaos")
   case HRWFS extends M1Source("Hrwfs")
-}

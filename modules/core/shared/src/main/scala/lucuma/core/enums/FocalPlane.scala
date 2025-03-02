@@ -5,14 +5,7 @@ package lucuma.core.enums
 
 import lucuma.core.util.Enumerated
 
-sealed abstract class FocalPlane(val tag: String) extends Product with Serializable
-
-object FocalPlane {
-  case object SingleSlit   extends FocalPlane("single_slit")
-  case object MultipleSlit extends FocalPlane("multiple_slit")
-  case object IFU          extends FocalPlane("ifu")
-
-  /** @group Typeclass Instances */
-  implicit val FocalPlaneEnumerated: Enumerated[FocalPlane] =
-    Enumerated.from(SingleSlit, MultipleSlit, IFU).withTag(_.tag)
-}
+enum FocalPlane(val tag: String) derives Enumerated:
+  case SingleSlit   extends FocalPlane("single_slit")
+  case MultipleSlit extends FocalPlane("multiple_slit")
+  case IFU          extends FocalPlane("ifu")

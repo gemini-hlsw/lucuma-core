@@ -89,6 +89,9 @@ object Enumerated {
     }
 
   inline def derived[E]: Enumerated[E] = ${ enumeratedImpl[E] }
+
+  extension [A](a: A)(using ev: Enumerated[A])
+    def tag: String = ev.tag(a)
 }
 
 /** @group Typeclasses */
