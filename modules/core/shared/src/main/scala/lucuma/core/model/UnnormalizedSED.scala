@@ -136,19 +136,31 @@ object UnnormalizedSED {
       Focus[UserDefined](_.fluxDensities)
   }
 
+  final case class UserDefinedAttachment(attachmentId: Attachment.Id)
+      extends UnnormalizedSED
+
+  object UserDefinedAttachment {
+    given Eq[UserDefinedAttachment] = Eq.by(_.attachmentId)
+
+    /** @group Optics */
+    val attachmentId: Lens[UserDefinedAttachment, Attachment.Id] =
+      Focus[UserDefinedAttachment](_.attachmentId)
+  }
+
   given Eq[UnnormalizedSED] =
     Eq.instance {
-      case (a @ StellarLibrary(_), b @ StellarLibrary(_))   => a === b
-      case (a @ CoolStarModel(_), b @ CoolStarModel(_))     => a === b
-      case (a @ Galaxy(_), b @ Galaxy(_))                   => a === b
-      case (a @ Planet(_), b @ Planet(_))                   => a === b
-      case (a @ Quasar(_), b @ Quasar(_))                   => a === b
-      case (a @ HIIRegion(_), b @ HIIRegion(_))             => a === b
-      case (a @ PlanetaryNebula(_), b @ PlanetaryNebula(_)) => a === b
-      case (a @ PowerLaw(_), b @ PowerLaw(_))               => a === b
-      case (a @ BlackBody(_), b @ BlackBody(_))             => a === b
-      case (a @ UserDefined(_), b @ UserDefined(_))         => a === b
-      case _                                                => false
+      case (a @ StellarLibrary(_), b @ StellarLibrary(_))               => a === b
+      case (a @ CoolStarModel(_), b @ CoolStarModel(_))                 => a === b
+      case (a @ Galaxy(_), b @ Galaxy(_))                               => a === b
+      case (a @ Planet(_), b @ Planet(_))                               => a === b
+      case (a @ Quasar(_), b @ Quasar(_))                               => a === b
+      case (a @ HIIRegion(_), b @ HIIRegion(_))                         => a === b
+      case (a @ PlanetaryNebula(_), b @ PlanetaryNebula(_))             => a === b
+      case (a @ PowerLaw(_), b @ PowerLaw(_))                           => a === b
+      case (a @ BlackBody(_), b @ BlackBody(_))                         => a === b
+      case (a @ UserDefined(_), b @ UserDefined(_))                     => a === b
+      case (a @ UserDefinedAttachment(_), b @ UserDefinedAttachment(_)) => a === b
+      case _                                                            => false
     }
 
   /** @group Optics */
@@ -190,4 +202,8 @@ object UnnormalizedSED {
   /** @group Optics */
   val userDefined: Prism[UnnormalizedSED, UserDefined] =
     GenPrism[UnnormalizedSED, UserDefined]
+
+  /** @group Optics */
+  val userDefinedAttachment: Prism[UnnormalizedSED, UserDefinedAttachment] =
+    GenPrism[UnnormalizedSED, UserDefinedAttachment]
 }

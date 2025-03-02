@@ -18,14 +18,16 @@ import lucuma.core.math.Wavelength
 import lucuma.core.math.arb.ArbRefined
 import lucuma.core.math.arb.ArbWavelength
 import lucuma.core.util.arb.ArbEnumerated
+import lucuma.core.util.arb.ArbGid
 import org.scalacheck.*
 import org.scalacheck.Arbitrary.arbitrary
 
 trait ArbUnnormalizedSED {
   import ArbEnumerated.given
-  import UnnormalizedSED.*
+  import ArbGid.given
   import ArbRefined.given
   import ArbWavelength.given
+  import UnnormalizedSED.*
 
   given Arbitrary[StellarLibrary] =
     Arbitrary(arbitrary[StellarLibrarySpectrum].map(StellarLibrary(_)))
@@ -93,6 +95,12 @@ trait ArbUnnormalizedSED {
   given Cogen[UserDefined] =
     Cogen[Map[Wavelength, PosBigDecimal]].contramap(_.fluxDensities.toSortedMap)
 
+  given Arbitrary[UserDefinedAttachment] =
+    Arbitrary(arbitrary[Attachment.Id].map(UserDefinedAttachment(_)))
+
+  given Cogen[UserDefinedAttachment] =
+    Cogen[Attachment.Id].contramap(_.attachmentId)
+
   given Arbitrary[UnnormalizedSED] =
     Arbitrary(
       Gen.oneOf(
@@ -105,7 +113,8 @@ trait ArbUnnormalizedSED {
         arbitrary[PlanetaryNebula],
         arbitrary[PowerLaw],
         arbitrary[BlackBody],
-        arbitrary[UserDefined]
+        arbitrary[UserDefined],
+        arbitrary[UserDefinedAttachment]
       )
     )
 
@@ -128,7 +137,10 @@ trait ArbUnnormalizedSED {
                     PowerLaw,
                     Either[
                       BlackBody,
-                      UserDefined
+                      Either[
+                        UserDefined,
+                        UserDefinedAttachment
+                      ]
                     ]
                   ]
                 ]
@@ -149,7 +161,9 @@ trait ArbUnnormalizedSED {
       case d @ BlackBody(_)       =>
         d.asLeft.asRight.asRight.asRight.asRight.asRight.asRight.asRight.asRight
       case d @ UserDefined(_)     =>
-        d.asRight.asRight.asRight.asRight.asRight.asRight.asRight.asRight.asRight
+        d.asLeft.asRight.asRight.asRight.asRight.asRight.asRight.asRight.asRight.asRight
+      case d @ UserDefinedAttachment(_) =>
+        d.asRight.asRight.asRight.asRight.asRight.asRight.asRight.asRight.asRight.asRight
     }
 }
 
