@@ -3,6 +3,7 @@
 
 package lucuma.core.enums
 
+import lucuma.core.syntax.string.*
 import lucuma.core.util.Enumerated
 
 enum StellarLibrarySpectrum(val tag: String, val label: String, val sedSpectrum: String) derives Enumerated:
@@ -175,3 +176,9 @@ enum StellarLibrarySpectrum(val tag: String, val label: String, val sedSpectrum:
   case T0800K     extends StellarLibrarySpectrum("T0800K", "T=800K (600nm-10um model)", "T0800K")
   case T0600K     extends StellarLibrarySpectrum("T0600K", "T=600K (600nm-10um model)", "T0600K")
   case T0400K     extends StellarLibrarySpectrum("T0400K", "T=400K (600nm-10um model)", "T0400K")
+
+object StellarLibrarySpectrum:
+  /* Iterates over all the values of the enumeration and prints them for the graphl schema. */
+  def main(args: Array[String]): Unit =
+    StellarLibrarySpectrum.values.foreach(s => println(s"""  \"\"\"\n  StellarLibrarySpectrum ${s.tag.toScreamingSnakeCase}\n  \"\"\"\n  ${s.tag.toScreamingSnakeCase}\n"""))
+
