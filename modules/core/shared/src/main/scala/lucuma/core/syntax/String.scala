@@ -15,7 +15,7 @@ trait ToStringOps {
   private val swapPattern: Pattern = Pattern.compile("([a-z\\d])([A-Z])")
 
   private def transformation(input: String, replacement: String): String = {
-    val partial = basePattern.matcher(input).replaceAll(replacement)
+    val partial = basePattern.matcher(input.replace(".", "_").replace("-", "_")).replaceAll(replacement)
     swapPattern.matcher(partial).replaceAll(replacement)
   }
 
