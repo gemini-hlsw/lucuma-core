@@ -9,6 +9,6 @@ import lucuma.core.util.Enumerated
  * Enumerated type for calibration unit shutter states.
  * @group Enumerations
  */
-enum GcalShutter(val tag: String, val shortName: String, val longName: String, val obsolete: Boolean) derives Enumerated:
-  /** @group Constructors */ case Open extends GcalShutter("Open", "Open", "Open", false)
-  /** @group Constructors */ case Closed extends GcalShutter("Closed", "Closed", "Closed", false)
+enum GcalShutter(val tag: String, val shortName: String, val longName: String) derives Enumerated:
+  /** @group Constructors */ case Open extends GcalShutter("Open", "Open", "Open")
+  /** @group Constructors */ case Closed extends GcalShutter("Closed", "Closed", "Closed")

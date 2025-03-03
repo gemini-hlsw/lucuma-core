@@ -30,8 +30,7 @@ sealed abstract class GmosNorthGrating(
   val dispersion:           Quantity[Rational, NanometersPerPixel],
   val simultaneousCoverage: WavelengthDelta,
   val blazeWavelength:      Wavelength,
-  val referenceResolution:  PosInt,
-  val obsolete:             Boolean
+  val referenceResolution:  PosInt
 ) extends Product with Serializable {
 
   /**
@@ -74,8 +73,7 @@ object GmosNorthGrating {
     dispersion           = pmToDispersion( 26),
     simultaneousCoverage = nmToWavelengthDelta( 164),
     blazeWavelength      = blazeNm( 463),
-    referenceResolution  = resolution(3744),
-    obsolete             = false
+    referenceResolution  = resolution(3744)
   )
 
   /** @group Constructors */
@@ -87,21 +85,7 @@ object GmosNorthGrating {
     dispersion           = pmToDispersion( 38),
     simultaneousCoverage = nmToWavelengthDelta( 235),
     blazeWavelength      = blazeNm(757),
-    referenceResolution  = resolution(4396),
-    obsolete             = false
-  )
-
-  /** @group Constructors */
-  case object B600_G5303  extends GmosNorthGrating(
-    tag                  = "B600_G5303",
-    shortName            = "B600",
-    longName             = "B600_G5303",
-    rulingDensity        = 600,
-    dispersion           = pmToDispersion( 45),
-    simultaneousCoverage = nmToWavelengthDelta( 276),
-    blazeWavelength      = blazeNm( 461),
-    referenceResolution  = resolution(1688),
-    obsolete             = true
+    referenceResolution  = resolution(4396)
   )
 
   /** @group Constructors */
@@ -113,8 +97,7 @@ object GmosNorthGrating {
     dispersion           = pmToDispersion( 50),
     simultaneousCoverage = nmToWavelengthDelta( 317),
     blazeWavelength      = blazeNm( 461),
-    referenceResolution  = resolution(1688),
-    obsolete             = false
+    referenceResolution  = resolution(1688)
   )
 
   /** @group Constructors */
@@ -126,8 +109,7 @@ object GmosNorthGrating {
     dispersion           = pmToDispersion( 52),
     simultaneousCoverage = nmToWavelengthDelta( 328),
     blazeWavelength      = blazeNm( 926),
-    referenceResolution  = resolution(3744),
-    obsolete             = false
+    referenceResolution  = resolution(3744)
   )
 
   /** @group Constructors */
@@ -139,8 +121,7 @@ object GmosNorthGrating {
     dispersion           = pmToDispersion( 62),
     simultaneousCoverage = nmToWavelengthDelta( 390),
     blazeWavelength      = blazeNm( 422),
-    referenceResolution  = resolution(1520),
-    obsolete             = false
+    referenceResolution  = resolution(1520)
   )
 
   /** @group Constructors */
@@ -152,21 +133,7 @@ object GmosNorthGrating {
     dispersion           = pmToDispersion( 74),
     simultaneousCoverage = nmToWavelengthDelta( 472),
     blazeWavelength      = blazeNm( 764),
-    referenceResolution  = resolution(1918),
-    obsolete             = false
-  )
-
-  /** @group Constructors */
-  case object R150_G5306  extends GmosNorthGrating(
-    tag                  = "R150_G5306",
-    shortName            = "R150",
-    longName             = "R150_G5306",
-    rulingDensity        = 150,
-    dispersion           = pmToDispersion(174),
-    simultaneousCoverage = nmToWavelengthDelta(1071),
-    blazeWavelength      = blazeNm( 717),
-    referenceResolution  = resolution(631),
-    obsolete             = true
+    referenceResolution  = resolution(1918)
   )
 
   /** @group Constructors */
@@ -178,13 +145,12 @@ object GmosNorthGrating {
     dispersion           = pmToDispersion(193),
     simultaneousCoverage = nmToWavelengthDelta(1219),
     blazeWavelength      = blazeNm( 717),
-    referenceResolution  = resolution(631),
-    obsolete             = false
+    referenceResolution  = resolution(631)
   )
 
   /** All members of GmosNorthDisperser, in canonical order. */
   lazy val all: List[GmosNorthGrating] =
-    List(B1200_G5301, R831_G5302, B600_G5303, B600_G5307, R600_G5304, B480_G5309, R400_G5305, R150_G5306, R150_G5308)
+    List(B1200_G5301, R831_G5302, B600_G5307, R600_G5304, B480_G5309, R400_G5305, R150_G5308)
 
   /** Select the member of GmosNorthDisperser with the given tag, if any. */
   def fromTag(s: String): Option[GmosNorthGrating] =
