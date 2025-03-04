@@ -34,11 +34,12 @@ def dms2deg(dms: String): Double =
 
 @JSExportTopLevel("dateToLocalObservingNight")
 def dateToLocalObservingNight(date: js.Date): String =
-  val localDate = LocalDateTime.of(date.getFullYear().toInt,
-                                   date.getMonth().toInt + 1,
-                                   date.getDate().toInt,
-                                   date.getHours().toInt,
-                                   date.getMinutes().toInt,
-                                   date.getSeconds().toInt
+  val localDate = LocalDateTime.of(
+    date.getFullYear().toInt,
+    date.getMonth().toInt + 1,
+    date.getDate().toInt,
+    date.getHours().toInt,
+    date.getMinutes().toInt,
+    date.getSeconds().toInt
   )
-  LocalObservingNight.fromLocalDateTime(localDate).format
+  LocalObservingNight.fromLocalDateTime(localDate).toLocalDate.toString()
