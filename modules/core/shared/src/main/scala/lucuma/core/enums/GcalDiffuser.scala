@@ -9,6 +9,6 @@ import lucuma.core.util.Enumerated
  * Enumerated type for calibration unit diffusers.
  * @group Enumerations
  */
-enum GcalDiffuser(val tag: String, val shortName: String, val longName: String, val obsolete: Boolean) derives Enumerated:
-  /** @group Constructors */ case Ir extends GcalDiffuser("Ir", "IR", "IR", false)
-  /** @group Constructors */ case Visible extends GcalDiffuser("Visible", "Visible", "Visible", false)
+enum GcalDiffuser(val tag: String, val shortName: String, val longName: String) derives Enumerated:
+  /** @group Constructors */ case Ir      extends GcalDiffuser("Ir", "IR", "IR")
+  /** @group Constructors */ case Visible extends GcalDiffuser("Visible", "Visible", "Visible")

@@ -93,9 +93,3 @@ object Enumerated {
   extension [A](a: A)(using ev: Enumerated[A])
     def tag: String = ev.tag(a)
 }
-
-/** @group Typeclasses */
-trait Obsoletable[A] {
-  def isActive(a: A): Boolean
-  final def isObsolete(a: A): Boolean = !isActive(a)
-}
