@@ -26,7 +26,7 @@ lazy val circeVersion          = "0.14.10"
 lazy val circeRefinedVersion   = "0.15.1"
 lazy val catsScalacheckVersion = "0.3.2"
 lazy val catsParseVersion      = "1.1.0"
-lazy val kittensVersion        = "3.4.0"
+lazy val kittensVersion        = "3.5.0"
 lazy val scalajsStubVersion    = "1.1.0"
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
