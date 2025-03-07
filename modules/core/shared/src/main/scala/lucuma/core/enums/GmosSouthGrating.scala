@@ -30,8 +30,7 @@ sealed abstract class GmosSouthGrating(
   val dispersion:           Quantity[Rational, NanometersPerPixel],
   val simultaneousCoverage: WavelengthDelta,
   val blazeWavelength:      Wavelength,
-  val referenceResolution:  PosInt,
-  val obsolete:             Boolean
+  val referenceResolution:  PosInt
 ) extends Product with Serializable {
 
   /**
@@ -74,8 +73,7 @@ object GmosSouthGrating {
     dispersion           = pmToDispersion( 26),
     simultaneousCoverage = nmToWavelengthDelta( 159),
     blazeWavelength      = blazeNm( 463),
-    referenceResolution  = resolution(3744),
-    obsolete             = false
+    referenceResolution  = resolution(3744)
   )
 
   /** @group Constructors */
@@ -87,8 +85,7 @@ object GmosSouthGrating {
     dispersion           = pmToDispersion( 38),
     simultaneousCoverage = nmToWavelengthDelta( 230),
     blazeWavelength      = blazeNm(757),
-    referenceResolution  = resolution(4396),
-    obsolete             = false
+    referenceResolution  = resolution(4396)
   )
 
   /** @group Constructors */
@@ -100,8 +97,7 @@ object GmosSouthGrating {
     dispersion           = pmToDispersion( 50),
     simultaneousCoverage = nmToWavelengthDelta( 307),
     blazeWavelength      = blazeNm( 461),
-    referenceResolution  = resolution(1688),
-    obsolete             = false
+    referenceResolution  = resolution(1688)
   )
 
   /** @group Constructors */
@@ -113,8 +109,7 @@ object GmosSouthGrating {
     dispersion           = pmToDispersion( 52),
     simultaneousCoverage = nmToWavelengthDelta( 318),
     blazeWavelength      = blazeNm( 926),
-    referenceResolution  = resolution(3744),
-    obsolete             = false
+    referenceResolution  = resolution(3744)
   )
 
   /** @group Constructors */
@@ -126,8 +121,7 @@ object GmosSouthGrating {
     dispersion           = pmToDispersion( 62),
     simultaneousCoverage = nmToWavelengthDelta( 390),
     blazeWavelength      = blazeNm( 422),
-    referenceResolution  = resolution(1520),
-    obsolete             = false
+    referenceResolution  = resolution(1520)
   )
 
   /** @group Constructors */
@@ -139,8 +133,7 @@ object GmosSouthGrating {
     dispersion           = pmToDispersion( 74),
     simultaneousCoverage = nmToWavelengthDelta( 462),
     blazeWavelength      = blazeNm( 764),
-    referenceResolution  = resolution(1918),
-    obsolete             = false
+    referenceResolution  = resolution(1918)
   )
 
   /** @group Constructors */
@@ -152,8 +145,7 @@ object GmosSouthGrating {
     dispersion           = pmToDispersion(193),
     simultaneousCoverage = nmToWavelengthDelta(1190),
     blazeWavelength      = blazeNm( 717),
-    referenceResolution  = resolution(631),
-    obsolete             = false
+    referenceResolution  = resolution(631)
   )
 
   /** All members of GmosSouthDisperser, in canonical order. */
