@@ -14,20 +14,18 @@ import lucuma.core.util.Enumerated
 sealed abstract class GmosSouthStageMode(
   val tag: String,
   val shortName: String,
-  val longName: String,
-  val obsolete: Boolean
+  val longName: String
 ) extends Product with Serializable
 
 object GmosSouthStageMode {
 
-  /** @group Constructors */ case object NoFollow extends GmosSouthStageMode("NoFollow", "No Follow", "Do Not Follow", false)
-  /** @group Constructors */ case object FollowXyz extends GmosSouthStageMode("FollowXyz", "Follow XYZ", "Follow in XYZ(focus)", false)
-  /** @group Constructors */ case object FollowXy extends GmosSouthStageMode("FollowXy", "Follow XY", "Follow in XY", true)
-  /** @group Constructors */ case object FollowZ extends GmosSouthStageMode("FollowZ", "Follow Z", "Follow in Z Only", false)
+  /** @group Constructors */ case object NoFollow extends GmosSouthStageMode("NoFollow", "No Follow", "Do Not Follow")
+  /** @group Constructors */ case object FollowXyz extends GmosSouthStageMode("FollowXyz", "Follow XYZ", "Follow in XYZ(focus)")
+  /** @group Constructors */ case object FollowZ extends GmosSouthStageMode("FollowZ", "Follow Z", "Follow in Z Only")
 
   /** All members of GmosSouthStageMode, in canonical order. */
   val all: List[GmosSouthStageMode] =
-    List(NoFollow, FollowXyz, FollowXy, FollowZ)
+    List(NoFollow, FollowXyz, FollowZ)
 
   /** Select the member of GmosSouthStageMode with the given tag, if any. */
   def fromTag(s: String): Option[GmosSouthStageMode] =
