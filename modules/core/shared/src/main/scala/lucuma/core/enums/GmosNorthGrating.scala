@@ -89,18 +89,6 @@ object GmosNorthGrating {
   )
 
   /** @group Constructors */
-  case object B600_G5307  extends GmosNorthGrating(
-    tag                  = "B600_G5307",
-    shortName            = "B600",
-    longName             = "B600_G5307",
-    rulingDensity        = 600,
-    dispersion           = pmToDispersion( 50),
-    simultaneousCoverage = nmToWavelengthDelta( 317),
-    blazeWavelength      = blazeNm( 461),
-    referenceResolution  = resolution(1688)
-  )
-
-  /** @group Constructors */
   case object R600_G5304  extends GmosNorthGrating(
     tag                  = "R600_G5304",
     shortName            = "R600",
@@ -150,7 +138,7 @@ object GmosNorthGrating {
 
   /** All members of GmosNorthDisperser, in canonical order. */
   lazy val all: List[GmosNorthGrating] =
-    List(B1200_G5301, R831_G5302, B600_G5307, R600_G5304, B480_G5309, R400_G5305, R150_G5308)
+    List(B1200_G5301, R831_G5302, R600_G5304, B480_G5309, R400_G5305, R150_G5308)
 
   /** Select the member of GmosNorthDisperser with the given tag, if any. */
   def fromTag(s: String): Option[GmosNorthGrating] =

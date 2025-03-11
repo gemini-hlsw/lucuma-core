@@ -21,10 +21,10 @@ final class BinningSuite extends FunSuite {
   def bandNormalized[T]: BandNormalized[T] =
     BandNormalized(none, SortedMap.empty)
 
-  //  Examples with B600
-  //  slit=0.50, fwhm=0.6: 2 2
+  //  Examples with R831
+  //  slit=0.50, fwhm=0.6: 1 2
   //  slit=0.75, fwhm=1.0: 2 4
-  //  slit=1.00, fwhm=1.5: 4 4
+  //  slit=1.00, fwhm=1.5: 2 4
 
   private def testLongslit(
     fpu:        GmosNorthFpu,
@@ -38,46 +38,46 @@ final class BinningSuite extends FunSuite {
     assertEquals(xy, (expectX, expectY))
   }
 
-  test("longslit, B600, slit=0.50, fwhm=0.6: 2 2") {
+  test("longslit, R831, slit=0.50, fwhm=0.6: 1 2") {
     testLongslit(
       GmosNorthFpu.LongSlit_0_50,
       SourceProfile.Gaussian(Angle.microarcseconds.reverseGet(600_000L), bandNormalized),
       ImageQuality.PointOne,
-      GmosNorthGrating.B600_G5307,
-      GmosXBinning.Two,
+      GmosNorthGrating.R831_G5302,
+      GmosXBinning.One,
       GmosYBinning.Two
     )
   }
 
-  test("longslit, B600, slit=0.75, fwhm=1.0: 2 4") {
+  test("longslit, R831, slit=0.75, fwhm=1.0: 2 4") {
     testLongslit(
       GmosNorthFpu.LongSlit_0_75,
       SourceProfile.Gaussian(Angle.microarcseconds.reverseGet(1_000_000L), bandNormalized),
       ImageQuality.PointOne,
-      GmosNorthGrating.B600_G5307,
+      GmosNorthGrating.R831_G5302,
       GmosXBinning.Two,
       GmosYBinning.Four
     )
   }
 
-  test("longslit, B600, slit=1.00, fwhm=1.5: 4 4") {
+  test("longslit, R831, slit=1.00, fwhm=1.5: 2 4") {
     testLongslit(
       GmosNorthFpu.LongSlit_1_00,
       SourceProfile.Gaussian(Angle.microarcseconds.reverseGet(1_500_000L), bandNormalized),
       ImageQuality.PointOne,
-      GmosNorthGrating.B600_G5307,
-      GmosXBinning.Four,
+      GmosNorthGrating.R831_G5302,
+      GmosXBinning.Two,
       GmosYBinning.Four
     )
   }
 
-  test("longslit, B600, slit=0.50, Uniform:  2 4") {
+  test("longslit, R831, slit=0.50, Uniform:  2 4") {
     testLongslit(
       GmosNorthFpu.LongSlit_0_50,
       SourceProfile.Uniform(bandNormalized),
       ImageQuality.PointOne,
-      GmosNorthGrating.B600_G5307,
-      GmosXBinning.Two,
+      GmosNorthGrating.R831_G5302,
+      GmosXBinning.One,
       GmosYBinning.Four
     )
   }
@@ -95,12 +95,12 @@ final class BinningSuite extends FunSuite {
     )
   }
 
-  test("longslit, B600, slit=0.50, fwhm=0.0: 1 1") {
+  test("longslit, R831, slit=0.50, fwhm=0.0: 1 1") {
     testLongslit(
       GmosNorthFpu.LongSlit_0_50,
       SourceProfile.Gaussian(Angle.Angle0, bandNormalized),
       ImageQuality.PointOne,
-      GmosNorthGrating.B600_G5307,
+      GmosNorthGrating.R831_G5302,
       GmosXBinning.One,
       GmosYBinning.One
     )
