@@ -21,6 +21,7 @@ import lucuma.core.math.Angle
 import lucuma.core.math.Wavelength
 import lucuma.core.math.units.NanometersPerPixel
 import lucuma.core.model.SourceProfile
+import lucuma.core.util.Enumerated
 import spire.math.Rational
 
 import java.math.RoundingMode.HALF_UP
@@ -86,7 +87,7 @@ object binning {
     val nPix   = blaze.toNanometers.value.value/effRes/dispersion.value.toBigDecimal(4, HALF_UP)
 
     // The maximum binning that gives the required sampling (<npix)
-    GmosXBinning.all.tail.reverse.find { bin =>
+    Enumerated[GmosXBinning].all.tail.reverse.find { bin =>
       sampling.value < (nPix / bin.count)
     }.getOrElse(GmosXBinning.One)
   }
@@ -120,7 +121,7 @@ object binning {
     val npix = objectSize(srcProfile, iq).arcsec / (pixelScale.arcsec * sampling.value)
 
     // The maximum binning that gives the required sampling (<npix)
-    GmosYBinning.all.tail.reverse.find { bin =>
+    Enumerated[GmosYBinning].all.tail.reverse.find { bin =>
       bin.count <= npix
     }.getOrElse(GmosYBinning.One)
   }

@@ -18,7 +18,7 @@ import scala.quoted.*
  * Typeclass for an enumerated type with unique string tags and a canonical ordering.
  * @group Typeclasses
  */
-trait Enumerated[A] extends Order[A] with Encoder[A] with Decoder[A] {
+trait Enumerated[A] extends Order[A] with Encoder[A] with Decoder[A]:
 
   /** All members of this enumeration, in unspecified but canonical order. */
   def all: List[A]
@@ -51,9 +51,7 @@ trait Enumerated[A] extends Order[A] with Encoder[A] with Decoder[A] {
   def apply(a: A): Json =
     Json.fromString(tag(a).toScreamingSnakeCase)
 
-}
-
-object Enumerated {
+object Enumerated:
 
   def apply[A](using ev: Enumerated[A]): ev.type = ev
 
@@ -90,6 +88,9 @@ object Enumerated {
 
   inline def derived[E]: Enumerated[E] = ${ enumeratedImpl[E] }
 
-  extension [A](a: A)(using ev: Enumerated[A])
-    def tag: String = ev.tag(a)
-}
+
+/** @group Typeclasses */
+trait Obsoletable[A]:
+  def isActive(a: A): Boolean
+  final def isObsolete(a: A): Boolean = !isActive(a)
+

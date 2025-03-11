@@ -6,7 +6,6 @@ package core
 package enums
 
 import cats.data.NonEmptySet
-import cats.syntax.eq.*
 import coulomb.*
 import eu.timepit.refined.numeric.Positive
 import eu.timepit.refined.types.numeric.PosInt
@@ -20,7 +19,7 @@ import lucuma.refined.*
  * @group Enumerations (Generated)
  * @see https://www.gemini.edu/instrumentation/gmos/components#Detector
  */
-sealed abstract class GmosSouthDetector(
+enum GmosSouthDetector(
   val tag: String,
   val shortName: String,
   val longName: String,
@@ -31,11 +30,9 @@ sealed abstract class GmosSouthDetector(
   val gapSize: Quantity[PosInt, Pixels],
   val maxRois: PosInt,
   val ampCounts: NonEmptySet[GmosAmpCount]
-) extends Product with Serializable
+) derives Enumerated:
 
-object GmosSouthDetector {
-
-  case object E2V extends GmosSouthDetector(
+  case E2V extends GmosSouthDetector(
     "E2V",
     "E2V",
     "E2V",
@@ -47,7 +44,8 @@ object GmosSouthDetector {
     4.refined,
     NonEmptySet.of(GmosAmpCount.Three, GmosAmpCount.Six)
   )
-  case object Hamamatsu extends GmosSouthDetector(
+  
+  case Hamamatsu extends GmosSouthDetector(
     "HAMAMATSU",
     "Hamamatsu",
     "Hamamatsu",
@@ -59,30 +57,3 @@ object GmosSouthDetector {
     5.refined,
     NonEmptySet.of(GmosAmpCount.Six, GmosAmpCount.Twelve)
   )
-
-  /** All members of GmosSouthDetector, in canonical order. */
-  val all: List[GmosSouthDetector] =
-    List(E2V, Hamamatsu)
-
-  /** Select the member of GmosSouthDetector with the given tag, if any. */
-  def fromTag(s: String): Option[GmosSouthDetector] =
-    all.find(_.tag === s)
-
-  /** Select the member of GmosSouthDetector with the given tag, throwing if absent. */
-  def unsafeFromTag(s: String): GmosSouthDetector =
-    fromTag(s).getOrElse(throw new NoSuchElementException(s"GmosSouthDetector: Invalid tag: '$s'"))
-
-  /** @group Typeclass Instances */
-  implicit val GmosDetectorEnumerated: Enumerated[GmosSouthDetector] =
-    new Enumerated[GmosSouthDetector] {
-      def all: List[GmosSouthDetector] =
-        GmosSouthDetector.all
-
-      def tag(a: GmosSouthDetector): String =
-        a.tag
-
-      override def unsafeFromTag(s: String): GmosSouthDetector =
-        GmosSouthDetector.unsafeFromTag(s)
-    }
-
-}

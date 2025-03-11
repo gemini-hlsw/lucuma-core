@@ -1,11 +1,12 @@
 // Copyright (c) 2016-2023 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package lucuma.core.enums
+package lucuma.core.syntax
 
 import lucuma.core.util.Enumerated
 
-enum ScienceMode(val tag: String) derives Enumerated:
-  case Imaging      extends ScienceMode("imaging")
-  case Spectroscopy extends ScienceMode("spectroscopy")
+trait ToEnumeratedOps:
+  extension [A](a: A)(using ev: Enumerated[A])
+    def tag: String = ev.tag(a)
 
+object enumerated extends ToEnumeratedOps

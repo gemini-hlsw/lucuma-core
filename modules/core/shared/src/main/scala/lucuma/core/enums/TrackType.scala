@@ -4,41 +4,15 @@
 package lucuma
 package core
 package enums
-import cats.syntax.eq.*
+
 import lucuma.core.util.Enumerated
 
 /**
  * Enumerated type for track types.
  * @group Enumerations (Generated)
  */
-sealed abstract class TrackType(
+enum TrackType(
   val tag: String
-) extends Product with Serializable
-
-object TrackType {
-
-  /** @group Constructors */ case object Sidereal extends TrackType("Sidereal")
-  /** @group Constructors */ case object Nonsidereal extends TrackType("Nonsidereal")
-
-  /** All members of TrackType, in canonical order. */
-  val all: List[TrackType] =
-    List(Sidereal, Nonsidereal)
-
-  /** Select the member of TrackType with the given tag, if any. */
-  def fromTag(s: String): Option[TrackType] =
-    all.find(_.tag === s)
-
-  /** Select the member of TrackType with the given tag, throwing if absent. */
-  def unsafeFromTag(s: String): TrackType =
-    fromTag(s).getOrElse(throw new NoSuchElementException(s"TrackType: Invalid tag: '$s'"))
-
-  /** @group Typeclass Instances */
-  implicit val TrackTypeEnumerated: Enumerated[TrackType] =
-    new Enumerated[TrackType] {
-      def all = TrackType.all
-      def tag(a: TrackType) = a.tag
-      override def unsafeFromTag(s: String): TrackType =
-        TrackType.unsafeFromTag(s)
-    }
-
-}
+) derives Enumerated:
+  case Sidereal extends TrackType("Sidereal")
+  case Nonsidereal extends TrackType("Nonsidereal")

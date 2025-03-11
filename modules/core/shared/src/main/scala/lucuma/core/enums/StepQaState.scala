@@ -9,14 +9,6 @@ import lucuma.core.util.Enumerated
  * Enumerated type for dataset QA state.
  * @group Enumerations
  */
-sealed abstract class StepQaState(
-  val tag:  String
-) extends Product with Serializable
-
-object StepQaState {
-  /** @group Constructors */ case object Pass   extends StepQaState("Pass")
-  /** @group Constructors */ case object Fail   extends StepQaState("Fail")
-
-  implicit val StepQaStateEnumerated: Enumerated[StepQaState] =
-    Enumerated.from(Pass, Fail).withTag(_.tag)
-}
+enum StepQaState(val tag: String) derives Enumerated:
+  case Pass extends StepQaState("Pass")
+  case Fail extends StepQaState("Fail")
