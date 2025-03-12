@@ -88,9 +88,3 @@ object Enumerated:
 
   inline def derived[E]: Enumerated[E] = ${ enumeratedImpl[E] }
 
-
-/** @group Typeclasses */
-trait Obsoletable[A]:
-  def isActive(a: A): Boolean
-  final def isObsolete(a: A): Boolean = !isActive(a)
-
