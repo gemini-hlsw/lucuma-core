@@ -4,42 +4,16 @@
 package lucuma
 package core
 package enums
-import cats.syntax.eq.*
+
 import lucuma.core.util.Enumerated
 
 /**
  * Enumerated type for ISS Port Disposition.
  * @group Enumerations (Generated)
  */
-sealed abstract class PortDisposition(
+enum PortDisposition(
   val tag: String,
   val shortName: String
-) extends Product with Serializable
-
-object PortDisposition {
-
-  /** @group Constructors */ case object Side extends PortDisposition("Side", "Side Looking")
-  /** @group Constructors */ case object Bottom extends PortDisposition("Bottom", "Up Looking")
-
-  /** All members of PortDisposition, in canonical order. */
-  val all: List[PortDisposition] =
-    List(Side, Bottom)
-
-  /** Select the member of PortDisposition with the given tag, if any. */
-  def fromTag(s: String): Option[PortDisposition] =
-    all.find(_.tag === s)
-
-  /** Select the member of PortDisposition with the given tag, throwing if absent. */
-  def unsafeFromTag(s: String): PortDisposition =
-    fromTag(s).getOrElse(throw new NoSuchElementException(s"PortDisposition: Invalid tag: '$s'"))
-
-  /** @group Typeclass Instances */
-  given Enumerated[PortDisposition] =
-    new Enumerated[PortDisposition] {
-      def all = PortDisposition.all
-      def tag(a: PortDisposition) = a.tag
-      override def unsafeFromTag(s: String): PortDisposition =
-        PortDisposition.unsafeFromTag(s)
-    }
-
-}
+) derives Enumerated:
+  case Side extends PortDisposition("Side", "Side Looking")
+  case Bottom extends PortDisposition("Bottom", "Up Looking")
