@@ -19,19 +19,16 @@ import scala.collection.immutable.SortedMap
  */
 case class CategorizedTime private (
   programTime: TimeSpan,
-  partnerTime: TimeSpan,
   nonCharged:  TimeSpan
-) {
+):
 
   /**
    * Gets the time charged for the given charge class.
    */
   def apply(chargeClass: ChargeClass): TimeSpan =
-    chargeClass match {
+    chargeClass match
       case ChargeClass.Program    => programTime
-      case ChargeClass.Partner    => partnerTime
       case ChargeClass.NonCharged => nonCharged
-    }
 
   /**
    * Lists the charge classes and their time value.
@@ -55,11 +52,9 @@ case class CategorizedTime private (
    * Sets the value associated with the given `ChargeClass` to `time`.
    */
   def updated(chargeClass: ChargeClass, time: TimeSpan): CategorizedTime =
-    chargeClass match {
+    chargeClass match
       case ChargeClass.Program    => copy(programTime = time)
-      case ChargeClass.Partner    => copy(partnerTime = time)
       case ChargeClass.NonCharged => copy(nonCharged  = time)
-    }
 
   /**
    * Modifies the amount associated with the given charge class using the
@@ -74,10 +69,9 @@ case class CategorizedTime private (
    * bounded by the min and max `TimeSpan` values.
    */
   def correct(c: TimeChargeCorrection): CategorizedTime =
-    c.op match {
+    c.op match
       case TimeChargeCorrection.Op.Add      => modify(c.chargeClass, _ +| c.amount)
       case TimeChargeCorrection.Op.Subtract => modify(c.chargeClass, _ -| c.amount)
-    }
 
   /**
    * Sums the current charge associated with `chargeClass` with the given
@@ -100,16 +94,14 @@ case class CategorizedTime private (
       res.sumCharge(chargeClass, time)
     }
 
-}
-
-object CategorizedTime {
+object CategorizedTime:
 
   /**
    * A CategorizedTime instance which associates Zero time with all charge
    * classes.
    */
   val Zero: CategorizedTime =
-    CategorizedTime(TimeSpan.Zero, TimeSpan.Zero, TimeSpan.Zero)
+    CategorizedTime(TimeSpan.Zero, TimeSpan.Zero)
 
   /**
    * Constructs a CategorizedTime instance from the provided charges.  If a
@@ -122,10 +114,9 @@ object CategorizedTime {
    * Constructs a CategorizedTime instance from the provided charges.  If a
    * ChargeClass is duplicated in the argument list, the last instance applies.
    */
-  def from(it: IterableOnce[(ChargeClass, TimeSpan)]): CategorizedTime = {
+  def from(it: IterableOnce[(ChargeClass, TimeSpan)]): CategorizedTime =
     val m = SortedMap.from(it.iterator.filter { (_, t) => t.nonZero }).withDefaultValue(TimeSpan.Zero)
-    CategorizedTime(m(ChargeClass.Program), m(ChargeClass.Partner), m(ChargeClass.NonCharged))
-  }
+    CategorizedTime(m(ChargeClass.Program), m(ChargeClass.NonCharged))
 
   /**
    * Creates a `CategorizedTime` instance where the entirety of the step estimate
@@ -138,15 +129,10 @@ object CategorizedTime {
     CommutativeMonoid.instance(Zero, _ +| _)
 
   /**
-   * Order by the sum of charges, then by program then partner.
+   * Order by the sum of charges, then by program.
    */
   given Order[CategorizedTime] =
     Order.whenEqual[CategorizedTime](
       Order.by(_.sum),
-      Order.whenEqual(
-        Order.by(_.apply(ChargeClass.Program)),
-        Order.by(_.apply(ChargeClass.Partner))
-      )
+      Order.by(_.apply(ChargeClass.Program))
     )
-
-}

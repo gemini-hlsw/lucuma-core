@@ -36,7 +36,7 @@ enum ObserveClass(
    */
   val respectsProprietaryPeriod: Boolean
 
-) derives Enumerated {
+) derives Enumerated:
 
   case Science extends ObserveClass(
     "science",
@@ -56,15 +56,6 @@ enum ObserveClass(
     respectsProprietaryPeriod = false
   )
 
-  case PartnerCal extends ObserveClass(
-    "partnerCal",
-    "Nighttime Partner Calibration",
-    "PCAL",
-    ChargeClass.Partner,
-    isCalibration             = true,
-    respectsProprietaryPeriod = false
-  )
-
   case Acquisition extends ObserveClass(
     "acquisition",
     "Acquisition",
@@ -72,15 +63,6 @@ enum ObserveClass(
     ChargeClass.Program,
     isCalibration             = false,
     respectsProprietaryPeriod = true
-  )
-
-  case AcquisitionCal extends ObserveClass(
-    "acquisitionCal",
-    "Acquisition Calibration",
-    "ACAL",
-    ChargeClass.Partner,
-    isCalibration             = true,
-    respectsProprietaryPeriod = false
   )
 
   case DayCal extends ObserveClass(
@@ -92,16 +74,10 @@ enum ObserveClass(
     respectsProprietaryPeriod = false
   )
 
-}
-
-object ObserveClass {
-
-  given Monoid[ObserveClass] with {
+object ObserveClass:
+  given Monoid[ObserveClass] with
     def empty: ObserveClass =
       ObserveClass.DayCal
 
     def combine(c0: ObserveClass, c1: ObserveClass): ObserveClass =
       c0 min c1
-  }
-
-}

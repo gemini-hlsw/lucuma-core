@@ -47,7 +47,6 @@ final class CategorizedTimeSuite extends DisciplineSuite {
   test("apply") {
     forAll { (a: CategorizedTime) =>
       assertEquals(a(ChargeClass.Program), a.programTime)
-      assertEquals(a(ChargeClass.Partner), a.partnerTime)
       assertEquals(a(ChargeClass.NonCharged), a.nonCharged)
     }
   }
@@ -60,15 +59,14 @@ final class CategorizedTimeSuite extends DisciplineSuite {
 
   test("sum") {
     forAll { (a: CategorizedTime) =>
-      assertEquals(a.sum, a(ChargeClass.Program) +| a(ChargeClass.Partner) +| a(ChargeClass.NonCharged))
+      assertEquals(a.sum, a(ChargeClass.Program) +| a(ChargeClass.NonCharged))
     }
   }
 
   test("CategorizedTime.Zero equals explicitly specified TimeSpan.Zero charges") {
     assertEquals(
       CategorizedTime(
-        ChargeClass.Program -> TimeSpan.Zero,
-        ChargeClass.Partner -> TimeSpan.Zero,
+        ChargeClass.Program    -> TimeSpan.Zero,
         ChargeClass.NonCharged -> TimeSpan.Zero
       ),
       CategorizedTime.Zero
