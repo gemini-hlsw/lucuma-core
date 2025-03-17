@@ -27,3 +27,9 @@ enum ExecutionState(val tag: String) derives Enumerated:
 
   /** No more data is expected for this observation or sequence. */
   case Completed   extends ExecutionState("completed")
+
+  /**
+   * The observation has been explicitly declared complete by a user even
+   * though more atoms and/or steps remain.
+   */
+  case DeclaredComplete extends ExecutionState("declared_complete")
