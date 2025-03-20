@@ -10,8 +10,8 @@ import lucuma.core.util.Enumerated
 /**
  * The class of an individual observe and (considering all the observes in an
  * observation) of the observation itself.  The observe classes are listed in
- * priority order.  For example, if one step is a `ProgramCal` and another is
- * a `Science` step, the atom that contains them both is considered `Science`.
+ * priority order.  For example, if one step is a `NightCal` and another is a
+ * `Science` step, the atom that contains them both is considered `Science`.
  */
 enum ObserveClass(
   val tag:          String,
@@ -36,7 +36,7 @@ enum ObserveClass(
    */
   val respectsProprietaryPeriod: Boolean
 
-) derives Enumerated {
+) derives Enumerated:
 
   case Science extends ObserveClass(
     "science",
@@ -47,20 +47,11 @@ enum ObserveClass(
     respectsProprietaryPeriod = true
   )
 
-  case ProgramCal extends ObserveClass(
-    "programCal",
-    "Nighttime Program Calibration",
+  case NightCal extends ObserveClass(
+    "nightCal",
+    "Nighttime Calibration",
     "NCAL",
     ChargeClass.Program,
-    isCalibration             = true,
-    respectsProprietaryPeriod = false
-  )
-
-  case PartnerCal extends ObserveClass(
-    "partnerCal",
-    "Nighttime Partner Calibration",
-    "PCAL",
-    ChargeClass.Partner,
     isCalibration             = true,
     respectsProprietaryPeriod = false
   )
@@ -74,15 +65,6 @@ enum ObserveClass(
     respectsProprietaryPeriod = true
   )
 
-  case AcquisitionCal extends ObserveClass(
-    "acquisitionCal",
-    "Acquisition Calibration",
-    "ACAL",
-    ChargeClass.Partner,
-    isCalibration             = true,
-    respectsProprietaryPeriod = false
-  )
-
   case DayCal extends ObserveClass(
     "dayCal",
     "Daytime Calibration",
@@ -92,16 +74,10 @@ enum ObserveClass(
     respectsProprietaryPeriod = false
   )
 
-}
-
-object ObserveClass {
-
-  given Monoid[ObserveClass] with {
+object ObserveClass:
+  given Monoid[ObserveClass] with
     def empty: ObserveClass =
       ObserveClass.DayCal
 
     def combine(c0: ObserveClass, c1: ObserveClass): ObserveClass =
       c0 min c1
-  }
-
-}

@@ -118,10 +118,7 @@ object PlannedTime {
   given Order[PlannedTime] =
     Order.whenEqual[PlannedTime](
       Order.by(pt => ChargeClass.values.toList.foldMap(pt.getOrZero)),  // Order.by(_.sum) picks up Map's sum :-/
-      Order.whenEqual(
-        Order.by(_.getOrZero(ChargeClass.Program)),
-        Order.by(_.getOrZero(ChargeClass.Partner))
-      )
+      Order.by(_.getOrZero(ChargeClass.Program))
     )
 
   val ToCategorizedTime: Iso[PlannedTime, CategorizedTime] =
