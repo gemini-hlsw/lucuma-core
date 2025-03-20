@@ -10,8 +10,8 @@ import lucuma.core.util.Enumerated
 /**
  * The class of an individual observe and (considering all the observes in an
  * observation) of the observation itself.  The observe classes are listed in
- * priority order.  For example, if one step is a `ProgramCal` and another is
- * a `Science` step, the atom that contains them both is considered `Science`.
+ * priority order.  For example, if one step is a `NightCal` and another is a
+ * `Science` step, the atom that contains them both is considered `Science`.
  */
 enum ObserveClass(
   val tag:          String,
@@ -47,9 +47,9 @@ enum ObserveClass(
     respectsProprietaryPeriod = true
   )
 
-  case ProgramCal extends ObserveClass(
-    "programCal",
-    "Nighttime Program Calibration",
+  case NightCal extends ObserveClass(
+    "nightCal",
+    "Nighttime Calibration",
     "NCAL",
     ChargeClass.Program,
     isCalibration             = true,
