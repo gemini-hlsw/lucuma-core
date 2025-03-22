@@ -1,0 +1,5 @@
+Name,                 RAJ2000,     DecJ2000,  Epoch,      pmRA,   pmDec,     g, g_unit,       K,    K_unit
+new target,      14:03:24.357, +45:33:31.73,   2016,  -272.345, -84.508, 18.89,     AB,   20.87,      Vega
+# comment
+newer target,    12:34:56.789, +15:13:11.13, 2015.5,   111.111,  44.444,      ,       , 1.23e-6, Jy/arcsec²
+

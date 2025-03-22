@@ -17,6 +17,14 @@ pull_request_rules:
   - status-success=Test (ubuntu-22.04, 3, temurin@17, rootJVM)
   actions:
     merge: {}
+- name: Label ags PRs
+  conditions:
+  - files~=^modules/ags/
+  actions:
+    label:
+      add:
+      - ags
+      remove: []
 - name: Label benchmarks PRs
   conditions:
   - files~=^modules/benchmarks/
@@ -24,6 +32,30 @@ pull_request_rules:
     label:
       add:
       - benchmarks
+      remove: []
+- name: Label catalog PRs
+  conditions:
+  - files~=^modules/catalog/
+  actions:
+    label:
+      add:
+      - catalog
+      remove: []
+- name: Label catalog-testkit PRs
+  conditions:
+  - files~=^modules/catalog-testkit/
+  actions:
+    label:
+      add:
+      - catalog-testkit
+      remove: []
+- name: Label catalog-tests PRs
+  conditions:
+  - files~=^modules/catalog-tests/
+  actions:
+    label:
+      add:
+      - catalog-tests
       remove: []
 - name: Label core PRs
   conditions:
