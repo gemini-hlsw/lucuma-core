@@ -52,7 +52,7 @@ trait GmosScienceAreaGeometry {
             longSlitFov(n.effectiveSlitWidth)
         },
         {
-          case GmosSouthFpu.Bhros | GmosSouthFpu.Ns1 | GmosSouthFpu.Ns2 | GmosSouthFpu.Ns3 |
+          case GmosSouthFpu.Ns1 | GmosSouthFpu.Ns2 | GmosSouthFpu.Ns3 |
                GmosSouthFpu.Ns4 | GmosSouthFpu.Ns5 | GmosSouthFpu.Ifu2Slits | GmosSouthFpu.IfuBlue |
                GmosSouthFpu.IfuRed | GmosSouthFpu.IfuNS2Slits | GmosSouthFpu.IfuNSBlue |
                GmosSouthFpu.IfuNSRed =>
