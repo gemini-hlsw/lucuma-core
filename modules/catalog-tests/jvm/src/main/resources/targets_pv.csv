@@ -1,0 +1,5 @@
+Name, RAJ2000, DecJ2000, V, r, parallax, rv, redshift
+supernova, 01:23:45, 12:34:56, 10, 11, 1, ,
+supernova I, 01:23:45, 12:34:56, 10, 11, , 1,
+supernova II, 01:23:45, 12:34:56, 10, 11, , ,1
+supernova II, 01:23:45, 12:34:56, 10, 11, , 2, 1
