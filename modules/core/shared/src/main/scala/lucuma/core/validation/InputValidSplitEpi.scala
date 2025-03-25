@@ -8,9 +8,14 @@ import cats.syntax.all.*
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.api.Validate as RefinedValidate
 import eu.timepit.refined.collection.NonEmpty
+import eu.timepit.refined.numeric.NonNegative
 import eu.timepit.refined.numeric.Positive
+import eu.timepit.refined.types.numeric.NonNegBigDecimal
+import eu.timepit.refined.types.numeric.NonNegInt
+import eu.timepit.refined.types.numeric.NonNegLong
 import eu.timepit.refined.types.numeric.PosBigDecimal
 import eu.timepit.refined.types.numeric.PosInt
+import eu.timepit.refined.types.numeric.PosLong
 import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.core.optics.*
 import lucuma.core.syntax.string.*
@@ -108,6 +113,40 @@ object InputValidSplitEpi {
     refinedInt[Positive]
 
   /**
+   * `InputValidSplitEpi` for `NonNegInt`
+   */
+  val nonNegInt: InputValidSplitEpi[NonNegInt] =
+    refinedInt[NonNegative]
+
+
+  /**
+   * `InputValidSplitEpi` for `Long`
+   */
+  val long: InputValidSplitEpi[Long] =
+    InputValidSplitEpi(
+      s => fixIntString(s).toLongOption.toRight(NonEmptyChain("Must be an integer".refined)),
+      _.toString
+    )
+
+  /**
+   * Build a `InputValidSplitEpi` for `Long Refined P`
+   */
+  def refinedLong[P](implicit v: RefinedValidate[Long, P]): InputValidSplitEpi[Long Refined P] =
+    long.refined[P](_ => NonEmptyChain("Invalid format".refined))
+
+  /**
+   * `InputValidSplitEpi` for `PosLong`.
+   */
+  val posLong: InputValidSplitEpi[PosLong] =
+    refinedLong[Positive]
+
+  /**
+   * `InputValidSplitEpi` for `NonNegLong`.
+   */
+  val nonNegLong: InputValidSplitEpi[NonNegLong] =
+    refinedLong[NonNegative]
+
+  /**
    * `InputValidSplitEpi` for `BigDecimal`.
    *
    * Does not, and cannot, format to a particular number of decimal places. For that you need a
@@ -132,6 +171,12 @@ object InputValidSplitEpi {
    */
   val posBigDecimal: InputValidSplitEpi[PosBigDecimal] =
     refinedBigDecimal[Positive]
+
+  /**
+   * `InputValidSplitEpi` for `NonNegBigDecimal`
+   */
+  val nonNegBigDecimal: InputValidSplitEpi[NonNegBigDecimal] =
+    refinedBigDecimal[NonNegative]
 
   /**
    * `InputValidSplitEpi` for `BigDecimal`, formatting with only one integer digit.

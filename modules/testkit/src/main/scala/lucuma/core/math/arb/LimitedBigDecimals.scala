@@ -3,6 +3,7 @@
 
 package lucuma.core.math.arb
 
+import eu.timepit.refined.types.numeric.NonNegBigDecimal
 import eu.timepit.refined.types.numeric.PosBigDecimal
 import org.scalacheck.*
 
@@ -22,4 +23,12 @@ trait LimitedBigDecimals:
         .map(_.abs)
         .suchThat(_ > 0)
         .map(PosBigDecimal.unsafeFrom)
+    )
+
+  given Arbitrary[NonNegBigDecimal] =
+    Arbitrary(
+      given_Arbitrary_BigDecimal.arbitrary
+        .map(_.abs)
+        .suchThat(_ >= 0)
+        .map(NonNegBigDecimal.unsafeFrom)
     )

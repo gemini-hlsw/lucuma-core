@@ -15,8 +15,13 @@ final class InputValidSplitEpiInstancesSuite extends DisciplineSuite with Limite
   checkAll("nonEmptyString", ValidSplitEpiTests(InputValidSplitEpi.nonEmptyString).validSplitEpi)
   checkAll("int", ValidSplitEpiTests(InputValidSplitEpi.int).validSplitEpi)
   checkAll("posInt", ValidSplitEpiTests(InputValidSplitEpi.posInt).validSplitEpi)
+  checkAll("nonNegInt", ValidSplitEpiTests(InputValidSplitEpi.nonNegInt).validSplitEpi)
+  checkAll("long", ValidSplitEpiTests(InputValidSplitEpi.long).validSplitEpi)
+  checkAll("posLong", ValidSplitEpiTests(InputValidSplitEpi.posLong).validSplitEpi)
+  checkAll("nonNegLong", ValidSplitEpiTests(InputValidSplitEpi.nonNegLong).validSplitEpi)
   checkAll("bigDecimal", ValidSplitEpiTests(InputValidSplitEpi.bigDecimal).validSplitEpi)
   checkAll("posBigDecimal", ValidSplitEpiTests(InputValidSplitEpi.posBigDecimal).validSplitEpi)
+  checkAll("nonNegBigDecimal", ValidSplitEpiTests(InputValidSplitEpi.nonNegBigDecimal).validSplitEpi)
   checkAll(
     "bigDecimalWithScientificNotation",
     ValidSplitEpiTests(InputValidSplitEpi.bigDecimalWithScientificNotation).validSplitEpi
