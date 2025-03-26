@@ -12,7 +12,7 @@ ThisBuild / crossScalaVersions := Seq("3.3.5")
 ThisBuild / scalacOptions += "-language:implicitConversions" // TODO
 
 lazy val catsVersion                = "2.13.0"
-lazy val catsEffectVersion          = "3.5.7"
+lazy val catsEffectVersion          = "3.6.0"
 lazy val kindProjectorVersion       = "0.13.2"
 lazy val monocleVersion             = "3.3.0"
 lazy val scalaJavaTimeVersion       = "2.6.0"
