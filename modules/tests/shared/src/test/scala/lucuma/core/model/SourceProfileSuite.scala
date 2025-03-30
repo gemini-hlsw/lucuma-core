@@ -20,7 +20,6 @@ import lucuma.core.math.LineFluxValue
 import lucuma.core.math.LineWidthValue
 import lucuma.core.math.Wavelength
 import lucuma.core.math.arb.ArbAngle
-import lucuma.core.math.arb.ArbFluxDensityContinuumValue
 import lucuma.core.math.arb.ArbWavelength
 import lucuma.core.math.dimensional.arb.ArbMeasure
 import lucuma.core.math.units.*
@@ -41,7 +40,6 @@ final class SourceProfileSuite extends DisciplineSuite {
   import ArbAngle.given
   import ArbEmissionLine.given
   import ArbEnumerated.given
-  import ArbFluxDensityContinuumValue.given
   import ArbMeasure.given
   import ArbNewType.given
   import ArbRefined.given

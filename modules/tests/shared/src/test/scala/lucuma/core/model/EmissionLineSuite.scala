@@ -19,14 +19,19 @@ import lucuma.core.model.arb.ArbEmissionLine
 import lucuma.core.util.arb.ArbEnumerated
 import monocle.law.discipline.LensTests
 import munit.*
+import lucuma.core.util.arb.ArbNewType
+import lucuma.core.math.arb.ArbRefined
+import eu.timepit.refined.scalacheck.numeric.*
+
 
 final class EmissionLineSuite extends DisciplineSuite {
   import ArbEnumerated.given
   import ArbEmissionLine.given
-  import ArbLineFluxValue.given
   import ArbLineWidthValue.given
   import ArbMeasure.given
+  import ArbNewType.given
   import ArbQuantity.given
+  import ArbRefined.given
 
   // Brightness type conversions
   val e1Integrated: EmissionLine[Integrated] =

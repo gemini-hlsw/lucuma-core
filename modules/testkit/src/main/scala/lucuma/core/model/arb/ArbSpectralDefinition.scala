@@ -9,7 +9,6 @@ import lucuma.core.enums.Band
 import lucuma.core.math.BrightnessUnits
 import lucuma.core.math.FluxDensityContinuumValue
 import lucuma.core.math.Wavelength
-import lucuma.core.math.arb.ArbFluxDensityContinuumValue
 import lucuma.core.math.arb.ArbWavelength
 import lucuma.core.math.dimensional.*
 import lucuma.core.math.dimensional.arb.ArbMeasure
@@ -29,7 +28,6 @@ import scala.collection.immutable.SortedMap
 trait ArbSpectralDefinition {
   import ArbEmissionLine.given
   import ArbEnumerated.given
-  import ArbFluxDensityContinuumValue.given
   import ArbMeasure.given
   import ArbNewType.given
   import ArbRefined.given

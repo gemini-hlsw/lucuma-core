@@ -20,7 +20,6 @@ import munit.*
 import lucuma.core.util.arb.ArbNewType
 import eu.timepit.refined.scalacheck.numeric.*
 
-
 class TargetSuite extends DisciplineSuite {
   import ArbAngle.given
   import ArbCatalogInfo.given
@@ -31,7 +30,6 @@ class TargetSuite extends DisciplineSuite {
   import ArbEpoch.given
   import ArbEphemerisKey.given
   import ArbEmissionLine.given
-  import ArbFluxDensityContinuumValue.given
   import ArbGid.given
   import ArbMeasure.given
   import ArbNewType.given

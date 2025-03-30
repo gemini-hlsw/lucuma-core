@@ -27,7 +27,7 @@ trait NewTypeGen[A, W]:
  * type Name = Name.Type
  * ```
  */
-trait NewType[Wrapped]{ self =>
+trait NewType[Wrapped]{ 
   opaque type Type = Wrapped
 
   inline def apply(w: Wrapped): Type = w
@@ -35,8 +35,8 @@ trait NewType[Wrapped]{ self =>
   val value: Iso[Type, Wrapped] = Iso[Type, Wrapped](_.value)(apply)
 
   given NewTypeGen[Type, Wrapped] = new NewTypeGen[Type, Wrapped]:
-    def wrap(w: Wrapped): Type = self.apply(w)
-    def unwrap(t: Type): Wrapped = t.value
+    def wrap(w: Wrapped): Type = w
+    def unwrap(t: Type): Wrapped = t
 
 
   extension (t: Type)
