@@ -9,25 +9,24 @@ import coulomb.*
 import coulomb.ops.algebra.cats.all.given
 import coulomb.syntax.*
 import eu.timepit.refined.cats.*
+import eu.timepit.refined.scalacheck.numeric.*
 import lucuma.core.math.BrightnessUnits.*
 import lucuma.core.math.LineFluxValue
 import lucuma.core.math.LineWidthValue
 import lucuma.core.math.arb.*
+import lucuma.core.math.arb.ArbRefined
 import lucuma.core.math.dimensional.arb.ArbMeasure
 import lucuma.core.math.units.*
 import lucuma.core.model.arb.ArbEmissionLine
 import lucuma.core.util.arb.ArbEnumerated
+import lucuma.core.util.arb.ArbNewType
 import monocle.law.discipline.LensTests
 import munit.*
-import lucuma.core.util.arb.ArbNewType
-import lucuma.core.math.arb.ArbRefined
-import eu.timepit.refined.scalacheck.numeric.*
 
 
 final class EmissionLineSuite extends DisciplineSuite {
   import ArbEnumerated.given
   import ArbEmissionLine.given
-  import ArbLineWidthValue.given
   import ArbMeasure.given
   import ArbNewType.given
   import ArbQuantity.given

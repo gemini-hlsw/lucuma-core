@@ -6,6 +6,7 @@ package lucuma.core.model
 import cats.Order.*
 import cats.kernel.laws.discipline.*
 import eu.timepit.refined.cats.*
+import eu.timepit.refined.scalacheck.numeric.*
 import eu.timepit.refined.scalacheck.string.*
 import lucuma.core.enums.Band
 import lucuma.core.math.arb.*
@@ -14,11 +15,10 @@ import lucuma.core.math.dimensional.arb.ArbMeasure
 import lucuma.core.model.arb.*
 import lucuma.core.util.arb.*
 import lucuma.core.util.arb.ArbCollection
+import lucuma.core.util.arb.ArbNewType
 import lucuma.core.util.laws.GidTests
 import monocle.law.discipline.*
 import munit.*
-import lucuma.core.util.arb.ArbNewType
-import eu.timepit.refined.scalacheck.numeric.*
 
 class TargetSuite extends DisciplineSuite {
   import ArbAngle.given

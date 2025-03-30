@@ -15,7 +15,10 @@ import monocle.Prism
 
 import scala.util.NotGiven
 
-// trait NewTypeGen[W, A <: NewType[W]]:
+/**
+  * Typeclass to convert between a new type and the wrapped value.
+  * Mostly used for deriving typeclasses not contemplated by `NewType`. For example: `Arbitrary` and `Cogen`.
+  */
 trait NewTypeGen[A, W]:
   def wrap(wrapped: W): A
   def unwrap(newType: A): W

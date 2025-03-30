@@ -10,6 +10,7 @@ import coulomb.*
 import coulomb.syntax.*
 import eu.timepit.refined.cats.*
 import eu.timepit.refined.numeric.Positive
+import eu.timepit.refined.scalacheck.numeric.*
 import lucuma.core.enums.Band
 import lucuma.core.enums.StellarLibrarySpectrum
 import lucuma.core.math.BrightnessUnits
@@ -18,18 +19,17 @@ import lucuma.core.math.FluxDensityContinuumValue
 import lucuma.core.math.LineFluxValue
 import lucuma.core.math.LineWidthValue
 import lucuma.core.math.Wavelength
+import lucuma.core.math.arb.ArbRefined
 import lucuma.core.math.arb.ArbWavelength
 import lucuma.core.math.dimensional.arb.ArbMeasure
 import lucuma.core.math.units.*
 import lucuma.core.model.arb.*
 import lucuma.core.util.arb.ArbCollection
 import lucuma.core.util.arb.ArbEnumerated
+import lucuma.core.util.arb.ArbNewType
 import lucuma.refined.*
 import monocle.law.discipline.*
 import munit.*
-import lucuma.core.util.arb.ArbNewType
-import lucuma.core.math.arb.ArbRefined
-import eu.timepit.refined.scalacheck.numeric.*
 
 import scala.collection.immutable.SortedMap
 

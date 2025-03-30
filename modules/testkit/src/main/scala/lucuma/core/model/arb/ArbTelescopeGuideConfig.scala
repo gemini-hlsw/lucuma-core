@@ -8,10 +8,10 @@ import lucuma.core.model.M1GuideConfig
 import lucuma.core.model.M2GuideConfig
 import lucuma.core.model.ProbeGuide
 import lucuma.core.model.TelescopeGuideConfig
+import lucuma.core.util.arb.ArbNewType.given
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.*
 import org.scalacheck.Cogen
-import lucuma.core.util.arb.ArbNewType.given
 
 import ArbM1GuideConfig.given
 import ArbM2GuideConfig.given

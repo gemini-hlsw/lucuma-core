@@ -8,12 +8,12 @@ import lucuma.core.enums.*
 import lucuma.core.model.GemsConfig
 import lucuma.core.model.GemsConfig.GemsOff
 import lucuma.core.model.GemsConfig.GemsOn
+import lucuma.core.util.arb.ArbNewType.given
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.*
 import org.scalacheck.Cogen
 import org.scalacheck.Cogen.*
 import org.scalacheck.Gen
-import lucuma.core.util.arb.ArbNewType.given
 
 trait ArbGemsConfig {
 

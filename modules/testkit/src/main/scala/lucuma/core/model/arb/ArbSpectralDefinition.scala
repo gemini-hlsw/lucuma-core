@@ -5,10 +5,12 @@ package lucuma.core.model.arb
 
 import cats.Order.*
 import cats.syntax.all.*
+import eu.timepit.refined.scalacheck.numeric.*
 import lucuma.core.enums.Band
 import lucuma.core.math.BrightnessUnits
 import lucuma.core.math.FluxDensityContinuumValue
 import lucuma.core.math.Wavelength
+import lucuma.core.math.arb.ArbRefined
 import lucuma.core.math.arb.ArbWavelength
 import lucuma.core.math.dimensional.*
 import lucuma.core.math.dimensional.arb.ArbMeasure
@@ -17,11 +19,9 @@ import lucuma.core.model.SpectralDefinition
 import lucuma.core.model.UnnormalizedSED
 import lucuma.core.util.*
 import lucuma.core.util.arb.ArbEnumerated
+import lucuma.core.util.arb.ArbNewType
 import org.scalacheck.*
 import org.scalacheck.Arbitrary.arbitrary
-import lucuma.core.math.arb.ArbRefined
-import eu.timepit.refined.scalacheck.numeric.*
-import lucuma.core.util.arb.ArbNewType
 
 import scala.collection.immutable.SortedMap
 
