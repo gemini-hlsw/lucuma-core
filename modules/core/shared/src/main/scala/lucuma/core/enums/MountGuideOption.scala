@@ -3,13 +3,8 @@
 
 package lucuma.core.enums
 
-import lucuma.core.util.NewType
+import lucuma.core.util.NewBoolean
 
-object MountGuideOption extends NewType[Boolean] {
-  val MountGuideOn = MountGuideOption(true)
-  val MountGuideOff = MountGuideOption(false)
-
-  def fromBoolean(b: Boolean): MountGuideOption = if (b) MountGuideOn else MountGuideOff
-}
+object MountGuideOption extends NewBoolean { val MountGuideOn = True; val MountGuideOff = False }
 type MountGuideOption = MountGuideOption.Type
 

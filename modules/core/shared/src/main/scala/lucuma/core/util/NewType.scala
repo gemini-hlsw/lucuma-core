@@ -72,21 +72,21 @@ trait RefinedNewType[T, P](using RefinedType.AuxT[T Refined P, T]) extends NewTy
 /**
  * Usage:
  * ```
- * object IsActive extends NewBool
+ * object IsActive extends NewBoolean
  * type IsActive = IsActive.Type
  * ```
  * or, if you want more descriptive names than `True` and `False`:
  * ```
- * object ActiveStatus extends NewBool { inline def Active = True; inline def Inactive = False }
+ * object ActiveStatus extends NewBoolean { inline def Active = True; inline def Inactive = False }
  * type ActiveStatus = ActiveStatus.Type
  * ```
  * or, if you want to be able to pattern-match (but allocate 2 vals):
  * ```
- * object ActiveStatus extends NewBool { val Active = True; val Inactive = False }
+ * object ActiveStatus extends NewBoolean { val Active = True; val Inactive = False }
  * type ActiveStatus = ActiveStatus.Type
  * ```
  */
-trait NewBool extends NewType[Boolean]:
+trait NewBoolean extends NewType[Boolean]:
   inline def True:  Type = apply(true)
   inline def False: Type = apply(false)
 
