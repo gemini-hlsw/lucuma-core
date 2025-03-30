@@ -18,7 +18,6 @@ import lucuma.core.math.FluxDensityContinuumValue
 import lucuma.core.math.LineFluxValue
 import lucuma.core.math.LineWidthValue
 import lucuma.core.math.Wavelength
-import lucuma.core.math.arb.ArbBrightnessValue
 import lucuma.core.math.arb.ArbFluxDensityContinuumValue
 import lucuma.core.math.arb.ArbWavelength
 import lucuma.core.math.dimensional.arb.ArbMeasure
@@ -29,16 +28,21 @@ import lucuma.core.util.arb.ArbEnumerated
 import lucuma.refined.*
 import monocle.law.discipline.*
 import munit.*
+import lucuma.core.util.arb.ArbNewType
+import lucuma.core.math.arb.ArbRefined
+import eu.timepit.refined.scalacheck.numeric.*
+
 
 import scala.collection.immutable.SortedMap
 
 final class SpectralDefinitionSuite extends DisciplineSuite {
-  import ArbBrightnessValue.given
   import ArbCollection.given
   import ArbEmissionLine.given
   import ArbEnumerated.given
   import ArbFluxDensityContinuumValue.given
   import ArbMeasure.given
+  import ArbNewType.given
+  import ArbRefined.given
   import ArbSpectralDefinition.given
   import ArbUnnormalizedSED.given
   import ArbWavelength.given

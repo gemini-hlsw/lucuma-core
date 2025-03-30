@@ -7,17 +7,20 @@ import lucuma.ags.GuideStarCandidate
 import lucuma.catalog.BandsList
 import lucuma.core.enums.Band
 import lucuma.core.math.BrightnessValue
-import lucuma.core.math.arb.ArbBrightnessValue
 import lucuma.core.model.SiderealTracking
 import lucuma.core.model.arb.ArbSiderealTracking
 import lucuma.core.util.arb.ArbEnumerated.given
 import org.scalacheck.*
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Cogen.*
+import lucuma.core.util.arb.ArbNewType
+import lucuma.core.math.arb.ArbRefined
+import eu.timepit.refined.scalacheck.numeric.*
 
 trait ArbGuideStarCandidate:
+  import ArbNewType.given
+  import ArbRefined.given
   import ArbSiderealTracking.given
-  import ArbBrightnessValue.given
 
   given Arbitrary[GuideStarCandidate] =
     given Arbitrary[Band] = Arbitrary(Gen.oneOf(BandsList.GaiaBandsList.bands))

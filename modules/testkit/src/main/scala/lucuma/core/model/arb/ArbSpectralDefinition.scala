@@ -9,7 +9,6 @@ import lucuma.core.enums.Band
 import lucuma.core.math.BrightnessUnits
 import lucuma.core.math.FluxDensityContinuumValue
 import lucuma.core.math.Wavelength
-import lucuma.core.math.arb.ArbBrightnessValue
 import lucuma.core.math.arb.ArbFluxDensityContinuumValue
 import lucuma.core.math.arb.ArbWavelength
 import lucuma.core.math.dimensional.*
@@ -21,19 +20,24 @@ import lucuma.core.util.*
 import lucuma.core.util.arb.ArbEnumerated
 import org.scalacheck.*
 import org.scalacheck.Arbitrary.arbitrary
+import lucuma.core.math.arb.ArbRefined
+import eu.timepit.refined.scalacheck.numeric.*
+import lucuma.core.util.arb.ArbNewType
 
 import scala.collection.immutable.SortedMap
 
 trait ArbSpectralDefinition {
-  import ArbBrightnessValue.given
   import ArbEmissionLine.given
   import ArbEnumerated.given
   import ArbFluxDensityContinuumValue.given
   import ArbMeasure.given
+  import ArbNewType.given
+  import ArbRefined.given
   import ArbUnnormalizedSED.given
   import ArbWavelength.given
   import BrightnessUnits.*
   import SpectralDefinition.*
+  
 
   given arbBandNormalizedSpectralDefinition[T](using
     arbUnit: Arbitrary[Units Of Brightness[T]]

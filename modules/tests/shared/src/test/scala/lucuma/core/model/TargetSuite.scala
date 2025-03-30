@@ -17,10 +17,12 @@ import lucuma.core.util.arb.ArbCollection
 import lucuma.core.util.laws.GidTests
 import monocle.law.discipline.*
 import munit.*
+import lucuma.core.util.arb.ArbNewType
+import eu.timepit.refined.scalacheck.numeric.*
+
 
 class TargetSuite extends DisciplineSuite {
   import ArbAngle.given
-  import ArbBrightnessValue.given
   import ArbCatalogInfo.given
   import ArbCollection.given
   import ArbCoordinates.given
@@ -32,6 +34,7 @@ class TargetSuite extends DisciplineSuite {
   import ArbFluxDensityContinuumValue.given
   import ArbGid.given
   import ArbMeasure.given
+  import ArbNewType.given
   import ArbParallax.given
   import ArbProperMotion.given
   import ArbRadialVelocity.given

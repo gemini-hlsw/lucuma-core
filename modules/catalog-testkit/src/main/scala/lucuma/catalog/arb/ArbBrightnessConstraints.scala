@@ -8,9 +8,11 @@ import lucuma.catalog.BrightnessConstraints
 import lucuma.catalog.FaintnessConstraint
 import lucuma.catalog.SaturationConstraint
 import lucuma.core.math.BrightnessValue
-import lucuma.core.math.arb.ArbBrightnessValue.given
 import org.scalacheck.*
 import org.scalacheck.Arbitrary.arbitrary
+import lucuma.core.util.arb.ArbNewType.given
+import lucuma.core.math.arb.ArbRefined.given
+import eu.timepit.refined.scalacheck.numeric.*
 
 trait ArbBrightnessConstraints {
 
