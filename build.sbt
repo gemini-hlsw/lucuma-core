@@ -38,7 +38,7 @@ lazy val refinedAlgebraVersion      = "0.1.1"
 lazy val scalaXmlVersion            = "2.3.0"
 lazy val munitVersion               = "1.1.0"
 lazy val munitDisciplineVersion     = "2.0.0"
-lazy val munitCatsEffectVersion     = "1.0.7"
+lazy val munitCatsEffectVersion     = "2.1.0"
 lazy val pprintVersion              = "0.9.0"
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
@@ -207,7 +207,7 @@ lazy val catalogTests = crossProject(JVMPlatform, JSPlatform)
       "org.typelevel"          %%% "cats-effect"         % catsEffectVersion      % Test,
       "org.scalameta"          %%% "munit"               % munitVersion           % Test,
       "org.typelevel"          %%% "discipline-munit"    % munitDisciplineVersion % Test,
-      "org.typelevel"          %%% "munit-cats-effect-3" % munitCatsEffectVersion % Test,
+      "org.typelevel"          %%% "munit-cats-effect" % munitCatsEffectVersion % Test,
       "org.scala-lang.modules" %%% "scala-xml"           % scalaXmlVersion        % Test,
       "org.http4s"             %%% "http4s-core"         % http4sVersion,
       "com.lihaoyi"            %%% "pprint"              % pprintVersion,
