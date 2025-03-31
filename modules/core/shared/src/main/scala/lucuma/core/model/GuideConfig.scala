@@ -148,15 +148,15 @@ object GuideConfig {
           useP1 <- c.downField("useP1").as[Boolean].recover { case _ => false }
           useOI <- c.downField("useOI").as[Boolean].recover { case _ => false }
         } yield GemsOn(
-          Cwfs1Usage.fromBoolean(cwfs1),
-          Cwfs2Usage.fromBoolean(cwfs2),
-          Cwfs3Usage.fromBoolean(cwfs3),
-          Odgw1Usage.fromBoolean(odgw1),
-          Odgw2Usage.fromBoolean(odgw2),
-          Odgw3Usage.fromBoolean(odgw3),
-          Odgw4Usage.fromBoolean(odgw4),
-          P1Usage.fromBoolean(useP1),
-          OIUsage.fromBoolean(useOI)
+          Cwfs1Usage(cwfs1),
+          Cwfs2Usage(cwfs2),
+          Cwfs3Usage(cwfs3),
+          Odgw1Usage(odgw1),
+          Odgw2Usage(odgw2),
+          Odgw3Usage(odgw3),
+          Odgw4Usage(odgw4),
+          P1Usage(useP1),
+          OIUsage(useOI)
         )
       else Right(GemsOff)
     }
