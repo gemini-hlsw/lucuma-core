@@ -3,13 +3,7 @@
 
 package lucuma.core.enums
 
-import lucuma.core.util.NewType
+import lucuma.core.util.NewBoolean
 
-object ComaOption extends NewType[Boolean] {
-  val ComaOn = ComaOption(true)
-  val ComaOff = ComaOption(false)
-
-  def fromBoolean(b: Boolean): ComaOption = if (b) ComaOn else ComaOff
-}
-
+object ComaOption extends NewBoolean { val ComaOn = True; val ComaOff = False }
 type ComaOption = ComaOption.Type

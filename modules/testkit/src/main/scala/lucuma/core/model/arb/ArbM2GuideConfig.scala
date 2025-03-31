@@ -3,19 +3,17 @@
 
 package lucuma.core.model.arb
 
-import lucuma.core.arb.*
 import lucuma.core.enums.ComaOption
 import lucuma.core.enums.TipTiltSource
 import lucuma.core.model.M2GuideConfig
 import lucuma.core.util.arb.ArbEnumerated.given
+import lucuma.core.util.arb.ArbNewType.given
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.*
 import org.scalacheck.Cogen
 import org.scalacheck.Gen
 
 trait ArbM2GuideConfig {
-
-  given Arbitrary[ComaOption] = newTypeArbitrary(ComaOption)
 
   given arbM2GuideOn: Arbitrary[M2GuideConfig.M2GuideOn] =
     Arbitrary {

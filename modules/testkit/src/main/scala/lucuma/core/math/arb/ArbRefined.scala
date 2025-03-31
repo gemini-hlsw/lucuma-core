@@ -3,27 +3,25 @@
 
 package lucuma.core.math.arb
 
+import eu.timepit.refined.api.Max
+import eu.timepit.refined.api.Min
 import eu.timepit.refined.api.Refined
-import eu.timepit.refined.types.numeric.PosBigDecimal
-import org.scalacheck.Arbitrary
-import org.scalacheck.Arbitrary.*
+import eu.timepit.refined.internal.Adjacent
 import org.scalacheck.Cogen
 
-trait ArbRefined {
-  val BigDecimalZero: BigDecimal      = BigDecimal(java.math.BigDecimal.ZERO)
-  val BigDecimalOne: BigDecimal      = BigDecimal(java.math.BigDecimal.ONE)
-  val PosBigDecimalOne: PosBigDecimal = PosBigDecimal.unsafeFrom(BigDecimalOne)
 
-  // Refined does not derive this arbitrary. Generally deriving `Arbitrary` instances for `Pos`
-  // numbers requires instances of `Adjacent` and `Max`, which don't exist for `BigDecimal`.
-  given Arbitrary[PosBigDecimal] =
-    Arbitrary(
-      arbitrary[BigDecimal]
-        .map {
-          case BigDecimalZero => PosBigDecimalOne
-          case x              => PosBigDecimal.unsafeFrom(x.abs)
-        }
-    )
+trait ArbRefined {
+  given Adjacent[BigDecimal] = Adjacent.instance[BigDecimal](
+    _.compare(_),
+    x => BigDecimal(Adjacent[Double].nextUp(x.toDouble)),
+    x => BigDecimal(Adjacent[Double].nextDown(x.toDouble))
+  )
+
+  given Max[BigDecimal] = new Max[BigDecimal]:
+    val max: BigDecimal = BigDecimal(Double.MaxValue)
+
+  given Min[BigDecimal] = new Min[BigDecimal]:
+    val min: BigDecimal = BigDecimal(Double.MinValue)
 
   given cogenRefined[A: Cogen, P]: Cogen[A Refined P] =
     Cogen[A].contramap(_.value)

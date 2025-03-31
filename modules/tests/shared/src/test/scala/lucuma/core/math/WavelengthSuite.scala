@@ -39,9 +39,9 @@ final class WavelengthSuite extends munit.DisciplineSuite {
   checkAll("Wavelength", OrderTests[Wavelength].order)
 
   checkAll("picometers",  IsoTests(Wavelength.picometers))
-  checkAll("angstroms",   FormatTests(Wavelength.angstroms).format)
-  checkAll("nanometers",  FormatTests(Wavelength.nanometers).format)
-  checkAll("micrometers", FormatTests(Wavelength.micrometers).format)
+  checkAll("angstroms",   FormatTests(Wavelength.angstroms).formatLaws)
+  checkAll("nanometers",  FormatTests(Wavelength.nanometers).formatLaws)
+  checkAll("micrometers", FormatTests(Wavelength.micrometers).formatLaws)
 
   checkAll("intPicometers",      PrismTests(Wavelength.intPicometers))
   checkAll("decimalPicometers",  FormatTests(Wavelength.decimalPicometers).formatWith(ArbWavelength.bigDecimalWavelengths))
@@ -129,7 +129,7 @@ final class WavelengthSuite extends munit.DisciplineSuite {
 
   test("toAngstrom") {
     forAll { (a: PosInt) =>
-      (a.value <= Wavelength.MaxAngstrom) ==> {
+      (a <= Wavelength.MaxAngstrom) ==> {
         assertEquals(Wavelength.fromIntAngstroms(a.value).map(_.toAngstroms.value.isWhole),  true.some)
         assertEquals(Wavelength.fromIntAngstroms(a.value).map(_.toAngstroms.value), PosBigDecimal.unsafeFrom(a.value).some)
       }

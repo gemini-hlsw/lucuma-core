@@ -5,22 +5,23 @@ package lucuma.core.model.arb
 
 import coulomb.*
 import coulomb.syntax.*
+import eu.timepit.refined.scalacheck.numeric.*
 import lucuma.core.math.BrightnessUnits
 import lucuma.core.math.LineWidthValue
-import lucuma.core.math.arb.ArbLineFluxValue
-import lucuma.core.math.arb.ArbLineWidthValue
+import lucuma.core.math.arb.ArbRefined
 import lucuma.core.math.dimensional.*
 import lucuma.core.math.dimensional.arb.ArbMeasure
 import lucuma.core.math.units.*
 import lucuma.core.model.EmissionLine
 import lucuma.core.util.*
+import lucuma.core.util.arb.ArbNewType
 import org.scalacheck.*
 import org.scalacheck.Arbitrary.arbitrary
 
 trait ArbEmissionLine {
-  import ArbLineFluxValue.given
-  import ArbLineWidthValue.given
   import ArbMeasure.given
+  import ArbNewType.given
+  import ArbRefined.given
   import BrightnessUnits.*
 
   given arbEmissionLine[T](using

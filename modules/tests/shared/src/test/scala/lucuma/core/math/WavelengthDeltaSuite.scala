@@ -38,9 +38,9 @@ final class WavelengthDeltaSuite extends munit.DisciplineSuite {
   checkAll("WavelengthDelta", OrderTests[WavelengthDelta].order)
 
   checkAll("picometers",  IsoTests(WavelengthDelta.picometers))
-  checkAll("angstroms",   FormatTests(WavelengthDelta.angstroms).format)
-  checkAll("nanometers",  FormatTests(WavelengthDelta.nanometers).format)
-  checkAll("micrometers", FormatTests(WavelengthDelta.micrometers).format)
+  checkAll("angstroms",   FormatTests(WavelengthDelta.angstroms).formatLaws)
+  checkAll("nanometers",  FormatTests(WavelengthDelta.nanometers).formatLaws)
+  checkAll("micrometers", FormatTests(WavelengthDelta.micrometers).formatLaws)
 
   checkAll("intPicometers",      PrismTests(WavelengthDelta.intPicometers))
   checkAll("decimalPicometers",  FormatTests(WavelengthDelta.decimalPicometers).formatWith(ArbWavelength.bigDecimalWavelengths))

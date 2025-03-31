@@ -4,6 +4,7 @@
 package lucuma.core.validation
 
 import eu.timepit.refined.cats.*
+import eu.timepit.refined.scalacheck.numeric.*
 import lucuma.core.math.arb.ArbRefined.given
 import lucuma.core.optics.laws.discipline.ValidWedgeTests
 import lucuma.refined.*

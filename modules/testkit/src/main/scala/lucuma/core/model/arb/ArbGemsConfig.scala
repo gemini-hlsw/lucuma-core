@@ -4,11 +4,11 @@
 package lucuma.core.model.arb
 
 import cats.syntax.all.*
-import lucuma.core.arb.*
 import lucuma.core.enums.*
 import lucuma.core.model.GemsConfig
 import lucuma.core.model.GemsConfig.GemsOff
 import lucuma.core.model.GemsConfig.GemsOn
+import lucuma.core.util.arb.ArbNewType.given
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.*
 import org.scalacheck.Cogen
@@ -16,24 +16,6 @@ import org.scalacheck.Cogen.*
 import org.scalacheck.Gen
 
 trait ArbGemsConfig {
-
-  given Arbitrary[Cwfs1Usage] = newTypeArbitrary(Cwfs1Usage)
-
-  given Arbitrary[Cwfs2Usage] = newTypeArbitrary(Cwfs2Usage)
-
-  given Arbitrary[Cwfs3Usage] = newTypeArbitrary(Cwfs3Usage)
-
-  given Arbitrary[Odgw1Usage] = newTypeArbitrary(Odgw1Usage)
-
-  given Arbitrary[Odgw2Usage] = newTypeArbitrary(Odgw2Usage)
-
-  given Arbitrary[Odgw3Usage] = newTypeArbitrary(Odgw3Usage)
-
-  given Arbitrary[Odgw4Usage] = newTypeArbitrary(Odgw4Usage)
-
-  given Arbitrary[OIUsage] = newTypeArbitrary(OIUsage)
-
-  given Arbitrary[P1Usage] = newTypeArbitrary(P1Usage)
 
   given Arbitrary[GemsOn] = Arbitrary {
     for {

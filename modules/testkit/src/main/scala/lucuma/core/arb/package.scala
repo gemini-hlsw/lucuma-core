@@ -49,8 +49,10 @@ given Cogen[NonNegInt] = Cogen[Int].contramap(_.value)
 
 given Cogen[NonEmptyString] = Cogen[String].contramap(_.value)
 
+@deprecated
 def newTypeArbitrary[T: Arbitrary](base: NewType[T]): Arbitrary[base.Type] =
   Arbitrary(arbitrary[T].map(base.apply(_)))
 
+@deprecated
 def newTypeCogen[T: Cogen](base: NewType[T]): Cogen[base.Type] =
   Cogen[T].contramap(_.value)

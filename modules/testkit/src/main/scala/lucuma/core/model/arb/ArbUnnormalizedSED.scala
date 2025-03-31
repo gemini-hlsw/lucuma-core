@@ -12,6 +12,7 @@ import coulomb.syntax.*
 import coulomb.units.si.Kelvin
 import eu.timepit.refined.numeric.Positive
 import eu.timepit.refined.refineV
+import eu.timepit.refined.scalacheck.numeric.*
 import eu.timepit.refined.types.numeric.PosBigDecimal
 import lucuma.core.enums.*
 import lucuma.core.math.Wavelength

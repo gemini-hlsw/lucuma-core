@@ -3,12 +3,12 @@
 
 package lucuma.core.model.arb
 
-import lucuma.core.arb.*
 import lucuma.core.enums.*
 import lucuma.core.model.M1GuideConfig
 import lucuma.core.model.M2GuideConfig
 import lucuma.core.model.ProbeGuide
 import lucuma.core.model.TelescopeGuideConfig
+import lucuma.core.util.arb.ArbNewType.given
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.*
 import org.scalacheck.Cogen
@@ -18,8 +18,6 @@ import ArbM2GuideConfig.given
 import ArbProbeGuide.given
 
 trait ArbTelescopeGuideConfig {
-  given Arbitrary[MountGuideOption] = newTypeArbitrary(MountGuideOption)
-
   given Arbitrary[TelescopeGuideConfig] =
     Arbitrary {
       for {
