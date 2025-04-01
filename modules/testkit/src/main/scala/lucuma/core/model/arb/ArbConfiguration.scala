@@ -4,14 +4,13 @@
 package lucuma.core.model
 package arb
 
-import lucuma.core.enums.CloudExtinction
 import lucuma.core.enums.GmosNorthGrating
 import lucuma.core.enums.GmosSouthGrating
-import lucuma.core.enums.ImageQuality
 import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.WaterVapor
 import lucuma.core.math.Coordinates
 import lucuma.core.math.arb.ArbCoordinates.given
+import lucuma.core.model.CloudExtinction
 import lucuma.core.util.arb.ArbEnumerated.given
 import org.scalacheck.*
 import org.scalacheck.Arbitrary.arbitrary
@@ -24,16 +23,16 @@ trait ArbConfiguration:
   given Arbitrary[Conditions] =
     Arbitrary:
       for
-        ce <- arbitrary[CloudExtinction]
-        iq <- arbitrary[ImageQuality]
+        ce <- arbitrary[CloudExtinction.Point]
+        iq <- arbitrary[ImageQuality.Point]
         sb <- arbitrary[SkyBackground]
         wv <- arbitrary[WaterVapor]
       yield Conditions(ce, iq, sb, wv)
     
 
   given Cogen[Conditions] =
-    Cogen[(ImageQuality, CloudExtinction, SkyBackground, WaterVapor)]
-      .contramap(c => (c.imageQuality, c.cloudExtinction, c.skyBackground, c.waterVapor))
+    Cogen[(CloudExtinction.Point, ImageQuality.Point, SkyBackground, WaterVapor)]
+      .contramap(c => (c.cloudExtinction,c.imageQuality,  c.skyBackground, c.waterVapor))
 
   given Arbitrary[ObservingMode.GmosNorthLongSlit] =
     Arbitrary:

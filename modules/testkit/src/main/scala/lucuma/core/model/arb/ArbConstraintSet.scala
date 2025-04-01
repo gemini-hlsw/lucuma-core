@@ -4,10 +4,9 @@
 package lucuma.core.model
 package arb
 
-import lucuma.core.enums.CloudExtinction
-import lucuma.core.enums.ImageQuality
 import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.WaterVapor
+import lucuma.core.model.CloudExtinction
 import lucuma.core.util.arb.ArbEnumerated.given
 import org.scalacheck.*
 import org.scalacheck.Arbitrary.arbitrary
@@ -19,8 +18,8 @@ trait ArbConstraintSet {
   given Arbitrary[ConstraintSet] =
     Arbitrary {
       for {
-        iq <- arbitrary[ImageQuality]
-        ce <- arbitrary[CloudExtinction]
+        iq <- arbitrary[ImageQuality.Point]
+        ce <- arbitrary[CloudExtinction.Point]
         sb <- arbitrary[SkyBackground]
         wv <- arbitrary[WaterVapor]
         er <- arbitrary[ElevationRange]
@@ -28,7 +27,7 @@ trait ArbConstraintSet {
     }
 
   given Cogen[ConstraintSet] =
-    Cogen[(ImageQuality, CloudExtinction, SkyBackground, WaterVapor, ElevationRange)]
+    Cogen[(ImageQuality.Point, CloudExtinction.Point, SkyBackground, WaterVapor, ElevationRange)]
       .contramap(c => (c.imageQuality, c.cloudExtinction, c.skyBackground, c.waterVapor, c.elevationRange))
 }
 

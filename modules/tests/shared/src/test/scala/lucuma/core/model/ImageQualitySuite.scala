@@ -1,19 +1,20 @@
 // Copyright (c) 2016-2023 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package lucuma.core.enums
+package lucuma.core.model
 
-import eu.timepit.refined.types.numeric.PosInt
+import eu.timepit.refined.scalacheck.numeric.given
 import lucuma.core.math.Angle
-import lucuma.core.util.arb.ArbEnumerated
+import lucuma.core.math.arb.ArbQuantity
+import lucuma.core.util.arb.ArbNewType
 import munit.DisciplineSuite
 import org.scalacheck.Prop.*
 
 import java.math.RoundingMode
 
 final class ImageQualitySuite extends DisciplineSuite {
-
-  import ArbEnumerated.given
+  import ArbNewType.given
+  import ArbQuantity.given
 
   test("toArcSeconds") {
     forAll { (a: ImageQuality) =>
@@ -28,7 +29,7 @@ final class ImageQualitySuite extends DisciplineSuite {
     forAll { (a: ImageQuality) =>
       assertEquals(
         a.toAngle.toMicroarcseconds,
-        a.toDeciArcSeconds.value.value * 100_000L
+        a.toCentiArcSeconds * 10_000L
       )
     }
   }

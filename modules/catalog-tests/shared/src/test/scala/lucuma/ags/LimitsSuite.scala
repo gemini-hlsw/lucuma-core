@@ -10,8 +10,10 @@ import lucuma.catalog.SaturationConstraint
 import lucuma.core.enums.*
 import lucuma.core.math.BrightnessValue
 import lucuma.core.math.Wavelength
+import lucuma.core.model.CloudExtinction
 import lucuma.core.model.ConstraintSet
 import lucuma.core.model.ElevationRange
+import lucuma.core.model.ImageQuality
 
 class LimitsSuite extends munit.FunSuite {
   test("widestConstraints") {
@@ -28,11 +30,11 @@ class LimitsSuite extends munit.FunSuite {
     // Sample query from explore
 
     val constraints = ConstraintSet(
-      ImageQuality.PointOne,         // min image quality
-      CloudExtinction.PointOne,      // min cloud extinction
-      SkyBackground.Dark,            // Not relevant
-      WaterVapor.Wet,                // Not relevant
-      ElevationRange.AirMass.Default // Not relevant
+      ImageQuality.Point.PointOne,    // min image quality
+      CloudExtinction.Point.PointOne, // min cloud extinction
+      SkyBackground.Dark,             // Not relevant
+      WaterVapor.Wet,                 // Not relevant
+      ElevationRange.AirMass.Default  // Not relevant
     )
 
     val wavelength = Wavelength.fromIntNanometers(300).get

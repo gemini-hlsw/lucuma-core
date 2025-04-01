@@ -6,13 +6,13 @@ package lucuma.core.conditions
 import coulomb.syntax.*
 import coulomb.units.accepted.*
 import eu.timepit.refined.refineV
-import lucuma.core.enums.CloudExtinction
 import lucuma.core.enums.Site
 import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.WaterVapor
 import lucuma.core.math.Declination
 import lucuma.core.math.Wavelength
 import lucuma.core.model.AirMassPredicate
+import lucuma.core.model.CloudExtinction
 
 /**
   * Tests the likelihood calculations
@@ -30,9 +30,9 @@ class ConditionsLikelihoodSuite extends munit.FunSuite:
     assertEquals(percentileSkyBackground(SkyBackground.Dark).toPercent, 50.0)
 
   test("percentile cloud coverage"):
-    assertEquals(percentileCloudCoverage(CloudExtinction.PointOne).toPercent, 50.0)
-    assertEquals(percentileCloudCoverage(CloudExtinction.PointThree).toPercent, 70.0)
-    assertEquals(percentileCloudCoverage(CloudExtinction.ThreePointZero).toPercent, 100.0)
+    assertEquals(percentileCloudCoverage(CloudExtinction.Point.PointOne).toPercent, 50.0)
+    assertEquals(percentileCloudCoverage(CloudExtinction.Point.PointThree).toPercent, 70.0)
+    assertEquals(percentileCloudCoverage(CloudExtinction.Point.ThreePointZero).toPercent, 100.0)
 
   test("percentile water vapor"):
     assertEquals(percentileWaterVapor(WaterVapor.Dry).toPercent, 50.0)
@@ -47,10 +47,10 @@ class ConditionsLikelihoodSuite extends munit.FunSuite:
     assertEqualsDouble(percentileImageQuality(BigDecimal(0.5).withUnit[ArcSecond], Wavelength.fromIntNanometers(630).get, refineV[AirMassPredicate](BigDecimal(2)).getOrElse(sys.error("Not possible"))).toPercent, 2.25, 0.00001)
     assertEqualsDouble(percentileImageQuality(BigDecimal(0.1).withUnit[ArcSecond], Wavelength.fromIntNanometers(630).get, refineV[AirMassPredicate](BigDecimal(2)).getOrElse(sys.error("Not possible"))).toPercent, 0.0, 0.00001)
 
-  test("conditions likelyhood"):
-    assertEquals(conditionsLikelihood(SkyBackground.Bright, CloudExtinction.ThreePointZero, WaterVapor.Wet, BigDecimal(3).withUnit[ArcSecond], Wavelength.fromIntNanometers(1000).get, Declination.fromDoubleDegrees(20).get, Site.GN).toPercent, 100.0)
-    assertEquals(conditionsLikelihood(SkyBackground.Dark, CloudExtinction.ThreePointZero, WaterVapor.Wet, BigDecimal(3).withUnit[ArcSecond], Wavelength.fromIntNanometers(1000).get, Declination.fromDoubleDegrees(20).get, Site.GN).toPercent, 50.0)
-    assertEquals(conditionsLikelihood(SkyBackground.Dark, CloudExtinction.PointOne, WaterVapor.Wet, BigDecimal(3).withUnit[ArcSecond], Wavelength.fromIntNanometers(1000).get, Declination.fromDoubleDegrees(20).get, Site.GN).toPercent, 25.0)
-    assertEquals(conditionsLikelihood(SkyBackground.Dark, CloudExtinction.PointOne, WaterVapor.Dry, BigDecimal(3).withUnit[ArcSecond], Wavelength.fromIntNanometers(1000).get, Declination.fromDoubleDegrees(20).get, Site.GN).toPercent, 12.0)
-    assertEquals(conditionsLikelihood(SkyBackground.Dark, CloudExtinction.PointOne, WaterVapor.Wet, BigDecimal(0.5).withUnit[ArcSecond], Wavelength.fromIntNanometers(500).get, Declination.fromDoubleDegrees(20).get, Site.GN).toPercent, 4.0)
-    assertEquals(conditionsLikelihood(SkyBackground.Dark, CloudExtinction.PointOne, WaterVapor.Wet, BigDecimal(0.5).withUnit[ArcSecond], Wavelength.fromIntNanometers(500).get, Declination.fromDoubleDegrees(68).get, Site.GN).toPercent, 1.0)
+  test("conditions likelihood"):
+    assertEquals(conditionsLikelihood(SkyBackground.Bright, CloudExtinction.Point.ThreePointZero, WaterVapor.Wet, BigDecimal(3).withUnit[ArcSecond], Wavelength.fromIntNanometers(1000).get, Declination.fromDoubleDegrees(20).get, Site.GN).toPercent, 100.0)
+    assertEquals(conditionsLikelihood(SkyBackground.Dark, CloudExtinction.Point.ThreePointZero, WaterVapor.Wet, BigDecimal(3).withUnit[ArcSecond], Wavelength.fromIntNanometers(1000).get, Declination.fromDoubleDegrees(20).get, Site.GN).toPercent, 50.0)
+    assertEquals(conditionsLikelihood(SkyBackground.Dark, CloudExtinction.Point.PointOne, WaterVapor.Wet, BigDecimal(3).withUnit[ArcSecond], Wavelength.fromIntNanometers(1000).get, Declination.fromDoubleDegrees(20).get, Site.GN).toPercent, 25.0)
+    assertEquals(conditionsLikelihood(SkyBackground.Dark, CloudExtinction.Point.PointOne, WaterVapor.Dry, BigDecimal(3).withUnit[ArcSecond], Wavelength.fromIntNanometers(1000).get, Declination.fromDoubleDegrees(20).get, Site.GN).toPercent, 12.0)
+    assertEquals(conditionsLikelihood(SkyBackground.Dark, CloudExtinction.Point.PointOne, WaterVapor.Wet, BigDecimal(0.5).withUnit[ArcSecond], Wavelength.fromIntNanometers(500).get, Declination.fromDoubleDegrees(20).get, Site.GN).toPercent, 4.0)
+    assertEquals(conditionsLikelihood(SkyBackground.Dark, CloudExtinction.Point.PointOne, WaterVapor.Wet, BigDecimal(0.5).withUnit[ArcSecond], Wavelength.fromIntNanometers(500).get, Declination.fromDoubleDegrees(68).get, Site.GN).toPercent, 1.0)

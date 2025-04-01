@@ -15,19 +15,23 @@ import lucuma.core.math.BrightnessValue
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Offset
 import lucuma.core.math.Wavelength
+import lucuma.core.model.CloudExtinction
 import lucuma.core.model.ConstraintSet
 import lucuma.core.model.ElevationRange
+import lucuma.core.model.ImageQuality
 import lucuma.core.model.SiderealTracking
 
 class AgsSuite extends munit.FunSuite {
-  val gs1 = GuideStarCandidate.unsafeApply(0L,
-                                           SiderealTracking.const(Coordinates.Zero),
-                                           (Band.Gaia, BrightnessValue.unsafeFrom(16.05)).some
+  val gs1 = GuideStarCandidate.unsafeApply(
+    0L,
+    SiderealTracking.const(Coordinates.Zero),
+    (Band.Gaia, BrightnessValue.unsafeFrom(16.05)).some
   )
 
-  val gs2 = GuideStarCandidate.unsafeApply(1L,
-                                           SiderealTracking.const(Coordinates.Zero),
-                                           (Band.Gaia, BrightnessValue.unsafeFrom(11.23)).some
+  val gs2 = GuideStarCandidate.unsafeApply(
+    1L,
+    SiderealTracking.const(Coordinates.Zero),
+    (Band.Gaia, BrightnessValue.unsafeFrom(11.23)).some
   )
 
   extension (l: Long) def toArea: Area = Area.fromMicroarcsecondsSquared.getOption(l).get
@@ -99,11 +103,12 @@ class AgsSuite extends munit.FunSuite {
   }
 
   test("discard science target") {
-    val constraints = ConstraintSet(ImageQuality.PointTwo,
-                                    CloudExtinction.PointFive,
-                                    SkyBackground.Dark,
-                                    WaterVapor.Wet,
-                                    ElevationRange.AirMass.Default
+    val constraints = ConstraintSet(
+      ImageQuality.Point.PointTwo,
+      CloudExtinction.Point.PointFive,
+      SkyBackground.Dark,
+      WaterVapor.Wet,
+      ElevationRange.AirMass.Default
     )
 
     val wavelength = Wavelength.fromIntNanometers(300).get

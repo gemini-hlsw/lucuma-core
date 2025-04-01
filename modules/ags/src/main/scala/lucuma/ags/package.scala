@@ -10,16 +10,16 @@ import lucuma.catalog.BandsList
 import lucuma.catalog.BrightnessConstraints
 import lucuma.catalog.FaintnessConstraint
 import lucuma.catalog.SaturationConstraint
-import lucuma.core.enums.CloudExtinction
 import lucuma.core.enums.GuideSpeed
-import lucuma.core.enums.ImageQuality
 import lucuma.core.enums.Site
 import lucuma.core.enums.SkyBackground
 import lucuma.core.math.Angle
 import lucuma.core.math.BrightnessValue
 import lucuma.core.math.Wavelength
 import lucuma.core.math.skycalc.averageParallacticAngle
+import lucuma.core.model.CloudExtinction
 import lucuma.core.model.ConstraintSet
+import lucuma.core.model.ImageQuality
 import lucuma.core.model.ObjectTracking
 import lucuma.core.model.PosAngleConstraint
 import lucuma.core.util.Enumerated
@@ -33,10 +33,9 @@ val baseFwhm = Wavelength.fromIntNanometers(500).get
 // FWHM as seen on the optical wavefront sensor (WFS)
 // Operate on Double, we don't need exact precision
 def wfsFwhm(sciFwhm: ImageQuality, wavelength: Wavelength): Double = {
-  val coeff =
+  val coeff: Double =
     baseFwhm.toPicometers.value.value.toDouble / wavelength.toPicometers.value.value.toDouble
-  (sciFwhm.toDeciArcSeconds.value.value / 10.0) * math.pow(coeff, -0.2)
-
+  ((sciFwhm.toArcSeconds.value) * math.pow(coeff, -0.2)).toDouble
 }
 
 // Calculate the widest set of constraints, useful to cache catalog results
@@ -45,9 +44,15 @@ def wfsFwhm(sciFwhm: ImageQuality, wavelength: Wavelength): Double = {
 val widestConstraints: BrightnessConstraints = {
   val widest = Wavelength.fromIntNanometers(300).get
 
-  val constraints = Enumerated[ImageQuality].all.flatMap { iq =>
-    Enumerated[CloudExtinction].all.map { ce =>
-      faintLimit(GuideSpeed.Slow, widest, SkyBackground.Darkest, iq, ce)
+  val constraints = Enumerated[ImageQuality.Point].all.flatMap { iq =>
+    Enumerated[CloudExtinction.Point].all.map { ce =>
+      faintLimit(
+        GuideSpeed.Slow,
+        widest,
+        SkyBackground.Darkest,
+        iq.toImageQuality,
+        ce.toCloudExtinction
+      )
     }
   }
   // The list is never empty
@@ -70,38 +75,38 @@ def faintLimit(
     case SkyBackground.Darkest =>
       guideSpeed match {
         case GuideSpeed.Fast   =>
-          16.4 - 0.8 * wfsFwhm(iq, wavelength) - ce.toBrightness
+          16.4 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.value.toDouble
         case GuideSpeed.Medium =>
-          16.9 - 0.8 * wfsFwhm(iq, wavelength) - ce.toBrightness
+          16.9 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.value.toDouble
         case GuideSpeed.Slow   =>
-          17.4 - 0.8 * wfsFwhm(iq, wavelength) - ce.toBrightness
+          17.4 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.value.toDouble
       }
     case SkyBackground.Dark    =>
       guideSpeed match {
         case GuideSpeed.Fast   =>
-          16.3 - 0.8 * wfsFwhm(iq, wavelength) - ce.toBrightness
+          16.3 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.value.toDouble
         case GuideSpeed.Medium =>
-          16.8 - 0.8 * wfsFwhm(iq, wavelength) - ce.toBrightness
+          16.8 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.value.toDouble
         case GuideSpeed.Slow   =>
-          17.3 - 0.8 * wfsFwhm(iq, wavelength) - ce.toBrightness
+          17.3 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.value.toDouble
       }
     case SkyBackground.Gray    =>
       guideSpeed match {
         case GuideSpeed.Fast   =>
-          16.2 - 0.8 * wfsFwhm(iq, wavelength) - ce.toBrightness
+          16.2 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.value.toDouble
         case GuideSpeed.Medium =>
-          16.7 - 0.8 * wfsFwhm(iq, wavelength) - ce.toBrightness
+          16.7 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.value.toDouble
         case GuideSpeed.Slow   =>
-          17.2 - 0.8 * wfsFwhm(iq, wavelength) - ce.toBrightness
+          17.2 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.value.toDouble
       }
     case SkyBackground.Bright  =>
       guideSpeed match {
         case GuideSpeed.Fast   =>
-          16.1 - 0.8 * wfsFwhm(iq, wavelength) - ce.toBrightness
+          16.1 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.value.toDouble
         case GuideSpeed.Medium =>
-          16.6 - 0.8 * wfsFwhm(iq, wavelength) - ce.toBrightness
+          16.6 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.value.toDouble
         case GuideSpeed.Slow   =>
-          17.1 - 0.8 * wfsFwhm(iq, wavelength) - ce.toBrightness
+          17.1 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.value.toDouble
       }
   }
   FaintnessConstraint(BrightnessValue.unsafeFrom(BigDecimal(limit)))
@@ -126,11 +131,12 @@ def gaiaBrightnessConstraints(
   guideSpeed:  GuideSpeed,
   wavelength:  Wavelength
 ): BrightnessConstraints =
-  gaiaBrightnessConstraints(guideSpeed,
-                            wavelength,
-                            constraints.skyBackground,
-                            constraints.imageQuality,
-                            constraints.cloudExtinction
+  gaiaBrightnessConstraints(
+    guideSpeed,
+    wavelength,
+    constraints.skyBackground,
+    constraints.imageQuality.toImageQuality,
+    constraints.cloudExtinction.toCloudExtinction
   )
 
 private val UnconstrainedAngles =

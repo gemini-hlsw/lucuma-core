@@ -16,10 +16,10 @@ import lucuma.core.enums.GmosSouthFpu
 import lucuma.core.enums.GmosSouthGrating
 import lucuma.core.enums.GmosXBinning
 import lucuma.core.enums.GmosYBinning
-import lucuma.core.enums.ImageQuality
 import lucuma.core.math.Angle
 import lucuma.core.math.Wavelength
 import lucuma.core.math.units.NanometersPerPixel
+import lucuma.core.model.ImageQuality
 import lucuma.core.model.SourceProfile
 import lucuma.core.util.Enumerated
 import spire.math.Rational

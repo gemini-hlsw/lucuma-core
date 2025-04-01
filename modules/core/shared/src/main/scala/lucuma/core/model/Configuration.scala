@@ -7,10 +7,8 @@ import cats.Eq
 import cats.derived.*
 import cats.kernel.Order
 import cats.syntax.all.*
-import lucuma.core.enums.CloudExtinction
 import lucuma.core.enums.GmosNorthGrating
 import lucuma.core.enums.GmosSouthGrating
-import lucuma.core.enums.ImageQuality
 import lucuma.core.enums.ObservingModeType
 import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.WaterVapor
@@ -28,8 +26,8 @@ case class Configuration(conditions: Configuration.Conditions, refererenceCoordi
 object Configuration:
 
   case class Conditions(
-    cloudExtinction: CloudExtinction,
-    imageQuality: ImageQuality,
+    cloudExtinction: CloudExtinction.Point,
+    imageQuality: ImageQuality.Point,
     skyBackground: SkyBackground,
     waterVapor: WaterVapor,
   )
