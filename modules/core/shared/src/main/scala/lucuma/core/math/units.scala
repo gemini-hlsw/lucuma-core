@@ -73,6 +73,7 @@ trait units {
   given TypeString[VegaMagnitude] = TypeString("VEGA_MAGNITUDE")
 
   type CentiVegaMagnitude = Centi * VegaMagnitude
+  type MilliVegaMagnitude = Milli * VegaMagnitude
 
   type ABMagnitude
   given BaseUnit[ABMagnitude, "AB magnitude", "AB mag"] = BaseUnit()

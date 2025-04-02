@@ -5,48 +5,54 @@ package lucuma.core.model
 
 import cats.syntax.contravariant.*
 import coulomb.*
-import coulomb.policy.spire.standard.given
 import coulomb.rational.Rational
-import coulomb.syntax.*
-import coulomb.units.si.prefixes.*
 import eu.timepit.refined.*
 import eu.timepit.refined.api.*
 import eu.timepit.refined.numeric.Interval
+import eu.timepit.refined.types.numeric.NonNegShort
 import lucuma.core.math.units.*
-import lucuma.core.math.units.given
+import lucuma.core.refined.given
 import lucuma.core.util.Display
 import lucuma.core.util.Enumerated
 import lucuma.core.util.NewType
 
-type CloudExtinctionPredicate = Interval.Closed[0, 500]
-type CloudExtinctionValue  = Int Refined CloudExtinctionPredicate
-val CloudExtinctionValue = new RefinedTypeOps[CloudExtinctionValue, Int]
+type CloudExtinctionPredicate = Interval.Closed[0, 5000]
+
+private type CloudExtinctionType  = Extinction Refined CloudExtinctionPredicate
+private val CloudExtinctionType = new RefinedTypeOps[CloudExtinctionType, Extinction]
 
 type CloudExtinction = CloudExtinction.Type
-object CloudExtinction extends NewType[Quantity[CloudExtinctionValue, CentiVegaMagnitude]]:
-  def fromCentiVegaMagnitude(value: Int): Either[String, CloudExtinction] =
-    CloudExtinctionValue.from(value).map(_.withUnit[CentiVegaMagnitude]).map(CloudExtinction(_))
+object CloudExtinction extends NewType[CloudExtinctionType]:
+  def from(value: Extinction): Either[String, CloudExtinction] =
+    CloudExtinctionType.from(value).map(CloudExtinction(_))
 
-  def unsafeFromCentiVegaMagnitude(value: Int): CloudExtinction           =
-    CloudExtinction(CloudExtinctionValue.unsafeFrom(value).withUnit[CentiVegaMagnitude])
+  def unsafeFrom(value: Extinction): CloudExtinction =
+    CloudExtinction(CloudExtinctionType.unsafeFrom(value))
+
+  def fromMilliVegaMagnitude(value: NonNegShort): Either[String, CloudExtinction] =
+    from(Extinction(value))
+
+  def unsafeFromMilliVegaMagnitude(value: NonNegShort): CloudExtinction           =
+    unsafeFrom(Extinction(value))
 
   extension (ce: CloudExtinction)
-    def toCentiVegaMagnitude: Int = ce.value.value.value
+    def toExtinction: Extinction = ce.value.value
 
-    def toVegaMagnitude: Quantity[Rational, VegaMagnitude] = ce.value.toValue[Int].toValue[Rational].toUnit[VegaMagnitude]
+    def toVegaMagnitude: Quantity[Rational, VegaMagnitude] = 
+      toExtinction.toVegaMagnitude
 
     def label: String        = f"< ${toVegaMagnitude.value.toDouble}%.2f mag"
 
   given Display[CloudExtinction] = Display.byShortName(_.label)
 
   enum Point(val tag: String, val toCloudExtinction: CloudExtinction) derives Enumerated:
-    case PointOne       extends Point("point_one", CloudExtinction.unsafeFromCentiVegaMagnitude(10))
-    case PointThree     extends Point("point_three", CloudExtinction.unsafeFromCentiVegaMagnitude(30))
-    case PointFive      extends Point("point_five", CloudExtinction.unsafeFromCentiVegaMagnitude(50))
-    case OnePointZero   extends Point("one_point_zero", CloudExtinction.unsafeFromCentiVegaMagnitude(100))
-    case OnePointFive   extends Point("one_point_five", CloudExtinction.unsafeFromCentiVegaMagnitude(150))
-    case TwoPointZero   extends Point("two_point_zero", CloudExtinction.unsafeFromCentiVegaMagnitude(200))
-    case ThreePointZero extends Point("three_point_zero", CloudExtinction.unsafeFromCentiVegaMagnitude(300))
+    case PointOne       extends Point("point_one", CloudExtinction.unsafeFromMilliVegaMagnitude(NonNegShort.unsafeFrom(100)))
+    case PointThree     extends Point("point_three", CloudExtinction.unsafeFromMilliVegaMagnitude(NonNegShort.unsafeFrom(300)))
+    case PointFive      extends Point("point_five", CloudExtinction.unsafeFromMilliVegaMagnitude(NonNegShort.unsafeFrom(500)))
+    case OnePointZero   extends Point("one_point_zero", CloudExtinction.unsafeFromMilliVegaMagnitude(NonNegShort.unsafeFrom(1000)))
+    case OnePointFive   extends Point("one_point_five", CloudExtinction.unsafeFromMilliVegaMagnitude(NonNegShort.unsafeFrom(1500)))
+    case TwoPointZero   extends Point("two_point_zero", CloudExtinction.unsafeFromMilliVegaMagnitude(NonNegShort.unsafeFrom(2000)))
+    case ThreePointZero extends Point("three_point_zero", CloudExtinction.unsafeFromMilliVegaMagnitude(NonNegShort.unsafeFrom(3000)))
 
   object Point:
     given Display[Point] = Display[CloudExtinction].contramap(_.toCloudExtinction)

@@ -21,21 +21,21 @@ import lucuma.core.util.NewType
 import spire.math.Rational
 
 type ImageQualityPredicate = Interval.OpenClosed[0, 500]
-type ImageQualityValue  = Int Refined ImageQualityPredicate
-val ImageQualityValue = new RefinedTypeOps[ImageQualityValue, Int]
+type ImageQualityValue  = Short Refined ImageQualityPredicate
+val ImageQualityValue = new RefinedTypeOps[ImageQualityValue, Short]
 
 type ImageQuality = ImageQuality.Type
 object ImageQuality extends NewType[Quantity[ImageQualityValue, CentiArcSecond]]:
-  def fromCentiArcSecond(value: Int): Either[String, ImageQuality] =
+  def fromCentiArcSecond(value: Short): Either[String, ImageQuality] =
     ImageQualityValue.from(value).map(_.withUnit[CentiArcSecond]).map(ImageQuality(_))
 
-  def unsafeFromCentiArcSecond(value: Int): ImageQuality           =
+  def unsafeFromCentiArcSecond(value: Short): ImageQuality           =
     ImageQuality(ImageQualityValue.unsafeFrom(value).withUnit[CentiArcSecond])
 
   extension (iq: ImageQuality)
     def toCentiArcSeconds: Int = iq.value.value.value
 
-    def toArcSeconds: Quantity[Rational, ArcSecond] = iq.value.toValue[Int].toValue[Rational].toUnit[ArcSecond]
+    def toArcSeconds: Quantity[Rational, ArcSecond] = iq.value.toValue[Short].toValue[Rational].toUnit[ArcSecond]
 
     def toAngle: Angle = Angle.fromMicroarcseconds(toCentiArcSeconds * 10_000L)
 

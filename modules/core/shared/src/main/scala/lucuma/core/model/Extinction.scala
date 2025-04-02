@@ -4,43 +4,50 @@
 package lucuma.core.model
 
 import cats.kernel.Order
+import coulomb.*
+import coulomb.policy.spire.standard.given
+import coulomb.rational.Rational
+import coulomb.syntax.*
 import eu.timepit.refined.types.numeric.NonNegShort
 import io.circe.Decoder
 import io.circe.Encoder
+import lucuma.core.math.units.MilliVegaMagnitude
+import lucuma.core.math.units.VegaMagnitude
+import lucuma.core.math.units.given
 import lucuma.core.optics.Format
+import lucuma.core.util.NewType
 import monocle.Prism
 
 /** 
- * Extinction in mags, a non-negative number with two decimal points of precision, 
- * in [0.00, 327.67].
+ * Extinction in mags, a non-negative number with three decimal points of precision, 
+ * in [0.000, 32.767].
  */
-opaque type Extinction = NonNegShort
-
-object Extinction:
-
+type Extinction = Extinction.Type
+object Extinction extends NewType[Quantity[NonNegShort, MilliVegaMagnitude]]:
   def apply(millimags: NonNegShort): Extinction =
-    millimags
+    super.apply(millimags.withUnit[MilliVegaMagnitude])
 
-  val FromMillimags: Prism[Short, Extinction] =
-    Prism((s: Short) => NonNegShort.from(s).toOption)(_.value)
+  val FromMilliVegaMagnitude: Prism[Short, Extinction] =
+    Prism((s: Short) => NonNegShort.from(s).toOption.map(apply(_)))(_.value.value.value)
 
-  val FromMags: Format[BigDecimal, Extinction] =
+  val FromVegaMagnitude: Format[BigDecimal, Extinction] =
     Format(
-      d => FromMillimags.getOption(d.bigDecimal.movePointRight(2).shortValue),
-      e => BigDecimal(FromMillimags.reverseGet(e)).bigDecimal.movePointLeft(2) 
+      d => FromMilliVegaMagnitude.getOption(d.bigDecimal.movePointRight(3).shortValue),
+      e => BigDecimal(FromMilliVegaMagnitude.reverseGet(e)).bigDecimal.movePointLeft(3) 
     )
 
   given Order[Extinction] =
-    Order.by(_.value)
+    Order.by(_.value.value.value)
 
   given Encoder[Extinction] =
-    Encoder[BigDecimal].contramap(FromMags.reverseGet)
+    Encoder[BigDecimal].contramap(FromVegaMagnitude.reverseGet)
 
   given Decoder[Extinction] =
-    Decoder[BigDecimal].emap(d => FromMags.getOption(d).toRight(s"Invalid extinction: $d"))
+    Decoder[BigDecimal].emap(d => FromVegaMagnitude.getOption(d).toRight(s"Invalid extinction: $d"))
 
   extension (e: Extinction)
-    def underlying: NonNegShort = e
-    def transmission: Double = math.pow(10.0, e.value * 1000.0 / -2.5)
+    def toMilliVegaMagnitude: Quantity[NonNegShort, MilliVegaMagnitude] = e.value
+    def toVegaMagnitude: Quantity[Rational, VegaMagnitude] = e.toMilliVegaMagnitude.toValue[Short].toValue[Rational].toUnit[VegaMagnitude]
+    def transmission: Double = math.pow(10.0, toVegaMagnitude.value.toDouble / -2.5)
   
   
