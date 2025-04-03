@@ -14,13 +14,13 @@ import lucuma.catalog.BrightnessConstraints
 import lucuma.core.enums.Band
 import lucuma.core.enums.GuideProbe
 import lucuma.core.enums.GuideSpeed
-import lucuma.core.enums.ImageQuality
 import lucuma.core.geom.Area
 import lucuma.core.math.BrightnessValue
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Offset
 import lucuma.core.math.Wavelength
 import lucuma.core.model.ConstraintSet
+import lucuma.core.model.ImageQuality
 
 import java.time.Instant
 
@@ -83,20 +83,20 @@ object Ags {
     // Called when we know that a valid guide speed can be chosen for the given guide star.
     // Determine the quality and return an analysis indicating that the star is usable.
     def usable(guideSpeed: GuideSpeed): AgsAnalysis = {
-      def worseOrEqual(iq: ImageQuality) = constraints.imageQuality >= iq
+      def worseOrEqual(iq: ImageQuality.Preset) = constraints.imageQuality >= iq
 
       val quality = guideSpeed match {
         case GuideSpeed.Fast   =>
           DeliversRequestedIq
         case GuideSpeed.Medium =>
           // TODO Review this limit
-          if (worseOrEqual(ImageQuality.PointSix)) DeliversRequestedIq
+          if (worseOrEqual(ImageQuality.Preset.PointSix)) DeliversRequestedIq
           else PossibleIqDegradation
         case GuideSpeed.Slow   =>
           // TODO Review this limit
-          if (worseOrEqual(ImageQuality.PointEight)) DeliversRequestedIq
+          if (worseOrEqual(ImageQuality.Preset.PointEight)) DeliversRequestedIq
           // TODO Review this limit
-          else if (worseOrEqual(ImageQuality.PointSix)) PossibleIqDegradation
+          else if (worseOrEqual(ImageQuality.Preset.PointSix)) PossibleIqDegradation
           else IqDegradation
       }
 

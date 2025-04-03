@@ -17,7 +17,7 @@ import lucuma.core.enums.GmosSouthFpu
 import lucuma.core.enums.GmosSouthGrating
 import lucuma.core.enums.GmosXBinning
 import lucuma.core.enums.GmosYBinning
-import lucuma.core.enums.ImageQuality
+import lucuma.core.model.ImageQuality
 import lucuma.core.model.SourceProfile
 
 

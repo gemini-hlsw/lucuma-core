@@ -4,27 +4,29 @@
 package lucuma.core.model
 
 import cats.kernel.laws.discipline.OrderTests
+import coulomb.testkit.given
 import eu.timepit.refined.scalacheck.all.*
-import eu.timepit.refined.types.numeric.NonNegShort
 import io.circe.testing.ArbitraryInstances
 import io.circe.testing.CodecTests
+import lucuma.core.math.arb.ArbRefined.given
 import lucuma.core.optics.laws.discipline.FormatTests
+import lucuma.core.util.arb.ArbNewType.given
 import monocle.law.discipline.PrismTests
 import munit.DisciplineSuite
 import org.scalacheck.Arbitrary
 import org.scalacheck.Cogen
 
 class ExtinctionSuite extends DisciplineSuite with ArbitraryInstances {
-  
-  given Arbitrary[Extinction] =
-    Arbitrary(Arbitrary.arbitrary[NonNegShort].map(Extinction.apply))
-
-  given Cogen[Extinction] =
-    Cogen[NonNegShort].contramap(_.underlying)
-
   checkAll("Order", OrderTests[Extinction].order)
-  checkAll("FromMillimags", PrismTests(Extinction.FromMillimags))
-  checkAll("FromMags", FormatTests(Extinction.FromMags).format)
-  checkAll("Cocdec", CodecTests[Extinction].codec)
+  checkAll("FromMilliVegaMagnitude", PrismTests(Extinction.FromMilliVegaMagnitude))
+  checkAll("FromVegaMagnitude", FormatTests(Extinction.FromVegaMagnitude).format)
+  checkAll("Codec", CodecTests[Extinction].codec)
+
+  test("Refine to CloudExtinction") {
+    val e1 = Extinction.FromVegaMagnitude.getOption(2).get
+    val e2 = Extinction.FromVegaMagnitude.getOption(20).get
+    assert(CloudExtinction.from(e1).isRight)
+    assert(CloudExtinction.from(e2).isLeft)
+  }
 
 }

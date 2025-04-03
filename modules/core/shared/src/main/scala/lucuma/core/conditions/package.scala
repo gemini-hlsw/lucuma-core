@@ -9,7 +9,6 @@ import eu.timepit.refined.*
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.boolean.Not
 import eu.timepit.refined.numeric.Less
-import lucuma.core.enums.CloudExtinction
 import lucuma.core.enums.Site
 import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.WaterVapor
@@ -18,6 +17,7 @@ import lucuma.core.math.Wavelength
 import lucuma.core.math.erf
 import lucuma.core.model.AirMassPredicate
 import lucuma.core.model.AirMassValue
+import lucuma.core.model.CloudExtinction
 import lucuma.core.model.IntCentiPercent
 import lucuma.refined.*
 
@@ -53,17 +53,16 @@ def percentileSkyBackground(bg: SkyBackground): IntCentiPercent =
 
 /**
   * Return the percentile of a measured extinction.
-  * extinction in magnitudes
   */
-def percentileCloudCoverage(extinction: CloudExtinction): IntCentiPercent =
+def percentileCloudCoverage(extinction: CloudExtinction.Preset): IntCentiPercent =
   extinction match
-    case CloudExtinction.PointOne       => IntCentiPercent(5000.refined)
-    case CloudExtinction.PointThree     => IntCentiPercent(7000.refined)
-    case CloudExtinction.PointFive      => IntCentiPercent(7500.refined)
-    case CloudExtinction.OnePointZero   => IntCentiPercent(8000.refined)
-    case CloudExtinction.OnePointFive   => IntCentiPercent(9000.refined)
-    case CloudExtinction.TwoPointZero   => IntCentiPercent(9500.refined)
-    case CloudExtinction.ThreePointZero => IntCentiPercent(10000.refined)
+    case CloudExtinction.Preset.PointOne       => IntCentiPercent(5000.refined)
+    case CloudExtinction.Preset.PointThree     => IntCentiPercent(7000.refined)
+    case CloudExtinction.Preset.PointFive      => IntCentiPercent(7500.refined)
+    case CloudExtinction.Preset.OnePointZero   => IntCentiPercent(8000.refined)
+    case CloudExtinction.Preset.OnePointFive   => IntCentiPercent(9000.refined)
+    case CloudExtinction.Preset.TwoPointZero   => IntCentiPercent(9500.refined)
+    case CloudExtinction.Preset.ThreePointZero => IntCentiPercent(10000.refined)
 
 /**
   * Return the percentile of the water vapor.
@@ -92,7 +91,7 @@ def percentileImageQuality(fwhm: Quantity[BigDecimal, ArcSecond], wavelength: Wa
     else IntCentiPercent.Max
   }
 
-def conditionsLikelihood(bg: SkyBackground, extinction: CloudExtinction, wv: WaterVapor, fwhm: Quantity[BigDecimal, ArcSecond], wavelength: Wavelength, dec: Declination, site: Site): IntCentiPercent =
+def conditionsLikelihood(bg: SkyBackground, extinction: CloudExtinction.Preset, wv: WaterVapor, fwhm: Quantity[BigDecimal, ArcSecond], wavelength: Wavelength, dec: Declination, site: Site): IntCentiPercent =
     (percentileSkyBackground(bg) *
       percentileCloudCoverage(extinction)  *
       percentileImageQuality(fwhm, wavelength, minimumAirmass(dec, site)) *

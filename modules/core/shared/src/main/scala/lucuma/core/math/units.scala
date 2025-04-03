@@ -58,6 +58,7 @@ trait units {
   given DerivedUnit[Year, 365 * Day, "year", "y"] = DerivedUnit()
 
   type DeciArcSecond  = Deci * ArcSecond
+  type CentiArcSecond = Centi * ArcSecond
   type MilliArcSecond = Milli * ArcSecond
   type MicroArcSecond = Micro * ArcSecond
 
@@ -70,6 +71,9 @@ trait units {
   type VegaMagnitude
   given BaseUnit[VegaMagnitude, "Vega magnitude", "Vega mag"] = BaseUnit()
   given TypeString[VegaMagnitude] = TypeString("VEGA_MAGNITUDE")
+
+  type CentiVegaMagnitude = Centi * VegaMagnitude
+  type MilliVegaMagnitude = Milli * VegaMagnitude
 
   type ABMagnitude
   given BaseUnit[ABMagnitude, "AB magnitude", "AB mag"] = BaseUnit()

@@ -11,11 +11,9 @@ import cats.syntax.all.*
 import fs2.*
 import lucuma.ags.*
 import lucuma.catalog.votable.*
-import lucuma.core.enums.CloudExtinction
 import lucuma.core.enums.F2Fpu
 import lucuma.core.enums.F2LyotWheel
 import lucuma.core.enums.GmosNorthFpu
-import lucuma.core.enums.ImageQuality
 import lucuma.core.enums.PortDisposition
 import lucuma.core.enums.Site
 import lucuma.core.enums.SkyBackground
@@ -31,10 +29,12 @@ import lucuma.core.math.ProperMotion
 import lucuma.core.math.RadialVelocity
 import lucuma.core.math.RightAscension
 import lucuma.core.math.Wavelength
+import lucuma.core.model.CloudExtinction
 import lucuma.core.model.ConstraintSet
 import lucuma.core.model.ElevationRange
 import lucuma.core.model.ElevationRange.AirMass
 import lucuma.core.model.ElevationRange.AirMass.DecimalValue
+import lucuma.core.model.ImageQuality
 import lucuma.core.model.ObjectTracking
 import lucuma.core.model.PosAngleConstraint
 import lucuma.core.model.SiderealTracking
@@ -87,12 +87,13 @@ trait AgsSelectionSample {
   )
 
   val constraints = ConstraintSet(
-    ImageQuality.PointSix,
-    CloudExtinction.PointOne,
+    ImageQuality.Preset.PointSix,
+    CloudExtinction.Preset.PointOne,
     SkyBackground.Bright,
     WaterVapor.Wet,
-    AirMass.fromDecimalValues.get(DecimalValue.unsafeFrom(BigDecimal(1.0)),
-                                  DecimalValue.unsafeFrom(BigDecimal(1.75))
+    AirMass.fromDecimalValues.get(
+      DecimalValue.unsafeFrom(BigDecimal(1.0)),
+      DecimalValue.unsafeFrom(BigDecimal(1.75))
     )
   )
 

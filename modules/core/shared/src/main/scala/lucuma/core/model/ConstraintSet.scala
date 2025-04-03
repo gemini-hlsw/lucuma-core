@@ -7,8 +7,6 @@
 package lucuma.core.model
 
 import cats.*
-import lucuma.core.enums.CloudExtinction
-import lucuma.core.enums.ImageQuality
 import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.WaterVapor
 import monocle.Focus
@@ -17,8 +15,8 @@ import monocle.Optional
 
 /** Constraints for an observation. */
 case class ConstraintSet(
-  imageQuality:    ImageQuality,
-  cloudExtinction: CloudExtinction,
+  imageQuality:    ImageQuality.Preset,
+  cloudExtinction: CloudExtinction.Preset,
   skyBackground:   SkyBackground,
   waterVapor:      WaterVapor,
   elevationRange:  ElevationRange
@@ -32,11 +30,11 @@ object ConstraintSet {
   )
 
   /** @group Optics */
-  val imageQuality: Lens[ConstraintSet, ImageQuality] =
+  val imageQuality: Lens[ConstraintSet, ImageQuality.Preset] =
     Focus[ConstraintSet](_.imageQuality)
 
   /** @group Optics */
-  val cloudExtinction: Lens[ConstraintSet, CloudExtinction] =
+  val cloudExtinction: Lens[ConstraintSet, CloudExtinction.Preset] =
     Focus[ConstraintSet](_.cloudExtinction)
 
   /** @group Optics */
