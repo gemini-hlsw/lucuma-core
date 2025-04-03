@@ -90,4 +90,10 @@ trait NewBoolean extends NewType[Boolean]:
   inline def True:  Type = apply(true)
   inline def False: Type = apply(false)
 
+  extension (t: Type)
+    def fold[A](whenTrue: => A, whenFalse: => A): A = 
+      if t then whenTrue else whenFalse
+
+    def flip: Type = fold(False, True)
+
   given Conversion[Type, Boolean] = _.asInstanceOf[Boolean] // Runs into loop if not type-coerced
