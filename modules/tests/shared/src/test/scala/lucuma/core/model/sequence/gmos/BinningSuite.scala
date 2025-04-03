@@ -42,7 +42,7 @@ final class BinningSuite extends FunSuite {
     testLongslit(
       GmosNorthFpu.LongSlit_0_50,
       SourceProfile.Gaussian(Angle.microarcseconds.reverseGet(600_000L), bandNormalized),
-      ImageQuality.Point.PointOne.toImageQuality,
+      ImageQuality.Preset.PointOne.toImageQuality,
       GmosNorthGrating.R831_G5302,
       GmosXBinning.One,
       GmosYBinning.Two
@@ -53,7 +53,7 @@ final class BinningSuite extends FunSuite {
     testLongslit(
       GmosNorthFpu.LongSlit_0_75,
       SourceProfile.Gaussian(Angle.microarcseconds.reverseGet(1_000_000L), bandNormalized),
-      ImageQuality.Point.PointOne.toImageQuality,
+      ImageQuality.Preset.PointOne.toImageQuality,
       GmosNorthGrating.R831_G5302,
       GmosXBinning.Two,
       GmosYBinning.Four
@@ -64,7 +64,7 @@ final class BinningSuite extends FunSuite {
     testLongslit(
       GmosNorthFpu.LongSlit_1_00,
       SourceProfile.Gaussian(Angle.microarcseconds.reverseGet(1_500_000L), bandNormalized),
-      ImageQuality.Point.PointOne.toImageQuality,
+      ImageQuality.Preset.PointOne.toImageQuality,
       GmosNorthGrating.R831_G5302,
       GmosXBinning.Two,
       GmosYBinning.Four
@@ -75,7 +75,7 @@ final class BinningSuite extends FunSuite {
     testLongslit(
       GmosNorthFpu.LongSlit_0_50,
       SourceProfile.Uniform(bandNormalized),
-      ImageQuality.Point.PointOne.toImageQuality,
+      ImageQuality.Preset.PointOne.toImageQuality,
       GmosNorthGrating.R831_G5302,
       GmosXBinning.One,
       GmosYBinning.Four
@@ -88,7 +88,7 @@ final class BinningSuite extends FunSuite {
     testLongslit(
       GmosNorthFpu.LongSlit_1_00,
       SourceProfile.Point(bandNormalized),
-      ImageQuality.Point.OnePointZero.toImageQuality,
+      ImageQuality.Preset.OnePointZero.toImageQuality,
       GmosNorthGrating.R831_G5302,
       GmosXBinning.Two,
       GmosYBinning.Four
@@ -99,7 +99,7 @@ final class BinningSuite extends FunSuite {
     testLongslit(
       GmosNorthFpu.LongSlit_0_50,
       SourceProfile.Gaussian(Angle.Angle0, bandNormalized),
-      ImageQuality.Point.PointOne.toImageQuality,
+      ImageQuality.Preset.PointOne.toImageQuality,
       GmosNorthGrating.R831_G5302,
       GmosXBinning.One,
       GmosYBinning.One

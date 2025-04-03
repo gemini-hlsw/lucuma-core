@@ -54,15 +54,15 @@ def percentileSkyBackground(bg: SkyBackground): IntCentiPercent =
 /**
   * Return the percentile of a measured extinction.
   */
-def percentileCloudCoverage(extinction: CloudExtinction.Point): IntCentiPercent =
+def percentileCloudCoverage(extinction: CloudExtinction.Preset): IntCentiPercent =
   extinction match
-    case CloudExtinction.Point.PointOne       => IntCentiPercent(5000.refined)
-    case CloudExtinction.Point.PointThree     => IntCentiPercent(7000.refined)
-    case CloudExtinction.Point.PointFive      => IntCentiPercent(7500.refined)
-    case CloudExtinction.Point.OnePointZero   => IntCentiPercent(8000.refined)
-    case CloudExtinction.Point.OnePointFive   => IntCentiPercent(9000.refined)
-    case CloudExtinction.Point.TwoPointZero   => IntCentiPercent(9500.refined)
-    case CloudExtinction.Point.ThreePointZero => IntCentiPercent(10000.refined)
+    case CloudExtinction.Preset.PointOne       => IntCentiPercent(5000.refined)
+    case CloudExtinction.Preset.PointThree     => IntCentiPercent(7000.refined)
+    case CloudExtinction.Preset.PointFive      => IntCentiPercent(7500.refined)
+    case CloudExtinction.Preset.OnePointZero   => IntCentiPercent(8000.refined)
+    case CloudExtinction.Preset.OnePointFive   => IntCentiPercent(9000.refined)
+    case CloudExtinction.Preset.TwoPointZero   => IntCentiPercent(9500.refined)
+    case CloudExtinction.Preset.ThreePointZero => IntCentiPercent(10000.refined)
 
 /**
   * Return the percentile of the water vapor.
@@ -91,7 +91,7 @@ def percentileImageQuality(fwhm: Quantity[BigDecimal, ArcSecond], wavelength: Wa
     else IntCentiPercent.Max
   }
 
-def conditionsLikelihood(bg: SkyBackground, extinction: CloudExtinction.Point, wv: WaterVapor, fwhm: Quantity[BigDecimal, ArcSecond], wavelength: Wavelength, dec: Declination, site: Site): IntCentiPercent =
+def conditionsLikelihood(bg: SkyBackground, extinction: CloudExtinction.Preset, wv: WaterVapor, fwhm: Quantity[BigDecimal, ArcSecond], wavelength: Wavelength, dec: Declination, site: Site): IntCentiPercent =
     (percentileSkyBackground(bg) *
       percentileCloudCoverage(extinction)  *
       percentileImageQuality(fwhm, wavelength, minimumAirmass(dec, site)) *

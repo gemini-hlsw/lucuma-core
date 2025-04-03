@@ -83,20 +83,20 @@ object Ags {
     // Called when we know that a valid guide speed can be chosen for the given guide star.
     // Determine the quality and return an analysis indicating that the star is usable.
     def usable(guideSpeed: GuideSpeed): AgsAnalysis = {
-      def worseOrEqual(iq: ImageQuality.Point) = constraints.imageQuality >= iq
+      def worseOrEqual(iq: ImageQuality.Preset) = constraints.imageQuality >= iq
 
       val quality = guideSpeed match {
         case GuideSpeed.Fast   =>
           DeliversRequestedIq
         case GuideSpeed.Medium =>
           // TODO Review this limit
-          if (worseOrEqual(ImageQuality.Point.PointSix)) DeliversRequestedIq
+          if (worseOrEqual(ImageQuality.Preset.PointSix)) DeliversRequestedIq
           else PossibleIqDegradation
         case GuideSpeed.Slow   =>
           // TODO Review this limit
-          if (worseOrEqual(ImageQuality.Point.PointEight)) DeliversRequestedIq
+          if (worseOrEqual(ImageQuality.Preset.PointEight)) DeliversRequestedIq
           // TODO Review this limit
-          else if (worseOrEqual(ImageQuality.Point.PointSix)) PossibleIqDegradation
+          else if (worseOrEqual(ImageQuality.Preset.PointSix)) PossibleIqDegradation
           else IqDegradation
       }
 

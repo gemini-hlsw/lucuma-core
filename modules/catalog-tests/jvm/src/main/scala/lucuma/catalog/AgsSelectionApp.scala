@@ -87,8 +87,8 @@ trait AgsSelectionSample {
   )
 
   val constraints = ConstraintSet(
-    ImageQuality.Point.PointSix,
-    CloudExtinction.Point.PointOne,
+    ImageQuality.Preset.PointSix,
+    CloudExtinction.Preset.PointOne,
     SkyBackground.Bright,
     WaterVapor.Wet,
     AirMass.fromDecimalValues.get(

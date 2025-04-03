@@ -26,8 +26,8 @@ case class Configuration(conditions: Configuration.Conditions, refererenceCoordi
 object Configuration:
 
   case class Conditions(
-    cloudExtinction: CloudExtinction.Point,
-    imageQuality: ImageQuality.Point,
+    cloudExtinction: CloudExtinction.Preset,
+    imageQuality: ImageQuality.Preset,
     skyBackground: SkyBackground,
     waterVapor: WaterVapor,
   )

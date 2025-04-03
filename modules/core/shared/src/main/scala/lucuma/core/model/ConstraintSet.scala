@@ -15,8 +15,8 @@ import monocle.Optional
 
 /** Constraints for an observation. */
 case class ConstraintSet(
-  imageQuality:    ImageQuality.Point,
-  cloudExtinction: CloudExtinction.Point,
+  imageQuality:    ImageQuality.Preset,
+  cloudExtinction: CloudExtinction.Preset,
   skyBackground:   SkyBackground,
   waterVapor:      WaterVapor,
   elevationRange:  ElevationRange
@@ -30,11 +30,11 @@ object ConstraintSet {
   )
 
   /** @group Optics */
-  val imageQuality: Lens[ConstraintSet, ImageQuality.Point] =
+  val imageQuality: Lens[ConstraintSet, ImageQuality.Preset] =
     Focus[ConstraintSet](_.imageQuality)
 
   /** @group Optics */
-  val cloudExtinction: Lens[ConstraintSet, CloudExtinction.Point] =
+  val cloudExtinction: Lens[ConstraintSet, CloudExtinction.Preset] =
     Focus[ConstraintSet](_.cloudExtinction)
 
   /** @group Optics */

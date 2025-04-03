@@ -44,8 +44,8 @@ def wfsFwhm(sciFwhm: ImageQuality, wavelength: Wavelength): Double = {
 val widestConstraints: BrightnessConstraints = {
   val widest = Wavelength.fromIntNanometers(300).get
 
-  val constraints = Enumerated[ImageQuality.Point].all.flatMap { iq =>
-    Enumerated[CloudExtinction.Point].all.map { ce =>
+  val constraints = Enumerated[ImageQuality.Preset].all.flatMap { iq =>
+    Enumerated[CloudExtinction.Preset].all.map { ce =>
       faintLimit(
         GuideSpeed.Slow,
         widest,

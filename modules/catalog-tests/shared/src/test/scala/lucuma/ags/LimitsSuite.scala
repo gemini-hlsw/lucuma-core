@@ -30,11 +30,11 @@ class LimitsSuite extends munit.FunSuite {
     // Sample query from explore
 
     val constraints = ConstraintSet(
-      ImageQuality.Point.PointOne,    // min image quality
-      CloudExtinction.Point.PointOne, // min cloud extinction
-      SkyBackground.Dark,             // Not relevant
-      WaterVapor.Wet,                 // Not relevant
-      ElevationRange.AirMass.Default  // Not relevant
+      ImageQuality.Preset.PointOne,    // min image quality
+      CloudExtinction.Preset.PointOne, // min cloud extinction
+      SkyBackground.Dark,              // Not relevant
+      WaterVapor.Wet,                  // Not relevant
+      ElevationRange.AirMass.Default   // Not relevant
     )
 
     val wavelength = Wavelength.fromIntNanometers(300).get

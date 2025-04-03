@@ -104,8 +104,8 @@ class AgsSuite extends munit.FunSuite {
 
   test("discard science target") {
     val constraints = ConstraintSet(
-      ImageQuality.Point.PointTwo,
-      CloudExtinction.Point.PointFive,
+      ImageQuality.Preset.PointTwo,
+      CloudExtinction.Preset.PointFive,
       SkyBackground.Dark,
       WaterVapor.Wet,
       ElevationRange.AirMass.Default

@@ -45,14 +45,14 @@ object CloudExtinction extends NewType[CloudExtinctionType]:
 
   given Display[CloudExtinction] = Display.byShortName(_.label)
 
-  enum Point(val tag: String, val toCloudExtinction: CloudExtinction) derives Enumerated:
-    case PointOne       extends Point("point_one", CloudExtinction.unsafeFromMilliVegaMagnitude(NonNegShort.unsafeFrom(100)))
-    case PointThree     extends Point("point_three", CloudExtinction.unsafeFromMilliVegaMagnitude(NonNegShort.unsafeFrom(300)))
-    case PointFive      extends Point("point_five", CloudExtinction.unsafeFromMilliVegaMagnitude(NonNegShort.unsafeFrom(500)))
-    case OnePointZero   extends Point("one_point_zero", CloudExtinction.unsafeFromMilliVegaMagnitude(NonNegShort.unsafeFrom(1000)))
-    case OnePointFive   extends Point("one_point_five", CloudExtinction.unsafeFromMilliVegaMagnitude(NonNegShort.unsafeFrom(1500)))
-    case TwoPointZero   extends Point("two_point_zero", CloudExtinction.unsafeFromMilliVegaMagnitude(NonNegShort.unsafeFrom(2000)))
-    case ThreePointZero extends Point("three_point_zero", CloudExtinction.unsafeFromMilliVegaMagnitude(NonNegShort.unsafeFrom(3000)))
+  enum Preset(val tag: String, val toCloudExtinction: CloudExtinction) derives Enumerated:
+    case PointOne       extends Preset("point_one", CloudExtinction.unsafeFromMilliVegaMagnitude(NonNegShort.unsafeFrom(100)))
+    case PointThree     extends Preset("point_three", CloudExtinction.unsafeFromMilliVegaMagnitude(NonNegShort.unsafeFrom(300)))
+    case PointFive      extends Preset("point_five", CloudExtinction.unsafeFromMilliVegaMagnitude(NonNegShort.unsafeFrom(500)))
+    case OnePointZero   extends Preset("one_point_zero", CloudExtinction.unsafeFromMilliVegaMagnitude(NonNegShort.unsafeFrom(1000)))
+    case OnePointFive   extends Preset("one_point_five", CloudExtinction.unsafeFromMilliVegaMagnitude(NonNegShort.unsafeFrom(1500)))
+    case TwoPointZero   extends Preset("two_point_zero", CloudExtinction.unsafeFromMilliVegaMagnitude(NonNegShort.unsafeFrom(2000)))
+    case ThreePointZero extends Preset("three_point_zero", CloudExtinction.unsafeFromMilliVegaMagnitude(NonNegShort.unsafeFrom(3000)))
 
-  object Point:
-    given Display[Point] = Display[CloudExtinction].contramap(_.toCloudExtinction)
+  object Preset:
+    given Display[Preset] = Display[CloudExtinction].contramap(_.toCloudExtinction)

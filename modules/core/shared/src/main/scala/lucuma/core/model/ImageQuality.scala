@@ -43,16 +43,16 @@ object ImageQuality extends NewType[Quantity[ImageQualityValue, CentiArcSecond]]
 
   given Display[ImageQuality] = Display.byShortName(_.label)
 
-  enum Point(val tag: String, val toImageQuality: ImageQuality) derives Enumerated:
-    case PointOne     extends Point("point_one", ImageQuality.unsafeFromCentiArcSecond(10))
-    case PointTwo     extends Point("point_two", ImageQuality.unsafeFromCentiArcSecond(20))
-    case PointThree   extends Point("point_three", ImageQuality.unsafeFromCentiArcSecond(30))
-    case PointFour    extends Point("point_four", ImageQuality.unsafeFromCentiArcSecond(40))
-    case PointSix     extends Point("point_six", ImageQuality.unsafeFromCentiArcSecond(60))
-    case PointEight   extends Point("point_eight", ImageQuality.unsafeFromCentiArcSecond(80))
-    case OnePointZero extends Point("one_point_zero", ImageQuality.unsafeFromCentiArcSecond(100))
-    case OnePointFive extends Point("one_point_five", ImageQuality.unsafeFromCentiArcSecond(150))
-    case TwoPointZero extends Point("two_point_zero", ImageQuality.unsafeFromCentiArcSecond(200))
+  enum Preset(val tag: String, val toImageQuality: ImageQuality) derives Enumerated:
+    case PointOne     extends Preset("point_one", ImageQuality.unsafeFromCentiArcSecond(10))
+    case PointTwo     extends Preset("point_two", ImageQuality.unsafeFromCentiArcSecond(20))
+    case PointThree   extends Preset("point_three", ImageQuality.unsafeFromCentiArcSecond(30))
+    case PointFour    extends Preset("point_four", ImageQuality.unsafeFromCentiArcSecond(40))
+    case PointSix     extends Preset("point_six", ImageQuality.unsafeFromCentiArcSecond(60))
+    case PointEight   extends Preset("point_eight", ImageQuality.unsafeFromCentiArcSecond(80))
+    case OnePointZero extends Preset("one_point_zero", ImageQuality.unsafeFromCentiArcSecond(100))
+    case OnePointFive extends Preset("one_point_five", ImageQuality.unsafeFromCentiArcSecond(150))
+    case TwoPointZero extends Preset("two_point_zero", ImageQuality.unsafeFromCentiArcSecond(200))
 
-  object Point:
-    given Display[Point] = Display[ImageQuality].contramap(_.toImageQuality)
+  object Preset:
+    given Display[Preset] = Display[ImageQuality].contramap(_.toImageQuality)

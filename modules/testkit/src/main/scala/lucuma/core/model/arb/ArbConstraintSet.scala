@@ -18,8 +18,8 @@ trait ArbConstraintSet {
   given Arbitrary[ConstraintSet] =
     Arbitrary {
       for {
-        iq <- arbitrary[ImageQuality.Point]
-        ce <- arbitrary[CloudExtinction.Point]
+        iq <- arbitrary[ImageQuality.Preset]
+        ce <- arbitrary[CloudExtinction.Preset]
         sb <- arbitrary[SkyBackground]
         wv <- arbitrary[WaterVapor]
         er <- arbitrary[ElevationRange]
@@ -27,7 +27,7 @@ trait ArbConstraintSet {
     }
 
   given Cogen[ConstraintSet] =
-    Cogen[(ImageQuality.Point, CloudExtinction.Point, SkyBackground, WaterVapor, ElevationRange)]
+    Cogen[(ImageQuality.Preset, CloudExtinction.Preset, SkyBackground, WaterVapor, ElevationRange)]
       .contramap(c => (c.imageQuality, c.cloudExtinction, c.skyBackground, c.waterVapor, c.elevationRange))
 }
 

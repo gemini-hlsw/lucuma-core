@@ -23,15 +23,15 @@ trait ArbConfiguration:
   given Arbitrary[Conditions] =
     Arbitrary:
       for
-        ce <- arbitrary[CloudExtinction.Point]
-        iq <- arbitrary[ImageQuality.Point]
+        ce <- arbitrary[CloudExtinction.Preset]
+        iq <- arbitrary[ImageQuality.Preset]
         sb <- arbitrary[SkyBackground]
         wv <- arbitrary[WaterVapor]
       yield Conditions(ce, iq, sb, wv)
     
 
   given Cogen[Conditions] =
-    Cogen[(CloudExtinction.Point, ImageQuality.Point, SkyBackground, WaterVapor)]
+    Cogen[(CloudExtinction.Preset, ImageQuality.Preset, SkyBackground, WaterVapor)]
       .contramap(c => (c.cloudExtinction,c.imageQuality,  c.skyBackground, c.waterVapor))
 
   given Arbitrary[ObservingMode.GmosNorthLongSlit] =
