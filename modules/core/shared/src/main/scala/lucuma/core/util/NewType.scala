@@ -6,9 +6,11 @@ package lucuma.core.util
 import cats.Eq
 import cats.Monoid
 import cats.Order
+import coulomb.Quantity
 import eu.timepit.refined.api.*
 import io.circe.Decoder
 import io.circe.Encoder
+import lucuma.core.optics.quantityIso
 import lucuma.core.optics.refinedPrism
 import monocle.Iso
 import monocle.Prism
@@ -59,15 +61,31 @@ trait NewType[Wrapped]{
 /**
  * Usage:
  * ```
- * object Score extends RefinedNewType[Int, Not[Less[0]] And Not[Greater[5]]]
- * type Score = Score.Type
+ * object Probability extends NewRefined[BigDecimal, Interval.Closed[0, 1]]
+ * type Probability = Probability.Type
  * ```
  */
-trait RefinedNewType[T, P](using RefinedType.AuxT[T Refined P, T]) extends NewType[T Refined P]:
-  private val TypeOps                                  = new RefinedTypeOps[T Refined P, T]
-  def from(using Validate[T, P]): Prism[T, Type]       = refinedPrism.andThen(value.reverse)
-  def from(t:       T): Either[String, Type]           = TypeOps.from(t).map(apply(_))
-  def unsafeFrom(x: T): Type                           = apply(TypeOps.unsafeFrom(x))
+trait NewRefined[T, P](using RefinedType.AuxT[T Refined P, T]) extends NewType[T Refined P]:
+  private val TypeOps                                 = new RefinedTypeOps[T Refined P, T]
+  def fromPrism(using Validate[T, P]): Prism[T, Type] = refinedPrism.andThen(value.reverse)
+  def from(t:       T): Either[String, Type]          = TypeOps.from(t).map(apply(_))
+  def unsafeFrom(x: T): Type                          = apply(TypeOps.unsafeFrom(x))
+
+/**
+  * Usage:
+  * ```
+  * object Score extends NewRefinedQuantity[Int, Interval.Closed[0, 5], Stars]
+  * type Score = Score.Type
+  * ```
+  */
+trait NewRefinedQuantity[T, P, U](using RefinedType.AuxT[T Refined P, T]) extends NewType[Quantity[T Refined P, U]]:
+  private val TypeOps                                       = new RefinedTypeOps[T Refined P, T]
+  def fromPrism(using Validate[T, P]): Prism[T, Type]       = refinedPrism.andThen(quantityIso.reverse).andThen(value.reverse)
+  def from(t:       T): Either[String, Type]                = TypeOps.from(t).map(quantityIso.reverseGet(_)).map(apply(_))
+  def unsafeFrom(x: T): Type                                = apply(quantityIso.reverseGet(TypeOps.unsafeFrom(x)))
+  def fromQuantity(q: Quantity[T, U]): Either[String, Type] = from(q.value)
+  def unsafeFromQuantity(q: Quantity[T, U]): Type           = unsafeFrom(q.value)
+  def fromRefined(r: Refined[T, P]): Type                   = apply(quantityIso.reverseGet(r))
 
 /**
  * Usage:

@@ -5,7 +5,7 @@ package lucuma.ags
 
 import eu.timepit.refined.string.MatchesRegex
 import eu.timepit.refined.types.string.NonEmptyString
-import lucuma.core.util.RefinedNewType
+import lucuma.core.util.NewRefined
 import monocle.Prism
 
 import scala.util.matching.Regex
@@ -15,7 +15,7 @@ import scala.util.matching.Regex
 private val regexStr = """^Gaia DR3 (-?\d+)$"""
 type GuideStarNamePred = MatchesRegex[regexStr.type]
 
-object GuideStarName extends RefinedNewType[String, GuideStarNamePred]:
+object GuideStarName extends NewRefined[String, GuideStarNamePred]:
   def gaiaSourceId: Prism[GuideStarName, Long] =
     Prism[GuideStarName, Long](_.toGaiaSourceId)(id => GuideStarName.unsafeFrom(s"Gaia DR3 $id"))
 

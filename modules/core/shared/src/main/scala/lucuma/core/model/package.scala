@@ -6,6 +6,11 @@ package lucuma.core.model
 import cats.Eq
 import cats.Monoid
 import cats.syntax.all.*
+import coulomb.*
+import coulomb.policy.spire.standard.given
+import coulomb.syntax.*
+import coulomb.units.accepted.*
+import coulomb.units.si.prefixes.*
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.api.RefinedTypeOps
 import eu.timepit.refined.api.Validate
@@ -15,36 +20,36 @@ import eu.timepit.refined.numeric.GreaterEqual
 import eu.timepit.refined.numeric.Interval
 import eu.timepit.refined.numeric.Less
 import eu.timepit.refined.numeric.NonNegative
+import lucuma.core.math.units.given
 import lucuma.core.optics.Format
-import lucuma.core.util.RefinedNewType
+import lucuma.core.util.NewRefinedQuantity
 import org.typelevel.cats.time.instances.duration.*
 
 import java.time.Duration
 import java.time.temporal.Temporal
 
-// Integer Percents
-type ZeroTo100  = Interval.Closed[0, 100]
-type IntPercent = Int Refined ZeroTo100
-
-object IntPercent extends RefinedTypeOps[IntPercent, Int]
-
 // Store a percentage with two decimals of precision for a 0-100% range
-type CentiPercent    = Interval.Closed[0, 10000]
-object IntCentiPercent extends RefinedNewType[Int, CentiPercent]:
-  val Max = IntCentiPercent.unsafeFrom(10000)
-  val Min = IntCentiPercent.unsafeFrom(0)
+type CentiPercentRange = Interval.Closed[0, 10000]
+type CentiPercent      = Centi * Percent
+object Percentile extends NewRefinedQuantity[Int, CentiPercentRange, CentiPercent]:
+  def fromPercent(p: Double): Either[String, Percentile] =
+    from((p * 100).round.toInt)
 
-  val fromBigDecimal: Format[BigDecimal, IntCentiPercent] =
-    Format.apply(d => IntCentiPercent.from((d * 100).toInt).toOption, _.value.value / 100.0)
+  def unsafeFromPercent(p: Double): Percentile =
+    unsafeFrom((p * 100).round.toInt)
 
-  extension(a: IntCentiPercent)
-    def toPercent: Double = a.value.value / 100.0
-    def *(b: IntCentiPercent): IntCentiPercent =
-      // Given a and b are in the range 0-1 the result is also in the range 0-1
-      IntCentiPercent.unsafeFrom((a.value.value * b.value.value) / 10000)
-    def round: IntCentiPercent = IntCentiPercent.unsafeFrom(100 * scala.math.round(a.value.value / 100.0f))
+  val Max: Percentile = unsafeFromPercent(100)
+  val Min: Percentile = unsafeFromPercent(0)
 
-type IntCentiPercent = IntCentiPercent.Type
+  val FromBigDecimal: Format[BigDecimal, Percentile] =
+    Format.apply(d => fromPercent(d.toDouble).toOption, _.value.toValue[Int].toValue[BigDecimal].toUnit[Percent].value)
+
+  extension(a: Percentile)
+    def toPercent: Double = FromBigDecimal.reverseGet(a).toDouble
+    def *(b: Percentile): Percentile = // Given a and b are in the range 0-1 the result is also in the range 0-1
+      FromBigDecimal.getOption(FromBigDecimal.reverseGet(a) * FromBigDecimal.reverseGet(b)).get
+    def rounded: Percentile = FromBigDecimal.getOption(FromBigDecimal.reverseGet(a).rounded).get
+type Percentile = Percentile.Type
 
 type AirMassPredicate = Not[Less[1]]
 type AirMassValue     = BigDecimal Refined AirMassPredicate

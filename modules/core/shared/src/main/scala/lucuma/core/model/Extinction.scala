@@ -9,13 +9,14 @@ import coulomb.policy.spire.standard.given
 import coulomb.rational.Rational
 import coulomb.syntax.*
 import eu.timepit.refined.types.numeric.NonNegShort
+import eu.timepit.refined.predicates.numeric.NonNegative
 import io.circe.Decoder
 import io.circe.Encoder
 import lucuma.core.math.units.MilliVegaMagnitude
 import lucuma.core.math.units.VegaMagnitude
 import lucuma.core.math.units.given
 import lucuma.core.optics.Format
-import lucuma.core.util.NewType
+import lucuma.core.util.NewRefinedQuantity
 import monocle.Prism
 
 /** 
@@ -23,12 +24,9 @@ import monocle.Prism
  * in [0.000, 32.767].
  */
 type Extinction = Extinction.Type
-object Extinction extends NewType[Quantity[NonNegShort, MilliVegaMagnitude]]:
-  def apply(millimags: NonNegShort): Extinction =
-    super.apply(millimags.withUnit[MilliVegaMagnitude])
-
+object Extinction extends NewRefinedQuantity[Short, NonNegative, MilliVegaMagnitude]:
   val FromMilliVegaMagnitude: Prism[Short, Extinction] =
-    Prism((s: Short) => NonNegShort.from(s).toOption.map(apply(_)))(_.value.value.value)
+    Prism((s: Short) => from(s).toOption)(_.value.value.value)
 
   val FromVegaMagnitude: Format[BigDecimal, Extinction] =
     Format(

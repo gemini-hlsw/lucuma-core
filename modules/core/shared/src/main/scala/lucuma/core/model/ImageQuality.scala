@@ -17,23 +17,20 @@ import lucuma.core.math.units.*
 import lucuma.core.math.units.given
 import lucuma.core.util.Display
 import lucuma.core.util.Enumerated
-import lucuma.core.util.NewType
+import lucuma.core.util.NewRefinedQuantity
 import spire.math.Rational
 
 type ImageQualityPredicate = Interval.OpenClosed[0, 500]
-type ImageQualityValue  = Short Refined ImageQualityPredicate
-val ImageQualityValue = new RefinedTypeOps[ImageQualityValue, Short]
+// type ImageQualityValue  = Short Refined ImageQualityPredicate
+// val ImageQualityValue = new RefinedTypeOps[ImageQualityValue, Short]
 
 type ImageQuality = ImageQuality.Type
-object ImageQuality extends NewType[Quantity[ImageQualityValue, CentiArcSecond]]:
-  def fromCentiArcSecond(value: Short): Either[String, ImageQuality] =
-    ImageQualityValue.from(value).map(_.withUnit[CentiArcSecond]).map(ImageQuality(_))
-
-  def unsafeFromCentiArcSecond(value: Short): ImageQuality           =
-    ImageQuality(ImageQualityValue.unsafeFrom(value).withUnit[CentiArcSecond])
+object ImageQuality extends NewRefinedQuantity[Short, ImageQualityPredicate, CentiArcSecond]:
+  inline def fromCentiArcSecond(value: Short): Either[String, ImageQuality] = from(value)
+  inline def unsafeFromCentiArcSecond(value: Short): ImageQuality           = unsafeFrom(value)
 
   extension (iq: ImageQuality)
-    def toCentiArcSeconds: Int = iq.value.value.value
+    def toCentiArcSeconds: Short = iq.value.value.value
 
     def toArcSeconds: Quantity[Rational, ArcSecond] = iq.value.toValue[Short].toValue[Rational].toUnit[ArcSecond]
 
