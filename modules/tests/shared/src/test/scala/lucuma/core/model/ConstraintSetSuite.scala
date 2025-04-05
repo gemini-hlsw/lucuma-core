@@ -16,6 +16,7 @@ final class ConstraintSetSuite extends DisciplineSuite {
   import ArbConstraintSet.given
   import ArbElevationRange.given
   import ArbEnumerated.given
+  import ArbNewType.given
   import ArbRefined.given
 
   // Laws

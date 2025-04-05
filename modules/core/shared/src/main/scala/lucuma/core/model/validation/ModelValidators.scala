@@ -3,32 +3,45 @@
 
 package lucuma.core.model.validation
 
-import lucuma.core.model.ElevationRange
+import lucuma.core.model.AirMass
+import lucuma.core.model.AirMassConstraint
+import lucuma.core.model.HourAngleConstraint
 import lucuma.core.optics.ValidSplitEpi
+import lucuma.core.refined.given
 import lucuma.core.validation.*
 import lucuma.refined.*
 
 object ModelValidators {
-  private val airMassErrorMsg   =
-    f"Must be ${ElevationRange.AirMass.MinValue.toDouble}%.1f to ${ElevationRange.AirMass.MaxValue.toDouble}%.1f"
-  private val hourAngleErrorMsg =
-    f"Must be ${ElevationRange.HourAngle.MinHour.toDouble}%.1f to ${ElevationRange.HourAngle.MaxHour.toDouble}%.1f"
+  private val airMassErrorMsg: String   =
+    f"Must be ${AirMassConstraint.Min.value.value.value.value.toDouble}%.1f to ${AirMassConstraint.Max.value.value.value.value.toDouble}%.1f"
+  private val hourAngleErrorMsg: String =
+    f"Must be ${HourAngleConstraint.Min.value}%.1f to ${HourAngleConstraint.Max.value}%.1f"
 
-  val airMassElevationRangeValidWedge: InputValidWedge[ElevationRange.AirMass.DecimalValue] =
+  // TODO TEST NEW OPTICS!!!!
+
+  val AirMassValidate: ValidSplitEpi[String, BigDecimal, AirMass] = 
+    ValidSplitEpi
+      .forRefined[String, BigDecimal, AirMass.Predicate](_ => airMassErrorMsg)
+      .andThen(AirMass.Value.reverse)
+
+  val AirMassConstraintValidate: ValidSplitEpi[String, AirMass, AirMassConstraint] = 
+    ValidSplitEpi
+      .forRefined[String, AirMass, AirMassConstraint.Predicate](_ => airMassErrorMsg)
+      .andThen(AirMassConstraint.Value.reverse)
+
+  val AirMassElevationRangeValidWedge: InputValidWedge[AirMassConstraint] = 
     InputValidWedge
       .truncatedBigDecimal(decimals = 1.refined)
-      .andThen(
-        ValidSplitEpi
-          .forRefined[String, BigDecimal, ElevationRange.AirMass.Value](_ => airMassErrorMsg)
-          .toErrorsValidSplitEpiUnsafe
-      )
+      .andThen(AirMassValidate.toErrorsValidSplitEpiUnsafe)
+      .andThen(AirMassConstraintValidate.toErrorsValidSplitEpiUnsafe)
 
-  val hourAngleElevationRangeValidWedge: InputValidWedge[ElevationRange.HourAngle.DecimalHour] =
+  val HourAngleConstraintValidate: ValidSplitEpi[String, BigDecimal, HourAngleConstraint] =
+    ValidSplitEpi
+     .forRefined[String, BigDecimal, HourAngleConstraint.Predicate](_ => hourAngleErrorMsg)
+    .andThen(HourAngleConstraint.Value.reverse)
+
+  val HourAngleElevationRangeValidWedge: InputValidWedge[HourAngleConstraint] = 
     InputValidWedge
       .truncatedBigDecimal(decimals = 1.refined)
-      .andThen(
-        ValidSplitEpi
-          .forRefined[String, BigDecimal, ElevationRange.HourAngle.Hour](_ => hourAngleErrorMsg)
-          .toErrorsValidSplitEpiUnsafe
-      )
+      .andThen(HourAngleConstraintValidate.toErrorsValidSplitEpiUnsafe)
 }

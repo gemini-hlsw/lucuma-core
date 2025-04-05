@@ -108,7 +108,7 @@ class AgsSuite extends munit.FunSuite {
       CloudExtinction.Preset.PointFive,
       SkyBackground.Dark,
       WaterVapor.Wet,
-      ElevationRange.AirMass.Default
+      ElevationRange.ByAirMass.Default
     )
 
     val wavelength = Wavelength.fromIntNanometers(300).get

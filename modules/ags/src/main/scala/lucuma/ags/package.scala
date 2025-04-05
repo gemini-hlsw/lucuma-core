@@ -35,7 +35,7 @@ val baseFwhm = Wavelength.fromIntNanometers(500).get
 def wfsFwhm(sciFwhm: ImageQuality, wavelength: Wavelength): Double = {
   val coeff: Double =
     baseFwhm.toPicometers.value.value.toDouble / wavelength.toPicometers.value.value.toDouble
-  ((sciFwhm.toArcSeconds.value) * math.pow(coeff, -0.2)).toDouble
+  ((sciFwhm.toArcSeconds.toDouble) * math.pow(coeff, -0.2)).toDouble
 }
 
 // Calculate the widest set of constraints, useful to cache catalog results
@@ -75,38 +75,38 @@ def faintLimit(
     case SkyBackground.Darkest =>
       guideSpeed match {
         case GuideSpeed.Fast   =>
-          16.4 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.value.toDouble
+          16.4 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.toDouble
         case GuideSpeed.Medium =>
-          16.9 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.value.toDouble
+          16.9 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.toDouble
         case GuideSpeed.Slow   =>
-          17.4 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.value.toDouble
+          17.4 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.toDouble
       }
     case SkyBackground.Dark    =>
       guideSpeed match {
         case GuideSpeed.Fast   =>
-          16.3 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.value.toDouble
+          16.3 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.toDouble
         case GuideSpeed.Medium =>
-          16.8 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.value.toDouble
+          16.8 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.toDouble
         case GuideSpeed.Slow   =>
-          17.3 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.value.toDouble
+          17.3 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.toDouble
       }
     case SkyBackground.Gray    =>
       guideSpeed match {
         case GuideSpeed.Fast   =>
-          16.2 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.value.toDouble
+          16.2 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.toDouble
         case GuideSpeed.Medium =>
-          16.7 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.value.toDouble
+          16.7 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.toDouble
         case GuideSpeed.Slow   =>
-          17.2 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.value.toDouble
+          17.2 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.toDouble
       }
     case SkyBackground.Bright  =>
       guideSpeed match {
         case GuideSpeed.Fast   =>
-          16.1 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.value.toDouble
+          16.1 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.toDouble
         case GuideSpeed.Medium =>
-          16.6 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.value.toDouble
+          16.6 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.toDouble
         case GuideSpeed.Slow   =>
-          17.1 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.value.toDouble
+          17.1 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.toDouble
       }
   }
   FaintnessConstraint(BrightnessValue.unsafeFrom(BigDecimal(limit)))

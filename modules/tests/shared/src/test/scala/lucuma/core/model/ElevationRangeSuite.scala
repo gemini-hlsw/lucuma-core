@@ -9,35 +9,41 @@ import eu.timepit.refined.scalacheck.numeric.*
 import lucuma.core.math.arb.*
 import lucuma.core.model.arb.*
 import lucuma.core.optics.laws.discipline.SplitEpiTests
+import lucuma.core.util.arb.*
 import monocle.law.discipline.*
 import munit.*
 
 final class ElevationRangeSuite extends DisciplineSuite {
   import ArbElevationRange.given
   import ArbRefined.given
+  import ArbNewType.given
 
   // Laws
-  checkAll("Eq[ElevationRange.AirMass]", EqTests[ElevationRange.AirMass].eqv)
-  checkAll("Eq[ElevationRange.HourAngle]", EqTests[ElevationRange.HourAngle].eqv)
+  checkAll("Eq[ElevationRange.AirMass]", EqTests[ElevationRange.ByAirMass].eqv)
+  checkAll("Eq[ElevationRange.HourAngle]", EqTests[ElevationRange.ByHourAngle].eqv)
   checkAll("Eq[ElevationRange]", EqTests[ElevationRange].eqv)
 
   // Optics
-  checkAll("ElevationRange.AirMass.min", LensTests(ElevationRange.AirMass.min))
-  checkAll("ElevationRange.AirMass.max", LensTests(ElevationRange.AirMass.max))
-  checkAll("ElevationRange.AirMass.fromDecimalValues",
-           SplitEpiTests(ElevationRange.AirMass.fromDecimalValues).splitEpi
+  checkAll("ElevationRange.AirMass.min", LensTests(ElevationRange.ByAirMass.min))
+  checkAll("ElevationRange.AirMass.max", LensTests(ElevationRange.ByAirMass.max))
+  checkAll(
+    "ElevationRange.AirMass.FromAirMassConstraints",
+    SplitEpiTests(ElevationRange.ByAirMass.FromAirMassConstraints).splitEpi
   )
-  checkAll("ElevationRange.AirMass.fromOrderedDecimalValues",
-           PrismTests(ElevationRange.AirMass.fromOrderedDecimalValues)
+  checkAll(
+    "ElevationRange.AirMass.FromOrderedAirMassConstraints",
+    PrismTests(ElevationRange.ByAirMass.FromOrderedAirMassConstraints)
   )
 
-  checkAll("ElevationRange.HourAngle.minHours", LensTests(ElevationRange.HourAngle.minHours))
-  checkAll("ElevationRange.HourAngle.maxHours", LensTests(ElevationRange.HourAngle.maxHours))
-  checkAll("ElevationRange.HourAngle.fromDecimalHours",
-           SplitEpiTests(ElevationRange.HourAngle.fromDecimalHours).splitEpi
+  checkAll("ElevationRange.HourAngle.minHours", LensTests(ElevationRange.ByHourAngle.minHours))
+  checkAll("ElevationRange.HourAngle.maxHours", LensTests(ElevationRange.ByHourAngle.maxHours))
+  checkAll(
+    "ElevationRange.HourAngle.FromHourAngleConstraints",
+    SplitEpiTests(ElevationRange.ByHourAngle.FromHourAngleConstraints).splitEpi
   )
-  checkAll("ElevationRange.HourAngle.fromOrderedDecimalHours",
-           PrismTests(ElevationRange.HourAngle.fromOrderedDecimalHours)
+  checkAll(
+    "ElevationRange.HourAngle.FromOrderedHourAngleConstraints",
+    PrismTests(ElevationRange.ByHourAngle.FromOrderedHourAngleConstraints)
   )
 
   checkAll("ElevationRange.airMass", PrismTests(ElevationRange.airMass))

@@ -75,7 +75,7 @@ case class AirmassSolver(min: Double, max: Double, tolerance: Duration = Duratio
       RoundStrategy.LinearInterpolating,
       SkyCalcResults,
       (Double, Declination)
-    ](AirmassConstraint(min, max), tolerance)
+    ](AirMassConstraint(min, max), tolerance)
 
 case class HourAngleSolver(
   min:       HourAngle,

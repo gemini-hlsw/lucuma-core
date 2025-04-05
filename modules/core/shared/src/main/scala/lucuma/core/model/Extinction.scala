@@ -8,8 +8,8 @@ import coulomb.*
 import coulomb.policy.spire.standard.given
 import coulomb.rational.Rational
 import coulomb.syntax.*
-import eu.timepit.refined.types.numeric.NonNegShort
 import eu.timepit.refined.predicates.numeric.NonNegative
+import eu.timepit.refined.types.numeric.NonNegShort
 import io.circe.Decoder
 import io.circe.Encoder
 import lucuma.core.math.units.MilliVegaMagnitude

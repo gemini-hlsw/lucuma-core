@@ -5,8 +5,11 @@ package lucuma.core.refined
 
 import coulomb.Quantity
 import eu.timepit.refined.api.Refined
+import eu.timepit.refined.api.RefinedType
 import eu.timepit.refined.api.Validate
 import lucuma.core.util.NewTypeGen
+
+type RefinedTypeAux[T, P] = RefinedType.Aux[Refined[T, P], Refined, T, P]
 
 // A `Refined[T, P]` can be further refined with predicate `P1` if `T` can be refined with predicate `P1`.
 given refinedValidate[T, P, FTP <: Refined[T, P], P1](using v: Validate[T, P1]): Validate[FTP, P1] = 

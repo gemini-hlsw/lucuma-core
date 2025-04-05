@@ -8,6 +8,7 @@ import coulomb.*
 import coulomb.rational.Rational
 import eu.timepit.refined.*
 import eu.timepit.refined.api.*
+import eu.timepit.refined.cats.given
 import eu.timepit.refined.numeric.Interval
 import eu.timepit.refined.types.numeric.NonNegShort
 import lucuma.core.math.units.*
@@ -15,24 +16,30 @@ import lucuma.core.refined.given
 import lucuma.core.util.Display
 import lucuma.core.util.Enumerated
 import lucuma.core.util.NewRefined
-import eu.timepit.refined.cats.given
 
 type CloudExtinctionPredicate = Interval.Closed[0, 5000]
 type CloudExtinction = CloudExtinction.Type
 object CloudExtinction extends NewRefined[Extinction, CloudExtinctionPredicate]:
-  def fromMilliVegaMagnitude(value: NonNegShort): Either[String, CloudExtinction] =
-    from(Extinction.fromRefined(value))
+  inline def fromMilliVegaMagnitude(value: Short): Either[String, CloudExtinction] =
+    NonNegShort.from(value).flatMap(nns => from(Extinction.fromRefined(nns)))
 
-  def unsafeFromMilliVegaMagnitude(value: NonNegShort): CloudExtinction           =
-    unsafeFrom(Extinction.fromRefined(value))
+  inline def unsafeFromMilliVegaMagnitude(value: Short): CloudExtinction           =
+    unsafeFrom(Extinction.fromRefined(NonNegShort.unsafeFrom(value)))
+
+  inline def fromVegaMagnitude(value: BigDecimal): Either[String, CloudExtinction] =
+    fromMilliVegaMagnitude((value * 1000).toShort)
+
+  inline def unsafeFromVegaMagnitude(value: BigDecimal): CloudExtinction =
+    unsafeFromMilliVegaMagnitude((value * 1000).toShort)
 
   extension (ce: CloudExtinction)
     def toExtinction: Extinction = ce.value.value
 
-    def toVegaMagnitude: Quantity[Rational, VegaMagnitude] = 
-      toExtinction.toVegaMagnitude
+    def toVegaMagnitude: BigDecimal = 
+      val r = toExtinction.toVegaMagnitude.value
+      BigDecimal(r.n) / BigDecimal(r.d)
 
-    def label: String        = f"< ${toVegaMagnitude.value.toDouble}%.2f mag"
+    def label: String = f"< ${toVegaMagnitude.toDouble}%.2f mag"
 
     def percentile: Percentile =
       Preset.values.find(preset => ce <= preset.toCloudExtinction).map(_.percentile).getOrElse(Percentile.Max)

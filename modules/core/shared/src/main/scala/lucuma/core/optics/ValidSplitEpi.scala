@@ -173,8 +173,6 @@ object ValidSplitEpi {
   /**
    * Build optic for a Refined predicate
    */
-  def forRefined[E, A, P](error: A => E)(implicit
-    v:                           RefinedValidate[A, P]
-  ): ValidSplitEpi[E, A, A Refined P] =
+  def forRefined[E, A, P](error: A => E)(using v: RefinedValidate[A, P]): ValidSplitEpi[E, A, A Refined P] =
     fromPrism(refinedPrism[A, P], error)
 }

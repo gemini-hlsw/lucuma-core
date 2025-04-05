@@ -34,7 +34,7 @@ class LimitsSuite extends munit.FunSuite {
       CloudExtinction.Preset.PointOne, // min cloud extinction
       SkyBackground.Dark,              // Not relevant
       WaterVapor.Wet,                  // Not relevant
-      ElevationRange.AirMass.Default   // Not relevant
+      ElevationRange.ByAirMass.Default // Not relevant
     )
 
     val wavelength = Wavelength.fromIntNanometers(300).get
