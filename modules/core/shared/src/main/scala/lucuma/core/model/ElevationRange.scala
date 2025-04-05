@@ -17,12 +17,12 @@ sealed trait ElevationRange extends Product with Serializable
 
 object ElevationRange {
 
-  final case class AirMass private (
+  case class AirMass private (
     min: AirMass.DecimalValue,
     max: AirMass.DecimalValue
   ) extends ElevationRange
 
-  final case class HourAngle private (
+  case class HourAngle private (
     minHours: HourAngle.DecimalHour,
     maxHours: HourAngle.DecimalHour
   ) extends ElevationRange

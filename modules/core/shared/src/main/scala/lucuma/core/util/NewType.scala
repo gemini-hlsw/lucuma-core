@@ -58,6 +58,9 @@ trait NewType[Wrapped]{
   given (using ord:  Order[Wrapped]): Order[Type]                              = ord
   given (using ord:  Ordering[Wrapped]): Ordering[Type]                        = ord
 }
+
+private type RefinedTypeAux[T, P] = RefinedType.Aux[Refined[T, P], Refined, T, P]
+
 /**
  * Usage:
  * ```
@@ -65,11 +68,10 @@ trait NewType[Wrapped]{
  * type Probability = Probability.Type
  * ```
  */
-trait NewRefined[T, P](using RefinedType.AuxT[T Refined P, T]) extends NewType[T Refined P]:
-  private val TypeOps                                 = new RefinedTypeOps[T Refined P, T]
-  def fromPrism(using Validate[T, P]): Prism[T, Type] = refinedPrism.andThen(value.reverse)
-  def from(t:       T): Either[String, Type]          = TypeOps.from(t).map(apply(_))
-  def unsafeFrom(x: T): Type                          = apply(TypeOps.unsafeFrom(x))
+trait NewRefined[T, P](using rt: RefinedTypeAux[T, P]) extends NewType[T Refined P]:
+  val From: Prism[T, Type]                   = refinedPrism(using rt.validate).andThen(value.reverse)
+  def from(t:       T): Either[String, Type] = rt.refine(t).map(apply(_))
+  def unsafeFrom(x: T): Type                 = apply(rt.unsafeRefine(x))
 
 /**
   * Usage:
@@ -78,11 +80,10 @@ trait NewRefined[T, P](using RefinedType.AuxT[T Refined P, T]) extends NewType[T
   * type Score = Score.Type
   * ```
   */
-trait NewRefinedQuantity[T, P, U](using RefinedType.AuxT[T Refined P, T]) extends NewType[Quantity[T Refined P, U]]:
-  private val TypeOps                                       = new RefinedTypeOps[T Refined P, T]
-  def fromPrism(using Validate[T, P]): Prism[T, Type]       = refinedPrism.andThen(quantityIso.reverse).andThen(value.reverse)
-  def from(t:       T): Either[String, Type]                = TypeOps.from(t).map(quantityIso.reverseGet(_)).map(apply(_))
-  def unsafeFrom(x: T): Type                                = apply(quantityIso.reverseGet(TypeOps.unsafeFrom(x)))
+trait NewRefinedQuantity[T, P, U](using rt: RefinedTypeAux[T, P]) extends NewType[Quantity[T Refined P, U]]:
+  val From: Prism[T, Type]                                  = refinedPrism(using rt.validate).andThen(quantityIso.reverse).andThen(value.reverse)
+  def from(t:       T): Either[String, Type]                = rt.refine(t).map(quantityIso.reverseGet(_)).map(apply(_))
+  def unsafeFrom(x: T): Type                                = apply(quantityIso.reverseGet(rt.unsafeRefine(x)))
   def fromQuantity(q: Quantity[T, U]): Either[String, Type] = from(q.value)
   def unsafeFromQuantity(q: Quantity[T, U]): Type           = unsafeFrom(q.value)
   def fromRefined(r: Refined[T, P]): Type                   = apply(quantityIso.reverseGet(r))

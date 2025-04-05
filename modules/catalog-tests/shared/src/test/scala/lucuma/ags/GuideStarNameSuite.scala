@@ -17,7 +17,7 @@ class GuideStarNameSuite extends munit.DisciplineSuite {
   test("typeclasses") {
     checkAll("GuideStarName", EqTests[GuideStarName].eqv)
     checkAll("GuideStarNameCodec", CodecTests[GuideStarName].codec)
-    checkAll("GuideStarName.from", PrismTests(GuideStarName.from))
+    checkAll("GuideStarName.from", PrismTests(GuideStarName.From))
     checkAll("GuideStarName.gaiaSourceId", PrismTests(GuideStarName.gaiaSourceId))
   }
 

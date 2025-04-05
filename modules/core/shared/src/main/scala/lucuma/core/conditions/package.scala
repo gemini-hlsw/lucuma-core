@@ -7,8 +7,6 @@ import coulomb.Quantity
 import coulomb.units.accepted.*
 import eu.timepit.refined.*
 import eu.timepit.refined.api.Refined
-import eu.timepit.refined.boolean.Not
-import eu.timepit.refined.numeric.Less
 import lucuma.core.enums.Site
 import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.WaterVapor
@@ -16,7 +14,7 @@ import lucuma.core.math.Declination
 import lucuma.core.math.Wavelength
 import lucuma.core.math.erf
 import lucuma.core.model.AirMassPredicate
-import lucuma.core.model.AirMassValue
+import lucuma.core.model.AirMass
 import lucuma.core.model.CloudExtinction
 import lucuma.core.model.Percentile
 
@@ -33,18 +31,18 @@ import scala.math.sin
 /**
   * Return the minimum airmass at a certain declination at a site.
   */
-def minimumAirmass(dec: Declination, site: Site): AirMassValue =
+def minimumAirmass(dec: Declination, site: Site): AirMass =
   val latitude = site.place.latitude
   // Maximum elevation in degrees
   val elevation = 90.0 - abs(dec.toAngle.toSignedDoubleDegrees - latitude.toAngle.toSignedDoubleDegrees)
-  refineV[AirMassPredicate](BigDecimal(1.0 / sin((elevation + 244.0 / (165.0 + 47.0 * pow(elevation, 1.1))) * Pi / 180.0))).getOrElse(sys.error("Not possible"))
+  AirMass.from(BigDecimal(1.0 / sin((elevation + 244.0 / (165.0 + 47.0 * pow(elevation, 1.1))) * Pi / 180.0))).getOrElse(sys.error("Not possible"))
 
 /**
   * Calculate the percentile of on-source image quality.
   * fwhm in arcsec (on-source) wavelength in microns
   */
-def percentileImageQuality(fwhm: Quantity[BigDecimal, ArcSecond], wavelength: Wavelength, airmass: AirMassValue): Percentile =
-  val zenithFwhm = fwhm.value.toDouble / pow(airmass.value.toDouble, 0.6)
+def percentileImageQuality(fwhm: Quantity[BigDecimal, ArcSecond], wavelength: Wavelength, airmass: AirMass): Percentile =
+  val zenithFwhm = fwhm.value.toDouble / pow(airmass.value.value.toDouble, 0.6)
 
   // model fit to QAP from 2004-2024:  (the extra +0.5 is to force 100% in the worst IQ)
   val c = Array(50.10221383, 0.87712202, 0.78467697, 16.10928544, 0.13778389, -15.8255612, 49.37405633 + 0.5)

@@ -3,7 +3,6 @@
 
 package lucuma.core.model
 
-import cats.syntax.contravariant.*
 import cats.syntax.all.*
 import coulomb.*
 import coulomb.rational.Rational

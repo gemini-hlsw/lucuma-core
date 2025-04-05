@@ -27,6 +27,7 @@ import org.typelevel.cats.time.instances.duration.*
 
 import java.time.Duration
 import java.time.temporal.Temporal
+import lucuma.core.util.NewRefined
 
 // Store a percentage with two decimals of precision for a 0-100% range
 type CentiPercentRange = Interval.Closed[0, 10000]
@@ -52,7 +53,8 @@ object Percentile extends NewRefinedQuantity[Int, CentiPercentRange, CentiPercen
 type Percentile = Percentile.Type
 
 type AirMassPredicate = Not[Less[1]]
-type AirMassValue     = BigDecimal Refined AirMassPredicate
+object AirMass extends NewRefined[BigDecimal, AirMassPredicate]
+type AirMass = AirMass.Type
 
 // Non negative duration
 given Plain[Duration, GreaterEqual[0]] =
