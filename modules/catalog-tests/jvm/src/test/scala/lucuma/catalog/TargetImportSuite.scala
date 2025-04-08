@@ -307,7 +307,7 @@ class TargetImportFileSuite extends CatsEffectSuite:
     val file    = getClass().getResource(xmlFile)
     JdkHttpClient
       .simple[IO]
-      .flatMap { client =>
+      .use { client =>
         Files[IO]
           .readAll(Path(file.getPath()))
           .through(text.utf8.decode)

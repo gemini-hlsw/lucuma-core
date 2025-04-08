@@ -12,7 +12,7 @@ object SimbadQueryApp extends IOApp.Simple with SimbadQuerySample {
   def run =
     JdkHttpClient
       .simple[IO]
-      .flatMap(simbadQuery[IO])
+      .use(simbadQuery[IO])
       .flatMap(x => IO.println(pprint.apply(x)))
       .void
 }
