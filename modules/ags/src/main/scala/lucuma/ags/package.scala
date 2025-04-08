@@ -151,15 +151,21 @@ extension (posAngleConstraint: PosAngleConstraint)
     vizTime:  Instant,
     duration: Duration
   ): Option[NonEmptyList[Angle]] =
-    TimeSpan
-      .fromDuration(duration)
-      .filter(_ > TimeSpan.Zero)
-      .flatMap: ts =>
-        posAngleConstraint match
-          case PosAngleConstraint.Fixed(a)               => NonEmptyList.of(a).some
-          case PosAngleConstraint.AllowFlip(a)           => NonEmptyList.of(a, a.flip).some
-          case PosAngleConstraint.ParallacticOverride(a) => NonEmptyList.of(a).some
-          case PosAngleConstraint.AverageParallactic     =>
-            averageParallacticAngle(site.place, tracking, vizTime, ts)
-              .map(a => NonEmptyList.of(a, a.flip))
-          case PosAngleConstraint.Unbounded              => UnconstrainedAngles
+    anglesToTestAt(
+      TimeSpan
+        .fromDuration(duration)
+        .filter(_ > TimeSpan.Zero)
+        .flatMap: ts =>
+          averageParallacticAngle(site.place, tracking, vizTime, ts)
+    )
+
+  def anglesToTestAt(
+    averageParallacticAngle: => Option[Angle]
+  ): Option[NonEmptyList[Angle]] =
+    posAngleConstraint match
+      case PosAngleConstraint.Fixed(a)               => NonEmptyList.of(a).some
+      case PosAngleConstraint.AllowFlip(a)           => NonEmptyList.of(a, a.flip).some
+      case PosAngleConstraint.ParallacticOverride(a) => NonEmptyList.of(a).some
+      case PosAngleConstraint.AverageParallactic     =>
+        averageParallacticAngle.map(a => NonEmptyList.of(a, a.flip))
+      case PosAngleConstraint.Unbounded              => UnconstrainedAngles
