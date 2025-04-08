@@ -27,23 +27,23 @@ final class ElevationRangeSuite extends DisciplineSuite {
   checkAll("ElevationRange.AirMass.min", LensTests(ElevationRange.ByAirMass.min))
   checkAll("ElevationRange.AirMass.max", LensTests(ElevationRange.ByAirMass.max))
   checkAll(
-    "ElevationRange.AirMass.FromAirMassConstraints",
-    SplitEpiTests(ElevationRange.ByAirMass.FromAirMassConstraints).splitEpi
+    "ElevationRange.AirMass.FromBounds",
+    SplitEpiTests(ElevationRange.ByAirMass.FromBounds).splitEpi
   )
   checkAll(
-    "ElevationRange.AirMass.FromOrderedAirMassConstraints",
-    PrismTests(ElevationRange.ByAirMass.FromOrderedAirMassConstraints)
+    "ElevationRange.AirMass.FromOrderedBounds",
+    PrismTests(ElevationRange.ByAirMass.FromOrderedBounds)
   )
 
   checkAll("ElevationRange.HourAngle.minHours", LensTests(ElevationRange.ByHourAngle.minHours))
   checkAll("ElevationRange.HourAngle.maxHours", LensTests(ElevationRange.ByHourAngle.maxHours))
   checkAll(
-    "ElevationRange.HourAngle.FromHourAngleConstraints",
-    SplitEpiTests(ElevationRange.ByHourAngle.FromHourAngleConstraints).splitEpi
+    "ElevationRange.HourAngle.FromBounds",
+    SplitEpiTests(ElevationRange.ByHourAngle.FromBounds).splitEpi
   )
   checkAll(
-    "ElevationRange.HourAngle.FromOrderedHourAngleConstraints",
-    PrismTests(ElevationRange.ByHourAngle.FromOrderedHourAngleConstraints)
+    "ElevationRange.HourAngle.FromOrderedHourAngleBounds",
+    PrismTests(ElevationRange.ByHourAngle.FromOrderedBounds)
   )
 
   checkAll("ElevationRange.airMass", PrismTests(ElevationRange.airMass))

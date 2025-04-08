@@ -6,9 +6,6 @@ package lucuma.core.model
 import cats.Eq
 import cats.Monoid
 import cats.syntax.all.*
-import coulomb.*
-import coulomb.units.accepted.*
-import coulomb.units.si.prefixes.*
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.api.RefinedTypeOps
 import eu.timepit.refined.api.Validate
@@ -24,7 +21,6 @@ import lucuma.core.math.Lat
 import lucuma.core.optics.Format
 import lucuma.core.refined.given
 import lucuma.core.util.NewRefined
-import lucuma.core.util.NewRefinedQuantity
 import org.typelevel.cats.time.instances.duration.*
 
 import java.time.Duration
@@ -34,28 +30,34 @@ import scala.math.abs
 import scala.math.pow
 import scala.math.sin
 
-// Store a percentage with two decimals of precision for a 0-100% range
-type CentiPercentRange = Interval.Closed[0, 10000]
-type CentiPercent      = Centi * Percent
-object Percentile extends NewRefinedQuantity[Int, CentiPercentRange, CentiPercent]:
-  def fromPercent(p: BigDecimal): Either[String, Percentile] =
-    from((p * 100).toInt)
+// Integer Percents
+type ZeroTo100  = Interval.Closed[0, 100]
+type IntPercent = Int Refined ZeroTo100
 
-  def unsafeFromPercent(p: BigDecimal): Percentile =
+object IntPercent extends RefinedTypeOps[IntPercent, Int]
+
+// Store a percentage with two decimals of precision for a 0-100% range
+type CentiPercent    = Interval.Closed[0, 10000]
+object IntCentiPercent extends NewRefined[Int, CentiPercent]:
+  val Max = unsafeFrom(10000)
+  val Min = unsafeFrom(0)
+
+  def fromPercent(p: BigDecimal): Either[String, IntCentiPercent] =
+    from((p * 100).toInt)
+  def unsafeFromPercent(p: BigDecimal): IntCentiPercent =
     unsafeFrom((p * 100).toInt)
 
-  val Max: Percentile = unsafeFromPercent(100)
-  val Min: Percentile = unsafeFromPercent(0)
-
-  val FromBigDecimal: Format[BigDecimal, Percentile] =
+  val FromBigDecimal: Format[BigDecimal, IntCentiPercent] =
     Format.apply(d => fromPercent(d).toOption, _.toPercent)
 
-  extension(a: Percentile)
-    def toPercent: BigDecimal = BigDecimal(a.value.value.value / 100.0)
-    def *(b: Percentile): Percentile = // Given a and b are in the range 0-1 the result is also in the range 0-1
-      FromBigDecimal.getOption(FromBigDecimal.reverseGet(a).toDouble * FromBigDecimal.reverseGet(b) / 100.0).get
-    def rounded: Percentile = FromBigDecimal.getOption(FromBigDecimal.reverseGet(a).rounded).get
-type Percentile = Percentile.Type
+  extension(a: IntCentiPercent)
+    def toPercent: BigDecimal = a.value.value / 100.0
+    def *(b: IntCentiPercent): IntCentiPercent =
+      // Given a and b are in the range 0-1 the result is also in the range 0-1
+      IntCentiPercent.unsafeFrom((a.value.value * b.value.value) / 10000)
+    def round: IntCentiPercent = IntCentiPercent.unsafeFrom(100 * scala.math.round(a.value.value / 100.0f))
+
+type IntCentiPercent = IntCentiPercent.Type
 
 object AirMass extends NewRefined[BigDecimal, Not[Less[1]]]:
   /**
@@ -68,21 +70,26 @@ object AirMass extends NewRefined[BigDecimal, Not[Less[1]]]:
 
 type AirMass = AirMass.Type
 
-object AirMassConstraint extends NewRefined[AirMass, Interval.Closed[1, 3]]:
-  def fromBigDecimal(b: BigDecimal): Either[String, AirMassConstraint] =
+object AirMassBound extends NewRefined[AirMass, Interval.Closed[1, 3]]:
+  def fromBigDecimal(b: BigDecimal): Either[String, AirMassBound] =
     AirMass.from(b).flatMap(from(_))
-  def unsafeFromBigDecimal(b: BigDecimal): AirMassConstraint =
+  def unsafeFromBigDecimal(b: BigDecimal): AirMassBound =
     unsafeFrom(AirMass.unsafeFrom(b))
 
-  val Min: AirMassConstraint = unsafeFromBigDecimal(BigDecimal(1))
-  val Max: AirMassConstraint = unsafeFromBigDecimal(BigDecimal(3))
-type AirMassConstraint = AirMassConstraint.Type
+  extension (a: AirMassBound)
+    def toBigDecimal: BigDecimal = a.s.value
 
+  val Min: AirMassBound = unsafeFromBigDecimal(BigDecimal(1))
+  val Max: AirMassBound = unsafeFromBigDecimal(BigDecimal(3))
+type AirMassBound = AirMassBound.Type
 
-object HourAngleConstraint extends NewRefined[BigDecimal, Interval.Closed[-5, 5]]:
-  lazy val Min: HourAngleConstraint = unsafeFrom(-5)
-  lazy val Max: HourAngleConstraint = unsafeFrom(5)
-type HourAngleConstraint = HourAngleConstraint.Type
+object HourAngleBound extends NewRefined[BigDecimal, Interval.Closed[-5, 5]]:
+  extension (h: HourAngleBound)
+    def toBigDecimal: BigDecimal = h.value.value
+
+  lazy val Min: HourAngleBound = unsafeFrom(-5)
+  lazy val Max: HourAngleBound = unsafeFrom(5)
+type HourAngleBound = HourAngleBound.Type
 
 // Non negative duration
 given Plain[Duration, GreaterEqual[0]] =

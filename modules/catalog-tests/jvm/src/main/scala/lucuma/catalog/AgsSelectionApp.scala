@@ -29,7 +29,7 @@ import lucuma.core.math.ProperMotion
 import lucuma.core.math.RadialVelocity
 import lucuma.core.math.RightAscension
 import lucuma.core.math.Wavelength
-import lucuma.core.model.AirMassConstraint
+import lucuma.core.model.AirMassBound
 import lucuma.core.model.CloudExtinction
 import lucuma.core.model.ConstraintSet
 import lucuma.core.model.ElevationRange
@@ -90,9 +90,9 @@ trait AgsSelectionSample {
     CloudExtinction.Preset.PointOne,
     SkyBackground.Bright,
     WaterVapor.Wet,
-    ElevationRange.ByAirMass.FromAirMassConstraints.get(
-      AirMassConstraint.unsafeFromBigDecimal(BigDecimal(1.0)),
-      AirMassConstraint.unsafeFromBigDecimal(BigDecimal(1.75))
+    ElevationRange.ByAirMass.FromBounds.get(
+      AirMassBound.unsafeFromBigDecimal(BigDecimal(1.0)),
+      AirMassBound.unsafeFromBigDecimal(BigDecimal(1.75))
     )
   )
 

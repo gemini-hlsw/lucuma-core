@@ -28,7 +28,7 @@ case class ConstraintSet(
   /** Calculations of likelihood of occurrence of observing conditions
     * Taken from: https://github.com/andrewwstephens/pyexplore/blob/main/test/percentile.py
     */
-  def likelihood(wavelength: Wavelength, dec: Declination, site: Site): Percentile =
+  def likelihood(wavelength: Wavelength, dec: Declination, site: Site): IntCentiPercent =
     conditionsLikelihood(skyBackground, cloudExtinction.toCloudExtinction, waterVapor, imageQuality.toImageQuality, wavelength, dec, site)
 
 object ConstraintSet {
@@ -63,11 +63,11 @@ object ConstraintSet {
     elevationRange.andThen(ElevationRange.airMass)
 
   /** @group Optics */
-  lazy val airMassMin: Optional[ConstraintSet, AirMassConstraint] =
+  lazy val airMassMin: Optional[ConstraintSet, AirMassBound] =
     airMass.andThen(ElevationRange.ByAirMass.min)
 
   /** @group Optics */
-  lazy val airMassMax: Optional[ConstraintSet, AirMassConstraint] =
+  lazy val airMassMax: Optional[ConstraintSet, AirMassBound] =
     airMass.andThen(ElevationRange.ByAirMass.max)
 
   /** @group Optics */
@@ -75,10 +75,10 @@ object ConstraintSet {
     elevationRange.andThen(ElevationRange.hourAngle)
 
   /** @group Optics */
-  lazy val hourAngleMin: Optional[ConstraintSet, HourAngleConstraint] =
+  lazy val hourAngleMin: Optional[ConstraintSet, HourAngleBound] =
     hourAngle.andThen(ElevationRange.ByHourAngle.minHours)
 
   /** @group Optics */
-  lazy val hourAngleMax: Optional[ConstraintSet, HourAngleConstraint] =
+  lazy val hourAngleMax: Optional[ConstraintSet, HourAngleBound] =
     hourAngle.andThen(ElevationRange.ByHourAngle.maxHours)
 }

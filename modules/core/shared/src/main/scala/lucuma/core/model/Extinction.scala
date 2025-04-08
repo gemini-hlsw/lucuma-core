@@ -35,7 +35,7 @@ object Extinction extends NewRefinedQuantity[Short, NonNegative, MilliVegaMagnit
     )
 
   given Order[Extinction] =
-    Order.by(_.value.value.value)
+    Order.by(FromMilliVegaMagnitude.reverseGet)
 
   given Encoder[Extinction] =
     Encoder[BigDecimal].contramap(FromVegaMagnitude.reverseGet)

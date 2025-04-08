@@ -13,13 +13,13 @@ import monocle.Prism
 import monocle.macros.GenPrism
 
 enum ElevationRange derives Eq:
-  case ByAirMass(min: AirMassConstraint,  max: AirMassConstraint) extends ElevationRange
-  case ByHourAngle(minHours: HourAngleConstraint, maxHours: HourAngleConstraint) extends ElevationRange
+  case ByAirMass(min: AirMassBound,  max: AirMassBound) extends ElevationRange
+  case ByHourAngle(minHours: HourAngleBound, maxHours: HourAngleBound) extends ElevationRange
 
 object ElevationRange:
   object ByAirMass:
-    val DefaultMin: AirMassConstraint   = AirMassConstraint.unsafeFromBigDecimal(BigDecimal(1.0))
-    val DefaultMax: AirMassConstraint   = AirMassConstraint.unsafeFromBigDecimal(BigDecimal(2.0))
+    val DefaultMin: AirMassBound   = AirMassBound.unsafeFromBigDecimal(BigDecimal(1.0))
+    val DefaultMax: AirMassBound   = AirMassBound.unsafeFromBigDecimal(BigDecimal(2.0))
     val Default: ElevationRange.ByAirMass = ElevationRange.ByAirMass(DefaultMin, DefaultMax)
 
     /** @group Typeclass Instances */
@@ -34,7 +34,7 @@ object ElevationRange:
 
     /** @group Optics */
     // Ensures that min <= max by swapping if necessary
-    val FromAirMassConstraints: SplitEpi[(AirMassConstraint, AirMassConstraint), ElevationRange.ByAirMass] =
+    val FromBounds: SplitEpi[(AirMassBound, AirMassBound), ElevationRange.ByAirMass] =
       SplitEpi(
         t => {
           val (min, max) = t
@@ -45,14 +45,16 @@ object ElevationRange:
       )
 
     /** @group Optics */
-    val FromOrderedAirMassConstraints: Prism[(AirMassConstraint, AirMassConstraint), ElevationRange.ByAirMass] =
-      Prism[(AirMassConstraint, AirMassConstraint), ElevationRange.ByAirMass] { case (min, max) =>
+    val FromOrderedBounds: Prism[(AirMassBound, AirMassBound), ElevationRange.ByAirMass] =
+      Prism[(AirMassBound, AirMassBound), ElevationRange.ByAirMass] { case (min, max) =>
         Option.when(min <= max)(ElevationRange.ByAirMass(min, max))
       }(a => (a.min, a.max))
   end ByAirMass
 
   object ByHourAngle:
-    val Default: ElevationRange.ByHourAngle = ElevationRange.ByHourAngle(HourAngleConstraint.Min, HourAngleConstraint.Max)
+    val DefaultMin: HourAngleBound   = HourAngleBound.Min
+    val DefaultMax: HourAngleBound   = HourAngleBound.Max
+    val Default: ElevationRange.ByHourAngle = ElevationRange.ByHourAngle(DefaultMin, DefaultMax)
 
     /** @group Typeclass Instances */
     given Eq[ByHourAngle] =
@@ -66,7 +68,7 @@ object ElevationRange:
 
     /** @group Optics */
     // Ensures that minHours <= maxHours by swapping if necessary
-    lazy val FromHourAngleConstraints: SplitEpi[(HourAngleConstraint, HourAngleConstraint), ByHourAngle] =
+    lazy val FromBounds: SplitEpi[(HourAngleBound, HourAngleBound), ByHourAngle] =
       SplitEpi(
         t => {
           val (min, max) = t
@@ -77,8 +79,8 @@ object ElevationRange:
       )
 
     /** @group Optics */
-    val FromOrderedHourAngleConstraints: Prism[(HourAngleConstraint, HourAngleConstraint), ByHourAngle] =
-      Prism[(HourAngleConstraint, HourAngleConstraint), ByHourAngle] { case (min, max) =>
+    val FromOrderedBounds: Prism[(HourAngleBound, HourAngleBound), ByHourAngle] =
+      Prism[(HourAngleBound, HourAngleBound), ByHourAngle] { case (min, max) =>
         Option.when(min <= max)(ByHourAngle(min, max))
       }(a => (a.minHours, a.maxHours))
   end ByHourAngle

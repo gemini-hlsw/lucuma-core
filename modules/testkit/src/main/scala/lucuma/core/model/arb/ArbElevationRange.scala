@@ -17,25 +17,25 @@ trait ArbElevationRange {
   given Arbitrary[ElevationRange.ByAirMass] =
     Arbitrary {
       for {
-        min <- arbitrary[AirMassConstraint]
-        max <- arbitrary[AirMassConstraint]
-      } yield ElevationRange.ByAirMass.FromAirMassConstraints.get((min, max))
+        min <- arbitrary[AirMassBound]
+        max <- arbitrary[AirMassBound]
+      } yield ElevationRange.ByAirMass.FromBounds.get((min, max))
     }
 
   given Cogen[ElevationRange.ByAirMass] =
-    Cogen[(AirMassConstraint, AirMassConstraint)]
+    Cogen[(AirMassBound, AirMassBound)]
       .contramap(t => (t.min, t.max))
 
   given Arbitrary[ElevationRange.ByHourAngle] =
     Arbitrary {
       for {
-        min <- arbitrary[HourAngleConstraint]
-        max <- arbitrary[HourAngleConstraint]
-      } yield ElevationRange.ByHourAngle.FromHourAngleConstraints.get((min, max))
+        min <- arbitrary[HourAngleBound]
+        max <- arbitrary[HourAngleBound]
+      } yield ElevationRange.ByHourAngle.FromBounds.get((min, max))
     }
 
   given Cogen[ElevationRange.ByHourAngle] =
-    Cogen[(HourAngleConstraint, HourAngleConstraint)]
+    Cogen[(HourAngleBound, HourAngleBound)]
       .contramap(t => (t.minHours, t.maxHours))
 
   given Arbitrary[ElevationRange] =

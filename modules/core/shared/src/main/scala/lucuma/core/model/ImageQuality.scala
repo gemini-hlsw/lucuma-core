@@ -43,15 +43,15 @@ object ImageQuality extends NewRefinedQuantity[Short, ImageQualityPredicate, Cen
     /**
       * Calculate the percentile of on-source image quality for this ImageQuality as fwhm.
       */
-    def percentile(wavelength: Wavelength, airmass: AirMass): Percentile =
+    def percentile(wavelength: Wavelength, airmass: AirMass): IntCentiPercent =
       val zenithFwhm = iq.toArcSeconds.toDouble / pow(airmass.value.value.toDouble, 0.6)
 
       // model fit to QAP from 2004-2024:  (the extra +0.5 is to force 100% in the worst IQ)
       val c = Array(50.10221383, 0.87712202, 0.78467697, 16.10928544, 0.13778389, -15.8255612, 49.37405633 + 0.5)
       // The equation should give a number between 0 and 100 but rounding can give numbers below 0 or above 100. It is clamped to that range.
       val result = c(0) * erf(c(1) * pow(wavelength.toMicrometers.value.value.toDouble, c(2)) + c(3) * pow(zenithFwhm, c(4)) + c(5)) + c(6)
-      Percentile.FromBigDecimal.getOption(result).getOrElse:
-        if (result < 0) Percentile.Min else Percentile.Max
+      IntCentiPercent.FromBigDecimal.getOption(result).getOrElse:
+        if (result < 0) IntCentiPercent.Min else IntCentiPercent.Max
 
   given Display[ImageQuality] = Display.byShortName(_.label)
 
