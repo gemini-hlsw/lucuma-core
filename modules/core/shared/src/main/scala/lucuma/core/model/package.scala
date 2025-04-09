@@ -77,7 +77,7 @@ object AirMassBound extends NewRefined[AirMass, Interval.Closed[1, 3]]:
     unsafeFrom(AirMass.unsafeFrom(b))
 
   extension (a: AirMassBound)
-    def toBigDecimal: BigDecimal = a.s.value
+    def toBigDecimal: BigDecimal = a.value.value.value.value
 
   val Min: AirMassBound = unsafeFromBigDecimal(BigDecimal(1))
   val Max: AirMassBound = unsafeFromBigDecimal(BigDecimal(3))
