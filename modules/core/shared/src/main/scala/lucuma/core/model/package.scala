@@ -11,16 +11,24 @@ import eu.timepit.refined.api.RefinedTypeOps
 import eu.timepit.refined.api.Validate
 import eu.timepit.refined.api.Validate.Plain
 import eu.timepit.refined.boolean.Not
+import eu.timepit.refined.internal.WitnessAs
 import eu.timepit.refined.numeric.GreaterEqual
 import eu.timepit.refined.numeric.Interval
 import eu.timepit.refined.numeric.Less
 import eu.timepit.refined.numeric.NonNegative
+import lucuma.core.math.Declination
+import lucuma.core.math.Lat
 import lucuma.core.optics.Format
-import lucuma.core.util.RefinedNewType
+import lucuma.core.refined.given
+import lucuma.core.util.NewRefined
 import org.typelevel.cats.time.instances.duration.*
 
 import java.time.Duration
 import java.time.temporal.Temporal
+import scala.math.Pi
+import scala.math.abs
+import scala.math.pow
+import scala.math.sin
 
 // Integer Percents
 type ZeroTo100  = Interval.Closed[0, 100]
@@ -30,15 +38,20 @@ object IntPercent extends RefinedTypeOps[IntPercent, Int]
 
 // Store a percentage with two decimals of precision for a 0-100% range
 type CentiPercent    = Interval.Closed[0, 10000]
-object IntCentiPercent extends RefinedNewType[Int, CentiPercent]:
-  val Max = IntCentiPercent.unsafeFrom(10000)
-  val Min = IntCentiPercent.unsafeFrom(0)
+object IntCentiPercent extends NewRefined[Int, CentiPercent]:
+  val Max = unsafeFrom(10000)
+  val Min = unsafeFrom(0)
 
-  val fromBigDecimal: Format[BigDecimal, IntCentiPercent] =
-    Format.apply(d => IntCentiPercent.from((d * 100).toInt).toOption, _.value.value / 100.0)
+  def fromPercent(p: BigDecimal): Either[String, IntCentiPercent] =
+    from((p * 100).toInt)
+  def unsafeFromPercent(p: BigDecimal): IntCentiPercent =
+    unsafeFrom((p * 100).toInt)
+
+  val FromBigDecimal: Format[BigDecimal, IntCentiPercent] =
+    Format.apply(d => fromPercent(d).toOption, _.toPercent)
 
   extension(a: IntCentiPercent)
-    def toPercent: Double = a.value.value / 100.0
+    def toPercent: BigDecimal = a.value.value / 100.0
     def *(b: IntCentiPercent): IntCentiPercent =
       // Given a and b are in the range 0-1 the result is also in the range 0-1
       IntCentiPercent.unsafeFrom((a.value.value * b.value.value) / 10000)
@@ -46,8 +59,37 @@ object IntCentiPercent extends RefinedNewType[Int, CentiPercent]:
 
 type IntCentiPercent = IntCentiPercent.Type
 
-type AirMassPredicate = Not[Less[1]]
-type AirMassValue     = BigDecimal Refined AirMassPredicate
+object AirMass extends NewRefined[BigDecimal, Not[Less[1]]]:
+  /**
+    * Minimum airmass that a given declination reaches from a given latitude.
+    */
+  def minimumFor(dec: Declination, latitude: Lat): AirMass =
+    // Maximum elevation in degrees
+    val elevation = 90.0 - abs(dec.toAngle.toSignedDoubleDegrees - latitude.toAngle.toSignedDoubleDegrees)
+    AirMass.from(BigDecimal(1.0 / sin((elevation + 244.0 / (165.0 + 47.0 * pow(elevation, 1.1))) * Pi / 180.0))).getOrElse(sys.error("Not possible"))
+
+type AirMass = AirMass.Type
+
+object AirMassBound extends NewRefined[AirMass, Interval.Closed[1, 3]]:
+  def fromBigDecimal(b: BigDecimal): Either[String, AirMassBound] =
+    AirMass.from(b).flatMap(from(_))
+  def unsafeFromBigDecimal(b: BigDecimal): AirMassBound =
+    unsafeFrom(AirMass.unsafeFrom(b))
+
+  extension (a: AirMassBound)
+    def toBigDecimal: BigDecimal = a.value.value.value.value
+
+  val Min: AirMassBound = unsafeFromBigDecimal(BigDecimal(1))
+  val Max: AirMassBound = unsafeFromBigDecimal(BigDecimal(3))
+type AirMassBound = AirMassBound.Type
+
+object HourAngleBound extends NewRefined[BigDecimal, Interval.Closed[-5, 5]]:
+  extension (h: HourAngleBound)
+    def toBigDecimal: BigDecimal = h.value.value
+
+  lazy val Min: HourAngleBound = unsafeFrom(-5)
+  lazy val Max: HourAngleBound = unsafeFrom(5)
+type HourAngleBound = HourAngleBound.Type
 
 // Non negative duration
 given Plain[Duration, GreaterEqual[0]] =

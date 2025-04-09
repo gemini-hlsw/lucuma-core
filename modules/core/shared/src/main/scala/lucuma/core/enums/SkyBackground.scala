@@ -3,14 +3,16 @@
 
 package lucuma.core.enums
 
+import lucuma.core.model.IntCentiPercent
 import lucuma.core.util.Display
 import lucuma.core.util.Enumerated
 
-enum SkyBackground(val tag: String, val label: String) derives Enumerated:
-  case Darkest extends SkyBackground("darkest", "Darkest")
-  case Dark    extends SkyBackground("dark", "Dark") 
-  case Gray    extends SkyBackground("gray", "Gray")
-  case Bright  extends SkyBackground("bright", "Bright")
+/** Percentiles from: https://www.gemini.edu/observing/telescopes-and-sites/sites#SkyBackground */
+enum SkyBackground(val tag: String, val label: String, val percentile: IntCentiPercent) derives Enumerated:
+  case Darkest extends SkyBackground("darkest", "Darkest", IntCentiPercent.FromBigDecimal.getOption(20).get)
+  case Dark    extends SkyBackground("dark", "Dark", IntCentiPercent.unsafeFromPercent(50)) 
+  case Gray    extends SkyBackground("gray", "Gray", IntCentiPercent.unsafeFromPercent(80))
+  case Bright  extends SkyBackground("bright", "Bright", IntCentiPercent.unsafeFromPercent(100))
 
 object SkyBackground:
   given Display[SkyBackground] = Display.byShortName(_.label)

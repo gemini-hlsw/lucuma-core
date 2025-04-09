@@ -21,6 +21,6 @@ class EmailAddressSuite extends munit.DisciplineSuite {
   test("typeclasses") {
     checkAll("EmailAddress", EqTests[EmailAddress].eqv)
     checkAll("EmailAddressCodec", CodecTests[EmailAddress].codec)
-    checkAll("EmailAddress.from", PrismTests(EmailAddress.from))
+    checkAll("EmailAddress.from", PrismTests(EmailAddress.From))
   }
 }

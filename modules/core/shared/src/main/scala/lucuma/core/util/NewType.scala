@@ -6,10 +6,13 @@ package lucuma.core.util
 import cats.Eq
 import cats.Monoid
 import cats.Order
+import coulomb.Quantity
 import eu.timepit.refined.api.*
 import io.circe.Decoder
 import io.circe.Encoder
+import lucuma.core.optics.quantityIso
 import lucuma.core.optics.refinedPrism
+import lucuma.core.refined.RefinedTypeAux
 import monocle.Iso
 import monocle.Prism
 
@@ -35,7 +38,7 @@ trait NewType[Wrapped]{
 
   inline def apply(w: Wrapped): Type = w
 
-  val value: Iso[Type, Wrapped] = Iso[Type, Wrapped](_.value)(apply)
+  val Value: Iso[Type, Wrapped] = Iso[Type, Wrapped](_.value)(apply)
 
   given NewTypeGen[Type, Wrapped] = new NewTypeGen[Type, Wrapped]:
     def wrap(w: Wrapped): Type = w
@@ -56,18 +59,38 @@ trait NewType[Wrapped]{
   given (using ord:  Order[Wrapped]): Order[Type]                              = ord
   given (using ord:  Ordering[Wrapped]): Ordering[Type]                        = ord
 }
+
 /**
  * Usage:
  * ```
- * object Score extends RefinedNewType[Int, Not[Less[0]] And Not[Greater[5]]]
- * type Score = Score.Type
+ * object Probability extends NewRefined[BigDecimal, Interval.Closed[0, 1]]
+ * type Probability = Probability.Type
  * ```
  */
-trait RefinedNewType[T, P](using RefinedType.AuxT[T Refined P, T]) extends NewType[T Refined P]:
-  private val TypeOps                                  = new RefinedTypeOps[T Refined P, T]
-  def from(using Validate[T, P]): Prism[T, Type]       = refinedPrism.andThen(value.reverse)
-  def from(t:       T): Either[String, Type]           = TypeOps.from(t).map(apply(_))
-  def unsafeFrom(x: T): Type                           = apply(TypeOps.unsafeFrom(x))
+trait NewRefined[T, P](using rt: RefinedTypeAux[T, P]) extends NewType[T Refined P]:
+  type BaseType  = T
+  type Predicate = P
+  val From: Prism[T, Type]                   = refinedPrism(using rt.validate).andThen(Value.reverse)
+  def from(t:       T): Either[String, Type] = rt.refine(t).map(apply(_))
+  def unsafeFrom(x: T): Type                 = apply(rt.unsafeRefine(x))
+
+/**
+  * Usage:
+  * ```
+  * object Score extends NewRefinedQuantity[Int, Interval.Closed[0, 5], Stars]
+  * type Score = Score.Type
+  * ```
+  */
+trait NewRefinedQuantity[T, P, U](using rt: RefinedTypeAux[T, P]) extends NewType[Quantity[T Refined P, U]]:
+  type BaseType  = T
+  type Predicate = P
+  type Units     = U
+  val From: Prism[T, Type]                                  = refinedPrism(using rt.validate).andThen(quantityIso.reverse).andThen(Value.reverse)
+  def from(t:       T): Either[String, Type]                = rt.refine(t).map(quantityIso.reverseGet(_)).map(apply(_))
+  def unsafeFrom(x: T): Type                                = apply(quantityIso.reverseGet(rt.unsafeRefine(x)))
+  def fromQuantity(q: Quantity[T, U]): Either[String, Type] = from(q.value)
+  def unsafeFromQuantity(q: Quantity[T, U]): Type           = unsafeFrom(q.value)
+  def fromRefined(r: Refined[T, P]): Type                   = apply(quantityIso.reverseGet(r))
 
 /**
  * Usage:

@@ -10,6 +10,7 @@ import lucuma.core.util.arb.ArbNewType
 import munit.DisciplineSuite
 import org.scalacheck.Prop.*
 
+import java.math.MathContext
 import java.math.RoundingMode
 
 final class ImageQualitySuite extends DisciplineSuite {
@@ -19,7 +20,7 @@ final class ImageQualitySuite extends DisciplineSuite {
   test("toArcSeconds") {
     forAll { (a: ImageQuality) =>
       assertEquals(
-        a.toArcSeconds.value.toBigDecimal(6, RoundingMode.HALF_UP),
+        a.toArcSeconds.round(MathContext(6, RoundingMode.HALF_UP)),
         Angle.signedDecimalArcseconds.get(a.toAngle)
       )
     }

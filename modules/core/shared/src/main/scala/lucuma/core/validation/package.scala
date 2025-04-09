@@ -31,11 +31,15 @@ package object validation {
   type ValidFormatNec[E, A, B] = ValidFormat[NonEmptyChain[E], A, B]
   type InputValidFormat[A]     = ValidFormatNec[NonEmptyString, String, A]
 
+  extension(s: String)
+    def toEitherErrorsUnsafe: NonEmptyChain[NonEmptyString] =
+      NonEmptyChain(NonEmptyString.unsafeFrom(s))
+
   extension[A](e: Either[String, A])
 
     /** Convert an `Either[String, A]` to an `Either[Errors, A]` */
     def toEitherErrorsUnsafe: EitherErrors[A] =
-      e.leftMap(s => NonEmptyChain(NonEmptyString.unsafeFrom(s)))
+      e.leftMap(_.toEitherErrorsUnsafe)
 
   extension[A](e: Either[NonEmptyString, A])
 
@@ -50,7 +54,7 @@ package object validation {
   extension[A, B](self: ValidSplitEpi[String, A, B])
     def toErrorsValidSplitEpiUnsafe: ValidSplitEpi[Errors, A, B] =
       ValidSplitEpi(
-        self.getValid.andThen(_.leftMap(s => NonEmptyChain(NonEmptyString.unsafeFrom(s)))),
+        self.getValid.andThen(_.leftMap(_.toEitherErrorsUnsafe)),
         self.reverseGet
       )
 
@@ -61,7 +65,7 @@ package object validation {
   extension[A, B](self: ValidWedge[String, A, B])
     def toErrorsValidWedgeUnsafe: ValidWedge[Errors, A, B] =
       ValidWedge(
-        self.getValid.andThen(_.leftMap(s => NonEmptyChain(NonEmptyString.unsafeFrom(s)))),
+        self.getValid.andThen(_.leftMap(_.toEitherErrorsUnsafe)),
         self.reverseGet
       )
 

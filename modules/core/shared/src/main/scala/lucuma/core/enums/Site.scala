@@ -12,10 +12,12 @@ import coulomb.units.si.Meter
 import eu.timepit.refined.numeric.*
 import eu.timepit.refined.types.numeric.NonNegInt
 import lucuma.core.math.Angle
+import lucuma.core.math.Declination
 import lucuma.core.math.Lat
 import lucuma.core.math.Lon
 import lucuma.core.math.Place
 import lucuma.core.math.units.*
+import lucuma.core.model.AirMass
 import lucuma.core.model.ObservingNight
 import lucuma.core.util.DateInterval
 import lucuma.core.util.Enumerated
@@ -46,6 +48,12 @@ sealed abstract class Site(
     val end      = ObservingNight.fromSiteAndLocalDate(this, active.end).end
     val duration = Duration.between(start, end)
     start.plus(duration.dividedBy(2L))
+
+  /**
+    * Minimum airmass that a given declination reaches from this site.
+    */
+  def minimumAirMassFor(dec: Declination): AirMass =
+    AirMass.minimumFor(dec, latitude)
 }
 
 object Site {

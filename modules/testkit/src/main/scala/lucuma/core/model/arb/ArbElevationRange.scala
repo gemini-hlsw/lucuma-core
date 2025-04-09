@@ -5,47 +5,48 @@ package lucuma.core.model
 package arb
 
 import eu.timepit.refined.scalacheck.numeric.*
-import lucuma.core.math.arb.ArbRefined
+import lucuma.core.math.arb.ArbRefined.given
+import lucuma.core.util.arb.ArbNewType.given
 import org.scalacheck.*
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Cogen.*
 
-trait ArbElevationRange {
-  import ArbRefined.given
 
-  given Arbitrary[ElevationRange.AirMass] =
+trait ArbElevationRange {
+
+  given Arbitrary[ElevationRange.ByAirMass] =
     Arbitrary {
       for {
-        min <- arbitrary[ElevationRange.AirMass.DecimalValue]
-        max <- arbitrary[ElevationRange.AirMass.DecimalValue]
-      } yield ElevationRange.AirMass.fromDecimalValues.get((min, max))
+        min <- arbitrary[AirMassBound]
+        max <- arbitrary[AirMassBound]
+      } yield ElevationRange.ByAirMass.FromBounds.get((min, max))
     }
 
-  given Cogen[ElevationRange.AirMass] =
-    Cogen[(ElevationRange.AirMass.DecimalValue, ElevationRange.AirMass.DecimalValue)]
+  given Cogen[ElevationRange.ByAirMass] =
+    Cogen[(AirMassBound, AirMassBound)]
       .contramap(t => (t.min, t.max))
 
-  given Arbitrary[ElevationRange.HourAngle] =
+  given Arbitrary[ElevationRange.ByHourAngle] =
     Arbitrary {
       for {
-        min <- arbitrary[ElevationRange.HourAngle.DecimalHour]
-        max <- arbitrary[ElevationRange.HourAngle.DecimalHour]
-      } yield ElevationRange.HourAngle.fromDecimalHours.get((min, max))
+        min <- arbitrary[HourAngleBound]
+        max <- arbitrary[HourAngleBound]
+      } yield ElevationRange.ByHourAngle.FromBounds.get((min, max))
     }
 
-  given Cogen[ElevationRange.HourAngle] =
-    Cogen[(ElevationRange.HourAngle.DecimalHour, ElevationRange.HourAngle.DecimalHour)]
+  given Cogen[ElevationRange.ByHourAngle] =
+    Cogen[(HourAngleBound, HourAngleBound)]
       .contramap(t => (t.minHours, t.maxHours))
 
   given Arbitrary[ElevationRange] =
     Arbitrary(
-      Gen.oneOf(arbitrary[ElevationRange.AirMass], arbitrary[ElevationRange.HourAngle])
+      Gen.oneOf(arbitrary[ElevationRange.ByAirMass], arbitrary[ElevationRange.ByHourAngle])
     )
 
   given Cogen[ElevationRange] =
-    Cogen[Either[ElevationRange.AirMass, ElevationRange.HourAngle]].contramap(_ match {
-      case am @ ElevationRange.AirMass(_, _)   => Left(am)
-      case ha @ ElevationRange.HourAngle(_, _) => Right(ha)
+    Cogen[Either[ElevationRange.ByAirMass, ElevationRange.ByHourAngle]].contramap(_ match {
+      case am @ ElevationRange.ByAirMass(_, _)   => Left(am)
+      case ha @ ElevationRange.ByHourAngle(_, _) => Right(ha)
     })
 }
 

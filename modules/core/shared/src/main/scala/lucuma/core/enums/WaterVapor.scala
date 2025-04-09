@@ -3,14 +3,16 @@
 
 package lucuma.core.enums
 
+import lucuma.core.model.IntCentiPercent
 import lucuma.core.util.Display
 import lucuma.core.util.Enumerated
 
-enum WaterVapor(val tag: String, val label: String) derives Enumerated:
-  case VeryDry extends WaterVapor("very_dry", "Very Dry")
-  case Dry     extends WaterVapor("dry", "Dry")
-  case Median  extends WaterVapor("median", "Median")
-  case Wet     extends WaterVapor("wet", "Wet")
+/** Percentiles from: https://www.gemini.edu/observing/telescopes-and-sites/sites#SkyTransparencyWater */
+enum WaterVapor(val tag: String, val label: String, val percentile: IntCentiPercent) derives Enumerated:
+  case VeryDry extends WaterVapor("very_dry", "Very Dry", IntCentiPercent.unsafeFromPercent(20))
+  case Dry     extends WaterVapor("dry", "Dry", IntCentiPercent.unsafeFromPercent(50))
+  case Median  extends WaterVapor("median", "Median", IntCentiPercent.unsafeFromPercent(80))
+  case Wet     extends WaterVapor("wet", "Wet",  IntCentiPercent.unsafeFromPercent(100))
 
 object WaterVapor:
   given Display[WaterVapor] = Display.byShortName(_.label)

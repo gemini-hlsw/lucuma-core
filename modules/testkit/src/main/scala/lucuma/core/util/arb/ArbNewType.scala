@@ -8,10 +8,10 @@ import org.scalacheck.*
 import org.scalacheck.Arbitrary.arbitrary
 
 trait ArbNewType:
-  given [A, W](using gen: NewTypeGen[A, W], arbw: Arbitrary[W]): Arbitrary[A] =
+  given arbitraryNewType[A, W](using gen: NewTypeGen[A, W], arbw: Arbitrary[W]): Arbitrary[A] =
     Arbitrary(arbitrary[W].map(gen.wrap(_)))
 
-  given [A, W](using gen: NewTypeGen[A, W], cogenw: Cogen[W]): Cogen[A] =
+  given cogenNewType[A, W](using gen: NewTypeGen[A, W], cogenw: Cogen[W]): Cogen[A] =
     Cogen[W].contramap(gen.unwrap(_))
 
 object ArbNewType extends ArbNewType

@@ -12,7 +12,7 @@ import io.circe.Decoder
 import io.circe.DecodingFailure
 import io.circe.Encoder
 import io.circe.Json
-import lucuma.core.util.RefinedNewType
+import lucuma.core.util.NewRefined
 import monocle.Prism
 
 import scala.util.matching.Regex
@@ -29,7 +29,7 @@ case class UserInvitation(id: UserInvitation.Id, body: String)
 
 object UserInvitation {
 
-  object Id extends RefinedNewType[Long, Positive] {
+  object Id extends NewRefined[Long, Positive] {
 
     /** Id from hex string. */
     val fromString: Prism[String, Id] =

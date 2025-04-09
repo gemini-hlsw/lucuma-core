@@ -54,7 +54,7 @@ case class SkyBrightnessConstraint(min: Double, max: Double)
       .getOrElse(false)
 }
 
-case class AirmassConstraint(min: Double, max: Double)
+case class AirMassConstraint(min: Double, max: Double)
     extends Constraint[SkyCalcResults, (Double, Declination)] {
 
   private val MinElevation: Declination =
