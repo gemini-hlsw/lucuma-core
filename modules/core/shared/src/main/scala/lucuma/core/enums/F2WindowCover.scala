@@ -19,9 +19,3 @@ enum F2WindowCover(
 
   case Open  extends F2WindowCover("Open",  "Open",  "Open")
   case Close extends F2WindowCover("Close", "Close", "Close")
-
-object F2WindowCover:
-  def fromStepType(stepType: StepType): F2WindowCover =
-    stepType match
-      case StepType.Dark => F2WindowCover.Close
-      case _             => F2WindowCover.Open
