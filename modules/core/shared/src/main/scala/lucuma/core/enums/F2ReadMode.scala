@@ -11,7 +11,7 @@ import lucuma.core.util.TimeSpan
 
 /**
  * Enumerated type for Flamingos2 read modes.
- * @group Enumerations (Generated)
+ * @group Enumerations
  */
 enum F2ReadMode(
   val tag: String,
@@ -21,11 +21,11 @@ enum F2ReadMode(
   val minimumExposureTime: TimeSpan,
   val recommendedExposureTime: TimeSpan,
   val readoutTime: TimeSpan,
-  val readCount: Int,
+  val readCount: F2Reads,
   val readNoise: Double
 ) derives Enumerated:
 
-  case Bright extends F2ReadMode("Bright", "bright", "Bright Object", "Strong Source", 1500.msTimeSpan, 5000.msTimeSpan, 8000.msTimeSpan, 1, 11.7)
-  case Medium extends F2ReadMode("Medium", "medium", "Medium Object", "Medium Source", 6.secTimeSpan,   21.secTimeSpan,  14.secTimeSpan,  4, 6.0)
-  case Faint  extends F2ReadMode("Faint",  "faint",  "Faint Object",  "Weak Source",   12.secTimeSpan,  85.secTimeSpan,  20.secTimeSpan,  8, 5.0)
+  case Bright extends F2ReadMode("Bright", "bright", "Bright Object", "Strong Source", 1500.msTimeSpan, 5000.msTimeSpan, 8000.msTimeSpan, F2Reads.Reads_1, 11.7)
+  case Medium extends F2ReadMode("Medium", "medium", "Medium Object", "Medium Source", 6.secTimeSpan,   21.secTimeSpan,  14.secTimeSpan,  F2Reads.Reads_4, 6.0)
+  case Faint  extends F2ReadMode("Faint",  "faint",  "Faint Object",  "Weak Source",   12.secTimeSpan,  85.secTimeSpan,  20.secTimeSpan,  F2Reads.Reads_8, 5.0)
 
