@@ -9,7 +9,7 @@ import lucuma.core.util.Enumerated
 
 /**
  * Enumerated type for Flamingos2 window cover state.
- * @group Enumerations (Generated)
+ * @group Enumerations
  */
 enum F2WindowCover(
   val tag: String,
