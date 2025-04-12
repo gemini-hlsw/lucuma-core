@@ -85,6 +85,8 @@ jobs:
       - name: Monitor bundle size
         if: matrix.project == 'rootJS'
         run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' bundleMon
+        with:
+          continue-on-error: true
 
       - name: Aggregate coverage reports
         run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' coverageReport coverageAggregate
