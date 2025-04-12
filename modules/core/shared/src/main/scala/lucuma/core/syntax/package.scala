@@ -21,3 +21,5 @@ object all
     with ToTreeMapOps
     with ToTreeSetCompanionOps
     with ToEnumeratedOps
+    with timespan
+    with validation

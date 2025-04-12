@@ -9,6 +9,7 @@ import eu.timepit.refined.numeric.Positive
 import eu.timepit.refined.types.numeric.PosBigDecimal
 import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.core.optics.*
+import lucuma.core.syntax.validation.*
 import lucuma.refined.*
 import monocle.Iso
 import monocle.Prism

@@ -9,6 +9,7 @@ import lucuma.core.math.Epoch
 import lucuma.core.math.HourAngle
 import lucuma.core.math.RightAscension
 import lucuma.core.syntax.string.*
+import lucuma.core.syntax.validation.*
 import lucuma.core.validation.*
 import lucuma.refined.*
 import spire.math.Rational

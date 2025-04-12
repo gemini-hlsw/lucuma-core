@@ -3,8 +3,11 @@
 
 package lucuma.core.model.validation
 
-import eu.timepit.refined.cats.*
+import coulomb.*
+import coulomb.ops.algebra.cats.all.given
+import eu.timepit.refined.cats.given
 import eu.timepit.refined.scalacheck.all.*
+import lucuma.core.math.arb.ArbQuantity.given
 import lucuma.core.math.arb.ArbRefined.given
 import lucuma.core.optics.laws.discipline.ValidWedgeTests
 import lucuma.core.util.arb.ArbNewType.given
@@ -12,12 +15,22 @@ import munit.DisciplineSuite
 
 final class ModelValidatorsSuite extends DisciplineSuite {
   checkAll(
-    "airMassElevationRangeValidWedge",
+    "AirMassElevationRangeValidWedge",
     ValidWedgeTests(ModelValidators.AirMassElevationRangeValidWedge).validWedgeLaws
   )
 
   checkAll(
-    "hourAngleElevationRangeValidWedge",
+    "HourAngleElevationRangeValidWedge",
     ValidWedgeTests(ModelValidators.HourAngleElevationRangeValidWedge).validWedgeLaws
+  )
+
+  checkAll(
+    "ImageQualityValidWedge",
+    ValidWedgeTests(ModelValidators.ImageQualityValidWedge).validWedgeLaws
+  )
+
+  checkAll(
+    "CloudExtinctionValidWedge",
+    ValidWedgeTests(ModelValidators.CloudExtinctionValidWedge).validWedgeLaws
   )
 }

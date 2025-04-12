@@ -17,6 +17,7 @@ import lucuma.core.math.Wavelength
 import lucuma.core.math.erf
 import lucuma.core.math.units.*
 import lucuma.core.math.units.given
+import lucuma.core.optics.Format
 import lucuma.core.util.Display
 import lucuma.core.util.Enumerated
 import lucuma.core.util.NewRefinedQuantity
@@ -30,6 +31,12 @@ object ImageQuality extends NewRefinedQuantity[Short, ImageQualityPredicate, Cen
   inline def unsafeFromCentiArcSeconds(value: Short): ImageQuality           = unsafeFrom(value)
   inline def fromArcSeconds(value: BigDecimal): Either[String, ImageQuality] = fromCentiArcSeconds((value * 100).toShort)
   inline def unsafeFromArcSeconds(value: BigDecimal): ImageQuality           = unsafeFromCentiArcSeconds((value * 100).toShort)
+
+  val FromArcSeconds: Format[BigDecimal, ImageQuality] =
+    Format(
+      d => From.getOption(d.bigDecimal.movePointRight(2).shortValue),
+      e => BigDecimal(From.reverseGet(e)).bigDecimal.movePointLeft(2) 
+    )
 
   extension (iq: ImageQuality)
     def toCentiArcSeconds: Short = iq.value.value.value

@@ -19,6 +19,7 @@ import eu.timepit.refined.types.numeric.PosLong
 import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.core.optics.*
 import lucuma.core.syntax.string.*
+import lucuma.core.syntax.validation.*
 import lucuma.refined.*
 import monocle.Iso
 import monocle.Prism
@@ -150,7 +151,7 @@ object InputValidSplitEpi {
    * `InputValidSplitEpi` for `BigDecimal`.
    *
    * Does not, and cannot, format to a particular number of decimal places. For that you need a
-   * `TruncatedBigDecimal`.
+   * `truncatedBigDecimal`.
    */
   val bigDecimal: InputValidSplitEpi[BigDecimal] =
     InputValidSplitEpi(
