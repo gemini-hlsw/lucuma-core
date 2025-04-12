@@ -60,6 +60,13 @@ trait ToStringOps {
     def toKebabCase: String =
       kebabCaseTransformation(self)
 
+    /**
+    * Converts the `String` to "sentence case" (eg "Foo-bar").
+    */
+    def toSentenceCase: String =
+      if (self.length == 0) self
+      else if (self.length == 1) self.toUpperCase
+      else s"${self.charAt(0).toUpper}${self.substring(1)}"
 }
 
 object string extends ToStringOps
