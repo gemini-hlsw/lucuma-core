@@ -104,6 +104,17 @@ abstract class ValidWedge[E, A, B] extends ValidFormat[E, A, B] with Serializabl
           self.getValid(a).map(_.some),
       (b: Option[B]) => b.foldMap(self.reverseGet)
     )
+
+  /** Build a `ValidWedge` for an `Option` that doesn't allow empty values */
+  def nonEmpty[C](msg: E)(using B =:= Option[C], Monoid[A], Eq[A]): ValidWedge[E, A, B] =
+    ValidWedge(
+      (a: A) =>
+        if (a.isEmpty)
+          Left(msg)
+        else
+          self.getValid(a),
+      self.reverseGet
+    )
 }
 
 object ValidWedge {

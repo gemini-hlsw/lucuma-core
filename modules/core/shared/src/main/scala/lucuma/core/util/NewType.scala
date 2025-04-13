@@ -85,7 +85,9 @@ trait NewRefinedQuantity[T, P, U](using rt: RefinedTypeAux[T, P]) extends NewTyp
   type BaseType  = T
   type Predicate = P
   type Units     = U
-  val From: Prism[T, Type]                                  = refinedPrism(using rt.validate).andThen(quantityIso.reverse).andThen(Value.reverse)
+  val FromRefined: Iso[Refined[T, P], Type]                 = quantityIso.reverse.andThen(Value.reverse)
+  val From: Prism[T, Type]                                  = refinedPrism(using rt.validate).andThen(FromRefined)
+  val FromQuantity: Prism[Quantity[T, U], Type]             = quantityIso.andThen(From)
   def from(t:       T): Either[String, Type]                = rt.refine(t).map(quantityIso.reverseGet(_)).map(apply(_))
   def unsafeFrom(x: T): Type                                = apply(quantityIso.reverseGet(rt.unsafeRefine(x)))
   def fromQuantity(q: Quantity[T, U]): Either[String, Type] = from(q.value)

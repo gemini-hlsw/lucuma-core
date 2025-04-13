@@ -120,6 +120,17 @@ abstract class ValidSplitEpi[E, A, B] extends ValidFormat[E, A, B] with Serializ
       (b: Option[B]) => b.foldMap(self.reverseGet)
     )
 
+  /** Build a `ValidSplitEpi` for an `Option` that doesn't allow empty values */
+  def nonEmpty[C](msg: E)(using B =:= Option[C], Monoid[A], Eq[A]): ValidSplitEpi[E, A, B] =
+    ValidSplitEpi(
+      (a: A) =>
+        if (a.isEmpty)
+          Left(msg)
+        else
+          self.getValid(a),
+      self.reverseGet
+    )
+
   /**
    * Build `ValidSplitEpi` from another one, refining the return type with predicate `P`.
    */
