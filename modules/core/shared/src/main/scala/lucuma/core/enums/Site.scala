@@ -77,3 +77,6 @@ enum Site(
     ),
     "Cerro Pachon"
   )
+
+object Site:
+  val all: List[Site] = List(GN, GS)
