@@ -5,67 +5,30 @@ package lucuma
 package core
 package enums
 
-import cats.syntax.eq.*
 import coulomb.*
-import coulomb.policy.spire.standard.given
-import coulomb.syntax.*
 import eu.timepit.refined.types.numeric.PosInt
-import lucuma.core.math.Angle
 import lucuma.core.math.Wavelength
 import lucuma.core.math.WavelengthDelta
-import lucuma.core.math.units.{*, given}
+import lucuma.core.math.units.*
 import lucuma.core.util.Enumerated
 import spire.math.Rational
 
 /**
  * Enumerated type for GMOS North gratings.
- * @group Enumerations (Generated)
  * @see https://www.gemini.edu/instrumentation/gmos/components#Gratings
  */
-sealed abstract class GmosNorthGrating(
+enum GmosNorthGrating(
   val tag:                  String,
   val shortName:            String,
   val longName:             String,
   val rulingDensity:        Int,
   val dispersion:           Quantity[Rational, NanometersPerPixel],
   val simultaneousCoverage: WavelengthDelta,
-  val blazeWavelength:      Wavelength,
-  val referenceResolution:  PosInt
-) extends Product with Serializable {
+  override val blazeWavelength:      Wavelength,
+  override val referenceResolution:  PosInt
+) extends GmosGrating derives Enumerated:
 
-  /**
-   * Δλ for 0.5" slit.
-   * @see http://hyperphysics.phy-astr.gsu.edu/hbase/phyopt/gratres.html
-   */
-  private def Δλ: Double =
-    blazeWavelength.nm.value.value.doubleValue / referenceResolution.value.toDouble
-
-  /** Resolution at λ with the specified slit width. */
-  def resolution(λ: Wavelength, slitWidth: Angle): Int =
-    ((λ.nm.value.value.doubleValue / Δλ) * (0.5 / Angle.signedDecimalArcseconds.get(slitWidth).toDouble)).toInt
-
-  /** Resolution at λ with the effective slit width of the given FPU. */
-  def resolution(λ: Wavelength, fpu: GmosNorthFpu): Int =
-    resolution(λ, fpu.effectiveSlitWidth)
-
-}
-
-object GmosNorthGrating {
-
-  private def pmToDispersion(pm: Int): Quantity[Rational, NanometersPerPixel] =
-    PosInt.unsafeFrom(pm).withUnit[PicometersPerPixel].toValue[Rational].toUnit[NanometersPerPixel]
-
-  private def nmToWavelengthDelta(value: Int): WavelengthDelta =
-    WavelengthDelta.fromIntNanometers(value).get
-
-  private def blazeNm(value: Int): Wavelength =
-    Wavelength.fromIntNanometers(value).get
-
-  private def resolution(value: Int): PosInt =
-    PosInt.unsafeFrom(value)
-
-  /** @group Constructors */
-  case object B1200_G5301 extends GmosNorthGrating(
+  case B1200_G5301 extends GmosNorthGrating(
     tag                  = "B1200_G5301",
     shortName            = "B1200",
     longName             = "B1200_G5301",
@@ -76,8 +39,7 @@ object GmosNorthGrating {
     referenceResolution  = resolution(3744)
   )
 
-  /** @group Constructors */
-  case object R831_G5302  extends GmosNorthGrating(
+  case R831_G5302  extends GmosNorthGrating(
     tag                  = "R831_G5302",
     shortName            = "R831",
     longName             = "R831_G5302",
@@ -88,8 +50,7 @@ object GmosNorthGrating {
     referenceResolution  = resolution(4396)
   )
 
-  /** @group Constructors */
-  case object R600_G5304  extends GmosNorthGrating(
+  case R600_G5304  extends GmosNorthGrating(
     tag                  = "R600_G5304",
     shortName            = "R600",
     longName             = "R600_G5304",
@@ -100,8 +61,7 @@ object GmosNorthGrating {
     referenceResolution  = resolution(3744)
   )
 
-  /** @group Constructors */
-  case object B480_G5309  extends GmosNorthGrating(
+  case B480_G5309  extends GmosNorthGrating(
     tag                  = "B480_G5309",
     shortName            = "B480",
     longName             = "B480_G5309",
@@ -112,8 +72,7 @@ object GmosNorthGrating {
     referenceResolution  = resolution(1520)
   )
 
-  /** @group Constructors */
-  case object R400_G5305  extends GmosNorthGrating(
+  case R400_G5305  extends GmosNorthGrating(
     tag                  = "R400_G5305",
     shortName            = "R400",
     longName             = "R400_G5305",
@@ -124,8 +83,7 @@ object GmosNorthGrating {
     referenceResolution  = resolution(1918)
   )
 
-  /** @group Constructors */
-  case object R150_G5308  extends GmosNorthGrating(
+  case R150_G5308  extends GmosNorthGrating(
     tag                  = "R150_G5308",
     shortName            = "R150",
     longName             = "R150_G5308",
@@ -135,26 +93,3 @@ object GmosNorthGrating {
     blazeWavelength      = blazeNm( 717),
     referenceResolution  = resolution(631)
   )
-
-  /** All members of GmosNorthDisperser, in canonical order. */
-  lazy val all: List[GmosNorthGrating] =
-    List(B1200_G5301, R831_G5302, R600_G5304, B480_G5309, R400_G5305, R150_G5308)
-
-  /** Select the member of GmosNorthDisperser with the given tag, if any. */
-  def fromTag(s: String): Option[GmosNorthGrating] =
-    all.find(_.tag === s)
-
-  /** Select the member of GmosNorthDisperser with the given tag, throwing if absent. */
-  def unsafeFromTag(s: String): GmosNorthGrating =
-    fromTag(s).getOrElse(throw new NoSuchElementException(s"GmosNorthDisperser: Invalid tag: '$s'"))
-
-  /** @group Typeclass Instances */
-  implicit val GmosNorthGratingEnumerated: Enumerated[GmosNorthGrating] =
-    new Enumerated[GmosNorthGrating] {
-      def all: List[GmosNorthGrating] = GmosNorthGrating.all
-      def tag(a: GmosNorthGrating): String = a.tag
-      override def unsafeFromTag(s: String): GmosNorthGrating =
-        GmosNorthGrating.unsafeFromTag(s)
-    }
-
-}

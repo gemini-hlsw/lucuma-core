@@ -5,7 +5,6 @@ package lucuma
 package core
 package enums
 
-import cats.syntax.eq.*
 import coulomb.*
 import coulomb.syntax.*
 import coulomb.units.si.Meter
@@ -28,16 +27,14 @@ import java.time.ZoneId
 
 /**
   * Enumerated type for Gemini observing sites.
-  * @group Enumerations (Generated)
   */
-sealed abstract class Site(
+enum Site(
   val tag:       String,
   val shortName: String,
   val longName:  String,
   val place:     Place,
   val mountain:  String
-) extends Product
-    with Serializable {
+) derives Enumerated:
   val latitude: Lat                        = place.latitude
   val longitude: Lon                       = place.longitude
   val altitude: Quantity[NonNegInt, Meter] = place.altitude
@@ -54,12 +51,8 @@ sealed abstract class Site(
     */
   def minimumAirMassFor(dec: Declination): AirMass =
     AirMass.minimumFor(dec, latitude)
-}
 
-object Site {
-
-  /** @group Constructors */
-  case object GN
+  case GN
       extends Site("GN",
                    "GN",
                    "Gemini North",
@@ -72,39 +65,18 @@ object Site {
                    "Mauna Kea"
       )
 
-  /** @group Constructors */
-  case object GS
-      extends Site("GS",
-                   "GS",
-                   "Gemini South",
-                   Place(
-                     Lat.fromAngleWithCarry(Angle.fromDoubleDegrees(-30.2407494))._1,
-                     Lon.fromDoubleDegrees(-70.7366867),
-                     2722.withRefinedUnit[NonNegative, Meter],
-                     ZoneId.of("America/Santiago")
-                   ),
-                   "Cerro Pachon"
-      )
+  case GS extends Site(
+    "GS",
+    "GS",
+    "Gemini South",
+    Place(
+      Lat.fromAngleWithCarry(Angle.fromDoubleDegrees(-30.2407494))._1,
+      Lon.fromDoubleDegrees(-70.7366867),
+      2722.withRefinedUnit[NonNegative, Meter],
+      ZoneId.of("America/Santiago")
+    ),
+    "Cerro Pachon"
+  )
 
-  /** All members of Site, in canonical order. */
-  val all: List[Site] =
-    List(GN, GS)
-
-  /** Select the member of Site with the given tag, if any. */
-  def fromTag(s: String): Option[Site] =
-    all.find(_.tag === s)
-
-  /** Select the member of Site with the given tag, throwing if absent. */
-  def unsafeFromTag(s: String): Site =
-    fromTag(s).getOrElse(throw new NoSuchElementException(s"Site: Invalid tag: '$s'"))
-
-  /** @group Typeclass Instances */
-  implicit val SiteEnumerated: Enumerated[Site] =
-    new Enumerated[Site] {
-      def all = Site.all
-      def tag(a:                    Site)         = a.tag
-      override def unsafeFromTag(s: String): Site =
-        Site.unsafeFromTag(s)
-    }
-
-}
+object Site:
+  val all: List[Site] = List(GN, GS)
