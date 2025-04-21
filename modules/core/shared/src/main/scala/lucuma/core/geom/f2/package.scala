@@ -8,9 +8,9 @@ import coulomb.policy.spire.standard.given
 import coulomb.syntax.*
 import coulomb.units.accepted.*
 import coulomb.units.si.prefixes.*
+import lucuma.core.math.Angle
 import lucuma.core.math.syntax.int.*
-import lucuma.core.math.units.ArcSecondPerMillimeter
-import lucuma.core.math.units.Micrometer
+import lucuma.core.math.units.*
 import spire.std.bigDecimal.*
 
 // Size of probe arm components in mm.
@@ -43,7 +43,10 @@ val LowerPatrolAreaRadius = BigDecimal(268693.9).withUnit[Micrometer]
 // The high limit of the bounding box to the right
 val PatrolAreaHiLimit     = BigDecimal(113000).withUnit[Micrometer]
 
-type F2PlateScale = Quantity[BigDecimal, ArcSecondPerMillimeter]
+val F2PixelScale: PixelScale   = BigDecimal(0.18).withUnit[ArcSecondPerPixel]
+
+def f2SlitWidthPixels(slitWidth: Angle): Quantity[BigDecimal, Pixels] =
+  val widthArcSeconds = Angle.decimalArcseconds.get(slitWidth).withUnit[ArcSecond]
+  widthArcSeconds / F2PixelScale
 
 object all extends F2ScienceAreaGeometry with F2PatrolField
-

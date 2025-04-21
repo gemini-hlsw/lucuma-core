@@ -67,7 +67,7 @@ trait F2ScienceAreaGeometry:
    * @param plateScale the plate scale in arcsec/mm
    * @return           a shape representing the FOV
    */
-  private def imaging(plateScale: F2PlateScale): ShapeExpression =
+  private def imaging(plateScale: PlateScale): ShapeExpression =
     val size = ImagingFOVSize ⨱ plateScale
     ShapeExpression.centeredEllipse(size.toAngle, size.toAngle)
 
@@ -76,7 +76,7 @@ trait F2ScienceAreaGeometry:
    * @param plateScale the plate scale in arcsec/mm
    * @return           a shape representing the FOV
    */
-  private def mosFOV(plateScale: F2PlateScale): ShapeExpression =
+  private def mosFOV(plateScale: PlateScale): ShapeExpression =
     val width  = (MOSFOVWidth ⨱ plateScale).toAngle
     val height = (ImagingFOVSize ⨱ plateScale).toAngle
 
@@ -92,7 +92,7 @@ trait F2ScienceAreaGeometry:
    * @return                 a shape representing the FOV
    */
   private def longslit(
-    plateScale: F2PlateScale,
+    plateScale: PlateScale,
     scienceAreaWidth: Angle
   ): ShapeExpression =
     val slitHeight = LongSlitFOVHeight ⨱ plateScale

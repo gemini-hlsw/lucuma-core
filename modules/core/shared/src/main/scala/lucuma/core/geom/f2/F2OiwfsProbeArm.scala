@@ -22,7 +22,7 @@ import lucuma.core.math.units.*
   */
 trait F2OiwfsProbeArm:
 
-  private def arm(plateScale: F2PlateScale): ShapeExpression = {
+  private def arm(plateScale: PlateScale): ShapeExpression = {
     val scaledLength = (ProbePickoffArmLength ⨱ plateScale).toAngle
     val hm = (PickoffMirrorSize ⨱ plateScale).toAngle.bisect
     val htw = ProbeArmTaperedWidth.bisect
@@ -37,7 +37,7 @@ trait F2OiwfsProbeArm:
     ShapeExpression.polygonAt((x0.p, y0.q), (x1.p, y1.q), (x2.p, y2.q), (x3.p, y3.q), (x4.p, y4.q), (x5.p, y5.q))
   }
 
-  private def pickoff(plateScale: F2PlateScale): ShapeExpression =
+  private def pickoff(plateScale: PlateScale): ShapeExpression =
     val scaledMirrorSize = (PickoffMirrorSize ⨱ plateScale).toAngle
     ShapeExpression.centeredRectangle(scaledMirrorSize, scaledMirrorSize)
 
@@ -45,7 +45,7 @@ trait F2OiwfsProbeArm:
     * Description of the F2 OIWFS probe arm with the pickoff mirror centered
     * at the base position.
     */
-  def shape(plateScale: F2PlateScale): ShapeExpression =
+  def shape(plateScale: PlateScale): ShapeExpression =
     arm(plateScale) ∪ pickoff(plateScale)
 
   /**
@@ -77,7 +77,7 @@ trait F2OiwfsProbeArm:
                        gsOffset:    Offset,
                        offset:      Offset,
                        port:        PortDisposition,
-                       plateScale:  F2PlateScale): Angle = {
+                       plateScale:  PlateScale): Angle = {
     // All calculations are done in arcseconds and just bigdecimal and doubles
     val Q = {
       val P = {
