@@ -3,12 +3,13 @@
 
 package lucuma.core.enums
 
+import lucuma.core.model.PosAngleConstraint
 import lucuma.core.util.Enumerated
 
-enum ObservingModeType(val dbTag: String, val instrument: Instrument):
-  case GmosNorthLongSlit  extends ObservingModeType("gmos_north_long_slit",  Instrument.GmosNorth)
-  case GmosSouthLongSlit  extends ObservingModeType("gmos_south_long_slit",  Instrument.GmosSouth)
-  case Flamingos2LongSlit extends ObservingModeType("flamingos_2_long_slit", Instrument.Flamingos2)
+enum ObservingModeType(val dbTag: String, val instrument: Instrument, val defaultPosAngleConstraint: PosAngleConstraint):
+  case GmosNorthLongSlit  extends ObservingModeType("gmos_north_long_slit",  Instrument.GmosNorth, PosAngleConstraint.AverageParallactic)
+  case GmosSouthLongSlit  extends ObservingModeType("gmos_south_long_slit",  Instrument.GmosSouth, PosAngleConstraint.AverageParallactic)
+  case Flamingos2LongSlit extends ObservingModeType("flamingos_2_long_slit", Instrument.Flamingos2, PosAngleConstraint.AverageParallactic)
 
 object ObservingModeType:
 
