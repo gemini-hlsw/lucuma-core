@@ -7,6 +7,6 @@ import coulomb.*
 import coulomb.syntax.*
 import lucuma.core.math.units.*
 
-val TelescopePlateScale: Quantity[BigDecimal, ArcSecondPerMillimeter] =
+val TelescopePlateScale: PlateScale =
   BigDecimal(1.611444).withUnit[ArcSecondPerMillimeter]
 

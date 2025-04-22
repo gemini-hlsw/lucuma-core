@@ -30,7 +30,7 @@ trait F2PatrolField:
   /**
     * F2 patrol field shape centered at the base position.
     */
-  def patrolField(plateScale: F2PlateScale): ShapeExpression = {
+  def patrolField(plateScale: PlateScale): ShapeExpression = {
     // define the "upper" and "lower" half-circles defining the patrol are
     // -- use full circle for upper smaller one (using only half circle for upper part of figure can
     // -- end in two disjoint areas due to calculation imprecisions, we have to make sure areas overlap

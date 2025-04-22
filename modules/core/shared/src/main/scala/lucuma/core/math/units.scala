@@ -66,6 +66,11 @@ trait units {
   type MicroArcSecondPerYear = MicroArcSecond / Year
 
   type ArcSecondPerMillimeter = ArcSecond / Millimeter
+  type ArcSecondPerPixel      = ArcSecond / Pixels
+
+  // PixelScale/PlateScale
+  type PixelScale = Quantity[BigDecimal, ArcSecondPerPixel]
+  type PlateScale = Quantity[BigDecimal, ArcSecondPerMillimeter]
 
   // Integrated Brightness units
   type VegaMagnitude
