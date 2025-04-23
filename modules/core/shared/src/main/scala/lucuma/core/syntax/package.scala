@@ -4,6 +4,7 @@
 package lucuma.core.syntax
 
 import lucuma.core.math.syntax.ToIntOps
+import lucuma.core.math.syntax.ToUnitsOps
 import lucuma.core.optics.syntax.ToPrismOps
 
 /**
@@ -21,5 +22,6 @@ object all
     with ToTreeMapOps
     with ToTreeSetCompanionOps
     with ToEnumeratedOps
+    with ToUnitsOps
     with timespan
     with validation

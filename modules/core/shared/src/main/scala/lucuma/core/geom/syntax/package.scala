@@ -15,7 +15,7 @@ import lucuma.core.math.Offset
 import lucuma.core.math.units.*
 import spire.std.bigDecimal.*
 
-// Syntax used in the JTS / JVM implementation only.
+// Syntax used in the JTS implementation only.
 object all extends shapeexpression:
   extension[U](q: Quantity[BigDecimal, U])(using UnitConversion[BigDecimal, U, Millimeter])
     def toTelescopePlane: Quantity[BigDecimal, ArcSecond] =
