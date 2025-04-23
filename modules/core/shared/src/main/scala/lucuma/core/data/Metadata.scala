@@ -38,6 +38,7 @@ object Metadata:
             // gn
             case Instrument.GmosNorth  |
                  Instrument.Gnirs      |
+                 Instrument.Gpi        |
                  Instrument.Igrins2    |
                  Instrument.Niri       |
                  Instrument.Alopeke    => PerSite(always, never)
@@ -54,8 +55,7 @@ object Metadata:
                  Instrument.Visitor    => PerSite(always, always)
 
             // future
-            case Instrument.Gpi        |
-                 Instrument.Scorpio    => PerSite(never, never)
+            case Instrument.Scorpio    => PerSite(never, never)
 
           .toMap
 

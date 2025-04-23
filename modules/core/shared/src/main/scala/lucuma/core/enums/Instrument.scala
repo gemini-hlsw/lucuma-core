@@ -9,9 +9,9 @@ import eu.timepit.refined.collection.NonEmpty
 import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.core.data.Metadata
 import lucuma.core.data.PerSite
-import lucuma.core.instances.time.given
 import lucuma.core.util.Enumerated
 import lucuma.refined.*
+import org.typelevel.cats.time.instantInstances
 
 import java.time.Instant
 

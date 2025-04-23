@@ -34,13 +34,17 @@ final case class PerSite[+A](gn: A, gs: A) extends (Site => A):
   def map[B](f: A => B): PerSite[B] =
     PerSite(f(gn), f(gs))
 
+  /** Collapse values into monoid B. */
+  def fold[B: Monoid](fgn: A => B, fgs: A => B): B =
+    fgn(gn) |+| fgs(gs)
+
   /** Examine each (Site, A) pair and fold into monoid B. */
-  def fold[B: Monoid](f: (Site, A) => B): B =
+  def foldWithSite[B: Monoid](f: (Site, A) => B): B =
     f(Site.GN, gn) |+| f(Site.GS, gs)      
 
   /** Select sites where the given predicate holds. */
   def filter(f: A => Boolean): Set[Site] =
-    fold: (s, a) =>
+    foldWithSite: (s, a) =>
       if f(a) then Set(s) else Set.empty
 
 object PerSite:
@@ -72,14 +76,14 @@ object PerSite:
     Eq.by(_.toPair)
 
   /** PerSite is encodable to Json if A is encodable. */      
-  implicit def encoderPerSite[A: Encoder]: Encoder[PerSite[A]] = ps =>
+  given [A: Encoder]: Encoder[PerSite[A]] = ps =>
     Json.obj(
       "gn" -> ps.gn.asJson,
       "gs" -> ps.gs.asJson,
     )
 
   /** PerSite is decodable from Json if A is decodable. */      
-  implicit def decoderPerSite[A: Decoder]: Decoder[PerSite[A]] = hc =>
+  given [A: Decoder]: Decoder[PerSite[A]] = hc =>
     for
       gn <- hc.downField("gn").as[A]
       gs <- hc.downField("gs").as[A]
