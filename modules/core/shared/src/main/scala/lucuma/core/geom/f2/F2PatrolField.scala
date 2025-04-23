@@ -86,7 +86,7 @@ trait F2PatrolField:
     lyotWheel: F2LyotWheel,
     port:      PortDisposition
   ): ShapeExpression =
-    val plateScale = BigDecimal(lyotWheel.plateScale).withUnit[ArcSecondPerMillimeter]
+    val plateScale = lyotWheel.plateScale
     val pf = patrolField(plateScale)
     val s  = if (port === PortDisposition.Bottom) pf.flipP else pf
     s ↗ offsetPos ⟲ posAngle

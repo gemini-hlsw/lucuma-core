@@ -6,7 +6,6 @@ package lucuma.core.geom.f2
 import cats.syntax.all.*
 import coulomb.*
 import coulomb.policy.spire.standard.given
-import coulomb.syntax.*
 import coulomb.units.accepted.*
 import coulomb.units.si.prefixes.*
 import lucuma.core.enums.F2LyotWheel
@@ -67,7 +66,7 @@ trait F2OiwfsProbeArm:
     lyot:      F2LyotWheel,
     port:      PortDisposition
   ): ShapeExpression =
-    val plateScale = BigDecimal(lyot.plateScale).withUnit[ArcSecondPerMillimeter]
+    val plateScale = lyot.plateScale
     shape(plateScale) ⟲ armAngle(posAngle, guideStar, offsetPos, port, plateScale) ↗ guideStar
 
   /**

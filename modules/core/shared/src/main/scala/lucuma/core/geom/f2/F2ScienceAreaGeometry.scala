@@ -3,6 +3,7 @@
 
 package lucuma.core.geom.f2
 
+import algebra.instances.all.given
 import coulomb.*
 import coulomb.policy.spire.standard.given
 import coulomb.syntax.*
@@ -17,7 +18,6 @@ import lucuma.core.math.Offset
 import lucuma.core.math.units.*
 import lucuma.core.model.sequence.f2.F2FpuMask
 import spire.math.*
-import spire.std.bigDecimal.*
 
 /**
   * F2 science area geometry.
@@ -30,15 +30,15 @@ trait F2ScienceAreaGeometry:
 
   def scienceAreaDimensions(lyotWheel: F2LyotWheel, fpu: F2FpuMask): (Angle, Angle) =
     lyotWheel match
-      case F2LyotWheel.F16 | F2LyotWheel.F32High | F2LyotWheel.F32Low =>
+      case F2LyotWheel.F16 =>
         val pixelScale = lyotWheel.pixelScale
-        val plateScale = BigDecimal(lyotWheel.plateScale).withUnit[ArcSecondPerMillimeter]
+        val plateScale = lyotWheel.plateScale
         fpu match
           case F2FpuMask.Imaging | F2FpuMask.Builtin(F2Fpu.Pinhole) | F2FpuMask.Builtin(F2Fpu.SubPixPinhole) =>
             val size = ImagingFOVSize ⨱ plateScale
             (size.toAngle, size.toAngle)
           case F2FpuMask.Builtin(fpu) =>
-            (Angle.fromBigDecimalArcseconds(fpu.slitWidth * pixelScale),
+            (Angle.fromBigDecimalArcseconds((fpu.slitWidth * pixelScale).value),
               (LongSlitFOVHeight ⨱ plateScale).toAngle)
           case F2FpuMask.Custom(_, _) =>
             ((MOSFOVWidth ⨱ plateScale).toAngle,
@@ -52,7 +52,7 @@ trait F2ScienceAreaGeometry:
     lyotWheel: F2LyotWheel,
     fpu:       F2FpuMask
   ): ShapeExpression =
-    val plateScale = BigDecimal(lyotWheel.plateScale).withUnit[ArcSecondPerMillimeter]
+    val plateScale = lyotWheel.plateScale
     val scienceAreaWidth = scienceAreaDimensions(lyotWheel, fpu)._1
     val shape =
       fpu.fold(
