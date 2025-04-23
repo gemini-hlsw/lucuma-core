@@ -7,4 +7,7 @@ package lucuma.core.instances
  * Implicit instances for types defined outside of Gen. Each set of instances is provided as a
  * trait that can be extended and as a module whose members can be imported (preferred).
  */
-object all extends TreeMapInstances with TreeSetInstances
+object all 
+  extends TimeInstances
+     with TreeMapInstances 
+     with TreeSetInstances

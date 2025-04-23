@@ -12,6 +12,7 @@ ThisBuild / crossScalaVersions := Seq("3.3.5")
 ThisBuild / scalacOptions += "-language:implicitConversions" // TODO
 
 lazy val catsVersion                = "2.13.0"
+lazy val catsCollctionsVersion      = "0.9.9"
 lazy val catsEffectVersion          = "3.6.1"
 lazy val catsParseVersion           = "1.1.0"
 lazy val catsScalacheckVersion      = "0.3.2"
@@ -53,6 +54,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
     libraryDependencies ++= Seq(
       "org.typelevel"  %%% "cats-parse"     % catsParseVersion,
       "org.typelevel"  %%% "cats-core"      % catsVersion,
+      "org.typelevel"  %%% "cats-collections-core" % catsCollctionsVersion,
       "dev.optics"     %%% "monocle-core"   % monocleVersion,
       "dev.optics"     %%% "monocle-macro"  % monocleVersion,
       "dev.optics"     %%% "monocle-state"  % monocleVersion,
