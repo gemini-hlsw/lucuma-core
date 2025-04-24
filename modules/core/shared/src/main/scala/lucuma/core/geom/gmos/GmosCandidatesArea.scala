@@ -40,3 +40,5 @@ trait GmosCandidatesArea:
       a <- posAngles
       o <- offsetPositions
     } yield candidatesAreaAt(a, o)).fold(ShapeExpression.Empty)(_ ∩ _)
+
+object candidatesArea extends GmosCandidatesArea

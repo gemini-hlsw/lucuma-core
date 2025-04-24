@@ -65,7 +65,7 @@ trait F2PatrolField:
       ShapeExpression.centeredRectangle(
         ((EntranceWindowRadius + PatrolAreaHiLimit) ⨱ plateScale).toAngle,
         ((EntranceWindowRadius * Two) ⨱ plateScale).toAngle
-      )↗  paLimitOffset
+      ) ↗  paLimitOffset
 
     ((upperPA ∪ lowerPA) ∩ ew) ∩ paLimit
   }

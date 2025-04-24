@@ -57,9 +57,6 @@ trait GmosOiwfsProbeArm {
   val shape: ShapeExpression =
     arm ∪ pickoff
 
-  private def ifuOffset(fpu: Option[Either[GmosNorthFpu, GmosSouthFpu]]): Offset =
-    fpu.fold(Angle.Angle0)(_.fold(_.xOffset, _.xOffset)).offsetInP
-
   /**
     * The GMOS OIWFS probe arm positioned to reach a particular guide star at
     * a particular offset.
@@ -127,33 +124,6 @@ trait GmosOiwfsProbeArm {
     Angle.fromDoubleRadians(-φ + θ + α + PI / 2.0)
   }
 
-  /**
-    * GMOS patrol field shape centered at the base position.
-    */
-  val patrolField: ShapeExpression =
-    ShapeExpression.centeredRectangle(212700.mas, 249600.mas)
-
-  /**
-    * GMOS patrol field shape, in context.
-    *
-    * @param posAngle position angle where positive is counterclockwise
-    * @param offsetPos offset position from the base, if any
-    * @param fpu focal plane unit, if any
-    * @param port port disposition
-    *
-    * @return probe field shape rotated and offset
-    */
-  def patrolFieldAt(
-    posAngle:  Angle,
-    offsetPos: Offset,
-    fpu:       Option[Either[GmosNorthFpu, GmosSouthFpu]],
-    port:      PortDisposition
-  ): ShapeExpression = {
-    val pf = patrolField ↗ (ifuOffset(fpu) - Offset(94950.mas.p, 89880.mas.q))
-    val s  = if (port === PortDisposition.Side) pf.flipQ else pf
-    s ↗ offsetPos ⟲ posAngle
-  }
-
 }
 
-object probeArm extends GmosOiwfsProbeArm with GmosCandidatesArea
+object probeArm extends GmosOiwfsProbeArm
