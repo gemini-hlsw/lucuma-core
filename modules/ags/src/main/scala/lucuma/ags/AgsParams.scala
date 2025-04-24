@@ -105,7 +105,7 @@ object AgsParams:
     override val probe = GuideProbe.GmosOIWFS
 
     override def patrolFieldAt(posAngle: Angle, offset: Offset): ShapeExpression =
-      GmosGeom.probeArm.patrolFieldAt(posAngle, offset, fpu, port)
+      GmosGeom.patrolField.patrolFieldAt(posAngle, offset, fpu, port)
 
     override def scienceArea(posAngle: Angle, offset: Offset): ShapeExpression =
       GmosGeom.scienceArea.shapeAt(posAngle, offset, fpu)

@@ -3,14 +3,14 @@
 
 package lucuma.core.geom.f2
 
+import coulomb.policy.spire.standard.given
+import coulomb.units.accepted.*
+import lucuma.core.enums.F2LyotWheel
 import lucuma.core.geom.ShapeExpression
 import lucuma.core.geom.syntax.all.*
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 import lucuma.core.math.syntax.int.*
-import lucuma.core.enums.F2LyotWheel
-import coulomb.policy.spire.standard.given
-import coulomb.units.accepted.*
 import spire.std.bigDecimal.*
 
 /**

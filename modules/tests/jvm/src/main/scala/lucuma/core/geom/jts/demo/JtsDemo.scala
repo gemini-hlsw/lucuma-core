@@ -47,9 +47,9 @@ trait GmosLSShapes extends InstrumentShapes:
   val shapes: List[ShapeExpression] =
     List(
       probeArm.shapeAt(posAngle, guideStarOffset, offsetPos, fpu, port),
-      probeArm.patrolFieldAt(posAngle, offsetPos, fpu, port),
+      patrolField.patrolFieldAt(posAngle, offsetPos, fpu, port),
       scienceArea.shapeAt(posAngle, offsetPos, fpu),
-      probeArm.candidatesAreaAt(posAngle, offsetPos)
+      candidatesArea.candidatesAreaAt(posAngle, offsetPos)
     )
 
 trait F2LSShapes extends InstrumentShapes:
