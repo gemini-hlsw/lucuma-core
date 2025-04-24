@@ -49,4 +49,4 @@ def f2SlitWidthPixels(slitWidth: Angle): Quantity[BigDecimal, Pixels] =
   val widthArcSeconds = Angle.decimalArcseconds.get(slitWidth).withUnit[ArcSecond]
   widthArcSeconds / F2PixelScale
 
-object all extends F2ScienceAreaGeometry with F2PatrolField
+object all extends F2ScienceAreaGeometry with F2PatrolField with F2CandidatesArea
