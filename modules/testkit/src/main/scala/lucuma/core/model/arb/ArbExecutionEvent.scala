@@ -7,7 +7,6 @@ package arb
 import lucuma.core.enums.AtomStage
 import lucuma.core.enums.DatasetStage
 import lucuma.core.enums.SequenceCommand
-import lucuma.core.enums.SlewStage
 import lucuma.core.enums.StepStage
 import lucuma.core.model.sequence.Atom
 import lucuma.core.model.sequence.Dataset
@@ -95,8 +94,7 @@ trait ArbExecutionEvent {
         rec <- arbitrary[Timestamp]
         oid <- arbitrary[Observation.Id]
         vid <- arbitrary[Visit.Id]
-        stg <- arbitrary[SlewStage]
-      } yield ExecutionEvent.SlewEvent(eid, rec, oid, vid, stg)
+      } yield ExecutionEvent.SlewEvent(eid, rec, oid, vid)
     }
 
   given Cogen[ExecutionEvent.SlewEvent] =
@@ -104,14 +102,12 @@ trait ArbExecutionEvent {
       ExecutionEvent.Id,
       Timestamp,
       Observation.Id,
-      Visit.Id,
-      SlewStage
+      Visit.Id
     )].contramap { a => (
       a.id,
       a.received,
       a.observationId,
-      a.visitId,
-      a.stage
+      a.visitId
     )}
 
   given Arbitrary[ExecutionEvent.AtomEvent] =

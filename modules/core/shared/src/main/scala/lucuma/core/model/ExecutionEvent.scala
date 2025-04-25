@@ -9,7 +9,6 @@ import cats.syntax.eq.*
 import lucuma.core.enums.AtomStage
 import lucuma.core.enums.DatasetStage
 import lucuma.core.enums.SequenceCommand
-import lucuma.core.enums.SlewStage
 import lucuma.core.enums.StepStage
 import lucuma.core.model.sequence.Atom
 import lucuma.core.model.sequence.Dataset
@@ -37,7 +36,7 @@ sealed trait ExecutionEvent derives Eq {
     datasetEvent:  DatasetEvent  => A
   ): A =
     this match {
-      case e@SlewEvent(_, _, _, _, _)             => slewEvent(e)
+      case e@SlewEvent(_, _, _, _)                => slewEvent(e)
       case e@SequenceEvent(_, _, _, _, _)         => sequenceEvent(e)
       case e@AtomEvent(_, _, _, _, _, _)          => atomEvent(e)
       case e@StepEvent(_, _, _, _, _, _, _)       => stepEvent(e)
@@ -53,7 +52,6 @@ object ExecutionEvent extends WithGid('e'.refined) {
     received:      Timestamp,
     observationId: Observation.Id,
     visitId:       Visit.Id,
-    stage:         SlewStage
   ) extends ExecutionEvent derives Eq
 
   case class SequenceEvent(
