@@ -54,3 +54,9 @@ enum GmosSouthFilter(
   case OVI              extends GmosSouthFilter("OVI",              "OVI",     "OVI_G0347",                  684_000.pm, (681_600,   686_500).pmRange, FilterType.NarrowBand)
   case OVIC             extends GmosSouthFilter("OVIC",             "OVIC",    "OVI_G0348",                  679_000.pm, (676_100,   680_900).pmRange, FilterType.NarrowBand)
 
+object GmosSouthFilter:
+  /** Acquisition filter options. */
+  val acquisition: NonEmptyList[GmosSouthFilter] =
+    NonEmptyList.fromListUnsafe(
+      List(UPrime, GPrime, RPrime, IPrime, ZPrime)
+    )

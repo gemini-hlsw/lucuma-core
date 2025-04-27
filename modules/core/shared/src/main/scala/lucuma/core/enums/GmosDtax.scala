@@ -9,50 +9,25 @@ import lucuma.core.util.Enumerated
 
 /**
  * Enumerated type for GMOS detector translation X offset.
- * @group Enumerations (Generated)
+ * @group Enumerations
  */
-sealed abstract class GmosDtax(
+enum GmosDtax(
   val tag: String,
   val shortName: String,
   val longName: String,
   val dtax: Int
-) extends Product with Serializable
+) derives Enumerated:
 
-object GmosDtax {
-
-  /** @group Constructors */ case object MinusSix extends GmosDtax("MinusSix", "-6", "-6", -6)
-  /** @group Constructors */ case object MinusFive extends GmosDtax("MinusFive", "-5", "-5", -5)
-  /** @group Constructors */ case object MinusFour extends GmosDtax("MinusFour", "-4", "-4", -4)
-  /** @group Constructors */ case object MinusThree extends GmosDtax("MinusThree", "-3", "-3", -3)
-  /** @group Constructors */ case object MinusTwo extends GmosDtax("MinusTwo", "-2", "-2", -2)
-  /** @group Constructors */ case object MinusOne extends GmosDtax("MinusOne", "-1", "-1", -1)
-  /** @group Constructors */ case object Zero extends GmosDtax("Zero", "0", "0", 0)
-  /** @group Constructors */ case object One extends GmosDtax("One", "1", "1", 1)
-  /** @group Constructors */ case object Two extends GmosDtax("Two", "2", "2", 2)
-  /** @group Constructors */ case object Three extends GmosDtax("Three", "3", "3", 3)
-  /** @group Constructors */ case object Four extends GmosDtax("Four", "4", "4", 4)
-  /** @group Constructors */ case object Five extends GmosDtax("Five", "5", "5", 5)
-  /** @group Constructors */ case object Six extends GmosDtax("Six", "6", "6", 6)
-
-  /** All members of GmosDtax, in canonical order. */
-  val all: List[GmosDtax] =
-    List(MinusSix, MinusFive, MinusFour, MinusThree, MinusTwo, MinusOne, Zero, One, Two, Three, Four, Five, Six)
-
-  /** Select the member of GmosDtax with the given tag, if any. */
-  def fromTag(s: String): Option[GmosDtax] =
-    all.find(_.tag === s)
-
-  /** Select the member of GmosDtax with the given tag, throwing if absent. */
-  def unsafeFromTag(s: String): GmosDtax =
-    fromTag(s).getOrElse(throw new NoSuchElementException(s"GmosDtax: Invalid tag: '$s'"))
-
-  /** @group Typeclass Instances */
-  given Enumerated[GmosDtax] =
-    new Enumerated[GmosDtax] {
-      def all = GmosDtax.all
-      def tag(a: GmosDtax) = a.tag
-      override def unsafeFromTag(s: String): GmosDtax =
-        GmosDtax.unsafeFromTag(s)
-    }
-
-}
+  case MinusSix   extends GmosDtax("MinusSix",   "-6", "-6", -6)
+  case MinusFive  extends GmosDtax("MinusFive",  "-5", "-5", -5)
+  case MinusFour  extends GmosDtax("MinusFour",  "-4", "-4", -4)
+  case MinusThree extends GmosDtax("MinusThree", "-3", "-3", -3)
+  case MinusTwo   extends GmosDtax("MinusTwo",   "-2", "-2", -2)
+  case MinusOne   extends GmosDtax("MinusOne",   "-1", "-1", -1)
+  case Zero       extends GmosDtax("Zero",        "0",  "0",  0)
+  case One        extends GmosDtax("One",         "1",  "1",  1)
+  case Two        extends GmosDtax("Two",         "2",  "2",  2)
+  case Three      extends GmosDtax("Three",       "3",  "3",  3)
+  case Four       extends GmosDtax("Four",        "4",  "4",  4)
+  case Five       extends GmosDtax("Five",        "5",  "5",  5)
+  case Six        extends GmosDtax("Six",         "6",  "6",  6)
