@@ -53,3 +53,9 @@ enum GmosNorthFilter(
   case IPrime_CaT       extends GmosNorthFilter("IPrime_CaT",       "i+CaT",   "i_G0302 + CaT_G0309",       815_000.pm, (780_000,   850_000).pmRange, FilterType.Combination)
   case ZPrime_CaT       extends GmosNorthFilter("ZPrime_CaT",       "z+CaT",   "z_G0305 + CaT_G0309",       890_000.pm, (848_000,   933_000).pmRange, FilterType.Combination)
 
+object GmosNorthFilter:
+  /** Acquisition filter options. */
+  val acquisition: NonEmptyList[GmosNorthFilter] =
+    NonEmptyList.fromListUnsafe(
+      List(GPrime, RPrime, IPrime, ZPrime)
+    )
