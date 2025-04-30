@@ -7,5 +7,5 @@ import cats.kernel.laws.discipline.*
 import lucuma.core.util.arb.ArbEnumerated.given
 import munit.*
 
-class CalculationPhaseSuite extends DisciplineSuite:
-  checkAll("CalculationPhase.Monoid", CommutativeMonoidTests[CalculationPhase].commutativeMonoid)
+class CalculationStateSuite extends DisciplineSuite:
+  checkAll("CalculationState.Monoid", CommutativeMonoidTests[CalculationState].commutativeMonoid)

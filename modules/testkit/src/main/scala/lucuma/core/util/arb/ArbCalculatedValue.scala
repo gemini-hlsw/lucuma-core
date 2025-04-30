@@ -7,18 +7,18 @@ package arb
 import org.scalacheck.*
 import org.scalacheck.Arbitrary.arbitrary
 
-trait ArbCalculationValue:
+trait ArbCalculatedValue:
   import ArbEnumerated.given
 
-  given [A: Arbitrary]: Arbitrary[CalculationValue[A]] =
+  given [A: Arbitrary]: Arbitrary[CalculatedValue[A]] =
     Arbitrary:
       for
-        p <- arbitrary[CalculationPhase]
+        s <- arbitrary[CalculationState]
         a <- arbitrary[A]
-      yield CalculationValue(p, a)
+      yield CalculatedValue(s, a)
 
-  given [A: Cogen]: Cogen[CalculationValue[A]] =
-    Cogen[(CalculationPhase, A)].contramap: cv =>
-      (cv.phase, cv.value)
+  given [A: Cogen]: Cogen[CalculatedValue[A]] =
+    Cogen[(CalculationState, A)].contramap: cv =>
+      (cv.state, cv.value)
 
-object ArbCalculationValue extends ArbCalculationValue
+object ArbCalculatedValue extends ArbCalculatedValue
