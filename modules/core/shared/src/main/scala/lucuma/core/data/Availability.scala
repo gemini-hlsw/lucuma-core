@@ -10,12 +10,12 @@ import cats.kernel.Semigroup
 import cats.syntax.all.*
 import lucuma.core.enums.Site
 import lucuma.core.instances.instant.given
+import lucuma.core.math.BoundedInterval
+import lucuma.core.model.ObservingNight
 import lucuma.core.model.Semester
 import lucuma.core.util.DateInterval
 
 import java.time.Instant
-import lucuma.core.model.ObservingNight
-import lucuma.core.math.BoundedInterval
 
 /**
  * Wrapper for a `DisjointIntervalMap[Site, Instant]` with convenience methods for determining
