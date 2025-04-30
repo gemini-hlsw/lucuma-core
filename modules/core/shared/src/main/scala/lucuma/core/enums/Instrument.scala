@@ -3,8 +3,11 @@
 
 package lucuma.core.enums
 
+import cats.implicits.*
 import eu.timepit.refined.collection.NonEmpty
 import eu.timepit.refined.types.string.NonEmptyString
+import lucuma.core.data.Availability
+import lucuma.core.data.Metadata
 import lucuma.core.util.Enumerated
 import lucuma.refined.*
 
@@ -28,3 +31,6 @@ enum Instrument(val tag: String, val shortName: String, val longName: String, va
   /** @group Constructors */ case Scorpio    extends Instrument("Scorpio", "SCORPIO", "Scorpio", "SCORPIO".refined[NonEmpty], false)
   /** @group Constructors */ case Alopeke    extends Instrument("Alopeke", "ALOPEKE", "Alopeke", "ALOPEKE".refined[NonEmpty], false)
   /** @group Constructors */ case Zorro      extends Instrument("Zorro", "ZORRO", "Zorro", "ZORRO".refined[NonEmpty], false)
+
+  def availability(using md: Metadata): Availability =
+    md.availability(this)
