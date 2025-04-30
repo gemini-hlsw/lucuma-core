@@ -3,17 +3,13 @@
 
 package lucuma.core.enums
 
-import cats.collections.Diet
 import cats.implicits.*
 import eu.timepit.refined.collection.NonEmpty
 import eu.timepit.refined.types.string.NonEmptyString
+import lucuma.core.data.Availability
 import lucuma.core.data.Metadata
-import lucuma.core.data.PerSite
 import lucuma.core.util.Enumerated
 import lucuma.refined.*
-import org.typelevel.cats.time.instantInstances
-
-import java.time.Instant
 
 /**
  * Enumerated type for instruments.
@@ -36,14 +32,5 @@ enum Instrument(val tag: String, val shortName: String, val longName: String, va
   /** @group Constructors */ case Alopeke    extends Instrument("Alopeke", "ALOPEKE", "Alopeke", "ALOPEKE".refined[NonEmpty], false)
   /** @group Constructors */ case Zorro      extends Instrument("Zorro", "ZORRO", "Zorro", "ZORRO".refined[NonEmpty], false)
 
-  def availability(using md: Metadata): PerSite[Diet[Instant]] =
-    md.instrumentAvailability.getOrElse(this, PerSite.unfold(_ => Diet.empty))
-
-  def availabilityAt(when: Instant)(using Metadata): Set[Site] =
-    availability.filter(_.contains(when))
-
-  def availabilityAt(site: Site)(using Metadata): Diet[Instant] =
-    availability.forSite(site)
-
-  def isAvailableAt(site: Site, when: Instant)(using Metadata): Boolean =
-    availabilityAt(site).contains(when)
+  def availability(using md: Metadata): Availability =
+    md.availability(this)

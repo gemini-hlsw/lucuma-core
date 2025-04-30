@@ -3,13 +3,8 @@
 
 package lucuma.core.data
 
-import cats.collections.Diet
-import cats.collections.Range
-import cats.syntax.all.*
 import lucuma.core.enums.Instrument
-import lucuma.core.util.Enumerated
-
-import java.time.Instant 
+import lucuma.core.enums.Site
 
 /** 
  * A bundle of lookup tables and similar slow-changing but dynamic information
@@ -18,45 +13,30 @@ import java.time.Instant
  * data classes can provide better-placed methods that demand `Metadata`.
  */
 trait Metadata:
-  def instrumentAvailability: Map[Instrument, PerSite[Diet[Instant]]]
+  def availability(i: Instrument): Availability
 
 object Metadata:
 
-  /** 
-   * A placeholder metadata until the server-side fetch is implemented. 
-   * 
-   */
+  /** A placeholder metadata until the server-side fetch is implemented. */
   val placeholder: Metadata =
     new Metadata:      
-
-      val instrumentAvailability: Map[Instrument, PerSite[Diet[Instant]]] =
-        val always = Diet.fromRange(Range(Instant.MIN, Instant.MAX))
-        val never  = Diet.empty[Instant]
-        Enumerated[Instrument]
-          .all.fproduct:
-
-            // gn
-            case Instrument.GmosNorth  |
-                 Instrument.Gnirs      |
-                 Instrument.Gpi        |
-                 Instrument.Igrins2    |
-                 Instrument.Niri       |
-                 Instrument.Alopeke    => PerSite(always, never)
-
-            // gs
-            case Instrument.GmosSouth  |
-                 Instrument.Flamingos2 |
-                 Instrument.Ghost      |
-                 Instrument.Gsaoi      |
-                 Instrument.Zorro      => PerSite(never, always)
-
-            // both
-            case Instrument.AcqCam     |
-                 Instrument.Visitor    => PerSite(always, always)
-
-            // future
-            case Instrument.Scorpio    => PerSite(never, never)
-
-          .toMap
-
-
+      def availability(i: Instrument): Availability =
+        i match
+          // GN
+          case Instrument.GmosNorth => Availability.always(Site.GN)
+          case Instrument.Gnirs     => Availability.always(Site.GN)
+          case Instrument.Gpi       => Availability.always(Site.GN)
+          case Instrument.Igrins2   => Availability.always(Site.GN)
+          case Instrument.Niri      => Availability.always(Site.GN)
+          case Instrument.Alopeke   => Availability.always(Site.GN)        
+          // GS
+          case Instrument.GmosSouth => Availability.always(Site.GS)
+          case Instrument.Flamingos2=> Availability.always(Site.GS)
+          case Instrument.Ghost     => Availability.always(Site.GS)
+          case Instrument.Gsaoi     => Availability.always(Site.GS)
+          case Instrument.Zorro     => Availability.always(Site.GS)        
+          // Todo: Need north and south versions of these
+          case Instrument.AcqCam    => Availability.Never
+          case Instrument.Visitor   => Availability.Never          
+          // Nowhere yet
+          case Instrument.Scorpio   => Availability.Never

@@ -91,3 +91,6 @@ object PerSite:
 
 
 
+case class X()
+
+class Y extends X

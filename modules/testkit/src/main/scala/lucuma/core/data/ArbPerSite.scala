@@ -9,16 +9,16 @@ package arb
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Cogen
+import org.scalacheck.Gen
 
 trait ArbPerSite:
 
-  def arbPerSite[A: Arbitrary]: Arbitrary[PerSite[A]] =
-    Arbitrary:
-      arbitrary[(A,A)].map: (a1, a2) =>
-        PerSite(a1, a2)
+  def genPerSite[A: Arbitrary]: Gen[PerSite[A]] =
+    arbitrary[(A,A)].map: (a1, a2) =>
+      PerSite(a1, a2)
 
   given[A: Arbitrary]: Arbitrary[PerSite[A]] =
-    arbPerSite
+    Arbitrary(genPerSite)
 
   given[A: Cogen]: Cogen[PerSite[A]] =
     Cogen[(A, A)].contramap(_.toPair)
