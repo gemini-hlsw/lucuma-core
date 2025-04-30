@@ -14,12 +14,17 @@ import lucuma.core.model.Semester
 import lucuma.core.util.DateInterval
 
 import java.time.Instant
+import lucuma.core.model.ObservingNight
+import lucuma.core.math.BoundedInterval
 
 /**
  * Wrapper for a `DisjointIntervalMap[Site, Instant]` with convenience methods for determining
  * resource availability for a given site, time [range], or both.
  */
 final case class Availability(toDisjointIntervalMap: DisjointIntervalMap[Site, Instant]):
+
+  extension (boundedInterval: BoundedInterval[Instant]) private inline def toRange: Range[Instant] =
+    Range(boundedInterval.lower, boundedInterval.upper)
 
   /** The interval set for the given site. */
   def forSite(site: Site): Diet[Instant] = 
@@ -42,6 +47,10 @@ final case class Availability(toDisjointIntervalMap: DisjointIntervalMap[Site, I
       DisjointIntervalMap.unsafeFromMap:
         Site.all.fproduct(forSiteAndDateInterval(_, dateInterval)).toMap  
   
+  /** This interval set intersected with the given bounded interval. */
+  def forBoundedInterval(boundedInterval: BoundedInterval[Instant]): Availability =
+    forRange(boundedInterval.toRange)
+
   /** The interval set for the given site and DateInterval. */
   def forSiteAndDateInterval(site: Site, dateInterval: DateInterval): Diet[Instant] =
     val start = dateInterval.start.atStartOfDay(site.timezone).toInstant() 
@@ -57,6 +66,14 @@ final case class Availability(toDisjointIntervalMap: DisjointIntervalMap[Site, I
   /** The interval set for the given site, intersected with the specified range. */
   def forSiteAndRange(site: Site, range: Range[Instant]): Diet[Instant] =
     forSite(site) & range
+
+  /** This interval set for the given site, intersected with the given bounded interval. */
+  def forSiteAndBoundedInterval(site: Site, boundedInterval: BoundedInterval[Instant]): Diet[Instant] =
+    forSite(site) & boundedInterval.toRange
+
+  /** This interval set for the given observing night. */
+  def forObservingNight(observingNight: ObservingNight): Diet[Instant] =
+    forSiteAndBoundedInterval(observingNight.site, observingNight.interval)
 
   /** The site whose interval set includes the specified instant (if any). */
   def siteForInstant(when: Instant): Option[Site] =
