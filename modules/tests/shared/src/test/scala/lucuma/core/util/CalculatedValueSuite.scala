@@ -6,9 +6,9 @@ package lucuma.core.util
 import cats.Semigroup
 import cats.kernel.laws.discipline.*
 import cats.laws.discipline.*
-import eu.timepit.refined.types.string.NonEmptyString
 import eu.timepit.refined.cats.*
 import eu.timepit.refined.scalacheck.string.*
+import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.core.util.arb.ArbCalculatedValue.given
 import munit.*
 
