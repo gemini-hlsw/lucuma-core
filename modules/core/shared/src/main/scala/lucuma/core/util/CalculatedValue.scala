@@ -15,13 +15,27 @@ import cats.syntax.order.*
 
 import scala.annotation.tailrec
 
-case class CalculatedValue[A](
+/**
+ * A value that is automatically maintained by a background worker.  The
+ * underlying value is associated with a calculation state. If the state is
+ * 'Ready' then the value may be considered up-to-date at the moment it was
+ * retrieved. Otherwise the value represents the last known value before an
+ * update (possibly) invalidated it and triggered a new computation.
+ *
+ * @param state current calculation state
+ * @param value last known underlying value
+ * @tparam A data type
+ */
+final case class CalculatedValue[A](
   state: CalculationState,
   value: A
 )
 
 object CalculatedValue:
 
+  /**
+   * An empty, or zero, 'Ready' calculated value.
+   */
   def empty[A](using Monoid[A]): CalculatedValue[A] =
     CalculatedValue(CalculationState.Zero, Monoid[A].empty)
 
