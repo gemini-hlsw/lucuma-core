@@ -8,7 +8,9 @@ import cats.Eq
 import cats.Eval
 import cats.Monad
 import cats.Monoid
+import cats.Semigroup
 import cats.Traverse
+import cats.kernel.CommutativeMonoid
 import cats.syntax.functor.*
 import cats.syntax.monoid.*
 import cats.syntax.order.*
@@ -42,13 +44,19 @@ object CalculatedValue:
   given [A: Eq]: Eq[CalculatedValue[A]] =
     Eq.by(cv => (cv.state, cv.value))
 
-  given [A](using Monoid[A]): Monoid[CalculatedValue[A]] =
-    Monoid.instance[CalculatedValue[A]](
-      empty,
-      (a, b) => CalculatedValue(a.state |+| b.state, a.value |+| b.value)
-    )
+  private def combine[A: Semigroup](a: CalculatedValue[A], b: CalculatedValue[A]): CalculatedValue[A] =
+    CalculatedValue(a.state |+| b.state, a.value |+| b.value)
 
-  given Monad[CalculatedValue] with
+  given [A](using CommutativeMonoid[A]): CommutativeMonoid[CalculatedValue[A]] =
+    CommutativeMonoid.instance[CalculatedValue[A]](empty, combine)
+
+  given [A](using Monoid[A]): Monoid[CalculatedValue[A]] =
+    Monoid.instance[CalculatedValue[A]](empty, combine)
+
+  given [A](using Semigroup[A]): Semigroup[CalculatedValue[A]] =
+    Semigroup.instance[CalculatedValue[A]](combine)
+
+  given Monad[CalculatedValue] with Traverse[CalculatedValue] with
     def pure[A](a: A): CalculatedValue[A] =
       CalculatedValue(CalculationState.Zero, a)
 
@@ -66,7 +74,6 @@ object CalculatedValue:
 
       loop(CalculationState.Zero, a)
 
-  given Traverse[CalculatedValue] with
     def traverse[G[_]: Applicative, A, B](fa: CalculatedValue[A])(f: A => G[B]): G[CalculatedValue[B]] =
       f(fa.value).map(b => CalculatedValue(fa.state, b))
 

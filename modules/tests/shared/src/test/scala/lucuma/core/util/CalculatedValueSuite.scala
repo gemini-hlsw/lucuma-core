@@ -3,22 +3,22 @@
 
 package lucuma.core.util
 
-import cats.Invariant
-import cats.Monad
+import cats.Semigroup
 import cats.kernel.laws.discipline.*
 import cats.laws.discipline.*
+import eu.timepit.refined.types.string.NonEmptyString
+import eu.timepit.refined.cats.*
+import eu.timepit.refined.scalacheck.string.*
 import lucuma.core.util.arb.ArbCalculatedValue.given
 import munit.*
 
 class CalculatedValueSuite extends DisciplineSuite:
-  checkAll("CalculatedValue.Monoid", MonoidTests[CalculatedValue[Int]].monoid)
 
-  // Without explicitly defining which version to use, we get this error:
-  //    But both object given_Monad_CalculatedValue in object CalculationValue
-  //    and object given_Traverse_CalculatedValue in object CalculationValue
-  //    match type cats.Invariant[lucuma.core.util.CalculatedValue].
-  // How do you fix this in a less clumsy way?
-  given Invariant[CalculatedValue] = Monad[CalculatedValue]
-  checkAll("CalculatedValue.Monad",  MonadTests[CalculatedValue].monad[Int, String, Long])
+  given Semigroup[NonEmptyString] =
+    Semigroup.instance[NonEmptyString]((a, b) => NonEmptyString.unsafeFrom(a.value + b.value))
 
-  checkAll("CalculatedValue.Traverse", TraverseTests[CalculatedValue].traverse[Int, Int, Int, Int, Option, Option])
+  checkAll("CalculatedValue.CommutativeMonoid", CommutativeMonoidTests[CalculatedValue[Int]].commutativeMonoid)
+  checkAll("CalculatedValue.Monoid",            MonoidTests[CalculatedValue[String]].monoid)
+  checkAll("CalculatedValue.Semigroup",         SemigroupTests[CalculatedValue[NonEmptyString]].semigroup)
+  checkAll("CalculatedValue.Monad",             MonadTests[CalculatedValue].monad[Int, String, Long])
+  checkAll("CalculatedValue.Traverse",          TraverseTests[CalculatedValue].traverse[Int, Int, Int, Int, Option, Option])
