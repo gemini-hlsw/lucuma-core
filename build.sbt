@@ -1,6 +1,6 @@
 import org.scalajs.linker.interface.ESVersion
 
-ThisBuild / tlBaseVersion                         := "0.126"
+ThisBuild / tlBaseVersion                         := "0.127"
 ThisBuild / tlCiReleaseBranches                   := Seq("master")
 ThisBuild / githubWorkflowEnv += "MUNIT_FLAKY_OK" -> "true"
 
@@ -24,7 +24,7 @@ lazy val fs2Version                 = "3.12.0"
 lazy val fs2DataVersion             = "1.11.3"
 lazy val geminiLocalesVersion       = "0.12.0"
 lazy val http4sVersion              = "0.23.30"
-lazy val http4sDomVersion           = "0.2.11"
+lazy val http4sDomVersion           = "0.2.12"
 lazy val http4sJdkHttpClientVersion = "0.10.0"
 lazy val jtsVersion                 = "0.4.0"
 lazy val kindProjectorVersion       = "0.13.2"
