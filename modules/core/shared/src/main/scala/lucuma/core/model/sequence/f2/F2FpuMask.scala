@@ -41,7 +41,7 @@ sealed trait F2FpuMask:
     fold(none, _ => none, _.some)
 
   def customFilename: Option[NonEmptyString] =
-    custom.flatMap(_.filename)
+    custom.map(_.filename)
 
   def customSlitWidth: Option[F2CustomSlitWidth] =
     custom.map(_.slitWidth)
@@ -68,13 +68,13 @@ object F2FpuMask:
     def value: Iso[Builtin, F2Fpu] =
       Iso[Builtin, F2Fpu](_.value)(Builtin.apply)
 
-  case class Custom(filename: Option[NonEmptyString], slitWidth: F2CustomSlitWidth) extends F2FpuMask
+  case class Custom(filename: NonEmptyString, slitWidth: F2CustomSlitWidth) extends F2FpuMask
 
   object Custom:
     given Eq[Custom] = Eq.by(x => (x.filename, x.slitWidth))
 
     /** @group Optics */
-    val filename: Lens[Custom, Option[NonEmptyString]] =
+    val filename: Lens[Custom, NonEmptyString] =
       Focus[Custom](_.filename)
 
     /** @group Optics */
