@@ -3,22 +3,26 @@
 
 package lucuma.core.model.sequence.f2.arb
 
+import lucuma.core.enums.MosPreImaging
 import lucuma.core.model.sequence.f2.F2StaticConfig
+import lucuma.core.util.arb.ArbEnumerated
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.*
 import org.scalacheck.Cogen
 
 trait ArbF2StaticConfig:
 
+  import ArbEnumerated.given
+
   given Arbitrary[F2StaticConfig] = Arbitrary(
     for
-      mosPreImaging          <- arbitrary[Boolean]
+      mosPreImaging          <- arbitrary[MosPreImaging]
       useElectronicOffseting <- arbitrary[Boolean]
     yield F2StaticConfig(mosPreImaging, useElectronicOffseting)
   )
 
   given Cogen[F2StaticConfig] =
-    Cogen[(Boolean, Boolean)]
+    Cogen[(MosPreImaging, Boolean)]
       .contramap(s => (s.mosPreImaging, s.useElectronicOffseting))
 
 object ArbF2StaticConfig extends ArbF2StaticConfig
