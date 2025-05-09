@@ -24,6 +24,22 @@ sealed trait InstrumentExecutionConfig:
 
 object InstrumentExecutionConfig:
 
+  case class Flamingos2(
+    executionConfig: ExecutionConfig[f2.F2StaticConfig, f2.F2DynamicConfig]
+  ) extends InstrumentExecutionConfig:
+    override def instrument: Instrument = Instrument.Flamingos2
+    override def isComplete: Boolean    = executionConfig.isComplete
+
+  object Flamingos2:
+    given Eq[Flamingos2] =
+      Eq.by(_.executionConfig)
+
+    val executionConfig: Lens[Flamingos2, ExecutionConfig[f2.F2StaticConfig, f2.F2DynamicConfig]] =
+      Focus[Flamingos2](_.executionConfig)
+
+  val flamingos2: Prism[InstrumentExecutionConfig, Flamingos2] =
+    GenPrism[InstrumentExecutionConfig, Flamingos2]
+
   case class GmosNorth(
     executionConfig: ExecutionConfig[gmos.StaticConfig.GmosNorth, gmos.DynamicConfig.GmosNorth]
   ) extends InstrumentExecutionConfig:
@@ -57,8 +73,8 @@ object InstrumentExecutionConfig:
     GenPrism[InstrumentExecutionConfig, GmosSouth]
 
   given Eq[InstrumentExecutionConfig] =
-    Eq.instance {
-      case (a @ GmosNorth(_), b @ GmosNorth(_)) => a === b
-      case (a @ GmosSouth(_), b @ GmosSouth(_)) => a === b
-      case _                                    => false
-    }
+    Eq.instance:
+      case (a @ Flamingos2(_), b @ Flamingos2(_)) => a === b
+      case (a @ GmosNorth(_),  b @ GmosNorth(_))  => a === b
+      case (a @ GmosSouth(_),  b @ GmosSouth(_))  => a === b
+      case _                                      => false

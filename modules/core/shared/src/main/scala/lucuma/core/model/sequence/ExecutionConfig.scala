@@ -25,10 +25,12 @@ case class ExecutionConfig[S, D](
     science.isEmpty
 
 object ExecutionConfig:
+  /** Shorthand type for Flamingos2. */
+  type Flamingos2 = ExecutionConfig[f2.F2StaticConfig, f2.F2DynamicConfig]
   /** Shorthand type for GmosNorth. */
-  type GmosNorth = ExecutionConfig[gmos.StaticConfig.GmosNorth, gmos.DynamicConfig.GmosNorth]
+  type GmosNorth  = ExecutionConfig[gmos.StaticConfig.GmosNorth, gmos.DynamicConfig.GmosNorth]
   /** Shorthand type for GmosSouth. */
-  type GmosSouth = ExecutionConfig[gmos.StaticConfig.GmosSouth, gmos.DynamicConfig.GmosSouth]
+  type GmosSouth  = ExecutionConfig[gmos.StaticConfig.GmosSouth, gmos.DynamicConfig.GmosSouth]
 
   given [S, D](using Eq[S], Eq[D]): Eq[ExecutionConfig[S, D]] =
     Eq.by { a => (
