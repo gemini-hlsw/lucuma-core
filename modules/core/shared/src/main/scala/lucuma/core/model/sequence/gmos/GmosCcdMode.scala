@@ -10,12 +10,6 @@ import coulomb.*
 import coulomb.syntax.*
 import eu.timepit.refined.types.numeric.PosBigDecimal
 import lucuma.core.enums.*
-import lucuma.core.enums.GmosNorthFpu
-import lucuma.core.enums.GmosNorthGrating
-import lucuma.core.enums.GmosSouthFpu
-import lucuma.core.enums.GmosSouthGrating
-import lucuma.core.enums.GmosXBinning
-import lucuma.core.enums.GmosYBinning
 import lucuma.core.math.units.Electron
 import lucuma.core.model.ImageQuality
 import lucuma.core.model.SourceProfile

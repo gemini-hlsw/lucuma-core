@@ -13,7 +13,6 @@ import cats.Traverse
 import cats.kernel.CommutativeMonoid
 import cats.syntax.functor.*
 import cats.syntax.monoid.*
-import cats.syntax.order.*
 
 import scala.annotation.tailrec
 

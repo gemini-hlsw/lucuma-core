@@ -4,7 +4,6 @@
 package lucuma.core.parser
 
 import cats.parse.*
-import cats.parse.Numbers
 import cats.parse.Numbers.digit
 import cats.parse.Numbers.nonZeroDigit
 import cats.parse.Parser.*
