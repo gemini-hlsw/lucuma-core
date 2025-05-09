@@ -7,7 +7,6 @@ package enums
 
 import lucuma.core.util.Enumerated
 
-enum FTSupportRole(val tag: String) derives Enumerated:
-  case Reviewer extends FTSupportRole("reviewer")
-  case Mentor   extends FTSupportRole("mentor")
-end FTSupportRole
+enum ProposalSupportRole(val tag: String) derives Enumerated:
+  case Reviewer extends ProposalSupportRole("reviewer")
+  case Mentor   extends ProposalSupportRole("mentor")
