@@ -4,6 +4,7 @@
 package lucuma.core.geom.jts
 package demo
 
+import cats.syntax.option.*
 import lucuma.core.enums.F2Fpu
 import lucuma.core.enums.F2LyotWheel
 import lucuma.core.enums.GmosNorthFpu
@@ -49,6 +50,30 @@ trait GmosLSShapes extends InstrumentShapes:
       probeArm.shapeAt(posAngle, guideStarOffset, offsetPos, fpu, port),
       patrolField.patrolFieldAt(posAngle, offsetPos, fpu, port),
       scienceArea.shapeAt(posAngle, offsetPos, fpu),
+      candidatesArea.candidatesAreaAt(posAngle, offsetPos)
+    )
+
+trait GmosImagingShapes extends InstrumentShapes:
+  import lucuma.core.geom.gmos.*
+
+  val posAngle: Angle =
+    145.deg
+
+  val guideStarOffset: Offset =
+    Offset(170543999.µas.p, -24177003.µas.q)
+
+  val offsetPos: Offset =
+    Offset(-60.arcsec.p, 60.arcsec.q)
+
+  val port: PortDisposition =
+    PortDisposition.Side
+
+  // Shape to display
+  val shapes: List[ShapeExpression] =
+    List(
+      probeArm.shapeAt(posAngle, guideStarOffset, offsetPos, none, port),
+      patrolField.patrolFieldAt(posAngle, offsetPos, none, port),
+      scienceArea.shapeAt(posAngle, offsetPos, none),
       candidatesArea.candidatesAreaAt(posAngle, offsetPos)
     )
 
@@ -216,3 +241,5 @@ class JtsDemo extends Frame("JTS Demo") {
 object JtsGmosLSDemo extends JtsDemo with GmosLSShapes
 
 object JtsF2LSDemo extends JtsDemo with F2LSShapes
+
+object JtsGmosImagingDemo extends JtsDemo with GmosImagingShapes
