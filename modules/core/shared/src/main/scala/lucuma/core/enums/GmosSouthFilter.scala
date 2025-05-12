@@ -43,7 +43,7 @@ enum GmosSouthFilter(
   case RPrime_RG610     extends GmosSouthFilter("RPrime_RG610",     "r+RG610", "r_G0326 + RG610_G0331",      657_000.pm, (615_000,   698_000).pmRange, FilterType.Combination)
   case IPrime_RG780     extends GmosSouthFilter("IPrime_RG780",     "i+RG780", "i_G0327 + RG780_G0334",      819_000.pm, (777_000,   851_000).pmRange, FilterType.Combination)
   case IPrime_CaT       extends GmosSouthFilter("IPrime_CaT",       "i+CaT",   "i_G0327 + CaT_G0333",        815_000.pm, (780_000,   850_000).pmRange, FilterType.Combination)
-  case ZPrime_CaT       extends GmosSouthFilter("ZPrime_CaT",       "z+Cat",   "z_G0328 + CaT_G0333",        890_000.pm, (848_000,   933_000).pmRange, FilterType.Combination)
+  case ZPrime_CaT       extends GmosSouthFilter("ZPrime_CaT",       "z+CaT",   "z_G0328 + CaT_G0333",        890_000.pm, (848_000,   933_000).pmRange, FilterType.Combination)
   case Ha               extends GmosSouthFilter("Ha",               "Ha",      "Ha_G0336",                   656_000.pm, (654_000,   661_000).pmRange, FilterType.NarrowBand)
   case SII              extends GmosSouthFilter("SII",              "SII",     "SII_G0335",                  672_000.pm, (669_400,   673_700).pmRange, FilterType.NarrowBand)
   case HaC              extends GmosSouthFilter("HaC",              "HaC",     "HaC_G0337",                  662_000.pm, (659_000,   665_000).pmRange, FilterType.NarrowBand)
