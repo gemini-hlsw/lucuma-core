@@ -12,9 +12,9 @@ import lucuma.core.util.Enumerated
  * Enumerated type for Flamingos2 readout modes.
  * @group Enumerations (Generated)
  */
-enum F2ReadoutMode(val tag: String, val shortName: String, val longName: String) derives Enumerated:
+enum Flamingos2ReadoutMode(val tag: String, val shortName: String, val longName: String) derives Enumerated:
 
   /** @group Constructors */
-  case Science extends F2ReadoutMode("Science", "science", "Science")
+  case Science extends Flamingos2ReadoutMode("Science", "science", "Science")
   /** @group Constructors */
-  case Engineering extends F2ReadoutMode("Engineering", "engineering", "Engineering")
+  case Engineering extends Flamingos2ReadoutMode("Engineering", "engineering", "Engineering")

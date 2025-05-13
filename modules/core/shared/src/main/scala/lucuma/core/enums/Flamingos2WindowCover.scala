@@ -11,11 +11,11 @@ import lucuma.core.util.Enumerated
  * Enumerated type for Flamingos2 window cover state.
  * @group Enumerations
  */
-enum F2WindowCover(
+enum Flamingos2WindowCover(
   val tag: String,
   val shortName: String,
   val longName: String
 ) derives Enumerated:
 
-  case Open  extends F2WindowCover("Open",  "Open",  "Open")
-  case Close extends F2WindowCover("Close", "Close", "Close")
+  case Open  extends Flamingos2WindowCover("Open",  "Open",  "Open")
+  case Close extends Flamingos2WindowCover("Close", "Close", "Close")

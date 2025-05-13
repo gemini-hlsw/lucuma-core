@@ -4,10 +4,10 @@
 package lucuma.core.model.sequence
 package arb
 
-import lucuma.core.model.sequence.f2.F2DynamicConfig
-import lucuma.core.model.sequence.f2.F2StaticConfig
-import lucuma.core.model.sequence.f2.arb.ArbF2DynamicConfig
-import lucuma.core.model.sequence.f2.arb.ArbF2StaticConfig
+import lucuma.core.model.sequence.flamingos2.Flamingos2DynamicConfig
+import lucuma.core.model.sequence.flamingos2.Flamingos2StaticConfig
+import lucuma.core.model.sequence.flamingos2.arb.ArbFlamingos2DynamicConfig
+import lucuma.core.model.sequence.flamingos2.arb.ArbFlamingos2StaticConfig
 import lucuma.core.model.sequence.gmos.DynamicConfig
 import lucuma.core.model.sequence.gmos.StaticConfig
 import lucuma.core.model.sequence.gmos.arb.ArbDynamicConfig
@@ -21,13 +21,13 @@ trait ArbInstrumentExecutionConfig:
 
   import ArbDynamicConfig.given
   import ArbExecutionConfig.given
-  import ArbF2DynamicConfig.given
-  import ArbF2StaticConfig.given
+  import ArbFlamingos2DynamicConfig.given
+  import ArbFlamingos2StaticConfig.given
   import ArbStaticConfig.given
 
   given Arbitrary[InstrumentExecutionConfig.Flamingos2] =
     Arbitrary:
-      arbitrary[ExecutionConfig[F2StaticConfig, F2DynamicConfig]].map(InstrumentExecutionConfig.Flamingos2(_))
+      arbitrary[ExecutionConfig[Flamingos2StaticConfig, Flamingos2DynamicConfig]].map(InstrumentExecutionConfig.Flamingos2(_))
 
   given Arbitrary[InstrumentExecutionConfig.GmosNorth] =
     Arbitrary:
@@ -46,7 +46,7 @@ trait ArbInstrumentExecutionConfig:
       )
 
   given Cogen[InstrumentExecutionConfig.Flamingos2] =
-    Cogen[ExecutionConfig[F2StaticConfig, F2DynamicConfig]].contramap(_.executionConfig)
+    Cogen[ExecutionConfig[Flamingos2StaticConfig, Flamingos2DynamicConfig]].contramap(_.executionConfig)
 
   given Cogen[InstrumentExecutionConfig.GmosNorth] =
     Cogen[ExecutionConfig[StaticConfig.GmosNorth, DynamicConfig.GmosNorth]].contramap(_.executionConfig)

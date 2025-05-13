@@ -5,8 +5,8 @@ package lucuma.core.geom.jts
 package demo
 
 import cats.syntax.option.*
-import lucuma.core.enums.F2Fpu
-import lucuma.core.enums.F2LyotWheel
+import lucuma.core.enums.Flamingos2Fpu
+import lucuma.core.enums.Flamingos2LyotWheel
 import lucuma.core.enums.GmosNorthFpu
 import lucuma.core.enums.GmosSouthFpu
 import lucuma.core.enums.PortDisposition
@@ -17,7 +17,7 @@ import lucuma.core.geom.syntax.all.*
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 import lucuma.core.math.syntax.int.*
-import lucuma.core.model.sequence.f2.F2FpuMask
+import lucuma.core.model.sequence.flamingos2.Flamingos2FpuMask
 
 import java.awt.event.*
 import java.awt.{List as _, *}
@@ -77,8 +77,8 @@ trait GmosImagingShapes extends InstrumentShapes:
       candidatesArea.candidatesAreaAt(posAngle, offsetPos)
     )
 
-trait F2LSShapes extends InstrumentShapes:
-  import lucuma.core.geom.f2.*
+trait Flamingos2LSShapes extends InstrumentShapes:
+  import lucuma.core.geom.flamingos2.*
 
   val posAngle: Angle =
     145.deg
@@ -89,8 +89,8 @@ trait F2LSShapes extends InstrumentShapes:
   val offsetPos: Offset =
     Offset(-60.arcsec.p, 60.arcsec.q)
 
-  val fpu: F2FpuMask = F2FpuMask.Builtin(F2Fpu.LongSlit8)
-  val lyot: F2LyotWheel = F2LyotWheel.F16
+  val fpu: Flamingos2FpuMask = Flamingos2FpuMask.Builtin(Flamingos2Fpu.LongSlit8)
+  val lyot: Flamingos2LyotWheel = Flamingos2LyotWheel.F16
 
   val port: PortDisposition =
     PortDisposition.Bottom
@@ -240,6 +240,6 @@ class JtsDemo extends Frame("JTS Demo") {
 
 object JtsGmosLSDemo extends JtsDemo with GmosLSShapes
 
-object JtsF2LSDemo extends JtsDemo with F2LSShapes
+object JtsFlamingos2LSDemo extends JtsDemo with Flamingos2LSShapes
 
 object JtsGmosImagingDemo extends JtsDemo with GmosImagingShapes
