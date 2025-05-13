@@ -6,6 +6,7 @@ package lucuma.core.model.sequence
 import cats.Eq
 import cats.syntax.eq.*
 import lucuma.core.enums.Instrument
+import lucuma.core.model.sequence.flamingos2 as f2
 import monocle.Focus
 import monocle.Lens
 import monocle.Prism
@@ -25,7 +26,7 @@ sealed trait InstrumentExecutionConfig:
 object InstrumentExecutionConfig:
 
   case class Flamingos2(
-    executionConfig: ExecutionConfig[f2.F2StaticConfig, f2.F2DynamicConfig]
+    executionConfig: ExecutionConfig[f2.Flamingos2StaticConfig, f2.Flamingos2DynamicConfig]
   ) extends InstrumentExecutionConfig:
     override def instrument: Instrument = Instrument.Flamingos2
     override def isComplete: Boolean    = executionConfig.isComplete
@@ -34,7 +35,7 @@ object InstrumentExecutionConfig:
     given Eq[Flamingos2] =
       Eq.by(_.executionConfig)
 
-    val executionConfig: Lens[Flamingos2, ExecutionConfig[f2.F2StaticConfig, f2.F2DynamicConfig]] =
+    val executionConfig: Lens[Flamingos2, ExecutionConfig[f2.Flamingos2StaticConfig, f2.Flamingos2DynamicConfig]] =
       Focus[Flamingos2](_.executionConfig)
 
   val flamingos2: Prism[InstrumentExecutionConfig, Flamingos2] =

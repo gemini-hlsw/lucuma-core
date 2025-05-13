@@ -11,8 +11,8 @@ import cats.syntax.all.*
 import fs2.*
 import lucuma.ags.*
 import lucuma.catalog.votable.*
-import lucuma.core.enums.F2Fpu
-import lucuma.core.enums.F2LyotWheel
+import lucuma.core.enums.Flamingos2Fpu
+import lucuma.core.enums.Flamingos2LyotWheel
 import lucuma.core.enums.GmosNorthFpu
 import lucuma.core.enums.PortDisposition
 import lucuma.core.enums.Site
@@ -38,7 +38,7 @@ import lucuma.core.model.ObjectTracking
 import lucuma.core.model.PosAngleConstraint
 import lucuma.core.model.SiderealTracking
 import lucuma.core.model.Target
-import lucuma.core.model.sequence.f2.F2FpuMask
+import lucuma.core.model.sequence.flamingos2.Flamingos2FpuMask
 import org.http4s.Method.*
 import org.http4s.Request
 import org.http4s.client.Client
@@ -79,9 +79,9 @@ trait AgsSelectionSample {
     PortDisposition.Bottom
   )
 
-  val f2Params = AgsParams.F2AgsParams(
-    F2LyotWheel.F16,
-    F2FpuMask.Builtin(F2Fpu.LongSlit3),
+  val flamingos2Params = AgsParams.Flamingos2AgsParams(
+    Flamingos2LyotWheel.F16,
+    Flamingos2FpuMask.Builtin(Flamingos2Fpu.LongSlit3),
     PortDisposition.Bottom
   )
 
@@ -144,7 +144,7 @@ object AgsSelectionSampleApp extends IOApp.Simple with AgsSelectionSample {
                 coords,
                 List(coords),
                 positions,
-                f2Params,
+                flamingos2Params,
                 candidates
               )
             pprint.pprintln(r.sortUsablePositions)

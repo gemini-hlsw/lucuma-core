@@ -10,10 +10,10 @@ import lucuma.core.util.Enumerated
  * Enumerated type for Flamingos2 decker option.
  * @group Enumerations
  */
-enum F2Decker(val tag: String, val shortName: String, val longName: String)
+enum Flamingos2Decker(val tag: String, val shortName: String, val longName: String)
   derives Enumerated:
 
-  case Imaging  extends F2Decker("Imaging",  "Imaging",   "Imaging")
-  case LongSlit extends F2Decker("LongSlit", "Long Slit", "LongSlit")
-  case MOS      extends F2Decker("MOS",      "MOS",       "MOS")
+  case Imaging  extends Flamingos2Decker("Imaging",  "Imaging",   "Imaging")
+  case LongSlit extends Flamingos2Decker("LongSlit", "Long Slit", "LongSlit")
+  case MOS      extends Flamingos2Decker("MOS",      "MOS",       "MOS")
 

@@ -1,14 +1,14 @@
 // Copyright (c) 2016-2025 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package lucuma.core.geom.f2
+package lucuma.core.geom.flamingos2
 
 import cats.syntax.all.*
 import coulomb.*
 import coulomb.policy.spire.standard.given
 import coulomb.units.accepted.*
 import coulomb.units.si.prefixes.*
-import lucuma.core.enums.F2LyotWheel
+import lucuma.core.enums.Flamingos2LyotWheel
 import lucuma.core.enums.PortDisposition
 import lucuma.core.geom.ShapeExpression
 import lucuma.core.geom.syntax.all.*
@@ -17,9 +17,9 @@ import lucuma.core.math.Offset
 import lucuma.core.math.units.*
 
 /**
-  * Description of the F2 OIWFS probe arm geometry.
+  * Description of the Flamingos2 OIWFS probe arm geometry.
   */
-trait F2OiwfsProbeArm:
+trait Flamingos2OiwfsProbeArm:
 
   private def arm(plateScale: PlateScale): ShapeExpression = {
     val scaledLength = (ProbePickoffArmLength ⨱ plateScale).toAngle
@@ -41,14 +41,14 @@ trait F2OiwfsProbeArm:
     ShapeExpression.centeredRectangle(scaledMirrorSize, scaledMirrorSize)
 
   /**
-    * Description of the F2 OIWFS probe arm with the pickoff mirror centered
+    * Description of the Flamingos2 OIWFS probe arm with the pickoff mirror centered
     * at the base position.
     */
   def shape(plateScale: PlateScale): ShapeExpression =
     arm(plateScale) ∪ pickoff(plateScale)
 
   /**
-    * The F2 OIWFS probe arm positioned to reach a particular guide star at
+    * The Flamingos2 OIWFS probe arm positioned to reach a particular guide star at
     * a particular offset.
     *
     * @param posAngle position angle where positive is counterclockwise
@@ -63,7 +63,7 @@ trait F2OiwfsProbeArm:
     posAngle:  Angle,
     guideStar: Offset,
     offsetPos: Offset,
-    lyot:      F2LyotWheel,
+    lyot:      Flamingos2LyotWheel,
     port:      PortDisposition
   ): ShapeExpression =
     val plateScale = lyot.plateScale
@@ -106,4 +106,4 @@ trait F2OiwfsProbeArm:
     Angle.fromDoubleRadians(-math.atan2(Q._2.toDouble, Q._1.toDouble)).flip
   }
 
-object probeArm extends F2OiwfsProbeArm
+object probeArm extends Flamingos2OiwfsProbeArm

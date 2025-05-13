@@ -20,7 +20,7 @@ import lucuma.core.util.Enumerated
  * scientifically useful option, but is used for focusing)
  * @group Enumerations (Generated)
  */
-enum F2LyotWheel(
+enum Flamingos2LyotWheel(
   val tag: String,
   val shortName: String,
   val longName: String,
@@ -28,8 +28,8 @@ enum F2LyotWheel(
   val pixelScale: PixelScale  // arcsec/pixel
 ) derives Enumerated:
 
-  case F16       extends F2LyotWheel("F16",       "f/16",            "f/16 (Open)",             1.61.plateScale,  0.18.pixelScale)
-  case GemsUnder extends F2LyotWheel("GemsUnder", "GeMS Under",      "f/33 (GeMS under-sized)", 0.784.plateScale, 0.09.pixelScale)
-  case GemsOver  extends F2LyotWheel("GemsOver",  "GeMS Over",       "f/33 (GeMS over-sized)",  0.784.plateScale, 0.09.pixelScale)
-  case HartmannA extends F2LyotWheel("HartmannA", "Hartmann A (H1)", "Hartmann A (H1)",         0.0.plateScale,   0.0.pixelScale)
-  case HartmannB extends F2LyotWheel("HartmannB", "Hartmann B (H2)", "Hartmann B (H2)",         0.0.plateScale,   0.0.pixelScale)
+  case F16       extends Flamingos2LyotWheel("F16",       "f/16",            "f/16 (Open)",             1.61.plateScale,  0.18.pixelScale)
+  case GemsUnder extends Flamingos2LyotWheel("GemsUnder", "GeMS Under",      "f/33 (GeMS under-sized)", 0.784.plateScale, 0.09.pixelScale)
+  case GemsOver  extends Flamingos2LyotWheel("GemsOver",  "GeMS Over",       "f/33 (GeMS over-sized)",  0.784.plateScale, 0.09.pixelScale)
+  case HartmannA extends Flamingos2LyotWheel("HartmannA", "Hartmann A (H1)", "Hartmann A (H1)",         0.0.plateScale,   0.0.pixelScale)
+  case HartmannB extends Flamingos2LyotWheel("HartmannB", "Hartmann B (H2)", "Hartmann B (H2)",         0.0.plateScale,   0.0.pixelScale)

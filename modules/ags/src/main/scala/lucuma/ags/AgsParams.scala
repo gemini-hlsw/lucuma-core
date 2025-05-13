@@ -8,7 +8,7 @@ import cats.Order
 import cats.data.NonEmptyList
 import cats.data.NonEmptyMap
 import cats.derived.*
-import lucuma.core.enums.F2LyotWheel
+import lucuma.core.enums.Flamingos2LyotWheel
 import lucuma.core.enums.GmosNorthFpu
 import lucuma.core.enums.GmosSouthFpu
 import lucuma.core.enums.GuideProbe
@@ -20,7 +20,7 @@ import lucuma.core.geom.syntax.all.*
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 import lucuma.core.math.syntax.int.*
-import lucuma.core.model.sequence.f2.F2FpuMask
+import lucuma.core.model.sequence.flamingos2.Flamingos2FpuMask
 
 private given Order[Angle] = Angle.SignedAngleOrder
 
@@ -115,25 +115,25 @@ object AgsParams:
 
     override def scienceRadius: Angle = GmosScienceRadius
 
-  case class F2AgsParams(
-    lyot: F2LyotWheel,
-    fpu:  F2FpuMask,
+  case class Flamingos2AgsParams(
+    lyot: Flamingos2LyotWheel,
+    fpu:  Flamingos2FpuMask,
     port: PortDisposition
   ) extends AgsParams
       with SingleProbeAgsParams derives Eq:
-    import lucuma.core.geom.{f2 => F2Geom}
+    import lucuma.core.geom.{flamingos2 => Flamingos2Geom}
 
-    val F2ScienceRadius = 20.arcseconds
+    val Flamingos2ScienceRadius = 20.arcseconds
 
-    override val probe = GuideProbe.F2OIWFS
+    override val probe = GuideProbe.Flamingos2OIWFS
 
     override def patrolFieldAt(posAngle: Angle, offset: Offset): ShapeExpression =
-      F2Geom.patrolField.patrolFieldAt(posAngle, offset, lyot, port)
+      Flamingos2Geom.patrolField.patrolFieldAt(posAngle, offset, lyot, port)
 
     override def scienceArea(posAngle: Angle, offset: Offset): ShapeExpression =
-      F2Geom.scienceArea.shapeAt(posAngle, offset, lyot, fpu)
+      Flamingos2Geom.scienceArea.shapeAt(posAngle, offset, lyot, fpu)
 
     override def probeArm(posAngle: Angle, guideStar: Offset, offset: Offset): ShapeExpression =
-      F2Geom.probeArm.shapeAt(posAngle, guideStar, offset, lyot, port)
+      Flamingos2Geom.probeArm.shapeAt(posAngle, guideStar, offset, lyot, port)
 
-    override def scienceRadius: Angle = F2ScienceRadius
+    override def scienceRadius: Angle = Flamingos2ScienceRadius

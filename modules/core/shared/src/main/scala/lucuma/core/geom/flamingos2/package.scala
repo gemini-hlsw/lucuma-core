@@ -1,7 +1,7 @@
 // Copyright (c) 2016-2025 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package lucuma.core.geom.f2
+package lucuma.core.geom.flamingos2
 
 import coulomb.*
 import coulomb.policy.spire.standard.given
@@ -24,7 +24,7 @@ val ProbeArmOffset             = BigDecimal(256870).withUnit[Micrometer]
 val ProbeArmTaperedWidth       = 15000.mas
 val ProbeArmTaperedLength      = 180000.mas
 
-// Geometry features for F2, in mm.
+// Geometry features for Flamingos2, in mm.
 val LongSlitFOVHeight   = BigDecimal(164100).withUnit[Micrometer]
 val LongSlitFOVSouthPos = BigDecimal(112000).withUnit[Micrometer]
 val LongSlitFOVNorthPos = BigDecimal(52100).withUnit[Micrometer]
@@ -43,14 +43,14 @@ val LowerPatrolAreaRadius = BigDecimal(268693.9).withUnit[Micrometer]
 // The high limit of the bounding box to the right
 val PatrolAreaHiLimit     = BigDecimal(113000).withUnit[Micrometer]
 
-val F2PixelScale: PixelScale   = BigDecimal(0.18).withUnit[ArcSecondPerPixel]
+val Flamingos2PixelScale: PixelScale   = BigDecimal(0.18).withUnit[ArcSecondPerPixel]
 
-def f2SlitWidthPixels(slitWidth: Angle): Quantity[BigDecimal, Pixels] =
+def flamingos2SlitWidthPixels(slitWidth: Angle): Quantity[BigDecimal, Pixels] =
   val widthArcSeconds = Angle.decimalArcseconds.get(slitWidth).withUnit[ArcSecond]
-  widthArcSeconds / F2PixelScale
+  widthArcSeconds / Flamingos2PixelScale
 
 object all
-  extends F2OiwfsProbeArm
-  with F2PatrolField
-  with F2ScienceAreaGeometry
-  with F2CandidatesArea
+  extends Flamingos2OiwfsProbeArm
+  with Flamingos2PatrolField
+  with Flamingos2ScienceAreaGeometry
+  with Flamingos2CandidatesArea

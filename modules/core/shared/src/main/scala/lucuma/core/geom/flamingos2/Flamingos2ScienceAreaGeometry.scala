@@ -1,7 +1,7 @@
 // Copyright (c) 2016-2025 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package lucuma.core.geom.f2
+package lucuma.core.geom.flamingos2
 
 import algebra.instances.all.given
 import coulomb.*
@@ -9,38 +9,38 @@ import coulomb.policy.spire.standard.given
 import coulomb.syntax.*
 import coulomb.units.accepted.*
 import coulomb.units.si.prefixes.*
-import lucuma.core.enums.F2Fpu
-import lucuma.core.enums.F2LyotWheel
+import lucuma.core.enums.Flamingos2Fpu
+import lucuma.core.enums.Flamingos2LyotWheel
 import lucuma.core.geom.*
 import lucuma.core.geom.syntax.all.*
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 import lucuma.core.math.units.*
-import lucuma.core.model.sequence.f2.F2FpuMask
+import lucuma.core.model.sequence.flamingos2.Flamingos2FpuMask
 import spire.math.*
 
 /**
-  * F2 science area geometry.
+  * Flamingos2 science area geometry.
   */
-trait F2ScienceAreaGeometry:
+trait Flamingos2ScienceAreaGeometry:
 
   // base target
   def base: ShapeExpression =
     ShapeExpression.point(Offset.Zero)
 
-  def scienceAreaDimensions(lyotWheel: F2LyotWheel, fpu: F2FpuMask): (Angle, Angle) =
+  def scienceAreaDimensions(lyotWheel: Flamingos2LyotWheel, fpu: Flamingos2FpuMask): (Angle, Angle) =
     lyotWheel match
-      case F2LyotWheel.F16 =>
+      case Flamingos2LyotWheel.F16 =>
         val pixelScale = lyotWheel.pixelScale
         val plateScale = lyotWheel.plateScale
         fpu match
-          case F2FpuMask.Imaging | F2FpuMask.Builtin(F2Fpu.Pinhole) | F2FpuMask.Builtin(F2Fpu.SubPixPinhole) =>
+          case Flamingos2FpuMask.Imaging | Flamingos2FpuMask.Builtin(Flamingos2Fpu.Pinhole) | Flamingos2FpuMask.Builtin(Flamingos2Fpu.SubPixPinhole) =>
             val size = ImagingFOVSize ⨱ plateScale
             (size.toAngle, size.toAngle)
-          case F2FpuMask.Builtin(fpu) =>
+          case Flamingos2FpuMask.Builtin(fpu) =>
             (Angle.fromBigDecimalArcseconds((fpu.slitWidth * pixelScale).value),
               (LongSlitFOVHeight ⨱ plateScale).toAngle)
-          case F2FpuMask.Custom(_, _) =>
+          case Flamingos2FpuMask.Custom(_, _) =>
             ((MOSFOVWidth ⨱ plateScale).toAngle,
               (LongSlitFOVHeight ⨱ plateScale).toAngle)
       case _                                                          =>
@@ -49,8 +49,8 @@ trait F2ScienceAreaGeometry:
   def shapeAt(
     posAngle:  Angle,
     offsetPos: Offset,
-    lyotWheel: F2LyotWheel,
-    fpu:       F2FpuMask
+    lyotWheel: Flamingos2LyotWheel,
+    fpu:       Flamingos2FpuMask
   ): ShapeExpression =
     val plateScale = lyotWheel.plateScale
     val scienceAreaWidth = scienceAreaDimensions(lyotWheel, fpu)._1
@@ -63,7 +63,7 @@ trait F2ScienceAreaGeometry:
     shape ↗ offsetPos ⟲ posAngle
 
   /**
-   * Create the F2 imaging field of view.
+   * Create the Flamingos2 imaging field of view.
    * @param plateScale the plate scale in arcsec/mm
    * @return           a shape representing the FOV
    */
@@ -72,7 +72,7 @@ trait F2ScienceAreaGeometry:
     ShapeExpression.centeredEllipse(size.toAngle, size.toAngle)
 
   /**
-   * Create the F2 MOS field of view shape.
+   * Create the Flamingos2 MOS field of view shape.
    * @param plateScale the plate scale in arcsec/mm
    * @return           a shape representing the FOV
    */
@@ -86,9 +86,9 @@ trait F2ScienceAreaGeometry:
     circle ∩ rectangle
 
   /**
-   * Create the F2 long slit field of view shape.
+   * Create the Flamingos2 long slit field of view shape.
    * @param plateScale       the plate scale in arcsec/mm
-   * @param scienceAreaWidth the width of the science area for the F2 configuration
+   * @param scienceAreaWidth the width of the science area for the Flamingos2 configuration
    * @return                 a shape representing the FOV
    */
   private def longslit(
@@ -100,5 +100,5 @@ trait F2ScienceAreaGeometry:
 
     ShapeExpression.centeredRectangle(scienceAreaWidth, slitHeight.toAngle) ↗ Offset.Zero.copy(q = y.toAngle.q)
 
-object scienceArea extends F2ScienceAreaGeometry
+object scienceArea extends Flamingos2ScienceAreaGeometry
 
