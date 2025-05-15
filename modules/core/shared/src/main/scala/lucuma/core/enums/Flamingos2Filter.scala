@@ -3,6 +3,7 @@
 
 package lucuma.core.enums
 
+import cats.data.NonEmptyList
 import lucuma.core.math.Wavelength
 import lucuma.core.util.Enumerated
 
@@ -23,3 +24,9 @@ enum Flamingos2Filter(val tag: String, val shortName: String, val longName: Stri
   case KShort extends Flamingos2Filter("KShort", "K-short", "K-short (2.15 um)",  2150000.pm)
   case KBlue  extends Flamingos2Filter("KBlue",  "K-blue",  "K-blue (2.06 um)",   2060000.pm)
   case KRed   extends Flamingos2Filter("KRed",   "K-red",   "K-red (2.31 um)",    2310000.pm)
+
+object Flamingos2Filter:
+
+  /** Acquisition filter options. */
+  val acquisition: NonEmptyList[Flamingos2Filter] =
+    NonEmptyList.of(J, H, KShort)

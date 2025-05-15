@@ -3,6 +3,7 @@
 
 package lucuma.core.enums
 
+import cats.syntax.order.*
 import lucuma.core.syntax.timespan.*
 import lucuma.core.util.Enumerated
 import lucuma.core.util.TimeSpan
@@ -28,3 +29,9 @@ enum Flamingos2ReadMode(
   case Medium extends Flamingos2ReadMode("Medium", "medium", "Medium Object", "Medium Source", 6.secTimeSpan,   21.secTimeSpan,  14.secTimeSpan,  Flamingos2Reads.Reads_4, 6.0)
   case Faint  extends Flamingos2ReadMode("Faint",  "faint",  "Faint Object",  "Weak Source",   12.secTimeSpan,  85.secTimeSpan,  20.secTimeSpan,  Flamingos2Reads.Reads_8, 5.0)
 
+object Flamingos2ReadMode:
+
+  def forExposureTime(t: TimeSpan): Flamingos2ReadMode =
+    if t >= Faint.recommendedExposureTime then Faint
+    else if t >= Medium.recommendedExposureTime then Medium
+    else Bright
