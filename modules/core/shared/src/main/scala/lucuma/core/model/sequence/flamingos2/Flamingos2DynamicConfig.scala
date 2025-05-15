@@ -27,7 +27,7 @@ case class Flamingos2DynamicConfig(
   val isLongSlit: Boolean = fpu.isLongSlit
 
   val centralWavelength: Wavelength =
-    disperser.fold(filter.wavelength)(_.wavelength)
+    filter.wavelength
 
 object Flamingos2DynamicConfig:
   given Eq[Flamingos2DynamicConfig] =
