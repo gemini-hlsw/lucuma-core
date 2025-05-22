@@ -17,12 +17,12 @@ trait ArbFlamingos2StaticConfig:
   given Arbitrary[Flamingos2StaticConfig] = Arbitrary(
     for
       mosPreImaging          <- arbitrary[MosPreImaging]
-      useElectronicOffseting <- arbitrary[Boolean]
-    yield Flamingos2StaticConfig(mosPreImaging, useElectronicOffseting)
+      useElectronicOffsetting <- arbitrary[Boolean]
+    yield Flamingos2StaticConfig(mosPreImaging, useElectronicOffsetting)
   )
 
   given Cogen[Flamingos2StaticConfig] =
     Cogen[(MosPreImaging, Boolean)]
-      .contramap(s => (s.mosPreImaging, s.useElectronicOffseting))
+      .contramap(s => (s.mosPreImaging, s.useElectronicOffsetting))
 
 object ArbFlamingos2StaticConfig extends ArbFlamingos2StaticConfig
