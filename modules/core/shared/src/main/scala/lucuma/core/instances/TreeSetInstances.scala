@@ -127,7 +127,7 @@ class TreeSetHash[A: Order: Hash] extends Hash[TreeSet[A]] {
 }
 
 class TreeSetSemilattice[A: Order] extends BoundedSemilattice[TreeSet[A]] {
-  def empty: TreeSet[A] = TreeSet.empty(summon[Order[A]].toOrdering)
+  def empty: TreeSet[A] = TreeSet.empty(using summon[Order[A]].toOrdering)
   def combine(x: TreeSet[A], y: TreeSet[A]): TreeSet[A] = x | y
 }
 

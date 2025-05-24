@@ -3,7 +3,6 @@
 
 package lucuma.core.enums
 
-import cats.syntax.eq.*
 import lucuma.core.util.Enumerated
 
 /**

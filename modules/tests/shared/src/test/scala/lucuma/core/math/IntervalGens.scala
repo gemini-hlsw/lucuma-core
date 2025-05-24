@@ -24,7 +24,6 @@ import java.time.Duration
 import java.time.Instant
 
 trait IntervalGens {
-  import ArbTime.*
 
   private val MaxDelta: Long = Duration.ofMinutes(10).toNanos
 

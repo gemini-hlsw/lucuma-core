@@ -6,7 +6,6 @@ package lucuma.catalog.votable
 import cats.data.*
 import cats.kernel.laws.discipline.EqTests
 import cats.syntax.all.*
-import eu.timepit.refined.*
 import eu.timepit.refined.collection.*
 import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.catalog.*

@@ -5,7 +5,6 @@ package lucuma.core.model
 
 import cats.Eq
 import cats.derived.*
-import cats.syntax.eq.*
 import lucuma.core.enums.AtomStage
 import lucuma.core.enums.DatasetStage
 import lucuma.core.enums.SequenceCommand

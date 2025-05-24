@@ -25,7 +25,6 @@ import java.time.ZoneId
 
 class BoundedIntervalSuite  extends munit.DisciplineSuite with IntervalGens {
   import ArbInterval.given
-  import ArbTime.*
 
   test("fromInterval") {
     forAll { (a: Int, b: Int) =>

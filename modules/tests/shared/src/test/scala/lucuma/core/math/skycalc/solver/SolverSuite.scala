@@ -12,16 +12,15 @@ import spire.math.extras.interval.IntervalSeq
 
 import java.time.Duration
 import java.time.Instant
+import scala.annotation.unused
 
 final class SolverSuite extends munit.DisciplineSuite with IntervalGens {
 
   val TestCalculator = Samples.single(Instant.MIN, ())
 
   case class TestConstraint(f: Instant => Boolean) extends Constraint[Unit, Unit] {
-    override def metAt[R](calc: Samples[Unit])(i: Instant)(implicit
-      rounder:                  SampleRounder[R, Unit]
-    ): Boolean = f(i)
   }
+  override def metAt[R](calc: Samples[Unit])(i: Instant)(using @unused _: SampleRounder[R, Unit]): Boolean = f(i)
 
   implicit val testValueRounder: SampleRounder[Closest, Unit] = new SampleRounder[Closest, Unit] {
     def round(

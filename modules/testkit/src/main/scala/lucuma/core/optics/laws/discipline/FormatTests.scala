@@ -50,7 +50,7 @@ trait FormatTests[A, B] extends Laws {
     ab:              Arbitrary[B],
     eb:              Eq[B]
   ): RuleSet =
-    format(Arbitrary(ga), ea, ab, eb)
+    format(using Arbitrary(ga), ea, ab, eb)
 
   def formatLaws(implicit
     aa: Arbitrary[A],
@@ -66,7 +66,7 @@ trait FormatTests[A, B] extends Laws {
     ab:                  Arbitrary[B],
     eb:                  Eq[B]
   ): RuleSet =
-    formatLaws(Arbitrary(ga), ea, ab, eb)
+    formatLaws(using Arbitrary(ga), ea, ab, eb)
 }
 
 object FormatTests extends Laws {

@@ -8,7 +8,6 @@ import cats.implicits.*
 import coulomb.*
 import coulomb.policy.spire.standard.given
 import coulomb.syntax.*
-import eu.timepit.refined.*
 import eu.timepit.refined.collection.NonEmpty
 import fs2.*
 import fs2.io.file.Files
