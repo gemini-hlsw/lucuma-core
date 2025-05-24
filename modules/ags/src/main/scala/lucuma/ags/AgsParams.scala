@@ -57,7 +57,7 @@ trait SingleProbeAgsParams:
             // note we use the outer posAngle but the inner offset
             // we want the intersection of offsets at a single PA
             .map(offset => patrolFieldAt(position.posAngle, offset))
-            .reduce(_ ∩ _)
+            .reduce(using _ ∩ _)
             .eval
 
         private val scienceAreaShape =

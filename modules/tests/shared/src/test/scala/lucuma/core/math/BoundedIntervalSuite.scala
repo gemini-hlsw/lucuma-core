@@ -5,7 +5,6 @@ package lucuma.core.math
 
 import cats.syntax.all.*
 import eu.timepit.refined.cats.*
-import lucuma.core.arb.ArbTime
 import lucuma.core.math.BoundedInterval
 import lucuma.core.math.arb.ArbInterval
 import lucuma.core.optics.laws.discipline.ValidSplitEpiTests
@@ -25,7 +24,6 @@ import java.time.ZoneId
 
 class BoundedIntervalSuite  extends munit.DisciplineSuite with IntervalGens {
   import ArbInterval.given
-  import ArbTime.*
 
   test("fromInterval") {
     forAll { (a: Int, b: Int) =>

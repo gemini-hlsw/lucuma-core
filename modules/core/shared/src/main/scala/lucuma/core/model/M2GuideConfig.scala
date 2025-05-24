@@ -5,7 +5,6 @@ package lucuma.core.model
 
 import cats.*
 import cats.derived.*
-import cats.syntax.all.*
 import lucuma.core.enums.ComaOption
 import lucuma.core.enums.TipTiltSource
 

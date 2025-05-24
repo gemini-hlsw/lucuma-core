@@ -52,7 +52,7 @@ trait SplitMonoTests[A, B] extends Laws {
     ab:                 Arbitrary[B],
     eb:                 Eq[B]
   ): RuleSet =
-    splitMono(Arbitrary(ga), ea, ab, eb)
+    splitMono(using Arbitrary(ga), ea, ab, eb)
 
   def splitMonoLaws(implicit
     aa: Arbitrary[A],
@@ -68,7 +68,7 @@ trait SplitMonoTests[A, B] extends Laws {
     ab:                     Arbitrary[B],
     eb:                     Eq[B]
   ): RuleSet =
-    splitMonoLaws(Arbitrary(ga), ea, ab, eb)
+    splitMonoLaws(using Arbitrary(ga), ea, ab, eb)
 }
 
 object SplitMonoTests extends Laws {

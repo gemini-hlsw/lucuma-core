@@ -10,7 +10,6 @@ import coulomb.define.*
 import coulomb.syntax.*
 import coulomb.units.accepted.*
 import coulomb.units.mks.*
-import coulomb.units.si.*
 import coulomb.units.si.prefixes.*
 import coulomb.units.time.*
 import eu.timepit.refined.*

@@ -10,7 +10,6 @@ import coulomb.Quantity
 import coulomb.syntax.*
 import eu.timepit.refined.auto.*
 import eu.timepit.refined.cats.*
-import eu.timepit.refined.numeric.*
 import eu.timepit.refined.types.numeric.PosBigDecimal
 import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.math.units.Angstrom
@@ -27,7 +26,7 @@ import scala.annotation.targetName
 /**
  * Represents a span of the spectrum, represented as a small positive wavelength
  * delta in picometers. It can be "anchored" by providing a starting, ending, or
- * central `Wavelength`, which results in a wavelength interval (ie: a 
+ * central `Wavelength`, which results in a wavelength interval (ie: a
  * `BoundedInterval[Wavelength]`).
  */
 opaque type WavelengthDelta = Quantity[PosInt, Picometer]
@@ -44,20 +43,20 @@ object WavelengthDelta:
       toPicometers
 
     /**
-      * Create a wavelength range centered on the given value. Will be truncated at 
+      * Create a wavelength range centered on the given value. Will be truncated at
       * Wavelength.Min and Wavelength.Max.
       */
-    def centeredAt(λ: Wavelength): BoundedInterval[Wavelength] = 
+    def centeredAt(λ: Wavelength): BoundedInterval[Wavelength] =
       val start =  λ.pm.value.value - w.value.value / 2
       BoundedInterval.unsafeClosed(
-        Wavelength(PosInt.unsafeFrom(math.max(Wavelength.Min.pm.value.value, start))), 
+        Wavelength(PosInt.unsafeFrom(math.max(Wavelength.Min.pm.value.value, start))),
         Wavelength(PosInt.unsafeFrom(math.min(Wavelength.Max.pm.value.value - pm.value.value, start) + pm.value.value))
       )
 
     /**
       * Create a wavelength range starting on the given value.  Will be truncated at Wavelength.Max.
       */
-    def startingAt(λ: Wavelength): BoundedInterval[Wavelength] = 
+    def startingAt(λ: Wavelength): BoundedInterval[Wavelength] =
       BoundedInterval.unsafeClosed(λ, Wavelength(PosInt.unsafeFrom(
         math.min(Wavelength.Max.pm.value.value - pm.value.value, λ.pm.value.value) + pm.value.value
       )))
@@ -65,12 +64,12 @@ object WavelengthDelta:
     /**
       * Create a wavelength range ending on the given value. Will be truncated at Wavelength.Min.
       */
-    def endingAt(λ: Wavelength): BoundedInterval[Wavelength] = 
+    def endingAt(λ: Wavelength): BoundedInterval[Wavelength] =
       BoundedInterval.unsafeClosed(
         Wavelength(PosInt.unsafeFrom(math.max(Wavelength.Min.pm.value.value, λ.pm.value.value - w.value.value))),
         λ
       )
-    
+
     // Conversion between units is guaranteed to be positive since the Wavelength in pm is positive.
     // The value can always be exactly represented as a (Pos)BigDecimal since sub-pm fractions cannot be
     // represented.

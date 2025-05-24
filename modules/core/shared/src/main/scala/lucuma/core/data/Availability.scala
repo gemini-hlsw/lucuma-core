@@ -27,9 +27,9 @@ final case class Availability(toDisjointIntervalMap: DisjointIntervalMap[Site, I
     Range(boundedInterval.lower, boundedInterval.upper)
 
   /** The interval set for the given site. */
-  def forSite(site: Site): Diet[Instant] = 
+  def forSite(site: Site): Diet[Instant] =
     toDisjointIntervalMap.get(site).getOrElse(Diet.empty)
-  
+
   /** This `Availability`, narrowed to the specified range. */
   def forRange(range: Range[Instant]): Availability =
     Availability:
@@ -45,22 +45,22 @@ final case class Availability(toDisjointIntervalMap: DisjointIntervalMap[Site, I
   def forDateInterval(dateInterval: DateInterval): Availability =
     Availability:
       DisjointIntervalMap.unsafeFromMap:
-        Site.all.fproduct(forSiteAndDateInterval(_, dateInterval)).toMap  
-  
+        Site.all.fproduct(forSiteAndDateInterval(_, dateInterval)).toMap
+
   /** This interval set intersected with the given bounded interval. */
   def forBoundedInterval(boundedInterval: BoundedInterval[Instant]): Availability =
     forRange(boundedInterval.toRange)
 
   /** The interval set for the given site and DateInterval. */
   def forSiteAndDateInterval(site: Site, dateInterval: DateInterval): Diet[Instant] =
-    val start = dateInterval.start.atStartOfDay(site.timezone).toInstant() 
+    val start = dateInterval.start.atStartOfDay(site.timezone).toInstant()
     val end   = dateInterval.end.atStartOfDay(site.timezone).plusDays(1).toInstant()
     forSiteAndRange(site, Range(start, end))
 
   /** The interval set for the given site and semester. */
   def forSiteAndSemester(site: Site, semester: Semester): Diet[Instant] =
     val start = semester.start.atSite(site).toInstant()
-    val end   = semester.end.atSite(site).toInstant()      
+    val end   = semester.end.atSite(site).toInstant()
     forSiteAndRange(site, Range(start, end))
 
   /** The interval set for the given site, intersected with the specified range. */
@@ -84,7 +84,7 @@ final case class Availability(toDisjointIntervalMap: DisjointIntervalMap[Site, I
     toDisjointIntervalMap.getKeyForRange(range)
 
   /** This `Availability` intersected with `other`. */
-  def intersect(other: Availability): Availability =
+  infix def intersect(other: Availability): Availability =
     Availability:
       toDisjointIntervalMap.intersect(other.toDisjointIntervalMap)
 

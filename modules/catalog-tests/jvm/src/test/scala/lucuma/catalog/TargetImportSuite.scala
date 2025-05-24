@@ -8,7 +8,6 @@ import cats.syntax.all.*
 import fs2.*
 import fs2.io.file.Files
 import fs2.io.file.Path
-import lucuma.catalog.*
 import lucuma.core.enums.Band
 import lucuma.core.math.BrightnessValue
 import lucuma.core.math.Epoch

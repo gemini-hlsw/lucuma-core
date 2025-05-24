@@ -8,7 +8,6 @@ import cats.effect.*
 import cats.syntax.all.*
 import fs2.*
 import fs2.data.xml.*
-import lucuma.catalog.*
 import munit.CatsEffectSuite
 
 import scala.xml.Node
