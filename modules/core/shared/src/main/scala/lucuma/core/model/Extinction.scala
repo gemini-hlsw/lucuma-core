@@ -47,7 +47,7 @@ object Extinction extends NewRefinedQuantity[Short, NonNegative, MilliVegaMagnit
   extension (e: Extinction)
     def toMilliVegaMagnitude: Quantity[NonNegShort, MilliVegaMagnitude] = e.value
     def toVegaMagnitude: Quantity[Rational, VegaMagnitude] = e.toMilliVegaMagnitude.toValue[Short].toValue[Rational].toUnit[VegaMagnitude]
-    @nowarn
+    @nowarn // should be fixed in 3.7.1
     def transmission: Double = math.pow(10.0, toVegaMagnitude.value.toDouble / -2.5)
 
 
