@@ -80,6 +80,4 @@ trait validation:
         _.map(self.reverseGet).toList.mkString(separator)
       )
 
-    def asValidWedge: InputValidWedge[A] = self.asValidWedge
-
 object validation extends validation

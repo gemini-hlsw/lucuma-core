@@ -4,7 +4,6 @@
 package lucuma.core.model.sequence.gmos
 
 import cats.kernel.laws.discipline.*
-import lucuma.core.math.arb.*
 import lucuma.core.math.arb.ArbWavelength
 import lucuma.core.util.arb.*
 import monocle.law.discipline.*

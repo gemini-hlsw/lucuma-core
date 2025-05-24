@@ -5,7 +5,6 @@ package lucuma.core.math
 
 import cats.Eq
 import cats.syntax.all.*
-import lucuma.core.arb.ArbTime
 import lucuma.core.math.BoundedInterval
 import lucuma.core.syntax.time.*
 import org.scalacheck.Arbitrary.*

@@ -18,6 +18,8 @@ import lucuma.core.optics.Format
 import lucuma.core.util.NewRefinedQuantity
 import monocle.Prism
 
+import scala.annotation.nowarn
+
 /**
  * Extinction in mags, a non-negative number with three decimal points of precision,
  * in [0.000, 32.767].
@@ -45,6 +47,7 @@ object Extinction extends NewRefinedQuantity[Short, NonNegative, MilliVegaMagnit
   extension (e: Extinction)
     def toMilliVegaMagnitude: Quantity[NonNegShort, MilliVegaMagnitude] = e.value
     def toVegaMagnitude: Quantity[Rational, VegaMagnitude] = e.toMilliVegaMagnitude.toValue[Short].toValue[Rational].toUnit[VegaMagnitude]
+    @nowarn
     def transmission: Double = math.pow(10.0, toVegaMagnitude.value.toDouble / -2.5)
 
 

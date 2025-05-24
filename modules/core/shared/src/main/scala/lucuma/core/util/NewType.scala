@@ -16,6 +16,7 @@ import lucuma.core.refined.RefinedTypeAux
 import monocle.Iso
 import monocle.Prism
 
+import scala.annotation.nowarn
 import scala.util.NotGiven
 
 /**
@@ -51,6 +52,7 @@ trait NewType[Wrapped]{
 
   given (using CanEqual[Wrapped, Wrapped]): CanEqual[Type, Type]               = CanEqual.derived
   // Only provide an Eq instance if it doesn't also provide Order
+  @nowarn
   given (using eq:   Eq[Wrapped], noOrder: NotGiven[Order[Wrapped]]): Eq[Type] = eq
   given (using enc:  Encoder[Wrapped]): Encoder[Type]                          = enc
   given (using dec:  Decoder[Wrapped]): Decoder[Type]                          = dec
