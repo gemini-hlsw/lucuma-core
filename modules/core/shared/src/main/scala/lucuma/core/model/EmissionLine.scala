@@ -10,7 +10,6 @@ import coulomb.ops.algebra.cats.all.given
 import eu.timepit.refined.cats.*
 import lucuma.core.math.BrightnessUnits.*
 import lucuma.core.math.dimensional.*
-import lucuma.core.math.units.*
 import monocle.Focus
 import monocle.Lens
 

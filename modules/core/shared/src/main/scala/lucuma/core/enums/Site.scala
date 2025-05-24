@@ -6,7 +6,6 @@ package core
 package enums
 
 import coulomb.*
-import coulomb.syntax.*
 import coulomb.units.si.Meter
 import eu.timepit.refined.numeric.*
 import eu.timepit.refined.types.numeric.NonNegInt

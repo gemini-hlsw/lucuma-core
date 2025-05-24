@@ -10,7 +10,6 @@ import cats.kernel.laws.discipline.*
 import cats.syntax.all.*
 import coulomb.*
 import coulomb.ops.algebra.cats.quantity.given
-import coulomb.syntax.*
 import eu.timepit.refined.auto.*
 import eu.timepit.refined.cats.*
 import eu.timepit.refined.numeric.*

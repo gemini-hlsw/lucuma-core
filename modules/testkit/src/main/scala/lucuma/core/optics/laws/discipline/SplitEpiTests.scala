@@ -50,7 +50,7 @@ trait SplitEpiTests[A, B] extends FormatTests[A, B] {
     ab:                Arbitrary[B],
     eb:                Eq[B]
   ): RuleSet =
-    splitEpi(Arbitrary(ga), ea, ab, eb)
+    splitEpi(using Arbitrary(ga), ea, ab, eb)
 
   def splitEpiLaws(implicit
     aa: Arbitrary[A],
@@ -66,7 +66,7 @@ trait SplitEpiTests[A, B] extends FormatTests[A, B] {
     ab:                    Arbitrary[B],
     eb:                    Eq[B]
   ): RuleSet =
-    splitEpiLaws(Arbitrary(ga), ea, ab, eb)
+    splitEpiLaws(using Arbitrary(ga), ea, ab, eb)
 }
 
 object SplitEpiTests extends Laws {

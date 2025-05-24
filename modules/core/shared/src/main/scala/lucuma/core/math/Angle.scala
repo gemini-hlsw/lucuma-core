@@ -367,13 +367,6 @@ object Angle extends AngleOptics {
     */
     inline def tan: Double = Math.tan(toDoubleRadians)
 
-    /** String representation of this Angle, for debugging purposes only. */
-    @targetName("toStringAngle")
-    def toString: String = {
-      val dms = Angle.dms.get(angle)
-      s"Angle.fromDMS(${dms.degrees},${dms.arcminutes},${dms.arcseconds},${dms.milliarcseconds},${dms.microarcseconds})"
-    }
-
     /**
     * angle difference or separation between two angles in the range [0 .. π]
     */
@@ -644,16 +637,6 @@ object HourAngle extends HourAngleOptics {
       HourAngle.fromMicroseconds(toMicroseconds + HourAngle.HourAngle12)
 
     /**
-    * Additive inverse of this HourAngle (by mirroring around the 0-12h axis). This is logically
-    * identical to the superclass implementation and serves only to refine the return type. Exact,
-    * invertible.
-    * @group Transformations
-    */
-    @targetName("unaryHourAngle") // to distinguish from flip Angle
-    def unary_- : HourAngle =
-      HourAngle.fromMicroseconds(-toMicroseconds)
-
-    /**
     * This `HourAngle` in microseconds. Exact.
     * @group Conversions
     */
@@ -682,11 +665,6 @@ object HourAngle extends HourAngleOptics {
     @targetName("minusHourAngle")
     def -(ha: HourAngle): HourAngle =
       HourAngle.fromMicroseconds(toMicroseconds - ha.toMicroseconds)
-
-    /** String representation of this HourAngle, for debugging purposes only. */
-    @targetName("toStringHourAngle")
-    def toString: String =
-      HourAngle.fromStringHMS.taggedToString("HourAngle", hourAngle)
 
   }
 

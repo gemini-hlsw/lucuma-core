@@ -7,7 +7,6 @@ import cats.kernel.Order
 import coulomb.*
 import coulomb.policy.spire.standard.given
 import coulomb.rational.Rational
-import coulomb.syntax.*
 import eu.timepit.refined.predicates.numeric.NonNegative
 import eu.timepit.refined.types.numeric.NonNegShort
 import io.circe.Decoder
@@ -19,8 +18,10 @@ import lucuma.core.optics.Format
 import lucuma.core.util.NewRefinedQuantity
 import monocle.Prism
 
-/** 
- * Extinction in mags, a non-negative number with three decimal points of precision, 
+import scala.annotation.nowarn
+
+/**
+ * Extinction in mags, a non-negative number with three decimal points of precision,
  * in [0.000, 32.767].
  */
 type Extinction = Extinction.Type
@@ -31,7 +32,7 @@ object Extinction extends NewRefinedQuantity[Short, NonNegative, MilliVegaMagnit
   val FromVegaMagnitude: Format[BigDecimal, Extinction] =
     Format(
       d => FromMilliVegaMagnitude.getOption(d.bigDecimal.movePointRight(3).shortValue),
-      e => BigDecimal(FromMilliVegaMagnitude.reverseGet(e)).bigDecimal.movePointLeft(3) 
+      e => BigDecimal(FromMilliVegaMagnitude.reverseGet(e)).bigDecimal.movePointLeft(3)
     )
 
   given Order[Extinction] =
@@ -46,6 +47,7 @@ object Extinction extends NewRefinedQuantity[Short, NonNegative, MilliVegaMagnit
   extension (e: Extinction)
     def toMilliVegaMagnitude: Quantity[NonNegShort, MilliVegaMagnitude] = e.value
     def toVegaMagnitude: Quantity[Rational, VegaMagnitude] = e.toMilliVegaMagnitude.toValue[Short].toValue[Rational].toUnit[VegaMagnitude]
+    @nowarn
     def transmission: Double = math.pow(10.0, toVegaMagnitude.value.toDouble / -2.5)
-  
-  
+
+

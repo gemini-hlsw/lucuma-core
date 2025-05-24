@@ -17,7 +17,7 @@ trait ArbStepEstimate {
   import ArbZipper.arbZipper
 
   private given [A: Arbitrary]: Arbitrary[Zipper[A]] =
-    Arbitrary {arbitrary(arbZipper[A](3))}
+    Arbitrary {arbitrary(using arbZipper[A](3))}
 
   private given [A: Cogen]: Cogen[Zipper[A]] =
     ArbZipper.given_Cogen_Zipper

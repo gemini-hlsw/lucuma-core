@@ -54,7 +54,7 @@ trait WedgeTests[A, B] extends Laws {
     ab:             Arbitrary[B],
     eb:             Eq[B]
   ): RuleSet =
-    wedge(Arbitrary(ga), ea, ab, eb)
+    wedge(using Arbitrary(ga), ea, ab, eb)
 
   def wedgeLaws(implicit
     aa: Arbitrary[A],
@@ -70,7 +70,7 @@ trait WedgeTests[A, B] extends Laws {
     ab:                 Arbitrary[B],
     eb:                 Eq[B]
   ): RuleSet =
-    wedgeLaws(Arbitrary(ga), ea, ab, eb)
+    wedgeLaws(using Arbitrary(ga), ea, ab, eb)
 }
 
 object WedgeTests extends Laws {

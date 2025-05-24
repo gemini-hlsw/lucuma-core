@@ -7,7 +7,6 @@ package lucuma.core.geom.syntax
 import coulomb.*
 import coulomb.conversion.UnitConversion
 import coulomb.policy.spire.standard.given
-import coulomb.syntax.*
 import coulomb.units.accepted.*
 import lucuma.core.geom.*
 import lucuma.core.math.Angle

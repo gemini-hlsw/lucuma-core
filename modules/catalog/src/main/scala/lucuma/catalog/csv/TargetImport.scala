@@ -25,7 +25,6 @@ import lucuma.core.math.Declination
 import lucuma.core.math.Epoch
 import lucuma.core.math.Parallax
 import lucuma.core.math.ProperMotion
-import lucuma.core.math.ProperMotion.AngularVelocity
 import lucuma.core.math.RadialVelocity
 import lucuma.core.math.Redshift
 import lucuma.core.math.RightAscension
@@ -319,8 +318,7 @@ object TargetImport extends ImportEpochParsers:
     // Try to decode a column with several alternative capitalizations
     // If any fails the whole thing fails, if none is found return none
     def withAlternatives[T](
-      col:          String,
-      defaultValue: Option[T] = None
+      col: String
     )(using CellDecoder[Option[T]]): DecoderResult[Option[T]] =
       internalAlternatives(List(col, col.toUpperCase(), col.toLowerCase(), col.capitalize))
 
@@ -328,9 +326,8 @@ object TargetImport extends ImportEpochParsers:
     // Try to decode a column with several alternative each expanded to several capitalization
     // If any fails the whole thing fails, if none is found return none
     def withAlternativesM[T](
-      defaultValue: Option[T] = None,
-      col:          String,
-      extras:       String*
+      col:    String,
+      extras: String*
     )(using CellDecoder[Option[T]]): DecoderResult[Option[T]] =
       internalAlternatives(
         (col :: extras.toList).flatMap(col =>
@@ -342,18 +339,14 @@ object TargetImport extends ImportEpochParsers:
     (row: CsvRow[String]) =>
       for {
         name              <- row.asIn[NonEmptyString]("Name", "NAME")
-        ra                <- row.withAlternativesM[RightAscension](None, "RAJ2000", "RaJ2000")
-        dec               <- row.withAlternativesM[Declination](None, "DecJ2000", "DECJ2000")
-        pmRa              <- row.withAlternativesM[ProperMotion.RA](None, "pmRa", "pmRA")
-        pmDec             <- row.withAlternativesM[ProperMotion.Dec](None, "pmDec", "pmDEC")
-        epoch             <- row.withAlternatives[Epoch]("epoch", Epoch.J2000.some)
-        parallax          <- row.withAlternatives[Parallax]("parallax", None)
-        rv                <- row.withAlternativesM[RadialVelocity](RadialVelocity.Zero.some,
-                                                                   "rv",
-                                                                   "radialvelocity",
-                                                                   "radialVelocity"
-                             )
-        z                 <- row.withAlternativesM[Redshift](None, "redshift")
+        ra                <- row.withAlternativesM[RightAscension]("RAJ2000", "RaJ2000")
+        dec               <- row.withAlternativesM[Declination]("DecJ2000", "DECJ2000")
+        pmRa              <- row.withAlternativesM[ProperMotion.RA]("pmRa", "pmRA")
+        pmDec             <- row.withAlternativesM[ProperMotion.Dec]("pmDec", "pmDEC")
+        epoch             <- row.withAlternatives[Epoch]("epoch")
+        parallax          <- row.withAlternatives[Parallax]("parallax")
+        rv                <- row.withAlternativesM[RadialVelocity]("rv", "radialvelocity", "radialVelocity")
+        z                 <- row.withAlternativesM[Redshift]("redshift")
         rowBrightnesses    = brightnesses(row)
         rowIntegratedUnits = integratedUnits(row)
         rowSurfaceUnits    = surfaceUnits(row)

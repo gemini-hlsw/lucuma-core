@@ -6,9 +6,7 @@ package lucuma.core.geom.flamingos2
 import algebra.instances.all.given
 import coulomb.*
 import coulomb.policy.spire.standard.given
-import coulomb.syntax.*
 import coulomb.units.accepted.*
-import coulomb.units.si.prefixes.*
 import lucuma.core.enums.Flamingos2Fpu
 import lucuma.core.enums.Flamingos2LyotWheel
 import lucuma.core.geom.*
