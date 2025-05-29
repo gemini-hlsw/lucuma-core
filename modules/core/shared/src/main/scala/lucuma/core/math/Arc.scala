@@ -9,9 +9,9 @@ import cats.syntax.all.*
 import lucuma.core.math.Arc.Empty
 import lucuma.core.math.Arc.Full
 import lucuma.core.math.Arc.Partial
-import monocle.Prism
 import monocle.Lens
 import monocle.Optional
+import monocle.Prism
 
 /** An arc, either empty (0°) or full (360°) with no endpoints, or partial and clockwise with starting and ending angles (inclusive). */
 sealed trait Arc[A] {
