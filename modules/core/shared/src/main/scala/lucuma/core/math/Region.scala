@@ -9,7 +9,7 @@ import monocle.Lens
 import monocle.Optional
 
 /** A quasirectangular region on a sphere, given by ranges in RA and Dec. */
-final case class Region(raArc: Arc[RightAscension], decArc: Arc[Declination]):
+final case class Region(raArc: Arc[RightAscension], decArc: Arc[Declination]) {
 
   def contains(coords: Coordinates): Boolean =
     raArc.contains(coords.ra) &&
@@ -35,7 +35,9 @@ final case class Region(raArc: Arc[RightAscension], decArc: Arc[Declination]):
   def nonFull: Boolean =
     !isFull
 
-object Region extends RegionOptics:
+}
+
+object Region extends RegionOptics {
 
   val Empty = Region(Arc.Empty(), Arc.Empty())
   val Full  = Region(Arc.Full(), Arc.Full())
@@ -43,7 +45,9 @@ object Region extends RegionOptics:
   given Eq[Region] =
     Eq.by(a => (a.raArc, a.decArc))
 
-trait RegionOptics:
+}
+
+trait RegionOptics {
 
   val raArc: Lens[Region, Arc[RightAscension]] =
     Focus[Region](_.raArc)
@@ -63,3 +67,4 @@ trait RegionOptics:
   val decArcEnd: Optional[Region, Declination] =
     decArc.andThen(Arc.end[Declination])
   
+}
