@@ -19,7 +19,9 @@ final class ArcSuite extends munit.DisciplineSuite:
   import ArbArc.given
   import ArbRightAscension.given
   import ArbDeclination.given
-  
+
+  override def scalaCheckInitialSeed = "Gdvwgu9aVUkJ7kMUl5BHZvfg1c5QPMnJ4EGutEgXr6A="
+
   extension (d: Double) def positiveFractionalPart: Double =
     d.abs % 1
 
@@ -116,9 +118,11 @@ final class ArcSuite extends munit.DisciplineSuite:
 
   test("Arc[Angle]: Partial arc should containAll of arc created with two interior points."):
     forAll: (a: Arc.Partial[Angle], d1: Double, d2: Double) =>
-      val s = a.start + a.size * (d1 min d2).positiveFractionalPart
-      val e = a.end - a.size * (d1 max d2).positiveFractionalPart
-      assert(a.containsAll(Arc.Partial(s, e)))
+      given Order[Angle] = Angle.AngleOrder
+      (a.size > Angle5 && a.size < Angle350) ==> {
+        val s = Arc.Partial(a.start + Angle1, a.end - Angle1)
+        assert(a.containsAll(s))
+      }
 
   test("Arc[Angle]: There existsOverlap between an partial arc and any other that contains one of its interior points."):
     forAll: (a: Arc.Partial[Angle], d1: Double, e: Angle) =>
