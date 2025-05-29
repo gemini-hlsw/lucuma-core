@@ -4,9 +4,13 @@
 package lucuma.core.model
 package arb
 
-import cats.syntax.all.*
 import eu.timepit.refined.scalacheck.string.*
 import eu.timepit.refined.types.string.NonEmptyString
+import lucuma.core.math.Region
+import lucuma.core.math.arb.ArbRegion
+import lucuma.core.model.Target.Nonsidereal
+import lucuma.core.model.Target.Opportunity
+import lucuma.core.model.Target.Sidereal
 import org.scalacheck.*
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Cogen.*
@@ -17,6 +21,7 @@ trait ArbTarget {
   import ArbSiderealTracking.given
   import ArbSourceProfile.given
   import ArbCatalogInfo.given
+  import ArbRegion.given
 
   given Arbitrary[Target.Sidereal] =
     Arbitrary {
@@ -37,8 +42,21 @@ trait ArbTarget {
       } yield Target.Nonsidereal(n, t, b)
     }
 
+  given Arbitrary[Target.Opportunity] =
+    Arbitrary {
+      for {
+        n <- arbitrary[NonEmptyString]
+        r <- arbitrary[Region]
+        b <- arbitrary[SourceProfile]
+      } yield Target.Opportunity(n, r, b)
+    }
+    
   given Arbitrary[Target] = Arbitrary(
-    Gen.oneOf(arbitrary[Target.Sidereal], arbitrary[Target.Nonsidereal])
+    Gen.oneOf(
+      arbitrary[Target.Sidereal], 
+      arbitrary[Target.Nonsidereal],
+      arbitrary[Target.Opportunity]
+    )
   )
 
   given Cogen[Target.Sidereal] =
@@ -49,12 +67,17 @@ trait ArbTarget {
     Cogen[(String, EphemerisKey, SourceProfile)]
       .contramap(t => (t.name.value, t.ephemerisKey, t.sourceProfile))
 
+  given Cogen[Target.Opportunity] =
+    Cogen[(String, Region, SourceProfile)]
+      .contramap(t => (t.name.value, t.region, t.sourceProfile))
+    
   given Cogen[Target] =
-    Cogen[Either[Target.Sidereal, Target.Nonsidereal]]
-      .contramap {
-        case t @ Target.Sidereal(_, _, _, _) => t.asLeft
-        case t @ Target.Nonsidereal(_, _, _) => t.asRight
-      }
+    Cogen[Target]: (s, t) =>
+      t match
+        case t @ Sidereal(_, _, _, _) => Cogen[Sidereal].perturb(s, t)
+        case t @ Nonsidereal(_, _, _) => Cogen[Nonsidereal].perturb(s, t)
+        case t @ Opportunity(_, _, _) => Cogen[Opportunity].perturb(s, t)
+
 }
 
 object ArbTarget extends ArbTarget

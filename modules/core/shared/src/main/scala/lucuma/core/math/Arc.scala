@@ -130,6 +130,16 @@ object Arc extends ArcOptics {
       case (a @ Partial(a1, b1), b @ Partial(a2, b2)) => a === b
       case _ => false
 
+  given [A: Order]: Order[Arc[A]] =
+    case (Empty(), Empty()) => 0
+    case (Full(), Full()) => 0
+    case (Arc.Empty(), _) => -1
+    case (_, Arc.Empty()) =>  1
+    case (Arc.Full(), _)  => 1
+    case (_, Arc.Full())  => -1
+    case (Arc.Partial(a1, b1), Arc.Partial(a2, b2)) => 
+      (a1, b1) compare (a2, b2)
+
 }
 
 trait ArcOptics {

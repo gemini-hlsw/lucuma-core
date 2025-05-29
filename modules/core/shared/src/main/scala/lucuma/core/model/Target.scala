@@ -81,9 +81,29 @@ object Target extends WithGid('t'.refined) with TargetOptics {
     val NameOrder: Order[Nonsidereal] = Order.by(x => (x.name, x.ephemerisKey))
   }
 
+  case class Opportunity(
+    name:          NonEmptyString,
+    region:        Region,
+    sourceProfile: SourceProfile
+  ) extends Target
+
+  object Opportunity extends OpportunityOptics {
+
+    given Eq[Opportunity] =
+      Eq.by(a => (a.name, a.region, a.sourceProfile))
+
+    val NameOrder: Order[Opportunity] = 
+      Order.by(x => (x.name, x.region))
+
+    val RegionOrder: Order[Opportunity] = 
+      Order.by(x => (x.region, x.name))
+    
+  }
+
   given Eq[Target] = Eq.instance {
     case (a @ Sidereal(_, _, _, _), b @ Sidereal(_, _, _, _)) => a === b
     case (a @ Nonsidereal(_, _, _), b @ Nonsidereal(_, _, _)) => a === b
+    case (a @ Opportunity(_, _, _), b @ Opportunity(_, _, _)) => a === b
     case _                                                    => false
   }
 
@@ -99,8 +119,21 @@ object Target extends WithGid('t'.refined) with TargetOptics {
         Sidereal.TrackOrder.compare(a, b)
       case (a @ Nonsidereal(_, _, _), b @ Nonsidereal(_, _, _)) =>
         Nonsidereal.TrackOrder.compare(a, b)
-      case (Nonsidereal(_, _, _), _)                            => -1
-      case _                                                    => 1
+      case (a @ Opportunity(_, _, _), b @ Opportunity(_, _, _)) =>
+        Opportunity.RegionOrder.compare(a, b)
+
+      // Nonsidereal sorts first
+      case (Nonsidereal(_, _, _), Sidereal(_, _, _, _)) => -1 
+      case (Nonsidereal(_, _, _), Opportunity(_, _, _)) => -1 
+ 
+      // Then Sidereal
+      case (Sidereal(_, _, _, _), Nonsidereal(_, _, _)) => 1
+      case (Sidereal(_, _, _, _), Opportunity(_, _, _)) => -1
+
+      // Then Opportunity
+      case (Opportunity(_, _, _), Sidereal(_, _, _, _)) => 1
+      case (Opportunity(_, _, _), Nonsidereal(_, _, _)) => 1
+
     }
 
   /**
@@ -114,8 +147,21 @@ object Target extends WithGid('t'.refined) with TargetOptics {
         Sidereal.NameOrder.compare(a, b)
       case (a @ Nonsidereal(_, _, _), b @ Nonsidereal(_, _, _)) =>
         Nonsidereal.NameOrder.compare(a, b)
-      case (Nonsidereal(_, _, _), _)                            => -1
-      case _                                                    => 1
+      case (a @ Opportunity(_, _, _), b @ Opportunity(_, _, _)) =>
+        Opportunity.NameOrder.compare(a, b)
+
+      // Nonsidereal sorts first
+      case (Nonsidereal(_, _, _), Sidereal(_, _, _, _)) => -1 
+      case (Nonsidereal(_, _, _), Opportunity(_, _, _)) => -1 
+ 
+      // Then Sidereal
+      case (Sidereal(_, _, _, _), Nonsidereal(_, _, _)) => 1
+      case (Sidereal(_, _, _, _), Opportunity(_, _, _)) => -1
+
+      // Then Opportunity
+      case (Opportunity(_, _, _), Sidereal(_, _, _, _)) => 1
+      case (Opportunity(_, _, _), Nonsidereal(_, _, _)) => 1
+
     }
 
   trait SiderealOptics { this: Sidereal.type =>
@@ -382,6 +428,120 @@ object Target extends WithGid('t'.refined) with TargetOptics {
     val surfaceFluxDensityContinuum: Optional[Nonsidereal, FluxDensityContinuumMeasure[Surface]] =
       sourceProfile.andThen(SourceProfile.surfaceFluxDensityContinuum)
   }
+
+  trait OpportunityOptics { this: Opportunity.type =>
+
+    /** @group Optics */
+    val name: Lens[Opportunity, NonEmptyString] =
+      Focus[Opportunity](_.name)
+
+    /** @group Optics */
+    val region: Lens[Opportunity, Region] =
+      Focus[Opportunity](_.region)
+
+    val sourceProfile: Lens[Opportunity, SourceProfile] =
+      Focus[Opportunity](_.sourceProfile)
+
+    /** @group Optics */
+    val integratedSpectralDefinition: Optional[Opportunity, SpectralDefinition[Integrated]] =
+      sourceProfile.andThen(SourceProfile.integratedSpectralDefinition)
+
+    /** @group Optics */
+    val surfaceSpectralDefinition: Optional[Opportunity, SpectralDefinition[Surface]] =
+      sourceProfile.andThen(SourceProfile.surfaceSpectralDefinition)
+
+    /** @group Optics */
+    val fwhm: Optional[Opportunity, Angle] =
+      sourceProfile.andThen(SourceProfile.fwhm)
+
+    /** @group Optics */
+    val integratedBandNormalizedSpectralDefinition
+      : Optional[Opportunity, SpectralDefinition.BandNormalized[Integrated]] =
+      sourceProfile.andThen(SourceProfile.integratedBandNormalizedSpectralDefinition)
+
+    /** @group Optics */
+    val surfaceBandNormalizedSpectralDefinition
+      : Optional[Opportunity, SpectralDefinition.BandNormalized[Surface]] =
+      sourceProfile.andThen(SourceProfile.surfaceBandNormalizedSpectralDefinition)
+
+    /** @group Optics */
+    val integratedEmissionLinesSpectralDefinition
+      : Optional[Opportunity, SpectralDefinition.EmissionLines[Integrated]] =
+      sourceProfile.andThen(SourceProfile.integratedEmissionLinesSpectralDefinition)
+
+    /** @group Optics */
+    val surfaceEmissionLinesSpectralDefinition
+      : Optional[Opportunity, SpectralDefinition.EmissionLines[Surface]] =
+      sourceProfile.andThen(SourceProfile.surfaceEmissionLinesSpectralDefinition)
+
+    /** @group Optics */
+    val unnormalizedSED: Optional[Opportunity, Option[UnnormalizedSED]] =
+      sourceProfile.andThen(SourceProfile.unnormalizedSED)
+
+    /** @group Optics */
+    val integratedBrightnesses
+      : Optional[Opportunity, SortedMap[Band, BrightnessMeasure[Integrated]]] =
+      sourceProfile.andThen(SourceProfile.integratedBrightnesses)
+
+    /** @group Optics */
+    val surfaceBrightnesses: Optional[Opportunity, SortedMap[Band, BrightnessMeasure[Surface]]] =
+      sourceProfile.andThen(SourceProfile.surfaceBrightnesses)
+
+    /** @group Optics */
+    val integratedBrightnessesT: Traversal[Opportunity, BrightnessMeasure[Integrated]] =
+      sourceProfile.andThen(SourceProfile.integratedBrightnessesT)
+
+    /** @group Optics */
+    val surfaceBrightnessesT: Traversal[Opportunity, BrightnessMeasure[Surface]] =
+      sourceProfile.andThen(SourceProfile.surfaceBrightnessesT)
+
+    /** @group Optics */
+    def integratedBrightnessIn[T](
+      b: Band
+    ): Traversal[Opportunity, BrightnessMeasure[Integrated]] =
+      sourceProfile.andThen(SourceProfile.integratedBrightnessIn(b))
+
+    /** @group Optics */
+    def surfaceBrightnessIn[T](b: Band): Traversal[Opportunity, BrightnessMeasure[Surface]] =
+      sourceProfile.andThen(SourceProfile.surfaceBrightnessIn(b))
+
+    /** @group Optics */
+    val integratedWavelengthLines
+      : Optional[Opportunity, SortedMap[Wavelength, EmissionLine[Integrated]]] =
+      sourceProfile.andThen(SourceProfile.integratedWavelengthLines)
+
+    /** @group Optics */
+    val surfaceWavelengthLines
+      : Optional[Opportunity, SortedMap[Wavelength, EmissionLine[Surface]]] =
+      sourceProfile.andThen(SourceProfile.surfaceWavelengthLines)
+
+    /** @group Optics */
+    val integratedWavelengthLinesT: Traversal[Opportunity, EmissionLine[Integrated]] =
+      sourceProfile.andThen(SourceProfile.integratedWavelengthLinesT)
+
+    /** @group Optics */
+    val surfaceWavelengthLinesT: Traversal[Opportunity, EmissionLine[Surface]] =
+      sourceProfile.andThen(SourceProfile.surfaceWavelengthLinesT)
+
+    /** @group Optics */
+    def integratedWavelengthLineIn(
+      w: Wavelength
+    ): Traversal[Opportunity, EmissionLine[Integrated]] =
+      sourceProfile.andThen(SourceProfile.integratedWavelengthLineIn(w))
+
+    /** @group Optics */
+    def surfaceWavelengthLineIn[T](w: Wavelength): Traversal[Opportunity, EmissionLine[Surface]] =
+      sourceProfile.andThen(SourceProfile.surfaceWavelengthLineIn(w))
+
+    /** @group Optics */
+    val integratedFluxDensityContinuum: Optional[Opportunity, FluxDensityContinuumMeasure[Integrated]] =
+      sourceProfile.andThen(SourceProfile.integratedFluxDensityContinuum)
+
+    /** @group Optics */
+    val surfaceFluxDensityContinuum: Optional[Opportunity, FluxDensityContinuumMeasure[Surface]] =
+      sourceProfile.andThen(SourceProfile.surfaceFluxDensityContinuum)
+  }
+
 }
 
 trait TargetOptics { this: Target.type =>
@@ -392,11 +552,15 @@ trait TargetOptics { this: Target.type =>
   /** @group Optics */
   val nonsidereal: Prism[Target, Target.Nonsidereal] = GenPrism[Target, Target.Nonsidereal]
 
+    /** @group Optics */
+  val opportunity: Prism[Target, Target.Opportunity] = GenPrism[Target, Target.Opportunity]
+
   /** @group Optics */
   val name: Lens[Target, NonEmptyString] =
     Lens[Target, NonEmptyString](_.name)(v => {
       case t @ Target.Sidereal(_, _, _, _) => Target.Sidereal.name.replace(v)(t)
       case t @ Target.Nonsidereal(_, _, _) => Target.Nonsidereal.name.replace(v)(t)
+      case t @ Target.Opportunity(_, _, _) => Target.Opportunity.name.replace(v)(t)
     })
 
   /** @group Optics */
@@ -412,7 +576,11 @@ trait TargetOptics { this: Target.type =>
     Lens[Target, SourceProfile](_.sourceProfile)(v => {
       case t @ Target.Sidereal(_, _, _, _) => Target.Sidereal.sourceProfile.replace(v)(t)
       case t @ Target.Nonsidereal(_, _, _) => Target.Nonsidereal.sourceProfile.replace(v)(t)
+      case t @ Target.Opportunity(_, _, _) => Target.Opportunity.sourceProfile.replace(v)(t)
     })
+
+  val region: Optional[Target, Region] =
+    opportunity.andThen(Opportunity.region)
 
   /** @group Optics */
   val integratedSpectralDefinition: Optional[Target, SpectralDefinition[Integrated]] =

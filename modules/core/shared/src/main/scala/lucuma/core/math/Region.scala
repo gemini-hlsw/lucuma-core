@@ -4,6 +4,7 @@
 package lucuma.core.math
 
 import cats.Eq
+import cats.kernel.Order
 import monocle.Focus
 import monocle.Lens
 import monocle.Optional
@@ -44,6 +45,10 @@ object Region extends RegionOptics {
 
   given Eq[Region] =
     Eq.by(a => (a.raArc, a.decArc))
+
+  given Order[Region] =
+    Order.by: r => 
+      (r.raArc, r.decArc)
 
 }
 
