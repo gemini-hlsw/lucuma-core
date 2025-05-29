@@ -8,11 +8,11 @@ import cats.Order
 import cats.kernel.laws.discipline.EqTests
 import cats.syntax.all.*
 import lucuma.core.math.arb.*
+import monocle.law.discipline.OptionalTests
+import monocle.law.discipline.PrismTests
 import org.scalacheck.Arbitrary
 import org.scalacheck.Cogen
 import org.scalacheck.Prop.*
-import monocle.law.discipline.PrismTests
-import monocle.law.discipline.OptionalTests
 
 final class ArcSuite extends munit.DisciplineSuite:
   import ArbAngle.given

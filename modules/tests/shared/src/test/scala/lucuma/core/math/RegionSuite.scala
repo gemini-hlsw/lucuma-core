@@ -6,9 +6,9 @@ package lucuma.core.math
 import cats.Eq
 import cats.kernel.laws.discipline.EqTests
 import lucuma.core.math.arb.*
+import monocle.law.discipline.OptionalTests
 import org.scalacheck.Arbitrary
 import org.scalacheck.Prop.*
-import monocle.law.discipline.OptionalTests
 
 final class RegionSuite extends munit.DisciplineSuite:
   import ArbArc.given
