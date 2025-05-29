@@ -11,6 +11,8 @@ import lucuma.core.math.arb.*
 import org.scalacheck.Arbitrary
 import org.scalacheck.Cogen
 import org.scalacheck.Prop.*
+import monocle.law.discipline.PrismTests
+import monocle.law.discipline.OptionalTests
 
 final class ArcSuite extends munit.DisciplineSuite:
   import ArbAngle.given
@@ -30,6 +32,11 @@ final class ArcSuite extends munit.DisciplineSuite:
     val label = s"Arc[$tpe]"
 
     checkAll(label, EqTests[Arc[A]].eqv)
+    checkAll(label, PrismTests(Arc.empty[A]))
+    checkAll(label, PrismTests(Arc.full[A]))
+    checkAll(label, PrismTests(Arc.partial[A]))
+    checkAll(label, OptionalTests(Arc.start[A]))
+    checkAll(label, OptionalTests(Arc.end[A]))
 
     test(s"$label: Equality must be natural"):
       forAll: (a: Arc[A], b: Arc[A]) =>
