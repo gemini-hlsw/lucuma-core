@@ -11,12 +11,12 @@ import monocle.Lens
 
 case class Flamingos2StaticConfig(
   mosPreImaging:          MosPreImaging,
-  useElectronicOffseting: Boolean
+  useElectronicOffsetting: Boolean
 )
 
 object Flamingos2StaticConfig:
   given Eq[Flamingos2StaticConfig] =
-    Eq.by(x => (x.mosPreImaging, x.useElectronicOffseting))
+    Eq.by(x => (x.mosPreImaging, x.useElectronicOffsetting))
 
   /** @group Optics */
   val mosPreImaging: Lens[Flamingos2StaticConfig, MosPreImaging] =
@@ -24,4 +24,4 @@ object Flamingos2StaticConfig:
 
   /** @group Optics */
   val useElectronicOffsetting: Lens[Flamingos2StaticConfig, Boolean] =
-    Focus[Flamingos2StaticConfig](_.useElectronicOffseting)
+    Focus[Flamingos2StaticConfig](_.useElectronicOffsetting)

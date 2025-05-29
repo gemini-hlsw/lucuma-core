@@ -302,7 +302,7 @@ class TargetImportFileSuite extends CatsEffectSuite:
     }
   }
 
-  test("parse names file with lookup".ignore) {
+  test("parse names file with lookup".flaky) {
     val xmlFile = "/target_names.csv"
     val file    = getClass().getResource(xmlFile)
     JdkHttpClient
