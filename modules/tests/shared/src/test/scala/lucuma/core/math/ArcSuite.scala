@@ -20,8 +20,6 @@ final class ArcSuite extends munit.DisciplineSuite:
   import ArbRightAscension.given
   import ArbDeclination.given
 
-  override def scalaCheckInitialSeed = "Gdvwgu9aVUkJ7kMUl5BHZvfg1c5QPMnJ4EGutEgXr6A="
-
   extension (d: Double) def positiveFractionalPart: Double =
     d.abs % 1
 
