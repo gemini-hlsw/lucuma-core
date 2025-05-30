@@ -18,16 +18,16 @@ class TimeSuite extends DisciplineSuite:
   private val secondsMinutesList = List((0, false), (29, false), (30, true), (31, true), (59, true))
   private val hoursList = List((0, false), (11, false), (12, true), (23, true))
 
-  private case class TestCase(setField: TemporalField, roundUnit: TemporalUnit, valuesDeltas: List[(Int, Boolean)])
+  case class TestCase(setField: TemporalField, roundUnit: TemporalUnit, valuesDeltas: List[(Int, Boolean)])
 
-  private class TimeChecker[T <: Temporal](
+  class TimeChecker[T <: Temporal](
     setField: (T, TemporalField, Long) => T,
     round: (T, TemporalUnit) => T,
     truncate: (T, TemporalUnit) => T,
     plus: (T, Long, TemporalUnit) => T,
     testCases: List[TestCase]
   ):
-    private def checkField(t: T, fieldToSet: TemporalField, roundUnit: TemporalUnit, valueDeltas: List[(Int, Boolean)]) = 
+    private def checkField(t: T, fieldToSet: TemporalField, roundUnit: TemporalUnit, valueDeltas: List[(Int, Boolean)]) =
       valueDeltas.foreach: (value, shouldCeil) =>
         val actual = setField(t, fieldToSet, value)
         val rounded = round(actual, roundUnit)

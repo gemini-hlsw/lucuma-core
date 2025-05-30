@@ -6,13 +6,12 @@ package lucuma.core.syntax
 import cats.data.NonEmptyChain
 import cats.data.NonEmptyList
 import cats.syntax.all.*
-import eu.timepit.refined.api.Refined
 import eu.timepit.refined.auto.*
 import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.core.optics.*
 import lucuma.core.validation.*
 
-trait validation: 
+trait validation:
   extension(s: String)
     def toEitherErrorsUnsafe: NonEmptyChain[NonEmptyString] =
       NonEmptyChain(NonEmptyString.unsafeFrom(s))
@@ -80,7 +79,5 @@ trait validation:
           .flatMap(_.traverse(self.getValid)),
         _.map(self.reverseGet).toList.mkString(separator)
       )
-
-    def asValidWedge: InputValidWedge[A] = self.asValidWedge
 
 object validation extends validation

@@ -16,6 +16,7 @@ import lucuma.core.refined.RefinedTypeAux
 import monocle.Iso
 import monocle.Prism
 
+import scala.annotation.nowarn
 import scala.util.NotGiven
 
 /**
@@ -33,7 +34,7 @@ trait NewTypeGen[A, W]:
  * type Name = Name.Type
  * ```
  */
-trait NewType[Wrapped]{ 
+trait NewType[Wrapped]{
   opaque type Type = Wrapped
 
   inline def apply(w: Wrapped): Type = w
@@ -51,6 +52,7 @@ trait NewType[Wrapped]{
 
   given (using CanEqual[Wrapped, Wrapped]): CanEqual[Type, Type]               = CanEqual.derived
   // Only provide an Eq instance if it doesn't also provide Order
+  @nowarn
   given (using eq:   Eq[Wrapped], noOrder: NotGiven[Order[Wrapped]]): Eq[Type] = eq
   given (using enc:  Encoder[Wrapped]): Encoder[Type]                          = enc
   given (using dec:  Decoder[Wrapped]): Decoder[Type]                          = dec
@@ -116,7 +118,7 @@ trait NewBoolean extends NewType[Boolean]:
   inline def False: Type = apply(false)
 
   extension (t: Type)
-    def fold[A](whenTrue: => A, whenFalse: => A): A = 
+    def fold[A](whenTrue: => A, whenFalse: => A): A =
       if t then whenTrue else whenFalse
 
     def flip: Type = fold(False, True)

@@ -7,7 +7,6 @@ import coulomb.*
 import coulomb.policy.spire.standard.given
 import coulomb.syntax.*
 import coulomb.units.accepted.*
-import coulomb.units.si.prefixes.*
 import lucuma.core.math.Angle
 import lucuma.core.math.syntax.int.*
 import lucuma.core.math.units.*

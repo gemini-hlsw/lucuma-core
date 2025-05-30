@@ -9,7 +9,6 @@ import cats.kernel.laws.discipline.EqTests
 import cats.laws.discipline.FunctorTests
 import cats.laws.discipline.MonoidKTests
 import cats.syntax.all.*
-import lucuma.core.arb.*
 import lucuma.core.arb.ArbEval
 import lucuma.core.arb.ArbTime
 import lucuma.core.arb.given

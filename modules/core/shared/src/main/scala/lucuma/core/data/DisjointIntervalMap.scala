@@ -33,30 +33,30 @@ sealed trait DisjointIntervalMap[K, V: Discrete: Order]:
         .view
         .mapValues(_ & range)
         .filterNot(_._2.isEmpty)
-        .toMap          
+        .toMap
 
   /** This map intersected pairwise with `other`. */
-  def intersect(other: DisjointIntervalMap[K, V]): DisjointIntervalMap[K, V] =
+  infix def intersect(other: DisjointIntervalMap[K, V]): DisjointIntervalMap[K, V] =
     DisjointIntervalMap.unsafeFromMap:
       toMap
         .view
         .map: (k, d) =>
           k -> other.get(k).map(d & _).getOrElse(Diet.empty)
         .filterNot(_._2.isEmpty)
-        .toMap          
-        
+        .toMap
+
   /** The interval set for `key`, if any. */
   def get(key: K): Option[Diet[V]] =
     toMap.get(key)
 
-  /** 
+  /**
    * A new `DisjointIntervalMap` where `value` is added to `k`'s interval set and
    * removed from its current interval set (if any).
    */
   def add(key: K, value: V): DisjointIntervalMap[K, V] =
     addRange(key, Range(value, value))
 
-  /** 
+  /**
    * A new `DisjointIntervalMap` where `range` is added to `k`'s interval set and
    * removed from any other interval sets where it overlaps.
    */
@@ -71,13 +71,13 @@ sealed trait DisjointIntervalMap[K, V: Discrete: Order]:
           case None    => Some(Diet.fromRange(range)) // new set if there wasn't one
           case Some(d) => Some(d.addRange(range))     // otherwise update
 
-  /** 
+  /**
    * A new `DisjointIntervalMap` where `value` is removed from `k`'s interval set.
    */
   def remove(key: K, value: V): DisjointIntervalMap[K, V] =
     removeRange(key, Range(value, value))
 
-  /** 
+  /**
    * A new `DisjointIntervalMap` where `range` is removed from `k`'s interval set.
    */
   def removeRange(key: K, range: Range[V]): DisjointIntervalMap[K, V] =
@@ -92,16 +92,16 @@ sealed trait DisjointIntervalMap[K, V: Discrete: Order]:
        d.toIterator
         .toList
         .sortBy(_.start)
-        .map: r => 
+        .map: r =>
           val (a, b) = (r.start, r.end)
           if (a == b) then a.toString
           else s"$a..$b"
         .mkString("[", ",", "]")
     s"DisjointIntervalMap(${toMap.view.mapValues(tsd).toMap.toString})"
-  
+
   override def equals(that: Any): Boolean =
     sys.error("Universal equality is not defined for DisjointIntervalMap.")
-  
+
   override def hashCode(): Int =
     sys.error("Universal hashing is not defined for DisjointIntervalMap.")
 
@@ -111,7 +111,7 @@ object DisjointIntervalMap:
   private def disjoint[V: Order](rs: List[Range[V]]): Boolean =
     rs match
       case Nil => true
-      case h :: t => !t.exists(_.overlaps(h)) && disjoint(t)    
+      case h :: t => !t.exists(_.overlaps(h)) && disjoint(t)
 
   /** Construct a DisjointIntervalMap with no entries. */
   def empty[K, V: Discrete: Order]: DisjointIntervalMap[K, V] =
@@ -129,7 +129,7 @@ object DisjointIntervalMap:
   def unsafeFromMap[K, V: Discrete: Order](map: Map[K, Diet[V]]): DisjointIntervalMap[K, V] =
     fromMap(map).getOrElse:
       throw new AssertionError(s"DisjointIntervalMap: overlapping ranges found in $map")
-  
+
   /** Construct a DisjointIntervalMap from the given map, if the interval sets are disjoint. */
   def fromMap[K, V: Discrete: Order](map: Map[K, Diet[V]]): Option[DisjointIntervalMap[K, V]] =
     Option.when(disjoint(map.values.flatMap(_.toIterator).toList)):
@@ -137,10 +137,10 @@ object DisjointIntervalMap:
         val toMap = map
 
   /** DisjointIntervalMap forms a commutative semigroup, with intersection as the combining operation. */
-  given [K,V]: CommutativeSemigroup[DisjointIntervalMap[K,V]] = 
+  given [K,V]: CommutativeSemigroup[DisjointIntervalMap[K,V]] =
     CommutativeSemigroup.instance(_ intersect _)
 
   /** DisjointIntervalMap is Eq if its key and values are Eq. */
-  given [K: Eq,V: Eq]: Eq[DisjointIntervalMap[K, V]] =
+  given [K, V: Eq]: Eq[DisjointIntervalMap[K, V]] =
     Eq.by(_.toMap)
 

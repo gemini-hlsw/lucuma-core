@@ -30,7 +30,7 @@ final class EpochSuite extends munit.DisciplineSuite {
   checkAll("fromString", PrismTests(Epoch.fromString))
   checkAll("fromStringNoScheme",
            FormatTests(Epoch.fromStringNoScheme)
-             .formatWith(ArbEpoch.stringsNoScheme)(Eq[String], ArbEpoch.arbJulianEpoch, Eq[Epoch])
+             .formatWith(ArbEpoch.stringsNoScheme)(using Eq[String], ArbEpoch.arbJulianEpoch, Eq[Epoch])
   )
 
   test("Epoch.eq.natural") {

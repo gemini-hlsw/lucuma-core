@@ -5,13 +5,11 @@ package lucuma.core.model
 
 import cats.syntax.all.*
 import coulomb.*
-import coulomb.rational.Rational
 import eu.timepit.refined.*
 import eu.timepit.refined.api.*
 import eu.timepit.refined.cats.given
 import eu.timepit.refined.numeric.Interval
 import eu.timepit.refined.types.numeric.NonNegShort
-import lucuma.core.math.units.*
 import lucuma.core.refined.given
 import lucuma.core.util.Display
 import lucuma.core.util.Enumerated
@@ -35,7 +33,7 @@ object CloudExtinction extends NewRefined[Extinction, CloudExtinctionPredicate]:
   extension (ce: CloudExtinction)
     def toExtinction: Extinction = ce.value.value
 
-    def toVegaMagnitude: BigDecimal = 
+    def toVegaMagnitude: BigDecimal =
       val r = toExtinction.toVegaMagnitude.value
       BigDecimal(r.n) / BigDecimal(r.d)
 

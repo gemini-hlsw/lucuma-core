@@ -36,7 +36,7 @@ trait ValidSplitEpiTests[E, A, B] extends Laws {
     ab:                         Arbitrary[B],
     eb:                         Eq[B]
   ): RuleSet =
-    validSplitEpiLaws(ee, Arbitrary(ga), ea, ab, eb)
+    validSplitEpiLaws(using ee, Arbitrary(ga), ea, ab, eb)
 
   def validSplitEpi(implicit
     ee: Eq[E],
@@ -60,7 +60,7 @@ trait ValidSplitEpiTests[E, A, B] extends Laws {
     ab:                     Arbitrary[B],
     eb:                     Eq[B]
   ): RuleSet =
-    validSplitEpi(ee, Arbitrary(ga), ea, ab, eb)
+    validSplitEpi(using ee, Arbitrary(ga), ea, ab, eb)
 }
 
 object ValidSplitEpiTests extends Laws {
