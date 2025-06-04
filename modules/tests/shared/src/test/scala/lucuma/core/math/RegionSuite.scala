@@ -4,7 +4,6 @@
 package lucuma.core.math
 
 import cats.Eq
-import cats.kernel.laws.discipline.EqTests
 import cats.kernel.laws.discipline.OrderTests
 import lucuma.core.math.arb.*
 import monocle.law.discipline.OptionalTests
@@ -20,7 +19,6 @@ final class RegionSuite extends munit.DisciplineSuite:
 
   val label = s"Region"
   
-  checkAll(label, EqTests[Region].eqv)
   checkAll(label, OrderTests[Region].order)
   checkAll(label, OptionalTests(Region.raArc))
   checkAll(label, OptionalTests(Region.raArcStart))

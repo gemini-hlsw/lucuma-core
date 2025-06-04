@@ -3,7 +3,6 @@
 
 package lucuma.core.math
 
-import cats.Eq
 import cats.kernel.Order
 import monocle.Focus
 import monocle.Lens
@@ -42,9 +41,6 @@ object Region extends RegionOptics {
 
   val Empty = Region(Arc.Empty(), Arc.Empty())
   val Full  = Region(Arc.Full(), Arc.Full())
-
-  given Eq[Region] =
-    Eq.by(a => (a.raArc, a.decArc))
 
   given Order[Region] =
     Order.by: r => 
