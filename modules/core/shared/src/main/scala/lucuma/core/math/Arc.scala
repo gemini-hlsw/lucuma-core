@@ -12,6 +12,7 @@ import lucuma.core.math.Arc.Partial
 import monocle.Lens
 import monocle.Optional
 import monocle.Prism
+
 import scala.util.NotGiven
 
 /** An arc, either empty (0°) or full (360°) with no endpoints, or partial and clockwise with starting and ending angles (inclusive). */
