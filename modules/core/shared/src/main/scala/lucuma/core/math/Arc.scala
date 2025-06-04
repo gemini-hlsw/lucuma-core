@@ -13,6 +13,8 @@ import monocle.Lens
 import monocle.Optional
 import monocle.Prism
 
+import scala.util.NotGiven
+
 /** An arc, either empty (0°) or full (360°) with no endpoints, or partial and clockwise with starting and ending angles (inclusive). */
 sealed trait Arc[A] {
 
@@ -123,12 +125,22 @@ object Arc extends ArcOptics {
     def end[A: Angular]: Lens[Arc.Partial[A], A] =
       Lens[Arc.Partial[A], A](_.end)(a => s => s.copy(end = a))
     
-  given [A: Eq]: Eq[Arc[A]] =
+  given [A: Eq](using NotGiven[Order[A]]): Eq[Arc[A]] =
     Eq.instance:
       case (Empty(), Empty()) => true
       case (Full(), Full()) => true
       case (a @ Partial(a1, b1), b @ Partial(a2, b2)) => a === b
       case _ => false
+
+  given [A: Order]: Order[Arc[A]] =
+    case (Empty(), Empty()) => 0
+    case (Full(), Full()) => 0
+    case (Arc.Empty(), _) => -1
+    case (_, Arc.Empty()) =>  1
+    case (Arc.Full(), _)  => 1
+    case (_, Arc.Full())  => -1
+    case (Arc.Partial(a1, b1), Arc.Partial(a2, b2)) => 
+      (a1, b1) compare (a2, b2)
 
 }
 

@@ -37,6 +37,7 @@ class TargetSuite extends DisciplineSuite {
   import ArbProperMotion.given
   import ArbRadialVelocity.given
   import ArbRefined.given
+  import ArbRegion.given
   import ArbRightAscension.given
   import ArbSiderealTracking.given
   import ArbSourceProfile.given
@@ -263,6 +264,110 @@ class TargetSuite extends DisciplineSuite {
     "Target.Nonsidereal.surfaceFluxDensityContinuum",
     OptionalTests(Target.Nonsidereal.surfaceFluxDensityContinuum)
   )
+
+  // Laws for Target.Opportunity
+  checkAll("Eq[Target.Opportunity]", EqTests[Target.Opportunity].eqv)
+  checkAll(
+    "Target.Opportunity.RegionOrder", 
+    OrderTests[Target.Opportunity](using Target.Opportunity.RegionOrder).order
+  )
+  checkAll(
+    "Target.Opportunity.NameOrder", 
+    OrderTests[Target.Opportunity](using Target.Opportunity.NameOrder).order
+  )
+  checkAll("Target.Opportunity.name", LensTests(Target.Opportunity.name))
+  checkAll("Target.Opportunity.region", LensTests(Target.Opportunity.region))
+  checkAll("Target.Opportunity.sourceProfile", LensTests(Target.Opportunity.sourceProfile))
+  checkAll(
+    "Target.Opportunity.integratedSpectralDefinition",
+    OptionalTests(Target.Opportunity.integratedSpectralDefinition)
+  )
+  checkAll(
+    "Target.Opportunity.surfaceSpectralDefinition",
+    OptionalTests(Target.Opportunity.surfaceSpectralDefinition)
+  )
+  checkAll("Target.Opportunity.fwhm", OptionalTests(Target.Opportunity.fwhm))
+  checkAll(
+    "Target.Opportunity.integratedBandNormalizedSpectralDefinition",
+    OptionalTests(Target.Opportunity.integratedBandNormalizedSpectralDefinition)
+  )
+  checkAll(
+    "Target.Opportunity.surfaceBandNormalizedSpectralDefinition",
+    OptionalTests(Target.Opportunity.surfaceBandNormalizedSpectralDefinition)
+  )
+  checkAll(
+    "Target.Opportunity.integratedEmissionLinesSpectralDefinition",
+    OptionalTests(Target.Opportunity.integratedEmissionLinesSpectralDefinition)
+  )
+  checkAll(
+    "Target.Opportunity.surfaceEmissionLinesSpectralDefinition",
+    OptionalTests(Target.Opportunity.surfaceEmissionLinesSpectralDefinition)
+  )
+  checkAll(
+    "Target.Opportunity.unnormalizedSED",
+    OptionalTests(Target.Opportunity.unnormalizedSED)
+  )
+  checkAll(
+    "Target.Opportunity.integratedBrightnesses",
+    OptionalTests(Target.Opportunity.integratedBrightnesses)
+  )
+  checkAll(
+    "Target.Opportunity.surfaceBrightnesses",
+    OptionalTests(Target.Opportunity.surfaceBrightnesses)
+  )
+  checkAll(
+    "Target.Opportunity.integratedBrightnessesT",
+    TraversalTests(Target.Opportunity.integratedBrightnessesT)
+  )
+  checkAll(
+    "Target.Opportunity.surfaceBrightnessesT",
+    TraversalTests(Target.Opportunity.surfaceBrightnessesT)
+  )
+  checkAll(
+    "Target.Opportunity.integratedBrightnessIn",
+    TraversalTests(Target.Opportunity.integratedBrightnessIn(Band.B))
+  )
+  checkAll(
+    "Target.Opportunity.surfaceBrightnessIn",
+    TraversalTests(Target.Opportunity.surfaceBrightnessIn(Band.B))
+  )
+  checkAll(
+    "Target.Opportunity.integratedWavelengthLines",
+    OptionalTests(Target.Opportunity.integratedWavelengthLines)
+  )
+  checkAll(
+    "Target.Opportunity.surfaceWavelengthLines",
+    OptionalTests(Target.Opportunity.surfaceWavelengthLines)
+  )
+  checkAll(
+    "Target.Opportunity.integratedWavelengthLinesT",
+    TraversalTests(Target.Opportunity.integratedWavelengthLinesT)
+  )
+  checkAll(
+    "Target.Opportunity.surfaceWavelengthLinesT",
+    TraversalTests(Target.Opportunity.surfaceWavelengthLinesT)
+  )
+  checkAll(
+    "Target.Opportunity.integratedWavelengthLineIn",
+    TraversalTests(
+      Target.Opportunity.integratedWavelengthLineIn(RedWavelength)
+    )
+  )
+  checkAll(
+    "Target.Opportunity.surfaceWavelengthLineIn",
+    TraversalTests(
+      Target.Opportunity.surfaceWavelengthLineIn(RedWavelength)
+    )
+  )
+  checkAll(
+    "Target.Opportunity.integratedFluxDensityContinuum",
+    OptionalTests(Target.Opportunity.integratedFluxDensityContinuum)
+  )
+  checkAll(
+    "Target.Opportunity.surfaceFluxDensityContinuum",
+    OptionalTests(Target.Opportunity.surfaceFluxDensityContinuum)
+  )
+
 
   // Laws for Target
   checkAll("Target.Id", GidTests[Target.Id].gid)
