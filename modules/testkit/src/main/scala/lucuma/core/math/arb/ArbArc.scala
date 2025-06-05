@@ -49,7 +49,7 @@ trait ArbArc:
         10 -> genPartial
       )
       
-  given [A: Cogen: Angular]: Cogen[Arc[A]] =
+  given [A: Cogen]: Cogen[Arc[A]] =
     Cogen: (seed, arc) => 
       arc match
         case e @ Empty() => Cogen[Empty[A]].perturb(seed, e)

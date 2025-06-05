@@ -115,7 +115,7 @@ final class ArcSuite extends munit.DisciplineSuite:
             assert(!a.contains(p))
 
   test("Arc[Angle]: Partial arc should containAll of arc created with two interior points."):
-    forAll: (a: Arc.Partial[Angle], d1: Double, d2: Double) =>
+    forAll: (a: Arc.Partial[Angle]) =>
       given Order[Angle] = Angle.AngleOrder
       (a.size > Angle5 && a.size < Angle350) ==> {
         val s = Arc.Partial(a.start + Angle1, a.end - Angle1)
@@ -123,13 +123,13 @@ final class ArcSuite extends munit.DisciplineSuite:
       }
 
   test("Arc[Angle]: There existsOverlap between an partial arc and any other that contains one of its interior points."):
-    forAll: (a: Arc.Partial[Angle], d1: Double, e: Angle) =>
-      val s = a.start + a.size * d1.positiveFractionalPart
-      assert(a.existsOverlap(Arc.Partial(s, e)))
+    forAll: (a: Arc.Partial[Angle]) =>
+      val s = a.start + a.size * 0.5.positiveFractionalPart
+      assert(a.existsOverlap(Arc.Partial(s, s)))
     
   test("Arc[Angle]: Partial arc should not overlap an arc created with two exterior points."):
     given Order[Angle] = Angle.AngleOrder
-    forAll: (a: Arc.Partial[Angle], d1: Double, d2: Double) =>
+    forAll: (a: Arc.Partial[Angle]) =>
       (a.size > Angle5 && a.size < Angle350) ==> {
         val s = Arc.Partial(a.end + Angle1, a.start - Angle1)
         assert(!a.existsOverlap(s))
