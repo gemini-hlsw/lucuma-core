@@ -33,7 +33,7 @@ trait NewTypeGen[A, W]:
  * type Name = Name.Type
  * ```
  */
-trait NewType[Wrapped]{ 
+trait NewType[Wrapped]{
   opaque type Type = Wrapped
 
   inline def apply(w: Wrapped): Type = w
@@ -116,7 +116,7 @@ trait NewBoolean extends NewType[Boolean]:
   inline def False: Type = apply(false)
 
   extension (t: Type)
-    def fold[A](whenTrue: => A, whenFalse: => A): A = 
+    def fold[A](whenTrue: => A, whenFalse: => A): A =
       if t then whenTrue else whenFalse
 
     def flip: Type = fold(False, True)

@@ -6,9 +6,7 @@ package lucuma.core.model
 import cats.syntax.contravariant.*
 import coulomb.*
 import coulomb.policy.spire.standard.given
-import coulomb.syntax.*
 import coulomb.units.accepted.*
-import coulomb.units.si.prefixes.*
 import eu.timepit.refined.*
 import eu.timepit.refined.api.*
 import eu.timepit.refined.numeric.Interval
@@ -35,7 +33,7 @@ object ImageQuality extends NewRefinedQuantity[Short, ImageQualityPredicate, Cen
   val FromArcSeconds: Format[BigDecimal, ImageQuality] =
     Format(
       d => From.getOption(d.bigDecimal.movePointRight(2).shortValue),
-      e => BigDecimal(From.reverseGet(e)).bigDecimal.movePointLeft(2) 
+      e => BigDecimal(From.reverseGet(e)).bigDecimal.movePointLeft(2)
     )
 
   extension (iq: ImageQuality)

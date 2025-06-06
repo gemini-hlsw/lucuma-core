@@ -7,7 +7,6 @@ package sequence
 
 import cats.Order
 import cats.parse.Parser
-import cats.parse.Parser.*
 import eu.timepit.refined.types.numeric.PosInt
 import io.circe.Decoder
 import io.circe.Encoder

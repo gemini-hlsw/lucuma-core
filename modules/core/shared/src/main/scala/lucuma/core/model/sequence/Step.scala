@@ -4,12 +4,10 @@
 package lucuma.core.model.sequence
 
 import cats.Eq
-import cats.syntax.all.*
 import lucuma.core.enums.Breakpoint
 import lucuma.core.enums.ObserveClass
 import lucuma.core.enums.StepGuideState
 import lucuma.core.math.Offset
-import lucuma.core.util.TimeSpan
 import lucuma.core.util.WithUid
 import lucuma.refined.*
 import monocle.Focus

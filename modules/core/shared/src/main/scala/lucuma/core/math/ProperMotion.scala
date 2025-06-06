@@ -9,7 +9,6 @@ import cats.syntax.all.*
 import coulomb.*
 import coulomb.policy.spire.standard.given
 import coulomb.syntax.*
-import lucuma.core.math.ProperMotion.AngularVelocity
 import lucuma.core.math.units.*
 import lucuma.core.optics.SplitMono
 import lucuma.core.util.*
@@ -71,9 +70,6 @@ object ProperMotion extends ProperMotionOptics {
     inline def toRadians: Double = (μasy.value.toDouble / (3600 * 1e6)).toRadians
 
     def masy: Quantity[Rational, MilliArcSecondPerYear] = μasy.toValue[Rational].toUnit[MilliArcSecondPerYear]
-
-    def toString: String =
-      s"AngularVelocity(${masy.show})"
 
   sealed trait AngularVelocityOptics[A] {
 

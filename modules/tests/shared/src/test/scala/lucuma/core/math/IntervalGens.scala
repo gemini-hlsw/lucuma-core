@@ -5,7 +5,6 @@ package lucuma.core.math
 
 import cats.Eq
 import cats.syntax.all.*
-import lucuma.core.arb.ArbTime
 import lucuma.core.math.BoundedInterval
 import lucuma.core.syntax.time.*
 import org.scalacheck.Arbitrary.*
@@ -24,7 +23,6 @@ import java.time.Duration
 import java.time.Instant
 
 trait IntervalGens {
-  import ArbTime.*
 
   private val MaxDelta: Long = Duration.ofMinutes(10).toNanos
 

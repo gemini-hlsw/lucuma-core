@@ -4,7 +4,6 @@
 package lucuma.core.model.sequence.flamingos2
 
 import cats.Eq
-import cats.syntax.all.*
 import lucuma.core.enums.MosPreImaging
 import monocle.Focus
 import monocle.Lens

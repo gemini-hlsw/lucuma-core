@@ -3,7 +3,6 @@
 
 package lucuma.core.enums
 
-import lucuma.core.syntax.display.*
 import lucuma.core.util.Display
 import lucuma.core.util.Enumerated
 import monocle.Iso

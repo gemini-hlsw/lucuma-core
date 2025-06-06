@@ -4,7 +4,6 @@
 package lucuma.core.model.sequence.flamingos2
 
 import cats.Eq
-import cats.syntax.all.*
 import lucuma.core.enums.*
 import lucuma.core.math.Wavelength
 import lucuma.core.util.TimeSpan

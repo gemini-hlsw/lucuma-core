@@ -18,9 +18,8 @@ final class SolverSuite extends munit.DisciplineSuite with IntervalGens {
   val TestCalculator = Samples.single(Instant.MIN, ())
 
   case class TestConstraint(f: Instant => Boolean) extends Constraint[Unit, Unit] {
-    override def metAt[R](calc: Samples[Unit])(i: Instant)(implicit
-      rounder:                  SampleRounder[R, Unit]
-    ): Boolean = f(i)
+    override def metAt[R: SampleRounder[*, Unit]](calc: Samples[Unit])(i: Instant): Boolean =
+      f(i)
   }
 
   implicit val testValueRounder: SampleRounder[Closest, Unit] = new SampleRounder[Closest, Unit] {

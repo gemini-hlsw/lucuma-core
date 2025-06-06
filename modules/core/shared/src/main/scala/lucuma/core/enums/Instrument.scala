@@ -3,7 +3,6 @@
 
 package lucuma.core.enums
 
-import cats.implicits.*
 import eu.timepit.refined.collection.NonEmpty
 import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.core.data.Availability

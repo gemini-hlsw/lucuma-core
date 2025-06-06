@@ -157,7 +157,7 @@ object AgsAnalysis {
      *   4. Otherwise, keep the posAngle within the group with the highest sorting - this is the
      *      worst case for the posAngle.
      * 5. For the target, choose the lowest sorting of the worst cases from step 4.
-     * NOTE: For any given target, all Usable instances should be the same except vignetting and 
+     * NOTE: For any given target, all Usable instances should be the same except vignetting and
      *       posAngle, so the comparisons really probably boil down to a comparison of vignetting.
      * NOTE: No effort is made to choose a specific angle among angles with equal sorting value.
      */
@@ -171,7 +171,7 @@ object AgsAnalysis {
             chooseForAngle(analyses)
           }
           .flatten
-        NonEmptyList.fromList(forAngles).map(_.minimum(Usable.rankOrder))
+        NonEmptyList.fromList(forAngles).map(_.minimum(using Usable.rankOrder))
 
       def chooseForAngle(analysesForAngle: List[AgsAnalysis]): Option[Usable] =
         analysesForAngle
@@ -181,7 +181,7 @@ object AgsAnalysis {
           }
           .flatMap(l =>
             // worst case for this posAngle
-            NonEmptyList.fromList(l).map(_.maximum(Usable.rankOrder))
+            NonEmptyList.fromList(l).map(_.maximum(using Usable.rankOrder))
           )
 
       val usablePerTarget: List[Usable] =
@@ -193,7 +193,7 @@ object AgsAnalysis {
           }
           .flatten
 
-      usablePerTarget.sorted(Usable.rankOrdering)
+      usablePerTarget.sorted(using Usable.rankOrdering)
     }
 
 }

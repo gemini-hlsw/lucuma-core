@@ -5,7 +5,6 @@ package lucuma
 package core
 package enums
 
-import cats.syntax.eq.*
 import lucuma.core.math.Angle
 import lucuma.core.util.Enumerated
 

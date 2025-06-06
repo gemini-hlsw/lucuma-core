@@ -49,7 +49,7 @@ trait TreeMapInstances extends TreeMapInstances2 {
       def traverse[G[_], A, B](
         fa: TreeMap[K, A]
       )(f:  A => G[B])(using G: Applicative[G]): G[TreeMap[K, B]] = {
-        val gba: Eval[G[TreeMap[K, B]]] = Always(G.pure(TreeMap.empty(Order[K].toOrdering)))
+        val gba: Eval[G[TreeMap[K, B]]] = Always(G.pure(TreeMap.empty(using Order[K].toOrdering)))
         Foldable
           .iterateRight(fa, gba) { (kv, lbuf) =>
             G.map2Eval(f(kv._2), lbuf)((b, buf) => buf + (kv._1 -> b))
@@ -66,7 +66,7 @@ trait TreeMapInstances extends TreeMapInstances2 {
       override def map2Eval[A, B, Z](fa: TreeMap[K, A], fb: Eval[TreeMap[K, B]])(
         f:                               (A, B) => Z
       ): Eval[TreeMap[K, Z]] =
-        if (fa.isEmpty) Eval.now(TreeMap.empty(Order[K].toOrdering)) // no need to evaluate fb
+        if (fa.isEmpty) Eval.now(TreeMap.empty(using Order[K].toOrdering)) // no need to evaluate fb
         else fb.map(fb => map2(fa, fb)(f))
 
       override def ap2[A, B, Z](
@@ -84,7 +84,7 @@ trait TreeMapInstances extends TreeMapInstances2 {
         Foldable.iterateRight(fa.values, lb)(f)
 
       def tailRecM[A, B](a: A)(f: A => TreeMap[K, Either[A, B]]): TreeMap[K, B] = {
-        val bldr = TreeMap.newBuilder[K, B](Order[K].toOrdering)
+        val bldr = TreeMap.newBuilder[K, B](using Order[K].toOrdering)
 
         @tailrec def descend(k: K, either: Either[A, B]): Unit =
           either match {
@@ -185,7 +185,7 @@ class TreeMapCommutativeMonoid[K, V](using V: CommutativeSemigroup[V], O: Order[
 
 class TreeMapMonoid[K, V](using V: Semigroup[V], O: Order[K]) extends Monoid[TreeMap[K, V]] {
 
-  def empty: TreeMap[K, V] = TreeMap.empty(O.toOrdering)
+  def empty: TreeMap[K, V] = TreeMap.empty(using O.toOrdering)
 
   def combine(xs: TreeMap[K, V], ys: TreeMap[K, V]): TreeMap[K, V] =
     if (xs.size <= ys.size)

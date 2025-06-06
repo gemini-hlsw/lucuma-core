@@ -3,7 +3,6 @@
 
 package lucuma.core.conditions
 
-import coulomb.units.accepted.*
 import lucuma.core.enums.Site
 import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.WaterVapor
