@@ -8,6 +8,7 @@ import cats.data.NonEmptyList
 import cats.syntax.all.*
 import coulomb.*
 import coulomb.syntax.*
+import eu.timepit.refined.cats.*
 import eu.timepit.refined.types.numeric.PosBigDecimal
 import lucuma.core.enums.*
 import lucuma.core.math.units.Electron
@@ -58,7 +59,7 @@ object GmosCcdMode {
   // For multiple targets, we take the smallest binning for each axis.
   // https://docs.google.com/document/d/1P8_pXLRVomUSvofyVkAniOyGROcAtiJ7EMYt9wWXB0o/edit?disco=AAAA32SmtD4
   private def asterismBinning(bs: NonEmptyList[(GmosXBinning, GmosYBinning)]): (GmosXBinning, GmosYBinning) =
-    (bs.map(_._1).minimumBy(_.value.count), bs.map(_._2).minimumBy(_.value.count))
+    (bs.map(_._1).minimumBy(_.count), bs.map(_._2).minimumBy(_.count))
 
   object Default {
     object Longslit {

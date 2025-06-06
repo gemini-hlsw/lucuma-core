@@ -88,7 +88,7 @@ object binning {
 
     // The maximum binning that gives the required sampling (<npix)
     Enumerated[GmosXBinning].all.tail.reverse.find { bin =>
-      sampling.value < (nPix / bin.value.count)
+      sampling.value < (nPix / bin.count.value)
     }.getOrElse(GmosXBinning.One)
   }
 
@@ -122,7 +122,7 @@ object binning {
 
     // The maximum binning that gives the required sampling (<npix)
     Enumerated[GmosYBinning].all.tail.reverse.find { bin =>
-      bin.value.count <= npix
+      bin.count.value <= npix
     }.getOrElse(GmosYBinning.One)
   }
 

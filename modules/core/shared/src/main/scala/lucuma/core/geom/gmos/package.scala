@@ -20,7 +20,7 @@ val GmosPixelScale: PixelScale = BigDecimal(0.0807).withUnit[ArcSecondPerPixel]
 
 def gmosSlitWidthPixels(slitWidth: Angle, xBin: GmosXBinning): Quantity[BigDecimal, Pixels] =
   val widthArcSeconds = Angle.decimalArcseconds.get(slitWidth).withUnit[ArcSecond]
-  widthArcSeconds / (BigDecimal(xBin.value.count) * GmosPixelScale)
+  widthArcSeconds / (BigDecimal(xBin.count.value) * GmosPixelScale)
 
 private[gmos] def ifuOffset(fpu: Option[Either[GmosNorthFpu, GmosSouthFpu]]): Offset =
   fpu.fold(Angle.Angle0)(_.fold(_.xOffset, _.xOffset)).offsetInP
