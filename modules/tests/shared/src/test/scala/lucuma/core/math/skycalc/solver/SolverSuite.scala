@@ -12,14 +12,12 @@ import spire.math.extras.interval.IntervalSeq
 
 import java.time.Duration
 import java.time.Instant
-import scala.annotation.unused
 
 final class SolverSuite extends munit.DisciplineSuite with IntervalGens {
 
   val TestCalculator = Samples.single(Instant.MIN, ())
 
   case class TestConstraint(f: Instant => Boolean) extends Constraint[Unit, Unit] {
-    @unused // false positive, should be fixed on 3.7.1
     override def metAt[R: SampleRounder[*, Unit]](calc: Samples[Unit])(i: Instant): Boolean =
       f(i)
   }
