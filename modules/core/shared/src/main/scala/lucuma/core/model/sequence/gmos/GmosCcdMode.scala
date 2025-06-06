@@ -8,6 +8,7 @@ import cats.data.NonEmptyList
 import cats.syntax.all.*
 import coulomb.*
 import coulomb.syntax.*
+import eu.timepit.refined.cats.*
 import eu.timepit.refined.types.numeric.PosBigDecimal
 import lucuma.core.enums.*
 import lucuma.core.math.units.Electron
