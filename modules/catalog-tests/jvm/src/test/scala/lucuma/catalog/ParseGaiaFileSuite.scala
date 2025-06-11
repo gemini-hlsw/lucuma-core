@@ -19,7 +19,7 @@ class ParseGaiaFileSuite extends CatsEffectSuite with VoTableParser {
       Files[IO]
         .readAll(Path(file.getPath()))
         .through(text.utf8.decode)
-        .through(CatalogSearch.siderealTargets(CatalogAdapter.Gaia))
+        .through(CatalogSearch.siderealTargets(CatalogAdapter.Gaia3Esa))
         .compile
         .toList
         .map { l =>
@@ -36,7 +36,7 @@ class ParseGaiaFileSuite extends CatsEffectSuite with VoTableParser {
       Files[IO]
         .readAll(Path(file.getPath()))
         .through(text.utf8.decode)
-        .through(CatalogSearch.siderealTargets(CatalogAdapter.Gaia))
+        .through(CatalogSearch.siderealTargets(CatalogAdapter.Gaia3Esa))
         .compile
         .toList
         .map { l =>

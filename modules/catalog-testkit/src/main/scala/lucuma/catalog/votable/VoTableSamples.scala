@@ -559,4 +559,279 @@ trait VoTableSamples {
           </GROUP>
       </RESOURCE>
     </VOTABLE>
+
+  lazy val voTableAlternative =
+    <VOTABLE xmlns="http://www.ivoa.net/xml/VOTable/v1.3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.5" xsi:schemaLocation="http://www.ivoa.net/xml/VOTable/v1.3 http://vo.ari.uni-heidelberg.de/docs/schemata/VOTable.xsd">
+      <DESCRIPTION>
+    This schema contains data re-published from the official
+    Gaia mirrors (such as ivo://uni-heidelberg.de/gaia/tap) either to
+    support combining its data with local tables (the various Xlite tables)
+    or to make the data more accessible to VO clients (e.g., epoch fluxes).
+
+    Other Gaia-related data is found in, among others, the gdr3mock,
+    gdr3spec, gedr3auto, gedr3dist, gedr3mock, and gedr3spur schemas.</DESCRIPTION>
+      <INFO name="legal" value=" If you use public Gaia DR3 data in a paper, please take note of `ESAC's guide`_ on how to acknowledge and cite it.  .. _ESAC's guide: https://gea.esac.esa.int/archive/documentation/GDR3/Miscellaneous/sec_credit_and_citation_instructions/"/>
+      <RESOURCE type="results">
+        <INFO name="sql_query" value="SELECT source_id, ra, pmra, dec, pmdec, parallax, radial_velocity, phot_g_mean_mag, phot_rp_mean_mag FROM gaia.dr3lite WHERE q3c_join(115.09507, - 17.41750, ra, dec, 0.08182) AND ( ( phot_rp_mean_mag &lt; 17.228 ) OR ( phot_g_mean_mag &lt; 17.228 ) ) AND ( ruwe &lt; 1.4 ) ORDER BY phot_g_mean_mag LIMIT 10">ADQL query translated to local SQL (for debugging)</INFO>
+        <INFO name="query" value="SELECT TOP 10 source_id,ra,pmra,dec,pmdec,parallax,radial_velocity,phot_g_mean_mag,phot_rp_mean_mag       FROM gaia.dr3lite      WHERE CONTAINS(POINT('ICRS',ra,dec),CIRCLE('ICRS', 115.09507, -17.41750, 0.08182))=1      and ((phot_rp_mean_mag &lt; 17.228) or (phot_g_mean_mag &lt; 17.228))      and (ruwe &lt; 1.4)      ORDER BY phot_g_mean_mag       ">Original ADQL query</INFO>
+        <INFO name="QUERY_STATUS" value="OK">Query successful</INFO>
+        <INFO name="server_software" value="DaCHS/2.10 twistedWeb/22.4.0">Software that produced this VOTable</INFO>
+        <INFO name="server" value="http://dc.g-vo.org">Base URI of the server</INFO>
+        <INFO name="citation" ucd="" value="http://dc.g-vo.org/tableinfo/gaia.dr3lite#ti-citing">Advice on citing this resource</INFO>
+        <INFO name="citation" ucd="" value="http://dc.g-vo.org/__system__/tap/run/howtocite">Advice on citing this resource</INFO>
+        <INFO name="ivoid" ucd="meta.ref.ivoid" value="ivo://org.gavo.dc/gaia/q3/cone">Originating VO resource</INFO>
+        <INFO name="ivoid" ucd="meta.ref.ivoid" value="ivo://org.gavo.dc/gaia/q3/dr3lite">Originating VO resource</INFO>
+        <INFO name="ivoid" ucd="meta.ref.ivoid" value="ivo://org.gavo.dc/gaia/q3/edr3lite">Originating VO resource</INFO>
+        <INFO name="ivoid_service" ucd="meta.ref.ivoid" value="ivo://org.gavo.dc/tap">Originating VO service</INFO>
+        <INFO name="publisher" value="The GAVO DC team">Data centre that has delivered the data</INFO>
+        <INFO name="rights" value=" If you use public Gaia DR3 data in a paper, please take note of `ESAC's guide`_ on how to acknowledge and cite it.  .. _ESAC's guide: https://gea.esac.esa.int/archive/documentation/GDR3/Miscellaneous/sec_credit_and_citation_instructions/">Legal conditions applicable to (parts of) the data contained</INFO>
+        <INFO name="request_date" ucd="time.creation" value="2025-06-11T18:31:34Z"/>
+        <INFO name="contact" ucd="meta.email" value="gavo@ari.uni-heidelberg.de">Contact option</INFO>
+        <INFO name="reference_url" ucd="meta.ref.url" value="http://dc.g-vo.org/tableinfo/gaia.dr3lite">More information on the data Source</INFO>
+        <INFO name="reference_url" ucd="meta.ref.url" value="http://dc.g-vo.org/__system__/tap/run/info">More information on the data Source</INFO>
+        <INFO name="creator" ucd="meta.bib.author" value="GAIA Collaboration">Name of a person or entity that produced a contributing resource</INFO>
+        <INFO name="creator" ucd="meta.bib.author" value="GAVO Data Centre">Name of a person or entity that produced a contributing resource</INFO>
+        <COOSYS ID="system" epoch="J2016.0" refposition="BARYCENTER" system="ICRS"/>
+        <TABLE name="dr3lite">
+          <DESCRIPTION> This is gaia_source from the Gaia Data Release 3, stripped to just
+    enough columns to enable basic science (but therefore a bit faster and
+    simpler to deal with than the full gaia_source table).
+
+    Note that on this server, there is also The gedr3dist.main, which
+    gives distances computed by Bailer-Jones et al. Use these in
+    preference to working with the raw parallaxes.
+
+    This server also carries the gedr3mock schema containing a simulation
+    of gaia_source based on a state-of-the-art galaxy model, computed by
+    Rybizki et al.
+
+    The full DR3 is available from numerous places in the VO (in
+    particular from the TAP services ivo://uni-heidelberg.de/gaia/tap and
+    ivo://esavo/gaia/tap).</DESCRIPTION>
+          <GROUP utype="stc:CatalogEntryLocation">
+            <PARAM arraysize="*" datatype="char" name="CoordFlavor" utype="stc:AstroCoordSystem.SpaceFrame.CoordFlavor" value="SPHERICAL"/>
+            <PARAM arraysize="*" datatype="char" name="coord_naxes" utype="stc:AstroCoordSystem.SpaceFrame.CoordFlavor.coord_naxes" value="3"/>
+            <PARAM arraysize="*" datatype="char" name="CoordRefFrame" utype="stc:AstroCoordSystem.SpaceFrame.CoordRefFrame" value="ICRS"/>
+            <PARAM arraysize="*" datatype="char" name="ReferencePosition" utype="stc:AstroCoordSystem.SpaceFrame.ReferencePosition" value="BARYCENTER"/>
+            <PARAM arraysize="*" datatype="char" name="Epoch" utype="stc:AstroCoords.Position3D.Epoch" value="2016.0"/>
+            <PARAM arraysize="*" datatype="char" name="yearDef" utype="stc:AstroCoords.Position3D.Epoch.yearDef" value="J"/>
+            <PARAM arraysize="*" datatype="char" name="URI" utype="stc:DataModel.URI" value="http://www.ivoa.net/xml/STC/stc-v1.30.xsd"/>
+            <FIELDref ref="ra" utype="stc:AstroCoords.Position3D.Value3.C1"/>
+            <FIELDref ref="dec" utype="stc:AstroCoords.Position3D.Value3.C2"/>
+            <FIELDref ref="parallax" utype="stc:AstroCoords.Position3D.Value3.C3"/>
+            <FIELDref ref="pmra" utype="stc:AstroCoords.Velocity3D.Value3.C1"/>
+            <FIELDref ref="pmdec" utype="stc:AstroCoords.Velocity3D.Value3.C2"/>
+            <FIELDref ref="radial_velocity" utype="stc:AstroCoords.Velocity3D.Value3.C3"/>
+          </GROUP>
+          <GROUP ID="ndtiluinwbea" name="note-id">
+            <DESCRIPTION>
+    For the contents of Gaia DR3,
+    the source ID consists of a 64-bit integer, least
+    significant bit = 1 and most significant bit = 64, comprising:
+
+    * a HEALPix index number (sky pixel) in bits 36 - 63; by definition the
+      smallest HEALPix index number is zero.
+    * a 3-bit Data Processing Centre code in bits 33 - 35; for example
+      MOD(source_id / 4294967296, 8) can be used to distinguish between
+      sources initialised via the Initial Gaia Source List by the Torino DPC
+      (code = 0) and sources otherwise detected and assigned by Gaia
+      observations (code &gt; 0)
+    * a 25-bit plus 7 bit sequence number within the HEALPix pixel in bits 1
+      to 32 split into:
+
+      * a 25 bit running number in bits 8 - 32; the running numbers are
+        defined to be positive, i.e. never zero (except in the case of forced
+        empty windows)
+      * a 7-bit component number in bits 1 - 7
+
+    This means that the HEALpix index level 12 of a given source is contained
+    in the most significant bits. HEALpix index of 12 and lower levels can
+    thus be retrieved as follows:
+
+    * HEALpix level 12 = source_id / 34359738368
+    * HEALpix level 11 = source_id / 137438953472
+    * HEALpix level 10 = source_id / 549755813888
+    * HEALpix level n = source_id / 2^35 * 4^(12 - level).</DESCRIPTION>
+            <FIELDref ref="source_id"/>
+          </GROUP>
+          <FIELD ID="source_id" datatype="long" name="source_id" ucd="meta.id;meta.main">
+            <DESCRIPTION>Gaia DR3 unique source identifier. Note that this *cannot* be matched against the DR1 or DR2 source_ids.</DESCRIPTION>
+            <VALUES null="-1">
+              <MIN value="1511828647680"/>
+              <MAX value="6917528993283204480"/>
+            </VALUES>
+          </FIELD>
+          <FIELD ID="ra" datatype="double" name="ra" ref="system" ucd="pos.eq.ra;meta.main" unit="deg">
+            <DESCRIPTION>Barycentric Right Ascension in ICRS at epoch J2016.0</DESCRIPTION>
+            <VALUES>
+              <MIN value="1.6327128351173464e-06"/>
+              <MAX value="359.9999839297149"/>
+            </VALUES>
+          </FIELD>
+          <FIELD ID="pmra" datatype="float" name="pmra" ref="system" ucd="pos.pm;pos.eq.ra" unit="mas/yr">
+            <DESCRIPTION>Proper motion in right ascension of the source in ICRS at J2016.0. This is the tangent plane projection (i.e., multiplied by cos(δ)) of the proper motion vector in the direction of increasing right ascension.</DESCRIPTION>
+            <VALUES>
+              <MIN value="-2290.752"/>
+              <MAX value="4002.6545"/>
+            </VALUES>
+          </FIELD>
+          <FIELD ID="dec" datatype="double" name="dec" ref="system" ucd="pos.eq.dec;meta.main" unit="deg">
+            <DESCRIPTION>Barycentric Declination in ICRS at epoch J2016.0</DESCRIPTION>
+            <VALUES>
+              <MIN value="-89.855906626967"/>
+              <MAX value="89.8088601480769"/>
+            </VALUES>
+          </FIELD>
+          <FIELD ID="pmdec" datatype="float" name="pmdec" ref="system" ucd="pos.pm;pos.eq.dec" unit="mas/yr">
+            <DESCRIPTION>Proper motion in declination at J2016.0.</DESCRIPTION>
+            <VALUES>
+              <MIN value="-5817.8003"/>
+              <MAX value="1707.6958"/>
+            </VALUES>
+          </FIELD>
+          <FIELD ID="parallax" datatype="float" name="parallax" ref="system" ucd="pos.parallax" unit="mas">
+            <DESCRIPTION>Absolute barycentric stellar parallax of the source at the reference epoch J2016.0. If looking for a distance, consider joining with gedr3dist.main and using the distances from there.</DESCRIPTION>
+            <VALUES>
+              <MIN value="-187.0294"/>
+              <MAX value="269.0573"/>
+            </VALUES>
+          </FIELD>
+          <FIELD ID="radial_velocity" datatype="float" name="radial_velocity" ref="system" ucd="spect.dopplerVeloc.opt;em.opt.I" unit="km/s">
+            <DESCRIPTION>Spectroscopic radial velocity in the solar barycentric reference frame. For stars brighter than about 12 mag, this is the median of all single-epoch measurements. For fainter stars, RV estimation is from a co-added spectrum.</DESCRIPTION>
+            <VALUES>
+              <MIN value="-861.1135"/>
+              <MAX value="859.6903"/>
+            </VALUES>
+          </FIELD>
+          <FIELD ID="phot_g_mean_mag" datatype="float" name="phot_g_mean_mag" ucd="phot.mag;em.opt;stat.mean" unit="mag">
+            <DESCRIPTION>Mean magnitude in the G band. This is computed from the G-band mean flux applying the magnitude zero-point in the Vega scale. To obtain error estimates, see phot_g_mean_flux_over_error.</DESCRIPTION>
+            <VALUES>
+              <MIN value="1.7732803"/>
+              <MAX value="22.75072"/>
+            </VALUES>
+          </FIELD>
+          <FIELD ID="phot_rp_mean_mag" datatype="float" name="phot_rp_mean_mag" ucd="phot.mag;em.opt.R" unit="mag">
+            <DESCRIPTION>Mean magnitude in the integrated RP band. This is computed from the RP-band mean flux applying the magnitude zero-point in the Vega scale. To obtain error estimates, see phot_rp_mean_flux_over_error.</DESCRIPTION>
+            <VALUES>
+              <MIN value="1.9687437"/>
+              <MAX value="24.64073"/>
+            </VALUES>
+          </FIELD>
+          <DATA>
+            <TABLEDATA>
+              <TR>
+                <TD>5717302551387263616</TD>
+                <TD>115.13078509503596</TD>
+                <TD>-4.5898952</TD>
+                <TD>-17.378470943968324</TD>
+                <TD>-32.278133</TD>
+                <TD>3.401994</TD>
+                <TD>19.551666</TD>
+                <TD>10.432884</TD>
+                <TD>9.963753</TD>
+              </TR>
+              <TR>
+                <TD>5717290422398546944</TD>
+                <TD>115.15809787648688</TD>
+                <TD>-0.8461862</TD>
+                <TD>-17.41198932433166</TD>
+                <TD>2.862218</TD>
+                <TD>0.2685737</TD>
+                <TD>90.652725</TD>
+                <TD>11.320968</TD>
+                <TD>9.906626</TD>
+              </TR>
+              <TR>
+                <TD>5717278529623194752</TD>
+                <TD>115.1056213385861</TD>
+                <TD>-3.4439244</TD>
+                <TD>-17.4536731554781</TD>
+                <TD>1.8140981</TD>
+                <TD>0.43036488</TD>
+                <TD>76.312164</TD>
+                <TD>12.15546</TD>
+                <TD>11.282522</TD>
+              </TR>
+              <TR>
+                <TD>5717277984171412608</TD>
+                <TD>115.05828105654949</TD>
+                <TD>-5.0840497</TD>
+                <TD>-17.48108295111334</TD>
+                <TD>5.6764627</TD>
+                <TD>0.898946</TD>
+                <TD>30.774696</TD>
+                <TD>12.5115</TD>
+                <TD>12.140568</TD>
+              </TR>
+              <TR>
+                <TD>5717266885975823616</TD>
+                <TD>115.11825700764322</TD>
+                <TD>7.877352</TD>
+                <TD>-17.447370919983996</TD>
+                <TD>-10.628754</TD>
+                <TD>4.565838</TD>
+                <TD>-5.5614724</TD>
+                <TD>12.955678</TD>
+                <TD>12.163287</TD>
+              </TR>
+              <TR>
+                <TD>5717278911884258176</TD>
+                <TD>115.09192337695882</TD>
+                <TD>1138.69</TD>
+                <TD>-17.41606611553706</TD>
+                <TD>-542.5559</TD>
+                <TD>109.34396</TD>
+                <TD>NaN</TD>
+                <TD>12.970207</TD>
+                <TD>12.747707</TD>
+              </TR>
+              <TR>
+                <TD>5717279667799253760</TD>
+                <TD>115.04547959087239</TD>
+                <TD>-2.0973725</TD>
+                <TD>-17.408184825633423</TD>
+                <TD>0.86172307</TD>
+                <TD>0.7067198</TD>
+                <TD>47.9421</TD>
+                <TD>13.024004</TD>
+                <TD>12.438143</TD>
+              </TR>
+              <TR>
+                <TD>5717279770877713792</TD>
+                <TD>115.08180902298042</TD>
+                <TD>-2.9639945</TD>
+                <TD>-17.39321171722777</TD>
+                <TD>-0.6608278</TD>
+                <TD>0.3536838</TD>
+                <TD>50.982304</TD>
+                <TD>13.059916</TD>
+                <TD>12.200551</TD>
+              </TR>
+              <TR>
+                <TD>5717279289841451520</TD>
+                <TD>115.02774840068207</TD>
+                <TD>-6.68285</TD>
+                <TD>-17.41158287028018</TD>
+                <TD>-9.555653</TD>
+                <TD>1.0674313</TD>
+                <TD>23.113613</TD>
+                <TD>13.179063</TD>
+                <TD>12.7104225</TD>
+              </TR>
+              <TR>
+                <TD>5717266473658972672</TD>
+                <TD>115.1270374417545</TD>
+                <TD>0.49613327</TD>
+                <TD>-17.479177473210687</TD>
+                <TD>-8.2364235</TD>
+                <TD>5.7029996</TD>
+                <TD>36.453594</TD>
+                <TD>13.313252</TD>
+                <TD>12.385625</TD>
+              </TR>
+            </TABLEDATA>
+          </DATA>
+        </TABLE>
+      </RESOURCE>
+    </VOTABLE>
 }

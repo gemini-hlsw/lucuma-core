@@ -6,12 +6,13 @@ package lucuma.catalog.votable
 import cats.syntax.all.*
 
 sealed trait ADQLGaiaQuery {
-  val gaia = CatalogAdapter.Gaia
 
   /**
    * Builds an adql query for gaia taking input from the adapter and the query itself
    */
-  def adql(gaia: CatalogAdapter.Gaia, cs: ADQLQuery)(using ci: ADQLInterpreter): String = {
+  def adql(gaia: CatalogAdapter.Gaia, cs: ADQLQuery)(using
+    ci: ADQLInterpreter
+  )(using CatalogAdapter.Gaia): String = {
     //
     val fields           = ci.allFields.map(_.id.value.toLowerCase).mkString(",")
     val extraFields      = ci.extraFields(cs.base)

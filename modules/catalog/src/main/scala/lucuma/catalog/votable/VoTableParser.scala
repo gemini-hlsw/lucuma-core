@@ -294,7 +294,7 @@ trait VoTableParser {
     bandList: BandsList,
     row:      TableRow
   ): EitherNec[CatalogProblem, Target.Sidereal] = {
-    val entries = row.itemsMap
+    val entries: Map[FieldId, String] = row.itemsMap
 
     // Only pick one relevant brightness
     def parseBandBrightnesses =
