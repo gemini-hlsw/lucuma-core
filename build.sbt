@@ -39,7 +39,7 @@ lazy val refinedVersion             = "0.11.3"
 lazy val refinedAlgebraVersion      = "0.1.1"
 lazy val scalaJavaTimeVersion       = "2.6.0"
 lazy val scalajsStubVersion         = "1.1.0"
-lazy val scalaXmlVersion            = "2.3.0"
+lazy val scalaXmlVersion            = "2.4.0"
 lazy val spireVersion               = "0.18.0"
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
