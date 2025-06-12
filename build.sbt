@@ -12,7 +12,7 @@ ThisBuild / crossScalaVersions := Seq("3.7.1")
 ThisBuild / scalacOptions += "-language:implicitConversions" // TODO
 
 lazy val catsVersion                = "2.13.0"
-lazy val catsCollctionsVersion      = "0.9.9"
+lazy val catsCollctionsVersion      = "0.9.10"
 lazy val catsEffectVersion          = "3.6.1"
 lazy val catsParseVersion           = "1.1.0"
 lazy val catsScalacheckVersion      = "0.3.2"
