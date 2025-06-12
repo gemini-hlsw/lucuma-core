@@ -50,22 +50,24 @@ trait GaiaBrightnessADQL extends CatalogQuery {
   def circleQuery(base: Coordinates, r: Angle): String =
     f"CIRCLE('ICRS', ${base.ra.toAngle.toDoubleDegrees}%7.5f, ${base.dec.toAngle.toSignedDoubleDegrees}%7.5f, ${r.toDoubleDegrees}%7.5f)"
 
-  def adqlBrightness(brightnessConstraints: Option[BrightnessConstraints]): List[String] =
+  def adqlBrightness(
+    brightnessConstraints: Option[BrightnessConstraints]
+  )(using adapter: CatalogAdapter.Gaia): List[String] =
     brightnessConstraints.foldMap {
       case BrightnessConstraints(bands, faintness, None)             =>
         bands.bands
           .collect {
-            case Band.Gaia   => CatalogAdapter.Gaia.gMagField.id
-            case Band.GaiaBP => CatalogAdapter.Gaia.bpMagField.id
-            case Band.GaiaRP => CatalogAdapter.Gaia.rpMagField.id
+            case Band.Gaia   => adapter.gMagField.id
+            case Band.GaiaBP => adapter.bpMagField.id
+            case Band.GaiaRP => adapter.rpMagField.id
           }
           .map(bid => f"($bid < ${faintness.brightness.value.value.toDouble}%.3f)")
       case BrightnessConstraints(bands, faintness, Some(saturation)) =>
         bands.bands
           .collect {
-            case Band.Gaia   => CatalogAdapter.Gaia.gMagField.id
-            case Band.GaiaBP => CatalogAdapter.Gaia.bpMagField.id
-            case Band.GaiaRP => CatalogAdapter.Gaia.rpMagField.id
+            case Band.Gaia   => adapter.gMagField.id
+            case Band.GaiaBP => adapter.bpMagField.id
+            case Band.GaiaRP => adapter.rpMagField.id
           }
           .map(bid =>
             f"($bid between ${saturation.brightness.value.value.toDouble}%.3f and ${faintness.brightness.value.value.toDouble}%.3f)"
@@ -79,7 +81,7 @@ trait GaiaBrightnessADQL extends CatalogQuery {
 sealed trait ADQLQuery {
   def base: Coordinates
   def adqlGeom(using ADQLInterpreter): String
-  def adqlBrightness: List[String]
+  def adqlBrightness(using CatalogAdapter.Gaia): List[String]
   def proxy: Option[Uri]
 }
 
@@ -94,7 +96,8 @@ case class QueryByADQL(
 ) extends CatalogQuery
     with ADQLQuery
     with GaiaBrightnessADQL {
-  def adqlBrightness: List[String] = adqlBrightness(brightnessConstraints)
+  def adqlBrightness(using CatalogAdapter.Gaia): List[String] =
+    adqlBrightness(brightnessConstraints)
 
   def adqlGeom(using ev: ADQLInterpreter): String = {
     implicit val si = ev.shapeInterpreter
@@ -122,7 +125,8 @@ case class TimeRangeQueryByADQL(
     with GaiaBrightnessADQL {
   val base = tracking.baseCoordinates
 
-  def adqlBrightness: List[String] = adqlBrightness(brightnessConstraints)
+  def adqlBrightness(using CatalogAdapter.Gaia): List[String] =
+    adqlBrightness(brightnessConstraints)
 
   def adqlGeom(using ev: ADQLInterpreter): String = {
     given ShapeInterpreter = ev.shapeInterpreter
@@ -170,7 +174,8 @@ case class CoordinatesRangeQueryByADQL(
     with GaiaBrightnessADQL {
   val base = Coordinates.centerOf(coords)
 
-  def adqlBrightness: List[String] = adqlBrightness(brightnessConstraints)
+  def adqlBrightness(using CatalogAdapter.Gaia): List[String] =
+    adqlBrightness(brightnessConstraints)
 
   def adqlGeom(using ev: ADQLInterpreter): String = {
     given ShapeInterpreter = ev.shapeInterpreter

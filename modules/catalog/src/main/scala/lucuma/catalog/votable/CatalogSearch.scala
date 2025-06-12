@@ -30,12 +30,17 @@ object CatalogSearch {
   }
 
   /**
-   * Takes a search query and builds a uri to query gaia
+   * Takes a search query and builds a uri to query gaia.
    */
   def gaiaSearchUri[F[_]](
     query: ADQLQuery
-  )(using CatalogAdapter.Gaia, ADQLInterpreter): Uri =
-    gaiaSearchByQueryString(ADQLGaiaQuery.adql(summon[CatalogAdapter.Gaia], query), query.proxy)
+  )(using adapter: CatalogAdapter.Gaia)(using ADQLInterpreter): Uri =
+    gaiaSearchByQueryString(
+      adapter.uri,
+      ADQLGaiaQuery.adql(summon[CatalogAdapter.Gaia], query),
+      adapter.format,
+      query.proxy
+    )
 
   /**
    * Takes a source id and builds a uri to query gaia for that one star.
@@ -43,23 +48,27 @@ object CatalogSearch {
   def gaiaSearchUriById[F[_]](
     id:    Long,
     proxy: Option[Uri] = None
-  )(using CatalogAdapter.Gaia): Uri =
-    gaiaSearchByQueryString(GaiaSourceIdQuery.idQueryString(id), proxy)
+  )(using adapter: CatalogAdapter.Gaia): Uri =
+    gaiaSearchByQueryString(adapter.uri, GaiaSourceIdQuery.idQueryString(id), adapter.format, proxy)
 
   /**
    * Helper method for the gaia queries.
    */
-  private def gaiaSearchByQueryString[F[_]](query: String, proxy: Option[Uri]): Uri = {
-    val esaUri = uri"https://gea.esac.esa.int/tap-server/tap/sync"
-    val base   = proxy.fold(esaUri)(p =>
+  private def gaiaSearchByQueryString[F[_]](
+    uri:    Uri,
+    query:  String,
+    format: String,
+    proxy:  Option[Uri]
+  ): Uri = {
+    val base = proxy.fold(uri)(p =>
       Uri
-        .fromString(s"${p}/$esaUri")
+        .fromString(s"${p}/$uri")
         .getOrElse(sys.error("Cannot build gaia url"))
     )
     base
       .withQueryParam("REQUEST", "doQuery")
       .withQueryParam("LANG", "ADQL")
-      .withQueryParam("FORMAT", "votable_plain")
+      .withQueryParam("FORMAT", format)
       .withQueryParam("QUERY", query)
   }
 

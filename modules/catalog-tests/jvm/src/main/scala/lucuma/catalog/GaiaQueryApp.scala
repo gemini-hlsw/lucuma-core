@@ -22,7 +22,7 @@ import org.http4s.client.Client
 import org.http4s.jdkhttpclient.JdkHttpClient
 
 trait GaiaQuerySample {
-  implicit val gaia: CatalogAdapter.Gaia = CatalogAdapter.Gaia3Lite
+  given gaia: CatalogAdapter.Gaia = CatalogAdapter.Gaia3LiteEsa
 
   val epoch = Epoch.fromString.getOption("J2022.000").getOrElse(Epoch.J2000)
 

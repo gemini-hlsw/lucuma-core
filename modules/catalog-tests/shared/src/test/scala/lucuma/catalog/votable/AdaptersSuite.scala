@@ -40,7 +40,7 @@ class AdaptersSuite extends CatsEffectSuite with VoTableParser with VoTableSampl
       .through(events[IO, Char]())
       .through(referenceResolver[IO]())
       .through(normalize[IO])
-      .through(VoTableParser.xml2targets[IO](CatalogAdapter.Gaia))
+      .through(VoTableParser.xml2targets[IO](CatalogAdapter.Gaia3Esa))
       .compile
       .lastOrError
       .map {
@@ -94,7 +94,7 @@ class AdaptersSuite extends CatsEffectSuite with VoTableParser with VoTableSampl
       .through(events[IO, Char]())
       .through(referenceResolver[IO]())
       .through(normalize[IO])
-      .through(VoTableParser.xml2guidestars[IO](CatalogAdapter.Gaia))
+      .through(VoTableParser.xml2guidestars[IO](CatalogAdapter.Gaia3Esa))
       .compile
       .lastOrError
       .map {
@@ -123,6 +123,40 @@ class AdaptersSuite extends CatsEffectSuite with VoTableParser with VoTableSampl
             Epoch.fromString.getOption("J2015.500")
           )
         case Left(_)  => fail("Gaia response could not be parsed")
+      }
+  }
+
+  test("parse alternative votable (from GAVO (dc.g-vo.org))") {
+    Stream
+      .emit[IO, String](Utility.trim(voTableAlternative).toString)
+      .through(CatalogSearch.guideStars[IO](CatalogAdapter.Gaia3LiteGavo))
+      .compile
+      .lastOrError
+      .map {
+        case Right(t) =>
+          assertEquals(t.name, "Gaia DR3 5717266473658972672".refined[NonEmpty])
+          assertEquals(t.tracking.epoch.some, Epoch.Julian.fromEpochYears(2016.0))
+          assertEquals(t.catalogInfo, none)
+          // base coordinates
+          assertEquals(
+            Target.baseRA.getOption(t),
+            RightAscension.fromDoubleDegrees(115.1270374417545).some
+          )
+          assertEquals(
+            Target.baseDec.getOption(t),
+            Declination.fromDoubleDegrees(-17.479177473210687)
+          )
+          // proper motions
+          assertEquals(
+            Target.properMotionRA.getOption(t),
+            ProperMotion.RA.milliarcsecondsPerYear.reverseGet(0.49613327).some
+          )
+          assertEquals(
+            Target.properMotionDec.getOption(t),
+            ProperMotion.Dec.milliarcsecondsPerYear.reverseGet(-8.2364235).some
+          )
+        case Left(e)  =>
+          fail(s"Gaia response could not be parsed: ${e.toList.mkString("; ")}")
       }
   }
 }

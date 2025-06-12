@@ -22,6 +22,8 @@ import lucuma.core.math.dimensional.*
 import lucuma.core.math.units.*
 import lucuma.core.syntax.string.*
 import lucuma.core.util.*
+import org.http4s.Uri
+import org.http4s.syntax.all.*
 
 import scala.math.BigDecimal
 
@@ -316,7 +318,9 @@ object CatalogAdapter {
 
     override def defaultEpoch: Epoch = Epoch.Julian.fromEpochYears(2016.0).get
 
-    val gaiaDB: String = "gaiadr3.gaia_source_lite"
+    def uri: Uri
+    def gaiaDB: String
+    def format: String
 
     def idField: FieldId             = FieldId.unsafeFrom("DESIGNATION", VoTableParser.UCD_OBJID)
     def nameField: FieldId           = idField
@@ -348,7 +352,7 @@ object CatalogAdapter {
      * List of all Gaia fields of interest. These are used in forming the ADQL query that produces
      * the VO Table. See VoTableClient and the GaiaBackend.
      */
-    val allFields: List[FieldId] =
+    lazy val allFields: List[FieldId] =
       List(
         idField,
         raField,
@@ -402,18 +406,24 @@ object CatalogAdapter {
 
   }
 
-  object Gaia extends Gaia
-
-  object Gaia3 extends Gaia {
-    override val gaiaDB: String = "gaiadr3.gaia_source"
+  trait GaiaEsa extends Gaia {
+    override lazy val uri: Uri       = uri"https://gea.esac.esa.int/tap-server/tap/sync"
+    override lazy val format: String = "votable_plain"
   }
 
-  object Gaia3Lite extends Gaia {
-    override val idField: FieldId = FieldId.unsafeFrom("source_id", VoTableParser.UCD_TYPEDID)
-    val alternateIdField: FieldId = FieldId.unsafeFrom("SOURCE_ID", VoTableParser.UCD_TYPEDID)
-    override val gaiaDB: String   = "gaiadr3.gaia_source_lite"
+  trait GaiaGavo extends Gaia {
+    override lazy val uri: Uri       = uri"https://dc.g-vo.org/__system__/tap/run/sync"
+    override lazy val format: String = "votabletd"
+  }
 
-    override def defaultEpoch: Epoch = Epoch.Julian.fromEpochYears(2016.0).get
+  object Gaia3Esa extends GaiaEsa {
+    override lazy val gaiaDB: String = "gaiadr3.gaia_source"
+  }
+
+  trait Gaia3Lite extends Gaia {
+    def alternateIdField: FieldId
+
+    override val defaultEpoch: Epoch = Epoch.Julian.fromEpochYears(2016.0).get
 
     override def parseName(entries: Map[FieldId, String]): Option[String] =
       entries.get(idField).orElse(entries.get(alternateIdField)).map(n => s"Gaia DR3 $n")
@@ -424,7 +434,7 @@ object CatalogAdapter {
     /**
      * Gaia lite doesn't have epoch
      */
-    override val allFields: List[FieldId] =
+    override lazy val allFields: List[FieldId] =
       List(
         idField,
         raField,
@@ -438,10 +448,25 @@ object CatalogAdapter {
       )
   }
 
-  def forCatalog(c: CatalogName): Option[CatalogAdapter] =
-    c match {
-      case CatalogName.Simbad => Simbad.some
-      case CatalogName.Gaia   => Gaia3.some
-      case CatalogName.Import => Gaia3.some
-    }
+  trait Gaia3LiteEsa extends Gaia3Lite with GaiaEsa {
+    override val gaiaDB: String = "gaiadr3.gaia_source_lite"
+
+    override val idField: FieldId          = FieldId.unsafeFrom("source_id", VoTableParser.UCD_TYPEDID)
+    override val alternateIdField: FieldId =
+      FieldId.unsafeFrom("SOURCE_ID", VoTableParser.UCD_TYPEDID)
+  }
+
+  object Gaia3LiteEsa extends Gaia3LiteEsa
+
+  object Gaia3LiteEsaProxy extends Gaia3LiteEsa { // Do not use with a proxy. This is already a proxy.
+    override lazy val uri: Uri = uri"https://gaia.noirlab.edu/tap-server/tap/sync"
+  }
+
+  object Gaia3LiteGavo extends Gaia3Lite with GaiaGavo {
+    override val gaiaDB: String = "gaia.dr3lite"
+
+    override val idField: FieldId          = FieldId.unsafeFrom("source_id", VoTableParser.UCD_OBJID)
+    override val alternateIdField: FieldId =
+      FieldId.unsafeFrom("SOURCE_ID", VoTableParser.UCD_OBJID)
+  }
 }

@@ -49,7 +49,7 @@ import java.time.Instant
 
 trait AgsSelectionSample {
 
-  given gaia: CatalogAdapter.Gaia = CatalogAdapter.Gaia3Lite
+  given gaia: CatalogAdapter.Gaia = CatalogAdapter.Gaia3LiteEsa
 
   given ADQLInterpreter =
     ADQLInterpreter.nTarget(100)
