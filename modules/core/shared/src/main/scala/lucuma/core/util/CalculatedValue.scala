@@ -13,6 +13,8 @@ import cats.Traverse
 import cats.kernel.CommutativeMonoid
 import cats.syntax.functor.*
 import cats.syntax.monoid.*
+import monocle.Focus
+import monocle.Lens
 
 import scala.annotation.tailrec
 
@@ -33,7 +35,9 @@ final case class CalculatedValue[A](
 )
 
 object CalculatedValue:
-
+  def state[A]: Lens[CalculatedValue[A], CalculationState] = Focus[CalculatedValue[A]](_.state)
+  def value[A]: Lens[CalculatedValue[A], A] = Focus[CalculatedValue[A]](_.value)
+    
   /**
    * An empty, or zero, 'Ready' calculated value.
    */
