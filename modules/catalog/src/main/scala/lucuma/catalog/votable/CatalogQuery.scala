@@ -30,11 +30,6 @@ sealed trait CatalogQuery {
    * Name of the catalog for this query
    */
   def catalog: CatalogName
-
-  /**
-   * Set if a proxy (e.g. cors proxy) in needed
-   */
-  def proxy: Option[Uri]
 }
 
 /**
@@ -80,9 +75,8 @@ trait GaiaBrightnessADQL extends CatalogQuery {
  */
 sealed trait ADQLQuery {
   def base: Coordinates
-  def adqlGeom(using ADQLInterpreter): String
-  def adqlBrightness(using CatalogAdapter.Gaia): List[String]
-  def proxy: Option[Uri]
+  def adqlGeom(ci:            ADQLInterpreter): String
+  def adqlBrightness(adapter: CatalogAdapter.Gaia): List[String]
 }
 
 /**
@@ -91,8 +85,7 @@ sealed trait ADQLQuery {
 case class QueryByADQL(
   base:                  Coordinates,
   shapeConstraint:       ShapeExpression,
-  brightnessConstraints: Option[BrightnessConstraints],
-  proxy:                 Option[Uri] = None
+  brightnessConstraints: Option[BrightnessConstraints]
 ) extends CatalogQuery
     with ADQLQuery
     with GaiaBrightnessADQL {

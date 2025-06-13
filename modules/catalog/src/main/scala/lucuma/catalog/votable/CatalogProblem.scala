@@ -63,6 +63,10 @@ object CatalogProblem {
     val displayValue = s"Requested an unknown catalog"
   }
 
+  case class SourceIdNotFound(sourceId: Long) extends CatalogProblem {
+    val displayValue = s"Source ID $sourceId not found in the catalog"
+  }
+
   case class CatalogException(problems: List[CatalogProblem])
       extends RuntimeException(problems.mkString(", ")) {
     def firstMessage: String =

@@ -8,8 +8,8 @@ import cats.effect.IO
 import cats.effect.IOApp
 import cats.effect.Sync
 import cats.syntax.all.*
-import fs2.text
 import lucuma.catalog.*
+import lucuma.catalog.clients.GaiaClient
 import lucuma.core.geom.gmos.all.candidatesArea
 import lucuma.core.geom.jts.interpreter.given
 import lucuma.core.math.BrightnessValue
@@ -19,14 +19,9 @@ import lucuma.core.math.Epoch
 import lucuma.core.math.ProperMotion
 import lucuma.core.math.RightAscension
 import lucuma.core.model.SiderealTracking
-import org.http4s.Method.*
-import org.http4s.Request
-import org.http4s.client.Client
 import org.http4s.jdkhttpclient.JdkHttpClient
 
 trait GaiaQueryPMSample {
-  given gaia: CatalogAdapter.Gaia = CatalogAdapter.Gaia3LiteEsa
-
   val epoch = Epoch.fromString.getOption("J2022.000").getOrElse(Epoch.J2000)
 
   given ADQLInterpreter = ADQLInterpreter.nTarget(100)
@@ -42,38 +37,28 @@ trait GaiaQueryPMSample {
 
   val tracking = SiderealTracking(m81Coords, Epoch.J2000, pm.some, none, none)
 
-  def gaiaQuery[F[_]: Sync](client: Client[F]) = {
-    val bc    = BrightnessConstraints(BandsList.GaiaBandsList,
-                                   FaintnessConstraint(BrightnessValue.unsafeFrom(16)),
-                                   SaturationConstraint(BrightnessValue.unsafeFrom(9)).some
+  def gaiaQuery[F[_]: Sync](client: GaiaClient[F]) = {
+    val bc               = BrightnessConstraints(
+      BandsList.GaiaBandsList,
+      FaintnessConstraint(BrightnessValue.unsafeFrom(16)),
+      SaturationConstraint(BrightnessValue.unsafeFrom(9)).some
     )
-    val query = CatalogSearch.gaiaSearchUri(
+    val query: ADQLQuery =
       CoordinatesRangeQueryByADQL(
         NonEmptyList.of(start, end),
         candidatesArea,
         bc.some
       )
-      //   TimeRangeQueryByADQL(
-      //     tracking,
-      //     Interval
-      //       .closed(Instant.EPOCH, Instant.EPOCH.plusSeconds(365 * 24 * 60 * 60 * 60))
-      //       .asInstanceOf[Bounded[Instant]],
-      //     candidatesArea,
-      //     bc.some
-      //   )
-    )
+    //   TimeRangeQueryByADQL(
+    //     tracking,
+    //     Interval
+    //       .closed(Instant.EPOCH, Instant.EPOCH.plusSeconds(365 * 24 * 60 * 60 * 60))
+    //       .asInstanceOf[Bounded[Instant]],
+    //     candidatesArea,
+    //     bc.some
+    //   )
 
-    val request = Request[F](GET, query)
-    client
-      .stream(request)
-      .flatMap(
-        _.body
-          .through(text.utf8.decode)
-          .evalTap(a => Sync[F].delay(println(a)))
-          .through(CatalogSearch.guideStars[F](gaia))
-      )
-      .compile
-      .toList
+    client.query(query).map(r => println(pprint(r)))
   }
 }
 
@@ -81,6 +66,7 @@ object GaiaQueryPMApp extends IOApp.Simple with GaiaQueryPMSample {
   def run =
     JdkHttpClient
       .simple[IO]
+      .map(GaiaClient.build(_))
       .use(gaiaQuery[IO])
       .flatMap(x => IO.println(pprint.apply(x)))
 }
