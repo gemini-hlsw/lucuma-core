@@ -5,7 +5,7 @@ package lucuma.catalog.votable
 
 import cats.data.*
 import fs2.*
-import fs2.data.xml.*
+import fs2.data.xml
 import lucuma.catalog.*
 import lucuma.core.model.Target
 import org.http4s.Uri
@@ -30,49 +30,6 @@ object CatalogSearch {
   }
 
   /**
-   * Takes a search query and builds a uri to query gaia.
-   */
-  def gaiaSearchUri[F[_]](
-    query: ADQLQuery
-  )(using adapter: CatalogAdapter.Gaia)(using ADQLInterpreter): Uri =
-    gaiaSearchByQueryString(
-      adapter.uri,
-      ADQLGaiaQuery.adql(summon[CatalogAdapter.Gaia], query),
-      adapter.format,
-      query.proxy
-    )
-
-  /**
-   * Takes a source id and builds a uri to query gaia for that one star.
-   */
-  def gaiaSearchUriById[F[_]](
-    id:    Long,
-    proxy: Option[Uri] = None
-  )(using adapter: CatalogAdapter.Gaia): Uri =
-    gaiaSearchByQueryString(adapter.uri, GaiaSourceIdQuery.idQueryString(id), adapter.format, proxy)
-
-  /**
-   * Helper method for the gaia queries.
-   */
-  private def gaiaSearchByQueryString[F[_]](
-    uri:    Uri,
-    query:  String,
-    format: String,
-    proxy:  Option[Uri]
-  ): Uri = {
-    val base = proxy.fold(uri)(p =>
-      Uri
-        .fromString(s"${p}/$uri")
-        .getOrElse(sys.error("Cannot build gaia url"))
-    )
-    base
-      .withQueryParam("REQUEST", "doQuery")
-      .withQueryParam("LANG", "ADQL")
-      .withQueryParam("FORMAT", format)
-      .withQueryParam("QUERY", query)
-  }
-
-  /**
    * FS2 pipe to convert a stream of String to targets
    */
   def siderealTargets[F[_]: RaiseThrowable](
@@ -80,8 +37,8 @@ object CatalogSearch {
   ): Pipe[F, String, EitherNec[CatalogProblem, CatalogTargetResult]] =
     in =>
       in.flatMap(Stream.emits(_))
-        .through(events[F, Char]())
-        .through(normalize[F])
+        .through(xml.events[F, Char]())
+        .through(xml.normalize[F])
         .through(VoTableParser.xml2targets[F](adapter))
 
   /**
@@ -91,8 +48,8 @@ object CatalogSearch {
     adapter: CatalogAdapter
   ): Pipe[F, String, EitherNec[CatalogProblem, Target.Sidereal]] =
     in =>
-      in.flatMap(Stream.emits(_))
-        .through(events[F, Char]())
-        .through(normalize[F])
+      in.flatMap(fs2.Stream.emits(_))
+        .through(xml.events[F, Char]())
+        .through(xml.normalize[F])
         .through(VoTableParser.xml2guidestars[F](adapter))
 }

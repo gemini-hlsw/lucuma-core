@@ -9,6 +9,7 @@ import cats.effect.IOApp
 import cats.syntax.all.*
 import fs2.*
 import lucuma.ags.*
+import lucuma.catalog.clients.GaiaClient
 import lucuma.core.enums.GmosNorthFpu
 import lucuma.core.enums.PortDisposition
 import lucuma.core.math.Angle
@@ -20,27 +21,28 @@ object AgsSelectionSampleStreamApp extends IOApp.Simple with AgsSelectionSample:
   def run =
     JdkHttpClient
       .simple[IO]
+      .map(GaiaClient.build(_))
       .use(
         gaiaQuery[IO](_)
-          .map(GuideStarCandidate.siderealTarget.get)
-          .through(
+          .map(candidates =>
             Ags
               .agsAnalysisStream(
                 constraints,
                 wavelength,
                 coords,
                 List(coords),
-                NonEmptyList.of(AgsPosition(Angle.fromDoubleDegrees(-120), Offset.Zero),
-                                AgsPosition(Angle.fromDoubleDegrees(120), Offset.Zero)
+                NonEmptyList.of(
+                  AgsPosition(Angle.fromDoubleDegrees(-120), Offset.Zero),
+                  AgsPosition(Angle.fromDoubleDegrees(120), Offset.Zero)
                 ),
                 AgsParams.GmosAgsParams(
                   GmosNorthFpu.LongSlit_1_00.asLeft.some,
                   PortDisposition.Side
                 )
-              )
+              )(fs2.Stream.emits(candidates))
+              .compile
+              .toList
           )
-          .compile
-          .toList
       )
       .flatTap(x => IO.println(x.length))
       // .flatMap(x => IO.println(x.head))

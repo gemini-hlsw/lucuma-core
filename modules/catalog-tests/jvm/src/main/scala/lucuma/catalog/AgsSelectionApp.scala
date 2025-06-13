@@ -3,13 +3,13 @@
 
 package lucuma.ags
 
+import cats.Functor
 import cats.data.NonEmptyList
 import cats.effect.IO
 import cats.effect.IOApp
-import cats.effect.Sync
 import cats.syntax.all.*
-import fs2.*
 import lucuma.ags.*
+import lucuma.catalog.clients.GaiaClient
 import lucuma.catalog.votable.*
 import lucuma.core.enums.Flamingos2Fpu
 import lucuma.core.enums.Flamingos2LyotWheel
@@ -39,9 +39,6 @@ import lucuma.core.model.PosAngleConstraint
 import lucuma.core.model.SiderealTracking
 import lucuma.core.model.Target
 import lucuma.core.model.sequence.flamingos2.Flamingos2FpuMask
-import org.http4s.Method.*
-import org.http4s.Request
-import org.http4s.client.Client
 import org.http4s.jdkhttpclient.JdkHttpClient
 
 import java.time.Duration
@@ -49,10 +46,7 @@ import java.time.Instant
 
 trait AgsSelectionSample {
 
-  given gaia: CatalogAdapter.Gaia = CatalogAdapter.Gaia3LiteEsa
-
-  given ADQLInterpreter =
-    ADQLInterpreter.nTarget(100)
+  given ADQLInterpreter = ADQLInterpreter.nTarget(100)
 
   val coords = (RightAscension.fromStringHMS.getOption("19:59:36.748"),
                 Declination.fromStringSignedDMS.getOption("+20:48:14.60")
@@ -106,23 +100,12 @@ trait AgsSelectionSample {
     .get
     .flatMap(a => offsets.map(o => AgsPosition(a, o)))
 
-  def gaiaQuery[F[_]: Sync](client: Client[F]): Stream[F, Target.Sidereal] = {
-    val query   =
-      CatalogSearch.gaiaSearchUri(
-        QueryByADQL(tracking.at(now).get, candidatesArea, widestConstraints.some)
-      )
-    val request = Request[F](GET, query)
-    client
-      .stream(request)
-      .flatMap(
-        _.body
-          .through(text.utf8.decode)
-          // .evalTap(a => Sync[F].delay(println(a)))
-          .through(CatalogSearch.guideStars[F](gaia))
-          .collect { case Right(t) => t }
-          // .evalTap(a => Sync[F].delay(println(a)))
-      )
-  }
+  def gaiaQuery[F[_]: Functor](gaiaClient: GaiaClient[F]): F[List[GuideStarCandidate]] =
+    gaiaClient
+      .query(QueryByADQL(tracking.at(now).get, candidatesArea, widestConstraints.some))
+      .map:
+        _.collect { case Right(t) => t }
+          .map(GuideStarCandidate.siderealTarget.get)
 }
 
 object AgsSelectionSampleApp extends IOApp.Simple with AgsSelectionSample {
@@ -130,11 +113,9 @@ object AgsSelectionSampleApp extends IOApp.Simple with AgsSelectionSample {
   def run =
     JdkHttpClient
       .simple[IO]
-      .use(
-        gaiaQuery[IO](_)
-          .map(GuideStarCandidate.siderealTarget.get)
-          .compile
-          .toList
+      .map(GaiaClient.build[IO](_))
+      .use(gaiaClient =>
+        gaiaQuery(gaiaClient)
           .map { candidates =>
             println(s"Candidates ${candidates.length}")
             val r = Ags

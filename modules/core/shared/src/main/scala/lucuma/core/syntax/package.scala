@@ -25,3 +25,4 @@ object all
     with ToUnitsOps
     with timespan
     with validation
+    with effect

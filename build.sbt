@@ -1,6 +1,6 @@
 import org.scalajs.linker.interface.ESVersion
 
-ThisBuild / tlBaseVersion                         := "0.134"
+ThisBuild / tlBaseVersion                         := "0.135"
 ThisBuild / tlCiReleaseBranches                   := Seq("master")
 ThisBuild / githubWorkflowEnv += "MUNIT_FLAKY_OK" -> "true"
 
@@ -52,25 +52,26 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
   .settings(
     name := "lucuma-core",
     libraryDependencies ++= Seq(
-      "org.typelevel"  %%% "cats-parse"     % catsParseVersion,
-      "org.typelevel"  %%% "cats-core"      % catsVersion,
+      "org.typelevel"  %%% "cats-parse"            % catsParseVersion,
+      "org.typelevel"  %%% "cats-core"             % catsVersion,
       "org.typelevel"  %%% "cats-collections-core" % catsCollctionsVersion,
-      "dev.optics"     %%% "monocle-core"   % monocleVersion,
-      "dev.optics"     %%% "monocle-macro"  % monocleVersion,
-      "dev.optics"     %%% "monocle-state"  % monocleVersion,
-      "edu.gemini"     %%% "lucuma-jts"     % jtsVersion,
-      "com.manyangled" %%% "coulomb-core"   % coulombVersion,
-      "com.manyangled" %%% "coulomb-spire"  % coulombVersion,
-      "com.manyangled" %%% "coulomb-units"  % coulombVersion,
-      "org.typelevel"  %%% "spire"          % spireVersion,
-      "org.typelevel"  %%% "spire-extras"   % spireVersion,
-      "eu.timepit"     %%% "refined"        % refinedVersion,
-      "eu.timepit"     %%% "refined-cats"   % refinedVersion,
-      "edu.gemini"     %%% "lucuma-refined" % lucumaRefinedVersion,
-      "org.typelevel"  %%% "cats-time"      % catsTimeVersion,
-      "org.typelevel"  %%% "kittens"        % kittensVersion,
-      "io.circe"       %%% "circe-core"     % circeVersion,
-      "io.circe"       %%% "circe-refined"  % circeRefinedVersion
+      "org.typelevel"  %%% "cats-effect"           % catsEffectVersion,
+      "dev.optics"     %%% "monocle-core"          % monocleVersion,
+      "dev.optics"     %%% "monocle-macro"         % monocleVersion,
+      "dev.optics"     %%% "monocle-state"         % monocleVersion,
+      "edu.gemini"     %%% "lucuma-jts"            % jtsVersion,
+      "com.manyangled" %%% "coulomb-core"          % coulombVersion,
+      "com.manyangled" %%% "coulomb-spire"         % coulombVersion,
+      "com.manyangled" %%% "coulomb-units"         % coulombVersion,
+      "org.typelevel"  %%% "spire"                 % spireVersion,
+      "org.typelevel"  %%% "spire-extras"          % spireVersion,
+      "eu.timepit"     %%% "refined"               % refinedVersion,
+      "eu.timepit"     %%% "refined-cats"          % refinedVersion,
+      "edu.gemini"     %%% "lucuma-refined"        % lucumaRefinedVersion,
+      "org.typelevel"  %%% "cats-time"             % catsTimeVersion,
+      "org.typelevel"  %%% "kittens"               % kittensVersion,
+      "io.circe"       %%% "circe-core"            % circeVersion,
+      "io.circe"       %%% "circe-refined"         % circeRefinedVersion
     )
   )
   .jvmConfigure(_.enablePlugins(AutomateHeaderPlugin))
@@ -209,7 +210,7 @@ lazy val catalogTests = crossProject(JVMPlatform, JSPlatform)
       "org.typelevel"          %%% "cats-effect"         % catsEffectVersion      % Test,
       "org.scalameta"          %%% "munit"               % munitVersion           % Test,
       "org.typelevel"          %%% "discipline-munit"    % munitDisciplineVersion % Test,
-      "org.typelevel"          %%% "munit-cats-effect" % munitCatsEffectVersion % Test,
+      "org.typelevel"          %%% "munit-cats-effect"   % munitCatsEffectVersion % Test,
       "org.scala-lang.modules" %%% "scala-xml"           % scalaXmlVersion        % Test,
       "org.http4s"             %%% "http4s-core"         % http4sVersion,
       "com.lihaoyi"            %%% "pprint"              % pprintVersion,
