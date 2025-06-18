@@ -1,6 +1,6 @@
 import org.scalajs.linker.interface.ESVersion
 
-ThisBuild / tlBaseVersion                         := "0.135"
+ThisBuild / tlBaseVersion                         := "0.136"
 ThisBuild / tlCiReleaseBranches                   := Seq("master")
 ThisBuild / githubWorkflowEnv += "MUNIT_FLAKY_OK" -> "true"
 
