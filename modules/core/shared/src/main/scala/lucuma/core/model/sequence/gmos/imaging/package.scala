@@ -9,8 +9,23 @@ import lucuma.core.enums.GmosNorthDetector
 import lucuma.core.enums.GmosSouthDetector
 import lucuma.core.enums.GmosXBinning
 import lucuma.core.enums.GmosYBinning
+import lucuma.core.math.Angle
 import lucuma.core.model.ImageQuality
 import lucuma.core.model.SourceProfile
+
+/**
+  * Optimal GMOS binning calculation for imaging mode.
+  * For imaging, both X and Y binning are the same (spatial binning).
+  */
+def imagingBinning(
+  srcProfile: SourceProfile,
+  iq:         ImageQuality,
+  pixelScale: Angle,
+  sampling:   PosDouble = binning.DefaultSampling
+): (GmosXBinning, GmosYBinning) = {
+  val yBin = binning.spatialBinning(srcProfile, iq, pixelScale, sampling)
+  (GmosXBinning(yBin.value), yBin)
+}
 
 /**
  * Optimal GMOS binning calculation for imaging.
@@ -21,7 +36,7 @@ def northBinning(
   detector:   GmosNorthDetector = binning.DefaultGmosNorthDetector,
   sampling:   PosDouble         = binning.DefaultSampling
 ): (GmosXBinning, GmosYBinning) =
-  binning.imagingBinning(srcProfile, iq, detector.pixelSize, sampling)
+  imagingBinning(srcProfile, iq, detector.pixelSize, sampling)
 
 /**
  * Optimal GMOS binning calculation for imaging.
@@ -32,4 +47,4 @@ def southBinning(
   detector:   GmosSouthDetector = binning.DefaultGmosSouthDetector,
   sampling:   PosDouble         = binning.DefaultSampling
 ): (GmosXBinning, GmosYBinning) =
-  binning.imagingBinning(srcProfile, iq, detector.pixelSize, sampling)
+  imagingBinning(srcProfile, iq, detector.pixelSize, sampling)

@@ -7,8 +7,16 @@ package ifu
 import lucuma.core.enums.GmosXBinning
 import lucuma.core.enums.GmosYBinning
 
-def northBinning: (GmosXBinning, GmosYBinning) =
-  binning.ifuBinning
+/**
+  * Optimal GMOS binning calculation for IFU (Integral Field Unit) mode.
+  * IFU observations always use 1x1 binning to maintain spatial resolution
+  * required for proper reconstruction of the integral field.
+  */
+val ifuBinning: (GmosXBinning, GmosYBinning) =
+  (GmosXBinning.One, GmosYBinning.One)
 
-def southBinning: (GmosXBinning, GmosYBinning) =
-  binning.ifuBinning
+val northBinning: (GmosXBinning, GmosYBinning) =
+  ifuBinning
+
+val southBinning: (GmosXBinning, GmosYBinning) =
+  ifuBinning

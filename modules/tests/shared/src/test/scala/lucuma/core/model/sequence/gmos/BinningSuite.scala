@@ -228,8 +228,7 @@ class BinningSuite extends FunSuite:
     assertEquals(longslitResult, GmosYBinning.Four)
 
     // MOS constrains spatial binning to 2x maximum
-    val mosResult = mosSpatialBinning(profile, iq,
-      lucuma.core.enums.GmosNorthDetector.Hamamatsu.pixelSize)
+    val mosResult = mos.mosSpatialBinning(profile, iq, DefaultGmosNorthDetector.pixelSize)
     assertEquals(mosResult, GmosYBinning.Two)
 
   test("mos spatial binning within constraint"):
@@ -237,8 +236,7 @@ class BinningSuite extends FunSuite:
     val profile = SourceProfile.Point(bandNormalized)
     val iq = ImageQuality.unsafeFromArcSeconds(0.5) // Should give 2x binning naturally
 
-    val mosResult = mosSpatialBinning(profile, iq,
-      lucuma.core.enums.GmosNorthDetector.Hamamatsu.pixelSize)
+    val mosResult = mos.mosSpatialBinning(profile, iq, DefaultGmosNorthDetector.pixelSize)
     assertEquals(mosResult, GmosYBinning.Two)
 
   test("mos spatial binning no constraint needed"):
@@ -246,7 +244,7 @@ class BinningSuite extends FunSuite:
     val profile = SourceProfile.Point(bandNormalized)
     val iq = ImageQuality.unsafeFromArcSeconds(0.3) // Should give 1x binning
 
-    val mosResult = mosSpatialBinning(profile, iq,
+    val mosResult = mos.mosSpatialBinning(profile, iq,
       lucuma.core.enums.GmosNorthDetector.Hamamatsu.pixelSize)
     assertEquals(mosResult, GmosYBinning.One)
 
@@ -267,6 +265,6 @@ class BinningSuite extends FunSuite:
     assertEquals(mosResult._2, GmosYBinning.Two)
 
   test("ifu always returns 1x1"):
-    val xy = ifuBinning
+    val xy = ifu.ifuBinning
     assertEquals(xy, (GmosXBinning.One, GmosYBinning.One))
 
