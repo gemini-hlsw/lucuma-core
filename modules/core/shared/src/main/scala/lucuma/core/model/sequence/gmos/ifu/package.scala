@@ -7,14 +7,8 @@ package ifu
 import lucuma.core.enums.GmosXBinning
 import lucuma.core.enums.GmosYBinning
 
-/**
- * Optimal GMOS binning calculation for IFU (Integral Field Unit).
- */
 def northBinning: (GmosXBinning, GmosYBinning) =
-  binning.northIfuBinning
+  binning.ifuBinning
 
-/**
- * Optimal GMOS binning calculation for IFU (Integral Field Unit).
- */
 def southBinning: (GmosXBinning, GmosYBinning) =
-  binning.southIfuBinning
+  binning.ifuBinning

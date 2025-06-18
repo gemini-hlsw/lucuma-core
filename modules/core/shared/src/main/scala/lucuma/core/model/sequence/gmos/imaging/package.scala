@@ -18,10 +18,10 @@ import lucuma.core.model.SourceProfile
 def northBinning(
   srcProfile: SourceProfile,
   iq:         ImageQuality,
-  detector:   GmosNorthDetector = GmosNorthDetector.Hamamatsu,
+  detector:   GmosNorthDetector = binning.DefaultGmosNorthDetector,
   sampling:   PosDouble         = binning.DefaultSampling
 ): (GmosXBinning, GmosYBinning) =
-  binning.northImagingBinning(srcProfile, iq, detector, sampling)
+  binning.imagingBinning(srcProfile, iq, detector.pixelSize, sampling)
 
 /**
  * Optimal GMOS binning calculation for imaging.
@@ -29,7 +29,7 @@ def northBinning(
 def southBinning(
   srcProfile: SourceProfile,
   iq:         ImageQuality,
-  detector:   GmosSouthDetector = GmosSouthDetector.Hamamatsu,
+  detector:   GmosSouthDetector = binning.DefaultGmosSouthDetector,
   sampling:   PosDouble         = binning.DefaultSampling
 ): (GmosXBinning, GmosYBinning) =
-  binning.southImagingBinning(srcProfile, iq, detector, sampling)
+  binning.imagingBinning(srcProfile, iq, detector.pixelSize, sampling)

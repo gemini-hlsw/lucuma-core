@@ -9,11 +9,7 @@ import coulomb.Quantity
 import eu.timepit.refined.types.numeric.PosDouble
 import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.enums.GmosNorthDetector
-import lucuma.core.enums.GmosNorthFpu
-import lucuma.core.enums.GmosNorthGrating
 import lucuma.core.enums.GmosSouthDetector
-import lucuma.core.enums.GmosSouthFpu
-import lucuma.core.enums.GmosSouthGrating
 import lucuma.core.enums.GmosXBinning
 import lucuma.core.enums.GmosYBinning
 import lucuma.core.math.Angle
@@ -35,6 +31,12 @@ object binning {
 
   val DefaultSampling: PosDouble =
     PosDouble.unsafeFrom(2.5)
+
+  val DefaultGmosSouthDetector: GmosSouthDetector =
+    GmosSouthDetector.Hamamatsu
+
+  val DefaultGmosNorthDetector: GmosNorthDetector =
+    GmosNorthDetector.Hamamatsu
 
   /**
    * Object angular size estimate based on source profile and image quality.
@@ -92,24 +94,6 @@ object binning {
     }.getOrElse(GmosXBinning.One)
   }
 
-  def northSpectralBinning(
-    fpu:        GmosNorthFpu,
-    srcProfile: SourceProfile,
-    iq:         ImageQuality,
-    grating:    GmosNorthGrating,
-    sampling:   PosDouble = DefaultSampling
-  ): GmosXBinning =
-    spectralBinning(fpu.effectiveSlitWidth, srcProfile, iq, grating.dispersion, grating.referenceResolution, grating.blazeWavelength, sampling)
-
-  def southSpectralBinning(
-    fpu:        GmosSouthFpu,
-    srcProfile: SourceProfile,
-    iq:         ImageQuality,
-    grating:    GmosSouthGrating,
-    sampling:   PosDouble = DefaultSampling
-  ): GmosXBinning =
-    spectralBinning(fpu.effectiveSlitWidth, srcProfile, iq, grating.dispersion, grating.referenceResolution, grating.blazeWavelength, sampling)
-
   def spatialBinning(
     srcProfile: SourceProfile,
     iq:         ImageQuality,
@@ -126,22 +110,6 @@ object binning {
     }.getOrElse(GmosYBinning.One)
   }
 
-  def northSpatialBinning(
-    srcProfile: SourceProfile,
-    iq:         ImageQuality,
-    detector:   GmosNorthDetector = GmosNorthDetector.Hamamatsu,
-    sampling:   PosDouble         = DefaultSampling
-  ): GmosYBinning =
-    spatialBinning(srcProfile, iq, detector.pixelSize, sampling)
-
-  def southSpatialBinning(
-    srcProfile: SourceProfile,
-    iq:         ImageQuality,
-    detector:   GmosSouthDetector = GmosSouthDetector.Hamamatsu,
-    sampling:   PosDouble         = DefaultSampling
-  ): GmosYBinning =
-    spatialBinning(srcProfile, iq, detector.pixelSize, sampling)
-
   /**
    * Optimal GMOS binning calculation for imaging mode.
    * For imaging, both X and Y binning are the same (spatial binning).
@@ -155,22 +123,6 @@ object binning {
     val yBin = spatialBinning(srcProfile, iq, pixelScale, sampling)
     (GmosXBinning(yBin.value), yBin)
   }
-
-  def northImagingBinning(
-    srcProfile: SourceProfile,
-    iq:         ImageQuality,
-    detector:   GmosNorthDetector = GmosNorthDetector.Hamamatsu,
-    sampling:   PosDouble         = DefaultSampling
-  ): (GmosXBinning, GmosYBinning) =
-    imagingBinning(srcProfile, iq, detector.pixelSize, sampling)
-
-  def southImagingBinning(
-    srcProfile: SourceProfile,
-    iq:         ImageQuality,
-    detector:   GmosSouthDetector = GmosSouthDetector.Hamamatsu,
-    sampling:   PosDouble         = DefaultSampling
-  ): (GmosXBinning, GmosYBinning) =
-    imagingBinning(srcProfile, iq, detector.pixelSize, sampling)
 
   /**
    * Spatial binning for MOS mode with maximum binning constraint.
@@ -204,48 +156,6 @@ object binning {
     (xBin, yBin)
   }
 
-  def northMosBinning(
-    fpu:        GmosNorthFpu,
-    srcProfile: SourceProfile,
-    iq:         ImageQuality,
-    grating:    GmosNorthGrating,
-    detector:   GmosNorthDetector = GmosNorthDetector.Hamamatsu,
-    maxYBin:    GmosYBinning      = mos.DefaultMaxYBinning,
-    sampling:   PosDouble         = DefaultSampling
-  ): (GmosXBinning, GmosYBinning) =
-    mosBinning(
-      fpu.effectiveSlitWidth,
-      srcProfile,
-      iq,
-      grating.dispersion,
-      grating.referenceResolution,
-      grating.blazeWavelength,
-      detector.pixelSize,
-      maxYBin,
-      sampling
-    )
-
-  def southMosBinning(
-    fpu:        GmosSouthFpu,
-    srcProfile: SourceProfile,
-    iq:         ImageQuality,
-    grating:    GmosSouthGrating,
-    detector:   GmosSouthDetector = GmosSouthDetector.Hamamatsu,
-    maxYBin:    GmosYBinning      = mos.DefaultMaxYBinning,
-    sampling:   PosDouble         = DefaultSampling
-  ): (GmosXBinning, GmosYBinning) =
-    mosBinning(
-      fpu.effectiveSlitWidth,
-      srcProfile,
-      iq,
-      grating.dispersion,
-      grating.referenceResolution,
-      grating.blazeWavelength,
-      detector.pixelSize,
-      maxYBin,
-      sampling
-    )
-
   /**
    * Optimal GMOS binning calculation for IFU (Integral Field Unit) mode.
    * IFU observations always use 1x1 binning to maintain spatial resolution
@@ -253,11 +163,5 @@ object binning {
    */
   val ifuBinning: (GmosXBinning, GmosYBinning) =
     (GmosXBinning.One, GmosYBinning.One)
-
-  val northIfuBinning: (GmosXBinning, GmosYBinning) =
-    ifuBinning
-
-  val southIfuBinning: (GmosXBinning, GmosYBinning) =
-    ifuBinning
 
 }

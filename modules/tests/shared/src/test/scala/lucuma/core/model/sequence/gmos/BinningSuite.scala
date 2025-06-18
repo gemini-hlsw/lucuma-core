@@ -136,25 +136,25 @@ class BinningSuite extends FunSuite:
 
     // Just below threshold for bin=2: fwhm=0.40 -> bin=1
     assertEquals(
-      northSpatialBinning(profile, ImageQuality.unsafeFromArcSeconds(0.40)),
+      spatialBinning(profile, ImageQuality.unsafeFromArcSeconds(0.40), DefaultGmosNorthDetector.pixelSize, DefaultSampling),
       GmosYBinning.One
     )
 
     // Just above threshold for bin=2: fwhm=0.41 -> bin=2
     assertEquals(
-      northSpatialBinning(profile, ImageQuality.unsafeFromArcSeconds(0.41)),
+      spatialBinning(profile, ImageQuality.unsafeFromArcSeconds(0.41), DefaultGmosNorthDetector.pixelSize, DefaultSampling),
       GmosYBinning.Two
     )
 
     // Just below threshold for bin=4: fwhm=0.80 -> bin=2
     assertEquals(
-      northSpatialBinning(profile, ImageQuality.unsafeFromArcSeconds(0.80)),
+      spatialBinning(profile, ImageQuality.unsafeFromArcSeconds(0.80), DefaultGmosNorthDetector.pixelSize, DefaultSampling),
       GmosYBinning.Two
     )
 
     // Just above threshold for bin=4: fwhm=0.81 -> bin=4
     assertEquals(
-      northSpatialBinning(profile, ImageQuality.unsafeFromArcSeconds(0.81)),
+      spatialBinning(profile, ImageQuality.unsafeFromArcSeconds(0.81), DefaultGmosNorthDetector.pixelSize, DefaultSampling),
       GmosYBinning.Four
     )
 
@@ -164,7 +164,7 @@ class BinningSuite extends FunSuite:
     expectX:    GmosXBinning,
     expectY:    GmosYBinning
   ): Unit = {
-    val xy = northImagingBinning(srcProfile, iq)
+    val xy = imaging.northBinning(srcProfile, iq)
     assertEquals(xy, (expectX, expectY))
   }
 
@@ -211,7 +211,7 @@ class BinningSuite extends FunSuite:
   test("mos, B480, slit=1.00, fwhm=1.12: 2x2"):
     // calc: effective_width = min(1.00" slit, 1.584" object_size) = 1.00"
     // npix = 422 / (1520*0.5/1.00) / 0.062 = 8.956, npix/4 = 2.24 < 2.5 -> bin=2
-    val xy = northMosBinning(
+    val xy = mos.northBinning(
       GmosNorthFpu.LongSlit_1_00,
       SourceProfile.Gaussian(Angle.microarcseconds.reverseGet(1_120_000L), bandNormalized),
       ImageQuality.unsafeFromArcSeconds(1.12), // 1.12" seeing
@@ -224,7 +224,7 @@ class BinningSuite extends FunSuite:
     val iq = ImageQuality.unsafeFromArcSeconds(1.0) // Would normally give 4x binning
 
     // Longslit allows up to 4x spatial binning
-    val longslitResult = northSpatialBinning(profile, iq)
+    val longslitResult = spatialBinning(profile, iq, DefaultGmosNorthDetector.pixelSize, DefaultSampling)
     assertEquals(longslitResult, GmosYBinning.Four)
 
     // MOS constrains spatial binning to 2x maximum
@@ -258,7 +258,7 @@ class BinningSuite extends FunSuite:
     val grating = GmosNorthGrating.R831_G5302
 
     val longslitResult = longslit.northBinning(fpu, profile, iq, grating)
-    val mosResult = northMosBinning(fpu, profile, iq, grating)
+    val mosResult = mos.northBinning(fpu, profile, iq, grating)
 
     assertEquals(longslitResult._1, mosResult._1)
 

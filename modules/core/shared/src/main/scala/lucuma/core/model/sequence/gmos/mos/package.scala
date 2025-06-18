@@ -32,11 +32,21 @@ def northBinning(
   srcProfile: SourceProfile,
   iq:         ImageQuality,
   grating:    GmosNorthGrating,
-  detector:   GmosNorthDetector = GmosNorthDetector.Hamamatsu,
+  detector:   GmosNorthDetector = binning.DefaultGmosNorthDetector,
   maxYBin:    GmosYBinning      = DefaultMaxYBinning,
   sampling:   PosDouble         = binning.DefaultSampling
 ): (GmosXBinning, GmosYBinning) =
-  binning.northMosBinning(fpu, srcProfile, iq, grating, detector, maxYBin, sampling)
+  binning.mosBinning(
+    fpu.effectiveSlitWidth,
+    srcProfile,
+    iq,
+    grating.dispersion,
+    grating.referenceResolution,
+    grating.blazeWavelength,
+    detector.pixelSize,
+    maxYBin,
+    sampling
+  )
 
 /**
  * Optimal GMOS binning calculation for MOS (Multi-Object Spectroscopy).
@@ -46,8 +56,18 @@ def southBinning(
   srcProfile: SourceProfile,
   iq:         ImageQuality,
   grating:    GmosSouthGrating,
-  detector:   GmosSouthDetector = GmosSouthDetector.Hamamatsu,
+  detector:   GmosSouthDetector = binning.DefaultGmosSouthDetector,
   maxYBin:    GmosYBinning      = DefaultMaxYBinning,
   sampling:   PosDouble         = binning.DefaultSampling
 ): (GmosXBinning, GmosYBinning) =
-  binning.southMosBinning(fpu, srcProfile, iq, grating, detector, maxYBin, sampling)
+  binning.mosBinning(
+    fpu.effectiveSlitWidth,
+    srcProfile,
+    iq,
+    grating.dispersion,
+    grating.referenceResolution,
+    grating.blazeWavelength,
+    detector.pixelSize,
+    maxYBin,
+    sampling
+  )
