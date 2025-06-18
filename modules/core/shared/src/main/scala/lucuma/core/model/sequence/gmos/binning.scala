@@ -9,11 +9,7 @@ import coulomb.Quantity
 import eu.timepit.refined.types.numeric.PosDouble
 import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.enums.GmosNorthDetector
-import lucuma.core.enums.GmosNorthFpu
-import lucuma.core.enums.GmosNorthGrating
 import lucuma.core.enums.GmosSouthDetector
-import lucuma.core.enums.GmosSouthFpu
-import lucuma.core.enums.GmosSouthGrating
 import lucuma.core.enums.GmosXBinning
 import lucuma.core.enums.GmosYBinning
 import lucuma.core.math.Angle
@@ -35,6 +31,12 @@ object binning {
 
   val DefaultSampling: PosDouble =
     PosDouble.unsafeFrom(2.5)
+
+  val DefaultGmosSouthDetector: GmosSouthDetector =
+    GmosSouthDetector.Hamamatsu
+
+  val DefaultGmosNorthDetector: GmosNorthDetector =
+    GmosNorthDetector.Hamamatsu
 
   /**
    * Object angular size estimate based on source profile and image quality.
@@ -92,24 +94,6 @@ object binning {
     }.getOrElse(GmosXBinning.One)
   }
 
-  def northSpectralBinning(
-    fpu:        GmosNorthFpu,
-    srcProfile: SourceProfile,
-    iq:         ImageQuality,
-    grating:    GmosNorthGrating,
-    sampling:   PosDouble = DefaultSampling
-  ): GmosXBinning =
-    spectralBinning(fpu.effectiveSlitWidth, srcProfile, iq, grating.dispersion, grating.referenceResolution, grating.blazeWavelength, sampling)
-
-  def southSpectralBinning(
-    fpu:        GmosSouthFpu,
-    srcProfile: SourceProfile,
-    iq:         ImageQuality,
-    grating:    GmosSouthGrating,
-    sampling:   PosDouble = DefaultSampling
-  ): GmosXBinning =
-    spectralBinning(fpu.effectiveSlitWidth, srcProfile, iq, grating.dispersion, grating.referenceResolution, grating.blazeWavelength, sampling)
-
   def spatialBinning(
     srcProfile: SourceProfile,
     iq:         ImageQuality,
@@ -125,21 +109,5 @@ object binning {
       bin.count.value <= npix
     }.getOrElse(GmosYBinning.One)
   }
-
-  def northSpatialBinning(
-    srcProfile: SourceProfile,
-    iq:         ImageQuality,
-    detector:   GmosNorthDetector = GmosNorthDetector.Hamamatsu,
-    sampling:   PosDouble         = DefaultSampling
-  ): GmosYBinning =
-    spatialBinning(srcProfile, iq, detector.pixelSize, sampling)
-
-  def southSpatialBinning(
-    srcProfile: SourceProfile,
-    iq:         ImageQuality,
-    detector:   GmosSouthDetector = GmosSouthDetector.Hamamatsu,
-    sampling:   PosDouble         = DefaultSampling
-  ): GmosYBinning =
-    spatialBinning(srcProfile, iq, detector.pixelSize, sampling)
 
 }
