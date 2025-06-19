@@ -19,21 +19,21 @@ trait effect:
     def raceToSuccess[A, B](fa: F[A], fb: F[B]): F[Either[A, B]] =
       given FlatMap[F] = F
       F.uncancelable: poll =>
-        poll(F.racePair(fa, fb)).flatMap:
+        poll(F.racePair(fa, fb)).flatMap: 
           case Left((oc, f))  =>
             oc match
-              case Outcome.Succeeded(fa)                   => f.cancel *> fa.map(Left(_))
+              case Outcome.Succeeded(ra)                   => f.cancel *> ra.map(Left(_))
               case Outcome.Errored(_) | Outcome.Canceled() =>
-                (f.cancel *> f.join).flatMap:
-                  case Outcome.Succeeded(fb) => fb.map(Right(_))
+                f.join.flatMap:
+                  case Outcome.Succeeded(rb) => rb.map(Right(_))
                   case Outcome.Errored(eb)   => F.raiseError(eb)
                   case Outcome.Canceled()    => poll(F.canceled) *> F.never
           case Right((f, oc)) =>
             oc match
-              case Outcome.Succeeded(fb)                   => f.cancel *> fb.map(Right(_))
+              case Outcome.Succeeded(rb)                   => f.cancel *> rb.map(Right(_))
               case Outcome.Errored(_) | Outcome.Canceled() =>
-                (f.cancel *> f.join).flatMap:
-                  case Outcome.Succeeded(fa) => fa.map(Left(_))
+                f.join.flatMap:
+                  case Outcome.Succeeded(ra) => ra.map(Left(_))
                   case Outcome.Errored(ea)   => F.raiseError(ea)
                   case Outcome.Canceled()    => poll(F.canceled) *> F.never
 
