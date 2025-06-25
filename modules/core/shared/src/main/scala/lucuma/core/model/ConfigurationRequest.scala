@@ -24,5 +24,7 @@ object ConfigurationRequest extends WithGid('x'.refined):
   val id: Lens[ConfigurationRequest, ConfigurationRequest.Id]        = Focus[ConfigurationRequest](_.id)
   val status: Lens[ConfigurationRequest, ConfigurationRequestStatus] =
     Focus[ConfigurationRequest](_.status)
+  val justification: Lens[ConfigurationRequest, Option[NonEmptyString]] =
+    Focus[ConfigurationRequest](_.justification)
   val configuration: Lens[ConfigurationRequest, Configuration]       =
     Focus[ConfigurationRequest](_.configuration)
