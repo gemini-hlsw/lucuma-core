@@ -16,7 +16,7 @@ import scala.util.Random
 /**
  * Based on the Python offset-generator script.
  */
-object OffsetGenerator {
+object OffsetGenerator:
 
   /**
    * Generates a grid pattern of offsets.
@@ -27,7 +27,7 @@ object OffsetGenerator {
     dp: Angle,
     dq: Angle,
     center: Offset = Offset.Zero
-  ): NonEmptyList[Offset] = {
+  ): NonEmptyList[Offset] =
     val pStart = -(nx.value - 1) / 2.0
     val qStart = (ny.value - 1) / 2.0
 
@@ -41,7 +41,6 @@ object OffsetGenerator {
     }
     // can't be empty as nx and ny are 1 or more
     NonEmptyList.fromListUnsafe(offsets.toList)
-  }
 
   /**
    * Generates a random pattern of offsets.
@@ -52,7 +51,7 @@ object OffsetGenerator {
     size: Angle,
     center: Offset = Offset.Zero,
     random: Random = new Random()
-  ): NonEmptyList[Offset] = {
+  ): NonEmptyList[Offset] =
     val n = PosInt.unsafeFrom(ceil(sqrt(num.value.toDouble)).toInt)
     val d = size * (1.0 / n.value.toDouble)
 
@@ -65,9 +64,7 @@ object OffsetGenerator {
 
     // shuffle and take the requested number
     val shuffled = random.shuffle(randomizedPoints.toList)
-    // can't be empty as num is 1 or more
     NonEmptyList.fromListUnsafe(shuffled.take(num.value))
-  }
 
   /**
    * Generates a Fermat spiral pattern of offsets.
@@ -78,7 +75,7 @@ object OffsetGenerator {
     size: Angle,
     center: Offset = Offset.Zero,
     random: Random = new Random()
-  ): NonEmptyList[Offset] = {
+  ): NonEmptyList[Offset] =
     val θ = Angle.fromDoubleDegrees(137.50776)  // golden angle
     val φ = Angle.fromDoubleRadians(random.nextDouble() * 2.0 * Pi)
 
@@ -98,7 +95,78 @@ object OffsetGenerator {
         Angle.fromDoubleArcseconds(q).q
       )
     }
-    // can't be empty as num is 1 or more
     NonEmptyList.fromListUnsafe(offsets.toList)
-  }
-}
+
+  /**
+   * Generates a 1D grid pattern of P components.
+   */
+  def gridP(
+    num: PosInt,
+    step: Angle,
+    center: Offset.P = Offset.P.Zero
+  ): NonEmptyList[Offset.P] =
+    val start = -(num.value - 1) / 2.0
+
+    val components = (0 until num.value).map { i =>
+      val pOffset = step * (start + i)
+      center + Offset.P(pOffset)
+    }
+
+    NonEmptyList.fromListUnsafe(components.toList)
+
+  /**
+   * Generates a 1D grid pattern of Q components.
+   */
+  def gridQ(
+    num: PosInt,
+    step: Angle,
+    center: Offset.Q = Offset.Q.Zero
+  ): NonEmptyList[Offset.Q] =
+    val start = (num.value - 1) / 2.0
+
+    val components = (0 until num.value).map { i =>
+      val qOffset = step * (start - i)
+      center + Offset.Q(qOffset)
+    }
+
+    NonEmptyList.fromListUnsafe(components.toList)
+
+  /**
+   * Generates a 1D random pattern of P components.
+   */
+  def randomP(
+    num: PosInt,
+    size: Angle,
+    center: Offset.P = Offset.P.Zero,
+    random: Random = new Random()
+  ): NonEmptyList[Offset.P] =
+    val step = size * (1.0 / num.value.toDouble)
+    val gridPoints = gridP(num, step, center)
+
+    val randomizedPoints = gridPoints.map { point =>
+      val pJitter = Offset.P(step * (random.nextDouble() - 0.5))
+      point + pJitter
+    }
+
+    val shuffled = random.shuffle(randomizedPoints.toList)
+    NonEmptyList.fromListUnsafe(shuffled)
+
+  /**
+   * Generates a 1D random pattern of Q components.
+   */
+  def randomQ(
+    num: PosInt,
+    size: Angle,
+    center: Offset.Q = Offset.Q.Zero,
+    random: Random = new Random()
+  ): NonEmptyList[Offset.Q] =
+    val step = size * (1.0 / num.value.toDouble)
+    val gridPoints = gridQ(num, step, center)
+
+    val randomizedPoints = gridPoints.map { point =>
+      val qJitter = Offset.Q(step * (random.nextDouble() - 0.5))
+      point + qJitter
+    }
+
+    val shuffled = random.shuffle(randomizedPoints.toList)
+    NonEmptyList.fromListUnsafe(shuffled)

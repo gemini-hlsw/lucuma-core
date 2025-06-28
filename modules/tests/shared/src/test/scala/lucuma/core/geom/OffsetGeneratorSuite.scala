@@ -92,3 +92,28 @@ class OffsetGeneratorSuite extends munit.FunSuite:
     // Should still generate valid offsets
     assert(offsets.toList.forall(o => o.p.toAngle.toSignedDoubleRadians.isFinite))
     assert(offsets.toList.forall(o => o.q.toAngle.toSignedDoubleRadians.isFinite))
+
+  test("gridP generates P components"):
+    val components = OffsetGenerator.gridP(PosInt.unsafeFrom(5), 1.arcsec)
+    assertEquals(components.length, 5)
+    // P components should be symmetric around center
+    val pValues = components.toList.map(_.toAngle.toSignedDoubleRadians).sorted
+    assertEquals(pValues.length, 5)
+
+  test("gridQ generates Q components"):
+    val components = OffsetGenerator.gridQ(PosInt.unsafeFrom(3), 2.arcsec)
+    assertEquals(components.length, 3)
+    // Should have center and symmetric points
+    assert(components.toList.contains(Offset.Q.Zero))
+
+  test("randomP generates P components"):
+    val random = new Random(42)
+    val components = OffsetGenerator.randomP(PosInt.unsafeFrom(10), 5.arcsec, random = random)
+    assertEquals(components.length, 10)
+    assert(components.toList.forall(_.toAngle.toSignedDoubleRadians.isFinite))
+
+  test("randomQ generates Q components"):
+    val random = new Random(42)
+    val components = OffsetGenerator.randomQ(PosInt.unsafeFrom(8), 4.arcsec, random = random)
+    assertEquals(components.length, 8)
+    assert(components.toList.forall(_.toAngle.toSignedDoubleRadians.isFinite))
