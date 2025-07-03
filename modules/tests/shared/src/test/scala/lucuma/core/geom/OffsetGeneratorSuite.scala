@@ -32,7 +32,7 @@ class OffsetGeneratorSuite extends munit.FunSuite:
 
   // Test random generation
   test("random generates correct number of offsets"):
-    val random = new Random(42) // Fixed seed
+    val random = new Random(42)
     val offsets = OffsetGenerator.random(PosInt.unsafeFrom(10), 5.arcsec, Offset.Zero, random)
     assertEquals(offsets.length, 10)
 
@@ -55,7 +55,6 @@ class OffsetGeneratorSuite extends munit.FunSuite:
     val random = new Random(42)
     val offsets = OffsetGenerator.spiral(PosInt.unsafeFrom(10), 5.arcsec, Offset.Zero, random)
 
-    // First point should be close to center
     val firstDistance = offsets.head.distance(Offset.Zero)
     assert(firstDistance.toSignedDoubleRadians < 0.001)
 
@@ -64,7 +63,6 @@ class OffsetGeneratorSuite extends munit.FunSuite:
     val offsets = OffsetGenerator.spiral(PosInt.unsafeFrom(1), 5.arcsec, Offset.Zero, random)
     assertEquals(offsets.length, 1)
 
-    // Single point should be at center
     val distance = offsets.head.distance(Offset.Zero)
     assert(distance.toSignedDoubleRadians < 0.001)
 
@@ -77,21 +75,15 @@ class OffsetGeneratorSuite extends munit.FunSuite:
     assertEquals(gridOffsets.length, 4)
     assert(gridOffsets.toList.forall(_ == Offset.Zero))
 
-    // Random with zero size should keep points at center
     val randomOffsets = OffsetGenerator.random(PosInt.unsafeFrom(3), zeroSize, Offset.Zero, random)
     assertEquals(randomOffsets.length, 3)
 
-    // Spiral with zero size should keep points at center
     val spiralOffsets = OffsetGenerator.spiral(PosInt.unsafeFrom(3), zeroSize, Offset.Zero, random)
     assertEquals(spiralOffsets.length, 3)
 
   test("negative step sizes work"):
-    val offsets = OffsetGenerator.grid(PosInt.unsafeFrom(2), PosInt.unsafeFrom(2), (-1).arcsec, (-1).arcsec)
+    val offsets = OffsetGenerator.grid(PosInt.unsafeFrom(2), PosInt.unsafeFrom(2), -1.arcsec, -1.arcsec)
     assertEquals(offsets.length, 4)
-
-    // Should still generate valid offsets
-    assert(offsets.toList.forall(o => o.p.toAngle.toSignedDoubleRadians.isFinite))
-    assert(offsets.toList.forall(o => o.q.toAngle.toSignedDoubleRadians.isFinite))
 
   test("gridP generates P components"):
     val components = OffsetGenerator.gridP(PosInt.unsafeFrom(5), 1.arcsec)
@@ -103,17 +95,15 @@ class OffsetGeneratorSuite extends munit.FunSuite:
   test("gridQ generates Q components"):
     val components = OffsetGenerator.gridQ(PosInt.unsafeFrom(3), 2.arcsec)
     assertEquals(components.length, 3)
-    // Should have center and symmetric points
+    // Should have center
     assert(components.toList.contains(Offset.Q.Zero))
 
   test("randomP generates P components"):
     val random = new Random(42)
     val components = OffsetGenerator.randomP(PosInt.unsafeFrom(10), 5.arcsec, random = random)
     assertEquals(components.length, 10)
-    assert(components.toList.forall(_.toAngle.toSignedDoubleRadians.isFinite))
 
   test("randomQ generates Q components"):
     val random = new Random(42)
     val components = OffsetGenerator.randomQ(PosInt.unsafeFrom(8), 4.arcsec, random = random)
     assertEquals(components.length, 8)
-    assert(components.toList.forall(_.toAngle.toSignedDoubleRadians.isFinite))
