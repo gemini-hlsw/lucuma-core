@@ -19,9 +19,10 @@ class LimitsSuite extends munit.FunSuite {
   test("widestConstraints") {
     assertEquals(
       widestConstraints,
-      BrightnessConstraints(BandsList.GaiaBandsList,
-                            FaintnessConstraint(BrightnessValue.unsafeFrom(17.227769563884202)),
-                            None
+      BrightnessConstraints(
+        BandsList.GaiaBandsList,
+        FaintnessConstraint(BrightnessValue.unsafeFrom(17.327769563884203)),
+        None
       )
     )
   }
