@@ -120,8 +120,9 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform)
   .settings(
     name := "lucuma-core-tests",
     libraryDependencies ++= Seq(
-      "org.scalameta" %%% "munit"            % munitVersion % Test,
-      "org.typelevel" %%% "discipline-munit" % munitDisciplineVersion % Test
+      "org.scalameta" %%% "munit"             % munitVersion % Test,
+      "org.typelevel" %%% "discipline-munit"  % munitDisciplineVersion % Test,
+      "org.typelevel" %%% "munit-cats-effect" % munitCatsEffectVersion % Test,
     ),
     testFrameworks += MUnitFramework,
     testOptions += MUnitFlakyOK
