@@ -3,7 +3,11 @@
 
 package lucuma.core.geom
 
+import cats.Applicative
+import cats.Monad
 import cats.data.NonEmptyList
+import cats.effect.std.Random
+import cats.syntax.all.*
 import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
@@ -11,7 +15,6 @@ import lucuma.core.math.Offset
 import scala.math.Pi
 import scala.math.ceil
 import scala.math.sqrt
-import scala.util.Random
 
 /**
  * Based on the Python offset-generator script.
@@ -21,7 +24,7 @@ object OffsetGenerator:
   /**
    * Generates a grid pattern of offsets.
    */
-  def grid(nx: PosInt, ny: PosInt, dp: Angle, dq: Angle, center: Offset = Offset.Zero): NonEmptyList[Offset] =
+  def grid[F[_]: Applicative](nx: PosInt, ny: PosInt, dp: Angle, dq: Angle, center: Offset = Offset.Zero): F[NonEmptyList[Offset]] =
     val pStart = -(nx.value - 1) / 2.0
     val qStart = (ny.value - 1) / 2.0
 
@@ -35,41 +38,42 @@ object OffsetGenerator:
         center + Offset(pOffset.p, qOffset.q)
 
     // can't be empty as nx and ny are 1 or more
-    NonEmptyList.fromListUnsafe(offsets.toList)
+    NonEmptyList.fromListUnsafe(offsets.toList).pure[F]
 
   /**
    * Generates a random pattern of offsets.
    * Creates a grid and randomly places points near each grid element.
    */
-  def random(num: PosInt, size: Angle, center: Offset = Offset.Zero, random: Random = new Random()): NonEmptyList[Offset] =
+  def random[F[_]: {Monad, Random as R}](num: PosInt, size: Angle, center: Offset = Offset.Zero): F[NonEmptyList[Offset]] =
     val n = PosInt.unsafeFrom(ceil(sqrt(num.value.toDouble)).toInt)
     val d = size * (1.0 / n.value.toDouble)
 
-    val gridPoints = grid(n, n, d, d, center)
+    def randomizedPoints(grid: NonEmptyList[Offset]) =
+      grid.traverse: point =>
+        for
+          pJitter <- R.nextDouble.map(x => d * (x - 0.5))
+          qJitter <- R.nextDouble.map(x => d * (x - 0.5))
+        yield point + Offset(pJitter.p, qJitter.q)
 
-    val randomizedPoints = gridPoints.map: point =>
-      val pJitter = d * (random.nextDouble() - 0.5)
-      val qJitter = d * (random.nextDouble() - 0.5)
-      point + Offset(pJitter.p, qJitter.q)
-
-    // shuffle and take the requested number
-    val shuffled = random.shuffle(randomizedPoints.toList)
-    NonEmptyList.fromListUnsafe(shuffled.take(num.value))
+    for
+      gridPoints       <- grid[F](n, n, d, d, center)
+      randomizedPoints <- randomizedPoints(gridPoints)
+      shuffled         <- R.shuffleList(randomizedPoints.toList)
+    yield NonEmptyList.fromListUnsafe(shuffled.take(num.value))
 
   /**
    * Generates a Fermat spiral pattern of offsets.
    * Uses the golden angle for optimal packing.
    */
-  def spiral(num: PosInt, size: Angle, center: Offset = Offset.Zero, random: Random = new Random()): NonEmptyList[Offset] =
+  def spiral[F[_]: {Monad, Random as R}](num: PosInt, size: Angle, center: Offset = Offset.Zero): F[NonEmptyList[Offset]] =
     val θ = Angle.fromDoubleDegrees(137.50776)  // golden angle
-    val φ = Angle.fromDoubleRadians(random.nextDouble() * 2.0 * Pi)
 
-    // Calculate scale factor
-    val arcsecs = Angle.signedDecimalArcseconds.get(size).toDouble
-    val θʹ = θ * num.value.toDouble
-    val α = arcsecs / 2.0 / sqrt(num.value * (θʹ.cos * θʹ.cos + θʹ.sin * θʹ.sin))
+    val offsets = R.nextDouble.map(x => Angle.fromDoubleRadians(x * 2.0 * Pi)).map: φ =>
+      // Calculate scale factor
+      val arcsecs = Angle.signedDecimalArcseconds.get(size).toDouble
+      val θʹ = θ * num.value.toDouble
+      val α = arcsecs / 2.0 / sqrt(num.value * (θʹ.cos * θʹ.cos + θʹ.sin * θʹ.sin))
 
-    val offsets =
       (0 until num.value).map: n =>
         val sqrtN = sqrt(n.toDouble)
         val angle = θ * n.toDouble + φ
@@ -78,12 +82,13 @@ object OffsetGenerator:
 
         center + Offset(Angle.fromDoubleArcseconds(p).p, Angle.fromDoubleArcseconds(q).q)
 
-    NonEmptyList.fromListUnsafe(offsets.toList)
+    offsets.map: o =>
+      NonEmptyList.fromListUnsafe(o.toList)
 
   /**
    * Generates a 1D grid pattern of P components.
    */
-  def gridP(num: PosInt, step: Angle, center: Offset.P = Offset.P.Zero): NonEmptyList[Offset.P] =
+  def gridP[F[_]: Applicative](num: PosInt, step: Angle, center: Offset.P = Offset.P.Zero): F[NonEmptyList[Offset.P]] =
     val start = -(num.value - 1) / 2.0
 
     val components =
@@ -91,12 +96,12 @@ object OffsetGenerator:
         val pOffset = step * (start + i)
         center + Offset.P(pOffset)
 
-    NonEmptyList.fromListUnsafe(components.toList)
+    NonEmptyList.fromListUnsafe(components.toList).pure[F]
 
   /**
    * Generates a 1D grid pattern of Q components.
    */
-  def gridQ(num: PosInt, step: Angle, center: Offset.Q = Offset.Q.Zero): NonEmptyList[Offset.Q] =
+  def gridQ[F[_]: Applicative](num: PosInt, step: Angle, center: Offset.Q = Offset.Q.Zero): F[NonEmptyList[Offset.Q]] =
     val start = (num.value - 1) / 2.0
 
     val components =
@@ -104,32 +109,30 @@ object OffsetGenerator:
         val qOffset = step * (start - i)
         center + Offset.Q(qOffset)
 
-    NonEmptyList.fromListUnsafe(components.toList)
+    NonEmptyList.fromListUnsafe(components.toList).pure[F]
 
   /**
    * Generates a 1D random pattern of P components.
    */
-  def randomP(num: PosInt, size: Angle, center: Offset.P = Offset.P.Zero, random: Random = new Random()): NonEmptyList[Offset.P] =
+  def randomP[F[_]: {Monad, Random as R}](num: PosInt, size: Angle, center: Offset.P = Offset.P.Zero): F[NonEmptyList[Offset.P]] =
     val step = size * (1.0 / num.value.toDouble)
-    val gridPoints = gridP(num, step, center)
 
-    val randomizedPoints = gridPoints.map: point =>
-      val pJitter = Offset.P(step * (random.nextDouble() - 0.5))
-      point + pJitter
-
-    val shuffled = random.shuffle(randomizedPoints.toList)
-    NonEmptyList.fromListUnsafe(shuffled)
+    for
+      gridPoints       <- gridP[F](num, step, center)
+      randomizedPoints <- gridPoints.traverse: point =>
+        R.nextDouble.map(x => point + Offset.P(step * (x - 0.5)))
+      shuffled         <- R.shuffleList(randomizedPoints.toList)
+    yield NonEmptyList.fromListUnsafe(shuffled)
 
   /**
    * Generates a 1D random pattern of Q components.
    */
-  def randomQ(num: PosInt, size: Angle, center: Offset.Q = Offset.Q.Zero, random: Random = new Random()): NonEmptyList[Offset.Q] =
+  def randomQ[F[_]: {Monad, Random as R}](num: PosInt, size: Angle, center: Offset.Q = Offset.Q.Zero): F[NonEmptyList[Offset.Q]] =
     val step = size * (1.0 / num.value.toDouble)
-    val gridPoints = gridQ(num, step, center)
 
-    val randomizedPoints = gridPoints.map: point =>
-      val qJitter = Offset.Q(step * (random.nextDouble() - 0.5))
-      point + qJitter
-
-    val shuffled = random.shuffle(randomizedPoints.toList)
-    NonEmptyList.fromListUnsafe(shuffled)
+    for
+      gridPoints       <- gridQ[F](num, step, center)
+      randomizedPoints <- gridPoints.traverse: point =>
+        R.nextDouble.map(x => point + Offset.Q(step * (x - 0.5)))
+      shuffled         <- R.shuffleList(randomizedPoints.toList)
+    yield NonEmptyList.fromListUnsafe(shuffled)
