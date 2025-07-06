@@ -14,22 +14,20 @@ import munit.CatsEffectSuite
 class OffsetGeneratorSuite extends CatsEffectSuite:
 
   test("grid generates correct number of offsets"):
-    assertIO(
-      OffsetGenerator.grid[IO](3.refined, 4.refined, 1.arcsec, 2.arcsec).map(_.length),
-      12 // 3 * 4
-    )
+    val offsets = OffsetGenerator.grid(3.refined, 4.refined, 1.arcsec, 2.arcsec)
+    assertEquals(offsets.length, 12) // 3 * 4
 
   test("grid generates symmetric pattern around center"):
-    OffsetGenerator.grid[IO](3.refined, 3.refined, 1.arcsec, 1.arcsec).map: offsets =>
-      assertEquals(offsets.length, 9)
-      assert(offsets.toList.contains(Offset.Zero))
-      val centerIndex = offsets.toList.indexOf(Offset.Zero)
-      assert(centerIndex >= 0)
+    val offsets = OffsetGenerator.grid(3.refined, 3.refined, 1.arcsec, 1.arcsec)
+    assertEquals(offsets.length, 9)
+    assert(offsets.toList.contains(Offset.Zero))
+    val centerIndex = offsets.toList.indexOf(Offset.Zero)
+    assert(centerIndex >= 0)
 
   test("grid handles single point"):
-    OffsetGenerator.grid[IO](1.refined, 1.refined, 1.arcsec, 1.arcsec).map: offsets =>
-      assertEquals(offsets.length, 1)
-      assertEquals(offsets.head, Offset.Zero)
+    val offsets = OffsetGenerator.grid(1.refined, 1.refined, 1.arcsec, 1.arcsec)
+    assertEquals(offsets.length, 1)
+    assertEquals(offsets.head, Offset.Zero)
 
   // Test random generation
   test("random generates correct number of offsets"):
@@ -76,23 +74,21 @@ class OffsetGeneratorSuite extends CatsEffectSuite:
       assert(distance.toSignedDoubleRadians < 0.001)
 
   test("negative step sizes work"):
-    assertIO(
-      OffsetGenerator.grid[IO](2.refined, 2.refined, -1.arcsec, -1.arcsec).map(_.length),
-      4
-    )
+    val offsets = OffsetGenerator.grid(2.refined, 2.refined, -1.arcsec, -1.arcsec)
+    assertEquals(offsets.length, 4)
 
   test("gridP generates P components"):
-    OffsetGenerator.gridP[IO](5.refined, 1.arcsec).map: c =>
-      assertEquals(c.length, 5)
-      // P components should be symmetric around center
-      val pValues = c.toList.map(_.toAngle.toSignedDoubleRadians).sorted
-      assertEquals(pValues.length, 5)
+    val components = OffsetGenerator.gridP(5.refined, 1.arcsec)
+    assertEquals(components.length, 5)
+    // P components should be symmetric around center
+    val pValues = components.toList.map(_.toAngle.toSignedDoubleRadians).sorted
+    assertEquals(pValues.length, 5)
 
   test("gridQ generates Q components"):
-    OffsetGenerator.gridQ[IO](3.refined, 2.arcsec).map: c =>
-      assertEquals(c.length, 3)
-      // Should have center
-      assert(c.toList.contains(Offset.Q.Zero))
+    val components = OffsetGenerator.gridQ(3.refined, 2.arcsec)
+    assertEquals(components.length, 3)
+    // Should have center
+    assert(components.toList.contains(Offset.Q.Zero))
 
   test("randomP generates P components"):
     for
