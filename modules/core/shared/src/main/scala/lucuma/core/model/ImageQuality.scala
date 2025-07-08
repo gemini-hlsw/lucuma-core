@@ -43,7 +43,7 @@ object ImageQuality extends NewRefinedQuantity[Short, ImageQualityPredicate, Cen
 
     def toAngle: Angle = Angle.fromMicroarcseconds(toCentiArcSeconds * 10_000L)
 
-    def label: String = f"""< ${toArcSeconds.toDouble}%.2f"""
+    def label: String = f"""< ${toArcSeconds.toDouble}%.2f arcsec"""
 
     /**
       * Calculate the percentile of on-source image quality for this ImageQuality as fwhm.
