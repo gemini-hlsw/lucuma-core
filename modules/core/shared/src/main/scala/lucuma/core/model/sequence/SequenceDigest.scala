@@ -35,22 +35,14 @@ case class SequenceDigest(
   executionState: ExecutionState
 ):
 
-  def add(o: ObserveClass): SequenceDigest =
-    SequenceDigest.observeClass.modify(_ |+| o)(this)
-
-  def add(p: CategorizedTime): SequenceDigest =
-    SequenceDigest.timeEstimate.modify(_ |+| p)(this)
-
-  def add(o: Offset): SequenceDigest =
-    SequenceDigest.offsets.modify(_ + o)(this)
-
-  def incrementAtomCount: Option[SequenceDigest] =
-    NonNegInt
-      .from(atomCount.value + 1)
-      .toOption
-      .map { ac =>
-        SequenceDigest.atomCount.replace(ac)(this)
-      }
+  def add[D](a: Atom[D]): SequenceDigest =
+    SequenceDigest(
+      observeClass   = observeClass |+| a.observeClass,
+      timeEstimate   = timeEstimate |+| a.timeEstimate,
+      offsets        = a.steps.toList.foldLeft(offsets)((os, s) => os + s.telescopeConfig.offset),
+      atomCount      = NonNegInt.unsafeFrom(atomCount.value + 1),
+      executionState = executionState
+    )
 
 object SequenceDigest:
 
@@ -76,12 +68,12 @@ object SequenceDigest:
     Focus[SequenceDigest](_.offsets)
 
   /** @group Optics */
-  val atomCount: Lens[SequenceDigest, NonNegInt] =
-    Focus[SequenceDigest](_.atomCount)
-
-  /** @group Optics */
   val executionState: Lens[SequenceDigest, ExecutionState] =
     Focus[SequenceDigest](_.executionState)
+
+  /** @group Optics */
+  val atomCount: Lens[SequenceDigest, NonNegInt] =
+    Focus[SequenceDigest](_.atomCount)
 
   given Eq[SequenceDigest] =
     Eq.by: a =>

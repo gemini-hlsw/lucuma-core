@@ -19,8 +19,8 @@ import org.scalacheck.Cogen
 import scala.collection.immutable.SortedSet
 
 trait ArbSequenceDigest:
-  import ArbEnumerated.given
   import ArbCategorizedTime.given
+  import ArbEnumerated.given
   import ArbOffset.given
 
   given Arbitrary[SequenceDigest] =
