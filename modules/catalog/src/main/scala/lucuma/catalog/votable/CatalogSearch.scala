@@ -17,7 +17,7 @@ object CatalogSearch {
    * Takes a name query and builds a uri to query simbad
    */
   def simbadSearchQuery[F[_]](query: QueryByName): Uri = {
-    val simbadUri = uri"http://simbad.cfa.harvard.edu/simbad/sim-id"
+    val simbadUri = uri"http://simbad.u-strasbg.fr/simbad/sim-id"
     val base      = query.proxy.fold(simbadUri)(p =>
       Uri
         .fromString(s"${p}/$simbadUri")
