@@ -22,5 +22,3 @@ final class AtomDigestSuite extends DisciplineSuite:
   checkAll("AtomDigest.id",           LensTests(AtomDigest.id))
   checkAll("AtomDigest.observeClass", LensTests(AtomDigest.observeClass))
   checkAll("AtomDigest.timeEstimate", LensTests(AtomDigest.timeEstimate))
-  checkAll("AtomDigest.hasArc",       LensTests(AtomDigest.hasArc))
-  checkAll("AtomDigest.hasFlat",      LensTests(AtomDigest.hasFlat))

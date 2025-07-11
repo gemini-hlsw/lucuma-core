@@ -6,6 +6,7 @@ package lucuma.core.model.sequence
 import cats.Eq
 import lucuma.core.enums.GcalLampType
 import lucuma.core.enums.ObserveClass
+import lucuma.core.enums.StepType
 import monocle.Focus
 import monocle.Lens
 
@@ -16,13 +17,16 @@ case class AtomDigest(
   id:           Atom.Id,
   observeClass: ObserveClass,
   timeEstimate: CategorizedTime,
-  hasArc:       Boolean,
-  hasFlat:      Boolean
+  stepTypes:    Set[StepType],
+  lampTypes:    Set[GcalLampType]
 )
 
 object AtomDigest:
 
   def fromAtom[D](atom: Atom[D]): AtomDigest =
+    val stepTypes = atom.steps.foldLeft(Set.empty[StepType]): (types, step) =>
+      types + step.stepConfig.stepType
+
     val lampTypes = atom.steps.foldLeft(Set.empty[GcalLampType]): (types, step) =>
       step.stepConfig.gcalLampType.fold(types)(types + _)
 
@@ -30,8 +34,8 @@ object AtomDigest:
       atom.id,
       atom.observeClass,
       atom.timeEstimate,
-      lampTypes(GcalLampType.Arc),
-      lampTypes(GcalLampType.Flat)
+      stepTypes,
+      lampTypes
     )
 
   /** @group Optics */
@@ -47,12 +51,12 @@ object AtomDigest:
     Focus[AtomDigest](_.timeEstimate)
 
   /** @group Optics */
-  val hasArc: Lens[AtomDigest, Boolean] =
-    Focus[AtomDigest](_.hasArc)
+  val stepTypes: Lens[AtomDigest, Set[StepType]] =
+    Focus[AtomDigest](_.stepTypes)
 
   /** @group Optics */
-  val hasFlat: Lens[AtomDigest, Boolean] =
-    Focus[AtomDigest](_.hasFlat)
+  val lampTypes: Lens[AtomDigest, Set[GcalLampType]] =
+    Focus[AtomDigest](_.lampTypes)
 
   given Eq[AtomDigest] =
     Eq.by: a =>
@@ -60,6 +64,6 @@ object AtomDigest:
         a.id,
         a.observeClass,
         a.timeEstimate,
-        a.hasArc,
-        a.hasFlat
+        a.stepTypes,
+        a.lampTypes
       )

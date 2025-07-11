@@ -4,7 +4,9 @@
 package lucuma.core.model.sequence
 package arb
 
+import lucuma.core.enums.GcalLampType
 import lucuma.core.enums.ObserveClass
+import lucuma.core.enums.StepType
 import lucuma.core.util.arb.ArbEnumerated
 import lucuma.core.util.arb.ArbUid
 import org.scalacheck.Arbitrary
@@ -23,24 +25,24 @@ trait ArbAtomDigest:
         i <- arbitrary[Atom.Id]
         c <- arbitrary[ObserveClass]
         t <- arbitrary[CategorizedTime]
-        a <- arbitrary[Boolean]
-        f <- arbitrary[Boolean]
-      yield AtomDigest(i, c, t, a, f)
+        s <- arbitrary[Set[StepType]]
+        l <- arbitrary[Set[GcalLampType]]
+      yield AtomDigest(i, c, t, s, l)
 
   given Cogen[AtomDigest] =
     Cogen[(
       Atom.Id,
       ObserveClass,
       CategorizedTime,
-      Boolean,
-      Boolean
+      List[StepType],
+      List[GcalLampType]
     )].contramap: a =>
       (
         a.id,
         a.observeClass,
         a.timeEstimate,
-        a.hasArc,
-        a.hasFlat
+        a.stepTypes.toList,
+        a.lampTypes.toList
       )
 
 object ArbAtomDigest extends ArbAtomDigest
