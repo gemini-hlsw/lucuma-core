@@ -9,6 +9,8 @@ import cats.data.NonEmptySet
 import cats.derived.*
 import cats.syntax.all.*
 import lucuma.core.enums.*
+import lucuma.core.enums.GcalLampType.Arc
+import lucuma.core.enums.GcalLampType.Flat
 import monocle.Focus
 import monocle.Lens
 import monocle.Optional
@@ -21,6 +23,16 @@ import scala.collection.immutable.SortedSet
 sealed abstract class StepConfig(val stepType: StepType):
   def usesGcalUnit: Boolean =
     stepType === StepType.Gcal || stepType === StepType.SmartGcal
+
+  def gcalLampType: Option[GcalLampType] =
+    this match
+      case StepConfig.Gcal(lamp, _, _, _)           => lamp.lampType.some
+      case StepConfig.SmartGcal(SmartGcalType.Arc)  => Arc.some
+      case StepConfig.SmartGcal(SmartGcalType.Flat) => Flat.some
+      case _                                        => none
+
+  def isArc: Boolean  = gcalLampType.exists(_ === Arc)
+  def isFlat: Boolean = gcalLampType.exists(_ === Flat)
 
 object StepConfig:
 
