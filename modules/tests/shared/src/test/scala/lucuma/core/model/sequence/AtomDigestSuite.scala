@@ -4,8 +4,8 @@
 package lucuma.core.model.sequence
 
 import cats.kernel.laws.discipline.*
-import lucuma.core.model.sequence.arb.ArbCategorizedTime
 import lucuma.core.model.sequence.arb.ArbAtomDigest
+import lucuma.core.model.sequence.arb.ArbCategorizedTime
 import lucuma.core.util.arb.ArbEnumerated
 import lucuma.core.util.arb.ArbUid
 import monocle.law.discipline.*

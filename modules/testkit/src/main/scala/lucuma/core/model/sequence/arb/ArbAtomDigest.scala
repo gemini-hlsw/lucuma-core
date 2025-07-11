@@ -4,12 +4,12 @@
 package lucuma.core.model.sequence
 package arb
 
-import org.scalacheck.Arbitrary
-import org.scalacheck.Arbitrary.*
-import org.scalacheck.Cogen
 import lucuma.core.enums.ObserveClass
 import lucuma.core.util.arb.ArbEnumerated
 import lucuma.core.util.arb.ArbUid
+import org.scalacheck.Arbitrary
+import org.scalacheck.Arbitrary.*
+import org.scalacheck.Cogen
 
 trait ArbAtomDigest:
 
