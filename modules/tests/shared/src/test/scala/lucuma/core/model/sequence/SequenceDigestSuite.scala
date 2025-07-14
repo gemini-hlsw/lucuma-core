@@ -12,15 +12,13 @@ import lucuma.core.util.arb.ArbEnumerated
 import monocle.law.discipline.*
 import munit.*
 
-final class SequenceDigestSuite extends DisciplineSuite {
+final class SequenceDigestSuite extends DisciplineSuite:
 
   import ArbEnumerated.given
-  import ArbSequenceDigest.given
   import ArbCategorizedTime.given
+  import ArbSequenceDigest.given
 
   checkAll("Eq[SequenceDigest]",          EqTests[SequenceDigest].eqv)
   checkAll("SequenceDigest.observeClass", LensTests(SequenceDigest.observeClass))
   checkAll("SequenceDigest.plannedTime",  LensTests(SequenceDigest.timeEstimate))
   checkAll("SequenceDigest.atomCount",    LensTests(SequenceDigest.atomCount))
-
-}
