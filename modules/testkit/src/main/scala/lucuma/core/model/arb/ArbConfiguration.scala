@@ -70,6 +70,6 @@ trait ArbConfiguration:
   
   given Cogen[Configuration] =
     Cogen[(Conditions, Either[Coordinates, Region], ObservingMode)]
-      .contramap(c => (c.conditions, c.refererenceCoordinates, c.observingMode))
+      .contramap(c => (c.conditions, c.target, c.observingMode))
 
 object ArbConfiguration extends ArbConfiguration
