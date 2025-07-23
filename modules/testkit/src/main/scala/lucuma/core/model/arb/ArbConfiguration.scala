@@ -12,9 +12,11 @@ import lucuma.core.math.Coordinates
 import lucuma.core.math.arb.ArbCoordinates.given
 import lucuma.core.model.CloudExtinction
 import lucuma.core.util.arb.ArbEnumerated.given
+import lucuma.core.math.arb.ArbRegion.given
 import org.scalacheck.*
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Cogen.*
+import lucuma.core.math.Region
 
 trait ArbConfiguration:
   import Configuration.Conditions
@@ -62,12 +64,12 @@ trait ArbConfiguration:
     Arbitrary:
       for
         c <- arbitrary[Conditions]
-        r <- arbitrary[Coordinates]
+        r <- arbitrary[Either[Coordinates, Region]]
         o <- arbitrary[ObservingMode]
       yield (Configuration(c, r, o))
   
   given Cogen[Configuration] =
-    Cogen[(Conditions, Coordinates, ObservingMode)]
+    Cogen[(Conditions, Either[Coordinates, Region], ObservingMode)]
       .contramap(c => (c.conditions, c.refererenceCoordinates, c.observingMode))
 
 object ArbConfiguration extends ArbConfiguration

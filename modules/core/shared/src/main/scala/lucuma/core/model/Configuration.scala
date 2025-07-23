@@ -16,12 +16,18 @@ import lucuma.core.math.Angle
 import lucuma.core.math.Coordinates
 import lucuma.core.model.Configuration.ObservingMode.GmosNorthLongSlit
 import lucuma.core.model.Configuration.ObservingMode.GmosSouthLongSlit
+import lucuma.core.math.Region
 
-case class Configuration(conditions: Configuration.Conditions, refererenceCoordinates: Coordinates, observingMode: Configuration.ObservingMode) derives Eq:
+case class Configuration(conditions: Configuration.Conditions, target: Either[Coordinates, Region], observingMode: Configuration.ObservingMode) derives Eq:
   def subsumes(other: Configuration): Boolean =
     conditions >= other.conditions &&
-    observingMode.fov.toDoubleDegrees / 2.0 >= refererenceCoordinates.angularDistance(other.refererenceCoordinates).toDoubleDegrees &&
-    observingMode === other.observingMode
+    observingMode === other.observingMode && {
+    (target, other.target) match
+      case (Left(self), Left(other))   => observingMode.fov.toDoubleDegrees / 2.0 >= self.angularDistance(other).toDoubleDegrees
+      case (Left(self), Right(other))  => false // coords never subsume region
+      case (Right(self), Left(other))  => self.contains(other) // region contains coords
+      case (Right(self), Right(other)) => self.containsAll(other) // region contains smaller region
+    }
 
 object Configuration:
 
