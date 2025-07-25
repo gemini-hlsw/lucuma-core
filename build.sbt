@@ -243,7 +243,7 @@ lazy val npmPublish = taskKey[Unit]("Run npm publish")
 lazy val npm        = project
   .in(file("modules/npm"))
   .dependsOn(core.js)
-  .enablePlugins(ScalaJSPlugin, NoPublishPlugin)
+  .enablePlugins(ScalaJSPlugin, NoPublishPlugin, BundleMonPlugin)
   .settings(
     scalaJSLinkerConfig ~= (_.withModuleKind(ModuleKind.ESModule)
       .withESFeatures(_.withESVersion(ESVersion.ES2021).withAvoidLetsAndConsts(false))),

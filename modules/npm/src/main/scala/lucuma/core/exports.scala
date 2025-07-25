@@ -8,6 +8,8 @@ import lucuma.core.math.HourAngle
 import lucuma.core.math.parser.AngleParsers
 import lucuma.core.model.*
 import lucuma.core.model.LocalObservingNight
+import lucuma.core.model.sequence.Dataset
+import lucuma.core.util.WithGid
 
 import java.time.LocalDateTime
 import scala.scalajs.js
@@ -46,34 +48,61 @@ def dateToLocalObservingNight(date: js.Date): String =
   )
   LocalObservingNight.fromLocalDateTime(localDate).toLocalDate.toString()
 
+def tryParseId(maybeId: String, withGid: WithGid): js.UndefOr[String] =
+  withGid.Id.parse(maybeId).orUndefined.map(_.toString)
+
 @JSExportTopLevel("parseAttachmentId")
 def parseAttachmentId(maybeAttachmentId: String): js.UndefOr[String] =
-  Attachment.Id.parse(maybeAttachmentId).map(_.toString).orUndefined
+  tryParseId(maybeAttachmentId, Attachment)
 
 @JSExportTopLevel("parseCallForProposalsId")
 def parseCallForProposalsId(maybeCallForProposalsId: String): js.UndefOr[String] =
-  CallForProposals.Id.parse(maybeCallForProposalsId).map(_.toString).orUndefined
+  tryParseId(maybeCallForProposalsId, CallForProposals)
+
+@JSExportTopLevel("parseConfigurationRequestId")
+def parseConfigurationRequestId(maybeConfigurationRequestId: String): js.UndefOr[String] =
+  tryParseId(maybeConfigurationRequestId, ConfigurationRequest)
+
+@JSExportTopLevel("parseDatasetId")
+def parseDatasetId(maybeDatasetId: String): js.UndefOr[String] =
+  tryParseId(maybeDatasetId, Dataset)
+
+@JSExportTopLevel("parseExecutionEventId")
+def parseExecutionEventId(maybeExecutionEventId: String): js.UndefOr[String] =
+  tryParseId(maybeExecutionEventId, ExecutionEvent)
 
 @JSExportTopLevel("parseGroupId")
 def parseGroupId(maybeGroupId: String): js.UndefOr[String] =
-  Group.Id.parse(maybeGroupId).map(_.toString).orUndefined
+  tryParseId(maybeGroupId, Group)
 
 @JSExportTopLevel("parseObservationId")
 def parseObservationId(maybeObservationId: String): js.UndefOr[String] =
-  Observation.Id.parse(maybeObservationId).map(_.toString).orUndefined
+  tryParseId(maybeObservationId, Observation)
 
 @JSExportTopLevel("parseProgramId")
 def parseProgramId(maybeProgramId: String): js.UndefOr[String] =
-  Program.Id.parse(maybeProgramId).map(_.toString).orUndefined
+  tryParseId(maybeProgramId, Program)
 
 @JSExportTopLevel("parseProgramNoteId")
 def parseProgramNoteId(maybeProgramNoteId: String): js.UndefOr[String] =
-  ProgramNote.Id.parse(maybeProgramNoteId).map(_.toString).orUndefined
+  tryParseId(maybeProgramNoteId, ProgramNote)
 
 @JSExportTopLevel("parseProgramUserId")
 def parseProgramUserId(maybeProgramUserId: String): js.UndefOr[String] =
-  ProgramUser.Id.parse(maybeProgramUserId).map(_.toString).orUndefined
+  tryParseId(maybeProgramUserId, ProgramUser)
+
+@JSExportTopLevel("parseStandardRoleId")
+def parseStandardRoleId(maybeStandardRoleId: String): js.UndefOr[String] =
+  tryParseId(maybeStandardRoleId, StandardRole)
+
+@JSExportTopLevel("parseTargetId")
+def parseTargetId(maybeTargetId: String): js.UndefOr[String] =
+  tryParseId(maybeTargetId, Target)
+
+@JSExportTopLevel("parseUserId")
+def parseUserId(maybeUserId: String): js.UndefOr[String] =
+  tryParseId(maybeUserId, User)
 
 @JSExportTopLevel("parseVisitId")
 def parseVisitId(maybeVisitId: String): js.UndefOr[String] =
-  Visit.Id.parse(maybeVisitId).map(_.toString).orUndefined
+  tryParseId(maybeVisitId, Visit)
