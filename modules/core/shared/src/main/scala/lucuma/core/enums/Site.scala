@@ -48,7 +48,7 @@ enum Site(
   /**
     * Minimum airmass that a given declination reaches from this site.
     */
-  def minimumAirMassFor(dec: Declination): AirMass =
+  def minimumAirMassFor(dec: Declination): Option[AirMass] =
     AirMass.minimumFor(dec, latitude)
 
   case GN
