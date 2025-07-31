@@ -17,7 +17,7 @@ jobs:
             const pr = context.payload.pull_request;
             const prAuthor = pr.user.login;
             const branchName = pr.head.ref;
-            const relevantUsers = ['swalker2m'];
+            const relevantUsers = ['swalker2m', 'toddburnside'];
             const skipScLabel = 'skip-sc';
 
             if (!branchName.startsWith('sc-')) {
