@@ -8,13 +8,13 @@ import cats.data.NonEmptyList
 import cats.derived.*
 import cats.syntax.all.*
 import lucuma.core.math.Coordinates
+import lucuma.core.math.Region
+import lucuma.core.model.Target.Nonsidereal
+import lucuma.core.model.Target.Opportunity
 import lucuma.core.model.syntax.tracking.*
 import lucuma.core.util.NewType
 
 import java.time.Instant
-import lucuma.core.model.Target.Nonsidereal
-import lucuma.core.model.Target.Opportunity
-import lucuma.core.math.Region
 
 // Tag to indicate the coordinates have been corrected for proper motion
 object CoordinatesAtVizTime extends NewType[Coordinates]

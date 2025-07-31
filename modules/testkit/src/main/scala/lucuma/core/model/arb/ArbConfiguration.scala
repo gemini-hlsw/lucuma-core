@@ -9,14 +9,14 @@ import lucuma.core.enums.GmosSouthGrating
 import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.WaterVapor
 import lucuma.core.math.Coordinates
+import lucuma.core.math.Region
 import lucuma.core.math.arb.ArbCoordinates.given
+import lucuma.core.math.arb.ArbRegion.given
 import lucuma.core.model.CloudExtinction
 import lucuma.core.util.arb.ArbEnumerated.given
-import lucuma.core.math.arb.ArbRegion.given
 import org.scalacheck.*
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Cogen.*
-import lucuma.core.math.Region
 
 trait ArbConfiguration:
   import Configuration.Conditions
