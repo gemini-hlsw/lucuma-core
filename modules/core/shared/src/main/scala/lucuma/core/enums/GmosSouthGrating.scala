@@ -50,17 +50,6 @@ enum GmosSouthGrating(
     referenceResolution  = resolution(4396)
   )
 
-  case B600_G5323  extends GmosSouthGrating(
-    tag                  = "B600_G5323",
-    shortName            = "B600",
-    longName             = "B600_G5323",
-    rulingDensity        = 600,
-    dispersion           = pmToDispersion( 50),
-    simultaneousCoverage = nmToWavelengthDelta( 307),
-    blazeWavelength      = blazeNm( 461),
-    referenceResolution  = resolution(1688)
-  )
-
   case R600_G5324  extends GmosSouthGrating(
     tag                  = "R600_G5324",
     shortName            = "R600",
