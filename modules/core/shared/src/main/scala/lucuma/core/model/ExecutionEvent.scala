@@ -25,6 +25,7 @@ sealed trait ExecutionEvent derives Eq {
   def received:      Timestamp
   def observationId: Observation.Id
   def visitId:       Visit.Id
+  def clientId:      Option[Client.Id]
 
   import ExecutionEvent.*
 
@@ -36,11 +37,11 @@ sealed trait ExecutionEvent derives Eq {
     datasetEvent:  DatasetEvent  => A
   ): A =
     this match {
-      case e@SlewEvent(_, _, _, _, _)             => slewEvent(e)
-      case e@SequenceEvent(_, _, _, _, _)         => sequenceEvent(e)
-      case e@AtomEvent(_, _, _, _, _, _)          => atomEvent(e)
-      case e@StepEvent(_, _, _, _, _, _, _)       => stepEvent(e)
-      case e@DatasetEvent(_, _, _, _, _, _, _, _) => datasetEvent(e)
+      case e@SlewEvent(_, _, _, _, _, _)             => slewEvent(e)
+      case e@SequenceEvent(_, _, _, _, _, _)         => sequenceEvent(e)
+      case e@AtomEvent(_, _, _, _, _, _, _)          => atomEvent(e)
+      case e@StepEvent(_, _, _, _, _, _, _, _)       => stepEvent(e)
+      case e@DatasetEvent(_, _, _, _, _, _, _, _, _) => datasetEvent(e)
     }
 
 }
@@ -52,6 +53,7 @@ object ExecutionEvent extends WithGid('e'.refined) {
     received:      Timestamp,
     observationId: Observation.Id,
     visitId:       Visit.Id,
+    clientId:      Option[Client.Id],
     stage:         SlewStage
   ) extends ExecutionEvent derives Eq
 
@@ -60,6 +62,7 @@ object ExecutionEvent extends WithGid('e'.refined) {
     received:      Timestamp,
     observationId: Observation.Id,
     visitId:       Visit.Id,
+    clientId:      Option[Client.Id],
     command:       SequenceCommand
   ) extends ExecutionEvent derives Eq
 
@@ -68,6 +71,7 @@ object ExecutionEvent extends WithGid('e'.refined) {
     received:      Timestamp,
     observationId: Observation.Id,
     visitId:       Visit.Id,
+    clientId:      Option[Client.Id],
     atomId:        Atom.Id,
     stage:         AtomStage
   ) extends ExecutionEvent derives Eq
@@ -77,6 +81,7 @@ object ExecutionEvent extends WithGid('e'.refined) {
     received:      Timestamp,
     observationId: Observation.Id,
     visitId:       Visit.Id,
+    clientId:      Option[Client.Id],
     atomId:        Atom.Id,
     stepId:        Step.Id,
     stage:         StepStage
@@ -87,6 +92,7 @@ object ExecutionEvent extends WithGid('e'.refined) {
     received:      Timestamp,
     observationId: Observation.Id,
     visitId:       Visit.Id,
+    clientId:      Option[Client.Id],
     atomId:        Atom.Id,
     stepId:        Step.Id,
     datasetId:     Dataset.Id,
