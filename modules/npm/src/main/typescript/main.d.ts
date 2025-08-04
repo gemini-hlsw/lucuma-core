@@ -3,6 +3,8 @@ export declare function deg2dms(deg: number): string;
 export declare function hms2deg(hms: string): number;
 export declare function dms2deg(dms: string): number;
 
+export declare function signedArcSeconds(arcseconds: string | number): number;
+
 export declare function dateToLocalObservingNight(date: Date): string;
 
 export declare function parseAttachmentId(maybeAttachmentId: string): string | undefined;
