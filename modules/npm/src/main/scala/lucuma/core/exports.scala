@@ -36,6 +36,13 @@ def dms2deg(dms: String): Double =
     case Left(value)  => throw new IllegalArgumentException(value.toString)
     case Right(value) => value.toDoubleDegrees
 
+@JSExportTopLevel("signedArcSeconds")
+def signedArcSeconds(arcseconds: Double | String) =
+  val angle = arcseconds match
+    case s: String => Angle.fromBigDecimalArcseconds(BigDecimal(s))
+    case d: Double => Angle.fromDoubleArcseconds(d)
+  Angle.signedDecimalArcseconds.get(angle).doubleValue
+
 @JSExportTopLevel("dateToLocalObservingNight")
 def dateToLocalObservingNight(date: js.Date): String =
   val localDate = LocalDateTime.of(
