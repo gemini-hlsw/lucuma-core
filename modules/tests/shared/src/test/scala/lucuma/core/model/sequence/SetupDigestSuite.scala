@@ -4,11 +4,11 @@
 package lucuma.core.model.sequence
 
 import cats.kernel.laws.discipline.*
-import lucuma.core.model.sequence.arb.ArbExecutionDigest
+import lucuma.core.model.sequence.arb.ArbSetupDigest
 import munit.*
 
-final class ExecutionDigestSuite extends DisciplineSuite:
+final class SetupDigestSuite extends DisciplineSuite:
 
-  import ArbExecutionDigest.given
+  import ArbSetupDigest.given
 
-  checkAll("Eq[ExecutionDigest]", EqTests[ExecutionDigest].eqv)
+  checkAll("Eq[SetupDigest]", EqTests[SetupDigest].eqv)

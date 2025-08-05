@@ -24,7 +24,7 @@ trait ArbSetupTime {
 
   given Cogen[SetupTime] =
     Cogen[(TimeSpan, TimeSpan)].contramap { a => (
-      a.full,
+      a.acquisition,
       a.reacquisition
     )}
 

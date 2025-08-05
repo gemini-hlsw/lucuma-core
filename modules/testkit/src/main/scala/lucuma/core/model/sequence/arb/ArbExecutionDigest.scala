@@ -8,30 +8,24 @@ import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.*
 import org.scalacheck.Cogen
 
-trait ArbExecutionDigest {
+trait ArbExecutionDigest:
 
-  import ArbSetupTime.given
   import ArbSequenceDigest.given
+  import ArbSetupDigest.given
 
   given Arbitrary[ExecutionDigest] =
-    Arbitrary {
-      for {
-        c <- arbitrary[SetupTime]
+    Arbitrary:
+      for
+        c <- arbitrary[SetupDigest]
         a <- arbitrary[SequenceDigest]
         s <- arbitrary[SequenceDigest]
-      } yield ExecutionDigest(c, a, s)
-    }
+      yield ExecutionDigest(c, a, s)
 
   given Cogen[ExecutionDigest] =
     Cogen[(
-      SetupTime,
+      SetupDigest,
       SequenceDigest,
       SequenceDigest
-    )].contramap { a => (
-      a.setup,
-      a.acquisition,
-      a.science
-    )}
-}
+    )].contramap(a => (a.setup, a.acquisition, a.science))
 
 object ArbExecutionDigest extends ArbExecutionDigest

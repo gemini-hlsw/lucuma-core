@@ -13,22 +13,14 @@ import lucuma.core.util.TimeSpan
  * acquisition time.
  */
 case class SetupTime(
-  full:          TimeSpan,
+  acquisition:   TimeSpan,
   reacquisition: TimeSpan
 )
 
-object SetupTime {
+object SetupTime:
 
   val Zero: SetupTime =
-    SetupTime(
-      TimeSpan.Zero,
-      TimeSpan.Zero
-    )
+    SetupTime(TimeSpan.Zero, TimeSpan.Zero)
 
   given Eq[SetupTime] =
-    Eq.by { a => (
-      a.full,
-      a.reacquisition
-    )}
-
-}
+    Eq.by(a => (a.acquisition, a.reacquisition))

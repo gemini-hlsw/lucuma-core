@@ -8,11 +8,11 @@ import lucuma.core.enums.ObserveClass
 import monocle.Focus
 import monocle.Lens
 
-case class ExecutionDigest(
-  setup:       SetupTime,
+final case class ExecutionDigest(
+  setup:       SetupDigest,
   acquisition: SequenceDigest,
   science:     SequenceDigest
-) {
+):
 
   /**
    * ObserveClass computed from the ObserveClass of the science sequence atoms.
@@ -21,32 +21,23 @@ case class ExecutionDigest(
     science.observeClass
 
   /**
-   * Planned time for the observation, including the science sequence but only
-   * a reacquisition cost instead of the full setup time.
+   * Planned time for the observation, including the science sequence and an
+   * estimated number of acquisitions.
    */
-  def reacquisitionTimeEstimate: CategorizedTime =
-    science.timeEstimate.sumCharge(science.observeClass.chargeClass, setup.reacquisition)
+  def timeEstimate: CategorizedTime =
+    science.timeEstimate.sumCharge(science.observeClass.chargeClass, setup.timeEstimate)
 
-  /**
-   * Planned time for the observation, including the science sequence and a
-   * full setup time.
-   */
-  def fullTimeEstimate: CategorizedTime =
-    science.timeEstimate.sumCharge(science.observeClass.chargeClass, setup.full)
-
-}
-
-object ExecutionDigest {
+object ExecutionDigest:
 
   val Zero: ExecutionDigest =
     ExecutionDigest(
-      SetupTime.Zero,
+      SetupDigest.Zero,
       SequenceDigest.Zero,
       SequenceDigest.Zero
     )
 
   /** @group Optics */
-  val setup: Lens[ExecutionDigest, SetupTime] =
+  val setup: Lens[ExecutionDigest, SetupDigest] =
     Focus[ExecutionDigest](_.setup)
 
   /** @group Optics */
@@ -58,10 +49,4 @@ object ExecutionDigest {
     Focus[ExecutionDigest](_.science)
 
   given Eq[ExecutionDigest] =
-    Eq.by { a => (
-      a.setup,
-      a.acquisition,
-      a.science
-    )}
-
-}
+    Eq.by(a => (a.setup, a.acquisition, a.science))
