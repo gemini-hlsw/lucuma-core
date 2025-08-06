@@ -72,10 +72,10 @@ enum GmosNorthGrating(
     referenceResolution  = resolution(1520)
   )
 
-  case R400_G5305  extends GmosNorthGrating(
-    tag                  = "R400_G5305",
+  case R400_G5310  extends GmosNorthGrating(
+    tag                  = "R400_G5310",
     shortName            = "R400",
-    longName             = "R400_G5305",
+    longName             = "R400_G5310",
     rulingDensity        = 400,
     dispersion           = pmToDispersion( 74),
     simultaneousCoverage = nmToWavelengthDelta( 472),

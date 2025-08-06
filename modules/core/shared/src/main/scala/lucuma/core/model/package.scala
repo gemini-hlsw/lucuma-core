@@ -63,10 +63,11 @@ object AirMass extends NewRefined[BigDecimal, Not[Less[1]]]:
   /**
     * Minimum airmass that a given declination reaches from a given latitude.
     */
-  def minimumFor(dec: Declination, latitude: Lat): AirMass =
+  def minimumFor(dec: Declination, latitude: Lat): Option[AirMass] =
     // Maximum elevation in degrees
     val elevation = 90.0 - abs(dec.toAngle.toSignedDoubleDegrees - latitude.toAngle.toSignedDoubleDegrees)
-    AirMass.from(BigDecimal(1.0 / sin((elevation + 244.0 / (165.0 + 47.0 * pow(elevation, 1.1))) * Pi / 180.0))).getOrElse(sys.error("Not possible"))
+    if elevation < 0 then None
+    else Some(AirMass.unsafeFrom(BigDecimal(1.0 / sin((elevation + 244.0 / (165.0 + 47.0 * pow(elevation, 1.1))) * Pi / 180.0))))
 
 type AirMass = AirMass.Type
 

@@ -737,5 +737,3 @@ trait OpticsHelpers:
         SplitEpi(_.toInt, _.toLong)
       self.imapB[Long](_ * n, _ / n).andThen(longToInt)
     }
-
-
