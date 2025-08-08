@@ -9,7 +9,9 @@ import lucuma.core.enums.GmosSouthGrating
 import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.WaterVapor
 import lucuma.core.math.Coordinates
+import lucuma.core.math.Region
 import lucuma.core.math.arb.ArbCoordinates.given
+import lucuma.core.math.arb.ArbRegion.given
 import lucuma.core.model.CloudExtinction
 import lucuma.core.util.arb.ArbEnumerated.given
 import org.scalacheck.*
@@ -62,12 +64,12 @@ trait ArbConfiguration:
     Arbitrary:
       for
         c <- arbitrary[Conditions]
-        r <- arbitrary[Coordinates]
+        r <- arbitrary[Either[Coordinates, Region]]
         o <- arbitrary[ObservingMode]
       yield (Configuration(c, r, o))
   
   given Cogen[Configuration] =
-    Cogen[(Conditions, Coordinates, ObservingMode)]
-      .contramap(c => (c.conditions, c.refererenceCoordinates, c.observingMode))
+    Cogen[(Conditions, Either[Coordinates, Region], ObservingMode)]
+      .contramap(c => (c.conditions, c.target, c.observingMode))
 
 object ArbConfiguration extends ArbConfiguration
