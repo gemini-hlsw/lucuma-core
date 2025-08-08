@@ -37,7 +37,10 @@ object CloudExtinction extends NewRefined[Extinction, CloudExtinctionPredicate]:
       val r = toExtinction.toVegaMagnitude.value
       BigDecimal(r.n) / BigDecimal(r.d)
 
-    def label: String = f"< ${toVegaMagnitude.toDouble}%.2f mag"
+    def label: String =
+      if (ce === Preset.Zero.toCloudExtinction)
+        f"${toVegaMagnitude.toDouble}%.2f mag"
+      else f"< ${toVegaMagnitude.toDouble}%.2f mag"
 
     def percentile: IntCentiPercent =
       Preset.values.find(preset => ce <= preset.toCloudExtinction).map(_.percentile).getOrElse(IntCentiPercent.Max)
