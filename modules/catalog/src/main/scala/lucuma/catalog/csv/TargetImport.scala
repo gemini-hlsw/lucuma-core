@@ -370,20 +370,21 @@ object TargetImport extends ImportEpochParsers:
                            z
       )
 
-  private def pm(t: TargetCsvRow): Option[ProperMotion] =
+  private def pm(t: TargetCsvRow): ProperMotion =
     (t.pmRA, t.pmDec) match
-      case (Some(ra), Some(dec)) => ProperMotion(ra, dec).some
-      case (Some(ra), None)      => ProperMotion(ra, ProperMotion.ZeroDecVelocity).some
-      case (None, Some(dec))     => ProperMotion(ProperMotion.ZeroRAVelocity, dec).some
-      case _                     => None
+      case (Some(ra), Some(dec)) => ProperMotion(ra, dec)
+      case (Some(ra), None)      => ProperMotion(ra, ProperMotion.ZeroDecVelocity)
+      case (None, Some(dec))     => ProperMotion(ProperMotion.ZeroRAVelocity, dec)
+      case _                     => ProperMotion.Zero
 
   private def tracking(t: TargetCsvRow, ra: RightAscension, dec: Declination): SiderealTracking =
     val base = Coordinates(ra, dec)
-    SiderealTracking(base,
-                     t.epoch.getOrElse(Epoch.J2000),
-                     pm(t),
-                     t.rv.orElse(t.z.flatMap(_.toRadialVelocity)).orElse(RadialVelocity.Zero.some),
-                     t.parallax
+    SiderealTracking(
+      base,
+      t.epoch.getOrElse(Epoch.J2000),
+      pm(t).some,
+      t.rv.orElse(t.z.flatMap(_.toRadialVelocity)).orElse(RadialVelocity.Zero.some),
+      t.parallax.orElse(Parallax.Zero.some)
     )
 
   private def csv2targetsRows[F[_]: RaiseThrowable]: Pipe[F, String, DecoderResult[TargetCsvRow]] =
@@ -417,7 +418,15 @@ object TargetImport extends ImportEpochParsers:
               .getOrElse(
                 Target.Sidereal(
                   t.name,
-                  tracking = SiderealTracking.const(Coordinates.Zero).copy(properMotion = pm(t)),
+                  tracking = SiderealTracking
+                    .const(Coordinates.Zero)
+                    .copy(
+                      properMotion = pm(t).some,
+                      radialVelocity = t.rv
+                        .orElse(t.z.flatMap(_.toRadialVelocity))
+                        .orElse(RadialVelocity.Zero.some),
+                      parallax = t.parallax.orElse(Parallax.Zero.some)
+                    ),
                   sourceProfile = t.sourceProfile,
                   None
                 )

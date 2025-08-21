@@ -17,8 +17,9 @@ import lucuma.core.model.IntCentiPercent
 // https://github.com/andrewwstephens/pyexplore/blob/3edd50f6c41509752cda6ad493ccaadd5eb5ad82/test/percentile.py
 //
 def conditionsLikelihood(bg: SkyBackground, ce: CloudExtinction, wv: WaterVapor, fwhm: ImageQuality, wavelength: Wavelength, dec: Declination, site: Site): IntCentiPercent =
+  site.minimumAirMassFor(dec).fold(IntCentiPercent.Min): airMass =>
     (bg.percentile *
       ce.percentile  *
-      fwhm.percentile(wavelength, site.minimumAirMassFor(dec)) *
+      fwhm.percentile(wavelength, airMass) *
       wv.percentile).round
 

@@ -6,7 +6,7 @@ package lucuma.core.model
 import cats.Eq
 import cats.syntax.all.*
 import eu.timepit.refined.cats.*
-import eu.timepit.refined.types.numeric.NonNegInt
+import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.math.SignalToNoise
 import lucuma.core.math.Wavelength
 import lucuma.core.util.TimeSpan
@@ -28,11 +28,11 @@ object ExposureTimeMode:
     given Eq[SignalToNoiseMode]                       = Eq.by(a => (a.value, a.at))
 
 
-  final case class TimeAndCountMode(time: TimeSpan, count: NonNegInt, at: Wavelength) extends ExposureTimeMode
+  final case class TimeAndCountMode(time: TimeSpan, count: PosInt, at: Wavelength) extends ExposureTimeMode
 
   object TimeAndCountMode:
     val time:  Lens[TimeAndCountMode, TimeSpan]   = Focus[TimeAndCountMode](_.time)
-    val count: Lens[TimeAndCountMode, NonNegInt]  = Focus[TimeAndCountMode](_.count)
+    val count: Lens[TimeAndCountMode, PosInt]     = Focus[TimeAndCountMode](_.count)
     val at:    Lens[TimeAndCountMode, Wavelength] = Focus[TimeAndCountMode](_.at)
     given Eq[TimeAndCountMode]                    = Eq.by(a => (a.time, a.count, a.at))
 

@@ -35,10 +35,11 @@ trait ArbExecutionEvent {
         oid <- arbitrary[Observation.Id]
         vid <- arbitrary[Visit.Id]
         aid <- arbitrary[Atom.Id]
+        cid <- arbitrary[Option[Client.Id]]
         sid <- arbitrary[Step.Id]
         did <- arbitrary[Dataset.Id]
         stg <- arbitrary[DatasetStage]
-      } yield ExecutionEvent.DatasetEvent(eid, rec, oid, vid, aid, sid, did, stg)
+      } yield ExecutionEvent.DatasetEvent(eid, rec, oid, vid, cid, aid, sid, did, stg)
     }
 
   given Cogen[ExecutionEvent.DatasetEvent] =
@@ -47,6 +48,7 @@ trait ArbExecutionEvent {
       Timestamp,
       Observation.Id,
       Visit.Id,
+      Option[Client.Id],
       Atom.Id,
       Step.Id,
       Dataset.Id,
@@ -56,6 +58,7 @@ trait ArbExecutionEvent {
       a.received,
       a.observationId,
       a.visitId,
+      a.clientId,
       a.atomId,
       a.stepId,
       a.datasetId,
@@ -69,8 +72,9 @@ trait ArbExecutionEvent {
         rec <- arbitrary[Timestamp]
         oid <- arbitrary[Observation.Id]
         vid <- arbitrary[Visit.Id]
+        cid <- arbitrary[Option[Client.Id]]
         cmd <- arbitrary[SequenceCommand]
-      } yield ExecutionEvent.SequenceEvent(eid, rec, oid, vid, cmd)
+      } yield ExecutionEvent.SequenceEvent(eid, rec, oid, vid, cid, cmd)
     }
 
   given Cogen[ExecutionEvent.SequenceEvent] =
@@ -79,12 +83,14 @@ trait ArbExecutionEvent {
       Timestamp,
       Observation.Id,
       Visit.Id,
+      Option[Client.Id],
       SequenceCommand
     )].contramap { a => (
       a.id,
       a.received,
       a.observationId,
       a.visitId,
+      a.clientId,
       a.command
     )}
 
@@ -95,8 +101,9 @@ trait ArbExecutionEvent {
         rec <- arbitrary[Timestamp]
         oid <- arbitrary[Observation.Id]
         vid <- arbitrary[Visit.Id]
+        cid <- arbitrary[Option[Client.Id]]
         stg <- arbitrary[SlewStage]
-      } yield ExecutionEvent.SlewEvent(eid, rec, oid, vid, stg)
+      } yield ExecutionEvent.SlewEvent(eid, rec, oid, vid, cid, stg)
     }
 
   given Cogen[ExecutionEvent.SlewEvent] =
@@ -105,12 +112,14 @@ trait ArbExecutionEvent {
       Timestamp,
       Observation.Id,
       Visit.Id,
+      Option[Client.Id],
       SlewStage
     )].contramap { a => (
       a.id,
       a.received,
       a.observationId,
       a.visitId,
+      a.clientId,
       a.stage
     )}
 
@@ -121,9 +130,10 @@ trait ArbExecutionEvent {
         rec <- arbitrary[Timestamp]
         oid <- arbitrary[Observation.Id]
         vid <- arbitrary[Visit.Id]
+        cid <- arbitrary[Option[Client.Id]]
         aid <- arbitrary[Atom.Id]
         stg <- arbitrary[AtomStage]
-      } yield ExecutionEvent.AtomEvent(eid, rec, oid, vid, aid, stg)
+      } yield ExecutionEvent.AtomEvent(eid, rec, oid, vid, cid, aid, stg)
     }
 
   given Cogen[ExecutionEvent.AtomEvent] =
@@ -132,6 +142,7 @@ trait ArbExecutionEvent {
       Timestamp,
       Observation.Id,
       Visit.Id,
+      Option[Client.Id],
       Atom.Id,
       AtomStage
     )].contramap { a => (
@@ -139,6 +150,7 @@ trait ArbExecutionEvent {
       a.received,
       a.observationId,
       a.visitId,
+      a.clientId,
       a.atomId,
       a.stage
     )}
@@ -151,9 +163,10 @@ trait ArbExecutionEvent {
         oid <- arbitrary[Observation.Id]
         vid <- arbitrary[Visit.Id]
         aid <- arbitrary[Atom.Id]
+        cid <- arbitrary[Option[Client.Id]]
         sid <- arbitrary[Step.Id]
         stg <- arbitrary[StepStage]
-      } yield ExecutionEvent.StepEvent(eid, rec, oid, vid, aid, sid, stg)
+      } yield ExecutionEvent.StepEvent(eid, rec, oid, vid, cid, aid, sid, stg)
     }
 
   given Cogen[ExecutionEvent.StepEvent] =
@@ -162,6 +175,7 @@ trait ArbExecutionEvent {
       Timestamp,
       Observation.Id,
       Visit.Id,
+      Option[Client.Id],
       Atom.Id,
       Step.Id,
       StepStage
@@ -170,6 +184,7 @@ trait ArbExecutionEvent {
       a.received,
       a.observationId,
       a.visitId,
+      a.clientId,
       a.atomId,
       a.stepId,
       a.stage

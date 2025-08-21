@@ -37,7 +37,10 @@ object CloudExtinction extends NewRefined[Extinction, CloudExtinctionPredicate]:
       val r = toExtinction.toVegaMagnitude.value
       BigDecimal(r.n) / BigDecimal(r.d)
 
-    def label: String = f"< ${toVegaMagnitude.toDouble}%.2f mag"
+    def label: String =
+      if (ce === Preset.Zero.toCloudExtinction)
+        f"${toVegaMagnitude.toDouble}%.2f mag"
+      else f"< ${toVegaMagnitude.toDouble}%.2f mag"
 
     def percentile: IntCentiPercent =
       Preset.values.find(preset => ce <= preset.toCloudExtinction).map(_.percentile).getOrElse(IntCentiPercent.Max)
@@ -45,11 +48,11 @@ object CloudExtinction extends NewRefined[Extinction, CloudExtinctionPredicate]:
   given Display[CloudExtinction] = Display.byShortName(_.label)
 
   enum Preset(val tag: String, val toCloudExtinction: CloudExtinction, val percentile: IntCentiPercent) derives Enumerated:
-    case PointOne       extends Preset("point_one", CloudExtinction.unsafeFrom(Extinction.unsafeFrom(100)), IntCentiPercent.unsafeFromPercent(50))
+    case Zero           extends Preset("zero", CloudExtinction.unsafeFrom(Extinction.unsafeFrom(0)), IntCentiPercent.unsafeFromPercent(50))
+    case PointOne       extends Preset("point_one", CloudExtinction.unsafeFrom(Extinction.unsafeFrom(100)), IntCentiPercent.unsafeFromPercent(55))
     case PointThree     extends Preset("point_three", CloudExtinction.unsafeFrom(Extinction.unsafeFrom(300)), IntCentiPercent.unsafeFromPercent(70))
     case PointFive      extends Preset("point_five", CloudExtinction.unsafeFrom(Extinction.unsafeFrom(500)), IntCentiPercent.unsafeFromPercent(75))
     case OnePointZero   extends Preset("one_point_zero", CloudExtinction.unsafeFrom(Extinction.unsafeFrom(1000)), IntCentiPercent.unsafeFromPercent(80))
-    case OnePointFive   extends Preset("one_point_five", CloudExtinction.unsafeFrom(Extinction.unsafeFrom(1500)), IntCentiPercent.unsafeFromPercent(90))
     case TwoPointZero   extends Preset("two_point_zero", CloudExtinction.unsafeFrom(Extinction.unsafeFrom(2000)), IntCentiPercent.unsafeFromPercent(95))
     case ThreePointZero extends Preset("three_point_zero", CloudExtinction.unsafeFrom(Extinction.unsafeFrom(3000)), IntCentiPercent.unsafeFromPercent(100))
 

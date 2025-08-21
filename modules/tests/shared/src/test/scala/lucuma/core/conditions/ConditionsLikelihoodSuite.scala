@@ -18,17 +18,20 @@ import lucuma.core.model.ImageQuality
 class ConditionsLikelihoodSuite extends munit.FunSuite:
 
   test("minimum airmass"):
-    assertEqualsDouble(Site.GN.minimumAirMassFor(Declination.fromDoubleDegrees(20).get).value.value.toDouble, 1.000003, 0.000001)
-    assertEqualsDouble(Site.GN.minimumAirMassFor(Declination.fromDoubleDegrees(80).get).value.value.toDouble, 2.003746, 0.000001)
-    assertEqualsDouble(Site.GS.minimumAirMassFor(Declination.fromDoubleDegrees(-30).get).value.value.toDouble, 1.000006, 0.000001)
-    assertEqualsDouble(Site.GS.minimumAirMassFor(Declination.fromDoubleDegrees(-90).get).value.value.toDouble, 1.978889, 0.000001)
+    assertEqualsDouble(Site.GN.minimumAirMassFor(Declination.fromDoubleDegrees(20).get).get.value.value.toDouble, 1.000003, 0.000001)
+    assertEqualsDouble(Site.GN.minimumAirMassFor(Declination.fromDoubleDegrees(80).get).get.value.value.toDouble, 2.003746, 0.000001)
+    assertEqualsDouble(Site.GS.minimumAirMassFor(Declination.fromDoubleDegrees(-30).get).get.value.value.toDouble, 1.000006, 0.000001)
+    assertEqualsDouble(Site.GS.minimumAirMassFor(Declination.fromDoubleDegrees(-90).get).get.value.value.toDouble, 1.978889, 0.000001)
+    assertEquals(Site.GS.minimumAirMassFor(Declination.fromDoubleDegrees(80).get), None)
+    assertEquals(Site.GN.minimumAirMassFor(Declination.fromDoubleDegrees(-80).get), None)
 
   test("percentile sky background"):
     assertEquals(SkyBackground.Bright.percentile.toPercent.toDouble, 100.0)
     assertEquals(SkyBackground.Dark.percentile.toPercent.toDouble, 50.0)
 
   test("percentile cloud coverage"):
-    assertEquals(CloudExtinction.Preset.PointOne.percentile.toPercent.toDouble, 50.0)
+    assertEquals(CloudExtinction.Preset.Zero.percentile.toPercent.toDouble, 50.0)
+    assertEquals(CloudExtinction.Preset.PointOne.percentile.toPercent.toDouble, 55.0)
     assertEquals(CloudExtinction.Preset.PointThree.percentile.toPercent.toDouble, 70.0)
     assertEquals(CloudExtinction.Preset.ThreePointZero.percentile.toPercent.toDouble, 100.0)
 
@@ -48,7 +51,8 @@ class ConditionsLikelihoodSuite extends munit.FunSuite:
   test("conditions likelihood"):
     assertEquals(conditionsLikelihood(SkyBackground.Bright, CloudExtinction.unsafeFromVegaMagnitude(3.0), WaterVapor.Wet, ImageQuality.unsafeFromArcSeconds(3.0), Wavelength.fromIntNanometers(1000).get, Declination.fromDoubleDegrees(20).get, Site.GN).toPercent.toDouble, 100.00)
     assertEquals(conditionsLikelihood(SkyBackground.Dark, CloudExtinction.unsafeFromVegaMagnitude(3.0), WaterVapor.Wet, ImageQuality.unsafeFromArcSeconds(3.0), Wavelength.fromIntNanometers(1000).get, Declination.fromDoubleDegrees(20).get, Site.GN).toPercent.toDouble, 50.00)
-    assertEquals(conditionsLikelihood(SkyBackground.Dark, CloudExtinction.unsafeFromVegaMagnitude(0.1), WaterVapor.Wet, ImageQuality.unsafeFromArcSeconds(3.0), Wavelength.fromIntNanometers(1000).get, Declination.fromDoubleDegrees(20).get, Site.GN).toPercent.toDouble, 25.00)
-    assertEquals(conditionsLikelihood(SkyBackground.Dark, CloudExtinction.unsafeFromVegaMagnitude(0.1), WaterVapor.Dry, ImageQuality.unsafeFromArcSeconds(3.0), Wavelength.fromIntNanometers(1000).get, Declination.fromDoubleDegrees(20).get, Site.GN).toPercent.toDouble, 12.00)
-    assertEquals(conditionsLikelihood(SkyBackground.Dark, CloudExtinction.unsafeFromVegaMagnitude(0.1), WaterVapor.Wet, ImageQuality.unsafeFromArcSeconds(0.5), Wavelength.fromIntNanometers(500).get, Declination.fromDoubleDegrees(20).get, Site.GN).toPercent.toDouble, 4.00)
+    assertEquals(conditionsLikelihood(SkyBackground.Dark, CloudExtinction.unsafeFromVegaMagnitude(0.1), WaterVapor.Wet, ImageQuality.unsafeFromArcSeconds(3.0), Wavelength.fromIntNanometers(1000).get, Declination.fromDoubleDegrees(20).get, Site.GN).toPercent.toDouble, 27.00)
+    assertEquals(conditionsLikelihood(SkyBackground.Dark, CloudExtinction.unsafeFromVegaMagnitude(0.1), WaterVapor.Dry, ImageQuality.unsafeFromArcSeconds(3.0), Wavelength.fromIntNanometers(1000).get, Declination.fromDoubleDegrees(20).get, Site.GN).toPercent.toDouble, 14.00)
+    assertEquals(conditionsLikelihood(SkyBackground.Dark, CloudExtinction.unsafeFromVegaMagnitude(0.1), WaterVapor.Wet, ImageQuality.unsafeFromArcSeconds(0.5), Wavelength.fromIntNanometers(500).get, Declination.fromDoubleDegrees(20).get, Site.GN).toPercent.toDouble, 5.00)
     assertEquals(conditionsLikelihood(SkyBackground.Dark, CloudExtinction.unsafeFromVegaMagnitude(0.1), WaterVapor.Wet, ImageQuality.unsafeFromArcSeconds(0.5), Wavelength.fromIntNanometers(500).get, Declination.fromDoubleDegrees(68).get, Site.GN).toPercent.toDouble, 1.00)
+    assertEquals(conditionsLikelihood(SkyBackground.Bright, CloudExtinction.unsafeFromVegaMagnitude(3.0), WaterVapor.Wet, ImageQuality.unsafeFromArcSeconds(3.0), Wavelength.fromIntNanometers(1000).get, Declination.fromDoubleDegrees(-80).get, Site.GN).toPercent.toDouble, 0.00)

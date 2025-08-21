@@ -1,6 +1,6 @@
 import org.scalajs.linker.interface.ESVersion
 
-ThisBuild / tlBaseVersion                         := "0.138"
+ThisBuild / tlBaseVersion                         := "0.142"
 ThisBuild / tlCiReleaseBranches                   := Seq("master")
 ThisBuild / githubWorkflowEnv += "MUNIT_FLAKY_OK" -> "true"
 
@@ -8,12 +8,12 @@ ThisBuild / tlCiReleaseBranches += "topic/scala3"
 
 Global / concurrentRestrictions += Tags.limit(Tags.Compile, 1)
 
-ThisBuild / crossScalaVersions := Seq("3.7.1")
+ThisBuild / crossScalaVersions := Seq("3.7.2")
 ThisBuild / scalacOptions += "-language:implicitConversions" // TODO
 
 lazy val catsVersion                = "2.13.0"
 lazy val catsCollctionsVersion      = "0.9.10"
-lazy val catsEffectVersion          = "3.6.2"
+lazy val catsEffectVersion          = "3.6.3"
 lazy val catsParseVersion           = "1.1.0"
 lazy val catsScalacheckVersion      = "0.3.2"
 lazy val catsTimeVersion            = "0.6.0"
@@ -34,7 +34,7 @@ lazy val monocleVersion             = "3.3.0"
 lazy val munitVersion               = "1.1.1"
 lazy val munitDisciplineVersion     = "2.0.0"
 lazy val munitCatsEffectVersion     = "2.1.0"
-lazy val pprintVersion              = "0.9.0"
+lazy val pprintVersion              = "0.9.3"
 lazy val refinedVersion             = "0.11.3"
 lazy val refinedAlgebraVersion      = "0.1.1"
 lazy val scalaJavaTimeVersion       = "2.6.0"
@@ -243,7 +243,7 @@ lazy val npmPublish = taskKey[Unit]("Run npm publish")
 lazy val npm        = project
   .in(file("modules/npm"))
   .dependsOn(core.js)
-  .enablePlugins(ScalaJSPlugin, NoPublishPlugin)
+  .enablePlugins(ScalaJSPlugin, NoPublishPlugin, BundleMonPlugin)
   .settings(
     scalaJSLinkerConfig ~= (_.withModuleKind(ModuleKind.ESModule)
       .withESFeatures(_.withESVersion(ESVersion.ES2021).withAvoidLetsAndConsts(false))),

@@ -12,6 +12,7 @@ import lucuma.core.enums.Band
 import lucuma.core.math.BrightnessValue
 import lucuma.core.math.Epoch
 import lucuma.core.math.Parallax
+import lucuma.core.math.ProperMotion
 import lucuma.core.math.RadialVelocity
 import lucuma.core.model.SiderealTracking
 import lucuma.core.model.SourceProfile
@@ -228,7 +229,7 @@ class TargetImportFileSuite extends CatsEffectSuite:
         .map { l =>
           assertEquals(l.length, 19)
           assertEquals(l.count(_.isRight), 19)
-          assertEquals(l.count(_.exists(_.tracking.properMotion.isDefined)), 5)
+          assertEquals(l.count(_.exists(_.tracking.properMotion.exists(_ != ProperMotion.Zero))), 4)
         }
     }
   }
@@ -247,7 +248,7 @@ class TargetImportFileSuite extends CatsEffectSuite:
         .map { l =>
           assertEquals(l.length, 20)
           assertEquals(l.count(_.isRight), 19)
-          assertEquals(l.count(_.exists(_.tracking.properMotion.isDefined)), 5)
+          assertEquals(l.count(_.exists(_.tracking.properMotion.exists(_ != ProperMotion.Zero))), 4)
           assertEquals(l.count(_.exists(_.tracking.epoch =!= Epoch.J2000)), 7)
           assertEquals(l.count(_.isLeft), 1)
           assertEquals(
@@ -360,11 +361,37 @@ class TargetImportFileSuite extends CatsEffectSuite:
           assertEquals(l.length, 2)
           assertEquals(
             l.count {
-              case Right(Target.Sidereal(_, s: SiderealTracking, _, _)) => s.properMotion.isEmpty
+              case Right(Target.Sidereal(_, s: SiderealTracking, _, _)) =>
+                s.properMotion.exists(_ === ProperMotion.Zero)
               case _                                                    => false
             },
             1
           )
         }
     }
+  }
+
+  test("motion parameters default to zero when not provided") {
+    val csvContent = """Name,RAJ2000,DecJ2000
+                       |Test Target 1,12:34:56.78,-12:34:56.7
+                       |Test Target 2,01:23:45.67,+89:12:34.5""".stripMargin
+
+    Stream
+      .emit(csvContent)
+      .through(TargetImport.csv2targets[IO])
+      .compile
+      .toList
+      .map { l =>
+        assertEquals(l.length, 2)
+        assertEquals(l.count(_.isRight), 2)
+
+        l.foreach {
+          case Right(Target.Sidereal(_, s: SiderealTracking, _, _)) =>
+            // All motion parameters should default to zero
+            assertEquals(s.properMotion, Some(ProperMotion.Zero))
+            assertEquals(s.radialVelocity, Some(RadialVelocity.Zero))
+            assertEquals(s.parallax, Some(Parallax.Zero))
+          case _                                                    => fail("Expected successful target import")
+        }
+      }
   }

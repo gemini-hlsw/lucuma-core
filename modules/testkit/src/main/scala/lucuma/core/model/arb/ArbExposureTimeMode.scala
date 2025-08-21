@@ -5,7 +5,7 @@ package lucuma.core.model
 package arb
 
 import eu.timepit.refined.scalacheck.all.*
-import eu.timepit.refined.types.all.NonNegInt
+import eu.timepit.refined.types.all.PosInt
 import lucuma.core.math.SignalToNoise
 import lucuma.core.math.Wavelength
 import lucuma.core.math.arb.ArbRefined
@@ -41,12 +41,12 @@ trait ArbExposureTimeMode:
     Arbitrary:
       for
         t <- arbitrary[TimeSpan]
-        c <- arbitrary[NonNegInt]
+        c <- arbitrary[PosInt]
         w <- arbitrary[Wavelength]
       yield TimeAndCountMode(t, c, w)
 
   given Cogen[TimeAndCountMode] =
-    Cogen[(TimeSpan, NonNegInt, Wavelength)].contramap: a =>
+    Cogen[(TimeSpan, PosInt, Wavelength)].contramap: a =>
       (
         a.time,
         a.count,

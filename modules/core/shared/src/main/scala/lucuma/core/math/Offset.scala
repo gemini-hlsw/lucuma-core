@@ -64,6 +64,10 @@ final case class Offset(p: Offset.Component[Axis.P], q: Offset.Component[Axis.Q]
   def toSignedDoubleRadians: (Double, Double) =
     (p.toSignedDoubleRadians, q.toSignedDoubleRadians)
 
+  /** This offset pair in decimal arcseconds. */
+  def toSignedDecimalArcseconds: (BigDecimal, BigDecimal) =
+    (p.toSignedDecimalArcseconds, q.toSignedDecimalArcseconds)
+
   /** String representation of this Offset, for debugging purposes only. */
   override def toString: String =
     s"Offset(Offset.P(${p.toAngle}), Offset.Q(${q.toAngle}))"
@@ -117,6 +121,10 @@ object Offset extends OffsetOptics {
       /** This component in signed radians. */
       inline def toSignedDoubleRadians: Double =
         toAngle.toSignedDoubleRadians
+
+      /** This component in signed arceseconds. */
+      inline def toSignedDecimalArcseconds: BigDecimal =
+        Angle.signedDecimalArcseconds.get(toAngle)
 
     /** The zero [A] component. */
     inline def Zero[A]: Component[A] =
