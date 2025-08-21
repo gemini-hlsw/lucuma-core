@@ -42,5 +42,14 @@ object syntax {
         f.setEnvelope(envelope(that))
         f
       }
+
+    extension (self: Coordinate)
+
+      def offset: Offset =
+        Offset(
+          Angle.fromMicroarcseconds(-self.x.toLong).p, // unflipped, see above
+          Angle.fromMicroarcseconds(self.y.toLong).q
+        )
+
   }
 }

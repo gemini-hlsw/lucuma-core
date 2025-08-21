@@ -17,6 +17,10 @@ import lucuma.core.util.arb.ArbEnumerated.given
 import org.scalacheck.*
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Cogen.*
+import org.scalacheck.rng.Seed
+import lucuma.core.enums.GmosNorthFilter
+import lucuma.core.enums.GmosSouthFilter
+import lucuma.core.enums.Flamingos2Disperser
 
 trait ArbConfiguration:
   import Configuration.Conditions
@@ -31,34 +35,60 @@ trait ArbConfiguration:
         wv <- arbitrary[WaterVapor]
       yield Conditions(ce, iq, sb, wv)
     
-
   given Cogen[Conditions] =
     Cogen[(CloudExtinction.Preset, ImageQuality.Preset, SkyBackground, WaterVapor)]
       .contramap(c => (c.cloudExtinction,c.imageQuality,  c.skyBackground, c.waterVapor))
 
   given Arbitrary[ObservingMode.GmosNorthLongSlit] =
     Arbitrary:
-      arbitrary[GmosNorthGrating].map(ObservingMode.GmosNorthLongSlit(_))
+      arbitrary[GmosNorthGrating].map(ObservingMode.GmosNorthLongSlit.apply)
 
   given Cogen[ObservingMode.GmosNorthLongSlit] =
     Cogen[GmosNorthGrating].contramap(_.grating)
 
   given Arbitrary[ObservingMode.GmosSouthLongSlit] =
     Arbitrary:
-      arbitrary[GmosSouthGrating].map(ObservingMode.GmosSouthLongSlit(_))
+      arbitrary[GmosSouthGrating].map(ObservingMode.GmosSouthLongSlit.apply)
 
   given Cogen[ObservingMode.GmosSouthLongSlit] =
     Cogen[GmosSouthGrating].contramap(_.grating)
+
+  given Arbitrary[ObservingMode.GmosNorthImaging] =
+    Arbitrary:
+      arbitrary[List[GmosNorthFilter]].map(ObservingMode.GmosNorthImaging.apply)
+
+  given Cogen[ObservingMode.GmosNorthImaging] =
+    Cogen[List[GmosNorthFilter]].contramap(_.filters)
+
+  given Arbitrary[ObservingMode.GmosSouthImaging] =
+    Arbitrary:
+      arbitrary[List[GmosSouthFilter]].map(ObservingMode.GmosSouthImaging.apply)
+
+  given Cogen[ObservingMode.GmosSouthImaging] =
+    Cogen[List[GmosSouthFilter]].contramap(_.filters)
+
+  given Arbitrary[ObservingMode.Flamingos2LongSlit] =
+    Arbitrary:
+      arbitrary[Flamingos2Disperser].map(ObservingMode.Flamingos2LongSlit.apply)
+
+  given Cogen[ObservingMode.Flamingos2LongSlit] =
+    Cogen[Flamingos2Disperser].contramap(_.disperser)
 
   given Arbitrary[ObservingMode] =
     Arbitrary:
       Gen.oneOf(arbitrary[ObservingMode.GmosNorthLongSlit], arbitrary[Configuration.ObservingMode.GmosSouthLongSlit])
 
+  def perturb[A](s: Seed, a: A)(using c: Cogen[A]): Seed =
+    c.perturb(s, a)
+
   given Cogen[ObservingMode] =
-    Cogen[Either[ObservingMode.GmosNorthLongSlit, ObservingMode.GmosSouthLongSlit]].contramap { 
-      case n @ ObservingMode.GmosNorthLongSlit(_) => Left(n)
-      case s @ ObservingMode.GmosSouthLongSlit(_) => Right(s)
-    }
+    Cogen: (s, m) =>
+      m match
+        case m: ObservingMode.GmosNorthLongSlit  => perturb(s, m)
+        case m: ObservingMode.GmosSouthLongSlit  => perturb(s, m)
+        case m: ObservingMode.GmosNorthImaging   => perturb(s, m)
+        case m: ObservingMode.GmosSouthImaging   => perturb(s, m)
+        case m: ObservingMode.Flamingos2LongSlit => perturb(s, m)
 
   given Arbitrary[Configuration] =
     Arbitrary:
