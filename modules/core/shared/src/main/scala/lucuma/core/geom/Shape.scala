@@ -3,8 +3,8 @@
 
 package lucuma.core.geom
 
-import lucuma.core.math.Offset
 import lucuma.core.math.Angle
+import lucuma.core.math.Offset
 
 /**
  * Shape description usable for testing point inclusion and calculating the area. Point inclusion is

@@ -4,7 +4,10 @@
 package lucuma.core.model
 package arb
 
+import lucuma.core.enums.Flamingos2Disperser
+import lucuma.core.enums.GmosNorthFilter
 import lucuma.core.enums.GmosNorthGrating
+import lucuma.core.enums.GmosSouthFilter
 import lucuma.core.enums.GmosSouthGrating
 import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.WaterVapor
@@ -18,9 +21,6 @@ import org.scalacheck.*
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Cogen.*
 import org.scalacheck.rng.Seed
-import lucuma.core.enums.GmosNorthFilter
-import lucuma.core.enums.GmosSouthFilter
-import lucuma.core.enums.Flamingos2Disperser
 
 trait ArbConfiguration:
   import Configuration.Conditions

@@ -5,9 +5,9 @@ package lucuma.core.geom
 package jts
 
 import lucuma.core.geom.jts.syntax.all.*
+import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 import org.locationtech.jts.geom.Geometry
-import lucuma.core.math.Angle
 
 /**
  * JTS implementation of Shape.
