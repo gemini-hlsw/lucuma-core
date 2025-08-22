@@ -3,6 +3,7 @@
 
 package lucuma.core.geom
 
+import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 
 /**
@@ -28,5 +29,8 @@ trait Shape {
    * is less useful than comparing across multiple shapes (to determine minimum vignetting).
    */
   def area: Area
+
+  /** Angular distance from the shape's origin to its most distant vertex. */
+  def radius: Angle
 
 }
