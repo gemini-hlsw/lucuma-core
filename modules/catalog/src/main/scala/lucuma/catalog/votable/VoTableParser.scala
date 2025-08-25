@@ -16,6 +16,7 @@ import fs2.data.xml.XmlEvent.*
 import lucuma.catalog.*
 import lucuma.catalog.votable.*
 import lucuma.catalog.votable.CatalogProblem.*
+import lucuma.core.enums.CatalogName
 import lucuma.core.math.*
 import lucuma.core.math.units.*
 import lucuma.core.model.CatalogInfo
@@ -310,14 +311,22 @@ trait VoTableParser {
        parseAngularSize
       )
         .parMapN { (name, pm, brightnesses, info, angSize) =>
+          // Infer SED for Simbad catalogs using object type and spectral classification
+          val inferredSED = if (adapter.catalog == CatalogName.Simbad) {
+            val otype = entries.get(adapter.oTypeField).getOrElse("")
+            val spectralType = entries.get(adapter.spTypeField)
+            val morphType = entries.get(adapter.morphTypeField)
+            SimbadSEDMatcher.inferSED(otype, spectralType, morphType)
+          } else {
+            None
+          }
+
           CatalogTargetResult(
             Target.Sidereal(
               name,
               pm,
-              // We set arbitrary values for `sourceProfile`, `spectralDefinition`, `sed` and  `librarySpectrum`: the first in each ADT.
-              // In the future we will attempt to infer some or all of these from the catalog info.
               SourceProfile.Point(
-                SpectralDefinition.BandNormalized(None, SortedMap.from(brightnesses))
+                SpectralDefinition.BandNormalized(inferredSED, SortedMap.from(brightnesses))
               ),
               info
             ),
@@ -353,13 +362,21 @@ trait VoTableParser {
     def parseSiderealTarget: EitherNec[CatalogProblem, Target.Sidereal] =
       (parseName(adapter, entries), parseSiderealTracking(adapter, entries), parseBandBrightnesses)
         .parMapN { (name, tracking, brightnesses) =>
+          // Infer SED for Simbad catalogs using object type and spectral classification
+          val inferredSED = if (adapter.catalog == CatalogName.Simbad) {
+            val otype = entries.get(adapter.oTypeField).getOrElse("")
+            val spectralType = entries.get(adapter.spTypeField)
+            val morphType = entries.get(adapter.morphTypeField)
+            SimbadSEDMatcher.inferSED(otype, spectralType, morphType)
+          } else {
+            None
+          }
+
           Target.Sidereal(
             name,
             tracking,
-            // We set arbitrary values for `sourceProfile`, `spectralDefinition`, `sed` and  `librarySpectrum`: the first in each ADT.
-            // In the future we will attempt to infer some or all of these from the catalog info.
             SourceProfile.Point(
-              SpectralDefinition.BandNormalized(None, SortedMap.from(brightnesses))
+              SpectralDefinition.BandNormalized(inferredSED, SortedMap.from(brightnesses))
             ),
             none
           )
