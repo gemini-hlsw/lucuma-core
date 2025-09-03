@@ -10,6 +10,7 @@ import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.JsonNumber
 import lucuma.core.optics.Format
+import lucuma.core.util.NewType
 import lucuma.core.validation.ValidSplitEpiNec
 import monocle.Prism
 
@@ -157,3 +158,10 @@ object SignalToNoise {
     }
 
 }
+
+object TotalSN extends NewType[SignalToNoise]
+type TotalSN = TotalSN.Type
+
+object SingleSN extends NewType[SignalToNoise]
+type SingleSN = SingleSN.Type
+
