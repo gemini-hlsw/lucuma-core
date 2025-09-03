@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VOTABLE version="1.4" xmlns="http://www.ivoa.net/xml/VOTable/v1.3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ivoa.net/xml/VOTable/v1.3 http://www.ivoa.net/xml/VOTable/v1.3">
+<RESOURCE type="results">
+<INFO name="QUERY_STATUS" value="OK" />
+
+<INFO name="QUERY" value="SELECT TOP 100 source_id, ra, dec, phot_g_mean_mag, DISTANCE(POINT('ICRS', 83.8221, 22.0145), POINT('ICRS', ra, dec)) * 3600.0 AS angular_distance_arcsec FROM gaiadr3.gaia_source_lite WHERE 1 = CONTAINS(POINT('ICRS', ra, dec), CIRCLE('ICRS', 83.8221, 22.0145, 0.05)) AND phot_g_mean_mag > 12.0 AND phot_g_mean_mag IS NOT NULL ORDER BY angular_distance_arcsec ASC"><![CDATA[SELECT TOP 100 source_id, ra, dec, phot_g_mean_mag, DISTANCE(POINT('ICRS', 83.8221, 22.0145), POINT('ICRS', ra, dec)) * 3600.0 AS angular_distance_arcsec FROM gaiadr3.gaia_source_lite WHERE 1 = CONTAINS(POINT('ICRS', ra, dec), CIRCLE('ICRS', 83.8221, 22.0145, 0.05)) AND phot_g_mean_mag > 12.0 AND phot_g_mean_mag IS NOT NULL ORDER BY angular_distance_arcsec ASC]]></INFO>
+<INFO name="CAPTION" value="How to cite and acknowledge Gaia: https://gea.esac.esa.int/archive/documentation/credits.html"><![CDATA[How to cite and acknowledge Gaia: https://gea.esac.esa.int/archive/documentation/credits.html]]></INFO>
+<INFO name="JOBID" value="1652450190043O"><![CDATA[1652450190043O]]></INFO>
+<COOSYS ID="GAIADR3" epoch="J2016.0" system="ICRS" />
+
+<TABLE>
+<FIELD ID="source_id" datatype="long" name="source_id" ucd="meta.id;meta.main">
+<DESCRIPTION>Unique source identifier</DESCRIPTION>
+</FIELD>
+<FIELD datatype="double" name="ra" ref="GAIADR3" ucd="pos.eq.ra;meta.main" unit="deg" utype="Char.SpatialAxis.Coverage.Location.Coord.Position2D.Value2.C1">
+<DESCRIPTION>Right ascension</DESCRIPTION>
+</FIELD>
+<FIELD datatype="double" name="dec" ref="GAIADR3" ucd="pos.eq.dec;meta.main" unit="deg" utype="Char.SpatialAxis.Coverage.Location.Coord.Position2D.Value2.C2">
+<DESCRIPTION>Declination</DESCRIPTION>
+</FIELD>
+<FIELD datatype="float" name="phot_g_mean_mag" ucd="phot.mag;stat.mean;em.opt" unit="mag">
+<DESCRIPTION>G-band mean magnitude</DESCRIPTION>
+</FIELD>
+<FIELD datatype="double" name="angular_distance_arcsec" unit="arcsec">
+<DESCRIPTION>Angular distance from base coordinate in arcseconds</DESCRIPTION>
+</FIELD>
+<DATA>
+<TABLEDATA>
+  <!-- Test data: Stars near Pleiades with G > 12 -->
+  <!-- Base coordinates: RA=83.8221°, Dec=22.0145° -->
+
+  <!-- Star 1: Closest, moderate magnitude (G=13.2) - should have good score -->
+  <TR>
+    <TD>123456789012345001</TD>
+    <TD>83.8225</TD>
+    <TD>22.0148</TD>
+    <TD>13.2</TD>
+    <TD>15.3</TD>
+  </TR>
+
+  <!-- Star 2: Further away, brighter (G=12.8) - should have good score -->
+  <TR>
+    <TD>123456789012345002</TD>
+    <TD>83.8195</TD>
+    <TD>22.0125</TD>
+    <TD>12.8</TD>
+    <TD>42.6</TD>
+  </TR>
+
+  <!-- Star 3: Close, fainter (G=14.5) - moderate score -->
+  <TR>
+    <TD>123456789012345003</TD>
+    <TD>83.8235</TD>
+    <TD>22.0155</TD>
+    <TD>14.5</TD>
+    <TD>28.7</TD>
+  </TR>
+
+  <!-- Star 4: Far, faint (G=15.1) - worst score -->
+  <TR>
+    <TD>123456789012345004</TD>
+    <TD>83.8350</TD>
+    <TD>22.0280</TD>
+    <TD>15.1</TD>
+    <TD>156.8</TD>
+  </TR>
+
+  <!-- Star 5: Medium distance, medium magnitude (G=13.8) -->
+  <TR>
+    <TD>123456789012345005</TD>
+    <TD>83.8180</TD>
+    <TD>22.0200</TD>
+    <TD>13.8</TD>
+    <TD>78.2</TD>
+  </TR>
+
+</TABLEDATA>
+</DATA>
+</TABLE>
+</RESOURCE>
+</VOTABLE>

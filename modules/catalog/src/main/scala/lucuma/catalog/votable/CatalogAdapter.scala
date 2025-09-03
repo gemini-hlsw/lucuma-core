@@ -158,12 +158,18 @@ sealed trait CatalogAdapter {
     u: Vector[(Band, Units Of Brightness[Integrated])]
   ): Vector[(Band, BrightnessMeasure[Integrated])] = {
     val values: Vector[(FieldId, (Band, BrightnessValue))] = v
+      .filter { case (_, _, d) =>
+        !d.isNaN && !d.isInfinite && d > -50.0 && d < 50.0 // Reasonable magnitude range
+      }
       .map { case (f, b, d) =>
         f -> (b -> BrightnessValue.from(d).toOption)
       }
       .collect { case (f, (b, Some(v))) => (f, (b, v)) }
 
     val errors = e
+      .filter { case (_, _, d) =>
+        !d.isNaN && !d.isInfinite && d > -50.0 && d < 50.0 // Reasonable magnitude range
+      }
       .map { case (_, b, d) => b -> BrightnessValue.from(d).toOption }
       .collect { case (b, Some(v)) => (b, v) }
       .toMap

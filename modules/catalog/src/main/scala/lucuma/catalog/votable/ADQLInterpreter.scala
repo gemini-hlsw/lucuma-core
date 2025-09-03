@@ -115,4 +115,22 @@ object ADQLInterpreter {
         s"${epoch.epochYear} as ref_epoch"
       )
     }
+
+  // Find blind offset star candidates within 180 arcseconds with G > 12
+  def blindOffsetCandidates(using si: ShapeInterpreter): ADQLInterpreter =
+    new ADQLInterpreter {
+      val MaxCount         = 100
+      val shapeInterpreter = si
+
+      val allFields: CatalogAdapter.Gaia => List[FieldId] = _.allFields
+
+      override def extraFields(c: Coordinates) =
+        List(
+          f"DISTANCE(POINT('ICRS', ${c.ra.toAngle.toDoubleDegrees}%9.8f, ${c.dec.toAngle.toSignedDoubleDegrees}%9.8f), POINT('ICRS', ra, dec)) * 3600.0 AS angular_distance_arcsec"
+        )
+
+      override def orderBy = Some("angular_distance_arcsec ASC")
+
+      override val extraConstraints: List[String] = List("phot_g_mean_mag > 12.0", "phot_g_mean_mag IS NOT NULL")
+    }
 }

@@ -8,9 +8,18 @@ import cats.data.NonEmptyChain
 import cats.effect.Concurrent
 import cats.syntax.all.*
 import fs2.RaiseThrowable
+import lucuma.catalog.BlindOffsetCandidate
+import lucuma.catalog.BlindOffsetScoringAlgorithm
 import lucuma.catalog.votable.*
+import lucuma.core.geom.ShapeExpression
+import lucuma.core.geom.ShapeInterpreter
+import lucuma.core.geom.jts.interpreter.given
+import lucuma.core.geom.syntax.all.*
+import lucuma.core.math.Angle
+import lucuma.core.math.Coordinates
 import lucuma.core.model.Target
-import lucuma.core.syntax.effect.*
+import lucuma.core.syntax.effect.raceAllToSuccess
+import lucuma.core.syntax.all.ToIntOps
 import org.http4s.Method
 import org.http4s.Request
 import org.http4s.Uri
@@ -39,6 +48,27 @@ class GaiaClientImpl[F[_]](
     multiAdapterQuery(queryUriById(_, sourceId)).map:
       _.headOption.toRight(NonEmptyChain(CatalogProblem.SourceIdNotFound(sourceId))).flatten
 
+  /**
+   * Get all blind offset star candidates within 180 arcseconds of the base coordinate with G
+   * magnitude > 12, sorted by score (best first)
+   */
+  def blindOffsetCandidates(baseCoords: Coordinates): F[List[BlindOffsetCandidate]] =
+    val searchRadius = 180.arcseconds
+    val adqlQuery    = QueryByADQL(
+      base = baseCoords,
+      shapeConstraint = ShapeExpression.centeredEllipse(searchRadius * 2, searchRadius * 2),
+      brightnessConstraints = None
+    )
+
+    println(adqlQuery)
+
+    val interpreter = ADQLInterpreter.blindOffsetCandidates(using summon[ShapeInterpreter])
+
+    query(adqlQuery)(using interpreter)
+      .map(_.collect { case Right(target) => target })
+      .map(BlindOffsetScoringAlgorithm.sortCandidatesFromTargets(_, baseCoords))
+
+
   private def multiAdapterQuery(
     queryUri: CatalogAdapter.Gaia => Uri
   ): F[List[EitherNec[CatalogProblem, Target.Sidereal]]] =
@@ -48,6 +78,7 @@ class GaiaClientImpl[F[_]](
     adapter:  CatalogAdapter.Gaia,
     queryUri: Uri
   ): F[List[EitherNec[CatalogProblem, Target.Sidereal]]] =
+    println(queryUri)
     val request: Request[F] = Request[F](Method.GET, modUri(queryUri))
     httpClient
       .stream(request)
