@@ -10,6 +10,7 @@ import cats.syntax.all.*
 import lucuma.catalog.clients.GaiaClient
 import lucuma.catalog.votable.CatalogAdapter.*
 import lucuma.core.geom.jts.interpreter.given
+import lucuma.core.math.Angle
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Declination
 import lucuma.core.math.Epoch
@@ -58,8 +59,8 @@ trait BlindOffsetSample:
         case Some(mag) => f"${mag}%5.2f"
         case None      => " N/A"
       }
-      val distance = f"${candidate.distance.toMicroarcseconds / 1000000.0}%8.1f"
-      val score    = f"${candidate.score}%6.3f"
+      val distance = f"${Angle.decimalArcseconds.get(candidate.distance)}%3.1f"
+      val score    = f"${candidate.score}%3.3f"
       println(f"$rank%4d, $sourceId%18s, $gMag%5s, ${distance} arcsec, $score%6s")
     }
 
