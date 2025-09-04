@@ -16,6 +16,7 @@ import lucuma.core.math.RightAscension
 import lucuma.core.model.ObjectTracking
 import lucuma.core.model.SiderealTracking
 import org.http4s.jdkhttpclient.JdkHttpClient
+import lucuma.core.geom.jts.interpreter.given
 
 import java.time.Instant
 import java.time.LocalDate
@@ -47,10 +48,8 @@ trait BlindOffsetSample:
   }
 
   def printCandidates(candidates: List[BlindOffsetCandidate]): IO[Unit] = IO {
-    println(s"Found ${candidates.length} blind offset star candidates:")
-    println("=" * 80)
-    println(f"${"Rank"}%4s | ${"Source ID"}%18s | ${"G Mag"}%5s | ${"Distance"}%8s | ${"Score"}%6s")
-    println("-" * 80)
+    println(s"Found ${candidates.length} blind offset star candidates, sorted by score:")
+    println("rank, sourceId, gmag, distance, score")
 
     candidates.zipWithIndex.foreach { case (candidate, index) =>
       val rank     = index + 1
@@ -61,7 +60,7 @@ trait BlindOffsetSample:
       }
       val distance = f"${candidate.distance.toMicroarcseconds / 1000000.0}%8.1f"
       val score    = f"${candidate.score}%6.3f"
-      println(f"$rank%4d | $sourceId%18s | $gMag%5s | ${distance}arcsec | $score%6s")
+      println(f"$rank%4d, $sourceId%18s, $gMag%5s, ${distance} arcsec, $score%6s")
     }
 
   }

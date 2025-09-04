@@ -124,14 +124,15 @@ object ADQLInterpreter {
 
       val allFields: CatalogAdapter.Gaia => List[FieldId] = _.allFields
 
-      override def extraFields(c: Coordinates) =
-        List(
-          f"DISTANCE(POINT('ICRS', ${c.ra.toAngle.toDoubleDegrees}%9.8f, ${c.dec.toAngle.toSignedDoubleDegrees}%9.8f), POINT('ICRS', ra, dec)) * 3600.0 AS angular_distance_arcsec"
-        )
+      override def extraFields(c: Coordinates) = Nil
 
-      override def orderBy = Some("angular_distance_arcsec ASC")
+      override def orderBy = None
 
       override val extraConstraints: List[String] =
-        List("phot_g_mean_mag > 12.0", "phot_g_mean_mag IS NOT NULL")
+        List("phot_g_mean_mag > 12.0",
+             "phot_g_mean_mag IS NOT NULL",
+             "ruwe < 1.4",
+             "astrometric_excess_noise < 1"
+        )
     }
 }

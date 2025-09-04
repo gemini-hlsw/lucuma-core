@@ -26,8 +26,9 @@ class BlindOffsetFileTestSuite extends CatsEffectSuite:
 
   private val observationTime: Instant =
     LocalDate.of(2025, 9, 4).atStartOfDay(ZoneOffset.UTC).toInstant()
-  private val xmlFile                  = "/gaia-blind-offset-test.xml"
-  private val file                     = getClass.getResource(xmlFile)
+
+  private val xmlFile = "/gaia-blind-offset-test.xml"
+  private val file    = getClass.getResource(xmlFile)
 
   test("Parse gaia blind offset test VOTable file"):
     val xmlFile = "/gaia-blind-offset-test.xml"
