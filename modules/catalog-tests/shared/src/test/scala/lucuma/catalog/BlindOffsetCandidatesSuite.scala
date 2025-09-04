@@ -11,7 +11,7 @@ import lucuma.core.math.Coordinates
 import lucuma.core.math.Declination
 import lucuma.core.math.Epoch
 import lucuma.core.math.RightAscension
-import lucuma.core.model.CoordinatesAtVizTime
+import lucuma.core.model.CoordinatesAt
 import lucuma.core.model.ObjectTracking
 import lucuma.core.model.SiderealTracking
 import lucuma.core.model.SourceProfile
@@ -81,16 +81,16 @@ class BlindOffsetCandidatesSuite extends CatsEffectSuite:
     val candidate1 = BlindOffsetCandidate(
       target = target1,
       distance = baseCoords.angularDistance(coords1),
-      baseCoordinates = CoordinatesAtVizTime(baseCoords),
-      candidateCoords = CoordinatesAtVizTime(coords1),
+      baseCoordinates = CoordinatesAt(baseCoords),
+      candidateCoords = CoordinatesAt(coords1),
       observationTime = observationTime
     )
 
     val candidate2 = BlindOffsetCandidate(
       target = target2,
       distance = baseCoords.angularDistance(coords2),
-      baseCoordinates = CoordinatesAtVizTime(baseCoords),
-      candidateCoords = CoordinatesAtVizTime(coords2),
+      baseCoordinates = CoordinatesAt(baseCoords),
+      candidateCoords = CoordinatesAt(coords2),
       observationTime = observationTime
     )
 
@@ -150,20 +150,20 @@ class BlindOffsetCandidatesSuite extends CatsEffectSuite:
     val candidates = List(
       BlindOffsetCandidate(targetWithMagnitude2,
                            baseCoords.angularDistance(coords2),
-                           CoordinatesAtVizTime(baseCoords),
-                           CoordinatesAtVizTime(coords2),
+                           CoordinatesAt(baseCoords),
+                           CoordinatesAt(coords2),
                            observationTime
       ), // Worst
       BlindOffsetCandidate(targetWithMagnitude1,
                            baseCoords.angularDistance(coords1),
-                           CoordinatesAtVizTime(baseCoords),
-                           CoordinatesAtVizTime(coords1),
+                           CoordinatesAt(baseCoords),
+                           CoordinatesAt(coords1),
                            observationTime
       ), // Best
       BlindOffsetCandidate(targetWithMagnitude3,
                            baseCoords.angularDistance(coords3),
-                           CoordinatesAtVizTime(baseCoords),
-                           CoordinatesAtVizTime(coords3),
+                           CoordinatesAt(baseCoords),
+                           CoordinatesAt(coords3),
                            observationTime
       )  // Medium
     )
@@ -204,8 +204,8 @@ class BlindOffsetCandidatesSuite extends CatsEffectSuite:
     val candidate = BlindOffsetCandidate(
       target = targetWithCoords,
       distance = baseCoords.angularDistance(targetCoords),
-      baseCoordinates = CoordinatesAtVizTime(baseCoords),
-      candidateCoords = CoordinatesAtVizTime(targetCoords),
+      baseCoordinates = CoordinatesAt(baseCoords),
+      candidateCoords = CoordinatesAt(targetCoords),
       observationTime = observationTime
     )
 
@@ -236,8 +236,8 @@ class BlindOffsetCandidatesSuite extends CatsEffectSuite:
     val candidate = BlindOffsetCandidate(
       targetWithoutMagnitude,
       distance,
-      CoordinatesAtVizTime(baseCoords),
-      CoordinatesAtVizTime(targetCoords),
+      CoordinatesAt(baseCoords),
+      CoordinatesAt(targetCoords),
       observationTime
     )
 

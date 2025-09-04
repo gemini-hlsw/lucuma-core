@@ -7,7 +7,7 @@ import cats.syntax.all.*
 import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.catalog.BandsList
 import lucuma.core.math.Angle
-import lucuma.core.model.CoordinatesAtVizTime
+import lucuma.core.model.CoordinatesAt
 import lucuma.core.model.ObjectTracking
 import lucuma.core.model.SourceProfile
 import lucuma.core.model.Target
@@ -17,8 +17,8 @@ import java.time.Instant
 case class BlindOffsetCandidate(
   target:          Target.Sidereal,
   distance:        Angle,
-  baseCoordinates: CoordinatesAtVizTime,
-  candidateCoords: CoordinatesAtVizTime,
+  baseCoordinates: CoordinatesAt,
+  candidateCoords: CoordinatesAt,
   observationTime: Instant
 ) {
   val score: BigDecimal        = BlindOffsetCandidate.calculateScore(this)
@@ -67,7 +67,7 @@ object BlindOffsetCandidate:
               BlindOffsetCandidate(target,
                                    distance,
                                    baseCoords,
-                                   CoordinatesAtVizTime(candidateCoords),
+                                   CoordinatesAt(candidateCoords),
                                    observationTime
               )
             }
