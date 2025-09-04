@@ -3,14 +3,22 @@
 
 package lucuma.catalog
 
+import cats.effect.Concurrent
 import cats.syntax.all.*
 import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.catalog.BandsList
+import lucuma.catalog.clients.GaiaClient
+import lucuma.catalog.votable.*
+import lucuma.core.geom.ShapeExpression
+import lucuma.core.geom.ShapeInterpreter
+import lucuma.core.geom.jts.interpreter.given
+import lucuma.core.geom.syntax.all.*
 import lucuma.core.math.Angle
 import lucuma.core.model.CoordinatesAt
 import lucuma.core.model.ObjectTracking
 import lucuma.core.model.SourceProfile
 import lucuma.core.model.Target
+import lucuma.core.syntax.all.*
 
 import java.time.Instant
 
@@ -26,7 +34,7 @@ case class BlindOffsetCandidate(
 }
 
 object BlindOffsetCandidate:
-  def extractGMagnitude(target: Target.Sidereal): Option[BigDecimal] =
+  def referenceBrightness(target: Target.Sidereal): Option[BigDecimal] =
     BandsList.GaiaBandsList.bands.foldMap: band =>
       SourceProfile
         .integratedBrightnessIn(band)
@@ -34,7 +42,7 @@ object BlindOffsetCandidate:
         .map(_.value.value.value)
 
   private def calculateScore(candidate: BlindOffsetCandidate): BigDecimal =
-    BlindOffsetCandidate.extractGMagnitude(candidate.target) match {
+    referenceBrightness(candidate.target) match
       case Some(g) =>
         // score = sqrt(((G-12)/6)^2 + (distance / 180 arcsec)^2)
         val distance = Angle.decimalArcseconds.get(
@@ -45,20 +53,45 @@ object BlindOffsetCandidate:
         // The original formula had a square root but we don't care about the value, just the
         // relative order
         magnitudeTerm.pow(2) + distance.pow(2)
-      case None    =>
+
+      case None =>
         Double.MaxValue
-    }
 
-  def sortCandidates(candidates: List[BlindOffsetCandidate]): List[BlindOffsetCandidate] =
-    candidates.sortBy(_.score)
+object BlindOffsets:
+  def runBlindOffsetAnalysis[F[_]](
+    gaiaClient:      GaiaClient[F],
+    baseTracking:    ObjectTracking,
+    observationTime: Instant
+  )(using Concurrent[F]): F[List[BlindOffsetCandidate]] =
+    baseTracking
+      .at(observationTime)
+      .map: baseCoords =>
+        val baseCoordinates = baseCoords.value
+        val searchRadius    = 180.arcseconds
+        val adqlQuery       = QueryByADQL(
+          base = baseCoordinates,
+          shapeConstraint = ShapeExpression.centeredEllipse(searchRadius * 2, searchRadius * 2),
+          brightnessConstraints = None
+        )
 
-  def sortCandidatesFromTargets(
+        val interpreter = ADQLInterpreter.blindOffsetCandidates(using summon[ShapeInterpreter])
+
+        gaiaClient
+          .query(adqlQuery)(using interpreter)
+          .map(_.collect { case Right(target) => target })
+          .map(
+            analysis(_, baseTracking, observationTime)
+          )
+      .getOrElse(List.empty.pure[F])
+
+  def analysis(
     targets:         List[Target.Sidereal],
     baseTracking:    ObjectTracking,
     observationTime: Instant
   ): List[BlindOffsetCandidate] =
-    baseTracking.at(observationTime) match {
-      case Some(baseCoords) =>
+    baseTracking
+      .at(observationTime)
+      .foldMap: baseCoords =>
         val baseCoordinates = baseCoords.value
         targets
           .flatMap { target =>
@@ -73,5 +106,3 @@ object BlindOffsetCandidate:
             }
           }
           .sortBy(_.score)
-      case None             => List.empty
-    }

@@ -21,24 +21,17 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
 
-trait BlindOffsetSample {
+trait BlindOffsetSample:
 
   protected val observationTime: Instant =
     LocalDate.of(2025, 9, 4).atStartOfDay(ZoneOffset.UTC).toInstant()
 
-  // Test coordinates near Pleiades (same as in our test data)
   val coords = (
     RightAscension.fromStringHMS.getOption("05:35:17.3"),
     Declination.fromStringSignedDMS.getOption("+22:00:52.0")
   ).mapN(Coordinates.apply).getOrElse(Coordinates.Zero)
 
-  // Alternative test coordinates (M81 galaxy region)
-  val m81Coords = (
-    RightAscension.fromStringHMS.getOption("09:55:33.2"),
-    Declination.fromStringSignedDMS.getOption("+69:03:55.0")
-  ).mapN(Coordinates.apply).getOrElse(Coordinates.Zero)
-
-  def blindOffsetQueryForCoords(
+  def runBlindOffsets(
     gaiaClient:  GaiaClient[IO],
     coordinates: Coordinates
   ): IO[List[BlindOffsetCandidate]] = {
@@ -50,7 +43,7 @@ trait BlindOffsetSample {
       parallax = None
     )
     val objectTracking   = ObjectTracking.SiderealObjectTracking(siderealTracking)
-    gaiaClient.blindOffsetCandidates(objectTracking, observationTime)
+    BlindOffsets.runBlindOffsetAnalysis(gaiaClient, objectTracking, observationTime)
   }
 
   def printCandidates(candidates: List[BlindOffsetCandidate]): IO[Unit] = IO {
@@ -62,7 +55,7 @@ trait BlindOffsetSample {
     candidates.zipWithIndex.foreach { case (candidate, index) =>
       val rank     = index + 1
       val sourceId = candidate.sourceId
-      val gMag     = BlindOffsetCandidate.extractGMagnitude(candidate.target) match {
+      val gMag     = BlindOffsetCandidate.referenceBrightness(candidate.target) match {
         case Some(mag) => f"${mag}%5.2f"
         case None      => " N/A"
       }
@@ -72,7 +65,6 @@ trait BlindOffsetSample {
     }
 
   }
-}
 
 object BlindOffsetApp extends IOApp.Simple with BlindOffsetSample:
 
@@ -82,20 +74,7 @@ object BlindOffsetApp extends IOApp.Simple with BlindOffsetSample:
       .map(GaiaClient.build[IO](_, adapters = NonEmptyChain.of[Gaia](Gaia3LiteGavo)))
       .use: gaiaClient =>
         for {
-          _                     <- IO.println(s"Querying blind offset star candidates around coordinates: $coords")
-          candidates            <- blindOffsetQueryForCoords(gaiaClient, coords)
-          _                     <- printCandidates(candidates)
-          _                     <- IO.println("Testing with alternative coordinates (M81 region):")
-          alternativeCandidates <- blindOffsetQueryForCoords(gaiaClient, m81Coords)
-          _                     <- IO.println(s"Found ${alternativeCandidates.length} candidates around M81 region")
-
-          // Show just the top 5 for the alternative region
-          _ <- if (alternativeCandidates.nonEmpty) {
-                 val top5 = alternativeCandidates.take(5)
-                 IO.println("Top 5 candidates:") *>
-                   printCandidates(top5)
-               } else {
-                 IO.println("No candidates found in M81 region")
-               }
-
+          _          <- IO.println(s"Querying blind offset star candidates on: $coords")
+          candidates <- runBlindOffsets(gaiaClient, coords)
+          _          <- printCandidates(candidates)
         } yield ()

@@ -81,7 +81,7 @@ class BlindOffsetFileTestSuite extends CatsEffectSuite:
       .map: targetResults =>
         val targets            = targetResults.map(_.target)
         val baseObjectTracking = ObjectTracking.SiderealObjectTracking(baseSiderealTracking)
-        val sorted             = BlindOffsetCandidate.sortCandidatesFromTargets(
+        val sorted             = BlindOffsets.analysis(
           targets,
           baseObjectTracking,
           observationTime
