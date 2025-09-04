@@ -7,7 +7,7 @@ import cats.syntax.all.*
 import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.catalog.BandsList
 import lucuma.core.math.Angle
-import lucuma.core.math.Coordinates
+import lucuma.core.model.CoordinatesAtVizTime
 import lucuma.core.model.ObjectTracking
 import lucuma.core.model.SourceProfile
 import lucuma.core.model.Target
@@ -16,14 +16,13 @@ import java.time.Instant
 
 case class BlindOffsetCandidate(
   target:          Target.Sidereal,
-  angularDistance: Angle,
-  baseCoordinates: Coordinates,
-  candidateCoords: Coordinates,
+  distance:        Angle,
+  baseCoordinates: CoordinatesAtVizTime,
+  candidateCoords: CoordinatesAtVizTime,
   observationTime: Instant
 ) {
-  val score: Double            = BlindOffsetScoringAlgorithm.calculateScore(this)
+  val score: BigDecimal        = BlindOffsetCandidate.calculateScore(this)
   def sourceId: NonEmptyString = target.name
-  def coordinates: Coordinates = candidateCoords
 }
 
 object BlindOffsetCandidate:
@@ -34,17 +33,18 @@ object BlindOffsetCandidate:
         .headOption(target.sourceProfile)
         .map(_.value.value.value)
 
-object BlindOffsetScoringAlgorithm {
-  def calculateScore(candidate: BlindOffsetCandidate): Double =
+  private def calculateScore(candidate: BlindOffsetCandidate): BigDecimal =
     BlindOffsetCandidate.extractGMagnitude(candidate.target) match {
       case Some(g) =>
         // score = sqrt(((G-12)/6)^2 + (distance / 180 arcsec)^2)
         val distance = Angle.decimalArcseconds.get(
-          candidate.angularDistance
+          candidate.distance
         ) / Angle.decimalArcseconds.get(Angle.Angle180)
 
         val magnitudeTerm = (g - 12.0) / 6.0
-        math.sqrt((magnitudeTerm.pow(2) + distance.pow(2)).toDouble)
+        // The original formula had a square root but we don't care about the value, just the
+        // relative order
+        magnitudeTerm.pow(2) + distance.pow(2)
       case None    =>
         Double.MaxValue
     }
@@ -66,8 +66,8 @@ object BlindOffsetScoringAlgorithm {
               val distance = baseCoordinates.angularDistance(candidateCoords)
               BlindOffsetCandidate(target,
                                    distance,
-                                   baseCoordinates,
-                                   candidateCoords,
+                                   baseCoords,
+                                   CoordinatesAtVizTime(candidateCoords),
                                    observationTime
               )
             }
@@ -75,4 +75,3 @@ object BlindOffsetScoringAlgorithm {
           .sortBy(_.score)
       case None             => List.empty
     }
-}

@@ -11,6 +11,7 @@ import lucuma.core.math.Coordinates
 import lucuma.core.math.Declination
 import lucuma.core.math.Epoch
 import lucuma.core.math.RightAscension
+import lucuma.core.model.CoordinatesAtVizTime
 import lucuma.core.model.ObjectTracking
 import lucuma.core.model.SiderealTracking
 import lucuma.core.model.SourceProfile
@@ -26,8 +27,8 @@ import scala.collection.immutable.SortedMap
 
 class BlindOffsetCandidatesSuite extends CatsEffectSuite:
 
-  // Use a fixed observation time for deterministic tests (today at midnight UTC)
-  private val observationTime: Instant = LocalDate.now().atStartOfDay(ZoneOffset.UTC).toInstant()
+  private val observationTime: Instant =
+    LocalDate.of(2025, 9, 4).atStartOfDay(ZoneOffset.UTC).toInstant()
 
   private val mockTarget = Target.Sidereal(
     name = "Test Star".refined,
@@ -42,7 +43,7 @@ class BlindOffsetCandidatesSuite extends CatsEffectSuite:
     catalogInfo = None
   )
 
-  test("BlindOffsetScoringAlgorithm calculates correct scores"):
+  test("calculates scores"):
     val baseCoords = (
       RightAscension.fromStringHMS.getOption("05:35:17.3"),
       Declination.fromStringSignedDMS.getOption("+22:00:52.2")
@@ -63,14 +64,14 @@ class BlindOffsetCandidatesSuite extends CatsEffectSuite:
       Band.Gaia.defaultUnits[Integrated].withValueTagged(BrightnessValue.unsafeFrom(15.0))
     val spectralDef = SpectralDefinition.BandNormalized(None, SortedMap(Band.Gaia -> gMagnitude))
 
-    val targetWithMagnitude1 = Target.Sidereal(
+    val target1 = Target.Sidereal(
       name = "Star1".refined,
       tracking = SiderealTracking(coords1, Epoch.J2000, None, None, None),
       sourceProfile = SourceProfile.Point(spectralDef),
       catalogInfo = None
     )
 
-    val targetWithMagnitude2 = Target.Sidereal(
+    val target2 = Target.Sidereal(
       name = "Star2".refined,
       tracking = SiderealTracking(coords2, Epoch.J2000, None, None, None),
       sourceProfile = SourceProfile.Point(spectralDef),
@@ -78,18 +79,18 @@ class BlindOffsetCandidatesSuite extends CatsEffectSuite:
     )
 
     val candidate1 = BlindOffsetCandidate(
-      target = targetWithMagnitude1,
-      angularDistance = baseCoords.angularDistance(coords1),
-      baseCoordinates = baseCoords,
-      candidateCoords = coords1,
+      target = target1,
+      distance = baseCoords.angularDistance(coords1),
+      baseCoordinates = CoordinatesAtVizTime(baseCoords),
+      candidateCoords = CoordinatesAtVizTime(coords1),
       observationTime = observationTime
     )
 
     val candidate2 = BlindOffsetCandidate(
-      target = targetWithMagnitude2,
-      angularDistance = baseCoords.angularDistance(coords2),
-      baseCoordinates = baseCoords,
-      candidateCoords = coords2,
+      target = target2,
+      distance = baseCoords.angularDistance(coords2),
+      baseCoordinates = CoordinatesAtVizTime(baseCoords),
+      candidateCoords = CoordinatesAtVizTime(coords2),
       observationTime = observationTime
     )
 
@@ -149,25 +150,25 @@ class BlindOffsetCandidatesSuite extends CatsEffectSuite:
     val candidates = List(
       BlindOffsetCandidate(targetWithMagnitude2,
                            baseCoords.angularDistance(coords2),
-                           baseCoords,
-                           coords2,
+                           CoordinatesAtVizTime(baseCoords),
+                           CoordinatesAtVizTime(coords2),
                            observationTime
       ), // Worst
       BlindOffsetCandidate(targetWithMagnitude1,
                            baseCoords.angularDistance(coords1),
-                           baseCoords,
-                           coords1,
+                           CoordinatesAtVizTime(baseCoords),
+                           CoordinatesAtVizTime(coords1),
                            observationTime
       ), // Best
       BlindOffsetCandidate(targetWithMagnitude3,
                            baseCoords.angularDistance(coords3),
-                           baseCoords,
-                           coords3,
+                           CoordinatesAtVizTime(baseCoords),
+                           CoordinatesAtVizTime(coords3),
                            observationTime
       )  // Medium
     )
 
-    val sorted = BlindOffsetScoringAlgorithm.sortCandidates(candidates)
+    val sorted = BlindOffsetCandidate.sortCandidates(candidates)
 
     // Verify sorting (best score first)
     assertEquals(sorted.length, 3)
@@ -202,13 +203,12 @@ class BlindOffsetCandidatesSuite extends CatsEffectSuite:
 
     val candidate = BlindOffsetCandidate(
       target = targetWithCoords,
-      angularDistance = baseCoords.angularDistance(targetCoords),
-      baseCoordinates = baseCoords,
-      candidateCoords = targetCoords,
+      distance = baseCoords.angularDistance(targetCoords),
+      baseCoordinates = CoordinatesAtVizTime(baseCoords),
+      candidateCoords = CoordinatesAtVizTime(targetCoords),
       observationTime = observationTime
     )
 
-    assertEquals(candidate.coordinates, targetCoords)
     assert(candidate.score > 0.0, "Score should be positive")
 
   test("BlindOffsetCandidate without G magnitude gets worst score"):
@@ -236,13 +236,13 @@ class BlindOffsetCandidatesSuite extends CatsEffectSuite:
     val candidate = BlindOffsetCandidate(
       targetWithoutMagnitude,
       distance,
-      baseCoords,
-      targetCoords,
+      CoordinatesAtVizTime(baseCoords),
+      CoordinatesAtVizTime(targetCoords),
       observationTime
     )
 
     // Should get the worst possible score (Double.MaxValue) because no G magnitude is available
-    assertEquals(candidate.score, Double.MaxValue)
+    assertEquals(candidate.score.toDouble, Double.MaxValue)
 
   test("sortCandidatesFromTargets ranks unusable candidates last"):
     val baseSiderealTracking = SiderealTracking(
@@ -258,7 +258,7 @@ class BlindOffsetCandidatesSuite extends CatsEffectSuite:
 
     val baseObjectTracking = ObjectTracking.SiderealObjectTracking(baseSiderealTracking)
 
-    val candidates = BlindOffsetScoringAlgorithm.sortCandidatesFromTargets(
+    val candidates = BlindOffsetCandidate.sortCandidatesFromTargets(
       targets,
       baseObjectTracking,
       observationTime
@@ -266,4 +266,4 @@ class BlindOffsetCandidatesSuite extends CatsEffectSuite:
 
     // Should return candidates but ones without magnitude will have the worst scores
     assertEquals(candidates.length, 1)
-    assertEquals(candidates.head.score, Double.MaxValue)
+    assertEquals(candidates.head.score.toDouble, Double.MaxValue)

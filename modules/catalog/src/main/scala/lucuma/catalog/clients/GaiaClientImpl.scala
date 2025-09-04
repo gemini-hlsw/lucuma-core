@@ -9,7 +9,6 @@ import cats.effect.Concurrent
 import cats.syntax.all.*
 import fs2.RaiseThrowable
 import lucuma.catalog.BlindOffsetCandidate
-import lucuma.catalog.BlindOffsetScoringAlgorithm
 import lucuma.catalog.votable.*
 import lucuma.core.geom.ShapeExpression
 import lucuma.core.geom.ShapeInterpreter
@@ -76,7 +75,7 @@ class GaiaClientImpl[F[_]](
         query(adqlQuery)(using interpreter)
           .map(_.collect { case Right(target) => target })
           .map(
-            BlindOffsetScoringAlgorithm.sortCandidatesFromTargets(_, baseTracking, observationTime)
+            BlindOffsetCandidate.sortCandidatesFromTargets(_, baseTracking, observationTime)
           )
       case None             =>
         F.pure(List.empty[BlindOffsetCandidate])

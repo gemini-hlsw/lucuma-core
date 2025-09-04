@@ -23,8 +23,8 @@ import java.time.ZoneOffset
 
 trait BlindOffsetSample {
 
-  // Use a fixed observation time for consistent results (today at midnight UTC)
-  protected val observationTime: Instant = LocalDate.now().atStartOfDay(ZoneOffset.UTC).toInstant()
+  protected val observationTime: Instant =
+    LocalDate.of(2025, 9, 4).atStartOfDay(ZoneOffset.UTC).toInstant()
 
   // Test coordinates near Pleiades (same as in our test data)
   val coords = (
@@ -38,9 +38,12 @@ trait BlindOffsetSample {
     Declination.fromStringSignedDMS.getOption("+69:03:55.0")
   ).mapN(Coordinates.apply).getOrElse(Coordinates.Zero)
 
-  def blindOffsetQuery(gaiaClient: GaiaClient[IO]): IO[List[BlindOffsetCandidate]] = {
+  def blindOffsetQueryForCoords(
+    gaiaClient:  GaiaClient[IO],
+    coordinates: Coordinates
+  ): IO[List[BlindOffsetCandidate]] = {
     val siderealTracking = SiderealTracking(
-      baseCoordinates = coords,
+      baseCoordinates = coordinates,
       epoch = Epoch.J2000,
       properMotion = None,
       radialVelocity = None,
@@ -63,56 +66,27 @@ trait BlindOffsetSample {
         case Some(mag) => f"${mag}%5.2f"
         case None      => " N/A"
       }
-      val distance = f"${candidate.angularDistance.toMicroarcseconds / 1000000.0}%8.1f"
+      val distance = f"${candidate.distance.toMicroarcseconds / 1000000.0}%8.1f"
       val score    = f"${candidate.score}%6.3f"
       println(f"$rank%4d | $sourceId%18s | $gMag%5s | ${distance}arcsec | $score%6s")
     }
 
-    if (candidates.nonEmpty) {
-      val best     = candidates.head
-      println()
-      println(s"Best candidate: ${best.sourceId}")
-      val bestGMag = BlindOffsetCandidate.extractGMagnitude(best.target) match {
-        case Some(mag) => mag.toString
-        case None      => "N/A"
-      }
-      println(s"  G magnitude: $bestGMag")
-      println(s"  Distance: ${best.angularDistance.toMicroarcseconds / 1000000.0} arcseconds")
-      println(s"  Score: ${best.score}")
-      println(s"  Coordinates: ${best.coordinates}")
-    }
   }
 }
 
-object BlindOffsetApp extends IOApp.Simple with BlindOffsetSample {
+object BlindOffsetApp extends IOApp.Simple with BlindOffsetSample:
 
   def run =
     JdkHttpClient
       .simple[IO]
       .map(GaiaClient.build[IO](_, adapters = NonEmptyChain.of[Gaia](Gaia3LiteGavo)))
-      .use { gaiaClient =>
+      .use: gaiaClient =>
         for {
-          _ <- IO.println(s"Querying blind offset star candidates around coordinates: $coords")
-          _ <- IO.println("This will search for stars within 180 arcseconds with G magnitude > 12")
-          _ <- IO.println("")
-
-          candidates <- blindOffsetQuery(gaiaClient)
-          _          <- printCandidates(candidates)
-
-          _ <- IO.println("")
-          _ <- IO.println("=" * 80)
-          _ <- IO.println("Testing with alternative coordinates (M81 region):")
-
-          m81SiderealTracking    = SiderealTracking(
-                                     baseCoordinates = m81Coords,
-                                     epoch = Epoch.J2000,
-                                     properMotion = None,
-                                     radialVelocity = None,
-                                     parallax = None
-                                   )
-          m81ObjectTracking      = ObjectTracking.SiderealObjectTracking(m81SiderealTracking)
-          alternativeCandidates <-
-            gaiaClient.blindOffsetCandidates(m81ObjectTracking, observationTime)
+          _                     <- IO.println(s"Querying blind offset star candidates around coordinates: $coords")
+          candidates            <- blindOffsetQueryForCoords(gaiaClient, coords)
+          _                     <- printCandidates(candidates)
+          _                     <- IO.println("Testing with alternative coordinates (M81 region):")
+          alternativeCandidates <- blindOffsetQueryForCoords(gaiaClient, m81Coords)
           _                     <- IO.println(s"Found ${alternativeCandidates.length} candidates around M81 region")
 
           // Show just the top 5 for the alternative region
@@ -125,5 +99,3 @@ object BlindOffsetApp extends IOApp.Simple with BlindOffsetSample {
                }
 
         } yield ()
-      }
-}

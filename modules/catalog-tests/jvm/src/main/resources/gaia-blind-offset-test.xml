@@ -29,7 +29,6 @@
   <!-- Test data: Stars near Pleiades with G > 12 -->
   <!-- Base coordinates: RA=83.8221°, Dec=22.0145° -->
 
-  <!-- Star 1: Closest, moderate magnitude (G=13.2) - should have good score -->
   <TR>
     <TD>123456789012345001</TD>
     <TD>83.8225</TD>
@@ -38,7 +37,6 @@
     <TD>15.3</TD>
   </TR>
 
-  <!-- Star 2: Further away, brighter (G=12.8) - should have good score -->
   <TR>
     <TD>123456789012345002</TD>
     <TD>83.8195</TD>
@@ -47,7 +45,6 @@
     <TD>42.6</TD>
   </TR>
 
-  <!-- Star 3: Close, fainter (G=14.5) - moderate score -->
   <TR>
     <TD>123456789012345003</TD>
     <TD>83.8235</TD>
@@ -56,7 +53,6 @@
     <TD>28.7</TD>
   </TR>
 
-  <!-- Star 4: Far, faint (G=15.1) - worst score -->
   <TR>
     <TD>123456789012345004</TD>
     <TD>83.8350</TD>
@@ -65,7 +61,6 @@
     <TD>156.8</TD>
   </TR>
 
-  <!-- Star 5: Medium distance, medium magnitude (G=13.8) -->
   <TR>
     <TD>123456789012345005</TD>
     <TD>83.8180</TD>
