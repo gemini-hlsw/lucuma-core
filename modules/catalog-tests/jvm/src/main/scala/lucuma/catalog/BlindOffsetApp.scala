@@ -9,6 +9,7 @@ import cats.effect.IOApp
 import cats.syntax.all.*
 import lucuma.catalog.clients.GaiaClient
 import lucuma.catalog.votable.CatalogAdapter.*
+import lucuma.core.geom.jts.interpreter.given
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Declination
 import lucuma.core.math.Epoch
@@ -16,7 +17,6 @@ import lucuma.core.math.RightAscension
 import lucuma.core.model.ObjectTracking
 import lucuma.core.model.SiderealTracking
 import org.http4s.jdkhttpclient.JdkHttpClient
-import lucuma.core.geom.jts.interpreter.given
 
 import java.time.Instant
 import java.time.LocalDate
