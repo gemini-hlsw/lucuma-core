@@ -3,22 +3,27 @@
 
 package lucuma.catalog
 
-import lucuma.catalog.BandsList
 import cats.syntax.all.*
+import eu.timepit.refined.types.string.NonEmptyString
+import lucuma.catalog.BandsList
 import lucuma.core.math.Angle
 import lucuma.core.math.Coordinates
+import lucuma.core.model.ObjectTracking
 import lucuma.core.model.SourceProfile
 import lucuma.core.model.Target
-import eu.timepit.refined.types.string.NonEmptyString
+
+import java.time.Instant
 
 case class BlindOffsetCandidate(
   target:          Target.Sidereal,
   angularDistance: Angle,
-  baseCoordinates: Coordinates
+  baseCoordinates: Coordinates,
+  candidateCoords: Coordinates,
+  observationTime: Instant
 ) {
   val score: Double            = BlindOffsetScoringAlgorithm.calculateScore(this)
   def sourceId: NonEmptyString = target.name
-  def coordinates: Coordinates = target.tracking.baseCoordinates
+  def coordinates: Coordinates = candidateCoords
 }
 
 object BlindOffsetCandidate:
@@ -49,12 +54,25 @@ object BlindOffsetScoringAlgorithm {
 
   def sortCandidatesFromTargets(
     targets:         List[Target.Sidereal],
-    baseCoordinates: Coordinates
+    baseTracking:    ObjectTracking,
+    observationTime: Instant
   ): List[BlindOffsetCandidate] =
-    targets
-      .map { target =>
-        val distance = baseCoordinates.angularDistance(target.tracking.baseCoordinates)
-        BlindOffsetCandidate(target, distance, baseCoordinates)
-      }
-      .sortBy(_.score)
+    baseTracking.at(observationTime) match {
+      case Some(baseCoords) =>
+        val baseCoordinates = baseCoords.value
+        targets
+          .flatMap { target =>
+            target.tracking.at(observationTime).map { candidateCoords =>
+              val distance = baseCoordinates.angularDistance(candidateCoords)
+              BlindOffsetCandidate(target,
+                                   distance,
+                                   baseCoordinates,
+                                   candidateCoords,
+                                   observationTime
+              )
+            }
+          }
+          .sortBy(_.score)
+      case None             => List.empty
+    }
 }

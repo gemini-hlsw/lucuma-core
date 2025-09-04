@@ -12,10 +12,20 @@ import lucuma.catalog.votable.CatalogAdapter
 import lucuma.catalog.votable.CatalogSearch
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Declination
+import lucuma.core.math.Epoch
 import lucuma.core.math.RightAscension
+import lucuma.core.model.ObjectTracking
+import lucuma.core.model.SiderealTracking
 import munit.CatsEffectSuite
 
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneOffset
+
 class BlindOffsetFileTestSuite extends CatsEffectSuite:
+
+  // Use a fixed observation time for deterministic tests (today at midnight UTC)
+  private val observationTime: Instant = LocalDate.now().atStartOfDay(ZoneOffset.UTC).toInstant()
 
   test("Parse gaia blind offset test VOTable file") {
     val xmlFile = "/gaia-blind-offset-test.xml"
@@ -24,7 +34,7 @@ class BlindOffsetFileTestSuite extends CatsEffectSuite:
     Files[IO]
       .readAll(Path(file.getPath))
       .through(text.utf8.decode)
-      .through(CatalogSearch.siderealTargets(CatalogAdapter.Gaia3Esa))
+      .through(CatalogSearch.siderealTargets(CatalogAdapter.Gaia3LiteGavo))
       .compile
       .toList
       .map { results =>
@@ -39,11 +49,11 @@ class BlindOffsetFileTestSuite extends CatsEffectSuite:
         // Verify we have the expected source IDs
         val sourceIds   = targets.map(_.target.name.value).toSet
         val expectedIds = Set(
-          "123456789012345001", // Star 1
-          "123456789012345002", // Star 2
-          "123456789012345003", // Star 3
-          "123456789012345004", // Star 4
-          "123456789012345005"  // Star 5
+          "Gaia DR3 123456789012345001", // Star 1
+          "Gaia DR3 123456789012345002", // Star 2
+          "Gaia DR3 123456789012345003", // Star 3
+          "Gaia DR3 123456789012345004", // Star 4
+          "Gaia DR3 123456789012345005"  // Star 5
         )
         assertEquals(sourceIds, expectedIds)
       }
@@ -57,17 +67,30 @@ class BlindOffsetFileTestSuite extends CatsEffectSuite:
       Declination.fromStringSignedDMS.getOption("+22:00:52.0")
     ).mapN(Coordinates.apply).getOrElse(Coordinates.Zero)
 
+    val baseSiderealTracking = SiderealTracking(
+      baseCoordinates = baseCoords,
+      epoch = Epoch.J2000,
+      properMotion = None,
+      radialVelocity = None,
+      parallax = None
+    )
+
     Files[IO]
       .readAll(Path(file.getPath))
       .through(text.utf8.decode)
-      .through(CatalogSearch.siderealTargets(CatalogAdapter.Gaia3Esa))
+      .through(CatalogSearch.siderealTargets(CatalogAdapter.Gaia3LiteGavo))
       .compile
       .toList
       .map(_.collect { case Right(targetResult) => targetResult })
       .map { targetResults =>
         // Convert target results to blind offset candidates using the new API that filters unusable candidates
-        val targets = targetResults.map(_.target)
-        val sorted  = BlindOffsetScoringAlgorithm.sortCandidatesFromTargets(targets, baseCoords)
+        val targets            = targetResults.map(_.target)
+        val baseObjectTracking = ObjectTracking.SiderealObjectTracking(baseSiderealTracking)
+        val sorted             = BlindOffsetScoringAlgorithm.sortCandidatesFromTargets(
+          targets,
+          baseObjectTracking,
+          observationTime
+        )
 
         // All targets should be converted to candidates (no filtering)
         assert(sorted.length >= 0, s"Should have candidates, got ${sorted.length}")
@@ -91,4 +114,3 @@ class BlindOffsetFileTestSuite extends CatsEffectSuite:
         }
       }
   }
-

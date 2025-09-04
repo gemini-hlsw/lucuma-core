@@ -131,6 +131,7 @@ object ADQLInterpreter {
 
       override def orderBy = Some("angular_distance_arcsec ASC")
 
-      override val extraConstraints: List[String] = List("phot_g_mean_mag > 12.0", "phot_g_mean_mag IS NOT NULL")
+      override val extraConstraints: List[String] =
+        List("phot_g_mean_mag > 12.0", "phot_g_mean_mag IS NOT NULL")
     }
 }

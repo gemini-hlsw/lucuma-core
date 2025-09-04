@@ -3,18 +3,28 @@
 
 package lucuma.catalog
 
-import cats.effect.IO
 import cats.data.NonEmptyChain
+import cats.effect.IO
 import cats.effect.IOApp
 import cats.syntax.all.*
 import lucuma.catalog.clients.GaiaClient
+import lucuma.catalog.votable.CatalogAdapter.*
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Declination
+import lucuma.core.math.Epoch
 import lucuma.core.math.RightAscension
+import lucuma.core.model.ObjectTracking
+import lucuma.core.model.SiderealTracking
 import org.http4s.jdkhttpclient.JdkHttpClient
-import lucuma.catalog.votable.CatalogAdapter.*
+
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneOffset
 
 trait BlindOffsetSample {
+
+  // Use a fixed observation time for consistent results (today at midnight UTC)
+  protected val observationTime: Instant = LocalDate.now().atStartOfDay(ZoneOffset.UTC).toInstant()
 
   // Test coordinates near Pleiades (same as in our test data)
   val coords = (
@@ -28,8 +38,17 @@ trait BlindOffsetSample {
     Declination.fromStringSignedDMS.getOption("+69:03:55.0")
   ).mapN(Coordinates.apply).getOrElse(Coordinates.Zero)
 
-  def blindOffsetQuery(gaiaClient: GaiaClient[IO]): IO[List[BlindOffsetCandidate]] =
-    gaiaClient.blindOffsetCandidates(coords)
+  def blindOffsetQuery(gaiaClient: GaiaClient[IO]): IO[List[BlindOffsetCandidate]] = {
+    val siderealTracking = SiderealTracking(
+      baseCoordinates = coords,
+      epoch = Epoch.J2000,
+      properMotion = None,
+      radialVelocity = None,
+      parallax = None
+    )
+    val objectTracking   = ObjectTracking.SiderealObjectTracking(siderealTracking)
+    gaiaClient.blindOffsetCandidates(objectTracking, observationTime)
+  }
 
   def printCandidates(candidates: List[BlindOffsetCandidate]): IO[Unit] = IO {
     println(s"Found ${candidates.length} blind offset star candidates:")
@@ -84,7 +103,16 @@ object BlindOffsetApp extends IOApp.Simple with BlindOffsetSample {
           _ <- IO.println("=" * 80)
           _ <- IO.println("Testing with alternative coordinates (M81 region):")
 
-          alternativeCandidates <- gaiaClient.blindOffsetCandidates(m81Coords)
+          m81SiderealTracking    = SiderealTracking(
+                                     baseCoordinates = m81Coords,
+                                     epoch = Epoch.J2000,
+                                     properMotion = None,
+                                     radialVelocity = None,
+                                     parallax = None
+                                   )
+          m81ObjectTracking      = ObjectTracking.SiderealObjectTracking(m81SiderealTracking)
+          alternativeCandidates <-
+            gaiaClient.blindOffsetCandidates(m81ObjectTracking, observationTime)
           _                     <- IO.println(s"Found ${alternativeCandidates.length} candidates around M81 region")
 
           // Show just the top 5 for the alternative region

@@ -11,15 +11,23 @@ import lucuma.core.math.Coordinates
 import lucuma.core.math.Declination
 import lucuma.core.math.Epoch
 import lucuma.core.math.RightAscension
+import lucuma.core.model.ObjectTracking
 import lucuma.core.model.SiderealTracking
 import lucuma.core.model.SourceProfile
 import lucuma.core.model.SpectralDefinition
 import lucuma.core.model.Target
-import munit.CatsEffectSuite
-import scala.collection.immutable.SortedMap
 import lucuma.refined.*
+import munit.CatsEffectSuite
+
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneOffset
+import scala.collection.immutable.SortedMap
 
 class BlindOffsetCandidatesSuite extends CatsEffectSuite:
+
+  // Use a fixed observation time for deterministic tests (today at midnight UTC)
+  private val observationTime: Instant = LocalDate.now().atStartOfDay(ZoneOffset.UTC).toInstant()
 
   private val mockTarget = Target.Sidereal(
     name = "Test Star".refined,
@@ -72,13 +80,17 @@ class BlindOffsetCandidatesSuite extends CatsEffectSuite:
     val candidate1 = BlindOffsetCandidate(
       target = targetWithMagnitude1,
       angularDistance = baseCoords.angularDistance(coords1),
-      baseCoordinates = baseCoords
+      baseCoordinates = baseCoords,
+      candidateCoords = coords1,
+      observationTime = observationTime
     )
 
     val candidate2 = BlindOffsetCandidate(
       target = targetWithMagnitude2,
       angularDistance = baseCoords.angularDistance(coords2),
-      baseCoordinates = baseCoords
+      baseCoordinates = baseCoords,
+      candidateCoords = coords2,
+      observationTime = observationTime
     )
 
     val score1 = candidate1.score
@@ -137,15 +149,21 @@ class BlindOffsetCandidatesSuite extends CatsEffectSuite:
     val candidates = List(
       BlindOffsetCandidate(targetWithMagnitude2,
                            baseCoords.angularDistance(coords2),
-                           baseCoords
+                           baseCoords,
+                           coords2,
+                           observationTime
       ), // Worst
       BlindOffsetCandidate(targetWithMagnitude1,
                            baseCoords.angularDistance(coords1),
-                           baseCoords
+                           baseCoords,
+                           coords1,
+                           observationTime
       ), // Best
       BlindOffsetCandidate(targetWithMagnitude3,
                            baseCoords.angularDistance(coords3),
-                           baseCoords
+                           baseCoords,
+                           coords3,
+                           observationTime
       )  // Medium
     )
 
@@ -185,7 +203,9 @@ class BlindOffsetCandidatesSuite extends CatsEffectSuite:
     val candidate = BlindOffsetCandidate(
       target = targetWithCoords,
       angularDistance = baseCoords.angularDistance(targetCoords),
-      baseCoordinates = baseCoords
+      baseCoordinates = baseCoords,
+      candidateCoords = targetCoords,
+      observationTime = observationTime
     )
 
     assertEquals(candidate.coordinates, targetCoords)
@@ -213,20 +233,37 @@ class BlindOffsetCandidatesSuite extends CatsEffectSuite:
     )
 
     val distance  = baseCoords.angularDistance(targetCoords)
-    val candidate = BlindOffsetCandidate(targetWithoutMagnitude, distance, baseCoords)
+    val candidate = BlindOffsetCandidate(
+      targetWithoutMagnitude,
+      distance,
+      baseCoords,
+      targetCoords,
+      observationTime
+    )
 
     // Should get the worst possible score (Double.MaxValue) because no G magnitude is available
     assertEquals(candidate.score, Double.MaxValue)
 
   test("sortCandidatesFromTargets ranks unusable candidates last"):
-    val baseCoords = Coordinates.Zero
+    val baseSiderealTracking = SiderealTracking(
+      baseCoordinates = Coordinates.Zero,
+      epoch = Epoch.J2000,
+      properMotion = None,
+      radialVelocity = None,
+      parallax = None
+    )
 
     // Create a mix of targets - some with magnitudes, some without
     val targets = List(mockTarget) // mockTarget has no magnitude data
 
-    val candidates = BlindOffsetScoringAlgorithm.sortCandidatesFromTargets(targets, baseCoords)
+    val baseObjectTracking = ObjectTracking.SiderealObjectTracking(baseSiderealTracking)
+
+    val candidates = BlindOffsetScoringAlgorithm.sortCandidatesFromTargets(
+      targets,
+      baseObjectTracking,
+      observationTime
+    )
 
     // Should return candidates but ones without magnitude will have the worst scores
     assertEquals(candidates.length, 1)
     assertEquals(candidates.head.score, Double.MaxValue)
-

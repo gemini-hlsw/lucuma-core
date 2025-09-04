@@ -16,14 +16,16 @@ import lucuma.core.geom.ShapeInterpreter
 import lucuma.core.geom.jts.interpreter.given
 import lucuma.core.geom.syntax.all.*
 import lucuma.core.math.Angle
-import lucuma.core.math.Coordinates
+import lucuma.core.model.ObjectTracking
 import lucuma.core.model.Target
-import lucuma.core.syntax.effect.raceAllToSuccess
 import lucuma.core.syntax.all.ToIntOps
+import lucuma.core.syntax.effect.raceAllToSuccess
 import org.http4s.Method
 import org.http4s.Request
 import org.http4s.Uri
 import org.http4s.client.Client
+
+import java.time.Instant
 
 // TODO Add Trace, we need natchez
 class GaiaClientImpl[F[_]](
@@ -50,24 +52,35 @@ class GaiaClientImpl[F[_]](
 
   /**
    * Get all blind offset star candidates within 180 arcseconds of the base coordinate with G
-   * magnitude > 12, sorted by score (best first)
+   * magnitude > 12, sorted by score (best first), accounting for proper motion and other
+   * time-dependent effects at the specified observation time.
    */
-  def blindOffsetCandidates(baseCoords: Coordinates): F[List[BlindOffsetCandidate]] =
-    val searchRadius = 180.arcseconds
-    val adqlQuery    = QueryByADQL(
-      base = baseCoords,
-      shapeConstraint = ShapeExpression.centeredEllipse(searchRadius * 2, searchRadius * 2),
-      brightnessConstraints = None
-    )
+  def blindOffsetCandidates(
+    baseTracking:    ObjectTracking,
+    observationTime: Instant
+  ): F[List[BlindOffsetCandidate]] =
+    baseTracking.at(observationTime) match {
+      case Some(baseCoords) =>
+        val baseCoordinates = baseCoords.value
+        val searchRadius    = 180.arcseconds
+        val adqlQuery       = QueryByADQL(
+          base = baseCoordinates,
+          shapeConstraint = ShapeExpression.centeredEllipse(searchRadius * 2, searchRadius * 2),
+          brightnessConstraints = None
+        )
 
-    println(adqlQuery)
+        println(adqlQuery)
 
-    val interpreter = ADQLInterpreter.blindOffsetCandidates(using summon[ShapeInterpreter])
+        val interpreter = ADQLInterpreter.blindOffsetCandidates(using summon[ShapeInterpreter])
 
-    query(adqlQuery)(using interpreter)
-      .map(_.collect { case Right(target) => target })
-      .map(BlindOffsetScoringAlgorithm.sortCandidatesFromTargets(_, baseCoords))
-
+        query(adqlQuery)(using interpreter)
+          .map(_.collect { case Right(target) => target })
+          .map(
+            BlindOffsetScoringAlgorithm.sortCandidatesFromTargets(_, baseTracking, observationTime)
+          )
+      case None             =>
+        F.pure(List.empty[BlindOffsetCandidate])
+    }
 
   private def multiAdapterQuery(
     queryUri: CatalogAdapter.Gaia => Uri
