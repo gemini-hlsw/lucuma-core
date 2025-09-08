@@ -5,22 +5,19 @@ package lucuma.core.math
 package arb
 
 import coulomb.*
-import coulomb.syntax.*
 import eu.timepit.refined.scalacheck.numeric.*
-import lucuma.core.math.units.*
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Cogen
 
-trait ArbParallax {
+trait ArbParallax:
 
   given Arbitrary[Parallax] =
     Arbitrary {
-      arbitrary[Parallax.LongParallaxμas].map(μas => Parallax(μas.withUnit[MicroArcSecond]))
+      arbitrary[Parallax.LongParallaxμas].map(Parallax.apply)
     }
 
   given Cogen[Parallax] =
     Cogen[Long].contramap(_.μas.value.value)
-}
 
 object ArbParallax extends ArbParallax
