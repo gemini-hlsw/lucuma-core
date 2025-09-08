@@ -122,6 +122,9 @@ object Wavelength {
   def apply(picometers: PosInt): Wavelength =
     picometers.withUnit[Picometer]
 
+  def unapply(w: Wavelength): Option[PosInt] =
+    Some(w.toPicometers.value)
+
   /** @group Typeclass Instances */
   given Show[Wavelength] =
     Show.fromToString
