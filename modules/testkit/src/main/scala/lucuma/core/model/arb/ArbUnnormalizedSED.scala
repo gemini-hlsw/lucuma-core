@@ -12,11 +12,8 @@ import coulomb.syntax.*
 import coulomb.units.si.Kelvin
 import eu.timepit.refined.numeric.Positive
 import eu.timepit.refined.refineV
-import eu.timepit.refined.scalacheck.numeric.*
-import eu.timepit.refined.types.numeric.PosBigDecimal
 import lucuma.core.enums.*
 import lucuma.core.math.Wavelength
-import lucuma.core.math.arb.ArbRefined
 import lucuma.core.math.arb.ArbWavelength
 import lucuma.core.util.arb.ArbEnumerated
 import lucuma.core.util.arb.ArbGid
@@ -26,7 +23,6 @@ import org.scalacheck.Arbitrary.arbitrary
 trait ArbUnnormalizedSED {
   import ArbEnumerated.given
   import ArbGid.given
-  import ArbRefined.given
   import ArbWavelength.given
   import UnnormalizedSED.*
 
@@ -90,11 +86,11 @@ trait ArbUnnormalizedSED {
 
   given Arbitrary[UserDefined] =
     Arbitrary(
-      arbitrary[NonEmptyMap[Wavelength, PosBigDecimal]].map(UserDefined(_))
+      arbitrary[NonEmptyMap[Wavelength, BigDecimal]].map(UserDefined(_))
     )
 
   given Cogen[UserDefined] =
-    Cogen[Map[Wavelength, PosBigDecimal]].contramap(_.fluxDensities.toSortedMap)
+    Cogen[Map[Wavelength, BigDecimal]].contramap(_.fluxDensities.toSortedMap)
 
   given Arbitrary[UserDefinedAttachment] =
     Arbitrary(arbitrary[Attachment.Id].map(UserDefinedAttachment(_)))
