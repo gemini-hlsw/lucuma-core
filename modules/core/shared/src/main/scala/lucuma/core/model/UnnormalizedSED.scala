@@ -11,7 +11,6 @@ import coulomb.*
 import coulomb.ops.algebra.cats.all.given
 import coulomb.units.si.Kelvin
 import eu.timepit.refined.cats.*
-import eu.timepit.refined.types.numeric.PosBigDecimal
 import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.enums.*
 import lucuma.core.math.Wavelength
@@ -125,14 +124,14 @@ object UnnormalizedSED {
   }
 
   // Flux density is unitless since we just need the shape of the function. It can be in any applicable units.
-  final case class UserDefined(fluxDensities: NonEmptyMap[Wavelength, PosBigDecimal])
+  final case class UserDefined(fluxDensities: NonEmptyMap[Wavelength, BigDecimal])
       extends UnnormalizedSED
 
   object UserDefined {
     given Eq[UserDefined] = Eq.by(_.fluxDensities)
 
     /** @group Optics */
-    val fluxDensities: Lens[UserDefined, NonEmptyMap[Wavelength, PosBigDecimal]] =
+    val fluxDensities: Lens[UserDefined, NonEmptyMap[Wavelength, BigDecimal]] =
       Focus[UserDefined](_.fluxDensities)
   }
 
