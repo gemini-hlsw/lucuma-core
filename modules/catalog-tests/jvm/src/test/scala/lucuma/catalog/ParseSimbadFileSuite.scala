@@ -257,7 +257,7 @@ class ParseSimbadFileSuite extends CatsEffectSuite with VoTableParser {
             // radial velocity
             assertEquals(
               Target.radialVelocity.getOption(t).flatten,
-              RadialVelocity(BigDecimal(233509).withUnit[MetersPerSecond])
+              RadialVelocity(BigDecimal(233509).withUnit[KilometersPerSecond])
             )
             // parallax
             assertEquals(Target.parallax.getOption(t).flatten, none)
