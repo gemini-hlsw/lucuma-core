@@ -11,7 +11,8 @@ import eu.timepit.refined.api.*
 import eu.timepit.refined.auto.*
 import eu.timepit.refined.numeric.*
 import eu.timepit.refined.refineV
-import lucuma.core.math.units.{*, given}
+import lucuma.core.math.units.*
+import lucuma.core.math.units.conversions.given
 import lucuma.core.optics.*
 import lucuma.core.refined.given
 import spire.math.Rational

@@ -146,15 +146,15 @@ trait units {
   given TypeString[ErgsPerSecondCentimeter2Arcsec2] =
     TypeString("ERG_PER_S_PER_CM_SQUARED_PER_ARCSEC_SQUARED")
 
-  // PosInt can be converted to Rational exactly
-  given rationalPosIntConverter: ValueConversion[PosInt, Rational] = Rational(_)
+  object conversions:
+    // PosInt can be converted to Rational exactly
+    given rationalPosIntConverter: ValueConversion[PosInt, Rational] = Rational(_)
 
-  given ValueConversion[NonNegInt, Double] = _.value.toDouble
+    given ValueConversion[NonNegInt, Double] = _.value.toDouble
 
-  given ValueConversion[Int, BigDecimal] = BigDecimal(_)
-  given ValueConversion[Parallax.LongParallaxμas, Rational] = Rational(_)
+    given ValueConversion[Parallax.LongParallaxμas, Rational] = Rational(_)
 
-  given refinedValueConversion[V, P]: ValueConversion[V Refined P, V] = _.value
+    given refinedValueConversion[V, P]: ValueConversion[V Refined P, V] = _.value
 
   extension [A](inline a: A)
     inline def withRefinedUnit[P, U](using inline p: Predicate[A, P]): Quantity[Refined[A, P], U] = refineMV(a).withUnit[U]

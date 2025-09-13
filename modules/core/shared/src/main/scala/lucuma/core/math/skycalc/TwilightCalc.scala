@@ -10,11 +10,11 @@ import lucuma.core.math.BoundedInterval
 import lucuma.core.math.Constants.*
 import lucuma.core.math.JulianDate
 import lucuma.core.math.Place
-import lucuma.core.math.units.given
 import lucuma.core.optics.Spire
 import org.typelevel.cats.time.*
 import spire.math.extras.interval.IntervalSeq
-import spire.std.double.*
+import lucuma.core.math.units.conversions.given
+import algebra.instances.all.*
 
 import java.time.Instant
 import java.time.LocalDate

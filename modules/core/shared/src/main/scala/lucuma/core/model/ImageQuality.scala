@@ -15,11 +15,11 @@ import lucuma.core.math.Angle
 import lucuma.core.math.Wavelength
 import lucuma.core.math.erf
 import lucuma.core.math.units.*
-import lucuma.core.math.units.given
 import lucuma.core.optics.Format
 import lucuma.core.util.Display
 import lucuma.core.util.Enumerated
 import lucuma.core.util.NewRefinedQuantity
+import lucuma.core.math.units.conversions.given
 
 import scala.math.pow
 
