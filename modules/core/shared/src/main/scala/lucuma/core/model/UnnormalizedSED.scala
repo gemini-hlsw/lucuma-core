@@ -115,17 +115,6 @@ object UnnormalizedSED {
   /** A black body with a temperature in Kelvin. */
   final case class BlackBody(temperature: Quantity[PosInt, Kelvin]) extends UnnormalizedSED
 
-  // given refinedOrderHash[T, P](using
-  //     orderT: Order[T],
-  //     hashT: Hash[T]
-  // ): (Order[Refined[T, P]] & Hash[Refined[T, P]]) =
-  //     new Order[Refined[T, P]] with Hash[Refined[T, P]] {
-  //         def compare(x: Refined[T, P], y: Refined[T, P]): Int =
-  //             orderT.compare(x.value, y.value)
-  //         def hash(x: Refined[T, P]): Int =
-  //             hashT.hash(x.value)
-  //     }
-
   object BlackBody {
     given Order[BlackBody] = Order.by(_.temperature)
     given Eq[BlackBody] = Eq.by(_.temperature)

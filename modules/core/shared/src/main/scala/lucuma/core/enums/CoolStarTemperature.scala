@@ -8,6 +8,7 @@ import coulomb.units.si.Kelvin
 import eu.timepit.refined.numeric.Positive
 import eu.timepit.refined.types.numeric.PosBigDecimal
 import lucuma.core.math.units.*
+import lucuma.core.math.units.refined.*
 import lucuma.core.util.Display
 import lucuma.core.util.Enumerated
 

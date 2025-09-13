@@ -34,13 +34,13 @@ object cats:
 
   // New coulomb needs an instance of `Order[T] & Hash[T]` to get refined coulomb quantities
   // to get the correct instances to play with cats
+  // However this may conflict if you import refined givens
   given [T, P](using
       orderT: Order[T],
       hashT: Hash[T],
       rt: RefType[Refined]
   ): (Order[Refined[T, P]] & Hash[Refined[T, P]]) =
       new Order[Refined[T, P]] with Hash[Refined[T, P]]:
-          // Use refined-cats Order instance directly
           private val orderInstance = eu.timepit.refined.cats.refTypeOrder[Refined, T, P](using orderT, rt)
           private val hashInstance = hashForRefined[T, P](using hashT, rt)
 
@@ -54,7 +54,6 @@ object cats:
       rt: RefType[Refined]
   ): Order[Refined[T, P]] =
       new Order[Refined[T, P]]:
-          // Use refined-cats Order instance directly
           private val orderInstance = eu.timepit.refined.cats.refTypeOrder[Refined, T, P](using orderT, rt)
           def compare(x: Refined[T, P], y: Refined[T, P]): Int =
               orderInstance.compare(x, y)

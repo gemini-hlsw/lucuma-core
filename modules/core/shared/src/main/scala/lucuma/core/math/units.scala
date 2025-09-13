@@ -49,7 +49,7 @@ trait units {
 
   type KilometersPerSecond
   given DerivedUnit[KilometersPerSecond, (Kilo * Meter) / Second, "kilometers per second", "km/s"] = DerivedUnit()
-  // given TypeString[KilometersPerSecond] = TypeString("KM_S")
+  given TypeString[KilometersPerSecond] = TypeString("KM_S")
 
   type Year
   given DerivedUnit[Year, 365 * Day, "year", "y"] = DerivedUnit()
@@ -156,16 +156,17 @@ trait units {
 
     given refinedValueConversion[V, P]: ValueConversion[V Refined P, V] = _.value
 
-  extension [A](inline a: A)
-    inline def withRefinedUnit[P, U](using inline p: Predicate[A, P]): Quantity[Refined[A, P], U] = refineMV(a).withUnit[U]
+  object refined:
+    extension [A](inline a: A)
+      inline def withRefinedUnit[P, U](using inline p: Predicate[A, P]): Quantity[Refined[A, P], U] = refineMV(a).withUnit[U]
 
-  inline def refineQV[R]: RefineQV[R] = RefineQV()
+    inline def refineQV[R]: RefineQV[R] = RefineQV()
 
-  final class RefineQV[P] {
-    inline def apply[V, U](q: Quantity[V, U])(using Validate[V, P]): Either[String, Quantity[V Refined P, U]] = {
-      refineV(q.value).map(_.withUnit[U])
+    final class RefineQV[P] {
+      inline def apply[V, U](q: Quantity[V, U])(using Validate[V, P]): Either[String, Quantity[V Refined P, U]] = {
+        refineV(q.value).map(_.withUnit[U])
+      }
     }
-  }
 
   extension (q: Quantity[BigDecimal, ArcSecond])
     inline def toAngle: Angle = Angle.fromBigDecimalArcseconds(q.value)

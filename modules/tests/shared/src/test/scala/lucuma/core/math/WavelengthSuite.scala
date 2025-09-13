@@ -19,6 +19,7 @@ import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.math.arb.*
 import lucuma.core.math.arb.ArbWavelength
 import lucuma.core.math.units.*
+import lucuma.core.math.units.refined.*
 import lucuma.core.optics.Format
 import lucuma.core.optics.laws.discipline.FormatTests
 import lucuma.core.refined.given
