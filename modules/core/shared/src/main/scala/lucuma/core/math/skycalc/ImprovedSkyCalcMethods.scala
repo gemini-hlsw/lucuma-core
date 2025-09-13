@@ -3,9 +3,9 @@
 
 package lucuma.core.math.skycalc
 
+import algebra.instances.all.*
 import lucuma.core.math.Constants.*
 import lucuma.core.math.JulianDate.J2000
-import spire.std.double.*
 
 import java.time.Instant
 import java.time.LocalTime

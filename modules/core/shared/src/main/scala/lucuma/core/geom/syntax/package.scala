@@ -4,6 +4,7 @@
 package lucuma.core.geom.syntax
 
 
+import algebra.instances.all.*
 import coulomb.Quantity
 import coulomb.conversion.*
 import coulomb.syntax.*
@@ -12,7 +13,6 @@ import lucuma.core.geom.*
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 import lucuma.core.math.units.*
-import spire.std.bigDecimal.*
 
 // Syntax used in the JTS implementation only.
 object all extends shapeexpression:

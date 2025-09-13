@@ -15,7 +15,6 @@ import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 import lucuma.core.math.units.*
 import lucuma.core.model.sequence.flamingos2.Flamingos2FpuMask
-import spire.math.*
 
 import scala.language.implicitConversions
 

@@ -16,7 +16,6 @@ import lucuma.core.math.units.conversions.given
 import lucuma.core.optics.*
 import lucuma.core.refined.given
 import spire.math.Rational
-import spire.std.long.*
 
 import scala.math.BigDecimal.RoundingMode
 

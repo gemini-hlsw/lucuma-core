@@ -11,9 +11,9 @@ import io.circe.Decoder
 import io.circe.Encoder
 import lucuma.core.math.units.MilliVegaMagnitude
 import lucuma.core.math.units.VegaMagnitude
+import lucuma.core.math.units.conversions.given
 import lucuma.core.optics.Format
 import lucuma.core.util.NewRefinedQuantity
-import lucuma.core.math.units.conversions.given
 import monocle.Prism
 import spire.math.Rational
 

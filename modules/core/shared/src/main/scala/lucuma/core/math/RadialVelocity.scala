@@ -3,6 +3,7 @@
 
 package lucuma.core.math
 
+import algebra.instances.all.*
 import cats.*
 import coulomb.*
 import coulomb.conversion.*
@@ -13,7 +14,6 @@ import lucuma.core.math.Constants.SpeedOfLight
 import lucuma.core.math.units.*
 import lucuma.core.optics.Format
 import monocle.Prism
-import spire.std.bigDecimal.*
 
 /**
   * Representation of a radial velocity in meters per second

@@ -19,7 +19,7 @@ import eu.timepit.refined.types.numeric.NonNegInt
 import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.util.TypeString
 import lucuma.refined.*
-import spire.math.*
+import spire.math.Rational
 
 trait units {
 
