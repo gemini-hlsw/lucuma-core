@@ -3,8 +3,6 @@
 
 package lucuma.core.refined
 
-import cats.kernel.Hash
-import cats.kernel.Order
 import coulomb.Quantity
 import eu.timepit.refined.api.RefType
 import eu.timepit.refined.api.Refined
@@ -27,32 +25,38 @@ given quantityValidate[T, P, U](using v: Validate[T, P]): Validate[Quantity[T, U
 given newTypeValidate[A, W, P](using n: NewTypeGen[A, W], v: Validate[W, P]): Validate[A, P] =
   Validate.instance(e => v.validate(n.unwrap(e)), e => v.showExpr(n.unwrap(e)))
 
-private given hashForRefined[T, P](using hashT: Hash[T], rt: RefType[Refined]): Hash[Refined[T, P]] =
-  refTypeViaContravariant[Refined, Hash, T, P]
+object cats:
+  import _root_.cats.Hash
+  import _root_.cats.Order
 
-// New coulomb needs an instance of `Order[T] & Hash[T]` to get refined coulomb quantities
-// to get the correct instances to play with cats
-given [T, P](using
-    orderT: Order[T],
-    hashT: Hash[T],
-    rt: RefType[Refined]
-): (Order[Refined[T, P]] & Hash[Refined[T, P]]) =
-    new Order[Refined[T, P]] with Hash[Refined[T, P]]:
-        // Use refined-cats Order instance directly
-        private val orderInstance = eu.timepit.refined.cats.refTypeOrder[Refined, T, P](using orderT, rt)
-        private val hashInstance = hashForRefined[T, P](using hashT, rt)
+  private given hashForRefined[T, P](using hashT: Hash[T], rt: RefType[Refined]): Hash[Refined[T, P]] =
+    refTypeViaContravariant[Refined, Hash, T, P]
 
-        def compare(x: Refined[T, P], y: Refined[T, P]): Int =
-            orderInstance.compare(x, y)
-        def hash(x: Refined[T, P]): Int =
-            hashInstance.hash(x)
+  // New coulomb needs an instance of `Order[T] & Hash[T]` to get refined coulomb quantities
+  // to get the correct instances to play with cats
+  given [T, P](using
+      orderT: Order[T],
+      hashT: Hash[T],
+      rt: RefType[Refined]
+  ): (Order[Refined[T, P]] & Hash[Refined[T, P]]) =
+      new Order[Refined[T, P]] with Hash[Refined[T, P]]:
+          // Use refined-cats Order instance directly
+          private val orderInstance = eu.timepit.refined.cats.refTypeOrder[Refined, T, P](using orderT, rt)
+          private val hashInstance = hashForRefined[T, P](using hashT, rt)
 
-given [T, P](using
-    orderT: Order[T],
-    rt: RefType[Refined]
-): Order[Refined[T, P]] =
-    new Order[Refined[T, P]]:
-        // Use refined-cats Order instance directly
-        private val orderInstance = eu.timepit.refined.cats.refTypeOrder[Refined, T, P](using orderT, rt)
-        def compare(x: Refined[T, P], y: Refined[T, P]): Int =
-            orderInstance.compare(x, y)
+          def compare(x: Refined[T, P], y: Refined[T, P]): Int =
+              orderInstance.compare(x, y)
+          def hash(x: Refined[T, P]): Int =
+              hashInstance.hash(x)
+
+  given [T, P](using
+      orderT: Order[T],
+      rt: RefType[Refined]
+  ): Order[Refined[T, P]] =
+      new Order[Refined[T, P]]:
+          // Use refined-cats Order instance directly
+          private val orderInstance = eu.timepit.refined.cats.refTypeOrder[Refined, T, P](using orderT, rt)
+          def compare(x: Refined[T, P], y: Refined[T, P]): Int =
+              orderInstance.compare(x, y)
+
+export cats.given
