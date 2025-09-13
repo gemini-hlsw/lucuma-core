@@ -15,7 +15,6 @@ import lucuma.core.math.units.given
 import lucuma.core.optics.Format
 import lucuma.core.util.NewRefinedQuantity
 import monocle.Prism
-
 import spire.math.Rational
 
 /**

@@ -3,6 +3,7 @@
 
 package lucuma.core.model
 
+import algebra.instances.all.given
 import cats.syntax.contravariant.*
 import coulomb.*
 import coulomb.conversion.*
@@ -19,7 +20,6 @@ import lucuma.core.optics.Format
 import lucuma.core.util.Display
 import lucuma.core.util.Enumerated
 import lucuma.core.util.NewRefinedQuantity
-import algebra.instances.all.given
 
 import scala.math.pow
 

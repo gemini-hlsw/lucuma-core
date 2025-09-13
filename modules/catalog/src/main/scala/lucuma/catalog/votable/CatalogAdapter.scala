@@ -3,9 +3,9 @@
 
 package lucuma.catalog.votable
 
+import algebra.instances.all.*
 import cats.data.*
 import cats.syntax.all.*
-import coulomb.policy.spire.standard.given
 import coulomb.syntax.*
 import lucuma.catalog.votable.*
 import lucuma.catalog.votable.CatalogProblem.*
@@ -104,8 +104,8 @@ sealed trait CatalogAdapter {
 
   // Attempts to extract the radial velocity of a field
   def parseRadialVelocity(ucd: Ucd, v: String): EitherNec[CatalogProblem, RadialVelocity] =
-    parseDoubleValue(ucd.some, v)
-      .map(v => RadialVelocity(v.toLong.withUnit[MetersPerSecond]))
+    parseBigDecimalValue(ucd.some, v)
+      .map(v => RadialVelocity(v.withUnit[MetersPerSecond]))
       .flatMap(Either.fromOption(_, NonEmptyChain.one(FieldValueProblem(ucd.some, v))))
 
   // Attempts to extract the angular velocity of a field
@@ -117,7 +117,7 @@ sealed trait CatalogAdapter {
       .map(v =>
         tag[A](
           AngularVelocity(
-            v.withUnit[MilliArcSecondPerYear].toUnit[MicroArcSecondPerYear].tToValue
+            v.withUnit[MilliArcSecondPerYear].toUnit[MicroArcSecondPerYear].toValue[Long]
           )
         )
       )

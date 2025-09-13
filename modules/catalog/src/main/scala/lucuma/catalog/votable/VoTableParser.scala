@@ -3,9 +3,9 @@
 
 package lucuma.catalog.votable
 
+import algebra.instances.all.*
 import cats.data.*
 import cats.syntax.all.*
-import coulomb.policy.spire.standard.given
 import coulomb.syntax.*
 import eu.timepit.refined.*
 import eu.timepit.refined.collection.NonEmpty
@@ -166,8 +166,12 @@ trait VoTableParser {
       parseDoubleValue(VoTableParser.UCD_Z.some, z).map(z => Redshift(z).toRadialVelocity)
 
     def fromRV(rv: String): EitherNec[CatalogProblem, Option[RadialVelocity]] =
-      parseDoubleValue(VoTableParser.UCD_RV.some, rv)
-        .map(rv => RadialVelocity(rv.withUnit[KilometersPerSecond]))
+      parseBigDecimalValue(VoTableParser.UCD_RV.some, rv)
+        .map(rv =>
+          RadialVelocity(
+            rv.withUnit[KilometersPerSecond].toUnit[MetersPerSecond].toUnit[MetersPerSecond]
+          )
+        )
 
     (entries.get(adapter.rvField), entries.get(adapter.zField)) match {
       case (Some(rv), Some(z)) => fromRV(rv).orElse(rvFromZ(z)).orElse(NoneRightNec)

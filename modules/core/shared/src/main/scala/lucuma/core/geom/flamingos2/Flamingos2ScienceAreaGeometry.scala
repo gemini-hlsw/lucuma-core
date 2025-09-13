@@ -14,9 +14,10 @@ import lucuma.core.geom.syntax.all.*
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 import lucuma.core.math.units.*
-import scala.language.implicitConversions
 import lucuma.core.model.sequence.flamingos2.Flamingos2FpuMask
 import spire.math.*
+
+import scala.language.implicitConversions
 
 /**
   * Flamingos2 science area geometry.

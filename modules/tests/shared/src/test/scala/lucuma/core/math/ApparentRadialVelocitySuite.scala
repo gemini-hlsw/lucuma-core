@@ -3,10 +3,10 @@
 
 package lucuma.core.math
 
+import algebra.instances.all.*
 import cats.*
 import cats.kernel.laws.discipline.*
 import coulomb.*
-import coulomb.policy.spire.standard.given
 import coulomb.syntax.*
 import lucuma.core.math.Constants.SpeedOfLight
 import lucuma.core.math.arb.*
@@ -16,6 +16,7 @@ import monocle.law.discipline.IsoTests
 import org.scalacheck.Prop.*
 
 import java.math.MathContext
+import scala.language.implicitConversions
 
 final class ApparentRadialVelocitySuite extends munit.DisciplineSuite {
   import ArbApparentRadialVelocity.given
@@ -32,7 +33,7 @@ final class ApparentRadialVelocitySuite extends munit.DisciplineSuite {
       ApparentRadialVelocity(BigDecimal(0).withUnit[MetersPerSecond]).toRedshift,
       Redshift.Zero
     )
-    assertEquals(ApparentRadialVelocity(SpeedOfLight).toRedshift, Redshift(1))
+    assertEquals(ApparentRadialVelocity(SpeedOfLight.toValue[BigDecimal]).toRedshift, Redshift(1))
     assertEquals(
       ApparentRadialVelocity(
         BigDecimal.decimal(1744792.10556, MathContext.DECIMAL64).withUnit[KilometersPerSecond].toUnit[MetersPerSecond]

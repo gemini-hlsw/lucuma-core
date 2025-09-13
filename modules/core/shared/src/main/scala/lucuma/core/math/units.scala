@@ -49,7 +49,7 @@ trait units {
 
   type KilometersPerSecond
   given DerivedUnit[KilometersPerSecond, (Kilo * Meter) / Second, "kilometers per second", "km/s"] = DerivedUnit()
-  given TypeString[KilometersPerSecond] = TypeString("KM_S")
+  // given TypeString[KilometersPerSecond] = TypeString("KM_S")
 
   type Year
   given DerivedUnit[Year, 365 * Day, "year", "y"] = DerivedUnit()
@@ -151,6 +151,7 @@ trait units {
 
   given ValueConversion[NonNegInt, Double] = _.value.toDouble
 
+  given ValueConversion[Int, BigDecimal] = BigDecimal(_)
   given ValueConversion[Parallax.LongParallaxμas, Rational] = Rational(_)
 
   given refinedValueConversion[V, P]: ValueConversion[V Refined P, V] = _.value

@@ -9,9 +9,9 @@ import cats.Show
 import cats.kernel.laws.discipline.*
 import cats.syntax.all.*
 import coulomb.*
-import coulomb.ops.algebra.cats.quantity.given
+import coulomb.integrations.cats.all.given
+import coulomb.syntax.*
 import eu.timepit.refined.auto.*
-import eu.timepit.refined.cats.*
 import eu.timepit.refined.numeric.*
 import eu.timepit.refined.scalacheck.numeric.*
 import eu.timepit.refined.types.numeric.PosBigDecimal
@@ -21,6 +21,7 @@ import lucuma.core.math.arb.ArbWavelength
 import lucuma.core.math.units.*
 import lucuma.core.optics.Format
 import lucuma.core.optics.laws.discipline.FormatTests
+import lucuma.core.refined.given
 import monocle.law.discipline.*
 import org.scalacheck.Arbitrary
 import org.scalacheck.Prop
@@ -110,7 +111,7 @@ final class WavelengthSuite extends munit.DisciplineSuite {
 
   test("picometer decimal format") {
     testFormat(Wavelength.decimalPicometers) { w =>
-      Quantity[Picometer](PosBigDecimal.unsafeFrom(BigDecimal(w.toPicometers.value.value)))
+      PosBigDecimal.unsafeFrom(BigDecimal(w.toPicometers.value.value)).withUnit[Picometer]
     }
   }
 

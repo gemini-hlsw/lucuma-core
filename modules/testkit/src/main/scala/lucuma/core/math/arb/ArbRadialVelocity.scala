@@ -5,7 +5,6 @@ package lucuma.core.math
 package arb
 
 import coulomb.*
-import coulomb.policy.spire.standard.given
 import coulomb.syntax.*
 import lucuma.core.math.Constants.*
 import lucuma.core.math.units.*

@@ -3,15 +3,15 @@
 
 package lucuma.core.refined
 
+import cats.kernel.Hash
+import cats.kernel.Order
 import coulomb.Quantity
+import eu.timepit.refined.api.RefType
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.api.RefinedType
 import eu.timepit.refined.api.Validate
-import lucuma.core.util.NewTypeGen
-import cats.kernel.Order
-import cats.kernel.Hash
-import eu.timepit.refined.api.RefType
 import eu.timepit.refined.cats.derivation.refTypeViaContravariant
+import lucuma.core.util.NewTypeGen
 
 type RefinedTypeAux[T, P] = RefinedType.Aux[Refined[T, P], Refined, T, P]
 
@@ -27,7 +27,7 @@ given quantityValidate[T, P, U](using v: Validate[T, P]): Validate[Quantity[T, U
 given newTypeValidate[A, W, P](using n: NewTypeGen[A, W], v: Validate[W, P]): Validate[A, P] =
   Validate.instance(e => v.validate(n.unwrap(e)), e => v.showExpr(n.unwrap(e)))
 
-given hashForRefined[T, P](using hashT: Hash[T], rt: RefType[Refined]): Hash[Refined[T, P]] =
+private given hashForRefined[T, P](using hashT: Hash[T], rt: RefType[Refined]): Hash[Refined[T, P]] =
   refTypeViaContravariant[Refined, Hash, T, P]
 
 // New coulomb needs an instance of `Order[T] & Hash[T]` to get refined coulomb quantities
@@ -46,3 +46,13 @@ given [T, P](using
             orderInstance.compare(x, y)
         def hash(x: Refined[T, P]): Int =
             hashInstance.hash(x)
+
+given [T, P](using
+    orderT: Order[T],
+    rt: RefType[Refined]
+): Order[Refined[T, P]] =
+    new Order[Refined[T, P]]:
+        // Use refined-cats Order instance directly
+        private val orderInstance = eu.timepit.refined.cats.refTypeOrder[Refined, T, P](using orderT, rt)
+        def compare(x: Refined[T, P], y: Refined[T, P]): Int =
+            orderInstance.compare(x, y)

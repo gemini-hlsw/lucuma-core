@@ -3,10 +3,11 @@
 
 package lucuma.catalog.votable
 
+import algebra.instances.all.*
 import cats.effect.*
 import cats.syntax.all.*
 import coulomb.*
-import coulomb.policy.spire.standard.given
+import coulomb.conversion.implicits.given
 import coulomb.syntax.*
 import eu.timepit.refined.collection.NonEmpty
 import eu.timepit.refined.types.string.NonEmptyString
@@ -30,6 +31,7 @@ import lucuma.core.model.Target
 import lucuma.refined.*
 import munit.CatsEffectSuite
 
+import scala.language.implicitConversions
 import scala.xml.Utility
 
 class AdaptersSuite extends CatsEffectSuite with VoTableParser with VoTableSamples {
@@ -81,7 +83,7 @@ class AdaptersSuite extends CatsEffectSuite with VoTableParser with VoTableSampl
           // radial velocity
           assertEquals(
             Target.radialVelocity.getOption(t).flatten,
-            RadialVelocity(20.30.withUnit[KilometersPerSecond])
+            RadialVelocity(BigDecimal(20.30).withUnit[KilometersPerSecond])
           )
         case Left(_)                          =>
           fail("Gaia response could not be parsed")

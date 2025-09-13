@@ -7,7 +7,6 @@ import cats.syntax.all.*
 import coulomb.*
 import eu.timepit.refined.*
 import eu.timepit.refined.api.*
-import eu.timepit.refined.cats.given
 import eu.timepit.refined.numeric.Interval
 import eu.timepit.refined.types.numeric.NonNegShort
 import lucuma.core.refined.given

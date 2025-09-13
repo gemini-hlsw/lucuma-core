@@ -7,13 +7,11 @@ import cats.Eq
 import cats.implicits.*
 import coulomb.*
 import lucuma.core.math.BrightnessUnits.*
+import lucuma.core.math.LineWidthValue
 import lucuma.core.math.dimensional.*
+import lucuma.core.refined.given
 import monocle.Focus
 import monocle.Lens
-import lucuma.core.refined.given
-
-// import eu.timepit.refined.cats.*
-import lucuma.core.math.LineWidthValue
 
 final case class EmissionLine[T](lineWidth: LineWidthQuantity, lineFlux: LineFluxMeasure[T]) {
   /**

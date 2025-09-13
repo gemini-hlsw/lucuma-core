@@ -5,6 +5,8 @@ package lucuma
 package core
 package math
 
+import cats.Eq
+import cats.Hash
 import eu.timepit.refined.numeric.*
 import lucuma.core.util.NewRefined
 
@@ -28,7 +30,9 @@ type BrightnessValue = BrightnessValue.Type
 
 // The line width must be positive. For upper limit, we could probably safely use 1e6 km/s.
 type LineWidthValueRefinement = Interval.OpenClosed[0, 1_000_000]
-object LineWidthValue extends NewRefined[BigDecimal, LineWidthValueRefinement]
+object LineWidthValue extends NewRefined[BigDecimal, LineWidthValueRefinement]:
+  given Hash[LineWidthValue] = Hash.by(_.value.value)
+  given Eq[LineWidthValue] = Eq.by(_.value.value)
 type LineWidthValue = LineWidthValue.Type
 
 // Should never be less than zero or larger than 1.
