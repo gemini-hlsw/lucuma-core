@@ -5,7 +5,6 @@ package lucuma.core.math.skycalc
 
 import cats.syntax.all.*
 import coulomb.*
-import coulomb.policy.spire.standard.given
 import lucuma.core.enums.TwilightType
 import lucuma.core.math.BoundedInterval
 import lucuma.core.math.Constants.*

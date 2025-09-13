@@ -8,9 +8,9 @@ import cats.Order
 import cats.data.NonEmptyMap
 import cats.implicits.*
 import coulomb.*
-import coulomb.ops.algebra.cats.all.given
 import coulomb.units.si.Kelvin
-import eu.timepit.refined.cats.*
+
+import coulomb.integrations.cats.all.given
 import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.enums.*
 import lucuma.core.math.Wavelength
@@ -18,6 +18,7 @@ import monocle.Focus
 import monocle.Lens
 import monocle.Prism
 import monocle.macros.GenPrism
+import lucuma.core.refined.given
 
 /**
  * Unnormalized Spectral Energy Distribution.
@@ -115,8 +116,20 @@ object UnnormalizedSED {
   /** A black body with a temperature in Kelvin. */
   final case class BlackBody(temperature: Quantity[PosInt, Kelvin]) extends UnnormalizedSED
 
+  // given refinedOrderHash[T, P](using
+  //     orderT: Order[T],
+  //     hashT: Hash[T]
+  // ): (Order[Refined[T, P]] & Hash[Refined[T, P]]) =
+  //     new Order[Refined[T, P]] with Hash[Refined[T, P]] {
+  //         def compare(x: Refined[T, P], y: Refined[T, P]): Int =
+  //             orderT.compare(x.value, y.value)
+  //         def hash(x: Refined[T, P]): Int =
+  //             hashT.hash(x.value)
+  //     }
+
   object BlackBody {
     given Order[BlackBody] = Order.by(_.temperature)
+    given Eq[BlackBody] = Eq.by(_.temperature)
 
     /** @group Optics */
     val temperature: Lens[BlackBody, Quantity[PosInt, Kelvin]] =

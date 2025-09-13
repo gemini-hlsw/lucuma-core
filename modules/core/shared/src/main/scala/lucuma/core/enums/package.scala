@@ -4,7 +4,6 @@
 package lucuma.core.enums
 
 import coulomb.*
-import coulomb.policy.spire.standard.given
 import coulomb.syntax.*
 import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.math.Angle

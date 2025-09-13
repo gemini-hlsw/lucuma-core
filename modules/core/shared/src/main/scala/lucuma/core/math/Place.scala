@@ -6,13 +6,13 @@ package lucuma.core.math
 import cats.Eq
 import cats.Show
 import coulomb.*
-import coulomb.ops.algebra.cats.all.given
 import coulomb.units.si.Meter
-import eu.timepit.refined.cats.*
 import eu.timepit.refined.types.numeric.NonNegInt
 import monocle.Focus
 import monocle.Lens
 import org.typelevel.cats.time.*
+import lucuma.core.refined.given
+import coulomb.integrations.cats.quantity.given
 
 import java.time.ZoneId
 

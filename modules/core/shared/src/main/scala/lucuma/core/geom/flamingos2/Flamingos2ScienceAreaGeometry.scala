@@ -5,7 +5,7 @@ package lucuma.core.geom.flamingos2
 
 import algebra.instances.all.given
 import coulomb.*
-import coulomb.policy.spire.standard.given
+import coulomb.conversion.*
 import coulomb.units.accepted.*
 import lucuma.core.enums.Flamingos2Fpu
 import lucuma.core.enums.Flamingos2LyotWheel
@@ -14,6 +14,7 @@ import lucuma.core.geom.syntax.all.*
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 import lucuma.core.math.units.*
+import scala.language.implicitConversions
 import lucuma.core.model.sequence.flamingos2.Flamingos2FpuMask
 import spire.math.*
 
@@ -36,7 +37,7 @@ trait Flamingos2ScienceAreaGeometry:
             val size = ImagingFOVSize ⨱ plateScale
             (size.toAngle, size.toAngle)
           case Flamingos2FpuMask.Builtin(fpu) =>
-            (Angle.fromBigDecimalArcseconds((fpu.slitWidth * pixelScale).value),
+            (Angle.fromBigDecimalArcseconds((fpu.slitWidth.toValue[BigDecimal] * pixelScale).value),
               (LongSlitFOVHeight ⨱ plateScale).toAngle)
           case Flamingos2FpuMask.Custom(_, _) =>
             ((MOSFOVWidth ⨱ plateScale).toAngle,

@@ -5,14 +5,15 @@ package lucuma.core.math
 
 import cats.*
 import coulomb.*
-import coulomb.ops.algebra.cats.all.given
-import coulomb.policy.spire.standard.given
 import coulomb.syntax.*
+import coulomb.conversion.*
 import lucuma.core.math.Constants.SpeedOfLight
 import lucuma.core.math.units.*
 import lucuma.core.optics.Format
 import monocle.Prism
 import spire.std.bigDecimal.*
+import coulomb.integrations.cats.quantity.given
+import coulomb.conversion.implicits.given
 
 /**
   * Representation of a radial velocity in meters per second
@@ -33,7 +34,7 @@ final case class RadialVelocity private (rv: Quantity[BigDecimal, MetersPerSecon
     */
   def toRedshift: Option[Redshift] =
     if (rv.value.abs < SpeedOfLight.value) {
-      val i = (rv / SpeedOfLight).value
+      val i = (rv / SpeedOfLight.toValue[BigDecimal]).value
       val t = (1 + i) / (1 - i)
       Some(Redshift(BigDecimal.decimal(java.lang.Math.sqrt(t.toDouble) - 1).round(rv.value.mc)))
     } else None
@@ -78,7 +79,7 @@ object RadialVelocity {
     * `Zero RadialVelocity`
     * @group Constructors
     */
-  val Zero: RadialVelocity = new RadialVelocity(0.withUnit[MetersPerSecond])
+  val Zero: RadialVelocity = new RadialVelocity(BigDecimal(0).withUnit[MetersPerSecond])
 
   /** @group Typeclass Instances */
   given Order[RadialVelocity] =

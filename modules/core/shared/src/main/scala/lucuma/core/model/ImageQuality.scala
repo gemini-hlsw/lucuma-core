@@ -5,7 +5,7 @@ package lucuma.core.model
 
 import cats.syntax.contravariant.*
 import coulomb.*
-import coulomb.policy.spire.standard.given
+import coulomb.conversion.*
 import coulomb.units.accepted.*
 import eu.timepit.refined.*
 import eu.timepit.refined.api.*
@@ -19,6 +19,7 @@ import lucuma.core.optics.Format
 import lucuma.core.util.Display
 import lucuma.core.util.Enumerated
 import lucuma.core.util.NewRefinedQuantity
+import algebra.instances.all.given
 
 import scala.math.pow
 

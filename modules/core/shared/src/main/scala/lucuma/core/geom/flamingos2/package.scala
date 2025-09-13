@@ -4,7 +4,6 @@
 package lucuma.core.geom.flamingos2
 
 import coulomb.*
-import coulomb.policy.spire.standard.given
 import coulomb.syntax.*
 import coulomb.units.accepted.*
 import lucuma.core.math.Angle

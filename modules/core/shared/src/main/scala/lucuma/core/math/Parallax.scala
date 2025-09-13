@@ -5,18 +5,17 @@ package lucuma.core.math
 
 import cats.*
 import coulomb.*
-import coulomb.ops.algebra.cats.all.given
-import coulomb.policy.spire.standard.given
 import coulomb.syntax.*
 import eu.timepit.refined.api.*
 import eu.timepit.refined.auto.*
-import eu.timepit.refined.cats.*
 import eu.timepit.refined.numeric.*
 import eu.timepit.refined.refineV
 import lucuma.core.math.units.{*, given}
 import lucuma.core.optics.*
 import spire.math.Rational
 import spire.std.long.*
+import lucuma.core.refined.given
+import coulomb.integrations.cats.quantity.given
 
 import scala.math.BigDecimal.RoundingMode
 

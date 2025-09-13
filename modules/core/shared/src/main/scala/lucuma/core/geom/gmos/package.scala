@@ -5,8 +5,6 @@ package lucuma.core.geom.gmos
 
 import algebra.instances.all.given
 import coulomb.*
-import coulomb.ops.algebra.spire.all.*
-import coulomb.policy.standard.given
 import coulomb.syntax.*
 import coulomb.units.accepted.*
 import lucuma.core.enums.GmosNorthFpu

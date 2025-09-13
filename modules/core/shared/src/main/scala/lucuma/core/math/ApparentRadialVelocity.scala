@@ -5,15 +5,17 @@ package lucuma.core.math
 
 import cats.*
 import coulomb.*
-import coulomb.ops.algebra.cats.all.given
-import coulomb.policy.spire.standard.given
 import coulomb.syntax.*
 import coulomb.units.constants.SpeedOfLight
 import coulomb.units.constants.constant
+import coulomb.conversion.*
+import scala.language.implicitConversions
 import lucuma.core.math.units.*
 import lucuma.core.optics.Wedge
 import monocle.Iso
-import spire.std.bigDecimal.*
+import coulomb.integrations.cats.quantity.given
+import coulomb.conversion.implicits.given
+import algebra.instances.all.given
 
 /**
   * Representation of a radial velocity in meters per second
@@ -37,7 +39,7 @@ object ApparentRadialVelocity {
     * Zero ApparentRadialVelocity
     * @group Constructors
     */
-  val Zero: ApparentRadialVelocity = new ApparentRadialVelocity(0.withUnit[MetersPerSecond])
+  val Zero: ApparentRadialVelocity = new ApparentRadialVelocity(0.withUnit[MetersPerSecond].toValue[BigDecimal])
 
   /**
     * Iso to convert BigDecimal to ApparentRadialVelocity and viceversa

@@ -15,7 +15,6 @@ import monocle.Iso
 
 import java.math.RoundingMode
 
-
 /**
  * A wavelength dither is a small offset (positive or negative) intended to be
  * applied to a wavelength, such as the observing wavelength.  It is therefore a
@@ -27,14 +26,14 @@ opaque type WavelengthDither = Quantity[Int, Picometer]
 object WavelengthDither {
 
   val Zero: WavelengthDither =
-    Quantity[Picometer](0)
+    WavelengthDither(0.withUnit[Picometer])
 
   extension (w: WavelengthDither) {
     def toPicometers: Quantity[Int, Picometer] =
       w
 
     private def to[U](scale: Int): Quantity[BigDecimal, U] =
-      Quantity[U](BigDecimal(w.value, scale))
+      BigDecimal(w.value, scale).withUnit[U]
 
     def toAngstroms: Quantity[BigDecimal, Angstrom] =
       to[Angstrom](2)
@@ -75,7 +74,7 @@ object WavelengthDither {
        .movePointRight(right)
        .setScale(0, RoundingMode.HALF_UP)
        .intValueExact
-    ).map(Quantity[Picometer](_))
+    ).map(_.withUnit[Picometer])
 
   val picometers: Iso[Quantity[Int, Picometer], WavelengthDither] =
     Iso[Quantity[Int, Picometer], WavelengthDither](apply)(_.toPicometers)
@@ -90,7 +89,7 @@ object WavelengthDither {
     Format(fromBigDecimal(6), _.toMicrometers)
 
   val intPicometers: Iso[Int, WavelengthDither] =
-    Iso[Int, Quantity[Int, Picometer]](Quantity[Picometer](_))(_.value).andThen(picometers)
+    Iso[Int, Quantity[Int, Picometer]](_.withUnit[Picometer])(_.value).andThen(picometers)
 
   private def scalingFormat(move: Int): Format[BigDecimal, WavelengthDither] =
     Format[BigDecimal, Int](

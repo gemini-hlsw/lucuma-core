@@ -35,7 +35,7 @@ object CloudExtinction extends NewRefined[Extinction, CloudExtinctionPredicate]:
 
     def toVegaMagnitude: BigDecimal =
       val r = toExtinction.toVegaMagnitude.value
-      BigDecimal(r.n) / BigDecimal(r.d)
+      BigDecimal(r.numerator.toLong) / BigDecimal(r.denominator.toLong)
 
     def label: String =
       if (ce === Preset.Zero.toCloudExtinction)

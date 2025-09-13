@@ -5,9 +5,9 @@ package lucuma.core.geom.flamingos2
 
 import cats.syntax.all.*
 import coulomb.*
-import coulomb.policy.spire.standard.given
 import coulomb.syntax.*
 import coulomb.units.accepted.*
+import coulomb.conversion.*
 import lucuma.core.enums.Flamingos2LyotWheel
 import lucuma.core.enums.PortDisposition
 import lucuma.core.geom.*
@@ -15,7 +15,7 @@ import lucuma.core.geom.syntax.all.*
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 import lucuma.core.math.units.*
-import spire.std.bigDecimal.*
+import algebra.instances.all.given
 
 /**
   * Flamingos2 area that could be reachable by the patrol arm

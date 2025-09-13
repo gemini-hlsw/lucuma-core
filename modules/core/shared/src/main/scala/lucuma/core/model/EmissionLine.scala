@@ -6,12 +6,14 @@ package lucuma.core.model
 import cats.Eq
 import cats.implicits.*
 import coulomb.*
-import coulomb.ops.algebra.cats.all.given
-import eu.timepit.refined.cats.*
 import lucuma.core.math.BrightnessUnits.*
 import lucuma.core.math.dimensional.*
 import monocle.Focus
 import monocle.Lens
+import lucuma.core.refined.given
+
+// import eu.timepit.refined.cats.*
+import lucuma.core.math.LineWidthValue
 
 final case class EmissionLine[T](lineWidth: LineWidthQuantity, lineFlux: LineFluxMeasure[T]) {
   /**
@@ -26,7 +28,7 @@ final case class EmissionLine[T](lineWidth: LineWidthQuantity, lineFlux: LineFlu
 
 object EmissionLine {
   given eqEmissionLine[T]: Eq[EmissionLine[T]] =
-    Eq.by(x => (x.lineWidth, x.lineFlux))
+    Eq.by(x => (x.lineWidth.value, x.lineFlux))
 
   /** @group Optics */
   def lineWidth[T]: Lens[EmissionLine[T], LineWidthQuantity] =

@@ -4,7 +4,6 @@
 package lucuma.core.math
 
 import coulomb.*
-import coulomb.conversion.TruncatingUnitConversion
 import coulomb.conversion.ValueConversion
 import coulomb.define.*
 import coulomb.syntax.*
@@ -16,7 +15,6 @@ import eu.timepit.refined.*
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.api.Validate
 import eu.timepit.refined.auto.*
-import eu.timepit.refined.numeric.*
 import eu.timepit.refined.types.numeric.NonNegInt
 import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.util.TypeString
@@ -156,10 +154,6 @@ trait units {
   given ValueConversion[Parallax.LongParallaxμas, Rational] = Rational(_)
 
   given refinedValueConversion[V, P]: ValueConversion[V Refined P, V] = _.value
-
-  given [UF, UT]: TruncatingUnitConversion[PosInt, UF, UT] = v =>
-    refineV[Positive](coulomb.conversion.standard.unit.ctx_TUC_Int(v))
-      .getOrElse(1.refined[Positive])
 
   extension [A](inline a: A)
     inline def withRefinedUnit[P, U](using inline p: Predicate[A, P]): Quantity[Refined[A, P], U] = refineMV(a).withUnit[U]
