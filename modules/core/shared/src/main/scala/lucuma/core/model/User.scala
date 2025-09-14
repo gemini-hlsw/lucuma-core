@@ -6,8 +6,8 @@ package lucuma.core.model
 import cats.ApplicativeError
 import cats.Eq
 import cats.implicits.*
+import lucuma.core.refined.auto.*
 import lucuma.core.util.WithGid
-import lucuma.refined.*
 
 /** A user has [at least] an identity and a role. */
 sealed trait User extends Product with Serializable {

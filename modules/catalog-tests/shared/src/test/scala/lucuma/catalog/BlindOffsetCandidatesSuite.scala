@@ -17,7 +17,7 @@ import lucuma.core.model.SiderealTracking
 import lucuma.core.model.SourceProfile
 import lucuma.core.model.SpectralDefinition
 import lucuma.core.model.Target
-import lucuma.refined.*
+import lucuma.core.refined.auto.*
 import munit.CatsEffectSuite
 
 import java.time.Instant

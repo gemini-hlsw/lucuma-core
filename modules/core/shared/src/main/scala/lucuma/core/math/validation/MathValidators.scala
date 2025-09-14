@@ -8,10 +8,10 @@ import lucuma.core.math.Declination
 import lucuma.core.math.Epoch
 import lucuma.core.math.HourAngle
 import lucuma.core.math.RightAscension
+import lucuma.core.refined.auto.*
 import lucuma.core.syntax.string.*
 import lucuma.core.syntax.validation.*
 import lucuma.core.validation.*
-import lucuma.refined.*
 import spire.math.Rational
 
 trait MathValidators {
@@ -36,7 +36,7 @@ trait MathValidators {
       (Angle.signedDecimalArcseconds.get(angle) * 100)
         .setScale(0, scala.math.BigDecimal.RoundingMode.HALF_UP) / 100 + 0.0
     )
-  
+
   val truncatedAngleSignedArcSec: InputValidWedge[Angle] =
     InputValidWedge(
       _.parseBigDecimalOption.map(Angle.signedDecimalArcseconds.reverseGet).map(truncateAngleSignedArcSec)

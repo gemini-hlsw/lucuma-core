@@ -6,9 +6,9 @@ package core
 package enums
 
 import eu.timepit.refined.types.numeric.PosInt
+import lucuma.core.refined.auto.*
 import lucuma.core.util.Enumerated
 import lucuma.core.util.NewType
-import lucuma.refined.*
 
 /**
  * Enumerated type for GMOS binning (both X and Y).

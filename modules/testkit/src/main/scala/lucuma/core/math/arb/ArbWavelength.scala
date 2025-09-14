@@ -6,7 +6,7 @@ package arb
 
 import eu.timepit.refined.scalacheck.numeric.*
 import eu.timepit.refined.types.numeric.PosInt
-import lucuma.refined.*
+import lucuma.core.refined.auto.*
 import org.scalacheck.*
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Cogen.*

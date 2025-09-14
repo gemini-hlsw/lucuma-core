@@ -11,7 +11,7 @@ import eu.timepit.refined.collection.NonEmpty
 import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.core.optics.ValidSplitEpi
 import lucuma.core.optics.Wedge
-import lucuma.refined.*
+import lucuma.core.refined.auto.*
 import spire.math.Bounded
 import spire.math.Interval
 import spire.math.Point

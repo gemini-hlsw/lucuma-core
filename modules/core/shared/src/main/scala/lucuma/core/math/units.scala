@@ -17,8 +17,8 @@ import eu.timepit.refined.api.Validate
 import eu.timepit.refined.auto.*
 import eu.timepit.refined.types.numeric.NonNegInt
 import eu.timepit.refined.types.numeric.PosInt
+import lucuma.core.refined.auto.*
 import lucuma.core.util.TypeString
-import lucuma.refined.*
 import spire.math.Rational
 
 trait units {

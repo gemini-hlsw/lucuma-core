@@ -12,8 +12,8 @@ import lucuma.core.math.BrightnessUnits.*
 import lucuma.core.math.Wavelength
 import lucuma.core.math.dimensional.*
 import lucuma.core.math.units.*
+import lucuma.core.refined.auto.*
 import lucuma.core.util.*
-import lucuma.refined.*
 
 /**
  * Enumerated type for wavelength band.

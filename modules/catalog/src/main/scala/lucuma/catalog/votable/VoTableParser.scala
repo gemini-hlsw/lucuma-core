@@ -23,7 +23,7 @@ import lucuma.core.model.SiderealTracking
 import lucuma.core.model.SourceProfile
 import lucuma.core.model.SpectralDefinition
 import lucuma.core.model.Target
-import lucuma.refined.*
+import lucuma.core.refined.auto.*
 import monocle.Focus
 import monocle.Lens
 import monocle.function.Index.listIndex
@@ -169,7 +169,7 @@ trait VoTableParser {
       parseBigDecimalValue(VoTableParser.UCD_RV.some, rv)
         .map(rv =>
           RadialVelocity(
-            rv.withUnit[KilometersPerSecond].toUnit[MetersPerSecond].toUnit[MetersPerSecond]
+            rv.withUnit[KilometersPerSecond].toUnit[MetersPerSecond]
           )
         )
 

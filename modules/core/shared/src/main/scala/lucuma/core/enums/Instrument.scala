@@ -7,8 +7,8 @@ import eu.timepit.refined.collection.NonEmpty
 import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.core.data.Availability
 import lucuma.core.data.Metadata
+import lucuma.core.refined.auto.*
 import lucuma.core.util.Enumerated
-import lucuma.refined.*
 
 /**
  * Enumerated type for instruments.

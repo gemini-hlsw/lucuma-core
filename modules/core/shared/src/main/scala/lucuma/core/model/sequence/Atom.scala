@@ -8,8 +8,8 @@ import cats.data.NonEmptyList
 import cats.syntax.all.*
 import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.core.enums.ObserveClass
+import lucuma.core.refined.auto.*
 import lucuma.core.util.WithUid
-import lucuma.refined.*
 import monocle.Focus
 import monocle.Lens
 

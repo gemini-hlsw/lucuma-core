@@ -10,10 +10,10 @@ import lucuma.core.model.Extinction
 import lucuma.core.model.HourAngleBound
 import lucuma.core.model.ImageQuality
 import lucuma.core.optics.ValidSplitEpi
+import lucuma.core.refined.auto.*
 import lucuma.core.refined.given
 import lucuma.core.syntax.validation.*
 import lucuma.core.validation.*
-import lucuma.refined.*
 
 object ModelValidators {
   private val AirMassErrorMsg: String   =

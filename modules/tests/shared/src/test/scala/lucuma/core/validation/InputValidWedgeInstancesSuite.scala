@@ -7,7 +7,7 @@ import eu.timepit.refined.cats.*
 import eu.timepit.refined.scalacheck.numeric.*
 import lucuma.core.math.arb.ArbRefined.given
 import lucuma.core.optics.laws.discipline.ValidWedgeTests
-import lucuma.refined.*
+import lucuma.core.refined.auto.*
 import munit.DisciplineSuite
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen

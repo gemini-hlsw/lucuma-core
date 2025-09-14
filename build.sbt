@@ -36,7 +36,6 @@ lazy val munitDisciplineVersion     = "2.0.0"
 lazy val munitCatsEffectVersion     = "2.1.0"
 lazy val pprintVersion              = "0.9.3"
 lazy val refinedVersion             = "0.11.3"
-lazy val refinedAlgebraVersion      = "0.1.1"
 lazy val scalaJavaTimeVersion       = "2.6.0"
 lazy val scalajsStubVersion         = "1.1.0"
 lazy val scalaXmlVersion            = "2.4.0"
@@ -62,12 +61,11 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
       "edu.gemini"     %%% "lucuma-jts"            % jtsVersion,
       "com.manyangled" %%% "coulomb-core"          % coulombVersion,
       "com.manyangled" %%% "coulomb-units"         % coulombVersion,
-      "com.manyangled" %%% "coulomb-refined"         % coulombVersion,
+      "com.manyangled" %%% "coulomb-refined"       % coulombVersion,
       "org.typelevel"  %%% "spire"                 % spireVersion,
       "org.typelevel"  %%% "spire-extras"          % spireVersion,
       "eu.timepit"     %%% "refined"               % refinedVersion,
       "eu.timepit"     %%% "refined-cats"          % refinedVersion,
-      "edu.gemini"     %%% "lucuma-refined"        % lucumaRefinedVersion,
       "org.typelevel"  %%% "cats-time"             % catsTimeVersion,
       "org.typelevel"  %%% "kittens"               % kittensVersion,
       "io.circe"       %%% "circe-core"            % circeVersion,

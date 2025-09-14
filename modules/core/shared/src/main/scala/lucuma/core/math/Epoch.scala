@@ -13,7 +13,7 @@ import eu.timepit.refined.numeric.Interval as RefinedInterval
 import lucuma.core.math.parser.EpochParsers
 import lucuma.core.optics.Format
 import lucuma.core.optics.syntax.all.*
-import lucuma.refined.*
+import lucuma.core.refined.auto.*
 import monocle.Prism
 
 import java.time.*

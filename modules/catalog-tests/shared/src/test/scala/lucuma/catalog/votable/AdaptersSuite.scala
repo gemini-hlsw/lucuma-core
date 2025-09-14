@@ -28,7 +28,7 @@ import lucuma.core.math.dimensional.syntax.*
 import lucuma.core.math.units.*
 import lucuma.core.model.CatalogInfo
 import lucuma.core.model.Target
-import lucuma.refined.*
+import lucuma.core.refined.auto.*
 import munit.CatsEffectSuite
 
 import scala.language.implicitConversions

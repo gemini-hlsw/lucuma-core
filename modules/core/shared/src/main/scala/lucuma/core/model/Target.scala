@@ -10,8 +10,8 @@ import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.core.enums.Band
 import lucuma.core.math.*
 import lucuma.core.math.BrightnessUnits.*
+import lucuma.core.refined.auto.*
 import lucuma.core.util.*
-import lucuma.refined.*
 import monocle.Focus
 import monocle.Lens
 import monocle.Optional
@@ -92,12 +92,12 @@ object Target extends WithGid('t'.refined) with TargetOptics {
     given Eq[Opportunity] =
       Eq.by(a => (a.name, a.region, a.sourceProfile))
 
-    val NameOrder: Order[Opportunity] = 
+    val NameOrder: Order[Opportunity] =
       Order.by(x => (x.name, x.region))
 
-    val RegionOrder: Order[Opportunity] = 
+    val RegionOrder: Order[Opportunity] =
       Order.by(x => (x.region, x.name))
-    
+
   }
 
   given Eq[Target] = Eq.instance {
@@ -123,9 +123,9 @@ object Target extends WithGid('t'.refined) with TargetOptics {
         Opportunity.RegionOrder.compare(a, b)
 
       // Nonsidereal sorts first
-      case (Nonsidereal(_, _, _), Sidereal(_, _, _, _)) => -1 
-      case (Nonsidereal(_, _, _), Opportunity(_, _, _)) => -1 
- 
+      case (Nonsidereal(_, _, _), Sidereal(_, _, _, _)) => -1
+      case (Nonsidereal(_, _, _), Opportunity(_, _, _)) => -1
+
       // Then Sidereal
       case (Sidereal(_, _, _, _), Nonsidereal(_, _, _)) => 1
       case (Sidereal(_, _, _, _), Opportunity(_, _, _)) => -1
@@ -151,9 +151,9 @@ object Target extends WithGid('t'.refined) with TargetOptics {
         Opportunity.NameOrder.compare(a, b)
 
       // Nonsidereal sorts first
-      case (Nonsidereal(_, _, _), Sidereal(_, _, _, _)) => -1 
-      case (Nonsidereal(_, _, _), Opportunity(_, _, _)) => -1 
- 
+      case (Nonsidereal(_, _, _), Sidereal(_, _, _, _)) => -1
+      case (Nonsidereal(_, _, _), Opportunity(_, _, _)) => -1
+
       // Then Sidereal
       case (Sidereal(_, _, _, _), Nonsidereal(_, _, _)) => 1
       case (Sidereal(_, _, _, _), Opportunity(_, _, _)) => -1

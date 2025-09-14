@@ -8,8 +8,8 @@ import cats.derived.*
 import eu.timepit.refined.cats.*
 import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.core.enums.ConfigurationRequestStatus
+import lucuma.core.refined.auto.*
 import lucuma.core.util.WithGid
-import lucuma.refined.*
 import monocle.Focus
 import monocle.Lens
 
