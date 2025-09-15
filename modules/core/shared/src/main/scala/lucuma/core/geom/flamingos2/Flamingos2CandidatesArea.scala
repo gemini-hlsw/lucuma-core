@@ -3,7 +3,6 @@
 
 package lucuma.core.geom.flamingos2
 
-import coulomb.policy.spire.standard.given
 import coulomb.units.accepted.*
 import lucuma.core.enums.Flamingos2LyotWheel
 import lucuma.core.geom.ShapeExpression

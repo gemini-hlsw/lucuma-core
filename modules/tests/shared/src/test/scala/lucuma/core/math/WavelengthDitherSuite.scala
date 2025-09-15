@@ -5,7 +5,7 @@ package lucuma.core.math
 
 import cats.syntax.all.*
 import coulomb.*
-import coulomb.ops.algebra.cats.quantity.given
+import coulomb.integrations.cats.all.given
 import coulomb.syntax.*
 import lucuma.core.math.arb.*
 import lucuma.core.math.units.Picometer

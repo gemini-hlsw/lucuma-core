@@ -4,8 +4,8 @@
 package lucuma.core.enums
 
 import eu.timepit.refined.types.string.NonEmptyString
+import lucuma.core.refined.auto.*
 import lucuma.core.util.Enumerated
-import lucuma.refined.*
 
 enum AttachmentType(
   val tag:             String,

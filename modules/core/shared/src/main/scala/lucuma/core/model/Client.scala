@@ -3,7 +3,7 @@
 
 package lucuma.core.model
 
+import lucuma.core.refined.auto.*
 import lucuma.core.util.WithUid
-import lucuma.refined.*
 
 object Client extends WithUid('c'.refined)

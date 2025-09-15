@@ -1,6 +1,6 @@
 import org.scalajs.linker.interface.ESVersion
 
-ThisBuild / tlBaseVersion                         := "0.143"
+ThisBuild / tlBaseVersion                         := "0.144"
 ThisBuild / tlCiReleaseBranches                   := Seq("master")
 ThisBuild / githubWorkflowEnv += "MUNIT_FLAKY_OK" -> "true"
 
@@ -19,7 +19,7 @@ lazy val catsScalacheckVersion      = "0.3.2"
 lazy val catsTimeVersion            = "0.6.0"
 lazy val circeVersion               = "0.14.14"
 lazy val circeRefinedVersion        = "0.15.1"
-lazy val coulombVersion             = "0.8.0"
+lazy val coulombVersion             = "0.9.1"
 lazy val fs2Version                 = "3.12.2"
 lazy val fs2DataVersion             = "1.12.0"
 lazy val geminiLocalesVersion       = "0.12.1"
@@ -36,7 +36,6 @@ lazy val munitDisciplineVersion     = "2.0.0"
 lazy val munitCatsEffectVersion     = "2.1.0"
 lazy val pprintVersion              = "0.9.3"
 lazy val refinedVersion             = "0.11.3"
-lazy val refinedAlgebraVersion      = "0.1.1"
 lazy val scalaJavaTimeVersion       = "2.6.0"
 lazy val scalajsStubVersion         = "1.1.0"
 lazy val scalaXmlVersion            = "2.4.0"
@@ -61,13 +60,12 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
       "dev.optics"     %%% "monocle-state"         % monocleVersion,
       "edu.gemini"     %%% "lucuma-jts"            % jtsVersion,
       "com.manyangled" %%% "coulomb-core"          % coulombVersion,
-      "com.manyangled" %%% "coulomb-spire"         % coulombVersion,
       "com.manyangled" %%% "coulomb-units"         % coulombVersion,
+      "com.manyangled" %%% "coulomb-refined"       % coulombVersion,
       "org.typelevel"  %%% "spire"                 % spireVersion,
       "org.typelevel"  %%% "spire-extras"          % spireVersion,
       "eu.timepit"     %%% "refined"               % refinedVersion,
       "eu.timepit"     %%% "refined-cats"          % refinedVersion,
-      "edu.gemini"     %%% "lucuma-refined"        % lucumaRefinedVersion,
       "org.typelevel"  %%% "cats-time"             % catsTimeVersion,
       "org.typelevel"  %%% "kittens"               % kittensVersion,
       "io.circe"       %%% "circe-core"            % circeVersion,
@@ -166,7 +164,6 @@ lazy val catalog = crossProject(JVMPlatform, JSPlatform)
       "eu.timepit"    %%% "refined-cats"         % refinedVersion,
       "org.http4s"    %%% "http4s-core"          % http4sVersion,
       "org.http4s"    %%% "http4s-client"        % http4sVersion,
-      "edu.gemini"    %%% "refined-algebra"      % refinedAlgebraVersion,
       "org.typelevel" %%% "cats-parse"           % catsParseVersion,
       "org.typelevel" %%% "kittens"              % kittensVersion
     )

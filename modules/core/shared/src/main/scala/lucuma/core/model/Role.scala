@@ -6,8 +6,8 @@ package lucuma.core.model
 import cats.Eq
 import cats.implicits.*
 import lucuma.core.enums.Partner
+import lucuma.core.refined.auto.*
 import lucuma.core.util.WithGid
-import lucuma.refined.*
 
 /**
  * Each user has a current `Role` and a set of other roles they may assume. A role has (at least) an

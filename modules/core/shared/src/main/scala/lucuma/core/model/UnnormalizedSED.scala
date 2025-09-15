@@ -8,12 +8,12 @@ import cats.Order
 import cats.data.NonEmptyMap
 import cats.implicits.*
 import coulomb.*
-import coulomb.ops.algebra.cats.all.given
+import coulomb.integrations.cats.all.given
 import coulomb.units.si.Kelvin
-import eu.timepit.refined.cats.*
 import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.enums.*
 import lucuma.core.math.Wavelength
+import lucuma.core.refined.given
 import monocle.Focus
 import monocle.Lens
 import monocle.Prism
@@ -117,6 +117,7 @@ object UnnormalizedSED {
 
   object BlackBody {
     given Order[BlackBody] = Order.by(_.temperature)
+    given Eq[BlackBody] = Eq.by(_.temperature)
 
     /** @group Optics */
     val temperature: Lens[BlackBody, Quantity[PosInt, Kelvin]] =

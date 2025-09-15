@@ -4,12 +4,12 @@
 package lucuma.core.model.validation
 
 import coulomb.*
-import coulomb.ops.algebra.cats.all.given
-import eu.timepit.refined.cats.given
+import coulomb.integrations.cats.all.given
 import eu.timepit.refined.scalacheck.all.*
 import lucuma.core.math.arb.ArbQuantity.given
 import lucuma.core.math.arb.ArbRefined.given
 import lucuma.core.optics.laws.discipline.ValidWedgeTests
+import lucuma.core.refined.given
 import lucuma.core.util.arb.ArbNewType.given
 import munit.DisciplineSuite
 

@@ -9,8 +9,8 @@ import cats.syntax.option.*
 import eu.timepit.refined.cats.*
 import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.enums.Site
+import lucuma.core.refined.auto.*
 import lucuma.core.util.WithGid
-import lucuma.refined.*
 import monocle.Prism
 import org.typelevel.cats.time.*
 

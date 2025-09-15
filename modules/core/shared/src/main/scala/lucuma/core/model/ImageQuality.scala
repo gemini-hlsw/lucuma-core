@@ -3,9 +3,10 @@
 
 package lucuma.core.model
 
+import algebra.instances.all.given
 import cats.syntax.contravariant.*
 import coulomb.*
-import coulomb.policy.spire.standard.given
+import coulomb.conversion.*
 import coulomb.units.accepted.*
 import eu.timepit.refined.*
 import eu.timepit.refined.api.*
@@ -14,7 +15,7 @@ import lucuma.core.math.Angle
 import lucuma.core.math.Wavelength
 import lucuma.core.math.erf
 import lucuma.core.math.units.*
-import lucuma.core.math.units.given
+import lucuma.core.math.units.conversions.given
 import lucuma.core.optics.Format
 import lucuma.core.util.Display
 import lucuma.core.util.Enumerated

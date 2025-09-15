@@ -3,10 +3,11 @@
 
 package lucuma.catalog.votable
 
+import algebra.instances.all.*
 import cats.effect.*
 import cats.implicits.*
 import coulomb.*
-import coulomb.policy.spire.standard.given
+import coulomb.conversion.implicits.given
 import coulomb.syntax.*
 import eu.timepit.refined.collection.NonEmpty
 import fs2.*
@@ -28,8 +29,10 @@ import lucuma.core.math.dimensional.syntax.*
 import lucuma.core.math.units.*
 import lucuma.core.model.CatalogInfo
 import lucuma.core.model.Target
-import lucuma.refined.*
+import lucuma.core.refined.auto.*
 import munit.CatsEffectSuite
+
+import scala.language.implicitConversions
 
 class ParseSimbadFileSuite extends CatsEffectSuite with VoTableParser {
 
@@ -112,7 +115,7 @@ class ParseSimbadFileSuite extends CatsEffectSuite with VoTableParser {
             // radial velocity
             assertEquals(
               Target.radialVelocity.getOption(t).flatten,
-              RadialVelocity(-20.60.withUnit[KilometersPerSecond])
+              RadialVelocity(BigDecimal(-20.60).withUnit[KilometersPerSecond])
             )
           case Left(_)                          => fail(s"VOTable xml $xmlFile cannot be parsed")
         }
@@ -154,7 +157,7 @@ class ParseSimbadFileSuite extends CatsEffectSuite with VoTableParser {
             // radial velocity
             assertEquals(
               Target.radialVelocity.getOption(t).flatten,
-              RadialVelocity(13822.withUnit[KilometersPerSecond])
+              RadialVelocity(BigDecimal(13822).withUnit[KilometersPerSecond])
             )
             // parallax
             assertEquals(
@@ -254,7 +257,7 @@ class ParseSimbadFileSuite extends CatsEffectSuite with VoTableParser {
             // radial velocity
             assertEquals(
               Target.radialVelocity.getOption(t).flatten,
-              RadialVelocity(233509.withUnit[KilometersPerSecond])
+              RadialVelocity(BigDecimal(233509).withUnit[KilometersPerSecond])
             )
             // parallax
             assertEquals(Target.parallax.getOption(t).flatten, none)
@@ -569,7 +572,7 @@ class ParseSimbadFileSuite extends CatsEffectSuite with VoTableParser {
             // radial velocity
             assertEquals(
               Target.radialVelocity.getOption(t).flatten,
-              RadialVelocity(-20.60.withUnit[KilometersPerSecond])
+              RadialVelocity(BigDecimal(-20.60).withUnit[KilometersPerSecond])
             )
           case Left(_)                          => fail(s"VOTable xml $xmlFile cannot be parsed")
         }
@@ -671,7 +674,7 @@ class ParseSimbadFileSuite extends CatsEffectSuite with VoTableParser {
             // radial velocity
             assertEquals(
               Target.radialVelocity.getOption(t).flatten,
-              RadialVelocity(-20.60.withUnit[KilometersPerSecond])
+              RadialVelocity(BigDecimal(-20.60).withUnit[KilometersPerSecond])
             )
           case Left(_)                          => fail(s"VOTable xml $xmlFile cannot be parsed")
         }

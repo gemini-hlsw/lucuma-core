@@ -5,11 +5,11 @@ package lucuma.core.math
 
 import cats.Show
 import cats.kernel.laws.discipline.EqTests
-import coulomb.ops.algebra.cats.all.given
-import eu.timepit.refined.cats.*
+import coulomb.integrations.cats.all.given
 import eu.timepit.refined.scalacheck.numeric.*
 import lucuma.core.arb.ArbTime
 import lucuma.core.math.arb.*
+import lucuma.core.refined.given
 import monocle.law.discipline.*
 import munit.DisciplineSuite
 import org.scalacheck.Prop.*

@@ -56,8 +56,9 @@ object Wavelength {
     // Conversion between units is guaranteed to be positive since the Wavelength in pm is positive.
     // The value can always be exactly represented as a (Pos)BigDecimal since sub-pm fractions cannot be
     // represented.
+    // given ValueConversion[Double, Double]
     private def to[U](scale: Int): Quantity[PosBigDecimal, U] =
-      Quantity[U](PosBigDecimal.unsafeFrom(BigDecimal(toPicometers.value.value, scale)))
+      PosBigDecimal.unsafeFrom(BigDecimal(toPicometers.value.value, scale)).withUnit[U]
 
     /**
      * Returns the wavelength value in angstroms.
@@ -141,7 +142,7 @@ object Wavelength {
          .movePointRight(right)
          .setScale(0, RoundingMode.HALF_UP)
          .intValueExact
-      ).flatMap(i => PosInt.from(i).toOption).map(Quantity[Picometer](_))
+      ).flatMap(i => PosInt.from(i).toOption).map(Wavelength(_))
 
     Format[Quantity[PosBigDecimal, U], Wavelength](from, to)
   }

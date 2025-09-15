@@ -8,8 +8,8 @@ import lucuma.core.enums.Breakpoint
 import lucuma.core.enums.ObserveClass
 import lucuma.core.enums.StepGuideState
 import lucuma.core.math.Offset
+import lucuma.core.refined.auto.*
 import lucuma.core.util.WithUid
-import lucuma.refined.*
 import monocle.Focus
 import monocle.Lens
 

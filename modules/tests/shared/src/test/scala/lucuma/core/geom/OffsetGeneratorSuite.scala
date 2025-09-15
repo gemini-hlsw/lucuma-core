@@ -8,7 +8,7 @@ import cats.effect.std.Random
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 import lucuma.core.math.syntax.int.*
-import lucuma.refined.*
+import lucuma.core.refined.auto.*
 import munit.CatsEffectSuite
 
 class OffsetGeneratorSuite extends CatsEffectSuite:

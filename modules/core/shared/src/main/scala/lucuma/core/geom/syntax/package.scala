@@ -4,29 +4,30 @@
 package lucuma.core.geom.syntax
 
 
-import coulomb.*
-import coulomb.conversion.UnitConversion
-import coulomb.policy.spire.standard.given
+import algebra.instances.all.*
+import coulomb.Quantity
+import coulomb.conversion.*
+import coulomb.syntax.*
 import coulomb.units.accepted.*
 import lucuma.core.geom.*
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 import lucuma.core.math.units.*
-import spire.std.bigDecimal.*
 
 // Syntax used in the JTS implementation only.
 object all extends shapeexpression:
-  extension[U](q: Quantity[BigDecimal, U])(using UnitConversion[BigDecimal, U, Millimeter])
+  extension[U](q: Quantity[BigDecimal, U])(using uc: UnitConversion[BigDecimal, U, Millimeter])
     def toTelescopePlane: Quantity[BigDecimal, ArcSecond] =
-      q.toUnit[Millimeter] * TelescopePlateScale
+      uc(q.value).withUnit[Millimeter] * TelescopePlateScale
 
   extension[U](q: (Quantity[BigDecimal, U], Quantity[BigDecimal, U]))(using UnitConversion[BigDecimal, U, Millimeter])
     def toTelescopePlaneOffset: (Offset.P, Offset.Q) =
       (q._1.toTelescopePlane.toAngle.p, q._2.toTelescopePlane.toAngle.q)
 
-  extension[U](q: Quantity[BigDecimal, U])(using UnitConversion[BigDecimal, U, Millimeter])
+  extension[U](q: Quantity[BigDecimal, U])(using uc: UnitConversion[BigDecimal, U, Millimeter])
     def withPlateScale(ps: Quantity[BigDecimal, ArcSecondPerMillimeter]): Quantity[BigDecimal, ArcSecond] =
-      q.toUnit[Millimeter] * ps
+      import algebra.instances.all.given
+      uc(q.value).withUnit[Millimeter] * ps
 
     inline def ⨱(ps: Quantity[BigDecimal, ArcSecondPerMillimeter]): Quantity[BigDecimal, ArcSecond] =
       withPlateScale(ps)
@@ -43,7 +44,6 @@ object all extends shapeexpression:
 
     inline def ⤇(ps: Quantity[BigDecimal, ArcSecondPerMillimeter]): Offset =
       offsetWithPlateScale(ps)
-
 
   extension[U](o: Offset)
     def toDoubleArcseconds: (BigDecimal, BigDecimal) =

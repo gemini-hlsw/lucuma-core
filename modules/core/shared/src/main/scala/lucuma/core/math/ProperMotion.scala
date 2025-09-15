@@ -7,7 +7,6 @@ import algebra.instances.all.given
 import cats.*
 import cats.syntax.all.*
 import coulomb.*
-import coulomb.policy.spire.standard.given
 import coulomb.syntax.*
 import lucuma.core.math.units.*
 import lucuma.core.optics.SplitMono
@@ -38,7 +37,7 @@ object ProperMotion extends ProperMotionOptics {
   object AngularVelocity extends NewType[Quantity[Long, MicroArcSecondPerYear]] {
 
     private val Zero: AngularVelocity =
-      AngularVelocity(0.withUnit[MicroArcSecondPerYear])
+      AngularVelocity(0L.withUnit[MicroArcSecondPerYear])
 
     def zeroOf[A]: AngularVelocity Of A = Zero.tag[A]
 

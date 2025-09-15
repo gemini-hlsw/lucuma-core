@@ -3,10 +3,10 @@
 
 package lucuma.core.math
 
+import algebra.instances.all.*
 import cats.*
 import cats.kernel.laws.discipline.*
 import coulomb.*
-import coulomb.policy.spire.standard.given
 import coulomb.syntax.*
 import lucuma.core.math.Constants.SpeedOfLight
 import lucuma.core.math.arb.*
@@ -15,6 +15,7 @@ import monocle.law.discipline.IsoTests
 import org.scalacheck.Prop.*
 
 import java.math.MathContext
+import scala.language.implicitConversions
 
 final class RedshiftSuite extends munit.DisciplineSuite {
   import ArbRedshift.given
