@@ -9,7 +9,6 @@ import cats.kernel.BoundedSemilattice
 import cats.syntax.eq.*
 import cats.syntax.foldable.*
 import cats.syntax.option.*
-import cats.syntax.traverse.*
 
 import scala.collection.immutable.SortedSet
 
@@ -91,9 +90,9 @@ sealed class TimestampUnion private (val intervals: SortedSet[TimestampInterval]
    * result fits in a `TimeSpan`.
    */
   def sum: Option[TimeSpan] =
-    intervals.toList.traverse(_.timeSpan).flatMap { ts =>
-      ts.foldLeft(TimeSpan.Zero.some) { case (s, t) => s.flatMap(_.add(t)) }
-    }
+    intervals.toList
+      .map(_.timeSpan)
+      .foldLeft(TimeSpan.Zero.some) { case (s, t) => s.flatMap(_.add(t)) }
 
   /**
    * Sums the time spanned by all the intervals in this union, capping the
@@ -101,7 +100,7 @@ sealed class TimestampUnion private (val intervals: SortedSet[TimestampInterval]
    * convenient than `sum`.
    */
   def boundedSum: TimeSpan =
-    intervals.foldMap(_.boundedTimeSpan)
+    intervals.foldMap(_.timeSpan)
 
   def isEmpty: Boolean =
     intervals.isEmpty

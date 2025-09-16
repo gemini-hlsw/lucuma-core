@@ -86,7 +86,7 @@ class TimestampUnionSuite extends DisciplineSuite {
 
   test("boundedSum") {
     forAll { (u: TimestampUnion) =>
-      assertEquals(u.boundedSum, u.intervals.foldMap(_.boundedTimeSpan))
+      assertEquals(u.boundedSum, u.intervals.foldMap(_.timeSpan))
     }
   }
 }
