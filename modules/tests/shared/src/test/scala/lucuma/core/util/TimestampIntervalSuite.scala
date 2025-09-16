@@ -199,13 +199,14 @@ class TimestampIntervalSuite extends DisciplineSuite {
     // Disjoint, out of order
     assertEquals(interval(29, 30).timeBetween(interval(0, 10)), Some(timeSpan(19)))
 
-    val oor = TimestampInterval.between(Timestamp.Max, Timestamp.Max)
+    val max = TimestampInterval.between(Timestamp.Max, Timestamp.Max)
+    val min = TimestampInterval.between(Timestamp.Min, Timestamp.Min)
 
-    // Out of range, in order
-    assertEquals(interval(0, 1).timeBetween(oor), None)
+    // Max disjoint, in order
+    assertEquals(min.timeBetween(max), Some(timeSpan(Timestamp.Max.toEpochMilli - Timestamp.Min.toEpochMilli)))
 
-    // Out of range, out of order
-    assertEquals(oor.timeBetween(interval(0, 10)), None)
+    // Max disjoint, out of order
+    assertEquals(max.timeBetween(min), Some(timeSpan(Timestamp.Max.toEpochMilli - Timestamp.Min.toEpochMilli)))
   }
 
   test("until abuts from") {

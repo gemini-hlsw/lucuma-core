@@ -43,6 +43,8 @@ object time:
     /** Round an Instant to the nearest value of the specified unit. */
     def roundTo(units: TemporalUnit): Instant =
       roundTemporalTo(i, units, _.truncatedTo(_), _.plus(_, _))
+    def toTimestampBounds: Instant =
+      Timestamp.fromInstantTruncatedAndBounded(i).toInstant
 
   extension (ldt: LocalDateTime)
     /** Round a LocalDateTime to the nearest value of the specified unit. */

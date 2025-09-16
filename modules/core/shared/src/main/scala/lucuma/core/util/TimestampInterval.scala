@@ -149,8 +149,7 @@ sealed class TimestampInterval private (val start: Timestamp, val end: Timestamp
       
   /**
    * Determine the time between the end of the earlier interval and the
-   * start of the later (None if it doesn't fit in a TimeSpan), or 
-   * TimeSpan.Zero if they intersect or abut.
+   * start of the later, or TimeSpan.Zero if they intersect or abut.
    */
   def timeBetween(other: TimestampInterval): Option[TimeSpan] = 
     if (intersects(other)) TimeSpan.Zero.some
