@@ -30,20 +30,10 @@ sealed class TimestampInterval private (val start: Timestamp, val end: Timestamp
   assert(start <= end, s"start time ($start) must be <= end time ($end)")
 
   /**
-   * The amount of time represented by the interval, if possible to fit in a
-   * TimeSpan.
+   * The amount of time represented by the interval.
    */
-  def timeSpan: Option[TimeSpan] =
+  def timeSpan: TimeSpan =
     TimeSpan.between(start, end)
-
-  /**
-   * The amount of time represented by the interval, but capped at
-   * TimeSpan.Max.  Most TimestampIntervals in practice will fall
-   * well short of TimeSpan.Max and this provides a convenient way
-   * of working with time spans that avoids Option.
-   */
-  def boundedTimeSpan: TimeSpan =
-    timeSpan.getOrElse(TimeSpan.Max)
 
   def contains(time: Timestamp): Boolean =
     start <= time && time < end
@@ -151,16 +141,10 @@ sealed class TimestampInterval private (val start: Timestamp, val end: Timestamp
    * Determine the time between the end of the earlier interval and the
    * start of the later, or TimeSpan.Zero if they intersect or abut.
    */
-  def timeBetween(other: TimestampInterval): Option[TimeSpan] = 
-    if (intersects(other)) TimeSpan.Zero.some
+  def timeBetween(other: TimestampInterval): TimeSpan = 
+    if (intersects(other)) TimeSpan.Zero
     else if (this < other) TimeSpan.between(end, other.start)
     else TimeSpan.between(other.end, start)
-
-  /**
-   * `timeBetween` but capped at TimeSpan.Max.
-   */
-  def boundedTimeBetween(other: TimestampInterval): TimeSpan = 
-    timeBetween(other).getOrElse(TimeSpan.Max) 
 
   override def equals(that: Any): Boolean =
     that match {

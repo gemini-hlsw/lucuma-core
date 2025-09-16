@@ -235,12 +235,12 @@ object TimeSpan {
   }
 
   /**
-   * Obtains the absolute (i.e., positive regardless of order) time span between two Timestamp, if in range.
+   * Obtains the absolute (i.e., positive regardless of order) time span between two Timestamp.
    */
-  def between(t0: Timestamp, t1: Timestamp): Option[TimeSpan] =
+  def between(t0: Timestamp, t1: Timestamp): TimeSpan =
     fromDuration(
       Duration.between(t0.toInstant, t1.toInstant).abs
-    )
+    ).get
 
   val NonNegMicroseconds: Iso[NonNegLong, TimeSpan] =
     Iso[NonNegLong, TimeSpan](fromNonNegMicroseconds)(toNonNegMicroseconds)

@@ -173,40 +173,40 @@ class TimestampIntervalSuite extends DisciplineSuite {
 
   test("timeBetween") {
     // Lower Partial
-    assertEquals(interval(1, 10).timeBetween(interval(0,  2)), Some(TimeSpan.Zero))
+    assertEquals(interval(1, 10).timeBetween(interval(0,  2)), TimeSpan.Zero)
 
     // Upper Partial
-    assertEquals(interval(1, 10).timeBetween(interval(9, 11)), Some(TimeSpan.Zero))
+    assertEquals(interval(1, 10).timeBetween(interval(9, 11)), TimeSpan.Zero)
 
     // Proper Superset
-    assertEquals(interval(0, 10).timeBetween(interval(3,  6)), Some(TimeSpan.Zero))
+    assertEquals(interval(0, 10).timeBetween(interval(3,  6)), TimeSpan.Zero)
 
     // Proper Subset
-    assertEquals(interval(3, 6).timeBetween(interval(0, 10)), Some(TimeSpan.Zero))
+    assertEquals(interval(3, 6).timeBetween(interval(0, 10)), TimeSpan.Zero)
 
     // Equal
-    assertEquals(interval(0, 10).timeBetween(interval(0, 10)), Some(TimeSpan.Zero))
+    assertEquals(interval(0, 10).timeBetween(interval(0, 10)), TimeSpan.Zero)
 
     // Abuts, in order
-    assertEquals(interval(0, 10).timeBetween(interval(10, 20)), Some(TimeSpan.Zero))
+    assertEquals(interval(0, 10).timeBetween(interval(10, 20)), TimeSpan.Zero)
 
     // Abuts, out of order
-    assertEquals(interval(10, 20).timeBetween(interval(0, 10)), Some(TimeSpan.Zero))
+    assertEquals(interval(10, 20).timeBetween(interval(0, 10)), TimeSpan.Zero)
 
     // Disjoint, in order
-    assertEquals(interval(0, 10).timeBetween(interval(15, 20)), Some(timeSpan(5)))
+    assertEquals(interval(0, 10).timeBetween(interval(15, 20)), timeSpan(5))
 
     // Disjoint, out of order
-    assertEquals(interval(29, 30).timeBetween(interval(0, 10)), Some(timeSpan(19)))
+    assertEquals(interval(29, 30).timeBetween(interval(0, 10)), timeSpan(19))
 
     val max = TimestampInterval.between(Timestamp.Max, Timestamp.Max)
     val min = TimestampInterval.between(Timestamp.Min, Timestamp.Min)
 
     // Max disjoint, in order
-    assertEquals(min.timeBetween(max), Some(timeSpan(Timestamp.Max.toEpochMilli - Timestamp.Min.toEpochMilli)))
+    assertEquals(min.timeBetween(max), timeSpan(Timestamp.Max.toEpochMilli - Timestamp.Min.toEpochMilli))
 
     // Max disjoint, out of order
-    assertEquals(max.timeBetween(min), Some(timeSpan(Timestamp.Max.toEpochMilli - Timestamp.Min.toEpochMilli)))
+    assertEquals(max.timeBetween(min), timeSpan(Timestamp.Max.toEpochMilli - Timestamp.Min.toEpochMilli))
   }
 
   test("until abuts from") {
