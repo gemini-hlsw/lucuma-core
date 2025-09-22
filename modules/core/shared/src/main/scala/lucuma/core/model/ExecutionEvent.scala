@@ -14,18 +14,19 @@ import lucuma.core.model.sequence.Atom
 import lucuma.core.model.sequence.Dataset
 import lucuma.core.model.sequence.Step
 import lucuma.core.refined.auto.*
+import lucuma.core.util.IdempotencyKey
 import lucuma.core.util.Timestamp
 import lucuma.core.util.WithGid
 import monocle.Prism
 import monocle.macros.GenPrism
 
-sealed trait ExecutionEvent derives Eq {
+sealed trait ExecutionEvent derives Eq:
 
-  def id:            ExecutionEvent.Id
-  def received:      Timestamp
-  def observationId: Observation.Id
-  def visitId:       Visit.Id
-  def clientId:      Option[Client.Id]
+  def id:             ExecutionEvent.Id
+  def received:       Timestamp
+  def observationId:  Observation.Id
+  def visitId:        Visit.Id
+  def idempotencyKey: Option[IdempotencyKey]
 
   import ExecutionEvent.*
 
@@ -36,67 +37,64 @@ sealed trait ExecutionEvent derives Eq {
     stepEvent:     StepEvent     => A,
     datasetEvent:  DatasetEvent  => A
   ): A =
-    this match {
+    this match
       case e@SlewEvent(_, _, _, _, _, _)             => slewEvent(e)
       case e@SequenceEvent(_, _, _, _, _, _)         => sequenceEvent(e)
       case e@AtomEvent(_, _, _, _, _, _, _)          => atomEvent(e)
       case e@StepEvent(_, _, _, _, _, _, _, _)       => stepEvent(e)
       case e@DatasetEvent(_, _, _, _, _, _, _, _, _) => datasetEvent(e)
-    }
 
-}
-
-object ExecutionEvent extends WithGid('e'.refined) {
+object ExecutionEvent extends WithGid('e'.refined):
 
   case class SlewEvent(
-    id:            ExecutionEvent.Id,
-    received:      Timestamp,
-    observationId: Observation.Id,
-    visitId:       Visit.Id,
-    clientId:      Option[Client.Id],
-    stage:         SlewStage
+    id:             ExecutionEvent.Id,
+    received:       Timestamp,
+    observationId:  Observation.Id,
+    visitId:        Visit.Id,
+    idempotencyKey: Option[IdempotencyKey],
+    stage:          SlewStage
   ) extends ExecutionEvent derives Eq
 
   case class SequenceEvent(
-    id:            ExecutionEvent.Id,
-    received:      Timestamp,
-    observationId: Observation.Id,
-    visitId:       Visit.Id,
-    clientId:      Option[Client.Id],
-    command:       SequenceCommand
+    id:             ExecutionEvent.Id,
+    received:       Timestamp,
+    observationId:  Observation.Id,
+    visitId:        Visit.Id,
+    idempotencyKey: Option[IdempotencyKey],
+    command:        SequenceCommand
   ) extends ExecutionEvent derives Eq
 
   case class AtomEvent(
-    id:            ExecutionEvent.Id,
-    received:      Timestamp,
-    observationId: Observation.Id,
-    visitId:       Visit.Id,
-    clientId:      Option[Client.Id],
-    atomId:        Atom.Id,
-    stage:         AtomStage
+    id:             ExecutionEvent.Id,
+    received:       Timestamp,
+    observationId:  Observation.Id,
+    visitId:        Visit.Id,
+    idempotencyKey: Option[IdempotencyKey],
+    atomId:         Atom.Id,
+    stage:          AtomStage
   ) extends ExecutionEvent derives Eq
 
   case class StepEvent(
-    id:            ExecutionEvent.Id,
-    received:      Timestamp,
-    observationId: Observation.Id,
-    visitId:       Visit.Id,
-    clientId:      Option[Client.Id],
-    atomId:        Atom.Id,
-    stepId:        Step.Id,
-    stage:         StepStage
+    id:             ExecutionEvent.Id,
+    received:       Timestamp,
+    observationId:  Observation.Id,
+    visitId:        Visit.Id,
+    idempotencyKey: Option[IdempotencyKey],
+    atomId:         Atom.Id,
+    stepId:         Step.Id,
+    stage:          StepStage
   ) extends ExecutionEvent derives Eq
 
   case class DatasetEvent(
-    id:            ExecutionEvent.Id,
-    received:      Timestamp,
-    observationId: Observation.Id,
-    visitId:       Visit.Id,
-    clientId:      Option[Client.Id],
-    atomId:        Atom.Id,
-    stepId:        Step.Id,
-    datasetId:     Dataset.Id,
-    stage:         DatasetStage
+    id:             ExecutionEvent.Id,
+    received:       Timestamp,
+    observationId:  Observation.Id,
+    visitId:        Visit.Id,
+    idempotencyKey: Option[IdempotencyKey],
+    atomId:         Atom.Id,
+    stepId:         Step.Id,
+    datasetId:      Dataset.Id,
+    stage:          DatasetStage
   ) extends ExecutionEvent derives Eq
 
   val atomEvent: Prism[ExecutionEvent, AtomEvent] =
@@ -113,5 +111,3 @@ object ExecutionEvent extends WithGid('e'.refined) {
 
   val stepEvent: Prism[ExecutionEvent, StepEvent] =
     GenPrism[ExecutionEvent, StepEvent]
-
-}

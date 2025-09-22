@@ -12,35 +12,37 @@ import lucuma.core.enums.StepStage
 import lucuma.core.model.sequence.Atom
 import lucuma.core.model.sequence.Dataset
 import lucuma.core.model.sequence.Step
+import lucuma.core.util.IdempotencyKey
 import lucuma.core.util.Timestamp
 import lucuma.core.util.arb.ArbEnumerated
 import lucuma.core.util.arb.ArbGid
+import lucuma.core.util.arb.ArbIdempotencyKey
 import lucuma.core.util.arb.ArbTimestamp
 import lucuma.core.util.arb.ArbUid
 import org.scalacheck.*
 import org.scalacheck.Arbitrary.*
 
-trait ArbExecutionEvent {
+trait ArbExecutionEvent:
 
   import ArbEnumerated.given
   import ArbGid.given
+  import ArbIdempotencyKey.given
   import ArbTimestamp.given
   import ArbUid.given
 
   given Arbitrary[ExecutionEvent.DatasetEvent] =
-    Arbitrary {
-      for {
+    Arbitrary:
+      for
         eid <- arbitrary[ExecutionEvent.Id]
         rec <- arbitrary[Timestamp]
         oid <- arbitrary[Observation.Id]
         vid <- arbitrary[Visit.Id]
         aid <- arbitrary[Atom.Id]
-        cid <- arbitrary[Option[Client.Id]]
+        idm <- arbitrary[Option[IdempotencyKey]]
         sid <- arbitrary[Step.Id]
         did <- arbitrary[Dataset.Id]
         stg <- arbitrary[DatasetStage]
-      } yield ExecutionEvent.DatasetEvent(eid, rec, oid, vid, cid, aid, sid, did, stg)
-    }
+      yield ExecutionEvent.DatasetEvent(eid, rec, oid, vid, idm, aid, sid, did, stg)
 
   given Cogen[ExecutionEvent.DatasetEvent] =
     Cogen[(
@@ -48,7 +50,7 @@ trait ArbExecutionEvent {
       Timestamp,
       Observation.Id,
       Visit.Id,
-      Option[Client.Id],
+      Option[IdempotencyKey],
       Atom.Id,
       Step.Id,
       Dataset.Id,
@@ -58,7 +60,7 @@ trait ArbExecutionEvent {
       a.received,
       a.observationId,
       a.visitId,
-      a.clientId,
+      a.idempotencyKey,
       a.atomId,
       a.stepId,
       a.datasetId,
@@ -66,16 +68,15 @@ trait ArbExecutionEvent {
     )}
 
   given Arbitrary[ExecutionEvent.SequenceEvent] =
-    Arbitrary {
-      for {
+    Arbitrary:
+      for
         eid <- arbitrary[ExecutionEvent.Id]
         rec <- arbitrary[Timestamp]
         oid <- arbitrary[Observation.Id]
         vid <- arbitrary[Visit.Id]
-        cid <- arbitrary[Option[Client.Id]]
+        idm <- arbitrary[Option[IdempotencyKey]]
         cmd <- arbitrary[SequenceCommand]
-      } yield ExecutionEvent.SequenceEvent(eid, rec, oid, vid, cid, cmd)
-    }
+      yield ExecutionEvent.SequenceEvent(eid, rec, oid, vid, idm, cmd)
 
   given Cogen[ExecutionEvent.SequenceEvent] =
     Cogen[(
@@ -83,28 +84,27 @@ trait ArbExecutionEvent {
       Timestamp,
       Observation.Id,
       Visit.Id,
-      Option[Client.Id],
+      Option[IdempotencyKey],
       SequenceCommand
     )].contramap { a => (
       a.id,
       a.received,
       a.observationId,
       a.visitId,
-      a.clientId,
+      a.idempotencyKey,
       a.command
     )}
 
   given Arbitrary[ExecutionEvent.SlewEvent] =
-    Arbitrary {
-      for {
+    Arbitrary:
+      for
         eid <- arbitrary[ExecutionEvent.Id]
         rec <- arbitrary[Timestamp]
         oid <- arbitrary[Observation.Id]
         vid <- arbitrary[Visit.Id]
-        cid <- arbitrary[Option[Client.Id]]
+        idm <- arbitrary[Option[IdempotencyKey]]
         stg <- arbitrary[SlewStage]
-      } yield ExecutionEvent.SlewEvent(eid, rec, oid, vid, cid, stg)
-    }
+      yield ExecutionEvent.SlewEvent(eid, rec, oid, vid, idm, stg)
 
   given Cogen[ExecutionEvent.SlewEvent] =
     Cogen[(
@@ -112,29 +112,28 @@ trait ArbExecutionEvent {
       Timestamp,
       Observation.Id,
       Visit.Id,
-      Option[Client.Id],
+      Option[IdempotencyKey],
       SlewStage
     )].contramap { a => (
       a.id,
       a.received,
       a.observationId,
       a.visitId,
-      a.clientId,
+      a.idempotencyKey,
       a.stage
     )}
 
   given Arbitrary[ExecutionEvent.AtomEvent] =
-    Arbitrary {
-      for {
+    Arbitrary:
+      for
         eid <- arbitrary[ExecutionEvent.Id]
         rec <- arbitrary[Timestamp]
         oid <- arbitrary[Observation.Id]
         vid <- arbitrary[Visit.Id]
-        cid <- arbitrary[Option[Client.Id]]
+        idm <- arbitrary[Option[IdempotencyKey]]
         aid <- arbitrary[Atom.Id]
         stg <- arbitrary[AtomStage]
-      } yield ExecutionEvent.AtomEvent(eid, rec, oid, vid, cid, aid, stg)
-    }
+      yield ExecutionEvent.AtomEvent(eid, rec, oid, vid, idm, aid, stg)
 
   given Cogen[ExecutionEvent.AtomEvent] =
     Cogen[(
@@ -142,7 +141,7 @@ trait ArbExecutionEvent {
       Timestamp,
       Observation.Id,
       Visit.Id,
-      Option[Client.Id],
+      Option[IdempotencyKey],
       Atom.Id,
       AtomStage
     )].contramap { a => (
@@ -150,24 +149,23 @@ trait ArbExecutionEvent {
       a.received,
       a.observationId,
       a.visitId,
-      a.clientId,
+      a.idempotencyKey,
       a.atomId,
       a.stage
     )}
 
   given Arbitrary[ExecutionEvent.StepEvent] =
-    Arbitrary {
-      for {
+    Arbitrary:
+      for
         eid <- arbitrary[ExecutionEvent.Id]
         rec <- arbitrary[Timestamp]
         oid <- arbitrary[Observation.Id]
         vid <- arbitrary[Visit.Id]
         aid <- arbitrary[Atom.Id]
-        cid <- arbitrary[Option[Client.Id]]
+        idm <- arbitrary[Option[IdempotencyKey]]
         sid <- arbitrary[Step.Id]
         stg <- arbitrary[StepStage]
-      } yield ExecutionEvent.StepEvent(eid, rec, oid, vid, cid, aid, sid, stg)
-    }
+      yield ExecutionEvent.StepEvent(eid, rec, oid, vid, idm, aid, sid, stg)
 
   given Cogen[ExecutionEvent.StepEvent] =
     Cogen[(
@@ -175,7 +173,7 @@ trait ArbExecutionEvent {
       Timestamp,
       Observation.Id,
       Visit.Id,
-      Option[Client.Id],
+      Option[IdempotencyKey],
       Atom.Id,
       Step.Id,
       StepStage
@@ -184,7 +182,7 @@ trait ArbExecutionEvent {
       a.received,
       a.observationId,
       a.visitId,
-      a.clientId,
+      a.idempotencyKey,
       a.atomId,
       a.stepId,
       a.stage
@@ -215,6 +213,5 @@ trait ArbExecutionEvent {
       ExecutionEvent.slewEvent.getOption(a),
       ExecutionEvent.stepEvent.getOption(a)
     )}
-}
 
 object ArbExecutionEvent extends ArbExecutionEvent
