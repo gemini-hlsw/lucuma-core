@@ -187,6 +187,7 @@ lazy val horizons = crossProject(JVMPlatform, JSPlatform)
 lazy val horizonsTests = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Full)
   .in(file("modules/horizons-tests"))
+  .enablePlugins(NoPublishPlugin)
   .dependsOn(horizons)
   .settings(
     name := "lucuma-horizons-tests",
