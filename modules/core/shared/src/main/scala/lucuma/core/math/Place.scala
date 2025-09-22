@@ -6,10 +6,10 @@ package lucuma.core.math
 import cats.Eq
 import cats.Show
 import coulomb.*
-import coulomb.ops.algebra.cats.all.given
+import coulomb.integrations.cats.quantity.given
 import coulomb.units.si.Meter
-import eu.timepit.refined.cats.*
 import eu.timepit.refined.types.numeric.NonNegInt
+import lucuma.core.refined.given
 import monocle.Focus
 import monocle.Lens
 import org.typelevel.cats.time.*

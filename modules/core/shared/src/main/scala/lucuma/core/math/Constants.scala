@@ -6,7 +6,6 @@ package lucuma.core.math
 import coulomb.*
 import coulomb.conversion.ValueConversion
 import coulomb.define.DerivedUnit
-import coulomb.policy.spire.standard.given
 import coulomb.units.constants.*
 import coulomb.units.si.Meter
 import lucuma.core.math.units.MetersPerSecond
@@ -30,7 +29,7 @@ object Constants {
 
   /** One AU in meters. */
   def AstronomicalUnit[V](
-    using ValueConversion[coulomb.rational.Rational, V]
+    using ValueConversion[Rational, V]
   ): Quantity[V, Meter] = constant[V, AstronomicalUnit]
 
   /** Meters/sec in 1 AU/day. */
@@ -41,7 +40,7 @@ object Constants {
 
   /** Equatorial radius of Earth. */
   def EquatorialRadius[V](
-    using ValueConversion[coulomb.rational.Rational, V]
+    using ValueConversion[Rational, V]
   ): Quantity[V, Meter] = constant[V, EquatorialRadius]
 
   /** Zenith extinction as magnitude. For use in lunar sky brightness calculations. */
@@ -56,7 +55,7 @@ object Constants {
 
   /** Speed of light in meters per second. Exact. */
   val SpeedOfLight: Quantity[Int, MetersPerSecond] =
-    constant[Rational, SpeedOfLight].tToValue[Int]
+    constant[Rational, SpeedOfLight].toValue[Int]
 
   /** Seconds in a Day. For Convenience. */
   val SecsInDay: Long = Duration.ofDays(1).getSeconds

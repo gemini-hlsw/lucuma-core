@@ -3,8 +3,8 @@
 
 package lucuma.core.model
 
+import lucuma.core.refined.auto.*
 import lucuma.core.util.WithGid
-import lucuma.refined.*
 
 object Attachment       extends WithGid('a'.refined)
 object CallForProposals extends WithGid('c'.refined)

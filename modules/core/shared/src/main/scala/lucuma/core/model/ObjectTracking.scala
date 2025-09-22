@@ -17,31 +17,31 @@ import lucuma.core.util.NewType
 import java.time.Instant
 
 // Tag to indicate the coordinates have been corrected for proper motion
-object CoordinatesAtVizTime extends NewType[Coordinates]
-type CoordinatesAtVizTime = CoordinatesAtVizTime.Type
+object CoordinatesAt extends NewType[Coordinates]
+type CoordinatesAt = CoordinatesAt.Type
 
 /**
  * Generic representation to track an object. It is generalization of SiderealTracking but allows
  * tracking "virtual" objects like the center of an asterism
  */
 sealed trait ObjectTracking derives Eq:
-  def at(i: Instant): Option[CoordinatesAtVizTime]
+  def at(i: Instant): Option[CoordinatesAt]
   def baseCoordinates: Coordinates
 
 object ObjectTracking:
 
   case class SiderealObjectTracking(tracking: SiderealTracking) extends ObjectTracking derives Eq:
-    def at(i: Instant): Option[CoordinatesAtVizTime] =
-      tracking.at(i).map(CoordinatesAtVizTime(_))
+    def at(i: Instant): Option[CoordinatesAt] =
+      tracking.at(i).map(CoordinatesAt(_))
     def baseCoordinates: Coordinates                 = tracking.baseCoordinates
 
   case class SiderealAsterismTracking(trackings : NonEmptyList[SiderealTracking]) extends ObjectTracking derives Eq:
-    def at(i: Instant): Option[CoordinatesAtVizTime] =
-      trackings.centerOfAt(i).map(CoordinatesAtVizTime(_))
+    def at(i: Instant): Option[CoordinatesAt] =
+      trackings.centerOfAt(i).map(CoordinatesAt(_))
     def baseCoordinates: Coordinates                 = trackings.centerOf
 
   case class ConstantTracking(coordinates: Coordinates) extends ObjectTracking derives Eq:
-    def at(i: Instant): Option[CoordinatesAtVizTime] = CoordinatesAtVizTime(coordinates).some
+    def at(i: Instant): Option[CoordinatesAt] = CoordinatesAt(coordinates).some
     def baseCoordinates: Coordinates = coordinates
 
   def fromTarget(target: Target): Option[ObjectTracking] =
@@ -50,8 +50,8 @@ object ObjectTracking:
   def orRegionFromTarget(target: Target): Either[ObjectTracking, Region] =
     target match
       case t: Target.Sidereal    => SiderealObjectTracking(t.tracking).asLeft
-      case t: Target.Opportunity => t.region.asRight 
-      case t: Target.Nonsidereal => sys.error("Nonsidereal targets not supported yet.")    
+      case t: Target.Opportunity => t.region.asRight
+      case t: Target.Nonsidereal => sys.error("Nonsidereal targets not supported yet.")
 
   def fromAsterism(targets: NonEmptyList[Target]): Option[ObjectTracking] =
     orRegionFromAsterism(targets).left.toOption
@@ -68,8 +68,8 @@ object ObjectTracking:
             Target
               .sidereal
               .getOption(t)
-              .getOrElse(sys.error("unpossible, list should only contain sidereal targets"))          
-          match          
+              .getOrElse(sys.error("unpossible, list should only contain sidereal targets"))
+          match
             case NonEmptyList(h, Nil) => SiderealObjectTracking(h.tracking)
             case NonEmptyList(h, t)   => SiderealAsterismTracking(NonEmptyList(h, t).map(_.tracking))
 

@@ -7,7 +7,6 @@ import cats.syntax.all.*
 import coulomb.*
 import eu.timepit.refined.*
 import eu.timepit.refined.api.*
-import eu.timepit.refined.cats.given
 import eu.timepit.refined.numeric.Interval
 import eu.timepit.refined.types.numeric.NonNegShort
 import lucuma.core.refined.given
@@ -35,7 +34,7 @@ object CloudExtinction extends NewRefined[Extinction, CloudExtinctionPredicate]:
 
     def toVegaMagnitude: BigDecimal =
       val r = toExtinction.toVegaMagnitude.value
-      BigDecimal(r.n) / BigDecimal(r.d)
+      BigDecimal(r.numerator.toLong) / BigDecimal(r.denominator.toLong)
 
     def label: String =
       if (ce === Preset.Zero.toCloudExtinction)

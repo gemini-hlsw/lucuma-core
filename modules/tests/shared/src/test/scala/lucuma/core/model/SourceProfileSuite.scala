@@ -26,10 +26,10 @@ import lucuma.core.math.arb.ArbWavelength
 import lucuma.core.math.dimensional.arb.ArbMeasure
 import lucuma.core.math.units.*
 import lucuma.core.model.arb.*
+import lucuma.core.refined.auto.*
 import lucuma.core.util.arb.ArbCollection
 import lucuma.core.util.arb.ArbEnumerated
 import lucuma.core.util.arb.ArbNewType
-import lucuma.refined.*
 import monocle.law.discipline.*
 import munit.*
 

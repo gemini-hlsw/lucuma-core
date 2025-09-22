@@ -25,12 +25,11 @@ trait GaiaClient[F[_]]:
   def queryById(sourceId: Long): F[EitherNec[CatalogProblem, Target.Sidereal]]
 
 object GaiaClient:
-  inline def build[F[_]](
+  inline def build[F[_]: Concurrent](
     httpClient: Client[F],
     modUri:     Uri => Uri = identity, // Override this if you need to add a CORS proxy
     adapters:   NonEmptyChain[CatalogAdapter.Gaia] = DefaultAdapters
-  )(using F: Concurrent[F]) =
-    GaiaClientImpl[F](httpClient, modUri, adapters)
+  ) = GaiaClientImpl[F](httpClient, modUri, adapters)
 
   val DefaultAdapters: NonEmptyChain[CatalogAdapter.Gaia] =
     NonEmptyChain.of(

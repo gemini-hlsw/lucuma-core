@@ -15,6 +15,7 @@ import lucuma.core.math.Lat
 import lucuma.core.math.Lon
 import lucuma.core.math.Place
 import lucuma.core.math.units.*
+import lucuma.core.math.units.refined.*
 import lucuma.core.model.AirMass
 import lucuma.core.model.ObservingNight
 import lucuma.core.util.DateInterval

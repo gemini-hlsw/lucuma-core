@@ -18,9 +18,9 @@ import eu.timepit.refined.types.numeric.PosInt
 import eu.timepit.refined.types.numeric.PosLong
 import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.core.optics.*
+import lucuma.core.refined.auto.*
 import lucuma.core.syntax.string.*
 import lucuma.core.syntax.validation.*
-import lucuma.refined.*
 import monocle.Iso
 import monocle.Prism
 

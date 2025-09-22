@@ -4,7 +4,6 @@
 package lucuma.core.math
 
 import coulomb.*
-import coulomb.conversion.TruncatingUnitConversion
 import coulomb.conversion.ValueConversion
 import coulomb.define.*
 import coulomb.syntax.*
@@ -16,12 +15,11 @@ import eu.timepit.refined.*
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.api.Validate
 import eu.timepit.refined.auto.*
-import eu.timepit.refined.numeric.*
 import eu.timepit.refined.types.numeric.NonNegInt
 import eu.timepit.refined.types.numeric.PosInt
+import lucuma.core.refined.auto.*
 import lucuma.core.util.TypeString
-import lucuma.refined.*
-import spire.math.*
+import spire.math.Rational
 
 trait units {
 
@@ -148,29 +146,27 @@ trait units {
   given TypeString[ErgsPerSecondCentimeter2Arcsec2] =
     TypeString("ERG_PER_S_PER_CM_SQUARED_PER_ARCSEC_SQUARED")
 
-  // PosInt can be converted to Rational exactly
-  given rationalPosIntConverter: ValueConversion[PosInt, Rational] = Rational(_)
+  object conversions:
+    // PosInt can be converted to Rational exactly
+    given rationalPosIntConverter: ValueConversion[PosInt, Rational] = Rational(_)
 
-  given ValueConversion[NonNegInt, Double] = _.value.toDouble
+    given ValueConversion[NonNegInt, Double] = _.value.toDouble
 
-  given ValueConversion[Parallax.LongParallaxμas, Rational] = Rational(_)
+    given ValueConversion[Parallax.LongParallaxμas, Rational] = Rational(_)
 
-  given refinedValueConversion[V, P]: ValueConversion[V Refined P, V] = _.value
+    given refinedValueConversion[V, P]: ValueConversion[V Refined P, V] = _.value
 
-  given [UF, UT]: TruncatingUnitConversion[PosInt, UF, UT] = v =>
-    refineV[Positive](coulomb.conversion.standard.unit.ctx_TUC_Int(v))
-      .getOrElse(1.refined[Positive])
+  object refined:
+    extension [A](inline a: A)
+      inline def withRefinedUnit[P, U](using inline p: Predicate[A, P]): Quantity[Refined[A, P], U] = refineMV(a).withUnit[U]
 
-  extension [A](inline a: A)
-    inline def withRefinedUnit[P, U](using inline p: Predicate[A, P]): Quantity[Refined[A, P], U] = refineMV(a).withUnit[U]
+    inline def refineQV[R]: RefineQV[R] = RefineQV()
 
-  inline def refineQV[R]: RefineQV[R] = RefineQV()
-
-  final class RefineQV[P] {
-    inline def apply[V, U](q: Quantity[V, U])(using Validate[V, P]): Either[String, Quantity[V Refined P, U]] = {
-      refineV(q.value).map(_.withUnit[U])
+    final class RefineQV[P] {
+      inline def apply[V, U](q: Quantity[V, U])(using Validate[V, P]): Either[String, Quantity[V Refined P, U]] = {
+        refineV(q.value).map(_.withUnit[U])
+      }
     }
-  }
 
   extension (q: Quantity[BigDecimal, ArcSecond])
     inline def toAngle: Angle = Angle.fromBigDecimalArcseconds(q.value)

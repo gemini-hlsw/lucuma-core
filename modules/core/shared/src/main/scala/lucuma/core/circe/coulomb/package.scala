@@ -3,8 +3,8 @@
 
 package lucuma.core.circe.coulomb
 
-import _root_.coulomb.*
-import _root_.coulomb.syntax.*
+import coulomb.Quantity
+import coulomb.syntax.*
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.syntax.*

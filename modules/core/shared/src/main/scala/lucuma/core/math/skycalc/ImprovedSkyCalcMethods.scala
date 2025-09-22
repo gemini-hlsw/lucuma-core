@@ -3,10 +3,10 @@
 
 package lucuma.core.math.skycalc
 
-import coulomb.policy.spire.standard.given
+import algebra.instances.all.*
 import lucuma.core.math.Constants.*
 import lucuma.core.math.JulianDate.J2000
-import spire.std.double.*
+import lucuma.core.util.time.*
 
 import java.time.Instant
 import java.time.LocalTime
@@ -841,14 +841,8 @@ trait ImprovedSkyCalcMethods {
     var inter  = 0L
     var jd     = .0
     var jdfrac = .0
-    val date   = instant.atZone(ZoneOffset.UTC)
-    if (
-      (date.getYear <= 1900) | (date.getYear >= 2100)
-    ) //        printf("Date out of range.  1900 - 2100 only.\n");
-      //        return(0.);
-      throw new IllegalArgumentException(
-        "Date out of range.  1900 - 2100 only."
-      )
+    val date   = instant.toTimestampBounds.atZone(ZoneOffset.UTC)
+
     if (date.getMonthValue <= 2) {
       yr1 = -1
       mo1 = 13

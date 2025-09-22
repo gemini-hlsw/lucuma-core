@@ -25,19 +25,21 @@ import scala.annotation.targetName
 
 /**
  * Timestamp is an Instant truncated and limited to fit in a database
- * `timestamp` column.  Using a `Timestamp`, we're guaranteed to safely
- * round-trip values through the database.
+ * `timestamp` column AND a javascript date.  Using a `Timestamp`, we're
+ * guaranteed to safely round-trip values through the database.
  */
 
 opaque type Timestamp = Instant
 
 object Timestamp {
 
+  // Minimum postgres timestamp
   val Min: Timestamp =
     ZonedDateTime.of( -4712, 1, 1, 0, 0, 0, 0, UTC).toInstant
 
+  // Maximum (about) javascript Date (earlier than postgres maximum)
   val Max: Timestamp =
-    ZonedDateTime.of(294275, 12, 31, 23, 59, 59, 999999000, UTC).toInstant
+    ZonedDateTime.of(275760, 1, 1, 0, 0, 0, 0, UTC).toInstant
 
   /** Instant.EPOCH transformed to Timestamp */
   val Epoch: Timestamp =
@@ -59,6 +61,12 @@ object Timestamp {
   def fromInstantTruncated(value: Instant): Option[Timestamp] =
     fromInstant(value.truncatedTo(MICROS))
 
+  def fromInstantTruncatedAndBounded(value: Instant): Timestamp =
+    val truncated = value.truncatedTo(MICROS)
+    if (truncated < Min) Min
+    else if (truncated > Max) Max
+    else truncated
+
   def unsafeFromInstant(value: Instant): Timestamp =
     fromInstant(value).getOrElse(sys.error(s"$value out of Timestamp range or includes sub-microsecond precision"))
 
@@ -67,6 +75,9 @@ object Timestamp {
 
   def fromLocalDateTime(value: LocalDateTime): Option[Timestamp] =
     fromInstant(value.toInstant(UTC))
+
+  def fromLocalDateTimeTruncatedAndBounded(value: LocalDateTime): Timestamp =
+    fromInstantTruncatedAndBounded(value.toInstant(UTC))
 
   def unsafeFromLocalDateTime(value: LocalDateTime): Timestamp =
     fromLocalDateTime(value).getOrElse(sys.error(s"$value out of Timestamp range or includes sub-microsecond precision"))

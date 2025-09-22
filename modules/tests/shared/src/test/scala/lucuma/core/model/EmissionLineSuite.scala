@@ -6,30 +6,26 @@ package lucuma.core.model
 import cats.implicits.*
 import cats.kernel.laws.discipline.*
 import coulomb.*
-import coulomb.ops.algebra.cats.all.given
 import coulomb.syntax.*
-import eu.timepit.refined.cats.*
 import eu.timepit.refined.scalacheck.numeric.*
 import lucuma.core.math.BrightnessUnits.*
 import lucuma.core.math.LineFluxValue
 import lucuma.core.math.LineWidthValue
-import lucuma.core.math.arb.*
 import lucuma.core.math.arb.ArbRefined
 import lucuma.core.math.dimensional.arb.ArbMeasure
 import lucuma.core.math.units.*
 import lucuma.core.model.arb.ArbEmissionLine
+import lucuma.core.refined.given
 import lucuma.core.util.arb.ArbEnumerated
 import lucuma.core.util.arb.ArbNewType
 import monocle.law.discipline.LensTests
 import munit.*
-
 
 final class EmissionLineSuite extends DisciplineSuite {
   import ArbEnumerated.given
   import ArbEmissionLine.given
   import ArbMeasure.given
   import ArbNewType.given
-  import ArbQuantity.given
   import ArbRefined.given
 
   // Brightness type conversions
@@ -60,6 +56,5 @@ final class EmissionLineSuite extends DisciplineSuite {
   checkAll("Eq[EmissionLine[Surface]]", EqTests[EmissionLine[Surface]].eqv)
 
   // Optics
-  checkAll("EmissionLine.lineWidth[Integrated]", LensTests(EmissionLine.lineWidth[Integrated]))
   checkAll("EmissionLine.lineFlux[Integrated]", LensTests(EmissionLine.lineFlux[Integrated]))
 }

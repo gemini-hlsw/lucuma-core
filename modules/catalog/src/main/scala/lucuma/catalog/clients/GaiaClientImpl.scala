@@ -10,19 +10,18 @@ import cats.syntax.all.*
 import fs2.RaiseThrowable
 import lucuma.catalog.votable.*
 import lucuma.core.model.Target
-import lucuma.core.syntax.effect.*
+import lucuma.core.syntax.effect.raceAllToSuccess
 import org.http4s.Method
 import org.http4s.Request
 import org.http4s.Uri
 import org.http4s.client.Client
 
 // TODO Add Trace, we need natchez
-class GaiaClientImpl[F[_]](
+class GaiaClientImpl[F[_]: Concurrent](
   httpClient: Client[F],
   modUri:     Uri => Uri = identity, // Override this if you need to add a CORS proxy
   adapters:   NonEmptyChain[CatalogAdapter.Gaia] = GaiaClient.DefaultAdapters
-)(using F: Concurrent[F])
-    extends GaiaClient[F] {
+) extends GaiaClient[F] {
 
   /**
    * Request and parse data from Gaia

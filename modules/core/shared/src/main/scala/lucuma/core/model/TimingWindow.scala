@@ -59,9 +59,9 @@ final case class TimingWindow(
   end:       Option[TimingWindowEnd]
 ):
   def duration: Option[TimeSpan] =
-    end.flatMap {
+    end.map {
       case TimingWindowEnd.At(ts)      => TimeSpan.between(start, ts)
-      case TimingWindowEnd.After(d, _) => d.some
+      case TimingWindowEnd.After(d, _) => d
     }
 
   def isValid: Boolean =

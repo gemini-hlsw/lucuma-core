@@ -5,18 +5,17 @@ package lucuma.core.math
 
 import cats.*
 import coulomb.*
-import coulomb.ops.algebra.cats.all.given
-import coulomb.policy.spire.standard.given
+import coulomb.integrations.cats.quantity.given
 import coulomb.syntax.*
 import eu.timepit.refined.api.*
 import eu.timepit.refined.auto.*
-import eu.timepit.refined.cats.*
 import eu.timepit.refined.numeric.*
 import eu.timepit.refined.refineV
-import lucuma.core.math.units.{*, given}
+import lucuma.core.math.units.*
+import lucuma.core.math.units.conversions.given
 import lucuma.core.optics.*
+import lucuma.core.refined.given
 import spire.math.Rational
-import spire.std.long.*
 
 import scala.math.BigDecimal.RoundingMode
 
@@ -27,18 +26,16 @@ import scala.math.BigDecimal.RoundingMode
  * Parallax values need to be in the interval [0°, 180°].
  * 180° is a theoretical limit - actual astronomical values will be very small.
  */
-sealed abstract case class Parallax protected (
-  μas: Quantity[Parallax.LongParallaxμas, MicroArcSecond]
-) {
-  val mas: Quantity[Rational, MilliArcSecond] = μas.toValue[Rational].toUnit[MilliArcSecond]
-
-  override def toString: String =
-    s"Parallax(${μas.show})"
-}
+opaque type Parallax = Quantity[Parallax.LongParallaxμas, MicroArcSecond]
 
 object Parallax extends ParallaxOptics {
   type Parallaxμas     = Interval.Closed[0, Angle.Angle180µas]
   type LongParallaxμas = Long Refined Parallaxμas
+
+  extension(px: Parallax)
+    def μas: Quantity[Parallax.LongParallaxμas, MicroArcSecond] = px
+
+    def mas: Quantity[Rational, MilliArcSecond] = μas.toValue[Rational].toUnit[MilliArcSecond]
 
   /**
    * The `No parallax`
@@ -48,10 +45,10 @@ object Parallax extends ParallaxOptics {
 
   // Internal unbounded constructor
   private def applyUnsafe(μas: Long): Parallax =
-    apply(refineV[Parallaxμas](μas).toOption.get.withUnit[MicroArcSecond])
+    apply(refineV[Parallaxμas](μas).toOption.get)
 
-  def apply(μas: Quantity[LongParallaxμas, MicroArcSecond]): Parallax =
-    new Parallax(μas) {}
+  def apply(μas: LongParallaxμas): Parallax =
+    μas.withUnit[MicroArcSecond]
 
   /** @group Typeclass Instances */
   given Order[Parallax] =

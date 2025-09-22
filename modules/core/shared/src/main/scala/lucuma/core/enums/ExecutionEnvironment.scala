@@ -6,8 +6,8 @@ package lucuma.core.enums
 import cats.syntax.all.*
 import eu.timepit.refined.collection.NonEmpty
 import eu.timepit.refined.types.string.NonEmptyString
+import lucuma.core.refined.auto.*
 import lucuma.core.util.Enumerated
-import lucuma.refined.*
 
 enum ExecutionEnvironment(val tag: String, val suffix: Option[NonEmptyString]) derives Enumerated:
   case Development extends ExecutionEnvironment("DEVELOPMENT", "DEV".refined[NonEmpty].some)

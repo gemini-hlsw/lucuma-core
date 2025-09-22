@@ -4,11 +4,11 @@
 package lucuma.core.model
 
 import cats.kernel.laws.discipline.*
-import coulomb.ops.algebra.cats.all.given
-import eu.timepit.refined.cats.*
+import coulomb.integrations.cats.all.given
 import eu.timepit.refined.scalacheck.numeric.*
 import lucuma.core.math.arb.*
 import lucuma.core.model.arb.*
+import lucuma.core.refined.given
 import lucuma.core.util.arb.ArbEnumerated
 import monocle.law.discipline.LensTests
 import monocle.law.discipline.PrismTests

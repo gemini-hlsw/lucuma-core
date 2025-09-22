@@ -7,7 +7,7 @@ import cats.data.*
 import cats.effect.Concurrent
 import fs2.*
 import lucuma.catalog.*
-import lucuma.refined.*
+import lucuma.core.refined.auto.*
 import org.http4s.Method.*
 import org.http4s.Request
 import org.http4s.client.Client
