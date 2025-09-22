@@ -65,6 +65,14 @@ pull_request_rules:
       add:
       - core
       remove: []
+- name: Label horizons PRs
+  conditions:
+  - files~=^modules/horizons/
+  actions:
+    label:
+      add:
+      - horizons
+      remove: []
 - name: Label npm PRs
   conditions:
   - files~=^modules/npm/
