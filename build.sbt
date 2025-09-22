@@ -178,22 +178,33 @@ lazy val horizons = crossProject(JVMPlatform, JSPlatform)
   .settings(
     name := "lucuma-horizons",
     libraryDependencies ++= Seq(
-      "org.http4s"    %%% "http4s-core"          % http4sVersion,
-      "org.http4s"    %%% "http4s-client"        % http4sVersion,
+      "org.http4s"    %%% "http4s-core"   % http4sVersion,
+      "org.http4s"    %%% "http4s-client" % http4sVersion,
+    )
+  )
+  .jsConfigure(_.enablePlugins(BundleMonPlugin))
+
+lazy val horizonsTests = crossProject(JVMPlatform, JSPlatform)
+  .crossType(CrossType.Full)
+  .in(file("modules/horizons-tests"))
+  .dependsOn(horizons)
+  .settings(
+    name := "lucuma-horizons-tests",
+    libraryDependencies ++= Seq(
       "org.typelevel" %%% "munit-cats-effect"   % munitCatsEffectVersion % Test,
     )
   )
   .jvmSettings(
     libraryDependencies ++= Seq(
       "org.http4s"    %% "http4s-ember-client" % http4sVersion % Test,
-      "org.slf4j"     %  "slf4j-simple"        % slf4jVersion % Test,
+      "org.slf4j"     %  "slf4j-simple"        % slf4jVersion  % Test,
     )
   )
   .jsSettings(
     scalaJSUseMainModuleInitializer := true,
     scalacOptions ~= (_.filterNot(Set("-Wdead-code"))),
     libraryDependencies ++= Seq(
-      "org.http4s" %%% "http4s-dom" % http4sDomVersion
+      "org.http4s" %%% "http4s-dom" % http4sDomVersion % Test,
     ),
     jsEnv                           := {
       import org.scalajs.jsenv.nodejs.NodeJSEnv
