@@ -6,12 +6,16 @@ package lucuma.core.data
 import cats.Functor
 import cats.kernel.Eq
 import cats.kernel.Monoid
-import cats.syntax.monoid.*
+import cats.syntax.all.*
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.Json
 import io.circe.syntax.*
 import lucuma.core.enums.Site
+import cats.Semigroupal
+import cats.Traverse
+import cats.Applicative
+import cats.Eval
 
 /** A total map from Site to A. */
 final case class PerSite[+A](gn: A, gs: A) extends (Site => A):
@@ -61,9 +65,16 @@ object PerSite:
   def unfold[A](f: Site => A): PerSite[A] =
     PerSite(f(Site.GN), f(Site.GS))
 
-  /** PerSite is a covariant functor. */
-  given Functor[PerSite] with
-    def map[A,B](fa: PerSite[A])(f: A => B): PerSite[B] = fa.map(f)
+  /** Construct a PerSite from a function. */
+  def unfoldF[F[_]: Functor: Semigroupal, A](f: Site => F[A]): F[PerSite[A]] =
+    (f(Site.GN), f(Site.GS)).mapN(apply)
+
+  /** PerSite is a traversable functor. */
+  given Traverse[PerSite] with
+    override def map[A,B](fa: PerSite[A])(f: A => B): PerSite[B] = fa.map(f)
+    def foldLeft[A, B](fa: PerSite[A], b: B)(f: (B, A) => B): B = (fa.gn, fa.gs).foldLeft(b)(f)
+    def foldRight[A, B](fa: PerSite[A], lb: Eval[B])(f: (A, Eval[B]) => Eval[B]): Eval[B] = (fa.gn, fa.gs).foldRight(lb)(f)
+    def traverse[G[_]: Applicative, A, B](fa: PerSite[A])(f: A => G[B]): G[PerSite[B]] = (f(fa.gn), f(fa.gs)).mapN(apply)
 
   /** PerSite is a monoid if A is a monoid. */
   given [A](using M: Monoid[A]): Monoid[PerSite[A]] with
