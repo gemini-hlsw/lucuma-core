@@ -3,7 +3,11 @@
 
 package lucuma.core.data
 
+import cats.Applicative
+import cats.Eval
 import cats.Functor
+import cats.Semigroupal
+import cats.Traverse
 import cats.kernel.Eq
 import cats.kernel.Monoid
 import cats.syntax.all.*
@@ -12,10 +16,6 @@ import io.circe.Encoder
 import io.circe.Json
 import io.circe.syntax.*
 import lucuma.core.enums.Site
-import cats.Semigroupal
-import cats.Traverse
-import cats.Applicative
-import cats.Eval
 
 /** A total map from Site to A. */
 final case class PerSite[+A](gn: A, gs: A) extends (Site => A):
