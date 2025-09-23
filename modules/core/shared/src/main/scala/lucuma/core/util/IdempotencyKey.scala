@@ -3,20 +3,20 @@
 
 package lucuma.core.util
 
-import monocle.Prism
+import lucuma.core.optics.Format
 
 import java.util.UUID
 import scala.util.Try
 
 object IdempotencyKey extends NewType[UUID]:
 
-  val FromString: Prism[String, IdempotencyKey] =
-    def parse(s: String): Option[IdempotencyKey] =
-      Try(UUID.fromString(s)).toOption.map(IdempotencyKey.apply)
+  def fromStringUnsafe(s: String): IdempotencyKey =
+    IdempotencyKey(UUID.fromString(s))
 
-    def show(k: IdempotencyKey): String =
-      k.value.toString.toLowerCase
+  def fromString(s: String): Option[IdempotencyKey] =
+    Try(UUID.fromString(s)).toOption.map(IdempotencyKey.apply)
 
-    Prism(parse)(show)
+  val FromString: Format[String, IdempotencyKey] =
+    Format(fromString, _.value.toString.toLowerCase)
 
 type IdempotencyKey = IdempotencyKey.Type
