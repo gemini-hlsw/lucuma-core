@@ -39,6 +39,7 @@ lazy val refinedVersion             = "0.11.3"
 lazy val scalaJavaTimeVersion       = "2.6.0"
 lazy val scalajsStubVersion         = "1.1.0"
 lazy val scalaXmlVersion            = "2.4.0"
+lazy val slf4jVersion               = "2.0.17"
 lazy val spireVersion               = "0.18.0"
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
@@ -167,6 +168,49 @@ lazy val catalog = crossProject(JVMPlatform, JSPlatform)
       "org.typelevel" %%% "cats-parse"           % catsParseVersion,
       "org.typelevel" %%% "kittens"              % kittensVersion
     )
+  )
+  .jsConfigure(_.enablePlugins(BundleMonPlugin))
+
+lazy val horizons = crossProject(JVMPlatform, JSPlatform)
+  .crossType(CrossType.Pure)
+  .in(file("modules/horizons"))
+  .dependsOn(core)
+  .settings(
+    name := "lucuma-horizons",
+    libraryDependencies ++= Seq(
+      "org.http4s"    %%% "http4s-core"   % http4sVersion,
+      "org.http4s"    %%% "http4s-client" % http4sVersion,
+    )
+  )
+  .jsConfigure(_.enablePlugins(BundleMonPlugin))
+
+lazy val horizonsTests = crossProject(JVMPlatform, JSPlatform)
+  .crossType(CrossType.Full)
+  .in(file("modules/horizons-tests"))
+  .enablePlugins(NoPublishPlugin)
+  .dependsOn(horizons)
+  .settings(
+    name := "lucuma-horizons-tests",
+    libraryDependencies ++= Seq(
+      "org.typelevel" %%% "munit-cats-effect"   % munitCatsEffectVersion % Test,
+    )
+  )
+  .jvmSettings(
+    libraryDependencies ++= Seq(
+      "org.http4s"    %% "http4s-ember-client" % http4sVersion % Test,
+      "org.slf4j"     %  "slf4j-simple"        % slf4jVersion  % Test,
+    )
+  )
+  .jsSettings(
+    scalaJSUseMainModuleInitializer := true,
+    scalacOptions ~= (_.filterNot(Set("-Wdead-code"))),
+    libraryDependencies ++= Seq(
+      "org.http4s" %%% "http4s-dom" % http4sDomVersion % Test,
+    ),
+    jsEnv                           := {
+      import org.scalajs.jsenv.nodejs.NodeJSEnv
+      new NodeJSEnv(NodeJSEnv.Config().withArgs(List("--experimental-fetch")))
+    }
   )
   .jsConfigure(_.enablePlugins(BundleMonPlugin))
 
