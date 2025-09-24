@@ -107,29 +107,33 @@ object HorizonsClient:
         stop: Instant,
         elems: Int,
       ): F[Either[String, List[HorizonsEphemerisEntry]]] =
-        val minutes  = (stop.toEpochMilli - start.toEpochMilli) / (1000L * 60)
-        val stepSize = 1L max minutes / elems
-        stream(
-            Format         -> Text,
-            Ephemeris      -> Yes,
-            Center         -> CenterCoord,
-            CoordType      -> CoordTypeGeo,
-            Command        -> s"'${key.queryString}'",
-            SiteCoord      -> horizonsCoordsAt(site),
-            StartTime      -> s"'${HorizonsDateFormat.format(start)}'",
-            StopTime       -> s"'${HorizonsDateFormat.format(stop)}'",
-            StepSize       -> s"${stepSize}m",
-            ExtraPrecision -> Yes,
-            TimeDigits     -> FractionalSec,
-            Quantities     -> "'1,3,8,9'" // see 3. Observer Table at https://ssd.jpl.nasa.gov/horizons/manual.html#output
-        ) .dropThrough(_ != "$$SOE")
-          .takeWhile(_ != "$$EOE")
-          .map(HorizonsParser.parseEntry)
-          .takeThrough(_.isRight) // stop on the first error, if any
-          .compile
-          .toList
-          .map: lines =>
-            lines.sequence
+        if !stop.isAfter(start) then Left("Stop must fall after start.").pure[F]
+        else if elems < 1 then Left("Cannot select fewer than one element.").pure[F]
+        else {
+          val minutes  = (stop.toEpochMilli - start.toEpochMilli) / (1000L * 60)
+          val stepSize = 1L max minutes / elems
+          stream(
+              Format         -> Text,
+              Ephemeris      -> Yes,
+              Center         -> CenterCoord,
+              CoordType      -> CoordTypeGeo,
+              Command        -> s"'${key.queryString}'",
+              SiteCoord      -> horizonsCoordsAt(site),
+              StartTime      -> s"'${HorizonsDateFormat.format(start)}'",
+              StopTime       -> s"'${HorizonsDateFormat.format(stop)}'",
+              StepSize       -> s"${stepSize}m",
+              ExtraPrecision -> Yes,
+              TimeDigits     -> FractionalSec,
+              Quantities     -> "'1,3,8,9'" // see 3. Observer Table at https://ssd.jpl.nasa.gov/horizons/manual.html#output
+          ) .dropThrough(_ != "$$SOE")
+            .takeWhile(_ != "$$EOE")
+            .map(HorizonsParser.parseEntry)
+            .takeThrough(_.isRight) // stop on the first error, if any
+            .compile
+            .toList
+            .map: lines =>
+              lines.sequence
+        }
       
       def ephemerisPerSite(
         key: EphemerisKey.Horizons,

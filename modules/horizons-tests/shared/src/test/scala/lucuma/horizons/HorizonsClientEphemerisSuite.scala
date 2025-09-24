@@ -66,3 +66,28 @@ class HorizonsClientEphemerisSuite extends HorizonsClientSuite:
           |""".stripMargin.linesIterator.toList.traverse(HorizonsParser.parseEntry)
       )
 
+  test("Stop must fall after start."):
+    assertIO(
+      client.use: c =>
+        c.ephemeris(
+          key   = EphemerisKey.Comet("1P"),
+          site  = site,
+          start = sem.start.atSite(site).toInstant,
+          stop  = sem.start.atSite(site).toInstant,
+          elems = elems
+        ),
+      Left("Stop must fall after start.")
+    )
+
+  test("Cannot select fewer than one element."):
+    assertIO(
+      client.use: c =>
+        c.ephemeris(
+          key   = EphemerisKey.Comet("1P"),
+          site  = site,
+          start = sem.start.atSite(site).toInstant,
+          stop  = sem.end.atSite(site).toInstant,
+          elems = 0
+        ),
+      Left("Cannot select fewer than one element.")
+    )
