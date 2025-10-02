@@ -105,20 +105,53 @@ trait VoTableParser {
   def parseId(
     adapter: CatalogAdapter,
     entries: Map[FieldId, String]
-  ): EitherNec[CatalogProblem, NonEmptyString] =
-    entries
+  ): EitherNec[CatalogProblem, NonEmptyString] = {
+    // Try primary idField first
+    val primaryId = entries
       .get(adapter.idField)
       .flatMap(refineV[NonEmpty](_).toOption)
-      .toRightNec(MissingValue(adapter.idField))
+
+    // For Gaia adapters, try common alternate field names
+    val alternateId = adapter match {
+      case _: CatalogAdapter.Gaia =>
+        // Try known Gaia field name variations (match by name only, ignore UCD)
+        val commonGaiaFieldNames = List("source_id", "SOURCE_ID", "DESIGNATION", "designation")
+        commonGaiaFieldNames
+          .flatMap(name =>
+            entries.keys.find(_.id.value == name).flatMap(field => entries.get(field))
+          )
+          .headOption
+          .flatMap(refineV[NonEmpty](_).toOption)
+      case _                      => None
+    }
+
+    primaryId.orElse(alternateId).toRightNec(MissingValue(adapter.idField))
+  }
 
   def parseName(
     adapter: CatalogAdapter,
     entries: Map[FieldId, String]
-  ): EitherNec[CatalogProblem, NonEmptyString] =
-    adapter
+  ): EitherNec[CatalogProblem, NonEmptyString] = {
+    // Try adapter's parseName first
+    val primaryName = adapter
       .parseName(entries)
       .flatMap(refineV[NonEmpty](_).toOption)
-      .toRightNec(MissingValue(adapter.nameField))
+
+    // For Gaia adapters, try common alternate field names as fallback
+    val alternateName = adapter match {
+      case _: CatalogAdapter.Gaia if primaryName.isEmpty =>
+        val commonGaiaFieldNames = List("source_id", "SOURCE_ID", "DESIGNATION", "designation")
+        commonGaiaFieldNames
+          .flatMap(name =>
+            entries.keys.find(_.id.value == name).flatMap(field => entries.get(field))
+          )
+          .headOption
+          .flatMap(refineV[NonEmpty](_).toOption)
+      case _                                             => None
+    }
+
+    primaryName.orElse(alternateName).toRightNec(MissingValue(adapter.nameField))
+  }
 
   def parseEpoch(
     adapter: CatalogAdapter,

@@ -57,14 +57,14 @@ class GaiaClientImpl[F[_]: Concurrent](
   private def multiAdapterQueryFullTargets(
     queryUri: CatalogAdapter.Gaia => Uri
   ): F[List[EitherNec[CatalogProblem, CatalogTargetResult]]] =
-    adapters.map(adapter => queryGaiaSourceFullTargets(adapter, queryUri(adapter))).raceAllToSuccess
+    adapters.map(adapter => queryGaiaTargets(adapter, queryUri(adapter))).raceAllToSuccess
 
   private def multiAdapterQueryGuideStars(
     queryUri: CatalogAdapter.Gaia => Uri
   ): F[List[EitherNec[CatalogProblem, Target.Sidereal]]] =
-    adapters.map(adapter => queryGaiaSourceGuideStars(adapter, queryUri(adapter))).raceAllToSuccess
+    adapters.map(adapter => queryGaiaGuideStars(adapter, queryUri(adapter))).raceAllToSuccess
 
-  private def queryGaiaSourceFullTargets(
+  private def queryGaiaTargets(
     adapter:  CatalogAdapter.Gaia,
     queryUri: Uri
   ): F[List[EitherNec[CatalogProblem, CatalogTargetResult]]] =
@@ -78,7 +78,7 @@ class GaiaClientImpl[F[_]: Concurrent](
       .compile
       .toList
 
-  private def queryGaiaSourceGuideStars(
+  private def queryGaiaGuideStars(
     adapter:  CatalogAdapter.Gaia,
     queryUri: Uri
   ): F[List[EitherNec[CatalogProblem, Target.Sidereal]]] =

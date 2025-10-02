@@ -419,7 +419,9 @@ object CatalogAdapter {
   }
 
   object Gaia3Esa extends GaiaEsa {
-    override lazy val gaiaDB: String = "gaiadr3.gaia_source"
+    override lazy val gaiaDB: String   = "gaiadr3.gaia_source"
+    lazy val alternateIdField: FieldId =
+      FieldId.unsafeFrom("source_id", VoTableParser.UCD_OBJID)
   }
 
   trait Gaia3Lite extends Gaia {
