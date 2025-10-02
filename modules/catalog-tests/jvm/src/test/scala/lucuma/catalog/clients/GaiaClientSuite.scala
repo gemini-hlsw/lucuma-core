@@ -46,7 +46,6 @@ class GaiaClientSuite extends CatsEffectSuite with VoTableSamples:
         assertEquals(target.get.catalogInfo.map(_.catalog), CatalogName.Gaia.some)
 
   test("GaiaClient.queryGuideStars returns minimal Target.Sidereal"):
-    // Use only Gaia3LiteGavo to avoid race conditions between adapters
     val client       = GaiaClientMock.mockGaiaClient[IO](
       Utility.trim(voTableAlternative).toString,
       NonEmptyChain.one(CatalogAdapter.Gaia3LiteGavo).some

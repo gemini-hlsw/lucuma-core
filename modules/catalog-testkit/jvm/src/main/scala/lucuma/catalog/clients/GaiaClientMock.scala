@@ -15,27 +15,22 @@ import scala.xml.Utility
 object GaiaClientMock:
 
   /**
-   * Helper to filter VOTable XML to only include rows matching a specific source ID. Handles both
-   * prefixed ("Gaia DR2 123") and raw numeric ("123") formats.
+   * Helper to filter VOTable XML to only include rows matching a specific source ID.
    */
-  def filterVoTableById(voTableXml: String, sourceId: Long): String = {
+  private def filterVoTableById(voTableXml: String, sourceId: Long): String = {
     import scala.xml._
 
     val xml      = XML.loadString(voTableXml)
     val targetId = sourceId.toString
 
     // Find all TR elements and filter to the one containing the target ID
-    // Handle both prefixed ("Gaia DR2 123") and raw numeric ("123") formats
-    val filteredRows = (xml \\ "TR").filter { tr =>
-      (tr \ "TD").headOption.exists { td =>
-        td.text == targetId || td.text.endsWith(targetId)
-      }
-    }
+    val filteredRows = (xml \\ "TR").filter: tr =>
+      (tr \ "TD").headOption.exists: td =>
+        td.text === targetId || td.text.endsWith(targetId)
 
-    // Reconstruct the VOTable with only the matching row
     val table = xml \\ "TABLE"
     if (filteredRows.isEmpty || table.isEmpty) {
-      voTableXml // Return original if no match found
+      voTableXml
     } else {
       val fields        = table.head \ "FIELD"
       val filteredTable =
@@ -53,21 +48,15 @@ object GaiaClientMock:
   }
 
   /**
-   * Create a mock GaiaClient that returns VOTable XML responses. Supports filtering for queryById
-   * requests based on ADQL query inspection.
-   *
-   * @param voTableXml
-   *   The VOTable XML to return in responses
-   * @param adapters
-   *   Optional specific adapters to use (default: all Gaia adapters)
+   * Create a mock GaiaClient that returns VOTable XML responses.
    */
   def mockGaiaClient[F[_]: Async](
     voTableXml: String,
     adapters:   Option[NonEmptyChain[CatalogAdapter.Gaia]] = None
   ): GaiaClient[F] = {
-    val mockHttpClient = Client.fromHttpApp[F](HttpApp[F] { request =>
-      // Check if this is a queryById request (contains "WHERE source_id = ")
-      val query           = request.uri.query.params.get("QUERY").getOrElse("")
+    val mockHttpClient = Client.fromHttpApp[F](HttpApp[F]: request =>
+      // Check if contains "WHERE source_id = "
+      val query           = request.uri.query.params.getOrElse("QUERY", "")
       val sourceIdPattern = """WHERE source_id = (\d+)""".r
 
       val responseXml = sourceIdPattern.findFirstMatchIn(query) match {
@@ -79,10 +68,10 @@ object GaiaClientMock:
       }
 
       Response[F](Status.Ok).withEntity(responseXml).pure[F]
-    })
+    )
 
     adapters match {
-      case Some(adpts) => GaiaClient.build[F](mockHttpClient, adapters = adpts)
-      case None        => GaiaClient.build[F](mockHttpClient)
+      case Some(a) => GaiaClient.build[F](mockHttpClient, adapters = a)
+      case None    => GaiaClient.build[F](mockHttpClient)
     }
   }

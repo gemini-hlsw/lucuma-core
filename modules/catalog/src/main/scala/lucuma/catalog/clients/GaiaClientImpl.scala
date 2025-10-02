@@ -25,7 +25,7 @@ class GaiaClientImpl[F[_]: Concurrent](
 ) extends GaiaClient[F] {
 
   /**
-   * Request and parse data from Gaia (full target data with all magnitude bands + angular size).
+   * Request and parse data from Gaia.
    */
   def query(adqlQuery: ADQLQuery)(using
     ADQLInterpreter
@@ -33,14 +33,14 @@ class GaiaClientImpl[F[_]: Concurrent](
     multiAdapterQueryFullTargets(queryUri(_, adqlQuery))
 
   /**
-   * Request and parse data from Gaia for a single source (full target data).
+   * Request and parse data from Gaia for a single source.
    */
   def queryById(sourceId: Long): F[EitherNec[CatalogProblem, CatalogTargetResult]] =
     multiAdapterQueryFullTargets(queryUriById(_, sourceId)).map:
       _.headOption.toRight(NonEmptyChain(CatalogProblem.SourceIdNotFound(sourceId))).flatten
 
   /**
-   * Request and parse data from Gaia for guide stars (filtered to single magnitude band).
+   * Request and parse data from Gaia for guide stars.
    */
   def queryGuideStars(adqlQuery: ADQLQuery)(using
     ADQLInterpreter

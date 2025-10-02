@@ -55,7 +55,7 @@ trait BlindOffsetSample:
     candidates.zipWithIndex.foreach { case (candidate, index) =>
       val rank     = index + 1
       val sourceId = candidate.sourceId
-      val gMag     = BlindOffsetCandidate.referenceBrightness(candidate.target) match {
+      val gMag     = BlindOffsetCandidate.referenceBrightness(candidate.catalogResult) match {
         case Some(mag) => f"${mag}%5.2f"
         case None      => " N/A"
       }

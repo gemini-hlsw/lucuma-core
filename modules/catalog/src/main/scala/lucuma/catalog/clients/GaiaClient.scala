@@ -14,19 +14,19 @@ import org.http4s.client.Client
 
 trait GaiaClient[F[_]]:
   /**
-   * Request and parse data from Gaia (full target data with all magnitude bands + angular size).
+   * Request and parse data from Gaia
    */
   def query(adqlQuery: ADQLQuery)(using
     ADQLInterpreter
   ): F[List[EitherNec[CatalogProblem, CatalogTargetResult]]]
 
   /**
-   * Request and parse data from Gaia for a single source (full target data).
+   * Request and parse data from Gaia for a single source.
    */
   def queryById(sourceId: Long): F[EitherNec[CatalogProblem, CatalogTargetResult]]
 
   /**
-   * Request and parse data from Gaia for guide stars (filtered to single magnitude band).
+   * Request and parse data from Gaia for guide stars.
    */
   def queryGuideStars(adqlQuery: ADQLQuery)(using
     ADQLInterpreter
