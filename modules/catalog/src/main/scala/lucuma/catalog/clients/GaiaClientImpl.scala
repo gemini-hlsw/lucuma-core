@@ -30,13 +30,13 @@ class GaiaClientImpl[F[_]: Concurrent](
   def query(adqlQuery: ADQLQuery)(using
     ADQLInterpreter
   ): F[List[EitherNec[CatalogProblem, CatalogTargetResult]]] =
-    multiAdapterQueryFullTargets(queryUri(_, adqlQuery))
+    multiAdapterQuery(queryUri(_, adqlQuery), CatalogSearch.siderealTargets)
 
   /**
    * Request and parse data from Gaia for a single source.
    */
   def queryById(sourceId: Long): F[EitherNec[CatalogProblem, CatalogTargetResult]] =
-    multiAdapterQueryFullTargets(queryUriById(_, sourceId)).map:
+    multiAdapterQuery(queryUriById(_, sourceId), CatalogSearch.siderealTargets).map:
       _.headOption.toRight(NonEmptyChain(CatalogProblem.SourceIdNotFound(sourceId))).flatten
 
   /**
@@ -45,50 +45,32 @@ class GaiaClientImpl[F[_]: Concurrent](
   def queryGuideStars(adqlQuery: ADQLQuery)(using
     ADQLInterpreter
   ): F[List[EitherNec[CatalogProblem, Target.Sidereal]]] =
-    multiAdapterQueryGuideStars(queryUri(_, adqlQuery))
+    multiAdapterQuery(queryUri(_, adqlQuery), CatalogSearch.guideStars)
 
   /**
    * Request and parse data from Gaia for a single guide star source.
    */
   def queryByIdGuideStar(sourceId: Long): F[EitherNec[CatalogProblem, Target.Sidereal]] =
-    multiAdapterQueryGuideStars(queryUriById(_, sourceId)).map:
+    multiAdapterQuery(queryUriById(_, sourceId), CatalogSearch.guideStars).map:
       _.headOption.toRight(NonEmptyChain(CatalogProblem.SourceIdNotFound(sourceId))).flatten
 
-  private def multiAdapterQueryFullTargets(
-    queryUri: CatalogAdapter.Gaia => Uri
-  ): F[List[EitherNec[CatalogProblem, CatalogTargetResult]]] =
-    adapters.map(adapter => queryGaiaTargets(adapter, queryUri(adapter))).raceAllToSuccess
+  private def multiAdapterQuery[A](
+    queryUri: CatalogAdapter.Gaia => Uri,
+    parser:   CatalogAdapter.Gaia => fs2.Pipe[F, String, EitherNec[CatalogProblem, A]]
+  ): F[List[EitherNec[CatalogProblem, A]]] =
+    adapters.map(adapter => queryGaia(queryUri(adapter), parser(adapter))).raceAllToSuccess
 
-  private def multiAdapterQueryGuideStars(
-    queryUri: CatalogAdapter.Gaia => Uri
-  ): F[List[EitherNec[CatalogProblem, Target.Sidereal]]] =
-    adapters.map(adapter => queryGaiaGuideStars(adapter, queryUri(adapter))).raceAllToSuccess
-
-  private def queryGaiaTargets(
-    adapter:  CatalogAdapter.Gaia,
-    queryUri: Uri
-  ): F[List[EitherNec[CatalogProblem, CatalogTargetResult]]] =
+  private def queryGaia[A](
+    queryUri: Uri,
+    parser:   fs2.Pipe[F, String, EitherNec[CatalogProblem, A]]
+  ): F[List[EitherNec[CatalogProblem, A]]] =
     val request: Request[F] = Request[F](Method.GET, modUri(queryUri))
     httpClient
       .stream(request)
       .flatMap:
         _.body
           .through(fs2.text.utf8.decode)
-          .through(CatalogSearch.siderealTargets(adapter))
-      .compile
-      .toList
-
-  private def queryGaiaGuideStars(
-    adapter:  CatalogAdapter.Gaia,
-    queryUri: Uri
-  ): F[List[EitherNec[CatalogProblem, Target.Sidereal]]] =
-    val request: Request[F] = Request[F](Method.GET, modUri(queryUri))
-    httpClient
-      .stream(request)
-      .flatMap:
-        _.body
-          .through(fs2.text.utf8.decode)
-          .through(CatalogSearch.guideStars(adapter))
+          .through(parser)
       .compile
       .toList
 
