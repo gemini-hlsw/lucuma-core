@@ -8,6 +8,7 @@ import cats.data.NonEmptyChain
 import cats.effect.Concurrent
 import cats.syntax.all.*
 import fs2.RaiseThrowable
+import lucuma.catalog.CatalogTargetResult
 import lucuma.catalog.votable.*
 import lucuma.core.model.Target
 import lucuma.core.syntax.effect.raceAllToSuccess
@@ -24,26 +25,60 @@ class GaiaClientImpl[F[_]: Concurrent](
 ) extends GaiaClient[F] {
 
   /**
-   * Request and parse data from Gaia
+   * Request and parse data from Gaia (full target data with all magnitude bands + angular size).
    */
   def query(adqlQuery: ADQLQuery)(using
     ADQLInterpreter
-  ): F[List[EitherNec[CatalogProblem, Target.Sidereal]]] =
-    multiAdapterQuery(queryUri(_, adqlQuery))
+  ): F[List[EitherNec[CatalogProblem, CatalogTargetResult]]] =
+    multiAdapterQueryFullTargets(queryUri(_, adqlQuery))
 
   /**
-   * Request and parse data from Gaia for a single source.
+   * Request and parse data from Gaia for a single source (full target data).
    */
-  def queryById(sourceId: Long): F[EitherNec[CatalogProblem, Target.Sidereal]] =
-    multiAdapterQuery(queryUriById(_, sourceId)).map:
+  def queryById(sourceId: Long): F[EitherNec[CatalogProblem, CatalogTargetResult]] =
+    multiAdapterQueryFullTargets(queryUriById(_, sourceId)).map:
       _.headOption.toRight(NonEmptyChain(CatalogProblem.SourceIdNotFound(sourceId))).flatten
 
-  private def multiAdapterQuery(
+  /**
+   * Request and parse data from Gaia for guide stars (filtered to single magnitude band).
+   */
+  def queryGuideStars(adqlQuery: ADQLQuery)(using
+    ADQLInterpreter
+  ): F[List[EitherNec[CatalogProblem, Target.Sidereal]]] =
+    multiAdapterQueryGuideStars(queryUri(_, adqlQuery))
+
+  /**
+   * Request and parse data from Gaia for a single guide star source.
+   */
+  def queryByIdGuideStar(sourceId: Long): F[EitherNec[CatalogProblem, Target.Sidereal]] =
+    multiAdapterQueryGuideStars(queryUriById(_, sourceId)).map:
+      _.headOption.toRight(NonEmptyChain(CatalogProblem.SourceIdNotFound(sourceId))).flatten
+
+  private def multiAdapterQueryFullTargets(
+    queryUri: CatalogAdapter.Gaia => Uri
+  ): F[List[EitherNec[CatalogProblem, CatalogTargetResult]]] =
+    adapters.map(adapter => queryGaiaSourceFullTargets(adapter, queryUri(adapter))).raceAllToSuccess
+
+  private def multiAdapterQueryGuideStars(
     queryUri: CatalogAdapter.Gaia => Uri
   ): F[List[EitherNec[CatalogProblem, Target.Sidereal]]] =
-    adapters.map(adapter => queryGaiaSource(adapter, queryUri(adapter))).raceAllToSuccess
+    adapters.map(adapter => queryGaiaSourceGuideStars(adapter, queryUri(adapter))).raceAllToSuccess
 
-  private def queryGaiaSource(
+  private def queryGaiaSourceFullTargets(
+    adapter:  CatalogAdapter.Gaia,
+    queryUri: Uri
+  ): F[List[EitherNec[CatalogProblem, CatalogTargetResult]]] =
+    val request: Request[F] = Request[F](Method.GET, modUri(queryUri))
+    httpClient
+      .stream(request)
+      .flatMap:
+        _.body
+          .through(fs2.text.utf8.decode)
+          .through(CatalogSearch.siderealTargets(adapter))
+      .compile
+      .toList
+
+  private def queryGaiaSourceGuideStars(
     adapter:  CatalogAdapter.Gaia,
     queryUri: Uri
   ): F[List[EitherNec[CatalogProblem, Target.Sidereal]]] =

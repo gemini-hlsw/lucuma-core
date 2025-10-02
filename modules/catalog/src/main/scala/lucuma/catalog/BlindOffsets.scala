@@ -79,7 +79,7 @@ object BlindOffsets:
 
         gaiaClient
           .query(adqlQuery)(using interpreter)
-          .map(_.collect { case Right(target) => target })
+          .map(_.collect { case Right(result) => result.target })
           .map(analysis(_, baseTracking, observationTime))
       .getOrElse(List.empty.pure[F])
 
