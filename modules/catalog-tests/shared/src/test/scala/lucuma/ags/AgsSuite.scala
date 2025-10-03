@@ -20,6 +20,7 @@ import lucuma.core.model.ConstraintSet
 import lucuma.core.model.ElevationRange
 import lucuma.core.model.ImageQuality
 import lucuma.core.model.SiderealTracking
+import lucuma.core.model.sequence.flamingos2.Flamingos2FpuMask
 
 class AgsSuite extends munit.FunSuite {
   val gs1 = GuideStarCandidate.unsafeApply(
@@ -102,7 +103,7 @@ class AgsSuite extends munit.FunSuite {
     assertEquals(sorted, List(b, a))
   }
 
-  test("discard science target") {
+  test("discard science target for gmos") {
     val constraints = ConstraintSet(
       ImageQuality.Preset.PointTwo,
       CloudExtinction.Preset.PointFive,
@@ -128,7 +129,7 @@ class AgsSuite extends munit.FunSuite {
       AgsAnalysis.VignettesScience(gs1, AgsPosition(Angle.Angle0, Offset.Zero)).some
     )
 
-    val gsOffset =
+    val guideStarOffset =
       GuideStarCandidate.unsafeApply(
         0L,
         SiderealTracking.const(
@@ -148,7 +149,68 @@ class AgsSuite extends munit.FunSuite {
           Nil,
           NonEmptyList.of(AgsPosition(Angle.Angle0, Offset.Zero)),
           AgsParams.GmosAgsParams(GmosNorthFpu.LongSlit_5_00.asLeft.some, PortDisposition.Bottom),
-          List(gsOffset)
+          List(guideStarOffset)
+        )
+        .headOption
+        .forall(_.isUsable)
+    )
+  }
+
+  test("discard science target - Flamingos2") {
+    val constraints = ConstraintSet(
+      ImageQuality.Preset.PointTwo,
+      CloudExtinction.Preset.PointFive,
+      SkyBackground.Dark,
+      WaterVapor.Wet,
+      ElevationRange.ByAirMass.Default
+    )
+
+    val wavelength = Wavelength.fromIntNanometers(300).get
+
+    assertEquals(
+      Ags
+        .agsAnalysis(
+          constraints,
+          wavelength,
+          Coordinates.Zero,
+          List(Coordinates.Zero),
+          NonEmptyList.of(AgsPosition(Angle.Angle0, Offset.Zero)),
+          AgsParams.Flamingos2AgsParams(
+            Flamingos2LyotWheel.F16,
+            Flamingos2FpuMask.Builtin(Flamingos2Fpu.LongSlit3),
+            PortDisposition.Bottom
+          ),
+          List(gs1)
+        )
+        .headOption,
+      AgsAnalysis.VignettesScience(gs1, AgsPosition(Angle.Angle0, Offset.Zero)).some
+    )
+
+    val guideStarOffset =
+      GuideStarCandidate.unsafeApply(
+        0L,
+        SiderealTracking.const(
+          Coordinates.Zero
+            .offsetBy(Angle.Angle0, Offset.signedDecimalArcseconds.reverseGet(0.0, 23.0))
+            .get
+        ),
+        (Band.Gaia, BrightnessValue.unsafeFrom(15)).some
+      )
+
+    assert(
+      Ags
+        .agsAnalysis(
+          constraints,
+          wavelength,
+          Coordinates.Zero,
+          Nil,
+          NonEmptyList.of(AgsPosition(Angle.Angle0, Offset.Zero)),
+          AgsParams.Flamingos2AgsParams(
+            Flamingos2LyotWheel.F16,
+            Flamingos2FpuMask.Builtin(Flamingos2Fpu.LongSlit3),
+            PortDisposition.Bottom
+          ),
+          List(guideStarOffset)
         )
         .headOption
         .forall(_.isUsable)
