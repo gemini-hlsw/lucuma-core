@@ -105,20 +105,44 @@ trait VoTableParser {
   def parseId(
     adapter: CatalogAdapter,
     entries: Map[FieldId, String]
-  ): EitherNec[CatalogProblem, NonEmptyString] =
-    entries
+  ): EitherNec[CatalogProblem, NonEmptyString] = {
+    val primaryId = entries
       .get(adapter.idField)
       .flatMap(refineV[NonEmpty](_).toOption)
-      .toRightNec(MissingValue(adapter.idField))
+
+    val alternateId = adapter match {
+      case _: CatalogAdapter.Gaia =>
+        val commonGaiaFieldNames = List("source_id", "SOURCE_ID", "DESIGNATION", "designation")
+        commonGaiaFieldNames
+          .flatMap(name => entries.keys.find(_.id.value === name).flatMap(entries.get))
+          .headOption
+          .flatMap(refineV[NonEmpty](_).toOption)
+      case _                      => None
+    }
+
+    primaryId.orElse(alternateId).toRightNec(MissingValue(adapter.idField))
+  }
 
   def parseName(
     adapter: CatalogAdapter,
     entries: Map[FieldId, String]
-  ): EitherNec[CatalogProblem, NonEmptyString] =
-    adapter
+  ): EitherNec[CatalogProblem, NonEmptyString] = {
+    val primaryName = adapter
       .parseName(entries)
       .flatMap(refineV[NonEmpty](_).toOption)
-      .toRightNec(MissingValue(adapter.nameField))
+
+    val alternateName = adapter match {
+      case _: CatalogAdapter.Gaia if primaryName.isEmpty =>
+        val commonGaiaFieldNames = List("source_id", "SOURCE_ID", "DESIGNATION", "designation")
+        commonGaiaFieldNames
+          .flatMap(name => entries.keys.find(_.id.value === name).flatMap(entries.get))
+          .headOption
+          .flatMap(refineV[NonEmpty](_).toOption)
+      case _                                             => None
+    }
+
+    primaryName.orElse(alternateName).toRightNec(MissingValue(adapter.nameField))
+  }
 
   def parseEpoch(
     adapter: CatalogAdapter,

@@ -8,6 +8,7 @@ import cats.data.NonEmptyChain
 import cats.effect.Concurrent
 import cats.syntax.all.*
 import fs2.RaiseThrowable
+import lucuma.catalog.CatalogTargetResult
 import lucuma.catalog.votable.*
 import lucuma.core.model.Target
 import lucuma.core.syntax.effect.raceAllToSuccess
@@ -24,36 +25,52 @@ class GaiaClientImpl[F[_]: Concurrent](
 ) extends GaiaClient[F] {
 
   /**
-   * Request and parse data from Gaia
+   * Request and parse data from Gaia.
    */
   def query(adqlQuery: ADQLQuery)(using
     ADQLInterpreter
-  ): F[List[EitherNec[CatalogProblem, Target.Sidereal]]] =
-    multiAdapterQuery(queryUri(_, adqlQuery))
+  ): F[List[EitherNec[CatalogProblem, CatalogTargetResult]]] =
+    multiAdapterQuery(queryUri(_, adqlQuery), CatalogSearch.siderealTargets)
 
   /**
    * Request and parse data from Gaia for a single source.
    */
-  def queryById(sourceId: Long): F[EitherNec[CatalogProblem, Target.Sidereal]] =
-    multiAdapterQuery(queryUriById(_, sourceId)).map:
+  def queryById(sourceId: Long): F[EitherNec[CatalogProblem, CatalogTargetResult]] =
+    multiAdapterQuery(queryUriById(_, sourceId), CatalogSearch.siderealTargets).map:
       _.headOption.toRight(NonEmptyChain(CatalogProblem.SourceIdNotFound(sourceId))).flatten
 
-  private def multiAdapterQuery(
-    queryUri: CatalogAdapter.Gaia => Uri
+  /**
+   * Request and parse data from Gaia for guide stars.
+   */
+  def queryGuideStars(adqlQuery: ADQLQuery)(using
+    ADQLInterpreter
   ): F[List[EitherNec[CatalogProblem, Target.Sidereal]]] =
-    adapters.map(adapter => queryGaiaSource(adapter, queryUri(adapter))).raceAllToSuccess
+    multiAdapterQuery(queryUri(_, adqlQuery), CatalogSearch.guideStars)
 
-  private def queryGaiaSource(
-    adapter:  CatalogAdapter.Gaia,
-    queryUri: Uri
-  ): F[List[EitherNec[CatalogProblem, Target.Sidereal]]] =
+  /**
+   * Request and parse data from Gaia for a single guide star source.
+   */
+  def queryByIdGuideStar(sourceId: Long): F[EitherNec[CatalogProblem, Target.Sidereal]] =
+    multiAdapterQuery(queryUriById(_, sourceId), CatalogSearch.guideStars).map:
+      _.headOption.toRight(NonEmptyChain(CatalogProblem.SourceIdNotFound(sourceId))).flatten
+
+  private def multiAdapterQuery[A](
+    queryUri: CatalogAdapter.Gaia => Uri,
+    parser:   CatalogAdapter.Gaia => fs2.Pipe[F, String, EitherNec[CatalogProblem, A]]
+  ): F[List[EitherNec[CatalogProblem, A]]] =
+    adapters.map(adapter => queryGaia(queryUri(adapter), parser(adapter))).raceAllToSuccess
+
+  private def queryGaia[A](
+    queryUri: Uri,
+    parser:   fs2.Pipe[F, String, EitherNec[CatalogProblem, A]]
+  ): F[List[EitherNec[CatalogProblem, A]]] =
     val request: Request[F] = Request[F](Method.GET, modUri(queryUri))
     httpClient
       .stream(request)
       .flatMap:
         _.body
           .through(fs2.text.utf8.decode)
-          .through(CatalogSearch.guideStars(adapter))
+          .through(parser)
       .compile
       .toList
 

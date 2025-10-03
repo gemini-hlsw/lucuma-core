@@ -16,34 +16,33 @@ import lucuma.core.math.Angle
 import lucuma.core.model.CoordinatesAt
 import lucuma.core.model.ObjectTracking
 import lucuma.core.model.SourceProfile
-import lucuma.core.model.Target
 import lucuma.core.syntax.all.*
 
 import java.time.Instant
 
 case class BlindOffsetCandidate(
-  target:          Target.Sidereal,
+  catalogResult:   CatalogTargetResult,
   distance:        Angle,
   baseCoordinates: CoordinatesAt,
   candidateCoords: CoordinatesAt,
   observationTime: Instant
 ) {
   val score: BigDecimal        = BlindOffsetCandidate.calculateScore(this)
-  def sourceId: NonEmptyString = target.name
+  def sourceId: NonEmptyString = catalogResult.target.name
 }
 
 object BlindOffsetCandidate:
-  def referenceBrightness(target: Target.Sidereal): Option[BigDecimal] =
+  def referenceBrightness(catalogResult: CatalogTargetResult): Option[BigDecimal] =
     BandsList.GaiaBandsList.bands.foldMap: band =>
       SourceProfile
         .integratedBrightnessIn(band)
-        .headOption(target.sourceProfile)
+        .headOption(catalogResult.target.sourceProfile)
         .map(_.value.value.value)
 
   private val PiArcsecs = Angle.decimalArcseconds.get(Angle.Angle180)
 
   private def calculateScore(candidate: BlindOffsetCandidate): BigDecimal =
-    referenceBrightness(candidate.target) match
+    referenceBrightness(candidate.catalogResult) match
       case Some(g) =>
         // score = sqrt(((G-12)/6)^2 + (distance / 180 arcsec)^2)
         val distance =
@@ -79,12 +78,12 @@ object BlindOffsets:
 
         gaiaClient
           .query(adqlQuery)(using interpreter)
-          .map(_.collect { case Right(target) => target })
+          .map(_.collect { case Right(result) => result })
           .map(analysis(_, baseTracking, observationTime))
       .getOrElse(List.empty.pure[F])
 
   def analysis(
-    targets:         List[Target.Sidereal],
+    catalogResults:  List[CatalogTargetResult],
     baseTracking:    ObjectTracking,
     observationTime: Instant
   ): List[BlindOffsetCandidate] =
@@ -92,11 +91,11 @@ object BlindOffsets:
       .at(observationTime)
       .foldMap: baseCoords =>
         val baseCoordinates = baseCoords.value
-        targets
-          .flatMap: target =>
-            target.tracking.at(observationTime).map { candidateCoords =>
+        catalogResults
+          .flatMap: catalogResult =>
+            catalogResult.target.tracking.at(observationTime).map { candidateCoords =>
               val distance = baseCoordinates.angularDistance(candidateCoords)
-              BlindOffsetCandidate(target,
+              BlindOffsetCandidate(catalogResult,
                                    distance,
                                    baseCoords,
                                    CoordinatesAt(candidateCoords),

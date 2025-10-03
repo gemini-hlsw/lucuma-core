@@ -78,7 +78,7 @@ class BlindOffsetCandidatesSuite extends CatsEffectSuite:
     )
 
     val candidate1 = BlindOffsetCandidate(
-      target = target1,
+      catalogResult = CatalogTargetResult(target1, None),
       distance = baseCoords.angularDistance(coords1),
       baseCoordinates = CoordinatesAt(baseCoords),
       candidateCoords = CoordinatesAt(coords1),
@@ -86,7 +86,7 @@ class BlindOffsetCandidatesSuite extends CatsEffectSuite:
     )
 
     val candidate2 = BlindOffsetCandidate(
-      target = target2,
+      catalogResult = CatalogTargetResult(target2, None),
       distance = baseCoords.angularDistance(coords2),
       baseCoordinates = CoordinatesAt(baseCoords),
       candidateCoords = CoordinatesAt(coords2),
@@ -109,12 +109,13 @@ class BlindOffsetCandidatesSuite extends CatsEffectSuite:
       parallax = None
     )
 
-    val targets = List(mockTarget) // mockTarget has no magnitude data
+    val catalogResults =
+      List(CatalogTargetResult(mockTarget, None)) // mockTarget has no magnitude data
 
     val baseObjectTracking = ObjectTracking.SiderealObjectTracking(baseSiderealTracking)
 
     val candidates = BlindOffsets.analysis(
-      targets,
+      catalogResults,
       baseObjectTracking,
       observationTime
     )

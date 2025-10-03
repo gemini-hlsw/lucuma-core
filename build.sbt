@@ -228,7 +228,7 @@ lazy val ags = crossProject(JVMPlatform, JSPlatform)
   .dependsOn(catalog)
 
 lazy val catalogTestkit = crossProject(JVMPlatform, JSPlatform)
-  .crossType(CrossType.Pure)
+  .crossType(CrossType.Full)
   .in(file("modules/catalog-testkit"))
   .dependsOn(catalog, testkit, ags)
   .settings(
