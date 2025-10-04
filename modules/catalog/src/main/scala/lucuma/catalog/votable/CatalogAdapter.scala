@@ -462,7 +462,8 @@ object CatalogAdapter {
 
   object Gaia3LiteEsa extends Gaia3LiteEsa
 
-  object Gaia3LiteEsaProxy extends Gaia3LiteEsa { // Do not use with a proxy. This is already a proxy.
+  object Gaia3LiteEsaProxy
+      extends Gaia3LiteEsa { // Do not use with a proxy. This is already a proxy.
     override lazy val uri: Uri = uri"https://gaia.noirlab.edu/tap-server/tap/sync"
   }
 
