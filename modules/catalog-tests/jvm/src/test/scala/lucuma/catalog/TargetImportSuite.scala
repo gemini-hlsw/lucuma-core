@@ -146,7 +146,7 @@ class TargetImportFileSuite extends CatsEffectSuite:
                                     SourceProfile.Point(SpectralDefinition.BandNormalized(_, m)),
                                     _
                     )
-                  ) if (m.count { case ((_, m)) =>
+                  ) if (m.count { case (_, m) =>
                     m.units.serialized === "VEGA_MAGNITUDE"
                   }) === 1 =>
                 true
@@ -162,7 +162,7 @@ class TargetImportFileSuite extends CatsEffectSuite:
                                     SourceProfile.Point(SpectralDefinition.BandNormalized(_, m)),
                                     _
                     )
-                  ) if (m.count { case ((_, m)) =>
+                  ) if (m.count { case (_, m) =>
                     m.units.serialized === "AB_MAGNITUDE"
                   }) === 1 =>
                 true

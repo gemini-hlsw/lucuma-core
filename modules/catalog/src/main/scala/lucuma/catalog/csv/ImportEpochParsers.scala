@@ -29,7 +29,7 @@ trait ImportEpochParsers {
   /** Parser for an `Epoch`. */
   private val epoch: Parser[Epoch] =
     (EpochParsers.epochScheme ~ year ~ char('.').void.? ~ miliyear.?)
-      .map { case ((((s, y), _), m)) =>
+      .map { case (((s, y), _), m) =>
         s.fromMilliyearsUnsafe(y * 1000 + m.getOrElse(0))
       }
       .withContext("epoch")

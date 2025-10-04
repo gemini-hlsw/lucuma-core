@@ -67,8 +67,7 @@ object GaiaClientMock:
           voTableXml
       }
 
-      Response[F](Status.Ok).withEntity(responseXml).pure[F]
-    )
+      Response[F](Status.Ok).withEntity(responseXml).pure[F])
 
     adapters match {
       case Some(a) => GaiaClient.build[F](mockHttpClient, adapters = a)
