@@ -313,9 +313,9 @@ trait VoTableParser {
         .parMapN { (name, pm, brightnesses, info, angSize) =>
           // Infer SED for Simbad catalogs using object type and spectral classification
           val inferredSED = if (adapter.catalog == CatalogName.Simbad) {
-            val otype = entries.get(adapter.oTypeField).getOrElse("")
+            val otype        = entries.get(adapter.oTypeField).getOrElse("")
             val spectralType = entries.get(adapter.spTypeField)
-            val morphType = entries.get(adapter.morphTypeField)
+            val morphType    = entries.get(adapter.morphTypeField)
             SimbadSEDMatcher.inferSED(otype, spectralType, morphType)
           } else {
             None
@@ -364,9 +364,9 @@ trait VoTableParser {
         .parMapN { (name, tracking, brightnesses) =>
           // Infer SED for Simbad catalogs using object type and spectral classification
           val inferredSED = if (adapter.catalog == CatalogName.Simbad) {
-            val otype = entries.get(adapter.oTypeField).getOrElse("")
+            val otype        = entries.get(adapter.oTypeField).getOrElse("")
             val spectralType = entries.get(adapter.spTypeField)
-            val morphType = entries.get(adapter.morphTypeField)
+            val morphType    = entries.get(adapter.morphTypeField)
             SimbadSEDMatcher.inferSED(otype, spectralType, morphType)
           } else {
             None
