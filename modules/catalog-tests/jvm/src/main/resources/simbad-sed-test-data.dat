@@ -1,0 +1,64 @@
+main_id otype morph_type sp_type
+"Vega" PulsV*delSct "" A0Va
+"* alf CMa" PM* "" A0mA1Va
+"* bet Ori" s*r "" B8Ia
+"* alf Ori" s*r "" M1-M2Ia-Iab
+"* alf Tau" LP* "" K5+III
+"* bet Gem" PM* "" K0IIIb
+"* alf Aur" SB* "" G5IIIe+G0III
+"* gam Ori A" ** "" B2III
+"* del CMa" SB* "" F8Ia
+"* eps CMa" SB* "" B2II
+"* alf Lyr" PulsV*delSct "" A0Va
+"* bet CMi" PM* "" B8Ve
+"Sun" * "" G2V
+"HD 209458" * "" G0V
+"* alf Cen A" SB* "" G2V
+"* alf Cen B" ** "" K1V
+"* Proxima" LP* "" M5.5Ve
+"* eps Eri" BY* "" K2V
+"* tau Cet" * "" G8V
+"* 61 Cyg A" PM* "" K5V
+"Barnard's Star" PM* "" M4.0Ve
+"* Kapteyn's Star" HV* "" sdM1
+"BD+28  4211" HS* "" sdO2VIIIHe5
+"BD+25  2534" HS* "" sdB1(k)
+"BD+52   913" WD* "" DA.8
+"1RXS J194343.1+500440" WD* "" DA1.4
+"GD 71" WD* "" DA1.1
+"* alf PsA" PM* "" A3V
+"* alf Lep" * "" F0Ib
+"* bet UMa" ** "" A1V
+"* gam UMa" SB* "" A0Ve
+"M  31" G Sb ""
+"M  51" GiP Sbc ""
+"M  87" G E+ ""
+"NGC  1316" G SB0 ""
+"NGC  5128" G S0 ""
+"M 104" G Sa ""
+"NGC  4258" SyG SABb ""
+"2MASX J14034502+2921441" Sy2 Sb ""
+"2MASS J13295700+1509093" QSO "" ""
+"2SLAQ J133815.86-004509.6" QSO "" ""
+"3C 273" QSO "" ""
+"PKS 2155-304" BLL "" ""
+"M  42" HII "" ""
+"NGC   595" HII "" ""
+"NGC  1514" PN "" sdO+A0/3III
+"M  97" PN "" ""
+"NGC 7009" PN "" ""
+"*   1 Boo" PM* "" A1V
+"*   3 Cam" SB* "" G9III
+"*   3 Cet" s*r "" K3Ib
+"*   4 Cap" HB* "" G8III
+"*   9 Sgr" Y*O "" O4V((f))z
+"*  17 Aqr" * "" K4/5III
+"*  21 Peg" * "" B9.5V
+"*  39 Aqr" ** "" F0V
+"*  48 Lib" Be* "" B5IIIp_sh
+"HD  10700" * "" G8.5V
+"HD  22049" PM* "" K0IIIbCN1
+"HD  48915" Be* "" B1V
+"HD  74956" delSctV* "" A7III
+"HD  91316" PM* "" K4III
+"HD 140283" sdF* "" sdF5
