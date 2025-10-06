@@ -86,6 +86,7 @@ object SimbadSEDMatcher:
 
   /**
    * Find the best matching StellarLibrarySpectrum for given spectral classes.
+   * Uses physics-based scoring from Stephens match_sed.py reference implementation.
    */
   private def findBestStellarMatch(
     luminosityClasses:  List[String],
@@ -95,45 +96,38 @@ object SimbadSEDMatcher:
     // Handle edge cases upfront
     if temperatureClasses.isEmpty && luminosityClasses.isEmpty then Some(StellarLibrarySpectrum.G2V)
     else
-      val candidates = StellarLibrarySpectrum.values.toList
-      val tempClass  = temperatureClasses.headOption.getOrElse("")
-      val lumClass   = luminosityClasses.headOption.getOrElse("V") // Default to main sequence
+      // Calculate physical parameters for target star
+      StellarPhysics.calculateParameters(luminosityClasses, temperatureClasses) match {
+        case Some(targetParams) =>
+          // Score all library SEDs based on physical parameters
+          val scored = StellarLibrarySpectrum.values.toList.flatMap { spectrum =>
+            StellarLibraryParameters.getParameters(spectrum).map { sedParams =>
+              // Calculate differences
+              val dt = sedParams.tEff - targetParams.tEff
+              val dg = sedParams.logG - targetParams.logG
+              val dtMax = 0.1 * targetParams.tEff
+              val dgMax = 0.5
 
-      // White dwarfs and subdwarfs use generic stellar spectrum
-      if lumClass.startsWith("D") || lumClass == "sd" then Some(StellarLibrarySpectrum.G2V)
-      else
-        val tempLetter = tempClass.take(1)
+              // Calculate score: sqrt((ΔT/ΔT_max)² + (Δlog_g/Δlog_g_max)²)
+              val score = math.sqrt((dt / dtMax) * (dt / dtMax) + (dg / dgMax) * (dg / dgMax))
 
-        // Try exact match first
-        val exactMatch = candidates.find { spectrum =>
-          val tag = spectrum.tag
-          tag.contains(tempClass) && tag.contains(lumClass)
-        }
-
-        // Chain fallbacks using orElse
-        exactMatch
-          .orElse {
-            // Try temperature class match with default luminosity
-            candidates.find(spectrum =>
-              spectrum.tag.contains(tempClass) && spectrum.tag.contains("V")
-            )
-          }
-          .orElse {
-            // Try to match just the spectral class letter
-            candidates.find { spectrum =>
-              spectrum.tag.startsWith(tempLetter) && spectrum.tag.contains(lumClass)
+              (spectrum, score, math.abs(dt), dtMax, math.abs(dg), dgMax)
             }
           }
-          .orElse {
-            // Last resort: match just the letter with main sequence
-            candidates.find { spectrum =>
-              spectrum.tag.startsWith(tempLetter) && spectrum.tag.contains("V")
+
+          // Return best match (lowest score) if BOTH differences are within tolerance
+          // This matches Python logic: abs(dt) < dt_max AND abs(dg) < dg_max
+          scored.sortBy(_._2).headOption
+            .filter { case (_, _, absDt, dtMax, absDg, dgMax) =>
+              absDt < dtMax && absDg < dgMax
             }
-          }
-          .orElse {
-            // Final fallback: return solar type
-            Some(StellarLibrarySpectrum.G2V)
-          }
+            .map(_._1)
+            .orElse(Some(StellarLibrarySpectrum.G2V)) // Fallback to solar type
+
+        case None =>
+          // Cannot calculate parameters, use fallback
+          Some(StellarLibrarySpectrum.G2V)
+      }
 
   /**
    * Match galaxy morphological type to appropriate GalaxySpectrum.
@@ -258,5 +252,6 @@ val StarTypes = Set(
   "Pu*",
   "Em*",
   "PM*",
-  "HV*"
+  "HV*",
+  "**"  // Double star systems are typically stellar
 )
