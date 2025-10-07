@@ -20,6 +20,7 @@ lazy val catsParseVersion           = "1.1.0"
 lazy val catsScalacheckVersion      = "0.3.2"
 lazy val catsTimeVersion            = "0.6.0"
 lazy val circeVersion               = "0.14.15"
+lazy val clueVersion                = "0.49.0"
 lazy val circeRefinedVersion        = "0.15.1"
 lazy val coulombVersion             = "0.9.1"
 lazy val fs2Version                 = "3.12.2"
@@ -31,6 +32,7 @@ lazy val http4sJdkHttpClientVersion = "0.10.0"
 lazy val jtsVersion                 = "0.4.1"
 lazy val kindProjectorVersion       = "0.13.2"
 lazy val kittensVersion             = "3.5.0"
+lazy val log4catsVersion            = "2.7.1"
 lazy val lucumaRefinedVersion       = "0.1.4"
 lazy val monocleVersion             = "3.3.0"
 lazy val munitVersion               = "1.2.1"
@@ -168,7 +170,10 @@ lazy val catalog = crossProject(JVMPlatform, JSPlatform)
       "org.http4s"    %%% "http4s-core"          % http4sVersion,
       "org.http4s"    %%% "http4s-client"        % http4sVersion,
       "org.typelevel" %%% "cats-parse"           % catsParseVersion,
-      "org.typelevel" %%% "kittens"              % kittensVersion
+      "org.typelevel" %%% "kittens"              % kittensVersion,
+      "edu.gemini"    %%% "clue-core"            % clueVersion,
+      "edu.gemini"    %%% "clue-http4s"          % clueVersion,
+      "org.typelevel" %%% "log4cats-core"        % log4catsVersion
     )
   )
   .jsConfigure(_.enablePlugins(BundleMonPlugin))
@@ -274,8 +279,10 @@ lazy val catalogTests = crossProject(JVMPlatform, JSPlatform)
   )
   .jvmSettings(
     libraryDependencies ++= Seq(
-      "co.fs2"     %% "fs2-io"                 % fs2Version,
-      "org.http4s" %% "http4s-jdk-http-client" % http4sJdkHttpClientVersion
+      "co.fs2"        %% "fs2-io"                 % fs2Version,
+      "org.http4s"    %% "http4s-jdk-http-client" % http4sJdkHttpClientVersion,
+      "org.typelevel" %% "log4cats-slf4j"         % log4catsVersion,
+      "org.slf4j"     %  "slf4j-simple"           % slf4jVersion
     )
   )
 
