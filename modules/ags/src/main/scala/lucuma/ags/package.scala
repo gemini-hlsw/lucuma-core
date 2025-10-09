@@ -20,7 +20,7 @@ import lucuma.core.math.skycalc.averageParallacticAngle
 import lucuma.core.model.CloudExtinction
 import lucuma.core.model.ConstraintSet
 import lucuma.core.model.ImageQuality
-import lucuma.core.model.ObjectTracking
+import lucuma.core.model.Tracking
 import lucuma.core.model.PosAngleConstraint
 import lucuma.core.util.Enumerated
 import lucuma.core.util.TimeSpan
@@ -147,7 +147,7 @@ private val UnconstrainedAngles =
 extension (posAngleConstraint: PosAngleConstraint)
   def anglesToTestAt(
     site:     Site,
-    tracking: ObjectTracking,
+    tracking: Tracking,
     vizTime:  Instant,
     duration: Duration
   ): Option[NonEmptyList[Angle]] =

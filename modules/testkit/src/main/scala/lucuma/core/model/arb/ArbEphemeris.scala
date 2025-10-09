@@ -19,7 +19,7 @@ trait ArbEphemeris {
   import ArbCoordinates.given
   import ArbOffset.given
   import ArbTimestamp.given
-  import Ephemeris.Element
+  import EphemerisTracking.Element
 
   given Arbitrary[EphemerisCoordinates] =
     Arbitrary {
@@ -37,18 +37,18 @@ trait ArbEphemeris {
       } yield (t, c)
     }
 
-  given Arbitrary[Ephemeris] =
+  given Arbitrary[EphemerisTracking] =
     Arbitrary {
       for {
         len <- choose(0, 10)
         es  <- listOfN(len, arbitrary[Element])
-      } yield Ephemeris(es*)
+      } yield EphemerisTracking(es*)
     }
 
   given Cogen[EphemerisCoordinates] =
     Cogen[(Coordinates, Offset)].contramap(co => (co.coord, co.delta))
 
-  given Cogen[Ephemeris] =
+  given Cogen[EphemerisTracking] =
     Cogen[Map[Timestamp, EphemerisCoordinates]].contramap(_.toMap)
 
 }

@@ -14,7 +14,6 @@ import lucuma.core.math.Coordinates
 import lucuma.core.math.Declination
 import lucuma.core.math.Epoch
 import lucuma.core.math.RightAscension
-import lucuma.core.model.ObjectTracking
 import lucuma.core.model.SiderealTracking
 import munit.CatsEffectSuite
 
@@ -80,10 +79,9 @@ class BlindOffsetFileTestSuite extends CatsEffectSuite:
       .toList
       .map(_.collect { case Right(targetResult) => targetResult })
       .map: targetResults =>
-        val baseObjectTracking = ObjectTracking.SiderealObjectTracking(baseSiderealTracking)
         val sorted             = BlindOffsets.analysis(
           targetResults,
-          baseObjectTracking,
+          baseSiderealTracking,
           observationTime
         )
 

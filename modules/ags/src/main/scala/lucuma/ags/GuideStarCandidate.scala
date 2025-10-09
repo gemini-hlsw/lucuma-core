@@ -50,7 +50,7 @@ case class GuideStarCandidate private (
   def at(i: Instant): GuideStarCandidate = {
     val ldt   = LocalDateTime.ofInstant(i, GuideStarCandidate.UTC)
     val epoch = Epoch.Julian.fromLocalDateTime(ldt).getOrElse(tracking.epoch)
-    copy(tracking = tracking.at(i).fold(tracking) { c =>
+    copy(tracking = tracking(i).fold(tracking) { c =>
       val update = SiderealTracking.baseCoordinates.replace(c) >>> SiderealTracking.epoch
         .replace(epoch)
       update(tracking)

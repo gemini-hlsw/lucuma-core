@@ -3,7 +3,9 @@
 
 package lucuma.core.model
 
-package object syntax {
-  object all extends ToNightOps
-                with ToNonNegDurationOps
-}
+import lucuma.core.math.Coordinates
+import java.time.Instant
+
+case class ConstantTracking(value: Coordinates) extends Tracking:
+  def apply(i: Instant): Option[Coordinates] =
+    Some(value)

@@ -7,11 +7,11 @@ import cats.Comparison
 import cats.Eq
 import cats.Order
 import cats.Order.catsKernelOrderingForOrder
-import cats.syntax.option.*
-import cats.syntax.order.*
+import cats.syntax.all.*
 import org.typelevel.cats.time.*
 
 import java.time.Instant
+import scala.concurrent.duration.FiniteDuration
 
 /**
  * A TimestampInterval represents a period of time with a fixed starting point
@@ -193,6 +193,16 @@ object TimestampInterval {
    */
   def until(t: Timestamp): TimestampInterval =
     TimestampInterval.between(Timestamp.Min, t)
+
+  /** 
+   * Creates an Interval [t + pad, t - pad), truncated and bounded as necessary to
+   * remain within the range and resolution of `Timestamp`.
+   */
+  def around(t: Timestamp, pad: FiniteDuration): TimestampInterval =
+    between(
+      Timestamp.fromInstantTruncatedAndBounded(t.toInstant.plusMillis(pad.toMillis)),
+      Timestamp.fromInstantTruncatedAndBounded(t.toInstant.minusMillis(pad.toMillis))
+    )
 
   given Order[TimestampInterval] =
     Order.whenEqual(Order.by(_.start), Order.by(_.end))

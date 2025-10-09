@@ -29,6 +29,10 @@ import scala.math.Pi
 import scala.math.abs
 import scala.math.pow
 import scala.math.sin
+import lucuma.core.math.Coordinates
+import java.time.Instant
+
+type Tracking = Instant => Option[Coordinates]
 
 // Integer Percents
 type ZeroTo100  = Interval.Closed[0, 100]

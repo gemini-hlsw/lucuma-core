@@ -12,6 +12,7 @@ import monocle.Focus
 import monocle.Lens
 
 import java.lang.Math.*
+import cats.data.NonEmptyList
 
 /** A point in the sky, given right ascension and declination. */
 final case class Coordinates(ra: RightAscension, dec: Declination) {
@@ -187,7 +188,7 @@ object Coordinates extends CoordinatesOptics {
   * Hyp = sqrt(x * x + y * y)
   * Lat = atan2(z, hyp)
   */
-  def centerOf[F[_]: Foldable](coords: F[Coordinates]): Coordinates =
+  def centerOf(coords: NonEmptyList[Coordinates]): Coordinates =
     val (x0, y0, z0) = coords.foldMap { case Coordinates(ra, dec) =>
       (cos(dec.toRadians) * cos(ra.toRadians),
       cos(dec.toRadians) * sin(ra.toRadians),

@@ -47,9 +47,9 @@ final case class SiderealTracking(
   properMotion:    Option[ProperMotion],
   radialVelocity:  Option[RadialVelocity],
   parallax:        Option[Parallax]
-) {
+) extends Tracking {
 
-  def at(i: Instant): Option[Coordinates] =
+  def apply(i: Instant): Option[Coordinates] =
     plusYears(epoch.untilInstant(i))
 
   /** Coordinates `elapsedYears` fractional epoch-years after `epoch`. */

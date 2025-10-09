@@ -34,7 +34,6 @@ import lucuma.core.model.CloudExtinction
 import lucuma.core.model.ConstraintSet
 import lucuma.core.model.ElevationRange
 import lucuma.core.model.ImageQuality
-import lucuma.core.model.ObjectTracking
 import lucuma.core.model.PosAngleConstraint
 import lucuma.core.model.SiderealTracking
 import lucuma.core.model.Target
@@ -93,7 +92,7 @@ trait AgsSelectionSample {
   val positions = PosAngleConstraint.Unbounded
     .anglesToTestAt(
       Site.GN,
-      ObjectTracking.SiderealObjectTracking(tracking),
+      tracking,
       now,
       Duration.ofHours(1)
     )
@@ -102,7 +101,7 @@ trait AgsSelectionSample {
 
   def gaiaQuery[F[_]: Functor](gaiaClient: GaiaClient[F]): F[List[GuideStarCandidate]] =
     gaiaClient
-      .queryGuideStars(QueryByADQL(tracking.at(now).get, candidatesArea, widestConstraints.some))
+      .queryGuideStars(QueryByADQL(tracking(now).get, candidatesArea, widestConstraints.some))
       .map:
         _.collect { case Right(t) => t }
           .map(GuideStarCandidate.siderealTarget.get)
