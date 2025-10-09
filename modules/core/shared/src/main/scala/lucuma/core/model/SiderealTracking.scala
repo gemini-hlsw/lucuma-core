@@ -69,6 +69,12 @@ final case class SiderealTracking(
     properMotion.forall(_ === ProperMotion.Zero) &&
       radialVelocity.forall(_ === RadialVelocity.Zero) &&
       parallax.forall(_ === Parallax.Zero)
+
+
+  // we have to implement this explicitly because Scala now just prints <function> :-\
+  override def toString =
+    s"SiderealTracking($baseCoordinates,$epoch,$properMotion,$radialVelocity,$parallax)"
+  
 }
 
 object SiderealTracking extends SiderealTrackingOptics {
