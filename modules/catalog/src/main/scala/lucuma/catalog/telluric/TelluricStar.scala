@@ -7,6 +7,8 @@ import io.circe.Decoder
 import io.circe.DecodingFailure
 import io.circe.Encoder
 import io.circe.Json
+import io.circe.syntax.*
+import lucuma.core.enums.TelluricCalibrationOrder
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Declination
 import lucuma.core.math.RightAscension
@@ -21,7 +23,7 @@ case class TelluricStar(
   distance: Double,
   hmag: Double,
   score: Double,
-  order: String
+  order: TelluricCalibrationOrder
 )
 
 object TelluricStar:
@@ -34,7 +36,7 @@ object TelluricStar:
       distance <- c.downField("Distance").as[Double]
       hmag     <- c.downField("Hmag").as[Double]
       score    <- c.downField("Score").as[Double]
-      order    <- c.downField("Order").as[String]
+      order    <- c.downField("Order").as[TelluricCalibrationOrder]
       dec      <- Declination.fromDoubleDegrees(decDeg).toRight(
                     DecodingFailure(s"Invalid declination: $decDeg", c.downField("Dec").history)
                   )
@@ -52,6 +54,6 @@ object TelluricStar:
       "distance" -> Json.fromDoubleOrNull(star.distance),
       "hmag" -> Json.fromDoubleOrNull(star.hmag),
       "score" -> Json.fromDoubleOrNull(star.score),
-      "order" -> Json.fromString(star.order)
+      "order" -> star.order.asJson
     )
   }
