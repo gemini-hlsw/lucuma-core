@@ -79,7 +79,7 @@ class BlindOffsetFileTestSuite extends CatsEffectSuite:
       .toList
       .map(_.collect { case Right(targetResult) => targetResult })
       .map: targetResults =>
-        val sorted             = BlindOffsets.analysis(
+        val sorted = BlindOffsets.analysis(
           targetResults,
           baseSiderealTracking,
           observationTime
