@@ -20,8 +20,8 @@ import lucuma.core.math.skycalc.averageParallacticAngle
 import lucuma.core.model.CloudExtinction
 import lucuma.core.model.ConstraintSet
 import lucuma.core.model.ImageQuality
-import lucuma.core.model.Tracking
 import lucuma.core.model.PosAngleConstraint
+import lucuma.core.model.Tracking
 import lucuma.core.util.Enumerated
 import lucuma.core.util.TimeSpan
 

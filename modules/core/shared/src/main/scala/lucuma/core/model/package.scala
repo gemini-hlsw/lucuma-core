@@ -16,6 +16,7 @@ import eu.timepit.refined.numeric.GreaterEqual
 import eu.timepit.refined.numeric.Interval
 import eu.timepit.refined.numeric.Less
 import eu.timepit.refined.numeric.NonNegative
+import lucuma.core.math.Coordinates
 import lucuma.core.math.Declination
 import lucuma.core.math.Lat
 import lucuma.core.optics.Format
@@ -24,13 +25,12 @@ import lucuma.core.util.NewRefined
 import org.typelevel.cats.time.instances.duration.*
 
 import java.time.Duration
+import java.time.Instant
 import java.time.temporal.Temporal
 import scala.math.Pi
 import scala.math.abs
 import scala.math.pow
 import scala.math.sin
-import lucuma.core.math.Coordinates
-import java.time.Instant
 
 type Tracking = Instant => Option[Coordinates]
 

@@ -3,9 +3,10 @@
 
 package lucuma.core.model
 
-import lucuma.core.math.Coordinates
-import java.time.Instant
 import cats.data.NonEmptyList
+import lucuma.core.math.Coordinates
+
+import java.time.Instant
 
 case class CompositeTracking(toNonEmptyList: NonEmptyList[Tracking]) extends Tracking:
   def apply(i: Instant): Option[Coordinates] =

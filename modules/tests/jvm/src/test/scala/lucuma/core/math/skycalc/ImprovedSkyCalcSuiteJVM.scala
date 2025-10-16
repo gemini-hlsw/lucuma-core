@@ -13,6 +13,7 @@ import lucuma.core.math.Coordinates
 import lucuma.core.math.Place
 import lucuma.core.math.arb.ArbCoordinates.given
 import lucuma.core.math.arb.ArbPlace.given
+import lucuma.core.model.ConstantTracking
 import lucuma.core.tests.ScalaCheckFlaky
 import lucuma.core.util.TimeSpan
 import munit.ScalaCheckSuite
@@ -21,7 +22,6 @@ import org.scalacheck.Test as ScalaCheckTest
 
 import java.time.*
 import java.util as ju
-import lucuma.core.model.ConstantTracking
 
 final class ImprovedSkyCalcSuiteJVM extends ScalaCheckSuite {
 

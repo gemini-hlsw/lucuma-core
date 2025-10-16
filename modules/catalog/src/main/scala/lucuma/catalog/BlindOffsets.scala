@@ -14,8 +14,8 @@ import lucuma.core.geom.ShapeInterpreter
 import lucuma.core.geom.syntax.all.*
 import lucuma.core.math.Angle
 import lucuma.core.math.Coordinates
-import lucuma.core.model.Tracking
 import lucuma.core.model.SourceProfile
+import lucuma.core.model.Tracking
 import lucuma.core.syntax.all.*
 
 import java.time.Instant

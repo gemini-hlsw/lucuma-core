@@ -4,6 +4,7 @@
 package lucuma.core.model
 
 import lucuma.core.math.Coordinates
+
 import java.time.Instant
 
 case class ConstantTracking(value: Coordinates) extends Tracking:

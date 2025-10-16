@@ -4,6 +4,7 @@
 package lucuma.core.math
 
 import cats.*
+import cats.data.NonEmptyList
 import cats.syntax.all.*
 import lucuma.core.math.parser.CoordinateParsers
 import lucuma.core.optics.Format
@@ -12,7 +13,6 @@ import monocle.Focus
 import monocle.Lens
 
 import java.lang.Math.*
-import cats.data.NonEmptyList
 
 /** A point in the sky, given right ascension and declination. */
 final case class Coordinates(ra: RightAscension, dec: Declination) {
