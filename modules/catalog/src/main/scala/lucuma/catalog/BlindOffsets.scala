@@ -65,7 +65,7 @@ object BlindOffsets:
     baseTracking
       .apply(observationTime)
       .map: baseCoordinates =>
-        val searchRadius    = 300.arcseconds
+        val searchRadius = 300.arcseconds
 
         val adqlQuery = QueryByADQL(
           base = baseCoordinates,
