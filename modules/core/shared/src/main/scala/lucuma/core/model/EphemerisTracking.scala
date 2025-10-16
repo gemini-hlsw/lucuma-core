@@ -8,17 +8,19 @@ import cats.Foldable
 import cats.Monoid
 import cats.kernel.Order.catsKernelOrderingForOrder
 import cats.syntax.all.*
+import lucuma.core.math.Coordinates
 import lucuma.core.optics.SplitMono
 import lucuma.core.syntax.treemap.*
 import lucuma.core.util.Timestamp
 
+import java.time.Instant
 import scala.collection.immutable.TreeMap
 
 /**
  * Time-parameterized coordinates over a fixed interval, defined pairwise. Coordinates that fall
  * between known instants are interpolated.
  */
-sealed abstract case class EphemerisTracking private (toMap: TreeMap[Timestamp, EphemerisCoordinates]) {
+sealed abstract case class EphemerisTracking private (toMap: TreeMap[Timestamp, EphemerisCoordinates]) extends Tracking {
   import EphemerisTracking.Element
 
   // N.B. this case class is abstract and has a private ctor because we want to keep construction of
@@ -42,6 +44,9 @@ sealed abstract case class EphemerisTracking private (toMap: TreeMap[Timestamp, 
           val factor       = (iʹ - aʹ).toDouble / (bʹ - aʹ).toDouble
           ca.interpolate(cb, factor)
       })
+
+  def apply(i: Instant): Option[Coordinates] =
+    Timestamp.fromInstant(i).flatMap(get).map(_.coord)
 
   /**
    * Greatest lower and least upper bounds of `t`; i.e., the closest elements on either side,
