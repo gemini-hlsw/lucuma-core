@@ -13,9 +13,9 @@ import lucuma.core.geom.ShapeExpression
 import lucuma.core.geom.ShapeInterpreter
 import lucuma.core.geom.syntax.all.*
 import lucuma.core.math.Angle
-import lucuma.core.model.CoordinatesAt
-import lucuma.core.model.ObjectTracking
+import lucuma.core.math.Coordinates
 import lucuma.core.model.SourceProfile
+import lucuma.core.model.Tracking
 import lucuma.core.syntax.all.*
 
 import java.time.Instant
@@ -23,8 +23,8 @@ import java.time.Instant
 case class BlindOffsetCandidate(
   catalogResult:   CatalogTargetResult,
   distance:        Angle,
-  baseCoordinates: CoordinatesAt,
-  candidateCoords: CoordinatesAt,
+  baseCoordinates: Coordinates,
+  candidateCoords: Coordinates,
   observationTime: Instant
 ) {
   val score: BigDecimal        = BlindOffsetCandidate.calculateScore(this)
@@ -59,14 +59,13 @@ object BlindOffsetCandidate:
 object BlindOffsets:
   def runBlindOffsetAnalysis[F[_]: Concurrent](
     gaiaClient:      GaiaClient[F],
-    baseTracking:    ObjectTracking,
+    baseTracking:    Tracking,
     observationTime: Instant
   )(using ShapeInterpreter): F[List[BlindOffsetCandidate]] =
     baseTracking
-      .at(observationTime)
-      .map: baseCoords =>
-        val baseCoordinates = baseCoords.value
-        val searchRadius    = 300.arcseconds
+      .apply(observationTime)
+      .map: baseCoordinates =>
+        val searchRadius = 300.arcseconds
 
         val adqlQuery = QueryByADQL(
           base = baseCoordinates,
@@ -84,21 +83,20 @@ object BlindOffsets:
 
   def analysis(
     catalogResults:  List[CatalogTargetResult],
-    baseTracking:    ObjectTracking,
+    baseTracking:    Tracking,
     observationTime: Instant
   ): List[BlindOffsetCandidate] =
     baseTracking
-      .at(observationTime)
-      .foldMap: baseCoords =>
-        val baseCoordinates = baseCoords.value
+      .apply(observationTime)
+      .foldMap: baseCoordinates =>
         catalogResults
           .flatMap: catalogResult =>
-            catalogResult.target.tracking.at(observationTime).map { candidateCoords =>
+            catalogResult.target.tracking(observationTime).map { candidateCoords =>
               val distance = baseCoordinates.angularDistance(candidateCoords)
               BlindOffsetCandidate(catalogResult,
                                    distance,
-                                   baseCoords,
-                                   CoordinatesAt(candidateCoords),
+                                   baseCoordinates,
+                                   candidateCoords,
                                    observationTime
               )
             }

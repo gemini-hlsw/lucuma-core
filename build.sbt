@@ -2,7 +2,7 @@ import org.scalajs.linker.interface.ESVersion
 import org.typelevel.sbt.gha.PermissionValue
 import org.typelevel.sbt.gha.Permissions
 
-ThisBuild / tlBaseVersion                         := "0.147"
+ThisBuild / tlBaseVersion                         := "0.148"
 ThisBuild / tlCiReleaseBranches                   := Seq("master")
 ThisBuild / githubWorkflowEnv += "MUNIT_FLAKY_OK" -> "true"
 
@@ -46,7 +46,7 @@ lazy val spireVersion               = "0.18.0"
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
-val root = tlCrossRootProject.aggregate(core, testkit, tests, catalog, ags, catalogTestkit, catalogTests)
+val root = tlCrossRootProject.aggregate(core, testkit, tests, catalog, ags, catalogTestkit, catalogTests, horizons)
 
 lazy val core = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Full)

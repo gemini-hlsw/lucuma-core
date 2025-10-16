@@ -13,7 +13,7 @@ import lucuma.core.math.Coordinates
 import lucuma.core.math.Place
 import lucuma.core.math.arb.ArbCoordinates.given
 import lucuma.core.math.arb.ArbPlace.given
-import lucuma.core.model.ObjectTracking
+import lucuma.core.model.ConstantTracking
 import lucuma.core.tests.ScalaCheckFlaky
 import lucuma.core.util.TimeSpan
 import munit.ScalaCheckSuite
@@ -42,7 +42,7 @@ final class ImprovedSkyCalcSuiteJVM extends ScalaCheckSuite {
     val coord = Coordinates.fromHmsDms.getOption("00:15:21.550600 +28:35:13.831766").get
     assert(averageParallacticAngle(
       Site.GN.place,
-      ObjectTracking.constant(coord),
+      ConstantTracking(coord),
       when,
       TimeSpan.fromHours(1).get).isEmpty
     )

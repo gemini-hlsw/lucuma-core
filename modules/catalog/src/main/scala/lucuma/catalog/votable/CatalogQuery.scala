@@ -125,8 +125,8 @@ case class TimeRangeQueryByADQL(
     given ShapeInterpreter = ev.shapeInterpreter
 
     // Coordinates at the start and of the time range
-    val start = tracking.at(timeRange.lowerBound.a)
-    val end   = tracking.at(timeRange.upperBound.a)
+    val start = tracking(timeRange.lowerBound.a)
+    val end   = tracking(timeRange.upperBound.a)
 
     // Try to set the base in the middle of both time ends
     val (offset, base) = (start, end) match {

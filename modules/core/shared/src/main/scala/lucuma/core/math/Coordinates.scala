@@ -4,6 +4,7 @@
 package lucuma.core.math
 
 import cats.*
+import cats.data.NonEmptyList
 import cats.syntax.all.*
 import lucuma.core.math.parser.CoordinateParsers
 import lucuma.core.optics.Format
@@ -187,7 +188,7 @@ object Coordinates extends CoordinatesOptics {
   * Hyp = sqrt(x * x + y * y)
   * Lat = atan2(z, hyp)
   */
-  def centerOf[F[_]: Foldable](coords: F[Coordinates]): Coordinates =
+  def centerOf(coords: NonEmptyList[Coordinates]): Coordinates =
     val (x0, y0, z0) = coords.foldMap { case Coordinates(ra, dec) =>
       (cos(dec.toRadians) * cos(ra.toRadians),
       cos(dec.toRadians) * sin(ra.toRadians),

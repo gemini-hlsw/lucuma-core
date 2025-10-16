@@ -15,7 +15,6 @@ import lucuma.core.math.Coordinates
 import lucuma.core.math.Declination
 import lucuma.core.math.Epoch
 import lucuma.core.math.RightAscension
-import lucuma.core.model.ObjectTracking
 import lucuma.core.model.SiderealTracking
 import org.http4s.jdkhttpclient.JdkHttpClient
 
@@ -44,8 +43,7 @@ trait BlindOffsetSample:
       radialVelocity = None,
       parallax = None
     )
-    val objectTracking   = ObjectTracking.SiderealObjectTracking(siderealTracking)
-    BlindOffsets.runBlindOffsetAnalysis(gaiaClient, objectTracking, observationTime)
+    BlindOffsets.runBlindOffsetAnalysis(gaiaClient, siderealTracking, observationTime)
   }
 
   def printCandidates(candidates: List[BlindOffsetCandidate]): IO[Unit] = IO {

@@ -17,22 +17,26 @@ import lucuma.core.util.NewType
 import java.time.Instant
 
 // Tag to indicate the coordinates have been corrected for proper motion
+@deprecated
 object CoordinatesAt extends NewType[Coordinates]
+@deprecated
 type CoordinatesAt = CoordinatesAt.Type
 
 /**
  * Generic representation to track an object. It is generalization of SiderealTracking but allows
  * tracking "virtual" objects like the center of an asterism
  */
+@deprecated
 sealed trait ObjectTracking derives Eq:
   def at(i: Instant): Option[CoordinatesAt]
   def baseCoordinates: Coordinates
 
+@deprecated
 object ObjectTracking:
 
   case class SiderealObjectTracking(tracking: SiderealTracking) extends ObjectTracking derives Eq:
     def at(i: Instant): Option[CoordinatesAt] =
-      tracking.at(i).map(CoordinatesAt(_))
+      tracking(i).map(CoordinatesAt(_))
     def baseCoordinates: Coordinates                 = tracking.baseCoordinates
 
   case class SiderealAsterismTracking(trackings : NonEmptyList[SiderealTracking]) extends ObjectTracking derives Eq:

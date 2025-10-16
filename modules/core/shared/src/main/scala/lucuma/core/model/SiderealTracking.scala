@@ -47,9 +47,9 @@ final case class SiderealTracking(
   properMotion:    Option[ProperMotion],
   radialVelocity:  Option[RadialVelocity],
   parallax:        Option[Parallax]
-) {
+) extends Tracking {
 
-  def at(i: Instant): Option[Coordinates] =
+  def apply(i: Instant): Option[Coordinates] =
     plusYears(epoch.untilInstant(i))
 
   /** Coordinates `elapsedYears` fractional epoch-years after `epoch`. */
@@ -69,6 +69,12 @@ final case class SiderealTracking(
     properMotion.forall(_ === ProperMotion.Zero) &&
       radialVelocity.forall(_ === RadialVelocity.Zero) &&
       parallax.forall(_ === Parallax.Zero)
+
+
+  // we have to implement this explicitly because Scala now just prints <function> :-\
+  override def toString =
+    s"SiderealTracking($baseCoordinates,$epoch,$properMotion,$radialVelocity,$parallax)"
+  
 }
 
 object SiderealTracking extends SiderealTrackingOptics {

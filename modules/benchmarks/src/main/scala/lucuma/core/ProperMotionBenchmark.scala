@@ -30,7 +30,7 @@ class ProperMotionBenchmark {
 
   @Benchmark
   def simpleRun: Unit = {
-    tracking.at(instant)
+    tracking(instant)
     ()
   }
 

@@ -8,18 +8,20 @@ import cats.Foldable
 import cats.Monoid
 import cats.kernel.Order.catsKernelOrderingForOrder
 import cats.syntax.all.*
+import lucuma.core.math.Coordinates
 import lucuma.core.optics.SplitMono
 import lucuma.core.syntax.treemap.*
 import lucuma.core.util.Timestamp
 
+import java.time.Instant
 import scala.collection.immutable.TreeMap
 
 /**
  * Time-parameterized coordinates over a fixed interval, defined pairwise. Coordinates that fall
  * between known instants are interpolated.
  */
-sealed abstract case class Ephemeris private (toMap: TreeMap[Timestamp, EphemerisCoordinates]) {
-  import Ephemeris.Element
+sealed abstract case class EphemerisTracking private (toMap: TreeMap[Timestamp, EphemerisCoordinates]) extends Tracking {
+  import EphemerisTracking.Element
 
   // N.B. this case class is abstract and has a private ctor because we want to keep construction of
   // the TreeMap private to ensure that the correct ordering is used and remains consistent.
@@ -43,6 +45,9 @@ sealed abstract case class Ephemeris private (toMap: TreeMap[Timestamp, Ephemeri
           ca.interpolate(cb, factor)
       })
 
+  def apply(i: Instant): Option[Coordinates] =
+    Timestamp.fromInstant(i).flatMap(get).map(_.coord)
+
   /**
    * Greatest lower and least upper bounds of `t`; i.e., the closest elements on either side,
    * inclusive (so if `t` is present then `bracket(t) = (t, t)`).
@@ -51,41 +56,41 @@ sealed abstract case class Ephemeris private (toMap: TreeMap[Timestamp, Ephemeri
     (toMap.rangeTo(t).lastOption, toMap.rangeFrom(t).headOption).tupled
 
   /** The sum of this ephemeris and `e`, taking values from `e` in the case of overlap. */
-  def ++(e: Ephemeris): Ephemeris =
-    new Ephemeris(toMap ++ e.toMap) {}
+  def ++(e: EphemerisTracking): EphemerisTracking =
+    new EphemerisTracking(toMap ++ e.toMap) {}
 
 }
-object Ephemeris {
+object EphemerisTracking {
 
   /** An ephemeris element. */
   type Element = (Timestamp, EphemerisCoordinates)
 
   /** The empty ephemeris. */
-  val empty: Ephemeris = apply()
+  val empty: EphemerisTracking = apply()
 
   /** Construct an ephemeris from a sequence of literal elements. */
-  def apply(es: Element*): Ephemeris =
+  def apply(es: Element*): EphemerisTracking =
     fromList(es.toList)
 
   /** Construct an ephemeris from a `List` of elements. */
-  def fromList(es:                     List[Element]): Ephemeris =
-    new Ephemeris(TreeMap.fromList(es)) {}
+  def fromList(es:                     List[Element]): EphemerisTracking =
+    new EphemerisTracking(TreeMap.fromList(es)) {}
 
   /** Construct an ephemeris from a foldable of elements. */
-  def fromFoldable[F[_]: Foldable](fa: F[Element]): Ephemeris    =
+  def fromFoldable[F[_]: Foldable](fa: F[Element]): EphemerisTracking    =
     fromList(fa.toList)
 
   /** Ephemerides form a monoid, using `++` as the combining operation. */
-  given Monoid[Ephemeris] =
-    new Monoid[Ephemeris] {
-      val empty: Ephemeris = Ephemeris.empty
-      def combine(a: Ephemeris, b: Ephemeris) = a ++ b
+  given Monoid[EphemerisTracking] =
+    new Monoid[EphemerisTracking] {
+      val empty: EphemerisTracking = EphemerisTracking.empty
+      def combine(a: EphemerisTracking, b: EphemerisTracking) = a ++ b
     }
 
-  given Eq[Ephemeris] =
+  given Eq[EphemerisTracking] =
     Eq.fromUniversalEquals
 
-  val elements: SplitMono[Ephemeris, List[Element]] =
+  val elements: SplitMono[EphemerisTracking, List[Element]] =
     SplitMono(_.toMap.toList, fromFoldable(_))
 
 }

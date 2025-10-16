@@ -16,16 +16,18 @@ trait ToTrackingOps {
     // We calculate the coordinates at a given time by doing PM
     // correction of each tracking and then finding the center
     @targetName("TrackingList_centerOfAt")
+    @deprecated
     def centerOfAt(i: Instant): Option[Coordinates] =
       trackings
-        .map(_.at(i))
+        .map(_(i))
         .sequence
-        .map(nel => Coordinates.centerOf(nel.toList))
+        .map(nel => Coordinates.centerOf(nel))
 
     @targetName("TrackingList_centerOf")
+    @deprecated
     def centerOf: Coordinates =
       val coords = trackings.map(_.baseCoordinates)
-      Coordinates.centerOf(coords.toList)
+      Coordinates.centerOf(coords)
     
 }
 

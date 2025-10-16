@@ -6,7 +6,7 @@ package lucuma.core.math.skycalc
 import cats.syntax.all.*
 import lucuma.core.math.Angle
 import lucuma.core.math.Place
-import lucuma.core.model.ObjectTracking
+import lucuma.core.model.Tracking
 import lucuma.core.util.TimeSpan
 
 import java.time.Instant
@@ -19,14 +19,12 @@ extension (r: TimeRange)
   def end: Long      = r._2
 
 // Calculate the parallactic angle for the given object at the given time.
-def parallacticAngle(place: Place, tracking: ObjectTracking, vizTime: Instant): Angle = {
+def parallacticAngle(place: Place, tracking: Tracking, vizTime: Instant): Option[Angle] = {
   val skycalc = new ImprovedSkyCalc(place)
 
-  val c = tracking
-    .at(vizTime)
-    .map(_.value)
-    .getOrElse(tracking.baseCoordinates)
-  skycalc.calculate(c, vizTime, false).parallacticAngle
+  tracking
+    .apply(vizTime)
+    .map(skycalc.calculate(_, vizTime, false).parallacticAngle)
 }
 
 /**
@@ -39,7 +37,7 @@ def parallacticAngle(place: Place, tracking: ObjectTracking, vizTime: Instant): 
   */
 def averageParallacticAngle(
   place: Place,
-  tracking: ObjectTracking,
+  tracking: Tracking,
   vizTime: Instant,
   duration: TimeSpan,
   samplingRate: TimeSpan = TimeSpan.unsafeFromMicroseconds(30.seconds.toMicros)
@@ -71,13 +69,14 @@ def averageParallacticAngle(
 
     times.traverse { t =>
       val at     = Instant.ofEpochMilli(t)
-      val coords = tracking.at(at)
-      coords.map(coords => skycalc.calculate(coords.value, Instant.ofEpochMilli(t), false))
+      val coords = tracking(at)
+      coords.map(coords => skycalc.calculate(coords, Instant.ofEpochMilli(t), false))
     }.orEmpty
   }
 
-  // If the target is visible during the scheduled time, return the weighted mean parallactic angle as Some(angle in degrees).
-  // Otherwise, the target is not visible, so return None.
+  // If the target is visible during the scheduled time and coordinates are known, 
+  // return the weighted mean parallactic angle as Some(angle in degrees).
+  // Otherwise, the target is not visible or its position is unknown, so return None.
   def weightedMeanParallacticAngle: Option[Double] = {
     val values = calculate
     val (weightedAngles, weights) = values
@@ -88,24 +87,28 @@ def averageParallacticAngle(
         // Wrap negative angles as per Andy's comment in OCSADV-16.
         val normalizedAngle =
           if (angle < 0) {
-            val normalizingFactor = {
-              val dec = tracking
-                .at(Instant.ofEpochMilli(t))
-                .map(_.value)
-                .getOrElse(tracking.baseCoordinates)
-                .dec
-                .toAngle
-                .toSignedDoubleDegrees
-              if (dec - place.latitude.toAngle.toSignedDoubleDegrees < -10) 0
-              else if (dec - place.latitude.toAngle.toSignedDoubleDegrees < 10) 180
-              else 360
+            val normalizingFactor: Option[Double] = {
+              tracking
+                .apply(Instant.ofEpochMilli(t))
+                .map: coords =>
+                  coords
+                    .dec
+                    .toAngle
+                    .toSignedDoubleDegrees
+                .map: dec =>
+                  if (dec - place.latitude.toAngle.toSignedDoubleDegrees < -10) 0
+                  else if (dec - place.latitude.toAngle.toSignedDoubleDegrees < 10) 180
+                  else 360
             }
-            angle + normalizingFactor
-          } else angle
+            normalizingFactor.map(angle + _)
+          } else Some(angle)
 
         val weight = if (airmass <= 0.0) 0.0 else math.pow(airmass - 1.0, 1.3)
-        (normalizedAngle * weight, weight)
+        normalizedAngle.map: a =>
+          (a * weight, weight)
       }
+      .collect:
+        case Some(pair) => pair
       .unzip
 
     val weightedSum = weights.sum

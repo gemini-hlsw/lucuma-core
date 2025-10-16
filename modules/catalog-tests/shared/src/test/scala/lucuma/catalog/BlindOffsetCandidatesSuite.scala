@@ -11,8 +11,6 @@ import lucuma.core.math.Coordinates
 import lucuma.core.math.Declination
 import lucuma.core.math.Epoch
 import lucuma.core.math.RightAscension
-import lucuma.core.model.CoordinatesAt
-import lucuma.core.model.ObjectTracking
 import lucuma.core.model.SiderealTracking
 import lucuma.core.model.SourceProfile
 import lucuma.core.model.SpectralDefinition
@@ -80,16 +78,16 @@ class BlindOffsetCandidatesSuite extends CatsEffectSuite:
     val candidate1 = BlindOffsetCandidate(
       catalogResult = CatalogTargetResult(target1, None),
       distance = baseCoords.angularDistance(coords1),
-      baseCoordinates = CoordinatesAt(baseCoords),
-      candidateCoords = CoordinatesAt(coords1),
+      baseCoordinates = baseCoords,
+      candidateCoords = coords1,
       observationTime = observationTime
     )
 
     val candidate2 = BlindOffsetCandidate(
       catalogResult = CatalogTargetResult(target2, None),
       distance = baseCoords.angularDistance(coords2),
-      baseCoordinates = CoordinatesAt(baseCoords),
-      candidateCoords = CoordinatesAt(coords2),
+      baseCoordinates = baseCoords,
+      candidateCoords = coords2,
       observationTime = observationTime
     )
 
@@ -112,11 +110,11 @@ class BlindOffsetCandidatesSuite extends CatsEffectSuite:
     val catalogResults =
       List(CatalogTargetResult(mockTarget, None)) // mockTarget has no magnitude data
 
-    val baseObjectTracking = ObjectTracking.SiderealObjectTracking(baseSiderealTracking)
+    val baseTracking = baseSiderealTracking
 
     val candidates = BlindOffsets.analysis(
       catalogResults,
-      baseObjectTracking,
+      baseTracking,
       observationTime
     )
 
