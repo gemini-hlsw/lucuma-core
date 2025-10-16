@@ -1,4 +1,6 @@
 import org.scalajs.linker.interface.ESVersion
+import org.typelevel.sbt.gha.PermissionValue
+import org.typelevel.sbt.gha.Permissions
 
 ThisBuild / tlBaseVersion                         := "0.147"
 ThisBuild / tlCiReleaseBranches                   := Seq("master")
@@ -31,7 +33,7 @@ lazy val kindProjectorVersion       = "0.13.2"
 lazy val kittensVersion             = "3.5.0"
 lazy val lucumaRefinedVersion       = "0.1.4"
 lazy val monocleVersion             = "3.3.0"
-lazy val munitVersion               = "1.2.0"
+lazy val munitVersion               = "1.2.1"
 lazy val munitDisciplineVersion     = "2.0.0"
 lazy val munitCatsEffectVersion     = "2.1.0"
 lazy val pprintVersion              = "0.9.4"
@@ -299,25 +301,31 @@ lazy val npm        = project
             |  "license": "${licenses.value.head._1}",
             |  "main": "main.js",
             |  "types": "main.d.ts",
-            |  "type": "module"
+            |  "type": "module",
+            |  "repository": {
+            |    "type": "git",
+            |    "url": "git+https://github.com/gemini-hlsw/lucuma-core.git"
+            |  }
             |}
             |""".stripMargin
       )
       IO.copyDirectory((Compile / sourceDirectory).value / "typescript", outDir)
+      streams.value.log.info(s"Created NPM project in ${outDir}")
       outDir
     },
     npmPublish := {
       import scala.sys.process._
       val outDir = npmPackage.value
       Process(List("npm", "publish"), outDir).!!
+      streams.value.log.info(s"Published NPM package from ${outDir}")
     }
   )
 
 ThisBuild / githubWorkflowPublishPreamble +=
   WorkflowStep.Use(
-    UseRef.Public("actions", "setup-node", "v4"),
+    UseRef.Public("actions", "setup-node", "v6"),
     Map(
-      "node-version" -> "22",
+      "node-version" -> "24",
       "registry-url" -> "https://registry.npmjs.org"
     )
   )
@@ -326,7 +334,13 @@ ThisBuild / githubWorkflowPublish ++= Seq(
   WorkflowStep.Sbt(
     List("npm/npmPublish"),
     name = Some("NPM Publish"),
-    env = Map("NODE_AUTH_TOKEN" -> s"$${{ secrets.NPM_REPO_TOKEN }}"),
     cond = Some("startsWith(github.ref, 'refs/tags/v')")
   )
+)
+
+// Needed for npm trusted publishing
+ThisBuild / githubWorkflowPermissions := Some(
+  Permissions.Specify.defaultPermissive
+    .withIdToken(PermissionValue.Write)
+    .withContents(PermissionValue.Read)
 )
