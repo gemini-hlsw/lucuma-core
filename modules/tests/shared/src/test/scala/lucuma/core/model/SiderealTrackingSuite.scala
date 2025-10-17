@@ -52,7 +52,7 @@ final class SiderealTrackingSuite extends DisciplineSuite {
     val pmdec = ProperMotion.Dec.milliarcsecondsPerYear.reverseGet(BigDecimal(938.527))
     val tracking = SiderealTracking(coord, Epoch.J2000, ProperMotion(pmra, pmdec).some, none, Parallax.fromMicroarcseconds(203887).some)
     val refEpoch = Instant.ofEpochSecond(4102444800L)
-    assertEquals(tracking(refEpoch), Coordinates.fromHmsDms.getOption("11 04 48.043284 +43 33 09.795210"))
+    assertEquals(tracking.at(refEpoch), Coordinates.fromHmsDms.getOption("11 04 48.043284 +43 33 09.795210"))
   }
 
   test("coordinatesOn corrected by cos(dec) case 2") {
@@ -61,7 +61,7 @@ final class SiderealTrackingSuite extends DisciplineSuite {
     val pmdec = ProperMotion.Dec.milliarcsecondsPerYear.reverseGet(BigDecimal(769.465))
     val tracking = SiderealTracking(coord, Epoch.J2000, ProperMotion(pmra, pmdec).some, none, Parallax.fromMicroarcseconds(768465).some)
     val refEpoch = Instant.ofEpochSecond(4102444800L)
-    assertEquals(tracking(refEpoch), Coordinates.fromHmsDms.getOption("14 28 48.054809 -62 39 28.543030"))
+    assertEquals(tracking.at(refEpoch), Coordinates.fromHmsDms.getOption("14 28 48.054809 -62 39 28.543030"))
   }
 
   test("SiderealTracking.constant") {

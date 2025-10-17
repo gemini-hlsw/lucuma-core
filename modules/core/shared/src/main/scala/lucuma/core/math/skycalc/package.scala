@@ -23,8 +23,8 @@ def parallacticAngle(place: Place, tracking: Tracking, vizTime: Instant): Option
   val skycalc = new ImprovedSkyCalc(place)
 
   tracking
-    .apply(vizTime)
-    .map(skycalc.calculate(_, vizTime, false).parallacticAngle)
+    .at(vizTime)
+    .map(coords => skycalc.calculate(coords, vizTime, false).parallacticAngle)
 }
 
 /**
@@ -69,7 +69,7 @@ def averageParallacticAngle(
 
     times.traverse { t =>
       val at     = Instant.ofEpochMilli(t)
-      val coords = tracking(at)
+      val coords = tracking.at(at)
       coords.map(coords => skycalc.calculate(coords, Instant.ofEpochMilli(t), false))
     }.orEmpty
   }
@@ -89,7 +89,7 @@ def averageParallacticAngle(
           if (angle < 0) {
             val normalizingFactor: Option[Double] = {
               tracking
-                .apply(Instant.ofEpochMilli(t))
+                .at(Instant.ofEpochMilli(t))
                 .map: coords =>
                   coords
                     .dec

@@ -125,7 +125,7 @@ object Ags {
     instant: Instant,
     gsc:     GuideStarCandidate
   ): Option[Offset] =
-    (at(instant), gsc.tracking(instant)).mapN(_.diff(_).offset)
+    (at(instant), gsc.tracking.at(instant)).mapN(_.diff(_).offset)
 
   private def scienceOffsetsAt(
     scienceAt: List[Instant => Option[Coordinates]],

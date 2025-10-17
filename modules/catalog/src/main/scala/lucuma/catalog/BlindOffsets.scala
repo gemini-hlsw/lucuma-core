@@ -63,7 +63,7 @@ object BlindOffsets:
     observationTime: Instant
   )(using ShapeInterpreter): F[List[BlindOffsetCandidate]] =
     baseTracking
-      .apply(observationTime)
+      .at(observationTime)
       .map: baseCoordinates =>
         val searchRadius = 300.arcseconds
 
@@ -87,17 +87,18 @@ object BlindOffsets:
     observationTime: Instant
   ): List[BlindOffsetCandidate] =
     baseTracking
-      .apply(observationTime)
+      .at(observationTime)
       .foldMap: baseCoordinates =>
         catalogResults
           .flatMap: catalogResult =>
-            catalogResult.target.tracking(observationTime).map { candidateCoords =>
+            catalogResult.target.tracking.at(observationTime).map { candidateCoords =>
               val distance = baseCoordinates.angularDistance(candidateCoords)
-              BlindOffsetCandidate(catalogResult,
-                                   distance,
-                                   baseCoordinates,
-                                   candidateCoords,
-                                   observationTime
+              BlindOffsetCandidate(
+                catalogResult,
+                distance,
+                baseCoordinates,
+                candidateCoords,
+                observationTime
               )
             }
           .sortBy(_.score)
