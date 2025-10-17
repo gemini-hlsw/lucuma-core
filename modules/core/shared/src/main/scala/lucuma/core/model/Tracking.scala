@@ -4,8 +4,16 @@
 package lucuma.core.model
 
 import cats.*
+import cats.Foldable
+import cats.Monoid
+import cats.data.NonEmptyList
+import cats.derived.*
+import cats.kernel.Order.catsKernelOrderingForOrder
 import cats.syntax.all.*
 import lucuma.core.math.*
+import lucuma.core.optics.SplitMono
+import lucuma.core.syntax.treemap.*
+import lucuma.core.util.Timestamp
 import monocle.Focus
 import monocle.Lens
 
@@ -13,7 +21,109 @@ import java.lang.Math.atan2
 import java.lang.Math.cos
 import java.lang.Math.hypot
 import java.lang.Math.sin
-import java.time.Instant
+import scala.collection.immutable.TreeMap
+
+/**
+ * Generic representation to track an object.
+ */
+sealed trait Tracking:
+  def at: TrackingAt
+
+object Tracking:
+  given Eq[Tracking] = Eq.instance:
+    case (a: ConstantTracking, b: ConstantTracking)   => a === b
+    case (a: CompositeTracking, b: CompositeTracking) => a === b
+    case (a: EphemerisTracking, b: EphemerisTracking) => a === b
+    case (a: SiderealTracking, b: SiderealTracking)   => a === b
+    case _                                            => false
+
+case class ConstantTracking(value: Coordinates) extends Tracking derives Eq:
+  val at: TrackingAt = _ =>
+    Some(value)
+
+case class CompositeTracking(toNonEmptyList: NonEmptyList[Tracking]) extends Tracking derives Eq:
+  val at: TrackingAt = i =>
+    toNonEmptyList
+      .traverse(_.at(i))
+      .map(cs => Coordinates.centerOf(cs))
+
+/**
+ * Time-parameterized coordinates over a fixed interval, defined pairwise. Coordinates that fall
+ * between known instants are interpolated.
+ */
+sealed abstract case class EphemerisTracking private (toMap: TreeMap[Timestamp, EphemerisCoordinates]) extends Tracking {
+  import EphemerisTracking.Element
+
+  // N.B. this case class is abstract and has a private ctor because we want to keep construction of
+  // the TreeMap private to ensure that the correct ordering is used and remains consistent.
+
+  /** First element in this ephemeris, if any. */
+  def first: Option[Element] =
+    toMap.headOption
+
+  /** Last element in this ephemeris, if any. */
+  def last: Option[Element] =
+    toMap.lastOption
+
+  /** Coordinates at time `t`, exact if known, interpolated if `bracket(t)` is known. */
+  def get(t: Timestamp): Option[EphemerisCoordinates] =
+    toMap
+      .get(t)
+      .orElse(bracket(t).map {
+        case ((a, ca), (b, cb)) =>
+          val (iʹ, aʹ, bʹ) = (t.toEpochMilli, a.toEpochMilli, b.toEpochMilli)
+          val factor       = (iʹ - aʹ).toDouble / (bʹ - aʹ).toDouble
+          ca.interpolate(cb, factor)
+      })
+
+  val at: TrackingAt = i =>
+    Timestamp.fromInstant(i).flatMap(get).map(_.coord)
+
+  /**
+   * Greatest lower and least upper bounds of `t`; i.e., the closest elements on either side,
+   * inclusive (so if `t` is present then `bracket(t) = (t, t)`).
+   */
+  def bracket(t: Timestamp): Option[(Element, Element)] =
+    (toMap.rangeTo(t).lastOption, toMap.rangeFrom(t).headOption).tupled
+
+  /** The sum of this ephemeris and `e`, taking values from `e` in the case of overlap. */
+  def ++(e: EphemerisTracking): EphemerisTracking =
+    new EphemerisTracking(toMap ++ e.toMap) {}
+}
+
+object EphemerisTracking {
+
+  /** An ephemeris element. */
+  type Element = (Timestamp, EphemerisCoordinates)
+
+  /** The empty ephemeris. */
+  val empty: EphemerisTracking = apply()
+
+  /** Construct an ephemeris from a sequence of literal elements. */
+  def apply(es: Element*): EphemerisTracking =
+    fromList(es.toList)
+
+  /** Construct an ephemeris from a `List` of elements. */
+  def fromList(es:                     List[Element]): EphemerisTracking =
+    new EphemerisTracking(TreeMap.fromList(es)) {}
+
+  /** Construct an ephemeris from a foldable of elements. */
+  def fromFoldable[F[_]: Foldable](fa: F[Element]): EphemerisTracking    =
+    fromList(fa.toList)
+
+  /** Ephemerides form a monoid, using `++` as the combining operation. */
+  given Monoid[EphemerisTracking] =
+    new Monoid[EphemerisTracking] {
+      val empty: EphemerisTracking = EphemerisTracking.empty
+      def combine(a: EphemerisTracking, b: EphemerisTracking) = a ++ b
+    }
+
+  given Eq[EphemerisTracking] =
+    Eq.fromUniversalEquals
+
+  val elements: SplitMono[EphemerisTracking, List[Element]] =
+    SplitMono(_.toMap.toList, fromFoldable(_))
+}
 
 /**
  * Time-parameterized coordinates, based on an observed position at some point in time (called the
@@ -47,9 +157,9 @@ final case class SiderealTracking(
   properMotion:    Option[ProperMotion],
   radialVelocity:  Option[RadialVelocity],
   parallax:        Option[Parallax]
-) extends Tracking {
+) extends Tracking derives Eq {
 
-  def apply(i: Instant): Option[Coordinates] =
+  val at: TrackingAt = i =>
     plusYears(epoch.untilInstant(i))
 
   /** Coordinates `elapsedYears` fractional epoch-years after `epoch`. */
@@ -268,5 +378,4 @@ trait SiderealTrackingOptics {
   /** @group Optics */
   val parallax: Lens[SiderealTracking, Option[Parallax]] =
     Focus[SiderealTracking](_.parallax)
-
 }
