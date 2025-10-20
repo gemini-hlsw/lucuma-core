@@ -4,6 +4,8 @@
 package lucuma.core.enums
 
 import cats.syntax.eq.*
+import lucuma.core.enums
+import lucuma.core.util.Display
 import lucuma.core.util.Enumerated
 
 /**
@@ -50,6 +52,9 @@ enum GmosLongSlitAcquisitionRoi(
   )
 
 object GmosLongSlitAcquisitionRoi:
+
+  given Display[GmosLongSlitAcquisitionRoi] =
+    Display.byShortName(_.displayName)
 
   /**
    * Selects the default Acquisition ROI for the given science ROI and
