@@ -3,8 +3,8 @@
 
 package lucuma.core.model.arb
 
-import cats.syntax.all.*
 import cats.data.NonEmptyList
+import cats.syntax.all.*
 import lucuma.core.math.*
 import lucuma.core.math.arb.*
 import lucuma.core.model.*
