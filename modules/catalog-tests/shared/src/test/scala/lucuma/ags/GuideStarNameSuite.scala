@@ -13,12 +13,8 @@ import io.circe.testing.instances.arbitraryJson
 import lucuma.ags.arb.ArbGuideStarName.given
 import monocle.law.discipline.PrismTests
 
-class GuideStarNameSuite extends munit.DisciplineSuite {
-  test("typeclasses") {
-    checkAll("GuideStarName", EqTests[GuideStarName].eqv)
-    checkAll("GuideStarNameCodec", CodecTests[GuideStarName].codec)
-    checkAll("GuideStarName.from", PrismTests(GuideStarName.From))
-    checkAll("GuideStarName.gaiaSourceId", PrismTests(GuideStarName.gaiaSourceId))
-  }
-
-}
+class GuideStarNameSuite extends munit.DisciplineSuite:
+  checkAll("GuideStarName", EqTests[GuideStarName].eqv)
+  checkAll("GuideStarNameCodec", CodecTests[GuideStarName].codec)
+  checkAll("GuideStarName.from", PrismTests(GuideStarName.From))
+  checkAll("GuideStarName.gaiaSourceId", PrismTests(GuideStarName.gaiaSourceId))

@@ -18,8 +18,6 @@ import lucuma.core.math.RightAscension
 import lucuma.core.syntax.all.*
 import munit.CatsEffectSuite
 
-import scala.xml.Utility
-
 class GaiaClientSuite extends CatsEffectSuite with VoTableSamples:
 
   given ADQLInterpreter = ADQLInterpreter.nTarget(10)
@@ -30,7 +28,7 @@ class GaiaClientSuite extends CatsEffectSuite with VoTableSamples:
   )
 
   test("GaiaClient.query returns CatalogTargetResult"):
-    val client       = GaiaClientMock.mockGaiaClient[IO](Utility.trim(gaia).toString)
+    val client       = GaiaClientMock.fromXML[IO](gaia, None)
     val searchRadius = 6.arcseconds
     val query        = QueryByADQL(testCoords,
                             ShapeExpression.centeredEllipse(searchRadius * 2, searchRadius * 2),
@@ -46,9 +44,8 @@ class GaiaClientSuite extends CatsEffectSuite with VoTableSamples:
         assertEquals(target.get.catalogInfo.map(_.catalog), CatalogName.Gaia.some)
 
   test("GaiaClient.queryGuideStars returns minimal Target.Sidereal"):
-    val client       = GaiaClientMock.mockGaiaClient[IO](
-      Utility.trim(voTableAlternative).toString,
-      NonEmptyChain.one(CatalogAdapter.Gaia3LiteGavo).some
+    val client       = GaiaClientMock.fromXML[IO](voTableAlternative,
+                                            NonEmptyChain.one(CatalogAdapter.Gaia3LiteGavo).some
     )
     val searchRadius = 6.arcseconds
     val query        = QueryByADQL(testCoords,
@@ -66,7 +63,7 @@ class GaiaClientSuite extends CatsEffectSuite with VoTableSamples:
         assert(target.get.catalogInfo.isEmpty)
 
   test("GaiaClient.queryById returns CatalogTargetResult for single source"):
-    val client = GaiaClientMock.mockGaiaClient[IO](Utility.trim(gaia).toString)
+    val client = GaiaClientMock.fromXML[IO](gaia, None)
 
     client
       .queryById(5500810326779190016L)
@@ -78,9 +75,8 @@ class GaiaClientSuite extends CatsEffectSuite with VoTableSamples:
           fail(s"queryById failed: ${e.toList.mkString("; ")}")
 
   test("GaiaClient.queryByIdGuideStar returns Target.Sidereal for single source"):
-    val client = GaiaClientMock.mockGaiaClient[IO](
-      Utility.trim(voTableAlternative).toString,
-      NonEmptyChain.one(CatalogAdapter.Gaia3LiteGavo).some
+    val client = GaiaClientMock.fromXML[IO](voTableAlternative,
+                                            NonEmptyChain.one(CatalogAdapter.Gaia3LiteGavo).some
     )
 
     client
