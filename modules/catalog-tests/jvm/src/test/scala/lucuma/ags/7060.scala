@@ -1,0 +1,152 @@
+// Copyright (c) 2016-2025 Association of Universities for Research in Astronomy, Inc. (AURA)
+// For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
+
+package lucuma.ags
+
+import cats.data.NonEmptyChain
+import cats.data.NonEmptyList
+import cats.effect.IO
+import cats.syntax.either.*
+import cats.syntax.option.*
+import lucuma.ags.AgsAnalysis.Usable
+import lucuma.catalog.clients.GaiaClientMock
+import lucuma.catalog.votable.*
+import lucuma.core.enums.GmosSouthFpu
+import lucuma.core.enums.PortDisposition
+import lucuma.core.enums.SkyBackground
+import lucuma.core.enums.WaterVapor
+import lucuma.core.geom.ShapeExpression
+import lucuma.core.geom.jts.interpreter.given
+import lucuma.core.geom.syntax.all.*
+import lucuma.core.math.Angle
+import lucuma.core.math.Coordinates
+import lucuma.core.math.Declination
+import lucuma.core.math.Epoch
+import lucuma.core.math.Offset
+import lucuma.core.math.ProperMotion
+import lucuma.core.math.Redshift
+import lucuma.core.math.RightAscension
+import lucuma.core.math.Wavelength
+import lucuma.core.model.AirMassBound
+import lucuma.core.model.CloudExtinction
+import lucuma.core.model.ConstraintSet
+import lucuma.core.model.ElevationRange
+import lucuma.core.model.ImageQuality
+import lucuma.core.model.PosAngleConstraint
+import lucuma.core.model.SiderealTracking
+import lucuma.core.syntax.all.*
+import munit.CatsEffectSuite
+
+import java.time.Instant
+
+// This is a replication of what explore does for the sample observation
+// It does not fix it
+// https://app.shortcut.com/lucuma/story/7060/gpp-ags-does-not-match-ocs-ags
+class ShortCut_7060 extends CatsEffectSuite:
+
+  given ADQLInterpreter = ADQLInterpreter.nTarget(100)
+
+  // Target coordinates for GP221000-483213
+  // made to match
+  // https://explore-dev.lucuma.xyz/p-d34/observation/o-3cf6/target/t-13784
+  val targetCoords = Coordinates(
+    RightAscension.fromDoubleDegrees(317.50417),
+    Declination.fromDoubleDegrees(-48.53700).getOrElse(Declination.Zero)
+  )
+
+  val wavelength = Wavelength.fromIntNanometers(750).get
+
+  val tracking = SiderealTracking(
+    targetCoords,
+    Epoch.J2000,
+    ProperMotion.Zero.some,
+    Redshift(0.4).toRadialVelocity,
+    None
+  )
+
+  val now = Instant.parse("2025-09-30T22:39:00Z")
+
+  val acqOffsets =
+    NonEmptyList.of(Offset.Zero, Offset.Zero.copy(p = Offset.P(Angle.fromDoubleArcseconds(10))))
+  val sciOffsets =
+    NonEmptyList.of(
+      Offset.Zero.copy(q = Offset.Q(Angle.fromDoubleArcseconds(-15))),
+      Offset.Zero,
+      Offset.Zero.copy(q = Offset.Q(Angle.fromDoubleArcseconds(15)))
+    )
+
+  val offsets =
+    (sciOffsets ++ acqOffsets.toList).toNes.toNonEmptyList
+
+  val anglesToTest = PosAngleConstraint.AverageParallactic
+    .anglesToTestAt(
+      Angle.fromDoubleDegrees(300.96).some
+    )
+    .get
+
+  val positions =
+    for {
+      pa  <- anglesToTest
+      off <- offsets
+    } yield AgsPosition(pa, off)
+
+  val constraints = ConstraintSet(
+    ImageQuality.Preset.OnePointZero,
+    CloudExtinction.Preset.PointThree,
+    SkyBackground.Gray,
+    WaterVapor.Wet,
+    ElevationRange.ByAirMass.FromBounds.get(
+      AirMassBound.unsafeFromBigDecimal(BigDecimal(1.0)),
+      AirMassBound.unsafeFromBigDecimal(BigDecimal(2.0))
+    )
+  )
+
+  val conf = AgsParams.GmosAgsParams(
+    GmosSouthFpu.LongSlit_0_50.asRight.some,
+    PortDisposition.Side
+  )
+
+  test("XML file - count stars in GP221000-483213-dr3.xml"):
+    val gaia         =
+      GaiaClientMock.fromResource[IO]("GP221000-483213-dr3.xml",
+                                      NonEmptyChain.one(CatalogAdapter.Gaia3LiteEsaProxy).some
+      )
+    val searchRadius = 6.arcseconds
+    val query        = QueryByADQL(targetCoords,
+                            ShapeExpression.centeredEllipse(searchRadius * 2, searchRadius * 2),
+                            None
+    )
+
+    gaia
+      .query(query)
+      .map: stars =>
+        assertEquals(stars.length, 52)
+
+  test("Run ags with GP221000-483213-dr3.xml"):
+    val gaia =
+      GaiaClientMock.fromResource[IO]("GP221000-483213-dr3.xml",
+                                      NonEmptyChain.one(CatalogAdapter.Gaia3LiteEsaProxy).some
+      )
+
+    val searchRadius = 6.arcseconds
+    val query        = QueryByADQL(targetCoords,
+                            ShapeExpression.centeredEllipse(searchRadius * 2, searchRadius * 2),
+                            None
+    )
+
+    gaia
+      .queryGuideStars(query)
+      .map: gs =>
+        val r = Ags
+          .agsAnalysis(
+            constraints,
+            wavelength,
+            targetCoords,
+            List(targetCoords),
+            positions,
+            conf,
+            gs.collect { case Right(t) => t }.map(GuideStarCandidate.siderealTarget.get)
+          )
+        r.sortUsablePositions.collectFirst:
+          case Usable(target = GuideStarCandidate(id = id)) => id
+      .assertEquals(6479709205473911296L.some)

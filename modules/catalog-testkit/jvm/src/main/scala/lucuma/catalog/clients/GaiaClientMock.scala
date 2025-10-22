@@ -6,13 +6,20 @@ package lucuma.catalog.clients
 import cats.data.NonEmptyChain
 import cats.effect.*
 import cats.syntax.all.*
+import fs2.Stream
+import fs2.io.readClassLoaderResource
+import fs2.text
 import lucuma.catalog.votable.CatalogAdapter
 import org.http4s.*
 import org.http4s.client.Client
 
+import scala.xml.Node
 import scala.xml.Utility
+import scala.xml.XML
 
 object GaiaClientMock:
+  enum Mode:
+    case All, ById
 
   /**
    * Helper to filter VOTable XML to only include rows matching a specific source ID.
@@ -48,10 +55,10 @@ object GaiaClientMock:
   }
 
   /**
-   * Create a mock GaiaClient that returns VOTable XML responses.
+   * ) Create a mock GaiaClient that returns VOTable XML responses.
    */
   def mockGaiaClient[F[_]: Async](
-    voTableXml: String,
+    voTableXml: Stream[F, String],
     adapters:   Option[NonEmptyChain[CatalogAdapter.Gaia]] = None
   ): GaiaClient[F] = {
     val mockHttpClient = Client.fromHttpApp[F](HttpApp[F]: request =>
@@ -62,7 +69,7 @@ object GaiaClientMock:
       val responseXml = sourceIdPattern.findFirstMatchIn(query) match {
         case Some(m) =>
           val sourceId = m.group(1).toLong
-          filterVoTableById(voTableXml, sourceId)
+          voTableXml.map(filterVoTableById(_, sourceId))
         case None    =>
           voTableXml
       }
@@ -74,3 +81,30 @@ object GaiaClientMock:
       case None    => GaiaClient.build[F](mockHttpClient)
     }
   }
+
+  /**
+   * Create a mock GaiaClient that reads XML.
+   */
+  def fromXML[F[_]: Async](
+    xml:      Node,
+    adapters: Option[NonEmptyChain[CatalogAdapter.Gaia]]
+  ): GaiaClient[F] =
+    mockGaiaClient(Stream.emit(Utility.trim(xml).toString), adapters)
+
+  /**
+   * Create a mock GaiaClient that reads a Strina String.
+   */
+  def fromString[F[_]: Async](
+    content:  String,
+    adapters: Option[NonEmptyChain[CatalogAdapter.Gaia]]
+  ): GaiaClient[F] =
+    mockGaiaClient(Stream.emit(content), adapters)
+
+  /**
+   * Create a mock GaiaClient that reads VOTable XML from a resource file.
+   */
+  def fromResource[F[_]: Async](
+    resource: String,
+    adapters: Option[NonEmptyChain[CatalogAdapter.Gaia]]
+  ): GaiaClient[F] =
+    mockGaiaClient(readClassLoaderResource[F](resource, 8192).through(text.utf8.decode), adapters)
