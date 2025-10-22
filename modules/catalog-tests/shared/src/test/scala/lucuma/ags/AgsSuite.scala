@@ -121,7 +121,9 @@ class AgsSuite extends munit.FunSuite {
           wavelength,
           Coordinates.Zero,
           List(Coordinates.Zero),
-          NonEmptyList.of(AgsPosition(Angle.Angle0, Offset.Zero)),
+          NonEmptyList.of(Angle.Angle0),
+          NonEmptyList.of(Offset.Zero).some,
+          NonEmptyList.of(Offset.Zero).some,
           AgsParams.GmosAgsParams(GmosNorthFpu.LongSlit_5_00.asLeft.some, PortDisposition.Bottom),
           List(gs1)
         )
@@ -147,7 +149,9 @@ class AgsSuite extends munit.FunSuite {
           wavelength,
           Coordinates.Zero,
           Nil,
-          NonEmptyList.of(AgsPosition(Angle.Angle0, Offset.Zero)),
+          NonEmptyList.of(Angle.Angle0),
+          NonEmptyList.of(Offset.Zero).some,
+          NonEmptyList.of(Offset.Zero).some,
           AgsParams.GmosAgsParams(GmosNorthFpu.LongSlit_5_00.asLeft.some, PortDisposition.Bottom),
           List(guideStarOffset)
         )
@@ -174,7 +178,9 @@ class AgsSuite extends munit.FunSuite {
           wavelength,
           Coordinates.Zero,
           List(Coordinates.Zero),
-          NonEmptyList.of(AgsPosition(Angle.Angle0, Offset.Zero)),
+          NonEmptyList.of(Angle.Angle0),
+          NonEmptyList.of(Offset.Zero).some,
+          NonEmptyList.of(Offset.Zero).some,
           AgsParams.Flamingos2AgsParams(
             Flamingos2LyotWheel.F16,
             Flamingos2FpuMask.Builtin(Flamingos2Fpu.LongSlit3),
@@ -204,7 +210,9 @@ class AgsSuite extends munit.FunSuite {
           wavelength,
           Coordinates.Zero,
           Nil,
-          NonEmptyList.of(AgsPosition(Angle.Angle0, Offset.Zero)),
+          NonEmptyList.of(Angle.Angle0),
+          NonEmptyList.of(Offset.Zero).some,
+          NonEmptyList.of(Offset.Zero).some,
           AgsParams.Flamingos2AgsParams(
             Flamingos2LyotWheel.F16,
             Flamingos2FpuMask.Builtin(Flamingos2Fpu.LongSlit3),

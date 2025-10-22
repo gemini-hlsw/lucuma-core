@@ -75,20 +75,11 @@ class ShortCut_7060 extends CatsEffectSuite:
       Offset.Zero.copy(q = Offset.Q(Angle.fromDoubleArcseconds(15)))
     )
 
-  val offsets =
-    (sciOffsets ++ acqOffsets.toList).toNes.toNonEmptyList
-
   val anglesToTest = PosAngleConstraint.AverageParallactic
     .anglesToTestAt(
       Angle.fromDoubleDegrees(300.96).some
     )
     .get
-
-  val positions =
-    for {
-      pa  <- anglesToTest
-      off <- offsets
-    } yield AgsPosition(pa, off)
 
   val constraints = ConstraintSet(
     ImageQuality.Preset.OnePointZero,
@@ -143,7 +134,9 @@ class ShortCut_7060 extends CatsEffectSuite:
             wavelength,
             targetCoords,
             List(targetCoords),
-            positions,
+            anglesToTest,
+            acqOffsets.some,
+            sciOffsets.some,
             conf,
             gs.collect { case Right(t) => t }.map(GuideStarCandidate.siderealTarget.get)
           )
