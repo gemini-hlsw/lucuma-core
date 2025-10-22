@@ -64,7 +64,9 @@ trait AgsSelectionSample {
   val now        = Instant.ofEpochMilli(1688486539L)
   val wavelength = Wavelength.fromIntNanometers(600).get
 
-  val offsets =
+  val acqOffsets =
+    NonEmptyList.of(Offset.Zero)
+  val sciOffsets =
     NonEmptyList.of(Offset.Zero, Offset.Zero.copy(q = Offset.Q(Angle.fromDoubleArcseconds(15))))
 
   val gmosParams = AgsParams.GmosAgsParams(
@@ -89,7 +91,7 @@ trait AgsSelectionSample {
     )
   )
 
-  val positions = PosAngleConstraint.Unbounded
+  val posAngles = PosAngleConstraint.Unbounded
     .anglesToTestAt(
       Site.GN,
       tracking,
@@ -97,7 +99,6 @@ trait AgsSelectionSample {
       Duration.ofHours(1)
     )
     .get
-    .flatMap(a => offsets.map(o => AgsPosition(a, o)))
 
   def gaiaQuery[F[_]: Functor](gaiaClient: GaiaClient[F]): F[List[GuideStarCandidate]] =
     gaiaClient
@@ -124,7 +125,9 @@ object AgsSelectionSampleApp extends IOApp.Simple with AgsSelectionSample {
                 wavelength,
                 coords,
                 List(coords),
-                positions,
+                posAngles,
+                acqOffsets.some,
+                sciOffsets.some,
                 flamingos2Params,
                 candidates
               )
