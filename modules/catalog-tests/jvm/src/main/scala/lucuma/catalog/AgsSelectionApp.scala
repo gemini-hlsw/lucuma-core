@@ -125,12 +125,12 @@ object AgsSelectionSampleApp extends IOApp.Simple with AgsSelectionSample {
                 wavelength,
                 coords,
                 List(coords),
+                None,
                 posAngles,
                 acqOffsets.some,
                 sciOffsets.some,
                 flamingos2Params,
-                candidates,
-                None
+                candidates
               )
             pprint.pprintln(r.sortUsablePositions)
             r.sortUsablePositions

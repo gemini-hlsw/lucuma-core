@@ -134,12 +134,12 @@ class ShortCut_7060 extends CatsEffectSuite:
             wavelength,
             targetCoords,
             List(targetCoords),
+            None,
             anglesToTest,
             acqOffsets.some,
             sciOffsets.some,
             conf,
-            gs.collect { case Right(t) => t }.map(GuideStarCandidate.siderealTarget.get),
-            None
+            gs.collect { case Right(t) => t }.map(GuideStarCandidate.siderealTarget.get)
           )
         r.sortUsablePositions.collectFirst:
           case Usable(target = GuideStarCandidate(id = id)) => id
@@ -166,12 +166,12 @@ class ShortCut_7060 extends CatsEffectSuite:
             wavelength,
             targetCoords,
             List(targetCoords),
+            targetCoords.some,
             anglesToTest,
             acqOffsets.some,
             sciOffsets.some,
             conf,
-            gs.collect { case Right(t) => t }.map(GuideStarCandidate.siderealTarget.get),
-            targetCoords.some
+            gs.collect { case Right(t) => t }.map(GuideStarCandidate.siderealTarget.get)
           )
         r.sortUsablePositions.collectFirst:
           case Usable(target = GuideStarCandidate(id = id)) => id
@@ -189,10 +189,9 @@ class ShortCut_7060 extends CatsEffectSuite:
                             None
     )
 
-    val farBlindOffset = Coordinates(
-      RightAscension.fromDoubleDegrees(317.50417 + 1.0),
-      Declination.fromDoubleDegrees(-48.53700 + 1.0).getOrElse(Declination.Zero)
-    )
+    // with a very far blind offset AGS fails
+    val blindOffset =
+      targetCoords.offsetBy(Angle.Angle0, Offset.signedDecimalArcseconds.reverseGet(3600, 3600))
 
     gaia
       .queryGuideStars(query)
@@ -203,12 +202,12 @@ class ShortCut_7060 extends CatsEffectSuite:
             wavelength,
             targetCoords,
             List(targetCoords),
+            blindOffset,
             anglesToTest,
             acqOffsets.some,
             sciOffsets.some,
             conf,
-            gs.collect { case Right(t) => t }.map(GuideStarCandidate.siderealTarget.get),
-            farBlindOffset.some
+            gs.collect { case Right(t) => t }.map(GuideStarCandidate.siderealTarget.get)
           )
         r.sortUsablePositions
       .assertEquals(Nil)
