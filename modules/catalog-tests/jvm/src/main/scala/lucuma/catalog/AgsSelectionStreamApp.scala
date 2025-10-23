@@ -33,6 +33,7 @@ object AgsSelectionSampleStreamApp extends IOApp.Simple with AgsSelectionSample:
                   wavelength,
                   coords,
                   List(coords),
+                  None,
                   NonEmptyList.of(
                     Angle.fromDoubleDegrees(-120),
                     Angle.fromDoubleDegrees(120)
@@ -42,8 +43,7 @@ object AgsSelectionSampleStreamApp extends IOApp.Simple with AgsSelectionSample:
                   AgsParams.GmosAgsParams(
                     GmosNorthFpu.LongSlit_1_00.asLeft.some,
                     PortDisposition.Side
-                  ),
-                  None
+                  )
                 )
               )
               .compile
