@@ -138,8 +138,77 @@ class ShortCut_7060 extends CatsEffectSuite:
             acqOffsets.some,
             sciOffsets.some,
             conf,
-            gs.collect { case Right(t) => t }.map(GuideStarCandidate.siderealTarget.get)
+            gs.collect { case Right(t) => t }.map(GuideStarCandidate.siderealTarget.get),
+            None
           )
         r.sortUsablePositions.collectFirst:
           case Usable(target = GuideStarCandidate(id = id)) => id
       .assertEquals(6479709205473911296L.some)
+
+  test("Run ags with GP221000-483213-dr3.xml with blindOffset matching baseCoordinates"):
+    val gaia =
+      GaiaClientMock.fromResource[IO]("GP221000-483213-dr3.xml",
+                                      NonEmptyChain.one(CatalogAdapter.Gaia3LiteEsaProxy).some
+      )
+
+    val searchRadius = 6.arcseconds
+    val query        = QueryByADQL(targetCoords,
+                            ShapeExpression.centeredEllipse(searchRadius * 2, searchRadius * 2),
+                            None
+    )
+
+    gaia
+      .queryGuideStars(query)
+      .map: gs =>
+        val r = Ags
+          .agsAnalysis(
+            constraints,
+            wavelength,
+            targetCoords,
+            List(targetCoords),
+            anglesToTest,
+            acqOffsets.some,
+            sciOffsets.some,
+            conf,
+            gs.collect { case Right(t) => t }.map(GuideStarCandidate.siderealTarget.get),
+            targetCoords.some
+          )
+        r.sortUsablePositions.collectFirst:
+          case Usable(target = GuideStarCandidate(id = id)) => id
+      .assertEquals(6479709205473911296L.some)
+
+  test("Run ags with GP221000-483213-dr3.xml with blindOffset 1 degree away"):
+    val gaia =
+      GaiaClientMock.fromResource[IO]("GP221000-483213-dr3.xml",
+                                      NonEmptyChain.one(CatalogAdapter.Gaia3LiteEsaProxy).some
+      )
+
+    val searchRadius = 6.arcseconds
+    val query        = QueryByADQL(targetCoords,
+                            ShapeExpression.centeredEllipse(searchRadius * 2, searchRadius * 2),
+                            None
+    )
+
+    val farBlindOffset = Coordinates(
+      RightAscension.fromDoubleDegrees(317.50417 + 1.0),
+      Declination.fromDoubleDegrees(-48.53700 + 1.0).getOrElse(Declination.Zero)
+    )
+
+    gaia
+      .queryGuideStars(query)
+      .map: gs =>
+        val r = Ags
+          .agsAnalysis(
+            constraints,
+            wavelength,
+            targetCoords,
+            List(targetCoords),
+            anglesToTest,
+            acqOffsets.some,
+            sciOffsets.some,
+            conf,
+            gs.collect { case Right(t) => t }.map(GuideStarCandidate.siderealTarget.get),
+            farBlindOffset.some
+          )
+        r.sortUsablePositions
+      .assertEquals(Nil)
