@@ -43,8 +43,7 @@ object Ags {
     scienceOffsets: List[Offset],
     pos:            AgsPosition,
     params:         AgsParams,
-    gsc:            GuideStarCandidate
-  )(
+    gsc:            GuideStarCandidate,
     speeds:         List[(GuideSpeed, BrightnessConstraints)],
     calcs:          NonEmptyMap[AgsPosition, AgsGeomCalc]
   ): AgsAnalysis = {
@@ -235,8 +234,14 @@ object Ags {
 
           offset
             .map { offset =>
-              runAnalysis(constraints, offset, sciOffsets, position, params, gsc)(guideSpeeds,
-                                                                                  calcs
+              runAnalysis(constraints,
+                          offset,
+                          sciOffsets,
+                          position,
+                          params,
+                          gsc,
+                          guideSpeeds,
+                          calcs
               )
             }
             .getOrElse(ProperMotionNotAvailable(gsc, position.posAngle))
@@ -276,7 +281,7 @@ object Ags {
         .mapN { (gsc, position) =>
           val offset     = baseCoordinates.diff(gsc.tracking.baseCoordinates).offset
           val sciOffsets = scienceCoordinates.map(_.diff(gsc.tracking.baseCoordinates).offset)
-          runAnalysis(constraints, offset, sciOffsets, position, params, gsc)(guideSpeeds, calcs)
+          runAnalysis(constraints, offset, sciOffsets, position, params, gsc, guideSpeeds, calcs)
         }
   }
 
@@ -326,9 +331,14 @@ object Ags {
           val oOffset = offsetAt(baseAt, instant, gsc)
           oOffset
             .map: offset =>
-              runAnalysis(constraints, offset, sciOffsets, position, params, gsc)(
-                guideSpeeds,
-                calcs
+              runAnalysis(constraints,
+                          offset,
+                          sciOffsets,
+                          position,
+                          params,
+                          gsc,
+                          guideSpeeds,
+                          calcs
               )
             .getOrElse(ProperMotionNotAvailable(gsc, position.posAngle))
   }
@@ -372,7 +382,7 @@ object Ags {
         val sciOffsets = scienceCoordinates.map(_.diff(gsc.tracking.baseCoordinates).offset)
 
         positions.toList.map: position =>
-          runAnalysis(constraints, offset, sciOffsets, position, params, gsc)(guideSpeeds, calcs)
+          runAnalysis(constraints, offset, sciOffsets, position, params, gsc, guideSpeeds, calcs)
   }
 
   /**
