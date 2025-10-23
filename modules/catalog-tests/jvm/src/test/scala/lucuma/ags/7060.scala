@@ -75,20 +75,11 @@ class ShortCut_7060 extends CatsEffectSuite:
       Offset.Zero.copy(q = Offset.Q(Angle.fromDoubleArcseconds(15)))
     )
 
-  val offsets =
-    (sciOffsets ++ acqOffsets.toList).toNes.toNonEmptyList
-
   val anglesToTest = PosAngleConstraint.AverageParallactic
     .anglesToTestAt(
       Angle.fromDoubleDegrees(300.96).some
     )
     .get
-
-  val positions =
-    for {
-      pa  <- anglesToTest
-      off <- offsets
-    } yield AgsPosition(pa, off)
 
   val constraints = ConstraintSet(
     ImageQuality.Preset.OnePointZero,
@@ -104,6 +95,12 @@ class ShortCut_7060 extends CatsEffectSuite:
   val conf = AgsParams.GmosAgsParams(
     GmosSouthFpu.LongSlit_0_50.asRight.some,
     PortDisposition.Side
+  )
+
+  val searchRadius = 6.arcseconds
+  val query        = QueryByADQL(targetCoords,
+                          ShapeExpression.centeredEllipse(searchRadius * 2, searchRadius * 2),
+                          none
   )
 
   test("XML file - count stars in GP221000-483213-dr3.xml"):
@@ -128,11 +125,62 @@ class ShortCut_7060 extends CatsEffectSuite:
                                       NonEmptyChain.one(CatalogAdapter.Gaia3LiteEsaProxy).some
       )
 
-    val searchRadius = 6.arcseconds
-    val query        = QueryByADQL(targetCoords,
-                            ShapeExpression.centeredEllipse(searchRadius * 2, searchRadius * 2),
-                            None
-    )
+    gaia
+      .queryGuideStars(query)
+      .map: gs =>
+        val r = Ags
+          .agsAnalysis(
+            constraints,
+            wavelength,
+            targetCoords,
+            List(targetCoords),
+            None,
+            anglesToTest,
+            acqOffsets.some,
+            sciOffsets.some,
+            conf,
+            gs.collect { case Right(t) => t }.map(GuideStarCandidate.siderealTarget.get)
+          )
+        r.sortUsablePositions.collectFirst:
+          case Usable(target = GuideStarCandidate(id = id)) => id
+      .assertEquals(6479709205473911296L.some)
+
+  test("Run ags with blindOffset matching baseCoordinates"):
+    val gaia =
+      GaiaClientMock.fromResource[IO]("GP221000-483213-dr3.xml",
+                                      NonEmptyChain.one(CatalogAdapter.Gaia3LiteEsaProxy).some
+      )
+
+    // if the blind offset is at science it is the same is if it didn't exist
+    gaia
+      .queryGuideStars(query)
+      .map: gs =>
+        val r = Ags
+          .agsAnalysis(
+            constraints,
+            wavelength,
+            targetCoords,
+            List(targetCoords),
+            targetCoords.some,
+            anglesToTest,
+            acqOffsets.some,
+            sciOffsets.some,
+            conf,
+            gs.collect { case Right(t) => t }.map(GuideStarCandidate.siderealTarget.get)
+          )
+        r.sortUsablePositions.collectFirst:
+          case Usable(target = GuideStarCandidate(id = id)) => id
+      .assertEquals(6479709205473911296L.some)
+
+  test("Run ags with blindOffset 1 degree away"):
+    val gaia =
+      GaiaClientMock.fromResource[IO]("GP221000-483213-dr3.xml",
+                                      NonEmptyChain.one(CatalogAdapter.Gaia3LiteEsaProxy).some
+      )
+
+    // with a very far blind offset AGS fails
+    val blindOffset =
+      targetCoords.offsetBy(Angle.Angle0, Offset.signedDecimalArcseconds.reverseGet(3600, 3600))
 
     gaia
       .queryGuideStars(query)
@@ -143,10 +191,12 @@ class ShortCut_7060 extends CatsEffectSuite:
             wavelength,
             targetCoords,
             List(targetCoords),
-            positions,
+            blindOffset,
+            anglesToTest,
+            acqOffsets.some,
+            sciOffsets.some,
             conf,
             gs.collect { case Right(t) => t }.map(GuideStarCandidate.siderealTarget.get)
           )
-        r.sortUsablePositions.collectFirst:
-          case Usable(target = GuideStarCandidate(id = id)) => id
-      .assertEquals(6479709205473911296L.some)
+        r.sortUsablePositions
+      .assertEquals(Nil)
