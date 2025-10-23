@@ -129,7 +129,8 @@ object AgsSelectionSampleApp extends IOApp.Simple with AgsSelectionSample {
                 acqOffsets.some,
                 sciOffsets.some,
                 flamingos2Params,
-                candidates
+                candidates,
+                None
               )
             pprint.pprintln(r.sortUsablePositions)
             r.sortUsablePositions

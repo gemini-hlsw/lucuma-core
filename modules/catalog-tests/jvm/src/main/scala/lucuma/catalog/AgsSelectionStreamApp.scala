@@ -24,24 +24,28 @@ object AgsSelectionSampleStreamApp extends IOApp.Simple with AgsSelectionSample:
       .map(GaiaClient.build(_))
       .use(
         gaiaQuery[IO](_)
-          .map(candidates =>
-            Ags
-              .agsAnalysisStream(
-                constraints,
-                wavelength,
-                coords,
-                List(coords),
-                NonEmptyList.of(
-                  Angle.fromDoubleDegrees(-120),
-                  Angle.fromDoubleDegrees(120)
-                ),
-                NonEmptyList.of(Offset.Zero).some,
-                NonEmptyList.of(Offset.Zero).some,
-                AgsParams.GmosAgsParams(
-                  GmosNorthFpu.LongSlit_1_00.asLeft.some,
-                  PortDisposition.Side
+          .flatMap(candidates =>
+            fs2.Stream
+              .emits[IO, GuideStarCandidate](candidates)
+              .through(
+                Ags.agsAnalysisStream[IO](
+                  constraints,
+                  wavelength,
+                  coords,
+                  List(coords),
+                  NonEmptyList.of(
+                    Angle.fromDoubleDegrees(-120),
+                    Angle.fromDoubleDegrees(120)
+                  ),
+                  NonEmptyList.of(Offset.Zero).some,
+                  NonEmptyList.of(Offset.Zero).some,
+                  AgsParams.GmosAgsParams(
+                    GmosNorthFpu.LongSlit_1_00.asLeft.some,
+                    PortDisposition.Side
+                  ),
+                  None
                 )
-              )(fs2.Stream.emits(candidates))
+              )
               .compile
               .toList
           )

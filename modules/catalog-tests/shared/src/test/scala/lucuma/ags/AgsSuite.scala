@@ -125,7 +125,8 @@ class AgsSuite extends munit.FunSuite {
           NonEmptyList.of(Offset.Zero).some,
           NonEmptyList.of(Offset.Zero).some,
           AgsParams.GmosAgsParams(GmosNorthFpu.LongSlit_5_00.asLeft.some, PortDisposition.Bottom),
-          List(gs1)
+          List(gs1),
+          None
         )
         .headOption,
       AgsAnalysis.VignettesScience(gs1, AgsPosition(Angle.Angle0, Offset.Zero)).some
@@ -153,7 +154,8 @@ class AgsSuite extends munit.FunSuite {
           NonEmptyList.of(Offset.Zero).some,
           NonEmptyList.of(Offset.Zero).some,
           AgsParams.GmosAgsParams(GmosNorthFpu.LongSlit_5_00.asLeft.some, PortDisposition.Bottom),
-          List(guideStarOffset)
+          List(guideStarOffset),
+          None
         )
         .headOption
         .forall(_.isUsable)
@@ -186,7 +188,8 @@ class AgsSuite extends munit.FunSuite {
             Flamingos2FpuMask.Builtin(Flamingos2Fpu.LongSlit3),
             PortDisposition.Bottom
           ),
-          List(gs1)
+          List(gs1),
+          None
         )
         .headOption,
       AgsAnalysis.VignettesScience(gs1, AgsPosition(Angle.Angle0, Offset.Zero)).some
@@ -218,7 +221,8 @@ class AgsSuite extends munit.FunSuite {
             Flamingos2FpuMask.Builtin(Flamingos2Fpu.LongSlit3),
             PortDisposition.Bottom
           ),
-          List(guideStarOffset)
+          List(guideStarOffset),
+          None
         )
         .headOption
         .forall(_.isUsable)
