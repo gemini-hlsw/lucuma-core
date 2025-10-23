@@ -97,6 +97,12 @@ class ShortCut_7060 extends CatsEffectSuite:
     PortDisposition.Side
   )
 
+  val searchRadius = 6.arcseconds
+  val query        = QueryByADQL(targetCoords,
+                          ShapeExpression.centeredEllipse(searchRadius * 2, searchRadius * 2),
+                          none
+  )
+
   test("XML file - count stars in GP221000-483213-dr3.xml"):
     val gaia         =
       GaiaClientMock.fromResource[IO]("GP221000-483213-dr3.xml",
@@ -119,12 +125,6 @@ class ShortCut_7060 extends CatsEffectSuite:
                                       NonEmptyChain.one(CatalogAdapter.Gaia3LiteEsaProxy).some
       )
 
-    val searchRadius = 6.arcseconds
-    val query        = QueryByADQL(targetCoords,
-                            ShapeExpression.centeredEllipse(searchRadius * 2, searchRadius * 2),
-                            None
-    )
-
     gaia
       .queryGuideStars(query)
       .map: gs =>
@@ -145,18 +145,13 @@ class ShortCut_7060 extends CatsEffectSuite:
           case Usable(target = GuideStarCandidate(id = id)) => id
       .assertEquals(6479709205473911296L.some)
 
-  test("Run ags with GP221000-483213-dr3.xml with blindOffset matching baseCoordinates"):
+  test("Run ags with blindOffset matching baseCoordinates"):
     val gaia =
       GaiaClientMock.fromResource[IO]("GP221000-483213-dr3.xml",
                                       NonEmptyChain.one(CatalogAdapter.Gaia3LiteEsaProxy).some
       )
 
-    val searchRadius = 6.arcseconds
-    val query        = QueryByADQL(targetCoords,
-                            ShapeExpression.centeredEllipse(searchRadius * 2, searchRadius * 2),
-                            None
-    )
-
+    // if the blind offset is at science it is the same is if it didn't exist
     gaia
       .queryGuideStars(query)
       .map: gs =>
@@ -177,17 +172,11 @@ class ShortCut_7060 extends CatsEffectSuite:
           case Usable(target = GuideStarCandidate(id = id)) => id
       .assertEquals(6479709205473911296L.some)
 
-  test("Run ags with GP221000-483213-dr3.xml with blindOffset 1 degree away"):
+  test("Run ags with blindOffset 1 degree away"):
     val gaia =
       GaiaClientMock.fromResource[IO]("GP221000-483213-dr3.xml",
                                       NonEmptyChain.one(CatalogAdapter.Gaia3LiteEsaProxy).some
       )
-
-    val searchRadius = 6.arcseconds
-    val query        = QueryByADQL(targetCoords,
-                            ShapeExpression.centeredEllipse(searchRadius * 2, searchRadius * 2),
-                            None
-    )
 
     // with a very far blind offset AGS fails
     val blindOffset =

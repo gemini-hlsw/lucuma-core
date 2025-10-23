@@ -162,7 +162,7 @@ object Ags {
   ): NonEmptyList[AgsPosition] = {
     val acqOffsetsOnBlind = (blindOffset, acqOffsets) match
       case (Some(blind), Some(acqOffsets)) =>
-        // it is correct it is the offset to the blindoffset
+        // Not a typo, it is the offset to the blind offset
         val blindOffsetOffset = blind.diff(baseCoordinates).offset
         acqOffsets.map(_ + blindOffsetOffset).some
       case (Some(_), None)                 =>
@@ -183,13 +183,13 @@ object Ags {
   ): NonEmptyList[AgsPosition] = {
     val acqOffsetsOnBlind = (blindOffset, acquisitionOffsets) match
       case (Some(blindAt), Some(acqOffsets)) =>
-        (baseAt(instant), blindAt(instant)) match {
-          case (Some(base), Some(blind)) =>
+        (baseAt(instant), blindAt(instant))
+          .mapN((base, blind) =>
             val offset = blind.diff(base).offset
-            acqOffsets.map(_ + offset).some
-          case _                         =>
-            acqOffsets.some
-        }
+            acqOffsets.map(_ + offset)
+          )
+          .getOrElse(acqOffsets)
+          .some
       case (Some(_), None)                   =>
         none
       case (None, acqOffsets)                =>
@@ -365,15 +365,14 @@ object Ags {
     val bc    = constraintsFor(guideSpeeds)
 
     candidates
-      .filter(c => c.gBrightness.exists { case (_, g) => bc.exists(_.contains(Band.Gaia, g)) })
-      .flatMap(gsc =>
+      .filter: c =>
+        c.gBrightness.exists { case (_, g) => bc.exists(_.contains(Band.Gaia, g)) }
+      .flatMap: gsc =>
         val offset     = baseCoordinates.diff(gsc.tracking.baseCoordinates).offset
         val sciOffsets = scienceCoordinates.map(_.diff(gsc.tracking.baseCoordinates).offset)
 
-        positions.toList.map { position =>
+        positions.toList.map: position =>
           runAnalysis(constraints, offset, sciOffsets, position, params, gsc)(guideSpeeds, calcs)
-        }
-      )
   }
 
   /**
@@ -385,9 +384,8 @@ object Ags {
     wavelength:  Wavelength,
     magnitude:   BrightnessValue
   ): Option[GuideSpeed] =
-    GuideSpeed.all.find { speed => // assumes the values are sorted fast to slow
+    GuideSpeed.inSpeedOrder.find: speed => // assumes the values are sorted fast to slow
       gaiaBrightnessConstraints(constraints, speed, wavelength).contains(Band.Gaia, magnitude)
-    }
 
   /**
    * Calculates brightness limits for each guide speed
@@ -396,8 +394,7 @@ object Ags {
     constraints: ConstraintSet,
     wavelength:  Wavelength
   ): List[(GuideSpeed, BrightnessConstraints)] =
-    GuideSpeed.all.map { speed => // assumes the values are sorted fast to slow
+    GuideSpeed.inSpeedOrder.map: speed =>
       (speed, gaiaBrightnessConstraints(constraints, speed, wavelength))
-    }
 
 }
