@@ -83,7 +83,7 @@ case class CompositeTracking(toNonEmptyList: NonEmptyList[Tracking]) extends Tra
  * Time-parameterized coordinates over a fixed interval, defined pairwise. Coordinates that fall
  * between known instants are interpolated.
  */
-sealed abstract case class EphemerisTracking private (toMap: TreeMap[Timestamp, EphemerisCoordinates]) extends Tracking {
+case class EphemerisTracking private (toMap: TreeMap[Timestamp, EphemerisCoordinates]) extends Tracking {
   import EphemerisTracking.Element
 
   // N.B. this case class is abstract and has a private ctor because we want to keep construction of
@@ -137,7 +137,7 @@ object EphemerisTracking {
 
   /** Construct an ephemeris from a `List` of elements. */
   def fromList(es:                     List[Element]): EphemerisTracking =
-    new EphemerisTracking(TreeMap.fromList(es)) {}
+    EphemerisTracking(TreeMap.fromList(es))
 
   /** Construct an ephemeris from a foldable of elements. */
   def fromFoldable[F[_]: Foldable](fa: F[Element]): EphemerisTracking    =
