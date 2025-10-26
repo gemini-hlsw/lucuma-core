@@ -52,6 +52,14 @@ final class Epoch private (val scheme: Epoch.Scheme, val toMilliyears: Epoch.Int
   def plusYears(y: Double): Option[Epoch] =
     scheme.fromEpochYears(epochYear + y)
 
+  /** Convert this `Epoch` to a Java `Instant`.
+    *
+    * Converts the epoch year to a Julian Day number using the scheme's reference parameters,
+    * then to a Java Instant. The conversion is approximate to approximately millisecond level.
+    */
+  def toInstant: Instant =
+    scheme.toInstant(epochYear)
+
   override def equals(a: Any): Boolean =
     a match {
       case e: Epoch => (scheme === e.scheme) && toMilliyears === e.toMilliyears
@@ -121,6 +129,15 @@ object Epoch extends EpochOptics {
 
     def fromJulianDayToEpochYears(jd: Double): Double =
       yearBasis + (jd - julianBasis) / lengthOfYear
+
+    /** Convert epoch year to Java `Instant`.
+      *
+      * Converts the epoch year to Julian Day using the inverse of the standard epoch formula,
+      * then to Instant via JulianDate.
+      */
+    def toInstant(epochYear: Double): Instant =
+      val jd = julianBasis + (epochYear - yearBasis) * lengthOfYear
+      JulianDate.fromDoubleApprox(jd).toInstant
   }
 
   object Scheme {
