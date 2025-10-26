@@ -52,11 +52,7 @@ final class Epoch private (val scheme: Epoch.Scheme, val toMilliyears: Epoch.Int
   def plusYears(y: Double): Option[Epoch] =
     scheme.fromEpochYears(epochYear + y)
 
-  /** Convert this `Epoch` to a Java `Instant`.
-    *
-    * Converts the epoch year to a Julian Day number using the scheme's reference parameters,
-    * then to a Java Instant. The conversion is approximate to approximately millisecond level.
-    */
+  /** Convert this `Epoch` to a Java `Instant`. */
   def toInstant: Instant =
     scheme.toInstant(epochYear)
 
@@ -198,5 +194,16 @@ trait EpochOptics { this: Epoch.type =>
           f"${e.toMilliyears.value / 1000}%d.${e.toMilliyears.value % 1000}%03d"
       }
     )
+
+  /**
+   * Format an epoch to a string with exactly 2 decimal places and scheme prefix.
+   * Examples: "J2025.00", "B1950.99"
+   */
+  def formatWithScheme(epoch: Epoch): String =
+    val milliyears = epoch.toMilliyears.value
+    val year       = milliyears / 1000
+    val fm         = milliyears % 1000
+    val f          = fm / 10  // Convert to hundredths (2 decimal places)
+    f"${epoch.scheme.prefix}%s${year}%d.${f}%02d"
 
 }

@@ -35,6 +35,18 @@ trait EpochParsers {
     }
       .withContext("epoch")
 
+  /** Parser for an `Epoch` with a schema and exactly 2 decimal places. */
+  val epochWithScheme: Parser[Epoch] =
+    val twoDecimals: Parser[Int] =
+      (digit ~ digit).string.flatMap: s =>
+        Parser.not(digit).as(s.toInt * 10)
+
+    (epochScheme ~ year ~ char('.').void ~ twoDecimals).map {
+      case ((((s, y), _), m)) =>
+        s.fromMilliyearsUnsafe(y * 1000 + m)
+    }.between(Parser.start, Parser.end)
+      .withContext("epochWithScheme")
+
   /** Parser for an `Epoch` with a default Julian schemme. */
   val epochLenientNoScheme: Parser[Epoch] =
     (year ~ char('.').? ~ miliyear.?).map {

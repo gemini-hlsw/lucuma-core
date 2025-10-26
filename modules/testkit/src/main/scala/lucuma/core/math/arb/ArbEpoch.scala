@@ -3,6 +3,7 @@
 
 package lucuma.core.math.arb
 
+import eu.timepit.refined.refineV
 import eu.timepit.refined.scalacheck.numeric.*
 import lucuma.core.arb.*
 import lucuma.core.math.Epoch
@@ -56,6 +57,19 @@ trait ArbEpoch {
     Arbitrary {
       arbitrary[Epoch.IntMilliYear].map(Julian.fromMilliyears)
     }
+
+  // Generator for epochs with 2 decimal places
+  val epochs2Decimal: Gen[Epoch] =
+    for {
+      scheme     <- arbitrary[Epoch.Scheme]
+      year       <- Gen.choose(1900, 3000)
+      hundredths <- Gen.choose(0, 99)
+      milliyears = year * 1000 + hundredths * 10
+      intMilliYear = refineV[Epoch.MilliYear](milliyears).toOption.get
+    } yield scheme.fromMilliyears(intMilliYear)
+
+  val arbEpoch2Decimal: Arbitrary[Epoch] = Arbitrary(epochs2Decimal)
+
 }
 
 object ArbEpoch extends ArbEpoch
