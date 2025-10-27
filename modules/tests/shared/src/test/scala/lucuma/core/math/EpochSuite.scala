@@ -16,7 +16,9 @@ import monocle.law.discipline.PrismTests
 import org.scalacheck.Arbitrary
 import org.scalacheck.Prop.*
 
+import java.time.Instant
 import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 
 final class EpochSuite extends munit.DisciplineSuite {
   import ArbEpoch.given
@@ -111,4 +113,41 @@ final class EpochSuite extends munit.DisciplineSuite {
                  "2014.35"
     )
   }
+
+  test("J2000 epoch should convert to correct Instant"):
+    val j2000 = Epoch.J2000
+    val instant = j2000.toInstant
+
+    // J2000 converts to exactly noon UTC on Jan 1, 2000
+    assertEquals(instant, Instant.parse("2000-01-01T12:00:00Z"))
+
+  test("B1950 epoch convert to Instant"):
+    val b1950 = Epoch.B1950
+    val instant = b1950.toInstant
+
+    // B1950 conversion  matches astropy
+    val expected = Instant.parse("1949-12-31T22:09:46.861Z")
+    assertEquals(instant.truncatedTo(ChronoUnit.MILLIS), expected.truncatedTo(ChronoUnit.MILLIS))
+
+  test("Custom Julian epoch"):
+    val epoch = Epoch.Julian.fromIntegralYears(2020.refined[Epoch.Year])
+    val instant = epoch.toInstant
+
+    val expected = Instant.parse("2020-01-01T12:00:00Z")
+    assertEquals(instant, expected)
+
+  test("Besselian epoch should match"):
+    val epoch = Epoch.Besselian.fromIntegralYears(1950.refined[Epoch.Year])
+    val instant = epoch.toInstant
+
+    val b1950 = Epoch.B1950.toInstant
+    assertEquals(instant, b1950)
+
+  test("Fractional epoch year"):
+    val epoch = Epoch.Julian.fromEpochYears(2020.5).get
+    val instant = epoch.toInstant
+
+    // 2020.5 Julian epoch converts to july 2nd assuming a year of 365.25 per definition
+    val expected = Instant.parse("2020-07-02T03:00:00Z")
+    assertEquals(instant, expected)
 }
