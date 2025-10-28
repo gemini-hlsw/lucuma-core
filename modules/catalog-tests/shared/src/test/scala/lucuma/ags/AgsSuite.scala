@@ -5,9 +5,11 @@ package lucuma.ags
 
 import cats.data.NonEmptyList
 import cats.syntax.all.*
+import lucuma.ags.AcquisitionOffsets
 import lucuma.ags.AgsAnalysis.NoMagnitudeForBand
 import lucuma.ags.AgsAnalysis.Usable
 import lucuma.ags.AgsAnalysis.VignettesScience
+import lucuma.ags.ScienceOffsets
 import lucuma.core.enums.*
 import lucuma.core.geom.Area
 import lucuma.core.math.Angle
@@ -123,8 +125,8 @@ class AgsSuite extends munit.FunSuite {
           List(Coordinates.Zero),
           None,
           NonEmptyList.of(Angle.Angle0),
-          NonEmptyList.of(Offset.Zero).some,
-          NonEmptyList.of(Offset.Zero).some,
+          Some(AcquisitionOffsets(NonEmptyList.of(Offset.Zero))),
+          Some(ScienceOffsets(NonEmptyList.of(Offset.Zero))),
           AgsParams.GmosAgsParams(GmosNorthFpu.LongSlit_5_00.asLeft.some, PortDisposition.Bottom),
           List(gs1)
         )
@@ -152,8 +154,8 @@ class AgsSuite extends munit.FunSuite {
           Nil,
           None,
           NonEmptyList.of(Angle.Angle0),
-          NonEmptyList.of(Offset.Zero).some,
-          NonEmptyList.of(Offset.Zero).some,
+          Some(AcquisitionOffsets(NonEmptyList.of(Offset.Zero))),
+          Some(ScienceOffsets(NonEmptyList.of(Offset.Zero))),
           AgsParams.GmosAgsParams(GmosNorthFpu.LongSlit_5_00.asLeft.some, PortDisposition.Bottom),
           List(guideStarOffset)
         )
@@ -182,8 +184,8 @@ class AgsSuite extends munit.FunSuite {
           List(Coordinates.Zero),
           None,
           NonEmptyList.of(Angle.Angle0),
-          NonEmptyList.of(Offset.Zero).some,
-          NonEmptyList.of(Offset.Zero).some,
+          Some(AcquisitionOffsets(NonEmptyList.of(Offset.Zero))),
+          Some(ScienceOffsets(NonEmptyList.of(Offset.Zero))),
           AgsParams.Flamingos2AgsParams(
             Flamingos2LyotWheel.F16,
             Flamingos2FpuMask.Builtin(Flamingos2Fpu.LongSlit3),
@@ -215,8 +217,8 @@ class AgsSuite extends munit.FunSuite {
           Nil,
           None,
           NonEmptyList.of(Angle.Angle0),
-          NonEmptyList.of(Offset.Zero).some,
-          NonEmptyList.of(Offset.Zero).some,
+          Some(AcquisitionOffsets(NonEmptyList.of(Offset.Zero))),
+          Some(ScienceOffsets(NonEmptyList.of(Offset.Zero))),
           AgsParams.Flamingos2AgsParams(
             Flamingos2LyotWheel.F16,
             Flamingos2FpuMask.Builtin(Flamingos2Fpu.LongSlit3),

@@ -23,8 +23,15 @@ import lucuma.core.math.Offset
 import lucuma.core.math.Wavelength
 import lucuma.core.model.ConstraintSet
 import lucuma.core.model.ImageQuality
+import lucuma.core.util.NewType
 
 import java.time.Instant
+
+object AcquisitionOffsets extends NewType[NonEmptyList[Offset]]
+type AcquisitionOffsets = AcquisitionOffsets.Type
+
+object ScienceOffsets extends NewType[NonEmptyList[Offset]]
+type ScienceOffsets = ScienceOffsets.Type
 
 object Ags {
 
@@ -136,15 +143,15 @@ object Ags {
 
   private def buildPositions(
     anglesToTest:   NonEmptyList[Angle],
-    acqOffsets:     Option[NonEmptyList[Offset]],
-    scienceOffsets: Option[NonEmptyList[Offset]]
+    acqOffsets:     Option[AcquisitionOffsets],
+    scienceOffsets: Option[ScienceOffsets]
   ): NonEmptyList[AgsPosition] =
-    val allOffsets =
+    val allOffsets: Option[NonEmptyList[Offset]] =
       (acqOffsets, scienceOffsets) match
-        case (Some(a), Some(s))  => (a |+| s).some
-        case (a @ Some(_), None) => a
-        case (None, s @ Some(_)) => s
-        case _                   => none
+        case (Some(a), Some(s)) => (a.value |+| s.value).some
+        case (Some(a), None)    => a.value.some
+        case (None, Some(s))    => s.value.some
+        case _                  => none
 
     allOffsets.fold(anglesToTest.map(AgsPosition(_, Offset.Zero))): offsets =>
       for {
@@ -156,14 +163,14 @@ object Ags {
     baseCoordinates: Coordinates,
     blindOffset:     Option[Coordinates],
     posAngles:       NonEmptyList[Angle],
-    acqOffsets:      Option[NonEmptyList[Offset]],
-    scienceOffsets:  Option[NonEmptyList[Offset]]
+    acqOffsets:      Option[AcquisitionOffsets],
+    scienceOffsets:  Option[ScienceOffsets]
   ): NonEmptyList[AgsPosition] = {
     val acqOffsetsOnBlind = (blindOffset, acqOffsets) match
       case (Some(blind), Some(acqOffsets)) =>
         // Not a typo, it is the offset to the blind offset
         val blindOffsetOffset = blind.diff(baseCoordinates).offset
-        acqOffsets.map(_ + blindOffsetOffset).some
+        Some(AcquisitionOffsets(acqOffsets.value.map(_ + blindOffsetOffset)))
       case (Some(_), None)                 =>
         none
       case (None, acqOffsets)              =>
@@ -176,19 +183,18 @@ object Ags {
     baseAt:             Instant => Option[Coordinates],
     blindOffset:        Option[Instant => Option[Coordinates]],
     posAngles:          NonEmptyList[Angle],
-    acquisitionOffsets: Option[NonEmptyList[Offset]],
-    scienceOffsets:     Option[NonEmptyList[Offset]],
+    acquisitionOffsets: Option[AcquisitionOffsets],
+    scienceOffsets:     Option[ScienceOffsets],
     instant:            Instant
   ): NonEmptyList[AgsPosition] = {
-    val acqOffsetsOnBlind = (blindOffset, acquisitionOffsets) match
+    val acqOffsetsOnBlind: Option[AcquisitionOffsets] = (blindOffset, acquisitionOffsets) match
       case (Some(blindAt), Some(acqOffsets)) =>
         (baseAt(instant), blindAt(instant))
           .mapN((base, blind) =>
             val offset = blind.diff(base).offset
-            acqOffsets.map(_ + offset)
+            AcquisitionOffsets(acqOffsets.value.map(_ + offset))
           )
-          .getOrElse(acqOffsets)
-          .some
+          .orElse(acqOffsets.some)
       case (Some(_), None)                   =>
         none
       case (None, acqOffsets)                =>
@@ -208,8 +214,8 @@ object Ags {
     scienceAt:          List[Instant => Option[Coordinates]],
     blindOffset:        Option[Instant => Option[Coordinates]],
     posAngles:          NonEmptyList[Angle],
-    acquisitionOffsets: Option[NonEmptyList[Offset]],
-    scienceOffsets:     Option[NonEmptyList[Offset]],
+    acquisitionOffsets: Option[AcquisitionOffsets],
+    scienceOffsets:     Option[ScienceOffsets],
     params:             AgsParams,
     instant:            Instant
   ): Pipe[F, GuideStarCandidate, AgsAnalysis] = {
@@ -259,8 +265,8 @@ object Ags {
     scienceCoordinates: List[Coordinates],
     blindOffset:        Option[Coordinates],
     posAngles:          NonEmptyList[Angle],
-    acquisitionOffsets: Option[NonEmptyList[Offset]],
-    scienceOffsets:     Option[NonEmptyList[Offset]],
+    acquisitionOffsets: Option[AcquisitionOffsets],
+    scienceOffsets:     Option[ScienceOffsets],
     params:             AgsParams
   ): Pipe[F, GuideStarCandidate, AgsAnalysis] = {
     val positions =
@@ -305,8 +311,8 @@ object Ags {
     scienceAt:          List[Instant => Option[Coordinates]],
     blindOffset:        Option[Instant => Option[Coordinates]],
     posAngles:          NonEmptyList[Angle],
-    acquisitionOffsets: Option[NonEmptyList[Offset]],
-    scienceOffsets:     Option[NonEmptyList[Offset]],
+    acquisitionOffsets: Option[AcquisitionOffsets],
+    scienceOffsets:     Option[ScienceOffsets],
     params:             AgsParams,
     instant:            Instant,
     candidates:         List[GuideStarCandidate]
@@ -357,8 +363,8 @@ object Ags {
     scienceCoordinates: List[Coordinates],
     blindOffset:        Option[Coordinates],
     posAngles:          NonEmptyList[Angle],
-    acquisitionOffsets: Option[NonEmptyList[Offset]],
-    scienceOffsets:     Option[NonEmptyList[Offset]],
+    acquisitionOffsets: Option[AcquisitionOffsets],
+    scienceOffsets:     Option[ScienceOffsets],
     params:             AgsParams,
     candidates:         List[GuideStarCandidate]
   ): List[AgsAnalysis] = {

@@ -9,6 +9,8 @@ import cats.effect.IO
 import cats.effect.IOApp
 import cats.syntax.all.*
 import lucuma.ags.*
+import lucuma.ags.AcquisitionOffsets
+import lucuma.ags.ScienceOffsets
 import lucuma.catalog.clients.GaiaClient
 import lucuma.catalog.votable.*
 import lucuma.core.enums.Flamingos2Fpu
@@ -65,9 +67,11 @@ trait AgsSelectionSample {
   val wavelength = Wavelength.fromIntNanometers(600).get
 
   val acqOffsets =
-    NonEmptyList.of(Offset.Zero)
+    AcquisitionOffsets(NonEmptyList.of(Offset.Zero))
   val sciOffsets =
-    NonEmptyList.of(Offset.Zero, Offset.Zero.copy(q = Offset.Q(Angle.fromDoubleArcseconds(15))))
+    ScienceOffsets(
+      NonEmptyList.of(Offset.Zero, Offset.Zero.copy(q = Offset.Q(Angle.fromDoubleArcseconds(15))))
+    )
 
   val gmosParams = AgsParams.GmosAgsParams(
     GmosNorthFpu.LongSlit_0_25.asLeft.some,
@@ -127,8 +131,8 @@ object AgsSelectionSampleApp extends IOApp.Simple with AgsSelectionSample {
                 List(coords),
                 None,
                 posAngles,
-                acqOffsets.some,
-                sciOffsets.some,
+                Some(acqOffsets),
+                Some(sciOffsets),
                 flamingos2Params,
                 candidates
               )

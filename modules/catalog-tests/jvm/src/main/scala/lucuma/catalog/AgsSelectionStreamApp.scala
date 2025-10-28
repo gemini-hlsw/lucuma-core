@@ -9,6 +9,8 @@ import cats.effect.IOApp
 import cats.syntax.all.*
 import fs2.*
 import lucuma.ags.*
+import lucuma.ags.AcquisitionOffsets
+import lucuma.ags.ScienceOffsets
 import lucuma.catalog.clients.GaiaClient
 import lucuma.core.enums.GmosNorthFpu
 import lucuma.core.enums.PortDisposition
@@ -38,8 +40,8 @@ object AgsSelectionSampleStreamApp extends IOApp.Simple with AgsSelectionSample:
                     Angle.fromDoubleDegrees(-120),
                     Angle.fromDoubleDegrees(120)
                   ),
-                  NonEmptyList.of(Offset.Zero).some,
-                  NonEmptyList.of(Offset.Zero).some,
+                  Some(AcquisitionOffsets(NonEmptyList.of(Offset.Zero))),
+                  Some(ScienceOffsets(NonEmptyList.of(Offset.Zero))),
                   AgsParams.GmosAgsParams(
                     GmosNorthFpu.LongSlit_1_00.asLeft.some,
                     PortDisposition.Side

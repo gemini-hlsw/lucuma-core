@@ -8,7 +8,9 @@ import cats.data.NonEmptyList
 import cats.effect.IO
 import cats.syntax.either.*
 import cats.syntax.option.*
+import lucuma.ags.AcquisitionOffsets
 import lucuma.ags.AgsAnalysis.Usable
+import lucuma.ags.ScienceOffsets
 import lucuma.catalog.clients.GaiaClientMock
 import lucuma.catalog.votable.*
 import lucuma.core.enums.GmosSouthFpu
@@ -67,12 +69,16 @@ class ShortCut_7060 extends CatsEffectSuite:
   val now = Instant.parse("2025-09-30T22:39:00Z")
 
   val acqOffsets =
-    NonEmptyList.of(Offset.Zero, Offset.Zero.copy(p = Offset.P(Angle.fromDoubleArcseconds(10))))
+    AcquisitionOffsets(
+      NonEmptyList.of(Offset.Zero, Offset.Zero.copy(p = Offset.P(Angle.fromDoubleArcseconds(10))))
+    )
   val sciOffsets =
-    NonEmptyList.of(
-      Offset.Zero.copy(q = Offset.Q(Angle.fromDoubleArcseconds(-15))),
-      Offset.Zero,
-      Offset.Zero.copy(q = Offset.Q(Angle.fromDoubleArcseconds(15)))
+    ScienceOffsets(
+      NonEmptyList.of(
+        Offset.Zero.copy(q = Offset.Q(Angle.fromDoubleArcseconds(-15))),
+        Offset.Zero,
+        Offset.Zero.copy(q = Offset.Q(Angle.fromDoubleArcseconds(15)))
+      )
     )
 
   val anglesToTest = PosAngleConstraint.AverageParallactic
@@ -136,8 +142,8 @@ class ShortCut_7060 extends CatsEffectSuite:
             List(targetCoords),
             None,
             anglesToTest,
-            acqOffsets.some,
-            sciOffsets.some,
+            Some(acqOffsets),
+            Some(sciOffsets),
             conf,
             gs.collect { case Right(t) => t }.map(GuideStarCandidate.siderealTarget.get)
           )
@@ -163,8 +169,8 @@ class ShortCut_7060 extends CatsEffectSuite:
             List(targetCoords),
             targetCoords.some,
             anglesToTest,
-            acqOffsets.some,
-            sciOffsets.some,
+            Some(acqOffsets),
+            Some(sciOffsets),
             conf,
             gs.collect { case Right(t) => t }.map(GuideStarCandidate.siderealTarget.get)
           )
@@ -193,8 +199,8 @@ class ShortCut_7060 extends CatsEffectSuite:
             List(targetCoords),
             blindOffset,
             anglesToTest,
-            acqOffsets.some,
-            sciOffsets.some,
+            Some(acqOffsets),
+            Some(sciOffsets),
             conf,
             gs.collect { case Right(t) => t }.map(GuideStarCandidate.siderealTarget.get)
           )
