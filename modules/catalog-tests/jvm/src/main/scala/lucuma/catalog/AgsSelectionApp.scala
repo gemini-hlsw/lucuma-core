@@ -9,6 +9,8 @@ import cats.effect.IO
 import cats.effect.IOApp
 import cats.syntax.all.*
 import lucuma.ags.*
+import lucuma.ags.AcquisitionOffsets
+import lucuma.ags.ScienceOffsets
 import lucuma.catalog.clients.GaiaClient
 import lucuma.catalog.votable.*
 import lucuma.core.enums.Flamingos2Fpu
@@ -64,8 +66,12 @@ trait AgsSelectionSample {
   val now        = Instant.ofEpochMilli(1688486539L)
   val wavelength = Wavelength.fromIntNanometers(600).get
 
-  val offsets =
-    NonEmptyList.of(Offset.Zero, Offset.Zero.copy(q = Offset.Q(Angle.fromDoubleArcseconds(15))))
+  val acqOffsets =
+    AcquisitionOffsets(NonEmptyList.of(Offset.Zero))
+  val sciOffsets =
+    ScienceOffsets(
+      NonEmptyList.of(Offset.Zero, Offset.Zero.copy(q = Offset.Q(Angle.fromDoubleArcseconds(15))))
+    )
 
   val gmosParams = AgsParams.GmosAgsParams(
     GmosNorthFpu.LongSlit_0_25.asLeft.some,
@@ -89,7 +95,7 @@ trait AgsSelectionSample {
     )
   )
 
-  val positions = PosAngleConstraint.Unbounded
+  val posAngles = PosAngleConstraint.Unbounded
     .anglesToTestAt(
       Site.GN,
       tracking,
@@ -97,7 +103,6 @@ trait AgsSelectionSample {
       Duration.ofHours(1)
     )
     .get
-    .flatMap(a => offsets.map(o => AgsPosition(a, o)))
 
   def gaiaQuery[F[_]: Functor](gaiaClient: GaiaClient[F]): F[List[GuideStarCandidate]] =
     gaiaClient
@@ -124,7 +129,10 @@ object AgsSelectionSampleApp extends IOApp.Simple with AgsSelectionSample {
                 wavelength,
                 coords,
                 List(coords),
-                positions,
+                None,
+                posAngles,
+                Some(acqOffsets),
+                Some(sciOffsets),
                 flamingos2Params,
                 candidates
               )

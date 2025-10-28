@@ -9,6 +9,8 @@ import cats.effect.IOApp
 import cats.syntax.all.*
 import fs2.*
 import lucuma.ags.*
+import lucuma.ags.AcquisitionOffsets
+import lucuma.ags.ScienceOffsets
 import lucuma.catalog.clients.GaiaClient
 import lucuma.core.enums.GmosNorthFpu
 import lucuma.core.enums.PortDisposition
@@ -24,22 +26,28 @@ object AgsSelectionSampleStreamApp extends IOApp.Simple with AgsSelectionSample:
       .map(GaiaClient.build(_))
       .use(
         gaiaQuery[IO](_)
-          .map(candidates =>
-            Ags
-              .agsAnalysisStream(
-                constraints,
-                wavelength,
-                coords,
-                List(coords),
-                NonEmptyList.of(
-                  AgsPosition(Angle.fromDoubleDegrees(-120), Offset.Zero),
-                  AgsPosition(Angle.fromDoubleDegrees(120), Offset.Zero)
-                ),
-                AgsParams.GmosAgsParams(
-                  GmosNorthFpu.LongSlit_1_00.asLeft.some,
-                  PortDisposition.Side
+          .flatMap(candidates =>
+            fs2.Stream
+              .emits[IO, GuideStarCandidate](candidates)
+              .through(
+                Ags.agsAnalysisStream[IO](
+                  constraints,
+                  wavelength,
+                  coords,
+                  List(coords),
+                  None,
+                  NonEmptyList.of(
+                    Angle.fromDoubleDegrees(-120),
+                    Angle.fromDoubleDegrees(120)
+                  ),
+                  Some(AcquisitionOffsets(NonEmptyList.of(Offset.Zero))),
+                  Some(ScienceOffsets(NonEmptyList.of(Offset.Zero))),
+                  AgsParams.GmosAgsParams(
+                    GmosNorthFpu.LongSlit_1_00.asLeft.some,
+                    PortDisposition.Side
+                  )
                 )
-              )(fs2.Stream.emits(candidates))
+              )
               .compile
               .toList
           )

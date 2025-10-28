@@ -5,42 +5,15 @@ package lucuma
 package core
 package enums
 
-import cats.syntax.eq.*
 import lucuma.core.util.Enumerated
 
 /**
  * Enumerated type for Guiding speed
- * @group Enumerations (Generated)
  */
-sealed abstract class GuideSpeed(val tag: String)
-    extends Product
-    with Serializable
+enum GuideSpeed(val tag: String) derives Enumerated:
+  case Fast   extends GuideSpeed("fast")
+  case Medium extends GuideSpeed("medium")
+  case Slow   extends GuideSpeed("slow")
 
-object GuideSpeed {
-
-  /** @group Constructors */
-  case object Fast extends GuideSpeed("fast")
-
-  /** @group Constructors */
-  case object Medium extends GuideSpeed("medium")
-
-  /** @group Constructors */
-  case object Slow extends GuideSpeed("slow")
-
-  /** All members of GuideSpeed, in canonical order. */
-  val all: List[GuideSpeed] =
-    List(Fast, Medium, Slow)
-
-  /** Select the member of GuideSpeed with the given tag, if any. */
-  def fromTag(s: String): Option[GuideSpeed] =
-    all.find(_.tag === s)
-
-  /** Select the member of GuideSpeed with the given tag, throwing if absent. */
-  def unsafeFromTag(s: String): GuideSpeed =
-    fromTag(s).getOrElse(throw new NoSuchElementException(s"GuideSpeed: Invalid tag: '$s'"))
-
-  /** @group Typeclass Instances */
-  implicit val GuideProbeEnumerated: Enumerated[GuideSpeed] =
-    Enumerated.from(Fast, Medium, Slow).withTag(_.tag)
-
-}
+object GuideSpeed:
+  val inSpeedOrder: List[GuideSpeed] = List(Fast, Medium, Slow)
