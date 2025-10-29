@@ -10,6 +10,7 @@ import lucuma.core.enums.Site
 import lucuma.core.model.EphemerisKey
 import lucuma.core.model.Semester
 import lucuma.core.model.Semester.YearInt
+import java.time.Instant
 
 class HorizonsClientEphemerisSuite extends HorizonsClientSuite:
 
@@ -187,5 +188,48 @@ class HorizonsClientEphemerisSuite extends HorizonsClientSuite:
         "2020-08-10T12:00:00Z",
         "2020-08-10T18:00:00Z",
         "2020-08-11T00:00:00Z"
+      ))
+    )
+
+  test("alignedEphemeris (24)"):
+    assertIO(
+      client.use: c =>
+
+        c.alignedEphemeris(
+          key   = EphemerisKey.Comet("1P"),
+          site  = site,
+          start = Instant.parse("2025-05-02T00:00:00Z"),
+          days  = 1,
+          cadence = 24
+        ).map: e =>
+          e.map: eph =>            
+            eph.entries.map(_.when.toString),
+        
+      Right(List(
+        "2025-05-02T00:00:00Z",
+        "2025-05-02T01:00:00Z",
+        "2025-05-02T02:00:00Z",
+        "2025-05-02T03:00:00Z",
+        "2025-05-02T04:00:00Z",
+        "2025-05-02T05:00:00Z",
+        "2025-05-02T06:00:00Z",
+        "2025-05-02T07:00:00Z",
+        "2025-05-02T08:00:00Z",
+        "2025-05-02T09:00:00Z",
+        "2025-05-02T10:00:00Z",
+        "2025-05-02T11:00:00Z",
+        "2025-05-02T12:00:00Z",
+        "2025-05-02T13:00:00Z",
+        "2025-05-02T14:00:00Z",
+        "2025-05-02T15:00:00Z",
+        "2025-05-02T16:00:00Z",
+        "2025-05-02T17:00:00Z",
+        "2025-05-02T18:00:00Z",
+        "2025-05-02T19:00:00Z",
+        "2025-05-02T20:00:00Z",
+        "2025-05-02T21:00:00Z",
+        "2025-05-02T22:00:00Z",
+        "2025-05-02T23:00:00Z",
+        "2025-05-03T00:00:00Z",
       ))
     )
