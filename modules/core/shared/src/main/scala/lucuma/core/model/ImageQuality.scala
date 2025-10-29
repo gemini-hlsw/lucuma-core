@@ -69,6 +69,7 @@ object ImageQuality extends NewRefinedQuantity[Short, ImageQualityPredicate, Cen
     case PointSix     extends Preset("point_six",      ImageQuality.unsafeFromArcSeconds(0.6))
     case PointEight   extends Preset("point_eight",    ImageQuality.unsafeFromArcSeconds(0.8))
     case OnePointZero extends Preset("one_point_zero", ImageQuality.unsafeFromArcSeconds(1.0))
+    case OnePointTwo  extends Preset("one_point_two",  ImageQuality.unsafeFromArcSeconds(1.2))
     case OnePointFive extends Preset("one_point_five", ImageQuality.unsafeFromArcSeconds(1.5))
     case TwoPointZero extends Preset("two_point_zero", ImageQuality.unsafeFromArcSeconds(2.0))
 
