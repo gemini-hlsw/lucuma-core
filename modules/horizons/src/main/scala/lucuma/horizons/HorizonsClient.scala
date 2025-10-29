@@ -17,6 +17,8 @@ import org.http4s.client.Client
 import org.typelevel.log4cats.Logger
 
 import java.time.Instant
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
 import scala.concurrent.duration.*
 
 import HorizonsConstants.*
@@ -43,7 +45,7 @@ trait HorizonsClient[F[_]]:
     start: Instant,
     stop: Instant,
     elems: Int,
-  ): F[Either[String, List[HorizonsEphemerisEntry]]]
+  ): F[Either[String, HorizonsEphemeris]]
 
   /** Equivalent to `ephemeris` but selects the ephemeris at both sites. */
   def ephemerisPerSite(
@@ -51,15 +53,45 @@ trait HorizonsClient[F[_]]:
     start: Instant,
     stop: Instant,
     elems: Int,
-  ): F[Either[String, PerSite[List[HorizonsEphemerisEntry]]]]
+  ): F[Either[String, PerSite[HorizonsEphemeris]]]
+
+  /**
+   * Similar to `ephemeris` but selects elements starting at midnight UTC on the day of
+   * `start` and advancing for `days` days at the specified cadence. The resulting ephemeris
+   * will contain `days * cadence + 1` elements.
+   */
+  def alignedEphemeris(
+    key: EphemerisKey.Horizons,
+    site: Site,
+    start: Instant,
+    days: Int,
+    cadence: HorizonsClient.ElementsPerDay,
+  ): F[Either[String, HorizonsEphemeris]] =
+    val aligned = 
+      ZonedDateTime
+        .ofInstant(start, ZoneOffset.UTC)
+        .withHour(0)
+        .withMinute(0)
+        .withSecond(0)            
+    ephemeris(key, site, aligned.toInstant, aligned.plusDays(days).toInstant, days * cadence)
+
+  /** Equivalent to `alignedEphemeris` but selects the ephemeris at both sites. */
+  def alignedEphemerisPerSite(
+    key: EphemerisKey.Horizons,
+    start: Instant,
+    days: Int,
+    cadence: HorizonsClient.ElementsPerDay,
+  ): F[Either[String, PerSite[HorizonsEphemeris]]]
 
 object HorizonsClient:
+
+  /** Even divisors of 24 */
+  type ElementsPerDay = 1 | 2 | 3 | 4 | 6 | 8 | 12 | 24
 
   enum Search[A](val queryString: String):
     case Comet(partial: String)     extends Search[EphemerisKey.Comet](s"NAME=$partial*;CAP")
     case Asteroid(partial: String)  extends Search[EphemerisKey.Asteroid](s"ASTNAM=$partial*")
     case MajorBody(partial: String) extends Search[EphemerisKey.MajorBody](s"$partial")
-
 
   /**
    * Construct a `HorizonsClient`. Requests will be retried automatically on failure, up to `maxRetries`,
@@ -106,7 +138,7 @@ object HorizonsClient:
         start: Instant,
         stop: Instant,
         elems: Int,
-      ): F[Either[String, List[HorizonsEphemerisEntry]]] =
+      ): F[Either[String, HorizonsEphemeris]] =
         if !stop.isAfter(start) then Left("Stop must fall after start.").pure[F]
         else if elems < 1 then Left("Cannot select fewer than one element.").pure[F]
         else {
@@ -132,7 +164,10 @@ object HorizonsClient:
             .compile
             .toList
             .map: lines =>
-              lines.sequence
+              lines.sequence.map: elements =>
+                HorizonsEphemeris(
+                  key, site, start, stop, elements
+                )
         }
       
       def ephemerisPerSite(
@@ -140,9 +175,20 @@ object HorizonsClient:
         start: Instant,
         stop: Instant,
         elems: Int,
-      ): F[Either[String, PerSite[List[HorizonsEphemerisEntry]]]] =
+      ): F[Either[String, PerSite[HorizonsEphemeris]]] =
         PerSite
           .unfoldF: site =>
             EitherT(ephemeris(key, site, start, stop, elems))
+          .value
+
+      def alignedEphemerisPerSite(
+        key: EphemerisKey.Horizons,
+        start: Instant,
+        days: Int,
+        cadence: HorizonsClient.ElementsPerDay,
+      ): F[Either[String, PerSite[HorizonsEphemeris]]] =
+        PerSite
+          .unfoldF: site =>
+            EitherT(alignedEphemeris(key, site, start, days, cadence))          
           .value
 
