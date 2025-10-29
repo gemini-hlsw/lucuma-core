@@ -25,7 +25,7 @@ class HorizonsClientEphemerisSuite extends HorizonsClientSuite:
         start = sem.start.atSite(site).toInstant,
         stop  = sem.end.atSite(site).toInstant,
         elems = elems
-      )
+      ).map(_.map(_.entries))
 
   def testEphemerisPopulation(name: String, key: EphemerisKey.Horizons) =
     test(s"Ensure ephemeris is populated for $site - $name (${key.keyType})"):
@@ -90,4 +90,102 @@ class HorizonsClientEphemerisSuite extends HorizonsClientSuite:
           elems = 0
         ),
       Left("Cannot select fewer than one element.")
+    )
+
+  test("alignedEphemeris (2)"):
+    assertIO(
+      client.use: c =>
+
+        c.alignedEphemeris(
+          key   = EphemerisKey.Comet("1P"),
+          site  = site,
+          start = sem.start.atSite(site).toInstant,
+          days  = 10,
+          cadence = 2
+        ).map: e =>
+          e.map: eph =>            
+            eph.entries.map(_.when.toString),
+        
+      Right(List(
+        "2020-08-01T00:00:00Z", // Day 1, midnight
+        "2020-08-01T12:00:00Z", // Day 1, noon
+        "2020-08-02T00:00:00Z", // Day 2
+        "2020-08-02T12:00:00Z", 
+        "2020-08-03T00:00:00Z",
+        "2020-08-03T12:00:00Z",
+        "2020-08-04T00:00:00Z", // ...
+        "2020-08-04T12:00:00Z",
+        "2020-08-05T00:00:00Z",
+        "2020-08-05T12:00:00Z",
+        "2020-08-06T00:00:00Z",
+        "2020-08-06T12:00:00Z",
+        "2020-08-07T00:00:00Z",
+        "2020-08-07T12:00:00Z",
+        "2020-08-08T00:00:00Z",
+        "2020-08-08T12:00:00Z",
+        "2020-08-09T00:00:00Z",
+        "2020-08-09T12:00:00Z",
+        "2020-08-10T00:00:00Z", // Day 10
+        "2020-08-10T12:00:00Z", // Day 10, noon
+        "2020-08-11T00:00:00Z"  // Day 11, midnight ... we get one extra
+      ))
+    )
+
+  test("alignedEphemeris (4)"):
+    assertIO(
+      client.use: c =>
+
+        c.alignedEphemeris(
+          key   = EphemerisKey.Comet("1P"),
+          site  = site,
+          start = sem.start.atSite(site).toInstant,
+          days  = 10,
+          cadence = 4
+        ).map: e =>
+          e.map: eph =>            
+            eph.entries.map(_.when.toString),
+        
+      Right(List(
+        "2020-08-01T00:00:00Z",
+        "2020-08-01T06:00:00Z",
+        "2020-08-01T12:00:00Z",
+        "2020-08-01T18:00:00Z",
+        "2020-08-02T00:00:00Z",
+        "2020-08-02T06:00:00Z",
+        "2020-08-02T12:00:00Z",
+        "2020-08-02T18:00:00Z",
+        "2020-08-03T00:00:00Z",
+        "2020-08-03T06:00:00Z",
+        "2020-08-03T12:00:00Z",
+        "2020-08-03T18:00:00Z",
+        "2020-08-04T00:00:00Z",
+        "2020-08-04T06:00:00Z",
+        "2020-08-04T12:00:00Z",
+        "2020-08-04T18:00:00Z",
+        "2020-08-05T00:00:00Z",
+        "2020-08-05T06:00:00Z",
+        "2020-08-05T12:00:00Z",
+        "2020-08-05T18:00:00Z",
+        "2020-08-06T00:00:00Z",
+        "2020-08-06T06:00:00Z",
+        "2020-08-06T12:00:00Z",
+        "2020-08-06T18:00:00Z",
+        "2020-08-07T00:00:00Z",
+        "2020-08-07T06:00:00Z",
+        "2020-08-07T12:00:00Z",
+        "2020-08-07T18:00:00Z",
+        "2020-08-08T00:00:00Z",
+        "2020-08-08T06:00:00Z",
+        "2020-08-08T12:00:00Z",
+        "2020-08-08T18:00:00Z",
+        "2020-08-09T00:00:00Z",
+        "2020-08-09T06:00:00Z",
+        "2020-08-09T12:00:00Z",
+        "2020-08-09T18:00:00Z",
+        "2020-08-10T00:00:00Z",
+        "2020-08-10T06:00:00Z",
+        "2020-08-10T12:00:00Z",
+        "2020-08-10T18:00:00Z",
+        "2020-08-11T00:00:00Z"
+      ))
     )

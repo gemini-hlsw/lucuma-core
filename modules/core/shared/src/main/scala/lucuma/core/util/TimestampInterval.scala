@@ -11,7 +11,7 @@ import cats.syntax.all.*
 import org.typelevel.cats.time.*
 
 import java.time.Instant
-import scala.concurrent.duration.FiniteDuration
+import scala.concurrent.duration.*
 
 /**
  * A TimestampInterval represents a period of time with a fixed starting point
@@ -145,6 +145,9 @@ sealed class TimestampInterval private (val start: Timestamp, val end: Timestamp
     if (intersects(other)) TimeSpan.Zero
     else if (this < other) TimeSpan.between(end, other.start)
     else TimeSpan.between(other.end, start)
+
+  def duration: FiniteDuration =
+    (end.toEpochMilli - start.toEpochMilli).millis
 
   override def equals(that: Any): Boolean =
     that match {
