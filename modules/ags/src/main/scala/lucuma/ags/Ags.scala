@@ -27,11 +27,25 @@ import lucuma.core.util.NewType
 
 import java.time.Instant
 
-object AcquisitionOffsets extends NewType[NonEmptyList[Offset]]
+object AcquisitionOffsets extends NewType[NonEmptyList[Offset]]:
+  extension (a: AcquisitionOffsets)
+    def withType: NonEmptyList[(GeometryType, Offset)] =
+      a.value.tupleLeft(GeometryType.AcqOffset)
+
 type AcquisitionOffsets = AcquisitionOffsets.Type
 
-object ScienceOffsets extends NewType[NonEmptyList[Offset]]
+object ScienceOffsets extends NewType[NonEmptyList[Offset]]:
+  extension (a: ScienceOffsets)
+    def withType: NonEmptyList[(GeometryType, Offset)] =
+      a.value.tupleLeft(GeometryType.SciOffset)
+
 type ScienceOffsets = ScienceOffsets.Type
+
+private case class AnalysisContext(
+  guideSpeeds:          List[(GuideSpeed, BrightnessConstraints)],
+  calcs:                NonEmptyMap[AgsPosition, AgsGeomCalc],
+  brightnessConstraint: Option[BrightnessConstraints]
+)
 
 object Ags {
 
@@ -141,23 +155,27 @@ object Ags {
   ): List[Offset] =
     scienceAt.map(s => offsetAt(s, instant, gsc)).flatten
 
+  private def blindOffsetOffset(base: Coordinates, blind: Coordinates): Offset =
+    base.diff(blind).offset
+
   private def buildPositions(
     anglesToTest:   NonEmptyList[Angle],
     acqOffsets:     Option[AcquisitionOffsets],
     scienceOffsets: Option[ScienceOffsets]
-  ): NonEmptyList[AgsPosition] =
-    val allOffsets: Option[NonEmptyList[Offset]] =
+  ): NonEmptyList[(GeometryType, AgsPosition)] =
+    val allOffsets: Option[NonEmptyList[(GeometryType, Offset)]] =
       (acqOffsets, scienceOffsets) match
-        case (Some(a), Some(s)) => (a.value |+| s.value).some
-        case (Some(a), None)    => a.value.some
-        case (None, Some(s))    => s.value.some
+        case (Some(a), Some(s)) => (a.withType |+| s.withType).some
+        case (Some(a), None)    => a.withType.some
+        case (None, Some(s))    => s.withType.some
         case _                  => none
 
-    allOffsets.fold(anglesToTest.map(AgsPosition(_, Offset.Zero))): offsets =>
-      for {
-        pa  <- anglesToTest
-        off <- offsets.distinct
-      } yield AgsPosition(pa, off)
+    allOffsets
+      .fold(anglesToTest.map(a => (GeometryType.Base, AgsPosition(a, Offset.Zero)))): offsets =>
+        for {
+          pa  <- anglesToTest
+          off <- offsets.distinct
+        } yield (off._1, AgsPosition(pa, off._2))
 
   def generatePositions(
     baseCoordinates: Coordinates,
@@ -165,15 +183,25 @@ object Ags {
     posAngles:       NonEmptyList[Angle],
     acqOffsets:      Option[AcquisitionOffsets],
     scienceOffsets:  Option[ScienceOffsets]
-  ): NonEmptyList[AgsPosition] = {
-    val acqOffsetsOnBlind = (blindOffset, acqOffsets) match
-      case (Some(blind), Some(acqOffsets)) =>
-        // Not a typo, it is the offset to the blind offset
-        val blindOffsetOffset = blind.diff(baseCoordinates).offset
-        Some(AcquisitionOffsets(acqOffsets.value.map(_ + blindOffsetOffset)))
-      case (Some(_), None)                 =>
+  ): NonEmptyList[AgsPosition] =
+    generatePositionGeometries(baseCoordinates, blindOffset, posAngles, acqOffsets, scienceOffsets)
+      .map(_._2)
+
+  def generatePositionGeometries(
+    baseCoordinates: Coordinates,
+    blindOffset:     Option[Coordinates],
+    posAngles:       NonEmptyList[Angle],
+    acqOffsets:      Option[AcquisitionOffsets],
+    scienceOffsets:  Option[ScienceOffsets]
+  ): NonEmptyList[(GeometryType, AgsPosition)] = {
+    val blindOffsetOff: Option[Offset] = blindOffset.map(blindOffsetOffset(baseCoordinates, _))
+
+    val acqOffsetsOnBlind: Option[AcquisitionOffsets] = (blindOffsetOff, acqOffsets) match
+      case (Some(offset), Some(acqOffsets)) =>
+        AcquisitionOffsets(acqOffsets.value.map(_ + offset)).some
+      case (Some(_), None)                  =>
         none
-      case (None, acqOffsets)              =>
+      case (None, acqOffsets)               =>
         acqOffsets
 
     buildPositions(posAngles, acqOffsetsOnBlind, scienceOffsets)
@@ -187,20 +215,27 @@ object Ags {
     scienceOffsets:     Option[ScienceOffsets],
     instant:            Instant
   ): NonEmptyList[AgsPosition] = {
-    val acqOffsetsOnBlind: Option[AcquisitionOffsets] = (blindOffset, acquisitionOffsets) match
-      case (Some(blindAt), Some(acqOffsets)) =>
-        (baseAt(instant), blindAt(instant))
-          .mapN((base, blind) =>
-            val offset = blind.diff(base).offset
-            AcquisitionOffsets(acqOffsets.value.map(_ + offset))
-          )
-          .orElse(acqOffsets.some)
-      case (Some(_), None)                   =>
-        none
-      case (None, acqOffsets)                =>
-        acqOffsets
+    val baseCoords: Option[Coordinates] = baseAt(instant)
+    val blindCoords: Option[Coordinates] = blindOffset.flatMap(_(instant))
 
-    buildPositions(posAngles, acqOffsetsOnBlind, scienceOffsets)
+    baseCoords
+      .map(base =>
+        generatePositionGeometries(base, blindCoords, posAngles, acquisitionOffsets, scienceOffsets)
+          .map(_._2)
+      )
+      .getOrElse(buildPositions(posAngles, acquisitionOffsets, scienceOffsets).map(_._2))
+  }
+
+  private def analysisContext(
+    constraints: ConstraintSet,
+    wavelength:  Wavelength,
+    positions:   NonEmptyList[AgsPosition],
+    params:      AgsParams
+  ): AnalysisContext = {
+    val guideSpeeds = guideSpeedLimits(constraints, wavelength)
+    val calcs       = params.posCalculations(positions)
+    val bc          = constraintsFor(guideSpeeds)
+    AnalysisContext(guideSpeeds, calcs, bc)
   }
 
   /**
@@ -219,19 +254,11 @@ object Ags {
     params:             AgsParams,
     instant:            Instant
   ): Pipe[F, GuideStarCandidate, AgsAnalysis] = {
-    val positions =
-      generatePositions(baseAt, blindOffset, posAngles, acquisitionOffsets, scienceOffsets, instant)
-
-    // Cache the limits for different speeds
-    val guideSpeeds = guideSpeedLimits(constraints, wavelength)
-    // This is essentially a cache of geometries avoiding calculatting them
-    // over and over again as they don't change for different positions
-    val calcs       = params.posCalculations(positions)
-    // use constraints to calculate all guide speeds
-    val bc          = constraintsFor(guideSpeeds)
+    val positions = generatePositions(baseAt, blindOffset, posAngles, acquisitionOffsets, scienceOffsets, instant)
+    val ctx       = analysisContext(constraints, wavelength, positions, params)
 
     in =>
-      (in.filter(c => c.gBrightness.exists { case (_, g) => bc.exists(_.contains(Band.Gaia, g)) }),
+      (in.filter(c => c.gBrightness.exists { case (_, g) => ctx.brightnessConstraint.exists(_.contains(Band.Gaia, g)) }),
        Stream.emits[F, AgsPosition](positions.toList).repeat
       )
         .mapN { case (gsc, position) =>
@@ -246,8 +273,8 @@ object Ags {
                           position,
                           params,
                           gsc,
-                          guideSpeeds,
-                          calcs
+                          ctx.guideSpeeds,
+                          ctx.calcs
               )
             }
             .getOrElse(ProperMotionNotAvailable(gsc, position.posAngle))
@@ -269,25 +296,17 @@ object Ags {
     scienceOffsets:     Option[ScienceOffsets],
     params:             AgsParams
   ): Pipe[F, GuideStarCandidate, AgsAnalysis] = {
-    val positions =
-      generatePositions(baseCoordinates, blindOffset, posAngles, acquisitionOffsets, scienceOffsets)
-
-    // Cache the limits for different speeds
-    val guideSpeeds = guideSpeedLimits(constraints, wavelength)
-    // This is essentially a cache of geometries avoiding calculatting them
-    // over and over again as they don't change for different positions
-    val calcs       = params.posCalculations(positions)
-    // use constraints to calculate all guide speeds
-    val bc          = constraintsFor(guideSpeeds)
+    val positions = generatePositions(baseCoordinates, blindOffset, posAngles, acquisitionOffsets, scienceOffsets)
+    val ctx       = analysisContext(constraints, wavelength, positions, params)
 
     in =>
-      (in.filter(c => c.gBrightness.exists { case (_, g) => bc.exists(_.contains(Band.Gaia, g)) }),
+      (in.filter(c => c.gBrightness.exists { case (_, g) => ctx.brightnessConstraint.exists(_.contains(Band.Gaia, g)) }),
        Stream.emits[F, AgsPosition](positions.toList)
       )
         .mapN { (gsc, position) =>
           val offset     = baseCoordinates.diff(gsc.tracking.baseCoordinates).offset
           val sciOffsets = scienceCoordinates.map(_.diff(gsc.tracking.baseCoordinates).offset)
-          runAnalysis(constraints, offset, sciOffsets, position, params, gsc, guideSpeeds, calcs)
+          runAnalysis(constraints, offset, sciOffsets, position, params, gsc, ctx.guideSpeeds, ctx.calcs)
         }
   }
 
@@ -317,19 +336,11 @@ object Ags {
     instant:            Instant,
     candidates:         List[GuideStarCandidate]
   ): List[AgsAnalysis] = {
-    val positions =
-      generatePositions(baseAt, blindOffset, posAngles, acquisitionOffsets, scienceOffsets, instant)
-
-    // Cache the limits for different speeds
-    val guideSpeeds = guideSpeedLimits(constraints, wavelength)
-    // This is essentially a cache of geometries avoiding calculatting them
-    // over and over again as they don't change for different positions
-    val calcs       = params.posCalculations(positions)
-    // use constraints to calculate all guide speeds
-    val bc          = constraintsFor(guideSpeeds)
+    val positions = generatePositions(baseAt, blindOffset, posAngles, acquisitionOffsets, scienceOffsets, instant)
+    val ctx       = analysisContext(constraints, wavelength, positions, params)
 
     candidates
-      .filter(c => c.gBrightness.exists { case (_, g) => bc.exists(_.contains(Band.Gaia, g)) })
+      .filter(c => c.gBrightness.exists { case (_, g) => ctx.brightnessConstraint.exists(_.contains(Band.Gaia, g)) })
       .flatMap: gsc =>
         val sciOffsets = scienceOffsetsAt(scienceAt, instant, gsc)
 
@@ -343,8 +354,8 @@ object Ags {
                           position,
                           params,
                           gsc,
-                          guideSpeeds,
-                          calcs
+                          ctx.guideSpeeds,
+                          ctx.calcs
               )
             .getOrElse(ProperMotionNotAvailable(gsc, position.posAngle))
   }
@@ -368,27 +379,18 @@ object Ags {
     params:             AgsParams,
     candidates:         List[GuideStarCandidate]
   ): List[AgsAnalysis] = {
-    val positions =
-      generatePositions(baseCoordinates, blindOffset, posAngles, acquisitionOffsets, scienceOffsets)
-
-    // Cache the limits for different speeds
-    val guideSpeeds = guideSpeedLimits(constraints, wavelength)
-
-    // This is essentially a cache of geometries avoiding calculating them
-    // over and over again as they don't change for different positions
-    val calcs = params.posCalculations(positions)
-    // use constraints to calculate all guide speeds
-    val bc    = constraintsFor(guideSpeeds)
+    val positions = generatePositions(baseCoordinates, blindOffset, posAngles, acquisitionOffsets, scienceOffsets)
+    val ctx       = analysisContext(constraints, wavelength, positions, params)
 
     candidates
       .filter: c =>
-        c.gBrightness.exists { case (_, g) => bc.exists(_.contains(Band.Gaia, g)) }
+        c.gBrightness.exists { case (_, g) => ctx.brightnessConstraint.exists(_.contains(Band.Gaia, g)) }
       .flatMap: gsc =>
         val offset     = baseCoordinates.diff(gsc.tracking.baseCoordinates).offset
         val sciOffsets = scienceCoordinates.map(_.diff(gsc.tracking.baseCoordinates).offset)
 
         positions.toList.map: position =>
-          runAnalysis(constraints, offset, sciOffsets, position, params, gsc, guideSpeeds, calcs)
+          runAnalysis(constraints, offset, sciOffsets, position, params, gsc, ctx.guideSpeeds, ctx.calcs)
   }
 
   /**

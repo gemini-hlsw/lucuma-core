@@ -21,8 +21,19 @@ import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 import lucuma.core.math.syntax.int.*
 import lucuma.core.model.sequence.flamingos2.Flamingos2FpuMask
+import lucuma.core.util.Enumerated
 
 private given Order[Angle] = Angle.SignedAngleOrder
+
+/**
+ * Enum representing type of patrol field for a position.
+ */
+enum GeometryType(private val tag: String) derives Enumerated:
+  case BlindOffset  extends GeometryType("blind_offset")
+  case AcqOffset    extends GeometryType("acq_offset")
+  case SciOffset    extends GeometryType("sci_offset")
+  case Base         extends GeometryType("base")
+  case Intersection extends GeometryType("intersection")
 
 case class AgsPosition(posAngle: Angle, offsetPos: Offset) derives Order
 
@@ -35,6 +46,8 @@ sealed trait AgsGeomCalc:
 
   // Indicates if the given guide star would vignette the science target
   def overlapsScience(gsOffset: Offset): Boolean
+
+  def intersectionPatrolField: ShapeExpression
 
 trait SingleProbeAgsParams:
   def patrolFieldAt(posAngle: Angle, offset: Offset): ShapeExpression
@@ -50,7 +63,7 @@ trait SingleProbeAgsParams:
   ): NonEmptyMap[AgsPosition, AgsGeomCalc] =
     val result = positions.map { position =>
       position -> new AgsGeomCalc() {
-        private val intersectionPatrolField =
+        override val intersectionPatrolField: ShapeExpression =
           positions
             .map(_.offsetPos)
             .distinct
@@ -58,7 +71,6 @@ trait SingleProbeAgsParams:
             // we want the intersection of offsets at a single PA
             .map(offset => patrolFieldAt(position.posAngle, offset))
             .reduce(using _ ∩ _) // it is very strange this is passed as an implicit
-            .eval
 
         private val scienceAreaShape =
           scienceArea(position.posAngle, position.offsetPos)
