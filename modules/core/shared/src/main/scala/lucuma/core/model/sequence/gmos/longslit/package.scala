@@ -41,6 +41,7 @@ def northBinning(
   iq:         ImageQuality,
   grating:    GmosNorthGrating,
   detector:   GmosNorthDetector = binning.DefaultGmosNorthDetector,
+  maxBinning: GmosYBinning      = binning.DefaultMaxYBinning,
   sampling:   PosDouble         = binning.DefaultSampling
 ): (GmosXBinning, GmosYBinning) =
   (binning.spectralBinning(
@@ -52,7 +53,7 @@ def northBinning(
       grating.blazeWavelength,
       sampling
     ),
-   binning.spatialBinning(srcProfile, iq, detector.pixelSize, sampling)
+   binning.spatialBinning(srcProfile, iq, detector.pixelSize, maxBinning, sampling)
  )
 
 /**
@@ -64,6 +65,7 @@ def southBinning(
   iq:         ImageQuality,
   grating:    GmosSouthGrating,
   detector:   GmosSouthDetector = binning.DefaultGmosSouthDetector,
+  maxBinning: GmosYBinning      = binning.DefaultMaxYBinning,
   sampling:   PosDouble         = binning.DefaultSampling
 ): (GmosXBinning, GmosYBinning) =
   (binning.spectralBinning(
@@ -75,5 +77,5 @@ def southBinning(
       grating.blazeWavelength,
       sampling
     ),
-   binning.spatialBinning(srcProfile, iq, detector.pixelSize, sampling)
+   binning.spatialBinning(srcProfile, iq, detector.pixelSize, maxBinning, sampling)
  )
