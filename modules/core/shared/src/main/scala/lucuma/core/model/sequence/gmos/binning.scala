@@ -28,7 +28,6 @@ import java.math.RoundingMode.HALF_UP
  * See https://docs.google.com/document/d/1P8_pXLRVomUSvofyVkAniOyGROcAtiJ7EMYt9wWXB0o.
  */
 object binning {
-
   val DefaultSampling: PosDouble =
     PosDouble.unsafeFrom(2.5)
 
@@ -37,6 +36,17 @@ object binning {
 
   val DefaultGmosNorthDetector: GmosNorthDetector =
     GmosNorthDetector.Hamamatsu
+
+  /**
+   * Default maximum Y binning.
+   * We want to cap binning in case observations are carried out under 
+   * better-than-requested conditions. Also, MOS observations typically use
+   * 2x2 binning maximum for spatial directionto maintain adequate sampling 
+   * for object identification and positioning.
+   */
+  // See https://app.shortcut.com/lucuma/story/7020/update-gmos-default-y-binning-calculation
+  val DefaultMaxYBinning: GmosYBinning =
+    GmosYBinning.Two    
 
   /**
    * Object angular size estimate based on source profile and image quality.
@@ -81,7 +91,6 @@ object binning {
     blaze:      Wavelength,
     sampling:   PosDouble = DefaultSampling
   ): GmosXBinning = {
-
     // Effective resolution of slit
     val effRes = resolution.value.toDouble / 2.0 / effectiveWidth(slitWidth, srcProfile, iq).arcsec
 
@@ -98,16 +107,19 @@ object binning {
     srcProfile: SourceProfile,
     iq:         ImageQuality,
     pixelScale: Angle,
+    maxBinning: GmosYBinning = DefaultMaxYBinning,
     sampling:   PosDouble = DefaultSampling
   ): GmosYBinning = {
-
     // Number of unbinned pixels to sample the slit width
     val npix = objectSize(srcProfile, iq).arcsec / (pixelScale.arcsec * sampling.value)
 
     // The maximum binning that gives the required sampling (<npix)
-    Enumerated[GmosYBinning].all.tail.reverse.find { bin =>
-      bin.count.value <= npix
-    }.getOrElse(GmosYBinning.One)
+    val binning: GmosYBinning =
+      Enumerated[GmosYBinning].all.tail.reverse.find { bin =>
+        bin.count.value <= npix
+      }.getOrElse(GmosYBinning.One)
+
+    binning.min(maxBinning)
   }
 
 }
