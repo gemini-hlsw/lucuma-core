@@ -31,7 +31,7 @@ trait EpochParsers {
   val epoch: Parser[Epoch] =
     (epochScheme ~ year ~ char('.').void ~ miliyear.?).map {
       case ((((s, y), _), m)) =>
-        s.fromMilliyearsUnsafe(y * 1000 + m.getOrElse(0))
+        s.unsafeFromMilliyears(y * 1000 + m.getOrElse(0))
     }
       .withContext("epoch")
 
@@ -39,7 +39,7 @@ trait EpochParsers {
   val epochLenientNoScheme: Parser[Epoch] =
     (year ~ char('.').? ~ miliyear.?).map {
       case (((y, _), m)) =>
-        Julian.fromMilliyearsUnsafe(y * 1000 + m.getOrElse(0))
+        Julian.unsafeFromMilliyears(y * 1000 + m.getOrElse(0))
       }
       .withContext("julianEpoch")
 

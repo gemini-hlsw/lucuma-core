@@ -10,23 +10,25 @@ import eu.timepit.refined.*
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.cats.*
 import eu.timepit.refined.numeric.Interval as RefinedInterval
+import lucuma.core.math.JulianDate.SecondsPerDay
 import lucuma.core.math.parser.EpochParsers
 import lucuma.core.optics.Format
 import lucuma.core.optics.syntax.all.*
-import lucuma.core.refined.auto.*
 import monocle.Prism
+import org.typelevel.cats.time.given
 
 import java.time.*
 
 /**
   * An epoch, the astronomer's equivalent of `Instant`, based on a fractional year in some temporal
-  * scheme (Julian or Besselian) that determines year zero and the length of a year. The only
+  * scheme (Julian or Besselian) that determines an anchor instant and the length of a year. The only
   * meaningful operation for an `Epoch` is to ask the elapsed epoch-years between it and some other
   * point in time. We need this for proper motion corrections because velocities are measured in
   * motion per epoch-year. The epoch year is stored internally as integral milliyears.
   * @param scheme This `Epoch`'s temporal scheme.
   * @see The Wikipedia [[https://en.wikipedia.org/wiki/Epoch_(astronomy) article]]
   */
+// TODO Comment something about Tai, Terrestrial and leap seconds???
 final class Epoch private (val scheme: Epoch.Scheme, val toMilliyears: Epoch.IntMilliYear) {
 
   /** This `Epoch`'s year. Note that this value is not very useful without the `Scheme`. */
@@ -34,31 +36,36 @@ final class Epoch private (val scheme: Epoch.Scheme, val toMilliyears: Epoch.Int
     toMilliyears.value.toDouble / 1000.0
 
   /** Offset in epoch-years from this `Epoch` to the given `Instant`. */
-  def untilInstant(i: Instant): Double =
-    untilLocalDateTime(LocalDateTime.ofInstant(i, ZoneOffset.UTC))
+  def untilInstant(i: Instant): Option[Double] = 
+    scheme.fromInstant(i).map(e => untilEpochYear(e.epochYear))
+
+  def unsafeUntilInstant(i: Instant): Double = 
+    untilInstant(i).get
 
   /** Offset in epoch-years from this `Epoch` to the given `LocalDateTime`. */
-  def untilLocalDateTime(ldt: LocalDateTime): Double =
-    untilJulianDay(Epoch.Scheme.toJulianDay(ldt))
+  def untilUtcDateTime(ldt: LocalDateTime): Option[Double] = 
+    scheme.fromUtcDateTime(ldt).map(e => untilEpochYear(e.epochYear))
 
-  /** Offset in epoch-years from this `Epoch` to the given fractional Julian day. */
-  def untilJulianDay(jd: Double): Double =
-    untilEpochYear(scheme.fromJulianDayToEpochYears(jd))
+  def unsafeUntilUtcDateTime(ldt: LocalDateTime): Double = 
+    untilUtcDateTime(ldt).get
 
   /** Offset in epoch-years from this `Epoch` to the given epoch year under the same scheme. */
-  def untilEpochYear(epochYear: Double): Double =
+  def untilEpochYear(epochYear: Double): Double = 
     epochYear - this.epochYear
 
-  def plusYears(y: Double): Option[Epoch] =
+  def plusEpochYears(y: Double): Option[Epoch] = 
     scheme.fromEpochYears(epochYear + y)
 
   /** Convert this `Epoch` to a Java `Instant`.
     *
     * Converts the epoch year to a Julian Day number using the scheme's reference parameters,
-    * then to a Java Instant. The conversion is approximate to approximately millisecond level.
+    * then to a Java Instant. The conversion is approximate to millisecond level.
     */
-  def toInstant: Instant =
-    scheme.toInstant(epochYear)
+  def toInstant: Option[Instant] =
+    scheme.toInstant(toMilliyears)
+
+  def unsafeToInstant: Instant =
+    toInstant.get
 
   override def equals(a: Any): Boolean =
     a match {
@@ -84,90 +91,113 @@ object Epoch extends EpochOptics {
     * Standard epoch.
     * @group Constructors
     */
-  val J2000: Epoch = Julian.fromIntegralYears(2000.refined[Year])
+  lazy val J2000: Epoch = Julian.unsafeFromTerrestrialInstant(JulianAnchor)
 
   /**
     * Standard epoch prior to J2000. Obsolete but still in use.
     * @group Constructors
     */
-  val B1950: Epoch = Besselian.fromIntegralYears(1950.refined[Year])
+  val B1950: Epoch = Besselian.unsafeFromTerrestrialInstant(BesselianAnchor)
 
   /**
-    * The scheme defines year zero and length of a year in terms of Julian days. There are two
+    * The scheme defines an anchor and length of a year in terms of terrestrial days. There are two
     * common schemes that we support here.
     */
   sealed abstract class Scheme(
     val prefix:       Char,
-    val yearBasis:    Double,
-    val julianBasis:  Double,
-    val lengthOfYear: Double
+    val anchor:       TerrestrialInstant,
+    val anchorValue:  Double,
+    val daysInYear:   Double
   ) {
+    def fromTerrestrialInstant(ttInstant: TerrestrialInstant): Option[Epoch] =
+      val yearsDelta: Double = (Duration.between(anchor.value, ttInstant.value).toSeconds / SecondsPerDay.toDouble) / daysInYear
+      val milliYears: Double = (anchorValue + yearsDelta) * 1000.0
+      val milliYearsRounded: Int = math.round(milliYears).toInt
+      val milliYearsRefined: Option[IntMilliYear] = refineV[Epoch.MilliYear](milliYearsRounded).toOption
+      milliYearsRefined.map(mys => Epoch(this, mys))
 
-    def fromIntegralYears(years: Epoch.IntYear): Epoch =
-      fromMilliyearsUnsafe(years.value * 1000)
+    def unsafeFromTerrestrialInstant(ttInstant: TerrestrialInstant): Epoch =
+      fromTerrestrialInstant(ttInstant).get
 
-    def fromMilliyears(mys: IntMilliYear): Epoch =
+    def fromInstant(instant: Instant): Option[Epoch] =
+      TerrestrialInstant.fromInstant(instant).flatMap(fromTerrestrialInstant(_))
+
+    def unsafeFromInstant(instant: Instant): Epoch =
+      fromInstant(instant).get
+
+    def fromIntYears(years: Epoch.IntYear): Option[Epoch] = 
+      fromIntMilliyears(years.value * 1000)
+
+    def unsafeFromIntYears(years: Epoch.IntYear): Epoch = 
+      fromIntYears(years).get
+
+    def fromMilliyears(mys: IntMilliYear): Epoch = 
       new Epoch(this, mys)
 
-    def fromIntMilliyears(mys: Int): Option[Epoch] =
+    def fromIntMilliyears(mys: Int): Option[Epoch] = 
       refineV[Epoch.MilliYear](mys).map(new Epoch(this, _)).toOption
 
-    def fromMilliyearsUnsafe(mys: Int): Epoch =
+    def unsafeFromMilliyears(mys: Int): Epoch = 
       fromIntMilliyears(mys).get
 
-    def fromLocalDateTime(ldt: LocalDateTime): Option[Epoch] =
-      fromJulianDay(Scheme.toJulianDay(ldt))
+    def fromUtcDateTime(ldt: LocalDateTime): Option[Epoch] = 
+      fromInstant(ldt.toInstant(ZoneOffset.UTC))
 
-    def fromJulianDay(jd: Double): Option[Epoch] =
-      fromEpochYears(fromJulianDayToEpochYears(jd))
+    def unsafeFromUtcDateTime(ldt: LocalDateTime): Epoch =
+      fromUtcDateTime(ldt).get
 
-    def fromEpochYears(epochYear: Double): Option[Epoch] =
+    def fromEpochYears(epochYear: Double): Option[Epoch] = 
       fromIntMilliyears((epochYear * 1000.0).toInt)
 
-    def fromLocalDateTimeToEpochYears(ldt: LocalDateTime): Double =
-      fromJulianDayToEpochYears(Scheme.toJulianDay(ldt))
+    def unsafeFromEpochYears(epochYear: Double): Epoch = 
+      fromEpochYears(epochYear).get
 
-    def fromJulianDayToEpochYears(jd: Double): Double =
-      yearBasis + (jd - julianBasis) / lengthOfYear
+    def toTerrestrialInstant(milliYears: Epoch.IntMilliYear): TerrestrialInstant = 
+      val yearsSinceAnchor: Double = milliYears.value.toDouble / 1000.0 - anchorValue
+      TerrestrialInstant:
+        anchor.value.plusSeconds((yearsSinceAnchor * daysInYear * SecondsPerDay.toDouble).toLong)
 
     /** Convert epoch year to Java `Instant`.
       *
       * Converts the epoch year to Julian Day using the inverse of the standard epoch formula,
       * then to Instant via JulianDate.
       */
-    def toInstant(epochYear: Double): Instant =
-      val jd = julianBasis + (epochYear - yearBasis) * lengthOfYear
-      JulianDate.fromDoubleApprox(jd).toInstant
+    def toInstant(milliYears: Epoch.IntMilliYear): Option[Instant] = 
+      toTerrestrialInstant(milliYears).toInstant
+
+    def unsafeToInstant(milliYears: Epoch.IntMilliYear): Instant = 
+      toInstant(milliYears).get
   }
 
   object Scheme {
-
-    /**
-      * Convert a `LocalDateTime` to a fractional Julian day.
-      * @see The Wikipedia [[https://en.wikipedia.org/wiki/Julian_day article]]
-      */
-    def toJulianDay(dt: LocalDateTime): Double =
-      JulianDate.ofLocalDateTime(dt).dayNumber.toDouble
-
     given Order[Scheme] =
-      Order.by(s => (s.prefix, s.yearBasis, s.julianBasis, s.lengthOfYear))
+      Order.by(s => (s.prefix, s.anchor, s.anchorValue, s.daysInYear))
 
     given Show[Scheme] =
       Show.fromToString
-
   }
 
   /**
     * Module of constructors for Besselian epochs.
     * @group Constructors
     */
-  case object Besselian extends Scheme('B', 1900.0, 2415020.31352, 365.242198781)
+  // January 0.9235, 1950 TT (yes, January 0 is December 31 of the previous year)
+  lazy val BesselianAnchor: TerrestrialInstant =
+    TerrestrialInstant.unsafeFromInstant:
+      Instant.from(ZonedDateTime.of(LocalDateTime.of(1949, 12, 31, 22, 9, 46, 861000000), ZoneOffset.UTC))
+
+  case object Besselian extends Scheme('B', BesselianAnchor, 1950.0, 365.242198781)
 
   /**
     * Module of constructors for Julian epochs.
     * @group Constructors
     */
-  case object Julian extends Scheme('J', 2000.0, 2451545.0, 365.25)
+  // January 1.5, 2000 TT (2000-Jan-01 11:58:55.816 UTC)
+  lazy val JulianAnchor: TerrestrialInstant =
+    TerrestrialInstant.unsafeFromInstant:
+      Instant.from(ZonedDateTime.of(LocalDateTime.of(2000, 1, 1, 11, 58, 55, 816000000), ZoneOffset.UTC))
+
+  case object Julian extends Scheme('J', JulianAnchor, 2000.0, 365.25)
 
   given Order[Epoch] =
     Order.by(e => (e.scheme, e.toMilliyears.value))
