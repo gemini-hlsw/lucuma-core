@@ -24,11 +24,11 @@ import java.time.*
   * scheme (Julian or Besselian) that determines an anchor instant and the length of a year. The only
   * meaningful operation for an `Epoch` is to ask the elapsed epoch-years between it and some other
   * point in time. We need this for proper motion corrections because velocities are measured in
-  * motion per epoch-year. The epoch year is stored internally as integral milliyears.
+  * motion per epoch-year. The epoch year is stored internally as integral milliyears, which are 
+  * computed based on Terrestial Time.
   * @param scheme This `Epoch`'s temporal scheme.
   * @see The Wikipedia [[https://en.wikipedia.org/wiki/Epoch_(astronomy) article]]
   */
-// TODO Comment something about Tai, Terrestrial and leap seconds???
 final class Epoch private (val scheme: Epoch.Scheme, val toMilliyears: Epoch.IntMilliYear) {
 
   /** This `Epoch`'s year. Note that this value is not very useful without the `Scheme`. */
@@ -56,11 +56,7 @@ final class Epoch private (val scheme: Epoch.Scheme, val toMilliyears: Epoch.Int
   def plusEpochYears(y: Double): Option[Epoch] = 
     scheme.fromEpochYears(epochYear + y)
 
-  /** Convert this `Epoch` to a Java `Instant`.
-    *
-    * Converts the epoch year to a Julian Day number using the scheme's reference parameters,
-    * then to a Java Instant. The conversion is approximate to millisecond level.
-    */
+  /** Convert this `Epoch` to a Java `Instant`. */
   def toInstant: Option[Instant] =
     scheme.toInstant(toMilliyears)
 
