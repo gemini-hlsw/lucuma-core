@@ -58,7 +58,7 @@ final class Epoch private (val scheme: Epoch.Scheme, val toMilliyears: Epoch.Int
 
   /** Convert this `Epoch` to a Java `Instant`.
     *
-    * Converts the epoch year to a Julian Day number using the scheme's reference parameters,
+    * Converts the epoch year to Terrestrial Time using the scheme's reference parameters,
     * then to a Java Instant. The conversion is approximate to millisecond level.
     */
   def toInstant: Option[Instant] =
@@ -159,8 +159,8 @@ object Epoch extends EpochOptics {
 
     /** Convert epoch year to Java `Instant`.
       *
-      * Converts the epoch year to Julian Day using the inverse of the standard epoch formula,
-      * then to Instant via JulianDate.
+      * Converts the epoch year to Terrestrial Time using the scheme's reference parameters,
+      * then to Instant.
       */
     def toInstant(milliYears: Epoch.IntMilliYear): Option[Instant] = 
       toTerrestrialInstant(milliYears).toInstant
