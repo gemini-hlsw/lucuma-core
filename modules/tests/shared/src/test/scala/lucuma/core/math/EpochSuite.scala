@@ -18,8 +18,6 @@ import org.scalacheck.Prop.*
 
 import java.time.Instant
 import java.time.LocalDateTime
-// import java.time.temporal.ChronoUnit
-
 final class EpochSuite extends munit.DisciplineSuite {
   import ArbEpoch.given
   import ArbTime.given
@@ -150,7 +148,7 @@ final class EpochSuite extends munit.DisciplineSuite {
     val epoch = Epoch.Julian.unsafeFromEpochYears(2020.5)
     val instant = epoch.unsafeToInstant
 
-    // 2020.5 Julian epoch converts to july 2nd assuming a year of 365.25 per definition
+    // 2020.5 Julian epoch converts to July 2nd assuming a year of 365.25 per definition
     val expected = Instant.parse("2020-07-02T02:58:50.816Z")
     assertEquals(instant, expected)
 

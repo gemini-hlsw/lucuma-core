@@ -97,7 +97,7 @@ object Epoch extends EpochOptics {
     * Standard epoch prior to J2000. Obsolete but still in use.
     * @group Constructors
     */
-  val B1950: Epoch = Besselian.unsafeFromTerrestrialInstant(BesselianAnchor)
+  lazy val B1950: Epoch = Besselian.unsafeFromTerrestrialInstant(BesselianAnchor)
 
   /**
     * The scheme defines an anchor and length of a year in terms of terrestrial days. There are two
@@ -159,8 +159,8 @@ object Epoch extends EpochOptics {
 
     /** Convert epoch year to Java `Instant`.
       *
-      * Converts the epoch year to Julian Day using the inverse of the standard epoch formula,
-      * then to Instant via JulianDate.
+      * Converts the epoch year to a TerrestrialInstant using the scheme's anchor and year length,
+      * then to Java Instant.
       */
     def toInstant(milliYears: Epoch.IntMilliYear): Option[Instant] = 
       toTerrestrialInstant(milliYears).toInstant

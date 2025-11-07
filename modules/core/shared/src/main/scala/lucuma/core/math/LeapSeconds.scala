@@ -68,14 +68,14 @@ object LeapSeconds {
   // Take advantage of the sorted list to short circuit the count.
   private def sortedCountBefore(list: List[(Long, Int)], i: Long): Int = 
     val overIndex: Option[Int] = list.indexWhere(_._1 >= i).some.filter(_ >= 0)
-    overIndex.map(i => list(i - 1)._2).getOrElse(Max)
+    overIndex.map(idx => list(idx - 1)._2).getOrElse(Max)
 
   /** Returns the number of leap seconds that have occurred *strictly before* the given Instant. */
   def before(instant: Instant): Int = {
     sortedCountBefore(AddLeapSecondBoundaries, instant.getEpochSecond)
   }
 
-  /** Returns the number of leap seconds that are included in the given TaiInstant . */
+  /** Returns the number of leap seconds that are included in the given TaiInstant. */
   def includedIn(taiInstant: TaiInstant): Int = {
     sortedCountBefore(RemoveLeapSecondBoundaries, taiInstant.value.getEpochSecond)
   }
