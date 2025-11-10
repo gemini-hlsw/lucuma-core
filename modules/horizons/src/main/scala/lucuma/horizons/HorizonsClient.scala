@@ -9,8 +9,8 @@ import fs2.text
 import lucuma.core.data.PerSite
 import lucuma.core.enums.Site
 import lucuma.core.model.EphemerisKey
-import org.http4s.Headers
 import org.http4s.Request
+import org.http4s.Uri
 import org.http4s.client.Client
 import org.typelevel.log4cats.Logger
 
@@ -98,14 +98,16 @@ object HorizonsClient:
   def apply[F[_]: Temporal: Logger](
     client: Client[F],
     maxRetries: Int = 5,
-    initialRetryInterval: FiniteDuration = 100.milli
+    initialRetryInterval: FiniteDuration = 100.milli,
+    modUri: Uri => Uri = identity // Override this if you need to add a CORS proxy
   ): HorizonsClient[F] =
     new AbstractHorizonsClient[F]:
       def stream(params: (String, String)*): Stream[F, String] =
+        val uri = modUri(HorizonsUri).withQueryParams(params.toMap)
         def go(retriesRemaining: Int, interval: FiniteDuration): Stream[F, String] =
           client
             .stream:
-              Request(uri = HorizonsUri.withQueryParams(params.toMap))
+              Request(uri = uri)
             .flatMap: res =>
               if res.status.isSuccess then
                 res
