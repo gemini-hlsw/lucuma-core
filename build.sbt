@@ -46,7 +46,7 @@ lazy val spireVersion               = "0.18.0"
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
-val root = tlCrossRootProject.aggregate(core, testkit, tests, catalog, ags, catalogTestkit, catalogTests, horizons)
+val root = tlCrossRootProject.aggregate(core, testkit, tests, catalog, ags, catalogTestkit, catalogTests, horizons, npm)
 
 lazy val core = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Full)
