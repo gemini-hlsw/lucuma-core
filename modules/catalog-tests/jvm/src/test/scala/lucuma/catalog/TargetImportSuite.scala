@@ -21,7 +21,7 @@ import lucuma.core.model.Target
 import munit.CatsEffectSuite
 import org.http4s.jdkhttpclient.JdkHttpClient
 
-class TargetImportFileSuite extends CatsEffectSuite:
+class TargetImportSuite extends CatsEffectSuite:
 
   test("parallax-rv-v") {
     val xmlFile = "/targets_pv.csv"
