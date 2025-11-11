@@ -21,7 +21,7 @@ import java.time.*
 
 /**
   * An epoch, the astronomer's equivalent of `Instant`, based on a fractional year in some temporal
-  * scheme (Julian or Besselian) that determines an anchor instant and the length of a year. The only
+  * scheme (only Julian supported) that determines an equinox instant and the length of a year. The only
   * meaningful operation for an `Epoch` is to ask the elapsed epoch-years between it and some other
   * point in time. We need this for proper motion corrections because velocities are measured in
   * motion per epoch-year. The epoch year is stored internally as integral milliyears, which are 
@@ -87,27 +87,21 @@ object Epoch extends EpochOptics {
     * Standard epoch.
     * @group Constructors
     */
-  lazy val J2000: Epoch = Julian.unsafeFromTerrestrialInstant(JulianAnchor)
+  lazy val J2000: Epoch = Julian.unsafeFromTerrestrialInstant(JulianEquinoxInstant)
 
   /**
-    * Standard epoch prior to J2000. Obsolete but still in use.
-    * @group Constructors
-    */
-  lazy val B1950: Epoch = Besselian.unsafeFromTerrestrialInstant(BesselianAnchor)
-
-  /**
-    * The scheme defines an anchor and length of a year in terms of terrestrial days. There are two
-    * common schemes that we support here.
+    * The scheme defines an equinox instant and length of a year in terms of terrestrial days.
+    * We only support Julian scheme.
     */
   sealed abstract class Scheme(
-    val prefix:       Char,
-    val anchor:       TerrestrialInstant,
-    val anchorValue:  Double,
-    val daysInYear:   Double
+    val prefix:         Char,
+    val equinoxInstant: TerrestrialInstant,
+    val equinoxValue:   Double,
+    val daysInYear:     Double
   ) {
     def fromTerrestrialInstant(ttInstant: TerrestrialInstant): Option[Epoch] =
-      val yearsDelta: Double = (Duration.between(anchor.value, ttInstant.value).toSeconds / SecondsPerDay.toDouble) / daysInYear
-      val milliYears: Double = (anchorValue + yearsDelta) * 1000.0
+      val yearsDelta: Double = (Duration.between(equinoxInstant.value, ttInstant.value).toSeconds / SecondsPerDay.toDouble) / daysInYear
+      val milliYears: Double = (equinoxValue + yearsDelta) * 1000.0
       val milliYearsRounded: Int = math.round(milliYears).toInt
       val milliYearsRefined: Option[IntMilliYear] = refineV[Epoch.MilliYear](milliYearsRounded).toOption
       milliYearsRefined.map(mys => Epoch(this, mys))
@@ -149,14 +143,14 @@ object Epoch extends EpochOptics {
       fromEpochYears(epochYear).get
 
     def toTerrestrialInstant(milliYears: Epoch.IntMilliYear): TerrestrialInstant = 
-      val yearsSinceAnchor: Double = milliYears.value.toDouble / 1000.0 - anchorValue
+      val yearsSinceEquinoxInstant: Double = milliYears.value.toDouble / 1000.0 - equinoxValue
       TerrestrialInstant:
-        anchor.value.plusSeconds((yearsSinceAnchor * daysInYear * SecondsPerDay.toDouble).toLong)
+        equinoxInstant.value.plusSeconds((yearsSinceEquinoxInstant * daysInYear * SecondsPerDay.toDouble).toLong)
 
     /** Convert epoch year to Java `Instant`.
       *
-      * Converts the epoch year to a TerrestrialInstant using the scheme's anchor and year length,
-      * then to Java Instant.
+      * Converts the epoch year to a TerrestrialInstant using the scheme's equinox instant
+      * and year length, then to Java Instant.
       */
     def toInstant(milliYears: Epoch.IntMilliYear): Option[Instant] = 
       toTerrestrialInstant(milliYears).toInstant
@@ -167,33 +161,22 @@ object Epoch extends EpochOptics {
 
   object Scheme {
     given Order[Scheme] =
-      Order.by(s => (s.prefix, s.anchor, s.anchorValue, s.daysInYear))
+      Order.by(s => (s.prefix, s.equinoxInstant, s.equinoxValue, s.daysInYear))
 
     given Show[Scheme] =
       Show.fromToString
   }
 
   /**
-    * Module of constructors for Besselian epochs.
-    * @group Constructors
-    */
-  // January 0.9235, 1950 TT (yes, January 0 is December 31 of the previous year)
-  lazy val BesselianAnchor: TerrestrialInstant =
-    TerrestrialInstant.unsafeFromInstant:
-      Instant.from(ZonedDateTime.of(LocalDateTime.of(1949, 12, 31, 22, 9, 46, 861000000), ZoneOffset.UTC))
-
-  case object Besselian extends Scheme('B', BesselianAnchor, 1950.0, 365.242198781)
-
-  /**
     * Module of constructors for Julian epochs.
     * @group Constructors
     */
   // January 1.5, 2000 TT (2000-Jan-01 11:58:55.816 UTC)
-  lazy val JulianAnchor: TerrestrialInstant =
+  lazy val JulianEquinoxInstant: TerrestrialInstant =
     TerrestrialInstant.unsafeFromInstant:
       Instant.from(ZonedDateTime.of(LocalDateTime.of(2000, 1, 1, 11, 58, 55, 816000000), ZoneOffset.UTC))
 
-  case object Julian extends Scheme('J', JulianAnchor, 2000.0, 365.25)
+  case object Julian extends Scheme('J', JulianEquinoxInstant, 2000.0, 365.25)
 
   given Order[Epoch] =
     Order.by(e => (e.scheme, e.toMilliyears.value))

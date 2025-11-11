@@ -10,6 +10,8 @@ import org.typelevel.cats.time.given
 
 import java.time.Duration
 import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 
 /**
   * Representation of an instant in International Atomic Time.
@@ -17,11 +19,18 @@ import java.time.Instant
   * 
   * See https://en.wikipedia.org/wiki/International_Atomic_Time
   * 
+  * NOTE: The current implementation only addresses dates after 1/1/1972.
+  * Before that date, TAI-UTC was not an integer number of seconds.
+  * See https://hpiers.obspm.fr/eop-pc/earthor/utc/TAI-UTC_tab.html for details.
+  * 
   * Wraps a java Instant adjusted for leap seconds.
   */
 object TaiInstant extends NewType[Instant]:
+  lazy val Min: Instant = LocalDateTime.of(1972, 1, 1, 0, 0).toInstant(ZoneOffset.UTC)
+
   def fromInstant(instant: Instant): Option[TaiInstant] = 
-    if Duration.between(instant, Instant.MAX).toSeconds < LeapSeconds.Max then none
+    if instant.isBefore(Instant.EPOCH) then none
+    else if Duration.between(instant, Instant.MAX).toSeconds < LeapSeconds.Max then none
     else
       TaiInstant(instant.plusSeconds(LeapSeconds.before(instant))).some
 

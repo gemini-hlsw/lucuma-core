@@ -18,6 +18,7 @@ import org.scalacheck.Prop.*
 
 import java.time.Instant
 import java.time.LocalDateTime
+
 final class EpochSuite extends munit.DisciplineSuite {
   import ArbEpoch.given
   import ArbTime.given
@@ -123,26 +124,12 @@ final class EpochSuite extends munit.DisciplineSuite {
     // J2000 converts to January 1, 2000 at 12:00 TT (2000-Jan-01 11:58:55.816 UTC)
     assertEquals(instant, Instant.parse("2000-01-01T11:58:55.816Z"))
 
-  test("B1950 epoch convert to Instant"):
-    val b1950 = Epoch.B1950
-    val instant = b1950.unsafeToInstant
-
-    // B1950 conversion matches astropy
-    assertEquals(instant, Instant.parse("1949-12-31T22:09:46.861Z"))
-
   test("Custom Julian epoch"):
     val epoch = Epoch.Julian.unsafeFromIntYears(2020.refined[Epoch.Year])
     val instant = epoch.unsafeToInstant
 
     val expected = Instant.parse("2020-01-01T11:58:50.816Z")
     assertEquals(instant, expected)
-
-  test("Besselian epoch should match"):
-    val epoch = Epoch.Besselian.unsafeFromIntYears(1950.refined[Epoch.Year])
-    val instant = epoch.unsafeToInstant
-
-    val b1950 = Epoch.B1950.unsafeToInstant
-    assertEquals(instant, b1950)
 
   test("Fractional epoch year"):
     val epoch = Epoch.Julian.unsafeFromEpochYears(2020.5)
