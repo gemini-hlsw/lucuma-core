@@ -10,6 +10,7 @@ import lucuma.core.enums.Site
 import lucuma.core.model.EphemerisKey
 import lucuma.core.model.Semester
 import lucuma.core.model.Semester.YearInt
+
 import java.time.Instant
 
 class HorizonsClientEphemerisSuite extends HorizonsClientSuite:
