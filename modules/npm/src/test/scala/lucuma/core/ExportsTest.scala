@@ -12,6 +12,8 @@ class ExportsTest extends munit.FunSuite {
     // Test rounding
     assertNoDiff(deg2hms(359.999999), "00:00:00.000")
     assertNoDiff(deg2hms(0.000001), "00:00:00.000")
+    // Large values
+    assertNoDiff(deg2hms(972000000000d), "09:52:03.652")
   }
 
   test("deg2dms") {
@@ -20,8 +22,10 @@ class ExportsTest extends munit.FunSuite {
     assertNoDiff(deg2dms(-15.0), "-15:00:00.00")
     assertNoDiff(deg2dms(23.4375), "+23:26:15.00")
     // Test rounding
-    assertNoDiff(deg2dms(-0.00001), "+00:00:00.00")
-    assertNoDiff(deg2dms(0.00001), "+00:00:00.00")
+    assertNoDiff(deg2dms(-0.000001), "+00:00:00.00")
+    assertNoDiff(deg2dms(0.000001), "+00:00:00.00")
+    // Large values
+    assertNoDiff(deg2dms(972000000000d), "+31:59:05.22")
   }
 
   test("hms2deg") {
