@@ -23,7 +23,7 @@ final class MathValidatorsSuite extends DisciplineSuite {
   val genMaybeNumericString = Gen.frequency(5 -> genNumericString, 1 -> arbitrary[String])
 
   checkAll("epoch", ValidSplitEpiTests(MathValidators.epoch).validSplitEpiLaws)
-  checkAll("epochNoScheme", ValidWedgeTests(MathValidators.epochNoScheme).validWedgeWith(ArbEpoch.stringsNoScheme))
+  checkAll("epochNoScheme", ValidWedgeTests(MathValidators.epochNoScheme).validWedgeLawsWith(ArbEpoch.stringsNoScheme))
   checkAll("angleArcSec", ValidSplitEpiTests(MathValidators.angleArcSec).validSplitEpiLaws)
 
   checkAll(

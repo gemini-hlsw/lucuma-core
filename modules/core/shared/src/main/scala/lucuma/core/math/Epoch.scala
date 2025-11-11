@@ -78,8 +78,8 @@ final class Epoch private (val scheme: Epoch.Scheme, val toMilliyears: Epoch.Int
 }
 
 object Epoch extends EpochOptics {
-  type Year         = RefinedInterval.Closed[1900, 3000]
-  type MilliYear    = RefinedInterval.Closed[1900000, 3000999]
+  type Year         = RefinedInterval.Closed[1972, 3000]
+  type MilliYear    = RefinedInterval.Closed[1972000, 3000999]
   type IntYear      = Int Refined Year
   type IntMilliYear = Int Refined MilliYear
 
