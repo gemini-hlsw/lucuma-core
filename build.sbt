@@ -204,15 +204,10 @@ lazy val horizonsTests = crossProject(JVMPlatform, JSPlatform)
     )
   )
   .jsSettings(
-    scalaJSUseMainModuleInitializer := true,
     scalacOptions ~= (_.filterNot(Set("-Wdead-code"))),
     libraryDependencies ++= Seq(
       "org.http4s" %%% "http4s-dom" % http4sDomVersion % Test,
     ),
-    jsEnv                           := {
-      import org.scalajs.jsenv.nodejs.NodeJSEnv
-      new NodeJSEnv(NodeJSEnv.Config().withArgs(List("--experimental-fetch")))
-    }
   )
   .jsConfigure(_.enablePlugins(BundleMonPlugin))
 
@@ -262,15 +257,10 @@ lazy val catalogTests = crossProject(JVMPlatform, JSPlatform)
     )
   )
   .jsSettings(
-    scalaJSUseMainModuleInitializer := true,
     scalacOptions ~= (_.filterNot(Set("-Wdead-code"))),
     libraryDependencies ++= Seq(
       "org.http4s" %%% "http4s-dom" % http4sDomVersion
     ),
-    jsEnv                           := {
-      import org.scalajs.jsenv.nodejs.NodeJSEnv
-      new NodeJSEnv(NodeJSEnv.Config().withArgs(List("--experimental-fetch")))
-    }
   )
   .jvmSettings(
     libraryDependencies ++= Seq(
