@@ -10,19 +10,28 @@ import lucuma.core.model.*
 import lucuma.core.model.LocalObservingNight
 import lucuma.core.model.sequence.Dataset
 import lucuma.core.util.WithGid
+import spire.math.Rational
 
 import java.time.LocalDateTime
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters.*
 import scala.scalajs.js.annotation.JSExportTopLevel
 
+private def roundedAngle(deg: Double, factor: Int): HourAngle =
+  val microseconds =
+    Rational(HourAngle.fromDoubleDegrees(deg).toMicroseconds, factor).round.toLong * factor
+  HourAngle.fromMicroseconds(microseconds)
+
 @JSExportTopLevel("deg2hms")
 def deg2hms(deg: Double): String =
-  HourAngle.fromStringHMS.reverseGet(HourAngle.fromDoubleDegrees(deg))
+  HourAngle.fromStringHMS.reverseGet(roundedAngle(deg, 1000)).dropRight(3)
 
 @JSExportTopLevel("deg2dms")
 def deg2dms(deg: Double): String =
-  Angle.fromStringSignedDMS.reverseGet(HourAngle.fromDoubleDegrees(deg))
+  Angle.fromStringSignedDMS
+    .reverseGet(roundedAngle(deg, 10000))
+    .dropRight(4)
+    .replace("-00:00:00.00", "+00:00:00.00")
 
 @JSExportTopLevel("hms2deg")
 def hms2deg(hms: String): Double =
@@ -55,7 +64,7 @@ def dateToLocalObservingNight(date: js.Date): String =
   )
   LocalObservingNight.fromLocalDateTime(localDate).toLocalDate.toString()
 
-def tryParseId(maybeId: String, withGid: WithGid): js.UndefOr[String] =
+private def tryParseId(maybeId: String, withGid: WithGid): js.UndefOr[String] =
   withGid.Id.parse(maybeId).orUndefined.map(_.toString)
 
 @JSExportTopLevel("parseAttachmentId")
