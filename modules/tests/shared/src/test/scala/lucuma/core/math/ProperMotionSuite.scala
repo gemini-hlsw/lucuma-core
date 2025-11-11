@@ -9,7 +9,7 @@ import lucuma.core.model.SiderealTracking
 import lucuma.core.optics.laws.discipline.SplitMonoTests
 import munit.DisciplineSuite
 
-import java.time.Instant
+import java.time.LocalDateTime
 
 final class ProperMotionSuite extends DisciplineSuite {
 
@@ -33,7 +33,7 @@ final class ProperMotionSuite extends DisciplineSuite {
       )
 
     // July 4th 2022, around mid day
-    val instant = Instant.ofEpochMilli(1656966489)
-    assertEquals(tracking.at(instant), Some(Coordinates.fromHmsDms.getOption("11:59:57.096352 -00:00:58.072942").get))
+    val instant = LocalDateTime.of(2022, 7, 4, 12, 0).toInstant(java.time.ZoneOffset.UTC)
+    assertEquals(tracking.at(instant), Some(Coordinates.fromHmsDms.getOption("23:59:58.636727 +00:00:27.265454").get))
   }
 }
