@@ -318,7 +318,10 @@ lazy val npm        = project
       val outDir = npmPackage.value
       Process(List("npm", "publish"), outDir).!!
       streams.value.log.info(s"Published NPM package from ${outDir}")
-    }
+    },
+    libraryDependencies ++= Seq(
+      "org.scalameta" %%% "munit" % munitVersion % Test
+    )
   )
 
 ThisBuild / githubWorkflowPublishPreamble +=
