@@ -4,34 +4,30 @@
 package lucuma.core
 
 import lucuma.core.math.Angle
+import lucuma.core.math.Declination
 import lucuma.core.math.HourAngle
+import lucuma.core.math.RightAscension
 import lucuma.core.math.parser.AngleParsers
+import lucuma.core.math.validation.MathValidators
 import lucuma.core.model.*
 import lucuma.core.model.LocalObservingNight
 import lucuma.core.model.sequence.Dataset
 import lucuma.core.util.WithGid
-import spire.math.Rational
 
 import java.time.LocalDateTime
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters.*
 import scala.scalajs.js.annotation.JSExportTopLevel
 
-private def roundedAngle(deg: Double, factor: Int): HourAngle =
-  val microseconds =
-    Rational(HourAngle.fromDoubleDegrees(deg).toMicroseconds, factor).round.toLong * factor
-  HourAngle.fromMicroseconds(microseconds)
-
 @JSExportTopLevel("deg2hms")
 def deg2hms(deg: Double): String =
-  HourAngle.fromStringHMS.reverseGet(roundedAngle(deg, 1000)).dropRight(3)
+  val ra = RightAscension.fromDoubleDegrees(deg)
+  MathValidators.truncatedRA.reverseGet(ra)
 
 @JSExportTopLevel("deg2dms")
 def deg2dms(deg: Double): String =
-  Angle.fromStringSignedDMS
-    .reverseGet(roundedAngle(deg, 10000))
-    .dropRight(4)
-    .replace("-00:00:00.00", "+00:00:00.00")
+  val dec = Declination.fromAngleWithCarry(HourAngle.fromDoubleDegrees(deg))._1
+  MathValidators.truncatedDec.reverseGet(dec)
 
 @JSExportTopLevel("hms2deg")
 def hms2deg(hms: String): Double =
