@@ -3,9 +3,6 @@
 
 package lucuma.core.enums
 
-/**
- * Telluric calibration order: before or after the observation
- */
 enum TelluricCalibrationOrder(val tag: String):
   case Before extends TelluricCalibrationOrder("before")
   case After  extends TelluricCalibrationOrder("after")

@@ -65,7 +65,7 @@ object TelluricClient:
                                       )
                                   }
                               } yield result
-                            case (None, None)         =>
+                            case _                    =>
                               error"No data and no errors in GraphQL response" *>
                                 ApplicativeThrow[F].raiseError[List[TelluricStar]](
                                   new RuntimeException("No data and no errors in GraphQL response")
