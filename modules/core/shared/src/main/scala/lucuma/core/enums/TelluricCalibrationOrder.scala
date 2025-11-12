@@ -3,9 +3,6 @@
 
 package lucuma.core.enums
 
-import io.circe.Decoder
-import io.circe.Encoder
-
 /**
  * Telluric calibration order: before or after the observation
  */
@@ -19,11 +16,3 @@ object TelluricCalibrationOrder:
       case "before" => Some(Before)
       case "after"  => Some(After)
       case _        => None
-
-  given Decoder[TelluricCalibrationOrder] =
-    Decoder[String].emap(s =>
-      fromString(s).toRight(s"Invalid telluric calibration order: $s")
-    )
-
-  given Encoder[TelluricCalibrationOrder] =
-    Encoder[String].contramap(_.tag)

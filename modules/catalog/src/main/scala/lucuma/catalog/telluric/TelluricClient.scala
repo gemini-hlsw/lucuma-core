@@ -3,6 +3,7 @@
 
 package lucuma.catalog.telluric
 
+import cats.Applicative
 import cats.ApplicativeThrow
 import cats.effect.Concurrent
 import cats.syntax.all.*
@@ -70,3 +71,7 @@ object TelluricClient:
                                   new RuntimeException("No data and no errors in GraphQL response")
                                 )
             } yield result
+
+  def noop[F[_]: Applicative]: TelluricClient[F] = new TelluricClient[F]:
+    def search(input: TelluricSearchInput): F[List[TelluricStar]] =
+      List.empty.pure[F]
