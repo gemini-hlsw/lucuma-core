@@ -18,20 +18,20 @@ import org.typelevel.log4cats.syntax.*
 /**
  * Client for the telluric targets service
  */
-trait TelluricClient[F[_]]:
+trait TelluricTargetsClient[F[_]]:
   def search(input: TelluricSearchInput): F[List[TelluricStar]]
 
-object TelluricClient:
-  def create[F[_]: Concurrent: Logger](
+object TelluricTargetsClient:
+  def build[F[_]: Concurrent: Logger](
     uri:    Uri,
     client: Client[F]
-  ): F[TelluricClient[F]] =
+  ): F[TelluricTargetsClient[F]] =
     given Http4sHttpBackend[F] = Http4sHttpBackend[F](client)
 
     Http4sHttpClient
       .of[F, Unit](uri)
       .map: http =>
-        new TelluricClient[F]:
+        new TelluricTargetsClient[F]:
           override def search(input: TelluricSearchInput): F[List[TelluricStar]] =
             val encodedVars = TelluricSearchQuery.varEncoder(input).asJson
 
@@ -72,6 +72,6 @@ object TelluricClient:
                                 )
             } yield result
 
-  def noop[F[_]: Applicative]: TelluricClient[F] = new TelluricClient[F]:
+  def noop[F[_]: Applicative]: TelluricTargetsClient[F] = new TelluricTargetsClient[F]:
     def search(input: TelluricSearchInput): F[List[TelluricStar]] =
       List.empty.pure[F]

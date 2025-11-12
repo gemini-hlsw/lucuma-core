@@ -5,8 +5,8 @@ package lucuma.catalog
 
 import cats.effect.IO
 import cats.effect.IOApp
-import lucuma.catalog.telluric.TelluricClient
 import lucuma.catalog.telluric.TelluricSearchInput
+import lucuma.catalog.telluric.TelluricTargetsClient
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Declination
 import lucuma.core.math.RightAscension
@@ -18,7 +18,7 @@ import org.http4s.syntax.literals.*
 import org.typelevel.log4cats.Logger
 import org.typelevel.log4cats.slf4j.Slf4jLogger
 
-object TelluricQueryApp extends IOApp.Simple:
+object TelluricTargetsQueryApp extends IOApp.Simple:
 
   val telluricUri = uri"https://telluric-targets.gpp.gemini.edu/"
 
@@ -44,7 +44,7 @@ object TelluricQueryApp extends IOApp.Simple:
       .simple[IO]
       .use: client =>
         for
-          telluricClient <- TelluricClient.create(telluricUri, client)
+          telluricClient <- TelluricTargetsClient.build(telluricUri, client)
           results        <- telluricClient.search(searchInput)
           _              <- IO.println(pprint.apply(results))
         yield ()
