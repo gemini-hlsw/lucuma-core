@@ -8,6 +8,7 @@ import io.circe.DecodingFailure
 import io.circe.Encoder
 import io.circe.Json
 import io.circe.syntax.*
+import lucuma.catalog.telluric.TelluricCodecs.given
 import lucuma.core.enums.TelluricCalibrationOrder
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Declination
@@ -50,7 +51,7 @@ object TelluricStar:
   given Encoder[TelluricStar] = star =>
     Json.obj(
       "hip"      -> Json.fromInt(star.hip),
-      "spType"   -> Json.fromString(star.spType),
+      "spType"   -> star.spType.asJson,
       "ra"       -> Json.fromDoubleOrNull(star.coordinates.ra.toAngle.toDoubleDegrees),
       "dec"      -> Json.fromDoubleOrNull(star.coordinates.dec.toAngle.toSignedDoubleDegrees),
       "distance" -> Json.fromDoubleOrNull(star.distance),

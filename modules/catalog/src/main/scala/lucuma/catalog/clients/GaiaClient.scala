@@ -3,9 +3,12 @@
 
 package lucuma.catalog.clients
 
+import cats.Applicative
 import cats.data.EitherNec
 import cats.data.NonEmptyChain
 import cats.effect.Concurrent
+import cats.syntax.applicative.*
+import cats.syntax.either.*
 import lucuma.catalog.CatalogTargetResult
 import lucuma.catalog.votable.*
 import lucuma.core.model.Target
@@ -43,6 +46,23 @@ object GaiaClient:
     modUri:     Uri => Uri = identity, // Override this if you need to add a CORS proxy
     adapters:   NonEmptyChain[CatalogAdapter.Gaia] = DefaultAdapters
   ) = GaiaClientImpl[F](httpClient, modUri, adapters)
+
+  def noop[F[_]: Applicative]: GaiaClient[F] = new GaiaClient[F]:
+    def query(adqlQuery: ADQLQuery)(using
+      ADQLInterpreter
+    ): F[List[EitherNec[CatalogProblem, CatalogTargetResult]]] =
+      List.empty.pure[F]
+
+    def queryById(sourceId: Long): F[EitherNec[CatalogProblem, CatalogTargetResult]] =
+      CatalogProblem.SourceIdNotFound(sourceId).leftNec.pure[F]
+
+    def queryGuideStars(adqlQuery: ADQLQuery)(using
+      ADQLInterpreter
+    ): F[List[EitherNec[CatalogProblem, Target.Sidereal]]] =
+      List.empty.pure[F]
+
+    def queryByIdGuideStar(sourceId: Long): F[EitherNec[CatalogProblem, Target.Sidereal]] =
+      CatalogProblem.SourceIdNotFound(sourceId).leftNec.pure[F]
 
   val DefaultAdapters: NonEmptyChain[CatalogAdapter.Gaia] =
     NonEmptyChain.of(
