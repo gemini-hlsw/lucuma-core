@@ -8,6 +8,7 @@ import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.JsonObject
+import lucuma.catalog.telluric.TelluricSearchInput.*
 
 /**
  * GraphQL query for searching telluric standard star candidates
@@ -33,15 +34,14 @@ object TelluricSearchQuery extends GraphQLOperation[Unit]:
     """
 
   override val varEncoder: Encoder.AsObject[Variables] =
-    Encoder.AsObject.instance[TelluricSearchInput] { input =>
+    Encoder.AsObject.instance[TelluricSearchInput]: input =>
       JsonObject(
-        "ra_deg" -> Encoder[Double].apply(input.coordinates.ra.toAngle.toDoubleDegrees),
-        "dec_deg" -> Encoder[Double].apply(input.coordinates.dec.toAngle.toSignedDoubleDegrees),
+        "ra_deg"       -> Encoder[Double].apply(input.coordinates.ra.toAngle.toDoubleDegrees),
+        "dec_deg"      -> Encoder[Double].apply(input.coordinates.dec.toAngle.toSignedDoubleDegrees),
         "duration_hrs" -> Encoder[Double].apply(input.duration.toHours.toDouble),
-        "brightest" -> Encoder[BigDecimal].apply(input.brightest),
-        "sp_type" -> Encoder[String].apply(input.spType)
+        "brightest"    -> Encoder[BigDecimal].apply(input.brightest),
+        "sp_type"      -> Encoder[String].apply(input.spType.toInput)
       )
-    }
 
   override val dataDecoder: Decoder[List[TelluricStar]] =
     (c: HCursor) => c.downField("search").as[List[TelluricStar]]

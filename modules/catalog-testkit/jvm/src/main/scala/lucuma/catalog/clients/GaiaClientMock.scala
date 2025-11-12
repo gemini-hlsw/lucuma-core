@@ -92,7 +92,7 @@ object GaiaClientMock:
     mockGaiaClient(Stream.emit(Utility.trim(xml).toString), adapters)
 
   /**
-   * Create a mock GaiaClient that reads a Strina String.
+   * Create a mock GaiaClient that reads a String.
    */
   def fromString[F[_]: Async](
     content:  String,

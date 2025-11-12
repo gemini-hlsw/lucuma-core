@@ -10,6 +10,7 @@ import lucuma.catalog.telluric.TelluricSearchInput
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Declination
 import lucuma.core.math.RightAscension
+import lucuma.core.model.TelluricType
 import lucuma.core.util.TimeSpan
 import org.http4s.Uri
 import org.http4s.jdkhttpclient.JdkHttpClient
@@ -23,7 +24,8 @@ object TelluricQueryApp extends IOApp.Simple {
   def run =
     given Logger[IO] = Slf4jLogger.getLogger[IO]
 
-    val coordinates = Declination.fromDoubleDegrees(10.0)
+    val coordinates = Declination
+      .fromDoubleDegrees(10.0)
       .map(dec => Coordinates(RightAscension.fromDoubleDegrees(150.0), dec))
       .getOrElse(Coordinates.Zero)
 
@@ -33,7 +35,7 @@ object TelluricQueryApp extends IOApp.Simple {
       coordinates = coordinates,
       duration = duration,
       brightest = BigDecimal(3.5),
-      spType = "hot"
+      spType = TelluricType.Hot
     )
 
     JdkHttpClient
