@@ -36,7 +36,7 @@ object TelluricClientMock:
 
     val mockHttpClient = Client.fromHttpApp[F](HttpApp[F]: _ =>
       Response[F](Status.Ok)
-        .withEntity(responseJson)(jsonEncoder)
+        .withEntity(responseJson)(using jsonEncoder)
         .pure[F])
 
     TelluricClient.create[F](uri"http://mock-telluric-service", mockHttpClient)
