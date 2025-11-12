@@ -6,13 +6,9 @@ package lucuma.catalog.telluric
 import clue.GraphQLOperation
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
 import io.circe.JsonObject
 import lucuma.catalog.telluric.TelluricSearchInput.*
 
-/**
- * GraphQL query for searching telluric standard star candidates
- */
 object TelluricSearchQuery extends GraphQLOperation[Unit]:
   type Data      = List[TelluricStar]
   type Variables = TelluricSearchInput
@@ -44,4 +40,4 @@ object TelluricSearchQuery extends GraphQLOperation[Unit]:
       )
 
   override val dataDecoder: Decoder[List[TelluricStar]] =
-    (c: HCursor) => c.downField("search").as[List[TelluricStar]]
+    _.downField("search").as[List[TelluricStar]]

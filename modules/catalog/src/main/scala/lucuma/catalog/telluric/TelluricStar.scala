@@ -15,9 +15,6 @@ import lucuma.core.math.Declination
 import lucuma.core.math.RightAscension
 import lucuma.core.model.TelluricType
 
-/**
- * A telluric standard star candidate from the telluric targets service
- */
 case class TelluricStar(
   hip:         Int,
   spType:      TelluricType,
@@ -30,7 +27,7 @@ case class TelluricStar(
 
 object TelluricStar:
   given Decoder[TelluricStar] = c =>
-    for
+    for {
       hip      <- c.downField("HIP").as[Int]
       spType   <- c.downField("spType").as[TelluricType]
       raDeg    <- c.downField("RA").as[Double]
@@ -46,7 +43,7 @@ object TelluricStar:
                     )
       ra        = RightAscension.fromDoubleDegrees(raDeg)
       coords    = Coordinates(ra, dec)
-    yield TelluricStar(hip, spType, coords, distance, hmag, score, order)
+    } yield TelluricStar(hip, spType, coords, distance, hmag, score, order)
 
   given Encoder[TelluricStar] = star =>
     Json.obj(

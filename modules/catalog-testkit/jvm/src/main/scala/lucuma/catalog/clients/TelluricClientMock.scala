@@ -25,7 +25,7 @@ object TelluricClientMock:
   /**
    * Create a mock TelluricClient that returns predefined telluric star responses.
    */
-  def mockTelluricClient[F[_]: Async: Logger](
+  def mockTelluricClient[F[_]: Concurrent: Logger](
     stars: List[TelluricStar]
   ): F[TelluricClient[F]] = {
     val responseJson = Json.obj(
@@ -34,10 +34,10 @@ object TelluricClientMock:
       )
     )
 
-    val mockHttpClient = Client.fromHttpApp[F](HttpApp[F]: _ =>
-      Response[F](Status.Ok)
-        .withEntity(responseJson)(using jsonEncoder)
-        .pure[F])
+    val mockHttpClient = Client[F]: _ =>
+      Resource.pure:
+        Response(Status.Ok)
+          .withEntity(responseJson)(using jsonEncoder)
 
     TelluricClient.create[F](uri"http://mock-telluric-service", mockHttpClient)
   }
@@ -45,11 +45,11 @@ object TelluricClientMock:
   /**
    * Create a mock TelluricClient from a JSON string.
    */
-  def fromJsonString[F[_]: Async: Logger](jsonString: String): F[TelluricClient[F]] = {
-    val mockHttpClient = Client.fromHttpApp[F](HttpApp[F]: _ =>
-      Response[F](Status.Ok)
-        .withEntity(jsonString)
-        .pure[F])
+  def fromJson[F[_]: Concurrent: Logger](json: Json): F[TelluricClient[F]] = {
+    val mockHttpClient = Client[F]: _ =>
+      Resource.pure:
+        Response(Status.Ok)
+          .withEntity(json)
 
     TelluricClient.create[F](uri"http://mock-telluric-service", mockHttpClient)
   }
@@ -60,11 +60,12 @@ object TelluricClientMock:
   def fromResource[F[_]: Async: Logger](resource: String): F[TelluricClient[F]] = {
     val jsonStream = readClassLoaderResource[F](resource, 8192).through(text.utf8.decode)
 
-    val mockHttpClient = Client.fromHttpApp[F](HttpApp[F]: _ =>
-      jsonStream.compile.string.flatMap: content =>
-        Response[F](Status.Ok)
-          .withEntity(content)
-          .pure[F])
+    val mockHttpClient = Client[F]: _ =>
+      Resource.eval:
+        jsonStream.compile.string.flatMap: content =>
+          Response[F](Status.Ok)
+            .withEntity(content)
+            .pure[F]
 
     TelluricClient.create[F](uri"http://mock-telluric-service", mockHttpClient)
   }
@@ -72,11 +73,11 @@ object TelluricClientMock:
   /**
    * Create a mock TelluricClient that returns an empty list (no telluric stars found).
    */
-  def empty[F[_]: Async: Logger]: F[TelluricClient[F]] =
+  def empty[F[_]: Concurrent: Logger]: F[TelluricClient[F]] =
     mockTelluricClient(List.empty)
 
   /**
    * Create a mock TelluricClient with a single test star.
    */
-  def withSingleStar[F[_]: Async: Logger](star: TelluricStar): F[TelluricClient[F]] =
+  def withSingleStar[F[_]: Concurrent: Logger](star: TelluricStar): F[TelluricClient[F]] =
     mockTelluricClient(List(star))

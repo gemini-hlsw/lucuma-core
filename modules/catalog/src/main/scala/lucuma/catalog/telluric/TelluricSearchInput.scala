@@ -10,18 +10,6 @@ import lucuma.core.math.Coordinates
 import lucuma.core.model.TelluricType
 import lucuma.core.util.TimeSpan
 
-/**
- * Input parameters for searching telluric standard star candidates
- *
- * @param coordinates
- *   target coordinates
- * @param duration
- *   duration of observation
- * @param brightest
- *   brightest magnitude limit
- * @param spType
- *   spectral type (e.g., "A0V", "hot")
- */
 case class TelluricSearchInput(
   coordinates: Coordinates,
   duration:    TimeSpan,

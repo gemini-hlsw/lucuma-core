@@ -9,36 +9,29 @@ import io.circe.Encoder
 import lucuma.core.enums.TelluricCalibrationOrder
 import lucuma.core.model.TelluricType
 
-/**
- * Circe encoder and decoder instances for telluric-related types
- */
 object TelluricCodecs:
 
   given Decoder[TelluricType] =
-    Decoder[String].emap { s =>
+    Decoder[String].emap: s =>
       s.toLowerCase match
         case "hot"   => Right(TelluricType.Hot)
         case "a0v"   => Right(TelluricType.A0V)
         case "solar" => Right(TelluricType.Solar)
         case other   =>
-          // Try to parse as comma-separated list for Manual case
           NonEmptyList.fromList(other.split(",").map(_.trim).filter(_.nonEmpty).toList) match
             case Some(types) => Right(TelluricType.Manual(types))
             case None        => Left(s"Invalid telluric type: $s")
-    }
 
   given Encoder[TelluricType] =
-    Encoder[String].contramap {
+    Encoder[String].contramap:
       case TelluricType.Hot               => "hot"
       case TelluricType.A0V               => "A0V"
       case TelluricType.Solar             => "Solar"
       case TelluricType.Manual(starTypes) => starTypes.toList.mkString(",")
-    }
 
   given Decoder[TelluricCalibrationOrder] =
-    Decoder[String].emap { s =>
+    Decoder[String].emap: s =>
       TelluricCalibrationOrder.fromString(s).toRight(s"Invalid telluric calibration order: $s")
-    }
 
   given Encoder[TelluricCalibrationOrder] =
     Encoder[String].contramap(_.tag)
