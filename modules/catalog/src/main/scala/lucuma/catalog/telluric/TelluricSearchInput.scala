@@ -6,6 +6,7 @@ package lucuma.catalog.telluric
 import io.circe.Encoder
 import io.circe.Json
 import io.circe.syntax.*
+import lucuma.catalog.telluric.codecs.given
 import lucuma.core.math.Coordinates
 import lucuma.core.model.TelluricType
 import lucuma.core.util.TimeSpan
@@ -19,19 +20,11 @@ case class TelluricSearchInput(
 
 object TelluricSearchInput:
 
-  extension (tt: TelluricType)
-    def toInput: String =
-      tt match
-        case TelluricType.Hot               => "hot"
-        case TelluricType.A0V               => "A0V"
-        case TelluricType.Solar             => "Solar"
-        case TelluricType.Manual(starTypes) => starTypes.toList.mkString(",")
-
   given Encoder[TelluricSearchInput] = input =>
     Json.obj(
       "ra_deg"       -> Json.fromDoubleOrNull(input.coordinates.ra.toAngle.toDoubleDegrees),
       "dec_deg"      -> Json.fromDoubleOrNull(input.coordinates.dec.toAngle.toSignedDoubleDegrees),
       "duration_hrs" -> Json.fromDoubleOrNull(input.duration.toHours.toDouble),
       "brightest"    -> Json.fromBigDecimal(input.brightest),
-      "sp_type"      -> input.spType.toInput.asJson
+      "sp_type"      -> input.spType.asJson
     )

@@ -9,8 +9,8 @@ import fs2.io.readClassLoaderResource
 import fs2.text
 import io.circe.Json
 import io.circe.syntax.*
-import lucuma.catalog.telluric.TelluricClient
 import lucuma.catalog.telluric.TelluricStar
+import lucuma.catalog.telluric.TelluricTargetsClient
 import org.http4s.*
 import org.http4s.circe.*
 import org.http4s.client.Client
@@ -20,14 +20,14 @@ import org.typelevel.log4cats.Logger
 /**
  * Mock TelluricClient for testing purposes.
  */
-object TelluricClientMock:
+object TelluricTargetsClientMock:
 
   /**
    * Create a mock TelluricClient that returns predefined telluric star responses.
    */
   def mockTelluricClient[F[_]: Concurrent: Logger](
     stars: List[TelluricStar]
-  ): F[TelluricClient[F]] = {
+  ): F[TelluricTargetsClient[F]] = {
     val responseJson = Json.obj(
       "data" -> Json.obj(
         "search" -> stars.asJson
@@ -39,25 +39,25 @@ object TelluricClientMock:
         Response(Status.Ok)
           .withEntity(responseJson)(using jsonEncoder)
 
-    TelluricClient.create[F](uri"http://mock-telluric-service", mockHttpClient)
+    TelluricTargetsClient.build[F](uri"https://telluric-targets.gpp.gemini.edu/", mockHttpClient)
   }
 
   /**
    * Create a mock TelluricClient from a JSON string.
    */
-  def fromJson[F[_]: Concurrent: Logger](json: Json): F[TelluricClient[F]] = {
+  def fromJson[F[_]: Concurrent: Logger](json: Json): F[TelluricTargetsClient[F]] = {
     val mockHttpClient = Client[F]: _ =>
       Resource.pure:
         Response(Status.Ok)
           .withEntity(json)
 
-    TelluricClient.create[F](uri"http://mock-telluric-service", mockHttpClient)
+    TelluricTargetsClient.build[F](uri"https://telluric-targets.gpp.gemini.edu/", mockHttpClient)
   }
 
   /**
    * Create a mock TelluricClient that reads JSON from a resource file.
    */
-  def fromResource[F[_]: Async: Logger](resource: String): F[TelluricClient[F]] = {
+  def fromResource[F[_]: Async: Logger](resource: String): F[TelluricTargetsClient[F]] = {
     val jsonStream = readClassLoaderResource[F](resource, 8192).through(text.utf8.decode)
 
     val mockHttpClient = Client[F]: _ =>
@@ -67,17 +67,17 @@ object TelluricClientMock:
             .withEntity(content)
             .pure[F]
 
-    TelluricClient.create[F](uri"http://mock-telluric-service", mockHttpClient)
+    TelluricTargetsClient.build[F](uri"https://telluric-targets.gpp.gemini.edu/", mockHttpClient)
   }
 
   /**
    * Create a mock TelluricClient that returns an empty list (no telluric stars found).
    */
-  def empty[F[_]: Concurrent: Logger]: F[TelluricClient[F]] =
+  def empty[F[_]: Concurrent: Logger]: F[TelluricTargetsClient[F]] =
     mockTelluricClient(List.empty)
 
   /**
    * Create a mock TelluricClient with a single test star.
    */
-  def withSingleStar[F[_]: Concurrent: Logger](star: TelluricStar): F[TelluricClient[F]] =
+  def withSingleStar[F[_]: Concurrent: Logger](star: TelluricStar): F[TelluricTargetsClient[F]] =
     mockTelluricClient(List(star))

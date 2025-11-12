@@ -8,7 +8,7 @@ import io.circe.DecodingFailure
 import io.circe.Encoder
 import io.circe.Json
 import io.circe.syntax.*
-import lucuma.catalog.telluric.TelluricCodecs.given
+import lucuma.catalog.telluric.codecs.given
 import lucuma.core.enums.TelluricCalibrationOrder
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Declination
