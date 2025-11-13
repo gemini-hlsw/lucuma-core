@@ -6,7 +6,6 @@ package lucuma.core.math.arb
 import eu.timepit.refined.scalacheck.numeric.*
 import lucuma.core.arb.*
 import lucuma.core.math.Epoch
-import lucuma.core.math.Epoch.Besselian
 import lucuma.core.math.Epoch.Julian
 import org.scalacheck.*
 import org.scalacheck.Arbitrary.arbitrary
@@ -14,7 +13,7 @@ import org.scalacheck.Gen.*
 
 trait ArbEpoch {
   given Arbitrary[Epoch.Scheme] =
-    Arbitrary(oneOf(Epoch.Julian, Epoch.Besselian))
+    Arbitrary(const(Epoch.Julian))
 
   given Arbitrary[Epoch] =
     Arbitrary {
@@ -37,8 +36,7 @@ trait ArbEpoch {
     List(
       _ => arbitrary[String],                // swap for a random string
       s => Gen.const(s"${s}0"),              // test normalization with trailing zeros
-      s => Gen.const(s"${Julian.prefix}$s"), // add the schemes, should not parse
-      s => Gen.const(s"${Besselian.prefix}$s")
+      s => Gen.const(s"${Julian.prefix}$s") // add the schemes, should not parse
     )
 
   // Strings that are often parsable as epoch

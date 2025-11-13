@@ -9,7 +9,7 @@ import lucuma.core.model.SiderealTracking
 import lucuma.core.optics.laws.discipline.SplitMonoTests
 import munit.DisciplineSuite
 
-import java.time.Instant
+import java.time.LocalDateTime
 
 final class ProperMotionSuite extends DisciplineSuite {
 
@@ -23,17 +23,17 @@ final class ProperMotionSuite extends DisciplineSuite {
 
   checkAll("milliarcsecondsPerYear", SplitMonoTests(ProperMotion.milliarcsecondsPerYear).splitMono)
 
-  test("Sanity checks") {
+  test("Sanity checks") { // checked with astropy
     val tracking = SiderealTracking(
-        Coordinates.Zero,
+        Coordinates(RightAscension.fromDoubleDegrees(0.0), Declination.fromDoubleDegrees(80.0).get),
         Epoch.J2000,
         Some(ProperMotion.milliarcsecondsPerYear.reverseGet((-3000, 4000))),
-        RadialVelocity.kilometerspersecond.getOption(10000),
+        RadialVelocity.kilometerspersecond.getOption(50),
         Some(Parallax.fromMicroarcseconds(10000000L))
       )
 
-    // July 4th 2022, around mid day
-    val instant = Instant.ofEpochMilli(1656966489)
-    assertEquals(tracking.at(instant), Some(Coordinates.fromHmsDms.getOption("11:59:57.096334 -00:00:58.073307").get))
+    // July 4th 2022, noon UTC
+    val instant = LocalDateTime.of(2022, 7, 4, 12, 0).toInstant(java.time.ZoneOffset.UTC)
+    assertEquals(tracking.at(instant), Some(Coordinates.fromHmsDms.getOption("23:59:34.311844 +80:01:28.934422").get))
   }
 }

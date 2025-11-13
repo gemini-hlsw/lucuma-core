@@ -46,22 +46,22 @@ final class SiderealTrackingSuite extends DisciplineSuite {
     }
   }
 
-  test("coordinatesOn corrected by cos(dec) case 1") {
+  test("coordinatesOn corrected by cos(dec) case 1") { // checked with astropy, accurate to within 1 mas
     val coord = Coordinates.fromHmsDms.getOption("11 05 28.577 +43 31 36.39").get
     val pmra = ProperMotion.RA.milliarcsecondsPerYear.reverseGet(BigDecimal(-4406.469))
     val pmdec = ProperMotion.Dec.milliarcsecondsPerYear.reverseGet(BigDecimal(938.527))
     val tracking = SiderealTracking(coord, Epoch.J2000, ProperMotion(pmra, pmdec).some, none, Parallax.fromMicroarcseconds(203887).some)
     val refEpoch = Instant.ofEpochSecond(4102444800L)
-    assertEquals(tracking.at(refEpoch), Coordinates.fromHmsDms.getOption("11 04 48.043284 +43 33 09.795210"))
+    assertEquals(tracking.at(refEpoch), Coordinates.fromHmsDms.getOption("11 04 48.043689 +43 33 09.794281"))
   }
 
-  test("coordinatesOn corrected by cos(dec) case 2") {
+  test("coordinatesOn corrected by cos(dec) case 2") { // checked with astropy, accurate to within 1 mas
     val coord = Coordinates.fromHmsDms.getOption("14 29 42.946 -62 40 46.16").get
     val pmra = ProperMotion.RA.milliarcsecondsPerYear.reverseGet(BigDecimal(-3781.741))
     val pmdec = ProperMotion.Dec.milliarcsecondsPerYear.reverseGet(BigDecimal(769.465))
     val tracking = SiderealTracking(coord, Epoch.J2000, ProperMotion(pmra, pmdec).some, none, Parallax.fromMicroarcseconds(768465).some)
     val refEpoch = Instant.ofEpochSecond(4102444800L)
-    assertEquals(tracking.at(refEpoch), Coordinates.fromHmsDms.getOption("14 28 48.054809 -62 39 28.543030"))
+    assertEquals(tracking.at(refEpoch), Coordinates.fromHmsDms.getOption("14 28 48.055358 -62 39 28.543813"))
   }
 
   test("SiderealTracking.constant") {

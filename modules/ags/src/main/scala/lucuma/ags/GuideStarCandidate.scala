@@ -48,8 +48,8 @@ case class GuideStarCandidate private (
   // This can be used to calculate and cache the location base on proper motion
   // The tracking variables are reset to match the epoch to the instant
   def at(i: Instant): GuideStarCandidate = {
-    val ldt   = LocalDateTime.ofInstant(i, GuideStarCandidate.UTC)
-    val epoch = Epoch.Julian.fromLocalDateTime(ldt).getOrElse(tracking.epoch)
+    val ldt: LocalDateTime = LocalDateTime.ofInstant(i, GuideStarCandidate.UTC)
+    val epoch: Epoch       = Epoch.Julian.fromUtcDateTime(ldt).getOrElse(tracking.epoch)
     copy(tracking = tracking.at(i).fold(tracking) { c =>
       val update =
         SiderealTracking.baseCoordinates.replace(c) >>>
