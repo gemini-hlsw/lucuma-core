@@ -46,7 +46,7 @@ final class SiderealTrackingSuite extends DisciplineSuite {
     }
   }
 
-  test("coordinatesOn corrected by cos(dec) case 1") {
+  test("coordinatesOn corrected by cos(dec) case 1") { // checked with astropy, accurate to within 1 mas
     val coord = Coordinates.fromHmsDms.getOption("11 05 28.577 +43 31 36.39").get
     val pmra = ProperMotion.RA.milliarcsecondsPerYear.reverseGet(BigDecimal(-4406.469))
     val pmdec = ProperMotion.Dec.milliarcsecondsPerYear.reverseGet(BigDecimal(938.527))
@@ -55,7 +55,7 @@ final class SiderealTrackingSuite extends DisciplineSuite {
     assertEquals(tracking.at(refEpoch), Coordinates.fromHmsDms.getOption("11 04 48.043689 +43 33 09.794281"))
   }
 
-  test("coordinatesOn corrected by cos(dec) case 2") {
+  test("coordinatesOn corrected by cos(dec) case 2") { // checked with astropy, accurate to within 1 mas
     val coord = Coordinates.fromHmsDms.getOption("14 29 42.946 -62 40 46.16").get
     val pmra = ProperMotion.RA.milliarcsecondsPerYear.reverseGet(BigDecimal(-3781.741))
     val pmdec = ProperMotion.Dec.milliarcsecondsPerYear.reverseGet(BigDecimal(769.465))
