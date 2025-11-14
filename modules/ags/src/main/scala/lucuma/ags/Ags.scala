@@ -159,7 +159,7 @@ object Ags {
         off <- offsets.distinct
       } yield AgsPosition(pa, off)
 
-  private def generatePositions(
+  def generatePositions(
     baseCoordinates: Coordinates,
     blindOffset:     Option[Coordinates],
     posAngles:       NonEmptyList[Angle],
