@@ -192,7 +192,7 @@ final case class SiderealTracking(
 ) extends Tracking derives Eq {
 
   val at: TrackingAt = i =>
-    plusYears(epoch.unsafeUntilInstant(i))
+    epoch.untilInstant(i).flatMap(plusYears(_))
 
   /** Coordinates `elapsedYears` fractional epoch-years after `epoch`. */
   def plusYears(elapsedYears: Double): Option[Coordinates] =
