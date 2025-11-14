@@ -21,9 +21,10 @@ def imagingBinning(
   srcProfile: SourceProfile,
   iq:         ImageQuality,
   pixelScale: Angle,
-  sampling:   PosDouble = binning.DefaultSampling
+  maxBinning: GmosYBinning = binning.DefaultMaxYBinning,
+  sampling:   PosDouble    = binning.DefaultSampling
 ): (GmosXBinning, GmosYBinning) = {
-  val yBin = binning.spatialBinning(srcProfile, iq, pixelScale, sampling)
+  val yBin = binning.spatialBinning(srcProfile, iq, pixelScale, maxBinning, sampling)
   (GmosXBinning(yBin.value), yBin)
 }
 
@@ -34,9 +35,10 @@ def northBinning(
   srcProfile: SourceProfile,
   iq:         ImageQuality,
   detector:   GmosNorthDetector = binning.DefaultGmosNorthDetector,
+  maxBinning: GmosYBinning      = binning.DefaultMaxYBinning,
   sampling:   PosDouble         = binning.DefaultSampling
 ): (GmosXBinning, GmosYBinning) =
-  imagingBinning(srcProfile, iq, detector.pixelSize, sampling)
+  imagingBinning(srcProfile, iq, detector.pixelSize, maxBinning, sampling)
 
 /**
  * Optimal GMOS binning calculation for imaging.
@@ -45,6 +47,7 @@ def southBinning(
   srcProfile: SourceProfile,
   iq:         ImageQuality,
   detector:   GmosSouthDetector = binning.DefaultGmosSouthDetector,
+  maxBinning: GmosYBinning      = binning.DefaultMaxYBinning,
   sampling:   PosDouble         = binning.DefaultSampling
 ): (GmosXBinning, GmosYBinning) =
-  imagingBinning(srcProfile, iq, detector.pixelSize, sampling)
+  imagingBinning(srcProfile, iq, detector.pixelSize, maxBinning,sampling)
