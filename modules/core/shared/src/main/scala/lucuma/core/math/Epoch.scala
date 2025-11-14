@@ -152,11 +152,9 @@ object Epoch extends EpochOptics {
       * Converts the epoch year to a TerrestrialInstant using the scheme's equinox instant
       * and year length, then to Java Instant.
       */
-    def toInstant(milliYears: Epoch.IntMilliYear): Option[Instant] = 
-      toTerrestrialInstant(milliYears).toInstant
+    def toInstant(milliYears: Epoch.IntMilliYear): Instant = 
+      toTerrestrialInstant(milliYears).toInstant.get // There's always an Instant between 1972 and 3000
 
-    def unsafeToInstant(milliYears: Epoch.IntMilliYear): Instant = 
-      toInstant(milliYears).get
   }
 
   object Scheme {
