@@ -119,21 +119,21 @@ final class EpochSuite extends munit.DisciplineSuite {
 
   test("J2000 epoch should convert to correct Instant"):
     val j2000 = Epoch.J2000
-    val instant = j2000.unsafeToInstant
+    val instant = j2000.toInstant
 
     // J2000 converts to January 1, 2000 at 12:00 TT (2000-Jan-01 11:58:55.816 UTC)
     assertEquals(instant, Instant.parse("2000-01-01T11:58:55.816Z"))
 
   test("Custom Julian epoch"):
     val epoch = Epoch.Julian.unsafeFromIntYears(2020.refined[Epoch.Year])
-    val instant = epoch.unsafeToInstant
+    val instant = epoch.toInstant
 
     val expected = Instant.parse("2020-01-01T11:58:50.816Z")
     assertEquals(instant, expected)
 
   test("Fractional epoch year"):
     val epoch = Epoch.Julian.unsafeFromEpochYears(2020.5)
-    val instant = epoch.unsafeToInstant
+    val instant = epoch.toInstant
 
     // 2020.5 Julian epoch converts to July 2nd assuming a year of 365.25 per definition
     val expected = Instant.parse("2020-07-02T02:58:50.816Z")

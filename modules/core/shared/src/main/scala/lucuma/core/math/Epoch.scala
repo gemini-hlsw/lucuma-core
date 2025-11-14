@@ -57,11 +57,8 @@ final class Epoch private (val scheme: Epoch.Scheme, val toMilliyears: Epoch.Int
     scheme.fromEpochYears(epochYear + y)
 
   /** Convert this `Epoch` to a Java `Instant`. */
-  def toInstant: Option[Instant] =
+  def toInstant: Instant =
     scheme.toInstant(toMilliyears)
-
-  def unsafeToInstant: Instant =
-    toInstant.get
 
   override def equals(a: Any): Boolean =
     a match {
