@@ -9,18 +9,43 @@ import fs2.io.readClassLoaderResource
 import fs2.text
 import io.circe.Json
 import io.circe.syntax.*
-import lucuma.catalog.telluric.TelluricStar
+import lucuma.catalog.telluric.TelluricSearchQuery.TelluricStar
 import lucuma.catalog.telluric.TelluricTargetsClient
 import org.http4s.*
 import org.http4s.circe.*
 import org.http4s.client.Client
 import org.http4s.syntax.literals.*
 import org.typelevel.log4cats.Logger
+import io.circe.Encoder
+import lucuma.core.model.TelluricType
+import lucuma.core.enums.TelluricCalibrationOrder
 
 /**
  * Mock TelluricClient for testing purposes.
  */
 object TelluricTargetsClientMock:
+
+  given Encoder[TelluricType] =
+    Encoder[String].contramap:
+      case TelluricType.Hot               => "hot"
+      case TelluricType.A0V               => "A0V"
+      case TelluricType.Solar             => "Solar"
+      case TelluricType.Manual(starTypes) => starTypes.toList.mkString(",")
+
+  given Encoder[TelluricCalibrationOrder] =
+    Encoder[String].contramap(_.tag)
+
+  given Encoder[TelluricStar] = star =>
+    Json.obj(
+      "hip"      -> Json.fromInt(star.hip),
+      "spType"   -> star.spType.asJson,
+      "ra"       -> Json.fromDoubleOrNull(star.coordinates.ra.toAngle.toDoubleDegrees),
+      "dec"      -> Json.fromDoubleOrNull(star.coordinates.dec.toAngle.toSignedDoubleDegrees),
+      "distance" -> Json.fromDoubleOrNull(star.distance),
+      "hmag"     -> Json.fromDoubleOrNull(star.hmag),
+      "score"    -> Json.fromDoubleOrNull(star.score),
+      "order"    -> star.order.asJson
+    )
 
   /**
    * Create a mock TelluricClient that returns predefined telluric star responses.
