@@ -6,15 +6,15 @@ package lucuma.catalog.telluric
 import cats.Applicative
 import cats.effect.Concurrent
 import cats.syntax.all.*
+import clue.FetchClient
 import clue.http4s.Http4sHttpBackend
 import clue.http4s.Http4sHttpClient
-import clue.FetchClient
 import clue.syntax.*
+import lucuma.catalog.telluric.TelluricSearchQuery.TelluricStar
+import lucuma.core.model.TelluricType
 import org.http4s.Uri
 import org.http4s.client.Client
 import org.typelevel.log4cats.Logger
-import lucuma.catalog.telluric.TelluricSearchQuery.TelluricStar
-import lucuma.core.model.TelluricType
 
 /**
  * Client for the telluric targets service

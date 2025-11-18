@@ -7,18 +7,18 @@ import cats.effect.*
 import cats.syntax.all.*
 import fs2.io.readClassLoaderResource
 import fs2.text
+import io.circe.Encoder
 import io.circe.Json
 import io.circe.syntax.*
 import lucuma.catalog.telluric.TelluricSearchQuery.TelluricStar
 import lucuma.catalog.telluric.TelluricTargetsClient
+import lucuma.core.enums.TelluricCalibrationOrder
+import lucuma.core.model.TelluricType
 import org.http4s.*
 import org.http4s.circe.*
 import org.http4s.client.Client
 import org.http4s.syntax.literals.*
 import org.typelevel.log4cats.Logger
-import io.circe.Encoder
-import lucuma.core.model.TelluricType
-import lucuma.core.enums.TelluricCalibrationOrder
 
 /**
  * Mock TelluricClient for testing purposes.
