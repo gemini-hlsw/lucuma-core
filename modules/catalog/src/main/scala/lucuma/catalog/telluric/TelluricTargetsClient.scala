@@ -4,11 +4,11 @@
 package lucuma.catalog.telluric
 
 import cats.Applicative
-import cats.ApplicativeThrow
 import cats.effect.Concurrent
 import cats.syntax.all.*
 import clue.http4s.Http4sHttpBackend
 import clue.http4s.Http4sHttpClient
+import clue.syntax.*
 import io.circe.syntax.*
 import org.http4s.Uri
 import org.http4s.client.Client
@@ -40,37 +40,9 @@ object TelluricTargetsClient:
               response <- http
                             .request(TelluricSearchQuery)
                             .withInput(input)
-              _        <- debug"raw GraphQL response: $response"
-              result   <- (response.data, response.errors) match
-                            case (Some(data), _)      =>
-                              data.pure[F]
-                            case (None, Some(errors)) =>
-                              for {
-                                _                 <-
-                                  warn"Telluric service errors: ${errors.toList.mkString("\n")}"
-                                // FIXME upstream
-                                isEmptyResultError =
-                                  errors.toList.exists(
-                                    _.message
-                                      .contains("Empty table cannot have column set to scalar value")
-                                  )
-                                result            <-
-                                  if (isEmptyResultError) {
-                                    warn"No telluric candidates found (server returned empty table error)"
-                                      .as(List.empty[TelluricStar])
-                                  } else {
-                                    error"GraphQL errors: $errors" *>
-                                      ApplicativeThrow[F].raiseError[List[TelluricStar]](
-                                        new RuntimeException(s"GraphQL errors: $errors")
-                                      )
-                                  }
-                              } yield result
-                            case _                    =>
-                              error"No data and no errors in GraphQL response" *>
-                                ApplicativeThrow[F].raiseError[List[TelluricStar]](
-                                  new RuntimeException("No data and no errors in GraphQL response")
-                                )
-            } yield result
+                            .raiseGraphQLErrors
+              _        <- debug"GraphQL response: $response"
+            } yield response
 
   def noop[F[_]: Applicative]: TelluricTargetsClient[F] = new TelluricTargetsClient[F]:
     def search(input: TelluricSearchInput): F[List[TelluricStar]] =
