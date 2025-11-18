@@ -1,0 +1,14 @@
+type star {
+  HIP: Int!
+  spType: String!
+  RA: Float!
+  Dec: Float!
+  Distance: Float!
+  Hmag: Float!
+  Score: Float!
+  Order: String!
+}
+
+type Query {
+  search(ra_deg: Float!, dec_deg: Float!, duration_hrs: Float!, brightest: Float!, sp_type: String!): [star!]!
+}

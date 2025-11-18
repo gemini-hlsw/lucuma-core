@@ -153,6 +153,7 @@ lazy val benchmarks = project
 lazy val catalog = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Pure)
   .in(file("modules/catalog"))
+  .enablePlugins(CluePlugin)
   .dependsOn(core)
   .settings(
     name := "lucuma-catalog",

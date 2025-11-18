@@ -29,7 +29,7 @@ object TelluricTargetsClient:
     given Http4sHttpBackend[F] = Http4sHttpBackend[F](client)
 
     Http4sHttpClient
-      .of[F, Unit](uri)
+      .of[F, TelluricService](uri)
       .map: http =>
         new TelluricTargetsClient[F]:
           override def search(input: TelluricSearchInput): F[List[TelluricStar]] =
@@ -41,7 +41,7 @@ object TelluricTargetsClient:
                             .request(TelluricSearchQuery)
                             .withInput(input)
               _        <- debug"raw GraphQL response: $response"
-              result   <- (response.data, response.errors) match
+              result   <- (response.data.map(_.search), response.errors) match
                             case (Some(data), _)      =>
                               data.pure[F]
                             case (None, Some(errors)) =>

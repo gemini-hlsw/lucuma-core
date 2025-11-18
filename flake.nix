@@ -22,6 +22,9 @@
       {
         devShell = pkgs.devshell.mkShell {
           imports = [ typelevel-nix.typelevelShell ];
+          packages = [
+            pkgs.corepack # also installs pnpm
+          ];          
           typelevelShell = {
             nodejs.enable = true;
             jdk.package = pkgs.jdk21;

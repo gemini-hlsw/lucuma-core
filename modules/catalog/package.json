@@ -1,0 +1,9 @@
+{
+  "scripts": {
+    "start": "./fetchTelluricSchema.mjs",
+    "fetch-schema": "./fetchTelluricSchema.mjs"
+  },
+  "devDependencies": {
+    "graphql": "16.12.0"
+  }
+}

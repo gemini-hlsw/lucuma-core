@@ -58,3 +58,5 @@ gnupg*
 .direnv/
 
 .vscode/
+
+node_modules/
