@@ -57,11 +57,11 @@ object GaiaClientMock:
   /**
    * ) Create a mock GaiaClient that returns VOTable XML responses.
    */
-  def mockGaiaClient[F[_]: Async](
+  def mockGaiaClient[F[_]: Concurrent](
     voTableXml: Stream[F, String],
     adapters:   Option[NonEmptyChain[CatalogAdapter.Gaia]] = None
   ): GaiaClient[F] = {
-    val mockHttpClient = Client.fromHttpApp[F](HttpApp[F]: request =>
+    val mockHttpClient = Client[F]: request =>
       // Check if contains "WHERE source_id = "
       val query           = request.uri.query.params.getOrElse("QUERY", "")
       val sourceIdPattern = """WHERE source_id = (\d+)""".r
@@ -74,7 +74,7 @@ object GaiaClientMock:
           voTableXml
       }
 
-      Response[F](Status.Ok).withEntity(responseXml).pure[F])
+      Resource.pure(Response(Status.Ok).withEntity(responseXml))
 
     adapters match {
       case Some(a) => GaiaClient.build[F](mockHttpClient, adapters = a)
@@ -85,16 +85,16 @@ object GaiaClientMock:
   /**
    * Create a mock GaiaClient that reads XML.
    */
-  def fromXML[F[_]: Async](
+  def fromXML[F[_]: Concurrent](
     xml:      Node,
     adapters: Option[NonEmptyChain[CatalogAdapter.Gaia]]
   ): GaiaClient[F] =
     mockGaiaClient(Stream.emit(Utility.trim(xml).toString), adapters)
 
   /**
-   * Create a mock GaiaClient that reads a Strina String.
+   * Create a mock GaiaClient that reads a String.
    */
-  def fromString[F[_]: Async](
+  def fromString[F[_]: Concurrent](
     content:  String,
     adapters: Option[NonEmptyChain[CatalogAdapter.Gaia]]
   ): GaiaClient[F] =

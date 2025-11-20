@@ -1,0 +1,36 @@
+{
+  "data": {
+    "search": [
+      {
+        "HIP": 12345,
+        "spType": "A0V",
+        "RA": 123.456,
+        "Dec": 45.678,
+        "Distance": 100.5,
+        "Hmag": 7.5,
+        "Score": 0.95,
+        "Order": "before"
+      },
+      {
+        "HIP": 67890,
+        "spType": "G2V",
+        "RA": 234.567,
+        "Dec": -12.345,
+        "Distance": 85.3,
+        "Hmag": 6.8,
+        "Score": 0.89,
+        "Order": "after"
+      },
+      {
+        "HIP": 11111,
+        "spType": "K0III",
+        "RA": 45.123,
+        "Dec": 23.456,
+        "Distance": 120.7,
+        "Hmag": 8.2,
+        "Score": 0.76,
+        "Order": "before"
+      }
+    ]
+  }
+}
