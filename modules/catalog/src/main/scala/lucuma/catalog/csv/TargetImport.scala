@@ -13,9 +13,7 @@ import eu.timepit.refined.types.string.NonEmptyString
 import fs2.*
 import fs2.data.csv.*
 import lucuma.catalog.*
-import lucuma.catalog.votable.CatalogAdapter
-import lucuma.catalog.votable.CatalogSearch
-import lucuma.catalog.votable.QueryByName
+import lucuma.catalog.clients.SimbadClient
 import lucuma.core.enums.Band
 import lucuma.core.enums.StellarLibrarySpectrum
 import lucuma.core.math.BrightnessUnits.*
@@ -36,10 +34,6 @@ import lucuma.core.model.Target
 import lucuma.core.model.UnnormalizedSED
 import lucuma.core.syntax.string.*
 import lucuma.core.util.*
-import org.http4s.Method.*
-import org.http4s.Request
-import org.http4s.Uri
-import org.http4s.client.Client
 
 import scala.collection.immutable.SortedMap
 
@@ -437,8 +431,7 @@ object TargetImport extends ImportEpochParsers:
     )
 
   def csv2targetsAndLookup[F[_]: Concurrent](
-    client: Client[F],
-    proxy:  Option[Uri] = None
+    simbadClient: SimbadClient[F]
   ): Pipe[F, String, EitherNec[ImportProblem, Target.Sidereal]] =
     csv2targetsRows.andThen { t =>
       t.evalMap {
@@ -463,42 +456,14 @@ object TargetImport extends ImportEpochParsers:
             )
             .getOrElse {
               // If only there is name do a lookup
-              val queryUri = CatalogSearch.simbadSearchQuery(QueryByName(t.name, proxy))
-              val request  = Request[F](GET, queryUri)
-
-              client
-                .stream(request)
-                .flatMap(
-                  _.body
-                    .through(text.utf8.decode)
-                    .through(CatalogSearch.siderealTargets[F](CatalogAdapter.Simbad))
-                )
-                .compile
-                .toList
-                // Convert catalog errors to import errors
+              simbadClient
+                .search(t.name)
                 .map(
-                  _.map(
-                    _.leftMap(e => ImportProblem.LookupError(e.foldMap(_.displayValue), t.line))
-                      .leftWiden[ImportProblem]
+                  _.bimap(problems =>
+                            problems.map(p => ImportProblem.LookupError(p.displayValue, t.line)),
+                          _.target
                   )
                 )
-                .map(imports =>
-                  // Fail if there is more than one result
-                  val result: EitherNec[ImportProblem, Target.Sidereal] =
-                    if (imports.length === 1) imports.head.map(_.target).toEitherNec
-                    else
-                      ImportProblem
-                        .LookupError(s"Multiple or no matches for ${t.name}", t.line)
-                        .leftNec
-                  result
-                )
-                // Handle general errors
-                .handleError { e =>
-                  ImportProblem
-                    .LookupError(e.getMessage, t.line)
-                    .asLeft[Target.Sidereal]
-                    .toEitherNec
-                }
             }
 
       }

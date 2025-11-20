@@ -18,6 +18,7 @@ import lucuma.core.model.SiderealTracking
 import lucuma.core.model.SourceProfile
 import lucuma.core.model.SpectralDefinition
 import lucuma.core.model.Target
+import lucuma.catalog.clients.SimbadClient
 import munit.CatsEffectSuite
 import org.http4s.jdkhttpclient.JdkHttpClient
 
@@ -308,10 +309,11 @@ class TargetImportSuite extends CatsEffectSuite:
     JdkHttpClient
       .simple[IO]
       .use { client =>
+        val simbadClient = SimbadClient.build(client)
         Files[IO]
           .readAll(Path(file.getPath()))
           .through(text.utf8.decode)
-          .through(TargetImport.csv2targetsAndLookup(client))
+          .through(TargetImport.csv2targetsAndLookup(simbadClient))
           .compile
           .toList
           // .flatTap(x => IO(pprint.pprintln(x)))

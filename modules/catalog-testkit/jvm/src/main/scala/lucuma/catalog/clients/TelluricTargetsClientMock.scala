@@ -39,7 +39,7 @@ object TelluricTargetsClientMock:
         Response(Status.Ok)
           .withEntity(responseJson)(using jsonEncoder)
 
-    TelluricTargetsClient.build[F](uri"https://telluric-targets.gpp.gemini.edu/", mockHttpClient)
+    TelluricTargetsClient.build[F](uri"https://telluric-targets.gpp.gemini.edu/", mockHttpClient, SimbadClient.noop)
   }
 
   /**
@@ -51,7 +51,7 @@ object TelluricTargetsClientMock:
         Response(Status.Ok)
           .withEntity(json)
 
-    TelluricTargetsClient.build[F](uri"https://telluric-targets.gpp.gemini.edu/", mockHttpClient)
+    TelluricTargetsClient.build[F](uri"https://telluric-targets.gpp.gemini.edu/", mockHttpClient, SimbadClient.noop)
   }
 
   /**
@@ -67,7 +67,7 @@ object TelluricTargetsClientMock:
             .withEntity(content)
             .pure[F]
 
-    TelluricTargetsClient.build[F](uri"https://telluric-targets.gpp.gemini.edu/", mockHttpClient)
+    TelluricTargetsClient.build[F](uri"https://telluric-targets.gpp.gemini.edu/", mockHttpClient, SimbadClient.noop)
   }
 
   /**

@@ -10,15 +10,10 @@ import cats.syntax.all.*
 import clue.http4s.Http4sHttpBackend
 import clue.http4s.Http4sHttpClient
 import clue.syntax.*
-import fs2.text
 import io.circe.syntax.*
-import lucuma.catalog.csv.ImportProblem
-import lucuma.catalog.votable.CatalogAdapter
-import lucuma.catalog.votable.CatalogSearch
-import lucuma.catalog.votable.QueryByName
+import lucuma.catalog.clients.SimbadClient
+import lucuma.catalog.votable.CatalogProblem
 import lucuma.core.model.Target
-import org.http4s.Method.*
-import org.http4s.Request
 import org.http4s.Uri
 import org.http4s.client.Client
 import org.typelevel.log4cats.Logger
@@ -31,14 +26,14 @@ trait TelluricTargetsClient[F[_]]:
   def search(input: TelluricSearchInput): F[List[TelluricStar]]
 
   def searchWithSiderealTargets(
-    input: TelluricSearchInput,
-    proxy: Option[Uri] = None
-  ): F[List[EitherNec[ImportProblem, (TelluricStar, Target.Sidereal)]]]
+    input: TelluricSearchInput
+  ): F[List[EitherNec[CatalogProblem, (TelluricStar, Target.Sidereal)]]]
 
 object TelluricTargetsClient:
   def build[F[_]: Concurrent: Logger](
-    uri:    Uri,
-    client: Client[F]
+    uri:          Uri,
+    client:       Client[F],
+    simbadClient: SimbadClient[F]
   ): F[TelluricTargetsClient[F]] =
     given Http4sHttpBackend[F] = Http4sHttpBackend[F](client)
 
@@ -59,47 +54,14 @@ object TelluricTargetsClient:
             } yield response
 
           override def searchWithSiderealTargets(
-            input: TelluricSearchInput,
-            proxy: Option[Uri] = None
-          ): F[List[EitherNec[ImportProblem, (TelluricStar, Target.Sidereal)]]] =
+            input: TelluricSearchInput
+          ): F[List[EitherNec[CatalogProblem, (TelluricStar, Target.Sidereal)]]] =
             for {
               telluricStars <- search(input)
               results       <- telluricStars.traverse { star =>
-                                 val queryUri =
-                                   CatalogSearch.simbadSearchQuery(QueryByName(star.simbadName, proxy))
-                                 val request  = Request[F](GET, queryUri)
-
-                                 client
-                                   .stream(request)
-                                   .flatMap(
-                                     _.body
-                                       .through(text.utf8.decode)
-                                       .through(CatalogSearch.siderealTargets[F](CatalogAdapter.Simbad))
-                                   )
-                                   .compile
-                                   .toList
-                                   .map(
-                                     _.map(
-                                       _.leftMap(e =>
-                                         ImportProblem.LookupError(e.foldMap(_.displayValue), None)
-                                       )
-                                     )
-                                   )
-                                   .map { imports =>
-                                     if (imports.length === 1)
-                                       imports.head.map(result => (star, result.target)).toEitherNec
-                                     else
-                                       ImportProblem
-                                         .LookupError(s"Multiple or no matches for ${star.simbadName}",
-                                                      None
-                                         )
-                                         .leftNec
-                                   }
-                                   .handleError { e =>
-                                     ImportProblem
-                                       .LookupError(e.getMessage, None)
-                                       .leftNec
-                                   }
+                                 simbadClient
+                                   .search(star.simbadName)
+                                   .map(_.map(target => (star, target.target)))
                                }
             } yield results
 
@@ -108,8 +70,6 @@ object TelluricTargetsClient:
       List.empty.pure[F]
 
     def searchWithSiderealTargets(
-      input:      TelluricSearchInput,
-      httpClient: Client[F],
-      proxy:      Option[Uri] = None
-    ): F[List[EitherNec[ImportProblem, (TelluricStar, Target.Sidereal)]]] =
+      input: TelluricSearchInput
+    ): F[List[EitherNec[CatalogProblem, (TelluricStar, Target.Sidereal)]]] =
       List.empty.pure[F]
