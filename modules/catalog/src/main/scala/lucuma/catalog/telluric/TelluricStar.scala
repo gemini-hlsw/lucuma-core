@@ -14,6 +14,7 @@ import lucuma.core.math.Coordinates
 import lucuma.core.math.Declination
 import lucuma.core.math.RightAscension
 import lucuma.core.model.TelluricType
+import eu.timepit.refined.types.string.NonEmptyString
 
 case class TelluricStar(
   hip:         Int,
@@ -23,7 +24,8 @@ case class TelluricStar(
   hmag:        Double,
   score:       Double,
   order:       TelluricCalibrationOrder
-)
+):
+  val simbadName: NonEmptyString = NonEmptyString.unsafeFrom(s"HIP $hip")
 
 object TelluricStar:
   given Decoder[TelluricStar] = c =>
