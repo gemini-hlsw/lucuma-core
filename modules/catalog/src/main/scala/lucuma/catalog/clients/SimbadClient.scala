@@ -21,12 +21,12 @@ import org.http4s.client.Client
 
 trait SimbadClient[F[_]]:
   /**
-   * Search SIMBAD for an exact match
+   * Simbad search for an exact match target.
    */
   def search(name: NonEmptyString): F[EitherNec[CatalogProblem, CatalogTargetResult]]
 
   /**
-   * Search SIMBAD with optional wildcard support and result limit
+   * Simbad search supporting wildcards.
    */
   def search(
     term:       NonEmptyString,

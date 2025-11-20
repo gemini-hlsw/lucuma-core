@@ -3,6 +3,7 @@
 
 package lucuma.catalog.telluric
 
+import eu.timepit.refined.types.string.NonEmptyString
 import io.circe.Decoder
 import io.circe.DecodingFailure
 import io.circe.Encoder
@@ -14,7 +15,6 @@ import lucuma.core.math.Coordinates
 import lucuma.core.math.Declination
 import lucuma.core.math.RightAscension
 import lucuma.core.model.TelluricType
-import eu.timepit.refined.types.string.NonEmptyString
 
 case class TelluricStar(
   hip:         Int,

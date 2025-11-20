@@ -8,6 +8,7 @@ import cats.syntax.all.*
 import fs2.*
 import fs2.io.file.Files
 import fs2.io.file.Path
+import lucuma.catalog.clients.SimbadClient
 import lucuma.core.enums.Band
 import lucuma.core.math.BrightnessValue
 import lucuma.core.math.Epoch
@@ -18,7 +19,6 @@ import lucuma.core.model.SiderealTracking
 import lucuma.core.model.SourceProfile
 import lucuma.core.model.SpectralDefinition
 import lucuma.core.model.Target
-import lucuma.catalog.clients.SimbadClient
 import munit.CatsEffectSuite
 import org.http4s.jdkhttpclient.JdkHttpClient
 

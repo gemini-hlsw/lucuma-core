@@ -46,6 +46,6 @@ object TelluricTargetsQueryApp extends IOApp.Simple:
         val simbadClient = SimbadClient.build(client)
         for
           telluricClient <- TelluricTargetsClient.build(telluricUri, client, simbadClient)
-          results        <- telluricClient.searchWithSiderealTargets(searchInput)
+          results        <- telluricClient.searchTarget(searchInput)
           _              <- IO.println(pprint.apply(results))
         yield ()

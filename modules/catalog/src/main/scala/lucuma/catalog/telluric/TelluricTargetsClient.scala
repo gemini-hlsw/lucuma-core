@@ -11,9 +11,9 @@ import clue.http4s.Http4sHttpBackend
 import clue.http4s.Http4sHttpClient
 import clue.syntax.*
 import io.circe.syntax.*
+import lucuma.catalog.CatalogTargetResult
 import lucuma.catalog.clients.SimbadClient
 import lucuma.catalog.votable.CatalogProblem
-import lucuma.core.model.Target
 import org.http4s.Uri
 import org.http4s.client.Client
 import org.typelevel.log4cats.Logger
@@ -25,9 +25,9 @@ import org.typelevel.log4cats.syntax.*
 trait TelluricTargetsClient[F[_]]:
   def search(input: TelluricSearchInput): F[List[TelluricStar]]
 
-  def searchWithSiderealTargets(
+  def searchTarget(
     input: TelluricSearchInput
-  ): F[List[EitherNec[CatalogProblem, (TelluricStar, Target.Sidereal)]]]
+  ): F[List[EitherNec[CatalogProblem, (TelluricStar, CatalogTargetResult)]]]
 
 object TelluricTargetsClient:
   def build[F[_]: Concurrent: Logger](
@@ -53,15 +53,15 @@ object TelluricTargetsClient:
               _        <- debug"GraphQL response: $response"
             } yield response
 
-          override def searchWithSiderealTargets(
+          override def searchTarget(
             input: TelluricSearchInput
-          ): F[List[EitherNec[CatalogProblem, (TelluricStar, Target.Sidereal)]]] =
+          ): F[List[EitherNec[CatalogProblem, (TelluricStar, CatalogTargetResult)]]] =
             for {
               telluricStars <- search(input)
               results       <- telluricStars.traverse { star =>
                                  simbadClient
                                    .search(star.simbadName)
-                                   .map(_.map(target => (star, target.target)))
+                                   .map(_.map(result => (star, result)))
                                }
             } yield results
 
@@ -69,7 +69,7 @@ object TelluricTargetsClient:
     def search(input: TelluricSearchInput): F[List[TelluricStar]] =
       List.empty.pure[F]
 
-    def searchWithSiderealTargets(
+    def searchTarget(
       input: TelluricSearchInput
-    ): F[List[EitherNec[CatalogProblem, (TelluricStar, Target.Sidereal)]]] =
+    ): F[List[EitherNec[CatalogProblem, (TelluricStar, CatalogTargetResult)]]] =
       List.empty.pure[F]
