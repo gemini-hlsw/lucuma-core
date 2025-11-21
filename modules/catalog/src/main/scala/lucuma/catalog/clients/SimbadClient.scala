@@ -48,10 +48,11 @@ object SimbadClient:
   ): SimbadClient[F] = new SimbadClient[F]:
 
     def search(name: NonEmptyString): F[EitherNec[CatalogProblem, CatalogTargetResult]] =
-      multiEndpointQuery(buildLookupUri(_, name)).map: results =>
-        results.headOption match
-          case Some(result) => result
-          case None         => CatalogProblem.GenericError(s"No results for $name").leftNec
+      multiEndpointQuery(buildSearchUri(_, name, wildcard = false, maxResults = None)).map:
+        results =>
+          results.headOption match
+            case Some(result) => result
+            case None         => CatalogProblem.GenericError(s"No results for $name").leftNec
 
     def search(
       term:       NonEmptyString,
@@ -80,11 +81,6 @@ object SimbadClient:
             .through(CatalogSearch.siderealTargets[F](CatalogAdapter.Simbad))
         .compile
         .toList
-
-    private def buildLookupUri(base: Uri, name: NonEmptyString): Uri =
-      base
-        .withQueryParam("output.format", "VOTable")
-        .withQueryParam("Ident", name.value)
 
     private def buildSearchUri(
       base:       Uri,
