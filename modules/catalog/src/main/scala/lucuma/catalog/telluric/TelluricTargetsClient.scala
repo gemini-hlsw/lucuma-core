@@ -4,7 +4,6 @@
 package lucuma.catalog.telluric
 
 import cats.Applicative
-import cats.data.EitherNec
 import cats.effect.Concurrent
 import cats.syntax.all.*
 import clue.http4s.Http4sHttpBackend
@@ -13,7 +12,6 @@ import clue.syntax.*
 import io.circe.syntax.*
 import lucuma.catalog.CatalogTargetResult
 import lucuma.catalog.clients.SimbadClient
-import lucuma.catalog.votable.CatalogProblem
 import org.http4s.Uri
 import org.http4s.client.Client
 import org.typelevel.log4cats.Logger
@@ -27,7 +25,7 @@ trait TelluricTargetsClient[F[_]]:
 
   def searchTarget(
     input: TelluricSearchInput
-  ): F[List[EitherNec[CatalogProblem, (TelluricStar, CatalogTargetResult)]]]
+  ): F[List[(TelluricStar, Option[CatalogTargetResult])]]
 
 object TelluricTargetsClient:
   def build[F[_]: Concurrent: Logger](
@@ -55,14 +53,14 @@ object TelluricTargetsClient:
 
           override def searchTarget(
             input: TelluricSearchInput
-          ): F[List[EitherNec[CatalogProblem, (TelluricStar, CatalogTargetResult)]]] =
+          ): F[List[(TelluricStar, Option[CatalogTargetResult])]] =
             for {
               telluricStars <- search(input)
-              results       <- telluricStars.traverse { star =>
+              results       <- telluricStars.traverse: star =>
                                  simbadClient
                                    .search(star.simbadName)
-                                   .map(_.map(result => (star, result)))
-                               }
+                                   .map(_.toOption)
+                                   .map(result => (star, result))
             } yield results
 
   def noop[F[_]: Applicative]: TelluricTargetsClient[F] = new TelluricTargetsClient[F]:
@@ -71,5 +69,5 @@ object TelluricTargetsClient:
 
     def searchTarget(
       input: TelluricSearchInput
-    ): F[List[EitherNec[CatalogProblem, (TelluricStar, CatalogTargetResult)]]] =
+    ): F[List[(TelluricStar, Option[CatalogTargetResult])]] =
       List.empty.pure[F]
