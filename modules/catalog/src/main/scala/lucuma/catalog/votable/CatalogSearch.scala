@@ -11,7 +11,7 @@ import lucuma.core.model.Target
 import org.http4s.Uri
 import org.http4s.syntax.all.*
 
-object CatalogSearch {
+object CatalogSearch:
 
   /**
    * Takes a name query and builds a uri to query simbad
@@ -52,4 +52,3 @@ object CatalogSearch {
         .through(xml.events[F, Char]())
         .through(xml.normalize[F])
         .through(VoTableParser.xml2guidestars[F](adapter))
-}

@@ -3,6 +3,7 @@
 
 package lucuma.catalog.telluric
 
+import eu.timepit.refined.types.string.NonEmptyString
 import io.circe.Decoder
 import io.circe.DecodingFailure
 import io.circe.Encoder
@@ -23,7 +24,8 @@ case class TelluricStar(
   hmag:        Double,
   score:       Double,
   order:       TelluricCalibrationOrder
-)
+):
+  val simbadName: NonEmptyString = NonEmptyString.unsafeFrom(s"HIP $hip")
 
 object TelluricStar:
   given Decoder[TelluricStar] = c =>
