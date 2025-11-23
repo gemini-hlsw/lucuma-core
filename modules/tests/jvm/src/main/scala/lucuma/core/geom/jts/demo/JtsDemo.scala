@@ -22,9 +22,18 @@ import lucuma.core.model.sequence.flamingos2.Flamingos2FpuMask
 import java.awt.event.*
 import java.awt.{List as _, *}
 import scala.jdk.CollectionConverters.*
+import lucuma.ags.GeometryType
 
-sealed trait InstrumentShapes:
+case class ColoredShape(
+  shape: ShapeExpression,
+  color: Color,
+  stroke: Option[BasicStroke] = None,
+  geometryType: Option[GeometryType] = None
+)
+
+trait InstrumentShapes:
   val shapes: List[ShapeExpression]
+  val coloredShapes: List[ColoredShape] = Nil
 
 trait GmosLSShapes extends InstrumentShapes:
   import lucuma.core.geom.gmos.*
@@ -211,7 +220,20 @@ class JtsDemo extends Frame("JTS Demo") {
       g2d.setPaint(originalColor)
       g2d.setStroke(origStroke)
 
-      // Finally, draw the shape.
+      // Draw colored shapes first
+      coloredShapes.foreach { cs =>
+        cs.shape.eval match {
+          case jts: JtsShape =>
+            g2d.setColor(cs.color)
+            cs.stroke.foreach(g2d.setStroke)
+            g2d.draw(jts.toAwt(arcsecPerPixel))
+            g2d.setStroke(origStroke)
+          case x             => sys.error(s"Whoa unexpected shape type: $x")
+        }
+      }
+
+      // Finally, draw the basic shapes in black.
+      g2d.setColor(Color.BLACK)
       shapes.foreach { shapeExpr =>
         shapeExpr.eval match {
           case jts: JtsShape =>
@@ -219,8 +241,6 @@ class JtsDemo extends Frame("JTS Demo") {
           case x             => sys.error(s"Whoa unexpected shape type: $x")
         }
       }
-
-      g2d.setColor(Color.green)
     }
   }
 
