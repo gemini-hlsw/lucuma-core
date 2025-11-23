@@ -204,7 +204,14 @@ object Ags {
       case (None, acqOffsets)               =>
         acqOffsets
 
-    buildPositions(posAngles, acqOffsetsOnBlind, scienceOffsets)
+    val offGeometries = buildPositions(posAngles, acqOffsetsOnBlind, scienceOffsets)
+    blindOffsetOff match
+      case Some(offset) =>
+        posAngles.map(a =>
+          (GeometryType.BlindOffset, AgsPosition(a, offset))
+        ) ::: offGeometries
+      case _            => offGeometries
+
   }
 
   private def generatePositions(
