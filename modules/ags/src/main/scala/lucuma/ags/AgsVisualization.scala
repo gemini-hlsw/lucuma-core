@@ -4,7 +4,7 @@
 package lucuma.ags
 
 import cats.data.NonEmptyList
-import cats.syntax.eq.*
+import cats.data.NonEmptyMap
 import lucuma.core.geom.Area
 import lucuma.core.geom.ShapeExpression
 import lucuma.core.geom.jts.interpreter.given
@@ -12,10 +12,6 @@ import lucuma.core.geom.syntax.all.*
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 
-/**
- * Visualization data pairing a position with its individual patrol field and the intersected patrol
- * field at that position angle.
- */
 case class PatrolFieldVisualization(
   geometryType:   GeometryType,
   position:       AgsPosition,
@@ -23,9 +19,6 @@ case class PatrolFieldVisualization(
   paIntersection: ShapeExpression  // Intersection area for the pa
 )
 
-/**
- * Viz data showing probe arm geometry and its overlaps with science areas.
- */
 case class ScienceOverlapVisualization(
   position:               AgsPosition,
   guideStarOffset:        Offset,
@@ -46,8 +39,7 @@ object AgsVisualization {
   ): NonEmptyList[PatrolFieldVisualization] = {
 
     // Calculate intersection of all patrol fields at each position angle
-    // This could be a total function but it is expensive to recalculate
-    val intersectionsByPA = // : Map[Angle, ShapeExpression] =
+    val intersectionsByPA: Map[Angle, NonEmptyMap[AgsPosition, ShapeExpression]] =
       positions
         .groupBy(_._2.posAngle)
         .view
@@ -56,7 +48,6 @@ object AgsVisualization {
         .toMap
 
     positions.map: (gt, position) =>
-      if (gt === GeometryType.BlindOffset) println(position)
       PatrolFieldVisualization(
         geometryType = gt,
         position = position,
@@ -73,19 +64,16 @@ object AgsVisualization {
     position:        AgsPosition,
     guideStarOffset: Offset
   ): ScienceOverlapVisualization = {
-    // Get the probe arm geometry at the guide star position
     val probeArm = params.probeArm(position.posAngle, guideStarOffset, position.offsetPos)
 
-    // Science target area (20 arcsec radius circle)
     val scienceTargetArea =
-      ShapeExpression.centeredEllipse(params.scienceRadius,
-                                      params.scienceRadius
-      ) ↗ position.offsetPos ⟲ position.posAngle
+      ShapeExpression
+        .centeredEllipse(params.scienceRadius,
+                         params.scienceRadius
+        ) ↗ position.offsetPos ⟲ position.posAngle
 
-    // Full detector science area (instrument/FPU dependent)
     val scienceArea = params.scienceArea(position.posAngle, position.offsetPos)
 
-    // Compute intersections
     val targetOverlap      = probeArm ∩ scienceTargetArea
     val detectorVignetting = probeArm ∩ scienceArea
 

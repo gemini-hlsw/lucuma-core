@@ -21,19 +21,8 @@ import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 import lucuma.core.math.syntax.int.*
 import lucuma.core.model.sequence.flamingos2.Flamingos2FpuMask
-import lucuma.core.util.Enumerated
 
 private given Order[Angle] = Angle.SignedAngleOrder
-
-/**
- * Enum representing type of patrol field for a position.
- */
-enum GeometryType(private val tag: String) derives Enumerated:
-  case BlindOffset  extends GeometryType("blind_offset")
-  case AcqOffset    extends GeometryType("acq_offset")
-  case SciOffset    extends GeometryType("sci_offset")
-  case Base         extends GeometryType("base")
-  case Intersection extends GeometryType("intersection")
 
 case class AgsPosition(posAngle: Angle, offsetPos: Offset) derives Order
 

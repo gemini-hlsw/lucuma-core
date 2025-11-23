@@ -220,7 +220,7 @@ class JtsDemo extends Frame("JTS Demo") {
       g2d.setPaint(originalColor)
       g2d.setStroke(origStroke)
 
-      // Draw colored shapes first
+      // colored shapes first
       coloredShapes.foreach { cs =>
         cs.shape.eval match {
           case jts: JtsShape =>
@@ -232,7 +232,7 @@ class JtsDemo extends Frame("JTS Demo") {
         }
       }
 
-      // Finally, draw the basic shapes in black.
+      // Finally, the basic shapes
       g2d.setColor(Color.BLACK)
       shapes.foreach { shapeExpr =>
         shapeExpr.eval match {

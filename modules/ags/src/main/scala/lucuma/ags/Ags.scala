@@ -23,6 +23,7 @@ import lucuma.core.math.Offset
 import lucuma.core.math.Wavelength
 import lucuma.core.model.ConstraintSet
 import lucuma.core.model.ImageQuality
+import lucuma.core.util.Enumerated
 import lucuma.core.util.NewType
 
 import java.time.Instant
@@ -41,13 +42,19 @@ object ScienceOffsets extends NewType[NonEmptyList[Offset]]:
 
 type ScienceOffsets = ScienceOffsets.Type
 
-private case class AnalysisContext(
-  guideSpeeds:          List[(GuideSpeed, BrightnessConstraints)],
-  calcs:                NonEmptyMap[AgsPosition, AgsGeomCalc],
-  brightnessConstraint: Option[BrightnessConstraints]
-)
+enum GeometryType(private val tag: String) derives Enumerated:
+  case BlindOffset  extends GeometryType("blind_offset")
+  case AcqOffset    extends GeometryType("acq_offset")
+  case SciOffset    extends GeometryType("sci_offset")
+  case Base         extends GeometryType("base")
+  case Intersection extends GeometryType("intersection")
 
 object Ags {
+  private case class AgsContextBuffer(
+    guideSpeeds:          List[(GuideSpeed, BrightnessConstraints)],
+    calcs:                NonEmptyMap[AgsPosition, AgsGeomCalc],
+    brightnessConstraint: Option[BrightnessConstraints]
+  )
 
   private def guideSpeedFor(
     speeds: List[(GuideSpeed, BrightnessConstraints)],
@@ -155,6 +162,7 @@ object Ags {
   ): List[Offset] =
     scienceAt.map(s => offsetAt(s, instant, gsc)).flatten
 
+  // Not a typo, it is the offset to the blind offset
   private def blindOffsetOffset(base: Coordinates, blind: Coordinates): Offset =
     base.diff(blind).offset
 
@@ -170,12 +178,18 @@ object Ags {
         case (None, Some(s))    => s.withType.some
         case _                  => none
 
-    allOffsets
-      .fold(anglesToTest.map(a => (GeometryType.Base, AgsPosition(a, Offset.Zero)))): offsets =>
-        for {
-          pa  <- anglesToTest
-          off <- offsets.distinct
-        } yield (off._1, AgsPosition(pa, off._2))
+    val basePositions =
+      anglesToTest.map(a => (GeometryType.Base, AgsPosition(a, Offset.Zero)))
+
+    val offsetPositions =
+      allOffsets
+        .map: offsets =>
+          for {
+            pa        <- anglesToTest
+            (gt, off) <- offsets.distinct
+          } yield (gt, AgsPosition(pa, off))
+
+    offsetPositions.fold(basePositions)(basePositions ::: _)
 
   def generatePositions(
     baseCoordinates: Coordinates,
@@ -205,10 +219,9 @@ object Ags {
         acqOffsets
 
     val offGeometries = buildPositions(posAngles, acqOffsetsOnBlind, scienceOffsets)
-    blindOffsetOff match
-      case Some(offset) =>
-        posAngles.map(a => (GeometryType.BlindOffset, AgsPosition(a, offset))) ::: offGeometries
-      case _            => offGeometries
+
+    blindOffsetOff.fold(offGeometries): offset =>
+      posAngles.map(a => (GeometryType.BlindOffset, AgsPosition(a, offset))) ::: offGeometries
 
   }
 
@@ -236,11 +249,11 @@ object Ags {
     wavelength:  Wavelength,
     positions:   NonEmptyList[AgsPosition],
     params:      AgsParams
-  ): AnalysisContext = {
+  ): AgsContextBuffer = {
     val guideSpeeds = guideSpeedLimits(constraints, wavelength)
     val calcs       = params.posCalculations(positions)
     val bc          = constraintsFor(guideSpeeds)
-    AnalysisContext(guideSpeeds, calcs, bc)
+    AgsContextBuffer(guideSpeeds, calcs, bc)
   }
 
   /**
@@ -312,9 +325,8 @@ object Ags {
 
     in =>
       (in.filter(c =>
-         c.gBrightness.exists { case (_, g) =>
+         c.gBrightness.exists: (_, g) =>
            ctx.brightnessConstraint.exists(_.contains(Band.Gaia, g))
-         }
        ),
        Stream.emits[F, AgsPosition](positions.toList)
       )
@@ -365,9 +377,8 @@ object Ags {
 
     candidates
       .filter(c =>
-        c.gBrightness.exists { case (_, g) =>
+        c.gBrightness.exists: (_, g) =>
           ctx.brightnessConstraint.exists(_.contains(Band.Gaia, g))
-        }
       )
       .flatMap: gsc =>
         val sciOffsets = scienceOffsetsAt(scienceAt, instant, gsc)

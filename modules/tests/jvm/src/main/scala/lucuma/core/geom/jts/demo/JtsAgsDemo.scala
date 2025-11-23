@@ -46,7 +46,6 @@ trait GmosAgsVisualizationShapes extends InstrumentShapes:
   val blindOffset: Coordinates =
     baseCoordinates.offsetBy(Angle.Angle0, blindOffsetRaw).get
 
-  // Acquisition offsets (small dither pattern)
   val acqOffsets: AcquisitionOffsets = AcquisitionOffsets(
     NonEmptyList.of(
       Offset.Zero,
@@ -75,7 +74,6 @@ trait GmosAgsVisualizationShapes extends InstrumentShapes:
   val params: GmosAgsParams = GmosAgsParams(fpu, port)
 
   val patrolViz = AgsVisualization.patrolFieldGeometries(params, positions)
-  pprint.pprintln(patrolViz.toList.map(_.geometryType))
 
   val scienceViz = AgsVisualization.scienceOverlapVisualization(
     params,
