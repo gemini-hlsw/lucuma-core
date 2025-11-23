@@ -5,6 +5,7 @@ package lucuma.core.geom.jts
 package demo
 
 import cats.syntax.option.*
+import lucuma.ags.GeometryType
 import lucuma.core.enums.Flamingos2Fpu
 import lucuma.core.enums.Flamingos2LyotWheel
 import lucuma.core.enums.GmosNorthFpu
@@ -22,7 +23,6 @@ import lucuma.core.model.sequence.flamingos2.Flamingos2FpuMask
 import java.awt.event.*
 import java.awt.{List as _, *}
 import scala.jdk.CollectionConverters.*
-import lucuma.ags.GeometryType
 
 case class ColoredShape(
   shape: ShapeExpression,

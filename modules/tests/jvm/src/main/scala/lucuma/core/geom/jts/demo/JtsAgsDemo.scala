@@ -11,19 +11,19 @@ import lucuma.ags.Ags
 import lucuma.ags.AgsParams.GmosAgsParams
 import lucuma.ags.AgsPosition
 import lucuma.ags.AgsVisualization
+import lucuma.ags.GeometryType
 import lucuma.ags.ScienceOffsets
-import lucuma.core.math.Coordinates
 import lucuma.core.enums.GmosNorthFpu
 import lucuma.core.enums.GmosSouthFpu
 import lucuma.core.enums.PortDisposition
 import lucuma.core.geom.ShapeExpression
 import lucuma.core.geom.syntax.all.*
 import lucuma.core.math.Angle
+import lucuma.core.math.Coordinates
 import lucuma.core.math.Offset
 import lucuma.core.math.syntax.int.*
 
 import java.awt.{List as _, *}
-import lucuma.ags.GeometryType
 
 trait GmosAgsVisualizationShapes extends InstrumentShapes:
   import lucuma.core.geom.gmos.*

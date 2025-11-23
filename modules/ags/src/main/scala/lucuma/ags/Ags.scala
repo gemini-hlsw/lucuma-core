@@ -207,9 +207,7 @@ object Ags {
     val offGeometries = buildPositions(posAngles, acqOffsetsOnBlind, scienceOffsets)
     blindOffsetOff match
       case Some(offset) =>
-        posAngles.map(a =>
-          (GeometryType.BlindOffset, AgsPosition(a, offset))
-        ) ::: offGeometries
+        posAngles.map(a => (GeometryType.BlindOffset, AgsPosition(a, offset))) ::: offGeometries
       case _            => offGeometries
 
   }
@@ -222,7 +220,7 @@ object Ags {
     scienceOffsets:     Option[ScienceOffsets],
     instant:            Instant
   ): NonEmptyList[AgsPosition] = {
-    val baseCoords: Option[Coordinates] = baseAt(instant)
+    val baseCoords: Option[Coordinates]  = baseAt(instant)
     val blindCoords: Option[Coordinates] = blindOffset.flatMap(_(instant))
 
     baseCoords
@@ -261,11 +259,16 @@ object Ags {
     params:             AgsParams,
     instant:            Instant
   ): Pipe[F, GuideStarCandidate, AgsAnalysis] = {
-    val positions = generatePositions(baseAt, blindOffset, posAngles, acquisitionOffsets, scienceOffsets, instant)
+    val positions =
+      generatePositions(baseAt, blindOffset, posAngles, acquisitionOffsets, scienceOffsets, instant)
     val ctx       = analysisContext(constraints, wavelength, positions, params)
 
     in =>
-      (in.filter(c => c.gBrightness.exists { case (_, g) => ctx.brightnessConstraint.exists(_.contains(Band.Gaia, g)) }),
+      (in.filter(c =>
+         c.gBrightness.exists { case (_, g) =>
+           ctx.brightnessConstraint.exists(_.contains(Band.Gaia, g))
+         }
+       ),
        Stream.emits[F, AgsPosition](positions.toList).repeat
       )
         .mapN { case (gsc, position) =>
@@ -303,17 +306,30 @@ object Ags {
     scienceOffsets:     Option[ScienceOffsets],
     params:             AgsParams
   ): Pipe[F, GuideStarCandidate, AgsAnalysis] = {
-    val positions = generatePositions(baseCoordinates, blindOffset, posAngles, acquisitionOffsets, scienceOffsets)
+    val positions =
+      generatePositions(baseCoordinates, blindOffset, posAngles, acquisitionOffsets, scienceOffsets)
     val ctx       = analysisContext(constraints, wavelength, positions, params)
 
     in =>
-      (in.filter(c => c.gBrightness.exists { case (_, g) => ctx.brightnessConstraint.exists(_.contains(Band.Gaia, g)) }),
+      (in.filter(c =>
+         c.gBrightness.exists { case (_, g) =>
+           ctx.brightnessConstraint.exists(_.contains(Band.Gaia, g))
+         }
+       ),
        Stream.emits[F, AgsPosition](positions.toList)
       )
         .mapN { (gsc, position) =>
           val offset     = baseCoordinates.diff(gsc.tracking.baseCoordinates).offset
           val sciOffsets = scienceCoordinates.map(_.diff(gsc.tracking.baseCoordinates).offset)
-          runAnalysis(constraints, offset, sciOffsets, position, params, gsc, ctx.guideSpeeds, ctx.calcs)
+          runAnalysis(constraints,
+                      offset,
+                      sciOffsets,
+                      position,
+                      params,
+                      gsc,
+                      ctx.guideSpeeds,
+                      ctx.calcs
+          )
         }
   }
 
@@ -343,11 +359,16 @@ object Ags {
     instant:            Instant,
     candidates:         List[GuideStarCandidate]
   ): List[AgsAnalysis] = {
-    val positions = generatePositions(baseAt, blindOffset, posAngles, acquisitionOffsets, scienceOffsets, instant)
+    val positions =
+      generatePositions(baseAt, blindOffset, posAngles, acquisitionOffsets, scienceOffsets, instant)
     val ctx       = analysisContext(constraints, wavelength, positions, params)
 
     candidates
-      .filter(c => c.gBrightness.exists { case (_, g) => ctx.brightnessConstraint.exists(_.contains(Band.Gaia, g)) })
+      .filter(c =>
+        c.gBrightness.exists { case (_, g) =>
+          ctx.brightnessConstraint.exists(_.contains(Band.Gaia, g))
+        }
+      )
       .flatMap: gsc =>
         val sciOffsets = scienceOffsetsAt(scienceAt, instant, gsc)
 
@@ -386,18 +407,29 @@ object Ags {
     params:             AgsParams,
     candidates:         List[GuideStarCandidate]
   ): List[AgsAnalysis] = {
-    val positions = generatePositions(baseCoordinates, blindOffset, posAngles, acquisitionOffsets, scienceOffsets)
+    val positions =
+      generatePositions(baseCoordinates, blindOffset, posAngles, acquisitionOffsets, scienceOffsets)
     val ctx       = analysisContext(constraints, wavelength, positions, params)
 
     candidates
       .filter: c =>
-        c.gBrightness.exists { case (_, g) => ctx.brightnessConstraint.exists(_.contains(Band.Gaia, g)) }
+        c.gBrightness.exists { case (_, g) =>
+          ctx.brightnessConstraint.exists(_.contains(Band.Gaia, g))
+        }
       .flatMap: gsc =>
         val offset     = baseCoordinates.diff(gsc.tracking.baseCoordinates).offset
         val sciOffsets = scienceCoordinates.map(_.diff(gsc.tracking.baseCoordinates).offset)
 
         positions.toList.map: position =>
-          runAnalysis(constraints, offset, sciOffsets, position, params, gsc, ctx.guideSpeeds, ctx.calcs)
+          runAnalysis(constraints,
+                      offset,
+                      sciOffsets,
+                      position,
+                      params,
+                      gsc,
+                      ctx.guideSpeeds,
+                      ctx.calcs
+          )
   }
 
   /**
