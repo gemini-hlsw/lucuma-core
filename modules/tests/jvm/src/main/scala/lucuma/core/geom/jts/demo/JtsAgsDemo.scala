@@ -29,8 +29,6 @@ import java.awt.{List as _, *}
 trait GmosAgsVisualizationShapes(val posAngle: Angle) extends InstrumentShapes:
   import lucuma.core.geom.gmos.*
 
-  val posAngle: Angle = 60.deg
-
   val guideStarOffset: Offset =
     Offset(170543999.µas.p, -24177003.µas.q)
 
@@ -75,6 +73,41 @@ trait GmosAgsVisualizationShapes(val posAngle: Angle) extends InstrumentShapes:
   val params: GmosAgsParams = GmosAgsParams(fpu, port)
 
   lazy val patrolViz = AgsVisualization.patrolFieldGeometries(params, positions)
+
+  lazy val scienceViz = AgsVisualization.scienceOverlapVisualization(
+    params,
+    AgsPosition(GeometryType.Base, posAngle, Offset.Zero),
+    guideStarOffset
+  )
+
+  override def shapes: List[ShapeExpression] = List(
+    scienceViz.probeArmShape,
+    scienceViz.scienceAreaShape,
+    candidatesArea.candidatesAreaAt(posAngle, Offset.Zero)
+  )
+
+  private def crossAt(offset: Offset): ShapeExpression = {
+    val size = 7.arcsec
+    val width = 500.mas
+    val h = ShapeExpression.centeredRectangle(size, width)
+    val v = ShapeExpression.centeredRectangle(width, size)
+    (h ∪ v) ↗ offset
+  }
+
+  val solidStroke = new BasicStroke(1.5f)
+  val tinyStroke = new BasicStroke(4f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10f, Array(1f, 1f), 0f)
+  val smallDashStroke = new BasicStroke(1f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10f, Array(3f, 3f), 0f)
+  val largeDashStroke = new BasicStroke(1f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10f, Array(8f, 4f), 0f)
+  val thickStroke = new BasicStroke(2.5f)
+
+  // Color and stroke mapping by GeometryType
+  val geometryStyle: Map[GeometryType, (Color, BasicStroke)] = Map(
+    GeometryType.BlindOffset  -> (Color.RED, thickStroke),
+    GeometryType.AcqOffset    -> (Color.CYAN, largeDashStroke),
+    GeometryType.SciOffset    -> (Color.BLUE, smallDashStroke),
+    GeometryType.Base         -> (Color.MAGENTA, solidStroke),
+    GeometryType.Intersection -> (Color.BLACK, solidStroke)
+  )
 
   override def coloredShapes: List[ColoredShape] = {
 
@@ -127,7 +160,6 @@ trait GmosAgsVisualizationShapes(val posAngle: Angle) extends InstrumentShapes:
     )
 
     patrolFields  ++ List(intersection, scienceTarget, vignetting, blindMarker) ++ overlap ++ scienceOffPos ++ acqOffPos
-    patrolFields  ++ List(intersection, blindMarker) // ++ overlap ++ scienceOffPos ++ acqOffPos
   }
 
 object JtsGmosAgsVisualizationDemo:
