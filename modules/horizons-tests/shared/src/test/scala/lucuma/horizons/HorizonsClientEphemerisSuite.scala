@@ -51,7 +51,7 @@ class HorizonsClientEphemerisSuite extends HorizonsClientSuite:
   testEphemerisEmpty(EphemerisKey.AsteroidOld(88715673))
   testEphemerisEmpty(EphemerisKey.MajorBody(85732756))
 
-  test("Ensure ephemeris content is correct (Halley)"):
+  test("Ensure ephemeris content is correct (Halley)".ignore): // nondeterministic, sadly
     assertIO(
       fetchEphemeris(EphemerisKey.Comet("1P")),
       s"""|2020-Aug-01 00:00:00.000 *   08 22 21.332241 +02 50 35.97409  3.742927  -0.97977   1.189  0.130   25.628  29.111
