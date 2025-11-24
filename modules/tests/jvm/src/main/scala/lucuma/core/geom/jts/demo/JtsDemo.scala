@@ -32,8 +32,8 @@ case class ColoredShape(
 )
 
 trait InstrumentShapes:
-  val shapes: List[ShapeExpression]
-  val coloredShapes: List[ColoredShape] = Nil
+  def shapes: List[ShapeExpression]
+  def coloredShapes: List[ColoredShape] = Nil
 
 trait GmosLSShapes extends InstrumentShapes:
   import lucuma.core.geom.gmos.*
@@ -54,7 +54,7 @@ trait GmosLSShapes extends InstrumentShapes:
     PortDisposition.Side
 
   // Shape to display
-  val shapes: List[ShapeExpression] =
+  def shapes: List[ShapeExpression] =
     List(
       probeArm.shapeAt(posAngle, guideStarOffset, offsetPos, fpu, port),
       patrolField.patrolFieldAt(posAngle, offsetPos, fpu, port),
@@ -78,7 +78,7 @@ trait GmosImagingShapes extends InstrumentShapes:
     PortDisposition.Side
 
   // Shape to display
-  val shapes: List[ShapeExpression] =
+  def shapes: List[ShapeExpression] =
     List(
       probeArm.shapeAt(posAngle, guideStarOffset, offsetPos, none, port),
       patrolField.patrolFieldAt(posAngle, offsetPos, none, port),
@@ -104,7 +104,7 @@ trait Flamingos2LSShapes extends InstrumentShapes:
   val port: PortDisposition =
     PortDisposition.Bottom
 
-  val shapes: List[ShapeExpression] =
+  def shapes: List[ShapeExpression] =
     List(
       ShapeExpression.centeredRectangle(1.arcsec, 1.arcsec).translate(guideStarOffset), // guide star
       probeArm.shapeAt(posAngle, guideStarOffset, offsetPos, lyot, port),

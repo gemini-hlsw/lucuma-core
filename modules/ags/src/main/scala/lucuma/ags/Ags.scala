@@ -48,6 +48,7 @@ enum GeometryType(private val tag: String) derives Enumerated:
   case SciOffset    extends GeometryType("sci_offset")
   case Base         extends GeometryType("base")
   case Intersection extends GeometryType("intersection")
+  case Vignetting   extends GeometryType("vignetting")
 
 object Ags {
   private case class AgsContextBuffer(
@@ -169,8 +170,9 @@ object Ags {
   private def buildPositions(
     anglesToTest:   NonEmptyList[Angle],
     acqOffsets:     Option[AcquisitionOffsets],
-    scienceOffsets: Option[ScienceOffsets]
-  ): NonEmptyList[(GeometryType, AgsPosition)] =
+    scienceOffsets: Option[ScienceOffsets],
+    blindOffsetOff: Option[Offset] = None
+  ): NonEmptyList[AgsPosition] =
     val allOffsets: Option[NonEmptyList[(GeometryType, Offset)]] =
       (acqOffsets, scienceOffsets) match
         case (Some(a), Some(s)) => (a.withType |+| s.withType).some
@@ -179,7 +181,7 @@ object Ags {
         case _                  => none
 
     val basePositions =
-      anglesToTest.map(a => (GeometryType.Base, AgsPosition(a, Offset.Zero)))
+      anglesToTest.map(a => AgsPosition(GeometryType.Base, a, Offset.Zero))
 
     val offsetPositions =
       allOffsets
@@ -187,7 +189,12 @@ object Ags {
           for {
             pa        <- anglesToTest
             (gt, off) <- offsets.distinct
-          } yield (gt, AgsPosition(pa, off))
+          } yield
+            // Acq offsets rotate around blind offset if present
+            val center = (gt, blindOffsetOff) match
+              case (GeometryType.AcqOffset, Some(blind)) => blind
+              case _                                     => Offset.Zero
+            AgsPosition(gt, pa, off, center)
 
     offsetPositions.fold(basePositions)(basePositions ::: _)
 
@@ -198,16 +205,6 @@ object Ags {
     acqOffsets:      Option[AcquisitionOffsets],
     scienceOffsets:  Option[ScienceOffsets]
   ): NonEmptyList[AgsPosition] =
-    generatePositionGeometries(baseCoordinates, blindOffset, posAngles, acqOffsets, scienceOffsets)
-      .map(_._2)
-
-  def generatePositionGeometries(
-    baseCoordinates: Coordinates,
-    blindOffset:     Option[Coordinates],
-    posAngles:       NonEmptyList[Angle],
-    acqOffsets:      Option[AcquisitionOffsets],
-    scienceOffsets:  Option[ScienceOffsets]
-  ): NonEmptyList[(GeometryType, AgsPosition)] = {
     val blindOffsetOff: Option[Offset] = blindOffset.map(blindOffsetOffset(baseCoordinates, _))
 
     val acqOffsetsOnBlind: Option[AcquisitionOffsets] = (blindOffsetOff, acqOffsets) match
@@ -218,12 +215,11 @@ object Ags {
       case (None, acqOffsets)               =>
         acqOffsets
 
-    val offGeometries = buildPositions(posAngles, acqOffsetsOnBlind, scienceOffsets)
+    val offGeometries = buildPositions(posAngles, acqOffsetsOnBlind, scienceOffsets, blindOffsetOff)
 
+    // Blind offset uses actual offset value, rotates around itself
     blindOffsetOff.fold(offGeometries): offset =>
-      posAngles.map(a => (GeometryType.BlindOffset, AgsPosition(a, offset))) ::: offGeometries
-
-  }
+      posAngles.map(a => AgsPosition(GeometryType.BlindOffset, a, offset, offset)) ::: offGeometries
 
   private def generatePositions(
     baseAt:             Instant => Option[Coordinates],
@@ -238,10 +234,9 @@ object Ags {
 
     baseCoords
       .map(base =>
-        generatePositionGeometries(base, blindCoords, posAngles, acquisitionOffsets, scienceOffsets)
-          .map(_._2)
+        generatePositions(base, blindCoords, posAngles, acquisitionOffsets, scienceOffsets)
       )
-      .getOrElse(buildPositions(posAngles, acquisitionOffsets, scienceOffsets).map(_._2))
+      .getOrElse(buildPositions(posAngles, acquisitionOffsets, scienceOffsets))
   }
 
   private def analysisContext(
@@ -274,7 +269,8 @@ object Ags {
   ): Pipe[F, GuideStarCandidate, AgsAnalysis] = {
     val positions =
       generatePositions(baseAt, blindOffset, posAngles, acquisitionOffsets, scienceOffsets, instant)
-    val ctx       = analysisContext(constraints, wavelength, positions, params)
+
+    val ctx = analysisContext(constraints, wavelength, positions, params)
 
     in =>
       (in.filter(c =>

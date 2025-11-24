@@ -13,10 +13,10 @@ import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 
 case class PatrolFieldVisualization(
-  geometryType:   GeometryType,
   position:       AgsPosition,
   posPatrolField: ShapeExpression, // Patrol field for the position
-  paIntersection: ShapeExpression  // Intersection area for the pa
+  paIntersection: ShapeExpression, // Intersection area for the pa
+  location:       Offset           // Position for placing visualization markers
 )
 
 case class ScienceOverlapVisualization(
@@ -35,27 +35,30 @@ object AgsVisualization {
 
   def patrolFieldGeometries(
     params:    SingleProbeAgsParams,
-    positions: NonEmptyList[(GeometryType, AgsPosition)]
+    positions: NonEmptyList[AgsPosition]
   ): NonEmptyList[PatrolFieldVisualization] = {
 
-    // Calculate intersection of all patrol fields at each position angle
-    val intersectionsByPA: Map[Angle, NonEmptyMap[AgsPosition, ShapeExpression]] =
+    val calcsByPA: Map[Angle, NonEmptyMap[AgsPosition, AgsGeomCalc]] =
       positions
-        .groupBy(_._2.posAngle)
+        .groupBy(_.posAngle)
         .view
-        .mapValues: positionsAtPA =>
-          params.posCalculations(positionsAtPA.map(_._2)).map(_.intersectionPatrolField)
+        .mapValues(params.posCalculations)
         .toMap
 
-    positions.map: (gt, position) =>
+    // Helper to get patrol field
+    def getPatrolField(position: AgsPosition): ShapeExpression =
+      params.patrolFieldAt(position.posAngle, position.offsetPos, position.pivot)
+
+    positions.map: position =>
       PatrolFieldVisualization(
-        geometryType = gt,
         position = position,
-        posPatrolField = params.patrolFieldAt(position.posAngle, position.offsetPos),
-        paIntersection = intersectionsByPA
+        posPatrolField = getPatrolField(position),
+        paIntersection = calcsByPA
           .get(position.posAngle)
           .flatMap(_.apply(position))
-          .getOrElse(ShapeExpression.Empty)
+          .map(_.intersectionPatrolField)
+          .getOrElse(ShapeExpression.Empty),
+        location = position.location
       )
   }
 
