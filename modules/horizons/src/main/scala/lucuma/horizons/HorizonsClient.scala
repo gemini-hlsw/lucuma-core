@@ -3,9 +3,7 @@
 
 package lucuma.horizons
 
-import cats.data.EitherT
 import cats.effect.Temporal
-import cats.syntax.all.*
 import fs2.Stream
 import fs2.text
 import lucuma.core.data.PerSite
@@ -102,8 +100,7 @@ object HorizonsClient:
     maxRetries: Int = 5,
     initialRetryInterval: FiniteDuration = 100.milli
   ): HorizonsClient[F] =
-    new HorizonsClient[F]:
-
+    new AbstractHorizonsClient[F]:
       def stream(params: (String, String)*): Stream[F, String] =
         def go(retriesRemaining: Int, interval: FiniteDuration): Stream[F, String] =
           client
@@ -124,71 +121,22 @@ object HorizonsClient:
                   Stream.raiseError(RuntimeException("HORIZONS service unavailable."))
         go(maxRetries, initialRetryInterval)
 
-      def resolve[A](search: HorizonsClient.Search[A]): F[Either[String, List[(A, String)]]] =
-        stream(
-          Format    -> "text",
-          Ephemeris -> No,
-          Command   -> s"'${search.queryString}'"
-        ).compile.toList.map:
-          HorizonsParser.parseResponse(search, _)
-
-      def ephemeris(
-        key: EphemerisKey.Horizons,
-        site: Site,
-        start: Instant,
-        stop: Instant,
-        elems: Int,
-      ): F[Either[String, HorizonsEphemeris]] =
-        if !stop.isAfter(start) then Left("Stop must fall after start.").pure[F]
-        else if elems < 1 then Left("Cannot select fewer than one element.").pure[F]
-        else {
-          val minutes  = (stop.toEpochMilli - start.toEpochMilli) / (1000L * 60)
-          val stepSize = 1L max minutes / elems
-          stream(
-              Format         -> Text,
-              Ephemeris      -> Yes,
-              Center         -> CenterCoord,
-              CoordType      -> CoordTypeGeo,
-              Command        -> s"'${key.queryString}'",
-              SiteCoord      -> horizonsCoordsAt(site),
-              StartTime      -> s"'${HorizonsDateFormat.format(start)}'",
-              StopTime       -> s"'${HorizonsDateFormat.format(stop)}'",
-              StepSize       -> s"${stepSize}m",
-              ExtraPrecision -> Yes,
-              TimeDigits     -> FractionalSec,
-              Quantities     -> "'1,3,8,9'" // see 3. Observer Table at https://ssd.jpl.nasa.gov/horizons/manual.html#output
-          ) .dropThrough(_ != "$$SOE")
-            .takeWhile(_ != "$$EOE")
-            .map(HorizonsParser.parseEntry)
-            .takeThrough(_.isRight) // stop on the first error, if any
-            .compile
-            .toList
-            .map: lines =>
-              lines.sequence.map: elements =>
-                HorizonsEphemeris(
-                  key, site, start, stop, elements
-                )
-        }
-      
-      def ephemerisPerSite(
-        key: EphemerisKey.Horizons,
-        start: Instant,
-        stop: Instant,
-        elems: Int,
-      ): F[Either[String, PerSite[HorizonsEphemeris]]] =
-        PerSite
-          .unfoldF: site =>
-            EitherT(ephemeris(key, site, start, stop, elems))
-          .value
-
-      def alignedEphemerisPerSite(
-        key: EphemerisKey.Horizons,
-        start: Instant,
-        days: Int,
-        cadence: HorizonsClient.ElementsPerDay,
-      ): F[Either[String, PerSite[HorizonsEphemeris]]] =
-        PerSite
-          .unfoldF: site =>
-            EitherT(alignedEphemeris(key, site, start, days, cadence))          
-          .value
-
+  def forTesting[F[_]: Temporal](
+    fixture: Map[Set[(String, String)], String]
+  ): HorizonsClient[F] =
+    new AbstractHorizonsClient[F]:
+      def stream(params: (String, String)*): Stream[F, String] =
+        fixture.get(params.toSet) match
+          case Some(s) => Stream.emits(s.linesIterator.toList)
+          case None =>
+            println(s"💫💫💫 HorizonsClient: Missing Fixture. Please add the following entry:")
+            println()
+            println:
+              params
+                .map(p => s"(\"${p._1}\", \"${p._2}\")")
+                .mkString("key = Set(", ", ", ")")
+            println(s"curl -k '${HorizonsUri.withQueryParams(params.toMap)}' | awk '{print \"|\" $$0}' | pbcopy")
+            println()
+            println(s"💫💫💫")
+            throw new Error("Missing fixture.")
+        
