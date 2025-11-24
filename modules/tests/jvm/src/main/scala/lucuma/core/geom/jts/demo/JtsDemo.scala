@@ -5,6 +5,7 @@ package lucuma.core.geom.jts
 package demo
 
 import cats.syntax.option.*
+import lucuma.ags.GeometryType
 import lucuma.core.enums.Flamingos2Fpu
 import lucuma.core.enums.Flamingos2LyotWheel
 import lucuma.core.enums.GmosNorthFpu
@@ -23,8 +24,16 @@ import java.awt.event.*
 import java.awt.{List as _, *}
 import scala.jdk.CollectionConverters.*
 
-sealed trait InstrumentShapes:
-  val shapes: List[ShapeExpression]
+case class ColoredShape(
+  shape: ShapeExpression,
+  color: Color,
+  stroke: Option[BasicStroke] = None,
+  geometryType: Option[GeometryType] = None
+)
+
+trait InstrumentShapes:
+  def shapes: List[ShapeExpression]
+  def coloredShapes: List[ColoredShape] = Nil
 
 trait GmosLSShapes extends InstrumentShapes:
   import lucuma.core.geom.gmos.*
@@ -45,7 +54,7 @@ trait GmosLSShapes extends InstrumentShapes:
     PortDisposition.Side
 
   // Shape to display
-  val shapes: List[ShapeExpression] =
+  def shapes: List[ShapeExpression] =
     List(
       probeArm.shapeAt(posAngle, guideStarOffset, offsetPos, fpu, port),
       patrolField.patrolFieldAt(posAngle, offsetPos, fpu, port),
@@ -69,7 +78,7 @@ trait GmosImagingShapes extends InstrumentShapes:
     PortDisposition.Side
 
   // Shape to display
-  val shapes: List[ShapeExpression] =
+  def shapes: List[ShapeExpression] =
     List(
       probeArm.shapeAt(posAngle, guideStarOffset, offsetPos, none, port),
       patrolField.patrolFieldAt(posAngle, offsetPos, none, port),
@@ -95,7 +104,7 @@ trait Flamingos2LSShapes extends InstrumentShapes:
   val port: PortDisposition =
     PortDisposition.Bottom
 
-  val shapes: List[ShapeExpression] =
+  def shapes: List[ShapeExpression] =
     List(
       ShapeExpression.centeredRectangle(1.arcsec, 1.arcsec).translate(guideStarOffset), // guide star
       probeArm.shapeAt(posAngle, guideStarOffset, offsetPos, lyot, port),
@@ -211,7 +220,20 @@ class JtsDemo extends Frame("JTS Demo") {
       g2d.setPaint(originalColor)
       g2d.setStroke(origStroke)
 
-      // Finally, draw the shape.
+      // colored shapes first
+      coloredShapes.foreach { cs =>
+        cs.shape.eval match {
+          case jts: JtsShape =>
+            g2d.setColor(cs.color)
+            cs.stroke.foreach(g2d.setStroke)
+            g2d.draw(jts.toAwt(arcsecPerPixel))
+            g2d.setStroke(origStroke)
+          case x             => sys.error(s"Whoa unexpected shape type: $x")
+        }
+      }
+
+      // Finally, the basic shapes
+      g2d.setColor(Color.BLACK)
       shapes.foreach { shapeExpr =>
         shapeExpr.eval match {
           case jts: JtsShape =>
@@ -219,8 +241,6 @@ class JtsDemo extends Frame("JTS Demo") {
           case x             => sys.error(s"Whoa unexpected shape type: $x")
         }
       }
-
-      g2d.setColor(Color.green)
     }
   }
 

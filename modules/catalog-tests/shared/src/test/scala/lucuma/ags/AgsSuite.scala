@@ -72,7 +72,8 @@ class AgsSuite extends munit.FunSuite {
 
   test("sortUsablePositions - bad angles thrown out") {
     val noMag            = NoMagnitudeForBand(GuideProbe.GmosOIWFS, gs1, Angle.Angle0)
-    val vignettesScience = VignettesScience(gs2, AgsPosition(Angle.Angle180, Offset.Zero))
+    val vignettesScience =
+      VignettesScience(gs2, AgsPosition(GeometryType.Base, Angle.Angle180, Offset.Zero))
     val analyses         = List(noMag, u1a, u1b.vignetting(9), u2a.vignetting(5), u2b, vignettesScience)
     val sorted           = analyses.sortUsablePositions
     assertEquals(sorted, List(u2a.vignetting(5), u1b.vignetting(9)))
@@ -131,7 +132,9 @@ class AgsSuite extends munit.FunSuite {
           List(gs1)
         )
         .headOption,
-      AgsAnalysis.VignettesScience(gs1, AgsPosition(Angle.Angle0, Offset.Zero)).some
+      AgsAnalysis
+        .VignettesScience(gs1, AgsPosition(GeometryType.Base, Angle.Angle0, Offset.Zero))
+        .some
     )
 
     val guideStarOffset =
@@ -194,7 +197,9 @@ class AgsSuite extends munit.FunSuite {
           List(gs1)
         )
         .headOption,
-      AgsAnalysis.VignettesScience(gs1, AgsPosition(Angle.Angle0, Offset.Zero)).some
+      AgsAnalysis
+        .VignettesScience(gs1, AgsPosition(GeometryType.Base, Angle.Angle0, Offset.Zero))
+        .some
     )
 
     val guideStarOffset =

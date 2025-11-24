@@ -2,7 +2,7 @@ import org.scalajs.linker.interface.ESVersion
 import org.typelevel.sbt.gha.PermissionValue
 import org.typelevel.sbt.gha.Permissions
 
-ThisBuild / tlBaseVersion                         := "0.156"
+ThisBuild / tlBaseVersion                         := "0.157"
 ThisBuild / tlCiReleaseBranches                   := Seq("master")
 ThisBuild / githubWorkflowEnv += "MUNIT_FLAKY_OK" -> "true"
 
@@ -119,13 +119,13 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Full)
   .in(file("modules/tests"))
   .enablePlugins(NoPublishPlugin)
-  .dependsOn(testkit)
+  .dependsOn(testkit, ags)
   .settings(
     name := "lucuma-core-tests",
     libraryDependencies ++= Seq(
       "org.scalameta" %%% "munit"             % munitVersion % Test,
       "org.typelevel" %%% "discipline-munit"  % munitDisciplineVersion % Test,
-      "org.typelevel" %%% "munit-cats-effect" % munitCatsEffectVersion % Test,
+      "org.typelevel" %%% "munit-cats-effect" % munitCatsEffectVersion % Test
     ),
     testFrameworks += MUnitFramework,
     testOptions += MUnitFlakyOK

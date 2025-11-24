@@ -24,7 +24,13 @@ import lucuma.core.model.sequence.flamingos2.Flamingos2FpuMask
 
 private given Order[Angle] = Angle.SignedAngleOrder
 
-case class AgsPosition(posAngle: Angle, offsetPos: Offset) derives Order
+case class AgsPosition(
+  geometryType: GeometryType,
+  posAngle:     Angle,
+  offsetPos:    Offset,
+  pivot:        Offset = Offset.Zero
+) derives Order:
+  val location: Offset = (offsetPos - pivot).rotate(posAngle) + pivot
 
 sealed trait AgsGeomCalc:
   // Indicates if the given offset is reachable
@@ -36,8 +42,10 @@ sealed trait AgsGeomCalc:
   // Indicates if the given guide star would vignette the science target
   def overlapsScience(gsOffset: Offset): Boolean
 
+  def intersectionPatrolField: ShapeExpression
+
 trait SingleProbeAgsParams:
-  def patrolFieldAt(posAngle: Angle, offset: Offset): ShapeExpression
+  def patrolFieldAt(posAngle: Angle, offset: Offset, pivot: Offset = Offset.Zero): ShapeExpression
 
   def scienceArea(posAngle: Angle, offset: Offset): ShapeExpression
 
@@ -45,20 +53,18 @@ trait SingleProbeAgsParams:
 
   def scienceRadius: Angle
 
+  private def patrolField(position: AgsPosition): ShapeExpression =
+    patrolFieldAt(position.posAngle, position.offsetPos, position.pivot)
+
   def posCalculations(
     positions: NonEmptyList[AgsPosition]
   ): NonEmptyMap[AgsPosition, AgsGeomCalc] =
-    val result = positions.map { position =>
+    val result = positions.map: position =>
       position -> new AgsGeomCalc() {
-        private val intersectionPatrolField =
+        override val intersectionPatrolField: ShapeExpression =
           positions
-            .map(_.offsetPos)
-            .distinct
-            // note we use the outer posAngle but the inner offset
-            // we want the intersection of offsets at a single PA
-            .map(offset => patrolFieldAt(position.posAngle, offset))
-            .reduce(using _ ∩ _) // it is very strange this is passed as an implicit
-            .eval
+            .map(innerPos => patrolField(innerPos.copy(posAngle = position.posAngle)))
+            .reduce(using _ ∩ _)
 
         private val scienceAreaShape =
           scienceArea(position.posAngle, position.offsetPos)
@@ -81,7 +87,6 @@ trait SingleProbeAgsParams:
             probeArm(position.posAngle, gsOffset, position.offsetPos)).eval.area
 
       }
-    }
     result.toNem
 
 sealed trait AgsParams derives Eq:
@@ -89,8 +94,10 @@ sealed trait AgsParams derives Eq:
   def probe: GuideProbe
 
   // Builds an AgsGeom object for each position
-  // Some of the geometries don't chage with the position and we can cache them
-  def posCalculations(positions: NonEmptyList[AgsPosition]): NonEmptyMap[AgsPosition, AgsGeomCalc]
+  // The geometries won't chage with the position and we can cache them
+  def posCalculations(
+    positions: NonEmptyList[AgsPosition]
+  ): NonEmptyMap[AgsPosition, AgsGeomCalc]
 
 object AgsParams:
   case class GmosAgsParams(
@@ -104,8 +111,12 @@ object AgsParams:
 
     override val probe = GuideProbe.GmosOIWFS
 
-    override def patrolFieldAt(posAngle: Angle, offset: Offset): ShapeExpression =
-      GmosGeom.patrolField.patrolFieldAt(posAngle, offset, fpu, port)
+    override def patrolFieldAt(
+      posAngle: Angle,
+      offset:   Offset,
+      pivot:    Offset = Offset.Zero
+    ): ShapeExpression =
+      GmosGeom.patrolField.patrolFieldAt(posAngle, offset, fpu, port, pivot)
 
     override def scienceArea(posAngle: Angle, offset: Offset): ShapeExpression =
       GmosGeom.scienceArea.shapeAt(posAngle, offset, fpu)
@@ -127,8 +138,12 @@ object AgsParams:
 
     override val probe = GuideProbe.Flamingos2OIWFS
 
-    override def patrolFieldAt(posAngle: Angle, offset: Offset): ShapeExpression =
-      Flamingos2Geom.patrolField.patrolFieldAt(posAngle, offset, lyot, port)
+    override def patrolFieldAt(
+      posAngle: Angle,
+      offset:   Offset,
+      pivot:    Offset = Offset.Zero
+    ): ShapeExpression =
+      Flamingos2Geom.patrolField.patrolFieldAt(posAngle, offset, lyot, port, pivot)
 
     override def scienceArea(posAngle: Angle, offset: Offset): ShapeExpression =
       Flamingos2Geom.scienceArea.shapeAt(posAngle, offset, lyot, fpu)

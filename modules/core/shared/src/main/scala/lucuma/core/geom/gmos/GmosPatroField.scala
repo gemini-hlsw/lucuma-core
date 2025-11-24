@@ -28,6 +28,7 @@ trait GmosPatrolField:
     *
     * @param posAngle position angle where positive is counterclockwise
     * @param offsetPos offset position from the base, if any
+    * @param pivot reference to rotate
     * @param fpu focal plane unit, if any
     * @param port port disposition
     *
@@ -37,11 +38,11 @@ trait GmosPatrolField:
     posAngle:  Angle,
     offsetPos: Offset,
     fpu:       Option[Either[GmosNorthFpu, GmosSouthFpu]],
-    port:      PortDisposition
-  ): ShapeExpression = {
+    port:      PortDisposition,
+    pivot:    Offset = Offset.Zero
+  ): ShapeExpression =
     val pf = patrolField ↗ (ifuOffset(fpu) - Offset(94950.mas.p, 89880.mas.q))
     val s  = if (port === PortDisposition.Side) pf.flipQ else pf
-    s ↗ offsetPos ⟲ posAngle
-  }
+    s ↗ (offsetPos - pivot) ⟲ posAngle ↗ pivot
 
 object patrolField extends GmosPatrolField

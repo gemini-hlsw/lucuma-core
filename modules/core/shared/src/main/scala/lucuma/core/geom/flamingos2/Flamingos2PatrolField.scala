@@ -82,11 +82,12 @@ trait Flamingos2PatrolField:
     posAngle:  Angle,
     offsetPos: Offset,
     lyotWheel: Flamingos2LyotWheel,
-    port:      PortDisposition
+    port:      PortDisposition,
+    pivot:     Offset = Offset.Zero
   ): ShapeExpression =
     val plateScale = lyotWheel.plateScale
     val pf = patrolField(plateScale)
     val s  = if (port === PortDisposition.Bottom) pf.flipP else pf
-    s ↗ offsetPos ⟲ posAngle
+    s ↗ (offsetPos - pivot) ⟲ posAngle ↗ pivot
 
 object patrolField extends Flamingos2PatrolField
