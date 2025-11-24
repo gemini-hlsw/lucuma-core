@@ -5,6 +5,7 @@ package lucuma.catalog
 
 import cats.effect.IO
 import cats.effect.IOApp
+import lucuma.catalog.clients.SimbadClient
 import lucuma.catalog.telluric.TelluricSearchInput
 import lucuma.catalog.telluric.TelluricTargetsClient
 import lucuma.core.math.Coordinates
@@ -12,7 +13,6 @@ import lucuma.core.math.Declination
 import lucuma.core.math.RightAscension
 import lucuma.core.model.TelluricType
 import lucuma.core.util.TimeSpan
-import org.http4s.Uri
 import org.http4s.jdkhttpclient.JdkHttpClient
 import org.http4s.syntax.literals.*
 import org.typelevel.log4cats.Logger
@@ -43,8 +43,9 @@ object TelluricTargetsQueryApp extends IOApp.Simple:
     JdkHttpClient
       .simple[IO]
       .use: client =>
+        val simbadClient = SimbadClient.build(client)
         for
-          telluricClient <- TelluricTargetsClient.build(telluricUri, client)
-          results        <- telluricClient.search(searchInput)
+          telluricClient <- TelluricTargetsClient.build(telluricUri, client, simbadClient)
+          results        <- telluricClient.searchTarget(searchInput)
           _              <- IO.println(pprint.apply(results))
         yield ()

@@ -7,13 +7,28 @@ import cats.effect.IO
 import cats.syntax.all.*
 import lucuma.core.enums.Half
 import lucuma.core.enums.Site
+import lucuma.core.math.Angle
+import lucuma.core.math.Coordinates
 import lucuma.core.model.EphemerisKey
 import lucuma.core.model.Semester
 import lucuma.core.model.Semester.YearInt
+import munit.Location
 
 import java.time.Instant
 
 class HorizonsClientEphemerisSuite extends HorizonsClientSuite:
+
+  def assertEqualsCoordinates(
+    obtained:  Coordinates,
+    expected:  Coordinates,
+    tolerance: Angle,
+    clue:      => Any = "values are not the same"
+  )(using Location): Unit =
+    val dist = obtained.angularDistance(expected).toMicroarcseconds
+    assert(
+      dist < tolerance.toMicroarcseconds,
+      s"$clue: coordinates distance $dist (tolerance=${tolerance.toMicroarcseconds}µas)"
+    )
 
   private val site = Site.GN
   private val sem  = Semester(YearInt.unsafeFrom(2020), Half.B)
@@ -44,17 +59,25 @@ class HorizonsClientEphemerisSuite extends HorizonsClientSuite:
   testEphemerisPopulation("'Oumuamua", EphemerisKey.AsteroidNew("A/2017 U1"))
   testEphemerisPopulation("Amphitrite", EphemerisKey.AsteroidOld(29))
   testEphemerisPopulation("Charon", EphemerisKey.MajorBody(901))
-  
   testEphemerisEmpty(EphemerisKey.Comet("17653287465t4"))
   testEphemerisEmpty(EphemerisKey.AsteroidNew("17653287465t4"))
   testEphemerisEmpty(EphemerisKey.AsteroidNew("17653287465t4"))
   testEphemerisEmpty(EphemerisKey.AsteroidOld(88715673))
   testEphemerisEmpty(EphemerisKey.MajorBody(85732756))
 
-  test("Ensure ephemeris content is correct (Halley)".ignore): // nondeterministic, sadly
-    assertIO(
-      fetchEphemeris(EphemerisKey.Comet("1P")),
-      s"""|2020-Aug-01 00:00:00.000 *   08 22 21.332241 +02 50 35.97409  3.742927  -0.97977   1.189  0.130   25.628  29.111
+  test("Ensure ephemeris content is correct (Halley)"):
+    val tolerance = Angle.fromMicroarcseconds(1000) // 1 milliarcsecond
+
+    def checkResults(
+      obtained: List[HorizonsEphemerisEntry],
+      expected: List[HorizonsEphemerisEntry]
+    ): Unit =
+      assertEquals(obtained.length, expected.length)
+      obtained.zip(expected).foreach: (o, e) =>
+        assertEquals(o.when, e.when)
+        assertEqualsCoordinates(o.coordinates, e.coordinates, tolerance)
+
+    val expected = s"""|2020-Aug-01 00:00:00.000 *   08 22 21.332241 +02 50 35.97409  3.742927  -0.97977   1.189  0.130   25.628  29.111
           |2020-Aug-19 09:35:00.000     08 24 09.845849 +02 42 20.15022  3.565667  -1.26261    n.a.   n.a.   25.626  29.115
           |2020-Sep-06 19:10:00.000 *m  08 25 44.746731 +02 32 22.49657  2.819498  -1.43290   1.058  0.115   25.618  29.117
           |2020-Sep-25 04:45:00.000 Nm  08 26 56.773006 +02 21 37.23421  2.011780  -1.47332    n.a.   n.a.   25.605  29.114
@@ -65,8 +88,10 @@ class HorizonsClientEphemerisSuite extends HorizonsClientSuite:
           |2020-Dec-26 04:40:00.000 Nm  08 24 17.223418 +01 51 20.35700  -3.83070  0.274248    n.a.   n.a.   25.525  29.022
           |2021-Jan-13 14:15:00.000     08 22 15.210694 +01 55 11.20811  -4.39315  0.777934   1.496  0.163   25.518  29.003
           |2021-Jan-31 23:50:00.000 *   08 20 05.764858 +02 02 30.25705  -4.30205  1.205358    n.a.   n.a.   25.517  28.999
-          |""".stripMargin.linesIterator.toList.traverse(HorizonsParser.parseEntry)
-      )
+          |""".stripMargin.linesIterator.toList.traverse(HorizonsParser.parseEntry).toList.flatten
+
+    fetchEphemeris(EphemerisKey.Comet("1P")).map:
+      _.map(checkResults(_, expected))
 
   test("Stop must fall after start."):
     assertIO(
@@ -105,14 +130,14 @@ class HorizonsClientEphemerisSuite extends HorizonsClientSuite:
           days  = 10,
           cadence = 2
         ).map: e =>
-          e.map: eph =>            
+          e.map: eph =>
             eph.entries.map(_.when.toString),
-        
+
       Right(List(
         "2020-08-01T00:00:00Z", // Day 1, midnight
         "2020-08-01T12:00:00Z", // Day 1, noon
         "2020-08-02T00:00:00Z", // Day 2
-        "2020-08-02T12:00:00Z", 
+        "2020-08-02T12:00:00Z",
         "2020-08-03T00:00:00Z",
         "2020-08-03T12:00:00Z",
         "2020-08-04T00:00:00Z", // ...
@@ -144,9 +169,9 @@ class HorizonsClientEphemerisSuite extends HorizonsClientSuite:
           days  = 10,
           cadence = 4
         ).map: e =>
-          e.map: eph =>            
+          e.map: eph =>
             eph.entries.map(_.when.toString),
-        
+
       Right(List(
         "2020-08-01T00:00:00Z",
         "2020-08-01T06:00:00Z",
@@ -203,9 +228,9 @@ class HorizonsClientEphemerisSuite extends HorizonsClientSuite:
           days  = 1,
           cadence = 24
         ).map: e =>
-          e.map: eph =>            
+          e.map: eph =>
             eph.entries.map(_.when.toString),
-        
+
       Right(List(
         "2025-05-02T00:00:00Z",
         "2025-05-02T01:00:00Z",
