@@ -14,6 +14,7 @@ import lucuma.core.enums.GmosSouthFpu
 import lucuma.core.enums.GuideProbe
 import lucuma.core.enums.PortDisposition
 import lucuma.core.geom.Area
+import lucuma.core.geom.Shape
 import lucuma.core.geom.ShapeExpression
 import lucuma.core.geom.jts.interpreter.given
 import lucuma.core.geom.syntax.all.*
@@ -74,8 +75,12 @@ trait SingleProbeAgsParams:
                                           scienceRadius
           ) ↗ position.offsetPos ⟲ position.posAngle
 
+        // Cache the shape or it will be re-computed on each isReachable call
+        private val intersectionShape: Shape =
+          intersectionPatrolField.eval
+
         override def isReachable(gsOffset: Offset): Boolean =
-          intersectionPatrolField.contains(gsOffset)
+          intersectionShape.contains(gsOffset)
 
         def overlapsScience(gsOffset: Offset): Boolean =
           // Calculating with area maybe more precise but it is more costly
