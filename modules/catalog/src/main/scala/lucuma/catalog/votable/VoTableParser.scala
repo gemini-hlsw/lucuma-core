@@ -184,13 +184,21 @@ trait VoTableParser {
   extension (entries: Map[FieldId, String])
     def entriesById = entries.map { case (k, v) => (k.id, v) }
 
+    def byId(field: FieldId): Option[String] =
+      // try exact match or else partial
+      entries
+        .get(field)
+        .orElse:
+          field.ucd.flatMap: ucd =>
+            entries.collectFirst:
+              case (k, v) if k.ucd.exists(_.covers(ucd)) =>
+                v
+
   // Read radial velocity. If not found it will try to get it from redshift
   def parseRadialVelocity(
     adapter: CatalogAdapter,
     entries: Map[FieldId, String]
   ): EitherNec[CatalogProblem, Option[RadialVelocity]] = {
-    val entriesById = entries.entriesById
-
     def rvFromZ(z: String): EitherNec[CatalogProblem, Option[RadialVelocity]] =
       parseDoubleValue(VoTableParser.UCD_Z.some, z).map(z => Redshift(z).toRadialVelocity)
 
@@ -202,7 +210,7 @@ trait VoTableParser {
           )
         )
 
-    (entriesById.get(adapter.rvField.id), entriesById.get(adapter.zField.id)) match {
+    (entries.byId(adapter.rvField), entries.byId(adapter.zField)) match {
       case (Some(rv), Some(z)) if rv.trim.nonEmpty =>
         fromRV(rv).orElse(rvFromZ(z)).orElse(RadialVelocity.Zero.some.rightNec)
       case (Some(rv), _) if rv.trim.nonEmpty       => fromRV(rv).orElse(RadialVelocity.Zero.some.rightNec)
@@ -214,10 +222,8 @@ trait VoTableParser {
   def parsePlx(
     adapter: CatalogAdapter,
     entries: Map[FieldId, String]
-  ): EitherNec[CatalogProblem, Option[Parallax]] = {
-    // Use lookup by ID only since VOTable UCDs may differ from adapter expected UCDs
-    val entriesById = entries.entriesById
-    entriesById.get(adapter.plxField.id) match {
+  ): EitherNec[CatalogProblem, Option[Parallax]] =
+    entries.byId(adapter.plxField) match {
       case Some(p) if p.trim.nonEmpty =>
         parseDoubleValue(VoTableParser.UCD_PLX.some, p).map(p =>
           Parallax.milliarcseconds.reverseGet(math.max(0.0, p)).some
@@ -225,7 +231,6 @@ trait VoTableParser {
       case _                          =>
         NoneRightNec
     }
-  }
 
   def parseSiderealTracking(
     adapter: CatalogAdapter,
