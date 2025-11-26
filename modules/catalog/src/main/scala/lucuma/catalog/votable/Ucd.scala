@@ -20,6 +20,8 @@ final case class Ucd(tokens: NonEmptyList[NonEmptyString]) derives Eq:
 
   def matches(r: Regex): Boolean = tokens.exists(t => r.findFirstIn(t.value).isDefined)
 
+  def covers(other: Ucd): Boolean = includes(other.tokens.head)
+
   override def toString = tokens.map(_.value).mkString_(", ")
 
 object Ucd:

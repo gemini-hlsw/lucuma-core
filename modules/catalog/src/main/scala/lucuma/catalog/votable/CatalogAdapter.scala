@@ -411,11 +411,21 @@ object CatalogAdapter {
   trait GaiaEsa extends Gaia {
     override lazy val uri: Uri       = uri"https://gea.esac.esa.int/tap-server/tap/sync"
     override lazy val format: String = "votable_plain"
+    // ESA uses pos.parallax.trig and spect.dopplerVeloc.opt;em.opt.I
+    override val plxField: FieldId   =
+      FieldId.unsafeFrom("parallax", Ucd.unsafeFromString("pos.parallax.trig"))
+    override val rvField: FieldId    =
+      FieldId.unsafeFrom("radial_velocity", Ucd.unsafeFromString("spect.dopplerVeloc.opt;em.opt.I"))
   }
 
   trait GaiaGavo extends Gaia {
     override lazy val uri: Uri       = uri"https://dc.g-vo.org/__system__/tap/run/sync"
     override lazy val format: String = "votabletd"
+    // GAVO uses pos.parallax and spect.dopplerVeloc.opt;em.opt.I
+    override val plxField: FieldId   =
+      FieldId.unsafeFrom("parallax", Ucd.unsafeFromString("pos.parallax"))
+    override val rvField: FieldId    =
+      FieldId.unsafeFrom("radial_velocity", Ucd.unsafeFromString("spect.dopplerVeloc.opt;em.opt.I"))
   }
 
   object Gaia3Esa extends GaiaEsa {

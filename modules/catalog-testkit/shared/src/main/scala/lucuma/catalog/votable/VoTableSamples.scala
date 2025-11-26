@@ -560,6 +560,122 @@ trait VoTableSamples {
       </RESOURCE>
     </VOTABLE>
 
+  // Sample for GAVO
+  // parallax:              pos.parallax
+  // radial_velocity_error: stat.error;spect.dopplerVeloc
+  //
+  // curl -s "https://dc.g-vo.org/__system__/tap/run/sync?REQUEST=doQuery&LANG=ADQL&FORMAT=votabletd&QUERY=SELECT%20source_id,ra,dec,pmra,pmdec,parallax,radial_velocity,phot_g_mean_mag,phot_rp_mean_mag%20FROM%20gaia.dr3lite%20WHERE%20source_id%20=%20538670232718296576"
+  lazy val gavoParallaxAndRV =
+    """<VOTABLE xmlns="http://www.ivoa.net/xml/VOTable/v1.3" version="1.5">
+      <RESOURCE type="results">
+        <TABLE name="dr3lite">
+          <FIELD ID="source_id" datatype="long" name="source_id" ucd="meta.id;meta.main"/>
+          <FIELD ID="ra" datatype="double" name="ra" ucd="pos.eq.ra;meta.main" unit="deg"/>
+          <FIELD ID="dec" datatype="double" name="dec" ucd="pos.eq.dec;meta.main" unit="deg"/>
+          <FIELD ID="pmra" datatype="float" name="pmra" ucd="pos.pm;pos.eq.ra" unit="mas/yr"/>
+          <FIELD ID="pmdec" datatype="float" name="pmdec" ucd="pos.pm;pos.eq.dec" unit="mas/yr"/>
+          <FIELD ID="parallax" datatype="float" name="parallax" ucd="pos.parallax" unit="mas"/>
+          <FIELD ID="radial_velocity" datatype="float" name="radial_velocity" ucd="spect.dopplerVeloc.opt;em.opt.I" unit="km/s"/>
+          <FIELD ID="phot_g_mean_mag" datatype="float" name="phot_g_mean_mag" ucd="phot.mag;em.opt;stat.mean" unit="mag"/>
+          <FIELD ID="phot_rp_mean_mag" datatype="float" name="phot_rp_mean_mag" ucd="phot.mag;em.opt.R" unit="mag"/>
+          <DATA>
+            <TABLEDATA>
+              <TR>
+                <TD>538670232718296576</TD>
+                <TD>11.041855402712585</TD>
+                <TD>74.84504666323086</TD>
+                <TD>-1.4343021</TD>
+                <TD>-1.0645945</TD>
+                <TD>0.16641381</TD>
+                <TD>-39.225376</TD>
+                <TD>15.083894</TD>
+                <TD>14.250962</TD>
+              </TR>
+            </TABLEDATA>
+          </DATA>
+        </TABLE>
+      </RESOURCE>
+    </VOTABLE>"""
+
+  // Alias for backwards compatibility
+  lazy val gaiaWithRVAndParallax = gavoParallaxAndRV
+
+  // Sample for ESA with gdr3_lite
+  // parallax:        pos.parallax.trig
+  // radial_velocity: spect.dopplerVeloc.opt;em.opt.I
+  //
+  // curl -s "https://gea.esac.esa.int/tap-server/tap/sync?REQUEST=doQuery&LANG=ADQL&FORMAT=votable_plain&QUERY=SELECT%20source_id,ra,pmra,dec,pmdec,parallax,radial_velocity,phot_g_mean_mag,phot_rp_mean_mag%20FROM%20gaiadr3.gaia_source_lite%20WHERE%20source_id%20=%20538670232718296576"
+  lazy val esaLiteParallaxAndRV =
+    """<VOTABLE xmlns="http://www.ivoa.net/xml/VOTable/v1.3" version="1.4">
+      <RESOURCE type="results">
+        <TABLE>
+          <FIELD ID="SOURCE_ID" datatype="long" name="source_id" ucd="meta.id"/>
+          <FIELD ID="ra" datatype="double" name="ra" ucd="pos.eq.ra;meta.main" unit="deg"/>
+          <FIELD ID="pmra" datatype="double" name="pmra" ucd="pos.pm;pos.eq.ra" unit="mas.yr**-1"/>
+          <FIELD ID="dec" datatype="double" name="dec" ucd="pos.eq.dec;meta.main" unit="deg"/>
+          <FIELD ID="pmdec" datatype="double" name="pmdec" ucd="pos.pm;pos.eq.dec" unit="mas.yr**-1"/>
+          <FIELD ID="parallax" datatype="double" name="parallax" ucd="pos.parallax.trig" unit="mas"/>
+          <FIELD ID="radial_velocity" datatype="float" name="radial_velocity" ucd="spect.dopplerVeloc.opt;em.opt.I" unit="km.s**-1"/>
+          <FIELD ID="phot_g_mean_mag" datatype="float" name="phot_g_mean_mag" ucd="phot.mag;em.opt" unit="mag"/>
+          <FIELD ID="phot_rp_mean_mag" datatype="float" name="phot_rp_mean_mag" ucd="phot.mag;em.opt.R" unit="mag"/>
+          <DATA>
+            <TABLEDATA>
+              <TR>
+                <TD>538670232718296576</TD>
+                <TD>11.041855402712585</TD>
+                <TD>-1.4343020524567958</TD>
+                <TD>74.84504666323086</TD>
+                <TD>-1.0645945622395614</TD>
+                <TD>0.16641382003793037</TD>
+                <TD>-39.225376</TD>
+                <TD>15.083894</TD>
+                <TD>14.250962</TD>
+              </TR>
+            </TABLEDATA>
+          </DATA>
+        </TABLE>
+      </RESOURCE>
+    </VOTABLE>"""
+
+  // Gaia3Esa adapter votable sample
+  // parallax:        pos.parallax.trig
+  // radial_velocity: spect.dopplerVeloc.opt;em.opt.I
+  //
+  // curl -s "https://gea.esac.esa.int/tap-server/tap/sync?REQUEST=doQuery&LANG=ADQL&FORMAT=votable_plain&QUERY=SELECT%20designation,ra,pmra,dec,pmdec,ref_epoch,parallax,radial_velocity,phot_g_mean_mag,phot_rp_mean_mag%20FROM%20gaiadr3.gaia_source%20WHERE%20source_id%20=%20538670232718296576"
+  lazy val esaFullParallaxAndRV =
+    """<VOTABLE xmlns="http://www.ivoa.net/xml/VOTable/v1.3" version="1.4">
+      <RESOURCE type="results">
+        <TABLE>
+          <FIELD ID="DESIGNATION" arraysize="*" datatype="char" name="designation" ucd="meta.id;meta.main"/>
+          <FIELD ID="ra" datatype="double" name="ra" ucd="pos.eq.ra;meta.main" unit="deg"/>
+          <FIELD ID="pmra" datatype="double" name="pmra" ucd="pos.pm;pos.eq.ra" unit="mas.yr**-1"/>
+          <FIELD ID="dec" datatype="double" name="dec" ucd="pos.eq.dec;meta.main" unit="deg"/>
+          <FIELD ID="pmdec" datatype="double" name="pmdec" ucd="pos.pm;pos.eq.dec" unit="mas.yr**-1"/>
+          <FIELD ID="ref_epoch" datatype="double" name="ref_epoch" ucd="meta.ref;time.epoch" unit="yr"/>
+          <FIELD ID="parallax" datatype="double" name="parallax" ucd="pos.parallax.trig" unit="mas"/>
+          <FIELD ID="radial_velocity" datatype="float" name="radial_velocity" ucd="spect.dopplerVeloc.opt;em.opt.I" unit="km.s**-1"/>
+          <FIELD ID="phot_g_mean_mag" datatype="float" name="phot_g_mean_mag" ucd="phot.mag;em.opt" unit="mag"/>
+          <FIELD ID="phot_rp_mean_mag" datatype="float" name="phot_rp_mean_mag" ucd="phot.mag;em.opt.R" unit="mag"/>
+          <DATA>
+            <TABLEDATA>
+              <TR>
+                <TD>Gaia DR3 538670232718296576</TD>
+                <TD>11.041855402712585</TD>
+                <TD>-1.4343020524567958</TD>
+                <TD>74.84504666323086</TD>
+                <TD>-1.0645945622395614</TD>
+                <TD>2016.0</TD>
+                <TD>0.16641382003793037</TD>
+                <TD>-39.225376</TD>
+                <TD>15.083894</TD>
+                <TD>14.250962</TD>
+              </TR>
+            </TABLEDATA>
+          </DATA>
+        </TABLE>
+      </RESOURCE>
+    </VOTABLE>"""
+
   lazy val voTableAlternative =
     <VOTABLE xmlns="http://www.ivoa.net/xml/VOTable/v1.3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.5" xsi:schemaLocation="http://www.ivoa.net/xml/VOTable/v1.3 http://vo.ari.uni-heidelberg.de/docs/schemata/VOTable.xsd">
       <DESCRIPTION>

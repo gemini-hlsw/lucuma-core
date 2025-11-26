@@ -87,3 +87,50 @@ class GaiaClientSuite extends CatsEffectSuite with VoTableSamples:
           assertEquals(target.catalogInfo.map(_.catalog), none)
         case Left(e)       =>
           fail(s"queryByIdGuideStar failed: ${e.toList.mkString("; ")}")
+
+  test("Gaia3LiteGavo adapter for px and rv"):
+    val client = GaiaClientMock.fromString[IO](gavoParallaxAndRV,
+                                               NonEmptyChain.one(CatalogAdapter.Gaia3LiteGavo).some
+    )
+
+    client
+      .queryById(538670232718296576L)
+      .map:
+        case Right(result) =>
+          val tracking = result.target.tracking
+          // parallax: 0.16641381 mas -> 166 μas as long
+          assertEquals(tracking.parallax.map(_.μas.value.value), 166L.some)
+          // radial_velocity: -39.225376 km/s -> -39225.376 m/s
+          assertEquals(tracking.radialVelocity.map(_.rv.value.toDouble), -39225.376.some)
+        case Left(e)       =>
+          fail(s"queryById failed: ${e.toList.mkString("; ")}")
+
+  test("Gaia3LiteEsa adapter for px and rv"):
+    val client = GaiaClientMock.fromString[IO](esaLiteParallaxAndRV,
+                                               NonEmptyChain.one(CatalogAdapter.Gaia3LiteEsa).some
+    )
+
+    client
+      .queryById(538670232718296576L)
+      .map:
+        case Right(result) =>
+          val tracking = result.target.tracking
+          assertEquals(tracking.parallax.map(_.μas.value.value), 166L.some)
+          assertEquals(tracking.radialVelocity.map(_.rv.value.toDouble), -39225.376.some)
+        case Left(e)       =>
+          fail(s"queryById failed: ${e.toList.mkString("; ")}")
+
+  test("GaiaClient parses parallax and radial velocity with Gaia3Esa adapter"):
+    val client = GaiaClientMock.fromString[IO](esaFullParallaxAndRV,
+                                               NonEmptyChain.one(CatalogAdapter.Gaia3Esa).some
+    )
+
+    client
+      .queryById(538670232718296576L)
+      .map:
+        case Right(result) =>
+          val tracking = result.target.tracking
+          assertEquals(tracking.parallax.map(_.μas.value.value), 166L.some)
+          assertEquals(tracking.radialVelocity.map(_.rv.value.toDouble), -39225.376.some)
+        case Left(e)       =>
+          fail(s"queryById failed: ${e.toList.mkString("; ")}")
