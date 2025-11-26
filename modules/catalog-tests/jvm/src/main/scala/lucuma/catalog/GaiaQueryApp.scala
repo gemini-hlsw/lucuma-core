@@ -19,9 +19,9 @@ import lucuma.core.math.RightAscension
 import org.http4s.jdkhttpclient.JdkHttpClient
 
 trait GaiaQuerySample {
-  val epoch = Epoch.fromString.getOption("J2022.000").getOrElse(Epoch.J2000)
+  val epoch = Epoch.fromString.getOption("J2016.000").getOrElse(Epoch.J2000)
 
-  given ADQLInterpreter = ADQLInterpreter.pmCorrected(1, epoch)
+  given ADQLInterpreter = ADQLInterpreter.oneTarget
 
   val m81Coords = (RightAscension.fromStringHMS.getOption("16:17:2.410"),
                    Declination.fromStringSignedDMS.getOption("-22:58:33.90")

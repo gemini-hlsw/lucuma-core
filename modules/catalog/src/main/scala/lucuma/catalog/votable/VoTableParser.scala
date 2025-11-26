@@ -181,11 +181,16 @@ trait VoTableParser {
   def parsePV(adapter: CatalogAdapter, entries: Map[FieldId, String]) =
     adapter.parseProperMotion(entries)
 
-  // Read readial velocity. if not found it will try to get it from redshift
+  extension (entries: Map[FieldId, String])
+    def entriesById = entries.map { case (k, v) => (k.id, v) }
+
+  // Read radial velocity. If not found it will try to get it from redshift
   def parseRadialVelocity(
     adapter: CatalogAdapter,
     entries: Map[FieldId, String]
   ): EitherNec[CatalogProblem, Option[RadialVelocity]] = {
+    val entriesById = entries.entriesById
+
     def rvFromZ(z: String): EitherNec[CatalogProblem, Option[RadialVelocity]] =
       parseDoubleValue(VoTableParser.UCD_Z.some, z).map(z => Redshift(z).toRadialVelocity)
 
@@ -197,19 +202,22 @@ trait VoTableParser {
           )
         )
 
-    (entries.get(adapter.rvField), entries.get(adapter.zField)) match {
-      case (Some(rv), Some(z)) => fromRV(rv).orElse(rvFromZ(z)).orElse(NoneRightNec)
-      case (Some(rv), _)       => fromRV(rv).orElse(NoneRightNec)
-      case (_, Some(z))        => rvFromZ(z).orElse(NoneRightNec)
-      case _                   => RadialVelocity.Zero.some.rightNec
+    (entriesById.get(adapter.rvField.id), entriesById.get(adapter.zField.id)) match {
+      case (Some(rv), Some(z)) if rv.trim.nonEmpty =>
+        fromRV(rv).orElse(rvFromZ(z)).orElse(RadialVelocity.Zero.some.rightNec)
+      case (Some(rv), _) if rv.trim.nonEmpty       => fromRV(rv).orElse(RadialVelocity.Zero.some.rightNec)
+      case (_, Some(z)) if z.trim.nonEmpty         => rvFromZ(z).orElse(RadialVelocity.Zero.some.rightNec)
+      case _                                       => RadialVelocity.Zero.some.rightNec
     }
   }
 
   def parsePlx(
     adapter: CatalogAdapter,
     entries: Map[FieldId, String]
-  ): EitherNec[CatalogProblem, Option[Parallax]] =
-    entries.get(adapter.plxField) match {
+  ): EitherNec[CatalogProblem, Option[Parallax]] = {
+    // Use lookup by ID only since VOTable UCDs may differ from adapter expected UCDs
+    val entriesById = entries.entriesById
+    entriesById.get(adapter.plxField.id) match {
       case Some(p) if p.trim.nonEmpty =>
         parseDoubleValue(VoTableParser.UCD_PLX.some, p).map(p =>
           Parallax.milliarcseconds.reverseGet(math.max(0.0, p)).some
@@ -217,12 +225,13 @@ trait VoTableParser {
       case _                          =>
         NoneRightNec
     }
+  }
 
   def parseSiderealTracking(
     adapter: CatalogAdapter,
     entries: Map[FieldId, String]
   ): EitherNec[CatalogProblem, SiderealTracking] = {
-    val entriesById = entries.map { case (k, v) => (k.id, v) }
+    val entriesById = entries.entriesById
     (parseRA(adapter, entriesById),
      parseDec(adapter, entriesById),
      parseEpoch(adapter, entries),
