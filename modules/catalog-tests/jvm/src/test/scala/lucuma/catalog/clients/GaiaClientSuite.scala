@@ -134,3 +134,18 @@ class GaiaClientSuite extends CatsEffectSuite with VoTableSamples:
           assertEquals(tracking.radialVelocity.map(_.rv.value.toDouble), -39225.376.some)
         case Left(e)       =>
           fail(s"queryById failed: ${e.toList.mkString("; ")}")
+
+  test("Gaia3DataLab adapter for px and rv"):
+    val client = GaiaClientMock.fromString[IO](dataLabParallaxAndRV,
+                                               NonEmptyChain.one(CatalogAdapter.Gaia3DataLab).some
+    )
+
+    client
+      .queryById(538670232718296576L)
+      .map:
+        case Right(result) =>
+          val tracking = result.target.tracking
+          assertEquals(tracking.parallax.map(_.μas.value.value), 166L.some)
+          assertEquals(tracking.radialVelocity.map(_.rv.value.toDouble), -39225.376.some)
+        case Left(e)       =>
+          fail(s"queryById failed: ${e.toList.mkString("; ")}")
