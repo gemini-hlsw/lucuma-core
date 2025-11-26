@@ -8,6 +8,7 @@ import cats.Show
 import cats.syntax.all.*
 import eu.timepit.refined.*
 import eu.timepit.refined.api.Refined
+import eu.timepit.refined.api.RefinedTypeOps
 import eu.timepit.refined.cats.*
 import eu.timepit.refined.numeric.Interval as RefinedInterval
 import lucuma.core.math.JulianDate.SecondsPerDay
@@ -80,11 +81,16 @@ object Epoch extends EpochOptics {
   type IntYear      = Int Refined Year
   type IntMilliYear = Int Refined MilliYear
 
+  object IntMilliYear extends RefinedTypeOps.Numeric[IntMilliYear, Int]
+
   /**
     * Standard epoch.
     * @group Constructors
     */
   lazy val J2000: Epoch = Julian.unsafeFromTerrestrialInstant(JulianEquinoxInstant)
+
+  lazy val MinValue: Epoch = Epoch(Julian, IntMilliYear.MinValue)
+  lazy val MaxValue: Epoch = Epoch(Julian, IntMilliYear.MaxValue)
 
   /**
     * The scheme defines an equinox instant and length of a year in terms of terrestrial days.
