@@ -12,10 +12,12 @@ import lucuma.catalog.CatalogTargetResult
 import lucuma.catalog.votable.*
 import lucuma.core.model.Target
 import lucuma.core.syntax.effect.raceAllToSuccess
+import org.http4s.Headers
 import org.http4s.Method
 import org.http4s.Request
 import org.http4s.Uri
 import org.http4s.client.Client
+import org.typelevel.ci.CIString
 
 // TODO Add Trace, we need natchez
 class GaiaClientImpl[F[_]: Concurrent](
@@ -58,13 +60,14 @@ class GaiaClientImpl[F[_]: Concurrent](
     queryUri: CatalogAdapter.Gaia => Uri,
     parser:   CatalogAdapter.Gaia => fs2.Pipe[F, String, EitherNec[CatalogProblem, A]]
   ): F[List[EitherNec[CatalogProblem, A]]] =
-    adapters.map(adapter => queryGaia(queryUri(adapter), parser(adapter))).raceAllToSuccess
+    adapters.map(adapter => queryGaia(queryUri(adapter), headersFor(adapter), parser(adapter))).raceAllToSuccess
 
   private def queryGaia[A](
     queryUri: Uri,
+    headers:  Headers,
     parser:   fs2.Pipe[F, String, EitherNec[CatalogProblem, A]]
   ): F[List[EitherNec[CatalogProblem, A]]] =
-    val request: Request[F] = Request[F](Method.GET, modUri(queryUri))
+    val request: Request[F] = Request[F](Method.GET, modUri(queryUri), headers = headers)
     httpClient
       .stream(request)
       .flatMap:
@@ -74,46 +77,27 @@ class GaiaClientImpl[F[_]: Concurrent](
       .compile
       .toList
 
+  private def headersFor(adapter: CatalogAdapter.Gaia): Headers =
+    Headers(adapter.requestHeaders.map((k, v) => org.http4s.Header.Raw(CIString(k), v)).toList)
+
   /**
    * Takes a search query and builds a uri to query gaia.
    */
   private def queryUri(adapter: CatalogAdapter.Gaia, query: ADQLQuery)(using
     intepreter: ADQLInterpreter
   ): Uri =
-    buildQueryUri(
-      adapter.uri,
-      intepreter.buildQueryString(adapter, query),
-      adapter.format
-    )
+    adapter.buildQueryUri(intepreter.buildQueryString(adapter, query))
 
   /**
    * Takes a source id and builds a uri to query gaia for that one star.
    */
-  private def queryUriById[F[_]](adapter: CatalogAdapter.Gaia, sourceId: Long): Uri =
-    buildQueryUri(
-      adapter.uri,
-      idQueryString(adapter, sourceId),
-      adapter.format
-    )
+  private def queryUriById(adapter: CatalogAdapter.Gaia, sourceId: Long): Uri =
+    adapter.buildQueryUri(idQueryString(adapter, sourceId))
 
   private def idQueryString(adapter: CatalogAdapter.Gaia, sourceId: Long): String =
     val fields = adapter.allFields.map(_.id.value.toLowerCase).mkString(",")
     f"""|SELECT $fields
-      |     FROM ${adapter.gaiaDB}
-      |     WHERE source_id = $sourceId
+        |     FROM ${adapter.gaiaDB}
+        |     WHERE source_id = $sourceId
     """.stripMargin
-
-  /**
-   * Helper method for the gaia queries.
-   */
-  private def buildQueryUri(
-    base:   Uri,
-    query:  String,
-    format: String
-  ): Uri =
-    base
-      .withQueryParam("REQUEST", "doQuery")
-      .withQueryParam("LANG", "ADQL")
-      .withQueryParam("FORMAT", format)
-      .withQueryParam("QUERY", query)
 }

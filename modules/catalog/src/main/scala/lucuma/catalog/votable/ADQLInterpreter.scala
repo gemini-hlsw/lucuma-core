@@ -26,10 +26,10 @@ trait ADQLInterpreter {
   given shapeInterpreter: ShapeInterpreter
 
   /**
-   * Builds an adql query for gaia taking input from the adapter and the query itself
+   * Builds a query for gaia taking input from the adapter and the query itself.
+   * Delegates to adapter.buildConeSearchQuery for the actual SQL generation.
    */
   def buildQueryString(adapter: CatalogAdapter.Gaia, cs: ADQLQuery): String = {
-    //
     val fields           = allFields(adapter).map(_.id.value.toLowerCase).mkString(",")
     val extraFields      = this.extraFields(cs.base)
     val extraFieldsStr   =
@@ -38,20 +38,20 @@ trait ADQLInterpreter {
     val brightnessFields = cs.adqlBrightness(adapter)
     val brightnessAdql   =
       if (brightnessFields.isEmpty) "" else brightnessFields.mkString("and (", " or ", ")")
-    val orderBy          = this.orderBy.foldMap(s => s"ORDER BY $s")
+    val orderByStr       = this.orderBy.getOrElse("")
     val extraConstraints =
       if (this.extraConstraints.isEmpty) ""
       else this.extraConstraints.mkString("and (", " and ", ")")
 
-    val query =
-      f"""|SELECT TOP ${MaxCount} $fields $extraFieldsStr
-        |     FROM ${adapter.gaiaDB}
-        |     WHERE CONTAINS(POINT('ICRS',${adapter.raField.id},${adapter.decField.id}),$shapeAdql)=1
-        |     $brightnessAdql
-        |     $extraConstraints
-        |     $orderBy
-      """.stripMargin
-    query
+    adapter.buildConeSearchQuery(
+      fields           = fields,
+      extraFields      = extraFieldsStr,
+      shapeQuery       = shapeAdql,
+      brightnessQuery  = brightnessAdql,
+      extraConstraints = extraConstraints,
+      orderBy          = orderByStr,
+      maxCount         = MaxCount
+    )
   }
 }
 
