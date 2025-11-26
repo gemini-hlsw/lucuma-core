@@ -421,7 +421,7 @@ object CatalogAdapter {
   trait GaiaGavo extends Gaia {
     override lazy val uri: Uri       = uri"https://dc.g-vo.org/__system__/tap/run/sync"
     override lazy val format: String = "votabletd"
-    // GAVO uses pos.parallax and spect.dopplerVeloc.opt;em.opt.I
+    // GAVO uses pos.parallax (no .trig) and spect.dopplerVeloc.opt;em.opt.I
     override val plxField: FieldId   =
       FieldId.unsafeFrom("parallax", Ucd.unsafeFromString("pos.parallax"))
     override val rvField: FieldId    =
