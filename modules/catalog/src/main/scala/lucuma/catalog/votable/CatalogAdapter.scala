@@ -428,6 +428,11 @@ object CatalogAdapter {
       FieldId.unsafeFrom("radial_velocity", Ucd.unsafeFromString("spect.dopplerVeloc.opt;em.opt.I"))
   }
 
+  trait GaiaDataLab extends Gaia {
+    override lazy val uri: Uri       = uri"https://datalab.noirlab.edu/tap/sync"
+    override lazy val format: String = "votable"
+  }
+
   object Gaia3Esa extends GaiaEsa {
     override lazy val gaiaDB: String   = "gaiadr3.gaia_source"
     lazy val alternateIdField: FieldId =
@@ -483,5 +488,11 @@ object CatalogAdapter {
     override val idField: FieldId          = FieldId.unsafeFrom("source_id", VoTableParser.UCD_OBJID)
     override val alternateIdField: FieldId =
       FieldId.unsafeFrom("SOURCE_ID", VoTableParser.UCD_OBJID)
+  }
+
+  object Gaia3DataLab extends GaiaDataLab {
+    override lazy val gaiaDB: String   = "gaia_dr3.gaia_source"
+    lazy val alternateIdField: FieldId =
+      FieldId.unsafeFrom("source_id", VoTableParser.UCD_OBJID)
   }
 }
