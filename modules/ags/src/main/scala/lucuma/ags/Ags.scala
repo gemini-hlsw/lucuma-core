@@ -67,21 +67,21 @@ object Ags {
 
   // Runs the analyisis for a single guide star at a single position
   protected def runAnalysis(
-    conditions:     ConstraintSet,
-    gsOffset:       Offset,
-    scienceOffsets: List[Offset],
-    pos:            AgsPosition,
-    params:         AgsParams,
-    gsc:            GuideStarCandidate,
-    speeds:         List[(GuideSpeed, BrightnessConstraints)],
-    calcs:          NonEmptyMap[AgsPosition, AgsGeomCalc]
+    conditions: ConstraintSet,
+    gsOffset:   Offset,
+    noZones:    List[Offset], // offsets not allowed, includes science targets + blind offset
+    pos:        AgsPosition,
+    params:     AgsParams,
+    gsc:        GuideStarCandidate,
+    speeds:     List[(GuideSpeed, BrightnessConstraints)],
+    calcs:      NonEmptyMap[AgsPosition, AgsGeomCalc]
   ): AgsAnalysis = {
     val geoms = calcs.lookup(pos)
     if (!geoms.exists(_.isReachable(gsOffset)))
       // Do we have a g magnitude
       val guideSpeed = gsc.gBrightness.flatMap { case (_, g) => guideSpeedFor(speeds, g) }
       AgsAnalysis.NotReachableAtPosition(pos, params.probe, guideSpeed, gsc)
-    else if (geoms.exists(g => scienceOffsets.exists(g.overlapsScience(_))))
+    else if (geoms.exists(g => noZones.exists(g.overlapsScience(_))))
       AgsAnalysis.VignettesScience(gsc, pos)
     else
       magnitudeAnalysis(
@@ -283,12 +283,14 @@ object Ags {
         .mapN { case (gsc, position) =>
           val offset     = offsetAt(baseAt, instant, gsc)
           val sciOffsets = scienceOffsetsAt(scienceAt, instant, gsc)
+          val noZones    =
+            blindOffset.flatMap(b => offsetAt(b, instant, gsc)).fold(sciOffsets)(_ :: sciOffsets)
 
           offset
             .map { offset =>
               runAnalysis(constraints,
                           offset,
-                          sciOffsets,
+                          noZones,
                           position,
                           params,
                           gsc,
@@ -329,9 +331,12 @@ object Ags {
         .mapN { (gsc, position) =>
           val offset     = baseCoordinates.diff(gsc.tracking.baseCoordinates).offset
           val sciOffsets = scienceCoordinates.map(_.diff(gsc.tracking.baseCoordinates).offset)
+          val noZones    = blindOffset
+            .map(_.diff(gsc.tracking.baseCoordinates).offset)
+            .fold(sciOffsets)(_ :: sciOffsets)
           runAnalysis(constraints,
                       offset,
-                      sciOffsets,
+                      noZones,
                       position,
                       params,
                       gsc,
@@ -378,6 +383,8 @@ object Ags {
       )
       .flatMap: gsc =>
         val sciOffsets = scienceOffsetsAt(scienceAt, instant, gsc)
+        val noZones    =
+          blindOffset.flatMap(b => offsetAt(b, instant, gsc)).fold(sciOffsets)(_ :: sciOffsets)
 
         positions.toList.map: position =>
           val oOffset = offsetAt(baseAt, instant, gsc)
@@ -385,7 +392,7 @@ object Ags {
             .map: offset =>
               runAnalysis(constraints,
                           offset,
-                          sciOffsets,
+                          noZones,
                           position,
                           params,
                           gsc,
@@ -426,11 +433,14 @@ object Ags {
       .flatMap: gsc =>
         val offset     = baseCoordinates.diff(gsc.tracking.baseCoordinates).offset
         val sciOffsets = scienceCoordinates.map(_.diff(gsc.tracking.baseCoordinates).offset)
+        val noZones    = blindOffset
+          .map(_.diff(gsc.tracking.baseCoordinates).offset)
+          .fold(sciOffsets)(_ :: sciOffsets)
 
         positions.toList.map: position =>
           runAnalysis(constraints,
                       offset,
-                      sciOffsets,
+                      noZones,
                       position,
                       params,
                       gsc,
