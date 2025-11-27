@@ -31,7 +31,7 @@ case class AgsPosition(
   offsetPos:    Offset,
   pivot:        Offset = Offset.Zero
 ) derives Order:
-  val location: Offset = (offsetPos - pivot).rotate(posAngle) + pivot
+  lazy val location: Offset = (offsetPos - pivot).rotate(posAngle) + pivot
 
 sealed trait AgsGeomCalc:
   // Indicates if the given offset is reachable
@@ -54,9 +54,6 @@ trait SingleProbeAgsParams:
 
   def scienceRadius: Angle
 
-  private def patrolField(position: AgsPosition): ShapeExpression =
-    patrolFieldAt(position.posAngle, position.offsetPos, position.pivot)
-
   def posCalculations(
     positions: NonEmptyList[AgsPosition]
   ): NonEmptyMap[AgsPosition, AgsGeomCalc] =
@@ -64,7 +61,9 @@ trait SingleProbeAgsParams:
       position -> new AgsGeomCalc() {
         override val intersectionPatrolField: ShapeExpression =
           positions
-            .map(innerPos => patrolField(innerPos.copy(posAngle = position.posAngle)))
+            .map(pos => (pos.offsetPos, pos.pivot))
+            .distinct
+            .map((offset, pivot) => patrolFieldAt(position.posAngle, offset, pivot))
             .reduce(using _ ∩ _)
 
         private val scienceAreaShape =
@@ -75,21 +74,26 @@ trait SingleProbeAgsParams:
                                           scienceRadius
           ) ↗ position.offsetPos ⟲ position.posAngle
 
-        // Cache the shape or it will be re-computed on each isReachable call
+        // Cache evaluated shapes to avoid re-computation on each call
         private val intersectionShape: Shape =
           intersectionPatrolField.eval
+
+        private val scienceTargetShape: Shape =
+          scienceTargetArea.eval
+
+        private val scienceAreaShapeEval: Shape =
+          scienceAreaShape.eval
 
         override def isReachable(gsOffset: Offset): Boolean =
           intersectionShape.contains(gsOffset)
 
         def overlapsScience(gsOffset: Offset): Boolean =
-          // Calculating with area maybe more precise but it is more costly
-          (probeArm(position.posAngle, gsOffset, position.offsetPos)
-            ∩ scienceTargetArea).maxSide.toMicroarcseconds > 5
+          probeArm(position.posAngle, gsOffset, position.offsetPos).eval
+            .intersects(scienceTargetShape)
 
         override def vignettingArea(gsOffset: Offset): Area =
-          (scienceAreaShape ∩
-            probeArm(position.posAngle, gsOffset, position.offsetPos)).eval.area
+          probeArm(position.posAngle, gsOffset, position.offsetPos).eval
+            .intersection(scienceAreaShapeEval).area
 
       }
     result.toNem
