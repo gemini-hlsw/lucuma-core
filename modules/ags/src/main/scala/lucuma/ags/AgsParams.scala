@@ -99,7 +99,8 @@ trait SingleProbeAgsParams:
 
         override def vignettingArea(gsOffset: Offset): Area =
           probeArm(position.posAngle, gsOffset, position.offsetPos).eval
-            .intersection(scienceAreaShapeEval).area
+            .intersection(scienceAreaShapeEval)
+            .area
 
       }
     result.toNem
