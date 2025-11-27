@@ -2,7 +2,7 @@ import org.scalajs.linker.interface.ESVersion
 import org.typelevel.sbt.gha.PermissionValue
 import org.typelevel.sbt.gha.Permissions
 
-ThisBuild / tlBaseVersion                         := "0.157"
+ThisBuild / tlBaseVersion                         := "0.158"
 ThisBuild / tlCiReleaseBranches                   := Seq("master")
 ThisBuild / githubWorkflowEnv += "MUNIT_FLAKY_OK" -> "true"
 
@@ -146,7 +146,7 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform)
 
 lazy val benchmarks = project
   .in(file("modules/benchmarks"))
-  .dependsOn(core.jvm)
+  .dependsOn(core.jvm, ags.jvm)
   .settings(name := "lucuma-core-benchmarks")
   .enablePlugins(NoPublishPlugin, JmhPlugin)
 

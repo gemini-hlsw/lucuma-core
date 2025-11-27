@@ -33,4 +33,10 @@ trait Shape {
   /** Angular distance from the shape's origin to its most distant vertex. */
   def radius: Angle
 
+  /** Checks if this shape intersects with another Shape */
+  def intersects(that: Shape): Boolean
+
+  /** Computes the intersection with another Shape */
+  def intersection(that: Shape): Shape
+
 }

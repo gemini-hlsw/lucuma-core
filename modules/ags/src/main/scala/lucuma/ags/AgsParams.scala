@@ -14,6 +14,7 @@ import lucuma.core.enums.GmosSouthFpu
 import lucuma.core.enums.GuideProbe
 import lucuma.core.enums.PortDisposition
 import lucuma.core.geom.Area
+import lucuma.core.geom.BoundingOffsets
 import lucuma.core.geom.Shape
 import lucuma.core.geom.ShapeExpression
 import lucuma.core.geom.jts.interpreter.given
@@ -31,7 +32,7 @@ case class AgsPosition(
   offsetPos:    Offset,
   pivot:        Offset = Offset.Zero
 ) derives Order:
-  val location: Offset = (offsetPos - pivot).rotate(posAngle) + pivot
+  lazy val location: Offset = (offsetPos - pivot).rotate(posAngle) + pivot
 
 sealed trait AgsGeomCalc:
   // Indicates if the given offset is reachable
@@ -54,9 +55,6 @@ trait SingleProbeAgsParams:
 
   def scienceRadius: Angle
 
-  private def patrolField(position: AgsPosition): ShapeExpression =
-    patrolFieldAt(position.posAngle, position.offsetPos, position.pivot)
-
   def posCalculations(
     positions: NonEmptyList[AgsPosition]
   ): NonEmptyMap[AgsPosition, AgsGeomCalc] =
@@ -64,7 +62,9 @@ trait SingleProbeAgsParams:
       position -> new AgsGeomCalc() {
         override val intersectionPatrolField: ShapeExpression =
           positions
-            .map(innerPos => patrolField(innerPos.copy(posAngle = position.posAngle)))
+            .map(pos => (pos.offsetPos, pos.pivot))
+            .distinct
+            .map((offset, pivot) => patrolFieldAt(position.posAngle, offset, pivot))
             .reduce(using _ ∩ _)
 
         private val scienceAreaShape =
@@ -75,21 +75,32 @@ trait SingleProbeAgsParams:
                                           scienceRadius
           ) ↗ position.offsetPos ⟲ position.posAngle
 
-        // Cache the shape or it will be re-computed on each isReachable call
+        // Cache shapes to avoid re-computation
         private val intersectionShape: Shape =
           intersectionPatrolField.eval
 
+        // Cache bounding box for fast rejection
+        private val intersectionBounds: BoundingOffsets =
+          intersectionShape.boundingOffsets
+
+        private val scienceTargetShape: Shape =
+          scienceTargetArea.eval
+
+        private val scienceAreaShapeEval: Shape =
+          scienceAreaShape.eval
+
         override def isReachable(gsOffset: Offset): Boolean =
-          intersectionShape.contains(gsOffset)
+          // Fast bounding box rejection, then precise check
+          intersectionBounds.contains(gsOffset) && intersectionShape.contains(gsOffset)
 
         def overlapsScience(gsOffset: Offset): Boolean =
-          // Calculating with area maybe more precise but it is more costly
-          (probeArm(position.posAngle, gsOffset, position.offsetPos)
-            ∩ scienceTargetArea).maxSide.toMicroarcseconds > 5
+          probeArm(position.posAngle, gsOffset, position.offsetPos).eval
+            .intersects(scienceTargetShape)
 
         override def vignettingArea(gsOffset: Offset): Area =
-          (scienceAreaShape ∩
-            probeArm(position.posAngle, gsOffset, position.offsetPos)).eval.area
+          probeArm(position.posAngle, gsOffset, position.offsetPos).eval
+            .intersection(scienceAreaShapeEval)
+            .area
 
       }
     result.toNem

@@ -3,6 +3,8 @@
 
 package lucuma.core.geom
 
+import cats.Order
+import cats.syntax.order.*
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 
@@ -22,6 +24,8 @@ import lucuma.core.math.Offset
  * }}}
  */
 final case class BoundingOffsets(topLeft: Offset, bottomRight: Offset) {
+
+  private given Order[Angle] = Angle.SignedAngleOrder
 
   /**
    * The vertices (p1, p2, p3, p4) are in the order indicated below:
@@ -45,4 +49,13 @@ final case class BoundingOffsets(topLeft: Offset, bottomRight: Offset) {
     val q = topLeft.q.toAngle.difference(bottomRight.q.toAngle)
     Angle.AngleOrder.max(p, q)
   }
+
+  /**
+   * Fast containment check
+   */
+  def contains(o: Offset): Boolean =
+    o.p.toAngle >= bottomRight.p.toAngle &&
+    o.p.toAngle <= topLeft.p.toAngle &&
+    o.q.toAngle >= bottomRight.q.toAngle &&
+    o.q.toAngle <= topLeft.q.toAngle
 }
