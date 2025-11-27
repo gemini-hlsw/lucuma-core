@@ -14,6 +14,7 @@ import lucuma.core.enums.GmosSouthFpu
 import lucuma.core.enums.GuideProbe
 import lucuma.core.enums.PortDisposition
 import lucuma.core.geom.Area
+import lucuma.core.geom.BoundingOffsets
 import lucuma.core.geom.Shape
 import lucuma.core.geom.ShapeExpression
 import lucuma.core.geom.jts.interpreter.given
@@ -74,9 +75,13 @@ trait SingleProbeAgsParams:
                                           scienceRadius
           ) ↗ position.offsetPos ⟲ position.posAngle
 
-        // Cache evaluated shapes to avoid re-computation on each call
+        // Cache shapes to avoid re-computation
         private val intersectionShape: Shape =
           intersectionPatrolField.eval
+
+        // Cache bounding box for fast rejection
+        private val intersectionBounds: BoundingOffsets =
+          intersectionShape.boundingOffsets
 
         private val scienceTargetShape: Shape =
           scienceTargetArea.eval
@@ -85,7 +90,8 @@ trait SingleProbeAgsParams:
           scienceAreaShape.eval
 
         override def isReachable(gsOffset: Offset): Boolean =
-          intersectionShape.contains(gsOffset)
+          // Fast bounding box rejection, then precise check
+          intersectionBounds.contains(gsOffset) && intersectionShape.contains(gsOffset)
 
         def overlapsScience(gsOffset: Offset): Boolean =
           probeArm(position.posAngle, gsOffset, position.offsetPos).eval
