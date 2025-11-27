@@ -13,6 +13,77 @@ import munit.CatsEffectSuite
 
 class OffsetGeneratorSuite extends CatsEffectSuite:
 
+  def offset(pµas: Long, qµas: Long): Offset =
+    Offset.signedMicroarcseconds.reverseGet((pµas, qµas))
+
+  def row(qµas: Long)(pµas: Long*): List[Offset] =
+    pµas.toList.map(p => offset(p, qµas))
+
+  test("uniform is correct when the region is empty"):
+    val offsets = OffsetGenerator.uniform(5.refined, Offset.Zero, Offset.Zero)
+    assertEquals(offsets.toList, List(Offset.Zero, Offset.Zero, Offset.Zero, Offset.Zero, Offset.Zero))
+
+  test("uniform is correct when the region has no width"):
+    val offsets = OffsetGenerator.uniform(5.refined, Offset.Zero, offset(0L, 10_000_000L))
+    assertEquals(
+      offsets.toList,
+      List(
+        offset(0L, 10_000_000L),
+        offset(0L,  7_500_000L),
+        offset(0L,  5_000_000L),
+        offset(0L,  2_500_000L),
+        offset(0L,          0L)
+      )
+    )
+
+  test("uniform is correct when the region has no height"):
+    val offsets = OffsetGenerator.uniform(5.refined, Offset.Zero, offset(10_000_000L, 0L))
+    assertEquals(
+      offsets.toList,
+      List(
+        offset(10_000_000L, 0L),
+        offset( 7_500_000L, 0L),
+        offset( 5_000_000L, 0L),
+        offset( 2_500_000L, 0L),
+        offset(         0L, 0L)
+      )
+    )
+
+  test("uniform selects the upper left corner"): // recall p increases to the left
+    val offsets = OffsetGenerator.uniform(1.refined, offset(10_000_000L, 5_000_000L), offset(20_000_000L, 0L))
+    assertEquals(offsets.toList, List(offset(20_000_000L, 5_000_000L)))
+
+  test("uniform respects the aspect ratio (1:1)"):
+    val offsets = OffsetGenerator.uniform(4.refined, offset(10_000_000L, 10_000_000L), offset(20_000_000L, 20_000_000L))
+    assertEquals(
+      offsets.toList,
+      row(20_000_000)(20_000_000, 10_000_000) ++
+      row(10_000_000)(20_000_000, 10_000_000)
+    )
+
+  test("uniform respects the aspect ratio (2:1)"):
+    val offsets8 = OffsetGenerator.uniform(8.refined, offset(10_000_000L, 10_000_000L), offset(30_000_000L, 20_000_000L))
+    assertEquals(
+      offsets8.toList,
+      row(20_000_000)(30_000_000, 23_333_334, 16_666_667, 10_000_000) ++
+      row(10_000_000)(30_000_000, 23_333_334, 16_666_667, 10_000_000)
+    )
+    val offsets18 = OffsetGenerator.uniform(18.refined, offset(10_000_000L, 10_000_000L), offset(30_000_000L, 20_000_000L))
+    assertEquals(
+      offsets18.toList,
+      row(20_000_000)(30_000_000, 26_000_000, 22_000_000, 18_000_000, 14_000_000, 10_000_000) ++
+      row(15_000_000)(30_000_000, 26_000_000, 22_000_000, 18_000_000, 14_000_000, 10_000_000) ++
+      row(10_000_000)(30_000_000, 26_000_000, 22_000_000, 18_000_000, 14_000_000, 10_000_000)
+    )
+
+  test("uniform respects the aspect ratio (almost 2:1)"):
+    val offsets = OffsetGenerator.uniform(8.refined, offset(10_000_000L, 10_000_000L), offset(30_000_002L, 20_000_000L))
+    assertEquals(
+      offsets.toList,
+      row(20_000_000)(30_000_002, 23_333_335, 16_666_668, 10_000_000) ++
+      row(10_000_000)(30_000_002, 23_333_335, 16_666_668, 10_000_000)
+    )
+
   test("grid generates correct number of offsets"):
     val offsets = OffsetGenerator.grid(3.refined, 4.refined, 1.arcsec, 2.arcsec)
     assertEquals(offsets.length, 12) // 3 * 4

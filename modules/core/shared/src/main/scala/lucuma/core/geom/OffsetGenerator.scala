@@ -21,6 +21,46 @@ import scala.math.sqrt
 object OffsetGenerator:
 
   /**
+   * Attempts to spread offsets uniformly, roughly matching the aspect ratio of
+   * the bounding region.
+   *
+   * @param num number of points to generate
+   * @param cornerA one corner of the bounding region
+   * @param cornerB other corner of the bounding region
+   */
+  def uniform(
+    num:     PosInt,
+    cornerA: Offset,
+    cornerB: Offset
+  ): NonEmptyList[Offset] =
+    val w = (cornerA.p.toSignedDecimalArcseconds - cornerB.p.toSignedDecimalArcseconds).abs
+    val h = (cornerA.q.toSignedDecimalArcseconds - cornerB.q.toSignedDecimalArcseconds).abs
+
+    val (rows, cols) =
+      if h <= 0.000001 then  // 1 microarcsecond, the min angle resolution
+        (1, num.value)
+      else
+        val aspectRatio = w / h
+        val cols0 = 1 max Math.sqrt(num.value * aspectRatio.doubleValue).round.toInt
+        val rows  = 1 max (num.value.toDouble / cols0).ceil.toInt
+        val cols  = (num.value.toDouble / rows).ceil.toInt
+        (rows, cols)
+
+    val stepP = if cols <= 2 then w else w / (cols - 1) // arcseconds
+    val stepQ = if rows <= 2 then h else h / (rows - 1) // arcseconds
+
+    val p0 = cornerA.p.toSignedDecimalArcseconds max cornerB.p.toSignedDecimalArcseconds  // p increases to the left
+    val q0 = cornerA.q.toSignedDecimalArcseconds max cornerB.q.toSignedDecimalArcseconds  // q increases to the top
+    val o  = Offset.signedDecimalArcseconds.reverseGet((p0, q0))
+
+    val offsets =
+      (0 until rows).toList.flatMap: r =>
+        (0 until cols).toList.map: c =>
+          o + Offset.signedDecimalArcseconds.reverseGet(-stepP * c, -stepQ * r)
+
+    NonEmptyList.fromListUnsafe(offsets.take(num.value))
+
+  /**
    * Generates a grid pattern of offsets.
    */
   def grid(nx: PosInt, ny: PosInt, dp: Angle, dq: Angle, center: Offset = Offset.Zero): NonEmptyList[Offset] =
