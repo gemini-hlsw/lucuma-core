@@ -70,14 +70,16 @@ class ShortCut_7060 extends CatsEffectSuite:
 
   val acqOffsets =
     AcquisitionOffsets(
-      NonEmptyList.of(Offset.Zero, Offset.Zero.copy(p = Offset.P(Angle.fromDoubleArcseconds(10))))
+      NonEmptyList.of(Offset.Zero.guided,
+                      Offset.Zero.copy(p = Offset.P(Angle.fromDoubleArcseconds(10))).guided
+      )
     )
   val sciOffsets =
     ScienceOffsets(
       NonEmptyList.of(
-        Offset.Zero.copy(q = Offset.Q(Angle.fromDoubleArcseconds(-15))),
-        Offset.Zero,
-        Offset.Zero.copy(q = Offset.Q(Angle.fromDoubleArcseconds(15)))
+        Offset.Zero.copy(q = Offset.Q(Angle.fromDoubleArcseconds(-15))).guided,
+        Offset.Zero.guided,
+        Offset.Zero.copy(q = Offset.Q(Angle.fromDoubleArcseconds(15))).guided
       )
     )
 

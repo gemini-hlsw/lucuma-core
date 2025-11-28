@@ -40,8 +40,8 @@ object AgsSelectionSampleStreamApp extends IOApp.Simple with AgsSelectionSample:
                     Angle.fromDoubleDegrees(-120),
                     Angle.fromDoubleDegrees(120)
                   ),
-                  Some(AcquisitionOffsets(NonEmptyList.of(Offset.Zero))),
-                  Some(ScienceOffsets(NonEmptyList.of(Offset.Zero))),
+                  Some(AcquisitionOffsets(NonEmptyList.of(Offset.Zero.guided))),
+                  Some(ScienceOffsets(NonEmptyList.of(Offset.Zero.guided))),
                   AgsParams.GmosAgsParams(
                     GmosNorthFpu.LongSlit_1_00.asLeft.some,
                     PortDisposition.Side

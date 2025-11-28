@@ -63,14 +63,17 @@ trait AgsSelectionSample {
     none
   )
 
-  val now        = Instant.ofEpochMilli(1688486539L)
+  val now        = Instant.ofEpochSecond(1688486539L)
   val wavelength = Wavelength.fromIntNanometers(600).get
 
   val acqOffsets =
-    AcquisitionOffsets(NonEmptyList.of(Offset.Zero))
+    AcquisitionOffsets(NonEmptyList.of(GuidedOffset(Offset.Zero)))
+
   val sciOffsets =
     ScienceOffsets(
-      NonEmptyList.of(Offset.Zero, Offset.Zero.copy(q = Offset.Q(Angle.fromDoubleArcseconds(15))))
+      NonEmptyList.of(GuidedOffset(Offset.Zero),
+                      GuidedOffset(Offset.Zero.copy(q = Offset.Q(Angle.fromDoubleArcseconds(15))))
+      )
     )
 
   val gmosParams = AgsParams.GmosAgsParams(
