@@ -9,6 +9,7 @@ import eu.timepit.refined.scalacheck.all.*
 import eu.timepit.refined.types.numeric.NonNegInt
 import lucuma.core.enums.ExecutionState
 import lucuma.core.enums.ObserveClass
+import lucuma.core.enums.StepGuideState
 import lucuma.core.math.Offset
 import lucuma.core.math.arb.ArbOffset
 import lucuma.core.util.arb.ArbEnumerated
@@ -28,7 +29,7 @@ trait ArbSequenceDigest:
       for
         c <- arbitrary[ObserveClass]
         t <- arbitrary[CategorizedTime]
-        o <- arbitrary[SortedSet[Offset]]
+        o <- arbitrary[SortedSet[(Offset, StepGuideState)]]
         n <- arbitrary[NonNegInt]
         s <- arbitrary[ExecutionState]
       yield SequenceDigest(c, t, o, n, s)
@@ -37,7 +38,7 @@ trait ArbSequenceDigest:
     Cogen[(
       ObserveClass,
       CategorizedTime,
-      Set[Offset],
+      Set[(Offset, StepGuideState)],
       NonNegInt,
       ExecutionState
     )].contramap: a =>
