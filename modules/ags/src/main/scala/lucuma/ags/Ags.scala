@@ -28,16 +28,21 @@ import lucuma.core.util.NewType
 
 import java.time.Instant
 
-object AcquisitionOffsets extends NewType[NonEmptyList[Offset]]:
+object GuidedOffset extends NewType[Offset]
+type GuidedOffset = GuidedOffset.Type
+
+extension (o: Offset) def guided: GuidedOffset = GuidedOffset(o)
+
+object AcquisitionOffsets extends NewType[NonEmptyList[GuidedOffset]]:
   extension (a: AcquisitionOffsets)
-    def withType: NonEmptyList[(GeometryType, Offset)] =
+    def withType: NonEmptyList[(GeometryType, GuidedOffset)] =
       a.value.tupleLeft(GeometryType.AcqOffset)
 
 type AcquisitionOffsets = AcquisitionOffsets.Type
 
-object ScienceOffsets extends NewType[NonEmptyList[Offset]]:
+object ScienceOffsets extends NewType[NonEmptyList[GuidedOffset]]:
   extension (a: ScienceOffsets)
-    def withType: NonEmptyList[(GeometryType, Offset)] =
+    def withType: NonEmptyList[(GeometryType, GuidedOffset)] =
       a.value.tupleLeft(GeometryType.SciOffset)
 
 type ScienceOffsets = ScienceOffsets.Type
@@ -173,7 +178,7 @@ object Ags {
     scienceOffsets: Option[ScienceOffsets],
     blindOffsetOff: Option[Offset] = None
   ): NonEmptyList[AgsPosition] =
-    val allOffsets: Option[NonEmptyList[(GeometryType, Offset)]] =
+    val allOffsets: Option[NonEmptyList[(GeometryType, GuidedOffset)]] =
       (acqOffsets, scienceOffsets) match
         case (Some(a), Some(s)) => (a.withType |+| s.withType).some
         case (Some(a), None)    => a.withType.some
@@ -194,7 +199,7 @@ object Ags {
             val center = (gt, blindOffsetOff) match
               case (GeometryType.AcqOffset, Some(blind)) => blind
               case _                                     => Offset.Zero
-            AgsPosition(gt, pa, off, center)
+            AgsPosition(gt, pa, off.value, center)
 
     offsetPositions.fold(basePositions)(basePositions ::: _)
 
@@ -209,7 +214,7 @@ object Ags {
 
     val acqOffsetsOnBlind: Option[AcquisitionOffsets] = (blindOffsetOff, acqOffsets) match
       case (Some(offset), Some(acqOffsets)) =>
-        AcquisitionOffsets(acqOffsets.value.map(_ + offset)).some
+        AcquisitionOffsets(acqOffsets.value.map(_.value + offset).map(GuidedOffset(_))).some
       case (Some(_), None)                  =>
         none
       case (None, acqOffsets)               =>

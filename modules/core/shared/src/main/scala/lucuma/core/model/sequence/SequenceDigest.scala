@@ -11,6 +11,7 @@ import eu.timepit.refined.cats.*
 import eu.timepit.refined.types.numeric.NonNegInt
 import lucuma.core.enums.ExecutionState
 import lucuma.core.enums.ObserveClass
+import lucuma.core.enums.StepGuideState
 import lucuma.core.math.Offset
 import monocle.Focus
 import monocle.Lens
@@ -30,7 +31,7 @@ import scala.collection.immutable.SortedSet
 case class SequenceDigest(
   observeClass:   ObserveClass,
   timeEstimate:   CategorizedTime,
-  offsets:        SortedSet[Offset],
+  offsets:        SortedSet[(Offset, StepGuideState)],
   atomCount:      NonNegInt,
   executionState: ExecutionState
 ):
@@ -39,7 +40,7 @@ case class SequenceDigest(
     SequenceDigest(
       observeClass   = observeClass |+| a.observeClass,
       timeEstimate   = timeEstimate |+| a.timeEstimate,
-      offsets        = a.steps.toList.foldLeft(offsets)((os, s) => os + s.telescopeConfig.offset),
+      offsets        = a.steps.toList.foldLeft(offsets)((os, s) => os + (s.telescopeConfig.offset -> s.telescopeConfig.guiding)),
       atomCount      = NonNegInt.unsafeFrom(atomCount.value + 1),
       executionState = executionState
     )
@@ -50,7 +51,7 @@ object SequenceDigest:
     SequenceDigest(
       Monoid[ObserveClass].empty,
       CategorizedTime.Zero,
-      SortedSet.empty,
+      SortedSet.empty[(Offset, StepGuideState)],
       NonNegInt.unsafeFrom(0),
       ExecutionState.NotStarted
     )
@@ -64,7 +65,7 @@ object SequenceDigest:
     Focus[SequenceDigest](_.timeEstimate)
 
   /** @group Optics */
-  val offsets: Lens[SequenceDigest, SortedSet[Offset]] =
+  val offsets: Lens[SequenceDigest, SortedSet[(Offset, StepGuideState)]] =
     Focus[SequenceDigest](_.offsets)
 
   /** @group Optics */
