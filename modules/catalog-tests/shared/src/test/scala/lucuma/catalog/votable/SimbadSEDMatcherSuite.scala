@@ -186,7 +186,8 @@ class SimbadSEDMatcherSuite extends FunSuite {
       val result = SimbadSEDMatcher.inferSED("WD*", Some(spectralType))
       // Result may be None if no match found (matches Python behavior)
       assert(result.isEmpty || result.isDefined,
-             s"White dwarf type $spectralType should be handled gracefully")
+             s"White dwarf type $spectralType should be handled gracefully"
+      )
     }
   }
 
@@ -199,14 +200,15 @@ class SimbadSEDMatcherSuite extends FunSuite {
       val result = SimbadSEDMatcher.inferSED("*", Some(spectralType))
       // Result may be None if no match found (matches Python behavior)
       assert(result.isEmpty || result.isDefined,
-             s"Subdwarf type $spectralType should be handled gracefully")
+             s"Subdwarf type $spectralType should be handled gracefully"
+      )
     }
   }
 
   test("galaxy morphological types should be classified correctly") {
     val ellipticalTests = List(
       ("E", GalaxySpectrum.Elliptical),
-      ("E0", GalaxySpectrum.Elliptical),  // Round elliptical - was bug
+      ("E0", GalaxySpectrum.Elliptical),   // Round elliptical - was bug
       ("E3", GalaxySpectrum.Elliptical),
       ("S0", GalaxySpectrum.Elliptical),
       ("S0/a", GalaxySpectrum.Elliptical),
