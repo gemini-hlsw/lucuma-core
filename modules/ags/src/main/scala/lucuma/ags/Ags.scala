@@ -24,28 +24,8 @@ import lucuma.core.math.Wavelength
 import lucuma.core.model.ConstraintSet
 import lucuma.core.model.ImageQuality
 import lucuma.core.util.Enumerated
-import lucuma.core.util.NewType
 
 import java.time.Instant
-
-object GuidedOffset extends NewType[Offset]
-type GuidedOffset = GuidedOffset.Type
-
-extension (o: Offset) def guided: GuidedOffset = GuidedOffset(o)
-
-object AcquisitionOffsets extends NewType[NonEmptyList[GuidedOffset]]:
-  extension (a: AcquisitionOffsets)
-    def withType: NonEmptyList[(GeometryType, GuidedOffset)] =
-      a.value.tupleLeft(GeometryType.AcqOffset)
-
-type AcquisitionOffsets = AcquisitionOffsets.Type
-
-object ScienceOffsets extends NewType[NonEmptyList[GuidedOffset]]:
-  extension (a: ScienceOffsets)
-    def withType: NonEmptyList[(GeometryType, GuidedOffset)] =
-      a.value.tupleLeft(GeometryType.SciOffset)
-
-type ScienceOffsets = ScienceOffsets.Type
 
 enum GeometryType(private val tag: String) derives Enumerated:
   case BlindOffset  extends GeometryType("blind_offset")

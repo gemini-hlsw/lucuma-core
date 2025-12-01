@@ -11,6 +11,7 @@ import cats.syntax.option.*
 import lucuma.ags.AcquisitionOffsets
 import lucuma.ags.AgsAnalysis.Usable
 import lucuma.ags.ScienceOffsets
+import lucuma.ags.syntax.*
 import lucuma.catalog.clients.GaiaClientMock
 import lucuma.catalog.votable.*
 import lucuma.core.enums.GmosSouthFpu

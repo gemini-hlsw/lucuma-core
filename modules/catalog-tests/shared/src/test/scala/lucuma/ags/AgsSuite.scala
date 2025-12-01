@@ -10,6 +10,7 @@ import lucuma.ags.AgsAnalysis.NoMagnitudeForBand
 import lucuma.ags.AgsAnalysis.Usable
 import lucuma.ags.AgsAnalysis.VignettesScience
 import lucuma.ags.ScienceOffsets
+import lucuma.ags.syntax.*
 import lucuma.core.enums.*
 import lucuma.core.geom.Area
 import lucuma.core.math.Angle

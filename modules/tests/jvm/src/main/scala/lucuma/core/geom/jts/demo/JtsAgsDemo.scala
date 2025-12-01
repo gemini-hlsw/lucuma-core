@@ -14,7 +14,7 @@ import lucuma.ags.AgsPosition
 import lucuma.ags.AgsVisualization
 import lucuma.ags.GeometryType
 import lucuma.ags.ScienceOffsets
-import lucuma.ags.guided
+import lucuma.ags.syntax.*
 import lucuma.core.enums.GmosNorthFpu
 import lucuma.core.enums.GmosSouthFpu
 import lucuma.core.enums.PortDisposition

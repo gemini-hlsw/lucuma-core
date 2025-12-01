@@ -11,6 +11,7 @@ import fs2.*
 import lucuma.ags.*
 import lucuma.ags.AcquisitionOffsets
 import lucuma.ags.ScienceOffsets
+import lucuma.ags.syntax.*
 import lucuma.catalog.clients.GaiaClient
 import lucuma.core.enums.GmosNorthFpu
 import lucuma.core.enums.PortDisposition

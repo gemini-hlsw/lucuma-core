@@ -9,8 +9,7 @@ import cats.effect.IO
 import cats.effect.IOApp
 import cats.syntax.all.*
 import lucuma.ags.*
-import lucuma.ags.AcquisitionOffsets
-import lucuma.ags.ScienceOffsets
+import lucuma.ags.syntax.*
 import lucuma.catalog.clients.GaiaClient
 import lucuma.catalog.votable.*
 import lucuma.core.enums.Flamingos2Fpu
