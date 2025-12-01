@@ -9,10 +9,8 @@ import eu.timepit.refined.scalacheck.all.*
 import eu.timepit.refined.types.numeric.NonNegInt
 import lucuma.core.enums.ExecutionState
 import lucuma.core.enums.ObserveClass
-import lucuma.core.enums.StepGuideState
-import lucuma.core.math.Offset
-import lucuma.core.math.arb.ArbOffset
 import lucuma.core.util.arb.ArbEnumerated
+import lucuma.core.model.sequence.arb.ArbTelescopeConfig.given
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.*
 import org.scalacheck.Cogen
@@ -22,14 +20,13 @@ import scala.collection.immutable.SortedSet
 trait ArbSequenceDigest:
   import ArbCategorizedTime.given
   import ArbEnumerated.given
-  import ArbOffset.given
 
   given Arbitrary[SequenceDigest] =
     Arbitrary:
       for
         c <- arbitrary[ObserveClass]
         t <- arbitrary[CategorizedTime]
-        o <- arbitrary[SortedSet[(Offset, StepGuideState)]]
+        o <- arbitrary[SortedSet[TelescopeConfig]]
         n <- arbitrary[NonNegInt]
         s <- arbitrary[ExecutionState]
       yield SequenceDigest(c, t, o, n, s)
@@ -38,14 +35,14 @@ trait ArbSequenceDigest:
     Cogen[(
       ObserveClass,
       CategorizedTime,
-      Set[(Offset, StepGuideState)],
+      Set[TelescopeConfig],
       NonNegInt,
       ExecutionState
     )].contramap: a =>
       (
         a.observeClass,
         a.timeEstimate,
-        a.offsets,
+        a.configs,
         a.atomCount,
         a.executionState
       )
