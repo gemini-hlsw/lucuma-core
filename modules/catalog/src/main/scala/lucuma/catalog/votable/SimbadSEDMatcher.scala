@@ -93,8 +93,8 @@ object SimbadSEDMatcher:
     temperatureClasses: List[String]
   ): Option[StellarLibrarySpectrum] =
 
-    // Handle edge cases upfront
-    if temperatureClasses.isEmpty && luminosityClasses.isEmpty then Some(StellarLibrarySpectrum.G2V)
+    // Handle edge cases upfront - match Python behavior: return None if no classes
+    if temperatureClasses.isEmpty && luminosityClasses.isEmpty then None
     else
       // Calculate physical parameters for target star
       StellarPhysics.calculateParameters(luminosityClasses, temperatureClasses) match {
@@ -122,18 +122,17 @@ object SimbadSEDMatcher:
               absDt < dtMax && absDg < dgMax
             }
             .map(_._1)
-            .orElse(Some(StellarLibrarySpectrum.G2V)) // Fallback to solar type
 
         case None =>
-          // Cannot calculate parameters, use fallback
-          Some(StellarLibrarySpectrum.G2V)
+          // Cannot calculate parameters - match Python behavior: return None
+          None
       }
 
   /**
    * Match galaxy morphological type to appropriate GalaxySpectrum.
    */
   private def matchGalaxySED(morphType: String): Option[UnnormalizedSED] = {
-    val ellipticalPattern  = """E[1-9:]?""".r
+    val ellipticalPattern  = """E[0-9:+]?""".r
     val s0Pattern          = """S0.*""".r
     val spiralPattern      = """S[abcABC_:]?.*""".r
     val hubbleStagePattern = """-?[0-9]+\.?[0-9]*""".r
@@ -148,7 +147,7 @@ object SimbadSEDMatcher:
       case hubbleStagePattern() =>
         // Numerical Hubble stage classification
         val hubbleStage = morphType.toDoubleOption.getOrElse(0.0)
-        if (hubbleStage < 0.0) {
+        if (hubbleStage <= -0.5) {
           Some(UnnormalizedSED.Galaxy(GalaxySpectrum.Elliptical))
         } else if (hubbleStage < 9) {
           Some(UnnormalizedSED.Galaxy(GalaxySpectrum.Spiral))
@@ -217,8 +216,6 @@ val StarTypes = Set(
   "HH",
   "MS*",
   "Be*",
-  "Ms*",
-  "SB*",
   "BS*",
   "SX*",
   "gD*",
@@ -240,7 +237,6 @@ val StarTypes = Set(
   "pA*",
   "RV*",
   "WD*",
-  "RG*",
   "Pe*",
   "a2*",
   "RC*",
@@ -252,6 +248,5 @@ val StarTypes = Set(
   "Pu*",
   "Em*",
   "PM*",
-  "HV*",
-  "**"  // Double star systems are typically stellar
+  "HV*"
 )
