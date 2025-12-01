@@ -14,6 +14,7 @@ import lucuma.ags.AgsPosition
 import lucuma.ags.AgsVisualization
 import lucuma.ags.GeometryType
 import lucuma.ags.ScienceOffsets
+import lucuma.ags.syntax.*
 import lucuma.core.enums.GmosNorthFpu
 import lucuma.core.enums.GmosSouthFpu
 import lucuma.core.enums.PortDisposition
@@ -47,16 +48,16 @@ trait GmosAgsVisualizationShapes(val posAngle: Angle) extends InstrumentShapes:
 
   val acqOffsets: AcquisitionOffsets = AcquisitionOffsets(
     NonEmptyList.of(
-      Offset(0.arcsec.p, -10.arcsec.q),
-      Offset(10.arcsec.p,  0.arcsec.q)
+      Offset(0.arcsec.p, -10.arcsec.q).guided,
+      Offset(10.arcsec.p,  0.arcsec.q).guided
     )
   )
 
   val scienceOffsets: ScienceOffsets = ScienceOffsets(
     NonEmptyList.of(
-      Offset(0.arcsec.p,  15.arcsec.q),
-      Offset.Zero,
-      Offset(0.arcsec.p, -15.arcsec.q)
+      Offset(0.arcsec.p,  15.arcsec.q).guided,
+      Offset.Zero.guided,
+      Offset(0.arcsec.p, -15.arcsec.q).guided
     )
   )
 
@@ -146,7 +147,7 @@ trait GmosAgsVisualizationShapes(val posAngle: Angle) extends InstrumentShapes:
     )
 
     val scienceOffPos = scienceOffsets.value.toList.map: offset =>
-      ColoredShape(crossAt(offset.rotate(posAngle)), Color.BLUE)
+      ColoredShape(crossAt(offset.value.rotate(posAngle)), Color.BLUE)
 
     // Acquisition offset markers - use the actual location from positions
     val acqOffPos = positions.toList

@@ -11,22 +11,16 @@ import lucuma.catalog.BrightnessConstraints
 import lucuma.catalog.FaintnessConstraint
 import lucuma.catalog.SaturationConstraint
 import lucuma.core.enums.GuideSpeed
-import lucuma.core.enums.Site
 import lucuma.core.enums.SkyBackground
 import lucuma.core.math.Angle
 import lucuma.core.math.BrightnessValue
+import lucuma.core.math.Offset
 import lucuma.core.math.Wavelength
-import lucuma.core.math.skycalc.averageParallacticAngle
 import lucuma.core.model.CloudExtinction
 import lucuma.core.model.ConstraintSet
 import lucuma.core.model.ImageQuality
-import lucuma.core.model.PosAngleConstraint
-import lucuma.core.model.Tracking
 import lucuma.core.util.Enumerated
-import lucuma.core.util.TimeSpan
-
-import java.time.Duration
-import java.time.Instant
+import lucuma.core.util.NewType
 
 val baseFwhm = Wavelength.fromIntNanometers(500).get
 
@@ -144,28 +138,19 @@ private val UnconstrainedAngles =
     (0 until 360 by 10).map(a => Angle.fromDoubleDegrees(a.toDouble)).toList
   )
 
-extension (posAngleConstraint: PosAngleConstraint)
-  def anglesToTestAt(
-    site:     Site,
-    tracking: Tracking,
-    vizTime:  Instant,
-    duration: Duration
-  ): Option[NonEmptyList[Angle]] =
-    anglesToTestAt(
-      TimeSpan
-        .fromDuration(duration)
-        .filter(_ > TimeSpan.Zero)
-        .flatMap: ts =>
-          averageParallacticAngle(site.place, tracking, vizTime, ts)
-    )
+object GuidedOffset extends NewType[Offset]
+type GuidedOffset = GuidedOffset.Type
 
-  def anglesToTestAt(
-    averageParallacticAngle: => Option[Angle]
-  ): Option[NonEmptyList[Angle]] =
-    posAngleConstraint match
-      case PosAngleConstraint.Fixed(a)               => NonEmptyList.of(a).some
-      case PosAngleConstraint.AllowFlip(a)           => NonEmptyList.of(a, a.flip).some
-      case PosAngleConstraint.ParallacticOverride(a) => NonEmptyList.of(a).some
-      case PosAngleConstraint.AverageParallactic     =>
-        averageParallacticAngle.map(a => NonEmptyList.of(a, a.flip))
-      case PosAngleConstraint.Unbounded              => UnconstrainedAngles
+object AcquisitionOffsets extends NewType[NonEmptyList[GuidedOffset]]:
+  extension (a: AcquisitionOffsets)
+    def withType: NonEmptyList[(GeometryType, GuidedOffset)] =
+      a.value.tupleLeft(GeometryType.AcqOffset)
+
+type AcquisitionOffsets = AcquisitionOffsets.Type
+
+object ScienceOffsets extends NewType[NonEmptyList[GuidedOffset]]:
+  extension (a: ScienceOffsets)
+    def withType: NonEmptyList[(GeometryType, GuidedOffset)] =
+      a.value.tupleLeft(GeometryType.SciOffset)
+
+type ScienceOffsets = ScienceOffsets.Type

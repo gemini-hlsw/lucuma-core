@@ -11,7 +11,6 @@ import eu.timepit.refined.cats.*
 import eu.timepit.refined.types.numeric.NonNegInt
 import lucuma.core.enums.ExecutionState
 import lucuma.core.enums.ObserveClass
-import lucuma.core.math.Offset
 import monocle.Focus
 import monocle.Lens
 
@@ -22,15 +21,15 @@ import scala.collection.immutable.SortedSet
  *
  * @param observeClass   ObserveClass of the sequence as a whole
  * @param plannedTime    expected execution time for the sequence
- * @param offsets        set of offsets that are expected over the course of the
- *                       sequence execution
+ * @param offsets        set of offsets and guide statesthat are expected over the
+ *                       course of the sequence execution
  * @param atomCount      number of atoms in the sequence
  * @param executionState completion state for this sequence
  */
 case class SequenceDigest(
   observeClass:   ObserveClass,
   timeEstimate:   CategorizedTime,
-  offsets:        SortedSet[Offset],
+  configs:        SortedSet[TelescopeConfig],
   atomCount:      NonNegInt,
   executionState: ExecutionState
 ):
@@ -39,7 +38,8 @@ case class SequenceDigest(
     SequenceDigest(
       observeClass   = observeClass |+| a.observeClass,
       timeEstimate   = timeEstimate |+| a.timeEstimate,
-      offsets        = a.steps.toList.foldLeft(offsets)((os, s) => os + s.telescopeConfig.offset),
+      configs        = a.steps.toList.foldLeft(configs)((os, s) =>
+                        os + TelescopeConfig(s.telescopeConfig.offset, s.telescopeConfig.guiding)),
       atomCount      = NonNegInt.unsafeFrom(atomCount.value + 1),
       executionState = executionState
     )
@@ -64,8 +64,8 @@ object SequenceDigest:
     Focus[SequenceDigest](_.timeEstimate)
 
   /** @group Optics */
-  val offsets: Lens[SequenceDigest, SortedSet[Offset]] =
-    Focus[SequenceDigest](_.offsets)
+  val configs: Lens[SequenceDigest, SortedSet[TelescopeConfig]] =
+    Focus[SequenceDigest](_.configs)
 
   /** @group Optics */
   val executionState: Lens[SequenceDigest, ExecutionState] =
@@ -80,7 +80,7 @@ object SequenceDigest:
       (
         a.observeClass,
         a.timeEstimate,
-        a.offsets,
+        a.configs,
         a.atomCount,
         a.executionState
       )

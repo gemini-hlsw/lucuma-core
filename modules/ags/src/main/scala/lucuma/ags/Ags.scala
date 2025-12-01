@@ -24,23 +24,8 @@ import lucuma.core.math.Wavelength
 import lucuma.core.model.ConstraintSet
 import lucuma.core.model.ImageQuality
 import lucuma.core.util.Enumerated
-import lucuma.core.util.NewType
 
 import java.time.Instant
-
-object AcquisitionOffsets extends NewType[NonEmptyList[Offset]]:
-  extension (a: AcquisitionOffsets)
-    def withType: NonEmptyList[(GeometryType, Offset)] =
-      a.value.tupleLeft(GeometryType.AcqOffset)
-
-type AcquisitionOffsets = AcquisitionOffsets.Type
-
-object ScienceOffsets extends NewType[NonEmptyList[Offset]]:
-  extension (a: ScienceOffsets)
-    def withType: NonEmptyList[(GeometryType, Offset)] =
-      a.value.tupleLeft(GeometryType.SciOffset)
-
-type ScienceOffsets = ScienceOffsets.Type
 
 enum GeometryType(private val tag: String) derives Enumerated:
   case BlindOffset  extends GeometryType("blind_offset")
@@ -173,7 +158,7 @@ object Ags {
     scienceOffsets: Option[ScienceOffsets],
     blindOffsetOff: Option[Offset] = None
   ): NonEmptyList[AgsPosition] =
-    val allOffsets: Option[NonEmptyList[(GeometryType, Offset)]] =
+    val allOffsets: Option[NonEmptyList[(GeometryType, GuidedOffset)]] =
       (acqOffsets, scienceOffsets) match
         case (Some(a), Some(s)) => (a.withType |+| s.withType).some
         case (Some(a), None)    => a.withType.some
@@ -194,7 +179,7 @@ object Ags {
             val center = (gt, blindOffsetOff) match
               case (GeometryType.AcqOffset, Some(blind)) => blind
               case _                                     => Offset.Zero
-            AgsPosition(gt, pa, off, center)
+            AgsPosition(gt, pa, off.value, center)
 
     offsetPositions.fold(basePositions)(basePositions ::: _)
 
@@ -209,7 +194,7 @@ object Ags {
 
     val acqOffsetsOnBlind: Option[AcquisitionOffsets] = (blindOffsetOff, acqOffsets) match
       case (Some(offset), Some(acqOffsets)) =>
-        AcquisitionOffsets(acqOffsets.value.map(_ + offset)).some
+        AcquisitionOffsets(acqOffsets.value.map(_.value + offset).map(GuidedOffset(_))).some
       case (Some(_), None)                  =>
         none
       case (None, acqOffsets)               =>
