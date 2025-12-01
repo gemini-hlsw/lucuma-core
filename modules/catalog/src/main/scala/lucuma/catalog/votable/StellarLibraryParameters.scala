@@ -3,8 +3,8 @@
 
 package lucuma.catalog.votable
 
-import lucuma.core.enums.StellarLibrarySpectrum
 import lucuma.catalog.votable.StellarPhysics.StellarParameters
+import lucuma.core.enums.StellarLibrarySpectrum
 
 /**
  * Pre-calculated physical parameters for each stellar library SED.
