@@ -23,6 +23,7 @@ import lucuma.core.math.RadialVelocity
 import lucuma.core.math.VelocityAxis
 import lucuma.core.math.dimensional.*
 import lucuma.core.math.units.*
+import lucuma.core.model.UnnormalizedSED
 import lucuma.core.syntax.string.*
 import lucuma.core.util.*
 import org.http4s.Uri
@@ -215,6 +216,9 @@ sealed trait CatalogAdapter {
     (values, errors, units).mapN(combineWithErrorsSystemAndFilter).map(_.sortBy(_._1))
   }
 
+  // Method to parse SED from the votable results
+  def parseSED(entries: Map[FieldId, String]): EitherNec[CatalogProblem, Option[UnnormalizedSED]]
+
   // Indicates if the field has a brightness value field
   protected def containsBrightnessValue(v: FieldId): Boolean =
     v.ucd.exists(_.includes(VoTableParser.UCD_MAG)) &&
@@ -272,6 +276,14 @@ object CatalogAdapter {
 
     override def isBrightnessUnitsField(v: (FieldId, String)): Boolean =
       v._1.id.value.toLowerCase.startsWith("flux_system")
+
+    override def parseSED(
+      entries: Map[FieldId, String]
+    ): EitherNec[CatalogProblem, Option[UnnormalizedSED]] =
+      val otype        = entries.get(oTypeField).getOrElse("")
+      val spectralType = entries.get(spTypeField)
+      val morphType    = entries.get(morphTypeField)
+      SimbadSEDMatcher.inferSED(otype, spectralType, morphType).rightNec
 
     // Simbad has a few special cases to map sloan band brightnesses
     def findBand(id: FieldId): Option[Band] =
@@ -477,6 +489,10 @@ object CatalogAdapter {
       v.ucd.exists(_.includes(VoTableParser.UCD_MAG)) &&
         !ignoreBrightnessValueField(v)
 
+    // Gaia has no sed
+    override def parseSED(
+      entries: Map[FieldId, String]
+    ): EitherNec[CatalogProblem, Option[UnnormalizedSED]] = none.rightNec
   }
 
   trait GaiaEsa extends Gaia {
