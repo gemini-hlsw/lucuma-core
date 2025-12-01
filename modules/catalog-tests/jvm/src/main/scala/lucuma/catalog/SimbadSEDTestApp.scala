@@ -177,14 +177,17 @@ object SimbadSEDTestApp extends IOApp:
     val sedTypes = results
       .flatMap(_.sed)
       .groupBy {
-        case UnnormalizedSED.StellarLibrary(_)  => "Stellar"
-        case UnnormalizedSED.Galaxy(_)          => "Galaxy"
-        case UnnormalizedSED.Quasar(_)          => "Quasar"
-        case UnnormalizedSED.HIIRegion(_)       => "HII Region"
-        case UnnormalizedSED.PlanetaryNebula(_) => "Planetary Nebula"
-        case UnnormalizedSED.PowerLaw(_)        => "Power Law"
-        case UnnormalizedSED.BlackBody(_)       => "Black Body"
-        case UnnormalizedSED.UserDefined(_)     => "User Defined"
+        case UnnormalizedSED.StellarLibrary(_)        => "Stellar"
+        case UnnormalizedSED.Galaxy(_)                => "Galaxy"
+        case UnnormalizedSED.Quasar(_)                => "Quasar"
+        case UnnormalizedSED.HIIRegion(_)             => "HII Region"
+        case UnnormalizedSED.PlanetaryNebula(_)       => "Planetary Nebula"
+        case UnnormalizedSED.PowerLaw(_)              => "Power Law"
+        case UnnormalizedSED.BlackBody(_)             => "Black Body"
+        case UnnormalizedSED.UserDefined(_)           => "User Defined"
+        case UnnormalizedSED.UserDefinedAttachment(_) => "User Defined"
+        case UnnormalizedSED.CoolStarModel(_)         => "Cool Star Model"
+        case UnnormalizedSED.Planet(_)                => "Planet"
       }
       .view
       .mapValues(_.length)

@@ -85,8 +85,8 @@ object SimbadSEDMatcher:
       SpectralTypeParsers.spectralType.parse(cleaned).toOption.map(_._2)
 
   /**
-   * Find the best matching StellarLibrarySpectrum for given spectral classes.
-   * Uses physics-based scoring from Stephens match_sed.py reference implementation.
+   * Find the best matching StellarLibrarySpectrum for given spectral classes. Uses physics-based
+   * scoring from Stephens match_sed.py reference implementation.
    */
   private def findBestStellarMatch(
     luminosityClasses:  List[String],
@@ -103,8 +103,8 @@ object SimbadSEDMatcher:
           val scored = StellarLibrarySpectrum.values.toList.flatMap { spectrum =>
             StellarLibraryParameters.getParameters(spectrum).map { sedParams =>
               // Calculate differences
-              val dt = sedParams.tEff - targetParams.tEff
-              val dg = sedParams.logG - targetParams.logG
+              val dt    = sedParams.tEff - targetParams.tEff
+              val dg    = sedParams.logG - targetParams.logG
               val dtMax = 0.1 * targetParams.tEff
               val dgMax = 0.5
 
@@ -117,7 +117,9 @@ object SimbadSEDMatcher:
 
           // Return best match (lowest score) if BOTH differences are within tolerance
           // This matches Python logic: abs(dt) < dt_max AND abs(dg) < dg_max
-          scored.sortBy(_._2).headOption
+          scored
+            .sortBy(_._2)
+            .headOption
             .filter { case (_, _, absDt, dtMax, absDg, dgMax) =>
               absDt < dtMax && absDg < dgMax
             }
