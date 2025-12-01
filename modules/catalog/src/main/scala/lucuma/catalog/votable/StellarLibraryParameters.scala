@@ -7,30 +7,29 @@ import lucuma.catalog.votable.StellarPhysics.StellarParameters
 import lucuma.core.enums.StellarLibrarySpectrum
 
 /**
- * Pre-calculated physical parameters for each stellar library SED.
- * Based on parsing spectral types from tag fields and calculating T_eff and log_g.
+ * Pre-calculated physical parameters for each stellar library SED. Based on parsing spectral types
+ * from tag fields and calculating T_eff and log_g.
  */
 object StellarLibraryParameters:
 
   /**
-   * Extract luminosity and temperature classes from a library spectrum tag.
-   * E.g., "G2V" -> (["V"], ["G2"])
-   *       "K1.5III" -> (["III"], ["K1.5"])
+   * Extract luminosity and temperature classes from a library spectrum tag. E.g., "G2V" -> (["V"],
+   * ["G2"]) "K1.5III" -> (["III"], ["K1.5"])
    */
   private def parseLibraryTag(tag: String): (List[String], List[String]) =
     // Handle white dwarfs (DA, DB, etc.)
     if tag.startsWith("D") then
-      val lumClass = tag.takeWhile(c => c.isLetter || c == 'A' || c == 'B' || c == 'Q' || c == 'P' || c == 'Z')
+      val lumClass  =
+        tag.takeWhile(c => c.isLetter || c == 'A' || c == 'B' || c == 'Q' || c == 'P' || c == 'Z')
       val tempClass = tag.drop(lumClass.length)
       return (List(lumClass), List(tempClass))
 
     // Handle subdwarfs
-    if tag == "sd" then
-      return (List("sd"), List.empty)
+    if tag == "sd" then return (List("sd"), List.empty)
 
     // Standard spectral types: extract Roman numerals for luminosity
     val romanPattern = """(VIII|VII|VI|IV|III|II|I|V)[ab]?""".r
-    val lumClasses = romanPattern.findAllIn(tag).toList
+    val lumClasses   = romanPattern.findAllIn(tag).toList
 
     // Extract temperature class (letter + number)
     val tempPattern = """[OBAFGKMLTY][0-9]?\.?[0-9]?[\+-]?""".r
@@ -39,8 +38,8 @@ object StellarLibraryParameters:
     (lumClasses, tempClasses)
 
   /**
-   * Map of stellar library spectra to their physical parameters.
-   * Lazy initialization to calculate parameters on first access.
+   * Map of stellar library spectra to their physical parameters. Lazy initialization to calculate
+   * parameters on first access.
    */
   lazy val parameters: Map[StellarLibrarySpectrum, StellarParameters] =
     StellarLibrarySpectrum.values.flatMap { spectrum =>

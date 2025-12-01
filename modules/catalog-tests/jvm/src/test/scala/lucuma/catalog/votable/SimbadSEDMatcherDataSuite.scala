@@ -11,15 +11,15 @@ import munit.FunSuite
 import scala.io.Source
 
 /**
- * Test suite that verifies SED matching against a dataset of Simbad entries.
- * Replicates the functionality of match_sed_test.py from the Python reference implementation.
+ * Test suite that verifies SED matching against a dataset of Simbad entries. Replicates the
+ * functionality of match_sed_test.py from the Python reference implementation.
  */
 class SimbadSEDMatcherDataSuite extends FunSuite:
 
   case class SimbadEntry(
-    mainId:     String,
-    otype:      String,
-    morphType:  String,
+    mainId:       String,
+    otype:        String,
+    morphType:    String,
     spectralType: String
   )
 
@@ -34,15 +34,16 @@ class SimbadSEDMatcherDataSuite extends FunSuite:
     val stream = getClass.getResourceAsStream("/simbad-sed-test-data.dat")
     val source = Source.fromInputStream(stream)
     try
-      source.getLines()
+      source
+        .getLines()
         .drop(1) // Skip header line
         .map { line =>
           // Parse space-separated format with quoted fields
           val parts = parseDataLine(line)
           if parts.length >= 4 then
-            val mainId = parts(0).replace("\"", "")
-            val otype = parts(1)
-            val morphType = parts(2).replace("\"", "")
+            val mainId       = parts(0).replace("\"", "")
+            val otype        = parts(1)
+            val morphType    = parts(2).replace("\"", "")
             val spectralType = parts(3).replace("\"", "")
             Some(SimbadEntry(mainId, otype, morphType, spectralType))
           else None
@@ -53,31 +54,37 @@ class SimbadSEDMatcherDataSuite extends FunSuite:
       source.close()
 
   /**
-   * Parse a data line handling quoted fields.
-   * Simple parser for format: "field1" field2 "field3" "field4"
+   * Parse a data line handling quoted fields. Simple parser for format: "field1" field2 "field3"
+   * "field4"
    */
   private def parseDataLine(line: String): Array[String] =
     val pattern = """"([^"]*)"|(\S+)""".r
-    pattern.findAllMatchIn(line).map { m =>
-      if m.group(1) != null then m.group(1) else m.group(2)
-    }.toArray
+    pattern
+      .findAllMatchIn(line)
+      .map { m =>
+        if m.group(1) != null then m.group(1) else m.group(2)
+      }
+      .toArray
 
   // Run SED matcher on all test data
   lazy val matchResults: List[MatchResult] =
     testData.map { entry =>
-      val morphTypeOpt = if entry.morphType.isEmpty then None else Some(entry.morphType)
+      val morphTypeOpt    = if entry.morphType.isEmpty then None else Some(entry.morphType)
       val spectralTypeOpt = if entry.spectralType.isEmpty then None else Some(entry.spectralType)
-      val sed = SimbadSEDMatcher.inferSED(entry.otype, spectralTypeOpt, morphTypeOpt)
+      val sed             = SimbadSEDMatcher.inferSED(entry.otype, spectralTypeOpt, morphTypeOpt)
 
       val category = sed.map {
-        case UnnormalizedSED.StellarLibrary(_) => "star"
-        case UnnormalizedSED.Galaxy(_) => "galaxy"
-        case UnnormalizedSED.Quasar(_) => "quasar"
-        case UnnormalizedSED.HIIRegion(_) => "hii"
-        case UnnormalizedSED.PlanetaryNebula(_) => "pn"
-        case UnnormalizedSED.PowerLaw(_) => "powerlaw"
-        case UnnormalizedSED.BlackBody(_) => "blackbody"
-        case UnnormalizedSED.UserDefined(_) => "user"
+        case UnnormalizedSED.StellarLibrary(_)        => "star"
+        case UnnormalizedSED.Galaxy(_)                => "galaxy"
+        case UnnormalizedSED.CoolStarModel(_)         => "coolstarmodel"
+        case UnnormalizedSED.Planet(_)                => "planet"
+        case UnnormalizedSED.Quasar(_)                => "quasar"
+        case UnnormalizedSED.HIIRegion(_)             => "hii"
+        case UnnormalizedSED.PlanetaryNebula(_)       => "pn"
+        case UnnormalizedSED.PowerLaw(_)              => "powerlaw"
+        case UnnormalizedSED.BlackBody(_)             => "blackbody"
+        case UnnormalizedSED.UserDefined(_)           => "user"
+        case UnnormalizedSED.UserDefinedAttachment(_) => "user"
       }
 
       MatchResult(entry, sed, category)
@@ -97,38 +104,47 @@ class SimbadSEDMatcherDataSuite extends FunSuite:
 
   test("identify star object types") {
     val starResults = matchResults.filter(r =>
-      Set("*", "PM*", "SB*", "s*r", "LP*", "**", "BY*", "HV*", "HS*", "WD*",
-          "Be*", "Y*O", "delSctV*").contains(r.entry.otype)
+      Set("*",
+          "PM*",
+          "SB*",
+          "s*r",
+          "LP*",
+          "**",
+          "BY*",
+          "HV*",
+          "HS*",
+          "WD*",
+          "Be*",
+          "Y*O",
+          "delSctV*"
+      ).contains(r.entry.otype)
     )
     // These should either get a stellar SED or None (if otype not recognized)
     starResults.foreach { result =>
       result.sed match {
         case Some(UnnormalizedSED.StellarLibrary(_)) => // OK
-        case None => // OK - otype not recognized (e.g., PulsV*delSct, delSctV*)
-        case other => fail(s"Star ${result.entry.mainId} (${result.entry.otype}) got unexpected SED: $other")
+        case None                                    => // OK - otype not recognized (e.g., PulsV*delSct, delSctV*)
+        case other                                   =>
+          fail(s"Star ${result.entry.mainId} (${result.entry.otype}) got unexpected SED: $other")
       }
     }
   }
 
   test("identify galaxy object types") {
     // Filter for galaxy types (not including SyG/Sy2 which are Quasar types per Python)
-    val galaxyResults = matchResults.filter(r =>
-      GalaxyTypes.contains(r.entry.otype)
-    )
+    val galaxyResults = matchResults.filter(r => GalaxyTypes.contains(r.entry.otype))
     assert(galaxyResults.nonEmpty, "Should have galaxy entries in test data")
     galaxyResults.foreach { result =>
       result.sed match {
         case Some(UnnormalizedSED.Galaxy(_)) => // OK
-        case None => // OK - no morphological type or doesn't match
-        case other => fail(s"Galaxy ${result.entry.mainId} got unexpected SED: $other")
+        case None                            => // OK - no morphological type or doesn't match
+        case other                           => fail(s"Galaxy ${result.entry.mainId} got unexpected SED: $other")
       }
     }
   }
 
   test("identify quasar object types") {
-    val quasarResults = matchResults.filter(r =>
-      Set("QSO", "BLL").contains(r.entry.otype)
-    )
+    val quasarResults = matchResults.filter(r => Set("QSO", "BLL").contains(r.entry.otype))
     assert(quasarResults.nonEmpty, "Should have quasar entries in test data")
     quasarResults.foreach { result =>
       assertEquals(result.sed, Some(UnnormalizedSED.Quasar(QuasarSpectrum.QS0)))
@@ -147,14 +163,18 @@ class SimbadSEDMatcherDataSuite extends FunSuite:
     val pnResults = matchResults.filter(r => r.entry.otype == "PN")
     assert(pnResults.nonEmpty, "Should have PN entries in test data")
     pnResults.foreach { result =>
-      assertEquals(result.sed, Some(UnnormalizedSED.PlanetaryNebula(PlanetaryNebulaSpectrum.NGC7009)))
+      assertEquals(result.sed,
+                   Some(UnnormalizedSED.PlanetaryNebula(PlanetaryNebulaSpectrum.NGC7009))
+      )
     }
   }
 
   test("match stellar spectral types correctly") {
     val sunResult = matchResults.find(_.entry.mainId == "Sun")
     assert(sunResult.isDefined)
-    assertEquals(sunResult.get.sed, Some(UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.G2V)))
+    assertEquals(sunResult.get.sed,
+                 Some(UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.G2V))
+    )
   }
 
   test("handle white dwarf spectral types") {
@@ -163,8 +183,8 @@ class SimbadSEDMatcherDataSuite extends FunSuite:
     wdResults.foreach { result =>
       result.sed match {
         case Some(UnnormalizedSED.StellarLibrary(_)) => // OK - found a match
-        case None => // OK - no match found (matches Python behavior)
-        case other => fail(s"White dwarf ${result.entry.mainId} got unexpected SED: $other")
+        case None                                    => // OK - no match found (matches Python behavior)
+        case other                                   => fail(s"White dwarf ${result.entry.mainId} got unexpected SED: $other")
       }
     }
   }
@@ -178,8 +198,8 @@ class SimbadSEDMatcherDataSuite extends FunSuite:
     sdResults.foreach { result =>
       result.sed match {
         case Some(UnnormalizedSED.StellarLibrary(_)) => // OK - found a match
-        case None => // OK - no match found (matches Python behavior)
-        case other => fail(s"Subdwarf ${result.entry.mainId} got unexpected SED: $other")
+        case None                                    => // OK - no match found (matches Python behavior)
+        case other                                   => fail(s"Subdwarf ${result.entry.mainId} got unexpected SED: $other")
       }
     }
   }
@@ -197,11 +217,12 @@ class SimbadSEDMatcherDataSuite extends FunSuite:
   }
 
   test("print summary statistics") {
-    val total = matchResults.length
-    val matched = matchResults.count(_.sed.isDefined)
+    val total     = matchResults.length
+    val matched   = matchResults.count(_.sed.isDefined)
     val unmatched = total - matched
 
-    val byCat = matchResults.filter(_.sed.isDefined).groupBy(_.category.get).view.mapValues(_.length).toMap
+    val byCat =
+      matchResults.filter(_.sed.isDefined).groupBy(_.category.get).view.mapValues(_.length).toMap
 
     println(s"\n=== SED Matching Results ===")
     println(s"Total entries: $total")
@@ -218,7 +239,9 @@ class SimbadSEDMatcherDataSuite extends FunSuite:
     if unmatchedEntries.nonEmpty then
       println("Sample unmatched entries:")
       unmatchedEntries.foreach { result =>
-        println(s"  ${result.entry.mainId}: otype=${result.entry.otype}, sp_type=${result.entry.spectralType}")
+        println(
+          s"  ${result.entry.mainId}: otype=${result.entry.otype}, sp_type=${result.entry.spectralType}"
+        )
       }
       println()
   }
@@ -230,7 +253,8 @@ class SimbadSEDMatcherDataSuite extends FunSuite:
     // Returns None if outside tolerance (matches Python behavior)
     val o9Result = SimbadSEDMatcher.inferSED("*", Some("O9.7IIn"), None)
     assert(o9Result.isEmpty || o9Result.exists(_.isInstanceOf[UnnormalizedSED.StellarLibrary]),
-           s"O9.7IIn should return None or StellarLibrary, got $o9Result")
+           s"O9.7IIn should return None or StellarLibrary, got $o9Result"
+    )
 
     // A0V should match A0V
     val a0Result = SimbadSEDMatcher.inferSED("*", Some("A0V"), None)
