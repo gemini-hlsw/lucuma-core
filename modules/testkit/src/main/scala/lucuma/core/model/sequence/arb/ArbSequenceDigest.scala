@@ -9,8 +9,8 @@ import eu.timepit.refined.scalacheck.all.*
 import eu.timepit.refined.types.numeric.NonNegInt
 import lucuma.core.enums.ExecutionState
 import lucuma.core.enums.ObserveClass
-import lucuma.core.util.arb.ArbEnumerated
 import lucuma.core.model.sequence.arb.ArbTelescopeConfig.given
+import lucuma.core.util.arb.ArbEnumerated
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.*
 import org.scalacheck.Cogen
