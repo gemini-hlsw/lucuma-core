@@ -16,7 +16,6 @@ import fs2.data.xml.XmlEvent.*
 import lucuma.catalog.*
 import lucuma.catalog.votable.*
 import lucuma.catalog.votable.CatalogProblem.*
-import lucuma.core.enums.CatalogName
 import lucuma.core.math.*
 import lucuma.core.math.units.*
 import lucuma.core.model.CatalogInfo
@@ -24,6 +23,7 @@ import lucuma.core.model.SiderealTracking
 import lucuma.core.model.SourceProfile
 import lucuma.core.model.SpectralDefinition
 import lucuma.core.model.Target
+import lucuma.core.model.UnnormalizedSED
 import lucuma.core.refined.auto.*
 import monocle.Focus
 import monocle.Lens
@@ -303,30 +303,23 @@ trait VoTableParser {
       }
     }
 
+    def parseSED: EitherNec[CatalogProblem, Option[UnnormalizedSED]] = adapter.parseSED(entries)
+
     def parseSiderealTarget: EitherNec[CatalogProblem, CatalogTargetResult] =
       (parseName(adapter, entries),
        parseSiderealTracking(adapter, entries),
        parseBandBrightnesses,
        parseCatalogInfo,
-       parseAngularSize
+       parseAngularSize,
+       parseSED
       )
-        .parMapN { (name, pm, brightnesses, info, angSize) =>
-          // Infer SED for Simbad catalogs using object type and spectral classification
-          val inferredSED = if (adapter.catalog == CatalogName.Simbad) {
-            val otype        = entries.get(adapter.oTypeField).getOrElse("")
-            val spectralType = entries.get(adapter.spTypeField)
-            val morphType    = entries.get(adapter.morphTypeField)
-            SimbadSEDMatcher.inferSED(otype, spectralType, morphType)
-          } else {
-            None
-          }
-
+        .parMapN { (name, pm, brightnesses, info, angSize, sed) =>
           CatalogTargetResult(
             Target.Sidereal(
               name,
               pm,
               SourceProfile.Point(
-                SpectralDefinition.BandNormalized(inferredSED, SortedMap.from(brightnesses))
+                SpectralDefinition.BandNormalized(sed, SortedMap.from(brightnesses))
               ),
               info
             ),
@@ -359,24 +352,20 @@ trait VoTableParser {
           }
       }
 
-    def parseSiderealTarget: EitherNec[CatalogProblem, Target.Sidereal] =
-      (parseName(adapter, entries), parseSiderealTracking(adapter, entries), parseBandBrightnesses)
-        .parMapN { (name, tracking, brightnesses) =>
-          // Infer SED for Simbad catalogs using object type and spectral classification
-          val inferredSED = if (adapter.catalog == CatalogName.Simbad) {
-            val otype        = entries.get(adapter.oTypeField).getOrElse("")
-            val spectralType = entries.get(adapter.spTypeField)
-            val morphType    = entries.get(adapter.morphTypeField)
-            SimbadSEDMatcher.inferSED(otype, spectralType, morphType)
-          } else {
-            None
-          }
+    def parseSED: EitherNec[CatalogProblem, Option[UnnormalizedSED]] = adapter.parseSED(entries)
 
+    def parseSiderealTarget: EitherNec[CatalogProblem, Target.Sidereal] =
+      (parseName(adapter, entries),
+       parseSiderealTracking(adapter, entries),
+       parseBandBrightnesses,
+       parseSED
+      )
+        .parMapN { (name, tracking, brightnesses, sed) =>
           Target.Sidereal(
             name,
             tracking,
             SourceProfile.Point(
-              SpectralDefinition.BandNormalized(inferredSED, SortedMap.from(brightnesses))
+              SpectralDefinition.BandNormalized(sed, SortedMap.from(brightnesses))
             ),
             none
           )
