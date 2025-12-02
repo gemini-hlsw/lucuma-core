@@ -27,3 +27,6 @@ object TelescopeConfig:
   /** @group Optics */
   val guiding: Lens[TelescopeConfig, StepGuideState] =
     Focus[TelescopeConfig](_.guiding)
+
+  // Explicitly define ordering to avoid auto derivation
+  given Ordering[TelescopeConfig] = Order[TelescopeConfig].toOrdering
