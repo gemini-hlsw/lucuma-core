@@ -17,6 +17,8 @@ import munit.*
 import org.scalacheck.Prop.forAll
 import org.scalacheck.Prop.propBoolean
 
+import scala.collection.immutable.SortedSet
+
 class SequenceDigestSuite extends DisciplineSuite:
   checkAll("Eq[SequenceDigest]",            EqTests[SequenceDigest].eqv)
   checkAll("SequenceDigest.observeClass",   LensTests(SequenceDigest.observeClass))
@@ -29,4 +31,4 @@ class SequenceDigestSuite extends DisciplineSuite:
     forAll: (a: Atom[Unit]) =>
       val sd = SequenceDigest.Zero.add(a)
       val result = a.steps.toList.map(s => TelescopeConfig(s.telescopeConfig.offset, s.telescopeConfig.guiding))
-      sd.configs === result
+      sd.configs === SortedSet.from(result)

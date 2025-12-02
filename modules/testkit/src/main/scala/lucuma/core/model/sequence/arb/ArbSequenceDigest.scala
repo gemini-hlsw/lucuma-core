@@ -14,6 +14,8 @@ import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.*
 import org.scalacheck.Cogen
 
+import scala.collection.immutable.SortedSet
+
 trait ArbSequenceDigest:
   import ArbCategorizedTime.given
   import ArbEnumerated.given
@@ -23,7 +25,7 @@ trait ArbSequenceDigest:
       for
         c <- arbitrary[ObserveClass]
         t <- arbitrary[CategorizedTime]
-        o <- arbitrary[List[TelescopeConfig]]
+        o <- arbitrary[SortedSet[TelescopeConfig]]
         n <- arbitrary[NonNegInt]
         s <- arbitrary[ExecutionState]
       yield SequenceDigest(c, t, o, n, s)
@@ -32,7 +34,7 @@ trait ArbSequenceDigest:
     Cogen[(
       ObserveClass,
       CategorizedTime,
-      List[TelescopeConfig],
+      Set[TelescopeConfig],
       NonNegInt,
       ExecutionState
     )].contramap: a =>
