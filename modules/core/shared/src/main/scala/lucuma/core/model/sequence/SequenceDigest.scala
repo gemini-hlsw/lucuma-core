@@ -26,21 +26,20 @@ import scala.collection.immutable.SortedSet
  * @param executionState completion state for this sequence
  */
 case class SequenceDigest(
-  observeClass:   ObserveClass,
-  timeEstimate:   CategorizedTime,
-  configs:        SortedSet[TelescopeConfig],
-  atomCount:      NonNegInt,
-  executionState: ExecutionState
+  observeClass:     ObserveClass,
+  timeEstimate:     CategorizedTime,
+  telescopeConfigs: SortedSet[TelescopeConfig],
+  atomCount:        NonNegInt,
+  executionState:   ExecutionState
 ):
 
   def add[D](a: Atom[D]): SequenceDigest =
     SequenceDigest(
-      observeClass   = observeClass |+| a.observeClass,
-      timeEstimate   = timeEstimate |+| a.timeEstimate,
-      configs        = configs ++ a.steps.toList.map: s =>
-                        TelescopeConfig(s.telescopeConfig.offset, s.telescopeConfig.guiding),
-      atomCount      = NonNegInt.unsafeFrom(atomCount.value + 1),
-      executionState = executionState
+      observeClass     = observeClass |+| a.observeClass,
+      timeEstimate     = timeEstimate |+| a.timeEstimate,
+      telescopeConfigs = telescopeConfigs ++ a.steps.toList.map(_.telescopeConfig),
+      atomCount        = NonNegInt.unsafeFrom(atomCount.value + 1),
+      executionState   = executionState
     )
 
 object SequenceDigest:
@@ -64,7 +63,7 @@ object SequenceDigest:
 
   /** @group Optics */
   val configs: Lens[SequenceDigest, SortedSet[TelescopeConfig]] =
-    Focus[SequenceDigest](_.configs)
+    Focus[SequenceDigest](_.telescopeConfigs)
 
   /** @group Optics */
   val executionState: Lens[SequenceDigest, ExecutionState] =
@@ -79,7 +78,7 @@ object SequenceDigest:
       (
         a.observeClass,
         a.timeEstimate,
-        a.configs,
+        a.telescopeConfigs,
         a.atomCount,
         a.executionState
       )

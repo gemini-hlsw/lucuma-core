@@ -41,7 +41,7 @@ trait ArbSequenceDigest:
       (
         a.observeClass,
         a.timeEstimate,
-        a.configs,
+        a.telescopeConfigs,
         a.atomCount,
         a.executionState
       )

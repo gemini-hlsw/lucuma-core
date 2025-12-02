@@ -31,4 +31,4 @@ class SequenceDigestSuite extends DisciplineSuite:
     forAll: (a: Atom[Unit]) =>
       val sd = SequenceDigest.Zero.add(a)
       val result = a.steps.toList.map(s => TelescopeConfig(s.telescopeConfig.offset, s.telescopeConfig.guiding))
-      sd.configs === SortedSet.from(result)
+      sd.telescopeConfigs === SortedSet.from(result)
