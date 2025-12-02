@@ -5,7 +5,6 @@ package lucuma.core.model.sequence
 
 import cats.Eq
 import cats.Monoid
-import cats.Order.catsKernelOrderingForOrder
 import cats.syntax.monoid.*
 import eu.timepit.refined.cats.*
 import eu.timepit.refined.types.numeric.NonNegInt
@@ -21,27 +20,26 @@ import scala.collection.immutable.SortedSet
  *
  * @param observeClass   ObserveClass of the sequence as a whole
  * @param plannedTime    expected execution time for the sequence
- * @param offsets        set of offsets and guide statesthat are expected over the
+ * @param configs        set of offsets and guide states that are expected over the
  *                       course of the sequence execution
  * @param atomCount      number of atoms in the sequence
  * @param executionState completion state for this sequence
  */
 case class SequenceDigest(
-  observeClass:   ObserveClass,
-  timeEstimate:   CategorizedTime,
-  configs:        SortedSet[TelescopeConfig],
-  atomCount:      NonNegInt,
-  executionState: ExecutionState
+  observeClass:     ObserveClass,
+  timeEstimate:     CategorizedTime,
+  telescopeConfigs: SortedSet[TelescopeConfig],
+  atomCount:        NonNegInt,
+  executionState:   ExecutionState
 ):
 
   def add[D](a: Atom[D]): SequenceDigest =
     SequenceDigest(
-      observeClass   = observeClass |+| a.observeClass,
-      timeEstimate   = timeEstimate |+| a.timeEstimate,
-      configs        = a.steps.toList.foldLeft(configs)((os, s) =>
-                        os + TelescopeConfig(s.telescopeConfig.offset, s.telescopeConfig.guiding)),
-      atomCount      = NonNegInt.unsafeFrom(atomCount.value + 1),
-      executionState = executionState
+      observeClass     = observeClass |+| a.observeClass,
+      timeEstimate     = timeEstimate |+| a.timeEstimate,
+      telescopeConfigs = telescopeConfigs ++ a.steps.toList.map(_.telescopeConfig),
+      atomCount        = NonNegInt.unsafeFrom(atomCount.value + 1),
+      executionState   = executionState
     )
 
 object SequenceDigest:
@@ -65,7 +63,7 @@ object SequenceDigest:
 
   /** @group Optics */
   val configs: Lens[SequenceDigest, SortedSet[TelescopeConfig]] =
-    Focus[SequenceDigest](_.configs)
+    Focus[SequenceDigest](_.telescopeConfigs)
 
   /** @group Optics */
   val executionState: Lens[SequenceDigest, ExecutionState] =
@@ -80,7 +78,7 @@ object SequenceDigest:
       (
         a.observeClass,
         a.timeEstimate,
-        a.configs,
+        a.telescopeConfigs,
         a.atomCount,
         a.executionState
       )

@@ -4,7 +4,6 @@
 package lucuma.core.model.sequence
 package arb
 
-import cats.Order.catsKernelOrderingForOrder
 import eu.timepit.refined.scalacheck.all.*
 import eu.timepit.refined.types.numeric.NonNegInt
 import lucuma.core.enums.ExecutionState
@@ -42,7 +41,7 @@ trait ArbSequenceDigest:
       (
         a.observeClass,
         a.timeEstimate,
-        a.configs,
+        a.telescopeConfigs,
         a.atomCount,
         a.executionState
       )

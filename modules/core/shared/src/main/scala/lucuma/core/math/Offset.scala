@@ -94,6 +94,10 @@ object Offset extends OffsetOptics {
   given Order[Offset] =
     Order.by(o => (o.p, o.q))
 
+  // Explicitly define ordering
+  given Ordering[Offset] = 
+    Order[Offset].toOrdering
+
   def symmetric(a: Angle): Offset =
     Offset(Component(a), Component(a))
 
