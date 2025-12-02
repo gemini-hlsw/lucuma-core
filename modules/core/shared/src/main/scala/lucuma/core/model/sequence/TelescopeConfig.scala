@@ -4,7 +4,6 @@
 package lucuma.core.model.sequence
 
 import cats.Order
-import cats.derived.*
 import lucuma.core.enums.StepGuideState
 import lucuma.core.math.Offset
 import monocle.Focus
@@ -13,7 +12,7 @@ import monocle.Lens
 case class TelescopeConfig(
   offset:  Offset,
   guiding: StepGuideState
-) derives Order
+)
 
 object TelescopeConfig:
 
@@ -27,6 +26,8 @@ object TelescopeConfig:
   /** @group Optics */
   val guiding: Lens[TelescopeConfig, StepGuideState] =
     Focus[TelescopeConfig](_.guiding)
+
+  given Order[TelescopeConfig] = Order.by(t => (t.offset, t.guiding))
 
   // Explicitly define ordering to avoid auto derivation
   given Ordering[TelescopeConfig] = Order[TelescopeConfig].toOrdering
