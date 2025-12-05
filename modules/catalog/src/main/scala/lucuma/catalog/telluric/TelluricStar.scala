@@ -13,8 +13,15 @@ import lucuma.catalog.telluric.codecs.given
 import lucuma.core.enums.TelluricCalibrationOrder
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Declination
+import lucuma.core.math.Epoch
 import lucuma.core.math.RightAscension
+import lucuma.core.model.SiderealTracking
+import lucuma.core.model.SourceProfile
+import lucuma.core.model.SpectralDefinition
+import lucuma.core.model.Target
 import lucuma.core.model.TelluricType
+
+import scala.collection.immutable.SortedMap
 
 case class TelluricStar(
   hip:         Int,
@@ -26,6 +33,22 @@ case class TelluricStar(
   order:       TelluricCalibrationOrder
 ):
   val simbadName: NonEmptyString = NonEmptyString.unsafeFrom(s"HIP $hip")
+
+  def asSiderealTarget: Target.Sidereal =
+    Target.Sidereal(
+      name = simbadName,
+      tracking = SiderealTracking(
+        baseCoordinates = coordinates,
+        epoch = Epoch.J2000,
+        properMotion = None,
+        radialVelocity = None,
+        parallax = None
+      ),
+      sourceProfile = SourceProfile.Point(
+        SpectralDefinition.BandNormalized(None, SortedMap.empty)
+      ),
+      catalogInfo = None
+    )
 
 object TelluricStar:
   given Decoder[TelluricStar] = c =>
