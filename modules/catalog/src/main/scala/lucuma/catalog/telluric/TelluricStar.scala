@@ -3,6 +3,7 @@
 
 package lucuma.catalog.telluric
 
+import cats.syntax.option.*
 import eu.timepit.refined.types.string.NonEmptyString
 import io.circe.Decoder
 import io.circe.DecodingFailure
@@ -10,11 +11,13 @@ import io.circe.Encoder
 import io.circe.Json
 import io.circe.syntax.*
 import lucuma.catalog.telluric.codecs.given
+import lucuma.core.enums.CatalogName
 import lucuma.core.enums.TelluricCalibrationOrder
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Declination
 import lucuma.core.math.Epoch
 import lucuma.core.math.RightAscension
+import lucuma.core.model.CatalogInfo
 import lucuma.core.model.SiderealTracking
 import lucuma.core.model.SourceProfile
 import lucuma.core.model.SpectralDefinition
@@ -47,7 +50,7 @@ case class TelluricStar(
       sourceProfile = SourceProfile.Point(
         SpectralDefinition.BandNormalized(None, SortedMap.empty)
       ),
-      catalogInfo = None
+      catalogInfo = CatalogInfo(CatalogName.Telluric, simbadName, none).some
     )
 
 object TelluricStar:
