@@ -26,8 +26,8 @@ trait ADQLInterpreter {
   given shapeInterpreter: ShapeInterpreter
 
   /**
-   * Builds a query for gaia taking input from the adapter and the query itself.
-   * Delegates to adapter.buildConeSearchQuery for the actual SQL generation.
+   * Builds a query for gaia taking input from the adapter and the query itself. Delegates to
+   * adapter.buildConeSearchQuery for the actual SQL generation.
    */
   def buildQueryString(adapter: CatalogAdapter.Gaia, cs: ADQLQuery): String = {
     val fields           = allFields(adapter).map(_.id.value.toLowerCase).mkString(",")
@@ -44,13 +44,13 @@ trait ADQLInterpreter {
       else this.extraConstraints.mkString("and (", " and ", ")")
 
     adapter.buildConeSearchQuery(
-      fields           = fields,
-      extraFields      = extraFieldsStr,
-      shapeQuery       = shapeAdql,
-      brightnessQuery  = brightnessAdql,
+      fields = fields,
+      extraFields = extraFieldsStr,
+      shapeQuery = shapeAdql,
+      brightnessQuery = brightnessAdql,
       extraConstraints = extraConstraints,
-      orderBy          = orderByStr,
-      maxCount         = MaxCount
+      orderBy = orderByStr,
+      maxCount = MaxCount
     )
   }
 }
