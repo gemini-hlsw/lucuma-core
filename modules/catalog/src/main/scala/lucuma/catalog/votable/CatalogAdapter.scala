@@ -331,8 +331,8 @@ object CatalogAdapter {
     def requestHeaders: Map[String, String] = Map.empty
 
     /**
-     * Build the full query string for a cone search.
-     * Default implementation uses ADQL syntax. Override for non-ADQL backends.
+     * Build the full query string for a cone search. Default implementation uses ADQL syntax.
+     * Override for non-ADQL backends.
      */
     def buildConeSearchQuery(
       fields:           String,
@@ -504,7 +504,7 @@ object CatalogAdapter {
       maxCount:         Int
     ): String = {
       // Parse CIRCLE('ICRS', ra, dec, radius) to extract coordinates
-      val circlePattern = """CIRCLE\('ICRS',\s*([\d.-]+),\s*([\d.-]+),\s*([\d.-]+)\)""".r
+      val circlePattern                 = """CIRCLE\('ICRS',\s*([\d.-]+),\s*([\d.-]+),\s*([\d.-]+)\)""".r
       val (centerRa, centerDec, radius) = shapeQuery match {
         case circlePattern(ra, dec, r) => (ra, dec, r)
         case _                         => ("0", "0", "0.1") // fallback
@@ -512,12 +512,14 @@ object CatalogAdapter {
 
       // Convert brightness query from ADQL to PostgreSQL
       // Replace "and (" prefix and " or " with PostgreSQL syntax
-      val pgBrightness = if (brightnessQuery.isEmpty) ""
-                         else brightnessQuery.replace("and (", "AND (").replace(" or ", " OR ")
+      val pgBrightness =
+        if (brightnessQuery.isEmpty) ""
+        else brightnessQuery.replace("and (", "AND (").replace(" or ", " OR ")
 
       // Convert extra constraints
-      val pgConstraints = if (extraConstraints.isEmpty) ""
-                          else extraConstraints.replace("and (", "AND (").replace(" and ", " AND ")
+      val pgConstraints =
+        if (extraConstraints.isEmpty) ""
+        else extraConstraints.replace("and (", "AND (").replace(" and ", " AND ")
 
       // PostgreSQL ORDER BY (no "ORDER BY" prefix in orderBy param)
       val pgOrderBy = if (orderBy.isEmpty) "" else s"ORDER BY $orderBy"

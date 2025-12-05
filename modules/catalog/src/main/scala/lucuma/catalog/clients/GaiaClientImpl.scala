@@ -60,7 +60,9 @@ class GaiaClientImpl[F[_]: Concurrent](
     queryUri: CatalogAdapter.Gaia => Uri,
     parser:   CatalogAdapter.Gaia => fs2.Pipe[F, String, EitherNec[CatalogProblem, A]]
   ): F[List[EitherNec[CatalogProblem, A]]] =
-    adapters.map(adapter => queryGaia(queryUri(adapter), headersFor(adapter), parser(adapter))).raceAllToSuccess
+    adapters
+      .map(adapter => queryGaia(queryUri(adapter), headersFor(adapter), parser(adapter)))
+      .raceAllToSuccess
 
   private def queryGaia[A](
     queryUri: Uri,

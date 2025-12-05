@@ -66,6 +66,7 @@ object GaiaClient:
 
   val DefaultAdapters: NonEmptyChain[CatalogAdapter.Gaia] =
     NonEmptyChain.of(
+      CatalogAdapter.Gaia3DataLab,
       CatalogAdapter.Gaia3LiteGavo,
       CatalogAdapter.Gaia3LiteEsaProxy
     )

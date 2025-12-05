@@ -28,7 +28,10 @@ class GaiaClientSuite extends CatsEffectSuite with VoTableSamples:
   )
 
   test("GaiaClient.query returns CatalogTargetResult"):
-    val client       = GaiaClientMock.fromXML[IO](gaia, None)
+    val client       = GaiaClientMock.fromXML[IO](
+      gaia,
+      NonEmptyChain.of(CatalogAdapter.Gaia3LiteGavo, CatalogAdapter.Gaia3LiteEsaProxy).some
+    )
     val searchRadius = 6.arcseconds
     val query        = QueryByADQL(testCoords,
                             ShapeExpression.centeredEllipse(searchRadius * 2, searchRadius * 2),
@@ -63,7 +66,10 @@ class GaiaClientSuite extends CatsEffectSuite with VoTableSamples:
         assert(target.get.catalogInfo.isEmpty)
 
   test("GaiaClient.queryById returns CatalogTargetResult for single source"):
-    val client = GaiaClientMock.fromXML[IO](gaia, None)
+    val client = GaiaClientMock.fromXML[IO](
+      gaia,
+      NonEmptyChain.of(CatalogAdapter.Gaia3LiteGavo, CatalogAdapter.Gaia3LiteEsaProxy).some
+    )
 
     client
       .queryById(5500810326779190016L)

@@ -22,9 +22,8 @@ import org.http4s.jdkhttpclient.JdkHttpClient
 /**
  * Test app for querying Gaia data via NOIRLab DataLab.
  *
- * Usage:
- *   sbt "catalogTestsJVM/runMain lucuma.catalog.votable.DataLabQueryApp"
- *   sbt "catalogTestsJVM/runMain lucuma.catalog.votable.DataLabQueryApp <auth-token>"
+ * Usage: sbt "catalogTestsJVM/runMain lucuma.catalog.votable.DataLabQueryApp" sbt
+ * "catalogTestsJVM/runMain lucuma.catalog.votable.DataLabQueryApp <auth-token>"
  *
  * If no token is provided, uses anonymous access.
  */
