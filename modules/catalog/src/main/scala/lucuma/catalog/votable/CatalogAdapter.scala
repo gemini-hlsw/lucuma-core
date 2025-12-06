@@ -501,7 +501,8 @@ object CatalogAdapter {
     def authToken: String = "anonymous.0.0.anon_access"
 
     // DataLab doesn't return UCDs for parallax and radial_velocity
-    override val rvField: FieldId = FieldId.unsafeFrom("radial_velocity")
+    override val plxField: FieldId = FieldId.unsafeFrom("parallax")
+    override val rvField: FieldId  = FieldId.unsafeFrom("radial_velocity")
 
     override def queryUri(query: String): Uri =
       uri
