@@ -7,12 +7,15 @@ import algebra.instances.all.*
 import cats.data.*
 import cats.syntax.all.*
 import coulomb.syntax.*
+import lucuma.catalog.*
 import lucuma.catalog.votable.*
 import lucuma.catalog.votable.CatalogProblem.*
 import lucuma.core.enums.Band
 import lucuma.core.enums.CatalogName
+import lucuma.core.math.Angle
 import lucuma.core.math.BrightnessUnits.*
 import lucuma.core.math.BrightnessValue
+import lucuma.core.math.Coordinates
 import lucuma.core.math.Epoch
 import lucuma.core.math.ProperMotion
 import lucuma.core.math.ProperMotion.AngularVelocity
@@ -24,6 +27,7 @@ import lucuma.core.syntax.string.*
 import lucuma.core.util.*
 import org.http4s.Uri
 import org.http4s.syntax.all.*
+import org.typelevel.ci.*
 
 import scala.math.BigDecimal
 
@@ -324,33 +328,64 @@ object CatalogAdapter {
     def gaiaDB: String
     def format: String
 
-    /** Build the query URI for a SQL/ADQL query string */
-    def buildQueryUri(query: String): Uri
+    /** Uri for the catalog request */
+    def queryUri(query: String): Uri =
+      uri
+        .withQueryParam("REQUEST", "doQuery")
+        .withQueryParam("LANG", "ADQL")
+        .withQueryParam("FORMAT", format)
+        .withQueryParam("QUERY", query)
 
-    /** HTTP headers required for requests to this adapter */
-    def requestHeaders: Map[String, String] = Map.empty
+    /** HTTP headers sent by this adapter */
+    def requestHeaders: Map[CIString, String] = Map.empty
 
     /**
-     * Build the full query string for a cone search. Default implementation uses ADQL syntax.
-     * Override for non-ADQL backends.
+     * Build the query string for a cone search. Default implementation uses ADQL syntax. Override
+     * for non-ADQL backends like DataLab.
      */
-    def buildConeSearchQuery(
-      fields:           String,
-      extraFields:      String,
-      shapeQuery:       String,
-      brightnessQuery:  String,
-      extraConstraints: String,
-      orderBy:          String,
-      maxCount:         Int
+    def geometryQuery(
+      fields:                String,
+      extraFields:           String,
+      center:                Coordinates,
+      radius:                Angle,
+      brightnessConstraints: Option[BrightnessConstraints],
+      extraConstraints:      String,
+      orderBy:               String,
+      maxCount:              Int
     ): String = {
-      val orderByClause = if (orderBy.isEmpty) "" else s"ORDER BY $orderBy"
+      val order      = if (orderBy.isEmpty) "" else s"ORDER BY $orderBy"
+      val centerRa   = f"${center.ra.toAngle.toDoubleDegrees}%7.5f"
+      val centerDec  = f"${center.dec.toAngle.toSignedDoubleDegrees}%7.5f"
+      val r          = f"${radius.toDoubleDegrees}%7.5f"
+      val brightness = brightnessQuery(brightnessConstraints)
+
       f"""|SELECT TOP $maxCount $fields $extraFields
           |     FROM $gaiaDB
-          |     WHERE CONTAINS(POINT('ICRS',${raField.id},${decField.id}),$shapeQuery)=1
-          |     $brightnessQuery
+          |     WHERE CONTAINS(POINT('ICRS',${raField.id},${decField.id}),CIRCLE('ICRS', $centerRa, $centerDec, $r))=1
+          |     $brightness
           |     $extraConstraints
-          |     $orderByClause
+          |     $order
       """.stripMargin
+    }
+
+    protected def brightnessQuery(constraints: Option[BrightnessConstraints]): String = {
+      val conditions = constraints.toList.flatMap { bc =>
+        val faintness  = bc.faintnessConstraint.brightness.value.value.toDouble
+        val saturation = bc.saturationConstraint.map(_.brightness.value.value.toDouble)
+        bc.searchBands.bands
+          .collect {
+            case Band.Gaia   => gMagField.id
+            case Band.GaiaBP => bpMagField.id
+            case Band.GaiaRP => rpMagField.id
+          }
+          .map { bid =>
+            saturation match {
+              case Some(sat) => f"($bid between $sat%.3f and $faintness%.3f)"
+              case None      => f"($bid < $faintness%.3f)"
+            }
+          }
+      }
+      if (conditions.isEmpty) "" else conditions.mkString("and (", " or ", ")")
     }
 
     def idField: FieldId             = FieldId.unsafeFrom("DESIGNATION", VoTableParser.UCD_OBJID)
@@ -445,44 +480,30 @@ object CatalogAdapter {
       FieldId.unsafeFrom("parallax", Ucd.unsafeFromString("pos.parallax.trig"))
     override val rvField: FieldId    =
       FieldId.unsafeFrom("radial_velocity", Ucd.unsafeFromString("spect.dopplerVeloc.opt;em.opt.I"))
-
-    override def buildQueryUri(query: String): Uri =
-      uri
-        .withQueryParam("REQUEST", "doQuery")
-        .withQueryParam("LANG", "ADQL")
-        .withQueryParam("FORMAT", format)
-        .withQueryParam("QUERY", query)
   }
 
   trait GaiaGavo extends Gaia {
     override lazy val uri: Uri       = uri"https://dc.g-vo.org/__system__/tap/run/sync"
     override lazy val format: String = "votabletd"
-    // GAVO uses pos.parallax (no .trig) and spect.dopplerVeloc.opt;em.opt.I
+    // GAVO uses pos.parallax and spect.dopplerVeloc.opt;em.opt.I
     override val plxField: FieldId   =
       FieldId.unsafeFrom("parallax", Ucd.unsafeFromString("pos.parallax"))
     override val rvField: FieldId    =
       FieldId.unsafeFrom("radial_velocity", Ucd.unsafeFromString("spect.dopplerVeloc.opt;em.opt.I"))
 
-    override def buildQueryUri(query: String): Uri =
-      uri
-        .withQueryParam("REQUEST", "doQuery")
-        .withQueryParam("LANG", "ADQL")
-        .withQueryParam("FORMAT", format)
-        .withQueryParam("QUERY", query)
   }
 
   trait GaiaDataLab extends Gaia {
-    // Query Service endpoint
-    override lazy val uri: Uri       = uri"https://datalab.noirlab.edu/query/query"
+    override lazy val uri: Uri = uri"https://datalab.noirlab.edu/query/query"
+
     override lazy val format: String = "votable"
 
     def authToken: String = "anonymous.0.0.anon_access"
 
     // DataLab doesn't return UCDs for parallax and radial_velocity
-    override val plxField: FieldId = FieldId.unsafeFrom("parallax")
-    override val rvField: FieldId  = FieldId.unsafeFrom("radial_velocity")
+    override val rvField: FieldId = FieldId.unsafeFrom("radial_velocity")
 
-    override def buildQueryUri(query: String): Uri =
+    override def queryUri(query: String): Uri =
       uri
         .withQueryParam("sql", query)
         .withQueryParam("ofmt", "votable")
@@ -491,56 +512,41 @@ object CatalogAdapter {
         .withQueryParam("drop", "False")
         .withQueryParam("profile", "default")
 
-    override def requestHeaders: Map[String, String] =
-      Map("X-DL-AuthToken" -> authToken)
+    override def requestHeaders: Map[CIString, String] =
+      Map(ci"X-DL-AuthToken" -> authToken)
 
-    // DataLab uses PostgreSQL with q3c extension instead of ADQL
-    // shapeQuery format: "CIRCLE('ICRS', ra, dec, radius)" - we extract the values
-    override def buildConeSearchQuery(
-      fields:           String,
-      extraFields:      String,
-      shapeQuery:       String,
-      brightnessQuery:  String,
-      extraConstraints: String,
-      orderBy:          String,
-      maxCount:         Int
+    override def geometryQuery(
+      fields:                String,
+      extraFields:           String,
+      center:                Coordinates,
+      radius:                Angle,
+      brightnessConstraints: Option[BrightnessConstraints],
+      extraConstraints:      String,
+      orderBy:               String,
+      maxCount:              Int
     ): String = {
-      // Parse CIRCLE('ICRS', ra, dec, radius) to extract coordinates
-      val circlePattern                 = """CIRCLE\('ICRS',\s*([\d.-]+),\s*([\d.-]+),\s*([\d.-]+)\)""".r
-      val (centerRa, centerDec, radius) = shapeQuery match {
-        case circlePattern(ra, dec, r) => (ra, dec, r)
-        case _                         => ("0", "0", "0.1") // fallback
-      }
+      val centerRa   = center.ra.toAngle.toDoubleDegrees
+      val centerDec  = center.dec.toAngle.toSignedDoubleDegrees
+      val r          = radius.toDoubleDegrees
+      val brightness = brightnessQuery(brightnessConstraints)
 
-      // Convert brightness query from ADQL to PostgreSQL
-      // Replace "and (" prefix and " or " with PostgreSQL syntax
-      val pgBrightness =
-        if (brightnessQuery.isEmpty) ""
-        else brightnessQuery.replace("and (", "AND (").replace(" or ", " OR ")
-
-      // Convert extra constraints
-      val pgConstraints =
+      val constraints =
         if (extraConstraints.isEmpty) ""
         else extraConstraints.replace("and (", "AND (").replace(" and ", " AND ")
 
-      // PostgreSQL ORDER BY (no "ORDER BY" prefix in orderBy param)
-      val pgOrderBy = if (orderBy.isEmpty) "" else s"ORDER BY $orderBy"
+      // SQL ORDER BY
+      val order = if (orderBy.isEmpty) "" else s"ORDER BY $orderBy"
 
       f"""|SELECT $fields $extraFields
           |     FROM $gaiaDB
-          |     WHERE q3c_radial_query(${raField.id}, ${decField.id}, $centerRa, $centerDec, $radius)
-          |     $pgBrightness
-          |     $pgConstraints
-          |     $pgOrderBy
+          |     WHERE q3c_radial_query(${raField.id}, ${decField.id}, $centerRa, $centerDec, $r)
+          |     $brightness
+          |     $constraints
+          |     $order
           |     LIMIT $maxCount
       """.stripMargin
     }
-  }
 
-  /** DataLab adapter with custom auth token */
-  def gaia3DataLabWithToken(token: String): GaiaDataLab = new GaiaDataLab {
-    override lazy val gaiaDB: String = "gaia_dr3.gaia_source"
-    override def authToken: String   = token
   }
 
   object Gaia3Esa extends GaiaEsa {

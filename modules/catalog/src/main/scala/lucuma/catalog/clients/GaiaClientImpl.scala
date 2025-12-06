@@ -12,12 +12,12 @@ import lucuma.catalog.CatalogTargetResult
 import lucuma.catalog.votable.*
 import lucuma.core.model.Target
 import lucuma.core.syntax.effect.raceAllToSuccess
+import org.http4s.Header
 import org.http4s.Headers
 import org.http4s.Method
 import org.http4s.Request
 import org.http4s.Uri
 import org.http4s.client.Client
-import org.typelevel.ci.CIString
 
 // TODO Add Trace, we need natchez
 class GaiaClientImpl[F[_]: Concurrent](
@@ -61,7 +61,12 @@ class GaiaClientImpl[F[_]: Concurrent](
     parser:   CatalogAdapter.Gaia => fs2.Pipe[F, String, EitherNec[CatalogProblem, A]]
   ): F[List[EitherNec[CatalogProblem, A]]] =
     adapters
-      .map(adapter => queryGaia(queryUri(adapter), headersFor(adapter), parser(adapter)))
+      .map(adapter =>
+        queryGaia(queryUri(adapter),
+                  Headers(adapter.requestHeaders.map((x, y) => Header.Raw(x, y)).toList),
+                  parser(adapter)
+        )
+      )
       .raceAllToSuccess
 
   private def queryGaia[A](
@@ -79,22 +84,19 @@ class GaiaClientImpl[F[_]: Concurrent](
       .compile
       .toList
 
-  private def headersFor(adapter: CatalogAdapter.Gaia): Headers =
-    Headers(adapter.requestHeaders.map((k, v) => org.http4s.Header.Raw(CIString(k), v)).toList)
-
   /**
    * Takes a search query and builds a uri to query gaia.
    */
   private def queryUri(adapter: CatalogAdapter.Gaia, query: ADQLQuery)(using
     intepreter: ADQLInterpreter
   ): Uri =
-    adapter.buildQueryUri(intepreter.buildQueryString(adapter, query))
+    adapter.queryUri(intepreter.buildQueryString(adapter, query))
 
   /**
    * Takes a source id and builds a uri to query gaia for that one star.
    */
   private def queryUriById(adapter: CatalogAdapter.Gaia, sourceId: Long): Uri =
-    adapter.buildQueryUri(idQueryString(adapter, sourceId))
+    adapter.queryUri(idQueryString(adapter, sourceId))
 
   private def idQueryString(adapter: CatalogAdapter.Gaia, sourceId: Long): String =
     val fields = adapter.allFields.map(_.id.value.toLowerCase).mkString(",")

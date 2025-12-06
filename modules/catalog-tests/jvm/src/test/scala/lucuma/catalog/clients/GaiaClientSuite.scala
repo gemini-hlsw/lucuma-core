@@ -127,9 +127,8 @@ class GaiaClientSuite extends CatsEffectSuite with VoTableSamples:
           fail(s"queryById failed: ${e.toList.mkString("; ")}")
 
   test("GaiaClient parses parallax and radial velocity with Gaia3Esa adapter"):
-    val client = GaiaClientMock.fromString[IO](esaFullParallaxAndRV,
-                                               NonEmptyChain.one(CatalogAdapter.Gaia3Esa).some
-    )
+    val client = GaiaClientMock
+      .fromString[IO](esaFullParallaxAndRV, NonEmptyChain.one(CatalogAdapter.Gaia3Esa).some)
 
     client
       .queryById(538670232718296576L)
@@ -142,9 +141,8 @@ class GaiaClientSuite extends CatsEffectSuite with VoTableSamples:
           fail(s"queryById failed: ${e.toList.mkString("; ")}")
 
   test("Gaia3DataLab adapter for px and rv"):
-    val client = GaiaClientMock.fromString[IO](dataLabParallaxAndRV,
-                                               NonEmptyChain.one(CatalogAdapter.Gaia3DataLab).some
-    )
+    val client = GaiaClientMock
+      .fromString[IO](dataLabSample, NonEmptyChain.one(CatalogAdapter.Gaia3DataLab).some)
 
     client
       .queryById(538670232718296576L)

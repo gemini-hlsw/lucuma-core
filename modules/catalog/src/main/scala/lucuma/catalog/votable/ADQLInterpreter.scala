@@ -26,28 +26,25 @@ trait ADQLInterpreter {
   given shapeInterpreter: ShapeInterpreter
 
   /**
-   * Builds a query for gaia taking input from the adapter and the query itself. Delegates to
-   * adapter.buildConeSearchQuery for the actual SQL generation.
+   * Builds a query for gaia taking input from the adapter and the query itself.
    */
   def buildQueryString(adapter: CatalogAdapter.Gaia, cs: ADQLQuery): String = {
     val fields           = allFields(adapter).map(_.id.value.toLowerCase).mkString(",")
     val extraFields      = this.extraFields(cs.base)
     val extraFieldsStr   =
       if (extraFields.isEmpty) "" else extraFields.mkString(",", ",", "")
-    val shapeAdql        = cs.adqlGeom(this)
-    val brightnessFields = cs.adqlBrightness(adapter)
-    val brightnessAdql   =
-      if (brightnessFields.isEmpty) "" else brightnessFields.mkString("and (", " or ", ")")
+    val (center, radius) = cs.searchParams(using this)
     val orderByStr       = this.orderBy.getOrElse("")
     val extraConstraints =
       if (this.extraConstraints.isEmpty) ""
       else this.extraConstraints.mkString("and (", " and ", ")")
 
-    adapter.buildConeSearchQuery(
+    adapter.geometryQuery(
       fields = fields,
       extraFields = extraFieldsStr,
-      shapeQuery = shapeAdql,
-      brightnessQuery = brightnessAdql,
+      center = center,
+      radius = radius,
+      brightnessConstraints = cs.brightnessConstraints,
       extraConstraints = extraConstraints,
       orderBy = orderByStr,
       maxCount = MaxCount

@@ -4,10 +4,8 @@
 package lucuma.catalog.votable
 
 import cats.data.NonEmptyList
-import cats.syntax.all.*
 import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.catalog.*
-import lucuma.core.enums.Band
 import lucuma.core.enums.CatalogName
 import lucuma.core.geom.ShapeExpression
 import lucuma.core.geom.ShapeInterpreter
@@ -39,44 +37,14 @@ case class QueryByName(id: NonEmptyString, proxy: Option[Uri] = None) extends Ca
   override val catalog = CatalogName.Simbad
 }
 
-trait GaiaBrightnessADQL extends CatalogQuery {
-  override val catalog = CatalogName.Gaia
-
-  def circleQuery(base: Coordinates, r: Angle): String =
-    f"CIRCLE('ICRS', ${base.ra.toAngle.toDoubleDegrees}%7.5f, ${base.dec.toAngle.toSignedDoubleDegrees}%7.5f, ${r.toDoubleDegrees}%7.5f)"
-
-  def adqlBrightness(
-    brightnessConstraints: Option[BrightnessConstraints]
-  )(using adapter: CatalogAdapter.Gaia): List[String] =
-    brightnessConstraints.foldMap {
-      case BrightnessConstraints(bands, faintness, None)             =>
-        bands.bands
-          .collect {
-            case Band.Gaia   => adapter.gMagField.id
-            case Band.GaiaBP => adapter.bpMagField.id
-            case Band.GaiaRP => adapter.rpMagField.id
-          }
-          .map(bid => f"($bid < ${faintness.brightness.value.value.toDouble}%.3f)")
-      case BrightnessConstraints(bands, faintness, Some(saturation)) =>
-        bands.bands
-          .collect {
-            case Band.Gaia   => adapter.gMagField.id
-            case Band.GaiaBP => adapter.bpMagField.id
-            case Band.GaiaRP => adapter.rpMagField.id
-          }
-          .map(bid =>
-            f"($bid between ${saturation.brightness.value.value.toDouble}%.3f and ${faintness.brightness.value.value.toDouble}%.3f)"
-          )
-    }
-}
-
 /**
  * Query based on ADQL with a given geometry around base coordinates
  */
 sealed trait ADQLQuery {
   def base: Coordinates
-  def adqlGeom(ci:            ADQLInterpreter): String
-  def adqlBrightness(adapter: CatalogAdapter.Gaia): List[String]
+  // Returns center points and radius
+  def searchParams(using ADQLInterpreter): (Coordinates, Angle)
+  def brightnessConstraints: Option[BrightnessConstraints]
 }
 
 /**
@@ -87,17 +55,13 @@ case class QueryByADQL(
   shapeConstraint:       ShapeExpression,
   brightnessConstraints: Option[BrightnessConstraints]
 ) extends CatalogQuery
-    with ADQLQuery
-    with GaiaBrightnessADQL {
-  def adqlBrightness(using CatalogAdapter.Gaia): List[String] =
-    adqlBrightness(brightnessConstraints)
+    with ADQLQuery {
+  override val catalog = CatalogName.Gaia
 
-  def adqlGeom(using ev: ADQLInterpreter): String = {
-    implicit val si = ev.shapeInterpreter
+  def searchParams(using ev: ADQLInterpreter): (Coordinates, Angle) = {
+    given ShapeInterpreter = ev.shapeInterpreter
 
-    val r = shapeConstraint.maxSide.bisect
-
-    circleQuery(base, r)
+    (base, shapeConstraint.maxSide.bisect)
   }
 }
 
@@ -114,14 +78,12 @@ case class TimeRangeQueryByADQL(
   brightnessConstraints: Option[BrightnessConstraints],
   proxy:                 Option[Uri] = None
 ) extends CatalogQuery
-    with ADQLQuery
-    with GaiaBrightnessADQL {
+    with ADQLQuery {
+  override val catalog = CatalogName.Gaia
+
   val base = tracking.baseCoordinates
 
-  def adqlBrightness(using CatalogAdapter.Gaia): List[String] =
-    adqlBrightness(brightnessConstraints)
-
-  def adqlGeom(using ev: ADQLInterpreter): String = {
+  def searchParams(using ev: ADQLInterpreter): (Coordinates, Angle) = {
     given ShapeInterpreter = ev.shapeInterpreter
 
     // Coordinates at the start and of the time range
@@ -129,7 +91,7 @@ case class TimeRangeQueryByADQL(
     val end   = tracking.at(timeRange.upperBound.a)
 
     // Try to set the base in the middle of both time ends
-    val (offset, base) = (start, end) match {
+    val (offset, center) = (start, end) match {
       case (Some(start), Some(end)) =>
         // offset between them and base at the middle point
         (start.diff(end).offset, start.interpolate(end, 0.5))
@@ -145,9 +107,8 @@ case class TimeRangeQueryByADQL(
         // Original values
         (Offset.Zero, tracking.baseCoordinates)
     }
-    val r              = (shapeConstraint ∪ (shapeConstraint ↗ offset)).maxSide.bisect
 
-    circleQuery(base, r)
+    (center, (shapeConstraint ∪ (shapeConstraint ↗ offset)).maxSide.bisect)
   }
 }
 
@@ -163,20 +124,18 @@ case class CoordinatesRangeQueryByADQL(
   brightnessConstraints: Option[BrightnessConstraints],
   proxy:                 Option[Uri] = None
 ) extends CatalogQuery
-    with ADQLQuery
-    with GaiaBrightnessADQL {
+    with ADQLQuery {
+  override val catalog = CatalogName.Gaia
+
   val base = Coordinates.centerOf(coords)
 
-  def adqlBrightness(using CatalogAdapter.Gaia): List[String] =
-    adqlBrightness(brightnessConstraints)
-
-  def adqlGeom(using ev: ADQLInterpreter): String = {
+  def searchParams(using ev: ADQLInterpreter): (Coordinates, Angle) = {
     given ShapeInterpreter = ev.shapeInterpreter
 
-    val r: ShapeExpression = coords
+    val shape: ShapeExpression = coords
       .map(_.diff(base).offset)
       .foldLeft(shapeConstraint)((prev, offset) => prev ∪ (shapeConstraint ↗ offset))
 
-    circleQuery(base, r.maxSide.bisect)
+    (base, shape.maxSide.bisect)
   }
 }
