@@ -342,14 +342,16 @@ object CatalogAdapter {
       extraConstraints: String,
       orderBy:          String,
       maxCount:         Int
-    ): String =
+    ): String = {
+      val orderByClause = if (orderBy.isEmpty) "" else s"ORDER BY $orderBy"
       f"""|SELECT TOP $maxCount $fields $extraFields
           |     FROM $gaiaDB
           |     WHERE CONTAINS(POINT('ICRS',${raField.id},${decField.id}),$shapeQuery)=1
           |     $brightnessQuery
           |     $extraConstraints
-          |     $orderBy
+          |     $orderByClause
       """.stripMargin
+    }
 
     def idField: FieldId             = FieldId.unsafeFrom("DESIGNATION", VoTableParser.UCD_OBJID)
     def nameField: FieldId           = idField
