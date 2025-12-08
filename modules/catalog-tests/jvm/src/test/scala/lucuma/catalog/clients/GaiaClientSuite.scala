@@ -28,7 +28,10 @@ class GaiaClientSuite extends CatsEffectSuite with VoTableSamples:
   )
 
   test("GaiaClient.query returns CatalogTargetResult"):
-    val client       = GaiaClientMock.fromXML[IO](gaia, None)
+    val client       = GaiaClientMock.fromXML[IO](
+      gaia,
+      NonEmptyChain.of(CatalogAdapter.Gaia3LiteGavo, CatalogAdapter.Gaia3LiteEsaProxy).some
+    )
     val searchRadius = 6.arcseconds
     val query        = QueryByADQL(testCoords,
                             ShapeExpression.centeredEllipse(searchRadius * 2, searchRadius * 2),
@@ -63,7 +66,10 @@ class GaiaClientSuite extends CatsEffectSuite with VoTableSamples:
         assert(target.get.catalogInfo.isEmpty)
 
   test("GaiaClient.queryById returns CatalogTargetResult for single source"):
-    val client = GaiaClientMock.fromXML[IO](gaia, None)
+    val client = GaiaClientMock.fromXML[IO](
+      gaia,
+      NonEmptyChain.of(CatalogAdapter.Gaia3LiteGavo, CatalogAdapter.Gaia3LiteEsaProxy).some
+    )
 
     client
       .queryById(5500810326779190016L)
@@ -121,9 +127,22 @@ class GaiaClientSuite extends CatsEffectSuite with VoTableSamples:
           fail(s"queryById failed: ${e.toList.mkString("; ")}")
 
   test("GaiaClient parses parallax and radial velocity with Gaia3Esa adapter"):
-    val client = GaiaClientMock.fromString[IO](esaFullParallaxAndRV,
-                                               NonEmptyChain.one(CatalogAdapter.Gaia3Esa).some
-    )
+    val client = GaiaClientMock
+      .fromString[IO](esaFullParallaxAndRV, NonEmptyChain.one(CatalogAdapter.Gaia3Esa).some)
+
+    client
+      .queryById(538670232718296576L)
+      .map:
+        case Right(result) =>
+          val tracking = result.target.tracking
+          assertEquals(tracking.parallax.map(_.μas.value.value), 166L.some)
+          assertEquals(tracking.radialVelocity.map(_.rv.value.toDouble), -39225.376.some)
+        case Left(e)       =>
+          fail(s"queryById failed: ${e.toList.mkString("; ")}")
+
+  test("Gaia3DataLab adapter for px and rv"):
+    val client = GaiaClientMock
+      .fromString[IO](dataLabSample, NonEmptyChain.one(CatalogAdapter.Gaia3DataLab).some)
 
     client
       .queryById(538670232718296576L)

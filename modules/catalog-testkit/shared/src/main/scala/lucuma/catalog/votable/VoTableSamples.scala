@@ -676,6 +676,48 @@ trait VoTableSamples {
       </RESOURCE>
     </VOTABLE>"""
 
+  // Gaia3DataLab adapter votable sample (NOIRLab DataLab Query Service)
+  // DataLab doesn't return UCDs for any fields
+  //
+  // curl -s -H 'X-DL-AuthToken:anonymous.0.0.anon_access' \
+  //   'https://datalab.noirlab.edu/query/query?sql=select+source_id,designation,ra,dec,pmra,pmdec,parallax,radial_velocity,phot_g_mean_mag,phot_rp_mean_mag,ref_epoch+from+gaia_dr3.gaia_source+where+source_id=538670232718296576&ofmt=votable&out=None&async=False&drop=False&profile=default'
+  lazy val dataLabSample =
+    """<?xml version="1.0" encoding="utf-8"?>
+      <VOTABLE version="1.4" xmlns="http://www.ivoa.net/xml/VOTable/v1.3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ivoa.net/xml/VOTable/v1.3 http://www.ivoa.net/xml/VOTable/VOTable-1.4.xsd">
+      <RESOURCE type="results">
+        <TABLE>
+        <FIELD ID="source_id" datatype="long" name="source_id"/>
+        <FIELD ID="designation" arraysize="27" datatype="unicodeChar" name="designation"/>
+        <FIELD ID="ra" datatype="double" name="ra"/>
+        <FIELD ID="dec" datatype="double" name="dec"/>
+        <FIELD ID="pmra" datatype="double" name="pmra"/>
+        <FIELD ID="pmdec" datatype="double" name="pmdec"/>
+        <FIELD ID="parallax" datatype="double" name="parallax"/>
+        <FIELD ID="radial_velocity" datatype="float" name="radial_velocity"/>
+        <FIELD ID="phot_g_mean_mag" datatype="float" name="phot_g_mean_mag"/>
+        <FIELD ID="phot_rp_mean_mag" datatype="float" name="phot_rp_mean_mag"/>
+        <FIELD ID="ref_epoch" datatype="double" name="ref_epoch"/>
+        <DATA>
+          <TABLEDATA>
+          <TR>
+            <TD>538670232718296576</TD>
+            <TD>Gaia DR3 538670232718296576</TD>
+            <TD>11.041855402712585</TD>
+            <TD>74.84504666323086</TD>
+            <TD>-1.4343020524567958</TD>
+            <TD>-1.0645945622395614</TD>
+            <TD>0.1664138200379304</TD>
+            <TD>-39.225376</TD>
+            <TD>15.083894</TD>
+            <TD>14.250962</TD>
+            <TD>2016</TD>
+          </TR>
+          </TABLEDATA>
+        </DATA>
+        </TABLE>
+      </RESOURCE>
+      </VOTABLE>"""
+
   lazy val voTableAlternative =
     <VOTABLE xmlns="http://www.ivoa.net/xml/VOTable/v1.3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.5" xsi:schemaLocation="http://www.ivoa.net/xml/VOTable/v1.3 http://vo.ari.uni-heidelberg.de/docs/schemata/VOTable.xsd">
       <DESCRIPTION>

@@ -38,25 +38,18 @@ trait GaiaQueryPMSample {
   val tracking = SiderealTracking(m81Coords, Epoch.J2000, pm.some, none, none)
 
   def gaiaQuery[F[_]: Sync](client: GaiaClient[F]) = {
-    val bc               = BrightnessConstraints(
+    val bc = BrightnessConstraints(
       BandsList.GaiaBandsList,
       FaintnessConstraint(BrightnessValue.unsafeFrom(16)),
       SaturationConstraint(BrightnessValue.unsafeFrom(9)).some
     )
+
     val query: ADQLQuery =
       CoordinatesRangeQueryByADQL(
         NonEmptyList.of(start, end),
         candidatesArea,
         bc.some
       )
-    //   TimeRangeQueryByADQL(
-    //     tracking,
-    //     Interval
-    //       .closed(Instant.EPOCH, Instant.EPOCH.plusSeconds(365 * 24 * 60 * 60 * 60))
-    //       .asInstanceOf[Bounded[Instant]],
-    //     candidatesArea,
-    //     bc.some
-    //   )
 
     client.query(query).map(r => println(pprint(r)))
   }
