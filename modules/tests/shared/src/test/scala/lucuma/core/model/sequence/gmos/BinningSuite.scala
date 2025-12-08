@@ -49,34 +49,34 @@ class BinningSuite extends FunSuite:
       GmosYBinning.Two
     )
 
-  test("longslit, R831, slit=0.75, fwhm=1.0: 2 4"):
+  test("longslit, R831, slit=0.75, fwhm=1.0: 2 2"):
     testLongslit(
       GmosNorthFpu.LongSlit_0_75,
       SourceProfile.Gaussian(Angle.microarcseconds.reverseGet(1_000_000L), bandNormalized),
       ImageQuality.Preset.PointOne.toImageQuality,
       GmosNorthGrating.R831_G5302,
       GmosXBinning.Two,
-      GmosYBinning.Four
+      GmosYBinning.Two
     )
 
-  test("longslit, R831, slit=1.00, fwhm=1.5: 2 4"):
+  test("longslit, R831, slit=1.00, fwhm=1.5: 2 2"):
     testLongslit(
       GmosNorthFpu.LongSlit_1_00,
       SourceProfile.Gaussian(Angle.microarcseconds.reverseGet(1_500_000L), bandNormalized),
       ImageQuality.Preset.PointOne.toImageQuality,
       GmosNorthGrating.R831_G5302,
       GmosXBinning.Two,
-      GmosYBinning.Four
+      GmosYBinning.Two
     )
 
-  test("longslit, R831, slit=0.50, Uniform:  2 4"):
+  test("longslit, R831, slit=0.50, Uniform:  2 2"):
     testLongslit(
       GmosNorthFpu.LongSlit_0_50,
       SourceProfile.Uniform(bandNormalized),
       ImageQuality.Preset.PointOne.toImageQuality,
       GmosNorthGrating.R831_G5302,
       GmosXBinning.One,
-      GmosYBinning.Four
+      GmosYBinning.Two
     )
 
   // Testing explore-dev using GMOS-N with the R831 grating with a 1" slit and IQ=1.0" should yield binning = 2 x 4,
@@ -88,7 +88,7 @@ class BinningSuite extends FunSuite:
       ImageQuality.Preset.OnePointZero.toImageQuality,
       GmosNorthGrating.R831_G5302,
       GmosXBinning.Two,
-      GmosYBinning.Four
+      GmosYBinning.Two
     )
 
   test("longslit, R831, slit=0.50, fwhm=0.0: 1 1"):
@@ -108,7 +108,7 @@ class BinningSuite extends FunSuite:
       ImageQuality.Preset.OnePointZero.toImageQuality,
       GmosNorthGrating.B480_G5309,
       GmosXBinning.One,
-      GmosYBinning.Four
+      GmosYBinning.Two
     )
 
   test("longslit, B480, slit=0.75, fwhm=1.0: edge case for spectral binning = 2"):
@@ -118,7 +118,7 @@ class BinningSuite extends FunSuite:
       ImageQuality.Preset.OnePointZero.toImageQuality,
       GmosNorthGrating.B480_G5309,
       GmosXBinning.Two,
-      GmosYBinning.Four
+      GmosYBinning.Two
     )
 
   test("longslit, B480, slit=1.00, fwhm=0.6: mixed case"):
@@ -136,26 +136,26 @@ class BinningSuite extends FunSuite:
 
     // Just below threshold for bin=2: fwhm=0.40 -> bin=1
     assertEquals(
-      spatialBinning(profile, ImageQuality.unsafeFromArcSeconds(0.40), DefaultGmosNorthDetector.pixelSize, DefaultSampling),
+      spatialBinning(profile, ImageQuality.unsafeFromArcSeconds(0.40), DefaultGmosNorthDetector.pixelSize, DefaultMaxYBinning, DefaultSampling),
       GmosYBinning.One
     )
 
     // Just above threshold for bin=2: fwhm=0.41 -> bin=2
     assertEquals(
-      spatialBinning(profile, ImageQuality.unsafeFromArcSeconds(0.41), DefaultGmosNorthDetector.pixelSize, DefaultSampling),
+      spatialBinning(profile, ImageQuality.unsafeFromArcSeconds(0.41), DefaultGmosNorthDetector.pixelSize, DefaultMaxYBinning, DefaultSampling),
       GmosYBinning.Two
     )
 
     // Just below threshold for bin=4: fwhm=0.80 -> bin=2
     assertEquals(
-      spatialBinning(profile, ImageQuality.unsafeFromArcSeconds(0.80), DefaultGmosNorthDetector.pixelSize, DefaultSampling),
+      spatialBinning(profile, ImageQuality.unsafeFromArcSeconds(0.80), DefaultGmosNorthDetector.pixelSize, DefaultMaxYBinning, DefaultSampling),
       GmosYBinning.Two
     )
 
-    // Just above threshold for bin=4: fwhm=0.81 -> bin=4
+    // Just above threshold for bin=4: fwhm=0.81 -> bin=2 (capped)
     assertEquals(
-      spatialBinning(profile, ImageQuality.unsafeFromArcSeconds(0.81), DefaultGmosNorthDetector.pixelSize, DefaultSampling),
-      GmosYBinning.Four
+      spatialBinning(profile, ImageQuality.unsafeFromArcSeconds(0.81), DefaultGmosNorthDetector.pixelSize, DefaultMaxYBinning, DefaultSampling),
+      GmosYBinning.Two
     )
 
   private def testImaging(
@@ -184,12 +184,12 @@ class BinningSuite extends FunSuite:
       GmosYBinning.Two
     )
 
-  test("imaging, fwhm=0.81: 4x4"):
+  test("imaging, fwhm=0.81: 2x2 (capped)"):
     testImaging(
       SourceProfile.Point(bandNormalized),
       ImageQuality.unsafeFromArcSeconds(0.81),
-      GmosXBinning.Four,
-      GmosYBinning.Four
+      GmosXBinning.Two,
+      GmosYBinning.Two
     )
 
   test("imaging, Gaussian fwhm=0.6: 2x2"):
@@ -200,12 +200,12 @@ class BinningSuite extends FunSuite:
       GmosYBinning.Two
     )
 
-  test("imaging, Uniform source: 4x4"):
+  test("imaging, Uniform source: 2x2"):
     testImaging(
       SourceProfile.Uniform(bandNormalized),
       ImageQuality.Preset.PointOne.toImageQuality,
-      GmosXBinning.Four,
-      GmosYBinning.Four
+      GmosXBinning.Two,
+      GmosYBinning.Two
     )
 
   test("mos, B480, slit=1.00, fwhm=1.12: 2x2"):
@@ -223,9 +223,9 @@ class BinningSuite extends FunSuite:
     val profile = SourceProfile.Point(bandNormalized)
     val iq = ImageQuality.unsafeFromArcSeconds(1.0) // Would normally give 4x binning
 
-    // Longslit allows up to 4x spatial binning
-    val longslitResult = spatialBinning(profile, iq, DefaultGmosNorthDetector.pixelSize, DefaultSampling)
-    assertEquals(longslitResult, GmosYBinning.Four)
+    // Longslit constrains spatial binning to 2x maximum
+    val longslitResult = spatialBinning(profile, iq, DefaultGmosNorthDetector.pixelSize, DefaultMaxYBinning, DefaultSampling)
+    assertEquals(longslitResult, GmosYBinning.Two)
 
     // MOS constrains spatial binning to 2x maximum
     val mosResult = mos.mosSpatialBinning(profile, iq, DefaultGmosNorthDetector.pixelSize)
@@ -260,8 +260,8 @@ class BinningSuite extends FunSuite:
 
     assertEquals(longslitResult._1, mosResult._1)
 
-    // MOS should limit spatial binning to 2x
-    assertEquals(longslitResult._2, GmosYBinning.Four)
+    // MOS and longslit should limit spatial binning to 2x
+    assertEquals(longslitResult._2, GmosYBinning.Two)
     assertEquals(mosResult._2, GmosYBinning.Two)
 
   test("ifu always returns 1x1"):
