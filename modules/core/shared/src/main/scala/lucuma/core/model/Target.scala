@@ -58,7 +58,7 @@ object Target extends WithGid('t'.refined) with TargetOptics {
 
   case class Nonsidereal(
     name:          NonEmptyString,
-    ephemerisKey:  EphemerisKey,
+    ephemerisKey:  Ephemeris.Key,
     sourceProfile: SourceProfile
   ) extends Target
 
@@ -109,7 +109,7 @@ object Target extends WithGid('t'.refined) with TargetOptics {
 
   /**
    * A target order based on tracking information. For sidereal targets this roughly means by base
-   * coordinate without applying proper motion. For non-sidereal this means by `EphemerisKey`.
+   * coordinate without applying proper motion. For non-sidereal this means by `Ephemeris.Key`.
    *
    * Not implicit.
    */
@@ -323,7 +323,7 @@ object Target extends WithGid('t'.refined) with TargetOptics {
       Focus[Nonsidereal](_.name)
 
     /** @group Optics */
-    val ephemerisKey: Lens[Nonsidereal, EphemerisKey] =
+    val ephemerisKey: Lens[Nonsidereal, Ephemeris.Key] =
       Focus[Nonsidereal](_.ephemerisKey)
 
     val sourceProfile: Lens[Nonsidereal, SourceProfile] =
@@ -564,7 +564,7 @@ trait TargetOptics { this: Target.type =>
     })
 
   /** @group Optics */
-  val ephemerisKey: Optional[Target, EphemerisKey] =
+  val ephemerisKey: Optional[Target, Ephemeris.Key] =
     nonsidereal.andThen(Nonsidereal.ephemerisKey)
 
   /** @group Optics */

@@ -6,7 +6,8 @@ package arb
 
 import lucuma.core.arb.*
 import lucuma.core.enums.EphemerisKeyType
-import lucuma.core.model.EphemerisKey.*
+import lucuma.core.model.Ephemeris
+import lucuma.core.model.Ephemeris.Key.*
 import lucuma.core.util.arb.ArbEnumerated.given
 import org.scalacheck.*
 import org.scalacheck.Arbitrary.*
@@ -19,9 +20,9 @@ trait ArbEphemerisKey {
   private def genIntDes[A](f: Int => A): Gen[A] =
     arbitrary[Int].map(f)
 
-  given Arbitrary[EphemerisKey] =
+  given Arbitrary[Ephemeris.Key] =
     Arbitrary {
-      Gen.oneOf[EphemerisKey](
+      Gen.oneOf[Ephemeris.Key](
         genStringDes(Comet.apply),
         genStringDes(AsteroidNew.apply),
         genIntDes(AsteroidOld.apply),
@@ -30,8 +31,8 @@ trait ArbEphemerisKey {
       )
     }
 
-  given Cogen[EphemerisKey] =
-    Cogen[String].contramap(EphemerisKey.fromString.reverseGet)
+  given Cogen[Ephemeris.Key] =
+    Cogen[String].contramap(Ephemeris.Key.fromString.reverseGet)
 
   private val perturbations: List[String => Gen[String]] =
     List(
@@ -48,8 +49,8 @@ trait ArbEphemerisKey {
 
   // Strings that are often parsable
   val strings: Gen[String] =
-    arbitrary[EphemerisKey]
-      .map(EphemerisKey.fromString.reverseGet)
+    arbitrary[Ephemeris.Key]
+      .map(Ephemeris.Key.fromString.reverseGet)
       .flatMapOneOf(Gen.const, perturbations*)
 
 }

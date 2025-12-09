@@ -8,7 +8,7 @@ import fs2.Stream
 import fs2.text
 import lucuma.core.data.PerSite
 import lucuma.core.enums.Site
-import lucuma.core.model.EphemerisKey
+import lucuma.core.model.Ephemeris
 import org.http4s.Request
 import org.http4s.Uri
 import org.http4s.client.Client
@@ -38,20 +38,20 @@ trait HorizonsClient[F[_]]:
    * never be more than one element per minute.
    */
   def ephemeris(
-    key: EphemerisKey.Horizons,
+    key: Ephemeris.Key.Horizons,
     site: Site,
     start: Instant,
     stop: Instant,
     elems: Int,
-  ): F[Either[String, HorizonsEphemeris]]
+  ): F[Either[String, Ephemeris.Horizons]]
 
   /** Equivalent to `ephemeris` but selects the ephemeris at both sites. */
   def ephemerisPerSite(
-    key: EphemerisKey.Horizons,
+    key: Ephemeris.Key.Horizons,
     start: Instant,
     stop: Instant,
     elems: Int,
-  ): F[Either[String, PerSite[HorizonsEphemeris]]]
+  ): F[Either[String, PerSite[Ephemeris.Horizons]]]
 
   /**
    * Similar to `ephemeris` but selects elements starting at midnight UTC on the day of
@@ -59,12 +59,12 @@ trait HorizonsClient[F[_]]:
    * will contain `days * cadence + 1` elements.
    */
   def alignedEphemeris(
-    key: EphemerisKey.Horizons,
+    key: Ephemeris.Key.Horizons,
     site: Site,
     start: Instant,
     days: Int,
     cadence: HorizonsClient.ElementsPerDay,
-  ): F[Either[String, HorizonsEphemeris]] =
+  ): F[Either[String, Ephemeris.Horizons]] =
     val aligned = 
       ZonedDateTime
         .ofInstant(start, ZoneOffset.UTC)
@@ -75,11 +75,11 @@ trait HorizonsClient[F[_]]:
 
   /** Equivalent to `alignedEphemeris` but selects the ephemeris at both sites. */
   def alignedEphemerisPerSite(
-    key: EphemerisKey.Horizons,
+    key: Ephemeris.Key.Horizons,
     start: Instant,
     days: Int,
     cadence: HorizonsClient.ElementsPerDay,
-  ): F[Either[String, PerSite[HorizonsEphemeris]]]
+  ): F[Either[String, PerSite[Ephemeris.Horizons]]]
 
 object HorizonsClient:
 
@@ -87,9 +87,9 @@ object HorizonsClient:
   type ElementsPerDay = 1 | 2 | 3 | 4 | 6 | 8 | 12 | 24
 
   enum Search[A](val queryString: String):
-    case Comet(partial: String)     extends Search[EphemerisKey.Comet](s"NAME=$partial*;CAP")
-    case Asteroid(partial: String)  extends Search[EphemerisKey.Asteroid](s"ASTNAM=$partial*")
-    case MajorBody(partial: String) extends Search[EphemerisKey.MajorBody](s"$partial")
+    case Comet(partial: String)     extends Search[Ephemeris.Key.Comet](s"NAME=$partial*;CAP")
+    case Asteroid(partial: String)  extends Search[Ephemeris.Key.Asteroid](s"ASTNAM=$partial*")
+    case MajorBody(partial: String) extends Search[Ephemeris.Key.MajorBody](s"$partial")
 
   /**
    * Construct a `HorizonsClient`. Requests will be retried automatically on failure, up to `maxRetries`,
