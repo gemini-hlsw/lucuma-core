@@ -18,23 +18,23 @@ final class EphemerisKeySuite extends DisciplineSuite {
   import ArbEphemerisKey.given
 
   // Laws
-  checkAll("EphemerisKey", OrderTests[EphemerisKey].order)
-  checkAll("fromString", FormatTests(EphemerisKey.fromString).formatWith(ArbEphemerisKey.strings))
+  checkAll("Ephemeris.Key", OrderTests[Ephemeris.Key].order)
+  checkAll("fromString", FormatTests(Ephemeris.Key.fromString).formatWith(ArbEphemerisKey.strings))
   checkAll(
     "fromTypeAndDes",
-    FormatTests(EphemerisKey.fromTypeAndDes).formatWith(ArbEphemerisKey.keyAndDes)
+    FormatTests(Ephemeris.Key.fromTypeAndDes).formatWith(ArbEphemerisKey.keyAndDes)
   )
-  checkAll("JSON Codec", CodecTests[EphemerisKey].codec)
+  checkAll("JSON Codec", CodecTests[Ephemeris.Key].codec)
 
   test("Equality must be natural") {
-    forAll { (a: EphemerisKey, b: EphemerisKey) =>
-      assertEquals(a.equals(b), Eq[EphemerisKey].eqv(a, b))
+    forAll { (a: Ephemeris.Key, b: Ephemeris.Key) =>
+      assertEquals(a.equals(b), Eq[Ephemeris.Key].eqv(a, b))
     }
   }
 
   test("Show must be natural") {
-    forAll { (a: EphemerisKey) =>
-      assertEquals(a.toString, Show[EphemerisKey].show(a))
+    forAll { (a: Ephemeris.Key) =>
+      assertEquals(a.toString, Show[Ephemeris.Key].show(a))
     }
   }
 

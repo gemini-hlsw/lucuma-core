@@ -3,7 +3,7 @@
 
 package lucuma.horizons
 
-import lucuma.core.model.EphemerisKey
+import lucuma.core.model.Ephemeris
 
 class HorizonsClientMajorBodySuite extends HorizonsClientSearchSuite(HorizonsClient.Search.MajorBody.apply):
   testEmptyResults("oideyqiduye")
@@ -11,17 +11,17 @@ class HorizonsClientMajorBodySuite extends HorizonsClientSearchSuite(HorizonsCli
   testEmptyResults("hermione", Some("small-body fallthrough (single)"))
   testMultipleResults(
     "mar",
-    (EphemerisKey.MajorBody(4), "Mars Barycenter"),
-    (EphemerisKey.MajorBody(499), "Mars"),
-    (EphemerisKey.MajorBody(723), "Margaret"),
-    (EphemerisKey.MajorBody(617), "Patroclus (primary body)"),
-    (EphemerisKey.MajorBody(50000), "Quaoar (primary body)")    //  up in October of 2022 (no idea why)
+    (Ephemeris.Key.MajorBody(4), "Mars Barycenter"),
+    (Ephemeris.Key.MajorBody(499), "Mars"),
+    (Ephemeris.Key.MajorBody(723), "Margaret"),
+    (Ephemeris.Key.MajorBody(617), "Patroclus (primary body)"),
+    (Ephemeris.Key.MajorBody(50000), "Quaoar (primary body)")    //  up in October of 2022 (no idea why)
   )
   testSingleResult("trailing space (!)")(
     "charon",
-    (EphemerisKey.MajorBody(901), "Charon")
+    (Ephemeris.Key.MajorBody(901), "Charon")
   )
   testSingleResult("no trailing space")(
     "europa",
-    (EphemerisKey.MajorBody(502), "Europa")
+    (Ephemeris.Key.MajorBody(502), "Europa")
   )

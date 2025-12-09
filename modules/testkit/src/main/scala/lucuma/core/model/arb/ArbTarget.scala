@@ -37,7 +37,7 @@ trait ArbTarget {
     Arbitrary {
       for {
         n <- arbitrary[NonEmptyString]
-        t <- arbitrary[EphemerisKey]
+        t <- arbitrary[Ephemeris.Key]
         b <- arbitrary[SourceProfile]
       } yield Target.Nonsidereal(n, t, b)
     }
@@ -64,7 +64,7 @@ trait ArbTarget {
       .contramap(t => (t.name.value, t.tracking, t.sourceProfile, t.catalogInfo))
 
   given Cogen[Target.Nonsidereal] =
-    Cogen[(String, EphemerisKey, SourceProfile)]
+    Cogen[(String, Ephemeris.Key, SourceProfile)]
       .contramap(t => (t.name.value, t.ephemerisKey, t.sourceProfile))
 
   given Cogen[Target.Opportunity] =
