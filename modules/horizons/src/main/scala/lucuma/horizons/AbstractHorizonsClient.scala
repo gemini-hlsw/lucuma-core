@@ -40,10 +40,8 @@ private[horizons] abstract class AbstractHorizonsClient[F[_]: Temporal] extends 
       stream(
           Format         -> Text,
           Ephemeris      -> Yes,
-          Center         -> CenterCoord,
-          CoordType      -> CoordTypeGeo,
+          Center         -> horizonsSiteCode(site),
           Command        -> s"'${key.queryString}'",
-          SiteCoord      -> horizonsCoordsAt(site),
           StartTime      -> s"'${HorizonsDateFormat.format(start)}'",
           StopTime       -> s"'${HorizonsDateFormat.format(stop)}'",
           StepSize       -> s"${stepSize}m",

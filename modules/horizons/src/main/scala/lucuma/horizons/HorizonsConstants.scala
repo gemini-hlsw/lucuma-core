@@ -19,10 +19,6 @@ object HorizonsConstants:
   val StopTime                   = "STOP_TIME"
   val StepSize                   = "STEP_SIZE"
   val Center                     = "CENTER"
-  val CenterCoord                = "coord"
-  val CoordType                  = "COORD_TYPE"
-  val CoordTypeGeo               = "GEODETIC"
-  val SiteCoord                  = "SITE_COORD"
   val ExtraPrecision             = "extra_prec"
   val TimeDigits                 = "time_digits"
   val FractionalSec              = "FRACSEC"
@@ -36,10 +32,7 @@ object HorizonsConstants:
       .ofPattern("yyyy-MMM-dd HH:mm:ss.SSS", Locale.US)
       .withZone(ZoneOffset.UTC)
 
-  def horizonsCoordsAt(site: Site): String =
-    String.format(
-      "'%1.6f,%1.6f,%1.3f'",
-      site.place.longitude.toDoubleDegrees,
-      site.place.latitude.toAngle.toDoubleDegrees,
-      site.place.altitude.value.value / 1000.0
-    )
+  def horizonsSiteCode(site: Site): String =
+    site match
+      case Site.GN => "T15"
+      case Site.GS => "I11"
