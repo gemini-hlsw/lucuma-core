@@ -133,7 +133,7 @@ def gaiaBrightnessConstraints(
     constraints.cloudExtinction.toCloudExtinction
   )
 
-private val UnconstrainedAngles =
+val UnconstrainedAngles =
   NonEmptyList.fromList(
     (0 until 360 by 10).map(a => Angle.fromDoubleDegrees(a.toDouble)).toList
   )
