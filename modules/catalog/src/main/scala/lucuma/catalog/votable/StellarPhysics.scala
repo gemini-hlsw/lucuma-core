@@ -5,9 +5,11 @@ package lucuma.catalog.votable
 
 import cats.parse.Parser.char
 import cats.parse.Rfc5234.digit
+import cats.syntax.option.*
 import coulomb.*
 import coulomb.syntax.*
 import coulomb.units.si.Kelvin
+import lucuma.core.syntax.string.*
 
 /**
  * Stellar physics calculations for matching spectral types to library SEDs. Based on the Python
@@ -20,23 +22,23 @@ import coulomb.units.si.Kelvin
 object StellarPhysics:
 
   case class StellarParameters(
-    tEff: Quantity[Int, Kelvin],     // Effective temperature
-    logG: Double                      // Log of surface gravity (dimensionless)
+    tEff: Quantity[Int, Kelvin], // Effective temperature
+    logG: Double                 // Log of surface gravity (dimensionless)
   )
 
   /**
    * Convert a spectral class string to a numerical code.
    *
-   * Maps spectral type letters to base values (O=0, B=10, A=20, ..., Y=90) and adds subclass
-   * digits (0-9.5). Handles +/- modifiers (±0.25 subclass adjustment).
+   * Maps spectral type letters to base values (O=0, B=10, A=20, ..., Y=90) and adds subclass digits
+   * (0-9.5). Handles +/- modifiers (±0.25 subclass adjustment).
    *
    * Examples:
-   *  - "O0" → 0.0
-   *  - "G2" → 42.0
-   *  - "G2.7" → 42.7
-   *  - "G2+" → 42.25
-   *  - "K6-" → 55.75
-   *  - "G" (bare letter) → 45.0 (defaults to subclass 5)
+   *   - "O0" → 0.0
+   *   - "G2" → 42.0
+   *   - "G2.7" → 42.7
+   *   - "G2+" → 42.25
+   *   - "K6-" → 55.75
+   *   - "G" (bare letter) → 45.0 (defaults to subclass 5)
    *
    * Based on Malkov et al, 2020, RAA, 20, 139, Figure 1.
    *
@@ -84,46 +86,36 @@ object StellarPhysics:
   /**
    * Calculate effective temperature from stellar spectral classification.
    *
-   * Uses polynomial relation from Malkov et al, 2020, RAA, 20, 139 for main sequence stars.
-   * White dwarfs use T_eff = 50400 / number formula. Returns average if multiple temperature
-   * classes provided.
-   *
-   * @param luminosityClasses
-   *   Luminosity class (e.g., ["V"], ["III"]), needed to identify white dwarfs
-   * @param temperatureClasses
-   *   Temperature classes (e.g., ["G2"], ["K1", "K2"] for ranges)
-   * @return
-   *   Effective temperature in Kelvin, or None if:
-   *   - Either list is empty
-   *   - Temperature class is L-type or later (brown dwarfs not supported)
-   *   - White dwarf number cannot be parsed
+   * Uses polynomial relation from Malkov et al, 2020, RAA, 20, 139 for main sequence stars. White
+   * dwarfs use T_eff = 50400 / number formula. Returns average if multiple temperature classes
+   * provided.
    */
   def calculateTemperature(
-    luminosityClasses:  List[String],
-    temperatureClasses: List[String]
+    luminosity:  List[String],
+    temperature: List[String]
   ): Option[Int] =
-    if luminosityClasses.isEmpty || temperatureClasses.isEmpty then return None
-
-    // Handle white dwarfs: T_eff = 50400 / number
-    if luminosityClasses.head.startsWith("D") then
-      return temperatureClasses.headOption.flatMap { tc =>
-        tc.toDoubleOption.map(num => (50400.0 / num).round.toInt)
-      }
-
-    // Calculate temperature for each temperature class
-    val temperatures = temperatureClasses.flatMap { tc =>
-      spectralClassCode(tc).flatMap { scc =>
-        if scc >= 70.0 then None // No support for brown dwarfs (L, T, Y) yet
-        else
-          // Polynomial from Malkov et al. 2020
-          val logTEff =
-            5.07073 - 7.57056e-2 * scc + 1.47089e-3 * scc * scc - 1.03905e-5 * scc * scc * scc
-          Some(math.pow(10, logTEff).round.toInt)
-      }
-    }
-
-    if temperatures.isEmpty then None
-    else Some((temperatures.sum.toDouble / temperatures.length).round.toInt)
+    (luminosity, temperature) match
+      case (Nil, _) | (_, Nil) | (Nil, Nil)   => none
+      case ((h :: _), t) if h.startsWith("D") =>
+        // white dwarfs: T_eff = 50400 / number
+        t.headOption.flatMap: tc =>
+          tc.parseDoubleOption.map(num => (50400.0 / num).round.toInt)
+      case _                                  =>
+        // Calculate temperature for each temperature class
+        temperature
+          .flatMap: tc =>
+            spectralClassCode(tc).flatMap:
+              // No support for brown dwarfs (L, T, Y) yet
+              case scc if scc >= 70.0 => None
+              case scc                =>
+                // Polynomial from Malkov et al. 2020
+                val logTEff =
+                  5.07073 - 7.57056e-2 * scc + 1.47089e-3 * scc * scc - 1.03905e-5 * scc * scc * scc
+                math.pow(10, logTEff).round.toInt.some
+        match
+          case Nil => none
+          // Return average
+          case t   => (t.sum.toDouble / t.length).round.toInt.some
 
   /**
    * Gravity interpolation table from Straizys & Kuriliene, 1981, Ap&SS, 80, 353S. Extended with
@@ -233,50 +225,43 @@ object StellarPhysics:
    * Calculate surface gravity (log g) from stellar spectral classification.
    *
    * Uses interpolation from Straizys & Kuriliene, 1981, Ap&SS, 80, 353S gravity table. Normalizes
-   * luminosity classes (I→Iab, VI→sd, drops subclasses from non-supergiant types). White dwarfs
-   * use fixed log g = 8.0. Returns average if multiple classes provided.
-   *
-   * @param luminosityClasses
-   *   Luminosity class (e.g., ["V"], ["III"]), determines gravity range
-   * @param temperatureClasses
-   *   Temperature classes (e.g., ["G2"], ["B2", "B3"] for ranges)
-   * @return
-   *   Surface gravity (log g), or None if:
-   *   - Either list is empty
-   *   - Temperature class is L-type or later (brown dwarfs not supported)
+   * luminosity classes (I→Iab, VI→sd, drops subclasses from non-supergiant types). White dwarfs use
+   * fixed log g = 8.0.
    */
   def calculateGravity(
-    luminosityClasses:  List[String],
-    temperatureClasses: List[String]
+    luminosity:  List[String],
+    temperature: List[String]
   ): Option[Double] =
-    if luminosityClasses.isEmpty || temperatureClasses.isEmpty then return None
+    (luminosity, temperature) match
+      case (Nil, _) | (_, Nil) | (Nil, Nil)   => none
+      case ((h :: _), t) if h.startsWith("D") =>
+        // Handle white dwarfs
+        8.0.some
+      case _                                  =>
+        val allLogG = for {
+          lc  <- luminosity
+          tc  <- temperature
+          scc <- spectralClassCode(tc)
+          if scc < 70.0 // No brown dwarf support
+        } yield
+          // Normalize luminosity matches Python logic
+          val supergiants  = Set("Ia", "Ib", "Iab")
+          val normalizedLC = lc match
+            case "I"                                     => "Iab"
+            case "VI"                                    => "sd"
+            case s if supergiants.contains(s)            => s
+            case s if s.endsWith("a") || s.endsWith("b") => s.dropRight(1)
+            case s                                       => s
 
-    // Handle white dwarfs
-    if luminosityClasses.head.startsWith("D") then return Some(8.0)
+          interpolateGravity(scc, normalizedLC)
 
-    val allLogG = for
-      lc  <- luminosityClasses
-      tc  <- temperatureClasses
-      scc <- spectralClassCode(tc)
-      if scc < 70.0 // No brown dwarf support
-    yield
-      // Normalize luminosity class - matches Python logic
-      val normalizedLC = lc match
-        case "I"                                                                              => "Iab" // Default I to Iab
-        case "VI"                                                                             => "sd"  // VI is subdwarf
-        case s if !Set("Ia", "Ib", "Iab").contains(s) && (s.endsWith("a") || s.endsWith("b")) =>
-          s.dropRight(1) // Drop subclass for non Ia/Ib/Iab
-        case s                                                                                => s
-
-      interpolateGravity(scc, normalizedLC)
-
-    if allLogG.isEmpty then None
-    else
-      Some(
-        BigDecimal(allLogG.sum / allLogG.length)
-          .setScale(3, BigDecimal.RoundingMode.HALF_UP)
-          .toDouble
-      )
+        if allLogG.isEmpty then None
+        else
+          Some(
+            BigDecimal(allLogG.sum / allLogG.length)
+              .setScale(3, BigDecimal.RoundingMode.HALF_UP)
+              .toDouble
+          )
 
   /**
    * Interpolate log(g) for a given spectral class code and luminosity class.
@@ -306,23 +291,11 @@ object StellarPhysics:
       val fraction = (scc - sccLow) / (sccHigh - sccLow)
       logGLow + fraction * (logGHigh - logGLow)
 
-  /**
-   * Calculate both effective temperature and surface gravity from spectral classification.
-   *
-   * Convenience method combining [[calculateTemperature]] and [[calculateGravity]].
-   *
-   * @param luminosityClasses
-   *   Luminosity class (e.g., ["V"])
-   * @param temperatureClasses
-   *   Temperature classes (e.g., ["G2"])
-   * @return
-   *   Both T_eff and log g, or None if either calculation fails
-   */
   def calculateParameters(
-    luminosityClasses:  List[String],
-    temperatureClasses: List[String]
+    luminosity:  List[String],
+    temperature: List[String]
   ): Option[StellarParameters] =
     for
-      tEff <- calculateTemperature(luminosityClasses, temperatureClasses)
-      logG <- calculateGravity(luminosityClasses, temperatureClasses)
+      tEff <- calculateTemperature(luminosity, temperature)
+      logG <- calculateGravity(luminosity, temperature)
     yield StellarParameters(tEff.withUnit[Kelvin], logG)
