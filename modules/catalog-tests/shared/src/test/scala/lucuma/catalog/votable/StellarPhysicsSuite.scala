@@ -4,6 +4,7 @@
 package lucuma.catalog.votable
 
 import munit.FunSuite
+import coulomb.*
 
 class StellarPhysicsSuite extends FunSuite:
 
@@ -94,7 +95,7 @@ class StellarPhysicsSuite extends FunSuite:
     val result = StellarPhysics.calculateParameters(List("V"), List("G2"))
     assert(result.isDefined)
     result.foreach { params =>
-      assertEquals(params.tEff, 5199)
+      assertEquals(params.tEff.value, 5199)
       assertEquals(params.logG, 4.426)
     }
 

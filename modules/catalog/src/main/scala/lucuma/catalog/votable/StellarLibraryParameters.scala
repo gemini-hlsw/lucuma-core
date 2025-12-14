@@ -5,6 +5,9 @@ package lucuma.catalog.votable
 
 import lucuma.catalog.votable.StellarPhysics.StellarParameters
 import lucuma.core.enums.StellarLibrarySpectrum
+import coulomb.*
+import coulomb.syntax.*
+import coulomb.units.si.Kelvin
 
 /**
  * Pre-calculated physical parameters for each stellar library SED. Based on parsing spectral types
@@ -49,11 +52,11 @@ object StellarLibraryParameters:
       val params = (spectrum.tag, lumClasses, tempClasses) match
         // White dwarfs without temperature number default to mid-range
         case (tag, lc :: _, Nil) if tag.startsWith("D") =>
-          Some(StellarParameters(16800, 8.0)) // ~DA3 equivalent
+          Some(StellarParameters(16800.withUnit[Kelvin], 8.0)) // ~DA3 equivalent
 
         // Subdwarf without specific type
         case ("sd", _, _) =>
-          Some(StellarParameters(5199, 4.0)) // Generic subdwarf
+          Some(StellarParameters(5199.withUnit[Kelvin], 4.0)) // Generic subdwarf
 
         // Standard stars
         case (_, lc, tc) if lc.nonEmpty && tc.nonEmpty =>

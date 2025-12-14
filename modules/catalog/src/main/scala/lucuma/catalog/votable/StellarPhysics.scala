@@ -5,6 +5,9 @@ package lucuma.catalog.votable
 
 import cats.parse.Parser.char
 import cats.parse.Rfc5234.digit
+import coulomb.*
+import coulomb.syntax.*
+import coulomb.units.si.Kelvin
 
 /**
  * Stellar physics calculations for matching spectral types to library SEDs. Based on the Python
@@ -17,8 +20,8 @@ import cats.parse.Rfc5234.digit
 object StellarPhysics:
 
   case class StellarParameters(
-    tEff: Int,   // Effective temperature in Kelvin
-    logG: Double // Log of surface gravity
+    tEff: Quantity[Int, Kelvin],     // Effective temperature
+    logG: Double                      // Log of surface gravity (dimensionless)
   )
 
   /**
@@ -272,4 +275,4 @@ object StellarPhysics:
     for
       tEff <- calculateTemperature(luminosityClasses, temperatureClasses)
       logG <- calculateGravity(luminosityClasses, temperatureClasses)
-    yield StellarParameters(tEff, logG)
+    yield StellarParameters(tEff.withUnit[Kelvin], logG)
