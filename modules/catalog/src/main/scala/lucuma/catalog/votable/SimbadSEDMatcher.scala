@@ -17,6 +17,26 @@ import lucuma.core.model.UnnormalizedSED
 private enum ObjectCategory:
   case Star, Galaxy, Quasar, HIIRegion, PlanetaryNebula
 
+/**
+ * Represents a stellar SED candidate with physics-based scoring.
+ *
+ * @param spectrum The library spectrum being evaluated
+ * @param score Normalized distance in (T_eff, log_g) parameter space
+ * @param absDt Absolute temperature difference from target
+ * @param dtMax Maximum allowed temperature tolerance
+ * @param absDg Absolute gravity difference from target
+ * @param dgMax Maximum allowed gravity tolerance
+ */
+private case class ScoredMatch(
+  spectrum: StellarLibrarySpectrum,
+  score: Double,
+  absDt: Double,
+  dtMax: Double,
+  absDg: Double,
+  dgMax: Double
+):
+  def isWithinTolerance: Boolean = absDt < dtMax && absDg < dgMax
+
 object SimbadSEDMatcher:
   // Stellar matching tolerances (physics-based scoring)
   private val TemperatureToleranceFraction: Double = 0.1   // 10% of target temperature
@@ -146,36 +166,33 @@ object SimbadSEDMatcher:
       // Calculate physical parameters for target star
       StellarPhysics.calculateParameters(luminosityClasses, temperatureClasses) match {
         case Some(targetParams) =>
-          // Score all library SEDs based on physical parameters
-          val scored = StellarLibrarySpectrum.values.toList.flatMap { spectrum =>
-            StellarLibraryParameters.getParameters(spectrum).map { sedParams =>
-              // Calculate differences - convert quantities to raw values for arithmetic
-              val dtValue   = sedParams.tEff.value - targetParams.tEff.value
-              val dg        = sedParams.logG - targetParams.logG
-              val dtMax     = TemperatureToleranceFraction * targetParams.tEff.value
-              val dgMax     = GravityToleranceDex
-
-              // Calculate score: sqrt((ΔT/ΔT_max)² + (Δlog_g/Δlog_g_max)²)
-              val score = math.sqrt((dtValue / dtMax) * (dtValue / dtMax) + (dg / dgMax) * (dg / dgMax))
-
-              (spectrum, score, math.abs(dtValue), dtMax, math.abs(dg), dgMax)
-            }
-          }
-
-          // Return best match (lowest score) if BOTH differences are within tolerance
-          // This matches Python logic: abs(dt) < dt_max AND abs(dg) < dg_max
-          scored
-            .sortBy(_._2)
+          StellarLibrarySpectrum.values.toList
+            .flatMap(scoreSpectrum(targetParams))
+            .sortBy(_.score)
             .headOption
-            .filter { case (_, _, absDt, dtMax, absDg, dgMax) =>
-              absDt < dtMax && absDg < dgMax
-            }
-            .map(_._1)
+            .filter(_.isWithinTolerance)
+            .map(_.spectrum)
 
         case None =>
           // Cannot calculate parameters - match Python behavior: return None
           None
       }
+
+  private def scoreSpectrum(targetParams: StellarPhysics.StellarParameters)(
+    spectrum: StellarLibrarySpectrum
+  ): Option[ScoredMatch] =
+    StellarLibraryParameters.getParameters(spectrum).map { sedParams =>
+      // Calculate differences - convert quantities to raw values for arithmetic
+      val dtValue   = sedParams.tEff.value - targetParams.tEff.value
+      val dg        = sedParams.logG - targetParams.logG
+      val dtMax     = TemperatureToleranceFraction * targetParams.tEff.value
+      val dgMax     = GravityToleranceDex
+
+      // Calculate score: sqrt((ΔT/ΔT_max)² + (Δlog_g/Δlog_g_max)²)
+      val score = math.sqrt((dtValue / dtMax) * (dtValue / dtMax) + (dg / dgMax) * (dg / dgMax))
+
+      ScoredMatch(spectrum, score, math.abs(dtValue), dtMax, math.abs(dg), dgMax)
+    }
 
   /**
    * Match galaxy morphological type to appropriate GalaxySpectrum.
