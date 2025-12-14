@@ -20,7 +20,7 @@ trait SpectralTypeParsers:
 
   /** Optional temperature subclass: digit, optionally followed by decimal */
   private val tempSubclass: Parser0[String] =
-    (digit ~ (char('.') ~ digit).?).string
+    (digit ~ (char('.') ~ digit.rep).?).string
 
   /** Optional modifier: + or - */
   private val modifier: Parser0[String] =

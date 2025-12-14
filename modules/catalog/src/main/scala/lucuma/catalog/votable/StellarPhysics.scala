@@ -3,6 +3,9 @@
 
 package lucuma.catalog.votable
 
+import cats.parse.Parser.char
+import cats.parse.Rfc5234.digit
+
 /**
  * Stellar physics calculations for matching spectral types to library SEDs. Based on the Python
  * reference implementation (match_sed.py by Andrew Stephens).
@@ -40,14 +43,13 @@ object StellarPhysics:
 
     val letter = spectralClass.head
     letterConversions.get(letter).flatMap { baseCode =>
-      // Extract subclass (e.g., "5" from "G5", "3.5" from "G3.5")
-      val subclassPattern = """([0-9])(\.[05])?""".r
-      val subclass        = subclassPattern.findFirstIn(spectralClass.tail) match
-        case Some(subclassPattern(digit, decimal)) =>
-          val base = digit.toDouble
-          val frac = if decimal == ".5" then 0.5 else 0.0
-          base + frac
-        case _                                     =>
+      // Reuse parser from SpectralTypeParsers: digit optionally followed by decimal
+      val subclassParser = (digit ~ (char('.') ~ digit.rep).?).string
+
+      val subclass = subclassParser.parse(spectralClass.tail) match
+        case Right((_, value)) =>
+          value.toDoubleOption.getOrElse(5.0)
+        case Left(_)           =>
           5.0 // Default to 5 if no subclass specified
 
       // Handle +/- modifiers (quarter subclass)
