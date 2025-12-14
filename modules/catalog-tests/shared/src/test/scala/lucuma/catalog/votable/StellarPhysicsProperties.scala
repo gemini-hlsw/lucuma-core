@@ -55,21 +55,21 @@ class StellarPhysicsProperties extends ScalaCheckSuite:
 
   property("+/- modifiers adjust spectral code by 0.25") {
     forAll(Gen.oneOf("O", "B", "A", "F", "G", "K", "M"), Gen.choose(0, 9)) { (letter, sub) =>
-      val base    = StellarPhysics.spectralClassCode(s"$letter$sub")
-      val plus    = StellarPhysics.spectralClassCode(s"$letter$sub+")
-      val minus   = StellarPhysics.spectralClassCode(s"$letter$sub-")
+      val base  = StellarPhysics.spectralClassCode(s"$letter$sub")
+      val plus  = StellarPhysics.spectralClassCode(s"$letter$sub+")
+      val minus = StellarPhysics.spectralClassCode(s"$letter$sub-")
 
       assert(
         (base, plus, minus).mapN { (b, p, m) =>
-          (p - b).abs < 0.01 && (m - b).abs < 0.01
+          (p - b - 0.25).abs < 0.01 && (b - m - 0.25).abs < 0.01
         }.getOrElse(false)
       )
     }
   }
 
   property("white dwarf temperature formula T = 50400 / number") {
-    forAll(Gen.choose(1.0, 20.0)) { num =>
-      val result = StellarPhysics.calculateTemperature(List("DA"), List(num.toInt.toString))
+    forAll(Gen.choose(1, 20)) { num =>
+      val result   = StellarPhysics.calculateTemperature(List("DA"), List(num.toString))
       val expected = (50400.0 / num).round.toInt
       assert(result.map(_ == expected).getOrElse(false))
     }
