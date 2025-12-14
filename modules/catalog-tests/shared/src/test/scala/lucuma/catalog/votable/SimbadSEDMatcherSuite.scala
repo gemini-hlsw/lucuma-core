@@ -3,6 +3,7 @@
 
 package lucuma.catalog.votable
 
+import cats.data.NonEmptyChain
 import lucuma.core.enums.*
 import lucuma.core.model.UnnormalizedSED
 import munit.FunSuite
@@ -65,11 +66,13 @@ class SimbadSEDMatcherSuite extends FunSuite {
 
     starTypes.foreach { otype =>
       val result = SimbadSEDMatcher.inferSED(otype, Some("G2V"))
-      assert(result.isDefined, s"Object type $otype should have a SED match")
-      result.foreach { sed =>
-        assert(sed.isInstanceOf[UnnormalizedSED.StellarLibrary],
-               s"Object type $otype should map to StellarLibrary SED"
-        )
+      assert(result.isRight, s"Object type $otype should have a SED match")
+      result match {
+        case Right(sed) =>
+          assert(sed.isInstanceOf[UnnormalizedSED.StellarLibrary],
+                 s"Object type $otype should map to StellarLibrary SED"
+          )
+        case Left(_) => fail(s"Expected Right but got Left for $otype")
       }
     }
   }
@@ -99,11 +102,13 @@ class SimbadSEDMatcherSuite extends FunSuite {
 
     galaxyTypes.foreach { otype =>
       val result = SimbadSEDMatcher.inferSED(otype, morphType = Some("Sb"))
-      assert(result.isDefined, s"Object type $otype should have a SED match")
-      result.foreach { sed =>
-        assert(sed.isInstanceOf[UnnormalizedSED.Galaxy],
-               s"Object type $otype should map to Galaxy SED"
-        )
+      assert(result.isRight, s"Object type $otype should have a SED match")
+      result match {
+        case Right(sed) =>
+          assert(sed.isInstanceOf[UnnormalizedSED.Galaxy],
+                 s"Object type $otype should map to Galaxy SED"
+          )
+        case Left(_) => fail(s"Expected Right but got Left for $otype")
       }
     }
   }
@@ -126,28 +131,32 @@ class SimbadSEDMatcherSuite extends FunSuite {
 
     quasarTypes.foreach { otype =>
       val result = SimbadSEDMatcher.inferSED(otype)
-      assert(result.isDefined, s"Object type $otype should have a SED match")
-      result.foreach { sed =>
-        assert(sed.isInstanceOf[UnnormalizedSED.Quasar],
-               s"Object type $otype should map to Quasar SED"
-        )
+      assert(result.isRight, s"Object type $otype should have a SED match")
+      result match {
+        case Right(sed) =>
+          assert(sed.isInstanceOf[UnnormalizedSED.Quasar],
+                 s"Object type $otype should map to Quasar SED"
+          )
+        case Left(_) => fail(s"Expected Right but got Left for $otype")
       }
     }
   }
 
   test("HII region should be classified correctly") {
     val result = SimbadSEDMatcher.inferSED("HII")
-    assert(result.isDefined)
-    result.foreach { sed =>
-      assert(sed.isInstanceOf[UnnormalizedSED.HIIRegion])
+    assert(result.isRight)
+    result match {
+      case Right(sed) => assert(sed.isInstanceOf[UnnormalizedSED.HIIRegion])
+      case Left(_)    => fail("Expected Right")
     }
   }
 
   test("planetary nebula should be classified correctly") {
     val result = SimbadSEDMatcher.inferSED("PN")
-    assert(result.isDefined)
-    result.foreach { sed =>
-      assert(sed.isInstanceOf[UnnormalizedSED.PlanetaryNebula])
+    assert(result.isRight)
+    result match {
+      case Right(sed) => assert(sed.isInstanceOf[UnnormalizedSED.PlanetaryNebula])
+      case Left(_)    => fail("Expected Right")
     }
   }
 
@@ -167,41 +176,41 @@ class SimbadSEDMatcherSuite extends FunSuite {
 
     testCases.foreach { case (spectralType, expectedTemp, expectedLum) =>
       val result = SimbadSEDMatcher.inferSED("*", Some(spectralType))
-      assert(result.isDefined, s"Spectral type $spectralType should be parseable")
-      result.foreach { sed =>
-        assert(sed.isInstanceOf[UnnormalizedSED.StellarLibrary],
-               s"Spectral type $spectralType should map to StellarLibrary"
-        )
+      assert(result.isRight, s"Spectral type $spectralType should be parseable")
+      result match {
+        case Right(sed) =>
+          assert(sed.isInstanceOf[UnnormalizedSED.StellarLibrary],
+                 s"Spectral type $spectralType should map to StellarLibrary"
+          )
+        case Left(_) => fail(s"Expected Right for $spectralType")
       }
     }
   }
 
   test("white dwarf spectral types should be handled gracefully") {
     // White dwarfs with numeric temperatures can be parsed
-    // But may not find a matching library SED (returns None like Python)
+    // But may not find a matching library SED (returns Left like Python)
     val whiteDwarfTypes = List("DA3.5", "DBAP3", "DZQA6", "DC?")
 
     whiteDwarfTypes.foreach { spectralType =>
       // Should not throw - graceful handling
       val result = SimbadSEDMatcher.inferSED("WD*", Some(spectralType))
-      // Result may be None if no match found (matches Python behavior)
-      assert(result.isEmpty || result.isDefined,
-             s"White dwarf type $spectralType should be handled gracefully"
-      )
+      // Result may be Left if no match found (matches Python behavior)
+      // Just ensure it doesn't throw
+      val _ = result
     }
   }
 
   test("subdwarf spectral types should be handled gracefully") {
-    // Subdwarfs may not find matching library SEDs (returns None like Python)
+    // Subdwarfs may not find matching library SEDs (returns Left like Python)
     val subdwarfTypes = List("sdO2VIIIHe5", "sdB1", "sdBN0VIIHe28", "sdG", "sd:K1Fe-1", "sdT8")
 
     subdwarfTypes.foreach { spectralType =>
       // Should not throw - graceful handling
       val result = SimbadSEDMatcher.inferSED("*", Some(spectralType))
-      // Result may be None if no match found (matches Python behavior)
-      assert(result.isEmpty || result.isDefined,
-             s"Subdwarf type $spectralType should be handled gracefully"
-      )
+      // Result may be Left if no match found (matches Python behavior)
+      // Just ensure it doesn't throw
+      val _ = result
     }
   }
 
@@ -229,17 +238,19 @@ class SimbadSEDMatcherSuite extends FunSuite {
 
     (ellipticalTests ++ spiralTests).foreach { case (morphType, expectedSpectrum) =>
       val result = SimbadSEDMatcher.inferSED("G", morphType = Some(morphType))
-      assert(result.isDefined, s"Morphological type $morphType should be parseable")
-      result.foreach { sed =>
-        sed match {
-          case UnnormalizedSED.Galaxy(spectrum) =>
-            assertEquals(spectrum,
-                         expectedSpectrum,
-                         s"Morphological type $morphType should map to $expectedSpectrum"
-            )
-          case _                                =>
-            fail(s"Expected Galaxy SED for morphological type $morphType")
-        }
+      assert(result.isRight, s"Morphological type $morphType should be parseable")
+      result match {
+        case Right(sed) =>
+          sed match {
+            case UnnormalizedSED.Galaxy(spectrum) =>
+              assertEquals(spectrum,
+                           expectedSpectrum,
+                           s"Morphological type $morphType should map to $expectedSpectrum"
+              )
+            case _                                =>
+              fail(s"Expected Galaxy SED for morphological type $morphType")
+          }
+        case Left(_) => fail(s"Expected Right for $morphType")
       }
     }
   }
@@ -262,7 +273,7 @@ class SimbadSEDMatcherSuite extends FunSuite {
 
     commonStars.foreach { case (spectralType, otype) =>
       val result = SimbadSEDMatcher.inferSED(otype, Some(spectralType))
-      assert(result.isDefined, s"Common stellar type $spectralType should have a SED match")
+      assert(result.isRight, s"Common stellar type $spectralType should have a SED match")
     }
   }
 
@@ -282,18 +293,25 @@ class SimbadSEDMatcherSuite extends FunSuite {
 
     testCases.foreach { case (otype, spectralType, morphType) =>
       val result = SimbadSEDMatcher.inferSED(otype, spectralType, morphType)
-      assert(result.isDefined,
+      assert(result.isRight,
              s"Test case ($otype, $spectralType, $morphType) should have a SED match"
       )
     }
   }
 
-  test("unrecognized object types should return None") {
+  test("unrecognized object types should return error") {
     val unrecognizedTypes = List("XYZ", "???", "Unknown", "")
 
     unrecognizedTypes.foreach { otype =>
       val result = SimbadSEDMatcher.inferSED(otype)
-      assert(result.isEmpty, s"Unrecognized object type $otype should return None")
+      assert(result.isLeft, s"Unrecognized object type $otype should return error")
+      result match {
+        case Left(errors) =>
+          assert(errors.head.isInstanceOf[CatalogProblem.UnknownObjectType],
+                 s"Should have UnknownObjectType error for $otype"
+          )
+        case Right(_) => fail(s"Expected Left for $otype")
+      }
     }
   }
 
@@ -302,10 +320,8 @@ class SimbadSEDMatcherSuite extends FunSuite {
 
     invalidSpectralTypes.foreach { spectralType =>
       val result = SimbadSEDMatcher.inferSED("*", Some(spectralType))
-      // Should either return None or a fallback SED
-      assert(result.isEmpty || result.isDefined,
-             s"Invalid spectral type $spectralType should be handled gracefully"
-      )
+      // Should return either Right or Left - just no exceptions
+      val _ = result
     }
   }
 }

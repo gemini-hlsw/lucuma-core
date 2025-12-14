@@ -9,6 +9,7 @@ import lucuma.core.model.UnnormalizedSED
 import munit.FunSuite
 
 import scala.io.Source
+import cats.data.EitherNec
 
 /**
  * Test suite that verifies SED matching against a dataset of Simbad entries. Replicates the
@@ -25,7 +26,7 @@ class SimbadSEDMatcherDataSuite extends FunSuite:
 
   case class MatchResult(
     entry:    SimbadEntry,
-    sed:      Option[UnnormalizedSED],
+    sed:      EitherNec[CatalogProblem, UnnormalizedSED],
     category: Option[String]
   )
 
@@ -73,7 +74,7 @@ class SimbadSEDMatcherDataSuite extends FunSuite:
       val spectralTypeOpt = if entry.spectralType.isEmpty then None else Some(entry.spectralType)
       val sed             = SimbadSEDMatcher.inferSED(entry.otype, spectralTypeOpt, morphTypeOpt)
 
-      val category = sed.map {
+      val category = sed.toOption.map {
         case UnnormalizedSED.StellarLibrary(_)        => "star"
         case UnnormalizedSED.Galaxy(_)                => "galaxy"
         case UnnormalizedSED.CoolStarModel(_)         => "coolstarmodel"
@@ -119,12 +120,12 @@ class SimbadSEDMatcherDataSuite extends FunSuite:
           "delSctV*"
       ).contains(r.entry.otype)
     )
-    // These should either get a stellar SED or None (if otype not recognized)
+    // These should either get a stellar SED or Left (if otype not recognized)
     starResults.foreach { result =>
       result.sed match {
-        case Some(UnnormalizedSED.StellarLibrary(_)) => // OK
-        case None                                    => // OK - otype not recognized (e.g., PulsV*delSct, delSctV*)
-        case other                                   =>
+        case Right(UnnormalizedSED.StellarLibrary(_)) => // OK
+        case Left(_)                                  => // OK - otype not recognized (e.g., PulsV*delSct, delSctV*)
+        case other                                    =>
           fail(s"Star ${result.entry.mainId} (${result.entry.otype}) got unexpected SED: $other")
       }
     }
@@ -136,9 +137,9 @@ class SimbadSEDMatcherDataSuite extends FunSuite:
     assert(galaxyResults.nonEmpty, "Should have galaxy entries in test data")
     galaxyResults.foreach { result =>
       result.sed match {
-        case Some(UnnormalizedSED.Galaxy(_)) => // OK
-        case None                            => // OK - no morphological type or doesn't match
-        case other                           => fail(s"Galaxy ${result.entry.mainId} got unexpected SED: $other")
+        case Right(UnnormalizedSED.Galaxy(_)) => // OK
+        case Left(_)                           => // OK - no morphological type or doesn't match
+        case other                             => fail(s"Galaxy ${result.entry.mainId} got unexpected SED: $other")
       }
     }
   }
@@ -147,7 +148,8 @@ class SimbadSEDMatcherDataSuite extends FunSuite:
     val quasarResults = matchResults.filter(r => Set("QSO", "BLL").contains(r.entry.otype))
     assert(quasarResults.nonEmpty, "Should have quasar entries in test data")
     quasarResults.foreach { result =>
-      assertEquals(result.sed, Some(UnnormalizedSED.Quasar(QuasarSpectrum.QS0)))
+      assert(result.sed.isRight)
+      assertEquals(result.sed.getOrElse(fail("Expected Right")), UnnormalizedSED.Quasar(QuasarSpectrum.QS0))
     }
   }
 
@@ -155,7 +157,8 @@ class SimbadSEDMatcherDataSuite extends FunSuite:
     val hiiResults = matchResults.filter(r => r.entry.otype == "HII")
     assert(hiiResults.nonEmpty, "Should have HII region entries in test data")
     hiiResults.foreach { result =>
-      assertEquals(result.sed, Some(UnnormalizedSED.HIIRegion(HIIRegionSpectrum.OrionNebula)))
+      assert(result.sed.isRight)
+      assertEquals(result.sed.getOrElse(fail("Expected Right")), UnnormalizedSED.HIIRegion(HIIRegionSpectrum.OrionNebula))
     }
   }
 
@@ -163,8 +166,9 @@ class SimbadSEDMatcherDataSuite extends FunSuite:
     val pnResults = matchResults.filter(r => r.entry.otype == "PN")
     assert(pnResults.nonEmpty, "Should have PN entries in test data")
     pnResults.foreach { result =>
-      assertEquals(result.sed,
-                   Some(UnnormalizedSED.PlanetaryNebula(PlanetaryNebulaSpectrum.NGC7009))
+      assert(result.sed.isRight)
+      assertEquals(result.sed.getOrElse(fail("Expected Right")),
+                   UnnormalizedSED.PlanetaryNebula(PlanetaryNebulaSpectrum.NGC7009)
       )
     }
   }
@@ -172,19 +176,20 @@ class SimbadSEDMatcherDataSuite extends FunSuite:
   test("match stellar spectral types correctly") {
     val sunResult = matchResults.find(_.entry.mainId == "Sun")
     assert(sunResult.isDefined)
-    assertEquals(sunResult.get.sed,
-                 Some(UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.G2V))
+    assert(sunResult.get.sed.isRight)
+    assertEquals(sunResult.get.sed.getOrElse(fail("Expected Right")),
+                 UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.G2V)
     )
   }
 
   test("handle white dwarf spectral types") {
     val wdResults = matchResults.filter(_.entry.spectralType.startsWith("DA"))
-    // White dwarfs may not find a matching library SED (returns None like Python)
+    // White dwarfs may not find a matching library SED (returns Left like Python)
     wdResults.foreach { result =>
       result.sed match {
-        case Some(UnnormalizedSED.StellarLibrary(_)) => // OK - found a match
-        case None                                    => // OK - no match found (matches Python behavior)
-        case other                                   => fail(s"White dwarf ${result.entry.mainId} got unexpected SED: $other")
+        case Right(UnnormalizedSED.StellarLibrary(_)) => // OK - found a match
+        case Left(_)                                  => // OK - no match found (matches Python behavior)
+        case other                                    => fail(s"White dwarf ${result.entry.mainId} got unexpected SED: $other")
       }
     }
   }
@@ -194,12 +199,12 @@ class SimbadSEDMatcherDataSuite extends FunSuite:
     val sdResults = matchResults.filter(r =>
       StarTypes.contains(r.entry.otype) && r.entry.spectralType.startsWith("sd")
     )
-    // Subdwarfs may not find a matching library SED (returns None like Python)
+    // Subdwarfs may not find a matching library SED (returns Left like Python)
     sdResults.foreach { result =>
       result.sed match {
-        case Some(UnnormalizedSED.StellarLibrary(_)) => // OK - found a match
-        case None                                    => // OK - no match found (matches Python behavior)
-        case other                                   => fail(s"Subdwarf ${result.entry.mainId} got unexpected SED: $other")
+        case Right(UnnormalizedSED.StellarLibrary(_)) => // OK - found a match
+        case Left(_)                                  => // OK - no match found (matches Python behavior)
+        case other                                    => fail(s"Subdwarf ${result.entry.mainId} got unexpected SED: $other")
       }
     }
   }
@@ -208,21 +213,23 @@ class SimbadSEDMatcherDataSuite extends FunSuite:
     // Elliptical galaxy
     val m87 = matchResults.find(_.entry.mainId == "M  87")
     assert(m87.isDefined)
-    assertEquals(m87.get.sed, Some(UnnormalizedSED.Galaxy(GalaxySpectrum.Elliptical)))
+    assert(m87.get.sed.isRight)
+    assertEquals(m87.get.sed.getOrElse(fail("Expected Right")), UnnormalizedSED.Galaxy(GalaxySpectrum.Elliptical))
 
     // Spiral galaxy
     val m31 = matchResults.find(_.entry.mainId == "M  31")
     assert(m31.isDefined)
-    assertEquals(m31.get.sed, Some(UnnormalizedSED.Galaxy(GalaxySpectrum.Spiral)))
+    assert(m31.get.sed.isRight)
+    assertEquals(m31.get.sed.getOrElse(fail("Expected Right")), UnnormalizedSED.Galaxy(GalaxySpectrum.Spiral))
   }
 
   test("print summary statistics") {
     val total     = matchResults.length
-    val matched   = matchResults.count(_.sed.isDefined)
+    val matched   = matchResults.count(_.sed.isRight)
     val unmatched = total - matched
 
     val byCat =
-      matchResults.filter(_.sed.isDefined).groupBy(_.category.get).view.mapValues(_.length).toMap
+      matchResults.filter(_.sed.isRight).groupBy(_.category.get).view.mapValues(_.length).toMap
 
     println(s"\n=== SED Matching Results ===")
     println(s"Total entries: $total")
@@ -235,7 +242,7 @@ class SimbadSEDMatcherDataSuite extends FunSuite:
     println()
 
     // Print some examples of unmatched entries
-    val unmatchedEntries = matchResults.filter(_.sed.isEmpty).take(10)
+    val unmatchedEntries = matchResults.filter(_.sed.isLeft).take(10)
     if unmatchedEntries.nonEmpty then
       println("Sample unmatched entries:")
       unmatchedEntries.foreach { result =>
@@ -250,17 +257,19 @@ class SimbadSEDMatcherDataSuite extends FunSuite:
     // These are test cases matching Python behavior
 
     // O9.7IIn - luminosity class II may not have close match in library
-    // Returns None if outside tolerance (matches Python behavior)
+    // Returns Left if outside tolerance (matches Python behavior)
     val o9Result = SimbadSEDMatcher.inferSED("*", Some("O9.7IIn"), None)
-    assert(o9Result.isEmpty || o9Result.exists(_.isInstanceOf[UnnormalizedSED.StellarLibrary]),
-           s"O9.7IIn should return None or StellarLibrary, got $o9Result"
+    assert(o9Result.isLeft || o9Result.exists(_.isInstanceOf[UnnormalizedSED.StellarLibrary]),
+           s"O9.7IIn should return Left or StellarLibrary, got $o9Result"
     )
 
     // A0V should match A0V
     val a0Result = SimbadSEDMatcher.inferSED("*", Some("A0V"), None)
-    assertEquals(a0Result, Some(UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.A0V)))
+    assert(a0Result.isRight)
+    assertEquals(a0Result.getOrElse(fail("Expected Right")), UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.A0V))
 
     // F1V should match F2V (closest available)
     val f1Result = SimbadSEDMatcher.inferSED("*", Some("F1V"), None)
-    assertEquals(f1Result, Some(UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.F2V)))
+    assert(f1Result.isRight)
+    assertEquals(f1Result.getOrElse(fail("Expected Right")), UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.F2V))
   }
