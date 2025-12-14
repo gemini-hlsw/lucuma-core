@@ -3,8 +3,6 @@
 
 package lucuma.catalog.votable
 
-import cats.parse.Parser.char
-import cats.parse.Rfc5234.digit
 import cats.syntax.option.*
 import coulomb.*
 import coulomb.syntax.*
@@ -21,6 +19,19 @@ import lucuma.core.syntax.string.*
  */
 object StellarPhysics:
 
+  private val LetterConversions = Map(
+    'O' -> 0.0,
+    'B' -> 10.0,
+    'A' -> 20.0,
+    'F' -> 30.0,
+    'G' -> 40.0,
+    'K' -> 50.0,
+    'M' -> 60.0,
+    'L' -> 70.0,
+    'T' -> 80.0,
+    'Y' -> 90.0
+  )
+
   case class StellarParameters(
     tEff: Quantity[Int, Kelvin], // Effective temperature
     logG: Double                 // Log of surface gravity (dimensionless)
@@ -30,7 +41,7 @@ object StellarPhysics:
    * Convert a spectral class string to a numerical code.
    *
    * Maps spectral type letters to base values (O=0, B=10, A=20, ..., Y=90) and adds subclass digits
-   * (0-9.5). Handles +/- modifiers (±0.25 subclass adjustment).
+   * (0-9.5).
    *
    * Examples:
    *   - "O0" → 0.0
@@ -40,35 +51,14 @@ object StellarPhysics:
    *   - "K6-" → 55.75
    *   - "G" (bare letter) → 45.0 (defaults to subclass 5)
    *
-   * Based on Malkov et al, 2020, RAA, 20, 139, Figure 1.
-   *
-   * @param spectralClass
-   *   Spectral type string (e.g., "G2V" → extract "G2")
-   * @return
-   *   Numerical code, or None if spectral class is empty or contains invalid letter
+   * Based on Malkov and match_sed.py
    */
   def spectralClassCode(spectralClass: String): Option[Double] =
     if spectralClass.isEmpty then return None
 
-    val letterConversions = Map(
-      'O' -> 0.0,
-      'B' -> 10.0,
-      'A' -> 20.0,
-      'F' -> 30.0,
-      'G' -> 40.0,
-      'K' -> 50.0,
-      'M' -> 60.0,
-      'L' -> 70.0,
-      'T' -> 80.0,
-      'Y' -> 90.0
-    )
-
     val letter = spectralClass.head
-    letterConversions.get(letter).flatMap { baseCode =>
-      // Reuse parser from SpectralTypeParsers: digit optionally followed by decimal
-      val subclassParser = (digit ~ (char('.') ~ digit.rep).?).string
-
-      val subclass = subclassParser.parse(spectralClass.tail) match
+    LetterConversions.get(letter).flatMap { baseCode =>
+      val subclass = SpectralTypeParsers.tempSubclass.parse(spectralClass.tail) match
         case Right((_, value)) =>
           value.toDoubleOption.getOrElse(5.0)
         case Left(_)           =>
@@ -119,9 +109,9 @@ object StellarPhysics:
 
   /**
    * Gravity interpolation table from Straizys & Kuriliene, 1981, Ap&SS, 80, 353S. Extended with
-   * data from Malkov et al, 2020, RAA, 20, 139.
+   * data from Malkov et al, 2020, RAA, 20, 139. TODO Externalize this to a file
    */
-  private val gravityTable: List[(Double, Map[String, Double])] = List(
+  private val GravityTable: List[(Double, Map[String, Double])] = List(
     (1.0,
      Map("V"   -> 3.90,
          "IV"  -> 3.85,
@@ -255,31 +245,30 @@ object StellarPhysics:
 
           interpolateGravity(scc, normalizedLC)
 
-        if allLogG.isEmpty then None
-        else
-          Some(
+        allLogG match
+          case Nil => none
+          case _   =>
+            // adjust to 3 decimals
             BigDecimal(allLogG.sum / allLogG.length)
               .setScale(3, BigDecimal.RoundingMode.HALF_UP)
               .toDouble
-          )
+              .some
 
   /**
-   * Interpolate log(g) for a given spectral class code and luminosity class.
+   * Interpolate log(g) for a given spectral class code and luminosity class. Ported from python
    */
   private def interpolateGravity(scc: Double, lumClass: String): Double =
     // Find the two table entries to interpolate between
-    val (lower, upper) = gravityTable.partition(_._1 <= scc) match
-      case (lows, highs) if lows.nonEmpty && highs.nonEmpty =>
-        (lows.last, highs.head)
-      case (lows, _) if lows.nonEmpty                       =>
-        (lows.last, lows.last) // Extrapolate from last entry
-      case (_, highs) if highs.nonEmpty                     =>
-        (highs.head, highs.head) // Extrapolate from first entry
-      case _                                                =>
-        return 4.0 // Default
-
-    val (sccLow, mapLow)   = lower
-    val (sccHigh, mapHigh) = upper
+    val ((sccLow, mapLow), (sccHigh, mapHigh)) =
+      GravityTable.partition(_._1 <= scc) match
+        case (lows, highs) if lows.nonEmpty && highs.nonEmpty =>
+          (lows.last, highs.head)
+        case (lows, _) if lows.nonEmpty                       =>
+          (lows.last, lows.last) // Extrapolate from last entry
+        case (_, highs) if highs.nonEmpty                     =>
+          (highs.head, highs.head) // Extrapolate from first entry
+        case _                                                =>
+          return 4.0 // Default
 
     // Get gravity values for this luminosity class
     val logGLow  = mapLow.getOrElse(lumClass, mapLow.getOrElse("V", 4.0))
