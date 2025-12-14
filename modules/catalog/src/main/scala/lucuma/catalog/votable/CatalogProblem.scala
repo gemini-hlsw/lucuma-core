@@ -67,6 +67,22 @@ object CatalogProblem {
     val displayValue = s"Source ID $sourceId not found in the catalog"
   }
 
+  case class UnknownObjectType(otype: String) extends CatalogProblem {
+    val displayValue = s"Unknown Simbad object type: '$otype'"
+  }
+
+  case class InvalidSpectralType(spType: String) extends CatalogProblem {
+    val displayValue = s"Cannot parse spectral type: '$spType'"
+  }
+
+  case class UnmatchedSpectralType(spType: String) extends CatalogProblem {
+    val displayValue = s"No suitable SED match found for spectral type: '$spType'"
+  }
+
+  case class InvalidMorphologicalType(morphType: String) extends CatalogProblem {
+    val displayValue = s"Cannot parse morphological type: '$morphType'"
+  }
+
   case class CatalogException(problems: List[CatalogProblem])
       extends RuntimeException(problems.mkString(", ")) {
     def firstMessage: String =

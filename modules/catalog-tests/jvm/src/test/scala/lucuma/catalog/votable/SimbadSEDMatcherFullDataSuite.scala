@@ -8,6 +8,7 @@ import lucuma.core.model.UnnormalizedSED
 import munit.FunSuite
 
 import scala.io.Source
+import cats.data.EitherNec
 
 /**
  * Comprehensive test suite using the full match_sed_test.dat dataset (8000+ entries). Tests SED
@@ -24,7 +25,7 @@ class SimbadSEDMatcherFullDataSuite extends FunSuite:
 
   case class MatchResult(
     entry:    SimbadEntry,
-    sed:      Option[UnnormalizedSED],
+    sed:      EitherNec[CatalogProblem, UnnormalizedSED],
     category: Option[String]
   )
 
@@ -71,7 +72,7 @@ class SimbadSEDMatcherFullDataSuite extends FunSuite:
       val spectralTypeOpt = if entry.spectralType.isEmpty then None else Some(entry.spectralType)
       val sed             = SimbadSEDMatcher.inferSED(entry.otype, spectralTypeOpt, morphTypeOpt)
 
-      val category = sed.map {
+      val category = sed.toOption.map {
         case UnnormalizedSED.StellarLibrary(_)        => "star"
         case UnnormalizedSED.Galaxy(_)                => "galaxy"
         case UnnormalizedSED.Quasar(_)                => "quasar"
@@ -96,13 +97,13 @@ class SimbadSEDMatcherFullDataSuite extends FunSuite:
 
   test("comprehensive statistics") {
     val total     = matchResults.length
-    val matched   = matchResults.count(_.sed.isDefined)
+    val matched   = matchResults.count(_.sed.isRight)
     val unmatched = total - matched
 
     val byCat   =
-      matchResults.filter(_.sed.isDefined).groupBy(_.category.get).view.mapValues(_.length).toMap
+      matchResults.filter(_.sed.isRight).groupBy(_.category.get).view.mapValues(_.length).toMap
     val byOtype =
-      matchResults.filter(_.sed.isEmpty).groupBy(_.entry.otype).view.mapValues(_.length).toMap
+      matchResults.filter(_.sed.isLeft).groupBy(_.entry.otype).view.mapValues(_.length).toMap
 
     println(s"\n=== Full Dataset SED Matching Results ===")
     println(s"Total entries: $total")
@@ -126,7 +127,7 @@ class SimbadSEDMatcherFullDataSuite extends FunSuite:
 
   test("star type coverage") {
     val starResults = matchResults.filter(r => StarTypes.contains(r.entry.otype))
-    val starMatched = starResults.count(_.sed.isDefined)
+    val starMatched = starResults.count(_.sed.isRight)
 
     println(
       s"\nStar types: ${starResults.length} total, $starMatched matched (${starMatched * 100 / starResults.length}%)"
@@ -137,7 +138,7 @@ class SimbadSEDMatcherFullDataSuite extends FunSuite:
 
   test("galaxy type coverage") {
     val galaxyResults = matchResults.filter(r => GalaxyTypes.contains(r.entry.otype))
-    val galaxyMatched = galaxyResults.count(_.sed.isDefined)
+    val galaxyMatched = galaxyResults.count(_.sed.isRight)
 
     println(
       s"Galaxy types: ${galaxyResults.length} total, $galaxyMatched matched (${galaxyMatched * 100 / galaxyResults.length}%)"
@@ -148,7 +149,7 @@ class SimbadSEDMatcherFullDataSuite extends FunSuite:
 
   test("quasar type coverage") {
     val quasarResults = matchResults.filter(r => QuasarTypes.contains(r.entry.otype))
-    val quasarMatched = quasarResults.count(_.sed.isDefined)
+    val quasarMatched = quasarResults.count(_.sed.isRight)
 
     println(
       s"Quasar types: ${quasarResults.length} total, $quasarMatched matched (${quasarMatched * 100 / quasarResults.length}%)"
@@ -167,14 +168,14 @@ class SimbadSEDMatcherFullDataSuite extends FunSuite:
     println(s"Planetary nebulae: ${pnResults.length}")
 
     // All HII and PN should match
-    assertEquals(hiiResults.count(_.sed.isDefined), hiiResults.length)
-    assertEquals(pnResults.count(_.sed.isDefined), pnResults.length)
+    assertEquals(hiiResults.count(_.sed.isRight), hiiResults.length)
+    assertEquals(pnResults.count(_.sed.isRight), pnResults.length)
   }
 
   test("spectral type parsing coverage") {
     val withSpectralType   = matchResults.filter(_.entry.spectralType.nonEmpty)
     val spectralTypeParsed = withSpectralType.filter { r =>
-      StarTypes.contains(r.entry.otype) && r.sed.isDefined
+      StarTypes.contains(r.entry.otype) && r.sed.isRight
     }
 
     println(s"\nEntries with spectral type: ${withSpectralType.length}")
@@ -186,7 +187,7 @@ class SimbadSEDMatcherFullDataSuite extends FunSuite:
   test("morphological type parsing coverage") {
     val withMorphType   = matchResults.filter(_.entry.morphType.nonEmpty)
     val morphTypeParsed = withMorphType.filter { r =>
-      GalaxyTypes.contains(r.entry.otype) && r.sed.isDefined
+      GalaxyTypes.contains(r.entry.otype) && r.sed.isRight
     }
 
     println(s"\nEntries with morphological type: ${withMorphType.length}")
