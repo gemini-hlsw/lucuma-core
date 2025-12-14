@@ -25,8 +25,25 @@ object StellarPhysics:
   )
 
   /**
-   * Convert a spectral class string to a spectral class code. O0 = 0, B0 = 10, A0 = 20, F0 = 30, G0 =
-   * 40, K0 = 50, M0 = 60, etc. Based on Malkov et al, 2020, RAA, 20, 139, Figure 1.
+   * Convert a spectral class string to a numerical code.
+   *
+   * Maps spectral type letters to base values (O=0, B=10, A=20, ..., Y=90) and adds subclass
+   * digits (0-9.5). Handles +/- modifiers (±0.25 subclass adjustment).
+   *
+   * Examples:
+   *  - "O0" → 0.0
+   *  - "G2" → 42.0
+   *  - "G2.7" → 42.7
+   *  - "G2+" → 42.25
+   *  - "K6-" → 55.75
+   *  - "G" (bare letter) → 45.0 (defaults to subclass 5)
+   *
+   * Based on Malkov et al, 2020, RAA, 20, 139, Figure 1.
+   *
+   * @param spectralClass
+   *   Spectral type string (e.g., "G2V" → extract "G2")
+   * @return
+   *   Numerical code, or None if spectral class is empty or contains invalid letter
    */
   def spectralClassCode(spectralClass: String): Option[Double] =
     if spectralClass.isEmpty then return None
@@ -65,9 +82,21 @@ object StellarPhysics:
     }
 
   /**
-   * Calculate effective temperature from luminosity and temperature classes. Uses the polynomial
-   * relation from Malkov et al, 2020, RAA, 20, 139. This is the relation for giants (III) but works
-   * well for all luminosity classes I-V.
+   * Calculate effective temperature from stellar spectral classification.
+   *
+   * Uses polynomial relation from Malkov et al, 2020, RAA, 20, 139 for main sequence stars.
+   * White dwarfs use T_eff = 50400 / number formula. Returns average if multiple temperature
+   * classes provided.
+   *
+   * @param luminosityClasses
+   *   Luminosity class (e.g., ["V"], ["III"]), needed to identify white dwarfs
+   * @param temperatureClasses
+   *   Temperature classes (e.g., ["G2"], ["K1", "K2"] for ranges)
+   * @return
+   *   Effective temperature in Kelvin, or None if:
+   *   - Either list is empty
+   *   - Temperature class is L-type or later (brown dwarfs not supported)
+   *   - White dwarf number cannot be parsed
    */
   def calculateTemperature(
     luminosityClasses:  List[String],
@@ -201,8 +230,20 @@ object StellarPhysics:
   )
 
   /**
-   * Calculate log(g) from luminosity and temperature classes. Uses interpolation from Straizys &
-   * Kuriliene, 1981, Ap&SS, 80, 353S.
+   * Calculate surface gravity (log g) from stellar spectral classification.
+   *
+   * Uses interpolation from Straizys & Kuriliene, 1981, Ap&SS, 80, 353S gravity table. Normalizes
+   * luminosity classes (I→Iab, VI→sd, drops subclasses from non-supergiant types). White dwarfs
+   * use fixed log g = 8.0. Returns average if multiple classes provided.
+   *
+   * @param luminosityClasses
+   *   Luminosity class (e.g., ["V"], ["III"]), determines gravity range
+   * @param temperatureClasses
+   *   Temperature classes (e.g., ["G2"], ["B2", "B3"] for ranges)
+   * @return
+   *   Surface gravity (log g), or None if:
+   *   - Either list is empty
+   *   - Temperature class is L-type or later (brown dwarfs not supported)
    */
   def calculateGravity(
     luminosityClasses:  List[String],
@@ -266,7 +307,16 @@ object StellarPhysics:
       logGLow + fraction * (logGHigh - logGLow)
 
   /**
-   * Calculate stellar parameters (T_eff and log_g) from spectral classification.
+   * Calculate both effective temperature and surface gravity from spectral classification.
+   *
+   * Convenience method combining [[calculateTemperature]] and [[calculateGravity]].
+   *
+   * @param luminosityClasses
+   *   Luminosity class (e.g., ["V"])
+   * @param temperatureClasses
+   *   Temperature classes (e.g., ["G2"])
+   * @return
+   *   Both T_eff and log g, or None if either calculation fails
    */
   def calculateParameters(
     luminosityClasses:  List[String],
