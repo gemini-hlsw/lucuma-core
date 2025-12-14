@@ -18,8 +18,8 @@ trait SpectralTypeParsers:
   private val tempLetter: Parser[Char] =
     charIn("OBAFGKMLTY").withContext("temperature class letter")
 
-  /** Optional temperature subclass: digit, optionally followed by decimal */
-  private val tempSubclass: Parser0[String] =
+  /** Temperature subclass: digit, optionally followed by decimal (e.g., "2", "3.5") */
+  val tempSubclass: Parser0[String] =
     (digit ~ (char('.') ~ digit.rep).?).string
 
   /** Optional modifier: + or - */
