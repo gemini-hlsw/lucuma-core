@@ -49,6 +49,7 @@ class StellarPhysicsSuite extends FunSuite:
     assertEquals(StellarPhysics.spectralClassCode("G"), Some(45.0))
     assertEquals(StellarPhysics.spectralClassCode("K"), Some(55.0))
 
+  // Calculate temperature
   test("temperature calculation for main sequence stars"):
     assertEquals(StellarPhysics.calculateTemperature(List("V"), List("A0")), Some(11531))
     assertEquals(StellarPhysics.calculateTemperature(List("V"), List("G2")), Some(5199))
@@ -73,6 +74,7 @@ class StellarPhysicsSuite extends FunSuite:
     // B9=12361, A0=11531, average=11946
     assertEquals(StellarPhysics.calculateTemperature(List("V"), List("B9", "A0")), Some(11946))
 
+  // Calculate gravity
   test("gravity calculation for main sequence stars"):
     assertEquals(StellarPhysics.calculateGravity(List("V"), List("A0")), Some(4.07))
     assertEquals(StellarPhysics.calculateGravity(List("V"), List("G2")), Some(4.426))
