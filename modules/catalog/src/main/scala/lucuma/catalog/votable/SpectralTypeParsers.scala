@@ -97,7 +97,7 @@ trait SpectralTypeParsers:
    * White dwarf spectral type: e.g., DA3.5, DBAP3, DC Pattern: D[ABCGKMOQPXZ]*<temperature>?
    * Temperature can include decimal point
    */
-  val whiteDwarf: Parser[(List[String], List[String])] =
+  private val whiteDwarf: Parser[(List[String], List[String])] =
     (char('D') ~ charIn("ABCGKMOQPXZ").rep0 ~ (digit.rep ~ (char('.') ~ digit.rep).?).string.?)
       .map { case ((_, letters), tempOpt) =>
         val lumClass  = "D" + letters.mkString
@@ -112,9 +112,9 @@ trait SpectralTypeParsers:
 
   /**
    * Subdwarf spectral type: e.g., sdO2, sdG, sdB1, sdBN0 Pattern: sd<anything that looks like a
-   * temperature class>? Uses lenient parsing to handle non-standard subdwarf classifications
+   * temperature class>?
    */
-  val subdwarf: Parser[(List[String], List[String])] =
+  private val subdwarf: Parser[(List[String], List[String])] =
     (string("sd") *> lenientTempClass.?)
       .map {
         case Some(temp) => (List("sd"), List(temp))
@@ -125,7 +125,7 @@ trait SpectralTypeParsers:
   /**
    * Main sequence spectral type: e.g., G2V, K3III, G8/K0III Pattern: <tempRange><lumRange>?
    */
-  val mainSequence: Parser[(List[String], List[String])] =
+  private val mainSequence: Parser[(List[String], List[String])] =
     (tempRange ~ lumRange.?)
       .map {
         case (temps, Some(lums)) => (lums, temps)

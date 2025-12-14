@@ -5,6 +5,7 @@ package lucuma.catalog.votable
 
 import cats.data.EitherNec
 import cats.data.NonEmptyChain
+import cats.syntax.option.*
 import lucuma.catalog.votable.CatalogProblem.*
 import lucuma.core.enums.*
 import lucuma.core.model.UnnormalizedSED
@@ -87,31 +88,28 @@ object SEDMatcher:
     }
 
   /**
-   * Parse Simbad OTYPE to determine broad object category. Based on simbad_otype mappings from
-   * match_sed.py parse_otype function.
+   * match simbad_otype mappings from as in match_sed.py
    *
    * https://simbad.u-strasbg.fr/Pages/guide/otypes.htx Simbad Object Types
    */
   private def parseObjectType(otype: String): Option[ObjectCategory] =
-
-    if (StarTypes.contains(otype)) Some(ObjectCategory.Star)
-    else if (GalaxyTypes.contains(otype)) Some(ObjectCategory.Galaxy)
-    else if (QuasarTypes.contains(otype)) Some(ObjectCategory.Quasar)
-    else if (HIITypes.contains(otype)) Some(ObjectCategory.HIIRegion)
-    else if (PNTypes.contains(otype)) Some(ObjectCategory.PlanetaryNebula)
-    else None
+    if (StarTypes.contains(otype)) ObjectCategory.Star.some
+    else if (GalaxyTypes.contains(otype)) ObjectCategory.Galaxy.some
+    else if (QuasarTypes.contains(otype)) ObjectCategory.Quasar.some
+    else if (HIITypes.contains(otype)) ObjectCategory.HIIRegion.some
+    else if (PNTypes.contains(otype)) ObjectCategory.PlanetaryNebula.some
+    else none
 
   /**
-   * Match a stellar spectral type to an appropriate StellarLibrarySpectrum. Based on the spectral
-   * type parsing from match_sed.py.
+   * Match a stellar spectral type to StellarLibrarySpectrum.
    */
   private def matchStellarSED(spectralType: String): EitherNec[CatalogProblem, UnnormalizedSED] =
     parseSpectralType(spectralType) match {
-      case Some((luminosityClasses, temperatureClasses)) =>
-        findBestStellarMatch(luminosityClasses, temperatureClasses)
-          .map(spectrum => UnnormalizedSED.StellarLibrary(spectrum))
+      case Some((luminosity, temperature)) =>
+        findBestStellarMatch(luminosity, temperature)
+          .map(UnnormalizedSED.StellarLibrary(_))
           .toRight(NonEmptyChain.one(UnmatchedSpectralType(spectralType)))
-      case None                                          =>
+      case _                               =>
         Left(NonEmptyChain.one(InvalidSpectralType(spectralType)))
     }
 
@@ -120,27 +118,24 @@ object SEDMatcher:
    * combinators for robust parsing.
    */
   private def parseSpectralType(spectralType: String): Option[(List[String], List[String])] =
-    if (spectralType.isEmpty) None
-    else
-      // Clean up the spectral type string (remove parentheses and colons)
-      val cleaned = spectralType.replaceAll("[():]", "")
-      // Use parse instead of parseAll to allow trailing characters
-      SpectralTypeParsers.spectralType.parse(cleaned).toOption.map(_._2)
+    // Clean up some chars used by simbad
+    // https://simbad.cds.unistra.fr/guide/chD.htx
+    val cleaned = spectralType.replaceAll("[():]", "")
+    SpectralTypeParsers.spectralType.parse(cleaned).toOption.map(_._2)
 
   /**
    * Find the best matching StellarLibrarySpectrum for given spectral classes. Uses physics-based
-   * scoring from Stephens match_sed.py reference implementation.
+   * scoring
    */
   private def findBestStellarMatch(
-    luminosityClasses:  List[String],
-    temperatureClasses: List[String]
+    luminosity:  List[String],
+    temperature: List[String]
   ): Option[StellarLibrarySpectrum] =
 
     // Handle edge cases upfront - match Python behavior: return None if no classes
-    if temperatureClasses.isEmpty && luminosityClasses.isEmpty then None
+    if luminosity.isEmpty && temperature.isEmpty then none
     else
-      // Calculate physical parameters for target star
-      StellarPhysics.calculateParameters(luminosityClasses, temperatureClasses) match {
+      StellarPhysics.calculateParameters(luminosity, temperature) match {
         case Some(targetParams) =>
           StellarLibrarySpectrum.values.toList
             .flatMap(scoreSpectrum(targetParams))
@@ -199,42 +194,30 @@ object SEDMatcher:
         .toRight(NonEmptyChain.one(InvalidMorphologicalType(morphType)))
     }
 
-val GalaxyTypes = Set(
-  "G",
-  "GGG",
-  "LSB",
-  "bCG",
-  "SBG",
-  "H2G",
-  "EmG",
-  "rG",
-  "GiP",
-  "GiG",
-  "GiC",
-  "BiC",
-  "IG",
-  "PaG",
-  "GrG",
-  "CGG",
-  "CIG",
-  "PCG",
-  "SCG"
+// TODO Consider making these external
+val GalaxyTypes = Set("G",
+                      "GGG",
+                      "LSB",
+                      "bCG",
+                      "SBG",
+                      "H2G",
+                      "EmG",
+                      "rG",
+                      "GiP",
+                      "GiG",
+                      "GiC",
+                      "BiC",
+                      "IG",
+                      "PaG",
+                      "GrG",
+                      "CGG",
+                      "CIG",
+                      "PCG",
+                      "SCG"
 )
 
-val QuasarTypes = Set(
-  "AGN",
-  "AG?",
-  "SyG",
-  "Sy1",
-  "Sy2",
-  "QSO",
-  "Q?",
-  "Bla",
-  "Bz?",
-  "BLL",
-  "BL?",
-  "LIN"
-)
+val QuasarTypes =
+  Set("AGN", "AG?", "SyG", "Sy1", "Sy2", "QSO", "Q?", "Bla", "Bz?", "BLL", "BL?", "LIN")
 
 val HIITypes = Set("HII")
 val PNTypes  = Set("PN")
