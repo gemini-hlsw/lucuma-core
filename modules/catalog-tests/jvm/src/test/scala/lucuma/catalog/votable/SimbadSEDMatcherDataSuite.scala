@@ -3,7 +3,7 @@
 
 package lucuma.catalog.votable
 
-import lucuma.catalog.votable.SimbadSEDMatcher
+import lucuma.catalog.votable.SEDMatcher
 import lucuma.core.enums.*
 import lucuma.core.model.UnnormalizedSED
 import munit.FunSuite
@@ -72,7 +72,7 @@ class SimbadSEDMatcherDataSuite extends FunSuite:
     testData.map { entry =>
       val morphTypeOpt    = if entry.morphType.isEmpty then None else Some(entry.morphType)
       val spectralTypeOpt = if entry.spectralType.isEmpty then None else Some(entry.spectralType)
-      val sed             = SimbadSEDMatcher.inferSED(entry.otype, spectralTypeOpt, morphTypeOpt)
+      val sed             = SEDMatcher.inferSED(entry.otype, spectralTypeOpt, morphTypeOpt)
 
       val category = sed.toOption.map {
         case UnnormalizedSED.StellarLibrary(_)        => "star"
@@ -258,18 +258,18 @@ class SimbadSEDMatcherDataSuite extends FunSuite:
 
     // O9.7IIn - luminosity class II may not have close match in library
     // Returns Left if outside tolerance (matches Python behavior)
-    val o9Result = SimbadSEDMatcher.inferSED("*", Some("O9.7IIn"), None)
+    val o9Result = SEDMatcher.inferSED("*", Some("O9.7IIn"), None)
     assert(o9Result.isLeft || o9Result.exists(_.isInstanceOf[UnnormalizedSED.StellarLibrary]),
            s"O9.7IIn should return Left or StellarLibrary, got $o9Result"
     )
 
     // A0V should match A0V
-    val a0Result = SimbadSEDMatcher.inferSED("*", Some("A0V"), None)
+    val a0Result = SEDMatcher.inferSED("*", Some("A0V"), None)
     assert(a0Result.isRight)
     assertEquals(a0Result.getOrElse(fail("Expected Right")), UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.A0V))
 
     // F1V should match F2V (closest available)
-    val f1Result = SimbadSEDMatcher.inferSED("*", Some("F1V"), None)
+    val f1Result = SEDMatcher.inferSED("*", Some("F1V"), None)
     assert(f1Result.isRight)
     assertEquals(f1Result.getOrElse(fail("Expected Right")), UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.F2V))
   }
