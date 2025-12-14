@@ -3,7 +3,6 @@
 
 package lucuma.catalog.votable
 
-import cats.data.NonEmptyChain
 import lucuma.core.enums.*
 import lucuma.core.model.UnnormalizedSED
 import munit.FunSuite
