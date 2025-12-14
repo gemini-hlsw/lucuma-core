@@ -5,70 +5,55 @@ package lucuma.catalog.votable
 
 import cats.data.EitherNec
 import cats.data.NonEmptyChain
-import cats.syntax.all.*
 import lucuma.catalog.votable.CatalogProblem.*
 import lucuma.core.enums.*
 import lucuma.core.model.UnnormalizedSED
 
-/**
- * Broad object categories for SED classification. Maps to the categories used in the Python
- * implementation.
- */
 private enum ObjectCategory:
   case Star, Galaxy, Quasar, HIIRegion, PlanetaryNebula
 
-/**
- * Represents a stellar SED candidate with physics-based scoring.
- *
- * @param spectrum The library spectrum being evaluated
- * @param score Normalized distance in (T_eff, log_g) parameter space
- * @param absDt Absolute temperature difference from target
- * @param dtMax Maximum allowed temperature tolerance
- * @param absDg Absolute gravity difference from target
- * @param dgMax Maximum allowed gravity tolerance
- */
 private case class ScoredMatch(
   spectrum: StellarLibrarySpectrum,
-  score: Double,
-  absDt: Double,
-  dtMax: Double,
-  absDg: Double,
-  dgMax: Double
+  score:    Double,
+  absDt:    Double,
+  dtMax:    Double,
+  absDg:    Double,
+  dgMax:    Double
 ):
   def isWithinTolerance: Boolean = absDt < dtMax && absDg < dgMax
 
 object SimbadSEDMatcher:
   // Stellar matching tolerances (physics-based scoring)
-  private val TemperatureToleranceFraction: Double = 0.1   // 10% of target temperature
-  private val GravityToleranceDex: Double = 0.5             // 0.5 dex in log(g)
+  private val TemperatureToleranceFraction: Double = 0.1 // 10% of target temperature
+  private val GravityToleranceDex: Double          = 0.5 // 0.5 dex in log(g)
 
   // Galaxy Hubble stage classification boundaries
   private val EllipticalHubbleStageThreshold: Double = -0.5 // E0-S0
-  private val SpiralHubbleStageThreshold: Double = 9.0      // Sa-Sm
+  private val SpiralHubbleStageThreshold: Double     = 9.0  // Sa-Sm
 
   // Galaxy morphological type patterns
   private val EllipticalPattern: String = """E[0-9:+]?.*"""
-  private val S0Pattern: String = """S0.*"""
-  private val SpiralPattern: String = """S[abcABC_:]?.*"""
+  private val S0Pattern: String         = """S0.*"""
+  private val SpiralPattern: String     = """S[abcABC_:]?.*"""
+
   /**
-   * Infer an appropriate UnnormalizedSED from Simbad object classification.
+   * Attempt to Infer an appropriate UnnormalizedSED from Simbad object classification.
    *
-   * Uses physics-based matching for stars (effective temperature and surface gravity) and
-   * morphological patterns for galaxies. Quasars, HII regions, and planetary nebulae are assigned
-   * fixed spectra.
+   * Based on match_sed python package by Andy S<D-e>phens:
+   *
+   * Uses physics-based matching for stars and morphological patterns for galaxies. 
+   * Quasars, HII regions, and planetary nebulae are assigned fixed spectra.
    *
    * For stars, matching is performed by comparing target stellar parameters (calculated from
-   * spectral type) against all library SEDs. The match must satisfy both temperature (±10%)
-   * and gravity (±0.5 dex) tolerances.
-   *
-   * Based on the reference implementation by Andrew Stephens (match_sed.py).
+   * spectral type) against all library SEDs. The match must satisfy both temperature (±10%) and
+   * gravity (±0.5 dex) tolerances.
    *
    * @param otype
    *   Simbad object type code (e.g., "*", "G", "QSO"). See [[StarTypes]], [[GalaxyTypes]],
    *   [[QuasarTypes]], [[HIITypes]], [[PNTypes]].
    * @param spectralType
-   *   Optional spectral classification string (e.g., "G2V", "K3III", "DA3"). Required for
-   *   stellar objects to perform physics-based matching.
+   *   Optional spectral classification string (e.g., "G2V", "K3III", "DA3"). Required for stellar
+   *   objects to perform physics-based matching.
    * @param morphType
    *   Optional morphological type for galaxies (e.g., "Sa", "E3", or Hubble stage like "2.0").
    * @return
@@ -76,12 +61,12 @@ object SimbadSEDMatcher:
    *   [[UnnormalizedSED]] if successful.
    *
    * @example
-   * {{{
+   *   {{{
    * inferSED("*", Some("G2V"))        // Right(UnnormalizedSED.StellarLibrary(...))
    * inferSED("G", None, Some("Sa"))   // Right(UnnormalizedSED.Galaxy(...))
    * inferSED("QSO", None, None)       // Right(UnnormalizedSED.Quasar(...))
    * inferSED("???", None, None)       // Left(UnknownObjectType("???"))
-   * }}}
+   *   }}}
    *
    * @see
    *   [[https://simbad.u-strasbg.fr/Pages/guide/otypes.htx Simbad Object Types]]
@@ -135,7 +120,7 @@ object SimbadSEDMatcher:
         findBestStellarMatch(luminosityClasses, temperatureClasses)
           .map(spectrum => UnnormalizedSED.StellarLibrary(spectrum))
           .toRight(NonEmptyChain.one(UnmatchedSpectralType(spectralType)))
-      case None =>
+      case None                                          =>
         Left(NonEmptyChain.one(InvalidSpectralType(spectralType)))
     }
 
@@ -183,10 +168,10 @@ object SimbadSEDMatcher:
   ): Option[ScoredMatch] =
     StellarLibraryParameters.getParameters(spectrum).map { sedParams =>
       // Calculate differences - convert quantities to raw values for arithmetic
-      val dtValue   = sedParams.tEff.value - targetParams.tEff.value
-      val dg        = sedParams.logG - targetParams.logG
-      val dtMax     = TemperatureToleranceFraction * targetParams.tEff.value
-      val dgMax     = GravityToleranceDex
+      val dtValue = sedParams.tEff.value - targetParams.tEff.value
+      val dg      = sedParams.logG - targetParams.logG
+      val dtMax   = TemperatureToleranceFraction * targetParams.tEff.value
+      val dgMax   = GravityToleranceDex
 
       // Calculate score: sqrt((ΔT/ΔT_max)² + (Δlog_g/Δlog_g_max)²)
       val score = math.sqrt((dtValue / dtMax) * (dtValue / dtMax) + (dg / dgMax) * (dg / dgMax))
@@ -197,7 +182,7 @@ object SimbadSEDMatcher:
   /**
    * Match galaxy morphological type to appropriate GalaxySpectrum.
    */
-  private def matchGalaxySED(morphType: String): EitherNec[CatalogProblem, UnnormalizedSED] = {
+  private def matchGalaxySED(morphType: String): EitherNec[CatalogProblem, UnnormalizedSED] =
     // Try elliptical pattern: E optionally followed by digit/colon/plus
     if (morphType.matches(EllipticalPattern)) {
       Right(UnnormalizedSED.Galaxy(GalaxySpectrum.Elliptical))
@@ -214,13 +199,14 @@ object SimbadSEDMatcher:
     else {
       morphType.toDoubleOption
         .flatMap { hubbleStage =>
-          if (hubbleStage <= EllipticalHubbleStageThreshold) Some(UnnormalizedSED.Galaxy(GalaxySpectrum.Elliptical))
-          else if (hubbleStage < SpiralHubbleStageThreshold) Some(UnnormalizedSED.Galaxy(GalaxySpectrum.Spiral))
+          if (hubbleStage <= EllipticalHubbleStageThreshold)
+            Some(UnnormalizedSED.Galaxy(GalaxySpectrum.Elliptical))
+          else if (hubbleStage < SpiralHubbleStageThreshold)
+            Some(UnnormalizedSED.Galaxy(GalaxySpectrum.Spiral))
           else None
         }
         .toRight(NonEmptyChain.one(InvalidMorphologicalType(morphType)))
     }
-  }
 
 val GalaxyTypes = Set(
   "G",
