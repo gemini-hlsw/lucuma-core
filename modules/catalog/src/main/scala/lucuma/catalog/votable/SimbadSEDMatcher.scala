@@ -3,7 +3,8 @@
 
 package lucuma.catalog.votable
 
-import cats.data.{EitherNec, NonEmptyChain}
+import cats.data.EitherNec
+import cats.data.NonEmptyChain
 import cats.syntax.all.*
 import lucuma.catalog.votable.CatalogProblem.*
 import lucuma.core.enums.*
@@ -24,6 +25,11 @@ object SimbadSEDMatcher:
   // Galaxy Hubble stage classification boundaries
   private val EllipticalHubbleStageThreshold: Double = -0.5 // E0-S0
   private val SpiralHubbleStageThreshold: Double = 9.0      // Sa-Sm
+
+  // Galaxy morphological type patterns
+  private val EllipticalPattern: String = """E[0-9:+]?.*"""
+  private val S0Pattern: String = """S0.*"""
+  private val SpiralPattern: String = """S[abcABC_:]?.*"""
   /**
    * Infer an appropriate UnnormalizedSED from Simbad object classification.
    *
@@ -143,16 +149,16 @@ object SimbadSEDMatcher:
           // Score all library SEDs based on physical parameters
           val scored = StellarLibrarySpectrum.values.toList.flatMap { spectrum =>
             StellarLibraryParameters.getParameters(spectrum).map { sedParams =>
-              // Calculate differences
-              val dt    = sedParams.tEff - targetParams.tEff
-              val dg    = sedParams.logG - targetParams.logG
-              val dtMax = TemperatureToleranceFraction * targetParams.tEff
-              val dgMax = GravityToleranceDex
+              // Calculate differences - convert quantities to raw values for arithmetic
+              val dtValue   = sedParams.tEff.value - targetParams.tEff.value
+              val dg        = sedParams.logG - targetParams.logG
+              val dtMax     = TemperatureToleranceFraction * targetParams.tEff.value
+              val dgMax     = GravityToleranceDex
 
               // Calculate score: sqrt((ΔT/ΔT_max)² + (Δlog_g/Δlog_g_max)²)
-              val score = math.sqrt((dt / dtMax) * (dt / dtMax) + (dg / dgMax) * (dg / dgMax))
+              val score = math.sqrt((dtValue / dtMax) * (dtValue / dtMax) + (dg / dgMax) * (dg / dgMax))
 
-              (spectrum, score, math.abs(dt), dtMax, math.abs(dg), dgMax)
+              (spectrum, score, math.abs(dtValue), dtMax, math.abs(dg), dgMax)
             }
           }
 
@@ -176,15 +182,15 @@ object SimbadSEDMatcher:
    */
   private def matchGalaxySED(morphType: String): EitherNec[CatalogProblem, UnnormalizedSED] = {
     // Try elliptical pattern: E optionally followed by digit/colon/plus
-    if (morphType.matches("""E[0-9:+]?.*""")) {
+    if (morphType.matches(EllipticalPattern)) {
       Right(UnnormalizedSED.Galaxy(GalaxySpectrum.Elliptical))
     }
     // Try S0 pattern (lenticular, classified as elliptical)
-    else if (morphType.matches("""S0.*""")) {
+    else if (morphType.matches(S0Pattern)) {
       Right(UnnormalizedSED.Galaxy(GalaxySpectrum.Elliptical))
     }
     // Try spiral pattern: S optionally followed by a/b/c (upper/lower)
-    else if (morphType.matches("""S[abcABC_:]?.*""")) {
+    else if (morphType.matches(SpiralPattern)) {
       Right(UnnormalizedSED.Galaxy(GalaxySpectrum.Spiral))
     }
     // Try numerical Hubble stage classification
