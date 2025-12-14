@@ -3,7 +3,9 @@
 
 package lucuma.catalog.votable
 
-import cats.syntax.option.*
+import cats.data.{EitherNec, NonEmptyChain}
+import cats.syntax.all.*
+import lucuma.catalog.votable.CatalogProblem.*
 import lucuma.core.enums.*
 import lucuma.core.model.UnnormalizedSED
 
@@ -15,35 +17,73 @@ private enum ObjectCategory:
   case Star, Galaxy, Quasar, HIIRegion, PlanetaryNebula
 
 object SimbadSEDMatcher:
+  // Stellar matching tolerances (physics-based scoring)
+  private val TemperatureToleranceFraction: Double = 0.1   // 10% of target temperature
+  private val GravityToleranceDex: Double = 0.5             // 0.5 dex in log(g)
+
+  // Galaxy Hubble stage classification boundaries
+  private val EllipticalHubbleStageThreshold: Double = -0.5 // E0-S0
+  private val SpiralHubbleStageThreshold: Double = 9.0      // Sa-Sm
   /**
-   * Infer an appropriate UnnormalizedSED from Simbad object type and classification information.
-   * Based on match_sed.py by Andrew Stephens.
+   * Infer an appropriate UnnormalizedSED from Simbad object classification.
+   *
+   * Uses physics-based matching for stars (effective temperature and surface gravity) and
+   * morphological patterns for galaxies. Quasars, HII regions, and planetary nebulae are assigned
+   * fixed spectra.
+   *
+   * For stars, matching is performed by comparing target stellar parameters (calculated from
+   * spectral type) against all library SEDs. The match must satisfy both temperature (±10%)
+   * and gravity (±0.5 dex) tolerances.
+   *
+   * Based on the reference implementation by Andrew Stephens (match_sed.py).
    *
    * @param otype
-   *   Simbad object type (OTYPE field)
+   *   Simbad object type code (e.g., "*", "G", "QSO"). See [[StarTypes]], [[GalaxyTypes]],
+   *   [[QuasarTypes]], [[HIITypes]], [[PNTypes]].
    * @param spectralType
-   *   Simbad spectral type (SP_TYPE field)
+   *   Optional spectral classification string (e.g., "G2V", "K3III", "DA3"). Required for
+   *   stellar objects to perform physics-based matching.
    * @param morphType
-   *   Simbad morphological type (MORPH_TYPE field)
+   *   Optional morphological type for galaxies (e.g., "Sa", "E3", or Hubble stage like "2.0").
+   * @return
+   *   Either a [[NonEmptyChain]] of [[CatalogProblem]] errors if matching fails, or a matched
+   *   [[UnnormalizedSED]] if successful.
+   *
+   * @example
+   * {{{
+   * inferSED("*", Some("G2V"))        // Right(UnnormalizedSED.StellarLibrary(...))
+   * inferSED("G", None, Some("Sa"))   // Right(UnnormalizedSED.Galaxy(...))
+   * inferSED("QSO", None, None)       // Right(UnnormalizedSED.Quasar(...))
+   * inferSED("???", None, None)       // Left(UnknownObjectType("???"))
+   * }}}
+   *
+   * @see
+   *   [[https://simbad.u-strasbg.fr/Pages/guide/otypes.htx Simbad Object Types]]
+   * @see
+   *   [[https://simbad.u-strasbg.fr/Pages/guide/chD.htx Simbad Spectral Types]]
    */
   def inferSED(
     otype:        String,
     spectralType: Option[String] = None,
     morphType:    Option[String] = None
-  ): Option[UnnormalizedSED] =
+  ): EitherNec[CatalogProblem, UnnormalizedSED] =
     parseObjectType(otype) match {
       case Some(ObjectCategory.Star)            =>
-        spectralType.flatMap(matchStellarSED)
+        spectralType
+          .toRight(NonEmptyChain.one(InvalidSpectralType("")))
+          .flatMap(matchStellarSED)
       case Some(ObjectCategory.Galaxy)          =>
-        morphType.flatMap(matchGalaxySED)
+        morphType
+          .toRight(NonEmptyChain.one(InvalidMorphologicalType("")))
+          .flatMap(matchGalaxySED)
       case Some(ObjectCategory.Quasar)          =>
-        UnnormalizedSED.Quasar(QuasarSpectrum.QS0).some
+        Right(UnnormalizedSED.Quasar(QuasarSpectrum.QS0))
       case Some(ObjectCategory.HIIRegion)       =>
-        UnnormalizedSED.HIIRegion(HIIRegionSpectrum.OrionNebula).some
+        Right(UnnormalizedSED.HIIRegion(HIIRegionSpectrum.OrionNebula))
       case Some(ObjectCategory.PlanetaryNebula) =>
-        UnnormalizedSED.PlanetaryNebula(PlanetaryNebulaSpectrum.NGC7009).some
+        Right(UnnormalizedSED.PlanetaryNebula(PlanetaryNebulaSpectrum.NGC7009))
       case None                                 =>
-        none
+        Left(NonEmptyChain.one(UnknownObjectType(otype)))
     }
 
   /**
@@ -63,13 +103,14 @@ object SimbadSEDMatcher:
    * Match a stellar spectral type to an appropriate StellarLibrarySpectrum. Based on the spectral
    * type parsing from match_sed.py.
    */
-  private def matchStellarSED(spectralType: String): Option[UnnormalizedSED] =
+  private def matchStellarSED(spectralType: String): EitherNec[CatalogProblem, UnnormalizedSED] =
     parseSpectralType(spectralType) match {
       case Some((luminosityClasses, temperatureClasses)) =>
-        findBestStellarMatch(luminosityClasses, temperatureClasses).map { spectrum =>
-          UnnormalizedSED.StellarLibrary(spectrum)
-        }
-      case None                                          => None
+        findBestStellarMatch(luminosityClasses, temperatureClasses)
+          .map(spectrum => UnnormalizedSED.StellarLibrary(spectrum))
+          .toRight(NonEmptyChain.one(UnmatchedSpectralType(spectralType)))
+      case None =>
+        Left(NonEmptyChain.one(InvalidSpectralType(spectralType)))
     }
 
   /**
@@ -105,8 +146,8 @@ object SimbadSEDMatcher:
               // Calculate differences
               val dt    = sedParams.tEff - targetParams.tEff
               val dg    = sedParams.logG - targetParams.logG
-              val dtMax = 0.1 * targetParams.tEff
-              val dgMax = 0.5
+              val dtMax = TemperatureToleranceFraction * targetParams.tEff
+              val dgMax = GravityToleranceDex
 
               // Calculate score: sqrt((ΔT/ΔT_max)² + (Δlog_g/Δlog_g_max)²)
               val score = math.sqrt((dt / dtMax) * (dt / dtMax) + (dg / dgMax) * (dg / dgMax))
@@ -133,30 +174,28 @@ object SimbadSEDMatcher:
   /**
    * Match galaxy morphological type to appropriate GalaxySpectrum.
    */
-  private def matchGalaxySED(morphType: String): Option[UnnormalizedSED] = {
-    val ellipticalPattern  = """E[0-9:+]?""".r
-    val s0Pattern          = """S0.*""".r
-    val spiralPattern      = """S[abcABC_:]?.*""".r
-    val hubbleStagePattern = """-?[0-9]+\.?[0-9]*""".r
-
-    morphType match {
-      case ellipticalPattern()  =>
-        Some(UnnormalizedSED.Galaxy(GalaxySpectrum.Elliptical))
-      case s0Pattern()          =>
-        Some(UnnormalizedSED.Galaxy(GalaxySpectrum.Elliptical))
-      case spiralPattern()      =>
-        Some(UnnormalizedSED.Galaxy(GalaxySpectrum.Spiral))
-      case hubbleStagePattern() =>
-        // Numerical Hubble stage classification
-        val hubbleStage = morphType.toDoubleOption.getOrElse(0.0)
-        if (hubbleStage <= -0.5) {
-          Some(UnnormalizedSED.Galaxy(GalaxySpectrum.Elliptical))
-        } else if (hubbleStage < 9) {
-          Some(UnnormalizedSED.Galaxy(GalaxySpectrum.Spiral))
-        } else {
-          None
+  private def matchGalaxySED(morphType: String): EitherNec[CatalogProblem, UnnormalizedSED] = {
+    // Try elliptical pattern: E optionally followed by digit/colon/plus
+    if (morphType.matches("""E[0-9:+]?.*""")) {
+      Right(UnnormalizedSED.Galaxy(GalaxySpectrum.Elliptical))
+    }
+    // Try S0 pattern (lenticular, classified as elliptical)
+    else if (morphType.matches("""S0.*""")) {
+      Right(UnnormalizedSED.Galaxy(GalaxySpectrum.Elliptical))
+    }
+    // Try spiral pattern: S optionally followed by a/b/c (upper/lower)
+    else if (morphType.matches("""S[abcABC_:]?.*""")) {
+      Right(UnnormalizedSED.Galaxy(GalaxySpectrum.Spiral))
+    }
+    // Try numerical Hubble stage classification
+    else {
+      morphType.toDoubleOption
+        .flatMap { hubbleStage =>
+          if (hubbleStage <= EllipticalHubbleStageThreshold) Some(UnnormalizedSED.Galaxy(GalaxySpectrum.Elliptical))
+          else if (hubbleStage < SpiralHubbleStageThreshold) Some(UnnormalizedSED.Galaxy(GalaxySpectrum.Spiral))
+          else None
         }
-      case _                    => None
+        .toRight(NonEmptyChain.one(InvalidMorphologicalType(morphType)))
     }
   }
 

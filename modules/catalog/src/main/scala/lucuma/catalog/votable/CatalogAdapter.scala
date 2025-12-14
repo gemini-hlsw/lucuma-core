@@ -283,7 +283,7 @@ object CatalogAdapter {
       val otype        = entries.get(oTypeField).getOrElse("")
       val spectralType = entries.get(spTypeField)
       val morphType    = entries.get(morphTypeField)
-      SimbadSEDMatcher.inferSED(otype, spectralType, morphType).rightNec
+      SimbadSEDMatcher.inferSED(otype, spectralType, morphType).map(Option(_))
 
     // Simbad has a few special cases to map sloan band brightnesses
     def findBand(id: FieldId): Option[Band] =
