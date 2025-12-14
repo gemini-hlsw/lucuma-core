@@ -22,7 +22,7 @@ private case class ScoredMatch(
 ):
   def isWithinTolerance: Boolean = absDt < dtMax && absDg < dgMax
 
-object SimbadSEDMatcher:
+object SEDMatcher:
   // Stellar matching tolerances (physics-based scoring)
   private val TemperatureToleranceFraction: Double = 0.1 // 10% of target temperature
   private val GravityToleranceDex: Double          = 0.5 // 0.5 dex in log(g)
@@ -39,10 +39,10 @@ object SimbadSEDMatcher:
   /**
    * Attempt to Infer an appropriate UnnormalizedSED from Simbad object classification.
    *
-   * Based on match_sed python package by Andy S<D-e>phens:
+   * Based on match_sed python package by Andy Stephens
    *
-   * Uses physics-based matching for stars and morphological patterns for galaxies. 
-   * Quasars, HII regions, and planetary nebulae are assigned fixed spectra.
+   * Uses physics-based matching for stars and morphological patterns for galaxies. Quasars, HII
+   * regions, and planetary nebulae are assigned fixed spectra.
    *
    * For stars, matching is performed by comparing target stellar parameters (calculated from
    * spectral type) against all library SEDs. The match must satisfy both temperature (±10%) and
@@ -56,17 +56,6 @@ object SimbadSEDMatcher:
    *   objects to perform physics-based matching.
    * @param morphType
    *   Optional morphological type for galaxies (e.g., "Sa", "E3", or Hubble stage like "2.0").
-   * @return
-   *   Either a [[NonEmptyChain]] of [[CatalogProblem]] errors if matching fails, or a matched
-   *   [[UnnormalizedSED]] if successful.
-   *
-   * @example
-   *   {{{
-   * inferSED("*", Some("G2V"))        // Right(UnnormalizedSED.StellarLibrary(...))
-   * inferSED("G", None, Some("Sa"))   // Right(UnnormalizedSED.Galaxy(...))
-   * inferSED("QSO", None, None)       // Right(UnnormalizedSED.Quasar(...))
-   * inferSED("???", None, None)       // Left(UnknownObjectType("???"))
-   *   }}}
    *
    * @see
    *   [[https://simbad.u-strasbg.fr/Pages/guide/otypes.htx Simbad Object Types]]
@@ -100,6 +89,8 @@ object SimbadSEDMatcher:
   /**
    * Parse Simbad OTYPE to determine broad object category. Based on simbad_otype mappings from
    * match_sed.py parse_otype function.
+   *
+   * https://simbad.u-strasbg.fr/Pages/guide/otypes.htx Simbad Object Types
    */
   private def parseObjectType(otype: String): Option[ObjectCategory] =
 

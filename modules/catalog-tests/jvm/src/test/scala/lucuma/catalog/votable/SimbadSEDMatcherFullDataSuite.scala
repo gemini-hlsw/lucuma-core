@@ -3,7 +3,7 @@
 
 package lucuma.catalog.votable
 
-import lucuma.catalog.votable.SimbadSEDMatcher
+import lucuma.catalog.votable.SEDMatcher
 import lucuma.core.model.UnnormalizedSED
 import munit.FunSuite
 
@@ -70,7 +70,7 @@ class SimbadSEDMatcherFullDataSuite extends FunSuite:
     testData.map { entry =>
       val morphTypeOpt    = if entry.morphType.isEmpty then None else Some(entry.morphType)
       val spectralTypeOpt = if entry.spectralType.isEmpty then None else Some(entry.spectralType)
-      val sed             = SimbadSEDMatcher.inferSED(entry.otype, spectralTypeOpt, morphTypeOpt)
+      val sed             = SEDMatcher.inferSED(entry.otype, spectralTypeOpt, morphTypeOpt)
 
       val category = sed.toOption.map {
         case UnnormalizedSED.StellarLibrary(_)        => "star"
