@@ -22,10 +22,15 @@ object StellarLibraryParameters:
   private def parseLibraryTag(tag: String): (List[String], List[String]) =
     // Handle white dwarfs (DA, DB, etc.)
     if tag.startsWith("D") then
-      val lumClass  =
-        tag.takeWhile(c => c.isLetter || c == 'A' || c == 'B' || c == 'Q' || c == 'P' || c == 'Z')
-      val tempClass = tag.drop(lumClass.length)
-      return (List(lumClass), List(tempClass))
+      val lumClass = tag.takeWhile(_.isLetter)
+      // Extract numeric part, stripping _calspec or similar suffixes
+      val numericPart = tag.drop(lumClass.length).takeWhile(c => c.isDigit || c == '.')
+      // Convert 2-digit format to decimal: DA08 -> 0.8, DA12 -> 1.2, DA15 -> 1.5
+      val tempClass =
+        if numericPart.length == 2 && numericPart.forall(_.isDigit) then
+          s"${numericPart.head}.${numericPart.tail}"
+        else numericPart
+      return (List(lumClass), if tempClass.nonEmpty then List(tempClass) else Nil)
 
     // Handle subdwarfs
     if tag == "sd" then return (List("sd"), List.empty)
