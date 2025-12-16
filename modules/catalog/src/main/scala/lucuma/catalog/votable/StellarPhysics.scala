@@ -60,7 +60,7 @@ object StellarPhysics:
     LetterConversions.get(letter).flatMap { baseCode =>
       val subclass = SpectralTypeParsers.tempSubclass.parse(spectralClass.tail) match
         case Right((_, value)) =>
-          value.toDoubleOption.getOrElse(5.0)
+          value.parseDoubleOption.getOrElse(5.0)
         case Left(_)           =>
           5.0 // Default to 5 if no subclass specified
 

@@ -9,6 +9,7 @@ import cats.syntax.option.*
 import lucuma.catalog.votable.CatalogProblem.*
 import lucuma.core.enums.*
 import lucuma.core.model.UnnormalizedSED
+import lucuma.core.syntax.string.*
 
 private enum ObjectCategory:
   case Star, Galaxy, Quasar, HIIRegion, PlanetaryNebula
@@ -32,10 +33,10 @@ object SEDMatcher:
   private val EllipticalHubbleStageThreshold: Double = -0.5 // E0-S0
   private val SpiralHubbleStageThreshold: Double     = 9.0  // Sa-Sm
 
-  // Galaxy morphological type patterns
-  private val EllipticalPattern: String = """E[0-9:+]?.*"""
-  private val S0Pattern: String         = """S0.*"""
-  private val SpiralPattern: String     = """S[abcABC_:]?.*"""
+  // Galaxy morphological type patterns (as Regex for pattern matching)
+  private val EllipticalPattern = """E[0-9:+]?.*""".r
+  private val S0Pattern         = """S0.*""".r
+  private val SpiralPattern     = """S[abcABC_:]?.*""".r
 
   /**
    * Attempt to Infer an appropriate UnnormalizedSED from Simbad object classification.
@@ -71,11 +72,11 @@ object SEDMatcher:
     parseObjectType(otype) match {
       case Some(ObjectCategory.Star)            =>
         spectralType
-          .toRight(NonEmptyChain.one(InvalidSpectralType("")))
+          .toRight(NonEmptyChain.one(InvalidSpectralType(spectralType.orEmpty)))
           .flatMap(matchStellarSED)
       case Some(ObjectCategory.Galaxy)          =>
         morphType
-          .toRight(NonEmptyChain.one(InvalidMorphologicalType("")))
+          .toRight(NonEmptyChain.one(InvalidMorphologicalType(morphType.orEmpty)))
           .flatMap(matchGalaxySED)
       case Some(ObjectCategory.Quasar)          =>
         Right(UnnormalizedSED.Quasar(QuasarSpectrum.QS0))
@@ -135,25 +136,21 @@ object SEDMatcher:
     // Handle edge cases upfront - match Python behavior: return None if no classes
     if luminosity.isEmpty && temperature.isEmpty then none
     else
-      StellarPhysics.calculateParameters(luminosity, temperature) match {
-        case Some(targetParams) =>
+      StellarPhysics
+        .calculateParameters(luminosity, temperature)
+        .flatMap: params =>
           StellarLibrarySpectrum.values.toList
-            .flatMap(scoreSpectrum(targetParams))
+            .flatMap(scoreSpectrum(params))
             .sortBy(_.score)
             .headOption
             .filter(_.isWithinTolerance)
             .map(_.spectrum)
 
-        case None =>
-          // Cannot calculate parameters - match Python behavior: return None
-          None
-      }
-
   private def scoreSpectrum(targetParams: StellarPhysics.StellarParameters)(
     spectrum: StellarLibrarySpectrum
   ): Option[ScoredMatch] =
     StellarLibraryParameters.getParameters(spectrum).map { sedParams =>
-      // Calculate differences - convert quantities to raw values for arithmetic
+      // Calculate differences
       val dtValue = sedParams.tEff.value - targetParams.tEff.value
       val dg      = sedParams.logG - targetParams.logG
       val dtMax   = TemperatureToleranceFraction * targetParams.tEff.value
@@ -169,30 +166,20 @@ object SEDMatcher:
    * Match galaxy morphological type to appropriate GalaxySpectrum.
    */
   private def matchGalaxySED(morphType: String): EitherNec[CatalogProblem, UnnormalizedSED] =
-    // Try elliptical pattern: E optionally followed by digit/colon/plus
-    if (morphType.matches(EllipticalPattern)) {
-      Right(UnnormalizedSED.Galaxy(GalaxySpectrum.Elliptical))
-    }
-    // Try S0 pattern (lenticular, classified as elliptical)
-    else if (morphType.matches(S0Pattern)) {
-      Right(UnnormalizedSED.Galaxy(GalaxySpectrum.Elliptical))
-    }
-    // Try spiral pattern: S optionally followed by a/b/c (upper/lower)
-    else if (morphType.matches(SpiralPattern)) {
-      Right(UnnormalizedSED.Galaxy(GalaxySpectrum.Spiral))
-    }
-    // Try numerical Hubble stage classification
-    else {
-      morphType.toDoubleOption
-        .flatMap { hubbleStage =>
-          if (hubbleStage <= EllipticalHubbleStageThreshold)
-            Some(UnnormalizedSED.Galaxy(GalaxySpectrum.Elliptical))
-          else if (hubbleStage < SpiralHubbleStageThreshold)
-            Some(UnnormalizedSED.Galaxy(GalaxySpectrum.Spiral))
-          else None
-        }
-        .toRight(NonEmptyChain.one(InvalidMorphologicalType(morphType)))
-    }
+    morphType match
+      case EllipticalPattern() => Right(UnnormalizedSED.Galaxy(GalaxySpectrum.Elliptical))
+      case S0Pattern()         => Right(UnnormalizedSED.Galaxy(GalaxySpectrum.Elliptical))
+      case SpiralPattern()     => Right(UnnormalizedSED.Galaxy(GalaxySpectrum.Spiral))
+      case hubble              =>
+        hubble.parseDoubleOption
+          .flatMap:
+            case stage if stage <= EllipticalHubbleStageThreshold =>
+              UnnormalizedSED.Galaxy(GalaxySpectrum.Elliptical).some
+            case stage if stage <= SpiralHubbleStageThreshold     =>
+              UnnormalizedSED.Galaxy(GalaxySpectrum.Spiral).some
+            case _                                                =>
+              none
+          .toRight(NonEmptyChain.one(InvalidMorphologicalType(morphType)))
 
 // TODO Consider making these external
 val GalaxyTypes = Set("G",
