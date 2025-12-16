@@ -10,6 +10,8 @@ import munit.FunSuite
 
 import scala.io.Source
 import cats.data.EitherNec
+import io.circe.parser.decode
+import io.circe.generic.auto.*
 
 /**
  * Test suite that verifies SED matching against a dataset of Simbad entries. Replicates the
@@ -138,8 +140,8 @@ class SimbadSEDMatcherDataSuite extends FunSuite:
     galaxyResults.foreach { result =>
       result.sed match {
         case Right(UnnormalizedSED.Galaxy(_)) => // OK
-        case Left(_)                           => // OK - no morphological type or doesn't match
-        case other                             => fail(s"Galaxy ${result.entry.mainId} got unexpected SED: $other")
+        case Left(_)                          => // OK - no morphological type or doesn't match
+        case other                            => fail(s"Galaxy ${result.entry.mainId} got unexpected SED: $other")
       }
     }
   }
@@ -149,7 +151,9 @@ class SimbadSEDMatcherDataSuite extends FunSuite:
     assert(quasarResults.nonEmpty, "Should have quasar entries in test data")
     quasarResults.foreach { result =>
       assert(result.sed.isRight)
-      assertEquals(result.sed.getOrElse(fail("Expected Right")), UnnormalizedSED.Quasar(QuasarSpectrum.QS0))
+      assertEquals(result.sed.getOrElse(fail("Expected Right")),
+                   UnnormalizedSED.Quasar(QuasarSpectrum.QS0)
+      )
     }
   }
 
@@ -158,7 +162,9 @@ class SimbadSEDMatcherDataSuite extends FunSuite:
     assert(hiiResults.nonEmpty, "Should have HII region entries in test data")
     hiiResults.foreach { result =>
       assert(result.sed.isRight)
-      assertEquals(result.sed.getOrElse(fail("Expected Right")), UnnormalizedSED.HIIRegion(HIIRegionSpectrum.OrionNebula))
+      assertEquals(result.sed.getOrElse(fail("Expected Right")),
+                   UnnormalizedSED.HIIRegion(HIIRegionSpectrum.OrionNebula)
+      )
     }
   }
 
@@ -214,43 +220,17 @@ class SimbadSEDMatcherDataSuite extends FunSuite:
     val m87 = matchResults.find(_.entry.mainId == "M  87")
     assert(m87.isDefined)
     assert(m87.get.sed.isRight)
-    assertEquals(m87.get.sed.getOrElse(fail("Expected Right")), UnnormalizedSED.Galaxy(GalaxySpectrum.Elliptical))
+    assertEquals(m87.get.sed.getOrElse(fail("Expected Right")),
+                 UnnormalizedSED.Galaxy(GalaxySpectrum.Elliptical)
+    )
 
     // Spiral galaxy
     val m31 = matchResults.find(_.entry.mainId == "M  31")
     assert(m31.isDefined)
     assert(m31.get.sed.isRight)
-    assertEquals(m31.get.sed.getOrElse(fail("Expected Right")), UnnormalizedSED.Galaxy(GalaxySpectrum.Spiral))
-  }
-
-  test("print summary statistics") {
-    val total     = matchResults.length
-    val matched   = matchResults.count(_.sed.isRight)
-    val unmatched = total - matched
-
-    val byCat =
-      matchResults.filter(_.sed.isRight).groupBy(_.category.get).view.mapValues(_.length).toMap
-
-    println(s"\n=== SED Matching Results ===")
-    println(s"Total entries: $total")
-    println(s"Matched: $matched (${matched * 100 / total}%)")
-    println(s"Unmatched: $unmatched (${unmatched * 100 / total}%)")
-    println(s"\nBy category:")
-    byCat.toSeq.sortBy(_._1).foreach { case (cat, count) =>
-      println(s"  $cat: $count")
-    }
-    println()
-
-    // Print some examples of unmatched entries
-    val unmatchedEntries = matchResults.filter(_.sed.isLeft).take(10)
-    if unmatchedEntries.nonEmpty then
-      println("Sample unmatched entries:")
-      unmatchedEntries.foreach { result =>
-        println(
-          s"  ${result.entry.mainId}: otype=${result.entry.otype}, sp_type=${result.entry.spectralType}"
-        )
-      }
-      println()
+    assertEquals(m31.get.sed.getOrElse(fail("Expected Right")),
+                 UnnormalizedSED.Galaxy(GalaxySpectrum.Spiral)
+    )
   }
 
   test("compare specific cases with Python reference") {
@@ -266,10 +246,117 @@ class SimbadSEDMatcherDataSuite extends FunSuite:
     // A0V should match A0V
     val a0Result = SEDMatcher.inferSED("*", Some("A0V"), None)
     assert(a0Result.isRight)
-    assertEquals(a0Result.getOrElse(fail("Expected Right")), UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.A0V))
+    assertEquals(a0Result.getOrElse(fail("Expected Right")),
+                 UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.A0V)
+    )
 
     // F1V should match F2V (closest available)
     val f1Result = SEDMatcher.inferSED("*", Some("F1V"), None)
     assert(f1Result.isRight)
-    assertEquals(f1Result.getOrElse(fail("Expected Right")), UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.F2V))
+    assertEquals(f1Result.getOrElse(fail("Expected Right")),
+                 UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.F2V)
+    )
+  }
+
+  case class PythonExpected(
+    main_id:  String,
+    otype:    String,
+    filename: Option[String],
+    t_eff:    Option[Double],
+    log_g:    Option[Double]
+  )
+
+  lazy val pythonExpected: List[PythonExpected] =
+    val stream = getClass.getResourceAsStream("/expected-output.jsonl")
+    val source = Source.fromInputStream(stream)
+    try
+      source.getLines().flatMap { line =>
+        decode[PythonExpected](line).toOption
+      }.toList
+    finally
+      source.close()
+
+  def filenameToSED(filename: String): Option[UnnormalizedSED] =
+    filename match
+      case "QSO.sed"        => Some(UnnormalizedSED.Quasar(QuasarSpectrum.QS0))
+      case "HII.sed"        => Some(UnnormalizedSED.HIIRegion(HIIRegionSpectrum.OrionNebula))
+      case "PN.sed"         => Some(UnnormalizedSED.PlanetaryNebula(PlanetaryNebulaSpectrum.NGC7009))
+      case "Elliptical.sed" => Some(UnnormalizedSED.Galaxy(GalaxySpectrum.Elliptical))
+      case "Spiral.sed"     => Some(UnnormalizedSED.Galaxy(GalaxySpectrum.Spiral))
+      case stellar          =>
+        // Extract spectrum tag: A0V_calspec.nm -> A0V_calspec, K5III_pickles_irtf.nm -> K5III_pickles_irtf
+        val spectrumTag = stellar.stripSuffix(".nm")
+        StellarLibrarySpectrum.values.find(_.tag == spectrumTag)
+          .map(UnnormalizedSED.StellarLibrary(_))
+
+  def stellarBaseType(sed: UnnormalizedSED): Option[String] =
+    sed match
+      case UnnormalizedSED.StellarLibrary(spectrum) =>
+        val name = spectrum.toString
+        Some(if name.endsWith("_new") then name.dropRight(4) else name)
+      case _ => None
+
+  def sedEquivalent(p: UnnormalizedSED, s: UnnormalizedSED): Boolean =
+    if p == s then true
+    else (stellarBaseType(p), stellarBaseType(s)) match
+      case (Some(pBase), Some(sBase)) => pBase == sBase
+      case _                          => false
+
+  val knownDifferences = Set(
+    "BD+25  2534", // sdB1(k) - subdwarf matching tolerance
+    "*   3 Cet",   // K3Ib with s*r otype - otype category difference
+    "*  17 Aqr"    // K4/5III - range scoring (Python picks K5, Scala picks K4)
+  )
+
+  test("validate against Python reference output") {
+    val inputData = testData.map(e => e.mainId -> e).toMap
+
+    var matches         = 0
+    var mismatches      = 0
+    var knownDiffs      = 0
+    val errors          = scala.collection.mutable.ListBuffer[String]()
+    val unexpectedDiffs = scala.collection.mutable.ListBuffer[String]()
+
+    pythonExpected.foreach { expected =>
+      inputData.get(expected.main_id).foreach { entry =>
+        val morphTypeOpt    = if entry.morphType.isEmpty then None else Some(entry.morphType)
+        val spectralTypeOpt = if entry.spectralType.isEmpty then None else Some(entry.spectralType)
+        val scalaResult     = SEDMatcher.inferSED(entry.otype, spectralTypeOpt, morphTypeOpt)
+
+        val pythonSED = expected.filename.flatMap(filenameToSED)
+        val scalaSED  = scalaResult.toOption
+
+        (pythonSED, scalaSED) match
+          case (None, None)                                 => matches += 1
+          case (Some(p), Some(s)) if sedEquivalent(p, s)    => matches += 1
+          case (Some(p), Some(s))                           =>
+            mismatches += 1
+            val msg = s"${expected.main_id}: Python=$p, Scala=$s"
+            errors += msg
+            if !knownDifferences.contains(expected.main_id) then unexpectedDiffs += msg
+            else knownDiffs += 1
+          case (Some(p), None)                              =>
+            mismatches += 1
+            val msg = s"${expected.main_id}: Python=$p, Scala=None"
+            errors += msg
+            if !knownDifferences.contains(expected.main_id) then unexpectedDiffs += msg
+            else knownDiffs += 1
+          case (None, Some(s))                              =>
+            mismatches += 1
+            val msg = s"${expected.main_id}: Python=None, Scala=$s"
+            errors += msg
+            if !knownDifferences.contains(expected.main_id) then unexpectedDiffs += msg
+            else knownDiffs += 1
+      }
+    }
+
+    println(s"\n=== Python Reference Validation ===")
+    println(s"Matches: $matches")
+    println(s"Known differences: $knownDiffs")
+    println(s"Total mismatches: $mismatches")
+    if errors.nonEmpty then
+      println(s"All differences:")
+      errors.foreach(e => println(s"  $e"))
+
+    assert(unexpectedDiffs.isEmpty, s"Found ${unexpectedDiffs.size} unexpected mismatches: ${unexpectedDiffs.mkString(", ")}")
   }
