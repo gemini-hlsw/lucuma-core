@@ -504,6 +504,13 @@ object CatalogAdapter {
     override val plxField: FieldId = FieldId.unsafeFrom("parallax")
     override val rvField: FieldId  = FieldId.unsafeFrom("radial_velocity")
 
+    // Match brightness fields by name
+    override protected def containsBrightnessValue(v: FieldId): Boolean =
+      findBand(v).isDefined && !ignoreBrightnessValueField(v)
+
+    override def fieldToBand(field: FieldId): Option[Band] =
+      if (!ignoreBrightnessValueField(field)) findBand(field) else none
+
     override def queryUri(query: String): Uri =
       uri
         .withQueryParam("sql", query)
