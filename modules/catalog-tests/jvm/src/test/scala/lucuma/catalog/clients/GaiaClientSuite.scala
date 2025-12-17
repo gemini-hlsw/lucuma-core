@@ -6,15 +6,23 @@ package lucuma.catalog.clients
 import cats.data.NonEmptyChain
 import cats.effect.*
 import cats.syntax.all.*
+import coulomb.*
+import coulomb.syntax.*
 import lucuma.catalog.clients.GaiaClientMock
 import lucuma.catalog.votable.*
+import lucuma.core.enums.Band
 import lucuma.core.enums.CatalogName
 import lucuma.core.geom.ShapeExpression
 import lucuma.core.geom.jts.interpreter.given
 import lucuma.core.geom.syntax.all.*
+import lucuma.core.math.BrightnessUnits.*
+import lucuma.core.math.BrightnessValue
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Declination
 import lucuma.core.math.RightAscension
+import lucuma.core.math.dimensional.syntax.*
+import lucuma.core.math.units.*
+import lucuma.core.model.Target
 import lucuma.core.syntax.all.*
 import munit.CatsEffectSuite
 
@@ -94,7 +102,7 @@ class GaiaClientSuite extends CatsEffectSuite with VoTableSamples:
         case Left(e)       =>
           fail(s"queryByIdGuideStar failed: ${e.toList.mkString("; ")}")
 
-  test("Gaia3LiteGavo adapter for px and rv"):
+  test("Gaia3LiteGavo adapter for px, rv, and brightness"):
     val client = GaiaClientMock.fromString[IO](gavoParallaxAndRV,
                                                NonEmptyChain.one(CatalogAdapter.Gaia3LiteGavo).some
     )
@@ -108,10 +116,18 @@ class GaiaClientSuite extends CatsEffectSuite with VoTableSamples:
           assertEquals(tracking.parallax.map(_.μas.value.value), 166L.some)
           // radial_velocity: -39.225376 km/s -> -39225.376 m/s
           assertEquals(tracking.radialVelocity.map(_.rv.value.toDouble), -39225.376.some)
+          assertEquals(
+            Target.integratedBrightnessIn(Band.Gaia).headOption(result.target),
+            BrightnessValue.unsafeFrom(15.083894).withUnit[VegaMagnitude].toMeasureTagged.some
+          )
+          assertEquals(
+            Target.integratedBrightnessIn(Band.GaiaRP).headOption(result.target),
+            BrightnessValue.unsafeFrom(14.250962).withUnit[VegaMagnitude].toMeasureTagged.some
+          )
         case Left(e)       =>
           fail(s"queryById failed: ${e.toList.mkString("; ")}")
 
-  test("Gaia3LiteEsa adapter for px and rv"):
+  test("Gaia3LiteEsa adapter for px, rv, and brightness"):
     val client = GaiaClientMock.fromString[IO](esaLiteParallaxAndRV,
                                                NonEmptyChain.one(CatalogAdapter.Gaia3LiteEsa).some
     )
@@ -123,6 +139,14 @@ class GaiaClientSuite extends CatsEffectSuite with VoTableSamples:
           val tracking = result.target.tracking
           assertEquals(tracking.parallax.map(_.μas.value.value), 166L.some)
           assertEquals(tracking.radialVelocity.map(_.rv.value.toDouble), -39225.376.some)
+          assertEquals(
+            Target.integratedBrightnessIn(Band.Gaia).headOption(result.target),
+            BrightnessValue.unsafeFrom(15.083894).withUnit[VegaMagnitude].toMeasureTagged.some
+          )
+          assertEquals(
+            Target.integratedBrightnessIn(Band.GaiaRP).headOption(result.target),
+            BrightnessValue.unsafeFrom(14.250962).withUnit[VegaMagnitude].toMeasureTagged.some
+          )
         case Left(e)       =>
           fail(s"queryById failed: ${e.toList.mkString("; ")}")
 
@@ -140,7 +164,7 @@ class GaiaClientSuite extends CatsEffectSuite with VoTableSamples:
         case Left(e)       =>
           fail(s"queryById failed: ${e.toList.mkString("; ")}")
 
-  test("Gaia3DataLab adapter for px and rv"):
+  test("Gaia3DataLab adapter for px, rv, and brightness"):
     val client = GaiaClientMock
       .fromString[IO](dataLabSample, NonEmptyChain.one(CatalogAdapter.Gaia3DataLab).some)
 
@@ -151,5 +175,13 @@ class GaiaClientSuite extends CatsEffectSuite with VoTableSamples:
           val tracking = result.target.tracking
           assertEquals(tracking.parallax.map(_.μas.value.value), 166L.some)
           assertEquals(tracking.radialVelocity.map(_.rv.value.toDouble), -39225.376.some)
+          assertEquals(
+            Target.integratedBrightnessIn(Band.Gaia).headOption(result.target),
+            BrightnessValue.unsafeFrom(15.083894).withUnit[VegaMagnitude].toMeasureTagged.some
+          )
+          assertEquals(
+            Target.integratedBrightnessIn(Band.GaiaRP).headOption(result.target),
+            BrightnessValue.unsafeFrom(14.250962).withUnit[VegaMagnitude].toMeasureTagged.some
+          )
         case Left(e)       =>
           fail(s"queryById failed: ${e.toList.mkString("; ")}")
