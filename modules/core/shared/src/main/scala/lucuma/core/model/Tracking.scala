@@ -37,6 +37,15 @@ object Tracking:
     case (a: SiderealTracking, b: SiderealTracking)   => a === b
     case _                                            => false
 
+  def fromList(trackings: List[Tracking]): Option[Tracking] = 
+    NonEmptyList.fromList(trackings).map(fromNel)
+
+  def fromNel(trackings: NonEmptyList[Tracking]): Tracking = trackings match
+    case NonEmptyList(h, Nil) => h
+    case _ => CompositeTracking(trackings)
+  
+  // The following helper methods than die when presented with a non-sidereal will
+  // be removed as soon as non-sidereal support is complete in Explore
   def fromTarget(target: Target): Option[Tracking] =
     orRegionFromTarget(target).left.toOption
 
