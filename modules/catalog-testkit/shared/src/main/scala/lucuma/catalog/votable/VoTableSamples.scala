@@ -680,7 +680,7 @@ trait VoTableSamples {
   // DataLab doesn't return UCDs for any fields
   //
   // curl -s -H 'X-DL-AuthToken:anonymous.0.0.anon_access' \
-  //   'https://datalab.noirlab.edu/query/query?sql=select+source_id,designation,ra,dec,pmra,pmdec,parallax,radial_velocity,phot_g_mean_mag,phot_rp_mean_mag,ref_epoch+from+gaia_dr3.gaia_source+where+source_id=538670232718296576&ofmt=votable&out=None&async=False&drop=False&profile=default'
+  //   'https://datalab.noirlab.edu/query/query?sql=select+source_id,designation,ra,dec,pmra,pmdec,parallax,radial_velocity,phot_g_mean_mag,phot_bp_mean_mag,phot_rp_mean_mag,ref_epoch+from+gaia_dr3.gaia_source+where+source_id=538670232718296576&ofmt=votable&out=None&async=False&drop=False&profile=default'
   lazy val dataLabSample =
     """<?xml version="1.0" encoding="utf-8"?>
       <VOTABLE version="1.4" xmlns="http://www.ivoa.net/xml/VOTable/v1.3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ivoa.net/xml/VOTable/v1.3 http://www.ivoa.net/xml/VOTable/VOTable-1.4.xsd">
@@ -695,6 +695,7 @@ trait VoTableSamples {
         <FIELD ID="parallax" datatype="double" name="parallax"/>
         <FIELD ID="radial_velocity" datatype="float" name="radial_velocity"/>
         <FIELD ID="phot_g_mean_mag" datatype="float" name="phot_g_mean_mag"/>
+        <FIELD ID="phot_bp_mean_mag" datatype="float" name="phot_bp_mean_mag"/>
         <FIELD ID="phot_rp_mean_mag" datatype="float" name="phot_rp_mean_mag"/>
         <FIELD ID="ref_epoch" datatype="double" name="ref_epoch"/>
         <DATA>
@@ -709,6 +710,7 @@ trait VoTableSamples {
             <TD>0.1664138200379304</TD>
             <TD>-39.225376</TD>
             <TD>15.083894</TD>
+            <TD>15.587215</TD>
             <TD>14.250962</TD>
             <TD>2016</TD>
           </TR>
@@ -1007,6 +1009,7 @@ trait VoTableSamples {
       |      <FIELD ID="parallax" datatype="double" name="parallax"/>
       |      <FIELD ID="radial_velocity" datatype="float" name="radial_velocity"/>
       |      <FIELD ID="phot_g_mean_mag" datatype="float" name="phot_g_mean_mag"/>
+      |      <FIELD ID="phot_bp_mean_mag" datatype="float" name="phot_bp_mean_mag"/>
       |      <FIELD ID="phot_rp_mean_mag" datatype="float" name="phot_rp_mean_mag"/>
       |      <FIELD ID="ref_epoch" datatype="double" name="ref_epoch"/>
       |      <FIELD ID="designation" arraysize="28" datatype="unicodeChar" name="designation"/>
@@ -1021,6 +1024,7 @@ trait VoTableSamples {
       |            <TD>546.975939730948</TD>
       |            <TD>-110.46822</TD>
       |            <TD>8.193974</TD>
+      |            <TD>9.791788</TD>
       |            <TD>6.958091</TD>
       |            <TD>2016</TD>
       |            <TD>Gaia DR3 4472832130942575872</TD>
@@ -1044,6 +1048,7 @@ trait VoTableSamples {
       |      <FIELD ID="parallax" datatype="float" name="parallax" ucd="pos.parallax" unit="mas"/>
       |      <FIELD ID="radial_velocity" datatype="float" name="radial_velocity" ucd="spect.dopplerVeloc.opt;em.opt.I" unit="km/s"/>
       |      <FIELD ID="phot_g_mean_mag" datatype="float" name="phot_g_mean_mag" ucd="phot.mag;em.opt;stat.mean" unit="mag"/>
+      |      <FIELD ID="phot_bp_mean_mag" datatype="float" name="phot_bp_mean_mag" ucd="phot.mag;em.opt.B" unit="mag"/>
       |      <FIELD ID="phot_rp_mean_mag" datatype="float" name="phot_rp_mean_mag" ucd="phot.mag;em.opt.R" unit="mag"/>
       |      <DATA>
       |        <TABLEDATA>
@@ -1056,6 +1061,7 @@ trait VoTableSamples {
       |            <TD>546.97595</TD>
       |            <TD>-110.46822</TD>
       |            <TD>8.1939745</TD>
+      |            <TD>9.791788</TD>
       |            <TD>6.9580913</TD>
       |          </TR>
       |        </TABLEDATA>
@@ -1077,6 +1083,7 @@ trait VoTableSamples {
       |      <FIELD datatype="double" name="parallax" ucd="pos.parallax.trig" unit="mas"/>
       |      <FIELD datatype="float" name="radial_velocity" ucd="spect.dopplerVeloc.opt;em.opt.I" unit="km.s**-1"/>
       |      <FIELD datatype="float" name="phot_g_mean_mag" ucd="phot.mag;em.opt" unit="mag"/>
+      |      <FIELD datatype="float" name="phot_bp_mean_mag" ucd="phot.mag;em.opt.B" unit="mag"/>
       |      <FIELD datatype="float" name="phot_rp_mean_mag" ucd="phot.mag;em.opt.R" unit="mag"/>
       |      <DATA>
       |        <TABLEDATA>
@@ -1089,6 +1096,7 @@ trait VoTableSamples {
       |            <TD>546.975939730948</TD>
       |            <TD>-110.46822</TD>
       |            <TD>8.1939745</TD>
+      |            <TD>9.791788</TD>
       |            <TD>6.9580913</TD>
       |          </TR>
       |        </TABLEDATA>

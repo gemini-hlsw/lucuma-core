@@ -176,14 +176,10 @@ class GaiaClientSuite extends CatsEffectSuite with VoTableSamples:
         case Right(result) =>
           val target   = result.target
           val tracking = target.tracking
-          // name from designation field
           assertEquals(target.name.value, "Gaia DR3 538670232718296576")
-          // epoch from ref_epoch field
           assertEquals(tracking.epoch.some, Epoch.Julian.fromEpochYears(2016.0))
-          // parallax and radial velocity
           assertEquals(tracking.parallax.map(_.μas.value.value), 166L.some)
           assertEquals(tracking.radialVelocity.map(_.rv.value.toDouble), -39225.376.some)
-          // proper motion: pmra=-1.4343 mas/yr, pmdec=-1.0646 mas/yr
           assertEquals(
             Target.properMotionRA.getOption(target),
             ProperMotion.μasyRA(-1434).some
@@ -192,10 +188,13 @@ class GaiaClientSuite extends CatsEffectSuite with VoTableSamples:
             Target.properMotionDec.getOption(target),
             ProperMotion.μasyDec(-1064).some
           )
-          // brightness
           assertEquals(
             Target.integratedBrightnessIn(Band.Gaia).headOption(target),
             BrightnessValue.unsafeFrom(15.083894).withUnit[VegaMagnitude].toMeasureTagged.some
+          )
+          assertEquals(
+            Target.integratedBrightnessIn(Band.GaiaBP).headOption(target),
+            BrightnessValue.unsafeFrom(15.587215).withUnit[VegaMagnitude].toMeasureTagged.some
           )
           assertEquals(
             Target.integratedBrightnessIn(Band.GaiaRP).headOption(target),
@@ -209,15 +208,18 @@ class GaiaClientSuite extends CatsEffectSuite with VoTableSamples:
       GaiaClientMock.fromString[IO](barnardStarDataLab,
                                     NonEmptyChain.one(CatalogAdapter.Gaia3DataLab).some
       )
-    val gavoClient    =
+
+    val gavoClient =
       GaiaClientMock.fromString[IO](barnardStarGavo,
                                     NonEmptyChain.one(CatalogAdapter.Gaia3LiteGavo).some
       )
-    val esaClient     =
+
+    val esaClient =
       GaiaClientMock.fromString[IO](barnardStarEsa,
                                     NonEmptyChain.one(CatalogAdapter.Gaia3LiteEsa).some
       )
 
+    // Barnard's Star on gaia
     val sourceId = 4472832130942575872L
 
     for {
@@ -259,6 +261,7 @@ class GaiaClientSuite extends CatsEffectSuite with VoTableSamples:
       assertEqualsDouble(pmDecDataLab, pmDecGavo, 2.0)
       assertEqualsDouble(pmDecDataLab, pmDecEsa, 2.0)
 
+      // G
       val gMagDataLab = Target
         .integratedBrightnessIn(Band.Gaia)
         .headOption(dataLab)
@@ -277,6 +280,7 @@ class GaiaClientSuite extends CatsEffectSuite with VoTableSamples:
       assertEqualsDouble(gMagDataLab, gMagGavo, 0.0001)
       assertEqualsDouble(gMagDataLab, gMagEsa, 0.0001)
 
+      // RP
       val rpMagDataLab = Target
         .integratedBrightnessIn(Band.GaiaRP)
         .headOption(dataLab)
@@ -294,3 +298,22 @@ class GaiaClientSuite extends CatsEffectSuite with VoTableSamples:
         .getOrElse(0.0)
       assertEqualsDouble(rpMagDataLab, rpMagGavo, 0.0001)
       assertEqualsDouble(rpMagDataLab, rpMagEsa, 0.0001)
+
+      // BP
+      val bpMagDataLab = Target
+        .integratedBrightnessIn(Band.GaiaBP)
+        .headOption(dataLab)
+        .map(_.value.value.value.toDouble)
+        .getOrElse(0.0)
+      val bpMagGavo    = Target
+        .integratedBrightnessIn(Band.GaiaBP)
+        .headOption(gavo)
+        .map(_.value.value.value.toDouble)
+        .getOrElse(0.0)
+      val bpMagEsa     = Target
+        .integratedBrightnessIn(Band.GaiaBP)
+        .headOption(esa)
+        .map(_.value.value.value.toDouble)
+        .getOrElse(0.0)
+      assertEqualsDouble(bpMagDataLab, bpMagGavo, 0.0001)
+      assertEqualsDouble(bpMagDataLab, bpMagEsa, 0.0001)
