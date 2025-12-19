@@ -19,6 +19,7 @@ import lucuma.core.math.BrightnessUnits.*
 import lucuma.core.math.BrightnessValue
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Declination
+import lucuma.core.math.Epoch
 import lucuma.core.math.ProperMotion
 import lucuma.core.math.RightAscension
 import lucuma.core.math.dimensional.syntax.*
@@ -165,7 +166,7 @@ class GaiaClientSuite extends CatsEffectSuite with VoTableSamples:
         case Left(e)       =>
           fail(s"queryById failed: ${e.toList.mkString("; ")}")
 
-  test("Gaia3DataLab adapter for px, rv, pm, and brightness"):
+  test("Gaia3DataLab adapter for all fields"):
     val client = GaiaClientMock
       .fromString[IO](dataLabSample, NonEmptyChain.one(CatalogAdapter.Gaia3DataLab).some)
 
@@ -173,24 +174,31 @@ class GaiaClientSuite extends CatsEffectSuite with VoTableSamples:
       .queryById(538670232718296576L)
       .map:
         case Right(result) =>
-          val tracking = result.target.tracking
+          val target   = result.target
+          val tracking = target.tracking
+          // name from designation field
+          assertEquals(target.name.value, "Gaia DR3 538670232718296576")
+          // epoch from ref_epoch field
+          assertEquals(tracking.epoch.some, Epoch.Julian.fromEpochYears(2016.0))
+          // parallax and radial velocity
           assertEquals(tracking.parallax.map(_.μas.value.value), 166L.some)
           assertEquals(tracking.radialVelocity.map(_.rv.value.toDouble), -39225.376.some)
           // proper motion: pmra=-1.4343 mas/yr, pmdec=-1.0646 mas/yr
           assertEquals(
-            Target.properMotionRA.getOption(result.target),
+            Target.properMotionRA.getOption(target),
             ProperMotion.μasyRA(-1434).some
           )
           assertEquals(
-            Target.properMotionDec.getOption(result.target),
+            Target.properMotionDec.getOption(target),
             ProperMotion.μasyDec(-1064).some
           )
+          // brightness
           assertEquals(
-            Target.integratedBrightnessIn(Band.Gaia).headOption(result.target),
+            Target.integratedBrightnessIn(Band.Gaia).headOption(target),
             BrightnessValue.unsafeFrom(15.083894).withUnit[VegaMagnitude].toMeasureTagged.some
           )
           assertEquals(
-            Target.integratedBrightnessIn(Band.GaiaRP).headOption(result.target),
+            Target.integratedBrightnessIn(Band.GaiaRP).headOption(target),
             BrightnessValue.unsafeFrom(14.250962).withUnit[VegaMagnitude].toMeasureTagged.some
           )
         case Left(e)       =>

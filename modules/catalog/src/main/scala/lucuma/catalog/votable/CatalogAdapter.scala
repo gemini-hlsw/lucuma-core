@@ -505,6 +505,7 @@ object CatalogAdapter {
     override val rvField: FieldId     = FieldId.unsafeFrom("radial_velocity")
     override val pmRaField: FieldId   = FieldId.unsafeFrom("pmra")
     override val pmDecField: FieldId  = FieldId.unsafeFrom("pmdec")
+    override val epochField: FieldId  = FieldId.unsafeFrom("ref_epoch")
 
     // Match brightness fields by name
     override protected def containsBrightnessValue(v: FieldId): Boolean =
@@ -618,7 +619,8 @@ object CatalogAdapter {
 
   object Gaia3DataLab extends GaiaDataLab {
     override lazy val gaiaDB: String   = "gaia_dr3.gaia_source"
-    lazy val alternateIdField: FieldId =
-      FieldId.unsafeFrom("source_id", VoTableParser.UCD_OBJID)
+    // DataLab returns fields without UCDs
+    override val idField: FieldId      = FieldId.unsafeFrom("designation")
+    lazy val alternateIdField: FieldId = FieldId.unsafeFrom("source_id")
   }
 }
