@@ -203,3 +203,94 @@ class GaiaClientSuite extends CatsEffectSuite with VoTableSamples:
           )
         case Left(e)       =>
           fail(s"queryById failed: ${e.toList.mkString("; ")}")
+
+  test("All adapters produce the same results for Barnard's Star"):
+    val dataLabClient =
+      GaiaClientMock.fromString[IO](barnardStarDataLab,
+                                    NonEmptyChain.one(CatalogAdapter.Gaia3DataLab).some
+      )
+    val gavoClient    =
+      GaiaClientMock.fromString[IO](barnardStarGavo,
+                                    NonEmptyChain.one(CatalogAdapter.Gaia3LiteGavo).some
+      )
+    val esaClient     =
+      GaiaClientMock.fromString[IO](barnardStarEsa,
+                                    NonEmptyChain.one(CatalogAdapter.Gaia3LiteEsa).some
+      )
+
+    val sourceId = 4472832130942575872L
+
+    for {
+      dataLabResult <- dataLabClient.queryById(sourceId)
+      gavoResult    <- gavoClient.queryById(sourceId)
+      esaResult     <- esaClient.queryById(sourceId)
+    } yield
+      val dataLab = dataLabResult.getOrElse(fail("DataLab query failed")).target
+      val gavo    = gavoResult.getOrElse(fail("GAVO query failed")).target
+      val esa     = esaResult.getOrElse(fail("ESA query failed")).target
+
+      assertEquals(dataLab.tracking.baseCoordinates, gavo.tracking.baseCoordinates)
+      assertEquals(dataLab.tracking.baseCoordinates, esa.tracking.baseCoordinates)
+      assertEquals(dataLab.tracking.epoch, gavo.tracking.epoch)
+      assertEquals(dataLab.tracking.epoch, esa.tracking.epoch)
+
+      // Parallax some differences on precission
+      val plxDataLab = dataLab.tracking.parallax.map(_.μas.value.value.toDouble).getOrElse(0.0)
+      val plxGavo    = gavo.tracking.parallax.map(_.μas.value.value.toDouble).getOrElse(0.0)
+      val plxEsa     = esa.tracking.parallax.map(_.μas.value.value.toDouble).getOrElse(0.0)
+      assertEqualsDouble(plxDataLab, plxGavo, 2.0)
+      assertEqualsDouble(plxDataLab, plxEsa, 2.0)
+
+      assertEquals(dataLab.tracking.radialVelocity, gavo.tracking.radialVelocity)
+      assertEquals(dataLab.tracking.radialVelocity, esa.tracking.radialVelocity)
+
+      // Proper motion some diferences on precession
+      val pmRaDataLab  =
+        Target.properMotionRA.getOption(dataLab).map(_.μasy.value.toDouble).getOrElse(0.0)
+      val pmRaGavo     = Target.properMotionRA.getOption(gavo).map(_.μasy.value.toDouble).getOrElse(0.0)
+      val pmRaEsa      = Target.properMotionRA.getOption(esa).map(_.μasy.value.toDouble).getOrElse(0.0)
+      val pmDecDataLab =
+        Target.properMotionDec.getOption(dataLab).map(_.μasy.value.toDouble).getOrElse(0.0)
+      val pmDecGavo    =
+        Target.properMotionDec.getOption(gavo).map(_.μasy.value.toDouble).getOrElse(0.0)
+      val pmDecEsa     = Target.properMotionDec.getOption(esa).map(_.μasy.value.toDouble).getOrElse(0.0)
+      assertEqualsDouble(pmRaDataLab, pmRaGavo, 2.0)
+      assertEqualsDouble(pmRaDataLab, pmRaEsa, 2.0)
+      assertEqualsDouble(pmDecDataLab, pmDecGavo, 2.0)
+      assertEqualsDouble(pmDecDataLab, pmDecEsa, 2.0)
+
+      val gMagDataLab = Target
+        .integratedBrightnessIn(Band.Gaia)
+        .headOption(dataLab)
+        .map(_.value.value.value.toDouble)
+        .getOrElse(0.0)
+      val gMagGavo    = Target
+        .integratedBrightnessIn(Band.Gaia)
+        .headOption(gavo)
+        .map(_.value.value.value.toDouble)
+        .getOrElse(0.0)
+      val gMagEsa     = Target
+        .integratedBrightnessIn(Band.Gaia)
+        .headOption(esa)
+        .map(_.value.value.value.toDouble)
+        .getOrElse(0.0)
+      assertEqualsDouble(gMagDataLab, gMagGavo, 0.0001)
+      assertEqualsDouble(gMagDataLab, gMagEsa, 0.0001)
+
+      val rpMagDataLab = Target
+        .integratedBrightnessIn(Band.GaiaRP)
+        .headOption(dataLab)
+        .map(_.value.value.value.toDouble)
+        .getOrElse(0.0)
+      val rpMagGavo    = Target
+        .integratedBrightnessIn(Band.GaiaRP)
+        .headOption(gavo)
+        .map(_.value.value.value.toDouble)
+        .getOrElse(0.0)
+      val rpMagEsa     = Target
+        .integratedBrightnessIn(Band.GaiaRP)
+        .headOption(esa)
+        .map(_.value.value.value.toDouble)
+        .getOrElse(0.0)
+      assertEqualsDouble(rpMagDataLab, rpMagGavo, 0.0001)
+      assertEqualsDouble(rpMagDataLab, rpMagEsa, 0.0001)

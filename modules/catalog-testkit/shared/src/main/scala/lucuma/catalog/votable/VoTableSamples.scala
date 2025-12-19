@@ -992,4 +992,108 @@ trait VoTableSamples {
         </TABLE>
       </RESOURCE>
     </VOTABLE>
+
+  // Barnard's Star (source_id 4472832130942575872) from each Gaia server
+  lazy val barnardStarDataLab: String =
+    """<?xml version="1.0" encoding="utf-8"?>
+      |<VOTABLE version="1.4" xmlns="http://www.ivoa.net/xml/VOTable/v1.3">
+      |  <RESOURCE type="results">
+      |    <TABLE>
+      |      <FIELD ID="source_id" datatype="long" name="source_id"/>
+      |      <FIELD ID="ra" datatype="double" name="ra"/>
+      |      <FIELD ID="pmra" datatype="double" name="pmra"/>
+      |      <FIELD ID="dec" datatype="double" name="dec"/>
+      |      <FIELD ID="pmdec" datatype="double" name="pmdec"/>
+      |      <FIELD ID="parallax" datatype="double" name="parallax"/>
+      |      <FIELD ID="radial_velocity" datatype="float" name="radial_velocity"/>
+      |      <FIELD ID="phot_g_mean_mag" datatype="float" name="phot_g_mean_mag"/>
+      |      <FIELD ID="phot_rp_mean_mag" datatype="float" name="phot_rp_mean_mag"/>
+      |      <FIELD ID="ref_epoch" datatype="double" name="ref_epoch"/>
+      |      <FIELD ID="designation" arraysize="28" datatype="unicodeChar" name="designation"/>
+      |      <DATA>
+      |        <TABLEDATA>
+      |          <TR>
+      |            <TD>4472832130942575872</TD>
+      |            <TD>269.44850252543836</TD>
+      |            <TD>-801.5509783684709</TD>
+      |            <TD>4.739420051112412</TD>
+      |            <TD>10362.394206546573</TD>
+      |            <TD>546.975939730948</TD>
+      |            <TD>-110.46822</TD>
+      |            <TD>8.193974</TD>
+      |            <TD>6.958091</TD>
+      |            <TD>2016</TD>
+      |            <TD>Gaia DR3 4472832130942575872</TD>
+      |          </TR>
+      |        </TABLEDATA>
+      |      </DATA>
+      |    </TABLE>
+      |  </RESOURCE>
+      |</VOTABLE>""".stripMargin
+
+  lazy val barnardStarGavo: String =
+    """<?xml version="1.0" encoding="utf-8"?>
+      |<VOTABLE version="1.5" xmlns="http://www.ivoa.net/xml/VOTable/v1.3">
+      |  <RESOURCE type="results">
+      |    <TABLE>
+      |      <FIELD ID="source_id" datatype="long" name="source_id" ucd="meta.id;meta.main"/>
+      |      <FIELD ID="ra" datatype="double" name="ra" ucd="pos.eq.ra;meta.main" unit="deg"/>
+      |      <FIELD ID="pmra" datatype="float" name="pmra" ucd="pos.pm;pos.eq.ra" unit="mas/yr"/>
+      |      <FIELD ID="dec" datatype="double" name="dec" ucd="pos.eq.dec;meta.main" unit="deg"/>
+      |      <FIELD ID="pmdec" datatype="float" name="pmdec" ucd="pos.pm;pos.eq.dec" unit="mas/yr"/>
+      |      <FIELD ID="parallax" datatype="float" name="parallax" ucd="pos.parallax" unit="mas"/>
+      |      <FIELD ID="radial_velocity" datatype="float" name="radial_velocity" ucd="spect.dopplerVeloc.opt;em.opt.I" unit="km/s"/>
+      |      <FIELD ID="phot_g_mean_mag" datatype="float" name="phot_g_mean_mag" ucd="phot.mag;em.opt;stat.mean" unit="mag"/>
+      |      <FIELD ID="phot_rp_mean_mag" datatype="float" name="phot_rp_mean_mag" ucd="phot.mag;em.opt.R" unit="mag"/>
+      |      <DATA>
+      |        <TABLEDATA>
+      |          <TR>
+      |            <TD>4472832130942575872</TD>
+      |            <TD>269.44850252543836</TD>
+      |            <TD>-801.55096</TD>
+      |            <TD>4.739420051112412</TD>
+      |            <TD>10362.395</TD>
+      |            <TD>546.97595</TD>
+      |            <TD>-110.46822</TD>
+      |            <TD>8.1939745</TD>
+      |            <TD>6.9580913</TD>
+      |          </TR>
+      |        </TABLEDATA>
+      |      </DATA>
+      |    </TABLE>
+      |  </RESOURCE>
+      |</VOTABLE>""".stripMargin
+
+  lazy val barnardStarEsa: String =
+    """<?xml version="1.0" encoding="UTF-8"?>
+      |<VOTABLE version="1.4" xmlns="http://www.ivoa.net/xml/VOTable/v1.3">
+      |  <RESOURCE type="results">
+      |    <TABLE>
+      |      <FIELD ID="SOURCE_ID" datatype="long" name="source_id" ucd="meta.id"/>
+      |      <FIELD datatype="double" name="ra" ucd="pos.eq.ra;meta.main" unit="deg"/>
+      |      <FIELD datatype="double" name="pmra" ucd="pos.pm;pos.eq.ra" unit="mas.yr**-1"/>
+      |      <FIELD datatype="double" name="dec" ucd="pos.eq.dec;meta.main" unit="deg"/>
+      |      <FIELD datatype="double" name="pmdec" ucd="pos.pm;pos.eq.dec" unit="mas.yr**-1"/>
+      |      <FIELD datatype="double" name="parallax" ucd="pos.parallax.trig" unit="mas"/>
+      |      <FIELD datatype="float" name="radial_velocity" ucd="spect.dopplerVeloc.opt;em.opt.I" unit="km.s**-1"/>
+      |      <FIELD datatype="float" name="phot_g_mean_mag" ucd="phot.mag;em.opt" unit="mag"/>
+      |      <FIELD datatype="float" name="phot_rp_mean_mag" ucd="phot.mag;em.opt.R" unit="mag"/>
+      |      <DATA>
+      |        <TABLEDATA>
+      |          <TR>
+      |            <TD>4472832130942575872</TD>
+      |            <TD>269.44850252543836</TD>
+      |            <TD>-801.5509783684709</TD>
+      |            <TD>4.739420051112412</TD>
+      |            <TD>10362.394206546573</TD>
+      |            <TD>546.975939730948</TD>
+      |            <TD>-110.46822</TD>
+      |            <TD>8.1939745</TD>
+      |            <TD>6.9580913</TD>
+      |          </TR>
+      |        </TABLEDATA>
+      |      </DATA>
+      |    </TABLE>
+      |  </RESOURCE>
+      |</VOTABLE>""".stripMargin
 }
