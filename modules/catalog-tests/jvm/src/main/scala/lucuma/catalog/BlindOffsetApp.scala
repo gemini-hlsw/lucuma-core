@@ -17,6 +17,8 @@ import lucuma.core.math.Epoch
 import lucuma.core.math.RightAscension
 import lucuma.core.model.SiderealTracking
 import org.http4s.jdkhttpclient.JdkHttpClient
+import org.typelevel.log4cats.LoggerFactory
+import org.typelevel.log4cats.noop.NoOpFactory
 
 import java.time.Instant
 import java.time.LocalDate
@@ -65,6 +67,8 @@ trait BlindOffsetSample:
   }
 
 object BlindOffsetApp extends IOApp.Simple with BlindOffsetSample:
+
+  given LoggerFactory[IO] = NoOpFactory[IO]
 
   def run =
     JdkHttpClient

@@ -24,6 +24,6 @@ object BandsList:
    * Extracts the first valid Gaia Band Magnitude if available
    */
   case object GaiaBandsList extends BandsList:
-    val bands = List(Band.GaiaRP, Band.Gaia) // Order is important
+    val bands = List(Band.GaiaRP, Band.Gaia, Band.GaiaBP) // Order is important
 
     def ∪(that: BandsList): BandsList = this

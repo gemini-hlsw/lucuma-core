@@ -429,6 +429,7 @@ object CatalogAdapter {
         plxField,
         rvField,
         gMagField,
+        bpMagField,
         rpMagField
       )
 
@@ -500,9 +501,12 @@ object CatalogAdapter {
 
     def authToken: String = "anonymous.0.0.anon_access"
 
-    // DataLab doesn't return UCDs for parallax and radial_velocity
-    override val plxField: FieldId = FieldId.unsafeFrom("parallax")
-    override val rvField: FieldId  = FieldId.unsafeFrom("radial_velocity")
+    // DataLab doesn't return UCDs
+    override val plxField: FieldId   = FieldId.unsafeFrom("parallax")
+    override val rvField: FieldId    = FieldId.unsafeFrom("radial_velocity")
+    override val pmRaField: FieldId  = FieldId.unsafeFrom("pmra")
+    override val pmDecField: FieldId = FieldId.unsafeFrom("pmdec")
+    override val epochField: FieldId = FieldId.unsafeFrom("ref_epoch")
 
     // Match brightness fields by name
     override protected def containsBrightnessValue(v: FieldId): Boolean =
@@ -587,6 +591,7 @@ object CatalogAdapter {
         plxField,
         rvField,
         gMagField,
+        bpMagField,
         rpMagField
       )
   }
@@ -616,7 +621,7 @@ object CatalogAdapter {
 
   object Gaia3DataLab extends GaiaDataLab {
     override lazy val gaiaDB: String   = "gaia_dr3.gaia_source"
-    lazy val alternateIdField: FieldId =
-      FieldId.unsafeFrom("source_id", VoTableParser.UCD_OBJID)
+    override val idField: FieldId      = FieldId.unsafeFrom("designation")
+    lazy val alternateIdField: FieldId = FieldId.unsafeFrom("source_id")
   }
 }

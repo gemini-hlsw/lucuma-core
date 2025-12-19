@@ -18,13 +18,17 @@ import org.http4s.Method
 import org.http4s.Request
 import org.http4s.Uri
 import org.http4s.client.Client
+import org.typelevel.log4cats.Logger
+import org.typelevel.log4cats.LoggerFactory
+import org.typelevel.log4cats.syntax.*
 
 // TODO Add Trace, we need natchez
-class GaiaClientImpl[F[_]: Concurrent](
+class GaiaClientImpl[F[_]: {Concurrent, LoggerFactory as LF}](
   httpClient: Client[F],
   modUri:     Uri => Uri = identity, // Override this if you need to add a CORS proxy
   adapters:   NonEmptyChain[CatalogAdapter.Gaia] = GaiaClient.DefaultAdapters
 ) extends GaiaClient[F] {
+  private given Logger[F] = LF.getLoggerFromName("gaia-client")
 
   /**
    * Request and parse data from Gaia.
@@ -61,28 +65,29 @@ class GaiaClientImpl[F[_]: Concurrent](
     parser:   CatalogAdapter.Gaia => fs2.Pipe[F, String, EitherNec[CatalogProblem, A]]
   ): F[List[EitherNec[CatalogProblem, A]]] =
     adapters
-      .map(adapter =>
-        queryGaia(queryUri(adapter),
-                  Headers(adapter.requestHeaders.map((x, y) => Header.Raw(x, y)).toList),
-                  parser(adapter)
-        )
-      )
+      .map(adapter => queryGaia(adapter, queryUri(adapter), parser(adapter)))
       .raceAllToSuccess
+      .flatMap: (adapter, results) =>
+        info"Selected adapter: $adapter" *> results.pure[F]
 
   private def queryGaia[A](
+    adapter:  CatalogAdapter.Gaia,
     queryUri: Uri,
-    headers:  Headers,
     parser:   fs2.Pipe[F, String, EitherNec[CatalogProblem, A]]
-  ): F[List[EitherNec[CatalogProblem, A]]] =
+  ): F[(CatalogAdapter.Gaia, List[EitherNec[CatalogProblem, A]])] =
+    val headers             = Headers(adapter.requestHeaders.map((x, y) => Header.Raw(x, y)).toList)
     val request: Request[F] = Request[F](Method.GET, modUri(queryUri), headers = headers)
-    httpClient
-      .stream(request)
-      .flatMap:
-        _.body
-          .through(fs2.text.utf8.decode)
-          .through(parser)
-      .compile
-      .toList
+
+    info"Querying Gaia adapter: $adapter, uri: ${queryUri.host}" *>
+      httpClient
+        .stream(request)
+        .flatMap:
+          _.body
+            .through(fs2.text.utf8.decode)
+            .through(parser)
+        .compile
+        .toList
+        .map(results => (adapter, results))
 
   /**
    * Takes a search query and builds a uri to query gaia.
