@@ -33,7 +33,7 @@ import org.typelevel.log4cats.noop.NoOpFactory
 class GaiaClientSuite extends CatsEffectSuite with VoTableSamples:
 
   given LoggerFactory[IO] = NoOpFactory[IO]
-  given ADQLInterpreter = ADQLInterpreter.nTarget(10)
+  given ADQLInterpreter   = ADQLInterpreter.nTarget(10)
 
   val testCoords = Coordinates(
     RightAscension.fromDoubleDegrees(95.98749097569124),

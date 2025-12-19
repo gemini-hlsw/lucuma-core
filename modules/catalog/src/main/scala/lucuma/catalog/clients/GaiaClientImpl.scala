@@ -65,9 +65,7 @@ class GaiaClientImpl[F[_]: {Concurrent, LoggerFactory as LF}](
     parser:   CatalogAdapter.Gaia => fs2.Pipe[F, String, EitherNec[CatalogProblem, A]]
   ): F[List[EitherNec[CatalogProblem, A]]] =
     adapters
-      .map(adapter =>
-        queryGaia(adapter, queryUri(adapter), parser(adapter))
-      )
+      .map(adapter => queryGaia(adapter, queryUri(adapter), parser(adapter)))
       .raceAllToSuccess
       .flatMap: (adapter, results) =>
         info"Selected adapter: $adapter" *> results.pure[F]
@@ -77,7 +75,7 @@ class GaiaClientImpl[F[_]: {Concurrent, LoggerFactory as LF}](
     queryUri: Uri,
     parser:   fs2.Pipe[F, String, EitherNec[CatalogProblem, A]]
   ): F[(CatalogAdapter.Gaia, List[EitherNec[CatalogProblem, A]])] =
-    val headers = Headers(adapter.requestHeaders.map((x, y) => Header.Raw(x, y)).toList)
+    val headers             = Headers(adapter.requestHeaders.map((x, y) => Header.Raw(x, y)).toList)
     val request: Request[F] = Request[F](Method.GET, modUri(queryUri), headers = headers)
 
     info"Querying Gaia adapter: $adapter, uri: ${queryUri.host}" *>

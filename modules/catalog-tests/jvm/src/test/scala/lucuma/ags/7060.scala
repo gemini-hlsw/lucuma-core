@@ -50,7 +50,7 @@ import java.time.Instant
 class ShortCut_7060 extends CatsEffectSuite:
 
   given LoggerFactory[IO] = NoOpFactory[IO]
-  given ADQLInterpreter = ADQLInterpreter.nTarget(100)
+  given ADQLInterpreter   = ADQLInterpreter.nTarget(100)
 
   // Target coordinates for GP221000-483213
   // made to match
