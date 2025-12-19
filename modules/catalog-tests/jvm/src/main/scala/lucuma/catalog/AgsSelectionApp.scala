@@ -40,6 +40,8 @@ import lucuma.core.model.SiderealTracking
 import lucuma.core.model.Target
 import lucuma.core.model.sequence.flamingos2.Flamingos2FpuMask
 import org.http4s.jdkhttpclient.JdkHttpClient
+import org.typelevel.log4cats.LoggerFactory
+import org.typelevel.log4cats.noop.NoOpFactory
 
 import java.time.Duration
 import java.time.Instant
@@ -116,6 +118,8 @@ trait AgsSelectionSample {
 }
 
 object AgsSelectionSampleApp extends IOApp.Simple with AgsSelectionSample {
+
+  given LoggerFactory[IO] = NoOpFactory[IO]
 
   def run =
     JdkHttpClient

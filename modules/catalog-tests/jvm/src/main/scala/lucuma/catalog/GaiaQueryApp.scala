@@ -17,6 +17,8 @@ import lucuma.core.math.Declination
 import lucuma.core.math.Epoch
 import lucuma.core.math.RightAscension
 import org.http4s.jdkhttpclient.JdkHttpClient
+import org.typelevel.log4cats.LoggerFactory
+import org.typelevel.log4cats.noop.NoOpFactory
 
 trait GaiaQuerySample {
   val epoch = Epoch.fromString.getOption("J2016.000").getOrElse(Epoch.J2000)
@@ -39,6 +41,8 @@ trait GaiaQuerySample {
 }
 
 object GaiaQueryApp extends IOApp.Simple with GaiaQuerySample {
+  given LoggerFactory[IO] = NoOpFactory[IO]
+
   def run =
     JdkHttpClient
       .simple[IO]

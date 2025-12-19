@@ -27,9 +27,12 @@ import lucuma.core.math.units.*
 import lucuma.core.model.Target
 import lucuma.core.syntax.all.*
 import munit.CatsEffectSuite
+import org.typelevel.log4cats.LoggerFactory
+import org.typelevel.log4cats.noop.NoOpFactory
 
 class GaiaClientSuite extends CatsEffectSuite with VoTableSamples:
 
+  given LoggerFactory[IO] = NoOpFactory[IO]
   given ADQLInterpreter = ADQLInterpreter.nTarget(10)
 
   val testCoords = Coordinates(

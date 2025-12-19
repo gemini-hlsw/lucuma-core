@@ -16,8 +16,12 @@ import lucuma.core.math.Coordinates
 import lucuma.core.math.Declination
 import lucuma.core.math.RightAscension
 import org.http4s.jdkhttpclient.JdkHttpClient
+import org.typelevel.log4cats.LoggerFactory
+import org.typelevel.log4cats.noop.NoOpFactory
 
 object DataLabQueryApp extends IOApp.Simple:
+
+  given LoggerFactory[IO] = NoOpFactory[IO]
 
   given ADQLInterpreter = ADQLInterpreter.nTarget(5)
 

@@ -39,6 +39,8 @@ import lucuma.core.model.PosAngleConstraint
 import lucuma.core.model.SiderealTracking
 import lucuma.core.syntax.all.*
 import munit.CatsEffectSuite
+import org.typelevel.log4cats.LoggerFactory
+import org.typelevel.log4cats.noop.NoOpFactory
 
 import java.time.Instant
 
@@ -47,6 +49,7 @@ import java.time.Instant
 // https://app.shortcut.com/lucuma/story/7060/gpp-ags-does-not-match-ocs-ags
 class ShortCut_7060 extends CatsEffectSuite:
 
+  given LoggerFactory[IO] = NoOpFactory[IO]
   given ADQLInterpreter = ADQLInterpreter.nTarget(100)
 
   // Target coordinates for GP221000-483213

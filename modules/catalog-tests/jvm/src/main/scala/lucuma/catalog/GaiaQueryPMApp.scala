@@ -20,6 +20,8 @@ import lucuma.core.math.ProperMotion
 import lucuma.core.math.RightAscension
 import lucuma.core.model.SiderealTracking
 import org.http4s.jdkhttpclient.JdkHttpClient
+import org.typelevel.log4cats.LoggerFactory
+import org.typelevel.log4cats.noop.NoOpFactory
 
 trait GaiaQueryPMSample {
   val epoch = Epoch.fromString.getOption("J2022.000").getOrElse(Epoch.J2000)
@@ -56,6 +58,9 @@ trait GaiaQueryPMSample {
 }
 
 object GaiaQueryPMApp extends IOApp.Simple with GaiaQueryPMSample {
+
+  given LoggerFactory[IO] = NoOpFactory[IO]
+
   def run =
     JdkHttpClient
       .simple[IO]

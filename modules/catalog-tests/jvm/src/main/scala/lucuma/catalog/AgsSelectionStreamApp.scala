@@ -18,8 +18,12 @@ import lucuma.core.enums.PortDisposition
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 import org.http4s.jdkhttpclient.JdkHttpClient
+import org.typelevel.log4cats.LoggerFactory
+import org.typelevel.log4cats.noop.NoOpFactory
 
 object AgsSelectionSampleStreamApp extends IOApp.Simple with AgsSelectionSample:
+
+  given LoggerFactory[IO] = NoOpFactory[IO]
 
   def run =
     JdkHttpClient
