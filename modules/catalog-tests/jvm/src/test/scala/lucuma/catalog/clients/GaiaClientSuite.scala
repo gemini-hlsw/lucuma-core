@@ -19,6 +19,7 @@ import lucuma.core.math.BrightnessUnits.*
 import lucuma.core.math.BrightnessValue
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Declination
+import lucuma.core.math.ProperMotion
 import lucuma.core.math.RightAscension
 import lucuma.core.math.dimensional.syntax.*
 import lucuma.core.math.units.*
@@ -164,7 +165,7 @@ class GaiaClientSuite extends CatsEffectSuite with VoTableSamples:
         case Left(e)       =>
           fail(s"queryById failed: ${e.toList.mkString("; ")}")
 
-  test("Gaia3DataLab adapter for px, rv, and brightness"):
+  test("Gaia3DataLab adapter for px, rv, pm, and brightness"):
     val client = GaiaClientMock
       .fromString[IO](dataLabSample, NonEmptyChain.one(CatalogAdapter.Gaia3DataLab).some)
 
@@ -175,6 +176,15 @@ class GaiaClientSuite extends CatsEffectSuite with VoTableSamples:
           val tracking = result.target.tracking
           assertEquals(tracking.parallax.map(_.μas.value.value), 166L.some)
           assertEquals(tracking.radialVelocity.map(_.rv.value.toDouble), -39225.376.some)
+          // proper motion: pmra=-1.4343 mas/yr, pmdec=-1.0646 mas/yr
+          assertEquals(
+            Target.properMotionRA.getOption(result.target),
+            ProperMotion.μasyRA(-1434).some
+          )
+          assertEquals(
+            Target.properMotionDec.getOption(result.target),
+            ProperMotion.μasyDec(-1064).some
+          )
           assertEquals(
             Target.integratedBrightnessIn(Band.Gaia).headOption(result.target),
             BrightnessValue.unsafeFrom(15.083894).withUnit[VegaMagnitude].toMeasureTagged.some

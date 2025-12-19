@@ -500,9 +500,11 @@ object CatalogAdapter {
 
     def authToken: String = "anonymous.0.0.anon_access"
 
-    // DataLab doesn't return UCDs for parallax and radial_velocity
-    override val plxField: FieldId = FieldId.unsafeFrom("parallax")
-    override val rvField: FieldId  = FieldId.unsafeFrom("radial_velocity")
+    // DataLab doesn't return UCDs for any fields
+    override val plxField: FieldId    = FieldId.unsafeFrom("parallax")
+    override val rvField: FieldId     = FieldId.unsafeFrom("radial_velocity")
+    override val pmRaField: FieldId   = FieldId.unsafeFrom("pmra")
+    override val pmDecField: FieldId  = FieldId.unsafeFrom("pmdec")
 
     // Match brightness fields by name
     override protected def containsBrightnessValue(v: FieldId): Boolean =
