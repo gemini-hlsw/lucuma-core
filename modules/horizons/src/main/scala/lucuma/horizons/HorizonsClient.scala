@@ -6,8 +6,6 @@ package lucuma.horizons
 import cats.effect.Temporal
 import fs2.Stream
 import fs2.text
-import lucuma.core.data.PerSite
-import lucuma.core.enums.Site
 import lucuma.core.model.Ephemeris
 import org.http4s.Request
 import org.http4s.Uri
@@ -39,19 +37,10 @@ trait HorizonsClient[F[_]]:
    */
   def ephemeris(
     key: Ephemeris.Key.Horizons,
-    site: Site,
     start: Instant,
     stop: Instant,
     elems: Int,
   ): F[Either[String, Ephemeris.Horizons]]
-
-  /** Equivalent to `ephemeris` but selects the ephemeris at both sites. */
-  def ephemerisPerSite(
-    key: Ephemeris.Key.Horizons,
-    start: Instant,
-    stop: Instant,
-    elems: Int,
-  ): F[Either[String, PerSite[Ephemeris.Horizons]]]
 
   /**
    * Similar to `ephemeris` but selects elements starting at midnight UTC on the day of
@@ -60,7 +49,6 @@ trait HorizonsClient[F[_]]:
    */
   def alignedEphemeris(
     key: Ephemeris.Key.Horizons,
-    site: Site,
     start: Instant,
     days: Int,
     cadence: HorizonsClient.ElementsPerDay,
@@ -70,16 +58,9 @@ trait HorizonsClient[F[_]]:
         .ofInstant(start, ZoneOffset.UTC)
         .withHour(0)
         .withMinute(0)
-        .withSecond(0)            
-    ephemeris(key, site, aligned.toInstant, aligned.plusDays(days).toInstant, days * cadence)
-
-  /** Equivalent to `alignedEphemeris` but selects the ephemeris at both sites. */
-  def alignedEphemerisPerSite(
-    key: Ephemeris.Key.Horizons,
-    start: Instant,
-    days: Int,
-    cadence: HorizonsClient.ElementsPerDay,
-  ): F[Either[String, PerSite[Ephemeris.Horizons]]]
+        .withSecond(0)     
+        .withNano(0)       
+    ephemeris(key, aligned.toInstant, aligned.plusDays(days).toInstant, days * cadence)
 
 object HorizonsClient:
 

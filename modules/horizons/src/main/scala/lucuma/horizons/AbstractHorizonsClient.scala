@@ -3,7 +3,6 @@
 
 package lucuma.horizons
 
-import cats.data.EitherT
 import cats.effect.Temporal
 import cats.syntax.all.*
 import fs2.Stream
@@ -27,11 +26,25 @@ private[horizons] abstract class AbstractHorizonsClient[F[_]: Temporal] extends 
 
   def ephemeris(
     key: Ephemeris.Key.Horizons,
-    site: Site,
     start: Instant,
     stop: Instant,
     elems: Int,
   ): F[Either[String, Ephemeris.Horizons]] =
+    if !stop.isAfter(start) then Left("Stop must fall after start.").pure[F]
+    else if elems < 1 then Left("Cannot select fewer than one element.").pure[F]
+    else
+      PerSite
+      .unfoldF(fetch(key, _, start, stop, elems))
+      .map: ps =>
+        ps.sequence.map(Ephemeris.Horizons(key, start, stop, _))         
+  
+  private def fetch(
+    key: Ephemeris.Key.Horizons,
+    site: Site,
+    start: Instant,
+    stop: Instant,
+    elems: Int,
+  ): F[Either[String, List[Ephemeris.Horizons.Element]]] =
     if !stop.isAfter(start) then Left("Stop must fall after start.").pure[F]
     else if elems < 1 then Left("Cannot select fewer than one element.").pure[F]
     else {
@@ -55,32 +68,5 @@ private[horizons] abstract class AbstractHorizonsClient[F[_]: Temporal] extends 
         .compile
         .toList
         .map: lines =>
-          lines.sequence.map: elements =>
-            Ephemeris.Horizons(
-              key, site, start, stop, elements
-            )
+          lines.sequence
     }
-  
-  def ephemerisPerSite(
-    key: Ephemeris.Key.Horizons,
-    start: Instant,
-    stop: Instant,
-    elems: Int,
-  ): F[Either[String, PerSite[Ephemeris.Horizons]]] =
-    PerSite
-      .unfoldF: site =>
-        EitherT(ephemeris(key, site, start, stop, elems))
-      .value
-
-  def alignedEphemerisPerSite(
-    key: Ephemeris.Key.Horizons,
-    start: Instant,
-    days: Int,
-    cadence: HorizonsClient.ElementsPerDay,
-  ): F[Either[String, PerSite[Ephemeris.Horizons]]] =
-    PerSite
-      .unfoldF: site =>
-        EitherT(alignedEphemeris(key, site, start, days, cadence))          
-      .value
-
-
