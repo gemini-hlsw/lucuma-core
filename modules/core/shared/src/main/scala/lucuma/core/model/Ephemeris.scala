@@ -21,14 +21,14 @@ import monocle.Focus
 import monocle.Lens
 
 import java.time.Instant
+import lucuma.core.data.PerSite
 
 sealed trait Ephemeris[E <: Ephemeris.Element]:
   def key: Ephemeris.Key
-  def site: Site
-  def elements: List[E]
-  def toEphemerisTracking: EphemerisTracking =
+  def elements: PerSite[List[E]]
+  def toEphemerisTracking(site: Site): EphemerisTracking =
     EphemerisTracking.fromList:
-      elements.flatMap: e =>
+      elements(site).flatMap: e =>
         Timestamp.fromInstant(e.when).tupleRight(EphemerisCoordinates(e.coordinates, e.velocity))
 
 object Ephemeris:
@@ -42,8 +42,7 @@ object Ephemeris:
 
   final case class UserSupplied(
     key: Key.UserSupplied,
-    site: Site,
-    elements: List[UserSupplied.Element]
+    elements: PerSite[List[UserSupplied.Element]]
   ) extends Ephemeris[UserSupplied.Element]
 
   object UserSupplied:
@@ -53,13 +52,11 @@ object Ephemeris:
       velocity: Offset,
     ) extends Ephemeris.Element
 
-
   final case class Horizons(
     key: Key.Horizons,
-    site: Site,
     start: Instant,
     stop: Instant,
-    elements: List[Horizons.Element]
+    elements: PerSite[List[Horizons.Element]]
   ) extends Ephemeris[Horizons.Element]
 
   object Horizons:
@@ -72,7 +69,6 @@ object Ephemeris:
       visualMagnitude: Double,
       surfaceBrightness: Option[Double],
     ) extends Ephemeris.Element
-
 
   /**
    * Ephemeris data lookup key which uniquely identifies a non-sidereal object in

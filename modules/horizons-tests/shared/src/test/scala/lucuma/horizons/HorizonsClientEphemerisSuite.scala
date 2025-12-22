@@ -38,11 +38,10 @@ class HorizonsClientEphemerisSuite extends HorizonsClientSuite:
     client.use: c =>
       c.ephemeris(
         key   = key,
-        site  = site,
         start = sem.start.atSite(site).toInstant,
         stop  = sem.end.atSite(site).toInstant,
         elems = elems
-      ).map(_.map(_.elements))
+      ).map(_.map(_.elements(site)))
 
   def testEphemerisPopulation(name: String, key: Ephemeris.Key.Horizons) =
     test(s"Ensure ephemeris is populated for $site - $name (${key.keyType})"):
@@ -98,7 +97,6 @@ class HorizonsClientEphemerisSuite extends HorizonsClientSuite:
       client.use: c =>
         c.ephemeris(
           key   = Ephemeris.Key.Comet("1P"),
-          site  = site,
           start = sem.start.atSite(site).toInstant,
           stop  = sem.start.atSite(site).toInstant,
           elems = elems
@@ -111,7 +109,6 @@ class HorizonsClientEphemerisSuite extends HorizonsClientSuite:
       client.use: c =>
         c.ephemeris(
           key   = Ephemeris.Key.Comet("1P"),
-          site  = site,
           start = sem.start.atSite(site).toInstant,
           stop  = sem.end.atSite(site).toInstant,
           elems = 0
@@ -125,13 +122,12 @@ class HorizonsClientEphemerisSuite extends HorizonsClientSuite:
 
         c.alignedEphemeris(
           key   = Ephemeris.Key.Comet("1P"),
-          site  = site,
           start = sem.start.atSite(site).toInstant,
           days  = 10,
           cadence = 2
         ).map: e =>
           e.map: eph =>
-            eph.elements.map(_.when.toString),
+            eph.elements(site).map(_.when.toString),
 
       Right(List(
         "2020-08-01T00:00:00Z", // Day 1, midnight
@@ -164,13 +160,12 @@ class HorizonsClientEphemerisSuite extends HorizonsClientSuite:
 
         c.alignedEphemeris(
           key   = Ephemeris.Key.Comet("1P"),
-          site  = site,
           start = sem.start.atSite(site).toInstant,
           days  = 10,
           cadence = 4
         ).map: e =>
           e.map: eph =>
-            eph.elements.map(_.when.toString),
+            eph.elements(site).map(_.when.toString),
 
       Right(List(
         "2020-08-01T00:00:00Z",
@@ -223,13 +218,12 @@ class HorizonsClientEphemerisSuite extends HorizonsClientSuite:
 
         c.alignedEphemeris(
           key   = Ephemeris.Key.Comet("1P"),
-          site  = site,
           start = Instant.parse("2025-05-02T00:00:00Z"),
           days  = 1,
           cadence = 24
         ).map: e =>
           e.map: eph =>
-            eph.elements.map(_.when.toString),
+            eph.elements(site).map(_.when.toString),
 
       Right(List(
         "2025-05-02T00:00:00Z",
