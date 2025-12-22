@@ -7,6 +7,7 @@ import cats.Order
 import cats.Show
 import cats.implicits.*
 import io.circe.*
+import lucuma.core.data.PerSite
 import lucuma.core.enums.EphemerisKeyType
 import lucuma.core.enums.Site
 import lucuma.core.math.Coordinates
@@ -21,7 +22,6 @@ import monocle.Focus
 import monocle.Lens
 
 import java.time.Instant
-import lucuma.core.data.PerSite
 
 sealed trait Ephemeris[E <: Ephemeris.Element]:
   def key: Ephemeris.Key
