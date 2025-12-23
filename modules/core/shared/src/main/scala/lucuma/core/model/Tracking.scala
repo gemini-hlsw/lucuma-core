@@ -44,36 +44,6 @@ object Tracking:
     case NonEmptyList(h, Nil) => h
     case _ => CompositeTracking(trackings)
   
-  // The following helper methods than die when presented with a non-sidereal will
-  // be removed as soon as non-sidereal support is complete in Explore
-  def fromTarget(target: Target): Option[Tracking] =
-    orRegionFromTarget(target).left.toOption
-
-  def orRegionFromTarget(target: Target): Either[Tracking, Region] =
-    target match
-      case t: Target.Sidereal    => t.tracking.asLeft
-      case t: Target.Opportunity => t.region.asRight
-      case t: Target.Nonsidereal => sys.error("Nonsidereal targets not supported yet.")
-
-  def fromAsterism(targets: NonEmptyList[Target]): Option[Tracking] =
-    orRegionFromAsterism(targets).left.toOption
-
-  def orRegionFromAsterism(targets: NonEmptyList[Target]): Either[Tracking, Region] =
-    targets
-      .collect:
-        case Target.Nonsidereal(_, _, _) => sys.error("Nonsidereal targets not supported yet.")
-        case Target.Opportunity(_, r, _) => r
-      .headOption // first region, if any
-      .toRight:
-        targets
-          .map: t =>
-            Target
-              .sidereal
-              .getOption(t)
-              .getOrElse(sys.error("unpossible, list should only contain sidereal targets"))
-          match
-            case NonEmptyList(h, Nil) => h.tracking
-            case NonEmptyList(h, t)   => CompositeTracking(NonEmptyList(h, t).map(_.tracking))
 
   def constant(coordinates: Coordinates): Tracking =
     ConstantTracking(coordinates)
