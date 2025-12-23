@@ -103,7 +103,7 @@ object HorizonsClient:
   ): HorizonsClient[F] =
     new AbstractHorizonsClient[F]:
       def stream(params: (String, String)*): Stream[F, String] =
-        val uri = modUri(HorizonsUri).withQueryParams(params.toMap)
+        val uri = modUri(HorizonsUri.withQueryParams(params.toMap))
         def go(retriesRemaining: Int, interval: FiniteDuration): Stream[F, String] =
           client
             .stream:
