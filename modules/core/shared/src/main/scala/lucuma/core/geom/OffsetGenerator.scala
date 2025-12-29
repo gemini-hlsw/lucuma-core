@@ -27,8 +27,6 @@ import scala.math.Pi
 import scala.math.ceil
 import scala.math.sqrt
 
-
-
 sealed trait OffsetGenerator {
   def generate[F[_]: {Monad, CatsRandom as R}](count: PosInt): F[NonEmptyList[Offset]]
 }
@@ -80,6 +78,10 @@ object OffsetGenerator {
     }
   }
 
+  object Random {
+    val size: Lens[Random, Angle]     = GenLens[Random](_.size)
+    val center: Lens[Random, Offset]   = GenLens[Random](_.center)
+  }
 
   /**
    * Generates a Fermat spiral pattern of offsets.
@@ -106,6 +108,11 @@ object OffsetGenerator {
       offsets.map: o =>
         NonEmptyList.fromListUnsafe(o.toList)
     }
+  }
+
+  object Spiral {
+    val size: Lens[Spiral, Angle]     = GenLens[Spiral](_.size)
+    val center: Lens[Spiral, Offset]   = GenLens[Spiral](_.center)
   }
 
   /**
@@ -182,7 +189,6 @@ object OffsetGenerator {
         case i            => i
     }
 
-
   given Eq[OffsetGenerator] with
     def eqv(x: OffsetGenerator, y: OffsetGenerator): Boolean =
       (x, y) match
@@ -193,16 +199,7 @@ object OffsetGenerator {
 
 }
 
-
-
-
-
-
-
-
-
-
-
+// Intentionally left commented out code in case we decide to use it.
 // /**
 //  * Based on the Python offset-generator script.
 //  */
