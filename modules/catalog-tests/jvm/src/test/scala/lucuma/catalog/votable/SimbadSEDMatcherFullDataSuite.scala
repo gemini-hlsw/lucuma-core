@@ -5,6 +5,7 @@ package lucuma.catalog.votable
 
 import cats.data.EitherNec
 import lucuma.catalog.votable.SEDMatcher
+import lucuma.core.enums.*
 import lucuma.core.model.UnnormalizedSED
 import munit.FunSuite
 
@@ -192,4 +193,109 @@ class SimbadSEDMatcherFullDataSuite extends FunSuite:
 
     println(s"\nEntries with morphological type: ${withMorphType.length}")
     println(s"Successfully parsed and matched: ${morphTypeParsed.length}")
+  }
+
+  case class ExpectedOutput(
+    main_id:  String,
+    otype:    String,
+    filename: Option[String],
+    t_eff:    Option[Double],
+    log_g:    Option[Double]
+  )
+
+  lazy val expectedOutput: List[ExpectedOutput] =
+    val stream = getClass.getResourceAsStream("/expected-output-full.csv")
+    val source = Source.fromInputStream(stream)
+    try
+      source
+        .getLines()
+        .drop(1) // Skip header
+        .flatMap { line =>
+          val parts = line.split(",", -1)
+          if parts.length >= 5 then
+            Some(
+              ExpectedOutput(
+                main_id = parts(0),
+                otype = parts(1),
+                filename = Option(parts(2)).filter(_.nonEmpty),
+                t_eff = Option(parts(3)).filter(_.nonEmpty).flatMap(_.toDoubleOption),
+                log_g = Option(parts(4)).filter(_.nonEmpty).flatMap(_.toDoubleOption)
+              )
+            )
+          else None
+        }
+        .toList
+    finally
+      source.close()
+
+  def filenameToSED(filename: String): Option[UnnormalizedSED] =
+    filename match
+      case "QSO.sed"        => Some(UnnormalizedSED.Quasar(QuasarSpectrum.QS0))
+      case "HII.sed"        => Some(UnnormalizedSED.HIIRegion(HIIRegionSpectrum.OrionNebula))
+      case "PN.sed"         => Some(UnnormalizedSED.PlanetaryNebula(PlanetaryNebulaSpectrum.NGC7009))
+      case "Elliptical.sed" => Some(UnnormalizedSED.Galaxy(GalaxySpectrum.Elliptical))
+      case "Spiral.sed"     => Some(UnnormalizedSED.Galaxy(GalaxySpectrum.Spiral))
+      case stellar          =>
+        val spectrumTag = stellar.stripSuffix(".nm")
+        StellarLibrarySpectrum.values
+          .find(_.tag == spectrumTag)
+          .map(UnnormalizedSED.StellarLibrary(_))
+
+  def stellarBaseType(sed: UnnormalizedSED): Option[String] =
+    sed match
+      case UnnormalizedSED.StellarLibrary(spectrum) =>
+        val name = spectrum.toString
+        Some(if name.endsWith("_new") then name.dropRight(4) else name)
+      case _                                        => None
+
+  def sedEquivalent(p: UnnormalizedSED, s: UnnormalizedSED): Boolean =
+    if p == s then true
+    else
+      (stellarBaseType(p), stellarBaseType(s)) match
+        case (Some(pBase), Some(sBase)) => pBase == sBase
+        case _                          => false
+
+  test("validate against Python reference output") {
+    val inputData = testData.map(e => e.mainId -> e).toMap
+
+    var matches    = 0
+    var mismatches = 0
+    val errors     = scala.collection.mutable.ListBuffer[String]()
+
+    expectedOutput.foreach { expected =>
+      inputData.get(expected.main_id).foreach { entry =>
+        val morphTypeOpt    = if entry.morphType.isEmpty then None else Some(entry.morphType)
+        val spectralTypeOpt = if entry.spectralType.isEmpty then None else Some(entry.spectralType)
+        val scalaResult     = SEDMatcher.inferSED(entry.otype, spectralTypeOpt, morphTypeOpt)
+
+        val pythonSED = expected.filename.flatMap(filenameToSED)
+        val scalaSED  = scalaResult.toOption
+
+        (pythonSED, scalaSED) match
+          case (None, None)                              => matches += 1
+          case (Some(p), Some(s)) if sedEquivalent(p, s) => matches += 1
+          case (Some(p), Some(s))                        =>
+            mismatches += 1
+            errors += s"${expected.main_id}: Python=$p, Scala=$s"
+          case (Some(p), None)                           =>
+            mismatches += 1
+            errors += s"${expected.main_id}: Python=$p, Scala=None"
+          case (None, Some(s))                           =>
+            mismatches += 1
+            errors += s"${expected.main_id}: Python=None, Scala=$s"
+      }
+    }
+
+    println(s"\n=== Full Dataset Python Reference Validation ===")
+    println(s"Total entries: ${expectedOutput.length}")
+    println(s"Matches: $matches (${matches * 100 / expectedOutput.length}%)")
+    println(s"Total mismatches: $mismatches")
+
+    if errors.nonEmpty && errors.length <= 50 then
+      println(s"\nAll differences:")
+      errors.foreach(e => println(s"  $e"))
+    else if errors.nonEmpty then
+      println(s"\nFirst 50 differences:")
+      errors.take(50).foreach(e => println(s"  $e"))
+      println(s"... and ${errors.length - 50} more")
   }
