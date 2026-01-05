@@ -3,11 +3,11 @@
 
 package lucuma.catalog.votable
 
-import lucuma.catalog.votable.StellarPhysics.StellarParameters
-import lucuma.core.enums.StellarLibrarySpectrum
 import coulomb.*
 import coulomb.syntax.*
 import coulomb.units.si.Kelvin
+import lucuma.catalog.votable.StellarPhysics.StellarParameters
+import lucuma.core.enums.StellarLibrarySpectrum
 
 /**
  * Pre-calculated physical parameters for each stellar library SED. Based on parsing spectral types
@@ -22,11 +22,11 @@ object StellarLibraryParameters:
   private def parseLibraryTag(tag: String): (List[String], List[String]) =
     // Handle white dwarfs (DA, DB, etc.)
     if tag.startsWith("D") then
-      val lumClass = tag.takeWhile(_.isLetter)
+      val lumClass    = tag.takeWhile(_.isLetter)
       // Extract numeric part, stripping _calspec or similar suffixes
       val numericPart = tag.drop(lumClass.length).takeWhile(c => c.isDigit || c == '.')
       // Convert 2-digit format to decimal: DA08 -> 0.8, DA12 -> 1.2, DA15 -> 1.5
-      val tempClass =
+      val tempClass   =
         if numericPart.length == 2 && numericPart.forall(_.isDigit) then
           s"${numericPart.head}.${numericPart.tail}"
         else numericPart

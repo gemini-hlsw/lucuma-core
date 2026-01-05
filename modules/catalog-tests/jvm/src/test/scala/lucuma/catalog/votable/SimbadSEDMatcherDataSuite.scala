@@ -3,15 +3,13 @@
 
 package lucuma.catalog.votable
 
+import cats.data.EitherNec
 import lucuma.catalog.votable.SEDMatcher
 import lucuma.core.enums.*
 import lucuma.core.model.UnnormalizedSED
 import munit.FunSuite
 
 import scala.io.Source
-import cats.data.EitherNec
-import io.circe.parser.decode
-import io.circe.generic.auto.*
 
 /**
  * Test suite that verifies SED matching against a dataset of Simbad entries. Replicates the
@@ -258,7 +256,7 @@ class SimbadSEDMatcherDataSuite extends FunSuite:
     )
   }
 
-  case class PythonExpected(
+  case class ExpectedOutput(
     main_id:  String,
     otype:    String,
     filename: Option[String],
@@ -266,13 +264,28 @@ class SimbadSEDMatcherDataSuite extends FunSuite:
     log_g:    Option[Double]
   )
 
-  lazy val pythonExpected: List[PythonExpected] =
-    val stream = getClass.getResourceAsStream("/expected-output.jsonl")
+  lazy val expectedOutput: List[ExpectedOutput] =
+    val stream = getClass.getResourceAsStream("/expected-output.csv")
     val source = Source.fromInputStream(stream)
     try
-      source.getLines().flatMap { line =>
-        decode[PythonExpected](line).toOption
-      }.toList
+      source
+        .getLines()
+        .drop(1) // Skip header
+        .flatMap { line =>
+          val parts = line.split(",", -1)
+          if parts.length >= 5 then
+            Some(
+              ExpectedOutput(
+                main_id = parts(0),
+                otype = parts(1),
+                filename = Option(parts(2)).filter(_.nonEmpty),
+                t_eff = Option(parts(3)).filter(_.nonEmpty).flatMap(_.toDoubleOption),
+                log_g = Option(parts(4)).filter(_.nonEmpty).flatMap(_.toDoubleOption)
+              )
+            )
+          else None
+        }
+        .toList
     finally
       source.close()
 
@@ -286,7 +299,8 @@ class SimbadSEDMatcherDataSuite extends FunSuite:
       case stellar          =>
         // Extract spectrum tag: A0V_calspec.nm -> A0V_calspec, K5III_pickles_irtf.nm -> K5III_pickles_irtf
         val spectrumTag = stellar.stripSuffix(".nm")
-        StellarLibrarySpectrum.values.find(_.tag == spectrumTag)
+        StellarLibrarySpectrum.values
+          .find(_.tag == spectrumTag)
           .map(UnnormalizedSED.StellarLibrary(_))
 
   def stellarBaseType(sed: UnnormalizedSED): Option[String] =
@@ -294,13 +308,14 @@ class SimbadSEDMatcherDataSuite extends FunSuite:
       case UnnormalizedSED.StellarLibrary(spectrum) =>
         val name = spectrum.toString
         Some(if name.endsWith("_new") then name.dropRight(4) else name)
-      case _ => None
+      case _                                        => None
 
   def sedEquivalent(p: UnnormalizedSED, s: UnnormalizedSED): Boolean =
     if p == s then true
-    else (stellarBaseType(p), stellarBaseType(s)) match
-      case (Some(pBase), Some(sBase)) => pBase == sBase
-      case _                          => false
+    else
+      (stellarBaseType(p), stellarBaseType(s)) match
+        case (Some(pBase), Some(sBase)) => pBase == sBase
+        case _                          => false
 
   val knownDifferences = Set(
     "BD+25  2534", // sdB1(k) - subdwarf matching tolerance
@@ -317,7 +332,7 @@ class SimbadSEDMatcherDataSuite extends FunSuite:
     val errors          = scala.collection.mutable.ListBuffer[String]()
     val unexpectedDiffs = scala.collection.mutable.ListBuffer[String]()
 
-    pythonExpected.foreach { expected =>
+    expectedOutput.foreach { expected =>
       inputData.get(expected.main_id).foreach { entry =>
         val morphTypeOpt    = if entry.morphType.isEmpty then None else Some(entry.morphType)
         val spectralTypeOpt = if entry.spectralType.isEmpty then None else Some(entry.spectralType)
@@ -327,21 +342,21 @@ class SimbadSEDMatcherDataSuite extends FunSuite:
         val scalaSED  = scalaResult.toOption
 
         (pythonSED, scalaSED) match
-          case (None, None)                                 => matches += 1
-          case (Some(p), Some(s)) if sedEquivalent(p, s)    => matches += 1
-          case (Some(p), Some(s))                           =>
+          case (None, None)                              => matches += 1
+          case (Some(p), Some(s)) if sedEquivalent(p, s) => matches += 1
+          case (Some(p), Some(s))                        =>
             mismatches += 1
             val msg = s"${expected.main_id}: Python=$p, Scala=$s"
             errors += msg
             if !knownDifferences.contains(expected.main_id) then unexpectedDiffs += msg
             else knownDiffs += 1
-          case (Some(p), None)                              =>
+          case (Some(p), None)                           =>
             mismatches += 1
             val msg = s"${expected.main_id}: Python=$p, Scala=None"
             errors += msg
             if !knownDifferences.contains(expected.main_id) then unexpectedDiffs += msg
             else knownDiffs += 1
-          case (None, Some(s))                              =>
+          case (None, Some(s))                           =>
             mismatches += 1
             val msg = s"${expected.main_id}: Python=None, Scala=$s"
             errors += msg
@@ -358,5 +373,7 @@ class SimbadSEDMatcherDataSuite extends FunSuite:
       println(s"All differences:")
       errors.foreach(e => println(s"  $e"))
 
-    assert(unexpectedDiffs.isEmpty, s"Found ${unexpectedDiffs.size} unexpected mismatches: ${unexpectedDiffs.mkString(", ")}")
+    assert(unexpectedDiffs.isEmpty,
+           s"Found ${unexpectedDiffs.size} unexpected mismatches: ${unexpectedDiffs.mkString(", ")}"
+    )
   }
