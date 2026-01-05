@@ -94,8 +94,8 @@ trait SpectralTypeParsers:
       .withContext("luminosity range")
 
   /**
-   * White dwarf temperature: handles both "3.5" and ".8" formats
-   * Pattern: [0-9]+\.?[0-9]* | \.[0-9]+
+   * White dwarf temperature: handles both "3.5" and ".8" formats Pattern: [0-9]+\.?[0-9]* |
+   * \.[0-9]+
    */
   private val whiteDwarfTemp: Parser[String] =
     ((digit.rep ~ (char('.') ~ digit.rep).?).backtrack | (char('.') ~ digit.rep)).string
@@ -130,16 +130,16 @@ trait SpectralTypeParsers:
       .withContext("subdwarf")
 
   /**
-   * Skip arbitrary characters that aren't part of a luminosity class.
-   * Used for Am star notation like A0mA1Va where we want to skip "mA1" to find "Va"
+   * Skip arbitrary characters that aren't part of a luminosity class. Used for Am star notation
+   * like A0mA1Va where we want to skip "mA1" to find "Va"
    */
   private val skipToLuminosity: Parser0[Unit] =
     (not(peek(lumClass)).with1 *> anyChar).rep0.void
 
   /**
-   * Main sequence spectral type: e.g., G2V, K3III, G8/K0III, A0mA1Va
-   * Pattern: <tempRange><arbitrary content>?<lumRange>?
-   * Handles Am star notation by skipping intermediate content before luminosity class
+   * Main sequence spectral type: e.g., G2V, K3III, G8/K0III, A0mA1Va Pattern: <tempRange><arbitrary
+   * content>?<lumRange>? Handles Am star notation by skipping intermediate content before
+   * luminosity class
    */
   private val mainSequence: Parser[(List[String], List[String])] =
     (tempRange ~ (skipToLuminosity *> lumRange).?)

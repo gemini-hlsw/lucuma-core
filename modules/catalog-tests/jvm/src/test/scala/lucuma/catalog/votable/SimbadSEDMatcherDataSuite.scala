@@ -3,15 +3,15 @@
 
 package lucuma.catalog.votable
 
+import cats.data.EitherNec
+import io.circe.generic.auto.*
+import io.circe.parser.decode
 import lucuma.catalog.votable.SEDMatcher
 import lucuma.core.enums.*
 import lucuma.core.model.UnnormalizedSED
 import munit.FunSuite
 
 import scala.io.Source
-import cats.data.EitherNec
-import io.circe.parser.decode
-import io.circe.generic.auto.*
 
 /**
  * Test suite that verifies SED matching against a dataset of Simbad entries. Replicates the
@@ -270,9 +270,12 @@ class SimbadSEDMatcherDataSuite extends FunSuite:
     val stream = getClass.getResourceAsStream("/expected-output.jsonl")
     val source = Source.fromInputStream(stream)
     try
-      source.getLines().flatMap { line =>
-        decode[PythonExpected](line).toOption
-      }.toList
+      source
+        .getLines()
+        .flatMap { line =>
+          decode[PythonExpected](line).toOption
+        }
+        .toList
     finally
       source.close()
 
@@ -286,7 +289,8 @@ class SimbadSEDMatcherDataSuite extends FunSuite:
       case stellar          =>
         // Extract spectrum tag: A0V_calspec.nm -> A0V_calspec, K5III_pickles_irtf.nm -> K5III_pickles_irtf
         val spectrumTag = stellar.stripSuffix(".nm")
-        StellarLibrarySpectrum.values.find(_.tag == spectrumTag)
+        StellarLibrarySpectrum.values
+          .find(_.tag == spectrumTag)
           .map(UnnormalizedSED.StellarLibrary(_))
 
   def stellarBaseType(sed: UnnormalizedSED): Option[String] =
@@ -294,13 +298,14 @@ class SimbadSEDMatcherDataSuite extends FunSuite:
       case UnnormalizedSED.StellarLibrary(spectrum) =>
         val name = spectrum.toString
         Some(if name.endsWith("_new") then name.dropRight(4) else name)
-      case _ => None
+      case _                                        => None
 
   def sedEquivalent(p: UnnormalizedSED, s: UnnormalizedSED): Boolean =
     if p == s then true
-    else (stellarBaseType(p), stellarBaseType(s)) match
-      case (Some(pBase), Some(sBase)) => pBase == sBase
-      case _                          => false
+    else
+      (stellarBaseType(p), stellarBaseType(s)) match
+        case (Some(pBase), Some(sBase)) => pBase == sBase
+        case _                          => false
 
   val knownDifferences = Set(
     "BD+25  2534", // sdB1(k) - subdwarf matching tolerance
@@ -327,21 +332,21 @@ class SimbadSEDMatcherDataSuite extends FunSuite:
         val scalaSED  = scalaResult.toOption
 
         (pythonSED, scalaSED) match
-          case (None, None)                                 => matches += 1
-          case (Some(p), Some(s)) if sedEquivalent(p, s)    => matches += 1
-          case (Some(p), Some(s))                           =>
+          case (None, None)                              => matches += 1
+          case (Some(p), Some(s)) if sedEquivalent(p, s) => matches += 1
+          case (Some(p), Some(s))                        =>
             mismatches += 1
             val msg = s"${expected.main_id}: Python=$p, Scala=$s"
             errors += msg
             if !knownDifferences.contains(expected.main_id) then unexpectedDiffs += msg
             else knownDiffs += 1
-          case (Some(p), None)                              =>
+          case (Some(p), None)                           =>
             mismatches += 1
             val msg = s"${expected.main_id}: Python=$p, Scala=None"
             errors += msg
             if !knownDifferences.contains(expected.main_id) then unexpectedDiffs += msg
             else knownDiffs += 1
-          case (None, Some(s))                              =>
+          case (None, Some(s))                           =>
             mismatches += 1
             val msg = s"${expected.main_id}: Python=None, Scala=$s"
             errors += msg
@@ -358,5 +363,7 @@ class SimbadSEDMatcherDataSuite extends FunSuite:
       println(s"All differences:")
       errors.foreach(e => println(s"  $e"))
 
-    assert(unexpectedDiffs.isEmpty, s"Found ${unexpectedDiffs.size} unexpected mismatches: ${unexpectedDiffs.mkString(", ")}")
+    assert(unexpectedDiffs.isEmpty,
+           s"Found ${unexpectedDiffs.size} unexpected mismatches: ${unexpectedDiffs.mkString(", ")}"
+    )
   }
