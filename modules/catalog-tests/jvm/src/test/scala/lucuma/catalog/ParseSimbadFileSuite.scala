@@ -61,7 +61,7 @@ class ParseSimbadFileSuite extends CatsEffectSuite with VoTableParser {
               t.catalogInfo,
               CatalogInfo(CatalogName.Simbad, "* alf Lyr", "PulsV*delSct, A0Va")
             )
-            // SED inferred from spectral type A0Va
+            // SED inferred from spectral A0Va
             t.sourceProfile match {
               case SourceProfile.Point(SpectralDefinition.BandNormalized(sed, _)) =>
                 assertEquals(sed, None)
