@@ -3,8 +3,8 @@
 
 package lucuma.catalog.votable
 
-import munit.FunSuite
 import coulomb.*
+import munit.FunSuite
 
 class StellarPhysicsSuite extends FunSuite:
 

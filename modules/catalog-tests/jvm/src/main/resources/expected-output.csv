@@ -1,0 +1,64 @@
+main_id,otype,filename,t_eff,log_g
+Vega,PulsV*delSct,,,
+* alf CMa,PM*,A0V_calspec.nm,11531,4.07
+* bet Ori,s*r,,13305,1.97
+* alf Ori,s*r,M2I_pickles_irtf.nm,3640,0.02
+* alf Tau,LP*,K5III_pickles_irtf.nm,4223,1.914
+* bet Gem,PM*,K0III_pickles_irtf.nm,4612,2.89
+* alf Aur,SB*,,,
+* gam Ori A,**,,,
+* del CMa,SB*,,,
+* eps CMa,SB*,,,
+* alf Lyr,PulsV*delSct,,,
+* bet CMi,PM*,B9III_calspec.nm,13305,4.07
+Sun,*,G2V_calspec.nm,5199,4.4
+HD 209458,*,G0V_calspec.nm,5382,4.39
+* alf Cen A,SB*,,,
+* alf Cen B,**,,,
+* Proxima,LP*,M5V_pickles_irtf.nm,3182,4.964
+* eps Eri,BY*,,,
+* tau Cet,*,G8V_pickles_irtf.nm,4750,4.55
+* 61 Cyg A,PM*,K5V_pickles_irtf.nm,4243,4.57
+Barnard's Star,PM*,M4V_pickles_irtf.nm,3361,4.812
+* Kapteyn's Star,HV*,,3693,3.0
+BD+28  4211,HS*,,84163,4.5
+BD+25  2534,HS*,,25242,4.5
+BD+52   913,WD*,DA08_calspec.nm,63000,8.0
+1RXS J194343.1+500440,WD*,DA15_calspec.nm,36000,8.0
+GD 71,WD*,DA12_calspec.nm,45818,8.0
+* alf PsA,PM*,A3V_calspec.nm,9576,4.2
+* alf Lep,*,F0I_pickles_irtf.nm,6963,2.0
+* bet UMa,**,,,
+* gam UMa,SB*,,,
+M  31,G,Spiral.sed,,
+M  51,GiP,Spiral.sed,,
+M  87,G,Elliptical.sed,,
+NGC  1316,G,Spiral.sed,,
+NGC  5128,G,Elliptical.sed,,
+M 104,G,Spiral.sed,,
+NGC  4258,SyG,QSO.sed,,
+2MASX J14034502+2921441,Sy2,QSO.sed,,
+2MASS J13295700+1509093,QSO,QSO.sed,,
+2SLAQ J133815.86-004509.6,QSO,QSO.sed,,
+3C 273,QSO,QSO.sed,,
+PKS 2155-304,BLL,QSO.sed,,
+M  42,HII,HII.sed,,
+NGC   595,HII,HII.sed,,
+NGC  1514,PN,PN.sed,,
+M  97,PN,PN.sed,,
+NGC 7009,PN,PN.sed,,
+*   1 Boo,PM*,A1V_calspec.nm,10798,4.1
+*   3 Cam,SB*,,,
+*   3 Cet,s*r,,4397,1.0
+*   4 Cap,HB*,G8III_pickles_irtf.nm,4750,2.95
+*   9 Sgr,Y*O,,61770,3.9
+*  17 Aqr,*,K5III_pickles_irtf.nm,4282,2.045
+*  21 Peg,*,A0V_calspec.nm,11933,4.05
+*  39 Aqr,**,,,
+*  48 Lib,Be*,B5III.nm,17023,3.81
+HD  10700,*,G8V_pickles_irtf.nm,4715,4.555
+HD  22049,PM*,K0III_pickles_irtf.nm,4612,2.89
+HD  48915,Be*,B0.5V_calspec.nm,25242,4.0
+HD  74956,delSctV*,,,
+HD  91316,PM*,K4III_pickles_irtf.nm,4321,2.16
+HD 140283,sdF*,,,

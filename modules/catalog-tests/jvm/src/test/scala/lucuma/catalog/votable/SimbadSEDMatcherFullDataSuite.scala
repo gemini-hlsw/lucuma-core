@@ -3,12 +3,12 @@
 
 package lucuma.catalog.votable
 
+import cats.data.EitherNec
 import lucuma.catalog.votable.SEDMatcher
 import lucuma.core.model.UnnormalizedSED
 import munit.FunSuite
 
 import scala.io.Source
-import cats.data.EitherNec
 
 /**
  * Comprehensive test suite using the full match_sed_test.dat dataset (8000+ entries). Tests SED
