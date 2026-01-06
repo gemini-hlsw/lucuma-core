@@ -112,6 +112,20 @@ trait Flamingos2LSShapes extends InstrumentShapes:
       scienceArea.shapeAt(posAngle, offsetPos, lyot, fpu),
     )
 
+trait PwfsShapes extends InstrumentShapes:
+  import lucuma.core.geom.pwfs.*
+
+  val posAngle: Angle =
+    0.deg
+
+  val offsetPos: Offset =
+    Offset.Zero
+
+  def shapes: List[ShapeExpression] =
+    List(
+      patrolField.patrolFieldAt(posAngle, offsetPos)
+    )
+
 /**
  * Throwaway demo code to visualize a shape created using `ShapeExpression`s.
  */
@@ -263,3 +277,6 @@ object JtsGmosLSDemo extends JtsDemo with GmosLSShapes
 object JtsFlamingos2LSDemo extends JtsDemo with Flamingos2LSShapes
 
 object JtsGmosImagingDemo extends JtsDemo with GmosImagingShapes
+
+object JtsPwfsDemo extends JtsDemo with PwfsShapes:
+  override val arcsecPerPixel: Double = 0.75  // Show full 417" radius patrol field
