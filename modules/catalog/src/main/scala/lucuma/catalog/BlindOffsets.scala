@@ -65,21 +65,28 @@ object BlindOffsets:
     baseTracking
       .at(observationTime)
       .map: baseCoordinates =>
-        val searchRadius = 300.arcseconds
-
-        val adqlQuery = QueryByADQL(
-          base = baseCoordinates,
-          shapeConstraint = ShapeExpression.centeredEllipse(searchRadius * 2, searchRadius * 2),
-          brightnessConstraints = None
-        )
-
-        val interpreter = ADQLInterpreter.blindOffsetCandidates
-
-        gaiaClient
-          .query(adqlQuery)(using interpreter)
-          .map(_.collect { case Right(result) => result })
-          .map(analysis(_, baseTracking, observationTime))
+        runBlindOffsetAnalysis(gaiaClient, baseCoordinates, observationTime)
       .getOrElse(List.empty.pure[F])
+
+  def runBlindOffsetAnalysis[F[_]: Concurrent](
+    gaiaClient:      GaiaClient[F],
+    baseCoordinates: Coordinates,
+    observationTime: Instant
+  )(using ShapeInterpreter): F[List[BlindOffsetCandidate]] =
+    val searchRadius = 300.arcseconds
+
+    val adqlQuery = QueryByADQL(
+      base = baseCoordinates,
+      shapeConstraint = ShapeExpression.centeredEllipse(searchRadius * 2, searchRadius * 2),
+      brightnessConstraints = None
+    )
+
+    val interpreter = ADQLInterpreter.blindOffsetCandidates
+
+    gaiaClient
+      .query(adqlQuery)(using interpreter)
+      .map(_.collect { case Right(result) => result })
+      .map(analysis(_, baseCoordinates, observationTime))
 
   def analysis(
     catalogResults:  List[CatalogTargetResult],
@@ -89,16 +96,23 @@ object BlindOffsets:
     baseTracking
       .at(observationTime)
       .foldMap: baseCoordinates =>
-        catalogResults
-          .flatMap: catalogResult =>
-            catalogResult.target.tracking.at(observationTime).map { candidateCoords =>
-              val distance = baseCoordinates.angularDistance(candidateCoords)
-              BlindOffsetCandidate(
-                catalogResult,
-                distance,
-                baseCoordinates,
-                candidateCoords,
-                observationTime
-              )
-            }
-          .sortBy(_.score)
+        analysis(catalogResults, baseCoordinates, observationTime)
+
+  def analysis(
+    catalogResults:  List[CatalogTargetResult],
+    baseCoordinates: Coordinates,
+    observationTime: Instant
+  ): List[BlindOffsetCandidate] =
+    catalogResults
+      .flatMap: catalogResult =>
+        catalogResult.target.tracking.at(observationTime).map { candidateCoords =>
+          val distance = baseCoordinates.angularDistance(candidateCoords)
+          BlindOffsetCandidate(
+            catalogResult,
+            distance,
+            baseCoordinates,
+            candidateCoords,
+            observationTime
+          )
+        }
+      .sortBy(_.score)
