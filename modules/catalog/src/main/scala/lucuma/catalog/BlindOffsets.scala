@@ -3,6 +3,8 @@
 
 package lucuma.catalog
 
+import cats.Eq
+import cats.derived.*
 import cats.effect.Concurrent
 import cats.syntax.all.*
 import eu.timepit.refined.types.string.NonEmptyString
@@ -17,6 +19,7 @@ import lucuma.core.math.Coordinates
 import lucuma.core.model.SourceProfile
 import lucuma.core.model.Tracking
 import lucuma.core.syntax.all.*
+import org.typelevel.cats.time.*
 
 import java.time.Instant
 
@@ -26,10 +29,9 @@ case class BlindOffsetCandidate(
   baseCoordinates: Coordinates,
   candidateCoords: Coordinates,
   observationTime: Instant
-) {
+) derives Eq:
   val score: BigDecimal        = BlindOffsetCandidate.calculateScore(this)
   def sourceId: NonEmptyString = catalogResult.target.name
-}
 
 object BlindOffsetCandidate:
   def referenceBrightness(catalogResult: CatalogTargetResult): Option[BigDecimal] =
