@@ -19,7 +19,17 @@ import lucuma.core.syntax.string.*
  */
 object StellarPhysics:
 
-  private val LetterConversions = Map(
+  // Brown dwarfs (L, T, Y) have spectral class codes >= 70
+  private val BrownDwarfThreshold: Double = 70.0
+
+  // White dwarfs have extremely high surface gravity (solar mass in Earth-sized volume)
+  private val WhiteDwarfLogG: Double = 8.0
+
+  private val Supergiants: Set[String] = Set("Ia", "Ib", "Iab")
+
+  private val DefaultLogG: Double = 4.0
+
+  private val SpectralClassCodes = Map(
     'O' -> 0.0,
     'B' -> 10.0,
     'A' -> 20.0,
@@ -33,8 +43,8 @@ object StellarPhysics:
   )
 
   case class StellarParameters(
-    tEff: Quantity[Int, Kelvin], // Effective temperature
-    logG: Double                 // Log of surface gravity (dimensionless)
+    temp: Quantity[Int, Kelvin], // Effective temperature
+    logG: Double                 // Log of surface gravity
   )
 
   /**
@@ -42,36 +52,29 @@ object StellarPhysics:
    *
    * Maps spectral type letters to base values (O=0, B=10, A=20, ..., Y=90) and adds subclass digits
    * (0-9.5).
-   *
-   * Examples:
-   *   - "O0" → 0.0
-   *   - "G2" → 42.0
-   *   - "G2.7" → 42.7
-   *   - "G2+" → 42.25
-   *   - "K6-" → 55.75
-   *   - "G" (bare letter) → 45.0 (defaults to subclass 5)
-   *
-   * Based on Malkov and match_sed.py
    */
   def spectralClassCode(spectralClass: String): Option[Double] =
-    if spectralClass.isEmpty then return None
+    Option
+      .when(spectralClass.nonEmpty):
+        val letter = spectralClass.head
+        SpectralClassCodes
+          .get(letter)
+          .flatMap: baseCode =>
+            val subclass = SpectralTypeParsers.tempSubclass.parse(spectralClass.tail) match
+              case Right((_, value)) =>
+                value.parseDoubleOption.getOrElse(5.0)
+              case Left(_)           =>
+                5.0 // Default to 5 if no subclass specified
 
-    val letter = spectralClass.head
-    LetterConversions.get(letter).flatMap { baseCode =>
-      val subclass = SpectralTypeParsers.tempSubclass.parse(spectralClass.tail) match
-        case Right((_, value)) =>
-          value.parseDoubleOption.getOrElse(5.0)
-        case Left(_)           =>
-          5.0 // Default to 5 if no subclass specified
+            // Handle modifiers on the spectral class
+            // '+' and '-' count as a quarter of a subclass (Keenan & McNeil)
+            val modifier =
+              if spectralClass.contains('+') then 0.25
+              else if spectralClass.contains('-') then -0.25
+              else 0.0
 
-      // Handle +/- modifiers (quarter subclass)
-      val modifier =
-        if spectralClass.contains('+') then 0.25
-        else if spectralClass.contains('-') then -0.25
-        else 0.0
-
-      Some(baseCode + subclass + modifier)
-    }
+            Some(baseCode + subclass + modifier)
+      .flatten
 
   /**
    * Calculate effective temperature from stellar spectral classification.
@@ -85,26 +88,26 @@ object StellarPhysics:
     temperature: List[String]
   ): Option[Int] =
     (luminosity, temperature) match
-      case (Nil, _) | (_, Nil) | (Nil, Nil)   => none
+      case (Nil, Nil) | (_, Nil) | (Nil, _)   => none
+      // White dwarfs luminosity start with D
       case ((h :: _), t) if h.startsWith("D") =>
-        // white dwarfs: T_eff = 50400 / number
+        // white dwarfs: T_eff = 50400 / number (Sion et al.)
         t.headOption.flatMap: tc =>
           tc.parseDoubleOption.map(num => (50400.0 / num).round.toInt)
       case _                                  =>
         // Calculate temperature for each temperature class
-        temperature
+        val temps = temperature
           .flatMap: tc =>
             spectralClassCode(tc).flatMap:
-              // No support for brown dwarfs (L, T, Y) yet
-              case scc if scc >= 70.0 => None
-              case scc                =>
-                // Polynomial from Malkov et al. 2020
+              case scc if scc >= BrownDwarfThreshold => None
+              case scc                               =>
+                // Polynomial from Malkov et al.
                 val logTEff =
                   5.07073 - 7.57056e-2 * scc + 1.47089e-3 * scc * scc - 1.03905e-5 * scc * scc * scc
                 math.pow(10, logTEff).round.toInt.some
-        match
+        temps match
           case Nil => none
-          // Return average
+          // average across temperatures
           case t   => (t.sum.toDouble / t.length).round.toInt.some
 
   /**
@@ -214,77 +217,78 @@ object StellarPhysics:
   /**
    * Calculate surface gravity (log g) from stellar spectral classification.
    *
-   * Uses interpolation from Straizys & Kuriliene, 1981, Ap&SS, 80, 353S gravity table. Normalizes
-   * luminosity classes (I→Iab, VI→sd, drops subclasses from non-supergiant types). White dwarfs use
-   * fixed log g = 8.0.
+   * Uses interpolation from Straizys & Kuriliene, 1981, Ap&SS, 80, 353S gravity table.
+   * Normalizes luminosity classes (I→Iab, VI→sd, drops subclasses from non-supergiant types).
+   * White dwarfs use fixed log g = 8.0.
    */
   def calculateGravity(
     luminosity:  List[String],
     temperature: List[String]
   ): Option[Double] =
     (luminosity, temperature) match
-      case (Nil, _) | (_, Nil) | (Nil, Nil)   => none
+      case (Nil, _) | (_, Nil) | (Nil, Nil)   =>
+        none
       case ((h :: _), t) if h.startsWith("D") =>
         // Handle white dwarfs
-        8.0.some
+        WhiteDwarfLogG.some
       case _                                  =>
-        val allLogG = for {
+        val gravities = for {
           lc  <- luminosity
           tc  <- temperature
           scc <- spectralClassCode(tc)
-          if scc < 70.0 // No brown dwarf support
+          if scc < BrownDwarfThreshold
         } yield
           // Normalize luminosity matches Python logic
-          val supergiants  = Set("Ia", "Ib", "Iab")
           val normalizedLC = lc match
             case "I"                                     => "Iab"
             case "VI"                                    => "sd"
-            case s if supergiants.contains(s)            => s
+            case s if Supergiants.contains(s)            => s
             case s if s.endsWith("a") || s.endsWith("b") => s.dropRight(1)
             case s                                       => s
 
           interpolateGravity(scc, normalizedLC)
 
-        allLogG match
+        gravities match
           case Nil => none
           case _   =>
             // adjust to 3 decimals
-            BigDecimal(allLogG.sum / allLogG.length)
+            BigDecimal(gravities.sum / gravities.length)
               .setScale(3, BigDecimal.RoundingMode.HALF_UP)
               .toDouble
               .some
 
   /**
-   * Interpolate log(g) for a given spectral class code and luminosity class. Ported from python
+   * Interpolate log(g) for a given spectral class code and luminosity class.
+   * Ported from  the original python code by Andy Stephens
    */
-  private def interpolateGravity(scc: Double, lumClass: String): Double =
-    // Find the two table entries to interpolate between
+  private def interpolateGravity(scc: Double, lumClass: String): Double = {
     val ((sccLow, mapLow), (sccHigh, mapHigh)) =
       GravityTable.partition(_._1 <= scc) match
         case (lows, highs) if lows.nonEmpty && highs.nonEmpty =>
           (lows.last, highs.head)
         case (lows, _) if lows.nonEmpty                       =>
-          (lows.last, lows.last) // Extrapolate from last entry
+          (lows.last, lows.last) // Extrapolate from last
         case (_, highs) if highs.nonEmpty                     =>
-          (highs.head, highs.head) // Extrapolate from first entry
+          (highs.head, highs.head) // Extrapolate from first
         case _                                                =>
-          return 4.0 // Default
+          return DefaultLogG
 
     // Get gravity values for this luminosity class
-    val logGLow  = mapLow.getOrElse(lumClass, mapLow.getOrElse("V", 4.0))
-    val logGHigh = mapHigh.getOrElse(lumClass, mapHigh.getOrElse("V", 4.0))
+    val logGLow  = mapLow.getOrElse(lumClass, mapLow.getOrElse("V", DefaultLogG))
+    val logGHigh = mapHigh.getOrElse(lumClass, mapHigh.getOrElse("V", DefaultLogG))
 
-    // Linear interpolation
+    // Linear interpolation, here equality make sense since we have a limited set of possible values
     if sccLow == sccHigh then logGLow
     else
       val fraction = (scc - sccLow) / (sccHigh - sccLow)
       logGLow + fraction * (logGHigh - logGLow)
+  }
 
   def calculateParameters(
     luminosity:  List[String],
     temperature: List[String]
   ): Option[StellarParameters] =
     for
-      tEff <- calculateTemperature(luminosity, temperature)
+      temp <- calculateTemperature(luminosity, temperature)
       logG <- calculateGravity(luminosity, temperature)
-    yield StellarParameters(tEff.withUnit[Kelvin], logG)
+    yield StellarParameters(temp.withUnit[Kelvin], logG)

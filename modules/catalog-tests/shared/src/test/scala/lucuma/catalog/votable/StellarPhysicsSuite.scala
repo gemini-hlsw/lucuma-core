@@ -97,7 +97,7 @@ class StellarPhysicsSuite extends FunSuite:
     val result = StellarPhysics.calculateParameters(List("V"), List("G2"))
     assert(result.isDefined)
     result.foreach { params =>
-      assertEquals(params.tEff.value, 5199)
+      assertEquals(params.temp.value, 5199)
       assertEquals(params.logG, 4.426)
     }
 

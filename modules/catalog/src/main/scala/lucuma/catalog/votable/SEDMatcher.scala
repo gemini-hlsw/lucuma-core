@@ -25,7 +25,7 @@ private case class ScoredMatch(
   def isWithinTolerance: Boolean = absDt < dtMax && absDg < dgMax
 
 object SEDMatcher:
-  // Stellar matching tolerances (physics-based scoring)
+  // Tolerances (physics-based scoring)
   private val TemperatureToleranceFraction: Double = 0.1 // 10% of target temperature
   private val GravityToleranceDex: Double          = 0.5 // 0.5 dex in log(g)
 
@@ -39,23 +39,20 @@ object SEDMatcher:
   private val SpiralPattern     = """S[abcABC_:]?.*""".r
 
   /**
-   * Attempt to Infer an appropriate UnnormalizedSED from Simbad object classification.
+   * Attempt to get an appropriate UnnormalizedSED from Simbad object classification.
    *
    * Based on match_sed python package by Andy Stephens
    *
    * Uses physics-based matching for stars and morphological patterns for galaxies. Quasars, HII
    * regions, and planetary nebulae are assigned fixed spectra.
    *
-   * For stars, matching is performed by comparing target stellar parameters (calculated from
-   * spectral type) against all library SEDs. The match must satisfy both temperature (±10%) and
-   * gravity (±0.5 dex) tolerances.
+   * For stars, matching is performed by comparing target stellar parameters against all library
+   * SEDs. The match must satisfy both temperature (±10%) and gravity (±0.5 dex) tolerances.
    *
    * @param otype
-   *   Simbad object type code (e.g., "*", "G", "QSO"). See [[StarTypes]], [[GalaxyTypes]],
-   *   [[QuasarTypes]], [[HIITypes]], [[PNTypes]].
+   *   Simbad object type code (e.g., "*", "G", "QSO").
    * @param spectralType
-   *   Optional spectral classification string (e.g., "G2V", "K3III", "DA3"). Required for stellar
-   *   objects to perform physics-based matching.
+   *   Optional spectral classification string (e.g., "G2V", "K3III", "DA3").
    * @param morphType
    *   Optional morphological type for galaxies (e.g., "Sa", "E3", or Hubble stage like "2.0").
    *
@@ -89,9 +86,7 @@ object SEDMatcher:
     }
 
   /**
-   * match simbad_otype mappings from as in match_sed.py
-   *
-   * https://simbad.u-strasbg.fr/Pages/guide/otypes.htx Simbad Object Types
+   * object type from o_tyipe https://simbad.u-strasbg.fr/Pages/guide/otypes.htx Simbad Object Types
    */
   private def parseObjectType(otype: String): Option[ObjectCategory] =
     if (StarTypes.contains(otype)) ObjectCategory.Star.some
@@ -102,12 +97,12 @@ object SEDMatcher:
     else none
 
   /**
-   * Match a stellar spectral type to StellarLibrarySpectrum.
+   * Match a stellar spectral type
    */
   private def matchStellarSED(spectralType: String): EitherNec[CatalogProblem, UnnormalizedSED] =
     parseSpectralType(spectralType) match {
       case Some((luminosity, temperature)) =>
-        findBestStellarMatch(luminosity, temperature)
+        matchingSpectrum(luminosity, temperature)
           .map(UnnormalizedSED.StellarLibrary(_))
           .toRight(NonEmptyChain.one(UnmatchedSpectralType(spectralType)))
       case _                               =>
@@ -125,47 +120,49 @@ object SEDMatcher:
     SpectralTypeParsers.spectralType.parse(cleaned).toOption.map(_._2)
 
   /**
-   * Find the best matching StellarLibrarySpectrum for given spectral classes. Uses physics-based
-   * scoring
+   * try to find the matching StellarLibrarySpectrum for given spectral classes. Uses physics-based
+   * scoring as in the python code
    */
-  private def findBestStellarMatch(
+  private def matchingSpectrum(
     luminosity:  List[String],
     temperature: List[String]
   ): Option[StellarLibrarySpectrum] =
 
-    // Handle edge cases upfront - match Python behavior: return None if no classes
-    if luminosity.isEmpty && temperature.isEmpty then none
-    else
-      StellarPhysics
-        .calculateParameters(luminosity, temperature)
-        .flatMap: params =>
-          StellarLibrarySpectrum.values.toList
-            .flatMap(scoreSpectrum(params))
-            .sortBy(_.score)
-            .headOption
-            .filter(_.isWithinTolerance)
-            .map(_.spectrum)
+    (luminosity, temperature) match
+      case (Nil, Nil) | (_, Nil) | (Nil, _) => none
+      case (l, t)                           =>
+        StellarPhysics
+          .calculateParameters(l, t)
+          .flatMap: params =>
+            StellarLibrarySpectrum.values.toList
+              .flatMap(scoreSpectrum(params))
+              .sortBy(_.score)
+              .headOption
+              .filter(_.isWithinTolerance)
+              .map(_.spectrum)
 
   private def scoreSpectrum(targetParams: StellarPhysics.StellarParameters)(
     spectrum: StellarLibrarySpectrum
   ): Option[ScoredMatch] =
-    StellarLibraryParameters.getParameters(spectrum).map { sedParams =>
-      // Calculate differences
-      val dtValue = sedParams.tEff.value - targetParams.tEff.value
-      val dg      = sedParams.logG - targetParams.logG
-      val dtMax   = TemperatureToleranceFraction * targetParams.tEff.value
-      val dgMax   = GravityToleranceDex
+    StellarLibraryParameters.params
+      .get(spectrum)
+      .map: sedParams =>
+        // Calculate differences
+        val dtValue = sedParams.temp.value - targetParams.temp.value
+        val dg      = sedParams.logG - targetParams.logG
+        val dtMax   = TemperatureToleranceFraction * targetParams.temp.value
+        val dgMax   = GravityToleranceDex
 
-      // Calculate score: sqrt((ΔT/ΔT_max)² + (Δlog_g/Δlog_g_max)²)
-      val score = math.sqrt((dtValue / dtMax) * (dtValue / dtMax) + (dg / dgMax) * (dg / dgMax))
+        // Calculate score: sqrt((ΔT/ΔT_max)² + (Δlog_g/Δlog_g_max)²)
+        val score = math.sqrt((dtValue / dtMax) * (dtValue / dtMax) + (dg / dgMax) * (dg / dgMax))
 
-      ScoredMatch(spectrum, score, math.abs(dtValue), dtMax, math.abs(dg), dgMax)
-    }
+        ScoredMatch(spectrum, score, math.abs(dtValue), dtMax, math.abs(dg), dgMax)
 
   /**
    * Match galaxy morphological type to appropriate GalaxySpectrum.
    */
   private def matchGalaxySED(morphType: String): EitherNec[CatalogProblem, UnnormalizedSED] =
+    // match via regexes first
     morphType match
       case EllipticalPattern() => Right(UnnormalizedSED.Galaxy(GalaxySpectrum.Elliptical))
       case S0Pattern()         => Right(UnnormalizedSED.Galaxy(GalaxySpectrum.Elliptical))
