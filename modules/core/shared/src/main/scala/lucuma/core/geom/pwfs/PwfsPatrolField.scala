@@ -59,20 +59,20 @@ trait PwfsPatrolField:
     offsetPos: Offset,
     pivot:     Offset = Offset.Zero
   ): ShapeExpression =
-    patrolField ↗ (offsetPos - pivot) ⟲ posAngle ↗ pivot
+    patrolField.shapePivotAt(posAngle, offsetPos, pivot)
 
   def patrolFieldInAt(
     posAngle:  Angle,
     offsetPos: Offset,
     pivot:     Offset = Offset.Zero
   ): ShapeExpression =
-    patrolFieldIn ↗ (offsetPos - pivot) ⟲ posAngle ↗ pivot
+    patrolFieldIn.shapePivotAt(posAngle, offsetPos, pivot)
 
   def patrolFieldOutAt(
     posAngle:  Angle,
     offsetPos: Offset,
     pivot:     Offset = Offset.Zero
   ): ShapeExpression =
-    patrolFieldOut ↗ (offsetPos - pivot) ⟲ posAngle ↗ pivot
+    patrolFieldOut.shapePivotAt(posAngle, offsetPos, pivot)
 
 object patrolField extends PwfsPatrolField

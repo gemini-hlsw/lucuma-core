@@ -59,7 +59,7 @@ trait Flamingos2ScienceAreaGeometry:
         _ => longslit(plateScale, scienceAreaWidth),
         _ => mosFOV(plateScale)
       )
-    shape ↗ offsetPos ⟲ posAngle
+    shape.shapeAt(posAngle, offsetPos)
 
   /**
    * Create the Flamingos2 imaging field of view.
@@ -100,4 +100,3 @@ trait Flamingos2ScienceAreaGeometry:
     ShapeExpression.centeredRectangle(scienceAreaWidth, slitHeight.toAngle) ↗ Offset.Zero.copy(q = y.toAngle.q)
 
 object scienceArea extends Flamingos2ScienceAreaGeometry
-

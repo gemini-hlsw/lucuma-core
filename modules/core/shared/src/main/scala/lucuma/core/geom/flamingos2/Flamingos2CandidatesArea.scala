@@ -32,15 +32,12 @@ trait Flamingos2CandidatesArea:
     * Flamingos2 area where the probe arm can reach centered with a given posAngle and offset
     */
   def candidatesAreaAt(l: Flamingos2LyotWheel, posAngle: Angle, offsetPos: Offset): ShapeExpression =
-    candidatesArea(l) ↗ offsetPos ⟲ posAngle
+    candidatesArea(l).shapeAt(posAngle, offsetPos)
 
   /**
     * Flamingos2 area reachable by the problem arm for a set of posAngles and offsets
     */
   def candidatesAreaAt(l: Flamingos2LyotWheel, posAngles: List[Angle], offsetPositions: List[Offset]): ShapeExpression =
-    (for {
-      a <- posAngles
-      o <- offsetPositions
-    } yield candidatesAreaAt(l, a, o)).fold(ShapeExpression.Empty)(_ ∩ _)
+    candidatesArea(l).intersectionShape(posAngles, offsetPositions)
 
 object candidatesArea extends Flamingos2CandidatesArea

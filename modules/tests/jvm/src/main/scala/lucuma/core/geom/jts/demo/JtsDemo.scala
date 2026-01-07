@@ -123,7 +123,8 @@ trait PwfsShapes extends InstrumentShapes:
 
   def shapes: List[ShapeExpression] =
     List(
-      patrolField.patrolFieldAt(posAngle, offsetPos)
+      patrolField.patrolFieldAt(posAngle, offsetPos),
+      candidatesArea.candidatesAreaAt(posAngle, offsetPos)
     )
 
 /**

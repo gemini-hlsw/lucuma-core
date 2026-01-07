@@ -55,6 +55,27 @@ trait shapeexpression {
       union(that)
 
     /**
+     * Positions a shape with translation and rotation around origin.
+     */
+    def shapeAt(posAngle: Angle, offset: Offset): ShapeExpression =
+      self ↗ offset ⟲ posAngle
+
+    /**
+     * Positions a shape with translation and rotation around a pivot.
+     */
+    def shapePivotAt(posAngle: Angle, offset: Offset, pivot: Offset): ShapeExpression =
+      self ↗ (offset - pivot) ⟲ posAngle ↗ pivot
+
+    /**
+     * Intersect positions at a set of offsets, used by AGS to intersect patrol fields
+     */
+    def intersectionShape(posAngles: List[Angle], offsets: List[Offset]): ShapeExpression =
+      (for {
+        a <- posAngles
+        o <- offsets
+      } yield self.shapeAt(a, o)).fold(ShapeExpression.Empty)(_ ∩ _)
+
+    /**
     * Creates a bounding box for an expression
     */
     def boundingBox: ShapeExpression =

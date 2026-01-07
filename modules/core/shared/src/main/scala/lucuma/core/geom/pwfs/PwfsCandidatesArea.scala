@@ -23,15 +23,12 @@ trait PwfsCandidatesArea extends PwfsPatrolField:
    * PWFS candidates area with a given posAngle and offset.
    */
   def candidatesAreaAt(posAngle: Angle, offsetPos: Offset): ShapeExpression =
-    candidatesArea.positionAt(posAngle, offsetPos)
+    candidatesArea.shapeAt(posAngle, offsetPos)
 
   /**
    * PWFS candidates area reachable for a set of posAngles and offsets.
    */
   def candidatesAreaAt(posAngles: List[Angle], offsetPositions: List[Offset]): ShapeExpression =
-    (for {
-      a <- posAngles
-      o <- offsetPositions
-    } yield candidatesAreaAt(a, o)).fold(ShapeExpression.Empty)(_ ∩ _)
+    candidatesArea.intersectionShape(posAngles, offsetPositions)
 
 object candidatesArea extends PwfsCandidatesArea
