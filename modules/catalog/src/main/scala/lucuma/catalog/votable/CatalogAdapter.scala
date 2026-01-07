@@ -490,9 +490,7 @@ object CatalogAdapter {
         !ignoreBrightnessValueField(v)
 
     // Gaia has no sed
-    override def parseSED(
-      entries: Map[FieldId, String]
-    ): EitherNec[CatalogProblem, Option[UnnormalizedSED]] = none.rightNec
+    override def parseSED(entries: Map[FieldId, String]) = none.rightNec
   }
 
   trait GaiaEsa extends Gaia {

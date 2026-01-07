@@ -6,76 +6,56 @@ package lucuma.catalog.votable
 import coulomb.*
 import coulomb.syntax.*
 import coulomb.units.si.Kelvin
+import cats.syntax.all.*
 import lucuma.catalog.votable.StellarPhysics.StellarParameters
 import lucuma.core.enums.StellarLibrarySpectrum
 
-/**
- * Pre-calculated physical parameters for each stellar library SED. Based on parsing spectral types
- * from tag fields and calculating T_eff and log_g.
- */
 object StellarLibraryParameters:
 
-  /**
-   * Extract luminosity and temperature classes from a library spectrum tag. E.g., "G2V" -> (["V"],
-   * ["G2"]) "K1.5III" -> (["III"], ["K1.5"])
-   */
+  private val DefaultWhiteDwarfTemp: Int    = 16800
+  private val DefaultWhiteDwarfLogG: Double = 8.0
+
+  private val DefaultSubdwarfTemp: Int    = 5199
+  private val DefaultSubdwarfLogG: Double = 4.0
+
+  private val WhiteDwarfTwoDigitPattern = """^(D[A-Z]*)(\d)(\d)(.*)$""".r
+
+  private def normalizeLibraryTag(tag: String): String =
+    val stripped = tag.takeWhile(c => c != '_')
+    stripped match
+      case WhiteDwarfTwoDigitPattern(prefix, d1, d2, rest) =>
+        s"$prefix$d1.$d2$rest"
+      case _                                               => stripped
+
   private def parseLibraryTag(tag: String): (List[String], List[String]) =
-    // Handle white dwarfs (DA, DB, etc.)
-    if tag.startsWith("D") then
-      val lumClass    = tag.takeWhile(_.isLetter)
-      // Extract numeric part, stripping _calspec or similar suffixes
-      val numericPart = tag.drop(lumClass.length).takeWhile(c => c.isDigit || c == '.')
-      // Convert 2-digit format to decimal: DA08 -> 0.8, DA12 -> 1.2, DA15 -> 1.5
-      val tempClass   =
-        if numericPart.length == 2 && numericPart.forall(_.isDigit) then
-          s"${numericPart.head}.${numericPart.tail}"
-        else numericPart
-      return (List(lumClass), if tempClass.nonEmpty then List(tempClass) else Nil)
-
-    // Handle subdwarfs
-    if tag == "sd" then return (List("sd"), List.empty)
-
-    // Standard spectral types: extract Roman numerals for luminosity
-    val romanPattern = """(VIII|VII|VI|IV|III|II|I|V)[ab]?""".r
-    val lumClasses   = romanPattern.findAllIn(tag).toList
-
-    // Extract temperature class (letter + number)
-    val tempPattern = """[OBAFGKMLTY][0-9]?\.?[0-9]?[\+-]?""".r
-    val tempClasses = tempPattern.findAllIn(tag).toList
-
-    (lumClasses, tempClasses)
+    val normalized = normalizeLibraryTag(tag)
+    SpectralTypeParsers.spectralType.parseAll(normalized) match
+      case Right((lumClasses, tempClasses)) => (lumClasses, tempClasses)
+      case Left(_)                          => (List.empty, List.empty)
 
   /**
-   * Map of stellar library spectra to their physical parameters. Lazy initialization to calculate
-   * parameters on first access.
+   * Map of stellar library spectra to their physical params. Lazy initialization to calculate
+   * params on first access.
    */
-  lazy val parameters: Map[StellarLibrarySpectrum, StellarParameters] =
+  lazy val params: Map[StellarLibrarySpectrum, StellarParameters] =
     StellarLibrarySpectrum.values.flatMap { spectrum =>
       val (lumClasses, tempClasses) = parseLibraryTag(spectrum.tag)
 
-      // Special cases that need manual override
       val params = (spectrum.tag, lumClasses, tempClasses) match
-        // White dwarfs without temperature number default to mid-range
+        // White dwarfs without temperature number
         case (tag, lc :: _, Nil) if tag.startsWith("D") =>
-          Some(StellarParameters(16800.withUnit[Kelvin], 8.0)) // ~DA3 equivalent
+          Some(StellarParameters(DefaultWhiteDwarfTemp.withUnit[Kelvin], DefaultWhiteDwarfLogG))
 
-        // Subdwarf without specific type
+        // Subdwarf
         case ("sd", _, _) =>
-          Some(StellarParameters(5199.withUnit[Kelvin], 4.0)) // Generic subdwarf
+          Some(StellarParameters(DefaultSubdwarfTemp.withUnit[Kelvin], DefaultSubdwarfLogG))
 
-        // Standard stars
+        // Standard
         case (_, lc, tc) if lc.nonEmpty && tc.nonEmpty =>
           StellarPhysics.calculateParameters(lc, tc)
 
-        // Fallback for malformed tags
         case _ =>
-          None
+          none
 
-      params.map(spectrum -> _)
+      params.tupleLeft(spectrum)
     }.toMap
-
-  /**
-   * Get physical parameters for a library spectrum.
-   */
-  def getParameters(spectrum: StellarLibrarySpectrum): Option[StellarParameters] =
-    parameters.get(spectrum)
