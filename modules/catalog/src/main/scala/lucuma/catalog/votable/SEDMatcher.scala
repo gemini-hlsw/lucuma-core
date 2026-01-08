@@ -14,6 +14,9 @@ import lucuma.core.syntax.string.*
 private enum ObjectCategory:
   case Star, Galaxy, Quasar, HIIRegion, PlanetaryNebula
 
+private enum LuminosityCategory:
+  case Subdwarf, WhiteDwarf, Normal
+
 private case class ScoredMatch(
   spectrum: StellarLibrarySpectrum,
   score:    Double,
@@ -138,6 +141,7 @@ object SEDMatcher:
           .calculateParameters(l, t)
           .flatMap: params =>
             StellarLibrarySpectrum.values.toList
+              .filter(s => luminosityCompatible(l, getLibraryLuminosity(s)))
               .flatMap(scoreSpectrum(params))
               .sortBy(_.score)
               .headOption
@@ -160,6 +164,29 @@ object SEDMatcher:
         val score = math.sqrt((dtValue / dtMax) * (dtValue / dtMax) + (dg / dgMax) * (dg / dgMax))
 
         ScoredMatch(spectrum, score, math.abs(dtValue), dtMax, math.abs(dg), dgMax)
+
+  private def categorizeLuminosity(lumClasses: List[String]): LuminosityCategory =
+    if lumClasses.exists(l => l === "sd" || l === "VI") then LuminosityCategory.Subdwarf
+    else if lumClasses.exists(_.startsWith("D")) then LuminosityCategory.WhiteDwarf
+    else LuminosityCategory.Normal
+
+  private def getLibraryLuminosity(spectrum: StellarLibrarySpectrum): List[String] =
+    val tag = spectrum.tag.takeWhile(_ != '_')
+    SpectralTypeParsers.spectralType.parseAll(tag) match
+      case Right((lumClasses, _)) => lumClasses
+      case Left(_)                => List.empty
+
+  /**
+   * Check if target and library luminosity classes are compatible.
+   * Subdwarfs only match subdwarfs, white dwarfs only match white dwarfs.
+   */
+  private def luminosityCompatible(
+    targetLum:  List[String],
+    libraryLum: List[String]
+  ): Boolean =
+    val targetCat  = categorizeLuminosity(targetLum)
+    val libraryCat = categorizeLuminosity(libraryLum)
+    targetCat == libraryCat
 
   /**
    * Match galaxy morphological type to appropriate GalaxySpectrum.
