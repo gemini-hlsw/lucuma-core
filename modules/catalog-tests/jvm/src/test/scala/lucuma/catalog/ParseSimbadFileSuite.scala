@@ -18,6 +18,7 @@ import lucuma.core.enums.Band
 import lucuma.core.enums.CatalogName
 import lucuma.core.enums.PlanetaryNebulaSpectrum
 import lucuma.core.enums.QuasarSpectrum
+import lucuma.core.enums.StellarLibrarySpectrum
 import lucuma.core.math.Angle
 import lucuma.core.math.BrightnessUnits.*
 import lucuma.core.math.BrightnessValue
@@ -64,7 +65,7 @@ class ParseSimbadFileSuite extends CatsEffectSuite with VoTableParser {
             // SED inferred from spectral A0Va
             t.sourceProfile match {
               case SourceProfile.Point(SpectralDefinition.BandNormalized(sed, _)) =>
-                assertEquals(sed, None)
+                assertEquals(sed, Some(UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.A0V)))
               case _                                                              =>
                 fail("Expected Point source profile")
             }
@@ -150,7 +151,6 @@ class ParseSimbadFileSuite extends CatsEffectSuite with VoTableParser {
             // id and search name
             assertEquals(t.name, "2MFGC6625".refined[NonEmpty])
             assertEquals(t.catalogInfo, CatalogInfo(CatalogName.Simbad, "2MFGC 6625", "EmG, I"))
-            // SED inferred from morphological type I - no matching galaxy type in library
             t.sourceProfile match {
               case SourceProfile.Point(SpectralDefinition.BandNormalized(sed, _)) =>
                 assertEquals(sed, None)
@@ -257,7 +257,7 @@ class ParseSimbadFileSuite extends CatsEffectSuite with VoTableParser {
               t.catalogInfo,
               CatalogInfo(CatalogName.Simbad, "2SLAQ J000008.13+001634.6", "QSO")
             )
-            // SED inferred as Quasar from object type QSO
+            // SED type QSO
             t.sourceProfile match {
               case SourceProfile.Point(SpectralDefinition.BandNormalized(sed, _)) =>
                 assertEquals(sed, Some(UnnormalizedSED.Quasar(QuasarSpectrum.QS0)))
@@ -452,7 +452,7 @@ class ParseSimbadFileSuite extends CatsEffectSuite with VoTableParser {
             // id and search name
             assertEquals(t.name, "NGC 2438".refined[NonEmpty])
             assertEquals(t.catalogInfo, CatalogInfo(CatalogName.Simbad, "NGC  2438", "PN"))
-            // SED inferred as PlanetaryNebula from object type PN
+            // SED is a PlanetaryNebula
             t.sourceProfile match {
               case SourceProfile.Point(SpectralDefinition.BandNormalized(sed, _)) =>
                 assertEquals(sed,
@@ -533,10 +533,9 @@ class ParseSimbadFileSuite extends CatsEffectSuite with VoTableParser {
               t.catalogInfo,
               CatalogInfo(CatalogName.Simbad, "* alf Lyr", "PulsV*delSct, A0Va")
             )
-            // SED inferred from spectral type A0Va
             t.sourceProfile match {
               case SourceProfile.Point(SpectralDefinition.BandNormalized(sed, _)) =>
-                assertEquals(sed, None)
+                assertEquals(sed, Some(UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.A0V)))
               case _                                                              =>
                 fail("Expected Point source profile")
             }
@@ -642,10 +641,9 @@ class ParseSimbadFileSuite extends CatsEffectSuite with VoTableParser {
               t.catalogInfo,
               CatalogInfo(CatalogName.Simbad, "* alf Lyr", "PulsV*delSct, A0Va")
             )
-            // SED inferred from spectral type A0Va
             t.sourceProfile match {
               case SourceProfile.Point(SpectralDefinition.BandNormalized(sed, _)) =>
-                assertEquals(sed, None)
+                assertEquals(sed, Some(UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.A0V)))
               case _                                                              =>
                 fail("Expected Point source profile")
             }
