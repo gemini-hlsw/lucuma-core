@@ -82,7 +82,10 @@ object SEDMatcher:
       case Some(ObjectCategory.PlanetaryNebula) =>
         Right(UnnormalizedSED.PlanetaryNebula(PlanetaryNebulaSpectrum.NGC7009))
       case None                                 =>
-        Left(NonEmptyChain.one(UnknownObjectType(otype)))
+        // Try stellar matching if spectral type looks valid, even with unknown otype
+        spectralType
+          .flatMap(matchStellarSED(_).toOption)
+          .toRight(NonEmptyChain.one(UnknownObjectType(otype)))
     }
 
   /**
