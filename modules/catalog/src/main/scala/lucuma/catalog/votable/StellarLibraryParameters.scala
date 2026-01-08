@@ -3,10 +3,10 @@
 
 package lucuma.catalog.votable
 
+import cats.syntax.all.*
 import coulomb.*
 import coulomb.syntax.*
 import coulomb.units.si.Kelvin
-import cats.syntax.all.*
 import lucuma.catalog.votable.StellarPhysics.StellarParameters
 import lucuma.core.enums.StellarLibrarySpectrum
 

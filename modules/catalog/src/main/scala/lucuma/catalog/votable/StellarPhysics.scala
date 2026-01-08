@@ -218,8 +218,6 @@ object StellarPhysics:
    * Calculate surface gravity (log g) from stellar spectral classification.
    *
    * Uses interpolation from Straizys & Kuriliene, 1981, Ap&SS, 80, 353S gravity table.
-   * Normalizes luminosity classes (I→Iab, VI→sd, drops subclasses from non-supergiant types).
-   * White dwarfs use fixed log g = 8.0.
    */
   def calculateGravity(
     luminosity:  List[String],
@@ -258,8 +256,8 @@ object StellarPhysics:
               .some
 
   /**
-   * Interpolate log(g) for a given spectral class code and luminosity class.
-   * Ported from  the original python code by Andy Stephens
+   * Interpolate log(g) for a given spectral class code and luminosity class. Ported from the
+   * original python code by Andy Stephens
    */
   private def interpolateGravity(scc: Double, lumClass: String): Double = {
     val ((sccLow, mapLow), (sccHigh, mapHigh)) =
