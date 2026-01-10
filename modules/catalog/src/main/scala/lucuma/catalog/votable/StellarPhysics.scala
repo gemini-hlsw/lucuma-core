@@ -249,9 +249,9 @@ object StellarPhysics:
         gravities match
           case Nil => none
           case _   =>
-            // adjust to 3 decimals
+            // Round to 1 decimal to match Python behavior
             BigDecimal(gravities.sum / gravities.length)
-              .setScale(3, BigDecimal.RoundingMode.HALF_UP)
+              .setScale(1, BigDecimal.RoundingMode.HALF_UP)
               .toDouble
               .some
 
