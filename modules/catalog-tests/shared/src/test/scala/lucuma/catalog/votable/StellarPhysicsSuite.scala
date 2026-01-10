@@ -62,13 +62,14 @@ class StellarPhysicsSuite extends FunSuite:
     assertEquals(StellarPhysics.calculateTemperature(List("V"), List("B9", "A0")), 11946.some)
 
   test("gravity calculation"):
-    assertEquals(StellarPhysics.calculateGravity(List("V"), List("A0")), 4.07.some)
-    assertEquals(StellarPhysics.calculateGravity(List("V"), List("G2")), 4.426.some)
-    assertEquals(StellarPhysics.calculateGravity(List("III"), List("K1")), 2.764.some)
+    // Gravity is rounded to 1 decimal to match Python behavior
+    assertEquals(StellarPhysics.calculateGravity(List("V"), List("A0")), 4.1.some)
+    assertEquals(StellarPhysics.calculateGravity(List("V"), List("G2")), 4.4.some)
+    assertEquals(StellarPhysics.calculateGravity(List("III"), List("K1")), 2.8.some)
     assertEquals(StellarPhysics.calculateGravity(List("DA"), List("3")), 8.0.some)
     // I -> Iab
-    assertEquals(StellarPhysics.calculateGravity(List("I"), List("A0")), 2.01.some)
+    assertEquals(StellarPhysics.calculateGravity(List("I"), List("A0")), 2.0.some)
     // VI -> sd
     assertEquals(StellarPhysics.calculateGravity(List("VI"), List("G2")), 3.4.some)
     // IIIa -> III (drops subclass)
-    assertEquals(StellarPhysics.calculateGravity(List("IIIa"), List("B3")), 3.743.some)
+    assertEquals(StellarPhysics.calculateGravity(List("IIIa"), List("B3")), 3.7.some)

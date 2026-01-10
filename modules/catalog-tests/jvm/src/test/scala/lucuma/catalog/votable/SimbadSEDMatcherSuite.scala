@@ -129,10 +129,7 @@ class SimbadSEDMatcherSuite extends CatsEffectSuite:
     testData.map(_.length > 8000).assert
 
   // Known differences between Python and Scala implementations
-  val knownDifferences = Set(
-    "*   3 Cet", // K3Ib with s*r otype - otype category difference
-    "*  17 Aqr"  // K4/5III - range scoring (Python picks K5, Scala picks K4)
-  )
+  val knownDifferences = Set.empty[String]
 
   test("validate against Python reference output") {
     (testData, output).mapN { (testData, expectedOutput) =>

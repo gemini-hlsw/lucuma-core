@@ -5,6 +5,7 @@ package lucuma.catalog.votable
 
 import cats.data.EitherNec
 import cats.data.NonEmptyChain
+import cats.syntax.eq.*
 import cats.syntax.option.*
 import lucuma.catalog.votable.CatalogProblem.*
 import lucuma.core.enums.*
@@ -85,10 +86,7 @@ object SEDMatcher:
       case Some(ObjectCategory.PlanetaryNebula) =>
         Right(UnnormalizedSED.PlanetaryNebula(PlanetaryNebulaSpectrum.NGC7009))
       case None                                 =>
-        // Try stellar matching if spectral type looks valid, even with unknown otype
-        spectralType
-          .flatMap(matchStellarSED(_).toOption)
-          .toRight(NonEmptyChain.one(UnknownObjectType(otype)))
+        Left(NonEmptyChain.one(UnknownObjectType(otype)))
     }
 
   /**
@@ -258,6 +256,7 @@ val StarTypes = Set(
   "SX*",
   "gD*",
   "dS*",
+  "PulsV*delSct",
   "Ev*",
   "RG*",
   "HS*",
