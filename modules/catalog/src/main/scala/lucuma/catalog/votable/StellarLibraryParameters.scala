@@ -21,7 +21,7 @@ object StellarLibraryParameters:
   private val WhiteDwarfTwoDigitPattern = """^(D[A-Z]*)(\d)(\d)(.*)$""".r
 
   private def normalizeLibraryTag(tag: String): String =
-    val stripped = tag.takeWhile(c => c != '_')
+    val stripped = tag.takeWhile(c => c != '_').replaceAll("-[rw]$", "")
     stripped match
       case WhiteDwarfTwoDigitPattern(prefix, d1, d2, rest) =>
         s"$prefix$d1.$d2$rest"
