@@ -94,13 +94,13 @@ trait PwfsProbeArm:
     val ml = mirrorLengthMm(probe)
     val mw = mirrorWidthMm(probe)
     val dr = drMm(probe)
-    val r = armLengthArcsec
 
-    val x1 = toArcsec(ml / 2.0 - dr) + r
+    // Mirror centered at origin
+    val x1 = toArcsec(ml / 2.0 - dr)
     val y1 = toArcsec(-mw / 2.0 + dr)
     val x2 = x1
     val y2 = -y1
-    val x3 = toArcsec(-ml / 2.0 + dr) + r
+    val x3 = toArcsec(-ml / 2.0 + dr)
     val y3 = y2
     val x4 = x3
     val y4 = y1
@@ -121,11 +121,11 @@ trait PwfsProbeArm:
     val mw = mirrorWidthMm(probe)
     val dr = drMm(probe)
     val dxl = dxlMm(probe)
-    val r = armLengthArcsec
     val sqrt2 = math.sqrt(2.0)
 
+    // Mirror centered at origin, arm extends in -X direction
     // Point 1: tip of mirror region on axis
-    val x1 = toArcsec(ml / 2.0 + dr) + r
+    val x1 = toArcsec(ml / 2.0 + dr)
     val y1 = 0.0
 
     // Point 2: corner at mirror width
@@ -133,15 +133,15 @@ trait PwfsProbeArm:
     val y2 = toArcsec(mw / 2.0)
 
     // Point 3: 45 degree point on arc
-    val x3 = toArcsec(ml / 2.0 + dr / sqrt2) + r
+    val x3 = toArcsec(ml / 2.0 + dr / sqrt2)
     val y3 = y2 + toArcsec(dr / sqrt2)
 
     // Point 4: 90 degree point on arc
-    val x4 = toArcsec(ml / 2.0) + r
+    val x4 = toArcsec(ml / 2.0)
     val y4 = y2 + toArcsec(dr)
 
     // Point 5: notch transition point
-    val x5 = toArcsec(-ml / 2.0 + dxl) + r
+    val x5 = toArcsec(-ml / 2.0 + dxl)
     val y5 = y4
 
     // Points 6-10: reflection through y axis
@@ -170,14 +170,15 @@ trait PwfsProbeArm:
     val dxl = dxlMm(probe)
     val r = armLengthArcsec
 
+    // Mirror at origin, arm extends in -X direction toward pivot at -r
     // Starting point at notch
-    val x1 = toArcsec(-ml / 2.0 + dxl) + r
+    val x1 = toArcsec(-ml / 2.0 + dxl)
     val y1 = 0.0
 
     val x2 = x1
     val y2 = toArcsec(mw / 2.0) + toArcsec(dr)
 
-    val x3 = toArcsec(-ml / 2.0) + r
+    val x3 = toArcsec(-ml / 2.0)
     val y3 = toArcsec(aw / 2.0 + dr)
 
     // Intermediate point for PWFS2
@@ -189,11 +190,11 @@ trait PwfsProbeArm:
     val x4 = x3 - toArcsec(dr)
     val y4 = y3
 
-    // End at pivot
-    val x5 = 0.0
+    // End at pivot (now at -r from mirror)
+    val x5 = -r
     val y5 = y3
 
-    val x6 = 0.0
+    val x6 = -r
     val y6 = 0.0
 
     val x7 = x1
@@ -238,13 +239,14 @@ trait PwfsProbeArm:
     val dxl = dxlMm(probe)
     val r = armLengthArcsec
 
-    val x1 = toArcsec(-ml / 2.0 + dr) + r
+    // Mirror at origin, arm extends toward pivot at -r
+    val x1 = toArcsec(-ml / 2.0 + dr)
     val y1 = 0.0
 
     val x2 = x1
     val y2 = toArcsec(mw / 2.0 - dr)
 
-    val x3 = toArcsec(-ml / 2.0) + r
+    val x3 = toArcsec(-ml / 2.0)
     val y3 = y2
 
     val x6 = x3 - toArcsec(dxl)
@@ -268,7 +270,7 @@ trait PwfsProbeArm:
       )
     }
 
-    val x7 = 0.0
+    val x7 = -r
     val y7 = y6
 
     ShapeExpression.polygonAt(
@@ -321,7 +323,7 @@ trait PwfsProbeArm:
       else acos(ratio)
     } else 0.0
 
-    Angle.fromDoubleRadians(b + d)
+    Angle.fromDoubleRadians(b - d)
 
   /**
    * Position the vignette shape at a guide star location.

@@ -123,7 +123,7 @@ trait PwfsShapes extends InstrumentShapes:
     Offset.Zero
 
   val guideStarOffset: Offset =
-    Offset(200.arcsec.p, 100.arcsec.q)
+    Offset(50.arcsec.p, 50.arcsec.q)
 
   val probe: GuideProbe = GuideProbe.PWFS1
 
@@ -287,4 +287,4 @@ object JtsFlamingos2LSDemo extends JtsDemo with Flamingos2LSShapes
 object JtsGmosImagingDemo extends JtsDemo with GmosImagingShapes
 
 object JtsPwfsDemo extends JtsDemo with PwfsShapes:
-  override val arcsecPerPixel: Double = 0.75  // Show full 417" radius patrol field
+  override val arcsecPerPixel: Double = 0.4  // Show full 417" radius patrol field
