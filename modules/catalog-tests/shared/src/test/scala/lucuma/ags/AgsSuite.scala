@@ -4,6 +4,7 @@
 package lucuma.ags
 
 import cats.data.NonEmptyList
+import cats.data.NonEmptySet
 import cats.syntax.all.*
 import lucuma.ags.AcquisitionOffsets
 import lucuma.ags.AgsAnalysis.NoMagnitudeForBand
@@ -74,7 +75,7 @@ class AgsSuite extends munit.FunSuite {
   test("sortUsablePositions - bad angles thrown out") {
     val noMag            = NoMagnitudeForBand(GuideProbe.GmosOIWFS, gs1, Angle.Angle0)
     val vignettesScience =
-      VignettesScience(gs2, AgsPosition(GeometryType.Base, Angle.Angle180, Offset.Zero))
+      VignettesScience(gs2, OffsetPosition(GeometryType.Base, Offset.Zero, Angle.Angle180))
     val analyses         = List(noMag, u1a, u1b.vignetting(9), u2a.vignetting(5), u2b, vignettesScience)
     val sorted           = analyses.sortUsablePositions
     assertEquals(sorted, List(u2a.vignetting(5), u1b.vignetting(9)))
@@ -118,7 +119,7 @@ class AgsSuite extends munit.FunSuite {
 
     val wavelength = Wavelength.fromIntNanometers(300).get
 
-    assertEquals(
+    assert(
       Ags
         .agsAnalysis(
           constraints,
@@ -127,15 +128,15 @@ class AgsSuite extends munit.FunSuite {
           List(Coordinates.Zero),
           None,
           NonEmptyList.of(Angle.Angle0),
-          Some(AcquisitionOffsets(NonEmptyList.of(Offset.Zero.guided))),
-          Some(ScienceOffsets(NonEmptyList.of(Offset.Zero.guided))),
+          Some(AcquisitionOffsets(NonEmptySet.of(Offset.Zero.guided))),
+          Some(ScienceOffsets(NonEmptySet.of(Offset.Zero.guided))),
           AgsParams.GmosAgsParams(GmosNorthFpu.LongSlit_5_00.asLeft.some, PortDisposition.Bottom),
           List(gs1)
         )
-        .headOption,
-      AgsAnalysis
-        .VignettesScience(gs1, AgsPosition(GeometryType.Base, Angle.Angle0, Offset.Zero))
-        .some
+        .contains(
+          AgsAnalysis
+            .VignettesScience(gs1, OffsetPosition(GeometryType.Base, Offset.Zero, Angle.Angle0))
+        )
     )
 
     val guideStarOffset =
@@ -158,8 +159,8 @@ class AgsSuite extends munit.FunSuite {
           Nil,
           None,
           NonEmptyList.of(Angle.Angle0),
-          Some(AcquisitionOffsets(NonEmptyList.of(Offset.Zero.guided))),
-          Some(ScienceOffsets(NonEmptyList.of(Offset.Zero.guided))),
+          Some(AcquisitionOffsets(NonEmptySet.of(Offset.Zero.guided))),
+          Some(ScienceOffsets(NonEmptySet.of(Offset.Zero.guided))),
           AgsParams.GmosAgsParams(GmosNorthFpu.LongSlit_5_00.asLeft.some, PortDisposition.Bottom),
           List(guideStarOffset)
         )
@@ -179,7 +180,7 @@ class AgsSuite extends munit.FunSuite {
 
     val wavelength = Wavelength.fromIntNanometers(300).get
 
-    assertEquals(
+    assert(
       Ags
         .agsAnalysis(
           constraints,
@@ -188,8 +189,8 @@ class AgsSuite extends munit.FunSuite {
           List(Coordinates.Zero),
           None,
           NonEmptyList.of(Angle.Angle0),
-          Some(AcquisitionOffsets(NonEmptyList.of(Offset.Zero.guided))),
-          Some(ScienceOffsets(NonEmptyList.of(Offset.Zero.guided))),
+          Some(AcquisitionOffsets(NonEmptySet.of(Offset.Zero.guided))),
+          Some(ScienceOffsets(NonEmptySet.of(Offset.Zero.guided))),
           AgsParams.Flamingos2AgsParams(
             Flamingos2LyotWheel.F16,
             Flamingos2FpuMask.Builtin(Flamingos2Fpu.LongSlit3),
@@ -197,10 +198,10 @@ class AgsSuite extends munit.FunSuite {
           ),
           List(gs1)
         )
-        .headOption,
-      AgsAnalysis
-        .VignettesScience(gs1, AgsPosition(GeometryType.Base, Angle.Angle0, Offset.Zero))
-        .some
+        .contains(
+          AgsAnalysis
+            .VignettesScience(gs1, OffsetPosition(GeometryType.Base, Offset.Zero, Angle.Angle0))
+        )
     )
 
     val guideStarOffset =
@@ -223,8 +224,8 @@ class AgsSuite extends munit.FunSuite {
           Nil,
           None,
           NonEmptyList.of(Angle.Angle0),
-          Some(AcquisitionOffsets(NonEmptyList.of(Offset.Zero.guided))),
-          Some(ScienceOffsets(NonEmptyList.of(Offset.Zero.guided))),
+          Some(AcquisitionOffsets(NonEmptySet.of(Offset.Zero.guided))),
+          Some(ScienceOffsets(NonEmptySet.of(Offset.Zero.guided))),
           AgsParams.Flamingos2AgsParams(
             Flamingos2LyotWheel.F16,
             Flamingos2FpuMask.Builtin(Flamingos2Fpu.LongSlit3),

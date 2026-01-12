@@ -3,7 +3,9 @@
 
 package lucuma.ags
 
+import cats.Order.given
 import cats.data.NonEmptyList
+import cats.data.NonEmptySet
 import cats.syntax.all.*
 import coulomb.*
 import lucuma.catalog.BandsList
@@ -138,19 +140,27 @@ val UnconstrainedAngles =
     (0 until 360 by 10).map(a => Angle.fromDoubleDegrees(a.toDouble)).toList
   )
 
+/**
+ * Position of a marker after rotation by position angle.
+ */
+object RotatedOffset extends NewType[Offset]
+type RotatedOffset = RotatedOffset.Type
+
 object GuidedOffset extends NewType[Offset]
 type GuidedOffset = GuidedOffset.Type
 
-object AcquisitionOffsets extends NewType[NonEmptyList[GuidedOffset]]:
+object AcquisitionOffsets extends NewType[NonEmptySet[GuidedOffset]]:
   extension (a: AcquisitionOffsets)
-    def withType: NonEmptyList[(GeometryType, GuidedOffset)] =
-      a.value.tupleLeft(GeometryType.AcqOffset)
+    def withType: NonEmptySet[(GeometryType, GuidedOffset)] =
+      NonEmptySet.fromSetUnsafe:
+        a.value.toSortedSet.map(o => (GeometryType.AcqGuidedOffset, o))
 
 type AcquisitionOffsets = AcquisitionOffsets.Type
 
-object ScienceOffsets extends NewType[NonEmptyList[GuidedOffset]]:
+object ScienceOffsets extends NewType[NonEmptySet[GuidedOffset]]:
   extension (a: ScienceOffsets)
-    def withType: NonEmptyList[(GeometryType, GuidedOffset)] =
-      a.value.tupleLeft(GeometryType.SciOffset)
+    def withType: NonEmptySet[(GeometryType, GuidedOffset)] =
+      NonEmptySet.fromSetUnsafe:
+        a.value.toSortedSet.map(o => (GeometryType.SciGuidedOffset, o))
 
 type ScienceOffsets = ScienceOffsets.Type

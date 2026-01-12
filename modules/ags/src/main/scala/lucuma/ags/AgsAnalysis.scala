@@ -33,8 +33,8 @@ object AgsAnalysis {
       "Cannot calculate proper motion."
   }
 
-  case class VignettesScience(target: GuideStarCandidate, position: AgsPosition) extends AgsAnalysis
-      derives Eq {
+  case class VignettesScience(target: GuideStarCandidate, position: OffsetPosition)
+      extends AgsAnalysis derives Eq {
     val posAngle: Angle = position.posAngle
 
     override def message(withProbe: Boolean): String =
@@ -77,7 +77,7 @@ object AgsAnalysis {
   }
 
   case class NotReachableAtPosition(
-    position:   AgsPosition,
+    position:   OffsetPosition,
     guideProbe: GuideProbe,
     guideSpeed: Option[GuideSpeed],
     target:     GuideStarCandidate

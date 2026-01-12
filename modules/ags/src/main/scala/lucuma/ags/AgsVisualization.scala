@@ -12,15 +12,15 @@ import lucuma.core.geom.syntax.all.*
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 
-case class PatrolFieldVisualization(
-  position:       AgsPosition,
+final case class PatrolFieldVisualization(
+  position:       OffsetPosition,
   posPatrolField: ShapeExpression, // Patrol field for the position
   paIntersection: ShapeExpression, // Intersection area for the pa
-  location:       Offset           // Position for placing visualization markers
+  rotatedOffset:  RotatedOffset    // Position for placing visualization markers
 )
 
-case class ScienceOverlapVisualization(
-  position:               AgsPosition,
+final case class ScienceOverlapVisualization(
+  position:               OffsetPosition,
   guideStarOffset:        Offset,
   probeArmShape:          ShapeExpression,
   scienceTargetAreaShape: ShapeExpression,
@@ -35,10 +35,10 @@ object AgsVisualization {
 
   def patrolFieldGeometries(
     params:    SingleProbeAgsParams,
-    positions: NonEmptyList[AgsPosition]
+    positions: NonEmptyList[OffsetPosition]
   ): NonEmptyList[PatrolFieldVisualization] = {
 
-    val calcsByPA: Map[Angle, NonEmptyMap[AgsPosition, AgsGeomCalc]] =
+    val calcsByPA: Map[Angle, NonEmptyMap[OffsetPosition, AgsGeomCalc]] =
       positions
         .groupBy(_.posAngle)
         .view
@@ -46,7 +46,7 @@ object AgsVisualization {
         .toMap
 
     // Helper to get patrol field
-    def getPatrolField(position: AgsPosition): ShapeExpression =
+    def getPatrolField(position: OffsetPosition): ShapeExpression =
       params.patrolFieldAt(position.posAngle, position.offsetPos, position.pivot)
 
     positions.map: position =>
@@ -58,13 +58,13 @@ object AgsVisualization {
           .flatMap(_.apply(position))
           .map(_.intersectionPatrolField)
           .getOrElse(ShapeExpression.Empty),
-        location = position.location
+        rotatedOffset = position.rotatedOffset
       )
   }
 
   def scienceOverlapVisualization(
     params:          SingleProbeAgsParams,
-    position:        AgsPosition,
+    position:        OffsetPosition,
     guideStarOffset: Offset
   ): ScienceOverlapVisualization = {
     val probeArm = params.probeArm(position.posAngle, guideStarOffset, position.offsetPos)

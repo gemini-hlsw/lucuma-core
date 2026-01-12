@@ -223,7 +223,8 @@ lazy val ags = crossProject(JVMPlatform, JSPlatform)
     name := "lucuma-ags",
     libraryDependencies ++= Seq(
       "edu.gemini"    %%% "lucuma-refined" % lucumaRefinedVersion,
-      "org.typelevel" %%% "cats-core"      % catsVersion
+      "org.typelevel" %%% "cats-core"      % catsVersion,
+      "com.lihaoyi"            %%% "pprint"              % pprintVersion,
     )
   )
   .jsConfigure(_.enablePlugins(BundleMonPlugin))

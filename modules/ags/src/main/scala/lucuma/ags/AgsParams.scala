@@ -26,14 +26,6 @@ import lucuma.core.model.sequence.flamingos2.Flamingos2FpuMask
 
 private given Order[Angle] = Angle.SignedAngleOrder
 
-case class AgsPosition(
-  geometryType: GeometryType,
-  posAngle:     Angle,
-  offsetPos:    Offset,
-  pivot:        Offset = Offset.Zero
-) derives Order:
-  lazy val location: Offset = (offsetPos - pivot).rotate(posAngle) + pivot
-
 sealed trait AgsGeomCalc:
   // Indicates if the given offset is reachable
   def isReachable(gsOffset: Offset): Boolean
@@ -56,8 +48,8 @@ trait SingleProbeAgsParams:
   def scienceRadius: Angle
 
   def posCalculations(
-    positions: NonEmptyList[AgsPosition]
-  ): NonEmptyMap[AgsPosition, AgsGeomCalc] =
+    positions: NonEmptyList[OffsetPosition]
+  ): NonEmptyMap[OffsetPosition, AgsGeomCalc] =
     val result = positions.map: position =>
       position -> new AgsGeomCalc() {
         override val intersectionPatrolField: ShapeExpression =
@@ -112,8 +104,8 @@ sealed trait AgsParams derives Eq:
   // Builds an AgsGeom object for each position
   // The geometries won't chage with the position and we can cache them
   def posCalculations(
-    positions: NonEmptyList[AgsPosition]
-  ): NonEmptyMap[AgsPosition, AgsGeomCalc]
+    positions: NonEmptyList[OffsetPosition]
+  ): NonEmptyMap[OffsetPosition, AgsGeomCalc]
 
 object AgsParams:
   case class GmosAgsParams(

@@ -4,7 +4,7 @@
 package lucuma.ags
 
 import cats.Functor
-import cats.data.NonEmptyList
+import cats.data.NonEmptySet
 import cats.effect.IO
 import cats.effect.IOApp
 import cats.syntax.all.*
@@ -68,12 +68,13 @@ trait AgsSelectionSample {
   val wavelength = Wavelength.fromIntNanometers(600).get
 
   val acqOffsets =
-    AcquisitionOffsets(NonEmptyList.of(GuidedOffset(Offset.Zero)))
+    AcquisitionOffsets(NonEmptySet.of(GuidedOffset(Offset.Zero)))
 
   val sciOffsets =
     ScienceOffsets(
-      NonEmptyList.of(GuidedOffset(Offset.Zero),
-                      GuidedOffset(Offset.Zero.copy(q = Offset.Q(Angle.fromDoubleArcseconds(15))))
+      NonEmptySet.of(
+        GuidedOffset(Offset.Zero),
+        GuidedOffset(Offset.Zero.copy(q = Offset.Q(Angle.fromDoubleArcseconds(15))))
       )
     )
 

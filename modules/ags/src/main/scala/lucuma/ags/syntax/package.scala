@@ -4,6 +4,7 @@
 package lucuma.ags.syntax
 
 import cats.data.NonEmptyList
+import cats.data.NonEmptySet
 import cats.syntax.all.*
 import lucuma.ags.*
 import lucuma.core.enums.Site
@@ -18,6 +19,7 @@ import lucuma.core.util.TimeSpan
 
 import java.time.Duration
 import java.time.Instant
+import scala.collection.immutable.SortedSet
 
 extension (posAngleConstraint: PosAngleConstraint)
   def anglesToTestAt(
@@ -48,12 +50,11 @@ extension (posAngleConstraint: PosAngleConstraint)
 extension (o: Offset) def guided: GuidedOffset = GuidedOffset(o)
 
 extension (c: NonEmptyList[TelescopeConfig])
-  def guidedOffsets: Option[NonEmptyList[GuidedOffset]] =
-    NonEmptyList
-      .fromFoldable:
+  def guidedOffsets: Option[NonEmptySet[GuidedOffset]] =
+    NonEmptySet.fromSet:
+      SortedSet.from:
         c.collect:
           case TelescopeConfig(o, StepGuideState.Enabled) => GuidedOffset(o)
-        .distinct
 
   def asAcqOffsets: Option[AcquisitionOffsets] = guidedOffsets.map(AcquisitionOffsets.apply)
 

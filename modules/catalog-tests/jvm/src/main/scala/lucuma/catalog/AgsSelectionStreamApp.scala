@@ -4,6 +4,7 @@
 package lucuma.catalog.votable
 
 import cats.data.NonEmptyList
+import cats.data.NonEmptySet
 import cats.effect.IO
 import cats.effect.IOApp
 import cats.syntax.all.*
@@ -45,8 +46,8 @@ object AgsSelectionSampleStreamApp extends IOApp.Simple with AgsSelectionSample:
                     Angle.fromDoubleDegrees(-120),
                     Angle.fromDoubleDegrees(120)
                   ),
-                  Some(AcquisitionOffsets(NonEmptyList.of(Offset.Zero.guided))),
-                  Some(ScienceOffsets(NonEmptyList.of(Offset.Zero.guided))),
+                  Some(AcquisitionOffsets(NonEmptySet.of(Offset.Zero.guided))),
+                  Some(ScienceOffsets(NonEmptySet.of(Offset.Zero.guided))),
                   AgsParams.GmosAgsParams(
                     GmosNorthFpu.LongSlit_1_00.asLeft.some,
                     PortDisposition.Side

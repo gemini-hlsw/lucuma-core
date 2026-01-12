@@ -5,12 +5,6 @@ package lucuma.core.enums
 
 import lucuma.core.util.Enumerated
 
-sealed abstract class SequenceType(val tag: String) extends Product with Serializable
-
-object SequenceType {
-  case object Acquisition extends SequenceType("acquisition")
-  case object Science     extends SequenceType("science")
-
-  implicit val SequenceTypeEnumerated: Enumerated[SequenceType] =
-    Enumerated.from(Acquisition, Science).withTag(_.tag)
-}
+enum SequenceType(val tag: String) derives Enumerated:
+  case Acquisition extends SequenceType("acquisition")
+  case Science     extends SequenceType("science")
