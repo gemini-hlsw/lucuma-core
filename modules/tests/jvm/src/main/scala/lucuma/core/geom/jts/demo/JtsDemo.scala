@@ -114,6 +114,7 @@ trait Flamingos2LSShapes extends InstrumentShapes:
 
 trait PwfsShapes extends InstrumentShapes:
   import lucuma.core.geom.pwfs.*
+  import lucuma.core.enums.GuideProbe
 
   val posAngle: Angle =
     0.deg
@@ -121,10 +122,16 @@ trait PwfsShapes extends InstrumentShapes:
   val offsetPos: Offset =
     Offset.Zero
 
+  val guideStarOffset: Offset =
+    Offset(200.arcsec.p, 100.arcsec.q)
+
+  val probe: GuideProbe = GuideProbe.PWFS1
+
   def shapes: List[ShapeExpression] =
     List(
+      ShapeExpression.centeredRectangle(1.arcsec, 1.arcsec).translate(guideStarOffset), // guide star
       patrolField.patrolFieldAt(posAngle, offsetPos),
-      candidatesArea.candidatesAreaAt(posAngle, offsetPos)
+      probeArm.shapeAt(probe, guideStarOffset, offsetPos)
     )
 
 /**
