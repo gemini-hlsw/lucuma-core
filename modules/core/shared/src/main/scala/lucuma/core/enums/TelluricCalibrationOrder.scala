@@ -3,7 +3,9 @@
 
 package lucuma.core.enums
 
-enum TelluricCalibrationOrder(val tag: String):
+import lucuma.core.util.Enumerated
+
+enum TelluricCalibrationOrder(val tag: String) derives Enumerated:
   case Before extends TelluricCalibrationOrder("before")
   case After  extends TelluricCalibrationOrder("after")
 
