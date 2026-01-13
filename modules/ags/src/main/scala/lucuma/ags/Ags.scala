@@ -3,6 +3,7 @@
 
 package lucuma.ags
 
+import cats.Order
 import cats.Order.given
 import cats.data.NonEmptyList
 import cats.data.NonEmptyMap
@@ -18,6 +19,8 @@ import lucuma.core.enums.GuideProbe
 import lucuma.core.enums.GuideSpeed
 import lucuma.core.enums.StepGuideState
 import lucuma.core.geom.Area
+import lucuma.core.geom.offsets.OffsetPosition
+import lucuma.core.geom.offsets.OffsetPositions
 import lucuma.core.math.Angle
 import lucuma.core.math.BrightnessValue
 import lucuma.core.math.Coordinates
@@ -150,6 +153,8 @@ object Ags {
     acqOffsets:      Option[AcquisitionOffsets],
     scienceOffsets:  Option[ScienceOffsets]
   ): OffsetPositions =
+    given Order[Angle] = Angle.SignedAngleOrder
+
     OffsetPositions
       .fromTelescopeConfigs(
         baseCoordinates,

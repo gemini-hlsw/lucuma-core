@@ -18,13 +18,12 @@ import lucuma.core.geom.BoundingOffsets
 import lucuma.core.geom.Shape
 import lucuma.core.geom.ShapeExpression
 import lucuma.core.geom.jts.interpreter.given
+import lucuma.core.geom.offsets.OffsetPosition
 import lucuma.core.geom.syntax.all.*
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 import lucuma.core.math.syntax.int.*
 import lucuma.core.model.sequence.flamingos2.Flamingos2FpuMask
-
-private given Order[Angle] = Angle.SignedAngleOrder
 
 sealed trait AgsGeomCalc:
   // Indicates if the given offset is reachable

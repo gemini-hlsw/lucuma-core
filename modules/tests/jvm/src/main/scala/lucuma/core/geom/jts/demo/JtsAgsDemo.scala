@@ -12,14 +12,14 @@ import lucuma.ags.AcquisitionOffsets
 import lucuma.ags.Ags
 import lucuma.ags.AgsParams.GmosAgsParams
 import lucuma.ags.AgsVisualization
-import lucuma.ags.GeometryType
-import lucuma.ags.OffsetPosition
 import lucuma.ags.ScienceOffsets
 import lucuma.ags.syntax.*
 import lucuma.core.enums.GmosNorthFpu
 import lucuma.core.enums.GmosSouthFpu
 import lucuma.core.enums.PortDisposition
 import lucuma.core.geom.ShapeExpression
+import lucuma.core.geom.offsets.GeometryType
+import lucuma.core.geom.offsets.OffsetPosition
 import lucuma.core.geom.syntax.all.*
 import lucuma.core.math.Angle
 import lucuma.core.math.Coordinates

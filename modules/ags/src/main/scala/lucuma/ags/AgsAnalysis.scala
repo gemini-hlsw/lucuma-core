@@ -14,6 +14,7 @@ import lucuma.core.enums.Band
 import lucuma.core.enums.GuideProbe
 import lucuma.core.enums.GuideSpeed
 import lucuma.core.geom.Area
+import lucuma.core.geom.offsets.OffsetPosition
 import lucuma.core.math.Angle
 import lucuma.core.math.BrightnessValue
 

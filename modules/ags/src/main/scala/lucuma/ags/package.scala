@@ -14,6 +14,7 @@ import lucuma.catalog.FaintnessConstraint
 import lucuma.catalog.SaturationConstraint
 import lucuma.core.enums.GuideSpeed
 import lucuma.core.enums.SkyBackground
+import lucuma.core.geom.offsets.GeometryType
 import lucuma.core.math.Angle
 import lucuma.core.math.BrightnessValue
 import lucuma.core.math.Offset
@@ -139,12 +140,6 @@ val UnconstrainedAngles =
   NonEmptyList.fromList(
     (0 until 360 by 10).map(a => Angle.fromDoubleDegrees(a.toDouble)).toList
   )
-
-/**
- * Position of a marker after rotation by position angle.
- */
-object RotatedOffset extends NewType[Offset]
-type RotatedOffset = RotatedOffset.Type
 
 object GuidedOffset extends NewType[Offset]
 type GuidedOffset = GuidedOffset.Type

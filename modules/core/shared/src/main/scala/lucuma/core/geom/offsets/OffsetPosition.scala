@@ -1,7 +1,7 @@
 // Copyright (c) 2016-2025 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package lucuma.ags
+package lucuma.core.geom.offsets
 
 import cats.Order
 import cats.derived.*
@@ -11,6 +11,9 @@ import lucuma.core.enums.SequenceType
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 import lucuma.core.model.sequence.TelescopeConfig
+
+
+private given Order[Angle] = Angle.SignedAngleOrder
 
 /**
  * An offset of a specific geometry type with parameters to rotate around a pivot. This is useful

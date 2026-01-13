@@ -5,7 +5,6 @@ package lucuma.core.geom.jts
 package demo
 
 import cats.syntax.option.*
-import lucuma.ags.GeometryType
 import lucuma.core.enums.Flamingos2Fpu
 import lucuma.core.enums.Flamingos2LyotWheel
 import lucuma.core.enums.GmosNorthFpu
@@ -14,6 +13,7 @@ import lucuma.core.enums.PortDisposition
 import lucuma.core.geom.ShapeExpression
 import lucuma.core.geom.jts.interpreter.given
 import lucuma.core.geom.jts.jvm.syntax.awt.*
+import lucuma.core.geom.offsets.GeometryType
 import lucuma.core.geom.syntax.all.*
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
