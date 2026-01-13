@@ -132,9 +132,9 @@ trait PwfsShapes extends InstrumentShapes:
       ShapeExpression.centeredRectangle(1.arcsec, 1.arcsec).translate(guideStarOffset), // guide star
       patrolField.patrolFieldAt(posAngle, offsetPos),
       probeArm.mirrorAt(probe, guideStarOffset, offsetPos),
-      probeArm.partiallyVignettedMirrorAt(probe, guideStarOffset, offsetPos),
-      probeArm.armHalvesAt(probe, guideStarOffset, offsetPos),
-      probeArm.fullyVignettedArmAt(probe, guideStarOffset, offsetPos)
+      probeArm.mirrorVignettedAreaAt(probe, guideStarOffset, offsetPos),
+      probeArm.armVignettedAreaAt(probe, guideStarOffset, offsetPos),
+      probeArm.armAt(probe, guideStarOffset, offsetPos)
     )
 
 /**

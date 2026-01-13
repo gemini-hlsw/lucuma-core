@@ -234,8 +234,8 @@ trait PwfsProbeArm:
 
     ShapeExpression.polygonAt(points*)
 
-  def armUpperHalf(probe: GuideProbe): ShapeExpression = armHalf(probe, BigDecimal(1.0))
-  def armLowerHalf(probe: GuideProbe): ShapeExpression = armHalf(probe, BigDecimal(-1.0))
+  private def armUpperHalf(probe: GuideProbe): ShapeExpression = armHalf(probe, 1.0)
+  private def armLowerHalf(probe: GuideProbe): ShapeExpression = armHalf(probe, -1.0)
 
   /**
    * Fully vignetted arm region (14 points).
@@ -301,46 +301,44 @@ trait PwfsProbeArm:
       pq(x1, -y1)
     )
 
-  /**
-   * Combined vignetting shape - union of all arm regions.
-   */
-  def vignetteShape(probe: GuideProbe): ShapeExpression =
+  private def vignetteShape(probe: GuideProbe): ShapeExpression =
     partiallyVignettedMirror(probe) ∪
       armUpperHalf(probe) ∪
       armLowerHalf(probe) ∪
       fullyVignettedArm(probe)
 
   /**
-   * Calculate arm angle to reach guide star.
-   * Matches OCS calculation in TpePWFSFeature.java.
+   * Calculate arm angle to reach guide star as ocs in TpePWFSFeature.java.
    */
   private def armAngle(guideStar: Offset, offsetPos: Offset): Angle =
-    val (p, q) = Offset.signedDecimalArcseconds
-      .get(guideStar - offsetPos)
-      .bimap(_.toDouble, _.toDouble)
+    val (p, q) =
+      Offset.signedDecimalArcseconds
+        .get(guideStar - offsetPos)
+        .bimap(_.toDouble, _.toDouble)
 
-    // Half distance to guide star
     val s2 = hypot(p, q) / 2.0
 
-    // Bearing of guide star (OCS uses atan2(-dy, dx))
+    // Bearing of guide star
     val b = atan2(-q, p)
 
     val armLen = armLengthArcsec.value.toDouble
 
     // Angle offset for pivot geometry
-    val d = if (s2 > 0 && armLen > 0) {
-      val ratio = s2 / armLen
-      if (ratio >= 1.0) 0.0
-      else if (ratio <= -1.0) PI
-      else acos(ratio)
-    } else 0.0
+    val d =
+      if (s2 > 0 && armLen > 0) {
+        val ratio = s2 / armLen
+        if (ratio >= 1.0) 0.0
+        else if (ratio <= -1.0) PI
+        else acos(ratio)
+      } else
+        0.0
 
     Angle.fromDoubleRadians(b - d)
 
   /**
-   * Position the vignette shape at a guide star location.
+   * Shape of all the area vignetted, union of mirror and argm mignettes
    */
-  def shapeAt(
+  def vignettedAreaAt(
     probe:     GuideProbe,
     guideStar: Offset,
     offsetPos: Offset
@@ -362,7 +360,7 @@ trait PwfsProbeArm:
   /**
    * Positioned partially vignetted region at guide star location.
    */
-  def partiallyVignettedMirrorAt(
+  def mirrorVignettedAreaAt(
     probe:     GuideProbe,
     guideStar: Offset,
     offsetPos: Offset
@@ -371,9 +369,9 @@ trait PwfsProbeArm:
     partiallyVignettedMirror(probe) ⟲ angle ↗ guideStar
 
   /**
-   * Positioned arm halves (partially vignetted) at guide star location.
+   * Arm shape including the partial shadow inducing vignetting
    */
-  def armHalvesAt(
+  def armVignettedAreaAt(
     probe:     GuideProbe,
     guideStar: Offset,
     offsetPos: Offset
@@ -383,9 +381,9 @@ trait PwfsProbeArm:
     arm ⟲ angle ↗ guideStar
 
   /**
-   * Positioned fully vignetted arm at guide star location.
+   * Arm shape, fully vignetting
    */
-  def fullyVignettedArmAt(
+  def armAt(
     probe:     GuideProbe,
     guideStar: Offset,
     offsetPos: Offset
