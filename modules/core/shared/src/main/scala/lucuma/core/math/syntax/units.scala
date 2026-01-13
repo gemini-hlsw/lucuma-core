@@ -6,17 +6,25 @@ package lucuma.core.math.syntax
 import coulomb.Quantity
 import coulomb.syntax.*
 import lucuma.core.math.units.*
+import coulomb.units.accepted.Millimeter
+import coulomb.units.accepted.*
 
 trait ToUnitsOps {
   extension(v: BigDecimal)
-    def plateScale: PlateScale =
+    inline def mm: Quantity[BigDecimal, Millimeter] =
+      v.withUnit[Millimeter]
+
+    inline def arcsecs: Quantity[BigDecimal, ArcSecond] =
+      v.withUnit[ArcSecond]
+
+    inline def plateScale: PlateScale =
       v.withUnit[ArcSecondPerMillimeter]
 
-    def pixelScale: PixelScale =
+    inline def pixelScale: PixelScale =
       v.withUnit[ArcSecondPerPixel]
 
   extension(v: Int)
-    def pixels: Quantity[Int, Pixels] =
+    inline def pixels: Quantity[Int, Pixels] =
       v.withUnit[Pixels]
 }
 

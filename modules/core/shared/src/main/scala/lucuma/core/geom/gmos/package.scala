@@ -13,11 +13,12 @@ import lucuma.core.enums.GmosXBinning
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 import lucuma.core.math.units.*
+import lucuma.core.math.syntax.units.*
 
-val GmosPixelScale: PixelScale = BigDecimal(0.0807).withUnit[ArcSecondPerPixel]
+val GmosPixelScale: PixelScale = 0.0807.pixelScale
 
 def gmosSlitWidthPixels(slitWidth: Angle, xBin: GmosXBinning): Quantity[BigDecimal, Pixels] =
-  val widthArcSeconds = Angle.decimalArcseconds.get(slitWidth).withUnit[ArcSecond]
+  val widthArcSeconds = Angle.decimalArcseconds.get(slitWidth).arcsecs
   widthArcSeconds / (BigDecimal(xBin.count.value) * GmosPixelScale)
 
 private[gmos] def ifuOffset(fpu: Option[Either[GmosNorthFpu, GmosSouthFpu]]): Offset =
