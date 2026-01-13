@@ -336,4 +336,49 @@ trait PwfsProbeArm:
     val angle = armAngle(guideStar, offsetPos)
     vignetteShape(probe) ⟲ angle ↗ guideStar
 
+  /**
+   * Positioned mirror outline at guide star location.
+   */
+  def mirrorAt(
+    probe:     GuideProbe,
+    guideStar: Offset,
+    offsetPos: Offset
+  ): ShapeExpression =
+    val angle = armAngle(guideStar, offsetPos)
+    mirror(probe) ⟲ angle ↗ guideStar
+
+  /**
+   * Positioned partially vignetted region at guide star location.
+   */
+  def partiallyVignettedMirrorAt(
+    probe:     GuideProbe,
+    guideStar: Offset,
+    offsetPos: Offset
+  ): ShapeExpression =
+    val angle = armAngle(guideStar, offsetPos)
+    partiallyVignettedMirror(probe) ⟲ angle ↗ guideStar
+
+  /**
+   * Positioned arm halves (partially vignetted) at guide star location.
+   */
+  def armHalvesAt(
+    probe:     GuideProbe,
+    guideStar: Offset,
+    offsetPos: Offset
+  ): ShapeExpression =
+    val angle = armAngle(guideStar, offsetPos)
+    val arm = armUpperHalf(probe) ∪ armLowerHalf(probe)
+    arm ⟲ angle ↗ guideStar
+
+  /**
+   * Positioned fully vignetted arm at guide star location.
+   */
+  def fullyVignettedArmAt(
+    probe:     GuideProbe,
+    guideStar: Offset,
+    offsetPos: Offset
+  ): ShapeExpression =
+    val angle = armAngle(guideStar, offsetPos)
+    fullyVignettedArm(probe) ⟲ angle ↗ guideStar
+
 object probeArm extends PwfsProbeArm

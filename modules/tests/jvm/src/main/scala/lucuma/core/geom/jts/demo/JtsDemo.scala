@@ -131,7 +131,10 @@ trait PwfsShapes extends InstrumentShapes:
     List(
       ShapeExpression.centeredRectangle(1.arcsec, 1.arcsec).translate(guideStarOffset), // guide star
       patrolField.patrolFieldAt(posAngle, offsetPos),
-      probeArm.shapeAt(probe, guideStarOffset, offsetPos)
+      probeArm.mirrorAt(probe, guideStarOffset, offsetPos),
+      probeArm.partiallyVignettedMirrorAt(probe, guideStarOffset, offsetPos),
+      probeArm.armHalvesAt(probe, guideStarOffset, offsetPos),
+      probeArm.fullyVignettedArmAt(probe, guideStarOffset, offsetPos)
     )
 
 /**
@@ -287,4 +290,4 @@ object JtsFlamingos2LSDemo extends JtsDemo with Flamingos2LSShapes
 object JtsGmosImagingDemo extends JtsDemo with GmosImagingShapes
 
 object JtsPwfsDemo extends JtsDemo with PwfsShapes:
-  override val arcsecPerPixel: Double = 0.4  // Show full 417" radius patrol field
+  override val arcsecPerPixel: Double = 0.5  // Show full arm (~644" length)
