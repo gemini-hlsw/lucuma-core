@@ -19,7 +19,6 @@ import lucuma.core.util.TimeSpan
 
 import java.time.Duration
 import java.time.Instant
-import scala.collection.immutable.SortedSet
 
 extension (posAngleConstraint: PosAngleConstraint)
   def anglesToTestAt(
@@ -49,12 +48,11 @@ extension (posAngleConstraint: PosAngleConstraint)
 
 extension (o: Offset) def guided: GuidedOffset = GuidedOffset(o)
 
-extension (c: NonEmptyList[TelescopeConfig])
+extension (c: NonEmptySet[TelescopeConfig])
   def guidedOffsets: Option[NonEmptySet[GuidedOffset]] =
     NonEmptySet.fromSet:
-      SortedSet.from:
-        c.collect:
-          case TelescopeConfig(o, StepGuideState.Enabled) => GuidedOffset(o)
+      c.collect:
+        case TelescopeConfig(o, StepGuideState.Enabled) => GuidedOffset(o)
 
   def asAcqOffsets: Option[AcquisitionOffsets] = guidedOffsets.map(AcquisitionOffsets.apply)
 
