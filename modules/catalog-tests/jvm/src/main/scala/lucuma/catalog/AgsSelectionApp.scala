@@ -78,16 +78,20 @@ trait AgsSelectionSample {
       )
     )
 
-  val gmosParams = AgsParams.GmosAgsParams(
-    GmosNorthFpu.LongSlit_0_25.asLeft.some,
-    PortDisposition.Bottom
-  )
+  val gmosParams = AgsParams
+    .GmosAgsParams(
+      GmosNorthFpu.LongSlit_0_25.asLeft.some,
+      PortDisposition.Bottom
+    )
+    .withPWFS2
 
-  val flamingos2Params = AgsParams.Flamingos2AgsParams(
-    Flamingos2LyotWheel.F16,
-    Flamingos2FpuMask.Builtin(Flamingos2Fpu.LongSlit3),
-    PortDisposition.Bottom
-  )
+  val flamingos2Params = AgsParams
+    .Flamingos2AgsParams(
+      Flamingos2LyotWheel.F16,
+      Flamingos2FpuMask.Builtin(Flamingos2Fpu.LongSlit3),
+      PortDisposition.Bottom
+    )
+    .withPWFS1
 
   val constraints = ConstraintSet(
     ImageQuality.Preset.PointSix,
