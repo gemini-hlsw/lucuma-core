@@ -8,7 +8,6 @@ import cats.Order
 import cats.data.NonEmptyList
 import cats.data.NonEmptyMap
 import cats.derived.*
-import cats.syntax.eq.*
 import lucuma.core.enums.Flamingos2LyotWheel
 import lucuma.core.enums.GmosNorthFpu
 import lucuma.core.enums.GmosSouthFpu
@@ -99,9 +98,8 @@ trait SingleProbeAgsParams:
 
 trait PwfsSupport[A]:
   def probe: GuideProbe
-  def withPWFS1: A     = withProbe(GuideProbe.PWFS1)
-  def withPWFS2: A     = withProbe(GuideProbe.PWFS2)
-  def usePwfs: Boolean = probe === GuideProbe.PWFS1 || probe === GuideProbe.PWFS2
+  def withPWFS1: A = withProbe(GuideProbe.PWFS1)
+  def withPWFS2: A = withProbe(GuideProbe.PWFS2)
   protected def withProbe(probe: GuideProbe): A
 
 sealed trait AgsParams derives Eq:
