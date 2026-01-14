@@ -12,8 +12,8 @@ import lucuma.core.enums.GmosSouthFpu
 import lucuma.core.enums.GmosXBinning
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
-import lucuma.core.math.units.*
 import lucuma.core.math.syntax.units.*
+import lucuma.core.math.units.*
 
 val GmosPixelScale: PixelScale = 0.0807.pixelScale
 

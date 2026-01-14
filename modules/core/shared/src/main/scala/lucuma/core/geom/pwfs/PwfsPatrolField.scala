@@ -10,7 +10,7 @@ import lucuma.core.math.Offset
 import lucuma.core.math.syntax.int.*
 
 /**
- * Description of the PWFS patrol field geometry.
+ * PWFS patrol field geometry.
  */
 trait PwfsPatrolField:
   /**
@@ -19,31 +19,18 @@ trait PwfsPatrolField:
   val PwfsRadius: Angle = 417.arcsec
 
   /**
-   * Boundary margin for guide star checking.
+   * Boundary margin for guide star checking
    */
   val Margin: Angle = 2.arcsec
 
   val PwfsDiameter: Angle = PwfsRadius * 2
 
   /**
-   * PWFS patrol field circle centered at the base position and with 417 arcsec radius.
+   * PWFS patrol field circle centered at the base position
+   * OCS has inner and outer field areas but in gpp we are going to use vignetting instead
    */
   val patrolField: ShapeExpression =
     ShapeExpression.centeredEllipse(PwfsDiameter, PwfsDiameter)
-
-  /**
-   * Inner patrol field boundary
-   */
-  val patrolFieldIn: ShapeExpression =
-    val innerDiameter = PwfsDiameter - Margin * 2
-    ShapeExpression.centeredEllipse(innerDiameter, innerDiameter)
-
-  /**
-   * Outer patrol field boundary
-   */
-  val patrolFieldOut: ShapeExpression =
-    val outerDiameter = PwfsDiameter + Margin * 2
-    ShapeExpression.centeredEllipse(outerDiameter, outerDiameter)
 
   /**
    * PWFS patrol field shape, in context.
@@ -60,19 +47,5 @@ trait PwfsPatrolField:
     pivot:     Offset = Offset.Zero
   ): ShapeExpression =
     patrolField.shapePivotAt(posAngle, offsetPos, pivot)
-
-  def patrolFieldInAt(
-    posAngle:  Angle,
-    offsetPos: Offset,
-    pivot:     Offset = Offset.Zero
-  ): ShapeExpression =
-    patrolFieldIn.shapePivotAt(posAngle, offsetPos, pivot)
-
-  def patrolFieldOutAt(
-    posAngle:  Angle,
-    offsetPos: Offset,
-    pivot:     Offset = Offset.Zero
-  ): ShapeExpression =
-    patrolFieldOut.shapePivotAt(posAngle, offsetPos, pivot)
 
 object patrolField extends PwfsPatrolField

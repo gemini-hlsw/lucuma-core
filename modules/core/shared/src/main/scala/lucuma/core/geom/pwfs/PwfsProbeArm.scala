@@ -14,8 +14,8 @@ import lucuma.core.geom.ShapeExpression
 import lucuma.core.geom.syntax.all.*
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
-import lucuma.core.math.units.*
 import lucuma.core.math.syntax.units.*
+import lucuma.core.math.units.*
 
 import java.lang.Math.PI
 import java.lang.Math.acos
@@ -49,7 +49,6 @@ trait PwfsProbeArm:
   private val ZeroMM = 0.0.mm
   private val ZeroArcsec  = 0.0.arcsecs
 
-  // Accessors for probe-specific values
   private def fplaneSep(probe: GuideProbe): Quantity[BigDecimal, Millimeter] =
     probe match
       case GuideProbe.PWFS1 => Pwfs1FplaneSep
@@ -74,16 +73,15 @@ trait PwfsProbeArm:
       case GuideProbe.PWFS2 => Pwfs2ArmWidth
       case _                => ZeroMM
 
-  // Derived values - vignetting geometry
-  // dr: M2 offset used to create the smooth vignetting region boundary
+  // M2 radius projected to the PWFS focal plane distance
   private def dr(probe: GuideProbe): Quantity[BigDecimal, Millimeter] =
     M2Radius * fplaneSep(probe) / M2FplaneSep
 
-  // step: Width of the notch (half the difference between arm width and mirror width)
+  // Width of the notch (half the difference between arm width and mirror width)
   private def step(probe: GuideProbe): Quantity[BigDecimal, Millimeter] =
     (armWidth(probe) - mirrorWidth(probe)) / 2
 
-  // dxl: X displacement for the rounded notch corner
+  // X displacement for the rounded notch corner
   private def dxl(probe: GuideProbe): Quantity[BigDecimal, Millimeter] =
     val d = dr(probe).value
     val s = step(probe).value
@@ -92,12 +90,11 @@ trait PwfsProbeArm:
   // Arm length in arcsec
   private val armLengthArcsec: Quantity[BigDecimal, ArcSecond] = ArmLength ⨱ PlateScale
 
-  // Helper to create P/Q offsets from arcsec Quantities
-  private def pq(x: Quantity[BigDecimal, ArcSecond], y: Quantity[BigDecimal, ArcSecond]): (Offset.P, Offset.Q) =
+  private def toPQ(x: Quantity[BigDecimal, ArcSecond], y: Quantity[BigDecimal, ArcSecond]): (Offset.P, Offset.Q) =
     (x.toAngle.p, y.toAngle.q)
 
   /**
-   * Mirror outline (4 points) - the actual pickoff mirror rectangle.
+   * The actual pickoff mirror rectangle.
    * Slightly inset from vignetting boundary by dr.
    */
   def mirror(probe: GuideProbe): ShapeExpression =
@@ -116,14 +113,14 @@ trait PwfsProbeArm:
     val y4 = y1
 
     ShapeExpression.polygonAt(
-      pq(x1, y1),
-      pq(x2, y2),
-      pq(x3, y3),
-      pq(x4, y4)
+      toPQ(x1, y1),
+      toPQ(x2, y2),
+      toPQ(x3, y3),
+      toPQ(x4, y4)
     )
 
   /**
-   * Partially vignetted region around the mirror (10 points).
+   * Partially vignetted region around the mirror
    * This is the outer halo with rounded corners.
    */
   def partiallyVignettedMirror(probe: GuideProbe): ShapeExpression =
@@ -154,22 +151,22 @@ trait PwfsProbeArm:
     val x5 = (-ml / 2 + dx) ⨱ PlateScale
     val y5 = y4
 
-    // Points 6-10: reflection through y axis
     ShapeExpression.polygonAt(
-      pq(x1, y1),
-      pq(x2, y2),
-      pq(x3, y3),
-      pq(x4, y4),
-      pq(x5, y5),
-      pq(x5, -y5),
-      pq(x4, -y4),
-      pq(x3, -y3),
-      pq(x2, -y2),
-      pq(x1, -y1)
+      toPQ(x1, y1),
+      toPQ(x2, y2),
+      toPQ(x3, y3),
+      toPQ(x4, y4),
+      toPQ(x5, y5),
+      // Reflect through y axis
+      toPQ(x5, -y5),
+      toPQ(x4, -y4),
+      toPQ(x3, -y3),
+      toPQ(x2, -y2),
+      toPQ(x1, -y1)
     )
 
   /**
-   * Arm shape - one half (upper or lower based on sign).
+   * One half of the arm (upper or lower based on sign).
    * Extends from the notch back to the pivot.
    */
   private def armHalf(probe: GuideProbe, sign: BigDecimal): ShapeExpression =
@@ -192,9 +189,9 @@ trait PwfsProbeArm:
     val y3 = (aw / 2 + d) ⨱ PlateScale
 
     // Intermediate point for PWFS2
-    val (x23, y23) = if (probe == GuideProbe.PWFS2)
-      (((x2 + x3) / 2), ((y2 + y3) / 2))
-    else (ZeroArcsec, ZeroArcsec)
+    val (x23, y23) =
+      if (probe == GuideProbe.PWFS2) (((x2 + x3) / 2), ((y2 + y3) / 2))
+      else (ZeroArcsec, ZeroArcsec)
 
     // Point along arm
     val x4 = x3 - d ⨱ PlateScale
@@ -210,27 +207,28 @@ trait PwfsProbeArm:
     val x7 = x1
     val y7 = y1
 
-    val points = if (probe === GuideProbe.PWFS2)
-      List(
-        pq(x1, (sign * y1)),
-        pq(x2, (sign * y2)),
-        pq(x23, (sign * y23)),
-        pq(x3, (sign * y3)),
-        pq(x4, (sign * y4)),
-        pq(x5, (sign * y5)),
-        pq(x6, (sign * y6)),
-        pq(x7, (sign * y7))
-      )
-    else
-      List(
-        pq(x1, (sign * y1)),
-        pq(x2, (sign * y2)),
-        pq(x3, (sign * y3)),
-        pq(x4, (sign * y4)),
-        pq(x5, (sign * y5)),
-        pq(x6, (sign * y6)),
-        pq(x7, (sign * y7)),
-      )
+    val points =
+      if (probe === GuideProbe.PWFS2)
+        List(
+          toPQ(x1, (sign * y1)),
+          toPQ(x2, (sign * y2)),
+          toPQ(x23, (sign * y23)),
+          toPQ(x3, (sign * y3)),
+          toPQ(x4, (sign * y4)),
+          toPQ(x5, (sign * y5)),
+          toPQ(x6, (sign * y6)),
+          toPQ(x7, (sign * y7))
+        )
+      else
+        List(
+          toPQ(x1, (sign * y1)),
+          toPQ(x2, (sign * y2)),
+          toPQ(x3, (sign * y3)),
+          toPQ(x4, (sign * y4)),
+          toPQ(x5, (sign * y5)),
+          toPQ(x6, (sign * y6)),
+          toPQ(x7, (sign * y7)),
+        )
 
     ShapeExpression.polygonAt(points*)
 
@@ -238,7 +236,7 @@ trait PwfsProbeArm:
   private def armLowerHalf(probe: GuideProbe): ShapeExpression = armHalf(probe, -1.0)
 
   /**
-   * Fully vignetted arm region (14 points).
+   * Fully vignetted arm region
    * The inner part of the arm that's completely blocked.
    */
   def fullyVignettedArm(probe: GuideProbe): ShapeExpression =
@@ -263,42 +261,43 @@ trait PwfsProbeArm:
     val y6 = (aw / 2 - d) ⨱ PlateScale
 
     // Intermediate points for smooth curve
-    val (x4, y4, x5, y5) = if (probe === GuideProbe.PWFS1) {
-      val theta = math.asin((dx / d).value.toDouble) / 3.0
-      (
-        x3 - (d * math.sin(theta)) ⨱ PlateScale,
-        y3 + (d * (1.0 - math.cos(theta))) ⨱ PlateScale,
-        x3 - (d * math.sin(2.0 * theta)) ⨱ PlateScale,
-        y3 + (d * (1.0 - math.cos(2.0 * theta))) ⨱ PlateScale
-      )
-    } else {
-      (
-        (x3 + (x6 - x3) / 3),
-        (y3 + (y6 - y3) / 3),
-        (x3 + BigDecimal(2) * (x6 - x3) / 3),
-        (y3 + BigDecimal(2) * (y6 - y3) / 3)
-      )
-    }
+    val (x4, y4, x5, y5) = 
+      if (probe === GuideProbe.PWFS1) {
+        val theta = math.asin((dx / d).value.toDouble) / 3.0
+
+        (
+          x3 - (d * math.sin(theta)) ⨱ PlateScale,
+          y3 + (d * (1.0 - math.cos(theta))) ⨱ PlateScale,
+          x3 - (d * math.sin(2.0 * theta)) ⨱ PlateScale,
+          y3 + (d * (1.0 - math.cos(2.0 * theta))) ⨱ PlateScale
+        )
+      } else
+        (
+          (x3 + (x6 - x3) / 3),
+          (y3 + (y6 - y3) / 3),
+          (x3 + BigDecimal(2) * (x6 - x3) / 3),
+          (y3 + BigDecimal(2) * (y6 - y3) / 3)
+        )
 
     val x7 = -r
     val y7 = y6
 
     ShapeExpression.polygonAt(
-      pq(x1, y1),
-      pq(x2, y2),
-      pq(x3, y3),
-      pq(x4, y4),
-      pq(x5, y5),
-      pq(x6, y6),
-      pq(x7, y7),
+      toPQ(x1, y1),
+      toPQ(x2, y2),
+      toPQ(x3, y3),
+      toPQ(x4, y4),
+      toPQ(x5, y5),
+      toPQ(x6, y6),
+      toPQ(x7, y7),
       // Reflect through y axis
-      pq(x7, -y7),
-      pq(x6, -y6),
-      pq(x5, -y5),
-      pq(x4, -y4),
-      pq(x3, -y3),
-      pq(x2, -y2),
-      pq(x1, -y1)
+      toPQ(x7, -y7),
+      toPQ(x6, -y6),
+      toPQ(x5, -y5),
+      toPQ(x4, -y4),
+      toPQ(x3, -y3),
+      toPQ(x2, -y2),
+      toPQ(x1, -y1)
     )
 
   private def vignetteShape(probe: GuideProbe): ShapeExpression =

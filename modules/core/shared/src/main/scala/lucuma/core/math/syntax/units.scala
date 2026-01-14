@@ -5,9 +5,9 @@ package lucuma.core.math.syntax
 
 import coulomb.Quantity
 import coulomb.syntax.*
-import lucuma.core.math.units.*
-import coulomb.units.accepted.Millimeter
 import coulomb.units.accepted.*
+import coulomb.units.accepted.Millimeter
+import lucuma.core.math.units.*
 
 trait ToUnitsOps {
   extension(v: BigDecimal)
