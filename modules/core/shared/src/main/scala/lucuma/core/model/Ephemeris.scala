@@ -33,7 +33,7 @@ sealed trait Ephemeris[E <: Ephemeris.Element]:
 
 object Ephemeris:
 
-  trait Element:
+  sealed trait Element:
     def when: Instant
     def coordinates: Coordinates
     def velocity: Offset
@@ -159,13 +159,13 @@ object Ephemeris:
      * Identifies a user-supplied collection of ephemeris data, where the number
      * comes from a database sequence.
      */
-    final case class UserSupplied(id: Int) extends Key {
+    final case class UserSupplied(id: Long) extends Key {
       override def des: String =
         id.toString
     }
 
     object UserSupplied {
-      val id: Lens[UserSupplied, Int] = Focus[UserSupplied](_.id)
+      val id: Lens[UserSupplied, Long] = Focus[UserSupplied](_.id)
     }
 
     given Show[Key] =

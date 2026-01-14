@@ -26,6 +26,9 @@ trait EphemerisKeyParsers {
   private def numDes[A](s: String)(f: Int => A): Parser[A] =
     des(s, signedInt.map(v => f(v.toInt)))
 
+  private def longDes[A](s: String)(f: Long => A): Parser[A] =
+    des(s, signedInt.map(v => f(v.toLong)))
+
   val comet: Parser[Comet] =
     textDes("Comet")(Comet.apply).withContext("comet")
 
@@ -39,7 +42,7 @@ trait EphemerisKeyParsers {
     numDes("MajorBody")(MajorBody.apply).withContext("majorBody")
 
   val userSupplied: Parser[UserSupplied] =
-    numDes("UserSupplied")(UserSupplied.apply).withContext("userSupplied")
+    longDes("UserSupplied")(UserSupplied.apply).withContext("userSupplied")
 
   val ephemerisKey: Parser[Ephemeris.Key] =
     (comet.widen[Ephemeris.Key] |

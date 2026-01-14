@@ -20,6 +20,9 @@ trait ArbEphemerisKey {
   private def genIntDes[A](f: Int => A): Gen[A] =
     arbitrary[Int].map(f)
 
+  private def genLongDes[A](f: Long => A): Gen[A] =
+    arbitrary[Long].map(f)
+
   given Arbitrary[Ephemeris.Key] =
     Arbitrary {
       Gen.oneOf[Ephemeris.Key](
@@ -27,7 +30,7 @@ trait ArbEphemerisKey {
         genStringDes(AsteroidNew.apply),
         genIntDes(AsteroidOld.apply),
         genIntDes(MajorBody.apply),
-        genIntDes(UserSupplied.apply)
+        genLongDes(UserSupplied.apply)
       )
     }
 
