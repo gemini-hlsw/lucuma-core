@@ -104,11 +104,11 @@ trait GmosAgsVisualizationShapes(val posAngle: Angle) extends InstrumentShapes:
 
   // Color and stroke mapping by GeometryType
   val geometryStyle: Map[GeometryType, (Color, BasicStroke)] = Map(
-    GeometryType.BlindOffset  -> (Color.RED, thickStroke),
-    GeometryType.AcqGuidedOffset    -> (Color.CYAN, largeDashStroke),
-    GeometryType.SciGuidedOffset    -> (Color.BLUE, smallDashStroke),
-    GeometryType.Base         -> (Color.MAGENTA, solidStroke),
-    GeometryType.Intersection -> (Color.BLACK, solidStroke)
+    GeometryType.BlindOffset     -> (Color.RED, thickStroke),
+    GeometryType.AcqGuidedOffset -> (Color.CYAN, largeDashStroke),
+    GeometryType.SciGuidedOffset -> (Color.BLUE, smallDashStroke),
+    GeometryType.Base            -> (Color.MAGENTA, solidStroke),
+    GeometryType.AgsIntersection -> (Color.BLACK, solidStroke)
   )
 
   override def coloredShapes: List[ColoredShape] = {
