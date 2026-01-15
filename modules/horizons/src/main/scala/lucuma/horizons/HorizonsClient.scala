@@ -4,22 +4,23 @@
 package lucuma.horizons
 
 import cats.effect.Temporal
+import cats.syntax.all.*
 import fs2.Stream
 import fs2.text
+import lucuma.core.data.PerSite
+import lucuma.core.enums.Site
 import lucuma.core.model.Ephemeris
 import org.http4s.Request
 import org.http4s.Uri
 import org.http4s.client.Client
 import org.typelevel.log4cats.Logger
-import cats.syntax.all.*
+
 import java.time.Instant
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import scala.concurrent.duration.*
 
 import HorizonsConstants.*
-import lucuma.core.data.PerSite
-import lucuma.core.enums.Site
 
 trait HorizonsClient[F[_]]:
 
