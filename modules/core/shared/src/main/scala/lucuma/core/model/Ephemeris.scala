@@ -194,7 +194,7 @@ object Ephemeris:
             case EphemerisKeyType.AsteroidNew  => Some(Key.AsteroidNew(des))
             case EphemerisKeyType.AsteroidOld  => des.parseIntOption.map(Key.AsteroidOld(_))
             case EphemerisKeyType.MajorBody    => des.parseIntOption.map(Key.MajorBody(_))
-            case EphemerisKeyType.UserSupplied => des.parseIntOption.map(Key.UserSupplied(_))
+            case EphemerisKeyType.UserSupplied => des.parseLongOption.map(Key.UserSupplied(_))
           }
         },
         k => (k.keyType, k.des)
