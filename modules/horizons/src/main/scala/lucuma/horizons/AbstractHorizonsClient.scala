@@ -29,12 +29,15 @@ private[horizons] abstract class AbstractHorizonsClient[F[_]: Temporal] extends 
     start: Instant,
     stop: Instant,
     elems: Int,
+    sites: HorizonsClient.SiteOption,
   ): F[Either[String, Ephemeris.Horizons]] =
     if !stop.isAfter(start) then Left("Stop must fall after start.").pure[F]
     else if elems < 1 then Left("Cannot select fewer than one element.").pure[F]
     else
       PerSite
-      .unfoldF(fetch(key, _, start, stop, elems))
+      .unfoldF: s =>
+        if sites(s) then fetch(key, s, start, stop, elems)
+        else Right(Nil).pure[F]
       .map: ps =>
         ps.sequence.map(Ephemeris.Horizons(key, start, stop, _))         
   

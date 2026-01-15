@@ -11,13 +11,15 @@ import org.http4s.Request
 import org.http4s.Uri
 import org.http4s.client.Client
 import org.typelevel.log4cats.Logger
-
+import cats.syntax.all.*
 import java.time.Instant
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import scala.concurrent.duration.*
 
 import HorizonsConstants.*
+import lucuma.core.data.PerSite
+import lucuma.core.enums.Site
 
 trait HorizonsClient[F[_]]:
 
@@ -31,7 +33,7 @@ trait HorizonsClient[F[_]]:
   def resolve[A](search: HorizonsClient.Search[A]): F[Either[String, List[(A, String)]]]
 
   /** 
-   * Select the ephemeris for the specified key, site, interval, and desired number of elements.
+   * Select the ephemeris for the specified key, interval, desired number of elements, and sites.
    * The number of elements returned will be approximately `elems`, with the caveat that there will
    * never be more than one element per minute.
    */
@@ -40,6 +42,7 @@ trait HorizonsClient[F[_]]:
     start: Instant,
     stop: Instant,
     elems: Int,
+    sites: HorizonsClient.SiteOption = HorizonsClient.SiteOption.Both
   ): F[Either[String, Ephemeris.Horizons]]
 
   /**
@@ -52,6 +55,7 @@ trait HorizonsClient[F[_]]:
     start: Instant,
     days: Int,
     cadence: HorizonsClient.ElementsPerDay,
+    sites: HorizonsClient.SiteOption = HorizonsClient.SiteOption.Both
   ): F[Either[String, Ephemeris.Horizons]] =
     val aligned = 
       ZonedDateTime
@@ -60,9 +64,16 @@ trait HorizonsClient[F[_]]:
         .withMinute(0)
         .withSecond(0)     
         .withNano(0)       
-    ephemeris(key, aligned.toInstant, aligned.plusDays(days).toInstant, days * cadence)
+    ephemeris(key, aligned.toInstant, aligned.plusDays(days).toInstant, days * cadence, sites)
 
 object HorizonsClient:
+
+  type SiteOption = PerSite[Boolean]
+  object SiteOption:
+    def forSite(site: Site): SiteOption = PerSite.unfold(_ === site)
+    def GN: SiteOption = forSite(Site.GN)
+    def GS: SiteOption = forSite(Site.GS)
+    def Both: SiteOption = PerSite.const(true)
 
   /** Even divisors of 24 */
   type ElementsPerDay = 1 | 2 | 3 | 4 | 6 | 8 | 12 | 24
