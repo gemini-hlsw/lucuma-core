@@ -112,6 +112,63 @@ trait Flamingos2LSShapes extends InstrumentShapes:
       scienceArea.shapeAt(posAngle, offsetPos, lyot, fpu),
     )
 
+// Just pwfs probe
+trait PwfsShapes extends InstrumentShapes:
+  import lucuma.core.geom.pwfs.*
+  import lucuma.core.enums.GuideProbe
+
+  val posAngle: Angle =
+    0.deg
+
+  val offsetPos: Offset =
+    Offset.Zero
+
+  val guideStarOffset: Offset =
+    Offset(50.arcsec.p, 50.arcsec.q)
+
+  val probe: GuideProbe = GuideProbe.PWFS1
+
+  def shapes: List[ShapeExpression] =
+    List(
+      ShapeExpression.centeredRectangle(1.arcsec, 1.arcsec).translate(guideStarOffset), // guide star
+      patrolField.patrolFieldAt(posAngle, offsetPos),
+      probeArm.mirrorAt(probe, guideStarOffset, offsetPos),
+      probeArm.mirrorVignettedAreaAt(probe, guideStarOffset, offsetPos),
+      probeArm.armVignettedAreaAt(probe, guideStarOffset, offsetPos),
+      probeArm.armAt(probe, guideStarOffset, offsetPos)
+    )
+
+// pwfs probe and gmos LS
+trait GmosWithPwfsShapes extends InstrumentShapes:
+  import lucuma.core.geom.gmos.scienceArea
+  import lucuma.core.geom.pwfs.{patrolField, probeArm}
+  import lucuma.core.enums.GuideProbe
+
+  val posAngle: Angle =
+    15.deg
+
+  val offsetPos: Offset =
+    Offset(-60.arcsec.p, 60.arcsec.q)
+
+  val guideStarOffset: Offset =
+    Offset(270.arcsec.p, 224.arcsec.q)
+
+  val fpu: Option[Either[GmosNorthFpu, GmosSouthFpu]] =
+    Some(Right(GmosSouthFpu.LongSlit_5_00))
+
+  val probe: GuideProbe = GuideProbe.PWFS2
+
+  def shapes: List[ShapeExpression] =
+    List(
+      ShapeExpression.centeredRectangle(1.arcsec, 1.arcsec).translate(guideStarOffset), // guide star
+      scienceArea.shapeAt(posAngle, offsetPos, fpu),
+      patrolField.patrolFieldAt(posAngle, offsetPos),
+      probeArm.mirrorAt(probe, guideStarOffset, offsetPos),
+      probeArm.mirrorVignettedAreaAt(probe, guideStarOffset, offsetPos),
+      probeArm.armVignettedAreaAt(probe, guideStarOffset, offsetPos),
+      probeArm.armAt(probe, guideStarOffset, offsetPos)
+    )
+
 /**
  * Throwaway demo code to visualize a shape created using `ShapeExpression`s.
  */
@@ -263,3 +320,9 @@ object JtsGmosLSDemo extends JtsDemo with GmosLSShapes
 object JtsFlamingos2LSDemo extends JtsDemo with Flamingos2LSShapes
 
 object JtsGmosImagingDemo extends JtsDemo with GmosImagingShapes
+
+object JtsPwfsDemo extends JtsDemo with PwfsShapes:
+  override val arcsecPerPixel: Double = 0.5
+
+object JtsGmosWithPwfsDemo extends JtsDemo with GmosWithPwfsShapes:
+  override val arcsecPerPixel: Double = 0.75

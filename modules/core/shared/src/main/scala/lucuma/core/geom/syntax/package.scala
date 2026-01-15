@@ -48,3 +48,4 @@ object all extends shapeexpression:
   extension[U](o: Offset)
     def toDoubleArcseconds: (BigDecimal, BigDecimal) =
       (Angle.signedDecimalArcseconds.get(o.p.toAngle), Angle.signedDecimalArcseconds.get(o.q.toAngle))
+
