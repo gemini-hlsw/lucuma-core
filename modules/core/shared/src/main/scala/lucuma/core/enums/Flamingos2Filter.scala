@@ -30,3 +30,11 @@ object Flamingos2Filter:
   /** Acquisition filter options. */
   val acquisition: NonEmptyList[Flamingos2Filter] =
     NonEmptyList.of(J, H, KShort)
+
+  /** Filters usable in spectrosocpy */
+  val spectroscopic: NonEmptyList[Flamingos2Filter] =
+    // KBlue and KRed cannot be used in spectroscopy
+    NonEmptyList.of(Y, J, H, JH, HK, JLow, KLong, KShort)
+
+  val spectroscopyFilters: Enumerated[Flamingos2Filter] =
+    Enumerated.fromNEL(spectroscopic).withTag(_.tag)
