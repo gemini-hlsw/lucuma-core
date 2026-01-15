@@ -5,20 +5,21 @@ package lucuma.core.geom.jts
 package demo
 
 import cats.data.NonEmptyList
+import cats.data.NonEmptySet
 import cats.syntax.eq.*
 import cats.syntax.option.*
 import lucuma.ags.AcquisitionOffsets
 import lucuma.ags.Ags
 import lucuma.ags.AgsParams.GmosAgsParams
-import lucuma.ags.AgsPosition
 import lucuma.ags.AgsVisualization
-import lucuma.ags.GeometryType
 import lucuma.ags.ScienceOffsets
 import lucuma.ags.syntax.*
 import lucuma.core.enums.GmosNorthFpu
 import lucuma.core.enums.GmosSouthFpu
 import lucuma.core.enums.PortDisposition
 import lucuma.core.geom.ShapeExpression
+import lucuma.core.geom.offsets.GeometryType
+import lucuma.core.geom.offsets.OffsetPosition
 import lucuma.core.geom.syntax.all.*
 import lucuma.core.math.Angle
 import lucuma.core.math.Coordinates
@@ -47,14 +48,14 @@ trait GmosAgsVisualizationShapes(val posAngle: Angle) extends InstrumentShapes:
     baseCoordinates.offsetBy(Angle.Angle0, blindOffsetRaw).get
 
   val acqOffsets: AcquisitionOffsets = AcquisitionOffsets(
-    NonEmptyList.of(
+    NonEmptySet.of(
       Offset(0.arcsec.p, -10.arcsec.q).guided,
       Offset(10.arcsec.p,  0.arcsec.q).guided
     )
   )
 
   val scienceOffsets: ScienceOffsets = ScienceOffsets(
-    NonEmptyList.of(
+    NonEmptySet.of(
       Offset(0.arcsec.p,  15.arcsec.q).guided,
       Offset.Zero.guided,
       Offset(0.arcsec.p, -15.arcsec.q).guided
@@ -62,14 +63,14 @@ trait GmosAgsVisualizationShapes(val posAngle: Angle) extends InstrumentShapes:
   )
 
   // each relevant ags position
-  lazy val positions: NonEmptyList[AgsPosition] =
+  lazy val positions: NonEmptyList[OffsetPosition] =
     Ags.generatePositions(
-      baseCoordinates,
+      baseCoordinates.some,
       blindOffset.some,
       NonEmptyList.one(posAngle),
       acqOffsets.some,
       scienceOffsets.some
-    )
+    ).value.toNonEmptyList
 
   val params: GmosAgsParams = GmosAgsParams(fpu, port)
 
@@ -77,7 +78,7 @@ trait GmosAgsVisualizationShapes(val posAngle: Angle) extends InstrumentShapes:
 
   lazy val scienceViz = AgsVisualization.scienceOverlapVisualization(
     params,
-    AgsPosition(GeometryType.Base, posAngle, Offset.Zero),
+    OffsetPosition(GeometryType.Base, Offset.Zero, posAngle),
     guideStarOffset
   )
 
@@ -103,11 +104,11 @@ trait GmosAgsVisualizationShapes(val posAngle: Angle) extends InstrumentShapes:
 
   // Color and stroke mapping by GeometryType
   val geometryStyle: Map[GeometryType, (Color, BasicStroke)] = Map(
-    GeometryType.BlindOffset  -> (Color.RED, thickStroke),
-    GeometryType.AcqOffset    -> (Color.CYAN, largeDashStroke),
-    GeometryType.SciOffset    -> (Color.BLUE, smallDashStroke),
-    GeometryType.Base         -> (Color.MAGENTA, solidStroke),
-    GeometryType.Intersection -> (Color.BLACK, solidStroke)
+    GeometryType.BlindOffset     -> (Color.RED, thickStroke),
+    GeometryType.AcqGuidedOffset -> (Color.CYAN, largeDashStroke),
+    GeometryType.SciGuidedOffset -> (Color.BLUE, smallDashStroke),
+    GeometryType.Base            -> (Color.MAGENTA, solidStroke),
+    GeometryType.AgsIntersection -> (Color.BLACK, solidStroke)
   )
 
   override def coloredShapes: List[ColoredShape] = {
@@ -146,14 +147,14 @@ trait GmosAgsVisualizationShapes(val posAngle: Angle) extends InstrumentShapes:
       new Color(255, 0, 0, 100)
     )
 
-    val scienceOffPos = scienceOffsets.value.toList.map: offset =>
+    val scienceOffPos = scienceOffsets.value.toSortedSet.toList.map: offset =>
       ColoredShape(crossAt(offset.value.rotate(posAngle)), Color.BLUE)
 
     // Acquisition offset markers - use the actual location from positions
     val acqOffPos = positions.toList
-      .filter(_.geometryType == GeometryType.AcqOffset)
+      .filter(_.geometryType == GeometryType.AcqGuidedOffset)
       .map: pos =>
-        ColoredShape(crossAt(pos.location), Color.ORANGE)
+        ColoredShape(crossAt(pos.rotatedOffset.value), Color.ORANGE)
 
     val blindMarker = ColoredShape(
       ShapeExpression.centeredEllipse(25.arcsec, 25.arcsec) ↗ blindOffsetRaw,

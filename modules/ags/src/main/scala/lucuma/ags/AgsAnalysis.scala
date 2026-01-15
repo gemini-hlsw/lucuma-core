@@ -14,6 +14,7 @@ import lucuma.core.enums.Band
 import lucuma.core.enums.GuideProbe
 import lucuma.core.enums.GuideSpeed
 import lucuma.core.geom.Area
+import lucuma.core.geom.offsets.OffsetPosition
 import lucuma.core.math.Angle
 import lucuma.core.math.BrightnessValue
 
@@ -33,8 +34,8 @@ object AgsAnalysis {
       "Cannot calculate proper motion."
   }
 
-  case class VignettesScience(target: GuideStarCandidate, position: AgsPosition) extends AgsAnalysis
-      derives Eq {
+  case class VignettesScience(target: GuideStarCandidate, position: OffsetPosition)
+      extends AgsAnalysis derives Eq {
     val posAngle: Angle = position.posAngle
 
     override def message(withProbe: Boolean): String =
@@ -77,7 +78,7 @@ object AgsAnalysis {
   }
 
   case class NotReachableAtPosition(
-    position:   AgsPosition,
+    position:   OffsetPosition,
     guideProbe: GuideProbe,
     guideSpeed: Option[GuideSpeed],
     target:     GuideStarCandidate

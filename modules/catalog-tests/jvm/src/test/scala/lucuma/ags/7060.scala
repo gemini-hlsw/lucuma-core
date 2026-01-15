@@ -4,7 +4,7 @@
 package lucuma.ags
 
 import cats.data.NonEmptyChain
-import cats.data.NonEmptyList
+import cats.data.NonEmptySet
 import cats.effect.IO
 import cats.syntax.either.*
 import cats.syntax.option.*
@@ -74,13 +74,14 @@ class ShortCut_7060 extends CatsEffectSuite:
 
   val acqOffsets =
     AcquisitionOffsets(
-      NonEmptyList.of(Offset.Zero.guided,
-                      Offset.Zero.copy(p = Offset.P(Angle.fromDoubleArcseconds(10))).guided
+      NonEmptySet.of(
+        Offset.Zero.guided,
+        Offset.Zero.copy(p = Offset.P(Angle.fromDoubleArcseconds(10))).guided
       )
     )
   val sciOffsets =
     ScienceOffsets(
-      NonEmptyList.of(
+      NonEmptySet.of(
         Offset.Zero.copy(q = Offset.Q(Angle.fromDoubleArcseconds(-15))).guided,
         Offset.Zero.guided,
         Offset.Zero.copy(q = Offset.Q(Angle.fromDoubleArcseconds(15))).guided
@@ -159,8 +160,9 @@ class ShortCut_7060 extends CatsEffectSuite:
 
   test("Run ags with blindOffset matching baseCoordinates"):
     val gaia =
-      GaiaClientMock.fromResource[IO]("GP221000-483213-dr3.xml",
-                                      NonEmptyChain.one(CatalogAdapter.Gaia3LiteEsaProxy).some
+      GaiaClientMock.fromResource[IO](
+        "GP221000-483213-dr3.xml",
+        NonEmptyChain.one(CatalogAdapter.Gaia3LiteEsaProxy).some
       )
 
     // if the blind offset is at science it is the same is if it didn't exist

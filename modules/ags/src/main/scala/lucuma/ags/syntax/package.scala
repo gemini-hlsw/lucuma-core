@@ -4,6 +4,7 @@
 package lucuma.ags.syntax
 
 import cats.data.NonEmptyList
+import cats.data.NonEmptySet
 import cats.syntax.all.*
 import lucuma.ags.*
 import lucuma.core.enums.Site
@@ -47,13 +48,11 @@ extension (posAngleConstraint: PosAngleConstraint)
 
 extension (o: Offset) def guided: GuidedOffset = GuidedOffset(o)
 
-extension (c: NonEmptyList[TelescopeConfig])
-  def guidedOffsets: Option[NonEmptyList[GuidedOffset]] =
-    NonEmptyList
-      .fromFoldable:
-        c.collect:
-          case TelescopeConfig(o, StepGuideState.Enabled) => GuidedOffset(o)
-        .distinct
+extension (c: NonEmptySet[TelescopeConfig])
+  def guidedOffsets: Option[NonEmptySet[GuidedOffset]] =
+    NonEmptySet.fromSet:
+      c.collect:
+        case TelescopeConfig(o, StepGuideState.Enabled) => GuidedOffset(o)
 
   def asAcqOffsets: Option[AcquisitionOffsets] = guidedOffsets.map(AcquisitionOffsets.apply)
 

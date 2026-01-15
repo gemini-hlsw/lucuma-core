@@ -3,7 +3,9 @@
 
 package lucuma.ags
 
+import cats.Order.given
 import cats.data.NonEmptyList
+import cats.data.NonEmptySet
 import cats.syntax.all.*
 import coulomb.*
 import lucuma.catalog.BandsList
@@ -12,6 +14,7 @@ import lucuma.catalog.FaintnessConstraint
 import lucuma.catalog.SaturationConstraint
 import lucuma.core.enums.GuideSpeed
 import lucuma.core.enums.SkyBackground
+import lucuma.core.geom.offsets.GeometryType
 import lucuma.core.math.Angle
 import lucuma.core.math.BrightnessValue
 import lucuma.core.math.Offset
@@ -141,16 +144,18 @@ val UnconstrainedAngles =
 object GuidedOffset extends NewType[Offset]
 type GuidedOffset = GuidedOffset.Type
 
-object AcquisitionOffsets extends NewType[NonEmptyList[GuidedOffset]]:
+object AcquisitionOffsets extends NewType[NonEmptySet[GuidedOffset]]:
   extension (a: AcquisitionOffsets)
-    def withType: NonEmptyList[(GeometryType, GuidedOffset)] =
-      a.value.tupleLeft(GeometryType.AcqOffset)
+    def withType: NonEmptySet[(GeometryType, GuidedOffset)] =
+      NonEmptySet.fromSetUnsafe:
+        a.value.toSortedSet.map(o => (GeometryType.AcqGuidedOffset, o))
 
 type AcquisitionOffsets = AcquisitionOffsets.Type
 
-object ScienceOffsets extends NewType[NonEmptyList[GuidedOffset]]:
+object ScienceOffsets extends NewType[NonEmptySet[GuidedOffset]]:
   extension (a: ScienceOffsets)
-    def withType: NonEmptyList[(GeometryType, GuidedOffset)] =
-      a.value.tupleLeft(GeometryType.SciOffset)
+    def withType: NonEmptySet[(GeometryType, GuidedOffset)] =
+      NonEmptySet.fromSetUnsafe:
+        a.value.toSortedSet.map(o => (GeometryType.SciGuidedOffset, o))
 
 type ScienceOffsets = ScienceOffsets.Type
