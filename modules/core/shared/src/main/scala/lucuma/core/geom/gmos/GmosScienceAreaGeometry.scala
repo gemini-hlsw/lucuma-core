@@ -21,7 +21,7 @@ trait GmosScienceAreaGeometry {
     ShapeExpression.point(Offset.Zero)
 
   def pointAt(posAngle: Angle, offsetPos: Offset): ShapeExpression =
-    base.shapeAt(posAngle, offsetPos)
+    base.shapeAt(offsetPos, posAngle)
 
   val imaging: ShapeExpression =
     imagingFov(330340.mas, 33840.mas)
@@ -34,7 +34,7 @@ trait GmosScienceAreaGeometry {
     offsetPos: Offset,
     fpu:       Option[Either[GmosNorthFpu, GmosSouthFpu]]
   ): ShapeExpression =
-    shapeFromFpu(fpu).shapeAt(posAngle, offsetPos)
+    shapeFromFpu(fpu).shapeAt(offsetPos, posAngle)
 
   private def shapeFromFpu(fpu: Option[Either[GmosNorthFpu, GmosSouthFpu]]): ShapeExpression =
     fpu.fold(imaging) { f =>

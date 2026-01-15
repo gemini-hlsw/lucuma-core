@@ -30,7 +30,7 @@ trait GmosCandidatesArea:
     * GMOS area where the probe arm can reach centered with a given posAngle and offset
     */
   def candidatesAreaAt(posAngle: Angle, offsetPos: Offset): ShapeExpression =
-    candidatesArea.shapeAt(posAngle, offsetPos)
+    candidatesArea.shapeAt(offsetPos, posAngle)
 
   /**
     * GMOS area reachable by the problem arm for a set of posAngles and offsets

@@ -57,13 +57,13 @@ trait shapeexpression {
     /**
      * Positions a shape with translation and rotation around origin.
      */
-    def shapeAt(posAngle: Angle, offset: Offset): ShapeExpression =
+    def shapeAt(offset: Offset, posAngle: Angle): ShapeExpression =
       self ↗ offset ⟲ posAngle
 
     /**
      * Positions a shape with translation and rotation around a pivot.
      */
-    def shapePivotAt(posAngle: Angle, offset: Offset, pivot: Offset): ShapeExpression =
+    def shapePivotAt(offset: Offset, posAngle: Angle, pivot: Offset): ShapeExpression =
       self ↗ (offset - pivot) ⟲ posAngle ↗ pivot
 
     /**
@@ -73,7 +73,7 @@ trait shapeexpression {
       (for {
         a <- posAngles
         o <- offsets
-      } yield self.shapeAt(a, o)).fold(ShapeExpression.Empty)(_ ∩ _)
+      } yield self.shapeAt(o, a)).fold(ShapeExpression.Empty)(_ ∩ _)
 
     /**
     * Creates a bounding box for an expression

@@ -46,6 +46,6 @@ trait PwfsPatrolField:
     offsetPos: Offset,
     pivot:     Offset = Offset.Zero
   ): ShapeExpression =
-    patrolField.shapePivotAt(posAngle, offsetPos, pivot)
+    patrolField.shapePivotAt(offsetPos, posAngle, pivot)
 
 object patrolField extends PwfsPatrolField
