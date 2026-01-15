@@ -10,7 +10,7 @@ import lucuma.core.math.Declination
 import lucuma.core.math.Offset
 import lucuma.core.math.RightAscension
 import lucuma.core.model.AirMass
-import lucuma.core.model.EphemerisKey
+import lucuma.core.model.Ephemeris
 import lucuma.core.model.Extinction
 import lucuma.core.syntax.all.*
 
@@ -51,7 +51,7 @@ object HorizonsParser:
   //   9. Visual magnitude & surface Brightness
   // Example Line
   //  2025-Sep-09 19:41:56 *   07 22 20.773253 +22 04 10.77648  13.56443  -1.19117   1.046  0.114    5.840   5.331
-  def parseEntry(line: String): Either[String, HorizonsEphemerisEntry] = {
+  def parseEntry(line: String): Either[String, Ephemeris.Horizons.Element] = {
 
     // Split the line into exactly 14 fields, dropping column 3 if it shows up (it's often empty).
     val fields: Either[String, List[String]] = 
@@ -80,7 +80,7 @@ object HorizonsParser:
           sVMag.parseDoubleOption.toRight(s"Invalid visual magnitude: $sVMag"),
           sSB.parseDoubleOrNA("surface brightness")(_.some)
         ).tupled.map: (inst, ra, dec, dRa, dDec, airmass, extinction, vmag, sb) =>
-          HorizonsEphemerisEntry(
+          Ephemeris.Horizons.Element(
             inst,
             Coordinates(ra, dec),
             Offset(
@@ -135,19 +135,19 @@ object HorizonsParser:
 
           // Common case is that we have many results, or none.
           lazy val case0 =
-            parseMany[Row[EphemerisKey.Comet]](header, tail, """  +Small-body Index Search Results  """.r): os =>
+            parseMany[Row[Ephemeris.Key.Comet]](header, tail, """  +Small-body Index Search Results  """.r): os =>
               (os.lift(2), os.lift(3)).tupled.map:
                 case ((ods, ode), (ons, one)) => row =>
                   val desig = row.substring(ods, ode).trim
                   val name  = row.substring(ons     ).trim // last column, so no end index because rows are ragged
-                  Row(EphemerisKey.Comet(desig), name)
+                  Row(Ephemeris.Key.Comet(desig), name)
 
           // Single result with form: JPL/HORIZONS      Hubble (C/1937 P1)     2015-Dec-31 11:40:21
           lazy val case1 =
             """  +([^(]+)\s+\((.+?)\)  """.r
               .findFirstMatchIn(header)
               .map: m =>
-                List(Row(EphemerisKey.Comet(m.group(2)), m.group(1)))
+                List(Row(Ephemeris.Key.Comet(m.group(2)), m.group(1)))
               .toRight( "Could not match 'Hubble (C/1937 P1)' header pattern.")
 
           // Single result with form: JPL/HORIZONS         1P/Halley           2015-Dec-31 11:40:21
@@ -155,7 +155,7 @@ object HorizonsParser:
             """  +([^/]+)/(.+?)  """.r
               .findFirstMatchIn(header)
               .map: m =>
-                List(Row(EphemerisKey.Comet(m.group(1)), m.group(2)))
+                List(Row(Ephemeris.Key.Comet(m.group(1)), m.group(2)))
               .toRight( "Could not match '1P/Halley' header pattern.")
 
           // First one that works!
@@ -167,22 +167,22 @@ object HorizonsParser:
 
           // Common case is that we have many results, or none.
           lazy val case0 =
-            parseMany[Row[EphemerisKey.Asteroid]](header, tail, """  +Small-body Index Search Results  """.r): os =>
+            parseMany[Row[Ephemeris.Key.Asteroid]](header, tail, """  +Small-body Index Search Results  """.r): os =>
               (os.lift(0), os.lift(1), os.lift(2)).tupled.map:
                 case ((ors, ore), (ods, ode), (ons, one)) => row =>
                   val rec   = row.substring(ors, ore).trim.toInt
                   val desig = row.substring(ods, ode).trim
                   val name  = row.substring(ons     ).trim // last column, so no end index because rows are ragged
                   desig match
-                    case "(undefined)" => Row(EphemerisKey.AsteroidOld(rec): EphemerisKey.Asteroid, name)
-                    case des           => Row(EphemerisKey.AsteroidNew(des): EphemerisKey.Asteroid, name)
+                    case "(undefined)" => Row(Ephemeris.Key.AsteroidOld(rec): Ephemeris.Key.Asteroid, name)
+                    case des           => Row(Ephemeris.Key.AsteroidNew(des): Ephemeris.Key.Asteroid, name)
 
           // Single result with form: JPL/HORIZONS      90377 Sedna (2003 VB12)     2015-Dec-31 11:40:21
           lazy val case1 =
             """  +\d+ ([^(]+)\s+\((.+?)\)  """.r
               .findFirstMatchIn(header)
               .map: m =>
-                List(Row(EphemerisKey.AsteroidNew(m.group(2)) : EphemerisKey.Asteroid, m.group(1)))
+                List(Row(Ephemeris.Key.AsteroidNew(m.group(2)) : Ephemeris.Key.Asteroid, m.group(1)))
               .toRight("Could not match '90377 Sedna (2003 VB12)' header pattern.")
 
           // Single result with form: JPL/HORIZONS      4 Vesta     2015-Dec-31 11:40:21
@@ -190,7 +190,7 @@ object HorizonsParser:
             """  +(\d+) ([^(]+?)  """.r
               .findFirstMatchIn(header)
               .map: m =>
-                List(Row(EphemerisKey.AsteroidOld(m.group(1).toInt) : EphemerisKey.Asteroid, m.group(2)))
+                List(Row(Ephemeris.Key.AsteroidOld(m.group(1).toInt) : Ephemeris.Key.Asteroid, m.group(2)))
               .toRight("Could not match '4 Vesta' header pattern.")
 
           // Single result with form: JPL/HORIZONS    (2016 GB222)    2016-Apr-20 15:22:36
@@ -198,7 +198,7 @@ object HorizonsParser:
             """  +\((.+?)\)  """.r
               .findFirstMatchIn(header)
               .map: m =>
-                List(Row(EphemerisKey.AsteroidNew(m.group(1)) : EphemerisKey.Asteroid, m.group(1)))
+                List(Row(Ephemeris.Key.AsteroidNew(m.group(1)) : Ephemeris.Key.Asteroid, m.group(1)))
               .toRight("Could not match '(2016 GB222)' header pattern.")
 
           // Single result with form: JPL/HORIZONS        418993 (2009 MS9)            2016-Sep-07 18:23:54
@@ -206,7 +206,7 @@ object HorizonsParser:
             """  +\d+\s+\((.+?)\)  """.r
               .findFirstMatchIn(header)
               .map: m =>
-                List(Row(EphemerisKey.AsteroidNew(m.group(1)) : EphemerisKey.Asteroid, m.group(1)))
+                List(Row(Ephemeris.Key.AsteroidNew(m.group(1)) : Ephemeris.Key.Asteroid, m.group(1)))
               .toRight("Could not match '418993 (2009 MS9)' header pattern.")
 
           // Single result with form: JPL/HORIZONS              1I/'Oumuamua (A/2017 U1)         2018-Apr-16 18:28:59
@@ -214,7 +214,7 @@ object HorizonsParser:
             """  +\S+\s+\((A/.+?)\)  """.r
               .findFirstMatchIn(header)
               .map: m =>
-                List(Row(EphemerisKey.AsteroidNew(m.group(1)) : EphemerisKey.Asteroid, m.group(1)))
+                List(Row(Ephemeris.Key.AsteroidNew(m.group(1)) : Ephemeris.Key.Asteroid, m.group(1)))
               .toRight("Could not match '1I/'Oumuamua (A/2017 U1)' header pattern.")
 
           // Single result with form: JPL/HORIZONS     A/2017 U7     2015-Dec-31 11:40:21
@@ -222,7 +222,7 @@ object HorizonsParser:
             """  +(A/\d+ [^(]+?)  """.r
               .findFirstMatchIn(header)
               .map: m =>
-                List(Row(EphemerisKey.AsteroidNew(m.group(1)) : EphemerisKey.Asteroid, m.group(1)))
+                List(Row(Ephemeris.Key.AsteroidNew(m.group(1)) : Ephemeris.Key.Asteroid, m.group(1)))
               .toRight("Could not match 'A/2017 U7' header pattern.")
 
           // First one that works!
@@ -239,12 +239,12 @@ object HorizonsParser:
           // Common case is that we have many results, or none.
           lazy val case0 =
             this
-              .parseMany[Row[EphemerisKey.MajorBody]](header, tail, """Multiple major-bodies match string""".r): os =>
+              .parseMany[Row[Ephemeris.Key.MajorBody]](header, tail, """Multiple major-bodies match string""".r): os =>
                 (os.lift(0), os.lift(1)).tupled.map:
                   case ((ors, ore), (ons, one)) => row =>
                     val rec  = row.substring(ors, ore).trim.toInt
                     val name = row.substring(ons, one).trim
-                    Row(EphemerisKey.MajorBody(rec.toInt), name)
+                    Row(Ephemeris.Key.MajorBody(rec.toInt), name)
               .map(_.filterNot(_.a.num < 0)) // filter out spacecraft
 
           // Single result with form:  Revised: Aug 11, 2015       Charon / (Pluto)     901
@@ -252,7 +252,7 @@ object HorizonsParser:
             """  +(.*?) / \((.+?)\)  +(\d+) *$""".r
               .findFirstMatchIn(header)
               .map: m =>
-                List(Row(EphemerisKey.MajorBody(m.group(3).toInt), m.group(1)))
+                List(Row(Ephemeris.Key.MajorBody(m.group(3).toInt), m.group(1)))
               .toRight("Could not match 'Charon / (Pluto)     901' header pattern.")
 
           // First one that works, otherwise Nil because it falls through to small-body search

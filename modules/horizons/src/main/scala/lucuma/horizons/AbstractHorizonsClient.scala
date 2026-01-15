@@ -3,35 +3,51 @@
 
 package lucuma.horizons
 
-import cats.data.EitherT
 import cats.effect.Temporal
 import cats.syntax.all.*
 import fs2.Stream
 import lucuma.core.data.PerSite
 import lucuma.core.enums.Site
-import lucuma.core.model.EphemerisKey
+import lucuma.core.model.Ephemeris
 
 import java.time.Instant
 
-import HorizonsConstants.*
+import HorizonsConstants. { Ephemeris as MkEphemeris, * }
 
 private[horizons] abstract class AbstractHorizonsClient[F[_]: Temporal] extends HorizonsClient[F]:
 
   def resolve[A](search: HorizonsClient.Search[A]): F[Either[String, List[(A, String)]]] =
     stream(
-      Format    -> "text",
-      Ephemeris -> No,
-      Command   -> s"'${search.queryString}'"
+      Format      -> "text",
+      MkEphemeris -> No,
+      Command     -> s"'${search.queryString}'"
     ).compile.toList.map:
       HorizonsParser.parseResponse(search, _)
 
   def ephemeris(
-    key: EphemerisKey.Horizons,
+    key: Ephemeris.Key.Horizons,
+    start: Instant,
+    stop: Instant,
+    elems: Int,
+    sites: HorizonsClient.SiteOption,
+  ): F[Either[String, Ephemeris.Horizons]] =
+    if !stop.isAfter(start) then Left("Stop must fall after start.").pure[F]
+    else if elems < 1 then Left("Cannot select fewer than one element.").pure[F]
+    else
+      PerSite
+      .unfoldF: s =>
+        if sites(s) then fetch(key, s, start, stop, elems)
+        else Right(Nil).pure[F]
+      .map: ps =>
+        ps.sequence.map(Ephemeris.Horizons(key, start, stop, _))         
+  
+  private def fetch(
+    key: Ephemeris.Key.Horizons,
     site: Site,
     start: Instant,
     stop: Instant,
     elems: Int,
-  ): F[Either[String, HorizonsEphemeris]] =
+  ): F[Either[String, List[Ephemeris.Horizons.Element]]] =
     if !stop.isAfter(start) then Left("Stop must fall after start.").pure[F]
     else if elems < 1 then Left("Cannot select fewer than one element.").pure[F]
     else {
@@ -39,7 +55,7 @@ private[horizons] abstract class AbstractHorizonsClient[F[_]: Temporal] extends 
       val stepSize = 1L max minutes / elems
       stream(
           Format         -> Text,
-          Ephemeris      -> Yes,
+          MkEphemeris    -> Yes,
           Center         -> horizonsSiteCode(site),
           Command        -> s"'${key.queryString}'",
           StartTime      -> s"'${HorizonsDateFormat.format(start)}'",
@@ -55,32 +71,5 @@ private[horizons] abstract class AbstractHorizonsClient[F[_]: Temporal] extends 
         .compile
         .toList
         .map: lines =>
-          lines.sequence.map: elements =>
-            HorizonsEphemeris(
-              key, site, start, stop, elements
-            )
+          lines.sequence
     }
-  
-  def ephemerisPerSite(
-    key: EphemerisKey.Horizons,
-    start: Instant,
-    stop: Instant,
-    elems: Int,
-  ): F[Either[String, PerSite[HorizonsEphemeris]]] =
-    PerSite
-      .unfoldF: site =>
-        EitherT(ephemeris(key, site, start, stop, elems))
-      .value
-
-  def alignedEphemerisPerSite(
-    key: EphemerisKey.Horizons,
-    start: Instant,
-    days: Int,
-    cadence: HorizonsClient.ElementsPerDay,
-  ): F[Either[String, PerSite[HorizonsEphemeris]]] =
-    PerSite
-      .unfoldF: site =>
-        EitherT(alignedEphemeris(key, site, start, days, cadence))          
-      .value
-
-

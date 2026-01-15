@@ -9,7 +9,7 @@ import lucuma.core.enums.Half
 import lucuma.core.enums.Site
 import lucuma.core.math.Angle
 import lucuma.core.math.Coordinates
-import lucuma.core.model.EphemerisKey
+import lucuma.core.model.Ephemeris
 import lucuma.core.model.Semester
 import lucuma.core.model.Semester.YearInt
 import munit.Location
@@ -34,43 +34,42 @@ class HorizonsClientEphemerisSuite extends HorizonsClientSuite:
   private val sem  = Semester(YearInt.unsafeFrom(2020), Half.B)
   private val elems = 10
 
-  def fetchEphemeris(key: EphemerisKey.Horizons): IO[Either[String, List[HorizonsEphemerisEntry]]] =
+  def fetchEphemeris(key: Ephemeris.Key.Horizons): IO[Either[String, List[Ephemeris.Horizons.Element]]] =
     client.use: c =>
       c.ephemeris(
         key   = key,
-        site  = site,
         start = sem.start.atSite(site).toInstant,
         stop  = sem.end.atSite(site).toInstant,
         elems = elems
-      ).map(_.map(_.entries))
+      ).map(_.map(_.elements(site)))
 
-  def testEphemerisPopulation(name: String, key: EphemerisKey.Horizons) =
+  def testEphemerisPopulation(name: String, key: Ephemeris.Key.Horizons) =
     test(s"Ensure ephemeris is populated for $site - $name (${key.keyType})"):
       assertIOBoolean:
         fetchEphemeris(key).map(e => (e.toOption.get.length - elems).abs < 3)
 
-  def testEphemerisEmpty(key: EphemerisKey.Horizons) =
+  def testEphemerisEmpty(key: Ephemeris.Key.Horizons) =
     test(s"Ensure ephemeris is empty for $site - ${key.des} (${key.keyType})"):
       assertIOBoolean:
         fetchEphemeris(key).map(_.toOption.get.isEmpty)
 
-  testEphemerisPopulation("Hally", EphemerisKey.Comet("1P"))
-  testEphemerisPopulation("Sedna", EphemerisKey.AsteroidNew("2003 VB12"))
-  testEphemerisPopulation("'Oumuamua", EphemerisKey.AsteroidNew("A/2017 U1"))
-  testEphemerisPopulation("Amphitrite", EphemerisKey.AsteroidOld(29))
-  testEphemerisPopulation("Charon", EphemerisKey.MajorBody(901))
-  testEphemerisEmpty(EphemerisKey.Comet("17653287465t4"))
-  testEphemerisEmpty(EphemerisKey.AsteroidNew("17653287465t4"))
-  testEphemerisEmpty(EphemerisKey.AsteroidNew("17653287465t4"))
-  testEphemerisEmpty(EphemerisKey.AsteroidOld(88715673))
-  testEphemerisEmpty(EphemerisKey.MajorBody(85732756))
+  testEphemerisPopulation("Hally", Ephemeris.Key.Comet("1P"))
+  testEphemerisPopulation("Sedna", Ephemeris.Key.AsteroidNew("2003 VB12"))
+  testEphemerisPopulation("'Oumuamua", Ephemeris.Key.AsteroidNew("A/2017 U1"))
+  testEphemerisPopulation("Amphitrite", Ephemeris.Key.AsteroidOld(29))
+  testEphemerisPopulation("Charon", Ephemeris.Key.MajorBody(901))
+  testEphemerisEmpty(Ephemeris.Key.Comet("17653287465t4"))
+  testEphemerisEmpty(Ephemeris.Key.AsteroidNew("17653287465t4"))
+  testEphemerisEmpty(Ephemeris.Key.AsteroidNew("17653287465t4"))
+  testEphemerisEmpty(Ephemeris.Key.AsteroidOld(88715673))
+  testEphemerisEmpty(Ephemeris.Key.MajorBody(85732756))
 
   test("Ensure ephemeris content is correct (Halley)"):
     val tolerance = Angle.fromMicroarcseconds(1000) // 1 milliarcsecond
 
     def checkResults(
-      obtained: List[HorizonsEphemerisEntry],
-      expected: List[HorizonsEphemerisEntry]
+      obtained: List[Ephemeris.Horizons.Element],
+      expected: List[Ephemeris.Horizons.Element]
     ): Unit =
       assertEquals(obtained.length, expected.length)
       obtained.zip(expected).foreach: (o, e) =>
@@ -90,15 +89,14 @@ class HorizonsClientEphemerisSuite extends HorizonsClientSuite:
           |2021-Jan-31 23:50:00.000 *   08 20 05.764858 +02 02 30.25705  -4.30205  1.205358    n.a.   n.a.   25.517  28.999
           |""".stripMargin.linesIterator.toList.traverse(HorizonsParser.parseEntry).toList.flatten
 
-    fetchEphemeris(EphemerisKey.Comet("1P")).map:
+    fetchEphemeris(Ephemeris.Key.Comet("1P")).map:
       _.map(checkResults(_, expected))
 
   test("Stop must fall after start."):
     assertIO(
       client.use: c =>
         c.ephemeris(
-          key   = EphemerisKey.Comet("1P"),
-          site  = site,
+          key   = Ephemeris.Key.Comet("1P"),
           start = sem.start.atSite(site).toInstant,
           stop  = sem.start.atSite(site).toInstant,
           elems = elems
@@ -110,8 +108,7 @@ class HorizonsClientEphemerisSuite extends HorizonsClientSuite:
     assertIO(
       client.use: c =>
         c.ephemeris(
-          key   = EphemerisKey.Comet("1P"),
-          site  = site,
+          key   = Ephemeris.Key.Comet("1P"),
           start = sem.start.atSite(site).toInstant,
           stop  = sem.end.atSite(site).toInstant,
           elems = 0
@@ -124,14 +121,13 @@ class HorizonsClientEphemerisSuite extends HorizonsClientSuite:
       client.use: c =>
 
         c.alignedEphemeris(
-          key   = EphemerisKey.Comet("1P"),
-          site  = site,
+          key   = Ephemeris.Key.Comet("1P"),
           start = sem.start.atSite(site).toInstant,
           days  = 10,
           cadence = 2
         ).map: e =>
           e.map: eph =>
-            eph.entries.map(_.when.toString),
+            eph.elements(site).map(_.when.toString),
 
       Right(List(
         "2020-08-01T00:00:00Z", // Day 1, midnight
@@ -163,14 +159,13 @@ class HorizonsClientEphemerisSuite extends HorizonsClientSuite:
       client.use: c =>
 
         c.alignedEphemeris(
-          key   = EphemerisKey.Comet("1P"),
-          site  = site,
+          key   = Ephemeris.Key.Comet("1P"),
           start = sem.start.atSite(site).toInstant,
           days  = 10,
           cadence = 4
         ).map: e =>
           e.map: eph =>
-            eph.entries.map(_.when.toString),
+            eph.elements(site).map(_.when.toString),
 
       Right(List(
         "2020-08-01T00:00:00Z",
@@ -222,14 +217,13 @@ class HorizonsClientEphemerisSuite extends HorizonsClientSuite:
       client.use: c =>
 
         c.alignedEphemeris(
-          key   = EphemerisKey.Comet("1P"),
-          site  = site,
+          key   = Ephemeris.Key.Comet("1P"),
           start = Instant.parse("2025-05-02T00:00:00Z"),
           days  = 1,
           cadence = 24
         ).map: e =>
           e.map: eph =>
-            eph.entries.map(_.when.toString),
+            eph.elements(site).map(_.when.toString),
 
       Right(List(
         "2025-05-02T00:00:00Z",

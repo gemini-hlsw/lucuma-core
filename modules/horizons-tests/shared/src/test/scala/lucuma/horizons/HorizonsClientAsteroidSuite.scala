@@ -3,35 +3,35 @@
 
 package lucuma.horizons
 
-import lucuma.core.model.EphemerisKey
+import lucuma.core.model.Ephemeris
 
 class HorizonsClientAsteroidSuite extends HorizonsClientSearchSuite(HorizonsClient.Search.Asteroid.apply):
   testEmptyResults("oideyqiduye")
   testMultipleResults(
     "her",
-    (EphemerisKey.AsteroidNew("A868 RA"), "Hera"),
-    (EphemerisKey.AsteroidNew("A872 JA"), "Hermione"),
-    (EphemerisKey.AsteroidNew("A874 DA"), "Hertha"),
-    (EphemerisKey.AsteroidNew("A879 TC"), "Hersilia"),
-    (EphemerisKey.AsteroidNew("A880 DB"), "Aschera"),
+    (Ephemeris.Key.AsteroidNew("A868 RA"), "Hera"),
+    (Ephemeris.Key.AsteroidNew("A872 JA"), "Hermione"),
+    (Ephemeris.Key.AsteroidNew("A874 DA"), "Hertha"),
+    (Ephemeris.Key.AsteroidNew("A879 TC"), "Hersilia"),
+    (Ephemeris.Key.AsteroidNew("A880 DB"), "Aschera"),
   )
   testSingleResult("(Format 1) 90377 Sedna (2003 VB12)")(
     "sedna",
-    (EphemerisKey.AsteroidNew("2003 VB12"), "Sedna"),
+    (Ephemeris.Key.AsteroidNew("2003 VB12"), "Sedna"),
   )
   testSingleResult("(Format 2) 29 Amphitrite")(
     "amphitrite",
-    (EphemerisKey.AsteroidNew("A854 EB"), "Amphitrite"),
+    (Ephemeris.Key.AsteroidNew("A854 EB"), "Amphitrite"),
   )
   testSingleResult("(Format 3) (2016 GB222)")(
     "2016 GB222",
-    (EphemerisKey.AsteroidNew("2016 GB222"), "2016 GB222"),
+    (Ephemeris.Key.AsteroidNew("2016 GB222"), "2016 GB222"),
   )
   testSingleResult("(Format 4) 418993 (2009 MS9)")(
     "2009 MS9",
-    (EphemerisKey.AsteroidNew("2009 MS9"), "2009 MS9"),
+    (Ephemeris.Key.AsteroidNew("2009 MS9"), "2009 MS9"),
   )
   testSingleResult("(Format 5) 1I/'Oumuamua (A/2017 U1)")(
     "A/2017 U1",
-    (EphemerisKey.AsteroidNew("A/2017 U1"), "A/2017 U1"),
+    (Ephemeris.Key.AsteroidNew("A/2017 U1"), "A/2017 U1"),
   )

@@ -4,11 +4,12 @@
 package lucuma.horizons
 
 import cats.effect.Temporal
+import cats.syntax.all.*
 import fs2.Stream
 import fs2.text
 import lucuma.core.data.PerSite
 import lucuma.core.enums.Site
-import lucuma.core.model.EphemerisKey
+import lucuma.core.model.Ephemeris
 import org.http4s.Request
 import org.http4s.Uri
 import org.http4s.client.Client
@@ -33,25 +34,17 @@ trait HorizonsClient[F[_]]:
   def resolve[A](search: HorizonsClient.Search[A]): F[Either[String, List[(A, String)]]]
 
   /** 
-   * Select the ephemeris for the specified key, site, interval, and desired number of elements.
+   * Select the ephemeris for the specified key, interval, desired number of elements, and sites.
    * The number of elements returned will be approximately `elems`, with the caveat that there will
    * never be more than one element per minute.
    */
   def ephemeris(
-    key: EphemerisKey.Horizons,
-    site: Site,
+    key: Ephemeris.Key.Horizons,
     start: Instant,
     stop: Instant,
     elems: Int,
-  ): F[Either[String, HorizonsEphemeris]]
-
-  /** Equivalent to `ephemeris` but selects the ephemeris at both sites. */
-  def ephemerisPerSite(
-    key: EphemerisKey.Horizons,
-    start: Instant,
-    stop: Instant,
-    elems: Int,
-  ): F[Either[String, PerSite[HorizonsEphemeris]]]
+    sites: HorizonsClient.SiteOption = HorizonsClient.SiteOption.Both
+  ): F[Either[String, Ephemeris.Horizons]]
 
   /**
    * Similar to `ephemeris` but selects elements starting at midnight UTC on the day of
@@ -59,37 +52,37 @@ trait HorizonsClient[F[_]]:
    * will contain `days * cadence + 1` elements.
    */
   def alignedEphemeris(
-    key: EphemerisKey.Horizons,
-    site: Site,
+    key: Ephemeris.Key.Horizons,
     start: Instant,
     days: Int,
     cadence: HorizonsClient.ElementsPerDay,
-  ): F[Either[String, HorizonsEphemeris]] =
+    sites: HorizonsClient.SiteOption = HorizonsClient.SiteOption.Both
+  ): F[Either[String, Ephemeris.Horizons]] =
     val aligned = 
       ZonedDateTime
         .ofInstant(start, ZoneOffset.UTC)
         .withHour(0)
         .withMinute(0)
-        .withSecond(0)            
-    ephemeris(key, site, aligned.toInstant, aligned.plusDays(days).toInstant, days * cadence)
-
-  /** Equivalent to `alignedEphemeris` but selects the ephemeris at both sites. */
-  def alignedEphemerisPerSite(
-    key: EphemerisKey.Horizons,
-    start: Instant,
-    days: Int,
-    cadence: HorizonsClient.ElementsPerDay,
-  ): F[Either[String, PerSite[HorizonsEphemeris]]]
+        .withSecond(0)     
+        .withNano(0)       
+    ephemeris(key, aligned.toInstant, aligned.plusDays(days).toInstant, days * cadence, sites)
 
 object HorizonsClient:
+
+  type SiteOption = PerSite[Boolean]
+  object SiteOption:
+    def forSite(site: Site): SiteOption = PerSite.unfold(_ === site)
+    def GN: SiteOption = forSite(Site.GN)
+    def GS: SiteOption = forSite(Site.GS)
+    def Both: SiteOption = PerSite.const(true)
 
   /** Even divisors of 24 */
   type ElementsPerDay = 1 | 2 | 3 | 4 | 6 | 8 | 12 | 24
 
   enum Search[A](val queryString: String):
-    case Comet(partial: String)     extends Search[EphemerisKey.Comet](s"NAME=$partial*;CAP")
-    case Asteroid(partial: String)  extends Search[EphemerisKey.Asteroid](s"ASTNAM=$partial*")
-    case MajorBody(partial: String) extends Search[EphemerisKey.MajorBody](s"$partial")
+    case Comet(partial: String)     extends Search[Ephemeris.Key.Comet](s"NAME=$partial*;CAP")
+    case Asteroid(partial: String)  extends Search[Ephemeris.Key.Asteroid](s"ASTNAM=$partial*")
+    case MajorBody(partial: String) extends Search[Ephemeris.Key.MajorBody](s"$partial")
 
   /**
    * Construct a `HorizonsClient`. Requests will be retried automatically on failure, up to `maxRetries`,

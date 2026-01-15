@@ -38,6 +38,9 @@ final case class PerSite[+A](gn: A, gs: A) extends (Site => A):
   def map[B](f: A => B): PerSite[B] =
     PerSite(f(gn), f(gs))
 
+  def mapWithSite[B](f: (Site, A) => B): PerSite[B] =
+    PerSite(f(Site.GN, gn), f(Site.GS, gs))
+
   /** Collapse values into monoid B. */
   def fold[B: Monoid](fgn: A => B, fgs: A => B): B =
     fgn(gn) |+| fgs(gs)
@@ -51,11 +54,24 @@ final case class PerSite[+A](gn: A, gs: A) extends (Site => A):
     foldWithSite: (s, a) =>
       if f(a) then Set(s) else Set.empty
 
+  override def toString: String =
+    s"PerSite($gn, $gs)" // the Site => A type breaks toString
+
 object PerSite:
 
   /** Construct a PerSite filled with the zeros of monoid A. */
   def empty[A](using M: Monoid[A]): PerSite[A] =
     PerSite(M.empty, M.empty)
+
+  def one[A](site: Site, a: A)(using M: Monoid[A]): PerSite[A] =
+    unfold: s =>
+      if s === site then a else M.empty
+
+  def fromMap[A: Monoid](map: Map[Site, A]): PerSite[A] =
+    unfold(map.get(_).orEmpty)
+
+  def fromPairs[A](es: List[(Site, A)]): PerSite[List[A]] =
+    fromMap(es.groupMap(_._1)(_._2))
 
   /** Construct a PerSite with a constant value. */
   def const[A](a: A): PerSite[A] =
@@ -72,8 +88,8 @@ object PerSite:
   /** PerSite is a traversable functor. */
   given Traverse[PerSite] with
     override def map[A,B](fa: PerSite[A])(f: A => B): PerSite[B] = fa.map(f)
-    def foldLeft[A, B](fa: PerSite[A], b: B)(f: (B, A) => B): B = (fa.gn, fa.gs).foldLeft(b)(f)
-    def foldRight[A, B](fa: PerSite[A], lb: Eval[B])(f: (A, Eval[B]) => Eval[B]): Eval[B] = (fa.gn, fa.gs).foldRight(lb)(f)
+    def foldLeft[A, B](fa: PerSite[A], b: B)(f: (B, A) => B): B = List(fa.gn, fa.gs).foldLeft(b)(f)
+    def foldRight[A, B](fa: PerSite[A], lb: Eval[B])(f: (A, Eval[B]) => Eval[B]): Eval[B] = List(fa.gn, fa.gs).foldRight(lb)(f)
     def traverse[G[_]: Applicative, A, B](fa: PerSite[A])(f: A => G[B]): G[PerSite[B]] = (f(fa.gn), f(fa.gs)).mapN(apply)
 
   /** PerSite is a monoid if A is a monoid. */

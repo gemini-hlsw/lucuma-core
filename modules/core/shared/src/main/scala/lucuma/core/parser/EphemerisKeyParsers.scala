@@ -1,17 +1,17 @@
 // Copyright (c) 2016-2025 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package lucuma.core.model.parser
+package lucuma.core.model
+package parser
 
 import cats.parse.*
 import cats.parse.Numbers.digits
 import cats.parse.Parser.anyChar
 import cats.parse.Parser.string
 import cats.syntax.all.*
-import lucuma.core.model.EphemerisKey
-import lucuma.core.model.EphemerisKey.*
+import lucuma.core.model.Ephemeris.Key.*
 
-/** Parser for [[lucuma.core.model.EphemerisKey]]. */
+/** Parser for [[lucuma.core.model.Ephemeris.Key]]. */
 trait EphemerisKeyParsers {
 
   private def des[A](s: String, p: Parser[A]): Parser[A] =
@@ -26,6 +26,9 @@ trait EphemerisKeyParsers {
   private def numDes[A](s: String)(f: Int => A): Parser[A] =
     des(s, signedInt.map(v => f(v.toInt)))
 
+  private def longDes[A](s: String)(f: Long => A): Parser[A] =
+    des(s, signedInt.map(v => f(v.toLong)))
+
   val comet: Parser[Comet] =
     textDes("Comet")(Comet.apply).withContext("comet")
 
@@ -39,14 +42,14 @@ trait EphemerisKeyParsers {
     numDes("MajorBody")(MajorBody.apply).withContext("majorBody")
 
   val userSupplied: Parser[UserSupplied] =
-    numDes("UserSupplied")(UserSupplied.apply).withContext("userSupplied")
+    longDes("UserSupplied")(UserSupplied.apply).withContext("userSupplied")
 
-  val ephemerisKey: Parser[EphemerisKey] =
-    (comet.widen[EphemerisKey] |
-      asteroidNew.widen[EphemerisKey] |
-      asteroidOld.widen[EphemerisKey] |
-      majorBody.widen[EphemerisKey] |
-      userSupplied.widen[EphemerisKey]).withContext("ephemerisKey")
+  val ephemerisKey: Parser[Ephemeris.Key] =
+    (comet.widen[Ephemeris.Key] |
+      asteroidNew.widen[Ephemeris.Key] |
+      asteroidOld.widen[Ephemeris.Key] |
+      majorBody.widen[Ephemeris.Key] |
+      userSupplied.widen[Ephemeris.Key]).withContext("ephemerisKey")
 
 }
 
