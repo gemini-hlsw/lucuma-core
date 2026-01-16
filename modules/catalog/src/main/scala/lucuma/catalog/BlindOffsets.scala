@@ -11,14 +11,22 @@ import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.catalog.BandsList
 import lucuma.catalog.clients.GaiaClient
 import lucuma.catalog.votable.*
+import lucuma.core.enums.Band
+import lucuma.core.enums.StellarLibrarySpectrum
 import lucuma.core.geom.ShapeExpression
 import lucuma.core.geom.ShapeInterpreter
 import lucuma.core.geom.syntax.all.*
 import lucuma.core.math.Angle
+import lucuma.core.math.BrightnessUnits.Integrated
 import lucuma.core.math.Coordinates
 import lucuma.core.model.SourceProfile
+import lucuma.core.model.SpectralDefinition.BandNormalized
+import lucuma.core.model.Target
 import lucuma.core.model.Tracking
+import lucuma.core.model.UnnormalizedSED
 import lucuma.core.syntax.all.*
+import monocle.Focus
+import monocle.Lens
 import org.typelevel.cats.time.*
 
 import java.time.Instant
@@ -57,6 +65,18 @@ object BlindOffsetCandidate:
 
       case None =>
         Double.MaxValue
+
+  // Optics
+  val catalogResult: Lens[BlindOffsetCandidate, CatalogTargetResult] =
+    Focus[BlindOffsetCandidate](_.catalogResult)
+  val distance: Lens[BlindOffsetCandidate, Angle]                    =
+    Focus[BlindOffsetCandidate](_.distance)
+  val baseCoordinates: Lens[BlindOffsetCandidate, Coordinates]       =
+    Focus[BlindOffsetCandidate](_.baseCoordinates)
+  val candidateCoords: Lens[BlindOffsetCandidate, Coordinates]       =
+    Focus[BlindOffsetCandidate](_.candidateCoords)
+  val observationTime: Lens[BlindOffsetCandidate, Instant]           =
+    Focus[BlindOffsetCandidate](_.observationTime)
 
 object BlindOffsets:
   def runBlindOffsetAnalysis[F[_]: Concurrent](
@@ -110,7 +130,7 @@ object BlindOffsets:
         catalogResult.target.tracking.at(observationTime).map { candidateCoords =>
           val distance = baseCoordinates.angularDistance(candidateCoords)
           BlindOffsetCandidate(
-            catalogResult,
+            fakeSedAndBrightness(catalogResult),
             distance,
             baseCoordinates,
             candidateCoords,
@@ -118,3 +138,25 @@ object BlindOffsets:
           )
         }
       .sortBy(_.score)
+
+  // See shortcut 7655
+  // The Gaia catalog only has Gaia, GaiaBP and GaiaRP brightnesses and an SED is not specified.
+  // Unfortunately the ITC does not yet use the `G` bands, so while Andy is fixing that, we'll
+  // "pretend" the Gaia band is a V band.
+  // Also we'll default the SED.
+  // Once the ITC is updated, we can remove the Gaia => V part. But, we may always need to
+  // fake the SED? We can figure that out at that point.
+  private def fakeSedAndBrightness(candidate: CatalogTargetResult): CatalogTargetResult =
+    CatalogTargetResult.target
+      .andThen(Target.Sidereal.integratedBandNormalizedSpectralDefinition)
+      .modify(bn =>
+        // Add an SED if there isn't one.
+        val withSed = BandNormalized.sed
+          .modify(_.orElse(UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.M0V_new).some))(bn)
+        BandNormalized
+          .brightnesses[Integrated]
+          .modify(map =>
+            // pretend the 'G' band is a V band
+            map.get(Band.Gaia).fold(map)(g => map.updated(Band.V, g))
+          )(withSed)
+      )(candidate)
