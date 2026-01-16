@@ -8,7 +8,6 @@ import cats.derived.*
 import cats.effect.Concurrent
 import cats.syntax.all.*
 import eu.timepit.refined.types.string.NonEmptyString
-import lucuma.catalog.BandsList
 import lucuma.catalog.clients.GaiaClient
 import lucuma.catalog.votable.*
 import lucuma.core.enums.Band
@@ -42,12 +41,12 @@ case class BlindOffsetCandidate(
   def sourceId: NonEmptyString = catalogResult.target.name
 
 object BlindOffsetCandidate:
+  // use the brightness from the Gaia band (G)
   def referenceBrightness(catalogResult: CatalogTargetResult): Option[BigDecimal] =
-    BandsList.GaiaBandsList.bands.foldMap: band =>
-      SourceProfile
-        .integratedBrightnessIn(band)
-        .headOption(catalogResult.target.sourceProfile)
-        .map(_.value.value.value)
+    SourceProfile
+      .integratedBrightnessIn(Band.Gaia)
+      .headOption(catalogResult.target.sourceProfile)
+      .map(_.value.value.value)
 
   private val PiArcsecs = Angle.decimalArcseconds.get(Angle.Angle180)
 
