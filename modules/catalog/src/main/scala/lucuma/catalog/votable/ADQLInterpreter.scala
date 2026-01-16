@@ -116,7 +116,7 @@ object ADQLInterpreter {
   // Find blind offset star candidates within 180 arcseconds with G > 12
   def blindOffsetCandidates(using si: ShapeInterpreter): ADQLInterpreter =
     new ADQLInterpreter {
-      val MaxCount         = 100
+      val MaxCount         = 1000
       val shapeInterpreter = si
 
       val allFields: CatalogAdapter.Gaia => List[FieldId] = _.allFields
