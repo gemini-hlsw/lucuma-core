@@ -121,9 +121,14 @@ object ADQLInterpreter {
 
       val allFields: CatalogAdapter.Gaia => List[FieldId] = _.allFields
 
-      override def extraFields(c: Coordinates) = Nil
+      override def extraFields(c: Coordinates) =
+        val centerRa  = f"${c.ra.toAngle.toDoubleDegrees}%7.5f"
+        val centerDec = f"${c.dec.toAngle.toSignedDoubleDegrees}%7.5f"
+        List(
+          s" q3c_dist(ra, dec, $centerRa, $centerDec) as separation"
+        )
 
-      override def orderBy = None
+      override def orderBy = "separation ASC".some
 
       override val extraConstraints: List[String] =
         List("phot_g_mean_mag > 12.0",
