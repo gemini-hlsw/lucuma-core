@@ -8,15 +8,16 @@ import lucuma.core.enums.GmosNorthFpu
 import lucuma.core.enums.GmosSouthFpu
 import lucuma.core.enums.PortDisposition
 import lucuma.core.geom.ShapeExpression
+import lucuma.core.geom.gmos.ifuOffset
 import lucuma.core.geom.syntax.all.*
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 import lucuma.core.math.syntax.int.*
 
 /**
-  * Description of the GMOS OIWFS probe arm geometry.
+  * Description of the GMOS OIWFS patrol field geometry.
   */
-trait GmosPatrolField:
+trait GmosOiwfsPatrolField:
   /**
     * GMOS patrol field shape centered at the base position.
     */
@@ -44,5 +45,3 @@ trait GmosPatrolField:
     val pf = patrolField ↗ (ifuOffset(fpu) - Offset(94950.mas.p, 89880.mas.q))
     val s  = if (port === PortDisposition.Side) pf.flipQ else pf
     s ↗ (offsetPos - pivot) ⟲ posAngle ↗ pivot
-
-object patrolField extends GmosPatrolField

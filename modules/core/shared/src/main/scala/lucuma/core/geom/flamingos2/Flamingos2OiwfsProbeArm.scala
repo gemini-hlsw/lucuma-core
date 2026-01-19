@@ -11,6 +11,7 @@ import coulomb.units.accepted.*
 import lucuma.core.enums.Flamingos2LyotWheel
 import lucuma.core.enums.PortDisposition
 import lucuma.core.geom.ShapeExpression
+import lucuma.core.geom.flamingos2.*
 import lucuma.core.geom.syntax.all.*
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset

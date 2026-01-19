@@ -120,8 +120,9 @@ object AgsParams:
   ) extends AgsParams
       with SingleProbeAgsParams
       with PwfsSupport[GmosAgsParams] derives Eq:
-    import lucuma.core.geom.{gmos => oiwfs}
-    import lucuma.core.geom.{pwfs => pwfs}
+    import lucuma.core.geom.gmos
+    import lucuma.core.geom.gmos.oiwfs
+    import lucuma.core.geom.pwfs
 
     val GmosScienceRadius = 20.arcseconds
 
@@ -141,7 +142,7 @@ object AgsParams:
           ShapeExpression.empty
 
     override def scienceArea(posAngle: Angle, offset: Offset): ShapeExpression =
-      oiwfs.scienceArea.shapeAt(posAngle, offset, fpu)
+      gmos.scienceArea.shapeAt(posAngle, offset, fpu)
 
     override def probeArm(posAngle: Angle, guideStar: Offset, offset: Offset): ShapeExpression =
       probe match
@@ -162,7 +163,8 @@ object AgsParams:
   ) extends AgsParams
       with SingleProbeAgsParams
       with PwfsSupport[Flamingos2AgsParams] derives Eq:
-    import lucuma.core.geom.{flamingos2 => oiwfs}
+    import lucuma.core.geom.flamingos2
+    import lucuma.core.geom.flamingos2.oiwfs
     import lucuma.core.geom.pwfs
 
     val Flamingos2ScienceRadius = 20.arcseconds
@@ -182,7 +184,7 @@ object AgsParams:
         case _                                   => ShapeExpression.Empty
 
     override def scienceArea(posAngle: Angle, offset: Offset): ShapeExpression =
-      oiwfs.scienceArea.shapeAt(posAngle, offset, lyot, fpu)
+      flamingos2.scienceArea.shapeAt(posAngle, offset, lyot, fpu)
 
     override def probeArm(posAngle: Angle, guideStar: Offset, offset: Offset): ShapeExpression =
       probe match

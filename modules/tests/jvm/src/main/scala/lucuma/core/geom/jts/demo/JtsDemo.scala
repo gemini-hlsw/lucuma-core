@@ -37,6 +37,7 @@ trait InstrumentShapes:
 
 trait GmosLSShapes extends InstrumentShapes:
   import lucuma.core.geom.gmos.*
+  import lucuma.core.geom.gmos.oiwfs.{probeArm, patrolField}
 
   val posAngle: Angle =
     145.deg
@@ -64,6 +65,7 @@ trait GmosLSShapes extends InstrumentShapes:
 
 trait GmosImagingShapes extends InstrumentShapes:
   import lucuma.core.geom.gmos.*
+  import lucuma.core.geom.gmos.oiwfs.{probeArm, patrolField}
 
   val posAngle: Angle =
     145.deg
@@ -88,6 +90,7 @@ trait GmosImagingShapes extends InstrumentShapes:
 
 trait Flamingos2LSShapes extends InstrumentShapes:
   import lucuma.core.geom.flamingos2.*
+  import lucuma.core.geom.flamingos2.oiwfs.{probeArm, patrolField}
 
   val posAngle: Angle =
     145.deg

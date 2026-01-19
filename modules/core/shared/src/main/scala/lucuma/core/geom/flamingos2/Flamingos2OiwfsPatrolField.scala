@@ -12,6 +12,7 @@ import coulomb.units.accepted.*
 import lucuma.core.enums.Flamingos2LyotWheel
 import lucuma.core.enums.PortDisposition
 import lucuma.core.geom.*
+import lucuma.core.geom.flamingos2.*
 import lucuma.core.geom.syntax.all.*
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
@@ -21,7 +22,7 @@ import lucuma.core.math.units.*
   * Flamingos2 area that could be reachable by the patrol arm
   * https://www.gemini.edu/instrumentation/flamingos-2/capability
   */
-trait Flamingos2PatrolField:
+trait Flamingos2OiwfsPatrolField:
   val Two = BigDecimal(2)
   val ZeroM = BigDecimal(0).withUnit[Micrometer]
 
@@ -90,4 +91,4 @@ trait Flamingos2PatrolField:
     val s  = if (port === PortDisposition.Bottom) pf.flipP else pf
     s.shapePivotAt(offsetPos, posAngle, pivot)
 
-object patrolField extends Flamingos2PatrolField
+object patrolField extends Flamingos2OiwfsPatrolField

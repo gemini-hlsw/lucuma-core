@@ -25,7 +25,9 @@ private[gmos] def ifuOffset(fpu: Option[Either[GmosNorthFpu, GmosSouthFpu]]): Of
   fpu.fold(Angle.Angle0)(_.fold(_.xOffset, _.xOffset)).offsetInP
 
 object all
-  extends GmosOiwfsProbeArm
-  with GmosPatrolField
-  with GmosScienceAreaGeometry
+  extends GmosScienceAreaGeometry
   with GmosCandidatesArea
+
+object oiwfs:
+  object patrolField extends GmosOiwfsPatrolField
+  object probeArm extends GmosOiwfsProbeArm
