@@ -48,7 +48,7 @@ object BlindOffsetCandidate:
       .headOption(catalogResult.target.sourceProfile)
       .map(_.value.value.value)
 
-  private val distanceDivisor = Angle.decimalArcseconds.get(Angle.degrees.reverseGet(60))
+  private val distanceDivisor: BigDecimal = BigDecimal(60)
 
   private def calculateScore(candidate: BlindOffsetCandidate): BigDecimal =
     referenceBrightness(candidate.catalogResult) match
