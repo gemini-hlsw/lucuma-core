@@ -23,6 +23,14 @@ trait ADQLInterpreter {
 
   def extraConstraints: List[String] = Nil
 
+  // If not None, a distance from the center field is appended to the end of the fields list.
+  // For example, if set to `Some("separation")` for most gaia catalogs it will be something like:
+  //  DISTANCE(POINT('ICRS', ra, dec), POINT('ICRS', 265.978, -29.745599999722224)) AS separation
+  // but some catalogs, such as datalab, require different syntax:
+  //   q3c_dist(ra, dec, 265.978, -29.745599999722224) AS separation
+  // The "separation" field can than be used, for example, in the ORDER BY.
+  def distanceFieldAsName: Option[String] = None
+
   given shapeInterpreter: ShapeInterpreter
 
   /**
@@ -30,7 +38,8 @@ trait ADQLInterpreter {
    */
   def buildQueryString(adapter: CatalogAdapter.Gaia, cs: ADQLQuery): String = {
     val fields           = allFields(adapter).map(_.id.value.toLowerCase).mkString(",")
-    val extraFields      = this.extraFields(cs.base)
+    val distanceField    = distanceFieldAsName.map(as => s"${adapter.distanceField(cs.base)} AS $as")
+    val extraFields      = this.extraFields(cs.base) ++ distanceField.toList
     val extraFieldsStr   =
       if (extraFields.isEmpty) "" else extraFields.mkString(",", ",", "")
     val (center, radius) = cs.searchParams(using this)
@@ -121,12 +130,9 @@ object ADQLInterpreter {
 
       val allFields: CatalogAdapter.Gaia => List[FieldId] = _.allFields
 
-      override def extraFields(c: Coordinates) =
-        val centerRa  = f"${c.ra.toAngle.toDoubleDegrees}%7.5f"
-        val centerDec = f"${c.dec.toAngle.toSignedDoubleDegrees}%7.5f"
-        List(
-          s" q3c_dist(ra, dec, $centerRa, $centerDec) as separation"
-        )
+      override val distanceFieldAsName: Option[String] = "separation".some
+
+      override def extraFields(c: Coordinates) = Nil
 
       override def orderBy = "separation ASC".some
 
