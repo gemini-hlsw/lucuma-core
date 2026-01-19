@@ -48,19 +48,19 @@ object BlindOffsetCandidate:
       .headOption(catalogResult.target.sourceProfile)
       .map(_.value.value.value)
 
-  private val PiArcsecs = Angle.decimalArcseconds.get(Angle.Angle180)
+  private val distanceDivisor = Angle.decimalArcseconds.get(Angle.degrees.reverseGet(60))
 
   private def calculateScore(candidate: BlindOffsetCandidate): BigDecimal =
     referenceBrightness(candidate.catalogResult) match
       case Some(g) =>
-        // score = sqrt(((G-12)/6)^2 + (distance / 180 arcsec)^2)
-        val distance =
-          Angle.decimalArcseconds.get(candidate.distance) / PiArcsecs
+        // score = sqrt(((G-15)/3)^2 + (distance / 60 arcsec)^2)
+        val distanceTerm =
+          Angle.decimalArcseconds.get(candidate.distance) / distanceDivisor
 
-        val magnitudeTerm = (g - 12.0) / 6.0
+        val magnitudeTerm = (g - 15.0) / 3.0
         // The original formula had a square root but we don't care about the value, just the
         // relative order
-        magnitudeTerm.pow(2) + distance.pow(2)
+        magnitudeTerm.pow(2) + distanceTerm.pow(2)
 
       case None =>
         Double.MaxValue
