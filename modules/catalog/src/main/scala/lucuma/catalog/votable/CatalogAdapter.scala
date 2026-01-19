@@ -339,6 +339,11 @@ object CatalogAdapter {
     /** HTTP headers sent by this adapter */
     def requestHeaders: Map[CIString, String] = Map.empty
 
+    def distanceField(center: Coordinates): String =
+      val centerRa  = center.ra.toAngle.toDoubleDegrees
+      val centerDec = center.dec.toAngle.toSignedDoubleDegrees
+      s"DISTANCE(POINT('ICRS', ${raField.id}, ${decField.id}), POINT('ICRS', $centerRa, $centerDec))"
+
     /**
      * Build the query string for a cone search. Default implementation uses ADQL syntax. Override
      * for non-ADQL backends like DataLab.
@@ -526,6 +531,11 @@ object CatalogAdapter {
 
     override def requestHeaders: Map[CIString, String] =
       Map(ci"X-DL-AuthToken" -> authToken)
+
+    override def distanceField(center: Coordinates): String =
+      val centerRa  = center.ra.toAngle.toDoubleDegrees
+      val centerDec = center.dec.toAngle.toSignedDoubleDegrees
+      s"q3c_dist(${raField.id}, ${decField.id}, $centerRa, $centerDec)"
 
     override def geometryQuery(
       fields:                String,
