@@ -10,6 +10,7 @@ import cats.data.NonEmptyList
 import cats.derived.*
 import cats.kernel.Order.catsKernelOrderingForOrder
 import cats.syntax.all.*
+import lucuma.core.enums.TrackType
 import lucuma.core.math.*
 import lucuma.core.optics.SplitMono
 import lucuma.core.syntax.treemap.*
@@ -29,6 +30,14 @@ import scala.collection.immutable.TreeMap
 sealed trait Tracking:
   def at: TrackingAt
 
+  def isNonsidereal: Boolean = this match
+    case EphemerisTracking(_)   => true
+    case CompositeTracking(nel) => nel.exists(_.isNonsidereal)
+    case _                      => false
+
+  def trackType: TrackType =
+    if (isNonsidereal) TrackType.Nonsidereal else TrackType.Sidereal
+
 object Tracking:
   given Eq[Tracking] = Eq.instance:
     case (a: ConstantTracking, b: ConstantTracking)   => a === b
@@ -37,13 +46,13 @@ object Tracking:
     case (a: SiderealTracking, b: SiderealTracking)   => a === b
     case _                                            => false
 
-  def fromList(trackings: List[Tracking]): Option[Tracking] = 
+  def fromList(trackings: List[Tracking]): Option[Tracking] =
     NonEmptyList.fromList(trackings).map(fromNel)
 
   def fromNel(trackings: NonEmptyList[Tracking]): Tracking = trackings match
     case NonEmptyList(h, Nil) => h
     case _ => CompositeTracking(trackings)
-  
+
 
   def constant(coordinates: Coordinates): Tracking =
     ConstantTracking(coordinates)
@@ -195,7 +204,7 @@ final case class SiderealTracking(
   // we have to implement this explicitly because Scala now just prints <function> :-\
   override def toString =
     s"SiderealTracking($baseCoordinates,$epoch,$properMotion,$radialVelocity,$parallax)"
-  
+
 }
 
 object SiderealTracking extends SiderealTrackingOptics {
