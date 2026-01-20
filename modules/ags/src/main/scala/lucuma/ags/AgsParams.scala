@@ -100,7 +100,7 @@ trait PwfsSupport[A]:
   def probe: GuideProbe
   def withPWFS1: A = withProbe(GuideProbe.PWFS1)
   def withPWFS2: A = withProbe(GuideProbe.PWFS2)
-  protected def withProbe(probe: GuideProbe): A
+  def withProbe(probe: GuideProbe): A
 
 sealed trait AgsParams derives Eq:
 
@@ -116,7 +116,7 @@ object AgsParams:
   case class GmosAgsParams(
     fpu:                Option[Either[GmosNorthFpu, GmosSouthFpu]],
     port:               PortDisposition,
-    override val probe: GuideProbe = GuideProbe.GmosOIWFS
+    override val probe: GuideProbe
   ) extends AgsParams
       with SingleProbeAgsParams
       with PwfsSupport[GmosAgsParams] derives Eq:
@@ -124,9 +124,7 @@ object AgsParams:
     import lucuma.core.geom.gmos.oiwfs
     import lucuma.core.geom.pwfs
 
-    val GmosScienceRadius = 20.arcseconds
-
-    protected def withProbe(probe: GuideProbe): GmosAgsParams = copy(probe = probe)
+    def withProbe(probe: GuideProbe): GmosAgsParams = copy(probe = probe)
 
     override def patrolFieldAt(
       posAngle: Angle,
@@ -153,13 +151,21 @@ object AgsParams:
         case _                                   =>
           ShapeExpression.Empty
 
-    override def scienceRadius: Angle = GmosScienceRadius
+    override def scienceRadius: Angle = GmosAgsParams.GmosScienceRadius
 
-  case class Flamingos2AgsParams(
+  object GmosAgsParams:
+    def apply(
+      fpu:  Option[Either[GmosNorthFpu, GmosSouthFpu]],
+      port: PortDisposition
+    ): GmosAgsParams = GmosAgsParams(fpu, port, GuideProbe.GmosOIWFS)
+
+    val GmosScienceRadius = 20.arcseconds
+
+  case class Flamingos2AgsParams private (
     lyot:               Flamingos2LyotWheel,
     fpu:                Flamingos2FpuMask,
     port:               PortDisposition,
-    override val probe: GuideProbe = GuideProbe.Flamingos2OIWFS
+    override val probe: GuideProbe
   ) extends AgsParams
       with SingleProbeAgsParams
       with PwfsSupport[Flamingos2AgsParams] derives Eq:
@@ -167,9 +173,7 @@ object AgsParams:
     import lucuma.core.geom.flamingos2.oiwfs
     import lucuma.core.geom.pwfs
 
-    val Flamingos2ScienceRadius = 20.arcseconds
-
-    protected def withProbe(probe: GuideProbe): Flamingos2AgsParams = copy(probe = probe)
+    def withProbe(probe: GuideProbe): Flamingos2AgsParams = copy(probe = probe)
 
     override def patrolFieldAt(
       posAngle: Angle,
@@ -194,4 +198,13 @@ object AgsParams:
           pwfs.probeArm.vignettedAreaAt(probe, guideStar, offset)
         case _                                   => ShapeExpression.Empty
 
-    override def scienceRadius: Angle = Flamingos2ScienceRadius
+    override def scienceRadius: Angle = Flamingos2AgsParams.Flamingos2ScienceRadius
+
+  object Flamingos2AgsParams:
+    def apply(
+      lyot: Flamingos2LyotWheel,
+      fpu:  Flamingos2FpuMask,
+      port: PortDisposition
+    ): Flamingos2AgsParams = Flamingos2AgsParams(lyot, fpu, port, GuideProbe.Flamingos2OIWFS)
+
+    val Flamingos2ScienceRadius = 20.arcseconds
