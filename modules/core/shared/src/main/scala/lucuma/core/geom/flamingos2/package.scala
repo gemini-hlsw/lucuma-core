@@ -48,7 +48,9 @@ def flamingos2SlitWidthPixels(slitWidth: Angle): Quantity[BigDecimal, Pixels] =
   widthArcSeconds / Flamingos2PixelScale
 
 object all
-  extends Flamingos2OiwfsProbeArm
-  with Flamingos2PatrolField
-  with Flamingos2ScienceAreaGeometry
+  extends Flamingos2ScienceAreaGeometry
   with Flamingos2CandidatesArea
+
+object oiwfs:
+  object patrolField extends Flamingos2OiwfsPatrolField
+  object probeArm extends Flamingos2OiwfsProbeArm
