@@ -100,7 +100,7 @@ trait PwfsSupport[A]:
   def probe: GuideProbe
   def withPWFS1: A = withProbe(GuideProbe.PWFS1)
   def withPWFS2: A = withProbe(GuideProbe.PWFS2)
-  def withProbe(probe: GuideProbe): A
+  protected def withProbe(probe: GuideProbe): A
 
 sealed trait AgsParams derives Eq:
 
@@ -124,7 +124,7 @@ object AgsParams:
     import lucuma.core.geom.gmos.oiwfs
     import lucuma.core.geom.pwfs
 
-    def withProbe(probe: GuideProbe): GmosAgsParams = copy(probe = probe)
+    protected def withProbe(probe: GuideProbe): GmosAgsParams = copy(probe = probe)
 
     override def patrolFieldAt(
       posAngle: Angle,
@@ -173,7 +173,7 @@ object AgsParams:
     import lucuma.core.geom.flamingos2.oiwfs
     import lucuma.core.geom.pwfs
 
-    def withProbe(probe: GuideProbe): Flamingos2AgsParams = copy(probe = probe)
+    protected def withProbe(probe: GuideProbe): Flamingos2AgsParams = copy(probe = probe)
 
     override def patrolFieldAt(
       posAngle: Angle,
