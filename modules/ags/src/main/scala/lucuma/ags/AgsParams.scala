@@ -8,6 +8,7 @@ import cats.Order
 import cats.data.NonEmptyList
 import cats.data.NonEmptyMap
 import cats.derived.*
+import cats.syntax.option.*
 import lucuma.core.enums.Flamingos2LyotWheel
 import lucuma.core.enums.GmosNorthFpu
 import lucuma.core.enums.GmosSouthFpu
@@ -113,10 +114,10 @@ sealed trait AgsParams derives Eq:
   ): NonEmptyMap[OffsetPosition, AgsGeomCalc]
 
 object AgsParams:
-  case class GmosAgsParams(
-    fpu:                Option[Either[GmosNorthFpu, GmosSouthFpu]],
-    port:               PortDisposition,
-    override val probe: GuideProbe
+  case class GmosAgsParams private (
+    fpu:   Option[Either[GmosNorthFpu, GmosSouthFpu]],
+    port:  PortDisposition,
+    probe: GuideProbe
   ) extends AgsParams
       with SingleProbeAgsParams
       with PwfsSupport[GmosAgsParams] derives Eq:
@@ -161,11 +162,17 @@ object AgsParams:
 
     val GmosScienceRadius = 20.arcseconds
 
+    def imaging(port: PortDisposition): GmosAgsParams =
+      apply(none, port, GuideProbe.GmosOIWFS)
+
+    def longSlit(fpu: Either[GmosNorthFpu, GmosSouthFpu], port: PortDisposition): GmosAgsParams =
+      apply(fpu.some, port, GuideProbe.GmosOIWFS)
+
   case class Flamingos2AgsParams private (
-    lyot:               Flamingos2LyotWheel,
-    fpu:                Flamingos2FpuMask,
-    port:               PortDisposition,
-    override val probe: GuideProbe
+    lyot:  Flamingos2LyotWheel,
+    fpu:   Flamingos2FpuMask,
+    port:  PortDisposition,
+    probe: GuideProbe
   ) extends AgsParams
       with SingleProbeAgsParams
       with PwfsSupport[Flamingos2AgsParams] derives Eq:
