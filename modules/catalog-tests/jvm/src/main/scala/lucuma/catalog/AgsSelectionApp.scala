@@ -78,15 +78,11 @@ trait AgsSelectionSample {
       )
     )
 
-  val gmosParams = AgsParams
-    .GmosAgsParams(
-      GmosNorthFpu.LongSlit_0_25.asLeft.some,
-      PortDisposition.Bottom
-    )
-    .withPWFS2
+  val gmosParams =
+    AgsParams.GmosLongSlit(GmosNorthFpu.LongSlit_0_25.asLeft, PortDisposition.Bottom).withPWFS2
 
   val flamingos2Params = AgsParams
-    .Flamingos2AgsParams(
+    .Flamingos2LongSlit(
       Flamingos2LyotWheel.F16,
       Flamingos2FpuMask.Builtin(Flamingos2Fpu.LongSlit3),
       PortDisposition.Bottom

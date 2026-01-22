@@ -105,8 +105,8 @@ class ShortCut_7060 extends CatsEffectSuite:
     )
   )
 
-  val conf = AgsParams.GmosAgsParams(
-    GmosSouthFpu.LongSlit_0_50.asRight.some,
+  val conf = AgsParams.GmosLongSlit(
+    GmosSouthFpu.LongSlit_0_50.asRight,
     PortDisposition.Side
   )
 
