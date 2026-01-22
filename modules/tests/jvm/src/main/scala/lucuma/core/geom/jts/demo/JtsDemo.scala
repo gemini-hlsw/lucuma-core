@@ -4,7 +4,6 @@
 package lucuma.core.geom.jts
 package demo
 
-import cats.syntax.option.*
 import lucuma.core.enums.Flamingos2Fpu
 import lucuma.core.enums.Flamingos2LyotWheel
 import lucuma.core.enums.GmosNorthFpu
@@ -48,8 +47,8 @@ trait GmosLSShapes extends InstrumentShapes:
   val offsetPos: Offset =
     Offset(-60.arcsec.p, 60.arcsec.q)
 
-  val fpu: Option[Either[GmosNorthFpu, GmosSouthFpu]] =
-    Some(Right(GmosSouthFpu.LongSlit_5_00)) // None will render imaging detector
+  val fpu: Either[GmosNorthFpu, GmosSouthFpu] =
+    Right(GmosSouthFpu.LongSlit_5_00)
 
   val port: PortDisposition =
     PortDisposition.Side
@@ -57,9 +56,9 @@ trait GmosLSShapes extends InstrumentShapes:
   // Shape to display
   def shapes: List[ShapeExpression] =
     List(
-      probeArm.shapeAt(posAngle, guideStarOffset, offsetPos, fpu, port),
-      patrolField.patrolFieldAt(posAngle, offsetPos, fpu, port),
-      scienceArea.shapeAt(posAngle, offsetPos, fpu),
+      probeArm.longSlit.shapeAt(posAngle, guideStarOffset, offsetPos, fpu, port),
+      patrolField.longSlitMode.patrolFieldAt(posAngle, offsetPos, fpu, port),
+      scienceArea.longSlitMode.shapeAt(posAngle, offsetPos, fpu),
       candidatesArea.candidatesAreaAt(posAngle, offsetPos)
     )
 
@@ -82,9 +81,9 @@ trait GmosImagingShapes extends InstrumentShapes:
   // Shape to display
   def shapes: List[ShapeExpression] =
     List(
-      probeArm.shapeAt(posAngle, guideStarOffset, offsetPos, none, port),
-      patrolField.patrolFieldAt(posAngle, offsetPos, none, port),
-      scienceArea.shapeAt(posAngle, offsetPos, none),
+      probeArm.imaging.shapeAt(posAngle, guideStarOffset, offsetPos, port),
+      patrolField.imagingMode.patrolFieldAt(posAngle, offsetPos, port),
+      scienceArea.imagingMode.shapeAt(posAngle, offsetPos),
       candidatesArea.candidatesAreaAt(posAngle, offsetPos)
     )
 
@@ -113,6 +112,7 @@ trait Flamingos2LSShapes extends InstrumentShapes:
       probeArm.shapeAt(posAngle, guideStarOffset, offsetPos, lyot, port),
       patrolField.patrolFieldAt(posAngle, offsetPos, lyot, port),
       scienceArea.shapeAt(posAngle, offsetPos, lyot, fpu),
+      candidatesArea.candidatesAreaAt(lyot, posAngle, offsetPos)
     )
 
 // Just pwfs probe
@@ -156,15 +156,15 @@ trait GmosWithPwfsShapes extends InstrumentShapes:
   val guideStarOffset: Offset =
     Offset(270.arcsec.p, 224.arcsec.q)
 
-  val fpu: Option[Either[GmosNorthFpu, GmosSouthFpu]] =
-    Some(Right(GmosSouthFpu.LongSlit_5_00))
+  val fpu: Either[GmosNorthFpu, GmosSouthFpu] =
+    Right(GmosSouthFpu.LongSlit_5_00)
 
   val probe: GuideProbe = GuideProbe.PWFS2
 
   def shapes: List[ShapeExpression] =
     List(
       ShapeExpression.centeredRectangle(1.arcsec, 1.arcsec).translate(guideStarOffset), // guide star
-      scienceArea.shapeAt(posAngle, offsetPos, fpu),
+      scienceArea.longSlitMode.shapeAt(posAngle, offsetPos, fpu),
       patrolField.patrolFieldAt(posAngle, offsetPos),
       probeArm.mirrorAt(probe, guideStarOffset, offsetPos),
       probeArm.mirrorVignettedAreaAt(probe, guideStarOffset, offsetPos),

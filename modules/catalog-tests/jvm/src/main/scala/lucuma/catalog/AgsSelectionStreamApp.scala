@@ -48,8 +48,8 @@ object AgsSelectionSampleStreamApp extends IOApp.Simple with AgsSelectionSample:
                   ),
                   Some(AcquisitionOffsets(NonEmptySet.of(Offset.Zero.guided))),
                   Some(ScienceOffsets(NonEmptySet.of(Offset.Zero.guided))),
-                  AgsParams.GmosAgsParams(
-                    GmosNorthFpu.LongSlit_1_00.asLeft.some,
+                  AgsParams.GmosLongSlit(
+                    GmosNorthFpu.LongSlit_1_00.asLeft,
                     PortDisposition.Side
                   )
                 )

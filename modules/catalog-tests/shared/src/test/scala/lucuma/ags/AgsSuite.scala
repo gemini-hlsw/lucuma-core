@@ -132,7 +132,7 @@ class AgsSuite extends munit.FunSuite {
           NonEmptyList.of(Angle.Angle0),
           Some(AcquisitionOffsets(NonEmptySet.of(Offset.Zero.guided))),
           Some(ScienceOffsets(NonEmptySet.of(Offset.Zero.guided))),
-          AgsParams.GmosAgsParams(GmosNorthFpu.LongSlit_5_00.asLeft.some, PortDisposition.Bottom),
+          AgsParams.GmosLongSlit(GmosNorthFpu.LongSlit_5_00.asLeft, PortDisposition.Bottom),
           List(gs1)
         )
         .contains(
@@ -163,7 +163,7 @@ class AgsSuite extends munit.FunSuite {
           NonEmptyList.of(Angle.Angle0),
           Some(AcquisitionOffsets(NonEmptySet.of(Offset.Zero.guided))),
           Some(ScienceOffsets(NonEmptySet.of(Offset.Zero.guided))),
-          AgsParams.GmosAgsParams(GmosNorthFpu.LongSlit_5_00.asLeft.some, PortDisposition.Bottom),
+          AgsParams.GmosLongSlit(GmosNorthFpu.LongSlit_5_00.asLeft, PortDisposition.Bottom),
           List(guideStarOffset)
         )
         .headOption
@@ -193,7 +193,7 @@ class AgsSuite extends munit.FunSuite {
           NonEmptyList.of(Angle.Angle0),
           Some(AcquisitionOffsets(NonEmptySet.of(Offset.Zero.guided))),
           Some(ScienceOffsets(NonEmptySet.of(Offset.Zero.guided))),
-          AgsParams.Flamingos2AgsParams(
+          AgsParams.Flamingos2LongSlit(
             Flamingos2LyotWheel.F16,
             Flamingos2FpuMask.Builtin(Flamingos2Fpu.LongSlit3),
             PortDisposition.Bottom
@@ -228,7 +228,7 @@ class AgsSuite extends munit.FunSuite {
           NonEmptyList.of(Angle.Angle0),
           Some(AcquisitionOffsets(NonEmptySet.of(Offset.Zero.guided))),
           Some(ScienceOffsets(NonEmptySet.of(Offset.Zero.guided))),
-          AgsParams.Flamingos2AgsParams(
+          AgsParams.Flamingos2LongSlit(
             Flamingos2LyotWheel.F16,
             Flamingos2FpuMask.Builtin(Flamingos2Fpu.LongSlit3),
             PortDisposition.Bottom

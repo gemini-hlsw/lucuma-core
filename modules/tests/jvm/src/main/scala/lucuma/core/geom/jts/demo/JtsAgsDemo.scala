@@ -10,7 +10,7 @@ import cats.syntax.eq.*
 import cats.syntax.option.*
 import lucuma.ags.AcquisitionOffsets
 import lucuma.ags.Ags
-import lucuma.ags.AgsParams.GmosAgsParams
+import lucuma.ags.AgsParams.GmosLongSlit
 import lucuma.ags.AgsVisualization
 import lucuma.ags.ScienceOffsets
 import lucuma.ags.syntax.*
@@ -53,13 +53,13 @@ trait GmosAgsVisualizationShapes(val posAngle: Angle) extends AgsVisualizationBa
   val guideStarOffset: Offset =
     Offset(-170543999.µas.p, -24177003.µas.q)
 
-  val defaultFpu: Option[Either[GmosNorthFpu, GmosSouthFpu]] =
-    Some(Right(GmosSouthFpu.LongSlit_5_00))
+  val defaultFpu: Either[GmosNorthFpu, GmosSouthFpu] =
+    Right(GmosSouthFpu.LongSlit_5_00)
 
   val anglesToTest: NonEmptyList[Angle] =
     PosAngleConstraint.Unbounded.anglesToTestAt(None).get
 
-  val fpu: Option[Either[GmosNorthFpu, GmosSouthFpu]] = defaultFpu
+  val fpu: Either[GmosNorthFpu, GmosSouthFpu] = defaultFpu
 
   val port: PortDisposition = PortDisposition.Side
 
@@ -94,7 +94,7 @@ trait GmosAgsVisualizationShapes(val posAngle: Angle) extends AgsVisualizationBa
       scienceOffsets.some
     ).value.toNonEmptyList
 
-  val params: GmosAgsParams = GmosAgsParams(fpu, port)
+  val params: GmosLongSlit = GmosLongSlit(fpu, port)
 
   lazy val patrolViz = AgsVisualization.patrolFieldGeometries(params, positions)
 
@@ -196,11 +196,12 @@ trait GmosWithPwfsVisualizationShapes(val posAngle: Angle) extends AgsVisualizat
     Some(Right(GmosSouthFpu.LongSlit_5_00))
 
   val anglesToTest: NonEmptyList[Angle] =
+    // This coulb be replaced by UconstraindAngles but lets us test more easily
     PosAngleConstraint.Unbounded.anglesToTestAt(None).get
 
   val offsetPos: Offset = Offset.Zero
 
-  val params = GmosAgsParams(defaultFpu, PortDisposition.Side).withPWFS2
+  val params = GmosLongSlit(defaultFpu.get, PortDisposition.Side).withPWFS2
 
   override def shapes: List[ShapeExpression] = List(
     params.scienceArea(posAngle, offsetPos),

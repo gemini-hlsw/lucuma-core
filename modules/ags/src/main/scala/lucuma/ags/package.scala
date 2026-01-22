@@ -137,9 +137,11 @@ def gaiaBrightnessConstraints(
   )
 
 val UnconstrainedAngles =
-  NonEmptyList.fromList(
-    (0 until 360 by 10).map(a => Angle.fromDoubleDegrees(a.toDouble)).toList
-  )
+  NonEmptyList
+    .fromList(
+      (0 until 360 by 10).map(a => Angle.fromDoubleDegrees(a.toDouble)).toList
+    )
+    .get
 
 object GuidedOffset extends NewType[Offset]
 type GuidedOffset = GuidedOffset.Type
