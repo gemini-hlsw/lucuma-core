@@ -196,6 +196,7 @@ trait GmosWithPwfsVisualizationShapes(val posAngle: Angle) extends AgsVisualizat
     Some(Right(GmosSouthFpu.LongSlit_5_00))
 
   val anglesToTest: NonEmptyList[Angle] =
+    // This coulb be replaced by UconstraindAngles but lets us test more easily
     PosAngleConstraint.Unbounded.anglesToTestAt(None).get
 
   val offsetPos: Offset = Offset.Zero

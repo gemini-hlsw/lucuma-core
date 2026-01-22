@@ -112,6 +112,7 @@ trait Flamingos2LSShapes extends InstrumentShapes:
       probeArm.shapeAt(posAngle, guideStarOffset, offsetPos, lyot, port),
       patrolField.patrolFieldAt(posAngle, offsetPos, lyot, port),
       scienceArea.shapeAt(posAngle, offsetPos, lyot, fpu),
+      candidatesArea.candidatesAreaAt(lyot, posAngle, offsetPos)
     )
 
 // Just pwfs probe
