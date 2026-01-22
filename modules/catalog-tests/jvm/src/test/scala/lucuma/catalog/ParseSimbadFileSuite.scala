@@ -65,7 +65,7 @@ class ParseSimbadFileSuite extends CatsEffectSuite with VoTableParser {
             // SED inferred from spectral A0Va
             t.sourceProfile match {
               case SourceProfile.Point(SpectralDefinition.BandNormalized(sed, _)) =>
-                assertEquals(sed, Some(UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.A0V)))
+                assertEquals(sed, Some(UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.A0V_new)))
               case _                                                              =>
                 fail("Expected Point source profile")
             }
@@ -535,7 +535,7 @@ class ParseSimbadFileSuite extends CatsEffectSuite with VoTableParser {
             )
             t.sourceProfile match {
               case SourceProfile.Point(SpectralDefinition.BandNormalized(sed, _)) =>
-                assertEquals(sed, Some(UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.A0V)))
+                assertEquals(sed, Some(UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.A0V_new)))
               case _                                                              =>
                 fail("Expected Point source profile")
             }
@@ -643,7 +643,7 @@ class ParseSimbadFileSuite extends CatsEffectSuite with VoTableParser {
             )
             t.sourceProfile match {
               case SourceProfile.Point(SpectralDefinition.BandNormalized(sed, _)) =>
-                assertEquals(sed, Some(UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.A0V)))
+                assertEquals(sed, Some(UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.A0V_new)))
               case _                                                              =>
                 fail("Expected Point source profile")
             }

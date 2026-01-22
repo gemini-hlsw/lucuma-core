@@ -32,6 +32,11 @@ object SEDMatcher:
   // Tolerances (physics-based scoring)
   private val TemperatureToleranceFraction: Double = 0.1 // 10% of target temperature
   private val GravityToleranceDex: Double          = 0.5 // 0.5 dex in log(g)
+  // Stricter gravity tolerance for cross-luminosity fallback (II/III target matching V spectrum)
+  private val CrossLuminosityGravityTolerance: Double = 0.4
+
+  // Giant/supergiant luminosity classes (non-dwarf)
+  private val GiantClasses: Set[String] = Set("I", "Ia", "Iab", "Ib", "II", "III")
 
   // Galaxy Hubble stage classification boundaries
   private val EllipticalHubbleStageThreshold: Double = -0.5 // E0-S0
@@ -138,13 +143,39 @@ object SEDMatcher:
         StellarPhysics
           .calculateParameters(l, t)
           .flatMap: params =>
-            StellarLibrarySpectrum.values.toList
+            // Check if target has giant/supergiant classes (I, II, III) but not V or IV
+            val targetHasGiantClass = l.exists(GiantClasses.contains)
+            val targetHasDwarfClass = l.exists(c => c === "V" || c === "IV")
+            val needsStrictGravity  = targetHasGiantClass && !targetHasDwarfClass
+
+            // Try to match with luminosity-compatible spectra first
+            val compatibleMatches = StellarLibraryParameters.preferredSpectraOrdered
               .filter(s => luminosityCompatible(l, getLibraryLuminosity(s)))
               .flatMap(scoreSpectrum(params))
-              .sortBy(_.score)
-              .headOption
-              .filter(_.isWithinTolerance)
-              .map(_.spectrum)
+              .sortBy(m => (m.score, StellarLibraryParameters.fileOrderIndex(m.spectrum)))
+
+            val bestMatch = compatibleMatches.headOption.filter(_.isWithinTolerance)
+
+            // For targets with giant classes but matching to V spectrum with large gravity diff, reject
+            bestMatch.flatMap: m =>
+              val libLum        = getLibraryLuminosity(m.spectrum)
+              val isVMatch      = libLum.contains("V") && !libLum.exists(GiantClasses.contains)
+              val rejectVMatch  = needsStrictGravity && isVMatch && m.absDg >= CrossLuminosityGravityTolerance
+
+              if rejectVMatch then none
+              else m.spectrum.some
+            .orElse:
+              // Fallback: if no subdwarf match found, try normal spectra (Python behavior)
+              val targetCat = categorizeLuminosity(l)
+              if targetCat == LuminosityCategory.Subdwarf then
+                StellarLibraryParameters.preferredSpectraOrdered
+                  .filter(s => categorizeLuminosity(getLibraryLuminosity(s)) == LuminosityCategory.Normal)
+                  .flatMap(scoreSpectrum(params))
+                  .sortBy(m => (m.score, StellarLibraryParameters.fileOrderIndex(m.spectrum)))
+                  .headOption
+                  .filter(_.isWithinTolerance)
+                  .map(_.spectrum)
+              else none
 
   private def scoreSpectrum(targetParams: StellarPhysics.StellarParameters)(
     spectrum: StellarLibrarySpectrum
@@ -169,10 +200,7 @@ object SEDMatcher:
     else LuminosityCategory.Normal
 
   private def getLibraryLuminosity(spectrum: StellarLibrarySpectrum): List[String] =
-    val tag = spectrum.tag.takeWhile(_ != '_')
-    SpectralTypeParsers.spectralType.parseAll(tag) match
-      case Right((lumClasses, _)) => lumClasses
-      case Left(_)                => List.empty
+    StellarLibraryParameters.getLuminosityClasses(spectrum)
 
   /**
    * Check if target and library luminosity classes are compatible.
@@ -200,7 +228,7 @@ object SEDMatcher:
           .flatMap:
             case stage if stage <= EllipticalHubbleStageThreshold =>
               UnnormalizedSED.Galaxy(GalaxySpectrum.Elliptical).some
-            case stage if stage <= SpiralHubbleStageThreshold     =>
+            case stage if stage < SpiralHubbleStageThreshold      =>
               UnnormalizedSED.Galaxy(GalaxySpectrum.Spiral).some
             case _                                                =>
               none
