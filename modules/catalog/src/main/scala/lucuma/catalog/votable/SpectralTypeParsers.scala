@@ -37,15 +37,22 @@ trait SpectralTypeParsers:
     stringIn(List("VIII", "VII", "VI", "IV", "III", "II", "I", "V"))
       .withContext("Roman numeral")
 
-  /** Optional luminosity subclass: a or b */
+  /** Optional luminosity subclass: a, b, or ab */
   private val lumSubclass: Parser0[String] =
-    charIn("ab").string.?.map(_.getOrElse("")).withContext("luminosity subclass")
+    (string("ab").string | charIn("ab").string).?.map(_.getOrElse("")).withContext("luminosity subclass")
+
+  /** Optional spectral peculiarity suffixes to skip: n (nebular), w (weak), p (peculiar), etc.
+   *  When "n" suffix is present after luminosity class, it can affect temperature parsing
+   *  (some systems treat O9.7n as O9n, ignoring fractional subclass)
+   */
+  private val peculiarSuffix: Parser0[Unit] =
+    charIn("npwevhkmsq").rep0.void.withContext("peculiar suffix")
 
   /**
-   * Luminosity class: e.g., V, III, Ia, IVb Pattern: (I|II|III|IV|V|VI|VII|VIII)[ab]?
+   * Luminosity class: e.g., V, III, Ia, IVb Pattern: (I|II|III|IV|V|VI|VII|VIII)[ab]?[npwe...]?
    */
   val lumClass: Parser[String] =
-    (romanNumeral ~ lumSubclass).string.withContext("luminosity class")
+    ((romanNumeral ~ lumSubclass).string <* peculiarSuffix).withContext("luminosity class")
 
   /** Range separator: - or / */
   private val separator: Parser[Char] =
@@ -54,18 +61,31 @@ trait SpectralTypeParsers:
   private val partialTempClass: Parser[String] =
     (digit ~ (char('.') ~ digit).?).string.withContext("partial temperature class")
 
+  /** Temperature class without trailing modifier (for ranges where "-" acts as separator) */
+  private val tempClassNoMod: Parser[String] =
+    (tempLetter ~ tempSubclass).string.withContext("temperature class no modifier")
+
   /**
-   * Temperature range: e.g., G8, G8/K0, M8-9, M2/3 Returns list of normalized temperature classes
+   * Temperature range: e.g., G8, G8/K0, M8-9, M2/3, O9-9.5, F1-F2 Returns list of normalized temperature classes
+   * Handles ambiguity where "-" can be modifier (K3-) or separator (F1-F2, O9-9.5)
    */
   val tempRange: Parser[List[String]] =
-    (tempClass ~ (separator ~ (tempClass | partialTempClass)).rep0)
-      .map { case (first, rest) =>
-        val classes = first :: rest.map(_._2)
+    (tempClass ~ (separator ~ (tempClass | partialTempClass)).rep0 ~ (tempClassNoMod | partialTempClass).?)
+      .map { case ((first, rest), trailing) =>
+        // If first ends with "-" or "+" and there's a trailing class,
+        // treat the modifier as a separator
+        val (baseFirst, extraClasses) =
+          if ((first.endsWith("-") || first.endsWith("+")) && trailing.isDefined) then
+            (first.dropRight(1), trailing.toList)
+          else
+            (first, Nil)
+
+        val classes = baseFirst :: rest.map(_._2) ::: extraClasses
         // Normalize: if second starts with digit, prepend first letter
         if (classes.length > 1) {
-          val firstLetter = first.charAt(0)
+          val firstLetter = baseFirst.charAt(0)
           classes.map { tc =>
-            if (tc.charAt(0).isDigit && !tc.contains(firstLetter)) {
+            if (tc.nonEmpty && tc.charAt(0).isDigit && !tc.contains(firstLetter)) {
               s"$firstLetter$tc"
             } else tc
           }
@@ -73,11 +93,15 @@ trait SpectralTypeParsers:
       }
       .withContext("temperature range")
 
+  /** Subclass-only luminosity: just "a", "b", or "ab" (used after a full luminosity class) */
+  private val lumSubclassOnly: Parser[String] =
+    charIn("ab").rep.string.withContext("luminosity subclass only")
+
   /**
-   * Luminosity range: e.g., V, IV/V, IIIb Returns normalized luminosity classes
+   * Luminosity range: e.g., V, IV/V, IIIb, Iab/b Returns normalized luminosity classes
    */
   val lumRange: Parser[List[String]] =
-    (lumClass ~ (separator ~ lumClass).rep0)
+    (lumClass ~ (separator ~ (lumClass.backtrack | lumSubclassOnly)).rep0)
       .map:
         case (first, rest) =>
           val classes = first :: rest.map(_._2)

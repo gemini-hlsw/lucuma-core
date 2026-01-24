@@ -118,6 +118,11 @@ object SEDMatcher:
         Left(NonEmptyChain.one(InvalidSpectralType(spectralType)))
     }
 
+  // Pattern for nebular emission stars with non-V luminosity class (IIn, IIIn, etc.)
+  // These have decimal subclass stripped in Python: O9.7IIn → O9IIn
+  // But V class stars (Vn) keep their decimal: O7.5Vn → O7.5Vn
+  private val NebularNonVPattern = """.*I{1,3}n.*""".r
+
   /**
    * Parse Simbad spectral type string into luminosity and temperature classes. Uses parser
    * combinators for robust parsing.
@@ -126,7 +131,15 @@ object SEDMatcher:
     // Clean up some chars used by simbad
     // https://simbad.cds.unistra.fr/guide/chD.htx
     val cleaned = spectralType.replaceAll("[():]", "")
-    SpectralTypeParsers.spectralType.parse(cleaned).toOption.map(_._2)
+    SpectralTypeParsers.spectralType.parse(cleaned).toOption.map(_._2).map { case (lum, temp) =>
+      // For nebular emission stars with non-V class (IIn, IIIn), truncate decimal subclass
+      // Python behavior: O9.7IIn → treated as O9IIn (but O7.5Vn stays as O7.5Vn)
+      val adjustedTemp: List[String] =
+        if spectralType.matches(NebularNonVPattern.regex) then
+          temp.map(tc => tc.replaceAll("""\.\d+""", ""))
+        else temp
+      (lum, adjustedTemp)
+    }
 
   /**
    * try to find the matching StellarLibrarySpectrum for given spectral classes. Uses physics-based
@@ -204,7 +217,8 @@ object SEDMatcher:
 
   /**
    * Check if target and library luminosity classes are compatible.
-   * Subdwarfs only match subdwarfs, white dwarfs only match white dwarfs.
+   * White dwarfs only match white dwarfs. Subdwarfs and normal stars can cross-match
+   * (Python behavior - best scoring spectrum wins regardless of sd/normal category).
    */
   private def luminosityCompatible(
     targetLum:  List[String],
@@ -212,7 +226,12 @@ object SEDMatcher:
   ): Boolean =
     val targetCat  = categorizeLuminosity(targetLum)
     val libraryCat = categorizeLuminosity(libraryLum)
-    targetCat == libraryCat
+    // White dwarfs must match white dwarfs
+    if targetCat == LuminosityCategory.WhiteDwarf || libraryCat == LuminosityCategory.WhiteDwarf then
+      targetCat == libraryCat
+    else
+      // Allow subdwarf ↔ normal cross-matching (Python behavior)
+      true
 
   /**
    * Match galaxy morphological type to appropriate GalaxySpectrum.
