@@ -3,10 +3,22 @@
 
 package lucuma.catalog.votable
 
+import cats.effect.Resource
 import cats.syntax.option.*
-import munit.FunSuite
+import munit.CatsEffectSuite
 
-class StellarPhysicsSuite extends FunSuite:
+class StellarPhysicsSuite extends CatsEffectSuite:
+
+  val physicsFixture = ResourceSuiteLocalFixture(
+    "physics",
+    Resource.eval(SEDDataLoader.load.map { config =>
+      new StellarPhysics(config.gravityTable)
+    })
+  )
+
+  override def munitFixtures = List(physicsFixture)
+
+  def physics: StellarPhysics = physicsFixture()
 
   test("letter conversions"):
     assertEquals(StellarPhysics.spectralClassCode("O0"), 0.0.some)
@@ -63,13 +75,13 @@ class StellarPhysicsSuite extends FunSuite:
 
   test("gravity calculation"):
     // Gravity values from Python's match_sed_log_g.csv table
-    assertEquals(StellarPhysics.calculateGravity(List("V"), List("A0")), 4.07.some)
-    assertEquals(StellarPhysics.calculateGravity(List("V"), List("G2")), 4.4.some)
-    assertEquals(StellarPhysics.calculateGravity(List("III"), List("K1")), 2.78.some)
-    assertEquals(StellarPhysics.calculateGravity(List("DA"), List("3")), 8.0.some)
+    assertEquals(physics.calculateGravity(List("V"), List("A0")), 4.07.some)
+    assertEquals(physics.calculateGravity(List("V"), List("G2")), 4.4.some)
+    assertEquals(physics.calculateGravity(List("III"), List("K1")), 2.78.some)
+    assertEquals(physics.calculateGravity(List("DA"), List("3")), 8.0.some)
     // I -> Iab
-    assertEquals(StellarPhysics.calculateGravity(List("I"), List("A0")), 2.01.some)
+    assertEquals(physics.calculateGravity(List("I"), List("A0")), 2.01.some)
     // VI -> sd, interpolated between G0 (sd=3.5) and K0 (sd=3.0)
-    assertEquals(StellarPhysics.calculateGravity(List("VI"), List("G2")), 3.4.some)
+    assertEquals(physics.calculateGravity(List("VI"), List("G2")), 3.4.some)
     // IIIa -> III (drops subclass)
-    assertEquals(StellarPhysics.calculateGravity(List("IIIa"), List("A0")), 3.75.some)
+    assertEquals(physics.calculateGravity(List("IIIa"), List("A0")), 3.75.some)

@@ -78,7 +78,7 @@ object SimbadClient:
         .flatMap:
           _.body
             .through(fs2.text.utf8.decode)
-            .through(CatalogSearch.siderealTargets[F](CatalogAdapter.Simbad))
+            .through(CatalogSearch.siderealTargets[F](CatalogAdapter.Simbad()))
         .compile
         .toList
 

@@ -145,7 +145,7 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform)
   )
 
 lazy val catalog = crossProject(JVMPlatform, JSPlatform)
-  .crossType(CrossType.Pure)
+  .crossType(CrossType.Full)
   .in(file("modules/catalog"))
   .dependsOn(core)
   .settings(
@@ -168,6 +168,16 @@ lazy val catalog = crossProject(JVMPlatform, JSPlatform)
       "edu.gemini"    %%% "clue-core"            % clueVersion,
       "edu.gemini"    %%% "clue-http4s"          % clueVersion,
       "org.typelevel" %%% "log4cats-core"        % log4catsVersion
+    )
+  )
+  .jvmSettings(
+    libraryDependencies ++= Seq(
+      "co.fs2" %% "fs2-io" % fs2Version
+    )
+  )
+  .jsSettings(
+    libraryDependencies ++= Seq(
+      "org.scala-js" %%% "scalajs-dom" % "2.8.0"
     )
   )
   .jsConfigure(_.enablePlugins(BundleMonPlugin))
