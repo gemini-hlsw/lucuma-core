@@ -68,9 +68,10 @@ object StellarPhysics:
 
             // Handle modifiers on the spectral class
             // '+' and '-' count as a quarter of a subclass (Keenan & McNeil)
+            // Only check trailing character to avoid false positives like "M3-5"
             val modifier =
-              if spectralClass.contains('+') then 0.25
-              else if spectralClass.contains('-') then -0.25
+              if spectralClass.lastOption.contains('+') then 0.25
+              else if spectralClass.lastOption.contains('-') then -0.25
               else 0.0
 
             Some(baseCode + subclass + modifier)

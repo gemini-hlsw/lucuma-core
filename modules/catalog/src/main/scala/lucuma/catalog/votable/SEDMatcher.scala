@@ -38,9 +38,8 @@ object SEDMatcher:
   // Giant/supergiant luminosity classes (non-dwarf)
   private val GiantClasses: Set[String] = Set("I", "Ia", "Iab", "Ib", "II", "III")
 
-  // Galaxy Hubble stage classification boundaries
+  // Galaxy Hubble stage classification boundary
   private val EllipticalHubbleStageThreshold: Double = -0.5 // E0-S0
-  private val SpiralHubbleStageThreshold: Double     = 9.0  // Sa-Sm
 
   // Galaxy morphological type patterns (as Regex for pattern matching)
   private val EllipticalPattern = """E[0-9:+]?.*""".r
@@ -197,19 +196,22 @@ object SEDMatcher:
   private def scoreSpectrum(targetParams: StellarPhysics.StellarParameters)(
     spectrum: StellarLibrarySpectrum
   ): Option[ScoredMatch] =
-    StellarLibraryParameters.params
-      .get(spectrum)
-      .map: sedParams =>
-        // Calculate differences
-        val dtValue = sedParams.temp.value - targetParams.temp.value
-        val dg      = sedParams.logG - targetParams.logG
-        val dtMax   = TemperatureToleranceFraction * targetParams.temp.value
-        val dgMax   = GravityToleranceDex
+    // Guard against zero/negative temperature which would cause division by zero
+    if targetParams.temp.value <= 0 then none
+    else
+      StellarLibraryParameters.params
+        .get(spectrum)
+        .map: sedParams =>
+          // Calculate differences
+          val dtValue = sedParams.temp.value - targetParams.temp.value
+          val dg      = sedParams.logG - targetParams.logG
+          val dtMax   = TemperatureToleranceFraction * targetParams.temp.value
+          val dgMax   = GravityToleranceDex
 
-        // Calculate score: sqrt((ΔT/ΔT_max)² + (Δlog_g/Δlog_g_max)²)
-        val score = math.sqrt((dtValue / dtMax) * (dtValue / dtMax) + (dg / dgMax) * (dg / dgMax))
+          // Calculate score: sqrt((ΔT/ΔT_max)² + (Δlog_g/Δlog_g_max)²)
+          val score = math.sqrt((dtValue / dtMax) * (dtValue / dtMax) + (dg / dgMax) * (dg / dgMax))
 
-        ScoredMatch(spectrum, score, math.abs(dtValue), dtMax, math.abs(dg), dgMax)
+          ScoredMatch(spectrum, score, math.abs(dtValue), dtMax, math.abs(dg), dgMax)
 
   private def categorizeLuminosity(lumClasses: List[String]): LuminosityCategory =
     if lumClasses.exists(l => l === "sd" || l === "VI") then LuminosityCategory.Subdwarf
@@ -235,13 +237,14 @@ object SEDMatcher:
     then targetCat == libraryCat
     else
       // Allow subdwarf ↔ normal cross-matching (Python behavior)
+      // Note: Empty lists are already guarded in matchingSpectrum
       true
 
   /**
    * Match galaxy morphological type to appropriate GalaxySpectrum.
    */
   private def matchGalaxySED(morphType: String): EitherNec[CatalogProblem, UnnormalizedSED] =
-    // match via regexes first
+    // Match via regexes first
     morphType match
       case EllipticalPattern() => Right(UnnormalizedSED.Galaxy(GalaxySpectrum.Elliptical))
       case S0Pattern()         => Right(UnnormalizedSED.Galaxy(GalaxySpectrum.Elliptical))
@@ -251,10 +254,9 @@ object SEDMatcher:
           .flatMap:
             case stage if stage <= EllipticalHubbleStageThreshold =>
               UnnormalizedSED.Galaxy(GalaxySpectrum.Elliptical).some
-            case stage if stage < SpiralHubbleStageThreshold      =>
-              UnnormalizedSED.Galaxy(GalaxySpectrum.Spiral).some
             case _                                                =>
-              none
+              // Hubble stage > -0.5 (Sa-Sm, Irr) all map to Spiral
+              UnnormalizedSED.Galaxy(GalaxySpectrum.Spiral).some
           .toRight(NonEmptyChain.one(InvalidMorphologicalType(morphType)))
 
 // TODO Consider making these external
