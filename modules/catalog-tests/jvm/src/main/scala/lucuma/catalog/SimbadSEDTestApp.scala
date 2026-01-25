@@ -80,7 +80,7 @@ object SimbadSEDTestApp extends IOApp:
           .flatMap(
             _.body
               .through(text.utf8.decode)
-              .through(CatalogSearch.siderealTargets[IO](CatalogAdapter.Simbad))
+              .through(CatalogSearch.siderealTargets[IO](CatalogAdapter.Simbad()))
           )
           .compile
           .toList

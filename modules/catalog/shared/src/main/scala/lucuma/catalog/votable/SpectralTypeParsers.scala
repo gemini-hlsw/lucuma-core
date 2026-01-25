@@ -12,7 +12,7 @@ import cats.syntax.eq.*
 /**
  * Parser combinators for astronomical spectral type strings from Simbad.
  */
-trait SpectralTypeParsers:
+private[votable] trait SpectralTypeParsers:
 
   /** Temperature class letter: O, B, A, F, G, K, M, L, T, Y */
   private val tempLetter: Parser[Char] =
@@ -174,4 +174,4 @@ trait SpectralTypeParsers:
     (whiteDwarf.backtrack | subdwarf.backtrack | mainSequence)
       .withContext("spectral type")
 
-object SpectralTypeParsers extends SpectralTypeParsers
+private[votable] object SpectralTypeParsers extends SpectralTypeParsers

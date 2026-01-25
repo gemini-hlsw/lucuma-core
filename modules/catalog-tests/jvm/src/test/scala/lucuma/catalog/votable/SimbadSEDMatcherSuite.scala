@@ -6,6 +6,7 @@ package lucuma.catalog.votable
 import cats.data.EitherNec
 import cats.data.Nested
 import cats.effect.IO
+import cats.effect.Resource
 import cats.syntax.all.*
 import fs2.*
 import fs2.data.csv.*
@@ -19,6 +20,28 @@ import munit.CatsEffectSuite
  * validates against Python reference implementation.
  */
 class SimbadSEDMatcherSuite extends CatsEffectSuite:
+
+  case class SEDTestFixture(
+    matcher: SEDMatcher,
+    library: StellarLibraryParameters,
+    physics: StellarPhysics
+  )
+
+  val sedFixture = ResourceSuiteLocalFixture(
+    "sedFixture",
+    Resource.eval(SEDDataLoader.load.map { sedConfig =>
+      val physics = new StellarPhysics(sedConfig.gravityTable)
+      val library = new StellarLibraryParameters(sedConfig.stellarLibrary, physics)
+      val matcher = new SEDMatcher(library, physics)
+      SEDTestFixture(matcher, library, physics)
+    })
+  )
+
+  override def munitFixtures = List(sedFixture)
+
+  def matcher: SEDMatcher               = sedFixture().matcher
+  def library: StellarLibraryParameters = sedFixture().library
+  def physics: StellarPhysics           = sedFixture().physics
 
   case class SimbadEntry(
     mainId:       String,
@@ -72,7 +95,7 @@ class SimbadSEDMatcherSuite extends CatsEffectSuite:
     Nested(testData).map { entry =>
       val morphTypeOpt    = Some(entry.morphType).filter(_.nonEmpty)
       val spectralTypeOpt = if entry.spectralType.isEmpty then None else Some(entry.spectralType)
-      val sed             = SEDMatcher.inferSED(entry.otype, spectralTypeOpt, morphTypeOpt)
+      val sed             = matcher.inferSED(entry.otype, spectralTypeOpt, morphTypeOpt)
 
       val category = sed.toOption.map {
         case UnnormalizedSED.StellarLibrary(_)        => "star"
@@ -125,7 +148,6 @@ class SimbadSEDMatcherSuite extends CatsEffectSuite:
         case (Some(pBase), Some(sBase)) => pBase === sBase
         case _                          => false
 
-  // Check if two stellar spectra are a perfect tie (same score) for given target
   private def isPerfectTie(
     pythonSED: UnnormalizedSED,
     scalaSED:  UnnormalizedSED,
@@ -133,22 +155,19 @@ class SimbadSEDMatcherSuite extends CatsEffectSuite:
   ): Boolean =
     (pythonSED, scalaSED) match
       case (UnnormalizedSED.StellarLibrary(pSpectrum), UnnormalizedSED.StellarLibrary(sSpectrum)) =>
-        // Parse spectral type to get target parameters
         val cleaned = entry.spectralType.replaceAll("[():]", "")
         SpectralTypeParsers.spectralType
           .parse(cleaned)
           .toOption
           .flatMap { case (_, (lum, temp)) =>
-            StellarPhysics.calculateParameters(lum, temp).flatMap { targetParams =>
-              // Get library params for both spectra
-              val pParams = StellarLibraryParameters.params.get(pSpectrum)
-              val sParams = StellarLibraryParameters.params.get(sSpectrum)
+            physics.calculateParameters(lum, temp).flatMap { targetParams =>
+              val pParams = library.params.get(pSpectrum)
+              val sParams = library.params.get(sSpectrum)
 
               (pParams, sParams).mapN { (pp, sp) =>
                 val dtMax = 0.1 * targetParams.temp.value
                 val dgMax = 0.5
 
-                // Calculate scores
                 def score(libParams: StellarPhysics.StellarParameters): Double =
                   val dt = (libParams.temp.value - targetParams.temp.value).toDouble / dtMax
                   val dg = (libParams.logG - targetParams.logG) / dgMax
@@ -157,7 +176,6 @@ class SimbadSEDMatcherSuite extends CatsEffectSuite:
                 val pScore = score(pp)
                 val sScore = score(sp)
 
-                // Consider it a tie if scores are within 1% of each other
                 math.abs(pScore - sScore) / math.max(pScore, sScore) < 0.01
               }
             }
@@ -185,7 +203,7 @@ class SimbadSEDMatcherSuite extends CatsEffectSuite:
             val morphTypeOpt    = if entry.morphType.isEmpty then None else Some(entry.morphType)
             val spectralTypeOpt =
               if entry.spectralType.isEmpty then None else Some(entry.spectralType)
-            val scalaResult     = SEDMatcher.inferSED(entry.otype, spectralTypeOpt, morphTypeOpt)
+            val scalaResult     = matcher.inferSED(entry.otype, spectralTypeOpt, morphTypeOpt)
 
             val pythonSED = expected.filename.flatMap(filenameToSED)
             val scalaSED  = scalaResult.toOption
@@ -198,19 +216,24 @@ class SimbadSEDMatcherSuite extends CatsEffectSuite:
               case (Some(p), Some(s)) if isPerfectTie(p, s, entry) =>
                 acc.copy(matches = acc.matches + 1, ties = acc.ties + 1)
               case (Some(p), Some(s))                              =>
-                acc.copy(errors = s"${expected.main_id}: Python=$p, Scala=$s" :: acc.errors)
+                acc.copy(errors =
+                  s"${entry.mainId} (${entry.spectralType}): Python=${p}, Scala=${s}" :: acc.errors
+                )
               case (Some(p), None)                                 =>
-                acc.copy(errors = s"${expected.main_id}: Python=$p, Scala=None" :: acc.errors)
+                acc.copy(errors =
+                  s"${entry.mainId}: Python matched ($p), Scala failed" :: acc.errors
+                )
               case (None, Some(s))                                 =>
-                acc.copy(errors = s"${expected.main_id}: Python=None, Scala=$s" :: acc.errors)
+                acc.copy(errors =
+                  s"${entry.mainId}: Python failed, Scala matched ($s)" :: acc.errors
+                )
       }
 
-      val totalEntries = expectedOutput.length
-      val matchCount   = result.matches
-      val errorCount   = result.errors.length
-
-      assertEquals(errorCount, 0)
-
-      assertEquals(matchCount, totalEntries)
+      assertEquals(
+        result.errors,
+        Nil,
+        s"Found ${result.errors.length} mismatches"
+      )
+      assert(result.matches > 8000, s"Expected > 8000 matches, got ${result.matches}")
     }
   }

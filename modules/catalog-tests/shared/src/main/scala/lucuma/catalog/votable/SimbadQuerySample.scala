@@ -23,7 +23,7 @@ trait SimbadQuerySample:
       .flatMap(
         _.body
           .through(text.utf8.decode)
-          .through(CatalogSearch.siderealTargets[F](CatalogAdapter.Simbad))
+          .through(CatalogSearch.siderealTargets[F](CatalogAdapter.Simbad()))
       )
       .compile
       .toList

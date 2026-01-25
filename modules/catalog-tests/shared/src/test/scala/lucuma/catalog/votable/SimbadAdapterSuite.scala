@@ -14,16 +14,17 @@ class SimbadAdapterSuite extends FunSuite {
     val magErrorUcd = Ucd.unsafeFromString("stat.error;phot.mag")
     // FLUX_r maps to r'
     assertEquals(
-      CatalogAdapter.Simbad
+      CatalogAdapter
+        .Simbad()
         .parseBrightnessValue(FieldId.unsafeFrom("FLUX_ERROR_r", magErrorUcd), "20.3051"),
       (FieldId.unsafeFrom("FLUX_ERROR_r", magErrorUcd), Band.SloanR, 20.3051).rightNec
     )
 
     // FLUX_R maps to R
     assertEquals(
-      CatalogAdapter.Simbad.parseBrightnessValue(FieldId.unsafeFrom("FLUX_ERROR_R", magErrorUcd),
-                                                 "20.3051"
-      ),
+      CatalogAdapter
+        .Simbad()
+        .parseBrightnessValue(FieldId.unsafeFrom("FLUX_ERROR_R", magErrorUcd), "20.3051"),
       (FieldId.unsafeFrom("FLUX_ERROR_R", magErrorUcd), Band.R, 20.3051).rightNec
     )
   }
