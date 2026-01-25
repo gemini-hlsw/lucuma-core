@@ -80,3 +80,54 @@ class SEDMatcherSuite extends FunSuite:
     val result = SEDMatcher.inferSED("UnknownType", Some("A0Va"), None)
     assert(result.isLeft)
   }
+
+  test("galaxy with Hubble stage >= 9.0 returns Spiral (irregular galaxies)") {
+    val result = SEDMatcher.inferSED("G", None, Some("10.0"))
+    assert(result.isRight)
+    assertEquals(
+      result.getOrElse(fail("Expected Right")),
+      UnnormalizedSED.Galaxy(GalaxySpectrum.Spiral)
+    )
+  }
+
+  test("galaxy with Hubble stage 9.0 returns Spiral") {
+    val result = SEDMatcher.inferSED("G", None, Some("9.0"))
+    assert(result.isRight)
+    assertEquals(
+      result.getOrElse(fail("Expected Right")),
+      UnnormalizedSED.Galaxy(GalaxySpectrum.Spiral)
+    )
+  }
+
+  test("star with empty spectral type returns error") {
+    val result = SEDMatcher.inferSED("*", Some(""), None)
+    assert(result.isLeft)
+  }
+
+  test("star with missing spectral type returns error") {
+    val result = SEDMatcher.inferSED("*", None, None)
+    assert(result.isLeft)
+  }
+
+  test("galaxy with S0 morphology returns Elliptical") {
+    val result = SEDMatcher.inferSED("G", None, Some("S0"))
+    assert(result.isRight)
+    assertEquals(
+      result.getOrElse(fail("Expected Right")),
+      UnnormalizedSED.Galaxy(GalaxySpectrum.Elliptical)
+    )
+  }
+
+  test("galaxy with negative Hubble stage returns Elliptical") {
+    val result = SEDMatcher.inferSED("G", None, Some("-3.0"))
+    assert(result.isRight)
+    assertEquals(
+      result.getOrElse(fail("Expected Right")),
+      UnnormalizedSED.Galaxy(GalaxySpectrum.Elliptical)
+    )
+  }
+
+  test("galaxy with invalid morphology returns error") {
+    val result = SEDMatcher.inferSED("G", None, Some("invalid"))
+    assert(result.isLeft)
+  }

@@ -77,3 +77,22 @@ class SpectralTypeParsersSuite extends FunSuite:
     assertEquals(SpectralTypeParsers.spectralType.parseAll("A0mA1Va"),
                  (List("Va"), List("A0")).asRight
     )
+
+  test("tempClass with trailing minus modifier"):
+    assertEquals(SpectralTypeParsers.tempClass.parseAll("K3-"), "K3-".asRight)
+
+  test("tempClass with trailing plus modifier"):
+    assertEquals(SpectralTypeParsers.tempClass.parseAll("G5+"), "G5+".asRight)
+
+  test("spectralType handles range like M3-5 (not a modifier)"):
+    val result = SpectralTypeParsers.spectralType.parseAll("M3-5III")
+    assert(result.isRight)
+
+  test("spectralType handles nebular emission with non-V class"):
+    val result = SpectralTypeParsers.spectralType.parseAll("O9IIn")
+    assert(result.isRight)
+    assertEquals(result.getOrElse(fail("Expected Right"))._1.headOption, Some("II"))
+
+  test("empty string fails to parse"):
+    val result = SpectralTypeParsers.spectralType.parseAll("")
+    assert(result.isLeft)
