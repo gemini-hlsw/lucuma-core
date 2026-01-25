@@ -20,7 +20,8 @@ trait SpectralTypeParsers:
 
   /** Temperature subclass: digit, optionally followed by decimal (e.g., "2", "3.5"), or empty */
   val tempSubclass: Parser0[String] =
-    (digit ~ (char('.') ~ digit.rep).?).string.?.map(_.getOrElse("")).withContext("temperature subclass")
+    (digit ~ (char('.') ~ digit.rep).?).string.?.map(_.getOrElse(""))
+      .withContext("temperature subclass")
 
   /** Optional modifier: + or - */
   private val modifier: Parser0[String] =
@@ -39,11 +40,13 @@ trait SpectralTypeParsers:
 
   /** Optional luminosity subclass: a, b, or ab */
   private val lumSubclass: Parser0[String] =
-    (string("ab").string | charIn("ab").string).?.map(_.getOrElse("")).withContext("luminosity subclass")
+    (string("ab").string | charIn("ab").string).?.map(_.getOrElse(""))
+      .withContext("luminosity subclass")
 
-  /** Optional spectral peculiarity suffixes to skip: n (nebular), w (weak), p (peculiar), etc.
-   *  When "n" suffix is present after luminosity class, it can affect temperature parsing
-   *  (some systems treat O9.7n as O9n, ignoring fractional subclass)
+  /**
+   * Optional spectral peculiarity suffixes to skip: n (nebular), w (weak), p (peculiar), etc. When
+   * "n" suffix is present after luminosity class, it can affect temperature parsing (some systems
+   * treat O9.7n as O9n, ignoring fractional subclass)
    */
   private val peculiarSuffix: Parser0[Unit] =
     charIn("npwevhkmsq").rep0.void.withContext("peculiar suffix")
@@ -66,8 +69,9 @@ trait SpectralTypeParsers:
     (tempLetter ~ tempSubclass).string.withContext("temperature class no modifier")
 
   /**
-   * Temperature range: e.g., G8, G8/K0, M8-9, M2/3, O9-9.5, F1-F2 Returns list of normalized temperature classes
-   * Handles ambiguity where "-" can be modifier (K3-) or separator (F1-F2, O9-9.5)
+   * Temperature range: e.g., G8, G8/K0, M8-9, M2/3, O9-9.5, F1-F2 Returns list of normalized
+   * temperature classes Handles ambiguity where "-" can be modifier (K3-) or separator (F1-F2,
+   * O9-9.5)
    */
   val tempRange: Parser[List[String]] =
     (tempClass ~ (separator ~ (tempClass | partialTempClass)).rep0 ~ (tempClassNoMod | partialTempClass).?)
@@ -75,10 +79,9 @@ trait SpectralTypeParsers:
         // If first ends with "-" or "+" and there's a trailing class,
         // treat the modifier as a separator
         val (baseFirst, extraClasses) =
-          if ((first.endsWith("-") || first.endsWith("+")) && trailing.isDefined) then
+          if (first.endsWith("-") || first.endsWith("+")) && trailing.isDefined then
             (first.dropRight(1), trailing.toList)
-          else
-            (first, Nil)
+          else (first, Nil)
 
         val classes = baseFirst :: rest.map(_._2) ::: extraClasses
         // Normalize: if second starts with digit, prepend first letter

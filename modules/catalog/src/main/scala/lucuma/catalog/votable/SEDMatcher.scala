@@ -30,8 +30,8 @@ private case class ScoredMatch(
 
 object SEDMatcher:
   // Tolerances (physics-based scoring)
-  private val TemperatureToleranceFraction: Double = 0.1 // 10% of target temperature
-  private val GravityToleranceDex: Double          = 0.5 // 0.5 dex in log(g)
+  private val TemperatureToleranceFraction: Double    = 0.1 // 10% of target temperature
+  private val GravityToleranceDex: Double             = 0.5 // 0.5 dex in log(g)
   // Stricter gravity tolerance for cross-luminosity fallback (II/III target matching V spectrum)
   private val CrossLuminosityGravityTolerance: Double = 0.4
 
@@ -170,25 +170,29 @@ object SEDMatcher:
             val bestMatch = compatibleMatches.headOption.filter(_.isWithinTolerance)
 
             // For targets with giant classes but matching to V spectrum with large gravity diff, reject
-            bestMatch.flatMap: m =>
-              val libLum        = getLibraryLuminosity(m.spectrum)
-              val isVMatch      = libLum.contains("V") && !libLum.exists(GiantClasses.contains)
-              val rejectVMatch  = needsStrictGravity && isVMatch && m.absDg >= CrossLuminosityGravityTolerance
+            bestMatch
+              .flatMap: m =>
+                val libLum       = getLibraryLuminosity(m.spectrum)
+                val isVMatch     = libLum.contains("V") && !libLum.exists(GiantClasses.contains)
+                val rejectVMatch =
+                  needsStrictGravity && isVMatch && m.absDg >= CrossLuminosityGravityTolerance
 
-              if rejectVMatch then none
-              else m.spectrum.some
-            .orElse:
-              // Fallback: if no subdwarf match found, try normal spectra (Python behavior)
-              val targetCat = categorizeLuminosity(l)
-              if targetCat == LuminosityCategory.Subdwarf then
-                StellarLibraryParameters.preferredSpectraOrdered
-                  .filter(s => categorizeLuminosity(getLibraryLuminosity(s)) == LuminosityCategory.Normal)
-                  .flatMap(scoreSpectrum(params))
-                  .sortBy(m => (m.score, StellarLibraryParameters.fileOrderIndex(m.spectrum)))
-                  .headOption
-                  .filter(_.isWithinTolerance)
-                  .map(_.spectrum)
-              else none
+                if rejectVMatch then none
+                else m.spectrum.some
+              .orElse:
+                // Fallback: if no subdwarf match found, try normal spectra (Python behavior)
+                val targetCat = categorizeLuminosity(l)
+                if targetCat == LuminosityCategory.Subdwarf then
+                  StellarLibraryParameters.preferredSpectraOrdered
+                    .filter(s =>
+                      categorizeLuminosity(getLibraryLuminosity(s)) == LuminosityCategory.Normal
+                    )
+                    .flatMap(scoreSpectrum(params))
+                    .sortBy(m => (m.score, StellarLibraryParameters.fileOrderIndex(m.spectrum)))
+                    .headOption
+                    .filter(_.isWithinTolerance)
+                    .map(_.spectrum)
+                else none
 
   private def scoreSpectrum(targetParams: StellarPhysics.StellarParameters)(
     spectrum: StellarLibrarySpectrum
@@ -216,9 +220,9 @@ object SEDMatcher:
     StellarLibraryParameters.getLuminosityClasses(spectrum)
 
   /**
-   * Check if target and library luminosity classes are compatible.
-   * White dwarfs only match white dwarfs. Subdwarfs and normal stars can cross-match
-   * (Python behavior - best scoring spectrum wins regardless of sd/normal category).
+   * Check if target and library luminosity classes are compatible. White dwarfs only match white
+   * dwarfs. Subdwarfs and normal stars can cross-match (Python behavior - best scoring spectrum
+   * wins regardless of sd/normal category).
    */
   private def luminosityCompatible(
     targetLum:  List[String],
@@ -227,8 +231,8 @@ object SEDMatcher:
     val targetCat  = categorizeLuminosity(targetLum)
     val libraryCat = categorizeLuminosity(libraryLum)
     // White dwarfs must match white dwarfs
-    if targetCat == LuminosityCategory.WhiteDwarf || libraryCat == LuminosityCategory.WhiteDwarf then
-      targetCat == libraryCat
+    if targetCat == LuminosityCategory.WhiteDwarf || libraryCat == LuminosityCategory.WhiteDwarf
+    then targetCat == libraryCat
     else
       // Allow subdwarf ↔ normal cross-matching (Python behavior)
       true
