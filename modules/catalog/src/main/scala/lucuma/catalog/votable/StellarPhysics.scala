@@ -126,7 +126,7 @@ object StellarPhysics:
          "sd"  -> 4.5
      )
     ),
-    (5.0, // O5
+    (5.0,  // O5
      Map("V"   -> 3.90,
          "IV"  -> 3.86,
          "III" -> 3.82,
@@ -136,7 +136,7 @@ object StellarPhysics:
          "Ia"  -> 3.57
      )
     ),
-    (6.0, // O6
+    (6.0,  // O6
      Map("V"   -> 3.86,
          "IV"  -> 3.80,
          "III" -> 3.76,
@@ -146,7 +146,7 @@ object StellarPhysics:
          "Ia"  -> 3.53
      )
     ),
-    (7.0, // O7
+    (7.0,  // O7
      Map("V"   -> 3.85,
          "IV"  -> 3.80,
          "III" -> 3.74,
@@ -156,7 +156,7 @@ object StellarPhysics:
          "Ia"  -> 3.45
      )
     ),
-    (8.0, // O8
+    (8.0,  // O8
      Map("V"   -> 3.87,
          "IV"  -> 3.81,
          "III" -> 3.75,
@@ -166,7 +166,7 @@ object StellarPhysics:
          "Ia"  -> 3.39
      )
     ),
-    (9.0, // O9
+    (9.0,  // O9
      Map("V"   -> 3.95,
          "IV"  -> 3.82,
          "III" -> 3.74,

@@ -4,6 +4,7 @@
 package lucuma.catalog.votable
 
 import cats.data.EitherNec
+import cats.data.Nested
 import cats.effect.IO
 import cats.syntax.all.*
 import fs2.*
@@ -12,7 +13,6 @@ import fs2.io.readClassLoaderResource
 import lucuma.core.enums.*
 import lucuma.core.model.UnnormalizedSED
 import munit.CatsEffectSuite
-import cats.data.Nested
 
 /**
  * Test suite for SED matching against Simbad entries. Uses the full dataset (8000+ entries) and
@@ -128,105 +128,89 @@ class SimbadSEDMatcherSuite extends CatsEffectSuite:
   // Check if two stellar spectra are a perfect tie (same score) for given target
   private def isPerfectTie(
     pythonSED: UnnormalizedSED,
-    scalaSED: UnnormalizedSED,
-    entry: SimbadEntry
+    scalaSED:  UnnormalizedSED,
+    entry:     SimbadEntry
   ): Boolean =
     (pythonSED, scalaSED) match
       case (UnnormalizedSED.StellarLibrary(pSpectrum), UnnormalizedSED.StellarLibrary(sSpectrum)) =>
         // Parse spectral type to get target parameters
         val cleaned = entry.spectralType.replaceAll("[():]", "")
-        SpectralTypeParsers.spectralType.parse(cleaned).toOption.flatMap { case (_, (lum, temp)) =>
-          StellarPhysics.calculateParameters(lum, temp).flatMap { targetParams =>
-            // Get library params for both spectra
-            val pParams = StellarLibraryParameters.params.get(pSpectrum)
-            val sParams = StellarLibraryParameters.params.get(sSpectrum)
+        SpectralTypeParsers.spectralType
+          .parse(cleaned)
+          .toOption
+          .flatMap { case (_, (lum, temp)) =>
+            StellarPhysics.calculateParameters(lum, temp).flatMap { targetParams =>
+              // Get library params for both spectra
+              val pParams = StellarLibraryParameters.params.get(pSpectrum)
+              val sParams = StellarLibraryParameters.params.get(sSpectrum)
 
-            (pParams, sParams).mapN { (pp, sp) =>
-              val dtMax = 0.1 * targetParams.temp.value
-              val dgMax = 0.5
+              (pParams, sParams).mapN { (pp, sp) =>
+                val dtMax = 0.1 * targetParams.temp.value
+                val dgMax = 0.5
 
-              // Calculate scores
-              def score(libParams: StellarPhysics.StellarParameters): Double =
-                val dt = (libParams.temp.value - targetParams.temp.value).toDouble / dtMax
-                val dg = (libParams.logG - targetParams.logG) / dgMax
-                math.sqrt(dt * dt + dg * dg)
+                // Calculate scores
+                def score(libParams: StellarPhysics.StellarParameters): Double =
+                  val dt = (libParams.temp.value - targetParams.temp.value).toDouble / dtMax
+                  val dg = (libParams.logG - targetParams.logG) / dgMax
+                  math.sqrt(dt * dt + dg * dg)
 
-              val pScore = score(pp)
-              val sScore = score(sp)
+                val pScore = score(pp)
+                val sScore = score(sp)
 
-              // Consider it a tie if scores are within 1% of each other
-              math.abs(pScore - sScore) / math.max(pScore, sScore) < 0.01
+                // Consider it a tie if scores are within 1% of each other
+                math.abs(pScore - sScore) / math.max(pScore, sScore) < 0.01
+              }
             }
           }
-        }.getOrElse(false)
-      case _ => false
+          .getOrElse(false)
+      case _                                                                                      => false
 
   test("sanity test"):
     testData.map(_.length > 8000).assert
 
-  // Known differences between Python and Scala implementations
-  val knownDifferences = Set.empty[String]
-
-  test("validate against Python reference output") {
+  test("validate against Python") {
     (testData, output).mapN { (testData, expectedOutput) =>
       val inputData = testData.map(e => e.mainId -> e).toMap
 
-      var matches         = 0
-      var ties            = 0
-      var mismatches      = 0
-      var knownDiffs      = 0
-      val errors          = scala.collection.mutable.ListBuffer[String]()
-      val unexpectedDiffs = scala.collection.mutable.ListBuffer[String]()
+      case class ValidationResult(
+        matches: Int = 0,
+        ties:    Int = 0,
+        errors:  List[String] = Nil
+      )
 
-      expectedOutput.foreach { expected =>
-        inputData.get(expected.main_id).foreach { entry =>
-          val morphTypeOpt    = if entry.morphType.isEmpty then None else Some(entry.morphType)
-          val spectralTypeOpt =
-            if entry.spectralType.isEmpty then None else Some(entry.spectralType)
-          val scalaResult     = SEDMatcher.inferSED(entry.otype, spectralTypeOpt, morphTypeOpt)
+      val result = expectedOutput.foldLeft(ValidationResult()) { (acc, expected) =>
+        inputData.get(expected.main_id) match
+          case None        => acc
+          case Some(entry) =>
+            val morphTypeOpt    = if entry.morphType.isEmpty then None else Some(entry.morphType)
+            val spectralTypeOpt =
+              if entry.spectralType.isEmpty then None else Some(entry.spectralType)
+            val scalaResult     = SEDMatcher.inferSED(entry.otype, spectralTypeOpt, morphTypeOpt)
 
-          val pythonSED = expected.filename.flatMap(filenameToSED)
-          val scalaSED  = scalaResult.toOption
+            val pythonSED = expected.filename.flatMap(filenameToSED)
+            val scalaSED  = scalaResult.toOption
 
-          (pythonSED, scalaSED) match
-            case (None, None)                              => matches += 1
-            case (Some(p), Some(s)) if sedEquivalent(p, s) => matches += 1
-            case (Some(p), Some(s)) if isPerfectTie(p, s, entry) =>
-              ties += 1
-              matches += 1
-            case (Some(p), Some(s))                        =>
-              mismatches += 1
-              val msg = s"${expected.main_id}: Python=$p, Scala=$s"
-              errors += msg
-              if knownDifferences.contains(expected.main_id) then knownDiffs += 1
-              else unexpectedDiffs += msg
-            case (Some(p), None)                           =>
-              mismatches += 1
-              val msg = s"${expected.main_id}: Python=$p, Scala=None"
-              errors += msg
-              if knownDifferences.contains(expected.main_id) then knownDiffs += 1
-              else unexpectedDiffs += msg
-            case (None, Some(s))                           =>
-              mismatches += 1
-              val msg = s"${expected.main_id}: Python=None, Scala=$s"
-              errors += msg
-              if knownDifferences.contains(expected.main_id) then knownDiffs += 1
-              else unexpectedDiffs += msg
-        }
+            (pythonSED, scalaSED) match
+              case (None, None)                                    =>
+                acc.copy(matches = acc.matches + 1)
+              case (Some(p), Some(s)) if sedEquivalent(p, s)       =>
+                acc.copy(matches = acc.matches + 1)
+              case (Some(p), Some(s)) if isPerfectTie(p, s, entry) =>
+                acc.copy(matches = acc.matches + 1, ties = acc.ties + 1)
+              case (Some(p), Some(s))                              =>
+                acc.copy(errors = s"${expected.main_id}: Python=$p, Scala=$s" :: acc.errors)
+              case (Some(p), None)                                 =>
+                acc.copy(errors = s"${expected.main_id}: Python=$p, Scala=None" :: acc.errors)
+              case (None, Some(s))                                 =>
+                acc.copy(errors = s"${expected.main_id}: Python=None, Scala=$s" :: acc.errors)
       }
 
-      println(s"\n=== Python Reference Validation ===")
-      println(s"Total entries: ${expectedOutput.length}")
-      println(s"Matches: $matches (${matches * 100 / expectedOutput.length}%) [includes $ties perfect ties]")
-      println(s"Known differences: $knownDiffs")
-      println(s"Total mismatches: $mismatches")
+      val totalEntries = expectedOutput.length
+      val matchCount   = result.matches
+      val errorCount   = result.errors.length
 
-      if errors.nonEmpty && errors.length <= 50 then
-        println(s"\nAll differences:")
-        errors.foreach(e => println(s"  $e"))
-      else if errors.nonEmpty then
-        println(s"\nFirst 50 differences:")
-        errors.take(50).foreach(e => println(s"  $e"))
-        println(s"... and ${errors.length - 50} more")
+      assertEquals(errorCount, 0)
+
+      assertEquals(matchCount, totalEntries)
     }
   }
