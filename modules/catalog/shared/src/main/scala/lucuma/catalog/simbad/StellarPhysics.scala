@@ -17,7 +17,7 @@ import lucuma.core.syntax.string.*
  *   - Temperature: Malkov et al, 2020, RAA, 20, 139
  *   - Gravity: Straizys & Kuriliene, 1981, Ap&SS, 80, 353S
  */
-private[simbad] class StellarPhysics(gravityTableConfig: GravityTableConfig):
+private[catalog] class StellarPhysics(gravityTableConfig: GravityTableConfig):
 
   import StellarPhysics.*
 
@@ -97,7 +97,7 @@ private[simbad] class StellarPhysics(gravityTableConfig: GravityTableConfig):
       logG <- calculateGravity(luminosity, temperature)
     } yield StellarParameters(temp.withUnit[Kelvin], logG)
 
-private[simbad] object StellarPhysics:
+private[catalog] object StellarPhysics:
 
   private val BrownDwarfThreshold = 70.0
   private val WhiteDwarfLogG      = 8.0

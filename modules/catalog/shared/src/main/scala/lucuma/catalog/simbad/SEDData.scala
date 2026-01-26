@@ -5,15 +5,19 @@ package lucuma.catalog.simbad
 
 import lucuma.core.enums.StellarLibrarySpectrum
 
-case class StellarLibraryConfig(
+// Data classes for SED matching configuration
+
+/** Maps stellar library spectra to their luminosity and temperature classes. */
+private[catalog] case class StellarLibraryConfig(
   entries: List[(StellarLibrarySpectrum, (List[String], List[String]))]
 )
 
-case class GravityTableConfig(
+/** Maps spectral type codes to log(g) values for each luminosity class. */
+private[catalog] case class GravityTableConfig(
   rows: List[(Double, Map[String, Double])]
 )
 
-case class SEDDataConfig(
+private[catalog] case class SEDDataConfig(
   stellarLibrary: StellarLibraryConfig,
   gravityTable:   GravityTableConfig
 )

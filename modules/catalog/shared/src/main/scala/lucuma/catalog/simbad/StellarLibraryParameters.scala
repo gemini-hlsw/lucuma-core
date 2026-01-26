@@ -7,31 +7,27 @@ import cats.syntax.all.*
 import lucuma.catalog.simbad.StellarPhysics.StellarParameters
 import lucuma.core.enums.StellarLibrarySpectrum
 
-private[simbad] class StellarLibraryParameters(
+private[catalog] class StellarLibraryParameters(
   config:  StellarLibraryConfig,
   physics: StellarPhysics
 ):
 
-  private val librarySpectraOrdered: List[(StellarLibrarySpectrum, (List[String], List[String]))] =
-    config.entries
-
   private val librarySpectraConfig: Map[StellarLibrarySpectrum, (List[String], List[String])] =
-    librarySpectraOrdered.toMap
+    config.entries.toMap
 
   val preferredSpectraOrdered: List[StellarLibrarySpectrum] =
-    librarySpectraOrdered.map(_._1)
+    config.entries.map(_._1)
 
-  val preferredSpectra: Set[StellarLibrarySpectrum] = librarySpectraConfig.keySet
+  private val spectrumIndexMap: Map[StellarLibrarySpectrum, Int] =
+    preferredSpectraOrdered.zipWithIndex.toMap
 
   def fileOrderIndex(spectrum: StellarLibrarySpectrum): Int =
-    preferredSpectraOrdered.indexOf(spectrum) match
-      case -1 => Int.MaxValue
-      case i  => i
+    spectrumIndexMap.getOrElse(spectrum, Int.MaxValue)
 
-  def getLuminosityClasses(spectrum: StellarLibrarySpectrum): List[String] =
-    librarySpectraConfig.get(spectrum).map(_._1).getOrElse(List.empty)
+  def luminosityClasses(spectrum: StellarLibrarySpectrum): List[String] =
+    librarySpectraConfig.get(spectrum).foldMap(_._1)
 
-  lazy val params: Map[StellarLibrarySpectrum, StellarParameters] =
-    librarySpectraConfig.flatMap { case (spectrum, (lumClasses, tempClasses)) =>
-      physics.calculateParameters(lumClasses, tempClasses).tupleLeft(spectrum)
-    }
+  val params: Map[StellarLibrarySpectrum, StellarParameters] =
+    librarySpectraConfig.flatMap:
+      case (spectrum, (lumClasses, tempClasses)) =>
+        physics.calculateParameters(lumClasses, tempClasses).tupleLeft(spectrum)

@@ -7,27 +7,14 @@ import cats.data.EitherNec
 import cats.data.NonEmptyChain
 import cats.syntax.eq.*
 import cats.syntax.option.*
+import cats.syntax.either.*
 import lucuma.catalog.votable.CatalogProblem
 import lucuma.catalog.votable.CatalogProblem.*
 import lucuma.core.enums.*
 import lucuma.core.model.UnnormalizedSED
 import lucuma.core.syntax.string.*
 
-private enum ObjectCategory:
-  case Star, Galaxy, Quasar, HIIRegion, PlanetaryNebula
-
-private enum LuminosityCategory:
-  case Subdwarf, WhiteDwarf, Normal
-
-private case class ScoredMatch(
-  spectrum: StellarLibrarySpectrum,
-  score:    Double,
-  absDt:    Double,
-  dtMax:    Double,
-  absDg:    Double,
-  dgMax:    Double
-):
-  def isWithinTolerance: Boolean = absDt < dtMax && absDg < dgMax
+import lucuma.core.util.Enumerated
 
 /**
  * SED matching based on match_sed Python package by Andy Stephens.
@@ -79,6 +66,7 @@ class SEDMatcher(
         Left(NonEmptyChain.one(InvalidSpectralType(spectralType)))
     }
 
+  // Finds the best matching spectrum
   private def matchingSpectrum(
     luminosity:  List[String],
     temperature: List[String]
@@ -95,7 +83,7 @@ class SEDMatcher(
             val needsStrictGravity  = targetHasGiantClass && !targetHasDwarfClass
 
             val compatibleMatches = stellarLibrary.preferredSpectraOrdered
-              .filter(s => luminosityCompatible(l, getLibraryLuminosity(s)))
+              .filter(s => luminosityCompatible(l, libraryLuminosity(s)))
               .flatMap(scoreSpectrum(params))
               .sortBy(m => (m.score, stellarLibrary.fileOrderIndex(m.spectrum)))
 
@@ -103,46 +91,49 @@ class SEDMatcher(
 
             bestMatch
               .flatMap: m =>
-                val libLum       = getLibraryLuminosity(m.spectrum)
+                val libLum       = libraryLuminosity(m.spectrum)
                 val isVMatch     = libLum.contains("V") && !libLum.exists(GiantClasses.contains)
                 val rejectVMatch =
                   needsStrictGravity && isVMatch && m.absDg >= CrossLuminosityGravityTolerance
 
-                if rejectVMatch then none
-                else m.spectrum.some
+                Option.unless(rejectVMatch)(m.spectrum)
               .orElse:
                 val targetCat = categorizeLuminosity(l)
-                if targetCat == LuminosityCategory.Subdwarf then
-                  stellarLibrary.preferredSpectraOrdered
-                    .filter(s =>
-                      categorizeLuminosity(getLibraryLuminosity(s)) == LuminosityCategory.Normal
-                    )
-                    .flatMap(scoreSpectrum(params))
-                    .sortBy(m => (m.score, stellarLibrary.fileOrderIndex(m.spectrum)))
-                    .headOption
-                    .filter(_.isWithinTolerance)
-                    .map(_.spectrum)
-                else none
+
+                Option
+                  .when(targetCat === LuminosityCategory.Subdwarf):
+                    stellarLibrary.preferredSpectraOrdered
+                      .filter(s =>
+                        categorizeLuminosity(libraryLuminosity(s)) === LuminosityCategory.Normal
+                      )
+                      .flatMap(scoreSpectrum(params))
+                      .sortBy(m => (m.score, stellarLibrary.fileOrderIndex(m.spectrum)))
+                      .headOption
+                      .filter(_.isWithinTolerance)
+                      .map(_.spectrum)
+                  .flatten
 
   private def scoreSpectrum(targetParams: StellarPhysics.StellarParameters)(
     spectrum: StellarLibrarySpectrum
   ): Option[ScoredMatch] =
-    if targetParams.temp.value <= 0 then none
-    else
-      stellarLibrary.params
-        .get(spectrum)
-        .map: sedParams =>
-          val dtValue = sedParams.temp.value - targetParams.temp.value
-          val dg      = sedParams.logG - targetParams.logG
-          val dtMax   = TemperatureToleranceFraction * targetParams.temp.value
-          val dgMax   = GravityToleranceDex
+    Option
+      .unless(targetParams.temp.value <= 0):
+        stellarLibrary.params
+          .get(spectrum)
+          .map: sedParams =>
+            val dtValue = sedParams.temp.value - targetParams.temp.value
+            val dg      = sedParams.logG - targetParams.logG
+            val dtMax   = TemperatureToleranceFraction * targetParams.temp.value
+            val dgMax   = GravityToleranceDex
 
-          val score = math.sqrt((dtValue / dtMax) * (dtValue / dtMax) + (dg / dgMax) * (dg / dgMax))
+            val score =
+              math.sqrt((dtValue / dtMax) * (dtValue / dtMax) + (dg / dgMax) * (dg / dgMax))
 
-          ScoredMatch(spectrum, score, math.abs(dtValue), dtMax, math.abs(dg), dgMax)
+            ScoredMatch(spectrum, score, math.abs(dtValue), dtMax, math.abs(dg), dgMax)
+      .flatten
 
-  private def getLibraryLuminosity(spectrum: StellarLibrarySpectrum): List[String] =
-    stellarLibrary.getLuminosityClasses(spectrum)
+  private inline def libraryLuminosity(spectrum: StellarLibrarySpectrum): List[String] =
+    stellarLibrary.luminosityClasses(spectrum)
 
 object SEDMatcher:
   def fromConfig(config: SEDDataConfig): SEDMatcher =
@@ -150,14 +141,37 @@ object SEDMatcher:
     val library = new StellarLibraryParameters(config.stellarLibrary, physics)
     new SEDMatcher(library, physics)
 
+  private enum ObjectCategory(val tag: String) derives Enumerated:
+    case Star            extends ObjectCategory("")
+    case Galaxy          extends ObjectCategory("")
+    case Quasar          extends ObjectCategory("")
+    case HIIRegion       extends ObjectCategory("")
+    case PlanetaryNebula extends ObjectCategory("")
+
+  private enum LuminosityCategory(val tag: String) derives Enumerated:
+    case Subdwarf   extends LuminosityCategory("subdwarf")
+    case WhiteDwarf extends LuminosityCategory("whitedwarf")
+    case Normal     extends LuminosityCategory("normal")
+
+  private case class ScoredMatch(
+    spectrum: StellarLibrarySpectrum,
+    score:    Double,
+    absDt:    Double,
+    dtMax:    Double,
+    absDg:    Double,
+    dgMax:    Double
+  ):
+    def isWithinTolerance: Boolean = absDt < dtMax && absDg < dgMax
+
+  // Tolerance factors are unitless
   private val TemperatureToleranceFraction: Double    = 0.1
   private val GravityToleranceDex: Double             = 0.5
   private val CrossLuminosityGravityTolerance: Double = 0.4
+  private val EllipticalHubbleStageThreshold: Double  = -0.5
 
   private val GiantClasses: Set[String] = Set("I", "Ia", "Iab", "Ib", "II", "III")
 
-  private val EllipticalHubbleStageThreshold: Double = -0.5
-
+  // Some regexes to match galaxy SEDs
   private val EllipticalPattern = """E[0-9:+]?.*""".r
   private val S0Pattern         = """S0.*""".r
   private val SpiralPattern     = """S[abcABC_:]?.*""".r
@@ -173,14 +187,18 @@ object SEDMatcher:
     else none
 
   private def parseSpectralType(spectralType: String): Option[(List[String], List[String])] =
-    val cleaned = spectralType.replaceAll("[():]", "")
-    SpectralTypeParsers.spectralType.parse(cleaned).toOption.map(_._2).map { case (lum, temp) =>
-      val adjustedTemp: List[String] =
-        if spectralType.matches(NebularNonVPattern.regex) then
-          temp.map(tc => tc.replaceAll("""\.\d+""", ""))
-        else temp
-      (lum, adjustedTemp)
-    }
+    val clean = spectralType.replaceAll("[():]", "")
+
+    SpectralTypeParsers.spectralType
+      .parse(clean)
+      .toOption
+      .map:
+        case (_, (lum, temp)) =>
+          val adjustedTemp =
+            if spectralType.matches(NebularNonVPattern.regex) then
+              temp.map(tc => tc.replaceAll("""\.\d+""", ""))
+            else temp
+          (lum, adjustedTemp)
 
   private def categorizeLuminosity(lumClasses: List[String]): LuminosityCategory =
     if lumClasses.exists(l => l === "sd" || l === "VI") then LuminosityCategory.Subdwarf
@@ -193,15 +211,15 @@ object SEDMatcher:
   ): Boolean =
     val targetCat  = categorizeLuminosity(targetLum)
     val libraryCat = categorizeLuminosity(libraryLum)
-    if targetCat == LuminosityCategory.WhiteDwarf || libraryCat == LuminosityCategory.WhiteDwarf
-    then targetCat == libraryCat
-    else true
+
+    targetCat =!= LuminosityCategory.WhiteDwarf && libraryCat =!= LuminosityCategory.WhiteDwarf ||
+    targetCat === libraryCat
 
   private def matchGalaxySED(morphType: String): EitherNec[CatalogProblem, UnnormalizedSED] =
     morphType match
-      case EllipticalPattern() => Right(UnnormalizedSED.Galaxy(GalaxySpectrum.Elliptical))
-      case S0Pattern()         => Right(UnnormalizedSED.Galaxy(GalaxySpectrum.Elliptical))
-      case SpiralPattern()     => Right(UnnormalizedSED.Galaxy(GalaxySpectrum.Spiral))
+      case EllipticalPattern() => UnnormalizedSED.Galaxy(GalaxySpectrum.Elliptical).asRight
+      case S0Pattern()         => UnnormalizedSED.Galaxy(GalaxySpectrum.Elliptical).asRight
+      case SpiralPattern()     => UnnormalizedSED.Galaxy(GalaxySpectrum.Spiral).asRight
       case hubble              =>
         hubble.parseDoubleOption
           .flatMap:
@@ -211,84 +229,21 @@ object SEDMatcher:
               UnnormalizedSED.Galaxy(GalaxySpectrum.Spiral).some
           .toRight(NonEmptyChain.one(InvalidMorphologicalType(morphType)))
 
-  private val GalaxyTypes: Set[String] = Set(
-    "G",
-    "GGG",
-    "LSB",
-    "bCG",
-    "SBG",
-    "H2G",
-    "EmG",
-    "rG",
-    "GiP",
-    "GiG",
-    "GiC",
-    "BiC",
-    "IG",
-    "PaG",
-    "GrG",
-    "CGG",
-    "CIG",
-    "PCG",
-    "SCG"
-  )
+  // TODO: Should we externalize these?
+  // format: off
+  private val GalaxyTypes = Set(
+    "G", "GGG", "LSB", "bCG", "SBG", "H2G", "EmG", "rG", "GiP", "GiG", "GiC", "BiC", "IG", "PaG",
+    "GrG", "CGG", "CIG", "PCG", "SCG")
 
-  private val QuasarTypes: Set[String] =
+  private val QuasarTypes  =
     Set("AGN", "AG?", "SyG", "Sy1", "Sy2", "QSO", "Q?", "Bla", "Bz?", "BLL", "BL?", "LIN")
 
-  private val HIITypes: Set[String] = Set("HII")
-  private val PNTypes: Set[String]  = Set("PN")
+  private val HIITypes  = Set("HII")
+  private val PNTypes   = Set("PN")
 
-  private val StarTypes: Set[String] = Set(
-    "*",
-    "Ma*",
-    "bC*",
-    "sg*",
-    "s*r",
-    "s*y",
-    "s*b",
-    "WR*",
-    "N*",
-    "Psr",
-    "Y*O",
-    "Or*",
-    "TT*",
-    "Ae*",
-    "HH",
-    "MS*",
-    "Be*",
-    "BS*",
-    "SX*",
-    "gD*",
-    "dS*",
-    "PulsV*delSct",
-    "Ev*",
-    "RG*",
-    "HS*",
-    "HB*",
-    "RR*",
-    "WV*",
-    "Ce*",
-    "cC*",
-    "C*",
-    "S*",
-    "LP*",
-    "AB*",
-    "Mi*",
-    "OH*",
-    "pA*",
-    "RV*",
-    "WD*",
-    "Pe*",
-    "a2*",
-    "RC*",
-    "LM*",
-    "BD*",
-    "Ir*",
-    "Er*",
-    "Ro*",
-    "Pu*",
-    "Em*",
-    "PM*",
-    "HV*"
-  )
+  private val StarTypes =
+    Set("*", "Ma*", "bC*", "sg*", "s*r", "s*y", "s*b", "WR*", "N*", "Psr", "Y*O", "Or*", "TT*",
+    "Ae*", "HH", "MS*", "Be*", "BS*", "SX*", "gD*", "dS*", "PulsV*delSct", "Ev*", "RG*", "HS*",
+    "HB*", "RR*", "WV*", "Ce*", "cC*", "C*", "S*", "LP*", "AB*", "Mi*", "OH*", "pA*", "RV*", "WD*",
+    "Pe*", "a2*", "RC*", "LM*", "BD*", "Ir*", "Er*", "Ro*", "Pu*", "Em*", "PM*", "HV*")
+  // format: on
