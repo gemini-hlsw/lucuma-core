@@ -10,6 +10,7 @@ import cats.effect.Concurrent
 import cats.syntax.all.*
 import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.catalog.CatalogTargetResult
+import lucuma.catalog.simbad.SEDMatcher
 import lucuma.catalog.votable.CatalogAdapter
 import lucuma.catalog.votable.CatalogProblem
 import lucuma.catalog.votable.CatalogSearch
@@ -43,6 +44,7 @@ object SimbadClient:
 
   def build[F[_]: Concurrent](
     httpClient: Client[F],
+    sedMatcher: SEDMatcher,
     modUri:     Uri => Uri = identity,
     endpoints:  NonEmptyChain[Uri] = DefaultEndpoints
   ): SimbadClient[F] = new SimbadClient[F]:
@@ -78,7 +80,7 @@ object SimbadClient:
         .flatMap:
           _.body
             .through(fs2.text.utf8.decode)
-            .through(CatalogSearch.siderealTargets[F](CatalogAdapter.Simbad()))
+            .through(CatalogSearch.siderealTargets[F](CatalogAdapter.Simbad(sedMatcher)))
         .compile
         .toList
 

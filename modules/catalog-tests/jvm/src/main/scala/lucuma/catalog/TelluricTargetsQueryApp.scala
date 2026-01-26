@@ -6,6 +6,8 @@ package lucuma.catalog
 import cats.effect.IO
 import cats.effect.IOApp
 import lucuma.catalog.clients.SimbadClient
+import lucuma.catalog.simbad.SEDDataLoader
+import lucuma.catalog.simbad.SEDMatcher
 import lucuma.catalog.telluric.TelluricSearchInput
 import lucuma.catalog.telluric.TelluricTargetsClient
 import lucuma.core.math.Coordinates
@@ -43,8 +45,9 @@ object TelluricTargetsQueryApp extends IOApp.Simple:
     JdkHttpClient
       .simple[IO]
       .use: client =>
-        val simbadClient = SimbadClient.build(client)
         for
+          sedConfig      <- SEDDataLoader.load
+          simbadClient    = SimbadClient.build(client, SEDMatcher.fromConfig(sedConfig))
           telluricClient <- TelluricTargetsClient.build(telluricUri, client, simbadClient)
           results        <- telluricClient.searchTarget(searchInput)
           _              <- IO.println(pprint.apply(results))

@@ -12,6 +12,7 @@ import fs2.Stream
 import fs2.io.readClassLoaderResource
 import fs2.text
 import lucuma.catalog.CatalogTargetResult
+import lucuma.catalog.simbad.SEDMatcher
 import lucuma.catalog.votable.CatalogProblem
 import lucuma.core.model.Target
 import org.http4s.*
@@ -26,30 +27,33 @@ object SimbadClientMock:
    * Create a mock SimbadClient that returns VOTable XML responses.
    */
   def mockSimbadClient[F[_]: Concurrent](
-    voTableXml: Stream[F, String]
+    voTableXml: Stream[F, String],
+    sedMatcher: SEDMatcher
   ): SimbadClient[F] =
     val mockHttpClient = Client[F]: _ =>
       Resource.pure(Response(Status.Ok).withEntity(voTableXml))
 
-    SimbadClient.build[F](mockHttpClient)
+    SimbadClient.build[F](mockHttpClient, sedMatcher)
 
   /**
    * Mock SimbadClient that reads XML.
    */
-  def fromXML[F[_]: Concurrent](xml: Node): SimbadClient[F] =
-    mockSimbadClient(Stream.emit(Utility.trim(xml).toString))
+  def fromXML[F[_]: Concurrent](xml: Node, sedMatcher: SEDMatcher): SimbadClient[F] =
+    mockSimbadClient(Stream.emit(Utility.trim(xml).toString), sedMatcher)
 
   /**
    * Mock SimbadClient that reads a String.
    */
-  def fromString[F[_]: Concurrent](content: String): SimbadClient[F] =
-    mockSimbadClient(Stream.emit(content))
+  def fromString[F[_]: Concurrent](content: String, sedMatcher: SEDMatcher): SimbadClient[F] =
+    mockSimbadClient(Stream.emit(content), sedMatcher)
 
   /**
    * Mock SimbadClient that reads VOTable XML from a resource file.
    */
-  def fromResource[F[_]: Async](resource: String): SimbadClient[F] =
-    mockSimbadClient(readClassLoaderResource[F](resource, 8192).through(text.utf8.decode))
+  def fromResource[F[_]: Async](resource: String, sedMatcher: SEDMatcher): SimbadClient[F] =
+    mockSimbadClient(readClassLoaderResource[F](resource, 8192).through(text.utf8.decode),
+                     sedMatcher
+    )
 
   /**
    * Mock SimbadClient with empty results.

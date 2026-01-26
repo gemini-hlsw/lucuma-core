@@ -3,22 +3,15 @@
 
 package lucuma.catalog.simbad
 
-import cats.effect.Resource
 import cats.syntax.option.*
+import lucuma.catalog.SEDMatcherFixture
 import munit.CatsEffectSuite
 
-class StellarPhysicsSuite extends CatsEffectSuite:
+class StellarPhysicsSuite extends CatsEffectSuite with SEDMatcherFixture:
 
-  val physicsFixture = ResourceSuiteLocalFixture(
-    "physics",
-    Resource.eval(SEDDataLoader.load.map { config =>
-      new StellarPhysics(config.gravityTable)
-    })
-  )
+  override def munitFixtures = List(sedConfigFixture)
 
-  override def munitFixtures = List(physicsFixture)
-
-  def physics: StellarPhysics = physicsFixture()
+  def physics: StellarPhysics = new StellarPhysics(sedConfig.gravityTable)
 
   test("letter conversions"):
     assertEquals(StellarPhysics.spectralClassCode("O0"), 0.0.some)

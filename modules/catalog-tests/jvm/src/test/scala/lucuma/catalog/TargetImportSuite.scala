@@ -9,6 +9,8 @@ import fs2.*
 import fs2.io.file.Files
 import fs2.io.file.Path
 import lucuma.catalog.clients.SimbadClient
+import lucuma.catalog.simbad.SEDDataLoader
+import lucuma.catalog.simbad.SEDMatcher
 import lucuma.core.enums.Band
 import lucuma.core.math.BrightnessValue
 import lucuma.core.math.Epoch
@@ -305,19 +307,19 @@ class TargetImportSuite extends CatsEffectSuite:
     JdkHttpClient
       .simple[IO]
       .use { client =>
-        val simbadClient = SimbadClient.build(client)
-        Files[IO]
-          .readAll(Path(file.getPath()))
-          .through(text.utf8.decode)
-          .through(TargetImport.csv2targetsAndLookup(simbadClient))
-          .compile
-          .toList
-          // .flatTap(x => IO(pprint.pprintln(x)))
-          .map { l =>
-            assertEquals(l.length, 7)
-            assertEquals(l.count(_.isRight), 4)
-            assertEquals(l.count(_.isLeft), 3)
-          }
+        for
+          sedConfig   <- SEDDataLoader.load
+          simbadClient = SimbadClient.build(client, SEDMatcher.fromConfig(sedConfig))
+          result      <- Files[IO]
+                           .readAll(Path(file.getPath()))
+                           .through(text.utf8.decode)
+                           .through(TargetImport.csv2targetsAndLookup(simbadClient))
+                           .compile
+                           .toList
+        yield
+          assertEquals(result.length, 7)
+          assertEquals(result.count(_.isRight), 4)
+          assertEquals(result.count(_.isLeft), 3)
       }
   }
 
