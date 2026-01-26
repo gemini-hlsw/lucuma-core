@@ -8,7 +8,7 @@ import cats.data.*
 import cats.syntax.all.*
 import coulomb.syntax.*
 import lucuma.catalog.*
-import lucuma.catalog.votable.*
+import lucuma.catalog.simbad.SEDMatcher
 import lucuma.catalog.votable.CatalogProblem.*
 import lucuma.core.enums.Band
 import lucuma.core.enums.CatalogName

@@ -1,7 +1,7 @@
 // Copyright (c) 2016-2025 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package lucuma.catalog.votable
+package lucuma.catalog.simbad
 
 import cats.parse.Numbers
 import cats.parse.Parser as P
@@ -10,7 +10,7 @@ import cats.parse.Rfc5234.wsp
 import lucuma.core.enums.StellarLibrarySpectrum
 import lucuma.core.util.Enumerated
 
-private[votable] object SEDDataParsers:
+private[simbad] object SEDDataParsers:
   private val whitespace: P[Unit]  = wsp.rep.void
   private val optionalWs: P0[Unit] = wsp.rep0.void
   private val newline: P[Unit]     = P.char('\n').void | (P.char('\r') ~ P.char('\n').?).void

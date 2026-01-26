@@ -1,12 +1,13 @@
 // Copyright (c) 2016-2025 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package lucuma.catalog.votable
+package lucuma.catalog.simbad
 
 import cats.data.EitherNec
 import cats.data.NonEmptyChain
 import cats.syntax.eq.*
 import cats.syntax.option.*
+import lucuma.catalog.votable.CatalogProblem
 import lucuma.catalog.votable.CatalogProblem.*
 import lucuma.core.enums.*
 import lucuma.core.model.UnnormalizedSED
@@ -144,6 +145,11 @@ class SEDMatcher(
     stellarLibrary.getLuminosityClasses(spectrum)
 
 object SEDMatcher:
+  def fromConfig(config: SEDDataConfig): SEDMatcher =
+    val physics = new StellarPhysics(config.gravityTable)
+    val library = new StellarLibraryParameters(config.stellarLibrary, physics)
+    new SEDMatcher(library, physics)
+
   private val TemperatureToleranceFraction: Double    = 0.1
   private val GravityToleranceDex: Double             = 0.5
   private val CrossLuminosityGravityTolerance: Double = 0.4

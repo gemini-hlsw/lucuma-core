@@ -1,7 +1,7 @@
 // Copyright (c) 2016-2025 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package lucuma.catalog.votable
+package lucuma.catalog.simbad
 
 import cats.parse.Parser
 import cats.parse.Parser.*
@@ -12,7 +12,7 @@ import cats.syntax.eq.*
 /**
  * Parser combinators for astronomical spectral type strings from Simbad.
  */
-private[votable] trait SpectralTypeParsers:
+private[simbad] trait SpectralTypeParsers:
 
   /** Temperature class letter: O, B, A, F, G, K, M, L, T, Y */
   private val tempLetter: Parser[Char] =
@@ -174,4 +174,4 @@ private[votable] trait SpectralTypeParsers:
     (whiteDwarf.backtrack | subdwarf.backtrack | mainSequence)
       .withContext("spectral type")
 
-private[votable] object SpectralTypeParsers extends SpectralTypeParsers
+private[simbad] object SpectralTypeParsers extends SpectralTypeParsers

@@ -14,6 +14,7 @@ import fs2.*
 import fs2.io.file.Files
 import fs2.io.file.Path
 import lucuma.catalog.*
+import lucuma.catalog.simbad.*
 import lucuma.core.enums.Band
 import lucuma.core.enums.CatalogName
 import lucuma.core.enums.PlanetaryNebulaSpectrum
@@ -46,10 +47,7 @@ class ParseSimbadFileSuite extends CatsEffectSuite with VoTableParser {
     ResourceSuiteLocalFixture(
       "simbadData",
       Resource.eval(SEDDataLoader.load.map { sedConfig =>
-        val physics = new StellarPhysics(sedConfig.gravityTable)
-        val library = new StellarLibraryParameters(sedConfig.stellarLibrary, physics)
-        val matcher = new SEDMatcher(library, physics)
-        CatalogAdapter.Simbad(matcher)
+        CatalogAdapter.Simbad(SEDMatcher.fromConfig(sedConfig))
       })
     )
 
