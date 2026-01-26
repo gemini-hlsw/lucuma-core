@@ -3,34 +3,20 @@
 
 package lucuma.catalog.simbad
 
-import cats.effect.IO
-import org.scalajs.dom.Fetch
-import org.scalajs.dom.HttpMethod
-import org.scalajs.dom.RequestInit
-
-import scala.scalajs.js
+import cats.effect.Concurrent
+import cats.syntax.all.*
+import org.http4s.Request
+import org.http4s.Uri
+import org.http4s.client.Client
 
 object SEDDataLoader:
-  def load(baseUrl: String): IO[SEDDataConfig] =
+  def load[F[_]: Concurrent](httpClient: Client[F], baseUrl: Uri): F[SEDDataConfig] =
     for
-      starsContent   <- fetchFile(s"$baseUrl/match_sed_stars.dat")
-      gravityContent <- fetchFile(s"$baseUrl/match_sed_log_g.csv")
-      config         <- IO.fromEither(
-                          (for
-                            stars   <- SEDDataParsers.parseStarsFile(starsContent)
-                            gravity <- SEDDataParsers.parseGravityFile(gravityContent)
-                          yield SEDDataConfig(stars, gravity)).left.map(new RuntimeException(_))
-                        )
-    yield config
+      starsContent   <- fetchFile(httpClient, baseUrl / "match_sed_stars.dat")
+      gravityContent <- fetchFile(httpClient, baseUrl / "match_sed_log_g.csv")
+      stars          <- SEDDataParsers.parseStarsFile(starsContent).liftTo[F]
+      gravity        <- SEDDataParsers.parseGravityFile(gravityContent).liftTo[F]
+    yield SEDDataConfig(stars, gravity)
 
-  private def fetchFile(url: String): IO[String] =
-    IO.fromPromise(IO {
-      val init = new RequestInit {}
-      init.method = HttpMethod.GET
-      Fetch
-        .fetch(url, init)
-        .`then`[String](response =>
-          if response.ok then response.text()
-          else js.Promise.reject(js.Error(s"Failed to fetch $url: ${response.status}"))
-        )
-    })
+  private def fetchFile[F[_]: Concurrent](client: Client[F], uri: Uri): F[String] =
+    client.expect[String](Request[F](uri = uri))

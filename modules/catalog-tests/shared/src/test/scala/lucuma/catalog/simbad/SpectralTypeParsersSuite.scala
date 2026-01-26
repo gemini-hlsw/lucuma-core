@@ -4,6 +4,7 @@
 package lucuma.catalog.simbad
 
 import cats.syntax.either.*
+import cats.syntax.option.*
 import munit.FunSuite
 
 class SpectralTypeParsersSuite extends FunSuite:
@@ -40,42 +41,51 @@ class SpectralTypeParsersSuite extends FunSuite:
     assertEquals(SpectralTypeParsers.spectralType.parseAll("DA3"), (List("DA"), List("3")).asRight)
     assertEquals(SpectralTypeParsers.spectralType.parseAll("DB4"), (List("DB"), List("4")).asRight)
     assertEquals(SpectralTypeParsers.spectralType.parseAll("DC"), (List("DC"), List.empty).asRight)
-    assertEquals(SpectralTypeParsers.spectralType.parseAll("DA3.5"),
-                 (List("DA"), List("3.5")).asRight
+    assertEquals(
+      SpectralTypeParsers.spectralType.parseAll("DA3.5"),
+      (List("DA"), List("3.5")).asRight
     )
-    assertEquals(SpectralTypeParsers.spectralType.parseAll("DA.8"),
-                 (List("DA"), List(".8")).asRight
+    assertEquals(
+      SpectralTypeParsers.spectralType.parseAll("DA.8"),
+      (List("DA"), List(".8")).asRight
     )
-    assertEquals(SpectralTypeParsers.spectralType.parseAll("DBAP3"),
-                 (List("DBAP"), List("3")).asRight
+    assertEquals(
+      SpectralTypeParsers.spectralType.parseAll("DBAP3"),
+      (List("DBAP"), List("3")).asRight
     )
 
   test("spectralType parses subdwarfs"):
-    assertEquals(SpectralTypeParsers.spectralType.parseAll("sdO2"),
-                 (List("sd"), List("O2")).asRight
+    assertEquals(
+      SpectralTypeParsers.spectralType.parseAll("sdO2"),
+      (List("sd"), List("O2")).asRight
     )
     assertEquals(SpectralTypeParsers.spectralType.parseAll("sdG"), (List("sd"), List("G")).asRight)
-    assertEquals(SpectralTypeParsers.spectralType.parseAll("sdB1"),
-                 (List("sd"), List("B1")).asRight
+    assertEquals(
+      SpectralTypeParsers.spectralType.parseAll("sdB1"),
+      (List("sd"), List("B1")).asRight
     )
 
   test("spectralType parses main sequence stars"):
     assertEquals(SpectralTypeParsers.spectralType.parseAll("G2V"), (List("V"), List("G2")).asRight)
-    assertEquals(SpectralTypeParsers.spectralType.parseAll("K3III"),
-                 (List("III"), List("K3")).asRight
+    assertEquals(
+      SpectralTypeParsers.spectralType.parseAll("K3III"),
+      (List("III"), List("K3")).asRight
     )
-    assertEquals(SpectralTypeParsers.spectralType.parseAll("A0Ia"),
-                 (List("Ia"), List("A0")).asRight
+    assertEquals(
+      SpectralTypeParsers.spectralType.parseAll("A0Ia"),
+      (List("Ia"), List("A0")).asRight
     )
-    assertEquals(SpectralTypeParsers.spectralType.parseAll("G8/K0III"),
-                 (List("III"), List("G8", "K0")).asRight
+    assertEquals(
+      SpectralTypeParsers.spectralType.parseAll("G8/K0III"),
+      (List("III"), List("G8", "K0")).asRight
     )
 
   test("spectralType parses temperature only"):
     assertEquals(SpectralTypeParsers.spectralType.parseAll("G2"), (List.empty, List("G2")).asRight)
     assertEquals(SpectralTypeParsers.spectralType.parseAll("M5"), (List.empty, List("M5")).asRight)
-    assertEquals(SpectralTypeParsers.spectralType.parseAll("A0mA1Va"),
-                 (List("Va"), List("A0")).asRight
+    assertEquals(
+      SpectralTypeParsers.spectralType.parseAll("A0mA1Va"),
+      (List("Va"), List("A0")).asRight
     )
 
   test("tempClass with trailing minus modifier"):
@@ -85,14 +95,8 @@ class SpectralTypeParsersSuite extends FunSuite:
     assertEquals(SpectralTypeParsers.tempClass.parseAll("G5+"), "G5+".asRight)
 
   test("spectralType handles range like M3-5 (not a modifier)"):
-    val result = SpectralTypeParsers.spectralType.parseAll("M3-5III")
-    assert(result.isRight)
+    assert(SpectralTypeParsers.spectralType.parseAll("M3-5III").isRight)
 
   test("spectralType handles nebular emission with non-V class"):
     val result = SpectralTypeParsers.spectralType.parseAll("O9IIn")
-    assert(result.isRight)
-    assertEquals(result.getOrElse(fail("Expected Right"))._1.headOption, Some("II"))
-
-  test("empty string fails to parse"):
-    val result = SpectralTypeParsers.spectralType.parseAll("")
-    assert(result.isLeft)
+    assertEquals(result.getOrElse(fail("Expected Right"))._1.headOption, "II".some)

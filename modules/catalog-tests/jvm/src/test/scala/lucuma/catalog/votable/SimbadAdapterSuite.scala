@@ -10,7 +10,7 @@ import munit.CatsEffectSuite
 
 class SimbadAdapterSuite extends CatsEffectSuite with SEDMatcherFixture:
 
-  override def munitFixtures = List(sedMatcherFixture)
+  override def munitFixtures = List(sedFixture)
 
   test("be able to map brightness errors in Simbad") {
     val magErrorUcd = Ucd.unsafeFromString("stat.error;phot.mag")

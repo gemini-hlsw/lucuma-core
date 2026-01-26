@@ -42,7 +42,7 @@ import scala.language.implicitConversions
 
 class ParseSimbadFileSuite extends CatsEffectSuite with VoTableParser with SEDMatcherFixture {
 
-  override def munitFixtures = List(sedMatcherFixture)
+  override def munitFixtures = List(sedFixture)
 
   def simbadAdapter: CatalogAdapter.Simbad = CatalogAdapter.Simbad(sedMatcher)
 

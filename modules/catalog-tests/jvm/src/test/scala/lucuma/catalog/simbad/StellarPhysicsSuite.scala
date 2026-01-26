@@ -9,9 +9,9 @@ import munit.CatsEffectSuite
 
 class StellarPhysicsSuite extends CatsEffectSuite with SEDMatcherFixture:
 
-  override def munitFixtures = List(sedConfigFixture)
+  override def munitFixtures = List(sedFixture)
 
-  def physics: StellarPhysics = new StellarPhysics(sedConfig.gravityTable)
+  def physics: StellarPhysics = sedPhysics
 
   test("letter conversions"):
     assertEquals(StellarPhysics.spectralClassCode("O0"), 0.0.some)
@@ -63,7 +63,6 @@ class StellarPhysicsSuite extends CatsEffectSuite with SEDMatcherFixture:
     assertEquals(StellarPhysics.calculateTemperature(List("V"), List("T8")), None)
 
   test("temperature calculation averages multiple classes"):
-    // B9=12361, A0=11531, average=11946
     assertEquals(StellarPhysics.calculateTemperature(List("V"), List("B9", "A0")), 11946.some)
 
   test("gravity calculation"):
@@ -72,9 +71,6 @@ class StellarPhysicsSuite extends CatsEffectSuite with SEDMatcherFixture:
     assertEquals(physics.calculateGravity(List("V"), List("G2")), 4.4.some)
     assertEquals(physics.calculateGravity(List("III"), List("K1")), 2.78.some)
     assertEquals(physics.calculateGravity(List("DA"), List("3")), 8.0.some)
-    // I -> Iab
     assertEquals(physics.calculateGravity(List("I"), List("A0")), 2.01.some)
-    // VI -> sd, interpolated between G0 (sd=3.5) and K0 (sd=3.0)
     assertEquals(physics.calculateGravity(List("VI"), List("G2")), 3.4.some)
-    // IIIa -> III (drops subclass)
     assertEquals(physics.calculateGravity(List("IIIa"), List("A0")), 3.75.some)

@@ -238,7 +238,7 @@ object CatalogAdapter {
 
   val magRegex = """(?i)em.(opt|IR)(\.\w)?""".r
 
-  class Simbad(sedMatcher: SEDMatcher) extends CatalogAdapter {
+  case class Simbad(sedMatcher: SEDMatcher) extends CatalogAdapter {
 
     val catalog: CatalogName =
       CatalogName.Simbad
@@ -280,10 +280,10 @@ object CatalogAdapter {
     override def parseSED(
       entries: Map[FieldId, String]
     ): EitherNec[CatalogProblem, Option[UnnormalizedSED]] =
-      val otype        = entries.get(oTypeField).getOrElse("")
+      val otype        = entries.getOrElse(oTypeField, "")
       val spectralType = entries.get(spTypeField)
       val morphType    = entries.get(morphTypeField)
-      sedMatcher.inferSED(otype, spectralType, morphType).fold(_ => none.rightNec, _.some.rightNec)
+      sedMatcher.inferSED(otype, spectralType, morphType).toOption.rightNec
 
     // Simbad has a few special cases to map sloan band brightnesses
     def findBand(id: FieldId): Option[Band] =
@@ -330,9 +330,6 @@ object CatalogAdapter {
         .toRightNec(UnmatchedField(f.ucd))
     }
   }
-
-  object Simbad:
-    def apply(sedMatcher: SEDMatcher): Simbad = new Simbad(sedMatcher)
 
   sealed trait Gaia extends CatalogAdapter {
     val catalog: CatalogName = CatalogName.Gaia

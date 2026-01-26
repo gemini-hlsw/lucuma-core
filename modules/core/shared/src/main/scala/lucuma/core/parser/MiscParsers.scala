@@ -56,9 +56,25 @@ trait MiscParsers {
       catchNFE((i: Int) => Index.fromShort.getOption(i.toShort))(s).filter(_ => s.isValidInt).flatten
     }
 
-  /** Parses optional whitespace. */
+  /** Parses optional whitespace (zero or more). */
   val maybeWhiteSpace: Parser0[Unit] =
     wsp.rep0.void
+
+  /** Parses required whitespace (one or more). */
+  val whitespace: Parser[Unit] =
+    wsp.rep.void
+
+  /** Parses a newline (LF or CRLF). */
+  val newline: Parser[Unit] =
+    char('\n').void | (char('\r') ~ char('\n').?).void
+
+  /** Parses one or more non-whitespace characters. */
+  val nonWhitespace: Parser[String] =
+    charsWhile(c => !c.isWhitespace)
+
+  /** Parses a blank line (newline or whitespace followed by newline/end). */
+  val blankLine: Parser[Unit] =
+    newline | (whitespace *> (newline | Parser.end))
 
   /** Parser for an optional sign (+ or -), returned as a boolean indicating whether to negate. */
   val neg: Parser0[Boolean]      =

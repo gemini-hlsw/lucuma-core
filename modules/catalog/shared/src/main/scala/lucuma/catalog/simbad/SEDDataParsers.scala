@@ -4,74 +4,79 @@
 package lucuma.catalog.simbad
 
 import cats.parse.Numbers
-import cats.parse.Parser as P
-import cats.parse.Parser0 as P0
-import cats.parse.Rfc5234.wsp
+import cats.parse.Parser
+import cats.parse.Parser0
 import lucuma.core.enums.StellarLibrarySpectrum
+import lucuma.core.parser.MiscParsers.blankLine
+import lucuma.core.parser.MiscParsers.comma
+import lucuma.core.parser.MiscParsers.maybeWhiteSpace
+import lucuma.core.parser.MiscParsers.newline
+import lucuma.core.parser.MiscParsers.nonWhitespace
+import lucuma.core.parser.MiscParsers.whitespace
 import lucuma.core.util.Enumerated
 
-private[simbad] object SEDDataParsers:
-  private val whitespace: P[Unit]  = wsp.rep.void
-  private val optionalWs: P0[Unit] = wsp.rep0.void
-  private val newline: P[Unit]     = P.char('\n').void | (P.char('\r') ~ P.char('\n').?).void
+private[simbad] trait SEDDataParsers:
 
-  private val comment: P[Unit]   = P.char('#') *> P.charsWhile0(_ != '\n').void <* (newline | P.end)
-  private val blankLine: P[Unit] = newline | (wsp.rep.void *> (newline | P.end))
+  // Ignore commented lines
+  val comment: Parser[Unit] =
+    Parser.char('#') *> Parser.charsWhile0(_ != '\n').void <* (newline | Parser.end)
 
-  private val nonWhitespace: P[String] = P.charsWhile(c => !c.isWhitespace)
-  private val csvToken: P[String]      = P.charsWhile(c => !c.isWhitespace && c != ',')
+  val csvToken: Parser[String] = Parser.charsWhile(c => !c.isWhitespace && c != ',')
 
-  private val spectrumByFilename: Map[String, StellarLibrarySpectrum] =
+  val spectrumByFilename: Map[String, StellarLibrarySpectrum] =
     Enumerated[StellarLibrarySpectrum].all.map(s => s.sedSpectrum -> s).toMap
 
-  private def lookupSpectrum(filename: String): Option[StellarLibrarySpectrum] =
+  def lookupSpectrum(filename: String): Option[StellarLibrarySpectrum] =
     val baseName = filename.stripSuffix(".nm")
     spectrumByFilename.get(baseName)
 
-  val starsFileDataRow: P[Option[(StellarLibrarySpectrum, (List[String], List[String]))]] =
-    (nonWhitespace ~ (whitespace *> nonWhitespace) ~ (whitespace *> nonWhitespace) <* optionalWs <* (newline | P.end))
+  // Parses a data row: luminosity_class temperature_class filename
+  val starsFileDataRow: Parser[Option[(StellarLibrarySpectrum, (List[String], List[String]))]] =
+    (nonWhitespace ~ (whitespace *> nonWhitespace) ~ (whitespace *> nonWhitespace) <* maybeWhiteSpace <* (newline | Parser.end))
       .map { case ((lc, tc), filename) =>
         lookupSpectrum(filename).map(spectrum => (spectrum, (List(lc), List(tc))))
       }
 
-  val starsFileHeader: P[Unit] =
-    (P.char('l') ~ P.char('c') ~ whitespace ~ P.char('t') ~ P.char('c') ~ whitespace ~ P.string(
+  // Parses the header line "lc tc filename"
+  val starsFileHeader: Parser[Unit] =
+    (Parser.char('l') ~ Parser.char('c') ~ whitespace ~ Parser.char('t') ~ Parser.char(
+      'c'
+    ) ~ whitespace ~ Parser.string(
       "filename"
-    ) ~ optionalWs ~ (newline | P.end)).void
+    ) ~ maybeWhiteSpace ~ (newline | Parser.end)).void
 
-  val starsFileLine: P[Option[(StellarLibrarySpectrum, (List[String], List[String]))]] =
+  // Parses any line in stars file
+  val starsFileLine: Parser[Option[(StellarLibrarySpectrum, (List[String], List[String]))]] =
     comment.backtrack.as(None) |
       blankLine.backtrack.as(None) |
       starsFileHeader.backtrack.as(None) |
       starsFileDataRow
 
-  val starsFile: P0[List[(StellarLibrarySpectrum, (List[String], List[String]))]] =
+  // Parses entire stars file
+  val starsFile: Parser0[List[(StellarLibrarySpectrum, (List[String], List[String]))]] =
     starsFileLine.rep0.map(_.flatten)
 
-  def parseStarsFile(content: String): Either[String, StellarLibraryConfig] =
-    starsFile.parseAll(content) match
-      case Right(entries) => Right(StellarLibraryConfig(entries))
-      case Left(error)    => Left(s"Failed to parse stars file: ${error.toString}")
+  // Parses gravity CSV header line starting with "Sp,Sc,..."
+  val csvHeader: Parser[Unit] =
+    (Parser.string("Sp") ~ maybeWhiteSpace ~ comma ~ maybeWhiteSpace ~
+      Parser.string("Sc") ~ Parser.charsWhile0(_ != '\n').void ~ (newline | Parser.end)).void
 
-  val csvHeader: P[Unit] =
-    (P.string("Sp") ~ optionalWs ~ P.char(',') ~ optionalWs ~ P
-      .string("Sc") ~ P.charsWhile0(_ != '\n').void ~ (newline | P.end)).void
+  val csvField: Parser0[Option[Double]] =
+    (maybeWhiteSpace *> Numbers.jsonNumber.? <* maybeWhiteSpace).map(_.map(_.toDouble))
 
-  val csvField: P0[Option[Double]] =
-    (optionalWs *> Numbers.jsonNumber.? <* optionalWs).map(_.map(_.toDouble))
-
-  val gravityRow: P[(Double, Map[String, Double])] =
+  // Parses a gravity CSV row: spectral code and log(g) values per luminosity class
+  val gravityRow: Parser[(Double, Map[String, Double])] =
     for
-      _   <- csvToken <* optionalWs <* P.char(',')
-      sc  <- csvField <* P.char(',')
-      v   <- csvField <* P.char(',')
-      iv  <- csvField <* P.char(',')
-      iii <- csvField <* P.char(',')
-      ii  <- csvField <* P.char(',')
-      ib  <- csvField <* P.char(',')
-      iab <- csvField <* P.char(',')
-      ia  <- csvField <* P.char(',')
-      sd  <- csvField <* optionalWs <* (newline | P.end)
+      _   <- csvToken <* maybeWhiteSpace <* comma
+      sc  <- csvField <* comma
+      v   <- csvField <* comma
+      iv  <- csvField <* comma
+      iii <- csvField <* comma
+      ii  <- csvField <* comma
+      ib  <- csvField <* comma
+      iab <- csvField <* comma
+      ia  <- csvField <* comma
+      sd  <- csvField <* maybeWhiteSpace <* (newline | Parser.end)
     yield
       val code   = sc.getOrElse(0.0)
       val values = List(
@@ -83,19 +88,29 @@ private[simbad] object SEDDataParsers:
         "Iab" -> iab,
         "Ia"  -> ia,
         "sd"  -> sd
-      ).collect { case (k, Some(v)) => k -> v }.toMap
+      ).collect:
+        case (k, Some(v)) => k -> v
+      .toMap
       (code, values)
 
-  val gravityFileLine: P[Option[(Double, Map[String, Double])]] =
+  // Parses any line in gravity file: comment, blank, header, or data row
+  val gravityFileLine: Parser[Option[(Double, Map[String, Double])]] =
     comment.backtrack.as(None) |
       blankLine.backtrack.as(None) |
       csvHeader.backtrack.as(None) |
       gravityRow.map(Some(_))
 
-  val gravityFile: P0[List[(Double, Map[String, Double])]] =
+  // Parses entire gravity CSV into list of (spectral_code, luminosity_class -> log_g) tuples
+  val gravityFile: Parser0[List[(Double, Map[String, Double])]] =
     gravityFileLine.rep0.map(_.flatten)
 
-  def parseGravityFile(content: String): Either[String, GravityTableConfig] =
+private[simbad] object SEDDataParsers extends SEDDataParsers:
+  def parseGravityFile(content: String): Either[Throwable, GravityTableConfig] =
     gravityFile.parseAll(content) match
       case Right(rows) => Right(GravityTableConfig(rows))
-      case Left(error) => Left(s"Failed to parse gravity file: ${error.toString}")
+      case Left(error) => Left(RuntimeException(s"Failed to parse gravity file: ${error.toString}"))
+
+  def parseStarsFile(content: String): Either[Throwable, StellarLibraryConfig] =
+    starsFile.parseAll(content) match
+      case Right(entries) => Right(StellarLibraryConfig(entries))
+      case Left(error)    => Left(RuntimeException(s"Failed to parse stars file: ${error.toString}"))

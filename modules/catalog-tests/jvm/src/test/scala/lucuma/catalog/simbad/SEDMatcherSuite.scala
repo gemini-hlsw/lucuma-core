@@ -3,6 +3,7 @@
 
 package lucuma.catalog.simbad
 
+import cats.syntax.eq.*
 import lucuma.catalog.SEDMatcherFixture
 import lucuma.core.enums.GalaxySpectrum
 import lucuma.core.enums.HIIRegionSpectrum
@@ -14,123 +15,64 @@ import munit.CatsEffectSuite
 
 class SEDMatcherSuite extends CatsEffectSuite with SEDMatcherFixture:
 
-  override def munitFixtures = List(sedMatcherFixture)
+  override def munitFixtures = List(sedFixture)
 
-  test("A0V matches A0V_new (Python-preferred calspec)") {
+  test("A0V matches A0V_new"):
     val result = sedMatcher.inferSED("*", Some("A0V"), None)
-    assert(result.isRight)
-    assertEquals(
-      result.getOrElse(fail("Expected Right")),
-      UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.A0V_new)
-    )
-  }
+    assert(result.exists(_ === UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.A0V_new)))
 
-  test("F1V matches F2V (closest available)") {
+  test("F1V matches F2V"):
     val result = sedMatcher.inferSED("*", Some("F1V"), None)
-    assert(result.isRight)
-    assertEquals(
-      result.getOrElse(fail("Expected Right")),
-      UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.F2V)
-    )
-  }
+    assert(result.exists(_ === UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.F2V)))
 
-  test("quasar otype returns QS0") {
+  test("quasar otype returns QS0"):
     val result = sedMatcher.inferSED("QSO", None, None)
-    assert(result.isRight)
-    assertEquals(
-      result.getOrElse(fail("Expected Right")),
-      UnnormalizedSED.Quasar(QuasarSpectrum.QS0)
-    )
-  }
+    assert(result.exists(_ === UnnormalizedSED.Quasar(QuasarSpectrum.QS0)))
 
-  test("HII otype returns OrionNebula") {
+  test("HII otype returns OrionNebula"):
     val result = sedMatcher.inferSED("HII", None, None)
-    assert(result.isRight)
-    assertEquals(
-      result.getOrElse(fail("Expected Right")),
-      UnnormalizedSED.HIIRegion(HIIRegionSpectrum.OrionNebula)
-    )
-  }
+    assert(result.exists(_ === UnnormalizedSED.HIIRegion(HIIRegionSpectrum.OrionNebula)))
 
-  test("PN otype returns NGC7009") {
+  test("PN otype returns NGC7009"):
     val result = sedMatcher.inferSED("PN", None, None)
-    assert(result.isRight)
-    assertEquals(
-      result.getOrElse(fail("Expected Right")),
-      UnnormalizedSED.PlanetaryNebula(PlanetaryNebulaSpectrum.NGC7009)
-    )
-  }
+    assert(result.exists(_ === UnnormalizedSED.PlanetaryNebula(PlanetaryNebulaSpectrum.NGC7009)))
 
-  test("galaxy with E morphology returns Elliptical") {
+  test("galaxy with E morphology returns Elliptical"):
     val result = sedMatcher.inferSED("G", None, Some("E3"))
-    assert(result.isRight)
-    assertEquals(
-      result.getOrElse(fail("Expected Right")),
-      UnnormalizedSED.Galaxy(GalaxySpectrum.Elliptical)
-    )
-  }
+    assert(result.exists(_ === UnnormalizedSED.Galaxy(GalaxySpectrum.Elliptical)))
 
-  test("galaxy with Sa morphology returns Spiral") {
+  test("galaxy with Sa morphology returns Spiral"):
     val result = sedMatcher.inferSED("G", None, Some("Sa"))
-    assert(result.isRight)
-    assertEquals(
-      result.getOrElse(fail("Expected Right")),
-      UnnormalizedSED.Galaxy(GalaxySpectrum.Spiral)
-    )
-  }
+    assert(result.exists(_ === UnnormalizedSED.Galaxy(GalaxySpectrum.Spiral)))
 
-  test("unknown otype returns error") {
+  test("unknown otype returns error"):
     val result = sedMatcher.inferSED("UnknownType", Some("A0Va"), None)
     assert(result.isLeft)
-  }
 
-  test("galaxy with Hubble stage >= 9.0 returns Spiral (irregular galaxies)") {
+  test("galaxy with Hubble stage >= 9.0 returns Spiral (irregular galaxies)"):
     val result = sedMatcher.inferSED("G", None, Some("10.0"))
-    assert(result.isRight)
-    assertEquals(
-      result.getOrElse(fail("Expected Right")),
-      UnnormalizedSED.Galaxy(GalaxySpectrum.Spiral)
-    )
-  }
+    assert(result.exists(_ === UnnormalizedSED.Galaxy(GalaxySpectrum.Spiral)))
 
-  test("galaxy with Hubble stage 9.0 returns Spiral") {
+  test("galaxy with Hubble stage 9.0 returns Spiral"):
     val result = sedMatcher.inferSED("G", None, Some("9.0"))
-    assert(result.isRight)
-    assertEquals(
-      result.getOrElse(fail("Expected Right")),
-      UnnormalizedSED.Galaxy(GalaxySpectrum.Spiral)
-    )
-  }
+    assert(result.exists(_ === UnnormalizedSED.Galaxy(GalaxySpectrum.Spiral)))
 
-  test("star with empty spectral type returns error") {
+  test("star with empty spectral type returns error"):
     val result = sedMatcher.inferSED("*", Some(""), None)
     assert(result.isLeft)
-  }
 
-  test("star with missing spectral type returns error") {
+  test("star with missing spectral type returns error"):
     val result = sedMatcher.inferSED("*", None, None)
     assert(result.isLeft)
-  }
 
-  test("galaxy with S0 morphology returns Elliptical") {
+  test("galaxy with S0 morphology returns Elliptical"):
     val result = sedMatcher.inferSED("G", None, Some("S0"))
-    assert(result.isRight)
-    assertEquals(
-      result.getOrElse(fail("Expected Right")),
-      UnnormalizedSED.Galaxy(GalaxySpectrum.Elliptical)
-    )
-  }
+    assert(result.exists(_ === UnnormalizedSED.Galaxy(GalaxySpectrum.Elliptical)))
 
-  test("galaxy with negative Hubble stage returns Elliptical") {
+  test("galaxy with negative Hubble stage returns Elliptical"):
     val result = sedMatcher.inferSED("G", None, Some("-3.0"))
-    assert(result.isRight)
-    assertEquals(
-      result.getOrElse(fail("Expected Right")),
-      UnnormalizedSED.Galaxy(GalaxySpectrum.Elliptical)
-    )
-  }
+    assert(result.exists(_ === UnnormalizedSED.Galaxy(GalaxySpectrum.Elliptical)))
 
-  test("galaxy with invalid morphology returns error") {
+  test("galaxy with invalid morphology returns error"):
     val result = sedMatcher.inferSED("G", None, Some("invalid"))
     assert(result.isLeft)
-  }
