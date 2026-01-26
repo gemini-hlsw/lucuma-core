@@ -1,7 +1,7 @@
 // Copyright (c) 2016-2025 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package lucuma.catalog.votable
+package lucuma.catalog.simbad
 
 import cats.effect.Resource
 import lucuma.core.enums.GalaxySpectrum
@@ -16,11 +16,7 @@ class SEDMatcherSuite extends CatsEffectSuite:
 
   val matcherFixture = ResourceSuiteLocalFixture(
     "matcher",
-    Resource.eval(SEDDataLoader.load.map { config =>
-      val physics = new StellarPhysics(config.gravityTable)
-      val library = new StellarLibraryParameters(config.stellarLibrary, physics)
-      new SEDMatcher(library, physics)
-    })
+    Resource.eval(SEDDataLoader.load.map(SEDMatcher.fromConfig))
   )
 
   override def munitFixtures = List(matcherFixture)

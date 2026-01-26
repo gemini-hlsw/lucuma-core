@@ -1,7 +1,7 @@
 // Copyright (c) 2016-2025 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package lucuma.catalog.votable
+package lucuma.catalog.simbad
 
 import cats.syntax.option.*
 import coulomb.*
@@ -17,13 +17,13 @@ import lucuma.core.syntax.string.*
  *   - Temperature: Malkov et al, 2020, RAA, 20, 139
  *   - Gravity: Straizys & Kuriliene, 1981, Ap&SS, 80, 353S
  */
-class StellarPhysics(gravityTableConfig: GravityTableConfig):
+private[simbad] class StellarPhysics(gravityTableConfig: GravityTableConfig):
 
   import StellarPhysics.*
 
   private val gravityTable = gravityTableConfig.rows
 
-  private[votable] def calculateGravity(
+  def calculateGravity(
     luminosity:  List[String],
     temperature: List[String]
   ): Option[Double] =
@@ -88,7 +88,7 @@ class StellarPhysics(gravityTableConfig: GravityTableConfig):
       val fraction = (scc - sccLow) / (sccHigh - sccLow)
       logGLow + fraction * (logGHigh - logGLow)
 
-  private[votable] def calculateParameters(
+  def calculateParameters(
     luminosity:  List[String],
     temperature: List[String]
   ): Option[StellarParameters] =
@@ -97,7 +97,7 @@ class StellarPhysics(gravityTableConfig: GravityTableConfig):
       logG <- calculateGravity(luminosity, temperature)
     } yield StellarParameters(temp.withUnit[Kelvin], logG)
 
-object StellarPhysics:
+private[simbad] object StellarPhysics:
 
   private val BrownDwarfThreshold = 70.0
   private val WhiteDwarfLogG      = 8.0
@@ -122,7 +122,7 @@ object StellarPhysics:
 
   case class StellarParameters(temp: Quantity[Int, Kelvin], logG: Double)
 
-  private[votable] def spectralClassCode(spectralClass: String): Option[Double] =
+  def spectralClassCode(spectralClass: String): Option[Double] =
     spectralClass.headOption.flatMap: letter =>
       SpectralClassCodes
         .get(letter)
@@ -139,7 +139,7 @@ object StellarPhysics:
 
           baseCode + subclass + modifier
 
-  private[votable] def calculateTemperature(
+  def calculateTemperature(
     luminosity:  List[String],
     temperature: List[String]
   ): Option[Int] =

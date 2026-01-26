@@ -1,7 +1,7 @@
 // Copyright (c) 2016-2025 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package lucuma.catalog.votable
+package lucuma.catalog.simbad
 
 import cats.data.EitherNec
 import cats.data.Nested
@@ -11,6 +11,7 @@ import cats.syntax.all.*
 import fs2.*
 import fs2.data.csv.*
 import fs2.io.readClassLoaderResource
+import lucuma.catalog.votable.CatalogProblem
 import lucuma.core.enums.*
 import lucuma.core.model.UnnormalizedSED
 import munit.CatsEffectSuite
