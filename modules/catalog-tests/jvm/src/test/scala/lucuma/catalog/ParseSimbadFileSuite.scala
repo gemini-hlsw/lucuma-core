@@ -14,7 +14,6 @@ import fs2.*
 import fs2.io.file.Files
 import fs2.io.file.Path
 import lucuma.catalog.*
-import lucuma.catalog.simbad.*
 import lucuma.core.enums.Band
 import lucuma.core.enums.CatalogName
 import lucuma.core.enums.PlanetaryNebulaSpectrum
@@ -41,19 +40,11 @@ import munit.CatsEffectSuite
 
 import scala.language.implicitConversions
 
-class ParseSimbadFileSuite extends CatsEffectSuite with VoTableParser {
+class ParseSimbadFileSuite extends CatsEffectSuite with VoTableParser with SEDMatcherFixture {
 
-  val simbadAdapterFixture =
-    ResourceSuiteLocalFixture(
-      "simbadData",
-      Resource.eval(SEDDataLoader.load.map { sedConfig =>
-        CatalogAdapter.Simbad(SEDMatcher.fromConfig(sedConfig))
-      })
-    )
+  override def munitFixtures = List(sedMatcherFixture)
 
-  override def munitFixtures = List(simbadAdapterFixture)
-
-  def simbadAdapter: CatalogAdapter.Simbad = simbadAdapterFixture()
+  def simbadAdapter: CatalogAdapter.Simbad = CatalogAdapter.Simbad(sedMatcher)
 
   test("parse simbad named queries") {
     // From http://simbad.u-strasbg.fr/simbad/sim-id?Ident=Vega&output.format=VOTable

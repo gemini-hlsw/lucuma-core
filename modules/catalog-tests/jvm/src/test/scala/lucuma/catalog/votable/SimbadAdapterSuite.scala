@@ -4,18 +4,20 @@
 package lucuma.catalog.votable
 
 import cats.syntax.all.*
+import lucuma.catalog.SEDMatcherFixture
 import lucuma.core.enums.Band
-import munit.FunSuite
+import munit.CatsEffectSuite
 
-class SimbadAdapterSuite extends FunSuite {
+class SimbadAdapterSuite extends CatsEffectSuite with SEDMatcherFixture:
+
+  override def munitFixtures = List(sedMatcherFixture)
 
   test("be able to map brightness errors in Simbad") {
-    // Brightness errors in simbad don't include the band in the UCD, we must get it from the ID :(
     val magErrorUcd = Ucd.unsafeFromString("stat.error;phot.mag")
     // FLUX_r maps to r'
     assertEquals(
       CatalogAdapter
-        .Simbad()
+        .Simbad(sedMatcher)
         .parseBrightnessValue(FieldId.unsafeFrom("FLUX_ERROR_r", magErrorUcd), "20.3051"),
       (FieldId.unsafeFrom("FLUX_ERROR_r", magErrorUcd), Band.SloanR, 20.3051).rightNec
     )
@@ -23,9 +25,8 @@ class SimbadAdapterSuite extends FunSuite {
     // FLUX_R maps to R
     assertEquals(
       CatalogAdapter
-        .Simbad()
+        .Simbad(sedMatcher)
         .parseBrightnessValue(FieldId.unsafeFrom("FLUX_ERROR_R", magErrorUcd), "20.3051"),
       (FieldId.unsafeFrom("FLUX_ERROR_R", magErrorUcd), Band.R, 20.3051).rightNec
     )
   }
-}

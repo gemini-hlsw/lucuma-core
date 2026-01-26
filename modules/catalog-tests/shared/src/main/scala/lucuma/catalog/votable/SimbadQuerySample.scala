@@ -7,6 +7,7 @@ import cats.data.*
 import cats.effect.Concurrent
 import fs2.*
 import lucuma.catalog.*
+import lucuma.catalog.simbad.SEDMatcher
 import lucuma.core.refined.auto.*
 import org.http4s.Method.*
 import org.http4s.Request
@@ -15,7 +16,8 @@ import org.http4s.client.Client
 trait SimbadQuerySample:
 
   def simbadQuery[F[_]: Concurrent](
-    client: Client[F]
+    client:     Client[F],
+    sedMatcher: SEDMatcher
   ): F[List[EitherNec[CatalogProblem, CatalogTargetResult]]] = {
     val request = Request[F](GET, CatalogSearch.simbadSearchQuery(QueryByName("Vega".refined)))
     client
@@ -23,7 +25,7 @@ trait SimbadQuerySample:
       .flatMap(
         _.body
           .through(text.utf8.decode)
-          .through(CatalogSearch.siderealTargets[F](CatalogAdapter.Simbad()))
+          .through(CatalogSearch.siderealTargets[F](CatalogAdapter.Simbad(sedMatcher)))
       )
       .compile
       .toList
