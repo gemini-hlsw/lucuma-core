@@ -229,21 +229,32 @@ object SEDMatcher:
               UnnormalizedSED.Galaxy(GalaxySpectrum.Spiral).some
           .toRight(NonEmptyChain.one(InvalidMorphologicalType(morphType)))
 
-  // TODO: Should we externalize these?
+  // Condensed codes and their OTYPE_S labels from the Simbad taxonomy.
+  // Labels sourced from https://simbad.cds.unistra.fr/guide/otypes.labels.txt
   // format: off
   private val GalaxyTypes = Set(
-    "G", "GGG", "LSB", "bCG", "SBG", "H2G", "EmG", "rG", "GiP", "GiG", "GiC", "BiC", "IG", "PaG",
-    "GrG", "CGG", "CIG", "PCG", "SCG")
+    "G", "Galaxy", "GGG", "LSB", "LowSurfBrghtG", "bCG", "BlueCompactG", "SBG", "StarburstG",
+    "H2G", "HIIG", "EmG", "EmissionG", "rG", "RadioG", "GiP", "GinPair", "GiG", "GtowardsGroup",
+    "GiC", "GtowardsCl", "BiC", "BrightestCG", "IG", "InteractingG", "PaG", "PairG",
+    "GrG", "GroupG", "CGG", "Compact_Gr_G", "CIG", "PCG", "SCG", "SuperClG")
 
-  private val QuasarTypes  =
-    Set("AGN", "AG?", "SyG", "Sy1", "Sy2", "QSO", "Q?", "Bla", "Bz?", "BLL", "BL?", "LIN")
+  private val QuasarTypes = Set(
+    "AGN", "AG?", "AGN_Candidate", "SyG", "Seyfert", "Sy1", "Seyfert1", "Sy2", "Seyfert2",
+    "QSO", "Q?", "QSO_Candidate", "Bla", "Blazar", "Bz?", "Blazar_Candidate",
+    "BLL", "BLLac", "BL?", "BLLac_Candidate", "LIN", "LINER")
 
-  private val HIITypes  = Set("HII")
-  private val PNTypes   = Set("PN")
+  private val HIITypes = Set("HII", "HIIReg")
+  private val PNTypes  = Set("PN", "PlanetaryNeb")
 
-  private val StarTypes =
-    Set("*", "Ma*", "bC*", "sg*", "s*r", "s*y", "s*b", "WR*", "N*", "Psr", "Y*O", "Or*", "TT*",
-    "Ae*", "HH", "MS*", "Be*", "BS*", "SX*", "gD*", "dS*", "PulsV*delSct", "Ev*", "RG*", "HS*",
-    "HB*", "RR*", "WV*", "Ce*", "cC*", "C*", "S*", "LP*", "AB*", "Mi*", "OH*", "pA*", "RV*", "WD*",
-    "Pe*", "a2*", "RC*", "LM*", "BD*", "Ir*", "Er*", "Ro*", "Pu*", "Em*", "PM*", "HV*")
+  private val StarTypes = Set(
+    "*", "Star", "Ma*", "bC*", "bCepV*", "sg*", "Supergiant", "s*r", "RedSG", "s*y", "YellowSG",
+    "s*b", "BlueSG", "WR*", "WolfRayet*", "N*", "Neutron*", "Psr", "Pulsar", "Y*O", "YSO",
+    "Or*", "OrionV*", "TT*", "TTauri*", "Ae*", "HH", "HerbigHaroObj", "MS*", "Be*", "BS*",
+    "BlueStraggler", "SX*", "SXPheV*", "gD*", "gammaDorV*", "dS*", "delSctV*", "PulsV*delSct",
+    "Ev*", "RG*", "RGB*", "HS*", "HotSubdwarf", "HB*", "HorBranch*", "RR*", "RRLyrae",
+    "WV*", "Type2Cep", "Ce*", "Cepheid", "cC*", "ClassicalCep", "C*", "S*", "LP*", "LongPeriodV*",
+    "AB*", "AGB*", "Mi*", "Mira", "OH*", "OH/IR*", "pA*", "post-AGB*", "RV*", "RVTauV*",
+    "WD*", "WhiteDwarf", "Pe*", "ChemPec*", "a2*", "alf2CVnV*", "RC*", "RCrBV*", "LM*", "Low-Mass*",
+    "BD*", "BrownD*", "Ir*", "IrregularV*", "Er*", "Eruptive*", "Ro*", "RotV*", "Pu*", "PulsV*",
+    "Em*", "EmLine*", "PM*", "HighPM*", "HV*", "HighVel*")
   // format: on
