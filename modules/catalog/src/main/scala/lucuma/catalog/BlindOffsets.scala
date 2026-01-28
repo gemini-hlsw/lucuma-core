@@ -7,6 +7,8 @@ import cats.Eq
 import cats.derived.*
 import cats.effect.Concurrent
 import cats.syntax.all.*
+import coulomb.*
+import coulomb.syntax.*
 import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.catalog.clients.GaiaClient
 import lucuma.catalog.votable.*
@@ -16,8 +18,11 @@ import lucuma.core.geom.ShapeExpression
 import lucuma.core.geom.ShapeInterpreter
 import lucuma.core.geom.syntax.all.*
 import lucuma.core.math.Angle
-import lucuma.core.math.BrightnessUnits.Integrated
+import lucuma.core.math.BrightnessUnits.*
+import lucuma.core.math.BrightnessValue
 import lucuma.core.math.Coordinates
+import lucuma.core.math.dimensional.syntax.*
+import lucuma.core.math.units.*
 import lucuma.core.model.SourceProfile
 import lucuma.core.model.SpectralDefinition.BandNormalized
 import lucuma.core.model.Target
@@ -141,7 +146,7 @@ object BlindOffsets:
   // See shortcut 7655
   // The Gaia catalog only has Gaia, GaiaBP and GaiaRP brightnesses and an SED is not specified.
   // Unfortunately the ITC does not yet use the `G` bands, so while Andy is fixing that, we'll
-  // "pretend" the Gaia band is a V band.
+  // make a V band out of the Gaia bands.
   // Also we'll default the SED.
   // Once the ITC is updated, we can remove the Gaia => V part. But, we may always need to
   // fake the SED? We can figure that out at that point.
@@ -154,8 +159,29 @@ object BlindOffsets:
           .modify(_.orElse(UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.M0V_new).some))(bn)
         BandNormalized
           .brightnesses[Integrated]
-          .modify(map =>
-            // pretend the 'G' band is a V band
-            map.get(Band.Gaia).fold(map)(g => map.updated(Band.V, g))
-          )(withSed)
+          .modify { map =>
+            // calculate V from Gaia bands - see shortcut 7655
+            map
+              .get(Band.Gaia)
+              .fold(map)(g =>
+                val optGbp = map.get(Band.GaiaBP)
+                val optGrp = map.get(Band.GaiaRP)
+                val v      = (optGbp, optGrp)
+                  .mapN((gbp, grp) =>
+                    val c    = gbp.value.value.value - grp.value.value.value
+                    val newV =
+                      g.value.value.value + 0.02704 - 0.01424 * c + 0.2156 * c.pow(2) -
+                        0.01426 * c.pow(3)
+                    // Need to set the scale or later precision gets lost somewhere between the ODB and Explore
+                    BrightnessValue
+                      .from(newV.setScale(5, scala.math.BigDecimal.RoundingMode.HALF_UP))
+                      .toOption
+                      .fold(g): bv =>
+                        bv.withUnit[VegaMagnitude].toMeasureTagged
+                  )
+                  .getOrElse(g)
+                map.updated(Band.V, v)
+              )
+
+          }(withSed)
       )(candidate)
