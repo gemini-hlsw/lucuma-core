@@ -21,6 +21,7 @@ import org.http4s.client.Client
 import org.typelevel.log4cats.Logger
 import org.typelevel.log4cats.LoggerFactory
 import org.typelevel.log4cats.syntax.*
+
 import java.net.URLDecoder
 
 // TODO Add Trace, we need natchez
