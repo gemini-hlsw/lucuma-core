@@ -81,7 +81,7 @@ class GaiaClientImpl[F[_]: {Concurrent, LoggerFactory as LF}](
     val request: Request[F] = Request[F](Method.GET, modUri(queryUri), headers = headers)
 
     info"Querying catalog: ${adapter.adapterName}, uri: ${URLDecoder.decode(queryUri.renderString, "UTF-8")}" *>
-      debug"curl ${headers.headers.map(h => s"-H '${h.name}: ${h.value}'").mkString(" ")} '${queryUri.renderString}'" *>
+      info"curl ${headers.headers.map(h => s"-H '${h.name}: ${h.value}'").mkString(" ")} '${queryUri.renderString}'" *>
       httpClient
         .stream(request)
         .flatMap:
