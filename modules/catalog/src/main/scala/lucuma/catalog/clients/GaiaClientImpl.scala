@@ -21,6 +21,7 @@ import org.http4s.client.Client
 import org.typelevel.log4cats.Logger
 import org.typelevel.log4cats.LoggerFactory
 import org.typelevel.log4cats.syntax.*
+import java.net.URLDecoder
 
 // TODO Add Trace, we need natchez
 class GaiaClientImpl[F[_]: {Concurrent, LoggerFactory as LF}](
@@ -68,7 +69,7 @@ class GaiaClientImpl[F[_]: {Concurrent, LoggerFactory as LF}](
       .map(adapter => queryGaia(adapter, queryUri(adapter), parser(adapter)))
       .raceAllToSuccess
       .flatMap: (adapter, results) =>
-        info"Selected adapter: $adapter" *> results.pure[F]
+        info"Selected catalog: ${adapter.adapterName}" *> results.pure[F]
 
   private def queryGaia[A](
     adapter:  CatalogAdapter.Gaia,
@@ -78,7 +79,8 @@ class GaiaClientImpl[F[_]: {Concurrent, LoggerFactory as LF}](
     val headers             = Headers(adapter.requestHeaders.map((x, y) => Header.Raw(x, y)).toList)
     val request: Request[F] = Request[F](Method.GET, modUri(queryUri), headers = headers)
 
-    info"Querying Gaia adapter: $adapter, uri: ${queryUri.host}" *>
+    info"Querying catalog: ${adapter.adapterName}, uri: ${URLDecoder.decode(queryUri.renderString, "UTF-8")}" *>
+      debug"curl ${headers.headers.map(h => s"-H '${h.name}: ${h.value}'").mkString(" ")} '${queryUri.renderString}'" *>
       httpClient
         .stream(request)
         .flatMap:
@@ -87,7 +89,7 @@ class GaiaClientImpl[F[_]: {Concurrent, LoggerFactory as LF}](
             .through(parser)
         .compile
         .toList
-        .map(results => (adapter, results))
+        .tupleLeft(adapter)
 
   /**
    * Takes a search query and builds a uri to query gaia.

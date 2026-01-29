@@ -324,6 +324,7 @@ object CatalogAdapter {
 
     override def defaultEpoch: Epoch = Epoch.Julian.fromEpochYears(2016.0).get
 
+    def adapterName: String
     def uri: Uri
     def gaiaDB: String
     def format: String
@@ -479,6 +480,7 @@ object CatalogAdapter {
   }
 
   trait GaiaEsa extends Gaia {
+    override val adapterName: String = "ESA"
     override lazy val uri: Uri       = uri"https://gea.esac.esa.int/tap-server/tap/sync"
     override lazy val format: String = "votable_plain"
     // ESA uses pos.parallax.trig and spect.dopplerVeloc.opt;em.opt.I
@@ -489,6 +491,7 @@ object CatalogAdapter {
   }
 
   trait GaiaGavo extends Gaia {
+    override val adapterName: String = "GAVO"
     override lazy val uri: Uri       = uri"https://dc.g-vo.org/__system__/tap/run/sync"
     override lazy val format: String = "votabletd"
     // GAVO uses pos.parallax and spect.dopplerVeloc.opt;em.opt.I
@@ -500,7 +503,8 @@ object CatalogAdapter {
   }
 
   trait GaiaDataLab extends Gaia {
-    override lazy val uri: Uri = uri"https://datalab.noirlab.edu/query/query"
+    override val adapterName: String = "DataLab"
+    override lazy val uri: Uri       = uri"https://datalab.noirlab.edu/query/query"
 
     override lazy val format: String = "votable"
 
@@ -618,7 +622,8 @@ object CatalogAdapter {
 
   object Gaia3LiteEsaProxy
       extends Gaia3LiteEsa { // Do not use with a proxy. This is already a proxy.
-    override lazy val uri: Uri = uri"https://gaia.noirlab.edu/tap-server/tap/sync"
+    override val adapterName: String = "NoirLab"
+    override lazy val uri: Uri       = uri"https://gaia.noirlab.edu/tap-server/tap/sync"
   }
 
   object Gaia3LiteGavo extends Gaia3Lite with GaiaGavo {
