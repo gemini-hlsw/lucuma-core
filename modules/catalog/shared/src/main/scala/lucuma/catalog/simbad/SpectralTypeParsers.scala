@@ -9,7 +9,7 @@ import cats.parse.Parser0
 import cats.parse.Rfc5234.digit
 import cats.syntax.eq.*
 
-private[simbad] trait SpectralTypeParsers:
+private[catalog] trait SpectralTypeParsers:
 
   // Temperature class letter: O, B, A, F, G, K, M, L, T, Y
   private val tempLetter: Parser[Char] =
@@ -153,4 +153,4 @@ private[simbad] trait SpectralTypeParsers:
     (whiteDwarf.backtrack | subdwarf.backtrack | mainSequence)
       .withContext("spectral type")
 
-private[simbad] object SpectralTypeParsers extends SpectralTypeParsers
+private[catalog] object SpectralTypeParsers extends SpectralTypeParsers
