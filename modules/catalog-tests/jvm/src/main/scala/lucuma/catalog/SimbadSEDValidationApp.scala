@@ -8,12 +8,12 @@ import cats.effect.IOApp
 import cats.syntax.all.*
 import eu.timepit.refined.types.string.NonEmptyString
 import fs2.*
-import fs2.data.csv.*
-import fs2.io.readClassLoaderResource
+import lucuma.catalog.SEDValidationData.*
 import lucuma.catalog.clients.SimbadClient
 import lucuma.catalog.simbad.SEDDataLoader
 import lucuma.catalog.simbad.SEDMatcher
-import lucuma.core.enums.*
+import lucuma.catalog.simbad.StellarLibraryParameters
+import lucuma.catalog.simbad.StellarPhysics
 import lucuma.core.model.SourceProfile
 import lucuma.core.model.SpectralDefinition
 import lucuma.core.model.UnnormalizedSED
@@ -23,79 +23,11 @@ import scala.concurrent.duration.*
 
 object SimbadSEDValidationApp extends IOApp.Simple:
 
-  case class SimbadEntry(
-    mainId:       String,
-    otype:        String,
-    morphType:    String,
-    spectralType: String
-  )
-
-  case class ExpectedOutput(
-    main_id:  String,
-    otype:    String,
-    filename: Option[String],
-    t_eff:    Option[Double],
-    log_g:    Option[Double]
-  )
-
-  given liftCellDecoder[A: CellDecoder]: CellDecoder[Option[A]] = s =>
-    s.nonEmpty.guard[Option].traverse(_ => CellDecoder[A].apply(s))
-
-  given CsvRowDecoder[SimbadEntry, String] = (row: CsvRow[String]) =>
-    for
-      mainId       <- row.as[String]("main_id")
-      otype        <- row.as[String]("otype")
-      morphType    <- row.as[String]("morph_type")
-      spectralType <- row.as[String]("sp_type")
-    yield SimbadEntry(mainId, otype, morphType, spectralType)
-
-  given CsvRowDecoder[ExpectedOutput, String] = (row: CsvRow[String]) =>
-    for
-      mainId   <- row.as[String]("main_id")
-      otype    <- row.as[String]("otype")
-      filename <- row.as[Option[String]]("filename")
-      tEff     <- row.as[Option[Double]]("t_eff")
-      logG     <- row.as[Option[Double]]("log_g")
-    yield ExpectedOutput(mainId, otype, filename, tEff, logG)
-
-  private val testData: IO[List[SimbadEntry]] =
-    readClassLoaderResource[IO]("simbad-sed-test-data-full.dat")
-      .through(text.utf8.decode)
-      .through(decodeUsingHeaders[SimbadEntry](' '))
-      .compile
-      .toList
-
-  private val expectedOutput: IO[List[ExpectedOutput]] =
-    readClassLoaderResource[IO]("expected-output-full.csv")
-      .through(text.utf8.decode)
-      .through(decodeUsingHeaders[ExpectedOutput]())
-      .compile
-      .toList
-
-  private def filenameToSED(filename: String): Option[UnnormalizedSED] =
-    filename match
-      case "QSO.sed"        => Some(UnnormalizedSED.Quasar(QuasarSpectrum.QS0))
-      case "HII.sed"        => Some(UnnormalizedSED.HIIRegion(HIIRegionSpectrum.OrionNebula))
-      case "PN.sed"         => Some(UnnormalizedSED.PlanetaryNebula(PlanetaryNebulaSpectrum.NGC7009))
-      case "Elliptical.sed" => Some(UnnormalizedSED.Galaxy(GalaxySpectrum.Elliptical))
-      case "Spiral.sed"     => Some(UnnormalizedSED.Galaxy(GalaxySpectrum.Spiral))
-      case stellar          =>
-        val spectrumTag = stellar.stripSuffix(".nm")
-        StellarLibrarySpectrum.values
-          .find(_.tag === spectrumTag)
-          .map(UnnormalizedSED.StellarLibrary(_))
-
-  private def stellarBaseType(sed: UnnormalizedSED): Option[String] =
-    sed match
-      case UnnormalizedSED.StellarLibrary(spectrum) =>
-        spectrum.toString.stripSuffix("_new").some
-      case _                                        =>
-        none
-
-  private def sedEquivalent(p: UnnormalizedSED, s: UnnormalizedSED): Boolean =
-    (stellarBaseType(p), stellarBaseType(s)) match
-      case (Some(pBase), Some(sBase)) => pBase === sBase
-      case _                          => p === s
+  private def retry[A](io: IO[A], maxRetries: Int, delay: FiniteDuration): IO[A] =
+    io.handleErrorWith { err =>
+      if maxRetries > 0 then IO.sleep(delay) *> retry(io, maxRetries - 1, delay * 2)
+      else IO.raiseError(err)
+    }
 
   private def extractSED(result: CatalogTargetResult): Option[UnnormalizedSED] =
     result.target.sourceProfile match
@@ -110,42 +42,22 @@ object SimbadSEDValidationApp extends IOApp.Simple:
   ) extends QueryResult
   case class Failure(mainId: String, error: String) extends QueryResult
 
-  private val mismatchesOnly = true
-
-  private val knownMismatchIds: Set[String] = Set(
-    "* alf Peg", "* del Leo", "* gam Vir",
-    "2MASS J16134848-2334143",
-    "BD+09  2152", "BD+17  3248",
-    "CD-45  3283", "CD-80   328",
-    "Feige  84", "G 139-8",
-    "HD   3136", "HD  21115", "HD  21527", "HD  32255", "HD  36527",
-    "HD  45207", "HD  51028", "HD  53098", "HD  66149", "HD  67288",
-    "HD  71253", "HD  72766", "HD  74429", "HD  75547", "HD  76972",
-    "HD  77785", "HD  78318", "HD  91651",
-    "HD 102036", "HD 102392", "HD 123682", "HD 124540", "HD 135788",
-    "HD 136947", "HD 137037", "HD 141441", "HD 145575", "HD 159447",
-    "HD 164340", "HD 172193A", "HD 172920", "HD 174450", "HD 175798",
-    "HD 187370", "HD 190336", "HD 193069A", "HD 203586", "HD 210851",
-    "HD 214749", "HD 220391"
-  )
-
   def run: IO[Unit] =
     JdkHttpClient.simple[IO].use { client =>
-      for
+      for {
         sedConfig <- SEDDataLoader.load
-        matcher    = SEDMatcher.fromConfig(sedConfig)
-        simbad     = SimbadClient.build[IO](client, matcher)
-        entries   <- testData
-        expected  <- expectedOutput
-        filtered   = if mismatchesOnly then entries.filter(e => knownMismatchIds.contains(e.mainId))
-                     else entries
-        _         <- IO.println(s"Loaded ${entries.size} test entries, running ${filtered.size}" +
-                       (if mismatchesOnly then " (mismatches only)" else ""))
+        matcher     = SEDMatcher.fromConfig(sedConfig)
+        physics     = new StellarPhysics(sedConfig.gravityTable)
+        library     = new StellarLibraryParameters(sedConfig.stellarLibrary, physics)
+        simbad      = SimbadClient.build[IO](client, matcher)
+        entries    <- testData
+        expected   <- expectedOutput
+        _          <- IO.println(s"Loaded ${entries.size} test entries")
         expectedMap = expected.map(e => e.main_id -> e).toMap
-        entriesMap = entries.map(e => e.mainId -> e).toMap
-        results   <- queryAll(simbad, filtered)
-        _         <- reportResults(results, expectedMap, entriesMap)
-      yield ()
+        entriesMap  = entries.map(e => e.mainId -> e).toMap
+        results    <- queryAll(simbad, entries)
+        _          <- reportResults(results, expectedMap, entriesMap, physics, library)
+      } yield ()
     }
 
   private def queryAll(
@@ -156,8 +68,8 @@ object SimbadSEDValidationApp extends IOApp.Simple:
     Stream
       .emits[IO, SimbadEntry](entries)
       .zipWithIndex
-      .metered(100.millis)
-      .evalMap { case (entry, idx) =>
+      .metered(50.millis)
+      .parEvalMap(5) { case (entry, idx) =>
         val progress = idx + 1
         val logProgress =
           if progress % 100 == 0 || progress == total.toLong then
@@ -176,7 +88,7 @@ object SimbadSEDValidationApp extends IOApp.Simple:
       case Left(_)     =>
         IO.pure(Failure(entry.mainId, "Invalid empty main_id"))
       case Right(name) =>
-        simbad
+        val attempt = simbad
           .search(name)
           .map {
             case Right(result) =>
@@ -185,21 +97,37 @@ object SimbadSEDValidationApp extends IOApp.Simple:
             case Left(errors)  =>
               Failure(entry.mainId, errors.toNonEmptyList.toList.mkString("; "))
           }
+        retry(attempt, 3, 1.second)
           .handleError(t => Failure(entry.mainId, t.getMessage))
 
   case class MismatchDetail(
-    mainId:       String,
-    expectedSED:  Option[UnnormalizedSED],
-    liveSED:      Option[UnnormalizedSED],
-    liveObjType:  Option[String],
-    origOtype:    String,
-    origSpType:   String,
+    mainId:        String,
+    expectedSED:   Option[UnnormalizedSED],
+    liveSED:       Option[UnnormalizedSED],
+    liveObjType:   Option[String],
+    origOtype:     String,
+    origSpType:    String,
     origMorphType: String
   )
 
-  private def categorizeMismatch(m: MismatchDetail): String =
+  private def isMismatchScoreTie(
+    m:       MismatchDetail,
+    physics: StellarPhysics,
+    library: StellarLibraryParameters
+  ): Boolean =
+    (m.expectedSED, m.liveSED) match
+      case (Some(expected), Some(live)) =>
+        isScoreTie(m.origSpType, expected, live, physics, library)
+      case _ => false
+
+  private def categorizeMismatch(
+    m:       MismatchDetail,
+    physics: StellarPhysics,
+    library: StellarLibraryParameters
+  ): String =
     (m.expectedSED, m.liveSED) match
       case (None, Some(_)) => "newly-matched"
+      case _ if isMismatchScoreTie(m, physics, library) => "score-tie"
       case _               =>
         val isStellarExpected = m.expectedSED.exists {
           case _: UnnormalizedSED.StellarLibrary => true
@@ -215,7 +143,9 @@ object SimbadSEDValidationApp extends IOApp.Simple:
   private def reportResults(
     results:     List[QueryResult],
     expectedMap: Map[String, ExpectedOutput],
-    entriesMap:  Map[String, SimbadEntry]
+    entriesMap:  Map[String, SimbadEntry],
+    physics:     StellarPhysics,
+    library:     StellarLibraryParameters
   ): IO[Unit] =
     val successes  = results.collect { case s: Success => s }
     val failures   = results.collect { case f: Failure => f }
@@ -250,7 +180,7 @@ object SimbadSEDValidationApp extends IOApp.Simple:
     }
 
     val allMismatches = mismatchDetails.result()
-    val grouped       = allMismatches.groupBy(categorizeMismatch)
+    val grouped       = allMismatches.groupBy(m => categorizeMismatch(m, physics, library))
 
     val report = new StringBuilder
     report ++= "\n=== Simbad SED Validation Report ===\n"
