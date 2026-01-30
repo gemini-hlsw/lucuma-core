@@ -329,3 +329,35 @@ object JtsPwfsDemo extends JtsDemo with PwfsShapes:
 
 object JtsGmosWithPwfsDemo extends JtsDemo with GmosWithPwfsShapes:
   override val arcsecPerPixel: Double = 0.75
+
+trait Igrins2Shapes extends InstrumentShapes:
+  import lucuma.core.geom.igrins2.*
+  import lucuma.core.geom.pwfs.{patrolField, probeArm}
+  import lucuma.core.enums.GuideProbe
+
+  val posAngle: Angle =
+    15.deg
+
+  val offsetPos: Offset =
+    Offset.Zero
+
+  val guideStarOffset: Offset =
+    Offset(270.arcsec.p, 224.arcsec.q)
+
+  val probe: GuideProbe = GuideProbe.PWFS2
+
+  def shapes: List[ShapeExpression] =
+    List(
+      ShapeExpression.centeredRectangle(1.arcsec, 1.arcsec).translate(guideStarOffset),
+      scienceArea.svcFieldOfView(posAngle, offsetPos),
+      scienceArea.scienceSlitFOV(posAngle, offsetPos),
+      // pwfs
+      patrolField.patrolFieldAt(posAngle, offsetPos),
+      probeArm.mirrorAt(probe, guideStarOffset, offsetPos),
+      probeArm.mirrorVignettedAreaAt(probe, guideStarOffset, offsetPos),
+      probeArm.armVignettedAreaAt(probe, guideStarOffset, offsetPos),
+      probeArm.armAt(probe, guideStarOffset, offsetPos)
+    )
+
+object JtsIgrins2Demo extends JtsDemo with Igrins2Shapes:
+  override val arcsecPerPixel: Double = 0.75
