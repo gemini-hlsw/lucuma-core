@@ -173,7 +173,7 @@ object SEDMatcher:
 
   // Some regexes to match galaxy SEDs
   private val EllipticalPattern = """E[0-9:+]?.*""".r
-  private val S0Pattern         = """S0.*""".r
+  private val S0Pattern         = """S[0O].*""".r
   private val SpiralPattern     = """S[abcABC_:]?.*""".r
 
   private val NebularNonVPattern = """.*I{1,3}n.*""".r
@@ -249,7 +249,7 @@ object SEDMatcher:
   private val StarTypes = Set(
     "*", "Star", "Ma*", "bC*", "bCepV*", "sg*", "Supergiant", "s*r", "RedSG", "s*y", "YellowSG",
     "s*b", "BlueSG", "WR*", "WolfRayet*", "N*", "Neutron*", "Psr", "Pulsar", "Y*O", "YSO",
-    "Or*", "OrionV*", "TT*", "TTauri*", "Ae*", "HH", "HerbigHaroObj", "MS*", "Be*", "BS*",
+    "Or*", "OrionV*", "TT*", "TTauri*", "Ae*", "HH", "HerbigHaroObj", "MS*", "MainSequence*", "Be*", "BS*",
     "BlueStraggler", "SX*", "SXPheV*", "gD*", "gammaDorV*", "dS*", "delSctV*", "PulsV*delSct",
     "Ev*", "RG*", "RGB*", "HS*", "HotSubdwarf", "HB*", "HorBranch*", "RR*", "RRLyrae",
     "WV*", "Type2Cep", "Ce*", "Cepheid", "cC*", "ClassicalCep", "C*", "S*", "LP*", "LongPeriodV*",
