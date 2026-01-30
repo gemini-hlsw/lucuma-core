@@ -6,13 +6,14 @@ package lucuma.core.model.sequence.igrins2.arb
 import lucuma.core.model.sequence.igrins2.Igrins2StaticConfig
 import org.scalacheck.Arbitrary
 import org.scalacheck.Cogen
+import org.scalacheck.Gen
 
 trait ArbIgrins2StaticConfig:
 
-  given Arbitrary[Igrins2StaticConfig] =
-    Arbitrary(Igrins2StaticConfig())
+  given Arbitrary[Igrins2StaticConfig.type] =
+    Arbitrary(Gen.const(Igrins2StaticConfig))
 
-  given Cogen[Igrins2StaticConfig] =
+  given Cogen[Igrins2StaticConfig.type] =
     Cogen[Unit].contramap(_ => ())
 
 object ArbIgrins2StaticConfig extends ArbIgrins2StaticConfig

@@ -45,7 +45,7 @@ trait ArbInstrumentExecutionConfig:
 
   given Arbitrary[InstrumentExecutionConfig.Igrins2] =
     Arbitrary:
-      arbitrary[ExecutionConfig[Igrins2StaticConfig, Igrins2DynamicConfig]].map(InstrumentExecutionConfig.Igrins2(_))
+      arbitrary[ExecutionConfig[Igrins2StaticConfig.type, Igrins2DynamicConfig]].map(InstrumentExecutionConfig.Igrins2(_))
 
   given Arbitrary[InstrumentExecutionConfig] =
     Arbitrary:
@@ -66,7 +66,7 @@ trait ArbInstrumentExecutionConfig:
     Cogen[ExecutionConfig[StaticConfig.GmosSouth, DynamicConfig.GmosSouth]].contramap(_.executionConfig)
 
   given Cogen[InstrumentExecutionConfig.Igrins2] =
-    Cogen[ExecutionConfig[Igrins2StaticConfig, Igrins2DynamicConfig]].contramap(_.executionConfig)
+    Cogen[ExecutionConfig[Igrins2StaticConfig.type, Igrins2DynamicConfig]].contramap(_.executionConfig)
 
   given Cogen[InstrumentExecutionConfig] =
     Cogen[(

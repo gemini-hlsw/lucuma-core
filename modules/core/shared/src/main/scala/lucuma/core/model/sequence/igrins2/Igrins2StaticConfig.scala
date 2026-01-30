@@ -3,10 +3,4 @@
 
 package lucuma.core.model.sequence.igrins2
 
-import cats.Eq
-
-case class Igrins2StaticConfig()
-
-object Igrins2StaticConfig:
-  given Eq[Igrins2StaticConfig] =
-    Eq.allEqual
+case object Igrins2StaticConfig
