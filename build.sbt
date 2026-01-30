@@ -2,7 +2,7 @@ import org.scalajs.linker.interface.ESVersion
 import org.typelevel.sbt.gha.PermissionValue
 import org.typelevel.sbt.gha.Permissions
 
-ThisBuild / tlBaseVersion                         := "0.171"
+ThisBuild / tlBaseVersion                         := "0.172"
 ThisBuild / tlCiReleaseBranches                   := Seq("master")
 ThisBuild / githubWorkflowEnv += "MUNIT_FLAKY_OK" -> "true"
 
@@ -143,12 +143,6 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform)
       "com.47deg"       %% "scalacheck-toolbox-datetime" % "0.7.0"       % Test
     )
   )
-
-lazy val benchmarks = project
-  .in(file("modules/benchmarks"))
-  .dependsOn(core.jvm, ags.jvm)
-  .settings(name := "lucuma-core-benchmarks")
-  .enablePlugins(NoPublishPlugin, JmhPlugin)
 
 lazy val catalog = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Pure)

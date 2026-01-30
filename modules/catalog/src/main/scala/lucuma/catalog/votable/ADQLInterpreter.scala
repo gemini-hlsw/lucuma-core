@@ -90,7 +90,7 @@ object ADQLInterpreter {
       val MaxCount                                        = count
       val shapeInterpreter                                = si
       val allFields: CatalogAdapter.Gaia => List[FieldId] = _.allFields
-      override def orderBy                                = Some("phot_g_mean_mag")
+      override def orderBy                                = Some("phot_g_mean_mag ASC")
       override def extraFields(c: Coordinates)            = Nil
       override val extraConstraints: List[String]         = List("ruwe < 1.4")
     }
@@ -99,7 +99,7 @@ object ADQLInterpreter {
   def pmCorrected(count: Int, epoch: Epoch)(using si: ShapeInterpreter): ADQLInterpreter =
     new ADQLInterpreter {
       val MaxCount         = count
-      override def orderBy = Some("phot_g_mean_mag")
+      override def orderBy = Some("phot_g_mean_mag ASC")
       val shapeInterpreter = si
 
       val allFields: CatalogAdapter.Gaia => List[FieldId] =

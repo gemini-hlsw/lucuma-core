@@ -104,7 +104,8 @@ object BlindOffsets:
     val adqlQuery = QueryByADQL(
       base = baseCoordinates,
       shapeConstraint = ShapeExpression.centeredEllipse(searchRadius * 2, searchRadius * 2),
-      brightnessConstraints = None
+      brightnessConstraints = None,
+      areaBuffer = Angle.Angle0
     )
 
     val interpreter = ADQLInterpreter.blindOffsetCandidates

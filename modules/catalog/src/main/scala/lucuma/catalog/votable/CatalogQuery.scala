@@ -53,7 +53,8 @@ sealed trait ADQLQuery {
 case class QueryByADQL(
   base:                  Coordinates,
   shapeConstraint:       ShapeExpression,
-  brightnessConstraints: Option[BrightnessConstraints]
+  brightnessConstraints: Option[BrightnessConstraints],
+  areaBuffer:            Angle = Angle.Angle0
 ) extends CatalogQuery
     with ADQLQuery {
   override val catalog = CatalogName.Gaia
@@ -61,7 +62,7 @@ case class QueryByADQL(
   def searchParams(using ev: ADQLInterpreter): (Coordinates, Angle) = {
     given ShapeInterpreter = ev.shapeInterpreter
 
-    (base, shapeConstraint.maxSide.bisect)
+    (base, shapeConstraint.maxSide.bisect + areaBuffer)
   }
 }
 
@@ -76,7 +77,8 @@ case class TimeRangeQueryByADQL(
   timeRange:             Bounded[Instant],
   shapeConstraint:       ShapeExpression,
   brightnessConstraints: Option[BrightnessConstraints],
-  proxy:                 Option[Uri] = None
+  proxy:                 Option[Uri] = None,
+  areaBuffer:            Angle = Angle.Angle0
 ) extends CatalogQuery
     with ADQLQuery {
   override val catalog = CatalogName.Gaia
@@ -108,7 +110,7 @@ case class TimeRangeQueryByADQL(
         (Offset.Zero, tracking.baseCoordinates)
     }
 
-    (center, (shapeConstraint ∪ (shapeConstraint ↗ offset)).maxSide.bisect)
+    (center, (shapeConstraint ∪ (shapeConstraint ↗ offset)).maxSide.bisect + areaBuffer)
   }
 }
 
@@ -122,7 +124,8 @@ case class CoordinatesRangeQueryByADQL(
   coords:                NonEmptyList[Coordinates],
   shapeConstraint:       ShapeExpression,
   brightnessConstraints: Option[BrightnessConstraints],
-  proxy:                 Option[Uri] = None
+  proxy:                 Option[Uri] = None,
+  areaBuffer:            Angle = Angle.Angle0
 ) extends CatalogQuery
     with ADQLQuery {
   override val catalog = CatalogName.Gaia
@@ -136,6 +139,6 @@ case class CoordinatesRangeQueryByADQL(
       .map(_.diff(base).offset)
       .foldLeft(shapeConstraint)((prev, offset) => prev ∪ (shapeConstraint ↗ offset))
 
-    (base, shape.maxSide.bisect)
+    (base, shape.maxSide.bisect + areaBuffer)
   }
 }
