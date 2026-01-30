@@ -30,6 +30,8 @@ object ExecutionConfig:
   type GmosNorth  = ExecutionConfig[gmos.StaticConfig.GmosNorth, gmos.DynamicConfig.GmosNorth]
   /** Shorthand type for GmosSouth. */
   type GmosSouth  = ExecutionConfig[gmos.StaticConfig.GmosSouth, gmos.DynamicConfig.GmosSouth]
+  /** Shorthand type for Igrins2. */
+  type Igrins2    = ExecutionConfig[igrins2.Igrins2StaticConfig, igrins2.Igrins2DynamicConfig]
 
   given [S, D](using Eq[S], Eq[D]): Eq[ExecutionConfig[S, D]] =
     Eq.by { a => (
