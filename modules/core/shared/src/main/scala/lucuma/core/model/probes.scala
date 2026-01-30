@@ -24,5 +24,7 @@ trait probes:
         GuideProbe.PWFS2.some
       case (ObservingModeType.GmosNorthImaging | ObservingModeType.GmosSouthImaging, TrackType.Sidereal) =>
         GuideProbe.GmosOIWFS.some
+      case (ObservingModeType.Igrins2LongSlit, _) =>
+        GuideProbe.PWFS2.some
 
 object probes extends probes
