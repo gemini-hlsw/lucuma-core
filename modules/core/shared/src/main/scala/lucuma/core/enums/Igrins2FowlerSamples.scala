@@ -3,19 +3,23 @@
 
 package lucuma.core.enums
 
+import lucuma.core.syntax.timespan.*
 import lucuma.core.util.Enumerated
 import lucuma.core.util.TimeSpan
-import lucuma.core.syntax.timespan.*
 
 /**
- * Enumerated type for Flamingos2 reads for engineering.
+ * Enumerated type for Igrins2 fowler samples
  * @group Enumerations
  */
-enum Igrins2FowlerSamples(val tag: String, val exposureTimeCutoff: TimeSpan)
-  derives Enumerated:
+enum Igrins2FowlerSamples(
+  val tag:                 String,
+  val exposureTimeCutoff:  TimeSpan,
+  val hReadNoise:          BigDecimal,
+  val kReadNoise:          BigDecimal
+) derives Enumerated:
 
-  case One     extends Igrins2FowlerSamples("one",     8500.msTimeSpan)
-  case Two     extends Igrins2FowlerSamples("two",     11300.msTimeSpan)
-  case Four    extends Igrins2FowlerSamples("four",    16000.msTimeSpan)
-  case Eight   extends Igrins2FowlerSamples("eight",   24000.msTimeSpan)
-  case Sixteen extends Igrins2FowlerSamples("sixteen", 39500.msTimeSpan)
+  case One     extends Igrins2FowlerSamples("one",     8500.msTimeSpan,  17.4, 23.7)
+  case Two     extends Igrins2FowlerSamples("two",     11300.msTimeSpan, 12.5, 16.9)
+  case Four    extends Igrins2FowlerSamples("four",    16000.msTimeSpan,  9.2, 12.2)
+  case Eight   extends Igrins2FowlerSamples("eight",   24000.msTimeSpan,  6.8,  8.9)
+  case Sixteen extends Igrins2FowlerSamples("sixteen", 39500.msTimeSpan,  5.1,  6.7)

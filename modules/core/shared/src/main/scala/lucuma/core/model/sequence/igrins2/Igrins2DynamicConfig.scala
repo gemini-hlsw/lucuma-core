@@ -5,6 +5,7 @@ package lucuma.core.model.sequence.igrins2
 
 import cats.Eq
 import cats.derived.*
+import lucuma.core.enums.Band
 import lucuma.core.enums.Igrins2FowlerSamples
 import lucuma.core.util.TimeSpan
 import monocle.Focus
@@ -14,11 +15,16 @@ case class Igrins2DynamicConfig(
   exposure: TimeSpan
 ) derives Eq:
   val fowlerSamples: Igrins2FowlerSamples =
-    val seconds  = exposure.toSeconds.toDouble
-    val nFowler  = ((seconds - 1.45479 - 0.168) / 1.45479).toInt
-    Igrins2FowlerSamples.values.reverse
-      .find(fs => nFowler >= (1 << fs.ordinal))
-      .getOrElse(Igrins2FowlerSamples.One)
+    fowlerSamplesForExposureTime(exposure)
+
+  val readoutTime: TimeSpan =
+    fowlerSamples.exposureTimeCutoff
+
+  def readNoise(band: Band): BigDecimal =
+    band match
+      case Band.H => fowlerSamples.hReadNoise
+      case Band.K => fowlerSamples.kReadNoise
+      case _      => fowlerSamples.hReadNoise
 
 object Igrins2DynamicConfig:
   /** @group Optics */

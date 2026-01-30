@@ -9,16 +9,26 @@ import lucuma.core.util.arb.ArbTimeSpan.given
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.*
 import org.scalacheck.Cogen
+import lucuma.core.model.sequence.igrins2.Igrins2StaticConfig
+import org.scalacheck.Gen
 
 trait ArbIgrins2DynamicConfig:
 
   given Arbitrary[Igrins2DynamicConfig] = Arbitrary(
-    for
-      exposure <- arbitrary[TimeSpan]
-    yield Igrins2DynamicConfig(exposure)
+    arbitrary[TimeSpan].map(Igrins2DynamicConfig(_))
   )
 
   given Cogen[Igrins2DynamicConfig] =
     Cogen[TimeSpan].contramap(_.exposure)
 
 object ArbIgrins2DynamicConfig extends ArbIgrins2DynamicConfig
+
+trait ArbIgrins2StaticConfig:
+
+  given Arbitrary[Igrins2StaticConfig.type] =
+    Arbitrary(Gen.const(Igrins2StaticConfig))
+
+  given Cogen[Igrins2StaticConfig.type] =
+    Cogen[Unit].contramap(_ => ())
+
+object ArbIgrins2StaticConfig extends ArbIgrins2StaticConfig
