@@ -12,13 +12,13 @@ import lucuma.core.util.TimeSpan
  * @group Enumerations
  */
 enum Igrins2FowlerSamples(
-  val tag:                 String,
-  val exposureTimeCutoff:  TimeSpan,
-  val hReadNoise:          BigDecimal,
-  val kReadNoise:          BigDecimal
+  val tag:         String,
+  val readoutTime: TimeSpan,
+  val hReadNoise:  BigDecimal,
+  val kReadNoise:  BigDecimal
 ) derives Enumerated:
 
-  case One     extends Igrins2FowlerSamples("one",     8500.msTimeSpan,  17.4, 23.7)
+  case One     extends Igrins2FowlerSamples("one",      8500.msTimeSpan, 17.4, 23.7)
   case Two     extends Igrins2FowlerSamples("two",     11300.msTimeSpan, 12.5, 16.9)
   case Four    extends Igrins2FowlerSamples("four",    16000.msTimeSpan,  9.2, 12.2)
   case Eight   extends Igrins2FowlerSamples("eight",   24000.msTimeSpan,  6.8,  8.9)

@@ -4,12 +4,12 @@
 package lucuma.core.model.sequence.igrins2.arb
 
 import lucuma.core.model.sequence.igrins2.Igrins2DynamicConfig
+import lucuma.core.model.sequence.igrins2.Igrins2StaticConfig
 import lucuma.core.util.TimeSpan
 import lucuma.core.util.arb.ArbTimeSpan.given
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.*
 import org.scalacheck.Cogen
-import lucuma.core.model.sequence.igrins2.Igrins2StaticConfig
 import org.scalacheck.Gen
 
 trait ArbIgrins2DynamicConfig:

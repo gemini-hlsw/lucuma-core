@@ -18,7 +18,7 @@ case class Igrins2DynamicConfig(
     fowlerSamplesForExposureTime(exposure)
 
   val readoutTime: TimeSpan =
-    fowlerSamples.exposureTimeCutoff
+    fowlerSamples.readoutTime
 
   def readNoise(band: Band): BigDecimal =
     band match
