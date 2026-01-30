@@ -4,9 +4,11 @@
 package lucuma.core.model.sequence
 
 import cats.Eq
+import cats.derived.*
 import cats.syntax.eq.*
 import lucuma.core.enums.Instrument
 import lucuma.core.model.sequence.flamingos2 as f2
+import lucuma.core.model.sequence.igrins2 as ig2
 import monocle.Focus
 import monocle.Lens
 import monocle.Prism
@@ -73,9 +75,23 @@ object InstrumentExecutionConfig:
   val gmosSouth: Prism[InstrumentExecutionConfig, GmosSouth] =
     GenPrism[InstrumentExecutionConfig, GmosSouth]
 
+  case class Igrins2(
+    executionConfig: ExecutionConfig[ig2.Igrins2StaticConfig.type, ig2.Igrins2DynamicConfig]
+  ) extends InstrumentExecutionConfig derives Eq:
+    override def instrument: Instrument = Instrument.Igrins2
+    override def isComplete: Boolean    = executionConfig.isComplete
+
+  object Igrins2:
+    val executionConfig: Lens[Igrins2, ExecutionConfig[ig2.Igrins2StaticConfig.type, ig2.Igrins2DynamicConfig]] =
+      Focus[Igrins2](_.executionConfig)
+
+  val igrins2: Prism[InstrumentExecutionConfig, Igrins2] =
+    GenPrism[InstrumentExecutionConfig, Igrins2]
+
   given Eq[InstrumentExecutionConfig] =
     Eq.instance:
       case (a @ Flamingos2(_), b @ Flamingos2(_)) => a === b
       case (a @ GmosNorth(_),  b @ GmosNorth(_))  => a === b
       case (a @ GmosSouth(_),  b @ GmosSouth(_))  => a === b
+      case (a @ Igrins2(_),    b @ Igrins2(_))    => a === b
       case _                                      => false
