@@ -25,6 +25,14 @@ class SEDMatcherSuite extends CatsEffectSuite with SEDMatcherFixture:
     val result = sedMatcher.inferSED("*", Some("F1V"), None)
     assert(result.exists(_ === UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.F2V)))
 
+  test("G4V matches G5V_new"):
+    val result = sedMatcher.inferSED("*", Some("G4V"), None)
+    assert(result.exists(_ === UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.G5V_new)))
+
+  test("MainSequence* otype with G4V spectral type matches G5V_new"):
+    val result = sedMatcher.inferSED("MainSequence*", Some("G4V"), None)
+    assert(result.exists(_ === UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.G5V_new)))
+
   test("quasar otype returns QS0"):
     val result = sedMatcher.inferSED("QSO", None, None)
     assert(result.exists(_ === UnnormalizedSED.Quasar(QuasarSpectrum.QS0)))
@@ -67,6 +75,14 @@ class SEDMatcherSuite extends CatsEffectSuite with SEDMatcherFixture:
 
   test("galaxy with S0 morphology returns Elliptical"):
     val result = sedMatcher.inferSED("G", None, Some("S0"))
+    assert(result.exists(_ === UnnormalizedSED.Galaxy(GalaxySpectrum.Elliptical)))
+
+  test("galaxy with SO morphology (capital O) returns Elliptical"):
+    val result = sedMatcher.inferSED("G", None, Some("SO"))
+    assert(result.exists(_ === UnnormalizedSED.Galaxy(GalaxySpectrum.Elliptical)))
+
+  test("galaxy with SO-a morphology returns Elliptical"):
+    val result = sedMatcher.inferSED("G", None, Some("SO-a"))
     assert(result.exists(_ === UnnormalizedSED.Galaxy(GalaxySpectrum.Elliptical)))
 
   test("galaxy with negative Hubble stage returns Elliptical"):
