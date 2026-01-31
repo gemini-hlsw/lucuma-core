@@ -20,6 +20,8 @@ import lucuma.core.model.UnnormalizedSED
 import org.http4s.jdkhttpclient.JdkHttpClient
 
 import scala.concurrent.duration.*
+import java.nio.file.{Files, Paths, StandardOpenOption}
+import java.nio.charset.StandardCharsets
 
 object SimbadSEDValidationApp extends IOApp.Simple:
 
@@ -99,6 +101,13 @@ object SimbadSEDValidationApp extends IOApp.Simple:
           }
         retry(attempt, 3, 1.second)
           .handleError(t => Failure(entry.mainId, t.getMessage))
+
+  private def writeReportToFile(report: String, filename: String): IO[Unit] =
+    IO.blocking {
+      val path = Paths.get(filename)
+      Files.writeString(path, report, StandardCharsets.UTF_8,
+        StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)
+    }.void
 
   case class MismatchDetail(
     mainId:        String,
@@ -212,4 +221,12 @@ object SimbadSEDValidationApp extends IOApp.Simple:
         items.sortBy(_.mainId).foreach(m => report ++= formatMismatch(m))
 
     report ++= "\n=== End Report ===\n"
-    IO.println(report.toString)
+    val reportText = report.toString
+    val timestamp = java.time.LocalDateTime.now.toString.replace(':', '-')
+    val filename = s"validation-report-$timestamp.txt"
+
+    for
+      _ <- writeReportToFile(reportText, filename)
+      _ <- IO.println(s"\nReport written to: $filename\n")
+      _ <- IO.println(reportText)
+    yield ()
