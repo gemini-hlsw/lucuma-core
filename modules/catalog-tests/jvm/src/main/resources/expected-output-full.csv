@@ -1760,7 +1760,7 @@ HD   5061,*,A0V_calspec.nm,11531,4.07
 HD   5075,PM*,,,
 HD   5220,**,,,
 HD   5271,*,F2III_pickles_irtf.nm,6514,3.91
-HD   5291,s*b,B5I.nm,15611,2.13
+HD   5291,s*b,,,
 HD   5323,*,F0III_pickles_irtf.nm,6963,3.83
 HD   5372,PM*,,,
 HD   5405,PM*,F4V_calspec.nm,6156,4.273
@@ -6370,7 +6370,7 @@ NGC  1091,EmG,Spiral.sed,,
 NGC  1092,Sy2,QSO.sed,,
 NGC  1098,EmG,Elliptical.sed,,
 NGC  1102,G,Spiral.sed,,
-NGC  1109,GiG,,,
+NGC  1109,GiG,Elliptical.sed,,
 NGC  1121,AG?,QSO.sed,,
 NGC  1126,Sy2,QSO.sed,,
 NGC  1132,EmG,Elliptical.sed,,
@@ -7794,7 +7794,7 @@ V* CQ Aur,RS*,,,
 V* CQ Ind,EB*,,,
 V* CU CVn,dS*,,,
 V* CV Leo,LP*,,,
-V* DD Leo,LP*,,,
+V* DD Leo,LP*,M6III_pickles_irtf.nm,,
 V* DE Lac,RR*,,,
 V* DM Psc,LP*,M2III_pickles_irtf.nm,3587,1.31
 V* DN Cha,LP*,M2III_pickles_irtf.nm,3587,1.31

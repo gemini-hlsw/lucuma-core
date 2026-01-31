@@ -6,6 +6,7 @@ package lucuma.catalog.votable
 import cats.effect.*
 import lucuma.catalog.simbad.SEDDataLoader
 import lucuma.catalog.simbad.SEDMatcher
+import org.http4s.Uri
 import org.http4s.dom.FetchClientBuilder
 
 import scala.scalajs.js.annotation.*
@@ -13,12 +14,12 @@ import scala.scalajs.js.annotation.*
 @JSExportTopLevel("main")
 object SimbadQueryApp extends IOApp.Simple with SimbadQuerySample {
 
-  val sedDataBaseUrl = "/lucuma/catalog"
+  val sedDataBaseUrl = Uri.unsafeFromString("/lucuma/catalog")
 
   def run =
     FetchClientBuilder[IO].resource.use { client =>
       for
-        sedConfig <- SEDDataLoader.load(sedDataBaseUrl)
+        sedConfig <- SEDDataLoader.load(client, sedDataBaseUrl)
         result    <- simbadQuery[IO](client, SEDMatcher.fromConfig(sedConfig))
         _         <- IO.println(pprint.apply(result))
       yield ()
