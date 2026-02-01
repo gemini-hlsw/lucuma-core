@@ -9,14 +9,14 @@ import lucuma.catalog.simbad.SEDDataLoader
 import lucuma.catalog.simbad.SEDMatcher
 import org.http4s.jdkhttpclient.JdkHttpClient
 
-object SimbadQueryApp extends IOApp.Simple with SimbadQuerySample {
+object SimbadQueryApp extends IOApp.Simple with SimbadQuerySample:
 
   def run =
-    JdkHttpClient.simple[IO].use { client =>
-      for
-        sedConfig <- SEDDataLoader.load
-        result    <- simbadQuery[IO](client, SEDMatcher.fromConfig(sedConfig))
-        _         <- IO.println(pprint.apply(result))
-      yield ()
-    }
-}
+    JdkHttpClient
+      .simple[IO]
+      .use: client =>
+        for
+          sedConfig <- SEDDataLoader.load
+          result    <- simbadQuery[IO](client, SEDMatcher.fromConfig(sedConfig))
+          _         <- IO.println(pprint.apply(result))
+        yield ()

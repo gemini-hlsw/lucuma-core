@@ -29,7 +29,7 @@ case class ExpectedOutput(
   log_g:    Option[Double]
 )
 
-object SEDValidationData:
+object SimbadData:
 
   given liftCellDecoder[A: CellDecoder]: CellDecoder[Option[A]] = s =>
     s.nonEmpty.guard[Option].traverse(_ => CellDecoder[A].apply(s))
@@ -67,11 +67,11 @@ object SEDValidationData:
 
   def filenameToSED(filename: String): Option[UnnormalizedSED] =
     filename match
-      case "QSO.sed"        => Some(UnnormalizedSED.Quasar(QuasarSpectrum.QS0))
-      case "HII.sed"        => Some(UnnormalizedSED.HIIRegion(HIIRegionSpectrum.OrionNebula))
-      case "PN.sed"         => Some(UnnormalizedSED.PlanetaryNebula(PlanetaryNebulaSpectrum.NGC7009))
-      case "Elliptical.sed" => Some(UnnormalizedSED.Galaxy(GalaxySpectrum.Elliptical))
-      case "Spiral.sed"     => Some(UnnormalizedSED.Galaxy(GalaxySpectrum.Spiral))
+      case "QSO.sed"        => UnnormalizedSED.Quasar(QuasarSpectrum.QS0).some
+      case "HII.sed"        => UnnormalizedSED.HIIRegion(HIIRegionSpectrum.OrionNebula).some
+      case "PN.sed"         => UnnormalizedSED.PlanetaryNebula(PlanetaryNebulaSpectrum.NGC7009).some
+      case "Elliptical.sed" => UnnormalizedSED.Galaxy(GalaxySpectrum.Elliptical).some
+      case "Spiral.sed"     => UnnormalizedSED.Galaxy(GalaxySpectrum.Spiral).some
       case stellar          =>
         val spectrumTag = stellar.stripSuffix(".nm")
         StellarLibrarySpectrum.values
@@ -90,7 +90,7 @@ object SEDValidationData:
       case (Some(pBase), Some(sBase)) => pBase === sBase
       case _                          => p === s
 
-  def isScoreTie(
+  def tiedScore(
     spectralType: String,
     expectedSED:  UnnormalizedSED,
     liveSED:      UnnormalizedSED,
@@ -103,24 +103,25 @@ object SEDValidationData:
         SpectralTypeParsers.spectralType
           .parse(cleaned)
           .toOption
-          .flatMap { case (_, (lum, temp)) =>
-            physics
-              .calculateParameters(lum, temp)
-              .flatMap { targetParams =>
-                val pParams = library.params.get(pSpectrum)
-                val sParams = library.params.get(sSpectrum)
-                (pParams, sParams).mapN { (pp, sp) =>
+          .flatMap:
+            case (_, (lum, temp)) =>
+              physics
+                .calculateParameters(lum, temp)
+                .flatMap: targetParams =>
                   val dtMax = 0.1 * targetParams.temp.value
                   val dgMax = 0.5
+
                   def score(libParams: StellarPhysics.StellarParameters): Double =
                     val dt = (libParams.temp.value - targetParams.temp.value).toDouble / dtMax
                     val dg = (libParams.logG - targetParams.logG) / dgMax
                     math.sqrt(dt * dt + dg * dg)
-                  val pScore = score(pp)
-                  val sScore = score(sp)
-                  math.abs(pScore - sScore) / math.max(pScore, sScore) < 0.01
-                }
-              }
-          }
+
+                  val pParams = library.params.get(pSpectrum)
+                  val sParams = library.params.get(sSpectrum)
+
+                  (pParams, sParams).mapN: (pp, sp) =>
+                    val pScore = score(pp)
+                    val sScore = score(sp)
+                    math.abs(pScore - sScore) / math.max(pScore, sScore) < 0.01
           .getOrElse(false)
-      case _ => false
+      case _                                                                                      => false

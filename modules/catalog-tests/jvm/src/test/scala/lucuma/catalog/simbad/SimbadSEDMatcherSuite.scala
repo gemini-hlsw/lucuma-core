@@ -5,7 +5,7 @@ package lucuma.catalog.simbad
 
 import cats.syntax.all.*
 import lucuma.catalog.SEDMatcherFixture
-import lucuma.catalog.SEDValidationData.*
+import lucuma.catalog.SimbadData.*
 import lucuma.catalog.SimbadEntry
 import lucuma.core.model.UnnormalizedSED
 import munit.CatsEffectSuite
@@ -19,12 +19,12 @@ class SimbadSEDMatcherSuite extends CatsEffectSuite with SEDMatcherFixture:
     scalaSED:  UnnormalizedSED,
     entry:     SimbadEntry
   ): Boolean =
-    isScoreTie(entry.spectralType, pythonSED, scalaSED, sedPhysics, sedLibrary)
+    tiedScore(entry.spectralType, pythonSED, scalaSED, sedPhysics, sedLibrary)
 
   test("sanity test"):
     testData.map(_.length > 8000).assert
 
-  test("validate against Python"):
+  test("validate against python"):
     (testData, expectedOutput).mapN: (testData, expectedOutput) =>
       val inputData = testData.fproductLeft(_.mainId).toMap
 
@@ -51,16 +51,12 @@ class SimbadSEDMatcherSuite extends CatsEffectSuite with SEDMatcherFixture:
                 acc.copy(matches = acc.matches + 1, ties = acc.ties + 1)
               case (Some(p), Some(s))                         =>
                 acc.copy(errors =
-                  s"${entry.mainId} (${entry.spectralType}): Python=${p}, Scala=${s}" :: acc.errors
+                  s"${entry.mainId} (${entry.spectralType}): python=${p}, scala=${s}" :: acc.errors
                 )
               case (Some(p), None)                            =>
-                acc.copy(errors =
-                  s"${entry.mainId}: Python matched ($p), Scala failed" :: acc.errors
-                )
+                acc.copy(errors = s"${entry.mainId}: python ($p), scala failed" :: acc.errors)
               case (None, Some(s))                            =>
-                acc.copy(errors =
-                  s"${entry.mainId}: Python failed, Scala matched ($s)" :: acc.errors
-                )
+                acc.copy(errors = s"${entry.mainId}: python failed, scala ($s)" :: acc.errors)
 
       assert(result.errors.isEmpty)
       assertEquals(result.matches, testData.length)

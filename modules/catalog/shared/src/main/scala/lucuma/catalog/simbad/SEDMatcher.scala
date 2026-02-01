@@ -5,15 +5,14 @@ package lucuma.catalog.simbad
 
 import cats.data.EitherNec
 import cats.data.NonEmptyChain
+import cats.syntax.either.*
 import cats.syntax.eq.*
 import cats.syntax.option.*
-import cats.syntax.either.*
 import lucuma.catalog.votable.CatalogProblem
 import lucuma.catalog.votable.CatalogProblem.*
 import lucuma.core.enums.*
 import lucuma.core.model.UnnormalizedSED
 import lucuma.core.syntax.string.*
-
 import lucuma.core.util.Enumerated
 
 /**
@@ -142,11 +141,11 @@ object SEDMatcher:
     new SEDMatcher(library, physics)
 
   private enum ObjectCategory(val tag: String) derives Enumerated:
-    case Star            extends ObjectCategory("")
-    case Galaxy          extends ObjectCategory("")
-    case Quasar          extends ObjectCategory("")
-    case HIIRegion       extends ObjectCategory("")
-    case PlanetaryNebula extends ObjectCategory("")
+    case Star            extends ObjectCategory("star")
+    case Galaxy          extends ObjectCategory("galaxy")
+    case Quasar          extends ObjectCategory("quasar")
+    case HIIRegion       extends ObjectCategory("hii_region")
+    case PlanetaryNebula extends ObjectCategory("plantery_nebula")
 
   private enum LuminosityCategory(val tag: String) derives Enumerated:
     case Subdwarf   extends LuminosityCategory("subdwarf")

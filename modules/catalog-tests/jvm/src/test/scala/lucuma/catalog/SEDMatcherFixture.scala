@@ -37,5 +37,5 @@ trait SEDMatcherFixture:
   def sedLibrary: StellarLibraryParameters = sedFixture().library
   def sedMatcher: SEDMatcher               = sedFixture().matcher
 
-  val testData: IO[List[SimbadEntry]]         = SEDValidationData.testData
-  val expectedOutput: IO[List[ExpectedOutput]] = SEDValidationData.expectedOutput
+  val testData: IO[List[SimbadEntry]]          = SimbadData.testData
+  val expectedOutput: IO[List[ExpectedOutput]] = SimbadData.expectedOutput

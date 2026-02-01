@@ -175,11 +175,6 @@ lazy val catalog = crossProject(JVMPlatform, JSPlatform)
       "co.fs2" %% "fs2-io" % fs2Version
     )
   )
-  .jsSettings(
-    libraryDependencies ++= Seq(
-      "org.scala-js" %%% "scalajs-dom" % "2.8.0"
-    )
-  )
   .jsConfigure(_.enablePlugins(BundleMonPlugin))
 
 lazy val horizons = crossProject(JVMPlatform, JSPlatform)
