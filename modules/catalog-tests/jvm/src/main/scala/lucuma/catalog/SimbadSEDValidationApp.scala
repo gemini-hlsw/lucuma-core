@@ -23,6 +23,7 @@ import scala.concurrent.duration.*
 import java.nio.file.{Files, Paths, StandardOpenOption}
 import java.nio.charset.StandardCharsets
 
+// test app to validate SED matching querying simbad directly
 object SimbadSEDValidationApp extends IOApp.Simple:
 
   private def retry[A](io: IO[A], maxRetries: Int, delay: FiniteDuration): IO[A] =
@@ -44,21 +45,23 @@ object SimbadSEDValidationApp extends IOApp.Simple:
   ) extends QueryResult
   case class Failure(mainId: String, error: String) extends QueryResult
 
-  def run: IO[Unit] =
+  override def run: IO[Unit] =
     JdkHttpClient.simple[IO].use { client =>
       for {
-        sedConfig <- SEDDataLoader.load
-        matcher     = SEDMatcher.fromConfig(sedConfig)
-        physics     = new StellarPhysics(sedConfig.gravityTable)
-        library     = new StellarLibraryParameters(sedConfig.stellarLibrary, physics)
+        loader     <- SEDDataLoader.load
+        matcher     = SEDMatcher.fromConfig(loader)
+        physics     = new StellarPhysics(loader.gravityTable)
+        library     = new StellarLibraryParameters(loader.stellarLibrary, physics)
         simbad      = SimbadClient.build[IO](client, matcher)
         entries    <- testData
         expected   <- expectedOutput
         _          <- IO.println(s"Loaded ${entries.size} test entries")
-        expectedMap = expected.map(e => e.main_id -> e).toMap
-        entriesMap  = entries.map(e => e.mainId -> e).toMap
+        expectedMap = expected.fproductLeft(_.main_id).toMap
+        entriesMap  = entries.fproductLeft(_.mainId).toMap
+        // Query simbad for each case
         results    <- queryAll(simbad, entries)
         _          <- reportResults(results, expectedMap, entriesMap, physics, library)
+        _          <- IO.println("\n=== Validation complete - app exiting ===\n")
       } yield ()
     }
 
@@ -72,7 +75,7 @@ object SimbadSEDValidationApp extends IOApp.Simple:
       .zipWithIndex
       .metered(50.millis)
       .parEvalMap(5) { case (entry, idx) =>
-        val progress = idx + 1
+        val progress    = idx + 1
         val logProgress =
           if progress % 100 == 0 || progress == total.toLong then
             IO.println(s"  Progress: $progress/$total")
@@ -105,8 +108,12 @@ object SimbadSEDValidationApp extends IOApp.Simple:
   private def writeReportToFile(report: String, filename: String): IO[Unit] =
     IO.blocking {
       val path = Paths.get(filename)
-      Files.writeString(path, report, StandardCharsets.UTF_8,
-        StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)
+      Files.writeString(path,
+                        report,
+                        StandardCharsets.UTF_8,
+                        StandardOpenOption.CREATE,
+                        StandardOpenOption.TRUNCATE_EXISTING
+      )
     }.void
 
   case class MismatchDetail(
@@ -127,7 +134,7 @@ object SimbadSEDValidationApp extends IOApp.Simple:
     (m.expectedSED, m.liveSED) match
       case (Some(expected), Some(live)) =>
         isScoreTie(m.origSpType, expected, live, physics, library)
-      case _ => false
+      case _                            => false
 
   private def categorizeMismatch(
     m:       MismatchDetail,
@@ -135,14 +142,14 @@ object SimbadSEDValidationApp extends IOApp.Simple:
     library: StellarLibraryParameters
   ): String =
     (m.expectedSED, m.liveSED) match
-      case (None, Some(_)) => "newly-matched"
+      case (None, Some(_))                              => "newly-matched"
       case _ if isMismatchScoreTie(m, physics, library) => "score-tie"
-      case _               =>
+      case _                                            =>
         val isStellarExpected = m.expectedSED.exists {
           case _: UnnormalizedSED.StellarLibrary => true
           case _                                 => false
         }
-        val isStellarLive = m.liveSED.exists {
+        val isStellarLive     = m.liveSED.exists {
           case _: UnnormalizedSED.StellarLibrary => true
           case _                                 => false
         }
@@ -156,15 +163,15 @@ object SimbadSEDValidationApp extends IOApp.Simple:
     physics:     StellarPhysics,
     library:     StellarLibraryParameters
   ): IO[Unit] =
-    val successes  = results.collect { case s: Success => s }
-    val failures   = results.collect { case f: Failure => f }
-    var matches    = 0
-    var noExpected = 0
+    val successes       = results.collect { case s: Success => s }
+    val failures        = results.collect { case f: Failure => f }
+    var matches         = 0
+    var noExpected      = 0
     val mismatchDetails = List.newBuilder[MismatchDetail]
 
     successes.foreach { case Success(mainId, liveSED, liveObjType) =>
       expectedMap.get(mainId) match
-        case None =>
+        case None      =>
           noExpected += 1
         case Some(exp) =>
           val pythonSED = exp.filename.flatMap(filenameToSED)
@@ -178,12 +185,12 @@ object SimbadSEDValidationApp extends IOApp.Simple:
             case (p, s)                                    =>
               val entry = entriesMap.get(mainId)
               mismatchDetails += MismatchDetail(
-                mainId        = mainId,
-                expectedSED   = p,
-                liveSED       = s,
-                liveObjType   = liveObjType,
-                origOtype     = entry.map(_.otype).getOrElse("?"),
-                origSpType    = entry.map(_.spectralType).getOrElse("?"),
+                mainId = mainId,
+                expectedSED = p,
+                liveSED = s,
+                liveObjType = liveObjType,
+                origOtype = entry.map(_.otype).getOrElse("?"),
+                origSpType = entry.map(_.spectralType).getOrElse("?"),
                 origMorphType = entry.map(_.morphType).getOrElse("?")
               )
     }
@@ -222,11 +229,11 @@ object SimbadSEDValidationApp extends IOApp.Simple:
 
     report ++= "\n=== End Report ===\n"
     val reportText = report.toString
-    val timestamp = java.time.LocalDateTime.now.toString.replace(':', '-')
-    val filename = s"validation-report-$timestamp.txt"
+    val timestamp  = java.time.LocalDateTime.now.toString.replace(':', '-')
+    val filename   = s"validation-report-$timestamp.txt"
 
-    for
+    for {
       _ <- writeReportToFile(reportText, filename)
       _ <- IO.println(s"\nReport written to: $filename\n")
       _ <- IO.println(reportText)
-    yield ()
+    } yield ()
