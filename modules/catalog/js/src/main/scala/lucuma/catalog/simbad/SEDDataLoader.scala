@@ -18,5 +18,8 @@ object SEDDataLoader:
       gravity        <- SEDDataParsers.parseGravityFile(gravityContent).liftTo[F]
     yield SEDDataConfig(stars, gravity)
 
+  def loadMatcher[F[_]: Concurrent](httpClient: Client[F], baseUrl: Uri): F[SEDMatcher] =
+    load(httpClient, baseUrl).map(SEDMatcher.fromConfig)
+
   private def fetchFile[F[_]: Concurrent](client: Client[F], uri: Uri): F[String] =
     client.expect[String](Request[F](uri = uri))

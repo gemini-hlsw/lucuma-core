@@ -17,6 +17,9 @@ object SEDDataLoader:
       gravity        <- SEDDataParsers.parseGravityFile(gravityContent).liftTo[IO]
     } yield SEDDataConfig(stars, gravity)
 
+  def loadMatcher: IO[SEDMatcher] =
+    load.map(SEDMatcher.fromConfig)
+
   private def loadResource(name: String): IO[String] =
     readClassLoaderResource[IO](s"lucuma/catalog/$name")
       .through(text.utf8.decode)
