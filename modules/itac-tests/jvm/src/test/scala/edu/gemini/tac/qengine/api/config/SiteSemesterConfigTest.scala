@@ -3,13 +3,13 @@
 
 package edu.gemini.tac.qengine.api.config
 
-import edu.gemini.tac.qengine.util.{Percent, Time}
+import edu.gemini.tac.qengine.util.Percent
+import edu.gemini.tac.qengine.util.Time
+import lucuma.core.enums.Half
 import lucuma.core.enums.Site
 import lucuma.core.model.Semester
-
-import org.junit._
 import lucuma.core.model.Semester.YearInt
-import lucuma.core.enums.Half
+import org.junit.*
 
 class SiteSemesterConfigTest {
   // these aren't really relevant for the test cases, but required to

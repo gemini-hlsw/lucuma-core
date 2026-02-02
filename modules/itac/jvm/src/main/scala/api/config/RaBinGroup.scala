@@ -3,8 +3,8 @@
 
 package edu.gemini.tac.qengine.api.config
 
-import edu.gemini.tac.qengine.util.Angle
 import edu.gemini.tac.qengine.p1.Target
+import edu.gemini.tac.qengine.util.Angle
 
 
 object RaBinGroup {

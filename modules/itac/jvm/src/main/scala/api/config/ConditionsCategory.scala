@@ -3,9 +3,11 @@
 
 package edu.gemini.tac.qengine.api.config
 
-import edu.gemini.tac.qengine.p1._
-import ConditionsCategory._
-import scala.Ordering.Implicits._
+import edu.gemini.tac.qengine.p1.*
+
+import scala.Ordering.Implicits.*
+
+import ConditionsCategory.*
 
 /** Specification for a set of observing conditions. */
 final case class ConditionsCategory(

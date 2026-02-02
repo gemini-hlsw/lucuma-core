@@ -3,14 +3,17 @@
 
 package edu.gemini.tac.qengine.impl
 
-import block.BlockIterator
-import edu.gemini.tac.qengine.p1.{Proposal, Observation}
-import annotation.tailrec
-import resource._
-import edu.gemini.tac.qengine.impl.queue.ProposalQueueBuilder
-import edu.gemini.tac.qengine.log.{RejectCategoryOverAllocation, ProposalLog}
-import org.slf4j.LoggerFactory
 import edu.gemini.tac.qengine.api.queue.ProposalQueue
+import edu.gemini.tac.qengine.impl.queue.ProposalQueueBuilder
+import edu.gemini.tac.qengine.log.ProposalLog
+import edu.gemini.tac.qengine.log.RejectCategoryOverAllocation
+import edu.gemini.tac.qengine.p1.Observation
+import edu.gemini.tac.qengine.p1.Proposal
+import org.slf4j.LoggerFactory
+
+import block.BlockIterator
+import annotation.tailrec
+import resource.*
 
 object QueueCalcStage {
   type Result = (QueueFrame, ProposalLog)

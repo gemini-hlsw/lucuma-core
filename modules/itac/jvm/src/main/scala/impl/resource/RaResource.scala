@@ -3,12 +3,15 @@
 
 package edu.gemini.tac.qengine.impl.resource
 
-import edu.gemini.tac.qengine.p1.{ObservingConditions, Target}
-import edu.gemini.tac.qengine.impl.block.Block
 import edu.gemini.tac.qengine.api.config.SiteSemesterConfig
-import edu.gemini.tac.qengine.log.{RejectTarget, RejectMessage}
-import edu.gemini.tac.qengine.util.{BoundedTime, Time}
+import edu.gemini.tac.qengine.impl.block.Block
 import edu.gemini.tac.qengine.impl.queue.ProposalQueueBuilder
+import edu.gemini.tac.qengine.log.RejectMessage
+import edu.gemini.tac.qengine.log.RejectTarget
+import edu.gemini.tac.qengine.p1.ObservingConditions
+import edu.gemini.tac.qengine.p1.Target
+import edu.gemini.tac.qengine.util.BoundedTime
+import edu.gemini.tac.qengine.util.Time
 
 object RaResource {
   def apply(t: Time, c: SiteSemesterConfig): RaResource = {

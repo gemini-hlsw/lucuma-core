@@ -3,7 +3,8 @@
 
 package edu.gemini.tac.qengine.impl.block
 
-import edu.gemini.tac.qengine.p1.{Observation, Proposal}
+import edu.gemini.tac.qengine.p1.Observation
+import edu.gemini.tac.qengine.p1.Proposal
 import edu.gemini.tac.qengine.util.Time
 
 /**

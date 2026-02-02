@@ -3,11 +3,14 @@
 
 package edu.gemini.tac.qengine.api.config
 
-import org.junit._
-import Assert._
-import edu.gemini.tac.qengine.util.{Angle, Time}
 import edu.gemini.tac.qengine.p1.Target
+import edu.gemini.tac.qengine.util.Angle
+import edu.gemini.tac.qengine.util.Time
+import org.junit.*
+
 import scala.annotation.unused
+
+import Assert.*
 
 class RaBinGroupTest {
 

@@ -3,13 +3,14 @@
 
 package lucuma.core.util
 
-import scala.concurrent.duration.*
-import lucuma.core.model.IntPercent
-import scala.collection.immutable.SortedMap
-import eu.timepit.refined.auto.autoUnwrap
-import eu.timepit.refined.cats.* 
 import cats.implicits.*
+import eu.timepit.refined.auto.autoUnwrap
+import eu.timepit.refined.cats.*
+import lucuma.core.model.IntPercent
+
 import scala.annotation.tailrec
+import scala.collection.immutable.SortedMap
+import scala.concurrent.duration.*
 
 // map from percentage to (remaining, allocated)
 case class AutoBucket private (value: SortedMap[IntPercent, AutoBucket.Element]):

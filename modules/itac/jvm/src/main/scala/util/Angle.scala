@@ -4,7 +4,8 @@
 package edu.gemini.tac.qengine.util
 
 import scala.math
-import Angle._
+
+import Angle.*
 
 object Angle {
   sealed class Unit(val circle: Double, val abbr: String) extends Serializable {

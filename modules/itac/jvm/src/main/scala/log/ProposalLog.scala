@@ -3,9 +3,11 @@
 
 package edu.gemini.tac.qengine.log
 
-import edu.gemini.tac.qengine.p1.{QueueBand, Proposal}
-import scala.collection.immutable.SortedSet
 import edu.gemini.tac.qengine.log.ProposalLog.Key
+import edu.gemini.tac.qengine.p1.Proposal
+import edu.gemini.tac.qengine.p1.QueueBand
+
+import scala.collection.immutable.SortedSet
 
 /**
  * A collection of log messages keyed by a combination of proposal id and

@@ -3,8 +3,9 @@
 
 package edu.gemini.tac.qengine.api.config
 
-import edu.gemini.tac.qengine.util.{Percent, Time}
 import edu.gemini.tac.qengine.ctx.Context
+import edu.gemini.tac.qengine.util.Percent
+import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.Site
 import lucuma.core.model.Semester
 

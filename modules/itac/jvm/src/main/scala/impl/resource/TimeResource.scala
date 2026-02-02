@@ -4,10 +4,13 @@
 package edu.gemini.tac.qengine.impl.resource
 
 import edu.gemini.tac.qengine.api.config.TimeRestriction
-import edu.gemini.tac.qengine.log.{RejectRestrictedBin, RejectMessage}
 import edu.gemini.tac.qengine.impl.block.Block
-import edu.gemini.tac.qengine.util.{BoundedTime, Percent, Time}
 import edu.gemini.tac.qengine.impl.queue.ProposalQueueBuilder
+import edu.gemini.tac.qengine.log.RejectMessage
+import edu.gemini.tac.qengine.log.RejectRestrictedBin
+import edu.gemini.tac.qengine.util.BoundedTime
+import edu.gemini.tac.qengine.util.Percent
+import edu.gemini.tac.qengine.util.Time
 
 object TimeResource {
   def apply(bin: TimeRestriction[Percent], time: Time): TimeResource =

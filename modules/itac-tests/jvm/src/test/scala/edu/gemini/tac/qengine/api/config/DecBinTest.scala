@@ -3,10 +3,11 @@
 
 package edu.gemini.tac.qengine.api.config
 
-import org.junit._
-import Assert._
 import edu.gemini.tac.qengine.p1.Target
 import edu.gemini.tac.qengine.util.Percent
+import org.junit.*
+
+import Assert.*
 
 class DecBinTest {
   val TenPercent = Percent(10)

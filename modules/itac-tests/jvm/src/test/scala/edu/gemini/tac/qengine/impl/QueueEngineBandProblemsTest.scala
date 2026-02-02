@@ -3,12 +3,13 @@
 
 package edu.gemini.tac.qengine.impl
 
-import org.junit.{ Test, Assert }
-import edu.gemini.tac.qengine.p1.Proposal
-import edu.gemini.tac.qengine.p1.Too
 import edu.gemini.tac.qengine.p1.Mode
+import edu.gemini.tac.qengine.p1.Proposal
 import edu.gemini.tac.qengine.p1.QueueBand
-import edu.gemini.tac.qengine.p1.QueueBand._
+import edu.gemini.tac.qengine.p1.QueueBand.*
+import edu.gemini.tac.qengine.p1.Too
+import org.junit.Assert
+import org.junit.Test
 
 class QueueEngineBandProblemsTest {
   import QueueEngineBandProblems._

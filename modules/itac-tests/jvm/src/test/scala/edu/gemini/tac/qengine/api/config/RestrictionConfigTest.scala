@@ -3,11 +3,14 @@
 
 package edu.gemini.tac.qengine.api.config
 
-import org.junit._
-import Assert._
 import edu.gemini.tac.qengine.p1.WaterVapor.WV50
-import edu.gemini.tac.qengine.util.{Time, Percent}
-import scala.Ordering.Implicits._
+import edu.gemini.tac.qengine.util.Percent
+import edu.gemini.tac.qengine.util.Time
+import org.junit.*
+
+import scala.Ordering.Implicits.*
+
+import Assert.*
 
 class RestrictionConfigTest {
   @Test def testMapCombine() = {

@@ -3,12 +3,20 @@
 
 package edu.gemini.tac.qengine.impl.resource
 
-import edu.gemini.tac.qengine.api.config.{DecBinGroup, DecBin}
-import edu.gemini.tac.qengine.util.{Angle, BoundedTime, Percent, Time}
-import edu.gemini.tac.qengine.impl.block.{TooBlocks, Block}
-import edu.gemini.tac.qengine.p1.{QueueBand, Target, Too}
-import edu.gemini.tac.qengine.log.{RejectTarget, RejectMessage}
+import edu.gemini.tac.qengine.api.config.DecBin
+import edu.gemini.tac.qengine.api.config.DecBinGroup
+import edu.gemini.tac.qengine.impl.block.Block
+import edu.gemini.tac.qengine.impl.block.TooBlocks
 import edu.gemini.tac.qengine.impl.queue.ProposalQueueBuilder
+import edu.gemini.tac.qengine.log.RejectMessage
+import edu.gemini.tac.qengine.log.RejectTarget
+import edu.gemini.tac.qengine.p1.QueueBand
+import edu.gemini.tac.qengine.p1.Target
+import edu.gemini.tac.qengine.p1.Too
+import edu.gemini.tac.qengine.util.Angle
+import edu.gemini.tac.qengine.util.BoundedTime
+import edu.gemini.tac.qengine.util.Percent
+import edu.gemini.tac.qengine.util.Time
 
 object DecResourceGroup {
   def apply(t: Time, bins: DecBinGroup[Percent]): DecResourceGroup = {

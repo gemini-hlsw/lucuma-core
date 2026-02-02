@@ -3,17 +3,18 @@
 
 package edu.gemini.tac.qengine.impl.resource
 
+import edu.gemini.tac.qengine.ctx.Partner
 import edu.gemini.tac.qengine.impl.block.Block
-import edu.gemini.tac.qengine.log.RejectMessage
-import edu.gemini.tac.qengine.p1._
-
-import org.junit._
-import Assert._
-import edu.gemini.tac.qengine.util.{BoundedTime, Time}
 import edu.gemini.tac.qengine.impl.queue.ProposalQueueBuilder
+import edu.gemini.tac.qengine.log.RejectMessage
+import edu.gemini.tac.qengine.p1.*
+import edu.gemini.tac.qengine.util.BoundedTime
+import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.Site
 import lucuma.core.util.Enumerated
-import edu.gemini.tac.qengine.ctx.Partner
+import org.junit.*
+
+import Assert.*
 
 class CompositeResourceTest {
   import Partner.US

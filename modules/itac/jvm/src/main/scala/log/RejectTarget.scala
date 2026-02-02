@@ -3,7 +3,9 @@
 
 package edu.gemini.tac.qengine.log
 
-import edu.gemini.tac.qengine.p1.{Observation, Proposal, QueueBand}
+import edu.gemini.tac.qengine.p1.Observation
+import edu.gemini.tac.qengine.p1.Proposal
+import edu.gemini.tac.qengine.p1.QueueBand
 import edu.gemini.tac.qengine.util.Time
 
 object RejectTarget extends TimeBinMessageFormatter {

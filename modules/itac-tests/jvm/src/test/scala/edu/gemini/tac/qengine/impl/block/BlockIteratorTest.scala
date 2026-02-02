@@ -3,15 +3,15 @@
 
 package edu.gemini.tac.qengine.impl.block
 
-import org.junit._
-import Assert._
-import edu.gemini.tac.qengine.util.Time
-import edu.gemini.tac.qengine.p1._
-
 import edu.gemini.tac.qengine.api.queue.time.PartnerTime
-import lucuma.core.enums.Site
 import edu.gemini.tac.qengine.ctx.Partner
+import edu.gemini.tac.qengine.p1.*
+import edu.gemini.tac.qengine.util.Time
+import lucuma.core.enums.Site
 import lucuma.core.util.Enumerated
+import org.junit.*
+
+import Assert.*
 
 class BlockIteratorTest {
   import Partner.{ BR, US }

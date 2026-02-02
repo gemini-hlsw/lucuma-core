@@ -3,16 +3,17 @@
 
 package edu.gemini.tac.qengine.impl.resource
 
-import org.junit._
-import edu.gemini.tac.qengine.util.Time
-import edu.gemini.tac.qengine.p1._
+import edu.gemini.tac.qengine.ctx.Partner
 import edu.gemini.tac.qengine.impl.block.Block
-import edu.gemini.tac.qengine.log.{RejectTarget, RejectConditions}
+import edu.gemini.tac.qengine.log.RejectConditions
+import edu.gemini.tac.qengine.log.RejectTarget
+import edu.gemini.tac.qengine.p1.*
+import edu.gemini.tac.qengine.util.Time
+import lucuma.core.util.Enumerated
+import org.junit.*
+import org.junit.Assert.*
 
 import Fixture.{badCC, emptyQueue, goodCC}
-import org.junit.Assert._
-import edu.gemini.tac.qengine.ctx.Partner
-import lucuma.core.util.Enumerated
 
 class RaResourceTest {
   import Partner.KR

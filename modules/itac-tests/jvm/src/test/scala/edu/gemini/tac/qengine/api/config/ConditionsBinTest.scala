@@ -3,12 +3,13 @@
 
 package edu.gemini.tac.qengine.api.config
 
-import org.junit._
-import Assert._
 import edu.gemini.tac.qengine.api.config.ConditionsCategory.Eq
 import edu.gemini.tac.qengine.p1.CloudCover.CC50
 import edu.gemini.tac.qengine.p1.CloudCover.CC70
 import edu.gemini.tac.qengine.util.Percent
+import org.junit.*
+
+import Assert.*
 
 class ConditionsBinTest {
   private val bin = ConditionsBin(ConditionsCategory(), Percent(10))

@@ -3,17 +3,20 @@
 
 package edu.gemini.tac.qengine.api.config
 
-import org.junit._
-import Assert._
+import edu.gemini.tac.qengine.ctx.Partner
+import edu.gemini.tac.qengine.p1.*
 import edu.gemini.tac.qengine.p1.CloudCover.CCAny
 import edu.gemini.tac.qengine.p1.ImageQuality.IQAny
 import edu.gemini.tac.qengine.p1.SkyBackground.SBAny
-import edu.gemini.tac.qengine.p1.WaterVapor._
-import edu.gemini.tac.qengine.p1._
-import edu.gemini.tac.qengine.util.{Time, Percent}
-import scala.Ordering.Implicits._
-import edu.gemini.tac.qengine.ctx.Partner
+import edu.gemini.tac.qengine.p1.WaterVapor.*
+import edu.gemini.tac.qengine.util.Percent
+import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.Site
+import org.junit.*
+
+import scala.Ordering.Implicits.*
+
+import Assert.*
 
 class TimeRestrictionTest {
 

@@ -3,10 +3,11 @@
 
 package edu.gemini.tac.qengine.p1
 
-import edu.gemini.tac.qengine.util.Time
 import edu.gemini.tac.qengine.ctx.Partner
-import java.io.File
+import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.Site
+
+import java.io.File
 
 case class Proposal(
   ntac: Ntac,

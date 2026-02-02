@@ -6,7 +6,7 @@ package edu.gemini.tac.qengine.impl.queue
 import cats.syntax.all.*
 import edu.gemini.tac.qengine.api.queue.ProposalQueue
 import edu.gemini.tac.qengine.api.queue.time.QueueTime
-import edu.gemini.tac.qengine.p1._
+import edu.gemini.tac.qengine.p1.*
 
 /**
  * ProposalQueueBuilder is used to construct the Band 1, 2, and 3 part of the

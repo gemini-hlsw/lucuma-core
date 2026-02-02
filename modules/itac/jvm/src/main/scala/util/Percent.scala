@@ -4,8 +4,8 @@
 package edu.gemini.tac.qengine.util
 
 import java.math.MathContext
-import scala.math.pow
 import scala.math.BigDecimal.RoundingMode.HALF_UP
+import scala.math.pow
 
 object Percent {
   val DefaultPrecision = 2

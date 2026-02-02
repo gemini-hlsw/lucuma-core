@@ -3,16 +3,17 @@
 
 package edu.gemini.tac.qengine.impl.block
 
-import edu.gemini.tac.qengine.util.Time
-
 import cats.syntax.all.*
-import BlockIterator.IMap
 import edu.gemini.tac.qengine.api.queue.time.PartnerTime
 import edu.gemini.tac.qengine.ctx.Partner
-import edu.gemini.tac.qengine.p1.{Observation, Proposal}
+import edu.gemini.tac.qengine.p1.Observation
+import edu.gemini.tac.qengine.p1.Proposal
+import edu.gemini.tac.qengine.util.Time
+import lucuma.core.util.Enumerated
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import lucuma.core.util.Enumerated
+
+import BlockIterator.IMap
 
 /**
  * An immutable iterator that can be used to generate time blocks across all

@@ -4,6 +4,7 @@
 package edu.gemini.qengine.skycalc
 
 import lucuma.core.enums.Site
+
 import java.time.ZonedDateTime
 
 trait RaBinCalc:

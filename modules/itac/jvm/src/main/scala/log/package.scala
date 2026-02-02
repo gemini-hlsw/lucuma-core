@@ -3,8 +3,9 @@
 
 package edu.gemini.tac.qengine
 
-import p1.{QueueBand, Observation, Proposal}
 import edu.gemini.tac.qengine.util.Time
+
+import p1.{QueueBand, Observation, Proposal}
 
 package object log {
   def rejectConditions(p: Proposal, o: Observation, b: QueueBand, c: Time, m: Time) = RejectConditions(p, o, b, c, m)

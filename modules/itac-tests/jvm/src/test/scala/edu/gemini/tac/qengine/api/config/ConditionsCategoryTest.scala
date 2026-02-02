@@ -3,17 +3,16 @@
 
 package edu.gemini.tac.qengine.api.config
 
-import edu.gemini.tac.qengine.p1._
-import edu.gemini.tac.qengine.p1.CloudCover._
-import edu.gemini.tac.qengine.p1.ImageQuality._
-import edu.gemini.tac.qengine.p1.SkyBackground._
-import edu.gemini.tac.qengine.p1.WaterVapor._
+import edu.gemini.tac.qengine.api.config.ConditionsCategory as Cat
+import edu.gemini.tac.qengine.p1.*
+import edu.gemini.tac.qengine.p1.CloudCover.*
+import edu.gemini.tac.qengine.p1.ImageQuality.*
+import edu.gemini.tac.qengine.p1.SkyBackground.*
+import edu.gemini.tac.qengine.p1.WaterVapor.*
+import org.junit.*
 
-import edu.gemini.tac.qengine.api.config.{ConditionsCategory => Cat}
-import Cat._
-
-import org.junit._
-import Assert._
+import Cat.*
+import Assert.*
 
 class ConditionsCategoryTest {
   private val oc = ObservingConditions(CC70, IQ20, SB20, WV20)

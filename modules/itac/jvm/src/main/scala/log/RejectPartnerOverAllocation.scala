@@ -3,9 +3,10 @@
 
 package edu.gemini.tac.qengine.log
 
-import edu.gemini.tac.qengine.p1.{Proposal}
 import edu.gemini.tac.qengine.ctx.Partner
-import edu.gemini.tac.qengine.util.{Time, BoundedTime}
+import edu.gemini.tac.qengine.p1.Proposal
+import edu.gemini.tac.qengine.util.BoundedTime
+import edu.gemini.tac.qengine.util.Time
 
 /**
  * A proposal rejection message for proposals of partners that have already

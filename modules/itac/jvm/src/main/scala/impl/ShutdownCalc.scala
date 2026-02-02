@@ -3,7 +3,8 @@
 
 package edu.gemini.tac.qservice.impl.shutdown
 
-import edu.gemini.qengine.skycalc.{RaDecBinCalc, RaBinSize}
+import edu.gemini.qengine.skycalc.RaBinSize
+import edu.gemini.qengine.skycalc.RaDecBinCalc
 import edu.gemini.tac.qengine.api.config.Shutdown
 import edu.gemini.tac.qengine.ctx.Context
 import edu.gemini.tac.qengine.util.Time

@@ -4,10 +4,11 @@
 package edu.gemini.tac.qengine.api.queue
 
 import cats.syntax.all.*
-import edu.gemini.tac.qengine.p1._
 import edu.gemini.tac.qengine.api.queue.time.QueueTime
-import edu.gemini.tac.qengine.util.{BoundedTime, Time}
 import edu.gemini.tac.qengine.ctx.Partner
+import edu.gemini.tac.qengine.p1.*
+import edu.gemini.tac.qengine.util.BoundedTime
+import edu.gemini.tac.qengine.util.Time
 
 /** A queue for a single band. */
 trait ProposalQueue {

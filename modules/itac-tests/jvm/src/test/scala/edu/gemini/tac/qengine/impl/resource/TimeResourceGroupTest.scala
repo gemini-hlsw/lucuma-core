@@ -3,22 +3,25 @@
 
 package edu.gemini.tac.qengine.impl.resource
 
-import org.junit._
-import Assert._
-import edu.gemini.tac.qengine.p1._
 import edu.gemini.tac.qengine.api.config.TimeRestriction
-import edu.gemini.tac.qengine.util.{Percent, Time}
+import edu.gemini.tac.qengine.ctx.Partner
+import edu.gemini.tac.qengine.impl.block.Block
+import edu.gemini.tac.qengine.log.RejectRestrictedBin
+import edu.gemini.tac.qengine.p1.*
 import edu.gemini.tac.qengine.p1.CloudCover.CCAny
 import edu.gemini.tac.qengine.p1.ImageQuality.IQAny
 import edu.gemini.tac.qengine.p1.SkyBackground.SBAny
 import edu.gemini.tac.qengine.p1.WaterVapor
-import edu.gemini.tac.qengine.p1.WaterVapor._
-import edu.gemini.tac.qengine.impl.block.Block
-import edu.gemini.tac.qengine.log.RejectRestrictedBin
-import scala.Ordering.Implicits._
+import edu.gemini.tac.qengine.p1.WaterVapor.*
+import edu.gemini.tac.qengine.util.Percent
+import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.Site
-import edu.gemini.tac.qengine.ctx.Partner
 import lucuma.core.util.Enumerated
+import org.junit.*
+
+import scala.Ordering.Implicits.*
+
+import Assert.*
 
 class TimeResourceGroupTest {
   import Partner.US

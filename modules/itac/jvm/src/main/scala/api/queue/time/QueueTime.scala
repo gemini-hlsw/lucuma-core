@@ -5,7 +5,8 @@ package edu.gemini.tac.qengine.api.queue.time
 
 
 import edu.gemini.tac.qengine.ctx.Partner
-import edu.gemini.tac.qengine.util.{Percent, Time}
+import edu.gemini.tac.qengine.util.Percent
+import edu.gemini.tac.qengine.util.Time
 
 object QueueTime {
   /** Number of hours in each "cycle" of 100 Partner countries. */

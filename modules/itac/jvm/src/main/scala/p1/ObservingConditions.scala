@@ -3,7 +3,7 @@
 
 package edu.gemini.tac.qengine.p1
 
-import scala.Ordering.Implicits._
+import scala.Ordering.Implicits.*
 
 case class ObservingConditions(
   cc: CloudCover    = CloudCover.CCAny,

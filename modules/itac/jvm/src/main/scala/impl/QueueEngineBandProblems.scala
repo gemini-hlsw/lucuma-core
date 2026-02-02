@@ -3,11 +3,11 @@
 
 package edu.gemini.tac.qengine.impl
 
-import cats.syntax.all.*
 import cats.data.*
-import edu.gemini.tac.qengine.p1._
-import org.slf4j.LoggerFactory
 import cats.data.Validated
+import cats.syntax.all.*
+import edu.gemini.tac.qengine.p1.*
+import org.slf4j.LoggerFactory
 
 object QueueEngineBandProblems {
   import QueueBand._

@@ -3,16 +3,16 @@
 
 package edu.gemini.tac.qengine.api.config
 
-import org.junit._
-import Assert._
-
 import edu.gemini.tac.qengine.api.config.ConditionsCategory.Eq
-import edu.gemini.tac.qengine.p1.CloudCover._
-import edu.gemini.tac.qengine.p1.ImageQuality._
-import edu.gemini.tac.qengine.p1.SkyBackground._
-import edu.gemini.tac.qengine.p1.WaterVapor._
-import edu.gemini.tac.qengine.util.Percent
+import edu.gemini.tac.qengine.p1.CloudCover.*
+import edu.gemini.tac.qengine.p1.ImageQuality.*
 import edu.gemini.tac.qengine.p1.ObservingConditions
+import edu.gemini.tac.qengine.p1.SkyBackground.*
+import edu.gemini.tac.qengine.p1.WaterVapor.*
+import edu.gemini.tac.qengine.util.Percent
+import org.junit.*
+
+import Assert.*
 
 class ConditionsBinGroupTest {
   val cat0 = ConditionsCategory(Eq(CC50))

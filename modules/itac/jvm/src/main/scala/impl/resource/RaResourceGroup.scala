@@ -3,12 +3,15 @@
 
 package edu.gemini.tac.qengine.impl.resource
 
-import edu.gemini.tac.qengine.impl.block.{TooBlocks, Block}
-import edu.gemini.tac.qengine.util.Time
-import edu.gemini.tac.qengine.log.{RejectToo, RejectMessage}
+import edu.gemini.tac.qengine.api.config.RaBinGroup
+import edu.gemini.tac.qengine.api.config.SiteSemesterConfig
+import edu.gemini.tac.qengine.impl.block.Block
+import edu.gemini.tac.qengine.impl.block.TooBlocks
 import edu.gemini.tac.qengine.impl.queue.ProposalQueueBuilder
-import edu.gemini.tac.qengine.p1._
-import edu.gemini.tac.qengine.api.config.{SiteSemesterConfig, RaBinGroup}
+import edu.gemini.tac.qengine.log.RejectMessage
+import edu.gemini.tac.qengine.log.RejectToo
+import edu.gemini.tac.qengine.p1.*
+import edu.gemini.tac.qengine.util.Time
 
 object RaResourceGroup {
   // Creates an RA resource group from the site/semester configuration.

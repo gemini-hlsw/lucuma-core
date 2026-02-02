@@ -3,20 +3,28 @@
 
 package edu.gemini.tac.qengine.impl
 
-import cats.syntax.all.*
 import cats.data.State
-import edu.gemini.tac.qengine.api.{ BucketsAllocation, QueueCalc, QueueEngine }
-import edu.gemini.tac.qengine.api.config.{ ConditionsCategory, QueueEngineConfig }
+import cats.syntax.all.*
+import edu.gemini.tac.qengine.api.BucketsAllocation
+import edu.gemini.tac.qengine.api.QueueCalc
+import edu.gemini.tac.qengine.api.QueueEngine
+import edu.gemini.tac.qengine.api.config.ConditionsCategory
+import edu.gemini.tac.qengine.api.config.QueueEngineConfig
+import edu.gemini.tac.qengine.api.queue.ProposalQueue
 import edu.gemini.tac.qengine.api.queue.time.QueueTime
 import edu.gemini.tac.qengine.ctx.Partner
 import edu.gemini.tac.qengine.impl.block.BlockIterator
 import edu.gemini.tac.qengine.impl.queue.ProposalQueueBuilder
-import edu.gemini.tac.qengine.impl.resource.{ RaResource, RaResourceGroup, SemesterResource, TimeResourceGroup }
-import edu.gemini.tac.qengine.log.{ ProposalLog, RemovedRejectMessage, AcceptMessage }
-import edu.gemini.tac.qengine.p1._
-import edu.gemini.tac.qengine.p1.QueueBand._
+import edu.gemini.tac.qengine.impl.resource.RaResource
+import edu.gemini.tac.qengine.impl.resource.RaResourceGroup
+import edu.gemini.tac.qengine.impl.resource.SemesterResource
+import edu.gemini.tac.qengine.impl.resource.TimeResourceGroup
+import edu.gemini.tac.qengine.log.AcceptMessage
+import edu.gemini.tac.qengine.log.ProposalLog
+import edu.gemini.tac.qengine.log.RemovedRejectMessage
+import edu.gemini.tac.qengine.p1.*
+import edu.gemini.tac.qengine.p1.QueueBand.*
 import edu.gemini.tac.qengine.util.BoundedTime
-import edu.gemini.tac.qengine.api.queue.ProposalQueue
 
 object QueueEngine2 extends QueueEngine {
 

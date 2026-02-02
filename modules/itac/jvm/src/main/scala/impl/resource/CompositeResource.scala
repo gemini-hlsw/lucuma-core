@@ -4,8 +4,8 @@
 package edu.gemini.tac.qengine.impl.resource
 
 import edu.gemini.tac.qengine.impl.block.Block
-import edu.gemini.tac.qengine.log.RejectMessage
 import edu.gemini.tac.qengine.impl.queue.ProposalQueueBuilder
+import edu.gemini.tac.qengine.log.RejectMessage
 
 object CompositeResource {
   def compositeReserve[A <: Resource{type T=A}, B <: Resource{type T=B}](block: Block, queue: ProposalQueueBuilder, a: A, b: B): RejectMessage Either (A, B) =

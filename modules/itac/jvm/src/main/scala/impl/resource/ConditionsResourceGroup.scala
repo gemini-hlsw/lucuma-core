@@ -3,13 +3,18 @@
 
 package edu.gemini.tac.qengine.impl.resource
 
-import edu.gemini.tac.qengine.api.config.{ConditionsBinGroup, ConditionsBin, ConditionsCategory => Cat}
-import edu.gemini.tac.qengine.log._
-import annotation.tailrec
+import edu.gemini.tac.qengine.api.config.ConditionsBin
+import edu.gemini.tac.qengine.api.config.ConditionsBinGroup
+import edu.gemini.tac.qengine.api.config.ConditionsCategory as Cat
 import edu.gemini.tac.qengine.impl.block.Block
-import edu.gemini.tac.qengine.util.{BoundedTime, Percent, Time}
-import edu.gemini.tac.qengine.p1.ObservingConditions
 import edu.gemini.tac.qengine.impl.queue.ProposalQueueBuilder
+import edu.gemini.tac.qengine.log.*
+import edu.gemini.tac.qengine.p1.ObservingConditions
+import edu.gemini.tac.qengine.util.BoundedTime
+import edu.gemini.tac.qengine.util.Percent
+import edu.gemini.tac.qengine.util.Time
+
+import annotation.tailrec
 
 object ConditionsResourceGroup {
 

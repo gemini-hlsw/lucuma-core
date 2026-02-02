@@ -3,8 +3,9 @@
 
 package edu.gemini.qengine.skycalc
 
-import org.junit._
-import Assert._
+import org.junit.*
+
+import Assert.*
 
 class HoursTest {
 

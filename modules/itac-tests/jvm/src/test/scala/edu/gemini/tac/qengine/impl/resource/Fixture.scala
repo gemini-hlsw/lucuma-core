@@ -3,22 +3,27 @@
 
 package edu.gemini.tac.qengine.impl.resource
 
-import edu.gemini.tac.qengine.api.config.ConditionsCategory.{Le, Ge}
-import edu.gemini.tac.qengine.util.{BoundedTime, Percent, Time}
-import edu.gemini.tac.qengine.p1._
-import edu.gemini.tac.qengine.p1.CloudCover._
-import edu.gemini.tac.qengine.p1.SkyBackground._
-import edu.gemini.tac.qengine.p1.ImageQuality._
-import edu.gemini.tac.qengine.p1.WaterVapor._
-import edu.gemini.tac.qengine.api.config._
-import edu.gemini.tac.qengine.impl.queue.ProposalQueueBuilder
-import edu.gemini.tac.qengine.api.queue.time.{PartnerTime, QueueTime}
-import lucuma.core.model.Semester
-import lucuma.core.enums.Site
+import edu.gemini.tac.qengine.api.config.*
+import edu.gemini.tac.qengine.api.config.ConditionsCategory.Ge
+import edu.gemini.tac.qengine.api.config.ConditionsCategory.Le
+import edu.gemini.tac.qengine.api.queue.time.PartnerTime
+import edu.gemini.tac.qengine.api.queue.time.QueueTime
 import edu.gemini.tac.qengine.ctx.Partner
-import lucuma.core.model.Semester.YearInt
+import edu.gemini.tac.qengine.impl.queue.ProposalQueueBuilder
+import edu.gemini.tac.qengine.p1.*
+import edu.gemini.tac.qengine.p1.CloudCover.*
+import edu.gemini.tac.qengine.p1.ImageQuality.*
+import edu.gemini.tac.qengine.p1.SkyBackground.*
+import edu.gemini.tac.qengine.p1.WaterVapor.*
+import edu.gemini.tac.qengine.util.BoundedTime
+import edu.gemini.tac.qengine.util.Percent
+import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.Half
+import lucuma.core.enums.Site
+import lucuma.core.model.Semester
+import lucuma.core.model.Semester.YearInt
 import lucuma.core.util.Enumerated
+
 import scala.annotation.unused
 
 object Fixture {

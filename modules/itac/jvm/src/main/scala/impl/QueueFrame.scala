@@ -3,12 +3,15 @@
 
 package edu.gemini.tac.qengine.impl
 
-import block.{Block, BlockIterator}
 import edu.gemini.tac.qengine.impl.resource.SemesterResource
-import edu.gemini.tac.qengine.log.{AcceptMessage, RejectMessage}
-import queue.ProposalQueueBuilder
-import edu.gemini.tac.qengine.p1.{Observation, Proposal}
+import edu.gemini.tac.qengine.log.AcceptMessage
+import edu.gemini.tac.qengine.log.RejectMessage
+import edu.gemini.tac.qengine.p1.Observation
+import edu.gemini.tac.qengine.p1.Proposal
 import org.slf4j.LoggerFactory
+
+import block.{Block, BlockIterator}
+import queue.ProposalQueueBuilder
 
 /**
  * QueueFrame represents the state of the queue generation process at a

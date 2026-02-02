@@ -3,23 +3,26 @@
 
 package edu.gemini.tac.qengine.impl.resource
 
+import edu.gemini.tac.qengine.api.config.ConditionsBin
+import edu.gemini.tac.qengine.api.config.ConditionsBinGroup
+import edu.gemini.tac.qengine.api.config.ConditionsCategory as Cat
+import edu.gemini.tac.qengine.ctx.Partner
+import edu.gemini.tac.qengine.impl.block.Block
 import edu.gemini.tac.qengine.log.RejectConditions
-import org.junit._
-import Assert._
+import edu.gemini.tac.qengine.p1.*
+import edu.gemini.tac.qengine.p1.*
+import edu.gemini.tac.qengine.util.Percent
+import edu.gemini.tac.qengine.util.Time
+import lucuma.core.enums.Site
+import lucuma.core.util.Enumerated
+import org.junit.*
 
-import edu.gemini.tac.qengine.p1._
-import CloudCover._
+import Assert.*
+import CloudCover.*
 import ImageQuality.IQ20
 import SkyBackground.SB20
 import WaterVapor.WV20
-import edu.gemini.tac.qengine.p1._
-import edu.gemini.tac.qengine.api.config.{ConditionsBinGroup, ConditionsBin, ConditionsCategory => Cat}
-import Cat._
-import edu.gemini.tac.qengine.util.{Percent, Time}
-import edu.gemini.tac.qengine.impl.block.Block
-import lucuma.core.enums.Site
-import lucuma.core.util.Enumerated
-import edu.gemini.tac.qengine.ctx.Partner
+import Cat.*
 
 class ConditionsResourceTest {
   import Partner.KR

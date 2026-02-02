@@ -4,9 +4,10 @@
 package edu.gemini.tac.qengine.impl.resource
 
 import edu.gemini.tac.qengine.impl.block.Block
-import edu.gemini.tac.qengine.log.RejectMessage
-import annotation.tailrec
 import edu.gemini.tac.qengine.impl.queue.ProposalQueueBuilder
+import edu.gemini.tac.qengine.log.RejectMessage
+
+import annotation.tailrec
 
 /**
  * A trait that represents an interface provided on a time bounded resource, be

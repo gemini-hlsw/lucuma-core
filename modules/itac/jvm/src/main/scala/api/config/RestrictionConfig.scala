@@ -3,7 +3,8 @@
 
 package edu.gemini.tac.qengine.api.config
 
-import edu.gemini.tac.qengine.util.{Time, Percent}
+import edu.gemini.tac.qengine.util.Percent
+import edu.gemini.tac.qengine.util.Time
 
 /**
  * Configuration of restricted bins, which may be specified in terms of a

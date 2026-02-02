@@ -4,11 +4,12 @@
 package edu.gemini.tac.qengine.p2.rollover
 
 import edu.gemini.tac.qengine.util.Time
-import java.time.Instant
+import lucuma.core.enums.Half
 import lucuma.core.enums.Site
 import lucuma.core.model.Semester
 import lucuma.core.model.Semester.YearInt
-import lucuma.core.enums.Half
+
+import java.time.Instant
 
 /**
  * A collection of rollover observations whose time values should be deducted

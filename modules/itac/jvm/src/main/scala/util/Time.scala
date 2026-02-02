@@ -3,8 +3,9 @@
 
 package edu.gemini.tac.qengine.util
 
-import Time.Units
 import cats.Monoid
+
+import Time.Units
 
 object Time {
   sealed abstract class Units extends Ordered[Units] with Serializable {

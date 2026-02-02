@@ -3,16 +3,19 @@
 
 package edu.gemini.tac.qengine.impl.resource
 
-import org.junit._
-import Assert._
-import edu.gemini.tac.qengine.api.config.{DecBin, DecBinGroup}
-import edu.gemini.tac.qengine.util.{BoundedTime, Time}
-import edu.gemini.tac.qengine.log.RejectTarget
-import edu.gemini.tac.qengine.impl.block.Block
-import edu.gemini.tac.qengine.p1._
-import lucuma.core.enums.Site
+import edu.gemini.tac.qengine.api.config.DecBin
+import edu.gemini.tac.qengine.api.config.DecBinGroup
 import edu.gemini.tac.qengine.ctx.Partner
+import edu.gemini.tac.qengine.impl.block.Block
+import edu.gemini.tac.qengine.log.RejectTarget
+import edu.gemini.tac.qengine.p1.*
+import edu.gemini.tac.qengine.util.BoundedTime
+import edu.gemini.tac.qengine.util.Time
+import lucuma.core.enums.Site
 import lucuma.core.util.Enumerated
+import org.junit.*
+
+import Assert.*
 
 class DecResourceTest {
   import Partner.KR

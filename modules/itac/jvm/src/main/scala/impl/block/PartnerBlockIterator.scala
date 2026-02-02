@@ -3,8 +3,9 @@
 
 package edu.gemini.tac.qengine.impl.block
 
+import edu.gemini.tac.qengine.p1.Observation
+import edu.gemini.tac.qengine.p1.Proposal
 import edu.gemini.tac.qengine.util.Time
-import edu.gemini.tac.qengine.p1.{Observation, Proposal}
 
 /**
  * An iterator, of sorts, which can be used to step through a single list of

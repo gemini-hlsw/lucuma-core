@@ -4,8 +4,9 @@
 package edu.gemini.tac.qengine.api.queue.time
 
 import cats.syntax.all.*
-import edu.gemini.tac.qengine.util.{Percent, Time}
 import edu.gemini.tac.qengine.ctx.Partner
+import edu.gemini.tac.qengine.util.Percent
+import edu.gemini.tac.qengine.util.Time
 import lucuma.core.util.Enumerated
 
 /** A total mapping from Partner to Time. */

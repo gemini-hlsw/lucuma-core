@@ -3,11 +3,15 @@
 
 package edu.gemini.tac.qengine.api.config
 
-import edu.gemini.tac.qengine.p1.{QueueBand, Observation, Proposal}
+import edu.gemini.tac.qengine.p1.Observation
+import edu.gemini.tac.qengine.p1.Proposal
+import edu.gemini.tac.qengine.p1.QueueBand
 import edu.gemini.tac.qengine.p1.WaterVapor
 import edu.gemini.tac.qengine.p1.WaterVapor.WV50
-import edu.gemini.tac.qengine.util.{Percent, Time}
-import scala.Ordering.Implicits._
+import edu.gemini.tac.qengine.util.Percent
+import edu.gemini.tac.qengine.util.Time
+
+import scala.Ordering.Implicits.*
 
 /**
  * TimeRestriction associates a name, a value, and a predicate.  The value

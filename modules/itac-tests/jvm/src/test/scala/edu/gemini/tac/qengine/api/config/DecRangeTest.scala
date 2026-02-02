@@ -3,9 +3,10 @@
 
 package edu.gemini.tac.qengine.api.config
 
-import org.junit._
-import Assert._
 import edu.gemini.tac.qengine.p1.Target
+import org.junit.*
+
+import Assert.*
 
 class DecRangeTest {
 

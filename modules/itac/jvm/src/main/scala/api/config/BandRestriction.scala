@@ -4,8 +4,11 @@
 package edu.gemini.tac.qengine.api.config
 
 import edu.gemini.tac.qengine.p1.ImageQuality.IQ20
-import edu.gemini.tac.qengine.p1.{Mode, Too, QueueBand, Proposal}
-import edu.gemini.tac.qengine.p1.QueueBand._
+import edu.gemini.tac.qengine.p1.Mode
+import edu.gemini.tac.qengine.p1.Proposal
+import edu.gemini.tac.qengine.p1.QueueBand
+import edu.gemini.tac.qengine.p1.QueueBand.*
+import edu.gemini.tac.qengine.p1.Too
 
 case class BandRestriction(name: String, bands: Set[QueueBand])(val matches: Proposal => Boolean)
 

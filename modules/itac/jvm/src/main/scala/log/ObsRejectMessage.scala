@@ -3,7 +3,8 @@
 
 package edu.gemini.tac.qengine.log
 
-import edu.gemini.tac.qengine.p1.{QueueBand, Observation}
+import edu.gemini.tac.qengine.p1.Observation
+import edu.gemini.tac.qengine.p1.QueueBand
 
 /**
  * A proposal rejection that occurs because a particular observation in the

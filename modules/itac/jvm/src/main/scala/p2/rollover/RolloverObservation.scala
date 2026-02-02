@@ -3,9 +3,11 @@
 
 package edu.gemini.tac.qengine.p2.rollover
 
-import lucuma.core.enums.Site
-import edu.gemini.tac.qengine.p1.{CategorizedTime, ObservingConditions, Target}
+import edu.gemini.tac.qengine.p1.CategorizedTime
+import edu.gemini.tac.qengine.p1.ObservingConditions
+import edu.gemini.tac.qengine.p1.Target
 import edu.gemini.tac.qengine.util.Time
+import lucuma.core.enums.Site
 
 /**
  * A class that represents a rollover time observation.  The time for each

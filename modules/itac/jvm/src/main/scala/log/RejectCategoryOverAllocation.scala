@@ -3,7 +3,8 @@
 
 package edu.gemini.tac.qengine.log
 
-import edu.gemini.tac.qengine.p1.{QueueBand, Proposal}
+import edu.gemini.tac.qengine.p1.Proposal
+import edu.gemini.tac.qengine.p1.QueueBand
 
 /**
  * A proposal rejection message for proposals that are remaining when all

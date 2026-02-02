@@ -4,12 +4,14 @@
 package edu.gemini.tac.qengine.impl.resource
 
 import edu.gemini.tac.qengine.impl.block.Block
-import edu.gemini.tac.qengine.util.Time
-import edu.gemini.tac.qengine.log.{ RejectMessage, RejectPartnerOverAllocation}
 import edu.gemini.tac.qengine.impl.queue.ProposalQueueBuilder
-import edu.gemini.tac.qengine.p1.{ObservingConditions, Target}
-import org.slf4j.LoggerFactory
+import edu.gemini.tac.qengine.log.RejectMessage
+import edu.gemini.tac.qengine.log.RejectPartnerOverAllocation
+import edu.gemini.tac.qengine.p1.ObservingConditions
 import edu.gemini.tac.qengine.p1.QueueBand
+import edu.gemini.tac.qengine.p1.Target
+import edu.gemini.tac.qengine.util.Time
+import org.slf4j.LoggerFactory
 
 final case class SemesterResource(
     ra:   RaResourceGroup,
