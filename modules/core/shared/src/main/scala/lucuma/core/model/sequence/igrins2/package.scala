@@ -9,11 +9,11 @@ import lucuma.core.syntax.timespan.*
 import lucuma.core.util.NewBoolean
 import lucuma.core.util.TimeSpan
 
-object Igrins2SvcImages extends NewBoolean:
+object Igrins2SVCImages extends NewBoolean:
   val Save = True
   val DontSave = False
 
-type Igrins2SvcImages = Igrins2SvcImages.Type
+type Igrins2SVCImages = Igrins2SVCImages.Type
 
 val SetupTime: TimeSpan = 7.minTimeSpan
 val ReAcquisitionTime: TimeSpan = 5.minTimeSpan

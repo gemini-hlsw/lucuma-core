@@ -5,8 +5,8 @@ package lucuma.core.model.sequence.igrins2.arb
 
 import lucuma.core.enums.Igrins2OffsetMode
 import lucuma.core.model.sequence.igrins2.Igrins2DynamicConfig
+import lucuma.core.model.sequence.igrins2.Igrins2SVCImages
 import lucuma.core.model.sequence.igrins2.Igrins2StaticConfig
-import lucuma.core.model.sequence.igrins2.Igrins2SvcImages
 import lucuma.core.util.TimeSpan
 import lucuma.core.util.arb.ArbEnumerated.given
 import lucuma.core.util.arb.ArbNewType.given
@@ -30,12 +30,12 @@ trait ArbIgrins2StaticConfig:
   given Arbitrary[Igrins2StaticConfig] =
     Arbitrary:
       for {
-        svc <- arbitrary[Igrins2SvcImages]
+        svc <- arbitrary[Igrins2SVCImages]
         off <- arbitrary[Igrins2OffsetMode]
       } yield Igrins2StaticConfig(svc, off)
 
   given Cogen[Igrins2StaticConfig] =
-    Cogen[(Igrins2SvcImages, Igrins2OffsetMode)]
-      .contramap(c => (c.saveSvcImages, c.offsetMode))
+    Cogen[(Igrins2SVCImages, Igrins2OffsetMode)]
+      .contramap(c => (c.saveSVCImages, c.offsetMode))
 
 object ArbIgrins2StaticConfig extends ArbIgrins2StaticConfig

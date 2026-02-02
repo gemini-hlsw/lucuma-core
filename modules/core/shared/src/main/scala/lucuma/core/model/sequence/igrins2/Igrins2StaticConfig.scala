@@ -10,14 +10,14 @@ import monocle.Focus
 import monocle.Lens
 
 case class Igrins2StaticConfig(
-  saveSvcImages: Igrins2SvcImages,
+  saveSVCImages: Igrins2SVCImages,
   offsetMode:    Igrins2OffsetMode
 ) derives Eq
 
 object Igrins2StaticConfig:
   /** @group Optics */
-  val saveSvcImages: Lens[Igrins2StaticConfig, Igrins2SvcImages] =
-    Focus[Igrins2StaticConfig](_.saveSvcImages)
+  val saveSVCImages: Lens[Igrins2StaticConfig, Igrins2SVCImages] =
+    Focus[Igrins2StaticConfig](_.saveSVCImages)
 
   /** @group Optics */
   val offsetMode: Lens[Igrins2StaticConfig, Igrins2OffsetMode] =
