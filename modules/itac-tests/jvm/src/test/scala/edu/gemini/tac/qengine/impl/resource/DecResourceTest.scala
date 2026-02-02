@@ -16,8 +16,9 @@ import lucuma.core.util.Enumerated
 import org.junit.*
 
 import Assert.*
+import munit.FunSuite
 
-class DecResourceTest {
+class DecResourceTest extends FunSuite {
   import Partner.KR
   val partners = Enumerated[Partner].all
 
@@ -41,12 +42,12 @@ class DecResourceTest {
   private def mkProp(target: Target): Proposal =
     Proposal(ntac, site = Site.GS, obsList = List(Observation(null, target, conds, Time.Zero)))
 
-  @Test def testNormalReserveWithRemainingTime() = {
+  test("testNormalReserveWithRemainingTime") {
     val prop   = mkProp(target0)
     val block  = Block(prop, prop.obsList.head, Time.hours(5))
 
     grp.reserve(block, Fixture.emptyQueue) match {
-      case Left(msg)   => fail()
+      case Left(msg)   => fail("failed")
       case Right(grp2) =>
         assertEquals(Time.hours(5),  grp2.remaining(target0))   // 5 hours left in bin1
         assertEquals(Time.hours(5),  grp2.remaining(target9))   // same 5 hours left in bin1
@@ -56,7 +57,7 @@ class DecResourceTest {
     }
   }
 
-  @Test def testNormalReserveAvailableWithRemainingTime() = {
+  test("testNormalReserveAvailableWithRemainingTime") {
     val (grp2, rem) = grp.reserveAvailable(Time.hours(5), target0)
     assertEquals(Time.Zero, rem)
     assertFalse(grp2.isFull(target0))
@@ -64,12 +65,12 @@ class DecResourceTest {
     assertEquals(Time.hours(20), grp2.remaining(target10))  // all 20 hours left in bin2, nothing was put there
   }
 
-  @Test def testReserveExactlyAllAvailableTime() = {
+  test("testReserveExactlyAllAvailableTime") {
     val prop   = mkProp(target0)
     val block  = Block(prop, prop.obsList.head, Time.hours(10))
 
     grp.reserve(block, Fixture.emptyQueue) match {
-      case Left(msg)   => fail()
+      case Left(msg)   => fail("failed")
       case Right(grp2) =>
         assertEquals(Time.Zero,      grp2.remaining(target0))   // took all the time in bin1
         assertEquals(Time.Zero,      grp2.remaining(target9))   // ditto
@@ -79,7 +80,7 @@ class DecResourceTest {
     }
   }
 
-  @Test def testReserveAvailableAllTime() = {
+  test("testReserveAvailableAllTime") {
     val (grp2, rem) = grp.reserveAvailable(Time.hours(10), target0)
     assertEquals(Time.Zero, rem)
     assertTrue(grp2.isFull(target0))
@@ -87,17 +88,17 @@ class DecResourceTest {
     assertEquals(Time.hours(20), grp2.remaining(target10))  // all 20 hours left in bin2, nothing was put there
   }
 
-  @Test def testCannotReserveMoreTimeThanAvailable() = {
+  test("testCannotReserveMoreTimeThanAvailable") {
     val prop   = mkProp(target10)
     val block  = Block(prop, prop.obsList.head, Time.hours(20.01))
 
     grp.reserve(block, Fixture.emptyQueue) match {
       case Left(msg: RejectTarget) => assertEquals(prop, msg.prop)
-      case _ => fail()
+      case _ => fail("failed")
     }
   }
 
-  @Test def testReserveAvailableWhenRequestingMoreTimeThanAvailable() = {
+  test("testReserveAvailableWhenRequestingMoreTimeThanAvailable") {
     val (grp2, rem) = grp.reserveAvailable(Time.hours(50), target0)
     assertEquals(Time.hours(40), rem)
     assertTrue(grp2.isFull(target0))
@@ -105,7 +106,7 @@ class DecResourceTest {
     assertEquals(Time.hours(20), grp2.remaining(target10))  // all 20 hours left in bin2, nothing was put there
   }
 
-  @Test def testReserveToo() = {
+  test("testReserveToo") {
     val prop   = mkProp(target0).copy(too = Too.standard)
     val block  = Block(prop, prop.obsList.head, Time.hours(10))
 
@@ -119,7 +120,7 @@ class DecResourceTest {
   }
 
   // Spread over the two bins, but the first bin cannot handle an equal share.
-  @Test def testReserveTooUnequal() = {
+  test("testReserveTooUnequal") {
     val prop   = mkProp(target0).copy(too = Too.standard)
     val block  = Block(prop, prop.obsList.head, Time.hours(22))
 
@@ -131,13 +132,13 @@ class DecResourceTest {
     }
   }
 
-  @Test def testReserveTooOverallocate() = {
+  test("testReserveTooOverallocate") {
     val prop   = mkProp(target0).copy(too = Too.standard)
     val block  = Block(prop, prop.obsList.head, Time.hours(30.001))
 
     grp.reserve(block, Fixture.emptyQueue) match {
       case Left(msg: RejectTarget) => assertEquals(prop, msg.prop)
-      case _ => fail()
+      case _ => fail("failed")
     }
   }
 

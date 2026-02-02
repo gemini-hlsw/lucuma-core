@@ -7,21 +7,22 @@ import edu.gemini.tac.qengine.p1.Target
 import org.junit.*
 
 import Assert.*
+import munit.FunSuite
 
-class DecRangeTest {
+class DecRangeTest extends FunSuite {
 
   val rng = DecRange(0, 10)
   val irng = DecRange.inclusive(0, 10)
 
-  @Test def testDefaultIsInclusive() = {
+  test("testDefaultIsInclusive") {
     assertFalse(rng.isInclusive)
   }
 
-  @Test def testInclusiveIsInclusive() = {
+  test("testInclusiveIsInclusive") {
     assertTrue(irng.isInclusive)
   }
 
-  @Test def testInclusive() = {
+  test("testInclusive") {
     assertTrue(rng.inclusive.isInclusive)
     assertTrue(rng.inclusive.contains(Target(0, 10.0)))
     assertSame(irng, irng.inclusive)
@@ -33,18 +34,18 @@ class DecRangeTest {
     assertTrue(r.contains(Target(0, 9.99)))
   }
 
-  @Test def testDefaultContains() = {
+  test("testDefaultContains") {
     validateContains(rng)
     assertFalse(rng.contains(Target(0, 10.0)))
   }
 
-  @Test def testInclusiveContains() = {
+  test("testInclusiveContains") {
     validateContains(irng)
     assertTrue(irng.contains(Target(0, 10.0)))
     assertFalse(irng.contains(Target(0, 10.001)))
   }
 
-  @Test def testAbutsRight() = {
+  test("testAbutsRight") {
     assertTrue(rng.abutsRight(DecRange(10, 20)))
     assertFalse(irng.abutsRight(DecRange(10, 20)))
 
@@ -55,42 +56,42 @@ class DecRangeTest {
     assertTrue(DecRange(-10, 0).abutsRight(rng))
   }
 
-  @Test def testEquals() = {
+  test("testEquals") {
     assertEquals(rng, DecRange(0, 10))
     assertFalse(rng.equals(irng))
     assertFalse(rng.equals(DecRange(1, 10)))
     assertFalse(rng.equals(DecRange(0,  9)))
   }
 
-  @Test def testValidateNil() = {
+  test("testValidateNil") {
     assertTrue(DecRange.validate(Nil))
   }
 
-  @Test def testValidateOne() = {
+  test("testValidateOne") {
     assertTrue(DecRange.validate(List(rng)))
   }
 
-  @Test def testValidateTwo() = {
+  test("testValidateTwo") {
     assertTrue(DecRange.validate(List(rng, DecRange(10, 20))))
   }
 
-  @Test def testValidateThree() = {
+  test("testValidateThree") {
     assertTrue(DecRange.validate(List(rng, DecRange(10, 20), DecRange(20, 30))))
   }
 
-  @Test def testInclusiveTerminate() = {
+  test("testInclusiveTerminate") {
     assertTrue(DecRange.validate(List(rng, DecRange.inclusive(10, 20))))
   }
 
-  @Test def testGap() = {
+  test("testGap") {
     assertFalse(DecRange.validate(List(rng, DecRange(11, 20))))
   }
 
-  @Test def testOverlap() = {
+  test("testOverlap") {
     assertFalse(DecRange.validate(List(rng, DecRange(9, 20))))
   }
 
-  @Test def testOrder() = {
+  test("testOrder") {
     assertFalse(DecRange.validate(List(DecRange(10, 20), rng)))
   }
 }

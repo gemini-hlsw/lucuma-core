@@ -6,14 +6,13 @@ package edu.gemini.tac.qengine.api.config
 import edu.gemini.tac.qengine.p1.WaterVapor.WV50
 import edu.gemini.tac.qengine.util.Percent
 import edu.gemini.tac.qengine.util.Time
-import org.junit.*
 
 import scala.Ordering.Implicits.*
 
-import Assert.*
+import munit.FunSuite
 
-class RestrictionConfigTest {
-  @Test def testMapCombine() = {
+class RestrictionConfigTest extends FunSuite {
+  test("testMapCombine") {
     val percentBin = TimeRestriction("WV", Percent(10)) {
       (_, obs, _) => obs.conditions.wv <= WV50
     }

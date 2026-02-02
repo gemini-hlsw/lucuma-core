@@ -12,13 +12,11 @@ import edu.gemini.tac.qengine.p1.WaterVapor.*
 import edu.gemini.tac.qengine.util.Percent
 import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.Site
-import org.junit.*
 
 import scala.Ordering.Implicits.*
+import munit.FunSuite
 
-import Assert.*
-
-class TimeRestrictionTest {
+class TimeRestrictionTest extends FunSuite {
 
   val US = Partner.US
 
@@ -35,17 +33,17 @@ class TimeRestrictionTest {
     Proposal(ntac, site = Site.GS, obsList = List(Observation(null, target, conds(wv), Time.hours(10))))
 
 
-  @Test def testMatches() = {
+  test("testMatches") {
     val propList = WaterVapor.values.map(mkProp(_))
     val boolList = propList.map(prop => bin.matches(prop, prop.obsList.head, QueueBand.QBand1))
     assertEquals(List(true, true, false, false), boolList)
   }
 
-  @Test def testUpdated() = {
+  test("testUpdated") {
     assertEquals(Percent(20), bin.updated(Percent(20)).value)
   }
 
-  @Test def testMap() = {
+  test("testMap") {
     assertEquals(Time.hours(10), bin.map(perc => Time.hours(100) * perc).value)
   }
 }

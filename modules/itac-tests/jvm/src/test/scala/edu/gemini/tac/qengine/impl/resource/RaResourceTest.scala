@@ -10,12 +10,11 @@ import edu.gemini.tac.qengine.log.RejectTarget
 import edu.gemini.tac.qengine.p1.*
 import edu.gemini.tac.qengine.util.Time
 import lucuma.core.util.Enumerated
-import org.junit.*
-import org.junit.Assert.*
 
 import Fixture.{badCC, emptyQueue, goodCC}
+import munit.FunSuite
 
-class RaResourceTest {
+class RaResourceTest extends FunSuite {
   import Partner.KR
   val partners = Enumerated[Partner].all
 
@@ -50,7 +49,7 @@ class RaResourceTest {
     assertEquals(Time.minutes(45), raRes.remaining)
   }
 
-  @Test def testReserve() = {
+  test("testReserve") {
     val target = Target(15.0, 0.0) // RA 1hr, Dec 0 deg
     val prop   = mkProp(target, goodCC)
     val block  = Block(prop, prop.obsList.head, Time.minutes(15))
@@ -61,7 +60,7 @@ class RaResourceTest {
     }
   }
 
-  @Test def testReserveAvailable() = {
+  test("testReserveAvailable") {
     val target = Target(15.0, 0.0) // RA 1hr, Dec 0 deg
     val raGrp  = Fixture.raResGroup.grp(target)
     val (newRes, rem) = raGrp.reserveAvailable(Time.minutes(15), target, goodCC)
@@ -70,14 +69,14 @@ class RaResourceTest {
     verifyReserve(newRes)
   }
 
-  @Test def testGroupReserveAvailable() = {
+  test("testGroupReserveAvailable") {
     val target = Target(15.0, 0.0) // RA 1hr, Dec 0 deg
     val (grp2, rem2) = Fixture.raResGroup.reserveAvailable(Time.minutes(15), target, goodCC)
     assertEquals(Time.Zero, rem2)
     verifyReserve(grp2.grp(target))
   }
 
-  @Test def testReserve2() = {
+  test("testReserve2") {
     val target = Target(15.0, 0.0) // RA 1hr, Dec 0 deg
     val prop   = mkProp(target, goodCC)
     val block  = Block(prop, prop.obsList.head, Time.minutes(15))
@@ -94,45 +93,45 @@ class RaResourceTest {
         // 2 obs of 15 minutes each take away 30 minutes from the total of 1 hr
         assertEquals(Time.minutes(60), newRes.limit)
         assertEquals(Time.minutes(30), newRes.remaining)
-        assertFalse(newRes.isFull)
+        assert(!newRes.isFull)
 
         // Dec range (0, 45] == 45 min still, but the absolute limit overrides
         assertEquals(Time.minutes(60), newRes.limit(target))
         assertEquals(Time.minutes(30), newRes.remaining(target))
-        assertFalse(newRes.isFull(target))
+        assert(!newRes.isFull(target))
 
         // Dec range (45, 90) is less than the overall limit
         assertEquals(Time.minutes(30), newRes.limit(target2))
         assertEquals(Time.minutes(15), newRes.remaining(target2))
-        assertFalse(newRes.isFull(target2))
+        assert(!newRes.isFull(target2))
 
         // Took 15 minutes of the total of 30 for the Good CC conditions.
         assertEquals(Time.minutes(30), newRes.limit(goodCC))
         assertEquals(Time.minutes(15), newRes.remaining(goodCC))
-        assertFalse(newRes.isFull(goodCC))
+        assert(!newRes.isFull(goodCC))
 
         // After two 15 min observations, there are only 30 min rem for bad CC
         assertEquals(Time.minutes(60), newRes.limit(badCC))
         assertEquals(Time.minutes(30), newRes.remaining(badCC))
-        assertFalse(newRes.isFull(badCC))
+        assert(!newRes.isFull(badCC))
 
         // Remaining for first target and conditions is therefore 15 mins
         // because the good CC is limited to 15 min.
         assertEquals(Time.minutes(30), newRes.limit(target, goodCC))
         assertEquals(Time.minutes(15), newRes.remaining(target, goodCC))
-        assertFalse(newRes.isFull(target, goodCC))
+        assert(!newRes.isFull(target, goodCC))
 
         // Second target and conditions is also 15 min because the upper half
         // of the dec range is 15 min
         assertEquals(Time.minutes(30), newRes.limit(target2, badCC))
         assertEquals(Time.minutes(15), newRes.remaining(target2, badCC))
-        assertFalse(newRes.isFull(target2, badCC))
+        assert(!newRes.isFull(target2, badCC))
     }
   }
 
   // Test that the absolute limit comes into play even if there is time
   // remaining for the obs conditions and dec.
-  @Test def testOverPrescribeAbsolute() = {
+  test("testOverPrescribeAbsolute") {
     val target = Target(15.0, 0.0) // RA 1hr, Dec 0 deg
     val prop = mkProp(target, badCC) // 1 hour limit for obs like this
 
@@ -154,11 +153,11 @@ class RaResourceTest {
     val block2 = Block(prop2, prop2.obsList.head, Time.minutes(0.11))
     raRes.reserve(block2, emptyQueue) match {
       case Left(msg: RejectTarget) => assertEquals(prop2, msg.prop)
-      case _ => fail()
+      case _ => fail("failed")
     }
   }
 
-  @Test def testReserveAvailableLimitedByAbsoluteTimeForRA() = {
+  test("testReserveAvailableLimitedByAbsoluteTimeForRA") {
     val target = Target(15.0, 0.0) // RA 1hr, Dec 0 deg
 
     val raRes1 = Fixture.raResGroup.grp(target)
@@ -173,10 +172,10 @@ class RaResourceTest {
     val target2 = Target(15.0, 45.0) // RA 1hr, Dec 45 deg
     val (raRes3, rem3) = raRes2.reserveAvailable(Time.minutes(0.11), target2, badCC)
     assertEquals(0.01, rem3.toMinutes.value, 0.000001)
-    assertTrue(raRes3.isFull)
+    assert(raRes3.isFull)
   }
 
-  @Test def testOverPrescribeDec() = {
+  test("testOverPrescribeDec") {
     val target = Target(15.0, 45.0)  // RA 1hr, Dec 45 deg -> 30 min dec
     val prop = mkProp(target, badCC) // 30 min dec limit, 1 hour conds limit
 
@@ -191,11 +190,11 @@ class RaResourceTest {
     val block2 = Block(prop, prop.obsList.head, Time.minutes(0.11))
     raRes.reserve(block2, emptyQueue) match {
       case Left(msg) => assertEquals(prop, msg.prop)
-      case _ => fail()
+      case _ => fail("failed")
     }
   }
 
-  @Test def testReserveAvailableLimitedByDec() = {
+  test("testReserveAvailableLimitedByDec") {
     val target = Target(15.0, 45.0)  // RA 1hr, Dec 45 deg -> 30 min dec
     val raRes1 = Fixture.raResGroup.grp(target)
 
@@ -209,11 +208,11 @@ class RaResourceTest {
     // Take it over the edge.
     val (raRes3, rem3) = raRes2.reserveAvailable(Time.minutes(0.11), target, badCC)
     assertEquals( 0.01, rem3.toMinutes.value, 0.000001)
-    assertTrue(raRes3.isFull(target))
-    assertFalse(raRes3.isFull)
+    assert(raRes3.isFull(target))
+    assert(!raRes3.isFull)
   }
 
-  @Test def testOverPrescribeConds() = {
+  test("testOverPrescribeConds") {
     val target = Target(15.0, 0.0) // RA 1hr, Dec 0 deg -> 60 min dec limit
     val prop = mkProp(target, goodCC) // 60 min dec limit, 30 mins conds limit
 
@@ -228,11 +227,11 @@ class RaResourceTest {
     val block2 = Block(prop, prop.obsList.head, Time.minutes(0.11))
     raRes.reserve(block2, emptyQueue) match {
       case Left(msg: RejectConditions) => assertEquals(prop, msg.prop)
-      case _ => fail()
+      case _ => fail("failed")
     }
   }
 
-  @Test def testReserveAvailableLimitedByConds() = {
+  test("testReserveAvailableLimitedByConds") {
     val target = Target(15.0, 0.0) // RA 1hr, Dec 0 deg -> 60 min dec limit
     val raRes1 = Fixture.raResGroup.grp(target)
 
@@ -246,16 +245,16 @@ class RaResourceTest {
     // Take it over the edge.
     val (raRes3, rem3) = raRes2.reserveAvailable(Time.minutes(0.11), target, goodCC)
     assertEquals(0.01, rem3.toMinutes.value, 0.000001)
-    assertTrue(raRes3.isFull(goodCC))
-    assertFalse(raRes3.isFull)
+    assert(raRes3.isFull(goodCC))
+    assert(!raRes3.isFull)
   }
 
-  @Test def testFull() = {
+  test("testFull") {
     val target = Target(0.0, 0.0) // RA 0 hr, Dec 0 deg -> 0 min dec limit
-    assertTrue(Fixture.raResGroup.grp(target).isFull)
-    assertTrue(Fixture.raResGroup.grp(target).isFull(target))
-    assertTrue(Fixture.raResGroup.grp(target).isFull(goodCC))
-    assertTrue(Fixture.raResGroup.grp(target).isFull(target, goodCC))
+    assert(Fixture.raResGroup.grp(target).isFull)
+    assert(Fixture.raResGroup.grp(target).isFull(target))
+    assert(Fixture.raResGroup.grp(target).isFull(goodCC))
+    assert(Fixture.raResGroup.grp(target).isFull(target, goodCC))
   }
 
   private case class TestCatTime(target: Target, conditions: ObservingConditions, time: Time) extends CategorizedTime
@@ -264,7 +263,7 @@ class RaResourceTest {
 //  private val cat2 = TestCatTime(Target(15.0, 0.0), badCC, Time.hours(10))
 //  private val cat3 = TestCatTime(Target(30.0, 0.0), badCC, Time.hours(10))
 
-  @Test def testReserveAvailableWithEmptyList() = {
+  test("testReserveAvailableWithEmptyList") {
     val (newGrp, leftover) = Fixture.raResGroup.reserveAvailable(Nil)
 
     assertEquals(Time.Zero, leftover)

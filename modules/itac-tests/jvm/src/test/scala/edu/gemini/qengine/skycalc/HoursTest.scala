@@ -3,13 +3,11 @@
 
 package edu.gemini.qengine.skycalc
 
-import org.junit.*
+import munit.FunSuite
 
-import Assert.*
+class HoursTest extends FunSuite {
 
-class HoursTest {
-
-  @Test def testFromMillisec() = {
+  test("testFromMillisec") {
     assertEquals(new Hours(42), Hours.fromMillisec(42L * 60 * 60 * 1000))
   }
 }

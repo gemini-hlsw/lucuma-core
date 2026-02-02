@@ -12,11 +12,9 @@ import edu.gemini.tac.qengine.util.BoundedTime
 import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.Site
 import lucuma.core.util.Enumerated
-import org.junit.*
+import munit.FunSuite
 
-import Assert.*
-
-class CompositeResourceTest {
+class CompositeResourceTest extends FunSuite {
   import Partner.US
   val partners = Enumerated[Partner].all
 
@@ -48,7 +46,7 @@ class CompositeResourceTest {
   private val conds  = ObservingConditions.AnyConditions
   private val prop   = Proposal(ntac, site = Site.GS, obsList = List(Observation(null, target, conds, Time.hours(10))))
 
-  @Test def testReserve() = {
+  test("testReserve") {
     val btr1 = new BoundedTimeReservation1(BoundedTime(Time.hours(1)))
     val btr2 = new BoundedTimeReservation2(BoundedTime(Time.hours(2)))
     val comp = new CompositeResource(btr1, btr2)
@@ -60,11 +58,11 @@ class CompositeResourceTest {
         assertEquals(Time.minutes(45),  newComp._1.bounds.remaining)
         assertEquals(Time.minutes(105), newComp._2.bounds.remaining)
       }
-      case _ => fail()
+      case _ => fail("failed")
     }
   }
 
-  @Test def testRejectFirst() = {
+  test("testRejectFirst") {
     val btr1 = new BoundedTimeReservation1(BoundedTime(Time.hours(1)))
     val btr2 = new BoundedTimeReservation2(BoundedTime(Time.hours(2)))
     val comp = new CompositeResource(btr1, btr2)
@@ -73,11 +71,11 @@ class CompositeResourceTest {
 
     comp.reserve(block, Fixture.emptyQueue) match {
       case Left(msg: Reject) => // ok
-      case _ => fail()
+      case _ => fail("failed")
     }
   }
 
-  @Test def testRejectSecond() = {
+  test("testRejectSecond") {
     val btr1 = new BoundedTimeReservation1(BoundedTime(Time.hours(2)))
     val btr2 = new BoundedTimeReservation2(BoundedTime(Time.hours(1)))
     val comp = new CompositeResource(btr1, btr2)
@@ -86,7 +84,7 @@ class CompositeResourceTest {
 
     comp.reserve(block, Fixture.emptyQueue) match {
       case Left(msg: Reject) => // ok
-      case _ => fail()
+      case _ => fail("failed")
     }
   }
 }

@@ -10,11 +10,10 @@ import edu.gemini.tac.qengine.p1.ObservingConditions
 import edu.gemini.tac.qengine.p1.SkyBackground.*
 import edu.gemini.tac.qengine.p1.WaterVapor.*
 import edu.gemini.tac.qengine.util.Percent
-import org.junit.*
 
-import Assert.*
+import munit.FunSuite
 
-class ConditionsBinGroupTest {
+class ConditionsBinGroupTest extends FunSuite {
   val cat0 = ConditionsCategory(Eq(CC50))
   val cat1 = ConditionsCategory(Eq(CC70))
   val cat2 = ConditionsCategory(Eq(CC80))
@@ -37,7 +36,7 @@ class ConditionsBinGroupTest {
     assertEquals(List(cat3, cat2, cat1, cat0), grp.searchPath(oc3))
   }
 
-  @Test def testCreation() = {
+  test("testCreation") {
     assertEquals(4, grp.bins.size)
     assertEquals(Percent(10), grp.bins(cat0))
     assertEquals(Percent(20), grp.bins(cat1))
@@ -46,25 +45,25 @@ class ConditionsBinGroupTest {
     validatePath(grp)
   }
 
-  @Test def testMap() = {
+  test("testMap") {
     // map percents to integer values
     val grp2 = grp.map(_.value)
     assertEquals(4, grp2.bins.size)
-    assertEquals(10, grp2.bins(cat0).toDouble, Double.MinPositiveValue)
-    assertEquals(20, grp2.bins(cat1).toDouble, Double.MinPositiveValue)
-    assertEquals(30, grp2.bins(cat2).toDouble, Double.MinPositiveValue)
-    assertEquals(40, grp2.bins(cat3).toDouble, Double.MinPositiveValue)
+    assertEquals(10.0, grp2.bins(cat0).toDouble, Double.MinPositiveValue)
+    assertEquals(20.0, grp2.bins(cat1).toDouble, Double.MinPositiveValue)
+    assertEquals(30.0, grp2.bins(cat2).toDouble, Double.MinPositiveValue)
+    assertEquals(40.0, grp2.bins(cat3).toDouble, Double.MinPositiveValue)
     validatePath(grp2)
   }
 
-  @Test def testLookup() = {
+  test("testLookup") {
     assertEquals(Percent(10), grp(cat0))
     assertEquals(Percent(20), grp(cat1))
     assertEquals(Percent(30), grp(cat2))
     assertEquals(Percent(40), grp(cat3))
   }
 
-  @Test def testSimpleUpdated() = {
+  test("testSimpleUpdated") {
     val grp2 = grp.updated(cat2, Percent(42))
     assertEquals(Percent(10), grp2(cat0))
     assertEquals(Percent(20), grp2(cat1))
@@ -73,7 +72,7 @@ class ConditionsBinGroupTest {
     validatePath(grp2)
   }
 
-  @Test def testSimpleUpdatedOC() = {
+  test("testSimpleUpdatedOC") {
     val grp2 = grp.updated(oc2, Percent(42))
     assertEquals(Percent(10), grp2(cat0))
     assertEquals(Percent(20), grp2(cat1))
@@ -82,7 +81,7 @@ class ConditionsBinGroupTest {
     validatePath(grp2)
   }
 
-  @Test def testMultipleUpdated() = {
+  test("testMultipleUpdated") {
     val grp2 = grp.updated(List((cat1, Percent(11)), (cat2, Percent(22))))
     assertEquals(Percent(10), grp2(cat0))
     assertEquals(Percent(11), grp2(cat1))
@@ -91,7 +90,7 @@ class ConditionsBinGroupTest {
     validatePath(grp2)
   }
 
-  @Test def testUndefinedSimpleUpdated() = {
+  test("testUndefinedSimpleUpdated") {
     try {
       grp.updated(ConditionsCategory(Eq(CC50), Eq(IQ20)), Percent(99))
       fail
@@ -100,7 +99,7 @@ class ConditionsBinGroupTest {
     }
   }
 
-  @Test def testUndefinedMuliptleUpdated() = {
+  test("testUndefinedMuliptleUpdated") {
     val cat4 = ConditionsCategory(Eq(CC50), Eq(IQ20))
     try {
       grp.updated(List((cat0, Percent(1)), (cat4, Percent(99))))
@@ -112,7 +111,7 @@ class ConditionsBinGroupTest {
   }
 
   /*
-  @Test def testFunctionUpdated() = {
+  test("testFunctionUpdated") {
     val grp2 = grp.updated(oc2, vals => Some(vals.map(perc => Percent(perc.value * 2)))).get
 
     assertEquals(Percent(20), grp2(cat0))

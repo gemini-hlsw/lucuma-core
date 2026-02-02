@@ -17,13 +17,12 @@ import edu.gemini.tac.qengine.util.Percent
 import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.Site
 import lucuma.core.util.Enumerated
-import org.junit.*
 
 import scala.Ordering.Implicits.*
 
-import Assert.*
+import munit.FunSuite
 
-class TimeResourceGroupTest {
+class TimeResourceGroupTest extends FunSuite {
   import Partner.US
   val partners = Enumerated[Partner].all
 
@@ -50,7 +49,7 @@ class TimeResourceGroupTest {
   private def mkProp(wv: WaterVapor, lgs: Boolean): Proposal =
     Proposal(ntac, site = Site.GS, obsList = List(Observation(null, target, conds(wv), Time.hours(10), lgs)))
 
-  @Test def testReserveWv() = {
+  test("testReserveWv") {
     val prop  = mkProp(WV20, lgs = false)  // matches WV limit, not LGS limit
     val block = Block(prop, prop.obsList.head, Time.minutes(15))
 
@@ -62,11 +61,11 @@ class TimeResourceGroupTest {
         assertEquals(Time.minutes(45), res1.remaining)
         assertEquals(Time.minutes(60), res2.remaining)
       }
-      case _ => fail()
+      case _ => fail("failed")
     }
   }
 
-  @Test def testReserveLgs() = {
+  test("testReserveLgs") {
     val prop  = mkProp(WV80, lgs = true) // matches LGS limit, not WV limit
     val block = Block(prop, prop.obsList.head, Time.minutes(15))
 
@@ -78,11 +77,11 @@ class TimeResourceGroupTest {
         assertEquals(Time.minutes(60), res1.remaining)
         assertEquals(Time.minutes(45), res2.remaining)
       }
-      case _ => fail()
+      case _ => fail("failed")
     }
   }
 
-  @Test def testReserveBoth() = {
+  test("testReserveBoth") {
     val prop  = mkProp(WV20, lgs = true) // matches WV and LGS
     val block = Block(prop, prop.obsList.head, Time.minutes(15))
 
@@ -94,31 +93,31 @@ class TimeResourceGroupTest {
         assertEquals(Time.minutes(45), res1.remaining)
         assertEquals(Time.minutes(45), res2.remaining)
       }
-      case _ => fail()
+      case _ => fail("failed")
     }
   }
 
-  @Test def testFailWv() = {
+  test("testFailWv") {
     val prop  = mkProp(WV20, lgs = false)  // matches WV limit, not LGS limit
     val block = Block(prop, prop.obsList.head, Time.minutes(61))
 
     grp.reserve(block, Fixture.emptyQueue) match {
       case Left(msg: RejectRestrictedBin) => // ok
-      case _ => fail()
+      case _ => fail("failed")
     }
   }
 
-  @Test def testFailLgs() = {
+  test("testFailLgs") {
     val prop  = mkProp(WV80, lgs = true)  // matches LGS, not WV
     val block = Block(prop, prop.obsList.head, Time.minutes(61))
 
     grp.reserve(block, Fixture.emptyQueue) match {
       case Left(msg: RejectRestrictedBin) => // ok
-      case _ => fail()
+      case _ => fail("failed")
     }
   }
 
-  @Test def testNoMatch() = {
+  test("testNoMatch") {
     val prop  = mkProp(WV80, lgs = false)  // matches LGS, not WV
 
     // no match so it doesn't matter that we try to reserve too much
@@ -132,7 +131,7 @@ class TimeResourceGroupTest {
         assertEquals(Time.minutes(60), res1.remaining)
         assertEquals(Time.minutes(60), res2.remaining)
       }
-      case _ => fail()
+      case _ => fail("failed")
     }
   }
 }

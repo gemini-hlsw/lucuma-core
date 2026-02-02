@@ -22,8 +22,9 @@ import org.junit.*
 import scala.Ordering.Implicits.*
 
 import Assert.*
+import munit.FunSuite
 
-class TimeResourceTest {
+class TimeResourceTest extends FunSuite {
   import Partner.US
   val partners = Enumerated[Partner].all
 
@@ -42,7 +43,7 @@ class TimeResourceTest {
   private def mkProp(wv: WaterVapor): Proposal =
     Proposal(ntac, site = Site.GS, obsList = List(Observation(null, target, conds(wv), Time.hours(10))))
 
-  @Test def testReserveNoMatch() = {
+  test("testReserveNoMatch") {
     val prop = mkProp(WV80)
 
     // If the restriction doesn't match the block, then the same instance is
@@ -50,11 +51,11 @@ class TimeResourceTest {
     val block = Block(prop, prop.obsList.head, Time.hours(1))
     res60min.reserve(block, Fixture.emptyQueue) match {
       case Right(res) => assertSame(res60min, res)
-      case _ => fail()
+      case _ => fail("failed")
     }
   }
 
-  @Test def testReserveNoTime() = {
+  test("testReserveNoTime") {
     val prop = mkProp(WV20)
 
     // Here the restriction matches the block, but we're not reserving any
@@ -62,29 +63,29 @@ class TimeResourceTest {
     val block = Block(prop, prop.obsList.head, Time.hours(0))
     res60min.reserve(block, Fixture.emptyQueue) match {
       case Right(res) => assertSame(res60min, res)
-      case _ => fail()
+      case _ => fail("failed")
     }
   }
 
-  @Test def testReserve() = {
+  test("testReserve") {
     val prop = mkProp(WV20)
 
     // Reserve 15 of the 60 available minutes
     val block = Block(prop, prop.obsList.head, Time.minutes(15))
     res60min.reserve(block, Fixture.emptyQueue) match {
       case Right(res) => assertEquals(Time.minutes(45), res.remaining)
-      case _ => fail()
+      case _ => fail("failed")
     }
   }
 
-  @Test def testReject() = {
+  test("testReject") {
     val prop = mkProp(WV20)
 
     // Try to reserve more than 1 hour
     val block = Block(prop, prop.obsList.head, Time.minutes(61))
     res60min.reserve(block, Fixture.emptyQueue) match {
       case Left(msg: RejectRestrictedBin) => assertEquals(prop, msg.prop)
-      case _ => fail()
+      case _ => fail("failed")
     }
   }
 }

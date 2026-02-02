@@ -14,16 +14,14 @@ import edu.gemini.tac.qengine.util.Percent
 import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.Site
 import lucuma.core.util.Enumerated
-import org.junit.*
-
-import Assert.*
 import CloudCover.*
 import ImageQuality.IQ20
 import SkyBackground.SB20
 import WaterVapor.WV20
 import Cat.*
+import munit.FunSuite
 
-class ConditionsResourceTest {
+class ConditionsResourceTest extends FunSuite{
   import Partner.KR
   val partners = Enumerated[Partner].all
 
@@ -68,11 +66,11 @@ class ConditionsResourceTest {
     val otb   = Block(prop, prop.obsList.head, time)
     resGrp.reserve(otb, Fixture.emptyQueue) match {
       case Right(res) => verifyTimes(res, mins*)
-      case _ => fail()
+      case _ => fail("failed")
     }
   }
 
-  @Test def testSimpleReservationThatRequiresNoTimeFromABetterBin() = {
+  test("testSimpleReservationThatRequiresNoTimeFromABetterBin") {
     val time  = Time.minutes(10)
     val cnds  = mkConds(CC70)
 
@@ -85,7 +83,7 @@ class ConditionsResourceTest {
     testSuccess(time, cnds, 25, 40, 65, 90)
   }
 
-  @Test def testStealTimeFromABetterBin() = {
+  test("testStealTimeFromABetterBin") {
     val time  = Time.minutes(51)
     val cnds  = mkConds(CC80)
 
@@ -98,7 +96,7 @@ class ConditionsResourceTest {
     testSuccess(time, cnds, 24, 24, 24, 49)
   }
 
-  @Test def testStealExactlyAllRemainingTimeFromBetterBins() = {
+  test("testStealExactlyAllRemainingTimeFromBetterBins") {
     val time  = Time.minutes(75)
     val cnds  = mkConds(CC80)
 
@@ -109,19 +107,19 @@ class ConditionsResourceTest {
     testSuccess(time, cnds, 0, 0, 0, 25)
   }
 
-  @Test def testAttemptToReserveMoreThanAvailable() = {
+  test("testAttemptToReserveMoreThanAvailable") {
     val (newGrp, rem) = resGrp.reserveAvailable(Time.minutes(76), mkConds(CC80))
     verifyTimes(newGrp, 0, 0, 0, 25)
     assertEquals(Time.minutes(1), rem) // 1 minute could not be reserved
   }
 
-  @Test def testCannotStealMoreThanThanAvailableFromBetterBins() = {
+  test("testCannotStealMoreThanThanAvailableFromBetterBins") {
     val prop = mkProp(mkConds(CC80))
 
     val otb2 = Block(prop, prop.obsList.head, Time.minutes(76))
     resGrp.reserve(otb2, Fixture.emptyQueue) match {
       case Left(rc: RejectConditions) => // pass
-      case _ => fail()
+      case _ => fail("failed")
     }
   }
 

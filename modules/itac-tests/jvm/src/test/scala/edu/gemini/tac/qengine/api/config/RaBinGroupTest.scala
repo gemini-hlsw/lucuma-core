@@ -6,13 +6,12 @@ package edu.gemini.tac.qengine.api.config
 import edu.gemini.tac.qengine.p1.Target
 import edu.gemini.tac.qengine.util.Angle
 import edu.gemini.tac.qengine.util.Time
-import org.junit.*
 
 import scala.annotation.unused
 
-import Assert.*
+import munit.FunSuite
 
-class RaBinGroupTest {
+class RaBinGroupTest extends FunSuite {
 
   // The function just generates a Time amount in minutes equal to the Angle.
   // So, a 30 min Angle yields 30 minutes of time.  This makes it easy to test.
@@ -20,7 +19,7 @@ class RaBinGroupTest {
   // visible at night and return that amount of time.
   private def f(a: Angle, @unused sizeMin: Int): Time = Time.minutes(a.mag)
 
-  @Test def testGenerate1Hr() = {
+  test("testGenerate1Hr") {
     val g1Hr = RaBinGroup.gen1HrBins(f)
     assertEquals(24, g1Hr.bins.length)
 
@@ -28,7 +27,7 @@ class RaBinGroupTest {
     assertEquals(times, g1Hr.bins)
   }
 
-  @Test def testGenerate2Hr() = {
+  test("testGenerate2Hr") {
     val g2Hr = RaBinGroup.gen2HrBins(f)
     assertEquals(12, g2Hr.bins.length)
 
@@ -48,19 +47,19 @@ class RaBinGroupTest {
     assertEquals(Time.minutes(30), lookup(g, 24*60))
   }
 
-  @Test def testLookupMin() = {
+  test("testLookupMin") {
     validateLookup((g, m) => g(m))
   }
 
-  @Test def testLookupAngle() = {
+  test("testLookupAngle") {
     validateLookup((g, m) => g(new Angle(m, Angle.Min)))
   }
 
-  @Test def testLookupTarget() = {
+  test("testLookupTarget") {
     validateLookup((g, m) => g(Target(new Angle(m, Angle.Min), Angle.angleDeg0)))
   }
 
-  @Test def testMap() = {
+  test("testMap") {
     val gTime = RaBinGroup.gen1HrBins(f)
 
     // Map the Time objects to Ints with the corresponding value in minutes
@@ -70,7 +69,7 @@ class RaBinGroupTest {
     assertEquals(30, gInt(0))
   }
 
-  @Test def testUpdated() = {
+  test("testUpdated") {
     val ra0 = new Angle( 0, Angle.Min)
     val ra1 = new Angle(60, Angle.Min)
     val min1 = Time.minutes(1)
@@ -86,7 +85,7 @@ class RaBinGroupTest {
       case _ => None
     }
 
-  @Test def testUpdatedFunSome() = {
+  test("testUpdatedFunSome") {
     val bg0 = RaBinGroup.gen1HrBins(f)
 
     val ra0 = new Angle(0, Angle.Min)
@@ -96,7 +95,7 @@ class RaBinGroupTest {
     }
   }
 
-  @Test def testUpdatedFunNone() = {
+  test("testUpdatedFunNone") {
   val bg0 = RaBinGroup.gen1HrBins(f)
 
     val ra1 = new Angle(60, Angle.Min)
