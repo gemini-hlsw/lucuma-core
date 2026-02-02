@@ -18,8 +18,8 @@ case class Proposal(
   isPoorWeather: Boolean = false,
   piName: Option[String] = None,
   piEmail: Option[String] = None,
-  p1proposal: Null = ???, // edu.gemini.model.p1.immutable.Proposal = null, // to avoid having to generate one for testcases that don't care
-  p1mutableProposal: Null = ???, // edu.gemini.model.p1.mutable.Proposal = null, // to avoid having to generate one for testcases that don't care
+  p1proposal: Null = null, // edu.gemini.model.p1.immutable.Proposal = null, // to avoid having to generate one for testcases that don't care
+  p1mutableProposal: Null = null, // edu.gemini.model.p1.mutable.Proposal = null, // to avoid having to generate one for testcases that don't care
   p1xmlFile: File = null, // to avoid having to generate one for testcases that don't care
   itacComment: Option[String] = None,
 ) {

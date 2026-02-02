@@ -10,12 +10,12 @@ import edu.gemini.tac.qengine.util.{Time, Percent}
 import scala.Ordering.Implicits._
 
 class RestrictionConfigTest {
-  @Test def testMapCombine() {
-    val percentBin = TimeRestriction("WV", Percent(10)) = {
-      (prop, obs, _) => obs.conditions.wv <= WV50
+  @Test def testMapCombine() = {
+    val percentBin = TimeRestriction("WV", Percent(10)) {
+      (_, obs, _) => obs.conditions.wv <= WV50
     }
-    val timeBin = TimeRestriction("LGS", Time.hours(10)) = {
-      (prop, obs, _) => obs.lgs
+    val timeBin = TimeRestriction("LGS", Time.hours(10)) {
+      (_, obs, _) => obs.lgs
     }
 
     val conf = new RestrictionConfig(List(percentBin), List(timeBin))

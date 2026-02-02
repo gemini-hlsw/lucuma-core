@@ -3,5 +3,7 @@
 
 package edu.gemini.qengine.skycalc
 
-trait RaBinSize:
-  def getBinCount: Int
+import scala.annotation.unused
+
+trait RaBinSize(@unused min: Int):
+  def getBinCount: Int = ???

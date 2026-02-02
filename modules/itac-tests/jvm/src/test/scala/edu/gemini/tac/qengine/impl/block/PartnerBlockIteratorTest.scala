@@ -7,11 +7,13 @@ import org.junit._
 import Assert._
 import edu.gemini.tac.qengine.p1._
 import edu.gemini.tac.qengine.util.Time
-import edu.gemini.spModel.core.Site
+import lucuma.core.enums.Site
+import edu.gemini.tac.qengine.ctx.Partner
+import lucuma.core.util.Enumerated
 
 class PartnerBlockIteratorTest {
-  import edu.gemini.tac.qengine.ctx.Partner._
-  val partners = all
+  import Partner.AR
+  val partners = Enumerated[Partner].all
 
   val target = Target(0.0, 0.0) // required but not used for this test
   val conds  = ObservingConditions.AnyConditions // required by not used
@@ -33,7 +35,7 @@ class PartnerBlockIteratorTest {
     Proposal(ntac, site = Site.GS, obsList = lst)
   }
 
-  @Test def testCreateEmpty() {
+  @Test def testCreateEmpty() = {
     val it = PartnerBlockIterator(Nil, _.obsList)
     assertEquals(false, it.hasNext)
   }
@@ -41,7 +43,7 @@ class PartnerBlockIteratorTest {
   private def validate(it: PartnerBlockIterator,
                        propList: List[Proposal],
                        obsList: List[Observation],
-                       time: Double) {
+                       time: Double) = {
 
     assertEquals(propList, it.remainingProposals)
     assertEquals(obsList,  it.remainingObservationsInActiveList)
@@ -50,14 +52,14 @@ class PartnerBlockIteratorTest {
     assertEquals(obsList.head,  it.currentObservation)
   }
 
-  @Test def testCreateSinglePropSingleObsFull() {
+  @Test def testCreateSinglePropSingleObsFull() = {
     val lst = List(mkProp(10, 10))
     val it = PartnerBlockIterator(lst, _.obsList)
     assertTrue(it.hasNext)
     validate(it, lst, lst.head.obsList, 10)
   }
 
-  @Test def testAdvancePartialObs() {
+  @Test def testAdvancePartialObs() = {
     val lst = List(mkProp(10, 10))
     val it = PartnerBlockIterator(lst, _.obsList)
 
@@ -69,7 +71,7 @@ class PartnerBlockIteratorTest {
     assertEquals(5.0, block.time.toHours.value, e)
   }
 
-  @Test def testCanAdvancePartialObservationInBand3(){
+  @Test def testCanAdvancePartialObservationInBand3() = {
     //NB: Note how this is structured exactly like above, but in B3
     val lst = List(mkProp(11, 10).copy(band3Observations = List(mkObs(11))))
     val it = PartnerBlockIterator(lst, _.band3Observations)
@@ -81,7 +83,7 @@ class PartnerBlockIteratorTest {
     assertEquals(5.0, block.time.toHours.value, e)
   }
 
-  @Test def testTryAdvancePastObs() {
+  @Test def testTryAdvancePastObs() = {
     val lst = List(mkProp(10, 10))
     val it = PartnerBlockIterator(lst, _.obsList)
 
@@ -92,7 +94,7 @@ class PartnerBlockIteratorTest {
     assertEquals(10.0, block.time.toHours.value, e)
   }
 
-  @Test def testAdvanceLastObs() {
+  @Test def testAdvanceLastObs() = {
     val lst = List(mkProp(10, 10))
     val it = PartnerBlockIterator(lst, _.obsList)
 
@@ -104,7 +106,7 @@ class PartnerBlockIteratorTest {
     assertEquals(10.0, block.time.toHours.value, e)
   }
 
-  @Test def testAdvanceObs() {
+  @Test def testAdvanceObs() = {
     val lst = List(mkProp(20, 10, 10))
     val it = PartnerBlockIterator(lst, _.obsList)
 
@@ -124,7 +126,7 @@ class PartnerBlockIteratorTest {
     assertEquals(10.0, block2.time.toHours.value, e)
   }
 
-  @Test def testAdvanceProp() {
+  @Test def testAdvanceProp() = {
     val lst = List(mkProp(20, 10, 10), mkProp(10, 5, 5))
     val it = PartnerBlockIterator(lst, _.obsList)
 
@@ -133,7 +135,7 @@ class PartnerBlockIteratorTest {
     validate(it2, lst.tail, lst.tail.head.obsList, 5)
   }
 
-  @Test def testAdvanceToEnd() {
+  @Test def testAdvanceToEnd() = {
     val lst = List(mkProp(20, 10, 10), mkProp(10, 5, 5))
     val it = PartnerBlockIterator(lst, _.obsList)
 
@@ -142,27 +144,27 @@ class PartnerBlockIteratorTest {
     assertFalse(it2.hasNext)
   }
 
-  @Test def testSkipFromBegining() {
+  @Test def testSkipFromBegining() = {
     val lst = List(mkProp(20, 10, 10), mkProp(10, 5, 5))
     val it = PartnerBlockIterator(lst, _.obsList)
     val it2 = it.skip(_.obsList)
     validate(it2, lst.tail, lst.tail.head.obsList, 5)
   }
 
-  @Test def testSkipFromMiddle() {
+  @Test def testSkipFromMiddle() = {
     val lst = List(mkProp(20, 10, 10), mkProp(10, 5, 5))
     val it = PartnerBlockIterator(lst, _.obsList)
     val it2 = it.next(Time.hours(10), _.obsList)._2.skip(_.obsList)
     validate(it2, lst.tail, lst.tail.head.obsList, 5)
   }
 
-  @Test def testEmpty() {
+  @Test def testEmpty() = {
     val it = PartnerBlockIterator(Nil, _.obsList)
     val it2 = it.skip(_.obsList)
     assertFalse(it2.hasNext)
   }
 
-  @Test def testStart() {
+  @Test def testStart() = {
     val prop1 = mkProp(20, 10, 10)
     val prop2 = mkProp(10,  5,  5)
     val lst   = List(prop1, prop2)

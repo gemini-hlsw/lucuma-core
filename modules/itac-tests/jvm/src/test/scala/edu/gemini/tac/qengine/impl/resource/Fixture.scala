@@ -13,13 +13,13 @@ import edu.gemini.tac.qengine.p1.WaterVapor._
 import edu.gemini.tac.qengine.api.config._
 import edu.gemini.tac.qengine.impl.queue.ProposalQueueBuilder
 import edu.gemini.tac.qengine.api.queue.time.{PartnerTime, QueueTime}
-import edu.gemini.tac.qengine.ctx.Partner
 import lucuma.core.model.Semester
 import lucuma.core.enums.Site
 import edu.gemini.tac.qengine.ctx.Partner
 import lucuma.core.model.Semester.YearInt
 import lucuma.core.enums.Half
 import lucuma.core.util.Enumerated
+import scala.annotation.unused
 
 object Fixture {
   val site = Site.GS
@@ -48,7 +48,7 @@ object Fixture {
   def timeResourceGroup(total: Time): TimeResourceGroup = {
     val bins = RestrictionConfig().mapTimeRestrictions(
       perc => BoundedTime(total * perc),
-      time => BoundedTime(total))
+      _ => BoundedTime(total))
     new TimeResourceGroup(bins.map(new TimeResource(_)))
   }
 
@@ -77,8 +77,8 @@ object Fixture {
   val Band2Percent = Percent(30)
   val Band3Percent = Percent(20)
 
-  def evenQueueTime(hrs: Double, overfill: Option[Percent]): QueueTime = {
-    val pt = PartnerTime.fromFunction { p => Time.hours(hrs) * Band1Percent }
+  def evenQueueTime(hrs: Double, @unused overfill: Option[Percent]): QueueTime = {
+    val pt = PartnerTime.fromFunction { _ => Time.hours(hrs) * Band1Percent }
     QueueTime(pt, Percent.Zero)
   }
 

@@ -30,7 +30,7 @@ class ConditionsBinGroupTest {
 
   val grp = ConditionsBinGroup.of(List(bin0, bin1, bin2, bin3))
 
-  def validatePath(grp: ConditionsBinGroup[_]) = {
+  def validatePath[A](grp: ConditionsBinGroup[A]) = {
     assertEquals(List(cat0), grp.searchPath(oc0))
     assertEquals(List(cat1, cat0), grp.searchPath(oc1))
     assertEquals(List(cat2, cat1, cat0), grp.searchPath(oc2))

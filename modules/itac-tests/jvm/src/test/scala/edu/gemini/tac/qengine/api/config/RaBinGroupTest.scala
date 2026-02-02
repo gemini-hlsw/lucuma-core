@@ -7,7 +7,7 @@ import org.junit._
 import Assert._
 import edu.gemini.tac.qengine.util.{Angle, Time}
 import edu.gemini.tac.qengine.p1.Target
-import xml.Elem
+import scala.annotation.unused
 
 class RaBinGroupTest {
 
@@ -15,7 +15,7 @@ class RaBinGroupTest {
   // So, a 30 min Angle yields 30 minutes of time.  This makes it easy to test.
   // A real function would compute the number of minutes that the RA is
   // visible at night and return that amount of time.
-  private def f(a: Angle, sizeMin: Int): Time = Time.minutes(a.mag)
+  private def f(a: Angle, @unused sizeMin: Int): Time = Time.minutes(a.mag)
 
   @Test def testGenerate1Hr() = {
     val g1Hr = RaBinGroup.gen1HrBins(f)

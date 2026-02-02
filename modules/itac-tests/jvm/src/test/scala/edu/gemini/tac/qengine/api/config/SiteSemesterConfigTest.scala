@@ -3,21 +3,25 @@
 
 package edu.gemini.tac.qengine.api.config
 
-import edu.gemini.spModel.core.{Semester, Site}
 import edu.gemini.tac.qengine.util.{Percent, Time}
+import lucuma.core.enums.Site
+import lucuma.core.model.Semester
 
 import org.junit._
+import lucuma.core.model.Semester.YearInt
+import lucuma.core.enums.Half
 
 class SiteSemesterConfigTest {
   // these aren't really relevant for the test cases, but required to
   // construct the SiteSemesterConfig
   val site     = Site.GN
-  val semester = new Semester(2011, Semester.Half.A)
+  val semester = new Semester(YearInt.unsafeFrom(2011), Half.A)
 
   @Test def testPassSingleDecBinPercentageRequirement() = {
     val ra  = RaBinGroup(List(Time.hours(100.0)))
     val dec = DecBinGroup(List(Percent(100)))
     new SiteSemesterConfig(site, semester, ra, dec, List.empty)
+    ()
   }
 
   @Test def testFailSingleDecBinPercentageRequirement() = {
@@ -25,15 +29,17 @@ class SiteSemesterConfigTest {
     val dec = DecBinGroup(List(Percent(99)))
     try {
       new SiteSemesterConfig(site, semester, ra, dec, List.empty)
+      ()
     } catch {
       case ex: IllegalArgumentException => // expected
-    }
+    }    
   }
 
   @Test def testPassMultiDecBinPercentageRequirement() = {
     val ra  = RaBinGroup(List(Time.hours(100.0)))
     val dec = DecBinGroup(List(Percent(10), Percent(100), Percent(0)))
     new SiteSemesterConfig(site, semester, ra, dec, List.empty)
+    ()
   }
 
   @Test def testFailMultiDecBinPercentageRequirement() = {
@@ -41,6 +47,7 @@ class SiteSemesterConfigTest {
     val dec = DecBinGroup(List(Percent(10), Percent(99), Percent(0)))
     try {
       new SiteSemesterConfig(site, semester, ra, dec, List.empty)
+      ()
     } catch {
       case ex: IllegalArgumentException => // expected
     }

@@ -8,13 +8,14 @@ import Assert._
 import edu.gemini.tac.qengine.util.Time
 import edu.gemini.tac.qengine.p1._
 
-import edu.gemini.tac.qengine.ctx.Partner
-import edu.gemini.spModel.core.Site
 import edu.gemini.tac.qengine.api.queue.time.PartnerTime
+import lucuma.core.enums.Site
+import edu.gemini.tac.qengine.ctx.Partner
+import lucuma.core.util.Enumerated
 
 class BlockIteratorTest {
-  import edu.gemini.tac.qengine.ctx.Partner._
-  val partners = all
+  import Partner.{ BR, US }
+  val partners = Enumerated[Partner].all
 
   val target = Target(0.0, 0.0) // required but not used for this test
   val conds = ObservingConditions.AnyConditions // required by not used
@@ -32,19 +33,20 @@ class BlockIteratorTest {
   def genQuanta(hrs: Double): PartnerTime = PartnerTime.constant(Time.hours(hrs))
 
   def genPropLists(count: Int, p: Partner, propTime: Double, obsTimes: List[Double], b3ObsTimes: List[Double] = List.empty): Map[Partner, List[Proposal]] = {
-    val lst = (1 to count).map(i => mkProp(p, propTime, obsTimes, b3ObsTimes)).toList
+    val lst = (1 to count).map(_ => mkProp(p, propTime, obsTimes, b3ObsTimes)).toList
     partners.map(p => (p, lst)).toMap
   }
 
-  @Test def testEmptyQuanta() {
+  @Test def testEmptyQuanta() = {
     List[(Proposal) => List[Observation]](_.obsList, _.band3Observations).map {
       fn =>
         val it = BlockIterator(PartnerTime.empty, List(US), genPropLists(1, US, 10, List(10), List(10)), fn)
         assertFalse(it.hasNext)
     }
+    ()
   }
 
-  // @Test def testZeroQuanta() {
+  // @Test def testZeroQuanta() = {
   //   List[(Proposal) => List[Observation]](_.obsList, _.band3Observations).foreach {
   //     fn =>
   //       val it = BlockIterator(genQuanta(0), List(US), genPropLists(1, US, 10, List(10)), fn)
@@ -52,20 +54,21 @@ class BlockIteratorTest {
   //   }
   // }
 
-  @Test def testEmptyPropListMap() {
+  @Test def testEmptyPropListMap() = {
     val it = BlockIterator(genQuanta(10), List(US), Map.empty, _.obsList)
     assertFalse(it.hasNext)
   }
 
-  @Test def testEmptyPropLists() {
+  @Test def testEmptyPropLists() = {
     List[(Proposal) => List[Observation]](_.obsList, _.band3Observations).map {
       fn =>
         val it = BlockIterator(genQuanta(10), List(US), genPropLists(0, US, 10, List(10)), fn)
         assertFalse(it.hasNext)
     }
+    ()
   }
 
-  // @Test def testEmptyPartnerSequence() {
+  // @Test def testEmptyPartnerSequence() = {
   //   List[(Proposal) => List[Observation]](_.obsList, _.band3Observations).map {
   //     fn =>
   //       val it = BlockIterator(genQuanta(10), Nil, genPropLists(1, US, 10, List(10)), fn)
@@ -73,7 +76,7 @@ class BlockIteratorTest {
   //   }
   // }
 
-  @Test def testPartnerAdvanceNoProps() {
+  @Test def testPartnerAdvanceNoProps() = {
     val prop = mkProp(US, 5, List(5), List.empty)
     val qMap = PartnerTime.fromMap(Map(BR -> Time.hours(10), US -> Time.hours(10)))
     // No proposals for Brazil, it will be skipped.
@@ -84,7 +87,7 @@ class BlockIteratorTest {
     assertEquals(expected, it.toList(_.obsList))
   }
 
-  @Test def testPartnerAdvanceNoTime() {
+  @Test def testPartnerAdvanceNoTime() = {
     val brProp = mkProp(BR, 1, List(1), List.empty)
     val usProp = mkProp(US, 2, List(2), List.empty)
 
@@ -98,7 +101,7 @@ class BlockIteratorTest {
     assertEquals(expected, it.toList(_.obsList))
   }
 
-  @Test def testPartnerAdvanceNoTimeIfOnlyB3() {
+  @Test def testPartnerAdvanceNoTimeIfOnlyB3() = {
     //Dup of above, but there are B3 observations
     val brProp = mkProp(BR, 1, List(1), List(1))
     val usProp = mkProp(US, 2, List(2), List.empty)
@@ -114,7 +117,7 @@ class BlockIteratorTest {
 
   }
 
-  @Test def testObsTimeLessThanQuantum() {
+  @Test def testObsTimeLessThanQuantum() = {
     val brProp = mkProp(BR, 1, List(1), List.empty)
     val usProp = mkProp(US, 2, List(2), List.empty)
 
@@ -130,7 +133,7 @@ class BlockIteratorTest {
     assertEquals(expected, actual)
   }
 
-  @Test def testObsTimeSpansQuantum() {
+  @Test def testObsTimeSpansQuantum() = {
     val brProp = mkProp(BR, 11, List(11), List.empty)
     val usProp = mkProp(US, 5, List(5), List.empty)
 
@@ -146,7 +149,7 @@ class BlockIteratorTest {
     assertEquals(expected, it.toList(_.obsList))
   }
 
-  @Test def testObsTimeEqualsQuantum() {
+  @Test def testObsTimeEqualsQuantum() = {
     val brProp = mkProp(BR, 10, List(10), List.empty)
     val usProp = mkProp(US, 10, List(10), List.empty)
 
@@ -161,7 +164,7 @@ class BlockIteratorTest {
     assertEquals(expected, it.toList(_.obsList))
   }
 
-  @Test def testMultipleObs() {
+  @Test def testMultipleObs() = {
     val brProp = mkProp(BR, 20, List[Double](10, 10), List.empty)
     val usProp = mkProp(US, 30, List[Double](10, 10, 10), List.empty)
 
@@ -195,7 +198,7 @@ class BlockIteratorTest {
     assertEquals(expected, it.toList(_.obsList))
   }
 
-  @Test def testMultiplePropsInOneQuantum() {
+  @Test def testMultiplePropsInOneQuantum() = {
     val brProp1 = mkProp(BR, 2, List[Double](1, 1), List.empty)
     val brProp2 = mkProp(BR, 3, List(3), List.empty)
 
@@ -212,7 +215,7 @@ class BlockIteratorTest {
     assertEquals(expected, it.toList(_.obsList))
   }
 
-  @Test def testMultiplePropsSpanningQuantums() {
+  @Test def testMultiplePropsSpanningQuantums() = {
     val brProp1 = mkProp(BR, 2, List[Double](1, 1), List.empty)
     val brProp2 = mkProp(BR, 3, List(3), List.empty)
 
@@ -231,7 +234,7 @@ class BlockIteratorTest {
     assertEquals(expected, it.toList(_.obsList))
   }
 
-  @Test def testSkipStartOfProposal() {
+  @Test def testSkipStartOfProposal() = {
     val brProp = mkProp(BR, 20, List[Double](10, 10), List.empty)
     val usProp = mkProp(US, 30, List[Double](10, 10, 10), List.empty)
 
@@ -252,7 +255,7 @@ class BlockIteratorTest {
     assertEquals(expected, it3.toList(_.obsList))
   }
 
-  @Test def testSkipMiddleOfProposal() {
+  @Test def testSkipMiddleOfProposal() = {
     val brProp = mkProp(BR, 20, List[Double](10, 10), List.empty)
     val usProp = mkProp(US, 30, List[Double](10, 10, 10), List.empty)
 
@@ -272,7 +275,7 @@ class BlockIteratorTest {
     assertEquals(expected, it2.toList(_.obsList))
   }
 
-  @Test def testRemainingProps() {
+  @Test def testRemainingProps() = {
     val brProp = mkProp(BR, 20, List[Double](10, 10), List.empty)
     val usProp = mkProp(US, 30, List[Double](10, 10, 10), List.empty)
 

@@ -11,9 +11,9 @@ import edu.gemini.tac.qengine.p1.SkyBackground.SBAny
 import edu.gemini.tac.qengine.p1.WaterVapor._
 import edu.gemini.tac.qengine.p1._
 import edu.gemini.tac.qengine.util.{Time, Percent}
-import edu.gemini.spModel.core.Site
 import scala.Ordering.Implicits._
 import edu.gemini.tac.qengine.ctx.Partner
+import lucuma.core.enums.Site
 
 class TimeRestrictionTest {
 
@@ -25,7 +25,7 @@ class TimeRestrictionTest {
     ObservingConditions(CCAny, IQAny, SBAny, wv)
 
   private val bin = TimeRestriction("wv", Percent(10)) {
-    (prop, obs, _) => obs.conditions.wv <= WV50
+    (_, obs, _) => obs.conditions.wv <= WV50
   }
 
   private def mkProp(wv: WaterVapor): Proposal =

@@ -81,7 +81,7 @@ class RaResourceTest {
     val prop   = mkProp(target, goodCC)
     val block  = Block(prop, prop.obsList.head, Time.minutes(15))
 
-    val grp    = Fixture.raResGroup.grp(target).reserve(block, emptyQueue).right.get
+    val grp    = Fixture.raResGroup.grp(target).reserve(block, emptyQueue).toOption.get
 
     val target2 = Target(15.0, 45.0) // RA 1hr, Dec 45 deg
     val prop2   = mkProp(target2, badCC)
@@ -137,7 +137,7 @@ class RaResourceTest {
 
     // Take almost all the time
     val block = Block(prop, prop.obsList.head, Time.minutes(59.9))
-    val raRes = Fixture.raResGroup.grp(target).reserve(block, emptyQueue).right.get
+    val raRes = Fixture.raResGroup.grp(target).reserve(block, emptyQueue).toOption.get
 
     // badCC is being limited here by the absolute limit
     assertEquals(0.1, raRes.remaining(target, badCC).toMinutes.value, 0.000001)
@@ -181,7 +181,7 @@ class RaResourceTest {
 
     // Take almost all the time for the dec
     val block = Block(prop, prop.obsList.head, Time.minutes(29.9))
-    val raRes = Fixture.raResGroup.grp(target).reserve(block, emptyQueue).right.get
+    val raRes = Fixture.raResGroup.grp(target).reserve(block, emptyQueue).toOption.get
 
     assertEquals( 0.1, raRes.remaining(target, badCC).toMinutes.value, 0.000001)
     assertEquals(30.1, raRes.remaining(badCC).toMinutes.value, 0.000001)
@@ -218,7 +218,7 @@ class RaResourceTest {
 
     // Take almost all the time for the conditions
     val block = Block(prop, prop.obsList.head, Time.minutes(29.9))
-    val raRes = Fixture.raResGroup.grp(target).reserve(block, emptyQueue).right.get
+    val raRes = Fixture.raResGroup.grp(target).reserve(block, emptyQueue).toOption.get
 
     assertEquals(0.1,  raRes.remaining(target, goodCC).toMinutes.value, 0.000001)
     assertEquals(30.1, raRes.remaining(target).toMinutes.value, 0.000001)

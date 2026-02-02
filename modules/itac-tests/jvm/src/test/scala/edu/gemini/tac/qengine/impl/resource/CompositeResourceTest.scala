@@ -16,7 +16,7 @@ import lucuma.core.util.Enumerated
 import edu.gemini.tac.qengine.ctx.Partner
 
 class CompositeResourceTest {
-  import Partner.{ KR, US }
+  import Partner.US
   val partners = Enumerated[Partner].all
 
   class Reject(val prop: Proposal) extends RejectMessage {

@@ -17,8 +17,6 @@ import edu.gemini.tac.qengine.api.config.{ConditionsBinGroup, ConditionsBin, Con
 import Cat._
 import edu.gemini.tac.qengine.util.{Percent, Time}
 import edu.gemini.tac.qengine.impl.block.Block
-import edu.gemini.tac.qengine.api.queue.time.QueueTime
-import edu.gemini.tac.qengine.impl.queue.ProposalQueueBuilder
 import lucuma.core.enums.Site
 import lucuma.core.util.Enumerated
 import edu.gemini.tac.qengine.ctx.Partner
