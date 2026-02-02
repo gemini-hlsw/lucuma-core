@@ -3,14 +3,17 @@
 
 package lucuma.core.model.sequence.igrins2.arb
 
+import lucuma.core.enums.Igrins2OffsetMode
 import lucuma.core.model.sequence.igrins2.Igrins2DynamicConfig
 import lucuma.core.model.sequence.igrins2.Igrins2StaticConfig
+import lucuma.core.model.sequence.igrins2.Igrins2SvcImages
 import lucuma.core.util.TimeSpan
+import lucuma.core.util.arb.ArbEnumerated.given
+import lucuma.core.util.arb.ArbNewType.given
 import lucuma.core.util.arb.ArbTimeSpan.given
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.*
 import org.scalacheck.Cogen
-import org.scalacheck.Gen
 
 trait ArbIgrins2DynamicConfig:
 
@@ -24,11 +27,15 @@ trait ArbIgrins2DynamicConfig:
 object ArbIgrins2DynamicConfig extends ArbIgrins2DynamicConfig
 
 trait ArbIgrins2StaticConfig:
+  given Arbitrary[Igrins2StaticConfig] =
+    Arbitrary:
+      for {
+        svc <- arbitrary[Igrins2SvcImages]
+        off <- arbitrary[Igrins2OffsetMode]
+      } yield Igrins2StaticConfig(svc, off)
 
-  given Arbitrary[Igrins2StaticConfig.type] =
-    Arbitrary(Gen.const(Igrins2StaticConfig))
-
-  given Cogen[Igrins2StaticConfig.type] =
-    Cogen[Unit].contramap(_ => ())
+  given Cogen[Igrins2StaticConfig] =
+    Cogen[(Igrins2SvcImages, Igrins2OffsetMode)]
+      .contramap(c => (c.saveSvcImages, c.offsetMode))
 
 object ArbIgrins2StaticConfig extends ArbIgrins2StaticConfig

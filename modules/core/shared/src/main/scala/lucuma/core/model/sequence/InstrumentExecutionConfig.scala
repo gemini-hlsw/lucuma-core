@@ -76,13 +76,13 @@ object InstrumentExecutionConfig:
     GenPrism[InstrumentExecutionConfig, GmosSouth]
 
   case class Igrins2(
-    executionConfig: ExecutionConfig[ig2.Igrins2StaticConfig.type, ig2.Igrins2DynamicConfig]
+    executionConfig: ExecutionConfig[ig2.Igrins2StaticConfig, ig2.Igrins2DynamicConfig]
   ) extends InstrumentExecutionConfig derives Eq:
     override def instrument: Instrument = Instrument.Igrins2
     override def isComplete: Boolean    = executionConfig.isComplete
 
   object Igrins2:
-    val executionConfig: Lens[Igrins2, ExecutionConfig[ig2.Igrins2StaticConfig.type, ig2.Igrins2DynamicConfig]] =
+    val executionConfig: Lens[Igrins2, ExecutionConfig[ig2.Igrins2StaticConfig, ig2.Igrins2DynamicConfig]] =
       Focus[Igrins2](_.executionConfig)
 
   val igrins2: Prism[InstrumentExecutionConfig, Igrins2] =

@@ -6,11 +6,13 @@ package lucuma.core.model.sequence.igrins2
 import cats.kernel.laws.discipline.*
 import lucuma.core.enums.Igrins2FowlerSamples
 import lucuma.core.model.sequence.igrins2.arb.ArbIgrins2DynamicConfig.given
+import lucuma.core.model.sequence.igrins2.arb.ArbIgrins2StaticConfig.given
 import lucuma.core.syntax.timespan.*
 import munit.*
 
-class Igrins2DynamicConfigSuite extends DisciplineSuite:
+class Igrins2ConfigSuite extends DisciplineSuite:
   checkAll("Eq[Igrins2DynamicConfig]", EqTests[Igrins2DynamicConfig].eqv)
+  checkAll("Eq[Igrins2StaticConfig]", EqTests[Igrins2StaticConfig].eqv)
 
   test("fowlerSamples from exposure time"):
     assertEquals(Igrins2DynamicConfig(1000.msTimeSpan).fowlerSamples, Igrins2FowlerSamples.One)
