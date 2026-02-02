@@ -3,14 +3,9 @@
 
 package edu.gemini.tac.qengine.p2.rollover
 
-import edu.gemini.spModel.core.Site
-import edu.gemini.tac.qengine.p1._
+import lucuma.core.enums.Site
 import edu.gemini.tac.qengine.p1.{CategorizedTime, ObservingConditions, Target}
-import edu.gemini.tac.qengine.util.Angle
 import edu.gemini.tac.qengine.util.Time
-import scala.util.Try
-import scalaz._, Scalaz._
-import java.text.ParseException
 
 /**
  * A class that represents a rollover time observation.  The time for each
@@ -22,7 +17,7 @@ case class RolloverObservation(
   conditions: ObservingConditions,
   time: Time
 ) extends CategorizedTime {
-  def site: Site = Site.parse(obsId.take(2))
+  def site: Site = ??? //Site.parse(obsId.take(2))
 }
 
 object RolloverObservation {
@@ -53,31 +48,31 @@ object RolloverObservation {
    *
    * @return a RolloverObservation, or a message on failure.
    */
-  def fromXml(o: scala.xml.Node): Either[String, RolloverObservation] =
-    Try {
+  // def fromXml(o: scala.xml.Node): Either[String, RolloverObservation] =
+  //   Try {
 
-      def fail(field: String): Nothing =
-        sys.error(s"Error parsing RolloverObservation: missing or invalid $field\n$o")
+  //     def fail(field: String): Nothing =
+  //       sys.error(s"Error parsing RolloverObservation: missing or invalid $field\n$o")
 
-      val id   = (o \ "id").text
-      val time = Time.millisecs((o \ "time").text.toLong).toMinutes
-      val ra   = new Angle((o \ "target" \ "ra" ).text.takeWhile(_ != ' ').toDouble, Angle.Deg)
-      val dec  = new Angle((o \ "target" \ "dec").text.takeWhile(_ != ' ').toDouble, Angle.Deg)
-      val t    = Target(ra, dec, None)
-      val cc   = CloudCover   .values.find(_.percent == (o \ "conditions" \ "cc").text.toInt).getOrElse(fail("cc"))
-      val iq   = ImageQuality .values.find(_.percent == (o \ "conditions" \ "iq").text.toInt).getOrElse(fail("iq"))
-      val sb   = SkyBackground.values.find(_.percent == (o \ "conditions" \ "sb").text.toInt).getOrElse(fail("sb"))
-      val wv   = WaterVapor   .values.find(_.percent == (o \ "conditions" \ "wv").text.toInt).getOrElse(fail("wv"))
+  //     val id   = (o \ "id").text
+  //     val time = Time.millisecs((o \ "time").text.toLong).toMinutes
+  //     val ra   = new Angle((o \ "target" \ "ra" ).text.takeWhile(_ != ' ').toDouble, Angle.Deg)
+  //     val dec  = new Angle((o \ "target" \ "dec").text.takeWhile(_ != ' ').toDouble, Angle.Deg)
+  //     val t    = Target(ra, dec, None)
+  //     val cc   = CloudCover   .values.find(_.percent == (o \ "conditions" \ "cc").text.toInt).getOrElse(fail("cc"))
+  //     val iq   = ImageQuality .values.find(_.percent == (o \ "conditions" \ "iq").text.toInt).getOrElse(fail("iq"))
+  //     val sb   = SkyBackground.values.find(_.percent == (o \ "conditions" \ "sb").text.toInt).getOrElse(fail("sb"))
+  //     val wv   = WaterVapor   .values.find(_.percent == (o \ "conditions" \ "wv").text.toInt).getOrElse(fail("wv"))
 
-      // Almost done!
-      val ro   = RolloverObservation(id, t, ObservingConditions(cc, iq, sb, wv), time)
+  //     // Almost done!
+  //     val ro   = RolloverObservation(id, t, ObservingConditions(cc, iq, sb, wv), time)
 
-      // Hack: ensure the id is valid enough to discern the site
-      try { ro.site } catch { case _: ParseException => fail("observation id")}
+  //     // Hack: ensure the id is valid enough to discern the site
+  //     try { ro.site } catch { case _: ParseException => fail("observation id")}
 
-      // Ok, done.
-      ro
+  //     // Ok, done.
+  //     ro
 
-    } .toEither.leftMap(_.getMessage)
+  //   } .toEither.leftMap(_.getMessage)
 
 }

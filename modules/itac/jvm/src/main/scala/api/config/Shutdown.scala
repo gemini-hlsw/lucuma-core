@@ -5,10 +5,8 @@ package edu.gemini.tac.qengine.api.config
 
 import cats.syntax.all.*
 import java.text.SimpleDateFormat
-import java.util.Date
 import java.time.ZonedDateTime
 import lucuma.core.enums.Site
-import scala.math.Ordered.orderingToOrdered
 import java.util.TimeZone
 /**
  * Defines a shutdown period.

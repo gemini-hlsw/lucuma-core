@@ -5,7 +5,7 @@ package edu.gemini.tac.qengine.p1
 
 import edu.gemini.tac.qengine.util.Time
 
-case class Observation(p1Observation: edu.gemini.model.p1.immutable.Observation, target: Target, conditions: ObservingConditions, time: Time, lgs: Boolean = false) extends CategorizedTime
+case class Observation(p1Observation: Null /* edu.gemini.model.p1.immutable.Observation */, target: Target, conditions: ObservingConditions, time: Time, lgs: Boolean = false) extends CategorizedTime
 
 object Observation {
   def sumObsTime(lst: List[Observation]): Time = lst.foldLeft(Time.Zero)(_ + _.time)

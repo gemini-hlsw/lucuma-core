@@ -54,17 +54,17 @@ object TooBlocks {
     // Distribute time across the bins, returning a sequence of (Int, Time) which
     // identifies the amount of time to reserve in each bin by index.  If there
     // isn't enough time remaining in all the bins, then Nil is returned.
-    private [this] def distributeTime(t: Time, bins: Seq[T]): List[Time] =
-      distributeTime(t, zipAndSort(bins)).sorted(TooBlocks.indexOrdering).unzip._1
+    private def distributeTime(t: Time, bins: Seq[T]): List[Time] =
+      distributeTime(t, zipAndSort(bins)).sorted(using TooBlocks.indexOrdering).unzip._1
 
     // Zips with index and sorts according to remaining time in each RA bin.
-    private[this] def zipAndSort(bins: Seq[T]): List[(T, Int)] =
-      bins.zipWithIndex.sorted(TooBlocks.remainingTimeOrdering(remTime)).toList
+    private def zipAndSort(bins: Seq[T]): List[(T, Int)] =
+      bins.zipWithIndex.sorted(using TooBlocks.remainingTimeOrdering(remTime)).toList
 
     // Considering the bins in sorted order according to remaining time, build
     // the time distribution sequence.  Bins that can't hold an even distribution
     // of time are filled to their capacity.
-    private[this] def distributeTime(t: Time, bins: List[(T, Int)]): List[(Time, Int)] =
+    private def distributeTime(t: Time, bins: List[(T, Int)]): List[(Time, Int)] =
       bins match {
         case Nil => Nil
         case head :: tail => {

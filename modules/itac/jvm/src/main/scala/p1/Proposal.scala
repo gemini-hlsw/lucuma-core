@@ -5,8 +5,8 @@ package edu.gemini.tac.qengine.p1
 
 import edu.gemini.tac.qengine.util.Time
 import edu.gemini.tac.qengine.ctx.Partner
-import edu.gemini.spModel.core.Site
 import java.io.File
+import lucuma.core.enums.Site
 
 case class Proposal(
   ntac: Ntac,
@@ -18,8 +18,8 @@ case class Proposal(
   isPoorWeather: Boolean = false,
   piName: Option[String] = None,
   piEmail: Option[String] = None,
-  p1proposal: edu.gemini.model.p1.immutable.Proposal = null, // to avoid having to generate one for testcases that don't care
-  p1mutableProposal: edu.gemini.model.p1.mutable.Proposal = null, // to avoid having to generate one for testcases that don't care
+  p1proposal: Null = ???, // edu.gemini.model.p1.immutable.Proposal = null, // to avoid having to generate one for testcases that don't care
+  p1mutableProposal: Null = ???, // edu.gemini.model.p1.mutable.Proposal = null, // to avoid having to generate one for testcases that don't care
   p1xmlFile: File = null, // to avoid having to generate one for testcases that don't care
   itacComment: Option[String] = None,
 ) {
@@ -78,7 +78,7 @@ object Proposal {
   final case class Id(partner: Partner, reference: String)
   object Id {
     implicit val OrderingId: Ordering[Id] =
-      Ordering.by(id => (id.partner.id, id.reference))
+      Ordering.by(id => (id.partner.tag, id.reference))
   }
 
   case class Pdfs[A](

@@ -6,8 +6,10 @@ package edu.gemini.tac.qengine.p1
 import edu.gemini.tac.qengine.util.Time
 import edu.gemini.tac.qengine.p1.Ntac.Rank
 import edu.gemini.tac.qengine.ctx.Partner
-import edu.gemini.model.p1.immutable.{ Submission, NgoSubmission }
+// import edu.gemini.model.p1.immutable.{ Submission, NgoSubmission }
 
+trait Submission
+trait NgoSubmission
 
 case class Ntac(partner: Partner,
   reference: String,

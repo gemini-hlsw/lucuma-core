@@ -3,12 +3,12 @@
 
 package edu.gemini.tac.qengine.p2.rollover
 
-import scalaz._, Scalaz._
-import edu.gemini.spModel.core.{ Semester, Site }
 import edu.gemini.tac.qengine.util.Time
 import java.time.Instant
-import scala.util.Try
-import scala.xml.Node
+import lucuma.core.enums.Site
+import lucuma.core.model.Semester
+import lucuma.core.model.Semester.YearInt
+import lucuma.core.enums.Half
 
 /**
  * A collection of rollover observations whose time values should be deducted
@@ -54,20 +54,20 @@ object RolloverReport {
    *
    * @return a RolloverReport, or a message on failure.
    */
-  def fromXml(rollover: Node): Either[String, RolloverReport] =
-    Try {
-      val site = Site.parse(rollover \@ "site")
-      val sem  = Semester.parse(rollover \@ "semester")
-      val ins  = Instant.ofEpochMilli((rollover \@ "timestamp").toLong)
-      val ros  = (rollover \ "obs").toList.traverseU(RolloverObservation.fromXml)
-      ros match {
-        case Right(ros) => RolloverReport(site, sem, ins, ros)
-        case Left(e)    => sys.error(e)
-      }
-    } .toEither.leftMap(_.getMessage)
+  // def fromXml(rollover: Node): Either[String, RolloverReport] =
+  //   Try {
+  //     val site = Site.parse(rollover \@ "site")
+  //     val sem  = Semester.parse(rollover \@ "semester")
+  //     val ins  = Instant.ofEpochMilli((rollover \@ "timestamp").toLong)
+  //     val ros  = (rollover \ "obs").toList.traverseU(RolloverObservation.fromXml)
+  //     ros match {
+  //       case Right(ros) => RolloverReport(site, sem, ins, ros)
+  //       case Left(e)    => sys.error(e)
+  //     }
+  //   } .toEither.leftMap(_.getMessage)
 
   /** An empty report with arbitrary site, semester, timestamp, and no observations. */
   def empty: RolloverReport =
-    RolloverReport(Site.GN, Semester.parse("2020A"), Instant.EPOCH, Nil)
+    RolloverReport(Site.GN, Semester(YearInt.unsafeFrom(2020), Half.A), Instant.EPOCH, Nil)
 
 }

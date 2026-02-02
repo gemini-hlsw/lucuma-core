@@ -7,8 +7,6 @@ import edu.gemini.qengine.skycalc.{RaDecBinCalc, RaBinSize}
 import edu.gemini.tac.qengine.api.config.Shutdown
 import edu.gemini.tac.qengine.ctx.Context
 import edu.gemini.tac.qengine.util.Time
-
-import scala.jdk.CollectionConverters._
 import lucuma.core.enums.Site
 
 /**
@@ -17,8 +15,8 @@ import lucuma.core.enums.Site
 object ShutdownCalc {
 
   def timePerRa(s: Shutdown, size: RaBinSize): List[Time] =
-    RaDecBinCalc.RA_CALC.calc(s.site, s.start, s.end, size).asScala.toList map {
-      hrs => Time.hours(hrs.getHours)
+    RaDecBinCalc.RA_CALC.calc(s.site, s.start, s.end, size).map {
+      hrs => Time.hours(hrs.hours)
     }
 
   def asTime(s: Shutdown, size: RaBinSize): Time =
