@@ -13,6 +13,9 @@ Global / concurrentRestrictions += Tags.limit(Tags.Compile, 1)
 ThisBuild / crossScalaVersions := Seq("3.7.4")
 ThisBuild / scalacOptions += "-language:implicitConversions" // TODO
 
+ThisBuild / resolvers += "Gemini Repository" at "https://github.com/gemini-hlsw/maven-repo/raw/master/releases"
+
+
 lazy val catsVersion                = "2.13.0"
 lazy val catsCollctionsVersion      = "0.9.10"
 lazy val catsEffectVersion          = "3.6.3"
@@ -48,7 +51,7 @@ lazy val spireVersion               = "0.18.0"
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
-val root = tlCrossRootProject.aggregate(core, testkit, tests, catalog, ags, catalogTestkit, catalogTests, horizons, horizonsTests, npm)
+val root = tlCrossRootProject.aggregate(core, testkit, tests, catalog, ags, catalogTestkit, catalogTests, horizons, horizonsTests, itac, itacTests, npm)
 
 lazy val core = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Full)
@@ -206,6 +209,40 @@ lazy val horizonsTests = crossProject(JVMPlatform, JSPlatform)
     libraryDependencies ++= Seq(
       "org.http4s"    %% "http4s-ember-client" % http4sVersion % Test,
       "org.slf4j"     %  "slf4j-simple"        % slf4jVersion  % Test,
+    )
+  )
+  .jsSettings(
+    scalacOptions ~= (_.filterNot(Set("-Wdead-code"))),
+    libraryDependencies ++= Seq(
+      "org.http4s" %%% "http4s-dom" % http4sDomVersion % Test,
+    ),
+  )
+  .jsConfigure(_.enablePlugins(BundleMonPlugin))
+
+lazy val itac = crossProject(JVMPlatform, JSPlatform)
+  .crossType(CrossType.Full)
+  .in(file("modules/itac"))
+  .dependsOn(core)
+  .settings(
+    name := "lucuma-itac",
+    libraryDependencies ++= Seq(
+    )
+  )
+  .jsConfigure(_.enablePlugins(BundleMonPlugin))
+
+lazy val itacTests = crossProject(JVMPlatform, JSPlatform)
+  .crossType(CrossType.Full)
+  .in(file("modules/itac-tests"))
+  .enablePlugins(NoPublishPlugin)
+  .dependsOn(itac)
+  .settings(
+    name := "lucuma-itac-tests",
+    libraryDependencies ++= Seq(
+      "org.typelevel" %%% "munit-cats-effect"   % munitCatsEffectVersion % Test,
+    )
+  )
+  .jvmSettings(
+    libraryDependencies ++= Seq(
     )
   )
   .jsSettings(
