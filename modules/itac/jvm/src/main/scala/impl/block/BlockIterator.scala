@@ -5,12 +5,14 @@ package edu.gemini.tac.qengine.impl.block
 
 import edu.gemini.tac.qengine.util.Time
 
+import cats.syntax.all.*
 import BlockIterator.IMap
 import edu.gemini.tac.qengine.api.queue.time.PartnerTime
 import edu.gemini.tac.qengine.ctx.Partner
 import edu.gemini.tac.qengine.p1.{Observation, Proposal}
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import lucuma.core.util.Enumerated
 
 /**
  * An immutable iterator that can be used to generate time blocks across all
@@ -47,7 +49,7 @@ trait BlockIterator {
    * Computes the list of remaining proposals in the iterator.
    */
   def remPropList: List[Proposal] =
-    Partner.all.flatMap(p => iterMap(p).remainingProposals)
+    Enumerated[Partner].all.flatMap(p => iterMap(p).remainingProposals)
 
   /**
    *  The partner that occupies the current time quantum.
@@ -110,7 +112,7 @@ trait BlockIterator {
   private def advancePartner(s: Seq[Partner], blockIteratorByPartner: IMap, remaining: Set[Partner] = BlockIterator.validpartners(quantaMap)): BlockIterator = {
     if (remaining.isEmpty || s.isEmpty){
       //QueueCalculationLog.logger.log(Level.trace, "BlockIterator.empty()")
-      LOGGER.debug(<Event source="BlockIterator" event="Empty"/>.toString())
+      LOGGER.debug("""<Event source="BlockIterator" event="Empty"/>""".toString())
       BlockIterator.Empty
     } else {
       val hasNext1 = blockIteratorByPartner(s.head).hasNext
@@ -166,7 +168,7 @@ object BlockIterator {
   }
 
   private def genIterMap(m: Map[Partner, List[Proposal]], activeList : Proposal=>List[Observation]): IMap =
-    Partner.mkMap(Partner.all, m, Nil).map { case (k, v) => (k, PartnerBlockIterator.apply(v, activeList)) }
+    Enumerated[Partner].all.map(p => p -> m.get(p).orEmpty).toMap.map { case (k, v) => (k, PartnerBlockIterator.apply(v, activeList)) }
 
   // Finds the first partner that has a non-zero time quantum and a proposal
   // list and returns the sequence advanced to that partner and the time in its
@@ -182,7 +184,7 @@ object BlockIterator {
   // Calculates an initial set of valid partners.  It trims any partners
   // without a time quanta.  These partners should not appear in the sequence.
   private def validpartners(quantaMap: PartnerTime): Set[Partner] =
-    Partner.all.filter(!quantaMap(_).isZero).toSet
+    Enumerated[Partner].all.filter(!quantaMap(_).isZero).toSet
 
   /**
    * Constructs the TimeBlockIterator for the appropriate queue band category,

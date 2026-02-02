@@ -3,6 +3,8 @@
 
 package edu.gemini.tac.qengine.impl
 
+import cats.syntax.all.*
+import cats.data.State
 import edu.gemini.tac.qengine.api.{ BucketsAllocation, QueueCalc, QueueEngine }
 import edu.gemini.tac.qengine.api.config.{ ConditionsCategory, QueueEngineConfig }
 import edu.gemini.tac.qengine.api.queue.time.QueueTime
@@ -15,7 +17,6 @@ import edu.gemini.tac.qengine.p1._
 import edu.gemini.tac.qengine.p1.QueueBand._
 import edu.gemini.tac.qengine.util.BoundedTime
 import edu.gemini.tac.qengine.api.queue.ProposalQueue
-import scalaz._, Scalaz._
 
 object QueueEngine2 extends QueueEngine {
 
@@ -84,8 +85,8 @@ object QueueEngine2 extends QueueEngine {
 
     // Run the queues in order!
     val ((finalResource, band123log), (queue1WithoutClassical, queue2, queue3)) = (
-      runQueue(QBand1) |@| runQueue(QBand2) |@| runQueue(QBand3)
-    ).tupled.run((semesterResource, ProposalLog.Empty))
+      runQueue(QBand1), runQueue(QBand2), runQueue(QBand3)
+    ).tupled.run((semesterResource, ProposalLog.Empty)).value
 
     // Add classical proposals back to Band 1
     val queue1 = new ProposalQueue {

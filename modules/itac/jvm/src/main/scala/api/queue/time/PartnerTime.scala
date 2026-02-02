@@ -3,20 +3,21 @@
 
 package edu.gemini.tac.qengine.api.queue.time
 
+import cats.syntax.all.*
 import edu.gemini.tac.qengine.util.{Percent, Time}
 import edu.gemini.tac.qengine.ctx.Partner
-import scalaz._, Scalaz._
+import lucuma.core.util.Enumerated
 
 /** A total mapping from Partner to Time. */
 final class PartnerTime private (private val f: Partner => Time) extends (Partner => Time) {
   def map(op: Time => Time): PartnerTime = new PartnerTime(f map op)
   def filter(g: Partner => Boolean): PartnerTime = new PartnerTime(p => if (g(p)) f(p) else Time.Zero)
   def apply(p: Partner): Time = f(p)
-  def zipWith(p: PartnerTime)(g: (Time, Time) => Time): PartnerTime = new PartnerTime((f |@| p.f)(g))
+  def zipWith(p: PartnerTime)(g: (Time, Time) => Time): PartnerTime = new PartnerTime((f, p.f).mapN(g))
   def +(p: PartnerTime): PartnerTime = zipWith(p)(_ + _)
   def -(p: PartnerTime): PartnerTime = zipWith(p)(_ - _)
   def *(p: Percent): PartnerTime = map(_ * p)
-  def total: Time = Partner.all.foldMap(f)
+  def total: Time = Enumerated[Partner].all.foldMap(f)
   def add(p: Partner, t: Time): PartnerTime = this + PartnerTime.single(p, t)
 }
 

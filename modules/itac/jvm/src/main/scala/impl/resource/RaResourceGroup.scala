@@ -67,7 +67,8 @@ case class RaResourceGroup(val grp: RaBinGroup[RaResource]) extends Resource {
   }
 
   def reserveAvailable[U](reduction: U)(implicit ev: U => CategorizedTime): (RaResourceGroup, Time) =
-    reserveAvailable(reduction.time, reduction.target, reduction.conditions)
+    val ct = ev(reduction)
+    reserveAvailable(ct.time, ct.target, ct.conditions)
 
   def reserveAvailable[U](reductions: List[U])(implicit ev: U => CategorizedTime): (RaResourceGroup, Time) = {
     reductions.foldLeft((this,Time.Zero)) {

@@ -57,7 +57,7 @@ final case class DecResourceGroup(val bins: DecBinGroup[BoundedTime]) extends Re
         val updatedBins = bins.bins.zip(s).map(
           binAndBlock => addTooTime(binAndBlock._1, binAndBlock._2)
         )
-        Right(new DecResourceGroup(DecBinGroup.fromBins(updatedBins: _*)))
+        Right(new DecResourceGroup(DecBinGroup.fromBins(updatedBins*)))
       }
       case _ =>
         val cur = bins.bins.foldLeft(Time.ZeroHours)(_ + _.binValue.used)

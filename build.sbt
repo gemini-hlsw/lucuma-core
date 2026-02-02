@@ -228,6 +228,11 @@ lazy val itac = crossProject(JVMPlatform, JSPlatform)
     libraryDependencies ++= Seq(
     )
   )
+  .jvmSettings(
+    libraryDependencies ++= Seq(
+      "org.slf4j"     %  "slf4j-simple"           % slf4jVersion
+    )
+  )
   .jsConfigure(_.enablePlugins(BundleMonPlugin))
 
 lazy val itacTests = crossProject(JVMPlatform, JSPlatform)

@@ -44,7 +44,7 @@ final class QueueFrame(val queue: ProposalQueueBuilder, val iter: BlockIterator,
 
   private def logBlock(block : Block) = {
     val msg = "Block of time " + block.time.toHours + " proposed for Proposal[" +block.prop.id + "] w observation time=" + block.obs.time.toHours.toString + "" +
-      " Proposal Awarded [" + block.prop.ntac.awardedTime.toHours.toString + "] by " + block.prop.ntac.partner.id + "]"
+      " Proposal Awarded [" + block.prop.ntac.awardedTime.toHours.toString + "] by " + block.prop.ntac.partner.tag + "]"
     LOGGER.debug(msg)
     //applicationLogger.log(Level.trace, "next():" + block.toString);
   }

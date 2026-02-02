@@ -9,7 +9,7 @@ import edu.gemini.tac.qengine.ctx.Context
 import edu.gemini.tac.qengine.util.Time
 
 import scala.jdk.CollectionConverters._
-import edu.gemini.spModel.core.Site
+import lucuma.core.enums.Site
 
 /**
  *
@@ -26,8 +26,8 @@ object ShutdownCalc {
 
   def trim(s: Shutdown, ctx: Context): Option[Shutdown] = {
     val semester = ctx.semester
-    val semStart = semester.getStartDate(ctx.site)
-    val semEnd   = semester.getEndDate(ctx.site)
+    val semStart = semester.start.atSite(ctx.site)
+    val semEnd   = semester.end.atSite(ctx.site)
 
     if ((ctx.site != s.site) || (s.end.compareTo(semStart) <= 0) || (s.start.compareTo(semEnd) >= 0)) None
     else {
@@ -40,9 +40,7 @@ object ShutdownCalc {
   }
 
   def trim(sds: List[Shutdown], ctx: Context): List[Shutdown] =
-    for {
-      Some(sd) <- sds.map { trim(_, ctx) }
-    } yield sd
+    sds.flatMap(trim(_, ctx))
 
   /**
    * Combines visible hours per RA for all the given shutdown periods into a
@@ -70,7 +68,7 @@ object ShutdownCalc {
         case head :: tail =>
           val (_, res) = tail.foldLeft((head,true)) {
             case ((last, result), cur) =>
-              (cur, result && (last.end.getTime <= cur.start.getTime))
+              (cur, result && (last.end.isBefore(cur.start) || last.end.equals(cur.start)))
           }
           res
       }

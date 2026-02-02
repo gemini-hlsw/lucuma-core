@@ -3,11 +3,11 @@
 
 package edu.gemini.tac.qengine.api.queue
 
+import cats.syntax.all.*
 import edu.gemini.tac.qengine.p1._
 import edu.gemini.tac.qengine.api.queue.time.QueueTime
 import edu.gemini.tac.qengine.util.{BoundedTime, Time}
 import edu.gemini.tac.qengine.ctx.Partner
-import scalaz._, Scalaz._
 
 /** A queue for a single band. */
 trait ProposalQueue {
@@ -20,7 +20,7 @@ trait ProposalQueue {
     toList.foldMap(_.time)
 
   def usedTime(p: Partner): Time =
-    toList.filter(_.ntac.partner == p).foldMap(_.time)
+    toList.filter(_.ntac.partner === p).foldMap(_.time)
 
   def remainingTime(partner: Partner): Time =
     queueTime(partner) - usedTime(partner)

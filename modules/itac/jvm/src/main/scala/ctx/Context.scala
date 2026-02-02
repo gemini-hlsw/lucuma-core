@@ -3,7 +3,7 @@
 
 package edu.gemini.tac.qengine.ctx
 
-import edu.gemini.spModel.core.Site
-import edu.gemini.spModel.core.Semester
+import lucuma.core.enums.Site
+import lucuma.core.model.Semester
 
-final case class Context(site: Site, semester: Semester)
+final case class Context(site: Site, semester: Semester) 

@@ -3,9 +3,11 @@
 
 package edu.gemini.tac.qengine.impl
 
+import cats.syntax.all.*
+import cats.data.*
 import edu.gemini.tac.qengine.p1._
-import scalaz._, Scalaz._
 import org.slf4j.LoggerFactory
+import cats.data.Validated
 
 object QueueEngineBandProblems {
   import QueueBand._
@@ -40,16 +42,17 @@ object QueueEngineBandProblems {
       s"Standard TOO proposal in band ${b.number}"
   }
 
-  val All: List[Problem] =
-    List(ClassicalNotInBand1, NoObsInBand, LpInBand3Or4, RapidTooOutsideBand1, StandardTooOutsideBand12)
+  val All: NonEmptyList[Problem] =
+    NonEmptyList.of(ClassicalNotInBand1, NoObsInBand, LpInBand3Or4, RapidTooOutsideBand1, StandardTooOutsideBand12)
 
-  def checkAll(p: Proposal, b: QueueBand): ValidationNel[String, Unit] =
-    All.foldMap(problem => problem.lift((p, b)).toFailureNel(()))
+  def checkAll(p: Proposal, b: QueueBand): ValidatedNel[String, Unit] =
+    All.foldMap: problem => 
+      problem.lift((p, b)).fold(().valid)(NonEmptyList.one(_).invalid)
 
   def unsafeCheckAll(p: Proposal, b: QueueBand): Unit =
     checkAll(p, b) match {
-      case Success(u)  => u
-      case Failure(es) => es.toList.foreach(w => Log.warn(s"${p.ntac.reference}: $w"))
+      case Validated.Valid(u)  => u
+      case Validated.Invalid(es) => es.toList.foreach(w => Log.warn(s"${p.ntac.reference}: $w"))
     }
 
 }

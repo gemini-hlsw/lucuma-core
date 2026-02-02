@@ -16,8 +16,9 @@ import edu.gemini.tac.qengine.util.Time
  * over time is spread across the remaining bins.
  */
 object TooBlocks {
-  private val indexOrdering: Ordering[(_, Int)] = new Ordering[(_, Int)] {
-    def compare(x: (_, Int), y: (_, Int)) = x._2 - y._2
+
+  private def indexOrdering[A]: Ordering[(A, Int)] = new Ordering[(A, Int)] {
+    def compare(x: (A, Int), y: (A, Int)) = x._2 - y._2
   }
 
   private def remainingTimeOrdering[T](remTime: T => Time): Ordering[(T, Int)] = new Ordering[(T, Int)] {
