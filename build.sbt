@@ -2,7 +2,7 @@ import org.scalajs.linker.interface.ESVersion
 import org.typelevel.sbt.gha.PermissionValue
 import org.typelevel.sbt.gha.Permissions
 
-ThisBuild / tlBaseVersion                         := "0.172"
+ThisBuild / tlBaseVersion                         := "0.173"
 ThisBuild / tlCiReleaseBranches                   := Seq("master")
 ThisBuild / githubWorkflowEnv += "MUNIT_FLAKY_OK" -> "true"
 
@@ -145,7 +145,7 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform)
   )
 
 lazy val catalog = crossProject(JVMPlatform, JSPlatform)
-  .crossType(CrossType.Pure)
+  .crossType(CrossType.Full)
   .in(file("modules/catalog"))
   .dependsOn(core)
   .settings(
@@ -168,6 +168,11 @@ lazy val catalog = crossProject(JVMPlatform, JSPlatform)
       "edu.gemini"    %%% "clue-core"            % clueVersion,
       "edu.gemini"    %%% "clue-http4s"          % clueVersion,
       "org.typelevel" %%% "log4cats-core"        % log4catsVersion
+    )
+  )
+  .jvmSettings(
+    libraryDependencies ++= Seq(
+      "co.fs2" %% "fs2-io" % fs2Version
     )
   )
   .jsConfigure(_.enablePlugins(BundleMonPlugin))
