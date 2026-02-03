@@ -10,7 +10,6 @@ import edu.gemini.tac.qengine.p1.ObservingConditions
 import edu.gemini.tac.qengine.p1.SkyBackground.*
 import edu.gemini.tac.qengine.p1.WaterVapor.*
 import edu.gemini.tac.qengine.util.Percent
-
 import munit.FunSuite
 
 class ConditionsBinGroupTest extends FunSuite {

@@ -3,13 +3,13 @@
 
 package edu.gemini.qengine.skycalc
 
-import lucuma.core.model.Semester
-import lucuma.core.enums.Site
 import lucuma.core.enums.Half.*
-import lucuma.core.model.Semester.YearInt
+import lucuma.core.enums.Site
 import lucuma.core.enums.TwilightType
-import munit.FunSuite
+import lucuma.core.model.Semester
+import lucuma.core.model.Semester.YearInt
 import lucuma.core.model.TwilightBoundedNight
+import munit.FunSuite
 
 class SemesterTest extends FunSuite{
 

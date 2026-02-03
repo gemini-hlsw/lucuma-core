@@ -12,9 +12,9 @@ import edu.gemini.tac.qengine.p1.WaterVapor.*
 import edu.gemini.tac.qengine.util.Percent
 import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.Site
+import munit.FunSuite
 
 import scala.Ordering.Implicits.*
-import munit.FunSuite
 
 class TimeRestrictionTest extends FunSuite {
 

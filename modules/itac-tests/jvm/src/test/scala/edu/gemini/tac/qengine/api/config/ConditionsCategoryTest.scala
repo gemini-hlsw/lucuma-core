@@ -9,9 +9,9 @@ import edu.gemini.tac.qengine.p1.CloudCover.*
 import edu.gemini.tac.qengine.p1.ImageQuality.*
 import edu.gemini.tac.qengine.p1.SkyBackground.*
 import edu.gemini.tac.qengine.p1.WaterVapor.*
+import munit.FunSuite
 
 import Cat.*
-import munit.FunSuite
 
 class ConditionsCategoryTest extends FunSuite {
   private val oc = ObservingConditions(CC70, IQ20, SB20, WV20)

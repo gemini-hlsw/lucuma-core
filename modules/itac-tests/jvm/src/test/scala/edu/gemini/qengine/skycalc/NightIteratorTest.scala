@@ -3,15 +3,18 @@
 
 package edu.gemini.qengine.skycalc
 
-import java.util.{Date, Calendar, GregorianCalendar}
 import lucuma.core.enums.Site
-import java.util.TimeZone
-import munit.FunSuite
-import java.time.Duration
+import lucuma.core.enums.TwilightType
 import lucuma.core.model.Night
 import lucuma.core.model.TwilightBoundedNight
+import munit.FunSuite
+
+import java.time.Duration
 import java.time.Instant
-import lucuma.core.enums.TwilightType
+import java.util.Calendar
+import java.util.Date
+import java.util.GregorianCalendar
+import java.util.TimeZone
 
 class NightIteratorTest extends FunSuite {
   val site = Site.GS

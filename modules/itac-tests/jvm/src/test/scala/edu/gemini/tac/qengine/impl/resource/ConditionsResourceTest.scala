@@ -14,12 +14,13 @@ import edu.gemini.tac.qengine.util.Percent
 import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.Site
 import lucuma.core.util.Enumerated
+import munit.FunSuite
+
 import CloudCover.*
 import ImageQuality.IQ20
 import SkyBackground.SB20
 import WaterVapor.WV20
 import Cat.*
-import munit.FunSuite
 
 class ConditionsResourceTest extends FunSuite{
   import Partner.KR

@@ -13,10 +13,10 @@ import edu.gemini.tac.qengine.util.BoundedTime
 import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.Site
 import lucuma.core.util.Enumerated
+import munit.FunSuite
 import org.junit.*
 
 import Assert.*
-import munit.FunSuite
 
 class DecResourceTest extends FunSuite {
   import Partner.KR

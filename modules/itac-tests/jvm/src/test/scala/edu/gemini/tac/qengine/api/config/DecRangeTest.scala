@@ -4,10 +4,10 @@
 package edu.gemini.tac.qengine.api.config
 
 import edu.gemini.tac.qengine.p1.Target
+import munit.FunSuite
 import org.junit.*
 
 import Assert.*
-import munit.FunSuite
 
 class DecRangeTest extends FunSuite {
 

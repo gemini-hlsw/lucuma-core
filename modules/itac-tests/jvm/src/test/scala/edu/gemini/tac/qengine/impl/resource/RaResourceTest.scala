@@ -10,9 +10,9 @@ import edu.gemini.tac.qengine.log.RejectTarget
 import edu.gemini.tac.qengine.p1.*
 import edu.gemini.tac.qengine.util.Time
 import lucuma.core.util.Enumerated
+import munit.FunSuite
 
 import Fixture.{badCC, emptyQueue, goodCC}
-import munit.FunSuite
 
 class RaResourceTest extends FunSuite {
   import Partner.KR

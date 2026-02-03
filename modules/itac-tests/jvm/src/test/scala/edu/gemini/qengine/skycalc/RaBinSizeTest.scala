@@ -3,11 +3,11 @@
 
 package edu.gemini.qengine.skycalc
 
-import munit.FunSuite
+import lucuma.core.math.Coordinates
+import lucuma.core.math.Declination
 import lucuma.core.math.HourAngle
 import lucuma.core.math.RightAscension
-import lucuma.core.math.Declination
-import lucuma.core.math.Coordinates
+import munit.FunSuite
 
 class RaBinSizeTest extends FunSuite {
 

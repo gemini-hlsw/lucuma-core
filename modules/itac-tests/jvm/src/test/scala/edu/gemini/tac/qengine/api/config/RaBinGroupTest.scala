@@ -6,10 +6,9 @@ package edu.gemini.tac.qengine.api.config
 import edu.gemini.tac.qengine.p1.Target
 import edu.gemini.tac.qengine.util.Angle
 import edu.gemini.tac.qengine.util.Time
+import munit.FunSuite
 
 import scala.annotation.unused
-
-import munit.FunSuite
 
 class RaBinGroupTest extends FunSuite {
 

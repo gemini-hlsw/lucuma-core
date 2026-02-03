@@ -6,10 +6,9 @@ package edu.gemini.tac.qengine.api.config
 import edu.gemini.tac.qengine.p1.WaterVapor.WV50
 import edu.gemini.tac.qengine.util.Percent
 import edu.gemini.tac.qengine.util.Time
+import munit.FunSuite
 
 import scala.Ordering.Implicits.*
-
-import munit.FunSuite
 
 class RestrictionConfigTest extends FunSuite {
   test("testMapCombine") {

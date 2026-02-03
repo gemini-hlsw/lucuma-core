@@ -8,8 +8,8 @@ import edu.gemini.tac.qengine.p1.Proposal
 import edu.gemini.tac.qengine.p1.QueueBand
 import edu.gemini.tac.qengine.p1.QueueBand.*
 import edu.gemini.tac.qengine.p1.Too
-import org.junit.Assert
 import munit.FunSuite
+import org.junit.Assert
 
 class QueueEngineBandProblemsTest extends FunSuite {
   import QueueEngineBandProblems._
