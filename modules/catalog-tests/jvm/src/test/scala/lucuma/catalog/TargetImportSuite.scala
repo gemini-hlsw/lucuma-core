@@ -308,7 +308,7 @@ class TargetImportSuite extends CatsEffectSuite:
       .simple[IO]
       .use { client =>
         for
-          sedConfig   <- SEDDataLoader.load
+          sedConfig   <- SEDDataLoader.load[IO]
           simbadClient = SimbadClient.build(client, SEDMatcher.fromConfig(sedConfig))
           result      <- Files[IO]
                            .readAll(Path(file.getPath()))

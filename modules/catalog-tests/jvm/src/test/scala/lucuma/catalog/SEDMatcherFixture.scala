@@ -24,7 +24,7 @@ trait SEDMatcherFixture:
 
   val sedFixture = ResourceSuiteLocalFixture(
     "sedFixture",
-    Resource.eval(SEDDataLoader.load.map { config =>
+    Resource.eval(SEDDataLoader.load[IO].map { config =>
       val physics = new StellarPhysics(config.gravityTable)
       val library = new StellarLibraryParameters(config.stellarLibrary, physics)
       val matcher = new SEDMatcher(library, physics)

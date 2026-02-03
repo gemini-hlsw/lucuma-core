@@ -46,7 +46,7 @@ object TelluricTargetsQueryApp extends IOApp.Simple:
       .simple[IO]
       .use: client =>
         for
-          sedConfig      <- SEDDataLoader.load
+          sedConfig      <- SEDDataLoader.load[IO]
           simbadClient    = SimbadClient.build(client, SEDMatcher.fromConfig(sedConfig))
           telluricClient <- TelluricTargetsClient.build(telluricUri, client, simbadClient)
           results        <- telluricClient.searchTarget(searchInput)

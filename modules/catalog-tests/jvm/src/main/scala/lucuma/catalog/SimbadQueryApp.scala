@@ -16,7 +16,7 @@ object SimbadQueryApp extends IOApp.Simple with SimbadQuerySample:
       .simple[IO]
       .use: client =>
         for
-          sedConfig <- SEDDataLoader.load
+          sedConfig <- SEDDataLoader.load[IO]
           result    <- simbadQuery[IO](client, SEDMatcher.fromConfig(sedConfig))
           _         <- IO.println(pprint.apply(result))
         yield ()

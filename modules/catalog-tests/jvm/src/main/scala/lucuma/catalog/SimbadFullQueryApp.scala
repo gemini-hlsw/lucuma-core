@@ -56,7 +56,7 @@ object SimbadFullQueryApp extends IOApp.Simple:
   override def run: IO[Unit] =
     JdkHttpClient.simple[IO].use { client =>
       for {
-        loader     <- SEDDataLoader.load
+        loader     <- SEDDataLoader.load[IO]
         matcher     = SEDMatcher.fromConfig(loader)
         physics     = new StellarPhysics(loader.gravityTable)
         library     = new StellarLibraryParameters(loader.stellarLibrary, physics)

@@ -3,25 +3,25 @@
 
 package lucuma.catalog.simbad
 
-import cats.effect.IO
-import cats.syntax.either.*
+import cats.effect.Sync
+import cats.syntax.all.*
 import fs2.io.readClassLoaderResource
 import fs2.text
 
 object SEDDataLoader:
-  def load: IO[SEDDataConfig] =
+  def load[F[_]: Sync]: F[SEDDataConfig] =
     for {
-      starsContent   <- loadResource("match_sed_stars.dat")
-      gravityContent <- loadResource("match_sed_log_g.csv")
-      stars          <- SEDDataParsers.parseStarsFile(starsContent).liftTo[IO]
-      gravity        <- SEDDataParsers.parseGravityFile(gravityContent).liftTo[IO]
+      starsContent   <- loadResource[F]("match_sed_stars.dat")
+      gravityContent <- loadResource[F]("match_sed_log_g.csv")
+      stars          <- SEDDataParsers.parseStarsFile(starsContent).liftTo[F]
+      gravity        <- SEDDataParsers.parseGravityFile(gravityContent).liftTo[F]
     } yield SEDDataConfig(stars, gravity)
 
-  def loadMatcher: IO[SEDMatcher] =
-    load.map(SEDMatcher.fromConfig)
+  def loadMatcher[F[_]: Sync]: F[SEDMatcher] =
+    load[F].map(SEDMatcher.fromConfig)
 
-  private def loadResource(name: String): IO[String] =
-    readClassLoaderResource[IO](s"lucuma/catalog/$name")
+  private def loadResource[F[_]: Sync](name: String): F[String] =
+    readClassLoaderResource[F](s"lucuma/catalog/$name")
       .through(text.utf8.decode)
       .compile
       .string
