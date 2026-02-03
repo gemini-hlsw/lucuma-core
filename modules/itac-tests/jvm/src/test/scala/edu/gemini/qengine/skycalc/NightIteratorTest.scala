@@ -27,7 +27,7 @@ class NightIteratorTest extends FunSuite {
     val cal0 = mkCal(2011, Calendar.JANUARY, 2, 16) // Jan 2, 2 PM
     val cal1 = mkCal(2011, Calendar.JANUARY, 1, 16) // Jan 1, 4 PM
 
-    val ni = new NightIterator(site, cal0.getTime, cal1.getTime)
+    val ni = NightIterator.bounded(TwilightType.Nautical, site, cal0.getTime, cal1.getTime)
     assertEquals(0, ni.toList.size)
   }
 
@@ -35,7 +35,7 @@ class NightIteratorTest extends FunSuite {
     val cal0 = mkCal(2011, Calendar.JANUARY, 1, 14) // 2 PM
     val cal1 = mkCal(2011, Calendar.JANUARY, 1, 16) // 4 PM
 
-    val ni = new NightIterator(site, cal0.getTime, cal1.getTime)
+    val ni = NightIterator.bounded(TwilightType.Nautical, site, cal0.getTime, cal1.getTime)
     assertEquals(0, ni.toList.size)
   }
 
@@ -43,7 +43,7 @@ class NightIteratorTest extends FunSuite {
     val cal0 = mkCal(2011, Calendar.JANUARY, 1, 23) // 11 PM, Jan 1
     val cal1 = mkCal(2011, Calendar.JANUARY, 2, 0)  // 12 AM, Jan 2
 
-    val ni  = new NightIterator(site, cal0.getTime, cal1.getTime)
+    val ni  = NightIterator.bounded(TwilightType.Nautical, site, cal0.getTime, cal1.getTime)
     val lst = ni.toList
     assertEquals(1, lst.size)
 
@@ -59,7 +59,7 @@ class NightIteratorTest extends FunSuite {
     val cal1 = mkCal(2011, Calendar.JANUARY, 1, 23) // 11 PM, Jan 1
     val cal2 = mkCal(2011, Calendar.JANUARY, 2, 23) // 11 PM, Jan 2
 
-    val ni  = new NightIterator(site, cal1.getTime, cal2.getTime)
+    val ni  = NightIterator.bounded(TwilightType.Nautical, site, cal1.getTime, cal2.getTime)
     val lst = ni.toList
     assertEquals(2, lst.size)
 
@@ -80,7 +80,7 @@ class NightIteratorTest extends FunSuite {
     val cal1 = mkCal(2011, Calendar.JANUARY, 1, 14) // 2 PM, Jan 1
     val cal2 = mkCal(2011, Calendar.JANUARY, 2, 14) // 2 PM, Jan 2
 
-    val ni  = new NightIterator(site, cal1.getTime, cal2.getTime)
+    val ni  = NightIterator.bounded(TwilightType.Nautical, site, cal1.getTime, cal2.getTime)
     val lst = ni.toList
     assertEquals(1, lst.size)
 
@@ -98,7 +98,7 @@ class NightIteratorTest extends FunSuite {
     val cal2 = mkCal(2011, Calendar.JANUARY, 2, 14) // 2 PM, Jan 2
     val cal3 = mkCal(2011, Calendar.JANUARY, 3, 14) // 2 PM, Jan 2
 
-    val ni  = new NightIterator(site, cal1.getTime, cal3.getTime)
+    val ni  = NightIterator.bounded(TwilightType.Nautical, site, cal1.getTime, cal3.getTime)
     val lst = ni.toList
     assertEquals(2, lst.size)
 

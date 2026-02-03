@@ -13,10 +13,7 @@ import lucuma.core.model.ObservingNight
 import cats.syntax.all.*
 import lucuma.core.math.BoundedInterval
 import org.typelevel.cats.time.*
-
-class NightIterator(site: Site, start: Date, end: Date) extends Iterator[Night]:
-  val delegate = NightIterator.bounded(TwilightType.Nautical, site, start.toInstant(), end.toInstant())
-  export delegate.{ next, hasNext }
+import lucuma.core.model.Semester
 
 object NightIterator: 
 
@@ -36,9 +33,15 @@ object NightIterator:
         from(tpe, ObservingNight.fromSiteAndInstant(site, start))
           .map: n =>
             (n.interval & bounds).map: i =>
-              println(i.toInterval.isEmpty)
               new Night:
                 export n.site
                 val interval = i
           .takeWhile(_.isDefined).map(_.get) // n.b. `collect` doesn't work on Iterators
           
+  def bounded(tpe: TwilightType, site: Site, start: Date, end: Date): Iterator[Night] =
+    bounded(tpe, site, start.toInstant(), end.toInstant())
+
+  def bounded(tpe: TwilightType, site: Site, semester: Semester): Iterator[Night] =
+    println(s"Semester start is ${semester.start.atSite(site).toInstant()}")
+    println(s"Semester end   is ${semester.end.atSite(site).toInstant()}")
+    bounded(tpe, site, semester.start.atSite(site).toInstant(), semester.end.atSite(site).toInstant())
