@@ -28,8 +28,9 @@ import lucuma.core.util.NewType
 
 // Gaia DR3 positions are at epoch 2016.0. To include high-proper-motion
 // stars that may have moved into the patrol field since 2016, we pad the
-// query radius by ~3 arcmin to reach ~10 arcmin total.
-val DefaultAreaBuffer: Angle = 183.arcseconds
+// query radius by 156 arcsecs which corresponds to Barnard's star
+// moving over 15y.
+val DefaultAreaBuffer: Angle = 156.arcseconds
 
 val baseFwhm = Wavelength.fromIntNanometers(500).get
 
