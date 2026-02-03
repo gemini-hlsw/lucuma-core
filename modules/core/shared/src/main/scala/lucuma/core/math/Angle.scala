@@ -557,6 +557,14 @@ object HourAngle extends HourAngleOptics {
     fromMicroseconds((hs * µsPerHour).round)
 
   /**
+   * Construct a new HourAngle of the given magnitude in floating point minutes, modulo 24h.
+   * Approximate.
+   * @group Constructors
+   */
+  def fromDoubleMinutes(ms: Double): HourAngle =
+    fromDoubleHours(ms / 60.0)
+
+  /**
    * Construct a new HourAngle of the given magnitude in double degrees, modulo 360°. Approximate.
    * @group Constructors
    */
@@ -649,6 +657,13 @@ object HourAngle extends HourAngleOptics {
     */
     def toDoubleHours: Double =
       toMicroseconds.toDouble / HourAngle.µsPerHour
+
+    /**
+    * This `HourAngle` in decimal minutes. Approximate.
+    * @group Conversions
+    */
+    def toDoubleMinutes: Double =
+      toDoubleHours * 60.0
 
     /**
     * Sum of this HourAngle and `ha`. Exact, commutative, invertible.

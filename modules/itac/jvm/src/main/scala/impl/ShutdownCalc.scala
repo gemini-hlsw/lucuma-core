@@ -47,7 +47,7 @@ object ShutdownCalc {
    */
   def sumHoursPerRa(shutdowns: List[Shutdown], size: RaBinSize): List[Time] = {
     val lsts  = shutdowns.map { timePerRa(_, size) }
-    val zeros = List.fill(size.getBinCount)(Time.ZeroHours)
+    val zeros = List.fill(size.binCount)(Time.ZeroHours)
 
     lsts.foldLeft(zeros) {
       (sum, cur) => sum.zip(cur).map { case (t1, t2) => t1 + t2 }

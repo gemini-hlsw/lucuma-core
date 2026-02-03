@@ -3,7 +3,22 @@
 
 package edu.gemini.qengine.skycalc
 
-import scala.annotation.unused
+import lucuma.core.math.RightAscension
+import lucuma.core.math.HourAngle
 
-trait RaBinSize(@unused min: Int):
-  def getBinCount: Int = ???
+sealed abstract case class RaBinSize(arcMinutes: Int):
+
+  def binCount: Int = 1440 / arcMinutes
+
+  def genRas: List[RightAscension] =
+    val half = arcMinutes.toDouble / 2.0
+    (0 until binCount).toList.map: b =>
+      RightAscension(HourAngle.fromDoubleMinutes(b * arcMinutes + half))
+
+object RaBinSize:
+
+  def ofArcMinutes(arcMinutes: Int): Option[RaBinSize] =
+    Some(arcMinutes)
+      .filter(_ > 0)
+      .filter(1440 % _ == 0)
+      .map(new RaBinSize(_) {})
