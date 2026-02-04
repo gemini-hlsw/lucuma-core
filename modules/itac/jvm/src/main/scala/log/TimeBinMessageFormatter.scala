@@ -22,7 +22,7 @@ trait TimeBinMessageFormatter {
     val obsTime = prop.relativeObsTime(obs, band)
     val target  = obs.target
     val targetName = target.name.map(n => "'%s' ".format(n)).getOrElse("")
-    obsInfoTemplate.format(obsTime.toHours.value, targetName, target.ra.toHr.mag, target.dec.toDeg.mag)
+    obsInfoTemplate.format(obsTime.toHours.value, targetName, target.ra.toHourAngle.toDoubleHours, target.dec.toAngle.toDoubleDegrees)
   }
 
   private val detailTemplate    = "%s. Reject %s."

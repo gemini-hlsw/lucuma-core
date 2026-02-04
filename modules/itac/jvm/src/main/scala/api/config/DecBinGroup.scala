@@ -4,7 +4,7 @@
 package edu.gemini.tac.qengine.api.config
 
 import edu.gemini.tac.qengine.p1.Target
-import edu.gemini.tac.qengine.util.Angle
+import lucuma.core.math.Declination
 
 object DecBinGroup {
   val TotalDeg = 180
@@ -48,19 +48,19 @@ case class DecBinGroup[T] private (val bins: IndexedSeq[DecBin[T]]) {
     f(bin.binValue).map(bv => new DecBinGroup(bins.updated(i, new DecBin(bin.range, bv))))
   }
 
-  def updated(dec: Angle, f: T => Option[T]): Option[DecBinGroup[T]] = indexOf(dec) match {
+  def updated(dec: Declination, f: T => Option[T]): Option[DecBinGroup[T]] = indexOf(dec) match {
     case i if i < 0 => None
     case i => updated(i, bins(i), f)
   }
 
-  def updated(dec: Angle, t: T): Option[DecBinGroup[T]] = indexOf(dec) match {
+  def updated(dec: Declination, t: T): Option[DecBinGroup[T]] = indexOf(dec) match {
     case i if i < 0 => None
     case i => Some(new DecBinGroup(bins.updated(i, DecBin(bins(i).range, t))))
   }
 
-  def indexOf(dec: Angle): Int = bins.indexWhere(_.range.contains(dec))
+  def indexOf(dec: Declination): Int = bins.indexWhere(_.range.contains(dec))
 
-  def get(dec: Angle): Option[DecBin[T]] = {
+  def get(dec: Declination): Option[DecBin[T]] = {
     bins.find(_.range.contains(dec))
   }
   def get(t: Target): Option[DecBin[T]] = get(t.dec)

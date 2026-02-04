@@ -3,10 +3,10 @@
 
 package edu.gemini.tac.qengine.api.config
 
-import edu.gemini.tac.qengine.p1.Target
-import edu.gemini.tac.qengine.util.Angle
 import edu.gemini.tac.qengine.util.Percent
 import munit.FunSuite
+import lucuma.core.math.Declination
+import edu.gemini.tac.qengine.p1.Target
 
 class DecBinGroupTest extends FunSuite {
 
@@ -19,21 +19,21 @@ class DecBinGroupTest extends FunSuite {
 
   test("testGen10deg") {
     val grp = DecBinGroup.gen10DegBins(f)
-    assertEquals(None, grp.get(new Angle(-10, Angle.Deg)))
-    assertEquals(Percent(0), grp.get(Angle.angleDeg0).get.binValue)
-    assertEquals(Percent(0), grp.get(new Angle(9.9, Angle.Deg)).get.binValue)
-    assertEquals(Percent(80), grp.get(new Angle(80, Angle.Deg)).get.binValue)
-    assertEquals(Percent(80), grp.get(new Angle(90, Angle.Deg)).get.binValue)
+    assertEquals(None, grp.get(Declination.fromDoubleDegrees(-10).get))
+    assertEquals(Percent(0), grp.get(Declination.Zero).get.binValue)
+    assertEquals(Percent(0), grp.get(Declination.fromDoubleDegrees(9.9).get).get.binValue)
+    assertEquals(Percent(80), grp.get(Declination.fromDoubleDegrees(80).get).get.binValue)
+    assertEquals(Percent(80), grp.get(Declination.fromDoubleDegrees(90).get).get.binValue)
   }
 
   test("testGen20deg") {
     val grp = DecBinGroup.gen20DegBins(f)
-    assertEquals(None, grp.get(new Angle(-10, Angle.Deg)))
-    assertEquals(None, grp.get(Angle.angleDeg0))
-    assertEquals(Percent(10), grp.get(new Angle(10, Angle.Deg)).get.binValue)
-    assertEquals(Percent(10), grp.get(new Angle(19.9, Angle.Deg)).get.binValue)
-    assertEquals(Percent(70), grp.get(new Angle(70, Angle.Deg)).get.binValue)
-    assertEquals(Percent(70), grp.get(new Angle(90, Angle.Deg)).get.binValue)
+    assertEquals(None, grp.get(Declination.fromDoubleDegrees(-10).get))
+    assertEquals(None, grp.get(Declination.Zero))
+    assertEquals(Percent(10), grp.get(Declination.fromDoubleDegrees(10).get).get.binValue)
+    assertEquals(Percent(10), grp.get(Declination.fromDoubleDegrees(19.9).get).get.binValue)
+    assertEquals(Percent(70), grp.get(Declination.fromDoubleDegrees(70).get).get.binValue)
+    assertEquals(Percent(70), grp.get(Declination.fromDoubleDegrees(90).get).get.binValue)
   }
 
   test("testBadBinSize") {
@@ -47,48 +47,40 @@ class DecBinGroupTest extends FunSuite {
 
   test("testUpdatedFunSome") {
     val grp = DecBinGroup.gen10DegBins(f)
-    val grp2 = grp.updated(Angle.angleDeg0, p => Some(Percent(p.value + 1))).get
-    assertEquals(Percent(1), grp2.get(Angle.angleDeg0).get.binValue)
+    val grp2 = grp.updated(Declination.Zero, p => Some(Percent(p.value + 1))).get
+    assertEquals(Percent(1), grp2.get(Declination.Zero).get.binValue)
   }
 
   test("testUpdatedFunNone") {
     val grp = DecBinGroup.gen10DegBins(f)
-    val opt = grp.updated(new Angle(-10, Angle.Deg), p => Some(Percent(p.value + 1)))
+    val opt = grp.updated(Declination.fromDoubleDegrees(-10).get, p => Some(Percent(p.value + 1)))
     assertEquals(None, opt)
   }
 
   test("testUpdatedSome") {
     val grp = DecBinGroup.gen10DegBins(f)
-    val grp2 = grp.updated(Angle.angleDeg0, Percent(42)).get
-    assertEquals(Percent(42), grp2.get(Angle.angleDeg0).get.binValue)
+    val grp2 = grp.updated(Declination.Zero, Percent(42)).get
+    assertEquals(Percent(42), grp2.get(Declination.Zero).get.binValue)
   }
 
   test("testUpdatedNone") {
     val grp = DecBinGroup.gen10DegBins(f)
-    assertEquals(None, grp.updated(new Angle(-10, Angle.Deg), Percent(42)))
+    assertEquals(None, grp.updated(Declination.fromDoubleDegrees(-10).get, Percent(42)))
   }
 
   test("testIndexOf") {
     val grp = DecBinGroup.gen10DegBins(f)
-    assertEquals(-1, grp.indexOf(new Angle(-10, Angle.Deg)))
-    assertEquals( 0, grp.indexOf(Angle.angleDeg0))
-    assertEquals( 8, grp.indexOf(new Angle( 80, Angle.Deg)))
-    assertEquals( 8, grp.indexOf(new Angle( 90, Angle.Deg)))
+    assertEquals(-1, grp.indexOf(Declination.fromDoubleDegrees(-10).get))
+    assertEquals( 0, grp.indexOf(Declination.Zero))
+    assertEquals( 8, grp.indexOf(Declination.fromDoubleDegrees( 80).get))
+    assertEquals( 8, grp.indexOf(Declination.fromDoubleDegrees( 90).get))
   }
 
   test("testApplyTarget") {
     val grp = DecBinGroup.gen10DegBins(f)
-    assertEquals(Percent( 0), grp.get(Target(new Angle(12, Angle.Hr), Angle.angleDeg0)).get.binValue)
-    assertEquals(Percent(70), grp.get(Target(new Angle(12, Angle.Hr), new Angle(70, Angle.Deg))).get.binValue)
-    assertEquals(None, grp.get(Target(new Angle(12, Angle.Hr), new Angle(-90, Angle.Deg))))
-  }
-
-  test("testMap") {
-    val grp = DecBinGroup.gen10DegBins(f)
-    val grpInt = grp.map(_.value)
-    assertEquals(None, grpInt.get(new Angle(-1, Angle.Deg)))
-    assertEquals(   0.0, grpInt.get(Angle.angleDeg0).get.binValue.doubleValue, Double.MinPositiveValue)
-    assertEquals(  10.0, grpInt.get(new Angle(15, Angle.Deg)).get.binValue.doubleValue, Double.MinPositiveValue)
+    assertEquals(Percent( 0), grp.get(Target(12 * 15, 0)).get.binValue)
+    assertEquals(Percent(70), grp.get(Target(12 * 16, 70)).get.binValue)
+    assertEquals(None, grp.get(Target(12 * 15, -90)))
   }
 
   test("testGenFromBinValues") {

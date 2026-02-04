@@ -49,7 +49,7 @@ class RaBinSizeTest extends FunSuite {
 
   }
 
-  test("testGenTargets".ignore) {
+  test("testGenTargets") {
     val sz = DecBinSize.ofDegrees(20).get
     val ra = RightAscension(HourAngle.fromDoubleHours(12))
     val wc = sz.genCoordinates(ra)

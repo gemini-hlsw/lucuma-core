@@ -20,13 +20,14 @@ import lucuma.core.util.Enumerated
 import munit.FunSuite
 
 import scala.Ordering.Implicits.*
+import lucuma.core.math.Coordinates
 
 class TimeResourceGroupTest extends FunSuite {
   import Partner.US
   val partners = Enumerated[Partner].all
 
   private val ntac   = Ntac(US, "x", 0, Time.hours(10))
-  private val target = Target(0.0, 0.0) // not used
+  private val target = Target(Coordinates.Zero) // not used
   private def conds(wv: WaterVapor) =
     ObservingConditions(CCAny, IQAny, SBAny, wv)
 

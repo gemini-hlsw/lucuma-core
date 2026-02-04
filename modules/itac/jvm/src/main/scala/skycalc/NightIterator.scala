@@ -42,6 +42,4 @@ object NightIterator:
     bounded(tpe, site, start.toInstant(), end.toInstant())
 
   def bounded(tpe: TwilightType, site: Site, semester: Semester): Iterator[Night] =
-    println(s"Semester start is ${semester.start.atSite(site).toInstant()}")
-    println(s"Semester end   is ${semester.end.atSite(site).toInstant()}")
     bounded(tpe, site, semester.start.atSite(site).toInstant(), semester.end.atSite(site).toInstant())

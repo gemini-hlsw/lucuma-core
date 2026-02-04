@@ -5,7 +5,7 @@ package edu.gemini.tac.qengine.api.config
 
 
 import edu.gemini.tac.qengine.p1.Target
-import edu.gemini.tac.qengine.util.Angle
+import lucuma.core.math.Declination
 
 /**
  * Defines a range of Declinations (interpreted as degrees).  DecRanges include
@@ -23,8 +23,8 @@ class DecRange(val startDeg: Int, val endDeg: Int) {
    */
   def inclusive: DecRange = DecRange.inclusive(startDeg, endDeg)
 
-  def contains(dec: Angle): Boolean = {
-    val dint = dec.toDeg.mag.toInt
+  def contains(dec: Declination): Boolean = {
+    val dint = dec.toAngle.toDoubleDegrees.toInt
     dint >= startDeg && dint < endDeg
   }
 
@@ -66,8 +66,8 @@ object DecRange {
   class Inclusive(startDeg: Int, endDeg: Int) extends DecRange(startDeg, endDeg) {
     override def isInclusive = true
     override def inclusive = this
-    override def contains(dec: Angle): Boolean = {
-      super.contains(dec) || dec.toDeg.mag == endDeg
+    override def contains(dec: Declination): Boolean = {
+      super.contains(dec) || dec.toAngle.toDoubleDegrees.toInt == endDeg
     }
     override def abutsRight(that: DecRange) = false
     override def toString: String = "(%d, %d)".format(startDeg, endDeg)

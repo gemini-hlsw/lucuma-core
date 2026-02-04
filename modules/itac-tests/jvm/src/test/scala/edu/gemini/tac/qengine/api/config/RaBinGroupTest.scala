@@ -4,11 +4,14 @@
 package edu.gemini.tac.qengine.api.config
 
 import edu.gemini.tac.qengine.p1.Target
-import edu.gemini.tac.qengine.util.Angle
 import edu.gemini.tac.qengine.util.Time
 import munit.FunSuite
 
 import scala.annotation.unused
+import lucuma.core.math.RightAscension
+import lucuma.core.math.HourAngle
+import lucuma.core.math.Declination
+import lucuma.core.math.Coordinates
 
 class RaBinGroupTest extends FunSuite {
 
@@ -16,7 +19,7 @@ class RaBinGroupTest extends FunSuite {
   // So, a 30 min Angle yields 30 minutes of time.  This makes it easy to test.
   // A real function would compute the number of minutes that the RA is
   // visible at night and return that amount of time.
-  private def f(a: Angle, @unused sizeMin: Int): Time = Time.minutes(a.mag)
+  private def f(a: RightAscension, @unused sizeMin: Int): Time = Time.minutes(a.toHourAngle.toDoubleMinutes)
 
   test("testGenerate1Hr") {
     val g1Hr = RaBinGroup.gen1HrBins(f)
@@ -51,11 +54,11 @@ class RaBinGroupTest extends FunSuite {
   }
 
   test("testLookupAngle") {
-    validateLookup((g, m) => g(new Angle(m, Angle.Min)))
+    validateLookup((g, m) => g(RightAscension(HourAngle.fromDoubleMinutes(m))))
   }
 
   test("testLookupTarget") {
-    validateLookup((g, m) => g(Target(new Angle(m, Angle.Min), Angle.angleDeg0)))
+    validateLookup((g, m) => g(Target(Coordinates(RightAscension(HourAngle.fromDoubleMinutes(m)), Declination.Zero))))
   }
 
   test("testMap") {
@@ -69,8 +72,8 @@ class RaBinGroupTest extends FunSuite {
   }
 
   test("testUpdated") {
-    val ra0 = new Angle( 0, Angle.Min)
-    val ra1 = new Angle(60, Angle.Min)
+    val ra0 = RightAscension(HourAngle.fromDoubleMinutes( 0))
+    val ra1 = RightAscension(HourAngle.fromDoubleMinutes(60))
     val min1 = Time.minutes(1)
     val bg = RaBinGroup.gen1HrBins(f).updated(ra0, Time.Zero).updated(ra1, min1)
     assertEquals(Time.Zero, bg(ra0))
@@ -87,7 +90,7 @@ class RaBinGroupTest extends FunSuite {
   test("testUpdatedFunSome") {
     val bg0 = RaBinGroup.gen1HrBins(f)
 
-    val ra0 = new Angle(0, Angle.Min)
+    val ra0 = RightAscension(HourAngle.fromDoubleMinutes(0))
     bg0.updated(ra0, doubleEveryOther) match {
       case Some(bg1) => assertEquals(bg0(ra0).value.toInt * 2, bg1(ra0).value.toInt)
       case _ => fail
@@ -97,7 +100,7 @@ class RaBinGroupTest extends FunSuite {
   test("testUpdatedFunNone") {
   val bg0 = RaBinGroup.gen1HrBins(f)
 
-    val ra1 = new Angle(60, Angle.Min)
+    val ra1 = RightAscension(HourAngle.fromDoubleMinutes(60))
     bg0.updated(ra1, doubleEveryOther) match {
       case None => // ok
       case _ => fail

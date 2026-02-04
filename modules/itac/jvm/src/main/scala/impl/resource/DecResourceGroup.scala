@@ -13,10 +13,10 @@ import edu.gemini.tac.qengine.log.RejectTarget
 import edu.gemini.tac.qengine.p1.QueueBand
 import edu.gemini.tac.qengine.p1.Target
 import edu.gemini.tac.qengine.p1.Too
-import edu.gemini.tac.qengine.util.Angle
 import edu.gemini.tac.qengine.util.BoundedTime
 import edu.gemini.tac.qengine.util.Percent
 import edu.gemini.tac.qengine.util.Time
+import lucuma.core.math.Declination
 
 object DecResourceGroup {
   def apply(t: Time, bins: DecBinGroup[Percent]): DecResourceGroup = {
@@ -34,16 +34,16 @@ object DecResourceGroup {
 final case class DecResourceGroup(val bins: DecBinGroup[BoundedTime]) extends Resource {
   type T = DecResourceGroup
 
-  private def lookup(dec: Angle, f: BoundedTime => Time): Time =
+  private def lookup(dec: Declination, f: BoundedTime => Time): Time =
     bins.get(dec).map(bin => f(bin.binValue)).getOrElse(Time.Zero)
 
-  def limit(dec: Angle): Time      = lookup(dec, _.limit)
+  def limit(dec: Declination): Time      = lookup(dec, _.limit)
   def limit(t: Target): Time       = limit(t.dec)
 
-  def remaining(dec: Angle): Time  = lookup(dec, _.remaining)
+  def remaining(dec: Declination): Time  = lookup(dec, _.remaining)
   def remaining(t: Target): Time   = remaining(t.dec)
 
-  def isFull(dec: Angle): Boolean  = remaining(dec).isZero
+  def isFull(dec: Declination): Boolean  = remaining(dec).isZero
   def isFull(t: Target): Boolean   = isFull(t.dec)
 
   private def reserveNormal(block: Block, band: QueueBand): RejectMessage Either DecResourceGroup = {
@@ -92,7 +92,7 @@ final case class DecResourceGroup(val bins: DecBinGroup[BoundedTime]) extends Re
    * declination.  Returns a new DecResourceGroup and any time that
    * could not be reserved.
    */
-  def reserveAvailable(time: Time, dec: Angle): (DecResourceGroup, Time) = {
+  def reserveAvailable(time: Time, dec: Declination): (DecResourceGroup, Time) = {
     bins.get(dec) match {
       case Some(DecBin(_, bt)) =>
         val (newBoundedTime, remainingTime) = bt.reserveAvailable(time)

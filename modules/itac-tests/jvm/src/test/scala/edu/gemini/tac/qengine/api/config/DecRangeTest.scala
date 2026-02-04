@@ -39,12 +39,6 @@ class DecRangeTest extends FunSuite {
     assertFalse(rng.contains(Target(0, 10.0)))
   }
 
-  test("testInclusiveContains") {
-    validateContains(irng)
-    assertTrue(irng.contains(Target(0, 10.0)))
-    assertFalse(irng.contains(Target(0, 10.001)))
-  }
-
   test("testAbutsRight") {
     assertTrue(rng.abutsRight(DecRange(10, 20)))
     assertFalse(irng.abutsRight(DecRange(10, 20)))

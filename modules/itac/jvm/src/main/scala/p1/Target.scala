@@ -3,14 +3,16 @@
 
 package edu.gemini.tac.qengine.p1
 
-import edu.gemini.tac.qengine.util.Angle
+import lucuma.core.math.Coordinates
+import lucuma.core.math.RightAscension
+import lucuma.core.math.HourAngle
+import lucuma.core.math.Declination
 
-object Target {
-  def apply(raDeg: Double, decDeg: Double, name: String): Target =
-    new Target(new Angle(raDeg, Angle.Deg), new Angle(decDeg, Angle.Deg), Option(name))
+case class Target(coords: Coordinates, name: Option[String] = None):
+  def ra = coords.ra
+  def dec = coords.dec
 
-  def apply(raDeg: Double, decDeg: Double): Target =
-    new Target(new Angle(raDeg, Angle.Deg), new Angle(decDeg, Angle.Deg))
-}
-
-case class Target(ra: Angle, dec: Angle, name: Option[String] = None)
+object Target:
+  // TODO: deprecate
+  def apply(ra: Double, dec: Double): Target =
+    Target(Coordinates(RightAscension(HourAngle.fromDoubleDegrees(ra)), Declination.fromDoubleDegrees(dec).get))
