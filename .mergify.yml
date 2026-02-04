@@ -81,6 +81,22 @@ pull_request_rules:
       add:
       - horizons-tests
       remove: []
+- name: Label itac PRs
+  conditions:
+  - files~=^modules/itac/
+  actions:
+    label:
+      add:
+      - itac
+      remove: []
+- name: Label itac-tests PRs
+  conditions:
+  - files~=^modules/itac-tests/
+  actions:
+    label:
+      add:
+      - itac-tests
+      remove: []
 - name: Label npm PRs
   conditions:
   - files~=^modules/npm/
