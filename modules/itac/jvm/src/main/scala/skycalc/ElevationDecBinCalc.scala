@@ -15,6 +15,7 @@ import spire.math.extras.interval.IntervalSeq
 import spire.math.interval.Closed
 import spire.math.interval.Open
 
+import java.time.Duration
 import java.time.Instant
 import java.time.ZonedDateTime
 
@@ -24,12 +25,13 @@ import java.time.ZonedDateTime
 class ElevationDecBinCalc(conf: ElevationConfig) extends DecBinCalc {
 
   def getSolvers(site: Site, coords: List[Coordinates]): List[BoundedInterval[Instant] => IntervalSeq[Instant]] =
+    val isc = ImprovedSkyCalc(site.place)
     coords.map: cs => 
       bi => 
         val samples = 
-          Samples.atFixedRate(bi, java.time.Duration.ofMinutes(1)): i =>
-            ImprovedSkyCalc(site.place).calculate(cs, i, false)
-        AirmassSolver(conf.minAirmass, conf.maxAirmass).solve(samples)(bi)
+          Samples.atFixedRate(bi, java.time.Duration.ofMinutes(15)): i =>
+            isc.calculate(cs, i, false)
+        AirmassSolver(conf.minAirmass, conf.maxAirmass, Duration.ofMinutes(7)).solve(samples)(bi)
 
   def calc(site: Site, start: ZonedDateTime, end: ZonedDateTime, size: DecBinSize, ra: RightAscension): List[Percent] =
     calc(site, start.toInstant(), end.toInstant(), size, ra)

@@ -19,6 +19,7 @@ import lucuma.core.math.RightAscension
 import lucuma.core.model.Semester
 
 import java.time.Instant
+import java.time.ZonedDateTime
 
 
 /**
@@ -52,6 +53,9 @@ object RaDecBinCalc {
     RaDecBinCalc(raHours, decPercents);
   }
 
+  def calc(site: Site, start: ZonedDateTime, end: ZonedDateTime, raSize: RaBinSize, decSize: DecBinSize): RaDecBinCalc =
+    calc(site, start.toInstant(), end.toInstant(), raSize, decSize)
+
   final case class Key(site: Site, semester: Semester, raBinSize: RaBinSize, decBinSize: DecBinSize)
 
   val CACHE_SIZE  = 50
@@ -81,7 +85,7 @@ object RaDecBinCalc {
     var res: RaDecBinCalc = null
     CACHE.synchronized(CACHE.get(key))
     if res == null then
-      res = calc(site, semester.start.atSite(site).toInstant(), semester.end.atSite(site).toInstant(), raSize, decSize)
+      res = calc(site, semester.start.atSite(site), semester.end.atSite(site), raSize, decSize)
       CACHE.synchronized(CACHE.put(key, res): Unit)
     res
     
