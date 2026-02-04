@@ -16,7 +16,7 @@ import lucuma.core.enums.Site
 object ShutdownCalc {
 
   def timePerRa(s: Shutdown, size: RaBinSize): List[Time] =
-    RaDecBinCalc.RA_CALC.calc(s.site, s.start, s.end, size).map {
+    RaDecBinCalc.RA_CALC.calc(s.site, s.start.toInstant(), s.end.toInstant(), size).map {
       hrs => Time.hours(hrs.hours)
     }
 

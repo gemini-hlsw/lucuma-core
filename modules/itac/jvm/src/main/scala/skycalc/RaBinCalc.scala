@@ -5,7 +5,7 @@ package edu.gemini.qengine.skycalc
 
 import lucuma.core.enums.Site
 
-import java.time.ZonedDateTime
+import java.time.Instant
 
 trait RaBinCalc:
-  def calc(site: Site, start: ZonedDateTime, end: ZonedDateTime, size: RaBinSize): List[Hours]
+  def calc(site: Site, start: Instant, end: Instant, size: RaBinSize): List[Hours]
