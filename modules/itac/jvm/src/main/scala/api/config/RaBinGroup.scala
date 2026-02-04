@@ -4,8 +4,8 @@
 package edu.gemini.tac.qengine.api.config
 
 import edu.gemini.tac.qengine.p1.Target
-import lucuma.core.math.RightAscension
 import lucuma.core.math.HourAngle
+import lucuma.core.math.RightAscension
 
 
 object RaBinGroup {

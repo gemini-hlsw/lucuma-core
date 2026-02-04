@@ -3,8 +3,8 @@
 
 package edu.gemini.qengine.skycalc
 
-import lucuma.core.math.RightAscension
 import lucuma.core.math.HourAngle
+import lucuma.core.math.RightAscension
 
 sealed abstract case class RaBinSize(arcMinutes: Int):
 

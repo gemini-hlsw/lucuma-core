@@ -3,11 +3,12 @@
 
 package edu.gemini.qengine.skycalc;
 
-import lucuma.core.enums.Site
-import java.time.Instant
 import edu.gemini.qengine.skycalc.DecBinSize
-import lucuma.core.math.RightAscension
 import edu.gemini.tac.qengine.util.Percent
+import lucuma.core.enums.Site
+import lucuma.core.math.RightAscension
+
+import java.time.Instant
 
 trait DecBinCalc:
   def calc(site: Site, start: Instant, end: Instant, size: DecBinSize, ra: RightAscension): List[Percent] 

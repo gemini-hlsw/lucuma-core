@@ -12,12 +12,13 @@
 
 package edu.gemini.qengine.skycalc;
 
-import lucuma.core.math.RightAscension
 import edu.gemini.tac.qengine.util.Percent
 import lucuma.core.enums.Site
-import java.time.Instant
-import lucuma.core.model.Semester
 import lucuma.core.enums.TwilightType
+import lucuma.core.math.RightAscension
+import lucuma.core.model.Semester
+
+import java.time.Instant
 
 
 /**

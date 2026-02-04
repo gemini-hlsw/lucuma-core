@@ -3,18 +3,19 @@
 
 package edu.gemini.qengine.skycalc;
 
-import lucuma.core.enums.Site
-import lucuma.core.math.Coordinates
-import lucuma.core.math.skycalc.solver.Samples
-import lucuma.core.math.BoundedInterval
-import spire.math.extras.interval.IntervalSeq
-import java.time.Instant
-import lucuma.core.math.skycalc.solver.AirmassSolver
-import lucuma.core.math.skycalc.ImprovedSkyCalc
-import lucuma.core.math.RightAscension
 import edu.gemini.tac.qengine.util.Percent
+import lucuma.core.enums.Site
+import lucuma.core.math.BoundedInterval
+import lucuma.core.math.Coordinates
+import lucuma.core.math.RightAscension
+import lucuma.core.math.skycalc.ImprovedSkyCalc
+import lucuma.core.math.skycalc.solver.AirmassSolver
+import lucuma.core.math.skycalc.solver.Samples
+import spire.math.extras.interval.IntervalSeq
 import spire.math.interval.Closed
 import spire.math.interval.Open
+
+import java.time.Instant
 import java.time.ZonedDateTime
 
 /**

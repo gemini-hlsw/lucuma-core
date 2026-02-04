@@ -5,13 +5,13 @@ package edu.gemini.tac.qengine.api.config
 
 import edu.gemini.tac.qengine.p1.Target
 import edu.gemini.tac.qengine.util.Time
+import lucuma.core.math.Coordinates
+import lucuma.core.math.Declination
+import lucuma.core.math.HourAngle
+import lucuma.core.math.RightAscension
 import munit.FunSuite
 
 import scala.annotation.unused
-import lucuma.core.math.RightAscension
-import lucuma.core.math.HourAngle
-import lucuma.core.math.Declination
-import lucuma.core.math.Coordinates
 
 class RaBinGroupTest extends FunSuite {
 

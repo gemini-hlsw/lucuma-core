@@ -3,17 +3,18 @@
 
 package edu.gemini.qengine.skycalc
 
+import cats.syntax.all.*
 import lucuma.core.enums.Site
 import lucuma.core.enums.TwilightType
-import lucuma.core.model.Night
-import lucuma.core.model.TwilightBoundedNight
-import java.util.Date
-import java.time.Instant
-import lucuma.core.model.ObservingNight
-import cats.syntax.all.*
 import lucuma.core.math.BoundedInterval
-import org.typelevel.cats.time.*
+import lucuma.core.model.Night
+import lucuma.core.model.ObservingNight
 import lucuma.core.model.Semester
+import lucuma.core.model.TwilightBoundedNight
+import org.typelevel.cats.time.*
+
+import java.time.Instant
+import java.util.Date
 
 object NightIterator: 
 

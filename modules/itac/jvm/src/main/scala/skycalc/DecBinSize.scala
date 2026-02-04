@@ -3,8 +3,8 @@
 
 package edu.gemini.qengine.skycalc
 
-import lucuma.core.math.Declination
 import lucuma.core.math.Coordinates
+import lucuma.core.math.Declination
 import lucuma.core.math.RightAscension
 
 sealed abstract case class DecBinSize(degrees: Int):

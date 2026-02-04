@@ -3,13 +3,14 @@
 
 package edu.gemini.qengine.skycalc;
 
+import lucuma.core.enums.Half
 import lucuma.core.enums.Site
-import java.time.Instant
 import lucuma.core.enums.TwilightType
 import lucuma.core.math.skycalc.ImprovedSkyCalc
 import lucuma.core.model.Semester
 import lucuma.core.model.Semester.YearInt
-import lucuma.core.enums.Half
+
+import java.time.Instant
 import java.time.ZonedDateTime
 
 /**
