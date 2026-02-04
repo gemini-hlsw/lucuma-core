@@ -24,18 +24,10 @@ trait Igrins2ScienceAreaGeometry:
   val scienceSlitFOV: ShapeExpression =
     ShapeExpression.centeredRectangle(ScienceFovWidth, ScienceFovHeight)
 
-  // I'm a bit unsure about this, in OCS it is defined this way
-  // but i don't think we have a need for this
-  val _scienceArea: ShapeExpression =
-    svcFieldOfView - scienceSlitFOV
-
   def svcFieldOfView(posAngle: Angle, offsetPos: Offset): ShapeExpression =
     svcFieldOfView.shapeAt(offsetPos, posAngle)
 
   def scienceSlitFOV(posAngle: Angle, offsetPos: Offset): ShapeExpression =
     scienceSlitFOV.shapeAt(offsetPos, posAngle)
-
-  def _shapeAt(posAngle: Angle, offsetPos: Offset): ShapeExpression =
-    _scienceArea.shapeAt(offsetPos, posAngle)
 
 object scienceArea extends Igrins2ScienceAreaGeometry

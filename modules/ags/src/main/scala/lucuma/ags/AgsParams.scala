@@ -256,3 +256,41 @@ object AgsParams:
     ): Flamingos2LongSlit = Flamingos2LongSlit(lyot, fpu, port, GuideProbe.Flamingos2OIWFS)
 
     val Flamingos2ScienceRadius = 20.arcseconds
+
+  case class Igrins2LongSlit private (
+    probe: GuideProbe
+  ) extends AgsParams
+      with SingleProbeAgsParams
+      with PwfsSupport[Igrins2LongSlit] derives Eq:
+    import lucuma.core.geom.igrins2
+    import lucuma.core.geom.pwfs
+
+    protected def withProbe(probe: GuideProbe): Igrins2LongSlit = copy(probe = probe)
+
+    override def patrolFieldAt(
+      posAngle: Angle,
+      offset:   Offset,
+      pivot:    Offset = Offset.Zero
+    ): ShapeExpression =
+      probe match
+        case GuideProbe.PWFS1 | GuideProbe.PWFS2 =>
+          pwfs.patrolField.patrolFieldAt(posAngle, offset, pivot)
+        case _                                   =>
+          ShapeExpression.empty
+
+    override def scienceArea(posAngle: Angle, offset: Offset): ShapeExpression =
+      igrins2.scienceArea.svcFieldOfView(posAngle, offset)
+
+    override def probeArm(posAngle: Angle, guideStar: Offset, offset: Offset): ShapeExpression =
+      probe match
+        case GuideProbe.PWFS1 | GuideProbe.PWFS2 =>
+          pwfs.probeArm.vignettedAreaAt(probe, guideStar, offset)
+        case _                                   =>
+          ShapeExpression.Empty
+
+    override def scienceRadius: Angle = Igrins2LongSlit.Igrins2ScienceRadius
+
+  object Igrins2LongSlit:
+    def apply(): Igrins2LongSlit = Igrins2LongSlit(GuideProbe.PWFS2)
+
+    val Igrins2ScienceRadius = 20.arcseconds

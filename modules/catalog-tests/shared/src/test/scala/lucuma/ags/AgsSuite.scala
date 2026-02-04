@@ -239,4 +239,65 @@ class AgsSuite extends munit.FunSuite {
         .forall(_.isUsable)
     )
   }
+
+  test("discard science target - Igrins2") {
+    val constraints = ConstraintSet(
+      ImageQuality.Preset.PointTwo,
+      CloudExtinction.Preset.PointFive,
+      SkyBackground.Dark,
+      WaterVapor.Wet,
+      ElevationRange.ByAirMass.Default
+    )
+
+    val wavelength = Wavelength.fromIntNanometers(300).get
+
+    assert(
+      Ags
+        .agsAnalysis(
+          constraints,
+          wavelength,
+          Coordinates.Zero,
+          List(Coordinates.Zero),
+          None,
+          NonEmptyList.of(Angle.Angle0),
+          Some(AcquisitionOffsets(NonEmptySet.of(Offset.Zero.guided))),
+          Some(ScienceOffsets(NonEmptySet.of(Offset.Zero.guided))),
+          AgsParams.Igrins2LongSlit(),
+          List(gs1)
+        )
+        .contains(
+          AgsAnalysis
+            .VignettesScience(gs1, OffsetPosition(GeometryType.Base, Offset.Zero, Angle.Angle0))
+        )
+    )
+
+    val guideStarOffset =
+      GuideStarCandidate.unsafeApply(
+        0L,
+        SiderealTracking.const(
+          Coordinates.Zero
+            .offsetBy(Angle.Angle0, Offset.signedDecimalArcseconds.reverseGet(0.0, 23.0))
+            .get
+        ),
+        (Band.Gaia, BrightnessValue.unsafeFrom(15)).some
+      )
+
+    assert(
+      Ags
+        .agsAnalysis(
+          constraints,
+          wavelength,
+          Coordinates.Zero,
+          Nil,
+          None,
+          NonEmptyList.of(Angle.Angle0),
+          Some(AcquisitionOffsets(NonEmptySet.of(Offset.Zero.guided))),
+          Some(ScienceOffsets(NonEmptySet.of(Offset.Zero.guided))),
+          AgsParams.Igrins2LongSlit(),
+          List(guideStarOffset)
+        )
+        .headOption
+        .forall(_.isUsable)
+    )
+  }
 }
