@@ -22,8 +22,15 @@ import lucuma.core.math.Wavelength
 import lucuma.core.model.CloudExtinction
 import lucuma.core.model.ConstraintSet
 import lucuma.core.model.ImageQuality
+import lucuma.core.syntax.all.*
 import lucuma.core.util.Enumerated
 import lucuma.core.util.NewType
+
+// Gaia DR3 positions are at epoch 2016.0. To include high-proper-motion
+// stars that may have moved into the patrol field since 2016, we pad the
+// query radius by 156 arcsecs which corresponds to Barnard's star
+// moving over 15y.
+val DefaultAreaBuffer: Angle = 156.arcseconds
 
 val baseFwhm = Wavelength.fromIntNanometers(500).get
 
@@ -137,9 +144,11 @@ def gaiaBrightnessConstraints(
   )
 
 val UnconstrainedAngles =
-  NonEmptyList.fromList(
-    (0 until 360 by 10).map(a => Angle.fromDoubleDegrees(a.toDouble)).toList
-  )
+  NonEmptyList
+    .fromList(
+      (0 until 360 by 10).map(a => Angle.fromDoubleDegrees(a.toDouble)).toList
+    )
+    .get
 
 object GuidedOffset extends NewType[Offset]
 type GuidedOffset = GuidedOffset.Type

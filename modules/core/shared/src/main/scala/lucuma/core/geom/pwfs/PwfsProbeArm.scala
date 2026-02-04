@@ -123,7 +123,7 @@ trait PwfsProbeArm:
    * Partially vignetted region around the mirror
    * This is the outer halo with rounded corners.
    */
-  def partiallyVignettedMirror(probe: GuideProbe): ShapeExpression =
+  def mirrorVignetting(probe: GuideProbe): ShapeExpression =
     val ml = mirrorLength(probe)
     val mw = mirrorWidth(probe)
     val d = dr(probe)
@@ -239,7 +239,7 @@ trait PwfsProbeArm:
    * Fully vignetted arm region
    * The inner part of the arm that's completely blocked.
    */
-  def fullyVignettedArm(probe: GuideProbe): ShapeExpression =
+  def armVignetting(probe: GuideProbe): ShapeExpression =
     val ml = mirrorLength(probe)
     val mw = mirrorWidth(probe)
     val aw = armWidth(probe)
@@ -261,7 +261,7 @@ trait PwfsProbeArm:
     val y6 = (aw / 2 - d) ⨱ PlateScale
 
     // Intermediate points for smooth curve
-    val (x4, y4, x5, y5) = 
+    val (x4, y4, x5, y5) =
       if (probe === GuideProbe.PWFS1) {
         val theta = math.asin((dx / d).value.toDouble) / 3.0
 
@@ -301,10 +301,11 @@ trait PwfsProbeArm:
     )
 
   private def vignetteShape(probe: GuideProbe): ShapeExpression =
-    partiallyVignettedMirror(probe) ∪
+    mirror(probe) ∪
+      mirrorVignetting(probe) ∪
       armUpperHalf(probe) ∪
       armLowerHalf(probe) ∪
-      fullyVignettedArm(probe)
+      armVignetting(probe)
 
   /**
    * Calculate arm angle to reach guide star as ocs in TpePWFSFeature.java.
@@ -365,7 +366,7 @@ trait PwfsProbeArm:
     offsetPos: Offset
   ): ShapeExpression =
     val angle = armAngle(guideStar, offsetPos)
-    partiallyVignettedMirror(probe) ⟲ angle ↗ guideStar
+    mirrorVignetting(probe) ⟲ angle ↗ guideStar
 
   /**
    * Arm shape including the partial shadow inducing vignetting
@@ -388,6 +389,6 @@ trait PwfsProbeArm:
     offsetPos: Offset
   ): ShapeExpression =
     val angle = armAngle(guideStar, offsetPos)
-    fullyVignettedArm(probe) ⟲ angle ↗ guideStar
+    armVignetting(probe) ⟲ angle ↗ guideStar
 
 object probeArm extends PwfsProbeArm

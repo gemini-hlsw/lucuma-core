@@ -10,7 +10,7 @@ import cats.syntax.eq.*
 import cats.syntax.option.*
 import lucuma.ags.AcquisitionOffsets
 import lucuma.ags.Ags
-import lucuma.ags.AgsParams.GmosAgsParams
+import lucuma.ags.AgsParams.GmosLongSlit
 import lucuma.ags.AgsVisualization
 import lucuma.ags.ScienceOffsets
 import lucuma.ags.syntax.*
@@ -25,25 +25,47 @@ import lucuma.core.math.Angle
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Offset
 import lucuma.core.math.syntax.int.*
+import lucuma.core.model.PosAngleConstraint
 
 import java.awt.{List as _, *}
 
-trait GmosAgsVisualizationShapes(val posAngle: Angle) extends InstrumentShapes:
+trait AgsVisualizationBase extends InstrumentShapes:
+  val solidStroke     = new BasicStroke(1.5f)
+  val thinStroke      = new BasicStroke(0.5f)
+  val dashStroke      = new BasicStroke(1f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10f, Array(4f, 4f), 0f)
+  val tinyStroke      = new BasicStroke(4f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10f, Array(1f, 1f), 0f)
+  val smallDashStroke = new BasicStroke(1f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10f, Array(3f, 3f), 0f)
+  val largeDashStroke = new BasicStroke(1f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10f, Array(8f, 4f), 0f)
+  val thickStroke     = new BasicStroke(2.5f)
+
+object AgsVisualizationDemo:
+  def parsePosAngle(args: Array[String], default: Angle): Angle =
+    args
+      .collectFirst {
+        case s if s.startsWith("--posAngle=") =>
+          Angle.fromDoubleDegrees(s.stripPrefix("--posAngle=").toDouble)
+      }
+      .getOrElse(default)
+
+trait GmosAgsVisualizationShapes(val posAngle: Angle) extends AgsVisualizationBase:
   import lucuma.core.geom.gmos.*
 
   val guideStarOffset: Offset =
-    Offset(170543999.µas.p, -24177003.µas.q)
+    Offset(-170543999.µas.p, -24177003.µas.q)
 
-  val fpu: Option[Either[GmosNorthFpu, GmosSouthFpu]] =
-    Some(Right(GmosSouthFpu.LongSlit_5_00))
+  val defaultFpu: Either[GmosNorthFpu, GmosSouthFpu] =
+    Right(GmosSouthFpu.LongSlit_5_00)
+
+  val anglesToTest: NonEmptyList[Angle] =
+    PosAngleConstraint.Unbounded.anglesToTestAt(None).get
+
+  val fpu: Either[GmosNorthFpu, GmosSouthFpu] = defaultFpu
 
   val port: PortDisposition = PortDisposition.Side
 
   val baseCoordinates: Coordinates = Coordinates.Zero
 
-  // Blind offset as an offset
   val blindOffsetRaw: Offset = Offset(0.arcsec.p, 70.arcsec.q)
-  // We need coordinates for ags
   val blindOffset: Coordinates =
     baseCoordinates.offsetBy(Angle.Angle0, blindOffsetRaw).get
 
@@ -67,12 +89,12 @@ trait GmosAgsVisualizationShapes(val posAngle: Angle) extends InstrumentShapes:
     Ags.generatePositions(
       baseCoordinates.some,
       blindOffset.some,
-      NonEmptyList.one(posAngle),
+      anglesToTest,
       acqOffsets.some,
       scienceOffsets.some
     ).value.toNonEmptyList
 
-  val params: GmosAgsParams = GmosAgsParams(fpu, port)
+  val params: GmosLongSlit = GmosLongSlit(fpu, port)
 
   lazy val patrolViz = AgsVisualization.patrolFieldGeometries(params, positions)
 
@@ -88,19 +110,12 @@ trait GmosAgsVisualizationShapes(val posAngle: Angle) extends InstrumentShapes:
     candidatesArea.candidatesAreaAt(posAngle, Offset.Zero)
   )
 
-  private def crossAt(offset: Offset): ShapeExpression = {
+  private def crossAt(offset: Offset): ShapeExpression =
     val size = 7.arcsec
     val width = 500.mas
     val h = ShapeExpression.centeredRectangle(size, width)
     val v = ShapeExpression.centeredRectangle(width, size)
     (h ∪ v) ↗ offset
-  }
-
-  val solidStroke = new BasicStroke(1.5f)
-  val tinyStroke = new BasicStroke(4f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10f, Array(1f, 1f), 0f)
-  val smallDashStroke = new BasicStroke(1f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10f, Array(3f, 3f), 0f)
-  val largeDashStroke = new BasicStroke(1f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10f, Array(8f, 4f), 0f)
-  val thickStroke = new BasicStroke(2.5f)
 
   // Color and stroke mapping by GeometryType
   val geometryStyle: Map[GeometryType, (Color, BasicStroke)] = Map(
@@ -165,17 +180,81 @@ trait GmosAgsVisualizationShapes(val posAngle: Angle) extends InstrumentShapes:
   }
 
 object JtsGmosAgsVisualizationDemo:
-
   def demo(posAngle: Angle) =
     new JtsDemo with GmosAgsVisualizationShapes(posAngle)
 
   def main(args: Array[String]): Unit =
-    val posAngle = args
-      .collectFirst {
-        case s if s.startsWith("--posAngle=") =>
-          val value = s.stripPrefix("--posAngle=").toDouble
-          Angle.fromDoubleDegrees(value)
-      }
-      .getOrElse(145.deg)
+    demo(AgsVisualizationDemo.parsePosAngle(args, 145.deg)).main(args)
 
-    demo(posAngle).main(args)
+trait GmosWithPwfsVisualizationShapes(val posAngle: Angle) extends AgsVisualizationBase:
+  import lucuma.core.geom.pwfs.probeArm
+
+  val guideStarOffset: Offset =
+    Offset(200.arcsec.p, -150.arcsec.q)
+
+  val defaultFpu: Option[Either[GmosNorthFpu, GmosSouthFpu]] =
+    Some(Right(GmosSouthFpu.LongSlit_5_00))
+
+  val anglesToTest: NonEmptyList[Angle] =
+    // This coulb be replaced by UconstraindAngles but lets us test more easily
+    PosAngleConstraint.Unbounded.anglesToTestAt(None).get
+
+  val offsetPos: Offset = Offset.Zero
+
+  val params = GmosLongSlit(defaultFpu.get, PortDisposition.Side).withPWFS2
+
+  override def shapes: List[ShapeExpression] = List(
+    params.scienceArea(posAngle, offsetPos),
+  )
+
+  override def coloredShapes: List[ColoredShape] =
+    val guideStarMarker = ColoredShape(
+      ShapeExpression.centeredRectangle(2.arcsec, 2.arcsec) ↗ guideStarOffset,
+      Color.GREEN,
+      solidStroke.some
+    )
+
+    val colors = List(Color.ORANGE, Color.CYAN, Color.MAGENTA, Color.YELLOW, Color.PINK, Color.LIGHT_GRAY)
+    val patrolFields = anglesToTest.toList.zipWithIndex.map { case (angle, idx) =>
+      ColoredShape(
+        params.patrolFieldAt(angle, offsetPos),
+        colors(idx % colors.length),
+        dashStroke.some
+      )
+    }
+
+    val intersection = ColoredShape(
+      anglesToTest.toList.map(params.patrolFieldAt(_, offsetPos)).reduce(_ ∩ _),
+      Color.GREEN,
+      solidStroke.some
+    )
+
+    val mirror = ColoredShape(
+      probeArm.mirrorAt(params.probe, guideStarOffset, offsetPos),
+      Color.RED,
+      solidStroke.some
+    )
+    val mirrorVignetted = ColoredShape(
+      probeArm.mirrorVignettedAreaAt(params.probe, guideStarOffset, offsetPos),
+      Color.BLUE,
+      thinStroke.some
+    )
+    val armVignetted = ColoredShape(
+      probeArm.armVignettedAreaAt(params.probe, guideStarOffset, offsetPos),
+      Color.BLUE,
+      thinStroke.some
+    )
+    val arm = ColoredShape(
+      probeArm.armAt(params.probe, guideStarOffset, offsetPos),
+      Color.DARK_GRAY,
+      thinStroke.some
+    )
+    patrolFields ++ List(intersection, mirrorVignetted, armVignetted, arm, mirror, guideStarMarker)
+
+object JtsGmosAgsPwfsDemo:
+  def demo(posAngle: Angle) =
+    new JtsDemo with GmosWithPwfsVisualizationShapes(posAngle):
+      override val arcsecPerPixel: Double = 0.5
+
+  def main(args: Array[String]): Unit =
+    demo(AgsVisualizationDemo.parsePosAngle(args, 0.deg)).main(args)

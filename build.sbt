@@ -2,7 +2,7 @@ import org.scalajs.linker.interface.ESVersion
 import org.typelevel.sbt.gha.PermissionValue
 import org.typelevel.sbt.gha.Permissions
 
-ThisBuild / tlBaseVersion                         := "0.170"
+ThisBuild / tlBaseVersion                         := "0.174"
 ThisBuild / tlCiReleaseBranches                   := Seq("master")
 ThisBuild / githubWorkflowEnv += "MUNIT_FLAKY_OK" -> "true"
 
@@ -23,7 +23,7 @@ lazy val catsParseVersion           = "1.1.0"
 lazy val catsScalacheckVersion      = "0.3.2"
 lazy val catsTimeVersion            = "0.6.0"
 lazy val circeVersion               = "0.14.15"
-lazy val clueVersion                = "0.51.2"
+lazy val clueVersion                = "0.51.3"
 lazy val circeRefinedVersion        = "0.15.1"
 lazy val coulombVersion             = "0.9.1"
 lazy val fs2Version                 = "3.12.2"
@@ -147,14 +147,8 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform)
     )
   )
 
-lazy val benchmarks = project
-  .in(file("modules/benchmarks"))
-  .dependsOn(core.jvm, ags.jvm)
-  .settings(name := "lucuma-core-benchmarks")
-  .enablePlugins(NoPublishPlugin, JmhPlugin)
-
 lazy val catalog = crossProject(JVMPlatform, JSPlatform)
-  .crossType(CrossType.Pure)
+  .crossType(CrossType.Full)
   .in(file("modules/catalog"))
   .dependsOn(core)
   .settings(
@@ -177,6 +171,11 @@ lazy val catalog = crossProject(JVMPlatform, JSPlatform)
       "edu.gemini"    %%% "clue-core"            % clueVersion,
       "edu.gemini"    %%% "clue-http4s"          % clueVersion,
       "org.typelevel" %%% "log4cats-core"        % log4catsVersion
+    )
+  )
+  .jvmSettings(
+    libraryDependencies ++= Seq(
+      "co.fs2" %% "fs2-io" % fs2Version
     )
   )
   .jsConfigure(_.enablePlugins(BundleMonPlugin))

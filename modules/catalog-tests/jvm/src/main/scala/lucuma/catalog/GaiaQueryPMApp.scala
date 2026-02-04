@@ -8,6 +8,7 @@ import cats.effect.IO
 import cats.effect.IOApp
 import cats.effect.Sync
 import cats.syntax.all.*
+import lucuma.ags.DefaultAreaBuffer
 import lucuma.catalog.*
 import lucuma.catalog.clients.GaiaClient
 import lucuma.core.geom.gmos.all.candidatesArea
@@ -50,7 +51,8 @@ trait GaiaQueryPMSample {
       CoordinatesRangeQueryByADQL(
         NonEmptyList.of(start, end),
         candidatesArea,
-        bc.some
+        bc.some,
+        areaBuffer = DefaultAreaBuffer
       )
 
     client.query(query).map(r => println(pprint(r)))
