@@ -13,9 +13,6 @@ Global / concurrentRestrictions += Tags.limit(Tags.Compile, 1)
 ThisBuild / crossScalaVersions := Seq("3.7.4")
 ThisBuild / scalacOptions += "-language:implicitConversions" // TODO
 
-ThisBuild / resolvers += "Gemini Repository" at "https://github.com/gemini-hlsw/maven-repo/raw/master/releases"
-
-
 lazy val catsVersion                = "2.13.0"
 lazy val catsCollctionsVersion      = "0.9.10"
 lazy val catsEffectVersion          = "3.6.3"
