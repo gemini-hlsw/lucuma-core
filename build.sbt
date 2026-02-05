@@ -48,7 +48,7 @@ lazy val spireVersion               = "0.18.0"
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
-val root = tlCrossRootProject.aggregate(core, testkit, tests, catalog, ags, catalogTestkit, catalogTests, horizons, horizonsTests, itac, itacTests, npm)
+val root = tlCrossRootProject.aggregate(core, testkit, tests, catalog, ags, catalogTestkit, catalogTests, horizons, horizonsTests, itac, npm)
 
 lazy val core = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Full)
@@ -215,44 +215,16 @@ lazy val horizonsTests = crossProject(JVMPlatform, JSPlatform)
   )
   .jsConfigure(_.enablePlugins(BundleMonPlugin))
 
-lazy val itac = crossProject(JVMPlatform, JSPlatform)
-  .crossType(CrossType.Full)
+lazy val itac = project
   .in(file("modules/itac"))
-  .dependsOn(core)
+  .dependsOn(core.jvm)
   .settings(
     name := "lucuma-itac",
     libraryDependencies ++= Seq(
-    )
-  )
-  .jvmSettings(
-    libraryDependencies ++= Seq(
-      "org.slf4j"     %  "slf4j-simple"           % slf4jVersion
-    )
-  )
-  .jsConfigure(_.enablePlugins(BundleMonPlugin))
-
-lazy val itacTests = crossProject(JVMPlatform, JSPlatform)
-  .crossType(CrossType.Full)
-  .in(file("modules/itac-tests"))
-  .enablePlugins(NoPublishPlugin)
-  .dependsOn(itac)
-  .settings(
-    name := "lucuma-itac-tests",
-    libraryDependencies ++= Seq(
+      "org.slf4j"     %  "slf4j-simple"           % slf4jVersion,
       "org.typelevel" %%% "munit-cats-effect"   % munitCatsEffectVersion % Test,
     )
   )
-  .jvmSettings(
-    libraryDependencies ++= Seq(
-    )
-  )
-  .jsSettings(
-    scalacOptions ~= (_.filterNot(Set("-Wdead-code"))),
-    libraryDependencies ++= Seq(
-      "org.http4s" %%% "http4s-dom" % http4sDomVersion % Test,
-    ),
-  )
-  .jsConfigure(_.enablePlugins(BundleMonPlugin))
 
 lazy val ags = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Pure)
