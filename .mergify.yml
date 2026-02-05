@@ -81,14 +81,6 @@ pull_request_rules:
       add:
       - itac
       remove: []
-- name: Label itac-tests PRs
-  conditions:
-  - files~=^modules/itac-tests/
-  actions:
-    label:
-      add:
-      - itac-tests
-      remove: []
 - name: Label npm PRs
   conditions:
   - files~=^modules/npm/
