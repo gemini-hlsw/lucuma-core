@@ -2,7 +2,7 @@ import org.scalajs.linker.interface.ESVersion
 import org.typelevel.sbt.gha.PermissionValue
 import org.typelevel.sbt.gha.Permissions
 
-ThisBuild / tlBaseVersion                         := "0.173"
+ThisBuild / tlBaseVersion                         := "0.174"
 ThisBuild / tlCiReleaseBranches                   := Seq("master")
 ThisBuild / githubWorkflowEnv += "MUNIT_FLAKY_OK" -> "true"
 
@@ -48,7 +48,7 @@ lazy val spireVersion               = "0.18.0"
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
-val root = tlCrossRootProject.aggregate(core, testkit, tests, catalog, ags, catalogTestkit, catalogTests, horizons, horizonsTests, npm)
+val root = tlCrossRootProject.aggregate(core, testkit, tests, catalog, ags, catalogTestkit, catalogTests, horizons, horizonsTests, itac, npm)
 
 lazy val core = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Full)
@@ -214,6 +214,17 @@ lazy val horizonsTests = crossProject(JVMPlatform, JSPlatform)
     ),
   )
   .jsConfigure(_.enablePlugins(BundleMonPlugin))
+
+lazy val itac = project
+  .in(file("modules/itac"))
+  .dependsOn(core.jvm)
+  .settings(
+    name := "lucuma-itac",
+    libraryDependencies ++= Seq(
+      "org.slf4j"     %  "slf4j-simple"           % slf4jVersion,
+      "org.typelevel" %%% "munit-cats-effect"   % munitCatsEffectVersion % Test,
+    )
+  )
 
 lazy val ags = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Pure)
