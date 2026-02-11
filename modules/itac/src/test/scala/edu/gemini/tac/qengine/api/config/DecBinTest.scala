@@ -10,8 +10,8 @@ import munit.FunSuite
 class DecBinTest extends FunSuite {
   val TenPercent = Percent(10)
 
-  val bin = DecBin(0, 10, TenPercent)
-  val ibin = DecBin.inclusive(0, 10, TenPercent)
+  val bin = DecRanged(0, 10, TenPercent)
+  val ibin = DecRanged.inclusive(0, 10, TenPercent)
 
   test("testInclusive") {
     assert(bin.inclusive.range.isInclusive)
@@ -20,14 +20,14 @@ class DecBinTest extends FunSuite {
   }
 
   test("testEquals") {
-    assertEquals(bin, DecBin(0, 10, TenPercent))
+    assertEquals(bin, DecRanged(0, 10, TenPercent))
     assert(!bin.equals(ibin))
-    assert(!bin.equals(DecBin(1, 10, TenPercent)))
-    assert(!bin.equals(DecBin(0,  9, TenPercent)))
-    assert(!bin.equals(DecBin(0, 10, Percent(11))))
+    assert(!bin.equals(DecRanged(1, 10, TenPercent)))
+    assert(!bin.equals(DecRanged(0,  9, TenPercent)))
+    assert(!bin.equals(DecRanged(0, 10, Percent(11))))
   }
 
   test("testMap") {
-    assertEquals(10.0, DecBin(10, 20, TenPercent).map(_.value).binValue.doubleValue, Double.MinPositiveValue)
+    assertEquals(10.0, DecRanged(10, 20, TenPercent).map(_.value).binValue.doubleValue, Double.MinPositiveValue)
   }
 }

@@ -4,13 +4,14 @@
 package edu.gemini.tac.qengine.api.config
 
 import edu.gemini.tac.qengine.p1.ImageQuality.IQ20
-import edu.gemini.tac.qengine.p1.Mode
 import edu.gemini.tac.qengine.p1.Proposal
-import edu.gemini.tac.qengine.p1.QueueBand
-import edu.gemini.tac.qengine.p1.QueueBand.*
-import edu.gemini.tac.qengine.p1.Too
+import lucuma.core.enums.ScienceBand
+import lucuma.core.enums.ScienceSubtype
+import lucuma.core.enums.ToOActivation
 
-case class BandRestriction(name: String, bands: Set[QueueBand])(val matches: Proposal => Boolean)
+import ScienceBand.*
+
+case class BandRestriction(name: String, bands: Set[ScienceBand])(val matches: Proposal => Boolean)
 
 object BandRestriction {
   def name(base: String): String = base // "%s Band Restriction".format(base)
@@ -22,15 +23,15 @@ object BandRestriction {
   val NotBand3Name = name("Not B3 Amenable")
 
   def largeProgram: BandRestriction =
-    BandRestriction(LpName, Set(QBand1, QBand2)) { _.mode == Mode.LargeProgram }
+    BandRestriction(LpName, Set(Band1, Band2)) { _.mode == ScienceSubtype.LargeProgram }
 
-  def rapidToo: BandRestriction = rapidToo(QBand1)
+  def rapidToo: BandRestriction = rapidToo(Band1)
 
-  def rapidToo(band: QueueBand*) =
-    BandRestriction(RapidTooName, Set(band*)) { _.too == Too.rapid }
+  def rapidToo(band: ScienceBand*) =
+    BandRestriction(RapidTooName, Set(band*)) { _.too == ToOActivation.Rapid }
 
   def lgs: BandRestriction =
-    BandRestriction(LgsName, Set(QBand1, QBand2)) { prop =>
+    BandRestriction(LgsName, Set(Band1, Band2)) { prop =>
       prop.band3Observations.exists(_.lgs)
     }
 
@@ -40,12 +41,12 @@ object BandRestriction {
   // we need to search the obsList for any obs that has an IQ20 value
 
   def iq20: BandRestriction =
-    BandRestriction(Iq20Name, Set(QBand1, QBand2)) {
+    BandRestriction(Iq20Name, Set(Band1, Band2)) {
       prop => prop.band3Observations.exists(_.conditions.iq == IQ20)
     }
 
   // Required to remove any proposal that is not-band3 that is pushed into
   // band 3 by a joint component moving up in the queue.
   def notBand3: BandRestriction =
-      BandRestriction(NotBand3Name, Set(QBand1, QBand2)) { _.band3Observations.isEmpty }
+      BandRestriction(NotBand3Name, Set(Band1, Band2)) { _.band3Observations.isEmpty }
 }

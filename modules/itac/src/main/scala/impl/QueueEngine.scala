@@ -28,7 +28,7 @@
 //   val Log = LoggerFactory.getLogger("edu.gemini.itac")
 
 //   case class RaAllocation(name: String, boundedTime: BoundedTime)
-//   case class BucketsAllocationImpl(raBins: List[RaResource]) extends BucketsAllocation {
+//   case class BucketsAllocationImpl(raBins: List[PerRightAscensionResource]) extends BucketsAllocation {
 
 //     sealed trait Row extends Product with Serializable
 //     case class RaRow(h: String, remaining: Double, used: Double, limit: Double) extends Row
@@ -91,14 +91,14 @@
 //     allProps filter { p => (p.mode == Mode.Classical) && (p.site == site) }
 
 //   private[impl] def classicalObs(allProps: List[Proposal], site: Site): List[Observation] =
-//     classicalProps(allProps, site) flatMap { p => p.relativeObsList(QueueBand.QBand1) }
+//     classicalProps(allProps, site) flatMap { p => p.relativeObsList(ScienceBand.QBand1) }
 
-//   private[impl] def initBins(config: SiteSemesterConfig, rollover: List[RolloverObservation], props: List[Proposal]): RaResourceGroup = {
+//   private[impl] def initBins(config: SiteSemesterConfig, rollover: List[RolloverObservation], props: List[Proposal]): RightAscensionMapResource = {
 //     val cattimes = rollover ++ classicalObs(props, config.site)
-//     RaResourceGroup(config).reserveAvailable(cattimes)._1
+//     RightAscensionMapResource(config).reserveAvailable(cattimes)._1
 //   }
 
-//   private[impl] def initBins(config: QueueEngineConfig, props: List[Proposal]): RaResourceGroup =
+//   private[impl] def initBins(config: QueueEngineConfig, props: List[Proposal]): RightAscensionMapResource =
 //     initBins(config.binConfig, config.rollover.obsList, props)
 
 //   def filterProposals(proposals: List[Proposal], config: QueueEngineConfig): List[Proposal] = {
@@ -107,9 +107,9 @@
 
 //   /**
 //    * Filters out proposals from the other site. Initializes bins using that list. *Then* removes non-queue proposals.
-//    * Note that this means that the RaResourceGroup returned is initialized from non-queue and queue proposals
+//    * Note that this means that the RightAscensionMapResource returned is initialized from non-queue and queue proposals
 //    */
-//   def filterProposalsAndInitializeBins(proposals: List[Proposal], config: QueueEngineConfig): (List[Proposal], RaResourceGroup) = {
+//   def filterProposalsAndInitializeBins(proposals: List[Proposal], config: QueueEngineConfig): (List[Proposal], RightAscensionMapResource) = {
 //     val siteProps = filterProposals(proposals, config) // filter out non-site and non-queue (classical time has already been subtracted)
 //     val bins = initBins(config, siteProps)
 //     (siteProps, bins)
@@ -122,16 +122,16 @@
 //   //   config.partners.foreach { p =>
 //   //     val q   = s.queue
 //   //     // val t0  = q.queueTime(p).toHours.value
-//   //     val b12Aval = q.queueTime(QueueBand.Category.B1_2, p).toHours.value
-//   //     val b12Used = q.usedTime(QueueBand.Category.B1_2, p).toHours.value
-//   //     val b3Aval = q.queueTime(QueueBand.Category.B3, p).toHours.value
-//   //     val b3Used = q.usedTime(QueueBand.Category.B3, p).toHours.value
+//   //     val b12Aval = q.queueTime(ScienceBand.Category.B1_2, p).toHours.value
+//   //     val b12Used = q.usedTime(ScienceBand.Category.B1_2, p).toHours.value
+//   //     val b3Aval = q.queueTime(ScienceBand.Category.B3, p).toHours.value
+//   //     val b3Used = q.usedTime(ScienceBand.Category.B3, p).toHours.value
 //   //     Log.info(f"${p.id}%-10s $b12Used%5.1f/$b12Aval%5.1f  $b3Used%5.1f/$b3Aval%5.1f")
 //   //   }
 //   //   Log.info(s"${Console.GREEN}-----------------------------------${Console.RESET}")
 //   // }
 
-//   def calc(bandedProposals: Map[QueueBand, List[Proposal]], queueTime: QueueTime, config: QueueEngineConfig, extras: List[Proposal], removed: List[Proposal]): QueueCalc = {
+//   def calc(bandedProposals: Map[ScienceBand, List[Proposal]], queueTime: QueueTime, config: QueueEngineConfig, extras: List[Proposal], removed: List[Proposal]): QueueCalc = {
 
 //     // temp
 //     val proposals = bandedProposals.values.toList.flatten
@@ -187,30 +187,30 @@
 //       // The band 1/2 boundary is wrong using the old strategy so we'll regroup them. First collect
 //       // the band 1/2 programs IN ORDER.
 //       val band12proposals: List[Proposal] =
-//         stageWithBands123.queue.bandedQueue.get(QueueBand.QBand1).orZero ++
-//         stageWithBands123.queue.bandedQueue.get(QueueBand.QBand2).orZero
+//         stageWithBands123.queue.bandedQueue.get(ScienceBand.QBand1).orZero ++
+//         stageWithBands123.queue.bandedQueue.get(ScienceBand.QBand2).orZero
 
 //       // Now re-group bands 1 and 2 using partner-specific time buckets
-//       val band12map: Map[QueueBand, List[Proposal]] =
+//       val band12map: Map[ScienceBand, List[Proposal]] =
 //         config.partners.foldMap { pa =>
 
 //           // Within a given partner we can map used time to band.
-//           def band(t: Time): QueueBand = {
-//             val b1 = queueTime(QueueBand.QBand1, pa) // exactly. we never overfill band 1
+//           def band(t: Time): ScienceBand = {
+//             val b1 = queueTime(ScienceBand.QBand1, pa) // exactly. we never overfill band 1
 
 //             // NOTE: the following doesn't work because the engine sometimes overfills slightly past
 //             // the limit. In these cases we *can't* push the last proposal to B3 because it's using
 //             // the wrong set of observations. So just leave it in B2 in that case.
-//             // val b2 = queueTime(QueueBand.QBand2, pa).percent(105)
-//             // if (t <= b1) QueueBand.QBand1 else if (t <= (b1 + b2)) QueueBand.QBand2 else QueueBand.QBand3
-//             if (t <= b1) QueueBand.QBand1 else QueueBand.QBand2
+//             // val b2 = queueTime(ScienceBand.QBand2, pa).percent(105)
+//             // if (t <= b1) ScienceBand.QBand1 else if (t <= (b1 + b2)) ScienceBand.QBand2 else ScienceBand.QBand3
+//             if (t <= b1) ScienceBand.QBand1 else ScienceBand.QBand2
 //           }
 
 //           // Go through all the proposals for this partner adding each to its band, based on the
 //           // accumulated used time. This is why they need to be in order above.
 //           band12proposals
 //             .filter(_.ntac.partner == pa)
-//             .foldLeft((Time.Zero, Map.empty[QueueBand, List[Proposal]])) { case ((t, m), p) =>
+//             .foldLeft((Time.Zero, Map.empty[ScienceBand, List[Proposal]])) { case ((t, m), p) =>
 //               val tʹ = t + p.time
 //               (tʹ, m |+| Map(band(tʹ) -> List(p)))
 //           } ._2
@@ -222,7 +222,7 @@
 
 //       // Ok so *replace* bands 1/2 and then add band 4.
 //       val bandedQueue1  = stageWithBands123.queue.bandedQueue ++ band12map
-//       val bandedQueue2  = bandedQueue1 + (QueueBand.QBand4 -> band4)
+//       val bandedQueue2  = bandedQueue1 + (ScienceBand.QBand4 -> band4)
 
 //       // Some proposals end up in the wrong bands and we want to override this. So those that are
 //       // mentioned in explicitQueueAssignments will get moved here.
@@ -247,7 +247,7 @@
 //       // Add `removed` propodals to the log so they show up as rejects instead of as orphans. This
 //       // makes it clear we didn't forget about them.
 //       val finalLog2 = removed.foldLeft(finalLog) { (log, p) =>
-//         log.updated(p.id, QueueBand.Category.B1_2, RemovedRejectMessage(p))
+//         log.updated(p.id, ScienceBand.Category.B1_2, RemovedRejectMessage(p))
 //       }
 
 //       // Done!

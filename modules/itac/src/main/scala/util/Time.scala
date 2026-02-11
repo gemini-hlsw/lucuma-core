@@ -4,6 +4,7 @@
 package edu.gemini.tac.qengine.util
 
 import cats.Monoid
+import cats.Order
 
 import Time.Units
 
@@ -80,6 +81,9 @@ object Time {
 
   implicit val MonoidTime: Monoid[Time] =
     Monoid.instance(Zero, _ + _)
+
+  given Order[Time] = Order.fromLessThan(_ < _)
+
 }
 
 final class Time private (val ms: Long, val unit: Units) extends Ordered[Time] with Serializable {
@@ -115,6 +119,7 @@ final class Time private (val ms: Long, val unit: Units) extends Ordered[Time] w
   def +(that: Time): Time = new Time(ms + that.ms, unit)
   def -(that: Time): Time = new Time(ms - that.ms, unit)
   def *(p: Percent): Time = percent(p.value.toDouble)
+  def /(d: Double): Time = new Time((ms / d.toLong), unit)
   def unary_- : Time      = new Time(-ms, unit)
 
   def percent(p: Double): Time = p match {

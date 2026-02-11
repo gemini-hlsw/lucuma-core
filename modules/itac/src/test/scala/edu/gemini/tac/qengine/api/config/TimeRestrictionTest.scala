@@ -11,6 +11,7 @@ import edu.gemini.tac.qengine.p1.SkyBackground.SBAny
 import edu.gemini.tac.qengine.p1.WaterVapor.*
 import edu.gemini.tac.qengine.util.Percent
 import edu.gemini.tac.qengine.util.Time
+import lucuma.core.enums.ScienceBand
 import lucuma.core.enums.Site
 import munit.FunSuite
 
@@ -30,12 +31,12 @@ class TimeRestrictionTest extends FunSuite {
   }
 
   private def mkProp(wv: WaterVapor): Proposal =
-    Proposal(ntac, site = Site.GS, obsList = List(Observation(null, target, conds(wv), Time.hours(10))))
+    Proposal(ntac, site = Site.GS, obsList = List(Observation(target, conds(wv), Time.hours(10))))
 
 
   test("testMatches") {
     val propList = WaterVapor.values.map(mkProp(_))
-    val boolList = propList.map(prop => bin.matches(prop, prop.obsList.head, QueueBand.QBand1))
+    val boolList = propList.map(prop => bin.matches(prop, prop.obsList.head, ScienceBand.Band1))
     assertEquals(List(true, true, false, false), boolList)
   }
 

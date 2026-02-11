@@ -14,7 +14,7 @@ import munit.FunSuite
 
 import Fixture.{badCC, emptyQueue, goodCC}
 
-class RaResourceTest extends FunSuite {
+class PerRightAscensionResourceTest extends FunSuite {
   import Partner.KR
   val partners = Enumerated[Partner].all
 
@@ -27,7 +27,7 @@ class RaResourceTest extends FunSuite {
   private def mkProp(target: Target, conds: ObservingConditions): Proposal =
     Fixture.mkProp(ntac,  (target, conds, Time.Zero))
 
-  private def verifyReserve(raRes: RaResource) = {
+  private def verifyReserve(raRes: PerRightAscensionResource) = {
     val target = Target(15.0, 0.0) // RA 1hr, Dec 0 deg
 
     // Took 15 minutes of the total of 1 hour for RA 1 hr at dec 0-45
@@ -256,12 +256,6 @@ class RaResourceTest extends FunSuite {
     assert(Fixture.raResGroup.grp(target).isFull(goodCC))
     assert(Fixture.raResGroup.grp(target).isFull(target, goodCC))
   }
-
-  private case class TestCatTime(target: Target, conditions: ObservingConditions, time: Time) extends CategorizedTime
-
-//  private val cat1 = TestCatTime(Target( 0.0, 0.0), badCC, Time.hours(10))
-//  private val cat2 = TestCatTime(Target(15.0, 0.0), badCC, Time.hours(10))
-//  private val cat3 = TestCatTime(Target(30.0, 0.0), badCC, Time.hours(10))
 
   test("testReserveAvailableWithEmptyList") {
     val (newGrp, leftover) = Fixture.raResGroup.reserveAvailable(Nil)

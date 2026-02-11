@@ -25,7 +25,7 @@ import scala.Ordering.Implicits.*
 
 import Assert.*
 
-class TimeResourceTest extends FunSuite {
+class TimeRestrictionResourceTest extends FunSuite {
   import Partner.US
   val partners = Enumerated[Partner].all
 
@@ -39,10 +39,10 @@ class TimeResourceTest extends FunSuite {
   }
 
   // 10% of 10 hours = 1 hr = 60 min
-  private val res60min = TimeResource(bin, Time.hours(10))
+  private val res60min = TimeRestrictionResource(bin, Time.hours(10))
 
   private def mkProp(wv: WaterVapor): Proposal =
-    Proposal(ntac, site = Site.GS, obsList = List(Observation(null, target, conds(wv), Time.hours(10))))
+    Proposal(ntac, site = Site.GS, obsList = List(Observation(target, conds(wv), Time.hours(10))))
 
   test("testReserveNoMatch") {
     val prop = mkProp(WV80)

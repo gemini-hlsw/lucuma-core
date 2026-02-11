@@ -3,20 +3,20 @@
 
 package edu.gemini.tac.qengine.impl.resource
 
+import edu.gemini.tac.qengine.api.config.TimeRestriction
 import edu.gemini.tac.qengine.impl.block.Block
 import edu.gemini.tac.qengine.impl.queue.ProposalQueueBuilder
 import edu.gemini.tac.qengine.log.RejectMessage
 import edu.gemini.tac.qengine.log.RejectPartnerOverAllocation
 import edu.gemini.tac.qengine.p1.ObservingConditions
-import edu.gemini.tac.qengine.p1.QueueBand
 import edu.gemini.tac.qengine.p1.Target
+import edu.gemini.tac.qengine.util.BoundedTime
 import edu.gemini.tac.qengine.util.Time
 import org.slf4j.LoggerFactory
 
 final case class SemesterResource(
-    ra:   RaResourceGroup,
-    time: TimeResourceGroup,
-    band:  QueueBand,
+    ra:   RightAscensionMapResource,
+    time: List[TimeRestriction[BoundedTime]],
 ) extends Resource {
   private val LOGGER = LoggerFactory.getLogger("edu.gemini.itac")
   type T = SemesterResource
@@ -24,12 +24,12 @@ final case class SemesterResource(
   private def reserveAll(block: Block, queue: ProposalQueueBuilder): RejectMessage Either SemesterResource =
     for {
       newRa   <- ra.reserve(block, queue)
-      newTime <- time.reserve(block, queue)
-    } yield new SemesterResource(newRa, newTime, band)
+      newTime <- Resource2.reserveAll(block, queue, time)
+    } yield new SemesterResource(newRa, newTime)
 
   // Determines whether the partner is already over allocated.
   private def partnerAlreadyOverallocated(block: Block, queue: ProposalQueueBuilder): Boolean = {
-    LOGGER.debug(f"Remaining time in $band for ${block.prop.ntac.partner} is ${queue.remainingTime(block.prop.ntac.partner).toHours.value}%5.1f")
+    LOGGER.debug(f"Remaining time for ${block.prop.ntac.partner} is ${queue.remainingTime(block.prop.ntac.partner).toHours.value}%5.1f")
     queue.remainingTime(block.prop.ntac.partner) <= Time.Zero
   }
 
@@ -73,7 +73,7 @@ final case class SemesterResource(
 
   def reserveAvailable(time: Time, target: Target, conds: ObservingConditions): (SemesterResource, Time) = {
     val (newRa, rem) = ra.reserveAvailable(time, target, conds)
-    (new SemesterResource(newRa, this.time, band), rem)
+    (new SemesterResource(newRa, this.time), rem)
   }
 
 

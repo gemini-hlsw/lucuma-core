@@ -3,8 +3,8 @@
 
 package edu.gemini.tac.qengine.impl.resource
 
-import edu.gemini.tac.qengine.api.config.DecBin
-import edu.gemini.tac.qengine.api.config.DecBinGroup
+import edu.gemini.tac.qengine.api.config.DecRanged
+import edu.gemini.tac.qengine.api.config.DeclinationMap
 import edu.gemini.tac.qengine.ctx.Partner
 import edu.gemini.tac.qengine.impl.block.Block
 import edu.gemini.tac.qengine.log.RejectTarget
@@ -12,6 +12,7 @@ import edu.gemini.tac.qengine.p1.*
 import edu.gemini.tac.qengine.util.BoundedTime
 import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.Site
+import lucuma.core.enums.ToOActivation
 import lucuma.core.util.Enumerated
 import munit.FunSuite
 import org.junit.*
@@ -22,10 +23,10 @@ class DecResourceTest extends FunSuite {
   import Partner.KR
   val partners = Enumerated[Partner].all
 
-  private val bin1 = DecBin( 0, 10, BoundedTime(Time.hours(10)))
-  private val bin2 = DecBin(10, 20, BoundedTime(Time.hours(20)))
-  private val binGrp = DecBinGroup.fromBins(bin1, bin2)
-  private val grp    = new DecResourceGroup(binGrp)
+  private val bin1 = DecRanged( 0, 10, BoundedTime(Time.hours(10)))
+  private val bin2 = DecRanged(10, 20, BoundedTime(Time.hours(20)))
+  private val binGrp = DeclinationMap.fromBins(bin1, bin2)
+  private val grp    = new DeclinationMapResource(binGrp)
 
   private def target(dec: Double): Target = Target(0.0, dec)
 
@@ -40,7 +41,7 @@ class DecResourceTest extends FunSuite {
   private val ntac = Ntac(KR, "x", 0, Time.Zero)
 
   private def mkProp(target: Target): Proposal =
-    Proposal(ntac, site = Site.GS, obsList = List(Observation(null, target, conds, Time.Zero)))
+    Proposal(ntac, site = Site.GS, obsList = List(Observation(target, conds, Time.Zero)))
 
   test("testNormalReserveWithRemainingTime") {
     val prop   = mkProp(target0)
@@ -107,7 +108,7 @@ class DecResourceTest extends FunSuite {
   }
 
   test("testReserveToo") {
-    val prop   = mkProp(target0).copy(too = Too.standard)
+    val prop   = mkProp(target0).copy(too = ToOActivation.Standard)
     val block  = Block(prop, prop.obsList.head, Time.hours(10))
 
     grp.reserve(block, Fixture.emptyQueue) match {
@@ -121,7 +122,7 @@ class DecResourceTest extends FunSuite {
 
   // Spread over the two bins, but the first bin cannot handle an equal share.
   test("testReserveTooUnequal") {
-    val prop   = mkProp(target0).copy(too = Too.standard)
+    val prop   = mkProp(target0).copy(too = ToOActivation.Standard)
     val block  = Block(prop, prop.obsList.head, Time.hours(22))
 
     grp.reserve(block, Fixture.emptyQueue) match {
@@ -133,7 +134,7 @@ class DecResourceTest extends FunSuite {
   }
 
   test("testReserveTooOverallocate") {
-    val prop   = mkProp(target0).copy(too = Too.standard)
+    val prop   = mkProp(target0).copy(too = ToOActivation.Standard)
     val block  = Block(prop, prop.obsList.head, Time.hours(30.001))
 
     grp.reserve(block, Fixture.emptyQueue) match {

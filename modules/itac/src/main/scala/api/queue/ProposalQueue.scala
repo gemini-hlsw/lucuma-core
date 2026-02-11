@@ -9,11 +9,12 @@ import edu.gemini.tac.qengine.ctx.Partner
 import edu.gemini.tac.qengine.p1.*
 import edu.gemini.tac.qengine.util.BoundedTime
 import edu.gemini.tac.qengine.util.Time
+import lucuma.core.enums.ScienceBand
 
 /** A queue for a single band. */
 trait ProposalQueue {
 
-  def band: QueueBand
+  def band: ScienceBand
 
   def queueTime: QueueTime
 

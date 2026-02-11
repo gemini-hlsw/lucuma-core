@@ -28,11 +28,11 @@ object TooBlocks {
   // Here we concern ourselves with the limit for the provided obs conditions.
   // The target is ignored since the target is not known.  We will be spreading
   // the time over the dec ranges.
-//  def apply(block: Block, raGroup: RaBinGroup[RaReservation]): Option[Seq[Block]] =
+//  def apply(block: Block, raGroup: RightAscensionMap[RaReservation]): Option[Seq[Block]] =
 //    apply[RaReservation](block, raGroup.bins, _.remaining(block.obs.conditions))
 
-//  def apply(block: Block, decGroup: DecBinGroup[BoundedTime]): Option[Seq[Block]] =
-//    apply[DecBin[BoundedTime]](block, decGroup.bins, _.binValue.remaining)
+//  def apply(block: Block, decGroup: DeclinationMap[BoundedTime]): Option[Seq[Block]] =
+//    apply[DecRanged[BoundedTime]](block, decGroup.bins, _.binValue.remaining)
 
   def apply[T](block: Block, bins: Seq[T], remTime: T => Time): Option[Seq[Block]] =
     new TooBlocks(block, bins, remTime).seq
@@ -42,7 +42,7 @@ object TooBlocks {
 
     /**
      * Returns a sequence of smaller blocks (one for each member of the
-     * RaBinGroup) wrapped in a Some.  Each block is adjusted to contain the
+     * RightAscensionMap) wrapped in a Some.  Each block is adjusted to contain the
      * amount of time to reserve in the corresponding RA bin.  If the original
      * block cannot be distributed over the RA bins, None is returned.
      */

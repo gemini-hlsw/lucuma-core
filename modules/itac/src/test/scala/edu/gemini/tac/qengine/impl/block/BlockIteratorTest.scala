@@ -21,12 +21,12 @@ class BlockIteratorTest {
   val conds = ObservingConditions.AnyConditions // required by not used
   val e = 0.000001
 
-  def mkObs(hrs: Double): Observation = Observation(null, target, conds, Time.hours(hrs))
+  def mkObs(hrs: Double): Observation = Observation(target, conds, Time.hours(hrs))
 
   def mkProp(p: Partner, hrs: Double, obsHrs: List[Double], b3ObsHrs: List[Double]): Proposal = {
     val ntac = Ntac(p, "na", 0, Time.hours(hrs))
-    val lst = obsHrs.map(curHrs => Observation(null, target, conds, Time.hours(curHrs))).toList
-    val b3obs = b3ObsHrs.map(curHrs => Observation(null, target, conds, Time.hours(curHrs))).toList
+    val lst = obsHrs.map(curHrs => Observation(target, conds, Time.hours(curHrs))).toList
+    val b3obs = b3ObsHrs.map(curHrs => Observation(target, conds, Time.hours(curHrs))).toList
     Proposal(ntac, site = Site.GS, obsList = lst, band3Observations = b3obs)
   }
 

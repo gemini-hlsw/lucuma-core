@@ -22,7 +22,7 @@ import munit.FunSuite
 
 import scala.Ordering.Implicits.*
 
-class TimeResourceGroupTest extends FunSuite {
+class CompositeTimeRestrictionResourceTest extends FunSuite {
   import Partner.US
   val partners = Enumerated[Partner].all
 
@@ -40,14 +40,14 @@ class TimeResourceGroupTest extends FunSuite {
   }
 
   // 10% of 10 hours = 1 hr = 60 min
-  private val resWV60min  = TimeResource(wvBin, Time.hours(10))
-  private val resLgs60min = TimeResource(lgsBin)
+  private val resWV60min  = TimeRestrictionResource(wvBin, Time.hours(10))
+  private val resLgs60min = TimeRestrictionResource(lgsBin)
 
   private val lst = List(resWV60min, resLgs60min)
-  private val grp = new TimeResourceGroup(lst)
+  private val grp = new CompositeTimeRestrictionResource(lst)
 
   private def mkProp(wv: WaterVapor, lgs: Boolean): Proposal =
-    Proposal(ntac, site = Site.GS, obsList = List(Observation(null, target, conds(wv), Time.hours(10), lgs)))
+    Proposal(ntac, site = Site.GS, obsList = List(Observation(target, conds(wv), Time.hours(10), lgs)))
 
   test("testReserveWv") {
     val prop  = mkProp(WV20, lgs = false)  // matches WV limit, not LGS limit

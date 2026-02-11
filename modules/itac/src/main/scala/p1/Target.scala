@@ -13,6 +13,5 @@ case class Target(coords: Coordinates, name: Option[String] = None):
   def dec = coords.dec
 
 object Target:
-  // TODO: deprecate
   def apply(ra: Double, dec: Double): Target =
     Target(Coordinates(RightAscension(HourAngle.fromDoubleDegrees(ra)), Declination.fromDoubleDegrees(dec).get))

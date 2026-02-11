@@ -8,25 +8,25 @@ import lucuma.core.math.HourAngle
 import lucuma.core.math.RightAscension
 
 
-object RaBinGroup {
+object RightAscensionMap {
 
   // The total number of minutes in the full range of RAs.
   val TotalMin = 24*60
 
-  def apply[T](bins: Seq[T]): RaBinGroup[T] = new RaBinGroup[T](bins.toIndexedSeq)
+  def apply[T](bins: Seq[T]): RightAscensionMap[T] = new RightAscensionMap[T](bins.toIndexedSeq)
 
   /**
-   * Generates an RaBinGroup given a bin size in minutes, which must evenly
+   * Generates an RightAscensionMap given a bin size in minutes, which must evenly
    * divide the total number of minutes in 24 hours, and a function that
    * calculates a value based upon the angle corresponding to the center of
    * the bin and the size of the bin in minutes.
    */
-  def gen[T ](binSizeMin: Int)(f: (RightAscension, Int) => T): RaBinGroup[T] = {
+  def gen[T ](binSizeMin: Int)(f: (RightAscension, Int) => T): RightAscensionMap[T] = {
     require((TotalMin % binSizeMin) == 0)
 
     val r = 0 until TotalMin by binSizeMin
     val halfSize = binSizeMin/2.0
-    new RaBinGroup(r.map(min => f(RightAscension(HourAngle.fromDoubleMinutes(min+halfSize)), binSizeMin)))
+    new RightAscensionMap(r.map(min => f(RightAscension(HourAngle.fromDoubleMinutes(min+halfSize)), binSizeMin)))
   }
 
   def gen15MinBins[T ] = gen[T](15)
@@ -39,27 +39,27 @@ object RaBinGroup {
   def gen4HrBins[T ]   = gen[T](240)
 }
 
-import RaBinGroup._
+import RightAscensionMap._
 
 // Choosing an IndexedSeq here because we want fast random access and arrays
 // are complicated.
 
 /**
- * An RaBinGroup is a parametrized collection indexed by RA angle.
+ * An RightAscensionMap is a parametrized collection indexed by RA angle.
  */
-case class RaBinGroup[T] private (val bins: IndexedSeq[T]) {
+case class RightAscensionMap[T] private (val bins: IndexedSeq[T]) {
   require((TotalMin % bins.length) == 0)
 
   /** Size of each bin in minutes. */
   val sizeMin = TotalMin / bins.length
 
-  def updated(ra: RightAscension, f: T => Option[T]): Option[RaBinGroup[T]] = {
+  def updated(ra: RightAscension, f: T => Option[T]): Option[RightAscensionMap[T]] = {
     val i = indexOf(ra)
-    f(bins(i)).map(bins.updated(i, _)).map(new RaBinGroup(_))
+    f(bins(i)).map(bins.updated(i, _)).map(new RightAscensionMap(_))
   }
 
-  def updated(ra: RightAscension, t: T): RaBinGroup[T] = {
-    new RaBinGroup(bins.updated(indexOf(ra), t))
+  def updated(ra: RightAscension, t: T): RightAscensionMap[T] = {
+    new RightAscensionMap(bins.updated(indexOf(ra), t))
   }
 
   def indexOf(ra: RightAscension): Int = ra.toHourAngle.toDoubleMinutes.toInt / sizeMin
@@ -68,6 +68,6 @@ case class RaBinGroup[T] private (val bins: IndexedSeq[T]) {
   def apply(ra: RightAscension): T  = bins(indexOf(ra))
   def apply(t: Target): T = apply(t.ra)
 
-  def map[U](f: T => U): RaBinGroup[U] = new RaBinGroup[U](bins.map(f))
+  def map[U](f: T => U): RightAscensionMap[U] = new RightAscensionMap[U](bins.map(f))
 }
 

@@ -19,6 +19,7 @@ import edu.gemini.tac.qengine.util.BoundedTime
 import edu.gemini.tac.qengine.util.Percent
 import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.Half
+import lucuma.core.enums.ScienceBand
 import lucuma.core.enums.Site
 import lucuma.core.model.Semester
 import lucuma.core.model.Semester.YearInt
@@ -34,31 +35,31 @@ object Fixture {
   // (-90,  0]   0%
   // (  0, 45] 100%
   // ( 45, 90)  50%
-  val decBins   = DecBinGroup.fromBins(
-    DecBin( 0, 45, Percent(100)),
-    DecBin(45, 90, Percent( 50)).inclusive
+  val decBins   = DeclinationMap.fromBins(
+    DecRanged( 0, 45, Percent(100)),
+    DecRanged(45, 90, Percent( 50)).inclusive
   )
 
   // <=CC70 50%
   // >=CC80 50%
-  val condsBins = ConditionsBinGroup.ofPercent(
+  val condsBins = ConditionsCategoryMap.ofPercent(
     (ConditionsCategory(Le(CC70)), 50), (ConditionsCategory(Ge(CC80)), 50)
   )
 
   // 0 hrs, 1 hrs, 2 hrs, ... 23 hrs
-  val raLimits   = RaBinGroup((0 to 23).map(Time.hours(_)))
+  val raLimits   = RightAscensionMap((0 to 23).map(Time.hours(_)))
   val binConfig  = new SiteSemesterConfig(site, semester, raLimits, decBins, List.empty, condsBins)
-  val raResGroup = RaResourceGroup(binConfig)
+  val raResGroup = RightAscensionMapResource(binConfig)
 
-  def timeResourceGroup(total: Time): TimeResourceGroup = {
+  def compositeTimeRestrictionResource(total: Time): List[TimeRestriction[BoundedTime]] = {
     val bins = RestrictionConfig().mapTimeRestrictions(
       perc => BoundedTime(total * perc),
       _ => BoundedTime(total))
-    new TimeResourceGroup(bins.map(new TimeResource(_)))
+    bins
   }
 
   def semesterRes(total: Time): SemesterResource =
-    new SemesterResource(raResGroup, timeResourceGroup(total), QueueBand.QBand1)
+    new SemesterResource(raResGroup, compositeTimeRestrictionResource(total))
 
   // Falls in the first conditions bin (<=CC70)
   val goodCC = ObservingConditions(CC50, IQAny, SBAny, WVAny)
@@ -71,9 +72,9 @@ object Fixture {
   // Makes a proposal with the given ntac info, and observations according
   // to the descriptions (target, conditions, time)
   def mkProp(ntac: Ntac, obsDefs: (Target, ObservingConditions, Time)*): Proposal =
-    Proposal(ntac, site = site, obsList = obsDefs.map(tup => Observation(null, tup._1, tup._2, tup._3)).toList)
+    Proposal(ntac, site = site, obsList = obsDefs.map(tup => Observation(tup._1, tup._2, tup._3)).toList)
 
-  val emptyQueue = ProposalQueueBuilder(QueueTime(PartnerTime.empty, Percent.Zero), QueueBand.QBand1, Nil) // QueueTime(Site.GN, PartnerTime.empty(partners).map, partners))
+  val emptyQueue = ProposalQueueBuilder(QueueTime(PartnerTime.empty, Percent.Zero), ScienceBand.Band1, Nil) // QueueTime(Site.GN, PartnerTime.empty(partners).map, partners))
   def evenQueue(hrs: Double): ProposalQueueBuilder =
     evenQueue(hrs, Some(QueueTime.DefaultPartnerOverfillAllowance))
 
@@ -88,7 +89,7 @@ object Fixture {
   }
 
   def evenQueue(hrs: Double, overfill: Option[Percent]): ProposalQueueBuilder =
-    ProposalQueueBuilder(evenQueueTime(hrs, overfill), QueueBand.QBand1)
+    ProposalQueueBuilder(evenQueueTime(hrs, overfill), ScienceBand.Band1)
 
 
 }
