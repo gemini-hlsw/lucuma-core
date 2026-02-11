@@ -77,7 +77,7 @@ object HorizonsParser:
           sDecRate.parseBigDecimalOption.map(Angle.fromBigDecimalArcseconds).toRight(s"Invalid Dec delta: $sRaRate"),
           sAirmass.parseDoubleOrNA("airmass")(AirMass.from(_).toOption),
           sExtinction.parseBigDecimalOrNA("extinction")(Extinction.FromVegaMagnitude.getOption),
-          sVMag.parseDoubleOption.toRight(s"Invalid visual magnitude: $sVMag"),
+          sVMag.parseDoubleOrNA("visual magnitude")(_.some),
           sSB.parseDoubleOrNA("surface brightness")(_.some)
         ).tupled.map: (inst, ra, dec, dRa, dDec, airmass, extinction, vmag, sb) =>
           Ephemeris.Horizons.Element(

@@ -66,7 +66,7 @@ object Ephemeris:
       velocity: Offset,
       airmass: Option[AirMass],
       extinction: Option[Extinction],
-      visualMagnitude: Double,
+      visualMagnitude: Option[Double],
       surfaceBrightness: Option[Double],
     ) extends Ephemeris.Element
 
