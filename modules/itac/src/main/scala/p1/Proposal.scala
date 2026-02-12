@@ -3,17 +3,20 @@
 
 package edu.gemini.tac.qengine.p1
 
-import edu.gemini.tac.qengine.ctx.Partner
 import edu.gemini.tac.qengine.util.Time
+import lucuma.core.enums.ScienceBand
+import lucuma.core.enums.ScienceSubtype
 import lucuma.core.enums.Site
+import lucuma.core.enums.TimeAccountingCategory
+import lucuma.core.enums.ToOActivation
 
 import java.io.File
 
 case class Proposal(
   ntac: Ntac,
   site: Site,
-  mode: Mode = Mode.Queue,
-  too: Too.Value = Too.none,
+  mode: ScienceSubtype = ScienceSubtype.Queue,
+  too: ToOActivation = ToOActivation.None,
   obsList: List[Observation] = Nil,
   band3Observations: List[Observation] = Nil,
   isPoorWeather: Boolean = false,
@@ -25,10 +28,10 @@ case class Proposal(
   itacComment: Option[String] = None,
 ) {
 
-  lazy val id: Proposal.Id = Proposal.Id(ntac.partner, ntac.reference)
+  lazy val id: Proposal.Id = Proposal.Id(ntac.TimeAccountingCategory, ntac.reference)
 
-  def obsListFor(band: QueueBand): List[Observation] =
-    if (band == QueueBand.QBand3) band3Observations else obsList
+  def obsListFor(band: ScienceBand): List[Observation] =
+    if (band == ScienceBand.Band3) band3Observations else obsList
 
   /**
    * Gets the time for the proposal as a whole.
@@ -45,14 +48,14 @@ case class Proposal(
    * Gets the time for the given observation relative to the total for all
    * observations in the proposal.
    */
-  def relativeObsTime(obs: Observation, band: QueueBand): Time =
+  def relativeObsTime(obs: Observation, band: ScienceBand): Time =
     Observation.relativeObsTime(obs, time, obsListFor(band))
 
   /**
    * Gets the observation list with their times adjusted to be relative to
    * the total for all observations in the proposal.
    */
-  def relativeObsList(band: QueueBand): List[Observation] =
+  def relativeObsList(band: ScienceBand): List[Observation] =
     Observation.relativeObsList(time, obsListFor(band))
 
   def p1pdfBaseName: Option[String] =
@@ -76,10 +79,10 @@ case class Proposal(
 
 object Proposal {
 
-  final case class Id(partner: Partner, reference: String)
+  final case class Id(TimeAccountingCategory: TimeAccountingCategory, reference: String)
   object Id {
     implicit val OrderingId: Ordering[Id] =
-      Ordering.by(id => (id.partner.tag, id.reference))
+      Ordering.by(id => (id.TimeAccountingCategory.tag, id.reference))
   }
 
   case class Pdfs[A](

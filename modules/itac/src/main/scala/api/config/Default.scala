@@ -19,7 +19,7 @@ import Cat.*
 
 object Default {
 
-  val Conditions = ConditionsBinGroup.ofPercent(
+  val Conditions = ConditionsCategoryMap.ofPercent(
     (Cat(Eq(CC50), Eq(IQ20), Le(SB50), UnspecifiedWV, Some("1")), 4),
     (Cat(Eq(CC50), Eq(IQ20), Ge(SB80), UnspecifiedWV, Some("2")), 4),
     (Cat(Ge(CC70), Eq(IQ20), UnspecifiedSB, UnspecifiedWV, Some("3")), 3),

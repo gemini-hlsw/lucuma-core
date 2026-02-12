@@ -12,7 +12,7 @@ import edu.gemini.tac.qengine.p1.WaterVapor.*
 import edu.gemini.tac.qengine.util.Percent
 import munit.FunSuite
 
-class ConditionsBinGroupTest extends FunSuite {
+class ConditionsCategoryMapTest extends FunSuite {
   val cat0 = ConditionsCategory(Eq(CC50))
   val cat1 = ConditionsCategory(Eq(CC70))
   val cat2 = ConditionsCategory(Eq(CC80))
@@ -26,9 +26,9 @@ class ConditionsBinGroupTest extends FunSuite {
   val oc2  = ObservingConditions(CC80,  IQ20, SB20, WV20)
   val oc3  = ObservingConditions(CCAny, IQ20, SB20, WV20)
 
-  val grp = ConditionsBinGroup.of(List(bin0, bin1, bin2, bin3))
+  val grp = ConditionsCategoryMap.of(List(bin0, bin1, bin2, bin3))
 
-  def validatePath[A](grp: ConditionsBinGroup[A]) = {
+  def validatePath[A](grp: ConditionsCategoryMap[A]) = {
     assertEquals(List(cat0), grp.searchPath(oc0))
     assertEquals(List(cat1, cat0), grp.searchPath(oc1))
     assertEquals(List(cat2, cat1, cat0), grp.searchPath(oc2))

@@ -4,7 +4,6 @@
 package edu.gemini.tac.qengine.impl.resource
 
 import edu.gemini.tac.qengine.api.config.TimeRestriction
-import edu.gemini.tac.qengine.ctx.Partner
 import edu.gemini.tac.qengine.impl.block.Block
 import edu.gemini.tac.qengine.log.RejectRestrictedBin
 import edu.gemini.tac.qengine.p1.*
@@ -16,6 +15,7 @@ import edu.gemini.tac.qengine.p1.WaterVapor.*
 import edu.gemini.tac.qengine.util.Percent
 import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.Site
+import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.math.Coordinates
 import lucuma.core.util.Enumerated
 import munit.FunSuite
@@ -25,9 +25,9 @@ import scala.Ordering.Implicits.*
 
 import Assert.*
 
-class TimeResourceTest extends FunSuite {
-  import Partner.US
-  val partners = Enumerated[Partner].all
+class TimeRestrictionResourceTest extends FunSuite {
+  import TimeAccountingCategory.US
+  val TimeAccountingCategorys = Enumerated[TimeAccountingCategory].all
 
   private val ntac   = Ntac(US, "x", 0, Time.hours(10))
   private val target = Target(Coordinates.Zero) // not used
@@ -39,10 +39,10 @@ class TimeResourceTest extends FunSuite {
   }
 
   // 10% of 10 hours = 1 hr = 60 min
-  private val res60min = TimeResource(bin, Time.hours(10))
+  private val res60min = TimeRestrictionResource(bin, Time.hours(10))
 
   private def mkProp(wv: WaterVapor): Proposal =
-    Proposal(ntac, site = Site.GS, obsList = List(Observation(null, target, conds(wv), Time.hours(10))))
+    Proposal(ntac, site = Site.GS, obsList = List(Observation(target, conds(wv), Time.hours(10))))
 
   test("testReserveNoMatch") {
     val prop = mkProp(WV80)

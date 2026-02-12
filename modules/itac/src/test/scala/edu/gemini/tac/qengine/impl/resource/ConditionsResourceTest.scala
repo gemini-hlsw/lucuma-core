@@ -4,15 +4,15 @@
 package edu.gemini.tac.qengine.impl.resource
 
 import edu.gemini.tac.qengine.api.config.ConditionsBin
-import edu.gemini.tac.qengine.api.config.ConditionsBinGroup
 import edu.gemini.tac.qengine.api.config.ConditionsCategory as Cat
-import edu.gemini.tac.qengine.ctx.Partner
+import edu.gemini.tac.qengine.api.config.ConditionsCategoryMap
 import edu.gemini.tac.qengine.impl.block.Block
 import edu.gemini.tac.qengine.log.RejectConditions
 import edu.gemini.tac.qengine.p1.*
 import edu.gemini.tac.qengine.util.Percent
 import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.Site
+import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.util.Enumerated
 import munit.FunSuite
 
@@ -23,8 +23,8 @@ import WaterVapor.WV20
 import Cat.*
 
 class ConditionsResourceTest extends FunSuite{
-  import Partner.KR
-  val partners = Enumerated[Partner].all
+  import TimeAccountingCategory.KR
+  val TimeAccountingCategorys = Enumerated[TimeAccountingCategory].all
 
   private val bins = ConditionsBin.of(
       (Cat(Eq(CC50)),  Percent(25)),
@@ -33,14 +33,14 @@ class ConditionsResourceTest extends FunSuite{
       (Cat(Eq(CCAny)), Percent(25))
     )
 
-  private val binGrp = ConditionsBinGroup.of(bins)
-  private val resGrp = ConditionsResourceGroup(Time.minutes(100), binGrp)
+  private val binGrp = ConditionsCategoryMap.of(bins)
+  private val resGrp = ConditionsCategoryMapResource(Time.minutes(100), binGrp)
 
   private val ntac   = Ntac(KR, "x", 0, Time.minutes(100)) // not used
   private val target = Target(0,0)                               // not used
 
   private def mkProp(obsConds: ObservingConditions): Proposal = {
-    val obsList = List(Observation(null, target, obsConds, Time.minutes(10)))
+    val obsList = List(Observation(target, obsConds, Time.minutes(10)))
     Proposal(ntac, site = Site.GS, obsList = obsList)
   }
 
@@ -49,7 +49,7 @@ class ConditionsResourceTest extends FunSuite{
 
   // Verify that the given remaining times match -- times must be specified
   // in order of CloudCover values.
-  private def verifyTimes(track: ConditionsResourceGroup, mins: Int*) = {
+  private def verifyTimes(track: ConditionsCategoryMapResource, mins: Int*) = {
     CloudCover.values.zip(mins).foreach {
       case (cc, min) => {
         val remaining = track.remaining(mkConds(cc))

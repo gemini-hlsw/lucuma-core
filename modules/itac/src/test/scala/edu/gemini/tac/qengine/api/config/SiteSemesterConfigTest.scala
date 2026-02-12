@@ -18,15 +18,15 @@ class SiteSemesterConfigTest extends FunSuite {
   val semester = new Semester(YearInt.unsafeFrom(2011), Half.A)
 
   test("testPassSingleDecBinPercentageRequirement") {
-    val ra  = RaBinGroup(List(Time.hours(100.0)))
-    val dec = DecBinGroup(List(Percent(100)))
+    val ra  = RightAscensionMap(List(Time.hours(100.0)))
+    val dec = DeclinationMap(List(Percent(100)))
     new SiteSemesterConfig(site, semester, ra, dec, List.empty)
     ()
   }
 
   test("testFailSingleDecBinPercentageRequirement") {
-    val ra  = RaBinGroup(List(Time.hours(100.0)))
-    val dec = DecBinGroup(List(Percent(99)))
+    val ra  = RightAscensionMap(List(Time.hours(100.0)))
+    val dec = DeclinationMap(List(Percent(99)))
     try {
       new SiteSemesterConfig(site, semester, ra, dec, List.empty)
       ()
@@ -36,15 +36,15 @@ class SiteSemesterConfigTest extends FunSuite {
   }
 
   test("testPassMultiDecBinPercentageRequirement") {
-    val ra  = RaBinGroup(List(Time.hours(100.0)))
-    val dec = DecBinGroup(List(Percent(10), Percent(100), Percent(0)))
+    val ra  = RightAscensionMap(List(Time.hours(100.0)))
+    val dec = DeclinationMap(List(Percent(10), Percent(100), Percent(0)))
     new SiteSemesterConfig(site, semester, ra, dec, List.empty)
     ()
   }
 
   test("testFailMultiDecBinPercentageRequirement") {
-    val ra  = RaBinGroup(List(Time.hours(100.0)))
-    val dec = DecBinGroup(List(Percent(10), Percent(99), Percent(0)))
+    val ra  = RightAscensionMap(List(Time.hours(100.0)))
+    val dec = DeclinationMap(List(Percent(10), Percent(99), Percent(0)))
     try {
       new SiteSemesterConfig(site, semester, ra, dec, List.empty)
       ()

@@ -5,14 +5,14 @@ package edu.gemini.tac.qengine.log
 
 import edu.gemini.tac.qengine.p1.Observation
 import edu.gemini.tac.qengine.p1.Proposal
-import edu.gemini.tac.qengine.p1.QueueBand
 import edu.gemini.tac.qengine.util.Time
+import lucuma.core.enums.ScienceBand
 
 object RejectToo {
   val name = "ToO Remaining Time"
 
   private val detailTemplate = "ToO observation of %.2f hours with conditions %s.  Remaining time %.2f hours."
-  def detail(prop: Proposal, obs: Observation, band: QueueBand, remaining: Time): String = {
+  def detail(prop: Proposal, obs: Observation, band: ScienceBand, remaining: Time): String = {
     val obsTime = prop.relativeObsTime(obs, band).toHours.value
     val remTime = remaining.toHours.value
     detailTemplate.format(obsTime, obs.conditions, remTime)
@@ -20,7 +20,7 @@ object RejectToo {
 
 }
 
-final case class RejectToo(prop: Proposal, obs: Observation, band: QueueBand, remaining: Time) extends ObsRejectMessage {
+final case class RejectToo(prop: Proposal, obs: Observation, band: ScienceBand, remaining: Time) extends ObsRejectMessage {
   def reason: String = RejectToo.name
   def detail: String = RejectToo.detail(prop, obs, band, remaining)
 }

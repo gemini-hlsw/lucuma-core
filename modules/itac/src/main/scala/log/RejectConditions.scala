@@ -5,8 +5,8 @@ package edu.gemini.tac.qengine.log
 
 import edu.gemini.tac.qengine.p1.Observation
 import edu.gemini.tac.qengine.p1.Proposal
-import edu.gemini.tac.qengine.p1.QueueBand
 import edu.gemini.tac.qengine.util.Time
+import lucuma.core.enums.ScienceBand
 
 /**
  * An observation rejection message for observing conditions restrictions
@@ -16,11 +16,11 @@ object RejectConditions extends TimeBinMessageFormatter {
   val name = "Conditions Limit"
 
   private val detailTemplate = "%s %s"
-  override def detail(prop: Proposal, obs: Observation, band: QueueBand, cur: Time, max: Time): String =
+  override def detail(prop: Proposal, obs: Observation, band: ScienceBand, cur: Time, max: Time): String =
     detailTemplate.format(obs.conditions, super.detail(prop, obs, band, cur, max))
 }
 
-final case class RejectConditions(prop: Proposal, obs: Observation, band: QueueBand, cur: Time, max: Time) extends ObsRejectMessage {
+final case class RejectConditions(prop: Proposal, obs: Observation, band: ScienceBand, cur: Time, max: Time) extends ObsRejectMessage {
   def reason: String = RejectConditions.name
   def detail: String = RejectConditions.detail(prop, obs, band, cur, max)
 }

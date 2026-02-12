@@ -11,7 +11,7 @@ import edu.gemini.tac.qengine.p1.Proposal
 object AcceptMessage {
   private def detailTemplate = "%s rank %5s."
   def detail(prop: Proposal): String = {
-    detailTemplate.format(prop.id.partner, prop.ntac.ranking.format)
+    detailTemplate.format(prop.id.TimeAccountingCategory, prop.ntac.ranking.format)
   }
 }
 

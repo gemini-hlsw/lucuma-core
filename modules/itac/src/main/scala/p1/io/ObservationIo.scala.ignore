@@ -55,7 +55,7 @@ object ObservationIo {
       if (imSite == im.Site.GN) Site.GN else Site.GS
     }
 
-    // Get the p1 observations QueueBand.Category (Band 3 or Band 1/2).
+    // Get the p1 observations ScienceBand.Category (Band 3 or Band 1/2).
     def band(p1Obs: im.Observation): BandChoice =
       if (p1Obs.band == im.Band.BAND_3) BandChoice.Band3 else BandChoice.Band124
 

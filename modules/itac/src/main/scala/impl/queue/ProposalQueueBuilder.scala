@@ -7,6 +7,8 @@ import cats.syntax.all.*
 import edu.gemini.tac.qengine.api.queue.ProposalQueue
 import edu.gemini.tac.qengine.api.queue.time.QueueTime
 import edu.gemini.tac.qengine.p1.*
+import lucuma.core.enums.ScienceBand
+import lucuma.core.util.Enumerated
 
 /**
  * ProposalQueueBuilder is used to construct the Band 1, 2, and 3 part of the
@@ -20,7 +22,7 @@ import edu.gemini.tac.qengine.p1.*
 
 final case class ProposalQueueBuilder(
   queueTime: QueueTime,
-  band:      QueueBand,
+  band:      ScienceBand,
   proposals: List[Proposal] = Nil
 ) extends ProposalQueue {
 
@@ -41,8 +43,8 @@ final case class ProposalQueueBuilder(
 
   def toList: List[Proposal] = proposals.reverse
 
-  val bandedQueue: Map[QueueBand,List[Proposal]] =
-    QueueBand.values.foldMap(b => Map(b -> List.empty[Proposal])) ++
+  val bandedQueue: Map[ScienceBand,List[Proposal]] =
+    Enumerated[ScienceBand].all.foldMap(b => Map(b -> List.empty[Proposal])) ++
     Map(band -> proposals)
 
 }

@@ -57,7 +57,7 @@ object QueueCalcStage {
    * provided parameters:
    * p.cat : Category -> The current band (essentially)
    * p.queue : ProposalQueueBuilder -> Encapsulates the state of the being-built queue
-   * p.iter : BlockIterator -> Produces a block of time for the current partner's preferred Proposal
+   * p.iter : BlockIterator -> Produces a block of time for the current TimeAccountingCategory's preferred Proposal
    * p.res :  SemesterResource -> Encapsulates the state of the remaining resources
    * p.log :  ProposalLog -> Holds a record of decisions
    * p.activeList : Proposal=>List[Observation] -> Either _.obsList or _.band3Observations

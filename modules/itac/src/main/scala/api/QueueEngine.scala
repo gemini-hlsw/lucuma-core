@@ -6,15 +6,15 @@ package edu.gemini.tac.qengine.api
 import edu.gemini.tac.qengine.api.config.QueueEngineConfig
 import edu.gemini.tac.qengine.api.queue.time.QueueTime
 import edu.gemini.tac.qengine.p1.Proposal
-import edu.gemini.tac.qengine.p1.QueueBand
+import lucuma.core.enums.ScienceBand
 
 /**
  * The queue generation engine.
  */
 trait QueueEngine {
   def calc(
-    bandedProposals: QueueBand => List[Proposal],
-    queueTimes:   QueueBand => QueueTime,
+    bandedProposals: ScienceBand => List[Proposal],
+    queueTimes:   ScienceBand => QueueTime,
     config: QueueEngineConfig,
     removed: List[Proposal] = Nil
   ): QueueCalc

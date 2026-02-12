@@ -4,8 +4,8 @@
 package edu.gemini.tac.qengine.impl.resource
 
 import edu.gemini.tac.qengine.api.config.ConditionsBin
-import edu.gemini.tac.qengine.api.config.ConditionsBinGroup
 import edu.gemini.tac.qengine.api.config.ConditionsCategory as Cat
+import edu.gemini.tac.qengine.api.config.ConditionsCategoryMap
 import edu.gemini.tac.qengine.impl.block.Block
 import edu.gemini.tac.qengine.impl.queue.ProposalQueueBuilder
 import edu.gemini.tac.qengine.log.*
@@ -16,7 +16,7 @@ import edu.gemini.tac.qengine.util.Time
 
 import annotation.tailrec
 
-object ConditionsResourceGroup {
+object ConditionsCategoryMapResource {
 
   // Absorbs the time into the BoundedTime values associated with the given
   // "in" list of observing conditions categories, returning a list of updated
@@ -33,11 +33,11 @@ object ConditionsResourceGroup {
    * Constructs with the total time to spread across the observing conditions
    * bins and the set of bins to use.
    */
-  def apply(t: Time, g: ConditionsBinGroup[Percent]) = {
+  def apply(t: Time, g: ConditionsCategoryMap[Percent]) = {
     // Creates a map from ConditionsBin.Category to BoundedTime initialized with
     // time values according to the relative percentage of the matching
     // conditions bin.
-    new ConditionsResourceGroup(g.map(perc => BoundedTime(t * perc)))
+    new ConditionsCategoryMapResource(g.map(perc => BoundedTime(t * perc)))
   }
 }
 
@@ -46,8 +46,8 @@ object ConditionsResourceGroup {
  * observing conditions categories.  Handles spilling the time across better
  * categories when necessary and possible.
  */
-final class ConditionsResourceGroup private (val bins: ConditionsBinGroup[BoundedTime]) extends Resource {
-  type T = ConditionsResourceGroup
+final class ConditionsCategoryMapResource private (val bins: ConditionsCategoryMap[BoundedTime]) extends Resource {
+  type T = ConditionsCategoryMapResource
 
   private def sum(c: ObservingConditions, f: (BoundedTime => Time)): Time = {
     val cats = bins.searchPath(c)
@@ -67,7 +67,7 @@ final class ConditionsResourceGroup private (val bins: ConditionsBinGroup[Bounde
    * if possible.  Returns an updated ConditionsReservation containing the
    * observation's time, or else an error.
    */
-  override def reserve(block: Block, queue: ProposalQueueBuilder): RejectMessage Either ConditionsResourceGroup = {
+  override def reserve(block: Block, queue: ProposalQueueBuilder): RejectMessage Either ConditionsCategoryMapResource = {
     val c = conds(block)
     reserveAvailable(block.time, c) match {
       case (newGrp, t) if t.isZero => Right(newGrp)
@@ -82,9 +82,9 @@ final class ConditionsResourceGroup private (val bins: ConditionsBinGroup[Bounde
    * returned.   Returns a new conditions resource group with the reserved time
    * along with any remaining time that could not be reserved.
    */
-  def reserveAvailable(time: Time, conds: ObservingConditions): (ConditionsResourceGroup, Time) = {
-    val (updatedBins, rem) = ConditionsResourceGroup.reserveAvailable(time, bins.searchBins(conds), Nil)
-    (new ConditionsResourceGroup(bins.updated(updatedBins)), rem)
+  def reserveAvailable(time: Time, conds: ObservingConditions): (ConditionsCategoryMapResource, Time) = {
+    val (updatedBins, rem) = ConditionsCategoryMapResource.reserveAvailable(time, bins.searchBins(conds), Nil)
+    (new ConditionsCategoryMapResource(bins.updated(updatedBins)), rem)
   }
 
 }

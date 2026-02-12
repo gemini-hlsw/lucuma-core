@@ -22,7 +22,7 @@ class RaBinGroupTest extends FunSuite {
   private def f(a: RightAscension, @unused sizeMin: Int): Time = Time.minutes(a.toHourAngle.toDoubleMinutes)
 
   test("testGenerate1Hr") {
-    val g1Hr = RaBinGroup.gen1HrBins(f)
+    val g1Hr = RightAscensionMap.gen1HrBins(f)
     assertEquals(24, g1Hr.bins.length)
 
     val times = for (i <- 0 until 24) yield Time.minutes(i * 60 + 30)
@@ -30,15 +30,15 @@ class RaBinGroupTest extends FunSuite {
   }
 
   test("testGenerate2Hr") {
-    val g2Hr = RaBinGroup.gen2HrBins(f)
+    val g2Hr = RightAscensionMap.gen2HrBins(f)
     assertEquals(12, g2Hr.bins.length)
 
     val times = for (i <- 0 until 12) yield Time.minutes(i * 120 + 60)
     assertEquals(times, g2Hr.bins)
   }
 
-  private def validateLookup(lookup: (RaBinGroup[Time], Int) => Time) = {
-    val g = RaBinGroup.gen1HrBins(f)
+  private def validateLookup(lookup: (RightAscensionMap[Time], Int) => Time) = {
+    val g = RightAscensionMap.gen1HrBins(f)
     assertEquals(Time.minutes(30), lookup(g, 0))
     assertEquals(Time.minutes(30), lookup(g, 15))
     assertEquals(Time.minutes(30), lookup(g, 59))
@@ -62,7 +62,7 @@ class RaBinGroupTest extends FunSuite {
   }
 
   test("testMap") {
-    val gTime = RaBinGroup.gen1HrBins(f)
+    val gTime = RightAscensionMap.gen1HrBins(f)
 
     // Map the Time objects to Ints with the corresponding value in minutes
     val gInt  = gTime.map(_.value.toInt)
@@ -75,7 +75,7 @@ class RaBinGroupTest extends FunSuite {
     val ra0 = RightAscension(HourAngle.fromDoubleMinutes( 0))
     val ra1 = RightAscension(HourAngle.fromDoubleMinutes(60))
     val min1 = Time.minutes(1)
-    val bg = RaBinGroup.gen1HrBins(f).updated(ra0, Time.Zero).updated(ra1, min1)
+    val bg = RightAscensionMap.gen1HrBins(f).updated(ra0, Time.Zero).updated(ra1, min1)
     assertEquals(Time.Zero, bg(ra0))
     assertEquals(min1, bg(ra1))
   }
@@ -88,7 +88,7 @@ class RaBinGroupTest extends FunSuite {
     }
 
   test("testUpdatedFunSome") {
-    val bg0 = RaBinGroup.gen1HrBins(f)
+    val bg0 = RightAscensionMap.gen1HrBins(f)
 
     val ra0 = RightAscension(HourAngle.fromDoubleMinutes(0))
     bg0.updated(ra0, doubleEveryOther) match {
@@ -98,7 +98,7 @@ class RaBinGroupTest extends FunSuite {
   }
 
   test("testUpdatedFunNone") {
-  val bg0 = RaBinGroup.gen1HrBins(f)
+  val bg0 = RightAscensionMap.gen1HrBins(f)
 
     val ra1 = RightAscension(HourAngle.fromDoubleMinutes(60))
     bg0.updated(ra1, doubleEveryOther) match {

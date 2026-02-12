@@ -7,7 +7,8 @@ import edu.gemini.tac.qengine.api.queue.ProposalQueue
 import edu.gemini.tac.qengine.ctx.Context
 import edu.gemini.tac.qengine.log.ProposalLog
 import edu.gemini.tac.qengine.p1.Proposal
-import edu.gemini.tac.qengine.p1.QueueBand
+import lucuma.core.enums.ScienceBand
+import lucuma.core.util.Enumerated
 
 trait BucketsAllocation {
   def raTablesANSI: String
@@ -20,9 +21,9 @@ trait BucketsAllocation {
  */
 trait QueueCalc {
   val context: Context
-  def queue(band: QueueBand): ProposalQueue
+  def queue(band: ScienceBand): ProposalQueue
   val proposalLog: ProposalLog
   val bucketsAllocation: BucketsAllocation
-  def toList: List[Proposal] = QueueBand.values.flatMap(queue(_).toList)
+  def toList: List[Proposal] = Enumerated[ScienceBand].all.flatMap(queue(_).toList)
 }
 

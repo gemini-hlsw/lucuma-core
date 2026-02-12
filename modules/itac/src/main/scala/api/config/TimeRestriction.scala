@@ -3,13 +3,16 @@
 
 package edu.gemini.tac.qengine.api.config
 
+import edu.gemini.tac.qengine.impl.resource.Resource2
+import edu.gemini.tac.qengine.log.RejectRestrictedBin
 import edu.gemini.tac.qengine.p1.Observation
 import edu.gemini.tac.qengine.p1.Proposal
-import edu.gemini.tac.qengine.p1.QueueBand
 import edu.gemini.tac.qengine.p1.WaterVapor
 import edu.gemini.tac.qengine.p1.WaterVapor.WV50
+import edu.gemini.tac.qengine.util.BoundedTime
 import edu.gemini.tac.qengine.util.Percent
 import edu.gemini.tac.qengine.util.Time
+import lucuma.core.enums.ScienceBand
 
 import scala.Ordering.Implicits.*
 
@@ -18,7 +21,7 @@ import scala.Ordering.Implicits.*
  * specifies the time being restricted, which may be an absolute amount of time
  * or a relative amount of time.
  */
-case class TimeRestriction[T](name: String, value: T)(val matches: (Proposal, Observation, QueueBand) => Boolean) {
+case class TimeRestriction[T](name: String, value: T)(val matches: (Proposal, Observation, ScienceBand) => Boolean) {
 
   def map[U](f: T => U): TimeRestriction[U]    =
     new TimeRestriction[U](name, f(value))(matches)
@@ -41,5 +44,15 @@ object TimeRestriction {
       (_, obs, _) => obs.lgs
     }
 
+  given Resource2[TimeRestriction[BoundedTime]] =
+    Resource2.instance: (bin, block, queue) =>
+      if (!bin.matches(block.prop, block.obs, queue.band))
+        Right(bin)  // didn't match so return the same reservation object
+      else
+        bin.value.reserve(block.time) match {
+          case Some(bt) if bt.remaining == bin.value.remaining => Right(bin)  // no time requested
+          case Some(bt) => Right(bin.updated(bt)) // update bounded time
+          case _ => Left(new RejectRestrictedBin(block.prop, block.obs, queue.band, bin.name, bin.value.used, bin.value.limit))
+        } 
 
 }

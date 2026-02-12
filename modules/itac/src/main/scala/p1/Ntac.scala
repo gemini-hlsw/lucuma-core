@@ -3,15 +3,15 @@
 
 package edu.gemini.tac.qengine.p1
 
-import edu.gemini.tac.qengine.ctx.Partner
 import edu.gemini.tac.qengine.p1.Ntac.Rank
 import edu.gemini.tac.qengine.util.Time
+import lucuma.core.enums.TimeAccountingCategory
 // import edu.gemini.model.p1.immutable.{ Submission, NgoSubmission }
 
 trait Submission
 trait NgoSubmission
 
-case class Ntac(partner: Partner,
+case class Ntac(TimeAccountingCategory: TimeAccountingCategory,
   reference: String,
   ranking: Rank,
   awardedTime: Time,
@@ -64,15 +64,15 @@ object Ntac {
   }
 
   // /**
-  //  * An ordering based upon awarded time (descending) followed by partner
+  //  * An ordering based upon awarded time (descending) followed by TimeAccountingCategory
   //  * percentage (ascending).  This is the default ordering for selecting
   //  * master proposals.
   //  */
   // object MasterOrdering extends CompoundOrdering(
   //   Ordering.by[Ntac, Time](_.awardedTime).reverse,
-  //   Ordering.by[Ntac, Percent](_.partner.share),
+  //   Ordering.by[Ntac, Percent](_.TimeAccountingCategory.share),
   //   Ordering.by[Ntac, Rank](_.ranking),
-  //   Ordering.by[Ntac, String](_.partner.id),
+  //   Ordering.by[Ntac, String](_.TimeAccountingCategory.id),
   //   Ordering.by[Ntac, String](_.reference)
   // )
 
@@ -82,12 +82,12 @@ object Ntac {
   def awardedTimeSum(ntacs: Iterable[Ntac]): Time =
     ntacs.foldLeft(Time.ZeroHours)(_ + _.awardedTime)
 
-  def apply(partner: Partner, reference: String, ranking: Double, awardedTime: Time, poorWeather : Boolean): Ntac =
-      new Ntac(partner, reference, Ntac.Rank(ranking), awardedTime, poorWeather)
+  def apply(TimeAccountingCategory: TimeAccountingCategory, reference: String, ranking: Double, awardedTime: Time, poorWeather : Boolean): Ntac =
+      new Ntac(TimeAccountingCategory, reference, Ntac.Rank(ranking), awardedTime, poorWeather)
 
-  def apply(partner: Partner, reference: String, ranking: Double, awardedTime: Time): Ntac =
-    new Ntac(partner, reference, Ntac.Rank(ranking), awardedTime, false)
+  def apply(TimeAccountingCategory: TimeAccountingCategory, reference: String, ranking: Double, awardedTime: Time): Ntac =
+    new Ntac(TimeAccountingCategory, reference, Ntac.Rank(ranking), awardedTime, false)
 
-  def apply(partner: Partner, reference: String, ranking: Double, awardedTime: Time, lead: String): Ntac =
-    new Ntac(partner, reference, Ntac.Rank(ranking), awardedTime, false, Some(lead))
+  def apply(TimeAccountingCategory: TimeAccountingCategory, reference: String, ranking: Double, awardedTime: Time, lead: String): Ntac =
+    new Ntac(TimeAccountingCategory, reference, Ntac.Rank(ranking), awardedTime, false, Some(lead))
 }

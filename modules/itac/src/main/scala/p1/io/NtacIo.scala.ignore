@@ -4,7 +4,7 @@
 package edu.gemini.tac.qengine.p1.io
 
 import edu.gemini.model.p1.{immutable => im}
-import edu.gemini.tac.qengine.ctx.Partner
+import lucuma.core.enums.TimeAccountingCategory
 import edu.gemini.tac.qengine.p1.Ntac
 import edu.gemini.tac.qengine.p1.Ntac.Rank
 import edu.gemini.tac.qengine.util.Time
@@ -26,26 +26,26 @@ object NtacIo {
   def NONE_ACCEPTED: String =
     "Proposal contains no accepted submissions"
 
-  def UNKNOWN_PARTNER_ID(id: String): String =
-    s"Unrecognized partner id in proposal submission: $id"
+  def UNKNOWN_TimeAccountingCategory_ID(id: String): String =
+    s"Unrecognized TimeAccountingCategory id in proposal submission: $id"
 
   private case class Response(ref: String, rank: Rank, awardedTime: Time, poorWeather: Boolean, comment: Option[String], ngoEmail: Option[String])
 
   private val EmptyResponse = none[Response].successNel[String]
 
-  private def response(sub: im.Submission, partnerId: String): ValidationNel[String, Option[Response]] =
+  private def response(sub: im.Submission, TimeAccountingCategoryId: String): ValidationNel[String, Option[Response]] =
     sub.response.fold(EmptyResponse) {
       case im.SubmissionResponse(im.SubmissionReceipt(pid, _, _), decision, comment) =>
         decision.fold(EmptyResponse) {
           case im.SubmissionDecision(Right(sa)) =>
-            sa.recommended.nonNegativeQueueEngineTime(s"$partnerId recommended time").map { awarded =>
+            sa.recommended.nonNegativeQueueEngineTime(s"$TimeAccountingCategoryId recommended time").map { awarded =>
               Some(Response(pid, Rank(sa.ranking), awarded, sa.poorWeather, comment, Option(sa.email)))
             }
           case _ => EmptyResponse
         }
     }
 
-  private def mkNtac(lead: Option[String], submission: im.Submission)(p: Partner)(response: Option[Response]): Option[Ntac] =
+  private def mkNtac(lead: Option[String], submission: im.Submission)(p: TimeAccountingCategory)(response: Option[Response]): Option[Ntac] =
     response.map { r => Ntac(p, r.ref, r.rank, r.awardedTime, r.poorWeather, lead, submission, None, response.flatMap(_.ngoEmail)) }
 
   private val NoneAccepted = NONE_ACCEPTED.failureNel[NonEmptyList[Ntac]]
@@ -74,26 +74,26 @@ class NtacIo {
     })
 
   private def ngoNtac(p: im.Proposal, ngo: im.NgoSubmission): ValidationNel[String, Option[Ntac]] =
-    submissionNtac(p, ngo, ngo.partner.name)
+    submissionNtac(p, ngo, ngo.TimeAccountingCategory.name)
 
   private def exchangeNtacs(p: im.Proposal, exc: im.ExchangeSubmission): ValidationNel[String, NonEmptyList[Ntac]] =
-    singletonNtac(submissionNtac(p, exc, exc.partner.name))
+    singletonNtac(submissionNtac(p, exc, exc.TimeAccountingCategory.name))
 
-  private def submissionNtac[A, B<:im.PartnerSubmission[A,B]](p: im.Proposal, sub: im.PartnerSubmission[A,B], partnerId: String): ValidationNel[String, Option[Ntac]] =
-    ntac(sub, partnerId, sub.partnerLead(p).map(_.lastName))
+  private def submissionNtac[A, B<:im.TimeAccountingCategorySubmission[A,B]](p: im.Proposal, sub: im.TimeAccountingCategorySubmission[A,B], TimeAccountingCategoryId: String): ValidationNel[String, Option[Ntac]] =
+    ntac(sub, TimeAccountingCategoryId, sub.TimeAccountingCategoryLead(p).map(_.lastName))
 
   private def lpNtacs(p: im.Proposal, sub: im.LargeProgramSubmission): ValidationNel[String, NonEmptyList[Ntac]] =
-    singletonNtac(ntac(sub, Partner.LP.id, Some(p.investigators.pi.lastName)))
+    singletonNtac(ntac(sub, TimeAccountingCategory.LP.id, Some(p.investigators.pi.lastName)))
 
   private def specialNtacs(p: im.Proposal, sub: im.SpecialSubmission): ValidationNel[String, NonEmptyList[Ntac]] =
     sub.specialType match {
-      case GUARANTEED_TIME => singletonNtac(ntac(sub, Partner.GT.id, Some(p.investigators.pi.lastName)))
+      case GUARANTEED_TIME => singletonNtac(ntac(sub, TimeAccountingCategory.GT.id, Some(p.investigators.pi.lastName)))
       case t               => s"Special submission type $t is not supported in ITAC.".failureNel
     }
 
-  private def ntac(sub: im.Submission, partnerId: String, lead: Option[String]): ValidationNel[String, Option[Ntac]] = {
-    val partner = Partner.fromString(partnerId).toSuccess(UNKNOWN_PARTNER_ID(partnerId).wrapNel)
-    response(sub, partnerId) <*> partner.map(mkNtac(lead, sub))
+  private def ntac(sub: im.Submission, TimeAccountingCategoryId: String, lead: Option[String]): ValidationNel[String, Option[Ntac]] = {
+    val TimeAccountingCategory = TimeAccountingCategory.fromString(TimeAccountingCategoryId).toSuccess(UNKNOWN_TimeAccountingCategory_ID(TimeAccountingCategoryId).wrapNel)
+    response(sub, TimeAccountingCategoryId) <*> TimeAccountingCategory.map(mkNtac(lead, sub))
   }
 }
 

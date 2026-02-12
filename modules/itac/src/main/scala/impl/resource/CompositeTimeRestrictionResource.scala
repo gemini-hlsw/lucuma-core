@@ -8,12 +8,12 @@ import edu.gemini.tac.qengine.impl.queue.ProposalQueueBuilder
 import edu.gemini.tac.qengine.log.RejectMessage
 
 
-class TimeResourceGroup(val lst: List[TimeResource]) extends Resource {
-  type T = TimeResourceGroup
+class CompositeTimeRestrictionResource(val lst: List[TimeRestrictionResource]) extends Resource {
+  type T = CompositeTimeRestrictionResource
 
-  def reserve(block: Block, queue: ProposalQueueBuilder): RejectMessage Either TimeResourceGroup =
+  def reserve(block: Block, queue: ProposalQueueBuilder): RejectMessage Either CompositeTimeRestrictionResource =
     Resource.reserveAll(block, queue, lst) map {
-      lst => new TimeResourceGroup(lst)
+      lst => new CompositeTimeRestrictionResource(lst)
     }
 
 }

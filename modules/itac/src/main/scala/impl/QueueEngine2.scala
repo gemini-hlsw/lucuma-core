@@ -10,76 +10,81 @@ import edu.gemini.tac.qengine.api.QueueCalc
 import edu.gemini.tac.qengine.api.QueueEngine
 import edu.gemini.tac.qengine.api.config.ConditionsCategory
 import edu.gemini.tac.qengine.api.config.QueueEngineConfig
+import edu.gemini.tac.qengine.api.config.TimeRestriction
 import edu.gemini.tac.qengine.api.queue.ProposalQueue
 import edu.gemini.tac.qengine.api.queue.time.QueueTime
-import edu.gemini.tac.qengine.ctx.Partner
 import edu.gemini.tac.qengine.impl.block.BlockIterator
 import edu.gemini.tac.qengine.impl.queue.ProposalQueueBuilder
-import edu.gemini.tac.qengine.impl.resource.RaResource
-import edu.gemini.tac.qengine.impl.resource.RaResourceGroup
+import edu.gemini.tac.qengine.impl.resource.PerRightAscensionResource
+import edu.gemini.tac.qengine.impl.resource.RightAscensionMapResource
 import edu.gemini.tac.qengine.impl.resource.SemesterResource
-import edu.gemini.tac.qengine.impl.resource.TimeResourceGroup
 import edu.gemini.tac.qengine.log.AcceptMessage
 import edu.gemini.tac.qengine.log.ProposalLog
 import edu.gemini.tac.qengine.log.RemovedRejectMessage
 import edu.gemini.tac.qengine.p1.*
-import edu.gemini.tac.qengine.p1.QueueBand.*
 import edu.gemini.tac.qengine.util.BoundedTime
+import lucuma.core.enums.ScienceBand
+import lucuma.core.enums.ScienceBand.*
+import lucuma.core.enums.ScienceSubtype
+import lucuma.core.enums.TimeAccountingCategory
+import lucuma.core.util.Enumerated
 
 object QueueEngine2 extends QueueEngine {
 
   def calc(
-    rawProposals: QueueBand => List[Proposal],
-    queueTimes:   QueueBand => QueueTime,
+    rawProposals: ScienceBand => List[Proposal],
+    queueTimes:   ScienceBand => QueueTime,
     config:       QueueEngineConfig,
     removed:      List[Proposal]
   ): QueueCalc = {
 
     // Silently filter out proposals that are not at our site.
-    val siteProposals: QueueBand => List[Proposal] =
+    val siteProposals: ScienceBand => List[Proposal] =
       rawProposals.map(_.filter(_.site == config.site))
 
     // Ensure that everything is in a compatible band. For now we'll just throw if there's an issue.
-    QueueBand.values.fproduct(siteProposals).foreach { case (b, ps) => ps.foreach { p => QueueEngineBandProblems.unsafeCheckAll(p, b) }}
+    Enumerated[ScienceBand].all.fproduct(siteProposals).foreach { case (b, ps) => ps.foreach { p => QueueEngineBandProblems.unsafeCheckAll(p, b) }}
 
     // Find all the observations that don't participate in the queue process, because their time
-    // needs to be subtracted from the initail RaResourceGroup (which happens on construction). Then
+    // needs to be subtracted from the initail RightAscensionMapResource (which happens on construction). Then
     // finish building our SemesterResource
-    val rolloverObs       = config.rollover.obsList
-    val classicalProps    = siteProposals(QBand1).filter(_.mode == Mode.Classical)
+    val rolloverObs: List[Observation]       = ???
+    val classicalProps    = siteProposals(Band1).filter(_.mode == ScienceSubtype.Classical)
     val classicalObs      = classicalProps.flatMap(_.obsList)
-    val raResourceGroup   = RaResourceGroup(config.binConfig).reserveAvailable(rolloverObs ++ classicalObs)._1
-    val timeResourceGroup = new TimeResourceGroup(Nil) // let's not do this for now
-    val semesterResource  = new SemesterResource(raResourceGroup, timeResourceGroup, QBand1)
+    val rightAscensionMapResource   = RightAscensionMapResource(config.binConfig).reserveAvailable(rolloverObs ++ classicalObs)._1
+    val compositeTimeRestrictionResource: List[TimeRestriction[BoundedTime]] = Nil
+    val semesterResource  = new SemesterResource(rightAscensionMapResource, compositeTimeRestrictionResource)
 
     // We're done with classical proposals. Filter them out.
-    val queueProposals: QueueBand => List[Proposal] =
-      siteProposals.map(_.filter(_.mode != Mode.Classical))
+    val queueProposals: ScienceBand => List[Proposal] =
+      siteProposals.map(_.filter(_.mode != ScienceSubtype.Classical))
 
     // All we need to construct an obs accessor is the banc.
-    def obsAccessor(band: QueueBand): Proposal => List[Observation] = { p =>
-      if (band == QBand3) p.band3Observations else p.obsList
+    def obsAccessor(band: ScienceBand): Proposal => List[Observation] = { p =>
+
+
+      if (band == Band3) p.band3Observations else p.obsList
     }
 
     // It's a moutful!
-    def proposalsGoupedByPartnerAndSortedByRanking(band: QueueBand): Map[Partner, List[Proposal]] =
-      queueProposals(band).groupBy(_.ntac.partner).map { case (k, v) => (k, v.sortBy(_.ntac.ranking)) }
+    def proposalsGoupedByTimeAccountingCategoryAndSortedByRanking(band: ScienceBand): Map[TimeAccountingCategory, List[Proposal]] =
+      queueProposals(band).groupBy(_.ntac.TimeAccountingCategory).map { case (k, v) => (k, v.sortBy(_.ntac.ranking)) }
 
     // All we need to construct a BlockIterator is the band.
-    def iteratorFor(band: QueueBand): BlockIterator =
+    def iteratorFor(band: ScienceBand): BlockIterator =
       BlockIterator(
-        queueTimes(band).partnerQuanta,
-        config.partnerSeq.sequence,
-        proposalsGoupedByPartnerAndSortedByRanking(band),
+        queueTimes(band).TimeAccountingCategoryQuanta,
+        config.TimeAccountingCategorySeq.sequence,
+        proposalsGoupedByTimeAccountingCategoryAndSortedByRanking(band),
         obsAccessor(band)
       )
 
     // All we need to construct an empty queue is the band.
-    def emptyQueue(band: QueueBand): ProposalQueueBuilder =
+    def emptyQueue(band: ScienceBand): ProposalQueueBuilder =
       ProposalQueueBuilder(queueTimes(band), band)
 
     // Building a queue is a state transition.
-    def runQueue(band: QueueBand): State[(SemesterResource, ProposalLog), ProposalQueue] =
+    def runQueue(band: ScienceBand): State[(SemesterResource, ProposalLog), ProposalQueue] =
       State { case (res, log) =>
         val stage = QueueCalcStage(
           queue       = emptyQueue(band),
@@ -93,7 +98,7 @@ object QueueEngine2 extends QueueEngine {
 
     // Run the queues in order!
     val ((finalResource, band123log), (queue1WithoutClassical, queue2, queue3)) = (
-      runQueue(QBand1), runQueue(QBand2), runQueue(QBand3)
+      runQueue(Band1), runQueue(Band2), runQueue(Band3)
     ).tupled.run((semesterResource, ProposalLog.Empty)).value
 
     // Add classical proposals back to Band 1
@@ -105,30 +110,30 @@ object QueueEngine2 extends QueueEngine {
 
     // All Band 4 proposals that made it to ITAC are accepted.
     val queue4 = new ProposalQueue {
-      def band      = QBand4
-      def queueTime = queueTimes(QBand4)
-      def toList    = queueProposals(QBand4)
+      def band      = Band4
+      def queueTime = queueTimes(Band4)
+      def toList    = queueProposals(Band4)
     }
 
     // Band 4 proposals need to go into the log.
     val band1234log: ProposalLog =
-      queue4.toList.foldLeft(band123log)((l, p) => l.updated(p.id, QBand4, AcceptMessage(p)))
+      queue4.toList.foldLeft(band123log)((l, p) => l.updated(p.id, Band4, AcceptMessage(p)))
 
     // Removed proposals need to go into the log.
     val finalLog: ProposalLog =
-      removed.foldLeft(band1234log)((l, p) => l.updated(p.id, QBand1, RemovedRejectMessage(p)))
+      removed.foldLeft(band1234log)((l, p) => l.updated(p.id, Band1, RemovedRejectMessage(p)))
 
     // Assemble our final result for the user
     new QueueCalc {
       val context           = config.binConfig.context
       val proposalLog       = finalLog
       val bucketsAllocation = BucketsAllocationImpl(finalResource.ra.grp.bins.toList)
-      def queue(b: QueueBand) =
+      def queue(b: ScienceBand) =
         b match {
-          case QBand1 => queue1
-          case QBand2 => queue2
-          case QBand3 => queue3
-          case QBand4 => queue4
+          case Band1 => queue1
+          case Band2 => queue2
+          case Band3 => queue3
+          case Band4 => queue4
         }
     }
 
@@ -142,12 +147,12 @@ object QueueEngine2 extends QueueEngine {
 
 
   implicit class ProposalListOps(self: List[Proposal]) {
-    def groupByPartnerAndSortedByRanking: Map[Partner, List[Proposal]] =
-      self.groupBy(_.ntac.partner).map { case (k, v) => (k, v.sortBy(_.ntac.ranking)) }
+    def groupByTimeAccountingCategoryAndSortedByRanking: Map[TimeAccountingCategory, List[Proposal]] =
+      self.groupBy(_.ntac.TimeAccountingCategory).map { case (k, v) => (k, v.sortBy(_.ntac.ranking)) }
   }
 
   case class RaAllocation(name: String, boundedTime: BoundedTime)
-  case class BucketsAllocationImpl(raBins: List[RaResource]) extends BucketsAllocation {
+  case class BucketsAllocationImpl(raBins: List[PerRightAscensionResource]) extends BucketsAllocation {
 
     sealed trait Row extends Product with Serializable
     case class RaRow(h: String, remaining: Double, used: Double, limit: Double) extends Row
