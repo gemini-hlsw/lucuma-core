@@ -43,14 +43,14 @@ class ProposalFixture {
   )
   def observations   = List(observation)
 
-  def ngoPartner         = im.NgoPartner.CL
+  def ngoTimeAccountingCategory         = im.NgoTimeAccountingCategory.CL
   val proposalKey        = some(UUID.randomUUID())
   def submissionId       = "abc-123"
   def submissionRequest  = im.SubmissionRequest(oneHour, oneHour, None, None)
-  def partnerRanking     = 6.66
+  def TimeAccountingCategoryRanking     = 6.66
   def submissionAccept   = im.SubmissionAccept(
     "abc@123.edu",
-    partnerRanking,
+    TimeAccountingCategoryRanking,
     oneHour,
     oneHour,
     poorWeather = false
@@ -65,13 +65,13 @@ class ProposalFixture {
       None
     ))
 
-  def partnerLead = im.InvestigatorRef(pi)
+  def TimeAccountingCategoryLead = im.InvestigatorRef(pi)
 
   def ngoSubmission      = im.NgoSubmission(
     submissionRequest,
     submissionResponse,
-    ngoPartner,
-    partnerLead
+    ngoTimeAccountingCategory,
+    TimeAccountingCategoryLead
   )
   def queueSubs: Either[List[im.NgoSubmission], im.ExchangeSubmission] =
     Left(List(ngoSubmission))

@@ -3,22 +3,22 @@
 
 package edu.gemini.tac.qengine.impl.resource
 
-import edu.gemini.tac.qengine.ctx.Partner
 import edu.gemini.tac.qengine.impl.block.Block
 import edu.gemini.tac.qengine.log.RejectConditions
 import edu.gemini.tac.qengine.log.RejectTarget
 import edu.gemini.tac.qengine.p1.*
 import edu.gemini.tac.qengine.util.Time
+import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.util.Enumerated
 import munit.FunSuite
 
 import Fixture.{badCC, emptyQueue, goodCC}
 
 class PerRightAscensionResourceTest extends FunSuite {
-  import Partner.KR
-  val partners = Enumerated[Partner].all
+  import TimeAccountingCategory.KR
+  val TimeAccountingCategorys = Enumerated[TimeAccountingCategory].all
 
-  // Proposal partner, proposal time, and observation time are not used in this
+  // Proposal TimeAccountingCategory, proposal time, and observation time are not used in this
   // test.  We will make time blocks with the explicit amount of time we need
   // for testing.
 

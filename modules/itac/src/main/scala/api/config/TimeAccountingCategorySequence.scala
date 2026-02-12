@@ -3,9 +3,9 @@
 
 package edu.gemini.tac.qengine.api.config
 
-import edu.gemini.tac.qengine.ctx.Partner
+import lucuma.core.enums.TimeAccountingCategory
 
-trait PartnerSequence{
-  def sequence: LazyList[Partner]
+trait TimeAccountingCategorySequence{
+  def sequence: LazyList[TimeAccountingCategory]
 }
 

@@ -5,13 +5,13 @@ package edu.gemini.tac.qengine.impl.resource
 
 import edu.gemini.tac.qengine.api.config.DecRanged
 import edu.gemini.tac.qengine.api.config.DeclinationMap
-import edu.gemini.tac.qengine.ctx.Partner
 import edu.gemini.tac.qengine.impl.block.Block
 import edu.gemini.tac.qengine.log.RejectTarget
 import edu.gemini.tac.qengine.p1.*
 import edu.gemini.tac.qengine.util.BoundedTime
 import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.Site
+import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.enums.ToOActivation
 import lucuma.core.util.Enumerated
 import munit.FunSuite
@@ -20,8 +20,8 @@ import org.junit.*
 import Assert.*
 
 class DecResourceTest extends FunSuite {
-  import Partner.KR
-  val partners = Enumerated[Partner].all
+  import TimeAccountingCategory.KR
+  val TimeAccountingCategorys = Enumerated[TimeAccountingCategory].all
 
   private val bin1 = DecRanged( 0, 10, BoundedTime(Time.hours(10)))
   private val bin2 = DecRanged(10, 20, BoundedTime(Time.hours(20)))

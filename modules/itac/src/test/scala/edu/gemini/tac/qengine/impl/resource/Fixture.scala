@@ -6,9 +6,8 @@ package edu.gemini.tac.qengine.impl.resource
 import edu.gemini.tac.qengine.api.config.*
 import edu.gemini.tac.qengine.api.config.ConditionsCategory.Ge
 import edu.gemini.tac.qengine.api.config.ConditionsCategory.Le
-import edu.gemini.tac.qengine.api.queue.time.PartnerTime
 import edu.gemini.tac.qengine.api.queue.time.QueueTime
-import edu.gemini.tac.qengine.ctx.Partner
+import edu.gemini.tac.qengine.api.queue.time.TimeAccountingCategoryTime
 import edu.gemini.tac.qengine.impl.queue.ProposalQueueBuilder
 import edu.gemini.tac.qengine.p1.*
 import edu.gemini.tac.qengine.p1.CloudCover.*
@@ -21,6 +20,7 @@ import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.Half
 import lucuma.core.enums.ScienceBand
 import lucuma.core.enums.Site
+import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.model.Semester
 import lucuma.core.model.Semester.YearInt
 import lucuma.core.util.Enumerated
@@ -30,7 +30,7 @@ import scala.annotation.unused
 object Fixture {
   val site = Site.GS
   val semester = Semester(YearInt.unsafeFrom(2011), Half.A)
-  val partners = Enumerated[Partner].all
+  val TimeAccountingCategorys = Enumerated[TimeAccountingCategory].all
 
   // (-90,  0]   0%
   // (  0, 45] 100%
@@ -67,16 +67,16 @@ object Fixture {
   // Falls in the second conditions bin (>=CC80)
   val badCC  = ObservingConditions(CC80, IQAny, SBAny, WVAny)
 
-  def genQuanta(hrs: Double): PartnerTime = PartnerTime.constant(Time.hours(hrs))
+  def genQuanta(hrs: Double): TimeAccountingCategoryTime = TimeAccountingCategoryTime.constant(Time.hours(hrs))
 
   // Makes a proposal with the given ntac info, and observations according
   // to the descriptions (target, conditions, time)
   def mkProp(ntac: Ntac, obsDefs: (Target, ObservingConditions, Time)*): Proposal =
     Proposal(ntac, site = site, obsList = obsDefs.map(tup => Observation(tup._1, tup._2, tup._3)).toList)
 
-  val emptyQueue = ProposalQueueBuilder(QueueTime(PartnerTime.empty, Percent.Zero), ScienceBand.Band1, Nil) // QueueTime(Site.GN, PartnerTime.empty(partners).map, partners))
+  val emptyQueue = ProposalQueueBuilder(QueueTime(TimeAccountingCategoryTime.empty, Percent.Zero), ScienceBand.Band1, Nil) // QueueTime(Site.GN, TimeAccountingCategoryTime.empty(TimeAccountingCategorys).map, TimeAccountingCategorys))
   def evenQueue(hrs: Double): ProposalQueueBuilder =
-    evenQueue(hrs, Some(QueueTime.DefaultPartnerOverfillAllowance))
+    evenQueue(hrs, Some(QueueTime.DefaultTimeAccountingCategoryOverfillAllowance))
 
   // defaults
   val Band1Percent = Percent(30)
@@ -84,7 +84,7 @@ object Fixture {
   val Band3Percent = Percent(20)
 
   def evenQueueTime(hrs: Double, @unused overfill: Option[Percent]): QueueTime = {
-    val pt = PartnerTime.fromFunction { _ => Time.hours(hrs) * Band1Percent }
+    val pt = TimeAccountingCategoryTime.fromFunction { _ => Time.hours(hrs) * Band1Percent }
     QueueTime(pt, Percent.Zero)
   }
 

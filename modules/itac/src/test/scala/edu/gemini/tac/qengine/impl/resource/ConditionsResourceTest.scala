@@ -6,13 +6,13 @@ package edu.gemini.tac.qengine.impl.resource
 import edu.gemini.tac.qengine.api.config.ConditionsBin
 import edu.gemini.tac.qengine.api.config.ConditionsCategory as Cat
 import edu.gemini.tac.qengine.api.config.ConditionsCategoryMap
-import edu.gemini.tac.qengine.ctx.Partner
 import edu.gemini.tac.qengine.impl.block.Block
 import edu.gemini.tac.qengine.log.RejectConditions
 import edu.gemini.tac.qengine.p1.*
 import edu.gemini.tac.qengine.util.Percent
 import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.Site
+import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.util.Enumerated
 import munit.FunSuite
 
@@ -23,8 +23,8 @@ import WaterVapor.WV20
 import Cat.*
 
 class ConditionsResourceTest extends FunSuite{
-  import Partner.KR
-  val partners = Enumerated[Partner].all
+  import TimeAccountingCategory.KR
+  val TimeAccountingCategorys = Enumerated[TimeAccountingCategory].all
 
   private val bins = ConditionsBin.of(
       (Cat(Eq(CC50)),  Percent(25)),

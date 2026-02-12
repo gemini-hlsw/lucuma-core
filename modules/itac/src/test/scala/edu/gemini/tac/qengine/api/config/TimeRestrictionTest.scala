@@ -3,7 +3,6 @@
 
 package edu.gemini.tac.qengine.api.config
 
-import edu.gemini.tac.qengine.ctx.Partner
 import edu.gemini.tac.qengine.p1.*
 import edu.gemini.tac.qengine.p1.CloudCover.CCAny
 import edu.gemini.tac.qengine.p1.ImageQuality.IQAny
@@ -13,13 +12,14 @@ import edu.gemini.tac.qengine.util.Percent
 import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.ScienceBand
 import lucuma.core.enums.Site
+import lucuma.core.enums.TimeAccountingCategory
 import munit.FunSuite
 
 import scala.Ordering.Implicits.*
 
 class TimeRestrictionTest extends FunSuite {
 
-  val US = Partner.US
+  val US = TimeAccountingCategory.US
 
   private val ntac   = Ntac(US, "x", 0, Time.hours(10))
   private val target = Target(0.0, 0.0) // not used

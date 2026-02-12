@@ -8,7 +8,7 @@ package edu.gemini.tac.qengine.api.config
  */
 final case class QueueEngineConfig(
   binConfig:           SiteSemesterConfig,
-  partnerSeq:          PartnerSequence,
+  TimeAccountingCategorySeq:          TimeAccountingCategorySequence,
   restrictedBinConfig: RestrictionConfig = RestrictionConfig(),
 ) {
   def site = binConfig.site

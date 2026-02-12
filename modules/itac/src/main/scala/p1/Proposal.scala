@@ -3,11 +3,11 @@
 
 package edu.gemini.tac.qengine.p1
 
-import edu.gemini.tac.qengine.ctx.Partner
 import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.ScienceBand
 import lucuma.core.enums.ScienceSubtype
 import lucuma.core.enums.Site
+import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.enums.ToOActivation
 
 import java.io.File
@@ -28,7 +28,7 @@ case class Proposal(
   itacComment: Option[String] = None,
 ) {
 
-  lazy val id: Proposal.Id = Proposal.Id(ntac.partner, ntac.reference)
+  lazy val id: Proposal.Id = Proposal.Id(ntac.TimeAccountingCategory, ntac.reference)
 
   def obsListFor(band: ScienceBand): List[Observation] =
     if (band == ScienceBand.Band3) band3Observations else obsList
@@ -79,10 +79,10 @@ case class Proposal(
 
 object Proposal {
 
-  final case class Id(partner: Partner, reference: String)
+  final case class Id(TimeAccountingCategory: TimeAccountingCategory, reference: String)
   object Id {
     implicit val OrderingId: Ordering[Id] =
-      Ordering.by(id => (id.partner.tag, id.reference))
+      Ordering.by(id => (id.TimeAccountingCategory.tag, id.reference))
   }
 
   case class Pdfs[A](

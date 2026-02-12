@@ -4,7 +4,6 @@
 package edu.gemini.tac.qengine.impl.resource
 
 import edu.gemini.tac.qengine.api.config.TimeRestriction
-import edu.gemini.tac.qengine.ctx.Partner
 import edu.gemini.tac.qengine.impl.block.Block
 import edu.gemini.tac.qengine.log.RejectRestrictedBin
 import edu.gemini.tac.qengine.p1.*
@@ -16,6 +15,7 @@ import edu.gemini.tac.qengine.p1.WaterVapor.*
 import edu.gemini.tac.qengine.util.Percent
 import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.Site
+import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.math.Coordinates
 import lucuma.core.util.Enumerated
 import munit.FunSuite
@@ -23,8 +23,8 @@ import munit.FunSuite
 import scala.Ordering.Implicits.*
 
 class CompositeTimeRestrictionResourceTest extends FunSuite {
-  import Partner.US
-  val partners = Enumerated[Partner].all
+  import TimeAccountingCategory.US
+  val TimeAccountingCategorys = Enumerated[TimeAccountingCategory].all
 
   private val ntac   = Ntac(US, "x", 0, Time.hours(10))
   private val target = Target(Coordinates.Zero) // not used

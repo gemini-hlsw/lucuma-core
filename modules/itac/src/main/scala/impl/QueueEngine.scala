@@ -118,8 +118,8 @@
 //   // /** Log the time availability and usage for a stage. */
 //   // def show(config: QueueEngineConfig, s: QueueCalcStage): Unit = {
 //   //   Log.info(s"${Console.GREEN}-----------------------------------${Console.RESET}")
-//   //   Log.info(s"${Console.GREEN}Partner       Band 1/2       Band 3${Console.RESET}")
-//   //   config.partners.foreach { p =>
+//   //   Log.info(s"${Console.GREEN}TimeAccountingCategory       Band 1/2       Band 3${Console.RESET}")
+//   //   config.TimeAccountingCategorys.foreach { p =>
 //   //     val q   = s.queue
 //   //     // val t0  = q.queueTime(p).toHours.value
 //   //     val b12Aval = q.queueTime(ScienceBand.Category.B1_2, p).toHours.value
@@ -167,7 +167,7 @@
 
 //     // Now add the band 3 programs. We do this by pretending the used time in bands 1/2 is all the
 //     // time we had in those bands, which is kind of an ugly hack but it works. Everything goes into
-//     // band 3, up to partner time limits.
+//     // band 3, up to TimeAccountingCategory time limits.
 //     val b3candidates = initialCandidates.remove(stageWithBands12.queue.toList).band3(stageWithBands12.log)
 //     val stageWithBands123 = {
 //       val params = QueueCalcStage.Params.band3(
@@ -190,11 +190,11 @@
 //         stageWithBands123.queue.bandedQueue.get(ScienceBand.QBand1).orZero ++
 //         stageWithBands123.queue.bandedQueue.get(ScienceBand.QBand2).orZero
 
-//       // Now re-group bands 1 and 2 using partner-specific time buckets
+//       // Now re-group bands 1 and 2 using TimeAccountingCategory-specific time buckets
 //       val band12map: Map[ScienceBand, List[Proposal]] =
-//         config.partners.foldMap { pa =>
+//         config.TimeAccountingCategorys.foldMap { pa =>
 
-//           // Within a given partner we can map used time to band.
+//           // Within a given TimeAccountingCategory we can map used time to band.
 //           def band(t: Time): ScienceBand = {
 //             val b1 = queueTime(ScienceBand.QBand1, pa) // exactly. we never overfill band 1
 
@@ -206,10 +206,10 @@
 //             if (t <= b1) ScienceBand.QBand1 else ScienceBand.QBand2
 //           }
 
-//           // Go through all the proposals for this partner adding each to its band, based on the
+//           // Go through all the proposals for this TimeAccountingCategory adding each to its band, based on the
 //           // accumulated used time. This is why they need to be in order above.
 //           band12proposals
-//             .filter(_.ntac.partner == pa)
+//             .filter(_.ntac.TimeAccountingCategory == pa)
 //             .foldLeft((Time.Zero, Map.empty[ScienceBand, List[Proposal]])) { case ((t, m), p) =>
 //               val tʹ = t + p.time
 //               (tʹ, m |+| Map(band(tʹ) -> List(p)))

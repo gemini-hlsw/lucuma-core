@@ -13,7 +13,6 @@ import edu.gemini.tac.qengine.api.config.QueueEngineConfig
 import edu.gemini.tac.qengine.api.config.TimeRestriction
 import edu.gemini.tac.qengine.api.queue.ProposalQueue
 import edu.gemini.tac.qengine.api.queue.time.QueueTime
-import edu.gemini.tac.qengine.ctx.Partner
 import edu.gemini.tac.qengine.impl.block.BlockIterator
 import edu.gemini.tac.qengine.impl.queue.ProposalQueueBuilder
 import edu.gemini.tac.qengine.impl.resource.PerRightAscensionResource
@@ -27,6 +26,7 @@ import edu.gemini.tac.qengine.util.BoundedTime
 import lucuma.core.enums.ScienceBand
 import lucuma.core.enums.ScienceBand.*
 import lucuma.core.enums.ScienceSubtype
+import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.util.Enumerated
 
 object QueueEngine2 extends QueueEngine {
@@ -67,15 +67,15 @@ object QueueEngine2 extends QueueEngine {
     }
 
     // It's a moutful!
-    def proposalsGoupedByPartnerAndSortedByRanking(band: ScienceBand): Map[Partner, List[Proposal]] =
-      queueProposals(band).groupBy(_.ntac.partner).map { case (k, v) => (k, v.sortBy(_.ntac.ranking)) }
+    def proposalsGoupedByTimeAccountingCategoryAndSortedByRanking(band: ScienceBand): Map[TimeAccountingCategory, List[Proposal]] =
+      queueProposals(band).groupBy(_.ntac.TimeAccountingCategory).map { case (k, v) => (k, v.sortBy(_.ntac.ranking)) }
 
     // All we need to construct a BlockIterator is the band.
     def iteratorFor(band: ScienceBand): BlockIterator =
       BlockIterator(
-        queueTimes(band).partnerQuanta,
-        config.partnerSeq.sequence,
-        proposalsGoupedByPartnerAndSortedByRanking(band),
+        queueTimes(band).TimeAccountingCategoryQuanta,
+        config.TimeAccountingCategorySeq.sequence,
+        proposalsGoupedByTimeAccountingCategoryAndSortedByRanking(band),
         obsAccessor(band)
       )
 
@@ -147,8 +147,8 @@ object QueueEngine2 extends QueueEngine {
 
 
   implicit class ProposalListOps(self: List[Proposal]) {
-    def groupByPartnerAndSortedByRanking: Map[Partner, List[Proposal]] =
-      self.groupBy(_.ntac.partner).map { case (k, v) => (k, v.sortBy(_.ntac.ranking)) }
+    def groupByTimeAccountingCategoryAndSortedByRanking: Map[TimeAccountingCategory, List[Proposal]] =
+      self.groupBy(_.ntac.TimeAccountingCategory).map { case (k, v) => (k, v.sortBy(_.ntac.ranking)) }
   }
 
   case class RaAllocation(name: String, boundedTime: BoundedTime)
