@@ -4,8 +4,6 @@
 package edu.gemini.tac.qengine.api.config
 
 import edu.gemini.tac.qengine.api.config.ConditionsCategory as Cat
-import edu.gemini.tac.qengine.p1.CloudCover
-import edu.gemini.tac.qengine.p1.CloudCover.*
 import edu.gemini.tac.qengine.p1.ImageQuality
 import edu.gemini.tac.qengine.p1.ImageQuality.*
 import edu.gemini.tac.qengine.p1.ObservingConditions
@@ -14,20 +12,22 @@ import edu.gemini.tac.qengine.p1.SkyBackground.*
 import edu.gemini.tac.qengine.p1.WaterVapor.*
 import edu.gemini.tac.qengine.util.Percent
 import edu.gemini.tac.qengine.util.Time
-
+import lucuma.core.model.CloudExtinction
+import cats.implicits.*
 import Cat.*
+import lucuma.core.util.Enumerated
 
 object Default {
 
   val Conditions = ConditionsCategoryMap.ofPercent(
-    (Cat(Eq(CC50), Eq(IQ20), Le(SB50), UnspecifiedWV, Some("1")), 4),
-    (Cat(Eq(CC50), Eq(IQ20), Ge(SB80), UnspecifiedWV, Some("2")), 4),
-    (Cat(Ge(CC70), Eq(IQ20), UnspecifiedSB, UnspecifiedWV, Some("3")), 3),
-    (Cat(Eq(CC50), Eq(IQ70), Le(SB50), UnspecifiedWV, Some("4")), 10),
-    (Cat(Eq(CC50), Eq(IQ70), Ge(SB80), UnspecifiedWV, Some("5")), 10),
-    (Cat(Ge(CC70), Eq(IQ70), UnspecifiedSB, UnspecifiedWV, Some("6")), 10),
-    (Cat(Eq(CC50), Eq(IQ85), UnspecifiedSB, UnspecifiedWV, Some("7")), 15),
-    (Cat(Ge(CC70), Eq(IQ85), UnspecifiedSB, UnspecifiedWV, Some("8")), 20),
+    (Cat(Eq(CloudExtinction.Preset.Zero), Eq(IQ20), Le(SB50), UnspecifiedWV, Some("1")), 4),
+    (Cat(Eq(CloudExtinction.Preset.Zero), Eq(IQ20), Ge(SB80), UnspecifiedWV, Some("2")), 4),
+    (Cat(Ge(CloudExtinction.Preset.PointThree), Eq(IQ20), UnspecifiedSB, UnspecifiedWV, Some("3")), 3),
+    (Cat(Eq(CloudExtinction.Preset.Zero), Eq(IQ70), Le(SB50), UnspecifiedWV, Some("4")), 10),
+    (Cat(Eq(CloudExtinction.Preset.Zero), Eq(IQ70), Ge(SB80), UnspecifiedWV, Some("5")), 10),
+    (Cat(Ge(CloudExtinction.Preset.PointThree), Eq(IQ70), UnspecifiedSB, UnspecifiedWV, Some("6")), 10),
+    (Cat(Eq(CloudExtinction.Preset.Zero), Eq(IQ85), UnspecifiedSB, UnspecifiedWV, Some("7")), 15),
+    (Cat(Ge(CloudExtinction.Preset.PointThree), Eq(IQ85), UnspecifiedSB, UnspecifiedWV, Some("8")), 20),
     (Cat(UnspecifiedCC, Eq(IQAny), UnspecifiedSB, UnspecifiedWV, Some("9")), 40)
   )
 
@@ -53,7 +53,7 @@ object Default {
 
     val ocList = for {
       iq <- ImageQuality.values
-      cc <- CloudCover.values
+      cc <- Enumerated[CloudExtinction.Preset].all
       sb <- SkyBackground.values
     } yield ObservingConditions(cc, iq, sb, WVAny)
 

@@ -10,7 +10,6 @@ import edu.gemini.tac.qengine.api.queue.time.QueueTime
 import edu.gemini.tac.qengine.api.queue.time.TimeAccountingCategoryTime
 import edu.gemini.tac.qengine.impl.queue.ProposalQueueBuilder
 import edu.gemini.tac.qengine.p1.*
-import edu.gemini.tac.qengine.p1.CloudCover.*
 import edu.gemini.tac.qengine.p1.ImageQuality.*
 import edu.gemini.tac.qengine.p1.SkyBackground.*
 import edu.gemini.tac.qengine.p1.WaterVapor.*
@@ -24,8 +23,9 @@ import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.model.Semester
 import lucuma.core.model.Semester.YearInt
 import lucuma.core.util.Enumerated
-
+import cats.implicits.*
 import scala.annotation.unused
+import lucuma.core.model.CloudExtinction
 
 object Fixture {
   val site = Site.GS
@@ -43,7 +43,7 @@ object Fixture {
   // <=CC70 50%
   // >=CC80 50%
   val condsBins = ConditionsCategoryMap.ofPercent(
-    (ConditionsCategory(Le(CC70)), 50), (ConditionsCategory(Ge(CC80)), 50)
+    (ConditionsCategory(Le(CloudExtinction.Preset.PointThree)), 50), (ConditionsCategory(Ge(CloudExtinction.Preset.OnePointZero)), 50)
   )
 
   // 0 hrs, 1 hrs, 2 hrs, ... 23 hrs
@@ -62,10 +62,10 @@ object Fixture {
     new SemesterResource(raResGroup, compositeTimeRestrictionResource(total))
 
   // Falls in the first conditions bin (<=CC70)
-  val goodCC = ObservingConditions(CC50, IQAny, SBAny, WVAny)
+  val goodCC = ObservingConditions(CloudExtinction.Preset.Zero, IQAny, SBAny, WVAny)
 
   // Falls in the second conditions bin (>=CC80)
-  val badCC  = ObservingConditions(CC80, IQAny, SBAny, WVAny)
+  val badCC  = ObservingConditions(CloudExtinction.Preset.OnePointZero, IQAny, SBAny, WVAny)
 
   def genQuanta(hrs: Double): TimeAccountingCategoryTime = TimeAccountingCategoryTime.constant(Time.hours(hrs))
 

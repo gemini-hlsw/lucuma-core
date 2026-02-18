@@ -3,30 +3,20 @@
 
 package edu.gemini.tac.qengine.p1
 
-import scala.Ordering.Implicits.*
+import lucuma.core.model.CloudExtinction
 
 case class ObservingConditions(
-  cc: CloudCover    = CloudCover.CCAny,
-  iq: ImageQuality  = ImageQuality.IQAny,
-  sb: SkyBackground = SkyBackground.SBAny,
-  wv: WaterVapor    = WaterVapor.WVAny
-) {
-
-  def isPoorWeather: Boolean =
-    wv == WaterVapor.WVAny && (
-      cc >= CloudCover.CC80 || (iq == ImageQuality.IQAny && cc > CloudCover.CC50)
-    )
-
-  override def toString: String =
-    s"$cc, $iq, $sb, $wv"
-
-}
+  cc: CloudExtinction.Preset,
+  iq: ImageQuality,
+  sb: SkyBackground,
+  wv: WaterVapor,
+)
 
 object ObservingConditions {
 
   val AnyConditions =
     ObservingConditions(
-      CloudCover.CCAny,
+      CloudExtinction.Preset.ThreePointZero,
       ImageQuality.IQAny,
       SkyBackground.SBAny,
       WaterVapor.WVAny

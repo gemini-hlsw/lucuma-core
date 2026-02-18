@@ -7,7 +7,6 @@ import edu.gemini.tac.qengine.api.config.TimeRestriction
 import edu.gemini.tac.qengine.impl.block.Block
 import edu.gemini.tac.qengine.log.RejectRestrictedBin
 import edu.gemini.tac.qengine.p1.*
-import edu.gemini.tac.qengine.p1.CloudCover.CCAny
 import edu.gemini.tac.qengine.p1.ImageQuality.IQAny
 import edu.gemini.tac.qengine.p1.SkyBackground.SBAny
 import edu.gemini.tac.qengine.p1.WaterVapor
@@ -21,6 +20,7 @@ import lucuma.core.util.Enumerated
 import munit.FunSuite
 
 import scala.Ordering.Implicits.*
+import lucuma.core.model.CloudExtinction
 
 class CompositeTimeRestrictionResourceTest extends FunSuite {
   import TimeAccountingCategory.US
@@ -29,7 +29,7 @@ class CompositeTimeRestrictionResourceTest extends FunSuite {
   private val ntac   = Ntac(US, "x", 0, Time.hours(10))
   private val target = Target(Coordinates.Zero) // not used
   private def conds(wv: WaterVapor) =
-    ObservingConditions(CCAny, IQAny, SBAny, wv)
+    ObservingConditions(CloudExtinction.Preset.ThreePointZero, IQAny, SBAny, wv)
 
   private val wvBin  = TimeRestriction("WV", Percent(10)) {
     (_, obs, _) => obs.conditions.wv <= WV50

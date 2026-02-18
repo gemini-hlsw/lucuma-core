@@ -8,10 +8,11 @@ import edu.gemini.tac.qengine.p1.*
 import scala.Ordering.Implicits.*
 
 import ConditionsCategory.*
+import lucuma.core.model.CloudExtinction
 
 /** Specification for a set of observing conditions. */
 final case class ConditionsCategory(
-  ccSpec: Specification[CloudCover]    = UnspecifiedCC,
+  ccSpec: Specification[CloudExtinction.Preset]    = UnspecifiedCC,
   iqSpec: Specification[ImageQuality]  = UnspecifiedIQ,
   sbSpec: Specification[SkyBackground] = UnspecifiedSB,
   wvSpec: Specification[WaterVapor]    = UnspecifiedWV,
@@ -35,7 +36,7 @@ final case class ConditionsCategory(
 object ConditionsCategory {
 
   /** A constraint on some observing condition. */
-  sealed trait Specification[A <: ObservingCondition] { // N.B. upper bound is only for doc
+  sealed trait Specification[A] { // N.B. upper bound is only for doc
 
     /**
      * Determines whether the given conditions variable matches (falls in) the
@@ -52,18 +53,18 @@ object ConditionsCategory {
 
   }
 
-  sealed abstract class Unspecified[A <: ObservingCondition] extends Specification[A] {
+  sealed abstract class Unspecified[A] extends Specification[A] {
     override def matches(other: A): Boolean   = true
     override def canObserve(cond: A): Boolean = true
     override def toString: String             = "--"
   }
 
-  object UnspecifiedCC extends Unspecified[CloudCover]
+  object UnspecifiedCC extends Unspecified[CloudExtinction.Preset]
   object UnspecifiedIQ extends Unspecified[ImageQuality]
   object UnspecifiedSB extends Unspecified[SkyBackground]
   object UnspecifiedWV extends Unspecified[WaterVapor]
 
-  case class Le[A <: ObservingCondition : Ordering](oc: A) extends Specification[A] {
+  case class Le[A : Ordering](oc: A) extends Specification[A] {
     override def matches(other: A): Boolean = other <= oc
     // When the category is anything better than or equal to X, we are saying
     // that the better conditions are essentially the same. For example,
@@ -73,13 +74,13 @@ object ConditionsCategory {
     override def toString: String              = "<=" + oc
   }
 
-  case class Eq[A <: ObservingCondition : Ordering](oc: A) extends Specification[A] {
+  case class Eq[A : Ordering](oc: A) extends Specification[A] {
     override def matches(other: A): Boolean    = other == oc
     override def canObserve(other: A): Boolean = oc <= other
     override def toString: String              = oc.toString
   }
 
-  case class Ge[A <: ObservingCondition : Ordering](oc: A) extends Specification[A] {
+  case class Ge[A : Ordering](oc: A) extends Specification[A] {
     override def matches(other: A): Boolean    = other >= oc
     override def canObserve(other: A): Boolean = oc <= other
     override def toString: String              = ">=" + oc

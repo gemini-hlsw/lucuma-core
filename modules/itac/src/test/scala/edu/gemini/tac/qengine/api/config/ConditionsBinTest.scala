@@ -4,10 +4,10 @@
 package edu.gemini.tac.qengine.api.config
 
 import edu.gemini.tac.qengine.api.config.ConditionsCategory.Eq
-import edu.gemini.tac.qengine.p1.CloudCover.CC50
-import edu.gemini.tac.qengine.p1.CloudCover.CC70
 import edu.gemini.tac.qengine.util.Percent
 import munit.FunSuite
+import lucuma.core.model.CloudExtinction
+import cats.implicits.*
 
 class ConditionsBinTest extends FunSuite {
   private val bin = ConditionsBin(ConditionsCategory(), Percent(10))
@@ -23,8 +23,8 @@ class ConditionsBinTest extends FunSuite {
   }
 
   test("testList") {
-    val cat0 = ConditionsCategory(Eq(CC50))
-    val cat1 = ConditionsCategory(Eq(CC70))
+    val cat0 = ConditionsCategory(Eq(CloudExtinction.Preset.Zero))
+    val cat1 = ConditionsCategory(Eq(CloudExtinction.Preset.PointThree))
 
     val l = ConditionsBin.of((cat0, Percent(10)), (cat1, Percent(20)))
     assertEquals(10.0, l.head.binValue.doubleValue, Double.MinPositiveValue)

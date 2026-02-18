@@ -14,21 +14,6 @@ sealed abstract class ObservingCondition(
 
 }
 
-sealed abstract class CloudCover(percent: Int) extends ObservingCondition("CC", percent)
-object CloudCover {
-
-  case object CC50  extends CloudCover(50)
-  case object CC70  extends CloudCover(70)
-  case object CC80  extends CloudCover(80)
-  case object CCAny extends CloudCover(100)
-
-  val values = List(CC50, CC70, CC80, CCAny)
-
-  implicit val CloudCoverOrder: Ordering[CloudCover] =
-    Ordering.by(_.percent)
-
-}
-
 sealed abstract class ImageQuality(percent: Int) extends ObservingCondition("IQ", percent)
 
 object ImageQuality {
