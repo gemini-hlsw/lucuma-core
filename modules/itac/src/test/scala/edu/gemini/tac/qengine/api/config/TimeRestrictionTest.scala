@@ -12,10 +12,10 @@ import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.ScienceBand
 import lucuma.core.enums.Site
 import lucuma.core.enums.TimeAccountingCategory
+import lucuma.core.model.CloudExtinction
 import munit.FunSuite
 
 import scala.Ordering.Implicits.*
-import lucuma.core.model.CloudExtinction
 
 class TimeRestrictionTest extends FunSuite {
 

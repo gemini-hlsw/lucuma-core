@@ -3,6 +3,7 @@
 
 package edu.gemini.tac.qengine.api.config
 
+import cats.implicits.*
 import edu.gemini.tac.qengine.api.config.ConditionsCategory as Cat
 import edu.gemini.tac.qengine.p1.ImageQuality
 import edu.gemini.tac.qengine.p1.ImageQuality.*
@@ -13,9 +14,9 @@ import edu.gemini.tac.qengine.p1.WaterVapor.*
 import edu.gemini.tac.qengine.util.Percent
 import edu.gemini.tac.qengine.util.Time
 import lucuma.core.model.CloudExtinction
-import cats.implicits.*
-import Cat.*
 import lucuma.core.util.Enumerated
+
+import Cat.*
 
 object Default {
 

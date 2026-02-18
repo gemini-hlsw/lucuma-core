@@ -3,14 +3,15 @@
 
 package edu.gemini.tac.qengine.api.config
 
+import cats.implicits.*
 import edu.gemini.tac.qengine.api.config.ConditionsCategory as Cat
 import edu.gemini.tac.qengine.p1.*
 import edu.gemini.tac.qengine.p1.ImageQuality.*
 import edu.gemini.tac.qengine.p1.SkyBackground.*
 import edu.gemini.tac.qengine.p1.WaterVapor.*
-import munit.FunSuite
 import lucuma.core.model.CloudExtinction
-import cats.implicits.*
+import munit.FunSuite
+
 import Cat.*
 
 class ConditionsCategoryTest extends FunSuite {

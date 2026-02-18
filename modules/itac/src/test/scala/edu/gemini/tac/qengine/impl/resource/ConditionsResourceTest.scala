@@ -3,6 +3,7 @@
 
 package edu.gemini.tac.qengine.impl.resource
 
+import cats.implicits.*
 import edu.gemini.tac.qengine.api.config.ConditionsBin
 import edu.gemini.tac.qengine.api.config.ConditionsCategory as Cat
 import edu.gemini.tac.qengine.api.config.ConditionsCategoryMap
@@ -13,14 +14,14 @@ import edu.gemini.tac.qengine.util.Percent
 import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.Site
 import lucuma.core.enums.TimeAccountingCategory
+import lucuma.core.model.CloudExtinction
 import lucuma.core.util.Enumerated
 import munit.FunSuite
-import cats.implicits.*
+
 import ImageQuality.IQ20
 import SkyBackground.SB20
 import WaterVapor.WV20
 import Cat.*
-import lucuma.core.model.CloudExtinction
 
 class ConditionsResourceTest extends FunSuite{
   import TimeAccountingCategory.KR

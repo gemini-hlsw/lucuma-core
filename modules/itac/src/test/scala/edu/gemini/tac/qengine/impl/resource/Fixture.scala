@@ -3,6 +3,7 @@
 
 package edu.gemini.tac.qengine.impl.resource
 
+import cats.implicits.*
 import edu.gemini.tac.qengine.api.config.*
 import edu.gemini.tac.qengine.api.config.ConditionsCategory.Ge
 import edu.gemini.tac.qengine.api.config.ConditionsCategory.Le
@@ -20,12 +21,12 @@ import lucuma.core.enums.Half
 import lucuma.core.enums.ScienceBand
 import lucuma.core.enums.Site
 import lucuma.core.enums.TimeAccountingCategory
+import lucuma.core.model.CloudExtinction
 import lucuma.core.model.Semester
 import lucuma.core.model.Semester.YearInt
 import lucuma.core.util.Enumerated
-import cats.implicits.*
+
 import scala.annotation.unused
-import lucuma.core.model.CloudExtinction
 
 object Fixture {
   val site = Site.GS

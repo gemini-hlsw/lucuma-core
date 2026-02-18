@@ -3,11 +3,11 @@
 
 package edu.gemini.tac.qengine.api.config
 
+import cats.implicits.*
 import edu.gemini.tac.qengine.api.config.ConditionsCategory.Eq
 import edu.gemini.tac.qengine.util.Percent
-import munit.FunSuite
 import lucuma.core.model.CloudExtinction
-import cats.implicits.*
+import munit.FunSuite
 
 class ConditionsBinTest extends FunSuite {
   private val bin = ConditionsBin(ConditionsCategory(), Percent(10))

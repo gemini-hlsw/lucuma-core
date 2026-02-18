@@ -16,6 +16,7 @@ import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.Site
 import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.math.Coordinates
+import lucuma.core.model.CloudExtinction
 import lucuma.core.util.Enumerated
 import munit.FunSuite
 import org.junit.*
@@ -23,7 +24,6 @@ import org.junit.*
 import scala.Ordering.Implicits.*
 
 import Assert.*
-import lucuma.core.model.CloudExtinction
 
 class TimeRestrictionResourceTest extends FunSuite {
   import TimeAccountingCategory.US

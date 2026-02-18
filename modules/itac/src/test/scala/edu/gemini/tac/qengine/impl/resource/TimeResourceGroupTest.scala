@@ -16,11 +16,11 @@ import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.Site
 import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.math.Coordinates
+import lucuma.core.model.CloudExtinction
 import lucuma.core.util.Enumerated
 import munit.FunSuite
 
 import scala.Ordering.Implicits.*
-import lucuma.core.model.CloudExtinction
 
 class CompositeTimeRestrictionResourceTest extends FunSuite {
   import TimeAccountingCategory.US

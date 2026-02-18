@@ -4,11 +4,11 @@
 package edu.gemini.tac.qengine.api.config
 
 import edu.gemini.tac.qengine.p1.*
+import lucuma.core.model.CloudExtinction
 
 import scala.Ordering.Implicits.*
 
 import ConditionsCategory.*
-import lucuma.core.model.CloudExtinction
 
 /** Specification for a set of observing conditions. */
 final case class ConditionsCategory(
