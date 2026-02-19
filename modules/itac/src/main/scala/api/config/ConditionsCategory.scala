@@ -7,7 +7,7 @@ import edu.gemini.tac.qengine.p1.*
 import lucuma.core.enums.SkyBackground
 import lucuma.core.model.CloudExtinction
 import lucuma.core.model.ImageQuality
-
+import lucuma.core.enums.WaterVapor
 import scala.Ordering.Implicits.*
 
 import ConditionsCategory.*

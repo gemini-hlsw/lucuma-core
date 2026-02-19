@@ -11,7 +11,7 @@ import edu.gemini.tac.qengine.api.queue.time.QueueTime
 import edu.gemini.tac.qengine.api.queue.time.TimeAccountingCategoryTime
 import edu.gemini.tac.qengine.impl.queue.ProposalQueueBuilder
 import edu.gemini.tac.qengine.p1.*
-import edu.gemini.tac.qengine.p1.WaterVapor.*
+import lucuma.core.enums.WaterVapor
 import edu.gemini.tac.qengine.util.BoundedTime
 import edu.gemini.tac.qengine.util.Percent
 import edu.gemini.tac.qengine.util.Time
@@ -63,10 +63,10 @@ object Fixture {
     new SemesterResource(raResGroup, compositeTimeRestrictionResource(total))
 
   // Falls in the first conditions bin (<=CC70)
-  val goodCC = ObservingConditions(CloudExtinction.Preset.Zero, ImageQuality.Preset.TwoPointZero, SkyBackground.Bright, WVAny)
+  val goodCC = ObservingConditions(CloudExtinction.Preset.Zero, ImageQuality.Preset.TwoPointZero, SkyBackground.Bright, WaterVapor.Wet)
 
   // Falls in the second conditions bin (>=CC80)
-  val badCC  = ObservingConditions(CloudExtinction.Preset.OnePointZero, ImageQuality.Preset.TwoPointZero, SkyBackground.Bright, WVAny)
+  val badCC  = ObservingConditions(CloudExtinction.Preset.OnePointZero, ImageQuality.Preset.TwoPointZero, SkyBackground.Bright, WaterVapor.Wet)
 
   def genQuanta(hrs: Double): TimeAccountingCategoryTime = TimeAccountingCategoryTime.constant(Time.hours(hrs))
 

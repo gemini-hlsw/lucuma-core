@@ -3,17 +3,17 @@
 
 package edu.gemini.tac.qengine.api.config
 
-import edu.gemini.tac.qengine.p1.WaterVapor.WV50
 import edu.gemini.tac.qengine.util.Percent
 import edu.gemini.tac.qengine.util.Time
 import munit.FunSuite
-
+import lucuma.core.enums.WaterVapor
 import scala.Ordering.Implicits.*
+import cats.syntax.all.*
 
 class RestrictionConfigTest extends FunSuite {
   test("testMapCombine") {
     val percentBin = TimeRestriction("WV", Percent(10)) {
-      (_, obs, _) => obs.conditions.wv <= WV50
+      (_, obs, _) => obs.conditions.wv <= WaterVapor.Dry
     }
     val timeBin = TimeRestriction("LGS", Time.hours(10)) {
       (_, obs, _) => obs.lgs

@@ -6,16 +6,15 @@ package edu.gemini.tac.qengine.api.config
 import cats.implicits.*
 import edu.gemini.tac.qengine.api.config.ConditionsCategory as Cat
 import edu.gemini.tac.qengine.p1.*
-import edu.gemini.tac.qengine.p1.WaterVapor.*
 import lucuma.core.enums.SkyBackground
 import lucuma.core.model.CloudExtinction
 import lucuma.core.model.ImageQuality
 import munit.FunSuite
-
+import lucuma.core.enums.WaterVapor
 import Cat.*
 
 class ConditionsCategoryTest extends FunSuite {
-  private val oc = ObservingConditions(CloudExtinction.Preset.PointThree, ImageQuality.Preset.PointOne, SkyBackground.Darkest, WV20)
+  private val oc = ObservingConditions(CloudExtinction.Preset.PointThree, ImageQuality.Preset.PointOne, SkyBackground.Darkest, WaterVapor.VeryDry)
 
   test("testEq") {
     val matches = CloudExtinction.Preset.values.toList.map(x => Cat(ccSpec=Eq(x)).matches(oc))
@@ -35,22 +34,22 @@ class ConditionsCategoryTest extends FunSuite {
   test("testMultiple") {
     val cat = Cat(Eq(CloudExtinction.Preset.PointThree), Eq(ImageQuality.Preset.PointOne))
     assert(cat.matches(oc))
-    assert(!cat.matches(ObservingConditions(CloudExtinction.Preset.Zero, ImageQuality.Preset.PointOne, SkyBackground.Darkest, WV20)))
-    assert(!cat.matches(ObservingConditions(CloudExtinction.Preset.PointThree, ImageQuality.Preset.OnePointZero, SkyBackground.Darkest, WV20)))
+    assert(!cat.matches(ObservingConditions(CloudExtinction.Preset.Zero, ImageQuality.Preset.PointOne, SkyBackground.Darkest, WaterVapor.VeryDry)))
+    assert(!cat.matches(ObservingConditions(CloudExtinction.Preset.PointThree, ImageQuality.Preset.OnePointZero, SkyBackground.Darkest, WaterVapor.VeryDry)))
   }
 
   test("testAll") {
-    val cat = Cat(Eq(CloudExtinction.Preset.PointThree), Eq(ImageQuality.Preset.PointOne), Eq(SkyBackground.Darkest), Eq(WV20))
+    val cat = Cat(Eq(CloudExtinction.Preset.PointThree), Eq(ImageQuality.Preset.PointOne), Eq(SkyBackground.Darkest), Eq(WaterVapor.VeryDry))
     assert(cat.matches(oc))
-    assert(!cat.matches(ObservingConditions(CloudExtinction.Preset.PointThree, ImageQuality.Preset.PointOne, SkyBackground.Dark, WV20)))
-    assert(!cat.matches(ObservingConditions(CloudExtinction.Preset.PointThree, ImageQuality.Preset.PointOne, SkyBackground.Darkest, WV50)))
+    assert(!cat.matches(ObservingConditions(CloudExtinction.Preset.PointThree, ImageQuality.Preset.PointOne, SkyBackground.Dark, WaterVapor.VeryDry)))
+    assert(!cat.matches(ObservingConditions(CloudExtinction.Preset.PointThree, ImageQuality.Preset.PointOne, SkyBackground.Darkest, WaterVapor.Dry)))
   }
 
   test("testUnspecified") {
     val cat = Cat()
     assert(cat.matches(oc))
-    assert(cat.matches(ObservingConditions(CloudExtinction.Preset.PointThree, ImageQuality.Preset.PointOne, SkyBackground.Dark, WV20)))
-    assert(cat.matches(ObservingConditions(CloudExtinction.Preset.PointThree, ImageQuality.Preset.PointOne, SkyBackground.Darkest, WV50)))
+    assert(cat.matches(ObservingConditions(CloudExtinction.Preset.PointThree, ImageQuality.Preset.PointOne, SkyBackground.Dark, WaterVapor.VeryDry)))
+    assert(cat.matches(ObservingConditions(CloudExtinction.Preset.PointThree, ImageQuality.Preset.PointOne, SkyBackground.Darkest, WaterVapor.Dry)))
   }
 
   test("testCanObserveEq") {
@@ -78,7 +77,7 @@ class ConditionsCategoryTest extends FunSuite {
     val cat2 = Cat(Eq(CloudExtinction.Preset.Zero), Eq(ImageQuality.Preset.PointOne), Ge(SkyBackground.Gray))
     val cat3 = Cat(Ge(CloudExtinction.Preset.PointThree), Eq(ImageQuality.Preset.PointOne))
 
-    val oc = ObservingConditions(CloudExtinction.Preset.OnePointZero, ImageQuality.Preset.PointOne, SkyBackground.Dark, WVAny)
+    val oc = ObservingConditions(CloudExtinction.Preset.OnePointZero, ImageQuality.Preset.PointOne, SkyBackground.Dark, WaterVapor.Wet)
 
     assert(cat3.canObserve(oc))
     assert(!cat2.canObserve(oc))

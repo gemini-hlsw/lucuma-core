@@ -7,8 +7,7 @@ import edu.gemini.tac.qengine.api.config.TimeRestriction
 import edu.gemini.tac.qengine.impl.block.Block
 import edu.gemini.tac.qengine.log.RejectRestrictedBin
 import edu.gemini.tac.qengine.p1.*
-import edu.gemini.tac.qengine.p1.WaterVapor
-import edu.gemini.tac.qengine.p1.WaterVapor.*
+import lucuma.core.enums.WaterVapor
 import edu.gemini.tac.qengine.util.Percent
 import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.Site
@@ -19,7 +18,7 @@ import lucuma.core.model.CloudExtinction
 import lucuma.core.model.ImageQuality
 import lucuma.core.util.Enumerated
 import munit.FunSuite
-
+import cats.syntax.all.*
 import scala.Ordering.Implicits.*
 
 class CompositeTimeRestrictionResourceTest extends FunSuite {
@@ -32,7 +31,7 @@ class CompositeTimeRestrictionResourceTest extends FunSuite {
     ObservingConditions(CloudExtinction.Preset.ThreePointZero, ImageQuality.Preset.TwoPointZero, SkyBackground.Bright, wv)
 
   private val wvBin  = TimeRestriction("WV", Percent(10)) {
-    (_, obs, _) => obs.conditions.wv <= WV50
+    (_, obs, _) => obs.conditions.wv <= WaterVapor.Dry
   }
 
   private val lgsBin = TimeRestriction("lgs", Time.hours(1)) {
@@ -50,7 +49,7 @@ class CompositeTimeRestrictionResourceTest extends FunSuite {
     Proposal(ntac, site = Site.GS, obsList = List(Observation(target, conds(wv), Time.hours(10), lgs)))
 
   test("testReserveWv") {
-    val prop  = mkProp(WV20, lgs = false)  // matches WV limit, not LGS limit
+    val prop  = mkProp(WaterVapor.VeryDry, lgs = false)  // matches WV limit, not LGS limit
     val block = Block(prop, prop.obsList.head, Time.minutes(15))
 
     grp.reserve(block, Fixture.emptyQueue) match {
@@ -66,7 +65,7 @@ class CompositeTimeRestrictionResourceTest extends FunSuite {
   }
 
   test("testReserveLgs") {
-    val prop  = mkProp(WV80, lgs = true) // matches LGS limit, not WV limit
+    val prop  = mkProp(WaterVapor.Median, lgs = true) // matches LGS limit, not WV limit
     val block = Block(prop, prop.obsList.head, Time.minutes(15))
 
     grp.reserve(block, Fixture.emptyQueue) match {
@@ -82,7 +81,7 @@ class CompositeTimeRestrictionResourceTest extends FunSuite {
   }
 
   test("testReserveBoth") {
-    val prop  = mkProp(WV20, lgs = true) // matches WV and LGS
+    val prop  = mkProp(WaterVapor.VeryDry, lgs = true) // matches WV and LGS
     val block = Block(prop, prop.obsList.head, Time.minutes(15))
 
     grp.reserve(block, Fixture.emptyQueue) match {
@@ -98,7 +97,7 @@ class CompositeTimeRestrictionResourceTest extends FunSuite {
   }
 
   test("testFailWv") {
-    val prop  = mkProp(WV20, lgs = false)  // matches WV limit, not LGS limit
+    val prop  = mkProp(WaterVapor.VeryDry, lgs = false)  // matches WV limit, not LGS limit
     val block = Block(prop, prop.obsList.head, Time.minutes(61))
 
     grp.reserve(block, Fixture.emptyQueue) match {
@@ -108,7 +107,7 @@ class CompositeTimeRestrictionResourceTest extends FunSuite {
   }
 
   test("testFailLgs") {
-    val prop  = mkProp(WV80, lgs = true)  // matches LGS, not WV
+    val prop  = mkProp(WaterVapor.Median, lgs = true)  // matches LGS, not WV
     val block = Block(prop, prop.obsList.head, Time.minutes(61))
 
     grp.reserve(block, Fixture.emptyQueue) match {
@@ -118,7 +117,7 @@ class CompositeTimeRestrictionResourceTest extends FunSuite {
   }
 
   test("testNoMatch") {
-    val prop  = mkProp(WV80, lgs = false)  // matches LGS, not WV
+    val prop  = mkProp(WaterVapor.Median, lgs = false)  // matches LGS, not WV
 
     // no match so it doesn't matter that we try to reserve too much
     val block = Block(prop, prop.obsList.head, Time.minutes(61))

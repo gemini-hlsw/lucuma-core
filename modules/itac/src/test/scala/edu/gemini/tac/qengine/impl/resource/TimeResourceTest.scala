@@ -7,8 +7,7 @@ import edu.gemini.tac.qengine.api.config.TimeRestriction
 import edu.gemini.tac.qengine.impl.block.Block
 import edu.gemini.tac.qengine.log.RejectRestrictedBin
 import edu.gemini.tac.qengine.p1.*
-import edu.gemini.tac.qengine.p1.WaterVapor
-import edu.gemini.tac.qengine.p1.WaterVapor.*
+import lucuma.core.enums.WaterVapor
 import edu.gemini.tac.qengine.util.Percent
 import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.Site
@@ -20,7 +19,7 @@ import lucuma.core.model.ImageQuality
 import lucuma.core.util.Enumerated
 import munit.FunSuite
 import org.junit.*
-
+import cats.syntax.all.*
 import scala.Ordering.Implicits.*
 
 import Assert.*
@@ -35,7 +34,7 @@ class TimeRestrictionResourceTest extends FunSuite {
     ObservingConditions(CloudExtinction.Preset.ThreePointZero, ImageQuality.Preset.TwoPointZero, SkyBackground.Bright, wv)
 
   private val bin = TimeRestriction("WV", Percent(10)) {
-    (_, obs, _) => obs.conditions.wv <= WV50
+    (_, obs, _) => obs.conditions.wv <= WaterVapor.Dry
   }
 
   // 10% of 10 hours = 1 hr = 60 min
@@ -45,7 +44,7 @@ class TimeRestrictionResourceTest extends FunSuite {
     Proposal(ntac, site = Site.GS, obsList = List(Observation(target, conds(wv), Time.hours(10))))
 
   test("testReserveNoMatch") {
-    val prop = mkProp(WV80)
+    val prop = mkProp(WaterVapor.Median)
 
     // If the restriction doesn't match the block, then the same instance is
     // returned -- not a copy with the same values
@@ -57,7 +56,7 @@ class TimeRestrictionResourceTest extends FunSuite {
   }
 
   test("testReserveNoTime") {
-    val prop = mkProp(WV20)
+    val prop = mkProp(WaterVapor.VeryDry)
 
     // Here the restriction matches the block, but we're not reserving any
     // time.  Again, no copy should be made
@@ -69,7 +68,7 @@ class TimeRestrictionResourceTest extends FunSuite {
   }
 
   test("testReserve") {
-    val prop = mkProp(WV20)
+    val prop = mkProp(WaterVapor.VeryDry)
 
     // Reserve 15 of the 60 available minutes
     val block = Block(prop, prop.obsList.head, Time.minutes(15))
@@ -80,7 +79,7 @@ class TimeRestrictionResourceTest extends FunSuite {
   }
 
   test("testReject") {
-    val prop = mkProp(WV20)
+    val prop = mkProp(WaterVapor.VeryDry)
 
     // Try to reserve more than 1 hour
     val block = Block(prop, prop.obsList.head, Time.minutes(61))

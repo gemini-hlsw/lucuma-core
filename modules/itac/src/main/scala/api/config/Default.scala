@@ -6,13 +6,13 @@ package edu.gemini.tac.qengine.api.config
 import cats.implicits.*
 import edu.gemini.tac.qengine.api.config.ConditionsCategory
 import edu.gemini.tac.qengine.p1.ObservingConditions
-import edu.gemini.tac.qengine.p1.WaterVapor.*
 import edu.gemini.tac.qengine.util.Percent
 import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.SkyBackground
 import lucuma.core.model.CloudExtinction
 import lucuma.core.model.ImageQuality
 import lucuma.core.util.Enumerated
+import lucuma.core.enums.WaterVapor
 
 object Default {
   import ConditionsCategory.*
@@ -29,7 +29,7 @@ object Default {
     (ConditionsCategory(UnspecifiedCC, Eq(ImageQuality.Preset.TwoPointZero), UnspecifiedSB, UnspecifiedWV, Some("9")), 40)
   )
 
-  val WvTimeRestriction  = TimeRestriction.wv(Percent(50), WV50)
+  val WvTimeRestriction  = TimeRestriction.wv(Percent(50), WaterVapor.Dry)
   val LgsTimeRestriction = TimeRestriction.lgs(Time.hours(200))
 
   val RapidTooBandRestriction = BandRestriction.rapidToo
@@ -53,7 +53,7 @@ object Default {
       iq <- Enumerated[ImageQuality.Preset].all
       cc <- Enumerated[CloudExtinction.Preset].all
       sb <- SkyBackground.values
-    } yield ObservingConditions(cc, iq, sb, WVAny)
+    } yield ObservingConditions(cc, iq, sb, WaterVapor.Wet)
 
     ocList foreach { oc =>
       val ocString   = "%s,%s,%s".format(oc.iq, oc.cc, oc.sb)

@@ -4,7 +4,7 @@
 package edu.gemini.tac.qengine.api.config
 
 import edu.gemini.tac.qengine.p1.*
-import edu.gemini.tac.qengine.p1.WaterVapor.*
+import lucuma.core.enums.WaterVapor
 import edu.gemini.tac.qengine.util.Percent
 import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.ScienceBand
@@ -14,8 +14,10 @@ import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.model.CloudExtinction
 import lucuma.core.model.ImageQuality
 import munit.FunSuite
+import cats.syntax.all.*
 
 import scala.Ordering.Implicits.*
+import lucuma.core.util.Enumerated
 
 class TimeRestrictionTest extends FunSuite {
 
@@ -27,7 +29,7 @@ class TimeRestrictionTest extends FunSuite {
     ObservingConditions(CloudExtinction.Preset.ThreePointZero, ImageQuality.Preset.TwoPointZero, SkyBackground.Bright, wv)
 
   private val bin = TimeRestriction("wv", Percent(10)) {
-    (_, obs, _) => obs.conditions.wv <= WV50
+    (_, obs, _) => obs.conditions.wv <= WaterVapor.Dry
   }
 
   private def mkProp(wv: WaterVapor): Proposal =
@@ -35,7 +37,7 @@ class TimeRestrictionTest extends FunSuite {
 
 
   test("testMatches") {
-    val propList = WaterVapor.values.map(mkProp(_))
+    val propList = Enumerated[WaterVapor].all.map(mkProp(_))
     val boolList = propList.map(prop => bin.matches(prop, prop.obsList.head, ScienceBand.Band1))
     assertEquals(List(true, true, false, false), boolList)
   }
