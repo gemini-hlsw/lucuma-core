@@ -107,7 +107,7 @@ class ObservationIoTest {
     // fails. When an observation is read the time is read before the blueprint.
     missing(ObservationIo.MISSING_TIME) {
       new ProposalFixture {
-        override def observation = im.Observation(
+        override def observation = im.ItacObservation(
           None,
           Some(conditions),
           Some(siderealTarget),
@@ -121,7 +121,7 @@ class ObservationIoTest {
   @Test def readNoConditions(): Unit = {
     missing(ObservationIo.MISSING_CONDITIONS) {
       new ProposalFixture {
-        override def observation = im.Observation(
+        override def observation = im.ItacObservation(
           Some(blueprint),
           None,
           Some(siderealTarget),
@@ -135,7 +135,7 @@ class ObservationIoTest {
   @Test def readNoTarget(): Unit = {
     missing(ObservationIo.MISSING_TARGET) {
       new ProposalFixture {
-        override def observation = im.Observation(
+        override def observation = im.ItacObservation(
           Some(blueprint),
           Some(conditions),
           None,
@@ -149,7 +149,7 @@ class ObservationIoTest {
   @Test def readNoTime(): Unit = {
     missing(ObservationIo.MISSING_TIME) {
       new ProposalFixture {
-        override def observation = im.Observation(
+        override def observation = im.ItacObservation(
           Some(blueprint),
           Some(conditions),
           Some(siderealTarget),
@@ -162,7 +162,7 @@ class ObservationIoTest {
 
   @Test def readMissingMultiple(): Unit = {
     val p = new ProposalFixture {
-      override def observation = im.Observation(
+      override def observation = im.ItacObservation(
         Some(blueprint),
         None,
         Some(siderealTarget),
@@ -196,12 +196,12 @@ class ObservationIoTest {
     }
   }
 
-  private def mapObsGroups(grps: GroupedObservations): Map[(Site, BandChoice), NonEmptyList[Observation]] =
+  private def mapObsGroups(grps: GroupedObservations): Map[(Site, BandChoice), NonEmptyList[ItacObservation]] =
     grps.list.toList.map { case (s, c, os) => (s, c) -> os }.toMap
 
   @Test def readMultiSiteObservations(): Unit = {
     val p = new ProposalFixture {
-      private def nifsObservation = im.Observation(
+      private def nifsObservation = im.ItacObservation(
         Some(nifsAo),
         Some(conditions),
         Some(siderealTarget),
@@ -227,7 +227,7 @@ class ObservationIoTest {
 
   @Test def readMultiBandObservations(): Unit = {
     val p = new ProposalFixture {
-      private def b3Observation = im.Observation(
+      private def b3Observation = im.ItacObservation(
         Some(blueprint),
         Some(conditions),
         Some(siderealTarget),
@@ -251,7 +251,7 @@ class ObservationIoTest {
 
   @Test def readMultiObservations(): Unit = {
     val p = new ProposalFixture {
-      private def observation2 = im.Observation(
+      private def observation2 = im.ItacObservation(
         Some(blueprint),
         Some(conditions),
         Some(siderealTarget),
@@ -259,7 +259,7 @@ class ObservationIoTest {
         Some(twoHour)
       )
 
-      private def b3Observation = im.Observation(
+      private def b3Observation = im.ItacObservation(
         Some(blueprint),
         Some(conditions),
         Some(siderealTarget),
@@ -267,7 +267,7 @@ class ObservationIoTest {
         Some(oneHour)
       )
 
-      private def nifsObservation = im.Observation(
+      private def nifsObservation = im.ItacObservation(
         Some(nifsAo),
         Some(conditions),
         Some(siderealTarget),

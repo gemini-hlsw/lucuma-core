@@ -3,7 +3,7 @@
 
 package edu.gemini.tac.qengine.impl.block
 
-import edu.gemini.tac.qengine.p1.Observation
+import edu.gemini.tac.qengine.p1.ItacObservation
 import edu.gemini.tac.qengine.p1.Proposal
 import edu.gemini.tac.qengine.util.Time
 
@@ -18,7 +18,7 @@ import edu.gemini.tac.qengine.util.Time
  * with a single observation may contain only a single block, in which case it
  * would be both the start and final block for the proposal.
  */
-final case class Block(prop: Proposal, obs: Observation, time: Time, isStart: Boolean, isFinal: Boolean) {
+final case class Block(prop: Proposal, obs: ItacObservation, time: Time, isStart: Boolean, isFinal: Boolean) {
   def toFinal: Block = Block(prop, obs, time, isStart, isFinal = true)
   def updated(t: Time): Block = Block(prop, obs, t, isStart, isFinal)
 
@@ -38,7 +38,7 @@ object Block {
    * test cases don't care whether the block is a start block or a final
    * block.
    */
-  def apply(prop: Proposal, obs: Observation, time: Time): Block =
+  def apply(prop: Proposal, obs: ItacObservation, time: Time): Block =
     new Block(prop, obs, time, false, false)
 }
 

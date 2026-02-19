@@ -55,7 +55,7 @@ class DecResourceTest extends ItacSuite {
   private val ntac = Ntac(KR, "x", 0, Time.Zero)
 
   private def mkProp(target: ItacTarget): Proposal =
-    Proposal(ntac, site = Site.GS, obsList = List(Observation(target, conds, Time.Zero)))
+    Proposal(ntac, site = Site.GS, obsList = List(ItacObservation(target, conds, Time.Zero)))
 
   test("testNormalReserveWithRemainingTime") {
     val prop   = mkProp(target0)

@@ -41,7 +41,7 @@ class ConditionsResourceTest extends ItacSuite {
   private val target = ItacTarget(0,0)                               // not used
 
   private def mkProp(obsConds: ConstraintSet): Proposal = {
-    val obsList = List(Observation(target, obsConds, Time.minutes(10)))
+    val obsList = List(ItacObservation(target, obsConds, Time.minutes(10)))
     Proposal(ntac, site = Site.GS, obsList = obsList)
   }
 

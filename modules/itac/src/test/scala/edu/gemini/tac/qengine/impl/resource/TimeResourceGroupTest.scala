@@ -31,7 +31,7 @@ class CompositeTimeRestrictionResourceTest extends ItacSuite {
     ConstraintSet(ImageQuality.Preset.TwoPointZero, CloudExtinction.Preset.ThreePointZero, SkyBackground.Bright, wv, ElevationRange.ByAirMass.Default)
 
   private val wvBin  = TimeRestriction("WV", IntCentiPercent.unsafeFromPercent(10)) {
-    (_, obs, _) => obs.conditions.waterVapor <= WaterVapor.Dry
+    (_, obs, _) => obs.constraintSet.waterVapor <= WaterVapor.Dry
   }
 
   private val lgsBin = TimeRestriction("lgs", Time.hours(1)) {
@@ -46,7 +46,7 @@ class CompositeTimeRestrictionResourceTest extends ItacSuite {
   private val grp = new CompositeTimeRestrictionResource(lst)
 
   private def mkProp(wv: WaterVapor, lgs: Boolean): Proposal =
-    Proposal(ntac, site = Site.GS, obsList = List(Observation(target, conds(wv), Time.hours(10), lgs)))
+    Proposal(ntac, site = Site.GS, obsList = List(ItacObservation(target, conds(wv), Time.hours(10), lgs)))
 
   test("testReserveWv") {
     val prop  = mkProp(WaterVapor.VeryDry, lgs = false)  // matches WV limit, not LGS limit

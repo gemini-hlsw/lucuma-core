@@ -39,7 +39,7 @@ case class RightAscensionMapResource(val grp: RightAscensionMap[PerRightAscensio
   private def reserveToo(block: Block, queue: ProposalQueueBuilder): RejectMessage Either RightAscensionMapResource =
     tooBlocks(block) match {
         case None => {
-          val sum = grp.bins.foldLeft(Time.hours(0))(_ + _.remaining(block.obs.conditions))
+          val sum = grp.bins.foldLeft(Time.hours(0))(_ + _.remaining(block.obs.constraintSet))
           Left(new RejectToo(block.prop, block.obs, queue.band, sum))
         }
         case Some(s) =>
@@ -55,12 +55,12 @@ case class RightAscensionMapResource(val grp: RightAscensionMap[PerRightAscensio
     }
 
   private def reserveNonToo(block: Block, queue: ProposalQueueBuilder): RejectMessage Either RightAscensionMapResource = {
-    val ra = block.obs.target.ra
+    val ra = block.obs.itacTarget.ra
     grp(ra).reserve(block, queue).map(bin => new RightAscensionMapResource(grp.updated(ra, bin)))
   }
 
   def tooBlocks(block: Block): Option[Seq[Block]] =
-    TooBlocks[PerRightAscensionResource](block, grp.bins, _.remaining(block.obs.conditions))
+    TooBlocks[PerRightAscensionResource](block, grp.bins, _.remaining(block.obs.constraintSet))
 
   /**
    * Reserves up-to the given amount of time, returning an updated
@@ -71,10 +71,10 @@ case class RightAscensionMapResource(val grp: RightAscensionMap[PerRightAscensio
     (new RightAscensionMapResource(grp.updated(target.ra, bin)), rem)
   }
 
-  def reserveAvailable(reduction: Observation): (RightAscensionMapResource, Time) =
-    reserveAvailable(reduction.time, reduction.target, reduction.conditions)
+  def reserveAvailable(reduction: ItacObservation): (RightAscensionMapResource, Time) =
+    reserveAvailable(reduction.time, reduction.itacTarget, reduction.constraintSet)
 
-  def reserveAvailable(reductions: List[Observation]): (RightAscensionMapResource, Time) = {
+  def reserveAvailable(reductions: List[ItacObservation]): (RightAscensionMapResource, Time) = {
     reductions.foldLeft((this,Time.Zero)) {
       case ((grp0, time), reduction) =>
         grp0.reserveAvailable(reduction) match {

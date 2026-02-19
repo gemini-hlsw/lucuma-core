@@ -59,7 +59,7 @@ final class ConditionsCategoryMapResource private (val bins: ConditionsCategoryM
   def isFull(c: ConstraintSet): Boolean = remaining(c).isZero
 
   private def conds(block: Block): ConstraintSet =
-    block.obs.conditions
+    block.obs.constraintSet
 
 
   /**

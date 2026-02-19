@@ -47,7 +47,7 @@ final case class DeclinationMapResource(val bins: DeclinationMap[BoundedTime]) e
   def isFull(t: ItacTarget): Boolean   = isFull(t.dec)
 
   private def reserveNormal(block: Block, band: ScienceBand): RejectMessage Either DeclinationMapResource = {
-    val dec = block.obs.target.dec
+    val dec = block.obs.itacTarget.dec
     bins.updated(dec, _.reserve(block.time)) match {
       case None => Left(RejectTarget(block.prop, block.obs, band, RejectTarget.Dec, lookup(dec, _.used), lookup(dec, _.limit)))
       case Some(updated) => Right(new DeclinationMapResource(updated))

@@ -34,7 +34,7 @@ class ProposalFixture {
 
   def blueprint: im.BlueprintBase = im.GmosSBlueprintImaging(List(m.GmosSFilter.CaT_G0333))
   def conditions     = im.Condition.empty
-  def observation    = im.Observation(
+  def observation    = im.ItacObservation(
     Some(blueprint),
     Some(conditions),
     Some(siderealTarget),

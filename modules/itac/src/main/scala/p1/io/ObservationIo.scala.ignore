@@ -22,11 +22,11 @@ import scalaz.Validation.FlatMap._
  * Extracts relevant information out of a Phase 1 observation, if possible.
  */
 object ObservationIo {
-  def MISSING_BLUEPRINT    = "Observation missing blueprint definition"
-  def MISSING_CONDITIONS   = "Observation missing observing conditions definition"
+  def MISSING_BLUEPRINT    = "ItacObservation missing blueprint definition"
+  def MISSING_CONDITIONS   = "ItacObservation missing observing conditions definition"
   def MISSING_OBSERVATIONS = "No observations in proposal"
-  def MISSING_TARGET       = "Observation missing target definition"
-  def MISSING_TIME         = "Observation missing time amount"
+  def MISSING_TARGET       = "ItacObservation missing target definition"
+  def MISSING_TIME         = "ItacObservation missing time amount"
 
   sealed trait BandChoice extends Product with Serializable
   object BandChoice {
@@ -34,11 +34,11 @@ object ObservationIo {
     case object Band3   extends BandChoice
   }
 
-  type GroupedObservations = NonEmptyList[(Site, BandChoice, NonEmptyList[Observation])]
+  type GroupedObservations = NonEmptyList[(Site, BandChoice, NonEmptyList[ItacObservation])]
 
   def readAllAndGroup(p: im.Proposal, when: Long): ValidationNel[String, GroupedObservations] = {
     // Get the p1 observation's site, defaulting to GN.
-    def site(p1Obs: im.Observation): Site = {
+    def site(p1Obs: im.ItacObservation): Site = {
       val imSite = p1Obs.blueprint.map {
         case d: im.DssiBlueprint       => d.site
         case a: im.AlopekeBlueprint    => a.site
@@ -56,7 +56,7 @@ object ObservationIo {
     }
 
     // Get the p1 observations ScienceBand.Category (Band 3 or Band 1/2).
-    def band(p1Obs: im.Observation): BandChoice =
+    def band(p1Obs: im.ItacObservation): BandChoice =
       if (p1Obs.band == im.Band.BAND_3) BandChoice.Band3 else BandChoice.Band124
 
     // Site and band tuple for each observation in the proposal in the order
@@ -82,13 +82,13 @@ object ObservationIo {
     }
   }
 
-  def read(o: im.Observation, when: Long): ValidationNel[String, Observation] =
-    (target(o, when) |@| conditions(o) |@| time(o) |@| lgs(o))(Observation(o, _, _, _, _))
-    // lgs(o) <*> (time(o) <*> (conditions(o) <*> (target(o, when) map (Observation.apply _).curried)))
+  def read(o: im.ItacObservation, when: Long): ValidationNel[String, ItacObservation] =
+    (target(o, when) |@| conditions(o) |@| time(o) |@| lgs(o))(ItacObservation(o, _, _, _, _))
+    // lgs(o) <*> (time(o) <*> (conditions(o) <*> (target(o, when) map (ItacObservation.apply _).curried)))
 
   val tooCoords = Coordinates.zero
 
-  private def target(o: im.Observation, when: Long): ValidationNel[String, Target] =
+  private def target(o: im.ItacObservation, when: Long): ValidationNel[String, Target] =
     o.target.map(target(_, when)).fold(MISSING_TARGET.failureNel[Target]) { _.successNel[String] }
 
   def target(t: im.Target, when: Long): Target = {
@@ -99,7 +99,7 @@ object ObservationIo {
     Target(c.ra.toAngle.toDegrees, c.dec.toDegrees, ~Option(t.name))
   }
 
-  private def conditions(o: im.Observation): ValidationNel[String, ObservingConditions] = {
+  private def conditions(o: im.ItacObservation): ValidationNel[String, ObservingConditions] = {
     o.condition.map(conditions).fold(MISSING_CONDITIONS.failureNel[ObservingConditions]) { _.successNel[String] }
   }
 
@@ -135,10 +135,10 @@ object ObservationIo {
     ObservingConditions(cc, iq, sb, wv)
   }
 
-  def time(o: im.Observation): ValidationNel[String, Time] =
+  def time(o: im.ItacObservation): ValidationNel[String, Time] =
     o.totalTime.map(_.nonNegativeQueueEngineTime("observation")) | MISSING_TIME.failureNel[Time]
 
-  def lgs(o: im.Observation): ValidationNel[String, Boolean] =
+  def lgs(o: im.ItacObservation): ValidationNel[String, Boolean] =
     o.blueprint.map {
       case g: im.GeminiBlueprintBase => g.ao.toBoolean
       case _ => false

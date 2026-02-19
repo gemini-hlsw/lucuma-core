@@ -17,8 +17,8 @@ case class Proposal(
   site: Site,
   mode: ScienceSubtype = ScienceSubtype.Queue,
   too: ToOActivation = ToOActivation.None,
-  obsList: List[Observation] = Nil,
-  band3Observations: List[Observation] = Nil,
+  obsList: List[ItacObservation] = Nil,
+  band3Observations: List[ItacObservation] = Nil,
   isPoorWeather: Boolean = false,
   piName: Option[String] = None,
   piEmail: Option[String] = None,
@@ -30,7 +30,7 @@ case class Proposal(
 
   lazy val id: Proposal.Id = Proposal.Id(ntac.TimeAccountingCategory, ntac.reference)
 
-  def obsListFor(band: ScienceBand): List[Observation] =
+  def obsListFor(band: ScienceBand): List[ItacObservation] =
     if (band == ScienceBand.Band3) band3Observations else obsList
 
   /**
@@ -48,15 +48,15 @@ case class Proposal(
    * Gets the time for the given observation relative to the total for all
    * observations in the proposal.
    */
-  def relativeObsTime(obs: Observation, band: ScienceBand): Time =
-    Observation.relativeObsTime(obs, time, obsListFor(band))
+  def relativeObsTime(obs: ItacObservation, band: ScienceBand): Time =
+    ItacObservation.relativeObsTime(obs, time, obsListFor(band))
 
   /**
    * Gets the observation list with their times adjusted to be relative to
    * the total for all observations in the proposal.
    */
-  def relativeObsList(band: ScienceBand): List[Observation] =
-    Observation.relativeObsList(time, obsListFor(band))
+  def relativeObsList(band: ScienceBand): List[ItacObservation] =
+    ItacObservation.relativeObsList(time, obsListFor(band))
 
   def p1pdfBaseName: Option[String] =
     Option(p1xmlFile).map { f =>

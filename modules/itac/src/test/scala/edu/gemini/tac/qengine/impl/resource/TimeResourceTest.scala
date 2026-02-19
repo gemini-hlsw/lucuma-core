@@ -34,14 +34,14 @@ class TimeRestrictionResourceTest extends ItacSuite {
     ConstraintSet(ImageQuality.Preset.TwoPointZero, CloudExtinction.Preset.ThreePointZero, SkyBackground.Bright, wv, ElevationRange.ByAirMass.Default)
 
   private val bin = TimeRestriction("WV", IntCentiPercent.unsafeFromPercent(10)) {
-    (_, obs, _) => obs.conditions.waterVapor <= WaterVapor.Dry
+    (_, obs, _) => obs.constraintSet.waterVapor <= WaterVapor.Dry
   }
 
   // 10% of 10 hours = 1 hr = 60 min
   private val res60min = TimeRestrictionResource(bin, Time.hours(10))
 
   private def mkProp(wv: WaterVapor): Proposal =
-    Proposal(ntac, site = Site.GS, obsList = List(Observation(target, conds(wv), Time.hours(10))))
+    Proposal(ntac, site = Site.GS, obsList = List(ItacObservation(target, conds(wv), Time.hours(10))))
 
   test("testReserveNoMatch") {
     val prop = mkProp(WaterVapor.Median)

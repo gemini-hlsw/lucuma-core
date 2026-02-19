@@ -35,12 +35,12 @@ class BlockIteratorTest extends ItacSuite {
     )
   val e = 0.000001
 
-  def mkObs(hrs: Double): Observation = Observation(target, conds, Time.hours(hrs))
+  def mkObs(hrs: Double): ItacObservation = ItacObservation(target, conds, Time.hours(hrs))
 
   def mkProp(p: TimeAccountingCategory, hrs: Double, obsHrs: List[Double], b3ObsHrs: List[Double]): Proposal = {
     val ntac = Ntac(p, "na", 0, Time.hours(hrs))
-    val lst = obsHrs.map(curHrs => Observation(target, conds, Time.hours(curHrs))).toList
-    val b3obs = b3ObsHrs.map(curHrs => Observation(target, conds, Time.hours(curHrs))).toList
+    val lst = obsHrs.map(curHrs => ItacObservation(target, conds, Time.hours(curHrs))).toList
+    val b3obs = b3ObsHrs.map(curHrs => ItacObservation(target, conds, Time.hours(curHrs))).toList
     Proposal(ntac, site = Site.GS, obsList = lst, band3Observations = b3obs)
   }
 
@@ -52,7 +52,7 @@ class BlockIteratorTest extends ItacSuite {
   }
 
   test("testEmptyQuanta") {
-    List[(Proposal) => List[Observation]](_.obsList, _.band3Observations).map {
+    List[(Proposal) => List[ItacObservation]](_.obsList, _.band3Observations).map {
       fn =>
         val it = BlockIterator(TimeAccountingCategoryTime.empty, List(US), genPropLists(1, US, 10, List(10), List(10)), fn)
         assertFalse(it.hasNext)
@@ -61,7 +61,7 @@ class BlockIteratorTest extends ItacSuite {
   }
 
   // test("testZeroQuanta") {
-  //   List[(Proposal) => List[Observation]](_.obsList, _.band3Observations).foreach {
+  //   List[(Proposal) => List[ItacObservation]](_.obsList, _.band3Observations).foreach {
   //     fn =>
   //       val it = BlockIterator(genQuanta(0), List(US), genPropLists(1, US, 10, List(10)), fn)
   //       assertFalse(it.hasNext)
@@ -74,7 +74,7 @@ class BlockIteratorTest extends ItacSuite {
   }
 
   test("testEmptyPropLists") {
-    List[(Proposal) => List[Observation]](_.obsList, _.band3Observations).map {
+    List[(Proposal) => List[ItacObservation]](_.obsList, _.band3Observations).map {
       fn =>
         val it = BlockIterator(genQuanta(10), List(US), genPropLists(0, US, 10, List(10)), fn)
         assertFalse(it.hasNext)
@@ -83,7 +83,7 @@ class BlockIteratorTest extends ItacSuite {
   }
 
   // test("testEmptyTimeAccountingCategorySequence") {
-  //   List[(Proposal) => List[Observation]](_.obsList, _.band3Observations).map {
+  //   List[(Proposal) => List[ItacObservation]](_.obsList, _.band3Observations).map {
   //     fn =>
   //       val it = BlockIterator(genQuanta(10), Nil, genPropLists(1, US, 10, List(10)), fn)
   //       assertFalse(it.hasNext)

@@ -146,7 +146,7 @@ class ProposalIo {
       val props = sites.map { site =>
 
           // Get the list of observations associated with the given band category (if any).
-          def bandList(cat: ObservationIo.BandChoice): List[Observation] =
+          def bandList(cat: ObservationIo.BandChoice): List[ItacObservation] =
             ~obsGroups.list
               .find { case (s, b, _) => s == site && b == cat }
               .map(_._3.list.toList)

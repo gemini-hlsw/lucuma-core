@@ -6,7 +6,7 @@ package edu.gemini.tac.qengine.api.config
 import cats.syntax.all.*
 import edu.gemini.tac.qengine.impl.resource.Resource2
 import edu.gemini.tac.qengine.log.RejectRestrictedBin
-import edu.gemini.tac.qengine.p1.Observation
+import edu.gemini.tac.qengine.p1.ItacObservation
 import edu.gemini.tac.qengine.p1.Proposal
 import edu.gemini.tac.qengine.util.BoundedTime
 import edu.gemini.tac.qengine.util.Time
@@ -19,7 +19,7 @@ import lucuma.core.model.IntCentiPercent
  * specifies the time being restricted, which may be an absolute amount of time
  * or a relative amount of time.
  */
-case class TimeRestriction[T](name: String, value: T)(val matches: (Proposal, Observation, ScienceBand) => Boolean) {
+case class TimeRestriction[T](name: String, value: T)(val matches: (Proposal, ItacObservation, ScienceBand) => Boolean) {
 
   def map[U](f: T => U): TimeRestriction[U]    =
     new TimeRestriction[U](name, f(value))(matches)
@@ -34,7 +34,7 @@ object TimeRestriction {
 
   def wv(limit: IntCentiPercent, wv: WaterVapor) =
     TimeRestriction("WV Queue Time Limit", limit) {
-       (_, obs, _) => obs.conditions.waterVapor <= wv
+       (_, obs, _) => obs.constraintSet.waterVapor <= wv
     }
 
   def lgs(limit: Time) =

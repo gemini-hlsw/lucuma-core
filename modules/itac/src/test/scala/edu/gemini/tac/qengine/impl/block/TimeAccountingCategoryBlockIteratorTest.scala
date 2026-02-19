@@ -41,12 +41,12 @@ class TimeAccountingCategoryBlockIteratorTest extends ItacSuite {
 
   var gen = IdGen()
 
-  def mkObs(hrs: Double): Observation = Observation(target, conds, Time.hours(hrs))
+  def mkObs(hrs: Double): ItacObservation = ItacObservation(target, conds, Time.hours(hrs))
 
   def mkProp(hrs: Double, obsHrs: Double*): Proposal = {
     val ntac = Ntac(AR, gen.id, 0, Time.hours(hrs))
     gen = gen.next
-    val lst  = obsHrs.map(curHrs => Observation(target, conds, Time.hours(curHrs))).toList
+    val lst  = obsHrs.map(curHrs => ItacObservation(target, conds, Time.hours(curHrs))).toList
     Proposal(ntac, site = Site.GS, obsList = lst)
   }
 
@@ -57,7 +57,7 @@ class TimeAccountingCategoryBlockIteratorTest extends ItacSuite {
 
   private def validate(it: TimeAccountingCategoryBlockIterator,
                        propList: List[Proposal],
-                       obsList: List[Observation],
+                       obsList: List[ItacObservation],
                        time: Double) = {
 
     assertEquals(propList, it.remainingProposals)
