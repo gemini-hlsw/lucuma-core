@@ -27,7 +27,7 @@ class CompositeTimeRestrictionResourceTest extends FunSuite {
   val TimeAccountingCategorys = Enumerated[TimeAccountingCategory].all
 
   private val ntac   = Ntac(US, "x", 0, Time.hours(10))
-  private val target = Target(Coordinates.Zero) // not used
+  private val target = Target(Coordinates.Zero, None) // not used
   private def conds(wv: WaterVapor) =
     ConstraintSet(ImageQuality.Preset.TwoPointZero, CloudExtinction.Preset.ThreePointZero, SkyBackground.Bright, wv, ElevationRange.ByAirMass.Default)
 

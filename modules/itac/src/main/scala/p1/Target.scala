@@ -4,14 +4,7 @@
 package edu.gemini.tac.qengine.p1
 
 import lucuma.core.math.Coordinates
-import lucuma.core.math.Declination
-import lucuma.core.math.HourAngle
-import lucuma.core.math.RightAscension
 
-case class Target(coords: Coordinates, name: Option[String] = None):
+case class Target(coords: Coordinates, name: Option[String]):
   def ra = coords.ra
   def dec = coords.dec
-
-object Target:
-  def apply(ra: Double, dec: Double): Target =
-    Target(Coordinates(RightAscension(HourAngle.fromDoubleDegrees(ra)), Declination.fromDoubleDegrees(dec).get))

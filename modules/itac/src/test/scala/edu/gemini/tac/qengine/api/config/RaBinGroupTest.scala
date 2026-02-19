@@ -58,7 +58,7 @@ class RaBinGroupTest extends FunSuite {
   }
 
   test("testLookupTarget") {
-    validateLookup((g, m) => g(Target(Coordinates(RightAscension(HourAngle.fromDoubleMinutes(m)), Declination.Zero))))
+    validateLookup((g, m) => g(Target(Coordinates(RightAscension(HourAngle.fromDoubleMinutes(m)), Declination.Zero), None)))
   }
 
   test("testMap") {

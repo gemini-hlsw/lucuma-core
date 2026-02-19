@@ -3,6 +3,7 @@
 
 package edu.gemini.tac.qengine.impl.resource
 
+import edu.gemini.tac.qengine.ItacSuite
 import edu.gemini.tac.qengine.impl.block.Block
 import edu.gemini.tac.qengine.log.RejectConditions
 import edu.gemini.tac.qengine.log.RejectTarget
@@ -11,11 +12,10 @@ import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.model.ConstraintSet
 import lucuma.core.util.Enumerated
-import munit.FunSuite
 
 import Fixture.{badCC, emptyQueue, goodCC}
 
-class PerRightAscensionResourceTest extends FunSuite {
+class PerRightAscensionResourceTest extends ItacSuite {
   import TimeAccountingCategory.KR
   val TimeAccountingCategorys = Enumerated[TimeAccountingCategory].all
 

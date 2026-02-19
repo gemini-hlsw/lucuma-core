@@ -3,13 +3,13 @@
 
 package edu.gemini.tac.qengine.api.config
 
+import edu.gemini.tac.qengine.ItacSuite
 import edu.gemini.tac.qengine.p1.Target
-import munit.FunSuite
 import org.junit.*
 
 import Assert.*
 
-class DecRangeTest extends FunSuite {
+class DecRangeTest extends ItacSuite {
 
   val rng = DecRange(0, 10)
   val irng = DecRange.inclusive(0, 10)

@@ -4,6 +4,7 @@
 package edu.gemini.tac.qengine.impl.resource
 
 import cats.implicits.*
+import edu.gemini.tac.qengine.ItacSuite
 import edu.gemini.tac.qengine.api.config.ConditionsBin
 import edu.gemini.tac.qengine.api.config.ConditionsCategory as Cat
 import edu.gemini.tac.qengine.api.config.ConditionsCategoryMap
@@ -21,11 +22,10 @@ import lucuma.core.model.ElevationRange
 import lucuma.core.model.ImageQuality
 import lucuma.core.model.IntCentiPercent
 import lucuma.core.util.Enumerated
-import munit.FunSuite
 
 import Cat.*
 
-class ConditionsResourceTest extends FunSuite{
+class ConditionsResourceTest extends ItacSuite {
   import TimeAccountingCategory.KR
   val TimeAccountingCategorys = Enumerated[TimeAccountingCategory].all
 

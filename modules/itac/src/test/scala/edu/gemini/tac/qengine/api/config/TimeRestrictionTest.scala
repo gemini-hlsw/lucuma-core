@@ -4,6 +4,7 @@
 package edu.gemini.tac.qengine.api.config
 
 import cats.syntax.all.*
+import edu.gemini.tac.qengine.ItacSuite
 import edu.gemini.tac.qengine.p1.*
 import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.ScienceBand
@@ -17,9 +18,8 @@ import lucuma.core.model.ElevationRange
 import lucuma.core.model.ImageQuality
 import lucuma.core.model.IntCentiPercent
 import lucuma.core.util.Enumerated
-import munit.FunSuite
 
-class TimeRestrictionTest extends FunSuite {
+class TimeRestrictionTest extends ItacSuite {
 
   val US = TimeAccountingCategory.US
 

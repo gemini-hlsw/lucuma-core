@@ -3,11 +3,11 @@
 
 package edu.gemini.tac.qengine.api.config
 
+import edu.gemini.tac.qengine.ItacSuite
 import edu.gemini.tac.qengine.p1.Target
 import lucuma.core.model.IntCentiPercent
-import munit.FunSuite
 
-class DecBinTest extends FunSuite {
+class DecBinTest extends ItacSuite {
   val TenPercent = IntCentiPercent.unsafeFromPercent(10)
 
   val bin = DecRanged(0, 10, TenPercent)

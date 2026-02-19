@@ -3,12 +3,12 @@
 
 package edu.gemini.tac.qengine.api.config
 
+import edu.gemini.tac.qengine.ItacSuite
 import edu.gemini.tac.qengine.p1.Target
 import lucuma.core.math.Declination
 import lucuma.core.model.IntCentiPercent
-import munit.FunSuite
 
-class DecBinGroupTest extends FunSuite {
+class DecBinGroupTest extends ItacSuite {
 
   private def f(decRange: DecRange): Option[IntCentiPercent] = {
     decRange.startDeg match {

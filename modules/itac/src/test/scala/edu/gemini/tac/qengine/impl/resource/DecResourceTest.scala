@@ -3,6 +3,7 @@
 
 package edu.gemini.tac.qengine.impl.resource
 
+import edu.gemini.tac.qengine.ItacSuite
 import edu.gemini.tac.qengine.api.config.DecRanged
 import edu.gemini.tac.qengine.api.config.DeclinationMap
 import edu.gemini.tac.qengine.impl.block.Block
@@ -20,12 +21,11 @@ import lucuma.core.model.ConstraintSet
 import lucuma.core.model.ElevationRange
 import lucuma.core.model.ImageQuality
 import lucuma.core.util.Enumerated
-import munit.FunSuite
 import org.junit.*
 
 import Assert.*
 
-class DecResourceTest extends FunSuite {
+class DecResourceTest extends ItacSuite {
   import TimeAccountingCategory.KR
   val TimeAccountingCategorys = Enumerated[TimeAccountingCategory].all
 
