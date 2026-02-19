@@ -21,6 +21,7 @@ import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.enums.WaterVapor
 import lucuma.core.model.CloudExtinction
+import lucuma.core.model.ElevationRange
 import lucuma.core.model.ImageQuality
 import lucuma.core.model.Semester
 import lucuma.core.model.Semester.YearInt
@@ -63,10 +64,10 @@ object Fixture {
     new SemesterResource(raResGroup, compositeTimeRestrictionResource(total))
 
   // Falls in the first conditions bin (<=CC70)
-  val goodCC = ObservingConditions(CloudExtinction.Preset.Zero, ImageQuality.Preset.TwoPointZero, SkyBackground.Bright, WaterVapor.Wet)
+  val goodCC = ObservingConditions(ImageQuality.Preset.TwoPointZero, CloudExtinction.Preset.Zero, SkyBackground.Bright, WaterVapor.Wet, ElevationRange.ByAirMass.Default)
 
   // Falls in the second conditions bin (>=CC80)
-  val badCC  = ObservingConditions(CloudExtinction.Preset.OnePointZero, ImageQuality.Preset.TwoPointZero, SkyBackground.Bright, WaterVapor.Wet)
+  val badCC  = ObservingConditions(ImageQuality.Preset.TwoPointZero, CloudExtinction.Preset.OnePointZero, SkyBackground.Bright, WaterVapor.Wet, ElevationRange.ByAirMass.Default)
 
   def genQuanta(hrs: Double): TimeAccountingCategoryTime = TimeAccountingCategoryTime.constant(Time.hours(hrs))
 

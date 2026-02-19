@@ -17,6 +17,7 @@ import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.enums.WaterVapor
 import lucuma.core.model.CloudExtinction
+import lucuma.core.model.ElevationRange
 import lucuma.core.model.ImageQuality
 import lucuma.core.util.Enumerated
 import munit.FunSuite
@@ -44,7 +45,7 @@ class ConditionsResourceTest extends FunSuite{
   }
 
   private def mkConds(cc: CloudExtinction.Preset): ObservingConditions =
-    ObservingConditions(cc, ImageQuality.Preset.PointOne, SkyBackground.Darkest, WaterVapor.VeryDry)
+    ObservingConditions(ImageQuality.Preset.PointOne, cc, SkyBackground.Darkest, WaterVapor.VeryDry, ElevationRange.ByAirMass.Default)
 
   // Verify that the given remaining times match -- times must be specified
   // in order of CloudCover values.

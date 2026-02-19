@@ -16,6 +16,7 @@ import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.enums.WaterVapor
 import lucuma.core.math.Coordinates
 import lucuma.core.model.CloudExtinction
+import lucuma.core.model.ElevationRange
 import lucuma.core.model.ImageQuality
 import lucuma.core.util.Enumerated
 import munit.FunSuite
@@ -30,7 +31,7 @@ class TimeRestrictionResourceTest extends FunSuite {
   private val ntac   = Ntac(US, "x", 0, Time.hours(10))
   private val target = Target(Coordinates.Zero) // not used
   private def conds(wv: WaterVapor) =
-    ObservingConditions(CloudExtinction.Preset.ThreePointZero, ImageQuality.Preset.TwoPointZero, SkyBackground.Bright, wv)
+    ObservingConditions(ImageQuality.Preset.TwoPointZero, CloudExtinction.Preset.ThreePointZero, SkyBackground.Bright, wv, ElevationRange.ByAirMass.Default)
 
   private val bin = TimeRestriction("WV", Percent(10)) {
     (_, obs, _) => obs.conditions.waterVapor <= WaterVapor.Dry

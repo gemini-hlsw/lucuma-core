@@ -11,6 +11,7 @@ import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.WaterVapor
 import lucuma.core.model.CloudExtinction
+import lucuma.core.model.ElevationRange
 import lucuma.core.model.ImageQuality
 import lucuma.core.util.Enumerated
 
@@ -53,7 +54,7 @@ object Default {
       iq <- Enumerated[ImageQuality.Preset].all
       cc <- Enumerated[CloudExtinction.Preset].all
       sb <- SkyBackground.values
-    } yield ObservingConditions(cc, iq, sb, WaterVapor.Wet)
+    } yield ObservingConditions(iq, cc, sb, WaterVapor.Wet, ElevationRange.ByAirMass.Default)
 
     ocList foreach { oc =>
       val ocString   = "%s,%s,%s".format(oc.imageQuality, oc.cloudExtinction, oc.skyBackground)
