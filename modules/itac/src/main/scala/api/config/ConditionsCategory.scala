@@ -4,6 +4,7 @@
 package edu.gemini.tac.qengine.api.config
 
 import edu.gemini.tac.qengine.p1.*
+import lucuma.core.enums.SkyBackground
 import lucuma.core.model.CloudExtinction
 import lucuma.core.model.ImageQuality
 

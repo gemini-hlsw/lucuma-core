@@ -6,8 +6,8 @@ package edu.gemini.tac.qengine.api.config
 import cats.implicits.*
 import edu.gemini.tac.qengine.api.config.ConditionsCategory as Cat
 import edu.gemini.tac.qengine.p1.*
-import edu.gemini.tac.qengine.p1.SkyBackground.*
 import edu.gemini.tac.qengine.p1.WaterVapor.*
+import lucuma.core.enums.SkyBackground
 import lucuma.core.model.CloudExtinction
 import lucuma.core.model.ImageQuality
 import munit.FunSuite
@@ -15,7 +15,7 @@ import munit.FunSuite
 import Cat.*
 
 class ConditionsCategoryTest extends FunSuite {
-  private val oc = ObservingConditions(CloudExtinction.Preset.PointThree, ImageQuality.Preset.PointOne, SB20, WV20)
+  private val oc = ObservingConditions(CloudExtinction.Preset.PointThree, ImageQuality.Preset.PointOne, SkyBackground.Darkest, WV20)
 
   test("testEq") {
     val matches = CloudExtinction.Preset.values.toList.map(x => Cat(ccSpec=Eq(x)).matches(oc))
@@ -35,22 +35,22 @@ class ConditionsCategoryTest extends FunSuite {
   test("testMultiple") {
     val cat = Cat(Eq(CloudExtinction.Preset.PointThree), Eq(ImageQuality.Preset.PointOne))
     assert(cat.matches(oc))
-    assert(!cat.matches(ObservingConditions(CloudExtinction.Preset.Zero, ImageQuality.Preset.PointOne, SB20, WV20)))
-    assert(!cat.matches(ObservingConditions(CloudExtinction.Preset.PointThree, ImageQuality.Preset.OnePointZero, SB20, WV20)))
+    assert(!cat.matches(ObservingConditions(CloudExtinction.Preset.Zero, ImageQuality.Preset.PointOne, SkyBackground.Darkest, WV20)))
+    assert(!cat.matches(ObservingConditions(CloudExtinction.Preset.PointThree, ImageQuality.Preset.OnePointZero, SkyBackground.Darkest, WV20)))
   }
 
   test("testAll") {
-    val cat = Cat(Eq(CloudExtinction.Preset.PointThree), Eq(ImageQuality.Preset.PointOne), Eq(SB20), Eq(WV20))
+    val cat = Cat(Eq(CloudExtinction.Preset.PointThree), Eq(ImageQuality.Preset.PointOne), Eq(SkyBackground.Darkest), Eq(WV20))
     assert(cat.matches(oc))
-    assert(!cat.matches(ObservingConditions(CloudExtinction.Preset.PointThree, ImageQuality.Preset.PointOne, SB50, WV20)))
-    assert(!cat.matches(ObservingConditions(CloudExtinction.Preset.PointThree, ImageQuality.Preset.PointOne, SB20, WV50)))
+    assert(!cat.matches(ObservingConditions(CloudExtinction.Preset.PointThree, ImageQuality.Preset.PointOne, SkyBackground.Dark, WV20)))
+    assert(!cat.matches(ObservingConditions(CloudExtinction.Preset.PointThree, ImageQuality.Preset.PointOne, SkyBackground.Darkest, WV50)))
   }
 
   test("testUnspecified") {
     val cat = Cat()
     assert(cat.matches(oc))
-    assert(cat.matches(ObservingConditions(CloudExtinction.Preset.PointThree, ImageQuality.Preset.PointOne, SB50, WV20)))
-    assert(cat.matches(ObservingConditions(CloudExtinction.Preset.PointThree, ImageQuality.Preset.PointOne, SB20, WV50)))
+    assert(cat.matches(ObservingConditions(CloudExtinction.Preset.PointThree, ImageQuality.Preset.PointOne, SkyBackground.Dark, WV20)))
+    assert(cat.matches(ObservingConditions(CloudExtinction.Preset.PointThree, ImageQuality.Preset.PointOne, SkyBackground.Darkest, WV50)))
   }
 
   test("testCanObserveEq") {
@@ -63,7 +63,7 @@ class ConditionsCategoryTest extends FunSuite {
   }
 
   test("testCanObserveLe") {
-    val cat = Le[SkyBackground](SB50)
+    val cat = Le[SkyBackground](SkyBackground.Dark)
     SkyBackground.values foreach { sb => assert(cat.canObserve(sb)) }
   }
 
@@ -74,11 +74,11 @@ class ConditionsCategoryTest extends FunSuite {
   }
 
   test("testCanObserveAll") {
-    val cat1 = Cat(Eq(CloudExtinction.Preset.Zero), Eq(ImageQuality.Preset.PointOne), Le(SB50))
-    val cat2 = Cat(Eq(CloudExtinction.Preset.Zero), Eq(ImageQuality.Preset.PointOne), Ge(SB80))
+    val cat1 = Cat(Eq(CloudExtinction.Preset.Zero), Eq(ImageQuality.Preset.PointOne), Le(SkyBackground.Dark))
+    val cat2 = Cat(Eq(CloudExtinction.Preset.Zero), Eq(ImageQuality.Preset.PointOne), Ge(SkyBackground.Gray))
     val cat3 = Cat(Ge(CloudExtinction.Preset.PointThree), Eq(ImageQuality.Preset.PointOne))
 
-    val oc = ObservingConditions(CloudExtinction.Preset.OnePointZero, ImageQuality.Preset.PointOne, SB50, WVAny)
+    val oc = ObservingConditions(CloudExtinction.Preset.OnePointZero, ImageQuality.Preset.PointOne, SkyBackground.Dark, WVAny)
 
     assert(cat3.canObserve(oc))
     assert(!cat2.canObserve(oc))

@@ -11,7 +11,6 @@ import edu.gemini.tac.qengine.api.queue.time.QueueTime
 import edu.gemini.tac.qengine.api.queue.time.TimeAccountingCategoryTime
 import edu.gemini.tac.qengine.impl.queue.ProposalQueueBuilder
 import edu.gemini.tac.qengine.p1.*
-import edu.gemini.tac.qengine.p1.SkyBackground.*
 import edu.gemini.tac.qengine.p1.WaterVapor.*
 import edu.gemini.tac.qengine.util.BoundedTime
 import edu.gemini.tac.qengine.util.Percent
@@ -19,6 +18,7 @@ import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.Half
 import lucuma.core.enums.ScienceBand
 import lucuma.core.enums.Site
+import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.model.CloudExtinction
 import lucuma.core.model.ImageQuality
@@ -63,10 +63,10 @@ object Fixture {
     new SemesterResource(raResGroup, compositeTimeRestrictionResource(total))
 
   // Falls in the first conditions bin (<=CC70)
-  val goodCC = ObservingConditions(CloudExtinction.Preset.Zero, ImageQuality.Preset.TwoPointZero, SBAny, WVAny)
+  val goodCC = ObservingConditions(CloudExtinction.Preset.Zero, ImageQuality.Preset.TwoPointZero, SkyBackground.Bright, WVAny)
 
   // Falls in the second conditions bin (>=CC80)
-  val badCC  = ObservingConditions(CloudExtinction.Preset.OnePointZero, ImageQuality.Preset.TwoPointZero, SBAny, WVAny)
+  val badCC  = ObservingConditions(CloudExtinction.Preset.OnePointZero, ImageQuality.Preset.TwoPointZero, SkyBackground.Bright, WVAny)
 
   def genQuanta(hrs: Double): TimeAccountingCategoryTime = TimeAccountingCategoryTime.constant(Time.hours(hrs))
 

@@ -6,11 +6,10 @@ package edu.gemini.tac.qengine.api.config
 import cats.implicits.*
 import edu.gemini.tac.qengine.api.config.ConditionsCategory
 import edu.gemini.tac.qengine.p1.ObservingConditions
-import edu.gemini.tac.qengine.p1.SkyBackground
-import edu.gemini.tac.qengine.p1.SkyBackground.*
 import edu.gemini.tac.qengine.p1.WaterVapor.*
 import edu.gemini.tac.qengine.util.Percent
 import edu.gemini.tac.qengine.util.Time
+import lucuma.core.enums.SkyBackground
 import lucuma.core.model.CloudExtinction
 import lucuma.core.model.ImageQuality
 import lucuma.core.util.Enumerated
@@ -19,11 +18,11 @@ object Default {
   import ConditionsCategory.*
   
   val Conditions = ConditionsCategoryMap.ofPercent(
-    (ConditionsCategory(Eq(CloudExtinction.Preset.Zero), Eq(ImageQuality.Preset.PointOne), Le(SB50), UnspecifiedWV, Some("1")), 4),
-    (ConditionsCategory(Eq(CloudExtinction.Preset.Zero), Eq(ImageQuality.Preset.PointOne), Ge(SB80), UnspecifiedWV, Some("2")), 4),
+    (ConditionsCategory(Eq(CloudExtinction.Preset.Zero), Eq(ImageQuality.Preset.PointOne), Le(SkyBackground.Dark), UnspecifiedWV, Some("1")), 4),
+    (ConditionsCategory(Eq(CloudExtinction.Preset.Zero), Eq(ImageQuality.Preset.PointOne), Ge(SkyBackground.Gray), UnspecifiedWV, Some("2")), 4),
     (ConditionsCategory(Ge(CloudExtinction.Preset.PointThree), Eq(ImageQuality.Preset.PointOne), UnspecifiedSB, UnspecifiedWV, Some("3")), 3),
-    (ConditionsCategory(Eq(CloudExtinction.Preset.Zero), Eq(ImageQuality.Preset.OnePointZero), Le(SB50), UnspecifiedWV, Some("4")), 10),
-    (ConditionsCategory(Eq(CloudExtinction.Preset.Zero), Eq(ImageQuality.Preset.OnePointZero), Ge(SB80), UnspecifiedWV, Some("5")), 10),
+    (ConditionsCategory(Eq(CloudExtinction.Preset.Zero), Eq(ImageQuality.Preset.OnePointZero), Le(SkyBackground.Dark), UnspecifiedWV, Some("4")), 10),
+    (ConditionsCategory(Eq(CloudExtinction.Preset.Zero), Eq(ImageQuality.Preset.OnePointZero), Ge(SkyBackground.Gray), UnspecifiedWV, Some("5")), 10),
     (ConditionsCategory(Ge(CloudExtinction.Preset.PointThree), Eq(ImageQuality.Preset.OnePointZero), UnspecifiedSB, UnspecifiedWV, Some("6")), 10),
     (ConditionsCategory(Eq(CloudExtinction.Preset.Zero), Eq(ImageQuality.Preset.OnePointFive), UnspecifiedSB, UnspecifiedWV, Some("7")), 15),
     (ConditionsCategory(Ge(CloudExtinction.Preset.PointThree), Eq(ImageQuality.Preset.OnePointFive), UnspecifiedSB, UnspecifiedWV, Some("8")), 20),

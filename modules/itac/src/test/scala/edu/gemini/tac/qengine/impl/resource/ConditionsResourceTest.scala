@@ -13,13 +13,13 @@ import edu.gemini.tac.qengine.p1.*
 import edu.gemini.tac.qengine.util.Percent
 import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.Site
+import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.model.CloudExtinction
 import lucuma.core.model.ImageQuality
 import lucuma.core.util.Enumerated
 import munit.FunSuite
 
-import SkyBackground.SB20
 import WaterVapor.WV20
 import Cat.*
 
@@ -44,7 +44,7 @@ class ConditionsResourceTest extends FunSuite{
   }
 
   private def mkConds(cc: CloudExtinction.Preset): ObservingConditions =
-    ObservingConditions(cc, ImageQuality.Preset.PointOne, SB20, WV20)
+    ObservingConditions(cc, ImageQuality.Preset.PointOne, SkyBackground.Darkest, WV20)
 
   // Verify that the given remaining times match -- times must be specified
   // in order of CloudCover values.

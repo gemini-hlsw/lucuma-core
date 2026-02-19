@@ -14,37 +14,21 @@ sealed abstract class ObservingCondition(
 
 }
 
-// sealed abstract class ImageQuality(percent: Int) extends ObservingCondition("IQ", percent)
+// sealed abstract class SkyBackground(percent: Int) extends ObservingCondition("SB", percent)
 
-// object ImageQuality {
+// object SkyBackground {
 
-//   case object IQ20  extends ImageQuality(20)
-//   case object IQ70  extends ImageQuality(70)
-//   case object IQ85  extends ImageQuality(85)
-//   case object IQAny extends ImageQuality(100)
+//   case object SB20  extends SkyBackground(20)
+//   case object SB50  extends SkyBackground(50)
+//   case object SB80  extends SkyBackground(80)
+//   case object SBAny extends SkyBackground(100)
 
-//   val values = List(IQ20, IQ70, IQ85, IQAny)
+//   val values = List(SB20, SB50, SB80, SBAny)
 
-//   implicit val ImageQualityOrder: Ordering[ImageQuality] =
+//   implicit val SkyBackgroundOrder: Ordering[SkyBackground] =
 //     Ordering.by(_.percent)
 
 // }
-
-sealed abstract class SkyBackground(percent: Int) extends ObservingCondition("SB", percent)
-
-object SkyBackground {
-
-  case object SB20  extends SkyBackground(20)
-  case object SB50  extends SkyBackground(50)
-  case object SB80  extends SkyBackground(80)
-  case object SBAny extends SkyBackground(100)
-
-  val values = List(SB20, SB50, SB80, SBAny)
-
-  implicit val SkyBackgroundOrder: Ordering[SkyBackground] =
-    Ordering.by(_.percent)
-
-}
 
 sealed abstract class WaterVapor(percent: Int) extends ObservingCondition("WV", percent)
 
