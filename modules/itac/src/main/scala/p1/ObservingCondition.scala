@@ -5,8 +5,8 @@ package edu.gemini.tac.qengine.p1
 
 /** Base type for all observing conditions. This might make more sense as a typeclass. */
 sealed abstract class ObservingCondition(
-  val prefix: String,
-  val percent: Int
+  private[p1] val prefix: String,
+  private[p1] val percent: Int
 ) {
 
   final override def toString: String =
@@ -14,21 +14,21 @@ sealed abstract class ObservingCondition(
 
 }
 
-sealed abstract class ImageQuality(percent: Int) extends ObservingCondition("IQ", percent)
+// sealed abstract class ImageQuality(percent: Int) extends ObservingCondition("IQ", percent)
 
-object ImageQuality {
+// object ImageQuality {
 
-  case object IQ20  extends ImageQuality(20)
-  case object IQ70  extends ImageQuality(70)
-  case object IQ85  extends ImageQuality(85)
-  case object IQAny extends ImageQuality(100)
+//   case object IQ20  extends ImageQuality(20)
+//   case object IQ70  extends ImageQuality(70)
+//   case object IQ85  extends ImageQuality(85)
+//   case object IQAny extends ImageQuality(100)
 
-  val values = List(IQ20, IQ70, IQ85, IQAny)
+//   val values = List(IQ20, IQ70, IQ85, IQAny)
 
-  implicit val ImageQualityOrder: Ordering[ImageQuality] =
-    Ordering.by(_.percent)
+//   implicit val ImageQualityOrder: Ordering[ImageQuality] =
+//     Ordering.by(_.percent)
 
-}
+// }
 
 sealed abstract class SkyBackground(percent: Int) extends ObservingCondition("SB", percent)
 

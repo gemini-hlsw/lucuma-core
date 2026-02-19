@@ -5,6 +5,7 @@ package edu.gemini.tac.qengine.api.config
 
 import edu.gemini.tac.qengine.p1.*
 import lucuma.core.model.CloudExtinction
+import lucuma.core.model.ImageQuality
 
 import scala.Ordering.Implicits.*
 
@@ -13,7 +14,7 @@ import ConditionsCategory.*
 /** Specification for a set of observing conditions. */
 final case class ConditionsCategory(
   ccSpec: Specification[CloudExtinction.Preset]    = UnspecifiedCC,
-  iqSpec: Specification[ImageQuality]  = UnspecifiedIQ,
+  iqSpec: Specification[ImageQuality.Preset]  = UnspecifiedIQ,
   sbSpec: Specification[SkyBackground] = UnspecifiedSB,
   wvSpec: Specification[WaterVapor]    = UnspecifiedWV,
   name:   Option[String]               = None
@@ -60,7 +61,7 @@ object ConditionsCategory {
   }
 
   object UnspecifiedCC extends Unspecified[CloudExtinction.Preset]
-  object UnspecifiedIQ extends Unspecified[ImageQuality]
+  object UnspecifiedIQ extends Unspecified[ImageQuality.Preset]
   object UnspecifiedSB extends Unspecified[SkyBackground]
   object UnspecifiedWV extends Unspecified[WaterVapor]
 

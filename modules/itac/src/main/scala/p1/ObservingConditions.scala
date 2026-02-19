@@ -4,10 +4,11 @@
 package edu.gemini.tac.qengine.p1
 
 import lucuma.core.model.CloudExtinction
+import lucuma.core.model.ImageQuality
 
 case class ObservingConditions(
   cc: CloudExtinction.Preset,
-  iq: ImageQuality,
+  iq: ImageQuality.Preset,
   sb: SkyBackground,
   wv: WaterVapor,
 )
@@ -17,7 +18,7 @@ object ObservingConditions {
   val AnyConditions =
     ObservingConditions(
       CloudExtinction.Preset.ThreePointZero,
-      ImageQuality.IQAny,
+      ImageQuality.Preset.TwoPointZero,
       SkyBackground.SBAny,
       WaterVapor.WVAny
     )

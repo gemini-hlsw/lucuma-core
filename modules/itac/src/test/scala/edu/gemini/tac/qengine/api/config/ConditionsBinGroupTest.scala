@@ -5,12 +5,12 @@ package edu.gemini.tac.qengine.api.config
 
 import cats.implicits.*
 import edu.gemini.tac.qengine.api.config.ConditionsCategory.Eq
-import edu.gemini.tac.qengine.p1.ImageQuality.*
 import edu.gemini.tac.qengine.p1.ObservingConditions
 import edu.gemini.tac.qengine.p1.SkyBackground.*
 import edu.gemini.tac.qengine.p1.WaterVapor.*
 import edu.gemini.tac.qengine.util.Percent
 import lucuma.core.model.CloudExtinction
+import lucuma.core.model.ImageQuality
 import munit.FunSuite
 
 class ConditionsCategoryMapTest extends FunSuite {
@@ -22,10 +22,10 @@ class ConditionsCategoryMapTest extends FunSuite {
   val bin1 = ConditionsBin(cat1, Percent(20))
   val bin2 = ConditionsBin(cat2, Percent(30))
   val bin3 = ConditionsBin(cat3, Percent(40))
-  val oc0  = ObservingConditions(CloudExtinction.Preset.Zero,  IQ20, SB20, WV20)
-  val oc1  = ObservingConditions(CloudExtinction.Preset.PointThree,  IQ20, SB20, WV20)
-  val oc2  = ObservingConditions(CloudExtinction.Preset.OnePointZero,  IQ20, SB20, WV20)
-  val oc3  = ObservingConditions(CloudExtinction.Preset.ThreePointZero, IQ20, SB20, WV20)
+  val oc0  = ObservingConditions(CloudExtinction.Preset.Zero,  ImageQuality.Preset.PointOne, SB20, WV20)
+  val oc1  = ObservingConditions(CloudExtinction.Preset.PointThree,  ImageQuality.Preset.PointOne, SB20, WV20)
+  val oc2  = ObservingConditions(CloudExtinction.Preset.OnePointZero,  ImageQuality.Preset.PointOne, SB20, WV20)
+  val oc3  = ObservingConditions(CloudExtinction.Preset.ThreePointZero, ImageQuality.Preset.PointOne, SB20, WV20)
 
   val grp = ConditionsCategoryMap.of(List(bin0, bin1, bin2, bin3))
 
@@ -92,7 +92,7 @@ class ConditionsCategoryMapTest extends FunSuite {
 
   test("testUndefinedSimpleUpdated") {
     try {
-      grp.updated(ConditionsCategory(Eq(CloudExtinction.Preset.Zero), Eq(IQ20)), Percent(99))
+      grp.updated(ConditionsCategory(Eq(CloudExtinction.Preset.Zero), Eq(ImageQuality.Preset.PointOne)), Percent(99))
       fail
     } catch {
       case _: IllegalArgumentException => // ok
@@ -100,7 +100,7 @@ class ConditionsCategoryMapTest extends FunSuite {
   }
 
   test("testUndefinedMuliptleUpdated") {
-    val cat4 = ConditionsCategory(Eq(CloudExtinction.Preset.Zero), Eq(IQ20))
+    val cat4 = ConditionsCategory(Eq(CloudExtinction.Preset.Zero), Eq(ImageQuality.Preset.PointOne))
     try {
       grp.updated(List((cat0, Percent(1)), (cat4, Percent(99))))
       fail
