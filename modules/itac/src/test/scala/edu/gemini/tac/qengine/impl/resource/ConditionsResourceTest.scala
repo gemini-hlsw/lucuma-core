@@ -10,7 +10,6 @@ import edu.gemini.tac.qengine.api.config.ConditionsCategoryMap
 import edu.gemini.tac.qengine.impl.block.Block
 import edu.gemini.tac.qengine.log.RejectConditions
 import edu.gemini.tac.qengine.p1.*
-import edu.gemini.tac.qengine.util.Percent
 import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.Site
 import lucuma.core.enums.SkyBackground
@@ -20,6 +19,7 @@ import lucuma.core.model.CloudExtinction
 import lucuma.core.model.ConstraintSet
 import lucuma.core.model.ElevationRange
 import lucuma.core.model.ImageQuality
+import lucuma.core.model.IntCentiPercent
 import lucuma.core.util.Enumerated
 import munit.FunSuite
 
@@ -31,7 +31,7 @@ class ConditionsResourceTest extends FunSuite{
 
   private val bins = ConditionsBin.of(
     CloudExtinction.Preset.values.map { ce =>
-      (Cat(Eq(ce)), Percent(100 / CloudExtinction.Preset.values.length))
+      (Cat(Eq(ce)), IntCentiPercent.unsafeFromPercent(100 / CloudExtinction.Preset.values.length))
     }*)
 
   private val binGrp = ConditionsCategoryMap.of(bins)

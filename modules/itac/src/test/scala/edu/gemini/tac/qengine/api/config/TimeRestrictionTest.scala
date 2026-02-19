@@ -5,7 +5,6 @@ package edu.gemini.tac.qengine.api.config
 
 import cats.syntax.all.*
 import edu.gemini.tac.qengine.p1.*
-import edu.gemini.tac.qengine.util.Percent
 import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.ScienceBand
 import lucuma.core.enums.Site
@@ -16,6 +15,7 @@ import lucuma.core.model.CloudExtinction
 import lucuma.core.model.ConstraintSet
 import lucuma.core.model.ElevationRange
 import lucuma.core.model.ImageQuality
+import lucuma.core.model.IntCentiPercent
 import lucuma.core.util.Enumerated
 import munit.FunSuite
 
@@ -28,7 +28,7 @@ class TimeRestrictionTest extends FunSuite {
   private def conds(wv: WaterVapor) =
     ConstraintSet(ImageQuality.Preset.TwoPointZero, CloudExtinction.Preset.ThreePointZero, SkyBackground.Bright, wv, ElevationRange.ByAirMass.Default)
 
-  private val bin = TimeRestriction("wv", Percent(10)) {
+  private val bin = TimeRestriction("wv", IntCentiPercent.unsafeFromPercent(10)) {
     (_, obs, _) => obs.conditions.waterVapor <= WaterVapor.Dry
   }
 
@@ -43,7 +43,7 @@ class TimeRestrictionTest extends FunSuite {
   }
 
   test("testUpdated") {
-    assertEquals(Percent(20), bin.updated(Percent(20)).value)
+    assertEquals(IntCentiPercent.unsafeFromPercent(20), bin.updated(IntCentiPercent.unsafeFromPercent(20)).value)
   }
 
   test("testMap") {

@@ -3,7 +3,6 @@
 
 package edu.gemini.qengine.skycalc;
 
-import edu.gemini.tac.qengine.util.Percent
 import lucuma.core.enums.Site
 import lucuma.core.math.BoundedInterval
 import lucuma.core.math.Coordinates
@@ -11,6 +10,7 @@ import lucuma.core.math.RightAscension
 import lucuma.core.math.skycalc.ImprovedSkyCalc
 import lucuma.core.math.skycalc.solver.AirmassSolver
 import lucuma.core.math.skycalc.solver.Samples
+import lucuma.core.model.IntCentiPercentUnbounded
 import spire.math.extras.interval.IntervalSeq
 import spire.math.interval.Closed
 import spire.math.interval.Open
@@ -33,10 +33,10 @@ class ElevationDecBinCalc(conf: ElevationConfig) extends DecBinCalc {
             isc.calculate(cs, i, false)
         AirmassSolver(conf.minAirmass, conf.maxAirmass, Duration.ofMinutes(7)).solve(samples)(bi)
 
-  def calc(site: Site, start: ZonedDateTime, end: ZonedDateTime, size: DecBinSize, ra: RightAscension): List[Percent] =
+  def calc(site: Site, start: ZonedDateTime, end: ZonedDateTime, size: DecBinSize, ra: RightAscension): List[IntCentiPercentUnbounded] =
     calc(site, start.toInstant(), end.toInstant(), size, ra)
 
-  def calc(site: Site, start: Instant, end: Instant, size: DecBinSize, ra: RightAscension): List[Percent] = {
+  def calc(site: Site, start: Instant, end: Instant, size: DecBinSize, ra: RightAscension): List[IntCentiPercentUnbounded] = {
     val coords  = size.genCoordinates(ra)
     val solvers = getSolvers(site, coords)
     val totals  = Array.ofDim[Long](size.binCount)
@@ -65,7 +65,7 @@ class ElevationDecBinCalc(conf: ElevationConfig) extends DecBinCalc {
     }    
     val max = totals(ElevationDecBinCalc.getSiteIndex(site, size))
     totals.toList.map: cur =>
-      Percent(100.0 * cur.toDouble / max)
+      IntCentiPercentUnbounded.unsafeFromPercent(100.0 * cur.toDouble / max)
   }
 
 }

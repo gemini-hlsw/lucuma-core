@@ -10,9 +10,9 @@ import edu.gemini.tac.qengine.impl.block.Block
 import edu.gemini.tac.qengine.impl.queue.ProposalQueueBuilder
 import edu.gemini.tac.qengine.log.*
 import edu.gemini.tac.qengine.util.BoundedTime
-import edu.gemini.tac.qengine.util.Percent
 import edu.gemini.tac.qengine.util.Time
 import lucuma.core.model.ConstraintSet
+import lucuma.core.model.IntCentiPercent
 
 import annotation.tailrec
 
@@ -33,7 +33,7 @@ object ConditionsCategoryMapResource {
    * Constructs with the total time to spread across the observing conditions
    * bins and the set of bins to use.
    */
-  def apply(t: Time, g: ConditionsCategoryMap[Percent]) = {
+  def apply(t: Time, g: ConditionsCategoryMap[IntCentiPercent]) = {
     // Creates a map from ConditionsBin.Category to BoundedTime initialized with
     // time values according to the relative percentage of the matching
     // conditions bin.

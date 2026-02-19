@@ -12,14 +12,14 @@ import edu.gemini.tac.qengine.log.RejectMessage
 import edu.gemini.tac.qengine.log.RejectTarget
 import edu.gemini.tac.qengine.p1.Target
 import edu.gemini.tac.qengine.util.BoundedTime
-import edu.gemini.tac.qengine.util.Percent
 import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.ScienceBand
 import lucuma.core.enums.ToOActivation
 import lucuma.core.math.Declination
+import lucuma.core.model.IntCentiPercent
 
 object DeclinationMapResource {
-  def apply(t: Time, bins: DeclinationMap[Percent]): DeclinationMapResource = {
+  def apply(t: Time, bins: DeclinationMap[IntCentiPercent]): DeclinationMapResource = {
     new DeclinationMapResource(bins.map(perc => BoundedTime(t * perc)))
   }
 

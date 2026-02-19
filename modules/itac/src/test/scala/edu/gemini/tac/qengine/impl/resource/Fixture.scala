@@ -12,7 +12,6 @@ import edu.gemini.tac.qengine.api.queue.time.TimeAccountingCategoryTime
 import edu.gemini.tac.qengine.impl.queue.ProposalQueueBuilder
 import edu.gemini.tac.qengine.p1.*
 import edu.gemini.tac.qengine.util.BoundedTime
-import edu.gemini.tac.qengine.util.Percent
 import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.Half
 import lucuma.core.enums.ScienceBand
@@ -24,6 +23,7 @@ import lucuma.core.model.CloudExtinction
 import lucuma.core.model.ConstraintSet
 import lucuma.core.model.ElevationRange
 import lucuma.core.model.ImageQuality
+import lucuma.core.model.IntCentiPercent
 import lucuma.core.model.Semester
 import lucuma.core.model.Semester.YearInt
 import lucuma.core.util.Enumerated
@@ -39,8 +39,8 @@ object Fixture {
   // (  0, 45] 100%
   // ( 45, 90)  50%
   val decBins   = DeclinationMap.fromBins(
-    DecRanged( 0, 45, Percent(100)),
-    DecRanged(45, 90, Percent( 50)).inclusive
+    DecRanged( 0, 45, IntCentiPercent.unsafeFromPercent(100)),
+    DecRanged(45, 90, IntCentiPercent.unsafeFromPercent( 50)).inclusive
   )
 
   // <=CC70 50%
@@ -77,21 +77,21 @@ object Fixture {
   def mkProp(ntac: Ntac, obsDefs: (Target, ConstraintSet, Time)*): Proposal =
     Proposal(ntac, site = site, obsList = obsDefs.map(tup => Observation(tup._1, tup._2, tup._3)).toList)
 
-  val emptyQueue = ProposalQueueBuilder(QueueTime(TimeAccountingCategoryTime.empty, Percent.Zero), ScienceBand.Band1, Nil) // QueueTime(Site.GN, TimeAccountingCategoryTime.empty(TimeAccountingCategorys).map, TimeAccountingCategorys))
+  val emptyQueue = ProposalQueueBuilder(QueueTime(TimeAccountingCategoryTime.empty, IntCentiPercent.Min), ScienceBand.Band1, Nil) // QueueTime(Site.GN, TimeAccountingCategoryTime.empty(TimeAccountingCategorys).map, TimeAccountingCategorys))
   def evenQueue(hrs: Double): ProposalQueueBuilder =
     evenQueue(hrs, Some(QueueTime.DefaultTimeAccountingCategoryOverfillAllowance))
 
   // defaults
-  val Band1Percent = Percent(30)
-  val Band2Percent = Percent(30)
-  val Band3Percent = Percent(20)
+  val Band1Percent = IntCentiPercent.unsafeFromPercent(30)
+  val Band2Percent = IntCentiPercent.unsafeFromPercent(30)
+  val Band3Percent = IntCentiPercent.unsafeFromPercent(20)
 
-  def evenQueueTime(hrs: Double, @unused overfill: Option[Percent]): QueueTime = {
+  def evenQueueTime(hrs: Double, @unused overfill: Option[IntCentiPercent]): QueueTime = {
     val pt = TimeAccountingCategoryTime.fromFunction { _ => Time.hours(hrs) * Band1Percent }
-    QueueTime(pt, Percent.Zero)
+    QueueTime(pt, IntCentiPercent.Min)
   }
 
-  def evenQueue(hrs: Double, overfill: Option[Percent]): ProposalQueueBuilder =
+  def evenQueue(hrs: Double, overfill: Option[IntCentiPercent]): ProposalQueueBuilder =
     ProposalQueueBuilder(evenQueueTime(hrs, overfill), ScienceBand.Band1)
 
 

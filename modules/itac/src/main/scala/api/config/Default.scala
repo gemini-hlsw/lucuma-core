@@ -5,7 +5,6 @@ package edu.gemini.tac.qengine.api.config
 
 import cats.implicits.*
 import edu.gemini.tac.qengine.api.config.ConditionsCategory
-import edu.gemini.tac.qengine.util.Percent
 import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.WaterVapor
@@ -13,6 +12,7 @@ import lucuma.core.model.CloudExtinction
 import lucuma.core.model.ConstraintSet
 import lucuma.core.model.ElevationRange
 import lucuma.core.model.ImageQuality
+import lucuma.core.model.IntCentiPercent
 import lucuma.core.util.Enumerated
 
 object Default {
@@ -30,7 +30,7 @@ object Default {
     (ConditionsCategory(UnspecifiedCC, Eq(ImageQuality.Preset.TwoPointZero), UnspecifiedSB, UnspecifiedWV, Some("9")), 40)
   )
 
-  val WvTimeRestriction  = TimeRestriction.wv(Percent(50), WaterVapor.Dry)
+  val WvTimeRestriction  = TimeRestriction.wv(IntCentiPercent.unsafeFromPercent(50), WaterVapor.Dry)
   val LgsTimeRestriction = TimeRestriction.lgs(Time.hours(200))
 
   val RapidTooBandRestriction = BandRestriction.rapidToo

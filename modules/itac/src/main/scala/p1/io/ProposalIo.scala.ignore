@@ -11,7 +11,7 @@ import edu.gemini.tac.qengine.p1._
 import scalaz._
 import Scalaz._
 import edu.gemini.spModel.core.Site
-import edu.gemini.tac.qengine.util.Percent
+import edu.gemini.tac.qengine.util.IntCentiPercent
 import org.slf4j.LoggerFactory
 import java.io.File
 
@@ -132,8 +132,8 @@ class ProposalIo {
       val proportionOfSharedTimeGS = if (totalSharedTime.isZero) 0.0 else estimatedSharedTimeGS.ms.toDouble / totalSharedTime.ms.toDouble
 
       // Now we can split the dual-site award between sites.
-      val sharedAwardGN = dualSiteAward * Percent(proportionOfSharedTimeGN * 100)
-      val sharedAwardGS = dualSiteAward * Percent(proportionOfSharedTimeGS * 100)
+      val sharedAwardGN = dualSiteAward * IntCentiPercent(proportionOfSharedTimeGN * 100)
+      val sharedAwardGS = dualSiteAward * IntCentiPercent(proportionOfSharedTimeGS * 100)
 
       // And add back the dedicated time.
       val totalAwardGN = dedicatedAwardGN + sharedAwardGN

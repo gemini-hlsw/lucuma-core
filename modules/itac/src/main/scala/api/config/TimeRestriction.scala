@@ -9,10 +9,10 @@ import edu.gemini.tac.qengine.log.RejectRestrictedBin
 import edu.gemini.tac.qengine.p1.Observation
 import edu.gemini.tac.qengine.p1.Proposal
 import edu.gemini.tac.qengine.util.BoundedTime
-import edu.gemini.tac.qengine.util.Percent
 import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.ScienceBand
 import lucuma.core.enums.WaterVapor
+import lucuma.core.model.IntCentiPercent
 
 /**
  * TimeRestriction associates a name, a value, and a predicate.  The value
@@ -30,9 +30,9 @@ case class TimeRestriction[T](name: String, value: T)(val matches: (Proposal, Ob
 }
 
 object TimeRestriction {
-  def wv(limit: Percent): TimeRestriction[Percent] = wv(limit, WaterVapor.Dry)
+  def wv(limit: IntCentiPercent): TimeRestriction[IntCentiPercent] = wv(limit, WaterVapor.Dry)
 
-  def wv(limit: Percent, wv: WaterVapor) =
+  def wv(limit: IntCentiPercent, wv: WaterVapor) =
     TimeRestriction("WV Queue Time Limit", limit) {
        (_, obs, _) => obs.conditions.waterVapor <= wv
     }

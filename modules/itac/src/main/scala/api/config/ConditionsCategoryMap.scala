@@ -3,8 +3,8 @@
 
 package edu.gemini.tac.qengine.api.config
 
-import edu.gemini.tac.qengine.util.Percent
 import lucuma.core.model.ConstraintSet
+import lucuma.core.model.IntCentiPercent
 
 /**
  * A mapping from conditions categories to values `A`, along with a search path that allows
@@ -60,7 +60,7 @@ object ConditionsCategoryMap {
     new ConditionsCategoryMap(map, path)
   }
 
-  def ofPercent(bins: (ConditionsCategory, Double)*): ConditionsCategoryMap[Percent] =
+  def ofPercent(bins: (ConditionsCategory, Double)*): ConditionsCategoryMap[IntCentiPercent] =
     of(ConditionsBin.ofPercent(bins*))
 
 }

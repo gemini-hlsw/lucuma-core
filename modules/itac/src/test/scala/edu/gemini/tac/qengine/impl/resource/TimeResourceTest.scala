@@ -8,7 +8,6 @@ import edu.gemini.tac.qengine.api.config.TimeRestriction
 import edu.gemini.tac.qengine.impl.block.Block
 import edu.gemini.tac.qengine.log.RejectRestrictedBin
 import edu.gemini.tac.qengine.p1.*
-import edu.gemini.tac.qengine.util.Percent
 import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.Site
 import lucuma.core.enums.SkyBackground
@@ -19,6 +18,7 @@ import lucuma.core.model.CloudExtinction
 import lucuma.core.model.ConstraintSet
 import lucuma.core.model.ElevationRange
 import lucuma.core.model.ImageQuality
+import lucuma.core.model.IntCentiPercent
 import lucuma.core.util.Enumerated
 import munit.FunSuite
 import org.junit.*
@@ -34,7 +34,7 @@ class TimeRestrictionResourceTest extends FunSuite {
   private def conds(wv: WaterVapor) =
     ConstraintSet(ImageQuality.Preset.TwoPointZero, CloudExtinction.Preset.ThreePointZero, SkyBackground.Bright, wv, ElevationRange.ByAirMass.Default)
 
-  private val bin = TimeRestriction("WV", Percent(10)) {
+  private val bin = TimeRestriction("WV", IntCentiPercent.unsafeFromPercent(10)) {
     (_, obs, _) => obs.conditions.waterVapor <= WaterVapor.Dry
   }
 

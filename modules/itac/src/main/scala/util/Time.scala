@@ -5,6 +5,7 @@ package edu.gemini.tac.qengine.util
 
 import cats.Monoid
 import cats.Order
+import lucuma.core.model.IntCentiPercent
 
 import Time.Units
 
@@ -74,10 +75,10 @@ object Time {
   def max(t0: Time, t1: Time): Time = if (t0 >= t1) t0 else t1
 
   // Allow expressions like p * t (and not just t * p)
-  class PercentMultiplier(p: Percent) {
+  class PercentMultiplier(p: IntCentiPercent) {
     def *(t: Time): Time = t * p
   }
-  implicit val toPercentMultiplier: Percent => PercentMultiplier = (p: Percent) => new PercentMultiplier(p)
+  implicit val toPercentMultiplier: IntCentiPercent => PercentMultiplier = (p: IntCentiPercent) => new PercentMultiplier(p)
 
   implicit val MonoidTime: Monoid[Time] =
     Monoid.instance(Zero, _ + _)
@@ -118,7 +119,7 @@ final class Time private (val ms: Long, val unit: Units) extends Ordered[Time] w
 
   def +(that: Time): Time = new Time(ms + that.ms, unit)
   def -(that: Time): Time = new Time(ms - that.ms, unit)
-  def *(p: Percent): Time = percent(p.value.toDouble)
+  def *(p: IntCentiPercent): Time = percent(p.toPercent.toDouble)
   def /(d: Double): Time = new Time((ms / d.toLong), unit)
   def unary_- : Time      = new Time(-ms, unit)
 
