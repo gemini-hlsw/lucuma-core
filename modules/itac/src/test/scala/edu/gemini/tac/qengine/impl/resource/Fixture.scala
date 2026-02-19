@@ -11,7 +11,6 @@ import edu.gemini.tac.qengine.api.queue.time.QueueTime
 import edu.gemini.tac.qengine.api.queue.time.TimeAccountingCategoryTime
 import edu.gemini.tac.qengine.impl.queue.ProposalQueueBuilder
 import edu.gemini.tac.qengine.p1.*
-import lucuma.core.enums.WaterVapor
 import edu.gemini.tac.qengine.util.BoundedTime
 import edu.gemini.tac.qengine.util.Percent
 import edu.gemini.tac.qengine.util.Time
@@ -20,6 +19,7 @@ import lucuma.core.enums.ScienceBand
 import lucuma.core.enums.Site
 import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.TimeAccountingCategory
+import lucuma.core.enums.WaterVapor
 import lucuma.core.model.CloudExtinction
 import lucuma.core.model.ImageQuality
 import lucuma.core.model.Semester

@@ -8,10 +8,10 @@ import edu.gemini.tac.qengine.api.config.ConditionsCategory.Eq
 import edu.gemini.tac.qengine.p1.ObservingConditions
 import edu.gemini.tac.qengine.util.Percent
 import lucuma.core.enums.SkyBackground
+import lucuma.core.enums.WaterVapor
 import lucuma.core.model.CloudExtinction
 import lucuma.core.model.ImageQuality
 import munit.FunSuite
-import lucuma.core.enums.WaterVapor
 
 class ConditionsCategoryMapTest extends FunSuite {
   val cat0 = ConditionsCategory(Eq(CloudExtinction.Preset.Zero))

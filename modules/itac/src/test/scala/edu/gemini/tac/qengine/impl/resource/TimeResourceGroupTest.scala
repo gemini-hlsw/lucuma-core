@@ -3,23 +3,22 @@
 
 package edu.gemini.tac.qengine.impl.resource
 
+import cats.syntax.all.*
 import edu.gemini.tac.qengine.api.config.TimeRestriction
 import edu.gemini.tac.qengine.impl.block.Block
 import edu.gemini.tac.qengine.log.RejectRestrictedBin
 import edu.gemini.tac.qengine.p1.*
-import lucuma.core.enums.WaterVapor
 import edu.gemini.tac.qengine.util.Percent
 import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.Site
 import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.TimeAccountingCategory
+import lucuma.core.enums.WaterVapor
 import lucuma.core.math.Coordinates
 import lucuma.core.model.CloudExtinction
 import lucuma.core.model.ImageQuality
 import lucuma.core.util.Enumerated
 import munit.FunSuite
-import cats.syntax.all.*
-import scala.Ordering.Implicits.*
 
 class CompositeTimeRestrictionResourceTest extends FunSuite {
   import TimeAccountingCategory.US

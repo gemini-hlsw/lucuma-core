@@ -7,10 +7,11 @@ import cats.implicits.*
 import edu.gemini.tac.qengine.api.config.ConditionsCategory as Cat
 import edu.gemini.tac.qengine.p1.*
 import lucuma.core.enums.SkyBackground
+import lucuma.core.enums.WaterVapor
 import lucuma.core.model.CloudExtinction
 import lucuma.core.model.ImageQuality
 import munit.FunSuite
-import lucuma.core.enums.WaterVapor
+
 import Cat.*
 
 class ConditionsCategoryTest extends FunSuite {

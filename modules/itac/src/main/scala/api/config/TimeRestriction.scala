@@ -3,6 +3,7 @@
 
 package edu.gemini.tac.qengine.api.config
 
+import cats.syntax.all.*
 import edu.gemini.tac.qengine.impl.resource.Resource2
 import edu.gemini.tac.qengine.log.RejectRestrictedBin
 import edu.gemini.tac.qengine.p1.Observation
@@ -12,8 +13,6 @@ import edu.gemini.tac.qengine.util.Percent
 import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.ScienceBand
 import lucuma.core.enums.WaterVapor
-import scala.Ordering.Implicits.*
-import cats.syntax.all.*
 
 /**
  * TimeRestriction associates a name, a value, and a predicate.  The value

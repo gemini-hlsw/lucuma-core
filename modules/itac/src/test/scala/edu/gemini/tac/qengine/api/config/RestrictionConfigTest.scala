@@ -3,12 +3,11 @@
 
 package edu.gemini.tac.qengine.api.config
 
+import cats.syntax.all.*
 import edu.gemini.tac.qengine.util.Percent
 import edu.gemini.tac.qengine.util.Time
-import munit.FunSuite
 import lucuma.core.enums.WaterVapor
-import scala.Ordering.Implicits.*
-import cats.syntax.all.*
+import munit.FunSuite
 
 class RestrictionConfigTest extends FunSuite {
   test("testMapCombine") {
