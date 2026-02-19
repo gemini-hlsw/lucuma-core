@@ -12,7 +12,7 @@ import munit.FunSuite
 class RestrictionConfigTest extends FunSuite {
   test("testMapCombine") {
     val percentBin = TimeRestriction("WV", Percent(10)) {
-      (_, obs, _) => obs.conditions.wv <= WaterVapor.Dry
+      (_, obs, _) => obs.conditions.waterVapor <= WaterVapor.Dry
     }
     val timeBin = TimeRestriction("LGS", Time.hours(10)) {
       (_, obs, _) => obs.lgs

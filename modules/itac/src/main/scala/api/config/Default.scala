@@ -56,7 +56,7 @@ object Default {
     } yield ObservingConditions(cc, iq, sb, WaterVapor.Wet)
 
     ocList foreach { oc =>
-      val ocString   = "%s,%s,%s".format(oc.iq, oc.cc, oc.sb)
+      val ocString   = "%s,%s,%s".format(oc.imageQuality, oc.cloudExtinction, oc.skyBackground)
       val searchPath = Conditions.searchPath(oc)
       val pathStr    = searchPath.map(sp => sp.name.get)
 

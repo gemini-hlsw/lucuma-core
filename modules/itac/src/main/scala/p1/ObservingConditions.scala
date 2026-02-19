@@ -9,10 +9,10 @@ import lucuma.core.model.CloudExtinction
 import lucuma.core.model.ImageQuality
 
 case class ObservingConditions(
-  cc: CloudExtinction.Preset,
-  iq: ImageQuality.Preset,
-  sb: SkyBackground,
-  wv: WaterVapor,
+  cloudExtinction: CloudExtinction.Preset,
+  imageQuality: ImageQuality.Preset,
+  skyBackground: SkyBackground,
+  waterVapor: WaterVapor,
 )
 
 object ObservingConditions {

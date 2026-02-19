@@ -23,12 +23,12 @@ final case class ConditionsCategory(
 ) {
 
   def matches(oc: ObservingConditions): Boolean =
-    ccSpec.matches(oc.cc) && iqSpec.matches(oc.iq) &&
-      sbSpec.matches(oc.sb) && wvSpec.matches(oc.wv)
+    ccSpec.matches(oc.cloudExtinction) && iqSpec.matches(oc.imageQuality) &&
+      sbSpec.matches(oc.skyBackground) && wvSpec.matches(oc.waterVapor)
 
   def canObserve(oc: ObservingConditions): Boolean =
-    ccSpec.canObserve(oc.cc) && iqSpec.canObserve(oc.iq) &&
-      sbSpec.canObserve(oc.sb) && wvSpec.canObserve(oc.wv)
+    ccSpec.canObserve(oc.cloudExtinction) && iqSpec.canObserve(oc.imageQuality) &&
+      sbSpec.canObserve(oc.skyBackground) && wvSpec.canObserve(oc.waterVapor)
 
   override def toString: String =
     "%s (%5s, %6s, %6s)".format(name.getOrElse(""), iqSpec, ccSpec, sbSpec)

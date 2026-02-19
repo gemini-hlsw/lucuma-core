@@ -30,7 +30,7 @@ class CompositeTimeRestrictionResourceTest extends FunSuite {
     ObservingConditions(CloudExtinction.Preset.ThreePointZero, ImageQuality.Preset.TwoPointZero, SkyBackground.Bright, wv)
 
   private val wvBin  = TimeRestriction("WV", Percent(10)) {
-    (_, obs, _) => obs.conditions.wv <= WaterVapor.Dry
+    (_, obs, _) => obs.conditions.waterVapor <= WaterVapor.Dry
   }
 
   private val lgsBin = TimeRestriction("lgs", Time.hours(1)) {

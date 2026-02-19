@@ -27,7 +27,7 @@ class TimeRestrictionTest extends FunSuite {
     ObservingConditions(CloudExtinction.Preset.ThreePointZero, ImageQuality.Preset.TwoPointZero, SkyBackground.Bright, wv)
 
   private val bin = TimeRestriction("wv", Percent(10)) {
-    (_, obs, _) => obs.conditions.wv <= WaterVapor.Dry
+    (_, obs, _) => obs.conditions.waterVapor <= WaterVapor.Dry
   }
 
   private def mkProp(wv: WaterVapor): Proposal =

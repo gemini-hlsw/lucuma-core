@@ -33,7 +33,7 @@ class TimeRestrictionResourceTest extends FunSuite {
     ObservingConditions(CloudExtinction.Preset.ThreePointZero, ImageQuality.Preset.TwoPointZero, SkyBackground.Bright, wv)
 
   private val bin = TimeRestriction("WV", Percent(10)) {
-    (_, obs, _) => obs.conditions.wv <= WaterVapor.Dry
+    (_, obs, _) => obs.conditions.waterVapor <= WaterVapor.Dry
   }
 
   // 10% of 10 hours = 1 hr = 60 min
