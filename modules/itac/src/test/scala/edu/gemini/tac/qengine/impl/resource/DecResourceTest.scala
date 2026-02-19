@@ -34,7 +34,7 @@ class DecResourceTest extends ItacSuite {
   private val binGrp = DeclinationMap.fromBins(bin1, bin2)
   private val grp    = new DeclinationMapResource(binGrp)
 
-  private def target(dec: Double): Target = Target(0.0, dec)
+  private def target(dec: Double): ItacTarget = ItacTarget(0.0, dec)
 
   private val targetNeg = target(-1)    // before bin1
   private val target0   = target( 0)    // start of bin1
@@ -54,7 +54,7 @@ class DecResourceTest extends ItacSuite {
 
   private val ntac = Ntac(KR, "x", 0, Time.Zero)
 
-  private def mkProp(target: Target): Proposal =
+  private def mkProp(target: ItacTarget): Proposal =
     Proposal(ntac, site = Site.GS, obsList = List(Observation(target, conds, Time.Zero)))
 
   test("testNormalReserveWithRemainingTime") {

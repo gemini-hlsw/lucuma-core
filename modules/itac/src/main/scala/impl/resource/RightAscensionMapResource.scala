@@ -66,7 +66,7 @@ case class RightAscensionMapResource(val grp: RightAscensionMap[PerRightAscensio
    * Reserves up-to the given amount of time, returning an updated
    * RightAscensionMapResource and any time left over that could not be reserved.
    */
-  def reserveAvailable(time: Time, target: Target, conds: ConstraintSet): (RightAscensionMapResource, Time) = {
+  def reserveAvailable(time: Time, target: ItacTarget, conds: ConstraintSet): (RightAscensionMapResource, Time) = {
     val (bin, rem) = grp(target.ra).reserveAvailable(time, target, conds)
     (new RightAscensionMapResource(grp.updated(target.ra, bin)), rem)
   }

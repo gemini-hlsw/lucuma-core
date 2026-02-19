@@ -21,7 +21,7 @@ trait TimeBinMessageFormatter {
   def obsInfo(prop: Proposal, obs: Observation, band: ScienceBand): String = {
     val obsTime = prop.relativeObsTime(obs, band)
     val target  = obs.target
-    val targetName = target.name.map(n => "'%s' ".format(n)).getOrElse("")
+    val targetName = target.id.toString
     obsInfoTemplate.format(obsTime.toHours.value, targetName, target.ra.toHourAngle.toDoubleHours, target.dec.toAngle.toDoubleDegrees)
   }
 

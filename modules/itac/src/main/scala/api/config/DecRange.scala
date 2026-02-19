@@ -4,7 +4,7 @@
 package edu.gemini.tac.qengine.api.config
 
 
-import edu.gemini.tac.qengine.p1.Target
+import edu.gemini.tac.qengine.p1.ItacTarget
 import lucuma.core.math.Declination
 
 /**
@@ -28,7 +28,7 @@ class DecRange(val startDeg: Int, val endDeg: Int) {
     dint >= startDeg && dint < endDeg
   }
 
-  def contains(t: Target): Boolean = contains(t.dec)
+  def contains(t: ItacTarget): Boolean = contains(t.dec)
 
   /**
    * Returns true if this DecRange falls immediately to the right of the

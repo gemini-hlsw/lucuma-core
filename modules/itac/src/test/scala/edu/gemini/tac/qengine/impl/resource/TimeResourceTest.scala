@@ -4,6 +4,7 @@
 package edu.gemini.tac.qengine.impl.resource
 
 import cats.syntax.all.*
+import edu.gemini.tac.qengine.ItacSuite
 import edu.gemini.tac.qengine.api.config.TimeRestriction
 import edu.gemini.tac.qengine.impl.block.Block
 import edu.gemini.tac.qengine.log.RejectRestrictedBin
@@ -13,24 +14,22 @@ import lucuma.core.enums.Site
 import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.enums.WaterVapor
-import lucuma.core.math.Coordinates
 import lucuma.core.model.CloudExtinction
 import lucuma.core.model.ConstraintSet
 import lucuma.core.model.ElevationRange
 import lucuma.core.model.ImageQuality
 import lucuma.core.model.IntCentiPercent
 import lucuma.core.util.Enumerated
-import munit.FunSuite
 import org.junit.*
 
 import Assert.*
 
-class TimeRestrictionResourceTest extends FunSuite {
+class TimeRestrictionResourceTest extends ItacSuite {
   import TimeAccountingCategory.US
   val TimeAccountingCategorys = Enumerated[TimeAccountingCategory].all
 
   private val ntac   = Ntac(US, "x", 0, Time.hours(10))
-  private val target = Target(Coordinates.Zero, None) // not used
+  private val target = ItacTarget(0, 0) // not used
   private def conds(wv: WaterVapor) =
     ConstraintSet(ImageQuality.Preset.TwoPointZero, CloudExtinction.Preset.ThreePointZero, SkyBackground.Bright, wv, ElevationRange.ByAirMass.Default)
 

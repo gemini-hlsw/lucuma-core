@@ -8,7 +8,7 @@ import edu.gemini.tac.qengine.impl.block.Block
 import edu.gemini.tac.qengine.impl.queue.ProposalQueueBuilder
 import edu.gemini.tac.qengine.log.RejectMessage
 import edu.gemini.tac.qengine.log.RejectTarget
-import edu.gemini.tac.qengine.p1.Target
+import edu.gemini.tac.qengine.p1.ItacTarget
 import edu.gemini.tac.qengine.util.BoundedTime
 import edu.gemini.tac.qengine.util.Time
 import lucuma.core.model.ConstraintSet
@@ -34,27 +34,27 @@ final case class PerRightAscensionResource(val absBounds: BoundedTime, val decRe
   // conditions, may be less than the absolute limit.
 
   def limit: Time                                  = absBounds.limit
-  def limit(t: Target): Time                       = limit.min(decRes.limit(t))
+  def limit(t: ItacTarget): Time                       = limit.min(decRes.limit(t))
   def limit(c: ConstraintSet): Time                = limit.min(condsRes.limit(c))
-  def limit(t: Target, c: ConstraintSet): Time     = limit(t).min(limit(c))
+  def limit(t: ItacTarget, c: ConstraintSet): Time     = limit(t).min(limit(c))
 
   // There is an absolute amount of time remaining for the RA, but the time
   // remaining for a particular dec (as indicated by a target) or for a
   // particular set of observing conditions, may be less than the absolute.
 
   def remaining: Time                              = absBounds.remaining
-  def remaining(t: Target): Time                   = remaining.min(decRes.remaining(t))
+  def remaining(t: ItacTarget): Time                   = remaining.min(decRes.remaining(t))
   def remaining(c: ConstraintSet): Time            = remaining.min(condsRes.remaining(c))
-  def remaining(t: Target, c: ConstraintSet): Time = remaining(t).min(remaining(c))
+  def remaining(t: ItacTarget, c: ConstraintSet): Time = remaining(t).min(remaining(c))
 
   // If the RA bin is full, then it is full at any dec or observing conditions.
   // However, the RA as a whole may not be full yet a particular dec or set of
   // observing conditions may be full.
 
   def isFull: Boolean                              = absBounds.isFull
-  def isFull(t: Target): Boolean                   = isFull || decRes.isFull(t)
+  def isFull(t: ItacTarget): Boolean                   = isFull || decRes.isFull(t)
   def isFull(c: ConstraintSet): Boolean            = isFull || condsRes.isFull(c)
-  def isFull(t: Target, c: ConstraintSet): Boolean = isFull(t) || isFull(c)
+  def isFull(t: ItacTarget, c: ConstraintSet): Boolean = isFull(t) || isFull(c)
 
   override def reserve(block: Block, queue: ProposalQueueBuilder): RejectMessage Either PerRightAscensionResource =
     absBounds.reserve(block.time) match {
@@ -67,7 +67,7 @@ final case class PerRightAscensionResource(val absBounds: BoundedTime, val decRe
         } yield new PerRightAscensionResource(newAbsBounds, newDecRes, newCondsRes)
     }
 
-  def reserveAvailable(time: Time, target: Target, conds: ConstraintSet): (PerRightAscensionResource, Time) = {
+  def reserveAvailable(time: Time, target: ItacTarget, conds: ConstraintSet): (PerRightAscensionResource, Time) = {
     val (newAbs, rem1) = absBounds.reserveAvailable(time)
     val (newDec, rem2) = decRes.reserveAvailable(time, target)
     val (newCon, rem3) = condsRes.reserveAvailable(time, conds)

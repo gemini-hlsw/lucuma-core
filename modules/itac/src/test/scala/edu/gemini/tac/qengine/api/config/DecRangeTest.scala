@@ -4,7 +4,7 @@
 package edu.gemini.tac.qengine.api.config
 
 import edu.gemini.tac.qengine.ItacSuite
-import edu.gemini.tac.qengine.p1.Target
+import edu.gemini.tac.qengine.p1.ItacTarget
 import org.junit.*
 
 import Assert.*
@@ -24,19 +24,19 @@ class DecRangeTest extends ItacSuite {
 
   test("testInclusive") {
     assertTrue(rng.inclusive.isInclusive)
-    assertTrue(rng.inclusive.contains(Target(0, 10.0)))
+    assertTrue(rng.inclusive.contains(ItacTarget(0, 10.0)))
     assertSame(irng, irng.inclusive)
   }
 
   private def validateContains(r: DecRange) = {
-    assertTrue(r.contains(Target(0, 0)))
-    assertTrue(r.contains(Target(0, 5.0)))
-    assertTrue(r.contains(Target(0, 9.99)))
+    assertTrue(r.contains(ItacTarget(0, 0)))
+    assertTrue(r.contains(ItacTarget(0, 5.0)))
+    assertTrue(r.contains(ItacTarget(0, 9.99)))
   }
 
   test("testDefaultContains") {
     validateContains(rng)
-    assertFalse(rng.contains(Target(0, 10.0)))
+    assertFalse(rng.contains(ItacTarget(0, 10.0)))
   }
 
   test("testAbutsRight") {

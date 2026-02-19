@@ -3,7 +3,7 @@
 
 package edu.gemini.tac.qengine.api.config
 
-import edu.gemini.tac.qengine.p1.Target
+import edu.gemini.tac.qengine.p1.ItacTarget
 import lucuma.core.math.Declination
 
 object DeclinationMap {
@@ -63,7 +63,7 @@ case class DeclinationMap[T] private (val bins: IndexedSeq[DecRanged[T]]) {
   def get(dec: Declination): Option[DecRanged[T]] = {
     bins.find(_.range.contains(dec))
   }
-  def get(t: Target): Option[DecRanged[T]] = get(t.dec)
+  def get(t: ItacTarget): Option[DecRanged[T]] = get(t.dec)
 
   def map[U](f: T => U): DeclinationMap[U] = {
     new DeclinationMap[U](bins.map(bin => DecRanged[U](bin.range, f(bin.binValue))))

@@ -7,7 +7,7 @@ import edu.gemini.tac.qengine.util.Time
 import lucuma.core.model.ConstraintSet
 
 case class Observation(
-  target: Target, 
+  target: ItacTarget, 
   conditions: ConstraintSet, 
   time: Time, 
   lgs: Boolean = false

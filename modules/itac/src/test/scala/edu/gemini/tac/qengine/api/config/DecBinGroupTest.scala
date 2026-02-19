@@ -4,7 +4,7 @@
 package edu.gemini.tac.qengine.api.config
 
 import edu.gemini.tac.qengine.ItacSuite
-import edu.gemini.tac.qengine.p1.Target
+import edu.gemini.tac.qengine.p1.ItacTarget
 import lucuma.core.math.Declination
 import lucuma.core.model.IntCentiPercent
 
@@ -78,9 +78,9 @@ class DecBinGroupTest extends ItacSuite {
 
   test("testApplyTarget") {
     val grp = DeclinationMap.gen10DegBins(f)
-    assertEquals(IntCentiPercent.unsafeFromPercent( 0), grp.get(Target(12 * 15, 0)).get.binValue)
-    assertEquals(IntCentiPercent.unsafeFromPercent(70), grp.get(Target(12 * 16, 70)).get.binValue)
-    assertEquals(None, grp.get(Target(12 * 15, -90)))
+    assertEquals(IntCentiPercent.unsafeFromPercent( 0), grp.get(ItacTarget(12 * 15, 0)).get.binValue)
+    assertEquals(IntCentiPercent.unsafeFromPercent(70), grp.get(ItacTarget(12 * 16, 70)).get.binValue)
+    assertEquals(None, grp.get(ItacTarget(12 * 15, -90)))
   }
 
   test("testGenFromBinValues") {

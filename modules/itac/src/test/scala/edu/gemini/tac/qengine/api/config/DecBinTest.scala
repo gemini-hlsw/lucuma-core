@@ -4,7 +4,7 @@
 package edu.gemini.tac.qengine.api.config
 
 import edu.gemini.tac.qengine.ItacSuite
-import edu.gemini.tac.qengine.p1.Target
+import edu.gemini.tac.qengine.p1.ItacTarget
 import lucuma.core.model.IntCentiPercent
 
 class DecBinTest extends ItacSuite {
@@ -15,7 +15,7 @@ class DecBinTest extends ItacSuite {
 
   test("testInclusive") {
     assert(bin.inclusive.range.isInclusive)
-    assert(bin.inclusive.range.contains(Target(0, 10.0)))
+    assert(bin.inclusive.range.contains(ItacTarget(0, 10.0)))
     assert(ibin eq ibin.inclusive)
   }
 

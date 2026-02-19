@@ -38,7 +38,7 @@ class ConditionsResourceTest extends ItacSuite {
   private val resGrp = ConditionsCategoryMapResource(Time.minutes(100), binGrp)
 
   private val ntac   = Ntac(KR, "x", 0, Time.minutes(100)) // not used
-  private val target = Target(0,0)                               // not used
+  private val target = ItacTarget(0,0)                               // not used
 
   private def mkProp(obsConds: ConstraintSet): Proposal = {
     val obsList = List(Observation(target, obsConds, Time.minutes(10)))

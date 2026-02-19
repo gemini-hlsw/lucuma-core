@@ -10,7 +10,7 @@ import edu.gemini.tac.qengine.impl.block.TooBlocks
 import edu.gemini.tac.qengine.impl.queue.ProposalQueueBuilder
 import edu.gemini.tac.qengine.log.RejectMessage
 import edu.gemini.tac.qengine.log.RejectTarget
-import edu.gemini.tac.qengine.p1.Target
+import edu.gemini.tac.qengine.p1.ItacTarget
 import edu.gemini.tac.qengine.util.BoundedTime
 import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.ScienceBand
@@ -38,13 +38,13 @@ final case class DeclinationMapResource(val bins: DeclinationMap[BoundedTime]) e
     bins.get(dec).map(bin => f(bin.binValue)).getOrElse(Time.Zero)
 
   def limit(dec: Declination): Time      = lookup(dec, _.limit)
-  def limit(t: Target): Time       = limit(t.dec)
+  def limit(t: ItacTarget): Time       = limit(t.dec)
 
   def remaining(dec: Declination): Time  = lookup(dec, _.remaining)
-  def remaining(t: Target): Time   = remaining(t.dec)
+  def remaining(t: ItacTarget): Time   = remaining(t.dec)
 
   def isFull(dec: Declination): Boolean  = remaining(dec).isZero
-  def isFull(t: Target): Boolean   = isFull(t.dec)
+  def isFull(t: ItacTarget): Boolean   = isFull(t.dec)
 
   private def reserveNormal(block: Block, band: ScienceBand): RejectMessage Either DeclinationMapResource = {
     val dec = block.obs.target.dec
@@ -84,7 +84,7 @@ final case class DeclinationMapResource(val bins: DeclinationMap[BoundedTime]) e
    * of the given target.  Returns a new DeclinationMapResource and any time that
    * could not be reserved.
    */
-  def reserveAvailable(time: Time, target: Target): (DeclinationMapResource, Time) =
+  def reserveAvailable(time: Time, target: ItacTarget): (DeclinationMapResource, Time) =
     reserveAvailable(time, target.dec)
 
   /**

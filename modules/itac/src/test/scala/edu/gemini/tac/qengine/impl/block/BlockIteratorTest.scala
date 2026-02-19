@@ -24,7 +24,7 @@ class BlockIteratorTest extends ItacSuite {
   import TimeAccountingCategory.{ BR, US }
   val TimeAccountingCategorys = Enumerated[TimeAccountingCategory].all
 
-  val target = Target(0.0, 0.0) // required but not used for this test
+  val target = ItacTarget(0.0, 0.0) // required but not used for this test
   private val conds =
     ConstraintSet(
       ImageQuality.Preset.TwoPointZero,
