@@ -21,6 +21,7 @@ import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.enums.WaterVapor
 import lucuma.core.model.CloudExtinction
+import lucuma.core.model.ConstraintSet
 import lucuma.core.model.ElevationRange
 import lucuma.core.model.ImageQuality
 import lucuma.core.model.Semester
@@ -64,16 +65,16 @@ object Fixture {
     new SemesterResource(raResGroup, compositeTimeRestrictionResource(total))
 
   // Falls in the first conditions bin (<=CC70)
-  val goodCC = ObservingConditions(ImageQuality.Preset.TwoPointZero, CloudExtinction.Preset.Zero, SkyBackground.Bright, WaterVapor.Wet, ElevationRange.ByAirMass.Default)
+  val goodCC = ConstraintSet(ImageQuality.Preset.TwoPointZero, CloudExtinction.Preset.Zero, SkyBackground.Bright, WaterVapor.Wet, ElevationRange.ByAirMass.Default)
 
   // Falls in the second conditions bin (>=CC80)
-  val badCC  = ObservingConditions(ImageQuality.Preset.TwoPointZero, CloudExtinction.Preset.OnePointZero, SkyBackground.Bright, WaterVapor.Wet, ElevationRange.ByAirMass.Default)
+  val badCC  = ConstraintSet(ImageQuality.Preset.TwoPointZero, CloudExtinction.Preset.OnePointZero, SkyBackground.Bright, WaterVapor.Wet, ElevationRange.ByAirMass.Default)
 
   def genQuanta(hrs: Double): TimeAccountingCategoryTime = TimeAccountingCategoryTime.constant(Time.hours(hrs))
 
   // Makes a proposal with the given ntac info, and observations according
   // to the descriptions (target, conditions, time)
-  def mkProp(ntac: Ntac, obsDefs: (Target, ObservingConditions, Time)*): Proposal =
+  def mkProp(ntac: Ntac, obsDefs: (Target, ConstraintSet, Time)*): Proposal =
     Proposal(ntac, site = site, obsList = obsDefs.map(tup => Observation(tup._1, tup._2, tup._3)).toList)
 
   val emptyQueue = ProposalQueueBuilder(QueueTime(TimeAccountingCategoryTime.empty, Percent.Zero), ScienceBand.Band1, Nil) // QueueTime(Site.GN, TimeAccountingCategoryTime.empty(TimeAccountingCategorys).map, TimeAccountingCategorys))

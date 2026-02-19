@@ -13,6 +13,7 @@ import edu.gemini.tac.qengine.log.RejectToo
 import edu.gemini.tac.qengine.p1.*
 import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.ToOActivation
+import lucuma.core.model.ConstraintSet
 
 object RightAscensionMapResource {
   // Creates an RA resource group from the site/semester configuration.
@@ -65,7 +66,7 @@ case class RightAscensionMapResource(val grp: RightAscensionMap[PerRightAscensio
    * Reserves up-to the given amount of time, returning an updated
    * RightAscensionMapResource and any time left over that could not be reserved.
    */
-  def reserveAvailable(time: Time, target: Target, conds: ObservingConditions): (RightAscensionMapResource, Time) = {
+  def reserveAvailable(time: Time, target: Target, conds: ConstraintSet): (RightAscensionMapResource, Time) = {
     val (bin, rem) = grp(target.ra).reserveAvailable(time, target, conds)
     (new RightAscensionMapResource(grp.updated(target.ra, bin)), rem)
   }

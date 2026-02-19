@@ -3,10 +3,10 @@
 
 package edu.gemini.tac.qengine.api.config
 
-import edu.gemini.tac.qengine.p1.*
 import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.WaterVapor
 import lucuma.core.model.CloudExtinction
+import lucuma.core.model.ConstraintSet
 import lucuma.core.model.ImageQuality
 
 import scala.Ordering.Implicits.*
@@ -22,11 +22,11 @@ final case class ConditionsCategory(
   name:   Option[String]               = None
 ) {
 
-  def matches(oc: ObservingConditions): Boolean =
+  def matches(oc: ConstraintSet): Boolean =
     ccSpec.matches(oc.cloudExtinction) && iqSpec.matches(oc.imageQuality) &&
       sbSpec.matches(oc.skyBackground) && wvSpec.matches(oc.waterVapor)
 
-  def canObserve(oc: ObservingConditions): Boolean =
+  def canObserve(oc: ConstraintSet): Boolean =
     ccSpec.canObserve(oc.cloudExtinction) && iqSpec.canObserve(oc.imageQuality) &&
       sbSpec.canObserve(oc.skyBackground) && wvSpec.canObserve(oc.waterVapor)
 
@@ -92,10 +92,10 @@ object ConditionsCategory {
   // RCN: I don't understand this.
   case class SearchPath(cats: List[ConditionsCategory]) {
 
-    def apply(oc: ObservingConditions): List[ConditionsCategory] =
+    def apply(oc: ConstraintSet): List[ConditionsCategory] =
       cats.filter(_.canObserve(oc)).reverse // why?
 
-    def category(oc: ObservingConditions): ConditionsCategory =
+    def category(oc: ConstraintSet): ConditionsCategory =
       cats.find(_.matches(oc)).get
   }
 

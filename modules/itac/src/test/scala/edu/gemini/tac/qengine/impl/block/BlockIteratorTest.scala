@@ -7,7 +7,13 @@ import edu.gemini.tac.qengine.api.queue.time.TimeAccountingCategoryTime
 import edu.gemini.tac.qengine.p1.*
 import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.Site
+import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.TimeAccountingCategory
+import lucuma.core.enums.WaterVapor
+import lucuma.core.model.CloudExtinction
+import lucuma.core.model.ConstraintSet
+import lucuma.core.model.ElevationRange
+import lucuma.core.model.ImageQuality
 import lucuma.core.util.Enumerated
 import org.junit.*
 
@@ -18,7 +24,14 @@ class BlockIteratorTest {
   val TimeAccountingCategorys = Enumerated[TimeAccountingCategory].all
 
   val target = Target(0.0, 0.0) // required but not used for this test
-  val conds = ObservingConditions.AnyConditions // required by not used
+  private val conds =
+    ConstraintSet(
+      ImageQuality.Preset.TwoPointZero,
+      CloudExtinction.Preset.ThreePointZero,
+      SkyBackground.Bright,
+      WaterVapor.Wet,
+      ElevationRange.ByAirMass.Default
+    )
   val e = 0.000001
 
   def mkObs(hrs: Double): Observation = Observation(target, conds, Time.hours(hrs))

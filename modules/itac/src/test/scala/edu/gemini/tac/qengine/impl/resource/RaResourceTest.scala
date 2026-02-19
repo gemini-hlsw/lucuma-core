@@ -9,6 +9,7 @@ import edu.gemini.tac.qengine.log.RejectTarget
 import edu.gemini.tac.qengine.p1.*
 import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.TimeAccountingCategory
+import lucuma.core.model.ConstraintSet
 import lucuma.core.util.Enumerated
 import munit.FunSuite
 
@@ -24,7 +25,7 @@ class PerRightAscensionResourceTest extends FunSuite {
 
   private val ntac = Ntac(KR, "x", 0, Time.Zero)
 
-  private def mkProp(target: Target, conds: ObservingConditions): Proposal =
+  private def mkProp(target: Target, conds: ConstraintSet): Proposal =
     Fixture.mkProp(ntac,  (target, conds, Time.Zero))
 
   private def verifyReserve(raRes: PerRightAscensionResource) = {

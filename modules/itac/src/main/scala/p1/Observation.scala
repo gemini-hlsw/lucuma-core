@@ -4,10 +4,11 @@
 package edu.gemini.tac.qengine.p1
 
 import edu.gemini.tac.qengine.util.Time
+import lucuma.core.model.ConstraintSet
 
 case class Observation(
   target: Target, 
-  conditions: ObservingConditions, 
+  conditions: ConstraintSet, 
   time: Time, 
   lgs: Boolean = false
 )

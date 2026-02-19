@@ -8,10 +8,10 @@ import edu.gemini.tac.qengine.impl.block.Block
 import edu.gemini.tac.qengine.impl.queue.ProposalQueueBuilder
 import edu.gemini.tac.qengine.log.RejectMessage
 import edu.gemini.tac.qengine.log.RejectTimeAccountingCategoryOverAllocation
-import edu.gemini.tac.qengine.p1.ObservingConditions
 import edu.gemini.tac.qengine.p1.Target
 import edu.gemini.tac.qengine.util.BoundedTime
 import edu.gemini.tac.qengine.util.Time
+import lucuma.core.model.ConstraintSet
 import org.slf4j.LoggerFactory
 
 final case class SemesterResource(
@@ -71,7 +71,7 @@ final case class SemesterResource(
     }
   }
 
-  def reserveAvailable(time: Time, target: Target, conds: ObservingConditions): (SemesterResource, Time) = {
+  def reserveAvailable(time: Time, target: Target, conds: ConstraintSet): (SemesterResource, Time) = {
     val (newRa, rem) = ra.reserveAvailable(time, target, conds)
     (new SemesterResource(newRa, this.time), rem)
   }

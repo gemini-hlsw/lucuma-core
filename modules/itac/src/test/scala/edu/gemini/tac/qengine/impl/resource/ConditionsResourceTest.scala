@@ -17,6 +17,7 @@ import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.enums.WaterVapor
 import lucuma.core.model.CloudExtinction
+import lucuma.core.model.ConstraintSet
 import lucuma.core.model.ElevationRange
 import lucuma.core.model.ImageQuality
 import lucuma.core.util.Enumerated
@@ -39,13 +40,13 @@ class ConditionsResourceTest extends FunSuite{
   private val ntac   = Ntac(KR, "x", 0, Time.minutes(100)) // not used
   private val target = Target(0,0)                               // not used
 
-  private def mkProp(obsConds: ObservingConditions): Proposal = {
+  private def mkProp(obsConds: ConstraintSet): Proposal = {
     val obsList = List(Observation(target, obsConds, Time.minutes(10)))
     Proposal(ntac, site = Site.GS, obsList = obsList)
   }
 
-  private def mkConds(cc: CloudExtinction.Preset): ObservingConditions =
-    ObservingConditions(ImageQuality.Preset.PointOne, cc, SkyBackground.Darkest, WaterVapor.VeryDry, ElevationRange.ByAirMass.Default)
+  private def mkConds(cc: CloudExtinction.Preset): ConstraintSet =
+    ConstraintSet(ImageQuality.Preset.PointOne, cc, SkyBackground.Darkest, WaterVapor.VeryDry, ElevationRange.ByAirMass.Default)
 
   // Verify that the given remaining times match -- times must be specified
   // in order of CloudCover values.
@@ -57,7 +58,7 @@ class ConditionsResourceTest extends FunSuite{
     assertEquals(obtained.mkString(", "), expected.mkString(", ")) // diff is easier to read this way
   }
 
-  private def testSuccess(time: Time, cnds: ObservingConditions, mins: Int*) = {
+  private def testSuccess(time: Time, cnds: ConstraintSet, mins: Int*) = {
     val (newResGrp, rem) = resGrp.reserveAvailable(time, cnds)
     assertEquals(Time.Zero, rem)
     verifyTimes(newResGrp, mins*)
