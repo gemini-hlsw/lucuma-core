@@ -23,7 +23,7 @@ final case class Block(prop: Proposal, obs: Observation, time: Time, isStart: Bo
   def updated(t: Time): Block = Block(prop, obs, t, isStart, isFinal)
 
   override def toString: String = "Block(%s(%s), %s, %s, %s, %s)".format(
-    prop.ntac.partner.tag,
+    prop.ntac.TimeAccountingCategory.tag,
     prop.ntac.reference,
     obs,
     time,

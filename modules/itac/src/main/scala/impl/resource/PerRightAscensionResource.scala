@@ -13,21 +13,21 @@ import edu.gemini.tac.qengine.p1.Target
 import edu.gemini.tac.qengine.util.BoundedTime
 import edu.gemini.tac.qengine.util.Time
 
-object RaResource {
-  def apply(t: Time, c: SiteSemesterConfig): RaResource = {
-    val decRes   = DecResourceGroup(t, c.decLimits)
-    val condsRes = ConditionsResourceGroup(t, c.conditions)
-    new RaResource(new BoundedTime(t), decRes, condsRes)
+object PerRightAscensionResource {
+  def apply(t: Time, c: SiteSemesterConfig): PerRightAscensionResource = {
+    val decRes   = DeclinationMapResource(t, c.decLimits)
+    val condsRes = ConditionsCategoryMapResource(t, c.conditions)
+    new PerRightAscensionResource(new BoundedTime(t), decRes, condsRes)
   }
 }
 
 /**
  * Groups the dec and obs conditions resources for a particular RA bin.
  *
- * Used as the parameterized type to RaResourceGroup
+ * Used as the parameterized type to RightAscensionMapResource
  */
-final case class RaResource(val absBounds: BoundedTime, val decRes: DecResourceGroup, val condsRes: ConditionsResourceGroup) extends Resource {
-  type T = RaResource
+final case class PerRightAscensionResource(val absBounds: BoundedTime, val decRes: DeclinationMapResource, val condsRes: ConditionsCategoryMapResource) extends Resource {
+  type T = PerRightAscensionResource
 
   // There is an absolute time limit for the RA, but the time limit for a
   // dec (as indicated by a target) or for a particular set of observing
@@ -56,7 +56,7 @@ final case class RaResource(val absBounds: BoundedTime, val decRes: DecResourceG
   def isFull(c: ObservingConditions): Boolean            = isFull || condsRes.isFull(c)
   def isFull(t: Target, c: ObservingConditions): Boolean = isFull(t) || isFull(c)
 
-  override def reserve(block: Block, queue: ProposalQueueBuilder): RejectMessage Either RaResource =
+  override def reserve(block: Block, queue: ProposalQueueBuilder): RejectMessage Either PerRightAscensionResource =
     absBounds.reserve(block.time) match {
       case None =>
         Left(new RejectTarget(block.prop, block.obs, queue.band, RejectTarget.Ra, absBounds.used, absBounds.limit))
@@ -64,14 +64,14 @@ final case class RaResource(val absBounds: BoundedTime, val decRes: DecResourceG
         for {
           newDecRes   <- decRes.reserve(block, queue)
           newCondsRes <- condsRes.reserve(block, queue)
-        } yield new RaResource(newAbsBounds, newDecRes, newCondsRes)
+        } yield new PerRightAscensionResource(newAbsBounds, newDecRes, newCondsRes)
     }
 
-  def reserveAvailable(time: Time, target: Target, conds: ObservingConditions): (RaResource, Time) = {
+  def reserveAvailable(time: Time, target: Target, conds: ObservingConditions): (PerRightAscensionResource, Time) = {
     val (newAbs, rem1) = absBounds.reserveAvailable(time)
     val (newDec, rem2) = decRes.reserveAvailable(time, target)
     val (newCon, rem3) = condsRes.reserveAvailable(time, conds)
-    (new RaResource(newAbs, newDec, newCon), rem1.max(rem2).max(rem3))
+    (new PerRightAscensionResource(newAbs, newDec, newCon), rem1.max(rem2).max(rem3))
   }
 
 }

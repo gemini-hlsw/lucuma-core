@@ -10,13 +10,13 @@ import edu.gemini.tac.qengine.util.Time
 /**
  * An iterator, of sorts, which can be used to step through a single list of
  * proposals generating TimeBlock instances.  The proposals are expected to be
- * associated with a single partner (hence the name of the class), but nothing
+ * associated with a single TimeAccountingCategory (hence the name of the class), but nothing
  * enforces this.
  *
  * <p>Unless the hasNext method returns <code>true</code>, the results of
  * calling any other method are unspecified.
  */
-trait PartnerBlockIterator{
+trait TimeAccountingCategoryBlockIterator{
 
   /**
    * Remaining proposals that have not yet been completely visited.
@@ -71,59 +71,59 @@ trait PartnerBlockIterator{
   }
 
   /**
-   * Generates the next TimeBlock and the next PartnerTimeBlockIterator.
+   * Generates the next TimeBlock and the next TimeAccountingCategoryTimeBlockIterator.
    */
-  def next(maxTime: Time, activeList : Proposal => List[Observation]): (Block, PartnerBlockIterator) = {
+  def next(maxTime: Time, activeList : Proposal => List[Observation]): (Block, TimeAccountingCategoryBlockIterator) = {
     val block = nextBlock(maxTime)
     (block, advance(block.time, activeList))
   }
 
   /**
-   * Generates a PartnerTimeBlock iterator for the next proposal, skipping the
+   * Generates a TimeAccountingCategoryTimeBlock iterator for the next proposal, skipping the
    * current proposal and its observations.
    */
-  def skip(activeList : Proposal => List[Observation]): PartnerBlockIterator = advanceProp(activeList)
+  def skip(activeList : Proposal => List[Observation]): TimeAccountingCategoryBlockIterator = advanceProp(activeList)
 
-  private def advanceProp(activeList : Proposal => List[Observation]): PartnerBlockIterator = remainingProposals match {
+  private def advanceProp(activeList : Proposal => List[Observation]): TimeAccountingCategoryBlockIterator = remainingProposals match {
     case _ :: nextProp :: tail =>
       mkIterator(nextProp :: tail, activeList(nextProp),
         Observation.relativeObsTime(activeList(nextProp).head, nextProp.time, activeList(nextProp)), isStartOfBlock = true)
-    case _ => PartnerBlockIterator.Empty
+    case _ => TimeAccountingCategoryBlockIterator.Empty
   }
 
-  private def advanceObs(activeList : Proposal => List[Observation]): PartnerBlockIterator = remainingObservationsInActiveList match {
+  private def advanceObs(activeList : Proposal => List[Observation]): TimeAccountingCategoryBlockIterator = remainingObservationsInActiveList match {
     case _ :: nextObs :: tail =>
       mkIterator(remainingProposals, nextObs :: tail,
         Observation.relativeObsTime(nextObs, currentProposal.time, activeList(currentProposal)), isStartOfBlock = false)
     case _ => advanceProp(activeList)
   }
 
-  private def advance(t: Time, activeList : Proposal => List[Observation]): PartnerBlockIterator =
+  private def advance(t: Time, activeList : Proposal => List[Observation]): TimeAccountingCategoryBlockIterator =
     if (currentObservationRemainingTime > t)
       mkIterator(remainingProposals, remainingObservationsInActiveList, currentObservationRemainingTime - t, isStartOfBlock = false)
     else
       advanceObs(activeList)
 
-  protected def mkIterator(propList: List[Proposal], obsList: List[Observation], time: Time, isStartOfBlock: Boolean): PartnerBlockIterator
+  protected def mkIterator(propList: List[Proposal], obsList: List[Observation], time: Time, isStartOfBlock: Boolean): TimeAccountingCategoryBlockIterator
 }
 
 
 /**
- * A factory for creating PartnerTimeBlockIterators.
+ * A factory for creating TimeAccountingCategoryTimeBlockIterators.
  */
-object PartnerBlockIterator {
+object TimeAccountingCategoryBlockIterator {
 
-  private object Empty extends PartnerBlockIterator {
+  private object Empty extends TimeAccountingCategoryBlockIterator {
     val remainingProposals: List[Proposal] = Nil
     val remainingObservationsInActiveList: List[Observation] = Nil
     val currentObservationRemainingTime: Time = Time.Zero
     val isStartBlock: Boolean = false
 
-    def mkIterator(propList: List[Proposal], obsList: List[Observation], time: Time, start: Boolean): PartnerBlockIterator = this
+    def mkIterator(propList: List[Proposal], obsList: List[Observation], time: Time, start: Boolean): TimeAccountingCategoryBlockIterator = this
   }
 
-  private class NormalIterator(val remainingProposals: List[Proposal], val remainingObservationsInActiveList: List[Observation], val currentObservationRemainingTime: Time, val isStartBlock: Boolean) extends PartnerBlockIterator {
-    def mkIterator(propList: List[Proposal], obsList: List[Observation], time: Time, start: Boolean): PartnerBlockIterator =
+  private class NormalIterator(val remainingProposals: List[Proposal], val remainingObservationsInActiveList: List[Observation], val currentObservationRemainingTime: Time, val isStartBlock: Boolean) extends TimeAccountingCategoryBlockIterator {
+    def mkIterator(propList: List[Proposal], obsList: List[Observation], time: Time, start: Boolean): TimeAccountingCategoryBlockIterator =
       new NormalIterator(propList, obsList, time, start)
   }
 
@@ -134,13 +134,13 @@ object PartnerBlockIterator {
     (activeObservations, Observation.relativeObsTime(firstObservation, activeProposal.time, activeObservations))
   }
 
-  private def applyNonEmpty(propList: List[Proposal], activeList : Proposal=>List[Observation]): PartnerBlockIterator =
+  private def applyNonEmpty(propList: List[Proposal], activeList : Proposal=>List[Observation]): TimeAccountingCategoryBlockIterator =
     init(propList, activeList) match {
       case (activeObservations, time) => new NormalIterator(propList, activeObservations, time, true)
     }
 
   /**
-   * Creates a PartnerTimeBlockIterator that uses times associated with the
+   * Creates a TimeAccountingCategoryTimeBlockIterator that uses times associated with the
    * specified category and steps through the given list of proposals.
    *
    * <p>Note, there is no input validation but it is expected that all the
@@ -150,6 +150,6 @@ object PartnerBlockIterator {
    * Please ensure that the proposal lists are filtered as
    * appropriate.
    */
-  def apply(propList: List[Proposal], activeList : Proposal=>List[Observation]): PartnerBlockIterator =
+  def apply(propList: List[Proposal], activeList : Proposal=>List[Observation]): TimeAccountingCategoryBlockIterator =
     if (propList.isEmpty) Empty else applyNonEmpty(propList, activeList)
 }

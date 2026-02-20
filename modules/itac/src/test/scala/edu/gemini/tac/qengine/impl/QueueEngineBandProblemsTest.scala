@@ -3,11 +3,11 @@
 
 package edu.gemini.tac.qengine.impl
 
-import edu.gemini.tac.qengine.p1.Mode
 import edu.gemini.tac.qengine.p1.Proposal
-import edu.gemini.tac.qengine.p1.QueueBand
-import edu.gemini.tac.qengine.p1.QueueBand.*
-import edu.gemini.tac.qengine.p1.Too
+import lucuma.core.enums.ScienceBand
+import lucuma.core.enums.ScienceBand.*
+import lucuma.core.enums.ScienceSubtype
+import lucuma.core.enums.ToOActivation
 import munit.FunSuite
 import org.junit.Assert
 
@@ -32,45 +32,45 @@ class QueueEngineBandProblemsTest extends FunSuite {
     )
 
   // Test that the given problem check fails with the the given proposal and per-band expectations.
-  private def testRule(problem: Problem, proposal: Proposal)(expect: PartialFunction[QueueBand, String]): Unit =
-    QueueBand.values.foreach(b => Assert.assertEquals(expect.lift(b), problem.lift((proposal, b))))
+  private def testRule(problem: Problem, proposal: Proposal)(expect: PartialFunction[ScienceBand, String]): Unit =
+    ScienceBand.values.foreach(b => Assert.assertEquals(expect.lift(b), problem.lift((proposal, b))))
 
   test("testClassicalNotInBand1"):
-    testRule(ClassicalNotInBand1, P.copy(mode = Mode.Classical)) {
-      case QBand2 => "Classical proposal in band 2"
-      case QBand3 => "Classical proposal in band 3"
-      case QBand4 => "Classical proposal in band 4"
+    testRule(ClassicalNotInBand1, P.copy(mode = ScienceSubtype.Classical)) {
+      case Band2 => "Classical proposal in Band2"
+      case Band3 => "Classical proposal in Band3"
+      case Band4 => "Classical proposal in Band4"
     }
 
   test("testNoObsInBand124"):
     testRule(NoObsInBand, P.copy(obsList = Nil, band3Observations = List(null))) {
-      case QBand1 => ("No observations were found for Band 1")
-      case QBand2 => ("No observations were found for Band 2")
-      case QBand4 => ("No observations were found for Band 4")
+      case Band1 => ("No observations were found for Band1")
+      case Band2 => ("No observations were found for Band2")
+      case Band4 => ("No observations were found for Band4")
     }
 
   test("testNoObsInBand3"):
     testRule(NoObsInBand, P.copy(obsList = List(null), band3Observations = Nil)) {
-      case QBand3 => "No observations were found for Band 3"
+      case Band3 => "No observations were found for Band3"
     }
 
   test("testLpInBand3Or4"):
-    testRule(LpInBand3Or4, P.copy(mode = Mode.LargeProgram)) {
-      case QBand3 => "LP proposal in Band 3"
-      case QBand4 => "LP proposal in Band 4"
+    testRule(LpInBand3Or4, P.copy(mode = ScienceSubtype.LargeProgram)) {
+      case Band3 => "LP proposal in Band3"
+      case Band4 => "LP proposal in Band4"
     }
 
   test("testRapidTooOutsideBand1"):
-    testRule(RapidTooOutsideBand1, P.copy(too = Too.rapid)) {
-      case QBand2 => "Rapid TOO proposal in Band 2"
-      case QBand3 => "Rapid TOO proposal in Band 3"
-      case QBand4 => "Rapid TOO proposal in Band 4"
+    testRule(RapidTooOutsideBand1, P.copy(too = ToOActivation.Rapid)) {
+      case Band2 => "Rapid TOO proposal in Band2"
+      case Band3 => "Rapid TOO proposal in Band3"
+      case Band4 => "Rapid TOO proposal in Band4"
     }
 
   test("testStandardTooOutsideBand12"):
-    testRule(StandardTooOutsideBand12, P.copy(too = Too.standard)) {
-      case QBand3 => "Standard TOO proposal in band 3"
-      case QBand4 => "Standard TOO proposal in band 4"
+    testRule(StandardTooOutsideBand12, P.copy(too = ToOActivation.Standard)) {
+      case Band3 => "Standard TOO proposal in Band3"
+      case Band4 => "Standard TOO proposal in Band4"
     }
 
 }

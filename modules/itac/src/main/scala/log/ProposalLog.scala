@@ -3,9 +3,10 @@
 
 package edu.gemini.tac.qengine.log
 
+import cats.implicits.*
 import edu.gemini.tac.qengine.log.ProposalLog.Key
 import edu.gemini.tac.qengine.p1.Proposal
-import edu.gemini.tac.qengine.p1.QueueBand
+import lucuma.core.enums.ScienceBand
 
 import scala.collection.immutable.SortedSet
 
@@ -16,7 +17,7 @@ import scala.collection.immutable.SortedSet
  * calculation.
  *
  * <p>This class wraps a SortedMap in order to simplify/hide the
- * (Proposal.Id, QueueBand.TimeCategory) keys and add a few features specific
+ * (Proposal.Id, ScienceBand.TimeCategory) keys and add a few features specific
  * to proposal logging.
  */
 trait ProposalLog {
@@ -26,7 +27,7 @@ trait ProposalLog {
   protected val log: List[Entry]
 
   def isDefinedAt(key: Key): Boolean = log.exists(_.key == key)
-  def isDefinedAt(id: Proposal.Id, band: QueueBand): Boolean =
+  def isDefinedAt(id: Proposal.Id, band: ScienceBand): Boolean =
     isDefinedAt(Key(id, band))
 
   /**
@@ -42,17 +43,17 @@ trait ProposalLog {
    * a convenience method to hide the creation of the Key from the proposal
    * id and time category.
    */
-  def apply(id: Proposal.Id, band: QueueBand): LogMessage = get(Key(id, band)).get
+  def apply(id: Proposal.Id, band: ScienceBand): LogMessage = get(Key(id, band)).get
 
   def get(key: Key): Option[LogMessage] =
     log.find(_.key == key).map(_.msg)
 
-  def get(id: Proposal.Id, band: QueueBand): Option[LogMessage] = get(Key(id, band))
+  def get(id: Proposal.Id, band: ScienceBand): Option[LogMessage] = get(Key(id, band))
 
   def getOrElse(key: Key, default: LogMessage): LogMessage =
     get(key).getOrElse(default)
 
-  def getOrElse(id: Proposal.Id, band: QueueBand, default: LogMessage): LogMessage =
+  def getOrElse(id: Proposal.Id, band: ScienceBand, default: LogMessage): LogMessage =
     getOrElse(Key(id, band), default)
 
   /**
@@ -81,7 +82,7 @@ trait ProposalLog {
   def toList: List[Entry] = removeDuplicateKeys(log)
 
   /**
-   * Gets a list of (QueueBand.TimeCategory, LogMessage) pairs for all entries
+   * Gets a list of (ScienceBand.TimeCategory, LogMessage) pairs for all entries
    * related to the given proposal.
    */
   def toList(id: Proposal.Id): List[Entry] =
@@ -108,7 +109,7 @@ trait ProposalLog {
    * message.  This is a convenience method to obviate the need to explicitly
    * create a Key object from the proposal id and category.
    */
-  def updated(id: Proposal.Id, band: QueueBand, msg: LogMessage): ProposalLog =
+  def updated(id: Proposal.Id, band: ScienceBand, msg: LogMessage): ProposalLog =
     updated(Key(id, band), msg)
 
   /**
@@ -116,7 +117,7 @@ trait ProposalLog {
    * specified time category.  The LogMessages are determined by the provided
    * function.
    */
-  def updated(propList: List[Proposal], band: QueueBand, f: Proposal => LogMessage): ProposalLog =
+  def updated(propList: List[Proposal], band: ScienceBand, f: Proposal => LogMessage): ProposalLog =
     mkProposalLog(propList.foldLeft(log) {
       (lst, prop) => Entry(Key(prop.id, band), f(prop)) :: lst
     })
@@ -136,7 +137,7 @@ object ProposalLog {
    * A combination of proposal id and queue band time category that serves as
    * a key for looking up proposal log messages.
    */
-  case class Key(id: Proposal.Id, band: QueueBand)
+  case class Key(id: Proposal.Id, band: ScienceBand)
   object Key {
     implicit val OrderingKey: Ordering[Key] =
       Ordering.by(k => (k.id, k.band))
@@ -172,7 +173,7 @@ object ProposalLog {
 
   val Empty: ProposalLog = new ProposalLogImpl(List.empty)
 
-  def apply(tups: (Proposal.Id, QueueBand, LogMessage)*): ProposalLog =
+  def apply(tups: (Proposal.Id, ScienceBand, LogMessage)*): ProposalLog =
     new ProposalLogImpl(List(tups.map {
       case (id, band, msg) => Entry(Key(id, band), msg)
     }*).reverse)

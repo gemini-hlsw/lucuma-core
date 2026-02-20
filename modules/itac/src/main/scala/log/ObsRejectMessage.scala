@@ -4,7 +4,7 @@
 package edu.gemini.tac.qengine.log
 
 import edu.gemini.tac.qengine.p1.Observation
-import edu.gemini.tac.qengine.p1.QueueBand
+import lucuma.core.enums.ScienceBand
 
 /**
  * A proposal rejection that occurs because a particular observation in the
@@ -15,12 +15,12 @@ import edu.gemini.tac.qengine.p1.QueueBand
 trait ObsRejectMessage extends RejectMessage {
   def obs: Observation
 
-  def percentObsMerged(b: QueueBand): Int = {
+  def percentObsMerged(b: ScienceBand): Int = {
     val l = prop.obsListFor(b)
     ((l.indexOf(obs) / l.size.toDouble) * 100).round.toInt
   }
 
-  def percentTimeMerged(b: QueueBand): Int = {
+  def percentTimeMerged(b: ScienceBand): Int = {
     val totalTime = prop.obsListFor(b).foldLeft(0L)(_ + _.time.ms)
     ((obs.time.ms / totalTime.toDouble) * 100).round.toInt
   }

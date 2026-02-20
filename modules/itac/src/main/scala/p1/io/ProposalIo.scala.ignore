@@ -5,7 +5,7 @@ package edu.gemini.tac.qengine.p1.io
 
 import edu.gemini.model.p1.{immutable => im}
 import edu.gemini.model.p1.{mutable => m}
-import edu.gemini.tac.qengine.ctx.Partner
+import lucuma.core.enums.TimeAccountingCategory
 import edu.gemini.tac.qengine.p1._
 
 import scalaz._
@@ -53,10 +53,10 @@ import ProposalIo._
 class ProposalIo {
   val ntacIo = new NtacIo
 
-  // We need to split up the partners based on the sites where they are active.
-  val gnPartners   = Partner.all.filter(_.sites == Set(Site.GN)).toSet
-  val gsPartners   = Partner.all.filter(_.sites == Set(Site.GS)).toSet
-  val dualPartners = Partner.all.filter(_.sites.size == 2).toSet
+  // We need to split up the TimeAccountingCategorys based on the sites where they are active.
+  val gnTimeAccountingCategorys   = TimeAccountingCategory.all.filter(_.sites == Set(Site.GN)).toSet
+  val gsTimeAccountingCategorys   = TimeAccountingCategory.all.filter(_.sites == Set(Site.GS)).toSet
+  val dualTimeAccountingCategorys = TimeAccountingCategory.all.filter(_.sites.size == 2).toSet
 
   /**
     * Extracts Queue Engine proposal information from the immutable proposal.
@@ -99,7 +99,7 @@ class ProposalIo {
       // OK LISTEN UP
 
       // Some proposals have observations at both sites, so we need to figure out how much awarded
-      // time goes to each site. Most partner time can be divided proportionally, but some partner
+      // time goes to each site. Most TimeAccountingCategory time can be divided proportionally, but some TimeAccountingCategory
       // time can be used only at one site or the other. So that's what all the code below figures
       // out. It's repetitive and has a lot of comments with small words. I want to keep it simple.
 
@@ -112,9 +112,9 @@ class ProposalIo {
       // NTAC awards, divided into gn, gs, and dual-site. These are mutually exclusive. The GN award
       // can be used only at GN; the GS award can be used only at GS; and the remainder can be used
       // anywhers.
-      val dedicatedAwardGN = Option(ntac).filter(n => gnPartners.contains(n.partner)).foldMap(_.awardedTime)
-      val dedicatedAwardGS = Option(ntac).filter(n => gsPartners.contains(n.partner)).foldMap(_.awardedTime)
-      val dualSiteAward    = Option(ntac).filter(n => dualPartners.contains(n.partner)).foldMap(_.awardedTime)
+      val dedicatedAwardGN = Option(ntac).filter(n => gnTimeAccountingCategorys.contains(n.TimeAccountingCategory)).foldMap(_.awardedTime)
+      val dedicatedAwardGS = Option(ntac).filter(n => gsTimeAccountingCategorys.contains(n.TimeAccountingCategory)).foldMap(_.awardedTime)
+      val dualSiteAward    = Option(ntac).filter(n => dualTimeAccountingCategorys.contains(n.TimeAccountingCategory)).foldMap(_.awardedTime)
 
       // The estimated shared time at each site, which means the estimated time at the site, less
       // dedicated time that can only be used there. We want to remove the dedicated time and then
@@ -173,10 +173,10 @@ class ProposalIo {
           // println(s"---")
           // println(s"my site is $site so my award here is ${totalAwardHere.toHours}")
           // println(s"---")
-          // println(ntacs.map(n => f"${n.partner.id}:${n.awardedTime.toHours.value}%5.1f").list.toList.mkString(", "))
+          // println(ntacs.map(n => f"${n.TimeAccountingCategory.id}:${n.awardedTime.toHours.value}%5.1f").list.toList.mkString(", "))
 
           if (totalAwardHere.isZero) {
-            LoggerFactory.getLogger("edu.gemini.itac").warn(s"Proposal ${ntac.reference} has observations at $site but no awarded time is usable there. Award was ${ntac.partner.id}: ${ntac.awardedTime.toHours}.")
+            LoggerFactory.getLogger("edu.gemini.itac").warn(s"Proposal ${ntac.reference} has observations at $site but no awarded time is usable there. Award was ${ntac.TimeAccountingCategory.id}: ${ntac.awardedTime.toHours}.")
           }
 
           val ntacʹ = ntac.copy(awardedTime = totalAwardHere, undividedTime = Some(ntac.awardedTime))
