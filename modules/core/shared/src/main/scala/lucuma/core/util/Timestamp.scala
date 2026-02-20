@@ -195,6 +195,6 @@ object Timestamp {
     Decoder.decodeString.emap(parse)
 
   given encoderTimestamp: Encoder[Timestamp] =
-    Encoder.encodeString.contramap[Timestamp](_.format)
+    Encoder.encodeString.contramap[Timestamp](_.isoFormat)
 
 }
