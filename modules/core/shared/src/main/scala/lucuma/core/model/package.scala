@@ -63,6 +63,29 @@ object IntCentiPercent extends NewRefined[Int, CentiPercent]:
 
 type IntCentiPercent = IntCentiPercent.Type
 
+// Like IntCentiPercent, but can handle values > 100%
+type CentiPercentUnbounded = GreaterEqual[0]
+object IntCentiPercentUnbounded extends NewRefined[Int, CentiPercentUnbounded]:
+  val Min = unsafeFrom(0)
+
+  def fromPercent(p: BigDecimal): Either[String, IntCentiPercentUnbounded] =
+    from((p * 100).toInt)
+  def unsafeFromPercent(p: BigDecimal): IntCentiPercentUnbounded =
+    unsafeFrom((p * 100).toInt)
+
+  val FromBigDecimal: Format[BigDecimal, IntCentiPercentUnbounded] =
+    Format.apply(d => fromPercent(d).toOption, _.toPercent)
+
+  extension(a: IntCentiPercentUnbounded)
+    def toPercent: BigDecimal = a.value.value / 100.0
+    def *(b: IntCentiPercentUnbounded): IntCentiPercentUnbounded =
+      // Given a and b are in the range 0-1 the result is also in the range 0-1
+      IntCentiPercentUnbounded.unsafeFrom((a.value.value * b.value.value) / 10000)
+    def round: IntCentiPercentUnbounded = IntCentiPercentUnbounded.unsafeFrom(100 * scala.math.round(a.value.value / 100.0f))
+
+type IntCentiPercentUnbounded = IntCentiPercentUnbounded.Type
+
+
 object AirMass extends NewRefined[BigDecimal, Not[Less[1]]]:
   /**
     * Minimum airmass that a given declination reaches from a given latitude.

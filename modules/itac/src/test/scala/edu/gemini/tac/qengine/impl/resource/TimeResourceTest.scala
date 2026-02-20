@@ -3,49 +3,48 @@
 
 package edu.gemini.tac.qengine.impl.resource
 
+import cats.syntax.all.*
+import edu.gemini.tac.qengine.ItacSuite
 import edu.gemini.tac.qengine.api.config.TimeRestriction
 import edu.gemini.tac.qengine.impl.block.Block
 import edu.gemini.tac.qengine.log.RejectRestrictedBin
 import edu.gemini.tac.qengine.p1.*
-import edu.gemini.tac.qengine.p1.CloudCover.CCAny
-import edu.gemini.tac.qengine.p1.ImageQuality.IQAny
-import edu.gemini.tac.qengine.p1.SkyBackground.SBAny
-import edu.gemini.tac.qengine.p1.WaterVapor
-import edu.gemini.tac.qengine.p1.WaterVapor.*
-import edu.gemini.tac.qengine.util.Percent
 import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.Site
+import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.TimeAccountingCategory
-import lucuma.core.math.Coordinates
+import lucuma.core.enums.WaterVapor
+import lucuma.core.model.CloudExtinction
+import lucuma.core.model.ConstraintSet
+import lucuma.core.model.ElevationRange
+import lucuma.core.model.ImageQuality
+import lucuma.core.model.IntCentiPercent
 import lucuma.core.util.Enumerated
-import munit.FunSuite
 import org.junit.*
-
-import scala.Ordering.Implicits.*
 
 import Assert.*
 
-class TimeRestrictionResourceTest extends FunSuite {
+class TimeRestrictionResourceTest extends ItacSuite {
   import TimeAccountingCategory.US
   val TimeAccountingCategorys = Enumerated[TimeAccountingCategory].all
 
   private val ntac   = Ntac(US, "x", 0, Time.hours(10))
-  private val target = Target(Coordinates.Zero) // not used
+  private val target = ItacTarget(0, 0) // not used
   private def conds(wv: WaterVapor) =
-    ObservingConditions(CCAny, IQAny, SBAny, wv)
+    ConstraintSet(ImageQuality.Preset.TwoPointZero, CloudExtinction.Preset.ThreePointZero, SkyBackground.Bright, wv, ElevationRange.ByAirMass.Default)
 
-  private val bin = TimeRestriction("WV", Percent(10)) {
-    (_, obs, _) => obs.conditions.wv <= WV50
+  private val bin = TimeRestriction("WV", IntCentiPercent.unsafeFromPercent(10)) {
+    (_, obs, _) => obs.constraintSet.waterVapor <= WaterVapor.Dry
   }
 
   // 10% of 10 hours = 1 hr = 60 min
   private val res60min = TimeRestrictionResource(bin, Time.hours(10))
 
   private def mkProp(wv: WaterVapor): Proposal =
-    Proposal(ntac, site = Site.GS, obsList = List(Observation(target, conds(wv), Time.hours(10))))
+    Proposal(ntac, site = Site.GS, obsList = List(ItacObservation(target, conds(wv), Time.hours(10))))
 
   test("testReserveNoMatch") {
-    val prop = mkProp(WV80)
+    val prop = mkProp(WaterVapor.Median)
 
     // If the restriction doesn't match the block, then the same instance is
     // returned -- not a copy with the same values
@@ -57,7 +56,7 @@ class TimeRestrictionResourceTest extends FunSuite {
   }
 
   test("testReserveNoTime") {
-    val prop = mkProp(WV20)
+    val prop = mkProp(WaterVapor.VeryDry)
 
     // Here the restriction matches the block, but we're not reserving any
     // time.  Again, no copy should be made
@@ -69,7 +68,7 @@ class TimeRestrictionResourceTest extends FunSuite {
   }
 
   test("testReserve") {
-    val prop = mkProp(WV20)
+    val prop = mkProp(WaterVapor.VeryDry)
 
     // Reserve 15 of the 60 available minutes
     val block = Block(prop, prop.obsList.head, Time.minutes(15))
@@ -80,7 +79,7 @@ class TimeRestrictionResourceTest extends FunSuite {
   }
 
   test("testReject") {
-    val prop = mkProp(WV20)
+    val prop = mkProp(WaterVapor.VeryDry)
 
     // Try to reserve more than 1 hour
     val block = Block(prop, prop.obsList.head, Time.minutes(61))

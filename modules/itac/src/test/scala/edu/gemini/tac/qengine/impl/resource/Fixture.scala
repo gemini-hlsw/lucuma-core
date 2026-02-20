@@ -3,6 +3,7 @@
 
 package edu.gemini.tac.qengine.impl.resource
 
+import cats.implicits.*
 import edu.gemini.tac.qengine.api.config.*
 import edu.gemini.tac.qengine.api.config.ConditionsCategory.Ge
 import edu.gemini.tac.qengine.api.config.ConditionsCategory.Le
@@ -10,17 +11,19 @@ import edu.gemini.tac.qengine.api.queue.time.QueueTime
 import edu.gemini.tac.qengine.api.queue.time.TimeAccountingCategoryTime
 import edu.gemini.tac.qengine.impl.queue.ProposalQueueBuilder
 import edu.gemini.tac.qengine.p1.*
-import edu.gemini.tac.qengine.p1.CloudCover.*
-import edu.gemini.tac.qengine.p1.ImageQuality.*
-import edu.gemini.tac.qengine.p1.SkyBackground.*
-import edu.gemini.tac.qengine.p1.WaterVapor.*
 import edu.gemini.tac.qengine.util.BoundedTime
-import edu.gemini.tac.qengine.util.Percent
 import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.Half
 import lucuma.core.enums.ScienceBand
 import lucuma.core.enums.Site
+import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.TimeAccountingCategory
+import lucuma.core.enums.WaterVapor
+import lucuma.core.model.CloudExtinction
+import lucuma.core.model.ConstraintSet
+import lucuma.core.model.ElevationRange
+import lucuma.core.model.ImageQuality
+import lucuma.core.model.IntCentiPercent
 import lucuma.core.model.Semester
 import lucuma.core.model.Semester.YearInt
 import lucuma.core.util.Enumerated
@@ -36,14 +39,14 @@ object Fixture {
   // (  0, 45] 100%
   // ( 45, 90)  50%
   val decBins   = DeclinationMap.fromBins(
-    DecRanged( 0, 45, Percent(100)),
-    DecRanged(45, 90, Percent( 50)).inclusive
+    DecRanged( 0, 45, IntCentiPercent.unsafeFromPercent(100)),
+    DecRanged(45, 90, IntCentiPercent.unsafeFromPercent( 50)).inclusive
   )
 
   // <=CC70 50%
   // >=CC80 50%
   val condsBins = ConditionsCategoryMap.ofPercent(
-    (ConditionsCategory(Le(CC70)), 50), (ConditionsCategory(Ge(CC80)), 50)
+    (ConditionsCategory(Le(CloudExtinction.Preset.PointThree)), 50), (ConditionsCategory(Ge(CloudExtinction.Preset.OnePointZero)), 50)
   )
 
   // 0 hrs, 1 hrs, 2 hrs, ... 23 hrs
@@ -62,33 +65,33 @@ object Fixture {
     new SemesterResource(raResGroup, compositeTimeRestrictionResource(total))
 
   // Falls in the first conditions bin (<=CC70)
-  val goodCC = ObservingConditions(CC50, IQAny, SBAny, WVAny)
+  val goodCC = ConstraintSet(ImageQuality.Preset.TwoPointZero, CloudExtinction.Preset.Zero, SkyBackground.Bright, WaterVapor.Wet, ElevationRange.ByAirMass.Default)
 
   // Falls in the second conditions bin (>=CC80)
-  val badCC  = ObservingConditions(CC80, IQAny, SBAny, WVAny)
+  val badCC  = ConstraintSet(ImageQuality.Preset.TwoPointZero, CloudExtinction.Preset.OnePointZero, SkyBackground.Bright, WaterVapor.Wet, ElevationRange.ByAirMass.Default)
 
   def genQuanta(hrs: Double): TimeAccountingCategoryTime = TimeAccountingCategoryTime.constant(Time.hours(hrs))
 
   // Makes a proposal with the given ntac info, and observations according
   // to the descriptions (target, conditions, time)
-  def mkProp(ntac: Ntac, obsDefs: (Target, ObservingConditions, Time)*): Proposal =
-    Proposal(ntac, site = site, obsList = obsDefs.map(tup => Observation(tup._1, tup._2, tup._3)).toList)
+  def mkProp(ntac: Ntac, obsDefs: (ItacTarget, ConstraintSet, Time)*): Proposal =
+    Proposal(ntac, site = site, obsList = obsDefs.map(tup => ItacObservation(tup._1, tup._2, tup._3)).toList)
 
-  val emptyQueue = ProposalQueueBuilder(QueueTime(TimeAccountingCategoryTime.empty, Percent.Zero), ScienceBand.Band1, Nil) // QueueTime(Site.GN, TimeAccountingCategoryTime.empty(TimeAccountingCategorys).map, TimeAccountingCategorys))
+  val emptyQueue = ProposalQueueBuilder(QueueTime(TimeAccountingCategoryTime.empty, IntCentiPercent.Min), ScienceBand.Band1, Nil) // QueueTime(Site.GN, TimeAccountingCategoryTime.empty(TimeAccountingCategorys).map, TimeAccountingCategorys))
   def evenQueue(hrs: Double): ProposalQueueBuilder =
     evenQueue(hrs, Some(QueueTime.DefaultTimeAccountingCategoryOverfillAllowance))
 
   // defaults
-  val Band1Percent = Percent(30)
-  val Band2Percent = Percent(30)
-  val Band3Percent = Percent(20)
+  val Band1Percent = IntCentiPercent.unsafeFromPercent(30)
+  val Band2Percent = IntCentiPercent.unsafeFromPercent(30)
+  val Band3Percent = IntCentiPercent.unsafeFromPercent(20)
 
-  def evenQueueTime(hrs: Double, @unused overfill: Option[Percent]): QueueTime = {
+  def evenQueueTime(hrs: Double, @unused overfill: Option[IntCentiPercent]): QueueTime = {
     val pt = TimeAccountingCategoryTime.fromFunction { _ => Time.hours(hrs) * Band1Percent }
-    QueueTime(pt, Percent.Zero)
+    QueueTime(pt, IntCentiPercent.Min)
   }
 
-  def evenQueue(hrs: Double, overfill: Option[Percent]): ProposalQueueBuilder =
+  def evenQueue(hrs: Double, overfill: Option[IntCentiPercent]): ProposalQueueBuilder =
     ProposalQueueBuilder(evenQueueTime(hrs, overfill), ScienceBand.Band1)
 
 

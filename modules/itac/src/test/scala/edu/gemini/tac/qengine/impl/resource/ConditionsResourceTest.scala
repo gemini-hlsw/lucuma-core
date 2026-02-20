@@ -3,62 +3,62 @@
 
 package edu.gemini.tac.qengine.impl.resource
 
+import cats.implicits.*
+import edu.gemini.tac.qengine.ItacSuite
 import edu.gemini.tac.qengine.api.config.ConditionsBin
 import edu.gemini.tac.qengine.api.config.ConditionsCategory as Cat
 import edu.gemini.tac.qengine.api.config.ConditionsCategoryMap
 import edu.gemini.tac.qengine.impl.block.Block
 import edu.gemini.tac.qengine.log.RejectConditions
 import edu.gemini.tac.qengine.p1.*
-import edu.gemini.tac.qengine.util.Percent
 import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.Site
+import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.TimeAccountingCategory
+import lucuma.core.enums.WaterVapor
+import lucuma.core.model.CloudExtinction
+import lucuma.core.model.ConstraintSet
+import lucuma.core.model.ElevationRange
+import lucuma.core.model.ImageQuality
+import lucuma.core.model.IntCentiPercent
 import lucuma.core.util.Enumerated
-import munit.FunSuite
 
-import CloudCover.*
-import ImageQuality.IQ20
-import SkyBackground.SB20
-import WaterVapor.WV20
 import Cat.*
 
-class ConditionsResourceTest extends FunSuite{
+class ConditionsResourceTest extends ItacSuite {
   import TimeAccountingCategory.KR
   val TimeAccountingCategorys = Enumerated[TimeAccountingCategory].all
 
   private val bins = ConditionsBin.of(
-      (Cat(Eq(CC50)),  Percent(25)),
-      (Cat(Eq(CC70)),  Percent(25)),
-      (Cat(Eq(CC80)),  Percent(25)),
-      (Cat(Eq(CCAny)), Percent(25))
-    )
+    CloudExtinction.Preset.values.map { ce =>
+      (Cat(Eq(ce)), IntCentiPercent.unsafeFromPercent(100 / CloudExtinction.Preset.values.length))
+    }*)
 
   private val binGrp = ConditionsCategoryMap.of(bins)
   private val resGrp = ConditionsCategoryMapResource(Time.minutes(100), binGrp)
 
   private val ntac   = Ntac(KR, "x", 0, Time.minutes(100)) // not used
-  private val target = Target(0,0)                               // not used
+  private val target = ItacTarget(0,0)                               // not used
 
-  private def mkProp(obsConds: ObservingConditions): Proposal = {
-    val obsList = List(Observation(target, obsConds, Time.minutes(10)))
+  private def mkProp(obsConds: ConstraintSet): Proposal = {
+    val obsList = List(ItacObservation(target, obsConds, Time.minutes(10)))
     Proposal(ntac, site = Site.GS, obsList = obsList)
   }
 
-  private def mkConds(cc: CloudCover): ObservingConditions =
-    ObservingConditions(cc, IQ20, SB20, WV20)
+  private def mkConds(cc: CloudExtinction.Preset): ConstraintSet =
+    ConstraintSet(ImageQuality.Preset.PointOne, cc, SkyBackground.Darkest, WaterVapor.VeryDry, ElevationRange.ByAirMass.Default)
 
   // Verify that the given remaining times match -- times must be specified
   // in order of CloudCover values.
   private def verifyTimes(track: ConditionsCategoryMapResource, mins: Int*) = {
-    CloudCover.values.zip(mins).foreach {
-      case (cc, min) => {
-        val remaining = track.remaining(mkConds(cc))
-        assertEquals(Time.minutes(min), remaining)
-      }
-    }
+    val expected = mins.map(m => Time.minutes(m.toDouble))
+    val obtained = 
+      CloudExtinction.Preset.values.toList.map: cc =>
+        track.remaining(mkConds(cc))
+    assertEquals(obtained.mkString(", "), expected.mkString(", ")) // diff is easier to read this way
   }
 
-  private def testSuccess(time: Time, cnds: ObservingConditions, mins: Int*) = {
+  private def testSuccess(time: Time, cnds: ConstraintSet, mins: Int*) = {
     val (newResGrp, rem) = resGrp.reserveAvailable(time, cnds)
     assertEquals(Time.Zero, rem)
     verifyTimes(newResGrp, mins*)
@@ -73,49 +73,58 @@ class ConditionsResourceTest extends FunSuite{
 
   test("testSimpleReservationThatRequiresNoTimeFromABetterBin") {
     val time  = Time.minutes(10)
-    val cnds  = mkConds(CC70)
+    val cnds  = mkConds(CloudExtinction.Preset.PointThree)
 
-    // Given 25 minutes for CC70, we should be able to fully reserve the time
+    // Given 14 minutes for PointThree, we should be able to fully reserve the time
     // in the corresponding bin.
-    // CC50:  25 -  0 = 25 (25 <- 25)
-    // CC70:  25 - 10 = 15 (40 <- 15 + 25)
-    // CC80:  25 -  0 = 25 (65 <- 25 + 15 + 25)
-    // Any.:  25 -  0 = 25 (90 <- 25 + 25 + 15 + 25)
-    testSuccess(time, cnds, 25, 40, 65, 90)
+    // Zero          : 14 -  0 = 14 (+14 = 14)
+    // PointOne      : 14 -  0 = 14 (+14 = 28)
+    // PointThree    : 14 - 10 =  4 ( +4 = 32)
+    // PointFive     : 14 -  0 = 14 (+14 = 46)
+    // OnePointZero  : 14 -  0 = 14 (+14 = 60)
+    // TwoPointZero  : 14 -  0 = 14 (+14 = 74)
+    // ThreePointZero: 14 -  0 = 14 (+14 = 80)
+    testSuccess(time, cnds, 14, 28, 32, 46, 60, 74, 88)
   }
 
   test("testStealTimeFromABetterBin") {
-    val time  = Time.minutes(51)
-    val cnds  = mkConds(CC80)
+    val time  = Time.minutes(29)
+    val cnds  = mkConds(CloudExtinction.Preset.OnePointZero)
 
-    // Given 51 minutes for CC80, we use all 25 minutes of CC80, all 25 of CC70,
-    // and 1 minute of CC50.
-    // CC50:  25 -  1 = 24 (24 <- 24)
-    // CC70:  25 - 25 =  0 (24 <-  0 + 24)
-    // CC80:  25 - 25 =  0 (24 <-  0 +  0 + 24)
-    // Any.:  25 -  0 = 25 (49 <- 25 +  0 +  0 + 24)
-    testSuccess(time, cnds, 24, 24, 24, 49)
+    // Given 29 minutes for OnePointZero, we use all 14 minutes of OnePointZero, all 14 of PointFive,
+    // and 1 minute of PointThree.
+    // Zero          : 14 -  0 = 14 (+14 = 14) 
+    // PointOne      : 14 -  0 = 14 (+14 = 28) 
+    // PointThree    : 14 -  1 = 13 (+13 = 41) 
+    // PointFive     : 14 - 14 =  0 (+ 0 = 41) 
+    // OnePointZero  : 14 - 14 =  0 (+ 0 = 41) 
+    // TwoPointZero  : 14 -  0 = 14 (+14 = 55) 
+    // ThreePointZero: 14 -  0 = 14 (+14 = 69) 
+    testSuccess(time, cnds, 14, 28, 41, 41, 41, 55, 69)
   }
 
   test("testStealExactlyAllRemainingTimeFromBetterBins") {
-    val time  = Time.minutes(75)
-    val cnds  = mkConds(CC80)
+    val time  = Time.minutes(14 * 5)
+    val cnds  = mkConds(CloudExtinction.Preset.OnePointZero)
 
-    // CC50:  25 - 25 =  0 ( 0 <-  0)
-    // CC70:  25 - 25 =  0 ( 0 <-  0 +  0)
-    // CC80:  25 - 25 =  0 ( 0 <-  0 +  0 +  0)
-    // Any.:  25 -  0 = 25 (25 <- 25 +  0 +  0 + 0)
-    testSuccess(time, cnds, 0, 0, 0, 25)
+    // Zero          : 14 - 14 =  0 (+ 0 =  0) 
+    // PointOne      : 14 - 14 =  0 (+ 0 =  0) 
+    // PointThree    : 14 - 14 =  0 (+ 0 =  0) 
+    // PointFive     : 14 - 14 =  0 (+ 0 =  0) 
+    // OnePointZero  : 14 - 14 =  0 (+ 0 =  0) 
+    // TwoPointZero  : 14 -  0 = 14 (+14 = 14) 
+    // ThreePointZero: 14 -  0 = 14 (+14 = 28) 
+    testSuccess(time, cnds, 0, 0, 0, 0, 0, 14, 28)
   }
 
   test("testAttemptToReserveMoreThanAvailable") {
-    val (newGrp, rem) = resGrp.reserveAvailable(Time.minutes(76), mkConds(CC80))
-    verifyTimes(newGrp, 0, 0, 0, 25)
+    val (newGrp, rem) = resGrp.reserveAvailable(Time.minutes(14 * 5 + 1), mkConds(CloudExtinction.Preset.OnePointZero))
+    verifyTimes(newGrp, 0, 0, 0, 0, 0, 14, 28)
     assertEquals(Time.minutes(1), rem) // 1 minute could not be reserved
   }
 
   test("testCannotStealMoreThanThanAvailableFromBetterBins") {
-    val prop = mkProp(mkConds(CC80))
+    val prop = mkProp(mkConds(CloudExtinction.Preset.OnePointZero))
 
     val otb2 = Block(prop, prop.obsList.head, Time.minutes(76))
     resGrp.reserve(otb2, Fixture.emptyQueue) match {

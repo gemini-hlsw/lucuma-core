@@ -3,21 +3,35 @@
 
 package edu.gemini.tac.qengine.impl.block
 
+import edu.gemini.tac.qengine.ItacSuite
 import edu.gemini.tac.qengine.p1.*
 import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.Site
+import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.TimeAccountingCategory
+import lucuma.core.enums.WaterVapor
+import lucuma.core.model.CloudExtinction
+import lucuma.core.model.ConstraintSet
+import lucuma.core.model.ElevationRange
+import lucuma.core.model.ImageQuality
 import lucuma.core.util.Enumerated
 import org.junit.*
 
 import Assert.*
 
-class TimeAccountingCategoryBlockIteratorTest {
+class TimeAccountingCategoryBlockIteratorTest extends ItacSuite {
   import TimeAccountingCategory.AR
   val TimeAccountingCategorys = Enumerated[TimeAccountingCategory].all
 
-  val target = Target(0.0, 0.0) // required but not used for this test
-  val conds  = ObservingConditions.AnyConditions // required by not used
+  val target = ItacTarget(0.0, 0.0) // required but not used for this test
+  private val conds =
+    ConstraintSet(
+      ImageQuality.Preset.TwoPointZero,
+      CloudExtinction.Preset.ThreePointZero,
+      SkyBackground.Bright,
+      WaterVapor.Wet,
+      ElevationRange.ByAirMass.Default
+    )
   val e      = 0.000001
 
   case class IdGen(num: Int = 0) {
@@ -27,23 +41,23 @@ class TimeAccountingCategoryBlockIteratorTest {
 
   var gen = IdGen()
 
-  def mkObs(hrs: Double): Observation = Observation(target, conds, Time.hours(hrs))
+  def mkObs(hrs: Double): ItacObservation = ItacObservation(target, conds, Time.hours(hrs))
 
   def mkProp(hrs: Double, obsHrs: Double*): Proposal = {
     val ntac = Ntac(AR, gen.id, 0, Time.hours(hrs))
     gen = gen.next
-    val lst  = obsHrs.map(curHrs => Observation(target, conds, Time.hours(curHrs))).toList
+    val lst  = obsHrs.map(curHrs => ItacObservation(target, conds, Time.hours(curHrs))).toList
     Proposal(ntac, site = Site.GS, obsList = lst)
   }
 
-  @Test def testCreateEmpty() = {
+  test("testCreateEmpty") {
     val it = TimeAccountingCategoryBlockIterator(Nil, _.obsList)
     assertEquals(false, it.hasNext)
   }
 
   private def validate(it: TimeAccountingCategoryBlockIterator,
                        propList: List[Proposal],
-                       obsList: List[Observation],
+                       obsList: List[ItacObservation],
                        time: Double) = {
 
     assertEquals(propList, it.remainingProposals)
@@ -53,14 +67,14 @@ class TimeAccountingCategoryBlockIteratorTest {
     assertEquals(obsList.head,  it.currentObservation)
   }
 
-  @Test def testCreateSinglePropSingleObsFull() = {
+  test("testCreateSinglePropSingleObsFull") {
     val lst = List(mkProp(10, 10))
     val it = TimeAccountingCategoryBlockIterator(lst, _.obsList)
     assertTrue(it.hasNext)
     validate(it, lst, lst.head.obsList, 10)
   }
 
-  @Test def testAdvancePartialObs() = {
+  test("testAdvancePartialObs") {
     val lst = List(mkProp(10, 10))
     val it = TimeAccountingCategoryBlockIterator(lst, _.obsList)
 
@@ -72,7 +86,7 @@ class TimeAccountingCategoryBlockIteratorTest {
     assertEquals(5.0, block.time.toHours.value, e)
   }
 
-  @Test def testCanAdvancePartialObservationInBand3() = {
+  test("testCanAdvancePartialObservationInBand3") {
     //NB: Note how this is structured exactly like above, but in B3
     val lst = List(mkProp(11, 10).copy(band3Observations = List(mkObs(11))))
     val it = TimeAccountingCategoryBlockIterator(lst, _.band3Observations)
@@ -84,7 +98,7 @@ class TimeAccountingCategoryBlockIteratorTest {
     assertEquals(5.0, block.time.toHours.value, e)
   }
 
-  @Test def testTryAdvancePastObs() = {
+  test("testTryAdvancePastObs") {
     val lst = List(mkProp(10, 10))
     val it = TimeAccountingCategoryBlockIterator(lst, _.obsList)
 
@@ -95,7 +109,7 @@ class TimeAccountingCategoryBlockIteratorTest {
     assertEquals(10.0, block.time.toHours.value, e)
   }
 
-  @Test def testAdvanceLastObs() = {
+  test("testAdvanceLastObs") {
     val lst = List(mkProp(10, 10))
     val it = TimeAccountingCategoryBlockIterator(lst, _.obsList)
 
@@ -107,7 +121,7 @@ class TimeAccountingCategoryBlockIteratorTest {
     assertEquals(10.0, block.time.toHours.value, e)
   }
 
-  @Test def testAdvanceObs() = {
+  test("testAdvanceObs") {
     val lst = List(mkProp(20, 10, 10))
     val it = TimeAccountingCategoryBlockIterator(lst, _.obsList)
 
@@ -127,7 +141,7 @@ class TimeAccountingCategoryBlockIteratorTest {
     assertEquals(10.0, block2.time.toHours.value, e)
   }
 
-  @Test def testAdvanceProp() = {
+  test("testAdvanceProp") {
     val lst = List(mkProp(20, 10, 10), mkProp(10, 5, 5))
     val it = TimeAccountingCategoryBlockIterator(lst, _.obsList)
 
@@ -136,7 +150,7 @@ class TimeAccountingCategoryBlockIteratorTest {
     validate(it2, lst.tail, lst.tail.head.obsList, 5)
   }
 
-  @Test def testAdvanceToEnd() = {
+  test("testAdvanceToEnd") {
     val lst = List(mkProp(20, 10, 10), mkProp(10, 5, 5))
     val it = TimeAccountingCategoryBlockIterator(lst, _.obsList)
 
@@ -145,27 +159,27 @@ class TimeAccountingCategoryBlockIteratorTest {
     assertFalse(it2.hasNext)
   }
 
-  @Test def testSkipFromBegining() = {
+  test("testSkipFromBegining") {
     val lst = List(mkProp(20, 10, 10), mkProp(10, 5, 5))
     val it = TimeAccountingCategoryBlockIterator(lst, _.obsList)
     val it2 = it.skip(_.obsList)
     validate(it2, lst.tail, lst.tail.head.obsList, 5)
   }
 
-  @Test def testSkipFromMiddle() = {
+  test("testSkipFromMiddle") {
     val lst = List(mkProp(20, 10, 10), mkProp(10, 5, 5))
     val it = TimeAccountingCategoryBlockIterator(lst, _.obsList)
     val it2 = it.next(Time.hours(10), _.obsList)._2.skip(_.obsList)
     validate(it2, lst.tail, lst.tail.head.obsList, 5)
   }
 
-  @Test def testEmpty() = {
+  test("testEmpty") {
     val it = TimeAccountingCategoryBlockIterator(Nil, _.obsList)
     val it2 = it.skip(_.obsList)
     assertFalse(it2.hasNext)
   }
 
-  @Test def testStart() = {
+  test("testStart") {
     val prop1 = mkProp(20, 10, 10)
     val prop2 = mkProp(10,  5,  5)
     val lst   = List(prop1, prop2)

@@ -9,10 +9,10 @@ import edu.gemini.tac.qengine.api.config.ConditionsCategoryMap
 import edu.gemini.tac.qengine.impl.block.Block
 import edu.gemini.tac.qengine.impl.queue.ProposalQueueBuilder
 import edu.gemini.tac.qengine.log.*
-import edu.gemini.tac.qengine.p1.ObservingConditions
 import edu.gemini.tac.qengine.util.BoundedTime
-import edu.gemini.tac.qengine.util.Percent
 import edu.gemini.tac.qengine.util.Time
+import lucuma.core.model.ConstraintSet
+import lucuma.core.model.IntCentiPercent
 
 import annotation.tailrec
 
@@ -33,7 +33,7 @@ object ConditionsCategoryMapResource {
    * Constructs with the total time to spread across the observing conditions
    * bins and the set of bins to use.
    */
-  def apply(t: Time, g: ConditionsCategoryMap[Percent]) = {
+  def apply(t: Time, g: ConditionsCategoryMap[IntCentiPercent]) = {
     // Creates a map from ConditionsBin.Category to BoundedTime initialized with
     // time values according to the relative percentage of the matching
     // conditions bin.
@@ -49,17 +49,17 @@ object ConditionsCategoryMapResource {
 final class ConditionsCategoryMapResource private (val bins: ConditionsCategoryMap[BoundedTime]) extends Resource {
   type T = ConditionsCategoryMapResource
 
-  private def sum(c: ObservingConditions, f: (BoundedTime => Time)): Time = {
+  private def sum(c: ConstraintSet, f: (BoundedTime => Time)): Time = {
     val cats = bins.searchPath(c)
     cats.foldLeft(Time.Minutes.zero)((t: Time, cat: Cat) => t + f(bins(cat)))
   }
 
-  def limit(c: ObservingConditions): Time = sum(c, _.limit)
-  def remaining(c: ObservingConditions): Time = sum(c, _.remaining)
-  def isFull(c: ObservingConditions): Boolean = remaining(c).isZero
+  def limit(c: ConstraintSet): Time = sum(c, _.limit)
+  def remaining(c: ConstraintSet): Time = sum(c, _.remaining)
+  def isFull(c: ConstraintSet): Boolean = remaining(c).isZero
 
-  private def conds(block: Block): ObservingConditions =
-    block.obs.conditions
+  private def conds(block: Block): ConstraintSet =
+    block.obs.constraintSet
 
 
   /**
@@ -82,7 +82,7 @@ final class ConditionsCategoryMapResource private (val bins: ConditionsCategoryM
    * returned.   Returns a new conditions resource group with the reserved time
    * along with any remaining time that could not be reserved.
    */
-  def reserveAvailable(time: Time, conds: ObservingConditions): (ConditionsCategoryMapResource, Time) = {
+  def reserveAvailable(time: Time, conds: ConstraintSet): (ConditionsCategoryMapResource, Time) = {
     val (updatedBins, rem) = ConditionsCategoryMapResource.reserveAvailable(time, bins.searchBins(conds), Nil)
     (new ConditionsCategoryMapResource(bins.updated(updatedBins)), rem)
   }

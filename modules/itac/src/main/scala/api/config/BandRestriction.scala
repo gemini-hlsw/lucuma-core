@@ -3,13 +3,13 @@
 
 package edu.gemini.tac.qengine.api.config
 
-import edu.gemini.tac.qengine.p1.ImageQuality.IQ20
+import cats.syntax.all.*
 import edu.gemini.tac.qengine.p1.Proposal
 import lucuma.core.enums.ScienceBand
+import lucuma.core.enums.ScienceBand.*
 import lucuma.core.enums.ScienceSubtype
 import lucuma.core.enums.ToOActivation
-
-import ScienceBand.*
+import lucuma.core.model.ImageQuality
 
 case class BandRestriction(name: String, bands: Set[ScienceBand])(val matches: Proposal => Boolean)
 
@@ -42,7 +42,7 @@ object BandRestriction {
 
   def iq20: BandRestriction =
     BandRestriction(Iq20Name, Set(Band1, Band2)) {
-      prop => prop.band3Observations.exists(_.conditions.iq == IQ20)
+      prop => prop.band3Observations.exists(_.constraintSet.imageQuality === ImageQuality.Preset.PointOne)
     }
 
   // Required to remove any proposal that is not-band3 that is pushed into

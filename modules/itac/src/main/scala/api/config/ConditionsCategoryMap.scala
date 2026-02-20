@@ -3,8 +3,8 @@
 
 package edu.gemini.tac.qengine.api.config
 
-import edu.gemini.tac.qengine.p1.ObservingConditions
-import edu.gemini.tac.qengine.util.Percent
+import lucuma.core.model.ConstraintSet
+import lucuma.core.model.IntCentiPercent
 
 /**
  * A mapping from conditions categories to values `A`, along with a search path that allows
@@ -26,7 +26,7 @@ final case class ConditionsCategoryMap[A](
     new ConditionsCategoryMap[A](bins ++ that, searchPath)
   }
 
-  def updated(oc: ObservingConditions, newValue: A): ConditionsCategoryMap[A] =
+  def updated(oc: ConstraintSet, newValue: A): ConditionsCategoryMap[A] =
     updated(category(oc), newValue)
 
   def updated(c: ConditionsCategory, newValue: A): ConditionsCategoryMap[A] = {
@@ -40,13 +40,13 @@ final case class ConditionsCategoryMap[A](
   def map[B](f: A => B): ConditionsCategoryMap[B] =
     new ConditionsCategoryMap[B](bins.map { case (k,v) => (k, f(v)) }, searchPath)
 
-  def category(oc: ObservingConditions): ConditionsCategory = searchPath.category(oc)
+  def category(oc: ConstraintSet): ConditionsCategory = searchPath.category(oc)
 
   /**
    * Gets the ordered list of ConditionsBin associated with the category into
    * which the given observing conditions fall.
    */
-  def searchBins(oc: ObservingConditions): List[ConditionsBin[A]] =
+  def searchBins(oc: ConstraintSet): List[ConditionsBin[A]] =
     searchPath(oc).map(cat => ConditionsBin(cat, bins(cat)))
 
 }
@@ -60,7 +60,7 @@ object ConditionsCategoryMap {
     new ConditionsCategoryMap(map, path)
   }
 
-  def ofPercent(bins: (ConditionsCategory, Double)*): ConditionsCategoryMap[Percent] =
+  def ofPercent(bins: (ConditionsCategory, Double)*): ConditionsCategoryMap[IntCentiPercent] =
     of(ConditionsBin.ofPercent(bins*))
 
 }

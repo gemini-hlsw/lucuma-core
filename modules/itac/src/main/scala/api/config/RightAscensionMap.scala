@@ -3,7 +3,7 @@
 
 package edu.gemini.tac.qengine.api.config
 
-import edu.gemini.tac.qengine.p1.Target
+import edu.gemini.tac.qengine.p1.ItacTarget
 import lucuma.core.math.HourAngle
 import lucuma.core.math.RightAscension
 
@@ -66,7 +66,7 @@ case class RightAscensionMap[T] private (val bins: IndexedSeq[T]) {
 
   def apply(min: Int): T  = bins((min % TotalMin) / sizeMin)
   def apply(ra: RightAscension): T  = bins(indexOf(ra))
-  def apply(t: Target): T = apply(t.ra)
+  def apply(t: ItacTarget): T = apply(t.ra)
 
   def map[U](f: T => U): RightAscensionMap[U] = new RightAscensionMap[U](bins.map(f))
 }

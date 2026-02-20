@@ -3,6 +3,7 @@
 
 package edu.gemini.tac.qengine.impl.resource
 
+import edu.gemini.tac.qengine.ItacSuite
 import edu.gemini.tac.qengine.api.config.DecRanged
 import edu.gemini.tac.qengine.api.config.DeclinationMap
 import edu.gemini.tac.qengine.impl.block.Block
@@ -11,15 +12,20 @@ import edu.gemini.tac.qengine.p1.*
 import edu.gemini.tac.qengine.util.BoundedTime
 import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.Site
+import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.enums.ToOActivation
+import lucuma.core.enums.WaterVapor
+import lucuma.core.model.CloudExtinction
+import lucuma.core.model.ConstraintSet
+import lucuma.core.model.ElevationRange
+import lucuma.core.model.ImageQuality
 import lucuma.core.util.Enumerated
-import munit.FunSuite
 import org.junit.*
 
 import Assert.*
 
-class DecResourceTest extends FunSuite {
+class DecResourceTest extends ItacSuite {
   import TimeAccountingCategory.KR
   val TimeAccountingCategorys = Enumerated[TimeAccountingCategory].all
 
@@ -28,7 +34,7 @@ class DecResourceTest extends FunSuite {
   private val binGrp = DeclinationMap.fromBins(bin1, bin2)
   private val grp    = new DeclinationMapResource(binGrp)
 
-  private def target(dec: Double): Target = Target(0.0, dec)
+  private def target(dec: Double): ItacTarget = ItacTarget(0.0, dec)
 
   private val targetNeg = target(-1)    // before bin1
   private val target0   = target( 0)    // start of bin1
@@ -37,11 +43,19 @@ class DecResourceTest extends FunSuite {
 //  private val target19  = target(19.99) // within bin2
   private val target20  = target(20)    // after bin2
 
-  private val conds = ObservingConditions.AnyConditions
+  private val conds =
+    ConstraintSet(
+      ImageQuality.Preset.TwoPointZero,
+      CloudExtinction.Preset.ThreePointZero,
+      SkyBackground.Bright,
+      WaterVapor.Wet,
+      ElevationRange.ByAirMass.Default
+    )
+
   private val ntac = Ntac(KR, "x", 0, Time.Zero)
 
-  private def mkProp(target: Target): Proposal =
-    Proposal(ntac, site = Site.GS, obsList = List(Observation(target, conds, Time.Zero)))
+  private def mkProp(target: ItacTarget): Proposal =
+    Proposal(ntac, site = Site.GS, obsList = List(ItacObservation(target, conds, Time.Zero)))
 
   test("testNormalReserveWithRemainingTime") {
     val prop   = mkProp(target0)

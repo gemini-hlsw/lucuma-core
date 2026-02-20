@@ -3,18 +3,19 @@
 
 package edu.gemini.tac.qengine.impl.resource
 
+import edu.gemini.tac.qengine.ItacSuite
 import edu.gemini.tac.qengine.impl.block.Block
 import edu.gemini.tac.qengine.log.RejectConditions
 import edu.gemini.tac.qengine.log.RejectTarget
 import edu.gemini.tac.qengine.p1.*
 import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.TimeAccountingCategory
+import lucuma.core.model.ConstraintSet
 import lucuma.core.util.Enumerated
-import munit.FunSuite
 
 import Fixture.{badCC, emptyQueue, goodCC}
 
-class PerRightAscensionResourceTest extends FunSuite {
+class PerRightAscensionResourceTest extends ItacSuite {
   import TimeAccountingCategory.KR
   val TimeAccountingCategorys = Enumerated[TimeAccountingCategory].all
 
@@ -24,11 +25,11 @@ class PerRightAscensionResourceTest extends FunSuite {
 
   private val ntac = Ntac(KR, "x", 0, Time.Zero)
 
-  private def mkProp(target: Target, conds: ObservingConditions): Proposal =
+  private def mkProp(target: ItacTarget, conds: ConstraintSet): Proposal =
     Fixture.mkProp(ntac,  (target, conds, Time.Zero))
 
   private def verifyReserve(raRes: PerRightAscensionResource) = {
-    val target = Target(15.0, 0.0) // RA 1hr, Dec 0 deg
+    val target = ItacTarget(15.0, 0.0) // RA 1hr, Dec 0 deg
 
     // Took 15 minutes of the total of 1 hour for RA 1 hr at dec 0-45
     assertEquals(Time.minutes(45), raRes.remaining(target))
@@ -40,7 +41,7 @@ class PerRightAscensionResourceTest extends FunSuite {
 
     // Didn't touch the time for the upper half of the Dec Range.  Should
     // still have all 30 minutes left.
-    assertEquals(Time.minutes(30), raRes.remaining(Target(15.0, 45.0)))
+    assertEquals(Time.minutes(30), raRes.remaining(ItacTarget(15.0, 45.0)))
 
     // The poor CC conditions have 30 + the 15 remaining for the good CC.
     assertEquals(Time.minutes(45), raRes.remaining(badCC))
@@ -50,7 +51,7 @@ class PerRightAscensionResourceTest extends FunSuite {
   }
 
   test("testReserve") {
-    val target = Target(15.0, 0.0) // RA 1hr, Dec 0 deg
+    val target = ItacTarget(15.0, 0.0) // RA 1hr, Dec 0 deg
     val prop   = mkProp(target, goodCC)
     val block  = Block(prop, prop.obsList.head, Time.minutes(15))
 
@@ -61,7 +62,7 @@ class PerRightAscensionResourceTest extends FunSuite {
   }
 
   test("testReserveAvailable") {
-    val target = Target(15.0, 0.0) // RA 1hr, Dec 0 deg
+    val target = ItacTarget(15.0, 0.0) // RA 1hr, Dec 0 deg
     val raGrp  = Fixture.raResGroup.grp(target)
     val (newRes, rem) = raGrp.reserveAvailable(Time.minutes(15), target, goodCC)
 
@@ -70,20 +71,20 @@ class PerRightAscensionResourceTest extends FunSuite {
   }
 
   test("testGroupReserveAvailable") {
-    val target = Target(15.0, 0.0) // RA 1hr, Dec 0 deg
+    val target = ItacTarget(15.0, 0.0) // RA 1hr, Dec 0 deg
     val (grp2, rem2) = Fixture.raResGroup.reserveAvailable(Time.minutes(15), target, goodCC)
     assertEquals(Time.Zero, rem2)
     verifyReserve(grp2.grp(target))
   }
 
   test("testReserve2") {
-    val target = Target(15.0, 0.0) // RA 1hr, Dec 0 deg
+    val target = ItacTarget(15.0, 0.0) // RA 1hr, Dec 0 deg
     val prop   = mkProp(target, goodCC)
     val block  = Block(prop, prop.obsList.head, Time.minutes(15))
 
     val grp    = Fixture.raResGroup.grp(target).reserve(block, emptyQueue).toOption.get
 
-    val target2 = Target(15.0, 45.0) // RA 1hr, Dec 45 deg
+    val target2 = ItacTarget(15.0, 45.0) // RA 1hr, Dec 45 deg
     val prop2   = mkProp(target2, badCC)
     val block2  = Block(prop2, prop2.obsList.head, Time.minutes(15))
 
@@ -132,7 +133,7 @@ class PerRightAscensionResourceTest extends FunSuite {
   // Test that the absolute limit comes into play even if there is time
   // remaining for the obs conditions and dec.
   test("testOverPrescribeAbsolute") {
-    val target = Target(15.0, 0.0) // RA 1hr, Dec 0 deg
+    val target = ItacTarget(15.0, 0.0) // RA 1hr, Dec 0 deg
     val prop = mkProp(target, badCC) // 1 hour limit for obs like this
 
     // Take almost all the time
@@ -145,7 +146,7 @@ class PerRightAscensionResourceTest extends FunSuite {
 
     // Create a target in the upper half of the dec range.  It's bin has
     // 30 minutes left, not considering the absolute limit for the RA.
-    val target2 = Target(15.0, 45.0) // RA 1hr, Dec 45 deg
+    val target2 = ItacTarget(15.0, 45.0) // RA 1hr, Dec 45 deg
     val prop2 = mkProp(target2, badCC) // 1 hour limit for obs like this
 
     // Try to schedule this block, which would work if it weren't for the
@@ -158,7 +159,7 @@ class PerRightAscensionResourceTest extends FunSuite {
   }
 
   test("testReserveAvailableLimitedByAbsoluteTimeForRA") {
-    val target = Target(15.0, 0.0) // RA 1hr, Dec 0 deg
+    val target = ItacTarget(15.0, 0.0) // RA 1hr, Dec 0 deg
 
     val raRes1 = Fixture.raResGroup.grp(target)
     val (raRes2, rem2) = raRes1.reserveAvailable(Time.minutes(59.9), target, badCC)
@@ -169,14 +170,14 @@ class PerRightAscensionResourceTest extends FunSuite {
 
     // Create a target in the upper half of the dec range.  It's bin has
     // 30 minutes left, not considering the absolute limit for the RA.
-    val target2 = Target(15.0, 45.0) // RA 1hr, Dec 45 deg
+    val target2 = ItacTarget(15.0, 45.0) // RA 1hr, Dec 45 deg
     val (raRes3, rem3) = raRes2.reserveAvailable(Time.minutes(0.11), target2, badCC)
     assertEquals(0.01, rem3.toMinutes.value, 0.000001)
     assert(raRes3.isFull)
   }
 
   test("testOverPrescribeDec") {
-    val target = Target(15.0, 45.0)  // RA 1hr, Dec 45 deg -> 30 min dec
+    val target = ItacTarget(15.0, 45.0)  // RA 1hr, Dec 45 deg -> 30 min dec
     val prop = mkProp(target, badCC) // 30 min dec limit, 1 hour conds limit
 
     // Take almost all the time for the dec
@@ -195,7 +196,7 @@ class PerRightAscensionResourceTest extends FunSuite {
   }
 
   test("testReserveAvailableLimitedByDec") {
-    val target = Target(15.0, 45.0)  // RA 1hr, Dec 45 deg -> 30 min dec
+    val target = ItacTarget(15.0, 45.0)  // RA 1hr, Dec 45 deg -> 30 min dec
     val raRes1 = Fixture.raResGroup.grp(target)
 
     // Take almost all the time for the dec
@@ -213,7 +214,7 @@ class PerRightAscensionResourceTest extends FunSuite {
   }
 
   test("testOverPrescribeConds") {
-    val target = Target(15.0, 0.0) // RA 1hr, Dec 0 deg -> 60 min dec limit
+    val target = ItacTarget(15.0, 0.0) // RA 1hr, Dec 0 deg -> 60 min dec limit
     val prop = mkProp(target, goodCC) // 60 min dec limit, 30 mins conds limit
 
     // Take almost all the time for the conditions
@@ -232,7 +233,7 @@ class PerRightAscensionResourceTest extends FunSuite {
   }
 
   test("testReserveAvailableLimitedByConds") {
-    val target = Target(15.0, 0.0) // RA 1hr, Dec 0 deg -> 60 min dec limit
+    val target = ItacTarget(15.0, 0.0) // RA 1hr, Dec 0 deg -> 60 min dec limit
     val raRes1 = Fixture.raResGroup.grp(target)
 
     // Uses almost all the time available for good CC.
@@ -250,7 +251,7 @@ class PerRightAscensionResourceTest extends FunSuite {
   }
 
   test("testFull") {
-    val target = Target(0.0, 0.0) // RA 0 hr, Dec 0 deg -> 0 min dec limit
+    val target = ItacTarget(0.0, 0.0) // RA 0 hr, Dec 0 deg -> 0 min dec limit
     assert(Fixture.raResGroup.grp(target).isFull)
     assert(Fixture.raResGroup.grp(target).isFull(target))
     assert(Fixture.raResGroup.grp(target).isFull(goodCC))

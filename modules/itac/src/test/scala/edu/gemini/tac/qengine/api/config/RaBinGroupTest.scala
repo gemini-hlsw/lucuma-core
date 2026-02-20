@@ -3,17 +3,17 @@
 
 package edu.gemini.tac.qengine.api.config
 
-import edu.gemini.tac.qengine.p1.Target
+import edu.gemini.tac.qengine.ItacSuite
+import edu.gemini.tac.qengine.p1.ItacTarget
 import edu.gemini.tac.qengine.util.Time
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Declination
 import lucuma.core.math.HourAngle
 import lucuma.core.math.RightAscension
-import munit.FunSuite
 
 import scala.annotation.unused
 
-class RaBinGroupTest extends FunSuite {
+class RaBinGroupTest extends ItacSuite {
 
   // The function just generates a Time amount in minutes equal to the Angle.
   // So, a 30 min Angle yields 30 minutes of time.  This makes it easy to test.
@@ -58,7 +58,7 @@ class RaBinGroupTest extends FunSuite {
   }
 
   test("testLookupTarget") {
-    validateLookup((g, m) => g(Target(Coordinates(RightAscension(HourAngle.fromDoubleMinutes(m)), Declination.Zero))))
+    validateLookup((g, m) => g(ItacTarget(Coordinates(RightAscension(HourAngle.fromDoubleMinutes(m)), Declination.Zero), null)))
   }
 
   test("testMap") {
