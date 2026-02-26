@@ -6,10 +6,10 @@ package edu.gemini.tac.qengine.util
 import cats.Monoid
 import cats.Order
 import lucuma.core.model.IntCentiPercent
-
 import Time.Units
 
 object Time {
+  
   sealed abstract class Units extends Ordered[Units] with Serializable {
     def msInUnit: Long
     def toTime(time: java.math.BigDecimal) : Time = toTime(time.doubleValue())
@@ -48,56 +48,31 @@ object Time {
     override def zero = ZeroHours
   }
 
-  val HoursPerNight = 10
-
-  object Nights extends Units {
-    def msInUnit =  HoursPerNight * Hours.msInUnit  // 10 hours in a night
-    override def toString = "nts"
-    override def zero = ZeroNights
-  }
-
-  val units = List(Millisecs, Seconds, Minutes, Hours, Nights)
+  val units = List(Millisecs, Seconds, Minutes, Hours)
 
   val Zero          = new Time(0, Millisecs)
   val ZeroMillisecs = Zero
   val ZeroSeconds   = Zero.toSeconds
   val ZeroMinutes   = Zero.toMinutes
   val ZeroHours     = Zero.toHours
-  val ZeroNights    = Zero.toNights
 
   def millisecs(ms: Long) = new Time(ms, Millisecs)
   def seconds(secs: Double) = new Time(Seconds.toMs(secs), Seconds)
   def minutes(mins: Double) = new Time(Minutes.toMs(mins), Minutes)
   def hours(hours: Double) = new Time(Hours.toMs(hours), Hours)
-  def nights(nights: Double) = new Time(Nights.toMs(nights), Nights)
 
-  def min(t0: Time, t1: Time): Time = if (t0 <= t1) t0 else t1
-  def max(t0: Time, t1: Time): Time = if (t0 >= t1) t0 else t1
-
-  // Allow expressions like p * t (and not just t * p)
-  class PercentMultiplier(p: IntCentiPercent) {
-    def *(t: Time): Time = t * p
-  }
-  implicit val toPercentMultiplier: IntCentiPercent => PercentMultiplier = (p: IntCentiPercent) => new PercentMultiplier(p)
-
-  implicit val MonoidTime: Monoid[Time] =
-    Monoid.instance(Zero, _ + _)
-
-  given Order[Time] = Order.fromLessThan(_ < _)
+  given Monoid[Time] = Monoid.instance(Zero, _ + _)
+  given Order[Time]  = Order.by(_.ms)
 
 }
 
-final class Time private (val ms: Long, val unit: Units) extends Ordered[Time] with Serializable {
+final class Time private (val ms: Long, val unit: Units) {
+  assert(ms >= 0)
 
   def isZero = ms == 0
   def toZero = if (ms == 0) this else new Time(0, unit)
 
   def value: Double = unit.toUnits(ms)
-  def compare(that: Time): Int = ms match {
-    case n if n < that.ms => -1
-    case n if n > that.ms =>  1
-    case _                =>  0
-  }
 
   def to(unit: Units): Time =
     if (unit == this.unit) this else new Time(ms, unit)
@@ -106,35 +81,29 @@ final class Time private (val ms: Long, val unit: Units) extends Ordered[Time] w
   def toSeconds: Time   = to(Time.Seconds)
   def toMinutes: Time   = to(Time.Minutes)
   def toHours: Time     = to(Time.Hours)
-  def toNights: Time    = to(Time.Nights)
-
-  override def toString = value.toString + " " + unit.toString
-
-  override def equals(other: Any): Boolean = other match {
-       case that: Time => ms == that.ms
-       case _ => false
-     }
 
   override def hashCode: Int = ms.hashCode
+  override def toString = s"$value $unit"
+
+  override def equals(other: Any): Boolean = 
+    other match
+      case that: Time => ms == that.ms
+      case _ => false
+
 
   def +(that: Time): Time = new Time(ms + that.ms, unit)
-  def -(that: Time): Time = new Time(ms - that.ms, unit)
+
+  def -(that: Time): Time =
+    val ms2 = ms - that.ms
+    if ms2 >= 0 then Time(ms2, unit) else unit.zero
+
   def *(p: IntCentiPercent): Time = percent(p.toPercent.toDouble)
   def /(d: Double): Time = new Time((ms / d.toLong), unit)
-  def unary_- : Time      = new Time(-ms, unit)
 
   def percent(p: Double): Time = p match {
-      case 0.0 => toZero
-      case 100.0 => this
-      case _ => new Time((ms * (p/100.0)).round, unit)
-    }
-
-  def min(that: Time): Time = if (this < that) this else that
-  def max(that: Time): Time = if (this > that) this else that
-
-//  def +(amt: Double): Time = Time(ms + unit.toMs(amt), unit)
-//  def *(amt: Double): Time = Time(ms * unit.toMs(amt), unit)
-//  def -(amt: Double): Time = Time(ms - unit.toMs(amt), unit)
-//  def /(amt: Double): Time = Time((ms.toDouble / unit.toMs(amt).toDouble).round, unit)
+    case 0.0 => toZero
+    case 100.0 => this
+    case _ => new Time((ms * (p/100.0)).round, unit)
+  }
 
 }
