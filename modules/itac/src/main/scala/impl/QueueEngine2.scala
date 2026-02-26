@@ -48,7 +48,7 @@ object QueueEngine2 extends QueueEngine {
     // Find all the observations that don't participate in the queue process, because their time
     // needs to be subtracted from the initail RightAscensionMapResource (which happens on construction). Then
     // finish building our SemesterResource
-    val rolloverObs: List[Observation]       = ???
+    val rolloverObs: List[ItacObservation]       = ???
     val classicalProps    = siteProposals(Band1).filter(_.mode == ScienceSubtype.Classical)
     val classicalObs      = classicalProps.flatMap(_.obsList)
     val rightAscensionMapResource   = RightAscensionMapResource(config.binConfig).reserveAvailable(rolloverObs ++ classicalObs)._1
@@ -60,7 +60,7 @@ object QueueEngine2 extends QueueEngine {
       siteProposals.map(_.filter(_.mode != ScienceSubtype.Classical))
 
     // All we need to construct an obs accessor is the banc.
-    def obsAccessor(band: ScienceBand): Proposal => List[Observation] = { p =>
+    def obsAccessor(band: ScienceBand): Proposal => List[ItacObservation] = { p =>
 
 
       if (band == Band3) p.band3Observations else p.obsList

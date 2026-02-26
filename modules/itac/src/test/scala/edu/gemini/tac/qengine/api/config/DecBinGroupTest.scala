@@ -3,37 +3,37 @@
 
 package edu.gemini.tac.qengine.api.config
 
-import edu.gemini.tac.qengine.p1.Target
-import edu.gemini.tac.qengine.util.Percent
+import edu.gemini.tac.qengine.ItacSuite
+import edu.gemini.tac.qengine.p1.ItacTarget
 import lucuma.core.math.Declination
-import munit.FunSuite
+import lucuma.core.model.IntCentiPercent
 
-class DecBinGroupTest extends FunSuite {
+class DecBinGroupTest extends ItacSuite {
 
-  private def f(decRange: DecRange): Option[Percent] = {
+  private def f(decRange: DecRange): Option[IntCentiPercent] = {
     decRange.startDeg match {
       case neg if neg < 0 => None
-      case pos => Some(Percent(decRange.startDeg))
+      case pos => Some(IntCentiPercent.unsafeFromPercent(decRange.startDeg))
     }
   }
 
   test("testGen10deg") {
     val grp = DeclinationMap.gen10DegBins(f)
     assertEquals(None, grp.get(Declination.fromDoubleDegrees(-10).get))
-    assertEquals(Percent(0), grp.get(Declination.Zero).get.binValue)
-    assertEquals(Percent(0), grp.get(Declination.fromDoubleDegrees(9.9).get).get.binValue)
-    assertEquals(Percent(80), grp.get(Declination.fromDoubleDegrees(80).get).get.binValue)
-    assertEquals(Percent(80), grp.get(Declination.fromDoubleDegrees(90).get).get.binValue)
+    assertEquals(IntCentiPercent.unsafeFromPercent(0), grp.get(Declination.Zero).get.binValue)
+    assertEquals(IntCentiPercent.unsafeFromPercent(0), grp.get(Declination.fromDoubleDegrees(9.9).get).get.binValue)
+    assertEquals(IntCentiPercent.unsafeFromPercent(80), grp.get(Declination.fromDoubleDegrees(80).get).get.binValue)
+    assertEquals(IntCentiPercent.unsafeFromPercent(80), grp.get(Declination.fromDoubleDegrees(90).get).get.binValue)
   }
 
   test("testGen20deg") {
     val grp = DeclinationMap.gen20DegBins(f)
     assertEquals(None, grp.get(Declination.fromDoubleDegrees(-10).get))
     assertEquals(None, grp.get(Declination.Zero))
-    assertEquals(Percent(10), grp.get(Declination.fromDoubleDegrees(10).get).get.binValue)
-    assertEquals(Percent(10), grp.get(Declination.fromDoubleDegrees(19.9).get).get.binValue)
-    assertEquals(Percent(70), grp.get(Declination.fromDoubleDegrees(70).get).get.binValue)
-    assertEquals(Percent(70), grp.get(Declination.fromDoubleDegrees(90).get).get.binValue)
+    assertEquals(IntCentiPercent.unsafeFromPercent(10), grp.get(Declination.fromDoubleDegrees(10).get).get.binValue)
+    assertEquals(IntCentiPercent.unsafeFromPercent(10), grp.get(Declination.fromDoubleDegrees(19.9).get).get.binValue)
+    assertEquals(IntCentiPercent.unsafeFromPercent(70), grp.get(Declination.fromDoubleDegrees(70).get).get.binValue)
+    assertEquals(IntCentiPercent.unsafeFromPercent(70), grp.get(Declination.fromDoubleDegrees(90).get).get.binValue)
   }
 
   test("testBadBinSize") {
@@ -47,25 +47,25 @@ class DecBinGroupTest extends FunSuite {
 
   test("testUpdatedFunSome") {
     val grp = DeclinationMap.gen10DegBins(f)
-    val grp2 = grp.updated(Declination.Zero, p => Some(Percent(p.value + 1))).get
-    assertEquals(Percent(1), grp2.get(Declination.Zero).get.binValue)
+    val grp2 = grp.updated(Declination.Zero, p => Some(IntCentiPercent.unsafeFromPercent(p.toPercent + 1))).get
+    assertEquals(IntCentiPercent.unsafeFromPercent(1), grp2.get(Declination.Zero).get.binValue)
   }
 
   test("testUpdatedFunNone") {
     val grp = DeclinationMap.gen10DegBins(f)
-    val opt = grp.updated(Declination.fromDoubleDegrees(-10).get, p => Some(Percent(p.value + 1)))
+    val opt = grp.updated(Declination.fromDoubleDegrees(-10).get, p => Some(IntCentiPercent.unsafeFromPercent(p.toPercent + 1)))
     assertEquals(None, opt)
   }
 
   test("testUpdatedSome") {
     val grp = DeclinationMap.gen10DegBins(f)
-    val grp2 = grp.updated(Declination.Zero, Percent(42)).get
-    assertEquals(Percent(42), grp2.get(Declination.Zero).get.binValue)
+    val grp2 = grp.updated(Declination.Zero, IntCentiPercent.unsafeFromPercent(42)).get
+    assertEquals(IntCentiPercent.unsafeFromPercent(42), grp2.get(Declination.Zero).get.binValue)
   }
 
   test("testUpdatedNone") {
     val grp = DeclinationMap.gen10DegBins(f)
-    assertEquals(None, grp.updated(Declination.fromDoubleDegrees(-10).get, Percent(42)))
+    assertEquals(None, grp.updated(Declination.fromDoubleDegrees(-10).get, IntCentiPercent.unsafeFromPercent(42)))
   }
 
   test("testIndexOf") {
@@ -78,20 +78,20 @@ class DecBinGroupTest extends FunSuite {
 
   test("testApplyTarget") {
     val grp = DeclinationMap.gen10DegBins(f)
-    assertEquals(Percent( 0), grp.get(Target(12 * 15, 0)).get.binValue)
-    assertEquals(Percent(70), grp.get(Target(12 * 16, 70)).get.binValue)
-    assertEquals(None, grp.get(Target(12 * 15, -90)))
+    assertEquals(IntCentiPercent.unsafeFromPercent( 0), grp.get(ItacTarget(12 * 15, 0)).get.binValue)
+    assertEquals(IntCentiPercent.unsafeFromPercent(70), grp.get(ItacTarget(12 * 16, 70)).get.binValue)
+    assertEquals(None, grp.get(ItacTarget(12 * 15, -90)))
   }
 
   test("testGenFromBinValues") {
-    val percs = List(Percent(0), Percent(25), Percent(100), Percent(50))
+    val percs = List(IntCentiPercent.unsafeFromPercent(0), IntCentiPercent.unsafeFromPercent(25), IntCentiPercent.unsafeFromPercent(100), IntCentiPercent.unsafeFromPercent(50))
     val grp = DeclinationMap(percs)
 
     val expected = List(
-      DecRanged(DecRange(-90, -45), Percent(  0)),
-      DecRanged(DecRange(-45,   0), Percent( 25)),
-      DecRanged(DecRange(  0,  45), Percent(100)),
-      DecRanged(DecRange( 45,  90).inclusive, Percent(50))
+      DecRanged(DecRange(-90, -45), IntCentiPercent.unsafeFromPercent(  0)),
+      DecRanged(DecRange(-45,   0), IntCentiPercent.unsafeFromPercent( 25)),
+      DecRanged(DecRange(  0,  45), IntCentiPercent.unsafeFromPercent(100)),
+      DecRanged(DecRange( 45,  90).inclusive, IntCentiPercent.unsafeFromPercent(50))
     )
 
     assertEquals(expected, grp.bins.toList)

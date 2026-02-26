@@ -90,7 +90,7 @@
 //   private[impl] def classicalProps(allProps: List[Proposal], site: Site): List[Proposal] =
 //     allProps filter { p => (p.mode == Mode.Classical) && (p.site == site) }
 
-//   private[impl] def classicalObs(allProps: List[Proposal], site: Site): List[Observation] =
+//   private[impl] def classicalObs(allProps: List[Proposal], site: Site): List[ItacObservation] =
 //     classicalProps(allProps, site) flatMap { p => p.relativeObsList(ScienceBand.QBand1) }
 
 //   private[impl] def initBins(config: SiteSemesterConfig, rollover: List[RolloverObservation], props: List[Proposal]): RightAscensionMapResource = {

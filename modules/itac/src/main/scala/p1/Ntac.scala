@@ -70,7 +70,7 @@ object Ntac {
   //  */
   // object MasterOrdering extends CompoundOrdering(
   //   Ordering.by[Ntac, Time](_.awardedTime).reverse,
-  //   Ordering.by[Ntac, Percent](_.TimeAccountingCategory.share),
+  //   Ordering.by[Ntac, IntCentiPercent](_.TimeAccountingCategory.share),
   //   Ordering.by[Ntac, Rank](_.ranking),
   //   Ordering.by[Ntac, String](_.TimeAccountingCategory.id),
   //   Ordering.by[Ntac, String](_.reference)

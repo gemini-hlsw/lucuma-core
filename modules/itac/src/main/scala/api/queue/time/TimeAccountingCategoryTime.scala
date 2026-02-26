@@ -4,9 +4,9 @@
 package edu.gemini.tac.qengine.api.queue.time
 
 import cats.syntax.all.*
-import edu.gemini.tac.qengine.util.Percent
 import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.TimeAccountingCategory
+import lucuma.core.model.IntCentiPercent
 import lucuma.core.util.Enumerated
 
 /** A total mapping from TimeAccountingCategory to Time. */
@@ -17,7 +17,7 @@ final class TimeAccountingCategoryTime private (private val f: TimeAccountingCat
   def zipWith(p: TimeAccountingCategoryTime)(g: (Time, Time) => Time): TimeAccountingCategoryTime = new TimeAccountingCategoryTime((f, p.f).mapN(g))
   def +(p: TimeAccountingCategoryTime): TimeAccountingCategoryTime = zipWith(p)(_ + _)
   def -(p: TimeAccountingCategoryTime): TimeAccountingCategoryTime = zipWith(p)(_ - _)
-  def *(p: Percent): TimeAccountingCategoryTime = map(_ * p)
+  def *(p: IntCentiPercent): TimeAccountingCategoryTime = map(_ * p)
   def total: Time = Enumerated[TimeAccountingCategory].all.foldMap(f)
   def add(p: TimeAccountingCategory, t: Time): TimeAccountingCategoryTime = this + TimeAccountingCategoryTime.single(p, t)
 }

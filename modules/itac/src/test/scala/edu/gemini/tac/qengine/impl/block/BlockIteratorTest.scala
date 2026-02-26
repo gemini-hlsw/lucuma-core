@@ -3,30 +3,44 @@
 
 package edu.gemini.tac.qengine.impl.block
 
+import edu.gemini.tac.qengine.ItacSuite
 import edu.gemini.tac.qengine.api.queue.time.TimeAccountingCategoryTime
 import edu.gemini.tac.qengine.p1.*
 import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.Site
+import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.TimeAccountingCategory
+import lucuma.core.enums.WaterVapor
+import lucuma.core.model.CloudExtinction
+import lucuma.core.model.ConstraintSet
+import lucuma.core.model.ElevationRange
+import lucuma.core.model.ImageQuality
 import lucuma.core.util.Enumerated
 import org.junit.*
 
 import Assert.*
 
-class BlockIteratorTest {
+class BlockIteratorTest extends ItacSuite {
   import TimeAccountingCategory.{ BR, US }
   val TimeAccountingCategorys = Enumerated[TimeAccountingCategory].all
 
-  val target = Target(0.0, 0.0) // required but not used for this test
-  val conds = ObservingConditions.AnyConditions // required by not used
+  val target = ItacTarget(0.0, 0.0) // required but not used for this test
+  private val conds =
+    ConstraintSet(
+      ImageQuality.Preset.TwoPointZero,
+      CloudExtinction.Preset.ThreePointZero,
+      SkyBackground.Bright,
+      WaterVapor.Wet,
+      ElevationRange.ByAirMass.Default
+    )
   val e = 0.000001
 
-  def mkObs(hrs: Double): Observation = Observation(target, conds, Time.hours(hrs))
+  def mkObs(hrs: Double): ItacObservation = ItacObservation(target, conds, Time.hours(hrs))
 
   def mkProp(p: TimeAccountingCategory, hrs: Double, obsHrs: List[Double], b3ObsHrs: List[Double]): Proposal = {
     val ntac = Ntac(p, "na", 0, Time.hours(hrs))
-    val lst = obsHrs.map(curHrs => Observation(target, conds, Time.hours(curHrs))).toList
-    val b3obs = b3ObsHrs.map(curHrs => Observation(target, conds, Time.hours(curHrs))).toList
+    val lst = obsHrs.map(curHrs => ItacObservation(target, conds, Time.hours(curHrs))).toList
+    val b3obs = b3ObsHrs.map(curHrs => ItacObservation(target, conds, Time.hours(curHrs))).toList
     Proposal(ntac, site = Site.GS, obsList = lst, band3Observations = b3obs)
   }
 
@@ -37,8 +51,8 @@ class BlockIteratorTest {
     TimeAccountingCategorys.map(p => (p, lst)).toMap
   }
 
-  @Test def testEmptyQuanta() = {
-    List[(Proposal) => List[Observation]](_.obsList, _.band3Observations).map {
+  test("testEmptyQuanta") {
+    List[(Proposal) => List[ItacObservation]](_.obsList, _.band3Observations).map {
       fn =>
         val it = BlockIterator(TimeAccountingCategoryTime.empty, List(US), genPropLists(1, US, 10, List(10), List(10)), fn)
         assertFalse(it.hasNext)
@@ -46,21 +60,21 @@ class BlockIteratorTest {
     ()
   }
 
-  // @Test def testZeroQuanta() = {
-  //   List[(Proposal) => List[Observation]](_.obsList, _.band3Observations).foreach {
+  // test("testZeroQuanta") {
+  //   List[(Proposal) => List[ItacObservation]](_.obsList, _.band3Observations).foreach {
   //     fn =>
   //       val it = BlockIterator(genQuanta(0), List(US), genPropLists(1, US, 10, List(10)), fn)
   //       assertFalse(it.hasNext)
   //   }
   // }
 
-  @Test def testEmptyPropListMap() = {
+  test("testEmptyPropListMap") {
     val it = BlockIterator(genQuanta(10), List(US), Map.empty, _.obsList)
     assertFalse(it.hasNext)
   }
 
-  @Test def testEmptyPropLists() = {
-    List[(Proposal) => List[Observation]](_.obsList, _.band3Observations).map {
+  test("testEmptyPropLists") {
+    List[(Proposal) => List[ItacObservation]](_.obsList, _.band3Observations).map {
       fn =>
         val it = BlockIterator(genQuanta(10), List(US), genPropLists(0, US, 10, List(10)), fn)
         assertFalse(it.hasNext)
@@ -68,15 +82,15 @@ class BlockIteratorTest {
     ()
   }
 
-  // @Test def testEmptyTimeAccountingCategorySequence() = {
-  //   List[(Proposal) => List[Observation]](_.obsList, _.band3Observations).map {
+  // test("testEmptyTimeAccountingCategorySequence") {
+  //   List[(Proposal) => List[ItacObservation]](_.obsList, _.band3Observations).map {
   //     fn =>
   //       val it = BlockIterator(genQuanta(10), Nil, genPropLists(1, US, 10, List(10)), fn)
   //       assertFalse(it.hasNext)
   //   }
   // }
 
-  @Test def testTimeAccountingCategoryAdvanceNoProps() = {
+  test("testTimeAccountingCategoryAdvanceNoProps") {
     val prop = mkProp(US, 5, List(5), List.empty)
     val qMap = TimeAccountingCategoryTime.fromMap(Map(BR -> Time.hours(10), US -> Time.hours(10)))
     // No proposals for Brazil, it will be skipped.
@@ -87,7 +101,7 @@ class BlockIteratorTest {
     assertEquals(expected, it.toList(_.obsList))
   }
 
-  @Test def testTimeAccountingCategoryAdvanceNoTime() = {
+  test("testTimeAccountingCategoryAdvanceNoTime") {
     val brProp = mkProp(BR, 1, List(1), List.empty)
     val usProp = mkProp(US, 2, List(2), List.empty)
 
@@ -101,7 +115,7 @@ class BlockIteratorTest {
     assertEquals(expected, it.toList(_.obsList))
   }
 
-  @Test def testTimeAccountingCategoryAdvanceNoTimeIfOnlyB3() = {
+  test("testTimeAccountingCategoryAdvanceNoTimeIfOnlyB3") {
     //Dup of above, but there are B3 observations
     val brProp = mkProp(BR, 1, List(1), List(1))
     val usProp = mkProp(US, 2, List(2), List.empty)
@@ -117,7 +131,7 @@ class BlockIteratorTest {
 
   }
 
-  @Test def testObsTimeLessThanQuantum() = {
+  test("testObsTimeLessThanQuantum") {
     val brProp = mkProp(BR, 1, List(1), List.empty)
     val usProp = mkProp(US, 2, List(2), List.empty)
 
@@ -133,7 +147,7 @@ class BlockIteratorTest {
     assertEquals(expected, actual)
   }
 
-  @Test def testObsTimeSpansQuantum() = {
+  test("testObsTimeSpansQuantum") {
     val brProp = mkProp(BR, 11, List(11), List.empty)
     val usProp = mkProp(US, 5, List(5), List.empty)
 
@@ -149,7 +163,7 @@ class BlockIteratorTest {
     assertEquals(expected, it.toList(_.obsList))
   }
 
-  @Test def testObsTimeEqualsQuantum() = {
+  test("testObsTimeEqualsQuantum") {
     val brProp = mkProp(BR, 10, List(10), List.empty)
     val usProp = mkProp(US, 10, List(10), List.empty)
 
@@ -164,7 +178,7 @@ class BlockIteratorTest {
     assertEquals(expected, it.toList(_.obsList))
   }
 
-  @Test def testMultipleObs() = {
+  test("testMultipleObs") {
     val brProp = mkProp(BR, 20, List[Double](10, 10), List.empty)
     val usProp = mkProp(US, 30, List[Double](10, 10, 10), List.empty)
 
@@ -198,7 +212,7 @@ class BlockIteratorTest {
     assertEquals(expected, it.toList(_.obsList))
   }
 
-  @Test def testMultiplePropsInOneQuantum() = {
+  test("testMultiplePropsInOneQuantum") {
     val brProp1 = mkProp(BR, 2, List[Double](1, 1), List.empty)
     val brProp2 = mkProp(BR, 3, List(3), List.empty)
 
@@ -215,7 +229,7 @@ class BlockIteratorTest {
     assertEquals(expected, it.toList(_.obsList))
   }
 
-  @Test def testMultiplePropsSpanningQuantums() = {
+  test("testMultiplePropsSpanningQuantums") {
     val brProp1 = mkProp(BR, 2, List[Double](1, 1), List.empty)
     val brProp2 = mkProp(BR, 3, List(3), List.empty)
 
@@ -234,7 +248,7 @@ class BlockIteratorTest {
     assertEquals(expected, it.toList(_.obsList))
   }
 
-  @Test def testSkipStartOfProposal() = {
+  test("testSkipStartOfProposal") {
     val brProp = mkProp(BR, 20, List[Double](10, 10), List.empty)
     val usProp = mkProp(US, 30, List[Double](10, 10, 10), List.empty)
 
@@ -255,7 +269,7 @@ class BlockIteratorTest {
     assertEquals(expected, it3.toList(_.obsList))
   }
 
-  @Test def testSkipMiddleOfProposal() = {
+  test("testSkipMiddleOfProposal") {
     val brProp = mkProp(BR, 20, List[Double](10, 10), List.empty)
     val usProp = mkProp(US, 30, List[Double](10, 10, 10), List.empty)
 
@@ -275,7 +289,7 @@ class BlockIteratorTest {
     assertEquals(expected, it2.toList(_.obsList))
   }
 
-  @Test def testRemainingProps() = {
+  test("testRemainingProps") {
     val brProp = mkProp(BR, 20, List[Double](10, 10), List.empty)
     val usProp = mkProp(US, 30, List[Double](10, 10, 10), List.empty)
 

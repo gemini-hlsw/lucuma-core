@@ -6,7 +6,7 @@ package edu.gemini.tac.qengine.impl
 import edu.gemini.tac.qengine.impl.resource.SemesterResource
 import edu.gemini.tac.qengine.log.AcceptMessage
 import edu.gemini.tac.qengine.log.RejectMessage
-import edu.gemini.tac.qengine.p1.Observation
+import edu.gemini.tac.qengine.p1.ItacObservation
 import edu.gemini.tac.qengine.p1.Proposal
 import org.slf4j.LoggerFactory
 
@@ -30,7 +30,7 @@ final class QueueFrame(val queue: ProposalQueueBuilder, val iter: BlockIterator,
 
   def isStartOf(prop: Proposal): Boolean = iter.isStartOf(prop)
 
-  def skip(activeList : Proposal => List[Observation]): QueueFrame = new QueueFrame(queue, iter.skip(activeList), res)
+  def skip(activeList : Proposal => List[ItacObservation]): QueueFrame = new QueueFrame(queue, iter.skip(activeList), res)
 
   def hasNext: Boolean = iter.hasNext
 
@@ -52,7 +52,7 @@ final class QueueFrame(val queue: ProposalQueueBuilder, val iter: BlockIterator,
     //applicationLogger.log(Level.trace, "next():" + block.toString);
   }
 
-  def next(activeList : Proposal=>List[Observation]): RejectMessage Either Next = {
+  def next(activeList : Proposal=>List[ItacObservation]): RejectMessage Either Next = {
     val (block, newIter) = iter.next(activeList)
     logBlock(block)
     res.reserve(block, queue) map {

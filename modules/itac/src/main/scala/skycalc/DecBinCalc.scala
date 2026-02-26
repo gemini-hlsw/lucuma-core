@@ -4,11 +4,11 @@
 package edu.gemini.qengine.skycalc;
 
 import edu.gemini.qengine.skycalc.DecBinSize
-import edu.gemini.tac.qengine.util.Percent
 import lucuma.core.enums.Site
 import lucuma.core.math.RightAscension
+import lucuma.core.model.IntCentiPercentUnbounded
 
 import java.time.Instant
 
 trait DecBinCalc:
-  def calc(site: Site, start: Instant, end: Instant, size: DecBinSize, ra: RightAscension): List[Percent] 
+  def calc(site: Site, start: Instant, end: Instant, size: DecBinSize, ra: RightAscension): List[IntCentiPercentUnbounded] 

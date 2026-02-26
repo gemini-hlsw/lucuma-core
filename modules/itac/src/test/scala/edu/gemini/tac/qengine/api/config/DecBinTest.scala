@@ -3,19 +3,19 @@
 
 package edu.gemini.tac.qengine.api.config
 
-import edu.gemini.tac.qengine.p1.Target
-import edu.gemini.tac.qengine.util.Percent
-import munit.FunSuite
+import edu.gemini.tac.qengine.ItacSuite
+import edu.gemini.tac.qengine.p1.ItacTarget
+import lucuma.core.model.IntCentiPercent
 
-class DecBinTest extends FunSuite {
-  val TenPercent = Percent(10)
+class DecBinTest extends ItacSuite {
+  val TenPercent = IntCentiPercent.unsafeFromPercent(10)
 
   val bin = DecRanged(0, 10, TenPercent)
   val ibin = DecRanged.inclusive(0, 10, TenPercent)
 
   test("testInclusive") {
     assert(bin.inclusive.range.isInclusive)
-    assert(bin.inclusive.range.contains(Target(0, 10.0)))
+    assert(bin.inclusive.range.contains(ItacTarget(0, 10.0)))
     assert(ibin eq ibin.inclusive)
   }
 
@@ -24,10 +24,10 @@ class DecBinTest extends FunSuite {
     assert(!bin.equals(ibin))
     assert(!bin.equals(DecRanged(1, 10, TenPercent)))
     assert(!bin.equals(DecRanged(0,  9, TenPercent)))
-    assert(!bin.equals(DecRanged(0, 10, Percent(11))))
+    assert(!bin.equals(DecRanged(0, 10, IntCentiPercent.unsafeFromPercent(11))))
   }
 
   test("testMap") {
-    assertEquals(10.0, DecRanged(10, 20, TenPercent).map(_.value).binValue.doubleValue, Double.MinPositiveValue)
+    assertEquals(10.0, DecRanged(10, 20, TenPercent).map(_.toPercent).binValue.doubleValue, Double.MinPositiveValue)
   }
 }

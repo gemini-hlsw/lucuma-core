@@ -3,25 +3,23 @@
 
 package edu.gemini.tac.qengine.api.config
 
+import cats.syntax.all.*
 import edu.gemini.tac.qengine.impl.resource.Resource2
 import edu.gemini.tac.qengine.log.RejectRestrictedBin
-import edu.gemini.tac.qengine.p1.Observation
+import edu.gemini.tac.qengine.p1.ItacObservation
 import edu.gemini.tac.qengine.p1.Proposal
-import edu.gemini.tac.qengine.p1.WaterVapor
-import edu.gemini.tac.qengine.p1.WaterVapor.WV50
 import edu.gemini.tac.qengine.util.BoundedTime
-import edu.gemini.tac.qengine.util.Percent
 import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.ScienceBand
-
-import scala.Ordering.Implicits.*
+import lucuma.core.enums.WaterVapor
+import lucuma.core.model.IntCentiPercent
 
 /**
  * TimeRestriction associates a name, a value, and a predicate.  The value
  * specifies the time being restricted, which may be an absolute amount of time
  * or a relative amount of time.
  */
-case class TimeRestriction[T](name: String, value: T)(val matches: (Proposal, Observation, ScienceBand) => Boolean) {
+case class TimeRestriction[T](name: String, value: T)(val matches: (Proposal, ItacObservation, ScienceBand) => Boolean) {
 
   def map[U](f: T => U): TimeRestriction[U]    =
     new TimeRestriction[U](name, f(value))(matches)
@@ -32,11 +30,11 @@ case class TimeRestriction[T](name: String, value: T)(val matches: (Proposal, Ob
 }
 
 object TimeRestriction {
-  def wv(limit: Percent): TimeRestriction[Percent] = wv(limit, WV50)
+  def wv(limit: IntCentiPercent): TimeRestriction[IntCentiPercent] = wv(limit, WaterVapor.Dry)
 
-  def wv(limit: Percent, wv: WaterVapor) =
+  def wv(limit: IntCentiPercent, wv: WaterVapor) =
     TimeRestriction("WV Queue Time Limit", limit) {
-       (_, obs, _) => obs.conditions.wv <= wv
+       (_, obs, _) => obs.constraintSet.waterVapor <= wv
     }
 
   def lgs(limit: Time) =

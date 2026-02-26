@@ -7,7 +7,7 @@ import edu.gemini.tac.qengine.api.queue.ProposalQueue
 import edu.gemini.tac.qengine.impl.queue.ProposalQueueBuilder
 import edu.gemini.tac.qengine.log.ProposalLog
 import edu.gemini.tac.qengine.log.RejectCategoryOverAllocation
-import edu.gemini.tac.qengine.p1.Observation
+import edu.gemini.tac.qengine.p1.ItacObservation
 import edu.gemini.tac.qengine.p1.Proposal
 import org.slf4j.LoggerFactory
 
@@ -20,7 +20,7 @@ object QueueCalcStage {
 
   private val Log = LoggerFactory.getLogger("edu.gemini.itac")
 
-  private def rollback(stack: List[QueueFrame], prop: Proposal, activeList: Proposal => List[Observation]): List[QueueFrame] =
+  private def rollback(stack: List[QueueFrame], prop: Proposal, activeList: Proposal => List[ItacObservation]): List[QueueFrame] =
     stack.dropWhile(!_.isStartOf(prop)) match {
       case head :: tail => head.skip(activeList) :: tail
       case Nil => sys.error("Tried to skip a proposal that wasn't seen.")
@@ -38,7 +38,7 @@ object QueueCalcStage {
   // RejectMessage. Call skip on that frame and push it so that it considers
   // the next proposal in the sequence.
   //
-  @tailrec private def compute(stack: List[QueueFrame], log: ProposalLog, activeList : Proposal=>List[Observation]): Result = {
+  @tailrec private def compute(stack: List[QueueFrame], log: ProposalLog, activeList : Proposal=>List[ItacObservation]): Result = {
     val stackHead = stack.head
     if (!stackHead.hasNext) {
       Log.trace( "Stack is empty [" + ! stackHead.hasNext + "]")
@@ -60,14 +60,14 @@ object QueueCalcStage {
    * p.iter : BlockIterator -> Produces a block of time for the current TimeAccountingCategory's preferred Proposal
    * p.res :  SemesterResource -> Encapsulates the state of the remaining resources
    * p.log :  ProposalLog -> Holds a record of decisions
-   * p.activeList : Proposal=>List[Observation] -> Either _.obsList or _.band3Observations
+   * p.activeList : Proposal=>List[ItacObservation] -> Either _.obsList or _.band3Observations
    *
    * Begins recursive call to compute(ProposalQueueBuilder, BlockIterator, SemesterResource)
    */
   def apply(
     queue:      ProposalQueueBuilder,
     iter:       BlockIterator,
-    activeList: Proposal => List[Observation],
+    activeList: Proposal => List[ItacObservation],
     res:        SemesterResource,
     log:        ProposalLog,
   ): QueueCalcStage = {

@@ -9,11 +9,11 @@ import edu.gemini.tac.qengine.impl.queue.ProposalQueueBuilder
 import edu.gemini.tac.qengine.log.RejectMessage
 import edu.gemini.tac.qengine.log.RejectRestrictedBin
 import edu.gemini.tac.qengine.util.BoundedTime
-import edu.gemini.tac.qengine.util.Percent
 import edu.gemini.tac.qengine.util.Time
+import lucuma.core.model.IntCentiPercent
 
 object TimeRestrictionResource {
-  def apply(bin: TimeRestriction[Percent], time: Time): TimeRestrictionResource =
+  def apply(bin: TimeRestriction[IntCentiPercent], time: Time): TimeRestrictionResource =
     new TimeRestrictionResource(bin.map(percent => BoundedTime(time * percent)))
 
   def apply(bin: TimeRestriction[Time]): TimeRestrictionResource =

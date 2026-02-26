@@ -12,10 +12,10 @@
 
 package edu.gemini.qengine.skycalc;
 
-import edu.gemini.tac.qengine.util.Percent
 import lucuma.core.enums.Site
 import lucuma.core.enums.TwilightType
 import lucuma.core.math.RightAscension
+import lucuma.core.model.IntCentiPercentUnbounded
 import lucuma.core.model.Semester
 
 import java.time.Instant
@@ -25,7 +25,7 @@ import java.time.ZonedDateTime
 /**
  * Calculated RA bin times and Dec bin percentages.
  */
-final case class RaDecBinCalc(raHours: List[Hours], decPercents: List[Percent])
+final case class RaDecBinCalc(raHours: List[Hours], decPercents: List[IntCentiPercentUnbounded])
 
 object RaDecBinCalc {
 

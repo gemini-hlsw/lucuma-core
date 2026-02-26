@@ -3,7 +3,7 @@
 
 package edu.gemini.tac.qengine.log
 
-import edu.gemini.tac.qengine.p1.Observation
+import edu.gemini.tac.qengine.p1.ItacObservation
 import lucuma.core.enums.ScienceBand
 
 /**
@@ -13,7 +13,7 @@ import lucuma.core.enums.ScienceBand
  * successfully merged prior to the the rejection.
  */
 trait ObsRejectMessage extends RejectMessage {
-  def obs: Observation
+  def obs: ItacObservation
 
   def percentObsMerged(b: ScienceBand): Int = {
     val l = prop.obsListFor(b)
