@@ -13,6 +13,7 @@ import edu.gemini.tac.qengine.util.BoundedTime
 import edu.gemini.tac.qengine.util.Time
 import lucuma.core.model.ConstraintSet
 import org.slf4j.LoggerFactory
+import cats.syntax.all.*
 
 final case class SemesterResource(
     ra:   RightAscensionMapResource,

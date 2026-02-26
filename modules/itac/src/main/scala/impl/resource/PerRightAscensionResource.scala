@@ -12,6 +12,7 @@ import edu.gemini.tac.qengine.p1.ItacTarget
 import edu.gemini.tac.qengine.util.BoundedTime
 import edu.gemini.tac.qengine.util.Time
 import lucuma.core.model.ConstraintSet
+import cats.syntax.all.*
 
 object PerRightAscensionResource {
   def apply(t: Time, c: SiteSemesterConfig): PerRightAscensionResource = {

@@ -6,6 +6,7 @@ package edu.gemini.tac.qengine.impl.block
 import edu.gemini.tac.qengine.p1.ItacObservation
 import edu.gemini.tac.qengine.p1.Proposal
 import edu.gemini.tac.qengine.util.Time
+import cats.syntax.all.*
 
 /**
  * An iterator, of sorts, which can be used to step through a single list of
@@ -65,7 +66,7 @@ trait TimeAccountingCategoryBlockIterator{
     (currentProposal.id == prop.id) && isStartBlock
 
   private def nextBlock(maxTime: Time): Block = {
-    val time = Time.min(currentObservationRemainingTime, maxTime)
+    val time = currentObservationRemainingTime.min(maxTime)
     val isFinal = (remainingObservationsInActiveList.tail == Nil) && (time == currentObservationRemainingTime)
     Block(currentProposal, currentObservation, time, isStartBlock, isFinal)
   }

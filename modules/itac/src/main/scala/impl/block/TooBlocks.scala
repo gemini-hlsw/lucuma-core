@@ -4,6 +4,7 @@
 package edu.gemini.tac.qengine.impl.block
 
 import edu.gemini.tac.qengine.util.Time
+import cats.syntax.all.*
 
 /**
  * An object used to split a Block into a number of smaller blocks, one for each
