@@ -5,6 +5,7 @@ package edu.gemini.tac.qengine.log
 
 import edu.gemini.tac.qengine.p1.Proposal
 import edu.gemini.tac.qengine.util.Time
+import cats.syntax.all.*
 
 /**
  * A proposal rejection message for proposals that are too big to fit in the
