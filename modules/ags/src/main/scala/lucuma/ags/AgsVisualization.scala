@@ -15,12 +15,19 @@ import lucuma.core.geom.syntax.all.*
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 
+sealed trait DebugShape:
+  def position: OffsetPosition
+  def shape: ShapeExpression
+
+final case class NoZoneShape(val position: OffsetPosition, val shape: ShapeExpression)
+    extends DebugShape
+
 final case class PatrolFieldVisualization(
-  position:       OffsetPosition,
-  posPatrolField: ShapeExpression, // Patrol field for the position
-  paIntersection: ShapeExpression, // Intersection area for the pa
-  rotatedOffset:  RotatedOffset    // Position for placing visualization markers
-)
+  override val position: OffsetPosition,
+  override val shape:    ShapeExpression, // Patrol field for the position
+  paIntersection:        ShapeExpression, // Intersection area for the pa
+  rotatedOffset:         RotatedOffset    // Position for placing visualization markers
+) extends DebugShape
 
 final case class ScienceOverlapVisualization(
   position:               OffsetPosition,
@@ -35,6 +42,18 @@ final case class ScienceOverlapVisualization(
 )
 
 object AgsVisualization {
+  def noZoneShapes(
+    params:        SingleProbeAgsParams,
+    noZoneOffsets: List[OffsetPosition]
+  ): List[DebugShape] =
+
+    noZoneOffsets.map: offset =>
+      NoZoneShape(
+        position = offset,
+        shape = ShapeExpression.centeredEllipse(params.scienceRadius,
+                                                params.scienceRadius
+        ) ↗ offset.offsetPos ⟲ offset.posAngle
+      )
 
   def patrolFieldGeometries(
     params:    SingleProbeAgsParams,
@@ -56,7 +75,7 @@ object AgsVisualization {
     positions.map: position =>
       PatrolFieldVisualization(
         position = position,
-        posPatrolField = getPatrolField(position),
+        shape = getPatrolField(position),
         paIntersection = calcsByPA
           .get(position.posAngle)
           .flatMap(_.apply(position))

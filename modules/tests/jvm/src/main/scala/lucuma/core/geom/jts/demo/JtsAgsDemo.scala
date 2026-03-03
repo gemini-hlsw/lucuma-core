@@ -139,7 +139,7 @@ trait GmosAgsVisualizationShapes(val posAngle: Angle) extends AgsVisualizationBa
         .toList
         .map: v =>
           val (color, stroke) = geometryStyle.getOrElse(v.position.geometryType, (Color.GRAY, solidStroke))
-          ColoredShape(v.posPatrolField, color, stroke.some, v.position.geometryType.some)
+          ColoredShape(v.shape, color, stroke.some, v.position.geometryType.some)
 
     val intersection = ColoredShape(
       patrolViz.head.paIntersection,
