@@ -34,7 +34,7 @@ trait ArbConfiguration:
         sb <- arbitrary[SkyBackground]
         wv <- arbitrary[WaterVapor]
       yield Conditions(ce, iq, sb, wv)
-    
+
   given Cogen[Conditions] =
     Cogen[(CloudExtinction.Preset, ImageQuality.Preset, SkyBackground, WaterVapor)]
       .contramap(c => (c.cloudExtinction,c.imageQuality,  c.skyBackground, c.waterVapor))
@@ -74,9 +74,22 @@ trait ArbConfiguration:
   given Cogen[ObservingMode.Flamingos2LongSlit] =
     Cogen[Flamingos2Disperser].contramap(_.disperser)
 
+  given Arbitrary[ObservingMode.Igrins2LongSlit.type] =
+    Arbitrary(Gen.const(ObservingMode.Igrins2LongSlit))
+
+  given Cogen[ObservingMode.Igrins2LongSlit.type] =
+    Cogen.cogenUnit.contramap(_ => ())
+
   given Arbitrary[ObservingMode] =
     Arbitrary:
-      Gen.oneOf(arbitrary[ObservingMode.GmosNorthLongSlit], arbitrary[Configuration.ObservingMode.GmosSouthLongSlit])
+      Gen.oneOf(
+        arbitrary[ObservingMode.GmosNorthLongSlit],
+        arbitrary[ObservingMode.GmosSouthLongSlit],
+        arbitrary[ObservingMode.GmosNorthImaging],
+        arbitrary[ObservingMode.GmosSouthImaging],
+        arbitrary[ObservingMode.Flamingos2LongSlit],
+        arbitrary[ObservingMode.Igrins2LongSlit.type]
+      )
 
   def perturb[A](s: Seed, a: A)(using c: Cogen[A]): Seed =
     c.perturb(s, a)
@@ -84,11 +97,12 @@ trait ArbConfiguration:
   given Cogen[ObservingMode] =
     Cogen: (s, m) =>
       m match
-        case m: ObservingMode.GmosNorthLongSlit  => perturb(s, m)
-        case m: ObservingMode.GmosSouthLongSlit  => perturb(s, m)
-        case m: ObservingMode.GmosNorthImaging   => perturb(s, m)
-        case m: ObservingMode.GmosSouthImaging   => perturb(s, m)
-        case m: ObservingMode.Flamingos2LongSlit => perturb(s, m)
+        case m: ObservingMode.GmosNorthLongSlit    => perturb(s, m)
+        case m: ObservingMode.GmosSouthLongSlit    => perturb(s, m)
+        case m: ObservingMode.GmosNorthImaging     => perturb(s, m)
+        case m: ObservingMode.GmosSouthImaging     => perturb(s, m)
+        case m: ObservingMode.Flamingos2LongSlit   => perturb(s, m)
+        case m: ObservingMode.Igrins2LongSlit.type => perturb(s, m)
 
   given Arbitrary[Configuration] =
     Arbitrary:
@@ -97,7 +111,7 @@ trait ArbConfiguration:
         r <- arbitrary[Either[Coordinates, Region]]
         o <- arbitrary[ObservingMode]
       yield (Configuration(c, r, o))
-  
+
   given Cogen[Configuration] =
     Cogen[(Conditions, Either[Coordinates, Region], ObservingMode)]
       .contramap(c => (c.conditions, c.target, c.observingMode))
