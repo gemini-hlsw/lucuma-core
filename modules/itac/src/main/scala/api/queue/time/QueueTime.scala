@@ -10,7 +10,7 @@ import lucuma.core.model.IntCentiPercent
 
 object QueueTime {
   /** Number of hours in each "cycle" of 100 TimeAccountingCategory countries. */
-  val Quantum = Time.hours(3.0)
+  val Quantum = Time.fromHoursBounded(3.0)
   val DefaultTimeAccountingCategoryOverfillAllowance = IntCentiPercent.unsafeFromPercent(5)
 }
 

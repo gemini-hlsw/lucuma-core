@@ -13,8 +13,8 @@ object RejectToo {
 
   private val detailTemplate = "ToO observation of %.2f hours with conditions %s.  Remaining time %.2f hours."
   def detail(prop: Proposal, obs: ItacObservation, band: ScienceBand, remaining: Time): String = {
-    val obsTime = prop.relativeObsTime(obs, band).toHours.value
-    val remTime = remaining.toHours.value
+    val obsTime = prop.relativeObsTime(obs, band).toHours
+    val remTime = remaining.toHours
     detailTemplate.format(obsTime, obs.constraintSet, remTime)
   }
 

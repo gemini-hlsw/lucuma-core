@@ -72,10 +72,10 @@ object TooBlocks {
           val rem   = remTime(head._1) // Time remaining in the current RA bin
           val index = head._2          // Index of the current (head) RA bin
           // Time in an even distribution across the remaining bins
-          val evenDist = Time.hours(t.toHours.value / bins.size)
+          val evenDist = Time.fromHoursBounded(t.toHours.toDouble / bins.size)
 
           if (rem < evenDist)
-            distributeTime(t - rem, tail) match {
+            distributeTime(t -| rem, tail) match {
               case Nil => Nil
               case distTail => (rem, index) :: distTail
             }

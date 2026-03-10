@@ -18,6 +18,7 @@ import java.time.temporal.ChronoUnit.MICROS
 import java.time.temporal.TemporalUnit
 import scala.annotation.targetName
 import scala.util.Try
+import lucuma.core.model.IntCentiPercent
 
 /**
  * TimeSpan is a time span, similar to a `FiniteDuration` in that it is a
@@ -220,6 +221,10 @@ object TimeSpan {
     @targetName("boundedMultiply")
     def *|(multiplier: BigDecimal): TimeSpan =
       fromMicrosecondsBounded(timeSpan.toMicroseconds * multiplier)
+
+    @targetName("boundedMultiply")
+    def *|(multiplier: IntCentiPercent)(using DummyImplicit): TimeSpan =
+      fromMicrosecondsBounded(timeSpan.toMicroseconds * multiplier.toPercent / 100.0)
 
     /**
      * Divides a TimeSpan by a non-negative integer, via integer division.

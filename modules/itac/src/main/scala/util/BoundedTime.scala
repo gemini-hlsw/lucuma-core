@@ -27,14 +27,14 @@ final case class BoundedTime(limit: Time, used: Time = Time.Zero) {
    * negative).
    */
   def remaining = 
-    if limit < used then Time.Zero else limit - used
+    if limit < used then Time.Zero else limit -| used
 
   /**
    * Returns the percentage of available time that has been used.  This will
    * be greater than 100 if overbooked.
    */
   def fillPercent: Double =
-    100 * (if (limit.ms == 0) 1.0 else used.to(limit.unit).value/limit.value)
+    100 * (if (limit.toMilliseconds == 0) 1.0 else used.toMilliseconds.toDouble/limit.toMilliseconds.toDouble)
 
   /**
    * Reserves the given time amount into a new BoundedTime instance together
@@ -45,7 +45,7 @@ final case class BoundedTime(limit: Time, used: Time = Time.Zero) {
     if (time == Time.Zero)
       Some(this)
     else {
-      val tmp = used + time
+      val tmp = used +| time
       if (tmp > limit)
         None
       else
@@ -62,9 +62,9 @@ final case class BoundedTime(limit: Time, used: Time = Time.Zero) {
    * </code>
    */
   def reserveAvailable(time: Time): (BoundedTime, Time) = {
-    val tmp = used + time
+    val tmp = used +| time
     val (newUsed, rem) = if (tmp > limit)
-      (limit, tmp - limit)
+      (limit, tmp -| limit)
     else if (tmp < Time.Zero)
       (Time.Zero, tmp)
     else

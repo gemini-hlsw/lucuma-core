@@ -21,7 +21,7 @@ case class Ntac(TimeAccountingCategory: TimeAccountingCategory,
   undividedTime: Option[Time] = None, // this will be set to the original time if the actual time is reduced due to a site split
   ngoEmail: Option[String] = None
 ) {
-  require(awardedTime.ms >= 0, "Awarded time must be non-negative, not " + awardedTime.ms)
+  require(awardedTime.toMilliseconds >= 0, "Awarded time must be non-negative, not " + awardedTime.toMilliseconds)
 
   // def compare(that: Ntac): Int = Ntac.MasterOrdering.compare(this, that)
 
@@ -80,7 +80,7 @@ object Ntac {
    * Sums the awarded time in a collection of Ntacs.
    */
   def awardedTimeSum(ntacs: Iterable[Ntac]): Time =
-    ntacs.foldLeft(Time.ZeroHours)(_ + _.awardedTime)
+    ntacs.foldLeft(Time.Zero)(_ +| _.awardedTime)
 
   def apply(TimeAccountingCategory: TimeAccountingCategory, reference: String, ranking: Double, awardedTime: Time, poorWeather : Boolean): Ntac =
       new Ntac(TimeAccountingCategory, reference, Ntac.Rank(ranking), awardedTime, poorWeather)

@@ -22,7 +22,7 @@ object RejectTimeAccountingCategoryOverAllocation {
       fullTemplate.format(p, LogMessage.formatBoundedTime(all))
     else {
       val s = "TODO" // all.overbook(t) map { b => LogMessage.formatBoundedTime(b) } getOrElse ""
-      longTemplate.format(p, t.toHours.value, s)
+      longTemplate.format(p, t.toHours, s)
     }
   }
 }

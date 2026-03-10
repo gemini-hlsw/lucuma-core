@@ -21,7 +21,7 @@ trait ObsRejectMessage extends RejectMessage {
   }
 
   def percentTimeMerged(b: ScienceBand): Int = {
-    val totalTime = prop.obsListFor(b).foldLeft(0L)(_ + _.time.ms)
-    ((obs.time.ms / totalTime.toDouble) * 100).round.toInt
+    val totalTime = prop.obsListFor(b).foldLeft(0L)(_ + _.time.toMilliseconds.toLong)
+    ((obs.time.toMilliseconds.toDouble / totalTime.toDouble) * 100).round.toInt
   }
 }

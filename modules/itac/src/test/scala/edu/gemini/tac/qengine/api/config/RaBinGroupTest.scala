@@ -19,13 +19,13 @@ class RaBinGroupTest extends ItacSuite {
   // So, a 30 min Angle yields 30 minutes of time.  This makes it easy to test.
   // A real function would compute the number of minutes that the RA is
   // visible at night and return that amount of time.
-  private def f(a: RightAscension, @unused sizeMin: Int): Time = Time.minutes(a.toHourAngle.toDoubleMinutes)
+  private def f(a: RightAscension, @unused sizeMin: Int): Time = Time.fromMinutesBounded(a.toHourAngle.toDoubleMinutes)
 
   test("testGenerate1Hr") {
     val g1Hr = RightAscensionMap.gen1HrBins(f)
     assertEquals(24, g1Hr.bins.length)
 
-    val times = for (i <- 0 until 24) yield Time.minutes(i * 60 + 30)
+    val times = for (i <- 0 until 24) yield Time.fromMinutesBounded(i * 60 + 30)
     assertEquals(times, g1Hr.bins)
   }
 
@@ -33,20 +33,20 @@ class RaBinGroupTest extends ItacSuite {
     val g2Hr = RightAscensionMap.gen2HrBins(f)
     assertEquals(12, g2Hr.bins.length)
 
-    val times = for (i <- 0 until 12) yield Time.minutes(i * 120 + 60)
+    val times = for (i <- 0 until 12) yield Time.fromMinutesBounded(i * 120 + 60)
     assertEquals(times, g2Hr.bins)
   }
 
   private def validateLookup(lookup: (RightAscensionMap[Time], Int) => Time) = {
     val g = RightAscensionMap.gen1HrBins(f)
-    assertEquals(Time.minutes(30), lookup(g, 0))
-    assertEquals(Time.minutes(30), lookup(g, 15))
-    assertEquals(Time.minutes(30), lookup(g, 59))
-    assertEquals(Time.minutes(90), lookup(g, 60))
-    assertEquals(Time.minutes(1410), lookup(g, 24*60-1))
+    assertEquals(Time.fromMinutesBounded(30), lookup(g, 0))
+    assertEquals(Time.fromMinutesBounded(30), lookup(g, 15))
+    assertEquals(Time.fromMinutesBounded(30), lookup(g, 59))
+    assertEquals(Time.fromMinutesBounded(90), lookup(g, 60))
+    assertEquals(Time.fromMinutesBounded(1410), lookup(g, 24*60-1))
 
     // wrap around
-    assertEquals(Time.minutes(30), lookup(g, 24*60))
+    assertEquals(Time.fromMinutesBounded(30), lookup(g, 24*60))
   }
 
   test("testLookupMin") {
@@ -65,7 +65,7 @@ class RaBinGroupTest extends ItacSuite {
     val gTime = RightAscensionMap.gen1HrBins(f)
 
     // Map the Time objects to Ints with the corresponding value in minutes
-    val gInt  = gTime.map(_.value.toInt)
+    val gInt  = gTime.map(_.toMinutes.toInt)
     assertEquals(24, gInt.bins.length)
 
     assertEquals(30, gInt(0))
@@ -74,7 +74,7 @@ class RaBinGroupTest extends ItacSuite {
   test("testUpdated") {
     val ra0 = RightAscension(HourAngle.fromDoubleMinutes( 0))
     val ra1 = RightAscension(HourAngle.fromDoubleMinutes(60))
-    val min1 = Time.minutes(1)
+    val min1 = Time.fromMinutesBounded(1)
     val bg = RightAscensionMap.gen1HrBins(f).updated(ra0, Time.Zero).updated(ra1, min1)
     assertEquals(Time.Zero, bg(ra0))
     assertEquals(min1, bg(ra1))
@@ -82,8 +82,8 @@ class RaBinGroupTest extends ItacSuite {
 
   // Need a fake function that sometimes returns None to simulate what
   // happens when the value cannot be updated.
-  private val doubleEveryOther = (t: Time) => t.value.toInt match {
-      case n if (n-30 % 120) == 0 => Some(t + t)
+  private val doubleEveryOther = (t: Time) => t.toMinutes.toInt match {
+      case n if (n-30 % 120) == 0 => Some(t +| t)
       case _ => None
     }
 
@@ -92,7 +92,7 @@ class RaBinGroupTest extends ItacSuite {
 
     val ra0 = RightAscension(HourAngle.fromDoubleMinutes(0))
     bg0.updated(ra0, doubleEveryOther) match {
-      case Some(bg1) => assertEquals(bg0(ra0).value.toInt * 2, bg1(ra0).value.toInt)
+      case Some(bg1) => assertEquals(bg0(ra0).toMinutes.toInt * 2, bg1(ra0).toMinutes.toInt)
       case _ => fail
     }
   }

@@ -15,9 +15,9 @@ final class TimeAccountingCategoryTime private (private val f: TimeAccountingCat
   def filter(g: TimeAccountingCategory => Boolean): TimeAccountingCategoryTime = new TimeAccountingCategoryTime(p => if (g(p)) f(p) else Time.Zero)
   def apply(p: TimeAccountingCategory): Time = f(p)
   def zipWith(p: TimeAccountingCategoryTime)(g: (Time, Time) => Time): TimeAccountingCategoryTime = new TimeAccountingCategoryTime((f, p.f).mapN(g))
-  def +(p: TimeAccountingCategoryTime): TimeAccountingCategoryTime = zipWith(p)(_ + _)
-  def -(p: TimeAccountingCategoryTime): TimeAccountingCategoryTime = zipWith(p)(_ - _)
-  def *(p: IntCentiPercent): TimeAccountingCategoryTime = map(_ * p)
+  def +(p: TimeAccountingCategoryTime): TimeAccountingCategoryTime = zipWith(p)(_ +| _)
+  def -(p: TimeAccountingCategoryTime): TimeAccountingCategoryTime = zipWith(p)(_ -| _)
+  def *(p: IntCentiPercent): TimeAccountingCategoryTime = map(_ *| p)
   def total: Time = Enumerated[TimeAccountingCategory].all.foldMap(f)
   def add(p: TimeAccountingCategory, t: Time): TimeAccountingCategoryTime = this + TimeAccountingCategoryTime.single(p, t)
 }
