@@ -10,7 +10,6 @@ import edu.gemini.tac.qengine.impl.block.Block
 import edu.gemini.tac.qengine.log.RejectTarget
 import edu.gemini.tac.qengine.p1.*
 import edu.gemini.tac.qengine.util.BoundedTime
-import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.Site
 import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.TimeAccountingCategory
@@ -21,6 +20,7 @@ import lucuma.core.model.ConstraintSet
 import lucuma.core.model.ElevationRange
 import lucuma.core.model.ImageQuality
 import lucuma.core.util.Enumerated
+import lucuma.core.util.TimeSpan
 import org.junit.*
 
 import Assert.*
@@ -29,8 +29,8 @@ class DecResourceTest extends ItacSuite {
   import TimeAccountingCategory.KR
   val TimeAccountingCategorys = Enumerated[TimeAccountingCategory].all
 
-  private val bin1 = DecRanged( 0, 10, BoundedTime(Time.fromHoursBounded(10)))
-  private val bin2 = DecRanged(10, 20, BoundedTime(Time.fromHoursBounded(20)))
+  private val bin1 = DecRanged( 0, 10, BoundedTime(TimeSpan.fromHoursBounded(10)))
+  private val bin2 = DecRanged(10, 20, BoundedTime(TimeSpan.fromHoursBounded(20)))
   private val binGrp = DeclinationMap.fromBins(bin1, bin2)
   private val grp    = new DeclinationMapResource(binGrp)
 
@@ -52,60 +52,60 @@ class DecResourceTest extends ItacSuite {
       ElevationRange.ByAirMass.Default
     )
 
-  private val ntac = Ntac(KR, "x", 0, Time.Zero)
+  private val ntac = Ntac(KR, "x", 0, TimeSpan.Zero)
 
   private def mkProp(target: ItacTarget): Proposal =
-    Proposal(ntac, site = Site.GS, obsList = List(ItacObservation(target, conds, Time.Zero)))
+    Proposal(ntac, site = Site.GS, obsList = List(ItacObservation(target, conds, TimeSpan.Zero)))
 
   test("testNormalReserveWithRemainingTime") {
     val prop   = mkProp(target0)
-    val block  = Block(prop, prop.obsList.head, Time.fromHoursBounded(5))
+    val block  = Block(prop, prop.obsList.head, TimeSpan.fromHoursBounded(5))
 
     grp.reserve(block, Fixture.emptyQueue) match {
       case Left(msg)   => fail("failed")
       case Right(grp2) =>
-        assertEquals(Time.fromHoursBounded(5),  grp2.remaining(target0))   // 5 hours left in bin1
-        assertEquals(Time.fromHoursBounded(5),  grp2.remaining(target9))   // same 5 hours left in bin1
-        assertEquals(Time.fromHoursBounded(20), grp2.remaining(target10))  // all 20 hours left in bin2, nothing was put there
-        assertEquals(Time.Zero,      grp2.remaining(targetNeg)) // there is no bin for this, so there is no time
-        assertEquals(Time.Zero,      grp2.remaining(target20))  // ditto
+        assertEquals(TimeSpan.fromHoursBounded(5),  grp2.remaining(target0))   // 5 hours left in bin1
+        assertEquals(TimeSpan.fromHoursBounded(5),  grp2.remaining(target9))   // same 5 hours left in bin1
+        assertEquals(TimeSpan.fromHoursBounded(20), grp2.remaining(target10))  // all 20 hours left in bin2, nothing was put there
+        assertEquals(TimeSpan.Zero,      grp2.remaining(targetNeg)) // there is no bin for this, so there is no time
+        assertEquals(TimeSpan.Zero,      grp2.remaining(target20))  // ditto
     }
   }
 
   test("testNormalReserveAvailableWithRemainingTime") {
-    val (grp2, rem) = grp.reserveAvailable(Time.fromHoursBounded(5), target0)
-    assertEquals(Time.Zero, rem)
+    val (grp2, rem) = grp.reserveAvailable(TimeSpan.fromHoursBounded(5), target0)
+    assertEquals(TimeSpan.Zero, rem)
     assertFalse(grp2.isFull(target0))
-    assertEquals(Time.fromHoursBounded(5),  grp2.remaining(target0))
-    assertEquals(Time.fromHoursBounded(20), grp2.remaining(target10))  // all 20 hours left in bin2, nothing was put there
+    assertEquals(TimeSpan.fromHoursBounded(5),  grp2.remaining(target0))
+    assertEquals(TimeSpan.fromHoursBounded(20), grp2.remaining(target10))  // all 20 hours left in bin2, nothing was put there
   }
 
   test("testReserveExactlyAllAvailableTime") {
     val prop   = mkProp(target0)
-    val block  = Block(prop, prop.obsList.head, Time.fromHoursBounded(10))
+    val block  = Block(prop, prop.obsList.head, TimeSpan.fromHoursBounded(10))
 
     grp.reserve(block, Fixture.emptyQueue) match {
       case Left(msg)   => fail("failed")
       case Right(grp2) =>
-        assertEquals(Time.Zero,      grp2.remaining(target0))   // took all the time in bin1
-        assertEquals(Time.Zero,      grp2.remaining(target9))   // ditto
-        assertEquals(Time.fromHoursBounded(20), grp2.remaining(target10))  // all 20 hours left in bin2, nothing was put there
-        assertEquals(Time.Zero,      grp2.remaining(targetNeg)) // there is no bin for this, so there is no time
-        assertEquals(Time.Zero,      grp2.remaining(target20))  // ditto
+        assertEquals(TimeSpan.Zero,      grp2.remaining(target0))   // took all the time in bin1
+        assertEquals(TimeSpan.Zero,      grp2.remaining(target9))   // ditto
+        assertEquals(TimeSpan.fromHoursBounded(20), grp2.remaining(target10))  // all 20 hours left in bin2, nothing was put there
+        assertEquals(TimeSpan.Zero,      grp2.remaining(targetNeg)) // there is no bin for this, so there is no time
+        assertEquals(TimeSpan.Zero,      grp2.remaining(target20))  // ditto
     }
   }
 
   test("testReserveAvailableAllTime") {
-    val (grp2, rem) = grp.reserveAvailable(Time.fromHoursBounded(10), target0)
-    assertEquals(Time.Zero, rem)
+    val (grp2, rem) = grp.reserveAvailable(TimeSpan.fromHoursBounded(10), target0)
+    assertEquals(TimeSpan.Zero, rem)
     assertTrue(grp2.isFull(target0))
-    assertEquals(Time.fromHoursBounded(0),  grp2.remaining(target0))
-    assertEquals(Time.fromHoursBounded(20), grp2.remaining(target10))  // all 20 hours left in bin2, nothing was put there
+    assertEquals(TimeSpan.fromHoursBounded(0),  grp2.remaining(target0))
+    assertEquals(TimeSpan.fromHoursBounded(20), grp2.remaining(target10))  // all 20 hours left in bin2, nothing was put there
   }
 
   test("testCannotReserveMoreTimeThanAvailable") {
     val prop   = mkProp(target10)
-    val block  = Block(prop, prop.obsList.head, Time.fromHoursBounded(20.01))
+    val block  = Block(prop, prop.obsList.head, TimeSpan.fromHoursBounded(20.01))
 
     grp.reserve(block, Fixture.emptyQueue) match {
       case Left(msg: RejectTarget) => assertEquals(prop, msg.prop)
@@ -114,22 +114,22 @@ class DecResourceTest extends ItacSuite {
   }
 
   test("testReserveAvailableWhenRequestingMoreTimeThanAvailable") {
-    val (grp2, rem) = grp.reserveAvailable(Time.fromHoursBounded(50), target0)
-    assertEquals(Time.fromHoursBounded(40), rem)
+    val (grp2, rem) = grp.reserveAvailable(TimeSpan.fromHoursBounded(50), target0)
+    assertEquals(TimeSpan.fromHoursBounded(40), rem)
     assertTrue(grp2.isFull(target0))
-    assertEquals(Time.fromHoursBounded(0),  grp2.remaining(target0))
-    assertEquals(Time.fromHoursBounded(20), grp2.remaining(target10))  // all 20 hours left in bin2, nothing was put there
+    assertEquals(TimeSpan.fromHoursBounded(0),  grp2.remaining(target0))
+    assertEquals(TimeSpan.fromHoursBounded(20), grp2.remaining(target10))  // all 20 hours left in bin2, nothing was put there
   }
 
   test("testReserveToo") {
     val prop   = mkProp(target0).copy(too = ToOActivation.Standard)
-    val block  = Block(prop, prop.obsList.head, Time.fromHoursBounded(10))
+    val block  = Block(prop, prop.obsList.head, TimeSpan.fromHoursBounded(10))
 
     grp.reserve(block, Fixture.emptyQueue) match {
       case Left(msg) => fail(msg.toString)
       case Right(grp2) => {
-        assertEquals(Time.fromHoursBounded( 5), grp2.remaining(target0))  // half (5hrs) in first bin of 10 hours
-        assertEquals(Time.fromHoursBounded(15), grp2.remaining(target10)) // half (5hrs) in second bin of 20 hours
+        assertEquals(TimeSpan.fromHoursBounded( 5), grp2.remaining(target0))  // half (5hrs) in first bin of 10 hours
+        assertEquals(TimeSpan.fromHoursBounded(15), grp2.remaining(target10)) // half (5hrs) in second bin of 20 hours
       }
     }
   }
@@ -137,19 +137,19 @@ class DecResourceTest extends ItacSuite {
   // Spread over the two bins, but the first bin cannot handle an equal share.
   test("testReserveTooUnequal") {
     val prop   = mkProp(target0).copy(too = ToOActivation.Standard)
-    val block  = Block(prop, prop.obsList.head, Time.fromHoursBounded(22))
+    val block  = Block(prop, prop.obsList.head, TimeSpan.fromHoursBounded(22))
 
     grp.reserve(block, Fixture.emptyQueue) match {
       case Left(msg) => fail(msg.toString)
       case Right(grp2) =>
-        assertEquals(Time.fromHoursBounded(0), grp2.remaining(target0))  // 10 hrs (the max) in first bin of 10 hours
-        assertEquals(Time.fromHoursBounded(8), grp2.remaining(target10)) // remainder (12 hrs) in the second bin of 20 hours
+        assertEquals(TimeSpan.fromHoursBounded(0), grp2.remaining(target0))  // 10 hrs (the max) in first bin of 10 hours
+        assertEquals(TimeSpan.fromHoursBounded(8), grp2.remaining(target10)) // remainder (12 hrs) in the second bin of 20 hours
     }
   }
 
   test("testReserveTooOverallocate") {
     val prop   = mkProp(target0).copy(too = ToOActivation.Standard)
-    val block  = Block(prop, prop.obsList.head, Time.fromHoursBounded(30.001))
+    val block  = Block(prop, prop.obsList.head, TimeSpan.fromHoursBounded(30.001))
 
     grp.reserve(block, Fixture.emptyQueue) match {
       case Left(msg: RejectTarget) => assertEquals(prop, msg.prop)

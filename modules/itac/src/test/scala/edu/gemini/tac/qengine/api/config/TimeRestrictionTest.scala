@@ -6,7 +6,6 @@ package edu.gemini.tac.qengine.api.config
 import cats.syntax.all.*
 import edu.gemini.tac.qengine.ItacSuite
 import edu.gemini.tac.qengine.p1.*
-import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.ScienceBand
 import lucuma.core.enums.Site
 import lucuma.core.enums.SkyBackground
@@ -18,12 +17,13 @@ import lucuma.core.model.ElevationRange
 import lucuma.core.model.ImageQuality
 import lucuma.core.model.IntCentiPercent
 import lucuma.core.util.Enumerated
+import lucuma.core.util.TimeSpan
 
 class TimeRestrictionTest extends ItacSuite {
 
   val US = TimeAccountingCategory.US
 
-  private val ntac   = Ntac(US, "x", 0, Time.fromHoursBounded(10))
+  private val ntac   = Ntac(US, "x", 0, TimeSpan.fromHoursBounded(10))
   private val target = ItacTarget(0.0, 0.0) // not used
   private def conds(wv: WaterVapor) =
     ConstraintSet(ImageQuality.Preset.TwoPointZero, CloudExtinction.Preset.ThreePointZero, SkyBackground.Bright, wv, ElevationRange.ByAirMass.Default)
@@ -33,7 +33,7 @@ class TimeRestrictionTest extends ItacSuite {
   }
 
   private def mkProp(wv: WaterVapor): Proposal =
-    Proposal(ntac, site = Site.GS, obsList = List(ItacObservation(target, conds(wv), Time.fromHoursBounded(10))))
+    Proposal(ntac, site = Site.GS, obsList = List(ItacObservation(target, conds(wv), TimeSpan.fromHoursBounded(10))))
 
 
   test("testMatches") {
@@ -47,6 +47,6 @@ class TimeRestrictionTest extends ItacSuite {
   }
 
   test("testMap") {
-    assertEquals(Time.fromHoursBounded(10), bin.map(perc => Time.fromHoursBounded(100) *| perc).value)
+    assertEquals(TimeSpan.fromHoursBounded(10), bin.map(perc => TimeSpan.fromHoursBounded(100) *| perc).value)
   }
 }

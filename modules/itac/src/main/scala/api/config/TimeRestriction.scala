@@ -9,10 +9,10 @@ import edu.gemini.tac.qengine.log.RejectRestrictedBin
 import edu.gemini.tac.qengine.p1.ItacObservation
 import edu.gemini.tac.qengine.p1.Proposal
 import edu.gemini.tac.qengine.util.BoundedTime
-import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.ScienceBand
 import lucuma.core.enums.WaterVapor
 import lucuma.core.model.IntCentiPercent
+import lucuma.core.util.TimeSpan
 
 /**
  * TimeRestriction associates a name, a value, and a predicate.  The value
@@ -37,7 +37,7 @@ object TimeRestriction {
        (_, obs, _) => obs.constraintSet.waterVapor <= wv
     }
 
-  def lgs(limit: Time) =
+  def lgs(limit: TimeSpan) =
     TimeRestriction("LGS Queue Time Limit", limit) {
       (_, obs, _) => obs.lgs
     }

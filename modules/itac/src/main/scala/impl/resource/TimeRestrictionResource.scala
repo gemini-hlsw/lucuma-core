@@ -9,14 +9,14 @@ import edu.gemini.tac.qengine.impl.queue.ProposalQueueBuilder
 import edu.gemini.tac.qengine.log.RejectMessage
 import edu.gemini.tac.qengine.log.RejectRestrictedBin
 import edu.gemini.tac.qengine.util.BoundedTime
-import edu.gemini.tac.qengine.util.Time
 import lucuma.core.model.IntCentiPercent
+import lucuma.core.util.TimeSpan
 
 object TimeRestrictionResource {
-  def apply(bin: TimeRestriction[IntCentiPercent], time: Time): TimeRestrictionResource =
+  def apply(bin: TimeRestriction[IntCentiPercent], time: TimeSpan): TimeRestrictionResource =
     new TimeRestrictionResource(bin.map(percent => BoundedTime(time *| percent)))
 
-  def apply(bin: TimeRestriction[Time]): TimeRestrictionResource =
+  def apply(bin: TimeRestriction[TimeSpan]): TimeRestrictionResource =
     new TimeRestrictionResource(bin.map(time => BoundedTime(time)))
 
 }
@@ -29,8 +29,8 @@ object TimeRestrictionResource {
 final class TimeRestrictionResource(val bin: TimeRestriction[BoundedTime]) extends Resource {
   type T = TimeRestrictionResource
 
-  def limit: Time = bin.value.limit
-  def remaining: Time = bin.value.remaining
+  def limit: TimeSpan = bin.value.limit
+  def remaining: TimeSpan = bin.value.remaining
   def isFull: Boolean = bin.value.isFull
 
   override def reserve(block: Block, queue: ProposalQueueBuilder): RejectMessage Either TimeRestrictionResource =

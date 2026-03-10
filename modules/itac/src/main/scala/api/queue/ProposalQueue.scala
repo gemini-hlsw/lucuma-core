@@ -7,9 +7,9 @@ import cats.syntax.all.*
 import edu.gemini.tac.qengine.api.queue.time.QueueTime
 import edu.gemini.tac.qengine.p1.*
 import edu.gemini.tac.qengine.util.BoundedTime
-import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.ScienceBand
 import lucuma.core.enums.TimeAccountingCategory
+import lucuma.core.util.TimeSpan
 
 /** A queue for a single band. */
 trait ProposalQueue {
@@ -18,13 +18,13 @@ trait ProposalQueue {
 
   def queueTime: QueueTime
 
-  def usedTime: Time =
+  def usedTime: TimeSpan =
     toList.foldMap(_.time)
 
-  def usedTime(p: TimeAccountingCategory): Time =
+  def usedTime(p: TimeAccountingCategory): TimeSpan =
     toList.filter(_.ntac.TimeAccountingCategory === p).foldMap(_.time)
 
-  def remainingTime(TimeAccountingCategory: TimeAccountingCategory): Time =
+  def remainingTime(TimeAccountingCategory: TimeAccountingCategory): TimeSpan =
     queueTime(TimeAccountingCategory) -| usedTime(TimeAccountingCategory)
 
   def bounds(p: TimeAccountingCategory): BoundedTime =

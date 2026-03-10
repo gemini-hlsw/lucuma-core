@@ -3,6 +3,7 @@
 
 package edu.gemini.tac.qengine.impl.resource
 
+import cats.syntax.all.*
 import edu.gemini.tac.qengine.api.config.SiteSemesterConfig
 import edu.gemini.tac.qengine.impl.block.Block
 import edu.gemini.tac.qengine.impl.queue.ProposalQueueBuilder
@@ -10,12 +11,11 @@ import edu.gemini.tac.qengine.log.RejectMessage
 import edu.gemini.tac.qengine.log.RejectTarget
 import edu.gemini.tac.qengine.p1.ItacTarget
 import edu.gemini.tac.qengine.util.BoundedTime
-import edu.gemini.tac.qengine.util.Time
 import lucuma.core.model.ConstraintSet
-import cats.syntax.all.*
+import lucuma.core.util.TimeSpan
 
 object PerRightAscensionResource {
-  def apply(t: Time, c: SiteSemesterConfig): PerRightAscensionResource = {
+  def apply(t: TimeSpan, c: SiteSemesterConfig): PerRightAscensionResource = {
     val decRes   = DeclinationMapResource(t, c.decLimits)
     val condsRes = ConditionsCategoryMapResource(t, c.conditions)
     new PerRightAscensionResource(new BoundedTime(t), decRes, condsRes)
@@ -34,19 +34,19 @@ final case class PerRightAscensionResource(val absBounds: BoundedTime, val decRe
   // dec (as indicated by a target) or for a particular set of observing
   // conditions, may be less than the absolute limit.
 
-  def limit: Time                                  = absBounds.limit
-  def limit(t: ItacTarget): Time                       = limit.min(decRes.limit(t))
-  def limit(c: ConstraintSet): Time                = limit.min(condsRes.limit(c))
-  def limit(t: ItacTarget, c: ConstraintSet): Time     = limit(t).min(limit(c))
+  def limit: TimeSpan                                  = absBounds.limit
+  def limit(t: ItacTarget): TimeSpan                       = limit.min(decRes.limit(t))
+  def limit(c: ConstraintSet): TimeSpan                = limit.min(condsRes.limit(c))
+  def limit(t: ItacTarget, c: ConstraintSet): TimeSpan     = limit(t).min(limit(c))
 
   // There is an absolute amount of time remaining for the RA, but the time
   // remaining for a particular dec (as indicated by a target) or for a
   // particular set of observing conditions, may be less than the absolute.
 
-  def remaining: Time                              = absBounds.remaining
-  def remaining(t: ItacTarget): Time                   = remaining.min(decRes.remaining(t))
-  def remaining(c: ConstraintSet): Time            = remaining.min(condsRes.remaining(c))
-  def remaining(t: ItacTarget, c: ConstraintSet): Time = remaining(t).min(remaining(c))
+  def remaining: TimeSpan                              = absBounds.remaining
+  def remaining(t: ItacTarget): TimeSpan                   = remaining.min(decRes.remaining(t))
+  def remaining(c: ConstraintSet): TimeSpan            = remaining.min(condsRes.remaining(c))
+  def remaining(t: ItacTarget, c: ConstraintSet): TimeSpan = remaining(t).min(remaining(c))
 
   // If the RA bin is full, then it is full at any dec or observing conditions.
   // However, the RA as a whole may not be full yet a particular dec or set of
@@ -68,7 +68,7 @@ final case class PerRightAscensionResource(val absBounds: BoundedTime, val decRe
         } yield new PerRightAscensionResource(newAbsBounds, newDecRes, newCondsRes)
     }
 
-  def reserveAvailable(time: Time, target: ItacTarget, conds: ConstraintSet): (PerRightAscensionResource, Time) = {
+  def reserveAvailable(time: TimeSpan, target: ItacTarget, conds: ConstraintSet): (PerRightAscensionResource, TimeSpan) = {
     val (newAbs, rem1) = absBounds.reserveAvailable(time)
     val (newDec, rem2) = decRes.reserveAvailable(time, target)
     val (newCon, rem3) = condsRes.reserveAvailable(time, conds)

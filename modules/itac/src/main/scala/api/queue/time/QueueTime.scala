@@ -4,13 +4,13 @@
 package edu.gemini.tac.qengine.api.queue.time
 
 
-import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.model.IntCentiPercent
+import lucuma.core.util.TimeSpan
 
 object QueueTime {
   /** Number of hours in each "cycle" of 100 TimeAccountingCategory countries. */
-  val Quantum = Time.fromHoursBounded(3.0)
+  val Quantum = TimeSpan.fromHoursBounded(3.0)
   val DefaultTimeAccountingCategoryOverfillAllowance = IntCentiPercent.unsafeFromPercent(5)
 }
 
@@ -18,9 +18,9 @@ object QueueTime {
 final case class QueueTime(timeAccountingCategoryTime: TimeAccountingCategoryTime, val overfillAllowance: IntCentiPercent) {
 
   def TimeAccountingCategoryQuanta: TimeAccountingCategoryTime =
-    TimeAccountingCategoryTime.fromFunction(p => if (timeAccountingCategoryTime(p) == Time.Zero) Time.Zero else QueueTime.Quantum)
+    TimeAccountingCategoryTime.fromFunction(p => if (timeAccountingCategoryTime(p) == TimeSpan.Zero) TimeSpan.Zero else QueueTime.Quantum)
 
-  def apply(p: TimeAccountingCategory): Time =
+  def apply(p: TimeAccountingCategory): TimeSpan =
     timeAccountingCategoryTime(p)
 
 }
