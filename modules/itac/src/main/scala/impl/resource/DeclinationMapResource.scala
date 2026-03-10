@@ -20,7 +20,7 @@ import lucuma.core.model.IntCentiPercent
 
 object DeclinationMapResource {
   def apply(t: Time, bins: DeclinationMap[IntCentiPercent]): DeclinationMapResource = {
-    new DeclinationMapResource(bins.map(perc => BoundedTime(t * perc)))
+    new DeclinationMapResource(bins.map(perc => BoundedTime(t *| perc)))
   }
 
   def tooBlocks(block: Block, grp: DeclinationMap[BoundedTime]): Option[Seq[Block]] =
@@ -68,8 +68,8 @@ final case class DeclinationMapResource(val bins: DeclinationMap[BoundedTime]) e
         Right(new DeclinationMapResource(DeclinationMap.fromBins(updatedBins*)))
       }
       case _ =>
-        val cur = bins.bins.foldLeft(Time.ZeroHours)(_ + _.binValue.used)
-        val max = bins.bins.foldLeft(Time.ZeroHours)(_ + _.binValue.limit)
+        val cur = bins.bins.foldLeft(Time.Zero)(_ +| _.binValue.used)
+        val max = bins.bins.foldLeft(Time.Zero)(_ +| _.binValue.limit)
         Left(RejectTarget(block.prop, block.obs, band, RejectTarget.Dec, cur, max))
     }
 

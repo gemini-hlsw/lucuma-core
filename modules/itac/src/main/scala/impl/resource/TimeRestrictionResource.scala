@@ -14,7 +14,7 @@ import lucuma.core.model.IntCentiPercent
 
 object TimeRestrictionResource {
   def apply(bin: TimeRestriction[IntCentiPercent], time: Time): TimeRestrictionResource =
-    new TimeRestrictionResource(bin.map(percent => BoundedTime(time * percent)))
+    new TimeRestrictionResource(bin.map(percent => BoundedTime(time *| percent)))
 
   def apply(bin: TimeRestriction[Time]): TimeRestrictionResource =
     new TimeRestrictionResource(bin.map(time => BoundedTime(time)))

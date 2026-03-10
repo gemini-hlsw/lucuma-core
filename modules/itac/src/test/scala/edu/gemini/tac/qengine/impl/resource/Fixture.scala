@@ -50,13 +50,13 @@ object Fixture {
   )
 
   // 0 hrs, 1 hrs, 2 hrs, ... 23 hrs
-  val raLimits   = RightAscensionMap((0 to 23).map(Time.hours(_)))
+  val raLimits   = RightAscensionMap((0 to 23).map(Time.fromHoursBounded(_)))
   val binConfig  = new SiteSemesterConfig(site, semester, raLimits, decBins, List.empty, condsBins)
   val raResGroup = RightAscensionMapResource(binConfig)
 
   def compositeTimeRestrictionResource(total: Time): List[TimeRestriction[BoundedTime]] = {
     val bins = RestrictionConfig().mapTimeRestrictions(
-      perc => BoundedTime(total * perc),
+      perc => BoundedTime(total *| perc),
       _ => BoundedTime(total))
     bins
   }
@@ -70,7 +70,7 @@ object Fixture {
   // Falls in the second conditions bin (>=CC80)
   val badCC  = ConstraintSet(ImageQuality.Preset.TwoPointZero, CloudExtinction.Preset.OnePointZero, SkyBackground.Bright, WaterVapor.Wet, ElevationRange.ByAirMass.Default)
 
-  def genQuanta(hrs: Double): TimeAccountingCategoryTime = TimeAccountingCategoryTime.constant(Time.hours(hrs))
+  def genQuanta(hrs: Double): TimeAccountingCategoryTime = TimeAccountingCategoryTime.constant(Time.fromHoursBounded(hrs))
 
   // Makes a proposal with the given ntac info, and observations according
   // to the descriptions (target, conditions, time)
@@ -87,7 +87,7 @@ object Fixture {
   val Band3Percent = IntCentiPercent.unsafeFromPercent(20)
 
   def evenQueueTime(hrs: Double, @unused overfill: Option[IntCentiPercent]): QueueTime = {
-    val pt = TimeAccountingCategoryTime.fromFunction { _ => Time.hours(hrs) * Band1Percent }
+    val pt = TimeAccountingCategoryTime.fromFunction { _ => Time.fromHoursBounded(hrs) *| Band1Percent }
     QueueTime(pt, IntCentiPercent.Min)
   }
 

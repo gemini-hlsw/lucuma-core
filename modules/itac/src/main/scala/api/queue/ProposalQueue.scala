@@ -25,7 +25,7 @@ trait ProposalQueue {
     toList.filter(_.ntac.TimeAccountingCategory === p).foldMap(_.time)
 
   def remainingTime(TimeAccountingCategory: TimeAccountingCategory): Time =
-    queueTime(TimeAccountingCategory) - usedTime(TimeAccountingCategory)
+    queueTime(TimeAccountingCategory) -| usedTime(TimeAccountingCategory)
 
   def bounds(p: TimeAccountingCategory): BoundedTime =
     BoundedTime(queueTime(p), usedTime(p))

@@ -17,11 +17,11 @@ object ShutdownCalc {
 
   def timePerRa(s: Shutdown, size: RaBinSize): List[Time] =
     RaDecBinCalc.RA_CALC.calc(s.site, s.start.toInstant(), s.end.toInstant(), size).map {
-      hrs => Time.hours(hrs.hours)
+      hrs => Time.fromHoursBounded(hrs.hours)
     }
 
   def asTime(s: Shutdown, size: RaBinSize): Time =
-    Time.hours(timePerRa(s, size).map(_.toHours.value).sum)
+    Time.fromHoursBounded(timePerRa(s, size).map(_.toHours.toDouble).sum)
 
   def trim(s: Shutdown, ctx: Context): Option[Shutdown] = {
     val semester = ctx.semester
@@ -47,10 +47,10 @@ object ShutdownCalc {
    */
   def sumHoursPerRa(shutdowns: List[Shutdown], size: RaBinSize): List[Time] = {
     val lsts  = shutdowns.map { timePerRa(_, size) }
-    val zeros = List.fill(size.binCount)(Time.ZeroHours)
+    val zeros = List.fill(size.binCount)(Time.Zero)
 
     lsts.foldLeft(zeros) {
-      (sum, cur) => sum.zip(cur).map { case (t1, t2) => t1 + t2 }
+      (sum, cur) => sum.zip(cur).map { case (t1, t2) => t1 +| t2 }
     }
   }
 

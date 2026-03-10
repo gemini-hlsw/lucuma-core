@@ -16,7 +16,7 @@ object RejectOverAllocation {
 
   val noRemaining = "All schedulable queue time in bands 1-3 has been allocated."
   def tooBig(propTime: Time, allRemainingTime: Time) =
-    "Adding %.1f hrs for proposal would require more time than remaining in the queue (%.1f hrs)".format(propTime.toHours.value, allRemainingTime.toHours.value)
+    "Adding %.1f hrs for proposal would require more time than remaining in the queue (%.1f hrs)".format(propTime.toHours, allRemainingTime.toHours)
 
   def detail(prop: Proposal, remainingGuaranteedTime: Time, allRemainingTime: Time): String =
     if (remainingGuaranteedTime <= Time.Zero)

@@ -23,7 +23,7 @@ class TimeRestrictionTest extends ItacSuite {
 
   val US = TimeAccountingCategory.US
 
-  private val ntac   = Ntac(US, "x", 0, Time.hours(10))
+  private val ntac   = Ntac(US, "x", 0, Time.fromHoursBounded(10))
   private val target = ItacTarget(0.0, 0.0) // not used
   private def conds(wv: WaterVapor) =
     ConstraintSet(ImageQuality.Preset.TwoPointZero, CloudExtinction.Preset.ThreePointZero, SkyBackground.Bright, wv, ElevationRange.ByAirMass.Default)
@@ -33,7 +33,7 @@ class TimeRestrictionTest extends ItacSuite {
   }
 
   private def mkProp(wv: WaterVapor): Proposal =
-    Proposal(ntac, site = Site.GS, obsList = List(ItacObservation(target, conds(wv), Time.hours(10))))
+    Proposal(ntac, site = Site.GS, obsList = List(ItacObservation(target, conds(wv), Time.fromHoursBounded(10))))
 
 
   test("testMatches") {
@@ -47,6 +47,6 @@ class TimeRestrictionTest extends ItacSuite {
   }
 
   test("testMap") {
-    assertEquals(Time.hours(10), bin.map(perc => Time.hours(100) * perc).value)
+    assertEquals(Time.fromHoursBounded(10), bin.map(perc => Time.fromHoursBounded(100) *| perc).value)
   }
 }

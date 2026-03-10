@@ -11,8 +11,8 @@ import lucuma.core.enums.ScienceBand
 trait TimeBinMessageFormatter {
   private val binStatusTemplate = "Bin %.1f%% full (%.2f / %.2f hrs)"
   def binStatus(cur: Time, max: Time): String = {
-    val curHrs = cur.toHours.value
-    val maxHrs = max.toHours.value
+    val curHrs = cur.toHours
+    val maxHrs = max.toHours
     val perc   = if (maxHrs.abs < 0.0001) 100.0 else curHrs/maxHrs * 100
     binStatusTemplate.format(perc, curHrs, maxHrs)
   }
@@ -22,7 +22,7 @@ trait TimeBinMessageFormatter {
     val obsTime = prop.relativeObsTime(obs, band)
     val target  = obs.itacTarget
     val targetName = target.id.toString
-    obsInfoTemplate.format(obsTime.toHours.value, targetName, target.ra.toHourAngle.toDoubleHours, target.dec.toAngle.toDoubleDegrees)
+    obsInfoTemplate.format(obsTime.toHours, targetName, target.ra.toHourAngle.toDoubleHours, target.dec.toAngle.toDoubleDegrees)
   }
 
   private val detailTemplate    = "%s. Reject %s."
