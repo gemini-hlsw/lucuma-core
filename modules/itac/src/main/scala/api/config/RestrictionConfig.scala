@@ -3,8 +3,8 @@
 
 package edu.gemini.tac.qengine.api.config
 
-import edu.gemini.tac.qengine.util.Time
 import lucuma.core.model.IntCentiPercent
+import lucuma.core.util.TimeSpan
 
 /**
  * Configuration of restricted bins, which may be specified in terms of a
@@ -12,7 +12,7 @@ import lucuma.core.model.IntCentiPercent
  */
 case class RestrictionConfig(
      relativeTimeRestrictions: List[TimeRestriction[IntCentiPercent]] = Default.RelativeTimeRestrictions,
-     absoluteTimeRestrictions: List[TimeRestriction[Time]]    = Default.AbsoluteTimeRestrictions,
+     absoluteTimeRestrictions: List[TimeRestriction[TimeSpan]]    = Default.AbsoluteTimeRestrictions,
      bandRestrictions:         List[BandRestriction]          = Default.BandRestrictions) {
 
   /**
@@ -20,6 +20,6 @@ case class RestrictionConfig(
    * supplied mapping functions, combines and returns the result in a single
    * list of restricted bins of the new type.
    */
-  def mapTimeRestrictions[A](f: IntCentiPercent => A, g: Time => A): List[TimeRestriction[A]] =
+  def mapTimeRestrictions[A](f: IntCentiPercent => A, g: TimeSpan => A): List[TimeRestriction[A]] =
     relativeTimeRestrictions.map(_.map(f)) ::: absoluteTimeRestrictions.map(_.map(g))
 }

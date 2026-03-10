@@ -11,9 +11,9 @@ import edu.gemini.tac.qengine.impl.queue.ProposalQueueBuilder
 import edu.gemini.tac.qengine.log.RejectMessage
 import edu.gemini.tac.qengine.log.RejectToo
 import edu.gemini.tac.qengine.p1.*
-import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.ToOActivation
 import lucuma.core.model.ConstraintSet
+import lucuma.core.util.TimeSpan
 
 object RightAscensionMapResource {
   // Creates an RA resource group from the site/semester configuration.
@@ -39,7 +39,7 @@ case class RightAscensionMapResource(val grp: RightAscensionMap[PerRightAscensio
   private def reserveToo(block: Block, queue: ProposalQueueBuilder): RejectMessage Either RightAscensionMapResource =
     tooBlocks(block) match {
         case None => {
-          val sum = grp.bins.foldLeft(Time.fromHoursBounded(0))(_ +| _.remaining(block.obs.constraintSet))
+          val sum = grp.bins.foldLeft(TimeSpan.fromHoursBounded(0))(_ +| _.remaining(block.obs.constraintSet))
           Left(new RejectToo(block.prop, block.obs, queue.band, sum))
         }
         case Some(s) =>
@@ -66,16 +66,16 @@ case class RightAscensionMapResource(val grp: RightAscensionMap[PerRightAscensio
    * Reserves up-to the given amount of time, returning an updated
    * RightAscensionMapResource and any time left over that could not be reserved.
    */
-  def reserveAvailable(time: Time, target: ItacTarget, conds: ConstraintSet): (RightAscensionMapResource, Time) = {
+  def reserveAvailable(time: TimeSpan, target: ItacTarget, conds: ConstraintSet): (RightAscensionMapResource, TimeSpan) = {
     val (bin, rem) = grp(target.ra).reserveAvailable(time, target, conds)
     (new RightAscensionMapResource(grp.updated(target.ra, bin)), rem)
   }
 
-  def reserveAvailable(reduction: ItacObservation): (RightAscensionMapResource, Time) =
+  def reserveAvailable(reduction: ItacObservation): (RightAscensionMapResource, TimeSpan) =
     reserveAvailable(reduction.time, reduction.itacTarget, reduction.constraintSet)
 
-  def reserveAvailable(reductions: List[ItacObservation]): (RightAscensionMapResource, Time) = {
-    reductions.foldLeft((this,Time.Zero)) {
+  def reserveAvailable(reductions: List[ItacObservation]): (RightAscensionMapResource, TimeSpan) = {
+    reductions.foldLeft((this,TimeSpan.Zero)) {
       case ((grp0, time), reduction) =>
         grp0.reserveAvailable(reduction) match {
           case (newGrp, leftover) => (newGrp, leftover+|time)

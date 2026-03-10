@@ -5,8 +5,8 @@ package edu.gemini.tac.qengine.log
 
 import edu.gemini.tac.qengine.p1.ItacObservation
 import edu.gemini.tac.qengine.p1.Proposal
-import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.ScienceBand
+import lucuma.core.util.TimeSpan
 
 /**
  * An observation rejection message for observations that would cause restricted
@@ -19,7 +19,7 @@ object RejectRestrictedBin extends TimeBinMessageFormatter {
   def reason(binName: String): String = reasonTemplate.format(name, binName)
 }
 
-final case class RejectRestrictedBin(prop: Proposal, obs: ItacObservation, band: ScienceBand, name: String, cur: Time, max: Time) extends RejectMessage {
+final case class RejectRestrictedBin(prop: Proposal, obs: ItacObservation, band: ScienceBand, name: String, cur: TimeSpan, max: TimeSpan) extends RejectMessage {
   def reason: String = RejectRestrictedBin.reason(name)
   def detail: String = RejectRestrictedBin.detail(prop, obs, band, cur, max)
 }

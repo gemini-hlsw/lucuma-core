@@ -10,9 +10,9 @@ import edu.gemini.tac.qengine.impl.block.Block
 import edu.gemini.tac.qengine.impl.queue.ProposalQueueBuilder
 import edu.gemini.tac.qengine.log.*
 import edu.gemini.tac.qengine.util.BoundedTime
-import edu.gemini.tac.qengine.util.Time
 import lucuma.core.model.ConstraintSet
 import lucuma.core.model.IntCentiPercent
+import lucuma.core.util.TimeSpan
 
 import annotation.tailrec
 
@@ -21,7 +21,7 @@ object ConditionsCategoryMapResource {
   // Absorbs the time into the BoundedTime values associated with the given
   // "in" list of observing conditions categories, returning a list of updated
   // bins and any remaining time
-  @tailrec private def reserveAvailable(t: Time, in: List[ConditionsBin[BoundedTime]], out: List[ConditionsBin[BoundedTime]]): (List[ConditionsBin[BoundedTime]], Time) =
+  @tailrec private def reserveAvailable(t: TimeSpan, in: List[ConditionsBin[BoundedTime]], out: List[ConditionsBin[BoundedTime]]): (List[ConditionsBin[BoundedTime]], TimeSpan) =
     if (t.isZero || in.isEmpty)
       (out, t)
     else {
@@ -33,7 +33,7 @@ object ConditionsCategoryMapResource {
    * Constructs with the total time to spread across the observing conditions
    * bins and the set of bins to use.
    */
-  def apply(t: Time, g: ConditionsCategoryMap[IntCentiPercent]) = {
+  def apply(t: TimeSpan, g: ConditionsCategoryMap[IntCentiPercent]) = {
     // Creates a map from ConditionsBin.Category to BoundedTime initialized with
     // time values according to the relative percentage of the matching
     // conditions bin.
@@ -49,13 +49,13 @@ object ConditionsCategoryMapResource {
 final class ConditionsCategoryMapResource private (val bins: ConditionsCategoryMap[BoundedTime]) extends Resource {
   type T = ConditionsCategoryMapResource
 
-  private def sum(c: ConstraintSet, f: (BoundedTime => Time)): Time = {
+  private def sum(c: ConstraintSet, f: (BoundedTime => TimeSpan)): TimeSpan = {
     val cats = bins.searchPath(c)
-    cats.foldLeft(Time.Zero)((t: Time, cat: Cat) => t +| f(bins(cat)))
+    cats.foldLeft(TimeSpan.Zero)((t: TimeSpan, cat: Cat) => t +| f(bins(cat)))
   }
 
-  def limit(c: ConstraintSet): Time = sum(c, _.limit)
-  def remaining(c: ConstraintSet): Time = sum(c, _.remaining)
+  def limit(c: ConstraintSet): TimeSpan = sum(c, _.limit)
+  def remaining(c: ConstraintSet): TimeSpan = sum(c, _.remaining)
   def isFull(c: ConstraintSet): Boolean = remaining(c).isZero
 
   private def conds(block: Block): ConstraintSet =
@@ -82,7 +82,7 @@ final class ConditionsCategoryMapResource private (val bins: ConditionsCategoryM
    * returned.   Returns a new conditions resource group with the reserved time
    * along with any remaining time that could not be reserved.
    */
-  def reserveAvailable(time: Time, conds: ConstraintSet): (ConditionsCategoryMapResource, Time) = {
+  def reserveAvailable(time: TimeSpan, conds: ConstraintSet): (ConditionsCategoryMapResource, TimeSpan) = {
     val (updatedBins, rem) = ConditionsCategoryMapResource.reserveAvailable(time, bins.searchBins(conds), Nil)
     (new ConditionsCategoryMapResource(bins.updated(updatedBins)), rem)
   }

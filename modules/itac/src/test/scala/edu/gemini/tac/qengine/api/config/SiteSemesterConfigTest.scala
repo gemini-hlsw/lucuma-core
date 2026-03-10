@@ -3,12 +3,12 @@
 
 package edu.gemini.tac.qengine.api.config
 
-import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.Half
 import lucuma.core.enums.Site
 import lucuma.core.model.IntCentiPercent
 import lucuma.core.model.Semester
 import lucuma.core.model.Semester.YearInt
+import lucuma.core.util.TimeSpan
 import munit.FunSuite
 
 class SiteSemesterConfigTest extends FunSuite {
@@ -18,14 +18,14 @@ class SiteSemesterConfigTest extends FunSuite {
   val semester = new Semester(YearInt.unsafeFrom(2011), Half.A)
 
   test("testPassSingleDecBinPercentageRequirement") {
-    val ra  = RightAscensionMap(List(Time.fromHoursBounded(100.0)))
+    val ra  = RightAscensionMap(List(TimeSpan.fromHoursBounded(100.0)))
     val dec = DeclinationMap(List(IntCentiPercent.unsafeFromPercent(100)))
     new SiteSemesterConfig(site, semester, ra, dec, List.empty)
     ()
   }
 
   test("testFailSingleDecBinPercentageRequirement") {
-    val ra  = RightAscensionMap(List(Time.fromHoursBounded(100.0)))
+    val ra  = RightAscensionMap(List(TimeSpan.fromHoursBounded(100.0)))
     val dec = DeclinationMap(List(IntCentiPercent.unsafeFromPercent(99)))
     try {
       new SiteSemesterConfig(site, semester, ra, dec, List.empty)
@@ -36,14 +36,14 @@ class SiteSemesterConfigTest extends FunSuite {
   }
 
   test("testPassMultiDecBinPercentageRequirement") {
-    val ra  = RightAscensionMap(List(Time.fromHoursBounded(100.0)))
+    val ra  = RightAscensionMap(List(TimeSpan.fromHoursBounded(100.0)))
     val dec = DeclinationMap(List(IntCentiPercent.unsafeFromPercent(10), IntCentiPercent.unsafeFromPercent(100), IntCentiPercent.unsafeFromPercent(0)))
     new SiteSemesterConfig(site, semester, ra, dec, List.empty)
     ()
   }
 
   test("testFailMultiDecBinPercentageRequirement") {
-    val ra  = RightAscensionMap(List(Time.fromHoursBounded(100.0)))
+    val ra  = RightAscensionMap(List(TimeSpan.fromHoursBounded(100.0)))
     val dec = DeclinationMap(List(IntCentiPercent.unsafeFromPercent(10), IntCentiPercent.unsafeFromPercent(99), IntCentiPercent.unsafeFromPercent(0)))
     try {
       new SiteSemesterConfig(site, semester, ra, dec, List.empty)

@@ -7,9 +7,9 @@ import cats.syntax.all.*
 import edu.gemini.tac.qengine.api.queue.time.TimeAccountingCategoryTime
 import edu.gemini.tac.qengine.p1.ItacObservation
 import edu.gemini.tac.qengine.p1.Proposal
-import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.util.Enumerated
+import lucuma.core.util.TimeSpan
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -44,7 +44,7 @@ trait BlockIterator {
   /**
    * The time remaining in the current time quantum.
    */
-  val remTime: Time
+  val remTime: TimeSpan
 
   /**
    * Computes the list of remaining proposals in the iterator.
@@ -103,7 +103,7 @@ trait BlockIterator {
     if (TimeAccountingCategoryIter.hasNext) mkIterator(seq, remTime, m) else advanceTimeAccountingCategory(m)
   }
 
-  private def advance(t: Time, m: IMap): BlockIterator =
+  private def advance(t: TimeSpan, m: IMap): BlockIterator =
     if ((remTime > t) && m(currentTimeAccountingCategory).hasNext) mkIterator(seq, remTime -| t, m)
     else advanceTimeAccountingCategory(m)
 
@@ -137,7 +137,7 @@ trait BlockIterator {
     }
   }
 
-  protected def mkIterator(TimeAccountingCategorySeq: Seq[TimeAccountingCategory], t: Time, iterMap: IMap): BlockIterator
+  protected def mkIterator(TimeAccountingCategorySeq: Seq[TimeAccountingCategory], t: TimeSpan, iterMap: IMap): BlockIterator
 }
 
 object BlockIterator {
@@ -146,22 +146,22 @@ object BlockIterator {
   object Empty extends BlockIterator {
     val quantaMap: TimeAccountingCategoryTime = TimeAccountingCategoryTime.empty
     val seq: Seq[TimeAccountingCategory] = Seq.empty
-    val remTime: Time = Time.Zero
+    val remTime: TimeSpan = TimeSpan.Zero
     val iterMap: IMap = Map.empty
 
     override def isStartOf(prop: Proposal): Boolean = false
     override def remPropList: List[Proposal] = Nil
     override def hasNext: Boolean = false
-    def mkIterator(s: Seq[TimeAccountingCategory], t: Time, m: IMap) = this
+    def mkIterator(s: Seq[TimeAccountingCategory], t: TimeSpan, m: IMap) = this
   }
 
   private class BlockIteratorImpl(
           val quantaMap: TimeAccountingCategoryTime,
           val seq: Seq[TimeAccountingCategory],
-          val remTime: Time,
+          val remTime: TimeSpan,
           val iterMap: IMap) extends BlockIterator {
 
-    def mkIterator(s: Seq[TimeAccountingCategory], t: Time, m: IMap) = {
+    def mkIterator(s: Seq[TimeAccountingCategory], t: TimeSpan, m: IMap) = {
       LoggerFactory.getLogger("edu.gemini.itac").debug("BlockIterator: " + seq.head + " remTime " + remTime)
       //QueueCalculationLog.logger.log(Level.trace, (<Event source="BlockIterator" event="mkIterator">{s.head.fullName}</Event>).toString)
       new BlockIteratorImpl(quantaMap, s, t, m)
@@ -174,9 +174,9 @@ object BlockIterator {
   // Finds the first TimeAccountingCategory that has a non-zero time quantum and a proposal
   // list and returns the sequence advanced to that TimeAccountingCategory and the time in its
   // time quantum.
-  private def init(qMap: TimeAccountingCategoryTime, iMap: IMap, TimeAccountingCategorySeq: Seq[TimeAccountingCategory], remaining: Set[TimeAccountingCategory]): (Seq[TimeAccountingCategory], Time) =
+  private def init(qMap: TimeAccountingCategoryTime, iMap: IMap, TimeAccountingCategorySeq: Seq[TimeAccountingCategory], remaining: Set[TimeAccountingCategory]): (Seq[TimeAccountingCategory], TimeSpan) =
     if (remaining.isEmpty || TimeAccountingCategorySeq.isEmpty)
-      (Seq.empty, Time.Zero)
+      (Seq.empty, TimeSpan.Zero)
     else if (!qMap(TimeAccountingCategorySeq.head).isZero && iMap(TimeAccountingCategorySeq.head).hasNext)
       (TimeAccountingCategorySeq, qMap(TimeAccountingCategorySeq.head))
     else

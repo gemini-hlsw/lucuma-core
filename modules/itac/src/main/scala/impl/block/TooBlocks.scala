@@ -3,8 +3,8 @@
 
 package edu.gemini.tac.qengine.impl.block
 
-import edu.gemini.tac.qengine.util.Time
 import cats.syntax.all.*
+import lucuma.core.util.TimeSpan
 
 /**
  * An object used to split a Block into a number of smaller blocks, one for each
@@ -22,7 +22,7 @@ object TooBlocks {
     def compare(x: (A, Int), y: (A, Int)) = x._2 - y._2
   }
 
-  private def remainingTimeOrdering[T](remTime: T => Time): Ordering[(T, Int)] = new Ordering[(T, Int)] {
+  private def remainingTimeOrdering[T](remTime: T => TimeSpan): Ordering[(T, Int)] = new Ordering[(T, Int)] {
     def compare(x: (T, Int), y: (T, Int)): Int = remTime(x._1).compare(remTime(y._1))
   }
 
@@ -35,11 +35,11 @@ object TooBlocks {
 //  def apply(block: Block, decGroup: DeclinationMap[BoundedTime]): Option[Seq[Block]] =
 //    apply[DecRanged[BoundedTime]](block, decGroup.bins, _.binValue.remaining)
 
-  def apply[T](block: Block, bins: Seq[T], remTime: T => Time): Option[Seq[Block]] =
+  def apply[T](block: Block, bins: Seq[T], remTime: T => TimeSpan): Option[Seq[Block]] =
     new TooBlocks(block, bins, remTime).seq
 
 
-  private class TooBlocks[T](val block: Block, val bins: Seq[T], val remTime: T => Time) {
+  private class TooBlocks[T](val block: Block, val bins: Seq[T], val remTime: T => TimeSpan) {
 
     /**
      * Returns a sequence of smaller blocks (one for each member of the
@@ -55,7 +55,7 @@ object TooBlocks {
     // Distribute time across the bins, returning a sequence of (Int, Time) which
     // identifies the amount of time to reserve in each bin by index.  If there
     // isn't enough time remaining in all the bins, then Nil is returned.
-    private def distributeTime(t: Time, bins: Seq[T]): List[Time] =
+    private def distributeTime(t: TimeSpan, bins: Seq[T]): List[TimeSpan] =
       distributeTime(t, zipAndSort(bins)).sorted(using TooBlocks.indexOrdering).unzip._1
 
     // Zips with index and sorts according to remaining time in each RA bin.
@@ -65,14 +65,14 @@ object TooBlocks {
     // Considering the bins in sorted order according to remaining time, build
     // the time distribution sequence.  Bins that can't hold an even distribution
     // of time are filled to their capacity.
-    private def distributeTime(t: Time, bins: List[(T, Int)]): List[(Time, Int)] =
+    private def distributeTime(t: TimeSpan, bins: List[(T, Int)]): List[(TimeSpan, Int)] =
       bins match {
         case Nil => Nil
         case head :: tail => {
           val rem   = remTime(head._1) // Time remaining in the current RA bin
           val index = head._2          // Index of the current (head) RA bin
           // Time in an even distribution across the remaining bins
-          val evenDist = Time.fromHoursBounded(t.toHours.toDouble / bins.size)
+          val evenDist = TimeSpan.fromHoursBounded(t.toHours.toDouble / bins.size)
 
           if (rem < evenDist)
             distributeTime(t -| rem, tail) match {

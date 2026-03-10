@@ -3,12 +3,12 @@
 
 package edu.gemini.tac.qengine.p1
 
-import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.ScienceBand
 import lucuma.core.enums.ScienceSubtype
 import lucuma.core.enums.Site
 import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.enums.ToOActivation
+import lucuma.core.util.TimeSpan
 
 import java.io.File
 
@@ -36,19 +36,19 @@ case class Proposal(
   /**
    * Gets the time for the proposal as a whole.
    */
-  def time: Time = ntac.awardedTime
+  def time: TimeSpan = ntac.awardedTime
 
   /**
    * Returns the original awarded time for this proposal, which will be more than `awardedTime` if
    * the original proposal was split in half due to the presence of observations at both sites.
    */
-  def undividedTime: Time = ntac.undividedTime.getOrElse(time)
+  def undividedTime: TimeSpan = ntac.undividedTime.getOrElse(time)
 
   /**
    * Gets the time for the given observation relative to the total for all
    * observations in the proposal.
    */
-  def relativeObsTime(obs: ItacObservation, band: ScienceBand): Time =
+  def relativeObsTime(obs: ItacObservation, band: ScienceBand): TimeSpan =
     ItacObservation.relativeObsTime(obs, time, obsListFor(band))
 
   /**

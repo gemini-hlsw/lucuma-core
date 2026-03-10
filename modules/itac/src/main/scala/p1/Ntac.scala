@@ -4,8 +4,8 @@
 package edu.gemini.tac.qengine.p1
 
 import edu.gemini.tac.qengine.p1.Ntac.Rank
-import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.TimeAccountingCategory
+import lucuma.core.util.TimeSpan
 // import edu.gemini.model.p1.immutable.{ Submission, NgoSubmission }
 
 trait Submission
@@ -14,11 +14,11 @@ trait NgoSubmission
 case class Ntac(TimeAccountingCategory: TimeAccountingCategory,
   reference: String,
   ranking: Rank,
-  awardedTime: Time,
+  awardedTime: TimeSpan,
   poorWeather: Boolean,
   lead: Option[String] = None,
   submission: Submission = null,
-  undividedTime: Option[Time] = None, // this will be set to the original time if the actual time is reduced due to a site split
+  undividedTime: Option[TimeSpan] = None, // this will be set to the original time if the actual time is reduced due to a site split
   ngoEmail: Option[String] = None
 ) {
   require(awardedTime.toMilliseconds >= 0, "Awarded time must be non-negative, not " + awardedTime.toMilliseconds)
@@ -79,15 +79,15 @@ object Ntac {
   /**
    * Sums the awarded time in a collection of Ntacs.
    */
-  def awardedTimeSum(ntacs: Iterable[Ntac]): Time =
-    ntacs.foldLeft(Time.Zero)(_ +| _.awardedTime)
+  def awardedTimeSum(ntacs: Iterable[Ntac]): TimeSpan =
+    ntacs.foldLeft(TimeSpan.Zero)(_ +| _.awardedTime)
 
-  def apply(TimeAccountingCategory: TimeAccountingCategory, reference: String, ranking: Double, awardedTime: Time, poorWeather : Boolean): Ntac =
+  def apply(TimeAccountingCategory: TimeAccountingCategory, reference: String, ranking: Double, awardedTime: TimeSpan, poorWeather : Boolean): Ntac =
       new Ntac(TimeAccountingCategory, reference, Ntac.Rank(ranking), awardedTime, poorWeather)
 
-  def apply(TimeAccountingCategory: TimeAccountingCategory, reference: String, ranking: Double, awardedTime: Time): Ntac =
+  def apply(TimeAccountingCategory: TimeAccountingCategory, reference: String, ranking: Double, awardedTime: TimeSpan): Ntac =
     new Ntac(TimeAccountingCategory, reference, Ntac.Rank(ranking), awardedTime, false)
 
-  def apply(TimeAccountingCategory: TimeAccountingCategory, reference: String, ranking: Double, awardedTime: Time, lead: String): Ntac =
+  def apply(TimeAccountingCategory: TimeAccountingCategory, reference: String, ranking: Double, awardedTime: TimeSpan, lead: String): Ntac =
     new Ntac(TimeAccountingCategory, reference, Ntac.Rank(ranking), awardedTime, false, Some(lead))
 }

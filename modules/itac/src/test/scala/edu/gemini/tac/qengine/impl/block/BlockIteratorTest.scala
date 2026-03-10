@@ -6,7 +6,6 @@ package edu.gemini.tac.qengine.impl.block
 import edu.gemini.tac.qengine.ItacSuite
 import edu.gemini.tac.qengine.api.queue.time.TimeAccountingCategoryTime
 import edu.gemini.tac.qengine.p1.*
-import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.Site
 import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.TimeAccountingCategory
@@ -16,6 +15,7 @@ import lucuma.core.model.ConstraintSet
 import lucuma.core.model.ElevationRange
 import lucuma.core.model.ImageQuality
 import lucuma.core.util.Enumerated
+import lucuma.core.util.TimeSpan
 import org.junit.*
 
 import Assert.*
@@ -35,16 +35,16 @@ class BlockIteratorTest extends ItacSuite {
     )
   val e = 0.000001
 
-  def mkObs(hrs: Double): ItacObservation = ItacObservation(target, conds, Time.fromHoursBounded(hrs))
+  def mkObs(hrs: Double): ItacObservation = ItacObservation(target, conds, TimeSpan.fromHoursBounded(hrs))
 
   def mkProp(p: TimeAccountingCategory, hrs: Double, obsHrs: List[Double], b3ObsHrs: List[Double]): Proposal = {
-    val ntac = Ntac(p, "na", 0, Time.fromHoursBounded(hrs))
-    val lst = obsHrs.map(curHrs => ItacObservation(target, conds, Time.fromHoursBounded(curHrs))).toList
-    val b3obs = b3ObsHrs.map(curHrs => ItacObservation(target, conds, Time.fromHoursBounded(curHrs))).toList
+    val ntac = Ntac(p, "na", 0, TimeSpan.fromHoursBounded(hrs))
+    val lst = obsHrs.map(curHrs => ItacObservation(target, conds, TimeSpan.fromHoursBounded(curHrs))).toList
+    val b3obs = b3ObsHrs.map(curHrs => ItacObservation(target, conds, TimeSpan.fromHoursBounded(curHrs))).toList
     Proposal(ntac, site = Site.GS, obsList = lst, band3Observations = b3obs)
   }
 
-  def genQuanta(hrs: Double): TimeAccountingCategoryTime = TimeAccountingCategoryTime.constant(Time.fromHoursBounded(hrs))
+  def genQuanta(hrs: Double): TimeAccountingCategoryTime = TimeAccountingCategoryTime.constant(TimeSpan.fromHoursBounded(hrs))
 
   def genPropLists(count: Int, p: TimeAccountingCategory, propTime: Double, obsTimes: List[Double], b3ObsTimes: List[Double] = List.empty): Map[TimeAccountingCategory, List[Proposal]] = {
     val lst = (1 to count).map(_ => mkProp(p, propTime, obsTimes, b3ObsTimes)).toList
@@ -92,12 +92,12 @@ class BlockIteratorTest extends ItacSuite {
 
   test("testTimeAccountingCategoryAdvanceNoProps") {
     val prop = mkProp(US, 5, List(5), List.empty)
-    val qMap = TimeAccountingCategoryTime.fromMap(Map(BR -> Time.fromHoursBounded(10), US -> Time.fromHoursBounded(10)))
+    val qMap = TimeAccountingCategoryTime.fromMap(Map(BR -> TimeSpan.fromHoursBounded(10), US -> TimeSpan.fromHoursBounded(10)))
     // No proposals for Brazil, it will be skipped.
     val pMap: Map[TimeAccountingCategory, List[Proposal]] = Map(US -> List(prop))
     val it = BlockIterator(qMap, List(BR, US), pMap, _.obsList)
 
-    val expected = List(Block(prop, prop.obsList.head, Time.fromHoursBounded(5), isStart = true, isFinal = true))
+    val expected = List(Block(prop, prop.obsList.head, TimeSpan.fromHoursBounded(5), isStart = true, isFinal = true))
     assertEquals(expected, it.toList(_.obsList))
   }
 
@@ -106,12 +106,12 @@ class BlockIteratorTest extends ItacSuite {
     val usProp = mkProp(US, 2, List(2), List.empty)
 
     // No time quantum for Brazil, it will be skipped.
-    val qMap = TimeAccountingCategoryTime.fromMap(Map(US -> Time.fromHoursBounded(10)))
+    val qMap = TimeAccountingCategoryTime.fromMap(Map(US -> TimeSpan.fromHoursBounded(10)))
     val pMap: Map[TimeAccountingCategory, List[Proposal]] = Map(BR -> List(brProp), US -> List(usProp))
 
     val it = BlockIterator(qMap, List(BR, US), pMap, _.obsList)
 
-    val expected = List(Block(usProp, usProp.obsList.head, Time.fromHoursBounded(2), isStart = true, isFinal = true))
+    val expected = List(Block(usProp, usProp.obsList.head, TimeSpan.fromHoursBounded(2), isStart = true, isFinal = true))
     assertEquals(expected, it.toList(_.obsList))
   }
 
@@ -121,12 +121,12 @@ class BlockIteratorTest extends ItacSuite {
     val usProp = mkProp(US, 2, List(2), List.empty)
 
     // No time quantum for Brazil, it will be skipped.
-    val qMap = TimeAccountingCategoryTime.fromMap(Map(US -> Time.fromHoursBounded(10)))
+    val qMap = TimeAccountingCategoryTime.fromMap(Map(US -> TimeSpan.fromHoursBounded(10)))
     val pMap: Map[TimeAccountingCategory, List[Proposal]] = Map(BR -> List(brProp), US -> List(usProp))
 
     val it = BlockIterator(qMap, List(BR, US), pMap, _.obsList)
 
-    val expected = List(Block(usProp, usProp.obsList.head, Time.fromHoursBounded(2), isStart = true, isFinal = true))
+    val expected = List(Block(usProp, usProp.obsList.head, TimeSpan.fromHoursBounded(2), isStart = true, isFinal = true))
     assertEquals(expected, it.toList(_.obsList))
 
   }
@@ -139,8 +139,8 @@ class BlockIteratorTest extends ItacSuite {
     val it = BlockIterator(genQuanta(10), List(BR, US, BR, US), pMap, _.obsList)
 
     val expected = List(
-      Block(brProp, brProp.obsList.head, Time.fromHoursBounded(1), isStart = true, isFinal = true),
-      Block(usProp, usProp.obsList.head, Time.fromHoursBounded(2), isStart = true, isFinal = true)
+      Block(brProp, brProp.obsList.head, TimeSpan.fromHoursBounded(1), isStart = true, isFinal = true),
+      Block(usProp, usProp.obsList.head, TimeSpan.fromHoursBounded(2), isStart = true, isFinal = true)
     )
 
     val actual = it.toList(_.obsList)
@@ -155,9 +155,9 @@ class BlockIteratorTest extends ItacSuite {
     val it = BlockIterator(genQuanta(10), List(BR, US, BR, US), pMap, _.obsList)
 
     val expected = List(
-      Block(brProp, brProp.obsList.head, Time.fromHoursBounded(10), isStart = true, isFinal = false),
-      Block(usProp, usProp.obsList.head, Time.fromHoursBounded(5), isStart = true, isFinal = true),
-      Block(brProp, brProp.obsList.head, Time.fromHoursBounded(1), isStart = false, isFinal = true)
+      Block(brProp, brProp.obsList.head, TimeSpan.fromHoursBounded(10), isStart = true, isFinal = false),
+      Block(usProp, usProp.obsList.head, TimeSpan.fromHoursBounded(5), isStart = true, isFinal = true),
+      Block(brProp, brProp.obsList.head, TimeSpan.fromHoursBounded(1), isStart = false, isFinal = true)
     )
 
     assertEquals(expected, it.toList(_.obsList))
@@ -171,8 +171,8 @@ class BlockIteratorTest extends ItacSuite {
     val it = BlockIterator(genQuanta(10), List(BR, US, BR, US), pMap, _.obsList)
 
     val expected = List(
-      Block(brProp, brProp.obsList.head, Time.fromHoursBounded(10), isStart = true, isFinal = true),
-      Block(usProp, usProp.obsList.head, Time.fromHoursBounded(10), isStart = true, isFinal = true)
+      Block(brProp, brProp.obsList.head, TimeSpan.fromHoursBounded(10), isStart = true, isFinal = true),
+      Block(usProp, usProp.obsList.head, TimeSpan.fromHoursBounded(10), isStart = true, isFinal = true)
     )
 
     assertEquals(expected, it.toList(_.obsList))
@@ -200,13 +200,13 @@ class BlockIteratorTest extends ItacSuite {
     //    All of third obs -- final block in proposal
 
     val expected = List(
-      Block(brProp, brProp.obsList.head, Time.fromHoursBounded(10), isStart = true, isFinal = false),
-      Block(brProp, brProp.obsList.tail.head, Time.fromHoursBounded(5), isStart = false, isFinal = false),
-      Block(usProp, usProp.obsList.head, Time.fromHoursBounded(10), isStart = true, isFinal = false),
-      Block(usProp, usProp.obsList.tail.head, Time.fromHoursBounded(5), isStart = false, isFinal = false),
-      Block(brProp, brProp.obsList.tail.head, Time.fromHoursBounded(5), isStart = false, isFinal = true),
-      Block(usProp, usProp.obsList.tail.head, Time.fromHoursBounded(5), isStart = false, isFinal = false),
-      Block(usProp, usProp.obsList.tail.tail.head, Time.fromHoursBounded(10), isStart = false, isFinal = true)
+      Block(brProp, brProp.obsList.head, TimeSpan.fromHoursBounded(10), isStart = true, isFinal = false),
+      Block(brProp, brProp.obsList.tail.head, TimeSpan.fromHoursBounded(5), isStart = false, isFinal = false),
+      Block(usProp, usProp.obsList.head, TimeSpan.fromHoursBounded(10), isStart = true, isFinal = false),
+      Block(usProp, usProp.obsList.tail.head, TimeSpan.fromHoursBounded(5), isStart = false, isFinal = false),
+      Block(brProp, brProp.obsList.tail.head, TimeSpan.fromHoursBounded(5), isStart = false, isFinal = true),
+      Block(usProp, usProp.obsList.tail.head, TimeSpan.fromHoursBounded(5), isStart = false, isFinal = false),
+      Block(usProp, usProp.obsList.tail.tail.head, TimeSpan.fromHoursBounded(10), isStart = false, isFinal = true)
     )
 
     assertEquals(expected, it.toList(_.obsList))
@@ -221,9 +221,9 @@ class BlockIteratorTest extends ItacSuite {
     val it = BlockIterator(genQuanta(5), List(BR, US), pMap, _.obsList)
 
     val expected = List(
-      Block(brProp1, brProp1.obsList.head, Time.fromHoursBounded(1), isStart = true, isFinal = false),
-      Block(brProp1, brProp1.obsList.tail.head, Time.fromHoursBounded(1), isStart = false, isFinal = true),
-      Block(brProp2, brProp2.obsList.head, Time.fromHoursBounded(3), isStart = true, isFinal = true)
+      Block(brProp1, brProp1.obsList.head, TimeSpan.fromHoursBounded(1), isStart = true, isFinal = false),
+      Block(brProp1, brProp1.obsList.tail.head, TimeSpan.fromHoursBounded(1), isStart = false, isFinal = true),
+      Block(brProp2, brProp2.obsList.head, TimeSpan.fromHoursBounded(3), isStart = true, isFinal = true)
     )
 
     assertEquals(expected, it.toList(_.obsList))
@@ -238,11 +238,11 @@ class BlockIteratorTest extends ItacSuite {
     val it = BlockIterator(genQuanta(1), List(BR, BR, BR, BR, BR), pMap, _.obsList)
 
     val expected = List(
-      Block(brProp1, brProp1.obsList.head, Time.fromHoursBounded(1), isStart = true, isFinal = false),
-      Block(brProp1, brProp1.obsList.tail.head, Time.fromHoursBounded(1), isStart = false, isFinal = true),
-      Block(brProp2, brProp2.obsList.head, Time.fromHoursBounded(1), isStart = true, isFinal = false),
-      Block(brProp2, brProp2.obsList.head, Time.fromHoursBounded(1), isStart = false, isFinal = false),
-      Block(brProp2, brProp2.obsList.head, Time.fromHoursBounded(1), isStart = false, isFinal = true)
+      Block(brProp1, brProp1.obsList.head, TimeSpan.fromHoursBounded(1), isStart = true, isFinal = false),
+      Block(brProp1, brProp1.obsList.tail.head, TimeSpan.fromHoursBounded(1), isStart = false, isFinal = true),
+      Block(brProp2, brProp2.obsList.head, TimeSpan.fromHoursBounded(1), isStart = true, isFinal = false),
+      Block(brProp2, brProp2.obsList.head, TimeSpan.fromHoursBounded(1), isStart = false, isFinal = false),
+      Block(brProp2, brProp2.obsList.head, TimeSpan.fromHoursBounded(1), isStart = false, isFinal = true)
     )
 
     assertEquals(expected, it.toList(_.obsList))
@@ -263,7 +263,7 @@ class BlockIteratorTest extends ItacSuite {
 
     // Expect the last time quantum from BR
     val expected = List(
-      Block(brProp, brProp.obsList.tail.head, Time.fromHoursBounded(5), isStart = false, isFinal = true)
+      Block(brProp, brProp.obsList.tail.head, TimeSpan.fromHoursBounded(5), isStart = false, isFinal = true)
     )
 
     assertEquals(expected, it3.toList(_.obsList))
@@ -283,7 +283,7 @@ class BlockIteratorTest extends ItacSuite {
 
     // Expect the last time quantum from BR
     val expected = List(
-      Block(brProp, brProp.obsList.tail.head, Time.fromHoursBounded(5), isStart = false, isFinal = true)
+      Block(brProp, brProp.obsList.tail.head, TimeSpan.fromHoursBounded(5), isStart = false, isFinal = true)
     )
 
     assertEquals(expected, it2.toList(_.obsList))

@@ -7,21 +7,21 @@ import edu.gemini.qengine.skycalc.RaBinSize
 import edu.gemini.qengine.skycalc.RaDecBinCalc
 import edu.gemini.tac.qengine.api.config.Shutdown
 import edu.gemini.tac.qengine.ctx.Context
-import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.Site
+import lucuma.core.util.TimeSpan
 
 /**
  *
  */
 object ShutdownCalc {
 
-  def timePerRa(s: Shutdown, size: RaBinSize): List[Time] =
+  def timePerRa(s: Shutdown, size: RaBinSize): List[TimeSpan] =
     RaDecBinCalc.RA_CALC.calc(s.site, s.start.toInstant(), s.end.toInstant(), size).map {
-      hrs => Time.fromHoursBounded(hrs.hours)
+      hrs => TimeSpan.fromHoursBounded(hrs.hours)
     }
 
-  def asTime(s: Shutdown, size: RaBinSize): Time =
-    Time.fromHoursBounded(timePerRa(s, size).map(_.toHours.toDouble).sum)
+  def asTime(s: Shutdown, size: RaBinSize): TimeSpan =
+    TimeSpan.fromHoursBounded(timePerRa(s, size).map(_.toHours.toDouble).sum)
 
   def trim(s: Shutdown, ctx: Context): Option[Shutdown] = {
     val semester = ctx.semester
@@ -45,9 +45,9 @@ object ShutdownCalc {
    * Combines visible hours per RA for all the given shutdown periods into a
    * single list.
    */
-  def sumHoursPerRa(shutdowns: List[Shutdown], size: RaBinSize): List[Time] = {
+  def sumHoursPerRa(shutdowns: List[Shutdown], size: RaBinSize): List[TimeSpan] = {
     val lsts  = shutdowns.map { timePerRa(_, size) }
-    val zeros = List.fill(size.binCount)(Time.Zero)
+    val zeros = List.fill(size.binCount)(TimeSpan.Zero)
 
     lsts.foldLeft(zeros) {
       (sum, cur) => sum.zip(cur).map { case (t1, t2) => t1 +| t2 }

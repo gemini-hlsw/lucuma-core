@@ -3,6 +3,7 @@
 
 package edu.gemini.tac.qengine.impl.resource
 
+import cats.syntax.all.*
 import edu.gemini.tac.qengine.api.config.TimeRestriction
 import edu.gemini.tac.qengine.impl.block.Block
 import edu.gemini.tac.qengine.impl.queue.ProposalQueueBuilder
@@ -10,10 +11,9 @@ import edu.gemini.tac.qengine.log.RejectMessage
 import edu.gemini.tac.qengine.log.RejectTimeAccountingCategoryOverAllocation
 import edu.gemini.tac.qengine.p1.ItacTarget
 import edu.gemini.tac.qengine.util.BoundedTime
-import edu.gemini.tac.qengine.util.Time
 import lucuma.core.model.ConstraintSet
+import lucuma.core.util.TimeSpan
 import org.slf4j.LoggerFactory
-import cats.syntax.all.*
 
 final case class SemesterResource(
     ra:   RightAscensionMapResource,
@@ -31,7 +31,7 @@ final case class SemesterResource(
   // Determines whether the TimeAccountingCategory is already over allocated.
   private def TimeAccountingCategoryAlreadyOverallocated(block: Block, queue: ProposalQueueBuilder): Boolean = {
     LOGGER.debug(f"Remaining time for ${block.prop.ntac.TimeAccountingCategory} is ${queue.remainingTime(block.prop.ntac.TimeAccountingCategory).toHours}%5.1f")
-    queue.remainingTime(block.prop.ntac.TimeAccountingCategory) <= Time.Zero
+    queue.remainingTime(block.prop.ntac.TimeAccountingCategory) <= TimeSpan.Zero
   }
 
   // Determines whether including the indicated proposal will overallocate the
@@ -72,7 +72,7 @@ final case class SemesterResource(
     }
   }
 
-  def reserveAvailable(time: Time, target: ItacTarget, conds: ConstraintSet): (SemesterResource, Time) = {
+  def reserveAvailable(time: TimeSpan, target: ItacTarget, conds: ConstraintSet): (SemesterResource, TimeSpan) = {
     val (newRa, rem) = ra.reserveAvailable(time, target, conds)
     (new SemesterResource(newRa, this.time), rem)
   }
