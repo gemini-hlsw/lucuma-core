@@ -5,12 +5,12 @@ package edu.gemini.tac.qengine.log
 
 import edu.gemini.tac.qengine.p1.ItacObservation
 import edu.gemini.tac.qengine.p1.Proposal
-import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.ScienceBand
+import lucuma.core.util.TimeSpan
 
 trait TimeBinMessageFormatter {
   private val binStatusTemplate = "Bin %.1f%% full (%.2f / %.2f hrs)"
-  def binStatus(cur: Time, max: Time): String = {
+  def binStatus(cur: TimeSpan, max: TimeSpan): String = {
     val curHrs = cur.toHours
     val maxHrs = max.toHours
     val perc   = if (maxHrs.abs < 0.0001) 100.0 else curHrs/maxHrs * 100
@@ -26,7 +26,7 @@ trait TimeBinMessageFormatter {
   }
 
   private val detailTemplate    = "%s. Reject %s."
-  def detail(prop: Proposal, obs: ItacObservation, band: ScienceBand, cur: Time, max: Time): String = {
+  def detail(prop: Proposal, obs: ItacObservation, band: ScienceBand, cur: TimeSpan, max: TimeSpan): String = {
     val statusMsg  = binStatus(cur, max)
     val obsInfoMsg = obsInfo(prop, obs, band)
     detailTemplate.format(statusMsg, obsInfoMsg)

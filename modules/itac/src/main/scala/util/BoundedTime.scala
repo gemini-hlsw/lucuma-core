@@ -3,6 +3,7 @@
 
 package edu.gemini.tac.qengine.util
 import cats.syntax.all.*
+import lucuma.core.util.TimeSpan
 
 /**
  * A class that represents a limited amount of time and the current amount used.
@@ -14,8 +15,7 @@ import cats.syntax.all.*
  * can always enforce a hard limit by limiting itself to methods that do not
  * permit more time than available to be reserved.
  */
-final case class BoundedTime(limit: Time, used: Time = Time.Zero) {
-  require((used >= Time.Zero) && (limit >= Time.Zero))
+final case class BoundedTime(limit: TimeSpan, used: TimeSpan = TimeSpan.Zero) {
 
   /**
    * Returns true iff the amount of time used is more or equal to the limit.
@@ -27,7 +27,7 @@ final case class BoundedTime(limit: Time, used: Time = Time.Zero) {
    * negative).
    */
   def remaining = 
-    if limit < used then Time.Zero else limit -| used
+    if limit < used then TimeSpan.Zero else limit -| used
 
   /**
    * Returns the percentage of available time that has been used.  This will
@@ -41,15 +41,15 @@ final case class BoundedTime(limit: Time, used: Time = Time.Zero) {
    * with the current amount of time in this instance.  If there isn't enough
    * remaining space (or if releasing more time than used), None is returned.
    */
-  def reserve(time: Time): Option[BoundedTime] =
-    if (time == Time.Zero)
+  def reserve(time: TimeSpan): Option[BoundedTime] =
+    if (time == TimeSpan.Zero)
       Some(this)
     else {
       val tmp = used +| time
       if (tmp > limit)
         None
       else
-        if (tmp < Time.Zero) None else Some(BoundedTime(limit, tmp))
+        if (tmp < TimeSpan.Zero) None else Some(BoundedTime(limit, tmp))
     }
 
   /**
@@ -61,14 +61,14 @@ final case class BoundedTime(limit: Time, used: Time = Time.Zero) {
    * val (newBoundedTime, leftOverTime) = boundedTime.reserveAvailable(...)
    * </code>
    */
-  def reserveAvailable(time: Time): (BoundedTime, Time) = {
+  def reserveAvailable(time: TimeSpan): (BoundedTime, TimeSpan) = {
     val tmp = used +| time
     val (newUsed, rem) = if (tmp > limit)
       (limit, tmp -| limit)
-    else if (tmp < Time.Zero)
-      (Time.Zero, tmp)
+    else if (tmp < TimeSpan.Zero)
+      (TimeSpan.Zero, tmp)
     else
-      (tmp, Time.Zero)
+      (tmp, TimeSpan.Zero)
 
     if (newUsed == used) (this, rem) else (BoundedTime(limit, newUsed), rem)
   }

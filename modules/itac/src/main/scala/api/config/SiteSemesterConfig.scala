@@ -4,10 +4,10 @@
 package edu.gemini.tac.qengine.api.config
 
 import edu.gemini.tac.qengine.ctx.Context
-import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.Site
 import lucuma.core.model.IntCentiPercent
 import lucuma.core.model.Semester
+import lucuma.core.util.TimeSpan
 
 // TODO:
 // The RightAscensionMap[Time] limits and DeclinationMap[IntCentiPercent] can be calculated given
@@ -23,7 +23,7 @@ import lucuma.core.model.Semester
 final class SiteSemesterConfig(
         val site: Site,
         val semester: Semester,
-        val raLimits: RightAscensionMap[Time],
+        val raLimits: RightAscensionMap[TimeSpan],
         val decLimits: DeclinationMap[IntCentiPercent],
         val shutdowns : List[Shutdown],
         val conditions: ConditionsCategoryMap[IntCentiPercent] = Default.Conditions) {

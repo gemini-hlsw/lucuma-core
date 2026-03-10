@@ -5,11 +5,11 @@ package edu.gemini.tac.qengine.api.config
 
 import edu.gemini.tac.qengine.ItacSuite
 import edu.gemini.tac.qengine.p1.ItacTarget
-import edu.gemini.tac.qengine.util.Time
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Declination
 import lucuma.core.math.HourAngle
 import lucuma.core.math.RightAscension
+import lucuma.core.util.TimeSpan
 
 import scala.annotation.unused
 
@@ -19,13 +19,13 @@ class RaBinGroupTest extends ItacSuite {
   // So, a 30 min Angle yields 30 minutes of time.  This makes it easy to test.
   // A real function would compute the number of minutes that the RA is
   // visible at night and return that amount of time.
-  private def f(a: RightAscension, @unused sizeMin: Int): Time = Time.fromMinutesBounded(a.toHourAngle.toDoubleMinutes)
+  private def f(a: RightAscension, @unused sizeMin: Int): TimeSpan = TimeSpan.fromMinutesBounded(a.toHourAngle.toDoubleMinutes)
 
   test("testGenerate1Hr") {
     val g1Hr = RightAscensionMap.gen1HrBins(f)
     assertEquals(24, g1Hr.bins.length)
 
-    val times = for (i <- 0 until 24) yield Time.fromMinutesBounded(i * 60 + 30)
+    val times = for (i <- 0 until 24) yield TimeSpan.fromMinutesBounded(i * 60 + 30)
     assertEquals(times, g1Hr.bins)
   }
 
@@ -33,20 +33,20 @@ class RaBinGroupTest extends ItacSuite {
     val g2Hr = RightAscensionMap.gen2HrBins(f)
     assertEquals(12, g2Hr.bins.length)
 
-    val times = for (i <- 0 until 12) yield Time.fromMinutesBounded(i * 120 + 60)
+    val times = for (i <- 0 until 12) yield TimeSpan.fromMinutesBounded(i * 120 + 60)
     assertEquals(times, g2Hr.bins)
   }
 
-  private def validateLookup(lookup: (RightAscensionMap[Time], Int) => Time) = {
+  private def validateLookup(lookup: (RightAscensionMap[TimeSpan], Int) => TimeSpan) = {
     val g = RightAscensionMap.gen1HrBins(f)
-    assertEquals(Time.fromMinutesBounded(30), lookup(g, 0))
-    assertEquals(Time.fromMinutesBounded(30), lookup(g, 15))
-    assertEquals(Time.fromMinutesBounded(30), lookup(g, 59))
-    assertEquals(Time.fromMinutesBounded(90), lookup(g, 60))
-    assertEquals(Time.fromMinutesBounded(1410), lookup(g, 24*60-1))
+    assertEquals(TimeSpan.fromMinutesBounded(30), lookup(g, 0))
+    assertEquals(TimeSpan.fromMinutesBounded(30), lookup(g, 15))
+    assertEquals(TimeSpan.fromMinutesBounded(30), lookup(g, 59))
+    assertEquals(TimeSpan.fromMinutesBounded(90), lookup(g, 60))
+    assertEquals(TimeSpan.fromMinutesBounded(1410), lookup(g, 24*60-1))
 
     // wrap around
-    assertEquals(Time.fromMinutesBounded(30), lookup(g, 24*60))
+    assertEquals(TimeSpan.fromMinutesBounded(30), lookup(g, 24*60))
   }
 
   test("testLookupMin") {
@@ -74,15 +74,15 @@ class RaBinGroupTest extends ItacSuite {
   test("testUpdated") {
     val ra0 = RightAscension(HourAngle.fromDoubleMinutes( 0))
     val ra1 = RightAscension(HourAngle.fromDoubleMinutes(60))
-    val min1 = Time.fromMinutesBounded(1)
-    val bg = RightAscensionMap.gen1HrBins(f).updated(ra0, Time.Zero).updated(ra1, min1)
-    assertEquals(Time.Zero, bg(ra0))
+    val min1 = TimeSpan.fromMinutesBounded(1)
+    val bg = RightAscensionMap.gen1HrBins(f).updated(ra0, TimeSpan.Zero).updated(ra1, min1)
+    assertEquals(TimeSpan.Zero, bg(ra0))
     assertEquals(min1, bg(ra1))
   }
 
   // Need a fake function that sometimes returns None to simulate what
   // happens when the value cannot be updated.
-  private val doubleEveryOther = (t: Time) => t.toMinutes.toInt match {
+  private val doubleEveryOther = (t: TimeSpan) => t.toMinutes.toInt match {
       case n if (n-30 % 120) == 0 => Some(t +| t)
       case _ => None
     }
