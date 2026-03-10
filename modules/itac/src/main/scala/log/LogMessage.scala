@@ -25,8 +25,8 @@ object LogMessage {
   }
   private def timeTemplate = "%4.1f%% (%.1f / %.1f)"
   def formatBoundedTime(bt: BoundedTime): String = {
-    val usedH = bt.used.toHours.value
-    val maxH  = bt.limit.toHours.value
+    val usedH = bt.used.toHours
+    val maxH  = bt.limit.toHours
     val perc  = bt.fillPercent
     timeTemplate.format(perc, usedH, maxH)
   }

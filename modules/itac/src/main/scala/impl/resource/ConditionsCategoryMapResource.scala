@@ -37,7 +37,7 @@ object ConditionsCategoryMapResource {
     // Creates a map from ConditionsBin.Category to BoundedTime initialized with
     // time values according to the relative percentage of the matching
     // conditions bin.
-    new ConditionsCategoryMapResource(g.map(perc => BoundedTime(t * perc)))
+    new ConditionsCategoryMapResource(g.map(perc => BoundedTime(t *| perc)))
   }
 }
 
@@ -51,7 +51,7 @@ final class ConditionsCategoryMapResource private (val bins: ConditionsCategoryM
 
   private def sum(c: ConstraintSet, f: (BoundedTime => Time)): Time = {
     val cats = bins.searchPath(c)
-    cats.foldLeft(Time.Minutes.zero)((t: Time, cat: Cat) => t + f(bins(cat)))
+    cats.foldLeft(Time.Zero)((t: Time, cat: Cat) => t +| f(bins(cat)))
   }
 
   def limit(c: ConstraintSet): Time = sum(c, _.limit)

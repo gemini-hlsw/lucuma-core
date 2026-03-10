@@ -14,12 +14,12 @@ class RestrictionConfigTest extends FunSuite {
     val percentBin = TimeRestriction("WV", IntCentiPercent.unsafeFromPercent(10)) {
       (_, obs, _) => obs.constraintSet.waterVapor <= WaterVapor.Dry
     }
-    val timeBin = TimeRestriction("LGS", Time.hours(10)) {
+    val timeBin = TimeRestriction("LGS", Time.fromHoursBounded(10)) {
       (_, obs, _) => obs.lgs
     }
 
     val conf = new RestrictionConfig(List(percentBin), List(timeBin))
-    val comb = conf.mapTimeRestrictions(_.toPercent.toLong, _.ms)
+    val comb = conf.mapTimeRestrictions(_.toPercent.toLong, _.toMilliseconds)
 
     assertEquals(2, comb.length)
     assertEquals(10l, comb.head.value)

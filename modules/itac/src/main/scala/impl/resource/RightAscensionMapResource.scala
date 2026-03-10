@@ -39,7 +39,7 @@ case class RightAscensionMapResource(val grp: RightAscensionMap[PerRightAscensio
   private def reserveToo(block: Block, queue: ProposalQueueBuilder): RejectMessage Either RightAscensionMapResource =
     tooBlocks(block) match {
         case None => {
-          val sum = grp.bins.foldLeft(Time.hours(0))(_ + _.remaining(block.obs.constraintSet))
+          val sum = grp.bins.foldLeft(Time.fromHoursBounded(0))(_ +| _.remaining(block.obs.constraintSet))
           Left(new RejectToo(block.prop, block.obs, queue.band, sum))
         }
         case Some(s) =>
@@ -78,7 +78,7 @@ case class RightAscensionMapResource(val grp: RightAscensionMap[PerRightAscensio
     reductions.foldLeft((this,Time.Zero)) {
       case ((grp0, time), reduction) =>
         grp0.reserveAvailable(reduction) match {
-          case (newGrp, leftover) => (newGrp, leftover+time)
+          case (newGrp, leftover) => (newGrp, leftover+|time)
         }
     }
   }

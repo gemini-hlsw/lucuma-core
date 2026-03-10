@@ -14,17 +14,17 @@ case class ItacObservation(
 )
 
 object ItacObservation {
-  def sumObsTime(lst: List[ItacObservation]): Time = lst.foldLeft(Time.Zero)(_ + _.time)
+  def sumObsTime(lst: List[ItacObservation]): Time = lst.foldLeft(Time.Zero)(_ +| _.time)
 
   private def percentOfSum(obs: ItacObservation, lst: List[ItacObservation]): Double =
-    obs.time.ms / sumObsTime(lst).ms.toDouble
+    obs.time.toMilliseconds.toDouble / sumObsTime(lst).toMilliseconds.toDouble
 
   /**
    * Gets the time for the given observation relative to the total for all
    * observations in the proposal.
    */
   def relativeObsTime(obs: ItacObservation, time: Time, lst: List[ItacObservation]): Time =
-    Time.millisecs((percentOfSum(obs, lst) * time.ms).round.toLong).to(obs.time.unit)
+    Time.fromMillisecondsBounded((percentOfSum(obs, lst) * time.toMilliseconds.toLong).round.toLong)
 
   /**
    * Gets the observation list with their times adjusted to be relative to

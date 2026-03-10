@@ -28,7 +28,7 @@ class TimeRestrictionResourceTest extends ItacSuite {
   import TimeAccountingCategory.US
   val TimeAccountingCategorys = Enumerated[TimeAccountingCategory].all
 
-  private val ntac   = Ntac(US, "x", 0, Time.hours(10))
+  private val ntac   = Ntac(US, "x", 0, Time.fromHoursBounded(10))
   private val target = ItacTarget(0, 0) // not used
   private def conds(wv: WaterVapor) =
     ConstraintSet(ImageQuality.Preset.TwoPointZero, CloudExtinction.Preset.ThreePointZero, SkyBackground.Bright, wv, ElevationRange.ByAirMass.Default)
@@ -38,17 +38,17 @@ class TimeRestrictionResourceTest extends ItacSuite {
   }
 
   // 10% of 10 hours = 1 hr = 60 min
-  private val res60min = TimeRestrictionResource(bin, Time.hours(10))
+  private val res60min = TimeRestrictionResource(bin, Time.fromHoursBounded(10))
 
   private def mkProp(wv: WaterVapor): Proposal =
-    Proposal(ntac, site = Site.GS, obsList = List(ItacObservation(target, conds(wv), Time.hours(10))))
+    Proposal(ntac, site = Site.GS, obsList = List(ItacObservation(target, conds(wv), Time.fromHoursBounded(10))))
 
   test("testReserveNoMatch") {
     val prop = mkProp(WaterVapor.Median)
 
     // If the restriction doesn't match the block, then the same instance is
     // returned -- not a copy with the same values
-    val block = Block(prop, prop.obsList.head, Time.hours(1))
+    val block = Block(prop, prop.obsList.head, Time.fromHoursBounded(1))
     res60min.reserve(block, Fixture.emptyQueue) match {
       case Right(res) => assertSame(res60min, res)
       case _ => fail("failed")
@@ -60,7 +60,7 @@ class TimeRestrictionResourceTest extends ItacSuite {
 
     // Here the restriction matches the block, but we're not reserving any
     // time.  Again, no copy should be made
-    val block = Block(prop, prop.obsList.head, Time.hours(0))
+    val block = Block(prop, prop.obsList.head, Time.fromHoursBounded(0))
     res60min.reserve(block, Fixture.emptyQueue) match {
       case Right(res) => assertSame(res60min, res)
       case _ => fail("failed")
@@ -71,9 +71,9 @@ class TimeRestrictionResourceTest extends ItacSuite {
     val prop = mkProp(WaterVapor.VeryDry)
 
     // Reserve 15 of the 60 available minutes
-    val block = Block(prop, prop.obsList.head, Time.minutes(15))
+    val block = Block(prop, prop.obsList.head, Time.fromMinutesBounded(15))
     res60min.reserve(block, Fixture.emptyQueue) match {
-      case Right(res) => assertEquals(Time.minutes(45), res.remaining)
+      case Right(res) => assertEquals(Time.fromMinutesBounded(45), res.remaining)
       case _ => fail("failed")
     }
   }
@@ -82,7 +82,7 @@ class TimeRestrictionResourceTest extends ItacSuite {
     val prop = mkProp(WaterVapor.VeryDry)
 
     // Try to reserve more than 1 hour
-    val block = Block(prop, prop.obsList.head, Time.minutes(61))
+    val block = Block(prop, prop.obsList.head, Time.fromMinutesBounded(61))
     res60min.reserve(block, Fixture.emptyQueue) match {
       case Left(msg: RejectRestrictedBin) => assertEquals(prop, msg.prop)
       case _ => fail("failed")

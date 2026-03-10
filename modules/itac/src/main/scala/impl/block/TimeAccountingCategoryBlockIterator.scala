@@ -101,7 +101,7 @@ trait TimeAccountingCategoryBlockIterator{
 
   private def advance(t: Time, activeList : Proposal => List[ItacObservation]): TimeAccountingCategoryBlockIterator =
     if (currentObservationRemainingTime > t)
-      mkIterator(remainingProposals, remainingObservationsInActiveList, currentObservationRemainingTime - t, isStartOfBlock = false)
+      mkIterator(remainingProposals, remainingObservationsInActiveList, currentObservationRemainingTime -| t, isStartOfBlock = false)
     else
       advanceObs(activeList)
 

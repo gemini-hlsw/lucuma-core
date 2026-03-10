@@ -165,22 +165,22 @@ object QueueEngine2 extends QueueEngine {
       case (h, b) =>
 
         val binUsedMins: Double =
-          b.condsRes.bins.bins.values.map(_.used.toMinutes.value).sum
+          b.condsRes.bins.bins.values.map(_.used.toMinutes.toDouble).sum
 
         val ra = RaRow(
           h,
-          math.round(b.remaining.toMinutes.value) / 60.0,
+          math.round(b.remaining.toMinutes.toDouble) / 60.0,
           math.round(binUsedMins) / 60.0,
-          math.round(b.limit.toMinutes.value) / 60.0
+          math.round(b.limit.toMinutes.toDouble) / 60.0
         )
 
         val conds = b.condsRes.bins.bins.toList.sortBy(_._1.name).map {
           case (c, t) =>
             ConditionsRow(
               c,
-              math.round(t.used.toMinutes.value) / 60.0,
-              (math.round(t.remaining.toMinutes.value) / 60.0) min ra.remaining,
-              math.round(t.limit.toMinutes.value) / 60.0
+              math.round(t.used.toMinutes.toDouble) / 60.0,
+              (math.round(t.remaining.toMinutes.toDouble) / 60.0) min ra.remaining,
+              math.round(t.limit.toMinutes.toDouble) / 60.0
             )
         }
 

@@ -31,7 +31,7 @@ object Default {
   )
 
   val WvTimeRestriction  = TimeRestriction.wv(IntCentiPercent.unsafeFromPercent(50), WaterVapor.Dry)
-  val LgsTimeRestriction = TimeRestriction.lgs(Time.hours(200))
+  val LgsTimeRestriction = TimeRestriction.lgs(Time.fromHoursBounded(200))
 
   val RapidTooBandRestriction = BandRestriction.rapidToo
   val LgsBandRestriction      = BandRestriction.lgs

@@ -104,7 +104,7 @@ trait BlockIterator {
   }
 
   private def advance(t: Time, m: IMap): BlockIterator =
-    if ((remTime > t) && m(currentTimeAccountingCategory).hasNext) mkIterator(seq, remTime - t, m)
+    if ((remTime > t) && m(currentTimeAccountingCategory).hasNext) mkIterator(seq, remTime -| t, m)
     else advanceTimeAccountingCategory(m)
 
   private def advanceTimeAccountingCategory(m: IMap): BlockIterator =
