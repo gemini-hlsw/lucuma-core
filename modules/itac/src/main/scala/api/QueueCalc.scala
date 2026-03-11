@@ -4,11 +4,12 @@
 package edu.gemini.tac.qengine.api
 
 import edu.gemini.tac.qengine.api.queue.ProposalQueue
-import edu.gemini.tac.qengine.ctx.Context
 import edu.gemini.tac.qengine.log.ProposalLog
 import edu.gemini.tac.qengine.p1.Proposal
 import lucuma.core.enums.ScienceBand
 import lucuma.core.util.Enumerated
+import lucuma.core.model.Semester
+import lucuma.core.enums.Site
 
 trait BucketsAllocation {
   def raTablesANSI: String
@@ -20,10 +21,11 @@ trait BucketsAllocation {
  * while the log records what happened to the proposals that were not selected.
  */
 trait QueueCalc {
-  val context: Context
+  def site: Site
+  def semester: Semester
   def queue(band: ScienceBand): ProposalQueue
-  val proposalLog: ProposalLog
-  val bucketsAllocation: BucketsAllocation
+  def proposalLog: ProposalLog
+  def bucketsAllocation: BucketsAllocation
   def toList: List[Proposal] = Enumerated[ScienceBand].all.flatMap(queue(_).toList)
 }
 
