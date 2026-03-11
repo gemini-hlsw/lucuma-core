@@ -6,9 +6,9 @@ package edu.gemini.tac.qservice.impl.shutdown
 import edu.gemini.qengine.skycalc.RaBinSize
 import edu.gemini.qengine.skycalc.RaDecBinCalc
 import edu.gemini.tac.qengine.api.config.Shutdown
-import edu.gemini.tac.qengine.ctx.Context
 import lucuma.core.enums.Site
 import lucuma.core.util.TimeSpan
+import lucuma.core.model.Semester
 
 /**
  *
@@ -23,12 +23,11 @@ object ShutdownCalc {
   def asTime(s: Shutdown, size: RaBinSize): TimeSpan =
     TimeSpan.fromHoursBounded(timePerRa(s, size).map(_.toHours.toDouble).sum)
 
-  def trim(s: Shutdown, ctx: Context): Option[Shutdown] = {
-    val semester = ctx.semester
-    val semStart = semester.start.atSite(ctx.site)
-    val semEnd   = semester.end.atSite(ctx.site)
+  def trim(s: Shutdown, site: Site, semester: Semester): Option[Shutdown] = {
+    val semStart = semester.start.atSite(site)
+    val semEnd   = semester.end.atSite(site)
 
-    if ((ctx.site != s.site) || (s.end.compareTo(semStart) <= 0) || (s.start.compareTo(semEnd) >= 0)) None
+    if ((site != s.site) || (s.end.compareTo(semStart) <= 0) || (s.start.compareTo(semEnd) >= 0)) None
     else {
       val newStart = if (s.start.compareTo(semStart) < 0) semStart else s.start
       val newEnd   = if (semEnd.compareTo(s.end) < 0) semEnd else s.end
@@ -38,8 +37,8 @@ object ShutdownCalc {
     }
   }
 
-  def trim(sds: List[Shutdown], ctx: Context): List[Shutdown] =
-    sds.flatMap(trim(_, ctx))
+  def trim(sds: List[Shutdown], site: Site, semester: Semester): List[Shutdown] =
+    sds.flatMap(trim(_, site, semester))
 
   /**
    * Combines visible hours per RA for all the given shutdown periods into a
