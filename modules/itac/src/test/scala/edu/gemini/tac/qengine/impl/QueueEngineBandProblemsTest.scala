@@ -26,9 +26,6 @@ class QueueEngineBandProblemsTest extends FunSuite {
       isPoorWeather     = false,
       piName            = null,
       piEmail           = null,
-      p1proposal        = null,
-      p1mutableProposal = null,
-      p1xmlFile         = null
     )
 
   // Test that the given problem check fails with the the given proposal and per-band expectations.
