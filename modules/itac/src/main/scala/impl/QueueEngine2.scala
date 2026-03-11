@@ -125,7 +125,7 @@ object QueueEngine2 extends QueueEngine {
 
     // Assemble our final result for the user
     new QueueCalc {
-      val context           = config.binConfig.context
+      export config.binConfig.{ site, semester }
       val proposalLog       = finalLog
       val bucketsAllocation = BucketsAllocationImpl(finalResource.ra.grp.bins.toList)
       def queue(b: ScienceBand) =

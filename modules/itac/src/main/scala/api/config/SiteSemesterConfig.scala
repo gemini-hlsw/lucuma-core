@@ -3,7 +3,6 @@
 
 package edu.gemini.tac.qengine.api.config
 
-import edu.gemini.tac.qengine.ctx.Context
 import lucuma.core.enums.Site
 import lucuma.core.model.IntCentiPercent
 import lucuma.core.model.Semester
@@ -34,6 +33,4 @@ final class SiteSemesterConfig(
   // that if there is sufficient remaining time in the RA bin overall, there
   // must be remaining time in at least one dec bin.
   require(decLimits.bins.exists(_.binValue.toPercent == 100))
-
-  def context: Context = new Context(site, semester)
 }
