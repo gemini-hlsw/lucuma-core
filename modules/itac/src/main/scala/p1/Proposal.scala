@@ -10,8 +10,6 @@ import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.enums.ToOActivation
 import lucuma.core.util.TimeSpan
 
-import java.io.File
-
 case class Proposal(
   ntac: Ntac,
   site: Site,
@@ -22,9 +20,6 @@ case class Proposal(
   isPoorWeather: Boolean = false,
   piName: Option[String] = None,
   piEmail: Option[String] = None,
-  p1proposal: Null = null, // edu.gemini.model.p1.immutable.Proposal = null, // to avoid having to generate one for testcases that don't care
-  p1mutableProposal: Null = null, // edu.gemini.model.p1.mutable.Proposal = null, // to avoid having to generate one for testcases that don't care
-  p1xmlFile: File = null, // to avoid having to generate one for testcases that don't care
   itacComment: Option[String] = None,
 ) {
 
@@ -58,23 +53,6 @@ case class Proposal(
   def relativeObsList(band: ScienceBand): List[ItacObservation] =
     ItacObservation.relativeObsList(time, obsListFor(band))
 
-  def p1pdfBaseName: Option[String] =
-    Option(p1xmlFile).map { f =>
-      val name     = f.getName
-      name.lastIndexOf('.') match {
-        case -1 => name
-        case  n => name.substring(0, n)
-      }
-    }
-
-  def p1pdfFile: String =
-    p1pdfBaseName.map(s => s + ".pdf").orNull
-
-  def p1pdfStage2File: String =
-    p1pdfBaseName.map(s => s + "_stage2.pdf").orNull
-
-  def p1pdfs: Proposal.Pdfs[String] =
-    Proposal.Pdfs(p1pdfFile, p1pdfStage2File)
 }
 
 object Proposal {
