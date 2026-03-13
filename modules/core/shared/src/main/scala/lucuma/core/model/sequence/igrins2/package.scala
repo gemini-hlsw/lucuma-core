@@ -4,7 +4,10 @@
 package lucuma.core.model.sequence.igrins2
 
 import lucuma.core.enums.Igrins2FowlerSamples
+import lucuma.core.enums.Igrins2OffsetMode
+import lucuma.core.math.Offset
 import lucuma.core.math.Wavelength
+import lucuma.core.math.syntax.bigDecimal.*
 import lucuma.core.syntax.timespan.*
 import lucuma.core.util.NewBoolean
 import lucuma.core.util.TimeSpan
@@ -31,3 +34,25 @@ def fowlerSamplesForExposureTime(exposure: TimeSpan): Igrins2FowlerSamples =
   Igrins2FowlerSamples.values.reverse
     .find(fs => nFowler >= (1 << fs.ordinal))
     .getOrElse(Igrins2FowlerSamples.One)
+
+val NodAlongSlitDefaultOffsets: List[Offset] =
+  List(
+    Offset.Zero.copy(q = -1.25.qArcsec),
+    Offset.Zero.copy(q =  1.25.qArcsec),
+    Offset.Zero.copy(q =  1.25.qArcsec),
+    Offset.Zero.copy(q = -1.25.qArcsec),
+  )
+
+val DefaultSpatialOffsets: List[Offset] = NodAlongSlitDefaultOffsets
+
+val NodToSkyDefaultOffsets: List[Offset] =
+  List(
+    Offset.Zero,
+    Offset(10.pArcsec, 10.qArcsec),
+    Offset.Zero,
+  )
+
+def defaultOffsetsFor(mode: Igrins2OffsetMode): List[Offset] =
+  mode match
+    case Igrins2OffsetMode.NodAlongSlit => NodAlongSlitDefaultOffsets
+    case Igrins2OffsetMode.NodToSky     => NodToSkyDefaultOffsets
