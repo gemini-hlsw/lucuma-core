@@ -94,17 +94,17 @@ class ConditionsCategoryMapTest extends FunSuite {
   test("testUndefinedSimpleUpdated") {
     try {
       grp.updated(ConditionsCategory(Eq(CloudExtinction.Preset.Zero), Eq(ImageQuality.Preset.PointOne)), IntCentiPercent.unsafeFromPercent(99))
-      fail
+      fail("undefined category should have thrown an exception")
     } catch {
       case _: IllegalArgumentException => // ok
     }
   }
 
-  test("testUndefinedMuliptleUpdated") {
+  test("testUndefinedMultipleUpdated") {
     val cat4 = ConditionsCategory(Eq(CloudExtinction.Preset.Zero), Eq(ImageQuality.Preset.PointOne))
     try {
       grp.updated(List((cat0, IntCentiPercent.unsafeFromPercent(1)), (cat4, IntCentiPercent.unsafeFromPercent(99))))
-      fail
+      fail("undefined category should have thrown an exception")
     } catch {
       case _: IllegalArgumentException => // ok
     }
