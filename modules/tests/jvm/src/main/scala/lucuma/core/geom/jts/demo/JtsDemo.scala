@@ -334,6 +334,9 @@ trait Igrins2Shapes extends InstrumentShapes:
   import lucuma.core.geom.igrins2.*
   import lucuma.core.geom.pwfs.{patrolField, probeArm}
   import lucuma.core.enums.GuideProbe
+  import lucuma.core.enums.PortDisposition
+
+  val port: PortDisposition = PortDisposition.Bottom
 
   val posAngle: Angle =
     15.deg
