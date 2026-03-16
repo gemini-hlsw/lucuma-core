@@ -21,6 +21,7 @@ type Igrins2SVCImages = Igrins2SVCImages.Type
 val SetupTime: TimeSpan = 7.minTimeSpan
 val ReAcquisitionTime: TimeSpan = 5.minTimeSpan
 val DefaultExposureTime: TimeSpan = 30.secTimeSpan
+val WriteOutTime: TimeSpan = 8.secTimeSpan
 
 val MinExposureTime: TimeSpan = 3080.msTimeSpan
 val MaxExposureTime: TimeSpan = 600.secTimeSpan
