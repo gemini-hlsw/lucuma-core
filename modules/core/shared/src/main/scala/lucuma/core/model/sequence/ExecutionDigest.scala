@@ -4,12 +4,15 @@
 package lucuma.core.model.sequence
 
 import cats.Eq
+import eu.timepit.refined.cats.given
+import eu.timepit.refined.types.numeric.NonNegInt
 import lucuma.core.enums.ObserveClass
 import monocle.Focus
 import monocle.Lens
 
 case class ExecutionDigest(
   setup:       SetupTime,
+  setupCount:  NonNegInt,
   acquisition: SequenceDigest,
   science:     SequenceDigest
 ) {
@@ -21,18 +24,11 @@ case class ExecutionDigest(
     science.observeClass
 
   /**
-   * Planned time for the observation, including the science sequence but only
-   * a reacquisition cost instead of the full setup time.
-   */
-  def reacquisitionTimeEstimate: CategorizedTime =
-    science.timeEstimate.sumCharge(science.observeClass.chargeClass, setup.reacquisition)
-
-  /**
-   * Planned time for the observation, including the science sequence and a
-   * full setup time.
+   * Planned time for the observation, including the science sequence and all
+   * expected acquisitions.
    */
   def fullTimeEstimate: CategorizedTime =
-    science.timeEstimate.sumCharge(science.observeClass.chargeClass, setup.full)
+    science.timeEstimate.sumCharge(science.observeClass.chargeClass, setup.full *| setupCount.value)
 
 }
 
@@ -41,6 +37,7 @@ object ExecutionDigest {
   val Zero: ExecutionDigest =
     ExecutionDigest(
       SetupTime.Zero,
+      NonNegInt.MinValue,
       SequenceDigest.Zero,
       SequenceDigest.Zero
     )
@@ -48,6 +45,10 @@ object ExecutionDigest {
   /** @group Optics */
   val setup: Lens[ExecutionDigest, SetupTime] =
     Focus[ExecutionDigest](_.setup)
+
+  /** @group Optics */
+  val setupCount: Lens[ExecutionDigest, NonNegInt] =
+    Focus[ExecutionDigest](_.setupCount)
 
   /** @group Optics */
   val acquisition: Lens[ExecutionDigest, SequenceDigest] =
@@ -60,6 +61,7 @@ object ExecutionDigest {
   given Eq[ExecutionDigest] =
     Eq.by { a => (
       a.setup,
+      a.setupCount,
       a.acquisition,
       a.science
     )}
