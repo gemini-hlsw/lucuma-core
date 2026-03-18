@@ -9,6 +9,8 @@ import edu.gemini.tac.qengine.api.config.TimeRestriction
 import edu.gemini.tac.qengine.impl.block.Block
 import edu.gemini.tac.qengine.log.RejectRestrictedBin
 import edu.gemini.tac.qengine.p1.*
+import eu.timepit.refined.types.numeric.PosInt
+import lucuma.core.enums.Half
 import lucuma.core.enums.Site
 import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.TimeAccountingCategory
@@ -18,6 +20,9 @@ import lucuma.core.model.ConstraintSet
 import lucuma.core.model.ElevationRange
 import lucuma.core.model.ImageQuality
 import lucuma.core.model.IntCentiPercent
+import lucuma.core.model.ProposalReference
+import lucuma.core.model.Semester
+import lucuma.core.model.Semester.YearInt
 import lucuma.core.util.Enumerated
 import lucuma.core.util.TimeSpan
 
@@ -46,7 +51,7 @@ class CompositeTimeRestrictionResourceTest extends ItacSuite {
   private val grp = new CompositeTimeRestrictionResource(lst)
 
   private def mkProp(wv: WaterVapor, lgs: Boolean): Proposal =
-    Proposal(ntac, site = Site.GS, obsList = List(ItacObservation(target, conds(wv), TimeSpan.fromHoursBounded(10), lgs)))
+    Proposal(ProposalReference(Semester(YearInt.unsafeFrom(2026), Half.A), PosInt.unsafeFrom(1)), ntac, site = Site.GS, obsList = List(ItacObservation(target, conds(wv), TimeSpan.fromHoursBounded(10), lgs)))
 
   test("testReserveWv") {
     val prop  = mkProp(WaterVapor.VeryDry, lgs = false)  // matches WV limit, not LGS limit

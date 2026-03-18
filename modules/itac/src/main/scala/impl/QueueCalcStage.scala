@@ -8,13 +8,13 @@ import edu.gemini.tac.qengine.impl.queue.ProposalQueueBuilder
 import edu.gemini.tac.qengine.log.ProposalLog
 import edu.gemini.tac.qengine.log.RejectCategoryOverAllocation
 import edu.gemini.tac.qengine.p1.ItacObservation
+import edu.gemini.tac.qengine.p1.ItacProposal
 import edu.gemini.tac.qengine.p1.Proposal
 import org.slf4j.LoggerFactory
 
 import block.BlockIterator
 import annotation.tailrec
 import resource.*
-import edu.gemini.tac.qengine.p1.ItacProposal
 
 object QueueCalcStage {
   type Result = (QueueFrame, ProposalLog)
@@ -46,9 +46,9 @@ object QueueCalcStage {
       (stackHead, log.updated(stackHead.iter.remPropList, stackHead.queue.band, RejectCategoryOverAllocation(_, stackHead.queue.band)))
     } else stackHead.next(activeList) match {
       case Left(msg) => //Error, so roll back (and recurse)
-        compute(rollback(stack, msg.prop, activeList), log.updated(msg.prop.id, stackHead.queue.band, msg), activeList)
+        compute(rollback(stack, msg.prop, activeList), log.updated(msg.prop.reference, stackHead.queue.band, msg), activeList)
       case Right(frameNext) => //OK, so accept (and recurse)
-        val updatedLog = frameNext.accept.map(msg => log.updated(msg.prop.id, stackHead.queue.band, msg)).getOrElse(log)
+        val updatedLog = frameNext.accept.map(msg => log.updated(msg.prop.reference, stackHead.queue.band, msg)).getOrElse(log)
         compute(frameNext.frame :: stack, updatedLog, activeList)
     }
   }

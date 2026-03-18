@@ -6,6 +6,8 @@ package edu.gemini.tac.qengine.impl.block
 import edu.gemini.tac.qengine.ItacSuite
 import edu.gemini.tac.qengine.api.queue.time.TimeAccountingCategoryTime
 import edu.gemini.tac.qengine.p1.*
+import eu.timepit.refined.types.numeric.PosInt
+import lucuma.core.enums.Half
 import lucuma.core.enums.Site
 import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.TimeAccountingCategory
@@ -14,6 +16,9 @@ import lucuma.core.model.CloudExtinction
 import lucuma.core.model.ConstraintSet
 import lucuma.core.model.ElevationRange
 import lucuma.core.model.ImageQuality
+import lucuma.core.model.ProposalReference
+import lucuma.core.model.Semester
+import lucuma.core.model.Semester.YearInt
 import lucuma.core.util.Enumerated
 import lucuma.core.util.TimeSpan
 import org.junit.*
@@ -41,7 +46,7 @@ class BlockIteratorTest extends ItacSuite {
     val ntac = Ntac(p, "na", 0, TimeSpan.fromHoursBounded(hrs))
     val lst = obsHrs.map(curHrs => ItacObservation(target, conds, TimeSpan.fromHoursBounded(curHrs))).toList
     val b3obs = b3ObsHrs.map(curHrs => ItacObservation(target, conds, TimeSpan.fromHoursBounded(curHrs))).toList
-    Proposal(ntac, site = Site.GS, obsList = lst, band3Observations = b3obs)
+    Proposal(ProposalReference(Semester(YearInt.unsafeFrom(2026), Half.A), PosInt.unsafeFrom(1)), ntac, site = Site.GS, obsList = lst, band3Observations = b3obs)
   }
 
   def genQuanta(hrs: Double): TimeAccountingCategoryTime = TimeAccountingCategoryTime.constant(TimeSpan.fromHoursBounded(hrs))

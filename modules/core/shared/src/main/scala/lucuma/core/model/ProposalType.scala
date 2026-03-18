@@ -20,8 +20,8 @@ enum ProposalType {
 
 object ProposalType:
   
-  val ToOActivation: Optional[ProposalType, ToOActivation] =
-    Optional[ProposalType, ToOActivation] {
+  val TooActivation: Optional[ProposalType, TooActivation] =
+    Optional[ProposalType, TooActivation] {
       case Classical(_, _)                        => None
       case DemoScience(toOActivation, _)          => Some(toOActivation)
       case DirectorsTime(toOActivation, _)        => Some(toOActivation)

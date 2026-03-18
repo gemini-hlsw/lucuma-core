@@ -1,18 +1,18 @@
-// Copyright (c) 2016-2025 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2026 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package edu.gemini.tac.qengine.p1
 
+import cats.syntax.all.*
 import lucuma.core.enums.ScienceBand
 import lucuma.core.enums.ScienceSubtype
 import lucuma.core.enums.Site
 import lucuma.core.enums.TimeAccountingCategory
-import lucuma.core.enums.ToOActivation
-import lucuma.core.util.TimeSpan
+import lucuma.core.enums.TooActivation
 import lucuma.core.model.Allocation
 import lucuma.core.model.ProposalReference
 import lucuma.core.model.ProposalType
-import cats.syntax.all.* 
+import lucuma.core.util.TimeSpan 
 
 // ok what do we really have?
 case class ItacProposal(
@@ -22,8 +22,8 @@ case class ItacProposal(
   itacObservations: List[ItacObservation]
 ):
 
-  def toOActivation: Option[ToOActivation] =
-    ProposalType.ToOActivation.getOption(tpe)
+  def toOActivation: Option[TooActivation] =
+    ProposalType.TooActivation.getOption(tpe)
 
   def itacObservationsScaledForSiteAndBand(site: Site, band: ScienceBand): List[ItacObservation.Scaled] =
     ???
@@ -44,7 +44,7 @@ case class Proposal2(
   ntac: Ntac,
   site: Site,
   mode: ScienceSubtype = ScienceSubtype.Queue,
-  too: ToOActivation = ToOActivation.None,
+  too: TooActivation = TooActivation.None,
   obsList: List[ItacObservation] = Nil,
   band3Observations: List[ItacObservation] = Nil,
 ) {
