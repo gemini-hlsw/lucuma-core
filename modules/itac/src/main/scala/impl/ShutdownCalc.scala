@@ -7,8 +7,8 @@ import edu.gemini.qengine.skycalc.RaBinSize
 import edu.gemini.qengine.skycalc.RaDecBinCalc
 import edu.gemini.tac.qengine.api.config.Shutdown
 import lucuma.core.enums.Site
-import lucuma.core.util.TimeSpan
 import lucuma.core.model.Semester
+import lucuma.core.util.TimeSpan
 
 /**
  *

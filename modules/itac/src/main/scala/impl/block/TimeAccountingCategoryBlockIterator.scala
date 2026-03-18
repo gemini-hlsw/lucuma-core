@@ -63,7 +63,7 @@ trait TimeAccountingCategoryBlockIterator{
 
 
   def isStartOf(prop: Proposal): Boolean =
-    (currentProposal.id == prop.id) && isStartBlock
+    (currentProposal.reference == prop.reference) && isStartBlock
 
   private def nextBlock(maxTime: TimeSpan): Block = {
     val time = currentObservationRemainingTime.min(maxTime)

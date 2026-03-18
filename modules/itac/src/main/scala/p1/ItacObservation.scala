@@ -3,10 +3,10 @@
 
 package edu.gemini.tac.qengine.p1
 
+import lucuma.core.enums.ObservingModeType
+import lucuma.core.enums.Site
 import lucuma.core.model.ConstraintSet
 import lucuma.core.util.TimeSpan
-import lucuma.core.enums.Site
-import lucuma.core.enums.ObservingModeType
 
 case class ItacObservation(
   itacTarget: ItacTarget, 

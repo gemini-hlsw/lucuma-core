@@ -5,6 +5,8 @@ package edu.gemini.tac.qengine.impl.block
 
 import edu.gemini.tac.qengine.ItacSuite
 import edu.gemini.tac.qengine.p1.*
+import eu.timepit.refined.types.numeric.PosInt
+import lucuma.core.enums.Half
 import lucuma.core.enums.Site
 import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.TimeAccountingCategory
@@ -13,6 +15,9 @@ import lucuma.core.model.CloudExtinction
 import lucuma.core.model.ConstraintSet
 import lucuma.core.model.ElevationRange
 import lucuma.core.model.ImageQuality
+import lucuma.core.model.ProposalReference
+import lucuma.core.model.Semester
+import lucuma.core.model.Semester.YearInt
 import lucuma.core.util.Enumerated
 import lucuma.core.util.TimeSpan
 import org.junit.*
@@ -34,7 +39,7 @@ class TimeAccountingCategoryBlockIteratorTest extends ItacSuite {
     )
   val e      = 0.000001
 
-  case class IdGen(num: Int = 0) {
+  case class IdGen(num: Int = 1) {
     def id: String = "PropId" + num
     def next: IdGen = IdGen(num + 1)
   }
@@ -47,7 +52,7 @@ class TimeAccountingCategoryBlockIteratorTest extends ItacSuite {
     val ntac = Ntac(AR, gen.id, 0, TimeSpan.fromHoursBounded(hrs))
     gen = gen.next
     val lst  = obsHrs.map(curHrs => ItacObservation(target, conds, TimeSpan.fromHoursBounded(curHrs))).toList
-    Proposal(ntac, site = Site.GS, obsList = lst)
+    Proposal(ProposalReference(Semester(YearInt.unsafeFrom(2026), Half.A), PosInt.unsafeFrom(gen.num)), ntac, site = Site.GS, obsList = lst)
   }
 
   test("testCreateEmpty") {
