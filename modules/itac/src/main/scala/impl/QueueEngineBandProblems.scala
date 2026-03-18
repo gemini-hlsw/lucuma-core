@@ -21,7 +21,7 @@ object QueueEngineBandProblems {
   type Problem = PartialFunction[(Proposal, ScienceBand), String]
 
   val ClassicalNotInBand1: Problem = {
-    case (p, b@(Band2 | Band3 | Band4)) if p.mode == ScienceSubtype.Classical =>
+    case (p, b@(Band2 | Band3 | Band4)) if p.tpe.scienceSubtype === ScienceSubtype.Classical =>
       s"Classical proposal in $b"
   }
 
@@ -31,7 +31,7 @@ object QueueEngineBandProblems {
   }
 
   val LpInBand3Or4: Problem = {
-    case (p, b@(Band3 | Band4)) if p.mode == ScienceSubtype.LargeProgram =>
+    case (p, b@(Band3 | Band4)) if p.tpe.scienceSubtype === ScienceSubtype.LargeProgram =>
       s"LP proposal in $b"
   }
 

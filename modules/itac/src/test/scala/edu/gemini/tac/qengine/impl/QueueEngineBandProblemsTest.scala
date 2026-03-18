@@ -15,6 +15,9 @@ import lucuma.core.model.Semester
 import lucuma.core.model.Semester.YearInt
 import munit.FunSuite
 import org.junit.Assert
+import lucuma.core.model.ProposalType
+import lucuma.core.model.IntPercent
+import lucuma.core.util.TimeSpan
 
 class QueueEngineBandProblemsTest extends FunSuite {
   import QueueEngineBandProblems._
@@ -24,9 +27,7 @@ class QueueEngineBandProblemsTest extends FunSuite {
     Proposal(
       ProposalReference(Semester(YearInt.unsafeFrom(2026), Half.A), PosInt.unsafeFrom(1)),
       allocations       = null,
-      site              = null,
-      mode              = null,
-      too               = null,
+      tpe               = null,
       obsList           = null,
       band3Observations = null,
     )
@@ -36,7 +37,7 @@ class QueueEngineBandProblemsTest extends FunSuite {
     ScienceBand.values.foreach(b => Assert.assertEquals(expect.lift(b), problem.lift((proposal, b))))
 
   test("testClassicalNotInBand1"):
-    testRule(ClassicalNotInBand1, P.copy(mode = ScienceSubtype.Classical)) {
+    testRule(ClassicalNotInBand1, P.copy(tpe = ProposalType.Classical(IntPercent.unsafeFrom(100), Nil))) { // TODO
       case Band2 => "Classical proposal in Band2"
       case Band3 => "Classical proposal in Band3"
       case Band4 => "Classical proposal in Band4"
@@ -55,20 +56,20 @@ class QueueEngineBandProblemsTest extends FunSuite {
     }
 
   test("testLpInBand3Or4"):
-    testRule(LpInBand3Or4, P.copy(mode = ScienceSubtype.LargeProgram)) {
+    testRule(LpInBand3Or4, P.copy(tpe = ProposalType.LargeProgram(ToOActivation.None, IntPercent.unsafeFrom(100), IntPercent.unsafeFrom(100), TimeSpan.Min))) { // TODO
       case Band3 => "LP proposal in Band3"
       case Band4 => "LP proposal in Band4"
     }
 
   test("testRapidTooOutsideBand1"):
-    testRule(RapidTooOutsideBand1, P.copy(too = ToOActivation.Rapid)) {
+    testRule(RapidTooOutsideBand1, P.copy(tpe = ProposalType.Queue(ToOActivation.Rapid, IntPercent.unsafeFrom(100), Nil))) { // TODO
       case Band2 => "Rapid TOO proposal in Band2"
       case Band3 => "Rapid TOO proposal in Band3"
       case Band4 => "Rapid TOO proposal in Band4"
     }
 
   test("testStandardTooOutsideBand12"):
-    testRule(StandardTooOutsideBand12, P.copy(too = ToOActivation.Standard)) {
+    testRule(StandardTooOutsideBand12, P.copy(tpe = ProposalType.Queue(ToOActivation.Standard, IntPercent.unsafeFrom(100), Nil))) { // TODO
       case Band3 => "Standard TOO proposal in Band3"
       case Band4 => "Standard TOO proposal in Band4"
     }

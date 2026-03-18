@@ -6,16 +6,17 @@ package lucuma.core.model
 import lucuma.core.enums.ToOActivation
 import lucuma.core.util.TimeSpan
 import monocle.Optional
+import lucuma.core.enums.ScienceSubtype
 
-enum ProposalType {
-  case Classical(minPercentTime: IntPercent, partnerSplits: List[PartnerSplit])
-  case DemoScience(toOActivation: ToOActivation, minPercentTime: IntPercent)
-  case DirectorsTime(toOActivation: ToOActivation, minPercentTime: IntPercent)
-  case FastTurnaround(toOActivation: ToOActivation, minPercentTime: IntPercent, reviewerId: ProgramUser.Id, mentorId: ProgramUser.Id)
-  case LargeProgram(toOActivation: ToOActivation, minPercentTime: IntPercent, minPercentTotalTime: IntPercent, totalTime: TimeSpan)
-  case PoorWeather
-  case Queue(toOActivation: ToOActivation, minPercentTime: IntPercent, partnerSplits: List[PartnerSplit])
-  case SystemVerification(toOActivation: ToOActivation, minPercentTime: IntPercent)
+enum ProposalType(val scienceSubtype: ScienceSubtype) {
+  case Classical(minPercentTime: IntPercent, partnerSplits: List[PartnerSplit]) extends ProposalType(ScienceSubtype.Classical)
+  case DemoScience(toOActivation: ToOActivation, minPercentTime: IntPercent) extends ProposalType(ScienceSubtype.DemoScience)
+  case DirectorsTime(toOActivation: ToOActivation, minPercentTime: IntPercent) extends ProposalType(ScienceSubtype.DirectorsTime)
+  case FastTurnaround(toOActivation: ToOActivation, minPercentTime: IntPercent, reviewerId: ProgramUser.Id, mentorId: ProgramUser.Id) extends ProposalType(ScienceSubtype.FastTurnaround)
+  case LargeProgram(toOActivation: ToOActivation, minPercentTime: IntPercent, minPercentTotalTime: IntPercent, totalTime: TimeSpan) extends ProposalType(ScienceSubtype.LargeProgram)
+  case PoorWeather extends ProposalType(ScienceSubtype.PoorWeather)
+  case Queue(toOActivation: ToOActivation, minPercentTime: IntPercent, partnerSplits: List[PartnerSplit]) extends ProposalType(ScienceSubtype.Queue)
+  case SystemVerification(toOActivation: ToOActivation, minPercentTime: IntPercent) extends ProposalType(ScienceSubtype.SystemVerification)
 }
 
 object ProposalType:
