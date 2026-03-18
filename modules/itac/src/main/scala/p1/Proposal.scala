@@ -9,25 +9,30 @@ import lucuma.core.enums.Site
 import lucuma.core.enums.ToOActivation
 import lucuma.core.model.ProposalReference
 import lucuma.core.util.TimeSpan
+import cats.syntax.all.*
+import cats.data.NonEmptyList
+import lucuma.core.model.Allocation
 
 case class Proposal(
   reference: ProposalReference,
-  ntac: Ntac,
+  allocations: NonEmptyList[Allocation],
   site: Site,
   mode: ScienceSubtype = ScienceSubtype.Queue,
   too: ToOActivation = ToOActivation.None,
   obsList: List[ItacObservation] = Nil,
   band3Observations: List[ItacObservation] = Nil,
-  isPoorWeather: Boolean = false,
 ) {
 
   def obsListFor(band: ScienceBand): List[ItacObservation] =
     if (band == ScienceBand.Band3) band3Observations else obsList
 
+  @deprecated
+  def ntac = allocations.head
+
   /**
    * Gets the time for the proposal as a whole.
    */
-  def time: TimeSpan = ntac.awardedTime
+  def time: TimeSpan = allocations.foldMap(_.duration)
 
   /**
    * Gets the time for the given observation relative to the total for all

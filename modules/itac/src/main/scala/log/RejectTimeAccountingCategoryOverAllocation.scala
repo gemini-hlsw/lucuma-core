@@ -29,5 +29,5 @@ object RejectTimeAccountingCategoryOverAllocation {
 
 case class RejectTimeAccountingCategoryOverAllocation(prop: Proposal, guaranteed: BoundedTime, all: BoundedTime) extends RejectMessage {
   def reason: String = RejectTimeAccountingCategoryOverAllocation.name
-  def detail: String = RejectTimeAccountingCategoryOverAllocation.detail(prop.ntac.timeAccountingCategory, prop.time, guaranteed, all)
+  def detail: String = RejectTimeAccountingCategoryOverAllocation.detail(prop.ntac.category, prop.time, guaranteed, all)
 }
