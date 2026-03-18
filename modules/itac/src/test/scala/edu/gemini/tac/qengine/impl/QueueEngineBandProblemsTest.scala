@@ -23,9 +23,6 @@ class QueueEngineBandProblemsTest extends FunSuite {
       too               = null,
       obsList           = null,
       band3Observations = null,
-      isPoorWeather     = false,
-      piName            = null,
-      piEmail           = null,
     )
 
   // Test that the given problem check fails with the the given proposal and per-band expectations.

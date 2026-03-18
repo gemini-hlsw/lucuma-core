@@ -5,15 +5,26 @@ package edu.gemini.tac.qengine.p1
 
 import lucuma.core.model.ConstraintSet
 import lucuma.core.util.TimeSpan
+import lucuma.core.enums.Site
+import lucuma.core.enums.ObservingModeType
 
 case class ItacObservation(
   itacTarget: ItacTarget, 
   constraintSet: ConstraintSet, 
-  time: TimeSpan, 
-  lgs: Boolean = false
-)
+  time: TimeSpan, // estimated time
+  lgs: Boolean = false, // TODO: compute this from observing mode?
+  mode: ObservingModeType = ObservingModeType.GmosNorthLongSlit,
+):
+  def site: Site = ??? // we need to know this because some partners can't observe 
+
 
 object ItacObservation {
+
+  /** An ItacObservation whose `time` field has been scaled to allocated time in a particular band+site. */
+  opaque type Scaled <: ItacObservation = ItacObservation
+  object Scaled:
+    def apply(io: ItacObservation): Scaled = io
+
   def sumObsTime(lst: List[ItacObservation]): TimeSpan = lst.foldLeft(TimeSpan.Zero)(_ +| _.time)
 
   private def percentOfSum(obs: ItacObservation, lst: List[ItacObservation]): Double =

@@ -48,3 +48,6 @@ final case class ProposalQueueBuilder(
     Map(band -> proposals)
 
 }
+
+// object ProposalQueueBuilder:
+  // val Empty: ProposalQueueBuilder = ???
