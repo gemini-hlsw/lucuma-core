@@ -4,24 +4,25 @@
 package edu.gemini.tac.qengine.p1
 
 import lucuma.core.enums.ScienceBand
-import lucuma.core.enums.ScienceSubtype
-import lucuma.core.enums.Site
 import lucuma.core.enums.TooActivation
 import lucuma.core.model.ProposalReference
 import lucuma.core.util.TimeSpan
 import cats.syntax.all.*
 import cats.data.NonEmptyList
 import lucuma.core.model.Allocation
+import lucuma.core.model.ProposalType
+import lucuma.core.model.IntPercent
 
 case class Proposal(
   reference: ProposalReference,
   allocations: NonEmptyList[Allocation],
-  site: Site,
-  mode: ScienceSubtype = ScienceSubtype.Queue,
-  too: TooActivation = TooActivation.None,
+  tpe: ProposalType = ProposalType.Queue(TooActivation.None, IntPercent.unsafeFrom(0), Nil), // TODO
   obsList: List[ItacObservation] = Nil,
   band3Observations: List[ItacObservation] = Nil,
 ) {
+
+  def too: TooActivation =
+    ProposalType.TooActivation.getOption(tpe).getOrElse(TooActivation.None)
 
   def obsListFor(band: ScienceBand): List[ItacObservation] =
     if (band == ScienceBand.Band3) band3Observations else obsList
@@ -49,3 +50,4 @@ case class Proposal(
     ItacObservation.relativeObsList(time, obsListFor(band))
 
 }
+

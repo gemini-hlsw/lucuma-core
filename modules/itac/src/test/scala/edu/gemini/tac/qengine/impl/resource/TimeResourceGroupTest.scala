@@ -51,7 +51,7 @@ class CompositeTimeRestrictionResourceTest extends ItacSuite {
   private val grp = new CompositeTimeRestrictionResource(lst)
 
   private def mkProp(wv: WaterVapor, lgs: Boolean): Proposal =
-    Proposal(ProposalReference(Semester(YearInt.unsafeFrom(2026), Half.A), PosInt.unsafeFrom(1)), ntac, site = Site.GS, obsList = List(ItacObservation(target, conds(wv), TimeSpan.fromHoursBounded(10), lgs)))
+    Proposal(ProposalReference(Semester(YearInt.unsafeFrom(2026), Half.A), PosInt.unsafeFrom(1)), ntac, obsList = List(ItacObservation(target, conds(wv), TimeSpan.fromHoursBounded(10), lgs)))
 
   test("testReserveWv") {
     val prop  = mkProp(WaterVapor.VeryDry, lgs = false)  // matches WV limit, not LGS limit

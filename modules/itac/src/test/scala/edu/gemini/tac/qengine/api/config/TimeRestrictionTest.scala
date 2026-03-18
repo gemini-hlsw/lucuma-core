@@ -38,7 +38,7 @@ class TimeRestrictionTest extends ItacSuite {
   }
 
   private def mkProp(wv: WaterVapor): Proposal =
-    Proposal(ProposalReference(Semester(YearInt.unsafeFrom(2026), Half.A), PosInt.unsafeFrom(1)), ntac, site = Site.GS, obsList = List(ItacObservation(target, conds(wv), TimeSpan.fromHoursBounded(10))))
+    Proposal(ProposalReference(Semester(YearInt.unsafeFrom(2026), Half.A), PosInt.unsafeFrom(1)), ntac, obsList = List(ItacObservation(target, conds(wv), TimeSpan.fromHoursBounded(10))))
 
 
   test("testMatches") {
