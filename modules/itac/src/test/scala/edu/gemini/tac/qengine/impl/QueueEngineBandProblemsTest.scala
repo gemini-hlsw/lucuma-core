@@ -4,10 +4,15 @@
 package edu.gemini.tac.qengine.impl
 
 import edu.gemini.tac.qengine.p1.Proposal
+import eu.timepit.refined.types.numeric.PosInt
+import lucuma.core.enums.Half
 import lucuma.core.enums.ScienceBand
 import lucuma.core.enums.ScienceBand.*
 import lucuma.core.enums.ScienceSubtype
 import lucuma.core.enums.ToOActivation
+import lucuma.core.model.ProposalReference
+import lucuma.core.model.Semester
+import lucuma.core.model.Semester.YearInt
 import munit.FunSuite
 import org.junit.Assert
 
@@ -17,6 +22,7 @@ class QueueEngineBandProblemsTest extends FunSuite {
   // A proposal with no data. We .copy it to make test proposals.
   private val P: Proposal =
     Proposal(
+      ProposalReference(Semester(YearInt.unsafeFrom(2026), Half.A), PosInt.unsafeFrom(1)),
       ntac              = null,
       site              = null,
       mode              = null,

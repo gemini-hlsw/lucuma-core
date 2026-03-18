@@ -3,16 +3,16 @@
 
 package edu.gemini.tac.qengine.p1
 
+import cats.syntax.all.*
 import lucuma.core.enums.ScienceBand
 import lucuma.core.enums.ScienceSubtype
 import lucuma.core.enums.Site
 import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.enums.ToOActivation
-import lucuma.core.util.TimeSpan
 import lucuma.core.model.Allocation
 import lucuma.core.model.ProposalReference
 import lucuma.core.model.ProposalType
-import cats.syntax.all.* 
+import lucuma.core.util.TimeSpan 
 
 // ok what do we really have?
 case class ItacProposal(

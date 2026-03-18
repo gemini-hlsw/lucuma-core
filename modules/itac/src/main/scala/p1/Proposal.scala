@@ -8,9 +8,11 @@ import lucuma.core.enums.ScienceSubtype
 import lucuma.core.enums.Site
 import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.enums.ToOActivation
+import lucuma.core.model.ProposalReference
 import lucuma.core.util.TimeSpan
 
 case class Proposal(
+  reference: ProposalReference,
   ntac: Ntac,
   site: Site,
   mode: ScienceSubtype = ScienceSubtype.Queue,
@@ -22,8 +24,6 @@ case class Proposal(
   piEmail: Option[String] = None,
   itacComment: Option[String] = None,
 ) {
-
-  lazy val id: Proposal.Id = Proposal.Id(ntac.TimeAccountingCategory, ntac.reference)
 
   def obsListFor(band: ScienceBand): List[ItacObservation] =
     if (band == ScienceBand.Band3) band3Observations else obsList

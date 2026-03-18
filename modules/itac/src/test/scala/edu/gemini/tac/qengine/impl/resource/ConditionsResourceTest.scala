@@ -11,6 +11,8 @@ import edu.gemini.tac.qengine.api.config.ConditionsCategoryMap
 import edu.gemini.tac.qengine.impl.block.Block
 import edu.gemini.tac.qengine.log.RejectConditions
 import edu.gemini.tac.qengine.p1.*
+import eu.timepit.refined.types.numeric.PosInt
+import lucuma.core.enums.Half
 import lucuma.core.enums.Site
 import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.TimeAccountingCategory
@@ -20,6 +22,9 @@ import lucuma.core.model.ConstraintSet
 import lucuma.core.model.ElevationRange
 import lucuma.core.model.ImageQuality
 import lucuma.core.model.IntCentiPercent
+import lucuma.core.model.ProposalReference
+import lucuma.core.model.Semester
+import lucuma.core.model.Semester.YearInt
 import lucuma.core.util.Enumerated
 import lucuma.core.util.TimeSpan
 
@@ -42,7 +47,7 @@ class ConditionsResourceTest extends ItacSuite {
 
   private def mkProp(obsConds: ConstraintSet): Proposal = {
     val obsList = List(ItacObservation(target, obsConds, TimeSpan.fromMinutesBounded(10)))
-    Proposal(ntac, site = Site.GS, obsList = obsList)
+    Proposal(ProposalReference(Semester(YearInt.unsafeFrom(2026), Half.A), PosInt.unsafeFrom(1)), ntac, site = Site.GS, obsList = obsList)
   }
 
   private def mkConds(cc: CloudExtinction.Preset): ConstraintSet =
