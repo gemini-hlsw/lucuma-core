@@ -42,12 +42,5 @@ case class Proposal(
   def relativeObsTime(obs: ItacObservation, band: ScienceBand): TimeSpan =
     ItacObservation.relativeObsTime(obs, time, obsListFor(band))
 
-  /**
-   * Gets the observation list with their times adjusted to be relative to
-   * the total for all observations in the proposal.
-   */
-  def relativeObsList(band: ScienceBand): List[ItacObservation] =
-    ItacObservation.relativeObsList(time, obsListFor(band))
-
 }
 
