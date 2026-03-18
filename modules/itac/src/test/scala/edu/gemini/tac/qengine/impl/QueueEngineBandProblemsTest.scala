@@ -23,7 +23,7 @@ class QueueEngineBandProblemsTest extends FunSuite {
   private val P: Proposal =
     Proposal(
       ProposalReference(Semester(YearInt.unsafeFrom(2026), Half.A), PosInt.unsafeFrom(1)),
-      ntac              = null,
+      allocations       = null,
       site              = null,
       mode              = null,
       too               = null,
