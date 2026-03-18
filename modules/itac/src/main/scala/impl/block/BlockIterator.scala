@@ -58,7 +58,7 @@ trait BlockIterator {
   def currentTimeAccountingCategory: TimeAccountingCategory = seq.head
 
   def isStartOf(prop: Proposal): Boolean =
-    (currentTimeAccountingCategory == prop.ntac.TimeAccountingCategory) &&
+    (currentTimeAccountingCategory == prop.ntac.timeAccountingCategory) &&
     iterMap(currentTimeAccountingCategory).isStartOf(prop)
 
   /**

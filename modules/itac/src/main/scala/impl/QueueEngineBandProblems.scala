@@ -55,7 +55,7 @@ object QueueEngineBandProblems {
   def unsafeCheckAll(p: Proposal, b: ScienceBand): Unit =
     checkAll(p, b) match {
       case Validated.Valid(u)  => u
-      case Validated.Invalid(es) => es.toList.foreach(w => Log.warn(s"${p.ntac.reference}: $w"))
+      case Validated.Invalid(es) => es.toList.foreach(w => Log.warn(s"${p.reference}: $w"))
     }
 
 }

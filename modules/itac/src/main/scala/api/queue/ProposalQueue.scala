@@ -22,7 +22,7 @@ trait ProposalQueue {
     toList.foldMap(_.time)
 
   def usedTime(p: TimeAccountingCategory): TimeSpan =
-    toList.filter(_.ntac.TimeAccountingCategory === p).foldMap(_.time)
+    toList.filter(_.ntac.timeAccountingCategory === p).foldMap(_.time)
 
   def remainingTime(TimeAccountingCategory: TimeAccountingCategory): TimeSpan =
     queueTime(TimeAccountingCategory) -| usedTime(TimeAccountingCategory)

@@ -23,7 +23,7 @@ class PerRightAscensionResourceTest extends ItacSuite {
   // test.  We will make time blocks with the explicit amount of time we need
   // for testing.
 
-  private val ntac = Ntac(KR, "x", 0, TimeSpan.Zero)
+  private val ntac = Ntac(KR, TimeSpan.Zero)
 
   private def mkProp(target: ItacTarget, conds: ConstraintSet): Proposal =
     Fixture.mkProp(ntac,  (target, conds, TimeSpan.Zero))

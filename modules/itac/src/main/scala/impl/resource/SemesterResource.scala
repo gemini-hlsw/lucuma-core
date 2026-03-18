@@ -30,15 +30,15 @@ final case class SemesterResource(
 
   // Determines whether the TimeAccountingCategory is already over allocated.
   private def TimeAccountingCategoryAlreadyOverallocated(block: Block, queue: ProposalQueueBuilder): Boolean = {
-    LOGGER.debug(f"Remaining time for ${block.prop.ntac.TimeAccountingCategory} is ${queue.remainingTime(block.prop.ntac.TimeAccountingCategory).toHours}%5.1f")
-    queue.remainingTime(block.prop.ntac.TimeAccountingCategory) <= TimeSpan.Zero
+    LOGGER.debug(f"Remaining time for ${block.prop.ntac.timeAccountingCategory} is ${queue.remainingTime(block.prop.ntac.timeAccountingCategory).toHours}%5.1f")
+    queue.remainingTime(block.prop.ntac.timeAccountingCategory) <= TimeSpan.Zero
   }
 
   // Determines whether including the indicated proposal will overallocate the
   // TimeAccountingCategory past the limit and allowance.
   private def TimeAccountingCategoryWouldBeOverallocated(block: Block, queue: ProposalQueueBuilder): Boolean = {
     val perc      = queue.queueTime.overfillAllowance
-    val TimeAccountingCategory   = block.prop.ntac.TimeAccountingCategory
+    val TimeAccountingCategory   = block.prop.ntac.timeAccountingCategory
     val used      = queue.usedTime(TimeAccountingCategory)
     val softLimit = queue.queueTime(TimeAccountingCategory)
     val allowance = softLimit *| perc // overfill is per category (B1_2 and B3 are what we're using)
@@ -60,7 +60,7 @@ final case class SemesterResource(
     // proposal is added so there is no need to check with every block that is
     // considered.
     if (block.isStart && TimeAccountingCategoryOverallocated(block, queue)) {
-      val p = block.prop.ntac.TimeAccountingCategory
+      val p = block.prop.ntac.timeAccountingCategory
       LOGGER.debug("Rejected due to TimeAccountingCategory overallocation")
       Left(RejectTimeAccountingCategoryOverAllocation(block.prop, queue.bounds(p), queue.bounds(p)))
     } else {

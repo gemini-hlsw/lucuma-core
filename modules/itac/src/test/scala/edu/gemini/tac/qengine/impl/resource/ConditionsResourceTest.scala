@@ -42,7 +42,7 @@ class ConditionsResourceTest extends ItacSuite {
   private val binGrp = ConditionsCategoryMap.of(bins)
   private val resGrp = ConditionsCategoryMapResource(TimeSpan.fromMinutesBounded(100), binGrp)
 
-  private val ntac   = Ntac(KR, "x", 0, TimeSpan.fromMinutesBounded(100)) // not used
+  private val ntac   = Ntac(KR, TimeSpan.fromMinutesBounded(100)) // not used
   private val target = ItacTarget(0,0)                               // not used
 
   private def mkProp(obsConds: ConstraintSet): Proposal = {

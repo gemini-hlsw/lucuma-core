@@ -28,7 +28,7 @@ class TimeRestrictionTest extends ItacSuite {
 
   val US = TimeAccountingCategory.US
 
-  private val ntac   = Ntac(US, "x", 0, TimeSpan.fromHoursBounded(10))
+  private val ntac   = Ntac(US, TimeSpan.fromHoursBounded(10))
   private val target = ItacTarget(0.0, 0.0) // not used
   private def conds(wv: WaterVapor) =
     ConstraintSet(ImageQuality.Preset.TwoPointZero, CloudExtinction.Preset.ThreePointZero, SkyBackground.Bright, wv, ElevationRange.ByAirMass.Default)
