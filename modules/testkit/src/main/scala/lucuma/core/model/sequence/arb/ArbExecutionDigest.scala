@@ -4,6 +4,8 @@
 package lucuma.core.model.sequence
 package arb
 
+import eu.timepit.refined.scalacheck.numeric.given
+import eu.timepit.refined.types.numeric.NonNegInt
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.*
 import org.scalacheck.Cogen
@@ -16,19 +18,22 @@ trait ArbExecutionDigest {
   given Arbitrary[ExecutionDigest] =
     Arbitrary {
       for {
-        c <- arbitrary[SetupTime]
+        t <- arbitrary[SetupTime]
+        c <- arbitrary[NonNegInt]
         a <- arbitrary[SequenceDigest]
         s <- arbitrary[SequenceDigest]
-      } yield ExecutionDigest(c, a, s)
+      } yield ExecutionDigest(t, c, a, s)
     }
 
   given Cogen[ExecutionDigest] =
     Cogen[(
       SetupTime,
+      Int,
       SequenceDigest,
       SequenceDigest
     )].contramap { a => (
       a.setup,
+      a.setupCount.value,
       a.acquisition,
       a.science
     )}
