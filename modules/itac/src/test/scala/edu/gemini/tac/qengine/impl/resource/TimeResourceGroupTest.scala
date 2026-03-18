@@ -30,7 +30,7 @@ class CompositeTimeRestrictionResourceTest extends ItacSuite {
   import TimeAccountingCategory.US
   val TimeAccountingCategorys = Enumerated[TimeAccountingCategory].all
 
-  private val ntac   = Ntac(US, "x", 0, TimeSpan.fromHoursBounded(10))
+  private val ntac   = Ntac(US, TimeSpan.fromHoursBounded(10))
   private val target = ItacTarget(0, 0) // not used
   private def conds(wv: WaterVapor) =
     ConstraintSet(ImageQuality.Preset.TwoPointZero, CloudExtinction.Preset.ThreePointZero, SkyBackground.Bright, wv, ElevationRange.ByAirMass.Default)

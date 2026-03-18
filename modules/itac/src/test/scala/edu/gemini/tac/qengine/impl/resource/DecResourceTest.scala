@@ -57,7 +57,7 @@ class DecResourceTest extends ItacSuite {
       ElevationRange.ByAirMass.Default
     )
 
-  private val ntac = Ntac(KR, "x", 0, TimeSpan.Zero)
+  private val ntac = Ntac(KR, TimeSpan.Zero)
 
   private def mkProp(target: ItacTarget): Proposal =
     Proposal(ProposalReference(Semester(YearInt.unsafeFrom(2026), Half.A), PosInt.unsafeFrom(1)), ntac, site = Site.GS, obsList = List(ItacObservation(target, conds, TimeSpan.Zero)))
