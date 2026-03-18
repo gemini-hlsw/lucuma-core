@@ -5,7 +5,6 @@ package edu.gemini.tac.qengine.p1
 
 import cats.syntax.all.*
 import lucuma.core.enums.ScienceBand
-import lucuma.core.enums.ScienceSubtype
 import lucuma.core.enums.Site
 import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.enums.ToOActivation
@@ -40,47 +39,3 @@ case class ItacProposal(
       case Allocation(_, `band`, _)                         => true
       case _                                                => false
       
-case class Proposal2(
-  ntac: Ntac,
-  site: Site,
-  mode: ScienceSubtype = ScienceSubtype.Queue,
-  too: ToOActivation = ToOActivation.None,
-  obsList: List[ItacObservation] = Nil,
-  band3Observations: List[ItacObservation] = Nil,
-) {
-
-  lazy val id: Proposal2.Id = Proposal2.Id(ntac.TimeAccountingCategory, ntac.reference)
-  
-  def obsListFor(band: ScienceBand): List[ItacObservation] =
-    if (band == ScienceBand.Band3) band3Observations else obsList
-
-  /**
-   * Gets the time for the proposal as a whole.
-   */
-  def time: TimeSpan = ntac.awardedTime
-
-  /**
-   * Gets the time for the given observation relative to the total for all
-   * observations in the proposal.
-   */
-  def relativeObsTime(obs: ItacObservation, band: ScienceBand): TimeSpan =
-    ItacObservation.relativeObsTime(obs, time, obsListFor(band))
-
-  /**
-   * Gets the observation list with their times adjusted to be relative to
-   * the total for all observations in the proposal.
-   */
-  def relativeObsList(band: ScienceBand): List[ItacObservation] =
-    ItacObservation.relativeObsList(time, obsListFor(band))
-
-}
-
-object Proposal2 {
-
-  final case class Id(TimeAccountingCategory: TimeAccountingCategory, reference: String)
-  object Id {
-    implicit val OrderingId: Ordering[Id] =
-      Ordering.by(id => (id.TimeAccountingCategory.tag, id.reference))
-  }
-
-}

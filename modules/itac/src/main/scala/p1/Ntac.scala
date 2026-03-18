@@ -3,91 +3,13 @@
 
 package edu.gemini.tac.qengine.p1
 
-import edu.gemini.tac.qengine.p1.Ntac.Rank
 import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.util.TimeSpan
-// import edu.gemini.model.p1.immutable.{ Submission, NgoSubmission }
 
 trait Submission
 trait NgoSubmission
 
-case class Ntac(TimeAccountingCategory: TimeAccountingCategory,
-  reference: String,
-  ranking: Rank,
+case class Ntac(
+  timeAccountingCategory: TimeAccountingCategory,
   awardedTime: TimeSpan,
-  poorWeather: Boolean,
-  lead: Option[String] = None,
-  submission: Submission = null,
-  undividedTime: Option[TimeSpan] = None, // this will be set to the original time if the actual time is reduced due to a site split
-  ngoEmail: Option[String] = None
-) {
-  require(awardedTime.toMilliseconds >= 0, "Awarded time must be non-negative, not " + awardedTime.toMilliseconds)
-
-  // def compare(that: Ntac): Int = Ntac.MasterOrdering.compare(this, that)
-
-  def ngoSubmission: NgoSubmission =
-    submission match {
-      case s: NgoSubmission => s
-      case _ => sys.error(s"Not an NgoSubmission: $submission")
-    }
-
-}
-
-object Ntac {
-
-  case class Rank(num: Option[Double]) extends Ordered[Rank] {
-    require(num.forall(_ >= 0), "Ranking must be non-negative, not " + num.get)
-
-    def compare(that: Rank): Int = {
-      (num, that.num) match {
-        case (None, None) =>  0
-        case (_, None)    => -1
-        case (None, _)    =>  1
-        case (Some(n0), Some(n1)) => n0.compare(n1)
-      }
-    }
-
-    def format: String = {
-      num map { n =>
-        val str = "%.1f".format(n)
-        if (str.endsWith(".0")) str.dropRight(2) else str
-      } getOrElse ""
-    }
-
-    override def toString: String = format
-  }
-
-  object Rank {
-    val empty: Rank = Rank(None)
-
-    def apply(num: Double): Rank = new Rank(Some(num))
-  }
-
-  // /**
-  //  * An ordering based upon awarded time (descending) followed by TimeAccountingCategory
-  //  * percentage (ascending).  This is the default ordering for selecting
-  //  * master proposals.
-  //  */
-  // object MasterOrdering extends CompoundOrdering(
-  //   Ordering.by[Ntac, Time](_.awardedTime).reverse,
-  //   Ordering.by[Ntac, IntCentiPercent](_.TimeAccountingCategory.share),
-  //   Ordering.by[Ntac, Rank](_.ranking),
-  //   Ordering.by[Ntac, String](_.TimeAccountingCategory.id),
-  //   Ordering.by[Ntac, String](_.reference)
-  // )
-
-  /**
-   * Sums the awarded time in a collection of Ntacs.
-   */
-  def awardedTimeSum(ntacs: Iterable[Ntac]): TimeSpan =
-    ntacs.foldLeft(TimeSpan.Zero)(_ +| _.awardedTime)
-
-  def apply(TimeAccountingCategory: TimeAccountingCategory, reference: String, ranking: Double, awardedTime: TimeSpan, poorWeather : Boolean): Ntac =
-      new Ntac(TimeAccountingCategory, reference, Ntac.Rank(ranking), awardedTime, poorWeather)
-
-  def apply(TimeAccountingCategory: TimeAccountingCategory, reference: String, ranking: Double, awardedTime: TimeSpan): Ntac =
-    new Ntac(TimeAccountingCategory, reference, Ntac.Rank(ranking), awardedTime, false)
-
-  def apply(TimeAccountingCategory: TimeAccountingCategory, reference: String, ranking: Double, awardedTime: TimeSpan, lead: String): Ntac =
-    new Ntac(TimeAccountingCategory, reference, Ntac.Rank(ranking), awardedTime, false, Some(lead))
-}
+)

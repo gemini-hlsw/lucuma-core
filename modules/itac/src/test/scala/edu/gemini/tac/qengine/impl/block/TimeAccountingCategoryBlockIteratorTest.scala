@@ -49,7 +49,7 @@ class TimeAccountingCategoryBlockIteratorTest extends ItacSuite {
   def mkObs(hrs: Double): ItacObservation = ItacObservation(target, conds, TimeSpan.fromHoursBounded(hrs))
 
   def mkProp(hrs: Double, obsHrs: Double*): Proposal = {
-    val ntac = Ntac(AR, gen.id, 0, TimeSpan.fromHoursBounded(hrs))
+    val ntac = Ntac(AR, TimeSpan.fromHoursBounded(hrs))
     gen = gen.next
     val lst  = obsHrs.map(curHrs => ItacObservation(target, conds, TimeSpan.fromHoursBounded(curHrs))).toList
     Proposal(ProposalReference(Semester(YearInt.unsafeFrom(2026), Half.A), PosInt.unsafeFrom(gen.num)), ntac, site = Site.GS, obsList = lst)
