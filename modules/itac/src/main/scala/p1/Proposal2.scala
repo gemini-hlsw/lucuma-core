@@ -1,0 +1,86 @@
+// Copyright (c) 2016-2025 Association of Universities for Research in Astronomy, Inc. (AURA)
+// For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
+
+package edu.gemini.tac.qengine.p1
+
+import lucuma.core.enums.ScienceBand
+import lucuma.core.enums.ScienceSubtype
+import lucuma.core.enums.Site
+import lucuma.core.enums.TimeAccountingCategory
+import lucuma.core.enums.ToOActivation
+import lucuma.core.util.TimeSpan
+import lucuma.core.model.Allocation
+import lucuma.core.model.ProposalReference
+import lucuma.core.model.ProposalType
+import cats.syntax.all.* 
+
+// ok what do we really have?
+case class ItacProposal(
+  reference: ProposalReference,
+  tpe: ProposalType,
+  allocations: List[Allocation],
+  itacObservations: List[ItacObservation]
+):
+
+  def toOActivation: Option[ToOActivation] =
+    ProposalType.ToOActivation.getOption(tpe)
+
+  def itacObservationsScaledForSiteAndBand(site: Site, band: ScienceBand): List[ItacObservation.Scaled] =
+    ???
+
+  /** Allocations that can be used at the given site, in the given band. */
+  def allocatedTimeForSiteAndBand(site: Site, band: ScienceBand): TimeSpan =
+    allocationsForSiteAndBand(site, band).foldMap(_.duration)
+
+  /** Allocations that can be used at the given site, in the given band. */
+  def allocationsForSiteAndBand(site: Site, band: ScienceBand): List[Allocation] =
+    allocations.filter:
+      case Allocation(TimeAccountingCategory.UH, `band`, _) => site == Site.GN
+      case Allocation(TimeAccountingCategory.CL, `band`, _) => site == Site.GS
+      case Allocation(_, `band`, _)                         => true
+      case _                                                => false
+      
+case class Proposal2(
+  ntac: Ntac,
+  site: Site,
+  mode: ScienceSubtype = ScienceSubtype.Queue,
+  too: ToOActivation = ToOActivation.None,
+  obsList: List[ItacObservation] = Nil,
+  band3Observations: List[ItacObservation] = Nil,
+) {
+
+  lazy val id: Proposal2.Id = Proposal2.Id(ntac.TimeAccountingCategory, ntac.reference)
+  
+  def obsListFor(band: ScienceBand): List[ItacObservation] =
+    if (band == ScienceBand.Band3) band3Observations else obsList
+
+  /**
+   * Gets the time for the proposal as a whole.
+   */
+  def time: TimeSpan = ntac.awardedTime
+
+  /**
+   * Gets the time for the given observation relative to the total for all
+   * observations in the proposal.
+   */
+  def relativeObsTime(obs: ItacObservation, band: ScienceBand): TimeSpan =
+    ItacObservation.relativeObsTime(obs, time, obsListFor(band))
+
+  /**
+   * Gets the observation list with their times adjusted to be relative to
+   * the total for all observations in the proposal.
+   */
+  def relativeObsList(band: ScienceBand): List[ItacObservation] =
+    ItacObservation.relativeObsList(time, obsListFor(band))
+
+}
+
+object Proposal2 {
+
+  final case class Id(TimeAccountingCategory: TimeAccountingCategory, reference: String)
+  object Id {
+    implicit val OrderingId: Ordering[Id] =
+      Ordering.by(id => (id.TimeAccountingCategory.tag, id.reference))
+  }
+
+}

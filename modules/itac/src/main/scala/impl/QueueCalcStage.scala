@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory
 import block.BlockIterator
 import annotation.tailrec
 import resource.*
+import edu.gemini.tac.qengine.p1.ItacProposal
 
 object QueueCalcStage {
   type Result = (QueueFrame, ProposalLog)
@@ -75,6 +76,16 @@ object QueueCalcStage {
     val result = compute(queueFrameHead, log, activeList)
     new QueueCalcStage(result)
   }
+
+  def newInstance(
+    queue:      ProposalQueueBuilder,
+    iter:       BlockIterator,
+    activeList: ItacProposal => List[ItacObservation],
+    res:        SemesterResource,
+    log:        ProposalLog,
+  ): QueueCalcStage =
+    ???
+
 }
 
 /**
