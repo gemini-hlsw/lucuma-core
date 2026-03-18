@@ -29,6 +29,8 @@ import lucuma.core.util.TimeSpan
 import org.junit.*
 
 import Assert.*
+import lucuma.core.model.ProposalType
+import lucuma.core.model.IntPercent
 
 class DecResourceTest extends ItacSuite {
   import TimeAccountingCategory.KR
@@ -60,7 +62,7 @@ class DecResourceTest extends ItacSuite {
   private val ntac = Ntac(KR, TimeSpan.Zero)
 
   private def mkProp(target: ItacTarget): Proposal =
-    Proposal(ProposalReference(Semester(YearInt.unsafeFrom(2026), Half.A), PosInt.unsafeFrom(1)), ntac, site = Site.GS, obsList = List(ItacObservation(target, conds, TimeSpan.Zero)))
+    Proposal(ProposalReference(Semester(YearInt.unsafeFrom(2026), Half.A), PosInt.unsafeFrom(1)), ntac, obsList = List(ItacObservation(target, conds, TimeSpan.Zero)))
 
   test("testNormalReserveWithRemainingTime") {
     val prop   = mkProp(target0)
@@ -127,7 +129,7 @@ class DecResourceTest extends ItacSuite {
   }
 
   test("testReserveToo") {
-    val prop   = mkProp(target0).copy(too = ToOActivation.Standard)
+    val prop   = mkProp(target0).copy(tpe = ProposalType.Queue(ToOActivation.Standard, IntPercent.unsafeFrom(100), Nil)) // TODO
     val block  = Block(prop, prop.obsList.head, TimeSpan.fromHoursBounded(10))
 
     grp.reserve(block, Fixture.emptyQueue) match {
@@ -141,7 +143,7 @@ class DecResourceTest extends ItacSuite {
 
   // Spread over the two bins, but the first bin cannot handle an equal share.
   test("testReserveTooUnequal") {
-    val prop   = mkProp(target0).copy(too = ToOActivation.Standard)
+    val prop   = mkProp(target0).copy(tpe = ProposalType.Queue(ToOActivation.Standard, IntPercent.unsafeFrom(100), Nil)) // TODO
     val block  = Block(prop, prop.obsList.head, TimeSpan.fromHoursBounded(22))
 
     grp.reserve(block, Fixture.emptyQueue) match {
@@ -153,7 +155,7 @@ class DecResourceTest extends ItacSuite {
   }
 
   test("testReserveTooOverallocate") {
-    val prop   = mkProp(target0).copy(too = ToOActivation.Standard)
+    val prop   = mkProp(target0).copy(tpe = ProposalType.Queue(ToOActivation.Standard, IntPercent.unsafeFrom(100), Nil)) // TODO
     val block  = Block(prop, prop.obsList.head, TimeSpan.fromHoursBounded(30.001))
 
     grp.reserve(block, Fixture.emptyQueue) match {

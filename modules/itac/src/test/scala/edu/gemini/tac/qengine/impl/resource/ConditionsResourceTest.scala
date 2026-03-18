@@ -47,7 +47,7 @@ class ConditionsResourceTest extends ItacSuite {
 
   private def mkProp(obsConds: ConstraintSet): Proposal = {
     val obsList = List(ItacObservation(target, obsConds, TimeSpan.fromMinutesBounded(10)))
-    Proposal(ProposalReference(Semester(YearInt.unsafeFrom(2026), Half.A), PosInt.unsafeFrom(1)), ntac, site = Site.GS, obsList = obsList)
+    Proposal(ProposalReference(Semester(YearInt.unsafeFrom(2026), Half.A), PosInt.unsafeFrom(1)), ntac, obsList = obsList)
   }
 
   private def mkConds(cc: CloudExtinction.Preset): ConstraintSet =

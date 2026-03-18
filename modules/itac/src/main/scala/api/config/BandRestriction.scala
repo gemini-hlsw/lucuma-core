@@ -23,7 +23,7 @@ object BandRestriction {
   val NotBand3Name = name("Not B3 Amenable")
 
   def largeProgram: BandRestriction =
-    BandRestriction(LpName, Set(Band1, Band2)) { _.mode == ScienceSubtype.LargeProgram }
+    BandRestriction(LpName, Set(Band1, Band2)) { _.tpe.scienceSubtype == ScienceSubtype.LargeProgram }
 
   def rapidToo: BandRestriction = rapidToo(Band1)
 
