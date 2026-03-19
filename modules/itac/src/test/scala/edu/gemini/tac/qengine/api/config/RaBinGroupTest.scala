@@ -93,7 +93,7 @@ class RaBinGroupTest extends ItacSuite {
     val ra0 = RightAscension(HourAngle.fromDoubleMinutes(0))
     bg0.updated(ra0, doubleEveryOther) match {
       case Some(bg1) => assertEquals(bg0(ra0).value.toInt * 2, bg1(ra0).value.toInt)
-      case _ => fail
+      case _ => fail("updated function should have returned Some")
     }
   }
 
@@ -103,7 +103,7 @@ class RaBinGroupTest extends ItacSuite {
     val ra1 = RightAscension(HourAngle.fromDoubleMinutes(60))
     bg0.updated(ra1, doubleEveryOther) match {
       case None => // ok
-      case _ => fail
+      case _ => fail("updated function should have returned None")
     }
   }
 }

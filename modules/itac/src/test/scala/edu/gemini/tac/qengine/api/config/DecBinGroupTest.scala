@@ -39,7 +39,7 @@ class DecBinGroupTest extends ItacSuite {
   test("testBadBinSize") {
     try {
       DeclinationMap.gen(17)(f)
-      fail
+      fail("bad bin size should have thrown an exception")
     } catch {
       case ex: IllegalArgumentException => // ok
     }
