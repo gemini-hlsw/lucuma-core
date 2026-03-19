@@ -258,6 +258,7 @@ object AgsParams:
     val Flamingos2ScienceRadius = 20.arcseconds
 
   case class Igrins2LongSlit private (
+    port:  PortDisposition,
     probe: GuideProbe
   ) extends AgsParams
       with SingleProbeAgsParams
@@ -291,6 +292,7 @@ object AgsParams:
     override def scienceRadius: Angle = Igrins2LongSlit.Igrins2ScienceRadius
 
   object Igrins2LongSlit:
-    def apply(): Igrins2LongSlit = Igrins2LongSlit(GuideProbe.PWFS2)
+    def apply(port: PortDisposition = PortDisposition.Bottom): Igrins2LongSlit =
+      Igrins2LongSlit(port, GuideProbe.PWFS2)
 
     val Igrins2ScienceRadius = 20.arcseconds
