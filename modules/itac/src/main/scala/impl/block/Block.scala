@@ -19,8 +19,8 @@ import lucuma.core.util.TimeSpan
  * would be both the start and final block for the proposal.
  */
 final case class Block(prop: Proposal, obs: ItacObservation, time: TimeSpan, isStart: Boolean, isFinal: Boolean) {
-  def toFinal: Block = Block(prop, obs, time, isStart, isFinal = true)
-  def updated(t: TimeSpan): Block = Block(prop, obs, t, isStart, isFinal)
+  def toFinal: Block = copy(isFinal = true)
+  def updated(t: TimeSpan): Block = copy(time = t)
 
   override def toString: String = "Block(%s(%s), %s, %s, %s, %s)".format(
     prop.ntac.category.tag,

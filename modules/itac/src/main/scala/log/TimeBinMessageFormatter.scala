@@ -19,10 +19,10 @@ trait TimeBinMessageFormatter {
 
   private val obsInfoTemplate   = "%.2f hrs at %s(%.3f hr, %.1f deg)"
   def obsInfo(prop: Proposal, obs: ItacObservation, band: ScienceBand): String = {
-    val obsTime = prop.relativeObsTime(obs, band)
+    val obsTime = 999 // TODO prop.relativeObsTime(obs, band)
     val target  = obs.itacTarget
     val targetName = target.id.toString
-    obsInfoTemplate.format(obsTime.toHours, targetName, target.ra.toHourAngle.toDoubleHours, target.dec.toAngle.toDoubleDegrees)
+    obsInfoTemplate.format(obsTime, targetName, target.ra.toHourAngle.toDoubleHours, target.dec.toAngle.toDoubleDegrees)
   }
 
   private val detailTemplate    = "%s. Reject %s."

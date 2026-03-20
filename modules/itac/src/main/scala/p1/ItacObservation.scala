@@ -8,14 +8,25 @@ import lucuma.core.enums.ObservingModeType
 import lucuma.core.enums.Site
 import lucuma.core.model.ConstraintSet
 import lucuma.core.util.TimeSpan
+import lucuma.core.data.Metadata
+import lucuma.core.util.DateInterval
+import lucuma.core.enums.ScienceBand
 
 case class ItacObservation(
-  itacTarget: ItacTarget, 
+  itacTarget: ItacTarget, // TODO: ToO
   constraintSet: ConstraintSet, 
   time: TimeSpan, // estimated time
   lgs: Boolean = false, // TODO: compute this from observing mode?
   mode: ObservingModeType = ObservingModeType.GmosNorthLongSlit,
-)
+):
+
+  /** Is the instrument available at the given site, for any amount of time in the given date interval? */
+  def isObservableAtSite(site: Site, when: DateInterval)(using Metadata): Boolean =
+    !mode.instrument.availability.forSiteAndDateInterval(site, when).isEmpty // TODO: compute available time based on this
+
+  /** Is this observation observable in the specified band? This is determined by conditions and the presence of ToO targets. */
+  def isObservableInBand(band: ScienceBand): Boolean =
+    ???
 
 object ItacObservation {
 
