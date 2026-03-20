@@ -64,8 +64,14 @@ object Configuration:
       (this, other) match
         case (GmosNorthLongSlit(g1),  GmosNorthLongSlit(g2))  => g1 === g2
         case (GmosSouthLongSlit(g1),  GmosSouthLongSlit(g2))  => g1 === g2
-        case (GmosNorthImaging(f1),   GmosNorthImaging(f2))   => f2.forall(f1.contains)
-        case (GmosSouthImaging(f1),   GmosSouthImaging(f2))   => f2.forall(f1.contains)
+
+        // RCN: The GMOS imaging configuration contains a set of filters, and originally additions to this set
+        // were disallowed, but this was relaxed in https://app.shortcut.com/lucuma/story/8036/. I am leaving
+        // the filters in the configuration for now because I suspect they may change their minds. But for now
+        // there are no constraints on changes to the filter set (or anything else).
+        case (GmosNorthImaging(f1),   GmosNorthImaging(f2))   => true // f2.forall(f1.contains)
+        case (GmosSouthImaging(f1),   GmosSouthImaging(f2))   => true // f2.forall(f1.contains)
+
         case (Flamingos2LongSlit(d1), Flamingos2LongSlit(d2)) => d1 === d2
         case (Igrins2LongSlit,        Igrins2LongSlit)        => true
         case _                                                => false
