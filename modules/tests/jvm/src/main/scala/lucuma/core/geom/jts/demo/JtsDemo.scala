@@ -205,6 +205,15 @@ class JtsDemo extends Frame("JTS Demo") {
           case _                                  =>
         }
     })
+    // println the position of the mouse in arcsec
+    addMouseMotionListener(new MouseMotionAdapter() {
+      override def mouseMoved(e: MouseEvent): Unit = {
+        val halfCanvas = canvasSize / 2
+        val pArcsec = -(e.getX - halfCanvas) * arcsecPerPixel
+        val qArcsec = -(e.getY - halfCanvas) * arcsecPerPixel
+        println(f"p: $pArcsec%+8.1f arcsec  q: $qArcsec%+8.1f arcsec")
+      }
+    })
 
     override def paint(g: Graphics): Unit = {
       val halfCanvas = canvasSize / 2
