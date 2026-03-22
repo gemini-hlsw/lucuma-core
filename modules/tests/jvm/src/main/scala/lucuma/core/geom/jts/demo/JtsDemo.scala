@@ -15,6 +15,7 @@ import lucuma.core.geom.jts.jvm.syntax.awt.*
 import lucuma.core.geom.offsets.GeometryType
 import lucuma.core.geom.syntax.all.*
 import lucuma.core.math.Angle
+import lucuma.core.math.HourAngle
 import lucuma.core.math.Offset
 import lucuma.core.math.syntax.int.*
 import lucuma.core.model.sequence.flamingos2.Flamingos2FpuMask
@@ -209,9 +210,14 @@ class JtsDemo extends Frame("JTS Demo") {
     addMouseMotionListener(new MouseMotionAdapter() {
       override def mouseMoved(e: MouseEvent): Unit = {
         val halfCanvas = canvasSize / 2
-        val pArcsec = -(e.getX - halfCanvas) * arcsecPerPixel
-        val qArcsec = -(e.getY - halfCanvas) * arcsecPerPixel
-        println(f"p: $pArcsec%+8.1f arcsec  q: $qArcsec%+8.1f arcsec")
+        val p = -(e.getX - halfCanvas) * arcsecPerPixel
+        val q = -(e.getY - halfCanvas) * arcsecPerPixel
+        val ra      = HourAngle.fromDoubleDegrees(p / 3600.0)
+        val raStr   = HourAngle.fromStringHMS.reverseGet(ra)
+        val dec     = Angle.fromDoubleArcseconds(q)
+        val decStr  = Angle.fromStringSignedDMS.reverseGet(dec)
+
+        println(f"p: $p%+8.1f\"  q: $q%+8.1f\"  |  RA: $raStr  Dec: $decStr")
       }
     })
 
