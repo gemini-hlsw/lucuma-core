@@ -364,3 +364,32 @@ trait Igrins2Shapes extends InstrumentShapes:
 
 object JtsIgrins2Demo extends JtsDemo with Igrins2Shapes:
   override val arcsecPerPixel: Double = 0.75
+
+trait GhostShapes extends InstrumentShapes:
+  import lucuma.core.geom.ghost.all.*
+  import lucuma.core.geom.pwfs.{patrolField, probeArm}
+  import lucuma.core.enums.GuideProbe
+
+  val posAngle: Angle =
+    0.deg
+
+  val offsetPos: Offset =
+    Offset.Zero
+
+  val guideStarOffset: Offset =
+    Offset(270.arcsec.p, 224.arcsec.q)
+
+  val probe: GuideProbe = GuideProbe.PWFS2
+
+  def shapes: List[ShapeExpression] =
+    List(
+      fovAt(posAngle, offsetPos),
+      // ifu1PatrolFieldAt(posAngle, offsetPos),
+      // ifu2PatrolFieldAt(posAngle, offsetPos),
+      // patrolField.patrolFieldAt(posAngle, offsetPos),
+      // probeArm.mirrorAt(probe, guideStarOffset, offsetPos),
+      // probeArm.armAt(probe, guideStarOffset, offsetPos)
+    )
+
+object JtsGhostDemo extends JtsDemo with GhostShapes:
+  override val arcsecPerPixel: Double = 0.75
