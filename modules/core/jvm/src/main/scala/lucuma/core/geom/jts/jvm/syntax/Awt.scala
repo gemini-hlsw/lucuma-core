@@ -17,7 +17,7 @@ trait ToAwtOps {
     */
     def toAwt(arcsecPerPixel: Double): java.awt.Shape = {
       val sw = new ShapeWriter((s: Coordinate, d: Point2D) => {
-        val scale = arcsecPerPixel / 1000000.0
+        val scale = 1.0 / (arcsecPerPixel * 1000000.0)
         d.setLocation(s.x * scale, -s.y * scale)
       })
 
