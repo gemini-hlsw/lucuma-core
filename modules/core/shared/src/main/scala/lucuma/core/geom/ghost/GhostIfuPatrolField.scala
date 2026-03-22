@@ -18,18 +18,18 @@ trait GhostIfuPatrolField:
   // 2 mm separation used for HR sky fiber and IFU boundary offsets
   val HRFiberOffset: Angle = Angle.fromDoubleArcseconds(2.0 / 0.61)
 
-  // IFU1 patrols the West half of FOV (negative P side)
+  // IFU1 patrols the West half of FOV (positive P side, P+ = West)
   val ifu1PatrolField: ShapeExpression =
-    ShapeExpression.rectangleAt(
-      ((-222).arcsec.p, 222.arcsec.q),
-      (HRFiberOffset.p, (-222).arcsec.q)
-    ) ∩ fov
-
-  // IFU2 patrols the East half of FOV (positive P side)
-  val ifu2PatrolField: ShapeExpression =
     ShapeExpression.rectangleAt(
       ((-HRFiberOffset).p, 222.arcsec.q),
       (222.arcsec.p, (-222).arcsec.q)
+    ) ∩ fov
+
+  // IFU2 patrols the East half of FOV (negative P side)
+  val ifu2PatrolField: ShapeExpression =
+    ShapeExpression.rectangleAt(
+      ((-222).arcsec.p, 222.arcsec.q),
+      (HRFiberOffset.p, (-222).arcsec.q)
     ) ∩ fov
 
   def ifu1PatrolFieldAt(posAngle: Angle, offsetPos: Offset): ShapeExpression =
