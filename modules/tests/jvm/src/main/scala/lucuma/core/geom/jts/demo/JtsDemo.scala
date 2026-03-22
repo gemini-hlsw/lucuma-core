@@ -28,7 +28,8 @@ case class ColoredShape(
   shape: ShapeExpression,
   color: Color,
   stroke: Option[BasicStroke] = None,
-  geometryType: Option[GeometryType] = None
+  geometryType: Option[GeometryType] = None,
+  filled: Boolean = false
 )
 
 trait InstrumentShapes:
@@ -301,7 +302,9 @@ class JtsDemo extends Frame("JTS Demo") {
           case jts: JtsShape =>
             g2d.setColor(cs.color)
             cs.stroke.foreach(g2d.setStroke)
-            g2d.draw(jts.toAwt(arcsecPerPixel))
+            val awt = jts.toAwt(arcsecPerPixel)
+            if (cs.filled) g2d.fill(awt)
+            g2d.draw(awt)
             g2d.setStroke(origStroke)
           case x             => sys.error(s"Whoa unexpected shape type: $x")
         }
@@ -396,15 +399,21 @@ trait GhostShapes extends InstrumentShapes:
 
   val probe: GuideProbe = GuideProbe.PWFS2
 
+  override def coloredShapes: List[ColoredShape] =
+    List(
+      ColoredShape(ifu1PatrolFieldAt(posAngle, offsetPos), new Color(100, 149, 237, 80), filled = true),
+      ColoredShape(ifu2PatrolFieldAt(posAngle, offsetPos), new Color(255, 165,   0, 80), filled = true)
+    )
+
   def shapes: List[ShapeExpression] =
     List(
       fovAt(posAngle, offsetPos),
-      // ifu1PatrolFieldAt(posAngle, offsetPos),
-      // ifu2PatrolFieldAt(posAngle, offsetPos),
-      // patrolField.patrolFieldAt(posAngle, offsetPos),
-      // probeArm.mirrorAt(probe, guideStarOffset, offsetPos),
-      // probeArm.armAt(probe, guideStarOffset, offsetPos)
+      ifu1PatrolFieldAt(posAngle, offsetPos),
+      ifu2PatrolFieldAt(posAngle, offsetPos),
+      patrolField.patrolFieldAt(posAngle, offsetPos),
+      probeArm.mirrorAt(probe, guideStarOffset, offsetPos),
+      probeArm.armAt(probe, guideStarOffset, offsetPos)
     )
 
 object JtsGhostDemo extends JtsDemo with GhostShapes:
-  override val arcsecPerPixel: Double = 0.75
+  override val arcsecPerPixel: Double = 1.5
