@@ -10,6 +10,7 @@ import coulomb.units.accepted.*
 import lucuma.core.math.Angle
 import lucuma.core.math.syntax.int.*
 import lucuma.core.math.units.*
+import lucuma.core.math.syntax.units.*
 
 // Size of probe arm components in mm.
 val PickoffMirrorSize          = BigDecimal(19800).withUnit[Micrometer]
@@ -41,7 +42,7 @@ val LowerPatrolAreaRadius = BigDecimal(268693.9).withUnit[Micrometer]
 // The high limit of the bounding box to the right
 val PatrolAreaHiLimit     = BigDecimal(113000).withUnit[Micrometer]
 
-val Flamingos2PixelScale: PixelScale   = BigDecimal(0.18).withUnit[ArcSecondPerPixel]
+val Flamingos2PixelScale: PixelScale   = BigDecimal(0.18).pixelScale
 
 def flamingos2SlitWidthPixels(slitWidth: Angle): Quantity[BigDecimal, Pixels] =
   val widthArcSeconds = Angle.decimalArcseconds.get(slitWidth).withUnit[ArcSecond]
