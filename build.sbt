@@ -2,7 +2,7 @@ import org.scalajs.linker.interface.ESVersion
 import org.typelevel.sbt.gha.PermissionValue
 import org.typelevel.sbt.gha.Permissions
 
-ThisBuild / tlBaseVersion                         := "0.170"
+ThisBuild / tlBaseVersion                         := "0.177"
 ThisBuild / tlCiReleaseBranches                   := Seq("master")
 ThisBuild / githubWorkflowEnv += "MUNIT_FLAKY_OK" -> "true"
 
@@ -15,7 +15,7 @@ ThisBuild / scalacOptions += "-language:implicitConversions" // TODO
 
 lazy val catsVersion                = "2.13.0"
 lazy val catsCollctionsVersion      = "0.9.10"
-lazy val catsEffectVersion          = "3.6.3"
+lazy val catsEffectVersion          = "3.7.0"
 lazy val catsParseVersion           = "1.1.0"
 lazy val catsScalacheckVersion      = "0.3.2"
 lazy val catsTimeVersion            = "0.6.0"
@@ -23,21 +23,21 @@ lazy val circeVersion               = "0.14.15"
 lazy val clueVersion                = "0.51.3"
 lazy val circeRefinedVersion        = "0.15.1"
 lazy val coulombVersion             = "0.9.1"
-lazy val fs2Version                 = "3.12.2"
-lazy val fs2DataVersion             = "1.12.0"
+lazy val fs2Version                 = "3.13.0"
+lazy val fs2DataVersion             = "1.12.1"
 lazy val geminiLocalesVersion       = "0.12.1"
 lazy val http4sVersion              = "0.23.33"
 lazy val http4sDomVersion           = "0.2.12"
 lazy val http4sJdkHttpClientVersion = "0.10.0"
-lazy val jtsVersion                 = "0.4.1"
+lazy val jtsVersion                 = "0.4.2"
 lazy val kindProjectorVersion       = "0.13.2"
 lazy val kittensVersion             = "3.5.0"
-lazy val log4catsVersion            = "2.7.1"
+lazy val log4catsVersion            = "2.8.0"
 lazy val lucumaRefinedVersion       = "0.1.4"
 lazy val monocleVersion             = "3.3.0"
-lazy val munitVersion               = "1.2.1"
+lazy val munitVersion               = "1.2.3"
 lazy val munitDisciplineVersion     = "2.0.0"
-lazy val munitCatsEffectVersion     = "2.1.0"
+lazy val munitCatsEffectVersion     = "2.2.0"
 lazy val pprintVersion              = "0.9.6"
 lazy val refinedVersion             = "0.11.3"
 lazy val scalaJavaTimeVersion       = "2.6.0"
@@ -48,7 +48,7 @@ lazy val spireVersion               = "0.18.0"
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
-val root = tlCrossRootProject.aggregate(core, testkit, tests, catalog, ags, catalogTestkit, catalogTests, horizons, horizonsTests, npm)
+val root = tlCrossRootProject.aggregate(core, testkit, tests, catalog, ags, catalogTestkit, catalogTests, horizons, horizonsTests, itac, npm)
 
 lazy val core = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Full)
@@ -144,14 +144,8 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform)
     )
   )
 
-lazy val benchmarks = project
-  .in(file("modules/benchmarks"))
-  .dependsOn(core.jvm, ags.jvm)
-  .settings(name := "lucuma-core-benchmarks")
-  .enablePlugins(NoPublishPlugin, JmhPlugin)
-
 lazy val catalog = crossProject(JVMPlatform, JSPlatform)
-  .crossType(CrossType.Pure)
+  .crossType(CrossType.Full)
   .in(file("modules/catalog"))
   .dependsOn(core)
   .settings(
@@ -174,6 +168,11 @@ lazy val catalog = crossProject(JVMPlatform, JSPlatform)
       "edu.gemini"    %%% "clue-core"            % clueVersion,
       "edu.gemini"    %%% "clue-http4s"          % clueVersion,
       "org.typelevel" %%% "log4cats-core"        % log4catsVersion
+    )
+  )
+  .jvmSettings(
+    libraryDependencies ++= Seq(
+      "co.fs2" %% "fs2-io" % fs2Version
     )
   )
   .jsConfigure(_.enablePlugins(BundleMonPlugin))
@@ -215,6 +214,17 @@ lazy val horizonsTests = crossProject(JVMPlatform, JSPlatform)
     ),
   )
   .jsConfigure(_.enablePlugins(BundleMonPlugin))
+
+lazy val itac = project
+  .in(file("modules/itac"))
+  .dependsOn(core.jvm)
+  .settings(
+    name := "lucuma-itac",
+    libraryDependencies ++= Seq(
+      "org.slf4j"     %  "slf4j-simple"           % slf4jVersion,
+      "org.typelevel" %%% "munit-cats-effect"   % munitCatsEffectVersion % Test,
+    )
+  )
 
 lazy val ags = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Pure)

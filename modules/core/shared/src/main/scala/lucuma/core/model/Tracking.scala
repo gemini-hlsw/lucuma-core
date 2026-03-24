@@ -97,7 +97,7 @@ case class EphemerisTracking private (toMap: TreeMap[Timestamp, EphemerisCoordin
       })
 
   val at: TrackingAt = i =>
-    Timestamp.fromInstant(i).flatMap(get).map(_.coord)
+    Timestamp.fromInstantTruncated(i).flatMap(get).map(_.coord)
 
   /**
    * Greatest lower and least upper bounds of `t`; i.e., the closest elements on either side,

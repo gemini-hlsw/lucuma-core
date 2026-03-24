@@ -58,33 +58,54 @@ trait GmosOiwfsProbeArm {
   val shape: ShapeExpression =
     arm ∪ pickoff
 
-  /**
-    * The GMOS OIWFS probe arm positioned to reach a particular guide star at
-    * a particular offset.
-    *
-    * @param posAngle position angle where positive is counterclockwise
-    * @param guideStar guide star offset from the center, relative to an un-rotated frame
-    * @param offsetPos offset position from the base, if any
-    * @param fpu focal plane unit, if any
-    * @param port port disposition
-    *
-    * @return probe arm shape correctly rotated and offset to reach the guide star
-    */
-  def shapeAt(
-    posAngle:  Angle,
-    guideStar: Offset,
-    offsetPos: Offset,
-    fpu:       Option[Either[GmosNorthFpu, GmosSouthFpu]],
-    port:      PortDisposition
-  ): ShapeExpression =
-    shape ⟲ armAngle(posAngle, guideStar, offsetPos, fpu, port) ↗ guideStar
+  object imaging:
+    /**
+      * The GMOS OIWFS probe arm positioned to reach a particular guide star at
+      * a particular offset in imaging mode.
+      *
+      * @param posAngle position angle where positive is counterclockwise
+      * @param guideStar guide star offset from the center, relative to an un-rotated frame
+      * @param offsetPos offset position from the base, if any
+      * @param port port disposition
+      *
+      * @return probe arm shape correctly rotated and offset to reach the guide star
+      */
+    def shapeAt(
+      posAngle:  Angle,
+      guideStar: Offset,
+      offsetPos: Offset,
+      port:      PortDisposition
+    ): ShapeExpression =
+      shape ⟲ armAngle(posAngle, guideStar, offsetPos, Offset.Zero, port) ↗ guideStar
+
+  object longSlit:
+    /**
+      * The GMOS OIWFS probe arm positioned to reach a particular guide star at
+      * a particular offset in long-slit mode.
+      *
+      * @param posAngle position angle where positive is counterclockwise
+      * @param guideStar guide star offset from the center, relative to an un-rotated frame
+      * @param offsetPos offset position from the base, if any
+      * @param fpu focal plane unit
+      * @param port port disposition
+      *
+      * @return probe arm shape correctly rotated and offset to reach the guide star
+      */
+    def shapeAt(
+      posAngle:  Angle,
+      guideStar: Offset,
+      offsetPos: Offset,
+      fpu:       Either[GmosNorthFpu, GmosSouthFpu],
+      port:      PortDisposition
+    ): ShapeExpression =
+      shape ⟲ armAngle(posAngle, guideStar, offsetPos, ifuOffset(fpu), port) ↗ guideStar
 
   private def armAngle(
-    posAngle:  Angle,
-    guideStar: Offset,
-    offsetPos: Offset,
-    fpu:       Option[Either[GmosNorthFpu, GmosSouthFpu]],
-    port:      PortDisposition
+    posAngle:   Angle,
+    guideStar:  Offset,
+    offsetPos:  Offset,
+    fpuOffset:  Offset,
+    port:       PortDisposition
   ): Angle = {
 
     val t  = Offset(427520.mas.p, 101840.mas.q)
@@ -100,7 +121,7 @@ trait GmosOiwfsProbeArm {
     val (x, y) =
       Offset.signedDecimalArcseconds
         .get(
-          tʹ.rotate(posAngle) + guideStar - (offsetPos - ifuOffset(fpu)).rotate(posAngle)
+          tʹ.rotate(posAngle) + guideStar - (offsetPos - fpuOffset).rotate(posAngle)
         )
         .bimap(x => -x.toDouble, _.toDouble)
 

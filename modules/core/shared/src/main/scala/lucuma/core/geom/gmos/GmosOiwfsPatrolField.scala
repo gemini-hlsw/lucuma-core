@@ -24,24 +24,53 @@ trait GmosOiwfsPatrolField:
   val patrolField: ShapeExpression =
     ShapeExpression.centeredRectangle(212700.mas, 249600.mas)
 
-  /**
-    * GMOS patrol field shape, in context.
-    *
-    * @param posAngle position angle where positive is counterclockwise
-    * @param offsetPos offset position from the base, if any
-    * @param pivot reference to rotate
-    * @param fpu focal plane unit, if any
-    * @param port port disposition
-    *
-    * @return probe field shape rotated and offset
-    */
-  def patrolFieldAt(
+  private def patrolFieldAtBase(
     posAngle:  Angle,
     offsetPos: Offset,
-    fpu:       Option[Either[GmosNorthFpu, GmosSouthFpu]],
+    fpuOffset: Offset,
     port:      PortDisposition,
-    pivot:    Offset = Offset.Zero
+    pivot:     Offset
   ): ShapeExpression =
-    val pf = patrolField ↗ (ifuOffset(fpu) - Offset(94950.mas.p, 89880.mas.q))
+    val pf = patrolField ↗ (fpuOffset - Offset(94950.mas.p, 89880.mas.q))
     val s  = if (port === PortDisposition.Side) pf.flipQ else pf
     s ↗ (offsetPos - pivot) ⟲ posAngle ↗ pivot
+
+  object imagingMode:
+    /**
+      * GMOS patrol field shape for imaging mode.
+      *
+      * @param posAngle position angle where positive is counterclockwise
+      * @param offsetPos offset position from the base, if any
+      * @param port port disposition
+      * @param pivot reference to rotate
+      *
+      * @return probe field shape rotated and offset
+      */
+    def patrolFieldAt(
+      posAngle:  Angle,
+      offsetPos: Offset,
+      port:      PortDisposition,
+      pivot:     Offset = Offset.Zero
+    ): ShapeExpression =
+      patrolFieldAtBase(posAngle, offsetPos, Offset.Zero, port, pivot)
+
+  object longSlitMode:
+    /**
+      * GMOS patrol field shape for long-slit mode.
+      *
+      * @param posAngle position angle where positive is counterclockwise
+      * @param offsetPos offset position from the base, if any
+      * @param fpu focal plane unit
+      * @param port port disposition
+      * @param pivot reference to rotate
+      *
+      * @return probe field shape rotated and offset
+      */
+    def patrolFieldAt(
+      posAngle:  Angle,
+      offsetPos: Offset,
+      fpu:       Either[GmosNorthFpu, GmosSouthFpu],
+      port:      PortDisposition,
+      pivot:     Offset = Offset.Zero
+    ): ShapeExpression =
+      patrolFieldAtBase(posAngle, offsetPos, ifuOffset(fpu), port, pivot)

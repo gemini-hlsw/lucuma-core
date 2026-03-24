@@ -29,43 +29,46 @@ trait GmosScienceAreaGeometry {
   val mos: ShapeExpression =
     imagingFov(314240.mas, 17750.mas)
 
-  def shapeAt(
-    posAngle:  Angle,
-    offsetPos: Offset,
-    fpu:       Option[Either[GmosNorthFpu, GmosSouthFpu]]
-  ): ShapeExpression =
-    shapeFromFpu(fpu).shapeAt(offsetPos, posAngle)
+  object imagingMode:
+    def shapeAt(posAngle: Angle, offsetPos: Offset): ShapeExpression =
+      imaging.shapeAt(offsetPos, posAngle)
 
-  private def shapeFromFpu(fpu: Option[Either[GmosNorthFpu, GmosSouthFpu]]): ShapeExpression =
-    fpu.fold(imaging) { f =>
-      f.fold(
-        {
-          case GmosNorthFpu.Ns0 | GmosNorthFpu.Ns1 | GmosNorthFpu.Ns2 | GmosNorthFpu.Ns3 |
-               GmosNorthFpu.Ns4 | GmosNorthFpu.Ns5 | GmosNorthFpu.Ifu2Slits | GmosNorthFpu.IfuBlue |
-               GmosNorthFpu.IfuRed =>
-            ShapeExpression.empty
+  object longSlitMode:
+    def shapeAt(
+      posAngle:  Angle,
+      offsetPos: Offset,
+      fpu:       Either[GmosNorthFpu, GmosSouthFpu]
+    ): ShapeExpression =
+      shapeFromLongSlitFpu(fpu).shapeAt(offsetPos, posAngle)
 
-          case n@(GmosNorthFpu.LongSlit_0_25 | GmosNorthFpu.LongSlit_0_50 |
-                  GmosNorthFpu.LongSlit_0_75 | GmosNorthFpu.LongSlit_1_00 |
-                  GmosNorthFpu.LongSlit_1_50 | GmosNorthFpu.LongSlit_2_00 |
-                  GmosNorthFpu.LongSlit_5_00) =>
-            longSlitFov(n.effectiveSlitWidth)
-        },
-        {
-          case GmosSouthFpu.Ns1 | GmosSouthFpu.Ns2 | GmosSouthFpu.Ns3 |
-               GmosSouthFpu.Ns4 | GmosSouthFpu.Ns5 | GmosSouthFpu.Ifu2Slits | GmosSouthFpu.IfuBlue |
-               GmosSouthFpu.IfuRed | GmosSouthFpu.IfuNS2Slits | GmosSouthFpu.IfuNSBlue |
-               GmosSouthFpu.IfuNSRed =>
-            ShapeExpression.empty
+  private def shapeFromLongSlitFpu(fpu: Either[GmosNorthFpu, GmosSouthFpu]): ShapeExpression =
+    fpu.fold(
+      {
+        case GmosNorthFpu.Ns0 | GmosNorthFpu.Ns1 | GmosNorthFpu.Ns2 | GmosNorthFpu.Ns3 |
+             GmosNorthFpu.Ns4 | GmosNorthFpu.Ns5 | GmosNorthFpu.Ifu2Slits | GmosNorthFpu.IfuBlue |
+             GmosNorthFpu.IfuRed =>
+          ShapeExpression.empty
 
-          case s@(GmosSouthFpu.LongSlit_0_25 | GmosSouthFpu.LongSlit_0_50 |
-                  GmosSouthFpu.LongSlit_0_75 | GmosSouthFpu.LongSlit_1_00 |
-                  GmosSouthFpu.LongSlit_1_50 | GmosSouthFpu.LongSlit_2_00 |
-                  GmosSouthFpu.LongSlit_5_00) =>
-            longSlitFov(s.effectiveSlitWidth)
-        }
-      )
-    }
+        case n@(GmosNorthFpu.LongSlit_0_25 | GmosNorthFpu.LongSlit_0_50 |
+                GmosNorthFpu.LongSlit_0_75 | GmosNorthFpu.LongSlit_1_00 |
+                GmosNorthFpu.LongSlit_1_50 | GmosNorthFpu.LongSlit_2_00 |
+                GmosNorthFpu.LongSlit_5_00) =>
+          longSlitFov(n.effectiveSlitWidth)
+      },
+      {
+        case GmosSouthFpu.Ns1 | GmosSouthFpu.Ns2 | GmosSouthFpu.Ns3 |
+             GmosSouthFpu.Ns4 | GmosSouthFpu.Ns5 | GmosSouthFpu.Ifu2Slits | GmosSouthFpu.IfuBlue |
+             GmosSouthFpu.IfuRed | GmosSouthFpu.IfuNS2Slits | GmosSouthFpu.IfuNSBlue |
+             GmosSouthFpu.IfuNSRed =>
+          ShapeExpression.empty
+
+        case s@(GmosSouthFpu.LongSlit_0_25 | GmosSouthFpu.LongSlit_0_50 |
+                GmosSouthFpu.LongSlit_0_75 | GmosSouthFpu.LongSlit_1_00 |
+                GmosSouthFpu.LongSlit_1_50 | GmosSouthFpu.LongSlit_2_00 |
+                GmosSouthFpu.LongSlit_5_00) =>
+          longSlitFov(s.effectiveSlitWidth)
+      }
+    )
 
   private def imagingFov(size: Angle, corner: Angle): ShapeExpression = {
     val centerCcdWidth: Angle = 165600.mas

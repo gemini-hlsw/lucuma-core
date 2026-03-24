@@ -1,0 +1,56 @@
+// Copyright (c) 2016-2025 Association of Universities for Research in Astronomy, Inc. (AURA)
+// For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
+
+package edu.gemini.tac.qengine.api.config
+
+import cats.syntax.all.*
+import edu.gemini.tac.qengine.impl.resource.Resource2
+import edu.gemini.tac.qengine.log.RejectRestrictedBin
+import edu.gemini.tac.qengine.p1.ItacObservation
+import edu.gemini.tac.qengine.p1.Proposal
+import edu.gemini.tac.qengine.util.BoundedTime
+import edu.gemini.tac.qengine.util.Time
+import lucuma.core.enums.ScienceBand
+import lucuma.core.enums.WaterVapor
+import lucuma.core.model.IntCentiPercent
+
+/**
+ * TimeRestriction associates a name, a value, and a predicate.  The value
+ * specifies the time being restricted, which may be an absolute amount of time
+ * or a relative amount of time.
+ */
+case class TimeRestriction[T](name: String, value: T)(val matches: (Proposal, ItacObservation, ScienceBand) => Boolean) {
+
+  def map[U](f: T => U): TimeRestriction[U]    =
+    new TimeRestriction[U](name, f(value))(matches)
+
+  def updated(newValue: T): TimeRestriction[T] =
+    new TimeRestriction[T](name, newValue)(matches)
+
+}
+
+object TimeRestriction {
+  def wv(limit: IntCentiPercent): TimeRestriction[IntCentiPercent] = wv(limit, WaterVapor.Dry)
+
+  def wv(limit: IntCentiPercent, wv: WaterVapor) =
+    TimeRestriction("WV Queue Time Limit", limit) {
+       (_, obs, _) => obs.constraintSet.waterVapor <= wv
+    }
+
+  def lgs(limit: Time) =
+    TimeRestriction("LGS Queue Time Limit", limit) {
+      (_, obs, _) => obs.lgs
+    }
+
+  given Resource2[TimeRestriction[BoundedTime]] =
+    Resource2.instance: (bin, block, queue) =>
+      if (!bin.matches(block.prop, block.obs, queue.band))
+        Right(bin)  // didn't match so return the same reservation object
+      else
+        bin.value.reserve(block.time) match {
+          case Some(bt) if bt.remaining == bin.value.remaining => Right(bin)  // no time requested
+          case Some(bt) => Right(bin.updated(bt)) // update bounded time
+          case _ => Left(new RejectRestrictedBin(block.prop, block.obs, queue.band, bin.name, bin.value.used, bin.value.limit))
+        } 
+
+}

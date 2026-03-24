@@ -9,13 +9,14 @@ import fs2.*
 import fs2.io.file.Files
 import fs2.io.file.Path
 import lucuma.catalog.clients.SimbadClient
+import lucuma.catalog.simbad.SEDDataLoader
+import lucuma.catalog.simbad.SEDMatcher
 import lucuma.core.enums.Band
 import lucuma.core.math.BrightnessValue
 import lucuma.core.math.Epoch
 import lucuma.core.math.Parallax
 import lucuma.core.math.ProperMotion
 import lucuma.core.math.RadialVelocity
-import lucuma.core.model.SiderealTracking
 import lucuma.core.model.SourceProfile
 import lucuma.core.model.SpectralDefinition
 import lucuma.core.model.Target
@@ -40,36 +41,36 @@ class TargetImportSuite extends CatsEffectSuite:
           // parallax
           assertEquals(
             l.count {
-              case Right(Target.Sidereal(_, s: SiderealTracking, _, _)) =>
+              case Right(Target.Sidereal(tracking = s)) =>
                 s.parallax.exists(_ === Parallax.fromMicroarcseconds(1000))
-              case _                                                    => false
+              case _                                    => false
             },
             1
           )
           // plain rv
           assertEquals(
             l.count {
-              case Right(Target.Sidereal(_, s: SiderealTracking, _, _)) =>
+              case Right(Target.Sidereal(tracking = s)) =>
                 s.radialVelocity === RadialVelocity.kilometerspersecond.getOption(1)
-              case _                                                    => false
+              case _                                    => false
             },
             1
           )
           // z converted to rv
           assertEquals(
             l.count {
-              case Right(Target.Sidereal(_, s: SiderealTracking, _, _)) =>
+              case Right(Target.Sidereal(tracking = s)) =>
                 s.radialVelocity === RadialVelocity.fromMetersPerSecond.getOption(179875474.8)
-              case _                                                    => false
+              case _                                    => false
             },
             1
           )
           // rv overrides z
           assertEquals(
             l.count {
-              case Right(Target.Sidereal(_, s: SiderealTracking, _, _)) =>
+              case Right(Target.Sidereal(tracking = s)) =>
                 s.radialVelocity === RadialVelocity.kilometerspersecond.getOption(2)
-              case _                                                    => false
+              case _                                    => false
             },
             1
           )
@@ -92,10 +93,9 @@ class TargetImportSuite extends CatsEffectSuite:
           assertEquals(l.length, 2)
           assertEquals(
             l.count {
-              case Right(Target.Sidereal(_, s: SiderealTracking, _, _))
-                  if s.epoch.epochYear === 2015.5 =>
+              case Right(Target.Sidereal(tracking = s)) if s.epoch.epochYear === 2015.5 =>
                 true
-              case _ => false
+              case _                                                                    => false
             },
             1
           )
@@ -117,8 +117,10 @@ class TargetImportSuite extends CatsEffectSuite:
         .map { l =>
           assertEquals(l.length, 7)
           assertEquals(l.count {
-                         case Right(Target.Sidereal(_, _, SourceProfile.Uniform(_), _)) => true
-                         case _                                                         => false
+                         case Right(Target.Sidereal(sourceProfile = SourceProfile.Uniform(_))) =>
+                           true
+                         case _                                                                =>
+                           false
                        },
                        2
           )
@@ -142,10 +144,8 @@ class TargetImportSuite extends CatsEffectSuite:
           assertEquals(
             l.count {
               case Right(
-                    Target.Sidereal(_,
-                                    _,
-                                    SourceProfile.Point(SpectralDefinition.BandNormalized(_, m)),
-                                    _
+                    Target.Sidereal(
+                      sourceProfile = SourceProfile.Point(SpectralDefinition.BandNormalized(_, m))
                     )
                   ) if (m.count { case (_, m) =>
                     m.units.serialized === "VEGA_MAGNITUDE"
@@ -158,10 +158,8 @@ class TargetImportSuite extends CatsEffectSuite:
           assertEquals(
             l.count {
               case Right(
-                    Target.Sidereal(_,
-                                    _,
-                                    SourceProfile.Point(SpectralDefinition.BandNormalized(_, m)),
-                                    _
+                    Target.Sidereal(
+                      sourceProfile = SourceProfile.Point(SpectralDefinition.BandNormalized(_, m))
                     )
                   ) if (m.count { case (_, m) =>
                     m.units.serialized === "AB_MAGNITUDE"
@@ -309,19 +307,19 @@ class TargetImportSuite extends CatsEffectSuite:
     JdkHttpClient
       .simple[IO]
       .use { client =>
-        val simbadClient = SimbadClient.build(client)
-        Files[IO]
-          .readAll(Path(file.getPath()))
-          .through(text.utf8.decode)
-          .through(TargetImport.csv2targetsAndLookup(simbadClient))
-          .compile
-          .toList
-          // .flatTap(x => IO(pprint.pprintln(x)))
-          .map { l =>
-            assertEquals(l.length, 7)
-            assertEquals(l.count(_.isRight), 4)
-            assertEquals(l.count(_.isLeft), 3)
-          }
+        for
+          sedConfig   <- SEDDataLoader.load[IO]
+          simbadClient = SimbadClient.build(client, SEDMatcher.fromConfig(sedConfig))
+          result      <- Files[IO]
+                           .readAll(Path(file.getPath()))
+                           .through(text.utf8.decode)
+                           .through(TargetImport.csv2targetsAndLookup(simbadClient))
+                           .compile
+                           .toList
+        yield
+          assertEquals(result.length, 7)
+          assertEquals(result.count(_.isRight), 4)
+          assertEquals(result.count(_.isLeft), 3)
       }
   }
 
@@ -363,9 +361,9 @@ class TargetImportSuite extends CatsEffectSuite:
           assertEquals(l.length, 2)
           assertEquals(
             l.count {
-              case Right(Target.Sidereal(_, s: SiderealTracking, _, _)) =>
+              case Right(Target.Sidereal(tracking = s)) =>
                 s.properMotion.exists(_ === ProperMotion.Zero)
-              case _                                                    => false
+              case _                                    => false
             },
             1
           )
@@ -388,12 +386,12 @@ class TargetImportSuite extends CatsEffectSuite:
         assertEquals(l.count(_.isRight), 2)
 
         l.foreach {
-          case Right(Target.Sidereal(_, s: SiderealTracking, _, _)) =>
+          case Right(Target.Sidereal(tracking = s)) =>
             // All motion parameters should default to zero
             assertEquals(s.properMotion, Some(ProperMotion.Zero))
             assertEquals(s.radialVelocity, Some(RadialVelocity.Zero))
             assertEquals(s.parallax, Some(Parallax.Zero))
-          case _                                                    => fail("Expected successful target import")
+          case _                                    => fail("Expected successful target import")
         }
       }
   }

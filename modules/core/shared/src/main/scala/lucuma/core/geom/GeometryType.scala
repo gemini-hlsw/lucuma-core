@@ -17,6 +17,7 @@ enum GeometryType(private val tag: String, val isSequence: Boolean, val isGuided
   case Base              extends GeometryType("base", false, false)
   case AgsIntersection   extends GeometryType("ags_intersection", false, false)
   case AgsVignetting     extends GeometryType("ags_vignetting", false, false)
+  case NoZone            extends GeometryType("no_zone", false, false)
 
 object GeometryType:
   def fromSequenceTypeAndGuiding(

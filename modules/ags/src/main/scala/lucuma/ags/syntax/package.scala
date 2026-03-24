@@ -44,7 +44,7 @@ extension (posAngleConstraint: PosAngleConstraint)
       case PosAngleConstraint.ParallacticOverride(a) => NonEmptyList.of(a).some
       case PosAngleConstraint.AverageParallactic     =>
         averageParallacticAngle.map(a => NonEmptyList.of(a, a.flip))
-      case PosAngleConstraint.Unbounded              => UnconstrainedAngles
+      case PosAngleConstraint.Unbounded              => UnconstrainedAngles.some
 
 extension (o: Offset) def guided: GuidedOffset = GuidedOffset(o)
 

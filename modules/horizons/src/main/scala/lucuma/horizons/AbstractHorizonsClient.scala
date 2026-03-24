@@ -5,7 +5,6 @@ package lucuma.horizons
 
 import cats.effect.Temporal
 import cats.syntax.all.*
-import fs2.Stream
 import lucuma.core.data.PerSite
 import lucuma.core.enums.Site
 import lucuma.core.model.Ephemeris

@@ -25,14 +25,6 @@ pull_request_rules:
       add:
       - ags
       remove: []
-- name: Label benchmarks PRs
-  conditions:
-  - files~=^modules/benchmarks/
-  actions:
-    label:
-      add:
-      - benchmarks
-      remove: []
 - name: Label catalog PRs
   conditions:
   - files~=^modules/catalog/
@@ -80,6 +72,14 @@ pull_request_rules:
     label:
       add:
       - horizons-tests
+      remove: []
+- name: Label itac PRs
+  conditions:
+  - files~=^modules/itac/
+  actions:
+    label:
+      add:
+      - itac
       remove: []
 - name: Label npm PRs
   conditions:
