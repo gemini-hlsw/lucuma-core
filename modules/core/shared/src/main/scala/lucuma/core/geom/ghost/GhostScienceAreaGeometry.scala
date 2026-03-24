@@ -7,14 +7,11 @@ import lucuma.core.geom.ShapeExpression
 import lucuma.core.geom.syntax.all.*
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
-import lucuma.core.math.syntax.int.*
 
 trait GhostScienceAreaGeometry:
   // base target
   def base: ShapeExpression =
     ShapeExpression.point(Offset.Zero)
-
-  val FovDiameter: Angle = 444.arcsec
 
   val fov: ShapeExpression =
     ShapeExpression.centeredEllipse(FovDiameter, FovDiameter)

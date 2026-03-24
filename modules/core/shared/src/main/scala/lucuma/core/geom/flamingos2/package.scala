@@ -9,8 +9,8 @@ import coulomb.syntax.*
 import coulomb.units.accepted.*
 import lucuma.core.math.Angle
 import lucuma.core.math.syntax.int.*
-import lucuma.core.math.units.*
 import lucuma.core.math.syntax.units.*
+import lucuma.core.math.units.*
 
 // Size of probe arm components in mm.
 val PickoffMirrorSize          = BigDecimal(19800).withUnit[Micrometer]

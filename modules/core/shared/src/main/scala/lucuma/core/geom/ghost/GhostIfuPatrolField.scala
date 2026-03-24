@@ -4,19 +4,13 @@
 package lucuma.core.geom.ghost
 
 import lucuma.core.geom.ShapeExpression
-import lucuma.core.geom.syntax.all.*
 import lucuma.core.geom.ghost.scienceArea.fov
+import lucuma.core.geom.syntax.all.*
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 import lucuma.core.math.syntax.int.*
 
 trait GhostIfuPatrolField:
-
-  // 1 mm in arcsec at GHOST plate scale (1/0.61 arcsec/mm)
-  val IFUSeparation: Angle = Angle.fromDoubleArcseconds(1.0 / 0.61)
-
-  // 2 mm separation used for HR sky fiber and IFU boundary offsets
-  val HRFiberOffset: Angle = IFUSeparation + IFUSeparation
 
   // IFU1 patrols the West half of FOV (positive P side, P+ = West)
   val ifu1PatrolField: ShapeExpression =

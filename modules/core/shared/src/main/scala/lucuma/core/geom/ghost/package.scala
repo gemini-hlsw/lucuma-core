@@ -3,14 +3,20 @@
 
 package lucuma.core.geom.ghost
 
-import lucuma.core.math.syntax.units.*
-import lucuma.core.math.syntax.int.*
-import lucuma.core.math.units.*
 import lucuma.core.math.Angle
+import lucuma.core.math.syntax.int.*
+import lucuma.core.math.syntax.units.*
+import lucuma.core.math.units.*
 
-val GhostPlateScale: PlateScale = BigDecimal(0.61).plateScale
+val GhostPlateScale: PlateScale = BigDecimal(1.0 / 0.61).plateScale
 
 val FovDiameter: Angle = 444.arcsec
+
+// 1 mm in arcsec at GHOST plate scale (1/0.61 arcsec/mm)
+val IFUSeparation: Angle = Angle.fromBigDecimalArcseconds(GhostPlateScale.value)
+
+// 2 mm separation used for HR sky fiber and IFU boundary offsets
+val HRFiberOffset: Angle = IFUSeparation + IFUSeparation
 
 object all
   extends GhostScienceAreaGeometry
