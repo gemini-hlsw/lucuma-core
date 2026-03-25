@@ -19,6 +19,7 @@ import org.http4s.Method
 import org.http4s.Request
 import org.http4s.Uri
 import org.http4s.client.Client
+import org.http4s.syntax.literals.*
 
 trait SimbadClient[F[_]]:
   /**
@@ -36,8 +37,8 @@ trait SimbadClient[F[_]]:
   ): F[List[CatalogTargetResult]]
 
 object SimbadClient:
-  val SimbadStrasbourg: Uri = Uri.unsafeFromString("http://simbad.u-strasbg.fr/simbad/sim-id")
-  val SimbadHarvard: Uri    = Uri.unsafeFromString("http://simbad.cfa.harvard.edu/simbad/sim-id")
+  val SimbadStrasbourg: Uri = uri"http://simbad.u-strasbg.fr/simbad/sim-id"
+  val SimbadHarvard: Uri    = uri"https://simbad.cfa.harvard.edu/simbad/sim-id"
 
   val DefaultEndpoints: NonEmptyChain[Uri] =
     NonEmptyChain.of(SimbadStrasbourg, SimbadHarvard)
