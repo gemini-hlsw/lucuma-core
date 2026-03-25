@@ -296,3 +296,41 @@ object AgsParams:
       Igrins2LongSlit(port, GuideProbe.PWFS2)
 
     val Igrins2ScienceRadius = 20.arcseconds
+
+  case class GhostIfu private (
+    probe: GuideProbe
+  ) extends AgsParams
+      with SingleProbeAgsParams
+      with PwfsSupport[GhostIfu] derives Eq:
+    import lucuma.core.geom.ghost
+    import lucuma.core.geom.pwfs
+
+    protected def withProbe(probe: GuideProbe): GhostIfu = copy(probe = probe)
+
+    override def patrolFieldAt(
+      posAngle: Angle,
+      offset:   Offset,
+      pivot:    Offset = Offset.Zero
+    ): ShapeExpression =
+      probe match
+        case GuideProbe.PWFS1 | GuideProbe.PWFS2 =>
+          pwfs.patrolField.patrolFieldAt(posAngle, offset, pivot)
+        case _                                   =>
+          ShapeExpression.empty
+
+    override def scienceArea(posAngle: Angle, offset: Offset): ShapeExpression =
+      ghost.scienceArea.fovAt(posAngle, offset)
+
+    override def probeArm(posAngle: Angle, guideStar: Offset, offset: Offset): ShapeExpression =
+      probe match
+        case GuideProbe.PWFS1 | GuideProbe.PWFS2 =>
+          pwfs.probeArm.vignettedAreaAt(probe, guideStar, offset)
+        case _                                   =>
+          ShapeExpression.Empty
+
+    override def scienceRadius: Angle = GhostIfu.GhostScienceRadius
+
+  object GhostIfu:
+    def apply(): GhostIfu = GhostIfu(GuideProbe.PWFS2)
+
+    val GhostScienceRadius = 20.arcseconds
