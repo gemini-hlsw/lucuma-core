@@ -15,6 +15,7 @@ import lucuma.core.geom.jts.jvm.syntax.awt.*
 import lucuma.core.geom.offsets.GeometryType
 import lucuma.core.geom.syntax.all.*
 import lucuma.core.math.Angle
+import lucuma.core.math.HourAngle
 import lucuma.core.math.Offset
 import lucuma.core.math.syntax.int.*
 import lucuma.core.model.sequence.flamingos2.Flamingos2FpuMask
@@ -27,7 +28,8 @@ case class ColoredShape(
   shape: ShapeExpression,
   color: Color,
   stroke: Option[BasicStroke] = None,
-  geometryType: Option[GeometryType] = None
+  geometryType: Option[GeometryType] = None,
+  filled: Boolean = false
 )
 
 trait InstrumentShapes:
@@ -205,6 +207,20 @@ class JtsDemo extends Frame("JTS Demo") {
           case _                                  =>
         }
     })
+    // println the position of the mouse in arcsec
+    addMouseMotionListener(new MouseMotionAdapter() {
+      override def mouseMoved(e: MouseEvent): Unit = {
+        val halfCanvas = canvasSize / 2
+        val p = -(e.getX - halfCanvas) * arcsecPerPixel
+        val q = -(e.getY - halfCanvas) * arcsecPerPixel
+        val ra      = HourAngle.fromDoubleDegrees(p / 3600.0)
+        val raStr   = HourAngle.fromStringHMS.reverseGet(ra)
+        val dec     = Angle.fromDoubleArcseconds(q)
+        val decStr  = Angle.fromStringSignedDMS.reverseGet(dec)
+
+        println(f"p: $p%+8.1f\"  q: $q%+8.1f\"  |  RA: $raStr  Dec: $decStr")
+      }
+    })
 
     override def paint(g: Graphics): Unit = {
       val halfCanvas = canvasSize / 2
@@ -286,7 +302,9 @@ class JtsDemo extends Frame("JTS Demo") {
           case jts: JtsShape =>
             g2d.setColor(cs.color)
             cs.stroke.foreach(g2d.setStroke)
-            g2d.draw(jts.toAwt(arcsecPerPixel))
+            val awt = jts.toAwt(arcsecPerPixel)
+            if (cs.filled) g2d.fill(awt)
+            g2d.draw(awt)
             g2d.setStroke(origStroke)
           case x             => sys.error(s"Whoa unexpected shape type: $x")
         }
@@ -364,3 +382,38 @@ trait Igrins2Shapes extends InstrumentShapes:
 
 object JtsIgrins2Demo extends JtsDemo with Igrins2Shapes:
   override val arcsecPerPixel: Double = 0.75
+
+trait GhostShapes extends InstrumentShapes:
+  import lucuma.core.geom.ghost.all.*
+  import lucuma.core.geom.pwfs.{patrolField, probeArm}
+  import lucuma.core.enums.GuideProbe
+
+  val posAngle: Angle =
+    0.deg
+
+  val offsetPos: Offset =
+    Offset.Zero
+
+  val guideStarOffset: Offset =
+    Offset(270.arcsec.p, 224.arcsec.q)
+
+  val probe: GuideProbe = GuideProbe.PWFS2
+
+  override def coloredShapes: List[ColoredShape] =
+    List(
+      ColoredShape(ifu1PatrolFieldAt(posAngle, offsetPos), new Color(100, 149, 237, 80), filled = true),
+      ColoredShape(ifu2PatrolFieldAt(posAngle, offsetPos), new Color(255, 165,   0, 80), filled = true)
+    )
+
+  def shapes: List[ShapeExpression] =
+    List(
+      fovAt(posAngle, offsetPos),
+      ifu1PatrolFieldAt(posAngle, offsetPos),
+      ifu2PatrolFieldAt(posAngle, offsetPos),
+      patrolField.patrolFieldAt(posAngle, offsetPos),
+      probeArm.mirrorAt(probe, guideStarOffset, offsetPos),
+      probeArm.armAt(probe, guideStarOffset, offsetPos)
+    )
+
+object JtsGhostDemo extends JtsDemo with GhostShapes:
+  override val arcsecPerPixel: Double = 1.5
