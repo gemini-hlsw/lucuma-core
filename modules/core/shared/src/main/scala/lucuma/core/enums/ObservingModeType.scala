@@ -14,6 +14,7 @@ enum ObservingModeType(val dbTag: String, val instrument: Instrument, val defaul
   case GmosNorthImaging   extends ObservingModeType("gmos_north_imaging",    Instrument.GmosNorth,  PosAngleConstraint.Fixed(Angle.Angle0))
   case GmosSouthImaging   extends ObservingModeType("gmos_south_imaging",    Instrument.GmosSouth,  PosAngleConstraint.Fixed(Angle.Angle0))
   case Igrins2LongSlit    extends ObservingModeType("igrins_2_long_slit",    Instrument.Igrins2,    PosAngleConstraint.AverageParallactic)
+  case GhostIfu           extends ObservingModeType("ghost_ifu",             Instrument.Ghost,      PosAngleConstraint.Fixed(Angle.Angle0))
 
 object ObservingModeType:
 
