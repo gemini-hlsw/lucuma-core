@@ -12,7 +12,9 @@ import lucuma.core.enums.Flamingos2LyotWheel
 import lucuma.core.enums.GmosNorthFpu
 import lucuma.core.enums.GmosSouthFpu
 import lucuma.core.enums.GuideProbe
+import lucuma.core.enums.PWFSGuideProbe
 import lucuma.core.enums.PortDisposition
+import lucuma.core.enums.given_Eq_PWFSGuideProbe
 import lucuma.core.geom.Area
 import lucuma.core.geom.BoundingOffsets
 import lucuma.core.geom.Shape
@@ -98,9 +100,9 @@ trait SingleProbeAgsParams:
 
 trait PwfsSupport[A]:
   def probe: GuideProbe
-  def withPWFS1: A = withProbe(GuideProbe.PWFS1)
-  def withPWFS2: A = withProbe(GuideProbe.PWFS2)
-  protected def withProbe(probe: GuideProbe): A
+  def withPWFS1: A = withPWFSProbe(GuideProbe.PWFS1)
+  def withPWFS2: A = withPWFSProbe(GuideProbe.PWFS2)
+  protected def withPWFSProbe(probe: PWFSGuideProbe): A
 
 sealed trait AgsParams derives Eq:
 
@@ -125,7 +127,7 @@ object AgsParams:
     import lucuma.core.geom.gmos.oiwfs
     import lucuma.core.geom.pwfs
 
-    protected def withProbe(probe: GuideProbe): GmosImaging = copy(probe = probe)
+    protected def withPWFSProbe(probe: PWFSGuideProbe): GmosImaging = copy(probe = probe)
 
     override def patrolFieldAt(
       posAngle: Angle,
@@ -133,11 +135,11 @@ object AgsParams:
       pivot:    Offset = Offset.Zero
     ): ShapeExpression =
       probe match
-        case GuideProbe.GmosOIWFS                =>
+        case GuideProbe.GmosOIWFS =>
           oiwfs.patrolField.imagingMode.patrolFieldAt(posAngle, offset, port, pivot)
-        case GuideProbe.PWFS1 | GuideProbe.PWFS2 =>
+        case _: PWFSGuideProbe    =>
           pwfs.patrolField.patrolFieldAt(posAngle, offset, pivot)
-        case _                                   =>
+        case _                    =>
           ShapeExpression.empty
 
     override def scienceArea(posAngle: Angle, offset: Offset): ShapeExpression =
@@ -145,11 +147,11 @@ object AgsParams:
 
     override def probeArm(posAngle: Angle, guideStar: Offset, offset: Offset): ShapeExpression =
       probe match
-        case GuideProbe.GmosOIWFS                =>
+        case GuideProbe.GmosOIWFS =>
           oiwfs.probeArm.imaging.shapeAt(posAngle, guideStar, offset, port)
-        case GuideProbe.PWFS1 | GuideProbe.PWFS2 =>
+        case _: PWFSGuideProbe    =>
           pwfs.probeArm.vignettedAreaAt(probe, guideStar, offset)
-        case _                                   =>
+        case _                    =>
           ShapeExpression.Empty
 
     override def scienceRadius: Angle = GmosScienceRadius
@@ -169,7 +171,7 @@ object AgsParams:
     import lucuma.core.geom.gmos.oiwfs
     import lucuma.core.geom.pwfs
 
-    protected def withProbe(probe: GuideProbe): GmosLongSlit = copy(probe = probe)
+    protected def withPWFSProbe(probe: PWFSGuideProbe): GmosLongSlit = copy(probe = probe)
 
     override def patrolFieldAt(
       posAngle: Angle,
@@ -177,11 +179,11 @@ object AgsParams:
       pivot:    Offset = Offset.Zero
     ): ShapeExpression =
       probe match
-        case GuideProbe.GmosOIWFS                =>
+        case GuideProbe.GmosOIWFS =>
           oiwfs.patrolField.longSlitMode.patrolFieldAt(posAngle, offset, fpu, port, pivot)
-        case GuideProbe.PWFS1 | GuideProbe.PWFS2 =>
+        case _: PWFSGuideProbe    =>
           pwfs.patrolField.patrolFieldAt(posAngle, offset, pivot)
-        case _                                   =>
+        case _                    =>
           ShapeExpression.empty
 
     override def scienceArea(posAngle: Angle, offset: Offset): ShapeExpression =
@@ -189,11 +191,11 @@ object AgsParams:
 
     override def probeArm(posAngle: Angle, guideStar: Offset, offset: Offset): ShapeExpression =
       probe match
-        case GuideProbe.GmosOIWFS                =>
+        case GuideProbe.GmosOIWFS =>
           oiwfs.probeArm.longSlit.shapeAt(posAngle, guideStar, offset, fpu, port)
-        case GuideProbe.PWFS1 | GuideProbe.PWFS2 =>
+        case _: PWFSGuideProbe    =>
           pwfs.probeArm.vignettedAreaAt(probe, guideStar, offset)
-        case _                                   =>
+        case _                    =>
           ShapeExpression.Empty
 
     override def scienceRadius: Angle = GmosScienceRadius
@@ -221,7 +223,7 @@ object AgsParams:
     import lucuma.core.geom.flamingos2.oiwfs
     import lucuma.core.geom.pwfs
 
-    protected def withProbe(probe: GuideProbe): Flamingos2LongSlit = copy(probe = probe)
+    protected def withPWFSProbe(probe: PWFSGuideProbe): Flamingos2LongSlit = copy(probe = probe)
 
     override def patrolFieldAt(
       posAngle: Angle,
@@ -229,22 +231,22 @@ object AgsParams:
       pivot:    Offset = Offset.Zero
     ): ShapeExpression =
       probe match
-        case GuideProbe.Flamingos2OIWFS          =>
+        case GuideProbe.Flamingos2OIWFS =>
           oiwfs.patrolField.patrolFieldAt(posAngle, offset, lyot, port, pivot)
-        case GuideProbe.PWFS1 | GuideProbe.PWFS2 =>
+        case _: PWFSGuideProbe          =>
           pwfs.patrolField.patrolFieldAt(posAngle, offset, pivot)
-        case _                                   => ShapeExpression.Empty
+        case _                          => ShapeExpression.Empty
 
     override def scienceArea(posAngle: Angle, offset: Offset): ShapeExpression =
       flamingos2.scienceArea.shapeAt(posAngle, offset, lyot, fpu)
 
     override def probeArm(posAngle: Angle, guideStar: Offset, offset: Offset): ShapeExpression =
       probe match
-        case GuideProbe.Flamingos2OIWFS          =>
+        case GuideProbe.Flamingos2OIWFS =>
           oiwfs.probeArm.shapeAt(posAngle, guideStar, offset, lyot, port)
-        case GuideProbe.PWFS1 | GuideProbe.PWFS2 =>
+        case _: PWFSGuideProbe          =>
           pwfs.probeArm.vignettedAreaAt(probe, guideStar, offset)
-        case _                                   => ShapeExpression.Empty
+        case _                          => ShapeExpression.Empty
 
     override def scienceRadius: Angle = Flamingos2LongSlit.Flamingos2ScienceRadius
 
@@ -258,34 +260,26 @@ object AgsParams:
     val Flamingos2ScienceRadius = 20.arcseconds
 
   trait PwfsOnlyParams extends SingleProbeAgsParams:
-    def probe: GuideProbe
+    def probe: PWFSGuideProbe
 
     override def patrolFieldAt(
       posAngle: Angle,
       offset:   Offset,
       pivot:    Offset = Offset.Zero
     ): ShapeExpression =
-      probe match
-        case GuideProbe.PWFS1 | GuideProbe.PWFS2 =>
-          lucuma.core.geom.pwfs.patrolField.patrolFieldAt(posAngle, offset, pivot)
-        case _                                   =>
-          ShapeExpression.empty
+      lucuma.core.geom.pwfs.patrolField.patrolFieldAt(posAngle, offset, pivot)
 
     override def probeArm(posAngle: Angle, guideStar: Offset, offset: Offset): ShapeExpression =
-      probe match
-        case GuideProbe.PWFS1 | GuideProbe.PWFS2 =>
-          lucuma.core.geom.pwfs.probeArm.vignettedAreaAt(probe, guideStar, offset)
-        case _                                   =>
-          ShapeExpression.Empty
+      lucuma.core.geom.pwfs.probeArm.vignettedAreaAt(probe, guideStar, offset)
 
   case class Igrins2LongSlit private (
     port:  PortDisposition,
-    probe: GuideProbe
+    probe: PWFSGuideProbe
   ) extends AgsParams
       with PwfsOnlyParams
       with PwfsSupport[Igrins2LongSlit] derives Eq:
 
-    protected def withProbe(probe: GuideProbe): Igrins2LongSlit = copy(probe = probe)
+    protected def withPWFSProbe(probe: PWFSGuideProbe): Igrins2LongSlit = copy(probe = probe)
 
     override def scienceArea(posAngle: Angle, offset: Offset): ShapeExpression =
       lucuma.core.geom.igrins2.scienceArea.svcFieldOfView(posAngle, offset)
@@ -300,12 +294,12 @@ object AgsParams:
 
   case class GhostIfu private (
     port:  PortDisposition,
-    probe: GuideProbe
+    probe: PWFSGuideProbe
   ) extends AgsParams
       with PwfsOnlyParams
       with PwfsSupport[GhostIfu] derives Eq:
 
-    protected def withProbe(probe: GuideProbe): GhostIfu = copy(probe = probe)
+    protected def withPWFSProbe(probe: PWFSGuideProbe): GhostIfu = copy(probe = probe)
 
     override def scienceArea(posAngle: Angle, offset: Offset): ShapeExpression =
       lucuma.core.geom.ghost.scienceArea.fovAt(posAngle, offset)
@@ -316,4 +310,5 @@ object AgsParams:
     def apply(port: PortDisposition = PortDisposition.Bottom): GhostIfu =
       GhostIfu(port, GuideProbe.PWFS2)
 
+    // Is this correct? is it the same for either ifu?
     val GhostScienceRadius = 20.arcseconds
