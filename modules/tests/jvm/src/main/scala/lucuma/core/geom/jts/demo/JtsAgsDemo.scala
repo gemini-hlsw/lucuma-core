@@ -10,6 +10,7 @@ import cats.syntax.eq.*
 import cats.syntax.option.*
 import lucuma.ags.AcquisitionOffsets
 import lucuma.ags.Ags
+import lucuma.ags.AgsParams.GhostIfu
 import lucuma.ags.AgsParams.GmosLongSlit
 import lucuma.ags.AgsVisualization
 import lucuma.ags.ScienceOffsets
@@ -258,3 +259,100 @@ object JtsGmosAgsPwfsDemo:
 
   def main(args: Array[String]): Unit =
     demo(AgsVisualizationDemo.parsePosAngle(args, 0.deg)).main(args)
+
+trait GhostWithPwfsVisualizationShapes(val posAngle: Angle) extends AgsVisualizationBase:
+  import lucuma.core.geom.ghost.all.*
+  import lucuma.core.geom.pwfs.probeArm
+
+  val guideStarOffset: Offset =
+    Offset(270.arcsec.p, 300.arcsec.q)
+
+  // IFU1 target
+  val target1Offset: Offset = Offset(100.arcsec.p, 30.arcsec.q)
+  // IFU2 target
+  val target2Offset: Offset = Offset(-180.arcsec.p, -70.arcsec.q)
+
+  val offsetPos: Offset = Offset.Zero
+
+  val params = GhostIfu()
+
+  private def noZoneAt(offset: Offset): ShapeExpression =
+    ShapeExpression.centeredEllipse(
+      params.scienceRadius + params.scienceRadius,
+      params.scienceRadius + params.scienceRadius
+    ) ↗ offset
+
+  override def shapes: List[ShapeExpression] = List(
+    params.scienceArea(posAngle, offsetPos)
+  )
+
+  override def coloredShapes: List[ColoredShape] =
+    val guideStarMarker = ColoredShape(
+      ShapeExpression.centeredRectangle(2.arcsec, 2.arcsec) ↗ guideStarOffset,
+      Color.GREEN,
+      solidStroke.some
+    )
+
+    val target1Marker = ColoredShape(
+      ShapeExpression.centeredRectangle(3.arcsec, 3.arcsec) ↗ target1Offset,
+      Color.YELLOW,
+      solidStroke.some
+    )
+
+    val target2Marker = ColoredShape(
+      ShapeExpression.centeredRectangle(3.arcsec, 3.arcsec) ↗ target2Offset,
+      Color.YELLOW,
+      solidStroke.some
+    )
+
+    val ifu1 = ColoredShape(
+      ifu1PatrolFieldAt(posAngle, offsetPos),
+      new Color(100, 149, 237, 80),
+      filled = true
+    )
+
+    val ifu2 = ColoredShape(
+      ifu2PatrolFieldAt(posAngle, offsetPos),
+      new Color(255, 165, 0, 80),
+      filled = true
+    )
+
+    val patrolField = ColoredShape(
+      params.patrolFieldAt(posAngle, offsetPos),
+      Color.ORANGE,
+      dashStroke.some
+    )
+
+    val mirror = ColoredShape(
+      probeArm.mirrorAt(params.probe, guideStarOffset, offsetPos),
+      Color.RED,
+      solidStroke.some
+    )
+    val mirrorVignetted = ColoredShape(
+      probeArm.mirrorVignettedAreaAt(params.probe, guideStarOffset, offsetPos),
+      Color.BLUE,
+      thinStroke.some
+    )
+    val armVignetted = ColoredShape(
+      probeArm.armVignettedAreaAt(params.probe, guideStarOffset, offsetPos),
+      Color.BLUE,
+      thinStroke.some
+    )
+    val arm = ColoredShape(
+      probeArm.armAt(params.probe, guideStarOffset, offsetPos),
+      Color.DARK_GRAY,
+      thinStroke.some
+    )
+
+    val noZone1 = ColoredShape(noZoneAt(target1Offset), Color.RED, dashStroke.some)
+    val noZone2 = ColoredShape(noZoneAt(target2Offset), Color.RED, dashStroke.some)
+
+    List(target1Marker, target2Marker, ifu1, ifu2, noZone1, noZone2, patrolField, mirrorVignetted, armVignetted, arm, mirror, guideStarMarker)
+
+object JtsGhostAgsPwfsDemo:
+  def demo(posAngle: Angle) =
+    new JtsDemo with GhostWithPwfsVisualizationShapes(posAngle):
+      override val arcsecPerPixel: Double = 1.5
+
+  def main(args: Array[String]): Unit =
+    demo(AgsVisualizationDemo.parsePosAngle(args, 40.deg)).main(args)
