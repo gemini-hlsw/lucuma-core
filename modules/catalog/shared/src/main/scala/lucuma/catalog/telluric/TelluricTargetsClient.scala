@@ -60,6 +60,8 @@ object TelluricTargetsClient:
                                  simbadClient
                                    .search(star.simbadName)
                                    .map(_.toOption)
+                                   // If simbad lookup fails return the base star
+                                   .recover(_ => None)
                                    .map(result => (star, result))
             } yield results
 
