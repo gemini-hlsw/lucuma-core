@@ -3,7 +3,6 @@
 
 package lucuma.core.enums
 
-import cats.Eq
 import lucuma.core.enums.Flamingos2LyotWheel
 import lucuma.core.geom
 import lucuma.core.geom.ShapeExpression
@@ -12,7 +11,6 @@ import lucuma.core.util.Enumerated
 // Type for instruments or configurations that can only use pwfs1/pwfs2
 sealed trait PWFSProbe
 type PWFSGuideProbe = GuideProbe & PWFSProbe
-given Eq[PWFSGuideProbe] = Eq.by(_.tag)
 
 /**
  * Enumerated type for guide probe
@@ -30,3 +28,6 @@ enum GuideProbe(val tag: String) derives Enumerated:
     case GmosOIWFS       => geom.gmos.candidatesArea.candidatesArea
     // For f2 oiwfs 222"
     case Flamingos2OIWFS => geom.flamingos2.candidatesArea.candidatesArea(Flamingos2LyotWheel.F16)
+
+object GuideProbe:
+  given Enumerated[PWFSGuideProbe] = Enumerated.from(GuideProbe.PWFS1, GuideProbe.PWFS2).withTag(_.tag)
