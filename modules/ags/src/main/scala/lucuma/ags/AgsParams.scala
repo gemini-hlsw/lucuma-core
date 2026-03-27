@@ -14,7 +14,6 @@ import lucuma.core.enums.GmosSouthFpu
 import lucuma.core.enums.GuideProbe
 import lucuma.core.enums.PWFSGuideProbe
 import lucuma.core.enums.PortDisposition
-import lucuma.core.enums.given_Eq_PWFSGuideProbe
 import lucuma.core.geom.Area
 import lucuma.core.geom.BoundingOffsets
 import lucuma.core.geom.Shape
