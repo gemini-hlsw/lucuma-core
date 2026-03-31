@@ -303,7 +303,7 @@ lazy val npm        = project
       IO.write(
         outDir / "package.json",
         s"""|{
-            |  "name": "lucuma-core",
+            |  "name": "@gemini-hlsw/lucuma-core",
             |  "version": "${version.value}",
             |  "license": "${licenses.value.head._1}",
             |  "main": "main.js",
