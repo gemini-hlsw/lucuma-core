@@ -16,7 +16,10 @@ final case class GhostDetector(
   exposureCount:  PosInt,
   binning:        GhostBinning,
   readMode:       GhostReadMode
-)
+):
+  /** The sum of exposure times for all exposures. */
+  def grossExposureTime: TimeSpan =
+    exposureTime *| exposureCount.value
 
 object GhostDetector:
   given Eq[GhostDetector] =
