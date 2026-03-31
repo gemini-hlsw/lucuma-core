@@ -5,7 +5,6 @@ package lucuma.core.math
 
 import cats.*
 import coulomb.*
-import coulomb.integrations.cats.quantity.given
 import coulomb.syntax.*
 import eu.timepit.refined.api.*
 import eu.timepit.refined.auto.*
@@ -52,7 +51,7 @@ object Parallax extends ParallaxOptics {
 
   /** @group Typeclass Instances */
   given Order[Parallax] =
-    Order.by(_.μas)
+    Order.by(_.μas.value)
 
   /**
    * Construct a new Parallax of the given magnitude in integral microarcseconds. Exact.

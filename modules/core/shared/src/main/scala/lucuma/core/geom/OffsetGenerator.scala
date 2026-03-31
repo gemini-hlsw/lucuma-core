@@ -14,7 +14,6 @@ import cats.syntax.flatMap.*
 import cats.syntax.functor.*
 import cats.syntax.option.*
 import eu.timepit.refined.types.numeric.PosInt
-import lucuma.core.geom.OffsetGenerator as OffsetGeneratorImpl
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 import monocle.Lens
@@ -28,7 +27,7 @@ import scala.math.ceil
 import scala.math.sqrt
 
 sealed trait OffsetGenerator {
-  def generate[F[_]: {Monad, CatsRandom as R}](count: PosInt): F[NonEmptyList[Offset]]
+  def generate[F[_]: Monad : CatsRandom](count: PosInt): F[NonEmptyList[Offset]]
 }
 
 object OffsetGenerator {
@@ -58,7 +57,7 @@ object OffsetGenerator {
       NonEmptyList.fromListUnsafe(offsets.toList)
     }
 
-    def generate[F[_]: {Monad, CatsRandom as R}](count: PosInt): F[NonEmptyList[Offset]] = {
+    def generate[F[_]: Monad : CatsRandom](count: PosInt): F[NonEmptyList[Offset]] = {
       val n           = PosInt.unsafeFrom(ceil(sqrt(count.value.toDouble)).toInt)
       val d           = size * (1.0 / n.value.toDouble)
       val jitterScale = d * 0.5
@@ -67,13 +66,13 @@ object OffsetGenerator {
       def randomized =
         gridPoints.traverse: point =>
           for
-            pJitter <- R.nextDouble.map(x => jitterScale * (2.0 * x - 1.0))
-            qJitter <- R.nextDouble.map(x => jitterScale * (2.0 * x - 1.0))
+            pJitter <- CatsRandom[F].nextDouble.map(x => jitterScale * (2.0 * x - 1.0))
+            qJitter <- CatsRandom[F].nextDouble.map(x => jitterScale * (2.0 * x - 1.0))
           yield point + Offset(pJitter.p, qJitter.q)
 
       for
         randomizedPoints <- randomized
-        shuffled         <- R.shuffleList(randomizedPoints.toList)
+        shuffled         <- CatsRandom[F].shuffleList(randomizedPoints.toList)
       yield NonEmptyList.fromListUnsafe(shuffled.take(count.value))
     }
   }
@@ -88,10 +87,10 @@ object OffsetGenerator {
    * Uses the golden angle for optimal packing.
    */
   case class Spiral(size:   Angle, center: Offset = Offset.Zero) extends OffsetGenerator derives Eq {
-    def generate[F[_]: {Monad, CatsRandom as R}](count: PosInt): F[NonEmptyList[Offset]] = {
+    def generate[F[_]: Monad : CatsRandom](count: PosInt): F[NonEmptyList[Offset]] = {
       val θ = Angle.fromDoubleDegrees(137.50776)  // golden angle
 
-      val offsets = R.nextDouble.map(x => Angle.fromDoubleRadians(x * 2.0 * Pi)).map: φ =>
+      val offsets = CatsRandom[F].nextDouble.map(x => Angle.fromDoubleRadians(x * 2.0 * Pi)).map: φ =>
         // Calculate scale factor
         val arcsecs = Angle.signedDecimalArcseconds.get(size).toDouble
         val θʹ = θ * count.value.toDouble
@@ -123,7 +122,7 @@ object OffsetGenerator {
    * @param cornerB other corner of the bounding region
    */
   case class Uniform(cornerA: Offset, cornerB: Offset) extends OffsetGenerator derives Eq {
-    def generate[F[_]: {Monad, CatsRandom as R}](count: PosInt): F[NonEmptyList[Offset]] = {
+    def generate[F[_]: Monad : CatsRandom](count: PosInt): F[NonEmptyList[Offset]] = {
       val w = (cornerA.p.toSignedDecimalArcseconds - cornerB.p.toSignedDecimalArcseconds).abs
       val h = (cornerA.q.toSignedDecimalArcseconds - cornerB.q.toSignedDecimalArcseconds).abs
 

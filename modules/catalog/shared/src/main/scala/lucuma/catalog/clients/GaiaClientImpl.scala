@@ -25,12 +25,12 @@ import org.typelevel.log4cats.syntax.*
 import java.net.URLDecoder
 
 // TODO Add Trace, we need natchez
-class GaiaClientImpl[F[_]: {Concurrent, LoggerFactory as LF}](
+class GaiaClientImpl[F[_]: Concurrent : LoggerFactory](
   httpClient: Client[F],
   modUri:     Uri => Uri = identity, // Override this if you need to add a CORS proxy
   adapters:   NonEmptyChain[CatalogAdapter.Gaia] = GaiaClient.DefaultAdapters
 ) extends GaiaClient[F] {
-  private given Logger[F] = LF.getLoggerFromName("gaia-client")
+  private given Logger[F] = LoggerFactory[F].getLoggerFromName("gaia-client")
 
   /**
    * Request and parse data from Gaia.
