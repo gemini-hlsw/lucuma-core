@@ -2,7 +2,7 @@ import org.scalajs.linker.interface.ESVersion
 import org.typelevel.sbt.gha.PermissionValue
 import org.typelevel.sbt.gha.Permissions
 
-ThisBuild / tlBaseVersion                         := "0.179"
+ThisBuild / tlBaseVersion                         := "0.180"
 ThisBuild / tlCiReleaseBranches                   := Seq("master")
 ThisBuild / githubWorkflowEnv += "MUNIT_FLAKY_OK" -> "true"
 
@@ -10,7 +10,7 @@ ThisBuild / tlCiReleaseBranches += "topic/scala3"
 
 Global / concurrentRestrictions += Tags.limit(Tags.Compile, 1)
 
-ThisBuild / crossScalaVersions := Seq("3.7.4")
+ThisBuild / crossScalaVersions := Seq("3.8.3")
 ThisBuild / scalacOptions += "-language:implicitConversions" // TODO
 
 lazy val catsVersion                = "2.13.0"
@@ -25,7 +25,7 @@ lazy val circeRefinedVersion        = "0.15.1"
 lazy val coulombVersion             = "0.9.1"
 lazy val fs2Version                 = "3.13.0"
 lazy val fs2DataVersion             = "1.13.0"
-lazy val geminiLocalesVersion       = "0.12.1"
+lazy val geminiLocalesVersion       = "0.12.2"
 lazy val http4sVersion              = "0.23.33"
 lazy val http4sDomVersion           = "0.2.12"
 lazy val http4sJdkHttpClientVersion = "0.10.0"
@@ -35,7 +35,7 @@ lazy val kittensVersion             = "3.5.0"
 lazy val log4catsVersion            = "2.8.0"
 lazy val lucumaRefinedVersion       = "0.1.4"
 lazy val monocleVersion             = "3.3.0"
-lazy val munitVersion               = "1.2.3"
+lazy val munitVersion               = "1.2.4"
 lazy val munitDisciplineVersion     = "2.0.0"
 lazy val munitCatsEffectVersion     = "2.2.0"
 lazy val pprintVersion              = "0.9.6"

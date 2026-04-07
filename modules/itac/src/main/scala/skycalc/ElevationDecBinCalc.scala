@@ -26,9 +26,9 @@ class ElevationDecBinCalc(conf: ElevationConfig) extends DecBinCalc {
 
   def getSolvers(site: Site, coords: List[Coordinates]): List[BoundedInterval[Instant] => IntervalSeq[Instant]] =
     val isc = ImprovedSkyCalc(site.place)
-    coords.map: cs => 
-      bi => 
-        val samples = 
+    coords.map: cs =>
+      bi =>
+        val samples =
           Samples.atFixedRate(bi, java.time.Duration.ofMinutes(15)): i =>
             isc.calculate(cs, i, false)
         AirmassSolver(conf.minAirmass, conf.maxAirmass, Duration.ofMinutes(7)).solve(samples)(bi)
@@ -43,26 +43,26 @@ class ElevationDecBinCalc(conf: ElevationConfig) extends DecBinCalc {
     val it      = NightIterator.bounded(conf.bounds, site, start, end)
     while (it.hasNext) {
       var bin = 0
-      val night = it.next
+      val night = it.next()
       solvers.foreach { s =>
         val u = s.apply(night.interval)
         u.intervalIterator.foreach: i =>
-          
+
           val end = i.upperBound match
             case Closed(a) => a
             case Open(a) => a
             case b => sys.error(s"can't handle $b")
-          
+
           val start = i.lowerBound match
             case Closed(a) => a
             case Open(a) => a
             case b => sys.error(s"can't handle $b")
 
           totals(bin) += end.toEpochMilli() - start.toEpochMilli()
-          
+
           bin += 1
       }
-    }    
+    }
     val max = totals(ElevationDecBinCalc.getSiteIndex(site, size))
     totals.toList.map: cur =>
       IntCentiPercentUnbounded.unsafeFromPercent(100.0 * cur.toDouble / max)
