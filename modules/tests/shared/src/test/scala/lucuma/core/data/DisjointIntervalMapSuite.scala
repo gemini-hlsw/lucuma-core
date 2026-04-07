@@ -34,7 +34,7 @@ final class DisjointIntervalMapSuite extends munit.DisciplineSuite:
         if ra.overlaps(rb) then
           DisjointIntervalMap.one(
             "a",
-            (Diet.fromRange(ra) & Diet.fromRange(rb)).toIterator.next
+            (Diet.fromRange(ra) & Diet.fromRange(rb)).toIterator.next()
           )
         else
           DisjointIntervalMap.empty[String, Byte]
@@ -42,13 +42,13 @@ final class DisjointIntervalMapSuite extends munit.DisciplineSuite:
 
   test("add"):
     forAll: (d: DisjointIntervalMap[Byte, Byte], k: Byte, v: Byte) =>
-      val dʹ = d.add(k, v)      
+      val dʹ = d.add(k, v)
       assert(dʹ.getKeyForValue(v) === Some(k))
-      assert(dʹ.get(k).map(_.contains(v)) === Some(true))      
+      assert(dʹ.get(k).map(_.contains(v)) === Some(true))
 
   test("addRange"):
     forAll: (d: DisjointIntervalMap[Byte, Byte], k: Byte, v: Range[Byte]) =>
-      val dʹ = d.addRange(k, v)      
+      val dʹ = d.addRange(k, v)
       assert(dʹ.getKeyForRange(v) === Some(k))
       assert(dʹ.get(k).map(_.containsRange(v)) === Some(true))
 
@@ -57,7 +57,7 @@ final class DisjointIntervalMapSuite extends munit.DisciplineSuite:
       d.getKeyForValue(v) match
         case None     => assert(d.add(k, v).remove(k, v) === d)
         case Some(kʹ) => assert(d.remove(kʹ, v).add(kʹ, v) === d)
-      
+
   test("addRange <-> removeRange"):
     forAll: (d: DisjointIntervalMap[Byte, Byte], k: Byte, v: Byte) =>
       d.getKeyForValue(v) match
