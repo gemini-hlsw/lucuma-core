@@ -8,8 +8,8 @@ import cats.Eq
 final case class GhostDynamicConfig(
   redCamera:         GhostDetector.Red,
   blueCamera:        GhostDetector.Blue,
-  ifu1FiberAgitator: Ifu1FiberAgitator = Ifu1FiberAgitator.Disabled,
-  ifu2FiberAgitator: Ifu2FiberAgitator = Ifu2FiberAgitator.Disabled
+  ifu1FiberAgitator: GhostIfu1FiberAgitator = GhostIfu1FiberAgitator.Disabled,
+  ifu2FiberAgitator: GhostIfu2FiberAgitator = GhostIfu2FiberAgitator.Disabled
 )
 
 object GhostDynamicConfig:

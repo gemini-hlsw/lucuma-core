@@ -5,7 +5,7 @@ package lucuma.core.model.sequence
 package ghost
 package arb
 
-import lucuma.core.util.arb.ArbNewType
+import lucuma.core.util.arb.ArbEnumerated
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Cogen
@@ -13,38 +13,24 @@ import org.scalacheck.Cogen
 
 trait ArbGhostDynamicConfig:
 
+  import ArbEnumerated.given
   import ArbGhostDetector.given
-  import ArbNewType.given
-
-  given Arbitrary[Ifu1FiberAgitator] =
-    Arbitrary:
-      arbitrary[Boolean].map(Ifu1FiberAgitator.apply)
-
-  given Cogen[Ifu1FiberAgitator] =
-    Cogen[Boolean].contramap(_.value)
-
-  given Arbitrary[Ifu2FiberAgitator] =
-    Arbitrary:
-      arbitrary[Boolean].map(Ifu2FiberAgitator.apply)
-
-  given Cogen[Ifu2FiberAgitator] =
-    Cogen[Boolean].contramap(_.value)
 
   given Arbitrary[GhostDynamicConfig] =
     Arbitrary:
       for
         r  <- arbitrary[GhostDetector.Red]
         b  <- arbitrary[GhostDetector.Blue]
-        a1 <- arbitrary[Ifu1FiberAgitator]
-        a2 <- arbitrary[Ifu2FiberAgitator]
+        a1 <- arbitrary[GhostIfu1FiberAgitator]
+        a2 <- arbitrary[GhostIfu2FiberAgitator]
       yield GhostDynamicConfig(r, b, a1, a2)
 
   given Cogen[GhostDynamicConfig] =
     Cogen[(
       GhostDetector.Red,
       GhostDetector.Blue,
-      Ifu1FiberAgitator,
-      Ifu2FiberAgitator
+      GhostIfu1FiberAgitator,
+      GhostIfu2FiberAgitator
     )].contramap: a =>
       (
         a.redCamera,
