@@ -45,4 +45,18 @@ trait ArbGhostDetector:
         a.readMode
       )
 
+  given Arbitrary[GhostDetector.Red] =
+    Arbitrary:
+      arbitrary[GhostDetector].map(GhostDetector.Red.apply)
+
+  given Cogen[GhostDetector.Red] =
+    Cogen[GhostDetector].contramap(_.value)
+
+  given Arbitrary[GhostDetector.Blue] =
+    Arbitrary:
+      arbitrary[GhostDetector].map(GhostDetector.Blue.apply)
+
+  given Cogen[GhostDetector.Blue] =
+    Cogen[GhostDetector].contramap(_.value)
+
 object ArbGhostDetector extends ArbGhostDetector
