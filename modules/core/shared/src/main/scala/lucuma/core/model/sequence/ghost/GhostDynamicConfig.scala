@@ -4,6 +4,8 @@
 package lucuma.core.model.sequence.ghost
 
 import cats.Eq
+import lucuma.core.enums.GhostIfu1FiberAgitator
+import lucuma.core.enums.GhostIfu2FiberAgitator
 
 final case class GhostDynamicConfig(
   redCamera:         GhostDetector.Red,

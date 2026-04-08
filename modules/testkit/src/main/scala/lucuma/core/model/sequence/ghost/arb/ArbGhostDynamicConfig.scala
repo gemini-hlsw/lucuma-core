@@ -5,6 +5,8 @@ package lucuma.core.model.sequence
 package ghost
 package arb
 
+import lucuma.core.enums.GhostIfu1FiberAgitator
+import lucuma.core.enums.GhostIfu2FiberAgitator
 import lucuma.core.util.arb.ArbEnumerated
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
