@@ -58,5 +58,5 @@ object GmosSouthFilter:
   /** Acquisition filter options. */
   val acquisition: NonEmptyList[GmosSouthFilter] =
     NonEmptyList.fromListUnsafe(
-      List(UPrime, GPrime, RPrime, IPrime, ZPrime)
+      List(UPrime, GPrime, RPrime, IPrime)
     )
