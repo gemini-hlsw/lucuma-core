@@ -69,5 +69,5 @@ object GaiaClient:
     NonEmptyChain.of(
       CatalogAdapter.Gaia3DataLab,
       CatalogAdapter.Gaia3LiteGavo,
-      CatalogAdapter.Gaia3LiteEsaProxy
+      CatalogAdapter.Gaia3Esa
     )
