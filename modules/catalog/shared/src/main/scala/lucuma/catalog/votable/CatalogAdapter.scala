@@ -589,11 +589,12 @@ object CatalogAdapter {
 
   }
 
-  object Gaia3Esa extends GaiaEsa {
+  trait Gaia3Esa extends GaiaEsa {
     override lazy val gaiaDB: String   = "gaiadr3.gaia_source"
     lazy val alternateIdField: FieldId =
       FieldId.unsafeFrom("source_id", VoTableParser.UCD_OBJID)
   }
+  object Gaia3Esa extends Gaia3Esa
 
   trait Gaia3Lite extends Gaia {
     def alternateIdField: FieldId
@@ -636,6 +637,12 @@ object CatalogAdapter {
 
   object Gaia3LiteEsaProxy
       extends Gaia3LiteEsa { // Do not use with a proxy. This is already a proxy.
+    override val adapterName: String = "NoirLab Lite"
+    override lazy val uri: Uri       = uri"https://gaia.noirlab.edu/tap-server/tap/sync"
+  }
+
+  object Gaia3EsaProxy
+      extends Gaia3Esa { // Do not use with a proxy. This is already a proxy.
     override val adapterName: String = "NoirLab"
     override lazy val uri: Uri       = uri"https://gaia.noirlab.edu/tap-server/tap/sync"
   }

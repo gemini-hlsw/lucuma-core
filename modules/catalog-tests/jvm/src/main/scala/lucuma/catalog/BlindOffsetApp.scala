@@ -79,7 +79,7 @@ object BlindOffsetApp extends IOApp.Simple with BlindOffsetSample:
       .map(c =>
         GaiaClient.build[IO](
           loggerClient(c),
-          adapters = NonEmptyChain.of[Gaia](Gaia3Esa)
+          adapters = NonEmptyChain.of[Gaia](Gaia3EsaProxy)
         )
       )
       .use: gaiaClient =>
