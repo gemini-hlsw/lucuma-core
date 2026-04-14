@@ -16,10 +16,11 @@ import lucuma.core.math.Declination
 import lucuma.core.math.Epoch
 import lucuma.core.math.RightAscension
 import lucuma.core.model.SiderealTracking
+import org.http4s.client.middleware.ResponseLogger as CliLogger
 import org.http4s.jdkhttpclient.JdkHttpClient
 import org.typelevel.log4cats.*
 import org.typelevel.log4cats.slf4j.Slf4jFactory
-import org.http4s.client.middleware.{ResponseLogger => CliLogger}
+import org.typelevel.otel4s.trace.Tracer.Implicits.noop
 
 import java.time.Instant
 import java.time.LocalDate

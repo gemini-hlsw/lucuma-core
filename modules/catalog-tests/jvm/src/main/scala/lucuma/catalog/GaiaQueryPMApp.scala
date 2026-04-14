@@ -23,6 +23,7 @@ import lucuma.core.model.SiderealTracking
 import org.http4s.jdkhttpclient.JdkHttpClient
 import org.typelevel.log4cats.LoggerFactory
 import org.typelevel.log4cats.noop.NoOpFactory
+import org.typelevel.otel4s.trace.Tracer.Implicits.noop
 
 trait GaiaQueryPMSample {
   val epoch = Epoch.fromString.getOption("J2022.000").getOrElse(Epoch.J2000)

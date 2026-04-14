@@ -15,6 +15,7 @@ import lucuma.core.model.Target
 import org.http4s.Uri
 import org.http4s.client.Client
 import org.typelevel.log4cats.LoggerFactory
+import org.typelevel.otel4s.trace.Tracer
 
 trait GaiaClient[F[_]]:
   /**
@@ -42,7 +43,7 @@ trait GaiaClient[F[_]]:
   def queryByIdGuideStar(sourceId: Long): F[EitherNec[CatalogProblem, Target.Sidereal]]
 
 object GaiaClient:
-  inline def build[F[_]: Concurrent: LoggerFactory](
+  inline def build[F[_]: Concurrent: Tracer: LoggerFactory](
     httpClient: Client[F],
     modUri:     Uri => Uri = identity, // Override this if you need to add a CORS proxy
     adapters:   NonEmptyChain[CatalogAdapter.Gaia] = DefaultAdapters

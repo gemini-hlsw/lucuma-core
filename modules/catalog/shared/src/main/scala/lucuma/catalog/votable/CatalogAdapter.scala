@@ -594,6 +594,7 @@ object CatalogAdapter {
     lazy val alternateIdField: FieldId =
       FieldId.unsafeFrom("source_id", VoTableParser.UCD_OBJID)
   }
+
   object Gaia3Esa extends Gaia3Esa
 
   trait Gaia3Lite extends Gaia {
@@ -641,8 +642,7 @@ object CatalogAdapter {
     override lazy val uri: Uri       = uri"https://gaia.noirlab.edu/tap-server/tap/sync"
   }
 
-  object Gaia3EsaProxy
-      extends Gaia3Esa { // Do not use with a proxy. This is already a proxy.
+  object Gaia3EsaProxy extends Gaia3Esa { // Do not use with a proxy. This is already a proxy.
     override val adapterName: String = "NoirLab"
     override lazy val uri: Uri       = uri"https://gaia.noirlab.edu/tap-server/tap/sync"
   }
