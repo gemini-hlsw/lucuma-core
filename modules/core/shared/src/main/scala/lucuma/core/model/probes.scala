@@ -5,8 +5,9 @@ package lucuma.core.model
 
 import cats.syntax.all.*
 import lucuma.core.enums.GuideProbe
-import lucuma.core.enums.ObservingModeType
 import lucuma.core.enums.TrackType
+import lucuma.core.enums.ObservingModeType
+import lucuma.core.enums.VisitorObservingModeType
 
 trait probes:
   def guideProbe(observingMode: ObservingModeType, trackType: TrackType): Option[GuideProbe] =
@@ -27,6 +28,8 @@ trait probes:
       case (ObservingModeType.Igrins2LongSlit, _) =>
         GuideProbe.PWFS2.some
       case (ObservingModeType.GhostIfu, _) =>
+        GuideProbe.PWFS2.some
+      case (_: VisitorObservingModeType, _) =>
         GuideProbe.PWFS2.some
 
 object probes extends probes
