@@ -16,15 +16,19 @@ import lucuma.core.math.Declination
 import lucuma.core.math.Epoch
 import lucuma.core.math.RightAscension
 import lucuma.core.model.SiderealTracking
+import org.http4s.client.middleware.ResponseLogger as CliLogger
 import org.http4s.jdkhttpclient.JdkHttpClient
-import org.typelevel.log4cats.LoggerFactory
-import org.typelevel.log4cats.noop.NoOpFactory
+import org.typelevel.log4cats.*
+import org.typelevel.log4cats.slf4j.Slf4jFactory
+import org.typelevel.otel4s.trace.Tracer.Implicits.noop
 
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
 
 trait BlindOffsetSample:
+  given LoggerFactory[IO] = Slf4jFactory.create[IO]
+  given L: Logger[IO]     = LoggerFactory[IO].getLoggerFromName("blind-offset-test")
 
   protected val observationTime: Instant =
     LocalDate.of(2025, 9, 4).atStartOfDay(ZoneOffset.UTC).toInstant()
@@ -48,32 +52,37 @@ trait BlindOffsetSample:
     BlindOffsets.runBlindOffsetAnalysis(gaiaClient, siderealTracking, observationTime)
   }
 
-  def printCandidates(candidates: List[BlindOffsetCandidate]): IO[Unit] = IO {
-    println(s"Found ${candidates.length} blind offset star candidates, sorted by score:")
-    println("rank, sourceId, gmag, distance, score")
-
-    candidates.zipWithIndex.foreach { case (candidate, index) =>
-      val rank     = index + 1
-      val sourceId = candidate.sourceId
-      val gMag     = BlindOffsetCandidate.referenceBrightness(candidate.catalogResult) match {
-        case Some(mag) => f"${mag}%5.2f"
-        case None      => " N/A"
-      }
-      val distance = f"${Angle.decimalArcseconds.get(candidate.distance)}%3.1f"
-      val score    = f"${candidate.score}%3.3f"
-      println(f"$rank%4d, $sourceId%18s, $gMag%5s, ${distance} arcsec, $score%6s")
-    }
-
-  }
+  def printCandidates(candidates: List[BlindOffsetCandidate]): IO[Unit] =
+    L.info(s"Found ${candidates.length} blind offset star candidates, sorted by score:") *>
+      L.info(f"rank, ${"sourceId"}%28s,  gmag, ${"distance"}%4s, score") *>
+      candidates.zipWithIndex.traverse_ : (candidate, index) =>
+        val rank     = index + 1
+        val sourceId = candidate.sourceId
+        val gMag     = BlindOffsetCandidate.referenceBrightness(candidate.catalogResult) match {
+          case Some(mag) => f"${mag}%5.2f"
+          case None      => " N/A"
+        }
+        val distance = f"${Angle.decimalArcseconds.get(candidate.distance)}%3.1f"
+        val score    = f"${candidate.score}%3.3f"
+        val msg      = f"$rank%4d, $sourceId%18s, $gMag%5s, ${distance} arcsec, $score%6s"
+        L.info(msg)
 
 object BlindOffsetApp extends IOApp.Simple with BlindOffsetSample:
 
-  given LoggerFactory[IO] = NoOpFactory[IO]
+  val loggerClient = CliLogger[IO](
+    logHeaders = true,
+    logBody = false
+  )
 
   def run =
     JdkHttpClient
       .simple[IO]
-      .map(GaiaClient.build[IO](_, adapters = NonEmptyChain.of[Gaia](Gaia3LiteGavo)))
+      .map(c =>
+        GaiaClient.build[IO](
+          loggerClient(c),
+          adapters = NonEmptyChain.of[Gaia](Gaia3EsaProxy)
+        )
+      )
       .use: gaiaClient =>
         for {
           _          <- IO.println(s"Querying blind offset star candidates on: $coords")

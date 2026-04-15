@@ -21,11 +21,12 @@ import org.http4s.client.Client
 import org.typelevel.log4cats.Logger
 import org.typelevel.log4cats.LoggerFactory
 import org.typelevel.log4cats.syntax.*
+import org.typelevel.otel4s.Attribute
+import org.typelevel.otel4s.trace.Tracer
 
 import java.net.URLDecoder
 
-// TODO Add Trace, we need natchez
-class GaiaClientImpl[F[_]: {Concurrent, LoggerFactory as LF}](
+class GaiaClientImpl[F[_]: {Concurrent, Tracer as T, LoggerFactory as LF}](
   httpClient: Client[F],
   modUri:     Uri => Uri = identity, // Override this if you need to add a CORS proxy
   adapters:   NonEmptyChain[CatalogAdapter.Gaia] = GaiaClient.DefaultAdapters
@@ -80,17 +81,19 @@ class GaiaClientImpl[F[_]: {Concurrent, LoggerFactory as LF}](
     val headers             = Headers(adapter.requestHeaders.map((x, y) => Header.Raw(x, y)).toList)
     val request: Request[F] = Request[F](Method.GET, modUri(queryUri), headers = headers)
 
-    info"Querying catalog: ${adapter.adapterName}, uri: ${URLDecoder.decode(queryUri.renderString, "UTF-8")}" *>
-      info"curl ${headers.headers.map(h => s"-H '${h.name}: ${h.value}'").mkString(" ")} '${queryUri.renderString}'" *>
-      httpClient
-        .stream(request)
-        .flatMap:
-          _.body
-            .through(fs2.text.utf8.decode)
-            .through(parser)
-        .compile
-        .toList
-        .tupleLeft(adapter)
+    T.span("query gaia", Attribute("adapter", adapter.adapterName))
+      .surround:
+        info"Querying catalog: ${adapter.adapterName}, uri: ${URLDecoder.decode(queryUri.renderString, "UTF-8")}" *>
+          info"curl ${headers.headers.map(h => s"-H '${h.name}: ${h.value}'").mkString(" ")} '${queryUri.renderString}'" *>
+          httpClient
+            .stream(request)
+            .flatMap:
+              _.body
+                .through(fs2.text.utf8.decode)
+                .through(parser)
+            .compile
+            .toList
+            .tupleLeft(adapter)
 
   /**
    * Takes a search query and builds a uri to query gaia.

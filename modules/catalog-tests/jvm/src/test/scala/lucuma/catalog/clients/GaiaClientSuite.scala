@@ -29,6 +29,7 @@ import lucuma.core.syntax.all.*
 import munit.CatsEffectSuite
 import org.typelevel.log4cats.LoggerFactory
 import org.typelevel.log4cats.noop.NoOpFactory
+import org.typelevel.otel4s.trace.Tracer.Implicits.noop
 
 class GaiaClientSuite extends CatsEffectSuite with VoTableSamples:
 

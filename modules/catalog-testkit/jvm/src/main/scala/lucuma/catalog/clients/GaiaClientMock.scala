@@ -13,6 +13,7 @@ import lucuma.catalog.votable.CatalogAdapter
 import org.http4s.*
 import org.http4s.client.Client
 import org.typelevel.log4cats.LoggerFactory
+import org.typelevel.otel4s.trace.Tracer
 
 import scala.xml.Node
 import scala.xml.Utility
@@ -58,7 +59,7 @@ object GaiaClientMock:
   /**
    * ) Create a mock GaiaClient that returns VOTable XML responses.
    */
-  def mockGaiaClient[F[_]: Concurrent: LoggerFactory](
+  def mockGaiaClient[F[_]: Concurrent: Tracer: LoggerFactory](
     voTableXml: Stream[F, String],
     adapters:   Option[NonEmptyChain[CatalogAdapter.Gaia]] = None
   ): GaiaClient[F] = {
@@ -86,7 +87,7 @@ object GaiaClientMock:
   /**
    * Create a mock GaiaClient that reads XML.
    */
-  def fromXML[F[_]: Concurrent: LoggerFactory](
+  def fromXML[F[_]: Concurrent: Tracer: LoggerFactory](
     xml:      Node,
     adapters: Option[NonEmptyChain[CatalogAdapter.Gaia]]
   ): GaiaClient[F] =
@@ -95,7 +96,7 @@ object GaiaClientMock:
   /**
    * Create a mock GaiaClient that reads a String.
    */
-  def fromString[F[_]: Concurrent: LoggerFactory](
+  def fromString[F[_]: Concurrent: Tracer: LoggerFactory](
     content:  String,
     adapters: Option[NonEmptyChain[CatalogAdapter.Gaia]]
   ): GaiaClient[F] =
@@ -104,7 +105,7 @@ object GaiaClientMock:
   /**
    * Create a mock GaiaClient that reads VOTable XML from a resource file.
    */
-  def fromResource[F[_]: Async: LoggerFactory](
+  def fromResource[F[_]: Async: Tracer: LoggerFactory](
     resource: String,
     adapters: Option[NonEmptyChain[CatalogAdapter.Gaia]]
   ): GaiaClient[F] =

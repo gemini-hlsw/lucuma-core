@@ -21,6 +21,7 @@ import lucuma.core.math.Offset
 import org.http4s.jdkhttpclient.JdkHttpClient
 import org.typelevel.log4cats.LoggerFactory
 import org.typelevel.log4cats.noop.NoOpFactory
+import org.typelevel.otel4s.trace.Tracer.Implicits.noop
 
 object AgsSelectionSampleStreamApp extends IOApp.Simple with AgsSelectionSample:
 

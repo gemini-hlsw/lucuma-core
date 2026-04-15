@@ -18,6 +18,7 @@ import lucuma.core.math.RightAscension
 import org.http4s.jdkhttpclient.JdkHttpClient
 import org.typelevel.log4cats.LoggerFactory
 import org.typelevel.log4cats.noop.NoOpFactory
+import org.typelevel.otel4s.trace.Tracer.Implicits.noop
 
 object DataLabQueryApp extends IOApp.Simple:
 
