@@ -26,6 +26,8 @@ case class ExecutionConfig[S, D](
 object ExecutionConfig:
   /** Shorthand type for Flamingos2. */
   type Flamingos2 = ExecutionConfig[flamingos2.Flamingos2StaticConfig, flamingos2.Flamingos2DynamicConfig]
+  /** Shorthand type for GHOST. */
+  type Ghost      = ExecutionConfig[ghost.GhostStaticConfig, ghost.GhostDynamicConfig]
   /** Shorthand type for GmosNorth. */
   type GmosNorth  = ExecutionConfig[gmos.StaticConfig.GmosNorth, gmos.DynamicConfig.GmosNorth]
   /** Shorthand type for GmosSouth. */
