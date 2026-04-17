@@ -6,7 +6,6 @@ package lucuma.core.model.sequence.ghost
 import cats.Eq
 import eu.timepit.refined.cats.given
 import eu.timepit.refined.types.numeric.PosInt
-import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.core.enums.GhostBinning
 import lucuma.core.enums.GhostReadMode
 import lucuma.core.util.NewType
@@ -18,13 +17,6 @@ final case class GhostDetector(
   binning:        GhostBinning,
   readMode:       GhostReadMode
 ):
-
-  /**
-   * Textual representation of exposure time and count.
-   */
-  def description: NonEmptyString =
-    NonEmptyString.unsafeFrom:
-      s"${exposureTime.toSeconds.bigDecimal.stripTrailingZeros.toPlainString} sec x ${exposureCount.value}"
 
   /**
    * Single `exposureTime` multiplied by the `exposureCount`.

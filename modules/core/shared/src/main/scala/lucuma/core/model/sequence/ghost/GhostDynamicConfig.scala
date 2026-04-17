@@ -5,7 +5,6 @@ package lucuma.core.model.sequence.ghost
 
 import cats.Eq
 import cats.syntax.order.*
-import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.core.enums.GhostIfu1FiberAgitator
 import lucuma.core.enums.GhostIfu2FiberAgitator
 import lucuma.core.util.TimeSpan
@@ -16,12 +15,6 @@ final case class GhostDynamicConfig(
   ifu1FiberAgitator: GhostIfu1FiberAgitator = GhostIfu1FiberAgitator.Disabled,
   ifu2FiberAgitator: GhostIfu2FiberAgitator = GhostIfu2FiberAgitator.Disabled
 ):
-  /**
-   * Textual representation of the red and blue channel exposure time and count
-   */
-  def description: NonEmptyString =
-    NonEmptyString.unsafeFrom:
-      s"GHOST red(${red.value.description}) blue(${blue.value.description})"
 
   /**
    * Total exposure time for the configuration as a whole (max of red and blue
