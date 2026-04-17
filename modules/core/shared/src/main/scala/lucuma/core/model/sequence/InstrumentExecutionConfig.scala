@@ -8,6 +8,8 @@ import cats.derived.*
 import cats.syntax.eq.*
 import lucuma.core.enums.Instrument
 import lucuma.core.model.sequence.flamingos2 as f2
+import lucuma.core.model.sequence.ghost.GhostDynamicConfig
+import lucuma.core.model.sequence.ghost.GhostStaticConfig
 import lucuma.core.model.sequence.igrins2 as ig2
 import monocle.Focus
 import monocle.Lens
@@ -42,6 +44,19 @@ object InstrumentExecutionConfig:
 
   val flamingos2: Prism[InstrumentExecutionConfig, Flamingos2] =
     GenPrism[InstrumentExecutionConfig, Flamingos2]
+
+  case class Ghost(
+    executionConfig: ExecutionConfig[GhostStaticConfig, GhostDynamicConfig]
+  ) extends InstrumentExecutionConfig derives Eq:
+    override def instrument: Instrument = Instrument.Ghost
+    override def isComplete: Boolean    = executionConfig.isComplete
+
+  object Ghost:
+    val executionConfig: Lens[Ghost, ExecutionConfig[GhostStaticConfig, GhostDynamicConfig]] =
+      Focus[Ghost](_.executionConfig)
+
+  val ghost: Prism[InstrumentExecutionConfig, Ghost] =
+    GenPrism[InstrumentExecutionConfig, Ghost]
 
   case class GmosNorth(
     executionConfig: ExecutionConfig[gmos.StaticConfig.GmosNorth, gmos.DynamicConfig.GmosNorth]
@@ -91,6 +106,7 @@ object InstrumentExecutionConfig:
   given Eq[InstrumentExecutionConfig] =
     Eq.instance:
       case (a @ Flamingos2(_), b @ Flamingos2(_)) => a === b
+      case (a @ Ghost(_),      b @ Ghost(_))      => a === b
       case (a @ GmosNorth(_),  b @ GmosNorth(_))  => a === b
       case (a @ GmosSouth(_),  b @ GmosSouth(_))  => a === b
       case (a @ Igrins2(_),    b @ Igrins2(_))    => a === b
