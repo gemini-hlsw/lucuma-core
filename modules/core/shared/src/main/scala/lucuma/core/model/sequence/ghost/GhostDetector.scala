@@ -16,7 +16,19 @@ final case class GhostDetector(
   exposureCount:  PosInt,
   binning:        GhostBinning,
   readMode:       GhostReadMode
-)
+):
+
+  /**
+   * Single `exposureTime` multiplied by the `exposureCount`.
+   */
+  def totalExposureTime: TimeSpan =
+    exposureTime *| exposureCount.value
+
+  def asRed: GhostDetector.Red =
+    GhostDetector.Red(this)
+
+  def asBlue: GhostDetector.Blue =
+    GhostDetector.Blue(this)
 
 object GhostDetector:
   given Eq[GhostDetector] =

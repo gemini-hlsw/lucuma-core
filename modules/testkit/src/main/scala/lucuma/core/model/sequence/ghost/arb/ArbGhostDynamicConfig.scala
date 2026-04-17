@@ -35,8 +35,8 @@ trait ArbGhostDynamicConfig:
       GhostIfu2FiberAgitator
     )].contramap: a =>
       (
-        a.redCamera,
-        a.blueCamera,
+        a.red,
+        a.blue,
         a.ifu1FiberAgitator,
         a.ifu2FiberAgitator
       )
