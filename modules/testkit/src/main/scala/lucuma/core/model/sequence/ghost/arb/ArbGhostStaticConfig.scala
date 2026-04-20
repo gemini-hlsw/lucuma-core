@@ -6,7 +6,9 @@ package ghost
 package arb
 
 import lucuma.core.enums.GhostResolutionMode
+import lucuma.core.util.TimeSpan
 import lucuma.core.util.arb.ArbEnumerated
+import lucuma.core.util.arb.ArbTimeSpan
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Cogen
@@ -14,12 +16,26 @@ import org.scalacheck.Cogen
 trait ArbGhostStaticConfig:
 
   import ArbEnumerated.given
+  import ArbTimeSpan.given
 
   given Arbitrary[GhostStaticConfig] =
     Arbitrary:
-      arbitrary[GhostResolutionMode].map(GhostStaticConfig.apply)
+      for
+        r <- arbitrary[GhostResolutionMode]
+        g <- arbitrary[Option[TimeSpan]]
+        s <- arbitrary[Option[TimeSpan]]
+      yield GhostStaticConfig(r, g, s)
 
   given Cogen[GhostStaticConfig] =
-    Cogen[GhostResolutionMode].contramap(_.resolutionMode)
+    Cogen[(
+      GhostResolutionMode,
+      Option[TimeSpan],
+      Option[TimeSpan]
+    )].contramap: a =>
+      (
+        a.resolutionMode,
+        a.guideCameraExposureTime,
+        a.slitViewingCameraExposureTime
+      )
 
 object ArbGhostStaticConfig extends ArbGhostStaticConfig
