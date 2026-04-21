@@ -4,6 +4,9 @@
 package lucuma.core.model.sequence
 package arb
 
+import eu.timepit.refined.scalacheck.numeric.*
+import eu.timepit.refined.types.numeric.NonNegInt
+import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.enums.GcalLampType
 import lucuma.core.enums.ObserveClass
 import lucuma.core.enums.StepType
@@ -27,7 +30,9 @@ trait ArbAtomDigest:
         t <- arbitrary[CategorizedTime]
         s <- arbitrary[Set[StepType]]
         l <- arbitrary[Set[GcalLampType]]
-      yield AtomDigest(i, c, t, s, l)
+        n <- arbitrary[NonNegInt]
+        p <- arbitrary[PosInt]
+      yield AtomDigest(i, c, t, s, l, n, p)
 
   given Cogen[AtomDigest] =
     Cogen[(
@@ -35,14 +40,18 @@ trait ArbAtomDigest:
       ObserveClass,
       CategorizedTime,
       List[StepType],
-      List[GcalLampType]
+      List[GcalLampType],
+      Int,
+      Int
     )].contramap: a =>
       (
         a.id,
         a.observeClass,
         a.timeEstimate,
         a.stepTypes.toList,
-        a.lampTypes.toList
+        a.lampTypes.toList,
+        a.stepIndex.value,
+        a.stepCount.value
       )
 
 object ArbAtomDigest extends ArbAtomDigest

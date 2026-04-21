@@ -4,6 +4,10 @@
 package lucuma.core.model.sequence
 
 import cats.Eq
+import cats.derived.*
+import eu.timepit.refined.cats.*
+import eu.timepit.refined.types.numeric.NonNegInt
+import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.enums.GcalLampType
 import lucuma.core.enums.ObserveClass
 import lucuma.core.enums.StepType
@@ -18,12 +22,14 @@ case class AtomDigest(
   observeClass: ObserveClass,
   timeEstimate: CategorizedTime,
   stepTypes:    Set[StepType],
-  lampTypes:    Set[GcalLampType]
-)
+  lampTypes:    Set[GcalLampType],
+  stepIndex:    NonNegInt,
+  stepCount:    PosInt
+) derives Eq
 
 object AtomDigest:
 
-  def fromAtom[D](atom: Atom[D]): AtomDigest =
+  def fromAtom[D](stepIndex: NonNegInt)(atom: Atom[D]): AtomDigest =
     val stepTypes = atom.steps.foldLeft(Set.empty[StepType]): (types, step) =>
       types + step.stepConfig.stepType
 
@@ -35,7 +41,9 @@ object AtomDigest:
       atom.observeClass,
       atom.timeEstimate,
       stepTypes,
-      lampTypes
+      lampTypes,
+      stepIndex,
+      PosInt.unsafeFrom(atom.steps.length) // atom.steps is a NonEmptyList
     )
 
   /** @group Optics */
@@ -58,12 +66,10 @@ object AtomDigest:
   val lampTypes: Lens[AtomDigest, Set[GcalLampType]] =
     Focus[AtomDigest](_.lampTypes)
 
-  given Eq[AtomDigest] =
-    Eq.by: a =>
-      (
-        a.id,
-        a.observeClass,
-        a.timeEstimate,
-        a.stepTypes,
-        a.lampTypes
-      )
+  /** @group Optics */
+  val stepIndex: Lens[AtomDigest, NonNegInt] =
+    Focus[AtomDigest](_.stepIndex)
+
+  /** @group Optics */
+  val stepCount: Lens[AtomDigest, PosInt] =
+    Focus[AtomDigest](_.stepCount)
