@@ -12,6 +12,5 @@ import lucuma.core.util.TimeSpan
 
 final case class GhostStaticConfig(
   resolutionMode:                GhostResolutionMode,
-  guideCameraExposureTime:       Option[TimeSpan],
   slitViewingCameraExposureTime: Option[TimeSpan]
 ) derives Eq

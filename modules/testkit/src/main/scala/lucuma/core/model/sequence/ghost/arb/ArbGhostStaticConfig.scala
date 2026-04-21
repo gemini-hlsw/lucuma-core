@@ -22,19 +22,16 @@ trait ArbGhostStaticConfig:
     Arbitrary:
       for
         r <- arbitrary[GhostResolutionMode]
-        g <- arbitrary[Option[TimeSpan]]
         s <- arbitrary[Option[TimeSpan]]
-      yield GhostStaticConfig(r, g, s)
+      yield GhostStaticConfig(r, s)
 
   given Cogen[GhostStaticConfig] =
     Cogen[(
       GhostResolutionMode,
-      Option[TimeSpan],
       Option[TimeSpan]
     )].contramap: a =>
       (
         a.resolutionMode,
-        a.guideCameraExposureTime,
         a.slitViewingCameraExposureTime
       )
 
