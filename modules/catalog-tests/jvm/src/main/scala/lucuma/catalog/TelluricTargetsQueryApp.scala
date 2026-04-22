@@ -17,15 +17,16 @@ import lucuma.core.model.TelluricType
 import lucuma.core.util.TimeSpan
 import org.http4s.jdkhttpclient.JdkHttpClient
 import org.http4s.syntax.literals.*
-import org.typelevel.log4cats.Logger
-import org.typelevel.log4cats.slf4j.Slf4jLogger
+import org.typelevel.log4cats.LoggerFactory
+import org.typelevel.log4cats.slf4j.Slf4jFactory
+import org.typelevel.otel4s.trace.Tracer.Implicits.noop
 
 object TelluricTargetsQueryApp extends IOApp.Simple:
 
   val telluricUri = uri"https://telluric-targets.gpp.gemini.edu/"
 
   def run =
-    given Logger[IO] = Slf4jLogger.getLogger[IO]
+    given LoggerFactory[IO] = Slf4jFactory.create[IO]
 
     val coordinates =
       Coordinates(
