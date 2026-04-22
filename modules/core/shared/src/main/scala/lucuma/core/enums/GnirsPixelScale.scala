@@ -4,44 +4,19 @@
 package lucuma
 package core
 package enums
-import cats.syntax.eq.*
+
+import lucuma.core.util.Display
 import lucuma.core.util.Enumerated
 
 /**
  * Enumerated type for GNIRS Pixel Scale.
  * @group Enumerations (Generated)
  */
-sealed abstract class GnirsPixelScale(
+enum GnirsPixelScale(
   val tag: String,
   val shortName: String,
   val longName: String,
   val value: BigDecimal
-) extends Product with Serializable
-
-object GnirsPixelScale {
-
-  /** @group Constructors */ case object PixelScale_0_05 extends GnirsPixelScale("PixelScale_0_05", "0.05 as/pix", "Pixel scale for short cameras", 0.05)
-  /** @group Constructors */ case object PixelScale_0_15 extends GnirsPixelScale("PixelScale_0_15", "0.15 as/pix", "Pixel scale for long cameras", 0.15)
-
-  /** All members of GnirsPixelScale, in canonical order. */
-  val all: List[GnirsPixelScale] =
-    List(PixelScale_0_05, PixelScale_0_15)
-
-  /** Select the member of GnirsPixelScale with the given tag, if any. */
-  def fromTag(s: String): Option[GnirsPixelScale] =
-    all.find(_.tag === s)
-
-  /** Select the member of GnirsPixelScale with the given tag, throwing if absent. */
-  def unsafeFromTag(s: String): GnirsPixelScale =
-    fromTag(s).getOrElse(throw new NoSuchElementException(s"GnirsPixelScale: Invalid tag: '$s'"))
-
-  /** @group Typeclass Instances */
-  implicit val GnirsPixelScaleEnumerated: Enumerated[GnirsPixelScale] =
-    new Enumerated[GnirsPixelScale] {
-      def all = GnirsPixelScale.all
-      def tag(a: GnirsPixelScale) = a.tag
-      override def unsafeFromTag(s: String): GnirsPixelScale =
-        GnirsPixelScale.unsafeFromTag(s)
-    }
-
-}
+) derives Enumerated, Display:
+    case PixelScale_0_05 extends GnirsPixelScale("PixelScale_0_05", "0.05 as/pix", "Pixel scale for short cameras", BigDecimal("0.05"))
+    case PixelScale_0_15 extends GnirsPixelScale("PixelScale_0_15", "0.15 as/pix", "Pixel scale for long cameras", BigDecimal("0.15"))

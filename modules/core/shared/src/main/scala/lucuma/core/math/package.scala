@@ -5,8 +5,6 @@ package lucuma
 package core
 package math
 
-import cats.Eq
-import cats.Hash
 import eu.timepit.refined.numeric.*
 import lucuma.core.util.NewRefined
 
@@ -30,9 +28,7 @@ type BrightnessValue = BrightnessValue.Type
 
 // The line width must be positive. For upper limit, we could probably safely use 1e6 km/s.
 type LineWidthValueRefinement = Interval.OpenClosed[0, 1_000_000]
-object LineWidthValue extends NewRefined[BigDecimal, LineWidthValueRefinement]:
-  given Hash[LineWidthValue] = Hash.by(_.value.value)
-  given Eq[LineWidthValue] = Eq.by(_.value.value)
+object LineWidthValue extends NewRefined[BigDecimal, LineWidthValueRefinement]
 type LineWidthValue = LineWidthValue.Type
 
 // Should never be less than zero or larger than 1.
@@ -51,22 +47,22 @@ object Erf:
   import scala.math.{abs, exp}
 
   // constants
-  private val a1: Double =  0.254829592
+  private val a1: Double = 0.254829592
   private val a2: Double = -0.284496736
-  private val a3: Double =  1.421413741
+  private val a3: Double = 1.421413741
   private val a4: Double = -1.453152027
-  private val a5: Double =  1.061405429
-  private val p: Double  =  0.3275911
+  private val a5: Double = 1.061405429
+  private val p: Double  = 0.3275911
 
   // Calculates the error function using Horner’s method.
   def erf(x: Double): Double =
     // Save the sign of x
     val sign = if (x < 0) -1 else 1
-    val absx =  abs(x)
+    val absx = abs(x)
 
     // A&S formula 7.1.26, rational approximation of error function
-    val t = 1.0/(1.0 + p*absx);
-    val y = 1.0 - (((((a5*t + a4)*t) + a3)*t + a2)*t + a1)*t*exp(-x*x);
-    sign*y
+    val t = 1.0 / (1.0 + p * absx);
+    val y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * exp(-x * x);
+    sign * y
 
 export Erf.erf

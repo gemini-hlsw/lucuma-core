@@ -7,6 +7,8 @@ import cats.Contravariant
 import cats.syntax.contravariant.*
 import eu.timepit.refined.api.*
 
+import scala.quoted.*
+
 /**
  * Typeclass for things that can be shown in a user interface.
  * @group Typeclasses
@@ -16,7 +18,7 @@ trait Display[A] {
   def longName(a: A): String = shortName(a)
 }
 
-object Display {
+object Display:
   def apply[A](using ev: Display[A]): ev.type = ev
 
   /**
@@ -56,4 +58,18 @@ object Display {
   given [T, P](using ev: Display[T]): Display[T Refined P] = ev.contramap(_.value)
 
   given Display[BigDecimal] = byShortName(_.toString.toLowerCase) // Use lower case "e" for exponent
-}
+
+  private def shortNameImpl[E](x: Expr[E])(using Quotes): Expr[String] =
+    import quotes.reflect.*
+    Select.unique(x.asTerm, "shortName").asExprOf[String]
+
+  private def longNameImpl[E](x: Expr[E])(using Quotes): Expr[String] =
+    import quotes.reflect.*
+    Select.unique(x.asTerm, "longName").asExprOf[String]
+
+  private def displayImpl[E: Type](using Quotes): Expr[Display[E]] =
+    '{
+      Display.by[E](x => ${ shortNameImpl[E]('x) }, x => ${ longNameImpl[E]('x) })
+    }
+
+  inline def derived[E]: Display[E] = ${ displayImpl[E] }
