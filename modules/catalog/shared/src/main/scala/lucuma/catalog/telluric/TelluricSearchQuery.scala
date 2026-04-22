@@ -18,7 +18,7 @@ object TelluricSearchQuery extends GraphQLOperation[Unit]:
     """
       query TelluricSearch($ra_deg: Float!, $dec_deg: Float!, $duration_hrs: Float!, $brightest: Float!, $sp_type: String!) {
         search(ra_deg: $ra_deg, dec_deg: $dec_deg, duration_hrs: $duration_hrs, brightest: $brightest, sp_type: $sp_type) {
-          HIP
+          ID
           spType
           RA
           Dec
@@ -26,6 +26,7 @@ object TelluricSearchQuery extends GraphQLOperation[Unit]:
           Hmag
           Score
           Order
+          SED
         }
       }
     """

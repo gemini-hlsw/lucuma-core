@@ -12,6 +12,7 @@ import io.circe.Json
 import io.circe.syntax.*
 import lucuma.catalog.telluric.codecs.given
 import lucuma.core.enums.CatalogName
+import lucuma.core.enums.StellarLibrarySpectrum
 import lucuma.core.enums.TelluricCalibrationOrder
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Declination
@@ -23,19 +24,22 @@ import lucuma.core.model.SourceProfile
 import lucuma.core.model.SpectralDefinition
 import lucuma.core.model.Target
 import lucuma.core.model.TelluricType
+import lucuma.core.model.UnnormalizedSED
+import lucuma.core.util.Enumerated
 
 import scala.collection.immutable.SortedMap
 
 case class TelluricStar(
-  hip:         Int,
+  id:          String,
   spType:      TelluricType,
   coordinates: Coordinates,
   distance:    Double,
   hmag:        Double,
   score:       Double,
-  order:       TelluricCalibrationOrder
+  order:       TelluricCalibrationOrder,
+  sed:         Option[UnnormalizedSED]
 ):
-  val simbadName: NonEmptyString = NonEmptyString.unsafeFrom(s"HIP $hip")
+  val simbadName: NonEmptyString = NonEmptyString.unsafeFrom(id)
 
   def asSiderealTarget: Target.Sidereal =
     Target.Sidereal(
@@ -48,15 +52,27 @@ case class TelluricStar(
         parallax = None
       ),
       sourceProfile = SourceProfile.Point(
-        SpectralDefinition.BandNormalized(None, SortedMap.empty)
+        SpectralDefinition.BandNormalized(sed, SortedMap.empty)
       ),
       catalogInfo = CatalogInfo(CatalogName.Telluric, simbadName, none).some
     )
 
 object TelluricStar:
+  // Can't use the standard encoders as the python server uses a different format
+  private def decodeSed(s: String): Option[UnnormalizedSED] =
+    Enumerated[StellarLibrarySpectrum]
+      .fromTag(s.stripSuffix(".nm"))
+      .map(UnnormalizedSED.StellarLibrary.apply)
+
+  private def encodeSed(sed: UnnormalizedSED): Option[Json] =
+    sed match
+      case UnnormalizedSED.StellarLibrary(s) =>
+        Json.fromString(Enumerated[StellarLibrarySpectrum].tag(s)).some
+      case _                                 => none
+
   given Decoder[TelluricStar] = c =>
     for {
-      hip      <- c.downField("HIP").as[Int]
+      id       <- c.downField("ID").as[String]
       spType   <- c.downField("spType").as[TelluricType]
       raDeg    <- c.downField("RA").as[Double]
       decDeg   <- c.downField("Dec").as[Double]
@@ -64,6 +80,7 @@ object TelluricStar:
       hmag     <- c.downField("Hmag").as[Double]
       score    <- c.downField("Score").as[Double]
       order    <- c.downField("Order").as[TelluricCalibrationOrder]
+      sed       = c.downField("SED").as[String].toOption.flatMap(decodeSed)
       dec      <- Declination
                     .fromDoubleDegrees(decDeg)
                     .toRight(
@@ -71,16 +88,17 @@ object TelluricStar:
                     )
       ra        = RightAscension.fromDoubleDegrees(raDeg)
       coords    = Coordinates(ra, dec)
-    } yield TelluricStar(hip, spType, coords, distance, hmag, score, order)
+    } yield TelluricStar(id, spType, coords, distance, hmag, score, order, sed)
 
   given Encoder[TelluricStar] = star =>
     Json.obj(
-      "hip"      -> Json.fromInt(star.hip),
+      "id"       -> Json.fromString(star.id),
       "spType"   -> star.spType.asJson,
       "ra"       -> Json.fromDoubleOrNull(star.coordinates.ra.toAngle.toDoubleDegrees),
       "dec"      -> Json.fromDoubleOrNull(star.coordinates.dec.toAngle.toSignedDoubleDegrees),
       "distance" -> Json.fromDoubleOrNull(star.distance),
       "hmag"     -> Json.fromDoubleOrNull(star.hmag),
       "score"    -> Json.fromDoubleOrNull(star.score),
-      "order"    -> star.order.asJson
+      "order"    -> star.order.asJson,
+      "sed"      -> star.sed.flatMap(encodeSed).asJson
     )
