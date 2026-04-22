@@ -38,6 +38,7 @@ object DetectorEstimate {
 
   given Order[DetectorEstimate] =
     Order.by { e => (
+      e.estimate,
       e.dataset,
       e.count.value,
       e.name,
