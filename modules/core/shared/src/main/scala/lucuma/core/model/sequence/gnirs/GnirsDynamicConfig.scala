@@ -5,6 +5,8 @@ package lucuma.core.model.sequence.gnirs
 
 import cats.Eq
 import cats.derived.*
+import eu.timepit.refined.cats.given
+import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.enums.GnirsCamera
 import lucuma.core.enums.GnirsDecker
 import lucuma.core.enums.GnirsFilter
@@ -17,6 +19,7 @@ import monocle.Lens
 
 final case class GnirsDynamicConfig(
   exposure:          TimeSpan,
+  coadds:            PosInt,
   filter:            GnirsFilter,
   decker:            GnirsDecker,
   fpu:               Either[GnirsFpuSlit, GnirsFpuOther],
@@ -29,6 +32,9 @@ final case class GnirsDynamicConfig(
 object GnirsDynamicConfig:
   val exposure: Lens[GnirsDynamicConfig, TimeSpan] =
     Focus[GnirsDynamicConfig](_.exposure)
+
+  val coadds: Lens[GnirsDynamicConfig, PosInt] =
+    Focus[GnirsDynamicConfig](_.coadds)
 
   val filter: Lens[GnirsDynamicConfig, GnirsFilter] =
     Focus[GnirsDynamicConfig](_.filter)
