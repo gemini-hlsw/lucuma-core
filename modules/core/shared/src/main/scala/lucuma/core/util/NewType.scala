@@ -4,6 +4,7 @@
 package lucuma.core.util
 
 import cats.Eq
+import cats.Hash
 import cats.Monoid
 import cats.Order
 import coulomb.Quantity
@@ -19,11 +20,11 @@ import monocle.Prism
 import scala.util.NotGiven
 
 /**
-  * Typeclass to convert between a new type and the wrapped value.
-  * Mostly used for deriving typeclasses not contemplated by `NewType`. For example: `Arbitrary` and `Cogen`.
-  */
+ * Typeclass to convert between a new type and the wrapped value. Mostly used for deriving
+ * typeclasses not contemplated by `NewType`. For example: `Arbitrary` and `Cogen`.
+ */
 trait NewTypeGen[A, W]:
-  def wrap(wrapped: W): A
+  def wrap(wrapped:   W): A
   def unwrap(newType: A): W
 
 /**
@@ -33,7 +34,7 @@ trait NewTypeGen[A, W]:
  * type Name = Name.Type
  * ```
  */
-trait NewType[Wrapped]{
+trait NewType[Wrapped] {
   opaque type Type = Wrapped
 
   inline def apply(w: Wrapped): Type = w
@@ -41,23 +42,29 @@ trait NewType[Wrapped]{
   val Value: Iso[Type, Wrapped] = Iso[Type, Wrapped](_.value)(apply)
 
   given NewTypeGen[Type, Wrapped] = new NewTypeGen[Type, Wrapped]:
-    def wrap(w: Wrapped): Type = w
+    def wrap(w:   Wrapped): Type = w
     def unwrap(t: Type): Wrapped = t
-
 
   extension (t: Type)
     inline def value: Wrapped                           = t
     inline def modifyValue(f: Wrapped => Wrapped): Type = apply(f(value))
 
-  given (using CanEqual[Wrapped, Wrapped]): CanEqual[Type, Type]               = CanEqual.derived
+  given (using CanEqual[Wrapped, Wrapped]): CanEqual[Type, Type]                   = CanEqual.derived
   // Only provide an Eq instance if it doesn't also provide Order
-  given (using eq:   Eq[Wrapped], noOrder: NotGiven[Order[Wrapped]]): Eq[Type] = eq
-  given (using enc:  Encoder[Wrapped]): Encoder[Type]                          = enc
-  given (using dec:  Decoder[Wrapped]): Decoder[Type]                          = dec
-  given (using disp: Display[Wrapped]): Display[Type]                          = disp
-  given (using m:    Monoid[Wrapped]): Monoid[Type]                            = m
-  given (using ord:  Order[Wrapped]): Order[Type]                              = ord
-  given (using ord:  Ordering[Wrapped]): Ordering[Type]                        = ord
+  given (using
+    eq:      Eq[Wrapped],
+    noOrder: NotGiven[Order[Wrapped]],
+    noHash:  NotGiven[Hash[Wrapped]]
+  ): Eq[Type] = eq
+  given (using enc:  Encoder[Wrapped]): Encoder[Type]                              = enc
+  given (using dec:  Decoder[Wrapped]): Decoder[Type]                              = dec
+  given (using disp: Display[Wrapped]): Display[Type]                              = disp
+  given (using m:    Monoid[Wrapped]): Monoid[Type]                                = m
+  given (using ord:  Order[Wrapped], noHash: NotGiven[Hash[Wrapped]]): Order[Type] = ord
+  given (using ord:  Ordering[Wrapped]): Ordering[Type]                            = ord
+  given (using hash: Hash[Wrapped], noOrder: NotGiven[Order[Wrapped]]): Hash[Type] = hash
+  given both(using ord: Order[Wrapped], hash: Hash[Wrapped]): OrderHash[Type]      =
+    OrderHash(ord, hash)
 }
 
 /**
@@ -75,24 +82,25 @@ trait NewRefined[T, P](using rt: RefinedTypeAux[T, P]) extends NewType[T Refined
   def unsafeFrom(x: T): Type                 = apply(rt.unsafeRefine(x))
 
 /**
-  * Usage:
-  * ```
-  * object Score extends NewRefinedQuantity[Int, Interval.Closed[0, 5], Stars]
-  * type Score = Score.Type
-  * ```
-  */
-trait NewRefinedQuantity[T, P, U](using rt: RefinedTypeAux[T, P]) extends NewType[Quantity[T Refined P, U]]:
+ * Usage:
+ * ```
+ * object Score extends NewRefinedQuantity[Int, Interval.Closed[0, 5], Stars]
+ * type Score = Score.Type
+ * ```
+ */
+trait NewRefinedQuantity[T, P, U](using rt: RefinedTypeAux[T, P])
+    extends NewType[Quantity[T Refined P, U]]:
   type BaseType  = T
   type Predicate = P
   type Units     = U
-  val FromRefined: Iso[Refined[T, P], Type]                 = quantityIso.reverse.andThen(Value.reverse)
-  val From: Prism[T, Type]                                  = refinedPrism(using rt.validate).andThen(FromRefined)
-  val FromQuantity: Prism[Quantity[T, U], Type]             = quantityIso.andThen(From)
-  def from(t:       T): Either[String, Type]                = rt.refine(t).map(quantityIso.reverseGet(_)).map(apply(_))
-  def unsafeFrom(x: T): Type                                = apply(quantityIso.reverseGet(rt.unsafeRefine(x)))
-  def fromQuantity(q: Quantity[T, U]): Either[String, Type] = from(q.value)
-  def unsafeFromQuantity(q: Quantity[T, U]): Type           = unsafeFrom(q.value)
-  def fromRefined(r: Refined[T, P]): Type                   = apply(quantityIso.reverseGet(r))
+  val FromRefined: Iso[Refined[T, P], Type]                       = quantityIso.reverse.andThen(Value.reverse)
+  val From: Prism[T, Type]                                        = refinedPrism(using rt.validate).andThen(FromRefined)
+  val FromQuantity: Prism[Quantity[T, U], Type]                   = quantityIso.andThen(From)
+  def from(t:               T): Either[String, Type]              = rt.refine(t).map(quantityIso.reverseGet(_)).map(apply(_))
+  def unsafeFrom(x:         T): Type                              = apply(quantityIso.reverseGet(rt.unsafeRefine(x)))
+  def fromQuantity(q:       Quantity[T, U]): Either[String, Type] = from(q.value)
+  def unsafeFromQuantity(q: Quantity[T, U]): Type                 = unsafeFrom(q.value)
+  def fromRefined(r:        Refined[T, P]): Type                  = apply(quantityIso.reverseGet(r))
 
 /**
  * Usage:
@@ -112,7 +120,7 @@ trait NewRefinedQuantity[T, P, U](using rt: RefinedTypeAux[T, P]) extends NewTyp
  * ```
  */
 trait NewBoolean extends NewType[Boolean]:
-  inline def True:  Type = apply(true)
+  inline def True: Type  = apply(true)
   inline def False: Type = apply(false)
 
   extension (t: Type)

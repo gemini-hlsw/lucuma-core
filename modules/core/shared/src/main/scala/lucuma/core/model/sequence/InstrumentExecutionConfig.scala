@@ -21,7 +21,7 @@ import monocle.macros.GenPrism
  */
 sealed trait InstrumentExecutionConfig:
 
-  /** Returns the instrument discriminator associated with this execution config.  */
+  /** Returns the instrument discriminator associated with this execution config. */
   def instrument: Instrument
 
   /** Returns `true` if there are no science steps to execute. */
@@ -39,7 +39,8 @@ object InstrumentExecutionConfig:
     given Eq[Flamingos2] =
       Eq.by(_.executionConfig)
 
-    val executionConfig: Lens[Flamingos2, ExecutionConfig[f2.Flamingos2StaticConfig, f2.Flamingos2DynamicConfig]] =
+    val executionConfig
+      : Lens[Flamingos2, ExecutionConfig[f2.Flamingos2StaticConfig, f2.Flamingos2DynamicConfig]] =
       Focus[Flamingos2](_.executionConfig)
 
   val flamingos2: Prism[InstrumentExecutionConfig, Flamingos2] =
@@ -68,7 +69,9 @@ object InstrumentExecutionConfig:
     given Eq[GmosNorth] =
       Eq.by(_.executionConfig)
 
-    val executionConfig: Lens[GmosNorth, ExecutionConfig[gmos.StaticConfig.GmosNorth, gmos.DynamicConfig.GmosNorth]] =
+    val executionConfig: Lens[GmosNorth, ExecutionConfig[gmos.StaticConfig.GmosNorth,
+                                                         gmos.DynamicConfig.GmosNorth
+    ]] =
       Focus[GmosNorth](_.executionConfig)
 
   val gmosNorth: Prism[InstrumentExecutionConfig, GmosNorth] =
@@ -84,11 +87,27 @@ object InstrumentExecutionConfig:
     given Eq[GmosSouth] =
       Eq.by(_.executionConfig)
 
-    val executionConfig: Lens[GmosSouth, ExecutionConfig[gmos.StaticConfig.GmosSouth, gmos.DynamicConfig.GmosSouth]] =
+    val executionConfig: Lens[GmosSouth, ExecutionConfig[gmos.StaticConfig.GmosSouth,
+                                                         gmos.DynamicConfig.GmosSouth
+    ]] =
       Focus[GmosSouth](_.executionConfig)
 
   val gmosSouth: Prism[InstrumentExecutionConfig, GmosSouth] =
     GenPrism[InstrumentExecutionConfig, GmosSouth]
+
+  case class Gnirs(
+    executionConfig: ExecutionConfig[gnirs.GnirsStaticConfig, gnirs.GnirsDynamicConfig]
+  ) extends InstrumentExecutionConfig:
+    override def instrument: Instrument = Instrument.Gnirs
+    override def isComplete: Boolean    = executionConfig.isComplete
+
+  object Gnirs:
+    given Eq[Gnirs] =
+      Eq.by(_.executionConfig)
+
+    val executionConfig
+      : Lens[Gnirs, ExecutionConfig[gnirs.GnirsStaticConfig, gnirs.GnirsDynamicConfig]] =
+      Focus[Gnirs](_.executionConfig)
 
   case class Igrins2(
     executionConfig: ExecutionConfig[ig2.Igrins2StaticConfig, ig2.Igrins2DynamicConfig]
@@ -97,7 +116,8 @@ object InstrumentExecutionConfig:
     override def isComplete: Boolean    = executionConfig.isComplete
 
   object Igrins2:
-    val executionConfig: Lens[Igrins2, ExecutionConfig[ig2.Igrins2StaticConfig, ig2.Igrins2DynamicConfig]] =
+    val executionConfig
+      : Lens[Igrins2, ExecutionConfig[ig2.Igrins2StaticConfig, ig2.Igrins2DynamicConfig]] =
       Focus[Igrins2](_.executionConfig)
 
   val igrins2: Prism[InstrumentExecutionConfig, Igrins2] =
@@ -106,8 +126,8 @@ object InstrumentExecutionConfig:
   given Eq[InstrumentExecutionConfig] =
     Eq.instance:
       case (a @ Flamingos2(_), b @ Flamingos2(_)) => a === b
-      case (a @ Ghost(_),      b @ Ghost(_))      => a === b
-      case (a @ GmosNorth(_),  b @ GmosNorth(_))  => a === b
-      case (a @ GmosSouth(_),  b @ GmosSouth(_))  => a === b
-      case (a @ Igrins2(_),    b @ Igrins2(_))    => a === b
+      case (a @ Ghost(_), b @ Ghost(_))           => a === b
+      case (a @ GmosNorth(_), b @ GmosNorth(_))   => a === b
+      case (a @ GmosSouth(_), b @ GmosSouth(_))   => a === b
+      case (a @ Igrins2(_), b @ Igrins2(_))       => a === b
       case _                                      => false

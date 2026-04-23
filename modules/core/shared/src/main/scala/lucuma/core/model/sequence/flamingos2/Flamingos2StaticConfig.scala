@@ -9,7 +9,7 @@ import monocle.Focus
 import monocle.Lens
 
 case class Flamingos2StaticConfig(
-  mosPreImaging:          MosPreImaging,
+  mosPreImaging:           MosPreImaging,
   useElectronicOffsetting: Boolean
 )
 

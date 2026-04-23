@@ -16,7 +16,7 @@ import monocle.Prism
 import monocle.macros.GenPrism
 
 sealed trait ExposureTimeMode extends Product with Serializable:
-  def at:  Wavelength
+  def at: Wavelength
 
 object ExposureTimeMode:
 
@@ -24,24 +24,32 @@ object ExposureTimeMode:
 
   object SignalToNoiseMode:
     val value: Lens[SignalToNoiseMode, SignalToNoise] = Focus[SignalToNoiseMode](_.value)
-    val at:    Lens[SignalToNoiseMode, Wavelength]    = Focus[SignalToNoiseMode](_.at)
+    val at: Lens[SignalToNoiseMode, Wavelength]       = Focus[SignalToNoiseMode](_.at)
     given Eq[SignalToNoiseMode]                       = Eq.by(a => (a.value, a.at))
 
-
-  final case class TimeAndCountMode(time: TimeSpan, count: PosInt, at: Wavelength) extends ExposureTimeMode
+  final case class TimeAndCountMode(
+    time:   TimeSpan,
+    count:  PosInt,
+    coadds: PosInt,
+    at:     Wavelength
+  ) extends ExposureTimeMode:
+    lazy val totalCount: PosInt = PosInt.unsafeFrom(count.value * coadds.value)
 
   object TimeAndCountMode:
-    val time:  Lens[TimeAndCountMode, TimeSpan]   = Focus[TimeAndCountMode](_.time)
-    val count: Lens[TimeAndCountMode, PosInt]     = Focus[TimeAndCountMode](_.count)
-    val at:    Lens[TimeAndCountMode, Wavelength] = Focus[TimeAndCountMode](_.at)
-    given Eq[TimeAndCountMode]                    = Eq.by(a => (a.time, a.count, a.at))
+    def apply(time: TimeSpan, count: PosInt, at: Wavelength): TimeAndCountMode =
+      new TimeAndCountMode(time, count, coadds = PosInt.unsafeFrom(1), at)
 
+    val time: Lens[TimeAndCountMode, TimeSpan] = Focus[TimeAndCountMode](_.time)
+    val count: Lens[TimeAndCountMode, PosInt]  = Focus[TimeAndCountMode](_.count)
+    val coadds: Lens[TimeAndCountMode, PosInt] = Focus[TimeAndCountMode](_.coadds)
+    val at: Lens[TimeAndCountMode, Wavelength] = Focus[TimeAndCountMode](_.at)
+    given Eq[TimeAndCountMode]                 = Eq.by(a => (a.time, a.count, a.coadds, a.at))
 
   given Eq[ExposureTimeMode] =
     Eq.instance:
-      case (a@SignalToNoiseMode(_, _),    b@SignalToNoiseMode(_, _))   => a === b
-      case (a@TimeAndCountMode(_, _, _),  b@TimeAndCountMode(_, _, _)) => a === b
-      case _                                                           => false
+      case (a @ SignalToNoiseMode(_, _), b @ SignalToNoiseMode(_, _))           => a === b
+      case (a @ TimeAndCountMode(_, _, _, _), b @ TimeAndCountMode(_, _, _, _)) => a === b
+      case _                                                                    => false
 
   val signalToNoise: Prism[ExposureTimeMode, SignalToNoiseMode] =
     GenPrism[ExposureTimeMode, SignalToNoiseMode]
@@ -51,11 +59,11 @@ object ExposureTimeMode:
 
   val at: Lens[ExposureTimeMode, Wavelength] =
     Lens[ExposureTimeMode, Wavelength] {
-      case SignalToNoiseMode(_, w)   => w
-      case TimeAndCountMode(_, _, w) => w
+      case SignalToNoiseMode(_, w)      => w
+      case TimeAndCountMode(_, _, _, w) => w
     } { w =>
       {
-        case a @ SignalToNoiseMode(_, _)   => SignalToNoiseMode.at.replace(w)(a)
-        case a @ TimeAndCountMode(_, _, _) => TimeAndCountMode.at.replace(w)(a)
+        case a @ SignalToNoiseMode(_, _)      => SignalToNoiseMode.at.replace(w)(a)
+        case a @ TimeAndCountMode(_, _, _, _) => TimeAndCountMode.at.replace(w)(a)
       }
     }

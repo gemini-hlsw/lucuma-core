@@ -14,4 +14,5 @@ enum ObservingModeType(val tag: String, val instrument: Instrument, val defaultP
   case GmosNorthLongSlit  extends ObservingModeType("gmos_north_long_slit",  Instrument.GmosNorth,  PosAngleConstraint.AverageParallactic)
   case GmosSouthImaging   extends ObservingModeType("gmos_south_imaging",    Instrument.GmosSouth,  PosAngleConstraint.Unbounded)
   case GmosSouthLongSlit  extends ObservingModeType("gmos_south_long_slit",  Instrument.GmosSouth,  PosAngleConstraint.AverageParallactic)
+  case GnirsLongSlit      extends ObservingModeType("gnirs_long_slit",       Instrument.Gnirs,      PosAngleConstraint.AverageParallactic)
   case Igrins2LongSlit    extends ObservingModeType("igrins_2_long_slit",    Instrument.Igrins2,    PosAngleConstraint.AverageParallactic)
