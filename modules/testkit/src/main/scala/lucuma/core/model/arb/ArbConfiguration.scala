@@ -13,6 +13,7 @@ import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.WaterVapor
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Region
+import lucuma.core.math.arb.ArbAngle.given
 import lucuma.core.math.arb.ArbCoordinates.given
 import lucuma.core.math.arb.ArbRegion.given
 import lucuma.core.model.CloudExtinction
@@ -21,6 +22,8 @@ import org.scalacheck.*
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Cogen.*
 import org.scalacheck.rng.Seed
+import lucuma.core.enums.VisitorObservingModeType
+import lucuma.core.math.Angle
 
 trait ArbConfiguration:
   import Configuration.Conditions
@@ -80,6 +83,16 @@ trait ArbConfiguration:
   given Cogen[ObservingMode.Igrins2LongSlit.type] =
     Cogen.cogenUnit.contramap(_ => ())
 
+  given Arbitrary[ObservingMode.Visitor] =
+    Arbitrary:
+      for 
+        m <- arbitrary[VisitorObservingModeType]
+        a <- arbitrary[Angle]
+      yield ObservingMode.Visitor(m, a)
+
+  given Cogen[ObservingMode.Visitor] =
+    Cogen[(VisitorObservingModeType, Angle)].contramap(v => (v.mode, v.radius))
+
   given Arbitrary[ObservingMode] =
     Arbitrary:
       Gen.oneOf(
@@ -103,6 +116,7 @@ trait ArbConfiguration:
         case m: ObservingMode.GmosSouthImaging     => perturb(s, m)
         case m: ObservingMode.Flamingos2LongSlit   => perturb(s, m)
         case m: ObservingMode.Igrins2LongSlit.type => perturb(s, m)
+        case m: ObservingMode.Visitor              => perturb(s, m)
 
   given Arbitrary[Configuration] =
     Arbitrary:

@@ -29,6 +29,9 @@ sealed trait InstrumentExecutionConfig:
 
 object InstrumentExecutionConfig:
 
+  case class Visitor(instrument: Instrument) extends InstrumentExecutionConfig:
+    val isComplete = true
+
   case class Flamingos2(
     executionConfig: ExecutionConfig[f2.Flamingos2StaticConfig, f2.Flamingos2DynamicConfig]
   ) extends InstrumentExecutionConfig:

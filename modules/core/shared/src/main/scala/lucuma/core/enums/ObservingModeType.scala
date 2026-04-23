@@ -39,6 +39,6 @@ enum VisitorObservingModeType(
   case VisitorNorth       extends VisitorObservingModeType("visitor_north",          Instrument.VisitorNorth)
   case VisitorSouth       extends VisitorObservingModeType("visitor_south",          Instrument.VisitorSouth)
   case MaroonX            extends VisitorObservingModeType("maroon_x",               Instrument.MaroonX)
-  case ZorroSpeckle       extends VisitorObservingModeType("zorro_speckle",          Instrument.Alopeke)
-  case ZorroWideField     extends VisitorObservingModeType("zorro_wide_field",       Instrument.Alopeke)
+  case ZorroSpeckle       extends VisitorObservingModeType("zorro_speckle",          Instrument.Zorro)
+  case ZorroWideField     extends VisitorObservingModeType("zorro_wide_field",       Instrument.Zorro)
 

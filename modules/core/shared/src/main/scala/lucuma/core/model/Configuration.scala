@@ -24,6 +24,7 @@ import lucuma.core.math.Offset
 import lucuma.core.math.Region
 import lucuma.core.model.Configuration.ObservingMode.*
 import lucuma.core.model.sequence.flamingos2.Flamingos2FpuMask
+import lucuma.core.enums.VisitorObservingModeType
 
 case class Configuration(conditions: Configuration.Conditions, target: Either[Coordinates, Region], observingMode: Configuration.ObservingMode) derives Eq:
   def subsumes(other: Configuration): Boolean =
@@ -59,6 +60,7 @@ object Configuration:
     def gmosSouthImaging:   Option[GmosSouthImaging    ] = Some(this).collect { case m: GmosSouthImaging     => m }
     def flamingos2LongSlit: Option[Flamingos2LongSlit  ] = Some(this).collect { case m: Flamingos2LongSlit   => m }
     def igrins2LongSlit:    Option[Igrins2LongSlit.type] = Some(this).collect { case m: Igrins2LongSlit.type => m }
+    def visitor:            Option[Visitor]              = Some(this).collect { case m: Visitor              => m }
 
     def subsumes(other: ObservingMode): Boolean =
       (this, other) match
@@ -74,6 +76,7 @@ object Configuration:
 
         case (Flamingos2LongSlit(d1), Flamingos2LongSlit(d2)) => d1 === d2
         case (Igrins2LongSlit,        Igrins2LongSlit)        => true
+        case (Visitor(ma, ra), Visitor(mb, rb))               => ma === mb && rb.toMicroarcseconds <= ra.toMicroarcseconds
         case _                                                => false
 
   object ObservingMode:
@@ -90,3 +93,4 @@ object Configuration:
     case class GmosSouthImaging(filters: List[GmosSouthFilter]) extends ObservingMode(ObservingModeType.GmosSouthImaging, Radii.GmosImaging)
     case class Flamingos2LongSlit(disperser: Flamingos2Disperser) extends ObservingMode(ObservingModeType.Flamingos2LongSlit, Radii.Flamingos2LongSlit)
     case object Igrins2LongSlit extends ObservingMode(ObservingModeType.Igrins2LongSlit, Radii.Igrins2LongSlit)
+    case class Visitor(mode: VisitorObservingModeType, override val radius: Angle) extends ObservingMode(mode, radius)
