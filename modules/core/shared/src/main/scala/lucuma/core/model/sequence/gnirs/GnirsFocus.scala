@@ -11,6 +11,10 @@ import coulomb.integrations.cats.quantity.given
 import eu.timepit.refined.numeric.Interval
 import lucuma.core.refined.cats.given
 import lucuma.core.util.NewRefined
+import monocle.Focus
+import monocle.Iso
+import monocle.Prism
+import monocle.macros.GenPrism
 
 final type GnirsFocusMotorStep
 given BaseUnit[GnirsFocusMotorStep, "motor step", "step"] = BaseUnit()
@@ -22,3 +26,11 @@ type GnirsFocusMotorStepsValue = GnirsFocusMotorStepsValue.Type
 enum GnirsFocus derives Eq:
   case Best
   case Custom(value: Quantity[GnirsFocusMotorStepsValue, GnirsFocusMotorStep])
+
+object GnirsFocus:
+  val best: Prism[GnirsFocus, GnirsFocus.Best.type] = GenPrism[GnirsFocus, GnirsFocus.Best.type]
+  val custom: Prism[GnirsFocus, GnirsFocus.Custom] = GenPrism[GnirsFocus, GnirsFocus.Custom]
+
+  object Custom:
+    val value: Iso[GnirsFocus.Custom, Quantity[GnirsFocusMotorStepsValue, GnirsFocusMotorStep]] =
+      Focus[GnirsFocus.Custom](_.value)

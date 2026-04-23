@@ -10,6 +10,12 @@ import lucuma.core.enums.GnirsGrating
 import lucuma.core.enums.GnirsPrism
 import lucuma.core.math.Wavelength
 import lucuma.core.util.NewType
+import monocle.Focus
+import monocle.Iso
+import monocle.Lens
+import monocle.Prism
+import monocle.macros.GenPrism
+
 
 object GnirsGratingWavelength extends NewType[Wavelength]
 type GnirsGratingWavelength = GnirsGratingWavelength.Type
@@ -18,3 +24,21 @@ enum GnirsAcquisitionMirrorMode(val acquisitionMirror: GnirsAcquisitionMirror) d
   case In extends GnirsAcquisitionMirrorMode(GnirsAcquisitionMirror.In)
   case Out(prism: GnirsPrism, grating: GnirsGrating, wavelength: GnirsGratingWavelength)
       extends GnirsAcquisitionMirrorMode(GnirsAcquisitionMirror.Out)
+
+object GnirsAcquisitionMirrorMode:
+  val in: Prism[GnirsAcquisitionMirrorMode, In.type] =
+    GenPrism[GnirsAcquisitionMirrorMode, In.type]
+
+  val out: Prism[GnirsAcquisitionMirrorMode, Out] =
+    GenPrism[GnirsAcquisitionMirrorMode, Out]
+
+  object Out:
+    val prism: Lens[Out, GnirsPrism] =
+      Focus[Out](_.prism)
+
+    val grating: Lens[Out, GnirsGrating] =
+      Focus[Out](_.grating)
+
+    val wavelength: Lens[Out, GnirsGratingWavelength] =
+      Focus[Out](_.wavelength)
+
