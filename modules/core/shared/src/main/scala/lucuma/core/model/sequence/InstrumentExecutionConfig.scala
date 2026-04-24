@@ -119,8 +119,7 @@ object InstrumentExecutionConfig:
     override def isComplete: Boolean    = executionConfig.isComplete
 
   object Igrins2:
-    val executionConfig
-      : Lens[Igrins2, ExecutionConfig[ig2.Igrins2StaticConfig, ig2.Igrins2DynamicConfig]] =
+    val executionConfig : Lens[Igrins2, ExecutionConfig[ig2.Igrins2StaticConfig, ig2.Igrins2DynamicConfig]] =
       Focus[Igrins2](_.executionConfig)
 
   val igrins2: Prism[InstrumentExecutionConfig, Igrins2] =
@@ -132,5 +131,6 @@ object InstrumentExecutionConfig:
       case (a @ Ghost(_), b @ Ghost(_))           => a === b
       case (a @ GmosNorth(_), b @ GmosNorth(_))   => a === b
       case (a @ GmosSouth(_), b @ GmosSouth(_))   => a === b
+      case (a @ Gnirs(_), b @ Gnirs(_))           => a === b
       case (a @ Igrins2(_), b @ Igrins2(_))       => a === b
       case _                                      => false

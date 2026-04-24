@@ -6,6 +6,7 @@ package lucuma.core.model.sequence.gnirs.arb
 import coulomb.Quantity
 import coulomb.testkit.given
 import eu.timepit.refined.scalacheck.numeric.given
+import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.enums.*
 import lucuma.core.math.arb.ArbRefined.given
 import lucuma.core.model.sequence.gnirs.GnirsAcquisitionMirrorMode
@@ -41,6 +42,7 @@ trait ArbGnirsDynamicConfig:
   given Arbitrary[GnirsDynamicConfig] = Arbitrary:
     for
       exposure          <- arbitrary[TimeSpan]
+      coadds            <- arbitrary[PosInt]
       filter            <- arbitrary[GnirsFilter]
       decker            <- arbitrary[GnirsDecker]
       fpu               <- arbitrary[Either[GnirsFpuSlit, GnirsFpuOther]]
@@ -50,6 +52,7 @@ trait ArbGnirsDynamicConfig:
       readMode          <- arbitrary[GnirsReadMode]
     yield GnirsDynamicConfig(
       exposure,
+      coadds,
       filter,
       decker,
       fpu,
@@ -63,6 +66,7 @@ trait ArbGnirsDynamicConfig:
     Cogen[
       (
         TimeSpan,
+        PosInt,
         GnirsFilter,
         GnirsDecker,
         Either[GnirsFpuSlit, GnirsFpuOther],
@@ -74,6 +78,7 @@ trait ArbGnirsDynamicConfig:
     ].contramap(x =>
       (
         x.exposure,
+        x.coadds,
         x.filter,
         x.decker,
         x.fpu,

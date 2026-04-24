@@ -16,13 +16,10 @@ enum GnirsDecker(
   val tag: String,
   val shortName: String,
   val longName: String,
-  val obsolete: Boolean
 ) derives Enumerated, Display:
-  case Acquisition extends GnirsDecker("Acquisition", "Acquisition", "Acquisition", false)
-  case PupilViewer extends GnirsDecker("PupilViewer", "Pupil", "Pupil viewer", false)
-  case ShortCamCrossDispersed extends GnirsDecker("ShortCamCrossDispersed", "Short camera XD", "Short camera cross dispersed", false)
-  case Ifu extends GnirsDecker("Ifu", "IFU", "Integral field unit", true)
-  case LongCamLongSlit extends GnirsDecker("LongCamLongSlit", "Long camera slit", "Long camera long slit", false)
-  case Wollaston extends GnirsDecker("Wollaston", "Wollaston", "Wollaston", true)
-  case ShortCamLongSlit extends GnirsDecker("ShortCamLongSlit", "Short camera slit", "Short camera long slit", false)
-  case LongCamCrossDispersed extends GnirsDecker("LongCamCrossDispersed", "Long camera XD", "Long camera cross dispersed", false)
+  case Acquisition extends GnirsDecker("Acquisition", "Acquisition", "Acquisition")
+  case PupilViewer extends GnirsDecker("PupilViewer", "Pupil", "Pupil viewer")
+  case ShortCamCrossDispersed extends GnirsDecker("ShortCamCrossDispersed", "Short camera XD", "Short camera cross dispersed")
+  case LongCamLongSlit extends GnirsDecker("LongCamLongSlit", "Long camera slit", "Long camera long slit")
+  case ShortCamLongSlit extends GnirsDecker("ShortCamLongSlit", "Short camera slit", "Short camera long slit")
+  case LongCamCrossDispersed extends GnirsDecker("LongCamCrossDispersed", "Long camera XD", "Long camera cross dispersed")
