@@ -42,16 +42,14 @@ trait ArbExposureTimeMode:
       for
         t <- arbitrary[TimeSpan]
         c <- arbitrary[PosInt]
-        a <- arbitrary[PosInt]
         w <- arbitrary[Wavelength]
-      yield TimeAndCountMode(t, c, a, w)
+      yield TimeAndCountMode(t, c, w)
 
   given Cogen[TimeAndCountMode] =
-    Cogen[(TimeSpan, PosInt, PosInt, Wavelength)].contramap: a =>
+    Cogen[(TimeSpan, PosInt, Wavelength)].contramap: a =>
       (
         a.time,
         a.count,
-        a.coadds,
         a.at
       )
 
