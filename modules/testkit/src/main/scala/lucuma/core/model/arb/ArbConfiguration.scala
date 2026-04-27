@@ -39,6 +39,12 @@ trait ArbConfiguration:
     Cogen[(CloudExtinction.Preset, ImageQuality.Preset, SkyBackground, WaterVapor)]
       .contramap(c => (c.cloudExtinction,c.imageQuality,  c.skyBackground, c.waterVapor))
 
+  given Arbitrary[ObservingMode.GhostIfu.type] =
+    Arbitrary(Gen.const(ObservingMode.GhostIfu))
+
+  given Cogen[ObservingMode.GhostIfu.type] =
+    Cogen.cogenUnit.contramap(_ => ())
+
   given Arbitrary[ObservingMode.GmosNorthLongSlit] =
     Arbitrary:
       arbitrary[GmosNorthGrating].map(ObservingMode.GmosNorthLongSlit.apply)
@@ -83,11 +89,12 @@ trait ArbConfiguration:
   given Arbitrary[ObservingMode] =
     Arbitrary:
       Gen.oneOf(
-        arbitrary[ObservingMode.GmosNorthLongSlit],
-        arbitrary[ObservingMode.GmosSouthLongSlit],
-        arbitrary[ObservingMode.GmosNorthImaging],
-        arbitrary[ObservingMode.GmosSouthImaging],
         arbitrary[ObservingMode.Flamingos2LongSlit],
+        arbitrary[ObservingMode.GhostIfu.type],
+        arbitrary[ObservingMode.GmosNorthImaging],
+        arbitrary[ObservingMode.GmosNorthLongSlit],
+        arbitrary[ObservingMode.GmosSouthImaging],
+        arbitrary[ObservingMode.GmosSouthLongSlit],
         arbitrary[ObservingMode.Igrins2LongSlit.type]
       )
 
@@ -97,11 +104,12 @@ trait ArbConfiguration:
   given Cogen[ObservingMode] =
     Cogen: (s, m) =>
       m match
-        case m: ObservingMode.GmosNorthLongSlit    => perturb(s, m)
-        case m: ObservingMode.GmosSouthLongSlit    => perturb(s, m)
-        case m: ObservingMode.GmosNorthImaging     => perturb(s, m)
-        case m: ObservingMode.GmosSouthImaging     => perturb(s, m)
         case m: ObservingMode.Flamingos2LongSlit   => perturb(s, m)
+        case m: ObservingMode.GhostIfu.type        => perturb(s, m)
+        case m: ObservingMode.GmosNorthImaging     => perturb(s, m)
+        case m: ObservingMode.GmosNorthLongSlit    => perturb(s, m)
+        case m: ObservingMode.GmosSouthImaging     => perturb(s, m)
+        case m: ObservingMode.GmosSouthLongSlit    => perturb(s, m)
         case m: ObservingMode.Igrins2LongSlit.type => perturb(s, m)
 
   given Arbitrary[Configuration] =
