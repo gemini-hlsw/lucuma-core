@@ -7,7 +7,9 @@ package arb
 
 import lucuma.core.enums.GhostIfu1FiberAgitator
 import lucuma.core.enums.GhostIfu2FiberAgitator
+import lucuma.core.util.TimeSpan
 import lucuma.core.util.arb.ArbEnumerated
+import lucuma.core.util.arb.ArbTimeSpan
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Cogen
@@ -17,6 +19,7 @@ trait ArbGhostDynamicConfig:
 
   import ArbEnumerated.given
   import ArbGhostDetector.given
+  import ArbTimeSpan.given
 
   given Arbitrary[GhostDynamicConfig] =
     Arbitrary:
@@ -25,20 +28,23 @@ trait ArbGhostDynamicConfig:
         b  <- arbitrary[GhostDetector.Blue]
         a1 <- arbitrary[GhostIfu1FiberAgitator]
         a2 <- arbitrary[GhostIfu2FiberAgitator]
-      yield GhostDynamicConfig(r, b, a1, a2)
+        sv <- arbitrary[Option[TimeSpan]]
+      yield GhostDynamicConfig(r, b, a1, a2, sv)
 
   given Cogen[GhostDynamicConfig] =
     Cogen[(
       GhostDetector.Red,
       GhostDetector.Blue,
       GhostIfu1FiberAgitator,
-      GhostIfu2FiberAgitator
+      GhostIfu2FiberAgitator,
+      Option[TimeSpan]
     )].contramap: a =>
       (
         a.red,
         a.blue,
         a.ifu1FiberAgitator,
-        a.ifu2FiberAgitator
+        a.ifu2FiberAgitator,
+        a.slitViewingExposureTime
       )
 
 object ArbGhostDynamicConfig extends ArbGhostDynamicConfig

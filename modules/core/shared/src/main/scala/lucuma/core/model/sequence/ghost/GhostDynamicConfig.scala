@@ -10,10 +10,11 @@ import lucuma.core.enums.GhostIfu2FiberAgitator
 import lucuma.core.util.TimeSpan
 
 final case class GhostDynamicConfig(
-  red:               GhostDetector.Red,
-  blue:              GhostDetector.Blue,
-  ifu1FiberAgitator: GhostIfu1FiberAgitator = GhostIfu1FiberAgitator.Disabled,
-  ifu2FiberAgitator: GhostIfu2FiberAgitator = GhostIfu2FiberAgitator.Disabled
+  red:                     GhostDetector.Red,
+  blue:                    GhostDetector.Blue,
+  ifu1FiberAgitator:       GhostIfu1FiberAgitator = GhostIfu1FiberAgitator.Disabled,
+  ifu2FiberAgitator:       GhostIfu2FiberAgitator = GhostIfu2FiberAgitator.Disabled,
+  slitViewingExposureTime: Option[TimeSpan]       = None
 ):
 
   /**
@@ -30,5 +31,6 @@ object GhostDynamicConfig:
         a.red,
         a.blue,
         a.ifu1FiberAgitator,
-        a.ifu2FiberAgitator
+        a.ifu2FiberAgitator,
+        a.slitViewingExposureTime
       )
