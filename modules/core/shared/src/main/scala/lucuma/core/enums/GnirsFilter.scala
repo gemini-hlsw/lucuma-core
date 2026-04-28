@@ -43,6 +43,8 @@ object GnirsFilter:
     values.map(f => f.spectroscopyCutoffWavelength.map(w => (f, w))).toList.flattenOption
 
   // Adapted from seqexec
-  def fromSpectroscopyWavelength(wavelength: Wavelength): GnirsFilter = 
-    SpectroscopyFilterTable.foldRight[GnirsFilter](GnirsFilter.CrossDispersed):  (entry, selected) =>
-      if (wavelength < entry._2) entry._1 else selected
+  def fromSpectroscopyWavelength(wavelength: Wavelength): Either[String, GnirsFilter] = 
+    SpectroscopyFilterTable
+      .collectFirst:
+        case (filter, cutoff) if wavelength < cutoff => filter
+      .toRight(s"No Gnirs spectroscopy filter available for wavelength: $wavelength")
