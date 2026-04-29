@@ -15,7 +15,9 @@ import lucuma.catalog.clients.SimbadClient
 import org.http4s.Uri
 import org.http4s.client.Client
 import org.typelevel.log4cats.Logger
+import org.typelevel.log4cats.LoggerFactory
 import org.typelevel.log4cats.syntax.*
+import org.typelevel.otel4s.trace.Tracer
 
 /**
  * Client for the telluric targets service
@@ -28,11 +30,13 @@ trait TelluricTargetsClient[F[_]]:
   ): F[List[(TelluricStar, Option[CatalogTargetResult])]]
 
 object TelluricTargetsClient:
-  def build[F[_]: Concurrent: Logger](
+  def build[F[_]: {Concurrent, Tracer as T, LoggerFactory as LF}](
     uri:          Uri,
     client:       Client[F],
     simbadClient: SimbadClient[F]
   ): F[TelluricTargetsClient[F]] =
+    given Logger[F] = LF.getLoggerFromName("tellurics-catalog-client")
+
     given Http4sHttpBackend[F] = Http4sHttpBackend[F](client)
 
     Http4sHttpClient
@@ -42,28 +46,32 @@ object TelluricTargetsClient:
           override def search(input: TelluricSearchInput): F[List[TelluricStar]] =
             val encodedVars = TelluricSearchQuery.varEncoder(input).asJson
 
-            for {
-              _        <- debug"Telluric targets call: $uri ${encodedVars.noSpaces}"
-              response <- http
-                            .request(TelluricSearchQuery)
-                            .withInput(input)
-                            .raiseGraphQLErrors
-              _        <- debug"GraphQL response: $response"
-            } yield response
+            T.span("query telluric server")
+              .surround:
+                for {
+                  _        <- debug"Telluric targets call: $uri ${encodedVars.noSpaces}"
+                  response <- http
+                                .request(TelluricSearchQuery)
+                                .withInput(input)
+                                .raiseGraphQLErrors
+                  _        <- debug"GraphQL response: $response"
+                } yield response
 
           override def searchTarget(
             input: TelluricSearchInput
           ): F[List[(TelluricStar, Option[CatalogTargetResult])]] =
-            for {
-              telluricStars <- search(input)
-              results       <- telluricStars.traverse: star =>
-                                 simbadClient
-                                   .search(star.simbadName)
-                                   .map(_.toOption)
-                                   // If simbad lookup fails return the base star
-                                   .recover(_ => None)
-                                   .map(result => (star, result))
-            } yield results
+            T.span("query telluric and simbad server")
+              .surround:
+                for {
+                  telluricStars <- search(input)
+                  results       <- telluricStars.traverse: star =>
+                                     simbadClient
+                                       .search(star.simbadName)
+                                       .map(_.toOption)
+                                       // If simbad lookup fails return the base star
+                                       .recover(_ => None)
+                                       .map(result => (star, result))
+                } yield results
 
   def noop[F[_]: Applicative]: TelluricTargetsClient[F] = new TelluricTargetsClient[F]:
     def search(input: TelluricSearchInput): F[List[TelluricStar]] =

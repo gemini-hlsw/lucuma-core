@@ -3,6 +3,7 @@
 
 package lucuma.catalog.clients
 
+import cats.Applicative
 import cats.effect.*
 import cats.syntax.all.*
 import fs2.io.readClassLoaderResource
@@ -16,17 +17,21 @@ import org.http4s.*
 import org.http4s.circe.*
 import org.http4s.client.Client
 import org.http4s.syntax.literals.*
-import org.typelevel.log4cats.Logger
+import org.typelevel.log4cats.LoggerFactory
+import org.typelevel.log4cats.noop.NoOpFactory
+import org.typelevel.otel4s.trace.Tracer.Implicits.noop
 
 /**
  * Mock TelluricClient for testing purposes. Takes a simbad client, could be a mock too
  */
 object TelluricTargetsClientMock:
 
+  given lf[F[_]: Applicative]: LoggerFactory[F] = NoOpFactory[F]
+
   /**
    * Create a mock TelluricClient that returns predefined telluric star responses.
    */
-  def mockTelluricClient[F[_]: Concurrent: Logger](
+  def mockTelluricClient[F[_]: Concurrent](
     stars:        List[TelluricStar],
     simbadClient: SimbadClient[F]
   ): F[TelluricTargetsClient[F]] = {
@@ -48,7 +53,7 @@ object TelluricTargetsClientMock:
   /**
    * Create a mock TelluricClient from a JSON string.
    */
-  def fromJson[F[_]: Concurrent: Logger](
+  def fromJson[F[_]: Concurrent](
     json:         Json,
     simbadClient: SimbadClient[F]
   ): F[TelluricTargetsClient[F]] = {
@@ -64,7 +69,7 @@ object TelluricTargetsClientMock:
   /**
    * Create a mock TelluricClient that reads JSON from a resource file.
    */
-  def fromResource[F[_]: Async: Logger](
+  def fromResource[F[_]: Async](
     resource:     String,
     simbadClient: SimbadClient[F]
   ): F[TelluricTargetsClient[F]] = {
@@ -84,13 +89,13 @@ object TelluricTargetsClientMock:
   /**
    * Create a mock TelluricClient that returns an empty list (no telluric stars found).
    */
-  def empty[F[_]: Concurrent: Logger]: F[TelluricTargetsClient[F]] =
+  def empty[F[_]: Concurrent]: F[TelluricTargetsClient[F]] =
     mockTelluricClient(List.empty, SimbadClient.noop)
 
   /**
    * Create a mock TelluricClient with a single test star.
    */
-  def withSingleStar[F[_]: Concurrent: Logger](
+  def withSingleStar[F[_]: Concurrent](
     star:   TelluricStar,
     target: Target.Sidereal
   ): F[TelluricTargetsClient[F]] =
