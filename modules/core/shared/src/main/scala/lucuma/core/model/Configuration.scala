@@ -15,6 +15,7 @@ import lucuma.core.enums.GmosSouthFilter
 import lucuma.core.enums.GmosSouthGrating
 import lucuma.core.enums.ObservingModeType
 import lucuma.core.enums.SkyBackground
+import lucuma.core.enums.VisitorObservingModeType
 import lucuma.core.enums.WaterVapor
 import lucuma.core.geom.*
 import lucuma.core.geom.jts.interpreter.given
@@ -24,7 +25,6 @@ import lucuma.core.math.Offset
 import lucuma.core.math.Region
 import lucuma.core.model.Configuration.ObservingMode.*
 import lucuma.core.model.sequence.flamingos2.Flamingos2FpuMask
-import lucuma.core.enums.VisitorObservingModeType
 
 case class Configuration(conditions: Configuration.Conditions, target: Either[Coordinates, Region], observingMode: Configuration.ObservingMode) derives Eq:
   def subsumes(other: Configuration): Boolean =

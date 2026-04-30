@@ -5,8 +5,8 @@ package lucuma.core.model
 
 import cats.syntax.all.*
 import lucuma.core.enums.GuideProbe
-import lucuma.core.enums.TrackType
 import lucuma.core.enums.ObservingModeType
+import lucuma.core.enums.TrackType
 import lucuma.core.enums.VisitorObservingModeType
 
 trait probes:

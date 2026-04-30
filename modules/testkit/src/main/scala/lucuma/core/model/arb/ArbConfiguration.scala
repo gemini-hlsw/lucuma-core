@@ -10,7 +10,9 @@ import lucuma.core.enums.GmosNorthGrating
 import lucuma.core.enums.GmosSouthFilter
 import lucuma.core.enums.GmosSouthGrating
 import lucuma.core.enums.SkyBackground
+import lucuma.core.enums.VisitorObservingModeType
 import lucuma.core.enums.WaterVapor
+import lucuma.core.math.Angle
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Region
 import lucuma.core.math.arb.ArbAngle.given
@@ -22,8 +24,6 @@ import org.scalacheck.*
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Cogen.*
 import org.scalacheck.rng.Seed
-import lucuma.core.enums.VisitorObservingModeType
-import lucuma.core.math.Angle
 
 trait ArbConfiguration:
   import Configuration.Conditions
