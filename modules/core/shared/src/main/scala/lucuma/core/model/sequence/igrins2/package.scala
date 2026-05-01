@@ -29,8 +29,8 @@ val MaxExposureTime: TimeSpan = 600.secTimeSpan
 val WavelengthCoverageLowerBound: Wavelength = Wavelength.fromIntNanometers(1490).get
 val WavelengthCoverageUpperBound: Wavelength = Wavelength.fromIntNanometers(2460).get
 
-// Middle point between H and K
-val CentralWavelength: Wavelength = Wavelength.fromIntNanometers(1975).get
+// Updated from OCS values
+val CentralWavelength: Wavelength = Wavelength.fromIntNanometers(2100).get
 
 def fowlerSamplesForExposureTime(exposure: TimeSpan): Igrins2FowlerSamples =
   val seconds = exposure.toSeconds.toDouble
