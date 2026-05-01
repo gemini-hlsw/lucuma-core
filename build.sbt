@@ -2,11 +2,7 @@ import org.scalajs.linker.interface.ESVersion
 import org.typelevel.sbt.gha.PermissionValue
 import org.typelevel.sbt.gha.Permissions
 
-<<<<<<< sc-8459-visitor-mode-support-in-odb
 ThisBuild / tlBaseVersion                         := "0.191"
-=======
-ThisBuild / tlBaseVersion                         := "0.190"
->>>>>>> main
 ThisBuild / tlCiReleaseBranches                   := Seq("master")
 ThisBuild / githubWorkflowEnv += "MUNIT_FLAKY_OK" -> "true"
 
