@@ -2,7 +2,11 @@ import org.scalajs.linker.interface.ESVersion
 import org.typelevel.sbt.gha.PermissionValue
 import org.typelevel.sbt.gha.Permissions
 
+<<<<<<< sc-8459-visitor-mode-support-in-odb
 ThisBuild / tlBaseVersion                         := "0.191"
+=======
+ThisBuild / tlBaseVersion                         := "0.190"
+>>>>>>> main
 ThisBuild / tlCiReleaseBranches                   := Seq("master")
 ThisBuild / githubWorkflowEnv += "MUNIT_FLAKY_OK" -> "true"
 
@@ -20,7 +24,7 @@ lazy val catsParseVersion           = "1.1.0"
 lazy val catsScalacheckVersion      = "0.3.2"
 lazy val catsTimeVersion            = "0.6.0"
 lazy val circeVersion               = "0.14.15"
-lazy val clueVersion                = "0.51.3"
+lazy val clueVersion                = "0.52.0"
 lazy val circeRefinedVersion        = "0.15.1"
 lazy val coulombVersion             = "0.9.1"
 lazy val fs2Version                 = "3.13.0"
