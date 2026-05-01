@@ -10,6 +10,7 @@ import lucuma.core.util.Enumerated
 sealed trait ObservingModeType derives Enumerated:
   def tag: String
   def instrument: Instrument
+  def defaultPosAngleConstraint: PosAngleConstraint
 
 object ObservingModeType:
   export FacilityObservingModeType.{ values => _, * }
@@ -34,6 +35,7 @@ enum VisitorObservingModeType(
   val tag: String, 
   val instrument: Instrument
 ) extends ObservingModeType derives Enumerated:
+  val defaultPosAngleConstraint = PosAngleConstraint.Fixed(Angle.Angle0) // for all visitors
   case AlopekeSpeckle     extends VisitorObservingModeType("alopeke_speckle",        Instrument.Alopeke)
   case AlopekeWideField   extends VisitorObservingModeType("alopeke_wide_field",     Instrument.Alopeke)
   case VisitorNorth       extends VisitorObservingModeType("visitor_north",          Instrument.VisitorNorth)
