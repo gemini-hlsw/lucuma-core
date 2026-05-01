@@ -15,6 +15,7 @@ import lucuma.core.enums.GmosSouthFilter
 import lucuma.core.enums.GmosSouthGrating
 import lucuma.core.enums.ObservingModeType
 import lucuma.core.enums.SkyBackground
+import lucuma.core.enums.VisitorObservingModeType
 import lucuma.core.enums.WaterVapor
 import lucuma.core.geom.*
 import lucuma.core.geom.jts.interpreter.given
@@ -60,6 +61,7 @@ object Configuration:
     def gmosSouthImaging:   Option[GmosSouthImaging    ] = Some(this).collect { case m: GmosSouthImaging     => m }
     def gmosSouthLongSlit:  Option[GmosSouthLongSlit   ] = Some(this).collect { case m: GmosSouthLongSlit    => m }
     def igrins2LongSlit:    Option[Igrins2LongSlit.type] = Some(this).collect { case m: Igrins2LongSlit.type => m }
+    def visitor:            Option[Visitor]              = Some(this).collect { case m: Visitor              => m }
 
     def subsumes(other: ObservingMode): Boolean =
       (this, other) match
@@ -76,6 +78,7 @@ object Configuration:
         case (GmosSouthImaging(f1),   GmosSouthImaging(f2))   => true // f2.forall(f1.contains)
 
         case (Igrins2LongSlit,        Igrins2LongSlit)        => true
+        case (Visitor(ma, ra), Visitor(mb, rb))               => ma === mb && rb.toMicroarcseconds <= ra.toMicroarcseconds
         case _                                                => false
 
   object ObservingMode:
@@ -94,3 +97,4 @@ object Configuration:
     case class GmosSouthImaging(filters: List[GmosSouthFilter]) extends ObservingMode(ObservingModeType.GmosSouthImaging, Radii.GmosImaging)
     case class GmosSouthLongSlit(grating: GmosSouthGrating) extends ObservingMode(ObservingModeType.GmosSouthLongSlit, Radii.GmosLongSlit)
     case object Igrins2LongSlit extends ObservingMode(ObservingModeType.Igrins2LongSlit, Radii.Igrins2LongSlit)
+    case class Visitor(mode: VisitorObservingModeType, override val radius: Angle) extends ObservingMode(mode, radius)

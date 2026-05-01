@@ -23,20 +23,21 @@ object Metadata:
       def availability(i: Instrument): Availability =
         i match
           // GN
-          case Instrument.GmosNorth => Availability.always(Site.GN)
-          case Instrument.Gnirs     => Availability.always(Site.GN)
-          case Instrument.Gpi       => Availability.always(Site.GN)
-          case Instrument.Igrins2   => Availability.always(Site.GN)
-          case Instrument.Niri      => Availability.always(Site.GN)
-          case Instrument.Alopeke   => Availability.always(Site.GN)        
+          case Instrument.AcqCamNorth  => Availability.always(Site.GN)
+          case Instrument.Alopeke      => Availability.always(Site.GN)        
+          case Instrument.GmosNorth    => Availability.always(Site.GN)
+          case Instrument.Gnirs        => Availability.always(Site.GN)
+          case Instrument.Gpi          => Availability.always(Site.GN)
+          case Instrument.Igrins2      => Availability.always(Site.GN)
+          case Instrument.MaroonX      => Availability.always(Site.GN)
+          case Instrument.Niri         => Availability.always(Site.GN)
+          case Instrument.VisitorNorth => Availability.always(Site.GN)        
           // GS
-          case Instrument.GmosSouth => Availability.always(Site.GS)
-          case Instrument.Flamingos2=> Availability.always(Site.GS)
-          case Instrument.Ghost     => Availability.always(Site.GS)
-          case Instrument.Gsaoi     => Availability.always(Site.GS)
-          case Instrument.Zorro     => Availability.always(Site.GS)        
-          // Todo: Need north and south versions of these
-          case Instrument.AcqCam    => Availability.Never
-          case Instrument.Visitor   => Availability.Never          
-          // Nowhere yet
-          case Instrument.Scorpio   => Availability.Never
+          case Instrument.AcqCamSouth  => Availability.always(Site.GS)
+          case Instrument.Flamingos2   => Availability.always(Site.GS)
+          case Instrument.Ghost        => Availability.always(Site.GS)
+          case Instrument.GmosSouth    => Availability.always(Site.GS)
+          case Instrument.Gsaoi        => Availability.always(Site.GS)
+          case Instrument.Scorpio      => Availability.always(Site.GS)
+          case Instrument.VisitorSouth => Availability.always(Site.GS)        
+          case Instrument.Zorro        => Availability.always(Site.GS)        

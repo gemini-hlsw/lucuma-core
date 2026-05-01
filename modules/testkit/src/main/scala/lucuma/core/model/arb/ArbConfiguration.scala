@@ -10,9 +10,12 @@ import lucuma.core.enums.GmosNorthGrating
 import lucuma.core.enums.GmosSouthFilter
 import lucuma.core.enums.GmosSouthGrating
 import lucuma.core.enums.SkyBackground
+import lucuma.core.enums.VisitorObservingModeType
 import lucuma.core.enums.WaterVapor
+import lucuma.core.math.Angle
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Region
+import lucuma.core.math.arb.ArbAngle.given
 import lucuma.core.math.arb.ArbCoordinates.given
 import lucuma.core.math.arb.ArbRegion.given
 import lucuma.core.model.CloudExtinction
@@ -86,6 +89,16 @@ trait ArbConfiguration:
   given Cogen[ObservingMode.Igrins2LongSlit.type] =
     Cogen.cogenUnit.contramap(_ => ())
 
+  given Arbitrary[ObservingMode.Visitor] =
+    Arbitrary:
+      for 
+        m <- arbitrary[VisitorObservingModeType]
+        a <- arbitrary[Angle]
+      yield ObservingMode.Visitor(m, a)
+
+  given Cogen[ObservingMode.Visitor] =
+    Cogen[(VisitorObservingModeType, Angle)].contramap(v => (v.mode, v.radius))
+
   given Arbitrary[ObservingMode] =
     Arbitrary:
       Gen.oneOf(
@@ -111,6 +124,7 @@ trait ArbConfiguration:
         case m: ObservingMode.GmosSouthImaging     => perturb(s, m)
         case m: ObservingMode.GmosSouthLongSlit    => perturb(s, m)
         case m: ObservingMode.Igrins2LongSlit.type => perturb(s, m)
+        case m: ObservingMode.Visitor              => perturb(s, m)
 
   given Arbitrary[Configuration] =
     Arbitrary:
