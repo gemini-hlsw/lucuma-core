@@ -431,9 +431,8 @@ object Ags {
     magnitude:   BrightnessValue
   ): Option[GuideSpeed] =
     GuideSpeed.inSpeedOrder.find: speed => // assumes the values are sorted fast to slow
-      gaiaBrightnessConstraints(constraints, probe, speed, wavelength).contains(Band.Gaia,
-                                                                                magnitude
-      )
+      gaiaBrightnessConstraints(constraints, probe, speed, wavelength)
+        .contains(Band.Gaia, magnitude)
 
   /**
    * Calculates brightness limits for each guide speed
