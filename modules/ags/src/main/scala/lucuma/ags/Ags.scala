@@ -186,7 +186,7 @@ object Ags {
     positions:   NonEmptyList[OffsetPosition],
     params:      AgsParams
   ): AgsContextBuffer = {
-    val guideSpeeds = guideSpeedLimits(constraints, wavelength)
+    val guideSpeeds = guideSpeedLimits(constraints, params.probe, wavelength)
     val calcs       = params.posCalculations(positions)
     val bc          = constraintsFor(guideSpeeds)
     AgsContextBuffer(guideSpeeds, calcs, bc)
@@ -426,20 +426,23 @@ object Ags {
    */
   def fastestGuideSpeed(
     constraints: ConstraintSet,
+    probe:       GuideProbe,
     wavelength:  Wavelength,
     magnitude:   BrightnessValue
   ): Option[GuideSpeed] =
     GuideSpeed.inSpeedOrder.find: speed => // assumes the values are sorted fast to slow
-      gaiaBrightnessConstraints(constraints, speed, wavelength).contains(Band.Gaia, magnitude)
+      gaiaBrightnessConstraints(constraints, probe, speed, wavelength)
+        .contains(Band.Gaia, magnitude)
 
   /**
    * Calculates brightness limits for each guide speed
    */
   def guideSpeedLimits(
     constraints: ConstraintSet,
+    probe:       GuideProbe,
     wavelength:  Wavelength
   ): List[(GuideSpeed, BrightnessConstraints)] =
     GuideSpeed.inSpeedOrder.map: speed =>
-      (speed, gaiaBrightnessConstraints(constraints, speed, wavelength))
+      (speed, gaiaBrightnessConstraints(constraints, probe, speed, wavelength))
 
 }

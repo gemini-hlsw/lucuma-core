@@ -251,6 +251,12 @@ class AgsSuite extends munit.FunSuite {
 
     val wavelength = Wavelength.fromIntNanometers(300).get
 
+    val pwfsGS = GuideStarCandidate.unsafeApply(
+      0L,
+      SiderealTracking.const(Coordinates.Zero),
+      (Band.Gaia, BrightnessValue.unsafeFrom(12.0)).some
+    )
+
     assert(
       Ags
         .agsAnalysis(
@@ -263,11 +269,11 @@ class AgsSuite extends munit.FunSuite {
           Some(AcquisitionOffsets(NonEmptySet.of(Offset.Zero.guided))),
           Some(ScienceOffsets(NonEmptySet.of(Offset.Zero.guided))),
           AgsParams.Igrins2LongSlit(),
-          List(gs1)
+          List(pwfsGS)
         )
         .contains(
           AgsAnalysis
-            .VignettesScience(gs1, OffsetPosition(GeometryType.Base, Offset.Zero, Angle.Angle0))
+            .VignettesScience(pwfsGS, OffsetPosition(GeometryType.Base, Offset.Zero, Angle.Angle0))
         )
     )
 
@@ -299,5 +305,52 @@ class AgsSuite extends munit.FunSuite {
         .headOption
         .forall(_.isUsable)
     )
+  }
+
+  test("magnitude limits with gmps OIWFS and PWFS1") {
+    val constraints = ConstraintSet(
+      ImageQuality.Preset.PointOne,
+      CloudExtinction.Preset.PointOne,
+      SkyBackground.Darkest,
+      WaterVapor.Wet,
+      ElevationRange.ByAirMass.Default
+    )
+    val wavelength  = Wavelength.fromIntNanometers(300).get
+
+    // candiate whithin OIWFS patrol field but too faint for PWFS1
+    val faintStar = GuideStarCandidate.unsafeApply(
+      0L,
+      SiderealTracking.const(
+        Coordinates.Zero
+          .offsetBy(Angle.Angle0, Offset.signedDecimalArcseconds.reverseGet(0.0, 23.0))
+          .get
+      ),
+      (Band.Gaia, BrightnessValue.unsafeFrom(17.0)).some
+    )
+
+    val gmosParams = AgsParams.GmosLongSlit(
+      GmosNorthFpu.LongSlit_5_00.asLeft,
+      PortDisposition.Bottom
+    )
+
+    def runAgs(params: AgsParams) =
+      Ags.agsAnalysis(
+        constraints,
+        wavelength,
+        Coordinates.Zero,
+        Nil,
+        None,
+        NonEmptyList.of(Angle.Angle0),
+        Some(AcquisitionOffsets(NonEmptySet.of(Offset.Zero.guided))),
+        Some(ScienceOffsets(NonEmptySet.of(Offset.Zero.guided))),
+        params,
+        List(faintStar)
+      )
+
+    // Candidate whithin OIWFS limits 17.0 < 17.43
+    assert(runAgs(gmosParams).headOption.exists(_.isUsable))
+
+    // PWFS1 requires bright starts 17 > 16.03
+    assert(runAgs(gmosParams.withPWFS1).headOption.forall(!_.isUsable))
   }
 }
