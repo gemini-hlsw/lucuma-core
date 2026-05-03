@@ -12,6 +12,7 @@ import lucuma.catalog.BandsList
 import lucuma.catalog.BrightnessConstraints
 import lucuma.catalog.FaintnessConstraint
 import lucuma.catalog.SaturationConstraint
+import lucuma.core.enums.GuideProbe
 import lucuma.core.enums.GuideSpeed
 import lucuma.core.enums.SkyBackground
 import lucuma.core.geom.offsets.GeometryType
@@ -42,25 +43,26 @@ def wfsFwhm(sciFwhm: ImageQuality, wavelength: Wavelength): Double = {
   ((sciFwhm.toArcSeconds.toDouble) * math.pow(coeff, -0.2)).toDouble
 }
 
-// Calculate the widest set of constraints, useful to cache catalog results
-// We get the union off all possible constraints at the slow guide speed
-// darkest sky background and 300nm wavelength
-val widestConstraints: BrightnessConstraints = {
-  val widest = Wavelength.fromIntNanometers(300).get
+private val wvForWidestConstraints = Wavelength.fromIntNanometers(300).get
 
-  val constraints = Enumerated[ImageQuality.Preset].all.flatMap { iq =>
-    Enumerated[CloudExtinction.Preset].all.map { ce =>
-      faintLimit(
-        GuideSpeed.Slow,
-        widest,
-        SkyBackground.Darkest,
-        iq.toImageQuality,
-        ce.toCloudExtinction
-      )
-    }
-  }
+// Calculate the widest set of constraints, useful to cache catalog results.
+// We get the union of all possible constraints across every guide probe at the
+// slow guide speed, darkest sky background and 300nm wavelength.
+val widestConstraints: BrightnessConstraints = {
+  val constraints = Enumerated[GuideProbe].all.flatMap: probe =>
+    Enumerated[ImageQuality.Preset].all.flatMap: iq =>
+      Enumerated[CloudExtinction.Preset].all.map: ce =>
+        faintLimit(
+          probe,
+          GuideSpeed.Slow,
+          wvForWidestConstraints,
+          SkyBackground.Darkest,
+          iq.toImageQuality,
+          ce.toCloudExtinction
+        )
+
   // The list is never empty
-  val lowest      = constraints.maximumOption.get
+  val lowest = constraints.maximumOption.get
   BrightnessConstraints(BandsList.GaiaBandsList, lowest, none)
 }
 
@@ -68,62 +70,122 @@ val widestConstraints: BrightnessConstraints = {
  * Calculates the daintness limits for a given Guide Speed/Wavelength and conditions These are based
  * on the gaia G band and described here:
  */
+/**
+ * Calculates the faintness limits for a given Probe / Guide Speed / Wavelength and conditions.
+ * Limits are updated to account for per probe differences in April 2026.
+ */
 def faintLimit(
+  probe:      GuideProbe,
   guideSpeed: GuideSpeed,
   wavelength: Wavelength,
   sb:         SkyBackground,
   iq:         ImageQuality,
   ce:         CloudExtinction
 ): FaintnessConstraint = {
-  val limit = sb match {
-    case SkyBackground.Darkest =>
-      guideSpeed match {
-        case GuideSpeed.Fast   =>
-          16.4 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.toDouble
-        case GuideSpeed.Medium =>
-          16.9 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.toDouble
-        case GuideSpeed.Slow   =>
-          17.4 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.toDouble
+  val limit = probe match {
+    case GuideProbe.GmosOIWFS | GuideProbe.Flamingos2OIWFS =>
+      sb match {
+        case SkyBackground.Darkest | SkyBackground.Dark =>
+          guideSpeed match {
+            case GuideSpeed.Fast   =>
+              16.4 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.toDouble
+            case GuideSpeed.Medium =>
+              16.9 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.toDouble
+            case GuideSpeed.Slow   =>
+              17.6 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.toDouble
+          }
+        case SkyBackground.Gray                         =>
+          guideSpeed match {
+            case GuideSpeed.Fast   =>
+              16.3 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.toDouble
+            case GuideSpeed.Medium =>
+              16.8 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.toDouble
+            case GuideSpeed.Slow   =>
+              17.5 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.toDouble
+          }
+        case SkyBackground.Bright                       =>
+          guideSpeed match {
+            case GuideSpeed.Fast   =>
+              16.2 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.toDouble
+            case GuideSpeed.Medium =>
+              16.7 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.toDouble
+            case GuideSpeed.Slow   =>
+              17.4 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.toDouble
+          }
       }
-    case SkyBackground.Dark    =>
-      guideSpeed match {
-        case GuideSpeed.Fast   =>
-          16.3 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.toDouble
-        case GuideSpeed.Medium =>
-          16.8 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.toDouble
-        case GuideSpeed.Slow   =>
-          17.3 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.toDouble
+    case GuideProbe.PWFS2                                  =>
+      sb match {
+        case SkyBackground.Darkest | SkyBackground.Dark =>
+          guideSpeed match {
+            case GuideSpeed.Fast   =>
+              14.7 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.toDouble
+            case GuideSpeed.Medium =>
+              15.0 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.toDouble
+            case GuideSpeed.Slow   =>
+              16.3 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.toDouble
+          }
+        case SkyBackground.Gray                         =>
+          guideSpeed match {
+            case GuideSpeed.Fast   =>
+              14.6 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.toDouble
+            case GuideSpeed.Medium =>
+              14.9 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.toDouble
+            case GuideSpeed.Slow   =>
+              16.2 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.toDouble
+          }
+        case SkyBackground.Bright                       =>
+          guideSpeed match {
+            case GuideSpeed.Fast   =>
+              14.5 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.toDouble
+            case GuideSpeed.Medium =>
+              14.8 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.toDouble
+            case GuideSpeed.Slow   =>
+              16.1 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.toDouble
+          }
       }
-    case SkyBackground.Gray    =>
-      guideSpeed match {
-        case GuideSpeed.Fast   =>
-          16.2 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.toDouble
-        case GuideSpeed.Medium =>
-          16.7 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.toDouble
-        case GuideSpeed.Slow   =>
-          17.2 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.toDouble
-      }
-    case SkyBackground.Bright  =>
-      guideSpeed match {
-        case GuideSpeed.Fast   =>
-          16.1 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.toDouble
-        case GuideSpeed.Medium =>
-          16.6 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.toDouble
-        case GuideSpeed.Slow   =>
-          17.1 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.toDouble
+    case GuideProbe.PWFS1                                  =>
+      sb match {
+        case SkyBackground.Darkest | SkyBackground.Dark =>
+          guideSpeed match {
+            case GuideSpeed.Fast   =>
+              14.6 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.toDouble
+            case GuideSpeed.Medium =>
+              14.9 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.toDouble
+            case GuideSpeed.Slow   =>
+              16.2 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.toDouble
+          }
+        case SkyBackground.Gray                         =>
+          guideSpeed match {
+            case GuideSpeed.Fast   =>
+              14.5 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.toDouble
+            case GuideSpeed.Medium =>
+              14.8 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.toDouble
+            case GuideSpeed.Slow   =>
+              16.1 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.toDouble
+          }
+        case SkyBackground.Bright                       =>
+          guideSpeed match {
+            case GuideSpeed.Fast   =>
+              14.4 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.toDouble
+            case GuideSpeed.Medium =>
+              14.7 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.toDouble
+            case GuideSpeed.Slow   =>
+              16.0 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.toDouble
+          }
       }
   }
   FaintnessConstraint(BrightnessValue.unsafeFrom(BigDecimal(limit)))
 }
 
 def gaiaBrightnessConstraints(
+  probe:      GuideProbe,
   guideSpeed: GuideSpeed,
   wavelength: Wavelength,
   sb:         SkyBackground,
   iq:         ImageQuality,
   ce:         CloudExtinction
 ): BrightnessConstraints = {
-  val faintness  = faintLimit(guideSpeed, wavelength, sb, iq, ce)
+  val faintness  = faintLimit(probe, guideSpeed, wavelength, sb, iq, ce)
   val saturation = SaturationConstraint(
     BrightnessValue.unsafeFrom(faintness.brightness.value.value - 6)
   )
@@ -132,10 +194,12 @@ def gaiaBrightnessConstraints(
 
 def gaiaBrightnessConstraints(
   constraints: ConstraintSet,
+  probe:       GuideProbe,
   guideSpeed:  GuideSpeed,
   wavelength:  Wavelength
 ): BrightnessConstraints =
   gaiaBrightnessConstraints(
+    probe,
     guideSpeed,
     wavelength,
     constraints.skyBackground,
