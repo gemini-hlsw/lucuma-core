@@ -21,7 +21,7 @@ class LimitsSuite extends munit.FunSuite {
       widestConstraints,
       BrightnessConstraints(
         BandsList.GaiaBandsList,
-        FaintnessConstraint(BrightnessValue.unsafeFrom(17.327769563884203)),
+        FaintnessConstraint(BrightnessValue.unsafeFrom(17.527769563884206)),
         None
       )
     )
@@ -41,14 +41,14 @@ class LimitsSuite extends munit.FunSuite {
     val wavelength = Wavelength.fromIntNanometers(300).get
 
     val brightnessConstraints =
-      gaiaBrightnessConstraints(constraints, GuideSpeed.Fast, wavelength)
+      gaiaBrightnessConstraints(constraints, GuideProbe.GmosOIWFS, GuideSpeed.Fast, wavelength)
 
     assertEquals(
       brightnessConstraints,
       BrightnessConstraints(
         BandsList.GaiaBandsList,
-        FaintnessConstraint(BrightnessValue.unsafeFrom(16.127769563884204)),
-        Some(SaturationConstraint(BrightnessValue.unsafeFrom(10.127769563884204)))
+        FaintnessConstraint(BrightnessValue.unsafeFrom(16.227769563884202)),
+        Some(SaturationConstraint(BrightnessValue.unsafeFrom(10.227769563884202)))
       )
     )
   }

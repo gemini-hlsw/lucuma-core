@@ -155,7 +155,7 @@ class ShortCut_7060 extends CatsEffectSuite:
             conf,
             gs.collect { case Right(t) => t }.map(GuideStarCandidate.siderealTarget.get)
           )
-        r.sortUsablePositions.collectFirst:
+        r.analyses.sortUsablePositions.collectFirst:
           case Usable(target = GuideStarCandidate(id = id)) => id
       .assertEquals(6479709205473911296L.some)
 
@@ -183,7 +183,7 @@ class ShortCut_7060 extends CatsEffectSuite:
             conf,
             gs.collect { case Right(t) => t }.map(GuideStarCandidate.siderealTarget.get)
           )
-        r.sortUsablePositions.collectFirst:
+        r.analyses.sortUsablePositions.collectFirst:
           case Usable(target = GuideStarCandidate(id = id)) => id
       .assertEquals(6479709205473911296L.some)
 
@@ -213,5 +213,5 @@ class ShortCut_7060 extends CatsEffectSuite:
             conf,
             gs.collect { case Right(t) => t }.map(GuideStarCandidate.siderealTarget.get)
           )
-        r.sortUsablePositions
+        r.analyses.sortUsablePositions
       .assertEquals(Nil)

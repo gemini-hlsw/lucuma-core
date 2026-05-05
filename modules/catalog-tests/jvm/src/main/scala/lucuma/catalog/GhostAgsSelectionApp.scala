@@ -51,8 +51,9 @@ object GhostAgsSelectionApp extends IOApp.Simple with AgsSelectionSample {
                 ghostParams,
                 candidates
               )
-            pprint.pprintln(r.sortUsablePositions)
-            r.sortUsablePositions
+            pprint.pprintln(r.stats)
+            pprint.pprintln(r.analyses.sortUsablePositions)
+            r.analyses.sortUsablePositions
           }
       )
       .flatTap(x => IO.println(x.length))

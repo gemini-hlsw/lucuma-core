@@ -2,7 +2,7 @@ import org.scalajs.linker.interface.ESVersion
 import org.typelevel.sbt.gha.PermissionValue
 import org.typelevel.sbt.gha.Permissions
 
-ThisBuild / tlBaseVersion                         := "0.191"
+ThisBuild / tlBaseVersion                         := "0.192"
 ThisBuild / tlCiReleaseBranches                   := Seq("master")
 ThisBuild / githubWorkflowEnv += "MUNIT_FLAKY_OK" -> "true"
 
@@ -12,6 +12,8 @@ Global / concurrentRestrictions += Tags.limit(Tags.Compile, 1)
 
 ThisBuild / crossScalaVersions := Seq("3.8.3")
 ThisBuild / scalacOptions += "-language:implicitConversions" // TODO
+
+ThisBuild / Test / testOptions += Tests.Argument(TestFrameworks.MUnit, "--log=debug")
 
 lazy val catsVersion                = "2.13.0"
 lazy val catsCollctionsVersion      = "0.9.10"
