@@ -13,6 +13,8 @@ Global / concurrentRestrictions += Tags.limit(Tags.Compile, 1)
 ThisBuild / crossScalaVersions := Seq("3.8.3")
 ThisBuild / scalacOptions += "-language:implicitConversions" // TODO
 
+ThisBuild / Test / testOptions += Tests.Argument(TestFrameworks.MUnit, "--log=debug")
+
 lazy val catsVersion                = "2.13.0"
 lazy val catsCollctionsVersion      = "0.9.10"
 lazy val catsEffectVersion          = "3.7.0"
