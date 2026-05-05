@@ -135,6 +135,7 @@ class AgsSuite extends munit.FunSuite {
           AgsParams.GmosLongSlit(GmosNorthFpu.LongSlit_5_00.asLeft, PortDisposition.Bottom),
           List(gs1)
         )
+        .analyses
         .contains(
           AgsAnalysis
             .VignettesScience(gs1, OffsetPosition(GeometryType.Base, Offset.Zero, Angle.Angle0))
@@ -166,6 +167,7 @@ class AgsSuite extends munit.FunSuite {
           AgsParams.GmosLongSlit(GmosNorthFpu.LongSlit_5_00.asLeft, PortDisposition.Bottom),
           List(guideStarOffset)
         )
+        .analyses
         .headOption
         .forall(_.isUsable)
     )
@@ -200,6 +202,7 @@ class AgsSuite extends munit.FunSuite {
           ),
           List(gs1)
         )
+        .analyses
         .contains(
           AgsAnalysis
             .VignettesScience(gs1, OffsetPosition(GeometryType.Base, Offset.Zero, Angle.Angle0))
@@ -235,6 +238,7 @@ class AgsSuite extends munit.FunSuite {
           ),
           List(guideStarOffset)
         )
+        .analyses
         .headOption
         .forall(_.isUsable)
     )
@@ -271,6 +275,7 @@ class AgsSuite extends munit.FunSuite {
           AgsParams.Igrins2LongSlit(),
           List(pwfsGS)
         )
+        .analyses
         .contains(
           AgsAnalysis
             .VignettesScience(pwfsGS, OffsetPosition(GeometryType.Base, Offset.Zero, Angle.Angle0))
@@ -302,6 +307,7 @@ class AgsSuite extends munit.FunSuite {
           AgsParams.Igrins2LongSlit(),
           List(guideStarOffset)
         )
+        .analyses
         .headOption
         .forall(_.isUsable)
     )
@@ -348,9 +354,9 @@ class AgsSuite extends munit.FunSuite {
       )
 
     // Candidate whithin OIWFS limits 17.0 < 17.43
-    assert(runAgs(gmosParams).headOption.exists(_.isUsable))
+    assert(runAgs(gmosParams).analyses.headOption.exists(_.isUsable))
 
     // PWFS1 requires bright starts 17 > 16.03
-    assert(runAgs(gmosParams.withPWFS1).headOption.forall(!_.isUsable))
+    assert(runAgs(gmosParams.withPWFS1).analyses.headOption.forall(!_.isUsable))
   }
 }

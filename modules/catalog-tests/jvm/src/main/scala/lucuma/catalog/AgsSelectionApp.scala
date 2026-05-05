@@ -144,8 +144,9 @@ object AgsSelectionSampleApp extends IOApp.Simple with AgsSelectionSample {
                 flamingos2Params,
                 candidates
               )
-            pprint.pprintln(r.sortUsablePositions)
-            r.sortUsablePositions
+            pprint.pprintln(r.stats)
+            pprint.pprintln(r.analyses.sortUsablePositions)
+            r.analyses.sortUsablePositions
           }
       )
       .flatTap(x => IO.println(x.length))

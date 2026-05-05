@@ -232,3 +232,75 @@ object ScienceOffsets extends NewType[NonEmptySet[GuidedOffset]]:
         a.value.toSortedSet.map(o => (GeometryType.SciGuidedOffset, o))
 
 type ScienceOffsets = ScienceOffsets.Type
+
+case class AgsAnalysisResult(analyses: List[AgsAnalysis], stats: AgsStats)
+
+object AgsAnalysisResult:
+  def from(
+    candidateCount:  Int,
+    acceptedCount:   Int,
+    posAngleCount:   Int,
+    acqOffsetCount:  Int,
+    sciOffsetCount:  Int,
+    positionCount:   Int,
+    analyses:        List[AgsAnalysis],
+    contextNanos:    Long,
+    analysisNanos:   Long
+  ): AgsAnalysisResult =
+    val usableCandidates = analyses.collect { case u: AgsAnalysis.Usable => u.target.id }.toSet.size
+    AgsAnalysisResult(
+      analyses,
+      AgsStats(
+        candidateCount,
+        acceptedCount,
+        usableCandidates,
+        posAngleCount,
+        acqOffsetCount,
+        sciOffsetCount,
+        positionCount,
+        analyses.size,
+        analyses.groupMapReduce(Ags.resultLabel)(_ => 1)(_ + _),
+        contextNanos,
+        analysisNanos
+      )
+    )
+
+/**
+ * Statistics for an ags run.
+ *
+ * @param candidateCount
+ *   candidates supplied to the analysis
+ * @param acceptedCount
+ *   candidates that passed the brightness pre-filter
+ * @param usableCandidateCount
+ *   distinct candidates with at least one `Usable` outcome across all positions
+ * @param posAngleCount
+ *   distinct position angles evaluated
+ * @param acqOffsetCount
+ *   acquisition offsets contributing to position generation
+ * @param sciOffsetCount
+ *   science offsets contributing to position generation
+ * @param positionCount
+ *   distinct (pos angle, offset) positions evaluated per candidate
+ * @param analysisCount
+ *   `runAnalysis` invocations actually performed = accepted * positions
+ * @param resultCounts
+ *   histogram of outcomes keyed by [[Ags.resultLabel]]
+ * @param contextNanos
+ *   monotonic ns spent building the per-position geometry context
+ * @param analysisNanos
+ *   monotonic ns spent in the runAnalysis loop (JTS work)
+ */
+case class AgsStats(
+  candidateCount:       Int,
+  acceptedCount:        Int,
+  usableCandidateCount: Int,
+  posAngleCount:        Int,
+  acqOffsetCount:       Int,
+  sciOffsetCount:       Int,
+  positionCount:        Int,
+  analysisCount:        Int,
+  resultCounts:         Map[String, Int],
+  contextNanos:         Long,
+  analysisNanos:        Long
+)

@@ -48,6 +48,16 @@ object Ags {
       .find(_._2.contains(Band.Gaia, gMag))
       .map(_._1)
 
+  def resultLabel(a: AgsAnalysis): String = a match
+    case _: Usable                   => "usable"
+    case _: NotReachableAtPosition   => "not_reachable"
+    case _: VignettesScience         => "vignettes_science"
+    case _: NoGuideStarForProbe      => "no_guide_star"
+    case _: NoMagnitudeForBand       => "no_magnitude"
+    case _: ProperMotionNotAvailable => "pm_not_available"
+    case _: MagnitudeTooFaint        => "magnitude_too_faint"
+    case _: MagnitudeTooBright       => "magnitude_too_bright"
+
   // Runs the analyisis for a single guide star at a single position
   protected def runAnalysis(
     conditions: ConstraintSet,
@@ -326,7 +336,7 @@ object Ags {
     params:             AgsParams,
     instant:            Instant,
     candidates:         List[GuideStarCandidate]
-  ): List[AgsAnalysis] = {
+  ): AgsAnalysisResult = {
     val positions =
       generatePositions(
         baseAt,
@@ -336,41 +346,57 @@ object Ags {
         scienceOffsets,
         instant
       ).value.toNonEmptyList
-    val ctx       = analysisContext(constraints, wavelength, positions, params)
 
-    candidates
-      .filter(c =>
-        c.gBrightness.exists: (_, g) =>
-          ctx.brightnessConstraint.exists(_.contains(Band.Gaia, g))
-      )
-      .flatMap: gsc =>
-        val sciOffsets = scienceOffsetsAt(scienceAt, instant, gsc)
-        val noZones    =
-          blindOffset.flatMap(b => offsetAt(b, instant, gsc)).fold(sciOffsets)(_ :: sciOffsets)
+    val ctxStart = System.nanoTime()
+    val ctx      = analysisContext(constraints, wavelength, positions, params)
+    val ctxEnd   = System.nanoTime()
 
-        positions.toList.map: position =>
-          val oOffset = offsetAt(baseAt, instant, gsc)
-          oOffset
-            .map: offset =>
-              runAnalysis(
-                constraints,
-                offset,
-                noZones,
-                position,
-                params,
-                gsc,
-                ctx.guideSpeeds,
-                ctx.calcs
-              )
-            .getOrElse(ProperMotionNotAvailable(gsc, position.posAngle))
+    val accepted = candidates.filter: c =>
+      c.gBrightness.exists: (_, g) =>
+        ctx.brightnessConstraint.exists(_.contains(Band.Gaia, g))
+
+    val anStart  = System.nanoTime()
+    val analyses = accepted.flatMap: gsc =>
+      val sciOffsets = scienceOffsetsAt(scienceAt, instant, gsc)
+      val noZones    =
+        blindOffset.flatMap(b => offsetAt(b, instant, gsc)).fold(sciOffsets)(_ :: sciOffsets)
+
+      positions.toList.map: position =>
+        offsetAt(baseAt, instant, gsc)
+          .map: offset =>
+            runAnalysis(
+              constraints,
+              offset,
+              noZones,
+              position,
+              params,
+              gsc,
+              ctx.guideSpeeds,
+              ctx.calcs
+            )
+          .getOrElse(ProperMotionNotAvailable(gsc, position.posAngle))
+    val anEnd    = System.nanoTime()
+
+    AgsAnalysisResult.from(
+      candidates.size,
+      accepted.size,
+      posAngles.size,
+      acquisitionOffsets.fold(0)(_.value.size.toInt),
+      scienceOffsets.fold(0)(_.value.size.toInt),
+      positions.size,
+      analyses,
+      ctxEnd - ctxStart,
+      anEnd - anStart
+    )
   }
 
   /**
-   * Do analysis of a list of Candidate Guide Stars Note the base coordinates should be pm corrected
-   * if needed.
+   * Do analysis of a list of Candidate Guide Stars. Note the base coordinates should be pm
+   * corrected if needed.
    *
-   * The results contaains every possible combination of candidates and positions, the result will
+   * The results contains every possible combination of candidates and positions, the result will
    * be less than candidates.length * positions.length as some candidates will be filtered out
+   * Added statistics to analyze the cost of an analysis run.
    */
   def agsAnalysis(
     constraints:        ConstraintSet,
@@ -383,7 +409,7 @@ object Ags {
     scienceOffsets:     Option[ScienceOffsets],
     params:             AgsParams,
     candidates:         List[GuideStarCandidate]
-  ): List[AgsAnalysis] = {
+  ): AgsAnalysisResult = {
     val positions =
       generatePositions(
         baseCoordinates.some,
@@ -393,31 +419,46 @@ object Ags {
         scienceOffsets
       ).value.toNonEmptyList
 
-    val ctx = analysisContext(constraints, wavelength, positions, params)
+    val ctxStart = System.nanoTime()
+    val ctx      = analysisContext(constraints, wavelength, positions, params)
+    val ctxEnd   = System.nanoTime()
 
-    candidates
-      .filter: c =>
-        c.gBrightness.exists { case (_, g) =>
-          ctx.brightnessConstraint.exists(_.contains(Band.Gaia, g))
-        }
-      .flatMap: gsc =>
-        val offset     = baseCoordinates.diff(gsc.tracking.baseCoordinates).offset
-        val sciOffsets = scienceCoordinates.map(_.diff(gsc.tracking.baseCoordinates).offset)
-        val noZones    = blindOffset
-          .map(_.diff(gsc.tracking.baseCoordinates).offset)
-          .fold(sciOffsets)(_ :: sciOffsets)
+    val accepted = candidates.filter: c =>
+      c.gBrightness.exists: (_, g) =>
+        ctx.brightnessConstraint.exists(_.contains(Band.Gaia, g))
 
-        positions.toList.map: position =>
-          runAnalysis(
-            constraints,
-            offset,
-            noZones,
-            position,
-            params,
-            gsc,
-            ctx.guideSpeeds,
-            ctx.calcs
-          )
+    val anStart  = System.nanoTime()
+    val analyses = accepted.flatMap: gsc =>
+      val offset     = baseCoordinates.diff(gsc.tracking.baseCoordinates).offset
+      val sciOffsets = scienceCoordinates.map(_.diff(gsc.tracking.baseCoordinates).offset)
+      val noZones    = blindOffset
+        .map(_.diff(gsc.tracking.baseCoordinates).offset)
+        .fold(sciOffsets)(_ :: sciOffsets)
+
+      positions.toList.map: position =>
+        runAnalysis(
+          constraints,
+          offset,
+          noZones,
+          position,
+          params,
+          gsc,
+          ctx.guideSpeeds,
+          ctx.calcs
+        )
+    val anEnd    = System.nanoTime()
+
+    AgsAnalysisResult.from(
+      candidates.size,
+      accepted.size,
+      posAngles.size,
+      acquisitionOffsets.fold(0)(_.value.size.toInt),
+      scienceOffsets.fold(0)(_.value.size.toInt),
+      positions.size,
+      analyses,
+      ctxEnd - ctxStart,
+      anEnd - anStart
+    )
   }
 
   /**
