@@ -237,15 +237,15 @@ case class AgsAnalysisResult(analyses: List[AgsAnalysis], stats: AgsStats)
 
 object AgsAnalysisResult:
   def from(
-    candidateCount:  Int,
-    acceptedCount:   Int,
-    posAngleCount:   Int,
-    acqOffsetCount:  Int,
-    sciOffsetCount:  Int,
-    positionCount:   Int,
-    analyses:        List[AgsAnalysis],
-    contextNanos:    Long,
-    analysisNanos:   Long
+    candidateCount: Int,
+    acceptedCount:  Int,
+    posAngleCount:  Int,
+    acqOffsetCount: Int,
+    sciOffsetCount: Int,
+    positionCount:  Int,
+    analyses:       List[AgsAnalysis],
+    contextNanos:   Long,
+    analysisNanos:  Long
   ): AgsAnalysisResult =
     val usableCandidates = analyses.collect { case u: AgsAnalysis.Usable => u.target.id }.toSet.size
     AgsAnalysisResult(

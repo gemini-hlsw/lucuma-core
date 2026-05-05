@@ -8,7 +8,6 @@ import cats.Order.given
 import cats.data.NonEmptyList
 import cats.data.NonEmptyMap
 import cats.data.NonEmptySet
-import cats.effect.Concurrent
 import cats.syntax.all.*
 import fs2.*
 import lucuma.ags.AgsAnalysis.*
@@ -30,7 +29,6 @@ import lucuma.core.model.ConstraintSet
 import lucuma.core.model.ImageQuality
 import lucuma.core.model.sequence.TelescopeConfig
 
-import java.time.Instant
 import scala.collection.immutable.SortedSet
 
 object Ags {
@@ -49,14 +47,13 @@ object Ags {
       .map(_._1)
 
   def resultLabel(a: AgsAnalysis): String = a match
-    case _: Usable                   => "usable"
-    case _: NotReachableAtPosition   => "not_reachable"
-    case _: VignettesScience         => "vignettes_science"
-    case _: NoGuideStarForProbe      => "no_guide_star"
-    case _: NoMagnitudeForBand       => "no_magnitude"
-    case _: ProperMotionNotAvailable => "pm_not_available"
-    case _: MagnitudeTooFaint        => "magnitude_too_faint"
-    case _: MagnitudeTooBright       => "magnitude_too_bright"
+    case _: Usable                 => "usable"
+    case _: NotReachableAtPosition => "not_reachable"
+    case _: VignettesScience       => "vignettes_science"
+    case _: NoGuideStarForProbe    => "no_guide_star"
+    case _: NoMagnitudeForBand     => "no_magnitude"
+    case _: MagnitudeTooFaint      => "magnitude_too_faint"
+    case _: MagnitudeTooBright     => "magnitude_too_bright"
 
   // Runs the analyisis for a single guide star at a single position
   protected def runAnalysis(
@@ -142,20 +139,6 @@ object Ags {
     }
   }
 
-  private def offsetAt(
-    at:      Instant => Option[Coordinates],
-    instant: Instant,
-    gsc:     GuideStarCandidate
-  ): Option[Offset] =
-    (at(instant), gsc.tracking.at(instant)).mapN(_.diff(_).offset)
-
-  private def scienceOffsetsAt(
-    scienceAt: List[Instant => Option[Coordinates]],
-    instant:   Instant,
-    gsc:       GuideStarCandidate
-  ): List[Offset] =
-    scienceAt.map(s => offsetAt(s, instant, gsc)).flatten
-
   def generatePositions(
     baseCoordinates: Option[Coordinates],
     blindOffset:     Option[Coordinates],
@@ -176,20 +159,6 @@ object Ags {
         )
       )
 
-  private def generatePositions(
-    baseAt:             Instant => Option[Coordinates],
-    blindOffset:        Option[Instant => Option[Coordinates]],
-    posAngles:          NonEmptyList[Angle],
-    acquisitionOffsets: Option[AcquisitionOffsets],
-    scienceOffsets:     Option[ScienceOffsets],
-    instant:            Instant
-  ): OffsetPositions = {
-    val baseCoords: Option[Coordinates]  = baseAt(instant)
-    val blindCoords: Option[Coordinates] = blindOffset.flatMap(_(instant))
-
-    generatePositions(baseCoords, blindCoords, posAngles, acquisitionOffsets, scienceOffsets)
-  }
-
   private def analysisContext(
     constraints: ConstraintSet,
     wavelength:  Wavelength,
@@ -203,66 +172,8 @@ object Ags {
   }
 
   /**
-   * FS2 pipe to do analysis of a stream of Candidate Guide Stars The base coordinates and
-   * candidates will be PM corrected
-   */
-  protected def agsAnalysisStreamPM[F[_]: Concurrent](
-    constraints:        ConstraintSet,
-    wavelength:         Wavelength,
-    baseAt:             Instant => Option[Coordinates],
-    scienceAt:          List[Instant => Option[Coordinates]],
-    blindOffset:        Option[Instant => Option[Coordinates]],
-    posAngles:          NonEmptyList[Angle],
-    acquisitionOffsets: Option[AcquisitionOffsets],
-    scienceOffsets:     Option[ScienceOffsets],
-    params:             AgsParams,
-    instant:            Instant
-  ): Pipe[F, GuideStarCandidate, AgsAnalysis] = {
-    val positions =
-      generatePositions(
-        baseAt,
-        blindOffset,
-        posAngles,
-        acquisitionOffsets,
-        scienceOffsets,
-        instant
-      ).value.toNonEmptyList
-
-    val ctx = analysisContext(constraints, wavelength, positions, params)
-
-    in =>
-      (in.filter(c =>
-         c.gBrightness.exists { case (_, g) =>
-           ctx.brightnessConstraint.exists(_.contains(Band.Gaia, g))
-         }
-       ),
-       Stream.emits[F, OffsetPosition](positions.toList).repeat
-      )
-        .mapN { case (gsc, position) =>
-          val offset     = offsetAt(baseAt, instant, gsc)
-          val sciOffsets = scienceOffsetsAt(scienceAt, instant, gsc)
-          val noZones    =
-            blindOffset.flatMap(b => offsetAt(b, instant, gsc)).fold(sciOffsets)(_ :: sciOffsets)
-
-          offset
-            .map { offset =>
-              runAnalysis(constraints,
-                          offset,
-                          noZones,
-                          position,
-                          params,
-                          gsc,
-                          ctx.guideSpeeds,
-                          ctx.calcs
-              )
-            }
-            .getOrElse(ProperMotionNotAvailable(gsc, position.posAngle))
-        }
-  }
-
-  /**
-   * FS2 pipe to do analysis of a stream of Candidate Guide Stars This method assumes the base and
-   * candidates are pm corrected already
+   * FS2 pipe to do analysis of a stream of Candidate Guide Stars. The base and candidates must be
+   * PM corrected by the caller.
    */
   def agsAnalysisStream[F[_]](
     constraints:        ConstraintSet,
@@ -322,81 +233,12 @@ object Ags {
     ).mapN(_ ∪ _)
 
   /**
-   * Do analysis of a list of Candidate Guide Stars. Proper motion is calculated inside if needed
-   */
-  protected def agsAnalysisPM(
-    constraints:        ConstraintSet,
-    wavelength:         Wavelength,
-    baseAt:             Instant => Option[Coordinates],
-    scienceAt:          List[Instant => Option[Coordinates]],
-    blindOffset:        Option[Instant => Option[Coordinates]],
-    posAngles:          NonEmptyList[Angle],
-    acquisitionOffsets: Option[AcquisitionOffsets],
-    scienceOffsets:     Option[ScienceOffsets],
-    params:             AgsParams,
-    instant:            Instant,
-    candidates:         List[GuideStarCandidate]
-  ): AgsAnalysisResult = {
-    val positions =
-      generatePositions(
-        baseAt,
-        blindOffset,
-        posAngles,
-        acquisitionOffsets,
-        scienceOffsets,
-        instant
-      ).value.toNonEmptyList
-
-    val ctxStart = System.nanoTime()
-    val ctx      = analysisContext(constraints, wavelength, positions, params)
-    val ctxEnd   = System.nanoTime()
-
-    val accepted = candidates.filter: c =>
-      c.gBrightness.exists: (_, g) =>
-        ctx.brightnessConstraint.exists(_.contains(Band.Gaia, g))
-
-    val anStart  = System.nanoTime()
-    val analyses = accepted.flatMap: gsc =>
-      val sciOffsets = scienceOffsetsAt(scienceAt, instant, gsc)
-      val noZones    =
-        blindOffset.flatMap(b => offsetAt(b, instant, gsc)).fold(sciOffsets)(_ :: sciOffsets)
-
-      positions.toList.map: position =>
-        offsetAt(baseAt, instant, gsc)
-          .map: offset =>
-            runAnalysis(
-              constraints,
-              offset,
-              noZones,
-              position,
-              params,
-              gsc,
-              ctx.guideSpeeds,
-              ctx.calcs
-            )
-          .getOrElse(ProperMotionNotAvailable(gsc, position.posAngle))
-    val anEnd    = System.nanoTime()
-
-    AgsAnalysisResult.from(
-      candidates.size,
-      accepted.size,
-      posAngles.size,
-      acquisitionOffsets.fold(0)(_.value.size.toInt),
-      scienceOffsets.fold(0)(_.value.size.toInt),
-      positions.size,
-      analyses,
-      ctxEnd - ctxStart,
-      anEnd - anStart
-    )
-  }
-
-  /**
    * Do analysis of a list of Candidate Guide Stars. Note the base coordinates should be pm
    * corrected if needed.
    *
-   * The results contains every possible combination of candidates and positions, the result will
-   * be less than candidates.length * positions.length as some candidates will be filtered out
-   * Added statistics to analyze the cost of an analysis run.
+   * The results contains every possible combination of candidates and positions, the result will be
+   * less than candidates.length * positions.length as some candidates will be filtered out Added
+   * statistics to analyze the cost of an analysis run.
    */
   def agsAnalysis(
     constraints:        ConstraintSet,

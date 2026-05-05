@@ -28,12 +28,6 @@ sealed trait AgsAnalysis derives Eq {
 
 object AgsAnalysis {
 
-  case class ProperMotionNotAvailable(target: GuideStarCandidate, posAngle: Angle)
-      extends AgsAnalysis derives Eq {
-    override def message(withProbe: Boolean): String =
-      "Cannot calculate proper motion."
-  }
-
   case class VignettesScience(target: GuideStarCandidate, position: OffsetPosition)
       extends AgsAnalysis derives Eq {
     val posAngle: Angle = position.posAngle
