@@ -233,7 +233,9 @@ object ScienceOffsets extends NewType[NonEmptySet[GuidedOffset]]:
 
 type ScienceOffsets = ScienceOffsets.Type
 
-case class AgsAnalysisResult(analyses: List[AgsAnalysis], stats: AgsStats)
+case class AgsAnalysisResult(analyses: List[AgsAnalysis], stats: AgsStats):
+  def sortUsablePositions: List[AgsAnalysis.Usable] =
+    analyses.sortUsablePositions
 
 object AgsAnalysisResult:
   def from(
