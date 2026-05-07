@@ -5,7 +5,7 @@ package lucuma.core.enums
 
 import lucuma.core.util.Enumerated
 
-enum ImagingCapabilities(val tag: String, val label: String) derives Enumerated:
-  case Speckle   extends ImagingCapabilities("speckle",    "speckle")
-  case WideField extends ImagingCapabilities("wide_field", "wide field")
+enum ImagingCapability(val tag: String, val label: String) derives Enumerated:
+  case Speckle   extends ImagingCapability("speckle",    "speckle")
+  case WideField extends ImagingCapability("wide_field", "wide field")
 
