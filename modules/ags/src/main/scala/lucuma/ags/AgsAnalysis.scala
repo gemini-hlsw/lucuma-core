@@ -191,4 +191,8 @@ object AgsAnalysis {
       usablePerTarget.sorted(using Usable.rankOrdering)
     }
 
+  extension (results: AgsAnalysisResult)
+    def sortUsablePositions: List[Usable] =
+      results.analyses.sortUsablePositions
+
 }

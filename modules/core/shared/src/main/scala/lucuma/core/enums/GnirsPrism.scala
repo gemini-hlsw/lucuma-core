@@ -17,5 +17,5 @@ enum  GnirsPrism(
   val longName: String
 ) derives Enumerated, Display:
     case Mirror extends GnirsPrism("Mirror", "Mirror", "Mirror")
-    case Sxd extends GnirsPrism("Sxd", "Short XD", "Short cross dispersion")
-    case Lxd extends GnirsPrism("Lxd", "Long XD", "Long cross dispersion")
+    case Sxd extends GnirsPrism("Sxd", "SXD", "Short cross dispersion")
+    case Lxd extends GnirsPrism("Lxd", "LXD", "Long cross dispersion")
