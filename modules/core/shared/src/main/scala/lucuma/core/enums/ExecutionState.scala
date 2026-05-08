@@ -33,3 +33,13 @@ enum ExecutionState(val tag: String) derives Enumerated:
    * though more atoms and/or steps remain.
    */
   case DeclaredComplete extends ExecutionState("declared_complete")
+
+  /**
+   * The observation has been explicitly declared ongoing, though no atoms 
+   * and/or steps remain. This state is only valid for visitor mode observations.
+   */
+  case DeclaredOngoing extends ExecutionState("declared_ongoing")
+
+  /** Union type of declared (i.e., non-computed) states. */
+  type DeclaredExecutionState = DeclaredComplete.type | DeclaredOngoing.type
+
