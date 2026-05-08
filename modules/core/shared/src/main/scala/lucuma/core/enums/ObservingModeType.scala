@@ -16,10 +16,10 @@ object ObservingModeType:
   export FacilityObservingModeType.{ values => _, * }
   export VisitorObservingModeType.{ values => _, * }
   val values = FacilityObservingModeType.values ++ VisitorObservingModeType.values
-    
+
 enum FacilityObservingModeType(
-  val tag: String, 
-  val instrument: Instrument, 
+  val tag: String,
+  val instrument: Instrument,
   val defaultPosAngleConstraint: PosAngleConstraint
 ) extends ObservingModeType derives Enumerated:
   case Flamingos2LongSlit extends FacilityObservingModeType("flamingos_2_long_slit", Instrument.Flamingos2, PosAngleConstraint.AverageParallactic)
@@ -32,7 +32,7 @@ enum FacilityObservingModeType(
   case Igrins2LongSlit    extends FacilityObservingModeType("igrins_2_long_slit",    Instrument.Igrins2,    PosAngleConstraint.AverageParallactic)
 
 enum VisitorObservingModeType(
-  val tag: String, 
+  val tag: String,
   val instrument: Instrument
 ) extends ObservingModeType derives Enumerated:
   val defaultPosAngleConstraint = PosAngleConstraint.Fixed(Angle.Angle0) // for all visitors

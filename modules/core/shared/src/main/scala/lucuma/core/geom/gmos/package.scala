@@ -14,8 +14,13 @@ import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 import lucuma.core.math.syntax.units.*
 import lucuma.core.math.units.*
+import lucuma.core.math.syntax.int.*
 
 val GmosPixelScale: PixelScale = 0.0807.pixelScale
+
+val LongSlitHeight: Angle = 108000.mas
+
+val NodAndShuffleHeight: Angle = 108000.mas
 
 def gmosSlitWidthPixels(slitWidth: Angle, xBin: GmosXBinning): Quantity[BigDecimal, Pixels] =
   val widthArcSeconds = Angle.decimalArcseconds.get(slitWidth).arcsecs
