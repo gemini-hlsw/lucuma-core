@@ -8,9 +8,8 @@ import cats.derived.*
 import lucuma.core.enums.GhostResolutionMode
 import lucuma.core.util.TimeSpan
 
-// Will the target mode (single vs dual, which if any is sky, etc.) go here?
-
 final case class GhostStaticConfig(
   resolutionMode:                GhostResolutionMode,
+  ifuMapping:                    Option[GhostIfuMapping],
   slitViewingCameraExposureTime: Option[TimeSpan]
 ) derives Eq

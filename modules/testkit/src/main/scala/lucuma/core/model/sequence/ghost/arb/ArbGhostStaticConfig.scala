@@ -16,22 +16,26 @@ import org.scalacheck.Cogen
 trait ArbGhostStaticConfig:
 
   import ArbEnumerated.given
+  import ArbGhostIfuMapping.given
   import ArbTimeSpan.given
 
   given Arbitrary[GhostStaticConfig] =
     Arbitrary:
       for
         r <- arbitrary[GhostResolutionMode]
+        m <- arbitrary[Option[GhostIfuMapping]]
         s <- arbitrary[Option[TimeSpan]]
-      yield GhostStaticConfig(r, s)
+      yield GhostStaticConfig(r, m, s)
 
   given Cogen[GhostStaticConfig] =
     Cogen[(
       GhostResolutionMode,
+      Option[GhostIfuMapping],
       Option[TimeSpan]
     )].contramap: a =>
       (
         a.resolutionMode,
+        a.ifuMapping,
         a.slitViewingCameraExposureTime
       )
 
