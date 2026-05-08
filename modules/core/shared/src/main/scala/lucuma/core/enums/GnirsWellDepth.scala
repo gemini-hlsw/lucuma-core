@@ -20,3 +20,9 @@ enum GnirsWellDepth(
 ) derives Enumerated, Display:
   case Shallow extends GnirsWellDepth("Shallow", "Shallow", "Shallow", 300)
   case Deep extends GnirsWellDepth("Deep", "Deep", "Deep", 600)
+
+object GnirsWellDepth:
+  def forCamera(camera: GnirsCamera): GnirsWellDepth =
+    camera match // By default, use shallow for blue camera and deep for red camera.
+      case GnirsCamera.ShortBlue | GnirsCamera.LongBlue => GnirsWellDepth.Shallow
+      case GnirsCamera.ShortRed | GnirsCamera.LongRed   => GnirsWellDepth.Deep
