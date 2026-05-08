@@ -9,6 +9,7 @@ import cats.data.NonEmptyList
 import cats.data.NonEmptyMap
 import cats.derived.*
 import lucuma.core.enums.Flamingos2LyotWheel
+import lucuma.core.enums.GmosFpuType
 import lucuma.core.enums.GmosNorthFpu
 import lucuma.core.enums.GmosSouthFpu
 import lucuma.core.enums.GuideProbe
@@ -204,11 +205,13 @@ object AgsParams:
       fpu:  Either[GmosNorthFpu, GmosSouthFpu],
       port: PortDisposition = PortDisposition.Side
     ): GmosLongSlit =
-      require(isLongSlit(fpu), s"FPU must be a long-slit, got: $fpu")
+      require(supportedFpu(fpu), s"FPU must be a long-slit or N&S, got: $fpu")
       new GmosLongSlit(fpu, port, GuideProbe.GmosOIWFS)
 
-    private def isLongSlit(fpu: Either[GmosNorthFpu, GmosSouthFpu]): Boolean =
-      fpu.fold(_.tag.startsWith("LongSlit"), _.tag.startsWith("LongSlit"))
+    private def supportedFpu(fpu: Either[GmosNorthFpu, GmosSouthFpu]): Boolean =
+      fpu.fold(_.fpuType, _.fpuType) match
+        case GmosFpuType.LongSlit | GmosFpuType.Ns => true
+        case GmosFpuType.Ifu                       => false
 
   case class Flamingos2LongSlit private (
     lyot:  Flamingos2LyotWheel,

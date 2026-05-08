@@ -44,9 +44,12 @@ trait GmosScienceAreaGeometry {
   private def shapeFromLongSlitFpu(fpu: Either[GmosNorthFpu, GmosSouthFpu]): ShapeExpression =
     fpu.fold(
       {
-        case GmosNorthFpu.Ns0 | GmosNorthFpu.Ns1 | GmosNorthFpu.Ns2 | GmosNorthFpu.Ns3 |
-             GmosNorthFpu.Ns4 | GmosNorthFpu.Ns5 | GmosNorthFpu.Ifu2Slits | GmosNorthFpu.IfuBlue |
-             GmosNorthFpu.IfuRed =>
+        case n @ (GmosNorthFpu.Ns0 | GmosNorthFpu.Ns1 |
+                  GmosNorthFpu.Ns2 | GmosNorthFpu.Ns3 |
+                  GmosNorthFpu.Ns4 | GmosNorthFpu.Ns5) =>
+          nsFov(n.effectiveSlitWidth)
+
+        case GmosNorthFpu.Ifu2Slits | GmosNorthFpu.IfuBlue | GmosNorthFpu.IfuRed =>
           ShapeExpression.empty
 
         case n@(GmosNorthFpu.LongSlit_0_25 | GmosNorthFpu.LongSlit_0_50 |
@@ -56,8 +59,12 @@ trait GmosScienceAreaGeometry {
           longSlitFov(n.effectiveSlitWidth)
       },
       {
-        case GmosSouthFpu.Ns1 | GmosSouthFpu.Ns2 | GmosSouthFpu.Ns3 |
-             GmosSouthFpu.Ns4 | GmosSouthFpu.Ns5 | GmosSouthFpu.Ifu2Slits | GmosSouthFpu.IfuBlue |
+        case n@(GmosSouthFpu.Ns1 | GmosSouthFpu.Ns2 |
+                GmosSouthFpu.Ns3 | GmosSouthFpu.Ns4 |
+                GmosSouthFpu.Ns5) =>
+          nsFov(n.effectiveSlitWidth)
+
+        case GmosSouthFpu.Ifu2Slits | GmosSouthFpu.IfuBlue |
              GmosSouthFpu.IfuRed | GmosSouthFpu.IfuNS2Slits | GmosSouthFpu.IfuNSBlue |
              GmosSouthFpu.IfuNSRed =>
           ShapeExpression.empty
@@ -97,7 +104,7 @@ trait GmosScienceAreaGeometry {
   }
 
   def longSlitFov(width: Angle): ShapeExpression = {
-    val h = 108000.mas
+    val h = LongSlitHeight
     val g = 3200.mas
 
     val x = width.bisect
@@ -110,6 +117,8 @@ trait GmosScienceAreaGeometry {
     }
   }
 
+  private def nsFov(size: Angle): ShapeExpression =
+    ShapeExpression.centeredRectangle(size, NodAndShuffleHeight)
 }
 
 object scienceArea extends GmosScienceAreaGeometry

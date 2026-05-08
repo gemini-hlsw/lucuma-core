@@ -36,7 +36,7 @@ trait InstrumentShapes:
   def shapes: List[ShapeExpression]
   def coloredShapes: List[ColoredShape] = Nil
 
-trait GmosLSShapes extends InstrumentShapes:
+trait GmosShapes extends InstrumentShapes:
   import lucuma.core.geom.gmos.*
   import lucuma.core.geom.gmos.oiwfs.{probeArm, patrolField}
 
@@ -49,8 +49,7 @@ trait GmosLSShapes extends InstrumentShapes:
   val offsetPos: Offset =
     Offset(-60.arcsec.p, 60.arcsec.q)
 
-  val fpu: Either[GmosNorthFpu, GmosSouthFpu] =
-    Right(GmosSouthFpu.LongSlit_5_00)
+  def fpu: Either[GmosNorthFpu, GmosSouthFpu]
 
   val port: PortDisposition =
     PortDisposition.Side
@@ -63,6 +62,14 @@ trait GmosLSShapes extends InstrumentShapes:
       scienceArea.longSlitMode.shapeAt(posAngle, offsetPos, fpu),
       candidatesArea.candidatesAreaAt(posAngle, offsetPos)
     )
+
+trait GmosLSShapes extends GmosShapes:
+  override val fpu: Either[GmosNorthFpu, GmosSouthFpu] =
+    Right(GmosSouthFpu.LongSlit_5_00)
+
+trait GmosNSShapes extends GmosShapes:
+  override val fpu: Either[GmosNorthFpu, GmosSouthFpu] =
+    Right(GmosSouthFpu.Ns5)
 
 trait GmosImagingShapes extends InstrumentShapes:
   import lucuma.core.geom.gmos.*
@@ -337,6 +344,8 @@ class JtsDemo extends Frame("JTS Demo") {
 }
 
 object JtsGmosLSDemo extends JtsDemo with GmosLSShapes
+
+object JtsGmosNSDemo extends JtsDemo with GmosNSShapes
 
 object JtsFlamingos2LSDemo extends JtsDemo with Flamingos2LSShapes
 
