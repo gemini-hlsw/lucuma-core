@@ -92,7 +92,7 @@ object ADQLInterpreter {
       val allFields: CatalogAdapter.Gaia => List[FieldId] = _.allFields
       override def orderBy                                = Some("phot_g_mean_mag ASC")
       override def extraFields(c: Coordinates)            = Nil
-      override val extraConstraints: List[String]         = List("ruwe < 1.4")
+      override val extraConstraints: List[String]         = List("ruwe < 2")
     }
 
   // Find n targets around the base
@@ -111,7 +111,7 @@ object ADQLInterpreter {
             case f if f === adapter.epochField => false
             case _                             => true
 
-      override val extraConstraints: List[String] = List("ruwe < 1.4")
+      override val extraConstraints: List[String] = List("ruwe < 2")
 
       def extraFields(c: Coordinates): List[String] = List(
         // Gaia can do pm correction for a given epoch
