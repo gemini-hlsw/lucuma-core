@@ -18,45 +18,57 @@ sealed trait GhostIfuMapping:
 
 object GhostIfuMapping:
 
-  case class GhostSingleTarget(
-    ifu1: Target
+  /**
+   * IFU1 is either a sidereal or nonsidereal target.
+   */
+  case class SingleTarget(
+    ifu1: GhostTarget
   ) extends GhostIfuMapping derives Eq:
     override def mappingType: GhostIfuMappingType = GhostIfuMappingType.SingleTarget
 
-  case class GhostTargetPlusSky(
-    ifu1: Target,
+  /**
+   * IFU1 is a sidereal target, IFU2 is a sky position.
+   */
+  case class TargetPlusSky(
+    ifu1: Target.Sidereal,
     ifu2: Coordinates
   ) extends GhostIfuMapping derives Eq:
     override def mappingType: GhostIfuMappingType = GhostIfuMappingType.TargetPlusSky
 
-  case class GhostSkyPlusTarget(
+  /**
+   * IFU1 is a sky position, IFU2 is a sidereal target.
+   */
+  case class SkyPlusTarget(
     ifu1: Coordinates,
-    ifu2: Target
+    ifu2: Target.Sidereal
   ) extends GhostIfuMapping derives Eq:
     override def mappingType: GhostIfuMappingType = GhostIfuMappingType.SkyPlusTarget
 
-  case class GhostDualTarget(
-    ifu1: Target,
-    ifu2: Target
+  /**
+   * IFU1 and IFU2 are sidereal targets.
+   */
+  case class DualTarget(
+    ifu1: Target.Sidereal,
+    ifu2: Target.Sidereal
   ) extends GhostIfuMapping derives Eq:
     override def mappingType: GhostIfuMappingType = GhostIfuMappingType.DualTarget
 
   given Eq[GhostIfuMapping] =
     Eq.instance:
-      case (a: GhostSingleTarget,  b: GhostSingleTarget)  => a === b
-      case (a: GhostSkyPlusTarget, b: GhostSkyPlusTarget) => a === b
-      case (a: GhostTargetPlusSky, b: GhostTargetPlusSky) => a === b
-      case (a: GhostDualTarget,    b: GhostDualTarget)    => a === b
-      case _                                              => false
+      case (a: SingleTarget,  b: SingleTarget)  => a === b
+      case (a: SkyPlusTarget, b: SkyPlusTarget) => a === b
+      case (a: TargetPlusSky, b: TargetPlusSky) => a === b
+      case (a: DualTarget,    b: DualTarget)    => a === b
+      case _                                    => false
 
-  val singleTarget: Prism[GhostIfuMapping, GhostSingleTarget] =
-    GenPrism[GhostIfuMapping, GhostSingleTarget]
+  val singleTarget: Prism[GhostIfuMapping, SingleTarget] =
+    GenPrism[GhostIfuMapping, SingleTarget]
 
-  val targetPlusSky: Prism[GhostIfuMapping, GhostTargetPlusSky] =
-    GenPrism[GhostIfuMapping, GhostTargetPlusSky]
+  val targetPlusSky: Prism[GhostIfuMapping, TargetPlusSky] =
+    GenPrism[GhostIfuMapping, TargetPlusSky]
 
-  val skyPlusTarget: Prism[GhostIfuMapping, GhostSkyPlusTarget] =
-    GenPrism[GhostIfuMapping, GhostSkyPlusTarget]
+  val skyPlusTarget: Prism[GhostIfuMapping, SkyPlusTarget] =
+    GenPrism[GhostIfuMapping, SkyPlusTarget]
 
-  val dualTarget: Prism[GhostIfuMapping, GhostDualTarget] =
-    GenPrism[GhostIfuMapping, GhostDualTarget]
+  val dualTarget: Prism[GhostIfuMapping, DualTarget] =
+    GenPrism[GhostIfuMapping, DualTarget]

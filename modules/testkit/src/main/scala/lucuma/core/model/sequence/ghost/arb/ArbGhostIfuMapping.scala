@@ -21,68 +21,80 @@ trait ArbGhostIfuMapping:
 
   import GhostIfuMapping.*
 
-  given Arbitrary[GhostSingleTarget] =
+  given Arbitrary[GhostTarget] =
     Arbitrary:
-      arbitrary[Target].map(GhostSingleTarget.apply)
+      Gen.oneOf(
+        arbitrary[Target.Sidereal],
+        arbitrary[Target.Nonsidereal]
+      )
 
-  given Cogen[GhostSingleTarget] =
-    Cogen[Target].contramap(_.ifu1)
+  given Cogen[GhostTarget] =
+    Cogen.apply: (seed, t) =>
+      t match
+        case s: Target.Sidereal    => Cogen[Target.Sidereal].perturb(seed, s)
+        case n: Target.Nonsidereal => Cogen[Target.Nonsidereal].perturb(seed.next, n)
 
-  given Arbitrary[GhostTargetPlusSky] =
+  given Arbitrary[SingleTarget] =
+    Arbitrary:
+      arbitrary[GhostTarget].map(SingleTarget(_))
+
+  given Cogen[SingleTarget] =
+    Cogen[GhostTarget].contramap(_.ifu1)
+
+  given Arbitrary[TargetPlusSky] =
     Arbitrary:
       for
-        t <- arbitrary[Target]
+        t <- arbitrary[Target.Sidereal]
         c <- arbitrary[Coordinates]
-      yield GhostTargetPlusSky(t, c)
+      yield TargetPlusSky(t, c)
 
-  given Cogen[GhostTargetPlusSky] =
-    Cogen[(Target, Coordinates)].contramap: a =>
+  given Cogen[TargetPlusSky] =
+    Cogen[(Target.Sidereal, Coordinates)].contramap: a =>
       (a.ifu1, a.ifu2)
 
-  given Arbitrary[GhostSkyPlusTarget] =
+  given Arbitrary[SkyPlusTarget] =
     Arbitrary:
       for
         c <- arbitrary[Coordinates]
-        t <- arbitrary[Target]
-      yield GhostSkyPlusTarget(c, t)
+        t <- arbitrary[Target.Sidereal]
+      yield SkyPlusTarget(c, t)
 
-  given Cogen[GhostSkyPlusTarget] =
-    Cogen[(Coordinates, Target)].contramap: a =>
+  given Cogen[SkyPlusTarget] =
+    Cogen[(Coordinates, Target.Sidereal)].contramap: a =>
       (a.ifu1, a.ifu2)
 
-  given Arbitrary[GhostDualTarget] =
+  given Arbitrary[DualTarget] =
     Arbitrary:
       for
-        t0 <- arbitrary[Target]
-        t1 <- arbitrary[Target]
-      yield GhostDualTarget(t0, t1)
+        t0 <- arbitrary[Target.Sidereal]
+        t1 <- arbitrary[Target.Sidereal]
+      yield DualTarget(t0, t1)
 
-  given Cogen[GhostDualTarget] =
-    Cogen[(Target, Target)].contramap: a =>
+  given Cogen[DualTarget] =
+    Cogen[(Target.Sidereal, Target.Sidereal)].contramap: a =>
       (a.ifu1, a.ifu2)
 
   given Arbitrary[GhostIfuMapping] =
     Arbitrary:
       Gen.oneOf(
-        arbitrary[GhostSingleTarget],
-        arbitrary[GhostTargetPlusSky],
-        arbitrary[GhostSkyPlusTarget],
-        arbitrary[GhostDualTarget]
+        arbitrary[SingleTarget],
+        arbitrary[TargetPlusSky],
+        arbitrary[SkyPlusTarget],
+        arbitrary[DualTarget]
       )
 
   given Cogen[GhostIfuMapping] =
     Cogen[(
       Int,
-      Option[Target],
-      Option[(Target, Coordinates)],
-      Option[(Coordinates, Target)],
-      Option[(Target, Target)]
+      Option[GhostTarget],
+      Option[(Target.Sidereal, Coordinates)],
+      Option[(Coordinates, Target.Sidereal)],
+      Option[(Target.Sidereal, Target.Sidereal)]
     )].contramap {
-      case GhostSingleTarget(t)     => (0, Some(t), None, None, None)
-      case GhostTargetPlusSky(t, c) => (1, None, Some((t, c)), None, None)
-      case GhostSkyPlusTarget(c, t) => (2, None, None, Some((c, t)), None)
-      case GhostDualTarget(t0, t1)  => (3, None, None, None, Some((t0, t1)))
+      case SingleTarget(t)     => (0, Some(t), None, None, None)
+      case TargetPlusSky(t, c) => (1, None, Some((t, c)), None, None)
+      case SkyPlusTarget(c, t) => (2, None, None, Some((c, t)), None)
+      case DualTarget(t0, t1)  => (3, None, None, None, Some((t0, t1)))
     }
 
 object ArbGhostIfuMapping extends ArbGhostIfuMapping
-
