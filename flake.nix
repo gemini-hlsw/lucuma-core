@@ -24,7 +24,7 @@
           imports = [ typelevel-nix.typelevelShell ];
           typelevelShell = {
             nodejs.enable = true;
-            jdk.package = pkgs.jdk21;
+            jdk.package = pkgs.jdk25;
           };
         };
       }
