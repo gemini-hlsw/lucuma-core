@@ -317,8 +317,8 @@ object AgsParams:
 
   case class Visitor private (
     scienceRadius: Angle,
-    port: PortDisposition,
-    probe: PWFSGuideProbe,
+    port:          PortDisposition,
+    probe:         PWFSGuideProbe
   ) extends AgsParams
       with PwfsOnlyParams
       with PwfsSupport[Visitor] derives Eq:
@@ -331,7 +331,7 @@ object AgsParams:
       ShapeExpression.centeredEllipse(scienceDiameter, scienceDiameter)
 
     override def scienceArea(posAngle: Angle, offset: Offset): ShapeExpression =
-        fov.shapeAt(offset, posAngle)
+      fov.shapeAt(offset, posAngle)
 
   object Visitor:
     def apply(scienceRadius: Angle, port: PortDisposition = PortDisposition.Bottom): Visitor =
