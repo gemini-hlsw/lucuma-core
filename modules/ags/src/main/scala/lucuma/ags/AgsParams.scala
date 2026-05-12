@@ -314,3 +314,25 @@ object AgsParams:
 
     // Is this correct? is it the same for either ifu?
     val GhostScienceRadius = 20.arcseconds
+
+  case class Visitor private (
+    scienceRadius: Angle,
+    port: PortDisposition,
+    probe: PWFSGuideProbe,
+  ) extends AgsParams
+      with PwfsOnlyParams
+      with PwfsSupport[Visitor] derives Eq:
+
+    protected def withPWFSProbe(probe: PWFSGuideProbe): Visitor =
+      copy(probe = probe)
+
+    private val fov =
+      val scienceDiameter = scienceRadius * 2
+      ShapeExpression.centeredEllipse(scienceDiameter, scienceDiameter)
+
+    override def scienceArea(posAngle: Angle, offset: Offset): ShapeExpression =
+        fov.shapeAt(offset, posAngle)
+
+  object Visitor:
+    def apply(scienceRadius: Angle, port: PortDisposition = PortDisposition.Bottom): Visitor =
+      Visitor(scienceRadius, port, GuideProbe.PWFS2)
