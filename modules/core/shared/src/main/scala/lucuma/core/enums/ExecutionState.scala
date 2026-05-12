@@ -40,6 +40,12 @@ enum ExecutionState(val tag: String) derives Enumerated:
    */
   case DeclaredOngoing extends ExecutionState("declared_ongoing")
 
-  /** Union type of declared (i.e., non-computed) states. */
-  type DeclaredExecutionState = DeclaredComplete.type | DeclaredOngoing.type
 
+/** Union type of declared (i.e., non-computed) states. */
+type DeclaredExecutionState = 
+  ExecutionState.DeclaredComplete.type | 
+  ExecutionState.DeclaredOngoing.type
+
+object DeclaredExecutionState:
+  given Enumerated[DeclaredExecutionState] =
+    Enumerated.from(ExecutionState.DeclaredOngoing, ExecutionState.DeclaredComplete).withTag(_.tag)
