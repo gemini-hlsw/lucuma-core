@@ -67,9 +67,44 @@ object Display:
     import quotes.reflect.*
     Select.unique(x.asTerm, "longName").asExprOf[String]
 
+  private def nameImpl[E](x: Expr[E])(using Quotes): Expr[String] =
+    import quotes.reflect.*
+    Select.unique(x.asTerm, "name").asExprOf[String]
+
+  private def descriptionImpl[E](x: Expr[E])(using Quotes): Expr[String] =
+    import quotes.reflect.*
+    Select.unique(x.asTerm, "description").asExprOf[String]
+
   private def displayImpl[E: Type](using Quotes): Expr[Display[E]] =
-    '{
-      Display.by[E](x => ${ shortNameImpl[E]('x) }, x => ${ longNameImpl[E]('x) })
-    }
+    import quotes.reflect.*
+    val typeSymbol: Symbol = TypeRepr.of[E].typeSymbol
+    val shortNameField: Symbol = typeSymbol.declaredField("shortName") 
+    val longNameField: Symbol = typeSymbol.declaredField("longName")
+    val nameField: Symbol = typeSymbol.declaredField("name")
+    val descriptionField: Symbol = typeSymbol.declaredField("description")
+
+    // If shortName and longName fields are present, use them ...
+    if shortNameField != Symbol.noSymbol && longNameField != Symbol.noSymbol then
+      '{
+        Display.by[E](x => ${ shortNameImpl[E]('x) }, x => ${ longNameImpl[E]('x) })
+      }
+    // ... otherwise, if name and description fields are present, use them...
+    else if nameField != Symbol.noSymbol && descriptionField != Symbol.noSymbol then
+      '{
+        Display.by[E](x => ${ nameImpl[E]('x) }, x => ${ descriptionImpl[E]('x) })
+      }
+    // ... otherwise, if only name field is present, use it for both shortName and longName...
+    else if nameField != Symbol.noSymbol then
+      '{
+        Display.byShortName[E](x => ${ nameImpl[E]('x) })
+      }
+    // ... and finally, if only description field is present, use it for both shortName and longName...
+    else if descriptionField != Symbol.noSymbol then
+      '{
+        Display.byShortName[E](x => ${ descriptionImpl[E]('x) })
+      }
+    // ... otherwise, fail with an error message.
+    else
+        report.errorAndAbort(s"Could not find a valid combination of 'shortName', 'longName', 'name', 'description' fields for type ${Type.show[E]}.")
 
   inline def derived[E]: Display[E] = ${ displayImpl[E] }

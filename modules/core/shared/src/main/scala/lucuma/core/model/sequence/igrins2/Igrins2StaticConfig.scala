@@ -5,13 +5,13 @@ package lucuma.core.model.sequence.igrins2
 
 import cats.Eq
 import cats.derived.*
-import lucuma.core.enums.Igrins2OffsetMode
+import lucuma.core.enums.SlitOffsetMode
 import monocle.Focus
 import monocle.Lens
 
 case class Igrins2StaticConfig(
   saveSVCImages: Igrins2SVCImages,
-  offsetMode:    Igrins2OffsetMode
+  offsetMode:    SlitOffsetMode
 ) derives Eq
 
 object Igrins2StaticConfig:
@@ -20,5 +20,5 @@ object Igrins2StaticConfig:
     Focus[Igrins2StaticConfig](_.saveSVCImages)
 
   /** @group Optics */
-  val offsetMode: Lens[Igrins2StaticConfig, Igrins2OffsetMode] =
+  val offsetMode: Lens[Igrins2StaticConfig, SlitOffsetMode] =
     Focus[Igrins2StaticConfig](_.offsetMode)
