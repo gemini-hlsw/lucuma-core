@@ -316,9 +316,9 @@ object AgsParams:
     val GhostScienceRadius = 20.arcseconds
 
   case class Visitor private (
-    scienceRadius: Angle,
-    port:          PortDisposition,
-    probe:         PWFSGuideProbe
+    scienceFov: Angle,
+    port:       PortDisposition,
+    probe:      PWFSGuideProbe
   ) extends AgsParams
       with PwfsOnlyParams
       with PwfsSupport[Visitor] derives Eq:
@@ -327,11 +327,13 @@ object AgsParams:
       copy(probe = probe)
 
     private val fov =
-      val scienceDiameter = scienceRadius * 2
-      ShapeExpression.centeredEllipse(scienceDiameter, scienceDiameter)
+      ShapeExpression.centeredEllipse(scienceFov, scienceFov)
 
     override def scienceArea(posAngle: Angle, offset: Offset): ShapeExpression =
       fov.shapeAt(offset, posAngle)
+
+    override def scienceRadius: Angle =
+      scienceFov * 0.5
 
   object Visitor:
     def apply(scienceRadius: Angle, port: PortDisposition = PortDisposition.Bottom): Visitor =
