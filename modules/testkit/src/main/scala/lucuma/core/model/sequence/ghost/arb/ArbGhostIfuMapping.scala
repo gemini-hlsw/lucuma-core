@@ -21,25 +21,12 @@ trait ArbGhostIfuMapping:
 
   import GhostIfuMapping.*
 
-  given Arbitrary[GhostTarget] =
-    Arbitrary:
-      Gen.oneOf(
-        arbitrary[Target.Sidereal],
-        arbitrary[Target.Nonsidereal]
-      )
-
-  given Cogen[GhostTarget] =
-    Cogen.apply: (seed, t) =>
-      t match
-        case s: Target.Sidereal    => Cogen[Target.Sidereal].perturb(seed, s)
-        case n: Target.Nonsidereal => Cogen[Target.Nonsidereal].perturb(seed.next, n)
-
   given Arbitrary[SingleTarget] =
     Arbitrary:
-      arbitrary[GhostTarget].map(SingleTarget(_))
+      arbitrary[Target].map(SingleTarget(_))
 
   given Cogen[SingleTarget] =
-    Cogen[GhostTarget].contramap(_.ifu1)
+    Cogen[Target].contramap(_.ifu1)
 
   given Arbitrary[TargetPlusSky] =
     Arbitrary:
@@ -86,7 +73,7 @@ trait ArbGhostIfuMapping:
   given Cogen[GhostIfuMapping] =
     Cogen[(
       Int,
-      Option[GhostTarget],
+      Option[Target],
       Option[(Target.Sidereal, Coordinates)],
       Option[(Coordinates, Target.Sidereal)],
       Option[(Target.Sidereal, Target.Sidereal)]

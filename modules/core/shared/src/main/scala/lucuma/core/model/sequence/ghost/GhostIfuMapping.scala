@@ -9,7 +9,6 @@ import cats.syntax.eq.*
 import lucuma.core.enums.GhostIfuMappingType
 import lucuma.core.math.Coordinates
 import lucuma.core.model.Target
-
 import monocle.Prism
 import monocle.macros.GenPrism
 
@@ -19,10 +18,11 @@ sealed trait GhostIfuMapping:
 object GhostIfuMapping:
 
   /**
-   * IFU1 is either a sidereal or nonsidereal target.
+   * Only IFU1 is used for single target mode, and it is not restricted to
+   * sidereal targets.
    */
   case class SingleTarget(
-    ifu1: GhostTarget
+    ifu1: Target
   ) extends GhostIfuMapping derives Eq:
     override def mappingType: GhostIfuMappingType = GhostIfuMappingType.SingleTarget
 
