@@ -22,6 +22,7 @@ import lucuma.core.geom.ShapeExpression
 import lucuma.core.geom.jts.interpreter.given
 import lucuma.core.geom.offsets.OffsetPosition
 import lucuma.core.geom.syntax.all.*
+import lucuma.core.geom.visitors.visitorScienceArea
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 import lucuma.core.math.syntax.int.*
@@ -326,11 +327,9 @@ object AgsParams:
     protected def withPWFSProbe(probe: PWFSGuideProbe): Visitor =
       copy(probe = probe)
 
-    private val fov =
-      ShapeExpression.centeredEllipse(scienceFov, scienceFov)
-
     override def scienceArea(posAngle: Angle, offset: Offset): ShapeExpression =
-      fov.shapeAt(offset, posAngle)
+      // Approximate maroonX as a circle
+      visitorScienceArea.shapeAt(posAngle, offset, scienceFov)
 
     override def scienceRadius: Angle =
       scienceFov * 0.5
