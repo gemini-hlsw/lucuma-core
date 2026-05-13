@@ -23,14 +23,14 @@ trait ArbGhostStaticConfig:
     Arbitrary:
       for
         r <- arbitrary[GhostResolutionMode]
-        m <- arbitrary[Option[GhostIfuMapping]]
+        m <- arbitrary[GhostIfuMapping]
         s <- arbitrary[Option[TimeSpan]]
       yield GhostStaticConfig(r, m, s)
 
   given Cogen[GhostStaticConfig] =
     Cogen[(
       GhostResolutionMode,
-      Option[GhostIfuMapping],
+      GhostIfuMapping,
       Option[TimeSpan]
     )].contramap: a =>
       (
