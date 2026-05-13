@@ -4,7 +4,7 @@
 package lucuma.core.model.sequence.igrins2
 
 import lucuma.core.enums.Igrins2FowlerSamples
-import lucuma.core.enums.Igrins2OffsetMode
+import lucuma.core.enums.SlitOffsetMode
 import lucuma.core.math.Offset
 import lucuma.core.math.Wavelength
 import lucuma.core.math.syntax.bigDecimal.*
@@ -56,7 +56,7 @@ val NodToSkyDefaultOffsets: List[Offset] =
     Offset.Zero,
   )
 
-def defaultOffsetsFor(mode: Igrins2OffsetMode): List[Offset] =
+def defaultOffsetsFor(mode: SlitOffsetMode): List[Offset] =
   mode match
-    case Igrins2OffsetMode.NodAlongSlit => NodAlongSlitDefaultOffsets
-    case Igrins2OffsetMode.NodToSky     => NodToSkyDefaultOffsets
+    case SlitOffsetMode.NodAlongSlit => NodAlongSlitDefaultOffsets
+    case SlitOffsetMode.NodToSky     => NodToSkyDefaultOffsets
