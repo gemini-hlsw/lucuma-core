@@ -472,3 +472,33 @@ trait GnirsShapes extends InstrumentShapes:
 
 object JtsGnirsDemo extends JtsDemo with GnirsShapes:
   override val arcsecPerPixel: Double = 1.0
+
+trait MaroonXShapes extends InstrumentShapes:
+  import lucuma.core.geom.visitors.maroonXScienceArea
+  import lucuma.core.geom.pwfs.{patrolField, probeArm}
+  import lucuma.core.enums.GuideProbe
+
+  val posAngle: Angle =
+    22.deg
+
+  val offsetPos: Offset =
+    Offset.Zero
+
+  val guideStarOffset: Offset =
+    Offset(50.arcsec.p, 50.arcsec.q)
+
+  val probe: GuideProbe = GuideProbe.PWFS2
+
+  def shapes: List[ShapeExpression] =
+    List(
+      ShapeExpression.centeredRectangle(1.arcsec, 1.arcsec).translate(guideStarOffset),
+      maroonXScienceArea.shapeAt(posAngle, offsetPos),
+      patrolField.patrolFieldAt(posAngle, offsetPos),
+      probeArm.mirrorAt(probe, guideStarOffset, offsetPos),
+      probeArm.mirrorVignettedAreaAt(probe, guideStarOffset, offsetPos),
+      probeArm.armVignettedAreaAt(probe, guideStarOffset, offsetPos),
+      probeArm.armAt(probe, guideStarOffset, offsetPos)
+    )
+
+object JtsMaroonXDemo extends JtsDemo with MaroonXShapes:
+  override val arcsecPerPixel: Double = 0.01
