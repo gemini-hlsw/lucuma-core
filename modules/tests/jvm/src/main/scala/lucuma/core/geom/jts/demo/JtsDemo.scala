@@ -4,6 +4,7 @@
 package lucuma.core.geom.jts
 package demo
 
+import cats.syntax.either.*
 import lucuma.core.enums.Flamingos2Fpu
 import lucuma.core.enums.Flamingos2LyotWheel
 import lucuma.core.enums.GmosNorthFpu
@@ -426,3 +427,48 @@ trait GhostShapes extends InstrumentShapes:
 
 object JtsGhostDemo extends JtsDemo with GhostShapes:
   override val arcsecPerPixel: Double = 1.5
+
+trait GnirsShapes extends InstrumentShapes:
+  import lucuma.core.geom.gnirs.*
+  import lucuma.core.geom.pwfs.{patrolField, probeArm}
+  import lucuma.core.enums.GnirsCamera
+  import lucuma.core.enums.GnirsFpuOther
+  import lucuma.core.enums.GnirsFpuSlit
+  import lucuma.core.enums.GnirsPrism
+  import lucuma.core.enums.GuideProbe
+
+  val posAngle: Angle =
+    15.deg
+
+  val offsetPos: Offset =
+    Offset.Zero
+
+  val guideStarOffset: Offset =
+    Offset(270.arcsec.p, 224.arcsec.q)
+
+  val probe: GuideProbe = GuideProbe.PWFS2
+
+  val longSlitFpu: Either[GnirsFpuSlit, GnirsFpuOther] =
+    GnirsFpuSlit.LongSlit_1_00.asLeft
+
+  val pinholeFpu: Either[GnirsFpuSlit, GnirsFpuOther] =
+    GnirsFpuOther.Pinhole3.asRight
+
+  val fpu = longSlitFpu
+
+  val camera: GnirsCamera = GnirsCamera.ShortBlue
+
+  val prism:  GnirsPrism = GnirsPrism.Mirror
+
+  def shapes: List[ShapeExpression] =
+    List(
+      ShapeExpression.centeredRectangle(1.arcsec, 1.arcsec).translate(guideStarOffset),
+      patrolField.patrolFieldAt(posAngle, offsetPos),
+      probeArm.mirrorAt(probe, guideStarOffset, offsetPos),
+      probeArm.mirrorVignettedAreaAt(probe, guideStarOffset, offsetPos),
+      probeArm.armVignettedAreaAt(probe, guideStarOffset, offsetPos),
+      probeArm.armAt(probe, guideStarOffset, offsetPos)
+    ) ++ scienceArea.shapeAt(posAngle, offsetPos, fpu, camera, prism).toList
+
+object JtsGnirsDemo extends JtsDemo with GnirsShapes:
+  override val arcsecPerPixel: Double = 1.0
