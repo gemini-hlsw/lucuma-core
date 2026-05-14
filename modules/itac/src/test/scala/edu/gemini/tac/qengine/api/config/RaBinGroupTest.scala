@@ -93,7 +93,7 @@ class RaBinGroupTest extends ItacSuite {
     val ra0 = RightAscension(HourAngle.fromDoubleMinutes(0))
     bg0.updated(ra0, doubleEveryOther) match {
       case Some(bg1) => assertEquals(bg0(ra0).toMinutes.toInt * 2, bg1(ra0).toMinutes.toInt)
-      case _ => fail
+      case _ => fail("nope")
     }
   }
 
