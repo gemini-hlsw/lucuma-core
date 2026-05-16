@@ -100,8 +100,6 @@ object Configuration:
       def gnirsLongSlit(camera: GnirsCamera, prism: GnirsPrism): Angle = 
         gnirs.all.slitLength(camera, prism).bisect
 
-        Angle.fromMicroarcseconds(gnirs.SlitLengthLongCamLxd.toMicroarcseconds / 2L) // SlitLengthLongCamLxd is the most conservative
-
     case class Flamingos2LongSlit(disperser: Flamingos2Disperser) extends ObservingMode(ObservingModeType.Flamingos2LongSlit, Radii.Flamingos2LongSlit)
     case object GhostIfu extends ObservingMode(ObservingModeType.GhostIfu, Radii.GhostIfu)
     case class GmosNorthImaging(filters: List[GmosNorthFilter]) extends ObservingMode(ObservingModeType.GmosNorthImaging, Radii.GmosImaging)
