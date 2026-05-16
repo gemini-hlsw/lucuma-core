@@ -9,6 +9,8 @@ import lucuma.core.enums.GmosNorthFilter
 import lucuma.core.enums.GmosNorthGrating
 import lucuma.core.enums.GmosSouthFilter
 import lucuma.core.enums.GmosSouthGrating
+import lucuma.core.enums.GnirsCamera
+import lucuma.core.enums.GnirsPrism
 import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.VisitorObservingModeType
 import lucuma.core.enums.WaterVapor
@@ -89,6 +91,16 @@ trait ArbConfiguration:
   given Cogen[ObservingMode.Igrins2LongSlit.type] =
     Cogen.cogenUnit.contramap(_ => ())
 
+  given Arbitrary[ObservingMode.GnirsLongSlit] =
+    Arbitrary:
+      for
+        c <- arbitrary[GnirsCamera]
+        p <- arbitrary[GnirsPrism]
+      yield ObservingMode.GnirsLongSlit(c, p)
+
+  given Cogen[ObservingMode.GnirsLongSlit] =
+    Cogen[(GnirsCamera, GnirsPrism)].contramap(m => (m.camera, m.prism))
+
   given Arbitrary[ObservingMode.Visitor] =
     Arbitrary:
       for 
@@ -108,7 +120,9 @@ trait ArbConfiguration:
         arbitrary[ObservingMode.GmosNorthLongSlit],
         arbitrary[ObservingMode.GmosSouthImaging],
         arbitrary[ObservingMode.GmosSouthLongSlit],
-        arbitrary[ObservingMode.Igrins2LongSlit.type]
+        arbitrary[ObservingMode.Igrins2LongSlit.type],
+        arbitrary[ObservingMode.GnirsLongSlit],
+        arbitrary[ObservingMode.Visitor]
       )
 
   def perturb[A](s: Seed, a: A)(using c: Cogen[A]): Seed =
@@ -124,6 +138,7 @@ trait ArbConfiguration:
         case m: ObservingMode.GmosSouthImaging     => perturb(s, m)
         case m: ObservingMode.GmosSouthLongSlit    => perturb(s, m)
         case m: ObservingMode.Igrins2LongSlit.type => perturb(s, m)
+        case m: ObservingMode.GnirsLongSlit        => perturb(s, m)
         case m: ObservingMode.Visitor              => perturb(s, m)
 
   given Arbitrary[Configuration] =
