@@ -21,7 +21,7 @@ trait GnirsScienceAreaGeometry:
   def base: ShapeExpression =
     ShapeExpression.point(Offset.Zero)
 
-  private def slitLength(camera: GnirsCamera, prism: GnirsPrism): Angle =
+  def slitLength(camera: GnirsCamera, prism: GnirsPrism): Angle =
     (camera.pixelScale, prism) match
       case (GnirsPixelScale.PixelScale_0_05, GnirsPrism.Mirror) => SlitLengthLongCamNoXd
       case (GnirsPixelScale.PixelScale_0_05, GnirsPrism.Sxd)    => SlitLengthLongCamSxd

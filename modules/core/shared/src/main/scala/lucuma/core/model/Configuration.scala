@@ -13,11 +13,14 @@ import lucuma.core.enums.GmosNorthFilter
 import lucuma.core.enums.GmosNorthGrating
 import lucuma.core.enums.GmosSouthFilter
 import lucuma.core.enums.GmosSouthGrating
+import lucuma.core.enums.GnirsCamera
+import lucuma.core.enums.GnirsPrism
 import lucuma.core.enums.ObservingModeType
 import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.VisitorObservingModeType
 import lucuma.core.enums.WaterVapor
 import lucuma.core.geom.*
+import lucuma.core.geom.gnirs
 import lucuma.core.geom.jts.interpreter.given
 import lucuma.core.math.Angle
 import lucuma.core.math.Coordinates
@@ -53,6 +56,8 @@ object Configuration:
         Order.by: conds =>
           (conds.cloudExtinction, conds.imageQuality, conds.skyBackground, conds.waterVapor)
 
+  // The radius is used to allow the user to move the base position around without needing approval.
+  // We limit this to the radius of the FOV, so you can move the base position anywhere that would be visible from the approved position.
   sealed abstract class ObservingMode(val tpe: ObservingModeType, val radius: Angle):
     def flamingos2LongSlit: Option[Flamingos2LongSlit  ] = Some(this).collect { case m: Flamingos2LongSlit   => m }
     def ghostIfu:           Option[GhostIfu.type       ] = Some(this).collect { case m: GhostIfu.type        => m }
@@ -60,6 +65,7 @@ object Configuration:
     def gmosNorthLongSlit:  Option[GmosNorthLongSlit   ] = Some(this).collect { case m: GmosNorthLongSlit    => m }
     def gmosSouthImaging:   Option[GmosSouthImaging    ] = Some(this).collect { case m: GmosSouthImaging     => m }
     def gmosSouthLongSlit:  Option[GmosSouthLongSlit   ] = Some(this).collect { case m: GmosSouthLongSlit    => m }
+    def gnirsLongSlit:      Option[GnirsLongSlit       ] = Some(this).collect { case m: GnirsLongSlit        => m }
     def igrins2LongSlit:    Option[Igrins2LongSlit.type] = Some(this).collect { case m: Igrins2LongSlit.type => m }
     def visitor:            Option[Visitor]              = Some(this).collect { case m: Visitor              => m }
 
@@ -74,12 +80,13 @@ object Configuration:
         // were disallowed, but this was relaxed in https://app.shortcut.com/lucuma/story/8036/. I am leaving
         // the filters in the configuration for now because I suspect they may change their minds. But for now
         // there are no constraints on changes to the filter set (or anything else).
-        case (GmosNorthImaging(f1),   GmosNorthImaging(f2))   => true // f2.forall(f1.contains)
-        case (GmosSouthImaging(f1),   GmosSouthImaging(f2))   => true // f2.forall(f1.contains)
+        case (GmosNorthImaging(f1),   GmosNorthImaging(f2))      => true // f2.forall(f1.contains)
+        case (GmosSouthImaging(f1),   GmosSouthImaging(f2))      => true // f2.forall(f1.contains)
 
-        case (Igrins2LongSlit,        Igrins2LongSlit)        => true
-        case (Visitor(ma, ra), Visitor(mb, rb))               => ma === mb && rb.toMicroarcseconds <= ra.toMicroarcseconds
-        case _                                                => false
+        case (Igrins2LongSlit,        Igrins2LongSlit)           => true
+        case (GnirsLongSlit(c1, p1),      GnirsLongSlit(c2, p2)) => c1 === c2 && p1 === p2
+        case (Visitor(ma, ra), Visitor(mb, rb))                  => ma === mb && rb.toMicroarcseconds <= ra.toMicroarcseconds
+        case _                                                   => false
 
   object ObservingMode:
 
@@ -90,11 +97,15 @@ object Configuration:
       val GmosImaging        = gmos.scienceArea.imaging.eval.radius
       val Igrins2LongSlit    = igrins2.scienceArea.scienceSlitFOV.eval.radius
 
+      def gnirsLongSlit(camera: GnirsCamera, prism: GnirsPrism): Angle = 
+        gnirs.all.slitLength(camera, prism).bisect
+
     case class Flamingos2LongSlit(disperser: Flamingos2Disperser) extends ObservingMode(ObservingModeType.Flamingos2LongSlit, Radii.Flamingos2LongSlit)
     case object GhostIfu extends ObservingMode(ObservingModeType.GhostIfu, Radii.GhostIfu)
     case class GmosNorthImaging(filters: List[GmosNorthFilter]) extends ObservingMode(ObservingModeType.GmosNorthImaging, Radii.GmosImaging)
     case class GmosNorthLongSlit(grating: GmosNorthGrating) extends ObservingMode(ObservingModeType.GmosNorthLongSlit, Radii.GmosLongSlit)
     case class GmosSouthImaging(filters: List[GmosSouthFilter]) extends ObservingMode(ObservingModeType.GmosSouthImaging, Radii.GmosImaging)
     case class GmosSouthLongSlit(grating: GmosSouthGrating) extends ObservingMode(ObservingModeType.GmosSouthLongSlit, Radii.GmosLongSlit)
+    case class GnirsLongSlit(camera: GnirsCamera, prism: GnirsPrism) extends ObservingMode(ObservingModeType.GnirsLongSlit, Radii.gnirsLongSlit(camera, prism))
     case object Igrins2LongSlit extends ObservingMode(ObservingModeType.Igrins2LongSlit, Radii.Igrins2LongSlit)
     case class Visitor(mode: VisitorObservingModeType, override val radius: Angle) extends ObservingMode(mode, radius)
