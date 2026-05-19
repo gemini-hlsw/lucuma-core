@@ -14,6 +14,7 @@ import lucuma.core.enums.GmosNorthGrating
 import lucuma.core.enums.GmosSouthFilter
 import lucuma.core.enums.GmosSouthGrating
 import lucuma.core.enums.GnirsCamera
+import lucuma.core.enums.GnirsGrating
 import lucuma.core.enums.GnirsPrism
 import lucuma.core.enums.ObservingModeType
 import lucuma.core.enums.SkyBackground
@@ -71,22 +72,22 @@ object Configuration:
 
     def subsumes(other: ObservingMode): Boolean =
       (this, other) match
-        case (Flamingos2LongSlit(d1), Flamingos2LongSlit(d2)) => d1 === d2
-        case (GhostIfu,               GhostIfu)               => true
-        case (GmosNorthLongSlit(g1),  GmosNorthLongSlit(g2))  => g1 === g2
-        case (GmosSouthLongSlit(g1),  GmosSouthLongSlit(g2))  => g1 === g2
+        case (Flamingos2LongSlit(d1),    Flamingos2LongSlit(d2)) => d1 === d2
+        case (GhostIfu,                  GhostIfu)               => true
+        case (GmosNorthLongSlit(g1),     GmosNorthLongSlit(g2))  => g1 === g2
+        case (GmosSouthLongSlit(g1),     GmosSouthLongSlit(g2))  => g1 === g2
 
         // RCN: The GMOS imaging configuration contains a set of filters, and originally additions to this set
         // were disallowed, but this was relaxed in https://app.shortcut.com/lucuma/story/8036/. I am leaving
         // the filters in the configuration for now because I suspect they may change their minds. But for now
         // there are no constraints on changes to the filter set (or anything else).
-        case (GmosNorthImaging(f1),   GmosNorthImaging(f2))      => true // f2.forall(f1.contains)
-        case (GmosSouthImaging(f1),   GmosSouthImaging(f2))      => true // f2.forall(f1.contains)
+        case (GmosNorthImaging(f1),      GmosNorthImaging(f2))      => true // f2.forall(f1.contains)
+        case (GmosSouthImaging(f1),      GmosSouthImaging(f2))      => true // f2.forall(f1.contains)
 
-        case (Igrins2LongSlit,        Igrins2LongSlit)           => true
-        case (GnirsLongSlit(c1, p1),      GnirsLongSlit(c2, p2)) => c1 === c2 && p1 === p2
-        case (Visitor(ma, ra), Visitor(mb, rb))                  => ma === mb && rb.toMicroarcseconds <= ra.toMicroarcseconds
-        case _                                                   => false
+        case (Igrins2LongSlit,           Igrins2LongSlit)           => true
+        case (GnirsLongSlit(g1, c1, p1), GnirsLongSlit(g2, c2, p2)) => g1 === g2 && c1 === c2 && p1 === p2
+        case (Visitor(ma, ra),           Visitor(mb, rb))           => ma === mb && rb.toMicroarcseconds <= ra.toMicroarcseconds
+        case _                                                      => false
 
   object ObservingMode:
 
@@ -106,6 +107,6 @@ object Configuration:
     case class GmosNorthLongSlit(grating: GmosNorthGrating) extends ObservingMode(ObservingModeType.GmosNorthLongSlit, Radii.GmosLongSlit)
     case class GmosSouthImaging(filters: List[GmosSouthFilter]) extends ObservingMode(ObservingModeType.GmosSouthImaging, Radii.GmosImaging)
     case class GmosSouthLongSlit(grating: GmosSouthGrating) extends ObservingMode(ObservingModeType.GmosSouthLongSlit, Radii.GmosLongSlit)
-    case class GnirsLongSlit(camera: GnirsCamera, prism: GnirsPrism) extends ObservingMode(ObservingModeType.GnirsLongSlit, Radii.gnirsLongSlit(camera, prism))
+    case class GnirsLongSlit(grating: GnirsGrating, camera: GnirsCamera, prism: GnirsPrism) extends ObservingMode(ObservingModeType.GnirsLongSlit, Radii.gnirsLongSlit(camera, prism))
     case object Igrins2LongSlit extends ObservingMode(ObservingModeType.Igrins2LongSlit, Radii.Igrins2LongSlit)
     case class Visitor(mode: VisitorObservingModeType, override val radius: Angle) extends ObservingMode(mode, radius)

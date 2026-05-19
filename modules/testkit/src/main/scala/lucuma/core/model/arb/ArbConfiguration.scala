@@ -10,6 +10,7 @@ import lucuma.core.enums.GmosNorthGrating
 import lucuma.core.enums.GmosSouthFilter
 import lucuma.core.enums.GmosSouthGrating
 import lucuma.core.enums.GnirsCamera
+import lucuma.core.enums.GnirsGrating
 import lucuma.core.enums.GnirsPrism
 import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.VisitorObservingModeType
@@ -94,12 +95,13 @@ trait ArbConfiguration:
   given Arbitrary[ObservingMode.GnirsLongSlit] =
     Arbitrary:
       for
+        g <- arbitrary[GnirsGrating]
         c <- arbitrary[GnirsCamera]
         p <- arbitrary[GnirsPrism]
-      yield ObservingMode.GnirsLongSlit(c, p)
+      yield ObservingMode.GnirsLongSlit(g, c, p)
 
   given Cogen[ObservingMode.GnirsLongSlit] =
-    Cogen[(GnirsCamera, GnirsPrism)].contramap(m => (m.camera, m.prism))
+    Cogen[(GnirsGrating, GnirsCamera, GnirsPrism)].contramap(m => (m.grating, m.camera, m.prism))
 
   given Arbitrary[ObservingMode.Visitor] =
     Arbitrary:
