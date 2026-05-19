@@ -34,3 +34,16 @@ trait MaroonXScienceAreaGeometry:
     fiberShape.shapeAt(offsetPos, posAngle)
 
 object maroonXScienceArea extends MaroonXScienceAreaGeometry
+
+trait MaroonXPatrolFieldGeometry:
+
+/**
+ * MAROON-X has a sky fiber at r=20 arcseconds, and observations are done with the
+ * CRCS fixed, so the sky rotates around the science fiber during observations.
+ *
+ * The probe should not vignette anything inside a fov diameter of 60 arcsec.
+ */
+  val patrolField: ShapeExpression =
+    ShapeExpression.centeredEllipse(MaroonXSkyFiberPatrol, MaroonXSkyFiberPatrol)
+
+object maroonXPatrolField extends MaroonXPatrolFieldGeometry
