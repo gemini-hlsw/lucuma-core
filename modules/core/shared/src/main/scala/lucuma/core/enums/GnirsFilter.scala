@@ -21,6 +21,7 @@ enum GnirsFilter(
   val tag: String,
   val shortName: String,
   val longName: String,
+  // ATTENTION: The optimal wavelength and spectroscopy range are duplicated in the DB view in the ODB. Modify it there too if it's changed here.
   val optimalWavelength: Option[Wavelength],
   val spectroscopyRange: Option[BoundedInterval[Wavelength]], // Range of the spectroscopy filters.
 ) derives Enumerated, Display:
@@ -39,10 +40,17 @@ enum GnirsFilter(
   case J extends GnirsFilter("J", "J", "J: 1.25µm", 1_250_000.pm.some, none)
   case K extends GnirsFilter("K", "K", "K: 2.20µm", 2_200_000.pm.some, none)
 
+  // ATTENTION: This logic is duplicated in the DB view in the ODB. Modify it there too if it's changed here.
+  def centralWavelength: Wavelength =
+    // The only case the filter optimalWavelength is none is for XD, where we fix to 1.65um.
+    optimalWavelength.getOrElse(Wavelength.unsafeFromIntPicometers(1_650_000))
+
+
 object GnirsFilter:
   private val SpectroscopyFilterTable: List[(GnirsFilter, BoundedInterval[Wavelength])] = 
     values.map(f => f.spectroscopyRange.map(w => (f, w))).toList.flattenOption
 
+  // ATTENTION: This logic is duplicated in the DB view in the ODB. Modify it there too if it's changed here.
   def fromSpectroscopyWavelength(wavelength: Wavelength): Either[String, GnirsFilter] = 
     SpectroscopyFilterTable
       .collectFirst:

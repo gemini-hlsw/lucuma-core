@@ -29,6 +29,7 @@ enum GnirsReadMode(
 
 object GnirsReadMode:
   // https://app.shortcut.com/lucuma/story/8557/set-gnirs-read-mode-based-on-exposure-time
+  // ATTENTION: This logic is duplicated in the DB view in the ODB. Modify it there too if it's changed here.
   def forExposureTime(t: TimeSpan): GnirsReadMode =
     val exposureSeconds: BigDecimal = t.toSeconds
     if (exposureSeconds < 0.6) GnirsReadMode.VeryBright
