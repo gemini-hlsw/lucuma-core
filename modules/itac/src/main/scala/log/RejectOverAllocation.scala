@@ -4,7 +4,7 @@
 package edu.gemini.tac.qengine.log
 
 import cats.syntax.all.*
-import edu.gemini.tac.qengine.p1.Proposal
+import edu.gemini.tac.qengine.p1.ProposalShard
 import lucuma.core.util.TimeSpan
 
 /**
@@ -18,14 +18,14 @@ object RejectOverAllocation {
   def tooBig(propTime: TimeSpan, allRemainingTime: TimeSpan) =
     "Adding %.1f hrs for proposal would require more time than remaining in the queue (%.1f hrs)".format(propTime.toHours, allRemainingTime.toHours)
 
-  def detail(prop: Proposal, remainingGuaranteedTime: TimeSpan, allRemainingTime: TimeSpan): String =
+  def detail(prop: ProposalShard, remainingGuaranteedTime: TimeSpan, allRemainingTime: TimeSpan): String =
     if (remainingGuaranteedTime <= TimeSpan.Zero)
       noRemaining
     else
-      tooBig(prop.allocatedTime, allRemainingTime)
+      tooBig(prop.allocation.duration, allRemainingTime)
 }
 
-case class RejectOverAllocation(prop: Proposal, remainingGuaranteedTime: TimeSpan, allRemainingTime: TimeSpan) extends RejectMessage {
+case class RejectOverAllocation(prop: ProposalShard, remainingGuaranteedTime: TimeSpan, allRemainingTime: TimeSpan) extends RejectMessage {
   def reason: String = RejectOverAllocation.name
   def detail: String = RejectOverAllocation.detail(prop, remainingGuaranteedTime, allRemainingTime)
 }

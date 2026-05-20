@@ -23,28 +23,28 @@ import lucuma.core.util.Enumerated
 final case class ProposalQueueBuilder(
   queueTime: QueueTime,
   band:      ScienceBand,
-  proposals: List[Proposal] = Nil
+  proposals: List[ProposalShard] = Nil
 ) extends ProposalQueue {
 
   /**
    * Adds the given proposal to the queue and returns a new ProposalQueue
    * reflecting the change.
    */
-  def :+(prop: Proposal): ProposalQueueBuilder =
+  def :+(prop: ProposalShard): ProposalQueueBuilder =
     copy(proposals = prop :: proposals)
 
   /**
    * Adds all the proposals to the queue in the traversal order.
    */
-  def ++(props: Iterable[Proposal]): ProposalQueueBuilder =
+  def ++(props: Iterable[ProposalShard]): ProposalQueueBuilder =
     props.foldLeft(this) {
       (q, p) => q :+ p
     }
 
-  def toList: List[Proposal] = proposals.reverse
+  def toList: List[ProposalShard] = proposals.reverse
 
-  val bandedQueue: Map[ScienceBand,List[Proposal]] =
-    Enumerated[ScienceBand].all.foldMap(b => Map(b -> List.empty[Proposal])) ++
+  val bandedQueue: Map[ScienceBand,List[ProposalShard]] =
+    Enumerated[ScienceBand].all.foldMap(b => Map(b -> List.empty[ProposalShard])) ++
     Map(band -> proposals)
 
 }

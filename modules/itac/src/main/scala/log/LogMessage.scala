@@ -3,7 +3,7 @@
 
 package edu.gemini.tac.qengine.log
 
-import edu.gemini.tac.qengine.p1.Proposal
+import edu.gemini.tac.qengine.p1.ProposalShard
 import edu.gemini.tac.qengine.util.BoundedTime
 
 import java.text.SimpleDateFormat
@@ -11,7 +11,7 @@ import java.util.Date
 import java.util.UUID
 
 trait LogMessage {
-  val prop: Proposal
+  val prop: ProposalShard
   val timestamp = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").format(new Date())
   val id = UUID.randomUUID()
 }

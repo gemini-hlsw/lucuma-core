@@ -7,7 +7,7 @@ import cats.syntax.all.*
 import edu.gemini.tac.qengine.impl.resource.Resource2
 import edu.gemini.tac.qengine.log.RejectRestrictedBin
 import edu.gemini.tac.qengine.p1.ItacObservation
-import edu.gemini.tac.qengine.p1.Proposal
+import edu.gemini.tac.qengine.p1.ProposalShard
 import edu.gemini.tac.qengine.util.BoundedTime
 import lucuma.core.enums.ScienceBand
 import lucuma.core.enums.WaterVapor
@@ -19,7 +19,7 @@ import lucuma.core.util.TimeSpan
  * specifies the time being restricted, which may be an absolute amount of time
  * or a relative amount of time.
  */
-case class TimeRestriction[T](name: String, value: T)(val matches: (Proposal, ItacObservation, ScienceBand) => Boolean) {
+case class TimeRestriction[T](name: String, value: T)(val matches: (ProposalShard, ItacObservation, ScienceBand) => Boolean) {
 
   def map[U](f: T => U): TimeRestriction[U]    =
     new TimeRestriction[U](name, f(value))(matches)
