@@ -22,6 +22,7 @@ enum GnirsWellDepth(
   case Deep extends GnirsWellDepth("Deep", "Deep", "Deep", 600)
 
 object GnirsWellDepth:
+  // ATTENTION: This logic is duplicated in the DB view in the ODB. Modify it there too if it's changed here.
   def forCamera(camera: GnirsCamera): GnirsWellDepth =
     camera match // By default, use shallow for blue camera and deep for red camera.
       case GnirsCamera.ShortBlue | GnirsCamera.LongBlue => GnirsWellDepth.Shallow

@@ -23,3 +23,15 @@ enum GnirsDecker(
   case LongCamLongSlit extends GnirsDecker("LongCamLongSlit", "Long camera slit", "Long camera long slit")
   case ShortCamLongSlit extends GnirsDecker("ShortCamLongSlit", "Short camera slit", "Short camera long slit")
   case LongCamCrossDispersed extends GnirsDecker("LongCamCrossDispersed", "Long camera XD", "Long camera cross dispersed")
+
+object GnirsDecker:
+  // ATTENTION: This logic is duplicated in the DB view in the ODB. Modify it there too if it's changed here.
+  def forCameraAndReadMode(camera: GnirsCamera, prism: GnirsPrism): GnirsDecker =
+    prism match
+      case GnirsPrism.Mirror => camera match
+        case GnirsCamera.ShortRed | GnirsCamera.ShortBlue => GnirsDecker.ShortCamLongSlit
+        case GnirsCamera.LongRed | GnirsCamera.LongBlue   => GnirsDecker.LongCamLongSlit
+      case GnirsPrism.Sxd | GnirsPrism.Lxd => camera match
+        case GnirsCamera.ShortRed | GnirsCamera.ShortBlue => GnirsDecker.ShortCamCrossDispersed
+        case GnirsCamera.LongRed | GnirsCamera.LongBlue   => GnirsDecker.LongCamCrossDispersed
+    
