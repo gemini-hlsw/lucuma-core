@@ -17,6 +17,29 @@ import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.util.DateInterval
 import lucuma.core.data.Metadata
 
+/**
+ * The slice of a proposal relevant to a specific site and allocation, with observations filtered
+ * by site and time-scaled by the allocation size.
+ */
+case class ProposalShard(
+  parentProposal: Proposal,
+  site: Site,
+  allocation: Allocation,
+):
+  opaque type Observation <: ItacObservation.Scaled = ItacObservation.Scaled
+
+  /** 
+   * Empty if the allocation is empty, otherwise all observations observable at `site`, scaled to
+   * the allocation.
+   */
+  def observations: List[Observation] =
+    if allocation.duration.isEmpty then Nil
+    else parentProposal.itacObservationsScaledForSiteAndBand(site, allocation.scienceBand)(using Metadata.placeholder)
+
+
+
+
+
 case class Proposal(
   reference: ProposalReference,
   allocations: NonEmptyList[Allocation],
@@ -26,36 +49,46 @@ case class Proposal(
   cfpActive: DateInterval = null,
 ) {
 
+  /** 
+   * The possibly empty allocation for the specified category and band. There should never be more than
+   * one of these but we handle this case and combine the result.
+   */
+  private def allocationFor(category: TimeAccountingCategory, band: ScienceBand): Allocation =
+    Allocation(
+      category,
+      band,
+      allocations
+        .collectFold: 
+          case Allocation(`category`, `band`, duration) => duration
+    )
+ 
+  def shardFor(site: Site, category: TimeAccountingCategory, band: ScienceBand): ProposalShard =
+    ProposalShard(
+      this,
+      site,
+      allocationFor(category, band)
+    )
+    
   def too: ToOActivation =
     ProposalType.ToOActivation.getOption(tpe).getOrElse(ToOActivation.None)
 
+  @deprecated
   def obsListFor(band: ScienceBand): List[ItacObservation] =
     if (band == ScienceBand.Band3) band3Observations else obsList
 
   @deprecated
   def ntac = allocations.head
 
-  /**
-   * Gets the time for the proposal as a whole.
-   */
-  def time: TimeSpan = allocations.foldMap(_.duration)
-
-
-
-
-
-  // new API below
-
   ///
   /// ALLOCATIONS
   ///
 
   /** Allocations awarded in the specified accounting category. */
-  def allocationsForTimeAccountingCategory(category: TimeAccountingCategory): List[Allocation] =
+  private def allocationsForTimeAccountingCategory(category: TimeAccountingCategory): List[Allocation] =
     allocations.filter(_.category === category)
 
   /** Allocations that can be used at the specified site, filtered for the given band. */
-  def allocationsForSiteAndBand(site: Site, band: ScienceBand): List[Allocation] =
+  private def allocationsForSiteAndBand(site: Site, band: ScienceBand): List[Allocation] =
     allocations.filter:
       case Allocation(TimeAccountingCategory.UH, `band`, _) => site == Site.GN
       case Allocation(TimeAccountingCategory.CL, `band`, _) => site == Site.GS
@@ -77,14 +110,14 @@ case class Proposal(
   ///
 
   /** Total time usable at the specified site, in the given band. In most cases time can be used at either site. */
-  def usableTimeForSiteAndBand(site: Site, band: ScienceBand): TimeSpan =
+  private def usableTimeForSiteAndBand(site: Site, band: ScienceBand): TimeSpan =
     allocationsForSiteAndBand(site, band).foldMap(_.duration)
 
   ///
   /// OBSERVATIONS
   ///
 
-  def itacObservations: List[ItacObservation] =
+  private def itacObservations: List[ItacObservation] =
     ???
 
   /** 
@@ -94,18 +127,18 @@ case class Proposal(
   def itacObservationsScaledForSiteAndBand(site: Site, band: ScienceBand)(using Metadata): List[ItacObservation.Scaled] =
     val f = scaleFactorForSiteAndBand(site, band)
     itacObservationsForSiteAndBand(site, band).map: o =>
-      ItacObservation.Scaled(o.copy(time = time *| f))
+      ItacObservation.Scaled(o.copy(time = o.time *| f))
 
   /** Estimated time required for all observations at the specified site, in the given band. */
-  def estimatedTimeForSiteAndBand(site: Site, band: ScienceBand)(using Metadata): TimeSpan =
+  private def estimatedTimeForSiteAndBand(site: Site, band: ScienceBand)(using Metadata): TimeSpan =
     itacObservationsForSiteAndBand(site, band).foldMap(_.time)
 
   /** Factor by which original estimated times must be multiplied to yield the scaled time used for bucket-filling. */
-  def scaleFactorForSiteAndBand(site: Site, band: ScienceBand)(using Metadata): BigDecimal =
+  private def scaleFactorForSiteAndBand(site: Site, band: ScienceBand)(using Metadata): BigDecimal =
     estimatedTimeForSiteAndBand(site, band).toHours / usableTimeForSiteAndBand(site, band).toHours
 
   /** Subset of observations observable at the specified site, in the specified band. */    
-  def itacObservationsForSiteAndBand(site: Site, band: ScienceBand)(using Metadata): List[ItacObservation] =
+  private def itacObservationsForSiteAndBand(site: Site, band: ScienceBand)(using Metadata): List[ItacObservation] =
     itacObservations.filter: o =>
       o.isObservableAtSite(site, cfpActive) && o.isObservableInBand(band)
 

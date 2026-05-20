@@ -88,14 +88,14 @@ trait TimeAccountingCategoryBlockIterator{
   private def advanceProp(activeList : Proposal => List[ItacObservation]): TimeAccountingCategoryBlockIterator = remainingProposals match {
     case _ :: nextProp :: tail =>
       mkIterator(nextProp :: tail, activeList(nextProp),
-        ItacObservation.relativeObsTime(activeList(nextProp).head, nextProp.time, activeList(nextProp)), isStartOfBlock = true)
+        ItacObservation.relativeObsTime(activeList(nextProp).head, nextProp.allocatedTime, activeList(nextProp)), isStartOfBlock = true)
     case _ => TimeAccountingCategoryBlockIterator.Empty
   }
 
   private def advanceObs(activeList : Proposal => List[ItacObservation]): TimeAccountingCategoryBlockIterator = remainingObservationsInActiveList match {
     case _ :: nextObs :: tail =>
       mkIterator(remainingProposals, nextObs :: tail,
-        ItacObservation.relativeObsTime(nextObs, currentProposal.time, activeList(currentProposal)), isStartOfBlock = false)
+        ItacObservation.relativeObsTime(nextObs, currentProposal.allocatedTime, activeList(currentProposal)), isStartOfBlock = false)
     case _ => advanceProp(activeList)
   }
 
@@ -132,7 +132,7 @@ object TimeAccountingCategoryBlockIterator {
     val activeProposal = l.head
     val activeObservations = activeList(activeProposal)
     val firstObservation = activeObservations.head
-    (activeObservations, ItacObservation.relativeObsTime(firstObservation, activeProposal.time, activeObservations))
+    (activeObservations, ItacObservation.relativeObsTime(firstObservation, activeProposal.allocatedTime, activeObservations))
   }
 
   private def applyNonEmpty(propList: List[Proposal], activeList : Proposal=>List[ItacObservation]): TimeAccountingCategoryBlockIterator =

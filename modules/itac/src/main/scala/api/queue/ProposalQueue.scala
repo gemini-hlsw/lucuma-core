@@ -28,16 +28,16 @@ trait ProposalQueue {
 
   def band: ScienceBand
 
-  def queueTime: QueueTime
+  def queueTime: QueueTime // this us unused time
 
   def usedTime: TimeSpan =
     toList.foldMap(_.allocatedTime)
 
   def usedTime(category: TimeAccountingCategory): TimeSpan =
-    toList.foldMap(_.allocatedTimeForTimeAccountingCategory(category))
+    toList.foldMap(_.allocatedTimeForTimeAccountingCategory(category)) // if a proposal is in the queue then all its time has been used up
 
-  def remainingTime(TimeAccountingCategory: TimeAccountingCategory): TimeSpan =
-    queueTime(TimeAccountingCategory) -| usedTime(TimeAccountingCategory)
+  def remainingTime(timeAccountingCategory: TimeAccountingCategory): TimeSpan =
+    queueTime(timeAccountingCategory) -| usedTime(timeAccountingCategory)
 
   def bounds(p: TimeAccountingCategory): BoundedTime =
     BoundedTime(queueTime(p), usedTime(p))
