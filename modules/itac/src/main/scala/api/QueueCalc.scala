@@ -21,11 +21,11 @@ trait BucketsAllocation {
  * while the log records what happened to the proposals that were not selected.
  */
 trait QueueCalc {
-  def site: Site
-  def semester: Semester
-  def queue(band: ScienceBand): ProposalQueue
-  def proposalLog: ProposalLog
-  def bucketsAllocation: BucketsAllocation
-  def toList: List[Proposal] = Enumerated[ScienceBand].all.flatMap(queue(_).toList)
+  // def site: Site
+  // def semester: Semester
+  // def queue(band: ScienceBand): ProposalQueue
+  // def proposalLog: ProposalLog
+  // def bucketsAllocation: BucketsAllocation
+  // def toList: List[Proposal] = Enumerated[ScienceBand].all.flatMap(queue(_).toList)
 }
 

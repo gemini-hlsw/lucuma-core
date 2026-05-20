@@ -23,7 +23,6 @@ import lucuma.core.util.TimeSpan
 // first because they're the most important. So let's rely on the ranking. We go by ranking,
 // round-robin by partner, using up the least-constrained time first.
 
-/** A queue for a single band. */
 trait ProposalQueue {
 
   def band: ScienceBand
@@ -31,10 +30,13 @@ trait ProposalQueue {
   def queueTime: QueueTime // this us unused time
 
   def usedTime: TimeSpan =
-    toList.foldMap(_.allocatedTime)
+    toList.foldMap(_.allocation.duration)
 
   def usedTime(category: TimeAccountingCategory): TimeSpan =
-    toList.foldMap(_.allocatedTimeForTimeAccountingCategory(category)) // if a proposal is in the queue then all its time has been used up
+    toList
+      .map(_.allocation)
+      .filter(_.category === category)
+      .foldMap(_.duration)
 
   def remainingTime(timeAccountingCategory: TimeAccountingCategory): TimeSpan =
     queueTime(timeAccountingCategory) -| usedTime(timeAccountingCategory)
@@ -42,6 +44,6 @@ trait ProposalQueue {
   def bounds(p: TimeAccountingCategory): BoundedTime =
     BoundedTime(queueTime(p), usedTime(p))
 
-  def toList: List[Proposal]
+  def toList: List[ProposalShard]
 
 }

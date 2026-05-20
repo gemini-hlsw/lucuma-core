@@ -5,7 +5,7 @@ package edu.gemini.tac.qengine.impl.block
 
 import cats.syntax.all.*
 import edu.gemini.tac.qengine.p1.ItacObservation
-import edu.gemini.tac.qengine.p1.Proposal
+import edu.gemini.tac.qengine.p1.ProposalShard
 import lucuma.core.util.TimeSpan
 
 /**
@@ -22,13 +22,13 @@ trait TimeAccountingCategoryBlockIterator{
   /**
    * Remaining proposals that have not yet been completely visited.
    */
-  def remainingProposals: List[Proposal]
+  def remainingProposals: List[ProposalShard]
 
   /**
    * The proposal that will be referenced from the TimeBlock that is generated
    * by the 'next' method.
    */
-  def currentProposal: Proposal = remainingProposals.head
+  def currentProposal: ProposalShard = remainingProposals.head
 
 
    /**
@@ -62,19 +62,19 @@ trait TimeAccountingCategoryBlockIterator{
   def hasNext = !remainingProposals.isEmpty
 
 
-  def isStartOf(prop: Proposal): Boolean =
+  def isStartOf(prop: ProposalShard): Boolean =
     (currentProposal.reference == prop.reference) && isStartBlock
 
   private def nextBlock(maxTime: TimeSpan): Block = {
     val time = currentObservationRemainingTime.min(maxTime)
     val isFinal = (remainingObservationsInActiveList.tail == Nil) && (time == currentObservationRemainingTime)
-    Block(currentProposal, currentObservation, time, isStartBlock, isFinal)
+    Block(currentProposal, currentObservation.asInstanceOf /** TODO */, time, isStartBlock, isFinal)
   }
 
   /**
    * Generates the next TimeBlock and the next TimeAccountingCategoryTimeBlockIterator.
    */
-  def next(maxTime: TimeSpan, activeList : Proposal => List[ItacObservation]): (Block, TimeAccountingCategoryBlockIterator) = {
+  def next(maxTime: TimeSpan, activeList : ProposalShard => List[ItacObservation.Scaled]): (Block, TimeAccountingCategoryBlockIterator) = {
     val block = nextBlock(maxTime)
     (block, advance(block.time, activeList))
   }
@@ -83,29 +83,29 @@ trait TimeAccountingCategoryBlockIterator{
    * Generates a TimeAccountingCategoryTimeBlock iterator for the next proposal, skipping the
    * current proposal and its observations.
    */
-  def skip(activeList : Proposal => List[ItacObservation]): TimeAccountingCategoryBlockIterator = advanceProp(activeList)
+  def skip(activeList : ProposalShard => List[ItacObservation.Scaled]): TimeAccountingCategoryBlockIterator = advanceProp(activeList)
 
-  private def advanceProp(activeList : Proposal => List[ItacObservation]): TimeAccountingCategoryBlockIterator = remainingProposals match {
+  private def advanceProp(activeList : ProposalShard => List[ItacObservation.Scaled]): TimeAccountingCategoryBlockIterator = remainingProposals match {
     case _ :: nextProp :: tail =>
-      mkIterator(nextProp :: tail, activeList(nextProp),
-        ItacObservation.relativeObsTime(activeList(nextProp).head, nextProp.allocatedTime, activeList(nextProp)), isStartOfBlock = true)
+      mkIterator(nextProp :: tail, activeList(nextProp), activeList(nextProp).head.time, isStartOfBlock = true);
+        // ItacObservation.relativeObsTime(activeList(nextProp).head, nextProp.allocatedTime, activeList(nextProp)), isStartOfBlock = true)
     case _ => TimeAccountingCategoryBlockIterator.Empty
   }
 
-  private def advanceObs(activeList : Proposal => List[ItacObservation]): TimeAccountingCategoryBlockIterator = remainingObservationsInActiveList match {
+  private def advanceObs(activeList : ProposalShard => List[ItacObservation.Scaled]): TimeAccountingCategoryBlockIterator = remainingObservationsInActiveList match {
     case _ :: nextObs :: tail =>
-      mkIterator(remainingProposals, nextObs :: tail,
-        ItacObservation.relativeObsTime(nextObs, currentProposal.allocatedTime, activeList(currentProposal)), isStartOfBlock = false)
+      mkIterator(remainingProposals, nextObs :: tail, nextObs.time, isStartOfBlock = false)
+        // ItacObservation.relativeObsTime(nextObs, currentProposal.allocatedTime, activeList(currentProposal)), isStartOfBlock = false)
     case _ => advanceProp(activeList)
   }
 
-  private def advance(t: TimeSpan, activeList : Proposal => List[ItacObservation]): TimeAccountingCategoryBlockIterator =
+  private def advance(t: TimeSpan, activeList : ProposalShard => List[ItacObservation.Scaled]): TimeAccountingCategoryBlockIterator =
     if (currentObservationRemainingTime > t)
       mkIterator(remainingProposals, remainingObservationsInActiveList, currentObservationRemainingTime -| t, isStartOfBlock = false)
     else
       advanceObs(activeList)
 
-  protected def mkIterator(propList: List[Proposal], obsList: List[ItacObservation], time: TimeSpan, isStartOfBlock: Boolean): TimeAccountingCategoryBlockIterator
+  protected def mkIterator(propList: List[ProposalShard], obsList: List[ItacObservation], time: TimeSpan, isStartOfBlock: Boolean): TimeAccountingCategoryBlockIterator
 }
 
 
@@ -115,27 +115,27 @@ trait TimeAccountingCategoryBlockIterator{
 object TimeAccountingCategoryBlockIterator {
 
   private object Empty extends TimeAccountingCategoryBlockIterator {
-    val remainingProposals: List[Proposal] = Nil
+    val remainingProposals: List[ProposalShard] = Nil
     val remainingObservationsInActiveList: List[ItacObservation] = Nil
     val currentObservationRemainingTime: TimeSpan = TimeSpan.Zero
     val isStartBlock: Boolean = false
 
-    def mkIterator(propList: List[Proposal], obsList: List[ItacObservation], time: TimeSpan, start: Boolean): TimeAccountingCategoryBlockIterator = this
+    def mkIterator(propList: List[ProposalShard], obsList: List[ItacObservation], time: TimeSpan, start: Boolean): TimeAccountingCategoryBlockIterator = this
   }
 
-  private class NormalIterator(val remainingProposals: List[Proposal], val remainingObservationsInActiveList: List[ItacObservation], val currentObservationRemainingTime: TimeSpan, val isStartBlock: Boolean) extends TimeAccountingCategoryBlockIterator {
-    def mkIterator(propList: List[Proposal], obsList: List[ItacObservation], time: TimeSpan, start: Boolean): TimeAccountingCategoryBlockIterator =
+  private class NormalIterator(val remainingProposals: List[ProposalShard], val remainingObservationsInActiveList: List[ItacObservation], val currentObservationRemainingTime: TimeSpan, val isStartBlock: Boolean) extends TimeAccountingCategoryBlockIterator {
+    def mkIterator(propList: List[ProposalShard], obsList: List[ItacObservation], time: TimeSpan, start: Boolean): TimeAccountingCategoryBlockIterator =
       new NormalIterator(propList, obsList, time, start)
   }
 
-  private def init(l: List[Proposal], activeList : Proposal => List[ItacObservation]): (List[ItacObservation], TimeSpan) = {
+  private def init(l: List[ProposalShard], activeList : ProposalShard => List[ItacObservation]): (List[ItacObservation], TimeSpan) = {
     val activeProposal = l.head
     val activeObservations = activeList(activeProposal)
     val firstObservation = activeObservations.head
-    (activeObservations, ItacObservation.relativeObsTime(firstObservation, activeProposal.allocatedTime, activeObservations))
+    (activeObservations, ItacObservation.relativeObsTime(firstObservation, activeProposal.allocation.duration, activeObservations))
   }
 
-  private def applyNonEmpty(propList: List[Proposal], activeList : Proposal=>List[ItacObservation]): TimeAccountingCategoryBlockIterator =
+  private def applyNonEmpty(propList: List[ProposalShard], activeList : ProposalShard=>List[ItacObservation]): TimeAccountingCategoryBlockIterator =
     init(propList, activeList) match {
       case (activeObservations, time) => new NormalIterator(propList, activeObservations, time, true)
     }
@@ -151,6 +151,6 @@ object TimeAccountingCategoryBlockIterator {
    * Please ensure that the proposal lists are filtered as
    * appropriate.
    */
-  def apply(propList: List[Proposal], activeList : Proposal=>List[ItacObservation]): TimeAccountingCategoryBlockIterator =
+  def apply(propList: List[ProposalShard], activeList : ProposalShard=>List[ItacObservation]): TimeAccountingCategoryBlockIterator =
     if (propList.isEmpty) Empty else applyNonEmpty(propList, activeList)
 }

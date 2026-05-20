@@ -25,10 +25,10 @@ object QueueEngineBandProblems {
       s"Classical proposal in $b"
   }
 
-  val NoObsInBand: Problem = {
-    case (p, b) if p.obsListFor(b).isEmpty =>
-      s"No observations were found for $b"
-  }
+  // val NoObsInBand: Problem = {
+  //   case (p, b) if p.obsListFor(b).isEmpty =>
+  //     s"No observations were found for $b"
+  // }
 
   val LpInBand3Or4: Problem = {
     case (p, b@(Band3 | Band4)) if p.tpe.scienceSubtype === ScienceSubtype.LargeProgram =>
@@ -46,7 +46,7 @@ object QueueEngineBandProblems {
   }
 
   val All: NonEmptyList[Problem] =
-    NonEmptyList.of(ClassicalNotInBand1, NoObsInBand, LpInBand3Or4, RapidTooOutsideBand1, StandardTooOutsideBand12)
+    NonEmptyList.of(ClassicalNotInBand1, LpInBand3Or4, RapidTooOutsideBand1, StandardTooOutsideBand12)
 
   def checkAll(p: Proposal, b: ScienceBand): ValidatedNel[String, Unit] =
     All.foldMap: problem => 

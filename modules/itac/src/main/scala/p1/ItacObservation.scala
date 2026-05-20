@@ -26,7 +26,7 @@ case class ItacObservation(
 
   /** Is this observation observable in the specified band? This is determined by conditions and the presence of ToO targets. */
   def isObservableInBand(band: ScienceBand): Boolean =
-    ???
+    true // TODO
 
 object ItacObservation {
 

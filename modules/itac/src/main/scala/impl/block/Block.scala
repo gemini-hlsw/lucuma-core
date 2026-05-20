@@ -3,8 +3,7 @@
 
 package edu.gemini.tac.qengine.impl.block
 
-import edu.gemini.tac.qengine.p1.ItacObservation
-import edu.gemini.tac.qengine.p1.Proposal
+import edu.gemini.tac.qengine.p1.ProposalShard
 import lucuma.core.util.TimeSpan
 
 /**
@@ -18,12 +17,12 @@ import lucuma.core.util.TimeSpan
  * with a single observation may contain only a single block, in which case it
  * would be both the start and final block for the proposal.
  */
-final case class Block(prop: Proposal, obs: ItacObservation, time: TimeSpan, isStart: Boolean, isFinal: Boolean) {
-  def toFinal: Block = copy(isFinal = true)
-  def updated(t: TimeSpan): Block = copy(time = t)
+final case class Block(prop: ProposalShard, obs: prop.Observation, time: TimeSpan, isStart: Boolean, isFinal: Boolean) {
+  def toFinal: Block = copy(prop = prop, obs = obs, isFinal = true)
+  def updated(t: TimeSpan): Block = copy(prop = prop, obs = obs, time = t)
 
   override def toString: String = "Block(%s(%s), %s, %s, %s, %s)".format(
-    prop.ntac.category.tag,
+    prop.allocation.category.tag,
     prop.reference,
     obs,
     time,
@@ -38,7 +37,7 @@ object Block {
    * test cases don't care whether the block is a start block or a final
    * block.
    */
-  def apply(prop: Proposal, obs: ItacObservation, time: TimeSpan): Block =
+  def apply(prop: ProposalShard, obs: prop.Observation, time: TimeSpan): Block =
     new Block(prop, obs, time, false, false)
 }
 

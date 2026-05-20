@@ -3,7 +3,7 @@
 
 package edu.gemini.tac.qengine.log
 
-import edu.gemini.tac.qengine.p1.Proposal
+import edu.gemini.tac.qengine.p1.ProposalShard
 import edu.gemini.tac.qengine.util.BoundedTime
 import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.util.TimeSpan
@@ -27,7 +27,7 @@ object RejectTimeAccountingCategoryOverAllocation {
   }
 }
 
-case class RejectTimeAccountingCategoryOverAllocation(prop: Proposal, guaranteed: BoundedTime, all: BoundedTime) extends RejectMessage {
+case class RejectTimeAccountingCategoryOverAllocation(prop: ProposalShard, guaranteed: BoundedTime, all: BoundedTime) extends RejectMessage {
   def reason: String = RejectTimeAccountingCategoryOverAllocation.name
-  def detail: String = RejectTimeAccountingCategoryOverAllocation.detail(prop.ntac.category, prop.allocatedTime, guaranteed, all)
+  def detail: String = RejectTimeAccountingCategoryOverAllocation.detail(prop.allocation.category, prop.allocation.duration, guaranteed, all)
 }

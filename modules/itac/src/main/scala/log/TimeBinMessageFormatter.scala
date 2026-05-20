@@ -4,7 +4,7 @@
 package edu.gemini.tac.qengine.log
 
 import edu.gemini.tac.qengine.p1.ItacObservation
-import edu.gemini.tac.qengine.p1.Proposal
+import edu.gemini.tac.qengine.p1.ProposalShard
 import lucuma.core.enums.ScienceBand
 import lucuma.core.util.TimeSpan
 
@@ -18,7 +18,7 @@ trait TimeBinMessageFormatter {
   }
 
   private val obsInfoTemplate   = "%.2f hrs at %s(%.3f hr, %.1f deg)"
-  def obsInfo(prop: Proposal, obs: ItacObservation, band: ScienceBand): String = {
+  def obsInfo(prop: ProposalShard, obs: ItacObservation, band: ScienceBand): String = {
     val obsTime = 999 // TODO prop.relativeObsTime(obs, band)
     val target  = obs.itacTarget
     val targetName = target.id.toString
@@ -26,7 +26,7 @@ trait TimeBinMessageFormatter {
   }
 
   private val detailTemplate    = "%s. Reject %s."
-  def detail(prop: Proposal, obs: ItacObservation, band: ScienceBand, cur: TimeSpan, max: TimeSpan): String = {
+  def detail(prop: ProposalShard, obs: ItacObservation, band: ScienceBand, cur: TimeSpan, max: TimeSpan): String = {
     val statusMsg  = binStatus(cur, max)
     val obsInfoMsg = obsInfo(prop, obs, band)
     detailTemplate.format(statusMsg, obsInfoMsg)

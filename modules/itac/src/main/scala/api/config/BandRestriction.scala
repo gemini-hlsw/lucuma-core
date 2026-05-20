@@ -4,14 +4,14 @@
 package edu.gemini.tac.qengine.api.config
 
 import cats.syntax.all.*
-import edu.gemini.tac.qengine.p1.Proposal
+import edu.gemini.tac.qengine.p1.ProposalShard
 import lucuma.core.enums.ScienceBand
 import lucuma.core.enums.ScienceBand.*
 import lucuma.core.enums.ScienceSubtype
 import lucuma.core.enums.ToOActivation
 import lucuma.core.model.ImageQuality
 
-case class BandRestriction(name: String, bands: Set[ScienceBand])(val matches: Proposal => Boolean)
+case class BandRestriction(name: String, bands: Set[ScienceBand])(val matches: ProposalShard => Boolean)
 
 object BandRestriction {
   def name(base: String): String = base // "%s Band Restriction".format(base)
@@ -32,7 +32,8 @@ object BandRestriction {
 
   def lgs: BandRestriction =
     BandRestriction(LgsName, Set(Band1, Band2)) { prop =>
-      prop.band3Observations.exists(_.lgs)
+      prop.allocation.scienceBand >= ScienceBand.Band3 &&
+      prop.observations.exists(_.lgs)
     }
 
   // TODO:
@@ -41,12 +42,15 @@ object BandRestriction {
   // we need to search the obsList for any obs that has an IQ20 value
 
   def iq20: BandRestriction =
-    BandRestriction(Iq20Name, Set(Band1, Band2)) {
-      prop => prop.band3Observations.exists(_.constraintSet.imageQuality === ImageQuality.Preset.PointOne)
+    BandRestriction(Iq20Name, Set(Band1, Band2)) { prop =>
+      prop.allocation.scienceBand >= ScienceBand.Band3 &&
+      prop.observations.exists(_.constraintSet.imageQuality === ImageQuality.Preset.PointOne)
     }
 
-  // Required to remove any proposal that is not-band3 that is pushed into
-  // band 3 by a joint component moving up in the queue.
-  def notBand3: BandRestriction =
-      BandRestriction(NotBand3Name, Set(Band1, Band2)) { _.band3Observations.isEmpty }
+  // // Required to remove any proposal that is not-band3 that is pushed into
+  // // band 3 by a joint component moving up in the queue.
+  // def notBand3: BandRestriction =
+  //     BandRestriction(NotBand3Name, Set(Band1, Band2)) { prop =>
+  //       prop.allocation.scienceBand < Scien
+  //     }
 }

@@ -36,12 +36,11 @@ object Default {
   val RapidTooBandRestriction = BandRestriction.rapidToo
   val LgsBandRestriction      = BandRestriction.lgs
   val Iq20BandRestriction     = BandRestriction.iq20
-  val NotBand3Restriction     = BandRestriction.notBand3
 
   val RelativeTimeRestrictions = List(WvTimeRestriction)
   val AbsoluteTimeRestrictions = List(LgsTimeRestriction)
   val BandRestrictions =
-    List(NotBand3Restriction, RapidTooBandRestriction, LgsBandRestriction, Iq20BandRestriction)
+    List(RapidTooBandRestriction, LgsBandRestriction, Iq20BandRestriction)
 
   def main(args: Array[String]): Unit = {
     Conditions.searchPath.cats foreach { cat =>

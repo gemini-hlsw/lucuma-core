@@ -16,37 +16,15 @@ import lucuma.core.enums.Site
 import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.util.DateInterval
 import lucuma.core.data.Metadata
-
-/**
- * The slice of a proposal relevant to a specific site and allocation, with observations filtered
- * by site and time-scaled by the allocation size.
- */
-case class ProposalShard(
-  parentProposal: Proposal,
-  site: Site,
-  allocation: Allocation,
-):
-  opaque type Observation <: ItacObservation.Scaled = ItacObservation.Scaled
-
-  /** 
-   * Empty if the allocation is empty, otherwise all observations observable at `site`, scaled to
-   * the allocation.
-   */
-  def observations: List[Observation] =
-    if allocation.duration.isEmpty then Nil
-    else parentProposal.itacObservationsScaledForSiteAndBand(site, allocation.scienceBand)(using Metadata.placeholder)
-
-
-
-
+import cats.kernel.Order
+import java.time.LocalDate
 
 case class Proposal(
   reference: ProposalReference,
   allocations: NonEmptyList[Allocation],
   tpe: ProposalType = ProposalType.Queue(ToOActivation.None, IntPercent.unsafeFrom(0), Nil), // TODO
   obsList: List[ItacObservation] = Nil,
-  band3Observations: List[ItacObservation] = Nil,
-  cfpActive: DateInterval = null,
+  cfpActive: DateInterval = DateInterval.between(LocalDate.now(), LocalDate.now())
 ) {
 
   /** 
@@ -71,13 +49,6 @@ case class Proposal(
     
   def too: ToOActivation =
     ProposalType.ToOActivation.getOption(tpe).getOrElse(ToOActivation.None)
-
-  @deprecated
-  def obsListFor(band: ScienceBand): List[ItacObservation] =
-    if (band == ScienceBand.Band3) band3Observations else obsList
-
-  @deprecated
-  def ntac = allocations.head
 
   ///
   /// ALLOCATIONS
@@ -118,7 +89,7 @@ case class Proposal(
   ///
 
   private def itacObservations: List[ItacObservation] =
-    ???
+    obsList
 
   /** 
    * The subset of observations observable at the specified site, in the specified band, with

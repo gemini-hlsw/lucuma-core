@@ -15,13 +15,13 @@ import lucuma.core.enums.ScienceBand
 trait ObsRejectMessage extends RejectMessage {
   def obs: ItacObservation
 
-  def percentObsMerged(b: ScienceBand): Int = {
-    val l = prop.obsListFor(b)
-    ((l.indexOf(obs) / l.size.toDouble) * 100).round.toInt
-  }
+  // def percentObsMerged(b: ScienceBand): Int = {
+  //   val l = prop.obsListFor(b)
+  //   ((l.indexOf(obs) / l.size.toDouble) * 100).round.toInt
+  // }
 
-  def percentTimeMerged(b: ScienceBand): Int = {
-    val totalTime = prop.obsListFor(b).foldLeft(0L)(_ + _.time.toMilliseconds.toLong)
-    ((obs.time.toMilliseconds.toDouble / totalTime.toDouble) * 100).round.toInt
-  }
+  // def percentTimeMerged(b: ScienceBand): Int = {
+  //   val totalTime = prop.obsListFor(b).foldLeft(0L)(_ + _.time.toMilliseconds.toLong)
+  //   ((obs.time.toMilliseconds.toDouble / totalTime.toDouble) * 100).round.toInt
+  // }
 }

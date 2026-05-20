@@ -4,18 +4,19 @@
 package edu.gemini.tac.qengine.log
 
 import edu.gemini.tac.qengine.p1.Proposal
+import edu.gemini.tac.qengine.p1.ProposalShard
 
 /**
  * Proposal acceptance message.
  */
 object AcceptMessage {
   private def detailTemplate = "TODO FIX ME %s rank %5s."
-  def detail(prop: Proposal): String = {
+  def detail(prop: ProposalShard): String = {
     detailTemplate.format(prop.reference, "TODO") // prop.ntac.ranking.format)
   }
 }
 
-case class AcceptMessage(prop: Proposal) extends LogMessage with ProposalDetailMessage {
+case class AcceptMessage(prop: ProposalShard) extends LogMessage with ProposalDetailMessage {
   val reason: String = "Accepted"
   val detail: String = AcceptMessage.detail(prop)
 }

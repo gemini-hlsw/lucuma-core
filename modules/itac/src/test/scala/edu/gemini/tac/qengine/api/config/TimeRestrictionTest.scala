@@ -23,6 +23,7 @@ import lucuma.core.model.Semester
 import lucuma.core.model.Semester.YearInt
 import lucuma.core.util.Enumerated
 import lucuma.core.util.TimeSpan
+import lucuma.core.model.Allocation
 
 class TimeRestrictionTest extends ItacSuite {
 
@@ -37,13 +38,13 @@ class TimeRestrictionTest extends ItacSuite {
     (_, obs, _) => obs.constraintSet.waterVapor <= WaterVapor.Dry
   }
 
-  private def mkProp(wv: WaterVapor): Proposal =
-    Proposal(ProposalReference(Semester(YearInt.unsafeFrom(2026), Half.A), PosInt.unsafeFrom(1)), ntac, obsList = List(ItacObservation(target, conds(wv), TimeSpan.fromHoursBounded(10))))
-
+  private def mkProp(wv: WaterVapor): ProposalShard =
+    val prop = Proposal(ProposalReference(Semester(YearInt.unsafeFrom(2026), Half.A), PosInt.unsafeFrom(1)), ntac, obsList = List(ItacObservation(target, conds(wv), TimeSpan.fromHoursBounded(10))))
+    ProposalShard(prop, Site.GN, Allocation(US, ScienceBand.Band1, TimeSpan.Max))
 
   test("testMatches") {
     val propList = Enumerated[WaterVapor].all.map(mkProp(_))
-    val boolList = propList.map(prop => bin.matches(prop, prop.obsList.head, ScienceBand.Band1))
+    val boolList = propList.map(prop => bin.matches(prop, prop.observations.head, ScienceBand.Band1))
     assertEquals(List(true, true, false, false), boolList)
   }
 

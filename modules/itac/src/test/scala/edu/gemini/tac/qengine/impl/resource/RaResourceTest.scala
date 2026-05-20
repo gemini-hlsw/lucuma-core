@@ -23,9 +23,9 @@ class PerRightAscensionResourceTest extends ItacSuite {
   // test.  We will make time blocks with the explicit amount of time we need
   // for testing.
 
-  private val ntac = Ntac(KR, TimeSpan.Zero)
+  private val ntac = Ntac(KR, TimeSpan.Max)
 
-  private def mkProp(target: ItacTarget, conds: ConstraintSet): Proposal =
+  private def mkProp(target: ItacTarget, conds: ConstraintSet): ProposalShard =
     Fixture.mkProp(ntac,  (target, conds, TimeSpan.Zero))
 
   private def verifyReserve(raRes: PerRightAscensionResource) = {
@@ -53,7 +53,7 @@ class PerRightAscensionResourceTest extends ItacSuite {
   test("testReserve") {
     val target = ItacTarget(15.0, 0.0) // RA 1hr, Dec 0 deg
     val prop   = mkProp(target, goodCC)
-    val block  = Block(prop, prop.obsList.head, TimeSpan.fromMinutesBounded(15))
+    val block  = Block(prop, prop.observations.head, TimeSpan.fromMinutesBounded(15))
 
     Fixture.raResGroup.grp(target).reserve(block, emptyQueue) match {
       case Left(msg)     => fail(msg.reason)
@@ -80,13 +80,13 @@ class PerRightAscensionResourceTest extends ItacSuite {
   test("testReserve2") {
     val target = ItacTarget(15.0, 0.0) // RA 1hr, Dec 0 deg
     val prop   = mkProp(target, goodCC)
-    val block  = Block(prop, prop.obsList.head, TimeSpan.fromMinutesBounded(15))
+    val block  = Block(prop, prop.observations.head, TimeSpan.fromMinutesBounded(15))
 
     val grp    = Fixture.raResGroup.grp(target).reserve(block, emptyQueue).toOption.get
 
     val target2 = ItacTarget(15.0, 45.0) // RA 1hr, Dec 45 deg
     val prop2   = mkProp(target2, badCC)
-    val block2  = Block(prop2, prop2.obsList.head, TimeSpan.fromMinutesBounded(15))
+    val block2  = Block(prop2, prop2.observations.head, TimeSpan.fromMinutesBounded(15))
 
     grp.reserve(block2, emptyQueue) match {
       case Left(msg)     => fail(msg.reason)
@@ -137,7 +137,7 @@ class PerRightAscensionResourceTest extends ItacSuite {
     val prop = mkProp(target, badCC) // 1 hour limit for obs like this
 
     // Take almost all the time
-    val block = Block(prop, prop.obsList.head, TimeSpan.fromMinutesBounded(59.9))
+    val block = Block(prop, prop.observations.head, TimeSpan.fromMinutesBounded(59.9))
     val raRes = Fixture.raResGroup.grp(target).reserve(block, emptyQueue).toOption.get
 
     // badCC is being limited here by the absolute limit
@@ -151,7 +151,7 @@ class PerRightAscensionResourceTest extends ItacSuite {
 
     // Try to schedule this block, which would work if it weren't for the
     // absolute limit.
-    val block2 = Block(prop2, prop2.obsList.head, TimeSpan.fromMinutesBounded(0.11))
+    val block2 = Block(prop2, prop2.observations.head, TimeSpan.fromMinutesBounded(0.11))
     raRes.reserve(block2, emptyQueue) match {
       case Left(msg: RejectTarget) => assertEquals(prop2, msg.prop)
       case _ => fail("failed")
@@ -181,14 +181,14 @@ class PerRightAscensionResourceTest extends ItacSuite {
     val prop = mkProp(target, badCC) // 30 min dec limit, 1 hour conds limit
 
     // Take almost all the time for the dec
-    val block = Block(prop, prop.obsList.head, TimeSpan.fromMinutesBounded(29.9))
+    val block = Block(prop, prop.observations.head, TimeSpan.fromMinutesBounded(29.9))
     val raRes = Fixture.raResGroup.grp(target).reserve(block, emptyQueue).toOption.get
 
     assertEquals( 0.1, raRes.remaining(target, badCC).toMinutes.toDouble, 0.000001)
     assertEquals(30.1, raRes.remaining(badCC).toMinutes.toDouble, 0.000001)
 
     // Take it over the edge.
-    val block2 = Block(prop, prop.obsList.head, TimeSpan.fromMinutesBounded(0.11))
+    val block2 = Block(prop, prop.observations.head, TimeSpan.fromMinutesBounded(0.11))
     raRes.reserve(block2, emptyQueue) match {
       case Left(msg) => assertEquals(prop, msg.prop)
       case _ => fail("failed")
@@ -218,14 +218,14 @@ class PerRightAscensionResourceTest extends ItacSuite {
     val prop = mkProp(target, goodCC) // 60 min dec limit, 30 mins conds limit
 
     // Take almost all the time for the conditions
-    val block = Block(prop, prop.obsList.head, TimeSpan.fromMinutesBounded(29.9))
+    val block = Block(prop, prop.observations.head, TimeSpan.fromMinutesBounded(29.9))
     val raRes = Fixture.raResGroup.grp(target).reserve(block, emptyQueue).toOption.get
 
     assertEquals(0.1,  raRes.remaining(target, goodCC).toMinutes.toDouble, 0.000001)
     assertEquals(30.1, raRes.remaining(target).toMinutes.toDouble, 0.000001)
 
     // Take it over the edge.
-    val block2 = Block(prop, prop.obsList.head, TimeSpan.fromMinutesBounded(0.11))
+    val block2 = Block(prop, prop.observations.head, TimeSpan.fromMinutesBounded(0.11))
     raRes.reserve(block2, emptyQueue) match {
       case Left(msg: RejectConditions) => assertEquals(prop, msg.prop)
       case _ => fail("failed")

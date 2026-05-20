@@ -3,9 +3,9 @@
 
 package edu.gemini.tac.qengine.log
 
-import edu.gemini.tac.qengine.p1.Proposal
+import edu.gemini.tac.qengine.p1.ProposalShard
 
-case class RemovedRejectMessage(prop: Proposal) extends RejectMessage {
+case class RemovedRejectMessage(prop: ProposalShard) extends RejectMessage {
   def reason: String = "Unknown."
   def detail: String = "Proposal was removed from consideration."
 }

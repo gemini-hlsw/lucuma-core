@@ -29,7 +29,6 @@ class QueueEngineBandProblemsTest extends FunSuite {
       allocations       = null,
       tpe               = null,
       obsList           = null,
-      band3Observations = null,
     )
 
   // Test that the given problem check fails with the the given proposal and per-band expectations.
@@ -43,17 +42,17 @@ class QueueEngineBandProblemsTest extends FunSuite {
       case Band4 => "Classical proposal in Band4"
     }
 
-  test("testNoObsInBand124"):
-    testRule(NoObsInBand, P.copy(obsList = Nil, band3Observations = List(null))) {
-      case Band1 => ("No observations were found for Band1")
-      case Band2 => ("No observations were found for Band2")
-      case Band4 => ("No observations were found for Band4")
-    }
+  // test("testNoObsInBand124"):
+  //   testRule(NoObsInBand, P.copy(obsList = Nil, band3Observations = List(null))) {
+  //     case Band1 => ("No observations were found for Band1")
+  //     case Band2 => ("No observations were found for Band2")
+  //     case Band4 => ("No observations were found for Band4")
+  //   }
 
-  test("testNoObsInBand3"):
-    testRule(NoObsInBand, P.copy(obsList = List(null), band3Observations = Nil)) {
-      case Band3 => "No observations were found for Band3"
-    }
+  // test("testNoObsInBand3"):
+  //   testRule(NoObsInBand, P.copy(obsList = List(null), band3Observations = Nil)) {
+  //     case Band3 => "No observations were found for Band3"
+  //   }
 
   test("testLpInBand3Or4"):
     testRule(LpInBand3Or4, P.copy(tpe = ProposalType.LargeProgram(ToOActivation.None, IntPercent.unsafeFrom(100), IntPercent.unsafeFrom(100), TimeSpan.Min))) { // TODO

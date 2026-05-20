@@ -29,6 +29,7 @@ import lucuma.core.util.Enumerated
 import lucuma.core.util.TimeSpan
 
 import Cat.*
+import lucuma.core.enums.ScienceBand
 
 class ConditionsResourceTest extends ItacSuite {
   import TimeAccountingCategory.KR
@@ -45,9 +46,10 @@ class ConditionsResourceTest extends ItacSuite {
   private val ntac   = Ntac(KR, TimeSpan.fromMinutesBounded(100)) // not used
   private val target = ItacTarget(0,0)                               // not used
 
-  private def mkProp(obsConds: ConstraintSet): Proposal = {
+  private def mkProp(obsConds: ConstraintSet): ProposalShard = {
     val obsList = List(ItacObservation(target, obsConds, TimeSpan.fromMinutesBounded(10)))
-    Proposal(ProposalReference(Semester(YearInt.unsafeFrom(2026), Half.A), PosInt.unsafeFrom(1)), ntac, obsList = obsList)
+    val prop = Proposal(ProposalReference(Semester(YearInt.unsafeFrom(2026), Half.A), PosInt.unsafeFrom(1)), ntac, obsList = obsList)
+    prop.shardFor(Site.GN, ntac.head.category, ntac.head.scienceBand)
   }
 
   private def mkConds(cc: CloudExtinction.Preset): ConstraintSet =
@@ -69,7 +71,7 @@ class ConditionsResourceTest extends ItacSuite {
     verifyTimes(newResGrp, mins*)
 
     val prop  = mkProp(cnds)
-    val otb   = Block(prop, prop.obsList.head, time)
+    val otb   = Block(prop, prop.observations.head, time)
     resGrp.reserve(otb, Fixture.emptyQueue) match {
       case Right(res) => verifyTimes(res, mins*)
       case _ => fail("failed")
@@ -131,7 +133,7 @@ class ConditionsResourceTest extends ItacSuite {
   test("testCannotStealMoreThanThanAvailableFromBetterBins") {
     val prop = mkProp(mkConds(CloudExtinction.Preset.OnePointZero))
 
-    val otb2 = Block(prop, prop.obsList.head, TimeSpan.fromMinutesBounded(76))
+    val otb2 = Block(prop, prop.observations.head, TimeSpan.fromMinutesBounded(76))
     resGrp.reserve(otb2, Fixture.emptyQueue) match {
       case Left(rc: RejectConditions) => // pass
       case _ => fail("failed")

@@ -56,35 +56,35 @@ object QueueEngine3 { //extends QueueEngine {
     //   siteProposals.map(_.filter(_.mode != ScienceSubtype.Classical))
 
     // BlockIterator for a given site (some observations are filtered out) and band (some proposals are filtered out).
-    def iteratorFor(band: ScienceBand, site: Site): BlockIterator =
-      BlockIterator(
-        queueTimes(band, site).TimeAccountingCategoryQuanta,
-        config.TimeAccountingCategorySeq.sequence,
-        TimeAccountingCategory
-          .values
-          .toList
-          .fproduct: tac =>
-            proposals.filter(_.allocations.exists(_.category === tac))
-          .toMap,
-        p => p.itacObservationsScaledForSiteAndBand(site, band)
-      )
+    // def iteratorFor(band: ScienceBand, site: Site): BlockIterator =
+    //   BlockIterator(
+    //     queueTimes(band, site).TimeAccountingCategoryQuanta,
+    //     config.TimeAccountingCategorySeq.sequence,
+    //     TimeAccountingCategory
+    //       .values
+    //       .toList
+    //       .fproduct: tac =>
+    //         proposals.filter(_.allocations.exists(_.category === tac))
+    //       .toMap,
+    //     p => p.itacObservationsScaledForSiteAndBand(site, band)
+    //   )
 
-    // Build a queue for each site+band combination, in ascending order by band, alternating between sites.
-    // The resulting queues will be combined somehow.
-    val z = (Enumerated[ScienceBand].all, Enumerated[Site].all)
-      .tupled
-      .traverse: (band, site) => 
-        State[(SemesterResource, ProposalLog), ProposalQueue]: (res, log) =>
-          val stage = QueueCalcStage(
-            queue       = ProposalQueueBuilder(queueTimes(band, site), band),
-            iter        = iteratorFor(band, site), 
-            activeList  = _.itacObservationsScaledForSiteAndBand(site, band),
-            res         = res,
-            log         = log,
-          )
-          ((stage.resource, stage.log), stage.queue)
-      .run((???, ProposalLog.Empty))
-      .value
+    // // Build a queue for each site+band combination, in ascending order by band, alternating between sites.
+    // // The resulting queues will be combined somehow.
+    // val z = (Enumerated[ScienceBand].all, Enumerated[Site].all)
+    //   .tupled
+    //   .traverse: (band, site) => 
+    //     State[(SemesterResource, ProposalLog), ProposalQueue]: (res, log) =>
+    //       val stage = QueueCalcStage(
+    //         queue       = ProposalQueueBuilder(queueTimes(band, site), band),
+    //         iter        = iteratorFor(band, site), 
+    //         activeList  = _.itacObservationsScaledForSiteAndBand(site, band),
+    //         res         = res,
+    //         log         = log,
+    //       )
+    //       ((stage.resource, stage.log), stage.queue)
+    //   .run((???, ProposalLog.Empty))
+    //   .value
 
     // val ((finalResource, band123log), (queue1WithoutClassical, queue2, queue3)) = (
     //   runQueue(Band1), runQueue(Band2), runQueue(Band3)

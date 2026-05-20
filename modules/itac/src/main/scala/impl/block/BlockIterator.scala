@@ -12,6 +12,7 @@ import lucuma.core.util.Enumerated
 import lucuma.core.util.TimeSpan
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import edu.gemini.tac.qengine.p1.ProposalShard
 
 /**
  * An immutable iterator that can be used to generate time blocks across all
@@ -47,7 +48,7 @@ trait BlockIterator {
   /**
    * Computes the list of remaining proposals in the iterator.
    */
-  def remPropList: List[Proposal] =
+  def remPropList: List[ProposalShard] =
     Enumerated[TimeAccountingCategory].all.flatMap(p => iterMap(p).remainingProposals)
 
   /**
@@ -55,8 +56,8 @@ trait BlockIterator {
    */
   def currentTimeAccountingCategory: TimeAccountingCategory = seq.head
 
-  def isStartOf(prop: Proposal): Boolean =
-    (currentTimeAccountingCategory == prop.ntac.category) &&
+  def isStartOf(prop: ProposalShard): Boolean =
+    (currentTimeAccountingCategory == prop.allocation.category) &&
     iterMap(currentTimeAccountingCategory).isStartOf(prop)
 
   /**
@@ -71,7 +72,7 @@ trait BlockIterator {
    * Generates the next TimeBlock and a new iterator configured to produce the
    * remaining blocks.
    */
-  def next(activeList : Proposal=>List[ItacObservation]) : (Block, BlockIterator) = {
+  def next(activeList : ProposalShard => List[ItacObservation.Scaled]) : (Block, BlockIterator) = {
     // Advance the TimeAccountingCategory time block iterator.  Use at most remTime time.
     // This may cause the iterator to generate a block for part of an
     // observation, which is fine.
@@ -89,13 +90,13 @@ trait BlockIterator {
    * This method is mostly intended for testing support since it is not
    * tail recursive and could be expensive for lengthy sequences.
    */
-  def toList(activeList : Proposal=>List[ItacObservation]) : List[Block] =
+  def toList(activeList : ProposalShard => List[ItacObservation.Scaled]) : List[Block] =
     if (!hasNext) Nil else next(activeList) match { case (b, it) => b :: it.toList(activeList) }
 
   /**
    * Skips the proposal that would be generated in the next TimeBlock.
    */
-  def skip(activeList : Proposal=>List[ItacObservation]): BlockIterator = {
+  def skip(activeList : ProposalShard => List[ItacObservation.Scaled]): BlockIterator = {
     val TimeAccountingCategoryIter = iterMap(currentTimeAccountingCategory).skip(activeList)
     val m = iterMap.updated(currentTimeAccountingCategory, TimeAccountingCategoryIter)
     if (TimeAccountingCategoryIter.hasNext) mkIterator(seq, remTime, m) else advanceTimeAccountingCategory(m)
@@ -146,8 +147,8 @@ object BlockIterator {
     val remTime: TimeSpan = TimeSpan.Zero
     val iterMap: Map[TimeAccountingCategory, TimeAccountingCategoryBlockIterator] = Map.empty
 
-    override def isStartOf(prop: Proposal): Boolean = false
-    override def remPropList: List[Proposal] = Nil
+    override def isStartOf(prop: ProposalShard): Boolean = false
+    override def remPropList: List[ProposalShard] = Nil
     override def hasNext: Boolean = false
     def mkIterator(s: Seq[TimeAccountingCategory], t: TimeSpan, m: Map[TimeAccountingCategory, TimeAccountingCategoryBlockIterator]) = this
   }
@@ -165,7 +166,7 @@ object BlockIterator {
     }
   }
 
-  private def genIterMap(m: Map[TimeAccountingCategory, List[Proposal]], activeList : Proposal=>List[ItacObservation]): Map[TimeAccountingCategory, TimeAccountingCategoryBlockIterator] =
+  private def genIterMap(m: Map[TimeAccountingCategory, List[ProposalShard]], activeList : ProposalShard => List[ItacObservation.Scaled]): Map[TimeAccountingCategory, TimeAccountingCategoryBlockIterator] =
     Enumerated[TimeAccountingCategory].all.map(p => p -> m.get(p).orEmpty).toMap.map { case (k, v) => (k, TimeAccountingCategoryBlockIterator.apply(v, activeList)) }
 
   // Finds the first TimeAccountingCategory that has a non-zero time quantum and a proposal
@@ -192,7 +193,7 @@ object BlockIterator {
    * <p>The TimeAccountingCategory sequence can be finite but an infinite sequence is expected
    * in order to be able to generate time blocks for all the proposals.
    */
-  def apply(quantaMap: TimeAccountingCategoryTime, seq: Seq[TimeAccountingCategory], propLists: Map[TimeAccountingCategory, List[Proposal]], activeList : Proposal=>List[ItacObservation]): BlockIterator = {
+  def apply(quantaMap: TimeAccountingCategoryTime, seq: Seq[TimeAccountingCategory], propLists: Map[TimeAccountingCategory, List[ProposalShard]], activeList : ProposalShard => List[ItacObservation.Scaled]): BlockIterator = {
 
     // Filter `quantaMap` to retain entries only for relevant TimeAccountingCategorys; i.e., those who have
     // proposals. Failure to do this can lead to nontermination in `advanceTimeAccountingCategory`.

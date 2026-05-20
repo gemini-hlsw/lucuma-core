@@ -4,7 +4,7 @@
 package edu.gemini.tac.qengine.log
 
 import edu.gemini.tac.qengine.p1.ItacObservation
-import edu.gemini.tac.qengine.p1.Proposal
+import edu.gemini.tac.qengine.p1.ProposalShard
 import lucuma.core.enums.ScienceBand
 import lucuma.core.util.TimeSpan
 
@@ -21,7 +21,7 @@ object RejectTarget extends TimeBinMessageFormatter {
   def reason(raDecType: RaDecType): String = reasonTemplate.format(raDecType)
 }
 
-final case class RejectTarget(prop: Proposal, obs: ItacObservation, band: ScienceBand, raDecType: RejectTarget.RaDecType, cur: TimeSpan, max: TimeSpan) extends ObsRejectMessage {
+final case class RejectTarget(prop: ProposalShard, obs: ItacObservation, band: ScienceBand, raDecType: RejectTarget.RaDecType, cur: TimeSpan, max: TimeSpan) extends ObsRejectMessage {
   def reason: String = RejectTarget.reason(raDecType)
   def detail: String = RejectTarget.detail(prop, obs, band, cur, max)
 }
