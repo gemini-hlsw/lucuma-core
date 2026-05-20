@@ -10,7 +10,6 @@ import edu.gemini.tac.qengine.log.RejectCategoryOverAllocation
 import edu.gemini.tac.qengine.p1.ItacObservation
 import edu.gemini.tac.qengine.p1.ProposalShard
 import org.slf4j.LoggerFactory
-import edu.gemini.tac.qengine.p1.ProposalShard
 
 import block.BlockIterator
 import annotation.tailrec

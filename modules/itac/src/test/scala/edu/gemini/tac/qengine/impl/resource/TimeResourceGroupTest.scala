@@ -25,12 +25,15 @@ import lucuma.core.model.Semester
 import lucuma.core.model.Semester.YearInt
 import lucuma.core.util.Enumerated
 import lucuma.core.util.TimeSpan
+import lucuma.core.enums.ScienceBand
+import cats.data.NonEmptyList
+import lucuma.core.model.Allocation
 
 class CompositeTimeRestrictionResourceTest extends ItacSuite {
   import TimeAccountingCategory.US
   val TimeAccountingCategorys = Enumerated[TimeAccountingCategory].all
 
-  private val ntac   = Ntac(US, TimeSpan.fromHoursBounded(10))
+  private val alloc  = Allocation(US, ScienceBand.Band1, TimeSpan.fromHoursBounded(10))
   private val target = ItacTarget(0, 0) // not used
   private def conds(wv: WaterVapor) =
     ConstraintSet(ImageQuality.Preset.TwoPointZero, CloudExtinction.Preset.ThreePointZero, SkyBackground.Bright, wv, ElevationRange.ByAirMass.Default)
@@ -51,8 +54,8 @@ class CompositeTimeRestrictionResourceTest extends ItacSuite {
   private val grp = new CompositeTimeRestrictionResource(lst)
 
   private def mkProp(wv: WaterVapor, lgs: Boolean): ProposalShard =
-    val p = Proposal(ProposalReference(Semester(YearInt.unsafeFrom(2026), Half.A), PosInt.unsafeFrom(1)), ntac, obsList = List(ItacObservation(target, conds(wv), TimeSpan.fromHoursBounded(10), lgs)))
-    p.shardFor(Site.GN, ntac.head.category, ntac.head.scienceBand)
+    val p = Proposal(ProposalReference(Semester(YearInt.unsafeFrom(2026), Half.A), PosInt.unsafeFrom(1)), NonEmptyList.one(alloc), obsList = List(ItacObservation(target, conds(wv), TimeSpan.fromHoursBounded(10), lgs)))
+    p.shardFor(Site.GN, alloc.category, alloc.scienceBand)
 
   test("testReserveWv") {
     val prop  = mkProp(WaterVapor.VeryDry, lgs = false)  // matches WV limit, not LGS limit

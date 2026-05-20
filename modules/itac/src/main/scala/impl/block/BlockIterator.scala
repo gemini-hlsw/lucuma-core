@@ -6,13 +6,12 @@ package edu.gemini.tac.qengine.impl.block
 import cats.syntax.all.*
 import edu.gemini.tac.qengine.api.queue.time.TimeAccountingCategoryTime
 import edu.gemini.tac.qengine.p1.ItacObservation
-import edu.gemini.tac.qengine.p1.Proposal
+import edu.gemini.tac.qengine.p1.ProposalShard
 import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.util.Enumerated
 import lucuma.core.util.TimeSpan
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import edu.gemini.tac.qengine.p1.ProposalShard
 
 /**
  * An immutable iterator that can be used to generate time blocks across all

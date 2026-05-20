@@ -44,7 +44,7 @@ object BandRestriction {
   def iq20: BandRestriction =
     BandRestriction(Iq20Name, Set(Band1, Band2)) { prop =>
       prop.allocation.scienceBand >= ScienceBand.Band3 &&
-      prop.observations.exists(_.constraintSet.imageQuality === ImageQuality.Preset.PointOne)
+      prop.observations.exists(_.constraintSet.imageQuality === ImageQuality.Preset.PointThree)
     }
 
   // // Required to remove any proposal that is not-band3 that is pushed into

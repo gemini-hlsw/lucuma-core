@@ -7,6 +7,7 @@ import edu.gemini.tac.qengine.ItacSuite
 import edu.gemini.tac.qengine.p1.*
 import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.enums.Half
+import lucuma.core.enums.ScienceBand
 import lucuma.core.enums.Site
 import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.TimeAccountingCategory
@@ -23,7 +24,8 @@ import lucuma.core.util.TimeSpan
 import org.junit.*
 
 import Assert.*
-import lucuma.core.enums.ScienceBand
+import lucuma.core.model.Allocation
+import cats.data.NonEmptyList
 
 class TimeAccountingCategoryBlockIteratorTest extends ItacSuite {
   import TimeAccountingCategory.AR
@@ -50,10 +52,11 @@ class TimeAccountingCategoryBlockIteratorTest extends ItacSuite {
   def mkObs(hrs: Double): ItacObservation = ItacObservation(target, conds, TimeSpan.fromHoursBounded(hrs))
 
   def mkProp(hrs: Double, obsHrs: Double*): ProposalShard =
-    val ntac = Ntac(AR, TimeSpan.fromHoursBounded(hrs))
+    val alloc = Allocation(AR, ScienceBand.Band1, TimeSpan.fromHoursBounded(hrs))
+    val allocs = NonEmptyList.one(alloc)
     gen = gen.next
     val lst  = obsHrs.map(curHrs => ItacObservation(target, conds, TimeSpan.fromHoursBounded(curHrs))).toList
-    val prop = Proposal(ProposalReference(Semester(YearInt.unsafeFrom(2026), Half.A), PosInt.unsafeFrom(gen.num)), ntac, obsList = lst)
+    val prop = Proposal(ProposalReference(Semester(YearInt.unsafeFrom(2026), Half.A), PosInt.unsafeFrom(gen.num)), allocs, obsList = lst)
     prop.shardFor(Site.GN, AR, ScienceBand.Band1)
 
   test("testCreateEmpty") {

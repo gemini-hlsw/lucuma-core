@@ -4,7 +4,6 @@
 package edu.gemini.tac.qengine.log
 
 import edu.gemini.tac.qengine.p1.ItacObservation
-import lucuma.core.enums.ScienceBand
 
 /**
  * A proposal rejection that occurs because a particular observation in the
