@@ -30,6 +30,8 @@ import lucuma.core.util.TimeSpan
 
 import Cat.*
 import lucuma.core.enums.ScienceBand
+import cats.data.NonEmptyList
+import lucuma.core.model.Allocation
 
 class ConditionsResourceTest extends ItacSuite {
   import TimeAccountingCategory.KR
@@ -43,13 +45,14 @@ class ConditionsResourceTest extends ItacSuite {
   private val binGrp = ConditionsCategoryMap.of(bins)
   private val resGrp = ConditionsCategoryMapResource(TimeSpan.fromMinutesBounded(100), binGrp)
 
-  private val ntac   = Ntac(KR, TimeSpan.fromMinutesBounded(100)) // not used
+  private val alloc  = Allocation(KR, ScienceBand.Band1, TimeSpan.fromMinutesBounded(100))
+  private val allocs = NonEmptyList.one(alloc)
   private val target = ItacTarget(0,0)                               // not used
 
   private def mkProp(obsConds: ConstraintSet): ProposalShard = {
     val obsList = List(ItacObservation(target, obsConds, TimeSpan.fromMinutesBounded(10)))
-    val prop = Proposal(ProposalReference(Semester(YearInt.unsafeFrom(2026), Half.A), PosInt.unsafeFrom(1)), ntac, obsList = obsList)
-    prop.shardFor(Site.GN, ntac.head.category, ntac.head.scienceBand)
+    val prop = Proposal(ProposalReference(Semester(YearInt.unsafeFrom(2026), Half.A), PosInt.unsafeFrom(1)), allocs, obsList = obsList)
+    prop.shardFor(Site.GN, allocs.head.category, allocs.head.scienceBand)
   }
 
   private def mkConds(cc: CloudExtinction.Preset): ConstraintSet =

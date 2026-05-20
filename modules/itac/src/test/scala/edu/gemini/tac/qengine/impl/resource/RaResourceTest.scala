@@ -14,6 +14,8 @@ import lucuma.core.util.Enumerated
 import lucuma.core.util.TimeSpan
 
 import Fixture.{badCC, emptyQueue, goodCC}
+import lucuma.core.enums.ScienceBand
+import lucuma.core.model.Allocation
 
 class PerRightAscensionResourceTest extends ItacSuite {
   import TimeAccountingCategory.KR
@@ -23,10 +25,10 @@ class PerRightAscensionResourceTest extends ItacSuite {
   // test.  We will make time blocks with the explicit amount of time we need
   // for testing.
 
-  private val ntac = Ntac(KR, TimeSpan.Max)
+  private val alloc = Allocation(KR, ScienceBand.Band1, TimeSpan.Max)
 
   private def mkProp(target: ItacTarget, conds: ConstraintSet): ProposalShard =
-    Fixture.mkProp(ntac,  (target, conds, TimeSpan.Zero))
+    Fixture.mkProp(alloc,  (target, conds, TimeSpan.Zero))
 
   private def verifyReserve(raRes: PerRightAscensionResource) = {
     val target = ItacTarget(15.0, 0.0) // RA 1hr, Dec 0 deg

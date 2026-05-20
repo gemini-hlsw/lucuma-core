@@ -8,16 +8,15 @@ import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.enums.Half
 import lucuma.core.enums.ScienceBand
 import lucuma.core.enums.ScienceBand.*
-import lucuma.core.enums.ScienceSubtype
 import lucuma.core.enums.ToOActivation
+import lucuma.core.model.IntPercent
 import lucuma.core.model.ProposalReference
+import lucuma.core.model.ProposalType
 import lucuma.core.model.Semester
 import lucuma.core.model.Semester.YearInt
+import lucuma.core.util.TimeSpan
 import munit.FunSuite
 import org.junit.Assert
-import lucuma.core.model.ProposalType
-import lucuma.core.model.IntPercent
-import lucuma.core.util.TimeSpan
 
 class QueueEngineBandProblemsTest extends FunSuite {
   import QueueEngineBandProblems._

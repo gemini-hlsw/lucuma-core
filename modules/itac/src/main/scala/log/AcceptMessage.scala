@@ -3,7 +3,6 @@
 
 package edu.gemini.tac.qengine.log
 
-import edu.gemini.tac.qengine.p1.Proposal
 import edu.gemini.tac.qengine.p1.ProposalShard
 
 /**

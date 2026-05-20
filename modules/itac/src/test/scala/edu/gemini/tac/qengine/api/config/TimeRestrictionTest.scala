@@ -3,6 +3,7 @@
 
 package edu.gemini.tac.qengine.api.config
 
+import cats.data.NonEmptyList
 import cats.syntax.all.*
 import edu.gemini.tac.qengine.ItacSuite
 import edu.gemini.tac.qengine.p1.*
@@ -13,6 +14,7 @@ import lucuma.core.enums.Site
 import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.enums.WaterVapor
+import lucuma.core.model.Allocation
 import lucuma.core.model.CloudExtinction
 import lucuma.core.model.ConstraintSet
 import lucuma.core.model.ElevationRange
@@ -23,13 +25,13 @@ import lucuma.core.model.Semester
 import lucuma.core.model.Semester.YearInt
 import lucuma.core.util.Enumerated
 import lucuma.core.util.TimeSpan
-import lucuma.core.model.Allocation
 
 class TimeRestrictionTest extends ItacSuite {
 
   val US = TimeAccountingCategory.US
 
-  private val ntac   = Ntac(US, TimeSpan.fromHoursBounded(10))
+  private val alloc  = Allocation(US, ScienceBand.Band1, TimeSpan.fromHoursBounded(10))
+  private val allocs   = NonEmptyList.one(alloc)
   private val target = ItacTarget(0.0, 0.0) // not used
   private def conds(wv: WaterVapor) =
     ConstraintSet(ImageQuality.Preset.TwoPointZero, CloudExtinction.Preset.ThreePointZero, SkyBackground.Bright, wv, ElevationRange.ByAirMass.Default)
@@ -39,8 +41,8 @@ class TimeRestrictionTest extends ItacSuite {
   }
 
   private def mkProp(wv: WaterVapor): ProposalShard =
-    val prop = Proposal(ProposalReference(Semester(YearInt.unsafeFrom(2026), Half.A), PosInt.unsafeFrom(1)), ntac, obsList = List(ItacObservation(target, conds(wv), TimeSpan.fromHoursBounded(10))))
-    ProposalShard(prop, Site.GN, Allocation(US, ScienceBand.Band1, TimeSpan.Max))
+    val prop = Proposal(ProposalReference(Semester(YearInt.unsafeFrom(2026), Half.A), PosInt.unsafeFrom(1)), allocs, obsList = List(ItacObservation(target, conds(wv), TimeSpan.fromHoursBounded(10))))
+    prop.shardFor(Site.GN, alloc.category, alloc.scienceBand)
 
   test("testMatches") {
     val propList = Enumerated[WaterVapor].all.map(mkProp(_))

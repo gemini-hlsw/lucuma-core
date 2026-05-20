@@ -21,7 +21,9 @@ import lucuma.core.model.CloudExtinction
 import lucuma.core.model.ConstraintSet
 import lucuma.core.model.ElevationRange
 import lucuma.core.model.ImageQuality
+import lucuma.core.model.IntPercent
 import lucuma.core.model.ProposalReference
+import lucuma.core.model.ProposalType
 import lucuma.core.model.Semester
 import lucuma.core.model.Semester.YearInt
 import lucuma.core.util.Enumerated
@@ -29,8 +31,9 @@ import lucuma.core.util.TimeSpan
 import org.junit.*
 
 import Assert.*
-import lucuma.core.model.ProposalType
-import lucuma.core.model.IntPercent
+import lucuma.core.model.Allocation
+import cats.data.NonEmptyList
+import lucuma.core.enums.ScienceBand
 
 class DecResourceTest extends ItacSuite {
   import TimeAccountingCategory.KR
@@ -59,11 +62,12 @@ class DecResourceTest extends ItacSuite {
       ElevationRange.ByAirMass.Default
     )
 
-  private val ntac = Ntac(KR, TimeSpan.Max)
+  private val alloc  = Allocation(KR, ScienceBand.Band1, TimeSpan.Max)
+  private val allocs = NonEmptyList.one(alloc)
 
   private def mkProp(target: ItacTarget): ProposalShard =
-    val p = Proposal(ProposalReference(Semester(YearInt.unsafeFrom(2026), Half.A), PosInt.unsafeFrom(1)), ntac, obsList = List(ItacObservation(target, conds, TimeSpan.Zero)))
-    ProposalShard(p, Site.GN, ntac.head)
+    val p = Proposal(ProposalReference(Semester(YearInt.unsafeFrom(2026), Half.A), PosInt.unsafeFrom(1)), allocs, obsList = List(ItacObservation(target, conds, TimeSpan.Zero)))
+    ProposalShard(p, Site.GN, allocs.head)
 
   test("testNormalReserveWithRemainingTime") {
     val prop   = mkProp(target0)

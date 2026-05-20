@@ -7,12 +7,11 @@ import edu.gemini.tac.qengine.impl.resource.SemesterResource
 import edu.gemini.tac.qengine.log.AcceptMessage
 import edu.gemini.tac.qengine.log.RejectMessage
 import edu.gemini.tac.qengine.p1.ItacObservation
-import edu.gemini.tac.qengine.p1.Proposal
+import edu.gemini.tac.qengine.p1.ProposalShard
 import org.slf4j.LoggerFactory
 
 import block.{Block, BlockIterator}
 import queue.ProposalQueueBuilder
-import edu.gemini.tac.qengine.p1.ProposalShard
 
 /**
  * QueueFrame represents the state of the queue generation process at a

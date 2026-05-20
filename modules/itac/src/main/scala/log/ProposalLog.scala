@@ -5,12 +5,10 @@ package edu.gemini.tac.qengine.log
 
 import cats.implicits.*
 import edu.gemini.tac.qengine.log.ProposalLog.Key
-import edu.gemini.tac.qengine.p1.Proposal
-import lucuma.core.enums.ScienceBand
 import edu.gemini.tac.qengine.p1.ProposalShard
+import lucuma.core.enums.ScienceBand
 
 import scala.collection.immutable.SortedSet
-import edu.gemini.tac.qengine.p1.ProposalShard
 
 /**
  * A collection of log messages keyed by a combination of proposal id and

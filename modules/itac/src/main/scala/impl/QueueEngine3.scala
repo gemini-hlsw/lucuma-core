@@ -23,13 +23,13 @@ import edu.gemini.tac.qengine.log.ProposalLog
 import edu.gemini.tac.qengine.log.RemovedRejectMessage
 import edu.gemini.tac.qengine.p1.*
 import edu.gemini.tac.qengine.util.BoundedTime
+import lucuma.core.data.Metadata
 import lucuma.core.enums.ScienceBand
 import lucuma.core.enums.ScienceBand.*
 import lucuma.core.enums.ScienceSubtype
+import lucuma.core.enums.Site
 import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.util.Enumerated
-import lucuma.core.enums.Site
-import lucuma.core.data.Metadata
 
 object QueueEngine3 { //extends QueueEngine {
 

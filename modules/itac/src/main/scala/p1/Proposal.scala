@@ -3,20 +3,20 @@
 
 package edu.gemini.tac.qengine.p1
 
-import lucuma.core.enums.ScienceBand
-import lucuma.core.enums.ToOActivation
-import lucuma.core.model.ProposalReference
-import lucuma.core.util.TimeSpan
-import cats.syntax.all.*
 import cats.data.NonEmptyList
-import lucuma.core.model.Allocation
-import lucuma.core.model.ProposalType
-import lucuma.core.model.IntPercent
+import cats.syntax.all.*
+import lucuma.core.data.Metadata
+import lucuma.core.enums.ScienceBand
 import lucuma.core.enums.Site
 import lucuma.core.enums.TimeAccountingCategory
+import lucuma.core.enums.ToOActivation
+import lucuma.core.model.Allocation
+import lucuma.core.model.IntPercent
+import lucuma.core.model.ProposalReference
+import lucuma.core.model.ProposalType
 import lucuma.core.util.DateInterval
-import lucuma.core.data.Metadata
-import cats.kernel.Order
+import lucuma.core.util.TimeSpan
+
 import java.time.LocalDate
 
 case class Proposal(

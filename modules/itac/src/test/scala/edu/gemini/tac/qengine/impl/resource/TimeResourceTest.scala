@@ -3,6 +3,7 @@
 
 package edu.gemini.tac.qengine.impl.resource
 
+import cats.data.NonEmptyList
 import cats.syntax.all.*
 import edu.gemini.tac.qengine.ItacSuite
 import edu.gemini.tac.qengine.api.config.TimeRestriction
@@ -11,10 +12,12 @@ import edu.gemini.tac.qengine.log.RejectRestrictedBin
 import edu.gemini.tac.qengine.p1.*
 import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.enums.Half
+import lucuma.core.enums.ScienceBand
 import lucuma.core.enums.Site
 import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.enums.WaterVapor
+import lucuma.core.model.Allocation
 import lucuma.core.model.CloudExtinction
 import lucuma.core.model.ConstraintSet
 import lucuma.core.model.ElevationRange
@@ -28,14 +31,14 @@ import lucuma.core.util.TimeSpan
 import org.junit.*
 
 import Assert.*
-import lucuma.core.model.Allocation
-import lucuma.core.enums.ScienceBand
 
 class TimeRestrictionResourceTest extends ItacSuite {
   import TimeAccountingCategory.US
   val TimeAccountingCategorys = Enumerated[TimeAccountingCategory].all
 
-  private val ntac   = Ntac(US, TimeSpan.fromHoursBounded(10))
+  private val site = Site.GN
+  private val alloc  = Allocation(US, ScienceBand.Band1, TimeSpan.fromHoursBounded(10))
+  private val allocs   = NonEmptyList.one(alloc)
   private val target = ItacTarget(0, 0) // not used
   private def conds(wv: WaterVapor) =
     ConstraintSet(ImageQuality.Preset.TwoPointZero, CloudExtinction.Preset.ThreePointZero, SkyBackground.Bright, wv, ElevationRange.ByAirMass.Default)
@@ -46,14 +49,14 @@ class TimeRestrictionResourceTest extends ItacSuite {
 
   // 10% of 10 hours = 1 hr = 60 min
   private val res60min = TimeRestrictionResource(bin, TimeSpan.fromHoursBounded(10))
-
   private def mkProp(wv: WaterVapor): ProposalShard =
-    val prop = Proposal(ProposalReference(Semester(YearInt.unsafeFrom(2026), Half.A), PosInt.unsafeFrom(1)), ntac, obsList = List(ItacObservation(target, conds(wv), TimeSpan.fromHoursBounded(10))))
-    ProposalShard(
-      prop,
-      Site.GN,
-      Allocation(US, ScienceBand.Band1, TimeSpan.Max)
-    )
+    val obs = ItacObservation(target, conds(wv), TimeSpan.fromHoursBounded(10))
+    Proposal(
+      ProposalReference(Semester(YearInt.unsafeFrom(2026), Half.A), 
+      PosInt.unsafeFrom(1)), 
+      allocs, 
+      obsList = List(obs)
+    ).shardFor(Site.GN, alloc.category, alloc.scienceBand)
 
   test("testReserveNoMatch") {
     val prop = mkProp(WaterVapor.Median)
