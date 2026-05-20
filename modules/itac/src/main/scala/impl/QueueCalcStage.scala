@@ -8,7 +8,6 @@ import edu.gemini.tac.qengine.impl.queue.ProposalQueueBuilder
 import edu.gemini.tac.qengine.log.ProposalLog
 import edu.gemini.tac.qengine.log.RejectCategoryOverAllocation
 import edu.gemini.tac.qengine.p1.ItacObservation
-import edu.gemini.tac.qengine.p1.ItacProposal
 import edu.gemini.tac.qengine.p1.Proposal
 import org.slf4j.LoggerFactory
 
@@ -76,15 +75,6 @@ object QueueCalcStage {
     val result = compute(queueFrameHead, log, activeList)
     new QueueCalcStage(result)
   }
-
-  def newInstance(
-    queue:      ProposalQueueBuilder,
-    iter:       BlockIterator,
-    activeList: ItacProposal => List[ItacObservation],
-    res:        SemesterResource,
-    log:        ProposalLog,
-  ): QueueCalcStage =
-    ???
 
 }
 

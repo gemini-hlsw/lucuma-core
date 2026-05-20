@@ -49,5 +49,3 @@ final case class ProposalQueueBuilder(
 
 }
 
-// object ProposalQueueBuilder:
-  // val Empty: ProposalQueueBuilder = ???

@@ -22,7 +22,7 @@ object RejectOverAllocation {
     if (remainingGuaranteedTime <= TimeSpan.Zero)
       noRemaining
     else
-      tooBig(prop.time, allRemainingTime)
+      tooBig(prop.allocatedTime, allRemainingTime)
 }
 
 case class RejectOverAllocation(prop: Proposal, remainingGuaranteedTime: TimeSpan, allRemainingTime: TimeSpan) extends RejectMessage {
