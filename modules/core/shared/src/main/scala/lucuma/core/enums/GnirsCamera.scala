@@ -17,7 +17,7 @@ enum GnirsCamera(
   val longName: String,
   val pixelScale: GnirsPixelScale
 ) derives Enumerated, Display:
-  case LongBlue extends GnirsCamera("LongBlue", "LB", "Long blue camera", GnirsPixelScale.PixelScale_0_05)
-  case LongRed extends GnirsCamera("LongRed", "LR", "Long red camera", GnirsPixelScale.PixelScale_0_05)
-  case ShortBlue extends GnirsCamera("ShortBlue", "SB", "Short blue camera", GnirsPixelScale.PixelScale_0_15)
-  case ShortRed extends GnirsCamera("ShortRed", "SR", "Short red camera", GnirsPixelScale.PixelScale_0_15)
+  case LongBlue extends GnirsCamera("LongBlue", "LB", "Long Blue", GnirsPixelScale.PixelScale_0_05)
+  case LongRed extends GnirsCamera("LongRed", "LR", "Long Red", GnirsPixelScale.PixelScale_0_05)
+  case ShortBlue extends GnirsCamera("ShortBlue", "SB", "Short Blue", GnirsPixelScale.PixelScale_0_15)
+  case ShortRed extends GnirsCamera("ShortRed", "SR", "Short Red", GnirsPixelScale.PixelScale_0_15)
