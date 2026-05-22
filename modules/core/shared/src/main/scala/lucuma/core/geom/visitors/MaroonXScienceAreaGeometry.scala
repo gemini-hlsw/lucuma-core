@@ -13,7 +13,12 @@ import lucuma.core.math.Offset
  *
  * https://www.gemini.edu/instrumentation/maroon-x/components
  *
- * Light is fed by a 100 um octagonal fiber at f/3.3, which projects to a 0.77" flat-to-flat fiberShape on sky.
+ * Light is fed by a 100 um octagonal fiber at f/3.3, which projects to a 0.77″
+ * flat-to-flat fiber on sky.
+ *
+ * MAROON-X also has a sky fiber at r=20 arcseconds, and observations are done
+ * with the CRCS fixed, so the sky rotates around the science fiber during
+ * observations.
  */
 trait MaroonXScienceAreaGeometry:
 
@@ -24,7 +29,7 @@ trait MaroonXScienceAreaGeometry:
   // circumscribed radius for an octagon is diameter / (2 * cos(pi/8)).
   val fiberShape: ShapeExpression =
     val octagonWidth = MaroonXScienceFov.toMicroarcseconds.toDouble
-    val radius     = Angle.fromMicroarcseconds(
+    val radius       = Angle.fromMicroarcseconds(
       (octagonWidth / (2.0 * Math.cos(Math.PI / 8.0))).round
     )
     ShapeExpression.regularPolygon(radius, 8)
@@ -33,17 +38,11 @@ trait MaroonXScienceAreaGeometry:
     // Does the fiber rotate with pos angle?
     fiberShape.shapeAt(offsetPos, posAngle)
 
-object maroonXScienceArea extends MaroonXScienceAreaGeometry
-
-trait MaroonXPatrolFieldGeometry:
-
-/**
- * MAROON-X has a sky fiber at r=20 arcseconds, and observations are done with the
- * CRCS fixed, so the sky rotates around the science fiber during observations.
- *
- * The probe should not vignette anything inside a fov diameter of 60 arcsec.
- */
-  val patrolField: ShapeExpression =
+  // Extra protected region: the 60"-diameter circle the sky fiber sweeps
+  val extendedVignettingArea: ShapeExpression =
     ShapeExpression.centeredEllipse(MaroonXSkyFiberPatrol, MaroonXSkyFiberPatrol)
 
-object maroonXPatrolField extends MaroonXPatrolFieldGeometry
+  def extendedVignettingAreaAt(posAngle: Angle, offsetPos: Offset): ShapeExpression =
+    extendedVignettingArea.shapeAt(offsetPos, posAngle)
+
+object maroonXScienceArea extends MaroonXScienceAreaGeometry
