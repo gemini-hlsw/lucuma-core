@@ -22,6 +22,8 @@ import lucuma.core.geom.ShapeExpression
 import lucuma.core.geom.jts.interpreter.given
 import lucuma.core.geom.offsets.OffsetPosition
 import lucuma.core.geom.syntax.all.*
+import lucuma.core.geom.visitors.MaroonXScienceFov
+import lucuma.core.geom.visitors.maroonXScienceArea
 import lucuma.core.geom.visitors.visitorScienceArea
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
@@ -48,6 +50,12 @@ trait SingleProbeAgsParams:
   def probeArm(posAngle: Angle, guideStar: Offset, offset: Offset): ShapeExpression
 
   def scienceRadius: Angle
+
+  /**
+   * Optional region that reperesent the area where we measure vignetting. In most cases it is just
+   * the science area
+   */
+  def extendedVignettingArea: Option[(Angle, Offset) => ShapeExpression] = None
 
   def posCalculations(
     positions: NonEmptyList[OffsetPosition]
@@ -83,6 +91,12 @@ trait SingleProbeAgsParams:
         private val scienceAreaShapeEval: Shape =
           scienceAreaShape.eval
 
+        // Default to the science area for the vignetting score; instruments
+        // may extend it with an additional region.
+        private val vignettingShapeEval: Shape =
+          extendedVignettingArea
+            .fold(scienceAreaShapeEval)(_.apply(position.posAngle, position.offsetPos).eval)
+
         override def isReachable(gsOffset: Offset): Boolean =
           // Fast bounding box rejection, then precise check
           intersectionBounds.contains(gsOffset) && intersectionShape.contains(gsOffset)
@@ -93,7 +107,7 @@ trait SingleProbeAgsParams:
 
         override def vignettingArea(gsOffset: Offset): Area =
           probeArm(position.posAngle, gsOffset, position.offsetPos).eval
-            .intersection(scienceAreaShapeEval)
+            .intersection(vignettingShapeEval)
             .area
 
       }
@@ -328,7 +342,6 @@ object AgsParams:
       copy(probe = probe)
 
     override def scienceArea(posAngle: Angle, offset: Offset): ShapeExpression =
-      // Approximate maroonX as a circle
       visitorScienceArea.shapeAt(posAngle, offset, scienceFov)
 
     override def scienceRadius: Angle =
@@ -337,3 +350,25 @@ object AgsParams:
   object Visitor:
     def apply(scienceRadius: Angle, port: PortDisposition = PortDisposition.Bottom): Visitor =
       Visitor(scienceRadius, port, GuideProbe.PWFS2)
+
+  case class MaroonX private (
+    port:  PortDisposition,
+    probe: PWFSGuideProbe
+  ) extends AgsParams
+      with PwfsOnlyParams
+      with PwfsSupport[MaroonX] derives Eq:
+
+    protected def withPWFSProbe(probe: PWFSGuideProbe): MaroonX =
+      copy(probe = probe)
+
+    override def scienceArea(posAngle: Angle, offset: Offset): ShapeExpression =
+      maroonXScienceArea.shapeAt(posAngle, offset)
+
+    override val extendedVignettingArea: Option[(Angle, Offset) => ShapeExpression] =
+      Some(maroonXScienceArea.extendedVignettingAreaAt)
+
+    override def scienceRadius: Angle = MaroonXScienceFov
+
+  object MaroonX:
+    def apply(port: PortDisposition = PortDisposition.Bottom): MaroonX =
+      MaroonX(port, GuideProbe.PWFS2)

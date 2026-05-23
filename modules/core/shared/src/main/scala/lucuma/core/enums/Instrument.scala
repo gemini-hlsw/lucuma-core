@@ -26,7 +26,7 @@ enum Instrument(val tag: String, val shortName: String, val longName: String, va
   /** @group Constructors */ case Gnirs        extends Instrument("Gnirs", "GNIRS", "GNIRS", "GNIRS".refined[NonEmpty], false)
   /** @group Constructors */ case Gpi          extends Instrument("Gpi", "GPI", "GPI", "GPI".refined[NonEmpty], false)
   /** @group Constructors */ case Gsaoi        extends Instrument("Gsaoi", "GSAOI", "GSAOI", "GSAOI".refined[NonEmpty], false)
-  /** @group Constructors */ case Igrins2      extends Instrument("Igrins2", "IGRINS2", "IGRINS2", "IGRINS2".refined[NonEmpty], false)
+  /** @group Constructors */ case Igrins2      extends Instrument("Igrins2", "IGRINS-2", "IGRINS-2", "IGRINS2".refined[NonEmpty], false)
   /** @group Constructors */ case MaroonX      extends Instrument("MaroonX", "MAROON-X", "MAROON-X", "MAROONX".refined[NonEmpty], false)
   /** @group Constructors */ case Niri         extends Instrument("Niri", "NIRI", "NIRI", "NIRI".refined[NonEmpty], false)
   /** @group Constructors */ case Scorpio      extends Instrument("Scorpio", "SCORPIO", "Scorpio", "SCORPIO".refined[NonEmpty], false)
