@@ -10,6 +10,8 @@ import lucuma.core.enums.Instrument
 import lucuma.core.model.sequence.flamingos2 as f2
 import lucuma.core.model.sequence.ghost.GhostDynamicConfig
 import lucuma.core.model.sequence.ghost.GhostStaticConfig
+import lucuma.core.model.sequence.gnirs.GnirsDynamicConfig
+import lucuma.core.model.sequence.gnirs.GnirsStaticConfig
 import lucuma.core.model.sequence.igrins2 as ig2
 import monocle.Focus
 import monocle.Lens
@@ -99,7 +101,7 @@ object InstrumentExecutionConfig:
     GenPrism[InstrumentExecutionConfig, GmosSouth]
 
   case class Gnirs(
-    executionConfig: ExecutionConfig[gnirs.GnirsStaticConfig, gnirs.GnirsDynamicConfig]
+    executionConfig: ExecutionConfig[GnirsStaticConfig, GnirsDynamicConfig]
   ) extends InstrumentExecutionConfig:
     override def instrument: Instrument = Instrument.Gnirs
     override def isComplete: Boolean    = executionConfig.isComplete
@@ -109,8 +111,11 @@ object InstrumentExecutionConfig:
       Eq.by(_.executionConfig)
 
     val executionConfig
-      : Lens[Gnirs, ExecutionConfig[gnirs.GnirsStaticConfig, gnirs.GnirsDynamicConfig]] =
+      : Lens[Gnirs, ExecutionConfig[GnirsStaticConfig, GnirsDynamicConfig]] =
       Focus[Gnirs](_.executionConfig)
+
+  val gnirs: Prism[InstrumentExecutionConfig, Gnirs] =
+    GenPrism[InstrumentExecutionConfig, Gnirs]
 
   case class Igrins2(
     executionConfig: ExecutionConfig[ig2.Igrins2StaticConfig, ig2.Igrins2DynamicConfig]
