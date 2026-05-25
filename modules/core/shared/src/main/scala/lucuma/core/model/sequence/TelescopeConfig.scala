@@ -12,7 +12,9 @@ import monocle.Lens
 case class TelescopeConfig(
   offset:  Offset,
   guiding: StepGuideState
-)
+):
+  def toTelescopeConfigAlongSlit: TelescopeConfigAlongSlit =
+    TelescopeConfigAlongSlit(offset.q, guiding)
 
 object TelescopeConfig:
 
