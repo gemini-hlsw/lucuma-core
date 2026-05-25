@@ -22,17 +22,15 @@ import lucuma.core.model.sequence.TelescopeConfigAlongSlit
 def alongSlitDefaultTelescopeConfigs(prism: GnirsPrism, camera: GnirsCamera, wavelength: GnirsGratingWavelength): NonEmptyList[TelescopeConfigAlongSlit] =
   val LongCameraCutoff: Wavelength = Wavelength.fromIntNanometers(2500).get
   val arcSecs: NonEmptyList[BigDecimal] =
-    if prism == GnirsPrism.Sxd || prism == GnirsPrism.Lxd then
+    if prism === GnirsPrism.Sxd || prism === GnirsPrism.Lxd then
       NonEmptyList.of(-1, 2, 2, -1)
-    else if camera == GnirsCamera.ShortBlue || camera == GnirsCamera.ShortRed then
+    else if camera === GnirsCamera.ShortBlue || camera === GnirsCamera.ShortRed then
       NonEmptyList.of(2, -4, -4, 2)
     else if wavelength.value >= LongCameraCutoff then
       NonEmptyList.of(-3, 3, 3, -3)
     else
       NonEmptyList.of(-1, 5, 5, -1)
   arcSecs.map(arcSec => TelescopeConfigAlongSlit(arcSec.qArcsec, StepGuideState.Enabled))
-
-  // y tambien el enum para acquisition!!! ojo que no exista ya
 
 val OnSkyDefaultTelescopeConfigs: NonEmptyList[TelescopeConfig] =
   NonEmptyList.of(
