@@ -143,7 +143,7 @@ sealed trait CatalogAdapter {
 
   def parseProperMotion(
     entries: Map[FieldId, String]
-  ): EitherNec[CatalogProblem, Option[ProperMotion]] = {
+  ): EitherNec[CatalogProblem, Option[ProperMotion]]    = {
     val pmRa  = entries.get(pmRaField)
     val pmDec = entries.get(pmDecField)
     parseProperMotion(pmRa, pmDec)
