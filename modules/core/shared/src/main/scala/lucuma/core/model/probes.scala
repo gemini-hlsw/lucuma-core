@@ -12,9 +12,9 @@ import lucuma.core.enums.VisitorObservingModeType
 trait probes:
   def guideProbe(observingMode: ObservingModeType, trackType: TrackType): Option[GuideProbe] =
     (observingMode, trackType) match
-      case (ObservingModeType.Flamingos2LongSlit, TrackType.Nonsidereal) =>
+      case (ObservingModeType.Flamingos2LongSlit | ObservingModeType.Flamingos2Imaging, TrackType.Nonsidereal) =>
         GuideProbe.PWFS2.some
-      case (ObservingModeType.Flamingos2LongSlit, TrackType.Sidereal) =>
+      case (ObservingModeType.Flamingos2LongSlit | ObservingModeType.Flamingos2Imaging, TrackType.Sidereal) =>
         GuideProbe.Flamingos2OIWFS.some
       // gmos modes could be condensed but I'll split them into longslit and imaging anyway
       case (ObservingModeType.GmosNorthLongSlit | ObservingModeType.GmosSouthLongSlit, TrackType.Nonsidereal) =>
