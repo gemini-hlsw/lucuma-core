@@ -40,7 +40,7 @@ val OnSkyDefaultTelescopeConfigs: NonEmptyList[TelescopeConfig] =
     TelescopeConfig(Offset.Zero, StepGuideState.Enabled)
   )
 
-def defaultSlitTelescopeConfigs(mode: SlitOffsetMode,prism: GnirsPrism, camera: GnirsCamera, wavelength: GnirsGratingWavelength): SlitTelescopeConfigs =
+def defaultSlitTelescopeConfigs(mode: SlitOffsetMode, prism: GnirsPrism, camera: GnirsCamera, wavelength: GnirsGratingWavelength): SlitTelescopeConfigs =
   mode match
     case SlitOffsetMode.NodAlongSlit => SlitTelescopeConfigs.AlongSlit(alongSlitDefaultTelescopeConfigs(prism, camera, wavelength))
     case SlitOffsetMode.NodToSky     => SlitTelescopeConfigs.ToSky(OnSkyDefaultTelescopeConfigs)
