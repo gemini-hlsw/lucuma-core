@@ -8,9 +8,7 @@ import coulomb.testkit.given
 import eu.timepit.refined.scalacheck.numeric.given
 import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.enums.*
-import lucuma.core.math.Wavelength
 import lucuma.core.math.arb.ArbRefined.given
-import lucuma.core.math.arb.ArbWavelength.given
 import lucuma.core.model.sequence.gnirs.GnirsAcquisitionMirrorMode
 import lucuma.core.model.sequence.gnirs.GnirsDynamicConfig
 import lucuma.core.model.sequence.gnirs.GnirsFocus
@@ -45,7 +43,6 @@ trait ArbGnirsDynamicConfig:
     for
       exposure          <- arbitrary[TimeSpan]
       coadds            <- arbitrary[PosInt]
-      centralWavelength <- arbitrary[Wavelength]
       filter            <- arbitrary[GnirsFilter]
       decker            <- arbitrary[GnirsDecker]
       fpu               <- arbitrary[Either[GnirsFpuSlit, GnirsFpuOther]]
@@ -56,7 +53,6 @@ trait ArbGnirsDynamicConfig:
     yield GnirsDynamicConfig(
       exposure,
       coadds,
-      centralWavelength,
       filter,
       decker,
       fpu,
@@ -71,7 +67,6 @@ trait ArbGnirsDynamicConfig:
       (
         TimeSpan,
         PosInt,
-        Wavelength,
         GnirsFilter,
         GnirsDecker,
         Either[GnirsFpuSlit, GnirsFpuOther],
@@ -84,7 +79,6 @@ trait ArbGnirsDynamicConfig:
       (
         x.exposure,
         x.coadds,
-        x.centralWavelength,
         x.filter,
         x.decker,
         x.fpu,
