@@ -8,7 +8,6 @@ import coulomb.syntax.*
 import coulomb.units.mksa.Volt
 import lucuma.core.math.units.Microvolt
 import lucuma.core.math.units.Millivolt
-import monocle.Prism
 
 import scala.util.Try
 

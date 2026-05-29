@@ -26,3 +26,4 @@ enum LightSinkName(val tag: String, val name: String) derives Enumerated:
   /** @group Constructors */ case Gpi extends LightSinkName("Gpi", "gpi")
   /** @group Constructors */ case Ghost extends LightSinkName("Ghost", "ghost")
   /** @group Constructors */ case Igrins2 extends LightSinkName("Igrins2", "igrins2")
+  /** @group Constructors */ case Scorpio extends LightSinkName("Scorpio", "scorpio")
