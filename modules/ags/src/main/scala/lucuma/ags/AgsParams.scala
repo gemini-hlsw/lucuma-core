@@ -60,14 +60,31 @@ trait SingleProbeAgsParams:
   def posCalculations(
     positions: NonEmptyList[OffsetPosition]
   ): NonEmptyMap[OffsetPosition, AgsGeomCalc] =
+    val distinctOffsets: NonEmptyList[(Offset, Offset)] =
+      positions.map(pos => (pos.offsetPos, pos.pivot)).distinct
+
+    // We can cache the intersection shapes for each tested pos angle.
+    val intersectionByPA: Map[Angle, (ShapeExpression, Shape, BoundingOffsets)] =
+      positions.toList
+        .map(_.posAngle)
+        .distinct
+        .map: posAngle =>
+          val se: ShapeExpression =
+            distinctOffsets
+              .map((offset, pivot) => patrolFieldAt(posAngle, offset, pivot))
+              .reduce(using _ ∩ _)
+
+          // eval is expensive. call it only once.
+          val shape = se.eval
+          posAngle -> (se, shape, shape.boundingOffsets)
+        .toMap
+
     val result = positions.map: position =>
+      val (pfExpr, pfShape, pfBounds) = intersectionByPA(position.posAngle)
+
       position -> new AgsGeomCalc() {
-        override val intersectionPatrolField: ShapeExpression =
-          positions
-            .map(pos => (pos.offsetPos, pos.pivot))
-            .distinct
-            .map((offset, pivot) => patrolFieldAt(position.posAngle, offset, pivot))
-            .reduce(using _ ∩ _)
+
+        override val intersectionPatrolField: ShapeExpression = pfExpr
 
         private val scienceAreaShape =
           scienceArea(position.posAngle, position.offsetPos)
@@ -77,13 +94,10 @@ trait SingleProbeAgsParams:
                                           scienceRadius
           ) ↗ position.offsetPos ⟲ position.posAngle
 
-        // Cache shapes to avoid re-computation
-        private val intersectionShape: Shape =
-          intersectionPatrolField.eval
+        private val intersectionShape: Shape = pfShape
 
         // Cache bounding box for fast rejection
-        private val intersectionBounds: BoundingOffsets =
-          intersectionShape.boundingOffsets
+        private val intersectionBounds: BoundingOffsets = pfBounds
 
         private val scienceTargetShape: Shape =
           scienceTargetArea.eval
