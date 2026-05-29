@@ -21,7 +21,6 @@ import monocle.Lens
 final case class GnirsDynamicConfig(
   exposure:          TimeSpan,
   coadds:            PosInt,
-  centralWavelength: Wavelength,
   filter:            GnirsFilter,
   decker:            GnirsDecker,
   fpu:               Either[GnirsFpuSlit, GnirsFpuOther],
@@ -29,7 +28,11 @@ final case class GnirsDynamicConfig(
   camera:            GnirsCamera,
   focus:             GnirsFocus,
   readMode:          GnirsReadMode
-) derives Eq
+) derives Eq:
+  val centralWavelength: Wavelength =
+    acquisitionMirror match
+      case GnirsAcquisitionMirrorMode.In => filter.centralWavelength
+      case GnirsAcquisitionMirrorMode.Out(_, _, gratingWavelength) => gratingWavelength.value
 
 object GnirsDynamicConfig:
   val exposure: Lens[GnirsDynamicConfig, TimeSpan] =
@@ -37,9 +40,6 @@ object GnirsDynamicConfig:
 
   val coadds: Lens[GnirsDynamicConfig, PosInt] =
     Focus[GnirsDynamicConfig](_.coadds)
-
-  val centralWavelength: Lens[GnirsDynamicConfig, Wavelength] =
-    Focus[GnirsDynamicConfig](_.centralWavelength)
 
   val filter: Lens[GnirsDynamicConfig, GnirsFilter] =
     Focus[GnirsDynamicConfig](_.filter)
