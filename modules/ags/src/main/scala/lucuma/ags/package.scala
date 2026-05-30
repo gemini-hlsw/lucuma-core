@@ -248,6 +248,7 @@ object AgsAnalysisResult:
     positionCount:  Int,
     analyses:       List[AgsAnalysis],
     contextNanos:   Long,
+    calcsNanos:     Long,
     analysisNanos:  Long
   ): AgsAnalysisResult =
     val usableCandidates = analyses.collect { case u: AgsAnalysis.Usable => u.target.id }.toSet.size
@@ -264,6 +265,7 @@ object AgsAnalysisResult:
         analyses.size,
         analyses.groupMapReduce(Ags.resultLabel)(_ => 1)(_ + _),
         contextNanos,
+        calcsNanos,
         analysisNanos
       )
     )
@@ -291,6 +293,8 @@ object AgsAnalysisResult:
  *   histogram of outcomes keyed by [[Ags.resultLabel]]
  * @param contextNanos
  *   monotonic ns spent building the per-position geometry context
+ * @param calcsNanos
+ *   monotonic ns spent in posCalculations
  * @param analysisNanos
  *   monotonic ns spent in the runAnalysis loop (JTS work)
  */
@@ -305,6 +309,7 @@ case class AgsStats(
   analysisCount:        Int,
   resultCounts:         Map[String, Int],
   contextNanos:         Long,
+  calcsNanos:           Long,
   analysisNanos:        Long
 ):
   def format: String =
@@ -325,9 +330,10 @@ case class AgsStats(
         |  candidates:   $candidateCount supplied, $acceptedCount accepted, $usableCandidateCount usable
         |  geometry:     $posAngleCount pos angles, $acqOffsetCount acq + $sciOffsetCount sci offsets, $positionCount positions
         |  analyses:     $analysisCount runAnalysis calls
-        |  timing:       context ${ms(contextNanos)}, analysis ${ms(analysisNanos)}, total ${ms(
-         totalNanos
-       )}
+        |  ctx timing:   ${ms(contextNanos)}
+        |  calcs timing: ${ms(calcsNanos)}
+        |  analysis time:${ms(analysisNanos)}
+        |  total time:   ${ms(totalNanos)}
         |  outcomes:
         |$histogram""".stripMargin
 
