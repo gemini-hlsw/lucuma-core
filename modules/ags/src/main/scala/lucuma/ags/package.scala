@@ -4,6 +4,7 @@
 package lucuma.ags
 
 import cats.Order.given
+import cats.Show
 import cats.data.NonEmptyList
 import cats.data.NonEmptySet
 import cats.syntax.all.*
@@ -305,4 +306,30 @@ case class AgsStats(
   resultCounts:         Map[String, Int],
   contextNanos:         Long,
   analysisNanos:        Long
-)
+):
+  def format: String =
+    def ms(nanos: Long): String = f"${nanos / 1.0e6}%.2f ms"
+
+    val totalNanos = contextNanos + analysisNanos
+    val histogram  =
+      if (resultCounts.isEmpty) "    (none)"
+      else
+        resultCounts.toList
+          .sortBy: (label, cnt) =>
+            (-cnt, label)
+          .map: (label, cnt) =>
+            f"    $label%-18s $cnt"
+          .mkString("\n")
+
+    s"""|AGS stats:
+        |  candidates:   $candidateCount supplied, $acceptedCount accepted, $usableCandidateCount usable
+        |  geometry:     $posAngleCount pos angles, $acqOffsetCount acq + $sciOffsetCount sci offsets, $positionCount positions
+        |  analyses:     $analysisCount runAnalysis calls
+        |  timing:       context ${ms(contextNanos)}, analysis ${ms(analysisNanos)}, total ${ms(
+         totalNanos
+       )}
+        |  outcomes:
+        |$histogram""".stripMargin
+
+object AgsStats:
+  given Show[AgsStats] = Show.show(_.format)
