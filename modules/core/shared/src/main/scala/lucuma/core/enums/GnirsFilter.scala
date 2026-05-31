@@ -5,6 +5,7 @@ package lucuma
 package core
 package enums
 
+import cats.data.NonEmptyList
 import cats.syntax.all.*
 import lucuma.core.math.BoundedInterval
 import lucuma.core.math.Wavelength
@@ -56,3 +57,9 @@ object GnirsFilter:
       .collectFirst:
         case (filter, range) if range.contains(wavelength) => filter
       .toRight(s"No Gnirs spectroscopy filter available for wavelength: $wavelength")
+
+  /** Acquisition filter options. */
+  // ATTENTION: This logic is duplicated in the DB view in the ODB. Modify it there too if it's changed here.
+  val acquisition: NonEmptyList[GnirsFilter] =
+    NonEmptyList.of(J, Order4, H2, K, PAH)
+
