@@ -35,7 +35,8 @@ object Ags {
   private case class AgsContextBuffer(
     guideSpeeds:          List[(GuideSpeed, BrightnessConstraints)],
     calcs:                NonEmptyMap[OffsetPosition, AgsGeomCalc],
-    brightnessConstraint: Option[BrightnessConstraints]
+    brightnessConstraint: Option[BrightnessConstraints],
+    calcsNanos:           Long // time spent in posCalculations
   )
 
   private def guideSpeedFor(
@@ -166,9 +167,11 @@ object Ags {
     params:      AgsParams
   ): AgsContextBuffer = {
     val guideSpeeds = guideSpeedLimits(constraints, params.probe, wavelength)
+    val calcsStart  = System.nanoTime()
     val calcs       = params.posCalculations(positions)
+    val calcsNanos  = System.nanoTime() - calcsStart
     val bc          = constraintsFor(guideSpeeds)
-    AgsContextBuffer(guideSpeeds, calcs, bc)
+    AgsContextBuffer(guideSpeeds, calcs, bc, calcsNanos)
   }
 
   /**
@@ -299,6 +302,7 @@ object Ags {
       positions.size,
       analyses,
       ctxEnd - ctxStart,
+      ctx.calcsNanos,
       anEnd - anStart
     )
   }

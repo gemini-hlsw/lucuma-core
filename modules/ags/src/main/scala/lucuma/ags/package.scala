@@ -4,6 +4,7 @@
 package lucuma.ags
 
 import cats.Order.given
+import cats.Show
 import cats.data.NonEmptyList
 import cats.data.NonEmptySet
 import cats.syntax.all.*
@@ -247,6 +248,7 @@ object AgsAnalysisResult:
     positionCount:  Int,
     analyses:       List[AgsAnalysis],
     contextNanos:   Long,
+    calcsNanos:     Long,
     analysisNanos:  Long
   ): AgsAnalysisResult =
     val usableCandidates = analyses.collect { case u: AgsAnalysis.Usable => u.target.id }.toSet.size
@@ -263,6 +265,7 @@ object AgsAnalysisResult:
         analyses.size,
         analyses.groupMapReduce(Ags.resultLabel)(_ => 1)(_ + _),
         contextNanos,
+        calcsNanos,
         analysisNanos
       )
     )
@@ -290,6 +293,8 @@ object AgsAnalysisResult:
  *   histogram of outcomes keyed by [[Ags.resultLabel]]
  * @param contextNanos
  *   monotonic ns spent building the per-position geometry context
+ * @param calcsNanos
+ *   monotonic ns spent in posCalculations
  * @param analysisNanos
  *   monotonic ns spent in the runAnalysis loop (JTS work)
  */
@@ -304,5 +309,33 @@ case class AgsStats(
   analysisCount:        Int,
   resultCounts:         Map[String, Int],
   contextNanos:         Long,
+  calcsNanos:           Long,
   analysisNanos:        Long
-)
+):
+  def format: String =
+    def ms(nanos: Long): String = f"${nanos / 1.0e6}%.2f ms"
+
+    val totalNanos = contextNanos + analysisNanos
+    val histogram  =
+      if (resultCounts.isEmpty) "    (none)"
+      else
+        resultCounts.toList
+          .sortBy: (label, cnt) =>
+            (-cnt, label)
+          .map: (label, cnt) =>
+            f"    $label%-18s $cnt"
+          .mkString("\n")
+
+    s"""|AGS stats:
+        |  candidates:   $candidateCount supplied, $acceptedCount accepted, $usableCandidateCount usable
+        |  geometry:     $posAngleCount pos angles, $acqOffsetCount acq + $sciOffsetCount sci offsets, $positionCount positions
+        |  analyses:     $analysisCount runAnalysis calls
+        |  ctx timing:   ${ms(contextNanos)}
+        |  calcs timing: ${ms(calcsNanos)}
+        |  analysis time:${ms(analysisNanos)}
+        |  total time:   ${ms(totalNanos)}
+        |  outcomes:
+        |$histogram""".stripMargin
+
+object AgsStats:
+  given Show[AgsStats] = Show.show(_.format)
