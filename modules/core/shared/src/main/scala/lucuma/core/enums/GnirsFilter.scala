@@ -5,6 +5,7 @@ package lucuma
 package core
 package enums
 
+import cats.data.NonEmptyList
 import cats.syntax.all.*
 import lucuma.core.math.BoundedInterval
 import lucuma.core.math.Wavelength
@@ -60,5 +61,5 @@ object GnirsFilter:
   /** Acquisition filter options. */
   // ATTENTION: This logic is duplicated in the DB view in the ODB. Modify it there too if it's changed here.
   val acquisition: NonEmptyList[GnirsFilter] =
-    NonEmptyList.of(J, H, H2, K, PAH)
+    NonEmptyList.of(J, Order4, H2, K, PAH)
 
