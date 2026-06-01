@@ -9,6 +9,7 @@ import coulomb.define.*
 import coulomb.syntax.*
 import coulomb.units.accepted.*
 import coulomb.units.mks.*
+import coulomb.units.mksa.Volt
 import coulomb.units.si.prefixes.*
 import coulomb.units.time.*
 import eu.timepit.refined.*
@@ -35,6 +36,9 @@ trait units {
   type Micrometer = Micro * Meter
   type Angstrom
   given DerivedUnit[Angstrom, Hecto * Picometer, "angstrom", "Å"] = DerivedUnit()
+  
+  type Microvolt = Micro * Volt
+  type Millivolt = Milli * Volt
 
   type NanometersPerPixel = Nanometer / Pixels
   type PicometersPerPixel = Picometer / Pixels
