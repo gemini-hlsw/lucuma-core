@@ -290,6 +290,54 @@ object AgsParams:
 
     val Flamingos2ScienceRadius = 20.arcseconds
 
+  case class Flamingos2Imaging private (
+    lyot:  Flamingos2LyotWheel,
+    port:  PortDisposition,
+    probe: GuideProbe
+  ) extends AgsParams
+      with SingleProbeAgsParams
+      with PwfsSupport[Flamingos2Imaging] derives Eq:
+    import lucuma.core.geom.flamingos2
+    import lucuma.core.geom.flamingos2.oiwfs
+    import lucuma.core.geom.pwfs
+
+    protected def withPWFSProbe(probe: PWFSGuideProbe): Flamingos2Imaging = copy(probe = probe)
+
+    override def patrolFieldAt(
+      posAngle: Angle,
+      offset:   Offset,
+      pivot:    Offset = Offset.Zero
+    ): ShapeExpression =
+      probe match
+        case GuideProbe.Flamingos2OIWFS =>
+          oiwfs.patrolField.patrolFieldAt(posAngle, offset, lyot, port, pivot)
+        case _: PWFSGuideProbe          =>
+          pwfs.patrolField.patrolFieldAt(posAngle, offset, pivot)
+        case _                          =>
+          ShapeExpression.Empty
+
+    override def scienceArea(posAngle: Angle, offset: Offset): ShapeExpression =
+      flamingos2.scienceArea.shapeAt(posAngle, offset, lyot, Flamingos2FpuMask.Imaging)
+
+    override def probeArm(posAngle: Angle, guideStar: Offset, offset: Offset): ShapeExpression =
+      probe match
+        case GuideProbe.Flamingos2OIWFS =>
+          oiwfs.probeArm.shapeAt(posAngle, guideStar, offset, lyot, port)
+        case _: PWFSGuideProbe          =>
+          pwfs.probeArm.vignettedAreaAt(probe, guideStar, offset)
+        case _                          =>
+          ShapeExpression.Empty
+
+    override def scienceRadius: Angle = Flamingos2Imaging.Flamingos2ScienceRadius
+
+  object Flamingos2Imaging:
+    def apply(
+      lyot: Flamingos2LyotWheel,
+      port: PortDisposition
+    ): Flamingos2Imaging = Flamingos2Imaging(lyot, port, GuideProbe.Flamingos2OIWFS)
+
+    val Flamingos2ScienceRadius = 20.arcseconds
+
   trait PwfsOnlyParams extends SingleProbeAgsParams:
     def probe: PWFSGuideProbe
 
