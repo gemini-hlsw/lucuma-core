@@ -49,7 +49,7 @@ class GoaClientSuite extends CatsEffectSuite:
 
   test("GoaClientMock returns error for unsupported instrument"):
     val client = GoaClientMock.empty[IO]
-    val params = GoaParams.Sidereal(testCoords, Instrument.Visitor, searchRadius)
+    val params = GoaParams.Sidereal(testCoords, Instrument.VisitorNorth, searchRadius)
 
     client.query(params).map: result =>
       assert(result.isLeft)
@@ -85,6 +85,6 @@ class GoaClientSuite extends CatsEffectSuite:
     assertEquals(GoaInstrument.toGoaName(Instrument.Igrins2), Some("IGRINS2"))
 
   test("GoaInstrument returns None for unsupported instruments"):
-    assertEquals(GoaInstrument.toGoaName(Instrument.Visitor), None)
-    assertEquals(GoaInstrument.toGoaName(Instrument.AcqCam), None)
+    assertEquals(GoaInstrument.toGoaName(Instrument.VisitorNorth), None)
+    assertEquals(GoaInstrument.toGoaName(Instrument.AcqCamNorth), None)
     assertEquals(GoaInstrument.toGoaName(Instrument.Scorpio), None)

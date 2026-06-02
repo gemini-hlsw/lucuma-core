@@ -17,8 +17,6 @@ import org.http4s.Uri
 import org.http4s.client.Client
 import org.typelevel.ci.CIStringSyntax
 
-import java.net.URLEncoder
-import java.nio.charset.StandardCharsets
 import java.time.format.DateTimeFormatter
 
 class GoaClientImpl[F[_]: Concurrent](
@@ -53,9 +51,8 @@ class GoaClientImpl[F[_]: Concurrent](
         val srArcsec = searchRadius.toMicroarcseconds.toDouble / 1_000_000.0
         base / s"ra=$raDeg" / s"dec=$decDeg" / s"sr=$srArcsec"
       case GoaParams.NonSidereal(targetName, _, searchRadius, _) =>
-        val encodedName = URLEncoder.encode(targetName, StandardCharsets.UTF_8)
-        val srArcsec    = searchRadius.toMicroarcseconds.toDouble / 1_000_000.0
-        base / s"object=$encodedName" / s"sr=$srArcsec"
+        val srArcsec = searchRadius.toMicroarcseconds.toDouble / 1_000_000.0
+        base / s"object=$targetName" / s"sr=$srArcsec"
 
     params.dateRange.fold(withCoords): (start, end) =>
       val startStr = start.format(dateFormatter)
