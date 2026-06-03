@@ -6,7 +6,6 @@ package lucuma.core.enums
 import lucuma.core.util.Enumerated
 
 enum GhostIfuMappingType(val tag: String, val name: String) derives Enumerated:
-  case Nonsidereal   extends GhostIfuMappingType("nonsidereal",     "Nonsidereal")
   case SingleTarget  extends GhostIfuMappingType("single_target",   "Single Target")
   case TargetPlusSky extends GhostIfuMappingType("target_plus_sky", "Target+Sky")
   case SkyPlusTarget extends GhostIfuMappingType("sky_plus_target", "Sky+Target")

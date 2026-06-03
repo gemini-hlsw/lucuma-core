@@ -7,8 +7,8 @@ package arb
 
 import lucuma.core.math.Coordinates
 import lucuma.core.math.arb.ArbCoordinates
-import lucuma.core.model.SiderealTracking
-import lucuma.core.model.arb.ArbSiderealTracking
+import lucuma.core.model.Target
+import lucuma.core.util.arb.ArbGid
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Cogen
@@ -17,58 +17,53 @@ import org.scalacheck.Gen
 trait ArbGhostIfuMapping:
 
   import ArbCoordinates.given
-  import ArbSiderealTracking.given
+  import ArbGid.given
 
   import GhostIfuMapping.*
 
-  given Arbitrary[Nonsidereal.type] =
-    Arbitrary:
-      Gen.const(Nonsidereal)
-
   given Arbitrary[SingleTarget] =
     Arbitrary:
-      arbitrary[SiderealTracking].map(SingleTarget(_))
+      arbitrary[Target.Id].map(SingleTarget(_))
 
   given Cogen[SingleTarget] =
-    Cogen[SiderealTracking].contramap(_.ifu1)
+    Cogen[Target.Id].contramap(_.ifu1)
 
   given Arbitrary[TargetPlusSky] =
     Arbitrary:
       for
-        t <- arbitrary[SiderealTracking]
+        t <- arbitrary[Target.Id]
         c <- arbitrary[Coordinates]
       yield TargetPlusSky(t, c)
 
   given Cogen[TargetPlusSky] =
-    Cogen[(SiderealTracking, Coordinates)].contramap: a =>
+    Cogen[(Target.Id, Coordinates)].contramap: a =>
       (a.ifu1, a.ifu2)
 
   given Arbitrary[SkyPlusTarget] =
     Arbitrary:
       for
         c <- arbitrary[Coordinates]
-        t <- arbitrary[SiderealTracking]
+        t <- arbitrary[Target.Id]
       yield SkyPlusTarget(c, t)
 
   given Cogen[SkyPlusTarget] =
-    Cogen[(Coordinates, SiderealTracking)].contramap: a =>
+    Cogen[(Coordinates, Target.Id)].contramap: a =>
       (a.ifu1, a.ifu2)
 
   given Arbitrary[DualTarget] =
     Arbitrary:
       for
-        t0 <- arbitrary[SiderealTracking]
-        t1 <- arbitrary[SiderealTracking]
+        t0 <- arbitrary[Target.Id]
+        t1 <- arbitrary[Target.Id]
       yield DualTarget(t0, t1)
 
   given Cogen[DualTarget] =
-    Cogen[(SiderealTracking, SiderealTracking)].contramap: a =>
+    Cogen[(Target.Id, Target.Id)].contramap: a =>
       (a.ifu1, a.ifu2)
 
   given Arbitrary[GhostIfuMapping] =
     Arbitrary:
       Gen.oneOf(
-        arbitrary[Nonsidereal.type],
         arbitrary[SingleTarget],
         arbitrary[TargetPlusSky],
         arbitrary[SkyPlusTarget],
@@ -78,15 +73,14 @@ trait ArbGhostIfuMapping:
   given Cogen[GhostIfuMapping] =
     Cogen[(
       Int,
-      Option[SiderealTracking],
-      Option[(SiderealTracking, Coordinates)],
-      Option[(Coordinates, SiderealTracking)],
-      Option[(SiderealTracking, SiderealTracking)]
+      Option[Target.Id],
+      Option[(Target.Id, Coordinates)],
+      Option[(Coordinates, Target.Id)],
+      Option[(Target.Id, Target.Id)]
     )].contramap:
-      case Nonsidereal         => (0, None, None, None, None)
-      case SingleTarget(t)     => (1, Some(t), None, None, None)
-      case TargetPlusSky(t, c) => (2, None, Some((t, c)), None, None)
-      case SkyPlusTarget(c, t) => (3, None, None, Some((c, t)), None)
-      case DualTarget(t0, t1)  => (4, None, None, None, Some((t0, t1)))
+      case SingleTarget(t)     => (0, Some(t), None, None, None)
+      case TargetPlusSky(t, c) => (1, None, Some((t, c)), None, None)
+      case SkyPlusTarget(c, t) => (2, None, None, Some((c, t)), None)
+      case DualTarget(t0, t1)  => (3, None, None, None, Some((t0, t1)))
 
 object ArbGhostIfuMapping extends ArbGhostIfuMapping
