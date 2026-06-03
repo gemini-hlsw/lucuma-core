@@ -51,7 +51,6 @@ object GnirsFilter:
   private val SpectroscopyFilterTable: List[(GnirsFilter, BoundedInterval[Wavelength])] = 
     values.map(f => f.spectroscopyRange.map(w => (f, w))).toList.flattenOption
 
-  // ATTENTION: This logic is duplicated in the DB view in the ODB. Modify it there too if it's changed here.
   def fromSpectroscopyWavelength(wavelength: Wavelength): Either[String, GnirsFilter] = 
     SpectroscopyFilterTable
       .collectFirst:
