@@ -28,8 +28,8 @@ trait ArbGnirsAcquisitionMode:
   given Cogen[GnirsAcquisitionMode] =
     Cogen[Either[Unit, Either[Unit, GnirsAcquisitionMode.Faint]]]
       .contramap:
-        case GnirsAcquisitionMode.VeryBright => Left(())
-        case GnirsAcquisitionMode.Bright     => Right(Left(()))
-        case m @ GnirsAcquisitionMode.Faint(_)      => Right(Right(m))
+        case GnirsAcquisitionMode.VeryBright   => Left(())
+        case GnirsAcquisitionMode.Bright       => Right(Left(()))
+        case m @ GnirsAcquisitionMode.Faint(_) => Right(Right(m))
 
 object ArbGnirsAcquisitionMode extends ArbGnirsAcquisitionMode
