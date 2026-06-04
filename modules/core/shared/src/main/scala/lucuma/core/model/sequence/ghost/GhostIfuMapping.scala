@@ -8,7 +8,7 @@ import cats.derived.*
 import cats.syntax.eq.*
 import lucuma.core.enums.GhostIfuMappingType
 import lucuma.core.math.Coordinates
-import lucuma.core.model.SiderealTracking
+import lucuma.core.model.Target
 import monocle.Prism
 import monocle.macros.GenPrism
 
@@ -17,14 +17,11 @@ sealed trait GhostIfuMapping:
 
 object GhostIfuMapping:
 
-  case object Nonsidereal extends GhostIfuMapping derives Eq:
-    override def mappingType: GhostIfuMappingType = GhostIfuMappingType.Nonsidereal
-
   /**
    * Only IFU1 is used for single target mode.
    */
   case class SingleTarget(
-    ifu1: SiderealTracking
+    ifu1: Target.Id
   ) extends GhostIfuMapping derives Eq:
     override def mappingType: GhostIfuMappingType = GhostIfuMappingType.SingleTarget
 
@@ -32,7 +29,7 @@ object GhostIfuMapping:
    * IFU1 is a sidereal target, IFU2 is a sky position.
    */
   case class TargetPlusSky(
-    ifu1: SiderealTracking,
+    ifu1: Target.Id,
     ifu2: Coordinates
   ) extends GhostIfuMapping derives Eq:
     override def mappingType: GhostIfuMappingType = GhostIfuMappingType.TargetPlusSky
@@ -42,7 +39,7 @@ object GhostIfuMapping:
    */
   case class SkyPlusTarget(
     ifu1: Coordinates,
-    ifu2: SiderealTracking
+    ifu2: Target.Id
   ) extends GhostIfuMapping derives Eq:
     override def mappingType: GhostIfuMappingType = GhostIfuMappingType.SkyPlusTarget
 
@@ -50,22 +47,18 @@ object GhostIfuMapping:
    * IFU1 and IFU2 are sidereal targets.
    */
   case class DualTarget(
-    ifu1: SiderealTracking,
-    ifu2: SiderealTracking
+    ifu1: Target.Id,
+    ifu2: Target.Id
   ) extends GhostIfuMapping derives Eq:
     override def mappingType: GhostIfuMappingType = GhostIfuMappingType.DualTarget
 
   given Eq[GhostIfuMapping] =
     Eq.instance:
-      case (Nonsidereal,      Nonsidereal)      => true
       case (a: SingleTarget,  b: SingleTarget)  => a === b
       case (a: SkyPlusTarget, b: SkyPlusTarget) => a === b
       case (a: TargetPlusSky, b: TargetPlusSky) => a === b
       case (a: DualTarget,    b: DualTarget)    => a === b
       case _                                    => false
-
-  val nonsidereal: Prism[GhostIfuMapping, Nonsidereal.type] =
-    GenPrism[GhostIfuMapping, Nonsidereal.type]
 
   val singleTarget: Prism[GhostIfuMapping, SingleTarget] =
     GenPrism[GhostIfuMapping, SingleTarget]
