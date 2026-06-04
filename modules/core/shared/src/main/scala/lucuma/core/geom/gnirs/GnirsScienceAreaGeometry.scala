@@ -56,4 +56,13 @@ trait GnirsScienceAreaGeometry:
       .fold(slit => Some(longSlitFov(slit, camera, prism)), pinholeFov)
       .map(_.shapeAt(offsetPos, posAngle))
 
+  def longSlitShapeAt(
+    posAngle:  Angle,
+    offsetPos: Offset,
+    slit:      GnirsFpuSlit,
+    camera:    GnirsCamera,
+    prism:     GnirsPrism
+  ): ShapeExpression =
+    longSlitFov(slit, camera, prism).shapeAt(offsetPos, posAngle)
+
 object scienceArea extends GnirsScienceAreaGeometry

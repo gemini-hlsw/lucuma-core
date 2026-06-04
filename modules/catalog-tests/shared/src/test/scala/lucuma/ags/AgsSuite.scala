@@ -313,6 +313,82 @@ class AgsSuite extends munit.FunSuite {
     )
   }
 
+  test("discard science target - Gnirs") {
+    val constraints = ConstraintSet(
+      ImageQuality.Preset.PointTwo,
+      CloudExtinction.Preset.PointFive,
+      SkyBackground.Dark,
+      WaterVapor.Wet,
+      ElevationRange.ByAirMass.Default
+    )
+
+    val wavelength = Wavelength.fromIntNanometers(300).get
+
+    val pwfsGS = GuideStarCandidate.unsafeApply(
+      0L,
+      SiderealTracking.const(Coordinates.Zero),
+      (Band.Gaia, BrightnessValue.unsafeFrom(12.0)).some
+    )
+
+    val gnirsParams =
+      AgsParams.GnirsLongSlit(
+        GnirsFpuSlit.LongSlit_0_30,
+        GnirsCamera.ShortBlue,
+        GnirsPrism.Mirror
+      )
+
+    assert(
+      Ags
+        .agsAnalysis(
+          constraints,
+          wavelength,
+          Coordinates.Zero,
+          List(Coordinates.Zero),
+          None,
+          NonEmptyList.of(Angle.Angle0),
+          Some(AcquisitionOffsets(NonEmptySet.of(Offset.Zero.guided))),
+          Some(ScienceOffsets(NonEmptySet.of(Offset.Zero.guided))),
+          gnirsParams,
+          List(pwfsGS)
+        )
+        .analyses
+        .contains(
+          AgsAnalysis
+            .VignettesScience(pwfsGS, OffsetPosition(GeometryType.Base, Offset.Zero, Angle.Angle0))
+        )
+    )
+
+    val guideStarOffset =
+      GuideStarCandidate.unsafeApply(
+        0L,
+        SiderealTracking.const(
+          Coordinates.Zero
+            .offsetBy(Angle.Angle0, Offset.signedDecimalArcseconds.reverseGet(0.0, 23.0))
+            .get
+        ),
+        (Band.Gaia, BrightnessValue.unsafeFrom(15)).some
+      )
+
+    assert(
+      Ags
+        .agsAnalysis(
+          constraints,
+          wavelength,
+          Coordinates.Zero,
+          Nil,
+          None,
+          NonEmptyList.of(Angle.Angle0),
+          Some(AcquisitionOffsets(NonEmptySet.of(Offset.Zero.guided))),
+          Some(ScienceOffsets(NonEmptySet.of(Offset.Zero.guided))),
+          gnirsParams,
+          List(guideStarOffset)
+        )
+        .analyses
+        .headOption
+        .forall(_.isUsable)
+    )
+  }
+
   test("magnitude limits with gmps OIWFS and PWFS1") {
     val constraints = ConstraintSet(
       ImageQuality.Preset.PointOne,
