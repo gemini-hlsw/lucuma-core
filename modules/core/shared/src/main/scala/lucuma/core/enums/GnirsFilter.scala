@@ -27,7 +27,7 @@ enum GnirsFilter(
   val spectroscopyRange: Option[BoundedInterval[Wavelength]], // Range of the spectroscopy filters.
 ) derives Enumerated, Display:
   case CrossDispersed extends GnirsFilter("CrossDispersed", "XD", "Cross dispersed", none, none)
-  case Order6 extends GnirsFilter("Order6", "X", "Order 6 (X)", 1_100_000.pm.some, (1_103_000, 1_175_400).pmRange.some)
+  case Order6 extends GnirsFilter("Order6", "X", "Order 6 (X)", 1_100_000.pm.some, (1_030_000, 1_175_400).pmRange.some)
   case Order5 extends GnirsFilter("Order5", "J", "Order 5 (J)", 1_270_000.pm.some, (1_175_400, 1_370_000).pmRange.some)
   case Order4 extends GnirsFilter("Order4", "H", "Order 4 (H: 1.645µm)", 1_645_000.pm.some, (1_490_000, 1_800_000).pmRange.some)
   case Order3 extends GnirsFilter("Order3", "K", "Order 3 (K)", 2_200_000.pm.some, (1_910_000, 2_490_000).pmRange.some)
