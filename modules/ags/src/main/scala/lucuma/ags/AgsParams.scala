@@ -12,6 +12,9 @@ import lucuma.core.enums.Flamingos2LyotWheel
 import lucuma.core.enums.GmosFpuType
 import lucuma.core.enums.GmosNorthFpu
 import lucuma.core.enums.GmosSouthFpu
+import lucuma.core.enums.GnirsCamera
+import lucuma.core.enums.GnirsFpuSlit
+import lucuma.core.enums.GnirsPrism
 import lucuma.core.enums.GuideProbe
 import lucuma.core.enums.PWFSGuideProbe
 import lucuma.core.enums.PortDisposition
@@ -370,6 +373,34 @@ object AgsParams:
       Igrins2LongSlit(port, GuideProbe.PWFS2)
 
     val Igrins2ScienceRadius = 20.arcseconds
+
+  case class GnirsLongSlit private (
+    fpu:    GnirsFpuSlit,
+    camera: GnirsCamera,
+    prism:  GnirsPrism,
+    port:   PortDisposition,
+    probe:  PWFSGuideProbe
+  ) extends AgsParams
+      with PwfsOnlyParams
+      with PwfsSupport[GnirsLongSlit] derives Eq:
+
+    protected def withPWFSProbe(probe: PWFSGuideProbe): GnirsLongSlit = copy(probe = probe)
+
+    override def scienceArea(posAngle: Angle, offset: Offset): ShapeExpression =
+      lucuma.core.geom.gnirs.scienceArea.longSlitShapeAt(posAngle, offset, fpu, camera, prism)
+
+    override def scienceRadius: Angle = GnirsLongSlit.GnirsScienceRadius
+
+  object GnirsLongSlit:
+    def apply(
+      fpu:    GnirsFpuSlit,
+      camera: GnirsCamera,
+      prism:  GnirsPrism,
+      port:   PortDisposition = PortDisposition.Bottom
+    ): GnirsLongSlit =
+      GnirsLongSlit(fpu, camera, prism, port, GuideProbe.PWFS2)
+
+    val GnirsScienceRadius = 20.arcseconds
 
   case class GhostIfu private (
     port:  PortDisposition,
