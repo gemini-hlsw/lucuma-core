@@ -58,7 +58,6 @@ object GnirsFilter:
       .toRight(s"No Gnirs spectroscopy filter available for wavelength: $wavelength")
 
   /** Acquisition filter options. */
-  // ATTENTION: This logic is duplicated in the DB view in the ODB. Modify it there too if it's changed here.
   val acquisition: NonEmptyList[GnirsFilter] =
     NonEmptyList.of(Order6, J, Order4, H2, K, PAH)
 
