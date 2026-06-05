@@ -60,5 +60,5 @@ object GnirsFilter:
   /** Acquisition filter options. */
   // ATTENTION: This logic is duplicated in the DB view in the ODB. Modify it there too if it's changed here.
   val acquisition: NonEmptyList[GnirsFilter] =
-    NonEmptyList.of(J, Order4, H2, K, PAH)
+    NonEmptyList.of(Order6, J, Order4, H2, K, PAH)
 
