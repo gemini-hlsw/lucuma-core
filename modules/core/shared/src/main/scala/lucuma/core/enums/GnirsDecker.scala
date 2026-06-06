@@ -7,7 +7,6 @@ package enums
 import lucuma.core.util.Display
 import lucuma.core.util.Enumerated
 
-
 /**
  * Enumerated type for GNRIS Decker.
  * @group Enumerations (Generated)
@@ -26,12 +25,10 @@ enum GnirsDecker(
 
 object GnirsDecker:
   // ATTENTION: This logic is duplicated in the DB view in the ODB. Modify it there too if it's changed here.
-  def forCameraAndReadMode(camera: GnirsCamera, prism: GnirsPrism): GnirsDecker =
-    prism match
-      case GnirsPrism.Mirror => camera match
-        case GnirsCamera.ShortRed | GnirsCamera.ShortBlue => GnirsDecker.ShortCamLongSlit
-        case GnirsCamera.LongRed | GnirsCamera.LongBlue   => GnirsDecker.LongCamLongSlit
-      case GnirsPrism.Sxd | GnirsPrism.Lxd => camera match
-        case GnirsCamera.ShortRed | GnirsCamera.ShortBlue => GnirsDecker.ShortCamCrossDispersed
-        case GnirsCamera.LongRed | GnirsCamera.LongBlue   => GnirsDecker.LongCamCrossDispersed
+  def forCameraAndPrism(camera: GnirsCamera, prism: GnirsPrism): GnirsDecker =
+    (prism, camera.pixelScale) match
+      case (GnirsPrism.Mirror, GnirsPixelScale.PixelScale_0_15)               => GnirsDecker.ShortCamLongSlit
+      case (GnirsPrism.Mirror, GnirsPixelScale.PixelScale_0_05)               => GnirsDecker.LongCamLongSlit
+      case (GnirsPrism.Sxd | GnirsPrism.Lxd, GnirsPixelScale.PixelScale_0_15) => GnirsDecker.ShortCamCrossDispersed
+      case (GnirsPrism.Sxd | GnirsPrism.Lxd, GnirsPixelScale.PixelScale_0_05) => GnirsDecker.LongCamCrossDispersed
     
