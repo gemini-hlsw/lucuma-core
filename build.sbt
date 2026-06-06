@@ -10,7 +10,7 @@ ThisBuild / tlCiReleaseBranches += "topic/scala3"
 
 Global / concurrentRestrictions += Tags.limit(Tags.Compile, 1)
 
-ThisBuild / crossScalaVersions := Seq("3.8.3")
+ThisBuild / crossScalaVersions := Seq("3.8.4")
 ThisBuild / scalacOptions += "-language:implicitConversions" // TODO
 
 ThisBuild / Test / testOptions += Tests.Argument(TestFrameworks.MUnit, "--log=debug")
