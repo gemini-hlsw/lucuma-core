@@ -7,20 +7,41 @@ import cats.syntax.all.*
 import io.circe.Decoder
 import io.circe.HCursor
 
+import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeFormatterBuilder
+import java.time.temporal.ChronoField
+import java.time.temporal.TemporalQueries
 
 object codecs:
 
+  // GOA emits UT timestamps as "yyyy-MM-dd HH:mm:ss" with an optional
+  // fractional-seconds part (any precision) and an optional zone offset.
   private val utDateTimeFormatter: DateTimeFormatter =
-    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss[.SSSSSS]")
+    new DateTimeFormatterBuilder()
+      .appendPattern("yyyy-MM-dd HH:mm:ss")
+      .optionalStart()
+      .appendFraction(ChronoField.NANO_OF_SECOND, 0, 9, true)
+      .optionalEnd()
+      .optionalStart()
+      .appendOffsetId()
+      .optionalEnd()
+      .toFormatter()
 
   private val releaseDateFormatter: DateTimeFormatter =
     DateTimeFormatter.ISO_LOCAL_DATE
 
-  given Decoder[LocalDateTime] = Decoder.decodeString.emap: s =>
-    Either.catchNonFatal(LocalDateTime.parse(s, utDateTimeFormatter))
+  // Times are UTC; when the string carries no explicit offset we assume UTC.
+  given Decoder[Instant] = Decoder.decodeString.emap: s =>
+    Either
+      .catchNonFatal:
+        val parsed = utDateTimeFormatter.parse(s)
+        val local  = LocalDateTime.from(parsed)
+        val offset = Option(parsed.query(TemporalQueries.offset)).getOrElse(ZoneOffset.UTC)
+        local.toInstant(offset)
       .leftMap(e => s"Invalid datetime: ${e.getMessage}")
 
   given Decoder[LocalDate] = Decoder.decodeString.emap: s =>
@@ -37,7 +58,7 @@ object codecs:
       observationType  <- c.get[String]("observation_type")
       observationClass <- c.get[Option[String]]("observation_class")
       qaState          <- c.get[Option[String]]("qa_state")
-      utDateTime       <- c.get[Option[LocalDateTime]]("ut_datetime")
+      utDateTime       <- c.get[Option[Instant]]("ut_datetime")
       releaseDate      <- c.get[Option[LocalDate]]("release")
       programId        <- c.get[Option[String]]("program_id")
       observationId    <- c.get[Option[String]]("observation_id")

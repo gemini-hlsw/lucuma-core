@@ -3,8 +3,8 @@
 
 package lucuma.catalog.goa
 
+import java.time.Instant
 import java.time.LocalDate
-import java.time.LocalDateTime
 
 final case class GoaSummaryRecord(
   name:             String,
@@ -15,7 +15,7 @@ final case class GoaSummaryRecord(
   observationType:  String,
   observationClass: Option[String],
   qaState:          Option[String],
-  utDateTime:       Option[LocalDateTime],
+  utDateTime:       Option[Instant],
   releaseDate:      Option[LocalDate],
   programId:        Option[String],
   observationId:    Option[String],
