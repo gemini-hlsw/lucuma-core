@@ -3,9 +3,10 @@
 
 package lucuma.core.enums
 
+import lucuma.core.util.Display
 import lucuma.core.util.Enumerated
 
-enum ImagingVariantType(val tag: String) derives Enumerated:
-  case Grouped     extends ImagingVariantType("grouped")
-  case Interleaved extends ImagingVariantType("interleaved")
-  case PreImaging  extends ImagingVariantType("pre_imaging")
+enum ImagingVariantType(val tag: String, val name: String) derives Enumerated, Display:
+  case Grouped     extends ImagingVariantType("grouped", "Grouped")
+  case Interleaved extends ImagingVariantType("interleaved", "Interleaved")
+  case PreImaging  extends ImagingVariantType("pre_imaging", "Pre-Imaging")
