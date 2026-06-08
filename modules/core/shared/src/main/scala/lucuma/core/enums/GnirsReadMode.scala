@@ -25,7 +25,7 @@ enum GnirsReadMode(
 ) derives Enumerated, Display:
     case VeryBright extends GnirsReadMode("VeryBright", "Very bright", "Very Bright Acquisition or High Background", 100.msTimeSpan, 190.msTimeSpan, 155, 1, 1)
     case Bright extends GnirsReadMode("Bright", "Bright", "Bright objects", 600.msTimeSpan, 690.msTimeSpan, 30, 1, 16)
-    case Faint extends GnirsReadMode("Faint", "Faint", "Faint objects", 9000.msTimeSpan, 11400.msTimeSpan, 10, 16, 16)
+    case Faint extends GnirsReadMode("Faint", "Faint", "Faint objects", 9000.msTimeSpan, 11140.msTimeSpan, 10, 16, 16)
     case VeryFaint extends GnirsReadMode("VeryFaint", "Very faint", "Very faint objects", 18000.msTimeSpan, 22310.msTimeSpan, 7, 32, 16)
 
 object GnirsReadMode:
