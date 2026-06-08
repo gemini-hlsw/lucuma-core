@@ -19,7 +19,7 @@ object GoaClient:
 
   val DefaultBaseUri: Uri = Uri.unsafeFromString("https://archive.gemini.edu")
 
-  val UserAgent: String = "lucuma-core/1.0 (GOA Query Client)"
+  val UserAgent: String = "GeminiPIT"
 
   inline def build[F[_]: Concurrent](
     httpClient: Client[F],
