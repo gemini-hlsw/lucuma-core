@@ -3,12 +3,16 @@
 
 package lucuma.core.enums
 
+import lucuma.core.util.Display
 import lucuma.core.util.Enumerated
 
 /**
  * Enumerated type for possible cass rotator modes.
  */
-enum CassRotator(val tag: String) derives Enumerated:
+enum CassRotator(val tag: String, val shortName: String) derives Enumerated:
 
-  case Fixed     extends CassRotator("fixed")
-  case Following extends CassRotator("following")
+  case Fixed     extends CassRotator("fixed", "Fixed")
+  case Following extends CassRotator("following", "Following")
+
+object CassRotator:
+  given Display[CassRotator] = Display.byShortName(_.shortName)

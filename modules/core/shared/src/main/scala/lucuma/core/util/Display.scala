@@ -13,10 +13,9 @@ import scala.quoted.*
  * Typeclass for things that can be shown in a user interface.
  * @group Typeclasses
  */
-trait Display[A] {
+trait Display[A]:
   def shortName(a: A): String
   def longName(a: A): String = shortName(a)
-}
 
 object Display:
   def apply[A](using ev: Display[A]): ev.type = ev
@@ -30,10 +29,9 @@ object Display:
    *   function that maps `A` to the longName
    */
   def by[A](toShortName: A => String, toLongName: A => String): Display[A] =
-    new Display[A] {
+    new Display[A]:
       def shortName(a: A)         = toShortName(a)
       override def longName(a: A) = toLongName(a)
-    }
 
   /**
    * Create an instance of `Display` using the provided function for the shortName. The longName
@@ -43,9 +41,8 @@ object Display:
    *   function that maps A to the shortName
    */
   def byShortName[A](toShortName: A => String): Display[A] =
-    new Display[A] {
+    new Display[A]:
       def shortName(a: A) = toShortName(a)
-    }
 
   given Contravariant[Display] = new Contravariant[Display] {
     def contramap[A, B](fa: Display[A])(f: B => A): Display[B] =
@@ -78,7 +75,7 @@ object Display:
   private def displayImpl[E: Type](using Quotes): Expr[Display[E]] =
     import quotes.reflect.*
     val typeSymbol: Symbol = TypeRepr.of[E].typeSymbol
-    val shortNameField: Symbol = typeSymbol.declaredField("shortName") 
+    val shortNameField: Symbol = typeSymbol.declaredField("shortName")
     val longNameField: Symbol = typeSymbol.declaredField("longName")
     val nameField: Symbol = typeSymbol.declaredField("name")
     val descriptionField: Symbol = typeSymbol.declaredField("description")
