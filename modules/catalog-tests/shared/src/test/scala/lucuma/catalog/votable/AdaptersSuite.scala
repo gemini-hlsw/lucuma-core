@@ -10,7 +10,6 @@ import coulomb.*
 import coulomb.conversion.implicits.given
 import coulomb.syntax.*
 import eu.timepit.refined.collection.NonEmpty
-import eu.timepit.refined.types.string.NonEmptyString
 import fs2.*
 import fs2.data.xml.*
 import lucuma.catalog.*
