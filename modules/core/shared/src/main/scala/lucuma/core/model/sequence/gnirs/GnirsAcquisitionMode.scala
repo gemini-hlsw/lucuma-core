@@ -56,6 +56,6 @@ object GnirsAcquisitionMode:
   // Default value depends on integration time (exposure time * coadds).
   def defaultFor(exposureTime: TimeSpan, coadds: PosInt): GnirsAcquisitionMode =
     val integrationTimeSeconds: BigDecimal = exposureTime.toSeconds * coadds.value
-    if (integrationTimeSeconds < 1) GnirsAcquisitionMode.VeryBright
+    if (integrationTimeSeconds < 0.5) GnirsAcquisitionMode.VeryBright
     else if (integrationTimeSeconds < 10) GnirsAcquisitionMode.Bright
     else GnirsAcquisitionMode.Faint.Default
