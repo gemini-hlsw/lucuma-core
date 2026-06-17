@@ -10,7 +10,8 @@ import edu.gemini.tac.qengine.p1.ItacObservation
 import edu.gemini.tac.qengine.p1.Proposal
 import org.slf4j.LoggerFactory
 
-import block.{Block, BlockIterator}
+import block.Block
+import block.BlockIterator
 import queue.ProposalQueueBuilder
 
 /**

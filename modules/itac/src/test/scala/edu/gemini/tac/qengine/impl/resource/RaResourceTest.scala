@@ -13,7 +13,9 @@ import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.model.ConstraintSet
 import lucuma.core.util.Enumerated
 
-import Fixture.{badCC, emptyQueue, goodCC}
+import Fixture.badCC
+import Fixture.emptyQueue
+import Fixture.goodCC
 
 class PerRightAscensionResourceTest extends ItacSuite {
   import TimeAccountingCategory.KR
