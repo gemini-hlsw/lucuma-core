@@ -14,7 +14,6 @@ import lucuma.core.math.Offset
 import lucuma.core.math.Offset.Component
 import lucuma.core.math.arb.*
 import lucuma.core.math.syntax.int.*
-import lucuma.core.tests.ScalaCheckFlaky
 import org.scalacheck.*
 import org.scalacheck.Arbitrary.*
 import org.scalacheck.Prop.*
@@ -67,7 +66,7 @@ class ShapeExpressionSuite extends munit.DisciplineSuite {
     }
   }
 
-  test("(a ∪ b).area = (a.area + b.area) - (a ∩ b).area".tag(ScalaCheckFlaky)) {
+  test("(a ∪ b).area = (a.area + b.area) - (a ∩ b).area".flaky) {
     forAll(genTwoCenteredShapes) { tcs =>
       val rhs = (tcs.shape0 ∪ tcs.shape1).µasSquared
       val lhs = (tcs.shape0.µasSquared + tcs.shape1.µasSquared) -
@@ -79,7 +78,7 @@ class ShapeExpressionSuite extends munit.DisciplineSuite {
     }
   }
 
-  test("(a ∩ b).area = (a ∪ b).area - ((a - b).area + (b - a).area)".tag(ScalaCheckFlaky)) {
+  test("(a ∩ b).area = (a ∪ b).area - ((a - b).area + (b - a).area)".flaky) {
     forAll(genTwoCenteredShapes) { tcs =>
       val rhs = (tcs.shape0 ∩ tcs.shape1).µasSquared
       val lhs = (tcs.shape0 ∪ tcs.shape1).µasSquared - (

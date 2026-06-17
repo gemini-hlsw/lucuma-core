@@ -14,7 +14,6 @@ import lucuma.core.math.Place
 import lucuma.core.math.arb.ArbCoordinates.given
 import lucuma.core.math.arb.ArbPlace.given
 import lucuma.core.model.ConstantTracking
-import lucuma.core.tests.ScalaCheckFlaky
 import lucuma.core.util.TimeSpan
 import munit.ScalaCheckSuite
 import org.scalacheck.Prop.*
@@ -48,7 +47,7 @@ final class ImprovedSkyCalcSuiteJVM extends ScalaCheckSuite {
     )
   }
 
-  test("Arbitrary sky calculations".tag(ScalaCheckFlaky)) {
+  test("Arbitrary sky calculations".flaky) {
     forAll { (place: Place) =>
       // This SkyCalc should be thread safe, but Java's isn't.
       val calc = ImprovedSkyCalc(place)
