@@ -26,8 +26,15 @@ enum GnirsFilter(
   val tag: String,
   val shortName: String,
   val longName: String,
+  // There are two J filters (ORDER5 and J-MK) and two K filters (ORDER3 and K-MK).  The "ORDER" filters are for spectroscopy and have wider
+  // wavelength coverage, while the "MK" filters are for imaging and are matched to the bandpasses of the Maunakea photometric system.
+  // The "ORDER" filters are physically large and cover the length of the slit, while the MK filters are small and only cover the inner circular region.
+  // Thus for spectroscopic acquisitions we use the ORDER filters while image science observations use the MK filters. The one outlier
+  // is the ORDER4 filter which has approximately the H-MK bandpass so it will be used for both spectroscopic acquisitions and imaging science.
+  // Note that only the "ORDER" filters are valid for spectroscopy science. The other ones with spectroscopyRange defined (H2 and PAH)
+  // can still be used for acquisition.
+  //
   // ATTENTION: The optimal wavelength and spectroscopy range are duplicated in the DB view in the ODB. Modify it there too if it's changed here.
-  // Note that only the Order* filters are valid for spectroscopy science. The other ones with spectroscopyRange defined can still be used for acquisition.
   val optimalWavelength: Option[Wavelength],
   val spectroscopyRange: Option[BoundedInterval[Wavelength]], // Range of the spectroscopy filters.
 ) derives Enumerated, Display:
