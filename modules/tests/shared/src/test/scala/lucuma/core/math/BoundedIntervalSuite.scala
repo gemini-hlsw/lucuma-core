@@ -10,7 +10,6 @@ import lucuma.core.math.arb.ArbInterval
 import lucuma.core.optics.laws.discipline.ValidSplitEpiTests
 import lucuma.core.optics.laws.discipline.WedgeTests
 import lucuma.core.syntax.time.*
-import lucuma.core.tests.ScalaCheckFlaky
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
 import org.scalacheck.Prop.*
@@ -128,7 +127,7 @@ class BoundedIntervalSuite  extends munit.DisciplineSuite with IntervalGens {
     }
   }
 
-  test("ToFullDays".tag(ScalaCheckFlaky)) {
+  test("ToFullDays".flaky) {
     forAll { (i: BoundedInterval[Instant], z: ZoneId, t: LocalTime) =>
       val allDay = i.toFullDays(z, t)
       assert(i.isSubsetOf(allDay))

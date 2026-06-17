@@ -113,8 +113,14 @@ lazy val testkit = crossProject(JVMPlatform, JSPlatform)
   .jvmConfigure(_.enablePlugins(AutomateHeaderPlugin))
 
 val MUnitFramework = new TestFramework("munit.Framework")
+// MUnit's built-in `.flaky` handling reads MUNIT_FLAKY_OK via System.getenv at test runtime.
+// On the JVM that works: flaky-tagged tests run and their failures are tolerated when the
+// env var is set. On Scala.js, System.getenv always returns empty, so the env var is invisible
+// and flaky tests would fail. To compensate, we exclude flaky-tagged tests at the build level
+// *only on Scala.js* (see jsSettings below) -- this exclusion is evaluated by the sbt JVM via
+// sys.env and passed as a test argument, so it works regardless of the JS runtime.
 val MUnitFlakyOK   = sys.env.get("MUNIT_FLAKY_OK") match {
-  case Some("true") => Tests.Argument(MUnitFramework, "--exclude-tags=ScalaCheckFlaky")
+  case Some("true") => Tests.Argument(MUnitFramework, "--exclude-tags=Flaky")
   case _            => Tests.Argument()
 }
 
@@ -130,9 +136,9 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform)
       "org.typelevel" %%% "discipline-munit"  % munitDisciplineVersion % Test,
       "org.typelevel" %%% "munit-cats-effect" % munitCatsEffectVersion % Test
     ),
-    testFrameworks += MUnitFramework,
-    testOptions += MUnitFlakyOK
+    testFrameworks += MUnitFramework
   )
+  .jsSettings(testOptions += MUnitFlakyOK)
   .jvmConfigure(_.enablePlugins(AutomateHeaderPlugin))
   .jvmSettings(
     resolvers += "Gemini Repository".at(
@@ -203,7 +209,8 @@ lazy val horizonsTests = crossProject(JVMPlatform, JSPlatform)
     name := "lucuma-horizons-tests",
     libraryDependencies ++= Seq(
       "org.typelevel" %%% "munit-cats-effect"   % munitCatsEffectVersion % Test,
-    )
+    ),
+    testFrameworks += MUnitFramework
   )
   .jvmSettings(
     libraryDependencies ++= Seq(
@@ -212,6 +219,7 @@ lazy val horizonsTests = crossProject(JVMPlatform, JSPlatform)
     )
   )
   .jsSettings(
+    testOptions += MUnitFlakyOK,
     scalacOptions ~= (_.filterNot(Set("-Wdead-code"))),
     libraryDependencies ++= Seq(
       "org.http4s" %%% "http4s-dom" % http4sDomVersion % Test,
@@ -273,9 +281,11 @@ lazy val catalogTests = crossProject(JVMPlatform, JSPlatform)
       "org.http4s"             %%% "http4s-core"         % http4sVersion,
       "com.lihaoyi"            %%% "pprint"              % pprintVersion,
       "org.typelevel"          %%% "cats-time"           % catsTimeVersion
-    )
+    ),
+    testFrameworks += MUnitFramework
   )
   .jsSettings(
+    testOptions += MUnitFlakyOK,
     scalacOptions ~= (_.filterNot(Set("-Wdead-code"))),
     libraryDependencies ++= Seq(
       "org.http4s" %%% "http4s-dom" % http4sDomVersion
