@@ -5,16 +5,12 @@ package lucuma
 package core
 package enums
 
-import cats.Order.given
-import cats.data.NonEmptyMap
-import cats.data.NonEmptySet
+import cats.data.NonEmptyList
 import cats.syntax.all.*
 import lucuma.core.math.BoundedInterval
 import lucuma.core.math.Wavelength
 import lucuma.core.util.Display
 import lucuma.core.util.Enumerated
-
-import scala.collection.immutable.SortedMap
 
 import ConvenienceOps.*
 
@@ -26,6 +22,10 @@ enum GnirsFilter(
   val tag: String,
   val shortName: String,
   val longName: String,
+  // ATTENTION: The optimal wavelength and spectroscopy range are duplicated in the DB view in the ODB. Modify it there too if it's changed here.
+  val optimalWavelength: Option[Wavelength],
+  val spectroscopyRange: Option[BoundedInterval[Wavelength]], // Range of the spectroscopy and acquisition filters.
+) derives Enumerated, Display:
   // There are two J filters (ORDER5 and J-MK) and two K filters (ORDER3 and K-MK).  The "ORDER" filters are for spectroscopy and have wider
   // wavelength coverage, while the "MK" filters are for imaging and are matched to the bandpasses of the Maunakea photometric system.
   // The "ORDER" filters are physically large and cover the length of the slit, while the MK filters are small and only cover the inner circular region.
@@ -33,16 +33,10 @@ enum GnirsFilter(
   // is the ORDER4 filter which has approximately the H-MK bandpass so it will be used for both spectroscopic acquisitions and imaging science.
   // Note that only the "ORDER" filters are valid for spectroscopy science. The other ones with spectroscopyRange defined (H2 and PAH)
   // can still be used for acquisition.
-  //
-  // ATTENTION: The optimal wavelength and spectroscopy range are duplicated in the DB view in the ODB. Modify it there too if it's changed here.
-  val optimalWavelength: Option[Wavelength],
-  val spectroscopyRange: Option[BoundedInterval[Wavelength]], // Range of the spectroscopy filters.
-) derives Enumerated, Display:
   case CrossDispersed extends GnirsFilter("CrossDispersed", "XD", "Cross dispersed", none, none)
   case Order6 extends GnirsFilter("Order6", "X", "Order 6 (X)", 1_100_000.pm.some, (1_030_000, 1_175_400).pmRange.some)
   case Order5 extends GnirsFilter("Order5", "J", "Order 5 (J)", 1_270_000.pm.some, (1_175_400, 1_370_000).pmRange.some)
   case Order4 extends GnirsFilter("Order4", "H", "Order 4 (H: 1.645µm)", 1_645_000.pm.some, (1_490_000, 1_800_000).pmRange.some)
-  // Declaration order matters for range match. Since H2 is completely contained in Order3, it needs to come before or it will never be selected.
   case H2 extends GnirsFilter("H2", "H2", "H2: 2.122µm", 2_122_000.pm.some, (2_105_000, 2_136_000).pmRange.some)
   case Order3 extends GnirsFilter("Order3", "K", "Order 3 (K)", 2_200_000.pm.some, (1_910_000, 2_490_000).pmRange.some)
   case Order2 extends GnirsFilter("Order2", "L", "Order 2 (L)", 3_500_000.pm.some, (2_800_000, 4_200_000).pmRange.some)
@@ -59,19 +53,21 @@ enum GnirsFilter(
     optimalWavelength.getOrElse(Wavelength.unsafeFromIntPicometers(1_650_000))
 
 object GnirsFilter:
-  private val SpectroscopyFilterTable: NonEmptyMap[GnirsFilter, BoundedInterval[Wavelength]] = 
-    NonEmptyMap.fromMapUnsafe:
-      SortedMap.from(values.flatMap(f => f.spectroscopyRange.map(w => (f, w))))
+  val SpectroscopyScienceFilters: NonEmptyList[GnirsFilter] =
+    NonEmptyList.of(Order6, Order5, Order4, Order3, Order2, Order1)
 
-  /** Acquisition filter options. */
-  val AcquisitionFilters: NonEmptySet[GnirsFilter] =
-    NonEmptySet.of(Order6, Order5, Order4, H2, Order3, PAH)
+  // Declaration order matters for range match. Since H2 is completely contained in Order3, it needs to come before or it will never be selected.
+  val AcquisitionFilters: NonEmptyList[GnirsFilter] =
+    NonEmptyList.of(Order6, Order5, Order4, H2, Order3, PAH)
 
-  def fromSpectroscopyWavelength(wavelength: Wavelength, isAcquisition: Boolean): Either[String, GnirsFilter] = 
-    SpectroscopyFilterTable
-      .toSortedMap
-      .collectFirst:
-        case (filter, range) if range.contains(wavelength)  && (!isAcquisition || AcquisitionFilters.contains_(filter)) => filter
+  private def forWavelength(lookupList: NonEmptyList[GnirsFilter])(wavelength: Wavelength): Either[String, GnirsFilter] = 
+    lookupList.find(_.spectroscopyRange.exists(_.contains(wavelength)))
       .toRight(s"No Gnirs spectroscopy filter available for wavelength: $wavelength")
+
+  def fromSpectroscopyScienceWavelength(wavelength: Wavelength): Either[String, GnirsFilter] = 
+    forWavelength(SpectroscopyScienceFilters)(wavelength)
+
+  def fromAcquisitionWavelength(wavelength: Wavelength): Either[String, GnirsFilter] = 
+    forWavelength(AcquisitionFilters)(wavelength)
 
 
