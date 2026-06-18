@@ -6,7 +6,6 @@ package lucuma.core
 import lucuma.core.math.Angle
 import lucuma.core.math.Declination
 import lucuma.core.math.Epoch
-import lucuma.core.math.HourAngle
 import lucuma.core.math.ProperMotion
 import lucuma.core.math.RightAscension
 import lucuma.core.math.parser.AngleParsers
@@ -28,7 +27,7 @@ def deg2hms(deg: Double): String =
 
 @JSExportTopLevel("deg2dms")
 def deg2dms(deg: Double): String =
-  val dec = Declination.fromAngleWithCarry(HourAngle.fromDoubleDegrees(deg))._1
+  val dec = Declination.fromAngleWithCarry(Angle.fromDoubleDegrees(deg))._1
   MathValidators.truncatedDec.reverseGet(dec)
 
 @JSExportTopLevel("hms2deg")
@@ -145,7 +144,7 @@ def toRightAscension(maybeRightAscension: Double): RightAscensionJS =
 
 @JSExportTopLevel("toDeclination")
 def toDeclination(maybeDeclination: Double): DeclinationJS =
-  DeclinationJS(Declination.fromAngleWithCarry(HourAngle.fromDoubleDegrees(maybeDeclination))._1)
+  DeclinationJS(Declination.fromAngleWithCarry(Angle.fromDoubleDegrees(maybeDeclination))._1)
 
 @JSExportTopLevel("toAngle")
 def toAngle(maybeAngle: Double): AngleJS =

@@ -2,7 +2,7 @@ import org.scalajs.linker.interface.ESVersion
 import org.typelevel.sbt.gha.PermissionValue
 import org.typelevel.sbt.gha.Permissions
 
-ThisBuild / tlBaseVersion                         := "0.210"
+ThisBuild / tlBaseVersion                         := "0.211"
 ThisBuild / tlCiReleaseBranches                   := Seq("master")
 ThisBuild / githubWorkflowEnv += "MUNIT_FLAKY_OK" -> "true"
 
@@ -112,12 +112,6 @@ lazy val testkit = crossProject(JVMPlatform, JSPlatform)
   )
   .jvmConfigure(_.enablePlugins(AutomateHeaderPlugin))
 
-val MUnitFramework = new TestFramework("munit.Framework")
-val MUnitFlakyOK   = sys.env.get("MUNIT_FLAKY_OK") match {
-  case Some("true") => Tests.Argument(MUnitFramework, "--exclude-tags=ScalaCheckFlaky")
-  case _            => Tests.Argument()
-}
-
 lazy val tests = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Full)
   .in(file("modules/tests"))
@@ -129,9 +123,7 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform)
       "org.scalameta" %%% "munit"             % munitVersion % Test,
       "org.typelevel" %%% "discipline-munit"  % munitDisciplineVersion % Test,
       "org.typelevel" %%% "munit-cats-effect" % munitCatsEffectVersion % Test
-    ),
-    testFrameworks += MUnitFramework,
-    testOptions += MUnitFlakyOK
+    )
   )
   .jvmConfigure(_.enablePlugins(AutomateHeaderPlugin))
   .jvmSettings(
