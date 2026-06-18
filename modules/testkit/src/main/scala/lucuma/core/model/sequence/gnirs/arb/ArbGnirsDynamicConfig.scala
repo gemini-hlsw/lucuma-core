@@ -3,6 +3,7 @@
 
 package lucuma.core.model.sequence.gnirs.arb
 
+import cats.syntax.either.*
 import coulomb.Quantity
 import coulomb.testkit.given
 import eu.timepit.refined.scalacheck.numeric.given
@@ -14,6 +15,7 @@ import lucuma.core.model.sequence.gnirs.GnirsDynamicConfig
 import lucuma.core.model.sequence.gnirs.GnirsFocus
 import lucuma.core.model.sequence.gnirs.GnirsFocusMotorStep
 import lucuma.core.model.sequence.gnirs.GnirsFocusMotorStepsValue
+import lucuma.core.model.sequence.gnirs.GnirsFpu
 import lucuma.core.util.TimeSpan
 import lucuma.core.util.arb.ArbEnumerated.given
 import lucuma.core.util.arb.ArbNewType.given
@@ -25,6 +27,17 @@ import org.scalacheck.Gen
 
 trait ArbGnirsDynamicConfig:
   import ArbGnirsAcquisitionMirrorMode.given
+
+  given Arbitrary[GnirsFpu] = Arbitrary:
+    Gen.oneOf(
+      arbitrary[GnirsFpuSlit].map(GnirsFpu.Slit(_)),
+      arbitrary[GnirsFpuOther].map(GnirsFpu.Other(_))
+    )
+
+  given Cogen[GnirsFpu] =
+    Cogen[Either[GnirsFpuSlit, GnirsFpuOther]].contramap:
+      case GnirsFpu.Slit(slit) => slit.asLeft
+      case GnirsFpu.Other(other) => other.asRight
 
   given Arbitrary[GnirsFocus] = Arbitrary:
     Gen.oneOf(
@@ -45,7 +58,7 @@ trait ArbGnirsDynamicConfig:
       coadds            <- arbitrary[PosInt]
       filter            <- arbitrary[GnirsFilter]
       decker            <- arbitrary[GnirsDecker]
-      fpu               <- arbitrary[Either[GnirsFpuSlit, GnirsFpuOther]]
+      fpu               <- arbitrary[GnirsFpu]
       acquisitionMirror <- arbitrary[GnirsAcquisitionMirrorMode]
       camera            <- arbitrary[GnirsCamera]
       focus             <- arbitrary[GnirsFocus]
@@ -69,7 +82,7 @@ trait ArbGnirsDynamicConfig:
         PosInt,
         GnirsFilter,
         GnirsDecker,
-        Either[GnirsFpuSlit, GnirsFpuOther],
+        GnirsFpu,
         GnirsAcquisitionMirrorMode,
         GnirsCamera,
         GnirsFocus,

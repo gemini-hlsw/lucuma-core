@@ -4,7 +4,6 @@
 package lucuma.core.geom.jts
 package demo
 
-import cats.syntax.either.*
 import lucuma.core.enums.Flamingos2Fpu
 import lucuma.core.enums.Flamingos2LyotWheel
 import lucuma.core.enums.GmosNorthFpu
@@ -465,6 +464,7 @@ trait GnirsShapes extends InstrumentShapes:
   import lucuma.core.enums.GnirsFpuSlit
   import lucuma.core.enums.GnirsPrism
   import lucuma.core.enums.GuideProbe
+  import lucuma.core.model.sequence.gnirs.GnirsFpu
 
   val posAngle: Angle =
     15.deg
@@ -477,11 +477,11 @@ trait GnirsShapes extends InstrumentShapes:
 
   val probe: GuideProbe = GuideProbe.PWFS2
 
-  val longSlitFpu: Either[GnirsFpuSlit, GnirsFpuOther] =
-    GnirsFpuSlit.LongSlit_1_00.asLeft
+  val longSlitFpu: GnirsFpu =
+    GnirsFpu.Slit(GnirsFpuSlit.LongSlit_1_00)
 
-  val pinholeFpu: Either[GnirsFpuSlit, GnirsFpuOther] =
-    GnirsFpuOther.Pinhole3.asRight
+  val pinholeFpu: GnirsFpu =
+    GnirsFpu.Other(GnirsFpuOther.Pinhole3)
 
   val fpu = longSlitFpu
 
