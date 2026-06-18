@@ -8,14 +8,14 @@ import edu.gemini.tac.qengine.impl.block.Block
 import edu.gemini.tac.qengine.log.RejectConditions
 import edu.gemini.tac.qengine.log.RejectTarget
 import edu.gemini.tac.qengine.p1.*
+import lucuma.core.enums.ScienceBand
 import lucuma.core.enums.TimeAccountingCategory
+import lucuma.core.model.Allocation
 import lucuma.core.model.ConstraintSet
 import lucuma.core.util.Enumerated
 import lucuma.core.util.TimeSpan
 
 import Fixture.{badCC, emptyQueue, goodCC}
-import lucuma.core.enums.ScienceBand
-import lucuma.core.model.Allocation
 
 class PerRightAscensionResourceTest extends ItacSuite {
   import TimeAccountingCategory.KR

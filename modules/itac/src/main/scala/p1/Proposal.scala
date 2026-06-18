@@ -16,9 +16,10 @@ import lucuma.core.model.ProposalReference
 import lucuma.core.model.ProposalType
 import lucuma.core.util.DateInterval
 import lucuma.core.util.TimeSpan
-import GroupTree.flattenAndScale
 
 import java.time.LocalDate
+
+import GroupTree.flattenAndScale
 
 case class Proposal(
   reference: ProposalReference,

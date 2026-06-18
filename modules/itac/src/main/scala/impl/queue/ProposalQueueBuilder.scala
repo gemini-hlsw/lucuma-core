@@ -8,8 +8,8 @@ import edu.gemini.tac.qengine.api.queue.ProposalQueue
 import edu.gemini.tac.qengine.api.queue.time.QueueTime
 import edu.gemini.tac.qengine.p1.*
 import lucuma.core.enums.ScienceBand
-import lucuma.core.util.Enumerated
 import lucuma.core.enums.Site
+import lucuma.core.util.Enumerated
 
 /**
  * ProposalQueueBuilder is used to construct the Band 1, 2, and 3 part of the

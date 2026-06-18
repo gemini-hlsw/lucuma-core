@@ -3,6 +3,7 @@
 
 package edu.gemini.tac.qengine.impl.resource
 
+import cats.data.NonEmptyList
 import edu.gemini.tac.qengine.ItacSuite
 import edu.gemini.tac.qengine.api.config.DecRanged
 import edu.gemini.tac.qengine.api.config.DeclinationMap
@@ -12,18 +13,17 @@ import edu.gemini.tac.qengine.p1.*
 import edu.gemini.tac.qengine.util.BoundedTime
 import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.enums.Half
+import lucuma.core.enums.ScienceBand
 import lucuma.core.enums.Site
 import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.TimeAccountingCategory
-// import lucuma.core.enums.ToOActivation
 import lucuma.core.enums.WaterVapor
+import lucuma.core.model.Allocation
 import lucuma.core.model.CloudExtinction
 import lucuma.core.model.ConstraintSet
 import lucuma.core.model.ElevationRange
 import lucuma.core.model.ImageQuality
-// import lucuma.core.model.IntPercent
 import lucuma.core.model.ProposalReference
-// import lucuma.core.model.ProposalType
 import lucuma.core.model.Semester
 import lucuma.core.model.Semester.YearInt
 import lucuma.core.util.Enumerated
@@ -31,9 +31,6 @@ import lucuma.core.util.TimeSpan
 import org.junit.*
 
 import Assert.*
-import lucuma.core.model.Allocation
-import cats.data.NonEmptyList
-import lucuma.core.enums.ScienceBand
 
 class DecResourceTest extends ItacSuite {
   import TimeAccountingCategory.KR

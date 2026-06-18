@@ -7,6 +7,7 @@ import edu.gemini.tac.qengine.p1.ItacObservation
 import edu.gemini.tac.qengine.p1.ProposalShard
 import lucuma.core.enums.ScienceBand
 import lucuma.core.util.TimeSpan
+
 import scala.annotation.nowarn
 
 object RejectToo {
