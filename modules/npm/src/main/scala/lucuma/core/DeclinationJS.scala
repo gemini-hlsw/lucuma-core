@@ -10,5 +10,5 @@ import scala.scalajs.js.annotation.JSExport
 
 final class DeclinationJS(dec: Declination):
   @JSExport val dms: String                = Declination.fromStringSignedDMS.reverseGet(dec)
-  @JSExport val degrees: Double            = BigDecimal(dec.toAngle.toDoubleDegrees).floatValue
+  @JSExport val degrees: Double            = dec.toAngle.toSignedDoubleDegrees
   @JSExport val microarcseconds: js.BigInt = js.BigInt(dec.toAngle.toMicroarcseconds.toString())

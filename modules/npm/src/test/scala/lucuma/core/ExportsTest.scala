@@ -204,10 +204,15 @@ class ExportsTest extends munit.FunSuite {
     assertNoDiff(dec45.dms, "+45:00:00.000000")
     assertEquals(dec45.degrees, 45.0)
 
+    val decOverflow = toDeclination(179.0)
+    assertNoDiff(decOverflow.dms, "+01:00:00.000000")
+    assertEquals(decOverflow.degrees, 1.0)
+    assertNoDiff(decOverflow.microarcseconds.toString(), "3600000000")
+
     val decNeg = toDeclination(-30.0)
     assertNoDiff(decNeg.dms, "-30:00:00.000000")
-    // Negative declinations are stored as angles in [270°, 360°), so -30° → 330°
-    assertEquals(decNeg.degrees, 330.0)
+    assertEquals(decNeg.degrees, -30.0)
+    assertEquals(decNeg.microarcseconds.toString(), "1188000000000")
   }
 
   test("toAngle") {
