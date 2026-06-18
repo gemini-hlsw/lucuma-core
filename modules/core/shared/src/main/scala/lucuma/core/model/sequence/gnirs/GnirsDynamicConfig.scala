@@ -10,8 +10,6 @@ import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.enums.GnirsCamera
 import lucuma.core.enums.GnirsDecker
 import lucuma.core.enums.GnirsFilter
-import lucuma.core.enums.GnirsFpuOther
-import lucuma.core.enums.GnirsFpuSlit
 import lucuma.core.enums.GnirsReadMode
 import lucuma.core.math.Wavelength
 import lucuma.core.util.TimeSpan
@@ -23,7 +21,7 @@ final case class GnirsDynamicConfig(
   coadds:            PosInt,
   filter:            GnirsFilter,
   decker:            GnirsDecker,
-  fpu:               Either[GnirsFpuSlit, GnirsFpuOther],
+  fpu:               GnirsFpu,
   acquisitionMirror: GnirsAcquisitionMirrorMode,
   camera:            GnirsCamera,
   focus:             GnirsFocus,
@@ -47,7 +45,7 @@ object GnirsDynamicConfig:
   val decker: Lens[GnirsDynamicConfig, GnirsDecker] =
     Focus[GnirsDynamicConfig](_.decker)
 
-  val fpu: Lens[GnirsDynamicConfig, Either[GnirsFpuSlit, GnirsFpuOther]] =
+  val fpu: Lens[GnirsDynamicConfig, GnirsFpu] =
     Focus[GnirsDynamicConfig](_.fpu)
 
   val acquisitionMirror: Lens[GnirsDynamicConfig, GnirsAcquisitionMirrorMode] =

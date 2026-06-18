@@ -12,6 +12,7 @@ import lucuma.core.geom.ShapeExpression
 import lucuma.core.geom.syntax.all.*
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
+import lucuma.core.model.sequence.gnirs.GnirsFpu
 
 /**
  * GNIRS science area geometry
@@ -48,7 +49,7 @@ trait GnirsScienceAreaGeometry:
   def shapeAt(
     posAngle:  Angle,
     offsetPos: Offset,
-    fpu:       Either[GnirsFpuSlit, GnirsFpuOther],
+    fpu:       GnirsFpu,
     camera:    GnirsCamera,
     prism:     GnirsPrism
   ): Option[ShapeExpression] =
