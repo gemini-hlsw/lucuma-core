@@ -7,11 +7,13 @@ import edu.gemini.tac.qengine.p1.ItacObservation
 import edu.gemini.tac.qengine.p1.ProposalShard
 import lucuma.core.enums.ScienceBand
 import lucuma.core.util.TimeSpan
+import scala.annotation.nowarn
 
 object RejectToo {
   val name = "ToO Remaining Time"
 
   private val detailTemplate = "ToO observation of %.2f hours with conditions %s.  Remaining time %.2f hours."
+  @nowarn()
   def detail(prop: ProposalShard, obs: ItacObservation, band: ScienceBand, remaining: TimeSpan): String = {
     val obsTime = 999 // TODO prop.relativeObsTime(obs, band).toHours
     val remTime = remaining.toHours

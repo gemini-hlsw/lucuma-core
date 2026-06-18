@@ -64,7 +64,7 @@ object QueueCalcStage {
    *
    * Begins recursive call to compute(ProposalQueueBuilder, BlockIterator, SemesterResource)
    */
-  def apply(
+  def compute(
     queue:      ProposalQueueBuilder,
     iter:       BlockIterator,
     activeList: ProposalShard => List[ItacObservation.Scaled],

@@ -54,7 +54,7 @@ class CompositeTimeRestrictionResourceTest extends ItacSuite {
   private val grp = new CompositeTimeRestrictionResource(lst)
 
   private def mkProp(wv: WaterVapor, lgs: Boolean): ProposalShard =
-    val p = Proposal(ProposalReference(Semester(YearInt.unsafeFrom(2026), Half.A), PosInt.unsafeFrom(1)), NonEmptyList.one(alloc), obsList = List(ItacObservation(target, conds(wv), TimeSpan.fromHoursBounded(10), lgs)))
+    val p = Proposal(ProposalReference(Semester(YearInt.unsafeFrom(2026), Half.A), PosInt.unsafeFrom(1)), NonEmptyList.one(alloc), groupTree = GroupTree.from(ItacObservation(target, conds(wv), TimeSpan.fromHoursBounded(10), lgs)))
     p.shardFor(Site.GN, alloc.category, alloc.scienceBand)
 
   test("testReserveWv") {

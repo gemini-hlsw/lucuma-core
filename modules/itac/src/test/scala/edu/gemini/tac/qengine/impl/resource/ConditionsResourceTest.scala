@@ -51,7 +51,7 @@ class ConditionsResourceTest extends ItacSuite {
 
   private def mkProp(obsConds: ConstraintSet): ProposalShard = {
     val obsList = List(ItacObservation(target, obsConds, TimeSpan.fromMinutesBounded(10)))
-    val prop = Proposal(ProposalReference(Semester(YearInt.unsafeFrom(2026), Half.A), PosInt.unsafeFrom(1)), allocs, obsList = obsList)
+    val prop = Proposal(ProposalReference(Semester(YearInt.unsafeFrom(2026), Half.A), PosInt.unsafeFrom(1)), allocs, groupTree = GroupTree.fromList(obsList))
     prop.shardFor(Site.GN, allocs.head.category, allocs.head.scienceBand)
   }
 

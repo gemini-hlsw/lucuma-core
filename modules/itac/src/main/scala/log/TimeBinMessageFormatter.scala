@@ -7,6 +7,7 @@ import edu.gemini.tac.qengine.p1.ItacObservation
 import edu.gemini.tac.qengine.p1.ProposalShard
 import lucuma.core.enums.ScienceBand
 import lucuma.core.util.TimeSpan
+import org.typelevel.scalaccompat.annotation.nowarn
 
 trait TimeBinMessageFormatter {
   private val binStatusTemplate = "Bin %.1f%% full (%.2f / %.2f hrs)"
@@ -18,6 +19,7 @@ trait TimeBinMessageFormatter {
   }
 
   private val obsInfoTemplate   = "%.2f hrs at %s(%.3f hr, %.1f deg)"
+  @nowarn
   def obsInfo(prop: ProposalShard, obs: ItacObservation, band: ScienceBand): String = {
     val obsTime = 999 // TODO prop.relativeObsTime(obs, band)
     val target  = obs.itacTarget

@@ -10,5 +10,5 @@ import p1.{ItacObservation, ProposalShard}
 
 package object log {
   def rejectConditions(p: ProposalShard, o: ItacObservation, b: ScienceBand, c: TimeSpan, m: TimeSpan) = RejectConditions(p, o, b, c, m)
-  def rejectTarget(p: ProposalShard, o: ItacObservation, b: ScienceBand, t: RejectTarget.RaDecType, c: TimeSpan, m: TimeSpan) = RejectTarget(p, o, b, t, c, m)
+  def rejectTarget(p: ProposalShard, o: ItacObservation.Scaled, b: ScienceBand, t: RejectTarget.RaDecType, c: TimeSpan, m: TimeSpan) = RejectTarget(p, o, b, t, c, m)
 }

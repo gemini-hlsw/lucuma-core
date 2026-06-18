@@ -41,7 +41,7 @@ class TimeRestrictionTest extends ItacSuite {
   }
 
   private def mkProp(wv: WaterVapor): ProposalShard =
-    val prop = Proposal(ProposalReference(Semester(YearInt.unsafeFrom(2026), Half.A), PosInt.unsafeFrom(1)), allocs, obsList = List(ItacObservation(target, conds(wv), TimeSpan.fromHoursBounded(10))))
+    val prop = Proposal(ProposalReference(Semester(YearInt.unsafeFrom(2026), Half.A), PosInt.unsafeFrom(1)), allocs, groupTree = GroupTree.from(ItacObservation(target, conds(wv), TimeSpan.fromHoursBounded(10))))
     prop.shardFor(Site.GN, alloc.category, alloc.scienceBand)
 
   test("testMatches") {

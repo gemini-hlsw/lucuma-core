@@ -3,13 +3,13 @@
 
 package edu.gemini.tac.qengine.api
 
-import edu.gemini.tac.qengine.api.queue.ProposalQueue
-import edu.gemini.tac.qengine.log.ProposalLog
-import edu.gemini.tac.qengine.p1.Proposal
-import lucuma.core.enums.ScienceBand
-import lucuma.core.enums.Site
-import lucuma.core.model.Semester
-import lucuma.core.util.Enumerated
+// import edu.gemini.tac.qengine.api.queue.ProposalQueue
+// import edu.gemini.tac.qengine.log.ProposalLog
+// import edu.gemini.tac.qengine.p1.Proposal
+// import lucuma.core.enums.ScienceBand
+// import lucuma.core.enums.Site
+// import lucuma.core.model.Semester
+// import lucuma.core.util.Enumerated
 
 trait BucketsAllocation {
   def raTablesANSI: String

@@ -49,7 +49,7 @@ class BlockIteratorTest extends ItacSuite {
     val alloc = Allocation(p, ScienceBand.Band1, TimeSpan.fromHoursBounded(hrs))
     val allocs = NonEmptyList.one(alloc)
     val lst = obsHrs.map(curHrs => ItacObservation(target, conds, TimeSpan.fromHoursBounded(curHrs))).toList
-    val prop = Proposal(ProposalReference(Semester(YearInt.unsafeFrom(2026), Half.A), PosInt.unsafeFrom(1)), allocs, obsList = lst)
+    val prop = Proposal(ProposalReference(Semester(YearInt.unsafeFrom(2026), Half.A), PosInt.unsafeFrom(1)), allocs, groupTree = GroupTree.fromList(lst))
     prop.shardFor(Site.GN, p, ScienceBand.Band1)
 
   def genQuanta(hrs: Double): TimeAccountingCategoryTime = TimeAccountingCategoryTime.constant(TimeSpan.fromHoursBounded(hrs))
