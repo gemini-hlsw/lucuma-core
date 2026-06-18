@@ -55,7 +55,7 @@ object ProposalShard:
     site: Site
   ):
     override def toString(): String =
-      s"$parentReference (Shard for $category/$band/$site)"
+      s"ProposalShard(${parentReference.semester.format}-${parentReference.index}, $category, $band, $site)"
     
   object Reference:
     given Order[Reference] =

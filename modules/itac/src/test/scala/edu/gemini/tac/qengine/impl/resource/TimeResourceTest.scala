@@ -36,7 +36,6 @@ class TimeRestrictionResourceTest extends ItacSuite {
   import TimeAccountingCategory.US
   val TimeAccountingCategorys = Enumerated[TimeAccountingCategory].all
 
-  private val site = Site.GN
   private val alloc  = Allocation(US, ScienceBand.Band1, TimeSpan.fromHoursBounded(10))
   private val allocs   = NonEmptyList.one(alloc)
   private val target = ItacTarget(0, 0) // not used
@@ -55,7 +54,7 @@ class TimeRestrictionResourceTest extends ItacSuite {
       ProposalReference(Semester(YearInt.unsafeFrom(2026), Half.A), 
       PosInt.unsafeFrom(1)), 
       allocs, 
-      obsList = List(obs)
+      groupTree = GroupTree.from(obs)
     ).shardFor(Site.GN, alloc.category, alloc.scienceBand)
 
   test("testReserveNoMatch") {

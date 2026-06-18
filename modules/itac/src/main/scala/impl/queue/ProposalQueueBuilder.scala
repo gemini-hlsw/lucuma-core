@@ -9,6 +9,7 @@ import edu.gemini.tac.qengine.api.queue.time.QueueTime
 import edu.gemini.tac.qengine.p1.*
 import lucuma.core.enums.ScienceBand
 import lucuma.core.util.Enumerated
+import lucuma.core.enums.Site
 
 /**
  * ProposalQueueBuilder is used to construct the Band 1, 2, and 3 part of the
@@ -23,6 +24,7 @@ import lucuma.core.util.Enumerated
 final case class ProposalQueueBuilder(
   queueTime: QueueTime,
   band:      ScienceBand,
+  site:      Site,
   proposals: List[ProposalShard] = Nil
 ) extends ProposalQueue {
 

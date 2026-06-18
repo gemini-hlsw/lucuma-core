@@ -15,15 +15,15 @@ import lucuma.core.enums.Half
 import lucuma.core.enums.Site
 import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.TimeAccountingCategory
-import lucuma.core.enums.ToOActivation
+// import lucuma.core.enums.ToOActivation
 import lucuma.core.enums.WaterVapor
 import lucuma.core.model.CloudExtinction
 import lucuma.core.model.ConstraintSet
 import lucuma.core.model.ElevationRange
 import lucuma.core.model.ImageQuality
-import lucuma.core.model.IntPercent
+// import lucuma.core.model.IntPercent
 import lucuma.core.model.ProposalReference
-import lucuma.core.model.ProposalType
+// import lucuma.core.model.ProposalType
 import lucuma.core.model.Semester
 import lucuma.core.model.Semester.YearInt
 import lucuma.core.util.Enumerated
@@ -66,7 +66,7 @@ class DecResourceTest extends ItacSuite {
   private val allocs = NonEmptyList.one(alloc)
 
   private def mkProp(target: ItacTarget): ProposalShard =
-    val p = Proposal(ProposalReference(Semester(YearInt.unsafeFrom(2026), Half.A), PosInt.unsafeFrom(1)), allocs, obsList = List(ItacObservation(target, conds, TimeSpan.Zero)))
+    val p = Proposal(ProposalReference(Semester(YearInt.unsafeFrom(2026), Half.A), PosInt.unsafeFrom(1)), allocs, groupTree = GroupTree.from(ItacObservation(target, conds, TimeSpan.Zero)))
     ProposalShard(p, Site.GN, allocs.head)
 
   test("testNormalReserveWithRemainingTime") {

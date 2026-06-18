@@ -152,5 +152,6 @@ object TimeAccountingCategoryBlockIterator {
    * appropriate.
    */
   def apply(propList: List[ProposalShard], activeList : ProposalShard=>List[ItacObservation]): TimeAccountingCategoryBlockIterator =
-    if (propList.isEmpty) Empty else applyNonEmpty(propList, activeList)
+    val nonEmptyProps = propList.filter(p => activeList(p).nonEmpty)
+    if (nonEmptyProps.isEmpty) Empty else applyNonEmpty(nonEmptyProps, activeList)
 }

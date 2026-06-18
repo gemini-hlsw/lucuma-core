@@ -56,7 +56,7 @@ class TimeAccountingCategoryBlockIteratorTest extends ItacSuite {
     val allocs = NonEmptyList.one(alloc)
     gen = gen.next
     val lst  = obsHrs.map(curHrs => ItacObservation(target, conds, TimeSpan.fromHoursBounded(curHrs))).toList
-    val prop = Proposal(ProposalReference(Semester(YearInt.unsafeFrom(2026), Half.A), PosInt.unsafeFrom(gen.num)), allocs, obsList = lst)
+    val prop = Proposal(ProposalReference(Semester(YearInt.unsafeFrom(2026), Half.A), PosInt.unsafeFrom(gen.num)), allocs, groupTree = GroupTree.fromList(lst))
     prop.shardFor(Site.GN, AR, ScienceBand.Band1)
 
   test("testCreateEmpty") {

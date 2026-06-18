@@ -17,6 +17,7 @@ import lucuma.core.model.Semester.YearInt
 import lucuma.core.util.TimeSpan
 import munit.FunSuite
 import org.junit.Assert
+import edu.gemini.tac.qengine.p1.GroupTree
 
 class QueueEngineBandProblemsTest extends FunSuite {
   import QueueEngineBandProblems._
@@ -27,7 +28,7 @@ class QueueEngineBandProblemsTest extends FunSuite {
       ProposalReference(Semester(YearInt.unsafeFrom(2026), Half.A), PosInt.unsafeFrom(1)),
       allocations       = null,
       tpe               = null,
-      obsList           = null,
+      groupTree         = GroupTree.empty,
     )
 
   // Test that the given problem check fails with the the given proposal and per-band expectations.

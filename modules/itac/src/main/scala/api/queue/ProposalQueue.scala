@@ -10,6 +10,7 @@ import edu.gemini.tac.qengine.util.BoundedTime
 import lucuma.core.enums.ScienceBand
 import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.util.TimeSpan
+import lucuma.core.enums.Site
 
 
 // Wait, do we really need to care about bands at all here? We need to know whether
@@ -26,6 +27,8 @@ import lucuma.core.util.TimeSpan
 trait ProposalQueue {
 
   def band: ScienceBand
+
+  def site: Site
 
   def queueTime: QueueTime // this us unused time
 

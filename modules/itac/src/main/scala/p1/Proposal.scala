@@ -16,6 +16,7 @@ import lucuma.core.model.ProposalReference
 import lucuma.core.model.ProposalType
 import lucuma.core.util.DateInterval
 import lucuma.core.util.TimeSpan
+import GroupTree.flattenAndScale
 
 import java.time.LocalDate
 
@@ -23,9 +24,12 @@ case class Proposal(
   reference: ProposalReference,
   allocations: NonEmptyList[Allocation],
   tpe: ProposalType = ProposalType.Queue(ToOActivation.None, IntPercent.unsafeFrom(0), Nil), // TODO
-  obsList: List[ItacObservation] = Nil,
+  groupTree: GroupTree[ItacObservation] = GroupTree.empty,
   cfpActive: DateInterval = DateInterval.between(LocalDate.now(), LocalDate.now())
 ) {
+
+  val obsList =
+    groupTree.flattenAndScale
 
   /** 
    * The possibly empty allocation for the specified category and band. There should never be more than

@@ -81,6 +81,16 @@ object TooBlocks {
             }
           else
             bins.map(tup => (evenDist, tup._2))
+
+          if (rem < evenDist)
+            distributeTime(t -| rem, tail) match {
+              case Nil => Nil
+              case distTail => (rem, index) :: distTail
+            }
+          else
+            bins.map(tup => (evenDist, tup._2)) // this will work because bins can't get any smaller from here on 
+
+
         }
       }
   }

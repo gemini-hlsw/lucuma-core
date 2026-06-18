@@ -21,7 +21,9 @@ object RejectTarget extends TimeBinMessageFormatter {
   def reason(raDecType: RaDecType): String = reasonTemplate.format(raDecType)
 }
 
-final case class RejectTarget(prop: ProposalShard, obs: ItacObservation, band: ScienceBand, raDecType: RejectTarget.RaDecType, cur: TimeSpan, max: TimeSpan) extends ObsRejectMessage {
+final case class RejectTarget(prop: ProposalShard, obs: ItacObservation.Scaled, band: ScienceBand, raDecType: RejectTarget.RaDecType, cur: TimeSpan, max: TimeSpan) extends ObsRejectMessage {
   def reason: String = RejectTarget.reason(raDecType)
   def detail: String = RejectTarget.detail(prop, obs, band, cur, max)
+  override def toString =
+    s"RejectTarget(${prop.reference}, requested: ${obs.time.toHours}, $band, $raDecType, cur: ${cur.toHours}, max: ${max.toHours})"
 }

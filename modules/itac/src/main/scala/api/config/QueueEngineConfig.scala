@@ -7,8 +7,8 @@ package edu.gemini.tac.qengine.api.config
  * A combination of configuration required by the Queue Engine.
  */
 final case class QueueEngineConfig(
-  binConfig:           SiteSemesterConfig,
-  TimeAccountingCategorySeq:          TimeAccountingCategorySequence,
+  binConfig: SiteSemesterConfig,
+  timeAccountingCategorySeq: TimeAccountingCategorySequence,
   restrictedBinConfig: RestrictionConfig = RestrictionConfig(),
 ) {
   def site = binConfig.site

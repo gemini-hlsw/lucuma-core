@@ -5,31 +5,32 @@ package edu.gemini.tac.qengine.impl
 
 import cats.data.State
 import cats.syntax.all.*
-import edu.gemini.tac.qengine.api.BucketsAllocation
-import edu.gemini.tac.qengine.api.QueueCalc
-import edu.gemini.tac.qengine.api.QueueEngine
-import edu.gemini.tac.qengine.api.config.ConditionsCategory
+// import edu.gemini.tac.qengine.api.BucketsAllocation
+// import edu.gemini.tac.qengine.api.QueueCalc
+// import edu.gemini.tac.qengine.api.config.ConditionsCategory
 import edu.gemini.tac.qengine.api.config.QueueEngineConfig
 import edu.gemini.tac.qengine.api.config.TimeRestriction
 import edu.gemini.tac.qengine.api.queue.ProposalQueue
 import edu.gemini.tac.qengine.api.queue.time.QueueTime
 import edu.gemini.tac.qengine.impl.block.BlockIterator
 import edu.gemini.tac.qengine.impl.queue.ProposalQueueBuilder
-import edu.gemini.tac.qengine.impl.resource.PerRightAscensionResource
+// import edu.gemini.tac.qengine.impl.resource.PerRightAscensionResource
 import edu.gemini.tac.qengine.impl.resource.RightAscensionMapResource
 import edu.gemini.tac.qengine.impl.resource.SemesterResource
-import edu.gemini.tac.qengine.log.AcceptMessage
+// import edu.gemini.tac.qengine.log.AcceptMessage
 import edu.gemini.tac.qengine.log.ProposalLog
-import edu.gemini.tac.qengine.log.RemovedRejectMessage
+// import edu.gemini.tac.qengine.log.RemovedRejectMessage
 import edu.gemini.tac.qengine.p1.*
 import edu.gemini.tac.qengine.util.BoundedTime
-import lucuma.core.data.Metadata
+// import lucuma.core.data.Metadata
 import lucuma.core.enums.ScienceBand
-import lucuma.core.enums.ScienceBand.*
+// import lucuma.core.enums.ScienceBand.*
 import lucuma.core.enums.ScienceSubtype
 import lucuma.core.enums.Site
 import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.util.Enumerated
+// import lucuma.core.model.IntCentiPercent
+// import edu.gemini.tac.qengine.api.config.Default
 
 object QueueEngine3 { //extends QueueEngine {
 
@@ -37,54 +38,64 @@ object QueueEngine3 { //extends QueueEngine {
     proposals:    List[Proposal],
     queueTimes:   (ScienceBand, Site) => QueueTime,
     config:       QueueEngineConfig,
-  ): QueueCalc = {
-
-    given Metadata = Metadata.placeholder
+  ): (SemesterResource, ProposalLog, List[ProposalQueue]) = {
 
     // Find all the observations that don't participate in the queue process, because their time
     // needs to be subtracted from the initail RightAscensionMapResource (which happens on construction). Then
     // finish building our SemesterResource
-    // val rolloverObs: List[ItacObservation]       = ???
-    // val classicalProps    = siteProposals(Band1).filter(_.mode == ScienceSubtype.Classical)
-    // val classicalObs      = classicalProps.flatMap(_.obsList)
-    // val rightAscensionMapResource   = RightAscensionMapResource(config.binConfig).reserveAvailable(rolloverObs ++ classicalObs)._1
-    // val compositeTimeRestrictionResource: List[TimeRestriction[BoundedTime]] = Nil
-    // val semesterResource  = new SemesterResource(rightAscensionMapResource, compositeTimeRestrictionResource)
+    val rolloverObs: List[ItacObservation]       = Nil 
+    val classicalProps    = proposals.filter(_.tpe.scienceSubtype == ScienceSubtype.Classical)
+    val classicalObs      = classicalProps.flatMap(_.obsList)
+    val rightAscensionMapResource   = RightAscensionMapResource(config.binConfig).reserveAvailable(rolloverObs ++ classicalObs)._1
+    val compositeTimeRestrictionResource: List[TimeRestriction[BoundedTime]] = Nil // do we need any of these?
+    val semesterResource  = new SemesterResource(rightAscensionMapResource, compositeTimeRestrictionResource)
 
     // We're done with classical proposals. Filter them out.
-    // val queueProposals: ScienceBand => List[Proposal] =
-    //   siteProposals.map(_.filter(_.mode != ScienceSubtype.Classical))
+    val queueProposals: List[Proposal] =
+      proposals.filter(_.tpe.scienceSubtype != ScienceSubtype.Classical)
 
-    // BlockIterator for a given site (some observations are filtered out) and band (some proposals are filtered out).
-    // def iteratorFor(band: ScienceBand, site: Site): BlockIterator =
-    //   BlockIterator(
-    //     queueTimes(band, site).TimeAccountingCategoryQuanta,
-    //     config.TimeAccountingCategorySeq.sequence,
-    //     TimeAccountingCategory
-    //       .values
-    //       .toList
-    //       .fproduct: tac =>
-    //         proposals.filter(_.allocations.exists(_.category === tac))
-    //       .toMap,
-    //     p => p.itacObservationsScaledForSiteAndBand(site, band)
-    //   )
+    // BlockIterator for a given site and band.
+    def iteratorFor(band: ScienceBand, site: Site): BlockIterator =
+      BlockIterator(
+        queueTimes(band, site).TimeAccountingCategoryQuanta,
+        config.timeAccountingCategorySeq.sequence,
+        TimeAccountingCategory
+          .values
+          .toList
+          .fproduct: cat =>
+            queueProposals.map(_.shardFor(site, cat, band))
+          .toMap,
+        p => p.observations
+      )
 
-    // // Build a queue for each site+band combination, in ascending order by band, alternating between sites.
-    // // The resulting queues will be combined somehow.
-    // val z = (Enumerated[ScienceBand].all, Enumerated[Site].all)
-    //   .tupled
-    //   .traverse: (band, site) => 
-    //     State[(SemesterResource, ProposalLog), ProposalQueue]: (res, log) =>
-    //       val stage = QueueCalcStage(
-    //         queue       = ProposalQueueBuilder(queueTimes(band, site), band),
-    //         iter        = iteratorFor(band, site), 
-    //         activeList  = _.itacObservationsScaledForSiteAndBand(site, band),
-    //         res         = res,
-    //         log         = log,
-    //       )
-    //       ((stage.resource, stage.log), stage.queue)
-    //   .run((???, ProposalLog.Empty))
-    //   .value
+    // Build a queue for each site+band combination, in ascending order by band, alternating between sites.
+    val ((remaining, log), queues) =
+      (Enumerated[ScienceBand].all, Enumerated[Site].all)
+        .tupled
+        .traverse: (band, site) => 
+          State[(SemesterResource, ProposalLog), ProposalQueue]: (res, log) =>
+            val stage = QueueCalcStage.compute(
+              queue       = ProposalQueueBuilder(queueTimes(band, site), band, site),
+              iter        = iteratorFor(band, site), 
+              activeList  = _.observations,
+              res         = res,
+              log         = log,
+            )
+            ((stage.resource, stage.log), stage.queue)
+        .run((semesterResource, ProposalLog.Empty))
+        .value
+ 
+    // ACTUALLY we should do the following after each pass in order to free up time. There's no
+    // point allocating time in the band 2 shard if there's not time for the band 1 shard.
+
+    // We now have queues for every (site, band) and can show results similar to what we did in OCS
+    // for each. But for the final queue (there is only one) we need to discard any proposals with
+    // kicked-out shards and add the shards' times back to the partners. This is an error condition and
+    // it indicates times need to be adjusted. 
+
+
+    (remaining, log, queues)
+
 
     // val ((finalResource, band123log), (queue1WithoutClassical, queue2, queue3)) = (
     //   runQueue(Band1), runQueue(Band2), runQueue(Band3)
@@ -126,12 +137,7 @@ object QueueEngine3 { //extends QueueEngine {
     //     }
     // }
 
-    ???
-
   }
 
 }
-
-
-
 
