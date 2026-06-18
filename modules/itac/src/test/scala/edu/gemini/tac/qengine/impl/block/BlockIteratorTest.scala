@@ -3,6 +3,7 @@
 
 package edu.gemini.tac.qengine.impl.block
 
+import cats.data.NonEmptyList
 import edu.gemini.tac.qengine.ItacSuite
 import edu.gemini.tac.qengine.api.queue.time.TimeAccountingCategoryTime
 import edu.gemini.tac.qengine.p1.*
@@ -13,6 +14,7 @@ import lucuma.core.enums.Site
 import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.enums.WaterVapor
+import lucuma.core.model.Allocation
 import lucuma.core.model.CloudExtinction
 import lucuma.core.model.ConstraintSet
 import lucuma.core.model.ElevationRange
@@ -25,8 +27,6 @@ import lucuma.core.util.TimeSpan
 import org.junit.*
 
 import Assert.*
-import lucuma.core.model.Allocation
-import cats.data.NonEmptyList
 
 class BlockIteratorTest extends ItacSuite {
   import TimeAccountingCategory.{ BR, US }

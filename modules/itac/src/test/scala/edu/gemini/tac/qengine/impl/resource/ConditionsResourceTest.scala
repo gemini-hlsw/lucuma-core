@@ -3,6 +3,7 @@
 
 package edu.gemini.tac.qengine.impl.resource
 
+import cats.data.NonEmptyList
 import cats.implicits.*
 import edu.gemini.tac.qengine.ItacSuite
 import edu.gemini.tac.qengine.api.config.ConditionsBin
@@ -13,10 +14,12 @@ import edu.gemini.tac.qengine.log.RejectConditions
 import edu.gemini.tac.qengine.p1.*
 import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.enums.Half
+import lucuma.core.enums.ScienceBand
 import lucuma.core.enums.Site
 import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.enums.WaterVapor
+import lucuma.core.model.Allocation
 import lucuma.core.model.CloudExtinction
 import lucuma.core.model.ConstraintSet
 import lucuma.core.model.ElevationRange
@@ -29,9 +32,6 @@ import lucuma.core.util.Enumerated
 import lucuma.core.util.TimeSpan
 
 import Cat.*
-import lucuma.core.enums.ScienceBand
-import cats.data.NonEmptyList
-import lucuma.core.model.Allocation
 
 class ConditionsResourceTest extends ItacSuite {
   import TimeAccountingCategory.KR

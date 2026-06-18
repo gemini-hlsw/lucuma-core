@@ -3,6 +3,7 @@
 
 package edu.gemini.tac.qengine.impl
 
+import edu.gemini.tac.qengine.p1.GroupTree
 import edu.gemini.tac.qengine.p1.Proposal
 import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.enums.Half
@@ -17,7 +18,6 @@ import lucuma.core.model.Semester.YearInt
 import lucuma.core.util.TimeSpan
 import munit.FunSuite
 import org.junit.Assert
-import edu.gemini.tac.qengine.p1.GroupTree
 
 class QueueEngineBandProblemsTest extends FunSuite {
   import QueueEngineBandProblems._

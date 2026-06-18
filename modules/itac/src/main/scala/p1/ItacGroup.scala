@@ -3,13 +3,12 @@
 
 package edu.gemini.tac.qengine.p1
 
-import eu.timepit.refined.types.numeric.NonNegShort
-import cats.free.Free
 import cats.*
+import cats.free.Free
+import cats.syntax.all.*
+import eu.timepit.refined.types.numeric.NonNegShort
 import lucuma.core.model.Group
 import lucuma.core.model.Observation
-import eu.timepit.refined.types.numeric.PosLong
-import cats.syntax.all.*
 
 /**
  * To handle groups we unfold the flattened structure we get from the database into
@@ -75,20 +74,3 @@ object GroupTree:
           t.children.foreach(go(_, indent + 2))
       )
     go(self, 0)
-
-@main def main(): Unit = {
-
-  import GroupTree.Item.*
-  import GroupTree.*
-
-  val items = 
-    List(
-      Leaf(Observation.Id(PosLong.unsafeFrom(1)), None),
-      Leaf(Observation.Id(PosLong.unsafeFrom(2)), None),
-      Leaf(Observation.Id(PosLong.unsafeFrom(3)), Some(Group.Id(PosLong.unsafeFrom(1)))),
-      Node(Group.Id(PosLong.unsafeFrom(1)), None, None),
-    )
-
-  GroupTree.unfold(items).dump()
-
-}

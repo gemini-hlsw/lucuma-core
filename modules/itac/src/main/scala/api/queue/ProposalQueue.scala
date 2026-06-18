@@ -8,9 +8,9 @@ import edu.gemini.tac.qengine.api.queue.time.QueueTime
 import edu.gemini.tac.qengine.p1.*
 import edu.gemini.tac.qengine.util.BoundedTime
 import lucuma.core.enums.ScienceBand
+import lucuma.core.enums.Site
 import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.util.TimeSpan
-import lucuma.core.enums.Site
 
 
 // Wait, do we really need to care about bands at all here? We need to know whether
