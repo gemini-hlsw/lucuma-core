@@ -51,7 +51,7 @@ object GhostAgsSelectionApp extends IOApp.Simple with AgsSelectionSample {
                 ghostParams,
                 candidates
               )
-            pprint.pprintln(r.stats)
+            println(r.stats.show)
             pprint.pprintln(r.analyses.sortUsablePositions)
             r.analyses.sortUsablePositions
           }
