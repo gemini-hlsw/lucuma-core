@@ -89,10 +89,9 @@ object Fixtures:
   def gmosImagingPatrolIntersectionExpr(offsets: List[Offset]): ShapeExpression =
     offsets
       .map(o => gmos.oiwfs.patrolField.imagingMode.patrolFieldAt(posAngle, o, port))
-      .reduce((a, b) => a ∩ b)
+      .reduce(_ ∩ _)
 
   // Candidate guide stars
-
   def testGuideStarOffsets(shape: Shape, n: Int, seed: Long): Array[Offset] =
     // calculate positions on mas
     val b   = shape.boundingOffsets
