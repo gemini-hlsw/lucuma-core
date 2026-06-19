@@ -32,6 +32,7 @@ lazy val http4sVersion              = "0.23.34"
 lazy val http4sDomVersion           = "0.2.12"
 lazy val http4sJdkHttpClientVersion = "0.10.0"
 lazy val jtsVersion                 = "0.4.2-40-1c7fd2f-20260618T021754Z-SNAPSHOT"
+// lazy val jtsVersion                 = "0.4.2"
 lazy val kindProjectorVersion       = "0.13.2"
 lazy val kittensVersion             = "3.5.0"
 lazy val log4catsVersion            = "2.8.0"
@@ -286,11 +287,9 @@ lazy val catalogTests = crossProject(JVMPlatform, JSPlatform)
 lazy val benchmarks = project
   .in(file("modules/benchmarks"))
   .dependsOn(core.jvm)
-  .enablePlugins(NoPublishPlugin, AutomateHeaderPlugin)
+  .enablePlugins(NoPublishPlugin, AutomateHeaderPlugin, JmhPlugin)
   .settings(
-    name                      := "lucuma-benchmarks",
-    run / fork                := true,
-    Compile / run / mainClass := Some("lucuma.bench.RelateNgBench")
+    name := "lucuma-benchmarks"
   )
 
 // for publishing to npm

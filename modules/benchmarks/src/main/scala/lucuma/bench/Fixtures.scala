@@ -73,7 +73,7 @@ object Fixtures:
 
   val gmosImagingFovSize: Angle = Angle.fromMicroarcseconds(330340000L)
 
-  // ugenerate offsets in an spiral for gmos wita fixed seed
+  // generate offsets in an spiral for gmos wita fixed seed
   def spiralOffsets(n: Int, size: Angle, seed: Int): List[Offset] =
     CatsRandom
       .scalaUtilRandomSeedInt[IO](seed)
@@ -84,9 +84,7 @@ object Fixtures:
       .toList
 
   /**
-   * Reduction of the GMOS imaging OIWFS patrol field over every offset with `∩` — exactly what
-   * `AgsParams.posCalculations` builds per position angle. Each `∩` is a JTS overlay intersection,
-   * so this is `n - 1` overlays plus the eval of the resulting expression tree.
+   * Reduction of the GMOS imaging OIWFS patrol field over every offset with `∩`
    */
   def gmosImagingPatrolIntersectionExpr(offsets: List[Offset]): ShapeExpression =
     offsets
