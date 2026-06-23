@@ -58,11 +58,25 @@ trait ArbConfiguration:
   given Cogen[ObservingMode.GmosNorthLongSlit] =
     Cogen[GmosNorthGrating].contramap(_.grating)
 
+  given Arbitrary[ObservingMode.GmosNorthMos] =
+    Arbitrary:
+      arbitrary[GmosNorthGrating].map(ObservingMode.GmosNorthMos.apply)
+
+  given Cogen[ObservingMode.GmosNorthMos] =
+    Cogen[GmosNorthGrating].contramap(_.grating)
+
   given Arbitrary[ObservingMode.GmosSouthLongSlit] =
     Arbitrary:
       arbitrary[GmosSouthGrating].map(ObservingMode.GmosSouthLongSlit.apply)
 
   given Cogen[ObservingMode.GmosSouthLongSlit] =
+    Cogen[GmosSouthGrating].contramap(_.grating)
+
+  given Arbitrary[ObservingMode.GmosSouthMos] =
+    Arbitrary:
+      arbitrary[GmosSouthGrating].map(ObservingMode.GmosSouthMos.apply)
+
+  given Cogen[ObservingMode.GmosSouthMos] =
     Cogen[GmosSouthGrating].contramap(_.grating)
 
   given Arbitrary[ObservingMode.GmosNorthImaging] =
@@ -120,8 +134,10 @@ trait ArbConfiguration:
         arbitrary[ObservingMode.GhostIfu.type],
         arbitrary[ObservingMode.GmosNorthImaging],
         arbitrary[ObservingMode.GmosNorthLongSlit],
+        arbitrary[ObservingMode.GmosNorthMos],
         arbitrary[ObservingMode.GmosSouthImaging],
         arbitrary[ObservingMode.GmosSouthLongSlit],
+        arbitrary[ObservingMode.GmosSouthMos],
         arbitrary[ObservingMode.Igrins2LongSlit.type],
         arbitrary[ObservingMode.GnirsLongSlit],
         arbitrary[ObservingMode.Visitor]
@@ -137,8 +153,10 @@ trait ArbConfiguration:
         case m: ObservingMode.GhostIfu.type        => perturb(s, m)
         case m: ObservingMode.GmosNorthImaging     => perturb(s, m)
         case m: ObservingMode.GmosNorthLongSlit    => perturb(s, m)
+        case m: ObservingMode.GmosNorthMos         => perturb(s, m)
         case m: ObservingMode.GmosSouthImaging     => perturb(s, m)
         case m: ObservingMode.GmosSouthLongSlit    => perturb(s, m)
+        case m: ObservingMode.GmosSouthMos         => perturb(s, m)
         case m: ObservingMode.Igrins2LongSlit.type => perturb(s, m)
         case m: ObservingMode.GnirsLongSlit        => perturb(s, m)
         case m: ObservingMode.Visitor              => perturb(s, m)
