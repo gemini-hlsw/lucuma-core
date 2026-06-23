@@ -20,10 +20,14 @@ trait probes:
         GuideProbe.PWFS2.some
       case (ObservingModeType.Flamingos2LongSlit | ObservingModeType.Flamingos2Imaging, TrackType.Sidereal) =>
         GuideProbe.Flamingos2OIWFS.some
-      // gmos modes could be condensed but I'll split them into longslit and imaging anyway
+      // gmos modes could be condensed but I'll split them into longslit, imaging, and mos anyway
       case (ObservingModeType.GmosNorthLongSlit | ObservingModeType.GmosSouthLongSlit, TrackType.Nonsidereal) =>
         GuideProbe.PWFS2.some
       case (ObservingModeType.GmosNorthLongSlit | ObservingModeType.GmosSouthLongSlit, TrackType.Sidereal) =>
+        GuideProbe.GmosOIWFS.some
+      case (ObservingModeType.GmosNorthMos | ObservingModeType.GmosSouthMos, TrackType.Nonsidereal) =>
+        GuideProbe.PWFS2.some
+      case (ObservingModeType.GmosNorthMos | ObservingModeType.GmosSouthMos, TrackType.Sidereal) =>
         GuideProbe.GmosOIWFS.some
       case (ObservingModeType.GmosNorthImaging | ObservingModeType.GmosSouthImaging, TrackType.Nonsidereal) =>
         GuideProbe.PWFS2.some
