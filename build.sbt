@@ -31,7 +31,7 @@ lazy val geminiLocalesVersion       = "0.12.3"
 lazy val http4sVersion              = "0.23.34"
 lazy val http4sDomVersion           = "0.2.12"
 lazy val http4sJdkHttpClientVersion = "0.10.0"
-lazy val jtsVersion                 = "0.4.2"
+lazy val jtsVersion                 = "0.5.0"
 lazy val kindProjectorVersion       = "0.13.2"
 lazy val kittensVersion             = "3.5.0"
 lazy val log4catsVersion            = "2.8.0"
@@ -51,7 +51,7 @@ lazy val spireVersion               = "0.18.0"
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
-val root = tlCrossRootProject.aggregate(core, testkit, tests, catalog, ags, catalogTestkit, catalogTests, horizons, horizonsTests, itac, npm)
+val root = tlCrossRootProject.aggregate(core, testkit, tests, catalog, ags, catalogTestkit, catalogTests, horizons, horizonsTests, itac, benchmarks, npm)
 
 lazy val core = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Full)
@@ -282,6 +282,14 @@ lazy val catalogTests = crossProject(JVMPlatform, JSPlatform)
     )
   )
 
+
+lazy val benchmarks = project
+  .in(file("modules/benchmarks"))
+  .dependsOn(core.jvm)
+  .enablePlugins(NoPublishPlugin, AutomateHeaderPlugin, JmhPlugin)
+  .settings(
+    name := "lucuma-benchmarks"
+  )
 
 // for publishing to npm
 lazy val npmPackage = taskKey[File]("Prepare the npm package")

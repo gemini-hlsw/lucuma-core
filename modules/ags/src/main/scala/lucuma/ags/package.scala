@@ -313,29 +313,39 @@ case class AgsStats(
   analysisNanos:        Long
 ):
   def format: String =
-    def ms(nanos: Long): String = f"${nanos / 1.0e6}%.2f ms"
+    def ms(nanos: Long): String           = f"${nanos / 1.0e6}%.2f ms"
+    def pct(num: Long, den: Long): String =
+      if (den <= 0) "n/a" else f"${100.0 * num / den}%.1f%%"
 
     val totalNanos = contextNanos + analysisNanos
-    val histogram  =
+    val throughput =
+      if (analysisNanos <= 0) ""
+      else f"  (${analysisCount / (analysisNanos / 1.0e6)}%.0f analyses/ms)"
+
+    val outcomes =
       if (resultCounts.isEmpty) "    (none)"
       else
         resultCounts.toList
           .sortBy: (label, cnt) =>
             (-cnt, label)
           .map: (label, cnt) =>
-            f"    $label%-18s $cnt"
+            f"    $label%-18s $cnt%,7d  (${pct(cnt.toLong, analysisCount.toLong)})"
           .mkString("\n")
 
+    val rows = List(
+      "candidates"    -> f"${candidateCount}%,d supplied, ${acceptedCount}%,d accepted (${pct(acceptedCount.toLong, candidateCount.toLong)}%s), ${usableCandidateCount}%,d usable (${pct(usableCandidateCount.toLong, acceptedCount.toLong)}%s of accepted)",
+      "geometry"      -> s"$posAngleCount pos angles, $acqOffsetCount acq + $sciOffsetCount sci offsets, $positionCount positions",
+      "analyses"      -> f"${analysisCount}%,d runAnalysis calls$throughput",
+      "ctx timing"    -> s"${ms(contextNanos)} (${pct(contextNanos, totalNanos)} of total)",
+      "calcs timing"  -> s"${ms(calcsNanos)} (${pct(calcsNanos, totalNanos)} of total, overlay build)",
+      "analysis time" -> s"${ms(analysisNanos)} (${pct(analysisNanos, totalNanos)} of total, predicate loop)",
+      "total time"    -> ms(totalNanos)
+    ).map((label, value) => f"  ${label + ":"}%-15s $value").mkString("\n")
+
     s"""|AGS stats:
-        |  candidates:   $candidateCount supplied, $acceptedCount accepted, $usableCandidateCount usable
-        |  geometry:     $posAngleCount pos angles, $acqOffsetCount acq + $sciOffsetCount sci offsets, $positionCount positions
-        |  analyses:     $analysisCount runAnalysis calls
-        |  ctx timing:   ${ms(contextNanos)}
-        |  calcs timing: ${ms(calcsNanos)}
-        |  analysis time:${ms(analysisNanos)}
-        |  total time:   ${ms(totalNanos)}
+        |$rows
         |  outcomes:
-        |$histogram""".stripMargin
+        |$outcomes""".stripMargin
 
 object AgsStats:
   given Show[AgsStats] = Show.show(_.format)
