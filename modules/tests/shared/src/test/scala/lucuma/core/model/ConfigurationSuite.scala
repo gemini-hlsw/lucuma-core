@@ -3,6 +3,7 @@
 
 package lucuma.core.model
 
+import cats.syntax.all.*
 import lucuma.core.model.arb.ArbConfiguration.given
 import munit.ScalaCheckSuite
 import org.scalacheck.*
@@ -24,3 +25,17 @@ final class ConfigurationSuite extends ScalaCheckSuite:
       val cb = cfg.copy(observingMode = b)
       assert(ca.subsumes(cb))
       assert(cb.subsumes(ca))
+
+  test("GMOS-S MOS is constrained by grating"):
+    forAll: (cfg: Configuration, a: GmosNorthMos, b: GmosNorthMos) =>
+      val ca = cfg.copy(observingMode = a)
+      val cb = cfg.copy(observingMode = b)
+      assertEquals(ca.subsumes(cb), a.grating === b.grating)
+      assertEquals(cb.subsumes(ca), a.grating === b.grating)
+
+  test("GMOS-S MOS is constrained by grating"):
+    forAll: (cfg: Configuration, a: GmosSouthMos, b: GmosSouthMos) =>
+      val ca = cfg.copy(observingMode = a)
+      val cb = cfg.copy(observingMode = b)
+      assertEquals(ca.subsumes(cb), a.grating === b.grating)
+      assertEquals(cb.subsumes(ca), a.grating === b.grating)
