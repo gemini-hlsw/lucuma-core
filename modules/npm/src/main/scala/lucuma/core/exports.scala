@@ -40,7 +40,7 @@ def hms2deg(hms: String): Double =
 def dms2deg(dms: String): Double =
   AngleParsers.dms.parseAll(dms) match
     case Left(value)  => throw new IllegalArgumentException(value.toString)
-    case Right(value) => value.toDoubleDegrees
+    case Right(value) => value.toSignedDoubleDegrees
 
 @JSExportTopLevel("signedArcSeconds")
 def signedArcSeconds(arcseconds: Double | String) =
@@ -122,9 +122,9 @@ def parseVisitId(maybeVisitId: String): js.UndefOr[String] =
 
 @JSExportTopLevel("parseDmsString")
 def parseDmsString(maybeDms: String): js.UndefOr[String] =
-  Angle.fromStringDMS
+  Angle.fromStringSignedDMS
     .getOption(maybeDms)
-    .fold(js.undefined)(Angle.fromStringDMS.reverseGet(_).dropRight(3))
+    .fold(js.undefined)(Angle.fromStringSignedDMS.reverseGet(_).dropRight(3))
 
 @JSExportTopLevel("parseHmsString")
 def parseHmsString(maybeHms: String): js.UndefOr[String] =

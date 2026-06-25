@@ -40,8 +40,13 @@ class ExportsTest extends munit.FunSuite {
   test("dms2deg") {
     assertEquals(dms2deg("+00:00:00.00"), 0.0)
     assertEquals(dms2deg("+15:00:00.00"), 15.0)
-    assertEquals(dms2deg("-15:00:00.00"), 345d)
     assertEquals(dms2deg("+23:26:15.00"), 23.4375)
+    // Declinations are in [-90, 90], so negative angles must stay negative
+    // rather than being shown as their equivalent positive angle.
+    assertEquals(dms2deg("-15:00:00.00"), -15d)
+    assertEquals(dms2deg("-38:00:00.00"), -38d)
+    assertEquals(dms2deg("-90:00:00.00"), -90d)
+    assertEquals(dms2deg("+90:00:00.00"), 90d)
   }
 
   test("signedArcSeconds") {
@@ -155,10 +160,10 @@ class ExportsTest extends munit.FunSuite {
   }
 
   test("parseDmsString") {
-    // Canonical output format is DD:MM:SS.MMMMMM (no sign); input requires a sign
-    assertEquals(parseDmsString("+00:00:00.000000").toOption, Some("00:00:00.000"))
-    assertEquals(parseDmsString("+15:00:00.00").toOption, Some("15:00:00.000"))
-    assertEquals(parseDmsString("-15:00:00.00").toOption, Some("345:00:00.000"))
+    assertEquals(parseDmsString("+00:00:00.000000").toOption, Some("+00:00:00.000"))
+    assertEquals(parseDmsString("+15:00:00.00").toOption, Some("+15:00:00.000"))
+    assertEquals(parseDmsString("-15:00:00.00").toOption, Some("-15:00:00.000"))
+    assertEquals(parseDmsString("-38:00:00.00").toOption, Some("-38:00:00.000"))
     assertEquals(parseDmsString("invalid").toOption, None)
     assertEquals(parseDmsString("000:00:00.000").toOption, None)
   }
@@ -194,7 +199,7 @@ class ExportsTest extends munit.FunSuite {
   }
 
   test("toDeclination") {
-    // dms format: +/-DD:MM:SS.MMMMMM (6 sub-second digits, always signed)
+    // dms format: +/-DD:MM:SS.MMM (3 sub-second digits, always signed)
     val dec0 = toDeclination(0.0)
     assertNoDiff(dec0.dms, "+00:00:00.000")
     assertEquals(dec0.degrees, 0.0)
@@ -213,6 +218,12 @@ class ExportsTest extends munit.FunSuite {
     assertNoDiff(decNeg.dms, "-30:00:00.000")
     assertEquals(decNeg.degrees, -30.0)
     assertEquals(decNeg.microarcseconds.toString(), "1188000000000")
+
+    // An angle in [270, 360) is a negative declination: dms is signed and
+    // degrees is the signed value in [-90, 90], not the equivalent positive angle.
+    val decWrap = toDeclination(350.9658694444444)
+    assertNoDiff(decWrap.dms, "-09:02:02.870")
+    assertEquals(decWrap.degrees, -9.034130555555556)
   }
 
   test("toAngle") {
