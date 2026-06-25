@@ -7,17 +7,16 @@ import lucuma.core.math.RightAscension
 import lucuma.core.math.validation.MathValidators
 
 import scala.scalajs.js
-import scala.scalajs.js.annotation.JSExport
 
-final case class RightAscensionJS(ra: RightAscension):
+final class RightAscensionJS(ra: RightAscension) extends js.Object:
 
-  val ha  = ra.toHourAngle
-  val µas = ra.toAngle.toMicroarcseconds
-  val µs  = ha.toMicroseconds
+  private val ha  = ra.toHourAngle
+  private val µas = ra.toAngle.toMicroarcseconds
+  private val µs  = ha.toMicroseconds
 
-  def divMicro(micro: Long, denom: Int) = BigDecimal(micro, 6) / denom
+  private def divMicro(micro: Long, denom: Int) = BigDecimal(micro, 6) / denom
 
-  @JSExport val hms: String             = MathValidators.truncatedRA.reverseGet(ra)
-  @JSExport val hours: Double           = divMicro(µs, 3_600).floatValue
-  @JSExport val degrees: Double         = divMicro(µas, 3_600).floatValue
-  @JSExport val microseconds: js.BigInt = js.BigInt(µs.toString())
+  val hms: String             = MathValidators.truncatedRA.reverseGet(ra)
+  val hours: Double           = divMicro(µs, 3_600).floatValue
+  val degrees: Double         = divMicro(µas, 3_600).floatValue
+  val microseconds: js.BigInt = js.BigInt(µs.toString())

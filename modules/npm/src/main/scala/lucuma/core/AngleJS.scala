@@ -7,27 +7,26 @@ import lucuma.core.math.Angle
 import lucuma.core.math.HourAngle
 
 import scala.scalajs.js
-import scala.scalajs.js.annotation.JSExport
 
-final case class AngleJS(a: Angle):
+final class AngleJS(a: Angle) extends js.Object:
 
-  val ha  = Angle.hourAngle.get(a)
-  val µas = a.toMicroarcseconds
-  val µs  = ha.toMicroseconds
+  private val ha  = Angle.hourAngle.get(a)
+  private val µas = a.toMicroarcseconds
+  private val µs  = ha.toMicroseconds
 
-  def divMicro(micro:    Long, denom: Int) = (BigDecimal(micro, 6) / denom).doubleValue
-  def divArcseconds(div: Int)              = divMicro(µas, div)
-  def divSeconds(div:    Int)              = divMicro(µs, div)
+  private def divMicro(micro:    Long, denom: Int) = (BigDecimal(micro, 6) / denom).doubleValue
+  private def divArcseconds(div: Int)              = divMicro(µas, div)
+  private def divSeconds(div:    Int)              = divMicro(µs, div)
 
-  @JSExport val arcminutes: Double         = divArcseconds(60)
-  @JSExport val arcseconds: Double         = BigDecimal(µas, 6).doubleValue
-  @JSExport val degrees: Double            = divArcseconds(3_600)
-  @JSExport val dms: String                = Angle.dms.get(a).format.dropRight(3)
-  @JSExport val hms: String                = HourAngle.HMS(ha).format.dropRight(3)
-  @JSExport val hours: Double              = divSeconds(3_600)
-  @JSExport val microarcseconds: js.BigInt = js.BigInt(µas.toString())
-  @JSExport val microseconds: Double       = µs.toDouble
-  @JSExport val milliarcseconds: Double    = BigDecimal(µas, 3).doubleValue
-  @JSExport val milliseconds: Double       = BigDecimal(µs, 3).doubleValue
-  @JSExport val minutes: Double            = divSeconds(60)
-  @JSExport val seconds: Double            = BigDecimal(µs, 6).doubleValue
+  val arcminutes: Double         = divArcseconds(60)
+  val arcseconds: Double         = BigDecimal(µas, 6).doubleValue
+  val degrees: Double            = divArcseconds(3_600)
+  val dms: String                = Angle.dms.get(a).format.dropRight(3)
+  val hms: String                = HourAngle.HMS(ha).format.dropRight(3)
+  val hours: Double              = divSeconds(3_600)
+  val microarcseconds: js.BigInt = js.BigInt(µas.toString())
+  val microseconds: Double       = µs.toDouble
+  val milliarcseconds: Double    = BigDecimal(µas, 3).doubleValue
+  val milliseconds: Double       = BigDecimal(µs, 3).doubleValue
+  val minutes: Double            = divSeconds(60)
+  val seconds: Double            = BigDecimal(µs, 6).doubleValue
