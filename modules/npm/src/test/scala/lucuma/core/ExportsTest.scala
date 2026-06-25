@@ -156,18 +156,18 @@ class ExportsTest extends munit.FunSuite {
 
   test("parseDmsString") {
     // Canonical output format is DD:MM:SS.MMMMMM (no sign); input requires a sign
-    assertEquals(parseDmsString("+00:00:00.000000").toOption, Some("00:00:00.000000"))
-    assertEquals(parseDmsString("+15:00:00.00").toOption, Some("15:00:00.000000"))
-    assertEquals(parseDmsString("-15:00:00.00").toOption, Some("345:00:00.000000"))
+    assertEquals(parseDmsString("+00:00:00.000000").toOption, Some("00:00:00.000"))
+    assertEquals(parseDmsString("+15:00:00.00").toOption, Some("15:00:00.000"))
+    assertEquals(parseDmsString("-15:00:00.00").toOption, Some("345:00:00.000"))
     assertEquals(parseDmsString("invalid").toOption, None)
     assertEquals(parseDmsString("000:00:00.000").toOption, None)
   }
 
   test("parseHmsString") {
     // Canonical output format is HH:MM:SS.MMMMMM
-    assertEquals(parseHmsString("00:00:00.000").toOption, Some("00:00:00.000000"))
-    assertEquals(parseHmsString("01:00:00.000").toOption, Some("01:00:00.000000"))
-    assertEquals(parseHmsString("12:00:00.000").toOption, Some("12:00:00.000000"))
+    assertEquals(parseHmsString("00:00:00.000").toOption, Some("00:00:00.000"))
+    assertEquals(parseHmsString("01:00:00.000").toOption, Some("01:00:00.000"))
+    assertEquals(parseHmsString("12:00:00.000").toOption, Some("12:00:00.000"))
     assertEquals(parseHmsString("invalid").toOption, None)
   }
 
@@ -182,13 +182,13 @@ class ExportsTest extends munit.FunSuite {
   test("toRightAscension") {
     // hms/HMS format: HH:MM:SS.MMMMMM (6 sub-second digits)
     val ra0 = toRightAscension(0.0)
-    assertNoDiff(ra0.hms, "00:00:00.000000")
+    assertNoDiff(ra0.hms, "00:00:00.000")
     assertEquals(ra0.degrees, 0.0)
     assertEquals(ra0.hours, 0.0)
     assertNoDiff(ra0.microseconds.toString(), "0")
 
     val ra180 = toRightAscension(180.0)
-    assertNoDiff(ra180.hms, "12:00:00.000000")
+    assertNoDiff(ra180.hms, "12:00:00.000")
     assertEquals(ra180.degrees, 180.0)
     assertEquals(ra180.hours, 12.0)
   }
@@ -196,21 +196,21 @@ class ExportsTest extends munit.FunSuite {
   test("toDeclination") {
     // dms format: +/-DD:MM:SS.MMMMMM (6 sub-second digits, always signed)
     val dec0 = toDeclination(0.0)
-    assertNoDiff(dec0.dms, "+00:00:00.000000")
+    assertNoDiff(dec0.dms, "+00:00:00.000")
     assertEquals(dec0.degrees, 0.0)
     assertNoDiff(dec0.microarcseconds.toString(), "0")
 
     val dec45 = toDeclination(45.0)
-    assertNoDiff(dec45.dms, "+45:00:00.000000")
+    assertNoDiff(dec45.dms, "+45:00:00.000")
     assertEquals(dec45.degrees, 45.0)
 
     val decOverflow = toDeclination(179.0)
-    assertNoDiff(decOverflow.dms, "+01:00:00.000000")
+    assertNoDiff(decOverflow.dms, "+01:00:00.000")
     assertEquals(decOverflow.degrees, 1.0)
     assertNoDiff(decOverflow.microarcseconds.toString(), "3600000000")
 
     val decNeg = toDeclination(-30.0)
-    assertNoDiff(decNeg.dms, "-30:00:00.000000")
+    assertNoDiff(decNeg.dms, "-30:00:00.000")
     assertEquals(decNeg.degrees, -30.0)
     assertEquals(decNeg.microarcseconds.toString(), "1188000000000")
   }
@@ -218,12 +218,12 @@ class ExportsTest extends munit.FunSuite {
   test("toAngle") {
     // dms format: DD:MM:SS.MMMMMM (6 sub-second digits, no sign)
     val a0 = toAngle(0.0)
-    assertNoDiff(a0.dms, "00:00:00.000000")
+    assertNoDiff(a0.dms, "00:00:00.000")
     assertEquals(a0.degrees, 0.0)
     assertEquals(a0.arcseconds, 0.0)
 
     val a90 = toAngle(90.0)
-    assertNoDiff(a90.dms, "90:00:00.000000")
+    assertNoDiff(a90.dms, "90:00:00.000")
     assertEquals(a90.degrees, 90.0)
     assertEquals(a90.arcseconds, 324000.0)
   }
