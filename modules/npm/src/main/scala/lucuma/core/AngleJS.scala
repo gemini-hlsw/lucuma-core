@@ -22,8 +22,8 @@ final case class AngleJS(a: Angle):
   @JSExport val arcminutes: Double         = divArcseconds(60)
   @JSExport val arcseconds: Double         = BigDecimal(µas, 6).doubleValue
   @JSExport val degrees: Double            = divArcseconds(3_600)
-  @JSExport val dms: String                = Angle.dms.get(a).format
-  @JSExport val hms: String                = HourAngle.HMS(ha).format
+  @JSExport val dms: String                = Angle.dms.get(a).format.dropRight(3)
+  @JSExport val hms: String                = HourAngle.HMS(ha).format.dropRight(3)
   @JSExport val hours: Double              = divSeconds(3_600)
   @JSExport val microarcseconds: js.BigInt = js.BigInt(µas.toString())
   @JSExport val microseconds: Double       = µs.toDouble

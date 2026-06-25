@@ -124,13 +124,13 @@ def parseVisitId(maybeVisitId: String): js.UndefOr[String] =
 def parseDmsString(maybeDms: String): js.UndefOr[String] =
   Angle.fromStringDMS
     .getOption(maybeDms)
-    .fold(js.undefined)(Angle.fromStringDMS.reverseGet)
+    .fold(js.undefined)(Angle.fromStringDMS.reverseGet(_).dropRight(3))
 
 @JSExportTopLevel("parseHmsString")
 def parseHmsString(maybeHms: String): js.UndefOr[String] =
   RightAscension.fromStringHMS
     .getOption(maybeHms)
-    .fold(js.undefined)(RightAscension.fromStringHMS.reverseGet)
+    .fold(js.undefined)(MathValidators.truncatedRA.reverseGet)
 
 @JSExportTopLevel("parseEpochString")
 def parseEpochString(maybeEpoch: String): js.UndefOr[String] =
