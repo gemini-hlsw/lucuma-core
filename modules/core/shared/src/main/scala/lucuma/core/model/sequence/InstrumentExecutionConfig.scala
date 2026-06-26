@@ -35,10 +35,6 @@ sealed trait InstrumentExecutionConfig:
 
 object InstrumentExecutionConfig:
 
-  case class Visitor(visitorInstrument: Instrument) extends InstrumentExecutionConfig derives Eq:
-    override def instrument: Option[Instrument] = visitorInstrument.some
-    val isComplete = true
-
   /**
    * Exchange observations (Keck/Subaru) have no Gemini instrument and no
    * generated sequence.
@@ -46,6 +42,9 @@ object InstrumentExecutionConfig:
   case object Exchange extends InstrumentExecutionConfig:
     override def instrument: Option[Instrument] = none
     override def isComplete: Boolean            = true
+
+  val exchange: Prism[InstrumentExecutionConfig, Exchange.type] =
+    GenPrism[InstrumentExecutionConfig, Exchange.type]
 
   case class Flamingos2(
     executionConfig: ExecutionConfig[f2.Flamingos2StaticConfig, f2.Flamingos2DynamicConfig]
@@ -142,6 +141,13 @@ object InstrumentExecutionConfig:
 
   val igrins2: Prism[InstrumentExecutionConfig, Igrins2] =
     GenPrism[InstrumentExecutionConfig, Igrins2]
+
+  case class Visitor(visitorInstrument: Instrument) extends InstrumentExecutionConfig derives Eq:
+    override def instrument: Option[Instrument] = visitorInstrument.some
+    val isComplete = true
+
+  val visitor: Prism[InstrumentExecutionConfig, Visitor] =
+    GenPrism[InstrumentExecutionConfig, Visitor]
 
   given Eq[InstrumentExecutionConfig] =
     Eq.instance:
