@@ -31,13 +31,15 @@ trait ArbGnirsDynamicConfig:
   given Arbitrary[GnirsFpu] = Arbitrary:
     Gen.oneOf(
       arbitrary[GnirsFpuSlit].map(GnirsFpu.Slit(_)),
+      arbitrary[GnirsFpuIfu].map(GnirsFpu.Ifu(_)),
       arbitrary[GnirsFpuOther].map(GnirsFpu.Other(_))
     )
 
   given Cogen[GnirsFpu] =
-    Cogen[Either[GnirsFpuSlit, GnirsFpuOther]].contramap:
-      case GnirsFpu.Slit(slit) => slit.asLeft
-      case GnirsFpu.Other(other) => other.asRight
+    Cogen[Either[GnirsFpuSlit, Either[GnirsFpuIfu, GnirsFpuOther]]].contramap:
+      case GnirsFpu.Slit(slit)   => slit.asLeft
+      case GnirsFpu.Ifu(ifu)     => ifu.asLeft.asRight
+      case GnirsFpu.Other(other) => other.asRight.asRight
 
   given Arbitrary[GnirsFocus] = Arbitrary:
     Gen.oneOf(

@@ -5,6 +5,7 @@ package lucuma.core.model.sequence.gnirs
 
 import cats.Eq
 import cats.derived.*
+import lucuma.core.enums.GnirsFpuIfu
 import lucuma.core.enums.GnirsFpuOther
 import lucuma.core.enums.GnirsFpuSlit
 import monocle.Iso
@@ -13,21 +14,26 @@ import monocle.macros.GenPrism
 
 /**
  * The GNIRS focal plane unit, which is either a long-slit aperture
- * (`GnirsFpuSlit`) or one of the other apertures such as the acquisition mirror,
- * pupil viewer or pinholes (`GnirsFpuOther`).
+ * (`GnirsFpuSlit`), an IFU aperture (`GnirsFpuIfu`) or one of the other apertures
+ * such as the acquisition mirror, pupil viewer or pinholes (`GnirsFpuOther`).
  */
 enum GnirsFpu derives Eq:
   case Slit(value: GnirsFpuSlit)
+  case Ifu(value: GnirsFpuIfu)
   case Other(value: GnirsFpuOther)
 
-  def fold[A](fs: GnirsFpuSlit => A, fo: GnirsFpuOther => A): A =
+  def fold[A](fs: GnirsFpuSlit => A, fi: GnirsFpuIfu => A, fo: GnirsFpuOther => A): A =
     this match
       case Slit(v)  => fs(v)
+      case Ifu(v)   => fi(v)
       case Other(v) => fo(v)
 
 object GnirsFpu:
   val slit: Prism[GnirsFpu, GnirsFpuSlit] =
     GenPrism[GnirsFpu, Slit].andThen(Iso[Slit, GnirsFpuSlit](_.value)(Slit(_)))
+
+  val ifu: Prism[GnirsFpu, GnirsFpuIfu] =
+    GenPrism[GnirsFpu, Ifu].andThen(Iso[Ifu, GnirsFpuIfu](_.value)(Ifu(_)))
 
   val other: Prism[GnirsFpu, GnirsFpuOther] =
     GenPrism[GnirsFpu, Other].andThen(Iso[Other, GnirsFpuOther](_.value)(Other(_)))
