@@ -478,7 +478,7 @@ trait GnirsShapes extends InstrumentShapes:
   val probe: GuideProbe = GuideProbe.PWFS2
 
   val longSlitFpu: GnirsFpu =
-    GnirsFpu.Slit(GnirsFpuSlit.LongSlit_1_00)
+    GnirsFpu.Spectroscopy.Slit(GnirsFpuSlit.LongSlit_1_00)
 
   val pinholeFpu: GnirsFpu =
     GnirsFpu.Other(GnirsFpuOther.Pinhole3)

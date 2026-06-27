@@ -4,6 +4,7 @@
 package lucuma.core.geom.gnirs
 
 import lucuma.core.enums.GnirsCamera
+import lucuma.core.enums.GnirsFpuIfu
 import lucuma.core.enums.GnirsFpuOther
 import lucuma.core.enums.GnirsFpuSlit
 import lucuma.core.enums.GnirsPixelScale
@@ -37,6 +38,14 @@ trait GnirsScienceAreaGeometry:
   ): ShapeExpression =
     ShapeExpression.centeredRectangle(slit.slitWidth, slitLength(camera, prism))
 
+  // IFU science area: a rectangle of the IFU "slit width" by a fixed,
+  // resolution-dependent height (derived from ocs InstGNIRS.getScienceArea).
+  private def ifuFov(ifu: GnirsFpuIfu): ShapeExpression =
+    val height = ifu match
+      case GnirsFpuIfu.LowResolution  => IfuLowResHeight
+      case GnirsFpuIfu.HighResolution => IfuHighResHeight
+    ShapeExpression.centeredRectangle(ifu.slitWidth, height)
+
   private def pinholeFov(other: GnirsFpuOther): Option[ShapeExpression] =
     other match
       case GnirsFpuOther.Pinhole1                                =>
@@ -54,7 +63,11 @@ trait GnirsScienceAreaGeometry:
     prism:     GnirsPrism
   ): Option[ShapeExpression] =
     fpu
-      .fold(slit => Some(longSlitFov(slit, camera, prism)), pinholeFov)
+      .fold(
+        slit => Some(longSlitFov(slit, camera, prism)),
+        ifu => Some(ifuFov(ifu)),
+        pinholeFov
+      )
       .map(_.shapeAt(offsetPos, posAngle))
 
   def longSlitShapeAt(
