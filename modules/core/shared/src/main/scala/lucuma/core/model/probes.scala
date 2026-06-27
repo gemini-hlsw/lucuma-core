@@ -29,7 +29,7 @@ trait probes:
         GuideProbe.PWFS2.some
       case (ObservingModeType.GhostIfu, _) =>
         GuideProbe.PWFS2.some
-      case (ObservingModeType.GnirsLongSlit, _) =>
+      case (ObservingModeType.GnirsLongSlit | ObservingModeType.GnirsIfu, _) =>
         GuideProbe.PWFS2.some
       case (_: VisitorObservingModeType, _) =>
         GuideProbe.PWFS2.some
