@@ -16,7 +16,9 @@ import lucuma.core.enums.WaterVapor
 import lucuma.core.math.Angle
 import lucuma.core.math.BrightnessValue
 import lucuma.core.math.Coordinates
+import lucuma.core.math.Declination
 import lucuma.core.math.Offset
+import lucuma.core.math.RightAscension
 import lucuma.core.math.Wavelength
 import lucuma.core.math.syntax.int.*
 import lucuma.core.model.CloudExtinction
@@ -92,5 +94,63 @@ class ShortCut_9024 extends munit.FunSuite {
   test("a blind offset is protected from probe vignetting") {
     val vignetting = ghostAnalysis(gsOnIFU, Nil, noZoneTarget.some)
     assert(vignettes(vignetting))
+  }
+
+  private def coord(ra: String, dec: String): Coordinates =
+    Coordinates(
+      RightAscension.fromStringHMS.getOption(ra).get,
+      Declination.fromStringSignedDMS.getOption(dec).get
+    )
+
+  private def gaiaCandidate(id: Long, ra: String, dec: String, g: Double): GuideStarCandidate =
+    GuideStarCandidate(
+      id,
+      SiderealTracking.const(coord(ra, dec)),
+      (Band.GaiaRP, BrightnessValue.unsafeFrom(g)).some
+    ).get
+
+  test("selects a clean guide star over a brighter vignetting one") {
+    val realConstraints = ConstraintSet(
+      ImageQuality.Preset.OnePointZero,
+      CloudExtinction.Preset.PointThree,
+      SkyBackground.Bright,
+      WaterVapor.Wet,
+      ElevationRange.ByAirMass.Default
+    )
+    val realWavelength  = Wavelength.fromIntNanometers(900).get
+
+    val offendingId = 5145821452872321792L
+    val cleanId     = 5145828496618683520L
+
+    val t1   = coord("02:27:53.351220", "-15:15:31.073879")
+    val t2   = coord("02:27:32.351218", "-15:14:29.073879")
+    val base = Coordinates.centerOf(NonEmptyList.of(t1, t2))
+
+    val offending = gaiaCandidate(offendingId, "02:27:23.401952", "-15:19:24.661144", 12.623376)
+    val clean     = gaiaCandidate(cleanId, "02:27:33.164983", "-15:08:44.481449", 13.580871)
+
+    val analyses = Ags
+      .agsAnalysis(
+        realConstraints,
+        realWavelength,
+        base,
+        List(t1, t2),
+        None,
+        NonEmptyList.of(Angle.Angle0),
+        None,
+        None,
+        AgsParams.GhostIfu(),
+        List(offending, clean)
+      )
+      .analyses
+
+    // The offending star's probe vignettes the second IFU target.
+    assert(analyses.filter(_.target.id === offendingId).exists {
+      case VignettesScience(_, _) => true
+      case _                      => false
+    })
+
+    // The clean star is the one selected.
+    assertEquals(analyses.sortUsablePositions.headOption.map(_.target.id), cleanId.some)
   }
 }
