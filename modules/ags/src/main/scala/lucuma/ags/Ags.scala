@@ -72,7 +72,7 @@ object Ags {
       // Do we have a g magnitude
       val guideSpeed = gsc.gBrightness.flatMap { case (_, g) => guideSpeedFor(speeds, g) }
       AgsAnalysis.NotReachableAtPosition(pos, params.probe, guideSpeed, gsc)
-    else if (geoms.exists(g => noZones.exists(g.overlapsScience(_))))
+    else if (geoms.exists(g => noZones.exists(nz => g.overlapsProtectedArea(gsOffset, nz))))
       AgsAnalysis.VignettesScience(gsc, pos)
     else
       magnitudeAnalysis(
@@ -208,9 +208,9 @@ object Ags {
       )
         .mapN { (gsc, position) =>
           val offset     = baseCoordinates.diff(gsc.tracking.baseCoordinates).offset
-          val sciOffsets = scienceCoordinates.map(_.diff(gsc.tracking.baseCoordinates).offset)
+          val sciOffsets = scienceCoordinates.map(baseCoordinates.diff(_).offset)
           val noZones    = blindOffset
-            .map(_.diff(gsc.tracking.baseCoordinates).offset)
+            .map(baseCoordinates.diff(_).offset)
             .fold(sciOffsets)(_ :: sciOffsets)
           runAnalysis(
             constraints,
@@ -275,9 +275,9 @@ object Ags {
     val anStart  = System.nanoTime()
     val analyses = accepted.flatMap: gsc =>
       val offset     = baseCoordinates.diff(gsc.tracking.baseCoordinates).offset
-      val sciOffsets = scienceCoordinates.map(_.diff(gsc.tracking.baseCoordinates).offset)
+      val sciOffsets = scienceCoordinates.map(baseCoordinates.diff(_).offset)
       val noZones    = blindOffset
-        .map(_.diff(gsc.tracking.baseCoordinates).offset)
+        .map(baseCoordinates.diff(_).offset)
         .fold(sciOffsets)(_ :: sciOffsets)
 
       positions.toList.map: position =>

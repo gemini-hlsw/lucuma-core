@@ -40,8 +40,8 @@ sealed trait AgsGeomCalc:
   // Calculates the area vignetted at a given offset
   def vignettingArea(gsOffset: Offset): Area
 
-  // Indicates if the given guide star would vignette the science target
-  def overlapsScience(gsOffset: Offset): Boolean
+  // Indicates if the given guide star would vignette a science area
+  def overlapsProtectedArea(gsOffset: Offset, noZone: Offset): Boolean
 
   def intersectionPatrolField: ShapeExpression
 
@@ -92,18 +92,10 @@ trait SingleProbeAgsParams:
         private val scienceAreaShape =
           scienceArea(position.posAngle, position.offsetPos)
 
-        private val scienceTargetArea =
-          ShapeExpression.centeredEllipse(scienceRadius,
-                                          scienceRadius
-          ) ↗ position.offsetPos ⟲ position.posAngle
-
         private val intersectionShape: Shape = pfShape
 
         // Cache bounding box for fast rejection
         private val intersectionBounds: BoundingOffsets = pfBounds
-
-        private val scienceTargetShape: Shape =
-          scienceTargetArea.eval
 
         private val scienceAreaShapeEval: Shape =
           scienceAreaShape.eval
@@ -118,9 +110,11 @@ trait SingleProbeAgsParams:
           // Fast bounding box rejection, then precise check
           intersectionBounds.contains(gsOffset) && intersectionShape.contains(gsOffset)
 
-        def overlapsScience(gsOffset: Offset): Boolean =
-          probeArm(position.posAngle, gsOffset, position.offsetPos).eval
-            .intersects(scienceTargetShape)
+        val scienceTargetShape = ShapeExpression.centeredEllipse(scienceRadius, scienceRadius)
+
+        override def overlapsProtectedArea(gsOffset: Offset, noZone: Offset): Boolean =
+          (probeArm(position.posAngle, gsOffset, position.offsetPos) ∩
+            (scienceTargetShape ↗ noZone)).maxSide.toMicroarcseconds > 5
 
         override def vignettingArea(gsOffset: Offset): Area =
           probeArm(position.posAngle, gsOffset, position.offsetPos).eval
