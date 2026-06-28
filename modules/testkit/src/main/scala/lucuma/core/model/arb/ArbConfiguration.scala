@@ -10,6 +10,7 @@ import lucuma.core.enums.GmosNorthGrating
 import lucuma.core.enums.GmosSouthFilter
 import lucuma.core.enums.GmosSouthGrating
 import lucuma.core.enums.GnirsCamera
+import lucuma.core.enums.GnirsFpuIfu
 import lucuma.core.enums.GnirsGrating
 import lucuma.core.enums.GnirsPrism
 import lucuma.core.enums.SkyBackground
@@ -103,6 +104,16 @@ trait ArbConfiguration:
   given Cogen[ObservingMode.GnirsLongSlit] =
     Cogen[(GnirsGrating, GnirsCamera, GnirsPrism)].contramap(m => (m.grating, m.camera, m.prism))
 
+  given Arbitrary[ObservingMode.GnirsIfu] =
+    Arbitrary:
+      for
+        g <- arbitrary[GnirsGrating]
+        f <- arbitrary[GnirsFpuIfu]
+      yield ObservingMode.GnirsIfu(g, f)
+
+  given Cogen[ObservingMode.GnirsIfu] =
+    Cogen[(GnirsGrating, GnirsFpuIfu)].contramap(m => (m.grating, m.fpu))
+
   given Arbitrary[ObservingMode.Visitor] =
     Arbitrary:
       for 
@@ -124,6 +135,7 @@ trait ArbConfiguration:
         arbitrary[ObservingMode.GmosSouthLongSlit],
         arbitrary[ObservingMode.Igrins2LongSlit.type],
         arbitrary[ObservingMode.GnirsLongSlit],
+        arbitrary[ObservingMode.GnirsIfu],
         arbitrary[ObservingMode.Visitor]
       )
 
@@ -141,6 +153,7 @@ trait ArbConfiguration:
         case m: ObservingMode.GmosSouthLongSlit    => perturb(s, m)
         case m: ObservingMode.Igrins2LongSlit.type => perturb(s, m)
         case m: ObservingMode.GnirsLongSlit        => perturb(s, m)
+        case m: ObservingMode.GnirsIfu             => perturb(s, m)
         case m: ObservingMode.Visitor              => perturb(s, m)
 
   given Arbitrary[Configuration] =
