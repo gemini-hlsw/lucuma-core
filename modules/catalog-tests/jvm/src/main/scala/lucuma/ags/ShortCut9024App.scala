@@ -9,20 +9,26 @@ import cats.effect.IOApp
 import cats.syntax.all.*
 import lucuma.catalog.clients.GaiaClient
 import lucuma.catalog.votable.*
+import lucuma.core.enums.GuideProbe
 import lucuma.core.enums.PortDisposition
 import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.WaterVapor
+import lucuma.core.geom.ShapeExpression
 import lucuma.core.geom.jts.interpreter.given
+import lucuma.core.geom.pwfs
 import lucuma.core.geom.pwfs.patrolField
+import lucuma.core.geom.syntax.all.*
 import lucuma.core.math.Angle
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Declination
 import lucuma.core.math.Epoch
+import lucuma.core.math.Offset
 import lucuma.core.math.Parallax
 import lucuma.core.math.ProperMotion
 import lucuma.core.math.RadialVelocity
 import lucuma.core.math.RightAscension
 import lucuma.core.math.Wavelength
+import lucuma.core.math.syntax.int.*
 import lucuma.core.model.CloudExtinction
 import lucuma.core.model.ConstraintSet
 import lucuma.core.model.ElevationRange
@@ -77,6 +83,16 @@ object ShortCut9024App extends IOApp.Simple {
   )
   private val wavelength  = Wavelength.fromIntNanometers(900).get
 
+  // protected radius around each science/IFU target.
+  private val protectedRadius = 20.arcseconds
+
+  private def overlapsProtected(gsOffset: Offset, noZones: List[Offset]): Boolean =
+    noZones.exists: nz =>
+      (pwfs.probeArm.vignettedAreaAt(GuideProbe.PWFS2, gsOffset, Offset.Zero) ∩
+        (ShapeExpression.centeredEllipse(protectedRadius,
+                                         protectedRadius
+        ) ↗ nz)).maxSide.toMicroarcseconds > 5
+
   def run =
     JdkHttpClient
       .simple[IO]
@@ -108,12 +124,21 @@ object ShortCut9024App extends IOApp.Simple {
               candidates
             )
             val analyses = r.analyses
+            pprint.pprintln(r.stats)
+
+            // No-zones (science/IFU targets) as base-relative offsets, for the
+            // independent overlap check.
+            val noZones                                       = List(t1, t2).map(base.diff(_).offset)
+            def overlapsFor(gsc: GuideStarCandidate): Boolean =
+              overlapsProtected(base.diff(gsc.tracking.baseCoordinates).offset, noZones)
 
             // Verdict for the known offending star.
             val offending = analyses.filter(_.target.id === OffendingId)
             println(
               s"offending star $OffendingId verdict(s): ${offending.map(Ags.resultLabel).mkString(", ")}"
             )
+            offending.headOption.foreach: a =>
+              println(s"offending overlaps protected area? ${overlapsFor(a.target)}")
 
             // The selected (best-ranked) guide star — what Explore would pick.
             val ranked = analyses.sortUsablePositions
@@ -121,14 +146,18 @@ object ShortCut9024App extends IOApp.Simple {
               case None       => println("selected         : <none usable>")
               case Some(best) =>
                 println(
-                  s"selected         : id=${best.target.id} vignetting=${best.vignetting.toMicroarcsecondsSquared} µas² posAngle=${best.posAngle.toDoubleDegrees}"
+                  s"selected         : id=${best.target.id} vignetting=${best.vignetting.toMicroarcsecondsSquared} µas² overlapsProtected=${overlapsFor(best.target)} posAngle=${best.posAngle.toDoubleDegrees}"
                 )
                 println(s"selected == offending? ${best.target.id === OffendingId}")
 
-            println("--- top usable (id, vignetting µas²) ---")
+            println("--- top usable (id, vignetting µas², overlapsProtected, posAngle°) ---")
             ranked
               .take(5)
-              .foreach(u => println(s"  ${u.target.id}  ${u.vignetting.toMicroarcsecondsSquared}"))
+              .foreach(u =>
+                println(
+                  s"  ${u.target.id}  ${u.vignetting.toMicroarcsecondsSquared}  ${overlapsFor(u.target)}  ${u.posAngle.toDoubleDegrees}"
+                )
+              )
           }
       .void
 }
