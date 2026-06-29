@@ -59,21 +59,21 @@ object Ags {
 
   // Runs the analyisis for a single guide star at a single position
   protected def runAnalysis(
-    conditions:      ConstraintSet,
-    gsOffset:        Offset,
-    protectedShapes: List[Shape],
-    pos:             OffsetPosition,
-    params:          AgsParams,
-    gsc:             GuideStarCandidate,
-    speeds:          List[(GuideSpeed, BrightnessConstraints)],
-    calcs:           NonEmptyMap[OffsetPosition, AgsGeomCalc]
+    conditions:     ConstraintSet,
+    gsOffset:       Offset,
+    protectedAreas: List[Shape],
+    pos:            OffsetPosition,
+    params:         AgsParams,
+    gsc:            GuideStarCandidate,
+    speeds:         List[(GuideSpeed, BrightnessConstraints)],
+    calcs:          NonEmptyMap[OffsetPosition, AgsGeomCalc]
   ): AgsAnalysis = {
     val geoms = calcs.lookup(pos)
     if (!geoms.exists(_.isReachable(gsOffset)))
       // Do we have a g magnitude
       val guideSpeed = gsc.gBrightness.flatMap { case (_, g) => guideSpeedFor(speeds, g) }
       AgsAnalysis.NotReachableAtPosition(pos, params.probe, guideSpeed, gsc)
-    else if (geoms.exists(g => protectedShapes.exists(ps => g.overlapsProtectedArea(gsOffset, ps))))
+    else if (geoms.exists(g => protectedAreas.exists(ps => g.overlapsProtectedArea(gsOffset, ps))))
       AgsAnalysis.VignettesScience(gsc, pos)
     else
       magnitudeAnalysis(
@@ -204,7 +204,7 @@ object Ags {
     val noZones         = blindOffset
       .map(baseCoordinates.diff(_).offset)
       .fold(sciOffsets)(_ :: sciOffsets)
-    val protectedShapes = params.protectedShapes(noZones)
+    val protectedShapes = params.protectedAreas(noZones)
 
     in =>
       (in.filter(c =>
@@ -279,7 +279,7 @@ object Ags {
     val noZones         = blindOffset
       .map(baseCoordinates.diff(_).offset)
       .fold(sciOffsets)(_ :: sciOffsets)
-    val protectedShapes = params.protectedShapes(noZones)
+    val protectedShapes = params.protectedAreas(noZones)
 
     val anStart  = System.nanoTime()
     val analyses = accepted.flatMap: gsc =>

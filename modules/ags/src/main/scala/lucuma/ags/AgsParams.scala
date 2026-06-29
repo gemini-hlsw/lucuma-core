@@ -56,7 +56,8 @@ trait SingleProbeAgsParams:
 
   private val scienceShape = ShapeExpression.centeredEllipse(scienceRadius, scienceRadius)
 
-  def protectedShapes(noZones: List[Offset]): List[Shape] =
+  // Return the protected shapes for each offset
+  def protectedAreas(noZones: List[Offset]): List[Shape] =
     noZones.map(nz => (scienceShape ↗ nz).eval)
 
   /**
@@ -146,8 +147,7 @@ sealed trait AgsParams derives Eq:
     positions: NonEmptyList[OffsetPosition]
   ): NonEmptyMap[OffsetPosition, AgsGeomCalc]
 
-  // Return the protected shapes for each offset
-  def protectedShapes(noZones: List[Offset]): List[Shape]
+  def protectedAreas(noZones: List[Offset]): List[Shape]
 
 object AgsParams:
   private val GmosScienceRadius = 20.arcseconds
