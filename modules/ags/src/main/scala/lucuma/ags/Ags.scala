@@ -18,6 +18,7 @@ import lucuma.core.enums.GuideProbe
 import lucuma.core.enums.GuideSpeed
 import lucuma.core.enums.StepGuideState
 import lucuma.core.geom.Area
+import lucuma.core.geom.Shape
 import lucuma.core.geom.offsets.OffsetPosition
 import lucuma.core.geom.offsets.OffsetPositions
 import lucuma.core.math.Angle
@@ -58,21 +59,21 @@ object Ags {
 
   // Runs the analyisis for a single guide star at a single position
   protected def runAnalysis(
-    conditions: ConstraintSet,
-    gsOffset:   Offset,
-    noZones:    List[Offset], // offsets not allowed, includes science targets + blind offset
-    pos:        OffsetPosition,
-    params:     AgsParams,
-    gsc:        GuideStarCandidate,
-    speeds:     List[(GuideSpeed, BrightnessConstraints)],
-    calcs:      NonEmptyMap[OffsetPosition, AgsGeomCalc]
+    conditions:      ConstraintSet,
+    gsOffset:        Offset,
+    protectedShapes: List[Shape],
+    pos:             OffsetPosition,
+    params:          AgsParams,
+    gsc:             GuideStarCandidate,
+    speeds:          List[(GuideSpeed, BrightnessConstraints)],
+    calcs:           NonEmptyMap[OffsetPosition, AgsGeomCalc]
   ): AgsAnalysis = {
     val geoms = calcs.lookup(pos)
     if (!geoms.exists(_.isReachable(gsOffset)))
       // Do we have a g magnitude
       val guideSpeed = gsc.gBrightness.flatMap { case (_, g) => guideSpeedFor(speeds, g) }
       AgsAnalysis.NotReachableAtPosition(pos, params.probe, guideSpeed, gsc)
-    else if (geoms.exists(g => noZones.exists(nz => g.overlapsProtectedArea(gsOffset, nz))))
+    else if (geoms.exists(g => protectedShapes.exists(ps => g.overlapsProtectedArea(gsOffset, ps))))
       AgsAnalysis.VignettesScience(gsc, pos)
     else
       magnitudeAnalysis(
@@ -199,6 +200,12 @@ object Ags {
       ).value.toNonEmptyList
     val ctx       = analysisContext(constraints, wavelength, positions, params)
 
+    val sciOffsets      = scienceCoordinates.map(baseCoordinates.diff(_).offset)
+    val noZones         = blindOffset
+      .map(baseCoordinates.diff(_).offset)
+      .fold(sciOffsets)(_ :: sciOffsets)
+    val protectedShapes = params.protectedShapes(noZones)
+
     in =>
       (in.filter(c =>
          c.gBrightness.exists: (_, g) =>
@@ -207,15 +214,11 @@ object Ags {
        Stream.emits[F, OffsetPosition](positions.toList)
       )
         .mapN { (gsc, position) =>
-          val offset     = baseCoordinates.diff(gsc.tracking.baseCoordinates).offset
-          val sciOffsets = scienceCoordinates.map(baseCoordinates.diff(_).offset)
-          val noZones    = blindOffset
-            .map(baseCoordinates.diff(_).offset)
-            .fold(sciOffsets)(_ :: sciOffsets)
+          val offset = baseCoordinates.diff(gsc.tracking.baseCoordinates).offset
           runAnalysis(
             constraints,
             offset,
-            noZones,
+            protectedShapes,
             position,
             params,
             gsc,
@@ -272,19 +275,21 @@ object Ags {
       c.gBrightness.exists: (_, g) =>
         ctx.brightnessConstraint.exists(_.contains(Band.Gaia, g))
 
+    val sciOffsets      = scienceCoordinates.map(baseCoordinates.diff(_).offset)
+    val noZones         = blindOffset
+      .map(baseCoordinates.diff(_).offset)
+      .fold(sciOffsets)(_ :: sciOffsets)
+    val protectedShapes = params.protectedShapes(noZones)
+
     val anStart  = System.nanoTime()
     val analyses = accepted.flatMap: gsc =>
-      val offset     = baseCoordinates.diff(gsc.tracking.baseCoordinates).offset
-      val sciOffsets = scienceCoordinates.map(baseCoordinates.diff(_).offset)
-      val noZones    = blindOffset
-        .map(baseCoordinates.diff(_).offset)
-        .fold(sciOffsets)(_ :: sciOffsets)
+      val offset = baseCoordinates.diff(gsc.tracking.baseCoordinates).offset
 
       positions.toList.map: position =>
         runAnalysis(
           constraints,
           offset,
-          noZones,
+          protectedShapes,
           position,
           params,
           gsc,
