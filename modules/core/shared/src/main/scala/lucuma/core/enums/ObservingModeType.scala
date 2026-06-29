@@ -29,6 +29,7 @@ enum FacilityObservingModeType(
   case GmosSouthImaging   extends FacilityObservingModeType("gmos_south_imaging",    Instrument.GmosSouth,  PosAngleConstraint.Unbounded)
   case GmosSouthLongSlit  extends FacilityObservingModeType("gmos_south_long_slit",  Instrument.GmosSouth,  PosAngleConstraint.AverageParallactic)
   case GnirsLongSlit      extends FacilityObservingModeType("gnirs_long_slit",       Instrument.Gnirs,      PosAngleConstraint.AverageParallactic)
+  case GnirsIfu           extends FacilityObservingModeType("gnirs_ifu",             Instrument.Gnirs,      PosAngleConstraint.AverageParallactic)
   case Igrins2LongSlit    extends FacilityObservingModeType("igrins_2_long_slit",    Instrument.Igrins2,    PosAngleConstraint.AverageParallactic)
   case Flamingos2Imaging  extends FacilityObservingModeType("flamingos_2_imaging",   Instrument.Flamingos2, PosAngleConstraint.Unbounded)
 

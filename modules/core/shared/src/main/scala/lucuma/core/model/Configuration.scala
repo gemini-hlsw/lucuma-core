@@ -14,6 +14,7 @@ import lucuma.core.enums.GmosNorthGrating
 import lucuma.core.enums.GmosSouthFilter
 import lucuma.core.enums.GmosSouthGrating
 import lucuma.core.enums.GnirsCamera
+import lucuma.core.enums.GnirsFpuIfu
 import lucuma.core.enums.GnirsGrating
 import lucuma.core.enums.GnirsPrism
 import lucuma.core.enums.ObservingModeType
@@ -67,6 +68,7 @@ object Configuration:
     def gmosSouthImaging:   Option[GmosSouthImaging    ] = Some(this).collect { case m: GmosSouthImaging     => m }
     def gmosSouthLongSlit:  Option[GmosSouthLongSlit   ] = Some(this).collect { case m: GmosSouthLongSlit    => m }
     def gnirsLongSlit:      Option[GnirsLongSlit       ] = Some(this).collect { case m: GnirsLongSlit        => m }
+    def gnirsIfu:           Option[GnirsIfu            ] = Some(this).collect { case m: GnirsIfu             => m }
     def igrins2LongSlit:    Option[Igrins2LongSlit.type] = Some(this).collect { case m: Igrins2LongSlit.type => m }
     def visitor:            Option[Visitor]              = Some(this).collect { case m: Visitor              => m }
 
@@ -86,6 +88,7 @@ object Configuration:
 
         case (Igrins2LongSlit,           Igrins2LongSlit)           => true
         case (GnirsLongSlit(g1, c1, p1), GnirsLongSlit(g2, c2, p2)) => g1 === g2 && c1 === c2 && p1 === p2
+        case (GnirsIfu(g1, f1),          GnirsIfu(g2, f2))          => g1 === g2 && f1 === f2
         case (Visitor(ma, ra),           Visitor(mb, rb))           => ma === mb && rb.toMicroarcseconds <= ra.toMicroarcseconds
         case _                                                      => false
 
@@ -98,8 +101,15 @@ object Configuration:
       val GmosImaging        = gmos.scienceArea.imaging.eval.radius
       val Igrins2LongSlit    = igrins2.scienceArea.scienceSlitFOV.eval.radius
 
-      def gnirsLongSlit(camera: GnirsCamera, prism: GnirsPrism): Angle = 
+      def gnirsLongSlit(camera: GnirsCamera, prism: GnirsPrism): Angle =
         gnirs.all.slitLength(camera, prism).bisect
+
+      // The IFU science-area height depends on the resolution.
+      def gnirsIfu(fpu: GnirsFpuIfu): Angle =
+        val height: Angle = fpu match
+          case GnirsFpuIfu.LowResolution  => gnirs.IfuLowResHeight
+          case GnirsFpuIfu.HighResolution => gnirs.IfuHighResHeight
+        height.bisect
 
     case class Flamingos2LongSlit(disperser: Flamingos2Disperser) extends ObservingMode(ObservingModeType.Flamingos2LongSlit, Radii.Flamingos2LongSlit)
     case object GhostIfu extends ObservingMode(ObservingModeType.GhostIfu, Radii.GhostIfu)
@@ -108,5 +118,6 @@ object Configuration:
     case class GmosSouthImaging(filters: List[GmosSouthFilter]) extends ObservingMode(ObservingModeType.GmosSouthImaging, Radii.GmosImaging)
     case class GmosSouthLongSlit(grating: GmosSouthGrating) extends ObservingMode(ObservingModeType.GmosSouthLongSlit, Radii.GmosLongSlit)
     case class GnirsLongSlit(grating: GnirsGrating, camera: GnirsCamera, prism: GnirsPrism) extends ObservingMode(ObservingModeType.GnirsLongSlit, Radii.gnirsLongSlit(camera, prism))
+    case class GnirsIfu(grating: GnirsGrating, fpu: GnirsFpuIfu) extends ObservingMode(ObservingModeType.GnirsIfu, Radii.gnirsIfu(fpu))
     case object Igrins2LongSlit extends ObservingMode(ObservingModeType.Igrins2LongSlit, Radii.Igrins2LongSlit)
     case class Visitor(mode: VisitorObservingModeType, override val radius: Angle) extends ObservingMode(mode, radius)
