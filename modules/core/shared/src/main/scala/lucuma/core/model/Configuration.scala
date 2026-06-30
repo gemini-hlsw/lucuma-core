@@ -65,8 +65,10 @@ object Configuration:
     def ghostIfu:           Option[GhostIfu.type       ] = Some(this).collect { case m: GhostIfu.type        => m }
     def gmosNorthImaging:   Option[GmosNorthImaging    ] = Some(this).collect { case m: GmosNorthImaging     => m }
     def gmosNorthLongSlit:  Option[GmosNorthLongSlit   ] = Some(this).collect { case m: GmosNorthLongSlit    => m }
+    def gmosNorthMos:       Option[GmosNorthMos        ] = Some(this).collect { case m: GmosNorthMos         => m }
     def gmosSouthImaging:   Option[GmosSouthImaging    ] = Some(this).collect { case m: GmosSouthImaging     => m }
     def gmosSouthLongSlit:  Option[GmosSouthLongSlit   ] = Some(this).collect { case m: GmosSouthLongSlit    => m }
+    def gmosSouthMos:       Option[GmosSouthMos        ] = Some(this).collect { case m: GmosSouthMos         => m }
     def gnirsLongSlit:      Option[GnirsLongSlit       ] = Some(this).collect { case m: GnirsLongSlit        => m }
     def gnirsIfu:           Option[GnirsIfu            ] = Some(this).collect { case m: GnirsIfu             => m }
     def igrins2LongSlit:    Option[Igrins2LongSlit.type] = Some(this).collect { case m: Igrins2LongSlit.type => m }
@@ -77,14 +79,16 @@ object Configuration:
         case (Flamingos2LongSlit(d1),    Flamingos2LongSlit(d2)) => d1 === d2
         case (GhostIfu,                  GhostIfu)               => true
         case (GmosNorthLongSlit(g1),     GmosNorthLongSlit(g2))  => g1 === g2
+        case (GmosNorthMos(g1),          GmosNorthMos(g2))       => g1 === g2
         case (GmosSouthLongSlit(g1),     GmosSouthLongSlit(g2))  => g1 === g2
+        case (GmosSouthMos(g1),          GmosSouthMos(g2))       => g1 === g2
 
         // RCN: The GMOS imaging configuration contains a set of filters, and originally additions to this set
         // were disallowed, but this was relaxed in https://app.shortcut.com/lucuma/story/8036/. I am leaving
         // the filters in the configuration for now because I suspect they may change their minds. But for now
         // there are no constraints on changes to the filter set (or anything else).
-        case (GmosNorthImaging(f1),      GmosNorthImaging(f2))      => true // f2.forall(f1.contains)
-        case (GmosSouthImaging(f1),      GmosSouthImaging(f2))      => true // f2.forall(f1.contains)
+        case (GmosNorthImaging(_),       GmosNorthImaging(_))       => true // f2.forall(f1.contains)
+        case (GmosSouthImaging(_),       GmosSouthImaging(_))       => true // f2.forall(f1.contains)
 
         case (Igrins2LongSlit,           Igrins2LongSlit)           => true
         case (GnirsLongSlit(g1, c1, p1), GnirsLongSlit(g2, c2, p2)) => g1 === g2 && c1 === c2 && p1 === p2
@@ -99,6 +103,7 @@ object Configuration:
       val GhostIfu           = ghost.scienceArea.fov.eval.radius
       val GmosLongSlit       = gmos.scienceArea.longSlitFov(Angle.fromMicroarcseconds(2L)).eval.radius // width doesn't matter but should be > 1 µas
       val GmosImaging        = gmos.scienceArea.imaging.eval.radius
+      val GmosMos            = gmos.scienceArea.imaging.eval.radius.bisect // We allow moving up to half of the imaging field
       val Igrins2LongSlit    = igrins2.scienceArea.scienceSlitFOV.eval.radius
 
       def gnirsLongSlit(camera: GnirsCamera, prism: GnirsPrism): Angle =
@@ -115,8 +120,10 @@ object Configuration:
     case object GhostIfu extends ObservingMode(ObservingModeType.GhostIfu, Radii.GhostIfu)
     case class GmosNorthImaging(filters: List[GmosNorthFilter]) extends ObservingMode(ObservingModeType.GmosNorthImaging, Radii.GmosImaging)
     case class GmosNorthLongSlit(grating: GmosNorthGrating) extends ObservingMode(ObservingModeType.GmosNorthLongSlit, Radii.GmosLongSlit)
+    case class GmosNorthMos(grating: GmosNorthGrating) extends ObservingMode(ObservingModeType.GmosNorthMos, Radii.GmosMos)
     case class GmosSouthImaging(filters: List[GmosSouthFilter]) extends ObservingMode(ObservingModeType.GmosSouthImaging, Radii.GmosImaging)
     case class GmosSouthLongSlit(grating: GmosSouthGrating) extends ObservingMode(ObservingModeType.GmosSouthLongSlit, Radii.GmosLongSlit)
+    case class GmosSouthMos(grating: GmosSouthGrating) extends ObservingMode(ObservingModeType.GmosSouthMos, Radii.GmosMos)
     case class GnirsLongSlit(grating: GnirsGrating, camera: GnirsCamera, prism: GnirsPrism) extends ObservingMode(ObservingModeType.GnirsLongSlit, Radii.gnirsLongSlit(camera, prism))
     case class GnirsIfu(grating: GnirsGrating, fpu: GnirsFpuIfu) extends ObservingMode(ObservingModeType.GnirsIfu, Radii.gnirsIfu(fpu))
     case object Igrins2LongSlit extends ObservingMode(ObservingModeType.Igrins2LongSlit, Radii.Igrins2LongSlit)

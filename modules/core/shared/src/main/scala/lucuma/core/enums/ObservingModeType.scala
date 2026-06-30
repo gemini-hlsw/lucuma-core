@@ -22,16 +22,18 @@ enum FacilityObservingModeType(
   val instrument: Instrument,
   val defaultPosAngleConstraint: PosAngleConstraint
 ) extends ObservingModeType derives Enumerated:
+  case Flamingos2Imaging  extends FacilityObservingModeType("flamingos_2_imaging",   Instrument.Flamingos2, PosAngleConstraint.Unbounded)
   case Flamingos2LongSlit extends FacilityObservingModeType("flamingos_2_long_slit", Instrument.Flamingos2, PosAngleConstraint.AverageParallactic)
   case GhostIfu           extends FacilityObservingModeType("ghost_ifu",             Instrument.Ghost,      PosAngleConstraint.Fixed(Angle.Angle0))
   case GmosNorthImaging   extends FacilityObservingModeType("gmos_north_imaging",    Instrument.GmosNorth,  PosAngleConstraint.Unbounded)
   case GmosNorthLongSlit  extends FacilityObservingModeType("gmos_north_long_slit",  Instrument.GmosNorth,  PosAngleConstraint.AverageParallactic)
+  case GmosNorthMos       extends FacilityObservingModeType("gmos_north_mos",        Instrument.GmosNorth,  PosAngleConstraint.Fixed(Angle.Angle0))
   case GmosSouthImaging   extends FacilityObservingModeType("gmos_south_imaging",    Instrument.GmosSouth,  PosAngleConstraint.Unbounded)
   case GmosSouthLongSlit  extends FacilityObservingModeType("gmos_south_long_slit",  Instrument.GmosSouth,  PosAngleConstraint.AverageParallactic)
+  case GmosSouthMos       extends FacilityObservingModeType("gmos_south_mos",        Instrument.GmosSouth,  PosAngleConstraint.Fixed(Angle.Angle0))
   case GnirsLongSlit      extends FacilityObservingModeType("gnirs_long_slit",       Instrument.Gnirs,      PosAngleConstraint.AverageParallactic)
   case GnirsIfu           extends FacilityObservingModeType("gnirs_ifu",             Instrument.Gnirs,      PosAngleConstraint.AverageParallactic)
   case Igrins2LongSlit    extends FacilityObservingModeType("igrins_2_long_slit",    Instrument.Igrins2,    PosAngleConstraint.AverageParallactic)
-  case Flamingos2Imaging  extends FacilityObservingModeType("flamingos_2_imaging",   Instrument.Flamingos2, PosAngleConstraint.Unbounded)
 
 enum VisitorObservingModeType(
   val tag: String,
