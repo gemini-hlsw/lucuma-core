@@ -6,6 +6,7 @@ package lucuma.core.model.sequence
 import cats.Eq
 import cats.derived.*
 import cats.syntax.eq.*
+import cats.syntax.option.*
 import lucuma.core.enums.Instrument
 import lucuma.core.model.sequence.flamingos2 as f2
 import lucuma.core.model.sequence.ghost.GhostDynamicConfig
@@ -23,21 +24,32 @@ import monocle.macros.GenPrism
  */
 sealed trait InstrumentExecutionConfig:
 
-  /** Returns the instrument discriminator associated with this execution config. */
-  def instrument: Instrument
+  /**
+   * Returns the instrument discriminator associated with this execution config,
+   * if any.  Exchange observations are not Gemini instruments and have none.
+   */
+  def instrument: Option[Instrument]
 
   /** Returns `true` if there are no science steps to execute. */
   def isComplete: Boolean
 
 object InstrumentExecutionConfig:
 
-  case class Visitor(instrument: Instrument) extends InstrumentExecutionConfig:
-    val isComplete = true
+  /**
+   * Exchange observations (Keck/Subaru) have no Gemini instrument and no
+   * generated sequence.
+   */
+  case object Exchange extends InstrumentExecutionConfig:
+    override def instrument: Option[Instrument] = none
+    override def isComplete: Boolean            = true
+
+  val exchange: Prism[InstrumentExecutionConfig, Exchange.type] =
+    GenPrism[InstrumentExecutionConfig, Exchange.type]
 
   case class Flamingos2(
     executionConfig: ExecutionConfig[f2.Flamingos2StaticConfig, f2.Flamingos2DynamicConfig]
   ) extends InstrumentExecutionConfig:
-    override def instrument: Instrument = Instrument.Flamingos2
+    override def instrument: Option[Instrument] = Instrument.Flamingos2.some
     override def isComplete: Boolean    = executionConfig.isComplete
 
   object Flamingos2:
@@ -54,7 +66,7 @@ object InstrumentExecutionConfig:
   case class Ghost(
     executionConfig: ExecutionConfig[GhostStaticConfig, GhostDynamicConfig]
   ) extends InstrumentExecutionConfig derives Eq:
-    override def instrument: Instrument = Instrument.Ghost
+    override def instrument: Option[Instrument] = Instrument.Ghost.some
     override def isComplete: Boolean    = executionConfig.isComplete
 
   object Ghost:
@@ -67,7 +79,7 @@ object InstrumentExecutionConfig:
   case class GmosNorth(
     executionConfig: ExecutionConfig[gmos.StaticConfig.GmosNorth, gmos.DynamicConfig.GmosNorth]
   ) extends InstrumentExecutionConfig:
-    override def instrument: Instrument = Instrument.GmosNorth
+    override def instrument: Option[Instrument] = Instrument.GmosNorth.some
     override def isComplete: Boolean    = executionConfig.isComplete
 
   object GmosNorth:
@@ -85,7 +97,7 @@ object InstrumentExecutionConfig:
   case class GmosSouth(
     executionConfig: ExecutionConfig[gmos.StaticConfig.GmosSouth, gmos.DynamicConfig.GmosSouth]
   ) extends InstrumentExecutionConfig:
-    override def instrument: Instrument = Instrument.GmosSouth
+    override def instrument: Option[Instrument] = Instrument.GmosSouth.some
     override def isComplete: Boolean    = executionConfig.isComplete
 
   object GmosSouth:
@@ -103,7 +115,7 @@ object InstrumentExecutionConfig:
   case class Gnirs(
     executionConfig: ExecutionConfig[GnirsStaticConfig, GnirsDynamicConfig]
   ) extends InstrumentExecutionConfig:
-    override def instrument: Instrument = Instrument.Gnirs
+    override def instrument: Option[Instrument] = Instrument.Gnirs.some
     override def isComplete: Boolean    = executionConfig.isComplete
 
   object Gnirs:
@@ -120,7 +132,7 @@ object InstrumentExecutionConfig:
   case class Igrins2(
     executionConfig: ExecutionConfig[ig2.Igrins2StaticConfig, ig2.Igrins2DynamicConfig]
   ) extends InstrumentExecutionConfig derives Eq:
-    override def instrument: Instrument = Instrument.Igrins2
+    override def instrument: Option[Instrument] = Instrument.Igrins2.some
     override def isComplete: Boolean    = executionConfig.isComplete
 
   object Igrins2:
@@ -130,12 +142,21 @@ object InstrumentExecutionConfig:
   val igrins2: Prism[InstrumentExecutionConfig, Igrins2] =
     GenPrism[InstrumentExecutionConfig, Igrins2]
 
+  case class Visitor(visitorInstrument: Instrument) extends InstrumentExecutionConfig derives Eq:
+    override def instrument: Option[Instrument] = visitorInstrument.some
+    val isComplete = true
+
+  val visitor: Prism[InstrumentExecutionConfig, Visitor] =
+    GenPrism[InstrumentExecutionConfig, Visitor]
+
   given Eq[InstrumentExecutionConfig] =
     Eq.instance:
+      case (Exchange, Exchange)                   => true
       case (a @ Flamingos2(_), b @ Flamingos2(_)) => a === b
-      case (a @ Ghost(_), b @ Ghost(_))           => a === b
-      case (a @ GmosNorth(_), b @ GmosNorth(_))   => a === b
-      case (a @ GmosSouth(_), b @ GmosSouth(_))   => a === b
-      case (a @ Gnirs(_), b @ Gnirs(_))           => a === b
-      case (a @ Igrins2(_), b @ Igrins2(_))       => a === b
+      case (a @ Ghost(_),      b @ Ghost(_))      => a === b
+      case (a @ GmosNorth(_),  b @ GmosNorth(_))  => a === b
+      case (a @ GmosSouth(_),  b @ GmosSouth(_))  => a === b
+      case (a @ Gnirs(_),      b @ Gnirs(_))      => a === b
+      case (a @ Igrins2(_),    b @ Igrins2(_))    => a === b
+      case (a @ Visitor(_),    b @ Visitor(_))    => a === b
       case _                                      => false

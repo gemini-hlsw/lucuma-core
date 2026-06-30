@@ -15,24 +15,32 @@ import lucuma.core.util.Enumerated
  *
  * @group Enumerations
  */
-enum Instrument(val tag: String, val shortName: String, val longName: String, val referenceName: NonEmptyString, val obsolete: Boolean) derives Enumerated:
-  /** @group Constructors */ case AcqCamNorth  extends Instrument("AcqCamNorth", "AcqCam (North)", "Acquisition Camera (North)", "ACQCAMN".refined[NonEmpty], false)
-  /** @group Constructors */ case AcqCamSouth  extends Instrument("AcqCamSouth", "AcqCam (South)", "Acquisition Camera (South)", "ACQCAMS".refined[NonEmpty], false)
-  /** @group Constructors */ case Alopeke      extends Instrument("Alopeke", "ALOPEKE", "Alopeke", "ALOPEKE".refined[NonEmpty], false)
-  /** @group Constructors */ case Flamingos2   extends Instrument("Flamingos2", "Flamingos2", "Flamingos 2", "F2".refined[NonEmpty], false)
-  /** @group Constructors */ case Ghost        extends Instrument("Ghost", "GHOST", "GHOST", "GHOST".refined[NonEmpty], false)
-  /** @group Constructors */ case GmosNorth    extends Instrument("GmosNorth", "GMOS-N", "GMOS North", "GMOSN".refined[NonEmpty], false)
-  /** @group Constructors */ case GmosSouth    extends Instrument("GmosSouth", "GMOS-S", "GMOS South", "GMOSS".refined[NonEmpty], false)
-  /** @group Constructors */ case Gnirs        extends Instrument("Gnirs", "GNIRS", "GNIRS", "GNIRS".refined[NonEmpty], false)
-  /** @group Constructors */ case Gpi          extends Instrument("Gpi", "GPI", "GPI", "GPI".refined[NonEmpty], false)
-  /** @group Constructors */ case Gsaoi        extends Instrument("Gsaoi", "GSAOI", "GSAOI", "GSAOI".refined[NonEmpty], false)
-  /** @group Constructors */ case Igrins2      extends Instrument("Igrins2", "IGRINS-2", "IGRINS-2", "IGRINS2".refined[NonEmpty], false)
-  /** @group Constructors */ case MaroonX      extends Instrument("MaroonX", "MAROON-X", "MAROON-X", "MAROONX".refined[NonEmpty], false)
-  /** @group Constructors */ case Niri         extends Instrument("Niri", "NIRI", "NIRI", "NIRI".refined[NonEmpty], false)
-  /** @group Constructors */ case Scorpio      extends Instrument("Scorpio", "SCORPIO", "Scorpio", "SCORPIO".refined[NonEmpty], false)
-  /** @group Constructors */ case VisitorNorth extends Instrument("VisitorNorth", "Visitor (North)", "Visitor Instrument (North)", "VISITORN".refined[NonEmpty], false)
-  /** @group Constructors */ case VisitorSouth extends Instrument("VisitorSouth", "Visitor (South)", "Visitor Instrument (South)", "VISITORS".refined[NonEmpty], false)
-  /** @group Constructors */ case Zorro        extends Instrument("Zorro", "ZORRO", "Zorro", "ZORRO".refined[NonEmpty], false)
+enum Instrument(val tag: String, val shortName: String, val longName: String, val referenceName: NonEmptyString, val isVisitor: Boolean = false) derives Enumerated:
+  /** @group Constructors */ case AcqCamNorth  extends Instrument("AcqCamNorth", "AcqCam (North)", "Acquisition Camera (North)", "ACQCAMN".refined[NonEmpty])
+  /** @group Constructors */ case AcqCamSouth  extends Instrument("AcqCamSouth", "AcqCam (South)", "Acquisition Camera (South)", "ACQCAMS".refined[NonEmpty])
+  /** @group Constructors */ case Alopeke      extends Instrument("Alopeke", "ALOPEKE", "Alopeke", "ALOPEKE".refined[NonEmpty], isVisitor = true)
+  /** @group Constructors */ case Flamingos2   extends Instrument("Flamingos2", "Flamingos2", "Flamingos 2", "F2".refined[NonEmpty])
+  /** @group Constructors */ case Ghost        extends Instrument("Ghost", "GHOST", "GHOST", "GHOST".refined[NonEmpty])
+  /** @group Constructors */ case GmosNorth    extends Instrument("GmosNorth", "GMOS-N", "GMOS North", "GMOSN".refined[NonEmpty])
+  /** @group Constructors */ case GmosSouth    extends Instrument("GmosSouth", "GMOS-S", "GMOS South", "GMOSS".refined[NonEmpty])
+  /** @group Constructors */ case Gnirs        extends Instrument("Gnirs", "GNIRS", "GNIRS", "GNIRS".refined[NonEmpty])
+  /** @group Constructors */ case Gpi          extends Instrument("Gpi", "GPI", "GPI", "GPI".refined[NonEmpty])
+  /** @group Constructors */ case Gsaoi        extends Instrument("Gsaoi", "GSAOI", "GSAOI", "GSAOI".refined[NonEmpty])
+  /** @group Constructors */ case Igrins2      extends Instrument("Igrins2", "IGRINS-2", "IGRINS-2", "IGRINS2".refined[NonEmpty])
+  /** @group Constructors */ case MaroonX      extends Instrument("MaroonX", "MAROON-X", "MAROON-X", "MAROONX".refined[NonEmpty], isVisitor = true)
+  /** @group Constructors */ case Niri         extends Instrument("Niri", "NIRI", "NIRI", "NIRI".refined[NonEmpty])
+  /** @group Constructors */ case Scorpio      extends Instrument("Scorpio", "SCORPIO", "Scorpio", "SCORPIO".refined[NonEmpty])
+  /** @group Constructors */ case VisitorNorth extends Instrument("VisitorNorth", "Visitor (North)", "Visitor Instrument (North)", "VISITORN".refined[NonEmpty], isVisitor = true)
+  /** @group Constructors */ case VisitorSouth extends Instrument("VisitorSouth", "Visitor (South)", "Visitor Instrument (South)", "VISITORS".refined[NonEmpty], isVisitor = true)
+  /** @group Constructors */ case Zorro        extends Instrument("Zorro", "ZORRO", "Zorro", "ZORRO".refined[NonEmpty], isVisitor = true)
 
   def availability(using md: Metadata): Availability =
     md.availability(this)
+
+object Instrument:
+
+  def facilityInstruments: Set[Instrument] =
+    values.filterNot(_.isVisitor).toSet
+
+  def visitorInstruments: Set[Instrument] =
+    values.filter(_.isVisitor).toSet

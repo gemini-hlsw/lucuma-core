@@ -4,6 +4,7 @@
 package lucuma.core.model
 
 import cats.syntax.all.*
+import lucuma.core.enums.ExchangeObservingModeType
 import lucuma.core.enums.GuideProbe
 import lucuma.core.enums.ObservingModeType
 import lucuma.core.enums.TrackType
@@ -12,6 +13,9 @@ import lucuma.core.enums.VisitorObservingModeType
 trait probes:
   def guideProbe(observingMode: ObservingModeType, trackType: TrackType): Option[GuideProbe] =
     (observingMode, trackType) match
+      // Exchange observations are not supported by AGS; there is no guide probe.
+      case (_: ExchangeObservingModeType, _) =>
+        none
       case (ObservingModeType.Flamingos2LongSlit | ObservingModeType.Flamingos2Imaging, TrackType.Nonsidereal) =>
         GuideProbe.PWFS2.some
       case (ObservingModeType.Flamingos2LongSlit | ObservingModeType.Flamingos2Imaging, TrackType.Sidereal) =>
