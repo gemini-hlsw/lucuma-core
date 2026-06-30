@@ -427,7 +427,7 @@ trait GhostShapes extends InstrumentShapes:
   import lucuma.core.enums.GuideProbe
 
   val posAngle: Angle =
-    0.deg
+    20.deg
 
   val offsetPos: Offset =
     Offset.Zero
@@ -437,10 +437,18 @@ trait GhostShapes extends InstrumentShapes:
 
   val probe: GuideProbe = GuideProbe.PWFS2
 
+  val ifu1Offset: Offset = Offset(100.arcsec.p,  30.arcsec.q)
+  val ifu2Offset: Offset = Offset(-120.arcsec.p, -40.arcsec.q)
+
+  private def ifuMarkerAt(offset: Offset): ShapeExpression =
+    ShapeExpression.centeredRectangle(7.arcsec, 7.arcsec).rotate(posAngle) ↗ offset
+
   override def coloredShapes: List[ColoredShape] =
     List(
       ColoredShape(ifu1PatrolFieldAt(posAngle, offsetPos), new Color(100, 149, 237, 80), filled = true),
-      ColoredShape(ifu2PatrolFieldAt(posAngle, offsetPos), new Color(255, 165,   0, 80), filled = true)
+      ColoredShape(ifu2PatrolFieldAt(posAngle, offsetPos), new Color(255, 165,   0, 80), filled = true),
+      ColoredShape(ifuMarkerAt(ifu1Offset), new Color(100, 149, 237), filled = true),
+      ColoredShape(ifuMarkerAt(ifu2Offset), new Color(255, 165,   0), filled = true)
     )
 
   def shapes: List[ShapeExpression] =

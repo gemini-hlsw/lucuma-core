@@ -40,8 +40,8 @@ sealed trait AgsGeomCalc:
   // Calculates the area vignetted at a given offset
   def vignettingArea(gsOffset: Offset): Area
 
-  // Indicates if the given guide star would vignette the science target
-  def overlapsScience(gsOffset: Offset): Boolean
+  // Indicates if the given guide star would vignette a protected area.
+  def overlapsProtectedArea(gsOffset: Offset, protectedShape: Shape): Boolean
 
   def intersectionPatrolField: ShapeExpression
 
@@ -53,6 +53,12 @@ trait SingleProbeAgsParams:
   def probeArm(posAngle: Angle, guideStar: Offset, offset: Offset): ShapeExpression
 
   def scienceRadius: Angle
+
+  private val scienceShape = ShapeExpression.centeredEllipse(scienceRadius, scienceRadius)
+
+  // Return the protected shapes for each offset
+  def protectedAreas(noZones: List[Offset]): List[Shape] =
+    noZones.map(nz => (scienceShape ↗ nz).eval)
 
   /**
    * Optional region that reperesent the area where we measure vignetting. In most cases it is just
@@ -92,18 +98,10 @@ trait SingleProbeAgsParams:
         private val scienceAreaShape =
           scienceArea(position.posAngle, position.offsetPos)
 
-        private val scienceTargetArea =
-          ShapeExpression.centeredEllipse(scienceRadius,
-                                          scienceRadius
-          ) ↗ position.offsetPos ⟲ position.posAngle
-
         private val intersectionShape: Shape = pfShape
 
         // Cache bounding box for fast rejection
         private val intersectionBounds: BoundingOffsets = pfBounds
-
-        private val scienceTargetShape: Shape =
-          scienceTargetArea.eval
 
         private val scienceAreaShapeEval: Shape =
           scienceAreaShape.eval
@@ -118,9 +116,12 @@ trait SingleProbeAgsParams:
           // Fast bounding box rejection, then precise check
           intersectionBounds.contains(gsOffset) && intersectionShape.contains(gsOffset)
 
-        def overlapsScience(gsOffset: Offset): Boolean =
+        override def overlapsProtectedArea(gsOffset: Offset, protectedShape: Shape): Boolean =
           probeArm(position.posAngle, gsOffset, position.offsetPos).eval
-            .intersects(scienceTargetShape)
+            .intersection(protectedShape)
+            .boundingOffsets
+            .maxSide
+            .toMicroarcseconds > 5
 
         override def vignettingArea(gsOffset: Offset): Area =
           probeArm(position.posAngle, gsOffset, position.offsetPos).eval
@@ -145,6 +146,8 @@ sealed trait AgsParams derives Eq:
   def posCalculations(
     positions: NonEmptyList[OffsetPosition]
   ): NonEmptyMap[OffsetPosition, AgsGeomCalc]
+
+  def protectedAreas(noZones: List[Offset]): List[Shape]
 
 object AgsParams:
   private val GmosScienceRadius = 20.arcseconds

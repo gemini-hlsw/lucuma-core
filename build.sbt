@@ -2,7 +2,7 @@ import org.scalajs.linker.interface.ESVersion
 import org.typelevel.sbt.gha.PermissionValue
 import org.typelevel.sbt.gha.Permissions
 
-ThisBuild / tlBaseVersion                         := "0.215"
+ThisBuild / tlBaseVersion                         := "0.216"
 ThisBuild / tlCiReleaseBranches                   := Seq("master")
 ThisBuild / githubWorkflowEnv += "MUNIT_FLAKY_OK" -> "true"
 
@@ -42,7 +42,7 @@ lazy val munitVersion               = "1.3.3"
 lazy val munitDisciplineVersion     = "2.0.0"
 lazy val munitCatsEffectVersion     = "2.2.0"
 lazy val pprintVersion              = "0.9.6"
-lazy val refinedVersion             = "0.11.3"
+lazy val refinedVersion             = "0.11.4"
 lazy val scalaJavaTimeVersion       = "2.7.0"
 lazy val scalajsStubVersion         = "1.1.0"
 lazy val scalaXmlVersion            = "2.4.0"
