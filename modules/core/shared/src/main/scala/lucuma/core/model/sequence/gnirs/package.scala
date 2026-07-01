@@ -6,6 +6,7 @@ package lucuma.core.model.sequence.gnirs
 import cats.data.NonEmptyList
 import cats.syntax.order.*
 import lucuma.core.enums.GnirsCamera
+import lucuma.core.enums.GnirsFpuIfu
 import lucuma.core.enums.GnirsPrism
 import lucuma.core.enums.SlitOffsetMode
 import lucuma.core.enums.StepGuideState
@@ -44,3 +45,49 @@ def defaultSlitTelescopeConfigs(mode: SlitOffsetMode, prism: GnirsPrism, camera:
   mode match
     case SlitOffsetMode.NodAlongSlit => SlitTelescopeConfigs.AlongSlit(alongSlitDefaultTelescopeConfigs(prism, camera, wavelength))
     case SlitOffsetMode.NodToSky     => SlitTelescopeConfigs.ToSky(OnSkyDefaultTelescopeConfigs)
+
+// GNIRS IFU telescope-config presets. Unlike the long-slit defaults these are not 
+// derived from the optical config; they are fixed templates.
+// The head of each list is the default value, used to initialize observing modes at creation.
+private val LowResolutionIfuPresets: NonEmptyList[(String, NonEmptyList[TelescopeConfig])] =
+  NonEmptyList.of(
+    "Extended" -> NonEmptyList.of(
+      TelescopeConfig(Offset(0.15.pArcsec, 0.15.qArcsec), StepGuideState.Enabled),
+      TelescopeConfig(Offset(10.pArcsec, 10.qArcsec), StepGuideState.Disabled),
+      TelescopeConfig(Offset(-0.15.pArcsec, -0.15.qArcsec), StepGuideState.Enabled),
+      TelescopeConfig(Offset(-10.pArcsec, -10.qArcsec), StepGuideState.Disabled)
+    ),
+    "Point"    -> NonEmptyList.of(
+      TelescopeConfig(Offset(0.75.pArcsec, -1.5.qArcsec), StepGuideState.Enabled),
+      TelescopeConfig(Offset(-0.75.pArcsec, -1.5.qArcsec), StepGuideState.Enabled),
+      TelescopeConfig(Offset(-0.75.pArcsec, 1.5.qArcsec), StepGuideState.Enabled),
+      TelescopeConfig(Offset(0.75.pArcsec, -1.5.qArcsec), StepGuideState.Enabled)
+    )
+  )
+
+private val HighResolutionIfuPresets: NonEmptyList[(String, NonEmptyList[TelescopeConfig])] =
+  NonEmptyList.of(
+    "Science"  -> NonEmptyList.of(
+      TelescopeConfig(Offset(0.1.pArcsec, -0.1.qArcsec), StepGuideState.Enabled),
+      TelescopeConfig(Offset(10.pArcsec, 10.qArcsec), StepGuideState.Disabled),
+      TelescopeConfig(Offset(-0.1.pArcsec, 0.1.qArcsec), StepGuideState.Enabled),
+      TelescopeConfig(Offset(-10.pArcsec, -10.qArcsec), StepGuideState.Disabled)
+    ),
+    "Telluric" -> NonEmptyList.of(
+      TelescopeConfig(Offset(0.pArcsec, 0.qArcsec), StepGuideState.Enabled),
+      TelescopeConfig(Offset(5.pArcsec, 5.qArcsec), StepGuideState.Disabled),
+      TelescopeConfig(Offset(0.pArcsec, 0.qArcsec), StepGuideState.Enabled),
+      TelescopeConfig(Offset(0.pArcsec, 0.qArcsec), StepGuideState.Enabled),
+      TelescopeConfig(Offset(-5.pArcsec, -5.qArcsec), StepGuideState.Disabled),
+      TelescopeConfig(Offset(0.pArcsec, 0.qArcsec), StepGuideState.Enabled)
+    )
+  )
+
+def gnirsIfuTelescopeConfigPresets(fpu: GnirsFpuIfu): NonEmptyList[(String, NonEmptyList[TelescopeConfig])] =
+  fpu match
+    case GnirsFpuIfu.LowResolution  => LowResolutionIfuPresets
+    case GnirsFpuIfu.HighResolution => HighResolutionIfuPresets
+
+// The default IFU telescope configs seeded at observing-mode creation (the first preset).
+def defaultIfuTelescopeConfigs(fpu: GnirsFpuIfu): NonEmptyList[TelescopeConfig] =
+  gnirsIfuTelescopeConfigPresets(fpu).head._2
