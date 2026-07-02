@@ -8,6 +8,6 @@ import lucuma.core.math.Declination
 import scala.scalajs.js
 
 final class DeclinationJS(dec: Declination) extends js.Object:
-  val dms: String                = Declination.fromStringSignedDMS.reverseGet(dec).dropRight(3)
+  val dms: String                = Declination.fromStringSignedDMS.reverseGet(dec).dropRight(4)
   val degrees: Double            = dec.toAngle.toSignedDoubleDegrees
   val microarcseconds: js.BigInt = js.BigInt(dec.toAngle.toMicroarcseconds.toString())
