@@ -124,7 +124,7 @@ def parseVisitId(maybeVisitId: String): js.UndefOr[String] =
 def parseDmsString(maybeDms: String): js.UndefOr[String] =
   Angle.fromStringSignedDMS
     .getOption(maybeDms)
-    .fold(js.undefined)(Angle.fromStringSignedDMS.reverseGet(_).dropRight(3))
+    .fold(js.undefined)(Angle.fromStringSignedDMS.reverseGet(_).dropRight(4))
 
 @JSExportTopLevel("parseHmsString")
 def parseHmsString(maybeHms: String): js.UndefOr[String] =

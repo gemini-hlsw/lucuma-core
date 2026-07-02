@@ -160,10 +160,10 @@ class ExportsTest extends munit.FunSuite {
   }
 
   test("parseDmsString") {
-    assertEquals(parseDmsString("+00:00:00.000000").toOption, Some("+00:00:00.000"))
-    assertEquals(parseDmsString("+15:00:00.00").toOption, Some("+15:00:00.000"))
-    assertEquals(parseDmsString("-15:00:00.00").toOption, Some("-15:00:00.000"))
-    assertEquals(parseDmsString("-38:00:00.00").toOption, Some("-38:00:00.000"))
+    assertEquals(parseDmsString("+00:00:00.000000").toOption, Some("+00:00:00.00"))
+    assertEquals(parseDmsString("+15:00:00.00").toOption, Some("+15:00:00.00"))
+    assertEquals(parseDmsString("-15:00:00.00").toOption, Some("-15:00:00.00"))
+    assertEquals(parseDmsString("-38:00:00.00").toOption, Some("-38:00:00.00"))
     assertEquals(parseDmsString("invalid").toOption, None)
     assertEquals(parseDmsString("000:00:00.000").toOption, None)
   }
