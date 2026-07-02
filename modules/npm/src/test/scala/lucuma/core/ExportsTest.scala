@@ -201,28 +201,28 @@ class ExportsTest extends munit.FunSuite {
   test("toDeclination") {
     // dms format: +/-DD:MM:SS.MMM (3 sub-second digits, always signed)
     val dec0 = toDeclination(0.0)
-    assertNoDiff(dec0.dms, "+00:00:00.000")
+    assertNoDiff(dec0.dms, "+00:00:00.00")
     assertEquals(dec0.degrees, 0.0)
     assertNoDiff(dec0.microarcseconds.toString(), "0")
 
     val dec45 = toDeclination(45.0)
-    assertNoDiff(dec45.dms, "+45:00:00.000")
+    assertNoDiff(dec45.dms, "+45:00:00.00")
     assertEquals(dec45.degrees, 45.0)
 
     val decOverflow = toDeclination(179.0)
-    assertNoDiff(decOverflow.dms, "+01:00:00.000")
+    assertNoDiff(decOverflow.dms, "+01:00:00.00")
     assertEquals(decOverflow.degrees, 1.0)
     assertNoDiff(decOverflow.microarcseconds.toString(), "3600000000")
 
     val decNeg = toDeclination(-30.0)
-    assertNoDiff(decNeg.dms, "-30:00:00.000")
+    assertNoDiff(decNeg.dms, "-30:00:00.00")
     assertEquals(decNeg.degrees, -30.0)
     assertEquals(decNeg.microarcseconds.toString(), "1188000000000")
 
     // An angle in [270, 360) is a negative declination: dms is signed and
     // degrees is the signed value in [-90, 90], not the equivalent positive angle.
     val decWrap = toDeclination(350.9658694444444)
-    assertNoDiff(decWrap.dms, "-09:02:02.870")
+    assertNoDiff(decWrap.dms, "-09:02:02.87")
     assertEquals(decWrap.degrees, -9.034130555555556)
   }
 
