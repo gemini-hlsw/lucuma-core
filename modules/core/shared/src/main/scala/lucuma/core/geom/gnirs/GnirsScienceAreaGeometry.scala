@@ -4,6 +4,7 @@
 package lucuma.core.geom.gnirs
 
 import lucuma.core.enums.GnirsCamera
+import lucuma.core.enums.GnirsFilter
 import lucuma.core.enums.GnirsFpuIfu
 import lucuma.core.enums.GnirsFpuOther
 import lucuma.core.enums.GnirsFpuSlit
@@ -37,6 +38,43 @@ trait GnirsScienceAreaGeometry:
     prism:  GnirsPrism
   ): ShapeExpression =
     ShapeExpression.centeredRectangle(slit.slitWidth, slitLength(camera, prism))
+
+  // Y-MK, J-MK and K-MK filters see the smaller, round unvignetted field; every other
+  // imaging filter (order-blocking, narrow-band, H-MK) sees the full keyhole.
+  def isRoundImagingFilter(filter: GnirsFilter): Boolean =
+    filter match
+      case GnirsFilter.Y | GnirsFilter.J | GnirsFilter.K => true
+      case _                                             => false
+
+  private def offP(pArcsec: Double): Offset =
+    Offset.signedMicroarcseconds.reverseGet(((pArcsec * 1e6).round, 0L))
+
+  // A circular cap (segment) protruding toward +p from the +p edge of a bar of the
+  // given p-width (centered on the origin). `capWidth` is the cap's extent along q, and
+  // `capHeight` its protrusion along p; the radius is implied by the two (the standard
+  // chord/sagitta relation for a circular segment). The long field axis runs along q
+  // (like the long slit), so the cap bumps out sideways.
+  // See https://www.gemini.edu/sciops/instruments/nirs/filters/imaging_aps.jpg
+  private def cap(capWidth: Angle, capHeight: Angle, barWidth: Angle): ShapeExpression =
+    val w       = capWidth.toSignedDoubleDecimalArcseconds
+    val h       = capHeight.toSignedDoubleDecimalArcseconds
+    val baseP   = barWidth.toSignedDoubleDecimalArcseconds / 2 // cap springs from the +p edge of the bar
+    val r       = (h * h + (w / 2) * (w / 2)) / (2 * h) // circle radius from chord (w) & sagitta (h)
+    val circle  = ShapeExpression.centeredEllipse((2 * r).toArcsecondsAngle, (2 * r).toArcsecondsAngle) ↗ offP(baseP - (r - h))
+    val clip    = ShapeExpression.centeredRectangle((2 * h + 2).toArcsecondsAngle, (w + 2).toArcsecondsAngle) ↗ offP(baseP + h + 1)
+    circle ∩ clip
+
+  // GNIRS imaging science area ("keyhole"): the 99"/49" no-XD field along q (camera-
+  // dependent, like the long slit) as a narrow bar, with a circular cap bumping out to
+  // one side; or, for the MK filters, the smaller round field. Widths below are the
+  // diagram's horizontal (mapped to q); heights are its vertical (the spatial cross-axis, p).
+  private def imagingFov(camera: GnirsCamera, filter: GnirsFilter): ShapeExpression =
+    if isRoundImagingFilter(filter) then
+      ShapeExpression.centeredRectangle(RoundFieldHeight, RoundFieldWidth) ∪
+        cap(RoundCapWidth, RoundCapHeight, RoundFieldHeight)
+    else
+      ShapeExpression.centeredRectangle(KeyholeBarHeight, slitLength(camera, GnirsPrism.Mirror)) ∪
+        cap(KeyholeCapWidth, KeyholeCapHeight, KeyholeBarHeight)
 
   // IFU science area: a rectangle of the IFU "slit width" by a fixed,
   // resolution-dependent height (derived from ocs InstGNIRS.getScienceArea).
@@ -78,5 +116,20 @@ trait GnirsScienceAreaGeometry:
     prism:     GnirsPrism
   ): ShapeExpression =
     longSlitFov(slit, camera, prism).shapeAt(offsetPos, posAngle)
+
+  def imagingShapeAt(
+    posAngle:  Angle,
+    offsetPos: Offset,
+    camera:    GnirsCamera,
+    filter:    GnirsFilter
+  ): ShapeExpression =
+    imagingFov(camera, filter).shapeAt(offsetPos, posAngle)
+
+  def ifuShapeAt(
+    posAngle:  Angle,
+    offsetPos: Offset,
+    ifu:       GnirsFpuIfu
+  ): ShapeExpression =
+    ifuFov(ifu).shapeAt(offsetPos, posAngle)
 
 object scienceArea extends GnirsScienceAreaGeometry

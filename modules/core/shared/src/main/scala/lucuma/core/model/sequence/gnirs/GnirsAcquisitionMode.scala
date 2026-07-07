@@ -27,10 +27,14 @@ enum GnirsAcquisitionMode(val acquisitionType: GnirsAcquisitionType) derives Eq:
 
 object GnirsAcquisitionMode:
   object Faint {
-    val DefaultSkyOffset: Offset = Offset(0.pArcsec, -2.qArcsec)
+    // The default Faint sky offset for long slit.
+    val DefaultSlitSkyOffset: Offset = Offset(0.pArcsec, -2.qArcsec)
+
+    // The default Faint sky offset for IFU: the sky is imaged 10" west of the target.
+    val DefaultIfuSkyOffset: Offset = Offset(-10.pArcsec, 0.qArcsec)
 
     val Default: GnirsAcquisitionMode.Faint =
-      GnirsAcquisitionMode.Faint(DefaultSkyOffset)
+      GnirsAcquisitionMode.Faint(DefaultSlitSkyOffset)
 
     val skyOffset: Iso[GnirsAcquisitionMode.Faint, Offset] = Focus[GnirsAcquisitionMode.Faint](_.skyOffset)
   }
@@ -51,7 +55,7 @@ object GnirsAcquisitionMode:
     acquisitionType match
       case GnirsAcquisitionType.VeryBright => VeryBright
       case GnirsAcquisitionType.Bright => Bright
-      case GnirsAcquisitionType.Faint => Faint(skyOffset.getOrElse(Faint.DefaultSkyOffset))
+      case GnirsAcquisitionType.Faint => Faint(skyOffset.getOrElse(Faint.DefaultSlitSkyOffset))
 
   // Default value depends on integration time (exposure time * coadds).
   def defaultFor(exposureTime: TimeSpan, coadds: PosInt): GnirsAcquisitionMode =
