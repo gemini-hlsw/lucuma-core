@@ -12,5 +12,5 @@ import lucuma.core.util.Enumerated
 enum GcalContinuum(val tag: String, val shortName: String, val longName: String) derives Enumerated:
   /** @group Constructors */ case IrGreyBodyLow     extends GcalContinuum("IrGreyBodyLow", "IR Low", "IR grey body - low")
   /** @group Constructors */ case IrGreyBodyHigh    extends GcalContinuum("IrGreyBodyHigh", "IR High", "IR grey body - high")
-  /** @group Constructors */ case QuartzHalogen5W   extends GcalContinuum("QuartzHalogen5", "5W Quartz Halogen", "5W Quartz Halogen")
-  /** @group Constructors */ case QuartzHalogen100W extends GcalContinuum("QuartzHalogen100", "100W Quartz Halogen", "100W Quartz Halogen")
+  /** @group Constructors */ case QuartzHalogen5W   extends GcalContinuum("QuartzHalogen5", "5W QH", "5W Quartz Halogen")
+  /** @group Constructors */ case QuartzHalogen100W extends GcalContinuum("QuartzHalogen100", "100W QH", "100W Quartz Halogen")
