@@ -257,6 +257,13 @@ object Angle extends AngleOptics {
       BigDecimal(toMicroarcseconds) / Angle.µasPerDegree
 
     /**
+    * This angle in decimal arcseconds. Approximate, non-invertible.
+    * @group Conversions
+    */
+    def toSignedDoubleDecimalArcseconds: Double =
+      Angle.signedDecimalArcseconds.get(angle).toDouble
+
+    /**
     * This angle in signed decimal degrees. Approximate, non-invertible
     * @group Conversions
     */

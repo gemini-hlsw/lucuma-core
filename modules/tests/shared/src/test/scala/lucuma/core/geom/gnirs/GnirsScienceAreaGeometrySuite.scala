@@ -6,13 +6,14 @@ package lucuma.core.geom.gnirs
 import lucuma.core.enums.GnirsCamera
 import lucuma.core.enums.GnirsFilter
 import lucuma.core.enums.GnirsFpuIfu
+import lucuma.core.geom.ShapeExpression
 import lucuma.core.geom.jts.interpreter.given
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 
 class GnirsScienceAreaGeometrySuite extends munit.FunSuite:
 
-  private def sides(shape: lucuma.core.geom.ShapeExpression): (Angle, Angle) =
+  private def sides(shape: ShapeExpression): (Angle, Angle) =
     val b = shape.eval.boundingOffsets
     (b.topLeft.p.toAngle.difference(b.bottomRight.p.toAngle),
      b.topLeft.q.toAngle.difference(b.bottomRight.q.toAngle)

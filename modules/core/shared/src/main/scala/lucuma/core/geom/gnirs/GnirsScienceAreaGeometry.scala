@@ -46,23 +46,22 @@ trait GnirsScienceAreaGeometry:
       case GnirsFilter.Y | GnirsFilter.J | GnirsFilter.K => true
       case _                                             => false
 
-  private def asec(a: Angle): Double = Angle.signedDecimalArcseconds.get(a).toDouble
-  private def arcsec(d: Double): Angle = Angle.fromDoubleArcseconds(d)
   private def offP(pArcsec: Double): Offset =
     Offset.signedMicroarcseconds.reverseGet(((pArcsec * 1e6).round, 0L))
 
   // A circular cap (segment) protruding toward +p from the +p edge of a bar of the
-  // given p-width (centered on the origin). `chord` is the cap's extent along q, and
-  // `sagitta` its protrusion along p; the radius is implied by the two. The long field
-  // axis runs along q (like the long slit), so the cap bumps out sideways.
+  // given p-width (centered on the origin). `capWidth` is the cap's extent along q, and
+  // `capHeight` its protrusion along p; the radius is implied by the two (the standard
+  // chord/sagitta relation for a circular segment). The long field axis runs along q
+  // (like the long slit), so the cap bumps out sideways.
   // See https://www.gemini.edu/sciops/instruments/nirs/filters/imaging_aps.jpg
-  private def cap(chord: Angle, sagitta: Angle, barWidth: Angle): ShapeExpression =
-    val c       = asec(chord)
-    val s       = asec(sagitta)
-    val baseP   = asec(barWidth) / 2                   // cap springs from the +p edge of the bar
-    val r       = (s * s + (c / 2) * (c / 2)) / (2 * s) // circle radius from chord & sagitta
-    val circle  = ShapeExpression.centeredEllipse(arcsec(2 * r), arcsec(2 * r)) ↗ offP(baseP - (r - s))
-    val clip    = ShapeExpression.centeredRectangle(arcsec(2 * s + 2), arcsec(c + 2)) ↗ offP(baseP + s + 1)
+  private def cap(capWidth: Angle, capHeight: Angle, barWidth: Angle): ShapeExpression =
+    val w       = capWidth.toSignedDoubleDecimalArcseconds
+    val h       = capHeight.toSignedDoubleDecimalArcseconds
+    val baseP   = barWidth.toSignedDoubleDecimalArcseconds / 2 // cap springs from the +p edge of the bar
+    val r       = (h * h + (w / 2) * (w / 2)) / (2 * h) // circle radius from chord (w) & sagitta (h)
+    val circle  = ShapeExpression.centeredEllipse((2 * r).toArcsecondsAngle, (2 * r).toArcsecondsAngle) ↗ offP(baseP - (r - h))
+    val clip    = ShapeExpression.centeredRectangle((2 * h + 2).toArcsecondsAngle, (w + 2).toArcsecondsAngle) ↗ offP(baseP + h + 1)
     circle ∩ clip
 
   // GNIRS imaging science area ("keyhole"): the 99"/49" no-XD field along q (camera-
