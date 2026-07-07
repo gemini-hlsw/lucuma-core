@@ -13,6 +13,8 @@ import lucuma.core.enums.GmosFpuType
 import lucuma.core.enums.GmosNorthFpu
 import lucuma.core.enums.GmosSouthFpu
 import lucuma.core.enums.GnirsCamera
+import lucuma.core.enums.GnirsFilter
+import lucuma.core.enums.GnirsFpuIfu
 import lucuma.core.enums.GnirsFpuSlit
 import lucuma.core.enums.GnirsPrism
 import lucuma.core.enums.GuideProbe
@@ -22,6 +24,7 @@ import lucuma.core.geom.Area
 import lucuma.core.geom.BoundingOffsets
 import lucuma.core.geom.Shape
 import lucuma.core.geom.ShapeExpression
+import lucuma.core.geom.gnirs
 import lucuma.core.geom.jts.interpreter.given
 import lucuma.core.geom.offsets.OffsetPosition
 import lucuma.core.geom.syntax.all.*
@@ -402,6 +405,64 @@ object AgsParams:
       port:   PortDisposition = PortDisposition.Bottom
     ): GnirsLongSlit =
       GnirsLongSlit(fpu, camera, prism, port, GuideProbe.PWFS2)
+
+    val GnirsScienceRadius = 20.arcseconds
+
+  case class GnirsImaging private (
+    camera: GnirsCamera,
+    filter: GnirsFilter,
+    port:   PortDisposition,
+    probe:  PWFSGuideProbe
+  ) extends AgsParams
+      with PwfsOnlyParams
+      with PwfsSupport[GnirsImaging] derives Eq:
+
+    protected def withPWFSProbe(probe: PWFSGuideProbe): GnirsImaging = copy(probe = probe)
+
+    override def scienceArea(posAngle: Angle, offset: Offset): ShapeExpression =
+      lucuma.core.geom.gnirs.scienceArea.imagingShapeAt(posAngle, offset, camera, filter)
+
+    override def scienceRadius: Angle = GnirsImaging.GnirsScienceRadius
+
+  object GnirsImaging:
+    def apply(
+      camera: GnirsCamera,
+      filter: GnirsFilter,
+      port:   PortDisposition = PortDisposition.Bottom
+    ): GnirsImaging =
+      GnirsImaging(camera, filter, port, GuideProbe.PWFS2)
+
+    // Representative filter for a multi-filter imaging observation: the keyhole
+    // (order-blocking / narrow-band / H-MK) field is larger than the round MK field,
+    // so a mixed set uses a keyhole filter when one is present.
+    def representativeFilter(filters: NonEmptyList[GnirsFilter]): GnirsFilter =
+      filters
+        .find(f => !gnirs.scienceArea.isRoundImagingFilter(f))
+        .getOrElse(filters.head)
+
+    val GnirsScienceRadius = 20.arcseconds
+
+  case class GnirsIfu private (
+    ifu:   GnirsFpuIfu,
+    port:  PortDisposition,
+    probe: PWFSGuideProbe
+  ) extends AgsParams
+      with PwfsOnlyParams
+      with PwfsSupport[GnirsIfu] derives Eq:
+
+    protected def withPWFSProbe(probe: PWFSGuideProbe): GnirsIfu = copy(probe = probe)
+
+    override def scienceArea(posAngle: Angle, offset: Offset): ShapeExpression =
+      lucuma.core.geom.gnirs.scienceArea.ifuShapeAt(posAngle, offset, ifu)
+
+    override def scienceRadius: Angle = GnirsIfu.GnirsScienceRadius
+
+  object GnirsIfu:
+    def apply(
+      ifu:  GnirsFpuIfu,
+      port: PortDisposition = PortDisposition.Bottom
+    ): GnirsIfu =
+      GnirsIfu(ifu, port, GuideProbe.PWFS2)
 
     val GnirsScienceRadius = 20.arcseconds
 
