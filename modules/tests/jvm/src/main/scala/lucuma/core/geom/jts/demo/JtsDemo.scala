@@ -222,7 +222,7 @@ class JtsDemo extends Frame("JTS Demo") {
     50.arcsec
 
   // Pixel width and height
-  val canvasSize: Int = 800
+  val canvasSize: Int = 1000
 
   val hints: Map[RenderingHints.Key, Object] =
     Map(
@@ -508,6 +508,44 @@ trait GnirsShapes extends InstrumentShapes:
     ) ++ scienceArea.shapeAt(posAngle, offsetPos, fpu, camera, prism).toList
 
 object JtsGnirsDemo extends JtsDemo with GnirsShapes:
+  override val arcsecPerPixel: Double = 1.0
+
+trait GnirsImagingShapes extends InstrumentShapes:
+  import lucuma.core.geom.gnirs.*
+  import lucuma.core.geom.pwfs.{patrolField, probeArm}
+  import lucuma.core.enums.GnirsCamera
+  import lucuma.core.enums.GnirsFilter
+  import lucuma.core.enums.GuideProbe
+
+  val posAngle: Angle =
+    15.deg
+
+  val offsetPos: Offset =
+    Offset.Zero
+
+  val guideStarOffset: Offset =
+    Offset(270.arcsec.p, 224.arcsec.q)
+
+  val probe: GuideProbe = GuideProbe.PWFS2
+
+  val camera: GnirsCamera = GnirsCamera.ShortBlue
+
+  // Order4 (H) is a keyhole filter, so this shows the full keyhole science area.
+  // Switch to GnirsFilter.Y/J/K to see the smaller round field.
+  val filter: GnirsFilter = GnirsFilter.Order4
+
+  def shapes: List[ShapeExpression] =
+    List(
+      ShapeExpression.centeredRectangle(1.arcsec, 1.arcsec).translate(guideStarOffset),
+      scienceArea.imagingShapeAt(posAngle, offsetPos, camera, filter),
+      patrolField.patrolFieldAt(posAngle, offsetPos),
+      probeArm.mirrorAt(probe, guideStarOffset, offsetPos),
+      probeArm.mirrorVignettedAreaAt(probe, guideStarOffset, offsetPos),
+      probeArm.armVignettedAreaAt(probe, guideStarOffset, offsetPos),
+      probeArm.armAt(probe, guideStarOffset, offsetPos)
+    )
+
+object JtsGnirsImagingDemo extends JtsDemo with GnirsImagingShapes:
   override val arcsecPerPixel: Double = 1.0
 
 trait MaroonXShapes extends InstrumentShapes:
