@@ -402,7 +402,7 @@ object AgsParams:
       fpu:    GnirsFpuSlit,
       camera: GnirsCamera,
       prism:  GnirsPrism,
-      port:   PortDisposition = PortDisposition.Bottom
+      port:   PortDisposition = PortDisposition.Side
     ): GnirsLongSlit =
       GnirsLongSlit(fpu, camera, prism, port, GuideProbe.PWFS2)
 
@@ -428,7 +428,7 @@ object AgsParams:
     def apply(
       camera: GnirsCamera,
       filter: GnirsFilter,
-      port:   PortDisposition = PortDisposition.Bottom
+      port:   PortDisposition = PortDisposition.Side
     ): GnirsImaging =
       GnirsImaging(camera, filter, port, GuideProbe.PWFS2)
 
@@ -460,7 +460,7 @@ object AgsParams:
   object GnirsIfu:
     def apply(
       ifu:  GnirsFpuIfu,
-      port: PortDisposition = PortDisposition.Bottom
+      port: PortDisposition = PortDisposition.Side
     ): GnirsIfu =
       GnirsIfu(ifu, port, GuideProbe.PWFS2)
 
