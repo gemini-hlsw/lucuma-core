@@ -5,6 +5,9 @@ package lucuma.core.model.sequence.igrins2
 
 import cats.kernel.laws.discipline.*
 import lucuma.core.enums.Igrins2FowlerSamples
+import lucuma.core.enums.SlitOffsetMode
+import lucuma.core.enums.StepGuideState
+import lucuma.core.model.SlitTelescopeConfigs
 import lucuma.core.model.sequence.igrins2.arb.ArbIgrins2DynamicConfig.given
 import lucuma.core.model.sequence.igrins2.arb.ArbIgrins2StaticConfig.given
 import lucuma.core.syntax.timespan.*
@@ -21,3 +24,19 @@ class Igrins2ConfigSuite extends DisciplineSuite:
     assertEquals(Igrins2DynamicConfig(15.secTimeSpan).fowlerSamples, Igrins2FowlerSamples.Eight)
     assertEquals(Igrins2DynamicConfig(30.secTimeSpan).fowlerSamples, Igrins2FowlerSamples.Sixteen)
     assertEquals(Igrins2DynamicConfig(120.secTimeSpan).fowlerSamples, Igrins2FowlerSamples.Sixteen)
+
+  test("defaultSlitTelescopeConfigs for NodAlongSlit"):
+    assertEquals(
+      defaultSlitTelescopeConfigs(SlitOffsetMode.NodAlongSlit),
+      SlitTelescopeConfigs.AlongSlit(NodAlongSlitDefaultTelescopeConfigs)
+    )
+    assert(NodAlongSlitDefaultTelescopeConfigs.forall(_.guiding == StepGuideState.Enabled))
+
+  test("defaultSlitTelescopeConfigs for NodToSky"):
+    assertEquals(
+      defaultSlitTelescopeConfigs(SlitOffsetMode.NodToSky),
+      SlitTelescopeConfigs.ToSky(NodToSkyDefaultTelescopeConfigs)
+    )
+    assertEquals(NodToSkyDefaultTelescopeConfigs.toList.map(_.guiding),
+      List(StepGuideState.Enabled, StepGuideState.Disabled, StepGuideState.Enabled)
+    )
