@@ -5,7 +5,7 @@ package lucuma.core.model.sequence.igrins2
 
 import cats.data.NonEmptyList
 import lucuma.core.enums.Igrins2FowlerSamples
-import lucuma.core.enums.SlitOffsetMode
+import lucuma.core.enums.Igrins2SlitOffsetPreset
 import lucuma.core.enums.StepGuideState
 import lucuma.core.math.Offset
 import lucuma.core.math.Wavelength
@@ -59,7 +59,7 @@ val NodToSkyDefaultTelescopeConfigs: NonEmptyList[TelescopeConfig] =
     TelescopeConfig(Offset.Zero, StepGuideState.Enabled),
   )
 
-def defaultSlitTelescopeConfigs(mode: SlitOffsetMode): SlitTelescopeConfigs =
-  mode match
-    case SlitOffsetMode.NodAlongSlit => SlitTelescopeConfigs.AlongSlit(NodAlongSlitDefaultTelescopeConfigs)
-    case SlitOffsetMode.NodToSky     => SlitTelescopeConfigs.ToSky(NodToSkyDefaultTelescopeConfigs)
+def defaultSlitTelescopeConfigs(preset: Igrins2SlitOffsetPreset): SlitTelescopeConfigs =
+  preset match
+    case Igrins2SlitOffsetPreset.NodAlongSlit => SlitTelescopeConfigs.AlongSlit(NodAlongSlitDefaultTelescopeConfigs)
+    case Igrins2SlitOffsetPreset.NodToSky     => SlitTelescopeConfigs.ToSky(NodToSkyDefaultTelescopeConfigs)

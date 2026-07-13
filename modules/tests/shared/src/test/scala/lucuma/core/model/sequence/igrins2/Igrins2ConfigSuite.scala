@@ -3,11 +3,15 @@
 
 package lucuma.core.model.sequence.igrins2
 
+import cats.data.NonEmptyList
 import cats.kernel.laws.discipline.*
 import lucuma.core.enums.Igrins2FowlerSamples
+import lucuma.core.enums.Igrins2SlitOffsetPreset
 import lucuma.core.enums.SlitOffsetMode
 import lucuma.core.enums.StepGuideState
-import lucuma.core.model.SlitTelescopeConfigs
+import lucuma.core.math.Offset
+import lucuma.core.math.syntax.bigDecimal.*
+import lucuma.core.model.sequence.TelescopeConfig
 import lucuma.core.model.sequence.igrins2.arb.ArbIgrins2DynamicConfig.given
 import lucuma.core.model.sequence.igrins2.arb.ArbIgrins2StaticConfig.given
 import lucuma.core.syntax.timespan.*
@@ -16,6 +20,11 @@ import munit.*
 class Igrins2ConfigSuite extends DisciplineSuite:
   checkAll("Eq[Igrins2DynamicConfig]", EqTests[Igrins2DynamicConfig].eqv)
   checkAll("Eq[Igrins2StaticConfig]", EqTests[Igrins2StaticConfig].eqv)
+
+  private def alongSlit(guiding: StepGuideState, qs: BigDecimal*): NonEmptyList[TelescopeConfig] =
+    NonEmptyList.fromListUnsafe(
+      qs.toList.map(q => TelescopeConfig(Offset(0.pArcsec, q.qArcsec), guiding))
+    )
 
   test("fowlerSamples from exposure time"):
     assertEquals(Igrins2DynamicConfig(1000.msTimeSpan).fowlerSamples, Igrins2FowlerSamples.One)
@@ -26,17 +35,18 @@ class Igrins2ConfigSuite extends DisciplineSuite:
     assertEquals(Igrins2DynamicConfig(120.secTimeSpan).fowlerSamples, Igrins2FowlerSamples.Sixteen)
 
   test("defaultSlitTelescopeConfigs for NodAlongSlit"):
-    assertEquals(
-      defaultSlitTelescopeConfigs(SlitOffsetMode.NodAlongSlit),
-      SlitTelescopeConfigs.AlongSlit(NodAlongSlitDefaultTelescopeConfigs)
-    )
-    assert(NodAlongSlitDefaultTelescopeConfigs.forall(_.guiding == StepGuideState.Enabled))
+    val cfg = defaultSlitTelescopeConfigs(Igrins2SlitOffsetPreset.NodAlongSlit)
+    assertEquals(cfg.offsetsType, SlitOffsetMode.NodAlongSlit)
+    assertEquals(cfg.telescopeConfigs, alongSlit(StepGuideState.Enabled, -1.25, 1.25, 1.25, -1.25))
 
   test("defaultSlitTelescopeConfigs for NodToSky"):
+    val cfg = defaultSlitTelescopeConfigs(Igrins2SlitOffsetPreset.NodToSky)
+    assertEquals(cfg.offsetsType, SlitOffsetMode.NodToSky)
     assertEquals(
-      defaultSlitTelescopeConfigs(SlitOffsetMode.NodToSky),
-      SlitTelescopeConfigs.ToSky(NodToSkyDefaultTelescopeConfigs)
-    )
-    assertEquals(NodToSkyDefaultTelescopeConfigs.toList.map(_.guiding),
-      List(StepGuideState.Enabled, StepGuideState.Disabled, StepGuideState.Enabled)
+      cfg.telescopeConfigs,
+      NonEmptyList.of(
+        TelescopeConfig(Offset.Zero, StepGuideState.Enabled),
+        TelescopeConfig(Offset(10.pArcsec, 10.qArcsec), StepGuideState.Disabled),
+        TelescopeConfig(Offset.Zero, StepGuideState.Enabled)
+      )
     )
