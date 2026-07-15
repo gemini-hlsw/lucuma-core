@@ -63,9 +63,9 @@ object Fixtures:
 
   // Science target
 
-  val scienceRadius: Angle               = Angle.fromDoubleArcseconds(50.0)
+  val scienceDiameter: Angle             = Angle.fromDoubleArcseconds(50.0)
   val scienceTargetExpr: ShapeExpression =
-    ShapeExpression.centeredEllipse(scienceRadius, scienceRadius) ↗ offset ⟲ posAngle
+    ShapeExpression.centeredEllipse(scienceDiameter, scienceDiameter) ↗ offset ⟲ posAngle
   val scienceTargetShape: Shape          = scienceTargetExpr.eval
   val scienceTargetGeom: Geometry        = geom(scienceTargetExpr)
 

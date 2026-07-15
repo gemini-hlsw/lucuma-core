@@ -278,8 +278,8 @@ trait GhostWithPwfsVisualizationShapes(val posAngle: Angle) extends AgsVisualiza
 
   private def noZoneAt(offset: Offset): ShapeExpression =
     ShapeExpression.centeredEllipse(
-      params.scienceRadius + params.scienceRadius,
-      params.scienceRadius + params.scienceRadius
+      params.scienceDiameter + params.scienceDiameter,
+      params.scienceDiameter + params.scienceDiameter
     ) ↗ offset
 
   override def shapes: List[ShapeExpression] = List(
