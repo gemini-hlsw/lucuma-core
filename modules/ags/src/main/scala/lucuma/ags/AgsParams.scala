@@ -28,8 +28,6 @@ import lucuma.core.geom.gnirs
 import lucuma.core.geom.jts.interpreter.given
 import lucuma.core.geom.offsets.OffsetPosition
 import lucuma.core.geom.syntax.all.*
-import lucuma.core.geom.visitors.MaroonXScienceFov
-import lucuma.core.geom.visitors.maroonXScienceArea
 import lucuma.core.geom.visitors.visitorScienceArea
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
@@ -55,9 +53,9 @@ trait SingleProbeAgsParams:
 
   def probeArm(posAngle: Angle, guideStar: Offset, offset: Offset): ShapeExpression
 
-  def scienceRadius: Angle
+  def scienceDiameter: Angle
 
-  private val scienceShape = ShapeExpression.centeredEllipse(scienceRadius, scienceRadius)
+  private val scienceShape = ShapeExpression.centeredEllipse(scienceDiameter, scienceDiameter)
 
   // Return the protected shapes for each offset
   def protectedAreas(noZones: List[Offset]): List[Shape] =
@@ -153,7 +151,7 @@ sealed trait AgsParams derives Eq:
   def protectedAreas(noZones: List[Offset]): List[Shape]
 
 object AgsParams:
-  private val GmosScienceRadius = 20.arcseconds
+  private val GmosScienceDiameter = 20.arcseconds
 
   case class GmosImaging private (
     port:  PortDisposition,
@@ -192,7 +190,7 @@ object AgsParams:
         case _                    =>
           ShapeExpression.Empty
 
-    override def scienceRadius: Angle = GmosScienceRadius
+    override def scienceDiameter: Angle = GmosScienceDiameter
 
   object GmosImaging:
     def apply(port: PortDisposition = PortDisposition.Side): GmosImaging =
@@ -236,7 +234,7 @@ object AgsParams:
         case _                    =>
           ShapeExpression.Empty
 
-    override def scienceRadius: Angle = GmosScienceRadius
+    override def scienceDiameter: Angle = GmosScienceDiameter
 
   object GmosLongSlit:
     def apply(
@@ -288,7 +286,7 @@ object AgsParams:
           pwfs.probeArm.vignettedAreaAt(probe, guideStar, offset)
         case _                          => ShapeExpression.Empty
 
-    override def scienceRadius: Angle = Flamingos2LongSlit.Flamingos2ScienceRadius
+    override def scienceDiameter: Angle = Flamingos2LongSlit.Flamingos2ScienceDiameter
 
   object Flamingos2LongSlit:
     def apply(
@@ -297,7 +295,7 @@ object AgsParams:
       port: PortDisposition
     ): Flamingos2LongSlit = Flamingos2LongSlit(lyot, fpu, port, GuideProbe.Flamingos2OIWFS)
 
-    val Flamingos2ScienceRadius = 20.arcseconds
+    val Flamingos2ScienceDiameter = 20.arcseconds
 
   case class Flamingos2Imaging private (
     lyot:  Flamingos2LyotWheel,
@@ -337,7 +335,7 @@ object AgsParams:
         case _                          =>
           ShapeExpression.Empty
 
-    override def scienceRadius: Angle = Flamingos2Imaging.Flamingos2ScienceRadius
+    override def scienceDiameter: Angle = Flamingos2Imaging.Flamingos2ScienceDiameter
 
   object Flamingos2Imaging:
     def apply(
@@ -345,7 +343,7 @@ object AgsParams:
       port: PortDisposition
     ): Flamingos2Imaging = Flamingos2Imaging(lyot, port, GuideProbe.Flamingos2OIWFS)
 
-    val Flamingos2ScienceRadius = 20.arcseconds
+    val Flamingos2ScienceDiameter = 20.arcseconds
 
   trait PwfsOnlyParams extends SingleProbeAgsParams:
     def probe: PWFSGuideProbe
@@ -372,13 +370,13 @@ object AgsParams:
     override def scienceArea(posAngle: Angle, offset: Offset): ShapeExpression =
       lucuma.core.geom.igrins2.scienceArea.svcFieldOfView(posAngle, offset)
 
-    override def scienceRadius: Angle = Igrins2LongSlit.Igrins2ScienceRadius
+    override def scienceDiameter: Angle = Igrins2LongSlit.Igrins2ScienceDiameter
 
   object Igrins2LongSlit:
     def apply(port: PortDisposition = PortDisposition.Bottom): Igrins2LongSlit =
       Igrins2LongSlit(port, GuideProbe.PWFS2)
 
-    val Igrins2ScienceRadius = 20.arcseconds
+    val Igrins2ScienceDiameter = 20.arcseconds
 
   case class GnirsLongSlit private (
     fpu:    GnirsFpuSlit,
@@ -395,7 +393,7 @@ object AgsParams:
     override def scienceArea(posAngle: Angle, offset: Offset): ShapeExpression =
       lucuma.core.geom.gnirs.scienceArea.longSlitShapeAt(posAngle, offset, fpu, camera, prism)
 
-    override def scienceRadius: Angle = GnirsLongSlit.GnirsScienceRadius
+    override def scienceDiameter: Angle = GnirsLongSlit.GnirsScienceDiameter
 
   object GnirsLongSlit:
     def apply(
@@ -406,7 +404,7 @@ object AgsParams:
     ): GnirsLongSlit =
       GnirsLongSlit(fpu, camera, prism, port, GuideProbe.PWFS2)
 
-    val GnirsScienceRadius = 20.arcseconds
+    val GnirsScienceDiameter = 20.arcseconds
 
   case class GnirsImaging private (
     camera: GnirsCamera,
@@ -422,7 +420,7 @@ object AgsParams:
     override def scienceArea(posAngle: Angle, offset: Offset): ShapeExpression =
       lucuma.core.geom.gnirs.scienceArea.imagingShapeAt(posAngle, offset, camera, filter)
 
-    override def scienceRadius: Angle = GnirsImaging.GnirsScienceRadius
+    override def scienceDiameter: Angle = GnirsImaging.GnirsScienceDiameter
 
   object GnirsImaging:
     def apply(
@@ -440,7 +438,7 @@ object AgsParams:
         .find(f => !gnirs.scienceArea.isRoundImagingFilter(f))
         .getOrElse(filters.head)
 
-    val GnirsScienceRadius = 20.arcseconds
+    val GnirsScienceDiameter = 20.arcseconds
 
   case class GnirsIfu private (
     ifu:   GnirsFpuIfu,
@@ -455,7 +453,7 @@ object AgsParams:
     override def scienceArea(posAngle: Angle, offset: Offset): ShapeExpression =
       lucuma.core.geom.gnirs.scienceArea.ifuShapeAt(posAngle, offset, ifu)
 
-    override def scienceRadius: Angle = GnirsIfu.GnirsScienceRadius
+    override def scienceDiameter: Angle = GnirsIfu.GnirsScienceDiameter
 
   object GnirsIfu:
     def apply(
@@ -464,7 +462,7 @@ object AgsParams:
     ): GnirsIfu =
       GnirsIfu(ifu, port, GuideProbe.PWFS2)
 
-    val GnirsScienceRadius = 20.arcseconds
+    val GnirsScienceDiameter = 20.arcseconds
 
   case class GhostIfu private (
     port:  PortDisposition,
@@ -478,19 +476,20 @@ object AgsParams:
     override def scienceArea(posAngle: Angle, offset: Offset): ShapeExpression =
       lucuma.core.geom.ghost.scienceArea.fovAt(posAngle, offset)
 
-    override def scienceRadius: Angle = GhostIfu.GhostScienceRadius
+    override def scienceDiameter: Angle = GhostIfu.GhostScienceDiameter
 
   object GhostIfu:
     def apply(port: PortDisposition = PortDisposition.Bottom): GhostIfu =
       GhostIfu(port, GuideProbe.PWFS2)
 
     // Is this correct? is it the same for either ifu?
-    val GhostScienceRadius = 20.arcseconds
+    val GhostScienceDiameter = 20.arcseconds
 
   case class Visitor private (
-    scienceFov: Angle,
-    port:       PortDisposition,
-    probe:      PWFSGuideProbe
+    agsDiameter:        Angle,
+    scienceFovDiameter: Angle,
+    port:               PortDisposition,
+    probe:              PWFSGuideProbe
   ) extends AgsParams
       with PwfsOnlyParams
       with PwfsSupport[Visitor] derives Eq:
@@ -499,33 +498,21 @@ object AgsParams:
       copy(probe = probe)
 
     override def scienceArea(posAngle: Angle, offset: Offset): ShapeExpression =
-      visitorScienceArea.shapeAt(posAngle, offset, scienceFov)
+      visitorScienceArea.shapeAt(posAngle, offset, scienceFovDiameter)
 
-    override def scienceRadius: Angle =
-      scienceFov * 0.5
+    override def scienceDiameter: Angle =
+      scienceFovDiameter
 
-  object Visitor:
-    def apply(scienceRadius: Angle, port: PortDisposition = PortDisposition.Bottom): Visitor =
-      Visitor(scienceRadius, port, GuideProbe.PWFS2)
-
-  case class MaroonX private (
-    port:  PortDisposition,
-    probe: PWFSGuideProbe
-  ) extends AgsParams
-      with PwfsOnlyParams
-      with PwfsSupport[MaroonX] derives Eq:
-
-    protected def withPWFSProbe(probe: PWFSGuideProbe): MaroonX =
-      copy(probe = probe)
-
-    override def scienceArea(posAngle: Angle, offset: Offset): ShapeExpression =
-      maroonXScienceArea.shapeAt(posAngle, offset)
+    private def extendedVignettingAreaAt(posAngle: Angle, offsetPos: Offset): ShapeExpression =
+      ShapeExpression.centeredEllipse(agsDiameter, agsDiameter).shapeAt(offsetPos, posAngle)
 
     override val extendedVignettingArea: Option[(Angle, Offset) => ShapeExpression] =
-      Some(maroonXScienceArea.extendedVignettingAreaAt)
+      Some(extendedVignettingAreaAt)
 
-    override def scienceRadius: Angle = MaroonXScienceFov
-
-  object MaroonX:
-    def apply(port: PortDisposition = PortDisposition.Bottom): MaroonX =
-      MaroonX(port, GuideProbe.PWFS2)
+  object Visitor:
+    def apply(
+      agsDiameter:        Angle,
+      scienceFovDiameter: Angle,
+      port:               PortDisposition = PortDisposition.Bottom
+    ): Visitor =
+      Visitor(agsDiameter, scienceFovDiameter, port, GuideProbe.PWFS2)
