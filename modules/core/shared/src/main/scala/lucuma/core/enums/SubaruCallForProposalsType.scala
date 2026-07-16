@@ -5,6 +5,6 @@ package lucuma.core.enums
 
 import lucuma.core.util.Enumerated
 
-enum SubaruCallForProposalsType(val tag: String) derives Enumerated:
-  case Normal    extends SubaruCallForProposalsType("normal")
-  case Intensive extends SubaruCallForProposalsType("intensive")
+enum SubaruCallForProposalsType(val tag: String, val letter: Char) derives Enumerated:
+  case Normal    extends SubaruCallForProposalsType("normal",    'U')
+  case Intensive extends SubaruCallForProposalsType("intensive", 'I')
