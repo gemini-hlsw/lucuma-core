@@ -20,6 +20,7 @@ import lucuma.core.enums.GnirsPrism
 import lucuma.core.enums.GuideProbe
 import lucuma.core.enums.PWFSGuideProbe
 import lucuma.core.enums.PortDisposition
+import lucuma.core.enums.Site
 import lucuma.core.geom.Area
 import lucuma.core.geom.BoundingOffsets
 import lucuma.core.geom.Shape
@@ -248,6 +249,56 @@ object AgsParams:
       fpu.fold(_.fpuType, _.fpuType) match
         case GmosFpuType.LongSlit | GmosFpuType.Ns => true
         case GmosFpuType.Ifu                       => false
+
+  // GMOS MOS. use as the science are the MOS outline.
+  case class GmosMos private (
+    site:  Site,
+    port:  PortDisposition,
+    probe: GuideProbe
+  ) extends AgsParams
+      with SingleProbeAgsParams
+      with PwfsSupport[GmosMos] derives Eq:
+    import lucuma.core.geom.gmos
+    import lucuma.core.geom.gmos.oiwfs
+    import lucuma.core.geom.pwfs
+
+    protected def withPWFSProbe(probe: PWFSGuideProbe): GmosMos = copy(probe = probe)
+
+    override def patrolFieldAt(
+      posAngle: Angle,
+      offset:   Offset,
+      pivot:    Offset = Offset.Zero
+    ): ShapeExpression =
+      probe match
+        case GuideProbe.GmosOIWFS =>
+          oiwfs.patrolField.imagingMode.patrolFieldAt(posAngle, offset, port, pivot)
+        case _: PWFSGuideProbe    =>
+          pwfs.patrolField.patrolFieldAt(posAngle, offset, pivot)
+        case _                    =>
+          ShapeExpression.empty
+
+    override def scienceArea(posAngle: Angle, offset: Offset): ShapeExpression =
+      site match
+        case Site.GN => gmos.scienceArea.mosModeNorth.shapeAt(posAngle, offset)
+        case Site.GS => gmos.scienceArea.mosModeSouth.shapeAt(posAngle, offset)
+
+    override def probeArm(posAngle: Angle, guideStar: Offset, offset: Offset): ShapeExpression =
+      probe match
+        case GuideProbe.GmosOIWFS =>
+          oiwfs.probeArm.imaging.shapeAt(posAngle, guideStar, offset, port)
+        case _: PWFSGuideProbe    =>
+          pwfs.probeArm.vignettedAreaAt(probe, guideStar, offset)
+        case _                    =>
+          ShapeExpression.Empty
+
+    override def scienceDiameter: Angle = GmosScienceDiameter
+
+  object GmosMos:
+    def apply(
+      site: Site,
+      port: PortDisposition = PortDisposition.Side
+    ): GmosMos =
+      new GmosMos(site, port, GuideProbe.GmosOIWFS)
 
   case class Flamingos2LongSlit private (
     lyot:  Flamingos2LyotWheel,

@@ -389,6 +389,69 @@ class AgsSuite extends munit.FunSuite {
     )
   }
 
+  test("discard science target for gmos mos") {
+    val constraints = ConstraintSet(
+      ImageQuality.Preset.PointTwo,
+      CloudExtinction.Preset.PointFive,
+      SkyBackground.Dark,
+      WaterVapor.Wet,
+      ElevationRange.ByAirMass.Default
+    )
+
+    val wavelength = Wavelength.fromIntNanometers(300).get
+
+    assert(
+      Ags
+        .agsAnalysis(
+          constraints,
+          wavelength,
+          Coordinates.Zero,
+          List(Coordinates.Zero),
+          None,
+          NonEmptyList.of(Angle.Angle0),
+          Some(AcquisitionOffsets(NonEmptySet.of(Offset.Zero.guided))),
+          Some(ScienceOffsets(NonEmptySet.of(Offset.Zero.guided))),
+          AgsParams.GmosMos(Site.GN, PortDisposition.Bottom),
+          List(gs1)
+        )
+        .analyses
+        .contains(
+          AgsAnalysis
+            .VignettesScience(gs1, OffsetPosition(GeometryType.Base, Offset.Zero, Angle.Angle0))
+        )
+    )
+
+    val guideStarOffset =
+      GuideStarCandidate.unsafeApply(
+        0L,
+        SiderealTracking.const(
+          Coordinates.Zero
+            .offsetBy(Angle.Angle0, Offset.signedDecimalArcseconds.reverseGet(0.0, 23.0))
+            .get
+        ),
+        (Band.Gaia, BrightnessValue.unsafeFrom(15)).some
+      )
+
+    assert(
+      Ags
+        .agsAnalysis(
+          constraints,
+          wavelength,
+          Coordinates.Zero,
+          Nil,
+          None,
+          NonEmptyList.of(Angle.Angle0),
+          Some(AcquisitionOffsets(NonEmptySet.of(Offset.Zero.guided))),
+          Some(ScienceOffsets(NonEmptySet.of(Offset.Zero.guided))),
+          AgsParams.GmosMos(Site.GN, PortDisposition.Bottom),
+          List(guideStarOffset)
+        )
+        .analyses
+        .headOption
+        .forall(_.isUsable)
+    )
+  }
+
   test("magnitude limits with gmps OIWFS and PWFS1") {
     val constraints = ConstraintSet(
       ImageQuality.Preset.PointOne,
