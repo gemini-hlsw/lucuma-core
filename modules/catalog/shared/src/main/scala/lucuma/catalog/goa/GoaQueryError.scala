@@ -16,7 +16,7 @@ object GoaQueryError:
     val message = s"Request failed with code $code: $msg"
 
   final case class NetworkError(cause: Throwable) extends GoaQueryError:
-    val message = s"Network error: ${cause.getMessage}"
+    val message                      = s"Network error: ${cause.getMessage}"
     override def getCause: Throwable = cause
 
   final case class ParseError(msg: String) extends GoaQueryError:

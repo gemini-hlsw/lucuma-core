@@ -19,7 +19,7 @@ object GoaClientMock:
     new GoaClient[F]:
       def query(params: GoaParams): F[EitherNec[GoaQueryError, List[GoaSummaryRecord]]] =
         GoaInstrument.toGoaName(params.instrument) match
-          case None =>
+          case None    =>
             NonEmptyChain
               .one(GoaQueryError.UnsupportedInstrument(params.instrument.tag))
               .asLeft[List[GoaSummaryRecord]]

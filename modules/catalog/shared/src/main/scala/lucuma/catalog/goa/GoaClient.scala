@@ -9,6 +9,7 @@ import cats.effect.Concurrent
 import cats.syntax.applicative.*
 import cats.syntax.either.*
 import org.http4s.Uri
+import org.http4s.syntax.literals.*
 import org.http4s.client.Client
 
 trait GoaClient[F[_]]:
@@ -17,7 +18,7 @@ trait GoaClient[F[_]]:
 
 object GoaClient:
 
-  val DefaultBaseUri: Uri = Uri.unsafeFromString("https://archive.gemini.edu")
+  val DefaultBaseUri: Uri = uri"https://archive.gemini.edu"
 
   val UserAgent: String = "GeminiPIT"
 

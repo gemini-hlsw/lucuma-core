@@ -30,13 +30,15 @@ object GoaQueryApp extends IOApp.Simple:
         val params = GoaParams.Sidereal(ngc4150Coords, Instrument.GmosNorth, searchRadius)
 
         IO.println(s"Querying GOA for ${params.instrument} at ${ngc4150Coords}...") *>
-          client.query(params).flatMap:
-            case Right(records) =>
-              IO.println(s"Found ${records.length} records:") *>
-                records.traverse_ : record =>
-                  IO.println(
-                    s"  ${record.name} | ${record.dataLabel.getOrElse("N/A")} | ${record.objectName.getOrElse("N/A")} | ${record.qaState.getOrElse("N/A")}"
-                  )
-            case Left(errors)   =>
-              IO.println(s"Query failed:") *>
-                errors.toList.traverse_(e => IO.println(s"  - ${e.message}"))
+          client
+            .query(params)
+            .flatMap:
+              case Right(records) =>
+                IO.println(s"Found ${records.length} records:") *>
+                  records.traverse_ : record =>
+                    IO.println(
+                      s"  ${record.name} | ${record.dataLabel.getOrElse("N/A")} | ${record.objectName.getOrElse("N/A")} | ${record.qaState.getOrElse("N/A")}"
+                    )
+              case Left(errors)   =>
+                IO.println(s"Query failed:") *>
+                  errors.toList.traverse_(e => IO.println(s"  - ${e.message}"))

@@ -36,7 +36,7 @@ class GoaClientImpl[F[_]: Concurrent](
         NonEmptyChain
           .one(GoaQueryError.UnsupportedInstrument(params.instrument.tag))
           .asLeft[List[GoaSummaryRecord]]
-          .pure[F]
+          .pure
       case Some(goaInstr) =>
         val uri = buildUri(params, goaInstr)
         executeQuery(uri)
@@ -45,7 +45,7 @@ class GoaClientImpl[F[_]: Concurrent](
     val base = baseUri / "jsonsummary" / "notengineering" / "NotFail" / goaInstr / "OBJECT"
 
     val withCoords = params match
-      case GoaParams.Sidereal(coords, _, searchRadius, _) =>
+      case GoaParams.Sidereal(coords, _, searchRadius, _)        =>
         val raDeg    = coords.ra.toAngle.toDoubleDegrees
         val decDeg   = coords.dec.toAngle.toSignedDoubleDegrees
         val srArcsec = searchRadius.toMicroarcseconds.toDouble / 1_000_000.0
@@ -60,7 +60,7 @@ class GoaClientImpl[F[_]: Concurrent](
       withCoords / s"daterange=$startStr-$endStr"
 
   private def executeQuery(uri: Uri): F[EitherNec[GoaQueryError, List[GoaSummaryRecord]]] =
-    val headers = Headers(
+    val headers             = Headers(
       Header.Raw(ci"User-Agent", GoaClient.UserAgent),
       Header.Raw(ci"Accept-Charset", "UTF-8")
     )

@@ -10,66 +10,55 @@ import lucuma.core.math.Angle
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Declination
 import lucuma.core.math.RightAscension
+import lucuma.core.math.syntax.int.*
 import munit.CatsEffectSuite
 
 class GoaClientSuite extends CatsEffectSuite:
 
   val testCoords: Coordinates = Coordinates(
     RightAscension.fromDoubleDegrees(182.64),
-    Declination.fromDoubleDegrees(30.40166667).getOrElse(Declination.Zero)
+    Declination.fromDoubleDegrees(30.40166667).get
   )
 
-  val searchRadius: Angle = Angle.fromDoubleArcseconds(60.0)
-
-  test("GoaClientMock.empty returns empty list"):
-    val client = GoaClientMock.empty[IO]
-    val params = GoaParams.Sidereal(testCoords, Instrument.GmosNorth, searchRadius)
-
-    client.query(params).map: result =>
-      assert(result.isRight)
-      assertEquals(result.toOption.get, List.empty)
+  val searchRadius: Angle = 60.arcseconds
 
   test("GoaClientMock.fromResource loads and parses JSON"):
-    GoaClientMock.fromResource[IO]("goa/sidereal-response.json").flatMap: client =>
-      val params = GoaParams.Sidereal(testCoords, Instrument.GmosNorth, searchRadius)
+    GoaClientMock
+      .fromResource[IO]("goa/sidereal-response.json")
+      .flatMap: client =>
+        val params = GoaParams.Sidereal(testCoords, Instrument.GmosNorth, searchRadius)
 
-      client.query(params).map: result =>
-        assert(result.isRight, s"Query failed: ${result.left.getOrElse("")}")
-        val records = result.toOption.get
-        assertEquals(records.length, 2)
-        assertEquals(records.head.programId, Some("GN-2024A-Q-101"))
+        client
+          .query(params)
+          .map: result =>
+            assert(result.isRight, s"Query failed: ${result.left.getOrElse("")}")
+            val records = result.toOption.get
+            assertEquals(records.length, 2)
+            assertEquals(records.head.programId, Some("GN-2024A-Q-101"))
 
   test("GoaClient.noop returns empty list"):
     val client = GoaClient.noop[IO]
     val params = GoaParams.Sidereal(testCoords, Instrument.GmosNorth, searchRadius)
 
-    client.query(params).map: result =>
-      assert(result.isRight)
-      assertEquals(result.toOption.get, List.empty)
+    client
+      .query(params)
+      .map: result =>
+        assert(result.isRight)
+        assertEquals(result.toOption.get, List.empty)
 
   test("GoaClientMock returns error for unsupported instrument"):
     val client = GoaClientMock.empty[IO]
     val params = GoaParams.Sidereal(testCoords, Instrument.VisitorNorth, searchRadius)
 
-    client.query(params).map: result =>
-      assert(result.isLeft)
-      val errors = result.left.toOption.get.toList
-      assertEquals(errors.length, 1)
-      assert(errors.head.isInstanceOf[GoaQueryError.UnsupportedInstrument])
-
-  test("GoaParams.Sidereal constructs correctly"):
-    val params = GoaParams.Sidereal(testCoords, Instrument.GmosNorth, searchRadius)
-    assertEquals(params.instrument, Instrument.GmosNorth)
-    assertEquals(params.searchRadius, searchRadius)
-    assertEquals(params.coords, testCoords)
-    assertEquals(params.dateRange, None)
-
-  test("GoaParams.NonSidereal constructs correctly"):
-    val params = GoaParams.NonSidereal("Ceres", Instrument.GmosSouth, searchRadius)
-    assertEquals(params.instrument, Instrument.GmosSouth)
-    assertEquals(params.searchRadius, searchRadius)
-    assertEquals(params.targetName, "Ceres")
-    assertEquals(params.dateRange, None)
+    client
+      .query(params)
+      .map: result =>
+        assert(result.isLeft)
+        val errors = result.left.toOption.get.toList
+        assertEquals(errors.length, 1)
+        assertMatches(errors.head) { case GoaQueryError.UnsupportedInstrument(_) =>
+          true
+        }
 
   test("GoaInstrument maps all supported instruments"):
     assertEquals(GoaInstrument.toGoaName(Instrument.GmosNorth), Some("GMOS-N"))

@@ -45,7 +45,8 @@ object codecs:
       .leftMap(e => s"Invalid datetime: ${e.getMessage}")
 
   given Decoder[LocalDate] = Decoder.decodeString.emap: s =>
-    Either.catchNonFatal(LocalDate.parse(s, releaseDateFormatter))
+    Either
+      .catchNonFatal(LocalDate.parse(s, releaseDateFormatter))
       .leftMap(e => s"Invalid date: ${e.getMessage}")
 
   given Decoder[GoaSummaryRecord] = (c: HCursor) =>
