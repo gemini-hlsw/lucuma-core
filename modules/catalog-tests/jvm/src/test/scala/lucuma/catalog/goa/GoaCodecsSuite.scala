@@ -7,6 +7,10 @@ import cats.effect.*
 import fs2.io.readClassLoaderResource
 import fs2.text
 import io.circe.parser.decode
+import lucuma.core.math.Declination
+import lucuma.core.math.RightAscension
+import lucuma.core.math.Wavelength
+import lucuma.core.util.TimeSpan
 import munit.CatsEffectSuite
 
 import java.time.Instant
@@ -32,21 +36,21 @@ class GoaCodecsSuite extends CatsEffectSuite:
       val first = records.head
       assertEquals(first.name, "N20240115S0001.fits")
       assertEquals(first.dataLabel, Some("GN-2024A-Q-101-1-001"))
-      assertEquals(first.ra, Some(182.64))
-      assertEquals(first.dec, Some(30.40166667))
+      assertEquals(first.ra, Some(RightAscension.fromDoubleDegrees(182.64)))
+      assertEquals(first.dec, Declination.fromDoubleDegrees(30.40166667))
       assertEquals(first.instrument, "GMOS-N")
-      assertEquals(first.observationType, "OBJECT")
-      assertEquals(first.observationClass, Some("science"))
+      assertEquals(first.observationType, GoaObservationType.Object)
+      assertEquals(first.observationClass, Some(GoaObservationClass.Science))
       assertEquals(first.qaState, Some("Pass"))
       assertEquals(first.utDateTime, Some(Instant.parse("2024-01-15T06:42:29.400Z")))
       assertEquals(first.releaseDate, Some(LocalDate.of(2025, 7, 15)))
       assertEquals(first.programId, Some("GN-2024A-Q-101"))
       assertEquals(first.observationId, Some("GN-2024A-Q-101-1"))
       assertEquals(first.objectName, Some("NGC4150"))
-      assertEquals(first.exposure, Some(1200.0))
+      assertEquals(first.exposure, TimeSpan.fromSeconds(1200.0))
       assertEquals(first.disperser, Some("B600"))
       assertEquals(first.filter, Some("g"))
-      assertEquals(first.wavelength, Some(0.475))
+      assertEquals(first.wavelength, Wavelength.decimalMicrometers.getOption(BigDecimal(0.475)))
       assertEquals(first.airmass, Some(1.126))
 
   test("decode nonsidereal response JSON"):
@@ -61,6 +65,16 @@ class GoaCodecsSuite extends CatsEffectSuite:
       assertEquals(record.objectName, Some("Ceres"))
       assertEquals(record.instrument, "GMOS-S")
       assertEquals(record.qaState, Some("Usable"))
+
+  test("decode preserves unrecognized observation_type/observation_class as Unknown"):
+    val json =
+      """[{"name": "test.fits", "instrument": "GMOS-N", "observation_type": "SOMETHING_NEW", "observation_class": "somethingElse"}]"""
+
+    val result  = decode[List[GoaSummaryRecord]](json)
+    assert(result.isRight, s"Failed to decode: ${result.left.getOrElse("")}")
+    val records = result.toOption.get
+    assertEquals(records.head.observationType, GoaObservationType.Unknown("SOMETHING_NEW"))
+    assertEquals(records.head.observationClass, Some(GoaObservationClass.Unknown("somethingElse")))
 
   test("decode empty response JSON"):
     val json   = "[]"

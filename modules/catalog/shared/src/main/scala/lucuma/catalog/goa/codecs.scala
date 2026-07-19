@@ -5,7 +5,13 @@ package lucuma.catalog.goa
 
 import cats.syntax.all.*
 import io.circe.Decoder
+import io.circe.DecodingFailure
 import io.circe.HCursor
+import lucuma.core.math.Angle
+import lucuma.core.math.Declination
+import lucuma.core.math.RightAscension
+import lucuma.core.math.Wavelength
+import lucuma.core.util.TimeSpan
 
 import java.time.Instant
 import java.time.LocalDate
@@ -34,7 +40,6 @@ object codecs:
   private val releaseDateFormatter: DateTimeFormatter =
     DateTimeFormatter.ISO_LOCAL_DATE
 
-  // Times are UTC; when the string carries no explicit offset we assume UTC.
   given Decoder[Instant] = Decoder.decodeString.emap: s =>
     Either
       .catchNonFatal:
@@ -49,28 +54,42 @@ object codecs:
       .catchNonFatal(LocalDate.parse(s, releaseDateFormatter))
       .leftMap(e => s"Invalid date: ${e.getMessage}")
 
+  extension (c: HCursor)
+    private def getOptA[A](
+      fieldName: String
+    )(parse: Double => Option[A]): Decoder.Result[Option[A]] =
+      c.get[Option[Double]](fieldName)
+        .flatMap:
+          case None    => Right(None)
+          case Some(d) =>
+            parse(d)
+              .map(Some(_))
+              .toRight(DecodingFailure(s"Invalid $fieldName: $d", c.history))
+
   given Decoder[GoaSummaryRecord] = (c: HCursor) =>
     for
       name             <- c.get[String]("name")
       dataLabel        <- c.get[Option[String]]("data_label")
-      ra               <- c.get[Option[Double]]("ra")
-      dec              <- c.get[Option[Double]]("dec")
+      ra               <- c.getOptA("ra")(d => Some(RightAscension.fromDoubleDegrees(d)))
+      dec              <- c.getOptA("dec")(Declination.fromDoubleDegrees)
       instrument       <- c.get[String]("instrument")
-      observationType  <- c.get[String]("observation_type")
-      observationClass <- c.get[Option[String]]("observation_class")
+      observationType  <- c.get[String]("observation_type").map(GoaObservationType.fromTag)
+      observationClass <-
+        c.get[Option[String]]("observation_class").map(_.map(GoaObservationClass.fromTag))
       qaState          <- c.get[Option[String]]("qa_state")
       utDateTime       <- c.get[Option[Instant]]("ut_datetime")
       releaseDate      <- c.get[Option[LocalDate]]("release")
       programId        <- c.get[Option[String]]("program_id")
       observationId    <- c.get[Option[String]]("observation_id")
       objectName       <- c.get[Option[String]]("object")
-      exposure         <- c.get[Option[Double]]("exposure_time")
+      exposure         <- c.getOptA("exposure_time")(d => TimeSpan.fromSeconds(BigDecimal(d)))
       disperser        <- c.get[Option[String]]("disperser")
       filter           <- c.get[Option[String]]("filter_name")
-      wavelength       <- c.get[Option[Double]]("central_wavelength")
+      wavelength       <-
+        c.getOptA("central_wavelength")(d => Wavelength.decimalMicrometers.getOption(BigDecimal(d)))
       airmass          <- c.get[Option[Double]]("airmass")
-      azimuth          <- c.get[Option[Double]]("azimuth")
-      elevation        <- c.get[Option[Double]]("elevation")
+      azimuth          <- c.getOptA("azimuth")(d => Some(Angle.fromDoubleDegrees(d)))
+      elevation        <- c.getOptA("elevation")(d => Some(Angle.fromDoubleDegrees(d)))
     yield GoaSummaryRecord(
       name,
       dataLabel,

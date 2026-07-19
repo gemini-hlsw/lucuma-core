@@ -9,8 +9,8 @@ import cats.effect.Concurrent
 import cats.syntax.applicative.*
 import cats.syntax.either.*
 import org.http4s.Uri
-import org.http4s.syntax.literals.*
 import org.http4s.client.Client
+import org.http4s.syntax.literals.*
 
 trait GoaClient[F[_]]:
 
