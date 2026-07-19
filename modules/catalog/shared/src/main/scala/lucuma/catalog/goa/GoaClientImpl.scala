@@ -8,6 +8,7 @@ import cats.data.NonEmptyChain
 import cats.effect.Concurrent
 import cats.syntax.all.*
 import io.circe.parser.decode
+import lucuma.catalog.goa.syntax.*
 import org.http4s.Header
 import org.http4s.Headers
 import org.http4s.Method
@@ -31,7 +32,7 @@ class GoaClientImpl[F[_]: Concurrent](
     DateTimeFormatter.ofPattern("yyyyMMdd")
 
   def query(params: GoaParams): F[EitherNec[GoaQueryError, List[GoaSummaryRecord]]] =
-    GoaInstrument.toGoaName(params.instrument) match
+    params.instrument.goaName match
       case None           =>
         NonEmptyChain
           .one(GoaQueryError.UnsupportedInstrument(params.instrument.tag))

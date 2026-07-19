@@ -5,6 +5,7 @@ package lucuma.catalog.goa
 
 import cats.effect.*
 import cats.syntax.all.*
+import lucuma.catalog.goa.syntax.*
 import lucuma.core.enums.Instrument
 import lucuma.core.math.Angle
 import lucuma.core.math.Coordinates
@@ -61,19 +62,19 @@ class GoaClientSuite extends CatsEffectSuite:
         }
 
   test("GoaInstrument maps all supported instruments"):
-    assertEquals(GoaInstrument.toGoaName(Instrument.GmosNorth), Some("GMOS-N"))
-    assertEquals(GoaInstrument.toGoaName(Instrument.GmosSouth), Some("GMOS-S"))
-    assertEquals(GoaInstrument.toGoaName(Instrument.Flamingos2), Some("F2"))
-    assertEquals(GoaInstrument.toGoaName(Instrument.Gnirs), Some("GNIRS"))
-    assertEquals(GoaInstrument.toGoaName(Instrument.Niri), Some("NIRI"))
-    assertEquals(GoaInstrument.toGoaName(Instrument.Ghost), Some("GHOST"))
-    assertEquals(GoaInstrument.toGoaName(Instrument.Gpi), Some("GPI"))
-    assertEquals(GoaInstrument.toGoaName(Instrument.Gsaoi), Some("GSAOI"))
-    assertEquals(GoaInstrument.toGoaName(Instrument.Alopeke), Some("ALOPEKE"))
-    assertEquals(GoaInstrument.toGoaName(Instrument.Zorro), Some("ZORRO"))
-    assertEquals(GoaInstrument.toGoaName(Instrument.Igrins2), Some("IGRINS2"))
+    assertEquals(Instrument.GmosNorth.goaName, Some("GMOS-N"))
+    assertEquals(Instrument.GmosSouth.goaName, Some("GMOS-S"))
+    assertEquals(Instrument.Flamingos2.goaName, Some("F2"))
+    assertEquals(Instrument.Gnirs.goaName, Some("GNIRS"))
+    assertEquals(Instrument.Niri.goaName, Some("NIRI"))
+    assertEquals(Instrument.Ghost.goaName, Some("GHOST"))
+    assertEquals(Instrument.Gpi.goaName, Some("GPI"))
+    assertEquals(Instrument.Gsaoi.goaName, Some("GSAOI"))
+    assertEquals(Instrument.Alopeke.goaName, Some("ALOPEKE"))
+    assertEquals(Instrument.Zorro.goaName, Some("ZORRO"))
+    assertEquals(Instrument.Igrins2.goaName, Some("IGRINS2"))
 
   test("GoaInstrument returns None for unsupported instruments"):
-    assertEquals(GoaInstrument.toGoaName(Instrument.VisitorNorth), None)
-    assertEquals(GoaInstrument.toGoaName(Instrument.AcqCamNorth), None)
-    assertEquals(GoaInstrument.toGoaName(Instrument.Scorpio), None)
+    assertEquals(Instrument.VisitorNorth.goaName, None)
+    assertEquals(Instrument.AcqCamNorth.goaName, None)
+    assertEquals(Instrument.Scorpio.goaName, None)

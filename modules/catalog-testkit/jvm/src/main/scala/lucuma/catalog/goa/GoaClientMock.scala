@@ -10,6 +10,7 @@ import cats.syntax.all.*
 import fs2.io.readClassLoaderResource
 import fs2.text
 import io.circe.parser.decode
+import lucuma.catalog.goa.syntax.*
 
 object GoaClientMock:
 
@@ -18,7 +19,7 @@ object GoaClientMock:
   def fromJson[F[_]: Concurrent](json: String): GoaClient[F] =
     new GoaClient[F]:
       def query(params: GoaParams): F[EitherNec[GoaQueryError, List[GoaSummaryRecord]]] =
-        GoaInstrument.toGoaName(params.instrument) match
+        params.instrument.goaName match
           case None    =>
             NonEmptyChain
               .one(GoaQueryError.UnsupportedInstrument(params.instrument.tag))
