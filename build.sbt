@@ -158,6 +158,8 @@ lazy val catalog = crossProject(JVMPlatform, JSPlatform)
       "eu.timepit"    %%% "refined-cats"         % refinedVersion,
       "org.http4s"    %%% "http4s-core"          % http4sVersion,
       "org.http4s"    %%% "http4s-client"        % http4sVersion,
+      "io.circe"      %%% "circe-core"           % circeVersion,
+      "io.circe"      %%% "circe-parser"         % circeVersion,
       "org.typelevel" %%% "cats-parse"           % catsParseVersion,
       "org.typelevel" %%% "kittens"              % kittensVersion,
       "edu.gemini"    %%% "clue-core"            % clueVersion,
