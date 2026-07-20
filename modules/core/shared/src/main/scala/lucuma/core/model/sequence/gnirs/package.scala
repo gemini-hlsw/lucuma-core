@@ -8,7 +8,7 @@ import cats.syntax.order.*
 import lucuma.core.enums.GnirsCamera
 import lucuma.core.enums.GnirsFpuIfu
 import lucuma.core.enums.GnirsPrism
-import lucuma.core.enums.SlitOffsetMode
+import lucuma.core.enums.GnirsSlitOffsetPreset
 import lucuma.core.enums.StepGuideState
 import lucuma.core.math.Offset
 import lucuma.core.math.Wavelength
@@ -41,12 +41,12 @@ val OnSkyDefaultTelescopeConfigs: NonEmptyList[TelescopeConfig] =
     TelescopeConfig(Offset.Zero, StepGuideState.Enabled)
   )
 
-def defaultSlitTelescopeConfigs(mode: SlitOffsetMode, prism: GnirsPrism, camera: GnirsCamera, wavelength: GnirsGratingWavelength): SlitTelescopeConfigs =
-  mode match
-    case SlitOffsetMode.NodAlongSlit => SlitTelescopeConfigs.AlongSlit(alongSlitDefaultTelescopeConfigs(prism, camera, wavelength))
-    case SlitOffsetMode.NodToSky     => SlitTelescopeConfigs.ToSky(OnSkyDefaultTelescopeConfigs)
+def defaultSlitTelescopeConfigs(preset: GnirsSlitOffsetPreset, prism: GnirsPrism, camera: GnirsCamera, wavelength: GnirsGratingWavelength): SlitTelescopeConfigs =
+  preset match
+    case GnirsSlitOffsetPreset.NodAlongSlit => SlitTelescopeConfigs.AlongSlit(alongSlitDefaultTelescopeConfigs(prism, camera, wavelength))
+    case GnirsSlitOffsetPreset.NodToSky     => SlitTelescopeConfigs.ToSky(OnSkyDefaultTelescopeConfigs)
 
-// GNIRS IFU telescope-config presets. Unlike the long-slit defaults these are not 
+// GNIRS IFU telescope-config presets. Unlike the long-slit defaults these are not
 // derived from the optical config; they are fixed templates.
 // The head of each list is the default value, used to initialize observing modes at creation.
 private val LowResolutionIfuPresets: NonEmptyList[(String, NonEmptyList[TelescopeConfig])] =
