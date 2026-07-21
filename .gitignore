@@ -59,3 +59,7 @@ gnupg*
 
 .vscode/
 .pi/
+
+CONTEXT-MAP.md
+CONTEXT.md
+.config/
