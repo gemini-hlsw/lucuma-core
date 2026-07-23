@@ -3,10 +3,10 @@
 
 package lucuma.catalog.goa
 
+import lucuma.catalog.goa.syntax.*
 import lucuma.core.enums.Instrument
 import lucuma.core.math.Angle
 import lucuma.core.math.Coordinates
-import lucuma.catalog.goa.syntax.*
 import org.http4s.Uri
 
 import java.time.LocalDate
