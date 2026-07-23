@@ -34,6 +34,8 @@ val MaxExposureTime: TimeSpan = 600.secTimeSpan
 val WavelengthCoverageLowerBound: Wavelength = Wavelength.fromIntNanometers(1490).get
 val WavelengthCoverageUpperBound: Wavelength = Wavelength.fromIntNanometers(2460).get
 
+val SvcDefaultExposure: TimeSpan = MinExposureTime
+
 // Updated from OCS values
 val CentralWavelength: Wavelength = Wavelength.fromIntNanometers(2100).get
 
@@ -63,3 +65,9 @@ def defaultSlitTelescopeConfigs(preset: Igrins2SlitOffsetPreset): SlitTelescopeC
   preset match
     case Igrins2SlitOffsetPreset.NodAlongSlit => SlitTelescopeConfigs.AlongSlit(NodAlongSlitDefaultTelescopeConfigs)
     case Igrins2SlitOffsetPreset.NodToSky     => SlitTelescopeConfigs.ToSky(NodToSkyDefaultTelescopeConfigs)
+
+val SvcDefaultTelescopeConfigs: NonEmptyList[TelescopeConfig] =
+  NonEmptyList.of(
+    TelescopeConfig(Offset.Zero,                  StepGuideState.Enabled),
+    TelescopeConfig(Offset(5.pArcsec, 0.qArcsec), StepGuideState.Enabled)
+  )
