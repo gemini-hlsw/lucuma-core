@@ -107,7 +107,8 @@ lazy val testkit = crossProject(JVMPlatform, JSPlatform)
       "eu.timepit"        %%% "refined-scalacheck" % refinedVersion,
       "io.circe"          %%% "circe-testing"      % circeVersion,
       "com.manyangled"    %%% "coulomb-testkit"    % coulombVersion,
-      "io.chrisdavenport" %%% "cats-scalacheck"    % catsScalacheckVersion
+      "io.chrisdavenport" %%% "cats-scalacheck"    % catsScalacheckVersion,
+      "org.scalameta"     %%% "munit"              % munitVersion,
     )
   )
   .jvmConfigure(_.enablePlugins(AutomateHeaderPlugin))
