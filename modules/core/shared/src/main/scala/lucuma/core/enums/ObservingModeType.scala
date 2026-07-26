@@ -77,7 +77,7 @@ enum FacilityObservingModeType(
   case GmosSouthMos       extends FacilityObservingModeType("gmos_south_mos",        Instrument.GmosSouth,  PosAngleConstraint.Fixed(Angle.Angle0))
   case GnirsImaging       extends FacilityObservingModeType("gnirs_imaging",         Instrument.Gnirs,      PosAngleConstraint.Unbounded)
   case GnirsLongSlit      extends FacilityObservingModeType("gnirs_long_slit",       Instrument.Gnirs,      PosAngleConstraint.AverageParallactic)
-  case GnirsIfu           extends FacilityObservingModeType("gnirs_ifu",             Instrument.Gnirs,      PosAngleConstraint.AverageParallactic)
+  case GnirsIfu           extends FacilityObservingModeType("gnirs_ifu",             Instrument.Gnirs,      PosAngleConstraint.Fixed(Angle.Angle0))
   case Igrins2LongSlit    extends FacilityObservingModeType("igrins_2_long_slit",    Instrument.Igrins2,    PosAngleConstraint.AverageParallactic)
 
   override def observatory: Observatory =
