@@ -5,17 +5,16 @@ package lucuma.core.model.sequence.gmos
 package arb
 
 import cats.syntax.all.*
-import eu.timepit.refined.scalacheck.string.*
-import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.core.enums.GmosCustomSlitWidth
-import lucuma.core.math.arb.ArbRefined
+import lucuma.core.model.MaskDefinition
+import lucuma.core.model.arb.ArbMaskDefinition
 import lucuma.core.util.arb.ArbEnumerated
 import org.scalacheck.*
 import org.scalacheck.Arbitrary.arbitrary
 
 trait ArbGmosFpuMask {
   import ArbEnumerated.given
-  import ArbRefined.given
+  import ArbMaskDefinition.given
 
   given arbGmosBuiltinFpuMask[T: Arbitrary]: Arbitrary[GmosFpuMask.Builtin[T]] =
     Arbitrary(arbitrary[T].map(GmosFpuMask.Builtin.apply))
@@ -23,9 +22,9 @@ trait ArbGmosFpuMask {
   given Arbitrary[GmosFpuMask.Custom] =
     Arbitrary(
       for {
-        filename  <- arbitrary[NonEmptyString]
+        mask      <- arbitrary[MaskDefinition]
         slitWidth <- arbitrary[GmosCustomSlitWidth]
-      } yield GmosFpuMask.Custom(filename, slitWidth)
+      } yield GmosFpuMask.Custom(mask, slitWidth)
     )
 
   given arbGmosFpuMask[T: Arbitrary]: Arbitrary[GmosFpuMask[T]] =
@@ -40,7 +39,7 @@ trait ArbGmosFpuMask {
     Cogen[T].contramap(_.value)
 
   given Cogen[GmosFpuMask.Custom] =
-    Cogen[(NonEmptyString, GmosCustomSlitWidth)].contramap(m => (m.filename, m.slitWidth))
+    Cogen[(MaskDefinition, GmosCustomSlitWidth)].contramap(m => (m.mask, m.slitWidth))
 
   given cogGmosFpuMask[T: Cogen]: Cogen[GmosFpuMask[T]] =
     Cogen[Either[GmosFpuMask.Builtin[T], GmosFpuMask.Custom]]
