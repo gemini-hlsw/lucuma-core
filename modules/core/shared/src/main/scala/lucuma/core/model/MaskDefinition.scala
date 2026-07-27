@@ -5,6 +5,9 @@ package lucuma.core.model
 
 import cats.Eq
 import cats.derived.*
+import monocle.Iso
+import monocle.Prism
+import monocle.macros.GenPrism
 
 /**
  * Observations with a mask to be defined are valid.
@@ -14,3 +17,14 @@ sealed trait MaskDefinition derives Eq
 
 case object ToBeDefined extends MaskDefinition derives Eq
 case class Defined(id: Attachment.Id) extends MaskDefinition derives Eq
+
+object Defined:
+  def id: Iso[Defined, Attachment.Id] =
+    Iso[Defined, Attachment.Id](_.id)(Defined(_))
+
+object MaskDefinition:
+  val toBeDefined: Prism[MaskDefinition, ToBeDefined.type] =
+    GenPrism[MaskDefinition, ToBeDefined.type]
+
+  val defined: Prism[MaskDefinition, Defined] =
+    GenPrism[MaskDefinition, Defined]
