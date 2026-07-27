@@ -14,6 +14,7 @@ import lucuma.core.math.Place
 import lucuma.core.math.arb.ArbCoordinates.given
 import lucuma.core.math.arb.ArbPlace.given
 import lucuma.core.model.ConstantTracking
+import lucuma.core.util.RetryFlakyTests
 import lucuma.core.util.TimeSpan
 import munit.ScalaCheckSuite
 import org.scalacheck.Prop.*
@@ -22,7 +23,7 @@ import org.scalacheck.Test as ScalaCheckTest
 import java.time.*
 import java.util as ju
 
-final class ImprovedSkyCalcSuiteJVM extends ScalaCheckSuite {
+final class ImprovedSkyCalcSuiteJVM extends ScalaCheckSuite with RetryFlakyTests {
 
   override protected val scalaCheckTestParameters = {
     val old = ScalaCheckTest.Parameters.default

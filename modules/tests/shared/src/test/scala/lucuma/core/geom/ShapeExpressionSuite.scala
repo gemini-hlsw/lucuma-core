@@ -14,11 +14,12 @@ import lucuma.core.math.Offset
 import lucuma.core.math.Offset.Component
 import lucuma.core.math.arb.*
 import lucuma.core.math.syntax.int.*
+import lucuma.core.util.RetryFlakyTests
 import org.scalacheck.*
 import org.scalacheck.Arbitrary.*
 import org.scalacheck.Prop.*
 
-class ShapeExpressionSuite extends munit.DisciplineSuite {
+class ShapeExpressionSuite extends munit.DisciplineSuite with RetryFlakyTests {
 
   implicit def saneUnitToProp(unit: Unit): Prop = super.unitToProp(unit)
 

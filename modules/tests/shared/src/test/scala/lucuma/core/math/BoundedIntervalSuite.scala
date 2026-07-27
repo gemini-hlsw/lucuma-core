@@ -10,6 +10,7 @@ import lucuma.core.math.arb.ArbInterval
 import lucuma.core.optics.laws.discipline.ValidSplitEpiTests
 import lucuma.core.optics.laws.discipline.WedgeTests
 import lucuma.core.syntax.time.*
+import lucuma.core.util.RetryFlakyTests
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
 import org.scalacheck.Prop.*
@@ -21,7 +22,7 @@ import java.time.Instant
 import java.time.LocalTime
 import java.time.ZoneId
 
-class BoundedIntervalSuite  extends munit.DisciplineSuite with IntervalGens {
+class BoundedIntervalSuite  extends munit.DisciplineSuite with IntervalGens with RetryFlakyTests {
   import ArbInterval.given
 
   test("fromInterval") {

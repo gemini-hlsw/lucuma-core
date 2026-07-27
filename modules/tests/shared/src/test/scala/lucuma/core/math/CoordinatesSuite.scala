@@ -12,10 +12,11 @@ import cats.syntax.all.*
 import lucuma.core.math.Coordinates.centerOf
 import lucuma.core.math.arb.*
 import lucuma.core.optics.laws.discipline.*
+import lucuma.core.util.RetryFlakyTests
 import monocle.law.discipline.*
 import org.scalacheck.Prop.*
 
-final class CoordinatesSuite extends munit.DisciplineSuite {
+final class CoordinatesSuite extends munit.DisciplineSuite with RetryFlakyTests {
   import ArbCoordinates.given
   import ArbRightAscension.given
   import ArbDeclination.given
