@@ -12,11 +12,10 @@ import cats.syntax.all.*
 import lucuma.core.math.Coordinates.centerOf
 import lucuma.core.math.arb.*
 import lucuma.core.optics.laws.discipline.*
-import lucuma.core.util.RetryFlakyTests
 import monocle.law.discipline.*
 import org.scalacheck.Prop.*
 
-final class CoordinatesSuite extends munit.DisciplineSuite with RetryFlakyTests {
+final class CoordinatesSuite extends munit.DisciplineSuite {
   import ArbCoordinates.given
   import ArbRightAscension.given
   import ArbDeclination.given
@@ -124,7 +123,7 @@ final class CoordinatesSuite extends munit.DisciplineSuite with RetryFlakyTests 
   }
 
   test(
-    "interpolate should be consistent with fractional angular separation, to within 20 µas".flaky
+    "interpolate should be consistent with fractional angular separation, to within 20 µas"
   ) {
     val µas180 = Angle.Angle180.toMicroarcseconds
     val µas360 = µas180 * 2L
