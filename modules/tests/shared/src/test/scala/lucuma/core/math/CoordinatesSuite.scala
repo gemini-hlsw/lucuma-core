@@ -123,7 +123,7 @@ final class CoordinatesSuite extends munit.DisciplineSuite {
   }
 
   test(
-    "interpolate should be consistent with fractional angular separation, to within 20 µas".flaky
+    "interpolate should be consistent with fractional angular separation, to within 20 µas"
   ) {
     val µas180 = Angle.Angle180.toMicroarcseconds
     val µas360 = µas180 * 2L

@@ -5,6 +5,7 @@ package lucuma.horizons
 
 import cats.effect.IO
 import cats.effect.kernel.Resource
+import lucuma.core.util.RetryFlakyTests
 import munit.CatsEffectSuite
 import org.http4s.dom.FetchClientBuilder
 import org.typelevel.log4cats.Logger
@@ -12,7 +13,7 @@ import org.typelevel.log4cats.noop.NoOpLogger
 
 import scala.concurrent.duration.*
 
-trait HorizonsClientSuite extends CatsEffectSuite:
+trait HorizonsClientSuite extends CatsEffectSuite with RetryFlakyTests:
 
   given Logger[IO] = NoOpLogger.apply
 
@@ -21,4 +22,3 @@ trait HorizonsClientSuite extends CatsEffectSuite:
       .withRequestTimeout(5.second)
       .resource
       .map(HorizonsClient(_))
-
