@@ -5,11 +5,10 @@ package lucuma.core.model.sequence.flamingos2
 
 import cats.Eq
 import cats.syntax.all.*
-import eu.timepit.refined.cats.*
-import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.core.enums.Flamingos2CustomSlitWidth
 import lucuma.core.enums.Flamingos2Decker
 import lucuma.core.enums.Flamingos2Fpu
+import lucuma.core.model.MaskDefinition
 import monocle.Focus
 import monocle.Iso
 import monocle.Lens
@@ -41,8 +40,8 @@ sealed trait Flamingos2FpuMask:
   def custom: Option[Custom] =
     fold(none, _ => none, _.some)
 
-  def customFilename: Option[NonEmptyString] =
-    custom.map(_.filename)
+  def customMaskDefinition: Option[MaskDefinition] =
+    custom.map(_.mask)
 
   def customSlitWidth: Option[Flamingos2CustomSlitWidth] =
     custom.map(_.slitWidth)
@@ -72,14 +71,14 @@ object Flamingos2FpuMask:
     def value: Iso[Builtin, Flamingos2Fpu] =
       Iso[Builtin, Flamingos2Fpu](_.value)(Builtin.apply)
 
-  case class Custom(filename: NonEmptyString, slitWidth: Flamingos2CustomSlitWidth) extends Flamingos2FpuMask
+  case class Custom(mask: MaskDefinition, slitWidth: Flamingos2CustomSlitWidth) extends Flamingos2FpuMask
 
   object Custom:
-    given Eq[Custom] = Eq.by(x => (x.filename, x.slitWidth))
+    given Eq[Custom] = Eq.by(x => (x.mask, x.slitWidth))
 
     /** @group Optics */
-    val filename: Lens[Custom, NonEmptyString] =
-      Focus[Custom](_.filename)
+    val maskDefinition: Lens[Custom, MaskDefinition] =
+      Focus[Custom](_.mask)
 
     /** @group Optics */
     val customSlitWidth: Lens[Custom, Flamingos2CustomSlitWidth] =

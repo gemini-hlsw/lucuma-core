@@ -4,9 +4,9 @@
 package lucuma.core.model.sequence.flamingos2.arb
 
 import cats.syntax.all.*
-import eu.timepit.refined.scalacheck.string.given
-import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.core.enums.*
+import lucuma.core.model.MaskDefinition
+import lucuma.core.model.arb.ArbMaskDefinition.given
 import lucuma.core.model.sequence.flamingos2.Flamingos2FpuMask
 import lucuma.core.util.Enumerated
 import lucuma.core.util.arb.ArbEnumerated.given
@@ -23,18 +23,18 @@ trait ArbFlamingos2FpuMask:
         Flamingos2FpuMask.Imaging,
         Gen.oneOf(Enumerated[Flamingos2Fpu].all).map(Flamingos2FpuMask.Builtin(_)),
         for
-          f <- arbitrary[NonEmptyString]
+          m <- arbitrary[MaskDefinition]
           s <- arbitrary[Flamingos2CustomSlitWidth]
-        yield Flamingos2FpuMask.Custom(f, s)
+        yield Flamingos2FpuMask.Custom(m, s)
       )
     )
 
   given Cogen[Flamingos2FpuMask] =
-    Cogen[Option[Either[Flamingos2Fpu, (String, Flamingos2CustomSlitWidth)]]]
+    Cogen[Option[Either[Flamingos2Fpu, (MaskDefinition, Flamingos2CustomSlitWidth)]]]
       .contramap {
         case Flamingos2FpuMask.Imaging => none
         case Flamingos2FpuMask.Builtin(b) => b.asLeft.some
-        case Flamingos2FpuMask.Custom(f, s) => (f.value, s).asRight.some
+        case Flamingos2FpuMask.Custom(m, s) => (m, s).asRight.some
       }
 
 object ArbFlamingos2FpuMask extends ArbFlamingos2FpuMask

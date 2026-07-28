@@ -4,13 +4,11 @@
 package lucuma.core.model.sequence.gmos
 
 import cats.kernel.laws.discipline.*
-import eu.timepit.refined.cats.*
-import eu.timepit.refined.scalacheck.string.*
-import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.core.enums.GmosCustomSlitWidth
 import lucuma.core.enums.GmosNorthGrating
 import lucuma.core.enums.GmosSouthGrating
-import lucuma.core.math.arb.*
+import lucuma.core.model.ToBeDefined
+import lucuma.core.model.arb.ArbMaskDefinition
 import lucuma.core.model.sequence.gmos.arb.*
 import lucuma.core.util.arb.*
 import monocle.law.discipline.*
@@ -19,7 +17,7 @@ import munit.*
 final class GmosFpuMaskSuite extends DisciplineSuite {
   import ArbEnumerated.given
   import ArbGmosFpuMask.given
-  import ArbRefined.given
+  import ArbMaskDefinition.given
 
   checkAll(
     "Eq[GmosFpuMask.Builtin[GmosNorthGrating]]",
@@ -39,7 +37,7 @@ final class GmosFpuMaskSuite extends DisciplineSuite {
   )
 
   checkAll("Eq[GmosFpuMask.Custom", EqTests[GmosFpuMask.Custom].eqv)
-  checkAll("GmosFpuMask.Custom.filename", LensTests(GmosFpuMask.Custom.filename))
+  checkAll("GmosFpuMask.Custom.maskDefinition", LensTests(GmosFpuMask.Custom.maskDefinition))
   checkAll("GmosFpuMask.Custom.slitWidth", LensTests(GmosFpuMask.Custom.slitWidth))
 
   checkAll("Eq[GmosFpuMask[GmosNorthGrating]]", EqTests[GmosFpuMask[GmosNorthGrating]].eqv)
@@ -57,7 +55,7 @@ final class GmosFpuMaskSuite extends DisciplineSuite {
     val b: GmosFpuMask[Int] = GmosFpuMask.Builtin(1)
     assertEquals(b.fold(_ => "builtin", _ => "custom"), "builtin")
 
-    val c: GmosFpuMask[Int] = GmosFpuMask.Custom(NonEmptyString.unsafeFrom("foo"), GmosCustomSlitWidth.CustomWidth_0_25)
+    val c: GmosFpuMask[Int] = GmosFpuMask.Custom(ToBeDefined, GmosCustomSlitWidth.CustomWidth_0_25)
     assertEquals(c.fold(_ => "builtin", _ => "custom"), "custom")
   }
 }
