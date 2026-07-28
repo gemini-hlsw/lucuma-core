@@ -137,7 +137,15 @@ class BoundedIntervalSuite  extends munit.DisciplineSuite with IntervalGens {
       assertEquals(start, start.`with`(t))
       val end    = allDay.upper.atZone(z)
       assertEquals(end, end.`with`(t))
-      assert((allDay -- i).forall(_.asInstanceOf[BoundedInterval[Instant]].duration < Duration.ofDays(1)))
+      // A civil day isn't always 24h (DST transitions can make it 23h or 25h), so we
+      // compare each padding piece against the actual length of the civil day it belongs
+      // to, rather than a fixed Duration.ofDays(1).
+      assert((allDay -- i).forall: piece =>
+        val lowerAtZone    = piece.lower.atZone(z)
+        // Length of the civil day this padding piece belongs to, not a fixed 24h.
+        val civilDayLength = Duration.between(lowerAtZone, lowerAtZone.plusDays(1))
+        piece.duration < civilDayLength
+      )
     }
   }
 
