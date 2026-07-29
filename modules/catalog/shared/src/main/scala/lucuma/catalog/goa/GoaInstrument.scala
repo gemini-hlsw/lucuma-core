@@ -20,7 +20,8 @@ trait GoaInstrumentOps:
         case Instrument.Gsaoi      => Some("GSAOI")
         case Instrument.Alopeke    => Some("ALOPEKE")
         case Instrument.Zorro      => Some("ZORRO")
-        case Instrument.Igrins2    => Some("IGRINS2")
+        case Instrument.Igrins2    => Some("IGRINS-2")
+        case Instrument.MaroonX    => Some("MAROON-X")
         case _                     => None
 
 object syntax extends GoaInstrumentOps

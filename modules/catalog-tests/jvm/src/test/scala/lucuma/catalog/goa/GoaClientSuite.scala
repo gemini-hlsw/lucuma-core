@@ -72,7 +72,8 @@ class GoaClientSuite extends CatsEffectSuite:
     assertEquals(Instrument.Gsaoi.goaName, Some("GSAOI"))
     assertEquals(Instrument.Alopeke.goaName, Some("ALOPEKE"))
     assertEquals(Instrument.Zorro.goaName, Some("ZORRO"))
-    assertEquals(Instrument.Igrins2.goaName, Some("IGRINS2"))
+    assertEquals(Instrument.Igrins2.goaName, Some("IGRINS-2"))
+    assertEquals(Instrument.MaroonX.goaName, Some("MAROON-X"))
 
   test("GoaInstrument returns None for unsupported instruments"):
     assertEquals(Instrument.VisitorNorth.goaName, None)
