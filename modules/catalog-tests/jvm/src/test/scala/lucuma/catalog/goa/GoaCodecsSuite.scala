@@ -76,6 +76,18 @@ class GoaCodecsSuite extends CatsEffectSuite:
     assertEquals(records.head.observationType, GoaObservationType.Unknown("SOMETHING_NEW"))
     assertEquals(records.head.observationClass, Some(GoaObservationClass.Unknown("somethingElse")))
 
+  test("decode blank observation_class as None"):
+    // The archive emits "" as a real value for observation_class; it should be
+    // treated as absent rather than Some(Unknown("")) (item 5).
+    val json =
+      """[{"name": "test.fits", "instrument": "GMOS-N", "observation_type": "OBJECT", "observation_class": ""}]"""
+
+    val result  = decode[List[GoaSummaryRecord]](json)
+    assert(result.isRight, s"Failed to decode: ${result.left.getOrElse("")}")
+    val records = result.toOption.get
+    assertEquals(records.length, 1)
+    assertEquals(records.head.observationClass, None)
+
   test("decode empty response JSON"):
     val json   = "[]"
     val result = decode[List[GoaSummaryRecord]](json)
