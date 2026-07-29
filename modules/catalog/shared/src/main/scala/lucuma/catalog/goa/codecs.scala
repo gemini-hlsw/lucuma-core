@@ -75,7 +75,8 @@ object codecs:
       instrument       <- c.get[String]("instrument")
       observationType  <- c.get[String]("observation_type").map(GoaObservationType.fromTag)
       observationClass <-
-        c.get[Option[String]]("observation_class").map(_.filter(_.nonEmpty).map(GoaObservationClass.fromTag))
+        c.get[Option[String]]("observation_class")
+          .map(_.filter(_.nonEmpty).map(GoaObservationClass.fromTag))
       qaState          <- c.get[Option[String]]("qa_state")
       utDateTime       <- c.get[Option[Instant]]("ut_datetime")
       releaseDate      <- c.get[Option[LocalDate]]("release")
