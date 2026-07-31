@@ -68,6 +68,7 @@ enum FacilityObservingModeType(
 ) extends ObservingModeType derives Enumerated:
   case Flamingos2Imaging  extends FacilityObservingModeType("flamingos_2_imaging",   Instrument.Flamingos2, PosAngleConstraint.Unbounded)
   case Flamingos2LongSlit extends FacilityObservingModeType("flamingos_2_long_slit", Instrument.Flamingos2, PosAngleConstraint.AverageParallactic)
+  case Flamingos2Mos      extends FacilityObservingModeType("flamingos_2_mos",       Instrument.Flamingos2, PosAngleConstraint.Fixed(Angle.Angle0))
   case GhostIfu           extends FacilityObservingModeType("ghost_ifu",             Instrument.Ghost,      PosAngleConstraint.Fixed(Angle.Angle0))
   case GmosNorthImaging   extends FacilityObservingModeType("gmos_north_imaging",    Instrument.GmosNorth,  PosAngleConstraint.Unbounded)
   case GmosNorthLongSlit  extends FacilityObservingModeType("gmos_north_long_slit",  Instrument.GmosNorth,  PosAngleConstraint.AverageParallactic)

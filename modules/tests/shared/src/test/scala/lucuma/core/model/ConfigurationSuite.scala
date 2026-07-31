@@ -26,7 +26,7 @@ final class ConfigurationSuite extends ScalaCheckSuite:
       assert(ca.subsumes(cb))
       assert(cb.subsumes(ca))
 
-  test("GMOS-S MOS is constrained by grating"):
+  test("GMOS-N MOS is constrained by grating"):
     forAll: (cfg: Configuration, a: GmosNorthMos, b: GmosNorthMos) =>
       val ca = cfg.copy(observingMode = a)
       val cb = cfg.copy(observingMode = b)
@@ -39,3 +39,10 @@ final class ConfigurationSuite extends ScalaCheckSuite:
       val cb = cfg.copy(observingMode = b)
       assertEquals(ca.subsumes(cb), a.grating === b.grating)
       assertEquals(cb.subsumes(ca), a.grating === b.grating)
+
+  test("Flamingos2 MOS is constrained by disperser"):
+    forAll: (cfg: Configuration, a: Flamingos2Mos, b: Flamingos2Mos) =>
+      val ca = cfg.copy(observingMode = a)
+      val cb = cfg.copy(observingMode = b)
+      assertEquals(ca.subsumes(cb), a.disperser === b.disperser)
+      assertEquals(cb.subsumes(ca), a.disperser === b.disperser)

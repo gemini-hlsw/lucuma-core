@@ -7,6 +7,7 @@ import cats.Eq
 import cats.derived.*
 import cats.kernel.Order
 import cats.syntax.all.*
+import lucuma.core.enums.Flamingos2CustomSlitWidth
 import lucuma.core.enums.Flamingos2Disperser
 import lucuma.core.enums.Flamingos2LyotWheel
 import lucuma.core.enums.GmosNorthFilter
@@ -62,6 +63,7 @@ object Configuration:
   // We limit this to the radius of the FOV, so you can move the base position anywhere that would be visible from the approved position.
   sealed abstract class ObservingMode(val tpe: ObservingModeType, val radius: Angle):
     def flamingos2LongSlit: Option[Flamingos2LongSlit  ] = Some(this).collect { case m: Flamingos2LongSlit   => m }
+    def flamingos2Mos:      Option[Flamingos2Mos       ] = Some(this).collect { case m: Flamingos2Mos        => m }
     def ghostIfu:           Option[GhostIfu.type       ] = Some(this).collect { case m: GhostIfu.type        => m }
     def gmosNorthImaging:   Option[GmosNorthImaging    ] = Some(this).collect { case m: GmosNorthImaging     => m }
     def gmosNorthLongSlit:  Option[GmosNorthLongSlit   ] = Some(this).collect { case m: GmosNorthLongSlit    => m }
@@ -77,6 +79,7 @@ object Configuration:
     def subsumes(other: ObservingMode): Boolean =
       (this, other) match
         case (Flamingos2LongSlit(d1),    Flamingos2LongSlit(d2)) => d1 === d2
+        case (Flamingos2Mos(d1),         Flamingos2Mos(d2))      => d1 === d2
         case (GhostIfu,                  GhostIfu)               => true
         case (GmosNorthLongSlit(g1),     GmosNorthLongSlit(g2))  => g1 === g2
         case (GmosNorthMos(g1),          GmosNorthMos(g2))       => g1 === g2
@@ -100,6 +103,9 @@ object Configuration:
 
     object Radii:
       val Flamingos2LongSlit = flamingos2.scienceArea.shapeAt(Angle.Angle0, Offset.Zero, Flamingos2LyotWheel.F16, Flamingos2FpuMask.Imaging).eval.radius
+      // MOS geometry is fixed by the mode (it ignores the mask contents), so a throwaway Custom mask
+      // selects the mosFOV shape. See ADR-0003.
+      val Flamingos2Mos      = flamingos2.scienceArea.shapeAt(Angle.Angle0, Offset.Zero, Flamingos2LyotWheel.F16, Flamingos2FpuMask.Custom(ToBeDefined, Flamingos2CustomSlitWidth.CustomWidth_1_pix)).eval.radius
       val GhostIfu           = ghost.scienceArea.fov.eval.radius
       val GmosLongSlit       = gmos.scienceArea.longSlitFov(Angle.fromMicroarcseconds(2L)).eval.radius // width doesn't matter but should be > 1 µas
       val GmosImaging        = gmos.scienceArea.imaging.eval.radius
@@ -117,6 +123,7 @@ object Configuration:
         height.bisect
 
     case class Flamingos2LongSlit(disperser: Flamingos2Disperser) extends ObservingMode(ObservingModeType.Flamingos2LongSlit, Radii.Flamingos2LongSlit)
+    case class Flamingos2Mos(disperser: Flamingos2Disperser) extends ObservingMode(ObservingModeType.Flamingos2Mos, Radii.Flamingos2Mos)
     case object GhostIfu extends ObservingMode(ObservingModeType.GhostIfu, Radii.GhostIfu)
     case class GmosNorthImaging(filters: List[GmosNorthFilter]) extends ObservingMode(ObservingModeType.GmosNorthImaging, Radii.GmosImaging)
     case class GmosNorthLongSlit(grating: GmosNorthGrating) extends ObservingMode(ObservingModeType.GmosNorthLongSlit, Radii.GmosLongSlit)
