@@ -29,6 +29,7 @@ import lucuma.core.math.Wavelength
 import lucuma.core.model.ConstraintSet
 import lucuma.core.model.ImageQuality
 import lucuma.core.model.sequence.TelescopeConfig
+import org.typelevel.otel4s.Attribute
 
 import scala.collection.immutable.SortedSet
 
@@ -56,6 +57,33 @@ object Ags {
     case _: NoMagnitudeForBand     => "no_magnitude"
     case _: MagnitudeTooFaint      => "magnitude_too_faint"
     case _: MagnitudeTooBright     => "magnitude_too_bright"
+
+  /** Trace span attributes mirroring the fields of an [[AgsStats]], for callers that run the pure
+    * [[agsAnalysis]] and want to record its results on their own span. Example:
+    * {{{
+    * T.span("ags.analysis", Attribute("ags.mode", params.mode), Attribute("ags.probe", params.probe.tag))
+    *   .use { span =>
+    *     val result = agsAnalysis(...)
+    *     span.addAttributes(result.stats.toSpanAttributes*).as(result)
+    *   }
+    * }}}
+    */
+  extension (stats: AgsStats) def toSpanAttributes: List[Attribute[Long]] =
+    List(
+      Attribute("ags.candidates", stats.candidateCount.toLong),
+      Attribute("ags.accepted", stats.acceptedCount.toLong),
+      Attribute("ags.usable_candidates", stats.usableCandidateCount.toLong),
+      Attribute("ags.pos_angles", stats.posAngleCount.toLong),
+      Attribute("ags.acq_offsets", stats.acqOffsetCount.toLong),
+      Attribute("ags.sci_offsets", stats.sciOffsetCount.toLong),
+      Attribute("ags.positions", stats.positionCount.toLong),
+      Attribute("ags.analyses", stats.analysisCount.toLong),
+      Attribute("ags.context_nanos", stats.contextNanos),
+      Attribute("ags.calcs_nanos", stats.calcsNanos),
+      Attribute("ags.analysis_nanos", stats.analysisNanos)
+    ) ++ stats.resultCounts.toList.map { case (label, cnt) =>
+      Attribute(s"ags.result.$label", cnt.toLong)
+    }
 
   // Runs the analyisis for a single guide star at a single position
   protected def runAnalysis(

@@ -233,6 +233,7 @@ lazy val ags = crossProject(JVMPlatform, JSPlatform)
     libraryDependencies ++= Seq(
       "edu.gemini"    %%% "lucuma-refined" % lucumaRefinedVersion,
       "org.typelevel" %%% "cats-core"      % catsVersion,
+      "org.typelevel" %%% "otel4s-core"    % otel4sVersion
     )
   )
   .jsConfigure(_.enablePlugins(BundleMonPlugin))
