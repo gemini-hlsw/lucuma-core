@@ -141,8 +141,8 @@ trait PwfsSupport[A]:
 
 sealed trait AgsParams extends Product derives Eq:
 
-  // Instrument/mode discriminator (the case class name, e.g. "GmosLongSlit"). Useful as a trace
-  // attribute since it distinguishes the geometry setup better than the guide probe alone.
+  // Instrument/mode discriminator (the case class name, e.g. "GmosLongSlit").
+  // Could be overriden if useful
   def mode: String = productPrefix
 
   def probe: GuideProbe
