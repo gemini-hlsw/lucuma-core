@@ -7,7 +7,6 @@ import cats.Eq
 import cats.derived.*
 import cats.kernel.Order
 import cats.syntax.all.*
-import lucuma.core.enums.Flamingos2CustomSlitWidth
 import lucuma.core.enums.Flamingos2Disperser
 import lucuma.core.enums.Flamingos2LyotWheel
 import lucuma.core.enums.GmosNorthFilter
@@ -103,9 +102,7 @@ object Configuration:
 
     object Radii:
       val Flamingos2LongSlit = flamingos2.scienceArea.shapeAt(Angle.Angle0, Offset.Zero, Flamingos2LyotWheel.F16, Flamingos2FpuMask.Imaging).eval.radius
-      // MOS geometry is fixed by the mode (it ignores the mask contents), so a throwaway Custom mask
-      // selects the mosFOV shape. See ADR-0003.
-      val Flamingos2Mos      = flamingos2.scienceArea.shapeAt(Angle.Angle0, Offset.Zero, Flamingos2LyotWheel.F16, Flamingos2FpuMask.Custom(ToBeDefined, Flamingos2CustomSlitWidth.CustomWidth_1_pix)).eval.radius
+      val Flamingos2Mos      = flamingos2.scienceArea.mosMode.shapeAt(Angle.Angle0, Offset.Zero).eval.radius
       val GhostIfu           = ghost.scienceArea.fov.eval.radius
       val GmosLongSlit       = gmos.scienceArea.longSlitFov(Angle.fromMicroarcseconds(2L)).eval.radius // width doesn't matter but should be > 1 µas
       val GmosImaging        = gmos.scienceArea.imaging.eval.radius
