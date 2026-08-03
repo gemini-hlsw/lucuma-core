@@ -4,6 +4,8 @@
 package lucuma
 package core
 package enums
+
+import cats.syntax.eq.*
 import lucuma.core.math.Angle
 import lucuma.core.util.Enumerated
 
@@ -25,3 +27,8 @@ enum GmosCustomSlitWidth(
   case CustomWidth_1_50 extends GmosCustomSlitWidth("CustomWidth_1_50", "1.50\"", "1.50 arcsec", Angle.fromDoubleArcseconds(1.50))
   case CustomWidth_2_00 extends GmosCustomSlitWidth("CustomWidth_2_00", "2.00\"", "2.00 arcsec", Angle.fromDoubleArcseconds(2.00))
   case CustomWidth_5_00 extends GmosCustomSlitWidth("CustomWidth_5_00", "5.00\"", "5.00 arcsec", Angle.fromDoubleArcseconds(5.00))
+
+object GmosCustomSlitWidth:
+
+  def fromWidth(slitWidth: Angle): Option[GmosCustomSlitWidth] =
+    values.find(_.width === slitWidth)

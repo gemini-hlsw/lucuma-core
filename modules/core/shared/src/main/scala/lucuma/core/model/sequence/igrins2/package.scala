@@ -34,6 +34,7 @@ val MaxExposureTime: TimeSpan = 600.secTimeSpan
 val WavelengthCoverageLowerBound: Wavelength = Wavelength.fromIntNanometers(1490).get
 val WavelengthCoverageUpperBound: Wavelength = Wavelength.fromIntNanometers(2460).get
 
+val SvcMinExposureTime: TimeSpan = 1630.msTimeSpan
 val SvcDefaultExposure: TimeSpan = MinExposureTime
 
 // Updated from OCS values
