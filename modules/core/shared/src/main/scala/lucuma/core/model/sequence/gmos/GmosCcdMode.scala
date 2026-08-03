@@ -10,12 +10,17 @@ import coulomb.*
 import coulomb.syntax.*
 import eu.timepit.refined.cats.*
 import eu.timepit.refined.types.numeric.PosBigDecimal
+import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.enums.*
+import lucuma.core.math.Angle
+import lucuma.core.math.Wavelength
 import lucuma.core.math.units.Electron
+import lucuma.core.math.units.NanometersPerPixel
 import lucuma.core.model.ImageQuality
 import lucuma.core.model.SourceProfile
 import monocle.Focus
 import monocle.Lens
+import spire.math.Rational
 
 final case class GmosCcdMode(
   xBin:        GmosXBinning,
@@ -62,42 +67,59 @@ object GmosCcdMode {
     (bs.map(_._1).minimumBy(_.count), bs.map(_._2).minimumBy(_.count))
 
   object Default {
-    object Longslit {
-      private def default(xBinning: GmosXBinning, yBinning: GmosYBinning): GmosCcdMode =
-        GmosCcdMode(
-          xBinning,
-          yBinning,
-          longslit.DefaultAmpCount,
-          longslit.DefaultAmpGain,
-          longslit.DefaultAmpReadMode
-        )
+
+    private def defaultCcdMode(xBinning: GmosXBinning, yBinning: GmosYBinning): GmosCcdMode =
+      GmosCcdMode(
+        xBinning,
+        yBinning,
+        longslit.DefaultAmpCount,
+        longslit.DefaultAmpGain,
+        longslit.DefaultAmpReadMode
+      )
+
+    object Longslit:
 
       def gmosNorth(
         profiles:     NonEmptyList[SourceProfile],
         fpu:          GmosNorthFpu,
         grating:      GmosNorthGrating,
         imageQuality: ImageQuality
-      ): GmosCcdMode = {
+      ): GmosCcdMode =
         val (defaultXBinning, defaultYBinning) =
           if (fpu.isIFU) (GmosXBinning.One, GmosYBinning.One)
           else asterismBinning(profiles.map(longslit.northBinning(fpu, _, imageQuality, grating)))
 
-        default(defaultXBinning, defaultYBinning)
-      }
+        defaultCcdMode(defaultXBinning, defaultYBinning)
 
       def gmosSouth(
         profiles:     NonEmptyList[SourceProfile],
         fpu:          GmosSouthFpu,
         grating:      GmosSouthGrating,
         imageQuality: ImageQuality
-      ): GmosCcdMode = {
+      ): GmosCcdMode =
         val (defaultXBinning, defaultYBinning) =
           if (fpu.isIFU) (GmosXBinning.One, GmosYBinning.One)
           else asterismBinning(profiles.map(longslit.southBinning(fpu, _, imageQuality, grating)))
 
-        default(defaultXBinning, defaultYBinning)
-      }
-    }
+        defaultCcdMode(defaultXBinning, defaultYBinning)
+
+    /**
+     * Default MOS CCD mode for a set of source profiles, ported back from explore.
+     */
+    object Mos:
+
+      def apply(
+        profiles:   NonEmptyList[SourceProfile],
+        slitWidth:  Angle,
+        iq:         ImageQuality,
+        dispersion: Quantity[Rational, NanometersPerPixel],
+        resolution: PosInt,
+        blaze:      Wavelength,
+        pixelScale: Angle
+      ): GmosCcdMode =
+        val (xBinning, yBinning) =
+          asterismBinning(profiles.map(mos.mosBinning(slitWidth, _, iq, dispersion, resolution, blaze, pixelScale)))
+        defaultCcdMode(xBinning, yBinning)
   }
 
   given Order[GmosCcdMode] =
