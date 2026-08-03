@@ -139,7 +139,11 @@ trait PwfsSupport[A]:
   def withPWFS2: A = withPWFSProbe(GuideProbe.PWFS2)
   protected def withPWFSProbe(probe: PWFSGuideProbe): A
 
-sealed trait AgsParams derives Eq:
+sealed trait AgsParams extends Product derives Eq:
+
+  // Instrument/mode discriminator (the case class name, e.g. "GmosLongSlit").
+  // Could be overriden if useful
+  def mode: String = productPrefix
 
   def probe: GuideProbe
 

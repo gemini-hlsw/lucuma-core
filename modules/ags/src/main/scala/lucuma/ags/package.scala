@@ -27,6 +27,7 @@ import lucuma.core.model.ImageQuality
 import lucuma.core.syntax.all.*
 import lucuma.core.util.Enumerated
 import lucuma.core.util.NewType
+import org.typelevel.otel4s.Attribute
 
 // Gaia DR3 positions are at epoch 2016.0. To include high-proper-motion
 // stars that may have moved into the patrol field since 2016, we pad the
@@ -349,3 +350,33 @@ case class AgsStats(
 
 object AgsStats:
   given Show[AgsStats] = Show.show(_.format)
+
+  /**
+   * Trace span attributes mirroring the fields of an [[AgsStats]], for callers that run the pure
+   * `Ags.agsAnalysis` and want to record its results on their own span. As a companion extension it
+   * is in scope wherever `AgsStats` is, so usage is just `result.stats.toSpanAttributes`.
+   * {{{
+   * T.span("ags.analysis", Attribute("ags.mode", params.mode), Attribute("ags.probe", params.probe.tag))
+   *   .use { span =>
+   *     val result = Ags.agsAnalysis(...)
+   *     span.addAttributes(result.stats.toSpanAttributes*).as(result)
+   *   }
+   * }}}
+   */
+  extension (stats: AgsStats)
+    def toSpanAttributes: List[Attribute[Long]] =
+      List(
+        Attribute("ags.candidates", stats.candidateCount.toLong),
+        Attribute("ags.accepted", stats.acceptedCount.toLong),
+        Attribute("ags.usable_candidates", stats.usableCandidateCount.toLong),
+        Attribute("ags.pos_angles", stats.posAngleCount.toLong),
+        Attribute("ags.acq_offsets", stats.acqOffsetCount.toLong),
+        Attribute("ags.sci_offsets", stats.sciOffsetCount.toLong),
+        Attribute("ags.positions", stats.positionCount.toLong),
+        Attribute("ags.analyses", stats.analysisCount.toLong),
+        Attribute("ags.context_nanos", stats.contextNanos),
+        Attribute("ags.calcs_nanos", stats.calcsNanos),
+        Attribute("ags.analysis_nanos", stats.analysisNanos)
+      ) ++ stats.resultCounts.toList.map { case (label, cnt) =>
+        Attribute(s"ags.result.$label", cnt.toLong)
+      }

@@ -2,7 +2,7 @@ import org.scalajs.linker.interface.ESVersion
 import org.typelevel.sbt.gha.PermissionValue
 import org.typelevel.sbt.gha.Permissions
 
-ThisBuild / tlBaseVersion                         := "0.224"
+ThisBuild / tlBaseVersion                         := "0.225"
 ThisBuild / tlCiReleaseBranches                   := Seq("master")
 ThisBuild / githubWorkflowEnv += "MUNIT_FLAKY_OK" -> "true"
 
@@ -233,6 +233,7 @@ lazy val ags = crossProject(JVMPlatform, JSPlatform)
     libraryDependencies ++= Seq(
       "edu.gemini"    %%% "lucuma-refined" % lucumaRefinedVersion,
       "org.typelevel" %%% "cats-core"      % catsVersion,
+      "org.typelevel" %%% "otel4s-core"    % otel4sVersion
     )
   )
   .jsConfigure(_.enablePlugins(BundleMonPlugin))
