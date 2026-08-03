@@ -85,6 +85,14 @@ trait Flamingos2ScienceAreaGeometry:
     circle ∩ rectangle
 
   /**
+   * The Flamingos2 MOS field of view, positioned at a given angle/offset.
+   * MOS is only defined at the F16 lyot wheel.
+   */
+  object mosMode:
+    def shapeAt(posAngle: Angle, offsetPos: Offset): ShapeExpression =
+      mosFOV(Flamingos2LyotWheel.F16.plateScale).shapeAt(offsetPos, posAngle)
+
+  /**
    * Create the Flamingos2 long slit field of view shape.
    * @param plateScale       the plate scale in arcsec/mm
    * @param scienceAreaWidth the width of the science area for the Flamingos2 configuration

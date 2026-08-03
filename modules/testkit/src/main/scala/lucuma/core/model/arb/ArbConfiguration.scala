@@ -101,6 +101,13 @@ trait ArbConfiguration:
   given Cogen[ObservingMode.Flamingos2LongSlit] =
     Cogen[Flamingos2Disperser].contramap(_.disperser)
 
+  given Arbitrary[ObservingMode.Flamingos2Mos] =
+    Arbitrary:
+      arbitrary[Flamingos2Disperser].map(ObservingMode.Flamingos2Mos.apply)
+
+  given Cogen[ObservingMode.Flamingos2Mos] =
+    Cogen[Flamingos2Disperser].contramap(_.disperser)
+
   given Arbitrary[ObservingMode.Igrins2LongSlit.type] =
     Arbitrary(Gen.const(ObservingMode.Igrins2LongSlit))
 
@@ -142,6 +149,7 @@ trait ArbConfiguration:
     Arbitrary:
       Gen.oneOf(
         arbitrary[ObservingMode.Flamingos2LongSlit],
+        arbitrary[ObservingMode.Flamingos2Mos],
         arbitrary[ObservingMode.GhostIfu.type],
         arbitrary[ObservingMode.GmosNorthImaging],
         arbitrary[ObservingMode.GmosNorthLongSlit],
@@ -162,6 +170,7 @@ trait ArbConfiguration:
     Cogen: (s, m) =>
       m match
         case m: ObservingMode.Flamingos2LongSlit   => perturb(s, m)
+        case m: ObservingMode.Flamingos2Mos        => perturb(s, m)
         case m: ObservingMode.GhostIfu.type        => perturb(s, m)
         case m: ObservingMode.GmosNorthImaging     => perturb(s, m)
         case m: ObservingMode.GmosNorthLongSlit    => perturb(s, m)

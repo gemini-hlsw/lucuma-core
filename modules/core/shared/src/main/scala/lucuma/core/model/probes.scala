@@ -16,9 +16,9 @@ trait probes:
       // Exchange observations are not supported by AGS; there is no guide probe.
       case (_: ExchangeObservingModeType, _) =>
         none
-      case (ObservingModeType.Flamingos2LongSlit | ObservingModeType.Flamingos2Imaging, TrackType.Nonsidereal) =>
+      case (ObservingModeType.Flamingos2LongSlit | ObservingModeType.Flamingos2Imaging | ObservingModeType.Flamingos2Mos, TrackType.Nonsidereal) =>
         GuideProbe.PWFS2.some
-      case (ObservingModeType.Flamingos2LongSlit | ObservingModeType.Flamingos2Imaging, TrackType.Sidereal) =>
+      case (ObservingModeType.Flamingos2LongSlit | ObservingModeType.Flamingos2Imaging | ObservingModeType.Flamingos2Mos, TrackType.Sidereal) =>
         GuideProbe.Flamingos2OIWFS.some
       // gmos modes could be condensed but I'll split them into longslit, imaging, and mos anyway
       case (ObservingModeType.GmosNorthLongSlit | ObservingModeType.GmosSouthLongSlit, TrackType.Nonsidereal) =>
