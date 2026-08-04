@@ -33,12 +33,21 @@ enum ObservationValidationCode(
     )
   case ConfigurationRequestPending
     extends ObservationValidationCode(
-      "config_request_pending", 
-      "Approval Pending", 
+      "config_request_pending",
+      "Approval Pending",
       ObservationValidationCode.ConfigurationRequestMsg.Pending
+    )
+  case TooActivationUnapproved
+    extends ObservationValidationCode(
+      "too_activation_unapproved",
+      "ToO Activation Unapproved",
+      ObservationValidationCode.TooActivationMsg.ExceedsCeiling
     )
 
 object ObservationValidationCode:
+  object TooActivationMsg:
+    val ExceedsCeiling = "Target of Opportunity activation exceeds what the accepted proposal allows."
+
   object ConfigurationRequestMsg:
     val Unavailable  = "Configuration approval status could not be determined."
     val NotRequested = "Configuration is unapproved (approval has not been requested)."
