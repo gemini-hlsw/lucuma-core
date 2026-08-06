@@ -33,6 +33,10 @@ object GnirsAcquisitionMode:
     // The default Faint sky offset for IFU: the sky is imaged 10" west of the target.
     val DefaultIfuSkyOffset: Offset = Offset(-10.pArcsec, 0.qArcsec)
 
+    // The default Faint sky offset for imaging: the field image doubles as the sky
+    // frame and is taken 10" north of the target.
+    val DefaultImagingSkyOffset: Offset = Offset(0.pArcsec, 10.qArcsec)
+
     val Default: GnirsAcquisitionMode.Faint =
       GnirsAcquisitionMode.Faint(DefaultSlitSkyOffset)
 
@@ -51,11 +55,16 @@ object GnirsAcquisitionMode:
   val skyOffset: Optional[GnirsAcquisitionMode, Offset] =
     faint.andThen(Faint.skyOffset)
 
-  def forTypeAndOffset(acquisitionType: GnirsAcquisitionType, skyOffset: Option[Offset]): GnirsAcquisitionMode =
+  /**
+   * The mode for an acquisition type, using the given sky offset if that type is Faint.
+   * The offset is required because its default differs per observing mode (see the
+   * `Faint.Default*SkyOffset` values); it is ignored for the other two types.
+   */
+  def forTypeAndOffset(acquisitionType: GnirsAcquisitionType, skyOffset: Offset): GnirsAcquisitionMode =
     acquisitionType match
       case GnirsAcquisitionType.VeryBright => VeryBright
       case GnirsAcquisitionType.Bright => Bright
-      case GnirsAcquisitionType.Faint => Faint(skyOffset.getOrElse(Faint.DefaultSlitSkyOffset))
+      case GnirsAcquisitionType.Faint => Faint(skyOffset)
 
   // Default value depends on integration time (exposure time * coadds).
   def defaultFor(exposureTime: TimeSpan, coadds: PosInt): GnirsAcquisitionMode =
