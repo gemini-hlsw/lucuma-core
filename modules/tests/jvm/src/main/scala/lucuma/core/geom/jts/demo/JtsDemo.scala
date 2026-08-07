@@ -178,13 +178,13 @@ trait Flamingos2MosShapes extends InstrumentShapes:
   import lucuma.core.geom.flamingos2.oiwfs.{probeArm, patrolField}
 
   val posAngle: Angle =
-    0.deg
+    20.deg
 
   val guideStarOffset: Offset =
     Offset(170543999.µas.p, -24177003.µas.q)
 
   val offsetPos: Offset =
-    Offset(-60.arcsec.p, 60.arcsec.q)
+    Offset(-5.arcsec.p, 5.arcsec.q)
 
   val lyot: Flamingos2LyotWheel = Flamingos2LyotWheel.F16
 
@@ -193,7 +193,6 @@ trait Flamingos2MosShapes extends InstrumentShapes:
 
   override def coloredShapes: List[ColoredShape] =
     List(
-      ColoredShape(scienceArea.mos.shapeAt(offsetPos, posAngle),     new Color(144, 238, 144), filled = true),
       ColoredShape(scienceArea.mosMode.shapeAt(posAngle, offsetPos), Color.cyan, Some(new BasicStroke(2f)))
     )
 
