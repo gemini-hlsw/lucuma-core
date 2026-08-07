@@ -173,6 +173,38 @@ trait Flamingos2ImagingShapes extends InstrumentShapes:
       candidatesArea.candidatesAreaAt(lyot, posAngle, offsetPos)
     )
 
+trait Flamingos2MosShapes extends InstrumentShapes:
+  import lucuma.core.geom.flamingos2.*
+  import lucuma.core.geom.flamingos2.oiwfs.{probeArm, patrolField}
+
+  val posAngle: Angle =
+    0.deg
+
+  val guideStarOffset: Offset =
+    Offset(170543999.µas.p, -24177003.µas.q)
+
+  val offsetPos: Offset =
+    Offset(-60.arcsec.p, 60.arcsec.q)
+
+  val lyot: Flamingos2LyotWheel = Flamingos2LyotWheel.F16
+
+  val port: PortDisposition =
+    PortDisposition.Bottom
+
+  override def coloredShapes: List[ColoredShape] =
+    List(
+      ColoredShape(scienceArea.mos.shapeAt(offsetPos, posAngle),     new Color(144, 238, 144), filled = true),
+      ColoredShape(scienceArea.mosMode.shapeAt(posAngle, offsetPos), Color.cyan, Some(new BasicStroke(2f)))
+    )
+
+  def shapes: List[ShapeExpression] =
+    List(
+      ShapeExpression.centeredRectangle(1.arcsec, 1.arcsec).translate(guideStarOffset), // guide star
+      probeArm.shapeAt(posAngle, guideStarOffset, offsetPos, lyot, port),
+      patrolField.patrolFieldAt(posAngle, offsetPos, lyot, port),
+      candidatesArea.candidatesAreaAt(lyot, posAngle, offsetPos)
+    )
+
 // Just pwfs probe
 trait PwfsShapes extends InstrumentShapes:
   import lucuma.core.geom.pwfs.*
@@ -399,6 +431,8 @@ object JtsGmosNSDemo extends JtsDemo with GmosNSShapes
 object JtsFlamingos2LSDemo extends JtsDemo with Flamingos2LSShapes
 
 object JtsFlamingos2ImagingDemo extends JtsDemo with Flamingos2ImagingShapes
+
+object JtsFlamingos2MosDemo extends JtsDemo with Flamingos2MosShapes
 
 object JtsGmosImagingDemo extends JtsDemo with GmosImagingShapes
 
