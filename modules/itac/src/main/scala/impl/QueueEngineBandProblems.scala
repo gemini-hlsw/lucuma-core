@@ -9,7 +9,7 @@ import cats.syntax.all.*
 import edu.gemini.tac.qengine.p1.*
 import lucuma.core.enums.ScienceBand
 import lucuma.core.enums.ScienceSubtype
-import lucuma.core.enums.ToOActivation
+import lucuma.core.enums.TooActivation
 import org.slf4j.LoggerFactory
 
 object QueueEngineBandProblems {
@@ -36,12 +36,12 @@ object QueueEngineBandProblems {
   }
 
   val RapidTooOutsideBand1: Problem = {
-    case (p, b@(Band2 | Band3 | Band4)) if p.too == ToOActivation.Rapid =>
+    case (p, b@(Band2 | Band3 | Band4)) if p.too >= TooActivation.Rapid =>
       s"Rapid TOO proposal in $b"
   }
 
   val StandardTooOutsideBand12: Problem = {
-    case (p, b@(Band3 | Band4)) if p.too == ToOActivation.Standard =>
+    case (p, b@(Band3 | Band4)) if p.too == TooActivation.Standard =>
       s"Standard TOO proposal in $b"
   }
 

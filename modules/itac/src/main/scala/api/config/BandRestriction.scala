@@ -8,7 +8,7 @@ import edu.gemini.tac.qengine.p1.Proposal
 import lucuma.core.enums.ScienceBand
 import lucuma.core.enums.ScienceBand.*
 import lucuma.core.enums.ScienceSubtype
-import lucuma.core.enums.ToOActivation
+import lucuma.core.enums.TooActivation
 import lucuma.core.model.ImageQuality
 
 case class BandRestriction(name: String, bands: Set[ScienceBand])(val matches: Proposal => Boolean)
@@ -28,7 +28,7 @@ object BandRestriction {
   def rapidToo: BandRestriction = rapidToo(Band1)
 
   def rapidToo(band: ScienceBand*) =
-    BandRestriction(RapidTooName, Set(band*)) { _.too == ToOActivation.Rapid }
+    BandRestriction(RapidTooName, Set(band*)) { _.too >= TooActivation.Rapid }
 
   def lgs: BandRestriction =
     BandRestriction(LgsName, Set(Band1, Band2)) { prop =>

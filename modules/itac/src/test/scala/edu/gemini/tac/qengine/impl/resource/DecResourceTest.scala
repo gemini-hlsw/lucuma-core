@@ -14,7 +14,7 @@ import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.Site
 import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.TimeAccountingCategory
-import lucuma.core.enums.ToOActivation
+import lucuma.core.enums.TooActivation
 import lucuma.core.enums.WaterVapor
 import lucuma.core.model.CloudExtinction
 import lucuma.core.model.ConstraintSet
@@ -122,7 +122,7 @@ class DecResourceTest extends ItacSuite {
   }
 
   test("testReserveToo") {
-    val prop   = mkProp(target0).copy(too = ToOActivation.Standard)
+    val prop   = mkProp(target0).copy(too = TooActivation.Standard)
     val block  = Block(prop, prop.obsList.head, Time.hours(10))
 
     grp.reserve(block, Fixture.emptyQueue) match {
@@ -136,7 +136,7 @@ class DecResourceTest extends ItacSuite {
 
   // Spread over the two bins, but the first bin cannot handle an equal share.
   test("testReserveTooUnequal") {
-    val prop   = mkProp(target0).copy(too = ToOActivation.Standard)
+    val prop   = mkProp(target0).copy(too = TooActivation.Standard)
     val block  = Block(prop, prop.obsList.head, Time.hours(22))
 
     grp.reserve(block, Fixture.emptyQueue) match {
@@ -148,7 +148,7 @@ class DecResourceTest extends ItacSuite {
   }
 
   test("testReserveTooOverallocate") {
-    val prop   = mkProp(target0).copy(too = ToOActivation.Standard)
+    val prop   = mkProp(target0).copy(too = TooActivation.Standard)
     val block  = Block(prop, prop.obsList.head, Time.hours(30.001))
 
     grp.reserve(block, Fixture.emptyQueue) match {
