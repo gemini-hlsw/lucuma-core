@@ -8,24 +8,24 @@ import lucuma.core.enums.ScienceBand
 import lucuma.core.enums.ScienceSubtype
 import lucuma.core.enums.Site
 import lucuma.core.enums.TimeAccountingCategory
-import lucuma.core.enums.ToOActivation
+import lucuma.core.enums.TooActivation
 
 import java.io.File
 
 case class Proposal(
-  ntac: Ntac,
-  site: Site,
-  mode: ScienceSubtype = ScienceSubtype.Queue,
-  too: ToOActivation = ToOActivation.None,
-  obsList: List[ItacObservation] = Nil,
+  ntac:              Ntac,
+  site:              Site,
+  mode:              ScienceSubtype = ScienceSubtype.Queue,
+  too:               TooActivation = TooActivation.None,
+  obsList:           List[ItacObservation] = Nil,
   band3Observations: List[ItacObservation] = Nil,
-  isPoorWeather: Boolean = false,
-  piName: Option[String] = None,
-  piEmail: Option[String] = None,
-  p1proposal: Null = null, // edu.gemini.model.p1.immutable.Proposal = null, // to avoid having to generate one for testcases that don't care
+  isPoorWeather:     Boolean = false,
+  piName:            Option[String] = None,
+  piEmail:           Option[String] = None,
+  p1proposal:        Null = null, // edu.gemini.model.p1.immutable.Proposal = null, // to avoid having to generate one for testcases that don't care
   p1mutableProposal: Null = null, // edu.gemini.model.p1.mutable.Proposal = null, // to avoid having to generate one for testcases that don't care
-  p1xmlFile: File = null, // to avoid having to generate one for testcases that don't care
-  itacComment: Option[String] = None,
+  p1xmlFile:         File = null, // to avoid having to generate one for testcases that don't care
+  itacComment:       Option[String] = None,
 ) {
 
   lazy val id: Proposal.Id = Proposal.Id(ntac.TimeAccountingCategory, ntac.reference)

@@ -7,7 +7,7 @@ import edu.gemini.tac.qengine.p1.Proposal
 import lucuma.core.enums.ScienceBand
 import lucuma.core.enums.ScienceBand.*
 import lucuma.core.enums.ScienceSubtype
-import lucuma.core.enums.ToOActivation
+import lucuma.core.enums.TooActivation
 import munit.FunSuite
 import org.junit.Assert
 
@@ -60,15 +60,22 @@ class QueueEngineBandProblemsTest extends FunSuite {
       case Band4 => "LP proposal in Band4"
     }
 
+  test("testInterruptingTooOutsideBand1"):
+    testRule(RapidTooOutsideBand1, P.copy(too = TooActivation.Interrupting)) {
+      case Band2 => "Rapid TOO proposal in Band2"
+      case Band3 => "Rapid TOO proposal in Band3"
+      case Band4 => "Rapid TOO proposal in Band4"
+    }
+
   test("testRapidTooOutsideBand1"):
-    testRule(RapidTooOutsideBand1, P.copy(too = ToOActivation.Rapid)) {
+    testRule(RapidTooOutsideBand1, P.copy(too = TooActivation.Rapid)) {
       case Band2 => "Rapid TOO proposal in Band2"
       case Band3 => "Rapid TOO proposal in Band3"
       case Band4 => "Rapid TOO proposal in Band4"
     }
 
   test("testStandardTooOutsideBand12"):
-    testRule(StandardTooOutsideBand12, P.copy(too = ToOActivation.Standard)) {
+    testRule(StandardTooOutsideBand12, P.copy(too = TooActivation.Standard)) {
       case Band3 => "Standard TOO proposal in Band3"
       case Band4 => "Standard TOO proposal in Band4"
     }
