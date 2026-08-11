@@ -45,7 +45,7 @@ class MosMaskReaderErrorSuite extends CatsEffectSuite:
     var block = 0
     var ends  = 0
     while ends < 2 && block * BlockSize < bs.length do
-      val base = block * BlockSize
+      val base   = block * BlockSize
       val hasEnd = (0 until 36).exists: c =>
         val o = base + c * 80
         o + 3 <= bs.length && (0 until 3).forall(k => (bs(o + k) & 0xff).toChar === "END".charAt(k))

@@ -60,19 +60,25 @@ object MosMaskReader:
    * neither should a name be looked up per row.
    */
   def slits[F[_]: RaiseThrowable]: Pipe[F, Byte, MosMaskSlit] = in =>
-    in.through(Fits.binaryTableRows).zipWithIndex.pull.uncons1.flatMap {
-      // A table with no rows is structurally valid: a design that placed no slits.
-      case None                       => Pull.done
-      case Some(((first, _), rest)) =>
-        (MosMaskHeaderDecoder.decode(first.table.header), MosMaskColumns.resolve(first.table))
-          .tupled match
-          case Left(problem)   => Pull.raiseError(problem)
-          case Right((h, cols)) =>
-            (Stream.emit((first, 0L)) ++ rest)
-              .flatMap((row, index) => emitOrRaise(decodeSlit(row, index, h, cols)))
-              .pull
-              .echo
-    }.stream
+    in.through(Fits.binaryTableRows)
+      .zipWithIndex
+      .pull
+      .uncons1
+      .flatMap {
+        // A table with no rows is structurally valid: a design that placed no slits.
+        case None                     => Pull.done
+        case Some(((first, _), rest)) =>
+          (MosMaskHeaderDecoder.decode(first.table.header),
+           MosMaskColumns.resolve(first.table)
+          ).tupled match
+            case Left(problem)    => Pull.raiseError(problem)
+            case Right((h, cols)) =>
+              (Stream.emit((first, 0L)) ++ rest)
+                .flatMap((row, index) => emitOrRaise(decodeSlit(row, index, h, cols)))
+                .pull
+                .echo
+      }
+      .stream
 
   private def emitOrRaise[F[_]: RaiseThrowable, A](e: Either[MosMaskProblem, A]): Stream[F, A] =
     e.fold(Stream.raiseError[F](_), Stream.emit)
@@ -168,8 +174,8 @@ object MosMaskReader:
  * Positions of a mask design's columns within its table, resolved once.
  *
  * The required set is drawn where the format's own history drew it. Object identity, position,
- * brightness and slit geometry have always been present; `redshift` and the spectrum footprint
- * were added to the format later, so files legitimately lack them and they stay optional.
+ * brightness and slit geometry have always been present; `redshift` and the spectrum footprint were
+ * added to the format later, so files legitimately lack them and they stay optional.
  */
 private case class MosMaskColumns(
   id:         Int,

@@ -50,6 +50,22 @@ class FitsReaderSuite extends CatsEffectSuite:
         assertEquals(t.header.cards.count(_.keyword == "FILE_OT"), 2)
         assertEquals(t.header.string("FILE_OT"), Some("preimage.sex_OT.fits"))
 
+  test("commentary cards are not retained"):
+    // Pins what FitsHeader documents. The fixture's primary header carries two COMMENT cards, and
+    // they do not reach `cards` or `rawValues` because they have no value indicator. If commentary
+    // support is ever added, this test should fail and the scaladoc be corrected with it.
+    bytes("/ngc7796_ODF.fits")
+      .through(Fits.headers[IO])
+      .head
+      .compile
+      .lastOrError
+      .map: h =>
+        assert(h.cards.forall(c => c.keyword != "COMMENT" && c.keyword != "HISTORY"))
+        assertEquals(h.rawValues.get("COMMENT"), None)
+        // The value carrying cards of the same header are retained.
+        assertEquals(h.boolean("SIMPLE"), Some(true))
+        assertEquals(h.int("NAXIS"), Some(0))
+
   test("describe the binary table of a GMOS-S mask"):
     bytes("/ngc7796_ODF.fits")
       .through(Fits.binaryTable[IO])

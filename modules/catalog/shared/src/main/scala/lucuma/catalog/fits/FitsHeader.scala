@@ -8,11 +8,23 @@ import cats.syntax.all.*
 import scala.util.control.NonFatal
 
 /**
- * The keyword records of one FITS header data unit.
+ * The value carrying records of one FITS header data unit.
  *
  * Cards are retained in file order. Real files do contain the same keyword more than once — mask
  * files written by GMMPS carry `FILE_OT` twice, with different values — so lookups resolve to the
  * '''first''' occurrence, and [[cards]] remains available when the later ones matter.
+ *
+ * '''Not everything in the header reaches here.''' A card is retained only if it has a value
+ * indicator in the ninth column and a keyword of at most eight characters. That excludes:
+ *
+ *   - `COMMENT`, `HISTORY` and blank keyword padding, which carry no value. Real files do contain
+ *     these; every Gemini file examined while writing this carries `COMMENT` cards.
+ *   - `CONTINUE` cards of the long string convention. A value split across cards is therefore
+ *     '''truncated to its first segment''' rather than reassembled.
+ *   - `HIERARCH` keywords, which exceed eight characters.
+ *
+ * None of the three appears in the mask files this reader was written for. Supporting them is
+ * bounded work, and the place to do it is here, but it has not been done.
  */
 case class FitsHeader(cards: List[FitsHeader.Card]):
 
@@ -28,7 +40,12 @@ case class FitsHeader(cards: List[FitsHeader.Card]):
   def raw(keyword: String): Option[String] =
     card(keyword).map(_.value)
 
-  /** Every keyword and its raw value, first occurrence winning. */
+  /**
+   * Every retained keyword and its raw value, first occurrence winning.
+   *
+   * Subject to the exclusions described on this class: commentary cards, `CONTINUE` continuations
+   * and `HIERARCH` keywords are not present.
+   */
   lazy val rawValues: Map[String, String] =
     byKeyword.view.mapValues(_.value).toMap
 

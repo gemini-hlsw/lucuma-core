@@ -15,11 +15,15 @@ import monocle.Lens
 /**
  * File level metadata of a MOS mask design.
  *
- * `keywords` retains every keyword found in the file, including those given a typed field above.
+ * `keywords` carries the design's raw keyword values, including those given a typed field above.
  * This is deliberate: the format has drifted across versions of the mask design software, so a
  * reader must be able to reach a keyword this library does not yet model without waiting for a
  * release. Where a keyword appears more than once — which real files do contain — the first
  * occurrence is the one retained.
+ *
+ * It is not, however, a complete transcript of the file's header. Records that carry no value are
+ * absent, `COMMENT` and `HISTORY` among them, as are the `CONTINUE` and `HIERARCH` conventions.
+ * Treat a missing key as "this reader did not retain it" rather than "the file did not have it".
  *
  * `pixelScale` is nominal rather than measured. Mask design software snaps it to a fixed value per
  * detector configuration, because the true scale is not constant across the field and downstream
@@ -36,7 +40,8 @@ import monocle.Lens
  * @param nodAndShuffle       Nod & Shuffle configuration, if any
  * @param spectroscopy        the spectroscopic setup the design assumes
  * @param provenance          where the design came from
- * @param keywords            every keyword in the file, as raw strings
+ * @param keywords            the file's value carrying keywords, as raw strings; see above for
+ *                            what is not included
  */
 case class MosMaskHeader(
   instrument:          Instrument,

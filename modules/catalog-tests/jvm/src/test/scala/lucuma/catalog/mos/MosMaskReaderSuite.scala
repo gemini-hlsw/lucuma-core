@@ -82,7 +82,7 @@ class MosMaskReaderSuite extends CatsEffectSuite:
             assertEquals(distance, 50)
             assertEquals(binning, 2)
             assertEqualsDouble(arcsec(slitLength), 4.0, 1e-6)
-          case other                                                       =>
+          case other                                                        =>
             fail(s"expected microShuffle, got $other")
 
   test("Flamingos-2 design is not Nod & Shuffle"):
