@@ -20,9 +20,9 @@ import java.nio.ByteBuffer
  * `TDIM`, variable length arrays or ASCII tables. Widening that set changes the module's public
  * contract, so it is stated here rather than left to be discovered.
  *
- * Header data units are traversed lazily and image data is skipped rather than read, so
- * [[headers]] and [[binaryTable]] terminate as soon as they have what they need. That matters for
- * files where the data dwarfs the metadata, such as pre images.
+ * Header data units are traversed lazily and image data is skipped rather than read, so [[headers]]
+ * and [[binaryTable]] terminate as soon as they have what they need. That matters for files where
+ * the data dwarfs the metadata, such as pre images.
  */
 object Fits:
 
@@ -98,20 +98,22 @@ object Fits:
     s:   Stream[F, Byte],
     acc: List[FitsHeader.Card]
   ): Pull[F, Nothing, Option[(FitsHeader, Stream[F, Byte])]] =
-    s.pull.unconsN(BlockSize, allowFewer = true).flatMap:
-      case None                                          =>
-        if acc.isEmpty then Pull.pure(None)
-        else Pull.raiseError(FitsProblem.UnterminatedHeader)
-      case Some((chunk, _)) if chunk.size < BlockSize    =>
-        Pull.raiseError(FitsProblem.IncompleteBlock(chunk.size.toLong))
-      case Some((chunk, rest))                           =>
-        val records = decodeRecords(chunk)
-        val endIdx  = records.indexWhere(_.take(8).trim === EndKeyword)
-        val cards   = (if endIdx < 0 then records else records.take(endIdx))
-                        .flatMap(FitsHeader.parseCard)
-                        .toList
-        if endIdx < 0 then readHeader(rest, acc ::: cards)
-        else Pull.pure(Some((FitsHeader(acc ::: cards), rest)))
+    s.pull
+      .unconsN(BlockSize, allowFewer = true)
+      .flatMap:
+        case None                                       =>
+          if acc.isEmpty then Pull.pure(None)
+          else Pull.raiseError(FitsProblem.UnterminatedHeader)
+        case Some((chunk, _)) if chunk.size < BlockSize =>
+          Pull.raiseError(FitsProblem.IncompleteBlock(chunk.size.toLong))
+        case Some((chunk, rest))                        =>
+          val records = decodeRecords(chunk)
+          val endIdx  = records.indexWhere(_.take(8).trim === EndKeyword)
+          val cards   = (if endIdx < 0 then records else records.take(endIdx))
+            .flatMap(FitsHeader.parseCard)
+            .toList
+          if endIdx < 0 then readHeader(rest, acc ::: cards)
+          else Pull.pure(Some((FitsHeader(acc ::: cards), rest)))
 
   /**
    * Emits exactly the declared number of rows.
@@ -128,13 +130,15 @@ object Fits:
   ): Pull[F, FitsRow, Unit] =
     if read >= table.rowCount then Pull.done
     else
-      s.pull.unconsN(table.rowLength, allowFewer = true).flatMap:
-        case None                                             =>
-          Pull.raiseError(FitsProblem.TruncatedData(table.rowCount, read))
-        case Some((chunk, _)) if chunk.size < table.rowLength =>
-          Pull.raiseError(FitsProblem.TruncatedData(table.rowCount, read))
-        case Some((chunk, rest))                              =>
-          Pull.output1(decodeRow(chunk, table)) >> readRows(rest, table, read + 1)
+      s.pull
+        .unconsN(table.rowLength, allowFewer = true)
+        .flatMap:
+          case None                                             =>
+            Pull.raiseError(FitsProblem.TruncatedData(table.rowCount, read))
+          case Some((chunk, _)) if chunk.size < table.rowLength =>
+            Pull.raiseError(FitsProblem.TruncatedData(table.rowCount, read))
+          case Some((chunk, rest))                              =>
+            Pull.output1(decodeRow(chunk, table)) >> readRows(rest, table, read + 1)
 
   /** Skips a unit's data section, including its padding to a block boundary. */
   private def skipData[F[_]](s: Stream[F, Byte], header: FitsHeader): Stream[F, Byte] =
@@ -155,8 +159,8 @@ object Fits:
 
   /** Decodes one fixed stride row. FITS numeric data is big endian, as ByteBuffer defaults to. */
   private def decodeRow(chunk: Chunk[Byte], table: FitsBinaryTable): FitsRow =
-    val arr = chunk.toArray
-    val bb  = ByteBuffer.wrap(arr)
+    val arr   = chunk.toArray
+    val bb    = ByteBuffer.wrap(arr)
     val cells = table.columns.map: c =>
       c.format match
         case FitsColumnFormat.Int32   => FitsCell.IntCell(bb.getInt(c.byteOffset).toLong)

@@ -30,7 +30,8 @@ import monocle.Lens
  *                            map onto the file's x and y columns
  * @param pixelScale          nominal pre-image plate scale, in arcseconds per pixel
  * @param pointing            pointing centre of the pre-image
- * @param positionAngle       position angle the mask must be observed at
+ * @param positionAngle       position angle the mask must be observed at; absent in designs
+ *                            produced before mask design software began recording it
  * @param hasTiltedSlits      whether any slit in the design is tilted
  * @param nodAndShuffle       Nod & Shuffle configuration, if any
  * @param spectroscopy        the spectroscopic setup the design assumes
@@ -42,7 +43,7 @@ case class MosMaskHeader(
   dispersionDirection: MosDispersionDirection,
   pixelScale:          Double,
   pointing:            Coordinates,
-  positionAngle:       Angle,
+  positionAngle:       Option[Angle],
   hasTiltedSlits:      Boolean,
   nodAndShuffle:       MosNodAndShuffle,
   spectroscopy:        MosSpectroscopyConfig,
@@ -91,7 +92,7 @@ object MosMaskHeader:
     Focus[MosMaskHeader](_.pointing)
 
   /** @group Optics */
-  val positionAngle: Lens[MosMaskHeader, Angle] =
+  val positionAngle: Lens[MosMaskHeader, Option[Angle]] =
     Focus[MosMaskHeader](_.positionAngle)
 
   /** @group Optics */

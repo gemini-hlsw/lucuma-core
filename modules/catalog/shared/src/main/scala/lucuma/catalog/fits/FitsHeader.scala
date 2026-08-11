@@ -36,21 +36,30 @@ case class FitsHeader(cards: List[FitsHeader.Card]):
     raw(keyword).map(FitsHeader.unquote)
 
   def int(keyword: String): Option[Int] =
-    raw(keyword).flatMap(s => try Some(s.trim.toInt) catch { case NonFatal(_) => None })
+    raw(keyword).flatMap(s =>
+      try Some(s.trim.toInt)
+      catch { case NonFatal(_) => None }
+    )
 
   def long(keyword: String): Option[Long] =
-    raw(keyword).flatMap(s => try Some(s.trim.toLong) catch { case NonFatal(_) => None })
+    raw(keyword).flatMap(s =>
+      try Some(s.trim.toLong)
+      catch { case NonFatal(_) => None }
+    )
 
   def double(keyword: String): Option[Double] =
     raw(keyword).flatMap: s =>
       // FITS permits Fortran style exponents, e.g. 1.234D+05
       val n = s.trim.replace('D', 'E').replace('d', 'E')
-      try Some(n.toDouble) catch { case NonFatal(_) => None }
+      try Some(n.toDouble)
+      catch { case NonFatal(_) => None }
 
   def boolean(keyword: String): Option[Boolean] =
-    raw(keyword).map(_.trim).collect:
-      case "T" => true
-      case "F" => false
+    raw(keyword)
+      .map(_.trim)
+      .collect:
+        case "T" => true
+        case "F" => false
 
   /** True if this header describes a binary table extension. */
   def isBinaryTable: Boolean =
@@ -76,10 +85,10 @@ case class FitsHeader(cards: List[FitsHeader.Card]):
     val naxis = int("NAXIS").getOrElse(0)
     if naxis <= 0 then 0L
     else
-      val axes    = (1 to naxis).toList.traverse(i => long(s"NAXIS$i"))
-      val bitpix  = int("BITPIX").getOrElse(8)
-      val pcount  = long("PCOUNT").getOrElse(0L)
-      val gcount  = long("GCOUNT").getOrElse(1L)
+      val axes   = (1 to naxis).toList.traverse(i => long(s"NAXIS$i"))
+      val bitpix = int("BITPIX").getOrElse(8)
+      val pcount = long("PCOUNT").getOrElse(0L)
+      val gcount = long("GCOUNT").getOrElse(1L)
       axes.fold(0L)(as => (math.abs(bitpix) / 8L) * gcount * (pcount + as.product))
 
 object FitsHeader:
@@ -109,7 +118,7 @@ object FitsHeader:
       // COMMENT, HISTORY and other commentary keywords have no value indicator.
       None
     else
-      val rest = record.drop(9)
+      val rest             = record.drop(9)
       val (value, comment) = splitValue(rest)
       Some(Card(keyword, value.trim, comment.map(_.trim).filter(_.nonEmpty)))
 

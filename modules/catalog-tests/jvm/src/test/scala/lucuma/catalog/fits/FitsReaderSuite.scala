@@ -12,9 +12,9 @@ import munit.CatsEffectSuite
 /**
  * Exercises the FITS reader against real mask files produced by GMMPS.
  *
- * The two fixtures are a deliberate pair: `ngc7796_ODF.fits` is a GMOS-S design and
- * `n159_ODF.fits` a Flamingos-2 one, so between them they cover both dispersion directions and
- * both slit size conventions.
+ * The two fixtures are a deliberate pair: `ngc7796_ODF.fits` is a GMOS-S design and `n159_ODF.fits`
+ * a Flamingos-2 one, so between them they cover both dispersion directions and both slit size
+ * conventions.
  */
 class FitsReaderSuite extends CatsEffectSuite:
 
@@ -61,9 +61,26 @@ class FitsReaderSuite extends CatsEffectSuite:
         assertEquals(t.columns.length, 18)
         assertEquals(
           t.columnNames.toList,
-          List("ID", "RA", "DEC", "x_ccd", "y_ccd", "slitpos_x", "slitpos_y", "slitsize_x",
-               "slitsize_y", "slittilt", "MAG", "priority", "slittype", "redshift", "specleft",
-               "specright", "specbottom", "spectop")
+          List(
+            "ID",
+            "RA",
+            "DEC",
+            "x_ccd",
+            "y_ccd",
+            "slitpos_x",
+            "slitpos_y",
+            "slitsize_x",
+            "slitsize_y",
+            "slittilt",
+            "MAG",
+            "priority",
+            "slittype",
+            "redshift",
+            "specleft",
+            "specright",
+            "specbottom",
+            "spectop"
+          )
         )
         // Byte offsets are what a mis-decode would get wrong first.
         assertEquals(t.column("ID").map(_.byteOffset), Some(0))

@@ -28,14 +28,16 @@ enum FitsCell:
     case _           => none
 
   /** The first character of a text cell, for the single character fields FITS tables use. */
-  def asChar: Option[Char] = asString.map(_.trim).collect:
-    case s if s.nonEmpty => s.charAt(0)
+  def asChar: Option[Char] = asString
+    .map(_.trim)
+    .collect:
+      case s if s.nonEmpty => s.charAt(0)
 
 /**
  * The subset of TFORM codes this reader supports.
  *
- * Deliberately narrow. Images, compressed data, `TDIM`, variable length arrays and ASCII tables
- * are out of scope, and widening this set is a change to the module's public contract.
+ * Deliberately narrow. Images, compressed data, `TDIM`, variable length arrays and ASCII tables are
+ * out of scope, and widening this set is a change to the module's public contract.
  */
 enum FitsColumnFormat(val code: Char, val unitWidth: Int):
   case Int32   extends FitsColumnFormat('J', 4)
@@ -50,12 +52,18 @@ object FitsColumnFormat:
 /**
  * One column of a binary table.
  *
- * @param index      one based position of the column in the table
- * @param name       value of the column's TTYPE keyword
- * @param format     element type
- * @param repeat     element count; only text columns may exceed one
- * @param unit       value of the column's TUNIT keyword, if present
- * @param byteOffset offset of this column within a row
+ * @param index
+ *   one based position of the column in the table
+ * @param name
+ *   value of the column's TTYPE keyword
+ * @param format
+ *   element type
+ * @param repeat
+ *   element count; only text columns may exceed one
+ * @param unit
+ *   value of the column's TUNIT keyword, if present
+ * @param byteOffset
+ *   offset of this column within a row
  */
 case class FitsColumn(
   index:      Int,
@@ -102,11 +110,11 @@ object FitsBinaryTable:
     name:  String,
     tform: String
   ): Either[FitsProblem, (FitsColumnFormat, Int)] =
-    val t         = tform.trim
-    val digits    = t.takeWhile(_.isDigit)
-    val codePart  = t.drop(digits.length)
-    val repeat    = if digits.isEmpty then 1 else digits.toIntOption.getOrElse(0)
-    val problem   = FitsProblem.UnsupportedColumnFormat(name, tform)
+    val t        = tform.trim
+    val digits   = t.takeWhile(_.isDigit)
+    val codePart = t.drop(digits.length)
+    val repeat   = if digits.isEmpty then 1 else digits.toIntOption.getOrElse(0)
+    val problem  = FitsProblem.UnsupportedColumnFormat(name, tform)
     for
       code <- codePart.headOption.toRight(problem)
       fmt  <- FitsColumnFormat.fromCode(code).toRight(problem)
