@@ -4,7 +4,6 @@
 package lucuma.catalog.mos
 
 import cats.data.NonEmptyList
-import cats.syntax.all.*
 import lucuma.catalog.fits.FitsProblem
 
 /** Indicates a problem interpreting a FITS file as a MOS mask design. */

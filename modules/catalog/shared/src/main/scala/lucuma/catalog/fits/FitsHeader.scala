@@ -54,13 +54,13 @@ case class FitsHeader(cards: List[FitsHeader.Card]):
 
   def int(keyword: String): Option[Int] =
     raw(keyword).flatMap(s =>
-      try Some(s.trim.toInt)
+      try s.trim.toInt.some
       catch { case NonFatal(_) => None }
     )
 
   def long(keyword: String): Option[Long] =
     raw(keyword).flatMap(s =>
-      try Some(s.trim.toLong)
+      try s.trim.toLong.some
       catch { case NonFatal(_) => None }
     )
 
@@ -68,7 +68,7 @@ case class FitsHeader(cards: List[FitsHeader.Card]):
     raw(keyword).flatMap: s =>
       // FITS permits Fortran style exponents, e.g. 1.234D+05
       val n = s.trim.replace('D', 'E').replace('d', 'E')
-      try Some(n.toDouble)
+      try n.toDouble.some
       catch { case NonFatal(_) => None }
 
   def boolean(keyword: String): Option[Boolean] =
@@ -137,7 +137,7 @@ object FitsHeader:
     else
       val rest             = record.drop(9)
       val (value, comment) = splitValue(rest)
-      Some(Card(keyword, value.trim, comment.map(_.trim).filter(_.nonEmpty)))
+      Card(keyword, value.trim, comment.map(_.trim).filter(_.nonEmpty)).some
 
   /**
    * Splits a card's value from its comment.

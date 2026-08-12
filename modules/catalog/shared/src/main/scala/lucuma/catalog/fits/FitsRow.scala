@@ -3,6 +3,8 @@
 
 package lucuma.catalog.fits
 
+import cats.syntax.all.*
+
 /**
  * One decoded row of a binary table, together with the structure needed to interpret it.
  *
@@ -14,7 +16,7 @@ case class FitsRow(table: FitsBinaryTable, cells: IndexedSeq[FitsCell]):
 
   /** The cell at a zero based column index. */
   def apply(index: Int): Option[FitsCell] =
-    if index >= 0 && index < cells.length then Some(cells(index)) else None
+    if index >= 0 && index < cells.length then cells(index).some else None
 
   /**
    * The cell of the named column.

@@ -65,7 +65,6 @@ class MosMaskReaderErrorSuite extends CatsEffectSuite:
     val bs = golden.take(dataOffset(golden) + 66 * 5 + 30)
     failsWith(stream(bs).through(MosMaskReader.slits[IO])):
       case MosMaskProblem.Fits(FitsProblem.TruncatedData(40L, actual)) => actual < 40L
-      case FitsProblem.TruncatedData(40L, actual)                      => actual < 40L
       case _                                                           => false
 
   // -- 2. Not a FITS file -------------------------------------------------------------------
@@ -73,7 +72,6 @@ class MosMaskReaderErrorSuite extends CatsEffectSuite:
   test("a file that does not begin with SIMPLE is rejected"):
     val bs = patch(golden, "SIMPLE  =", "SIMPLX  =")
     failsWith(stream(bs).through(MosMaskReader.slits[IO])):
-      case FitsProblem.NotFitsFormat                      => true
       case MosMaskProblem.Fits(FitsProblem.NotFitsFormat) => true
       case _                                              => false
 
@@ -83,7 +81,6 @@ class MosMaskReaderErrorSuite extends CatsEffectSuite:
     // The primary header alone is a structurally valid FITS file carrying no data.
     val bs = golden.take(BlockSize)
     failsWith(stream(bs).through(MosMaskReader.slits[IO])):
-      case FitsProblem.NoBinaryTable                      => true
       case MosMaskProblem.Fits(FitsProblem.NoBinaryTable) => true
       case _                                              => false
 
@@ -113,9 +110,27 @@ class MosMaskReaderErrorSuite extends CatsEffectSuite:
     // nonsense rather than failing.
     val bs = patch(golden, "NAXIS1  =                   66", "NAXIS1  =                   67")
     failsWith(stream(bs).through(MosMaskReader.slits[IO])):
-      case FitsProblem.RowLengthMismatch(67, 66)                      => true
       case MosMaskProblem.Fits(FitsProblem.RowLengthMismatch(67, 66)) => true
       case _                                                          => false
+
+  // -- Column formats outside the declared scope --------------------------------------------
+
+  test("a column of an unsupported type is rejected, not guessed at"):
+    // The reader advertises support for 1J, 1E, 1D and nA only. 1I is a 2-byte integer: a real
+    // FITS type this reader does not decode, and the boundary of that advertised scope.
+    val bs = patch(golden, "TFORM1  = '1J", "TFORM1  = '1I")
+    failsWith(stream(bs).through(MosMaskReader.slits[IO])):
+      case MosMaskProblem.Fits(FitsProblem.UnsupportedColumnFormat("ID", "1I")) => true
+      case _                                                                    => false
+
+  test("a numeric column may not repeat"):
+    // Text columns take a repeat count, numeric ones do not: 2E is a two element vector field,
+    // which is an array column and out of scope. Rejecting it here is why no row decoder has to
+    // consider the possibility.
+    val bs = patch(golden, "TFORM2  = '1E", "TFORM2  = '2E")
+    failsWith(stream(bs).through(MosMaskReader.slits[IO])):
+      case MosMaskProblem.Fits(FitsProblem.UnsupportedColumnFormat("RA", "2E")) => true
+      case _                                                                    => false
 
   // -- Unrecognised enumerated values -------------------------------------------------------
 
@@ -152,6 +167,14 @@ class MosMaskReaderErrorSuite extends CatsEffectSuite:
         assertEquals(ss(2).priority, MosSlitPriority.Ignore)
 
   // -- Header keyword failures --------------------------------------------------------------
+
+  test("a design without a pixel scale is rejected"):
+    // PIXSCALE is mandatory: slit sizes are arcseconds but positions are pixels, so without it a
+    // design cannot be placed on sky. Renaming the keyword is how a file comes to lack it.
+    val bs = patch(golden, "PIXSCALE=", "PIXSCALX=")
+    failsWith(stream(bs).through(MosMaskReader.header[IO])):
+      case MosMaskProblem.MissingKeyword("PIXSCALE") => true
+      case _                                         => false
 
   test("an unrecognised instrument is rejected"):
     val bs = patch(golden, "INSTRUME= 'GMOS-S  '", "INSTRUME= 'GMOS-Q  '")

@@ -15,10 +15,9 @@ import java.nio.ByteBuffer
 /**
  * Streaming reader for FITS files.
  *
- * '''Scope.''' This reader understands header data units and binary table extensions whose columns
- * are of type `nA`, `1J`, `1E` or `1D`. It does not decode image data, compressed extensions,
- * `TDIM`, variable length arrays or ASCII tables. Widening that set changes the module's public
- * contract, so it is stated here rather than left to be discovered.
+ * This reader understands header data units and binary table extensions whose columns are of type
+ * `nA`, `1J`, `1E` or `1D`. It does not decode image data, compressed extensions, `TDIM`, variable
+ * length arrays or ASCII tables.
  *
  * Header data units are traversed lazily and image data is skipped rather than read, so [[headers]]
  * and [[binaryTable]] terminate as soon as they have what they need. That matters for files where
@@ -113,15 +112,10 @@ object Fits:
             .flatMap(FitsHeader.parseCard)
             .toList
           if endIdx < 0 then readHeader(rest, acc ::: cards)
-          else Pull.pure(Some((FitsHeader(acc ::: cards), rest)))
+          else Pull.pure((FitsHeader(acc ::: cards), rest).some)
 
   /**
    * Emits exactly the declared number of rows.
-   *
-   * Stopping at `rowCount` rather than at the end of the data section is essential: the section is
-   * zero padded up to a block boundary, and the row stride does not divide the block size, so the
-   * padding would otherwise decode as extra rows. Reading row by row also lets truncation be
-   * reported precisely, which chunking cannot do.
    */
   private def readRows[F[_]: RaiseThrowable](
     s:     Stream[F, Byte],

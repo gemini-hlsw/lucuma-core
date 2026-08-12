@@ -20,7 +20,6 @@ import lucuma.core.math.Coordinates
 import lucuma.core.math.Declination
 import lucuma.core.math.Redshift
 import lucuma.core.math.RightAscension
-import lucuma.core.model.mos.MosMask
 import lucuma.core.model.mos.MosMaskHeader
 import lucuma.core.model.mos.MosMaskSlit
 import lucuma.core.model.mos.MosObjectId
@@ -45,8 +44,9 @@ object MosMaskReader:
    * The slit rows are not read, so this is cheap regardless of how many slits the design places.
    */
   def header[F[_]: RaiseThrowable]: Pipe[F, Byte, MosMaskHeader] = in =>
-    in.through(Fits.binaryTable)
-      .flatMap(t => emitOrRaise(MosMaskHeaderDecoder.decode(t.header)))
+    asMaskProblem:
+      in.through(Fits.binaryTable)
+        .flatMap(t => emitOrRaise(MosMaskHeaderDecoder.decode(t.header)))
 
   /**
    * Emits every slit in the design.
@@ -60,28 +60,41 @@ object MosMaskReader:
    * neither should a name be looked up per row.
    */
   def slits[F[_]: RaiseThrowable]: Pipe[F, Byte, MosMaskSlit] = in =>
-    in.through(Fits.binaryTableRows)
-      .zipWithIndex
-      .pull
-      .uncons1
-      .flatMap {
-        // A table with no rows is structurally valid: a design that placed no slits.
-        case None                     => Pull.done
-        case Some(((first, _), rest)) =>
-          (MosMaskHeaderDecoder.decode(first.table.header),
-           MosMaskColumns.resolve(first.table)
-          ).tupled match
-            case Left(problem)    => Pull.raiseError(problem)
-            case Right((h, cols)) =>
-              (Stream.emit((first, 0L)) ++ rest)
-                .flatMap((row, index) => emitOrRaise(decodeSlit(row, index, h, cols)))
-                .pull
-                .echo
-      }
-      .stream
+    asMaskProblem:
+      in.through(Fits.binaryTableRows)
+        .zipWithIndex
+        .pull
+        .uncons1
+        .flatMap {
+          // A table with no rows is structurally valid: a design that placed no slits.
+          case None                     => Pull.done
+          case Some(((first, _), rest)) =>
+            (MosMaskHeaderDecoder.decode(first.table.header),
+             MosMaskColumns.resolve(first.table)
+            ).tupled match
+              case Left(problem)    => Pull.raiseError(problem)
+              case Right((h, cols)) =>
+                (Stream.emit((first, 0L)) ++ rest)
+                  .flatMap((row, index) => emitOrRaise(decodeSlit(row, index, h, cols)))
+                  .pull
+                  .echo
+        }
+        .stream
 
   private def emitOrRaise[F[_]: RaiseThrowable, A](e: Either[MosMaskProblem, A]): Stream[F, A] =
     e.fold(Stream.raiseError[F](_), Stream.emit)
+
+  /**
+   * Restates a FITS level failure as a mask level one.
+   *
+   * The two layers have separate problem types because the FITS reader is usable on its own, but a
+   * caller of this reader should not have to catch both. Anything that is not a `FitsProblem` — an
+   * IO failure from the source, say — passes through untouched.
+   */
+  private def asMaskProblem[F[_]: RaiseThrowable, A](s: Stream[F, A]): Stream[F, A] =
+    s.handleErrorWith:
+      case p: FitsProblem => Stream.raiseError(MosMaskProblem.Fits(p))
+      case t              => Stream.raiseError(t)
 
   /**
    * Builds one slit.

@@ -35,9 +35,6 @@ enum FitsCell:
 
 /**
  * The subset of TFORM codes this reader supports.
- *
- * Deliberately narrow. Images, compressed data, `TDIM`, variable length arrays and ASCII tables are
- * out of scope, and widening this set is a change to the module's public contract.
  */
 enum FitsColumnFormat(val code: Char, val unitWidth: Int):
   case Int32   extends FitsColumnFormat('J', 4)
