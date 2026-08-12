@@ -16,6 +16,7 @@ import lucuma.core.enums.MosDispersionDirection
 import lucuma.core.enums.MosSlitPriority
 import lucuma.core.enums.MosSlitType
 import lucuma.core.math.Angle
+import lucuma.core.math.BrightnessValue
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Declination
 import lucuma.core.math.Redshift
@@ -24,6 +25,7 @@ import lucuma.core.model.mos.MosMaskHeader
 import lucuma.core.model.mos.MosMaskSlit
 import lucuma.core.model.mos.MosObjectId
 import lucuma.core.model.mos.MosSpectrumFootprint
+import lucuma.core.util.Enumerated
 
 /**
  * Reads Gemini MOS mask designs from FITS.
@@ -51,13 +53,8 @@ object MosMaskReader:
   /**
    * Emits every slit in the design.
    *
-   * A decoded slit needs no further context: the instrument's axis convention has already been
-   * resolved into physical width and length. Where the design's metadata is also wanted, run
-   * [[header]] over the same source — it stops after the header rather than reading the rows.
-   *
-   * Column positions are resolved by name exactly once, before any row is decoded. Mask design
-   * software is documented to write columns in varying order, so positions cannot be assumed; but
-   * neither should a name be looked up per row.
+   * Where the design's metadata is also wanted, run [[header]] over the same source — it stops
+   * after the header rather than reading the rows.
    */
   def slits[F[_]: RaiseThrowable]: Pipe[F, Byte, MosMaskSlit] = in =>
     asMaskProblem:
@@ -96,14 +93,7 @@ object MosMaskReader:
       case p: FitsProblem => Stream.raiseError(MosMaskProblem.Fits(p))
       case t              => Stream.raiseError(t)
 
-  /**
-   * Builds one slit.
-   *
-   * This is where the file's x and y columns become physical dimensions. A horizontally dispersing
-   * instrument spreads its spectrum along x, so x is the slit's width and y its length; a
-   * vertically dispersing one is the transpose. Doing this once, here, is what stops the two
-   * conventions from being confused downstream.
-   */
+  /** Builds one slit, resolving the file's x and y columns into physical width and length. */
   private def decodeSlit(
     row:    FitsRow,
     index:  Long,
@@ -125,7 +115,10 @@ object MosMaskReader:
                     .toRight(MosMaskProblem.InvalidCell(index, "DEC", decDeg.toString))
       x        <- real(cols.x, "x_ccd")
       y        <- real(cols.y, "y_ccd")
-      mag      <- real(cols.mag, "MAG")
+      mag      <- real(cols.mag, "MAG").flatMap: d =>
+                    BrightnessValue
+                      .from(BigDecimal(d))
+                      .leftMap(_ => MosMaskProblem.InvalidCell(index, "MAG", d.toString))
       posX     <- real(cols.slitPosX, "slitpos_x")
       posY     <- real(cols.slitPosY, "slitpos_y")
       sizeX    <- real(cols.slitSizeX, "slitsize_x")
@@ -133,13 +126,13 @@ object MosMaskReader:
       tilt     <- real(cols.slitTilt, "slittilt")
       priority <- charCell(row, cols.priority, index, "priority")
                     .flatMap: c =>
-                      MosSlitPriority.fromFitsValue
-                        .getOption(c)
+                      Enumerated[MosSlitPriority]
+                        .fromTag(c.toString)
                         .toRight(MosMaskProblem.InvalidCell(index, "priority", c.toString))
       slitType <- charCell(row, cols.slitType, index, "slittype")
                     .flatMap: c =>
-                      MosSlitType.fromFitsValue
-                        .getOption(c)
+                      Enumerated[MosSlitType]
+                        .fromTag(c.toString)
                         .toRight(MosMaskProblem.InvalidCell(index, "slittype", c.toString))
       redshift <- optReal(cols.redshift, "redshift")
       left     <- optReal(cols.specLeft, "specleft")
@@ -184,7 +177,8 @@ object MosMaskReader:
     row(idx).flatMap(_.asChar).toRight(MosMaskProblem.MissingCell(index, name))
 
 /**
- * Positions of a mask design's columns within its table, resolved once.
+ * Positions of a mask design's columns within its table, resolved by name once — mask design
+ * software writes columns in varying order, so positions cannot be assumed.
  *
  * The required set is drawn where the format's own history drew it. Object identity, position,
  * brightness and slit geometry have always been present; `redshift` and the spectrum footprint were

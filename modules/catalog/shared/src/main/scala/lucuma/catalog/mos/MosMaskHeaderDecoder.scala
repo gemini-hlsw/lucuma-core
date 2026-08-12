@@ -4,6 +4,7 @@
 package lucuma.catalog.mos
 
 import cats.syntax.all.*
+import coulomb.syntax.*
 import lucuma.catalog.fits.FitsHeader
 import lucuma.core.enums.Instrument
 import lucuma.core.enums.MosDispersionDirection
@@ -12,10 +13,14 @@ import lucuma.core.math.Coordinates
 import lucuma.core.math.Declination
 import lucuma.core.math.RightAscension
 import lucuma.core.math.Wavelength
+import lucuma.core.math.units.ArcSecondPerPixel
+import lucuma.core.math.units.NanometersPerPixel
+import lucuma.core.math.units.Pixels
 import lucuma.core.model.mos.MosMaskHeader
 import lucuma.core.model.mos.MosMaskProvenance
 import lucuma.core.model.mos.MosNodAndShuffle
 import lucuma.core.model.mos.MosSpectroscopyConfig
+import lucuma.core.util.Enumerated
 import lucuma.core.util.Timestamp
 
 import java.time.LocalDateTime
@@ -24,6 +29,11 @@ import scala.util.control.NonFatal
 
 /** Interprets the keywords of a mask file's binary table extension. */
 object MosMaskHeaderDecoder:
+
+  extension (h: FitsHeader)
+    /** A string keyword, with whitespace-only values read as absent. */
+    private def nonBlank(keyword: String): Option[String] =
+      h.string(keyword).map(_.trim).filter(_.nonEmpty)
 
   /**
    * The three instruments that do multi-object spectroscopy at Gemini, keyed by the value their
@@ -53,11 +63,10 @@ object MosMaskHeaderDecoder:
     yield MosMaskHeader(
       instrument = instrument,
       dispersionDirection = h
-        .string("DISPDIR")
-        .map(_.trim)
-        .flatMap(MosDispersionDirection.fromFitsValue.getOption)
+        .nonBlank("DISPDIR")
+        .flatMap(Enumerated[MosDispersionDirection].fromTag)
         .getOrElse(impliedDirection(instrument)),
-      pixelScale = pixelScale,
+      pixelScale = BigDecimal(pixelScale).withUnit[ArcSecondPerPixel],
       pointing = pointing,
       positionAngle = h.double("MASK_PA").map(Angle.fromDoubleDegrees),
       hasTiltedSlits = h.int("TILTSLIT").exists(_ =!= 0),
@@ -68,7 +77,7 @@ object MosMaskHeaderDecoder:
     )
 
   private def decodeInstrument(h: FitsHeader): Either[MosMaskProblem, Instrument] =
-    h.string("INSTRUME").map(_.trim) match
+    h.nonBlank("INSTRUME") match
       case None    => MosMaskProblem.MissingKeyword("INSTRUME").asLeft
       case Some(s) =>
         Instruments.get(s).toRight(MosMaskProblem.InvalidKeyword("INSTRUME", s))
@@ -101,7 +110,7 @@ object MosMaskHeaderDecoder:
   private def decodeNodAndShuffle(h: FitsHeader): MosNodAndShuffle =
     val shuffle = h.int("SHUFSIZE").getOrElse(0)
     val binning = h.int("BINNING").getOrElse(1)
-    h.string("SHUFMODE").map(_.trim) match
+    h.nonBlank("SHUFMODE") match
       case Some("microShuffle") =>
         MosNodAndShuffle.MicroShuffle(
           shuffle,
@@ -124,24 +133,24 @@ object MosMaskHeaderDecoder:
         .flatMap(d => Wavelength.decimalNanometers.getOption(BigDecimal(d)))
 
     MosSpectroscopyConfig(
-      filter = h.string("FILTSPEC").map(_.trim).filter(_.nonEmpty),
-      grating = h.string("GRATING").map(_.trim).filter(_.nonEmpty),
+      filter = h.nonBlank("FILTSPEC"),
+      grating = h.nonBlank("GRATING"),
       centralWavelength = nm("WAVELENG"),
       minWavelength = nm("SPEC_MIN"),
       maxWavelength = nm("SPEC_MAX"),
-      dispersion = h.double("SPEC_DIS"),
-      spectrumLength = h.double("SPEC_LEN"),
+      dispersion = h.double("SPEC_DIS").map(BigDecimal(_).withUnit[NanometersPerPixel]),
+      spectrumLength = h.double("SPEC_LEN").map(BigDecimal(_).withUnit[Pixels]),
       anamorphicFactor = h.double("ANAMORPH")
     )
 
   private def decodeProvenance(h: FitsHeader): MosMaskProvenance =
     MosMaskProvenance(
-      softwareVersion = h.string("GMMPSVER").map(_.trim).filter(_.nonEmpty),
-      designer = h.string("PERS_ODF").map(_.trim).filter(_.nonEmpty),
-      designedAt = h.string("DATE_ODF").flatMap(parseTimestamp),
-      sourceObjectTable = h.string("FILE_OT").map(_.trim).filter(_.nonEmpty),
-      detectorIdImaging = h.string("DET_IMG").map(_.trim).filter(_.nonEmpty),
-      detectorIdSpectroscopy = h.string("DET_SPEC").map(_.trim).filter(_.nonEmpty)
+      softwareVersion = h.nonBlank("GMMPSVER"),
+      designer = h.nonBlank("PERS_ODF"),
+      designedAt = h.nonBlank("DATE_ODF").flatMap(parseTimestamp),
+      sourceObjectTable = h.nonBlank("FILE_OT"),
+      detectorIdImaging = h.nonBlank("DET_IMG"),
+      detectorIdSpectroscopy = h.nonBlank("DET_SPEC")
     )
 
   /** `DATE_ODF` is an ISO-8601 local date and time, without a zone. */

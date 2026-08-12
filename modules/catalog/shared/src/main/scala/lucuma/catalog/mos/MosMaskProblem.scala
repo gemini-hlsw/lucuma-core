@@ -51,6 +51,3 @@ object MosMaskProblem:
   /** A cell that must be present is absent or of the wrong type. */
   case class MissingCell(row: Long, column: String) extends MosMaskProblem:
     val displayValue = s"Missing or untyped value in column '$column' at row $row"
-
-  def missingColumns(first: String, rest: String*): MosMaskProblem =
-    MissingColumns(NonEmptyList.of(first, rest*))

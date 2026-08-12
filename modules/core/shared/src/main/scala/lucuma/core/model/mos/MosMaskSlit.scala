@@ -5,12 +5,15 @@ package lucuma.core.model.mos
 
 import cats.Eq
 import cats.Show
+import cats.derived.*
 import cats.syntax.eq.*
 import lucuma.core.enums.MosSlitPriority
 import lucuma.core.enums.MosSlitType
 import lucuma.core.math.Angle
+import lucuma.core.math.BrightnessValue
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Redshift
+import lucuma.core.refined.cats.given
 import monocle.Focus
 import monocle.Lens
 
@@ -33,8 +36,6 @@ import monocle.Lens
  * @param offsetAcrossSlit displacement of the slit from the object, across its width; a non-zero
  *                         value drives a point source off the slit and loses flux
  * @param tilt             slit position angle, counter-clockwise positive; bounded to 45 degrees
- * @param slitType         aperture shape
- * @param priority         placement priority
  * @param redshift         redshift of the source, if the design recorded one
  * @param spectrumFootprint expected extent of the spectrum on the detector, if the design
  *                          recorded one
@@ -44,7 +45,7 @@ case class MosMaskSlit(
   coordinates:       Coordinates,
   x:                 Double,
   y:                 Double,
-  magnitude:         Double,
+  magnitude:         BrightnessValue,
   slitWidth:         Angle,
   slitLength:        Angle,
   offsetAlongSlit:   Angle,
@@ -54,32 +55,13 @@ case class MosMaskSlit(
   priority:          MosSlitPriority,
   redshift:          Option[Redshift],
   spectrumFootprint: Option[MosSpectrumFootprint]
-):
+) derives Eq:
 
   /** True if this slit targets an acquisition star rather than a science object. */
   def isAcquisition: Boolean =
     priority === MosSlitPriority.Acquisition
 
 object MosMaskSlit:
-
-  given Eq[MosMaskSlit] =
-    Eq.by(s =>
-      (s.id,
-       s.coordinates,
-       s.x,
-       s.y,
-       s.magnitude,
-       s.slitWidth,
-       s.slitLength,
-       s.offsetAlongSlit,
-       s.offsetAcrossSlit,
-       s.tilt,
-       s.slitType,
-       s.priority,
-       s.redshift,
-       s.spectrumFootprint
-      )
-    )
 
   given Show[MosMaskSlit] =
     Show.fromToString
@@ -101,7 +83,7 @@ object MosMaskSlit:
     Focus[MosMaskSlit](_.y)
 
   /** @group Optics */
-  val magnitude: Lens[MosMaskSlit, Double] =
+  val magnitude: Lens[MosMaskSlit, BrightnessValue] =
     Focus[MosMaskSlit](_.magnitude)
 
   /** @group Optics */

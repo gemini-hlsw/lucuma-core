@@ -3,10 +3,8 @@
 
 package lucuma.core.enums
 
-import cats.syntax.eq.*
 import lucuma.core.util.Display
 import lucuma.core.util.Enumerated
-import monocle.Prism
 
 /**
  * Axis along which an instrument spreads a spectrum, in pre-image detector coordinates.
@@ -16,26 +14,23 @@ import monocle.Prism
  * it. GMOS disperses horizontally, so its x column is the width; Flamingos-2 disperses vertically,
  * so its x column is the length.
  *
+ * Tags are the values of the `DISPDIR` keyword in a MOS mask file.
+ *
  * @group Enumerations
  */
 enum MosDispersionDirection(
   val tag:       String,
-  val fitsValue: String,
   val shortName: String,
   val longName:  String
 ) derives Enumerated:
 
   /** GMOS-N and GMOS-S. The x axis is the dispersion axis. */
-  case Horizontal extends MosDispersionDirection("horizontal", "horizontal", "X", "Horizontal")
+  case Horizontal extends MosDispersionDirection("horizontal", "X", "Horizontal")
 
   /** Flamingos-2. The y axis is the dispersion axis. */
-  case Vertical   extends MosDispersionDirection("vertical",   "vertical",   "Y", "Vertical")
+  case Vertical   extends MosDispersionDirection("vertical",   "Y", "Vertical")
 
 object MosDispersionDirection:
-
-  /** The value of the `DISPDIR` keyword in a MOS mask file. */
-  val fromFitsValue: Prism[String, MosDispersionDirection] =
-    Prism[String, MosDispersionDirection](s => values.find(_.fitsValue === s))(_.fitsValue)
 
   given Display[MosDispersionDirection] =
     Display.by(_.shortName, _.longName)

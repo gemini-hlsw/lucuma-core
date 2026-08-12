@@ -3,10 +3,8 @@
 
 package lucuma.core.enums
 
-import cats.syntax.eq.*
 import lucuma.core.util.Display
 import lucuma.core.util.Enumerated
-import monocle.Prism
 
 /**
  * Shape of an aperture cut in a MOS mask.
@@ -16,22 +14,18 @@ import monocle.Prism
  * unchanged, so spectral resolution is preserved. Curved slits do not exist; they are approximated
  * by concatenating neighbouring slits at different tilts.
  *
+ * Tags are the single characters used to encode a slit type in a MOS mask file.
+ *
  * @group Enumerations
  */
 enum MosSlitType(
-  val tag:       String,
-  val fitsValue: Char,
-  val shortName: String,
-  val longName:  String
+  val tag:      String,
+  val longName: String
 ) derives Enumerated:
 
-  case Rectangular extends MosSlitType("rectangular", 'R', "R", "Rectangular")
+  case Rectangular extends MosSlitType("R", "Rectangular")
 
 object MosSlitType:
 
-  /** The single character used to encode a slit type in a MOS mask file. */
-  val fromFitsValue: Prism[Char, MosSlitType] =
-    Prism[Char, MosSlitType](c => values.find(_.fitsValue === c))(_.fitsValue)
-
   given Display[MosSlitType] =
-    Display.by(_.shortName, _.longName)
+    Display.by(_.tag, _.longName)

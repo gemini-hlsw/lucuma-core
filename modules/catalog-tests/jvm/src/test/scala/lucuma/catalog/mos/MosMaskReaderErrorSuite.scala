@@ -106,8 +106,6 @@ class MosMaskReaderErrorSuite extends CatsEffectSuite:
   // -- 5. Declared row length disagrees with the columns ------------------------------------
 
   test("a header that lies about the row length is rejected"):
-    // Without this check the stride would be wrong and every row would decode to plausible
-    // nonsense rather than failing.
     val bs = patch(golden, "NAXIS1  =                   66", "NAXIS1  =                   67")
     failsWith(stream(bs).through(MosMaskReader.slits[IO])):
       case MosMaskProblem.Fits(FitsProblem.RowLengthMismatch(67, 66)) => true
@@ -124,9 +122,7 @@ class MosMaskReaderErrorSuite extends CatsEffectSuite:
       case _                                                                    => false
 
   test("a numeric column may not repeat"):
-    // Text columns take a repeat count, numeric ones do not: 2E is a two element vector field,
-    // which is an array column and out of scope. Rejecting it here is why no row decoder has to
-    // consider the possibility.
+    // 2E is a two element vector field: an array column, out of the declared scope.
     val bs = patch(golden, "TFORM2  = '1E", "TFORM2  = '2E")
     failsWith(stream(bs).through(MosMaskReader.slits[IO])):
       case MosMaskProblem.Fits(FitsProblem.UnsupportedColumnFormat("RA", "2E")) => true
@@ -135,8 +131,7 @@ class MosMaskReaderErrorSuite extends CatsEffectSuite:
   // -- Unrecognised enumerated values -------------------------------------------------------
 
   test("an unrecognised priority is rejected, with the row it came from"):
-    // Deliberately stricter than GMMPS. The output of this pipeline is a plate that gets cut, so
-    // a design carrying a priority nobody defined must not decode into something plausible.
+    // Stricter than GMMPS: the output gets cut in metal, so a typo'd priority must not decode.
     val bs   = golden.clone()
     val prio = dataOffset(bs) + 66 * 3 + 44 // fourth row, priority column
     bs(prio) = '7'.toByte

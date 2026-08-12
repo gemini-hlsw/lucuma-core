@@ -5,8 +5,6 @@ package lucuma.catalog.fits
 
 import cats.syntax.all.*
 
-import scala.util.control.NonFatal
-
 /**
  * The value carrying records of one FITS header data unit.
  *
@@ -53,23 +51,15 @@ case class FitsHeader(cards: List[FitsHeader.Card]):
     raw(keyword).map(FitsHeader.unquote)
 
   def int(keyword: String): Option[Int] =
-    raw(keyword).flatMap(s =>
-      try s.trim.toInt.some
-      catch { case NonFatal(_) => None }
-    )
+    raw(keyword).flatMap(_.trim.toIntOption)
 
   def long(keyword: String): Option[Long] =
-    raw(keyword).flatMap(s =>
-      try s.trim.toLong.some
-      catch { case NonFatal(_) => None }
-    )
+    raw(keyword).flatMap(_.trim.toLongOption)
 
   def double(keyword: String): Option[Double] =
     raw(keyword).flatMap: s =>
       // FITS permits Fortran style exponents, e.g. 1.234D+05
-      val n = s.trim.replace('D', 'E').replace('d', 'E')
-      try n.toDouble.some
-      catch { case NonFatal(_) => None }
+      s.trim.replace('D', 'E').replace('d', 'E').toDoubleOption
 
   def boolean(keyword: String): Option[Boolean] =
     raw(keyword)

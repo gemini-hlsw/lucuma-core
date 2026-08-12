@@ -5,6 +5,7 @@ package lucuma.catalog.mos
 
 import cats.effect.*
 import cats.syntax.all.*
+import coulomb.syntax.*
 import fs2.*
 import fs2.io.readClassResource
 import lucuma.core.enums.Instrument
@@ -14,6 +15,8 @@ import lucuma.core.enums.MosSlitType
 import lucuma.core.math.Angle
 import lucuma.core.math.Coordinates
 import lucuma.core.math.syntax.int.*
+import lucuma.core.math.syntax.units.*
+import lucuma.core.math.units.NanometersPerPixel
 import lucuma.core.model.mos.MosNodAndShuffle
 import munit.CatsEffectSuite
 
@@ -43,7 +46,7 @@ class MosMaskReaderSuite extends CatsEffectSuite:
       .map: h =>
         assertEquals(h.instrument, Instrument.GmosSouth)
         assertEquals(h.dispersionDirection, MosDispersionDirection.Horizontal)
-        assertEquals(h.pixelScale, 0.16)
+        assertEquals(h.pixelScale, BigDecimal(0.16).pixelScale)
         // RA_IMAG and DEC_IMAG are degrees, unlike the table's RA column. 359.7794 deg / 15.
         assertEquals(h.pointing, coordinates("23:59:07.055999 -55:28:16.608000"))
         assertEquals(h.positionAngle, Angle.fromDoubleDegrees(160.1).some)
@@ -63,9 +66,11 @@ class MosMaskReaderSuite extends CatsEffectSuite:
       .map: h =>
         assertEquals(h.instrument, Instrument.Flamingos2)
         assertEquals(h.dispersionDirection, MosDispersionDirection.Vertical)
-        assertEquals(h.pixelScale, 0.1792)
+        assertEquals(h.pixelScale, BigDecimal(0.1792).pixelScale)
         assertEquals(h.spectroscopy.grating, "R1200_JH".some)
-        assertEquals(h.spectroscopy.dispersion, 0.6667.some)
+        assertEquals(h.spectroscopy.dispersion,
+                     BigDecimal(0.6667).withUnit[NanometersPerPixel].some
+        )
 
   test("GMOS-S design is microshuffling"):
     bytes("/ngc7796_ODF.fits")
@@ -144,7 +149,7 @@ class MosMaskReaderSuite extends CatsEffectSuite:
         assertEquals(s.coordinates, coordinates("23:58:59.135742 -55:31:27.052917"))
         assertEqualsDouble(s.x, 765.2130127, 1e-6)
         assertEqualsDouble(s.y, 70.8921967, 1e-6)
-        assertEqualsDouble(s.magnitude, 11.3459997, 1e-6)
+        assertEqualsDouble(s.magnitude.value.value.toDouble, 11.3459997, 1e-6)
         assertEquals(s.tilt, Angle.Angle0)
         assertEquals(s.priority, MosSlitPriority.Medium)
         assertEquals(s.slitType, MosSlitType.Rectangular)

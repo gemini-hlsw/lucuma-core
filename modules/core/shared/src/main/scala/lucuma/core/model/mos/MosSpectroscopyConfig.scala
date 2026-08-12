@@ -5,7 +5,12 @@ package lucuma.core.model.mos
 
 import cats.Eq
 import cats.Show
+import cats.derived.*
+import coulomb.Quantity
+import coulomb.integrations.cats.quantity.given
 import lucuma.core.math.Wavelength
+import lucuma.core.math.units.NanometersPerPixel
+import lucuma.core.math.units.Pixels
 import monocle.Focus
 import monocle.Lens
 
@@ -20,13 +25,10 @@ import monocle.Lens
  * mask file may name a configuration this library does not know, and rejecting the whole file over
  * an unrecognised grating would be unhelpful.
  *
- * @param filter            filter used for the spectroscopic observation
  * @param grating           grating or grism
- * @param centralWavelength requested central wavelength
  * @param minWavelength     shortest wavelength reaching the detector
  * @param maxWavelength     longest wavelength reaching the detector
- * @param dispersion        dispersion in nanometres per pixel
- * @param spectrumLength    length of a spectrum on the detector, in pixels
+ * @param spectrumLength    length of a spectrum on the detector
  * @param anamorphicFactor  anamorphic magnification of the spectrograph
  */
 case class MosSpectroscopyConfig(
@@ -35,28 +37,15 @@ case class MosSpectroscopyConfig(
   centralWavelength: Option[Wavelength],
   minWavelength:     Option[Wavelength],
   maxWavelength:     Option[Wavelength],
-  dispersion:        Option[Double],
-  spectrumLength:    Option[Double],
+  dispersion:        Option[Quantity[BigDecimal, NanometersPerPixel]],
+  spectrumLength:    Option[Quantity[BigDecimal, Pixels]],
   anamorphicFactor:  Option[Double]
-)
+) derives Eq
 
 object MosSpectroscopyConfig:
 
   val Empty: MosSpectroscopyConfig =
     MosSpectroscopyConfig(None, None, None, None, None, None, None, None)
-
-  given Eq[MosSpectroscopyConfig] =
-    Eq.by(c =>
-      (c.filter,
-       c.grating,
-       c.centralWavelength,
-       c.minWavelength,
-       c.maxWavelength,
-       c.dispersion,
-       c.spectrumLength,
-       c.anamorphicFactor
-      )
-    )
 
   given Show[MosSpectroscopyConfig] =
     Show.fromToString
@@ -82,11 +71,11 @@ object MosSpectroscopyConfig:
     Focus[MosSpectroscopyConfig](_.maxWavelength)
 
   /** @group Optics */
-  val dispersion: Lens[MosSpectroscopyConfig, Option[Double]] =
+  val dispersion: Lens[MosSpectroscopyConfig, Option[Quantity[BigDecimal, NanometersPerPixel]]] =
     Focus[MosSpectroscopyConfig](_.dispersion)
 
   /** @group Optics */
-  val spectrumLength: Lens[MosSpectroscopyConfig, Option[Double]] =
+  val spectrumLength: Lens[MosSpectroscopyConfig, Option[Quantity[BigDecimal, Pixels]]] =
     Focus[MosSpectroscopyConfig](_.spectrumLength)
 
   /** @group Optics */

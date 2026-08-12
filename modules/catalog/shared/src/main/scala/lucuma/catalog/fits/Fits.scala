@@ -41,14 +41,7 @@ object Fits:
    * Take from the resulting stream to stop early: nothing beyond the headers consumed is read.
    */
   def headers[F[_]: RaiseThrowable]: Pipe[F, Byte, FitsHeader] = in =>
-    def go(s: Stream[F, Byte], primary: Boolean): Pull[F, FitsHeader, Unit] =
-      readHeader(s, Nil).flatMap:
-        case None            => Pull.done
-        case Some((h, rest)) =>
-          if primary && !h.isPrimary then Pull.raiseError(FitsProblem.NotFitsFormat)
-          else Pull.output1(h) >> go(skipData(rest, h), false)
-
-    go(in, true).stream
+    walkHdus(in, Pull.done)((h, _) => Right(Pull.output1(h))).stream
 
   /**
    * Emits the structure of the first binary table extension, then terminates.
@@ -56,16 +49,11 @@ object Fits:
    * The rows are not read, so this is cheap even on a large file.
    */
   def binaryTable[F[_]: RaiseThrowable]: Pipe[F, Byte, FitsBinaryTable] = in =>
-    def go(s: Stream[F, Byte], primary: Boolean): Pull[F, FitsBinaryTable, Unit] =
-      readHeader(s, Nil).flatMap:
-        case None            => Pull.raiseError(FitsProblem.NoBinaryTable)
-        case Some((h, rest)) =>
-          if primary && !h.isPrimary then Pull.raiseError(FitsProblem.NotFitsFormat)
-          else if h.isBinaryTable then
-            FitsBinaryTable.fromHeader(h).fold(Pull.raiseError, Pull.output1)
-          else go(skipData(rest, h), false)
-
-    go(in, true).stream
+    walkHdus(in, Pull.raiseError(FitsProblem.NoBinaryTable))((h, _) =>
+      if h.isBinaryTable then
+        Left(FitsBinaryTable.fromHeader(h).fold(Pull.raiseError, Pull.output1))
+      else Right(Pull.pure(()))
+    ).stream
 
   /**
    * Emits every row of the first binary table extension.
@@ -74,18 +62,37 @@ object Fits:
    * particular extension name would reject files that are structurally fine.
    */
   def binaryTableRows[F[_]: RaiseThrowable]: Pipe[F, Byte, FitsRow] = in =>
-    def go(s: Stream[F, Byte], primary: Boolean): Pull[F, FitsRow, Unit] =
+    walkHdus(in, Pull.raiseError(FitsProblem.NoBinaryTable))((h, rest) =>
+      if h.isBinaryTable then
+        Left(FitsBinaryTable.fromHeader(h).fold(Pull.raiseError, t => readRows(rest, t, 0L)))
+      else Right(Pull.pure(()))
+    ).stream
+
+  /**
+   * Walks the header data units in forward order, raising `NotFitsFormat` if the first is not a
+   * primary header.
+   *
+   * `onHdu` sees each header together with the stream positioned just after it. A `Left` is
+   * terminal; a `Right` runs and the walk skips the unit's data section and moves to the next
+   * header. `onEnd` runs at a clean end of stream.
+   */
+  private def walkHdus[F[_]: RaiseThrowable, O](
+    in:    Stream[F, Byte],
+    onEnd: Pull[F, O, Unit]
+  )(
+    onHdu: (FitsHeader, Stream[F, Byte]) => Either[Pull[F, O, Unit], Pull[F, O, Unit]]
+  ): Pull[F, O, Unit] =
+    def go(s: Stream[F, Byte], primary: Boolean): Pull[F, O, Unit] =
       readHeader(s, Nil).flatMap:
-        case None            => Pull.raiseError(FitsProblem.NoBinaryTable)
+        case None            => onEnd
         case Some((h, rest)) =>
           if primary && !h.isPrimary then Pull.raiseError(FitsProblem.NotFitsFormat)
-          else if h.isBinaryTable then
-            FitsBinaryTable.fromHeader(h) match
-              case Left(p)      => Pull.raiseError(p)
-              case Right(table) => readRows(rest, table, 0L)
-          else go(skipData(rest, h), false)
+          else
+            onHdu(h, rest) match
+              case Left(terminal) => terminal
+              case Right(prefix)  => prefix >> go(skipData(rest, h), false)
 
-    go(in, true).stream
+    go(in, true)
 
   /**
    * Reads header blocks until the END card.

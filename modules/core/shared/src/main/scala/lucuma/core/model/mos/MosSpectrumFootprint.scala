@@ -5,6 +5,7 @@ package lucuma.core.model.mos
 
 import cats.Eq
 import cats.Show
+import cats.derived.*
 import monocle.Focus
 import monocle.Lens
 
@@ -24,12 +25,9 @@ case class MosSpectrumFootprint(
   right:  Double,
   bottom: Double,
   top:    Double
-)
+) derives Eq
 
 object MosSpectrumFootprint:
-
-  given Eq[MosSpectrumFootprint] =
-    Eq.by(f => (f.left, f.right, f.bottom, f.top))
 
   given Show[MosSpectrumFootprint] =
     Show.fromToString

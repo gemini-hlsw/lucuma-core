@@ -5,25 +5,25 @@ package lucuma.core.model.mos
 
 import cats.Eq
 import cats.Show
+import cats.derived.*
+import coulomb.integrations.cats.quantity.given
 import lucuma.core.enums.Instrument
 import lucuma.core.enums.MosDispersionDirection
 import lucuma.core.math.Angle
 import lucuma.core.math.Coordinates
+import lucuma.core.math.units.PixelScale
 import monocle.Focus
 import monocle.Lens
 
 /**
  * File level metadata of a MOS mask design.
  *
- * `keywords` carries the design's raw keyword values, including those given a typed field above.
- * This is deliberate: the format has drifted across versions of the mask design software, so a
- * reader must be able to reach a keyword this library does not yet model without waiting for a
- * release. Where a keyword appears more than once — which real files do contain — the first
- * occurrence is the one retained.
- *
- * It is not, however, a complete transcript of the file's header. Records that carry no value are
- * absent, `COMMENT` and `HISTORY` among them, as are the `CONTINUE` and `HIERARCH` conventions.
- * Treat a missing key as "this reader did not retain it" rather than "the file did not have it".
+ * `keywords` carries the design's raw keyword values, including those given a typed field above:
+ * the format has drifted across versions of the mask design software, so an unmodelled keyword
+ * must stay reachable without a release. It is not a complete transcript of the header — a
+ * duplicated keyword retains its first occurrence, and records that carry no value are not
+ * retained at all — so treat a missing key as "the reader did not retain it" rather than "the
+ * file did not have it".
  *
  * `pixelScale` is nominal rather than measured. Mask design software snaps it to a fixed value per
  * detector configuration, because the true scale is not constant across the field and downstream
@@ -32,7 +32,7 @@ import monocle.Lens
  * @param instrument          instrument the mask was designed for
  * @param dispersionDirection axis along which spectra are spread; determines how slit dimensions
  *                            map onto the file's x and y columns
- * @param pixelScale          nominal pre-image plate scale, in arcseconds per pixel
+ * @param pixelScale          nominal pre-image plate scale
  * @param pointing            pointing centre of the pre-image
  * @param positionAngle       position angle the mask must be observed at; absent in designs
  *                            produced before mask design software began recording it
@@ -46,7 +46,7 @@ import monocle.Lens
 case class MosMaskHeader(
   instrument:          Instrument,
   dispersionDirection: MosDispersionDirection,
-  pixelScale:          Double,
+  pixelScale:          PixelScale,
   pointing:            Coordinates,
   positionAngle:       Option[Angle],
   hasTiltedSlits:      Boolean,
@@ -54,28 +54,13 @@ case class MosMaskHeader(
   spectroscopy:        MosSpectroscopyConfig,
   provenance:          MosMaskProvenance,
   keywords:            Map[String, String]
-):
+) derives Eq:
 
   /** The raw value of `key`, if the file carried it. */
   def keyword(key: String): Option[String] =
     keywords.get(key)
 
 object MosMaskHeader:
-
-  given Eq[MosMaskHeader] =
-    Eq.by(h =>
-      (h.instrument,
-       h.dispersionDirection,
-       h.pixelScale,
-       h.pointing,
-       h.positionAngle,
-       h.hasTiltedSlits,
-       h.nodAndShuffle,
-       h.spectroscopy,
-       h.provenance,
-       h.keywords
-      )
-    )
 
   given Show[MosMaskHeader] =
     Show.fromToString
@@ -89,7 +74,7 @@ object MosMaskHeader:
     Focus[MosMaskHeader](_.dispersionDirection)
 
   /** @group Optics */
-  val pixelScale: Lens[MosMaskHeader, Double] =
+  val pixelScale: Lens[MosMaskHeader, PixelScale] =
     Focus[MosMaskHeader](_.pixelScale)
 
   /** @group Optics */

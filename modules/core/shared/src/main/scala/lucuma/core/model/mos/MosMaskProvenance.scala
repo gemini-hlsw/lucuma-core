@@ -5,6 +5,7 @@ package lucuma.core.model.mos
 
 import cats.Eq
 import cats.Show
+import cats.derived.*
 import lucuma.core.util.Timestamp
 import monocle.Focus
 import monocle.Lens
@@ -29,23 +30,12 @@ case class MosMaskProvenance(
   sourceObjectTable:      Option[String],
   detectorIdImaging:      Option[String],
   detectorIdSpectroscopy: Option[String]
-)
+) derives Eq
 
 object MosMaskProvenance:
 
   val Empty: MosMaskProvenance =
     MosMaskProvenance(None, None, None, None, None, None)
-
-  given Eq[MosMaskProvenance] =
-    Eq.by(p =>
-      (p.softwareVersion,
-       p.designer,
-       p.designedAt,
-       p.sourceObjectTable,
-       p.detectorIdImaging,
-       p.detectorIdSpectroscopy
-      )
-    )
 
   given Show[MosMaskProvenance] =
     Show.fromToString

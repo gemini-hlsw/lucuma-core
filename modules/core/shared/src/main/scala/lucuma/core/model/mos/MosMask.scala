@@ -5,6 +5,7 @@ package lucuma.core.model.mos
 
 import cats.Eq
 import cats.Show
+import cats.derived.*
 import cats.syntax.eq.*
 import lucuma.core.enums.MosSlitPriority
 import monocle.Focus
@@ -25,7 +26,7 @@ import monocle.Lens
 case class MosMask(
   header: MosMaskHeader,
   slits:  List[MosMaskSlit]
-):
+) derives Eq:
 
   /**
    * Slits targeting acquisition stars, used to align the mask on sky.
@@ -44,9 +45,6 @@ case class MosMask(
     slits.filter(_.priority === priority)
 
 object MosMask:
-
-  given Eq[MosMask] =
-    Eq.by(m => (m.header, m.slits))
 
   given Show[MosMask] =
     Show.fromToString

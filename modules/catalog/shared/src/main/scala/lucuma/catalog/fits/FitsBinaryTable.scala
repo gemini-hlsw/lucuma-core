@@ -53,8 +53,6 @@ object FitsColumnFormat:
  *   one based position of the column in the table
  * @param name
  *   value of the column's TTYPE keyword
- * @param format
- *   element type
  * @param repeat
  *   element count; only text columns may exceed one
  * @param unit
