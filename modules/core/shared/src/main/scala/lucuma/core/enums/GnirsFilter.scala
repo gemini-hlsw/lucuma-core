@@ -61,18 +61,63 @@ object GnirsFilter:
   val SpectroscopyScienceFilters: NonEmptyList[GnirsFilter] =
     NonEmptyList.of(Order6, Order5, Order4, Order3, Order2, Order1)
 
+  /** Every filter that may be used for a spectroscopic acquisition, explicitly or automatically. */
   // Declaration order matters for range match. Since H2 is completely contained in Order3, it needs to come before or it will never be selected.
   val AcquisitionFilters: NonEmptyList[GnirsFilter] =
     NonEmptyList.of(Order6, Order5, Order4, H2, Order3, PAH)
 
-  private def forWavelength(lookupList: NonEmptyList[GnirsFilter])(wavelength: Wavelength): Either[String, GnirsFilter] =
-    lookupList.find(_.spectroscopyRange.exists(_.contains(wavelength)))
-      .toRight(s"No Gnirs spectroscopy filter available for wavelength: $wavelength")
+  /**
+   * The filters that automatic acquisition selection may produce by wavelength coverage.
+   * PAH is excluded: thermal-IR science is acquired on the blue camera, where a 3.3µm filter
+   * does not belong, and above `ThermalAcquisitionCutoff` `ThermalAcquisitionFilter` is used
+   * instead of a coverage match.  It remains available as an explicit choice.
+   */
+  // Declaration order matters here too (see AcquisitionFilters).
+  val AutoAcquisitionFilters: NonEmptyList[GnirsFilter] =
+    NonEmptyList.of(Order6, Order5, Order4, H2, Order3)
+
+  /** The broadband subset of the automatic filters, used when no range contains the wavelength. */
+  private val BroadbandAutoAcquisitionFilters: NonEmptyList[GnirsFilter] =
+    NonEmptyList.of(Order6, Order5, Order4, Order3)
+
+  /** The blue/red boundary: science above this wavelength is a thermal-IR observation. */
+  val ThermalAcquisitionCutoff: Wavelength =
+    Wavelength.unsafeFromIntPicometers(2_500_000)
+
+  /**
+   * The automatic acquisition filter for thermal-IR science (L and M), where no acquisition
+   * filter covers the science wavelength.  The broad L and M filters cannot be used: they
+   * saturate on the sky background.
+   *
+   * Per the GNIRS instrument scientists, red-camera science is acquired with the blue camera
+   * (`GnirsCamera.blue`) in H, or in H2 when the target is very bright — and that second case
+   * is just the ordinary brightness rule, so only the Bright/Faint choice is fixed here.  The
+   * legacy OCS did the same: its templates imaged the slit in H and the field in H or H2 in
+   * every band.
+   */
+  val ThermalAcquisitionFilter: GnirsFilter =
+    Order4
 
   def fromSpectroscopyScienceWavelength(wavelength: Wavelength): Either[String, GnirsFilter] =
-    forWavelength(SpectroscopyScienceFilters)(wavelength)
+    SpectroscopyScienceFilters.find(_.spectroscopyRange.exists(_.contains(wavelength)))
+      .toRight(s"No Gnirs spectroscopy science filter available for wavelength: $wavelength")
 
-  def fromAcquisitionWavelength(wavelength: Wavelength): Either[String, GnirsFilter] =
-    forWavelength(AcquisitionFilters)(wavelength)
+  /**
+   * The automatic acquisition filter for science at the given wavelength: the filter whose
+   * range contains it, else `ThermalAcquisitionFilter` for thermal-IR science, else the
+   * nearest broadband filter (which covers the gaps between the order filter bandpasses).
+   * Total: acquisition must always be possible for an observable wavelength.
+   */
+  def fromAcquisitionWavelength(wavelength: Wavelength): GnirsFilter =
+    AutoAcquisitionFilters
+      .find(_.spectroscopyRange.exists(_.contains(wavelength)))
+      .getOrElse:
+        if wavelength >= ThermalAcquisitionCutoff then ThermalAcquisitionFilter
+        else
+          // Ties keep the earlier (shorter) filter, hence the strict comparison.
+          def distance(f: GnirsFilter): Int =
+            (wavelength.toPicometers.value.value - f.centralWavelength.toPicometers.value.value).abs
+          BroadbandAutoAcquisitionFilters.reduceLeft: (a, b) =>
+            if distance(b) < distance(a) then b else a
 
 
