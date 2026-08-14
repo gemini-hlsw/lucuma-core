@@ -4,6 +4,7 @@
 package lucuma.core.model.sequence.gmos
 package longslit
 
+import cats.data.NonEmptyList
 import eu.timepit.refined.types.numeric.PosDouble
 import lucuma.core.enums.GmosAmpCount
 import lucuma.core.enums.GmosAmpGain
@@ -17,8 +18,12 @@ import lucuma.core.enums.GmosSouthFpu
 import lucuma.core.enums.GmosSouthGrating
 import lucuma.core.enums.GmosXBinning
 import lucuma.core.enums.GmosYBinning
+import lucuma.core.enums.StepGuideState
+import lucuma.core.math.syntax.bigDecimal.*
 import lucuma.core.model.ImageQuality
+import lucuma.core.model.SlitTelescopeConfigs
 import lucuma.core.model.SourceProfile
+import lucuma.core.model.sequence.TelescopeConfigAlongSlit
 
 val DefaultAmpReadMode: GmosAmpReadMode =
   GmosAmpReadMode.Slow
@@ -31,6 +36,19 @@ val DefaultRoi: GmosRoi =
 
 val DefaultAmpCount: GmosAmpCount =
   GmosAmpCount.Twelve
+
+/**
+ * Default nod pattern for a GMOS long slit
+ * three guided positions along the slit.
+ */
+val DefaultSlitTelescopeConfigs: SlitTelescopeConfigs =
+  SlitTelescopeConfigs.AlongSlit(
+    NonEmptyList.of(
+      TelescopeConfigAlongSlit(  0.qArcsec, StepGuideState.Enabled),
+      TelescopeConfigAlongSlit( 15.qArcsec, StepGuideState.Enabled),
+      TelescopeConfigAlongSlit(-15.qArcsec, StepGuideState.Enabled)
+    )
+  )
 
 /**
  * Optimal GMOS binning calculation for longslit.
