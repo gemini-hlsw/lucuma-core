@@ -4,6 +4,7 @@
 package lucuma.core.model.sequence.flamingos2
 
 import cats.data.NonEmptyList
+import lucuma.core.enums.Flamingos2MosOffsetPreset
 import lucuma.core.enums.Flamingos2SlitOffsetPreset
 import lucuma.core.enums.StepGuideState
 import lucuma.core.math.Offset
@@ -41,3 +42,25 @@ def defaultSlitTelescopeConfigs(preset: Flamingos2SlitOffsetPreset): SlitTelesco
     case Flamingos2SlitOffsetPreset.Telluric     => SlitTelescopeConfigs.AlongSlit(TelluricDefaultTelescopeConfigs)
     case Flamingos2SlitOffsetPreset.NodAlongSlit => SlitTelescopeConfigs.AlongSlit(NodAlongSlitDefaultTelescopeConfigs)
     case Flamingos2SlitOffsetPreset.NodToSky     => SlitTelescopeConfigs.ToSky(NodToSkyDefaultTelescopeConfigs)
+
+// MOS presets.
+val SparseFieldDefaultTelescopeConfigs: NonEmptyList[TelescopeConfigAlongSlit] =
+  NonEmptyList.of(
+    TelescopeConfigAlongSlit( 1.2.qArcsec, StepGuideState.Enabled),
+    TelescopeConfigAlongSlit(-1.2.qArcsec, StepGuideState.Enabled),
+    TelescopeConfigAlongSlit(-1.2.qArcsec, StepGuideState.Enabled),
+    TelescopeConfigAlongSlit( 1.2.qArcsec, StepGuideState.Enabled),
+  )
+
+val CrowdedFieldDefaultTelescopeConfigs: NonEmptyList[TelescopeConfig] =
+  NonEmptyList.of(
+    TelescopeConfig(Offset.Zero, StepGuideState.Enabled),
+    TelescopeConfig(Offset(0.pArcsec, 300.qArcsec), StepGuideState.Disabled),
+    TelescopeConfig(Offset(0.pArcsec, 320.qArcsec), StepGuideState.Disabled),
+    TelescopeConfig(Offset.Zero, StepGuideState.Enabled),
+  )
+
+def defaultMosTelescopeConfigs(preset: Flamingos2MosOffsetPreset): SlitTelescopeConfigs =
+  preset match
+    case Flamingos2MosOffsetPreset.SparseField  => SlitTelescopeConfigs.AlongSlit(SparseFieldDefaultTelescopeConfigs)
+    case Flamingos2MosOffsetPreset.CrowdedField => SlitTelescopeConfigs.ToSky(CrowdedFieldDefaultTelescopeConfigs)

@@ -26,6 +26,16 @@ enum Flamingos2SlitOffsetPreset(
   case NodToSky     extends Flamingos2SlitOffsetPreset("nod_to_sky",     "Nod to sky")
 
 /**
+ * Enumerated type for the Flamingos2 MOS offset presets.
+ */
+enum Flamingos2MosOffsetPreset(
+  val tag:         String,
+  val description: String
+) extends SlitOffsetPreset derives Enumerated, Display:
+  case SparseField  extends Flamingos2MosOffsetPreset("sparse_field",  "Sparse field")
+  case CrowdedField extends Flamingos2MosOffsetPreset("crowded_field", "Crowded field")
+
+/**
  * Enumerated type for the GNIRS slit offset presets.
  */
 enum GnirsSlitOffsetPreset(
