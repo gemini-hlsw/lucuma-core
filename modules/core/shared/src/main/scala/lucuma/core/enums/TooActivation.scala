@@ -8,7 +8,12 @@ import lucuma.core.util.Enumerated
 /**
  * Target-of-Opportunity activation, in order of increasing disruption.  Used
  * both as a proposal-level ceiling (the maximum an observation in the program
- * may declare) and as the observation's own value.
+ * may reach) and as the observation's own value.
+ *
+ * An observation does not declare its activation. It is derived from whether the
+ * observation is a Target of Opportunity -- that is, whether its asterism holds
+ * an opportunity target -- together with its [[SchedulingMode]]; see
+ * [[TooActivation.fromSchedulingMode]].
  */
 enum TooActivation(val tag: String, val label: String) derives Enumerated:
 
@@ -24,14 +29,18 @@ enum TooActivation(val tag: String, val label: String) derives Enumerated:
   /** Observed as soon as possible, displacing ongoing work where permitted. */
   case Interrupting extends TooActivation("interrupting", "Interrupting")
 
+object TooActivation:
+
   /**
-   * The execution requirement an observation with this activation gets when it
-   * states none of its own -- and, because the default acts as a floor, the
-   * least restrictive requirement it can end up with.  A rapid or interrupting
-   * Target of Opportunity is triggered precisely because the target will not
-   * wait, so allowing it to be interrupted would defeat the purpose.
+   * Which kind of Target of Opportunity an observation scheduled in `mode` is.
+   *
+   * This assumes the observation is one -- that its asterism holds an
+   * opportunity target -- and answers only which kind; asking is what says so.
+   * An observation without an opportunity target has activation `None` whatever
+   * its mode, and the caller answers that before reaching here.
    */
-  def executionRequirementDefault: ExecutionRequirement =
-    this match
-      case None  | Standard     => ExecutionRequirement.Unconstrained
-      case Rapid | Interrupting => ExecutionRequirement.Uninterruptible
+  def fromSchedulingMode(mode: SchedulingMode): TooActivation =
+    mode match
+      case SchedulingMode.Unconstrained | SchedulingMode.NoSplitting => TooActivation.Standard
+      case SchedulingMode.Uninterruptible                            => TooActivation.Rapid
+      case SchedulingMode.Interrupting                               => TooActivation.Interrupting
