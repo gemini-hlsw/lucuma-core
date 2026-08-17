@@ -61,7 +61,7 @@ object GoaParams:
           base / s"ra=$raDeg" / s"dec=$decDeg" / s"sr=$srArcsec"
         case NonSidereal(targetName, _, searchRadius, _, _) =>
           val srArcsec = searchRadius.toSignedDoubleDecimalArcseconds
-          base / s"object=${targetName}" / s"sr=$srArcsec"
+          base / s"object=$targetName" / s"sr=$srArcsec"
 
       params.dateRange.fold(withCoords): (start, end) =>
         val startStr = start.format(dateFormatter)
