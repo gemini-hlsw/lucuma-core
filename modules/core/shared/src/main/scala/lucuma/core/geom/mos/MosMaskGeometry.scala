@@ -18,13 +18,17 @@ import scala.math.sin
 import scala.math.sqrt
 
 /**
- * On-sky geometry of a MOS mask design including the slit placement area and every aperture, as
- * offsets from the design's pointing.
+ * On-sky geometry of a MOS mask design: the slit placement area and every aperture, as offsets
+ * from the design's pointing.
  *
- * @param outline the slit placement area
- * @param slits   one aperture per input slit, in input order; Ignored apertures of slits are
- *                included and left to the caller to filter.
- * @param rotation detector-to-sky rotation of the pre-image
+ * All shapes come from a single transform, so every aperture of a valid design falls within the
+ * outline.
+ *
+ * @param outline  the slit placement area
+ * @param slits    one aperture per input slit, in input order; slits with `Ignore` priority are
+ *                 not cut into the mask but still get an aperture here, left to the caller to
+ *                 filter
+ * @param rotation rotation of the pre-image's pixel axes onto the sky
  */
 final case class MosMaskGeometry(
   outline:  ShapeExpression,
@@ -35,7 +39,8 @@ final case class MosMaskGeometry(
 object MosMaskGeometry:
 
   /**
-   * The subset of a slit's description that determines its geometry.
+   * The subset of a slit's description that determines its geometry, for callers whose mask data
+   * does not come from a parsed file. With a parsed design, use [[fromMask]] directly.
    */
   final case class Slit(
     coordinates:      Coordinates,
@@ -73,13 +78,14 @@ object MosMaskGeometry:
   /**
    * Computes the geometry of a design, if it can be oriented.
    *
-   * The mapping from the design's detector frame onto the sky is not recorded in a mask file, so
-   * it is recovered from the design itself: every slit carries both its pre-image pixel position
-   * and its sky coordinates, which together determine the rotation, plate scale and pointing
-   * pixel. The pre-image's parity is fixed per instrument — mask design software rejects
-   * pre-images in any other orientation — so it is looked up rather than fitted. Fitting needs at
-   * least two slits at distinct positions; a design with fewer cannot be oriented and yields
-   * `None`, as does an instrument without a modelled slit placement area.
+   * A mask file does not record how its detector frame maps onto the sky. It does not need to be
+   * assumed either: every slit carries its position in both frames — pre-image pixels and sky
+   * coordinates — and together the slits determine the rotation, the plate scale and the pointing
+   * pixel. Parity is fixed per instrument, because mask design software rejects pre-images in any
+   * other orientation.
+   *
+   * Yields `None` for a design with fewer than two distinct slits, which cannot be oriented, and
+   * for an instrument without a modelled slit placement area.
    */
   def fromSlits(
     instrument:          Instrument,
@@ -96,10 +102,9 @@ object MosMaskGeometry:
    * Per-instrument facts about the pre-image frame: the GMMPS slit placement area, in arcsec in
    * the pre-image's pixel axes, and the frame's parity.
    *
-   * The parity mirrors the per-instrument constants GMMPS itself hardcodes when it derives the
-   * mask position angle from a pre-image (`get_OT_posangle`: GMOS images are "flipped", F2 not);
-   * GMMPS rejects pre-images in any other orientation, so masks in the wild cannot disagree. The
-   * flag here is expressed relative to this library's p/q axes, hence the inverted-looking values.
+   * The parity values mirror the constants GMMPS hardcodes when it derives a mask's position
+   * angle.
+   * GMMPS rejects pre-images in any other orientation, so a mask in the wild cannot disagree.
    */
   private case class InstrumentConfig(vertices: List[(Int, Int)], flipped: Boolean)
 
@@ -115,18 +120,29 @@ object MosMaskGeometry:
 
   /**
    * Similarity transform from pre-image pixels to pointing-relative sky offsets:
-   * `sky = scale * R(theta) * F * (pixel - anchor)`, where `F` reflects pixel y when
-   * `flipped`. With the parity known, rotation and scale have a closed-form least-squares
-   * solution over the centered point clouds.
+   *
+   * {{{ sky = scale * R(θ) * F * (pixel - anchor) }}}
+   *
+   * where `scale` is the plate scale in arcsec per pixel, `R(θ)` the detector-to-sky
+   * rotation, `F` a reflection of pixel y when `flipped`, and `anchor` the pixel that lands on
+   * the pointing.
    */
   private case class Fit(
-    theta:   Double,
+    θ:       Double,
     scale:   Double,
     flipped: Boolean,
     anchorX: Double,
     anchorY: Double
   )
 
+  /**
+   * Recovers the [[Fit]] from the slits themselves. The slit pattern is drawn twice — once in
+   * pre-image pixels, once in sky offsets from the pointing — and the two drawings differ only by
+   * the transform being sought: a shift, a rotation and a change of scale. Centering each pattern
+   * on its centroid takes the shift out of the problem; rotation and scale then fall out of the
+   * per-slit comparisons directly, and the shift is recovered last as the pixel that reconciles
+   * the two centroids.
+   */
   private def fitTransform(
     pointing: Coordinates,
     slits:    List[Slit],
@@ -149,17 +165,20 @@ object MosMaskGeometry:
       val pairs = sky.zip(pix).map { case ((p, q), (x, y)) =>
         (p - scx, q - scy, x - pcx, f * (y - pcy))
       }
+      // Centering the two clouds removes the translation, leaving rotation and scale, which
+      // have a closed-form least-squares solution: every slit pair votes for the angle between
+      // its pixel and sky vectors, weighted by its distance from the centroid.
       val dot   = pairs.map((p, q, x, y) => p * x + q * y).sum
       val cross = pairs.map((p, q, x, y) => x * q - y * p).sum
       val norm  = pairs.map((_, _, x, y) => x * x + y * y).sum
       val scale = sqrt(dot * dot + cross * cross) / norm
       Option.when(norm > 0.0 && scale > 0.0):
-        val theta    = atan2(cross, dot)
-        val (ct, st) = (cos(theta), sin(theta))
+        val θ        = atan2(cross, dot)
+        val (ct, st) = (cos(θ), sin(θ))
         // anchor: the pixel that lands exactly on the pointing
         val ax       = pcx - (scx * ct + scy * st) / scale
         val ay       = pcy - f * (-scx * st + scy * ct) / scale
-        Fit(theta, scale, flipped, ax, ay)
+        Fit(θ, scale, flipped, ax, ay)
 
   private def build(
     dispersionDirection: MosDispersionDirection,
@@ -167,7 +186,7 @@ object MosMaskGeometry:
     vertices:            List[(Int, Int)],
     fit:                 Fit
   ): MosMaskGeometry =
-    val (ct, st) = (cos(fit.theta), sin(fit.theta))
+    val (ct, st) = (cos(fit.θ), sin(fit.θ))
     val f        = if fit.flipped then -1.0 else 1.0
 
     def toSky(x: Double, y: Double): (Double, Double) =
@@ -208,5 +227,5 @@ object MosMaskGeometry:
     MosMaskGeometry(
       outline = outline,
       slits = slits.map(slitShape),
-      rotation = Angle.fromDoubleRadians(fit.theta)
+      rotation = Angle.fromDoubleRadians(fit.θ)
     )
