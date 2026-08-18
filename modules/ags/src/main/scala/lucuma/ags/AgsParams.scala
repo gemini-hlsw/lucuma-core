@@ -400,6 +400,53 @@ object AgsParams:
 
     val Flamingos2ScienceDiameter = 20.arcseconds
 
+  case class Flamingos2Mos private (
+    lyot:  Flamingos2LyotWheel,
+    port:  PortDisposition,
+    probe: GuideProbe
+  ) extends AgsParams
+      with SingleProbeAgsParams
+      with PwfsSupport[Flamingos2Mos] derives Eq:
+    import lucuma.core.geom.flamingos2
+    import lucuma.core.geom.flamingos2.oiwfs
+    import lucuma.core.geom.pwfs
+
+    protected def withPWFSProbe(probe: PWFSGuideProbe): Flamingos2Mos = copy(probe = probe)
+
+    override def patrolFieldAt(
+      posAngle: Angle,
+      offset:   Offset,
+      pivot:    Offset = Offset.Zero
+    ): ShapeExpression =
+      probe match
+        case GuideProbe.Flamingos2OIWFS =>
+          oiwfs.patrolField.patrolFieldAt(posAngle, offset, lyot, port, pivot)
+        case _: PWFSGuideProbe          =>
+          pwfs.patrolField.patrolFieldAt(posAngle, offset, pivot)
+        case _                          => ShapeExpression.Empty
+
+    // MOS is only defined at the F16 lyot wheel, so the science area ignores `lyot`.
+    override def scienceArea(posAngle: Angle, offset: Offset): ShapeExpression =
+      flamingos2.scienceArea.mosMode.shapeAt(posAngle, offset)
+
+    override def probeArm(posAngle: Angle, guideStar: Offset, offset: Offset): ShapeExpression =
+      probe match
+        case GuideProbe.Flamingos2OIWFS =>
+          oiwfs.probeArm.shapeAt(posAngle, guideStar, offset, lyot, port)
+        case _: PWFSGuideProbe          =>
+          pwfs.probeArm.vignettedAreaAt(probe, guideStar, offset)
+        case _                          => ShapeExpression.Empty
+
+    override def scienceDiameter: Angle = Flamingos2Mos.Flamingos2ScienceDiameter
+
+  object Flamingos2Mos:
+    def apply(
+      lyot: Flamingos2LyotWheel,
+      port: PortDisposition
+    ): Flamingos2Mos = Flamingos2Mos(lyot, port, GuideProbe.Flamingos2OIWFS)
+
+    val Flamingos2ScienceDiameter = 20.arcseconds
+
   trait PwfsOnlyParams extends SingleProbeAgsParams:
     def probe: PWFSGuideProbe
 
