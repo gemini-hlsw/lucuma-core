@@ -35,8 +35,7 @@ final case class MosMaskGeometry(
 object MosMaskGeometry:
 
   /**
-   * The subset of a slit's description that determines its geometry, for callers that hold mask
-   * data in another shape than the file model — a GraphQL response, say.
+   * The subset of a slit's description that determines its geometry.
    */
   final case class Slit(
     coordinates:      Coordinates,
@@ -74,10 +73,11 @@ object MosMaskGeometry:
   /**
    * Computes the geometry of a design, if it can be oriented.
    *
-   * The mapping from the design's detector frame onto the sky is not recorded in a mask file and
-   * is not fixed per instrument — pre-image parity and rotation vary — so it is fitted from the
-   * design: every slit carries both its pre-image pixel position and its sky coordinates, which
-   * together determine the rotation, plate scale, parity and pointing pixel. Fitting needs at
+   * The mapping from the design's detector frame onto the sky is not recorded in a mask file, so
+   * it is recovered from the design itself: every slit carries both its pre-image pixel position
+   * and its sky coordinates, which together determine the rotation, plate scale and pointing
+   * pixel. The pre-image's parity is fixed per instrument — mask design software rejects
+   * pre-images in any other orientation — so it is looked up rather than fitted. Fitting needs at
    * least two slits at distinct positions; a design with fewer cannot be oriented and yields
    * `None`, as does an instrument without a modelled slit placement area.
    */
@@ -88,23 +88,36 @@ object MosMaskGeometry:
     slits:               List[Slit]
   ): Option[MosMaskGeometry] =
     for
-      vertices <- placementVertices(instrument)
-      fit      <- fitTransform(pointing, slits)
-    yield build(dispersionDirection, slits, vertices, fit)
+      config <- instrumentConfig(instrument)
+      fit    <- fitTransform(pointing, slits, config.flipped)
+    yield build(dispersionDirection, slits, config.vertices, fit)
 
-  /** The GMMPS slit placement area, in arcsec in the pre-image's pixel axes. */
-  private def placementVertices(instrument: Instrument): Option[List[(Int, Int)]] =
+  /**
+   * Per-instrument facts about the pre-image frame: the GMMPS slit placement area, in arcsec in
+   * the pre-image's pixel axes, and the frame's parity.
+   *
+   * The parity mirrors the per-instrument constants GMMPS itself hardcodes when it derives the
+   * mask position angle from a pre-image (`get_OT_posangle`: GMOS images are "flipped", F2 not);
+   * GMMPS rejects pre-images in any other orientation, so masks in the wild cannot disagree. The
+   * flag here is expressed relative to this library's p/q axes, hence the inverted-looking values.
+   */
+  private case class InstrumentConfig(vertices: List[(Int, Int)], flipped: Boolean)
+
+  private def instrumentConfig(instrument: Instrument): Option[InstrumentConfig] =
     instrument match
-      case Instrument.GmosNorth  => Some(lucuma.core.geom.gmos.scienceArea.mosVerticesNorth)
-      case Instrument.GmosSouth  => Some(lucuma.core.geom.gmos.scienceArea.mosVerticesSouth)
-      case Instrument.Flamingos2 => Some(lucuma.core.geom.flamingos2.scienceArea.mosVertices)
+      case Instrument.GmosNorth  =>
+        Some(InstrumentConfig(lucuma.core.geom.gmos.scienceArea.mosVerticesNorth, flipped = false))
+      case Instrument.GmosSouth  =>
+        Some(InstrumentConfig(lucuma.core.geom.gmos.scienceArea.mosVerticesSouth, flipped = false))
+      case Instrument.Flamingos2 =>
+        Some(InstrumentConfig(lucuma.core.geom.flamingos2.scienceArea.mosVertices, flipped = true))
       case _                     => None
 
   /**
    * Similarity transform from pre-image pixels to pointing-relative sky offsets:
    * `sky = scale * R(theta) * F * (pixel - anchor)`, where `F` reflects pixel y when
-   * `flipped`. Solved in closed form (orthogonal Procrustes), trying both parities and
-   * keeping the one with the smaller residual.
+   * `flipped`. With the parity known, rotation and scale have a closed-form least-squares
+   * solution over the centered point clouds.
    */
   private case class Fit(
     theta:   Double,
@@ -114,43 +127,39 @@ object MosMaskGeometry:
     anchorY: Double
   )
 
-  private def fitTransform(pointing: Coordinates, slits: List[Slit]): Option[Fit] =
+  private def fitTransform(
+    pointing: Coordinates,
+    slits:    List[Slit],
+    flipped:  Boolean
+  ): Option[Fit] =
     if slits.sizeIs < 2 then None
     else
       val n = slits.size.toDouble
 
       val sky = slits.map { s =>
         val o = pointing.diff(s.coordinates).offset
-        (arcsec(o.p.toAngle), arcsec(o.q.toAngle))
+        (o.p.toAngle.toSignedDoubleDecimalArcseconds, o.q.toAngle.toSignedDoubleDecimalArcseconds)
       }
       val pix = slits.map(s => (s.x, s.y))
 
       val (scx, scy) = (sky.map(_._1).sum / n, sky.map(_._2).sum / n)
       val (pcx, pcy) = (pix.map(_._1).sum / n, pix.map(_._2).sum / n)
 
-      def solve(flipped: Boolean): Option[(Fit, Double)] =
-        val f     = if flipped then -1.0 else 1.0
-        val pairs = sky.zip(pix).map { case ((p, q), (x, y)) =>
-          (p - scx, q - scy, x - pcx, f * (y - pcy))
-        }
-        val dot   = pairs.map((p, q, x, y) => p * x + q * y).sum
-        val cross = pairs.map((p, q, x, y) => x * q - y * p).sum
-        val norm  = pairs.map((_, _, x, y) => x * x + y * y).sum
-        val scale = sqrt(dot * dot + cross * cross) / norm
-        Option.when(norm > 0.0 && scale > 0.0):
-          val theta    = atan2(cross, dot)
-          val (ct, st) = (cos(theta), sin(theta))
-          val residual = pairs.map { (p, q, x, y) =>
-            val rp = scale * (x * ct - y * st) - p
-            val rq = scale * (x * st + y * ct) - q
-            rp * rp + rq * rq
-          }.sum
-          // anchor: the pixel that lands exactly on the pointing
-          val ax = pcx - (scx * ct + scy * st) / scale
-          val ay = pcy - f * (-scx * st + scy * ct) / scale
-          (Fit(theta, scale, flipped, ax, ay), residual)
-
-      List(solve(false), solve(true)).flatten.minByOption(_._2).map(_._1)
+      val f     = if flipped then -1.0 else 1.0
+      val pairs = sky.zip(pix).map { case ((p, q), (x, y)) =>
+        (p - scx, q - scy, x - pcx, f * (y - pcy))
+      }
+      val dot   = pairs.map((p, q, x, y) => p * x + q * y).sum
+      val cross = pairs.map((p, q, x, y) => x * q - y * p).sum
+      val norm  = pairs.map((_, _, x, y) => x * x + y * y).sum
+      val scale = sqrt(dot * dot + cross * cross) / norm
+      Option.when(norm > 0.0 && scale > 0.0):
+        val theta    = atan2(cross, dot)
+        val (ct, st) = (cos(theta), sin(theta))
+        // anchor: the pixel that lands exactly on the pointing
+        val ax       = pcx - (scx * ct + scy * st) / scale
+        val ay       = pcy - f * (-scx * st + scy * ct) / scale
+        Fit(theta, scale, flipped, ax, ay)
 
   private def build(
     dispersionDirection: MosDispersionDirection,
@@ -182,12 +191,12 @@ object MosMaskGeometry:
     // Everything below is in the detector frame, in arcsec: slit width lies along the
     // dispersion axis and the across/along offsets displace the slit from its object.
     def slitShape(s: Slit): ShapeExpression =
-      val across = arcsec(s.offsetAcrossSlit)
-      val along  = arcsec(s.offsetAlongSlit)
+      val across = s.offsetAcrossSlit.toSignedDoubleDecimalArcseconds
+      val along  = s.offsetAlongSlit.toSignedDoubleDecimalArcseconds
       val cx     = fit.scale * (s.x - fit.anchorX) + (if horizontal then across else along)
       val cy     = fit.scale * (s.y - fit.anchorY) + (if horizontal then along else across)
-      val hx     = arcsec(if horizontal then s.width else s.length) / 2.0
-      val hy     = arcsec(if horizontal then s.length else s.width) / 2.0
+      val hx     = (if horizontal then s.width else s.length).toSignedDoubleDecimalArcseconds / 2.0
+      val hy     = (if horizontal then s.length else s.width).toSignedDoubleDecimalArcseconds / 2.0
       val tilt   = s.tilt.toSignedDoubleDegrees.toRadians
       val (c, n) = (cos(tilt), sin(tilt))
       polygon(
@@ -201,6 +210,3 @@ object MosMaskGeometry:
       slits = slits.map(slitShape),
       rotation = Angle.fromDoubleRadians(fit.theta)
     )
-
-  private def arcsec(a: Angle): Double =
-    Angle.signedDecimalArcseconds.get(a).toDouble
