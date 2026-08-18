@@ -163,7 +163,126 @@ pointing-relative sky offsets (right).
 </figcaption>
 </figure>
 
-<h2>2 · Anatomy of one slit</h2>
+<h2>2 · How the transform is fitted</h2>
+
+<p>
+The slit pattern is effectively drawn twice — once in pixels, once in sky offsets — and the two
+drawings differ only by the transform being sought. <code>fitTransform</code> reads it off in
+three steps:
+</p>
+
+<figure>
+<svg viewBox="0 0 960 400" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, Segoe UI, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrP" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#8250df"/>
+    </marker>
+    <marker id="arrS" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#0969da"/>
+    </marker>
+    <marker id="arrG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#59636e"/>
+    </marker>
+  </defs>
+
+  <!-- ============ Panel 1: same pattern, two frames ============ -->
+  <g transform="translate(15,40)">
+    <text x="145" y="-12" text-anchor="middle" font-size="13" font-weight="600" fill="#1f2328">① Same pattern, two frames</text>
+    <rect x="0" y="0" width="290" height="290" fill="#f6f8fa" stroke="#d1d9e0"/>
+
+    <!-- pixel cloud, upper left -->
+    <g transform="translate(80,85) scale(0.55)">
+      <g fill="#8250df">
+        <circle cx="55" cy="-15" r="6"/><circle cx="-40" cy="30" r="6"/>
+        <circle cx="15" cy="50" r="6"/><circle cx="-35" cy="-45" r="6"/>
+      </g>
+      <g stroke="#8250df" stroke-width="2.5">
+        <line x1="-9" y1="0" x2="9" y2="0"/><line x1="0" y1="-9" x2="0" y2="9"/>
+      </g>
+    </g>
+    <text x="80" y="35" text-anchor="middle" font-size="11" fill="#8250df">pixels (x, y)</text>
+
+    <!-- sky cloud, lower right: rotated + scaled -->
+    <g transform="translate(195,195) scale(0.55)">
+      <g fill="#0969da">
+        <circle cx="72" cy="19" r="6"/><circle cx="-64" cy="8" r="6"/>
+        <circle cx="-16" cy="66" r="6"/><circle cx="-10" cy="-73" r="6"/>
+      </g>
+      <g stroke="#0969da" stroke-width="2.5">
+        <line x1="-9" y1="0" x2="9" y2="0"/><line x1="0" y1="-9" x2="0" y2="9"/>
+      </g>
+    </g>
+    <text x="195" y="262" text-anchor="middle" font-size="11" fill="#0969da">sky offsets (p, q)</text>
+
+    <text x="10" y="316" font-size="11.5" fill="#59636e">Shift, rotation and size ratio unknown.</text>
+    <text x="10" y="332" font-size="11.5" fill="#59636e">Crosses mark each pattern's centroid.</text>
+  </g>
+
+  <!-- ============ Panel 2: centre and compare ============ -->
+  <g transform="translate(335,40)">
+    <text x="145" y="-12" text-anchor="middle" font-size="13" font-weight="600" fill="#1f2328">② Centre both, compare arrows</text>
+    <rect x="0" y="0" width="290" height="290" fill="#f6f8fa" stroke="#d1d9e0"/>
+
+    <g transform="translate(145,150)">
+      <!-- pixel arrows -->
+      <g stroke="#8250df" stroke-width="1.6">
+        <line x1="0" y1="0" x2="55" y2="-15" marker-end="url(#arrP)"/>
+        <line x1="0" y1="0" x2="-40" y2="30" marker-end="url(#arrP)"/>
+        <line x1="0" y1="0" x2="15" y2="50" marker-end="url(#arrP)"/>
+        <line x1="0" y1="0" x2="-35" y2="-45" marker-end="url(#arrP)"/>
+      </g>
+      <!-- sky arrows: same rotation + scale applied to each -->
+      <g stroke="#0969da" stroke-width="1.6">
+        <line x1="0" y1="0" x2="72" y2="19" marker-end="url(#arrS)"/>
+        <line x1="0" y1="0" x2="-64" y2="8" marker-end="url(#arrS)"/>
+        <line x1="0" y1="0" x2="-16" y2="66" marker-end="url(#arrS)"/>
+        <line x1="0" y1="0" x2="-10" y2="-73" marker-end="url(#arrS)"/>
+      </g>
+      <!-- highlighted vote: angle between the first pair -->
+      <path d="M 38 -10 A 39 39 0 0 1 42 11" fill="none" stroke="#e0a800" stroke-width="2"/>
+      <text x="52" y="-28" font-size="11" fill="#b08800" font-weight="600">one slit's vote for θ</text>
+    </g>
+
+    <text x="10" y="316" font-size="11.5" fill="#59636e">Centering removes the shift. Each slit's pixel and</text>
+    <text x="10" y="332" font-size="11.5" fill="#59636e">sky arrows disagree by θ; longer arrows vote stronger.</text>
+  </g>
+
+  <!-- ============ Panel 3: aligned result ============ -->
+  <g transform="translate(655,40)">
+    <text x="145" y="-12" text-anchor="middle" font-size="13" font-weight="600" fill="#1f2328">③ Aligned: read off the fit</text>
+    <rect x="0" y="0" width="290" height="290" fill="#f6f8fa" stroke="#d1d9e0"/>
+
+    <g transform="translate(145,120)">
+      <!-- transformed pixel points (purple rings) land on sky points (blue dots) -->
+      <g fill="#0969da">
+        <circle cx="72" cy="19" r="4.5"/><circle cx="-64" cy="8" r="4.5"/>
+        <circle cx="-16" cy="66" r="4.5"/><circle cx="-10" cy="-73" r="4.5"/>
+      </g>
+      <g fill="none" stroke="#8250df" stroke-width="2">
+        <circle cx="72" cy="19" r="9.5"/><circle cx="-64" cy="8" r="9.5"/>
+        <circle cx="-16" cy="66" r="9.5"/><circle cx="-10" cy="-73" r="9.5"/>
+      </g>
+      <g stroke="#1f2328" stroke-width="1.5">
+        <line x1="-8" y1="0" x2="8" y2="0"/><line x1="0" y1="-8" x2="0" y2="8"/>
+      </g>
+    </g>
+
+    <g font-size="11.5" fill="#1f2328">
+      <text x="18" y="240"><tspan font-weight="600" fill="#b08800">θ</tspan> — the tally of all votes (one atan2)</text>
+      <text x="18" y="258"><tspan font-weight="600">scale</tspan> — sky-to-pixel arrow length ratio</text>
+      <text x="18" y="276"><tspan font-weight="600">anchor</tspan> — the shift, recovered last: the pixel</text>
+      <text x="18" y="292">that lands exactly on the pointing</text>
+    </g>
+    <text x="10" y="332" font-size="11.5" fill="#59636e">Transformed pixel positions ◯ land on sky positions ●.</text>
+  </g>
+</svg>
+<figcaption>
+Figure 2 — <code>fitTransform</code> in pictures. There is no iteration: the votes are tallied by
+two sums over the slits, and the rotation, scale and anchor come out in closed form.
+</figcaption>
+</figure>
+
+<h2>3 · Anatomy of one slit</h2>
 
 <figure>
 <svg viewBox="0 0 960 420" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, Segoe UI, Helvetica, Arial, sans-serif">
@@ -232,12 +351,12 @@ pointing-relative sky offsets (right).
   <text x="80" y="392" font-size="12" fill="#59636e">Width and length always mean the same thing physically — the parser and geometry swap axes, not meanings.</text>
 </svg>
 <figcaption>
-Figure 2 — One aperture in the detector frame, for a horizontally-dispersing instrument.
+Figure 3 — One aperture in the detector frame, for a horizontally-dispersing instrument.
 The slit is displaced from its object by the two offsets and may be tilted about its centre.
 </figcaption>
 </figure>
 
-<h2>3 · Where each value enters the computation</h2>
+<h2>4 · Where each value enters the computation</h2>
 
 <table>
   <tr><th>Value</th><th>Role in the geometry</th></tr>
