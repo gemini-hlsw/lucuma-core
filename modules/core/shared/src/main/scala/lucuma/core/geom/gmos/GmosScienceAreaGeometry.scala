@@ -33,9 +33,6 @@ trait GmosScienceAreaGeometry {
   // GMMPS "slit placement area" for GMOS MOS masks
   // It is a a polygon whose vertices come from the GMMPS Hamamatsu FoV definitions,
   // in arcsec relative to the pointing center, in the pre-image's pixel axes.
-  // Public because mask geometry needs the vertices in the detector frame: the
-  // orientation of that frame on sky varies per pre-image and must be fitted from
-  // the mask data rather than assumed (see MosMaskGeometry).
   val mosVerticesNorth: List[(Int, Int)] =
     List(
       (-128, -164), (-163, -131), (-163, 131), (-130, 164),
