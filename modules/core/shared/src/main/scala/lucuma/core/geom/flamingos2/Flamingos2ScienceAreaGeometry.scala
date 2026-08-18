@@ -82,9 +82,10 @@ trait Flamingos2ScienceAreaGeometry:
     ShapeExpression.centeredEllipse(height, height) ∩ ShapeExpression.centeredRectangle(width, height)
 
   // GMMPS "slit placement area" for Flamingos2 MOS masks.
-  // The vertices come from the GMMPS  FoV definition, in arcsec relative to
-  // the pointing center.
-  private val mosVertices: List[(Int, Int)] =
+  // The vertices come from the GMMPS FoV definition, in arcsec relative to
+  // the pointing center, in the pre-image's pixel axes. Public for the same
+  // reason as the GMOS mos vertices (see MosMaskGeometry).
+  val mosVertices: List[(Int, Int)] =
     List(
       (-174, -60), (-183, -21), (-183,  21), (-174,  60),
       (173,   60), ( 182,  21), ( 182, -21), ( 173, -60)

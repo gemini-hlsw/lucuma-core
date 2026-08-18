@@ -118,80 +118,109 @@ trait GmosMosShapes extends InstrumentShapes:
       candidatesArea.candidatesAreaAt(posAngle, offsetPos)
     )
 
-trait GmosMosMaskShapes extends InstrumentShapes:
+// Renders a real mask design read from FITS: the fitted slit placement area with the
+// design's apertures inside it, acquisition boxes in red. The shapes come out in the
+// field's true sky orientation, fitted from the design itself; see MosMaskGeometry.
+trait MosMaskShapes extends InstrumentShapes:
   import fs2.Chunk
   import fs2.Fallible
   import fs2.Stream
   import lucuma.catalog.mos.MosMaskReader
-  import lucuma.core.geom.gmos.{scienceArea, candidatesArea}
-  import lucuma.core.model.mos.MosMaskHeader
-  import lucuma.core.model.mos.MosMaskSlit
+  import lucuma.core.geom.mos.MosMaskGeometry
 
-  private val (header: MosMaskHeader, slits: List[MosMaskSlit]) =
+  def resource: String
+
+  // Lazy: `resource` is provided by the mixing trait, which initializes after this one.
+  private lazy val (geometry: MosMaskGeometry, maskSlits: List[lucuma.core.model.mos.MosMaskSlit]) =
     val bytes =
-      val in = getClass.getResourceAsStream("/ngc7796_ODF.fits")
+      val in = getClass.getResourceAsStream(resource)
       try in.readAllBytes finally in.close()
     val src = Stream.chunk(Chunk.array(bytes))
     (for
       h <- src.through(MosMaskReader.header[Fallible]).compile.lastOrError
       s <- src.through(MosMaskReader.slits[Fallible]).compile.toList
-    yield (h, s)).fold(throw _, identity)
-
-  val posAngle: Angle = header.positionAngle.getOrElse(Angle.Angle0)
-
-  // Slits are placed in the detector frame — the frame GMMPS validates slit placement
-  // in and the frame the mos outline's vertices are defined in — so slits and outline
-  // agree by construction. Placing them from the slits' sky coordinates instead would
-  // depend on the pre-image's WCS parity, which for this GMOS-S design mirrors the
-  // outline's convention in y.
-  //
-  // The detector pixel that lands on the pointing is not recorded in the design, so it
-  // is recovered from the data: for each slit, invert the pointing-relative sky offset
-  // through the design's rotation and plate scale and subtract from its pixel position.
-  private val arcsecPerDetPixel: Double =
-    header.pixelScale.value.toDouble
-
-  private val pointingPixel: (Double, Double) =
-    val scale   = arcsecPerDetPixel
-    val anchors = slits.map { s =>
-      val o     = header.pointing.diff(s.coordinates).offset
-      val p     = Angle.signedDecimalArcseconds.get(o.p.toAngle).toDouble
-      val q     = Angle.signedDecimalArcseconds.get(o.q.toAngle).toDouble
-      // Sky = scale * R(180 - PA) * pixel, as measured from the design itself.
-      val theta = math.Pi - posAngle.toDoubleRadians
-      val (c, n) = (math.cos(-theta), math.sin(-theta))
-      (s.x - (p * c - q * n) / scale, s.y - (p * n + q * c) / scale)
-    }
-    (anchors.map(_._1).sum / anchors.size, anchors.map(_._2).sum / anchors.size)
-
-  // Slit dimensions are physical: width along the dispersion axis (detector x for this
-  // GMOS-S design), length across it. Detector x maps to -p, as in the outline; the
-  // tilt sign flips with it.
-  private def slitShape(s: MosMaskSlit): ShapeExpression =
-    def arcsec(a: Angle): Double = Angle.signedDecimalArcseconds.get(a).toDouble
-    val (px0, py0) = pointingPixel
-    // The pixel columns give the object position; the slit is displaced from it by the
-    // across/along offsets, which for this horizontally dispersing design run along
-    // detector x and y respectively.
-    val dx         = (s.x - px0) * arcsecPerDetPixel + arcsec(s.offsetAcrossSlit)
-    val dy         = (s.y - py0) * arcsecPerDetPixel + arcsec(s.offsetAlongSlit)
-    ShapeExpression
-      .centeredRectangle(s.slitWidth, s.slitLength)
-      .rotate(-s.tilt)
-      .translate(Offset(Angle.fromDoubleArcseconds(-dx).p, Angle.fromDoubleArcseconds(dy).q))
-      .rotate(posAngle)
+    yield MosMaskGeometry.fromMask(h, s).map((_, s)))
+      .fold(throw _, identity)
+      .getOrElse(sys.error(s"cannot orient the design in $resource"))
 
   override def coloredShapes: List[ColoredShape] =
-    val (acq, sci) = slits.partition(_.isAcquisition)
-    ColoredShape(scienceArea.mosModeSouth.shapeAt(posAngle, Offset.Zero),
-                 Color.cyan,
-                 Some(new BasicStroke(2f))
-    ) ::
-      acq.map(s => ColoredShape(slitShape(s), Color.red, filled = true)) :::
-      sci.map(s => ColoredShape(slitShape(s), Color.blue, filled = true))
+    ColoredShape(geometry.outline, Color.cyan, Some(new BasicStroke(2f))) ::
+      maskSlits.zip(geometry.slits).map { (s, shape) =>
+        ColoredShape(shape, if s.isAcquisition then Color.red else Color.blue, filled = true)
+      }
 
   def shapes: List[ShapeExpression] =
-    List(candidatesArea.candidatesAreaAt(posAngle, Offset.Zero))
+    Nil
+
+trait GmosMosMaskShapes extends MosMaskShapes:
+  val resource: String = "/ngc7796_ODF.fits"
+
+trait Flamingos2MosMaskShapes extends MosMaskShapes:
+  val resource: String = "/n159_ODF.fits"
+
+// Renders a mask design from the fields a GraphQL MaskDefinition serves, through the slim
+// MosMaskGeometry.fromSlits entry point: no FITS file, no full header — just instrument,
+// dispersion direction, pointing and the per-slit geometry. Data is a real GMOS-N design
+// (GN2026AENG051-10) at position angle 180.
+trait GmosNorthMaskDataShapes extends InstrumentShapes:
+  import lucuma.core.enums.Instrument
+  import lucuma.core.enums.MosDispersionDirection
+  import lucuma.core.geom.mos.MosMaskGeometry
+  import lucuma.core.math.Coordinates
+
+  private def coords(hms: String, dms: String): Coordinates =
+    Coordinates.fromHmsDms.getOption(s"$hms $dms").getOrElse(sys.error(s"bad coordinates: $hms $dms"))
+
+  // (acquisition, width, length, ra, dec, x, y, offsetAlongSlit)
+  private val rows: List[(Boolean, Double, Double, String, String, Double, Double, Double)] = List(
+    (false, 0.75, 5.0, "13:29:55.275878", "+47:10:04.508972", 1459.43994140625, 436.04998779296875, 0.0),
+    (true, 2.0, 2.0, "13:29:45.944366", "+47:11:20.259704", 872.125, 904.3690185546875, 0.0),
+    (true, 2.0, 2.0, "13:29:44.282684", "+47:12:32.000427", 767.9929809570312, 1347.219970703125, 0.0),
+    (true, 2.0, 2.0, "13:29:54.002151", "+47:10:56.996154", 1379.4000244140625, 760.1859741210938, 0.0),
+    (false, 0.75, 10.0, "13:30:01.047134", "+47:09:29.517517", 1823.0, 219.9499969482422, 0.0),
+    (false, 0.75, 10.0, "13:30:02.413558", "+47:09:48.990783", 1909.1500244140625, 340.08599853515625, -1.5),
+    (false, 0.75, 7.0, "13:30:02.760314", "+47:09:56.736145", 1931.0999755859375, 387.97198486328125, 1.0),
+    (false, 0.75, 10.0, "13:29:52.927551", "+47:10:35.394287", 1311.6300048828125, 626.7979736328125, 0.0),
+    (false, 0.75, 10.0, "13:29:58.774337", "+47:10:52.890014", 1680.0, 734.906982421875, -2.799999),
+    (false, 0.75, 10.0, "13:30:00.199127", "+47:11:13.887634", 1769.699951171875, 864.3200073242188, -1.0),
+    (false, 0.75, 10.0, "13:29:54.506835", "+47:11:37.425842", 1411.260009765625, 1009.8800048828125, 0.0),
+    (false, 0.75, 10.0, "13:30:01.998138", "+47:11:54.317321", 1882.9300537109375, 1114.030029296875, 0.0),
+    (false, 0.75, 10.0, "13:29:54.029617", "+47:12:12.774353", 1381.5, 1228.199951171875, -2.0),
+    (false, 0.75, 10.0, "13:30:03.697586", "+47:12:20.409851", 1990.050048828125, 1275.1500244140625, 1.5),
+    (false, 0.75, 10.0, "13:30:01.054000", "+47:13:05.412597", 1823.5400390625, 1553.1800537109375, 0.0),
+    (false, 0.75, 10.0, "13:29:47.053298", "+47:13:40.692443", 942.6270141601562, 1771.5400390625, 2.5),
+    (false, 0.75, 10.0, "13:29:58.547744", "+47:14:10.602722", 1665.8399658203125, 1955.8599853515625, 0.0)
+  )
+
+  private val geometry: MosMaskGeometry =
+    MosMaskGeometry
+      .fromSlits(
+        Instrument.GmosNorth,
+        MosDispersionDirection.Horizontal,
+        coords("13:29:57.000000", "+47:11:43.007999"),
+        rows.map { (_, w, l, ra, dec, x, y, offAlong) =>
+          MosMaskGeometry.Slit(
+            coordinates = coords(ra, dec),
+            x = x,
+            y = y,
+            width = Angle.fromDoubleArcseconds(w),
+            length = Angle.fromDoubleArcseconds(l),
+            offsetAlongSlit = Angle.fromDoubleArcseconds(offAlong),
+            offsetAcrossSlit = Angle.Angle0,
+            tilt = Angle.Angle0
+          )
+        }
+      )
+      .getOrElse(sys.error("cannot orient the design"))
+
+  override def coloredShapes: List[ColoredShape] =
+    ColoredShape(geometry.outline, Color.cyan, Some(new BasicStroke(2f))) ::
+      rows.zip(geometry.slits).map { (row, shape) =>
+        ColoredShape(shape, if row._1 then Color.red else Color.blue, filled = true)
+      }
+
+  def shapes: List[ShapeExpression] =
+    Nil
 
 trait Flamingos2LSShapes extends InstrumentShapes:
   import lucuma.core.geom.flamingos2.*
@@ -513,6 +542,12 @@ object JtsGmosImagingDemo extends JtsDemo with GmosImagingShapes
 object JtsGmosMosDemo extends JtsDemo with GmosMosShapes
 
 object JtsGmosMosMaskDemo extends JtsDemo with GmosMosMaskShapes:
+  override val arcsecPerPixel: Double = 0.4
+
+object JtsFlamingos2MosMaskDemo extends JtsDemo with Flamingos2MosMaskShapes:
+  override val arcsecPerPixel: Double = 0.4
+
+object JtsGmosNorthMaskDataDemo extends JtsDemo with GmosNorthMaskDataShapes:
   override val arcsecPerPixel: Double = 0.4
 
 object JtsPwfsDemo extends JtsDemo with PwfsShapes:
