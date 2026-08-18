@@ -118,6 +118,81 @@ trait GmosMosShapes extends InstrumentShapes:
       candidatesArea.candidatesAreaAt(posAngle, offsetPos)
     )
 
+trait GmosMosMaskShapes extends InstrumentShapes:
+  import fs2.Chunk
+  import fs2.Fallible
+  import fs2.Stream
+  import lucuma.catalog.mos.MosMaskReader
+  import lucuma.core.geom.gmos.{scienceArea, candidatesArea}
+  import lucuma.core.model.mos.MosMaskHeader
+  import lucuma.core.model.mos.MosMaskSlit
+
+  private val (header: MosMaskHeader, slits: List[MosMaskSlit]) =
+    val bytes =
+      val in = getClass.getResourceAsStream("/ngc7796_ODF.fits")
+      try in.readAllBytes finally in.close()
+    val src = Stream.chunk(Chunk.array(bytes))
+    (for
+      h <- src.through(MosMaskReader.header[Fallible]).compile.lastOrError
+      s <- src.through(MosMaskReader.slits[Fallible]).compile.toList
+    yield (h, s)).fold(throw _, identity)
+
+  val posAngle: Angle = header.positionAngle.getOrElse(Angle.Angle0)
+
+  // Slits are placed in the detector frame — the frame GMMPS validates slit placement
+  // in and the frame the mos outline's vertices are defined in — so slits and outline
+  // agree by construction. Placing them from the slits' sky coordinates instead would
+  // depend on the pre-image's WCS parity, which for this GMOS-S design mirrors the
+  // outline's convention in y.
+  //
+  // The detector pixel that lands on the pointing is not recorded in the design, so it
+  // is recovered from the data: for each slit, invert the pointing-relative sky offset
+  // through the design's rotation and plate scale and subtract from its pixel position.
+  private val arcsecPerDetPixel: Double =
+    header.pixelScale.value.toDouble
+
+  private val pointingPixel: (Double, Double) =
+    val scale   = arcsecPerDetPixel
+    val anchors = slits.map { s =>
+      val o     = header.pointing.diff(s.coordinates).offset
+      val p     = Angle.signedDecimalArcseconds.get(o.p.toAngle).toDouble
+      val q     = Angle.signedDecimalArcseconds.get(o.q.toAngle).toDouble
+      // Sky = scale * R(180 - PA) * pixel, as measured from the design itself.
+      val theta = math.Pi - posAngle.toDoubleRadians
+      val (c, n) = (math.cos(-theta), math.sin(-theta))
+      (s.x - (p * c - q * n) / scale, s.y - (p * n + q * c) / scale)
+    }
+    (anchors.map(_._1).sum / anchors.size, anchors.map(_._2).sum / anchors.size)
+
+  // Slit dimensions are physical: width along the dispersion axis (detector x for this
+  // GMOS-S design), length across it. Detector x maps to -p, as in the outline; the
+  // tilt sign flips with it.
+  private def slitShape(s: MosMaskSlit): ShapeExpression =
+    def arcsec(a: Angle): Double = Angle.signedDecimalArcseconds.get(a).toDouble
+    val (px0, py0) = pointingPixel
+    // The pixel columns give the object position; the slit is displaced from it by the
+    // across/along offsets, which for this horizontally dispersing design run along
+    // detector x and y respectively.
+    val dx         = (s.x - px0) * arcsecPerDetPixel + arcsec(s.offsetAcrossSlit)
+    val dy         = (s.y - py0) * arcsecPerDetPixel + arcsec(s.offsetAlongSlit)
+    ShapeExpression
+      .centeredRectangle(s.slitWidth, s.slitLength)
+      .rotate(-s.tilt)
+      .translate(Offset(Angle.fromDoubleArcseconds(-dx).p, Angle.fromDoubleArcseconds(dy).q))
+      .rotate(posAngle)
+
+  override def coloredShapes: List[ColoredShape] =
+    val (acq, sci) = slits.partition(_.isAcquisition)
+    ColoredShape(scienceArea.mosModeSouth.shapeAt(posAngle, Offset.Zero),
+                 Color.cyan,
+                 Some(new BasicStroke(2f))
+    ) ::
+      acq.map(s => ColoredShape(slitShape(s), Color.red, filled = true)) :::
+      sci.map(s => ColoredShape(slitShape(s), Color.blue, filled = true))
+
+  def shapes: List[ShapeExpression] =
+    List(candidatesArea.candidatesAreaAt(posAngle, Offset.Zero))
+
 trait Flamingos2LSShapes extends InstrumentShapes:
   import lucuma.core.geom.flamingos2.*
   import lucuma.core.geom.flamingos2.oiwfs.{probeArm, patrolField}
@@ -436,6 +511,9 @@ object JtsFlamingos2MosDemo extends JtsDemo with Flamingos2MosShapes
 object JtsGmosImagingDemo extends JtsDemo with GmosImagingShapes
 
 object JtsGmosMosDemo extends JtsDemo with GmosMosShapes
+
+object JtsGmosMosMaskDemo extends JtsDemo with GmosMosMaskShapes:
+  override val arcsecPerPixel: Double = 0.4
 
 object JtsPwfsDemo extends JtsDemo with PwfsShapes:
   override val arcsecPerPixel: Double = 0.5
