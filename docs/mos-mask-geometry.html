@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>MOS Mask Geometry</title>
+<style>
+  body {
+    font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+    color: #1f2328;
+    background: #ffffff;
+    max-width: 1020px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    line-height: 1.5;
+  }
+  h1 { font-size: 1.6rem; }
+  h2 { font-size: 1.2rem; margin-top: 2.2rem; }
+  figure { margin: 1.5rem 0; }
+  figcaption { font-size: 0.85rem; color: #59636e; margin-top: 0.4rem; }
+  svg { max-width: 100%; height: auto; display: block; }
+  code { background: #f0f1f3; padding: 0.1em 0.3em; border-radius: 3px; font-size: 0.9em; }
+  table { border-collapse: collapse; font-size: 0.9rem; }
+  th, td { border: 1px solid #d1d9e0; padding: 0.4em 0.7em; text-align: left; }
+  th { background: #f6f8fa; }
+  .note { background: #fff8e1; border-left: 4px solid #e0a800; padding: 0.6em 1em; font-size: 0.9rem; }
+</style>
+</head>
+<body>
+
+<h1>MOS mask geometry: how the design's values become shapes</h1>
+
+<p>
+A MOS mask design (ODF/MDF) describes its apertures in the <strong>pre-image's pixel
+frame</strong>: each slit records the pixel position of its target object plus the slit's
+dimensions and displacements in arcseconds. The file carries <em>no WCS</em> — no reference
+pixel, no rotation matrix — because GMMPS only ever overlays the design on the pre-image it
+came from. To draw a mask on the sky, <code>MosMaskGeometry</code> recovers the missing
+detector&#8594;sky transform from the design itself and applies it to both the instrument's
+slit placement area and every slit.
+</p>
+
+<h2>1 · Two frames, one fitted transform</h2>
+
+<figure>
+<svg viewBox="0 0 960 470" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, Segoe UI, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#59636e"/>
+    </marker>
+    <marker id="arrB" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#0969da"/>
+    </marker>
+  </defs>
+
+  <!-- ==================== LEFT: detector frame ==================== -->
+  <g transform="translate(20,42)">
+    <text x="170" y="-14" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2328">Pre-image (detector) frame</text>
+    <rect x="0" y="0" width="340" height="340" fill="#f6f8fa" stroke="#d1d9e0"/>
+
+    <!-- placement area polygon, GMOS-like with barcode notch on the right -->
+    <polygon points="80,40 260,40 300,80 300,140 285,140 285,190 300,190 300,260 260,300 80,300 40,260 40,80"
+             fill="none" stroke="#00a0b0" stroke-width="2"/>
+    <text x="90" y="60" font-size="11" fill="#00808d">slit placement area</text>
+    <text x="90" y="74" font-size="11" fill="#00808d">(per instrument, GMMPS vertices)</text>
+
+    <!-- slits: object positions in pixels -->
+    <g fill="#0969da">
+      <rect x="118" y="96"  width="4" height="16"/>
+      <rect x="198" y="126" width="4" height="16"/>
+      <rect x="146" y="216" width="4" height="16"/>
+      <rect x="238" y="246" width="4" height="16"/>
+      <rect x="108" y="156" width="4" height="16"/>
+    </g>
+    <rect x="216" y="186" width="9" height="9" fill="#d1242f"/>
+    <text x="210" y="195" text-anchor="end" font-size="11" fill="#d1242f">acquisition box</text>
+    <text x="126" y="108" font-size="11" fill="#0969da">slit at (x, y) pixels</text>
+
+    <!-- anchor -->
+    <g stroke="#1f2328" stroke-width="1.5">
+      <line x1="162" y1="170" x2="178" y2="170"/>
+      <line x1="170" y1="162" x2="170" y2="178"/>
+    </g>
+    <text x="170" y="152" text-anchor="middle" font-size="11" fill="#1f2328" font-weight="600">anchor</text>
+
+    <!-- pixel axes -->
+    <g stroke="#59636e" stroke-width="1.5" fill="none">
+      <line x1="14" y1="326" x2="64" y2="326" marker-end="url(#arr)"/>
+      <line x1="14" y1="326" x2="14" y2="276" marker-end="url(#arr)"/>
+    </g>
+    <text x="68" y="330" font-size="12" fill="#59636e">x</text>
+    <text x="8" y="268" font-size="12" fill="#59636e">y</text>
+
+    <text x="0" y="368" font-size="12" fill="#59636e">Units: pixels · plate scale ≈ PIXSCALE ″/px (nominal)</text>
+    <text x="0" y="386" font-size="12" fill="#59636e">The anchor (pointing pixel) is NOT recorded in the file.</text>
+  </g>
+
+  <!-- ==================== MIDDLE: the transform ==================== -->
+  <g transform="translate(388,42)">
+    <line x1="0" y1="170" x2="176" y2="170" stroke="#0969da" stroke-width="2.5" marker-end="url(#arrB)"/>
+    <text x="88" y="150" text-anchor="middle" font-size="11.5" font-weight="600" fill="#0969da">sky = scale · R(θ) · F · (pixel − anchor)</text>
+
+    <g font-size="11.5" fill="#1f2328">
+      <text x="0" y="205"><tspan font-weight="600">scale</tspan> — ″/px, fitted</text>
+      <text x="0" y="223"><tspan font-weight="600">R(θ)</tspan> — rotation, fitted</text>
+      <text x="0" y="241"><tspan font-weight="600">F</tspan> — parity, fixed per instrument</text>
+      <text x="0" y="259"><tspan font-weight="600">anchor</tspan> — pointing pixel, fitted</text>
+    </g>
+    <g font-size="11" fill="#59636e">
+      <text x="0" y="292">Fitted least-squares from the slits'</text>
+      <text x="0" y="307">(pixel, sky) pairs: every slit carries</text>
+      <text x="0" y="322">both (x, y) and coordinates.</text>
+      <text x="0" y="344">Needs ≥ 2 distinct slits.</text>
+    </g>
+  </g>
+
+  <!-- ==================== RIGHT: sky frame ==================== -->
+  <g transform="translate(600,42)">
+    <text x="170" y="-14" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2328">Sky frame</text>
+    <rect x="0" y="0" width="340" height="340" fill="#f6f8fa" stroke="#d1d9e0"/>
+
+    <!-- rotated copy of the layout: rotate about the anchor/pointing -->
+    <g transform="rotate(-20 170 170)">
+      <polygon points="80,40 260,40 300,80 300,140 285,140 285,190 300,190 300,260 260,300 80,300 40,260 40,80"
+               fill="none" stroke="#00a0b0" stroke-width="2"/>
+      <g fill="#0969da">
+        <rect x="118" y="96"  width="4" height="16"/>
+        <rect x="198" y="126" width="4" height="16"/>
+        <rect x="146" y="216" width="4" height="16"/>
+        <rect x="238" y="246" width="4" height="16"/>
+        <rect x="108" y="156" width="4" height="16"/>
+      </g>
+      <rect x="216" y="186" width="9" height="9" fill="#d1242f"/>
+    </g>
+
+    <!-- pointing -->
+    <g stroke="#1f2328" stroke-width="1.5">
+      <line x1="162" y1="170" x2="178" y2="170"/>
+      <line x1="170" y1="162" x2="170" y2="178"/>
+    </g>
+    <text x="170" y="152" text-anchor="middle" font-size="11" font-weight="600" fill="#1f2328">pointing</text>
+
+    <!-- rotation angle hint -->
+    <path d="M 170 60 A 110 110 0 0 0 132 66" fill="none" stroke="#e0a800" stroke-width="1.8" marker-end="url(#arr)"/>
+    <text x="146" y="52" font-size="12" fill="#b08800" font-weight="600">θ</text>
+
+    <!-- compass: north up, east left -->
+    <g stroke="#59636e" stroke-width="1.5" fill="none">
+      <line x1="316" y1="326" x2="316" y2="276" marker-end="url(#arr)"/>
+      <line x1="316" y1="326" x2="266" y2="326" marker-end="url(#arr)"/>
+    </g>
+    <text x="312" y="268" font-size="12" fill="#59636e">N (q)</text>
+    <text x="240" y="330" font-size="12" fill="#59636e">E (p)</text>
+
+    <text x="0" y="368" font-size="12" fill="#59636e">Units: arcsec offsets (p, q) from the pointing</text>
+    <text x="0" y="386" font-size="12" fill="#59636e">(RA_IMAG / DEC_IMAG). Outline and slits share the transform,</text>
+    <text x="0" y="404" font-size="12" fill="#59636e">so every slit of a valid design falls inside the outline.</text>
+  </g>
+</svg>
+<figcaption>
+Figure 1 — The design lives in the pre-image's pixel frame (left). One similarity transform,
+fitted from the slits themselves, maps both the placement outline and the apertures onto
+pointing-relative sky offsets (right).
+</figcaption>
+</figure>
+
+<h2>2 · Anatomy of one slit</h2>
+
+<figure>
+<svg viewBox="0 0 960 420" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, Segoe UI, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arr2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#59636e"/>
+    </marker>
+    <marker id="arrO" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#bc4c00"/>
+    </marker>
+  </defs>
+
+  <!-- spectrum band along dispersion -->
+  <rect x="60" y="95" width="760" height="150" fill="#fff8e1"/>
+  <text x="70" y="115" font-size="11" fill="#b08800">spectrum disperses along this axis</text>
+
+  <!-- slit rectangle: width along x (dispersion), length along y -->
+  <rect x="372" y="95" width="36" height="150" fill="#dbe9ff" stroke="#0969da" stroke-width="2"/>
+
+  <!-- tilted ghost -->
+  <g transform="rotate(-14 390 170)">
+    <rect x="372" y="95" width="36" height="150" fill="none" stroke="#0969da" stroke-width="1.3" stroke-dasharray="5,4"/>
+  </g>
+  <path d="M 390 84 A 86 86 0 0 1 412 88" fill="none" stroke="#59636e" stroke-width="1.4" marker-end="url(#arr2)"/>
+  <text x="424" y="82" font-size="12" fill="#1f2328"><tspan font-weight="600">tilt</tspan> — rotation about the slit centre, CCW positive, ≤ 45°</text>
+
+  <!-- width dimension -->
+  <g stroke="#59636e" stroke-width="1.3">
+    <line x1="372" y1="62" x2="408" y2="62" marker-start="url(#arr2)" marker-end="url(#arr2)"/>
+    <line x1="372" y1="56" x2="372" y2="68"/>
+    <line x1="408" y1="56" x2="408" y2="68"/>
+  </g>
+  <text x="188" y="66" font-size="12" fill="#1f2328"><tspan font-weight="600">width</tspan> — along dispersion;</text>
+  <text x="188" y="82" font-size="12" fill="#1f2328">sets spectral resolution</text>
+
+  <!-- length dimension -->
+  <g stroke="#59636e" stroke-width="1.3">
+    <line x1="430" y1="95" x2="430" y2="245" marker-start="url(#arr2)" marker-end="url(#arr2)"/>
+    <line x1="424" y1="95" x2="436" y2="95"/>
+    <line x1="424" y1="245" x2="436" y2="245"/>
+  </g>
+  <text x="444" y="164" font-size="12" fill="#1f2328"><tspan font-weight="600">length</tspan> — across dispersion;</text>
+  <text x="444" y="180" font-size="12" fill="#1f2328">room for object + sky background</text>
+
+  <!-- object and offsets -->
+  <g stroke="#bc4c00" stroke-width="2">
+    <line x1="352" y1="262" x2="360" y2="270"/>
+    <line x1="360" y1="262" x2="352" y2="270"/>
+  </g>
+  <text x="340" y="290" text-anchor="end" font-size="12" fill="#bc4c00"><tspan font-weight="600">object</tspan> at (x, y) / coordinates</text>
+
+  <!-- offset arrows: object -> across -> along -> slit centre -->
+  <line x1="356" y1="266" x2="388" y2="266" stroke="#bc4c00" stroke-width="1.6" marker-end="url(#arrO)"/>
+  <line x1="390" y1="262" x2="390" y2="176" stroke="#bc4c00" stroke-width="1.6" marker-end="url(#arrO)"/>
+  <circle cx="390" cy="170" r="3.5" fill="#0969da"/>
+  <text x="412" y="316" font-size="12" fill="#bc4c00"><tspan font-weight="600">offsetAcrossSlit</tspan> — across the width;</text>
+  <text x="412" y="332" font-size="12" fill="#bc4c00">non-zero drives a point source off the slit (flux loss)</text>
+  <line x1="374" y1="268" x2="428" y2="310" stroke="#bc4c00" stroke-width="0.8"/>
+  <text x="448" y="228" font-size="12" fill="#bc4c00"><tspan font-weight="600">offsetAlongSlit</tspan> — slides the slit along its length</text>
+  <line x1="392" y1="220" x2="444" y2="224" stroke="#bc4c00" stroke-width="0.8"/>
+
+  <!-- dispersion axis -->
+  <line x1="80" y1="350" x2="250" y2="350" stroke="#59636e" stroke-width="2" marker-end="url(#arr2)"/>
+  <text x="80" y="336" font-size="12" font-weight="600" fill="#1f2328">dispersion axis</text>
+  <text x="80" y="376" font-size="12" fill="#59636e">GMOS disperses along detector x (drawn here); F2 along detector y.</text>
+  <text x="80" y="392" font-size="12" fill="#59636e">Width and length always mean the same thing physically — the parser and geometry swap axes, not meanings.</text>
+</svg>
+<figcaption>
+Figure 2 — One aperture in the detector frame, for a horizontally-dispersing instrument.
+The slit is displaced from its object by the two offsets and may be tilted about its centre.
+</figcaption>
+</figure>
+
+<h2>3 · Where each value enters the computation</h2>
+
+<table>
+  <tr><th>Value</th><th>Role in the geometry</th></tr>
+  <tr><td><code>instrument</code></td><td>Selects the placement-area vertices and the frame's parity <code>F</code> (fixed per instrument; GMMPS rejects pre-images in any other orientation).</td></tr>
+  <tr><td><code>dispersionDirection</code></td><td>Maps <code>width</code>/<code>length</code> and the two offsets onto detector x/y (GMOS: horizontal, F2: vertical).</td></tr>
+  <tr><td><code>pointing</code></td><td>Origin of the sky frame; all output shapes are offsets from it.</td></tr>
+  <tr><td><code>coordinates</code> + <code>x</code>, <code>y</code></td><td>The fit's data: each slit's position in both frames determines <code>scale</code>, <code>θ</code> and the <code>anchor</code> (least squares, ≥ 2 distinct slits).</td></tr>
+  <tr><td><code>width</code>, <code>length</code></td><td>Aperture extents along / across the dispersion axis.</td></tr>
+  <tr><td><code>offsetAlongSlit</code>, <code>offsetAcrossSlit</code></td><td>Displace the aperture from its object, in the slit's own axes.</td></tr>
+  <tr><td><code>tilt</code></td><td>Rotates the aperture about its centre (counter-clockwise positive, bounded to 45°).</td></tr>
+</table>
+
+<div class="note" style="margin-top:1.5rem">
+<strong>Why fit instead of reading a transform from the file?</strong> The ODF/MDF carries no
+CRPIX/CRVAL/CD keywords — GMMPS uses the pre-image's WCS at design time and drops it when
+writing the mask. <code>MASK_PA</code> relates to the sky rotation only through
+instrument-special formulas (GMMPS's <code>get_OT_posangle</code> warns it is "not a general
+purpose tool"), and nothing in the file records the pointing pixel. The redundant
+(pixel, sky) pairs in the slit table determine all of it, with parity the only per-instrument
+assumption — the same one GMMPS itself enforces.
+</div>
+
+<p style="margin-top:1.5rem; font-size:0.9rem; color:#59636e">
+See <code>lucuma.core.geom.mos.MosMaskGeometry</code> for the implementation,
+<code>docs/mos-mask-reading.md</code> for the file-reading API, and the
+<code>JtsGmosMosMaskDemo</code> / <code>JtsFlamingos2MosMaskDemo</code> /
+<code>JtsGmosNorthMaskDataDemo</code> demos for rendered examples.
+</p>
+
+</body>
+</html>
