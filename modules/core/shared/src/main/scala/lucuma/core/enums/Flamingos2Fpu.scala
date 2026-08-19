@@ -3,8 +3,13 @@
 
 package lucuma.core.enums
 
+import cats.syntax.eq.*
 import coulomb.*
+import lucuma.core.math.Angle
+import lucuma.core.math.ApertureExtent
+import lucuma.core.math.syntax.int.*
 import lucuma.core.math.syntax.units.*
+import lucuma.core.math.units.PixelScale
 import lucuma.core.math.units.Pixels
 import lucuma.core.util.Enumerated
 
@@ -28,3 +33,25 @@ enum Flamingos2Fpu(
   case LongSlit4     extends Flamingos2Fpu("LongSlit_4",    "Long Slit 4px",   "4-Pixel Long Slit",    4.pixels, Flamingos2Decker.LongSlit)
   case LongSlit6     extends Flamingos2Fpu("LongSlit_6",    "Long Slit 6px",   "6-Pixel Long Slit",    6.pixels, Flamingos2Decker.LongSlit)
   case LongSlit8     extends Flamingos2Fpu("LongSlit_8",    "Long Slit 8px",   "8-Pixel Long Slit",    8.pixels, Flamingos2Decker.LongSlit)
+
+  /**
+   * `slitWidth` as an angle. Flamingos 2 is the only mode that reports its slit
+   * width in pixels, so consumers comparing apertures across instruments want
+   * this rather than the raw pixel count.
+   */
+  def slitWidthAngle: Angle =
+    Angle.fromDoubleArcseconds((slitWidth.value * Flamingos2Fpu.PixelScale.value).toDouble)
+
+  /** Focal-plane extent of this FPU, or `None` for the pinhole masks. */
+  def apertureExtent: Option[ApertureExtent] =
+    Option.when(decker === Flamingos2Decker.LongSlit)(
+      ApertureExtent(slitWidthAngle, Flamingos2Fpu.LongSlitLength)
+    )
+
+object Flamingos2Fpu:
+
+  /** Plate scale in f/16 non-AO mode. */
+  val PixelScale: PixelScale = BigDecimal(0.18).pixelScale
+
+  /** Long slit length (4.4') in f/16 non-AO mode. */
+  val LongSlitLength: Angle = 263.arcsec

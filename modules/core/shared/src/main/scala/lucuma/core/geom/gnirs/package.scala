@@ -3,20 +3,22 @@
 
 package lucuma.core.geom.gnirs
 
+import lucuma.core.enums.GnirsFpuIfu
+import lucuma.core.enums.GnirsFpuSlit
 import lucuma.core.math.Angle
 import lucuma.core.math.syntax.int.*
 
-// Long slit lengths derived from ocs.
-val SlitLengthShortCamNoXd: Angle = 99.arcsec
-val SlitLengthLongCamNoXd:  Angle = 49.arcsec
-val SlitLengthShortCamXd:   Angle = 7.arcsec
-val SlitLengthLongCamSxd:   Angle = 7.arcsec
-val SlitLengthLongCamLxd:   Angle = 5100.mas
+// Long slit lengths and IFU science-area heights now live beside the FPU
+// enumerations, so the drawn shape and the aperture extent cannot drift apart.
+val SlitLengthShortCamNoXd: Angle = GnirsFpuSlit.SlitLengthShortCamNoXd
+val SlitLengthLongCamNoXd:  Angle = GnirsFpuSlit.SlitLengthLongCamNoXd
+val SlitLengthShortCamXd:   Angle = GnirsFpuSlit.SlitLengthShortCamXd
+val SlitLengthLongCamSxd:   Angle = GnirsFpuSlit.SlitLengthLongCamSxd
+val SlitLengthLongCamLxd:   Angle = GnirsFpuSlit.SlitLengthLongCamLxd
 
-// IFU science-area heights, derived from ocs (InstGNIRS.getScienceArea). The
-// width is the IFU "slit width" (GnirsFpuIfu.slitWidth: 3.15" / 1.25").
-val IfuLowResHeight:  Angle = 4800.mas
-val IfuHighResHeight: Angle = 1800.mas
+// The IFU width is the IFU "slit width" (GnirsFpuIfu.slitWidth: 3.15" / 1.25").
+val IfuLowResHeight:  Angle = GnirsFpuIfu.IfuLowResHeight
+val IfuHighResHeight: Angle = GnirsFpuIfu.IfuHighResHeight
 
 // Pinhole sizes
 val Pinhole1Size: Angle = 100.mas

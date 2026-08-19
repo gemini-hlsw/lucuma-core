@@ -7,6 +7,7 @@ package enums
 
 import cats.syntax.eq.*
 import lucuma.core.math.Angle
+import lucuma.core.math.ApertureExtent
 import lucuma.core.util.Enumerated
 
 /**
@@ -41,3 +42,10 @@ enum GmosSouthFpu(
   case IfuNSRed      extends GmosSouthFpu("IfuNSRed",      "IFU-NS-R", "IFU N and S Right Slit (red)", Angle.milliarcseconds.reverseGet( 310), Angle.fromDoubleArcseconds(-32.625), GmosFpuType.Ifu)
 
   def isIFU: Boolean = fpuType === GmosFpuType.Ifu
+
+  /**
+   * Focal-plane extent of this FPU, or `None` for the IFUs whose field
+   * dimensions are not yet modelled.
+   */
+  def apertureExtent: Option[ApertureExtent] =
+    fpuType.slitLength.map(ApertureExtent(effectiveSlitWidth, _))

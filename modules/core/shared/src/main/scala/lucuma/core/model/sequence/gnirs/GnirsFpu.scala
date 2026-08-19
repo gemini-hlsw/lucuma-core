@@ -5,9 +5,12 @@ package lucuma.core.model.sequence.gnirs
 
 import cats.Eq
 import cats.derived.*
+import lucuma.core.enums.GnirsCamera
 import lucuma.core.enums.GnirsFpuIfu
 import lucuma.core.enums.GnirsFpuOther
 import lucuma.core.enums.GnirsFpuSlit
+import lucuma.core.enums.GnirsPrism
+import lucuma.core.math.ApertureExtent
 import monocle.Iso
 import monocle.Prism
 import monocle.macros.GenPrism
@@ -25,6 +28,17 @@ sealed trait GnirsFpu derives Eq:
       case GnirsFpu.Spectroscopy.Slit(v) => fs(v)
       case GnirsFpu.Spectroscopy.Ifu(v)  => fi(v)
       case GnirsFpu.Other(v)             => fo(v)
+
+  /**
+   * Focal-plane extent of this aperture, or `None` for the non-spectroscopy
+   * apertures (acquisition mirror, pupil viewer, pinholes).
+   */
+  def apertureExtent(camera: GnirsCamera, prism: GnirsPrism): Option[ApertureExtent] =
+    fold(
+      slit => Some(slit.apertureExtent(camera, prism)),
+      ifu  => Some(ifu.apertureExtent),
+      _    => None
+    )
 
 object GnirsFpu:
 

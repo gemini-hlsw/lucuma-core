@@ -5,6 +5,7 @@ package lucuma.core.geom
 package syntax
 
 import lucuma.core.math.Angle
+import lucuma.core.math.ApertureExtent
 import lucuma.core.math.Offset
 
 import ShapeExpression.*
@@ -182,6 +183,15 @@ trait shapeexpression {
     */
     def centeredRectangle(w: Angle, h: Angle): ShapeExpression =
       Translate(rectangle(w, h), Offset(-w.bisect.p, -h.bisect.q))
+
+    /**
+    * Constructs the rectangle an `ApertureExtent` describes, so that the drawn shape and the
+    * aperture's containment test agree by construction.
+    *
+    * @group Constructors
+    */
+    def centeredRectangle(extent: ApertureExtent): ShapeExpression =
+      centeredRectangle(extent.p, extent.q)
 
     /**
     * Constructs an ellipse contained in a rectangle of width w and height h with a corner at (0,0).

@@ -8,7 +8,6 @@ import lucuma.core.enums.GnirsFilter
 import lucuma.core.enums.GnirsFpuIfu
 import lucuma.core.enums.GnirsFpuOther
 import lucuma.core.enums.GnirsFpuSlit
-import lucuma.core.enums.GnirsPixelScale
 import lucuma.core.enums.GnirsPrism
 import lucuma.core.geom.ShapeExpression
 import lucuma.core.geom.syntax.all.*
@@ -25,19 +24,14 @@ trait GnirsScienceAreaGeometry:
     ShapeExpression.point(Offset.Zero)
 
   def slitLength(camera: GnirsCamera, prism: GnirsPrism): Angle =
-    (camera.pixelScale, prism) match
-      case (GnirsPixelScale.PixelScale_0_05, GnirsPrism.Mirror) => SlitLengthLongCamNoXd
-      case (GnirsPixelScale.PixelScale_0_05, GnirsPrism.Sxd)    => SlitLengthLongCamSxd
-      case (GnirsPixelScale.PixelScale_0_05, GnirsPrism.Lxd)    => SlitLengthLongCamLxd
-      case (GnirsPixelScale.PixelScale_0_15, GnirsPrism.Mirror) => SlitLengthShortCamNoXd
-      case (GnirsPixelScale.PixelScale_0_15, _)                 => SlitLengthShortCamXd
+    GnirsFpuSlit.slitLength(camera, prism)
 
   private def longSlitFov(
     slit:   GnirsFpuSlit,
     camera: GnirsCamera,
     prism:  GnirsPrism
   ): ShapeExpression =
-    ShapeExpression.centeredRectangle(slit.slitWidth, slitLength(camera, prism))
+    ShapeExpression.centeredRectangle(slit.apertureExtent(camera, prism))
 
   // Y-MK, J-MK and K-MK filters see the smaller, round unvignetted field; every other
   // imaging filter (order-blocking, narrow-band, H-MK) sees the full keyhole.
@@ -79,10 +73,7 @@ trait GnirsScienceAreaGeometry:
   // IFU science area: a rectangle of the IFU "slit width" by a fixed,
   // resolution-dependent height (derived from ocs InstGNIRS.getScienceArea).
   private def ifuFov(ifu: GnirsFpuIfu): ShapeExpression =
-    val height = ifu match
-      case GnirsFpuIfu.LowResolution  => IfuLowResHeight
-      case GnirsFpuIfu.HighResolution => IfuHighResHeight
-    ShapeExpression.centeredRectangle(ifu.slitWidth, height)
+    ShapeExpression.centeredRectangle(ifu.apertureExtent)
 
   private def pinholeFov(other: GnirsFpuOther): Option[ShapeExpression] =
     other match
