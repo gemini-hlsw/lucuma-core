@@ -102,9 +102,10 @@ object MosMaskGeometry:
    * Per-instrument facts about the pre-image frame: the GMMPS slit placement area, in arcsec in
    * the pre-image's pixel axes, and the frame's parity.
    *
-   * The parity values mirror the constants GMMPS hardcodes when it derives a mask's position
-   * angle.
-   * GMMPS rejects pre-images in any other orientation, so a mask in the wild cannot disagree.
+   * The parity encodes the same per-instrument facts GMMPS hardcodes when it derives a mask's
+   * position angle (get_OT_posangle.cc), but the booleans are opposite: GMMPS names parity in
+   * raw (RA, Dec) CD-matrix axes, where the RA axis runs backwards, while `flipped` here says
+   * whether F negates pixel y in the (p, q) offset frame.
    */
   private case class InstrumentConfig(vertices: List[(Int, Int)], flipped: Boolean)
 
@@ -152,18 +153,18 @@ object MosMaskGeometry:
     else
       val n = slits.size.toDouble
 
-      val sky = slits.map { s =>
+      val sky = slits.map: s =>
         val o = pointing.diff(s.coordinates).offset
         (o.p.toAngle.toSignedDoubleDecimalArcseconds, o.q.toAngle.toSignedDoubleDecimalArcseconds)
-      }
+
       val pix = slits.map(s => (s.x, s.y))
 
       val (scx, scy) = (sky.map(_._1).sum / n, sky.map(_._2).sum / n)
       val (pcx, pcy) = (pix.map(_._1).sum / n, pix.map(_._2).sum / n)
 
-      val f     = if flipped then -1.0 else 1.0
+      val flip  = if flipped then -1.0 else 1.0
       val pairs = sky.zip(pix).map { case ((p, q), (x, y)) =>
-        (p - scx, q - scy, x - pcx, f * (y - pcy))
+        (p - scx, q - scy, x - pcx, flip * (y - pcy))
       }
       // Centering the two clouds removes the translation, leaving rotation and scale, which
       // have a closed-form least-squares solution: every slit pair votes for the angle between
@@ -177,7 +178,7 @@ object MosMaskGeometry:
         val (ct, st) = (cos(θ), sin(θ))
         // anchor: the pixel that lands exactly on the pointing
         val ax       = pcx - (scx * ct + scy * st) / scale
-        val ay       = pcy - f * (-scx * st + scy * ct) / scale
+        val ay       = pcy - flip * (-scx * st + scy * ct) / scale
         Fit(θ, scale, flipped, ax, ay)
 
   private def build(
@@ -187,10 +188,10 @@ object MosMaskGeometry:
     fit:                 Fit
   ): MosMaskGeometry =
     val (ct, st) = (cos(fit.θ), sin(fit.θ))
-    val f        = if fit.flipped then -1.0 else 1.0
+    val flip     = if fit.flipped then -1.0 else 1.0
 
-    def toSky(x: Double, y: Double): (Double, Double) =
-      val yy = f * y
+    inline def toSky(x: Double, y: Double): (Double, Double) =
+      val yy = flip * y
       (x * ct - yy * st, x * st + yy * ct)
 
     def polygon(points: List[(Double, Double)]): ShapeExpression =

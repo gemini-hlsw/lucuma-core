@@ -18,6 +18,7 @@ import lucuma.core.math.Angle
 import lucuma.core.math.HourAngle
 import lucuma.core.math.Offset
 import lucuma.core.math.syntax.int.*
+import lucuma.core.model.mos.MosMaskSlit
 import lucuma.core.model.sequence.flamingos2.Flamingos2FpuMask
 
 import java.awt.event.*
@@ -118,29 +119,22 @@ trait GmosMosShapes extends InstrumentShapes:
       candidatesArea.candidatesAreaAt(posAngle, offsetPos)
     )
 
-// Renders a real mask design read from FITS: the fitted slit placement area with the
-// design's apertures inside it, acquisition boxes in red. The shapes come out in the
-// field's true sky orientation, fitted from the design itself; see MosMaskGeometry.
+// Renders a real mask design read from FITS
 trait MosMaskShapes extends InstrumentShapes:
-  import fs2.Chunk
-  import fs2.Fallible
-  import fs2.Stream
+  import cats.effect.SyncIO
+  import fs2.io.readClassLoaderResource
   import lucuma.catalog.mos.MosMaskReader
   import lucuma.core.geom.mos.MosMaskGeometry
 
   def resource: String
 
-  // Lazy: `resource` is provided by the mixing trait, which initializes after this one.
-  private lazy val (geometry: MosMaskGeometry, maskSlits: List[lucuma.core.model.mos.MosMaskSlit]) =
-    val bytes =
-      val in = getClass.getResourceAsStream(resource)
-      try in.readAllBytes finally in.close()
-    val src = Stream.chunk(Chunk.array(bytes))
+  private lazy val (geometry: MosMaskGeometry, maskSlits: List[MosMaskSlit]) =
+    val src = readClassLoaderResource[SyncIO](resource)
     (for
-      h <- src.through(MosMaskReader.header[Fallible]).compile.lastOrError
-      s <- src.through(MosMaskReader.slits[Fallible]).compile.toList
+      h <- src.through(MosMaskReader.header[SyncIO]).compile.lastOrError
+      s <- src.through(MosMaskReader.slits[SyncIO]).compile.toList
     yield MosMaskGeometry.fromMask(h, s).map((_, s)))
-      .fold(throw _, identity)
+      .unsafeRunSync()
       .getOrElse(sys.error(s"cannot orient the design in $resource"))
 
   override def coloredShapes: List[ColoredShape] =
@@ -153,15 +147,13 @@ trait MosMaskShapes extends InstrumentShapes:
     Nil
 
 trait GmosMosMaskShapes extends MosMaskShapes:
-  val resource: String = "/ngc7796_ODF.fits"
+  val resource: String = "ngc7796_ODF.fits"
 
 trait Flamingos2MosMaskShapes extends MosMaskShapes:
-  val resource: String = "/n159_ODF.fits"
+  val resource: String = "n159_ODF.fits"
 
-// Renders a mask design from the fields a GraphQL MaskDefinition serves, through the slim
-// MosMaskGeometry.fromSlits entry point: no FITS file, no full header — just instrument,
-// dispersion direction, pointing and the per-slit geometry. Data is a real GMOS-N design
-// (GN2026AENG051-10) at position angle 180.
+// Renders a mask design from the fields a GraphQL MaskDefinition may serve.
+// Data is a real GMOS-N design (GN2026AENG051-10) at position angle 180.
 trait GmosNorthMaskDataShapes extends InstrumentShapes:
   import lucuma.core.enums.Instrument
   import lucuma.core.enums.MosDispersionDirection
