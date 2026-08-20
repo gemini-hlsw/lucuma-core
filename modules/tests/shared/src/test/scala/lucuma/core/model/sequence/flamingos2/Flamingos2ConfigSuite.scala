@@ -4,6 +4,7 @@
 package lucuma.core.model.sequence.flamingos2
 
 import cats.data.NonEmptyList
+import lucuma.core.enums.Flamingos2MosOffsetPreset
 import lucuma.core.enums.Flamingos2SlitOffsetPreset
 import lucuma.core.enums.SlitOffsetMode
 import lucuma.core.enums.StepGuideState
@@ -38,6 +39,24 @@ class Flamingos2ConfigSuite extends FunSuite:
         TelescopeConfig(Offset(0.pArcsec,   0.qArcsec), StepGuideState.Enabled),
         TelescopeConfig(Offset(0.pArcsec, 300.qArcsec), StepGuideState.Disabled),
         TelescopeConfig(Offset(0.pArcsec, 310.qArcsec), StepGuideState.Disabled),
+        TelescopeConfig(Offset(0.pArcsec,   0.qArcsec), StepGuideState.Enabled)
+      )
+    )
+
+  test("MOS SparseField: along-slit ±1.2 arcsec, all guided"):
+    val cfg = defaultMosTelescopeConfigs(Flamingos2MosOffsetPreset.SparseField)
+    assertEquals(cfg.offsetsType, SlitOffsetMode.NodAlongSlit)
+    assertEquals(cfg.telescopeConfigs, alongSlit(StepGuideState.Enabled, 1.2, -1.2, -1.2, 1.2))
+
+  test("MOS CrowdedField: (0,0),(0,300),(0,320),(0,0), guide off on the sky offsets"):
+    val cfg = defaultMosTelescopeConfigs(Flamingos2MosOffsetPreset.CrowdedField)
+    assertEquals(cfg.offsetsType, SlitOffsetMode.NodToSky)
+    assertEquals(
+      cfg.telescopeConfigs,
+      NonEmptyList.of(
+        TelescopeConfig(Offset(0.pArcsec,   0.qArcsec), StepGuideState.Enabled),
+        TelescopeConfig(Offset(0.pArcsec, 300.qArcsec), StepGuideState.Disabled),
+        TelescopeConfig(Offset(0.pArcsec, 320.qArcsec), StepGuideState.Disabled),
         TelescopeConfig(Offset(0.pArcsec,   0.qArcsec), StepGuideState.Enabled)
       )
     )

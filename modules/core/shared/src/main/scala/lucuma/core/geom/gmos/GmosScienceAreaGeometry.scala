@@ -31,16 +31,16 @@ trait GmosScienceAreaGeometry {
     imagingFov(314240.mas, 17750.mas)
 
   // GMMPS "slit placement area" for GMOS MOS masks
-  // It is a a polygon whose vertices come from the GMMPS Hamamatsu FoV definitions 
-  // in arcsec relative to the pointing center.
-  private val mosVerticesNorth: List[(Int, Int)] =
+  // It is a a polygon whose vertices come from the GMMPS Hamamatsu FoV definitions,
+  // in arcsec relative to the pointing center, in the pre-image's pixel axes.
+  val mosVerticesNorth: List[(Int, Int)] =
     List(
       (-128, -164), (-163, -131), (-163, 131), (-130, 164),
       (130, 164),   (164, 129),   (164, 48),    (155, 48),
       (155, -65),   (164, -65),   (164, -106),  (114, -164)
     )
 
-  private val mosVerticesSouth: List[(Int, Int)] =
+  val mosVerticesSouth: List[(Int, Int)] =
     List(
       (-130, -159), (-163, -125), (-163, 136), (-133, 166),
       (136, 166),   (165, 136),   (165, 50),   (150, 50),

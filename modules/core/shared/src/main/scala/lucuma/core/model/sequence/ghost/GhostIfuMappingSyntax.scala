@@ -14,6 +14,7 @@ import lucuma.core.math.Angle
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Offset
 import lucuma.core.model.Target
+import lucuma.core.model.TargetResolution
 import lucuma.core.model.sequence.ghost.GhostIfuMapping
 import lucuma.core.util.Timestamp
 
@@ -76,10 +77,13 @@ object GhostIfuMappingSyntax:
     ctx:    IfuMappingContext,
     target: (Target.Id, Target)
   ): Either[String, GhostIfuMapping] =
+    // Keyed on how the target tracks rather than on which subtype it is, so that a Target of
+    // Opportunity behaves as whatever it resolved to.  An unresolved one has no tracking at all,
+    // which is the None case.
     ctx.resolutionMode match
       case GhostResolutionMode.Standard =>
-        target._2 match
-          case Target.Sidereal(_, track, _, _) =>
+        target._2.resolution match
+          case Some(TargetResolution.Sidereal(track, _)) =>
             track.at(ctx.when.toInstant).fold("Cannot determine the target coordinates.".asLeft): c =>
               ifuAssignment(ctx.explicitBase.getOrElse(c), c, ctx.sky, ctx.angle) match
                 case TargetAtIfu1 => ctx.sky.fold(GhostIfuMapping.SingleTarget(target._1).asRight)(s => GhostIfuMapping.TargetPlusSky(target._1, s).asRight)
@@ -87,16 +91,16 @@ object GhostIfuMappingSyntax:
                 case OutOfRange   => "The target and sky positions are too far apart.".asLeft
                 case TooClose     => s"The target and sky positions are too close (minimum separation is $MinimumArmSeparationString arcseconds).".asLeft
 
-          case Target.Nonsidereal(_, _, _)     =>
+          case Some(TargetResolution.Nonsidereal(_))     =>
             ctx.sky.fold(GhostIfuMapping.SingleTarget(target._1).asRight): _ =>
               "GHOST does not support sky positions for nonsidereal targets.".asLeft
 
-          case Target.Opportunity(_, _, _)     =>
+          case None                                       =>
             "A GHOST IFU mapping can only be determined after the science target is identified.".asLeft
 
       case GhostResolutionMode.High =>
-        target._2 match
-          case Target.Sidereal(_, track, _, _) =>
+        target._2.resolution match
+          case Some(TargetResolution.Sidereal(track, _)) =>
             track.at(ctx.when.toInstant).fold("Cannot determine the target coordinates.".asLeft): c =>
               ctx.sky.fold("GHOST High Resolution mode requires a sky position.".asLeft): s =>
                 ifuAssignment(ctx.explicitBase.getOrElse(c), c, s.some, ctx.angle) match
@@ -104,11 +108,11 @@ object GhostIfuMappingSyntax:
                   case TooClose     => s"The target and sky positions are too close (minimum separation is $MinimumArmSeparationString arcseconds).".asLeft
                   case _            => "The target and/or sky position is not reachable by the GHOST IFU probes.".asLeft
 
-          case Target.Nonsidereal(_, _, _)     =>
+          case Some(TargetResolution.Nonsidereal(_))     =>
             ctx.sky.fold(GhostIfuMapping.SingleTarget(target._1).asRight): _ =>
               "GHOST does not support sky positions for nonsidereal targets.".asLeft
 
-          case Target.Opportunity(_, _, _)     =>
+          case None                                       =>
             "A GHOST IFU mapping can only be determined after the science target is identified.".asLeft
 
   private def deriveDualTarget(
@@ -118,8 +122,8 @@ object GhostIfuMappingSyntax:
   ): Either[String, GhostIfuMapping] =
     (ctx.resolutionMode, ctx.sky) match
       case (GhostResolutionMode.Standard, None)    =>
-        (targetA._2, targetB._2) match
-          case (Target.Sidereal(_, track1, _, _), Target.Sidereal(_, track2, _, _)) =>
+        (targetA._2.resolution, targetB._2.resolution) match
+          case (Some(TargetResolution.Sidereal(track1, _)), Some(TargetResolution.Sidereal(track2, _))) =>
             (track1.at(ctx.when.toInstant), track2.at(ctx.when.toInstant))
               .tupled
               .fold("Cannot determine the target coordinates.".asLeft): (c1, c2) =>

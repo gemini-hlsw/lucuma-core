@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 960 470" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, Segoe UI, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#59636e"/>
+    </marker>
+    <marker id="arrB" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#0969da"/>
+    </marker>
+  </defs>
+
+  <!-- ==================== LEFT: detector frame ==================== -->
+  <g transform="translate(20,42)">
+    <text x="170" y="-14" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2328">Pre-image (detector) frame</text>
+    <rect x="0" y="0" width="340" height="340" fill="#f6f8fa" stroke="#d1d9e0"/>
+
+    <!-- placement area polygon, GMOS-like with barcode notch on the right -->
+    <polygon points="80,40 260,40 300,80 300,140 285,140 285,190 300,190 300,260 260,300 80,300 40,260 40,80"
+             fill="none" stroke="#00a0b0" stroke-width="2"/>
+    <text x="90" y="60" font-size="11" fill="#00808d">slit placement area</text>
+    <text x="90" y="74" font-size="11" fill="#00808d">(per instrument, GMMPS vertices)</text>
+
+    <!-- slits: object positions in pixels -->
+    <g fill="#0969da">
+      <rect x="118" y="96"  width="4" height="16"/>
+      <rect x="198" y="126" width="4" height="16"/>
+      <rect x="146" y="216" width="4" height="16"/>
+      <rect x="238" y="246" width="4" height="16"/>
+      <rect x="108" y="156" width="4" height="16"/>
+    </g>
+    <rect x="216" y="186" width="9" height="9" fill="#d1242f"/>
+    <text x="210" y="195" text-anchor="end" font-size="11" fill="#d1242f">acquisition box</text>
+    <text x="126" y="108" font-size="11" fill="#0969da">slit at (x, y) pixels</text>
+
+    <!-- anchor -->
+    <g stroke="#1f2328" stroke-width="1.5">
+      <line x1="162" y1="170" x2="178" y2="170"/>
+      <line x1="170" y1="162" x2="170" y2="178"/>
+    </g>
+    <text x="170" y="152" text-anchor="middle" font-size="11" fill="#1f2328" font-weight="600">anchor</text>
+
+    <!-- pixel axes -->
+    <g stroke="#59636e" stroke-width="1.5" fill="none">
+      <line x1="14" y1="326" x2="64" y2="326" marker-end="url(#arr)"/>
+      <line x1="14" y1="326" x2="14" y2="276" marker-end="url(#arr)"/>
+    </g>
+    <text x="68" y="330" font-size="12" fill="#59636e">x</text>
+    <text x="8" y="268" font-size="12" fill="#59636e">y</text>
+
+    <text x="0" y="368" font-size="12" fill="#59636e">Units: pixels · plate scale ≈ PIXSCALE ″/px (nominal)</text>
+    <text x="0" y="386" font-size="12" fill="#59636e">The anchor (pointing pixel) is NOT recorded in the file.</text>
+  </g>
+
+  <!-- ==================== MIDDLE: the transform ==================== -->
+  <g transform="translate(388,42)">
+    <line x1="0" y1="170" x2="176" y2="170" stroke="#0969da" stroke-width="2.5" marker-end="url(#arrB)"/>
+    <text x="88" y="150" text-anchor="middle" font-size="11.5" font-weight="600" fill="#0969da">sky = scale · R(θ) · F · (pixel − anchor)</text>
+
+    <g font-size="11.5" fill="#1f2328">
+      <text x="0" y="205"><tspan font-weight="600">scale</tspan> — ″/px, fitted</text>
+      <text x="0" y="223"><tspan font-weight="600">R(θ)</tspan> — rotation, fitted</text>
+      <text x="0" y="241"><tspan font-weight="600">F</tspan> — parity, fixed per instrument</text>
+      <text x="0" y="259"><tspan font-weight="600">anchor</tspan> — pointing pixel, fitted</text>
+    </g>
+    <g font-size="11" fill="#59636e">
+      <text x="0" y="292">Fitted least-squares from the slits'</text>
+      <text x="0" y="307">(pixel, sky) pairs: every slit carries</text>
+      <text x="0" y="322">both (x, y) and coordinates.</text>
+      <text x="0" y="344">Needs ≥ 2 distinct slits.</text>
+    </g>
+  </g>
+
+  <!-- ==================== RIGHT: sky frame ==================== -->
+  <g transform="translate(600,42)">
+    <text x="170" y="-14" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2328">Sky frame</text>
+    <rect x="0" y="0" width="340" height="340" fill="#f6f8fa" stroke="#d1d9e0"/>
+
+    <!-- rotated copy of the layout: rotate about the anchor/pointing -->
+    <g transform="rotate(-20 170 170)">
+      <polygon points="80,40 260,40 300,80 300,140 285,140 285,190 300,190 300,260 260,300 80,300 40,260 40,80"
+               fill="none" stroke="#00a0b0" stroke-width="2"/>
+      <g fill="#0969da">
+        <rect x="118" y="96"  width="4" height="16"/>
+        <rect x="198" y="126" width="4" height="16"/>
+        <rect x="146" y="216" width="4" height="16"/>
+        <rect x="238" y="246" width="4" height="16"/>
+        <rect x="108" y="156" width="4" height="16"/>
+      </g>
+      <rect x="216" y="186" width="9" height="9" fill="#d1242f"/>
+    </g>
+
+    <!-- pointing -->
+    <g stroke="#1f2328" stroke-width="1.5">
+      <line x1="162" y1="170" x2="178" y2="170"/>
+      <line x1="170" y1="162" x2="170" y2="178"/>
+    </g>
+    <text x="170" y="152" text-anchor="middle" font-size="11" font-weight="600" fill="#1f2328">pointing</text>
+
+    <!-- rotation angle hint -->
+    <path d="M 170 60 A 110 110 0 0 0 132 66" fill="none" stroke="#e0a800" stroke-width="1.8" marker-end="url(#arr)"/>
+    <text x="146" y="52" font-size="12" fill="#b08800" font-weight="600">θ</text>
+
+    <!-- compass: north up, east left -->
+    <g stroke="#59636e" stroke-width="1.5" fill="none">
+      <line x1="316" y1="326" x2="316" y2="276" marker-end="url(#arr)"/>
+      <line x1="316" y1="326" x2="266" y2="326" marker-end="url(#arr)"/>
+    </g>
+    <text x="312" y="268" font-size="12" fill="#59636e">N (q)</text>
+    <text x="240" y="330" font-size="12" fill="#59636e">E (p)</text>
+
+    <text x="0" y="368" font-size="12" fill="#59636e">Units: arcsec offsets (p, q) from the pointing</text>
+    <text x="0" y="386" font-size="12" fill="#59636e">(RA_IMAG / DEC_IMAG). Outline and slits share the transform,</text>
+    <text x="0" y="404" font-size="12" fill="#59636e">so every slit of a valid design falls inside the outline.</text>
+  </g>
+</svg>

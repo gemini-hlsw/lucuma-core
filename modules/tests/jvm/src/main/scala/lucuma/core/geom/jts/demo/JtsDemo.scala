@@ -18,6 +18,7 @@ import lucuma.core.math.Angle
 import lucuma.core.math.HourAngle
 import lucuma.core.math.Offset
 import lucuma.core.math.syntax.int.*
+import lucuma.core.model.mos.MosMaskSlit
 import lucuma.core.model.sequence.flamingos2.Flamingos2FpuMask
 
 import java.awt.event.*
@@ -117,6 +118,101 @@ trait GmosMosShapes extends InstrumentShapes:
       patrolField.imagingMode.patrolFieldAt(posAngle, offsetPos, port),
       candidatesArea.candidatesAreaAt(posAngle, offsetPos)
     )
+
+// Renders a real mask design read from FITS
+trait MosMaskShapes extends InstrumentShapes:
+  import cats.effect.SyncIO
+  import fs2.io.readClassLoaderResource
+  import lucuma.catalog.mos.MosMaskReader
+  import lucuma.core.geom.mos.MosMaskGeometry
+
+  def resource: String
+
+  private lazy val (geometry: MosMaskGeometry, maskSlits: List[MosMaskSlit]) =
+    val src = readClassLoaderResource[SyncIO](resource)
+    (for
+      h <- src.through(MosMaskReader.header[SyncIO]).compile.lastOrError
+      s <- src.through(MosMaskReader.slits[SyncIO]).compile.toList
+    yield MosMaskGeometry.fromMask(h, s).map((_, s)))
+      .unsafeRunSync()
+      .getOrElse(sys.error(s"cannot orient the design in $resource"))
+
+  override def coloredShapes: List[ColoredShape] =
+    ColoredShape(geometry.outline, Color.cyan, Some(new BasicStroke(2f))) ::
+      maskSlits.zip(geometry.slits).map { (s, shape) =>
+        ColoredShape(shape, if s.isAcquisition then Color.red else Color.blue, filled = true)
+      }
+
+  def shapes: List[ShapeExpression] =
+    Nil
+
+trait GmosMosMaskShapes extends MosMaskShapes:
+  val resource: String = "ngc7796_ODF.fits"
+
+trait Flamingos2MosMaskShapes extends MosMaskShapes:
+  val resource: String = "n159_ODF.fits"
+
+// Renders a mask design from the fields a GraphQL MaskDefinition may serve.
+// Data is a real GMOS-N design (GN2026AENG051-10) at position angle 180.
+trait GmosNorthMaskDataShapes extends InstrumentShapes:
+  import lucuma.core.enums.Instrument
+  import lucuma.core.enums.MosDispersionDirection
+  import lucuma.core.geom.mos.MosMaskGeometry
+  import lucuma.core.math.Coordinates
+
+  private def coords(hms: String, dms: String): Coordinates =
+    Coordinates.fromHmsDms.getOption(s"$hms $dms").getOrElse(sys.error(s"bad coordinates: $hms $dms"))
+
+  // (acquisition, width, length, ra, dec, x, y, offsetAlongSlit)
+  private val rows: List[(Boolean, Double, Double, String, String, Double, Double, Double)] = List(
+    (false, 0.75, 5.0, "13:29:55.275878", "+47:10:04.508972", 1459.43994140625, 436.04998779296875, 0.0),
+    (true, 2.0, 2.0, "13:29:45.944366", "+47:11:20.259704", 872.125, 904.3690185546875, 0.0),
+    (true, 2.0, 2.0, "13:29:44.282684", "+47:12:32.000427", 767.9929809570312, 1347.219970703125, 0.0),
+    (true, 2.0, 2.0, "13:29:54.002151", "+47:10:56.996154", 1379.4000244140625, 760.1859741210938, 0.0),
+    (false, 0.75, 10.0, "13:30:01.047134", "+47:09:29.517517", 1823.0, 219.9499969482422, 0.0),
+    (false, 0.75, 10.0, "13:30:02.413558", "+47:09:48.990783", 1909.1500244140625, 340.08599853515625, -1.5),
+    (false, 0.75, 7.0, "13:30:02.760314", "+47:09:56.736145", 1931.0999755859375, 387.97198486328125, 1.0),
+    (false, 0.75, 10.0, "13:29:52.927551", "+47:10:35.394287", 1311.6300048828125, 626.7979736328125, 0.0),
+    (false, 0.75, 10.0, "13:29:58.774337", "+47:10:52.890014", 1680.0, 734.906982421875, -2.799999),
+    (false, 0.75, 10.0, "13:30:00.199127", "+47:11:13.887634", 1769.699951171875, 864.3200073242188, -1.0),
+    (false, 0.75, 10.0, "13:29:54.506835", "+47:11:37.425842", 1411.260009765625, 1009.8800048828125, 0.0),
+    (false, 0.75, 10.0, "13:30:01.998138", "+47:11:54.317321", 1882.9300537109375, 1114.030029296875, 0.0),
+    (false, 0.75, 10.0, "13:29:54.029617", "+47:12:12.774353", 1381.5, 1228.199951171875, -2.0),
+    (false, 0.75, 10.0, "13:30:03.697586", "+47:12:20.409851", 1990.050048828125, 1275.1500244140625, 1.5),
+    (false, 0.75, 10.0, "13:30:01.054000", "+47:13:05.412597", 1823.5400390625, 1553.1800537109375, 0.0),
+    (false, 0.75, 10.0, "13:29:47.053298", "+47:13:40.692443", 942.6270141601562, 1771.5400390625, 2.5),
+    (false, 0.75, 10.0, "13:29:58.547744", "+47:14:10.602722", 1665.8399658203125, 1955.8599853515625, 0.0)
+  )
+
+  private val geometry: MosMaskGeometry =
+    MosMaskGeometry
+      .fromSlits(
+        Instrument.GmosNorth,
+        MosDispersionDirection.Horizontal,
+        coords("13:29:57.000000", "+47:11:43.007999"),
+        rows.map { (_, w, l, ra, dec, x, y, offAlong) =>
+          MosMaskGeometry.Slit(
+            coordinates = coords(ra, dec),
+            x = x,
+            y = y,
+            width = Angle.fromDoubleArcseconds(w),
+            length = Angle.fromDoubleArcseconds(l),
+            offsetAlongSlit = Angle.fromDoubleArcseconds(offAlong),
+            offsetAcrossSlit = Angle.Angle0,
+            tilt = Angle.Angle0
+          )
+        }
+      )
+      .getOrElse(sys.error("cannot orient the design"))
+
+  override def coloredShapes: List[ColoredShape] =
+    ColoredShape(geometry.outline, Color.cyan, Some(new BasicStroke(2f))) ::
+      rows.zip(geometry.slits).map { (row, shape) =>
+        ColoredShape(shape, if row._1 then Color.red else Color.blue, filled = true)
+      }
+
+  def shapes: List[ShapeExpression] =
+    Nil
 
 trait Flamingos2LSShapes extends InstrumentShapes:
   import lucuma.core.geom.flamingos2.*
@@ -436,6 +532,15 @@ object JtsFlamingos2MosDemo extends JtsDemo with Flamingos2MosShapes
 object JtsGmosImagingDemo extends JtsDemo with GmosImagingShapes
 
 object JtsGmosMosDemo extends JtsDemo with GmosMosShapes
+
+object JtsGmosMosMaskDemo extends JtsDemo with GmosMosMaskShapes:
+  override val arcsecPerPixel: Double = 0.4
+
+object JtsFlamingos2MosMaskDemo extends JtsDemo with Flamingos2MosMaskShapes:
+  override val arcsecPerPixel: Double = 0.4
+
+object JtsGmosNorthMaskDataDemo extends JtsDemo with GmosNorthMaskDataShapes:
+  override val arcsecPerPixel: Double = 0.4
 
 object JtsPwfsDemo extends JtsDemo with PwfsShapes:
   override val arcsecPerPixel: Double = 0.5
