@@ -22,6 +22,7 @@
       {
         devShell = pkgs.devshell.mkShell {
           imports = [ typelevel-nix.typelevelShell ];
+          packages = [ pkgs.github-cli ];
           typelevelShell = {
             nodejs.enable = true;
             jdk.package = pkgs.jdk25;
