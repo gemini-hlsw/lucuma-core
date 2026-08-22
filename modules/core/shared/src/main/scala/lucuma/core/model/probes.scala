@@ -29,6 +29,10 @@ trait probes:
         GuideProbe.PWFS2.some
       case (ObservingModeType.GmosNorthMos | ObservingModeType.GmosSouthMos, TrackType.Sidereal) =>
         GuideProbe.GmosOIWFS.some
+      case (ObservingModeType.GmosNorthIfu | ObservingModeType.GmosSouthIfu, TrackType.Nonsidereal) =>
+        GuideProbe.PWFS2.some
+      case (ObservingModeType.GmosNorthIfu | ObservingModeType.GmosSouthIfu, TrackType.Sidereal) =>
+        GuideProbe.GmosOIWFS.some
       case (ObservingModeType.GmosNorthImaging | ObservingModeType.GmosSouthImaging, TrackType.Nonsidereal) =>
         GuideProbe.PWFS2.some
       case (ObservingModeType.GmosNorthImaging | ObservingModeType.GmosSouthImaging, TrackType.Sidereal) =>
