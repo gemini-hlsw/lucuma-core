@@ -22,6 +22,19 @@ val LongSlitHeight: Angle = 108000.mas
 
 val NodAndShuffleHeight: Angle = 108000.mas
 
+/**
+ * Height of an IFU lenslet field, the same for one slit and two: masking to one pseudo-slit halves
+ * the field across `p`, not along `q` (`GmosCommonType.IFU_FOV`).
+ */
+val IfuFieldHeight: Angle = 5000.mas
+
+/**
+ * Distance between the two IFU lenslet fields in the focal plane (`GmosCommonType.IFU_FOV_OFFSET`
+ * either side of the pointing). The telescope points so the target field lands on the base, which
+ * carries the sky field out to roughly this much in `p`.
+ */
+val IfuFieldSeparation: Angle = 60000.mas
+
 def gmosSlitWidthPixels(slitWidth: Angle, xBin: GmosXBinning): Quantity[BigDecimal, Pixels] =
   val widthArcSeconds = Angle.decimalArcseconds.get(slitWidth).arcsecs
   widthArcSeconds / (BigDecimal(xBin.count.value) * GmosPixelScale)

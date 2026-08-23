@@ -12,6 +12,8 @@ Global / concurrentRestrictions += Tags.limit(Tags.Compile, 1)
 
 ThisBuild / crossScalaVersions := Seq("3.8.4")
 ThisBuild / scalacOptions += "-language:implicitConversions" // TODO
+// Derivation for wide sums (Configuration.ObservingMode) exceeds the default budget of 32.
+ThisBuild / scalacOptions += "-Xmax-inlines:64"
 
 ThisBuild / Test / testOptions += Tests.Argument(TestFrameworks.MUnit, "--log=debug")
 

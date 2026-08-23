@@ -5,6 +5,7 @@ package lucuma.core.geom.gmos
 
 import lucuma.core.enums.GmosNorthFpu
 import lucuma.core.enums.GmosSouthFpu
+import lucuma.core.enums.Site
 import lucuma.core.geom.*
 import lucuma.core.geom.syntax.all.*
 import lucuma.core.math.Angle
@@ -69,6 +70,55 @@ trait GmosScienceAreaGeometry {
   object imagingMode:
     def shapeAt(posAngle: Angle, offsetPos: Offset): ShapeExpression =
       imaging.shapeAt(offsetPos, posAngle)
+
+  /**
+   * The lenslet field the target falls in. The IFU also has a dedicated sky field, half as wide and
+   * 60" away, but it is deliberately not part of this shape: the science area says where the target
+   * may sit, and including a field an arcminute off would inflate every radius derived from it.
+   */
+  def ifuFov(fieldWidth: Angle): ShapeExpression =
+    ShapeExpression.centeredRectangle(fieldWidth, IfuFieldHeight)
+
+  /**
+   * The sky lenslet field, half as wide as the target field because one pseudo-slit samples half of
+   * each. It does not sit on the base: see [[ifuSkyOffset]].
+   */
+  def ifuSkyFov(fieldWidth: Angle, site: Site): ShapeExpression =
+    ShapeExpression.centeredRectangle(ifuSkyFieldWidth(fieldWidth), IfuFieldHeight) ↗
+      ifuSkyOffset(fieldWidth, site)
+
+  def ifuSkyFieldWidth(fieldWidth: Angle): Angle =
+    fieldWidth.bisect
+
+  /**
+   * Where the sky field lands once the target field is centred on the base. The two fields are a
+   * fixed [[IfuFieldSeparation]] apart, so re-centring shifts the sky field by the difference of the
+   * two half-widths on top of that. South mirrors it about the base, North does not, which is the
+   * `OT-10` flip in OCS `GmosScienceAreaGeometry.ifuFOV`.
+   */
+  def ifuSkyOffset(fieldWidth: Angle, site: Site): Offset =
+    val p = IfuFieldSeparation + fieldWidth.bisect - ifuSkyFieldWidth(fieldWidth).bisect
+    (site match
+      case Site.GN => -p
+      case Site.GS => p
+    ).offsetInP
+
+  object ifuMode:
+    def shapeAt(
+      posAngle:   Angle,
+      offsetPos:  Offset,
+      fieldWidth: Angle
+    ): ShapeExpression =
+      ifuFov(fieldWidth).shapeAt(offsetPos, posAngle)
+
+    /** The sky field, drawn separately so it can be labelled: it is nowhere near the base. */
+    def skyShapeAt(
+      posAngle:   Angle,
+      offsetPos:  Offset,
+      fieldWidth: Angle,
+      site:       Site
+    ): ShapeExpression =
+      ifuSkyFov(fieldWidth, site).shapeAt(offsetPos, posAngle)
 
   object longSlitMode:
     def shapeAt(
