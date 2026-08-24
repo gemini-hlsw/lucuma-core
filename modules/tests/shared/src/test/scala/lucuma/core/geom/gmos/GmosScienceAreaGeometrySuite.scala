@@ -6,24 +6,15 @@ package lucuma.core.geom.gmos
 import lucuma.core.enums.GmosNorthIfuFpu
 import lucuma.core.enums.GmosSouthIfuFpu
 import lucuma.core.enums.Site
-import lucuma.core.geom.ShapeExpression
+import lucuma.core.geom.ScienceAreaGeometrySuite
 import lucuma.core.geom.jts.interpreter.given
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 
-class GmosScienceAreaGeometrySuite extends munit.FunSuite:
-
-  private def sides(shape: ShapeExpression): (Angle, Angle) =
-    val b = shape.eval.boundingOffsets
-    (b.topLeft.p.toAngle.difference(b.bottomRight.p.toAngle),
-     b.topLeft.q.toAngle.difference(b.bottomRight.q.toAngle)
-    )
+class GmosScienceAreaGeometrySuite extends ScienceAreaGeometrySuite:
 
   private def ifuSides(fieldWidth: Angle): (Angle, Angle) =
     sides(scienceArea.ifuMode.shapeAt(Angle.Angle0, Offset.Zero, fieldWidth))
-
-  private def assertCloseArcsec(actual: Angle, expectedArcsec: Double): Unit =
-    assertEqualsDouble(actual.toSignedDoubleDegrees * 3600.0, expectedArcsec, 0.01)
 
   // GmosCommonType.IFU_FOV: the target lenslet field is 7" x 5"; masking to one
   // pseudo-slit halves it across p, leaving 3.5" x 5".

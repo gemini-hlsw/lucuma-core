@@ -87,7 +87,7 @@ trait GmosScienceAreaGeometry {
     ShapeExpression.centeredRectangle(ifuSkyFieldWidth(fieldWidth), IfuFieldHeight) ↗
       ifuSkyOffset(fieldWidth, site)
 
-  def ifuSkyFieldWidth(fieldWidth: Angle): Angle =
+  inline def ifuSkyFieldWidth(fieldWidth: Angle): Angle =
     fieldWidth.bisect
 
   /**
