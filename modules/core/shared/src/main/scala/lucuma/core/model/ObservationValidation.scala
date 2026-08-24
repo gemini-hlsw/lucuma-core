@@ -34,5 +34,3 @@ object ObservationValidation:
     fromMsgs(ConfigurationRequestPending, ConfigurationRequestPending.description)
   def tooActivationUnapproved(msg: String, moreMsgs: String*): ObservationValidation =
     fromMsgs(TooActivationUnapproved, msg, moreMsgs*)
-  def genericWarning(msg: String, moreMsgs: String*): ObservationValidation =
-    fromMsgs(GenericWarning, msg, moreMsgs*)
