@@ -70,3 +70,12 @@ enum AttachmentType(
         false,
         Set("sed".refined, "txt".refined, "dat".refined)
       )
+  case Summary
+      extends AttachmentType(
+        "summary",
+        AttachmentPurpose.Proposal,
+        "Proposal Summary",
+        "Proposal Summary",
+        true,
+        Set("pdf".refined)
+      )
