@@ -9,11 +9,11 @@ import eu.timepit.refined.types.numeric.PosDouble
 import lucuma.core.enums.GmosAmpCount
 import lucuma.core.enums.GmosAmpGain
 import lucuma.core.enums.GmosAmpReadMode
-import lucuma.core.enums.GmosSlitOffsetPreset
 import lucuma.core.enums.GmosNorthDetector
 import lucuma.core.enums.GmosNorthFpu
 import lucuma.core.enums.GmosNorthGrating
 import lucuma.core.enums.GmosRoi
+import lucuma.core.enums.GmosSlitOffsetPreset
 import lucuma.core.enums.GmosSouthDetector
 import lucuma.core.enums.GmosSouthFpu
 import lucuma.core.enums.GmosSouthGrating
