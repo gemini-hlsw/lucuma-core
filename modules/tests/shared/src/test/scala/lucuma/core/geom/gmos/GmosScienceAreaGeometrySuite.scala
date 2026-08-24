@@ -33,8 +33,9 @@ class GmosScienceAreaGeometrySuite extends munit.FunSuite:
       assertCloseArcsec(p, 7.0)
       assertCloseArcsec(q, 5.0)
 
-  test("one-slit IFU science area is half the target field (3.5\" x 5\")"):
-    List(GmosNorthIfuFpu.OneSlit.fieldWidth, GmosSouthIfuFpu.OneSlit.fieldWidth).foreach: w =>
+  test("either one-slit IFU science area is half the target field (3.5\" x 5\")"):
+    List(GmosNorthIfuFpu.OneSlitRed.fieldWidth,  GmosNorthIfuFpu.OneSlitBlue.fieldWidth,
+         GmosSouthIfuFpu.OneSlitRed.fieldWidth,  GmosSouthIfuFpu.OneSlitBlue.fieldWidth).foreach: w =>
       val (p, q) = ifuSides(w)
       assertCloseArcsec(p, 3.5)
       assertCloseArcsec(q, 5.0)
@@ -51,7 +52,7 @@ class GmosScienceAreaGeometrySuite extends munit.FunSuite:
     val (p2, q2) = skySides(GmosNorthIfuFpu.TwoSlits.fieldWidth, Site.GN)
     assertCloseArcsec(p2, 3.5)
     assertCloseArcsec(q2, 5.0)
-    val (p1, q1) = skySides(GmosNorthIfuFpu.OneSlit.fieldWidth, Site.GN)
+    val (p1, q1) = skySides(GmosNorthIfuFpu.OneSlitRed.fieldWidth, Site.GN)
     assertCloseArcsec(p1, 1.75)
     assertCloseArcsec(q1, 5.0)
 
@@ -62,5 +63,5 @@ class GmosScienceAreaGeometrySuite extends munit.FunSuite:
     assertEqualsDouble(skyCentreArcsecP(GmosSouthIfuFpu.TwoSlits.fieldWidth, Site.GS), 61.75, 0.01)
 
   test("one-slit sky field shifts in with the narrower fields"):
-    assertEqualsDouble(skyCentreArcsecP(GmosNorthIfuFpu.OneSlit.fieldWidth, Site.GN), -60.875, 0.01)
-    assertEqualsDouble(skyCentreArcsecP(GmosSouthIfuFpu.OneSlit.fieldWidth, Site.GS), 60.875, 0.01)
+    assertEqualsDouble(skyCentreArcsecP(GmosNorthIfuFpu.OneSlitRed.fieldWidth, Site.GN), -60.875, 0.01)
+    assertEqualsDouble(skyCentreArcsecP(GmosSouthIfuFpu.OneSlitRed.fieldWidth, Site.GS), 60.875, 0.01)
