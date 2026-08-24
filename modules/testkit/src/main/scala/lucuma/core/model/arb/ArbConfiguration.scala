@@ -7,8 +7,10 @@ package arb
 import lucuma.core.enums.Flamingos2Disperser
 import lucuma.core.enums.GmosNorthFilter
 import lucuma.core.enums.GmosNorthGrating
+import lucuma.core.enums.GmosNorthIfuFpu
 import lucuma.core.enums.GmosSouthFilter
 import lucuma.core.enums.GmosSouthGrating
+import lucuma.core.enums.GmosSouthIfuFpu
 import lucuma.core.enums.GnirsCamera
 import lucuma.core.enums.GnirsFpuIfu
 import lucuma.core.enums.GnirsGrating
@@ -65,6 +67,26 @@ trait ArbConfiguration:
 
   given Cogen[ObservingMode.GmosNorthMos] =
     Cogen[GmosNorthGrating].contramap(_.grating)
+
+  given Arbitrary[ObservingMode.GmosNorthIfu] =
+    Arbitrary:
+      for
+        g <- arbitrary[GmosNorthGrating]
+        u <- arbitrary[GmosNorthIfuFpu]
+      yield ObservingMode.GmosNorthIfu(g, u)
+
+  given Cogen[ObservingMode.GmosNorthIfu] =
+    Cogen[(GmosNorthGrating, GmosNorthIfuFpu)].contramap(m => (m.grating, m.fpu))
+
+  given Arbitrary[ObservingMode.GmosSouthIfu] =
+    Arbitrary:
+      for
+        g <- arbitrary[GmosSouthGrating]
+        u <- arbitrary[GmosSouthIfuFpu]
+      yield ObservingMode.GmosSouthIfu(g, u)
+
+  given Cogen[ObservingMode.GmosSouthIfu] =
+    Cogen[(GmosSouthGrating, GmosSouthIfuFpu)].contramap(m => (m.grating, m.fpu))
 
   given Arbitrary[ObservingMode.GmosSouthLongSlit] =
     Arbitrary:
@@ -157,6 +179,8 @@ trait ArbConfiguration:
         arbitrary[ObservingMode.GmosSouthImaging],
         arbitrary[ObservingMode.GmosSouthLongSlit],
         arbitrary[ObservingMode.GmosSouthMos],
+        arbitrary[ObservingMode.GmosNorthIfu],
+        arbitrary[ObservingMode.GmosSouthIfu],
         arbitrary[ObservingMode.Igrins2LongSlit.type],
         arbitrary[ObservingMode.GnirsLongSlit],
         arbitrary[ObservingMode.GnirsIfu],
@@ -178,6 +202,8 @@ trait ArbConfiguration:
         case m: ObservingMode.GmosSouthImaging     => perturb(s, m)
         case m: ObservingMode.GmosSouthLongSlit    => perturb(s, m)
         case m: ObservingMode.GmosSouthMos         => perturb(s, m)
+        case m: ObservingMode.GmosNorthIfu         => perturb(s, m)
+        case m: ObservingMode.GmosSouthIfu         => perturb(s, m)
         case m: ObservingMode.Igrins2LongSlit.type => perturb(s, m)
         case m: ObservingMode.GnirsLongSlit        => perturb(s, m)
         case m: ObservingMode.GnirsIfu             => perturb(s, m)

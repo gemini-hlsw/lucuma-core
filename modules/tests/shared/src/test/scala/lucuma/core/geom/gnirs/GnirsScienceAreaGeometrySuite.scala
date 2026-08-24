@@ -6,18 +6,11 @@ package lucuma.core.geom.gnirs
 import lucuma.core.enums.GnirsCamera
 import lucuma.core.enums.GnirsFilter
 import lucuma.core.enums.GnirsFpuIfu
-import lucuma.core.geom.ShapeExpression
-import lucuma.core.geom.jts.interpreter.given
+import lucuma.core.geom.ScienceAreaGeometrySuite
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 
-class GnirsScienceAreaGeometrySuite extends munit.FunSuite:
-
-  private def sides(shape: ShapeExpression): (Angle, Angle) =
-    val b = shape.eval.boundingOffsets
-    (b.topLeft.p.toAngle.difference(b.bottomRight.p.toAngle),
-     b.topLeft.q.toAngle.difference(b.bottomRight.q.toAngle)
-    )
+class GnirsScienceAreaGeometrySuite extends ScienceAreaGeometrySuite:
 
   // Bounding-box side lengths (p, q) of the imaging science area at PA 0, no offset.
   private def imagingSides(camera: GnirsCamera, filter: GnirsFilter): (Angle, Angle) =
@@ -25,9 +18,6 @@ class GnirsScienceAreaGeometrySuite extends munit.FunSuite:
 
   private def ifuSides(ifu: GnirsFpuIfu): (Angle, Angle) =
     sides(scienceArea.ifuShapeAt(Angle.Angle0, Offset.Zero, ifu))
-
-  private def assertCloseArcsec(actual: Angle, expectedArcsec: Double): Unit =
-    assertEqualsDouble(actual.toSignedDoubleDegrees * 3600.0, expectedArcsec, 0.01)
 
   // Order4 (H) is a keyhole filter; the bar runs the full no-XD slit length along q, and
   // the cap bumps out 10" along p, so the bounding box is (p = 10 + 10) x (q = slit length).
