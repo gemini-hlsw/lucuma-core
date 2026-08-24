@@ -7,7 +7,6 @@ import lucuma.core.util.Enumerated
 
 import ObservationValidationCode.Severity
 import ObservationValidationCode.Severity.Fatal
-import ObservationValidationCode.Severity.Nonfatal
 
 enum ObservationValidationCode(
   val tag: String,
@@ -52,13 +51,6 @@ enum ObservationValidationCode(
       "ToO Activation Unapproved",
       ObservationValidationCode.TooActivationMsg.ExceedsCeiling,
       Fatal
-    )
-  case GenericWarning
-    extends ObservationValidationCode(
-      "generic_warning",
-      "Warning",
-      "A warning was issued.",
-      Nonfatal
     )
 
 object ObservationValidationCode:
