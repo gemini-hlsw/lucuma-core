@@ -43,7 +43,7 @@ enum GmosSlitOffsetPreset(
   val description: String
 ) extends SlitOffsetPreset derives Enumerated, Display:
   case NodAlongSlit extends GmosSlitOffsetPreset("nod_along_slit", "Nod along slit")
-  case NodToSky     extends GmosSlitOffsetPreset("nod_to_sky",     "Nod to sky")
+  case NoOffsets    extends GmosSlitOffsetPreset("no_offsets",     "No Offsets")
 
 /**
  * Enumerated type for the GNIRS slit offset presets.
