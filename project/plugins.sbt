@@ -1,1 +1,2 @@
-addSbtPlugin("edu.gemini"         % "sbt-lucuma-lib" % "0.14.13")
+addSbtPlugin("edu.gemini"         % "sbt-lucuma-lib" % "0.14.20")
+addSbtPlugin("pl.project13.scala" % "sbt-jmh"        % "0.4.7")

@@ -12,7 +12,6 @@ import cats.syntax.all.*
 import lucuma.core.math.Coordinates.centerOf
 import lucuma.core.math.arb.*
 import lucuma.core.optics.laws.discipline.*
-import lucuma.core.tests.ScalaCheckFlaky
 import monocle.law.discipline.*
 import org.scalacheck.Prop.*
 
@@ -125,20 +124,27 @@ final class CoordinatesSuite extends munit.DisciplineSuite {
 
   test(
     "interpolate should be consistent with fractional angular separation, to within 20 µas"
-      .tag(ScalaCheckFlaky)
   ) {
     val µas180 = Angle.Angle180.toMicroarcseconds
     val µas360 = µas180 * 2L
+    // Great-circle (slerp) interpolation is ill-conditioned for near-antipodal points:
+    // sin(δ) -> 0 in sin((1-f)δ)/sin(δ), so  error grows without as the separation approaches 180°
+    // Let's skip pairs within 1° of antipodal
+    val minGapµas = Angle.fromDoubleDegrees(1.0).toMicroarcseconds
 
     forAll { (c1: Coordinates, c2: Coordinates) =>
-      val sep = c1.angularDistance(c2)
-      val Δs  = (Range.BigDecimal(-1.0, 2.0, 0.1)).map { f =>
-        val stepSep  = c1.interpolate(c2, f.toDouble).angularDistance(c1).toMicroarcseconds
-        val fracSep  = (sep.toMicroarcseconds * f.abs).toLong
-        val fracSepʹ = if (fracSep <= µas180) fracSep else µas360 - fracSep
-        (stepSep - fracSepʹ).abs
+      val sep           = c1.angularDistance(c2)
+      val nearAntipodal = (µas180 - sep.toMicroarcseconds).abs < minGapµas
+      // Skip test cases very close to 180
+      !nearAntipodal ==> {
+        val Δs = (Range.BigDecimal(-1.0, 2.0, 0.1)).map { f =>
+          val stepSep  = c1.interpolate(c2, f.toDouble).angularDistance(c1).toMicroarcseconds
+          val fracSep  = (sep.toMicroarcseconds * f.abs).toLong
+          val fracSepʹ = if (fracSep <= µas180) fracSep else µas360 - fracSep
+          (stepSep - fracSepʹ).abs
+        }
+        assert(Δs.max <= 55L)
       }
-      assert(Δs.filter(_ > 55L).isEmpty)
     }
 
   }

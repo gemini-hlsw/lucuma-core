@@ -10,8 +10,6 @@ import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.enums.GnirsCamera
 import lucuma.core.enums.GnirsDecker
 import lucuma.core.enums.GnirsFilter
-import lucuma.core.enums.GnirsFpuOther
-import lucuma.core.enums.GnirsFpuSlit
 import lucuma.core.enums.GnirsReadMode
 import lucuma.core.math.Wavelength
 import lucuma.core.util.TimeSpan
@@ -21,15 +19,18 @@ import monocle.Lens
 final case class GnirsDynamicConfig(
   exposure:          TimeSpan,
   coadds:            PosInt,
-  centralWavelength: Wavelength,
   filter:            GnirsFilter,
   decker:            GnirsDecker,
-  fpu:               Either[GnirsFpuSlit, GnirsFpuOther],
+  fpu:               GnirsFpu,
   acquisitionMirror: GnirsAcquisitionMirrorMode,
   camera:            GnirsCamera,
   focus:             GnirsFocus,
   readMode:          GnirsReadMode
-) derives Eq
+) derives Eq:
+  val centralWavelength: Wavelength =
+    acquisitionMirror match
+      case GnirsAcquisitionMirrorMode.In => filter.centralWavelength
+      case GnirsAcquisitionMirrorMode.Out(_, _, gratingWavelength) => gratingWavelength.value
 
 object GnirsDynamicConfig:
   val exposure: Lens[GnirsDynamicConfig, TimeSpan] =
@@ -38,16 +39,13 @@ object GnirsDynamicConfig:
   val coadds: Lens[GnirsDynamicConfig, PosInt] =
     Focus[GnirsDynamicConfig](_.coadds)
 
-  val centralWavelength: Lens[GnirsDynamicConfig, Wavelength] =
-    Focus[GnirsDynamicConfig](_.centralWavelength)
-
   val filter: Lens[GnirsDynamicConfig, GnirsFilter] =
     Focus[GnirsDynamicConfig](_.filter)
 
   val decker: Lens[GnirsDynamicConfig, GnirsDecker] =
     Focus[GnirsDynamicConfig](_.decker)
 
-  val fpu: Lens[GnirsDynamicConfig, Either[GnirsFpuSlit, GnirsFpuOther]] =
+  val fpu: Lens[GnirsDynamicConfig, GnirsFpu] =
     Focus[GnirsDynamicConfig](_.fpu)
 
   val acquisitionMirror: Lens[GnirsDynamicConfig, GnirsAcquisitionMirrorMode] =

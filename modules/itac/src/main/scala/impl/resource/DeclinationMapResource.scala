@@ -13,7 +13,7 @@ import edu.gemini.tac.qengine.log.RejectTarget
 import edu.gemini.tac.qengine.p1.ItacTarget
 import edu.gemini.tac.qengine.util.BoundedTime
 import lucuma.core.enums.ScienceBand
-import lucuma.core.enums.ToOActivation
+import lucuma.core.enums.TooActivation
 import lucuma.core.math.Declination
 import lucuma.core.model.IntCentiPercent
 import lucuma.core.util.TimeSpan
@@ -75,7 +75,7 @@ final case class DeclinationMapResource(val bins: DeclinationMap[BoundedTime]) e
 
   override def reserve(block: Block, queue: ProposalQueueBuilder): RejectMessage Either DeclinationMapResource =
     block.prop.too match {
-      case ToOActivation.None => reserveNormal(block, queue.band)
+      case TooActivation.None => reserveNormal(block, queue.band)
       case _ => reserveToo(block, queue.band)
     }
 

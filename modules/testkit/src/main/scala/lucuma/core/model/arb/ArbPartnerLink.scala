@@ -4,6 +4,7 @@
 package lucuma.core.model
 package arb
 
+import lucuma.core.enums.ExchangePartner
 import lucuma.core.enums.Partner
 import lucuma.core.enums.PartnerLinkType
 import lucuma.core.util.arb.ArbEnumerated
@@ -12,33 +13,38 @@ import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen.const
 
 
-trait ArbPartnerLink {
+trait ArbPartnerLink:
 
   import ArbEnumerated.given
 
-  given Arbitrary[PartnerLink.HasPartner] =
-    Arbitrary {
-      arbitrary[Partner].map(PartnerLink.HasPartner.apply)
-    }
+  given Arbitrary[PartnerLink.HasGeminiPartner] =
+    Arbitrary:
+      arbitrary[Partner].map(PartnerLink.HasGeminiPartner.apply)
 
-  given Cogen[PartnerLink.HasPartner] =
+  given Cogen[PartnerLink.HasGeminiPartner] =
     Cogen[Partner].contramap(_.partner)
 
+  given Arbitrary[PartnerLink.HasExchangePartner] =
+    Arbitrary:
+      arbitrary[ExchangePartner].map(PartnerLink.HasExchangePartner.apply)
+
+  given Cogen[PartnerLink.HasExchangePartner] =
+    Cogen[ExchangePartner].contramap(_.partner)
+
   given Arbitrary[PartnerLink] =
-    Arbitrary {
+    Arbitrary:
       Gen.oneOf(
-        arbitrary[PartnerLink.HasPartner],
+        arbitrary[PartnerLink.HasGeminiPartner],
+        arbitrary[PartnerLink.HasExchangePartner],
         const(PartnerLink.HasNonPartner),
         const(PartnerLink.HasUnspecifiedPartner)
       )
-    }
 
   given Cogen[PartnerLink] =
-    Cogen[(PartnerLinkType, Option[Partner])].contramap { a => (
+    Cogen[(PartnerLinkType, Option[Partner], Option[ExchangePartner])].contramap { a => (
       a.linkType,
-      a.partnerOption
+      a.geminiPartnerOption,
+      a.exchangePartnerOption
     )}
-
-}
 
 object ArbPartnerLink extends ArbPartnerLink

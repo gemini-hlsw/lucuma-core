@@ -15,10 +15,20 @@ enum ProgramType(val tag: String, val abbreviation: String) derives Enumerated:
   case Commissioning extends ProgramType("commissioning", "COM")
   case Engineering   extends ProgramType("engineering",   "ENG")
   case Example       extends ProgramType("example",       "XPL")
+  case Keck          extends ProgramType("keck",          "KCK")
   case Library       extends ProgramType("library",       "LIB")
   case Monitoring    extends ProgramType("monitoring",    "MON")
   case Science       extends ProgramType("science",       "SCI")
+  case Subaru        extends ProgramType("subaru",        "SUB")
   case System        extends ProgramType("system",        "SYS")
+
+  /**
+   * True for program types that carry a proposal: Gemini science and the Keck
+   * and Subaru time-exchange types.
+   */
+  def hasProposal: Boolean = this match
+    case Science | Keck | Subaru => true
+    case _                       => false
 
 object ProgramType {
 

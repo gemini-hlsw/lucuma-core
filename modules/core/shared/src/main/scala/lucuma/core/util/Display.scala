@@ -13,10 +13,9 @@ import scala.quoted.*
  * Typeclass for things that can be shown in a user interface.
  * @group Typeclasses
  */
-trait Display[A] {
+trait Display[A]:
   def shortName(a: A): String
   def longName(a: A): String = shortName(a)
-}
 
 object Display:
   def apply[A](using ev: Display[A]): ev.type = ev
@@ -30,10 +29,9 @@ object Display:
    *   function that maps `A` to the longName
    */
   def by[A](toShortName: A => String, toLongName: A => String): Display[A] =
-    new Display[A] {
+    new Display[A]:
       def shortName(a: A)         = toShortName(a)
       override def longName(a: A) = toLongName(a)
-    }
 
   /**
    * Create an instance of `Display` using the provided function for the shortName. The longName
@@ -43,9 +41,8 @@ object Display:
    *   function that maps A to the shortName
    */
   def byShortName[A](toShortName: A => String): Display[A] =
-    new Display[A] {
+    new Display[A]:
       def shortName(a: A) = toShortName(a)
-    }
 
   given Contravariant[Display] = new Contravariant[Display] {
     def contramap[A, B](fa: Display[A])(f: B => A): Display[B] =
@@ -67,9 +64,44 @@ object Display:
     import quotes.reflect.*
     Select.unique(x.asTerm, "longName").asExprOf[String]
 
+  private def nameImpl[E](x: Expr[E])(using Quotes): Expr[String] =
+    import quotes.reflect.*
+    Select.unique(x.asTerm, "name").asExprOf[String]
+
+  private def descriptionImpl[E](x: Expr[E])(using Quotes): Expr[String] =
+    import quotes.reflect.*
+    Select.unique(x.asTerm, "description").asExprOf[String]
+
   private def displayImpl[E: Type](using Quotes): Expr[Display[E]] =
-    '{
-      Display.by[E](x => ${ shortNameImpl[E]('x) }, x => ${ longNameImpl[E]('x) })
-    }
+    import quotes.reflect.*
+    val typeSymbol: Symbol = TypeRepr.of[E].typeSymbol
+    val shortNameField: Symbol = typeSymbol.declaredField("shortName")
+    val longNameField: Symbol = typeSymbol.declaredField("longName")
+    val nameField: Symbol = typeSymbol.declaredField("name")
+    val descriptionField: Symbol = typeSymbol.declaredField("description")
+
+    // If shortName and longName fields are present, use them ...
+    if shortNameField != Symbol.noSymbol && longNameField != Symbol.noSymbol then
+      '{
+        Display.by[E](x => ${ shortNameImpl[E]('x) }, x => ${ longNameImpl[E]('x) })
+      }
+    // ... otherwise, if name and description fields are present, use them...
+    else if nameField != Symbol.noSymbol && descriptionField != Symbol.noSymbol then
+      '{
+        Display.by[E](x => ${ nameImpl[E]('x) }, x => ${ descriptionImpl[E]('x) })
+      }
+    // ... otherwise, if only name field is present, use it for both shortName and longName...
+    else if nameField != Symbol.noSymbol then
+      '{
+        Display.byShortName[E](x => ${ nameImpl[E]('x) })
+      }
+    // ... and finally, if only description field is present, use it for both shortName and longName...
+    else if descriptionField != Symbol.noSymbol then
+      '{
+        Display.byShortName[E](x => ${ descriptionImpl[E]('x) })
+      }
+    // ... otherwise, fail with an error message.
+    else
+        report.errorAndAbort(s"Could not find a valid combination of 'shortName', 'longName', 'name', 'description' fields for type ${Type.show[E]}.")
 
   inline def derived[E]: Display[E] = ${ displayImpl[E] }

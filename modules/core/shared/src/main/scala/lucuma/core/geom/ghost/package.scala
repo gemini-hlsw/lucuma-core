@@ -18,6 +18,11 @@ val IFUSeparation: Angle = Angle.fromBigDecimalArcseconds(GhostPlateScale.value)
 // 2 mm separation used for HR sky fiber and IFU boundary offsets
 val HRFiberOffset: Angle = IFUSeparation + IFUSeparation
 
+/**
+ * The closest that the two IFU arms may be.
+ */
+val MinimumIfuArmSeparation: Angle = Angle.fromBigDecimalArcseconds(102)
+
 object all
   extends GhostScienceAreaGeometry
   with GhostIfuPatrolField

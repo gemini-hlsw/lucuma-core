@@ -6,9 +6,7 @@ package lucuma.core.enums
 import lucuma.core.util.Enumerated
 
 enum PartnerLinkType(val tag: String) derives Enumerated:
-
-  case HasPartner            extends PartnerLinkType("has_partner")
+  case HasGeminiPartner      extends PartnerLinkType("has_gemini_partner")
+  case HasExchangePartner    extends PartnerLinkType("has_exchange_partner")
   case HasNonPartner         extends PartnerLinkType("has_non_partner")
   case HasUnspecifiedPartner extends PartnerLinkType("has_unspecified_partner")
-
-end PartnerLinkType

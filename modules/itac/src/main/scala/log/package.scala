@@ -6,7 +6,8 @@ package edu.gemini.tac.qengine
 import lucuma.core.enums.ScienceBand
 import lucuma.core.util.TimeSpan
 
-import p1.{ItacObservation, ProposalShard}
+import p1.ItacObservation
+import edu.gemini.tac.qengine.p1.ProposalShard
 
 package object log {
   def rejectConditions(p: ProposalShard, o: ItacObservation, b: ScienceBand, c: TimeSpan, m: TimeSpan) = RejectConditions(p, o, b, c, m)

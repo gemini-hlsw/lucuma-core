@@ -3,11 +3,16 @@
 
 package lucuma.core.model.sequence.igrins2
 
+import cats.data.NonEmptyList
 import lucuma.core.enums.Igrins2FowlerSamples
-import lucuma.core.enums.Igrins2OffsetMode
+import lucuma.core.enums.Igrins2SlitOffsetPreset
+import lucuma.core.enums.StepGuideState
 import lucuma.core.math.Offset
 import lucuma.core.math.Wavelength
 import lucuma.core.math.syntax.bigDecimal.*
+import lucuma.core.model.SlitTelescopeConfigs
+import lucuma.core.model.sequence.TelescopeConfig
+import lucuma.core.model.sequence.TelescopeConfigAlongSlit
 import lucuma.core.syntax.timespan.*
 import lucuma.core.util.NewBoolean
 import lucuma.core.util.TimeSpan
@@ -29,6 +34,9 @@ val MaxExposureTime: TimeSpan = 600.secTimeSpan
 val WavelengthCoverageLowerBound: Wavelength = Wavelength.fromIntNanometers(1490).get
 val WavelengthCoverageUpperBound: Wavelength = Wavelength.fromIntNanometers(2460).get
 
+val SvcMinExposureTime: TimeSpan = 1630.msTimeSpan
+val SvcDefaultExposure: TimeSpan = MinExposureTime
+
 // Updated from OCS values
 val CentralWavelength: Wavelength = Wavelength.fromIntNanometers(2100).get
 
@@ -39,24 +47,28 @@ def fowlerSamplesForExposureTime(exposure: TimeSpan): Igrins2FowlerSamples =
     .find(fs => nFowler >= (1 << fs.ordinal))
     .getOrElse(Igrins2FowlerSamples.One)
 
-val NodAlongSlitDefaultOffsets: List[Offset] =
-  List(
-    Offset.Zero.copy(q = -1.25.qArcsec),
-    Offset.Zero.copy(q =  1.25.qArcsec),
-    Offset.Zero.copy(q =  1.25.qArcsec),
-    Offset.Zero.copy(q = -1.25.qArcsec),
+val NodAlongSlitDefaultTelescopeConfigs: NonEmptyList[TelescopeConfigAlongSlit] =
+  NonEmptyList.of(
+    TelescopeConfigAlongSlit(-1.25.qArcsec, StepGuideState.Enabled),
+    TelescopeConfigAlongSlit( 1.25.qArcsec, StepGuideState.Enabled),
+    TelescopeConfigAlongSlit( 1.25.qArcsec, StepGuideState.Enabled),
+    TelescopeConfigAlongSlit(-1.25.qArcsec, StepGuideState.Enabled),
   )
 
-val DefaultSpatialOffsets: List[Offset] = NodAlongSlitDefaultOffsets
-
-val NodToSkyDefaultOffsets: List[Offset] =
-  List(
-    Offset.Zero,
-    Offset(10.pArcsec, 10.qArcsec),
-    Offset.Zero,
+val NodToSkyDefaultTelescopeConfigs: NonEmptyList[TelescopeConfig] =
+  NonEmptyList.of(
+    TelescopeConfig(Offset.Zero, StepGuideState.Enabled),
+    TelescopeConfig(Offset(10.pArcsec, 10.qArcsec), StepGuideState.Disabled),
+    TelescopeConfig(Offset.Zero, StepGuideState.Enabled),
   )
 
-def defaultOffsetsFor(mode: Igrins2OffsetMode): List[Offset] =
-  mode match
-    case Igrins2OffsetMode.NodAlongSlit => NodAlongSlitDefaultOffsets
-    case Igrins2OffsetMode.NodToSky     => NodToSkyDefaultOffsets
+def defaultSlitTelescopeConfigs(preset: Igrins2SlitOffsetPreset): SlitTelescopeConfigs =
+  preset match
+    case Igrins2SlitOffsetPreset.NodAlongSlit => SlitTelescopeConfigs.AlongSlit(NodAlongSlitDefaultTelescopeConfigs)
+    case Igrins2SlitOffsetPreset.NodToSky     => SlitTelescopeConfigs.ToSky(NodToSkyDefaultTelescopeConfigs)
+
+val SvcDefaultTelescopeConfigs: NonEmptyList[TelescopeConfig] =
+  NonEmptyList.of(
+    TelescopeConfig(Offset.Zero,                  StepGuideState.Enabled),
+    TelescopeConfig(Offset(5.pArcsec, 0.qArcsec), StepGuideState.Enabled)
+  )

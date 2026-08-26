@@ -11,7 +11,7 @@ import lucuma.core.model.Ephemeris
 
 import java.time.Instant
 
-import HorizonsConstants. { Ephemeris as MkEphemeris, * }
+import HorizonsConstants.{ Ephemeris as MkEphemeris, * }
 
 private[horizons] abstract class AbstractHorizonsClient[F[_]: Temporal] extends HorizonsClient[F]:
 

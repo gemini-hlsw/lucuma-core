@@ -5,9 +5,8 @@ package lucuma.core.model.sequence.gmos
 
 import cats.Eq
 import cats.syntax.all.*
-import eu.timepit.refined.cats.*
-import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.core.enums.GmosCustomSlitWidth
+import lucuma.core.model.MaskDefinition
 import monocle.Focus
 import monocle.Iso
 import monocle.Lens
@@ -37,8 +36,8 @@ sealed trait GmosFpuMask[+T] {
   def custom: Option[Custom] =
     fold(_ => none, _.some)
 
-  def customFilename: Option[NonEmptyString] =
-    custom.map(_.filename)
+  def customMaskDefinition: Option[MaskDefinition] =
+    custom.map(_.mask)
 
   def customSlitWidth: Option[GmosCustomSlitWidth] =
     custom.map(_.slitWidth)
@@ -58,14 +57,14 @@ object GmosFpuMask {
       Iso[Builtin[T], T](_.value)(Builtin.apply)
   }
 
-  final case class Custom(filename: NonEmptyString, slitWidth: GmosCustomSlitWidth) extends GmosFpuMask[Nothing]
+  final case class Custom(mask: MaskDefinition, slitWidth: GmosCustomSlitWidth) extends GmosFpuMask[Nothing]
 
   object Custom {
-    given Eq[Custom] = Eq.by(x => (x.filename, x.slitWidth))
+    given Eq[Custom] = Eq.by(x => (x.mask, x.slitWidth))
 
     /** @group Optics */
-    val filename: Lens[Custom, NonEmptyString] =
-      Focus[Custom](_.filename)
+    val maskDefinition: Lens[Custom, MaskDefinition] =
+      Focus[Custom](_.mask)
 
     /** @group Optics */
     val slitWidth: Lens[Custom, GmosCustomSlitWidth] =

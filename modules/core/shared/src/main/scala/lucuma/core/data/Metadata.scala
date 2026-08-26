@@ -40,4 +40,4 @@ object Metadata:
           case Instrument.Gsaoi        => Availability.always(Site.GS)
           case Instrument.Scorpio      => Availability.always(Site.GS)
           case Instrument.VisitorSouth => Availability.always(Site.GS)        
-          case Instrument.Zorro        => Availability.always(Site.GS)        
+          case Instrument.Zorro        => Availability.always(Site.GS)

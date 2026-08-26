@@ -50,8 +50,8 @@ object AgsVisualization {
     noZoneOffsets.map: offset =>
       NoZoneShape(
         position = offset,
-        shape = ShapeExpression.centeredEllipse(params.scienceRadius,
-                                                params.scienceRadius
+        shape = ShapeExpression.centeredEllipse(params.scienceDiameter,
+                                                params.scienceDiameter
         ) ↗ offset.offsetPos ⟲ offset.posAngle
       )
 
@@ -94,8 +94,8 @@ object AgsVisualization {
 
     val scienceTargetArea =
       ShapeExpression
-        .centeredEllipse(params.scienceRadius,
-                         params.scienceRadius
+        .centeredEllipse(params.scienceDiameter,
+                         params.scienceDiameter
         ) ↗ position.offsetPos ⟲ position.posAngle
 
     val scienceArea = params.scienceArea(position.posAngle, position.offsetPos)

@@ -49,3 +49,6 @@ object all extends shapeexpression:
     def toDoubleArcseconds: (BigDecimal, BigDecimal) =
       (Angle.signedDecimalArcseconds.get(o.p.toAngle), Angle.signedDecimalArcseconds.get(o.q.toAngle))
 
+  extension (arcsec: Double)
+    def toArcsecondsAngle: Angle =
+      Angle.fromDoubleArcseconds(arcsec)

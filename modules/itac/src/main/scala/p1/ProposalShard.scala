@@ -9,7 +9,7 @@ import lucuma.core.data.Metadata
 import lucuma.core.enums.ScienceBand
 import lucuma.core.enums.Site
 import lucuma.core.enums.TimeAccountingCategory
-import lucuma.core.enums.ToOActivation
+import lucuma.core.enums.TooActivation
 import lucuma.core.model.Allocation
 import lucuma.core.model.ProposalReference
 import lucuma.core.model.ProposalType
@@ -36,8 +36,8 @@ class ProposalShard(
       site
     )
 
-  def too: ToOActivation =
-    ToOActivation.None // TODO
+  def too: TooActivation =
+    TooActivation.None // TODO
 
   /** 
    * Empty if the allocation is empty, otherwise all observations observable at `site`, scaled to

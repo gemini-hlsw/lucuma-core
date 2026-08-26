@@ -6,6 +6,7 @@ package lucuma.catalog.clients
 import cats.data.EitherNec
 import cats.data.NonEmptyChain
 import cats.effect.Concurrent
+import cats.effect.kernel.Resource
 import cats.syntax.all.*
 import fs2.RaiseThrowable
 import lucuma.catalog.CatalogTargetResult
@@ -22,6 +23,8 @@ import org.typelevel.log4cats.Logger
 import org.typelevel.log4cats.LoggerFactory
 import org.typelevel.log4cats.syntax.*
 import org.typelevel.otel4s.Attribute
+import org.typelevel.otel4s.trace.SpanFinalizer
+import org.typelevel.otel4s.trace.StatusCode
 import org.typelevel.otel4s.trace.Tracer
 
 import java.net.URLDecoder
@@ -32,6 +35,12 @@ class GaiaClientImpl[F[_]: {Concurrent, Tracer as T, LoggerFactory as LF}](
   adapters:   NonEmptyChain[CatalogAdapter.Gaia] = GaiaClient.DefaultAdapters
 ) extends GaiaClient[F] {
   private given Logger[F] = LF.getLoggerFromName("gaia-client")
+
+  // Catalog queries race multiple adapters and keep the fastest. A cancelled query is an
+  // expected outcome, not a failure.
+  private val racingSpanStrategy: SpanFinalizer.Strategy = { case Resource.ExitCase.Errored(e) =>
+    SpanFinalizer.recordException(e) |+| SpanFinalizer.setStatus(StatusCode.Error)
+  }
 
   /**
    * Request and parse data from Gaia.
@@ -81,7 +90,10 @@ class GaiaClientImpl[F[_]: {Concurrent, Tracer as T, LoggerFactory as LF}](
     val headers             = Headers(adapter.requestHeaders.map((x, y) => Header.Raw(x, y)).toList)
     val request: Request[F] = Request[F](Method.GET, modUri(queryUri), headers = headers)
 
-    T.span("query gaia", Attribute("adapter", adapter.adapterName))
+    T.spanBuilder("query gaia")
+      .withFinalizationStrategy(racingSpanStrategy)
+      .addAttribute(Attribute("adapter", adapter.adapterName))
+      .build
       .surround:
         info"Querying catalog: ${adapter.adapterName}, uri: ${URLDecoder.decode(queryUri.renderString, "UTF-8")}" *>
           info"curl ${headers.headers.map(h => s"-H '${h.name}: ${h.value}'").mkString(" ")} '${queryUri.renderString}'" *>

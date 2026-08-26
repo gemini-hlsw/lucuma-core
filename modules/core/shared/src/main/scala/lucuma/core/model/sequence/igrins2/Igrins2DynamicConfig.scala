@@ -7,6 +7,7 @@ import cats.Eq
 import cats.derived.*
 import lucuma.core.enums.Band
 import lucuma.core.enums.Igrins2FowlerSamples
+import lucuma.core.math.Wavelength
 import lucuma.core.util.TimeSpan
 import monocle.Focus
 import monocle.Lens
@@ -25,6 +26,8 @@ case class Igrins2DynamicConfig(
       case Band.H => fowlerSamples.hReadNoise
       case Band.K => fowlerSamples.kReadNoise
       case _      => fowlerSamples.hReadNoise
+
+  val centralWavelength: Wavelength = CentralWavelength
 
 object Igrins2DynamicConfig:
   /** @group Optics */

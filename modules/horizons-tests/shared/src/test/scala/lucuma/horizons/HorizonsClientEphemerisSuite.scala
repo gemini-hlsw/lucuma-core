@@ -44,12 +44,12 @@ class HorizonsClientEphemerisSuite extends HorizonsClientSuite:
       ).map(_.map(_.elements(site)))
 
   def testEphemerisPopulation(name: String, key: Ephemeris.Key.Horizons) =
-    test(s"Ensure ephemeris is populated for $site - $name (${key.keyType})"):
+    test(s"Ensure ephemeris is populated for $site - $name (${key.keyType})".flaky):
       assertIOBoolean:
         fetchEphemeris(key).map(e => (e.toOption.get.length - elems).abs < 3)
 
   def testEphemerisEmpty(key: Ephemeris.Key.Horizons) =
-    test(s"Ensure ephemeris is empty for $site - ${key.des} (${key.keyType})"):
+    test(s"Ensure ephemeris is empty for $site - ${key.des} (${key.keyType})".flaky):
       assertIOBoolean:
         fetchEphemeris(key).map(_.toOption.get.isEmpty)
 
@@ -64,7 +64,7 @@ class HorizonsClientEphemerisSuite extends HorizonsClientSuite:
   testEphemerisEmpty(Ephemeris.Key.AsteroidOld(88715673))
   testEphemerisEmpty(Ephemeris.Key.MajorBody(85732756))
 
-  test("Ensure ephemeris content is correct (Halley)"):
+  test("Ensure ephemeris content is correct (Halley)".flaky):
     val tolerance = Angle.fromMicroarcseconds(1000) // 1 milliarcsecond
 
     def checkResults(
@@ -92,7 +92,7 @@ class HorizonsClientEphemerisSuite extends HorizonsClientSuite:
     fetchEphemeris(Ephemeris.Key.Comet("1P")).map:
       _.map(checkResults(_, expected))
 
-  test("Stop must fall after start."):
+  test("Stop must fall after start.".flaky):
     assertIO(
       client.use: c =>
         c.ephemeris(
@@ -104,7 +104,7 @@ class HorizonsClientEphemerisSuite extends HorizonsClientSuite:
       Left("Stop must fall after start.")
     )
 
-  test("Cannot select fewer than one element."):
+  test("Cannot select fewer than one element.".flaky):
     assertIO(
       client.use: c =>
         c.ephemeris(
@@ -116,7 +116,7 @@ class HorizonsClientEphemerisSuite extends HorizonsClientSuite:
       Left("Cannot select fewer than one element.")
     )
 
-  test("alignedEphemeris (2)"):
+  test("alignedEphemeris (2)".flaky):
     assertIO(
       client.use: c =>
 
@@ -154,7 +154,7 @@ class HorizonsClientEphemerisSuite extends HorizonsClientSuite:
       ))
     )
 
-  test("alignedEphemeris (4)"):
+  test("alignedEphemeris (4)".flaky):
     assertIO(
       client.use: c =>
 
@@ -212,7 +212,7 @@ class HorizonsClientEphemerisSuite extends HorizonsClientSuite:
       ))
     )
 
-  test("alignedEphemeris (24)"):
+  test("alignedEphemeris (24)".flaky):
     assertIO(
       client.use: c =>
 

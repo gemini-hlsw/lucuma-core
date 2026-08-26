@@ -7,6 +7,7 @@ import cats.Eq
 import cats.syntax.order.*
 import lucuma.core.enums.GhostIfu1FiberAgitator
 import lucuma.core.enums.GhostIfu2FiberAgitator
+import lucuma.core.math.Wavelength
 import lucuma.core.util.TimeSpan
 
 final case class GhostDynamicConfig(
@@ -22,6 +23,8 @@ final case class GhostDynamicConfig(
    */
   def totalExposureTime: TimeSpan =
     red.value.totalExposureTime max blue.value.totalExposureTime
+    
+  val centralWavelength: Wavelength = CentralWavelength
 
 object GhostDynamicConfig:
   given Eq[GhostDynamicConfig] =

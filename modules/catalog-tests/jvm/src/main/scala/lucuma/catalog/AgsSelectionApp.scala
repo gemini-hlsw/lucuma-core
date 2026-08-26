@@ -119,7 +119,7 @@ trait AgsSelectionSample {
           .map(GuideStarCandidate.siderealTarget.get)
 }
 
-object AgsSelectionSampleApp extends IOApp.Simple with AgsSelectionSample {
+object AgsSelectionSampleApp extends IOApp.Simple with AgsSelectionSample:
 
   given LoggerFactory[IO] = NoOpFactory[IO]
 
@@ -129,7 +129,7 @@ object AgsSelectionSampleApp extends IOApp.Simple with AgsSelectionSample {
       .map(GaiaClient.build[IO](_))
       .use(gaiaClient =>
         gaiaQuery(gaiaClient)
-          .map { candidates =>
+          .map: candidates =>
             println(s"Candidates ${candidates.length}")
             val r = Ags
               .agsAnalysis(
@@ -144,12 +144,10 @@ object AgsSelectionSampleApp extends IOApp.Simple with AgsSelectionSample {
                 flamingos2Params,
                 candidates
               )
-            pprint.pprintln(r.stats)
+            println(r.stats.show)
             pprint.pprintln(r.analyses.sortUsablePositions)
             r.analyses.sortUsablePositions
-          }
       )
       .flatTap(x => IO.println(x.length))
       // .flatMap(x => x.filter(_.isUsable).traverse(u => IO(pprint.pprintln(u))))
       .void
-}

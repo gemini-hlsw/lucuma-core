@@ -6,14 +6,14 @@ package lucuma.core.enums
 import cats.data.NonEmptyList
 import lucuma.core.util.Enumerated
 
-enum CallForProposalsType(val tag: String, val title: String) derives Enumerated:
-  case DemoScience        extends CallForProposalsType("demo_science", "Demo Science")
-  case DirectorsTime      extends CallForProposalsType("directors_time", "Director's Time")
-  case FastTurnaround     extends CallForProposalsType("fast_turnaround", "Fast Turnaround")
-  case LargeProgram       extends CallForProposalsType("large_program", "Large Program")
-  case PoorWeather        extends CallForProposalsType("poor_weather", "Poor Weather")
-  case RegularSemester    extends CallForProposalsType("regular_semester", "Regular Semester")
-  case SystemVerification extends CallForProposalsType("system_verification", "System Verification")
+enum GeminiCallForProposalsType(val tag: String, val title: String) derives Enumerated:
+  case DemoScience        extends GeminiCallForProposalsType("demo_science", "Demo Science")
+  case DirectorsTime      extends GeminiCallForProposalsType("directors_time", "Director's Time")
+  case FastTurnaround     extends GeminiCallForProposalsType("fast_turnaround", "Fast Turnaround")
+  case LargeProgram       extends GeminiCallForProposalsType("large_program", "Large Program")
+  case PoorWeather        extends GeminiCallForProposalsType("poor_weather", "Poor Weather")
+  case RegularSemester    extends GeminiCallForProposalsType("regular_semester", "Regular Semester")
+  case SystemVerification extends GeminiCallForProposalsType("system_verification", "System Verification")
 
   def subTypes: NonEmptyList[ScienceSubtype] =
       this match

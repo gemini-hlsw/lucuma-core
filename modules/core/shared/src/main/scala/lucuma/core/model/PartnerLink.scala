@@ -3,21 +3,20 @@
 
 package lucuma.core.model
 
-
-
 import cats.Eq
 import cats.syntax.either.*
+import cats.syntax.option.*
+import lucuma.core.enums.ExchangePartner
 import lucuma.core.enums.Partner
 import lucuma.core.enums.PartnerLinkType
-import monocle.Iso
-
 
 /**
  * Embodies the association between a user and a partner, if any.  There are
- * three possible values: `HasPartner` (meaning the user is tied to a particular
- * `Partner`), `HasNonPartner` (the user is explicitly not associated with any
- * `Partner`) and `HasUnspecifiedPartner` (the relationship is not yet
- * determined).
+ * four possible values: `HasGeminiPartner` (the user is tied to a particular
+ * Gemini `Partner`), `HasExchangePartner` (the user is tied to a particular
+ * `ExchangePartner` community), `HasNonPartner` (the user is explicitly not
+ * associated with any partner) and `HasUnspecifiedPartner` (the relationship
+ * is not yet determined).
  */
 sealed trait PartnerLink extends Product with Serializable:
 
@@ -25,78 +24,72 @@ sealed trait PartnerLink extends Product with Serializable:
     fold(
       PartnerLinkType.HasUnspecifiedPartner,
       PartnerLinkType.HasNonPartner,
-      _ => PartnerLinkType.HasPartner
+      _ => PartnerLinkType.HasGeminiPartner,
+      _ => PartnerLinkType.HasExchangePartner
     )
 
   /**
-   * Converts to an either where Left(true) is `HasNonPartner`, Left(false) is
-   * `HasUnspecifiedPartner` and Right(partner) is `HasPartner`.
+   * Creates an Option[Partner] which is Some when this link is
+   * `HasGeminiPartner`.
    */
-  def toEither: Either[Boolean, Partner] =
-    fold(false.asLeft, true.asLeft, _.asRight)
+  def geminiPartnerOption: Option[Partner] =
+    fold(none, none, _.some, _ => none)
 
   /**
-   * Creates an Option[Partner] which is Some when this link is `HasPartner`.
+   * Creates an Option[ExchangePartner] which is Some when this link is
+   * `HasExchangePartner`.
    */
-  def partnerOption: Option[Partner] =
-    toEither.toOption
+  def exchangePartnerOption: Option[ExchangePartner] =
+    fold(none, none, _ => none, _.some)
+
+  /**
+   * True only if HasUnspecifiedPartner.  Same as `!hasPartner`.
+   */
+  def isUnspecifiedPartner: Boolean =
+    !isSet
 
   /**
    * True only if HasNonPartner.
    */
   def isNonPartner: Boolean =
-    fold(false, true, _ => false)
+    fold(false, true, _ => false, _ => false)
 
   /**
-   * True if HasPartner or HasNonPartner.
+   * True if associated with a partner, an exchange partner, or explicitly no
+   * partner.
    */
   def isSet: Boolean =
-    fold(false, true, _ => true)
+    fold(false, true, _ => true, _ => true)
 
-  /**
-   * True only if HasUnspecifiedPartner.  Same as `!isSet`.
-   */
-  def isUnspecified: Boolean =
-    !isSet
-
-  def fold[A](unspecified: => A, hasNonPartner: => A, hasPartner: Partner => A): A =
-    this match {
+  def fold[A](
+    unspecified:        => A,
+    hasNonPartner:      => A,
+    hasGeminiPartner:   Partner => A,
+    hasExchangePartner: ExchangePartner => A
+  ): A =
+    this match
       case PartnerLink.HasUnspecifiedPartner => unspecified
       case PartnerLink.HasNonPartner         => hasNonPartner
-      case PartnerLink.HasPartner(p)         => hasPartner(p)
-    }
-end PartnerLink
+      case PartnerLink.HasGeminiPartner(p)   => hasGeminiPartner(p)
+      case PartnerLink.HasExchangePartner(p) => hasExchangePartner(p)
 
 object PartnerLink:
 
-  case class HasPartner(partner: Partner) extends PartnerLink
-  case object HasNonPartner               extends PartnerLink
-  case object HasUnspecifiedPartner       extends PartnerLink
+  case class  HasGeminiPartner(partner: Partner)           extends PartnerLink
+  case class  HasExchangePartner(partner: ExchangePartner) extends PartnerLink
+  case object HasNonPartner                                extends PartnerLink
+  case object HasUnspecifiedPartner                        extends PartnerLink
 
   given Eq[PartnerLink] =
-    Eq.by(_.toEither)
+    Eq.by(pl => (pl.linkType, pl.geminiPartnerOption, pl.exchangePartnerOption))
 
-  private def fromEither(e: Either[Boolean, Partner]): PartnerLink =
-    e.fold(b => if (b) HasNonPartner else HasUnspecifiedPartner, HasPartner.apply)
-
-  /**
-   * Iso for an Either where Left(true) is HasNoPartner and Left(false) is
-   * HasUnspecifiedPartner.
-   */
-  val either: Iso[PartnerLink, Either[Boolean, Partner]] =
-    Iso[PartnerLink, Either[Boolean, Partner]](_.toEither)(fromEither)
-
-  /**
-   * Creates a `PartnerLink` where a None value for `Partner` is interpreted as
-   * `HasNonPartner`.
-   */
-  def asNonPartner(p: Option[Partner]): PartnerLink =
-    p.fold(HasNonPartner)(HasPartner.apply)
-
-  def fromLinkType(linkType: PartnerLinkType, partner: Option[Partner] = None): Either[String, PartnerLink] =
+  def fromLinkType(
+    linkType:        PartnerLinkType,
+    geminiPartner:   Option[Partner]         = None,
+    exchangePartner: Option[ExchangePartner] = None
+  ): Either[String, PartnerLink] =
     linkType match
-      case PartnerLinkType.HasPartner            => partner.map(HasPartner.apply).toRight("HasPartner instance missing partner")
+      case PartnerLinkType.HasGeminiPartner      => geminiPartner.map(HasGeminiPartner.apply).toRight("HasGeminiPartner instance missing gemini partner")
+      case PartnerLinkType.HasExchangePartner    => exchangePartner.map(HasExchangePartner.apply).toRight("HasExchangePartner instance missing exchange partner")
       case PartnerLinkType.HasNonPartner         => HasNonPartner.asRight
       case PartnerLinkType.HasUnspecifiedPartner => HasUnspecifiedPartner.asRight
-
-end PartnerLink

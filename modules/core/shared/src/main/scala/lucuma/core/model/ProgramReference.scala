@@ -17,6 +17,7 @@ import io.circe.syntax.*
 import lucuma.core.enums.Instrument
 import lucuma.core.enums.ProgramType
 import lucuma.core.enums.ScienceSubtype
+import lucuma.core.enums.SubaruCallForProposalsType
 import lucuma.core.optics.Format
 import monocle.Prism
 
@@ -176,6 +177,42 @@ object ProgramReference {
       Format(s => parse.program.parseAll(s).toOption, _.label)
   }
 
+  case class Keck(proposal: ProposalReference) extends SemesterlyProgramReference {
+    override def programType: ProgramType = ProgramType.Keck
+
+    override def semester: Semester = proposal.semester
+
+    override def label: String =
+      s"${proposal.label}-K"
+  }
+
+  object Keck {
+
+    given Order[Keck] =
+      Order.by(_.proposal)
+
+    val fromString: Format[String, Keck] =
+      Format(s => parse.keck.parseAll(s).toOption, _.label)
+  }
+
+  case class Subaru(proposal: ProposalReference, subaruType: SubaruCallForProposalsType) extends SemesterlyProgramReference {
+    override def programType: ProgramType = ProgramType.Subaru
+
+    override def semester: Semester = proposal.semester
+
+    override def label: String =
+      s"${proposal.label}-${subaruType.letter}"
+  }
+
+  object Subaru {
+
+    given Order[Subaru] =
+      Order.by { a => (a.proposal, a.subaruType) }
+
+    val fromString: Format[String, Subaru] =
+      Format(s => parse.subaru.parseAll(s).toOption, _.label)
+  }
+
   case class System(description: Description) extends ProgramReference {
     override def programType: ProgramType = ProgramType.System
 
@@ -196,6 +233,7 @@ object ProgramReference {
   object parse {
 
     import lucuma.core.enums.parser.EnumParsers.scienceSubtype
+    import lucuma.core.enums.parser.EnumParsers.subaruCallForProposalsType
     import parser.ReferenceParsers.*
     import Semester.parse.semester
 
@@ -233,12 +271,22 @@ object ProgramReference {
         Science(proposal, scienceSubtype)
       }
 
+    val keck: Parser[Keck] =
+      (ProposalReference.parse.proposal <* dash <* char('K')).map(Keck(_))
+
+    val subaru: Parser[Subaru] =
+      ((ProposalReference.parse.proposal <* dash) ~ subaruCallForProposalsType).map { case (proposal, subaruType) =>
+        Subaru(proposal, subaruType)
+      }
+
     val system: Parser[System] =
       (string(s"SYS-") *> description).map { description => System(description) }
 
     val programReference: Parser[ProgramReference] =
       oneOf(
         parse.program.backtrack       ::
+        parse.keck.backtrack          ::
+        parse.subaru.backtrack        ::
         parse.calibration.backtrack   ::
         parse.commissioning.backtrack ::
         parse.engineering.backtrack   ::
@@ -269,9 +317,11 @@ object ProgramReference {
       case (a @ Commissioning(_, _, _), b @ Commissioning(_, _, _)) => Order.compare(a, b)
       case (a @ Engineering(_, _, _),   b @ Engineering(_, _, _))   => Order.compare(a, b)
       case (a @ Example(_),             b @ Example(_))             => Order.compare(a, b)
+      case (a @ Keck(_),                b @ Keck(_))                => Order.compare(a, b)
       case (a @ Library(_, _),          b @ Library(_, _))          => Order.compare(a, b)
       case (a @ Monitoring(_, _, _),    b @ Monitoring(_, _, _))    => Order.compare(a, b)
       case (a @ Science(_, _),          b @ Science(_, _))          => Order.compare(a, b)
+      case (a @ Subaru(_, _),           b @ Subaru(_, _))           => Order.compare(a, b)
       case (a @ System(_),              b @ System(_))              => Order.compare(a, b)
       case (a, b)                                                   => Order.compare(a.programType, b.programType)
     }

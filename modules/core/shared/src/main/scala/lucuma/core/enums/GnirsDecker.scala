@@ -7,7 +7,6 @@ package enums
 import lucuma.core.util.Display
 import lucuma.core.util.Enumerated
 
-
 /**
  * Enumerated type for GNRIS Decker.
  * @group Enumerations (Generated)
@@ -23,3 +22,21 @@ enum GnirsDecker(
   case LongCamLongSlit extends GnirsDecker("LongCamLongSlit", "Long camera slit", "Long camera long slit")
   case ShortCamLongSlit extends GnirsDecker("ShortCamLongSlit", "Short camera slit", "Short camera long slit")
   case LongCamCrossDispersed extends GnirsDecker("LongCamCrossDispersed", "Long camera XD", "Long camera cross dispersed")
+  case LowResolutionIfu extends GnirsDecker("LowResolutionIfu", "LR-IFU", "Low resolution IFU")
+  case HighResolutionIfu extends GnirsDecker("HighResolutionIfu", "HR-IFU", "High resolution IFU")
+
+object GnirsDecker:
+  // ATTENTION: This logic is duplicated in the DB view in the ODB. Modify it there too if it's changed here.
+  def forCameraAndPrism(camera: GnirsCamera, prism: GnirsPrism): GnirsDecker =
+    (prism, camera.pixelScale) match
+      case (GnirsPrism.Mirror, GnirsPixelScale.PixelScale_0_15)               => GnirsDecker.ShortCamLongSlit
+      case (GnirsPrism.Mirror, GnirsPixelScale.PixelScale_0_05)               => GnirsDecker.LongCamLongSlit
+      case (GnirsPrism.Sxd | GnirsPrism.Lxd, GnirsPixelScale.PixelScale_0_15) => GnirsDecker.ShortCamCrossDispersed
+      case (GnirsPrism.Sxd | GnirsPrism.Lxd, GnirsPixelScale.PixelScale_0_05) => GnirsDecker.LongCamCrossDispersed
+
+  // The IFU decker is determined solely by the IFU resolution (the long-slit
+  // camera/prism derivation above does not apply to IFU configs).
+  def forIfu(ifu: GnirsFpuIfu): GnirsDecker =
+    ifu match
+      case GnirsFpuIfu.LowResolution  => GnirsDecker.LowResolutionIfu
+      case GnirsFpuIfu.HighResolution => GnirsDecker.HighResolutionIfu

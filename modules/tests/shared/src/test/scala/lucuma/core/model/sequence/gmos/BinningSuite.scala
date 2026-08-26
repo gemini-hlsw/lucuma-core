@@ -3,6 +3,7 @@
 
 package lucuma.core.model.sequence.gmos
 
+import cats.data.NonEmptyList
 import cats.syntax.option.*
 import lucuma.core.enums.GmosNorthFpu
 import lucuma.core.enums.GmosNorthGrating
@@ -267,4 +268,39 @@ class BinningSuite extends FunSuite:
   test("ifu always returns 1x1"):
     val xy = ifu.ifuBinning
     assertEquals(xy, (GmosXBinning.One, GmosYBinning.One))
+
+  test("mos ccd mode with a single profile"):
+    val fpu = GmosNorthFpu.LongSlit_1_00
+    val grating = GmosNorthGrating.B480_G5309
+    val profile = SourceProfile.Gaussian(Angle.microarcseconds.reverseGet(1_120_000L), bandNormalized)
+    val iq = ImageQuality.unsafeFromArcSeconds(1.12) // 1.12" seeing
+    val slitWidth = fpu.effectiveSlitWidth
+    val dispersion = grating.dispersion
+    val resolution = grating.referenceResolution
+    val blaze = grating.blazeWavelength
+    val pixelScale = DefaultGmosNorthDetector.pixelSize
+    val (x, y) = mos.mosBinning(slitWidth, profile, iq, dispersion, resolution, blaze, pixelScale)
+    val expected = GmosCcdMode(x, y, longslit.DefaultAmpCount, longslit.DefaultAmpGain, longslit.DefaultAmpReadMode)
+    val actual = GmosCcdMode.Default.Mos(NonEmptyList.one(profile), slitWidth, iq, dispersion, resolution, blaze, pixelScale)
+    assertEquals(actual, expected)
+
+  test("mos ccd mode with multiple profiles"):
+    // R831, slit=0.50", shared IQ=PointOne: Gaussian fwhm=0.0 -> (1,1); Gaussian fwhm=0.6 -> (1,2).
+    // The set's CCD mode must therefore select yBin = One (the minimum count).
+    val fpu = GmosNorthFpu.LongSlit_0_50
+    val grating = GmosNorthGrating.R831_G5302
+    val iq = ImageQuality.Preset.PointOne.toImageQuality
+    val slitWidth = fpu.effectiveSlitWidth
+    val dispersion = grating.dispersion
+    val resolution = grating.referenceResolution
+    val blaze = grating.blazeWavelength
+    val pixelScale = DefaultGmosNorthDetector.pixelSize
+    val p1 = SourceProfile.Gaussian(Angle.Angle0, bandNormalized)
+    val p2 = SourceProfile.Gaussian(Angle.microarcseconds.reverseGet(600_000L), bandNormalized)
+    val ccd = GmosCcdMode.Default.Mos(NonEmptyList.of(p1, p2), slitWidth, iq, dispersion, resolution, blaze, pixelScale)
+    assertEquals(ccd.xBin, GmosXBinning.One)
+    assertEquals(ccd.yBin, GmosYBinning.One)
+    assertEquals(ccd.ampCount, longslit.DefaultAmpCount)
+    assertEquals(ccd.ampGain, longslit.DefaultAmpGain)
+    assertEquals(ccd.ampReadMode, longslit.DefaultAmpReadMode)
 

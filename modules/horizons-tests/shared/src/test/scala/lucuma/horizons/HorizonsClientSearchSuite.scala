@@ -9,7 +9,7 @@ import cats.syntax.all.*
 trait HorizonsClientSearchSuite[A](ctor: String => HorizonsClient.Search[A]) extends HorizonsClientSuite:
 
   def testEmptyResults(partial: String, detail: Option[String] = None) =
-    test(s"empty results${detail.foldMap(" - " + _)}"):
+    test(s"empty results${detail.foldMap(" - " + _)}".flaky):
       client.use: c =>
         assertIO(
           c.resolve(ctor(partial)),
@@ -17,7 +17,7 @@ trait HorizonsClientSearchSuite[A](ctor: String => HorizonsClient.Search[A]) ext
         )
 
   def testMultipleResults(partial: String, expected: (A, String)*) =
-    test("multiple results"):
+    test("multiple results".flaky):
       client.use: c =>
         assertIO(
           c.resolve(ctor(partial)).map(_.map(_.take(expected.length))),
@@ -25,7 +25,7 @@ trait HorizonsClientSearchSuite[A](ctor: String => HorizonsClient.Search[A]) ext
         )
 
   def testSingleResult(style: String)(partial: String, expected: (A, String)) =
-    test(s"single result - $style"):
+    test(s"single result - $style".flaky):
       client.use: c =>
         assertIO(
           c.resolve(ctor(partial)),

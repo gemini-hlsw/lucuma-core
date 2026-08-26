@@ -4,6 +4,7 @@
 package lucuma.core.model
 
 import cats.syntax.all.*
+import lucuma.core.enums.ExchangeObservingModeType
 import lucuma.core.enums.GuideProbe
 import lucuma.core.enums.ObservingModeType
 import lucuma.core.enums.TrackType
@@ -12,14 +13,25 @@ import lucuma.core.enums.VisitorObservingModeType
 trait probes:
   def guideProbe(observingMode: ObservingModeType, trackType: TrackType): Option[GuideProbe] =
     (observingMode, trackType) match
-      case (ObservingModeType.Flamingos2LongSlit, TrackType.Nonsidereal) =>
+      // Exchange observations are not supported by AGS; there is no guide probe.
+      case (_: ExchangeObservingModeType, _) =>
+        none
+      case (ObservingModeType.Flamingos2LongSlit | ObservingModeType.Flamingos2Imaging | ObservingModeType.Flamingos2Mos, TrackType.Nonsidereal) =>
         GuideProbe.PWFS2.some
-      case (ObservingModeType.Flamingos2LongSlit, TrackType.Sidereal) =>
+      case (ObservingModeType.Flamingos2LongSlit | ObservingModeType.Flamingos2Imaging | ObservingModeType.Flamingos2Mos, TrackType.Sidereal) =>
         GuideProbe.Flamingos2OIWFS.some
-      // gmos modes could be condensed but I'll split them into longslit and imaging anyway
+      // gmos modes could be condensed but I'll split them into longslit, imaging, and mos anyway
       case (ObservingModeType.GmosNorthLongSlit | ObservingModeType.GmosSouthLongSlit, TrackType.Nonsidereal) =>
         GuideProbe.PWFS2.some
       case (ObservingModeType.GmosNorthLongSlit | ObservingModeType.GmosSouthLongSlit, TrackType.Sidereal) =>
+        GuideProbe.GmosOIWFS.some
+      case (ObservingModeType.GmosNorthMos | ObservingModeType.GmosSouthMos, TrackType.Nonsidereal) =>
+        GuideProbe.PWFS2.some
+      case (ObservingModeType.GmosNorthMos | ObservingModeType.GmosSouthMos, TrackType.Sidereal) =>
+        GuideProbe.GmosOIWFS.some
+      case (ObservingModeType.GmosNorthIfu | ObservingModeType.GmosSouthIfu, TrackType.Nonsidereal) =>
+        GuideProbe.PWFS2.some
+      case (ObservingModeType.GmosNorthIfu | ObservingModeType.GmosSouthIfu, TrackType.Sidereal) =>
         GuideProbe.GmosOIWFS.some
       case (ObservingModeType.GmosNorthImaging | ObservingModeType.GmosSouthImaging, TrackType.Nonsidereal) =>
         GuideProbe.PWFS2.some
@@ -29,7 +41,7 @@ trait probes:
         GuideProbe.PWFS2.some
       case (ObservingModeType.GhostIfu, _) =>
         GuideProbe.PWFS2.some
-      case (ObservingModeType.GnirsLongSlit, _) =>
+      case (ObservingModeType.GnirsImaging | ObservingModeType.GnirsLongSlit | ObservingModeType.GnirsIfu, _) =>
         GuideProbe.PWFS2.some
       case (_: VisitorObservingModeType, _) =>
         GuideProbe.PWFS2.some

@@ -3,8 +3,11 @@
 
 package lucuma.core.util
 
+import cats.Functor
 import cats.Order
+import cats.effect.Clock
 import cats.syntax.either.*
+import cats.syntax.functor.*
 import cats.syntax.order.*
 import io.circe.Decoder
 import io.circe.Encoder
@@ -197,4 +200,7 @@ object Timestamp {
   given encoderTimestamp: Encoder[Timestamp] =
     Encoder.encodeString.contramap[Timestamp](_.isoFormat)
 
+  def timestampNow[F[_]: Clock: Functor]: F[Timestamp] =
+    Clock[F].realTime.map: d =>
+      Timestamp.fromInstantTruncatedAndBounded(Instant.EPOCH.plusNanos(d.toNanos))
 }

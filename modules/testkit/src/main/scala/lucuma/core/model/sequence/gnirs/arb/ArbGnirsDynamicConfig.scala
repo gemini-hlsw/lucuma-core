@@ -3,19 +3,19 @@
 
 package lucuma.core.model.sequence.gnirs.arb
 
+import cats.syntax.either.*
 import coulomb.Quantity
 import coulomb.testkit.given
 import eu.timepit.refined.scalacheck.numeric.given
 import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.enums.*
-import lucuma.core.math.Wavelength
 import lucuma.core.math.arb.ArbRefined.given
-import lucuma.core.math.arb.ArbWavelength.given
 import lucuma.core.model.sequence.gnirs.GnirsAcquisitionMirrorMode
 import lucuma.core.model.sequence.gnirs.GnirsDynamicConfig
 import lucuma.core.model.sequence.gnirs.GnirsFocus
 import lucuma.core.model.sequence.gnirs.GnirsFocusMotorStep
 import lucuma.core.model.sequence.gnirs.GnirsFocusMotorStepsValue
+import lucuma.core.model.sequence.gnirs.GnirsFpu
 import lucuma.core.util.TimeSpan
 import lucuma.core.util.arb.ArbEnumerated.given
 import lucuma.core.util.arb.ArbNewType.given
@@ -27,6 +27,19 @@ import org.scalacheck.Gen
 
 trait ArbGnirsDynamicConfig:
   import ArbGnirsAcquisitionMirrorMode.given
+
+  given Arbitrary[GnirsFpu] = Arbitrary:
+    Gen.oneOf(
+      arbitrary[GnirsFpuSlit].map(GnirsFpu.Spectroscopy.Slit(_)),
+      arbitrary[GnirsFpuIfu].map(GnirsFpu.Spectroscopy.Ifu(_)),
+      arbitrary[GnirsFpuOther].map(GnirsFpu.Other(_))
+    )
+
+  given Cogen[GnirsFpu] =
+    Cogen[Either[GnirsFpuSlit, Either[GnirsFpuIfu, GnirsFpuOther]]].contramap:
+      case GnirsFpu.Spectroscopy.Slit(slit) => slit.asLeft
+      case GnirsFpu.Spectroscopy.Ifu(ifu)   => ifu.asLeft.asRight
+      case GnirsFpu.Other(other)            => other.asRight.asRight
 
   given Arbitrary[GnirsFocus] = Arbitrary:
     Gen.oneOf(
@@ -45,10 +58,9 @@ trait ArbGnirsDynamicConfig:
     for
       exposure          <- arbitrary[TimeSpan]
       coadds            <- arbitrary[PosInt]
-      centralWavelength <- arbitrary[Wavelength]
       filter            <- arbitrary[GnirsFilter]
       decker            <- arbitrary[GnirsDecker]
-      fpu               <- arbitrary[Either[GnirsFpuSlit, GnirsFpuOther]]
+      fpu               <- arbitrary[GnirsFpu]
       acquisitionMirror <- arbitrary[GnirsAcquisitionMirrorMode]
       camera            <- arbitrary[GnirsCamera]
       focus             <- arbitrary[GnirsFocus]
@@ -56,7 +68,6 @@ trait ArbGnirsDynamicConfig:
     yield GnirsDynamicConfig(
       exposure,
       coadds,
-      centralWavelength,
       filter,
       decker,
       fpu,
@@ -71,10 +82,9 @@ trait ArbGnirsDynamicConfig:
       (
         TimeSpan,
         PosInt,
-        Wavelength,
         GnirsFilter,
         GnirsDecker,
-        Either[GnirsFpuSlit, GnirsFpuOther],
+        GnirsFpu,
         GnirsAcquisitionMirrorMode,
         GnirsCamera,
         GnirsFocus,
@@ -84,7 +94,6 @@ trait ArbGnirsDynamicConfig:
       (
         x.exposure,
         x.coadds,
-        x.centralWavelength,
         x.filter,
         x.decker,
         x.fpu,

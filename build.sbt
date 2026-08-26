@@ -2,7 +2,7 @@ import org.scalajs.linker.interface.ESVersion
 import org.typelevel.sbt.gha.PermissionValue
 import org.typelevel.sbt.gha.Permissions
 
-ThisBuild / tlBaseVersion                         := "0.197"
+ThisBuild / tlBaseVersion                         := "0.236"
 ThisBuild / tlCiReleaseBranches                   := Seq("master")
 ThisBuild / githubWorkflowEnv += "MUNIT_FLAKY_OK" -> "true"
 
@@ -10,48 +10,50 @@ ThisBuild / tlCiReleaseBranches += "topic/scala3"
 
 Global / concurrentRestrictions += Tags.limit(Tags.Compile, 1)
 
-ThisBuild / crossScalaVersions := Seq("3.8.3")
+ThisBuild / crossScalaVersions := Seq("3.8.4")
 ThisBuild / scalacOptions += "-language:implicitConversions" // TODO
+// Derivation for wide sums (Configuration.ObservingMode) exceeds the default budget of 32.
+ThisBuild / scalacOptions += "-Xmax-inlines:64"
 
 ThisBuild / Test / testOptions += Tests.Argument(TestFrameworks.MUnit, "--log=debug")
 
 lazy val catsVersion                = "2.13.0"
 lazy val catsCollctionsVersion      = "0.9.10"
-lazy val catsEffectVersion          = "3.7.0"
+lazy val catsEffectVersion          = "3.7.1"
 lazy val catsParseVersion           = "1.1.0"
 lazy val catsScalacheckVersion      = "0.3.2"
 lazy val catsTimeVersion            = "0.6.0"
-lazy val circeVersion               = "0.14.15"
-lazy val clueVersion                = "0.53.1"
+lazy val circeVersion               = "0.14.16"
+lazy val clueVersion                = "0.58.0"
 lazy val circeRefinedVersion        = "0.15.1"
 lazy val coulombVersion             = "0.9.1"
 lazy val fs2Version                 = "3.13.0"
-lazy val fs2DataVersion             = "1.13.0"
-lazy val geminiLocalesVersion       = "0.12.2"
-lazy val http4sVersion              = "0.23.34"
+lazy val fs2DataVersion             = "1.14.1"
+lazy val geminiLocalesVersion       = "0.12.3"
+lazy val http4sVersion              = "0.23.36"
 lazy val http4sDomVersion           = "0.2.12"
 lazy val http4sJdkHttpClientVersion = "0.10.0"
-lazy val jtsVersion                 = "0.4.2"
+lazy val jtsVersion                 = "0.5.0"
 lazy val kindProjectorVersion       = "0.13.2"
 lazy val kittensVersion             = "3.5.0"
 lazy val log4catsVersion            = "2.8.0"
-lazy val otel4sVersion              = "1.0.0"
+lazy val otel4sVersion              = "1.1.0"
 lazy val lucumaRefinedVersion       = "0.1.4"
 lazy val monocleVersion             = "3.3.0"
-lazy val munitVersion               = "1.3.0"
+lazy val munitVersion               = "1.3.5"
 lazy val munitDisciplineVersion     = "2.0.0"
 lazy val munitCatsEffectVersion     = "2.2.0"
 lazy val pprintVersion              = "0.9.6"
-lazy val refinedVersion             = "0.11.3"
-lazy val scalaJavaTimeVersion       = "2.6.0"
+lazy val refinedVersion             = "0.11.4"
+lazy val scalaJavaTimeVersion       = "2.7.0"
 lazy val scalajsStubVersion         = "1.1.0"
 lazy val scalaXmlVersion            = "2.4.0"
-lazy val slf4jVersion               = "2.0.17"
+lazy val slf4jVersion               = "2.0.18"
 lazy val spireVersion               = "0.18.0"
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
-val root = tlCrossRootProject.aggregate(core, testkit, tests, catalog, ags, catalogTestkit, catalogTests, horizons, horizonsTests, itac, npm)
+val root = tlCrossRootProject.aggregate(core, testkit, tests, catalog, ags, catalogTestkit, catalogTests, horizons, horizonsTests, itac, benchmarks, npm)
 
 lazy val core = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Full)
@@ -107,16 +109,11 @@ lazy val testkit = crossProject(JVMPlatform, JSPlatform)
       "eu.timepit"        %%% "refined-scalacheck" % refinedVersion,
       "io.circe"          %%% "circe-testing"      % circeVersion,
       "com.manyangled"    %%% "coulomb-testkit"    % coulombVersion,
-      "io.chrisdavenport" %%% "cats-scalacheck"    % catsScalacheckVersion
+      "io.chrisdavenport" %%% "cats-scalacheck"    % catsScalacheckVersion,
+      "org.scalameta"     %%% "munit"              % munitVersion,
     )
   )
   .jvmConfigure(_.enablePlugins(AutomateHeaderPlugin))
-
-val MUnitFramework = new TestFramework("munit.Framework")
-val MUnitFlakyOK   = sys.env.get("MUNIT_FLAKY_OK") match {
-  case Some("true") => Tests.Argument(MUnitFramework, "--exclude-tags=ScalaCheckFlaky")
-  case _            => Tests.Argument()
-}
 
 lazy val tests = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Full)
@@ -129,9 +126,7 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform)
       "org.scalameta" %%% "munit"             % munitVersion % Test,
       "org.typelevel" %%% "discipline-munit"  % munitDisciplineVersion % Test,
       "org.typelevel" %%% "munit-cats-effect" % munitCatsEffectVersion % Test
-    ),
-    testFrameworks += MUnitFramework,
-    testOptions += MUnitFlakyOK
+    )
   )
   .jvmConfigure(_.enablePlugins(AutomateHeaderPlugin))
   .jvmSettings(
@@ -166,6 +161,8 @@ lazy val catalog = crossProject(JVMPlatform, JSPlatform)
       "eu.timepit"    %%% "refined-cats"         % refinedVersion,
       "org.http4s"    %%% "http4s-core"          % http4sVersion,
       "org.http4s"    %%% "http4s-client"        % http4sVersion,
+      "io.circe"      %%% "circe-core"           % circeVersion,
+      "io.circe"      %%% "circe-parser"         % circeVersion,
       "org.typelevel" %%% "cats-parse"           % catsParseVersion,
       "org.typelevel" %%% "kittens"              % kittensVersion,
       "edu.gemini"    %%% "clue-core"            % clueVersion,
@@ -198,7 +195,7 @@ lazy val horizonsTests = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Full)
   .in(file("modules/horizons-tests"))
   .enablePlugins(NoPublishPlugin)
-  .dependsOn(horizons)
+  .dependsOn(horizons, testkit)
   .settings(
     name := "lucuma-horizons-tests",
     libraryDependencies ++= Seq(
@@ -238,6 +235,7 @@ lazy val ags = crossProject(JVMPlatform, JSPlatform)
     libraryDependencies ++= Seq(
       "edu.gemini"    %%% "lucuma-refined" % lucumaRefinedVersion,
       "org.typelevel" %%% "cats-core"      % catsVersion,
+      "org.typelevel" %%% "otel4s-core"    % otel4sVersion
     )
   )
   .jsConfigure(_.enablePlugins(BundleMonPlugin))
@@ -290,6 +288,14 @@ lazy val catalogTests = crossProject(JVMPlatform, JSPlatform)
     )
   )
 
+
+lazy val benchmarks = project
+  .in(file("modules/benchmarks"))
+  .dependsOn(core.jvm)
+  .enablePlugins(NoPublishPlugin, AutomateHeaderPlugin, JmhPlugin)
+  .settings(
+    name := "lucuma-benchmarks"
+  )
 
 // for publishing to npm
 lazy val npmPackage = taskKey[File]("Prepare the npm package")

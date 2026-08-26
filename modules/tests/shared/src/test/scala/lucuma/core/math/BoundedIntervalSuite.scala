@@ -10,7 +10,6 @@ import lucuma.core.math.arb.ArbInterval
 import lucuma.core.optics.laws.discipline.ValidSplitEpiTests
 import lucuma.core.optics.laws.discipline.WedgeTests
 import lucuma.core.syntax.time.*
-import lucuma.core.tests.ScalaCheckFlaky
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
 import org.scalacheck.Prop.*
@@ -128,7 +127,7 @@ class BoundedIntervalSuite  extends munit.DisciplineSuite with IntervalGens {
     }
   }
 
-  test("ToFullDays".tag(ScalaCheckFlaky)) {
+  test("ToFullDays") {
     forAll { (i: BoundedInterval[Instant], z: ZoneId, t: LocalTime) =>
       val allDay = i.toFullDays(z, t)
       assert(i.isSubsetOf(allDay))
@@ -138,7 +137,15 @@ class BoundedIntervalSuite  extends munit.DisciplineSuite with IntervalGens {
       assertEquals(start, start.`with`(t))
       val end    = allDay.upper.atZone(z)
       assertEquals(end, end.`with`(t))
-      assert((allDay -- i).forall(_.asInstanceOf[BoundedInterval[Instant]].duration < Duration.ofDays(1)))
+      // A civil day isn't always 24h (DST transitions can make it 23h or 25h), so we
+      // compare each padding piece against the actual length of the civil day it belongs
+      // to, rather than a fixed Duration.ofDays(1).
+      assert((allDay -- i).forall: piece =>
+        val lowerAtZone    = piece.lower.atZone(z)
+        // Length of the civil day this padding piece belongs to, not a fixed 24h.
+        val civilDayLength = Duration.between(lowerAtZone, lowerAtZone.plusDays(1))
+        piece.duration < civilDayLength
+      )
     }
   }
 

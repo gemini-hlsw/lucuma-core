@@ -30,6 +30,7 @@ class EnumeratedSuite extends DisciplineSuite {
   checkEnumLaws[Site]
   checkEnumLaws[TwilightType]
   checkEnumLaws[EventType]
+  checkEnumLaws[SchedulingMode]
 
   // Derivation
   checkEnumLaws[Theme]

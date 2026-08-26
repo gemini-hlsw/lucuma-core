@@ -5,7 +5,8 @@ package lucuma.core
 
 import lucuma.core.math.Angle
 import lucuma.core.math.Declination
-import lucuma.core.math.HourAngle
+import lucuma.core.math.Epoch
+import lucuma.core.math.ProperMotion
 import lucuma.core.math.RightAscension
 import lucuma.core.math.parser.AngleParsers
 import lucuma.core.math.validation.MathValidators
@@ -26,7 +27,7 @@ def deg2hms(deg: Double): String =
 
 @JSExportTopLevel("deg2dms")
 def deg2dms(deg: Double): String =
-  val dec = Declination.fromAngleWithCarry(HourAngle.fromDoubleDegrees(deg))._1
+  val dec = Declination.fromAngleWithCarry(Angle.fromDoubleDegrees(deg))._1
   MathValidators.truncatedDec.reverseGet(dec)
 
 @JSExportTopLevel("hms2deg")
@@ -39,7 +40,7 @@ def hms2deg(hms: String): Double =
 def dms2deg(dms: String): Double =
   AngleParsers.dms.parseAll(dms) match
     case Left(value)  => throw new IllegalArgumentException(value.toString)
-    case Right(value) => value.toDoubleDegrees
+    case Right(value) => value.toSignedDoubleDegrees
 
 @JSExportTopLevel("signedArcSeconds")
 def signedArcSeconds(arcseconds: Double | String) =
@@ -118,3 +119,40 @@ def parseUserId(maybeUserId: String): js.UndefOr[String] =
 @JSExportTopLevel("parseVisitId")
 def parseVisitId(maybeVisitId: String): js.UndefOr[String] =
   tryParseId(maybeVisitId, Visit)
+
+@JSExportTopLevel("parseDmsString")
+def parseDmsString(maybeDms: String): js.UndefOr[String] =
+  Angle.fromStringSignedDMS
+    .getOption(maybeDms)
+    .fold(js.undefined)(Angle.fromStringSignedDMS.reverseGet(_).dropRight(4))
+
+@JSExportTopLevel("parseHmsString")
+def parseHmsString(maybeHms: String): js.UndefOr[String] =
+  RightAscension.fromStringHMS
+    .getOption(maybeHms)
+    .fold(js.undefined)(MathValidators.truncatedRA.reverseGet)
+
+@JSExportTopLevel("parseEpochString")
+def parseEpochString(maybeEpoch: String): js.UndefOr[String] =
+  Epoch.fromString
+    .getOption(maybeEpoch)
+    .fold(js.undefined)(Epoch.fromString.reverseGet)
+
+@JSExportTopLevel("toRightAscension")
+def toRightAscension(maybeRightAscension: Double): RightAscensionJS =
+  RightAscensionJS(RightAscension.fromDoubleDegrees(maybeRightAscension))
+
+@JSExportTopLevel("toDeclination")
+def toDeclination(maybeDeclination: Double): DeclinationJS =
+  DeclinationJS(Declination.fromAngleWithCarry(Angle.fromDoubleDegrees(maybeDeclination))._1)
+
+@JSExportTopLevel("toAngle")
+def toAngle(maybeAngle: Double): AngleJS =
+  AngleJS(Angle.fromDoubleDegrees(maybeAngle))
+
+@JSExportTopLevel("toProperMotion")
+def toProperMotion(pmRa: Double, pmDec: Double): ProperMotionJS =
+  ProperMotionJS(
+    ProperMotion.RA.microarcsecondsPerYear.get(pmRa.toLong),
+    ProperMotion.Dec.microarcsecondsPerYear.get(pmDec.toLong)
+  )

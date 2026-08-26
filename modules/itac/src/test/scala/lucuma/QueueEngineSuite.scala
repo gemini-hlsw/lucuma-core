@@ -20,7 +20,7 @@ import lucuma.core.enums.Partner
 import lucuma.core.enums.ScienceBand
 import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.TimeAccountingCategory
-import lucuma.core.enums.ToOActivation
+import lucuma.core.enums.TooActivation
 import lucuma.core.enums.WaterVapor
 import lucuma.core.math.Coordinates
 import lucuma.core.model.Allocation
@@ -56,7 +56,7 @@ class QueueEngineSuite extends FunSuite:
         Allocation(TimeAccountingCategory.US, ScienceBand.Band1, TimeSpan.fromHoursBounded(0.25)),
         Allocation(TimeAccountingCategory.US, ScienceBand.Band2, TimeSpan.fromHoursBounded(0.25)),
       ),
-      ProposalType.Queue(ToOActivation.None, IntPercent.unsafeFrom(50), List(
+      ProposalType.Queue(TooActivation.None, IntPercent.unsafeFrom(50), List(
         PartnerSplit(Partner.US, IntPercent.unsafeFrom(100))
       )),
       GroupTree.from(

@@ -4,6 +4,7 @@
 package lucuma.ags
 
 import cats.Order.given
+import cats.Show
 import cats.data.NonEmptyList
 import cats.data.NonEmptySet
 import cats.syntax.all.*
@@ -26,6 +27,7 @@ import lucuma.core.model.ImageQuality
 import lucuma.core.syntax.all.*
 import lucuma.core.util.Enumerated
 import lucuma.core.util.NewType
+import org.typelevel.otel4s.Attribute
 
 // Gaia DR3 positions are at epoch 2016.0. To include high-proper-motion
 // stars that may have moved into the patrol field since 2016, we pad the
@@ -247,6 +249,7 @@ object AgsAnalysisResult:
     positionCount:  Int,
     analyses:       List[AgsAnalysis],
     contextNanos:   Long,
+    calcsNanos:     Long,
     analysisNanos:  Long
   ): AgsAnalysisResult =
     val usableCandidates = analyses.collect { case u: AgsAnalysis.Usable => u.target.id }.toSet.size
@@ -263,6 +266,7 @@ object AgsAnalysisResult:
         analyses.size,
         analyses.groupMapReduce(Ags.resultLabel)(_ => 1)(_ + _),
         contextNanos,
+        calcsNanos,
         analysisNanos
       )
     )
@@ -290,6 +294,8 @@ object AgsAnalysisResult:
  *   histogram of outcomes keyed by [[Ags.resultLabel]]
  * @param contextNanos
  *   monotonic ns spent building the per-position geometry context
+ * @param calcsNanos
+ *   monotonic ns spent in posCalculations
  * @param analysisNanos
  *   monotonic ns spent in the runAnalysis loop (JTS work)
  */
@@ -304,5 +310,73 @@ case class AgsStats(
   analysisCount:        Int,
   resultCounts:         Map[String, Int],
   contextNanos:         Long,
+  calcsNanos:           Long,
   analysisNanos:        Long
-)
+):
+  def format: String =
+    def ms(nanos: Long): String           = f"${nanos / 1.0e6}%.2f ms"
+    def pct(num: Long, den: Long): String =
+      if (den <= 0) "n/a" else f"${100.0 * num / den}%.1f%%"
+
+    val totalNanos = contextNanos + analysisNanos
+    val throughput =
+      if (analysisNanos <= 0) ""
+      else f"  (${analysisCount / (analysisNanos / 1.0e6)}%.0f analyses/ms)"
+
+    val outcomes =
+      if (resultCounts.isEmpty) "    (none)"
+      else
+        resultCounts.toList
+          .sortBy: (label, cnt) =>
+            (-cnt, label)
+          .map: (label, cnt) =>
+            f"    $label%-18s $cnt%,7d  (${pct(cnt.toLong, analysisCount.toLong)})"
+          .mkString("\n")
+
+    val rows = List(
+      "candidates"    -> f"${candidateCount}%,d supplied, ${acceptedCount}%,d accepted (${pct(acceptedCount.toLong, candidateCount.toLong)}%s), ${usableCandidateCount}%,d usable (${pct(usableCandidateCount.toLong, acceptedCount.toLong)}%s of accepted)",
+      "geometry"      -> s"$posAngleCount pos angles, $acqOffsetCount acq + $sciOffsetCount sci offsets, $positionCount positions",
+      "analyses"      -> f"${analysisCount}%,d runAnalysis calls$throughput",
+      "ctx timing"    -> s"${ms(contextNanos)} (${pct(contextNanos, totalNanos)} of total)",
+      "calcs timing"  -> s"${ms(calcsNanos)} (${pct(calcsNanos, totalNanos)} of total, overlay build)",
+      "analysis time" -> s"${ms(analysisNanos)} (${pct(analysisNanos, totalNanos)} of total, predicate loop)",
+      "total time"    -> ms(totalNanos)
+    ).map((label, value) => f"  ${label + ":"}%-15s $value").mkString("\n")
+
+    s"""|AGS stats:
+        |$rows
+        |  outcomes:
+        |$outcomes""".stripMargin
+
+object AgsStats:
+  given Show[AgsStats] = Show.show(_.format)
+
+  /**
+   * Trace span attributes mirroring the fields of an [[AgsStats]], for callers that run the pure
+   * `Ags.agsAnalysis` and want to record its results on their own span. As a companion extension it
+   * is in scope wherever `AgsStats` is, so usage is just `result.stats.toSpanAttributes`.
+   * {{{
+   * T.span("ags.analysis", Attribute("ags.mode", params.mode), Attribute("ags.probe", params.probe.tag))
+   *   .use { span =>
+   *     val result = Ags.agsAnalysis(...)
+   *     span.addAttributes(result.stats.toSpanAttributes*).as(result)
+   *   }
+   * }}}
+   */
+  extension (stats: AgsStats)
+    def toSpanAttributes: List[Attribute[Long]] =
+      List(
+        Attribute("ags.candidates", stats.candidateCount.toLong),
+        Attribute("ags.accepted", stats.acceptedCount.toLong),
+        Attribute("ags.usable_candidates", stats.usableCandidateCount.toLong),
+        Attribute("ags.pos_angles", stats.posAngleCount.toLong),
+        Attribute("ags.acq_offsets", stats.acqOffsetCount.toLong),
+        Attribute("ags.sci_offsets", stats.sciOffsetCount.toLong),
+        Attribute("ags.positions", stats.positionCount.toLong),
+        Attribute("ags.analyses", stats.analysisCount.toLong),
+        Attribute("ags.context_nanos", stats.contextNanos),
+        Attribute("ags.calcs_nanos", stats.calcsNanos),
+        Attribute("ags.analysis_nanos", stats.analysisNanos)
+      ) ++ stats.resultCounts.toList.map { case (label, cnt) =>
+        Attribute(s"ags.result.$label", cnt.toLong)
+      }

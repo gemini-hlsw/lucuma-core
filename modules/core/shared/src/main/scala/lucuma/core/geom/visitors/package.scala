@@ -30,3 +30,8 @@ val ZorroWideFieldScienceFov: Angle = 35.arcsec
  * The fixed value for the Maroon-X science fov. It is an octogonal IFU with 0.77" diameter.
  */
 val MaroonXScienceFov: Angle = 770.milliarcseconds
+
+/**
+ * Requested that the probe should not vignette anything inside r=30 arcsec.
+ */
+val MaroonXSkyFiberPatrol: Angle = 60.arcsec

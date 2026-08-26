@@ -13,6 +13,7 @@ import lucuma.core.geom.*
 import lucuma.core.geom.syntax.all.*
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
+import lucuma.core.math.syntax.int.*
 import lucuma.core.math.units.*
 import lucuma.core.model.sequence.flamingos2.Flamingos2FpuMask
 
@@ -40,8 +41,7 @@ trait Flamingos2ScienceAreaGeometry:
             (Angle.fromBigDecimalArcseconds((fpu.slitWidth.toValue[BigDecimal] * pixelScale).value),
               (LongSlitFOVHeight ⨱ plateScale).toAngle)
           case Flamingos2FpuMask.Custom(_, _) =>
-            ((MOSFOVWidth ⨱ plateScale).toAngle,
-              (LongSlitFOVHeight ⨱ plateScale).toAngle)
+            (MosFOVWidth, MosFOVHeight)
       case _                                                          =>
         (Angle.Angle0, Angle.Angle0)
 
@@ -57,7 +57,7 @@ trait Flamingos2ScienceAreaGeometry:
       fpu.fold(
         imaging(plateScale),
         _ => longslit(plateScale, scienceAreaWidth),
-        _ => mosFOV(plateScale)
+        _ => mosOutline
       )
     shape.shapeAt(offsetPos, posAngle)
 
@@ -75,14 +75,36 @@ trait Flamingos2ScienceAreaGeometry:
    * @param plateScale the plate scale in arcsec/mm
    * @return           a shape representing the FOV
    */
-  private def mosFOV(plateScale: PlateScale): ShapeExpression =
-    val width  = (MOSFOVWidth ⨱ plateScale).toAngle
-    val height = (ImagingFOVSize ⨱ plateScale).toAngle
+  val mos: ShapeExpression =
+    val plateScale = Flamingos2LyotWheel.F16.plateScale
+    val width      = (MOSFOVWidth ⨱ plateScale).toAngle
+    val height     = (ImagingFOVSize ⨱ plateScale).toAngle
+    ShapeExpression.centeredEllipse(height, height) ∩ ShapeExpression.centeredRectangle(width, height)
 
-    // The FOV is the intersection of a rectangle and a circle.
-    val circle = ShapeExpression.centeredEllipse(height, height)
-    val rectangle = ShapeExpression.centeredRectangle(width, height)
-    circle ∩ rectangle
+  // GMMPS "slit placement area" for Flamingos2 MOS masks.
+  // The vertices come from the GMMPS FoV definition, in arcsec relative to
+  // the pointing center, in the pre-image's pixel axes.
+  val mosVertices: List[(Int, Int)] =
+    List(
+      (-174, -60), (-183, -21), (-183,  21), (-174,  60),
+      (173,   60), ( 182,  21), ( 182, -21), ( 173, -60)
+    )
+
+  private val MosFOVWidth: Angle  = 120.arcsec
+  private val MosFOVHeight: Angle = 365.arcsec
+
+  val mosOutline: ShapeExpression =
+    ShapeExpression.polygonAt(
+      mosVertices.map((x, y) => (y.arcsec.p, x.arcsec.q))*
+    )
+
+  /**
+   * The Flamingos2 MOS field of view, positioned at a given angle/offset.
+   * MOS is only defined at the F16 lyot wheel.
+   */
+  object mosMode:
+    def shapeAt(posAngle: Angle, offsetPos: Offset): ShapeExpression =
+      mosOutline.shapeAt(offsetPos, posAngle)
 
   /**
    * Create the Flamingos2 long slit field of view shape.

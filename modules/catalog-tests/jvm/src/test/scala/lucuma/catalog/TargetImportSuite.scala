@@ -20,10 +20,11 @@ import lucuma.core.math.RadialVelocity
 import lucuma.core.model.SourceProfile
 import lucuma.core.model.SpectralDefinition
 import lucuma.core.model.Target
+import lucuma.core.util.RetryFlakyTests
 import munit.CatsEffectSuite
 import org.http4s.jdkhttpclient.JdkHttpClient
 
-class TargetImportSuite extends CatsEffectSuite:
+class TargetImportSuite extends CatsEffectSuite with RetryFlakyTests:
 
   test("parallax-rv-v") {
     val xmlFile = "/targets_pv.csv"

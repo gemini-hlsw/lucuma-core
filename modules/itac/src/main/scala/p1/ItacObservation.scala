@@ -11,6 +11,7 @@ import lucuma.core.enums.Site
 import lucuma.core.model.ConstraintSet
 import lucuma.core.util.DateInterval
 import lucuma.core.util.TimeSpan
+import lucuma.core.enums.Instrument
 
 case class ItacObservation(
   itacTarget: ItacTarget, // TODO: ToO
@@ -22,7 +23,12 @@ case class ItacObservation(
 
   /** Is the instrument available at the given site, for any amount of time in the given date interval? */
   def isObservableAtSite(site: Site, when: DateInterval)(using Metadata): Boolean =
-    !mode.instrument.availability.forSiteAndDateInterval(site, when).isEmpty // TODO: compute available time based on this
+    def instrumentAvailable(i: Instrument): Boolean = !i.availability.forSiteAndDateInterval(site, when).isEmpty
+    mode.fold(
+      _  => true, // exchange, we don't know, assume it's ok
+      ff => instrumentAvailable(ff.instrument),
+      fv => instrumentAvailable(fv.instrument)
+    )
 
   /** Is this observation observable in the specified band? This is determined by conditions and the presence of ToO targets. */
   def isObservableInBand(band: ScienceBand): Boolean =

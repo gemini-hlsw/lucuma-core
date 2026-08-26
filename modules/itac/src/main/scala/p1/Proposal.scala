@@ -9,7 +9,7 @@ import lucuma.core.data.Metadata
 import lucuma.core.enums.ScienceBand
 import lucuma.core.enums.Site
 import lucuma.core.enums.TimeAccountingCategory
-import lucuma.core.enums.ToOActivation
+import lucuma.core.enums.TooActivation
 import lucuma.core.model.Allocation
 import lucuma.core.model.IntPercent
 import lucuma.core.model.ProposalReference
@@ -24,7 +24,7 @@ import GroupTree.flattenAndScale
 case class Proposal(
   reference: ProposalReference,
   allocations: NonEmptyList[Allocation],
-  tpe: ProposalType = ProposalType.Queue(ToOActivation.None, IntPercent.unsafeFrom(0), Nil), // TODO
+  tpe: ProposalType = ProposalType.Queue(TooActivation.None, IntPercent.unsafeFrom(0), Nil), // TODO
   groupTree: GroupTree[ItacObservation] = GroupTree.empty,
   cfpActive: DateInterval = DateInterval.between(LocalDate.now(), LocalDate.now())
 ) {
@@ -52,8 +52,8 @@ case class Proposal(
       allocationFor(category, band)
     )
     
-  def too: ToOActivation =
-    ProposalType.ToOActivation.getOption(tpe).getOrElse(ToOActivation.None)
+  def too: TooActivation =
+    ProposalType.TooActivation.getOption(tpe).getOrElse(TooActivation.None)
 
   ///
   /// ALLOCATIONS

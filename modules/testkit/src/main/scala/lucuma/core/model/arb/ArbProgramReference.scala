@@ -7,6 +7,7 @@ package arb
 import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.enums.Instrument
 import lucuma.core.enums.ScienceSubtype
+import lucuma.core.enums.SubaruCallForProposalsType
 import lucuma.core.util.arb.ArbEnumerated
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
@@ -136,6 +137,32 @@ trait ArbProgramReference extends ArbReference {
   val scienceStrings: Gen[String] =
     referenceStrings[Science](_.label)
 
+  given Arbitrary[Keck] =
+    Arbitrary(arbitrary[ProposalReference].map(Keck(_)))
+
+  given Cogen[Keck] =
+    Cogen[ProposalReference].contramap(_.proposal)
+
+  val keckStrings: Gen[String] =
+    referenceStrings[Keck](_.label)
+
+  given Arbitrary[Subaru] =
+    Arbitrary {
+      for {
+        p <- arbitrary[ProposalReference]
+        t <- arbitrary[SubaruCallForProposalsType]
+      } yield Subaru(p, t)
+    }
+
+  given Cogen[Subaru] =
+    Cogen[(ProposalReference, SubaruCallForProposalsType)].contramap { a => (
+      a.proposal,
+      a.subaruType
+    )}
+
+  val subaruStrings: Gen[String] =
+    referenceStrings[Subaru](_.label)
+
   given Arbitrary[ProgramReference] =
     Arbitrary {
       Gen.oneOf[ProgramReference](
@@ -143,9 +170,11 @@ trait ArbProgramReference extends ArbReference {
         arbitrary[Commissioning],
         arbitrary[Engineering],
         arbitrary[Example],
+        arbitrary[Keck],
         arbitrary[Library],
         arbitrary[Monitoring],
         arbitrary[Science],
+        arbitrary[Subaru],
         arbitrary[System]
       )
     }

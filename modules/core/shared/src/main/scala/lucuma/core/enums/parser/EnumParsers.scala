@@ -31,6 +31,10 @@ trait EnumParsers {
   val scienceSubtype: Parser[ScienceSubtype] =
     enumBy[ScienceSubtype](_.letter.toString)
 
+  /** Parser for `SubaruCallForProposalsType` based on the single reference letter (U/I). */
+  val subaruCallForProposalsType: Parser[SubaruCallForProposalsType] =
+    enumBy[SubaruCallForProposalsType](_.letter.toString)
+
   /** Parser for `Site` based on `shortName` like `GS`. */
   val site: Parser[Site] =
     enumBy[Site](_.shortName).withContext("Site")

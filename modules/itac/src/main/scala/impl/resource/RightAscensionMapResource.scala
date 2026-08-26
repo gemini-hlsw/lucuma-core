@@ -11,7 +11,7 @@ import edu.gemini.tac.qengine.impl.queue.ProposalQueueBuilder
 import edu.gemini.tac.qengine.log.RejectMessage
 import edu.gemini.tac.qengine.log.RejectToo
 import edu.gemini.tac.qengine.p1.*
-import lucuma.core.enums.ToOActivation
+import lucuma.core.enums.TooActivation
 import lucuma.core.model.ConstraintSet
 import lucuma.core.util.TimeSpan
 
@@ -30,7 +30,7 @@ case class RightAscensionMapResource(val grp: RightAscensionMap[PerRightAscensio
   type T = RightAscensionMapResource
 
   def reserve(block: Block, queue: ProposalQueueBuilder): RejectMessage Either RightAscensionMapResource =
-    if (block.prop.too != ToOActivation.None) reserveToo(block, queue) else reserveNonToo(block, queue)
+    if (block.prop.too != TooActivation.None) reserveToo(block, queue) else reserveNonToo(block, queue)
 
   // Splits the block into one block/RaReservation according to the amount of
   // time to distribute to each RaReservation.  If the split is successful,

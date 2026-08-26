@@ -3,26 +3,26 @@
 
 package lucuma.core.model
 
-import lucuma.core.enums.ToOActivation
+import lucuma.core.enums.TooActivation
 import lucuma.core.util.TimeSpan
 import monocle.Optional
 import lucuma.core.enums.ScienceSubtype
 
 enum ProposalType(val scienceSubtype: ScienceSubtype) {
   case Classical(minPercentTime: IntPercent, partnerSplits: List[PartnerSplit]) extends ProposalType(ScienceSubtype.Classical)
-  case DemoScience(toOActivation: ToOActivation, minPercentTime: IntPercent) extends ProposalType(ScienceSubtype.DemoScience)
-  case DirectorsTime(toOActivation: ToOActivation, minPercentTime: IntPercent) extends ProposalType(ScienceSubtype.DirectorsTime)
-  case FastTurnaround(toOActivation: ToOActivation, minPercentTime: IntPercent, reviewerId: ProgramUser.Id, mentorId: ProgramUser.Id) extends ProposalType(ScienceSubtype.FastTurnaround)
-  case LargeProgram(toOActivation: ToOActivation, minPercentTime: IntPercent, minPercentTotalTime: IntPercent, totalTime: TimeSpan) extends ProposalType(ScienceSubtype.LargeProgram)
+  case DemoScience(toOActivation: TooActivation, minPercentTime: IntPercent) extends ProposalType(ScienceSubtype.DemoScience)
+  case DirectorsTime(toOActivation: TooActivation, minPercentTime: IntPercent) extends ProposalType(ScienceSubtype.DirectorsTime)
+  case FastTurnaround(toOActivation: TooActivation, minPercentTime: IntPercent, reviewerId: ProgramUser.Id, mentorId: ProgramUser.Id) extends ProposalType(ScienceSubtype.FastTurnaround)
+  case LargeProgram(toOActivation: TooActivation, minPercentTime: IntPercent, minPercentTotalTime: IntPercent, totalTime: TimeSpan) extends ProposalType(ScienceSubtype.LargeProgram)
   case PoorWeather extends ProposalType(ScienceSubtype.PoorWeather)
-  case Queue(toOActivation: ToOActivation, minPercentTime: IntPercent, partnerSplits: List[PartnerSplit]) extends ProposalType(ScienceSubtype.Queue)
-  case SystemVerification(toOActivation: ToOActivation, minPercentTime: IntPercent) extends ProposalType(ScienceSubtype.SystemVerification)
+  case Queue(toOActivation: TooActivation, minPercentTime: IntPercent, partnerSplits: List[PartnerSplit]) extends ProposalType(ScienceSubtype.Queue)
+  case SystemVerification(toOActivation: TooActivation, minPercentTime: IntPercent) extends ProposalType(ScienceSubtype.SystemVerification)
 }
 
 object ProposalType:
   
-  val ToOActivation: Optional[ProposalType, ToOActivation] =
-    Optional[ProposalType, ToOActivation] {
+  val TooActivation: Optional[ProposalType, TooActivation] =
+    Optional[ProposalType, TooActivation] {
       case Classical(_, _)                        => None
       case DemoScience(toOActivation, _)          => Some(toOActivation)
       case DirectorsTime(toOActivation, _)        => Some(toOActivation)
