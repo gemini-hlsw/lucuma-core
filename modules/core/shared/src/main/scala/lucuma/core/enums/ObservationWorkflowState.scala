@@ -3,17 +3,18 @@
 
 package lucuma.core.enums
 
+import lucuma.core.util.Display
 import lucuma.core.util.Enumerated
 
-enum ObservationWorkflowState(val tag: String) derives Enumerated:
-  case Inactive   extends ObservationWorkflowState("inactive")
-  case Undefined  extends ObservationWorkflowState("undefined")
-  case Unapproved extends ObservationWorkflowState("unapproved")
-  case Defined    extends ObservationWorkflowState("defined")
-  case ForReview  extends ObservationWorkflowState("for_review")
-  case Ready      extends ObservationWorkflowState("ready")
-  case Ongoing    extends ObservationWorkflowState("ongoing")
-  case Completed  extends ObservationWorkflowState("completed")
+enum ObservationWorkflowState(val tag: String, val name: String) derives Enumerated, Display:
+  case Inactive   extends ObservationWorkflowState("inactive", "Inactive")
+  case Undefined  extends ObservationWorkflowState("undefined", "Undefined")
+  case Unapproved extends ObservationWorkflowState("unapproved", "Unapproved")
+  case Defined    extends ObservationWorkflowState("defined", "Defined")
+  case ForReview  extends ObservationWorkflowState("for_review", "For Review")
+  case Ready      extends ObservationWorkflowState("ready", "Ready")
+  case Ongoing    extends ObservationWorkflowState("ongoing", "Ongoing")
+  case Completed  extends ObservationWorkflowState("completed", "Completed")
 
 
 
