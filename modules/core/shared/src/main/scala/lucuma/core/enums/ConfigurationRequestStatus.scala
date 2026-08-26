@@ -3,11 +3,12 @@
 
 package lucuma.core.enums
 
+import lucuma.core.util.Display
 import lucuma.core.util.Enumerated
 
 
-enum ConfigurationRequestStatus(val tag: String) derives Enumerated:
-  case Requested extends ConfigurationRequestStatus("requested")
-  case Approved  extends ConfigurationRequestStatus("approved")
-  case Denied    extends ConfigurationRequestStatus("denied")
-  case Withdrawn extends ConfigurationRequestStatus("withdrawn")
+enum ConfigurationRequestStatus(val tag: String, val name: String) derives Enumerated, Display:
+  case Requested extends ConfigurationRequestStatus("requested", "Requested")
+  case Approved  extends ConfigurationRequestStatus("approved", "Approved")
+  case Denied    extends ConfigurationRequestStatus("denied", "Denied")
+  case Withdrawn extends ConfigurationRequestStatus("withdrawn", "Withdrawn")
