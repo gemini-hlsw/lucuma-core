@@ -21,6 +21,16 @@ val TelluricDefaultTelescopeConfigs: NonEmptyList[TelescopeConfigAlongSlit] =
     TelescopeConfigAlongSlit( 15.qArcsec, StepGuideState.Enabled),
   )
 
+val MosTelluricDefaultTelescopeConfigs: NonEmptyList[TelescopeConfigAlongSlit] =
+  NonEmptyList.of(
+    TelescopeConfigAlongSlit( 60.qArcsec, StepGuideState.Enabled),
+    TelescopeConfigAlongSlit( 40.qArcsec, StepGuideState.Enabled),
+    TelescopeConfigAlongSlit( 20.qArcsec, StepGuideState.Enabled),
+    TelescopeConfigAlongSlit(-20.qArcsec, StepGuideState.Enabled),
+    TelescopeConfigAlongSlit( 40.qArcsec, StepGuideState.Enabled),
+    TelescopeConfigAlongSlit( 60.qArcsec, StepGuideState.Enabled),
+  )
+
 val NodAlongSlitDefaultTelescopeConfigs: NonEmptyList[TelescopeConfigAlongSlit] =
   NonEmptyList.of(
     TelescopeConfigAlongSlit( 10.qArcsec, StepGuideState.Enabled),
@@ -40,6 +50,7 @@ val NodToSkyDefaultTelescopeConfigs: NonEmptyList[TelescopeConfig] =
 def defaultSlitTelescopeConfigs(preset: Flamingos2SlitOffsetPreset): SlitTelescopeConfigs =
   preset match
     case Flamingos2SlitOffsetPreset.Telluric     => SlitTelescopeConfigs.AlongSlit(TelluricDefaultTelescopeConfigs)
+    case Flamingos2SlitOffsetPreset.MosTelluric  => SlitTelescopeConfigs.AlongSlit(MosTelluricDefaultTelescopeConfigs)
     case Flamingos2SlitOffsetPreset.NodAlongSlit => SlitTelescopeConfigs.AlongSlit(NodAlongSlitDefaultTelescopeConfigs)
     case Flamingos2SlitOffsetPreset.NodToSky     => SlitTelescopeConfigs.ToSky(NodToSkyDefaultTelescopeConfigs)
 
