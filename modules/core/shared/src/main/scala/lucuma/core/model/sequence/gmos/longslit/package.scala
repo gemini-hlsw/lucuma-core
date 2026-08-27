@@ -53,11 +53,8 @@ val DefaultSlitTelescopeConfigs: SlitTelescopeConfigs =
     )
   )
 
-val OnSkyDefaultTelescopeConfigs: NonEmptyList[TelescopeConfig] =
+val DefaultTelescopeConfigs: NonEmptyList[TelescopeConfig] =
   NonEmptyList.of(
-    TelescopeConfig(Offset.Zero, StepGuideState.Enabled),
-    TelescopeConfig(Offset(30.pArcsec, 0.qArcsec), StepGuideState.Disabled),
-    TelescopeConfig(Offset(30.pArcsec, 0.qArcsec), StepGuideState.Disabled),
     TelescopeConfig(Offset.Zero, StepGuideState.Enabled)
   )
 
@@ -65,7 +62,7 @@ val OnSkyDefaultTelescopeConfigs: NonEmptyList[TelescopeConfig] =
 def defaultSlitTelescopeConfigs(preset: GmosSlitOffsetPreset): SlitTelescopeConfigs =
   preset match
     case GmosSlitOffsetPreset.NodAlongSlit => DefaultSlitTelescopeConfigs
-    case GmosSlitOffsetPreset.NodToSky     => SlitTelescopeConfigs.ToSky(OnSkyDefaultTelescopeConfigs)
+    case GmosSlitOffsetPreset.NoOffsets    => SlitTelescopeConfigs.ToSky(DefaultTelescopeConfigs)
 
 /**
  * Optimal GMOS binning calculation for longslit.
