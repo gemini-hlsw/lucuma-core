@@ -5,6 +5,7 @@ package lucuma
 package core
 package enums
 
+import cats.syntax.eq.*
 import lucuma.core.math.Angle
 import lucuma.core.util.Display
 import lucuma.core.util.Enumerated
@@ -26,3 +27,13 @@ enum GmosSouthIfuFpu(
   case TwoSlits    extends GmosSouthIfuFpu("TwoSlits",    "IFU-2", "IFU 2 Slits",          GmosSouthFpu.Ifu2Slits, Angle.milliarcseconds.reverseGet(7000))
   case OneSlitRed  extends GmosSouthIfuFpu("OneSlitRed",  "IFU-R", "IFU Right Slit (red)", GmosSouthFpu.IfuRed,    Angle.milliarcseconds.reverseGet(3500))
   case OneSlitBlue extends GmosSouthIfuFpu("OneSlitBlue", "IFU-B", "IFU Left Slit (blue)", GmosSouthFpu.IfuBlue,   Angle.milliarcseconds.reverseGet(3500))
+
+object GmosSouthIfuFpu:
+
+  /**
+   * The IFU aperture that widens to the given focal plane unit, if any.  The inverse of `fpu`.
+   * Empty for every non-IFU unit and for the nod & shuffle IFUs, which this mode does not offer.
+   */
+  def fromFpu(fpu: GmosSouthFpu): Option[GmosSouthIfuFpu] =
+    Enumerated[GmosSouthIfuFpu].all.find(_.fpu === fpu)
+
