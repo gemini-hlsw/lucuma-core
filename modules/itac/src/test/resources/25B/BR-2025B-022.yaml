@@ -1,0 +1,20 @@
+
+Reference: BR-2025B-022
+Mode:      Queue
+Partner:   BR
+Award:     2.5
+Rank:      8.0
+ToO:       None
+Comment:   
+
+Observations:
+  GS:
+  - 12a3c3e1  B1/2    0.6h  CC70  IQ70  SB80  WVAny    01:39:42.853192  -34:42:39.577891  WD 0137-349
+  - bb0cdc61  B1/2    0.6h  CC70  IQ70  SB80  WVAny    01:47:21.824617  -21:56:51.386849  GD 1400
+  - c85ea281  B1/2    1.3h  CC70  IQ70  SB80  WVAny    22:03:40.604467  -12:15:11.943387  DENIS J220340.5-121511
+  - 1d70ed22  B3      0.6h  CC70  IQ85  SB80  WVAny    01:39:42.853192  -34:42:39.577891  WD 0137-349
+  - 8b1a885c  B3      0.6h  CC70  IQ85  SB80  WVAny    01:47:21.824617  -21:56:51.386849  GD 1400
+  - 9288d479  B3      1.3h  CC70  IQ85  SB80  WVAny    22:03:40.604467  -12:15:11.943387  DENIS J220340.5-121511
+
+
+

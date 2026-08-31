@@ -1,0 +1,17 @@
+
+Reference: AR-2025B-022
+Mode:      Queue
+Partner:   AR
+Award:     1.0
+Rank:      8.0
+ToO:       None
+Comment:   Two targets disabled as allocated time by NTAC is less that minimum requested time
+
+Observations:
+  GS:
+  - 398efe07  B1/2    0.9h  CC70  IQ70  SBAny WVAny    01:03:42.364648  -72:13:42.736977  LHA 115-S 38
+  - a84191eb  B3      1.2h  CC70  IQ85  SBAny WVAny    00:55:53.812204  -72:08:59.511625  LHA 115-S 23
+  - b6aed034  B3      1.0h  CC70  IQ85  SBAny WVAny    01:03:42.364648  -72:13:42.736977  LHA 115-S 38
+
+
+

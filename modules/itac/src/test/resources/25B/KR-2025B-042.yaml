@@ -1,0 +1,24 @@
+
+Reference: KR-2025B-042
+Mode:      Queue
+Partner:   KR
+Award:     10.0
+Rank:      21.0
+ToO:       None
+Comment:   
+
+Observations:
+  GN:
+  - 0863def4  B1/2    2.7h  CC80  IQ70  SBAny WVAny    01:37:41.299663  +33:09:35.080388  ID12
+  - 31e4a400  B1/2    1.5h  CC80  IQ70  SBAny WVAny    09:56:52.393155  +41:15:22.211247  ID13
+  - 16e4137a  B1/2    1.2h  CC80  IQ70  SBAny WVAny    12:24:54.458314  +21:22:46.385507  ID03
+  - 985ede80  B1/2    2.3h  CC80  IQ70  SBAny WVAny    22:03:14.975683  +31:45:38.269473  ID10
+  - fd21c7de  B1/2    2.3h  CC80  IQ70  SBAny WVAny    22:54:10.421422  +11:36:38.748083  ID11
+  - 9ec33dba  B3      2.7h  CC80  IQ85  SBAny WVAny    01:37:41.299663  +33:09:35.080388  ID12
+  - 091feb46  B3      1.5h  CC80  IQ85  SBAny WVAny    09:56:52.393155  +41:15:22.211247  ID13
+  - bede99ff  B3      1.2h  CC80  IQ85  SBAny WVAny    12:24:54.458314  +21:22:46.385507  ID03
+  - 4a05544d  B3      2.3h  CC80  IQ85  SBAny WVAny    22:03:14.975683  +31:45:38.269473  ID10
+  - 849ff286  B3      2.3h  CC80  IQ85  SBAny WVAny    22:54:10.421422  +11:36:38.748083  ID11
+
+
+

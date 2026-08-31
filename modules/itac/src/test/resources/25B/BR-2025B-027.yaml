@@ -1,0 +1,20 @@
+
+Reference: BR-2025B-027
+Mode:      Queue
+Partner:   BR
+Award:     7.8
+Rank:      10.0
+ToO:       None
+Comment:   B3 enabled according to NTAC. Conditions upgraded (IQ85/CC70/SBAny). PI agreed.
+
+Observations:
+  GS:
+  - b1438d56  B1/2    1.1h  CC70  IQ70  SB50  WVAny    08:23:40.689999  -43:12:47.099999  PN WRAY 16-20
+  - c21dcbf9  B1/2    5.5h  CC70  IQ70  SB50  WVAny    11:10:25.122000  -60:15:36.849600  PhJa 1
+  - a1ae440b  B1/2    1.1h  CC70  IQ70  SB50  WVAny    17:12:34.008000  -35:43:19.919999  PN RPZM 5
+  - bbcbba4d  B3      1.1h  CC70  IQ85  SBAny WVAny    08:23:40.689999  -43:12:47.099999  PN WRAY 16-20
+  - 34475c2f  B3      5.5h  CC70  IQ85  SBAny WVAny    11:10:25.122000  -60:15:36.849600  PhJa 1
+  - 28f8a0d1  B3      1.1h  CC70  IQ85  SBAny WVAny    17:12:34.008000  -35:43:19.919999  PN RPZM 5
+
+
+

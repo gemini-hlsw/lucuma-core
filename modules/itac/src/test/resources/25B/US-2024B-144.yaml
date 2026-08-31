@@ -1,0 +1,20 @@
+
+Reference: US-2024B-144
+Mode:      Queue
+Partner:   US
+Award:     12.8
+Rank:      1.0
+ToO:       Standard
+Comment:   
+
+Observations:
+  GS:
+  - 1e5e4748  B1/2   12.8h  CC70  IQ70  SBAny WVAny    00:00:00.000000  +00:00:00.000000  K > 18 Transient
+  - ba0d184b  B1/2   12.8h  CC70  IQ70  SBAny WVAny    00:00:00.000000  +00:00:00.000000  K > 18 Transient
+  - 4d024cd8  B1/2   12.8h  CC70  IQ70  SBAny WVAny    00:00:00.000000  +00:00:00.000000  K > 18 Transient
+  - 99f6fefc  B3     12.8h  CC80  IQ85  SBAny WVAny    00:00:00.000000  +00:00:00.000000  K > 16 Transient
+  - d2165839  B3     12.8h  CC80  IQ85  SBAny WVAny    00:00:00.000000  +00:00:00.000000  K > 16 Transient
+  - c9e48d73  B3     12.8h  CC80  IQ85  SBAny WVAny    00:00:00.000000  +00:00:00.000000  K > 16 Transient
+
+
+

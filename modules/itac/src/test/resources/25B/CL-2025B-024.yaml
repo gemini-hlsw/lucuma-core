@@ -1,0 +1,18 @@
+
+Reference: CL-2025B-024
+Mode:      Queue
+Partner:   CL
+Award:     22.0
+Rank:      14.0
+ToO:       None
+Comment:   SB reduced SB50 to SB20 requested by NTAC. Apparently the observations will requiere SB20, which is unlikely to happen for a B3 program. PI can relax this constraint in PhaseII
+
+Observations:
+  GS:
+  - 29e82550  B1/2   22.0h  CC50  IQ70  SB20  WVAny    03:34:59.199351  -35:10:15.879086  FCC143
+  - 663c1b64  B1/2   22.0h  CC50  IQ70  SB20  WVAny    03:40:55.339200  -37:50:16.800000  FCC253
+  - c614b337  B3     22.0h  CC50  IQ70  SB20  WVAny    03:34:59.100000  -35:10:09.999999  FCC143
+  - c3b79211  B3     22.0h  CC50  IQ70  SB20  WVAny    03:40:55.200000  -37:50:11.999999  FCC253
+
+
+

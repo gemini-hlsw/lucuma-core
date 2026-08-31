@@ -1,0 +1,18 @@
+
+Reference: US-2025B-003_S
+Mode:      Queue
+Partner:   US
+Award:     4.9
+Rank:      54.0
+ToO:       Standard
+Comment:   
+
+Observations:
+  GS:
+  - 026404c5  B1/2    2.5h  CC50  IQ85  SB80  WV50     00:00:00.000000  +00:00:00.000000  ToO6-GS
+  - 23883808  B1/2    2.5h  CC50  IQ85  SB80  WV50     00:00:00.000000  +00:00:00.000000  ToO5-GS
+  - bc5c7068  B3      3.5h  CC70  IQ70  SBAny WVAny    00:00:00.000000  +00:00:00.000000  ToO6-GS
+  - b595e4e7  B3      3.5h  CC70  IQ70  SBAny WVAny    00:00:00.000000  +00:00:00.000000  ToO5-GS
+
+
+

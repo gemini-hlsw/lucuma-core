@@ -1,0 +1,18 @@
+
+Reference: CA-2025B-007_1
+Mode:      Queue
+Partner:   CA
+Award:     8.2
+Rank:      9.0
+ToO:       None
+Comment:   DISABLE ges_19264986+0147368
+
+Observations:
+  GS:
+  - b337face  B1/2    0.6h  CC80  IQ85  SB80  WVAny    01:26:58.580879  +01:35:15.320399  J0126+0135
+  - 30e7d024  B1/2    0.8h  CC80  IQ85  SB80  WVAny    08:16:27.986640  -05:59:13.380000  J0816-0559
+  - 423fa532  B1/2    3.0h  CC80  IQ85  SB80  WVAny    17:10:09.976079  -26:35:53.559599  2M17100997-2635535
+  - 71317ae6  B1/2    3.8h  CC80  IQ85  SB80  WVAny    21:30:14.262720  +12:09:23.421599  2M21301426+1209234
+
+
+

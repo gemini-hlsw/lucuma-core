@@ -1,0 +1,22 @@
+
+Reference: AR-2025B-011
+Mode:      Queue
+Partner:   AR
+Award:     5.0
+Rank:      18.0
+ToO:       None
+Comment:   Conditions relaxed to B4 IQAny, CC70, SB50, WVAny as per NTAC
+
+Observations:
+  GS:
+  - e1083bd1  B1/2    1.9h  CC50  IQ70  SB50  WVAny    10:03:50.900000  -59:13:54.999999  [DBSB2003] 43
+  - 6337c2bf  B1/2    0.5h  CC50  IQ70  SB50  WVAny    10:32:13.618554  -35:37:41.711776  CD-34 6792 (Std 2)
+  - 8cba8c60  B1/2    0.5h  CC50  IQ70  SB50  WVAny    10:32:13.618554  -35:37:41.711776  CD-34 6792 (Std 1)
+  - b69a653c  B1/2    1.9h  CC50  IQ70  SB50  WVAny    10:44:05.760000  -58:05:42.000000  UBC 501
+  - 98a0c202  B3      2.0h  CC70  IQAny SB50  WVAny    10:03:50.900000  -59:13:54.999999  [DBSB2003] 43
+  - 242fc6c8  B3      0.5h  CC70  IQAny SB50  WVAny    10:32:13.618554  -35:37:41.711776  CD-34 6792 (Std 2)
+  - 43fd90b4  B3      0.5h  CC70  IQAny SB50  WVAny    10:32:13.618554  -35:37:41.711776  CD-34 6792 (Std 1)
+  - 8f1bc15b  B3      2.0h  CC70  IQAny SB50  WVAny    10:44:05.760000  -58:05:42.000000  UBC 501
+
+
+

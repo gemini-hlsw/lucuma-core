@@ -1,0 +1,31 @@
+
+Reference: CA-2025B-030_S
+Mode:      Queue
+Partner:   CA
+Award:     8.3
+Rank:      26.0
+ToO:       None
+Comment:   Conditions adapted to B4
+
+Observations:
+  GS:
+  - f46063e7  B1/2    0.9h  CC70  IQ85  SB80  WVAny    01:18:47.224800  +05:05:31.254000  Melotte25-c1
+  - 082f5cf5  B1/2    0.9h  CC70  IQ85  SB80  WVAny    04:23:22.000000  -43:51:06.999999  Alessi13-c1
+  - b9dded5f  B1/2    0.8h  CC70  IQ85  SB80  WVAny    07:45:33.290639  -13:33:32.716799  NGC2422-c1
+  - 770b354a  B1/2    0.8h  CC70  IQ85  SB80  WVAny    08:01:16.306320  -60:57:19.810800  NGC2516-c1
+  - 5036c4e4  B1/2    0.9h  CC70  IQ85  SB80  WVAny    08:03:44.496000  -41:53:04.559999  Theia2103-c1
+  - 689a7006  B1/2    0.9h  CC70  IQ85  SB80  WVAny    08:36:59.437920  -48:55:46.811999  Platais10-c1
+  - 09afa498  B1/2    0.4h  CC70  IQ85  SB80  WVAny    09:18:15.955200  -42:20:31.271999  Platais9-c1
+  - f960aa50  B1/2    0.7h  CC70  IQ85  SB80  WVAny    11:03:17.256000  -48:35:03.983999  HSC2303-c1
+  - 906f8504  B1/2    0.5h  CC70  IQ85  SB80  WVAny    18:31:11.992800  -41:43:56.532000  Mamajek4-c1
+  - 046e3e9c  B3      1.1h  CC70  IQAny SB80  WVAny    04:23:22.079999  -43:51:03.600000  Alessi13-c1
+  - 8a05c682  B3      1.3h  CC70  IQAny SB80  WVAny    07:45:33.120000  -13:33:32.400000  NGC2422-c1
+  - e5ca3a56  B3      1.3h  CC70  IQAny SB80  WVAny    08:01:16.080000  -60:57:17.999999  NGC2516-c1
+  - 12736d17  B3      1.5h  CC70  IQAny SB80  WVAny    08:03:44.400000  -41:53:02.400000  Theia2103-c1
+  - 6e476ecb  B3      1.1h  CC70  IQAny SB80  WVAny    08:36:59.280000  -48:55:44.399999  Platais10-c1
+  - 159120e5  B3      0.4h  CC70  IQAny SB80  WVAny    09:18:15.840000  -42:20:31.199999  Platais9-c1
+  - 7cbcd96a  B3      0.9h  CC70  IQAny SB80  WVAny    11:03:17.040000  -48:35:02.400000  HSC2303-c1
+  - a48647f9  B3      0.7h  CC70  IQAny SB80  WVAny    18:31:11.759999  -41:43:55.199999  Mamajek4-c1
+
+
+

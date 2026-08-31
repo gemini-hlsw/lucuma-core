@@ -1,0 +1,28 @@
+
+Reference: CA-2025B-028
+Mode:      Queue
+Partner:   CA
+Award:     4.0
+Rank:      16.0
+ToO:       None
+Comment:   
+
+Observations:
+  GS:
+  - d8d76581  B1/2    0.6h  CC70  IQ85  SB80  WVAny    09:22:54.999999  -28:55:40.000000  HSC2303-c1
+  - d8d76581  B1/2    0.6h  CC70  IQ85  SB80  WVAny    09:22:54.999999  -28:55:40.000000  HSC2303-c1
+  - d8d76581  B1/2    0.6h  CC70  IQ85  SB80  WVAny    09:22:54.999999  -28:55:40.000000  HSC2303-c1
+  - d8d76581  B1/2    0.6h  CC70  IQ85  SB80  WVAny    09:22:54.999999  -28:55:40.000000  HSC2303-c1
+  - 3ef4a879  B1/2    0.4h  CC70  IQ85  SB80  WVAny    10:24:22.999999  -68:48:57.000000  Melotte25-c1
+  - 3ef4a879  B1/2    0.4h  CC70  IQ85  SB80  WVAny    10:24:22.999999  -68:48:57.000000  Melotte25-c1
+  - 3ef4a879  B1/2    0.4h  CC70  IQ85  SB80  WVAny    10:24:22.999999  -68:48:57.000000  Melotte25-c1
+  - 3ef4a879  B1/2    0.4h  CC70  IQ85  SB80  WVAny    10:24:22.999999  -68:48:57.000000  Melotte25-c1
+  - 149cc139  B3      0.7h  CC70  IQAny SB80  WVAny    09:22:54.999999  -28:55:40.000000  HSC2303-c1
+  - 149cc139  B3      0.7h  CC70  IQAny SB80  WVAny    09:22:54.999999  -28:55:40.000000  HSC2303-c1
+  - 149cc139  B3      0.7h  CC70  IQAny SB80  WVAny    09:22:54.999999  -28:55:40.000000  HSC2303-c1
+  - e7df5f64  B3      0.5h  CC70  IQAny SB80  WVAny    10:24:22.999999  -68:48:57.000000  Melotte25-c1
+  - e7df5f64  B3      0.5h  CC70  IQAny SB80  WVAny    10:24:22.999999  -68:48:57.000000  Melotte25-c1
+  - e7df5f64  B3      0.5h  CC70  IQAny SB80  WVAny    10:24:22.999999  -68:48:57.000000  Melotte25-c1
+
+
+

@@ -1,0 +1,18 @@
+
+Reference: KR-2025B-019_2
+Mode:      Queue
+Partner:   KR
+Award:     6.4
+Rank:      15.0
+ToO:       None
+Comment:   Target disabled as per NTAC decision. Conditions adapted to B2 agreed by PI.
+
+Observations:
+  GN:
+  - fc8dad84  B1/2    0.7h  CC70  IQ70  SB50  WVAny    01:39:28.399200  +43:28:02.604000  FASHI J013929.04+432819.4
+  - 5111fc9a  B1/2    2.2h  CC70  IQ70  SB50  WVAny    01:39:28.399200  +43:28:02.604000  FASHI J013929.04+432819.4
+  - 8e33b367  B1/2    0.7h  CC80  IQ70  SBAny WVAny    11:56:28.200000  +15:07:06.960000  AGC 215217
+  - dcedcfc1  B1/2    3.6h  CC80  IQ70  SBAny WVAny    11:56:28.200000  +15:07:06.960000  AGC 215217
+
+
+

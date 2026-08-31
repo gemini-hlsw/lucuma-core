@@ -1,0 +1,26 @@
+
+Reference: AR-2025B-003
+Mode:      Queue
+Partner:   AR
+Award:     3.2
+Rank:      1.0
+ToO:       None
+Comment:   
+
+Observations:
+  GS:
+  - 120d3e86  B1/2    1.1h  CC70  IQ85  SB80  WVAny    01:10:45.969599  -71:20:17.700000  HW 64
+  - fc935577  B1/2    1.1h  CC70  IQ85  SB80  WVAny    01:11:53.971199  -71:19:48.396000  IC 1655
+  - b7712b9e  B1/2    1.1h  CC70  IQ85  SB80  WVAny    01:12:37.370400  -71:45:41.796000  IC 1660
+  - 9ed15866  B1/2    1.1h  CC70  IQ85  SB80  WVAny    01:14:44.880000  -71:20:49.199999  Cl Lindsay 95
+  - 200ab4c9  B1/2    1.1h  CC70  IQ85  SB80  WVAny    01:14:52.939199  -71:33:00.000000  NGC 458
+  - cf163d8e  B1/2    1.1h  CC70  IQ85  SB80  WVAny    01:16:24.849600  -71:19:38.495999  HW 73
+  - a48388ff  B3      1.1h  CC70  IQ85  SB80  WVAny    01:10:45.969599  -71:20:17.700000  HW 64
+  - 88c71de9  B3      1.1h  CC70  IQ85  SB80  WVAny    01:11:53.971199  -71:19:48.396000  IC 1655
+  - 12da0381  B3      1.1h  CC70  IQ85  SB80  WVAny    01:12:37.370400  -71:45:41.796000  IC 1660
+  - 67ae86e1  B3      1.1h  CC70  IQ85  SB80  WVAny    01:14:44.880000  -71:20:49.199999  Cl Lindsay 95
+  - ceaf062f  B3      1.1h  CC70  IQ85  SB80  WVAny    01:14:52.939199  -71:33:00.000000  NGC 458
+  - 42fafec3  B3      1.1h  CC70  IQ85  SB80  WVAny    01:16:24.849600  -71:19:38.495999  HW 73
+
+
+

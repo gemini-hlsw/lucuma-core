@@ -1,0 +1,18 @@
+
+Reference: US-2025B-014
+Mode:      Queue
+Partner:   US
+Award:     12.9
+Rank:      80.0
+ToO:       None
+Comment:   Keep WV but IQ relaxed to adapt proposal to B3. PI accepted after NTAC request.
+
+Observations:
+  GN:
+  - 7640dbeb  B1/2    5.1h  CC70  IQ70  SBAny WVAny    03:51:05.708288  +19:55:26.466364  uranus
+  - dd7a1b48  B1/2    7.9h  CC70  IQ70  SBAny WV80     03:51:05.708288  +19:55:26.466364  Uranus
+  - 697db602  B3      5.1h  CC70  IQ85  SBAny WVAny    03:51:05.708288  +19:55:26.466364  uranus
+  - c7010f8c  B3      7.9h  CC70  IQ85  SBAny WV80     03:51:05.708288  +19:55:26.466364  uranus
+
+
+

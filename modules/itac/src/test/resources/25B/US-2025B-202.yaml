@@ -1,0 +1,16 @@
+
+Reference: US-2025B-202
+Mode:      Queue
+Partner:   US
+Award:     23.3
+Rank:      89.0
+ToO:       None
+Comment:   Band3 enabled agreed by PI and CC50 relaxed to CC70
+
+Observations:
+  GS:
+  - 3bc50bd0  B1/2   23.3h  CC50  IQ85  SB80  WVAny    03:29:17.718767  -23:30:09.725760  ACT-CL J0329.2-2330
+  - 20e68850  B3     23.3h  CC70  IQ85  SB80  WVAny    03:29:17.718767  -23:30:09.725760  ACT-CL J0329.2-2330
+
+
+

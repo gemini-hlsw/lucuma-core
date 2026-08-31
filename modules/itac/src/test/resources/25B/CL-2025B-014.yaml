@@ -1,0 +1,22 @@
+
+Reference: CL-2025B-014
+Mode:      Queue
+Partner:   CL
+Award:     19.5
+Rank:      2.0
+ToO:       None
+Comment:   Targets will go along Timing windows, which will be defined as the observations at VLT with UVES progresses.
+
+Observations:
+  GS:
+  - 5633ae57  B1/2    3.7h  CC70  IQ70  SB50  WVAny    01:04:31.708799  +02:10:07.103999  [AFF2006] 3059-3
+  - cf28118b  B1/2    3.7h  CC70  IQ70  SB50  WVAny    01:04:32.130509  +02:05:02.068654  ZTF J010432.12+020502.1
+  - c2f8f919  B1/2    3.7h  CC70  IQ70  SB50  WVAny    01:04:34.540799  +02:06:42.084000  [AFF2006] 1046-3
+  - 4d47fe0e  B1/2    3.7h  CC70  IQ70  SB50  WVAny    01:04:37.697531  +02:09:08.627384  [MWF2015] 2154
+  - 252979e9  B1/2    3.7h  CC70  IQ70  SB50  WVAny    01:04:41.520000  +02:08:23.892000  [AFF2006] 3191-2
+  - 03a4458e  B1/2    3.7h  CC70  IQ70  SB50  WVAny    01:04:59.741400  +02:05:28.523511  [MWF2015] 4062
+  - fc31b4b4  B1/2    3.7h  CC70  IQ70  SB50  WVAny    01:05:02.042751  +02:10:24.858333  [S71b] V39
+  - 367a8d67  B1/2    3.7h  CC70  IQ70  SB50  WVAny    01:05:02.806795  +02:10:35.399212  [MWF2015] 1206
+
+
+

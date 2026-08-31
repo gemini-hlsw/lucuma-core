@@ -1,0 +1,20 @@
+
+Reference: BR-2025B-018_S
+Mode:      Queue
+Partner:   BR
+Award:     3.1
+Rank:      11.0
+ToO:       Standard
+Comment:   B3 enabled according to NTAC. Conditions upgraded. PI agreed.
+
+Observations:
+  GS:
+  - 14025a06  B1/2    1.4h  CC70  IQAny SB80  WVAny    01:26:24.250000  -71:17:13.199999  TIC0631161222
+  - 8368081d  B1/2    0.9h  CC70  IQAny SB80  WVAny    20:43:11.780000  -46:10:49.099999  TIC1989866634
+  - 97e2a0a8  B1/2    0.8h  CC70  IQAny SB80  WVAny    23:22:32.110000  -83:13:14.299999  TIC0317153172
+  - b99184b6  B3      1.4h  CC70  IQAny SB80  WVAny    01:26:24.250000  -71:17:13.199999  TIC0631161222
+  - 83bc8ec0  B3      0.9h  CC70  IQAny SB80  WVAny    20:43:11.780000  -46:10:49.099999  TIC1989866634
+  - bdb0d050  B3      0.8h  CC70  IQAny SB80  WVAny    23:22:32.110000  -83:13:14.299999  TIC0317153172
+
+
+

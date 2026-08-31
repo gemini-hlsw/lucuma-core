@@ -1,0 +1,18 @@
+
+Reference: BR-2025B-020
+Mode:      Queue
+Partner:   BR
+Award:     8.0
+Rank:      9.0
+ToO:       Standard
+Comment:   Conditions upgraded (CC70/IQ70/SBAny) requested by NTAC
+
+Observations:
+  GS:
+  - 6dac745b  B1/2    3.3h  CC70  IQ70  SB50  WVAny    10:30:26.514600  -35:21:34.165000  NGC 3271_i
+  - 5d02cf96  B1/2   11.9h  CC70  IQ70  SB50  WVAny    10:30:26.514600  -35:21:34.165000  NGC 3271_g
+  - 3aca94ea  B1/2    1.3h  CC70  IQ70  SB50  WVAny    20:20:49.633900  -48:14:20.612000  NGC 6893_i
+  - b6fa2845  B1/2    4.6h  CC70  IQ70  SB50  WVAny    20:20:49.633900  -48:14:20.612000  NGC 6893_g
+
+
+

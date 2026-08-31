@@ -1,0 +1,24 @@
+
+Reference: US-2025B-086_S
+Mode:      Queue
+Partner:   US
+Award:     4.3
+Rank:      44.0
+ToO:       None
+Comment:   
+
+Observations:
+  GS:
+  - c5223bbb  B1/2    0.9h  CC70  IQ70  SB50  WVAny    01:18:07.771620  -07:42:40.362219  2022 SJ21
+  - ed4c5f2f  B1/2    0.9h  CC70  IQ70  SB50  WVAny    01:51:55.740654  -05:14:50.269932  2022 OA5
+  - 6bfef4ba  B1/2    0.9h  CC70  IQ70  SB50  WVAny    02:00:43.289395  +00:29:01.282055  2014 NX65
+  - 1a5ee84c  B1/2    0.9h  CC70  IQ70  SB50  WVAny    04:30:56.595122  +04:25:29.441347  2024 WT4
+  - b5d0d565  B1/2    0.9h  CC70  IQ70  SB50  WVAny    22:58:16.447543  -14:24:32.217111  2024 OZ14
+  - 19b951c0  B3      1.9h  CC80  IQ70  SB80  WVAny    01:18:07.771620  -07:42:40.362219  2022 SJ21
+  - aad26284  B3      1.9h  CC80  IQ70  SB80  WVAny    01:51:55.740654  -05:14:50.269932  2022 OA5
+  - b3ceabdf  B3      1.9h  CC80  IQ70  SB80  WVAny    02:00:43.289395  +00:29:01.282055  2014 NX65
+  - e486cfeb  B3      1.9h  CC80  IQ70  SB80  WVAny    04:30:56.595122  +04:25:29.441347  2024 WT4
+  - ebc2bcf8  B3      1.9h  CC80  IQ70  SB80  WVAny    22:58:16.447543  -14:24:32.217111  2024 OZ14
+
+
+
