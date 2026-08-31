@@ -11,7 +11,6 @@ enum ObservationWorkflowState(val tag: String, val name: String) derives Enumera
   case Undefined  extends ObservationWorkflowState("undefined", "Undefined")
   case Unapproved extends ObservationWorkflowState("unapproved", "Unapproved")
   case Defined    extends ObservationWorkflowState("defined", "Defined")
-  case ForReview  extends ObservationWorkflowState("for_review", "For Review")
   case Ready      extends ObservationWorkflowState("ready", "Ready")
   case Ongoing    extends ObservationWorkflowState("ongoing", "Ongoing")
   case Completed  extends ObservationWorkflowState("completed", "Completed")
