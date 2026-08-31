@@ -8,10 +8,13 @@ import cats.Order
 import cats.data.NonEmptyList
 import cats.data.NonEmptyMap
 import cats.derived.*
+import cats.syntax.either.*
 import lucuma.core.enums.Flamingos2LyotWheel
 import lucuma.core.enums.GmosFpuType
 import lucuma.core.enums.GmosNorthFpu
+import lucuma.core.enums.GmosNorthIfuFpu
 import lucuma.core.enums.GmosSouthFpu
+import lucuma.core.enums.GmosSouthIfuFpu
 import lucuma.core.enums.GnirsCamera
 import lucuma.core.enums.GnirsFilter
 import lucuma.core.enums.GnirsFpuIfu
@@ -200,6 +203,66 @@ object AgsParams:
   object GmosImaging:
     def apply(port: PortDisposition = PortDisposition.Side): GmosImaging =
       new GmosImaging(port, GuideProbe.GmosOIWFS)
+
+  /**
+   * GMOS IFU. The probe geometry goes through the long slit path because that is the only one
+   * taking an FPU, and so the only one that applies `ifuOffset`; the imaging path used by MOS takes
+   * none. That offset is the point: it is zero for every slit but 31.75" to 35.25" for the IFU
+   * apertures, being the shift that puts the target into the aperture.
+   *
+   * The science area, though, is the IFU field rather than a slit, which is what makes this its own
+   * variant instead of a `GmosLongSlit`.
+   */
+  case class GmosIfu private (
+    fpu:   Either[GmosNorthIfuFpu, GmosSouthIfuFpu],
+    port:  PortDisposition,
+    probe: GuideProbe
+  ) extends AgsParams
+      with SingleProbeAgsParams
+      with PwfsSupport[GmosIfu] derives Eq:
+    import lucuma.core.geom.gmos
+    import lucuma.core.geom.gmos.oiwfs
+    import lucuma.core.geom.pwfs
+
+    protected def withPWFSProbe(probe: PWFSGuideProbe): GmosIfu = copy(probe = probe)
+
+    private def gmosFpu: Either[GmosNorthFpu, GmosSouthFpu] = fpu.fold(_.fpu.asLeft, _.fpu.asRight)
+
+    private def fieldWidth: Angle = fpu.fold(_.fieldWidth, _.fieldWidth)
+
+    override def patrolFieldAt(
+      posAngle: Angle,
+      offset:   Offset,
+      pivot:    Offset = Offset.Zero
+    ): ShapeExpression =
+      probe match
+        case GuideProbe.GmosOIWFS =>
+          oiwfs.patrolField.longSlitMode.patrolFieldAt(posAngle, offset, gmosFpu, port, pivot)
+        case _: PWFSGuideProbe    =>
+          pwfs.patrolField.patrolFieldAt(posAngle, offset, pivot)
+        case _                    =>
+          ShapeExpression.empty
+
+    override def scienceArea(posAngle: Angle, offset: Offset): ShapeExpression =
+      gmos.scienceArea.ifuMode.shapeAt(posAngle, offset, fieldWidth)
+
+    override def probeArm(posAngle: Angle, guideStar: Offset, offset: Offset): ShapeExpression =
+      probe match
+        case GuideProbe.GmosOIWFS =>
+          oiwfs.probeArm.longSlit.shapeAt(posAngle, guideStar, offset, gmosFpu, port)
+        case _: PWFSGuideProbe    =>
+          pwfs.probeArm.vignettedAreaAt(probe, guideStar, offset)
+        case _                    =>
+          ShapeExpression.Empty
+
+    override def scienceDiameter: Angle = GmosScienceDiameter
+
+  object GmosIfu:
+    def apply(
+      fpu:  Either[GmosNorthIfuFpu, GmosSouthIfuFpu],
+      port: PortDisposition = PortDisposition.Side
+    ): GmosIfu =
+      new GmosIfu(fpu, port, GuideProbe.GmosOIWFS)
 
   case class GmosLongSlit private (
     fpu:   Either[GmosNorthFpu, GmosSouthFpu],
