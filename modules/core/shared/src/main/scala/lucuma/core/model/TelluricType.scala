@@ -21,6 +21,7 @@ object TelluricType:
   case object A0V                                     extends TelluricType("A0V")
   case object Solar                                   extends TelluricType("Solar")
   case class  Manual(starTypes: NonEmptyList[String]) extends TelluricType("Manual") derives Eq
+  case object None                                    extends TelluricType("None")
 
   object Manual:
     val starTypes: Lens[Manual, NonEmptyList[String]] = Focus[Manual](_.starTypes)
@@ -36,3 +37,6 @@ object TelluricType:
 
   val manual: Prism[TelluricType, TelluricType.Manual] =
     GenPrism[TelluricType, TelluricType.Manual]
+
+  val none: Prism[TelluricType, TelluricType.None.type] =
+    GenPrism[TelluricType, TelluricType.None.type]

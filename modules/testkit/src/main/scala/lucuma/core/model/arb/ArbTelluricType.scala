@@ -19,15 +19,14 @@ trait ArbTelluricType:
         Gen.const(TelluricType.Hot),
         Gen.const(TelluricType.A0V),
         Gen.const(TelluricType.Solar),
+        Gen.const(TelluricType.None),
         arbitrary[TelluricType.Manual]
       )
 
   given Cogen[TelluricType] =
-    Cogen[Either[Unit, Either[Unit, Either[Unit, List[String]]]]].contramap:
-      case TelluricType.Hot           => Left(())
-      case TelluricType.A0V           => Right(Left(()))
-      case TelluricType.Solar         => Right(Right(Left(())))
-      case TelluricType.Manual(types) => Right(Right(Right(types.toList)))
+    Cogen[(String, List[String])].contramap:
+      case TelluricType.Manual(types) => ("Manual", types.toList)
+      case t                          => (t.tag, Nil)
 
 
 object ArbTelluricType extends ArbTelluricType
