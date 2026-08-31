@@ -15,11 +15,11 @@ object codecs:
   given Decoder[TelluricType] =
     Decoder[String].emap: s =>
       s.toLowerCase match
-        case "hot"   => TelluricType.Hot.asRight
-        case "a0v"   => TelluricType.A0V.asRight
-        case "solar" => TelluricType.Solar.asRight
-        case "none"  => TelluricType.None.asRight
-        case other   =>
+        case "hot"        => TelluricType.Hot.asRight
+        case "a0v"        => TelluricType.A0V.asRight
+        case "solar"      => TelluricType.Solar.asRight
+        case "notelluric" => TelluricType.NoTelluric.asRight
+        case other        =>
           NonEmptyList.fromList(other.split(",").map(_.trim).filter(_.nonEmpty).toList) match
             case Some(types) => TelluricType.Manual(types).asRight
             case None        => s"Invalid telluric type: $s".asLeft
@@ -29,7 +29,7 @@ object codecs:
       case TelluricType.Hot               => "hot"
       case TelluricType.A0V               => "A0V"
       case TelluricType.Solar             => "Solar"
-      case TelluricType.None              => "none"
+      case TelluricType.NoTelluric        => "NoTelluric"
       case TelluricType.Manual(starTypes) => starTypes.toList.mkString(",")
 
   given Decoder[TelluricCalibrationOrder] =

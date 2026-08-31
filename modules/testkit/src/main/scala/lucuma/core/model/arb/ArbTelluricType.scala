@@ -19,7 +19,7 @@ trait ArbTelluricType:
         Gen.const(TelluricType.Hot),
         Gen.const(TelluricType.A0V),
         Gen.const(TelluricType.Solar),
-        Gen.const(TelluricType.None),
+        Gen.const(TelluricType.NoTelluric),
         arbitrary[TelluricType.Manual]
       )
 
