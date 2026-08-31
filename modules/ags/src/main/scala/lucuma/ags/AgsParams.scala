@@ -205,10 +205,9 @@ object AgsParams:
       new GmosImaging(port, GuideProbe.GmosOIWFS)
 
   /**
-   * GMOS IFU. The probe geometry goes through the long slit path because that is the only one
-   * taking an FPU, and so the only one that applies `ifuOffset`; the imaging path used by MOS takes
-   * none. That offset is the point: it is zero for every slit but 31.75" to 35.25" for the IFU
-   * apertures, being the shift that puts the target into the aperture.
+   * GMOS IFU. The probe geometry goes through `fpuMode`, shared with long slit: that offset is the
+   * point, being zero for every slit but 31.75" to 35.25" for the IFU apertures, the shift that puts
+   * the target into the aperture. The imaging path used by MOS applies none.
    *
    * The science area, though, is the IFU field rather than a slit, which is what makes this its own
    * variant instead of a `GmosLongSlit`.
@@ -237,7 +236,7 @@ object AgsParams:
     ): ShapeExpression =
       probe match
         case GuideProbe.GmosOIWFS =>
-          oiwfs.patrolField.longSlitMode.patrolFieldAt(posAngle, offset, gmosFpu, port, pivot)
+          oiwfs.patrolField.fpuMode.patrolFieldAt(posAngle, offset, gmosFpu, port, pivot)
         case _: PWFSGuideProbe    =>
           pwfs.patrolField.patrolFieldAt(posAngle, offset, pivot)
         case _                    =>
@@ -249,7 +248,7 @@ object AgsParams:
     override def probeArm(posAngle: Angle, guideStar: Offset, offset: Offset): ShapeExpression =
       probe match
         case GuideProbe.GmosOIWFS =>
-          oiwfs.probeArm.longSlit.shapeAt(posAngle, guideStar, offset, gmosFpu, port)
+          oiwfs.probeArm.fpuMode.shapeAt(posAngle, guideStar, offset, gmosFpu, port)
         case _: PWFSGuideProbe    =>
           pwfs.probeArm.vignettedAreaAt(probe, guideStar, offset)
         case _                    =>
@@ -284,7 +283,7 @@ object AgsParams:
     ): ShapeExpression =
       probe match
         case GuideProbe.GmosOIWFS =>
-          oiwfs.patrolField.longSlitMode.patrolFieldAt(posAngle, offset, fpu, port, pivot)
+          oiwfs.patrolField.fpuMode.patrolFieldAt(posAngle, offset, fpu, port, pivot)
         case _: PWFSGuideProbe    =>
           pwfs.patrolField.patrolFieldAt(posAngle, offset, pivot)
         case _                    =>
@@ -296,7 +295,7 @@ object AgsParams:
     override def probeArm(posAngle: Angle, guideStar: Offset, offset: Offset): ShapeExpression =
       probe match
         case GuideProbe.GmosOIWFS =>
-          oiwfs.probeArm.longSlit.shapeAt(posAngle, guideStar, offset, fpu, port)
+          oiwfs.probeArm.fpuMode.shapeAt(posAngle, guideStar, offset, fpu, port)
         case _: PWFSGuideProbe    =>
           pwfs.probeArm.vignettedAreaAt(probe, guideStar, offset)
         case _                    =>

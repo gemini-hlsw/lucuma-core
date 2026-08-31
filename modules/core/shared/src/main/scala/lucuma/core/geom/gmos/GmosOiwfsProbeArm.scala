@@ -78,10 +78,12 @@ trait GmosOiwfsProbeArm {
     ): ShapeExpression =
       shape ⟲ armAngle(posAngle, guideStar, offsetPos, Offset.Zero, port) ↗ guideStar
 
-  object longSlit:
+  object fpuMode:
     /**
-      * The GMOS OIWFS probe arm positioned to reach a particular guide star at
-      * a particular offset in long-slit mode.
+      * The GMOS OIWFS probe arm positioned to reach a particular guide star at a particular offset,
+      * for the modes that carry a focal plane unit: long slit, nod & shuffle and IFU.  Taking an FPU
+      * is what brings in `ifuOffset`, which is zero for every slit and non-zero only for the IFU
+      * apertures, so this is the only path that shifts the arm.
       *
       * @param posAngle position angle where positive is counterclockwise
       * @param guideStar guide star offset from the center, relative to an un-rotated frame

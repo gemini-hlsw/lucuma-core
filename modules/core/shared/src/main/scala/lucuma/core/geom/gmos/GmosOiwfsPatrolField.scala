@@ -54,9 +54,11 @@ trait GmosOiwfsPatrolField:
     ): ShapeExpression =
       patrolFieldAtBase(posAngle, offsetPos, Offset.Zero, port, pivot)
 
-  object longSlitMode:
+  object fpuMode:
     /**
-      * GMOS patrol field shape for long-slit mode.
+      * GMOS patrol field shape for the modes that carry a focal plane unit: long slit, nod & shuffle
+      * and IFU.  Taking an FPU is what brings in `ifuOffset`, which is zero for every slit and
+      * non-zero only for the IFU apertures, so this is the only path that shifts the field.
       *
       * @param posAngle position angle where positive is counterclockwise
       * @param offsetPos offset position from the base, if any
