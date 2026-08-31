@@ -1,0 +1,27 @@
+
+Reference: AR-2025B-014
+Mode:      Queue
+Partner:   AR
+Award:     4.1
+Rank:      5.0
+ToO:       None
+Comment:   
+
+Observations:
+  GN:
+  - 567b1c17  B1/2    0.5h  CC70  IQ70  SBAny WVAny    00:54:45.950012  +64:05:05.169399  V* BM Cas
+  - 5099f9e3  B1/2    2.5h  CC70  IQ70  SBAny WVAny    01:33:50.159040  +30:41:25.987200  IFM-B 1026
+  - adebb2a5  B1/2    0.4h  CC70  IQ70  SBAny WVAny    01:37:47.198309  +64:44:21.679246  HD 9811
+  - abac3ba1  B1/2    0.4h  CC70  IQ70  SBAny WVAny    02:03:49.124504  +64:14:14.953025  HD 12399
+  - aaed6cc7  B1/2    0.4h  CC70  IQ70  SBAny WVAny    02:49:30.736929  +57:05:03.548427  HD 17378
+  - 5c5e0b78  B1/2    0.4h  CC70  IQ70  SBAny WVAny    02:55:54.311852  +60:23:35.747497  HD 17971
+  - 96ba21e1  B1/2    0.5h  CC70  IQ70  SBAny WVAny    08:02:40.704957  -24:04:42.588796  IRAS 08005-2356
+  - 5a5cf7f6  B3      0.7h  CC80  IQ85  SBAny WVAny    00:54:45.950012  +64:05:05.169399  V* BM Cas
+  - 8cdcf85c  B3      0.5h  CC80  IQ85  SBAny WVAny    01:37:47.198309  +64:44:21.679246  HD 9811
+  - d6f06bf8  B3      0.5h  CC80  IQ85  SBAny WVAny    02:03:49.124504  +64:14:14.953025  HD 12399
+  - ea4d5ab7  B3      0.5h  CC80  IQ85  SBAny WVAny    02:49:30.736929  +57:05:03.548427  HD 17378
+  - 08b4b292  B3      0.6h  CC80  IQ85  SBAny WVAny    02:55:54.311852  +60:23:35.747497  HD 17971
+  - cc492734  B3      0.6h  CC80  IQ85  SBAny WVAny    08:02:40.704957  -24:04:42.588796  IRAS 08005-2356
+
+
+

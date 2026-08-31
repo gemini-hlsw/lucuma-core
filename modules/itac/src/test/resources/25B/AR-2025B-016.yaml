@@ -1,0 +1,22 @@
+
+Reference: AR-2025B-016
+Mode:      Queue
+Partner:   AR
+Award:     3.3
+Rank:      12.0
+ToO:       None
+Comment:   Observing conditions relaxed for B4 IQAny, CC70, SBAny, WVAny
+
+Observations:
+  GN:
+  - 493a3f8f  B1/2    0.8h  CC70  IQ70  SBAny WV80     06:24:02.283105  +08:53:06.046437  HD 44783
+  - cc05e023  B1/2    0.6h  CC70  IQ70  SBAny WV80     06:24:02.283105  +08:53:06.046437  HD 44783
+  - d6a05a32  B1/2    0.8h  CC70  IQ70  SBAny WV80     06:36:35.329652  -05:12:40.103033  HD 47054
+  - cc8b2c87  B1/2    0.5h  CC70  IQ70  SBAny WV80     06:36:35.329652  -05:12:40.103033  HD 47054
+  - 79ee392b  B3      1.0h  CC70  IQAny SBAny WVAny    06:24:02.283105  +08:53:06.046437  HD 44783
+  - 4821040f  B3      0.6h  CC70  IQAny SBAny WVAny    06:24:02.283105  +08:53:06.046437  HD 44783
+  - 5f8d82cf  B3      1.0h  CC70  IQAny SBAny WVAny    06:36:35.329652  -05:12:40.103033  HD 47054
+  - 724971f8  B3      0.6h  CC70  IQAny SBAny WVAny    06:36:35.329652  -05:12:40.103033  HD 47054
+
+
+

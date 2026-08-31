@@ -1,0 +1,54 @@
+
+Reference: US-2025B-136_S
+Mode:      Queue
+Partner:   US
+Award:     5.2
+Rank:      106.0
+ToO:       None
+Comment:   
+
+Observations:
+  GS:
+  - 3e263d74  B1/2    0.3h  CC70  IQ70  SBAny WVAny    05:33:37.515972  -62:29:23.376457  * bet Dor
+  - eb3052d3  B1/2    0.3h  CC70  IQ70  SBAny WVAny    07:21:32.857193  -16:41:13.998801  V* RZ CMa
+  - cfd78b97  B1/2    0.3h  CC70  IQ70  SBAny WVAny    07:41:59.003741  -25:52:34.252471  V* WX Pup
+  - 93ef0e2d  B1/2    0.3h  CC70  IQ70  SBAny WVAny    07:57:45.672542  -40:07:24.082195  V* AP Pup
+  - 4974f28c  B1/2    0.3h  CC70  IQ70  SBAny WVAny    07:58:59.219704  -29:18:28.358867  V* LS Pup
+  - b17e1eb2  B1/2    0.3h  CC70  IQ70  SBAny WVAny    08:06:21.475034  -30:05:48.770958  V* BN Pup
+  - 73894123  B1/2    0.3h  CC70  IQ70  SBAny WVAny    08:44:55.893127  -50:33:36.141820  V* ST Vel
+  - f2f8da72  B1/2    0.3h  CC70  IQ70  SBAny WVAny    09:17:16.718960  -53:05:05.508109  V* DK Vel
+  - d878d7f6  B1/2    0.3h  CC70  IQ70  SBAny WVAny    09:55:26.159938  -58:25:46.924744  V* GX Car
+  - 24677d2c  B1/2    0.3h  CC70  IQ70  SBAny WVAny    10:20:41.031588  -55:19:17.028180  V* RY Vel
+  - 4d946e0d  B1/2    0.3h  CC70  IQ70  SBAny WVAny    10:42:23.031720  -61:09:57.295281  V* EY Car
+  - 8d0e2763  B1/2    0.3h  CC70  IQ70  SBAny WVAny    10:46:05.841234  -57:32:51.122540  V* SX Car
+  - eea0cb68  B1/2    0.3h  CC70  IQ70  SBAny WVAny    10:51:35.767837  -59:23:06.014351  V* WW Car
+  - b4a91d3c  B1/2    0.3h  CC70  IQ70  SBAny WVAny    10:57:09.214986  -65:08:05.119320  V* XX Car
+  - 0ed09bd6  B1/2    0.3h  CC70  IQ70  SBAny WVAny    11:30:54.429695  -56:53:55.837531  V* V419 Cen
+  - 78e0e2a2  B1/2    0.3h  CC70  IQ70  SBAny WVAny    16:58:19.748000  -33:36:32.767208  V* RV Sco
+  - 0b7a7809  B1/2    0.3h  CC70  IQ70  SBAny WVAny    18:10:02.132250  -13:32:45.471161  V* CR Ser
+  - 3b5fdc2f  B1/2    0.3h  CC70  IQ70  SBAny WVAny    18:23:19.149878  -18:34:29.188062  V* AY Sgr
+  - 0ebefd97  B1/2    0.3h  CC70  IQ70  SBAny WVAny    18:24:44.500923  -16:47:49.818126  V* XX Sgr
+  - ecf82170  B1/2    0.3h  CC70  IQ70  SBAny WVAny    18:38:03.306418  -08:22:08.163746  V* Y Sct
+  - 95ad910a  B3      0.3h  CC70  IQ85  SBAny WVAny    05:33:37.515972  -62:29:23.376457  * bet Dor
+  - 350cfe5b  B3      0.3h  CC70  IQ85  SBAny WVAny    07:21:32.857193  -16:41:13.998801  V* RZ CMa
+  - efb5453d  B3      0.3h  CC70  IQ85  SBAny WVAny    07:41:59.003741  -25:52:34.252471  V* WX Pup
+  - d41184ae  B3      0.3h  CC70  IQ85  SBAny WVAny    07:57:45.672542  -40:07:24.082195  V* AP Pup
+  - bb665a40  B3      0.3h  CC70  IQ85  SBAny WVAny    07:58:59.219704  -29:18:28.358867  V* LS Pup
+  - 77d87481  B3      0.3h  CC70  IQ85  SBAny WVAny    08:06:21.475034  -30:05:48.770958  V* BN Pup
+  - bafab905  B3      0.3h  CC70  IQ85  SBAny WVAny    08:44:55.893127  -50:33:36.141820  V* ST Vel
+  - 4ffd430e  B3      0.3h  CC70  IQ85  SBAny WVAny    09:17:16.718960  -53:05:05.508109  V* DK Vel
+  - d550b8ad  B3      0.3h  CC70  IQ85  SBAny WVAny    09:55:26.159938  -58:25:46.924744  V* GX Car
+  - ca9352b3  B3      0.3h  CC70  IQ85  SBAny WVAny    10:20:41.031588  -55:19:17.028180  V* RY Vel
+  - 6300f254  B3      0.3h  CC70  IQ85  SBAny WVAny    10:42:23.031720  -61:09:57.295281  V* EY Car
+  - 88e78598  B3      0.3h  CC70  IQ85  SBAny WVAny    10:46:05.841234  -57:32:51.122540  V* SX Car
+  - ce843115  B3      0.3h  CC70  IQ85  SBAny WVAny    10:51:35.767837  -59:23:06.014351  V* WW Car
+  - 48563ec4  B3      0.3h  CC70  IQ85  SBAny WVAny    10:57:09.214986  -65:08:05.119320  V* XX Car
+  - f613461e  B3      0.3h  CC70  IQ85  SBAny WVAny    11:30:54.429695  -56:53:55.837531  V* V419 Cen
+  - 56a4782a  B3      0.3h  CC70  IQ85  SBAny WVAny    16:58:19.748000  -33:36:32.767208  V* RV Sco
+  - c773b2fd  B3      0.3h  CC70  IQ85  SBAny WVAny    18:10:02.132250  -13:32:45.471161  V* CR Ser
+  - 8e5e7179  B3      0.3h  CC70  IQ85  SBAny WVAny    18:23:19.149878  -18:34:29.188062  V* AY Sgr
+  - 86587a98  B3      0.3h  CC70  IQ85  SBAny WVAny    18:24:44.500923  -16:47:49.818126  V* XX Sgr
+  - bf760ec6  B3      0.3h  CC70  IQ85  SBAny WVAny    18:38:03.306418  -08:22:08.163746  V* Y Sct
+
+
+

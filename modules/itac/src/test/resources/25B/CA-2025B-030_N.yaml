@@ -1,0 +1,24 @@
+
+Reference: CA-2025B-030_N
+Mode:      Queue
+Partner:   CA
+Award:     2.3
+Rank:      26.0
+ToO:       None
+Comment:   Conditions adapted to B4
+
+Observations:
+  GN:
+  - b2b7a69d  B1/2    0.4h  CC70  IQ85  SB80  WVAny    05:57:04.293599  +44:09:45.972000  HSC1347-c1
+  - 7f3c63d7  B1/2    0.6h  CC70  IQ85  SB80  WVAny    19:30:55.919999  +33:43:04.800000  Stock1-c1
+  - b72701cb  B1/2    0.5h  CC70  IQ85  SB80  WVAny    19:54:44.328000  +26:36:21.348000  UPK82-c1
+  - 2ad86d50  B1/2    1.5h  CC70  IQ85  SB80  WVAny    20:19:16.488000  +42:57:37.115999  RSG5-c1
+  - 494efb7f  B1/2    0.4h  CC70  IQ85  SB80  WVAny    21:30:18.312000  +47:10:07.320000  HSC759-c1
+  - 88e4c0f3  B1/2    0.7h  CC70  IQ85  SB80  WVAny    21:45:17.203200  +76:20:52.098000  HSC976-c1
+  - 00eb9291  B3      0.4h  CC70  IQAny SB80  WVAny    05:57:04.079999  +44:09:43.199999  HSC1347-c1
+  - 8f199dd8  B3      0.6h  CC70  IQAny SB80  WVAny    19:30:55.919999  +33:43:04.800000  Stock1-c1
+  - 3008cc70  B3      0.4h  CC70  IQAny SB80  WVAny    21:30:18.240000  +47:10:04.800000  HSC759-c1
+  - 84dea091  B3      0.9h  CC70  IQAny SB80  WVAny    21:45:17.040000  +76:20:49.199999  HSC976-c1
+
+
+

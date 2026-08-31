@@ -1,0 +1,18 @@
+
+Reference: US-2025B-269
+Mode:      Queue
+Partner:   US
+Award:     10.0
+Rank:      112.0
+ToO:       None
+Comment:   Band 3 enabled and conditions relaxed accepted by NTAC
+
+Observations:
+  GN:
+  - 7c74f686  B1/2    5.0h  CC70  IQ70  SBAny WV50     20:12:40.169336  -02:08:39.187438  WASP-80
+  - 7c74f686  B1/2    5.0h  CC70  IQ70  SBAny WV50     20:12:40.169336  -02:08:39.187438  WASP-80
+  - 914cd63f  B3      5.0h  CC70  IQ85  SBAny WVAny    20:12:40.169336  -02:08:39.187438  WASP-80
+  - 914cd63f  B3      5.0h  CC70  IQ85  SBAny WVAny    20:12:40.169336  -02:08:39.187438  WASP-80
+
+
+

@@ -1,0 +1,20 @@
+
+Reference: US-2025B-022
+Mode:      Queue
+Partner:   US
+Award:     9.0
+Rank:      45.0
+ToO:       None
+Comment:   Joint proposal, with only US contribution, 9h allocated to observe two target, the other one is disabled
+
+Observations:
+  GN:
+  - a55bd962  B1/2    7.0h  CC70  IQ70  SB80  WVAny    03:42:27.624065  -07:22:13.267808  DIABLE
+  - 182a09d4  B1/2    4.8h  CC70  IQ70  SB80  WVAny    10:35:55.515031  +42:10:43.964123  PB 393
+  - 60ecaeaa  B1/2    4.2h  CC70  IQAny SBAny WVAny    21:01:10.170696  -05:27:51.145177  GALEX J210110.1-052750
+  - c6e7e39a  B3      8.4h  CC70  IQ85  SB80  WVAny    03:42:27.624065  -07:22:13.267809  GALEX J034227.6-072212
+  - 95fe5211  B3      5.3h  CC70  IQ85  SB80  WVAny    10:35:55.515031  +42:10:43.964123  PB 393
+  - b8d90f00  B3      4.2h  CC70  IQAny SBAny WVAny    21:01:10.170696  -05:27:51.145177  GALEX J210110.1-052750
+
+
+

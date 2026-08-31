@@ -1,0 +1,16 @@
+
+Reference: CA-2025B-011
+Mode:      Queue
+Partner:   CA
+Award:     10.0
+Rank:      17.0
+ToO:       None
+Comment:   B3 enabled and conditions adapted. Accepted by PI according to NTAC
+
+Observations:
+  GS:
+  - 4fb54b76  B1/2    1.1h  CC70  IQ70  SB80  WVAny    04:45:28.865256  -48:08:24.737316  J0445-4808
+  - 482851ec  B3      1.1h  CC70  IQ85  SBAny WVAny    04:45:28.865256  -48:08:24.737316  J0445-4808
+
+
+

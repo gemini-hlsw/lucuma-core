@@ -1,0 +1,22 @@
+
+Reference: AR-2025B-024_S
+Mode:      Queue
+Partner:   AR
+Award:     2.8
+Rank:      6.0
+ToO:       None
+Comment:   
+
+Observations:
+  GS:
+  - 962b1ffc  B1/2    0.6h  CC50  IQ70  SBAny WVAny    08:58:53.414806  -13:18:45.114181  TOI-2669
+  - e5cc8f00  B1/2    1.1h  CC50  IQ70  SBAny WVAny    10:59:43.916781  -82:13:17.060689  TYC 9422-91-1
+  - f7257961  B1/2    0.4h  CC50  IQ70  SBAny WVAny    17:28:44.021270  -62:50:24.793279  TYC 9057-870-1
+  - 4632c257  B1/2    0.7h  CC50  IQ70  SBAny WVAny    23:51:12.517454  -50:52:11.474873  TYC 8463-11-1
+  - cd186447  B3      1.1h  CC70  IQ85  SBAny WVAny    08:58:53.414806  -13:18:45.114181  TOI-2669
+  - 3ba3af31  B3      2.4h  CC70  IQ85  SBAny WVAny    10:59:43.916781  -82:13:17.060689  TYC 9422-91-1
+  - 89e6cdd8  B3      0.8h  CC70  IQ85  SBAny WVAny    17:28:44.021270  -62:50:24.793279  TYC 9057-870-1
+  - 6d0bc11c  B3      0.8h  CC70  IQ85  SBAny WVAny    23:51:12.517454  -50:52:11.474873  TYC 8463-11-1
+
+
+

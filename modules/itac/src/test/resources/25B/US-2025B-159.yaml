@@ -1,0 +1,26 @@
+
+Reference: US-2025B-159
+Mode:      Queue
+Partner:   US
+Award:     11.2
+Rank:      40.0
+ToO:       None
+Comment:   
+
+Observations:
+  GS:
+  - 0900bc42  B1/2    0.4h  CC70  IQ85  SB80  WVAny    05:27:04.763328  -11:54:03.466002  V* AF Lep
+  - 6cd6e7a1  B1/2    3.2h  CC70  IQ85  SB80  WVAny    06:09:19.208117  -35:49:31.065774  CD-35 2722
+  - d5169480  B1/2    0.4h  CC70  IQ85  SB80  WVAny    07:59:03.946837  -04:19:56.702793  V* V769 Mon
+  - c997662b  B1/2    6.2h  CC70  IQ85  SB80  WVAny    16:21:54.667691  -20:43:09.140591  GSC 06214-00210
+  - eaac6d69  B1/2    0.4h  CC70  IQ85  SB80  WVAny    22:03:21.653626  -56:47:09.522795  * eps Ind
+  - e99ee6e0  B1/2    0.7h  CC70  IQ85  SB80  WVAny    23:39:37.387367  -72:43:19.755447  HD 222237
+  - bb4980fd  B3      0.4h  CC70  IQ85  SB80  WVAny    05:27:04.763328  -11:54:03.466002  V* AF Lep
+  - 4d9b288c  B3      3.2h  CC70  IQ85  SB80  WVAny    06:09:19.208117  -35:49:31.065774  CD-35 2722
+  - d9780308  B3      0.4h  CC70  IQ85  SB80  WVAny    07:59:03.946837  -04:19:56.702793  V* V769 Mon
+  - c38528b4  B3      6.2h  CC70  IQ85  SB80  WVAny    16:21:54.667691  -20:43:09.140591  GSC 06214-00210
+  - d9c110b0  B3      0.4h  CC70  IQ85  SB80  WVAny    22:03:21.653626  -56:47:09.522795  * eps Ind
+  - 17e3ad3c  B3      0.7h  CC70  IQ85  SB80  WVAny    23:39:37.387367  -72:43:19.755447  HD 222237
+
+
+

@@ -1,0 +1,22 @@
+
+Reference: AR-2025B-007
+Mode:      Queue
+Partner:   AR
+Award:     23.0
+Rank:      19.0
+ToO:       None
+Comment:   Conditions relaxed to B4 IQAny, CC70, SB50, WVAny as per NTAC
+
+Observations:
+  GS:
+  - af97ee75  B1/2    1.4h  CC50  IQ70  SB50  WVAny    05:56:24.741904  -27:51:32.361761  L 595-22
+  - 641c1da9  B1/2    5.9h  CC50  IQ70  SB50  WVAny    06:47:23.405151  -26:44:10.678368  NGC 2295
+  - f5817bde  B1/2    5.9h  CC50  IQ70  SB50  WVAny    06:47:39.650400  -26:44:46.499999  NGC 2292
+  - ce15428d  B1/2    5.9h  CC50  IQ70  SB50  WVAny    06:47:42.912000  -26:45:15.699600  NGC 2293
+  - be8e904f  B3      1.4h  CC70  IQAny SB50  WVAny    05:56:24.741904  -27:51:32.361761  L 595-22
+  - fde35625  B3      7.1h  CC70  IQAny SB50  WVAny    06:47:23.405151  -26:44:10.678368  NGC 2295
+  - 6fb29bf6  B3      7.1h  CC70  IQAny SB50  WVAny    06:47:39.650400  -26:44:46.499999  NGC 2292
+  - c4cb81b1  B3      7.1h  CC70  IQAny SB50  WVAny    06:47:42.912000  -26:45:15.699600  NGC 2293
+
+
+

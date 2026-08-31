@@ -1,0 +1,22 @@
+
+Reference: US-2025B-003_N
+Mode:      Queue
+Partner:   US
+Award:     24.0
+Rank:      66.0
+ToO:       Standard
+Comment:   IQ relaxed to IQ85 to accomodate observations to B3. PI agreed
+
+Observations:
+  GN:
+  - 9fac264b  B1/2    2.6h  CC50  IQ85  SB80  WV50     00:00:00.000000  +00:00:00.000000  ToO4-GN
+  - 781b58a6  B1/2    2.6h  CC50  IQ85  SB80  WV50     00:00:00.000000  +00:00:00.000000  ToO3-GN
+  - ac4e868d  B1/2    2.6h  CC50  IQ85  SB80  WV50     00:00:00.000000  +00:00:00.000000  ToO2-GN
+  - a4b511db  B1/2    2.6h  CC50  IQ85  SB80  WV50     00:00:00.000000  +00:00:00.000000  ToO1-GN
+  - 9306fcac  B3      3.5h  CC70  IQ85  SBAny WVAny    00:00:00.000000  +00:00:00.000000  ToO4-GN
+  - 1e76a8d9  B3      3.5h  CC70  IQ85  SBAny WVAny    00:00:00.000000  +00:00:00.000000  ToO3-GN
+  - 2770cf95  B3      3.5h  CC70  IQ85  SBAny WVAny    00:00:00.000000  +00:00:00.000000  ToO2-GN
+  - 34edf387  B3      3.5h  CC70  IQ85  SBAny WVAny    00:00:00.000000  +00:00:00.000000  ToO1-GN
+
+
+

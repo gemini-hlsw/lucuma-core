@@ -1,0 +1,19 @@
+
+Reference: LP-Shen-207-S
+Mode:      LargeProgram
+Partner:   LP
+Award:     39.3
+Rank:      6.0
+ToO:       None
+Comment:   
+
+Observations:
+  GS:
+  - 43ef2e4c  B1/2   20.5h  CC70  IQ85  SB80  WVAny    02:22:58.897000  -04:58:52.109999  XMM-ST-01
+  - 34edfa05  B1/2    6.8h  CC70  IQ85  SB80  WVAny    02:24:52.430000  -06:09:44.630000  XMM-LT-01
+  - eb13e6b3  B1/2    6.8h  CC70  IQ85  SB80  WVAny    02:27:51.123999  -04:42:52.760000  XMM-LT-02
+  - 8feea72f  B1/2    2.5h  CC70  IQ85  SB80  WVAny    10:02:19.499000  +01:55:40.440000  COSMOS-LT-01
+  - 1028affe  B1/2    2.6h  CC70  IQ85  SB80  WVAny    10:02:38.630000  +01:37:44.739999  COSMOS-LT-02
+
+
+

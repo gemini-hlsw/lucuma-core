@@ -1,0 +1,17 @@
+
+Reference: KR-2025B-019_1
+Mode:      Queue
+Partner:   KR
+Award:     4.0
+Rank:      7.0
+ToO:       None
+Comment:   Targets disabled as per NTAC decision
+
+Observations:
+  GN:
+  - 4975f484  B1/2    0.7h  CC70  IQ20  SB50  WVAny    07:47:44.112000  +03:37:14.879999  AGC 174804
+  - 6600b747  B1/2    3.4h  CC70  IQ20  SB50  WVAny    07:47:44.112000  +03:37:14.879999  AGC 174804
+  - 300cb345  B1/2    3.6h  CC70  IQ20  SB50  WVAny    11:56:28.200000  +15:07:06.960000  DIABLE
+
+
+
