@@ -76,6 +76,6 @@ enum AttachmentType(
         AttachmentPurpose.Proposal,
         "Proposal Summary",
         "Proposal Summary",
-        true,
+        false,
         Set("pdf".refined)
       )
