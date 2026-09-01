@@ -60,7 +60,7 @@ jobs:
       - name: Setup Java (temurin@25)
         id: setup-java-temurin-25
         if: matrix.java == 'temurin@25'
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: 25
@@ -127,7 +127,7 @@ jobs:
       - name: Setup Java (temurin@25)
         id: setup-java-temurin-25
         if: matrix.java == 'temurin@25'
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: 25
