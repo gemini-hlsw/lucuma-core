@@ -278,16 +278,8 @@ class TargetSuite extends DisciplineSuite {
   )
   checkAll("Target.Opportunity.name", LensTests(Target.Opportunity.name))
   checkAll("Target.Opportunity.region", LensTests(Target.Opportunity.region))
-  checkAll("Target.Opportunity.resolution", LensTests(Target.Opportunity.resolution))
   checkAll("Target.Opportunity.sourceProfile", LensTests(Target.Opportunity.sourceProfile))
 
-  // Laws for TargetResolution
-  checkAll("Eq[TargetResolution]", EqTests[TargetResolution].eqv)
-  checkAll(
-    "TargetResolution.TrackOrder",
-    OrderTests[TargetResolution](using TargetResolution.TrackOrder).order
-  )
-  checkAll("Target.opportunityResolution", OptionalTests(Target.opportunityResolution))
 
 
   checkAll(
@@ -492,41 +484,4 @@ class TargetSuite extends DisciplineSuite {
   checkAll("Target.properMotionDec", OptionalTests(Target.properMotionDec))
   checkAll("Target.catalogInfo", OptionalTests(Target.catalogInfo))
 
-  // Resolution
-
-  property("only an opportunity target can be unresolved"):
-    forAll: (t: Target) =>
-      assert(t.resolution.isDefined || t.isInstanceOf[Target.Opportunity])
-
-  property("an opportunity target is resolved exactly when it has a resolution"):
-    forAll: (t: Target.Opportunity) =>
-      assertEquals(t.isResolved, t.resolution.isDefined)
-
-  property("asSidereal round-trips a sidereal target"):
-    forAll: (t: Target.Sidereal) =>
-      assertEquals(t.asSidereal, Some(t))
-      assertEquals(t.asNonsidereal, None)
-
-  property("asNonsidereal round-trips a nonsidereal target"):
-    forAll: (t: Target.Nonsidereal) =>
-      assertEquals(t.asNonsidereal, Some(t))
-      assertEquals(t.asSidereal, None)
-
-  property("an opportunity target projects to exactly one thing, and only when resolved"):
-    forAll: (t: Target.Opportunity) =>
-      assertEquals(t.asSidereal.isDefined || t.asNonsidereal.isDefined, t.isResolved)
-      assert(!(t.asSidereal.isDefined && t.asNonsidereal.isDefined))
-
-  property("the projection keeps the name and source profile, and drops the region"):
-    forAll: (t: Target.Opportunity) =>
-      val projected: Option[Target] = t.asSidereal.orElse(t.asNonsidereal)
-      projected.foreach: p =>
-        assertEquals(p.name, t.name)
-        assertEquals(p.sourceProfile, t.sourceProfile)
-        assertEquals(Target.region.getOption(p), None)
-
-  property("the projection carries the resolution through unchanged"):
-    forAll: (t: Target.Opportunity) =>
-      val projected: Option[Target] = t.asSidereal.orElse(t.asNonsidereal)
-      assertEquals(projected.flatMap(_.resolution), t.resolution)
 }

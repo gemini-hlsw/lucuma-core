@@ -8,18 +8,25 @@ import lucuma.core.util.Enumerated
 import munit.FunSuite
 
 /**
- * The scheduling mode carries its meaning in its ordering, and the Target of
- * Opportunity activation is derived from it. Both are easy to break silently by
- * reordering a case or adding one, so they are pinned here.
+ * The scheduling mode and the Target of Opportunity activation are two
+ * independent axes, each carrying its meaning in its ordering, related by a
+ * single compatibility rule.  All three are easy to break silently by reordering
+ * a case or adding one, so they are pinned here.
  */
 final class SchedulingModeSuite extends FunSuite:
 
   import SchedulingMode.*
 
-  private val ladder = List(Unconstrained, NoSplitting, Uninterruptible, Interrupting)
+  private val ladder = List(Unconstrained, NoSplitting, Uninterruptible)
+
+  private val activations =
+    List(TooActivation.None, TooActivation.Standard, TooActivation.Rapid, TooActivation.Interrupting)
 
   test("the ladder is the declaration order"):
     assertEquals(Enumerated[SchedulingMode].all, ladder)
+
+  test("the activations are the declaration order"):
+    assertEquals(Enumerated[TooActivation].all, activations)
 
   test("each rung keeps every restriction below it"):
     // Splittable implies interruptible: an observation willing to be delivered
@@ -33,29 +40,44 @@ final class SchedulingModeSuite extends FunSuite:
       assert(!higher.isSplittable || lower.isSplittable, s"$higher splittable but $lower is not")
       assert(!higher.isInterruptible || lower.isInterruptible, s"$higher interruptible but $lower is not")
 
-  test("only Interrupting may interrupt, and it is itself uninterruptible"):
-    assertEquals(ladder.filter(_.mayInterrupt), List(Interrupting))
-    assert(!Interrupting.isInterruptible)
+  test("a Target of Opportunity is exactly an activation above None"):
+    assertEquals(activations.filter(_.isToo), activations.filter(_ =!= TooActivation.None))
 
-  test("an interrupting observation can never preempt another one"):
-    val aggressors = ladder.filter(_.mayInterrupt)
-    aggressors.foreach: a =>
-      aggressors.foreach: v =>
-        assert(!a.canPreempt(v), s"$a preempted $v")
-
-  test("preemption is exactly Interrupting over the interruptible modes"):
-    val pairs = for a <- ladder; v <- ladder if a.canPreempt(v) yield (a, v)
-    assertEquals(pairs, List((Interrupting, Unconstrained), (Interrupting, NoSplitting)))
-
-  // Nothing here covers the observation that has no opportunity target: it has no activation to
-  // derive, so the question never reaches TooActivation and the answer is the caller's to give.
-  test("activation follows the mode"):
+  test("only Rapid and Interrupting oblige the observation to be Uninterruptible"):
     assertEquals(
-      ladder.map(TooActivation.fromSchedulingMode),
-      List(TooActivation.Standard, TooActivation.Standard, TooActivation.Rapid, TooActivation.Interrupting)
+      activations.filter(_.requiresUninterruptible),
+      List(TooActivation.Rapid, TooActivation.Interrupting)
     )
 
-  test("activation is monotone in the mode"):
-    val activations = ladder.map(TooActivation.fromSchedulingMode)
-    activations.zip(activations.tail).foreach: (lower, higher) =>
-      assert(lower <= higher, s"$higher is less disruptive than $lower")
+  // Eight of the twelve pairings are legal.  The four that are not are exactly
+  // the two most disruptive activations over the two modes that permit
+  // interruption.
+  test("compatibility is the whole of the relationship between the axes"):
+    val legal = for a <- activations; m <- ladder if a.isCompatibleWith(m) yield (a, m)
+    assertEquals(
+      legal,
+      List(
+        (TooActivation.None,         Unconstrained),
+        (TooActivation.None,         NoSplitting),
+        (TooActivation.None,         Uninterruptible),
+        (TooActivation.Standard,     Unconstrained),
+        (TooActivation.Standard,     NoSplitting),
+        (TooActivation.Standard,     Uninterruptible),
+        (TooActivation.Rapid,        Uninterruptible),
+        (TooActivation.Interrupting, Uninterruptible)
+      )
+    )
+
+  test("preemption is exactly Interrupting over the interruptible modes"):
+    val pairs = for a <- activations; m <- ladder if a.canPreempt(m) yield (a, m)
+    assertEquals(pairs, List((TooActivation.Interrupting, Unconstrained), (TooActivation.Interrupting, NoSplitting)))
+
+  test("no Target of Opportunity can preempt another"):
+    // Every legally configured Rapid or Interrupting ToO is Uninterruptible, so
+    // nothing can displace it -- the Scheduler never chooses between two of them
+    // mid-execution.  A Standard ToO is displaceable, which is correct: it asked
+    // to be observed whenever convenient.
+    val legalDisruptive =
+      for a <- activations; m <- ladder if a.isCompatibleWith(m) && a.requiresUninterruptible yield (a, m)
+    legalDisruptive.foreach: (a, m) =>
+      assert(!TooActivation.Interrupting.canPreempt(m), s"an interrupting ToO preempted $a in $m")

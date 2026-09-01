@@ -93,6 +93,12 @@ enum ProposalSubmissionError(val tag: String, val message: String) derives Enume
   case UndefinedObservations
     extends ProposalSubmissionError("undefined_observations", "There are undefined observations. Define them or mark them as inactive.")
 
+  case UnusedTooActivationCeiling
+    extends ProposalSubmissionError("unused_too_activation_ceiling", "The proposal asks for a Target of Opportunity activation that no observation reaches. Raise the observations that need it, or lower the request.")
+
+  case TooActivationExceedsCeiling
+    extends ProposalSubmissionError("too_activation_exceeds_ceiling", "One or more observations have a Target of Opportunity activation above what the proposal asks for. Lower them, or raise the request.")
+
   case MissingDeadline
     extends ProposalSubmissionError("missing_deadline", "Could not determine the Call for Proposals deadline.")
 
