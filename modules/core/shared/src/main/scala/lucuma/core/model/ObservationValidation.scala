@@ -6,11 +6,11 @@ package lucuma.core.model
 import cats.Eq
 import cats.data.NonEmptyChain
 import cats.derived.*
+import cats.syntax.all.*
 import io.circe.Codec
 import lucuma.core.enums.ObservationValidationCode
 import lucuma.core.enums.ObservationValidationCode.*
 import lucuma.core.math.TotalSN
-import cats.syntax.all.*
 
 case class ObservationValidation(
   code: ObservationValidationCode,
