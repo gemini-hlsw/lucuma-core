@@ -206,8 +206,8 @@ object AgsParams:
 
   /**
    * GMOS IFU. The probe geometry goes through `fpuMode`, shared with long slit: that offset is the
-   * point, being zero for every slit but 31.75" to 35.25" for the IFU apertures, the shift that puts
-   * the target into the aperture. The imaging path used by MOS applies none.
+   * point, being zero for every slit but 31.75" to 35.25" for the IFU apertures, the shift that
+   * puts the target into the aperture. The imaging path used by MOS applies none.
    *
    * The science area, though, is the IFU field rather than a slit, which is what makes this its own
    * variant instead of a `GmosLongSlit`.
