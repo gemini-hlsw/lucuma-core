@@ -15,7 +15,6 @@ import fs2.data.csv.*
 import lucuma.catalog.*
 import lucuma.catalog.clients.SimbadClient
 import lucuma.core.enums.Band
-import lucuma.core.enums.StellarLibrarySpectrum
 import lucuma.core.math.BrightnessUnits.*
 import lucuma.core.math.BrightnessValue
 import lucuma.core.math.Coordinates
@@ -31,7 +30,6 @@ import lucuma.core.model.SiderealTracking
 import lucuma.core.model.SourceProfile
 import lucuma.core.model.SpectralDefinition
 import lucuma.core.model.Target
-import lucuma.core.model.UnnormalizedSED
 import lucuma.core.syntax.string.*
 import lucuma.core.util.*
 
@@ -86,7 +84,7 @@ private case class TargetCsvRow(
     if (surfaceUnits.nonEmpty)
       SourceProfile.Uniform(
         SpectralDefinition.BandNormalized(
-          UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.O5V).some,
+          None,
           SortedMap(surfaceBrightness*)
         )
       )
