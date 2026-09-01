@@ -58,8 +58,8 @@ trait GmosShapes extends InstrumentShapes:
   // Shape to display
   def shapes: List[ShapeExpression] =
     List(
-      probeArm.longSlit.shapeAt(posAngle, guideStarOffset, offsetPos, fpu, port),
-      patrolField.longSlitMode.patrolFieldAt(posAngle, offsetPos, fpu, port),
+      probeArm.fpuMode.shapeAt(posAngle, guideStarOffset, offsetPos, fpu, port),
+      patrolField.fpuMode.patrolFieldAt(posAngle, offsetPos, fpu, port),
       scienceArea.longSlitMode.shapeAt(posAngle, offsetPos, fpu),
       candidatesArea.candidatesAreaAt(posAngle, offsetPos)
     )

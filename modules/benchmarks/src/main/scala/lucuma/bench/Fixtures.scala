@@ -47,12 +47,12 @@ object Fixtures:
   // GMOS OIWFS
 
   val gmosPatrolFieldExpr: ShapeExpression =
-    gmos.oiwfs.patrolField.longSlitMode.patrolFieldAt(posAngle, offset, gmosFpu, port)
+    gmos.oiwfs.patrolField.fpuMode.patrolFieldAt(posAngle, offset, gmosFpu, port)
   val gmosPatrolFieldShape: Shape          = gmosPatrolFieldExpr.eval
   val gmosPatrolFieldGeom: Geometry        = geom(gmosPatrolFieldExpr)
 
   def gmosProbeArmExpr(guideStar: Offset): ShapeExpression =
-    gmos.oiwfs.probeArm.longSlit.shapeAt(posAngle, guideStar, offset, gmosFpu, port)
+    gmos.oiwfs.probeArm.fpuMode.shapeAt(posAngle, guideStar, offset, gmosFpu, port)
 
   // F2 OIWFS
 
