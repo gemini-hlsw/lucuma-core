@@ -27,8 +27,8 @@ object codecs:
   given Encoder[TelluricType] =
     Encoder[String].contramap:
       case TelluricType.Hot               => "hot"
-      case TelluricType.A0V               => "A0V"
-      case TelluricType.Solar             => "Solar"
+      case TelluricType.A0V               => "A0"
+      case TelluricType.Solar             => "solar"
       case TelluricType.NoTelluric        => "NoTelluric"
       case TelluricType.Manual(starTypes) => starTypes.toList.mkString(",")
 
