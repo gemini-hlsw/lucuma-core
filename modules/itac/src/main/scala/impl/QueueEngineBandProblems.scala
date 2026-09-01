@@ -40,13 +40,8 @@ object QueueEngineBandProblems {
       s"Rapid TOO proposal in $b"
   }
 
-  val StandardTooOutsideBand12: Problem = {
-    case (p, b@(Band3 | Band4)) if p.too == TooActivation.Standard =>
-      s"Standard TOO proposal in $b"
-  }
-
   val All: NonEmptyList[Problem] =
-    NonEmptyList.of(ClassicalNotInBand1, NoObsInBand, LpInBand3Or4, RapidTooOutsideBand1, StandardTooOutsideBand12)
+    NonEmptyList.of(ClassicalNotInBand1, NoObsInBand, LpInBand3Or4, RapidTooOutsideBand1)
 
   def checkAll(p: Proposal, b: ScienceBand): ValidatedNel[String, Unit] =
     All.foldMap: problem => 
