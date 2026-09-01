@@ -16,6 +16,7 @@ import lucuma.core.enums.GnirsCamera
 import lucuma.core.enums.GnirsFpuIfu
 import lucuma.core.enums.GnirsGrating
 import lucuma.core.enums.GnirsPrism
+import lucuma.core.enums.SchedulingMode
 import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.VisitorObservingModeType
 import lucuma.core.enums.WaterVapor
@@ -233,10 +234,11 @@ trait ArbConfiguration:
         r <- arbitrary[Either[Coordinates, Region]]
         o <- arbitrary[ObservingMode]
         a <- arbitrary[Option[AltairMode]]
-      yield Configuration(c, r, o, a)
+        m <- arbitrary[SchedulingMode]
+      yield Configuration(c, r, o, a, m)
 
   given Cogen[Configuration] =
-    Cogen[(Conditions, Either[Coordinates, Region], ObservingMode, Option[AltairMode])]
-      .contramap(c => (c.conditions, c.target, c.observingMode, c.altair))
+    Cogen[(Conditions, Either[Coordinates, Region], ObservingMode, Option[AltairMode], SchedulingMode)]
+      .contramap(c => (c.conditions, c.target, c.observingMode, c.altair, c.schedulingMode))
 
 object ArbConfiguration extends ArbConfiguration

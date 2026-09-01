@@ -21,6 +21,7 @@ import lucuma.core.enums.GnirsFpuIfu
 import lucuma.core.enums.GnirsGrating
 import lucuma.core.enums.GnirsPrism
 import lucuma.core.enums.ObservingModeType
+import lucuma.core.enums.SchedulingMode
 import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.VisitorObservingModeType
 import lucuma.core.enums.WaterVapor
@@ -34,15 +35,30 @@ import lucuma.core.math.Region
 import lucuma.core.model.Configuration.ObservingMode.*
 import lucuma.core.model.sequence.flamingos2.Flamingos2FpuMask
 
+/**
+ * What staff approve about an observation: the conditions it needs, where it
+ * points, how it observes, and what the Scheduler may do to it.
+ *
+ * The scheduling mode is part of the configuration because every rung above
+ * `Unconstrained` constrains the Scheduler, so it is approved per configuration:
+ * a program gets `Uninterruptible` for the observations that need it, and only
+ * those.  The Target of Opportunity activation is deliberately *not* here.  It is
+ * approved program-wide, as a ceiling on the proposal, rather than per
+ * configuration.
+ */
 case class Configuration(
-  conditions:    Configuration.Conditions,
-  target:        Either[Coordinates, Region],
-  observingMode: Configuration.ObservingMode,
-  altair:        Option[AltairMode]
+  conditions:     Configuration.Conditions,
+  target:         Either[Coordinates, Region],
+  observingMode:  Configuration.ObservingMode,
+  altair:         Option[AltairMode],
+  schedulingMode: SchedulingMode
 ) derives Eq:
   def subsumes(other: Configuration): Boolean =
     conditions >= other.conditions &&
     altair === other.altair &&
+    // A ladder: each rung keeps every restriction below it, so approval of a
+    // stricter mode covers the looser ones.
+    schedulingMode >= other.schedulingMode &&
     observingMode.subsumes(other.observingMode) && {
     (target, other.target) match
       case (Left(self), Left(other))   => observingMode.radius.toDoubleDegrees >= self.angularDistance(other).toDoubleDegrees

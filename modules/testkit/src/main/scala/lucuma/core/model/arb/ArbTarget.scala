@@ -42,25 +42,13 @@ trait ArbTarget {
       } yield Target.Nonsidereal(n, t, b)
     }
 
-  given Arbitrary[TargetResolution] =
-    Arbitrary {
-      Gen.oneOf(
-        for {
-          t <- arbitrary[SiderealTracking]
-          c <- arbitrary[Option[CatalogInfo]]
-        } yield TargetResolution.Sidereal(t, c),
-        arbitrary[Ephemeris.Key].map(TargetResolution.Nonsidereal(_))
-      )
-    }
-
   given Arbitrary[Target.Opportunity] =
     Arbitrary {
       for {
         n <- arbitrary[NonEmptyString]
         r <- arbitrary[Region]
-        s <- arbitrary[Option[TargetResolution]]
         b <- arbitrary[SourceProfile]
-      } yield Target.Opportunity(n, r, s, b)
+      } yield Target.Opportunity(n, r, b)
     }
 
   given Arbitrary[Target] = Arbitrary(
@@ -79,22 +67,16 @@ trait ArbTarget {
     Cogen[(String, Ephemeris.Key, SourceProfile)]
       .contramap(t => (t.name.value, t.ephemerisKey, t.sourceProfile))
 
-  given Cogen[TargetResolution] =
-    Cogen[Either[(SiderealTracking, Option[CatalogInfo]), Ephemeris.Key]]
-      .contramap:
-        case TargetResolution.Sidereal(t, c) => Left((t, c))
-        case TargetResolution.Nonsidereal(k) => Right(k)
-
   given Cogen[Target.Opportunity] =
-    Cogen[(String, Region, Option[TargetResolution], SourceProfile)]
-      .contramap(t => (t.name.value, t.region, t.resolution, t.sourceProfile))
+    Cogen[(String, Region, SourceProfile)]
+      .contramap(t => (t.name.value, t.region, t.sourceProfile))
 
   given Cogen[Target] =
     Cogen[Target]: (s, t) =>
       t match
         case t @ Sidereal(_, _, _, _)    => Cogen[Sidereal].perturb(s, t)
         case t @ Nonsidereal(_, _, _)    => Cogen[Nonsidereal].perturb(s, t)
-        case t @ Opportunity(_, _, _, _) => Cogen[Opportunity].perturb(s, t)
+        case t @ Opportunity(_, _, _) => Cogen[Opportunity].perturb(s, t)
 
 }
 

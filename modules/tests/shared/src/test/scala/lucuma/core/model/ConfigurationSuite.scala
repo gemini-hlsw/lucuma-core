@@ -9,6 +9,7 @@ import lucuma.core.enums.FacilityObservingModeType
 import lucuma.core.enums.GnirsCamera
 import lucuma.core.enums.GnirsPrism
 import lucuma.core.enums.ObservingModeType
+import lucuma.core.enums.SchedulingMode
 import lucuma.core.enums.VisitorObservingModeType
 import lucuma.core.model.arb.ArbConfiguration.given
 import lucuma.core.util.arb.ArbEnumerated.given
@@ -104,6 +105,19 @@ final class ConfigurationSuite extends ScalaCheckSuite:
       val cb = cfg.copy(altair = b)
       assertEquals(ca.subsumes(cb), a === b)
       assertEquals(cb.subsumes(ca), a === b)
+
+  test("an approved scheduling mode covers itself and every looser rung"):
+    forAll: (cfg: Configuration, a: SchedulingMode, b: SchedulingMode) =>
+      val ca = cfg.copy(schedulingMode = a)
+      val cb = cfg.copy(schedulingMode = b)
+      assertEquals(ca.subsumes(cb), cfg.subsumes(cfg) && a >= b)
+
+  test("approval of Uninterruptible covers an Unconstrained observation, not the reverse"):
+    forAll: (cfg: Configuration) =>
+      val strict = cfg.copy(schedulingMode = SchedulingMode.Uninterruptible)
+      val loose  = cfg.copy(schedulingMode = SchedulingMode.Unconstrained)
+      assertEquals(strict.subsumes(loose), cfg.subsumes(cfg))
+      assert(!loose.subsumes(strict))
 
   test("Flamingos2 MOS is constrained by disperser"):
     forAll: (cfg: Configuration, a: Flamingos2Mos, b: Flamingos2Mos) =>
