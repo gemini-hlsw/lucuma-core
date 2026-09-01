@@ -52,7 +52,7 @@ class GmosOiwfsGeometrySuite extends munit.FunSuite:
 
   /** Centre of the patrol field, at the base position and a zero position angle. */
   private def patrolFieldCentre(fpu: Either[GmosNorthFpu, GmosSouthFpu]): Offset =
-    val b = oiwfs.patrolField.longSlitMode
+    val b = oiwfs.patrolField.fpuMode
               .patrolFieldAt(Angle.Angle0, Offset.Zero, fpu, Port)
               .eval.boundingOffsets
     Offset(
@@ -65,7 +65,7 @@ class GmosOiwfsGeometrySuite extends munit.FunSuite:
     fpu: Either[GmosNorthFpu, GmosSouthFpu]
   ): (Double, Double, Double, Double) =
     val centre = patrolFieldCentre(fpu)
-    val b      = (oiwfs.probeArm.longSlit
+    val b      = (oiwfs.probeArm.fpuMode
                    .shapeAt(Angle.Angle0, centre, Offset.Zero, fpu, Port) ↗ (Offset.Zero - centre))
                    .eval.boundingOffsets
     (arcsec(b.topLeft.p.toAngle),     arcsec(b.topLeft.q.toAngle),
@@ -125,7 +125,7 @@ class GmosOiwfsGeometrySuite extends munit.FunSuite:
   test("a slit patrol field is the imaging patrol field"):
     List(PortDisposition.Side, PortDisposition.Bottom).foreach: port =>
       assertBox(
-        box(oiwfs.patrolField.longSlitMode
+        box(oiwfs.patrolField.fpuMode
               .patrolFieldAt(Angle.Angle0, Offset.Zero, GmosNorthFpu.LongSlit_1_00.asLeft, port)),
         box(oiwfs.patrolField.imagingMode.patrolFieldAt(Angle.Angle0, Offset.Zero, port)),
         s"$port"
