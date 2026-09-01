@@ -24,6 +24,13 @@ trait GmosOiwfsPatrolField:
   val patrolField: ShapeExpression =
     ShapeExpression.centeredRectangle(212700.mas, 249600.mas)
 
+  /**
+   * The FPU offset enters negated here. Only affects IFU. OCS applies it to the patrol field
+   * in the shape frame, where `x = -p` (`GmosOiwfsGuideProbe.getCorrectedPatrolField`), but to the
+   * probe arm in sky `p` (`GmosOiwfsProbeArm.armAdjustment`). The two must pull in opposite
+   * directions in `p` or the field and the arm drift apart: the offset has to cancel for a guide
+   * star fixed relative to the field, or stars well inside the patrol field become unreachable.
+   */
   private def patrolFieldAtBase(
     posAngle:  Angle,
     offsetPos: Offset,
@@ -31,7 +38,7 @@ trait GmosOiwfsPatrolField:
     port:      PortDisposition,
     pivot:     Offset
   ): ShapeExpression =
-    val pf = patrolField ↗ (fpuOffset - Offset(94950.mas.p, 89880.mas.q))
+    val pf = patrolField ↗ (Offset.Zero - fpuOffset - Offset(94950.mas.p, 89880.mas.q))
     val s  = if (port === PortDisposition.Side) pf.flipQ else pf
     s ↗ (offsetPos - pivot) ⟲ posAngle ↗ pivot
 
