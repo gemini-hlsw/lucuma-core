@@ -125,6 +125,9 @@ class TargetImportSuite extends CatsEffectSuite with RetryFlakyTests:
                        },
                        2
           )
+          // No SED column exists in the CSV format, so imported targets must have no SED,
+          // for uniform as well as for point sources.
+          assertEquals(l.count(_.exists(Target.unnormalizedSED.getOption(_).flatten.isDefined)), 0)
         }
     }
   }
@@ -395,4 +398,39 @@ class TargetImportSuite extends CatsEffectSuite with RetryFlakyTests:
           case _                                    => fail("Expected successful target import")
         }
       }
+  }
+
+  test("no SED is assigned when the CSV does not specify one") {
+    val xmlFile = "/galaxies_surface_sidereal.csv"
+    val file    = getClass().getResource(xmlFile)
+    Resource.unit[IO].use { _ =>
+      Files[IO]
+        .readAll(Path(file.getPath()))
+        .through(text.utf8.decode)
+        .through(TargetImport.csv2targets)
+        .compile
+        .toList
+        .map { l =>
+          assertEquals(l.length, 9)
+          assertEquals(l.count(_.isRight), 9)
+
+          // Surface brightness units select a uniform profile, integrated units a point one.
+          val (uniform, point) = l.collect { case Right(t) => t }.partition { t =>
+            SourceProfile.uniform.getOption(t.sourceProfile).isDefined
+          }
+          assertEquals(uniform.map(_.name.value).sorted,
+                       List("A0136-0801", "IC 1528", "NGC 253", "NGC 5746", "UGC 29", "UGC 89")
+          )
+          assertEquals(point.map(_.name.value).sorted,
+                       List("Markarian 132", "Markarian 573", "Mayall II")
+          )
+
+          // None of them carry an SED, since the file specifies none.
+          l.foreach {
+            case Right(t) =>
+              assertEquals(Target.unnormalizedSED.getOption(t).flatten, None, clue = t.name.value)
+            case Left(e)  => fail(s"Expected successful target import, got $e")
+          }
+        }
+    }
   }
