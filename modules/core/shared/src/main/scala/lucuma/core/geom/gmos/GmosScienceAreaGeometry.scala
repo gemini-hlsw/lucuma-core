@@ -93,14 +93,17 @@ trait GmosScienceAreaGeometry {
   /**
    * Where the sky field lands once the target field is centred on the base. The two fields are a
    * fixed [[IfuFieldSeparation]] apart, so re-centring shifts the sky field by the difference of the
-   * two half-widths on top of that. South mirrors it about the base, North does not, which is the
-   * `OT-10` flip in OCS `GmosScienceAreaGeometry.ifuFOV`.
+   * two half-widths on top of that.
+   *
+   * North puts it East of the base and South mirrors it West, the `OT-10` flip in OCS
+   * `GmosScienceAreaGeometry.ifuFOV`. Beware the frame: OCS states those rectangles in the shape
+   * frame, where `x = -p`, so the negative x it uses for North is a positive `p` here.
    */
   def ifuSkyOffset(fieldWidth: Angle, site: Site): Offset =
     val p = IfuFieldSeparation + fieldWidth.bisect - ifuSkyFieldWidth(fieldWidth).bisect
     (site match
-      case Site.GN => -p
-      case Site.GS => p
+      case Site.GN => p
+      case Site.GS => -p
     ).offsetInP
 
   object ifuMode:

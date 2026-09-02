@@ -3,8 +3,10 @@
 
 package lucuma.catalog
 
+import cats.data.NonEmptyList
 import cats.effect.IO
 import cats.effect.IOApp
+import cats.syntax.all.*
 import lucuma.catalog.clients.SimbadClient
 import lucuma.catalog.simbad.SEDDataLoader
 import lucuma.catalog.simbad.SEDMatcher
@@ -25,6 +27,14 @@ object TelluricTargetsQueryApp extends IOApp.Simple:
 
   val telluricUri = uri"https://telluric-targets.gpp.gemini.edu/"
 
+  // Manual uses temperature classes.
+  val searchTypes: List[TelluricType] = List(
+    TelluricType.Hot,
+    TelluricType.Solar,
+    TelluricType.A0V,
+    TelluricType.Manual(NonEmptyList.of("A0", "A2"))
+  )
+
   def run =
     given LoggerFactory[IO] = Slf4jFactory.create[IO]
 
@@ -36,13 +46,6 @@ object TelluricTargetsQueryApp extends IOApp.Simple:
 
     val duration = TimeSpan.fromHours(1.0).get
 
-    val searchInput = TelluricSearchInput(
-      coordinates = coordinates,
-      duration = duration,
-      brightest = BigDecimal(3.5),
-      spType = TelluricType.Hot
-    )
-
     JdkHttpClient
       .simple[IO]
       .use: client =>
@@ -50,6 +53,20 @@ object TelluricTargetsQueryApp extends IOApp.Simple:
           sedConfig      <- SEDDataLoader.load[IO]
           simbadClient    = SimbadClient.build(client, SEDMatcher.fromConfig(sedConfig))
           telluricClient <- TelluricTargetsClient.build(telluricUri, client, simbadClient)
-          results        <- telluricClient.searchTarget(searchInput)
-          _              <- IO.println(pprint.apply(results))
+          _              <- searchTypes.traverse_ : spType =>
+                              val searchInput = TelluricSearchInput(
+                                coordinates = coordinates,
+                                duration = duration,
+                                brightest = BigDecimal(3.5),
+                                spType = spType
+                              )
+                              telluricClient
+                                .searchTarget(searchInput)
+                                .attempt
+                                .flatMap:
+                                  case Right(results) =>
+                                    IO.println(s"=== $spType: ${results.size} star(s)") *>
+                                      IO.println(pprint.apply(results))
+                                  case Left(err)      =>
+                                    IO.println(s"=== $spType FAILED: ${err.getMessage}")
         yield ()

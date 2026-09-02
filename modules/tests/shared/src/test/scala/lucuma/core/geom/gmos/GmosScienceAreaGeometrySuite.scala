@@ -48,11 +48,13 @@ class GmosScienceAreaGeometrySuite extends ScienceAreaGeometrySuite:
     assertCloseArcsec(q1, 5.0)
 
   // OCS GmosScienceAreaGeometry.ifuFOV, OT-10: South mirrors the sky bundle about the base.
-  // Getting this backwards would put an observer's sky bundle on the wrong patch of sky.
-  test("sky field sits ~62\" away, on opposite sides in North and South"):
-    assertEqualsDouble(skyCentreArcsecP(GmosNorthIfuFpu.TwoSlits.fieldWidth, Site.GN), -61.75, 0.01)
-    assertEqualsDouble(skyCentreArcsecP(GmosSouthIfuFpu.TwoSlits.fieldWidth, Site.GS), 61.75, 0.01)
+  // OCS states those rectangles in the shape frame, where x = -p, so its negative x for North is
+  // East, a positive p here. Getting this backwards, as we did, points an observer's sky bundle at
+  // the wrong patch of sky.
+  test("sky field sits ~62\" away, East in North and West in South"):
+    assertEqualsDouble(skyCentreArcsecP(GmosNorthIfuFpu.TwoSlits.fieldWidth, Site.GN), 61.75, 0.01)
+    assertEqualsDouble(skyCentreArcsecP(GmosSouthIfuFpu.TwoSlits.fieldWidth, Site.GS), -61.75, 0.01)
 
   test("one-slit sky field shifts in with the narrower fields"):
-    assertEqualsDouble(skyCentreArcsecP(GmosNorthIfuFpu.OneSlitRed.fieldWidth, Site.GN), -60.875, 0.01)
-    assertEqualsDouble(skyCentreArcsecP(GmosSouthIfuFpu.OneSlitRed.fieldWidth, Site.GS), 60.875, 0.01)
+    assertEqualsDouble(skyCentreArcsecP(GmosNorthIfuFpu.OneSlitRed.fieldWidth, Site.GN), 60.875, 0.01)
+    assertEqualsDouble(skyCentreArcsecP(GmosSouthIfuFpu.OneSlitRed.fieldWidth, Site.GS), -60.875, 0.01)
