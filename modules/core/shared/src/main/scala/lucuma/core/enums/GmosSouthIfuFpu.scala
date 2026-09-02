@@ -21,12 +21,13 @@ enum GmosSouthIfuFpu(
   val shortName: String,
   val longName: String,
   val fpu: GmosSouthFpu,
-  val fieldWidth: Angle
+  val fieldWidth: Angle,
+  val skyFieldWidth: Angle
 ) derives Enumerated, Display:
 
-  case TwoSlits    extends GmosSouthIfuFpu("TwoSlits",    "IFU-2", "IFU 2 Slits",          GmosSouthFpu.Ifu2Slits, Angle.milliarcseconds.reverseGet(7000))
-  case OneSlitRed  extends GmosSouthIfuFpu("OneSlitRed",  "IFU-R", "IFU Right Slit (red)", GmosSouthFpu.IfuRed,    Angle.milliarcseconds.reverseGet(3500))
-  case OneSlitBlue extends GmosSouthIfuFpu("OneSlitBlue", "IFU-B", "IFU Left Slit (blue)", GmosSouthFpu.IfuBlue,   Angle.milliarcseconds.reverseGet(3500))
+  case TwoSlits    extends GmosSouthIfuFpu("TwoSlits",    "IFU-2", "IFU 2 Slits",          GmosSouthFpu.Ifu2Slits, Angle.milliarcseconds.reverseGet(7500), Angle.milliarcseconds.reverseGet(3500))
+  case OneSlitRed  extends GmosSouthIfuFpu("OneSlitRed",  "IFU-R", "IFU Right Slit (red)", GmosSouthFpu.IfuRed,    Angle.milliarcseconds.reverseGet(3750), Angle.milliarcseconds.reverseGet(1750))
+  case OneSlitBlue extends GmosSouthIfuFpu("OneSlitBlue", "IFU-B", "IFU Left Slit (blue)", GmosSouthFpu.IfuBlue,   Angle.milliarcseconds.reverseGet(3750), Angle.milliarcseconds.reverseGet(1750))
 
 object GmosSouthIfuFpu:
 

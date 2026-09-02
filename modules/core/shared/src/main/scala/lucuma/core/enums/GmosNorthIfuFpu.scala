@@ -14,21 +14,23 @@ import lucuma.core.util.Enumerated
  * The GMOS North focal plane units the IFU observing mode offers: both pseudo-slits, or either
  * one on its own.
  *
- * `fieldWidth` is the target lenslet field across `p`; masking to one pseudo-slit halves it,
- * whichever slit is kept. The field is 5" along `q` either way, so the height lives in the
- * geometry package as `IfuFieldHeight` rather than here.
+ * `fieldWidth` is the target lenslet field across `p` and `skyFieldWidth` the dedicated sky field
+ * ~60" away; masking to one pseudo-slit halves both, whichever slit is kept. The sky field is not
+ * half the target field: they are independent apertures (OCS `GmosScienceAreaGeometry.IFUFOVs`).
+ * Both are 5" along `q`, so the height lives in the geometry package as `IfuFieldHeight`.
  */
 enum GmosNorthIfuFpu(
   val tag: String,
   val shortName: String,
   val longName: String,
   val fpu: GmosNorthFpu,
-  val fieldWidth: Angle
+  val fieldWidth: Angle,
+  val skyFieldWidth: Angle
 ) derives Enumerated, Display:
 
-  case TwoSlits    extends GmosNorthIfuFpu("TwoSlits",    "IFU-2", "IFU 2 Slits",           GmosNorthFpu.Ifu2Slits, Angle.milliarcseconds.reverseGet(7000))
-  case OneSlitRed  extends GmosNorthIfuFpu("OneSlitRed",  "IFU-R", "IFU Right Slit (red)",  GmosNorthFpu.IfuRed,    Angle.milliarcseconds.reverseGet(3500))
-  case OneSlitBlue extends GmosNorthIfuFpu("OneSlitBlue", "IFU-B", "IFU Left Slit (blue)",  GmosNorthFpu.IfuBlue,   Angle.milliarcseconds.reverseGet(3500))
+  case TwoSlits    extends GmosNorthIfuFpu("TwoSlits",    "IFU-2", "IFU 2 Slits",           GmosNorthFpu.Ifu2Slits, Angle.milliarcseconds.reverseGet(7500), Angle.milliarcseconds.reverseGet(3500))
+  case OneSlitRed  extends GmosNorthIfuFpu("OneSlitRed",  "IFU-R", "IFU Right Slit (red)",  GmosNorthFpu.IfuRed,    Angle.milliarcseconds.reverseGet(3750), Angle.milliarcseconds.reverseGet(1750))
+  case OneSlitBlue extends GmosNorthIfuFpu("OneSlitBlue", "IFU-B", "IFU Left Slit (blue)",  GmosNorthFpu.IfuBlue,   Angle.milliarcseconds.reverseGet(3750), Angle.milliarcseconds.reverseGet(1750))
 
 object GmosNorthIfuFpu:
 

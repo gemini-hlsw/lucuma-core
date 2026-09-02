@@ -72,35 +72,36 @@ trait GmosScienceAreaGeometry {
       imaging.shapeAt(offsetPos, posAngle)
 
   /**
-   * The lenslet field the target falls in. The IFU also has a dedicated sky field, half as wide and
-   * 60" away, but it is deliberately not part of this shape: the science area says where the target
-   * may sit, and including a field an arcminute off would inflate every radius derived from it.
+   * The lenslet field the target falls in. The IFU also has a dedicated sky field, narrower and 60"
+   * away, but it is deliberately not part of this shape: the science area says where the target may
+   * sit, and including a field an arcminute off would inflate every radius derived from it.
    */
   def ifuFov(fieldWidth: Angle): ShapeExpression =
     ShapeExpression.centeredRectangle(fieldWidth, IfuFieldHeight)
 
   /**
-   * The sky lenslet field, half as wide as the target field because one pseudo-slit samples half of
-   * each. It does not sit on the base: see [[ifuSkyOffset]].
+   * The sky lenslet field. Narrower than the target field, but not half of it: the two are
+   * independent apertures (`GmosScienceAreaGeometry.IFUFOVs` in OCS), so the width comes from the
+   * focal plane unit rather than being derived. It does not sit on the base: see [[ifuSkyOffset]].
    */
-  def ifuSkyFov(fieldWidth: Angle, site: Site): ShapeExpression =
-    ShapeExpression.centeredRectangle(ifuSkyFieldWidth(fieldWidth), IfuFieldHeight) ↗
-      ifuSkyOffset(fieldWidth, site)
-
-  inline def ifuSkyFieldWidth(fieldWidth: Angle): Angle =
-    fieldWidth.bisect
+  def ifuSkyFov(fieldWidth: Angle, skyFieldWidth: Angle, site: Site): ShapeExpression =
+    ShapeExpression.centeredRectangle(skyFieldWidth, IfuFieldHeight) ↗
+      ifuSkyOffset(fieldWidth, skyFieldWidth, site)
 
   /**
    * Where the sky field lands once the target field is centred on the base. The two fields are a
    * fixed [[IfuFieldSeparation]] apart, so re-centring shifts the sky field by the difference of the
-   * two half-widths on top of that. South mirrors it about the base, North does not, which is the
-   * `OT-10` flip in OCS `GmosScienceAreaGeometry.ifuFOV`.
+   * two half-widths on top of that.
+   *
+   * North puts it east of the base and South mirrors it west, the `OT-10` flip in OCS
+   * `GmosScienceAreaGeometry.ifuFOV`. Note that OCS states those rectangles in the shape frame,
+   * where `x = -p`, so its negative x for North is a positive `p` here.
    */
-  def ifuSkyOffset(fieldWidth: Angle, site: Site): Offset =
-    val p = IfuFieldSeparation + fieldWidth.bisect - ifuSkyFieldWidth(fieldWidth).bisect
+  def ifuSkyOffset(fieldWidth: Angle, skyFieldWidth: Angle, site: Site): Offset =
+    val p = IfuFieldSeparation + fieldWidth.bisect - skyFieldWidth.bisect
     (site match
-      case Site.GN => -p
-      case Site.GS => p
+      case Site.GN => p
+      case Site.GS => -p
     ).offsetInP
 
   object ifuMode:
@@ -113,12 +114,13 @@ trait GmosScienceAreaGeometry {
 
     /** The sky field, drawn separately so it can be labelled: it is nowhere near the base. */
     def skyShapeAt(
-      posAngle:   Angle,
-      offsetPos:  Offset,
-      fieldWidth: Angle,
-      site:       Site
+      posAngle:      Angle,
+      offsetPos:     Offset,
+      fieldWidth:    Angle,
+      skyFieldWidth: Angle,
+      site:          Site
     ): ShapeExpression =
-      ifuSkyFov(fieldWidth, site).shapeAt(offsetPos, posAngle)
+      ifuSkyFov(fieldWidth, skyFieldWidth, site).shapeAt(offsetPos, posAngle)
 
   object longSlitMode:
     def shapeAt(
