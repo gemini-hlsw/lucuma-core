@@ -11,6 +11,7 @@ import eu.timepit.refined.cats.given
 import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.enums.TimingWindowInclusion
 import lucuma.core.math.BoundedInterval
+import lucuma.core.math.BoundedInterval.unionAll
 import lucuma.core.util.TimeSpan
 import lucuma.core.util.Timestamp
 import monocle.Focus
@@ -74,11 +75,10 @@ final case class TimingWindow(
    */
   def toIntervalSeq(within: BoundedInterval[Instant]): IntervalSeq[Instant] = {
     // Builds a bunch of single-interval `IntervalSeq`s, for each of the `starts` provided, each lasting `duration`.
-    // Returns the union of all of them.
+    // Returns the union of all of them.  A short repeat period over a long `within` (say, every
+    // minute for a semester) is hundreds of thousands of starts, hence `unionAll` rather than a fold.
     def intervalsForStarts(starts: List[Instant], duration: Duration): IntervalSeq[Instant] =
-      starts
-        .map(start => IntervalSeq(Interval(start, start.plus(duration))))
-        .foldLeft(IntervalSeq.empty[Instant])(_ | _)
+      IntervalSeq.unionAll(starts.map(start => IntervalSeq(Interval(start, start.plus(duration)))))
 
     val windowStart = start.toInstant
 

@@ -18,6 +18,8 @@ import spire.math.Point
 import spire.math.extras.interval.IntervalSeq
 import spire.math.interval.ValueBound
 
+import scala.annotation.tailrec
+
 /**
   * A `BoundedInterval` is a `spire.math.Interval` but with both bounds defined.
   * Therefore, it can only be a `Bounded` or `Point`. It simplifies usage,
@@ -167,6 +169,20 @@ object BoundedInterval:
   extension (self: IntervalSeq.type)
     def apply[T: Order](i: BoundedInterval[T]): IntervalSeq[T] =
       self(i.toInterval)
+
+    /**
+     * The union of any number of `IntervalSeq`s.
+     */
+    def unionAll[T: Order](seqs: Iterable[IntervalSeq[T]]): IntervalSeq[T] =
+      // Spire's `|` allocates a new IntervalSeq and copies its operands.
+      // Folding left-to-right repeatedly copies the growing result, which
+      // can make merging many sequences quadratic. Merging pairwise keeps
+      // the merge tree balanced and avoids repeatedly copying the same data.
+      @tailrec
+      def go(v: Vector[IntervalSeq[T]]): IntervalSeq[T] =
+        if (v.sizeIs <= 1) v.headOption.getOrElse(self.empty[T])
+        else go(v.grouped(2).map(_.reduce(_ | _)).toVector)
+      go(seqs.toVector)
 
    /**
    * Makes a best-effort attempt to convert the tuple (a, b) into interval [a, b) or [b, a).
