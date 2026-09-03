@@ -17,9 +17,16 @@ import org.typelevel.cats.time.given
 import java.time.Duration
 import java.time.Instant
 import java.time.temporal.ChronoUnit
+import scala.concurrent.duration.*
 
 final class TimingWindowSuite extends DisciplineSuite {
   import ArbTimingWindow.given
+
+  // Every test here should run in milliseconds.  The bound exists for the
+  // "tractable" test below: munit runs each test body under this timeout (on
+  // the JVM, synchronous tests included), so a quadratic regression fails at
+  // ten seconds instead of grinding for minutes.
+  override def munitTimeout: FiniteDuration = 10.seconds
 
   // Laws
   checkAll("Order[TimingWindow]", OrderTests[TimingWindow].eqv)
@@ -63,7 +70,7 @@ final class TimingWindowSuite extends DisciplineSuite {
   test("toIntervalSeq: a short period over a long interval is tractable") {
     // 30 seconds every minute for 180 days: 259,200 repeats.  A left fold of
     // spire unions over that many singletons is quadratic and takes minutes;
-    // this must complete in well under a second.
+    // this must complete within `munitTimeout` (and does, in well under a second).
     val seq = repeating(lower, Duration.ofSeconds(30), Duration.ofMinutes(1), None).toIntervalSeq(within(180))
     assertEquals(seq.intervals.size, 259200)
     assertEquals(seq.duration, Duration.ofDays(90))
