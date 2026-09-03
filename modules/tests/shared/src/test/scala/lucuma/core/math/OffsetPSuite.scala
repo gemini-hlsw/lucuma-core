@@ -11,7 +11,7 @@ import lucuma.core.optics.laws.discipline.*
 import monocle.law.discipline.*
 import org.scalacheck.Prop.*
 
-final class OffsetPSuite extends munit.DisciplineSuite {
+final class OffsetPSuite extends munit.DisciplineSuite:
   import ArbAngle.given
   import ArbOffset.given
 
@@ -25,28 +25,26 @@ final class OffsetPSuite extends munit.DisciplineSuite {
            SplitMonoTests(Offset.Component.signedDecimalArcseconds[Axis.P]).splitMono
   )
 
-  test("Equality must be natural") {
-    forAll { (a: Offset.Component[Axis.P], b: Offset.Component[Axis.P]) =>
+  test("Equality must be natural"):
+    forAll: (a: Offset.Component[Axis.P], b: Offset.Component[Axis.P]) =>
       assertEquals(a.equals(b),  Eq[Offset.Component[Axis.P]].eqv(a, b))
-    }
-  }
 
-  test("Equality be consistent with .toAngle") {
-    forAll { (a: Offset.Component[Axis.P], b: Offset.Component[Axis.P]) =>
+  test("Equality be consistent with .toAngle"):
+    forAll: (a: Offset.Component[Axis.P], b: Offset.Component[Axis.P]) =>
       assertEquals(Eq[Angle].eqv(a.toAngle, b.toAngle),  Eq[Offset.Component[Axis.P]].eqv(a, b))
-    }
-  }
 
-  test("Show must be natural") {
-    forAll { (a: Offset.Component[Axis.P]) =>
+  test("Show must be natural"):
+    forAll: (a: Offset.Component[Axis.P]) =>
       assertEquals(a.toString,  Show[Offset.Component[Axis.P]].show(a))
-    }
-  }
 
-  test("Conversion to angle must be invertable") {
-    forAll { (p: Offset.Component[Axis.P]) =>
+  test("Conversion to angle must be invertable"):
+    forAll: (p: Offset.Component[Axis.P]) =>
       assertEquals(Offset.Component[Axis.P](p.toAngle),  p)
-    }
-  }
 
-}
+  test("unary_- must be consistent with .toAngle"):
+    forAll: (p: Offset.Component[Axis.P]) =>
+      assertEquals((-p).toAngle,  -p.toAngle)
+
+  test("unary_- must be invertable"):
+    forAll: (p: Offset.Component[Axis.P]) =>
+      assertEquals(-(-p),  p)
