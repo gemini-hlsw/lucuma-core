@@ -4,6 +4,7 @@
 package lucuma.core.optics
 
 import cats.Order
+import lucuma.core.math.BoundedInterval.unionAll
 import monocle.Iso
 import spire.math.*
 import spire.math.extras.interval.IntervalSeq
@@ -51,7 +52,7 @@ object Spire {
    */
   def intervalListUnion[A: Order]: SplitEpi[List[Interval[A]], IntervalSeq[A]] =
     SplitEpi[List[Interval[A]], IntervalSeq[A]](
-      _.foldLeft(IntervalSeq.empty[A])((s, i) => s | i),
+      is => IntervalSeq.unionAll(is.map(IntervalSeq(_))),
       _.intervals.toList
     )
 }
