@@ -27,8 +27,8 @@ val MosTelluricDefaultTelescopeConfigs: NonEmptyList[TelescopeConfigAlongSlit] =
     TelescopeConfigAlongSlit(  40.qArcsec,  StepGuideState.Enabled),
     TelescopeConfigAlongSlit(  20.qArcsec,  StepGuideState.Enabled),
     TelescopeConfigAlongSlit(-(20.qArcsec), StepGuideState.Enabled),
-    TelescopeConfigAlongSlit(  40.qArcsec,  StepGuideState.Enabled),
-    TelescopeConfigAlongSlit(  60.qArcsec,  StepGuideState.Enabled),
+    TelescopeConfigAlongSlit(-(40.qArcsec), StepGuideState.Enabled),
+    TelescopeConfigAlongSlit(-(60.qArcsec), StepGuideState.Enabled),
   )
 
 val NodAlongSlitDefaultTelescopeConfigs: NonEmptyList[TelescopeConfigAlongSlit] =

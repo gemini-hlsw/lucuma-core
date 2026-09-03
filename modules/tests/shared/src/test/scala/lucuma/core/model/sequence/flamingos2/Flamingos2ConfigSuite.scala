@@ -25,10 +25,10 @@ class Flamingos2ConfigSuite extends FunSuite:
     assertEquals(cfg.offsetsType, SlitOffsetMode.NodAlongSlit)
     assertEquals(cfg.telescopeConfigs, alongSlit(StepGuideState.Enabled, 15, -15, -15, 15))
 
-  test("MosTelluric: along-slit 60,40,20,-20,40,60 arcsec, all guided"):
+  test("MosTelluric: along-slit 60,40,20,-20,-40,-60 arcsec, all guided"):
     val cfg = defaultSlitTelescopeConfigs(Flamingos2SlitOffsetPreset.MosTelluric)
     assertEquals(cfg.offsetsType, SlitOffsetMode.NodAlongSlit)
-    assertEquals(cfg.telescopeConfigs, alongSlit(StepGuideState.Enabled, 60, 40, 20, -20, 40, 60))
+    assertEquals(cfg.telescopeConfigs, alongSlit(StepGuideState.Enabled, 60, 40, 20, -20, -40, -60))
 
   test("NodAlongSlit: along-slit ±10 arcsec, all guided"):
     val cfg = defaultSlitTelescopeConfigs(Flamingos2SlitOffsetPreset.NodAlongSlit)
