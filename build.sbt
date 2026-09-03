@@ -11,6 +11,7 @@ ThisBuild / tlCiReleaseBranches += "topic/scala3"
 Global / concurrentRestrictions += Tags.limit(Tags.Compile, 1)
 
 ThisBuild / crossScalaVersions := Seq("3.9.0")
+ThisBuild / lucumaCoverage := false
 ThisBuild / scalacOptions += "-language:implicitConversions" // TODO
 // Derivation for wide sums (Configuration.ObservingMode) exceeds the default budget of 32.
 ThisBuild / scalacOptions += "-Xmax-inlines:64"
