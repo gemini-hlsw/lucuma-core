@@ -14,4 +14,13 @@ enum ProgramUserRole(val tag: String) derives Enumerated:
   case SupportPrimary   extends ProgramUserRole("support_primary")
   case SupportSecondary extends ProgramUserRole("support_secondary")
 
+  /**
+   * Whether this role is an investigator's -- the PI's or a co-investigator's. The rules a
+   * proposal must satisfy before it can be submitted speak of investigators, so support and
+   * external users are not held to them.
+   */
+  def isInvestigator: Boolean = this match
+    case Pi | Coi | CoiRO                             => true
+    case External | SupportPrimary | SupportSecondary => false
+
 end ProgramUserRole
