@@ -12,7 +12,9 @@ import lucuma.core.optics.laws.discipline.SplitMonoTests
 import monocle.law.discipline.*
 import org.scalacheck.Prop.*
 
-final class OffsetSuite extends munit.DisciplineSuite {
+import scala.language.implicitConversions
+
+final class OffsetSuite extends munit.DisciplineSuite:
   import ArbAngle.given
   import ArbOffset.given
 
@@ -27,57 +29,51 @@ final class OffsetSuite extends munit.DisciplineSuite {
   checkAll("Offset.signedMicroarcseconds", SplitMonoTests(Offset.signedMicroarcseconds).splitMono)
   checkAll("Offset.signedArcseconds", SplitMonoTests(Offset.signedDecimalArcseconds).splitMono)
 
-  test("Equality must be natural") {
-    forAll { (a: Offset, b: Offset) =>
+  test("Equality must be natural"):
+    forAll: (a: Offset, b: Offset) =>
       assertEquals(a.equals(b),  Eq[Offset].eqv(a, b))
-    }
-  }
 
-  test("it must operate pairwise") {
-    forAll { (a: Offset, b: Offset) =>
+  test("it must operate pairwise"):
+    forAll: (a: Offset, b: Offset) =>
       assertEquals(Eq[Offset.Component[Axis.P]].eqv(a.p, b.p) &&
         Eq[Offset.Component[Axis.Q]].eqv(a.q, b.q),  Eq[Offset].eqv(a, b))
-    }
-  }
 
-  test("Show must be natural") {
-    forAll { (a: Offset) =>
+  test("Show must be natural"):
+    forAll: (a: Offset) =>
       assertEquals(a.toString,  Show[Offset].show(a))
-    }
-  }
 
-  test("Conversion to components must be invertable") {
-    forAll { (o: Offset) =>
+  test("Conversion to components must be invertable"):
+    forAll: (o: Offset) =>
       val (p, q) = (o.p, o.q)
       assertEquals(Offset(p, q),  o)
-    }
-  }
 
-  test("subtraction is addition with unary_-") {
-    forAll { (a: Offset, b: Offset) =>
+  test("subtraction is addition with unary_-"):
+    forAll: (a: Offset, b: Offset) =>
       assertEquals((a - b),  (a + -b))
-    }
-  }
 
-  test("Fixed Rotation tests") {
+  test("unary_- negates each component"):
+    forAll: (o: Offset) =>
+      assertEquals(-o,  Offset(-o.p, -o.q))
+
+  test("Fixed Rotation tests"):
     val pqa = List(
-      (-1.arcsec.p, 0.arcsec.q, 90.deg)                                     -> ((0.arcsec.p, 1.arcsec.q)),
-      (0.arcsec.p, 1.arcsec.q, 90.deg)                                      -> ((1.arcsec.p, 0.arcsec.q)),
-      (1.arcsec.p, 0.arcsec.q, 90.deg)                                      -> ((0.arcsec.p, -1.arcsec.q)),
-      (0.arcsec.p, -1.arcsec.q, 90.deg)                                     -> ((-1.arcsec.p, 0.arcsec.q)),
-      (-1.arcsec.p, 0.arcsec.q, -90.deg)                                    -> ((0.arcsec.p, -1.arcsec.q)),
-      (0.arcsec.p, 1.arcsec.q, -90.deg)                                     -> ((-1.arcsec.p, 0.arcsec.q)),
-      (1.arcsec.p, 0.arcsec.q, -90.deg)                                     -> ((0.arcsec.p, 1.arcsec.q)),
-      (0.arcsec.p, -1.arcsec.q, -90.deg)                                    -> ((1.arcsec.p, 0.arcsec.q)),
-      (-1.arcsec.p, 0.arcsec.q, 30.deg)                                     -> ((-866025.µas.p, 500000.µas.q)),
-      (-1.arcsec.p, 0.arcsec.q, -30.deg)                                    -> ((-866025.µas.p, -500000.µas.q)),
-      (-2999291.µas.p, 9537000.µas.q, Angle.fromDMS(148, 0, 54, 775, 807))  -> ((7595657.µas.p,
-                                                                                -6500470.µas.q
-                                                                               )
+      (-(1.arcsec.p),  0.arcsec.q,    90.deg)                                 -> ((  0.arcsec.p,   1.arcsec.q)),
+      (  0.arcsec.p,   1.arcsec.q,    90.deg)                                 -> ((  1.arcsec.p,   0.arcsec.q)),
+      (  1.arcsec.p,   0.arcsec.q,    90.deg)                                 -> ((  0.arcsec.p, -(1.arcsec.q))),
+      (  0.arcsec.p, -(1.arcsec.q),   90.deg)                                 -> ((-(1.arcsec.p),  0.arcsec.q)),
+      (-(1.arcsec.p),  0.arcsec.q,  -(90.deg))                                -> ((  0.arcsec.p, -(1.arcsec.q))),
+      (  0.arcsec.p,   1.arcsec.q,  -(90.deg))                                -> ((-(1.arcsec.p),  0.arcsec.q)),
+      (  1.arcsec.p,   0.arcsec.q,  -(90.deg))                                -> ((  0.arcsec.p,   1.arcsec.q)),
+      (  0.arcsec.p, -(1.arcsec.q), -(90.deg))                                -> ((  1.arcsec.p,   0.arcsec.q)),
+      (-(1.arcsec.p),  0.arcsec.q,    30.deg)                                 -> ((-(866025.µas.p),   500000.µas.q)),
+      (-(1.arcsec.p),  0.arcsec.q,  -(30.deg))                                -> ((-(866025.µas.p), -(500000.µas.q))),
+      (-(2999291.µas.p), 9537000.µas.q, Angle.fromDMS(148, 0, 54, 775, 807))  -> ((7595657.µas.p,
+                                                                                  -(6500470.µas.q)
+                                                                                 )
       ),
-      (7595657.µas.p, -6500470.µas.q, -Angle.fromDMS(148, 0, 54, 775, 807)) -> ((-2999291.µas.p,
-                                                                                 9537000.µas.q
-                                                                                )
+      (7595657.µas.p, -(6500470.µas.q), -Angle.fromDMS(148, 0, 54, 775, 807)) -> ((-(2999291.µas.p),
+                                                                                   9537000.µas.q
+                                                                                  )
       )
     )
 
@@ -96,33 +92,26 @@ final class OffsetSuite extends munit.DisciplineSuite {
         """.stripMargin)
         }
     }
-  }
 
-  test("Rotation is invertable within 1 µas") {
+  test("Rotation is invertable within 1 µas"):
     // not exactly invertable because of rounding
-    forAll { (o: Offset, θ: Angle) =>
+    forAll: (o: Offset, θ: Angle) =>
       val oʹ       = o.rotate(θ).rotate(-θ)
       val (p, q)   = Offset.signedMicroarcseconds.get(o)
       val (pʹ, qʹ) = Offset.signedMicroarcseconds.get(oʹ)
       assert(
         ((p - pʹ).abs <= 1) && ((q - qʹ).abs <= 1)
       )
-    }
-  }
 
-  test("Distance is commutative") {
-    forAll { (a: Offset, b: Offset) =>
+  test("Distance is commutative"):
+    forAll: (a: Offset, b: Offset) =>
       assertEquals(a.distance(b), b.distance(a))
-    }
-  }
 
-  test("Distance is never greater than 180º") {
-    forAll { (a: Offset, b: Offset) =>
+  test("Distance is never greater than 180º"):
+    forAll: (a: Offset, b: Offset) =>
       assert(a.distance(b).toMicroarcseconds <= Angle.µasPer180)
-    }
-  }
 
-  test("Distance tests") {
+  test("Distance tests"):
     val examples = List(
       ((  0L,  0L), ( 0L,  0L)) ->  0L,
       ((  0L, 10L), ( 0L,  0L)) -> 10L,
@@ -136,5 +125,3 @@ final class OffsetSuite extends munit.DisciplineSuite {
     examples.foreach { case ((a, b), result) =>
       assertEquals(toOffset(a).distance(toOffset(b)).toMicroarcseconds, result)
     }
-  }
-}

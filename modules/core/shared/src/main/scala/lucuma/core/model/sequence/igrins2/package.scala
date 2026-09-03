@@ -49,10 +49,10 @@ def fowlerSamplesForExposureTime(exposure: TimeSpan): Igrins2FowlerSamples =
 
 val NodAlongSlitDefaultTelescopeConfigs: NonEmptyList[TelescopeConfigAlongSlit] =
   NonEmptyList.of(
-    TelescopeConfigAlongSlit(-1.25.qArcsec, StepGuideState.Enabled),
-    TelescopeConfigAlongSlit( 1.25.qArcsec, StepGuideState.Enabled),
-    TelescopeConfigAlongSlit( 1.25.qArcsec, StepGuideState.Enabled),
-    TelescopeConfigAlongSlit(-1.25.qArcsec, StepGuideState.Enabled),
+    TelescopeConfigAlongSlit(-(1.25.qArcsec), StepGuideState.Enabled),
+    TelescopeConfigAlongSlit(  1.25.qArcsec, StepGuideState.Enabled),
+    TelescopeConfigAlongSlit(  1.25.qArcsec, StepGuideState.Enabled),
+    TelescopeConfigAlongSlit(-(1.25.qArcsec), StepGuideState.Enabled),
   )
 
 val NodToSkyDefaultTelescopeConfigs: NonEmptyList[TelescopeConfig] =

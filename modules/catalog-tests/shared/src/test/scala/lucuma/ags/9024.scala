@@ -76,9 +76,9 @@ class ShortCut_9024 extends munit.FunSuite {
       case _                      => false
 
   // target like one on ifu1/ifu2 that is away from the base
-  private val noZoneTarget = coordAt(Offset(-100.arcsec.p, 0.arcsec.q))
+  private val noZoneTarget = coordAt(Offset((-100).arcsec.p, 0.arcsec.q))
   // This guide star is on top of ifu1/ifu2 it should be reject
-  private val gsOnIFU      = guidestarAt(Offset(100.arcsec.p, -100.arcsec.q))
+  private val gsOnIFU      = guidestarAt(Offset(100.arcsec.p, (-100).arcsec.q))
   // This guide star is away
   private val gsAtDistance = guidestarAt(Offset(100.arcsec.p, 0.arcsec.q))
 

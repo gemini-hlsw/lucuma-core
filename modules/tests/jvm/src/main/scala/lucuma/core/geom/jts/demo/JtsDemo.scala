@@ -45,10 +45,10 @@ trait GmosShapes extends InstrumentShapes:
     145.deg
 
   val guideStarOffset: Offset =
-    Offset(170543999.µas.p, -24177003.µas.q)
+    Offset(170543999.µas.p, -(24177003.µas.q))
 
   val offsetPos: Offset =
-    Offset(-60.arcsec.p, 60.arcsec.q)
+    Offset(-(60.arcsec.p), 60.arcsec.q)
 
   def fpu: Either[GmosNorthFpu, GmosSouthFpu]
 
@@ -80,10 +80,10 @@ trait GmosImagingShapes extends InstrumentShapes:
     145.deg
 
   val guideStarOffset: Offset =
-    Offset(170543999.µas.p, -24177003.µas.q)
+    Offset(170543999.µas.p, -(24177003.µas.q))
 
   val offsetPos: Offset =
-    Offset(-60.arcsec.p, 60.arcsec.q)
+    Offset(-(60.arcsec.p), 60.arcsec.q)
 
   val port: PortDisposition =
     PortDisposition.Side
@@ -102,8 +102,8 @@ trait GmosMosShapes extends InstrumentShapes:
   import lucuma.core.geom.gmos.oiwfs.{probeArm, patrolField}
 
   val posAngle: Angle         = 0.deg
-  val offsetPos: Offset       = Offset(-60.arcsec.p, 60.arcsec.q)
-  val guideStarOffset: Offset = Offset(-140.arcsec.p, 160.arcsec.q)
+  val offsetPos: Offset       = Offset(-(60.arcsec.p), 60.arcsec.q)
+  val guideStarOffset: Offset = Offset(-(140.arcsec.p), 160.arcsec.q)
   val port: PortDisposition   = PortDisposition.Side
 
   override def coloredShapes: List[ColoredShape] =
@@ -222,10 +222,10 @@ trait Flamingos2LSShapes extends InstrumentShapes:
     145.deg
 
   val guideStarOffset: Offset =
-    Offset(170543999.µas.p, -24177003.µas.q)
+    Offset(170543999.µas.p, -(24177003.µas.q))
 
   val offsetPos: Offset =
-    Offset(-60.arcsec.p, 60.arcsec.q)
+    Offset(-(60.arcsec.p), 60.arcsec.q)
 
   val fpu: Flamingos2FpuMask = Flamingos2FpuMask.Builtin(Flamingos2Fpu.LongSlit8)
   val lyot: Flamingos2LyotWheel = Flamingos2LyotWheel.F16
@@ -250,10 +250,10 @@ trait Flamingos2ImagingShapes extends InstrumentShapes:
     145.deg
 
   val guideStarOffset: Offset =
-    Offset(170543999.µas.p, -24177003.µas.q)
+    Offset(170543999.µas.p, -(24177003.µas.q))
 
   val offsetPos: Offset =
-    Offset(-60.arcsec.p, 60.arcsec.q)
+    Offset(-(60.arcsec.p), 60.arcsec.q)
 
   val lyot: Flamingos2LyotWheel = Flamingos2LyotWheel.F16
 
@@ -277,10 +277,10 @@ trait Flamingos2MosShapes extends InstrumentShapes:
     20.deg
 
   val guideStarOffset: Offset =
-    Offset(170543999.µas.p, -24177003.µas.q)
+    Offset(170543999.µas.p, -(24177003.µas.q))
 
   val offsetPos: Offset =
-    Offset(-5.arcsec.p, 5.arcsec.q)
+    Offset(-(5.arcsec.p), 5.arcsec.q)
 
   val lyot: Flamingos2LyotWheel = Flamingos2LyotWheel.F16
 
@@ -336,7 +336,7 @@ trait GmosWithPwfsShapes extends InstrumentShapes:
     15.deg
 
   val offsetPos: Offset =
-    Offset(-60.arcsec.p, 60.arcsec.q)
+    Offset(-(60.arcsec.p), 60.arcsec.q)
 
   val guideStarOffset: Offset =
     Offset(270.arcsec.p, 224.arcsec.q)
@@ -599,8 +599,8 @@ trait GhostShapes extends InstrumentShapes:
 
   val probe: GuideProbe = GuideProbe.PWFS2
 
-  val ifu1Offset: Offset = Offset(100.arcsec.p,  30.arcsec.q)
-  val ifu2Offset: Offset = Offset(-120.arcsec.p, -40.arcsec.q)
+  val ifu1Offset: Offset = Offset(  100.arcsec.p,    30.arcsec.q)
+  val ifu2Offset: Offset = Offset(-(120.arcsec.p), -(40.arcsec.q))
 
   private def ifuMarkerAt(offset: Offset): ShapeExpression =
     ShapeExpression.centeredRectangle(7.arcsec, 7.arcsec).rotate(posAngle) ↗ offset

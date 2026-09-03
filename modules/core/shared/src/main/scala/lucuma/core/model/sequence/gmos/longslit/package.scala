@@ -47,9 +47,9 @@ val DefaultAmpCount: GmosAmpCount =
 val DefaultSlitTelescopeConfigs: SlitTelescopeConfigs =
   SlitTelescopeConfigs.AlongSlit(
     NonEmptyList.of(
-      TelescopeConfigAlongSlit(  0.qArcsec, StepGuideState.Enabled),
-      TelescopeConfigAlongSlit( 15.qArcsec, StepGuideState.Enabled),
-      TelescopeConfigAlongSlit(-15.qArcsec, StepGuideState.Enabled)
+      TelescopeConfigAlongSlit(   0.qArcsec,  StepGuideState.Enabled),
+      TelescopeConfigAlongSlit(  15.qArcsec,  StepGuideState.Enabled),
+      TelescopeConfigAlongSlit(-(15.qArcsec), StepGuideState.Enabled)
     )
   )
 

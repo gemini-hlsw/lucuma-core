@@ -2,7 +2,7 @@ import org.scalajs.linker.interface.ESVersion
 import org.typelevel.sbt.gha.PermissionValue
 import org.typelevel.sbt.gha.Permissions
 
-ThisBuild / tlBaseVersion                         := "0.243"
+ThisBuild / tlBaseVersion                         := "0.244"
 ThisBuild / tlCiReleaseBranches                   := Seq("master")
 ThisBuild / githubWorkflowEnv += "MUNIT_FLAKY_OK" -> "true"
 
@@ -10,7 +10,8 @@ ThisBuild / tlCiReleaseBranches += "topic/scala3"
 
 Global / concurrentRestrictions += Tags.limit(Tags.Compile, 1)
 
-ThisBuild / crossScalaVersions := Seq("3.8.4")
+ThisBuild / crossScalaVersions := Seq("3.9.0")
+ThisBuild / lucumaCoverage := false
 ThisBuild / scalacOptions += "-language:implicitConversions" // TODO
 // Derivation for wide sums (Configuration.ObservingMode) exceeds the default budget of 32.
 ThisBuild / scalacOptions += "-Xmax-inlines:64"

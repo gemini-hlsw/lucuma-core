@@ -112,7 +112,7 @@ object Offset extends OffsetOptics {
 
       /** This component, reflected around the 0 .. 180° axis. Exact, invertable. */
       inline def unary_- : Component[A] =
-        -toAngle.toMicroarcseconds
+        Component(-toAngle)
 
       /** Sum of this component and `o` of the same type. Exact. */
       inline def +(o: Component[A]): Component[A] =
