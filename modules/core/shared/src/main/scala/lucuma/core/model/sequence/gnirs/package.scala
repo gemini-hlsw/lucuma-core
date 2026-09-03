@@ -52,34 +52,34 @@ def defaultSlitTelescopeConfigs(preset: GnirsSlitOffsetPreset, prism: GnirsPrism
 private val LowResolutionIfuPresets: NonEmptyList[(String, NonEmptyList[TelescopeConfig])] =
   NonEmptyList.of(
     "Extended" -> NonEmptyList.of(
-      TelescopeConfig(Offset(0.15.pArcsec, 0.15.qArcsec), StepGuideState.Enabled),
-      TelescopeConfig(Offset(10.pArcsec, 10.qArcsec), StepGuideState.Disabled),
-      TelescopeConfig(Offset(-0.15.pArcsec, -0.15.qArcsec), StepGuideState.Enabled),
-      TelescopeConfig(Offset(-10.pArcsec, -10.qArcsec), StepGuideState.Disabled)
+      TelescopeConfig(Offset(  0.15.pArcsec,    0.15.qArcsec),  StepGuideState.Enabled),
+      TelescopeConfig(Offset(    10.pArcsec,      10.qArcsec),  StepGuideState.Disabled),
+      TelescopeConfig(Offset(-(0.15.pArcsec), -(0.15.qArcsec)), StepGuideState.Enabled),
+      TelescopeConfig(Offset(  -(10.pArcsec),   -(10.qArcsec)), StepGuideState.Disabled)
     ),
     "Point"    -> NonEmptyList.of(
-      TelescopeConfig(Offset(0.75.pArcsec, -1.5.qArcsec), StepGuideState.Enabled),
-      TelescopeConfig(Offset(-0.75.pArcsec, -1.5.qArcsec), StepGuideState.Enabled),
-      TelescopeConfig(Offset(-0.75.pArcsec, 1.5.qArcsec), StepGuideState.Enabled),
-      TelescopeConfig(Offset(0.75.pArcsec, -1.5.qArcsec), StepGuideState.Enabled)
+      TelescopeConfig(Offset(  0.75.pArcsec,  -(1.5.qArcsec)), StepGuideState.Enabled),
+      TelescopeConfig(Offset(-(0.75.pArcsec), -(1.5.qArcsec)), StepGuideState.Enabled),
+      TelescopeConfig(Offset(-(0.75.pArcsec),   1.5.qArcsec),  StepGuideState.Enabled),
+      TelescopeConfig(Offset(  0.75.pArcsec,  -(1.5.qArcsec)), StepGuideState.Enabled)
     )
   )
 
 private val HighResolutionIfuPresets: NonEmptyList[(String, NonEmptyList[TelescopeConfig])] =
   NonEmptyList.of(
     "Science"  -> NonEmptyList.of(
-      TelescopeConfig(Offset(0.1.pArcsec, -0.1.qArcsec), StepGuideState.Enabled),
-      TelescopeConfig(Offset(10.pArcsec, 10.qArcsec), StepGuideState.Disabled),
-      TelescopeConfig(Offset(-0.1.pArcsec, 0.1.qArcsec), StepGuideState.Enabled),
-      TelescopeConfig(Offset(-10.pArcsec, -10.qArcsec), StepGuideState.Disabled)
+      TelescopeConfig(Offset(  0.1.pArcsec, -(0.1.qArcsec)), StepGuideState.Enabled),
+      TelescopeConfig(Offset(   10.pArcsec,    10.qArcsec),  StepGuideState.Disabled),
+      TelescopeConfig(Offset(-(0.1.pArcsec),  0.1.qArcsec),  StepGuideState.Enabled),
+      TelescopeConfig(Offset( -(10.pArcsec), -(10.qArcsec)), StepGuideState.Disabled)
     ),
     "Telluric" -> NonEmptyList.of(
-      TelescopeConfig(Offset(0.pArcsec, 0.qArcsec), StepGuideState.Enabled),
-      TelescopeConfig(Offset(5.pArcsec, 5.qArcsec), StepGuideState.Disabled),
-      TelescopeConfig(Offset(0.pArcsec, 0.qArcsec), StepGuideState.Enabled),
-      TelescopeConfig(Offset(0.pArcsec, 0.qArcsec), StepGuideState.Enabled),
-      TelescopeConfig(Offset(-5.pArcsec, -5.qArcsec), StepGuideState.Disabled),
-      TelescopeConfig(Offset(0.pArcsec, 0.qArcsec), StepGuideState.Enabled)
+      TelescopeConfig(Offset(  0.pArcsec,    0.qArcsec),  StepGuideState.Enabled),
+      TelescopeConfig(Offset(  5.pArcsec,    5.qArcsec),  StepGuideState.Disabled),
+      TelescopeConfig(Offset(  0.pArcsec,    0.qArcsec),  StepGuideState.Enabled),
+      TelescopeConfig(Offset(  0.pArcsec,    0.qArcsec),  StepGuideState.Enabled),
+      TelescopeConfig(Offset(-(5.pArcsec), -(5.qArcsec)), StepGuideState.Disabled),
+      TelescopeConfig(Offset(  0.pArcsec,    0.qArcsec),  StepGuideState.Enabled)
     )
   )
 

@@ -121,7 +121,7 @@ class GaiaClientSuite extends CatsEffectSuite with VoTableSamples:
           // parallax: 0.16641381 mas -> 166 μas as long
           assertEquals(tracking.parallax.map(_.μas.value.value), 166L.some)
           // radial_velocity: -39.225376 km/s -> -39225.376 m/s
-          assertEquals(tracking.radialVelocity.map(_.rv.value.toDouble), -39225.376.some)
+          assertEquals(tracking.radialVelocity.map(_.rv.value.toDouble), (-39225.376).some)
           assertEquals(
             Target.integratedBrightnessIn(Band.Gaia).headOption(result.target),
             BrightnessValue.unsafeFrom(15.083894).withUnit[VegaMagnitude].toMeasureTagged.some
@@ -144,7 +144,7 @@ class GaiaClientSuite extends CatsEffectSuite with VoTableSamples:
         case Right(result) =>
           val tracking = result.target.tracking
           assertEquals(tracking.parallax.map(_.μas.value.value), 166L.some)
-          assertEquals(tracking.radialVelocity.map(_.rv.value.toDouble), -39225.376.some)
+          assertEquals(tracking.radialVelocity.map(_.rv.value.toDouble), (-39225.376).some)
           assertEquals(
             Target.integratedBrightnessIn(Band.Gaia).headOption(result.target),
             BrightnessValue.unsafeFrom(15.083894).withUnit[VegaMagnitude].toMeasureTagged.some
@@ -166,7 +166,7 @@ class GaiaClientSuite extends CatsEffectSuite with VoTableSamples:
         case Right(result) =>
           val tracking = result.target.tracking
           assertEquals(tracking.parallax.map(_.μas.value.value), 166L.some)
-          assertEquals(tracking.radialVelocity.map(_.rv.value.toDouble), -39225.376.some)
+          assertEquals(tracking.radialVelocity.map(_.rv.value.toDouble), (-39225.376).some)
         case Left(e)       =>
           fail(s"queryById failed: ${e.toList.mkString("; ")}")
 
@@ -183,7 +183,7 @@ class GaiaClientSuite extends CatsEffectSuite with VoTableSamples:
           assertEquals(target.name.value, "Gaia DR3 538670232718296576")
           assertEquals(tracking.epoch.some, Epoch.Julian.fromEpochYears(2016.0))
           assertEquals(tracking.parallax.map(_.μas.value.value), 166L.some)
-          assertEquals(tracking.radialVelocity.map(_.rv.value.toDouble), -39225.376.some)
+          assertEquals(tracking.radialVelocity.map(_.rv.value.toDouble), (-39225.376).some)
           assertEquals(
             Target.properMotionRA.getOption(target),
             ProperMotion.μasyRA(-1434).some

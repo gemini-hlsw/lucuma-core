@@ -12,6 +12,8 @@ import lucuma.core.optics.laws.discipline.SplitMonoTests
 import monocle.law.discipline.*
 import org.scalacheck.Prop.*
 
+import scala.language.implicitConversions
+
 final class OffsetSuite extends munit.DisciplineSuite {
   import ArbAngle.given
   import ArbOffset.given
@@ -61,23 +63,23 @@ final class OffsetSuite extends munit.DisciplineSuite {
 
   test("Fixed Rotation tests") {
     val pqa = List(
-      (-1.arcsec.p, 0.arcsec.q, 90.deg)                                     -> ((0.arcsec.p, 1.arcsec.q)),
-      (0.arcsec.p, 1.arcsec.q, 90.deg)                                      -> ((1.arcsec.p, 0.arcsec.q)),
-      (1.arcsec.p, 0.arcsec.q, 90.deg)                                      -> ((0.arcsec.p, -1.arcsec.q)),
-      (0.arcsec.p, -1.arcsec.q, 90.deg)                                     -> ((-1.arcsec.p, 0.arcsec.q)),
-      (-1.arcsec.p, 0.arcsec.q, -90.deg)                                    -> ((0.arcsec.p, -1.arcsec.q)),
-      (0.arcsec.p, 1.arcsec.q, -90.deg)                                     -> ((-1.arcsec.p, 0.arcsec.q)),
-      (1.arcsec.p, 0.arcsec.q, -90.deg)                                     -> ((0.arcsec.p, 1.arcsec.q)),
-      (0.arcsec.p, -1.arcsec.q, -90.deg)                                    -> ((1.arcsec.p, 0.arcsec.q)),
-      (-1.arcsec.p, 0.arcsec.q, 30.deg)                                     -> ((-866025.µas.p, 500000.µas.q)),
-      (-1.arcsec.p, 0.arcsec.q, -30.deg)                                    -> ((-866025.µas.p, -500000.µas.q)),
-      (-2999291.µas.p, 9537000.µas.q, Angle.fromDMS(148, 0, 54, 775, 807))  -> ((7595657.µas.p,
-                                                                                -6500470.µas.q
-                                                                               )
+      (-(1.arcsec.p),  0.arcsec.q,    90.deg)                                 -> ((  0.arcsec.p,   1.arcsec.q)),
+      (  0.arcsec.p,   1.arcsec.q,    90.deg)                                 -> ((  1.arcsec.p,   0.arcsec.q)),
+      (  1.arcsec.p,   0.arcsec.q,    90.deg)                                 -> ((  0.arcsec.p, -(1.arcsec.q))),
+      (  0.arcsec.p, -(1.arcsec.q),   90.deg)                                 -> ((-(1.arcsec.p),  0.arcsec.q)),
+      (-(1.arcsec.p),  0.arcsec.q,  -(90.deg))                                -> ((  0.arcsec.p, -(1.arcsec.q))),
+      (  0.arcsec.p,   1.arcsec.q,  -(90.deg))                                -> ((-(1.arcsec.p),  0.arcsec.q)),
+      (  1.arcsec.p,   0.arcsec.q,  -(90.deg))                                -> ((  0.arcsec.p,   1.arcsec.q)),
+      (  0.arcsec.p, -(1.arcsec.q), -(90.deg))                                -> ((  1.arcsec.p,   0.arcsec.q)),
+      (-(1.arcsec.p),  0.arcsec.q,    30.deg)                                 -> ((-(866025.µas.p),   500000.µas.q)),
+      (-(1.arcsec.p),  0.arcsec.q,  -(30.deg))                                -> ((-(866025.µas.p), -(500000.µas.q))),
+      (-(2999291.µas.p), 9537000.µas.q, Angle.fromDMS(148, 0, 54, 775, 807))  -> ((7595657.µas.p,
+                                                                                  -(6500470.µas.q)
+                                                                                 )
       ),
-      (7595657.µas.p, -6500470.µas.q, -Angle.fromDMS(148, 0, 54, 775, 807)) -> ((-2999291.µas.p,
-                                                                                 9537000.µas.q
-                                                                                )
+      (7595657.µas.p, -(6500470.µas.q), -Angle.fromDMS(148, 0, 54, 775, 807)) -> ((-(2999291.µas.p),
+                                                                                   9537000.µas.q
+                                                                                  )
       )
     )
 

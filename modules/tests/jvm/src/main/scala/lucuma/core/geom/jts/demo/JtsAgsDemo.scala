@@ -52,7 +52,7 @@ trait GmosAgsVisualizationShapes(val posAngle: Angle) extends AgsVisualizationBa
   import lucuma.core.geom.gmos.*
 
   val guideStarOffset: Offset =
-    Offset(-170543999.µas.p, -24177003.µas.q)
+    Offset(-(170543999.µas.p), -(24177003.µas.q))
 
   val defaultFpu: Either[GmosNorthFpu, GmosSouthFpu] =
     Right(GmosSouthFpu.LongSlit_5_00)
@@ -72,16 +72,16 @@ trait GmosAgsVisualizationShapes(val posAngle: Angle) extends AgsVisualizationBa
 
   val acqOffsets: AcquisitionOffsets = AcquisitionOffsets(
     NonEmptySet.of(
-      Offset(0.arcsec.p, -10.arcsec.q).guided,
-      Offset(10.arcsec.p,  0.arcsec.q).guided
+      Offset( 0.arcsec.p, -(10.arcsec.q)).guided,
+      Offset(10.arcsec.p,    0.arcsec.q).guided
     )
   )
 
   val scienceOffsets: ScienceOffsets = ScienceOffsets(
     NonEmptySet.of(
-      Offset(0.arcsec.p,  15.arcsec.q).guided,
+      Offset(0.arcsec.p,   15.arcsec.q).guided,
       Offset.Zero.guided,
-      Offset(0.arcsec.p, -15.arcsec.q).guided
+      Offset(0.arcsec.p, -(15.arcsec.q)).guided
     )
   )
 
@@ -191,7 +191,7 @@ trait GmosWithPwfsVisualizationShapes(val posAngle: Angle) extends AgsVisualizat
   import lucuma.core.geom.pwfs.probeArm
 
   val guideStarOffset: Offset =
-    Offset(200.arcsec.p, -150.arcsec.q)
+    Offset(200.arcsec.p, -(150.arcsec.q))
 
   val defaultFpu: Option[Either[GmosNorthFpu, GmosSouthFpu]] =
     Some(Right(GmosSouthFpu.LongSlit_5_00))
@@ -268,9 +268,9 @@ trait GhostWithPwfsVisualizationShapes(val posAngle: Angle) extends AgsVisualiza
     Offset(270.arcsec.p, 300.arcsec.q)
 
   // IFU1 target
-  val target1Offset: Offset = Offset(100.arcsec.p, 30.arcsec.q)
+  val target1Offset: Offset = Offset(  100.arcsec.p,    30.arcsec.q)
   // IFU2 target
-  val target2Offset: Offset = Offset(-180.arcsec.p, -70.arcsec.q)
+  val target2Offset: Offset = Offset(-(180.arcsec.p), -(70.arcsec.q))
 
   val offsetPos: Offset = Offset.Zero
 

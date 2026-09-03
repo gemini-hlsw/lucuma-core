@@ -15,36 +15,36 @@ import lucuma.core.model.sequence.TelescopeConfigAlongSlit
 
 val TelluricDefaultTelescopeConfigs: NonEmptyList[TelescopeConfigAlongSlit] =
   NonEmptyList.of(
-    TelescopeConfigAlongSlit( 15.qArcsec, StepGuideState.Enabled),
-    TelescopeConfigAlongSlit(-15.qArcsec, StepGuideState.Enabled),
-    TelescopeConfigAlongSlit(-15.qArcsec, StepGuideState.Enabled),
-    TelescopeConfigAlongSlit( 15.qArcsec, StepGuideState.Enabled),
+    TelescopeConfigAlongSlit(  15.qArcsec,  StepGuideState.Enabled),
+    TelescopeConfigAlongSlit(-(15.qArcsec), StepGuideState.Enabled),
+    TelescopeConfigAlongSlit(-(15.qArcsec), StepGuideState.Enabled),
+    TelescopeConfigAlongSlit(  15.qArcsec,  StepGuideState.Enabled),
   )
 
 val MosTelluricDefaultTelescopeConfigs: NonEmptyList[TelescopeConfigAlongSlit] =
   NonEmptyList.of(
-    TelescopeConfigAlongSlit( 60.qArcsec, StepGuideState.Enabled),
-    TelescopeConfigAlongSlit( 40.qArcsec, StepGuideState.Enabled),
-    TelescopeConfigAlongSlit( 20.qArcsec, StepGuideState.Enabled),
-    TelescopeConfigAlongSlit(-20.qArcsec, StepGuideState.Enabled),
-    TelescopeConfigAlongSlit( 40.qArcsec, StepGuideState.Enabled),
-    TelescopeConfigAlongSlit( 60.qArcsec, StepGuideState.Enabled),
+    TelescopeConfigAlongSlit(  60.qArcsec,  StepGuideState.Enabled),
+    TelescopeConfigAlongSlit(  40.qArcsec,  StepGuideState.Enabled),
+    TelescopeConfigAlongSlit(  20.qArcsec,  StepGuideState.Enabled),
+    TelescopeConfigAlongSlit(-(20.qArcsec), StepGuideState.Enabled),
+    TelescopeConfigAlongSlit(  40.qArcsec,  StepGuideState.Enabled),
+    TelescopeConfigAlongSlit(  60.qArcsec,  StepGuideState.Enabled),
   )
 
 val NodAlongSlitDefaultTelescopeConfigs: NonEmptyList[TelescopeConfigAlongSlit] =
   NonEmptyList.of(
-    TelescopeConfigAlongSlit( 10.qArcsec, StepGuideState.Enabled),
-    TelescopeConfigAlongSlit(-10.qArcsec, StepGuideState.Enabled),
-    TelescopeConfigAlongSlit(-10.qArcsec, StepGuideState.Enabled),
-    TelescopeConfigAlongSlit( 10.qArcsec, StepGuideState.Enabled),
+    TelescopeConfigAlongSlit(  10.qArcsec,  StepGuideState.Enabled),
+    TelescopeConfigAlongSlit(-(10.qArcsec), StepGuideState.Enabled),
+    TelescopeConfigAlongSlit(-(10.qArcsec), StepGuideState.Enabled),
+    TelescopeConfigAlongSlit(  10.qArcsec,  StepGuideState.Enabled),
   )
 
 val NodToSkyDefaultTelescopeConfigs: NonEmptyList[TelescopeConfig] =
   NonEmptyList.of(
-    TelescopeConfig(Offset.Zero, StepGuideState.Enabled),
+    TelescopeConfig(Offset.Zero,                    StepGuideState.Enabled),
     TelescopeConfig(Offset(0.pArcsec, 300.qArcsec), StepGuideState.Disabled),
     TelescopeConfig(Offset(0.pArcsec, 310.qArcsec), StepGuideState.Disabled),
-    TelescopeConfig(Offset.Zero, StepGuideState.Enabled),
+    TelescopeConfig(Offset.Zero,                    StepGuideState.Enabled),
   )
 
 def defaultSlitTelescopeConfigs(preset: Flamingos2SlitOffsetPreset): SlitTelescopeConfigs =
@@ -57,18 +57,18 @@ def defaultSlitTelescopeConfigs(preset: Flamingos2SlitOffsetPreset): SlitTelesco
 // MOS presets.
 val SparseFieldDefaultTelescopeConfigs: NonEmptyList[TelescopeConfigAlongSlit] =
   NonEmptyList.of(
-    TelescopeConfigAlongSlit( 1.2.qArcsec, StepGuideState.Enabled),
-    TelescopeConfigAlongSlit(-1.2.qArcsec, StepGuideState.Enabled),
-    TelescopeConfigAlongSlit(-1.2.qArcsec, StepGuideState.Enabled),
-    TelescopeConfigAlongSlit( 1.2.qArcsec, StepGuideState.Enabled),
+    TelescopeConfigAlongSlit(  1.2.qArcsec,  StepGuideState.Enabled),
+    TelescopeConfigAlongSlit(-(1.2.qArcsec), StepGuideState.Enabled),
+    TelescopeConfigAlongSlit(-(1.2.qArcsec), StepGuideState.Enabled),
+    TelescopeConfigAlongSlit(  1.2.qArcsec,  StepGuideState.Enabled),
   )
 
 val CrowdedFieldDefaultTelescopeConfigs: NonEmptyList[TelescopeConfig] =
   NonEmptyList.of(
-    TelescopeConfig(Offset.Zero, StepGuideState.Enabled),
+    TelescopeConfig(Offset.Zero,                    StepGuideState.Enabled),
     TelescopeConfig(Offset(0.pArcsec, 300.qArcsec), StepGuideState.Disabled),
     TelescopeConfig(Offset(0.pArcsec, 320.qArcsec), StepGuideState.Disabled),
-    TelescopeConfig(Offset.Zero, StepGuideState.Enabled),
+    TelescopeConfig(Offset.Zero,                    StepGuideState.Enabled),
   )
 
 def defaultMosTelescopeConfigs(preset: Flamingos2MosOffsetPreset): SlitTelescopeConfigs =
