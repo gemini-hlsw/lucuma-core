@@ -266,7 +266,7 @@ class BinningSuite extends FunSuite:
     assertEquals(mosResult._2, GmosYBinning.Two)
 
   test("ifu always returns 1x1"):
-    val xy = ifu.ifuBinning
+    val xy = ifu.NorthBinning
     assertEquals(xy, (GmosXBinning.One, GmosYBinning.One))
 
   test("mos ccd mode with a single profile"):
