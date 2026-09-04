@@ -21,6 +21,8 @@ import lucuma.core.enums.WaterVapor
 import lucuma.core.math.Angle
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Region
+import lucuma.core.util.TimeSpan
+import lucuma.core.util.arb.ArbTimeSpan.given
 import lucuma.core.math.arb.ArbAngle.given
 import lucuma.core.math.arb.ArbCoordinates.given
 import lucuma.core.math.arb.ArbRegion.given
@@ -215,10 +217,11 @@ trait ArbConfiguration:
         c <- arbitrary[Conditions]
         r <- arbitrary[Either[Coordinates, Region]]
         o <- arbitrary[ObservingMode]
-      yield (Configuration(c, r, o))
+        w <- arbitrary[TimeSpan]
+      yield (Configuration(c, r, o, w))
 
   given Cogen[Configuration] =
-    Cogen[(Conditions, Either[Coordinates, Region], ObservingMode)]
-      .contramap(c => (c.conditions, c.target, c.observingMode))
+    Cogen[(Conditions, Either[Coordinates, Region], ObservingMode, TimeSpan)]
+      .contramap(c => (c.conditions, c.target, c.observingMode, c.schedulingWindow))
 
 object ArbConfiguration extends ArbConfiguration

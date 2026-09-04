@@ -32,11 +32,26 @@ import lucuma.core.math.Offset
 import lucuma.core.math.Region
 import lucuma.core.model.Configuration.ObservingMode.*
 import lucuma.core.model.sequence.flamingos2.Flamingos2FpuMask
+import lucuma.core.util.TimeSpan
 
-case class Configuration(conditions: Configuration.Conditions, target: Either[Coordinates, Region], observingMode: Configuration.ObservingMode) derives Eq:
+/**
+ * A configuration that may be requested and approved.
+ *
+ * The `schedulingWindow` is the total time the observation is available for
+ * scheduling -- how long it is *open*, unrelated to how long it takes to
+ * execute.  On an approved configuration it is the minimum: an observation
+ * that has become less available than what was approved needs a new request.
+ */
+case class Configuration(
+  conditions:       Configuration.Conditions,
+  target:           Either[Coordinates, Region],
+  observingMode:    Configuration.ObservingMode,
+  schedulingWindow: TimeSpan
+) derives Eq:
   def subsumes(other: Configuration): Boolean =
     conditions >= other.conditions &&
-    observingMode.subsumes(other.observingMode) && {
+    observingMode.subsumes(other.observingMode) &&
+    schedulingWindow <= other.schedulingWindow && {
     (target, other.target) match
       case (Left(self), Left(other))   => observingMode.radius.toDoubleDegrees >= self.angularDistance(other).toDoubleDegrees
       case (Left(self), Right(other))  => false // coords never subsume region
