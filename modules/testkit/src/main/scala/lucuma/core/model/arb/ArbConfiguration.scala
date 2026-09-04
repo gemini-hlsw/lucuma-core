@@ -25,6 +25,7 @@ import lucuma.core.math.arb.ArbAngle.given
 import lucuma.core.math.arb.ArbCoordinates.given
 import lucuma.core.math.arb.ArbRegion.given
 import lucuma.core.model.CloudExtinction
+import lucuma.core.model.arb.ArbSchedulingAvailability.given
 import lucuma.core.util.arb.ArbEnumerated.given
 import org.scalacheck.*
 import org.scalacheck.Arbitrary.arbitrary
@@ -215,10 +216,11 @@ trait ArbConfiguration:
         c <- arbitrary[Conditions]
         r <- arbitrary[Either[Coordinates, Region]]
         o <- arbitrary[ObservingMode]
-      yield (Configuration(c, r, o))
+        w <- arbitrary[SchedulingAvailability]
+      yield (Configuration(c, r, o, w))
 
   given Cogen[Configuration] =
-    Cogen[(Conditions, Either[Coordinates, Region], ObservingMode)]
-      .contramap(c => (c.conditions, c.target, c.observingMode))
+    Cogen[(Conditions, Either[Coordinates, Region], ObservingMode, SchedulingAvailability)]
+      .contramap(c => (c.conditions, c.target, c.observingMode, c.availability))
 
 object ArbConfiguration extends ArbConfiguration
