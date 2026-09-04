@@ -19,14 +19,14 @@ import lucuma.core.model.sequence.TelescopeConfig
   * IFU observations always use 1x1 binning to maintain spatial resolution
   * required for proper reconstruction of the integral field.
   */
-val ifuBinning: (GmosXBinning, GmosYBinning) =
+private val Binning: (GmosXBinning, GmosYBinning) =
   (GmosXBinning.One, GmosYBinning.One)
 
-val northBinning: (GmosXBinning, GmosYBinning) =
-  ifuBinning
+val NorthBinning: (GmosXBinning, GmosYBinning) =
+  Binning
 
-val southBinning: (GmosXBinning, GmosYBinning) =
-  ifuBinning
+val SouthBinning: (GmosXBinning, GmosYBinning) =
+  Binning
 
 // GMOS IFU telescope-config presets. The head of each list is the default
 // used to initialize observing modes at creation -- for GMOS IFU that is "no offsets".
@@ -48,14 +48,14 @@ private val OneSlitPresets: NonEmptyList[(String, NonEmptyList[TelescopeConfig])
 private val TwoSlitsPresets: NonEmptyList[(String, NonEmptyList[TelescopeConfig])] =
   presets(BigDecimal("1.5"), BigDecimal("0.9"))
 
-def northIfuTelescopeConfigPresets(
+def northTelescopeConfigPresets(
   fpu: GmosNorthIfuFpu
 ): NonEmptyList[(String, NonEmptyList[TelescopeConfig])] =
   fpu match
     case GmosNorthIfuFpu.TwoSlits                                 => TwoSlitsPresets
     case GmosNorthIfuFpu.OneSlitRed | GmosNorthIfuFpu.OneSlitBlue => OneSlitPresets
 
-def southIfuTelescopeConfigPresets(
+def southTelescopeConfigPresets(
   fpu: GmosSouthIfuFpu
 ): NonEmptyList[(String, NonEmptyList[TelescopeConfig])] =
   fpu match

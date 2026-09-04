@@ -29,7 +29,7 @@ object GmosIfuAnalysis:
    */
   val DefaultSumRadius: Angle = Angle.microarcseconds.reverseGet(200_000)
 
-  val Default: GmosIfuAnalysis = Sum(DefaultSumRadius)
+  val Default: GmosIfuAnalysis = Single(Angle.Angle0)
 
   given Eq[GmosIfuAnalysis] = Eq.by:
     case Sum(radius)    => (0, radius)
