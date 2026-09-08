@@ -15,30 +15,16 @@ import lucuma.core.math.Offset
 import munit.CatsEffectSuite
 
 import scala.scalajs.js
-import scala.scalajs.js.annotation.JSImport
 
 /**
  * Smoke tests for the kernel facade against JTS. The exhaustive cross-engine parity suite over
- * every AgsParams variant is separate.
+ * every AgsParams variant is `lucuma.ags.AgsGeometryParitySuite`.
  */
-@js.native
-@JSImport("node:fs", JSImport.Namespace)
-private object NodeFs extends js.Object {
-  def readFileSync(path: js.Any): js.typedarray.Uint8Array = js.native
-}
-
 class WasmShapeInterpreterSuite extends CatsEffectSuite {
-
-  // Node cannot fetch file: URLs, so read the wasm bytes next to the package's JS glue.
-  private def wasmBytes: IO[js.typedarray.Uint8Array] = IO {
-    val url = js.`import`.meta.asInstanceOf[js.Dynamic]
-      .resolve("lucuma-geo-wasm/lucuma_geo_wasm_bg.wasm")
-    NodeFs.readFileSync(js.Dynamic.newInstance(js.Dynamic.global.URL)(url))
-  }
 
   private val kernel = ResourceSuiteLocalFixture(
     "kernel",
-    Resource.make(wasmBytes.flatMap(WasmGeometry.loadFrom(_)))(_ =>
+    Resource.make(WasmKernel.load)(_ =>
       IO(ShapeInterpreter.default = JtsShapeInterpreter)
     )
   )

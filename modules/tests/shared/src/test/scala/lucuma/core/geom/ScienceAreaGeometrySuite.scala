@@ -3,10 +3,9 @@
 
 package lucuma.core.geom
 
-import lucuma.core.geom.jts.interpreter.given
 import lucuma.core.math.Angle
 
-trait ScienceAreaGeometrySuite extends munit.FunSuite:
+abstract class ScienceAreaGeometrySuite(using ShapeInterpreter) extends munit.FunSuite:
 
   protected def sides(shape: ShapeExpression): (Angle, Angle) =
     val b = shape.eval.boundingOffsets

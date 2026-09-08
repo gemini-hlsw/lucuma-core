@@ -7,7 +7,7 @@ import cats.Order
 import cats.syntax.all.*
 import lucuma.core.geom.ShapeExpression.*
 import lucuma.core.geom.arb.*
-import lucuma.core.geom.jts.interpreter.given
+import lucuma.core.geom.jts.JtsShapeInterpreter
 import lucuma.core.geom.syntax.all.*
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
@@ -19,7 +19,7 @@ import org.scalacheck.*
 import org.scalacheck.Arbitrary.*
 import org.scalacheck.Prop.*
 
-class ShapeExpressionSuite extends munit.DisciplineSuite with RetryFlakyTests {
+abstract class ShapeExpressionTests(using ShapeInterpreter) extends munit.DisciplineSuite with RetryFlakyTests {
 
   implicit def saneUnitToProp(unit: Unit): Prop = super.unitToProp(unit)
 
@@ -27,6 +27,9 @@ class ShapeExpressionSuite extends munit.DisciplineSuite with RetryFlakyTests {
   import ArbOffset.given
   import ArbShapeExpression.*
   import ShapeExpressionSpec.*
+
+  // Area calculation isn't exact but within 1/2 mas^2 seems fine for our purposes.
+  protected def overlayAreaTolerance(nominal: Long): Double = 700.0
 
   test("intersection contains") {
     forAll(genTwoCenteredShapesAndAnOffset) { case (tcs, off) =>
@@ -73,9 +76,7 @@ class ShapeExpressionSuite extends munit.DisciplineSuite with RetryFlakyTests {
       val lhs = (tcs.shape0.µasSquared + tcs.shape1.µasSquared) -
         (tcs.shape0 ∩ tcs.shape1).µasSquared
 
-      // Area calculation isn't exact but within 1/2 mas^2 seems fine for our
-      // purposes.
-      assertEqualsDouble((rhs - lhs).toDouble, 0L, 700L)
+      assertEqualsDouble((rhs - lhs).toDouble, 0.0, overlayAreaTolerance(rhs))
     }
   }
 
@@ -87,8 +88,7 @@ class ShapeExpressionSuite extends munit.DisciplineSuite with RetryFlakyTests {
           (tcs.shape1 - tcs.shape0).µasSquared
       )
 
-      // Area calculation isn't exact but within 1/2 mas^2 seems fine.
-      assertEqualsDouble((rhs - lhs).toDouble, 0L, 700L)
+      assertEqualsDouble((rhs - lhs).toDouble, 0.0, overlayAreaTolerance(rhs))
     }
   }
 
@@ -250,6 +250,8 @@ class ShapeExpressionSuite extends munit.DisciplineSuite with RetryFlakyTests {
     assert(l.reduce(_ ∩ _).eval != null)
   }
 }
+
+class ShapeExpressionSuite extends ShapeExpressionTests(using JtsShapeInterpreter)
 
 object ShapeExpressionSpec {
 
