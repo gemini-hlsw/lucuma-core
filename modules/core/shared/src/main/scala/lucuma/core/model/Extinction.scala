@@ -32,8 +32,9 @@ object Extinction extends NewRefinedQuantity[Short, NonNegative, MilliVegaMagnit
   val FromVegaMagnitude: Format[BigDecimal, Extinction] =
     Format(
       d =>
-        // Truncate to millimags; Try guards against exponent overflow and out-of-range values.
-        Try(d.bigDecimal.movePointRight(3).setScale(0, RoundingMode.DOWN).shortValueExact).toOption
+        // Truncate to millimags (FLOOR so tiny negatives are rejected rather than becoming 0);
+        // Try guards against exponent overflow and out-of-range values.
+        Try(d.bigDecimal.movePointRight(3).setScale(0, RoundingMode.FLOOR).shortValueExact).toOption
           .flatMap(FromMilliVegaMagnitude.getOption),
       e => BigDecimal(FromMilliVegaMagnitude.reverseGet(e)).bigDecimal.movePointLeft(3)
     )
