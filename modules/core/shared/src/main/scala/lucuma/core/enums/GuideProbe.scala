@@ -3,6 +3,7 @@
 
 package lucuma.core.enums
 
+import cats.Order
 import lucuma.core.enums.Flamingos2LyotWheel
 import lucuma.core.geom
 import lucuma.core.geom.ShapeExpression
@@ -31,3 +32,12 @@ enum GuideProbe(val tag: String) derives Enumerated:
 
 object GuideProbe:
   given Enumerated[PWFSGuideProbe] = Enumerated.from(GuideProbe.PWFS1, GuideProbe.PWFS2).withTag(_.tag)
+
+  /**
+   * Probes ranked best-first: an OIWFS beats PWFS2, which beats PWFS1.
+   */
+  val Preference: Order[GuideProbe] =
+    Order.by:
+      case GmosOIWFS | Flamingos2OIWFS => 0
+      case PWFS2                       => 1
+      case PWFS1                       => 2
