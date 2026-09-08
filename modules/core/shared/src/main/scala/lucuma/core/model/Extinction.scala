@@ -17,6 +17,9 @@ import lucuma.core.util.NewRefinedQuantity
 import monocle.Prism
 import spire.math.Rational
 
+import java.math.RoundingMode
+import scala.util.Try
+
 /**
  * Extinction in mags, a non-negative number with three decimal points of precision,
  * in [0.000, 32.767].
@@ -28,7 +31,11 @@ object Extinction extends NewRefinedQuantity[Short, NonNegative, MilliVegaMagnit
 
   val FromVegaMagnitude: Format[BigDecimal, Extinction] =
     Format(
-      d => FromMilliVegaMagnitude.getOption(d.bigDecimal.movePointRight(3).shortValue),
+      d =>
+        // Truncate to millimags (FLOOR so tiny negatives are rejected rather than becoming 0);
+        // Try guards against exponent overflow and out-of-range values.
+        Try(d.bigDecimal.movePointRight(3).setScale(0, RoundingMode.FLOOR).shortValueExact).toOption
+          .flatMap(FromMilliVegaMagnitude.getOption),
       e => BigDecimal(FromMilliVegaMagnitude.reverseGet(e)).bigDecimal.movePointLeft(3)
     )
 
