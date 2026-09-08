@@ -5,6 +5,7 @@ package lucuma.core.geom
 package jts
 
 import cats.syntax.all.*
+import lucuma.core.geom.ShapeExpression
 import lucuma.core.geom.ShapeExpression.*
 import lucuma.core.geom.jts.syntax.all.*
 import lucuma.core.math.Offset
@@ -52,10 +53,14 @@ object JtsShapeInterpreter extends ShapeInterpreter {
         val (a, b) = Jts.boundingOffsets(toGeometry(e))
         safeRectangularBoundedShape(a, b)(_.createRectangle)
 
-      // Combinations
-      case Difference(a, b)      => toGeometry(a).difference(toGeometry(b))
-      case Intersection(a, b)    => toGeometry(a).intersection(toGeometry(b))
-      case Union(a, b)           => toGeometry(a).union(toGeometry(b))
+      // Combinations: fold the chain of same-kind nodes in a loop, see ShapeExpression.leftSpine
+      case Difference(_, _) | Intersection(_, _) | Union(_, _) =>
+        val (op, operands) = ShapeExpression.leftSpine(e).get
+        operands.tail.foldLeft(toGeometry(operands.head)): (acc, x) =>
+          op match
+            case ShapeExpression.BinaryOp.Difference   => acc.difference(toGeometry(x))
+            case ShapeExpression.BinaryOp.Intersection => acc.intersection(toGeometry(x))
+            case ShapeExpression.BinaryOp.Union        => acc.union(toGeometry(x))
 
       // Transformations
       case FlipP(e)                    =>

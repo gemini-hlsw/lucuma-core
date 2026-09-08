@@ -31,6 +31,27 @@ abstract class ShapeExpressionTests(using ShapeInterpreter) extends munit.Discip
   // Area calculation isn't exact but within 1/2 mas^2 seems fine for our purposes.
   protected def overlayAreaTolerance(nominal: Long): Double = 700.0
 
+  test("deep chains of one operation evaluate without recursion per operand") {
+    def at(p: Long, q: Long): Offset =
+      Offset(Offset.P(Angle.fromMicroarcseconds(p)), Offset.Q(Angle.fromMicroarcseconds(q)))
+    val rect: ShapeExpression = Rectangle(at(-10.arcsec.toMicroarcseconds, -10.arcsec.toMicroarcseconds), at(2000.arcsec.toMicroarcseconds, 2000.arcsec.toMicroarcseconds))
+    // Each operand is the square shifted by i mas along both axes
+    def shifted(i: Int): ShapeExpression = rect ↗ at(i.mas.toMicroarcseconds, i.mas.toMicroarcseconds)
+    // JTS overlays cost a few ms each, so only the intersection chain is deep
+    val squares               = (1 to 2000).map(shifted)
+
+    val chain = squares.reduce(_ ∩ _) // [-8", 2000.001"]^2
+    assertEquals(chain.contains(at(1000.arcsec.toMicroarcseconds, 1000.arcsec.toMicroarcseconds)), true)
+    assertEquals(chain.contains(at(-9.arcsec.toMicroarcseconds, -9.arcsec.toMicroarcseconds)), false)
+
+    val union = squares.take(200).reduce(_ ∪ _) // [-9.999", 2000.2"]^2
+    assertEquals(union.contains(at(-9.arcsec.toMicroarcseconds, -9.arcsec.toMicroarcseconds)), true)
+
+    val diff = squares.take(200).foldLeft(rect)(_ - _) // rect minus [-9.999", ...)^2: a 1 mas L-shaped strip
+    assertEquals(diff.contains(at(-9_999_500L, 1000.arcsec.toMicroarcseconds)), true)
+    assertEquals(diff.contains(at(1000.arcsec.toMicroarcseconds, 1000.arcsec.toMicroarcseconds)), false)
+  }
+
   test("intersection contains") {
     forAll(genTwoCenteredShapesAndAnOffset) { case (tcs, off) =>
       assertEquals(

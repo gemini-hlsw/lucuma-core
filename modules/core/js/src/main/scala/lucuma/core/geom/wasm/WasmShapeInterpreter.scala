@@ -87,16 +87,29 @@ object WasmShapeInterpreter extends ShapeInterpreter {
       LucumaGeoWasm.poly_new(arr)
     }
 
-  private def combine(kind: Int, a: ShapeExpression, b: ShapeExpression): Int = {
-    val ha = go(a)
-    val hb =
-      try go(b)
-      catch { case t: Throwable => LucumaGeoWasm.free(ha); throw t }
-    try LucumaGeoWasm.op(kind, ha, hb)
-    finally {
-      LucumaGeoWasm.free(ha)
-      LucumaGeoWasm.free(hb)
+  // Folds a chain of same-kind nodes in a loop, see ShapeExpression.leftSpine. Intermediates
+  // are freed as soon as they are consumed.
+  private def chain(e: ShapeExpression): Int = {
+    val (op, operands) = ShapeExpression.leftSpine(e).get
+    val kind           = op match {
+      case ShapeExpression.BinaryOp.Intersection => 0
+      case ShapeExpression.BinaryOp.Union        => 1
+      case ShapeExpression.BinaryOp.Difference   => 2
     }
+    var acc            = go(operands.head)
+    operands.tail.foreach { x =>
+      val hx   =
+        try go(x)
+        catch { case t: Throwable => LucumaGeoWasm.free(acc); throw t }
+      val next =
+        try LucumaGeoWasm.op(kind, acc, hx)
+        finally {
+          LucumaGeoWasm.free(acc)
+          LucumaGeoWasm.free(hx)
+        }
+      acc = next
+    }
+    acc
   }
 
   private def transform(
@@ -132,9 +145,7 @@ object WasmShapeInterpreter extends ShapeInterpreter {
       else LucumaGeoWasm.rect_new(b(0), b(1), b(2), b(3))
 
     // Combinations
-    case Difference(a, b)   => combine(2, a, b)
-    case Intersection(a, b) => combine(0, a, b)
-    case Union(a, b)        => combine(1, a, b)
+    case Difference(_, _) | Intersection(_, _) | Union(_, _) => chain(e)
 
     // Transformations
     case FlipP(e)                    => transform(e, -1, 0, 0, 0, 1, 0)
