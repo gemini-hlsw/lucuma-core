@@ -33,6 +33,22 @@ pull_request_rules:
       add:
       - benchmarks
       remove: []
+- name: Label benchmarks-js PRs
+  conditions:
+  - files~=^modules/benchmarks-js/
+  actions:
+    label:
+      add:
+      - benchmarks-js
+      remove: []
+- name: Label benchmarks-wasm PRs
+  conditions:
+  - files~=^modules/benchmarks-wasm/
+  actions:
+    label:
+      add:
+      - benchmarks-wasm
+      remove: []
 - name: Label catalog PRs
   conditions:
   - files~=^modules/catalog/
