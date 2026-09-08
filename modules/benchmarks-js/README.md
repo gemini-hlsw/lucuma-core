@@ -51,6 +51,18 @@ polygons: constructors, boolean ops, affine transform, area, bbox, contains, int
 `KernelBench.scala` evaluates the posCalculations geometry with both interpreters in the
 same process and checks parity. Pass `kernel` (Node) or `&kernel` (browser) to run only that.
 
+## Production kernel, end to end
+
+Pass `wasm` (Node; in a browser `&wasm` also needs an import map or bundler for the bare
+`lucuma-geo-wasm` specifier) to load the `lucuma-geo-wasm` npm package through
+`WasmGeometry.loadFrom` and run the full `Ags.agsAnalysis` on JTS and on the kernel, paired per
+rep, with result histograms and the kernel handle count left behind by each run:
+
+    sbt benchmarksJS/fullLinkJS
+    node modules/benchmarks-js/target/scala-3.9.0/lucuma-benchmarks-js-opt/main.js 20,30,50 wasm
+
+Node resolves the package from the repo-root `node_modules` (`npm ci` first).
+
 Build the kernel (needs a rustup toolchain with the wasm32 target; the nix rustc has none):
 
     export PATH=$HOME/.rustup/toolchains/stable-aarch64-apple-darwin/bin:$HOME/.cargo/bin:$PATH

@@ -206,10 +206,6 @@ class AgsGeometryParitySuite extends munit.FunSuite with WasmKernelSuite:
         assertEquals(w.contains(o), j.contains(o), s"$clue contains $o")
     (w, j)
 
-  private def protectedAreas(params: Params): List[(ShapeExpression, Offset)] =
-    val d = params.scienceDiameter
-    offsets.map(nz => (ShapeExpression.centeredEllipse(d, d) ↗ nz, nz))
-
   private def overlaps(arm: Shape, protectedShape: Shape): Boolean =
     arm.intersection(protectedShape).boundingOffsets.maxSide.toMicroarcseconds > 5
 
@@ -220,7 +216,11 @@ class AgsGeometryParitySuite extends munit.FunSuite with WasmKernelSuite:
     val vignetting = params.extendedVignettingArea.fold((wSa, jSa)): f =>
       assertParity(f(pa, offset), s"$clue extended vignetting area")
     val (wVig, jVig) = vignetting
-    val prot       = protectedAreas(params).map((e, nz) => (wasm(e), jts(e), nz))
+    val prot       = params
+      .protectedAreas(offsets)(using WasmShapeInterpreter)
+      .lazyZip(params.protectedAreas(offsets)(using JtsShapeInterpreter))
+      .lazyZip(offsets)
+      .toList
     candidates(jPf.boundingOffsets).foreach: gs =>
       val gsClue = s"$clue guide star $gs"
       assertEquals(wPf.contains(gs), jPf.contains(gs), s"$gsClue reachable")

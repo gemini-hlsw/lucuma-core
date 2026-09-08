@@ -9,15 +9,19 @@ import cats.syntax.all.*
 import lucuma.ags.*
 import lucuma.ags.syntax.*
 import lucuma.core.enums.Band
-import lucuma.core.model.CloudExtinction
 import lucuma.core.enums.PortDisposition
 import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.WaterVapor
+import lucuma.core.geom.ShapeInterpreter
+import lucuma.core.geom.jts.JtsShapeInterpreter
+import lucuma.core.geom.wasm.WasmGeometry
+import lucuma.core.geom.wasm.WasmShapeInterpreter
 import lucuma.core.math.Angle
 import lucuma.core.math.BrightnessValue
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Offset
 import lucuma.core.math.Wavelength
+import lucuma.core.model.CloudExtinction
 import lucuma.core.model.ConstraintSet
 import lucuma.core.model.ElevationRange
 import lucuma.core.model.ImageQuality
@@ -75,7 +79,7 @@ object AgsBench:
       val g      = BrightnessValue.unsafeFrom(BigDecimal(8.0 + rnd.nextDouble() * 12.0).setScale(3, BigDecimal.RoundingMode.HALF_UP))
       GuideStarCandidate.unsafeApply(i.toLong, SiderealTracking.const(coords), (Band.Gaia, g).some)
 
-  def runOnce(offsets: Int, cands: List[GuideStarCandidate]): AgsStats =
+  def runOnce(offsets: Int, cands: List[GuideStarCandidate])(using ShapeInterpreter): AgsStats =
     Ags
       .agsAnalysis(
         constraints,
@@ -125,12 +129,13 @@ object AgsBench:
       val pre = global.document.getElementById("out")
       if pre != null then pre.textContent = pre.textContent.toString + line + "\n"
 
-  def kernelOnly: Boolean =
+  // `kernel`: prototype crate stage only; `wasm`: paired agsAnalysis on JTS and the production kernel.
+  def mode: Option[String] =
     if js.typeOf(global.process) != "undefined" then
-      global.process.argv.asInstanceOf[js.Array[String]].drop(3).headOption.contains("kernel")
+      global.process.argv.asInstanceOf[js.Array[String]].drop(3).headOption
     else if js.typeOf(global.location) != "undefined" then
-      global.location.search.toString.contains("kernel")
-    else false
+      List("kernel", "wasm").find(global.location.search.toString.contains)
+    else None
 
   // Load the Rust geo kernel (wasm-bindgen web target) relative to the linked main.js
   def loadKernel(): js.Promise[AgsGeoModule] =
@@ -155,12 +160,55 @@ object AgsBench:
         KernelBench.run(n, cfg.reps, geo, candOffsets).foreach(report)
     .`catch`[Unit](e => report(s"kernel stage failed: $e")): Unit
 
+  // Node cannot fetch the package's own file: URL; hand the loader the bytes. Browsers resolve it.
+  def wasmBytes(): js.Promise[js.UndefOr[js.Any]] =
+    if js.typeOf(global.process) != "undefined" then
+      js.`import`[js.Dynamic]("node:fs").`then`[js.UndefOr[js.Any]]: fs =>
+        val url = js.`import`.meta.asInstanceOf[js.Dynamic].resolve("lucuma-geo-wasm/lucuma_geo_wasm_bg.wasm")
+        fs.readFileSync(js.Dynamic.newInstance(global.URL)(url)).asInstanceOf[js.Any]
+    else js.Promise.resolve[js.UndefOr[js.Any]](js.undefined)
+
+  def histogram(s: AgsStats): String =
+    s"accepted=${s.acceptedCount} " + s.resultCounts.toList.sortBy(_._1).map((k, v) => s"$k=$v").mkString(" ")
+
+  // End to end agsAnalysis on JTS and on the production wasm kernel, paired per rep.
+  def wasmStage(cfg: Config, cands: List[GuideStarCandidate]): Unit =
+    given cats.effect.unsafe.IORuntime = cats.effect.unsafe.implicits.global
+    wasmBytes()
+      .`then`[ShapeInterpreter](b => WasmGeometry.loadFrom(b).unsafeToPromise())
+      .`then`[Unit]: wasm =>
+        val engines = List("jts" -> JtsShapeInterpreter, "wasm" -> wasm)
+        report(s"kernel: lucuma-geo-wasm, default interpreter installed: ${ShapeInterpreter.default eq wasm}")
+        report("offsets\tengine\trep\tcalcs_ms\tcontext_ms\tanalysis_ms\ttotal_ms\tlive_handles")
+        engines.foreach((_, si) => runOnce(cfg.offsets.min, cands)(using si))
+        cfg.offsets.foreach: n =>
+          val stats = (1 to cfg.reps).toList.flatMap: rep =>
+            engines.map: (name, si) =>
+              val before = WasmShapeInterpreter.liveHandles
+              val s      = runOnce(n, cands)(using si)
+              val live   = WasmShapeInterpreter.liveHandles - before
+              report(s"$n\t$name\t$rep\t${ms(s.calcsNanos)}\t${ms(s.contextNanos)}\t${ms(s.analysisNanos)}\t${ms(s.contextNanos + s.analysisNanos)}\t$live")
+              name -> s
+          val avg   = engines.map: (name, _) =>
+            val ss = stats.collect { case (`name`, s) => s }
+            (name, ss.map(_.calcsNanos).sum / ss.size, ss.map(_.analysisNanos).sum / ss.size)
+          avg.foreach: (name, c, a) =>
+            report(s"$n\t$name\tavg\tcalcs=${ms(c)} analysis=${ms(a)} total=${ms(c + a)}")
+          val (_, jc, ja) = avg.find(_._1 == "jts").get
+          val (_, wc, wa) = avg.find(_._1 == "wasm").get
+          report(f"$n\tspeedup\tcalcs=${jc.toDouble / wc}%.2fx analysis=${ja.toDouble / wa}%.2fx total=${(jc + ja).toDouble / (wc + wa)}%.2fx")
+          val hists = engines.map((name, _) => name -> histogram(stats.findLast(_._1 == name).get._2))
+          hists.foreach((name, h) => report(s"$n\thistogram\t$name\t$h"))
+          if hists.map(_._2).distinct.size != 1 then report(s"$n\tHISTOGRAM MISMATCH between engines")
+      .`catch`[Unit](e => report(s"wasm stage failed: $e")): Unit
+
   def main(args: Array[String]): Unit =
     val cfg   = parseConfig()
     val cands = candidates(cfg.candidates, seed = 42L)
     report(s"engine: $engine")
     report(s"config: offsets=${cfg.offsets.mkString(",")} reps=${cfg.reps} candidates=${cfg.candidates}")
-    if kernelOnly then { kernelStage(cfg, cands); return }
+    if mode.contains("kernel") then { kernelStage(cfg, cands); return }
+    if mode.contains("wasm") then { wasmStage(cfg, cands); return }
     report("offsets\tpositions\trep\tcalcs_ms\tcontext_ms\tanalysis_ms\ttotal_ms")
 
     // warm up the JIT on the smallest case

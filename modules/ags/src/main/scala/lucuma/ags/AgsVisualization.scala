@@ -8,7 +8,7 @@ import cats.data.NonEmptyList
 import cats.data.NonEmptyMap
 import lucuma.core.geom.Area
 import lucuma.core.geom.ShapeExpression
-import lucuma.core.geom.jts.interpreter.given
+import lucuma.core.geom.ShapeInterpreter
 import lucuma.core.geom.offsets.OffsetPosition
 import lucuma.core.geom.offsets.RotatedOffset
 import lucuma.core.geom.syntax.all.*
@@ -58,7 +58,7 @@ object AgsVisualization {
   def patrolFieldGeometries(
     params:    SingleProbeAgsParams,
     positions: NonEmptyList[OffsetPosition]
-  ): NonEmptyList[PatrolFieldVisualization] = {
+  )(using ShapeInterpreter): NonEmptyList[PatrolFieldVisualization] = {
     given Order[Angle] = Angle.SignedAngleOrder
 
     val calcsByPA: Map[Angle, NonEmptyMap[OffsetPosition, AgsGeomCalc]] =
@@ -89,7 +89,7 @@ object AgsVisualization {
     params:          SingleProbeAgsParams,
     position:        OffsetPosition,
     guideStarOffset: Offset
-  ): ScienceOverlapVisualization = {
+  )(using ShapeInterpreter): ScienceOverlapVisualization = {
     val probeArm = params.probeArm(position.posAngle, guideStarOffset, position.offsetPos)
 
     val scienceTargetArea =

@@ -4,8 +4,8 @@
 package lucuma.bench
 
 import cats.syntax.all.*
-import lucuma.ags.AgsParams
 import lucuma.ags.Ags
+import lucuma.ags.AgsParams
 import lucuma.core.geom.Shape
 import lucuma.core.geom.ShapeExpression
 import lucuma.core.geom.ShapeInterpreter

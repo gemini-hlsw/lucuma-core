@@ -25,7 +25,6 @@ import lucuma.core.enums.VisitorObservingModeType
 import lucuma.core.enums.WaterVapor
 import lucuma.core.geom.*
 import lucuma.core.geom.gnirs
-import lucuma.core.geom.jts.interpreter.given
 import lucuma.core.math.Angle
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Offset
