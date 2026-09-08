@@ -1,0 +1,8 @@
+{
+  "private": true,
+  "type": "module",
+  "description": "Node dependencies for the Scala.js test suites (see .scratch/geo-kernel)",
+  "devDependencies": {
+    "lucuma-geo-wasm": "file:vendor/lucuma-geo-wasm-0.1.0.tgz"
+  }
+}

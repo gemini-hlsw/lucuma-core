@@ -63,3 +63,5 @@ gnupg*
 CONTEXT-MAP.md
 CONTEXT.md
 .config/
+
+node_modules/
