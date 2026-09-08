@@ -25,7 +25,7 @@ trait probes:
   /**
    * Probes AGS has geometry for in the given observing mode, i.e. the probes a
    * user may legitimately pick when overriding the automatic choice made by
-   * `guideProbe`.  Ordered best-first, see `GuideProbe.Preference`.
+   * `defaultGuideProbe`.  Ordered best-first, see `GuideProbe.Preference`.
    */
   def allowedProbes(observingMode: ObservingModeType): SortedSet[GuideProbe] =
     observingMode match
@@ -62,7 +62,7 @@ trait probes:
    * The probe AGS selects by default: the most preferred allowed probe.  An
    * OIWFS cannot track a nonsidereal target, so it drops out of the running.
    */
-  def guideProbe(observingMode: ObservingModeType, trackType: TrackType): Option[GuideProbe] =
+  def defaultGuideProbe(observingMode: ObservingModeType, trackType: TrackType): Option[GuideProbe] =
     allowedProbes(observingMode)
       .filter:
         case GuideProbe.GmosOIWFS | GuideProbe.Flamingos2OIWFS => trackType === TrackType.Sidereal

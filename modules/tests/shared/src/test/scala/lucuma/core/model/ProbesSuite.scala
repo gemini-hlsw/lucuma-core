@@ -26,14 +26,14 @@ final class ProbesSuite extends FunSuite:
 
   test("an OIWFS is never selected for a nonsidereal target"):
     modes.foreach: m =>
-      probes.guideProbe(m, TrackType.Nonsidereal).foreach: p =>
+      probes.defaultGuideProbe(m, TrackType.Nonsidereal).foreach: p =>
         assertEquals(p, GuideProbe.PWFS2, clue = m.tag)
 
   test("the automatically selected probe is always an allowed one"):
     for
       m <- modes
       t <- Enumerated[TrackType].all
-      p <- probes.guideProbe(m, t)
+      p <- probes.defaultGuideProbe(m, t)
     do assert(probes.isProbeAllowed(m, p), s"${m.tag} / ${t.tag}: $p not allowed")
 
   test("GHOST excludes PWFS1"):
