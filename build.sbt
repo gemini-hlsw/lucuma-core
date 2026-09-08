@@ -55,7 +55,7 @@ lazy val spireVersion               = "0.18.0"
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
-val root = tlCrossRootProject.aggregate(core, testkit, tests, catalog, ags, catalogTestkit, catalogTests, horizons, horizonsTests, itac, benchmarks, benchmarksJS, benchmarksWasm, npm)
+val root = tlCrossRootProject.aggregate(core, testkit, tests, catalog, ags, catalogTestkit, catalogTests, horizons, horizonsTests, itac, benchmarks, benchmarksJS, npm)
 
 lazy val core = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Full)
@@ -315,21 +315,6 @@ lazy val benchmarksJS = project
     scalaJSUseMainModuleInitializer := true,
     scalaJSLinkerConfig ~= (_.withModuleKind(ModuleKind.ESModule)
       .withESFeatures(_.withESVersion(ESVersion.ES2022)))
-  )
-
-// Same harness, WebAssembly backend. Prototype for .scratch/ags-wasm; throwaway.
-lazy val benchmarksWasm = project
-  .in(file("modules/benchmarks-wasm"))
-  .dependsOn(ags.js)
-  .enablePlugins(ScalaJSPlugin, NoPublishPlugin)
-  .settings(
-    name                            := "lucuma-benchmarks-wasm",
-    scalaJSUseMainModuleInitializer := true,
-    Compile / unmanagedSourceDirectories +=
-      (benchmarksJS / Compile / scalaSource).value,
-    scalaJSLinkerConfig ~= (_.withModuleKind(ModuleKind.ESModule)
-      .withESFeatures(_.withESVersion(ESVersion.ES2022).withUseWebAssembly(true))
-      .withOutputPatterns(org.scalajs.linker.interface.OutputPatterns.fromJSFile("%s.mjs")))
   )
 
 // for publishing to npm

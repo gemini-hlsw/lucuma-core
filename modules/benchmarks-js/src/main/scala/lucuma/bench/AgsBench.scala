@@ -129,36 +129,13 @@ object AgsBench:
       val pre = global.document.getElementById("out")
       if pre != null then pre.textContent = pre.textContent.toString + line + "\n"
 
-  // `kernel`: prototype crate stage only; `wasm`: paired agsAnalysis on JTS and the production kernel.
+  // `wasm`: paired agsAnalysis on JTS and the production kernel.
   def mode: Option[String] =
     if js.typeOf(global.process) != "undefined" then
       global.process.argv.asInstanceOf[js.Array[String]].drop(3).headOption
     else if js.typeOf(global.location) != "undefined" then
-      List("kernel", "wasm").find(global.location.search.toString.contains)
+      Option.when(global.location.search.toString.contains("wasm"))("wasm")
     else None
-
-  // Load the Rust geo kernel (wasm-bindgen web target) relative to the linked main.js
-  def loadKernel(): js.Promise[AgsGeoModule] =
-    val mod = js.`import`[AgsGeoModule]("../../../agsgeo/pkg/agsgeo.js")
-    mod.`then`[AgsGeoModule]: m =>
-      val bytes: js.Promise[js.Any] =
-        if js.typeOf(global.process) != "undefined" then
-          js.`import`[js.Dynamic]("node:fs").`then`[js.Any]: fs =>
-            val url  = js.Dynamic.newInstance(global.URL)("../../../agsgeo/pkg/agsgeo_bg.wasm", js.`import`.meta.url)
-            fs.readFileSync(js.Dynamic.global.decodeURIComponent(url.pathname)).asInstanceOf[js.Any]
-        else js.Promise.resolve[js.Any](js.undefined)
-      bytes.`then`[AgsGeoModule](b => m.init(b).`then`[AgsGeoModule](_ => m))
-
-  def kernelStage(cfg: Config, cands: List[GuideStarCandidate]): Unit =
-    val candOffsets = cands.map(c => base.diff(c.tracking.baseCoordinates).offset)
-    loadKernel().`then`[Unit]: m =>
-      given AgsGeoModule = m
-      val geo = new GeoWasmInterpreter
-      report("offsets	kernel	chains	jts_ms	wasm_ms	speedup")
-      KernelBench.run(cfg.offsets.min, 1, geo, candOffsets) // warm up
-      cfg.offsets.foreach: n =>
-        KernelBench.run(n, cfg.reps, geo, candOffsets).foreach(report)
-    .`catch`[Unit](e => report(s"kernel stage failed: $e")): Unit
 
   // Node cannot fetch the package's own file: URL; hand the loader the bytes. Browsers resolve it.
   def wasmBytes(): js.Promise[js.UndefOr[js.Any]] =
@@ -207,7 +184,6 @@ object AgsBench:
     val cands = candidates(cfg.candidates, seed = 42L)
     report(s"engine: $engine")
     report(s"config: offsets=${cfg.offsets.mkString(",")} reps=${cfg.reps} candidates=${cfg.candidates}")
-    if mode.contains("kernel") then { kernelStage(cfg, cands); return }
     if mode.contains("wasm") then { wasmStage(cfg, cands); return }
     report("offsets\tpositions\trep\tcalcs_ms\tcontext_ms\tanalysis_ms\ttotal_ms")
 
@@ -229,4 +205,3 @@ object AgsBench:
         s"$n\thistogram\taccepted=${last.acceptedCount} " +
           last.resultCounts.toList.sortBy(_._1).map((k, v) => s"$k=$v").mkString(" ")
       )
-    kernelStage(cfg, cands)

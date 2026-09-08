@@ -41,14 +41,6 @@ pull_request_rules:
       add:
       - benchmarks-js
       remove: []
-- name: Label benchmarks-wasm PRs
-  conditions:
-  - files~=^modules/benchmarks-wasm/
-  actions:
-    label:
-      add:
-      - benchmarks-wasm
-      remove: []
 - name: Label catalog PRs
   conditions:
   - files~=^modules/catalog/
