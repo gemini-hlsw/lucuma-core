@@ -34,10 +34,12 @@ object GuideProbe:
   given Enumerated[PWFSGuideProbe] = Enumerated.from(GuideProbe.PWFS1, GuideProbe.PWFS2).withTag(_.tag)
 
   /**
-   * Probes ranked best-first: an OIWFS beats PWFS2, which beats PWFS1.
+   * Probes ranked best-first: an OIWFS beats PWFS2, which beats PWFS1. Every
+   * probe gets its own rank so the order is total and usable in a SortedSet.
    */
   val Preference: Order[GuideProbe] =
     Order.by:
-      case GmosOIWFS | Flamingos2OIWFS => 0
-      case PWFS2                       => 1
-      case PWFS1                       => 2
+      case GmosOIWFS       => 0
+      case Flamingos2OIWFS => 1
+      case PWFS2           => 2
+      case PWFS1           => 3
