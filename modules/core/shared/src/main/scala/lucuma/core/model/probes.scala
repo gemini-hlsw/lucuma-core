@@ -54,9 +54,8 @@ trait probes:
       case FacilityObservingModeType.GnirsImaging | FacilityObservingModeType.GnirsLongSlit |
            FacilityObservingModeType.GnirsIfu =>
         Pwfs
-      // PWFS1 vignettes the GHOST field.
       case FacilityObservingModeType.GhostIfu =>
-        SortedSet(GuideProbe.PWFS2)
+        Pwfs
 
   /**
    * The probe AGS selects by default: the most preferred allowed probe.  An

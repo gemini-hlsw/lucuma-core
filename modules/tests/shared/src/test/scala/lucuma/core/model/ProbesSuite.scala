@@ -10,8 +10,6 @@ import lucuma.core.enums.TrackType
 import lucuma.core.util.Enumerated
 import munit.FunSuite
 
-import scala.collection.immutable.SortedSet
-
 final class ProbesSuite extends FunSuite:
 
   private val modes = Enumerated[ObservingModeType].all
@@ -36,8 +34,11 @@ final class ProbesSuite extends FunSuite:
       p <- probes.defaultGuideProbe(m, t)
     do assert(probes.isProbeAllowed(m, p), s"${m.tag} / ${t.tag}: $p not allowed")
 
-  test("GHOST excludes PWFS1"):
-    assertEquals(probes.allowedProbes(ObservingModeType.GhostIfu), SortedSet(GuideProbe.PWFS2)(using GuideProbe.Preference.toOrdering))
+  test("GHOST allows both PWFS, defaulting to PWFS2"):
+    assertEquals(
+      probes.allowedProbes(ObservingModeType.GhostIfu).toList,
+      List(GuideProbe.PWFS2, GuideProbe.PWFS1)
+    )
 
   test("allowed probes come back best-first"):
     assertEquals(
