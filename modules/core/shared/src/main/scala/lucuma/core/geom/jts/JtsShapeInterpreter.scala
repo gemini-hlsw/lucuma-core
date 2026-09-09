@@ -30,6 +30,10 @@ object JtsShapeInterpreter extends ShapeInterpreter {
       if ((a.p === b.p) || (a.q === b.q)) EmptyGeometry
       else f(a.shapeFactory(b))
 
+    def foldChain(op: BinaryOp)(combine: (Geometry, Geometry) => Geometry): Geometry =
+      val (head, rest) = ShapeExpression.leftSpine(e, op)
+      rest.foldLeft(toGeometry(head))((acc, x) => combine(acc, toGeometry(x)))
+
     def safePolygon(os: List[Offset]): Geometry =
       // We need at least 3 distinct points.
       if (os.toSet.size < 3)
@@ -52,10 +56,10 @@ object JtsShapeInterpreter extends ShapeInterpreter {
         val (a, b) = Jts.boundingOffsets(toGeometry(e))
         safeRectangularBoundedShape(a, b)(_.createRectangle)
 
-      // Combinations
-      case Difference(a, b)      => toGeometry(a).difference(toGeometry(b))
-      case Intersection(a, b)    => toGeometry(a).intersection(toGeometry(b))
-      case Union(a, b)           => toGeometry(a).union(toGeometry(b))
+      // Combinations: fold the chain of same-kind nodes in a loop, see ShapeExpression.leftSpine
+      case Difference(_, _)      => foldChain(BinaryOp.Difference)(_.difference(_))
+      case Intersection(_, _)    => foldChain(BinaryOp.Intersection)(_.intersection(_))
+      case Union(_, _)           => foldChain(BinaryOp.Union)(_.union(_))
 
       // Transformations
       case FlipP(e)                    =>
