@@ -3,6 +3,8 @@
 
 package lucuma.core.geom
 
+import cats.Eq
+import cats.syntax.eq.*
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 
@@ -121,5 +123,34 @@ object ShapeExpression {
    * @group Transformations
    */
   final case class Translate(e: ShapeExpression, o: Offset) extends ShapeExpression
+
+  private[geom] enum BinaryOp:
+    case Difference, Intersection, Union
+
+  private given Eq[BinaryOp] = Eq.fromUniversalEquals
+
+  /**
+   * Operands of the left-nested chain of `op` rooted at `e`, in evaluation order.
+   * AGS builds `∩` chains with one operand per science offset, so interpreters fold this
+   * list in a loop instead of recursing once per offset.
+   */
+  private[geom] def leftSpine(e: ShapeExpression, op: BinaryOp): List[ShapeExpression] =
+    var operands: List[ShapeExpression] = Nil
+    var cur                             = e
+    var descending                      = true
+    while descending do
+      cur match
+        case Difference(a, b) if op === BinaryOp.Difference     =>
+          operands = b :: operands
+          cur = a
+        case Intersection(a, b) if op === BinaryOp.Intersection =>
+          operands = b :: operands
+          cur = a
+        case Union(a, b) if op === BinaryOp.Union               =>
+          operands = b :: operands
+          cur = a
+        case _                                                  =>
+          descending = false
+    cur :: operands
 
 }

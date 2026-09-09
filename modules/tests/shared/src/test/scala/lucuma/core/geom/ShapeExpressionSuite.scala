@@ -28,6 +28,31 @@ class ShapeExpressionSuite extends munit.DisciplineSuite with RetryFlakyTests {
   import ArbShapeExpression.*
   import ShapeExpressionSpec.*
 
+  def at(arcseconds: Int): Offset = Offset.symmetric(arcseconds.arcsec)
+
+  test("deep chains of one operation evaluate without recursion per operand"):
+    val rect: ShapeExpression = Rectangle(at(-10), at(2000))
+
+    // Each operand is the square shifted by i mas along both axes
+    def shifted(i: Int): ShapeExpression = rect ↗ Offset.symmetric(i.mas)
+
+    // JTS overlays cost a few ms each, so only the intersection chain is deep
+    val squares = (1 to 2000).map(shifted)
+
+    // Test for intersection (Used by AGS)
+    val chain = squares.reduce(_ ∩ _) // [-8", 2000.001"]^2
+    assertEquals(chain.contains(at(1000)), true)
+    assertEquals(chain.contains(at(-9)), false)
+
+    // Test for union.
+    val union = squares.take(200).reduce(_ ∪ _) // [-9.999", 2000.2"]^2
+    assertEquals(union.contains(at(-9)), true)
+
+    // Test for difference
+    val diff = squares.take(200).foldLeft(rect)(_ - _)
+    assertEquals(diff.contains(Offset(Offset.P((-9_999_500).µas), Offset.Q(1000.arcsec))), true)
+    assertEquals(diff.contains(at(1000)), false)
+
   test("intersection contains") {
     forAll(genTwoCenteredShapesAndAnOffset) { case (tcs, off) =>
       assertEquals(
