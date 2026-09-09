@@ -31,8 +31,8 @@ object JtsShapeInterpreter extends ShapeInterpreter {
       else f(a.shapeFactory(b))
 
     def foldChain(op: BinaryOp)(combine: (Geometry, Geometry) => Geometry): Geometry =
-      val operands = ShapeExpression.leftSpine(e, op)
-      operands.tail.foldLeft(toGeometry(operands.head))((acc, x) => combine(acc, toGeometry(x)))
+      val (head, rest) = ShapeExpression.leftSpine(e, op)
+      rest.foldLeft(toGeometry(head))((acc, x) => combine(acc, toGeometry(x)))
 
     def safePolygon(os: List[Offset]): Geometry =
       // We need at least 3 distinct points.

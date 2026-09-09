@@ -30,6 +30,7 @@ class ShapeExpressionSuite extends munit.DisciplineSuite with RetryFlakyTests {
 
   def at(arcseconds: Int): Offset = Offset.symmetric(arcseconds.arcsec)
 
+  // Regression test on Scala.js only: the JVM stack is deep enough that 2000 levels pass either way
   test("deep chains of one operation evaluate without recursion per operand"):
     val rect: ShapeExpression = Rectangle(at(-10), at(2000))
 
