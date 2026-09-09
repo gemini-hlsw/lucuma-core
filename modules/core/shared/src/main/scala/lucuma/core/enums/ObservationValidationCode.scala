@@ -129,5 +129,11 @@ object ObservationValidationCode:
         "Low Total Signal to Noise",
         "Total signal to noise is below recommended threshold.",
       ) 
+    case ConfigurationWarning
+      extends Warning(
+        "configuration_warning",
+        "Configuration Warning",
+        "The observation configuration is unusual and should be reviewed.",
+      )
 
 
