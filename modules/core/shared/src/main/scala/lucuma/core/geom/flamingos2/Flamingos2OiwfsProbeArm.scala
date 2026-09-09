@@ -67,8 +67,17 @@ trait Flamingos2OiwfsProbeArm:
     lyot:      Flamingos2LyotWheel,
     port:      PortDisposition
   ): ShapeExpression =
-    val plateScale = lyot.plateScale
-    shape(plateScale) ⟲ armAngle(posAngle, guideStar, offsetPos, port, plateScale) ↗ guideStar
+    shape(lyot.plateScale) ⟲ angleAt(posAngle, guideStar, offsetPos, lyot, port) ↗ guideStar
+
+  /** Rotation of `shape` that reaches the guide star; `shapeAt` is `shape ⟲ angleAt ↗ guideStar`. */
+  def angleAt(
+    posAngle:  Angle,
+    guideStar: Offset,
+    offsetPos: Offset,
+    lyot:      Flamingos2LyotWheel,
+    port:      PortDisposition
+  ): Angle =
+    armAngle(posAngle, guideStar, offsetPos, port, lyot.plateScale)
 
   /**
     * Calculate the angle of the probe arm to reach a guide star at a given offset.

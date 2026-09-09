@@ -8,6 +8,7 @@ import lucuma.core.geom.jts.syntax.all.*
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 import org.locationtech.jts.geom.Geometry
+import org.locationtech.jts.geom.util.AffineTransformation
 
 /**
  * JTS implementation of Shape.
@@ -39,4 +40,9 @@ final case class JtsShape(g: Geometry) extends Shape {
     case JtsShape(thatG) => JtsShape(g.intersection(thatG))
     case _               => throw new UnsupportedOperationException("Cannot intersect non-JTS shapes")
 
+  // Two transforms in sequence, exactly as the interpreter evaluates Rotate then Translate.
+  def transform(rotation: Angle, translation: Offset): Shape =
+    val c       = translation.coordinate
+    val rotated = AffineTransformation.rotationInstance(rotation.toDoubleRadians).transform(g)
+    JtsShape(AffineTransformation.translationInstance(c.x, c.y).transform(rotated))
 }

@@ -76,7 +76,16 @@ trait GmosOiwfsProbeArm {
       offsetPos: Offset,
       port:      PortDisposition
     ): ShapeExpression =
-      shape ⟲ armAngle(posAngle, guideStar, offsetPos, Offset.Zero, port) ↗ guideStar
+      shape ⟲ angleAt(posAngle, guideStar, offsetPos, port) ↗ guideStar
+
+    /** Rotation of `shape` that reaches the guide star; `shapeAt` is `shape ⟲ angleAt ↗ guideStar`. */
+    def angleAt(
+      posAngle:  Angle,
+      guideStar: Offset,
+      offsetPos: Offset,
+      port:      PortDisposition
+    ): Angle =
+      armAngle(posAngle, guideStar, offsetPos, Offset.Zero, port)
 
   object fpuMode:
     /**
@@ -100,7 +109,17 @@ trait GmosOiwfsProbeArm {
       fpu:       Either[GmosNorthFpu, GmosSouthFpu],
       port:      PortDisposition
     ): ShapeExpression =
-      shape ⟲ armAngle(posAngle, guideStar, offsetPos, ifuOffset(fpu), port) ↗ guideStar
+      shape ⟲ angleAt(posAngle, guideStar, offsetPos, fpu, port) ↗ guideStar
+
+    /** Rotation of `shape` that reaches the guide star; `shapeAt` is `shape ⟲ angleAt ↗ guideStar`. */
+    def angleAt(
+      posAngle:  Angle,
+      guideStar: Offset,
+      offsetPos: Offset,
+      fpu:       Either[GmosNorthFpu, GmosSouthFpu],
+      port:      PortDisposition
+    ): Angle =
+      armAngle(posAngle, guideStar, offsetPos, ifuOffset(fpu), port)
 
   private def armAngle(
     posAngle:   Angle,

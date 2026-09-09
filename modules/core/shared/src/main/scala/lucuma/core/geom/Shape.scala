@@ -39,4 +39,10 @@ trait Shape {
   /** Computes the intersection with another Shape */
   def intersection(that: Shape): Shape
 
+  /**
+   * This shape rotated about the origin by `rotation`, then moved by `translation`: the evaluated
+   * form of `e ⟲ rotation ↗ translation`, for reusing one evaluated shape at many placements.
+   */
+  def transform(rotation: Angle, translation: Offset): Shape
+
 }
