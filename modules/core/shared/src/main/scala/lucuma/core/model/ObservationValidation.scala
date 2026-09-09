@@ -47,3 +47,6 @@ object ObservationValidation:
 
     def lowTotalSignalToNoise(extra: Option[String], minRecommended: TotalSN, actual: TotalSN): ObservationValidation =
       fromMsgs(LowTotalSignalToNoise, f"Total S/N ${extra.foldMap(s => s"($s) ")} is ${actual.value.toBigDecimal}%4.3f (min. ${minRecommended.value.toBigDecimal}%4.3f recommended)")
+
+    def configuration(msg: String, moreMsgs: String*): ObservationValidation =
+      fromMsgs(ConfigurationWarning, msg, moreMsgs*)
