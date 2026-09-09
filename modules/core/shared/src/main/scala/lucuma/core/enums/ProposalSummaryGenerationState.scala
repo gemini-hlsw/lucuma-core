@@ -15,7 +15,7 @@ enum ProposalSummaryGenerationState(val tag: String, val name: String) derives E
   case Idle extends ProposalSummaryGenerationState("idle", "Idle")
 
   /** A regeneration is queued or rendering. */
-  case Pending extends ProposalSummaryGenerationState("pending", "Pending")
+  case Generating extends ProposalSummaryGenerationState("generating", "Generating")
 
   /** Every render of the last regeneration stopped, and at least one failed. */
   case Failed extends ProposalSummaryGenerationState("failed", "Failed")
