@@ -32,24 +32,29 @@ abstract class ShapeExpressionTests(using ShapeInterpreter) extends munit.Discip
   protected def overlayAreaTolerance(nominal: Long): Double = 700.0
 
   test("deep chains of one operation evaluate without recursion per operand") {
-    def at(p: Long, q: Long): Offset =
-      Offset(Offset.P(Angle.fromMicroarcseconds(p)), Offset.Q(Angle.fromMicroarcseconds(q)))
-    val rect: ShapeExpression = Rectangle(at(-10.arcsec.toMicroarcseconds, -10.arcsec.toMicroarcseconds), at(2000.arcsec.toMicroarcseconds, 2000.arcsec.toMicroarcseconds))
+    def at(arcseconds: Int): Offset = Offset.symmetric(arcseconds.arcsec)
+
+    val rect: ShapeExpression = Rectangle(at(-10), at(2000))
+
     // Each operand is the square shifted by i mas along both axes
-    def shifted(i: Int): ShapeExpression = rect ↗ at(i.mas.toMicroarcseconds, i.mas.toMicroarcseconds)
+    def shifted(i: Int): ShapeExpression = rect ↗ Offset.symmetric(i.mas)
+
     // JTS overlays cost a few ms each, so only the intersection chain is deep
-    val squares               = (1 to 2000).map(shifted)
+    val squares = (1 to 2000).map(shifted)
 
+    // Test for intersection (Used by AGS)
     val chain = squares.reduce(_ ∩ _) // [-8", 2000.001"]^2
-    assertEquals(chain.contains(at(1000.arcsec.toMicroarcseconds, 1000.arcsec.toMicroarcseconds)), true)
-    assertEquals(chain.contains(at(-9.arcsec.toMicroarcseconds, -9.arcsec.toMicroarcseconds)), false)
+    assertEquals(chain.contains(at(1000)), true)
+    assertEquals(chain.contains(at(-9)), false)
 
+    // Test for union.
     val union = squares.take(200).reduce(_ ∪ _) // [-9.999", 2000.2"]^2
-    assertEquals(union.contains(at(-9.arcsec.toMicroarcseconds, -9.arcsec.toMicroarcseconds)), true)
+    assertEquals(union.contains(at(-9)), true)
 
-    val diff = squares.take(200).foldLeft(rect)(_ - _) // rect minus [-9.999", ...)^2: a 1 mas L-shaped strip
-    assertEquals(diff.contains(at(-9_999_500L, 1000.arcsec.toMicroarcseconds)), true)
-    assertEquals(diff.contains(at(1000.arcsec.toMicroarcseconds, 1000.arcsec.toMicroarcseconds)), false)
+    // Test for difference
+    val diff = squares.take(200).foldLeft(rect)(_ - _)
+    assertEquals(diff.contains(Offset(Offset.P((-9_999_500).µas), Offset.Q(1000.arcsec))), true)
+    assertEquals(diff.contains(at(1000)), false)
   }
 
   test("intersection contains") {

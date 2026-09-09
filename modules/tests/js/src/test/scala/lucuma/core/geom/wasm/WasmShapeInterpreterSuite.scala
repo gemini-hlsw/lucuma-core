@@ -15,7 +15,6 @@ import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 import munit.CatsEffectSuite
 
-import scala.scalajs.js
 
 /**
  * Smoke tests for the kernel facade against JTS. The exhaustive cross-engine parity suite over

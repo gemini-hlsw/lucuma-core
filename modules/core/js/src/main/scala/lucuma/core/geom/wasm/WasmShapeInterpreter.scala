@@ -102,14 +102,9 @@ object WasmShapeInterpreter extends ShapeInterpreter {
 
   // Folds a chain of same-kind nodes in a loop, see ShapeExpression.leftSpine. Intermediates
   // are freed as soon as they are consumed.
-  private def chain(e: ShapeExpression): Int = {
-    val (op, operands) = ShapeExpression.leftSpine(e).get
-    val kind           = op match {
-      case ShapeExpression.BinaryOp.Intersection => 0
-      case ShapeExpression.BinaryOp.Union        => 1
-      case ShapeExpression.BinaryOp.Difference   => 2
-    }
-    var acc            = go(operands.head)
+  private def chain(op: BinaryOp, kind: Int, e: ShapeExpression): Int = {
+    val operands = ShapeExpression.leftSpine(e, op)
+    var acc      = go(operands.head)
     operands.tail.foreach { x =>
       val hx   =
         try go(x)
@@ -158,7 +153,9 @@ object WasmShapeInterpreter extends ShapeInterpreter {
       else LucumaGeoWasm.rect_new(b(0), b(1), b(2), b(3))
 
     // Combinations
-    case Difference(_, _) | Intersection(_, _) | Union(_, _) => chain(e)
+    case Difference(_, _)   => chain(BinaryOp.Difference, 2, e)
+    case Intersection(_, _) => chain(BinaryOp.Intersection, 0, e)
+    case Union(_, _)        => chain(BinaryOp.Union, 1, e)
 
     // Transformations
     case FlipP(e)                    => transform(e, -1, 0, 0, 0, 1, 0)

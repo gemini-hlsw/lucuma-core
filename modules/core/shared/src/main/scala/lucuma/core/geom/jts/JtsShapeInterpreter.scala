@@ -5,7 +5,6 @@ package lucuma.core.geom
 package jts
 
 import cats.syntax.all.*
-import lucuma.core.geom.ShapeExpression
 import lucuma.core.geom.ShapeExpression.*
 import lucuma.core.geom.jts.syntax.all.*
 import lucuma.core.math.Offset
@@ -31,6 +30,11 @@ object JtsShapeInterpreter extends ShapeInterpreter {
       if ((a.p === b.p) || (a.q === b.q)) EmptyGeometry
       else f(a.shapeFactory(b))
 
+    def foldChain(op: BinaryOp)(combine: (Geometry, Geometry) => Geometry): Geometry = {
+      val operands = ShapeExpression.leftSpine(e, op)
+      operands.tail.foldLeft(toGeometry(operands.head))((acc, x) => combine(acc, toGeometry(x)))
+    }
+
     def safePolygon(os: List[Offset]): Geometry =
       // We need at least 3 distinct points.
       if (os.toSet.size < 3)
@@ -54,13 +58,9 @@ object JtsShapeInterpreter extends ShapeInterpreter {
         safeRectangularBoundedShape(a, b)(_.createRectangle)
 
       // Combinations: fold the chain of same-kind nodes in a loop, see ShapeExpression.leftSpine
-      case Difference(_, _) | Intersection(_, _) | Union(_, _) =>
-        val (op, operands) = ShapeExpression.leftSpine(e).get
-        operands.tail.foldLeft(toGeometry(operands.head)): (acc, x) =>
-          op match
-            case ShapeExpression.BinaryOp.Difference   => acc.difference(toGeometry(x))
-            case ShapeExpression.BinaryOp.Intersection => acc.intersection(toGeometry(x))
-            case ShapeExpression.BinaryOp.Union        => acc.union(toGeometry(x))
+      case Difference(_, _)      => foldChain(BinaryOp.Difference)(_.difference(_))
+      case Intersection(_, _)    => foldChain(BinaryOp.Intersection)(_.intersection(_))
+      case Union(_, _)           => foldChain(BinaryOp.Union)(_.union(_))
 
       // Transformations
       case FlipP(e)                    =>

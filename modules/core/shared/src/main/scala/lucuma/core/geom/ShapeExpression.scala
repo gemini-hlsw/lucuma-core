@@ -3,6 +3,8 @@
 
 package lucuma.core.geom
 
+import cats.Eq
+import cats.syntax.eq.*
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 
@@ -125,29 +127,31 @@ object ShapeExpression {
   private[geom] enum BinaryOp:
     case Difference, Intersection, Union
 
+  private given Eq[BinaryOp] = Eq.fromUniversalEquals
+
   /**
-   * Operands of the left-nested chain of one binary operation rooted at `e`, in evaluation
-   * order. AGS builds `∩` chains with one operand per science offset, so interpreters fold this
-   * list in a loop instead of recursing once per offset (a 500-offset chain overflowed the JS
-   * stack). Folding left over the list performs exactly the operations the tree describes,
-   * `Difference` included.
+   * Operands of the left-nested chain of `op` rooted at `e`, in evaluation order.
+   * AGS builds `∩` chains with one operand per science offset, so interpreters fold this
+   * list in a loop instead of recursing once per offset. Folding left over the list performs
+   * exactly the operations the tree describes.
    */
-  private[geom] def leftSpine(e: ShapeExpression): Option[(BinaryOp, List[ShapeExpression])] =
-    def kind(x: ShapeExpression): Option[BinaryOp] = x match
-      case Difference(_, _)   => Some(BinaryOp.Difference)
-      case Intersection(_, _) => Some(BinaryOp.Intersection)
-      case Union(_, _)        => Some(BinaryOp.Union)
-      case _                  => None
-    kind(e).map: op =>
-      var operands: List[ShapeExpression] = Nil
-      var cur                             = e
-      var descending                      = true
-      while descending do
-        cur match
-          case Difference(a, b) if op == BinaryOp.Difference     => operands = b :: operands; cur = a
-          case Intersection(a, b) if op == BinaryOp.Intersection => operands = b :: operands; cur = a
-          case Union(a, b) if op == BinaryOp.Union               => operands = b :: operands; cur = a
-          case _                                                 => descending = false
-      (op, cur :: operands)
+  private[geom] def leftSpine(e: ShapeExpression, op: BinaryOp): List[ShapeExpression] =
+    var operands: List[ShapeExpression] = Nil
+    var cur                             = e
+    var descending                      = true
+    while descending do
+      cur match
+        case Difference(a, b) if op === BinaryOp.Difference     =>
+          operands = b :: operands
+          cur = a
+        case Intersection(a, b) if op === BinaryOp.Intersection =>
+          operands = b :: operands
+          cur = a
+        case Union(a, b) if op === BinaryOp.Union               =>
+          operands = b :: operands
+          cur = a
+        case _                                                  =>
+          descending = false
+    cur :: operands
 
 }
