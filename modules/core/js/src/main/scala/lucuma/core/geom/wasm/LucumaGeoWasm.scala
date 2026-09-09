@@ -43,6 +43,9 @@ private[wasm] object LucumaGeoWasm extends js.Object {
   /** Flat x,y coordinates of every exterior ring. */
   def coords(h: Int): Float64Array = js.native
 
+  /** `[nPolygons, (nRings, (nPoints, x, y, ...)*)*]`; the first ring of a polygon is its exterior. */
+  def rings(h: Int): Float64Array = js.native
+
   def contains_point(h: Int, x: Double, y: Double): Boolean = js.native
   def intersects(a: Int, b: Int): Boolean                   = js.native
 

@@ -8,6 +8,7 @@ import cats.effect.Resource
 import lucuma.core.geom.Shape
 import lucuma.core.geom.ShapeExpression
 import lucuma.core.geom.ShapeExpression.*
+import lucuma.core.geom.ShapePolygon
 import lucuma.core.geom.ShapeInterpreter
 import lucuma.core.geom.jts.JtsShapeInterpreter
 import lucuma.core.math.Angle
@@ -95,6 +96,29 @@ class WasmShapeInterpreterSuite extends CatsEffectSuite {
     assert(!WasmGeometry.isCompatible("0.2.0"))
     assert(!WasmGeometry.isCompatible("1.0.0"))
     assert(!WasmGeometry.isCompatible("garbage"))
+  }
+
+  test("polygons round-trip a shape with a hole and two parts") {
+    val hole  = Rectangle(µas(-2 * Arcsec, -2 * Arcsec), µas(2 * Arcsec, 2 * Arcsec))
+    val far   = Translate(hole, µas(30 * Arcsec, 30 * Arcsec))
+    val shape = Union(Difference(rect, hole), far)
+    val w     = kernel().interpret(shape)
+    val j     = jts(shape)
+    assertEquals(w.polygons.length, 2)
+    assertEquals(w.polygons.map(_.holes.length).sorted, List(0, 1))
+    assertEquals(j.polygons.length, 2)
+    assertEquals(j.polygons.map(_.holes.length).sorted, List(0, 1))
+    // Rebuilding from the vertices draws the same figure on either engine.
+    val rebuilt = ShapePolygon.toShapeExpression(w.polygons)
+    assertClose(
+      jts(rebuilt).area.toMicroarcsecondsSquared.toDouble,
+      j.area.toMicroarcsecondsSquared.toDouble,
+      1e-7,
+      "rebuilt area"
+    )
+    val o = µas(5 * Arcsec, 0)
+    assert(jts(rebuilt).contains(o))
+    assert(!jts(rebuilt).contains(Offset.Zero))
   }
 
   test("rectangle matches JTS") {

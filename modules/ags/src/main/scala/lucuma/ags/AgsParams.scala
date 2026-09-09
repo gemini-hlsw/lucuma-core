@@ -50,6 +50,9 @@ sealed trait AgsGeomCalc:
 
   def intersectionPatrolField: ShapeExpression
 
+  // The evaluated intersection, valid only within the interpreter scope that created it.
+  def intersectionPatrolFieldShape: Shape
+
 trait SingleProbeAgsParams:
   def patrolFieldAt(posAngle: Angle, offset: Offset, pivot: Offset = Offset.Zero): ShapeExpression
 
@@ -99,6 +102,8 @@ trait SingleProbeAgsParams:
       position -> new AgsGeomCalc() {
 
         override val intersectionPatrolField: ShapeExpression = pfExpr
+
+        override val intersectionPatrolFieldShape: Shape = pfShape
 
         private val scienceAreaShape =
           scienceArea(position.posAngle, position.offsetPos)

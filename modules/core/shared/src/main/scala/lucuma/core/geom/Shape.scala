@@ -39,4 +39,7 @@ trait Shape {
   /** Computes the intersection with another Shape */
   def intersection(that: Shape): Shape
 
+  /** The polygons making up this shape, for rendering or transport. */
+  def polygons: List[ShapePolygon]
+
 }

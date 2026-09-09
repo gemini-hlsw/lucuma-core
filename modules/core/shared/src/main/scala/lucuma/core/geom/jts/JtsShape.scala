@@ -8,6 +8,7 @@ import lucuma.core.geom.jts.syntax.all.*
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 import org.locationtech.jts.geom.Geometry
+import org.locationtech.jts.geom.Polygon
 
 /**
  * JTS implementation of Shape.
@@ -38,5 +39,15 @@ final case class JtsShape(g: Geometry) extends Shape {
   def intersection(that: Shape): Shape = that match
     case JtsShape(thatG) => JtsShape(g.intersection(thatG))
     case _               => throw new UnsupportedOperationException("Cannot intersect non-JTS shapes")
+
+  def polygons: List[ShapePolygon] =
+    def ring(cs: Array[org.locationtech.jts.geom.Coordinate]): List[Offset] =
+      cs.toList.map(_.offset)
+    (0 until g.getNumGeometries).toList.map(g.getGeometryN).collect:
+      case p: Polygon if !p.isEmpty =>
+        ShapePolygon(
+          ring(p.getExteriorRing.getCoordinates),
+          (0 until p.getNumInteriorRing).toList.map(i => ring(p.getInteriorRingN(i).getCoordinates))
+        )
 
 }

@@ -6,6 +6,7 @@ package lucuma.core.geom.wasm
 import lucuma.core.geom.Area
 import lucuma.core.geom.BoundingOffsets
 import lucuma.core.geom.Shape
+import lucuma.core.geom.ShapePolygon
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 
@@ -75,6 +76,29 @@ final class WasmShape private[wasm] (private[wasm] val handle: Int) extends Shap
   def intersection(that: Shape): Shape = that match {
     case w: WasmShape => WasmShapeInterpreter.wrap(LucumaGeoWasm.op(0, h, w.h))
     case _            => throw WasmShape.mixed(that)
+  }
+
+  def polygons: List[ShapePolygon] = {
+    val r = LucumaGeoWasm.rings(h)
+    var i = 1
+    def ring(): List[Offset] = {
+      val n   = r(i).toInt
+      i += 1
+      val out = List.newBuilder[Offset]
+      var k   = 0
+      while (k < n) {
+        out += WasmCoords.toOffset(r(i), r(i + 1))
+        i += 2
+        k += 1
+      }
+      out.result()
+    }
+    List.fill(r(0).toInt) {
+      val nRings   = r(i).toInt
+      i += 1
+      val exterior = ring()
+      ShapePolygon(exterior, List.fill(nRings - 1)(ring()))
+    }
   }
 
   override def toString: String =
