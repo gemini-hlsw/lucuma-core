@@ -69,11 +69,20 @@ enum ProposalSubmissionError(val tag: String, val message: String) derives Enume
   case UnmatchedPartnerTime
     extends ProposalSubmissionError("unmatched_partner_time", "Non-US partner time requests must have matching collaborators.")
 
-  case MissingPiEmail
-    extends ProposalSubmissionError("missing_pi_email", "PI email is required.")
+  case MissingInvestigatorName
+    extends ProposalSubmissionError("missing_investigator_name", "Every investigator must have a name.")
 
-  case InvalidPiEmail
-    extends ProposalSubmissionError("invalid_pi_email", "PI email address is invalid.")
+  case MissingInvestigatorEmail
+    extends ProposalSubmissionError("missing_investigator_email", "Every investigator must have an email address.")
+
+  case InvalidInvestigatorEmail
+    extends ProposalSubmissionError("invalid_investigator_email", "Every investigator's email address must be valid.")
+
+  case MissingInvestigatorEducationalStatus
+    extends ProposalSubmissionError("missing_investigator_educational_status", "Every investigator must have an educational status.")
+
+  case MissingInvestigatorAffiliation
+    extends ProposalSubmissionError("missing_investigator_affiliation", "Every investigator must have an affiliation.")
 
   case UninvitedInvestigator
     extends ProposalSubmissionError("uninvited_investigator", "All investigators must be invited.")
