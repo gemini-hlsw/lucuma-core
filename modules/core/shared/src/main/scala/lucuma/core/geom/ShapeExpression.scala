@@ -3,9 +3,10 @@
 
 package lucuma.core.geom
 
-import scala.annotation.tailrec
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
+
+import scala.annotation.tailrec
 
 /**
  * Describes a `Shape`, which is produced by evaluating the expression using
