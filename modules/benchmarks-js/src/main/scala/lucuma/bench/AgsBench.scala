@@ -59,25 +59,36 @@ object AgsBench:
   // Deterministic dither spiral, 30" radius so the patrol-field intersection stays non-empty
   def spiralOffsets(n: Int): List[Offset] =
     val maxRadiusArcsec = 30.0
-    1.to(n).toList.map: i =>
-      val t = i.toDouble / n
-      val r = t * maxRadiusArcsec
-      val a = i * 2.399963 // golden angle
-      Offset.signedDecimalArcseconds.reverseGet((r * math.cos(a), r * math.sin(a)))
+    1.to(n)
+      .toList
+      .map: i =>
+        val t = i.toDouble / n
+        val r = t * maxRadiusArcsec
+        val a = i * 2.399963 // golden angle
+        Offset.signedDecimalArcseconds.reverseGet((r * math.cos(a), r * math.sin(a)))
 
   def scienceOffsets(n: Int): Option[ScienceOffsets] =
-    NonEmptySet.fromSet(scala.collection.immutable.SortedSet.from(spiralOffsets(n).map(_.guided)))
+    NonEmptySet
+      .fromSet(scala.collection.immutable.SortedSet.from(spiralOffsets(n).map(_.guided)))
       .map(ScienceOffsets(_))
 
   // Candidates spread over a 10' box, Gaia G uniform in [8, 20)
   def candidates(n: Int, seed: Long): List[GuideStarCandidate] =
     val rnd = new Random(seed)
-    1.to(n).toList.map: i =>
-      val p      = (rnd.nextDouble() - 0.5) * 600.0
-      val q      = (rnd.nextDouble() - 0.5) * 600.0
-      val coords = base.offsetBy(Angle.Angle0, Offset.signedDecimalArcseconds.reverseGet((p, q))).get
-      val g      = BrightnessValue.unsafeFrom(BigDecimal(8.0 + rnd.nextDouble() * 12.0).setScale(3, BigDecimal.RoundingMode.HALF_UP))
-      GuideStarCandidate.unsafeApply(i.toLong, SiderealTracking.const(coords), (Band.Gaia, g).some)
+    1.to(n)
+      .toList
+      .map: i =>
+        val p      = (rnd.nextDouble() - 0.5) * 600.0
+        val q      = (rnd.nextDouble() - 0.5) * 600.0
+        val coords =
+          base.offsetBy(Angle.Angle0, Offset.signedDecimalArcseconds.reverseGet((p, q))).get
+        val g      = BrightnessValue.unsafeFrom(
+          BigDecimal(8.0 + rnd.nextDouble() * 12.0).setScale(3, BigDecimal.RoundingMode.HALF_UP)
+        )
+        GuideStarCandidate.unsafeApply(i.toLong,
+                                       SiderealTracking.const(coords),
+                                       (Band.Gaia, g).some
+        )
 
   def runOnce(offsets: Int, cands: List[GuideStarCandidate])(using ShapeInterpreter): AgsStats =
     Ags
@@ -100,14 +111,16 @@ object AgsBench:
   def engine: String =
     val hasWasm = js.typeOf(global.WebAssembly) != "undefined"
     val runtime =
-      if js.typeOf(global.process) != "undefined" && js.typeOf(global.process.versions) != "undefined"
+      if js.typeOf(global.process) != "undefined" && js.typeOf(
+          global.process.versions
+        ) != "undefined"
       then s"node ${global.process.versions.node}"
       else if js.typeOf(global.navigator) != "undefined" then global.navigator.userAgent.toString
       else "unknown"
     s"$runtime (WebAssembly available: $hasWasm)"
 
   def parseConfig(): Config =
-    def fromNode: Option[String] =
+    def fromNode: Option[String]    =
       if js.typeOf(global.process) != "undefined" then
         val argv = global.process.argv.asInstanceOf[js.Array[String]]
         argv.drop(2).headOption
@@ -117,7 +130,8 @@ object AgsBench:
         val q = global.location.search.toString.stripPrefix("?")
         q.split("&").collectFirst { case s"offsets=$v" => v }
       else None
-    val offsets = fromNode.orElse(fromBrowser)
+    val offsets                     = fromNode
+      .orElse(fromBrowser)
       .map(_.split(",").toList.flatMap(_.trim.toIntOption))
       .filter(_.nonEmpty)
       .getOrElse(List(20, 30, 50))
@@ -140,13 +154,19 @@ object AgsBench:
   // Node cannot fetch the package's own file: URL; hand the loader the bytes. Browsers resolve it.
   def wasmBytes(): js.Promise[js.UndefOr[js.Any]] =
     if js.typeOf(global.process) != "undefined" then
-      js.`import`[js.Dynamic]("node:fs").`then`[js.UndefOr[js.Any]]: fs =>
-        val url = js.`import`.meta.asInstanceOf[js.Dynamic].resolve("lucuma-geo-wasm/lucuma_geo_wasm_bg.wasm")
-        fs.readFileSync(js.Dynamic.newInstance(global.URL)(url)).asInstanceOf[js.Any]
+      js.`import`[js.Dynamic]("node:fs")
+        .`then`[js.UndefOr[js.Any]]: fs =>
+          val url = js.`import`.meta
+            .asInstanceOf[js.Dynamic]
+            .resolve("lucuma-geo-wasm/lucuma_geo_wasm_bg.wasm")
+          fs.readFileSync(js.Dynamic.newInstance(global.URL)(url)).asInstanceOf[js.Any]
     else js.Promise.resolve[js.UndefOr[js.Any]](js.undefined)
 
   def histogram(s: AgsStats): String =
-    s"accepted=${s.acceptedCount} " + s.resultCounts.toList.sortBy(_._1).map((k, v) => s"$k=$v").mkString(" ")
+    s"accepted=${s.acceptedCount} " + s.resultCounts.toList
+      .sortBy(_._1)
+      .map((k, v) => s"$k=$v")
+      .mkString(" ")
 
   // End to end agsAnalysis on JTS and on the production wasm kernel, paired per rep.
   def wasmStage(cfg: Config, cands: List[GuideStarCandidate]): Unit =
@@ -155,35 +175,45 @@ object AgsBench:
       .`then`[ShapeInterpreter](b => WasmGeometry.loadFrom(b).unsafeToPromise())
       .`then`[Unit]: wasm =>
         val engines = List("jts" -> JtsShapeInterpreter, "wasm" -> wasm)
-        report(s"kernel: lucuma-geo-wasm, default interpreter installed: ${ShapeInterpreter.default eq wasm}")
+        report(
+          s"kernel: lucuma-geo-wasm, default interpreter installed: ${ShapeInterpreter.default eq wasm}"
+        )
         report("offsets\tengine\trep\tcalcs_ms\tcontext_ms\tanalysis_ms\ttotal_ms\tlive_handles")
         engines.foreach((_, si) => runOnce(cfg.offsets.min, cands)(using si))
         cfg.offsets.foreach: n =>
-          val stats = (1 to cfg.reps).toList.flatMap: rep =>
+          val stats       = (1 to cfg.reps).toList.flatMap: rep =>
             engines.map: (name, si) =>
               val before = WasmShapeInterpreter.liveHandles
               val s      = runOnce(n, cands)(using si)
               val live   = WasmShapeInterpreter.liveHandles - before
-              report(s"$n\t$name\t$rep\t${ms(s.calcsNanos)}\t${ms(s.contextNanos)}\t${ms(s.analysisNanos)}\t${ms(s.contextNanos + s.analysisNanos)}\t$live")
+              report(
+                s"$n\t$name\t$rep\t${ms(s.calcsNanos)}\t${ms(s.contextNanos)}\t${ms(s.analysisNanos)}\t${ms(s.contextNanos + s.analysisNanos)}\t$live"
+              )
               name -> s
-          val avg   = engines.map: (name, _) =>
+          val avg         = engines.map: (name, _) =>
             val ss = stats.collect { case (`name`, s) => s }
             (name, ss.map(_.calcsNanos).sum / ss.size, ss.map(_.analysisNanos).sum / ss.size)
           avg.foreach: (name, c, a) =>
             report(s"$n\t$name\tavg\tcalcs=${ms(c)} analysis=${ms(a)} total=${ms(c + a)}")
           val (_, jc, ja) = avg.find(_._1 == "jts").get
           val (_, wc, wa) = avg.find(_._1 == "wasm").get
-          report(f"$n\tspeedup\tcalcs=${jc.toDouble / wc}%.2fx analysis=${ja.toDouble / wa}%.2fx total=${(jc + ja).toDouble / (wc + wa)}%.2fx")
-          val hists = engines.map((name, _) => name -> histogram(stats.findLast(_._1 == name).get._2))
+          report(
+            f"$n\tspeedup\tcalcs=${jc.toDouble / wc}%.2fx analysis=${ja.toDouble / wa}%.2fx total=${(jc + ja).toDouble / (wc + wa)}%.2fx"
+          )
+          val hists       =
+            engines.map((name, _) => name -> histogram(stats.findLast(_._1 == name).get._2))
           hists.foreach((name, h) => report(s"$n\thistogram\t$name\t$h"))
-          if hists.map(_._2).distinct.size != 1 then report(s"$n\tHISTOGRAM MISMATCH between engines")
+          if hists.map(_._2).distinct.size != 1 then
+            report(s"$n\tHISTOGRAM MISMATCH between engines")
       .`catch`[Unit](e => report(s"wasm stage failed: $e")): Unit
 
   def main(args: Array[String]): Unit =
     val cfg   = parseConfig()
     val cands = candidates(cfg.candidates, seed = 42L)
     report(s"engine: $engine")
-    report(s"config: offsets=${cfg.offsets.mkString(",")} reps=${cfg.reps} candidates=${cfg.candidates}")
+    report(
+      s"config: offsets=${cfg.offsets.mkString(",")} reps=${cfg.reps} candidates=${cfg.candidates}"
+    )
     if mode.contains("wasm") then { wasmStage(cfg, cands); return }
     report("offsets\tpositions\trep\tcalcs_ms\tcontext_ms\tanalysis_ms\ttotal_ms")
 
