@@ -37,10 +37,23 @@ object WasmShapeInterpreter extends ShapeInterpreter {
   private val registry: js.FinalizationRegistry[WasmShape, Int, WasmShape] =
     new js.FinalizationRegistry(h => LucumaGeoWasm.free(h))
 
-  private[wasm] def markLoaded(): Unit = loaded = true
+  private var exports: js.Dynamic = null
+
+  private[wasm] def markLoaded(wasmExports: js.Any): Unit = {
+    exports = wasmExports.asInstanceOf[js.Dynamic]
+    loaded = true
+  }
 
   /** Number of geometries currently held by the kernel; a leak detector for tests. */
   def liveHandles: Int = LucumaGeoWasm.live()
+
+  /**
+   * Bytes of wasm linear memory currently reserved by the kernel. Linear memory grows on demand
+   * and never shrinks, so this is the peak working set since load; 0 before `WasmGeometry.load`.
+   */
+  def memoryBytes: Long =
+    if (exports == null) 0L
+    else exports.memory.buffer.byteLength.asInstanceOf[Double].toLong
 
   /** True while at least one `scoped` block is running. */
   def inScope: Boolean = scopes.nonEmpty

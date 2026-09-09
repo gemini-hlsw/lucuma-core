@@ -178,7 +178,10 @@ object AgsBench:
         report(
           s"kernel: lucuma-geo-wasm, default interpreter installed: ${ShapeInterpreter.default eq wasm}"
         )
-        report("offsets\tengine\trep\tcalcs_ms\tcontext_ms\tanalysis_ms\ttotal_ms\tlive_handles")
+        report(f"kernel memory after load: ${WasmShapeInterpreter.memoryBytes / 1048576.0}%.1f MB")
+        report(
+          "offsets\tengine\trep\tcalcs_ms\tcontext_ms\tanalysis_ms\ttotal_ms\tlive_handles\twasm_mb"
+        )
         engines.foreach((_, si) => runOnce(cfg.offsets.min, cands)(using si))
         cfg.offsets.foreach: n =>
           val stats       = (1 to cfg.reps).toList.flatMap: rep =>
@@ -186,8 +189,9 @@ object AgsBench:
               val before = WasmShapeInterpreter.liveHandles
               val s      = runOnce(n, cands)(using si)
               val live   = WasmShapeInterpreter.liveHandles - before
+              val mb     = f"${WasmShapeInterpreter.memoryBytes / 1048576.0}%.1f"
               report(
-                s"$n\t$name\t$rep\t${ms(s.calcsNanos)}\t${ms(s.contextNanos)}\t${ms(s.analysisNanos)}\t${ms(s.contextNanos + s.analysisNanos)}\t$live"
+                s"$n\t$name\t$rep\t${ms(s.calcsNanos)}\t${ms(s.contextNanos)}\t${ms(s.analysisNanos)}\t${ms(s.contextNanos + s.analysisNanos)}\t$live\t$mb"
               )
               name -> s
           val avg         = engines.map: (name, _) =>

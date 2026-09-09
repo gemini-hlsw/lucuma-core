@@ -37,7 +37,7 @@ object WasmGeometry {
     val opts: js.UndefOr[js.Object] =
       moduleOrPath.map(m => js.Dynamic.literal(module_or_path = m))
     for {
-      _ <- IO.fromPromise(IO(LucumaGeoWasm.init(opts)))
+      x <- IO.fromPromise(IO(LucumaGeoWasm.init(opts)))
       v <- IO(LucumaGeoWasm.version())
       _ <- IO.raiseUnless(isCompatible(v))(
              new IllegalStateException(
@@ -45,7 +45,7 @@ object WasmGeometry {
              )
            )
       _ <- IO {
-             WasmShapeInterpreter.markLoaded()
+             WasmShapeInterpreter.markLoaded(x)
              ShapeInterpreter.default = WasmShapeInterpreter
            }
     } yield WasmShapeInterpreter

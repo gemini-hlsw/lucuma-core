@@ -90,6 +90,13 @@ class WasmShapeInterpreterSuite extends CatsEffectSuite {
     assert(WasmGeometry.isCompatible(LucumaGeoWasm.version()), LucumaGeoWasm.version())
   }
 
+  test("memoryBytes reports the kernel's linear memory once loaded") {
+    kernel()
+    val bytes = WasmShapeInterpreter.memoryBytes
+    assert(bytes > 0, bytes)
+    assertEquals(bytes % 65536, 0L, "wasm memory is a whole number of 64 KiB pages")
+  }
+
   test("version range check") {
     assert(WasmGeometry.isCompatible("0.1.0"))
     assert(WasmGeometry.isCompatible("0.1.7-rc1"))
