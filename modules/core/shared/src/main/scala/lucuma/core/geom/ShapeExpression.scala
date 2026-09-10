@@ -6,6 +6,8 @@ package lucuma.core.geom
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 
+import scala.annotation.tailrec
+
 /**
  * Describes a `Shape`, which is produced by evaluating the expression using
  * the JVM or JavaScript specific interpreter.
@@ -121,5 +123,24 @@ object ShapeExpression {
    * @group Transformations
    */
   final case class Translate(e: ShapeExpression, o: Offset) extends ShapeExpression
+
+  private[geom] enum BinaryOp:
+    case Difference, Intersection, Union
+
+  /**
+   * Operands of the left-nested chain of `op` rooted at `e`, in evaluation order: the leftmost
+   * leaf first, then the right operand of each node from the bottom up. AGS builds `∩` chains
+   * with one operand per science offset, so interpreters fold this list in a loop instead of
+   * recursing once per offset.
+   */
+  private[geom] def leftSpine(e: ShapeExpression, op: BinaryOp): (ShapeExpression, List[ShapeExpression]) =
+    @tailrec
+    def go(cur: ShapeExpression, acc: List[ShapeExpression]): (ShapeExpression, List[ShapeExpression]) =
+      cur match
+        case Difference(a, b) if op == BinaryOp.Difference     => go(a, b :: acc)
+        case Intersection(a, b) if op == BinaryOp.Intersection => go(a, b :: acc)
+        case Union(a, b) if op == BinaryOp.Union               => go(a, b :: acc)
+        case _                                                 => (cur, acc)
+    go(e, Nil)
 
 }
