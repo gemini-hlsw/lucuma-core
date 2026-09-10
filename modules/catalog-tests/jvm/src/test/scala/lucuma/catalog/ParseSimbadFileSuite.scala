@@ -11,8 +11,6 @@ import coulomb.conversion.implicits.given
 import coulomb.syntax.*
 import eu.timepit.refined.collection.NonEmpty
 import fs2.*
-import fs2.io.file.Files
-import fs2.io.file.Path
 import lucuma.catalog.*
 import lucuma.core.enums.Band
 import lucuma.core.enums.CatalogName
@@ -50,10 +48,9 @@ class ParseSimbadFileSuite extends CatsEffectSuite with VoTableParser with SEDMa
     // From http://simbad.u-strasbg.fr/simbad/sim-id?Ident=Vega&output.format=VOTable
     val xmlFile = "/simbad-vega.xml"
     // The sample has only one row
-    val file    = getClass().getResource(xmlFile)
     Resource.unit[IO].use { _ =>
-      Files[IO]
-        .readAll(Path(file.getPath()))
+      TestResources
+        .bytes(xmlFile)
         .through(text.utf8.decode)
         .through(CatalogSearch.siderealTargets(simbadAdapter))
         .compile
@@ -144,10 +141,9 @@ class ParseSimbadFileSuite extends CatsEffectSuite with VoTableParser with SEDMa
   test("parse simbad named queries with sloan band brightnesses") {
     // From http://simbad.u-strasbg.fr/simbad/sim-id?Ident=2MFGC6625&output.format=VOTable
     val xmlFile = "/simbad-2MFGC6625.xml"
-    val file    = getClass().getResource(xmlFile)
     Resource.unit[IO].use { _ =>
-      Files[IO]
-        .readAll(Path(file.getPath()))
+      TestResources
+        .bytes(xmlFile)
         .through(text.utf8.decode)
         .through(CatalogSearch.siderealTargets(simbadAdapter))
         .compile
@@ -247,10 +243,9 @@ class ParseSimbadFileSuite extends CatsEffectSuite with VoTableParser with SEDMa
   test("parse simbad named queries with mixed band brightnesses") {
     // From http://simbad.u-strasbg.fr/simbad/sim-id?Ident=2SLAQ%20J000008.13%2B001634.6&output.format=VOTable
     val xmlFile = "/simbad-J000008.13.xml"
-    val file    = getClass().getResource(xmlFile)
     Resource.unit[IO].use { _ =>
-      Files[IO]
-        .readAll(Path(file.getPath()))
+      TestResources
+        .bytes(xmlFile)
         .through(text.utf8.decode)
         .through(CatalogSearch.siderealTargets(simbadAdapter))
         .compile
@@ -387,10 +382,9 @@ class ParseSimbadFileSuite extends CatsEffectSuite with VoTableParser with SEDMa
     // From http://simbad.u-strasbg.fr/simbad/sim-id?output.format=VOTable&Ident=HIP43018
     val xmlFile = "/simbad_hip43018.xml"
 
-    val file = getClass().getResource(xmlFile)
     Resource.unit[IO].use { _ =>
-      Files[IO]
-        .readAll(Path(file.getPath()))
+      TestResources
+        .bytes(xmlFile)
         .through(text.utf8.decode)
         .through(CatalogSearch.siderealTargets(simbadAdapter))
         .compile
@@ -410,10 +404,9 @@ class ParseSimbadFileSuite extends CatsEffectSuite with VoTableParser with SEDMa
   test("parse simbad with a not-found name") {
     val xmlFile = "/simbad-not-found.xml"
     // Simbad returns non-valid xml when an element is not found, we need to skip validation :S
-    val file    = getClass().getResource(xmlFile)
     Resource.unit[IO].use { _ =>
-      Files[IO]
-        .readAll(Path(file.getPath()))
+      TestResources
+        .bytes(xmlFile)
         .through(text.utf8.decode)
         .through(CatalogSearch.siderealTargets(simbadAdapter))
         .compile
@@ -427,10 +420,9 @@ class ParseSimbadFileSuite extends CatsEffectSuite with VoTableParser with SEDMa
   test("parse simbad with an npe") {
     val xmlFile = "/simbad-npe.xml"
     // Simbad returns non-valid xml when there is an internal error like an NPE
-    val file    = getClass().getResource(xmlFile)
     Resource.unit[IO].use { _ =>
-      Files[IO]
-        .readAll(Path(file.getPath()))
+      TestResources
+        .bytes(xmlFile)
         .through(text.utf8.decode)
         .through(CatalogSearch.siderealTargets(simbadAdapter))
         .compile
@@ -445,10 +437,9 @@ class ParseSimbadFileSuite extends CatsEffectSuite with VoTableParser with SEDMa
   test("support simbad repeated band brightnesses entries and angular size") {
     val xmlFile = "/simbad-ngc-2438.xml"
     // Simbad returns an xml with multiple measurements of the same band, use only the first one
-    val file    = getClass().getResource(xmlFile)
     Resource.unit[IO].use { _ =>
-      Files[IO]
-        .readAll(Path(file.getPath()))
+      TestResources
+        .bytes(xmlFile)
         .through(text.utf8.decode)
         .through(CatalogSearch.siderealTargets(simbadAdapter))
         .compile
@@ -490,10 +481,9 @@ class ParseSimbadFileSuite extends CatsEffectSuite with VoTableParser with SEDMa
     // Taken from the url below and manually edited to remove PM RA
     // From http://simbad.u-strasbg.fr/simbad/sim-id?Ident=Vega&output.format=VOTable
     val xmlFile = "/simbad-vega-partial-pm.xml"
-    val file    = getClass().getResource(xmlFile)
     Resource.unit[IO].use { _ =>
-      Files[IO]
-        .readAll(Path(file.getPath()))
+      TestResources
+        .bytes(xmlFile)
         .through(text.utf8.decode)
         .through(CatalogSearch.siderealTargets(simbadAdapter))
         .compile
@@ -523,10 +513,9 @@ class ParseSimbadFileSuite extends CatsEffectSuite with VoTableParser with SEDMa
     // From https://simbad.u-strasbg.fr/simbad/sim-id?Ident=name+vega*&NbIdent=wild&output.format=VOTable
     val xmlFile = "/simbad-vega-name.xml"
     // The sample has only one row
-    val file    = getClass().getResource(xmlFile)
     Resource.unit[IO].use { _ =>
-      Files[IO]
-        .readAll(Path(file.getPath()))
+      TestResources
+        .bytes(xmlFile)
         .through(text.utf8.decode)
         .through(CatalogSearch.siderealTargets(simbadAdapter))
         .compile
@@ -633,10 +622,9 @@ class ParseSimbadFileSuite extends CatsEffectSuite with VoTableParser with SEDMa
     // From the old format https://simbad.u-strasbg.fr/simbad/sim-id?Ident=name+vega*&NbIdent=wild&output.format=VOTable
     val xmlFile = "/simbad-vega-name2.xml"
     // The sample has only one row
-    val file    = getClass().getResource(xmlFile)
     Resource.unit[IO].use { _ =>
-      Files[IO]
-        .readAll(Path(file.getPath()))
+      TestResources
+        .bytes(xmlFile)
         .through(text.utf8.decode)
         .through(CatalogSearch.siderealTargets(simbadAdapter))
         .compile

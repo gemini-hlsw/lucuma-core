@@ -5,8 +5,6 @@ package lucuma.catalog
 
 import cats.effect.IO
 import cats.syntax.all.*
-import fs2.io.file.Files
-import fs2.io.file.Path
 import fs2.text
 import lucuma.catalog.votable.CatalogAdapter
 import lucuma.catalog.votable.CatalogSearch
@@ -27,14 +25,12 @@ class BlindOffsetFileTestSuite extends CatsEffectSuite:
     LocalDate.of(2025, 9, 4).atStartOfDay(ZoneOffset.UTC).toInstant()
 
   private val xmlFile = "/gaia-blind-offset-test.xml"
-  private val file    = getClass.getResource(xmlFile)
 
   test("Parse gaia blind offset test VOTable file"):
     val xmlFile = "/gaia-blind-offset-test.xml"
-    val file    = getClass.getResource(xmlFile)
 
-    Files[IO]
-      .readAll(Path(file.getPath))
+    TestResources
+      .bytes(xmlFile)
       .through(text.utf8.decode)
       .through(CatalogSearch.siderealTargets(CatalogAdapter.Gaia3LiteGavo))
       .compile
@@ -71,8 +67,8 @@ class BlindOffsetFileTestSuite extends CatsEffectSuite:
       parallax = None
     )
 
-    Files[IO]
-      .readAll(Path(file.getPath))
+    TestResources
+      .bytes(xmlFile)
       .through(text.utf8.decode)
       .through(CatalogSearch.siderealTargets(CatalogAdapter.Gaia3LiteGavo))
       .compile

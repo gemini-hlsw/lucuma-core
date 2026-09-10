@@ -75,38 +75,34 @@ jobs:
 
       - name: Check headers and formatting
         if: matrix.java == 'temurin@25' && matrix.os == 'ubuntu-22.04'
-        run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' headerCheckAll scalafmtCheckAll 'project /' scalafmtSbtCheck lucumaScalafmtCheck lucumaScalafixCheck lucumaSlackNotifyCheck
+        run: sbt 'project ${{ matrix.project }}; ++ ${{ matrix.scala }}; headerCheckAll; scalafmtCheckAll; project /; scalafmtSbtCheck; lucumaScalafmtCheck; lucumaScalafixCheck; lucumaSlackNotifyCheck'
 
       - name: Check scalafix lints
         if: matrix.java == 'temurin@25' && matrix.os == 'ubuntu-22.04'
-        run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' 'scalafixAll --check'
+        run: sbt 'project ${{ matrix.project }}; ++ ${{ matrix.scala }}; scalafix --check; Test/scalafix --check'
 
       - name: scalaJSLink
         if: matrix.project == 'rootJS'
-        run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' Test/scalaJSLinkerResult
+        run: sbt 'project ${{ matrix.project }}; ++ ${{ matrix.scala }}; Test/scalaJSLinkerResult'
 
       - name: Test affected projects
-        run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' lucumaTestAffected
+        run: sbt 'project ${{ matrix.project }}; ++ ${{ matrix.scala }}; lucumaTestAffected'
 
       - name: Check binary compatibility
         if: matrix.java == 'temurin@25' && matrix.os == 'ubuntu-22.04'
-        run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' mimaReportBinaryIssues
+        run: sbt 'project ${{ matrix.project }}; ++ ${{ matrix.scala }}; mimaReportBinaryIssues'
 
       - name: Generate API documentation
         if: matrix.java == 'temurin@25' && matrix.os == 'ubuntu-22.04'
-        run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' doc
-
-      - name: Monitor bundle size
-        if: matrix.project == 'rootJS'
-        run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' bundleMon
+        run: sbt 'project ${{ matrix.project }}; ++ ${{ matrix.scala }}; doc'
 
       - name: Make target directories
         if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/topic/scala3')
-        run: mkdir -p modules/ags/.jvm/target modules/catalog-testkit/js/target modules/catalog/jvm/target modules/testkit/.js/target modules/ags/.js/target modules/core/js/target modules/catalog/js/target modules/horizons/.js/target modules/horizons/.jvm/target modules/catalog-testkit/jvm/target modules/core/jvm/target modules/itac/target modules/testkit/.jvm/target project/target
+        run: mkdir -p target/out/jvm/scala-3.9.0/lucuma-ags target/out/sjs1/scala-3.9.0/lucuma-core target/out/jvm/scala-3.9.0/lucuma-core-testkit target/out/sjs1/scala-3.9.0/lucuma-catalog-testkit target/out/jvm/scala-3.9.0/lucuma-catalog target/out/sjs1/scala-3.9.0/lucuma-core-testkit target/out/sjs1/scala-3.9.0/lucuma-ags target/out/sjs1/scala-3.9.0/lucuma-catalog target/out/sjs1/scala-3.9.0/lucuma-horizons target/out/jvm/scala-3.9.0/lucuma-horizons target/out/jvm/scala-3.9.0/lucuma-catalog-testkit target/out/jvm/scala-3.9.0/lucuma-core target/out/jvm/scala-3.9.0/lucuma-itac project/target
 
       - name: Compress target directories
         if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/topic/scala3')
-        run: tar cf targets.tar modules/ags/.jvm/target modules/catalog-testkit/js/target modules/catalog/jvm/target modules/testkit/.js/target modules/ags/.js/target modules/core/js/target modules/catalog/js/target modules/horizons/.js/target modules/horizons/.jvm/target modules/catalog-testkit/jvm/target modules/core/jvm/target modules/itac/target modules/testkit/.jvm/target project/target
+        run: tar cf targets.tar target/out/jvm/scala-3.9.0/lucuma-ags target/out/sjs1/scala-3.9.0/lucuma-core target/out/jvm/scala-3.9.0/lucuma-core-testkit target/out/sjs1/scala-3.9.0/lucuma-catalog-testkit target/out/jvm/scala-3.9.0/lucuma-catalog target/out/sjs1/scala-3.9.0/lucuma-core-testkit target/out/sjs1/scala-3.9.0/lucuma-ags target/out/sjs1/scala-3.9.0/lucuma-catalog target/out/sjs1/scala-3.9.0/lucuma-horizons target/out/jvm/scala-3.9.0/lucuma-horizons target/out/jvm/scala-3.9.0/lucuma-catalog-testkit target/out/jvm/scala-3.9.0/lucuma-core target/out/jvm/scala-3.9.0/lucuma-itac project/target
 
       - name: Upload target directories
         if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/topic/scala3')

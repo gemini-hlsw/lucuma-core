@@ -63,3 +63,6 @@ gnupg*
 CONTEXT-MAP.md
 CONTEXT.md
 .config/
+
+# scalafix on build.sbt under sbt 2
+*.sbt.semanticdb
