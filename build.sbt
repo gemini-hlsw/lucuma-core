@@ -250,6 +250,11 @@ lazy val catalogTestkit = crossProject(JVMPlatform, JSPlatform)
       "io.chrisdavenport"      %% "cats-scalacheck"     % catsScalacheckVersion
     )
   )
+  .jvmSettings(
+    libraryDependencies ++= Seq(
+      "co.fs2" %% "fs2-io" % fs2Version
+    )
+  )
 
 lazy val catalogTests = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Full)

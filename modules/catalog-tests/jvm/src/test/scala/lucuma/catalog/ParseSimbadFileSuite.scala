@@ -50,7 +50,7 @@ class ParseSimbadFileSuite extends CatsEffectSuite with VoTableParser with SEDMa
     // The sample has only one row
     Resource.unit[IO].use { _ =>
       TestResources
-        .bytes(xmlFile)
+        .stream(xmlFile)
         .through(text.utf8.decode)
         .through(CatalogSearch.siderealTargets(simbadAdapter))
         .compile
@@ -143,7 +143,7 @@ class ParseSimbadFileSuite extends CatsEffectSuite with VoTableParser with SEDMa
     val xmlFile = "/simbad-2MFGC6625.xml"
     Resource.unit[IO].use { _ =>
       TestResources
-        .bytes(xmlFile)
+        .stream(xmlFile)
         .through(text.utf8.decode)
         .through(CatalogSearch.siderealTargets(simbadAdapter))
         .compile
@@ -245,7 +245,7 @@ class ParseSimbadFileSuite extends CatsEffectSuite with VoTableParser with SEDMa
     val xmlFile = "/simbad-J000008.13.xml"
     Resource.unit[IO].use { _ =>
       TestResources
-        .bytes(xmlFile)
+        .stream(xmlFile)
         .through(text.utf8.decode)
         .through(CatalogSearch.siderealTargets(simbadAdapter))
         .compile
@@ -384,7 +384,7 @@ class ParseSimbadFileSuite extends CatsEffectSuite with VoTableParser with SEDMa
 
     Resource.unit[IO].use { _ =>
       TestResources
-        .bytes(xmlFile)
+        .stream(xmlFile)
         .through(text.utf8.decode)
         .through(CatalogSearch.siderealTargets(simbadAdapter))
         .compile
@@ -406,7 +406,7 @@ class ParseSimbadFileSuite extends CatsEffectSuite with VoTableParser with SEDMa
     // Simbad returns non-valid xml when an element is not found, we need to skip validation :S
     Resource.unit[IO].use { _ =>
       TestResources
-        .bytes(xmlFile)
+        .stream(xmlFile)
         .through(text.utf8.decode)
         .through(CatalogSearch.siderealTargets(simbadAdapter))
         .compile
@@ -422,7 +422,7 @@ class ParseSimbadFileSuite extends CatsEffectSuite with VoTableParser with SEDMa
     // Simbad returns non-valid xml when there is an internal error like an NPE
     Resource.unit[IO].use { _ =>
       TestResources
-        .bytes(xmlFile)
+        .stream(xmlFile)
         .through(text.utf8.decode)
         .through(CatalogSearch.siderealTargets(simbadAdapter))
         .compile
@@ -439,7 +439,7 @@ class ParseSimbadFileSuite extends CatsEffectSuite with VoTableParser with SEDMa
     // Simbad returns an xml with multiple measurements of the same band, use only the first one
     Resource.unit[IO].use { _ =>
       TestResources
-        .bytes(xmlFile)
+        .stream(xmlFile)
         .through(text.utf8.decode)
         .through(CatalogSearch.siderealTargets(simbadAdapter))
         .compile
@@ -483,7 +483,7 @@ class ParseSimbadFileSuite extends CatsEffectSuite with VoTableParser with SEDMa
     val xmlFile = "/simbad-vega-partial-pm.xml"
     Resource.unit[IO].use { _ =>
       TestResources
-        .bytes(xmlFile)
+        .stream(xmlFile)
         .through(text.utf8.decode)
         .through(CatalogSearch.siderealTargets(simbadAdapter))
         .compile
@@ -515,7 +515,7 @@ class ParseSimbadFileSuite extends CatsEffectSuite with VoTableParser with SEDMa
     // The sample has only one row
     Resource.unit[IO].use { _ =>
       TestResources
-        .bytes(xmlFile)
+        .stream(xmlFile)
         .through(text.utf8.decode)
         .through(CatalogSearch.siderealTargets(simbadAdapter))
         .compile
@@ -624,7 +624,7 @@ class ParseSimbadFileSuite extends CatsEffectSuite with VoTableParser with SEDMa
     // The sample has only one row
     Resource.unit[IO].use { _ =>
       TestResources
-        .bytes(xmlFile)
+        .stream(xmlFile)
         .through(text.utf8.decode)
         .through(CatalogSearch.siderealTargets(simbadAdapter))
         .compile
