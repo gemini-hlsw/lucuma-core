@@ -30,7 +30,7 @@ class BlindOffsetFileTestSuite extends CatsEffectSuite:
     val xmlFile = "/gaia-blind-offset-test.xml"
 
     TestResources
-      .bytes(xmlFile)
+      .stream(xmlFile)
       .through(text.utf8.decode)
       .through(CatalogSearch.siderealTargets(CatalogAdapter.Gaia3LiteGavo))
       .compile
@@ -68,7 +68,7 @@ class BlindOffsetFileTestSuite extends CatsEffectSuite:
     )
 
     TestResources
-      .bytes(xmlFile)
+      .stream(xmlFile)
       .through(text.utf8.decode)
       .through(CatalogSearch.siderealTargets(CatalogAdapter.Gaia3LiteGavo))
       .compile

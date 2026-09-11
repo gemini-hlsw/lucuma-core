@@ -23,7 +23,7 @@ class MosMaskReaderErrorSuite extends CatsEffectSuite:
   private val BlockSize = Fits.BlockSize
 
   private def golden: Array[Byte] =
-    TestResources.allBytes("/ngc7796_ODF.fits")
+    TestResources.bytes("/ngc7796_ODF.fits")
 
   private def stream(bs: Array[Byte]): Stream[IO, Byte] =
     Stream.emits(bs).covary[IO]

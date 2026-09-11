@@ -15,7 +15,7 @@ class ParseGaiaFileSuite extends CatsEffectSuite with VoTableParser {
     val xmlFile = "/gaia-esa-large.xml"
     Resource.unit[IO].use { _ =>
       TestResources
-        .bytes(xmlFile)
+        .stream(xmlFile)
         .through(text.utf8.decode)
         .through(CatalogSearch.siderealTargets(CatalogAdapter.Gaia3Esa))
         .compile
@@ -31,7 +31,7 @@ class ParseGaiaFileSuite extends CatsEffectSuite with VoTableParser {
     val xmlFile = "/gaia-gemini-large.xml"
     Resource.unit[IO].use { _ =>
       TestResources
-        .bytes(xmlFile)
+        .stream(xmlFile)
         .through(text.utf8.decode)
         .through(CatalogSearch.siderealTargets(CatalogAdapter.Gaia3Esa))
         .compile
