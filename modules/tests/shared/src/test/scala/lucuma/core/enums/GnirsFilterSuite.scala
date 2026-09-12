@@ -3,6 +3,7 @@
 
 package lucuma.core.enums
 
+import cats.syntax.eq.*
 import lucuma.core.math.Wavelength
 import munit.DisciplineSuite
 
@@ -56,7 +57,23 @@ final class GnirsFilterSuite extends DisciplineSuite {
 
   test("automatic acquisition selection never produces PAH") {
     assert(!GnirsFilter.AutoAcquisitionFilters.toList.contains(GnirsFilter.PAH))
-    assert(GnirsFilter.AcquisitionFilters.toList.contains(GnirsFilter.PAH))
+    assert(GnirsFilter.SpectroscopyAcquisitionFilters.toList.contains(GnirsFilter.PAH))
+  }
+
+  test("imaging acquisition filters are the imaging filters, plus H2") {
+    // Order is presentational, so compare membership.
+    val (h2, imaging) = GnirsFilter.ImagingAcquisitionFilters.toList.partition(_ === GnirsFilter.H2)
+    assertEquals(h2, List(GnirsFilter.H2))
+    assertEquals(imaging.toSet, GnirsFilter.values.filter(_.imagingWidth.isDefined).toSet)
+  }
+
+  test("the J and K of an imaging acquisition are the photometric filters, not the orders") {
+    val imaging = GnirsFilter.ImagingAcquisitionFilters.toList
+    assert(imaging.contains(GnirsFilter.J) && imaging.contains(GnirsFilter.K))
+    assert(!imaging.contains(GnirsFilter.Order5) && !imaging.contains(GnirsFilter.Order3))
+    val spectroscopy = GnirsFilter.SpectroscopyAcquisitionFilters.toList
+    assert(spectroscopy.contains(GnirsFilter.Order5) && spectroscopy.contains(GnirsFilter.Order3))
+    assert(!spectroscopy.contains(GnirsFilter.J) && !spectroscopy.contains(GnirsFilter.K))
   }
 
   test("science filter") {

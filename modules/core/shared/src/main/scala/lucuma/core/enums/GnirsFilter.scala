@@ -63,8 +63,13 @@ object GnirsFilter:
 
   /** Every filter that may be used for a spectroscopic acquisition, explicitly or automatically. */
   // Declaration order matters for range match. Since H2 is completely contained in Order3, it needs to come before or it will never be selected.
-  val AcquisitionFilters: NonEmptyList[GnirsFilter] =
+  val SpectroscopyAcquisitionFilters: NonEmptyList[GnirsFilter] =
     NonEmptyList.of(Order6, Order5, Order4, H2, Order3, PAH)
+
+  /** Every filter that may be used for an imaging acquisition, explicitly or automatically. */
+  // Wavelength order, which is the order the filters are offered in.
+  val ImagingAcquisitionFilters: NonEmptyList[GnirsFilter] =
+    NonEmptyList.of(Y, Order6, J, Order4, H2, K)
 
   /**
    * The filters that automatic acquisition selection may produce by wavelength coverage.
@@ -72,7 +77,7 @@ object GnirsFilter:
    * does not belong, and above `ThermalAcquisitionCutoff` `ThermalAcquisitionFilter` is used
    * instead of a coverage match.  It remains available as an explicit choice.
    */
-  // Declaration order matters here too (see AcquisitionFilters).
+  // Declaration order matters here too (see SpectroscopyAcquisitionFilters).
   val AutoAcquisitionFilters: NonEmptyList[GnirsFilter] =
     NonEmptyList.of(Order6, Order5, Order4, H2, Order3)
 
