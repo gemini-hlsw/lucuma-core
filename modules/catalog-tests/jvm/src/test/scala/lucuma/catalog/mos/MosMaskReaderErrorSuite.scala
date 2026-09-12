@@ -6,13 +6,11 @@ package lucuma.catalog.mos
 import cats.effect.*
 import cats.syntax.all.*
 import fs2.*
+import lucuma.catalog.TestResources
 import lucuma.catalog.fits.Fits
 import lucuma.catalog.fits.FitsProblem
 import lucuma.core.enums.MosSlitPriority
 import munit.CatsEffectSuite
-
-import java.nio.file.Files as JFiles
-import java.nio.file.Paths
 
 /**
  * Failure paths, exercised against deliberately damaged copies of a real design.
@@ -25,7 +23,7 @@ class MosMaskReaderErrorSuite extends CatsEffectSuite:
   private val BlockSize = Fits.BlockSize
 
   private def golden: Array[Byte] =
-    JFiles.readAllBytes(Paths.get(getClass().getResource("/ngc7796_ODF.fits").getPath()))
+    TestResources.bytes("/ngc7796_ODF.fits")
 
   private def stream(bs: Array[Byte]): Stream[IO, Byte] =
     Stream.emits(bs).covary[IO]

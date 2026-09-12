@@ -61,25 +61,25 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
   .settings(
     name := "lucuma-core",
     libraryDependencies ++= Seq(
-      "org.typelevel"  %%% "cats-parse"            % catsParseVersion,
-      "org.typelevel"  %%% "cats-core"             % catsVersion,
-      "org.typelevel"  %%% "cats-collections-core" % catsCollctionsVersion,
-      "org.typelevel"  %%% "cats-effect"           % catsEffectVersion,
-      "dev.optics"     %%% "monocle-core"          % monocleVersion,
-      "dev.optics"     %%% "monocle-macro"         % monocleVersion,
-      "dev.optics"     %%% "monocle-state"         % monocleVersion,
-      "edu.gemini"     %%% "lucuma-jts"            % jtsVersion,
-      "com.manyangled" %%% "coulomb-core"          % coulombVersion,
-      "com.manyangled" %%% "coulomb-units"         % coulombVersion,
-      "com.manyangled" %%% "coulomb-refined"       % coulombVersion,
-      "org.typelevel"  %%% "spire"                 % spireVersion,
-      "org.typelevel"  %%% "spire-extras"          % spireVersion,
-      "eu.timepit"     %%% "refined"               % refinedVersion,
-      "eu.timepit"     %%% "refined-cats"          % refinedVersion,
-      "org.typelevel"  %%% "cats-time"             % catsTimeVersion,
-      "org.typelevel"  %%% "kittens"               % kittensVersion,
-      "io.circe"       %%% "circe-core"            % circeVersion,
-      "io.circe"       %%% "circe-refined"         % circeRefinedVersion
+      "org.typelevel"  %% "cats-parse"            % catsParseVersion,
+      "org.typelevel"  %% "cats-core"             % catsVersion,
+      "org.typelevel"  %% "cats-collections-core" % catsCollctionsVersion,
+      "org.typelevel"  %% "cats-effect"           % catsEffectVersion,
+      "dev.optics"     %% "monocle-core"          % monocleVersion,
+      "dev.optics"     %% "monocle-macro"         % monocleVersion,
+      "dev.optics"     %% "monocle-state"         % monocleVersion,
+      "edu.gemini"     %% "lucuma-jts"            % jtsVersion,
+      "com.manyangled" %% "coulomb-core"          % coulombVersion,
+      "com.manyangled" %% "coulomb-units"         % coulombVersion,
+      "com.manyangled" %% "coulomb-refined"       % coulombVersion,
+      "org.typelevel"  %% "spire"                 % spireVersion,
+      "org.typelevel"  %% "spire-extras"          % spireVersion,
+      "eu.timepit"     %% "refined"               % refinedVersion,
+      "eu.timepit"     %% "refined-cats"          % refinedVersion,
+      "org.typelevel"  %% "cats-time"             % catsTimeVersion,
+      "org.typelevel"  %% "kittens"               % kittensVersion,
+      "io.circe"       %% "circe-core"            % circeVersion,
+      "io.circe"       %% "circe-refined"         % circeRefinedVersion
     )
   )
   .jvmConfigure(_.enablePlugins(AutomateHeaderPlugin))
@@ -91,8 +91,8 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
   )
   .jsSettings(
     libraryDependencies ++= Seq(
-      "io.github.cquiroz" %%% "scala-java-time" % scalaJavaTimeVersion,
-      "edu.gemini"        %%% "gemini-locales"  % geminiLocalesVersion
+      "io.github.cquiroz" %% "scala-java-time" % scalaJavaTimeVersion,
+      "edu.gemini"        %% "gemini-locales"  % geminiLocalesVersion
     )
   )
 
@@ -103,14 +103,14 @@ lazy val testkit = crossProject(JVMPlatform, JSPlatform)
   .settings(
     name := "lucuma-core-testkit",
     libraryDependencies ++= Seq(
-      "org.typelevel"     %%% "cats-testkit"       % catsVersion,
-      "dev.optics"        %%% "monocle-law"        % monocleVersion,
-      "org.typelevel"     %%% "spire-laws"         % spireVersion,
-      "eu.timepit"        %%% "refined-scalacheck" % refinedVersion,
-      "io.circe"          %%% "circe-testing"      % circeVersion,
-      "com.manyangled"    %%% "coulomb-testkit"    % coulombVersion,
-      "io.chrisdavenport" %%% "cats-scalacheck"    % catsScalacheckVersion,
-      "org.scalameta"     %%% "munit"              % munitVersion,
+      "org.typelevel"     %% "cats-testkit"       % catsVersion,
+      "dev.optics"        %% "monocle-law"        % monocleVersion,
+      "org.typelevel"     %% "spire-laws"         % spireVersion,
+      "eu.timepit"        %% "refined-scalacheck" % refinedVersion,
+      "io.circe"          %% "circe-testing"      % circeVersion,
+      "com.manyangled"    %% "coulomb-testkit"    % coulombVersion,
+      "io.chrisdavenport" %% "cats-scalacheck"    % catsScalacheckVersion,
+      "org.scalameta"     %% "munit"              % munitVersion,
     )
   )
   .jvmConfigure(_.enablePlugins(AutomateHeaderPlugin))
@@ -123,9 +123,9 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform)
   .settings(
     name := "lucuma-core-tests",
     libraryDependencies ++= Seq(
-      "org.scalameta" %%% "munit"             % munitVersion % Test,
-      "org.typelevel" %%% "discipline-munit"  % munitDisciplineVersion % Test,
-      "org.typelevel" %%% "munit-cats-effect" % munitCatsEffectVersion % Test
+      "org.scalameta" %% "munit"             % munitVersion % Test,
+      "org.typelevel" %% "discipline-munit"  % munitDisciplineVersion % Test,
+      "org.typelevel" %% "munit-cats-effect" % munitCatsEffectVersion % Test
     )
   )
   .jvmConfigure(_.enablePlugins(AutomateHeaderPlugin))
@@ -149,26 +149,26 @@ lazy val catalog = crossProject(JVMPlatform, JSPlatform)
   .settings(
     name := "lucuma-catalog",
     libraryDependencies ++= Seq(
-      "co.fs2"        %%% "fs2-core"             % fs2Version,
-      "org.gnieh"     %%% "fs2-data-xml"         % fs2DataVersion,
-      "org.gnieh"     %%% "fs2-data-csv"         % fs2DataVersion,
-      "org.gnieh"     %%% "fs2-data-csv-generic" % fs2DataVersion,
-      "edu.gemini"    %%% "lucuma-refined"       % lucumaRefinedVersion,
-      "org.typelevel" %%% "cats-core"            % catsVersion,
-      "dev.optics"    %%% "monocle-core"         % monocleVersion,
-      "dev.optics"    %%% "monocle-state"        % monocleVersion,
-      "eu.timepit"    %%% "refined"              % refinedVersion,
-      "eu.timepit"    %%% "refined-cats"         % refinedVersion,
-      "org.http4s"    %%% "http4s-core"          % http4sVersion,
-      "org.http4s"    %%% "http4s-client"        % http4sVersion,
-      "io.circe"      %%% "circe-core"           % circeVersion,
-      "io.circe"      %%% "circe-parser"         % circeVersion,
-      "org.typelevel" %%% "cats-parse"           % catsParseVersion,
-      "org.typelevel" %%% "kittens"              % kittensVersion,
-      "edu.gemini"    %%% "clue-core"            % clueVersion,
-      "edu.gemini"    %%% "clue-http4s"          % clueVersion,
-      "org.typelevel" %%% "log4cats-core"        % log4catsVersion,
-      "org.typelevel" %%% "otel4s-core"          % otel4sVersion
+      "co.fs2"        %% "fs2-core"             % fs2Version,
+      "org.gnieh"     %% "fs2-data-xml"         % fs2DataVersion,
+      "org.gnieh"     %% "fs2-data-csv"         % fs2DataVersion,
+      "org.gnieh"     %% "fs2-data-csv-generic" % fs2DataVersion,
+      "edu.gemini"    %% "lucuma-refined"       % lucumaRefinedVersion,
+      "org.typelevel" %% "cats-core"            % catsVersion,
+      "dev.optics"    %% "monocle-core"         % monocleVersion,
+      "dev.optics"    %% "monocle-state"        % monocleVersion,
+      "eu.timepit"    %% "refined"              % refinedVersion,
+      "eu.timepit"    %% "refined-cats"         % refinedVersion,
+      "org.http4s"    %% "http4s-core"          % http4sVersion,
+      "org.http4s"    %% "http4s-client"        % http4sVersion,
+      "io.circe"      %% "circe-core"           % circeVersion,
+      "io.circe"      %% "circe-parser"         % circeVersion,
+      "org.typelevel" %% "cats-parse"           % catsParseVersion,
+      "org.typelevel" %% "kittens"              % kittensVersion,
+      "edu.gemini"    %% "clue-core"            % clueVersion,
+      "edu.gemini"    %% "clue-http4s"          % clueVersion,
+      "org.typelevel" %% "log4cats-core"        % log4catsVersion,
+      "org.typelevel" %% "otel4s-core"          % otel4sVersion
     )
   )
   .jvmSettings(
@@ -176,7 +176,6 @@ lazy val catalog = crossProject(JVMPlatform, JSPlatform)
       "co.fs2" %% "fs2-io" % fs2Version
     )
   )
-  .jsConfigure(_.enablePlugins(BundleMonPlugin))
 
 lazy val horizons = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Pure)
@@ -185,11 +184,10 @@ lazy val horizons = crossProject(JVMPlatform, JSPlatform)
   .settings(
     name := "lucuma-horizons",
     libraryDependencies ++= Seq(
-      "org.http4s"    %%% "http4s-core"   % http4sVersion,
-      "org.http4s"    %%% "http4s-client" % http4sVersion,
+      "org.http4s"    %% "http4s-core"   % http4sVersion,
+      "org.http4s"    %% "http4s-client" % http4sVersion,
     )
   )
-  .jsConfigure(_.enablePlugins(BundleMonPlugin))
 
 lazy val horizonsTests = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Full)
@@ -199,7 +197,7 @@ lazy val horizonsTests = crossProject(JVMPlatform, JSPlatform)
   .settings(
     name := "lucuma-horizons-tests",
     libraryDependencies ++= Seq(
-      "org.typelevel" %%% "munit-cats-effect"   % munitCatsEffectVersion % Test,
+      "org.typelevel" %% "munit-cats-effect"   % munitCatsEffectVersion % Test,
     )
   )
   .jvmSettings(
@@ -211,10 +209,9 @@ lazy val horizonsTests = crossProject(JVMPlatform, JSPlatform)
   .jsSettings(
     scalacOptions ~= (_.filterNot(Set("-Wdead-code"))),
     libraryDependencies ++= Seq(
-      "org.http4s" %%% "http4s-dom" % http4sDomVersion % Test,
+      "org.http4s" %% "http4s-dom" % http4sDomVersion % Test,
     ),
   )
-  .jsConfigure(_.enablePlugins(BundleMonPlugin))
 
 lazy val itac = project
   .in(file("modules/itac"))
@@ -223,7 +220,7 @@ lazy val itac = project
     name := "lucuma-itac",
     libraryDependencies ++= Seq(
       "org.slf4j"     %  "slf4j-simple"           % slf4jVersion,
-      "org.typelevel" %%% "munit-cats-effect"   % munitCatsEffectVersion % Test,
+      "org.typelevel" %% "munit-cats-effect"   % munitCatsEffectVersion % Test,
     )
   )
 
@@ -233,12 +230,11 @@ lazy val ags = crossProject(JVMPlatform, JSPlatform)
   .settings(
     name := "lucuma-ags",
     libraryDependencies ++= Seq(
-      "edu.gemini"    %%% "lucuma-refined" % lucumaRefinedVersion,
-      "org.typelevel" %%% "cats-core"      % catsVersion,
-      "org.typelevel" %%% "otel4s-core"    % otel4sVersion
+      "edu.gemini"    %% "lucuma-refined" % lucumaRefinedVersion,
+      "org.typelevel" %% "cats-core"      % catsVersion,
+      "org.typelevel" %% "otel4s-core"    % otel4sVersion
     )
   )
-  .jsConfigure(_.enablePlugins(BundleMonPlugin))
   .dependsOn(catalog)
 
 lazy val catalogTestkit = crossProject(JVMPlatform, JSPlatform)
@@ -248,10 +244,15 @@ lazy val catalogTestkit = crossProject(JVMPlatform, JSPlatform)
   .settings(
     name := "lucuma-catalog-testkit",
     libraryDependencies ++= Seq(
-      "org.typelevel"          %%% "cats-testkit"        % catsVersion,
-      "eu.timepit"             %%% "refined-scalacheck"  % refinedVersion,
-      "org.scala-lang.modules" %%% "scala-xml"           % scalaXmlVersion,
-      "io.chrisdavenport"      %%% "cats-scalacheck"     % catsScalacheckVersion
+      "org.typelevel"          %% "cats-testkit"        % catsVersion,
+      "eu.timepit"             %% "refined-scalacheck"  % refinedVersion,
+      "org.scala-lang.modules" %% "scala-xml"           % scalaXmlVersion,
+      "io.chrisdavenport"      %% "cats-scalacheck"     % catsScalacheckVersion
+    )
+  )
+  .jvmSettings(
+    libraryDependencies ++= Seq(
+      "co.fs2" %% "fs2-io" % fs2Version
     )
   )
 
@@ -263,20 +264,20 @@ lazy val catalogTests = crossProject(JVMPlatform, JSPlatform)
   .settings(
     name := "lucuma-catalog-tests",
     libraryDependencies ++= Seq(
-      "org.typelevel"          %%% "cats-effect"         % catsEffectVersion      % Test,
-      "org.scalameta"          %%% "munit"               % munitVersion           % Test,
-      "org.typelevel"          %%% "discipline-munit"    % munitDisciplineVersion % Test,
-      "org.typelevel"          %%% "munit-cats-effect"   % munitCatsEffectVersion % Test,
-      "org.scala-lang.modules" %%% "scala-xml"           % scalaXmlVersion        % Test,
-      "org.http4s"             %%% "http4s-core"         % http4sVersion,
-      "com.lihaoyi"            %%% "pprint"              % pprintVersion,
-      "org.typelevel"          %%% "cats-time"           % catsTimeVersion
+      "org.typelevel"          %% "cats-effect"         % catsEffectVersion      % Test,
+      "org.scalameta"          %% "munit"               % munitVersion           % Test,
+      "org.typelevel"          %% "discipline-munit"    % munitDisciplineVersion % Test,
+      "org.typelevel"          %% "munit-cats-effect"   % munitCatsEffectVersion % Test,
+      "org.scala-lang.modules" %% "scala-xml"           % scalaXmlVersion        % Test,
+      "org.http4s"             %% "http4s-core"         % http4sVersion,
+      "com.lihaoyi"            %% "pprint"              % pprintVersion,
+      "org.typelevel"          %% "cats-time"           % catsTimeVersion
     )
   )
   .jsSettings(
     scalacOptions ~= (_.filterNot(Set("-Wdead-code"))),
     libraryDependencies ++= Seq(
-      "org.http4s" %%% "http4s-dom" % http4sDomVersion
+      "org.http4s" %% "http4s-dom" % http4sDomVersion
     ),
   )
   .jvmSettings(
@@ -303,11 +304,11 @@ lazy val npmPublish = taskKey[Unit]("Run npm publish")
 lazy val npm        = project
   .in(file("modules/npm"))
   .dependsOn(core.js)
-  .enablePlugins(ScalaJSPlugin, NoPublishPlugin, BundleMonPlugin)
+  .enablePlugins(ScalaJSPlugin, NoPublishPlugin)
   .settings(
     scalaJSLinkerConfig ~= (_.withModuleKind(ModuleKind.ESModule)
       .withESFeatures(_.withESVersion(ESVersion.ES2021).withAvoidLetsAndConsts(false))),
-    npmPackage := {
+    npmPackage := Def.uncached {
       val _      = (Compile / fullLinkJS).value
       val outDir = (Compile / fullLinkJS / scalaJSLinkerOutputDirectory).value
       IO.write(
@@ -315,7 +316,7 @@ lazy val npm        = project
         s"""|{
             |  "name": "@gemini-hlsw/lucuma-core",
             |  "version": "${version.value}",
-            |  "license": "${licenses.value.head._1}",
+            |  "license": "${licenses.value.head.spdxId}",
             |  "main": "main.js",
             |  "types": "main.d.ts",
             |  "type": "module",
@@ -330,14 +331,14 @@ lazy val npm        = project
       streams.value.log.info(s"Created NPM project in ${outDir}")
       outDir
     },
-    npmPublish := {
+    npmPublish := Def.uncached {
       import scala.sys.process._
       val outDir = npmPackage.value
       Process(List("npm", "publish"), outDir).!!
       streams.value.log.info(s"Published NPM package from ${outDir}")
     },
     libraryDependencies ++= Seq(
-      "org.scalameta" %%% "munit" % munitVersion % Test
+      "org.scalameta" %% "munit" % munitVersion % Test
     )
   )
 
