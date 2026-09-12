@@ -137,16 +137,18 @@ class ShapeExpressionSuite extends munit.DisciplineSuite with RetryFlakyTests {
   }
 
 
-  // There is a bug apparently in JTS that makes the area calculation a bit off
-  // after rotation and/or translation in some cases.  This is expressed as a
-  // maximum fraction of the nominal area of the original shape.
+  // Area is computed by JTS on doubles and then rounded to a Long of µas², so
+  // the same shape rotated or moved can legitimately differ by 1 µas² when the
+  // two unrounded values fall on opposite sides of a .5 boundary. On top of that
+  // there is a tiny floating-point drift proportional to the area. The
+  // tolerance below is a fraction of the nominal area and must absorb both.
 
   test("area is the 'same' after rotation") {
     forAll(genShape, arbitrary[Angle]) { (e: ShapeExpression, a) =>
       val nominal = e.µasSquared
       val rotated = (e ⟲ a).µasSquared
       val error   = if (nominal === 0L) 0.0 else (nominal - rotated).toDouble / nominal.toDouble
-      assertEqualsDouble(error, 0.0, 1.0e-13)
+      assertEqualsDouble(error, 0.0, 1.0e-12)
     }
   }
 
@@ -155,7 +157,7 @@ class ShapeExpressionSuite extends munit.DisciplineSuite with RetryFlakyTests {
       val nominal = e.µasSquared
       val moved   = (e ↗ o).µasSquared
       val error   = if (nominal === 0L) 0.0 else (nominal - moved).toDouble / nominal.toDouble
-      assertEqualsDouble(error, 0.0, 1.0e-13)
+      assertEqualsDouble(error, 0.0, 1.0e-12)
     }
   }
 
