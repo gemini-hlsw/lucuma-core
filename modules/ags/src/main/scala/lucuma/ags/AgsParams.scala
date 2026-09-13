@@ -57,6 +57,17 @@ trait SingleProbeAgsParams:
 
   def scienceArea(posAngle: Angle, offset: Offset): ShapeExpression
 
+  /**
+   * The science area in its own frame. Every `scienceArea` places a fixed shape with `shapeAt`, so
+   * the unplaced shape is what that placement leaves behind at the base. Evaluating this once and
+   * transforming it per position replaces one polygon build per position with one affine pair.
+   * `ShapePlacementSuite` holds the law.
+   */
+  def scienceAreaShape: ShapeExpression = scienceArea(Angle.Angle0, Offset.Zero)
+
+  /** The patrol field in its own frame; `patrolFieldAt` places it with `shapePivotAt`. */
+  def patrolFieldShape: ShapeExpression = patrolFieldAt(Angle.Angle0, Offset.Zero, Offset.Zero)
+
   // The arm in its own frame, mirror at the origin, independent of position and guide star.
   def probeArmShape: ShapeExpression
 
@@ -86,6 +97,12 @@ trait SingleProbeAgsParams:
     val distinctOffsets: NonEmptyList[(Offset, Offset)] =
       positions.map(pos => (pos.offsetPos, pos.pivot)).distinct
 
+    // The three unplaced shapes, evaluated once for the whole run and then placed per position.
+    val patrolFieldEval: Shape                = patrolFieldShape.eval
+    val scienceAreaEval: Shape                = scienceAreaShape.eval
+    val extendedVignettingEval: Option[Shape] =
+      extendedVignettingArea.map(_.apply(Angle.Angle0, Offset.Zero).eval)
+
     // We can cache the intersection shapes for each tested pos angle.
     val intersectionByPA: Map[Angle, (ShapeExpression, Shape, BoundingOffsets)] =
       positions.toList
@@ -97,8 +114,11 @@ trait SingleProbeAgsParams:
               .map((offset, pivot) => patrolFieldAt(posAngle, offset, pivot))
               .reduce(using _ ∩ _)
 
-          // eval is expensive. call it only once.
-          val shape = se.eval
+          // One evaluated patrol field placed per offset, rather than rebuilt at each of them.
+          val shape =
+            distinctOffsets
+              .map((offset, pivot) => patrolFieldEval.transform(offset - pivot, posAngle, pivot))
+              .reduceLeft(_.intersection(_))
           posAngle -> (se, shape, shape.boundingOffsets)
         .toMap
 
@@ -114,22 +134,20 @@ trait SingleProbeAgsParams:
 
         override val intersectionPatrolField: ShapeExpression = pfExpr
 
-        private val scienceAreaShape =
-          scienceArea(position.posAngle, position.offsetPos)
-
         private val intersectionShape: Shape = pfShape
 
         // Cache bounding box for fast rejection
         private val intersectionBounds: BoundingOffsets = pfBounds
 
-        private val scienceAreaShapeEval: Shape =
-          scienceAreaShape.eval
+        private def placed(shape: Shape): Shape =
+          shape.transform(position.offsetPos, position.posAngle, Offset.Zero)
+
+        private val scienceAreaShapeEval: Shape = placed(scienceAreaEval)
 
         // Default to the science area for the vignetting score; instruments
         // may extend it with an additional region.
         private val vignettingShapeEval: Shape =
-          extendedVignettingArea
-            .fold(scienceAreaShapeEval)(_.apply(position.posAngle, position.offsetPos).eval)
+          extendedVignettingEval.fold(scienceAreaShapeEval)(placed)
 
         private val vignettingBounds: BoundingOffsets = vignettingShapeEval.boundingOffsets
 
@@ -139,7 +157,10 @@ trait SingleProbeAgsParams:
 
         private def armAt(gsOffset: Offset): Option[Shape] =
           armShape.map(
-            _.transform(probeArmAngle(position.posAngle, gsOffset, position.offsetPos), gsOffset)
+            _.transform(Offset.Zero,
+                        probeArmAngle(position.posAngle, gsOffset, position.offsetPos),
+                        gsOffset
+            )
           )
 
         // Disjoint bounding boxes settle both questions without an overlay.

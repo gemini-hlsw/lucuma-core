@@ -40,9 +40,18 @@ final case class JtsShape(g: Geometry) extends Shape {
     case JtsShape(thatG) => JtsShape(g.intersection(thatG))
     case _               => throw new UnsupportedOperationException("Cannot intersect non-JTS shapes")
 
-  // Two transforms in sequence, exactly as the interpreter evaluates Rotate then Translate.
-  def transform(rotation: Angle, translation: Offset): Shape =
-    val c       = translation.coordinate
-    val rotated = AffineTransformation.rotationInstance(rotation.toDoubleRadians).transform(g)
-    JtsShape(AffineTransformation.translationInstance(c.x, c.y).transform(rotated))
+  // Each step applied in sequence, exactly as the interpreter evaluates Translate, Rotate and
+  // Translate. Identity steps are skipped: transforming by them is a no-op on every coordinate, so
+  // the result stays bit-identical to evaluating the expression.
+  def transform(preTranslation: Offset, rotation: Angle, postTranslation: Offset): Shape =
+    def translate(geom: Geometry, o: Offset): Geometry =
+      val c = o.coordinate
+      if (c.x == 0.0 && c.y == 0.0) geom
+      else AffineTransformation.translationInstance(c.x, c.y).transform(geom)
+
+    def rotate(geom: Geometry): Geometry =
+      if (rotation.toMicroarcseconds == 0L) geom
+      else AffineTransformation.rotationInstance(rotation.toDoubleRadians).transform(geom)
+
+    JtsShape(translate(rotate(translate(g, preTranslation)), postTranslation))
 }
