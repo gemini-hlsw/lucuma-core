@@ -3,7 +3,11 @@
 
 package lucuma.catalog
 
+import cats.syntax.all.*
+import lucuma.core.enums.Band
 import lucuma.core.math.BrightnessValue
+
+import scala.collection.immutable.SortedMap
 
 /**
  * Transformations from Gaia photometry to other systems. Gaia has no R band, but Altair guide star
@@ -51,3 +55,16 @@ object GaiaPhotometry:
     Option
       .when(colour > MinBpMinusRp && colour < MaxBpMinusRp)(colour)
       .flatMap(c => BrightnessValue.from(g.value.value - BigDecimal(gMinusR(c))).toOption)
+
+  /**
+   * Adds an estimated R to a set of brightnesses that has G, BP and RP but no R of its own. A
+   * catalog R is never overwritten.
+   */
+  def withEstimatedR(
+    brightnesses: SortedMap[Band, BrightnessValue]
+  ): SortedMap[Band, BrightnessValue] =
+    if brightnesses.contains(Band.R) then brightnesses
+    else
+      (brightnesses.get(Band.Gaia), brightnesses.get(Band.GaiaBP), brightnesses.get(Band.GaiaRP))
+        .flatMapN(johnsonCousinsR)
+        .fold(brightnesses)(r => brightnesses + (Band.R -> r))

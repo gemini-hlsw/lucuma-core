@@ -128,9 +128,9 @@ object ShortCut9024App extends IOApp.Simple {
 
             // No-zones (science/IFU targets) as base-relative offsets, for the
             // independent overlap check.
-            val noZones                                       = List(t1, t2).map(base.diff(_).offset)
-            def overlapsFor(gsc: GuideStarCandidate): Boolean =
-              overlapsProtected(base.diff(gsc.tracking.baseCoordinates).offset, noZones)
+            val noZones                                             = List(t1, t2).map(base.diff(_).offset)
+            def overlapsFor(candidate: GuideStarCandidate): Boolean =
+              overlapsProtected(base.diff(candidate.tracking.baseCoordinates).offset, noZones)
 
             // Verdict for the known offending star.
             val offending = analyses.filter(_.target.id === OffendingId)

@@ -27,6 +27,8 @@ import lucuma.core.model.ElevationRange
 import lucuma.core.model.ImageQuality
 import lucuma.core.model.SiderealTracking
 
+import scala.collection.immutable.SortedMap
+
 // Regression tests for the GHOST ifu vignetting
 class ShortCut_9024 extends munit.FunSuite {
 
@@ -47,8 +49,8 @@ class ShortCut_9024 extends munit.FunSuite {
     GuideStarCandidate(
       0L,
       SiderealTracking.const(coordAt(offset)),
-      (Band.Gaia, BrightnessValue.unsafeFrom(12.0)).some
-    ).get
+      SortedMap[Band, BrightnessValue](Band.Gaia -> BrightnessValue.unsafeFrom(12.0))
+    )
 
   private def ghostAnalysis(
     gs:             GuideStarCandidate,
@@ -106,8 +108,8 @@ class ShortCut_9024 extends munit.FunSuite {
     GuideStarCandidate(
       id,
       SiderealTracking.const(coord(ra, dec)),
-      (Band.GaiaRP, BrightnessValue.unsafeFrom(g)).some
-    ).get
+      SortedMap[Band, BrightnessValue](Band.GaiaRP -> BrightnessValue.unsafeFrom(g))
+    )
 
   test("selects a clean guide star over a brighter vignetting one") {
     val realConstraints = ConstraintSet(

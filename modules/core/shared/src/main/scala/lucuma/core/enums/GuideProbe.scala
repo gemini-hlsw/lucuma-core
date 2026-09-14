@@ -21,6 +21,7 @@ enum GuideProbe(val tag: String) derives Enumerated:
   case PWFS2           extends GuideProbe("Pwfs2") with PWFSProbe
   case GmosOIWFS       extends GuideProbe("GmosOiwfs")
   case Flamingos2OIWFS extends GuideProbe("Flamingos2Oiwfs")
+  case AltairAOWFS     extends GuideProbe("AltairAowfs")
 
   def candidatesArea: ShapeExpression = this match
     // For pwfs1/2 417"
@@ -29,17 +30,21 @@ enum GuideProbe(val tag: String) derives Enumerated:
     case GmosOIWFS       => geom.gmos.candidatesArea.candidatesArea
     // For f2 oiwfs 222"
     case Flamingos2OIWFS => geom.flamingos2.candidatesArea.candidatesArea(Flamingos2LyotWheel.F16)
+    // For Altair 54", the patrol field oval at any position angle
+    case AltairAOWFS     => geom.altair.patrolField.candidatesArea
 
 object GuideProbe:
   given Enumerated[PWFSGuideProbe] = Enumerated.from(GuideProbe.PWFS1, GuideProbe.PWFS2).withTag(_.tag)
 
   /**
-   * Probes ranked best-first: an OIWFS beats PWFS2, which beats PWFS1. Every
-   * probe gets its own rank so the order is total and usable in a SortedSet.
+   * Probes ranked best-first: the Altair AOWFS beats an OIWFS, which beats PWFS2,
+   * which beats PWFS1. Every probe gets its own rank so the order is total and
+   * usable in a SortedSet.
    */
   val Preference: Order[GuideProbe] =
     Order.by:
-      case GmosOIWFS       => 0
-      case Flamingos2OIWFS => 1
-      case PWFS2           => 2
-      case PWFS1           => 3
+      case AltairAOWFS     => 0
+      case GmosOIWFS       => 1
+      case Flamingos2OIWFS => 2
+      case PWFS2           => 3
+      case PWFS1           => 4
