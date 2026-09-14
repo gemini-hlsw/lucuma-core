@@ -15,8 +15,12 @@ import fs2.data.xml.*
 import lucuma.catalog.*
 import lucuma.core.enums.Band
 import lucuma.core.enums.CatalogName
+import lucuma.core.geom.ShapeExpression
+import lucuma.core.geom.jts.interpreter.given
+import lucuma.core.geom.syntax.all.*
 import lucuma.core.math.BrightnessUnits.*
 import lucuma.core.math.BrightnessValue
+import lucuma.core.math.Coordinates
 import lucuma.core.math.Declination
 import lucuma.core.math.Epoch
 import lucuma.core.math.Parallax
@@ -24,6 +28,7 @@ import lucuma.core.math.ProperMotion
 import lucuma.core.math.RadialVelocity
 import lucuma.core.math.RightAscension
 import lucuma.core.math.dimensional.syntax.*
+import lucuma.core.math.syntax.int.*
 import lucuma.core.math.units.*
 import lucuma.core.model.CatalogInfo
 import lucuma.core.model.Target
@@ -159,5 +164,69 @@ class AdaptersSuite extends CatsEffectSuite with VoTableParser with VoTableSampl
         case Left(e)  =>
           fail(s"Gaia response could not be parsed: ${e.toList.mkString("; ")}")
       }
+  }
+
+  test("guide stars keep every Gaia band so R can be estimated") {
+    Stream
+      .emits(Utility.trim(voTableGaiaGuideStar).toString)
+      .through(events[IO, Char]())
+      .through(referenceResolver[IO]())
+      .through(normalize[IO])
+      .through(VoTableParser.xml2guidestars[IO](CatalogAdapter.Gaia3Esa))
+      .compile
+      .lastOrError
+      .map {
+        case Right(t) =>
+          assertEquals(
+            Target.integratedBrightnessIn(Band.Gaia).headOption(t).map(_.value),
+            BrightnessValue.unsafeFrom(14.5).some
+          )
+          assertEquals(
+            Target.integratedBrightnessIn(Band.GaiaBP).headOption(t).map(_.value),
+            BrightnessValue.unsafeFrom(15.2).some
+          )
+          assertEquals(
+            Target.integratedBrightnessIn(Band.GaiaRP).headOption(t).map(_.value),
+            BrightnessValue.unsafeFrom(13.7).some
+          )
+        case Left(e)  => fail(s"Gaia response could not be parsed: ${e.toList.mkString("; ")}")
+      }
+  }
+
+  test("an R band constraint queries G widened by the G - R range") {
+    given ADQLInterpreter = ADQLInterpreter.nTarget(10)
+    val constraints       = BrightnessConstraints(
+      BandsList.RBandsList,
+      FaintnessConstraint(BrightnessValue.unsafeFrom(15.0)),
+      SaturationConstraint(BrightnessValue.unsafeFrom(8.0)).some
+    )
+    val query             = QueryByADQL(
+      Coordinates.Zero,
+      ShapeExpression.centeredEllipse(10.arcseconds, 10.arcseconds),
+      constraints.some
+    )
+    val adql              = summon[ADQLInterpreter].buildQueryString(CatalogAdapter.Gaia3Esa, query)
+    assert(adql.contains("(phot_g_mean_mag between 7.646 and 15.264)"), adql)
+  }
+
+  test("a Gaia band constraint queries the Gaia columns unchanged") {
+    given ADQLInterpreter = ADQLInterpreter.nTarget(10)
+    val constraints       = BrightnessConstraints(
+      BandsList.GaiaBandsList,
+      FaintnessConstraint(BrightnessValue.unsafeFrom(15.0)),
+      none
+    )
+    val query             = QueryByADQL(
+      Coordinates.Zero,
+      ShapeExpression.centeredEllipse(10.arcseconds, 10.arcseconds),
+      constraints.some
+    )
+    val adql              = summon[ADQLInterpreter].buildQueryString(CatalogAdapter.Gaia3Esa, query)
+    assert(
+      adql.contains(
+        "(phot_rp_mean_mag < 15.000) or (phot_g_mean_mag < 15.000) or (phot_bp_mean_mag < 15.000)"
+      ),
+      adql
+    )
   }
 }

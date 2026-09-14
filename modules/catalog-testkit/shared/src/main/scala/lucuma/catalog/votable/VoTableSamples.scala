@@ -560,6 +560,88 @@ trait VoTableSamples {
       </RESOURCE>
     </VOTABLE>
 
+  // As above but with all three Gaia magnitudes, as an Altair guide star needs BP and RP for R
+  lazy val voTableGaiaGuideStar =
+    <VOTABLE version="1.4" xmlns="http://www.ivoa.net/xml/VOTable/v1.3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ivoa.net/xml/VOTable/v1.3 http://www.ivoa.net/xml/VOTable/v1.3">
+      <RESOURCE type="results">
+      <INFO name="QUERY_STATUS" value="OK" />
+
+      <INFO name="QUERY" value="SELECT TOP 1 designation,pmra,pmdec,ref_epoch,parallax,radial_velocity,phot_g_mean_mag,phot_bp_mean_mag,phot_rp_mean_mag ,COORD1(EPOCH_PROP_POS(ra, dec, parallax, pmra, pmdec, radial_velocity, 2015.5, 2000)) as ra,COORD2(EPOCH_PROP_POS(ra, dec, parallax, pmra, pmdec, radial_velocity, 2015.5, 2000)) as dec
+          FROM gaiadr2.gaia_source
+          WHERE CONTAINS(POINT(&#039;ICRS&#039;,ra,dec),CIRCLE(&#039;ICRS&#039;, 244.26004167, -22.97608333, 0.04083333))=1
+
+            "><![CDATA[SELECT TOP 1 designation,pmra,pmdec,ref_epoch,parallax,radial_velocity,phot_g_mean_mag,phot_bp_mean_mag,phot_rp_mean_mag ,COORD1(EPOCH_PROP_POS(ra, dec, parallax, pmra, pmdec, radial_velocity, 2015.5, 2000)) as ra,COORD2(EPOCH_PROP_POS(ra, dec, parallax, pmra, pmdec, radial_velocity, 2015.5, 2000)) as dec
+          FROM gaiadr2.gaia_source
+          WHERE CONTAINS(POINT('ICRS',ra,dec),CIRCLE('ICRS', 244.26004167, -22.97608333, 0.04083333))=1
+
+            ]]></INFO>
+      <INFO name="CAPTION" value="How to cite and acknowledge Gaia: https://gea.esac.esa.int/archive/documentation/credits.html"><![CDATA[How to cite and acknowledge Gaia: https://gea.esac.esa.int/archive/documentation/credits.html]]></INFO>
+      <INFO name="PAGE" value="" />
+      <INFO name="PAGE_SIZE" value="" />
+      <INFO name="JOBID" value="1649874610452O"><![CDATA[1649874610452O]]></INFO>
+      <INFO name="JOBNAME" value="" />
+
+      <TABLE>
+      <FIELD ID="DESIGNATION" arraysize="*" datatype="char" name="designation" ucd="meta.id;meta.main">
+      <DESCRIPTION>Unique source designation (unique across all Data Releases)</DESCRIPTION>
+      </FIELD>
+      <FIELD datatype="double" name="pmra" ucd="pos.pm;pos.eq.ra" unit="mas.yr**-1">
+      <DESCRIPTION>Proper motion in right ascension direction</DESCRIPTION>
+      </FIELD>
+      <FIELD datatype="double" name="pmdec" ucd="pos.pm;pos.eq.dec" unit="mas.yr**-1">
+      <DESCRIPTION>Proper motion in declination direction</DESCRIPTION>
+      </FIELD>
+      <FIELD datatype="double" name="ref_epoch" ucd="meta.ref;time.epoch" unit="yr">
+      <DESCRIPTION>Reference epoch</DESCRIPTION>
+      </FIELD>
+      <FIELD datatype="double" name="parallax" ucd="pos.parallax" unit="mas">
+      <DESCRIPTION>Parallax</DESCRIPTION>
+      </FIELD>
+      <FIELD datatype="double" name="radial_velocity" ucd="spect.dopplerVeloc.opt" unit="km.s**-1">
+      <DESCRIPTION>Radial velocity</DESCRIPTION>
+      </FIELD>
+      <FIELD datatype="float" name="phot_g_mean_mag" ucd="phot.mag;stat.mean;em.opt" unit="mag">
+      <DESCRIPTION>G-band mean magnitude</DESCRIPTION>
+      </FIELD>
+      <FIELD datatype="float" name="phot_bp_mean_mag" ucd="phot.mag;stat.mean" unit="mag">
+      <DESCRIPTION>Integrated BP mean magnitude</DESCRIPTION>
+      </FIELD>
+      <FIELD datatype="float" name="phot_rp_mean_mag" ucd="phot.mag;stat.mean" unit="mag">
+      <DESCRIPTION>Integrated RP mean magnitude</DESCRIPTION>
+      </FIELD>
+      <FIELD datatype="double" name="ra"/>
+      <FIELD datatype="double" name="dec"/>
+      <DATA>
+      <TABLEDATA>
+        <TR>
+          <TD>Gaia DR2 6050423032358097664</TD>
+          <TD></TD>
+          <TD></TD>
+          <TD>2015.5</TD>
+          <TD></TD>
+          <TD></TD>
+          <TD>14.5</TD>
+          <TD>15.2</TD>
+          <TD>13.7</TD>
+          <TD>244.26317318202356</TD>
+          <TD>-22.954945101383874</TD>
+        </TR>
+      </TABLEDATA>
+      </DATA>
+
+      </TABLE>
+      </RESOURCE>
+      <RESOURCE type="meta" utype="adhoc:service" name="ancillary">
+          <DESCRIPTION>Retrieve DataLink file containing ancillary data for source</DESCRIPTION>
+          <PARAM name="standardID" datatype="char" arraysize="*" value="ivo://ivoa.net/std/DataLink#links-1.0"/>
+          <PARAM name="accessURL" datatype="char" arraysize="*" value="https://gea.esac.esa.int/data-server/datalink/links"/>
+          <PARAM name="contentType" datatype="char" arraysize="*" value="application/x-votable+xml;content=datalink"/>
+          <GROUP name="inputParams">
+              <PARAM name="ID"  datatype="char" arraysize="*" value="" ref="DESIGNATION"/>
+          </GROUP>
+      </RESOURCE>
+    </VOTABLE>
+
   // Sample for GAVO
   // parallax:              pos.parallax
   // radial_velocity_error: stat.error;spect.dopplerVeloc

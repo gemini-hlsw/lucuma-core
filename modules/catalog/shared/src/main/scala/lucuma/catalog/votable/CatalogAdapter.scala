@@ -388,20 +388,21 @@ object CatalogAdapter {
 
     protected def brightnessQuery(constraints: Option[BrightnessConstraints]): String = {
       val conditions = constraints.toList.flatMap { bc =>
-        val faintness  = bc.faintnessConstraint.brightness.value.value.toDouble
-        val saturation = bc.saturationConstraint.map(_.brightness.value.value.toDouble)
+        val faintness                = bc.faintnessConstraint.brightness.value.value.toDouble
+        val saturation               = bc.saturationConstraint.map(_.brightness.value.value.toDouble)
+        // Gaia has no R column: constrain G instead, widened by the G - R range so no star whose
+        // estimated R is in range is dropped. Consumers apply the exact R limits.
+        val (minGMinusR, maxGMinusR) = GaiaPhotometry.GMinusRBounds
         bc.searchBands.bands
-          .collect {
-            case Band.Gaia   => gMagField.id
-            case Band.GaiaBP => bpMagField.id
-            case Band.GaiaRP => rpMagField.id
-          }
-          .map { bid =>
-            saturation match {
-              case Some(sat) => f"($bid between $sat%.3f and $faintness%.3f)"
-              case None      => f"($bid < $faintness%.3f)"
-            }
-          }
+          .collect:
+            case Band.Gaia   => (gMagField.id, faintness, saturation)
+            case Band.GaiaBP => (bpMagField.id, faintness, saturation)
+            case Band.GaiaRP => (rpMagField.id, faintness, saturation)
+            case Band.R      => (gMagField.id, faintness + maxGMinusR, saturation.map(_ + minGMinusR))
+          .map: (bid, faint, sat) =>
+            sat match
+              case Some(sat) => f"($bid between $sat%.3f and $faint%.3f)"
+              case None      => f"($bid < $faint%.3f)"
       }
       if (conditions.isEmpty) "" else conditions.mkString("and (", " or ", ")")
     }
