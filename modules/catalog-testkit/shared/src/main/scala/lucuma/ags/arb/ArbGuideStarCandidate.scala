@@ -17,25 +17,29 @@ import org.scalacheck.*
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Cogen.*
 
+import scala.collection.immutable.SortedMap
+
 trait ArbGuideStarCandidate:
   import ArbNewType.given
   import ArbRefined.given
   import ArbSiderealTracking.given
 
-  given Arbitrary[GuideStarCandidate] =
-    given Arbitrary[Band] = Arbitrary(Gen.oneOf(BandsList.GaiaBandsList.bands))
+  private val candidateBands: List[Band] = (BandsList.GaiaBandsList ∪ BandsList.RBandsList).bands
 
+  given Arbitrary[GuideStarCandidate] =
     Arbitrary:
       for {
-        n <- arbitrary[Long]
-        t <- arbitrary[SiderealTracking]
-        g <- arbitrary[Option[(Band, BrightnessValue)]]
-        // This is safe because we have a local Band arbitrary
-      } yield GuideStarCandidate.unsafeApply(n, t, g)
+        id           <- arbitrary[Long]
+        tracking     <- arbitrary[SiderealTracking]
+        bands        <- Gen.someOf(candidateBands)
+        brightnesses <- Gen.sequence[List[(Band, BrightnessValue)], (Band, BrightnessValue)](
+                          bands.toList.map(band => arbitrary[BrightnessValue].map(band -> _))
+                        )
+      } yield GuideStarCandidate(id, tracking, SortedMap.from(brightnesses))
 
   given Cogen[GuideStarCandidate] =
-    Cogen[(Long, SiderealTracking, Option[(Band, BrightnessValue)])].contramap(r =>
-      (r.id, r.tracking, r.gBrightness)
+    Cogen[(Long, SiderealTracking, List[(Band, BrightnessValue)])].contramap(candidate =>
+      (candidate.id, candidate.tracking, candidate.brightnesses.toList)
     )
 
 object ArbGuideStarCandidate extends ArbGuideStarCandidate

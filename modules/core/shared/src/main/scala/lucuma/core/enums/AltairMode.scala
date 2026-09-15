@@ -21,3 +21,8 @@ enum AltairMode(val tag: String, val name: String) derives Enumerated, Display:
   def usesLaser: Boolean = this match
     case Ngs         => false
     case Lgs | LgsP1 => true
+
+  /** The wavefront sensor that holds the natural guide star. */
+  def guideProbe: GuideProbe = this match
+    case Ngs | Lgs => GuideProbe.AltairAOWFS
+    case LgsP1     => GuideProbe.PWFS1

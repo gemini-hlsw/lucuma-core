@@ -3,8 +3,11 @@
 
 package lucuma.catalog
 
+import lucuma.core.enums.Band
 import lucuma.core.math.BrightnessValue
 import munit.FunSuite
+
+import scala.collection.immutable.SortedMap
 
 class GaiaPhotometrySuite extends FunSuite:
 
@@ -40,4 +43,27 @@ class GaiaPhotometrySuite extends FunSuite:
     // The polynomial peaks at 0.2645 near BP - RP = 1.43 and dips to -0.3542 at the red end
     assertEqualsDouble(max, 0.27, 1e-9)
     assertEqualsDouble(min, -0.36, 1e-9)
+  }
+
+  test("estimatedR derives R from G, BP and RP") {
+    val gaia = SortedMap[Band, BrightnessValue](Band.Gaia -> bv(14.5),
+                                                Band.GaiaBP -> bv(15.2),
+                                                Band.GaiaRP -> bv(14.2)
+    )
+    assertEqualsDouble(GaiaPhotometry.estimatedR(gaia).get.value.value.toDouble,
+                       14.5 - 0.238865,
+                       1e-6
+    )
+  }
+
+  test("estimatedR needs all three Gaia bands") {
+    assertEquals(GaiaPhotometry.estimatedR(SortedMap[Band, BrightnessValue](Band.Gaia -> bv(14.5))),
+                 None
+    )
+    assertEquals(
+      GaiaPhotometry.estimatedR(
+        SortedMap[Band, BrightnessValue](Band.Gaia -> bv(14.5), Band.GaiaRP -> bv(14.2))
+      ),
+      None
+    )
   }

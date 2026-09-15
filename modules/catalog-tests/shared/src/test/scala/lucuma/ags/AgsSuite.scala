@@ -28,17 +28,19 @@ import lucuma.core.model.ImageQuality
 import lucuma.core.model.SiderealTracking
 import lucuma.core.model.sequence.flamingos2.Flamingos2FpuMask
 
+import scala.collection.immutable.SortedMap
+
 class AgsSuite extends munit.FunSuite {
-  val gs1 = GuideStarCandidate.unsafeApply(
+  val gs1 = GuideStarCandidate(
     0L,
     SiderealTracking.const(Coordinates.Zero),
-    (Band.Gaia, BrightnessValue.unsafeFrom(16.05)).some
+    SortedMap[Band, BrightnessValue](Band.Gaia -> BrightnessValue.unsafeFrom(16.05))
   )
 
-  val gs2 = GuideStarCandidate.unsafeApply(
+  val gs2 = GuideStarCandidate(
     1L,
     SiderealTracking.const(Coordinates.Zero),
-    (Band.Gaia, BrightnessValue.unsafeFrom(11.23)).some
+    SortedMap[Band, BrightnessValue](Band.Gaia -> BrightnessValue.unsafeFrom(11.23))
   )
 
   extension (l: Long) def toArea: Area = Area.fromMicroarcsecondsSquared.getOption(l).get
@@ -143,14 +145,14 @@ class AgsSuite extends munit.FunSuite {
     )
 
     val guideStarOffset =
-      GuideStarCandidate.unsafeApply(
+      GuideStarCandidate(
         0L,
         SiderealTracking.const(
           Coordinates.Zero
             .offsetBy(Angle.Angle0, Offset.signedDecimalArcseconds.reverseGet(0.0, 23.0))
             .get
         ),
-        (Band.Gaia, BrightnessValue.unsafeFrom(15)).some
+        SortedMap[Band, BrightnessValue](Band.Gaia -> BrightnessValue.unsafeFrom(15))
       )
 
     assert(
@@ -210,14 +212,14 @@ class AgsSuite extends munit.FunSuite {
     )
 
     val guideStarOffset =
-      GuideStarCandidate.unsafeApply(
+      GuideStarCandidate(
         0L,
         SiderealTracking.const(
           Coordinates.Zero
             .offsetBy(Angle.Angle0, Offset.signedDecimalArcseconds.reverseGet(0.0, 23.0))
             .get
         ),
-        (Band.Gaia, BrightnessValue.unsafeFrom(15)).some
+        SortedMap[Band, BrightnessValue](Band.Gaia -> BrightnessValue.unsafeFrom(15))
       )
 
     assert(
@@ -280,14 +282,14 @@ class AgsSuite extends munit.FunSuite {
     )
 
     val guideStarOffset =
-      GuideStarCandidate.unsafeApply(
+      GuideStarCandidate(
         0L,
         SiderealTracking.const(
           Coordinates.Zero
             .offsetBy(Angle.Angle0, Offset.signedDecimalArcseconds.reverseGet(0.0, 23.0))
             .get
         ),
-        (Band.Gaia, BrightnessValue.unsafeFrom(15)).some
+        SortedMap[Band, BrightnessValue](Band.Gaia -> BrightnessValue.unsafeFrom(15))
       )
 
     assert(
@@ -324,10 +326,10 @@ class AgsSuite extends munit.FunSuite {
 
     val wavelength = Wavelength.fromIntNanometers(300).get
 
-    val pwfsGS = GuideStarCandidate.unsafeApply(
+    val pwfsGS = GuideStarCandidate(
       0L,
       SiderealTracking.const(Coordinates.Zero),
-      (Band.Gaia, BrightnessValue.unsafeFrom(12.0)).some
+      SortedMap[Band, BrightnessValue](Band.Gaia -> BrightnessValue.unsafeFrom(12.0))
     )
 
     assert(
@@ -352,14 +354,14 @@ class AgsSuite extends munit.FunSuite {
     )
 
     val guideStarOffset =
-      GuideStarCandidate.unsafeApply(
+      GuideStarCandidate(
         0L,
         SiderealTracking.const(
           Coordinates.Zero
             .offsetBy(Angle.Angle0, Offset.signedDecimalArcseconds.reverseGet(0.0, 23.0))
             .get
         ),
-        (Band.Gaia, BrightnessValue.unsafeFrom(15)).some
+        SortedMap[Band, BrightnessValue](Band.Gaia -> BrightnessValue.unsafeFrom(15))
       )
 
     assert(
@@ -393,10 +395,10 @@ class AgsSuite extends munit.FunSuite {
 
     val wavelength = Wavelength.fromIntNanometers(300).get
 
-    val pwfsGS = GuideStarCandidate.unsafeApply(
+    val pwfsGS = GuideStarCandidate(
       0L,
       SiderealTracking.const(Coordinates.Zero),
-      (Band.Gaia, BrightnessValue.unsafeFrom(12.0)).some
+      SortedMap[Band, BrightnessValue](Band.Gaia -> BrightnessValue.unsafeFrom(12.0))
     )
 
     val gnirsParams =
@@ -428,14 +430,14 @@ class AgsSuite extends munit.FunSuite {
     )
 
     val guideStarOffset =
-      GuideStarCandidate.unsafeApply(
+      GuideStarCandidate(
         0L,
         SiderealTracking.const(
           Coordinates.Zero
             .offsetBy(Angle.Angle0, Offset.signedDecimalArcseconds.reverseGet(0.0, 23.0))
             .get
         ),
-        (Band.Gaia, BrightnessValue.unsafeFrom(15)).some
+        SortedMap[Band, BrightnessValue](Band.Gaia -> BrightnessValue.unsafeFrom(15))
       )
 
     assert(
@@ -491,14 +493,14 @@ class AgsSuite extends munit.FunSuite {
     )
 
     val guideStarOffset =
-      GuideStarCandidate.unsafeApply(
+      GuideStarCandidate(
         0L,
         SiderealTracking.const(
           Coordinates.Zero
             .offsetBy(Angle.Angle0, Offset.signedDecimalArcseconds.reverseGet(0.0, 23.0))
             .get
         ),
-        (Band.Gaia, BrightnessValue.unsafeFrom(15)).some
+        SortedMap[Band, BrightnessValue](Band.Gaia -> BrightnessValue.unsafeFrom(15))
       )
 
     assert(
@@ -532,14 +534,14 @@ class AgsSuite extends munit.FunSuite {
     val wavelength  = Wavelength.fromIntNanometers(300).get
 
     // candiate whithin OIWFS patrol field but too faint for PWFS1
-    val faintStar = GuideStarCandidate.unsafeApply(
+    val faintStar = GuideStarCandidate(
       0L,
       SiderealTracking.const(
         Coordinates.Zero
           .offsetBy(Angle.Angle0, Offset.signedDecimalArcseconds.reverseGet(0.0, 23.0))
           .get
       ),
-      (Band.Gaia, BrightnessValue.unsafeFrom(17.0)).some
+      SortedMap[Band, BrightnessValue](Band.Gaia -> BrightnessValue.unsafeFrom(17.0))
     )
 
     val gmosParams = AgsParams.GmosLongSlit(
@@ -566,5 +568,87 @@ class AgsSuite extends munit.FunSuite {
 
     // PWFS1 requires bright starts 17 > 16.03
     assert(runAgs(gmosParams.withPWFS1).analyses.headOption.forall(!_.isUsable))
+  }
+
+  test("altair guides on the AOWFS oval using the estimated R magnitude") {
+    val constraints = ConstraintSet(
+      ImageQuality.Preset.PointTwo,
+      CloudExtinction.Preset.PointOne,
+      SkyBackground.Dark,
+      WaterVapor.Wet,
+      ElevationRange.ByAirMass.Default
+    )
+    val wavelength  = Wavelength.fromIntNanometers(1650).get
+
+    def candidate(id: Long, q: Double, r: Option[Double]): GuideStarCandidate =
+      GuideStarCandidate(
+        id,
+        SiderealTracking.const(
+          Coordinates.Zero
+            .offsetBy(Angle.Angle0, Offset.signedDecimalArcseconds.reverseGet(0.0, q))
+            .get
+        ),
+        SortedMap.from[Band, BrightnessValue](
+          (Band.Gaia -> BrightnessValue.unsafeFrom(12.0)) :: r.toList.map(
+            Band.R -> BrightnessValue.unsafeFrom(_)
+          )
+        )
+      )
+
+    val inOval     = candidate(0L, 20.0, Some(11.0))
+    val belowOval  = candidate(1L, -26.0, Some(11.0))
+    val noR        = candidate(2L, 20.0, None)
+    val faintForNg = candidate(3L, 20.0, Some(17.0))
+
+    val gnirs = AgsParams.GnirsLongSlit(
+      GnirsFpuSlit.LongSlit_0_30,
+      GnirsCamera.ShortBlue,
+      GnirsPrism.Mirror
+    )
+
+    def runAgs(params: AgsParams, candidate: GuideStarCandidate) =
+      Ags
+        .agsAnalysis(
+          constraints,
+          wavelength,
+          Coordinates.Zero,
+          Nil,
+          None,
+          NonEmptyList.of(Angle.Angle0),
+          Some(AcquisitionOffsets(NonEmptySet.of(Offset.Zero.guided))),
+          Some(ScienceOffsets(NonEmptySet.of(Offset.Zero.guided))),
+          params,
+          List(candidate)
+        )
+        .analyses
+
+    val ngs = gnirs.withAltair(AltairMode.Ngs)
+    assertEquals(ngs.probe, GuideProbe.AltairAOWFS)
+
+    // R = 11 is a fast NGS star and 20" north is inside the 27" upper half
+    assert(runAgs(ngs, inOval).headOption.exists(_.isUsable))
+    assertEquals(
+      runAgs(ngs, inOval).headOption.collect { case Usable(guideProbe = p, guideSpeed = s) =>
+        (p, s)
+      },
+      Some((GuideProbe.AltairAOWFS, GuideSpeed.Fast))
+    )
+
+    // 26" south falls outside the 23" lower half
+    assert(runAgs(ngs, belowOval).headOption.exists {
+      case AgsAnalysis.NotReachableAtPosition(guideProbe = _) => true
+      case _                                                  => false
+    })
+
+    // Candidates without an R estimate are filtered out before analysis
+    assert(runAgs(ngs, noR).isEmpty)
+
+    // R = 17 is too faint for NGS (slow limit 14.95) but fine for LGS tip/tilt (slow limit 18.2)
+    assert(runAgs(ngs, faintForNg).isEmpty)
+    assert(runAgs(gnirs.withAltair(AltairMode.Lgs), faintForNg).headOption.exists(_.isUsable))
+
+    // Going back to a PWFS drops Altair
+    assertEquals(ngs.withPWFS2.altair, None)
+    assertEquals(ngs.withPWFS2.probe, GuideProbe.PWFS2)
   }
 }

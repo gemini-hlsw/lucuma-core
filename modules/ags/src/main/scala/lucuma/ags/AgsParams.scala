@@ -9,6 +9,8 @@ import cats.data.NonEmptyList
 import cats.data.NonEmptyMap
 import cats.derived.*
 import cats.syntax.either.*
+import cats.syntax.option.*
+import lucuma.core.enums.AltairMode
 import lucuma.core.enums.Flamingos2LyotWheel
 import lucuma.core.enums.GmosFpuType
 import lucuma.core.enums.GmosNorthFpu
@@ -121,17 +123,22 @@ trait SingleProbeAgsParams:
           // Fast bounding box rejection, then precise check
           intersectionBounds.contains(gsOffset) && intersectionShape.contains(gsOffset)
 
+        // A probe with no arm in the beam (the Altair AOWFS) cannot vignette anything, so the
+        // geometry is skipped rather than evaluated empty.
         override def overlapsProtectedArea(gsOffset: Offset, protectedShape: Shape): Boolean =
-          probeArm(position.posAngle, gsOffset, position.offsetPos).eval
-            .intersection(protectedShape)
-            .boundingOffsets
-            .maxSide
-            .toMicroarcseconds > 5
+          probeArm(position.posAngle, gsOffset, position.offsetPos) match
+            case ShapeExpression.Empty => false
+            case arm                   =>
+              arm.eval
+                .intersection(protectedShape)
+                .boundingOffsets
+                .maxSide
+                .toMicroarcseconds > 5
 
         override def vignettingArea(gsOffset: Offset): Area =
-          probeArm(position.posAngle, gsOffset, position.offsetPos).eval
-            .intersection(vignettingShapeEval)
-            .area
+          probeArm(position.posAngle, gsOffset, position.offsetPos) match
+            case ShapeExpression.Empty => Area.MinArea
+            case arm                   => arm.eval.intersection(vignettingShapeEval).area
 
       }
     result.toNem
@@ -149,6 +156,9 @@ sealed trait AgsParams extends Product derives Eq:
   def mode: String = productPrefix
 
   def probe: GuideProbe
+
+  // Altair mode when the probe is fed through Altair; it selects the AOWFS brightness limits
+  def altair: Option[AltairMode] = None
 
   // Builds an AgsGeom object for each position
   // The geometries won't chage with the position and we can cache them
@@ -522,6 +532,35 @@ object AgsParams:
     override def probeArm(posAngle: Angle, guideStar: Offset, offset: Offset): ShapeExpression =
       lucuma.core.geom.pwfs.probeArm.vignettedAreaAt(probe, guideStar, offset)
 
+  trait AltairSupport[A]:
+    def withAltair(mode: AltairMode): A
+
+  /**
+   * Instruments behind Altair guide with a PWFS or, through Altair, its AOWFS. The AOWFS picks the
+   * star off behind a dichroic, so it never vignettes the science field.
+   */
+  trait AltairCapableParams extends SingleProbeAgsParams:
+    def probe: GuideProbe
+
+    override def patrolFieldAt(
+      posAngle: Angle,
+      offset:   Offset,
+      pivot:    Offset = Offset.Zero
+    ): ShapeExpression =
+      probe match
+        case GuideProbe.AltairAOWFS =>
+          lucuma.core.geom.altair.patrolField.patrolFieldAt(posAngle, offset, pivot)
+        case _: PWFSGuideProbe      =>
+          lucuma.core.geom.pwfs.patrolField.patrolFieldAt(posAngle, offset, pivot)
+        case _                      =>
+          ShapeExpression.Empty
+
+    override def probeArm(posAngle: Angle, guideStar: Offset, offset: Offset): ShapeExpression =
+      probe match
+        case _: PWFSGuideProbe =>
+          lucuma.core.geom.pwfs.probeArm.vignettedAreaAt(probe, guideStar, offset)
+        case _                 => ShapeExpression.Empty
+
   case class Igrins2LongSlit private (
     port:  PortDisposition,
     probe: PWFSGuideProbe
@@ -543,16 +582,22 @@ object AgsParams:
     val Igrins2ScienceDiameter = 20.arcseconds
 
   case class GnirsLongSlit private (
-    fpu:    GnirsFpuSlit,
-    camera: GnirsCamera,
-    prism:  GnirsPrism,
-    port:   PortDisposition,
-    probe:  PWFSGuideProbe
+    fpu:                 GnirsFpuSlit,
+    camera:              GnirsCamera,
+    prism:               GnirsPrism,
+    port:                PortDisposition,
+    probe:               GuideProbe,
+    override val altair: Option[AltairMode]
   ) extends AgsParams
-      with PwfsOnlyParams
-      with PwfsSupport[GnirsLongSlit] derives Eq:
+      with AltairCapableParams
+      with PwfsSupport[GnirsLongSlit]
+      with AltairSupport[GnirsLongSlit] derives Eq:
 
-    protected def withPWFSProbe(probe: PWFSGuideProbe): GnirsLongSlit = copy(probe = probe)
+    protected def withPWFSProbe(probe: PWFSGuideProbe): GnirsLongSlit =
+      copy(probe = probe, altair = None)
+
+    def withAltair(mode: AltairMode): GnirsLongSlit =
+      copy(probe = mode.guideProbe, altair = mode.some)
 
     override def scienceArea(posAngle: Angle, offset: Offset): ShapeExpression =
       lucuma.core.geom.gnirs.scienceArea.longSlitShapeAt(posAngle, offset, fpu, camera, prism)
@@ -566,20 +611,26 @@ object AgsParams:
       prism:  GnirsPrism,
       port:   PortDisposition = PortDisposition.Side
     ): GnirsLongSlit =
-      GnirsLongSlit(fpu, camera, prism, port, GuideProbe.PWFS2)
+      GnirsLongSlit(fpu, camera, prism, port, GuideProbe.PWFS2, None)
 
     val GnirsScienceDiameter = 20.arcseconds
 
   case class GnirsImaging private (
-    camera: GnirsCamera,
-    filter: GnirsFilter,
-    port:   PortDisposition,
-    probe:  PWFSGuideProbe
+    camera:              GnirsCamera,
+    filter:              GnirsFilter,
+    port:                PortDisposition,
+    probe:               GuideProbe,
+    override val altair: Option[AltairMode]
   ) extends AgsParams
-      with PwfsOnlyParams
-      with PwfsSupport[GnirsImaging] derives Eq:
+      with AltairCapableParams
+      with PwfsSupport[GnirsImaging]
+      with AltairSupport[GnirsImaging] derives Eq:
 
-    protected def withPWFSProbe(probe: PWFSGuideProbe): GnirsImaging = copy(probe = probe)
+    protected def withPWFSProbe(probe: PWFSGuideProbe): GnirsImaging =
+      copy(probe = probe, altair = None)
+
+    def withAltair(mode: AltairMode): GnirsImaging =
+      copy(probe = mode.guideProbe, altair = mode.some)
 
     override def scienceArea(posAngle: Angle, offset: Offset): ShapeExpression =
       lucuma.core.geom.gnirs.scienceArea.imagingShapeAt(posAngle, offset, camera, filter)
@@ -592,7 +643,7 @@ object AgsParams:
       filter: GnirsFilter,
       port:   PortDisposition = PortDisposition.Side
     ): GnirsImaging =
-      GnirsImaging(camera, filter, port, GuideProbe.PWFS2)
+      GnirsImaging(camera, filter, port, GuideProbe.PWFS2, None)
 
     // Representative filter for a multi-filter imaging observation: the keyhole
     // (order-blocking / narrow-band / H-MK) field is larger than the round MK field,
@@ -605,14 +656,20 @@ object AgsParams:
     val GnirsScienceDiameter = 20.arcseconds
 
   case class GnirsIfu private (
-    ifu:   GnirsFpuIfu,
-    port:  PortDisposition,
-    probe: PWFSGuideProbe
+    ifu:                 GnirsFpuIfu,
+    port:                PortDisposition,
+    probe:               GuideProbe,
+    override val altair: Option[AltairMode]
   ) extends AgsParams
-      with PwfsOnlyParams
-      with PwfsSupport[GnirsIfu] derives Eq:
+      with AltairCapableParams
+      with PwfsSupport[GnirsIfu]
+      with AltairSupport[GnirsIfu] derives Eq:
 
-    protected def withPWFSProbe(probe: PWFSGuideProbe): GnirsIfu = copy(probe = probe)
+    protected def withPWFSProbe(probe: PWFSGuideProbe): GnirsIfu =
+      copy(probe = probe, altair = None)
+
+    def withAltair(mode: AltairMode): GnirsIfu =
+      copy(probe = mode.guideProbe, altair = mode.some)
 
     override def scienceArea(posAngle: Angle, offset: Offset): ShapeExpression =
       lucuma.core.geom.gnirs.scienceArea.ifuShapeAt(posAngle, offset, ifu)
@@ -624,7 +681,7 @@ object AgsParams:
       ifu:  GnirsFpuIfu,
       port: PortDisposition = PortDisposition.Side
     ): GnirsIfu =
-      GnirsIfu(ifu, port, GuideProbe.PWFS2)
+      GnirsIfu(ifu, port, GuideProbe.PWFS2, None)
 
     val GnirsScienceDiameter = 20.arcseconds
 

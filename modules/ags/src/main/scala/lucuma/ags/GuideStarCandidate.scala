@@ -12,6 +12,7 @@ import eu.timepit.refined.*
 import eu.timepit.refined.cats.*
 import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.catalog.BandsList
+import lucuma.catalog.GaiaPhotometry
 import lucuma.core.enums.Band
 import lucuma.core.enums.CatalogName
 import lucuma.core.math.BrightnessUnits.*
@@ -34,15 +35,28 @@ import java.time.ZoneId
 import scala.collection.immutable.SortedMap
 
 /**
- * Poors' man Target.Sidereal with a single G brightness and no extra metadata
+ * Poors' man Target.Sidereal: tracking plus the catalog's bare brightness values, no units, errors
+ * or metadata. R for Altair is not stored: it is estimated from the Gaia bands on first use and
+ * memoized, so a cached candidate holds catalog data only.
  */
-case class GuideStarCandidate private (
-  id:          Long,
-  tracking:    SiderealTracking,
-  gBrightness: Option[(Band, BrightnessValue)]
+case class GuideStarCandidate(
+  id:           Long,
+  tracking:     SiderealTracking,
+  brightnesses: SortedMap[Band, BrightnessValue]
 ) derives Eq {
 
   def name: NonEmptyString = GuideStarName.gaiaSourceId.reverseGet(id).toNonEmptyString
+
+  /** Catalog R if the star has one, else the estimate from G, BP and RP. */
+  lazy val rBrightness: Option[BrightnessValue] =
+    brightnesses.get(Band.R).orElse(GaiaPhotometry.estimatedR(brightnesses))
+
+  /** The first brightness available among the bands a probe works in, in that order. */
+  def brightnessIn(bands: BandsList): Option[(Band, BrightnessValue)] =
+    bands.bands.collectFirstSome: band =>
+      val brightness: Option[BrightnessValue] =
+        if band === Band.R then rBrightness else brightnesses.get(band)
+      brightness.tupleLeft(band)
 
   // Reset the candidate to a given instant
   // This can be used to calculate and cache the location base on proper motion
@@ -60,22 +74,6 @@ case class GuideStarCandidate private (
 }
 
 object GuideStarCandidate {
-  def apply(
-    id:          Long,
-    tracking:    SiderealTracking,
-    gBrightness: Option[(Band, BrightnessValue)]
-  ): Option[GuideStarCandidate] =
-    if (gBrightness.forall { case (b, _) => BandsList.GaiaBandsList.bands.exists(_ === b) })
-      new GuideStarCandidate(id, tracking, gBrightness).some
-    else none
-
-  def unsafeApply(
-    id:          Long,
-    tracking:    SiderealTracking,
-    gBrightness: Option[(Band, BrightnessValue)]
-  ): GuideStarCandidate =
-    apply(id, tracking, gBrightness).get
-
   val UTC = ZoneId.of("UTC")
 
   val id: Lens[GuideStarCandidate, Long] =
@@ -84,42 +82,37 @@ object GuideStarCandidate {
   val tracking: Lens[GuideStarCandidate, SiderealTracking] =
     Focus[GuideStarCandidate](_.tracking)
 
-  val gBrightness: Lens[GuideStarCandidate, Option[(Band, BrightnessValue)]] =
-    Focus[GuideStarCandidate](_.gBrightness)
+  val brightnesses: Lens[GuideStarCandidate, SortedMap[Band, BrightnessValue]] =
+    Focus[GuideStarCandidate](_.brightnesses)
 
   // There is some loss of info converting one to the other but further
   // conversions are always the same, thus SplitEpi
   val siderealTarget: SplitEpi[Target.Sidereal, GuideStarCandidate] =
     SplitEpi(
-      st => {
-        val gBrightness = BandsList.GaiaBandsList.bands
-          .flatMap { band =>
-            SourceProfile.integratedBrightnessIn(band).headOption(st.sourceProfile).tupleLeft(band)
-          }
-          .headOption
-          .map { case (b, v) => (b, v.value) }
-
-        new GuideStarCandidate(
-          GuideStarName.from(st.name.value).toOption.flatMap(_.toGaiaSourceId).getOrElse(-1),
-          st.tracking,
-          gBrightness
-        )
-      },
-      g =>
+      target =>
+        GuideStarCandidate(
+          GuideStarName.from(target.name.value).toOption.flatMap(_.toGaiaSourceId).getOrElse(-1),
+          target.tracking,
+          SortedMap.from(
+            SourceProfile.integratedBrightnesses
+              .getOption(target.sourceProfile)
+              .foldMap(_.toList)
+              .map((band, measure) => band -> measure.value)
+          )
+        ),
+      candidate =>
         Target.Sidereal(
-          g.name,
-          g.tracking,
+          candidate.name,
+          candidate.tracking,
           SourceProfile.Point(
             SpectralDefinition.BandNormalized(
               None,
-              SortedMap.from(
-                g.gBrightness.foldMap { case (b, v) =>
-                  List(b -> v.withUnit[VegaMagnitude].toMeasureTagged)
-                }.toSeq
+              candidate.brightnesses.map((band, brightness) =>
+                band -> brightness.withUnit[VegaMagnitude].toMeasureTagged
               )
             )
           ),
-          CatalogInfo(CatalogName.Gaia, g.id.toString)
+          CatalogInfo(CatalogName.Gaia, candidate.id.toString)
         )
     )
 }

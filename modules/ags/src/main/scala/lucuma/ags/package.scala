@@ -13,6 +13,7 @@ import lucuma.catalog.BandsList
 import lucuma.catalog.BrightnessConstraints
 import lucuma.catalog.FaintnessConstraint
 import lucuma.catalog.SaturationConstraint
+import lucuma.core.enums.AltairMode
 import lucuma.core.enums.GuideProbe
 import lucuma.core.enums.GuideSpeed
 import lucuma.core.enums.SkyBackground
@@ -21,6 +22,7 @@ import lucuma.core.math.Angle
 import lucuma.core.math.BrightnessValue
 import lucuma.core.math.Offset
 import lucuma.core.math.Wavelength
+import lucuma.core.model.AirMass
 import lucuma.core.model.CloudExtinction
 import lucuma.core.model.ConstraintSet
 import lucuma.core.model.ImageQuality
@@ -85,7 +87,9 @@ def faintLimit(
   ce:         CloudExtinction
 ): FaintnessConstraint = {
   val limit = probe match {
-    case GuideProbe.GmosOIWFS | GuideProbe.Flamingos2OIWFS =>
+    // The Altair AOWFS has no Gaia G limits; callers route it to `altairBrightnessConstraints`
+    // and this branch only keeps the match total.
+    case GuideProbe.GmosOIWFS | GuideProbe.Flamingos2OIWFS | GuideProbe.AltairAOWFS =>
       sb match {
         case SkyBackground.Darkest | SkyBackground.Dark =>
           guideSpeed match {
@@ -115,7 +119,7 @@ def faintLimit(
               17.4 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.toDouble
           }
       }
-    case GuideProbe.PWFS2                                  =>
+    case GuideProbe.PWFS2                                                           =>
       sb match {
         case SkyBackground.Darkest | SkyBackground.Dark =>
           guideSpeed match {
@@ -145,7 +149,7 @@ def faintLimit(
               16.1 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.toDouble
           }
       }
-    case GuideProbe.PWFS1                                  =>
+    case GuideProbe.PWFS1                                                           =>
       sb match {
         case SkyBackground.Darkest | SkyBackground.Dark =>
           guideSpeed match {
@@ -380,3 +384,122 @@ object AgsStats:
       ) ++ stats.resultCounts.toList.map { case (label, cnt) =>
         Attribute(s"ags.result.$label", cnt.toLong)
       }
+
+/** Bands a probe's brightness limits are expressed in. */
+def probeBands(probe: GuideProbe): BandsList =
+  probe match
+    case GuideProbe.AltairAOWFS => BandsList.RBandsList
+    case _                      => BandsList.GaiaBandsList
+
+// OCS image quality buckets ("Guide Limits - OT Config.csv" rows), from the percentile the
+// requested image quality corresponds to at the science wavelength.
+private enum IqBucket:
+  case Twenty, Seventy, EightyFive, Any
+
+private def iqBucket(iq: ImageQuality, wavelength: Wavelength): IqBucket =
+  val percentile: BigDecimal = iq.percentile(wavelength, AirMass.unsafeFrom(1)).toPercent
+  if percentile <= 20 then IqBucket.Twenty
+  else if percentile <= 70 then IqBucket.Seventy
+  else if percentile <= 85 then IqBucket.EightyFive
+  else IqBucket.Any
+
+/**
+ * Altair AOWFS faint R limits per guide speed (fast, medium, slow), transcribed from the OCS "Guide
+ * Limits - OT Config.csv" Altair NGS and Altair LGS tables.
+ */
+private def altairFaintLimits(
+  mode: AltairMode,
+  iq:   IqBucket,
+  sb:   SkyBackground
+): (Double, Double, Double) =
+  mode match
+    case AltairMode.Ngs                    =>
+      (iq, sb) match
+        case (IqBucket.Twenty, SkyBackground.Darkest | SkyBackground.Dark)     => (11.85, 13.55, 15.05)
+        case (IqBucket.Twenty, SkyBackground.Gray)                             => (11.75, 13.45, 14.95)
+        case (IqBucket.Twenty, SkyBackground.Bright)                           => (11.65, 13.35, 14.85)
+        case (IqBucket.Seventy, SkyBackground.Darkest | SkyBackground.Dark)    => (11.65, 13.35, 14.85)
+        case (IqBucket.Seventy, SkyBackground.Gray)                            => (11.55, 13.25, 14.75)
+        case (IqBucket.Seventy, SkyBackground.Bright)                          => (11.45, 13.15, 14.65)
+        case (IqBucket.EightyFive, SkyBackground.Darkest | SkyBackground.Dark) =>
+          (11.45, 13.15, 14.65)
+        case (IqBucket.EightyFive, SkyBackground.Gray)                         => (11.35, 13.05, 14.55)
+        case (IqBucket.EightyFive, SkyBackground.Bright)                       => (11.25, 12.95, 14.45)
+        case (IqBucket.Any, SkyBackground.Darkest | SkyBackground.Dark)        => (11.00, 12.70, 14.20)
+        case (IqBucket.Any, SkyBackground.Gray)                                => (10.90, 12.60, 14.10)
+        case (IqBucket.Any, SkyBackground.Bright)                              => (10.80, 12.50, 14.00)
+    case AltairMode.Lgs | AltairMode.LgsP1 =>
+      (iq, sb) match
+        case (IqBucket.Twenty, SkyBackground.Darkest)     => (15.90, 17.40, 18.40)
+        case (IqBucket.Twenty, SkyBackground.Dark)        => (15.80, 17.30, 18.30)
+        case (IqBucket.Twenty, SkyBackground.Gray)        => (15.70, 17.20, 18.20)
+        case (IqBucket.Twenty, SkyBackground.Bright)      => (15.60, 17.10, 18.10)
+        case (IqBucket.Seventy, SkyBackground.Darkest)    => (15.60, 17.10, 18.10)
+        case (IqBucket.Seventy, SkyBackground.Dark)       => (15.50, 17.00, 18.00)
+        case (IqBucket.Seventy, SkyBackground.Gray)       => (15.40, 16.90, 17.90)
+        case (IqBucket.Seventy, SkyBackground.Bright)     => (15.30, 16.80, 17.80)
+        case (IqBucket.EightyFive, SkyBackground.Darkest) => (15.30, 16.80, 17.30)
+        case (IqBucket.EightyFive, SkyBackground.Dark)    => (15.20, 16.70, 17.20)
+        case (IqBucket.EightyFive, SkyBackground.Gray)    => (15.10, 16.60, 17.10)
+        case (IqBucket.EightyFive, SkyBackground.Bright)  => (15.00, 16.50, 17.00)
+        case (IqBucket.Any, SkyBackground.Darkest)        => (14.30, 15.80, 16.30)
+        case (IqBucket.Any, SkyBackground.Dark)           => (14.20, 15.70, 16.20)
+        case (IqBucket.Any, SkyBackground.Gray)           => (14.10, 15.60, 16.10)
+        case (IqBucket.Any, SkyBackground.Bright)         => (14.00, 15.50, 16.00)
+
+// How far below the faint limit the AOWFS saturates, from the same OCS tables. NGS guides on
+// bright stars routinely (with the ND filter); the LGS tip/tilt sensor tolerates far less.
+private def altairSaturationAdjustment(mode: AltairMode): Double =
+  mode match
+    case AltairMode.Ngs                    => 17.0
+    case AltairMode.Lgs | AltairMode.LgsP1 => 5.0
+
+/**
+ * Brightness limits in R for a natural guide star on the Altair AOWFS.
+ */
+def altairBrightnessConstraints(
+  mode:       AltairMode,
+  guideSpeed: GuideSpeed,
+  wavelength: Wavelength,
+  sb:         SkyBackground,
+  iq:         ImageQuality,
+  ce:         CloudExtinction
+): BrightnessConstraints =
+  val (fast, medium, slow) = altairFaintLimits(mode, iqBucket(iq, wavelength), sb)
+  val limit: Double        =
+    guideSpeed match
+      case GuideSpeed.Fast   => fast
+      case GuideSpeed.Medium => medium
+      case GuideSpeed.Slow   => slow
+  val faintness: Double    = limit - ce.toVegaMagnitude.toDouble
+  BrightnessConstraints(
+    BandsList.RBandsList,
+    FaintnessConstraint(BrightnessValue.unsafeFrom(BigDecimal(faintness))),
+    SaturationConstraint(
+      BrightnessValue.unsafeFrom(BigDecimal(faintness - altairSaturationAdjustment(mode)))
+    ).some
+  )
+
+/**
+ * Brightness limits for a guide star on the given probe: R limits for the Altair AOWFS, Gaia G
+ * limits for every other probe (including PWFS1 carrying the LGS+P1 tip/tilt star).
+ */
+def guideStarBrightnessConstraints(
+  constraints: ConstraintSet,
+  probe:       GuideProbe,
+  altair:      Option[AltairMode],
+  guideSpeed:  GuideSpeed,
+  wavelength:  Wavelength
+): BrightnessConstraints =
+  (probe, altair) match
+    case (GuideProbe.AltairAOWFS, Some(mode)) =>
+      altairBrightnessConstraints(
+        mode,
+        guideSpeed,
+        wavelength,
+        constraints.skyBackground,
+        constraints.imageQuality.toImageQuality,
+        constraints.cloudExtinction.toCloudExtinction
+      )
+    case _                                    =>
+      gaiaBrightnessConstraints(constraints, probe, guideSpeed, wavelength)
