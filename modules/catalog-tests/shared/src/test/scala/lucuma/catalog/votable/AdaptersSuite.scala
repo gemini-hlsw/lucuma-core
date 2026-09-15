@@ -206,7 +206,12 @@ class AdaptersSuite extends CatsEffectSuite with VoTableParser with VoTableSampl
       constraints.some
     )
     val adql              = summon[ADQLInterpreter].buildQueryString(CatalogAdapter.Gaia3Esa, query)
-    assert(adql.contains("(phot_g_mean_mag between 7.646 and 15.264)"), adql)
+    assert(
+      adql.contains(
+        "((phot_g_mean_mag between 7.640 and 15.270) and phot_bp_mean_mag - phot_rp_mean_mag between 0.0 and 4.0)"
+      ),
+      adql
+    )
   }
 
   test("a Gaia band constraint queries the Gaia columns unchanged") {

@@ -30,13 +30,16 @@ object GaiaPhotometry:
       acc + c * math.pow(bpMinusRp, i.toDouble)
 
   /**
-   * Smallest and largest G - R over the validity range. A query on G that must not drop any star
-   * whose R falls in a given range has to widen that range by these bounds.
+   * Conservative bounds on G - R over the validity range, padded outward to 0.01 mag. A query on G
+   * widened by them never drops a star whose R falls in the requested range.
    */
   val GMinusRBounds: (Double, Double) =
+    val steps: Int            = 4000
     val samples: List[Double] =
-      (0 to 400).toList.map(i => gMinusR(MinBpMinusRp + i * (MaxBpMinusRp - MinBpMinusRp) / 400))
-    (samples.min, samples.max)
+      (0 to steps).toList.map(i =>
+        gMinusR(MinBpMinusRp + i * (MaxBpMinusRp - MinBpMinusRp) / steps)
+      )
+    (math.floor(samples.min * 100) / 100, math.ceil(samples.max * 100) / 100)
 
   /** Johnson-Cousins R estimated from Gaia G, BP and RP, if the colour is in the validity range. */
   def johnsonCousinsR(

@@ -31,12 +31,13 @@ class GaiaPhotometrySuite extends FunSuite:
     assertEquals(GaiaPhotometry.johnsonCousinsR(bv(10.0), bv(14.5), bv(10.0)), None)
   }
 
-  test("G - R bounds bracket the polynomial over the validity range") {
+  test("G - R bounds bracket the polynomial over the validity range, padded outward") {
     val (min, max) = GaiaPhotometry.GMinusRBounds
-    assert(min <= GaiaPhotometry.gMinusR(0.0))
-    assert(min <= GaiaPhotometry.gMinusR(4.0))
-    assert(max >= GaiaPhotometry.gMinusR(1.5))
-    // The polynomial peaks near BP - RP = 1.5 and dips at the red end
-    assertEqualsDouble(max, 0.264, 1e-3)
-    assertEqualsDouble(min, -0.354, 1e-3)
+    (0 to 400).map(_ / 100.0).foreach { colour =>
+      assert(min < GaiaPhotometry.gMinusR(colour))
+      assert(max > GaiaPhotometry.gMinusR(colour))
+    }
+    // The polynomial peaks at 0.2645 near BP - RP = 1.43 and dips to -0.3542 at the red end
+    assertEqualsDouble(max, 0.27, 1e-9)
+    assertEqualsDouble(min, -0.36, 1e-9)
   }
