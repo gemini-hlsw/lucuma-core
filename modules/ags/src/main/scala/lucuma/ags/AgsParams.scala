@@ -123,17 +123,22 @@ trait SingleProbeAgsParams:
           // Fast bounding box rejection, then precise check
           intersectionBounds.contains(gsOffset) && intersectionShape.contains(gsOffset)
 
+        // A probe with no arm in the beam (the Altair AOWFS) cannot vignette anything, so the
+        // geometry is skipped rather than evaluated empty.
         override def overlapsProtectedArea(gsOffset: Offset, protectedShape: Shape): Boolean =
-          probeArm(position.posAngle, gsOffset, position.offsetPos).eval
-            .intersection(protectedShape)
-            .boundingOffsets
-            .maxSide
-            .toMicroarcseconds > 5
+          probeArm(position.posAngle, gsOffset, position.offsetPos) match
+            case ShapeExpression.Empty => false
+            case arm                   =>
+              arm.eval
+                .intersection(protectedShape)
+                .boundingOffsets
+                .maxSide
+                .toMicroarcseconds > 5
 
         override def vignettingArea(gsOffset: Offset): Area =
-          probeArm(position.posAngle, gsOffset, position.offsetPos).eval
-            .intersection(vignettingShapeEval)
-            .area
+          probeArm(position.posAngle, gsOffset, position.offsetPos) match
+            case ShapeExpression.Empty => Area.MinArea
+            case arm                   => arm.eval.intersection(vignettingShapeEval).area
 
       }
     result.toNem
