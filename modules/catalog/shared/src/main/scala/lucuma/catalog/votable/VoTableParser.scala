@@ -340,17 +340,12 @@ trait VoTableParser {
   ): EitherNec[CatalogProblem, Target.Sidereal] = {
     val entries: Map[FieldId, String] = row.itemsMap
 
-    // Only pick one relevant brightness
+    // Keep only the brightnesses in the band list; R is estimated from G, BP and RP downstream
     def parseBandBrightnesses =
-      adapter.parseBandBrightnesses(entries).map { brightnesses =>
-        bandList.bands
-          .map { case b =>
-            brightnesses.find(_._1 === b)
-          }
-          .collectFirst { case Some(b) =>
-            b
-          }
-      }
+      adapter
+        .parseBandBrightnesses(entries)
+        .map: brightnesses =>
+          brightnesses.filter { case (b, _) => bandList.bands.contains(b) }
 
     def parseSED: EitherNec[CatalogProblem, Option[UnnormalizedSED]] = adapter.parseSED(entries)
 

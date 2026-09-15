@@ -41,4 +41,26 @@ class BrightnessConstraintsSuite extends DisciplineSuite {
     // Saturated
     assert(!bc.contains(Band.Gaia, BrightnessValue.unsafeFrom(1.0)))
   }
+
+  test("filter targets on the R band") {
+    val bc = BrightnessConstraints(
+      BandsList.RBandsList,
+      FaintnessConstraint(BrightnessValue.unsafeFrom(15.0)),
+      Some(SaturationConstraint(BrightnessValue.unsafeFrom(8.0)))
+    )
+    assert(bc.contains(Band.R, BrightnessValue.unsafeFrom(12.0)))
+    // Gaia bands don't satisfy an R constraint
+    assert(!bc.contains(Band.Gaia, BrightnessValue.unsafeFrom(12.0)))
+    assert(!bc.contains(Band.R, BrightnessValue.unsafeFrom(15.5)))
+    assert(!bc.contains(Band.R, BrightnessValue.unsafeFrom(7.5)))
+  }
+
+  test("union of band lists covers both") {
+    val union = BandsList.GaiaBandsList ∪ BandsList.RBandsList
+    assertEquals(union.bands.toSet, Set[Band](Band.R, Band.GaiaRP, Band.Gaia, Band.GaiaBP))
+    assertEquals(BandsList.RBandsList ∪ BandsList.GaiaBandsList, union)
+    assertEquals(union ∪ BandsList.GaiaBandsList, union)
+    assertEquals(BandsList.GaiaBandsList ∪ BandsList.GaiaBandsList, BandsList.GaiaBandsList)
+    assertEquals(BandsList.RBandsList ∪ BandsList.RBandsList, BandsList.RBandsList)
+  }
 }
