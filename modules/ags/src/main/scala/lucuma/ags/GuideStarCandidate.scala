@@ -35,11 +35,11 @@ import java.time.ZoneId
 import scala.collection.immutable.SortedMap
 
 /**
- * Poors' man Target.Sidereal: tracking plus bare brightness values, no units, errors or metadata.
- * Brightnesses always include the R estimated from the Gaia bands when the colour allows it, so a
- * candidate is a fixed point of that estimation.
+ * Poors' man Target.Sidereal: tracking plus the catalog's bare brightness values, no units, errors
+ * or metadata. R for Altair is not stored: it is estimated from the Gaia bands on first use and
+ * memoized, so a cached candidate holds catalog data only.
  */
-case class GuideStarCandidate private (
+case class GuideStarCandidate(
   id:           Long,
   tracking:     SiderealTracking,
   brightnesses: SortedMap[Band, BrightnessValue]
@@ -47,9 +47,16 @@ case class GuideStarCandidate private (
 
   def name: NonEmptyString = GuideStarName.gaiaSourceId.reverseGet(id).toNonEmptyString
 
+  /** Catalog R if the star has one, else the estimate from G, BP and RP. */
+  lazy val rBrightness: Option[BrightnessValue] =
+    brightnesses.get(Band.R).orElse(GaiaPhotometry.estimatedR(brightnesses))
+
   /** The first brightness available among the bands a probe works in, in that order. */
   def brightnessIn(bands: BandsList): Option[(Band, BrightnessValue)] =
-    bands.bands.collectFirstSome(band => brightnesses.get(band).tupleLeft(band))
+    bands.bands.collectFirstSome: band =>
+      val brightness: Option[BrightnessValue] =
+        if band === Band.R then rBrightness else brightnesses.get(band)
+      brightness.tupleLeft(band)
 
   // Reset the candidate to a given instant
   // This can be used to calculate and cache the location base on proper motion
@@ -67,13 +74,6 @@ case class GuideStarCandidate private (
 }
 
 object GuideStarCandidate {
-  def apply(
-    id:           Long,
-    tracking:     SiderealTracking,
-    brightnesses: SortedMap[Band, BrightnessValue]
-  ): GuideStarCandidate =
-    new GuideStarCandidate(id, tracking, GaiaPhotometry.withEstimatedR(brightnesses))
-
   val UTC = ZoneId.of("UTC")
 
   val id: Lens[GuideStarCandidate, Long] =

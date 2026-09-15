@@ -56,7 +56,9 @@ class GuideStarCandidateSuite extends DisciplineSuite {
     val candidate = GuideStarCandidate.siderealTarget.get(
       target(Band.Gaia -> 14.5, Band.GaiaBP -> 15.2, Band.GaiaRP -> 14.2)
     )
-    assertEqualsDouble(candidate.brightnesses(Band.R).value.value.toDouble, 14.5 - 0.238865, 1e-6)
+    // Only catalog bands are stored; R is derived on demand
+    assertEquals(candidate.brightnesses.keySet, Set[Band](Band.Gaia, Band.GaiaBP, Band.GaiaRP))
+    assertEqualsDouble(candidate.rBrightness.get.value.value.toDouble, 14.5 - 0.238865, 1e-6)
     assertEquals(candidate.brightnessIn(BandsList.RBandsList).map(_._1), Some(Band.R))
     assertEquals(candidate.brightnessIn(BandsList.GaiaBandsList).map(_._1), Some(Band.GaiaRP))
   }
@@ -65,12 +67,12 @@ class GuideStarCandidateSuite extends DisciplineSuite {
     val candidate = GuideStarCandidate.siderealTarget.get(
       target(Band.Gaia -> 14.5, Band.GaiaBP -> 15.2, Band.GaiaRP -> 14.2, Band.R -> 13.0)
     )
-    assertEquals(candidate.brightnesses.get(Band.R), Some(BrightnessValue.unsafeFrom(13.0)))
+    assertEquals(candidate.rBrightness, Some(BrightnessValue.unsafeFrom(13.0)))
   }
 
   test("no R without a colour") {
     val candidate = GuideStarCandidate.siderealTarget.get(target(Band.Gaia -> 14.5))
-    assertEquals(candidate.brightnesses.get(Band.R), None)
+    assertEquals(candidate.rBrightness, None)
     assertEquals(candidate.brightnessIn(BandsList.RBandsList), None)
   }
 }

@@ -45,25 +45,25 @@ class GaiaPhotometrySuite extends FunSuite:
     assertEqualsDouble(min, -0.36, 1e-9)
   }
 
-  test("withEstimatedR adds R from G, BP and RP") {
-    val gaia  = SortedMap[Band, BrightnessValue](Band.Gaia -> bv(14.5),
+  test("estimatedR derives R from G, BP and RP") {
+    val gaia = SortedMap[Band, BrightnessValue](Band.Gaia -> bv(14.5),
                                                 Band.GaiaBP -> bv(15.2),
                                                 Band.GaiaRP -> bv(14.2)
     )
-    val withR = GaiaPhotometry.withEstimatedR(gaia)
-    assertEquals(withR.keySet, gaia.keySet + Band.R)
-    assertEqualsDouble(withR(Band.R).value.value.toDouble, 14.5 - 0.238865, 1e-6)
-    // Idempotent: the estimate is not re-derived once present
-    assertEquals(GaiaPhotometry.withEstimatedR(withR), withR)
+    assertEqualsDouble(GaiaPhotometry.estimatedR(gaia).get.value.value.toDouble,
+                       14.5 - 0.238865,
+                       1e-6
+    )
   }
 
-  test("withEstimatedR keeps a catalog R and needs all three Gaia bands") {
-    val catalogR = SortedMap[Band, BrightnessValue](Band.Gaia -> bv(14.5),
-                                                    Band.GaiaBP -> bv(15.2),
-                                                    Band.GaiaRP -> bv(14.2),
-                                                    Band.R      -> bv(13.0)
+  test("estimatedR needs all three Gaia bands") {
+    assertEquals(GaiaPhotometry.estimatedR(SortedMap[Band, BrightnessValue](Band.Gaia -> bv(14.5))),
+                 None
     )
-    assertEquals(GaiaPhotometry.withEstimatedR(catalogR), catalogR)
-    val noColour = SortedMap[Band, BrightnessValue](Band.Gaia -> bv(14.5))
-    assertEquals(GaiaPhotometry.withEstimatedR(noColour), noColour)
+    assertEquals(
+      GaiaPhotometry.estimatedR(
+        SortedMap[Band, BrightnessValue](Band.Gaia -> bv(14.5), Band.GaiaRP -> bv(14.2))
+      ),
+      None
+    )
   }

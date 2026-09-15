@@ -64,7 +64,11 @@ object AltairAgsSelectionApp extends IOApp.Simple with AgsSelectionSample {
           .map { candidates =>
             println(s"Altair candidates: ${candidates.length}")
             candidates
-              .foreach(candidate => println(s"  ${candidate.name} ${candidate.brightnesses}"))
+              .foreach(candidate =>
+                println(
+                  s"  ${candidate.name} ${candidate.brightnesses} R: ${candidate.rBrightness}"
+                )
+              )
             List(AltairMode.Ngs, AltairMode.Lgs).map { mode =>
               val result = Ags
                 .agsAnalysis(

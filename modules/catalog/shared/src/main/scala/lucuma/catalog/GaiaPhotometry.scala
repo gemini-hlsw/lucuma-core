@@ -57,14 +57,9 @@ object GaiaPhotometry:
       .flatMap(c => BrightnessValue.from(g.value.value - BigDecimal(gMinusR(c))).toOption)
 
   /**
-   * Adds an estimated R to a set of brightnesses that has G, BP and RP but no R of its own. A
-   * catalog R is never overwritten.
+   * R estimated from the G, BP and RP entries of a set of brightnesses, when all three are present
+   * and the colour is in the validity range.
    */
-  def withEstimatedR(
-    brightnesses: SortedMap[Band, BrightnessValue]
-  ): SortedMap[Band, BrightnessValue] =
-    if brightnesses.contains(Band.R) then brightnesses
-    else
-      (brightnesses.get(Band.Gaia), brightnesses.get(Band.GaiaBP), brightnesses.get(Band.GaiaRP))
-        .flatMapN(johnsonCousinsR)
-        .fold(brightnesses)(r => brightnesses + (Band.R -> r))
+  def estimatedR(brightnesses: SortedMap[Band, BrightnessValue]): Option[BrightnessValue] =
+    (brightnesses.get(Band.Gaia), brightnesses.get(Band.GaiaBP), brightnesses.get(Band.GaiaRP))
+      .flatMapN(johnsonCousinsR)
