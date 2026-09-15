@@ -11,10 +11,11 @@ import monocle.Focus
 import monocle.Lens
 
 case class ExecutionDigest(
-  setup:       SetupTime,
-  setupCount:  NonNegInt,
-  acquisition: SequenceDigest,
-  science:     SequenceDigest
+  setup:            SetupTime,
+  setupCount:       NonNegInt,
+  calibrationCount: NonNegInt,
+  acquisition:      SequenceDigest,
+  science:          SequenceDigest
 ) {
 
   /**
@@ -38,6 +39,7 @@ object ExecutionDigest {
     ExecutionDigest(
       SetupTime.Zero,
       NonNegInt.MinValue,
+      NonNegInt.MinValue,
       SequenceDigest.Zero,
       SequenceDigest.Zero
     )
@@ -51,6 +53,10 @@ object ExecutionDigest {
     Focus[ExecutionDigest](_.setupCount)
 
   /** @group Optics */
+  val calibrationCount: Lens[ExecutionDigest, NonNegInt] =
+    Focus[ExecutionDigest](_.calibrationCount)
+
+  /** @group Optics */
   val acquisition: Lens[ExecutionDigest, SequenceDigest] =
     Focus[ExecutionDigest](_.acquisition)
 
@@ -62,6 +68,7 @@ object ExecutionDigest {
     Eq.by { a => (
       a.setup,
       a.setupCount,
+      a.calibrationCount,
       a.acquisition,
       a.science
     )}
