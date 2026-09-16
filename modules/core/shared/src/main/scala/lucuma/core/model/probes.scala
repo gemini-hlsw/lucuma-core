@@ -4,9 +4,11 @@
 package lucuma.core.model
 
 import cats.syntax.all.*
+import lucuma.core.enums.AltairMode
 import lucuma.core.enums.ExchangeObservingModeType
 import lucuma.core.enums.FacilityObservingModeType
 import lucuma.core.enums.GuideProbe
+import lucuma.core.enums.Instrument
 import lucuma.core.enums.ObservingModeType
 import lucuma.core.enums.PWFSGuideProbe
 import lucuma.core.enums.TrackType
@@ -34,8 +36,23 @@ trait probes:
       case _: VisitorObservingModeType  => Pwfs
       case m: FacilityObservingModeType => facilityProbes(m)
 
+  /**
+   * Allowed probes when the observation may be behind Altair. Altair fixes the probe to the one
+   * holding its natural guide star, and it only supports GNIRS.
+   */
+  def allowedProbes(observingMode: ObservingModeType, altair: Option[AltairMode]): SortedSet[GuideProbe] =
+    val isGnirs: Boolean =
+      ObservingModeType.toFacility.getOption(observingMode).exists(_.instrument === Instrument.Gnirs)
+    altair match
+      case Some(mode) if isGnirs => SortedSet(mode.guideProbe)
+      case Some(_)               => SortedSet.empty
+      case None                  => allowedProbes(observingMode)
+
   def isProbeAllowed(observingMode: ObservingModeType, probe: GuideProbe): Boolean =
     allowedProbes(observingMode).contains(probe)
+
+  def isProbeAllowed(observingMode: ObservingModeType, altair: Option[AltairMode], probe: GuideProbe): Boolean =
+    allowedProbes(observingMode, altair).contains(probe)
 
   // Split out so the compiler enforces exhaustivity: adding a facility mode
   // must not silently fall through to a MatchError at runtime.
@@ -62,7 +79,15 @@ trait probes:
    * OIWFS cannot track a nonsidereal target, so it drops out of the running.
    */
   def defaultGuideProbe(observingMode: ObservingModeType, trackType: TrackType): Option[GuideProbe] =
-    allowedProbes(observingMode)
+    defaultGuideProbe(observingMode, trackType, none)
+
+  /** As above, with Altair fixing the probe; the Altair WFS itself can track a nonsidereal star. */
+  def defaultGuideProbe(
+    observingMode: ObservingModeType,
+    trackType:     TrackType,
+    altair:        Option[AltairMode]
+  ): Option[GuideProbe] =
+    allowedProbes(observingMode, altair)
       .filter:
         case GuideProbe.GmosOIWFS | GuideProbe.Flamingos2OIWFS => trackType === TrackType.Sidereal
         case _                                                 => true
