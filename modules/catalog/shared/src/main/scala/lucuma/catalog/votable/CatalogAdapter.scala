@@ -388,19 +388,29 @@ object CatalogAdapter {
 
     protected def brightnessQuery(constraints: Option[BrightnessConstraints]): String = {
       val conditions = constraints.toList.flatMap { bc =>
-        val faintness  = bc.faintnessConstraint.brightness.value.value.toDouble
-        val saturation = bc.saturationConstraint.map(_.brightness.value.value.toDouble)
+        val faintness                = bc.faintnessConstraint.brightness.value.value.toDouble
+        val saturation               = bc.saturationConstraint.map(_.brightness.value.value.toDouble)
+        val (minGMinusR, maxGMinusR) = GaiaPhotometry.GMinusRBounds
+        val colour: String           = s"${bpMagField.id} - ${rpMagField.id}"
+
+        def range(field: FieldId, faint: Double, sat: Option[Double]): String =
+          sat match {
+            case Some(sat) => f"(${field.id} between $sat%.3f and $faint%.3f)"
+            case None      => f"(${field.id} < $faint%.3f)"
+          }
+
         bc.searchBands.bands
           .collect {
-            case Band.Gaia   => gMagField.id
-            case Band.GaiaBP => bpMagField.id
-            case Band.GaiaRP => rpMagField.id
-          }
-          .map { bid =>
-            saturation match {
-              case Some(sat) => f"($bid between $sat%.3f and $faintness%.3f)"
-              case None      => f"($bid < $faintness%.3f)"
-            }
+            case Band.Gaia   => range(gMagField, faintness, saturation)
+            case Band.GaiaBP => range(bpMagField, faintness, saturation)
+            case Band.GaiaRP => range(rpMagField, faintness, saturation)
+            // Gaia has no R column: R is estimated from G and BP - RP, so only stars with a colour in
+            // the validity range qualify, over a G range widened by the G - R bounds. Consumers
+            // apply the exact R limits.
+            case Band.R      =>
+              val g: String =
+                range(gMagField, faintness + maxGMinusR, saturation.map(_ + minGMinusR))
+              f"($g and $colour between ${GaiaPhotometry.MinBpMinusRp}%.1f and ${GaiaPhotometry.MaxBpMinusRp}%.1f)"
           }
       }
       if (conditions.isEmpty) "" else conditions.mkString("and (", " or ", ")")

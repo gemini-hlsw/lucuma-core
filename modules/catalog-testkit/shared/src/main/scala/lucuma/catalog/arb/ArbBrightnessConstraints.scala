@@ -36,17 +36,24 @@ trait ArbBrightnessConstraints {
   given Cogen[SaturationConstraint] =
     Cogen[BrightnessValue].contramap(_.brightness)
 
+  given Arbitrary[BandsList] =
+    Arbitrary(Gen.oneOf(BandsList.GaiaBandsList, BandsList.RBandsList))
+
+  given Cogen[BandsList] =
+    Cogen[List[String]].contramap(_.bands.map(_.tag))
+
   given Arbitrary[BrightnessConstraints] =
     Arbitrary {
       for {
+        b <- arbitrary[BandsList]
         f <- arbitrary[FaintnessConstraint]
         l <- arbitrary[Option[SaturationConstraint]]
-      } yield BrightnessConstraints(BandsList.GaiaBandsList, f, l)
+      } yield BrightnessConstraints(b, f, l)
     }
 
   given Cogen[BrightnessConstraints] =
-    Cogen[(FaintnessConstraint, Option[SaturationConstraint])].contramap(x =>
-      (x.faintnessConstraint, x.saturationConstraint)
+    Cogen[(BandsList, FaintnessConstraint, Option[SaturationConstraint])].contramap(x =>
+      (x.searchBands, x.faintnessConstraint, x.saturationConstraint)
     )
 }
 
