@@ -7,6 +7,7 @@ import cats.Eq
 import cats.derived.*
 import cats.kernel.Order
 import cats.syntax.all.*
+import lucuma.core.enums.AltairMode
 import lucuma.core.enums.Flamingos2Disperser
 import lucuma.core.enums.Flamingos2LyotWheel
 import lucuma.core.enums.GmosNorthFilter
@@ -33,9 +34,15 @@ import lucuma.core.math.Region
 import lucuma.core.model.Configuration.ObservingMode.*
 import lucuma.core.model.sequence.flamingos2.Flamingos2FpuMask
 
-case class Configuration(conditions: Configuration.Conditions, target: Either[Coordinates, Region], observingMode: Configuration.ObservingMode) derives Eq:
+case class Configuration(
+  conditions:    Configuration.Conditions,
+  target:        Either[Coordinates, Region],
+  observingMode: Configuration.ObservingMode,
+  altair:        Option[AltairMode]
+) derives Eq:
   def subsumes(other: Configuration): Boolean =
     conditions >= other.conditions &&
+    altair === other.altair &&
     observingMode.subsumes(other.observingMode) && {
     (target, other.target) match
       case (Left(self), Left(other))   => observingMode.radius.toDoubleDegrees >= self.angularDistance(other).toDoubleDegrees

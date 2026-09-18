@@ -4,6 +4,7 @@
 package lucuma.core.model
 package arb
 
+import lucuma.core.enums.AltairMode
 import lucuma.core.enums.Flamingos2Disperser
 import lucuma.core.enums.GmosNorthFilter
 import lucuma.core.enums.GmosNorthGrating
@@ -215,10 +216,11 @@ trait ArbConfiguration:
         c <- arbitrary[Conditions]
         r <- arbitrary[Either[Coordinates, Region]]
         o <- arbitrary[ObservingMode]
-      yield (Configuration(c, r, o))
+        a <- arbitrary[Option[AltairMode]]
+      yield Configuration(c, r, o, a)
 
   given Cogen[Configuration] =
-    Cogen[(Conditions, Either[Coordinates, Region], ObservingMode)]
-      .contramap(c => (c.conditions, c.target, c.observingMode))
+    Cogen[(Conditions, Either[Coordinates, Region], ObservingMode, Option[AltairMode])]
+      .contramap(c => (c.conditions, c.target, c.observingMode, c.altair))
 
 object ArbConfiguration extends ArbConfiguration
