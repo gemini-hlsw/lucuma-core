@@ -9,7 +9,6 @@ import cats.data.NonEmptyList
 import cats.derived.*
 import cats.syntax.all.*
 import eu.timepit.refined.cats.*
-import lucuma.catalog.BandsList
 import lucuma.core.enums.Band
 import lucuma.core.enums.GuideProbe
 import lucuma.core.enums.GuideSpeed
@@ -90,13 +89,13 @@ object AgsAnalysis {
     target:     GuideStarCandidate,
     posAngle:   Angle
   ) extends AgsAnalysis derives Eq {
-    private val probeBands: List[Band]               = BandsList.GaiaBandsList.bands
+    private val bands: List[Band]                    = probeBands(guideProbe).bands
     override def message(withProbe: Boolean): String = {
       val p = if (withProbe) s"${guideProbe} g" else "G"
-      if (probeBands.length == 1) {
-        s"${p}uide star ${probeBands.head}-band magnitude is missing. Cannot determine guiding performance."
+      if (bands.length == 1) {
+        s"${p}uide star ${bands.head.shortName}-band magnitude is missing. Cannot determine guiding performance."
       } else {
-        s"${p}uide star ${probeBands.map(_.shortName).mkString(", ")}-band magnitudes are missing. Cannot determine guiding performance."
+        s"${p}uide star ${bands.map(_.shortName).mkString(", ")}-band magnitudes are missing. Cannot determine guiding performance."
       }
     }
   }
@@ -128,7 +127,7 @@ object AgsAnalysis {
           (u.guideSpeed,
            u.quality,
            u.vignetting.toMicroarcsecondsSquared,
-           u.target.gBrightness,
+           u.target.brightnessIn(probeBands(u.guideProbe)).map(_._2),
            u.target.id
           )
         )

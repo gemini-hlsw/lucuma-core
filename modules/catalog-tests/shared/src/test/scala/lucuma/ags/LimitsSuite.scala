@@ -52,4 +52,77 @@ class LimitsSuite extends munit.FunSuite {
       )
     )
   }
+
+  // IQ 0.2" is in the 20% bucket, 2.0" in the "any" bucket, at any wavelength
+  private def altairConstraints(iq: ImageQuality.Preset, sb: SkyBackground): ConstraintSet =
+    ConstraintSet(
+      iq,
+      CloudExtinction.Preset.PointOne,
+      sb,
+      WaterVapor.Wet,
+      ElevationRange.ByAirMass.Default
+    )
+
+  private val wavelength: Wavelength = Wavelength.fromIntNanometers(1650).get
+
+  test("altair NGS limits are the OCS R table minus cloud extinction") {
+    val limits = guideStarBrightnessConstraints(
+      altairConstraints(ImageQuality.Preset.PointTwo, SkyBackground.Dark),
+      GuideProbe.AltairAOWFS,
+      Some(AltairMode.Ngs),
+      GuideSpeed.Slow,
+      wavelength
+    )
+    // IQ20 / SB50 slow: 15.05, CE 0.1 mag, saturation 17 mag brighter
+    assertEquals(limits.searchBands, BandsList.RBandsList)
+    assertEqualsDouble(limits.faintnessConstraint.brightness.value.value.toDouble, 14.95, 1e-6)
+    assertEqualsDouble(
+      limits.saturationConstraint.get.brightness.value.value.toDouble,
+      14.95 - 17.0,
+      1e-6
+    )
+  }
+
+  test("altair LGS limits are fainter and saturate sooner") {
+    val limits = guideStarBrightnessConstraints(
+      altairConstraints(ImageQuality.Preset.PointTwo, SkyBackground.Dark),
+      GuideProbe.AltairAOWFS,
+      Some(AltairMode.Lgs),
+      GuideSpeed.Fast,
+      wavelength
+    )
+    // IQ20 / SB50 fast: 15.80, CE 0.1 mag, saturation 5 mag brighter
+    assertEqualsDouble(limits.faintnessConstraint.brightness.value.value.toDouble, 15.70, 1e-6)
+    assertEqualsDouble(
+      limits.saturationConstraint.get.brightness.value.value.toDouble,
+      15.70 - 5.0,
+      1e-6
+    )
+  }
+
+  test("altair limits follow the image quality and sky background buckets") {
+    val worst = guideStarBrightnessConstraints(
+      altairConstraints(ImageQuality.Preset.TwoPointZero, SkyBackground.Bright),
+      GuideProbe.AltairAOWFS,
+      Some(AltairMode.Ngs),
+      GuideSpeed.Medium,
+      wavelength
+    )
+    // ANY / ANY medium: 12.50, CE 0.1 mag
+    assertEqualsDouble(worst.faintnessConstraint.brightness.value.value.toDouble, 12.40, 1e-6)
+  }
+
+  test("LGS+P1 guides on PWFS1 with the Gaia limits") {
+    val constraints = altairConstraints(ImageQuality.Preset.PointTwo, SkyBackground.Dark)
+    assertEquals(
+      guideStarBrightnessConstraints(
+        constraints,
+        AltairMode.LgsP1.guideProbe,
+        Some(AltairMode.LgsP1),
+        GuideSpeed.Fast,
+        wavelength
+      ),
+      gaiaBrightnessConstraints(constraints, GuideProbe.PWFS1, GuideSpeed.Fast, wavelength)
+    )
+  }
 }

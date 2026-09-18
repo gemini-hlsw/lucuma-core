@@ -40,13 +40,22 @@ object Ags {
     calcsNanos:           Long // time spent in posCalculations
   )
 
+  private def satisfies(constraint: BrightnessConstraints, candidate: GuideStarCandidate): Boolean =
+    candidate
+      .brightnessIn(constraint.searchBands)
+      .exists((band, brightness) => constraint.contains(band, brightness))
+
   private def guideSpeedFor(
-    speeds: List[(GuideSpeed, BrightnessConstraints)],
-    gMag:   BrightnessValue
+    speeds:    List[(GuideSpeed, BrightnessConstraints)],
+    candidate: GuideStarCandidate
   ): Option[GuideSpeed] =
-    speeds
-      .find(_._2.contains(Band.Gaia, gMag))
-      .map(_._1)
+    speeds.find((_, constraint) => satisfies(constraint, candidate)).map(_._1)
+
+  private def withinConstraint(
+    constraint: Option[BrightnessConstraints],
+    candidate:  GuideStarCandidate
+  ): Boolean =
+    constraint.exists(satisfies(_, candidate))
 
   def resultLabel(a: AgsAnalysis): String = a match
     case _: Usable                 => "usable"
@@ -64,23 +73,25 @@ object Ags {
     protectedAreas: List[Shape],
     pos:            OffsetPosition,
     params:         AgsParams,
-    gsc:            GuideStarCandidate,
+    candidate:      GuideStarCandidate,
     speeds:         List[(GuideSpeed, BrightnessConstraints)],
     calcs:          NonEmptyMap[OffsetPosition, AgsGeomCalc]
   ): AgsAnalysis = {
     val geoms = calcs.lookup(pos)
     if (!geoms.exists(_.isReachable(gsOffset)))
-      // Do we have a g magnitude
-      val guideSpeed = gsc.gBrightness.flatMap { case (_, g) => guideSpeedFor(speeds, g) }
-      AgsAnalysis.NotReachableAtPosition(pos, params.probe, guideSpeed, gsc)
+      AgsAnalysis.NotReachableAtPosition(pos,
+                                         params.probe,
+                                         guideSpeedFor(speeds, candidate),
+                                         candidate
+      )
     else if (geoms.exists(g => protectedAreas.exists(ps => g.overlapsProtectedArea(gsOffset, ps))))
-      AgsAnalysis.VignettesScience(gsc, pos)
+      AgsAnalysis.VignettesScience(candidate, pos)
     else
       magnitudeAnalysis(
         conditions,
         params.probe,
         gsOffset,
-        gsc,
+        candidate,
         // calculate vignetting
         geoms
           .map(c => (o: Offset) => c.vignettingArea(o))
@@ -131,13 +142,13 @@ object Ags {
       )
     }
 
-    // Do we have a g magnitude
-    guideStar.gBrightness match {
-      case Some((_, g)) =>
-        guideSpeedFor(speeds, g)
+    // Do we have a magnitude in the probe's band
+    guideStar.brightnessIn(probeBands(guideProbe)) match {
+      case Some(_) =>
+        guideSpeedFor(speeds, guideStar)
           .map(usable)
           .getOrElse(NoGuideStarForProbe(guideProbe, guideStar, position.posAngle))
-      case _            => NoMagnitudeForBand(guideProbe, guideStar, position.posAngle)
+      case _       => NoMagnitudeForBand(guideProbe, guideStar, position.posAngle)
     }
   }
 
@@ -167,7 +178,7 @@ object Ags {
     positions:   NonEmptyList[OffsetPosition],
     params:      AgsParams
   ): AgsContextBuffer = {
-    val guideSpeeds = guideSpeedLimits(constraints, params.probe, wavelength)
+    val guideSpeeds = guideSpeedLimits(constraints, params, wavelength)
     val calcsStart  = System.nanoTime()
     val calcs       = params.posCalculations(positions)
     val calcsNanos  = System.nanoTime() - calcsStart
@@ -207,21 +218,18 @@ object Ags {
     val protectedShapes = params.protectedAreas(noZones)
 
     in =>
-      (in.filter(c =>
-         c.gBrightness.exists: (_, g) =>
-           ctx.brightnessConstraint.exists(_.contains(Band.Gaia, g))
-       ),
+      (in.filter(withinConstraint(ctx.brightnessConstraint, _)),
        Stream.emits[F, OffsetPosition](positions.toList)
       )
-        .mapN { (gsc, position) =>
-          val offset = baseCoordinates.diff(gsc.tracking.baseCoordinates).offset
+        .mapN { (candidate, position) =>
+          val offset = baseCoordinates.diff(candidate.tracking.baseCoordinates).offset
           runAnalysis(
             constraints,
             offset,
             protectedShapes,
             position,
             params,
-            gsc,
+            candidate,
             ctx.guideSpeeds,
             ctx.calcs
           )
@@ -271,9 +279,7 @@ object Ags {
     val ctx      = analysisContext(constraints, wavelength, positions, params)
     val ctxEnd   = System.nanoTime()
 
-    val accepted = candidates.filter: c =>
-      c.gBrightness.exists: (_, g) =>
-        ctx.brightnessConstraint.exists(_.contains(Band.Gaia, g))
+    val accepted = candidates.filter(withinConstraint(ctx.brightnessConstraint, _))
 
     val sciOffsets      = scienceCoordinates.map(baseCoordinates.diff(_).offset)
     val noZones         = blindOffset
@@ -282,8 +288,8 @@ object Ags {
     val protectedShapes = params.protectedAreas(noZones)
 
     val anStart  = System.nanoTime()
-    val analyses = accepted.flatMap: gsc =>
-      val offset = baseCoordinates.diff(gsc.tracking.baseCoordinates).offset
+    val analyses = accepted.flatMap: candidate =>
+      val offset = baseCoordinates.diff(candidate.tracking.baseCoordinates).offset
 
       positions.toList.map: position =>
         runAnalysis(
@@ -292,7 +298,7 @@ object Ags {
           protectedShapes,
           position,
           params,
-          gsc,
+          candidate,
           ctx.guideSpeeds,
           ctx.calcs
         )
@@ -336,5 +342,18 @@ object Ags {
   ): List[(GuideSpeed, BrightnessConstraints)] =
     GuideSpeed.inSpeedOrder.map: speed =>
       (speed, gaiaBrightnessConstraints(constraints, probe, speed, wavelength))
+
+  /**
+   * Calculates brightness limits for each guide speed, in the band the params' probe uses
+   */
+  def guideSpeedLimits(
+    constraints: ConstraintSet,
+    params:      AgsParams,
+    wavelength:  Wavelength
+  ): List[(GuideSpeed, BrightnessConstraints)] =
+    GuideSpeed.inSpeedOrder.map: speed =>
+      (speed,
+       guideStarBrightnessConstraints(constraints, params.probe, params.altair, speed, wavelength)
+      )
 
 }
