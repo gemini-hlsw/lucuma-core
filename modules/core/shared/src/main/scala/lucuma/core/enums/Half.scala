@@ -44,7 +44,7 @@ object Half {
 
   /** Select the member of Half with the given tag, if any. */
   def fromTag(s: String): Option[Half] =
-    all.find(_.tag === s)
+    HalfEnumerated.fromTag(s)
 
   /** Select the member of Half with the given tag, throwing if absent. */
   def unsafeFromTag(s: String): Half =

@@ -6,7 +6,6 @@ package core
 package enums
 
 import cats.data.NonEmptySet
-import cats.syntax.eq.*
 import coulomb.*
 import eu.timepit.refined.numeric.Positive
 import eu.timepit.refined.types.numeric.PosInt
@@ -67,7 +66,7 @@ object GmosNorthDetector {
 
   /** Select the member of GmosNorthDetector with the given tag, if any. */
   def fromTag(s: String): Option[GmosNorthDetector] =
-    all.find(_.tag === s)
+    GmosDetectorEnumerated.fromTag(s)
 
   /** Select the member of GmosNorthDetector with the given tag, throwing if absent. */
   def unsafeFromTag(s: String): GmosNorthDetector =

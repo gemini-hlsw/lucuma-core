@@ -321,7 +321,7 @@ object Band {
 
   /** Select the member of Band with the given tag, if any. */
   def fromTag(s: String): Option[Band] =
-    all.find(_.tag === s)
+    Enumerated[Band].fromTag(s)
 
   /** Select the member of Band with the given tag, throwing if absent. */
   def unsafeFromTag(s: String): Band =

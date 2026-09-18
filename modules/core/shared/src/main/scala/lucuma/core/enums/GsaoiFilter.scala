@@ -4,7 +4,6 @@
 package lucuma
 package core
 package enums
-import cats.syntax.eq.*
 import lucuma.core.math.Wavelength
 import lucuma.core.syntax.timespan.*
 import lucuma.core.util.Enumerated
@@ -386,7 +385,7 @@ object GsaoiFilter {
 
   /** Select the member of GsaoiFilter with the given tag, if any. */
   def fromTag(s: String): Option[GsaoiFilter] =
-    all.find(_.tag === s)
+    GsaoiFilterEnumerated.fromTag(s)
 
   /** Select the member of GsaoiFilter with the given tag, throwing if absent. */
   def unsafeFromTag(s: String): GsaoiFilter =

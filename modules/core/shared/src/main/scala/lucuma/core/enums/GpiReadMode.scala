@@ -38,7 +38,7 @@ object GpiReadMode {
 
   /** Select the member of GpiReadMode with the given tag, if any. */
   def fromTag(s: String): Option[GpiReadMode] =
-    all.find(_.tag === s)
+    GpiReadModeEnumerated.fromTag(s)
 
   /** Select the member of GpiReadMode with the given tag, throwing if absent. */
   def unsafeFromTag(s: String): GpiReadMode =

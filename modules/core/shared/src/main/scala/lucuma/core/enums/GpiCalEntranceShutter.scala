@@ -4,7 +4,6 @@
 package lucuma
 package core
 package enums
-import cats.syntax.eq.*
 import lucuma.core.util.Enumerated
 
 /**
@@ -29,7 +28,7 @@ object GpiCalEntranceShutter {
 
   /** Select the member of GpiCalEntranceShutter with the given tag, if any. */
   def fromTag(s: String): Option[GpiCalEntranceShutter] =
-    all.find(_.tag === s)
+    GpiCalEntranceShutterEnumerated.fromTag(s)
 
   /** Select the member of GpiCalEntranceShutter with the given tag, throwing if absent. */
   def unsafeFromTag(s: String): GpiCalEntranceShutter =
