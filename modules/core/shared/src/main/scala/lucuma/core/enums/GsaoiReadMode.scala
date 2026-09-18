@@ -4,7 +4,6 @@
 package lucuma
 package core
 package enums
-import cats.syntax.eq.*
 import lucuma.core.syntax.timespan.*
 import lucuma.core.util.Enumerated
 import lucuma.core.util.TimeSpan
@@ -35,7 +34,7 @@ object GsaoiReadMode {
 
   /** Select the member of GsaoiReadMode with the given tag, if any. */
   def fromTag(s: String): Option[GsaoiReadMode] =
-    all.find(_.tag === s)
+    GsaoiReadModeEnumerated.fromTag(s)
 
   /** Select the member of GsaoiReadMode with the given tag, throwing if absent. */
   def unsafeFromTag(s: String): GsaoiReadMode =

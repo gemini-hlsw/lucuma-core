@@ -4,7 +4,6 @@
 package lucuma
 package core
 package enums
-import cats.syntax.eq.*
 import lucuma.core.util.Enumerated
 
 /**
@@ -29,7 +28,7 @@ object GpiPupilCamera {
 
   /** Select the member of GpiPupilCamera with the given tag, if any. */
   def fromTag(s: String): Option[GpiPupilCamera] =
-    all.find(_.tag === s)
+    GpiPupilCameraEnumerated.fromTag(s)
 
   /** Select the member of GpiPupilCamera with the given tag, throwing if absent. */
   def unsafeFromTag(s: String): GpiPupilCamera =

@@ -5,7 +5,6 @@ package lucuma
 package core
 package enums
 
-import cats.syntax.eq.*
 import lucuma.core.math.Angle
 import lucuma.core.math.Declination
 import lucuma.core.optics.syntax.prism.*
@@ -43,7 +42,7 @@ object TwilightType {
 
   /** Select the member of TwilightType with the given tag, if any. */
   def fromTag(s: String): Option[TwilightType] =
-    all.find(_.tag === s)
+    enumeratedTwilightType.fromTag(s)
 
   /** Select the member of TwilightType with the given tag, throwing if absent. */
   def unsafeFromTag(s: String): TwilightType =

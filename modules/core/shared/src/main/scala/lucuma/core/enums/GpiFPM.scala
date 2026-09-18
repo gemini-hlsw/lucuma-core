@@ -4,7 +4,6 @@
 package lucuma
 package core
 package enums
-import cats.syntax.eq.*
 import lucuma.core.util.Enumerated
 
 /**
@@ -35,7 +34,7 @@ object GpiFPM {
 
   /** Select the member of GpiFPM with the given tag, if any. */
   def fromTag(s: String): Option[GpiFPM] =
-    all.find(_.tag === s)
+    GpiFPMEnumerated.fromTag(s)
 
   /** Select the member of GpiFPM with the given tag, throwing if absent. */
   def unsafeFromTag(s: String): GpiFPM =

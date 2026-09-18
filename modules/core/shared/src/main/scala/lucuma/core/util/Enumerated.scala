@@ -27,24 +27,28 @@ trait Enumerated[A] extends Order[A] with Encoder[A] with Decoder[A]:
   def tag(a: A): String
 
   /** Select the member of this enumeration with the given tag, if any. */
-  def fromTag(s: String): Option[A] = all.find(tag(_) === s)
+  def fromTag(s: String): Option[A] = tagToValue.get(s).map(_._1)
 
   /** Select the member of this enumeration with the given tag, throwing if absent. */
   def unsafeFromTag(tag: String): A = fromTag(tag).getOrElse(sys.error("Invalid tag: " + tag))
 
   def compare(a: A, b: A): Int =
-    Order[Int].compare(indexOfTag(tag(a)), indexOfTag(tag(b)))
+    Order[Int].compare(tagToValue(tag(a))._2, tagToValue(tag(b))._2)
 
-  // Hashed index lookup, for efficient use as an `Order`.
-  private lazy val indexOfTag: Map[String, Int] =
-    all.zipWithIndex.iterator.map { case (a, n) => (tag(a), n) }.toMap
+  // Hashed tag lookup to value and canonical index, for efficient use in `fromTag` and `Order`.
+  private lazy val tagToValue: Map[String, (A, Int)] =
+    all.mapWithIndex((a, n) => (tag(a), (a, n))).toMap
+
+  // Hashed screaming snake case tag lookup, for efficient use as a `Decoder`.
+  private lazy val screamingSnakeCaseTagToValue: Map[String, A] =
+    all.map(a => (tag(a).toScreamingSnakeCase, a)).toMap
 
   // Decoder
   def apply(c: HCursor): Decoder.Result[A] =
     c.as[String].flatMap { s =>
-      all
-        .find(e => tag(e).toScreamingSnakeCase === s)
-        .toRight(DecodingFailure(s"Could not parse enumerated type value '$s'", Nil))
+      screamingSnakeCaseTagToValue
+        .get(s)
+        .toRight(DecodingFailure(s"Could not parse enumerated type value '$s'", c.history))
     }
 
   // Encoder
@@ -82,9 +86,8 @@ object Enumerated:
   private def enumeratedImpl[E: Type](using Quotes): Expr[Enumerated[E]] =
     '{
       Enumerated
-        .fromNEL(NonEmptyList.fromList(${ enumValuesImpl[E] }.toList).get)
+        .fromNEL(NonEmptyList.fromListUnsafe(${ enumValuesImpl[E] }.toList))
         .withTag(x => ${ tagImpl[E]('x) })
     }
 
   inline def derived[E]: Enumerated[E] = ${ enumeratedImpl[E] }
-

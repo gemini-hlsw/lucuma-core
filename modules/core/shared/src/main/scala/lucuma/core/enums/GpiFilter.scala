@@ -4,7 +4,6 @@
 package lucuma
 package core
 package enums
-import cats.syntax.eq.*
 import lucuma.core.util.Enumerated
 
 /**
@@ -43,7 +42,7 @@ object GpiFilter {
 
   /** Select the member of GpiFilter with the given tag, if any. */
   def fromTag(s: String): Option[GpiFilter] =
-    all.find(_.tag === s)
+    GpiFilterEnumerated.fromTag(s)
 
   /** Select the member of GpiFilter with the given tag, throwing if absent. */
   def unsafeFromTag(s: String): GpiFilter =

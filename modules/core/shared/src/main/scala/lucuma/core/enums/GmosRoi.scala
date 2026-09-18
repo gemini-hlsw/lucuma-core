@@ -4,7 +4,6 @@
 package lucuma
 package core
 package enums
-import cats.syntax.eq.*
 import lucuma.core.util.Enumerated
 
 /**
@@ -31,7 +30,7 @@ object GmosRoi {
 
   /** Select the member of GmosRoi with the given tag, if any. */
   def fromTag(s: String): Option[GmosRoi] =
-    all.find(_.tag === s)
+    GmosRoiEnumerated.fromTag(s)
 
   /** Select the member of GmosRoi with the given tag, throwing if absent. */
   def unsafeFromTag(s: String): GmosRoi =
