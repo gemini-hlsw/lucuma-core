@@ -4,7 +4,9 @@
 package lucuma.core.model
 
 import cats.syntax.all.*
+import lucuma.core.enums.AltairMode
 import lucuma.core.model.arb.ArbConfiguration.given
+import lucuma.core.util.arb.ArbEnumerated.given
 import munit.ScalaCheckSuite
 import org.scalacheck.*
 import org.scalacheck.Prop.*
@@ -39,6 +41,13 @@ final class ConfigurationSuite extends ScalaCheckSuite:
       val cb = cfg.copy(observingMode = b)
       assertEquals(ca.subsumes(cb), a.grating === b.grating)
       assertEquals(cb.subsumes(ca), a.grating === b.grating)
+
+  test("Altair mode must match exactly"):
+    forAll: (cfg: Configuration, a: Option[AltairMode], b: Option[AltairMode]) =>
+      val ca = cfg.copy(altair = a)
+      val cb = cfg.copy(altair = b)
+      assertEquals(ca.subsumes(cb), a === b)
+      assertEquals(cb.subsumes(ca), a === b)
 
   test("Flamingos2 MOS is constrained by disperser"):
     forAll: (cfg: Configuration, a: Flamingos2Mos, b: Flamingos2Mos) =>
