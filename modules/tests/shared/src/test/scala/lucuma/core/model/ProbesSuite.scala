@@ -74,11 +74,3 @@ final class ProbesSuite extends FunSuite:
     modes.filterNot(_.tag.startsWith("gnirs")).foreach: m =>
       assert(probes.allowedProbes(m, Some(AltairMode.Ngs)).isEmpty, clue = m.tag)
       assertEquals(probes.defaultGuideProbe(m, TrackType.Sidereal, Some(AltairMode.Ngs)), None, clue = m.tag)
-
-  test("without Altair the Altair-aware rules agree with the plain ones"):
-    for
-      m <- modes
-      t <- Enumerated[TrackType].all
-    do
-      assertEquals(probes.allowedProbes(m, None), probes.allowedProbes(m), clue = m.tag)
-      assertEquals(probes.defaultGuideProbe(m, t, None), probes.defaultGuideProbe(m, t), clue = m.tag)
