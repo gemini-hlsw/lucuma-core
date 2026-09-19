@@ -28,30 +28,31 @@ trait probes:
    * Probes AGS has geometry for in the given observing mode, i.e. the probes a
    * user may legitimately pick when overriding the automatic choice made by
    * `defaultGuideProbe`.  Ordered best-first, see `GuideProbe.Preference`.
+   *
+   * Behind Altair the probe is fixed to the one holding its natural guide
+   * star, and Altair only supports GNIRS.
    */
-  def allowedProbes(observingMode: ObservingModeType): SortedSet[GuideProbe] =
-    observingMode match
-      // Exchange observations are not supported by AGS; there is no guide probe.
-      case _: ExchangeObservingModeType => SortedSet.empty
-      case _: VisitorObservingModeType  => Pwfs
-      case m: FacilityObservingModeType => facilityProbes(m)
-
-  /**
-   * Allowed probes when the observation may be behind Altair. Altair fixes the probe to the one
-   * holding its natural guide star, and it only supports GNIRS.
-   */
-  def allowedProbes(observingMode: ObservingModeType, altair: Option[AltairMode]): SortedSet[GuideProbe] =
+  def allowedProbes(
+    observingMode: ObservingModeType,
+    altair:        Option[AltairMode] = None
+  ): SortedSet[GuideProbe] =
     val isGnirs: Boolean =
       ObservingModeType.toFacility.getOption(observingMode).exists(_.instrument === Instrument.Gnirs)
     altair match
       case Some(mode) if isGnirs => SortedSet(mode.guideProbe)
       case Some(_)               => SortedSet.empty
-      case None                  => allowedProbes(observingMode)
+      case None                  =>
+        observingMode match
+          // Exchange observations are not supported by AGS; there is no guide probe.
+          case _: ExchangeObservingModeType => SortedSet.empty
+          case _: VisitorObservingModeType  => Pwfs
+          case m: FacilityObservingModeType => facilityProbes(m)
 
-  def isProbeAllowed(observingMode: ObservingModeType, probe: GuideProbe): Boolean =
-    allowedProbes(observingMode).contains(probe)
-
-  def isProbeAllowed(observingMode: ObservingModeType, altair: Option[AltairMode], probe: GuideProbe): Boolean =
+  def isProbeAllowed(
+    observingMode: ObservingModeType,
+    probe:         GuideProbe,
+    altair:        Option[AltairMode] = None
+  ): Boolean =
     allowedProbes(observingMode, altair).contains(probe)
 
   // Split out so the compiler enforces exhaustivity: adding a facility mode
@@ -76,16 +77,13 @@ trait probes:
 
   /**
    * The probe AGS selects by default: the most preferred allowed probe.  An
-   * OIWFS cannot track a nonsidereal target, so it drops out of the running.
+   * OIWFS cannot track a nonsidereal target, so it drops out of the running;
+   * the Altair WFS itself can track a nonsidereal star.
    */
-  def defaultGuideProbe(observingMode: ObservingModeType, trackType: TrackType): Option[GuideProbe] =
-    defaultGuideProbe(observingMode, trackType, none)
-
-  /** As above, with Altair fixing the probe; the Altair WFS itself can track a nonsidereal star. */
   def defaultGuideProbe(
     observingMode: ObservingModeType,
     trackType:     TrackType,
-    altair:        Option[AltairMode]
+    altair:        Option[AltairMode] = None
   ): Option[GuideProbe] =
     allowedProbes(observingMode, altair)
       .filter:

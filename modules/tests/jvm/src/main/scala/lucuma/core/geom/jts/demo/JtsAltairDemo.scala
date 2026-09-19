@@ -36,7 +36,7 @@ import java.awt.{List as _, *}
  */
 trait GnirsAltairVisualizationShapes(val posAngle: Angle) extends AgsVisualizationBase:
 
-  val guideStarOffset: Offset = Offset(12.arcsec.p, 18.arcsec.q)
+  val guideStarOffset: Offset = Offset(12.arcsec.p, 12.arcsec.q)
 
   val anglesToTest: NonEmptyList[Angle] =
     NonEmptyList.of(posAngle, posAngle + Angle.Angle180)
