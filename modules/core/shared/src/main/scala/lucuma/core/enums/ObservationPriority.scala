@@ -21,3 +21,6 @@ enum ObservationPriority(
   case Low    extends ObservationPriority("low",    "Low")
   case Medium extends ObservationPriority("medium", "Medium")
   case High   extends ObservationPriority("high",   "High")
+
+object ObservationPriority:
+  val Default: ObservationPriority = Medium
