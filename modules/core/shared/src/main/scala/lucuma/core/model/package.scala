@@ -87,6 +87,9 @@ type IntCentiPercentUnbounded = IntCentiPercentUnbounded.Type
 
 
 object AirMass extends NewRefined[BigDecimal, Not[Less[1]]]:
+  /** Air mass at the zenith. */
+  val Zenith: AirMass = unsafeFrom(BigDecimal(1))
+
   /**
     * Minimum airmass that a given declination reaches from a given latitude.
     */
