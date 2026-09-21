@@ -35,7 +35,9 @@ object AgsParamsVariants:
   val variants: List[(String, Params)] =
     withProbes("GMOS imaging side", AgsParams.GmosImaging(PortDisposition.Side)) ++
       withProbes("GMOS imaging bottom", AgsParams.GmosImaging(PortDisposition.Bottom)) ++
-      withProbes("GMOS-N long slit 1.0", AgsParams.GmosLongSlit(GmosNorthFpu.LongSlit_1_00.asLeft)) ++
+      withProbes("GMOS-N long slit 1.0",
+                 AgsParams.GmosLongSlit(GmosNorthFpu.LongSlit_1_00.asLeft)
+      ) ++
       withProbes(
         "GMOS-S long slit 0.5 bottom",
         AgsParams.GmosLongSlit(GmosSouthFpu.LongSlit_0_50.asRight, PortDisposition.Bottom)
@@ -68,14 +70,31 @@ object AgsParamsVariants:
           PortDisposition.Side
         )
       ) ++
-      withProbes("F2 MOS", AgsParams.Flamingos2Mos(Flamingos2LyotWheel.F16, PortDisposition.Side)) ++
+      withProbes("F2 MOS",
+                 AgsParams.Flamingos2Mos(Flamingos2LyotWheel.F16, PortDisposition.Side)
+      ) ++
       withProbes("IGRINS-2", AgsParams.Igrins2LongSlit()) ++
       withProbes(
         "GNIRS long slit",
-        AgsParams.GnirsLongSlit(GnirsFpuSlit.LongSlit_0_30, GnirsCamera.ShortBlue, GnirsPrism.Mirror)
+        AgsParams.GnirsLongSlit(GnirsFpuSlit.LongSlit_0_30,
+                                GnirsCamera.ShortBlue,
+                                GnirsPrism.Mirror
+        )
       ) ++
-      withProbes("GNIRS imaging keyhole", AgsParams.GnirsImaging(GnirsCamera.LongRed, GnirsFilter.Order4)) ++
+      withProbes("GNIRS imaging keyhole",
+                 AgsParams.GnirsImaging(GnirsCamera.LongRed, GnirsFilter.Order4)
+      ) ++
       withProbes("GNIRS IFU", AgsParams.GnirsIfu(GnirsFpuIfu.LowResolution)) ++
+      List(
+        "GNIRS imaging Altair NGS"      ->
+          AgsParams
+            .GnirsImaging(GnirsCamera.ShortBlue, GnirsFilter.Order4)
+            .withAltair(AltairMode.Ngs),
+        "GNIRS long slit Altair LGS+P1" ->
+          AgsParams
+            .GnirsLongSlit(GnirsFpuSlit.LongSlit_0_30, GnirsCamera.ShortBlue, GnirsPrism.Mirror)
+            .withAltair(AltairMode.LgsP1)
+      ) ++
       withProbes("GHOST", AgsParams.GhostIfu()) ++
       withProbes("MaroonX", AgsParams.Visitor(MaroonXSkyFiberPatrol, MaroonXScienceFov)) ++
       withProbes("Visitor 30/10", AgsParams.Visitor(30.arcsec, 10.arcsec))

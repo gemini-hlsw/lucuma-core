@@ -7,7 +7,6 @@ import lucuma.core.geom.BoundingOffsets
 import lucuma.core.geom.Shape
 import lucuma.core.geom.ShapeExpression
 import lucuma.core.geom.jts.interpreter.given
-import lucuma.core.geom.syntax.all.*
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 

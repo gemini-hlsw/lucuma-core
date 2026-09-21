@@ -40,9 +40,7 @@ final case class JtsShape(g: Geometry) extends Shape {
     case JtsShape(thatG) => JtsShape(g.intersection(thatG))
     case _               => throw new UnsupportedOperationException("Cannot intersect non-JTS shapes")
 
-  // Each step applied in sequence, exactly as the interpreter evaluates Translate, Rotate and
-  // Translate. Identity steps are skipped: transforming by them is a no-op on every coordinate, so
-  // the result stays bit-identical to evaluating the expression.
+  // Same steps as the interpreter; identity steps skipped so the result stays bit-identical.
   def transform(preTranslation: Offset, rotation: Angle, postTranslation: Offset): Shape =
     def translate(geom: Geometry, o: Offset): Geometry =
       val c = o.coordinate

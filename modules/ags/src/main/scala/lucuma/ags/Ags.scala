@@ -6,7 +6,6 @@ package lucuma.ags
 import cats.Order
 import cats.Order.given
 import cats.data.NonEmptyList
-import cats.data.NonEmptyMap
 import cats.data.NonEmptySet
 import cats.syntax.all.*
 import fs2.*
@@ -34,7 +33,6 @@ import scala.collection.immutable.SortedSet
 object Ags {
   private case class AgsContextBuffer(
     guideSpeeds:          List[(GuideSpeed, BrightnessConstraints)],
-    calcs:                NonEmptyMap[OffsetPosition, AgsGeomCalc],
     // Positions paired with their geometry, in generation order, so the loop never looks up.
     positionCalcs:        List[(OffsetPosition, AgsGeomCalc)],
     brightnessConstraint: Option[BrightnessConstraints],
@@ -174,7 +172,7 @@ object Ags {
     val bc            = constraintsFor(guideSpeeds)
     val byPosition    = calcs.toSortedMap
     val positionCalcs = positions.toList.map(p => (p, byPosition(p)))
-    AgsContextBuffer(guideSpeeds, calcs, positionCalcs, bc, calcsNanos)
+    AgsContextBuffer(guideSpeeds, positionCalcs, bc, calcsNanos)
   }
 
   /**
@@ -279,13 +277,11 @@ object Ags {
     val protectedShapes = params.protectedAreas(noZones)
 
     val anStart  = System.nanoTime()
-    val analyses = List.newBuilder[AgsAnalysis]
-    analyses.sizeHint(accepted.size * ctx.positionCalcs.size)
-    accepted.foreach: candidate =>
+    val analyses = accepted.flatMap: candidate =>
       val offset     = baseCoordinates.diff(candidate.tracking.baseCoordinates).offset
       val guideSpeed = ctx.guideSpeedOf(candidate)
-      ctx.positionCalcs.foreach: (position, geoms) =>
-        analyses += runAnalysis(
+      ctx.positionCalcs.map: (position, geoms) =>
+        runAnalysis(
           constraints,
           offset,
           protectedShapes,
@@ -304,7 +300,7 @@ object Ags {
       acquisitionOffsets.fold(0)(_.value.size.toInt),
       scienceOffsets.fold(0)(_.value.size.toInt),
       positions.size,
-      analyses.result(),
+      analyses,
       ctxEnd - ctxStart,
       ctx.calcsNanos,
       anEnd - anStart

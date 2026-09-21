@@ -5,7 +5,6 @@ package lucuma.ags
 
 import lucuma.core.geom.Shape
 import lucuma.core.geom.jts.interpreter.given
-import lucuma.core.geom.syntax.all.*
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 import lucuma.core.math.syntax.int.*
@@ -55,8 +54,8 @@ class ShapePlacementSuite extends munit.FunSuite:
 
   // The only extended vignetting area is the Visitor's, and `posCalculations` hoists it too.
   test("extended vignetting area places like the science area"):
-    val params = AgsParams.Visitor(30.arcsec, 10.arcsec)
-    val f      = params.extendedVignettingArea.getOrElse(fail("Visitor has no extended area"))
+    val params   = AgsParams.Visitor(30.arcsec, 10.arcsec)
+    val f        = params.extendedVignettingArea.getOrElse(fail("Visitor has no extended area"))
     val constant = f(Angle.Angle0, Offset.Zero).eval
     for
       pa     <- posAngles

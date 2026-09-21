@@ -39,11 +39,7 @@ trait Shape {
   /** Computes the intersection with another Shape */
   def intersection(that: Shape): Shape
 
-  /**
-   * The evaluated form of `e ↗ preTranslation ⟲ rotation ↗ postTranslation`, for reusing one
-   * evaluated shape at many placements. This covers every placement AGS uses: `⟲ a ↗ o` (the probe
-   * arm), `shapeAt` and `shapePivotAt`.
-   */
+  /** The evaluated form of `e ↗ preTranslation ⟲ rotation ↗ postTranslation`. */
   def transform(preTranslation: Offset, rotation: Angle, postTranslation: Offset): Shape
 
 }
