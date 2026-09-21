@@ -40,8 +40,6 @@ import lucuma.core.math.Offset
 import lucuma.core.math.syntax.int.*
 import lucuma.core.model.sequence.flamingos2.Flamingos2FpuMask
 
-import scala.annotation.unused
-
 sealed trait AgsGeomCalc:
   // Indicates if the given offset is reachable
   def isReachable(gsOffset: Offset): Boolean
@@ -68,14 +66,9 @@ trait SingleProbeAgsParams:
   def patrolFieldShape: ShapeExpression = patrolFieldAt(Angle.Angle0, Offset.Zero, Offset.Zero)
 
   // The OIWFS arm in its own frame, mirror at the origin. PWFS is handled below for every probe.
-  protected def oiwfsArmShape: ShapeExpression = ShapeExpression.Empty
+  protected def oiwfsArmShape: ShapeExpression
 
-  protected def oiwfsArmAngle(
-    @unused posAngle:  Angle,
-    @unused guideStar: Offset,
-    @unused offset:    Offset
-  ): Angle =
-    Angle.Angle0
+  protected def oiwfsArmAngle(posAngle: Angle, guideStar: Offset, offset: Offset): Angle
 
   def probeArmShape: ShapeExpression =
     probe match
@@ -577,6 +570,16 @@ object AgsParams:
   trait PwfsOnlyParams extends SingleProbeAgsParams:
     def probe: PWFSGuideProbe
 
+    // No OIWFS behind these probes.
+    override protected def oiwfsArmShape: ShapeExpression = ShapeExpression.Empty
+
+    override protected def oiwfsArmAngle(
+      posAngle:  Angle,
+      guideStar: Offset,
+      offset:    Offset
+    ): Angle =
+      Angle.Angle0
+
     override def patrolFieldAt(
       posAngle: Angle,
       offset:   Offset,
@@ -593,6 +596,16 @@ object AgsParams:
    */
   trait AltairCapableParams extends SingleProbeAgsParams:
     def probe: GuideProbe
+
+    // No OIWFS behind these probes.
+    override protected def oiwfsArmShape: ShapeExpression = ShapeExpression.Empty
+
+    override protected def oiwfsArmAngle(
+      posAngle:  Angle,
+      guideStar: Offset,
+      offset:    Offset
+    ): Angle =
+      Angle.Angle0
 
     override def patrolFieldAt(
       posAngle: Angle,

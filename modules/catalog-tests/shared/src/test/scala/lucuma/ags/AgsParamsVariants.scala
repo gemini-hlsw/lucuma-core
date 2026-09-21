@@ -55,12 +55,8 @@ object AgsParamsVariants:
         AgsParams.Flamingos2Imaging(Flamingos2LyotWheel.F16, PortDisposition.Side)
       ) ++
       withProbes(
-        "F2 imaging GeMS-under bottom",
-        AgsParams.Flamingos2Imaging(Flamingos2LyotWheel.GemsUnder, PortDisposition.Bottom)
-      ) ++
-      withProbes(
-        "F2 imaging GeMS-over bottom",
-        AgsParams.Flamingos2Imaging(Flamingos2LyotWheel.GemsOver, PortDisposition.Bottom)
+        "F2 imaging f/16 bottom",
+        AgsParams.Flamingos2Imaging(Flamingos2LyotWheel.F16, PortDisposition.Bottom)
       ) ++
       withProbes(
         "F2 long slit 2px",

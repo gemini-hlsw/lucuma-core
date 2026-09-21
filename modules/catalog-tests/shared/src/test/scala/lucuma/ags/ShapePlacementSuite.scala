@@ -13,18 +13,16 @@ import AgsParamsVariants.*
 
 /**
  * `posCalculations` evaluates the science area and the patrol field once and places them per
- * position with `Shape.transform`, instead of rebuilding each polygon at every position. That is
- * only sound while both are a fixed shape put somewhere, so this holds the law: for every variant,
- * position angle, offset and pivot, the placed constant must equal the placed expression.
+ * position with `Shape.transform`, instead of rebuilding each polygon at every position.
  */
 class ShapePlacementSuite extends munit.FunSuite:
 
   private val pivots: List[Offset] =
     List(Offset.Zero, off(-12.5, 8), off(30, 30))
 
-  private def assertSame(placed: Shape, direct: Shape, clue: String): Unit =
-    assertEquals(placed.area, direct.area, s"$clue area")
-    assertEquals(placed.boundingOffsets, direct.boundingOffsets, s"$clue bbox")
+  private def assertSame(placed: Shape, direct: Shape): Unit =
+    assertEquals(placed.area, direct.area)
+    assertEquals(placed.boundingOffsets, direct.boundingOffsets)
 
   variants.foreach: (name, params) =>
     test(s"$name: placed science area equals the evaluated science area expression"):
@@ -35,8 +33,7 @@ class ShapePlacementSuite extends munit.FunSuite:
       do
         assertSame(
           constant.transform(offset, pa, Offset.Zero),
-          params.scienceArea(pa, offset).eval,
-          s"$name PA ${pa.toDoubleDegrees} offset $offset"
+          params.scienceArea(pa, offset).eval
         )
 
     test(s"$name: placed patrol field equals the evaluated patrol field expression"):
@@ -48,8 +45,7 @@ class ShapePlacementSuite extends munit.FunSuite:
       do
         assertSame(
           constant.transform(offset - pivot, pa, pivot),
-          params.patrolFieldAt(pa, offset, pivot).eval,
-          s"$name PA ${pa.toDoubleDegrees} offset $offset pivot $pivot"
+          params.patrolFieldAt(pa, offset, pivot).eval
         )
 
   // The only extended vignetting area is the Visitor's, and `posCalculations` hoists it too.
@@ -63,6 +59,5 @@ class ShapePlacementSuite extends munit.FunSuite:
     do
       assertSame(
         constant.transform(offset, pa, Offset.Zero),
-        f(pa, offset).eval,
-        s"Visitor PA ${pa.toDoubleDegrees} offset $offset"
+        f(pa, offset).eval
       )
