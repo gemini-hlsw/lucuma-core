@@ -32,6 +32,8 @@ final case class JtsShape(g: Geometry) extends Shape {
   override def area: Area =
     Area.fromMicroarcsecondsSquared.getOption(g.getArea.round).getOrElse(Area.MinArea)
 
+  def isEmpty: Boolean = g.isEmpty
+
   def intersects(that: Shape): Boolean = that match
     case JtsShape(thatG) => g.intersects(thatG)
     case _               => throw new UnsupportedOperationException("Cannot intersect non-JTS shapes")

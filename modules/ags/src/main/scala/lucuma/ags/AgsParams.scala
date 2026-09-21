@@ -129,10 +129,11 @@ trait SingleProbeAgsParams:
               .reduce(using _ ∩ _)
 
           // One evaluated patrol field placed per offset, rather than rebuilt at each of them.
+          // The intersection only shrinks, so once empty the remaining overlays are skipped.
           val shape =
             distinctOffsets
               .map((offset, pivot) => patrolFieldEval.transform(offset - pivot, posAngle, pivot))
-              .reduceLeft(_.intersection(_))
+              .reduceLeft((acc, next) => if acc.isEmpty then acc else acc.intersection(next))
           posAngle -> (se, shape, shape.boundingOffsets)
         .toMap
 
