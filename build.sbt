@@ -222,8 +222,11 @@ lazy val itac = project
   .settings(
     name := "lucuma-itac",
     libraryDependencies ++= Seq(
-      "org.slf4j"     %  "slf4j-simple"           % slf4jVersion,
-      "org.typelevel" %%% "munit-cats-effect"   % munitCatsEffectVersion % Test,
+      "org.slf4j"     %  "slf4j-simple"         % slf4jVersion,
+      "io.circe"      %% "circe-yaml"           % "0.16.1",
+      "org.typelevel" %% "munit-cats-effect"   % munitCatsEffectVersion % Test,
+      "org.scala-lang.modules" %% "scala-xml"  % scalaXmlVersion % Test,
+      "org.typelevel" %% "cats-mtl" % "1.4.0",
     )
   )
 
