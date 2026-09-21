@@ -1,7 +1,7 @@
 // Copyright (c) 2016-2025 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package lucuma
+package lucuma.ocs
 
 import lucuma.core.enums.ScienceBand
 import edu.gemini.tac.qengine.p1.Proposal
@@ -9,6 +9,7 @@ import lucuma.core.util.Enumerated
 import scala.io.Source
 import scala.io.Codec
 import munit.FunSuite
+import io.circe.yaml.parser
 
 object Fixture_25B:
 
@@ -28,6 +29,9 @@ object Fixture_25B:
   def loadProposalIntoBand(band: ScienceBand, yamlFile: String): Proposal =
     println(s"$band -> $yamlFile")
     withSource(yamlFile): s =>
+      parser.parse(s.getLines().mkString("\n")) match
+        case Left(e) => sys.error("can't parse $yamlFile")
+        case Right(j) => println(j.hcursor.downField("Reference").as[String])
       null
 
   def loadBand(band: ScienceBand): List[Proposal] =
