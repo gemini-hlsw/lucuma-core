@@ -33,7 +33,6 @@ import scala.collection.immutable.SortedSet
 object Ags {
   private case class AgsContextBuffer(
     guideSpeeds:          List[(GuideSpeed, BrightnessConstraints)],
-    // Positions paired with their geometry, in generation order, so the loop never looks up.
     positionCalcs:        List[(OffsetPosition, AgsGeomCalc)],
     brightnessConstraint: Option[BrightnessConstraints],
     calcsNanos:           Long // time spent in posCalculations
