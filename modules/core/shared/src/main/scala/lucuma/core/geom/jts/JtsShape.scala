@@ -8,6 +8,7 @@ import lucuma.core.geom.jts.syntax.all.*
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 import org.locationtech.jts.geom.Geometry
+import org.locationtech.jts.geom.util.AffineTransformation
 
 /**
  * JTS implementation of Shape.
@@ -31,6 +32,8 @@ final case class JtsShape(g: Geometry) extends Shape {
   override def area: Area =
     Area.fromMicroarcsecondsSquared.getOption(g.getArea.round).getOrElse(Area.MinArea)
 
+  def isEmpty: Boolean = g.isEmpty
+
   def intersects(that: Shape): Boolean = that match
     case JtsShape(thatG) => g.intersects(thatG)
     case _               => throw new UnsupportedOperationException("Cannot intersect non-JTS shapes")
@@ -39,4 +42,16 @@ final case class JtsShape(g: Geometry) extends Shape {
     case JtsShape(thatG) => JtsShape(g.intersection(thatG))
     case _               => throw new UnsupportedOperationException("Cannot intersect non-JTS shapes")
 
+  // Same steps as the interpreter; identity steps skipped so the result stays bit-identical.
+  def transform(preTranslation: Offset, rotation: Angle, postTranslation: Offset): Shape =
+    def translate(geom: Geometry, o: Offset): Geometry =
+      val c = o.coordinate
+      if (c.x == 0.0 && c.y == 0.0) geom
+      else AffineTransformation.translationInstance(c.x, c.y).transform(geom)
+
+    def rotate(geom: Geometry): Geometry =
+      if (rotation.toMicroarcseconds == 0L) geom
+      else AffineTransformation.rotationInstance(rotation.toDoubleRadians).transform(geom)
+
+    JtsShape(translate(rotate(translate(g, preTranslation)), postTranslation))
 }

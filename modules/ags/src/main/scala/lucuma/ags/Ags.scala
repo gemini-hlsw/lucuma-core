@@ -6,7 +6,6 @@ package lucuma.ags
 import cats.Order
 import cats.Order.given
 import cats.data.NonEmptyList
-import cats.data.NonEmptyMap
 import cats.data.NonEmptySet
 import cats.syntax.all.*
 import fs2.*
@@ -17,7 +16,6 @@ import lucuma.core.enums.Band
 import lucuma.core.enums.GuideProbe
 import lucuma.core.enums.GuideSpeed
 import lucuma.core.enums.StepGuideState
-import lucuma.core.geom.Area
 import lucuma.core.geom.Shape
 import lucuma.core.geom.offsets.OffsetPosition
 import lucuma.core.geom.offsets.OffsetPositions
@@ -35,10 +33,12 @@ import scala.collection.immutable.SortedSet
 object Ags {
   private case class AgsContextBuffer(
     guideSpeeds:          List[(GuideSpeed, BrightnessConstraints)],
-    calcs:                NonEmptyMap[OffsetPosition, AgsGeomCalc],
+    positionCalcs:        List[(OffsetPosition, AgsGeomCalc)],
     brightnessConstraint: Option[BrightnessConstraints],
     calcsNanos:           Long // time spent in posCalculations
-  )
+  ):
+    def guideSpeedOf(candidate: GuideStarCandidate): Option[GuideSpeed] =
+      guideSpeedFor(guideSpeeds, candidate)
 
   private def satisfies(constraint: BrightnessConstraints, candidate: GuideStarCandidate): Boolean =
     candidate
@@ -66,7 +66,8 @@ object Ags {
     case _: MagnitudeTooFaint      => "magnitude_too_faint"
     case _: MagnitudeTooBright     => "magnitude_too_bright"
 
-  // Runs the analyisis for a single guide star at a single position
+  // Runs the analysis for a single guide star at a single position. `guideSpeed` is the
+  // candidate's fastest usable speed, computed once per candidate by the caller.
   protected def runAnalysis(
     conditions:     ConstraintSet,
     gsOffset:       Offset,
@@ -74,44 +75,29 @@ object Ags {
     pos:            OffsetPosition,
     params:         AgsParams,
     candidate:      GuideStarCandidate,
-    speeds:         List[(GuideSpeed, BrightnessConstraints)],
-    calcs:          NonEmptyMap[OffsetPosition, AgsGeomCalc]
-  ): AgsAnalysis = {
-    val geoms = calcs.lookup(pos)
-    if (!geoms.exists(_.isReachable(gsOffset)))
-      AgsAnalysis.NotReachableAtPosition(pos,
-                                         params.probe,
-                                         guideSpeedFor(speeds, candidate),
-                                         candidate
-      )
-    else if (geoms.exists(g => protectedAreas.exists(ps => g.overlapsProtectedArea(gsOffset, ps))))
+    guideSpeed:     Option[GuideSpeed],
+    geoms:          AgsGeomCalc
+  ): AgsAnalysis =
+    if (!geoms.isReachable(gsOffset))
+      AgsAnalysis.NotReachableAtPosition(pos, params.probe, guideSpeed, candidate)
+    else if (protectedAreas.exists(ps => geoms.overlapsProtectedArea(gsOffset, ps)))
       AgsAnalysis.VignettesScience(candidate, pos)
     else
-      magnitudeAnalysis(
-        conditions,
-        params.probe,
-        gsOffset,
-        candidate,
-        // calculate vignetting
-        geoms
-          .map(c => (o: Offset) => c.vignettingArea(o))
-          .getOrElse((_: Offset) => Area.MaxArea),
-        pos
-      )(speeds)
-  }
+      magnitudeAnalysis(conditions, params.probe, gsOffset, candidate, geoms, pos, guideSpeed)
 
   /**
    * Analysis of the suitability of the magnitude of the given guide star regardless of its
    * reachability.
    */
   protected def magnitudeAnalysis(
-    constraints:    ConstraintSet,
-    guideProbe:     GuideProbe,
-    gsOffset:       Offset,
-    guideStar:      GuideStarCandidate,
-    vignettingArea: Offset => Area,
-    position:       OffsetPosition
-  )(speeds: List[(GuideSpeed, BrightnessConstraints)]): AgsAnalysis = {
+    constraints: ConstraintSet,
+    guideProbe:  GuideProbe,
+    gsOffset:    Offset,
+    guideStar:   GuideStarCandidate,
+    geoms:       AgsGeomCalc,
+    position:    OffsetPosition,
+    guideSpeed:  Option[GuideSpeed]
+  ): AgsAnalysis = {
 
     // Called when we know that a valid guide speed can be chosen for the given guide star.
     // Determine the quality and return an analysis indicating that the star is usable.
@@ -138,14 +124,14 @@ object Ags {
              guideSpeed,
              quality,
              position.posAngle,
-             vignettingArea(gsOffset)
+             geoms.vignettingArea(gsOffset)
       )
     }
 
     // Do we have a magnitude in the probe's band
     guideStar.brightnessIn(probeBands(guideProbe)) match {
       case Some(_) =>
-        guideSpeedFor(speeds, guideStar)
+        guideSpeed
           .map(usable)
           .getOrElse(NoGuideStarForProbe(guideProbe, guideStar, position.posAngle))
       case _       => NoMagnitudeForBand(guideProbe, guideStar, position.posAngle)
@@ -178,12 +164,14 @@ object Ags {
     positions:   NonEmptyList[OffsetPosition],
     params:      AgsParams
   ): AgsContextBuffer = {
-    val guideSpeeds = guideSpeedLimits(constraints, params, wavelength)
-    val calcsStart  = System.nanoTime()
-    val calcs       = params.posCalculations(positions)
-    val calcsNanos  = System.nanoTime() - calcsStart
-    val bc          = constraintsFor(guideSpeeds)
-    AgsContextBuffer(guideSpeeds, calcs, bc, calcsNanos)
+    val guideSpeeds   = guideSpeedLimits(constraints, params, wavelength)
+    val calcsStart    = System.nanoTime()
+    val calcs         = params.posCalculations(positions)
+    val calcsNanos    = System.nanoTime() - calcsStart
+    val bc            = constraintsFor(guideSpeeds)
+    val byPosition    = calcs.toSortedMap
+    val positionCalcs = positions.toList.map(p => (p, byPosition(p)))
+    AgsContextBuffer(guideSpeeds, positionCalcs, bc, calcsNanos)
   }
 
   /**
@@ -217,12 +205,18 @@ object Ags {
       .fold(sciOffsets)(_ :: sciOffsets)
     val protectedShapes = params.protectedAreas(noZones)
 
+    // Offset and guide speed are per candidate, so they are attached before the product.
     in =>
-      (in.filter(withinConstraint(ctx.brightnessConstraint, _)),
-       Stream.emits[F, OffsetPosition](positions.toList)
+      (in
+         .filter(withinConstraint(ctx.brightnessConstraint, _))
+         .map: candidate =>
+           (candidate,
+            baseCoordinates.diff(candidate.tracking.baseCoordinates).offset,
+            ctx.guideSpeedOf(candidate)
+           ),
+       Stream.emits[F, (OffsetPosition, AgsGeomCalc)](ctx.positionCalcs)
       )
-        .mapN { (candidate, position) =>
-          val offset = baseCoordinates.diff(candidate.tracking.baseCoordinates).offset
+        .mapN { case ((candidate, offset, guideSpeed), (position, geoms)) =>
           runAnalysis(
             constraints,
             offset,
@@ -230,8 +224,8 @@ object Ags {
             position,
             params,
             candidate,
-            ctx.guideSpeeds,
-            ctx.calcs
+            guideSpeed,
+            geoms
           )
         }
   }
@@ -289,9 +283,9 @@ object Ags {
 
     val anStart  = System.nanoTime()
     val analyses = accepted.flatMap: candidate =>
-      val offset = baseCoordinates.diff(candidate.tracking.baseCoordinates).offset
-
-      positions.toList.map: position =>
+      val offset     = baseCoordinates.diff(candidate.tracking.baseCoordinates).offset
+      val guideSpeed = ctx.guideSpeedOf(candidate)
+      ctx.positionCalcs.map: (position, geoms) =>
         runAnalysis(
           constraints,
           offset,
@@ -299,8 +293,8 @@ object Ags {
           position,
           params,
           candidate,
-          ctx.guideSpeeds,
-          ctx.calcs
+          guideSpeed,
+          geoms
         )
     val anEnd    = System.nanoTime()
 

@@ -58,4 +58,14 @@ final case class BoundingOffsets(topLeft: Offset, bottomRight: Offset) {
     o.p.toAngle <= topLeft.p.toAngle &&
     o.q.toAngle >= bottomRight.q.toAngle &&
     o.q.toAngle <= topLeft.q.toAngle
+
+  /**
+   * Whether the boxes share at least a point. Disjoint boxes mean the shapes they bound cannot
+   * intersect, so this is a cheap pre-check before an overlay.
+   */
+  def intersects(that: BoundingOffsets): Boolean =
+    bottomRight.p.toAngle <= that.topLeft.p.toAngle &&
+    that.bottomRight.p.toAngle <= topLeft.p.toAngle &&
+    bottomRight.q.toAngle <= that.topLeft.q.toAngle &&
+    that.bottomRight.q.toAngle <= topLeft.q.toAngle
 }

@@ -33,10 +33,16 @@ trait Shape {
   /** Angular distance from the shape's origin to its most distant vertex. */
   def radius: Angle
 
+  /** True when the shape covers no area. */
+  def isEmpty: Boolean
+
   /** Checks if this shape intersects with another Shape */
   def intersects(that: Shape): Boolean
 
   /** Computes the intersection with another Shape */
   def intersection(that: Shape): Shape
+
+  /** The evaluated form of `e ↗ preTranslation ⟲ rotation ↗ postTranslation`. */
+  def transform(preTranslation: Offset, rotation: Angle, postTranslation: Offset): Shape
 
 }

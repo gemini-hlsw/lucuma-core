@@ -53,11 +53,36 @@ sealed trait AgsGeomCalc:
   def intersectionPatrolField: ShapeExpression
 
 trait SingleProbeAgsParams:
+  def probe: GuideProbe
+
   def patrolFieldAt(posAngle: Angle, offset: Offset, pivot: Offset = Offset.Zero): ShapeExpression
 
   def scienceArea(posAngle: Angle, offset: Offset): ShapeExpression
 
-  def probeArm(posAngle: Angle, guideStar: Offset, offset: Offset): ShapeExpression
+  // The science area in its own frame, evaluated once and placed per position. See ShapePlacementSuite.
+  def scienceAreaShape: ShapeExpression = scienceArea(Angle.Angle0, Offset.Zero)
+
+  /** The patrol field in its own frame; `patrolFieldAt` places it with `shapePivotAt`. */
+  def patrolFieldShape: ShapeExpression = patrolFieldAt(Angle.Angle0, Offset.Zero, Offset.Zero)
+
+  // The OIWFS arm in its own frame, mirror at the origin. PWFS is handled below for every probe.
+  protected def oiwfsArmShape: ShapeExpression
+
+  protected def oiwfsArmAngle(posAngle: Angle, guideStar: Offset, offset: Offset): Angle
+
+  def probeArmShape: ShapeExpression =
+    probe match
+      case _: PWFSGuideProbe => lucuma.core.geom.pwfs.probeArm.vignetteShape(probe)
+      case _                 => oiwfsArmShape
+
+  // Rotation of `probeArmShape` that reaches the guide star.
+  def probeArmAngle(posAngle: Angle, guideStar: Offset, offset: Offset): Angle =
+    probe match
+      case _: PWFSGuideProbe => lucuma.core.geom.pwfs.probeArm.armAngle(guideStar, offset)
+      case _                 => oiwfsArmAngle(posAngle, guideStar, offset)
+
+  def probeArm(posAngle: Angle, guideStar: Offset, offset: Offset): ShapeExpression =
+    probeArmShape ⟲ probeArmAngle(posAngle, guideStar, offset) ↗ guideStar
 
   def scienceDiameter: Angle
 
@@ -79,6 +104,12 @@ trait SingleProbeAgsParams:
     val distinctOffsets: NonEmptyList[(Offset, Offset)] =
       positions.map(pos => (pos.offsetPos, pos.pivot)).distinct
 
+    // The three unplaced shapes, evaluated once for the whole run and then placed per position.
+    val patrolFieldEval: Shape                = patrolFieldShape.eval
+    val scienceAreaEval: Shape                = scienceAreaShape.eval
+    val extendedVignettingEval: Option[Shape] =
+      extendedVignettingArea.map(_.apply(Angle.Angle0, Offset.Zero).eval)
+
     // We can cache the intersection shapes for each tested pos angle.
     val intersectionByPA: Map[Angle, (ShapeExpression, Shape, BoundingOffsets)] =
       positions.toList
@@ -90,10 +121,19 @@ trait SingleProbeAgsParams:
               .map((offset, pivot) => patrolFieldAt(posAngle, offset, pivot))
               .reduce(using _ ∩ _)
 
-          // eval is expensive. call it only once.
-          val shape = se.eval
+          // One evaluated patrol field placed per offset, rather than rebuilt at each of them.
+          // The intersection only shrinks, so once empty the remaining overlays are skipped.
+          val shape =
+            distinctOffsets
+              .map((offset, pivot) => patrolFieldEval.transform(offset - pivot, posAngle, pivot))
+              .reduceLeft((acc, next) => if acc.isEmpty then acc else acc.intersection(next))
           posAngle -> (se, shape, shape.boundingOffsets)
         .toMap
+
+    // None when the probe has no arm in the beam (the Altair AOWFS), so nothing is placed.
+    val armShape: Option[Shape] = probeArmShape match
+      case ShapeExpression.Empty => None
+      case arm                   => Some(arm.eval)
 
     val result = positions.map: position =>
       val (pfExpr, pfShape, pfBounds) = intersectionByPA(position.posAngle)
@@ -102,43 +142,49 @@ trait SingleProbeAgsParams:
 
         override val intersectionPatrolField: ShapeExpression = pfExpr
 
-        private val scienceAreaShape =
-          scienceArea(position.posAngle, position.offsetPos)
-
         private val intersectionShape: Shape = pfShape
 
         // Cache bounding box for fast rejection
         private val intersectionBounds: BoundingOffsets = pfBounds
 
-        private val scienceAreaShapeEval: Shape =
-          scienceAreaShape.eval
+        private def placed(shape: Shape): Shape =
+          shape.transform(position.offsetPos, position.posAngle, Offset.Zero)
+
+        private val scienceAreaShapeEval: Shape = placed(scienceAreaEval)
 
         // Default to the science area for the vignetting score; instruments
         // may extend it with an additional region.
         private val vignettingShapeEval: Shape =
-          extendedVignettingArea
-            .fold(scienceAreaShapeEval)(_.apply(position.posAngle, position.offsetPos).eval)
+          extendedVignettingEval.fold(scienceAreaShapeEval)(placed)
+
+        private val vignettingBounds: BoundingOffsets = vignettingShapeEval.boundingOffsets
 
         override def isReachable(gsOffset: Offset): Boolean =
           // Fast bounding box rejection, then precise check
           intersectionBounds.contains(gsOffset) && intersectionShape.contains(gsOffset)
 
-        // A probe with no arm in the beam (the Altair AOWFS) cannot vignette anything, so the
-        // geometry is skipped rather than evaluated empty.
+        private def armAt(gsOffset: Offset): Option[Shape] =
+          armShape.map(
+            _.transform(Offset.Zero,
+                        probeArmAngle(position.posAngle, gsOffset, position.offsetPos),
+                        gsOffset
+            )
+          )
+
+        // Disjoint bounding boxes settle both questions without an overlay.
         override def overlapsProtectedArea(gsOffset: Offset, protectedShape: Shape): Boolean =
-          probeArm(position.posAngle, gsOffset, position.offsetPos) match
-            case ShapeExpression.Empty => false
-            case arm                   =>
-              arm.eval
+          armAt(gsOffset).exists: placed =>
+            placed.boundingOffsets.intersects(protectedShape.boundingOffsets) &&
+              placed
                 .intersection(protectedShape)
                 .boundingOffsets
                 .maxSide
                 .toMicroarcseconds > 5
 
         override def vignettingArea(gsOffset: Offset): Area =
-          probeArm(position.posAngle, gsOffset, position.offsetPos) match
-            case ShapeExpression.Empty => Area.MinArea
-            case arm                   => arm.eval.intersection(vignettingShapeEval).area
+          armAt(gsOffset)
+            .filter(_.boundingOffsets.intersects(vignettingBounds))
+            .fold(Area.MinArea)(_.intersection(vignettingShapeEval).area)
 
       }
     result.toNem
@@ -199,14 +245,14 @@ object AgsParams:
     override def scienceArea(posAngle: Angle, offset: Offset): ShapeExpression =
       gmos.scienceArea.imagingMode.shapeAt(posAngle, offset)
 
-    override def probeArm(posAngle: Angle, guideStar: Offset, offset: Offset): ShapeExpression =
-      probe match
-        case GuideProbe.GmosOIWFS =>
-          oiwfs.probeArm.imaging.shapeAt(posAngle, guideStar, offset, port)
-        case _: PWFSGuideProbe    =>
-          pwfs.probeArm.vignettedAreaAt(probe, guideStar, offset)
-        case _                    =>
-          ShapeExpression.Empty
+    override protected def oiwfsArmShape: ShapeExpression = oiwfs.probeArm.shape
+
+    override protected def oiwfsArmAngle(
+      posAngle:  Angle,
+      guideStar: Offset,
+      offset:    Offset
+    ): Angle =
+      oiwfs.probeArm.imaging.angleAt(posAngle, guideStar, offset, port)
 
     override def scienceDiameter: Angle = GmosScienceDiameter
 
@@ -255,14 +301,14 @@ object AgsParams:
     override def scienceArea(posAngle: Angle, offset: Offset): ShapeExpression =
       gmos.scienceArea.ifuMode.shapeAt(posAngle, offset, fieldWidth)
 
-    override def probeArm(posAngle: Angle, guideStar: Offset, offset: Offset): ShapeExpression =
-      probe match
-        case GuideProbe.GmosOIWFS =>
-          oiwfs.probeArm.fpuMode.shapeAt(posAngle, guideStar, offset, gmosFpu, port)
-        case _: PWFSGuideProbe    =>
-          pwfs.probeArm.vignettedAreaAt(probe, guideStar, offset)
-        case _                    =>
-          ShapeExpression.Empty
+    override protected def oiwfsArmShape: ShapeExpression = oiwfs.probeArm.shape
+
+    override protected def oiwfsArmAngle(
+      posAngle:  Angle,
+      guideStar: Offset,
+      offset:    Offset
+    ): Angle =
+      oiwfs.probeArm.fpuMode.angleAt(posAngle, guideStar, offset, gmosFpu, port)
 
     override def scienceDiameter: Angle = GmosScienceDiameter
 
@@ -302,14 +348,14 @@ object AgsParams:
     override def scienceArea(posAngle: Angle, offset: Offset): ShapeExpression =
       gmos.scienceArea.longSlitMode.shapeAt(posAngle, offset, fpu)
 
-    override def probeArm(posAngle: Angle, guideStar: Offset, offset: Offset): ShapeExpression =
-      probe match
-        case GuideProbe.GmosOIWFS =>
-          oiwfs.probeArm.fpuMode.shapeAt(posAngle, guideStar, offset, fpu, port)
-        case _: PWFSGuideProbe    =>
-          pwfs.probeArm.vignettedAreaAt(probe, guideStar, offset)
-        case _                    =>
-          ShapeExpression.Empty
+    override protected def oiwfsArmShape: ShapeExpression = oiwfs.probeArm.shape
+
+    override protected def oiwfsArmAngle(
+      posAngle:  Angle,
+      guideStar: Offset,
+      offset:    Offset
+    ): Angle =
+      oiwfs.probeArm.fpuMode.angleAt(posAngle, guideStar, offset, fpu, port)
 
     override def scienceDiameter: Angle = GmosScienceDiameter
 
@@ -358,14 +404,14 @@ object AgsParams:
         case Site.GN => gmos.scienceArea.mosModeNorth.shapeAt(posAngle, offset)
         case Site.GS => gmos.scienceArea.mosModeSouth.shapeAt(posAngle, offset)
 
-    override def probeArm(posAngle: Angle, guideStar: Offset, offset: Offset): ShapeExpression =
-      probe match
-        case GuideProbe.GmosOIWFS =>
-          oiwfs.probeArm.imaging.shapeAt(posAngle, guideStar, offset, port)
-        case _: PWFSGuideProbe    =>
-          pwfs.probeArm.vignettedAreaAt(probe, guideStar, offset)
-        case _                    =>
-          ShapeExpression.Empty
+    override protected def oiwfsArmShape: ShapeExpression = oiwfs.probeArm.shape
+
+    override protected def oiwfsArmAngle(
+      posAngle:  Angle,
+      guideStar: Offset,
+      offset:    Offset
+    ): Angle =
+      oiwfs.probeArm.imaging.angleAt(posAngle, guideStar, offset, port)
 
     override def scienceDiameter: Angle = GmosScienceDiameter
 
@@ -405,13 +451,14 @@ object AgsParams:
     override def scienceArea(posAngle: Angle, offset: Offset): ShapeExpression =
       flamingos2.scienceArea.shapeAt(posAngle, offset, lyot, fpu)
 
-    override def probeArm(posAngle: Angle, guideStar: Offset, offset: Offset): ShapeExpression =
-      probe match
-        case GuideProbe.Flamingos2OIWFS =>
-          oiwfs.probeArm.shapeAt(posAngle, guideStar, offset, lyot, port)
-        case _: PWFSGuideProbe          =>
-          pwfs.probeArm.vignettedAreaAt(probe, guideStar, offset)
-        case _                          => ShapeExpression.Empty
+    override protected def oiwfsArmShape: ShapeExpression = oiwfs.probeArm.shape(lyot.plateScale)
+
+    override protected def oiwfsArmAngle(
+      posAngle:  Angle,
+      guideStar: Offset,
+      offset:    Offset
+    ): Angle =
+      oiwfs.probeArm.angleAt(posAngle, guideStar, offset, lyot, port)
 
     override def scienceDiameter: Angle = Flamingos2LongSlit.Flamingos2ScienceDiameter
 
@@ -453,14 +500,14 @@ object AgsParams:
     override def scienceArea(posAngle: Angle, offset: Offset): ShapeExpression =
       flamingos2.scienceArea.shapeAt(posAngle, offset, lyot, Flamingos2FpuMask.Imaging)
 
-    override def probeArm(posAngle: Angle, guideStar: Offset, offset: Offset): ShapeExpression =
-      probe match
-        case GuideProbe.Flamingos2OIWFS =>
-          oiwfs.probeArm.shapeAt(posAngle, guideStar, offset, lyot, port)
-        case _: PWFSGuideProbe          =>
-          pwfs.probeArm.vignettedAreaAt(probe, guideStar, offset)
-        case _                          =>
-          ShapeExpression.Empty
+    override protected def oiwfsArmShape: ShapeExpression = oiwfs.probeArm.shape(lyot.plateScale)
+
+    override protected def oiwfsArmAngle(
+      posAngle:  Angle,
+      guideStar: Offset,
+      offset:    Offset
+    ): Angle =
+      oiwfs.probeArm.angleAt(posAngle, guideStar, offset, lyot, port)
 
     override def scienceDiameter: Angle = Flamingos2Imaging.Flamingos2ScienceDiameter
 
@@ -501,13 +548,14 @@ object AgsParams:
     override def scienceArea(posAngle: Angle, offset: Offset): ShapeExpression =
       flamingos2.scienceArea.mosMode.shapeAt(posAngle, offset)
 
-    override def probeArm(posAngle: Angle, guideStar: Offset, offset: Offset): ShapeExpression =
-      probe match
-        case GuideProbe.Flamingos2OIWFS =>
-          oiwfs.probeArm.shapeAt(posAngle, guideStar, offset, lyot, port)
-        case _: PWFSGuideProbe          =>
-          pwfs.probeArm.vignettedAreaAt(probe, guideStar, offset)
-        case _                          => ShapeExpression.Empty
+    override protected def oiwfsArmShape: ShapeExpression = oiwfs.probeArm.shape(lyot.plateScale)
+
+    override protected def oiwfsArmAngle(
+      posAngle:  Angle,
+      guideStar: Offset,
+      offset:    Offset
+    ): Angle =
+      oiwfs.probeArm.angleAt(posAngle, guideStar, offset, lyot, port)
 
     override def scienceDiameter: Angle = Flamingos2Mos.Flamingos2ScienceDiameter
 
@@ -522,15 +570,22 @@ object AgsParams:
   trait PwfsOnlyParams extends SingleProbeAgsParams:
     def probe: PWFSGuideProbe
 
+    // No OIWFS behind these probes.
+    override protected def oiwfsArmShape: ShapeExpression = ShapeExpression.Empty
+
+    override protected def oiwfsArmAngle(
+      posAngle:  Angle,
+      guideStar: Offset,
+      offset:    Offset
+    ): Angle =
+      Angle.Angle0
+
     override def patrolFieldAt(
       posAngle: Angle,
       offset:   Offset,
       pivot:    Offset = Offset.Zero
     ): ShapeExpression =
       lucuma.core.geom.pwfs.patrolField.patrolFieldAt(posAngle, offset, pivot)
-
-    override def probeArm(posAngle: Angle, guideStar: Offset, offset: Offset): ShapeExpression =
-      lucuma.core.geom.pwfs.probeArm.vignettedAreaAt(probe, guideStar, offset)
 
   trait AltairSupport[A]:
     def withAltair(mode: AltairMode): A
@@ -541,6 +596,16 @@ object AgsParams:
    */
   trait AltairCapableParams extends SingleProbeAgsParams:
     def probe: GuideProbe
+
+    // No OIWFS behind these probes.
+    override protected def oiwfsArmShape: ShapeExpression = ShapeExpression.Empty
+
+    override protected def oiwfsArmAngle(
+      posAngle:  Angle,
+      guideStar: Offset,
+      offset:    Offset
+    ): Angle =
+      Angle.Angle0
 
     override def patrolFieldAt(
       posAngle: Angle,
@@ -554,12 +619,6 @@ object AgsParams:
           lucuma.core.geom.pwfs.patrolField.patrolFieldAt(posAngle, offset, pivot)
         case _                      =>
           ShapeExpression.Empty
-
-    override def probeArm(posAngle: Angle, guideStar: Offset, offset: Offset): ShapeExpression =
-      probe match
-        case _: PWFSGuideProbe =>
-          lucuma.core.geom.pwfs.probeArm.vignettedAreaAt(probe, guideStar, offset)
-        case _                 => ShapeExpression.Empty
 
   case class Igrins2LongSlit private (
     port:  PortDisposition,

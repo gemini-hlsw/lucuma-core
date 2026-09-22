@@ -300,7 +300,8 @@ trait PwfsProbeArm:
       toPQ(x1, -y1)
     )
 
-  private def vignetteShape(probe: GuideProbe): ShapeExpression =
+  /** Everything the probe vignettes, mirror centred at the origin, arm along -x; see `vignettedAreaAt`. */
+  def vignetteShape(probe: GuideProbe): ShapeExpression =
     mirror(probe) ∪
       mirrorVignetting(probe) ∪
       armUpperHalf(probe) ∪
@@ -308,9 +309,10 @@ trait PwfsProbeArm:
       armVignetting(probe)
 
   /**
-   * Calculate arm angle to reach guide star as ocs in TpePWFSFeature.java.
+   * Calculate arm angle to reach guide star as ocs in TpePWFSFeature.java. `vignettedAreaAt` is
+   * `vignetteShape ⟲ armAngle ↗ guideStar`.
    */
-  private def armAngle(guideStar: Offset, offsetPos: Offset): Angle =
+  def armAngle(guideStar: Offset, offsetPos: Offset): Angle =
     val (p, q) =
       Offset.signedDecimalArcseconds
         .get(guideStar - offsetPos)
