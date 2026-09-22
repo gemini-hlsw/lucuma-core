@@ -291,10 +291,21 @@ lazy val catalogTests = crossProject(JVMPlatform, JSPlatform)
 
 lazy val benchmarks = project
   .in(file("modules/benchmarks"))
-  .dependsOn(core.jvm)
+  .dependsOn(core.jvm, ags.jvm)
   .enablePlugins(NoPublishPlugin, AutomateHeaderPlugin, JmhPlugin)
   .settings(
     name := "lucuma-benchmarks"
+  )
+
+lazy val benchmarksJS = project
+  .in(file("modules/benchmarks-js"))
+  .dependsOn(ags.js)
+  .enablePlugins(ScalaJSPlugin, NoPublishPlugin, AutomateHeaderPlugin)
+  .settings(
+    name                            := "lucuma-benchmarks-js",
+    scalaJSUseMainModuleInitializer := true,
+    scalaJSLinkerConfig ~= (_.withModuleKind(ModuleKind.ESModule)
+      .withESFeatures(_.withESVersion(ESVersion.ES2022)))
   )
 
 // for publishing to npm
