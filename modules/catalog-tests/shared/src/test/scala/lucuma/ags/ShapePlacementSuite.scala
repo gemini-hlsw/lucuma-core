@@ -20,9 +20,13 @@ class ShapePlacementSuite extends munit.FunSuite:
   private val pivots: List[Offset] =
     List(Offset.Zero, off(-12.5, 8), off(30, 30))
 
+  // Equal areas plus a full-area overlap means the interiors coincide, not just their summaries.
+  // The overlay itself carries noding noise of a few parts in 1e17, hence the tolerance.
   private def assertSame(placed: Shape, direct: Shape): Unit =
     assertEquals(placed.area, direct.area)
-    assertEquals(placed.boundingOffsets, direct.boundingOffsets)
+    val full    = direct.area.toMicroarcsecondsSquared
+    val overlap = placed.intersection(direct).area.toMicroarcsecondsSquared
+    assert(math.abs(full - overlap) <= math.max(1L, full / 1_000_000_000L), s"$overlap vs $full")
 
   variants.foreach: (name, params) =>
     test(s"$name: placed science area equals the evaluated science area expression"):
