@@ -118,5 +118,16 @@ case class Proposal(
     itacObservations.filter: o =>
       o.isObservableAtSite(site, cfpActive) && o.isObservableInBand(band)
 
+  override def toString(): String =
+    s"""|Proposal:
+        |   reference: $reference
+        |   tpe: $tpe
+        |   cfpActive: $cfpActive
+        |   allocations:
+        |     ${allocations.toList.mkString("\n     ")}
+        |   observations (scaled):
+        |     ${obsList.mkString("\n     ")}
+        |""".stripMargin
+
 }
 

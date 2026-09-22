@@ -3,13 +3,12 @@
 
 package lucuma.ocs
 
+import lucuma.core.enums.ScienceBand
+
 import java.io.File
 import java.io.FileReader
-import scala.xml.XML
 import scala.xml.Elem
-import lucuma.core.enums.ScienceBand
-import cats.arrow.FunctionK
-import edu.gemini.tac.qengine.p1.ItacGroup
+import scala.xml.XML
 
 object Test:
 
@@ -26,12 +25,6 @@ object Test:
         val out = Converter.convert(Anonymizer.anonymize(elem), ScienceBand.Band1)
         println(out)
         if (out.isLeft) then sys.exit()
-        out.foreach: pr=>
-          pr.groupTree
-            .foldMap:
-              new FunctionK[ItacGroup, List]:
-                def apply[A](a: ItacGroup[A]) = a.children
-            .foreach(println)
                           
   def load(f: File): Elem =
     val r = new FileReader(f)

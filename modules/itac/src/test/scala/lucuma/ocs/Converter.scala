@@ -3,12 +3,13 @@
 
 package lucuma.ocs
 
-import scala.xml.Elem
-import edu.gemini.tac.qengine.p1.Proposal
-import lucuma.core.enums.ScienceBand
 import cats.data.EitherT
 import cats.data.StateT
+import edu.gemini.tac.qengine.p1.Proposal
+import lucuma.core.enums.ScienceBand
 import lucuma.ocs.Namer.State
+
+import scala.xml.Elem
 
 object Converter:
 

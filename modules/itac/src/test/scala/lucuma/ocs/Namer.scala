@@ -3,14 +3,14 @@
 
 package lucuma.ocs
 
-import cats.mtl.Stateful
 import cats.Monad
+import cats.mtl.Stateful
 import cats.syntax.all.*
-import lucuma.core.model.Semester
-import lucuma.core.model.ProposalReference
 import eu.timepit.refined.types.numeric.PosInt
-import lucuma.core.model.Target
 import eu.timepit.refined.types.numeric.PosLong
+import lucuma.core.model.ProposalReference
+import lucuma.core.model.Semester
+import lucuma.core.model.Target
 
 trait Namer[F[_]]:
   def nextProposalReference(sem: Semester): F[ProposalReference]
