@@ -29,8 +29,8 @@ import scala.collection.immutable.SortedMap
 import scala.collection.immutable.SortedSet
 
 /**
- * Full `Ags.agsAnalysis` on the workload of the JS harness: GMOS imaging, 36 position angles,
- * N science offsets on a 30" spiral, 91 candidates with Gaia G in [8, 20).
+ * Full `Ags.agsAnalysis` on the workload of the JS harness: GMOS imaging, 36 position angles, N
+ * science offsets on a 30" spiral, 91 candidates with Gaia G in [8, 20).
  */
 @BenchmarkMode(Array(Mode.SampleTime))
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
@@ -58,28 +58,32 @@ class AgsAnalysisBenchmark:
   private val posAngles: NonEmptyList[Angle] =
     NonEmptyList.fromListUnsafe(0.until(360).by(10).toList.map(d => Angle.fromDoubleDegrees(d)))
 
-  private var scienceOffsets: Option[ScienceOffsets]  = scala.compiletime.uninitialized
+  private var scienceOffsets: Option[ScienceOffsets]                           = scala.compiletime.uninitialized
   private var positions: NonEmptyList[lucuma.core.geom.offsets.OffsetPosition] =
     scala.compiletime.uninitialized
-  private var candidates: List[GuideStarCandidate]     = scala.compiletime.uninitialized
+  private var candidates: List[GuideStarCandidate]                             = scala.compiletime.uninitialized
 
   private def spiral(n: Int): List[Offset] =
-    1.to(n).toList.map: i =>
-      val r = i.toDouble / n * 30.0
-      val a = i * 2.399963
-      Offset.signedDecimalArcseconds.reverseGet((r * math.cos(a), r * math.sin(a)))
+    1.to(n)
+      .toList
+      .map: i =>
+        val r = i.toDouble / n * 30.0
+        val a = i * 2.399963
+        Offset.signedDecimalArcseconds.reverseGet((r * math.cos(a), r * math.sin(a)))
 
   private def stars(n: Int, seed: Long): List[GuideStarCandidate] =
     val rnd = new Random(seed)
-    1.to(n).toList.map: i =>
-      val p      = (rnd.nextDouble() - 0.5) * 600.0
-      val q      = (rnd.nextDouble() - 0.5) * 600.0
-      val coords =
-        base.offsetBy(Angle.Angle0, Offset.signedDecimalArcseconds.reverseGet((p, q))).get
-      val g      = BrightnessValue.unsafeFrom(
-        BigDecimal(8.0 + rnd.nextDouble() * 12.0).setScale(3, BigDecimal.RoundingMode.HALF_UP)
-      )
-      GuideStarCandidate(i.toLong, SiderealTracking.const(coords), SortedMap(Band.Gaia -> g))
+    1.to(n)
+      .toList
+      .map: i =>
+        val p      = (rnd.nextDouble() - 0.5) * 600.0
+        val q      = (rnd.nextDouble() - 0.5) * 600.0
+        val coords =
+          base.offsetBy(Angle.Angle0, Offset.signedDecimalArcseconds.reverseGet((p, q))).get
+        val g      = BrightnessValue.unsafeFrom(
+          BigDecimal(8.0 + rnd.nextDouble() * 12.0).setScale(3, BigDecimal.RoundingMode.HALF_UP)
+        )
+        GuideStarCandidate(i.toLong, SiderealTracking.const(coords), SortedMap(Band.Gaia -> g))
 
   @Setup(Level.Trial)
   def setUp(): Unit =
@@ -99,7 +103,16 @@ class AgsAnalysisBenchmark:
   @Benchmark
   def agsAnalysis(): Int =
     Ags
-      .agsAnalysis(constraints, wavelength, base, Nil, None, posAngles, None, scienceOffsets,
-                   params, candidates)
+      .agsAnalysis(constraints,
+                   wavelength,
+                   base,
+                   Nil,
+                   None,
+                   posAngles,
+                   None,
+                   scienceOffsets,
+                   params,
+                   candidates
+      )
       .analyses
       .size
