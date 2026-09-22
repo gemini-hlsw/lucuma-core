@@ -30,6 +30,7 @@ permissions:
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  SBT_OPTS: '-Dlmcoursier.internal.shaded.coursier.exception-retry=10'
   LUCUMA_AFFECTED_DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
   MUNIT_FLAKY_OK: true
 
@@ -66,6 +67,12 @@ jobs:
           distribution: temurin
           java-version: 25
           cache: sbt
+          cache-dependency-path: |
+            **/*.sbt
+            **/project/build.properties
+            **/project/**.scala
+            **/project/**.sbt
+            .github/workflows/ci.yml
 
       - name: sbt update
         if: matrix.java == 'temurin@25' && steps.setup-java-temurin-25.outputs.cache-hit == 'false'
@@ -142,6 +149,12 @@ jobs:
           distribution: temurin
           java-version: 25
           cache: sbt
+          cache-dependency-path: |
+            **/*.sbt
+            **/project/build.properties
+            **/project/**.scala
+            **/project/**.sbt
+            .github/workflows/ci.yml
 
       - name: sbt update
         if: matrix.java == 'temurin@25' && steps.setup-java-temurin-25.outputs.cache-hit == 'false'
