@@ -87,7 +87,7 @@ jobs:
 
       - name: Check scalafix lints
         if: matrix.java == 'temurin@25' && matrix.os == 'ubuntu-22.04'
-        run: sbt 'project ${{ matrix.project }}; ++ ${{ matrix.scala }}; scalafix --check; Test/scalafix --check'
+        run: sbt 'project ${{ matrix.project }}; ++ ${{ matrix.scala }}; scalafixAll --check'
 
       - name: scalaJSLink
         if: matrix.project == 'rootJS'
@@ -106,11 +106,11 @@ jobs:
 
       - name: Make target directories
         if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/topic/scala3')
-        run: mkdir -p target/out/jvm/scala-3.9.0/lucuma-ags target/out/sjs1/scala-3.9.0/lucuma-core target/out/jvm/scala-3.9.0/lucuma-core-testkit target/out/sjs1/scala-3.9.0/lucuma-catalog-testkit target/out/jvm/scala-3.9.0/lucuma-catalog target/out/sjs1/scala-3.9.0/lucuma-core-testkit target/out/sjs1/scala-3.9.0/lucuma-ags target/out/sjs1/scala-3.9.0/lucuma-catalog target/out/sjs1/scala-3.9.0/lucuma-horizons target/out/jvm/scala-3.9.0/lucuma-horizons target/out/jvm/scala-3.9.0/lucuma-catalog-testkit target/out/jvm/scala-3.9.0/lucuma-core target/out/jvm/scala-3.9.0/lucuma-itac project/target
+        run: mkdir -p project/target target/out/jvm/scala-3.9.0/lucuma-ags target/out/jvm/scala-3.9.0/lucuma-catalog target/out/jvm/scala-3.9.0/lucuma-catalog-testkit target/out/jvm/scala-3.9.0/lucuma-core target/out/jvm/scala-3.9.0/lucuma-core-testkit target/out/jvm/scala-3.9.0/lucuma-horizons target/out/jvm/scala-3.9.0/lucuma-itac target/out/sjs1/scala-3.9.0/lucuma-ags target/out/sjs1/scala-3.9.0/lucuma-catalog target/out/sjs1/scala-3.9.0/lucuma-catalog-testkit target/out/sjs1/scala-3.9.0/lucuma-core target/out/sjs1/scala-3.9.0/lucuma-core-testkit target/out/sjs1/scala-3.9.0/lucuma-horizons
 
       - name: Compress target directories
         if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/topic/scala3')
-        run: tar cf targets.tar target/out/jvm/scala-3.9.0/lucuma-ags target/out/sjs1/scala-3.9.0/lucuma-core target/out/jvm/scala-3.9.0/lucuma-core-testkit target/out/sjs1/scala-3.9.0/lucuma-catalog-testkit target/out/jvm/scala-3.9.0/lucuma-catalog target/out/sjs1/scala-3.9.0/lucuma-core-testkit target/out/sjs1/scala-3.9.0/lucuma-ags target/out/sjs1/scala-3.9.0/lucuma-catalog target/out/sjs1/scala-3.9.0/lucuma-horizons target/out/jvm/scala-3.9.0/lucuma-horizons target/out/jvm/scala-3.9.0/lucuma-catalog-testkit target/out/jvm/scala-3.9.0/lucuma-core target/out/jvm/scala-3.9.0/lucuma-itac project/target
+        run: tar cf targets.tar project/target target/out/jvm/scala-3.9.0/lucuma-ags target/out/jvm/scala-3.9.0/lucuma-catalog target/out/jvm/scala-3.9.0/lucuma-catalog-testkit target/out/jvm/scala-3.9.0/lucuma-core target/out/jvm/scala-3.9.0/lucuma-core-testkit target/out/jvm/scala-3.9.0/lucuma-horizons target/out/jvm/scala-3.9.0/lucuma-itac target/out/sjs1/scala-3.9.0/lucuma-ags target/out/sjs1/scala-3.9.0/lucuma-catalog target/out/sjs1/scala-3.9.0/lucuma-catalog-testkit target/out/sjs1/scala-3.9.0/lucuma-core target/out/sjs1/scala-3.9.0/lucuma-core-testkit target/out/sjs1/scala-3.9.0/lucuma-horizons
 
       - name: Upload target directories
         if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/topic/scala3')
