@@ -19,6 +19,7 @@ import scala.collection.immutable.SortedSet
 trait ArbSequenceDigest:
   import ArbCategorizedTime.given
   import ArbEnumerated.given
+  import ArbGcalDigest.given
 
   given Arbitrary[SequenceDigest] =
     Arbitrary:
@@ -27,8 +28,10 @@ trait ArbSequenceDigest:
         t <- arbitrary[CategorizedTime]
         o <- arbitrary[SortedSet[TelescopeConfig]]
         n <- arbitrary[NonNegInt]
+        r <- arbitrary[GcalDigest]
+        f <- arbitrary[GcalDigest]
         s <- arbitrary[ExecutionState]
-      yield SequenceDigest(c, t, o, n, s)
+      yield SequenceDigest(c, t, o, n, r, f, s)
 
   given Cogen[SequenceDigest] =
     Cogen[(
@@ -36,6 +39,8 @@ trait ArbSequenceDigest:
       CategorizedTime,
       Set[TelescopeConfig],
       NonNegInt,
+      GcalDigest,
+      GcalDigest,
       ExecutionState
     )].contramap: a =>
       (
@@ -43,6 +48,8 @@ trait ArbSequenceDigest:
         a.timeEstimate,
         a.telescopeConfigs,
         a.atomCount,
+        a.arcs,
+        a.flats,
         a.executionState
       )
 

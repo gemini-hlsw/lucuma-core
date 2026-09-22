@@ -5,10 +5,12 @@ package lucuma.core.model.sequence
 
 import cats.kernel.laws.discipline.*
 import cats.syntax.eq.*
+import cats.syntax.foldable.*
 import eu.timepit.refined.cats.*
 import eu.timepit.refined.scalacheck.all.*
 import lucuma.core.model.sequence.arb.ArbAtom.given
 import lucuma.core.model.sequence.arb.ArbCategorizedTime.given
+import lucuma.core.model.sequence.arb.ArbGcalDigest.given
 import lucuma.core.model.sequence.arb.ArbSequenceDigest.given
 import lucuma.core.model.sequence.arb.ArbTelescopeConfig.given
 import lucuma.core.util.arb.ArbEnumerated.given
@@ -24,6 +26,8 @@ class SequenceDigestSuite extends DisciplineSuite:
   checkAll("SequenceDigest.observeClass",   LensTests(SequenceDigest.observeClass))
   checkAll("SequenceDigest.plannedTime",    LensTests(SequenceDigest.timeEstimate))
   checkAll("SequenceDigest.atomCount",      LensTests(SequenceDigest.atomCount))
+  checkAll("SequenceDigest.arcs",           LensTests(SequenceDigest.arcs))
+  checkAll("SequenceDigest.flats",          LensTests(SequenceDigest.flats))
   checkAll("SequenceDigest.executionState", LensTests(SequenceDigest.executionState))
   checkAll("SequenceDigest.configs",        LensTests(SequenceDigest.configs))
 
@@ -32,3 +36,14 @@ class SequenceDigestSuite extends DisciplineSuite:
       val sd = SequenceDigest.Zero.add(a)
       val result = a.steps.toList.map(s => TelescopeConfig(s.telescopeConfig.offset, s.telescopeConfig.guiding))
       sd.telescopeConfigs === SortedSet.from(result)
+
+  property("counts arc and flat steps"):
+    forAll: (a: Atom[Unit]) =>
+      val sd    = SequenceDigest.Zero.add(a)
+      val steps = a.steps.toList
+      val arcs  = steps.filter(_.stepConfig.isArc)
+      val flats = steps.filter(_.stepConfig.isFlat)
+      (sd.arcs.count.value === arcs.size) &&
+      (sd.flats.count.value === flats.size) &&
+      (sd.arcs.time === arcs.foldMap(_.estimate.total)) &&
+      (sd.flats.time === flats.foldMap(_.estimate.total))

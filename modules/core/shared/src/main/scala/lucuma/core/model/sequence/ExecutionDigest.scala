@@ -4,6 +4,7 @@
 package lucuma.core.model.sequence
 
 import cats.Eq
+import cats.syntax.monoid.*
 import eu.timepit.refined.cats.given
 import eu.timepit.refined.types.numeric.NonNegInt
 import lucuma.core.enums.ObserveClass
@@ -30,6 +31,18 @@ case class ExecutionDigest(
    */
   def fullTimeEstimate: CategorizedTime =
     science.timeEstimate.sumCharge(science.observeClass.chargeClass, setup.full *| setupCount.value)
+
+  /**
+   * Arc steps across the acquisition and science sequences.
+   */
+  def arcs: GcalDigest =
+    acquisition.arcs |+| science.arcs
+
+  /**
+   * Flat steps across the acquisition and science sequences.
+   */
+  def flats: GcalDigest =
+    acquisition.flats |+| science.flats
 
 }
 

@@ -9,7 +9,9 @@ import cats.syntax.monoid.*
 import eu.timepit.refined.cats.*
 import eu.timepit.refined.types.numeric.NonNegInt
 import lucuma.core.enums.ExecutionState
+import lucuma.core.enums.GcalLampType
 import lucuma.core.enums.ObserveClass
+import lucuma.core.util.TimeSpan
 import monocle.Focus
 import monocle.Lens
 
@@ -23,6 +25,8 @@ import scala.collection.immutable.SortedSet
  * @param configs        set of offsets and guide states that are expected over the
  *                       course of the sequence execution
  * @param atomCount      number of atoms in the sequence
+ * @param arcs           count and estimated time of the arc steps
+ * @param flats          count and estimated time of the flat steps
  * @param executionState completion state for this sequence
  */
 case class SequenceDigest(
@@ -30,6 +34,8 @@ case class SequenceDigest(
   timeEstimate:     CategorizedTime,
   telescopeConfigs: SortedSet[TelescopeConfig],
   atomCount:        NonNegInt,
+  arcs:             GcalDigest,
+  flats:            GcalDigest,
   executionState:   ExecutionState
 ):
 
@@ -39,8 +45,14 @@ case class SequenceDigest(
       timeEstimate     = timeEstimate |+| a.timeEstimate,
       telescopeConfigs = telescopeConfigs ++ a.steps.toList.map(_.telescopeConfig),
       atomCount        = NonNegInt.unsafeFrom(atomCount.value + 1),
+      arcs             = gcalSteps(a, GcalLampType.Arc).foldLeft(arcs)(_.add(_)),
+      flats            = gcalSteps(a, GcalLampType.Flat).foldLeft(flats)(_.add(_)),
       executionState   = executionState
     )
+
+  private def gcalSteps[D](a: Atom[D], lampType: GcalLampType): List[TimeSpan] =
+    a.steps.toList.collect:
+      case s if s.stepConfig.gcalLampType.contains(lampType) => s.estimate.total
 
 object SequenceDigest:
 
@@ -50,6 +62,8 @@ object SequenceDigest:
       CategorizedTime.Zero,
       SortedSet.empty,
       NonNegInt.unsafeFrom(0),
+      GcalDigest.Zero,
+      GcalDigest.Zero,
       ExecutionState.NotStarted
     )
 
@@ -66,6 +80,14 @@ object SequenceDigest:
     Focus[SequenceDigest](_.telescopeConfigs)
 
   /** @group Optics */
+  val arcs: Lens[SequenceDigest, GcalDigest] =
+    Focus[SequenceDigest](_.arcs)
+
+  /** @group Optics */
+  val flats: Lens[SequenceDigest, GcalDigest] =
+    Focus[SequenceDigest](_.flats)
+
+  /** @group Optics */
   val executionState: Lens[SequenceDigest, ExecutionState] =
     Focus[SequenceDigest](_.executionState)
 
@@ -80,5 +102,7 @@ object SequenceDigest:
         a.timeEstimate,
         a.telescopeConfigs,
         a.atomCount,
+        a.arcs,
+        a.flats,
         a.executionState
       )
