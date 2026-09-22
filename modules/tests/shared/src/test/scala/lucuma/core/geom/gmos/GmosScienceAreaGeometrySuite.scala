@@ -7,11 +7,12 @@ import lucuma.core.enums.GmosNorthIfuFpu
 import lucuma.core.enums.GmosSouthIfuFpu
 import lucuma.core.enums.Site
 import lucuma.core.geom.ScienceAreaGeometrySuite
-import lucuma.core.geom.jts.interpreter.given
+import lucuma.core.geom.ShapeInterpreter
+import lucuma.core.geom.jts.JtsShapeInterpreter
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 
-class GmosScienceAreaGeometrySuite extends ScienceAreaGeometrySuite:
+abstract class GmosScienceAreaGeometryTests(using ShapeInterpreter) extends ScienceAreaGeometrySuite:
 
   private def ifuSides(fieldWidth: Angle): (Angle, Angle) =
     sides(scienceArea.ifuMode.shapeAt(Angle.Angle0, Offset.Zero, fieldWidth))
@@ -58,3 +59,5 @@ class GmosScienceAreaGeometrySuite extends ScienceAreaGeometrySuite:
   test("one-slit sky field shifts in with the narrower fields"):
     assertEqualsDouble(skyCentreArcsecP(GmosNorthIfuFpu.OneSlitRed.fieldWidth, Site.GN), 60.875, 0.01)
     assertEqualsDouble(skyCentreArcsecP(GmosSouthIfuFpu.OneSlitRed.fieldWidth, Site.GS), -60.875, 0.01)
+
+class GmosScienceAreaGeometrySuite extends GmosScienceAreaGeometryTests(using JtsShapeInterpreter)

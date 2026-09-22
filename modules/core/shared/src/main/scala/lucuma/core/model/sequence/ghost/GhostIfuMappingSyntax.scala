@@ -9,7 +9,6 @@ import cats.syntax.either.*
 import cats.syntax.option.*
 import lucuma.core.enums.GhostResolutionMode
 import lucuma.core.geom.ghost.*
-import lucuma.core.geom.jts.interpreter.given
 import lucuma.core.math.Angle
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Offset
