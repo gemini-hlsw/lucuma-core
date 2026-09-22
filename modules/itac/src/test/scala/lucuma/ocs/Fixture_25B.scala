@@ -3,13 +3,14 @@
 
 package lucuma.ocs
 
-import lucuma.core.enums.ScienceBand
 import edu.gemini.tac.qengine.p1.Proposal
-import lucuma.core.util.Enumerated
-import scala.io.Source
-import scala.io.Codec
-import munit.FunSuite
 import io.circe.yaml.parser
+import lucuma.core.enums.ScienceBand
+import lucuma.core.util.Enumerated
+import munit.FunSuite
+
+import scala.io.Codec
+import scala.io.Source
 
 object Fixture_25B:
 
