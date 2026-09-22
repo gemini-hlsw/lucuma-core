@@ -205,12 +205,18 @@ object Ags {
       .fold(sciOffsets)(_ :: sciOffsets)
     val protectedShapes = params.protectedAreas(noZones)
 
+    // Offset and guide speed are per candidate, so they are attached before the product.
     in =>
-      (in.filter(withinConstraint(ctx.brightnessConstraint, _)),
+      (in
+         .filter(withinConstraint(ctx.brightnessConstraint, _))
+         .map: candidate =>
+           (candidate,
+            baseCoordinates.diff(candidate.tracking.baseCoordinates).offset,
+            ctx.guideSpeedOf(candidate)
+           ),
        Stream.emits[F, (OffsetPosition, AgsGeomCalc)](ctx.positionCalcs)
       )
-        .mapN { case (candidate, (position, geoms)) =>
-          val offset = baseCoordinates.diff(candidate.tracking.baseCoordinates).offset
+        .mapN { case ((candidate, offset, guideSpeed), (position, geoms)) =>
           runAnalysis(
             constraints,
             offset,
@@ -218,7 +224,7 @@ object Ags {
             position,
             params,
             candidate,
-            ctx.guideSpeedOf(candidate),
+            guideSpeed,
             geoms
           )
         }
