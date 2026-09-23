@@ -9,25 +9,25 @@ import cats.derived.*
 import cats.syntax.monoid.*
 import eu.timepit.refined.cats.given
 import eu.timepit.refined.types.numeric.NonNegInt
-import lucuma.core.util.TimeSpan
 import monocle.Focus
 import monocle.Lens
 
 /**
- * Number of GCAL steps of a given lamp type and their estimated total time.
+ * Number of GCAL steps of a given lamp type and their estimated time, broken
+ * down by charge class.
  */
 case class GcalDigest(
   count: NonNegInt,
-  time:  TimeSpan
+  time:  CategorizedTime
 ) derives Eq:
 
-  def add(stepTime: TimeSpan): GcalDigest =
+  def add(stepTime: CategorizedTime): GcalDigest =
     this |+| GcalDigest(NonNegInt.unsafeFrom(1), stepTime)
 
 object GcalDigest:
 
   val Zero: GcalDigest =
-    GcalDigest(NonNegInt.MinValue, TimeSpan.Zero)
+    GcalDigest(NonNegInt.MinValue, CategorizedTime.Zero)
 
   /**
    * Both count and time saturate rather than overflow.
@@ -45,5 +45,5 @@ object GcalDigest:
     Focus[GcalDigest](_.count)
 
   /** @group Optics */
-  val time: Lens[GcalDigest, TimeSpan] =
+  val time: Lens[GcalDigest, CategorizedTime] =
     Focus[GcalDigest](_.time)

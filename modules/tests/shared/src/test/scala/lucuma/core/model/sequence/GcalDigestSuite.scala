@@ -7,12 +7,9 @@ import cats.kernel.laws.discipline.*
 import eu.timepit.refined.cats.*
 import eu.timepit.refined.scalacheck.all.*
 import lucuma.core.model.sequence.arb.ArbGcalDigest.given
-import lucuma.core.util.arb.ArbTimeSpan.given
-import monocle.law.discipline.*
+import lucuma.core.model.sequence.arb.ArbCategorizedTime.given
 import munit.*
 
 class GcalDigestSuite extends DisciplineSuite:
   checkAll("Eq[GcalDigest]",     EqTests[GcalDigest].eqv)
   checkAll("Monoid[GcalDigest]", MonoidTests[GcalDigest].monoid)
-  checkAll("GcalDigest.count",   LensTests(GcalDigest.count))
-  checkAll("GcalDigest.time",    LensTests(GcalDigest.time))

@@ -6,23 +6,21 @@ package arb
 
 import eu.timepit.refined.scalacheck.all.*
 import eu.timepit.refined.types.numeric.NonNegInt
-import lucuma.core.util.TimeSpan
-import lucuma.core.util.arb.ArbTimeSpan
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.*
 import org.scalacheck.Cogen
 
 trait ArbGcalDigest:
-  import ArbTimeSpan.given
+  import ArbCategorizedTime.given
 
   given Arbitrary[GcalDigest] =
     Arbitrary:
       for
         c <- arbitrary[NonNegInt]
-        t <- arbitrary[TimeSpan]
+        t <- arbitrary[CategorizedTime]
       yield GcalDigest(c, t)
 
   given Cogen[GcalDigest] =
-    Cogen[(Int, TimeSpan)].contramap(a => (a.count.value, a.time))
+    Cogen[(Int, CategorizedTime)].contramap(a => (a.count.value, a.time))
 
 object ArbGcalDigest extends ArbGcalDigest

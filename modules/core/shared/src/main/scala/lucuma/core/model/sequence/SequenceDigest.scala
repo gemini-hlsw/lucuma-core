@@ -11,7 +11,6 @@ import eu.timepit.refined.types.numeric.NonNegInt
 import lucuma.core.enums.ExecutionState
 import lucuma.core.enums.GcalLampType
 import lucuma.core.enums.ObserveClass
-import lucuma.core.util.TimeSpan
 import monocle.Focus
 import monocle.Lens
 
@@ -27,6 +26,7 @@ import scala.collection.immutable.SortedSet
  * @param atomCount      number of atoms in the sequence
  * @param arcs           count and estimated time of the arc steps
  * @param flats          count and estimated time of the flat steps
+ * @param observingTime  estimated time of the steps that are neither arcs nor flats
  * @param executionState completion state for this sequence
  */
 case class SequenceDigest(
@@ -36,23 +36,29 @@ case class SequenceDigest(
   atomCount:        NonNegInt,
   arcs:             GcalDigest,
   flats:            GcalDigest,
+  observingTime:    CategorizedTime,
   executionState:   ExecutionState
 ):
 
   def add[D](a: Atom[D]): SequenceDigest =
+    val (arcSteps, flatSteps, otherSteps) =
+      a.steps.toList.foldLeft((arcs, flats, observingTime)): (acc, s) =>
+        val (r, f, o) = acc
+        s.stepConfig.gcalLampType match
+          case Some(GcalLampType.Arc)  => (r.add(s.timeEstimate), f, o)
+          case Some(GcalLampType.Flat) => (r, f.add(s.timeEstimate), o)
+          case None                    => (r, f, o |+| s.timeEstimate)
+
     SequenceDigest(
       observeClass     = observeClass |+| a.observeClass,
       timeEstimate     = timeEstimate |+| a.timeEstimate,
       telescopeConfigs = telescopeConfigs ++ a.steps.toList.map(_.telescopeConfig),
       atomCount        = NonNegInt.unsafeFrom(atomCount.value + 1),
-      arcs             = gcalSteps(a, GcalLampType.Arc).foldLeft(arcs)(_.add(_)),
-      flats            = gcalSteps(a, GcalLampType.Flat).foldLeft(flats)(_.add(_)),
+      arcs             = arcSteps,
+      flats            = flatSteps,
+      observingTime    = otherSteps,
       executionState   = executionState
     )
-
-  private def gcalSteps[D](a: Atom[D], lampType: GcalLampType): List[TimeSpan] =
-    a.steps.toList.collect:
-      case s if s.stepConfig.gcalLampType.contains(lampType) => s.estimate.total
 
 object SequenceDigest:
 
@@ -64,6 +70,7 @@ object SequenceDigest:
       NonNegInt.unsafeFrom(0),
       GcalDigest.Zero,
       GcalDigest.Zero,
+      CategorizedTime.Zero,
       ExecutionState.NotStarted
     )
 
@@ -88,6 +95,10 @@ object SequenceDigest:
     Focus[SequenceDigest](_.flats)
 
   /** @group Optics */
+  val observingTime: Lens[SequenceDigest, CategorizedTime] =
+    Focus[SequenceDigest](_.observingTime)
+
+  /** @group Optics */
   val executionState: Lens[SequenceDigest, ExecutionState] =
     Focus[SequenceDigest](_.executionState)
 
@@ -104,5 +115,6 @@ object SequenceDigest:
         a.atomCount,
         a.arcs,
         a.flats,
+        a.observingTime,
         a.executionState
       )

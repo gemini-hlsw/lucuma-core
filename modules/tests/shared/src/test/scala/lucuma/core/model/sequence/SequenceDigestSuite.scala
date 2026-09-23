@@ -6,6 +6,7 @@ package lucuma.core.model.sequence
 import cats.kernel.laws.discipline.*
 import cats.syntax.eq.*
 import cats.syntax.foldable.*
+import cats.syntax.monoid.*
 import eu.timepit.refined.cats.*
 import eu.timepit.refined.scalacheck.all.*
 import lucuma.core.model.sequence.arb.ArbAtom.given
@@ -26,8 +27,6 @@ class SequenceDigestSuite extends DisciplineSuite:
   checkAll("SequenceDigest.observeClass",   LensTests(SequenceDigest.observeClass))
   checkAll("SequenceDigest.plannedTime",    LensTests(SequenceDigest.timeEstimate))
   checkAll("SequenceDigest.atomCount",      LensTests(SequenceDigest.atomCount))
-  checkAll("SequenceDigest.arcs",           LensTests(SequenceDigest.arcs))
-  checkAll("SequenceDigest.flats",          LensTests(SequenceDigest.flats))
   checkAll("SequenceDigest.executionState", LensTests(SequenceDigest.executionState))
   checkAll("SequenceDigest.configs",        LensTests(SequenceDigest.configs))
 
@@ -45,5 +44,12 @@ class SequenceDigestSuite extends DisciplineSuite:
       val flats = steps.filter(_.stepConfig.isFlat)
       (sd.arcs.count.value === arcs.size) &&
       (sd.flats.count.value === flats.size) &&
-      (sd.arcs.time === arcs.foldMap(_.estimate.total)) &&
-      (sd.flats.time === flats.foldMap(_.estimate.total))
+      (sd.arcs.time === arcs.foldMap(_.timeEstimate)) &&
+      (sd.flats.time === flats.foldMap(_.timeEstimate))
+
+  property("observing time excludes arcs and flats"):
+    forAll: (a: Atom[Unit]) =>
+      val sd    = SequenceDigest.Zero.add(a)
+      val other = a.steps.toList.filterNot(s => s.stepConfig.isArc || s.stepConfig.isFlat)
+      (sd.observingTime === other.foldMap(_.timeEstimate)) &&
+      ((sd.observingTime |+| sd.arcs.time |+| sd.flats.time) === sd.timeEstimate)

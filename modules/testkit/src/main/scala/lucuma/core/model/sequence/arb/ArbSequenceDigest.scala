@@ -30,8 +30,9 @@ trait ArbSequenceDigest:
         n <- arbitrary[NonNegInt]
         r <- arbitrary[GcalDigest]
         f <- arbitrary[GcalDigest]
+        b <- arbitrary[CategorizedTime]
         s <- arbitrary[ExecutionState]
-      yield SequenceDigest(c, t, o, n, r, f, s)
+      yield SequenceDigest(c, t, o, n, r, f, b, s)
 
   given Cogen[SequenceDigest] =
     Cogen[(
@@ -41,6 +42,7 @@ trait ArbSequenceDigest:
       NonNegInt,
       GcalDigest,
       GcalDigest,
+      CategorizedTime,
       ExecutionState
     )].contramap: a =>
       (
@@ -50,6 +52,7 @@ trait ArbSequenceDigest:
         a.atomCount,
         a.arcs,
         a.flats,
+        a.observingTime,
         a.executionState
       )
 

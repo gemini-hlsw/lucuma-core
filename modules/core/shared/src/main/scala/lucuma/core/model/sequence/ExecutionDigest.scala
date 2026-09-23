@@ -44,6 +44,13 @@ case class ExecutionDigest(
   def flats: GcalDigest =
     acquisition.flats |+| science.flats
 
+  /**
+   * Observing time (neither arcs nor flats) across the acquisition and science
+   * sequences.  Excludes setup time.
+   */
+  def observingTime: CategorizedTime =
+    acquisition.observingTime |+| science.observingTime
+
 }
 
 object ExecutionDigest {
