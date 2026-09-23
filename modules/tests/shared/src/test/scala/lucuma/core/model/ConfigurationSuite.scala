@@ -5,17 +5,51 @@ package lucuma.core.model
 
 import cats.syntax.all.*
 import lucuma.core.enums.AltairMode
+import lucuma.core.enums.FacilityObservingModeType
 import lucuma.core.enums.GnirsCamera
 import lucuma.core.enums.GnirsPrism
+import lucuma.core.enums.ObservingModeType
+import lucuma.core.enums.VisitorObservingModeType
 import lucuma.core.model.arb.ArbConfiguration.given
 import lucuma.core.util.arb.ArbEnumerated.given
 import munit.ScalaCheckSuite
 import org.scalacheck.*
 import org.scalacheck.Prop.*
+import org.scalacheck.rng.Seed
+
+import scala.compiletime.constValueTuple
+import scala.compiletime.summonAll
+import scala.deriving.Mirror
 
 final class ConfigurationSuite extends ScalaCheckSuite:
   import Configuration.ObservingMode.*
   import Configuration.ObservingMode.Radii
+
+  // Guards against adding an ObservingModeType without a Configuration.ObservingMode for it.  The
+  // subclasses come from the compiler-derived Mirror, so there is no list here to keep up to date;
+  // a new subclass without an Arbitrary given fails to compile.  Exchange modes are deliberately
+  // excluded: they are not Gemini instruments and need no configuration approval.
+  test("every facility and visitor ObservingModeType has exactly one Configuration.ObservingMode"):
+    val m      = summon[Mirror.SumOf[Configuration.ObservingMode]]
+    val labels = constValueTuple[m.MirroredElemLabels].toList.asInstanceOf[List[String]]
+    val arbs   = summonAll[Tuple.Map[m.MirroredElemTypes, Arbitrary]].toList.asInstanceOf[List[Arbitrary[Configuration.ObservingMode]]]
+
+    // Enough samples, with a fixed seed, to reach every mode a subclass can produce (e.g. Visitor).
+    val produced: Map[ObservingModeType, Set[String]] =
+      labels.zip(arbs).flatMap { (label, arb) =>
+        Gen.listOfN(500, arb.arbitrary)(Gen.Parameters.default, Seed(0L)).orEmpty.map(_.tpe -> label)
+      }.groupMap(_._1)(_._2).view.mapValues(_.toSet).toMap
+
+    val expected: Set[ObservingModeType] =
+      (FacilityObservingModeType.values ++ VisitorObservingModeType.values).toSet
+
+    val missing    = (expected -- produced.keySet).toList.map(t => s"No Configuration.ObservingMode for ${t.tag}")
+    val unexpected = (produced.keySet -- expected).toList.map(t => s"Unexpected Configuration.ObservingMode for ${t.tag}")
+    val duplicated = produced.toList.collect:
+      case (t, ls) if ls.sizeIs > 1 => s"More than one Configuration.ObservingMode for ${t.tag}: ${ls.toList.sorted.mkString(", ")}"
+
+    val problems = missing ++ unexpected ++ duplicated
+    assert(problems.isEmpty, problems.mkString("\n"))
 
   test("Flamingos2 Imaging has no constraints"):
     forAll: (cfg: Configuration) =>
