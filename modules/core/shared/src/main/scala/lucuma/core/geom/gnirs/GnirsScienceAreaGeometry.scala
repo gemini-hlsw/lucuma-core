@@ -68,10 +68,15 @@ trait GnirsScienceAreaGeometry:
   // dependent, like the long slit) as a narrow bar, with a circular cap bumping out to
   // one side; or, for the MK filters, the smaller round field. Widths below are the
   // diagram's horizontal (mapped to q); heights are its vertical (the spatial cross-axis, p).
+  // The smaller round field the Y-MK, J-MK and K-MK filters see. It is the smallest
+  // GNIRS imaging science area and, unlike the keyhole, does not depend on the camera.
+  val roundImagingFov: ShapeExpression =
+    ShapeExpression.centeredRectangle(RoundFieldHeight, RoundFieldWidth) ∪
+      cap(RoundCapWidth, RoundCapHeight, RoundFieldHeight)
+
   private def imagingFov(camera: GnirsCamera, filter: GnirsFilter): ShapeExpression =
     if isRoundImagingFilter(filter) then
-      ShapeExpression.centeredRectangle(RoundFieldHeight, RoundFieldWidth) ∪
-        cap(RoundCapWidth, RoundCapHeight, RoundFieldHeight)
+      roundImagingFov
     else
       ShapeExpression.centeredRectangle(KeyholeBarHeight, slitLength(camera, GnirsPrism.Mirror)) ∪
         cap(KeyholeCapWidth, KeyholeCapHeight, KeyholeBarHeight)
