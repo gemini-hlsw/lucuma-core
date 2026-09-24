@@ -23,6 +23,7 @@ import scala.collection.immutable.SortedSet
  * @param configs        set of offsets and guide states that are expected over the
  *                       course of the sequence execution
  * @param atomCount      number of atoms in the sequence
+ * @param gcalSets       number of atoms that contain at least one GCAL step
  * @param steps          count and estimated time of the steps, by kind
  * @param executionState completion state for this sequence
  */
@@ -31,6 +32,7 @@ case class SequenceDigest(
   timeEstimate:     CategorizedTime,
   telescopeConfigs: SortedSet[TelescopeConfig],
   atomCount:        NonNegInt,
+  gcalSets:         NonNegInt,
   steps:            StepDigests,
   executionState:   ExecutionState
 ):
@@ -41,6 +43,9 @@ case class SequenceDigest(
       timeEstimate     = timeEstimate |+| a.timeEstimate,
       telescopeConfigs = telescopeConfigs ++ a.steps.toList.map(_.telescopeConfig),
       atomCount        = NonNegInt.unsafeFrom(atomCount.value + 1),
+      gcalSets         =
+        if a.steps.exists(_.stepConfig.usesGcalUnit) then NonNegInt.unsafeFrom(gcalSets.value + 1)
+        else gcalSets,
       steps            = a.steps.toList.foldLeft(steps)(_.add(_)),
       executionState   = executionState
     )
@@ -52,6 +57,7 @@ object SequenceDigest:
       Monoid[ObserveClass].empty,
       CategorizedTime.Zero,
       SortedSet.empty,
+      NonNegInt.unsafeFrom(0),
       NonNegInt.unsafeFrom(0),
       StepDigests.Zero,
       ExecutionState.NotStarted
@@ -81,6 +87,10 @@ object SequenceDigest:
   val atomCount: Lens[SequenceDigest, NonNegInt] =
     Focus[SequenceDigest](_.atomCount)
 
+  /** @group Optics */
+  val gcalSets: Lens[SequenceDigest, NonNegInt] =
+    Focus[SequenceDigest](_.gcalSets)
+
   given Eq[SequenceDigest] =
     Eq.by: a =>
       (
@@ -88,6 +98,7 @@ object SequenceDigest:
         a.timeEstimate,
         a.telescopeConfigs,
         a.atomCount,
+        a.gcalSets,
         a.steps,
         a.executionState
       )

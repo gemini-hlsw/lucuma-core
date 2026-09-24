@@ -28,15 +28,17 @@ trait ArbSequenceDigest:
         t <- arbitrary[CategorizedTime]
         o <- arbitrary[SortedSet[TelescopeConfig]]
         n <- arbitrary[NonNegInt]
+        g <- arbitrary[NonNegInt]
         d <- arbitrary[StepDigests]
         s <- arbitrary[ExecutionState]
-      yield SequenceDigest(c, t, o, n, d, s)
+      yield SequenceDigest(c, t, o, n, g, d, s)
 
   given Cogen[SequenceDigest] =
     Cogen[(
       ObserveClass,
       CategorizedTime,
       Set[TelescopeConfig],
+      NonNegInt,
       NonNegInt,
       StepDigests,
       ExecutionState
@@ -46,6 +48,7 @@ trait ArbSequenceDigest:
         a.timeEstimate,
         a.telescopeConfigs,
         a.atomCount,
+        a.gcalSets,
         a.steps,
         a.executionState
       )

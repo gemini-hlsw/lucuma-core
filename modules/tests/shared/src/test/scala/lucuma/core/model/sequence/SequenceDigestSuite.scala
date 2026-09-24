@@ -27,6 +27,7 @@ class SequenceDigestSuite extends DisciplineSuite:
   checkAll("SequenceDigest.observeClass",   LensTests(SequenceDigest.observeClass))
   checkAll("SequenceDigest.plannedTime",    LensTests(SequenceDigest.timeEstimate))
   checkAll("SequenceDigest.atomCount",      LensTests(SequenceDigest.atomCount))
+  checkAll("SequenceDigest.gcalSets",       LensTests(SequenceDigest.gcalSets))
   checkAll("SequenceDigest.executionState", LensTests(SequenceDigest.executionState))
   checkAll("SequenceDigest.configs",        LensTests(SequenceDigest.configs))
   checkAll("SequenceDigest.steps",          LensTests(SequenceDigest.steps))
@@ -59,3 +60,9 @@ class SequenceDigestSuite extends DisciplineSuite:
     forAll: (a: Atom[Unit]) =>
       val sd = SequenceDigest.Zero.add(a)
       sd.steps.time === sd.timeEstimate
+
+  property("counts an atom as one gcal set when it has any GCAL step"):
+    forAll: (as: List[Atom[Unit]]) =>
+      val sd       = as.foldLeft(SequenceDigest.Zero)(_.add(_))
+      val expected = as.count(_.steps.exists(_.stepConfig.usesGcalUnit))
+      sd.gcalSets.value === expected
