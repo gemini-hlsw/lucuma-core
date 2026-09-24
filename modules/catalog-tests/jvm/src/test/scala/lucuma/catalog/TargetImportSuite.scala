@@ -6,8 +6,7 @@ package lucuma.catalog.csv
 import cats.effect.*
 import cats.syntax.all.*
 import fs2.*
-import fs2.io.file.Files
-import fs2.io.file.Path
+import lucuma.catalog.TestResources
 import lucuma.catalog.clients.SimbadClient
 import lucuma.catalog.simbad.SEDDataLoader
 import lucuma.catalog.simbad.SEDMatcher
@@ -28,10 +27,9 @@ class TargetImportSuite extends CatsEffectSuite with RetryFlakyTests:
 
   test("parallax-rv-v") {
     val xmlFile = "/targets_pv.csv"
-    val file    = getClass().getResource(xmlFile)
     Resource.unit[IO].use { _ =>
-      Files[IO]
-        .readAll(Path(file.getPath()))
+      TestResources
+        .stream(xmlFile)
         .through(text.utf8.decode)
         .through(TargetImport.csv2targets)
         .compile
@@ -81,10 +79,9 @@ class TargetImportSuite extends CatsEffectSuite with RetryFlakyTests:
 
   test("Another test case") {
     val xmlFile = "/another_test.csv"
-    val file    = getClass().getResource(xmlFile)
     Resource.unit[IO].use { _ =>
-      Files[IO]
-        .readAll(Path(file.getPath()))
+      TestResources
+        .stream(xmlFile)
         .through(text.utf8.decode)
         .through(TargetImport.csv2targets)
         .compile
@@ -106,10 +103,9 @@ class TargetImportSuite extends CatsEffectSuite with RetryFlakyTests:
 
   test("parse sample pit file") {
     val xmlFile = "/PIT_sidereal.csv"
-    val file    = getClass().getResource(xmlFile)
     Resource.unit[IO].use { _ =>
-      Files[IO]
-        .readAll(Path(file.getPath()))
+      TestResources
+        .stream(xmlFile)
         .through(text.utf8.decode)
         .through(TargetImport.csv2targets)
         .compile
@@ -134,10 +130,9 @@ class TargetImportSuite extends CatsEffectSuite with RetryFlakyTests:
 
   test("parse file with no brightness units") {
     val xmlFile = "/assign_units_sidereal.csv"
-    val file    = getClass().getResource(xmlFile)
     Resource.unit[IO].use { _ =>
-      Files[IO]
-        .readAll(Path(file.getPath()))
+      TestResources
+        .stream(xmlFile)
         .through(text.utf8.decode)
         .through(TargetImport.csv2targets)
         .compile
@@ -179,10 +174,9 @@ class TargetImportSuite extends CatsEffectSuite with RetryFlakyTests:
 
   test("parse sample pit file with mixed units") {
     val xmlFile = "/PIT_sidereal_mixed_units.csv"
-    val file    = getClass().getResource(xmlFile)
     Resource.unit[IO].use { _ =>
-      Files[IO]
-        .readAll(Path(file.getPath()))
+      TestResources
+        .stream(xmlFile)
         .through(text.utf8.decode)
         .through(TargetImport.csv2targets)
         .compile
@@ -202,10 +196,9 @@ class TargetImportSuite extends CatsEffectSuite with RetryFlakyTests:
 
   test("parse stars sample file") {
     val xmlFile = "/stars.csv"
-    val file    = getClass().getResource(xmlFile)
     Resource.unit[IO].use { _ =>
-      Files[IO]
-        .readAll(Path(file.getPath()))
+      TestResources
+        .stream(xmlFile)
         .through(text.utf8.decode)
         .through(TargetImport.csv2targets)
         .compile
@@ -220,10 +213,9 @@ class TargetImportSuite extends CatsEffectSuite with RetryFlakyTests:
 
   test("parse stars with pm file") {
     val xmlFile = "/stars_pm.csv"
-    val file    = getClass().getResource(xmlFile)
     Resource.unit[IO].use { _ =>
-      Files[IO]
-        .readAll(Path(file.getPath()))
+      TestResources
+        .stream(xmlFile)
         .through(text.utf8.decode)
         .through(TargetImport.csv2targets)
         .compile
@@ -239,10 +231,9 @@ class TargetImportSuite extends CatsEffectSuite with RetryFlakyTests:
 
   test("parse stars with pm and epoch file") {
     val xmlFile = "/stars_pm_epoch.csv"
-    val file    = getClass().getResource(xmlFile)
     Resource.unit[IO].use { _ =>
-      Files[IO]
-        .readAll(Path(file.getPath()))
+      TestResources
+        .stream(xmlFile)
         .through(text.utf8.decode)
         .through(TargetImport.csv2targets)
         .compile
@@ -266,10 +257,9 @@ class TargetImportSuite extends CatsEffectSuite with RetryFlakyTests:
 
   test("parse stars sample file with errors") {
     val xmlFile = "/stars_with_errors.csv"
-    val file    = getClass().getResource(xmlFile)
     Resource.unit[IO].use { _ =>
-      Files[IO]
-        .readAll(Path(file.getPath()))
+      TestResources
+        .stream(xmlFile)
         .through(text.utf8.decode)
         .through(TargetImport.csv2targets)
         .compile
@@ -290,10 +280,9 @@ class TargetImportSuite extends CatsEffectSuite with RetryFlakyTests:
 
   test("parse stars random file") {
     val xmlFile = "/random.csv"
-    val file    = getClass().getResource(xmlFile)
     Resource.unit[IO].use { _ =>
-      Files[IO]
-        .readAll(Path(file.getPath()))
+      TestResources
+        .stream(xmlFile)
         .through(text.utf8.decode)
         .through(TargetImport.csv2targets)
         .compile
@@ -307,15 +296,14 @@ class TargetImportSuite extends CatsEffectSuite with RetryFlakyTests:
 
   test("parse names file with lookup".flaky) {
     val xmlFile = "/target_names.csv"
-    val file    = getClass().getResource(xmlFile)
     JdkHttpClient
       .simple[IO]
       .use { client =>
         for
           sedConfig   <- SEDDataLoader.load[IO]
           simbadClient = SimbadClient.build(client, SEDMatcher.fromConfig(sedConfig))
-          result      <- Files[IO]
-                           .readAll(Path(file.getPath()))
+          result      <- TestResources
+                           .stream(xmlFile)
                            .through(text.utf8.decode)
                            .through(TargetImport.csv2targetsAndLookup(simbadClient))
                            .compile
@@ -329,10 +317,9 @@ class TargetImportSuite extends CatsEffectSuite with RetryFlakyTests:
 
   test("parse sample pit file with spaces") {
     val xmlFile = "/targets_test_case.csv"
-    val file    = getClass().getResource(xmlFile)
     Resource.unit[IO].use { _ =>
-      Files[IO]
-        .readAll(Path(file.getPath()))
+      TestResources
+        .stream(xmlFile)
         .through(text.utf8.decode)
         .through(TargetImport.csv2targets)
         .compile
@@ -352,10 +339,9 @@ class TargetImportSuite extends CatsEffectSuite with RetryFlakyTests:
 
   test("test case with no pmRA") {
     val xmlFile = "/import_test_2.csv"
-    val file    = getClass().getResource(xmlFile)
     Resource.unit[IO].use { _ =>
-      Files[IO]
-        .readAll(Path(file.getPath()))
+      TestResources
+        .stream(xmlFile)
         .through(text.utf8.decode)
         .through(TargetImport.csv2targets)
         .compile
@@ -402,10 +388,9 @@ class TargetImportSuite extends CatsEffectSuite with RetryFlakyTests:
 
   test("no SED is assigned when the CSV does not specify one") {
     val xmlFile = "/galaxies_surface_sidereal.csv"
-    val file    = getClass().getResource(xmlFile)
     Resource.unit[IO].use { _ =>
-      Files[IO]
-        .readAll(Path(file.getPath()))
+      TestResources
+        .stream(xmlFile)
         .through(text.utf8.decode)
         .through(TargetImport.csv2targets)
         .compile
