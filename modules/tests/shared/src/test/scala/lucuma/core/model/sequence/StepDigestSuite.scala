@@ -4,10 +4,7 @@
 package lucuma.core.model.sequence
 
 import cats.kernel.laws.discipline.*
-import eu.timepit.refined.cats.*
-import eu.timepit.refined.scalacheck.all.*
 import lucuma.core.model.sequence.arb.ArbStepDigest.given
-import lucuma.core.model.sequence.arb.ArbCategorizedTime.given
 import munit.*
 
 class StepDigestSuite extends DisciplineSuite:

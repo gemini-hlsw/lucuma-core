@@ -6,12 +6,11 @@ package lucuma.core.model.sequence
 import cats.kernel.laws.discipline.*
 import cats.syntax.eq.*
 import cats.syntax.foldable.*
-import cats.syntax.monoid.*
 import eu.timepit.refined.cats.*
 import eu.timepit.refined.scalacheck.all.*
 import lucuma.core.model.sequence.arb.ArbAtom.given
 import lucuma.core.model.sequence.arb.ArbCategorizedTime.given
-import lucuma.core.model.sequence.arb.ArbStepDigest.given
+import lucuma.core.model.sequence.arb.ArbStepDigests.given
 import lucuma.core.model.sequence.arb.ArbSequenceDigest.given
 import lucuma.core.model.sequence.arb.ArbTelescopeConfig.given
 import lucuma.core.enums.StepType
@@ -30,6 +29,7 @@ class SequenceDigestSuite extends DisciplineSuite:
   checkAll("SequenceDigest.atomCount",      LensTests(SequenceDigest.atomCount))
   checkAll("SequenceDigest.executionState", LensTests(SequenceDigest.executionState))
   checkAll("SequenceDigest.configs",        LensTests(SequenceDigest.configs))
+  checkAll("SequenceDigest.steps",          LensTests(SequenceDigest.steps))
 
   property("preserves ordering of atom steps"):
     forAll: (a: Atom[Unit]) =>
@@ -49,13 +49,13 @@ class SequenceDigestSuite extends DisciplineSuite:
       val arcs   = steps.filter(_.stepConfig.isArc)
       val flats  = steps.filter(s => s.stepConfig.usesGcalUnit && !s.stepConfig.isArc)
       val other  = steps.filter(_.stepConfig.stepType === StepType.Science)
-      matches(sd.biases, biases) &&
-      matches(sd.darks, darks) &&
-      matches(sd.arcs, arcs) &&
-      matches(sd.flats, flats) &&
-      matches(sd.observing, other)
+      matches(sd.steps.biases, biases) &&
+      matches(sd.steps.darks, darks) &&
+      matches(sd.steps.arcs, arcs) &&
+      matches(sd.steps.flats, flats) &&
+      matches(sd.steps.observing, other)
 
   property("buckets sum to the time estimate"):
     forAll: (a: Atom[Unit]) =>
       val sd = SequenceDigest.Zero.add(a)
-      (sd.biases.time |+| sd.darks.time |+| sd.arcs.time |+| sd.flats.time |+| sd.observing.time) === sd.timeEstimate
+      sd.steps.time === sd.timeEstimate
