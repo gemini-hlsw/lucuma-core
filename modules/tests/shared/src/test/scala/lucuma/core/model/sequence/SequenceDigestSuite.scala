@@ -8,12 +8,12 @@ import cats.syntax.eq.*
 import cats.syntax.foldable.*
 import eu.timepit.refined.cats.*
 import eu.timepit.refined.scalacheck.all.*
+import lucuma.core.enums.StepType
 import lucuma.core.model.sequence.arb.ArbAtom.given
 import lucuma.core.model.sequence.arb.ArbCategorizedTime.given
-import lucuma.core.model.sequence.arb.ArbStepDigests.given
 import lucuma.core.model.sequence.arb.ArbSequenceDigest.given
+import lucuma.core.model.sequence.arb.ArbStepDigests.given
 import lucuma.core.model.sequence.arb.ArbTelescopeConfig.given
-import lucuma.core.enums.StepType
 import lucuma.core.util.arb.ArbEnumerated.given
 import monocle.law.discipline.*
 import munit.*
