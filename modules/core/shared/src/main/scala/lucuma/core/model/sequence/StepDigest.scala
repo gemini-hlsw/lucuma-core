@@ -13,37 +13,37 @@ import monocle.Focus
 import monocle.Lens
 
 /**
- * Number of GCAL steps of a given lamp type and their estimated time, broken
- * down by charge class.
+ * Number of steps of one kind (bias, dark, arc, flat, observing) and their
+ * estimated time, broken down by charge class.
  */
-case class GcalDigest(
+case class StepDigest(
   count: NonNegInt,
   time:  CategorizedTime
 ) derives Eq:
 
-  def add(stepTime: CategorizedTime): GcalDigest =
-    this |+| GcalDigest(NonNegInt.unsafeFrom(1), stepTime)
+  def add(stepTime: CategorizedTime): StepDigest =
+    this |+| StepDigest(NonNegInt.unsafeFrom(1), stepTime)
 
-object GcalDigest:
+object StepDigest:
 
-  val Zero: GcalDigest =
-    GcalDigest(NonNegInt.MinValue, CategorizedTime.Zero)
+  val Zero: StepDigest =
+    StepDigest(NonNegInt.MinValue, CategorizedTime.Zero)
 
   /**
    * Both count and time saturate rather than overflow.
    */
-  given Monoid[GcalDigest] =
+  given Monoid[StepDigest] =
     Monoid.instance(
       Zero,
       (a, b) =>
         val count = (a.count.value.toLong + b.count.value).min(Int.MaxValue).toInt
-        GcalDigest(NonNegInt.unsafeFrom(count), a.time |+| b.time)
+        StepDigest(NonNegInt.unsafeFrom(count), a.time |+| b.time)
     )
 
   /** @group Optics */
-  val count: Lens[GcalDigest, NonNegInt] =
-    Focus[GcalDigest](_.count)
+  val count: Lens[StepDigest, NonNegInt] =
+    Focus[StepDigest](_.count)
 
   /** @group Optics */
-  val time: Lens[GcalDigest, CategorizedTime] =
-    Focus[GcalDigest](_.time)
+  val time: Lens[StepDigest, CategorizedTime] =
+    Focus[StepDigest](_.time)

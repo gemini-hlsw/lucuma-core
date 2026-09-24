@@ -32,24 +32,28 @@ case class ExecutionDigest(
   def fullTimeEstimate: CategorizedTime =
     science.timeEstimate.sumCharge(science.observeClass.chargeClass, setup.full *| setupCount.value)
 
-  /**
-   * Arc steps across the acquisition and science sequences.
-   */
-  def arcs: GcalDigest =
+  /** Bias steps across the acquisition and science sequences. */
+  def biases: StepDigest =
+    acquisition.biases |+| science.biases
+
+  /** Dark steps across the acquisition and science sequences. */
+  def darks: StepDigest =
+    acquisition.darks |+| science.darks
+
+  /** Arc steps across the acquisition and science sequences. */
+  def arcs: StepDigest =
     acquisition.arcs |+| science.arcs
 
-  /**
-   * Flat steps across the acquisition and science sequences.
-   */
-  def flats: GcalDigest =
+  /** Flat steps across the acquisition and science sequences. */
+  def flats: StepDigest =
     acquisition.flats |+| science.flats
 
   /**
-   * Observing time (neither arcs nor flats) across the acquisition and science
-   * sequences.  Excludes setup time.
+   * All other steps across the acquisition and science sequences.  Excludes
+   * setup time.
    */
-  def observingTime: CategorizedTime =
-    acquisition.observingTime |+| science.observingTime
+  def observing: StepDigest =
+    acquisition.observing |+| science.observing
 
 }
 

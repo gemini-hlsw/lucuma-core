@@ -6,10 +6,10 @@ package lucuma.core.model.sequence
 import cats.kernel.laws.discipline.*
 import eu.timepit.refined.cats.*
 import eu.timepit.refined.scalacheck.all.*
-import lucuma.core.model.sequence.arb.ArbGcalDigest.given
+import lucuma.core.model.sequence.arb.ArbStepDigest.given
 import lucuma.core.model.sequence.arb.ArbCategorizedTime.given
 import munit.*
 
-class GcalDigestSuite extends DisciplineSuite:
-  checkAll("Eq[GcalDigest]",     EqTests[GcalDigest].eqv)
-  checkAll("Monoid[GcalDigest]", MonoidTests[GcalDigest].monoid)
+class StepDigestSuite extends DisciplineSuite:
+  checkAll("Eq[StepDigest]",     EqTests[StepDigest].eqv)
+  checkAll("Monoid[StepDigest]", MonoidTests[StepDigest].monoid)

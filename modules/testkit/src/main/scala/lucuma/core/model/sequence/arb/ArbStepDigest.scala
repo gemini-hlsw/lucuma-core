@@ -10,17 +10,17 @@ import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.*
 import org.scalacheck.Cogen
 
-trait ArbGcalDigest:
+trait ArbStepDigest:
   import ArbCategorizedTime.given
 
-  given Arbitrary[GcalDigest] =
+  given Arbitrary[StepDigest] =
     Arbitrary:
       for
         c <- arbitrary[NonNegInt]
         t <- arbitrary[CategorizedTime]
-      yield GcalDigest(c, t)
+      yield StepDigest(c, t)
 
-  given Cogen[GcalDigest] =
+  given Cogen[StepDigest] =
     Cogen[(Int, CategorizedTime)].contramap(a => (a.count.value, a.time))
 
-object ArbGcalDigest extends ArbGcalDigest
+object ArbStepDigest extends ArbStepDigest

@@ -11,9 +11,10 @@ import eu.timepit.refined.cats.*
 import eu.timepit.refined.scalacheck.all.*
 import lucuma.core.model.sequence.arb.ArbAtom.given
 import lucuma.core.model.sequence.arb.ArbCategorizedTime.given
-import lucuma.core.model.sequence.arb.ArbGcalDigest.given
+import lucuma.core.model.sequence.arb.ArbStepDigest.given
 import lucuma.core.model.sequence.arb.ArbSequenceDigest.given
 import lucuma.core.model.sequence.arb.ArbTelescopeConfig.given
+import lucuma.core.enums.StepType
 import lucuma.core.util.arb.ArbEnumerated.given
 import monocle.law.discipline.*
 import munit.*
@@ -36,20 +37,25 @@ class SequenceDigestSuite extends DisciplineSuite:
       val result = a.steps.toList.map(s => TelescopeConfig(s.telescopeConfig.offset, s.telescopeConfig.guiding))
       sd.telescopeConfigs === SortedSet.from(result)
 
-  property("counts arc and flat steps"):
-    forAll: (a: Atom[Unit]) =>
-      val sd    = SequenceDigest.Zero.add(a)
-      val steps = a.steps.toList
-      val arcs  = steps.filter(_.stepConfig.isArc)
-      val flats = steps.filter(_.stepConfig.isFlat)
-      (sd.arcs.count.value === arcs.size) &&
-      (sd.flats.count.value === flats.size) &&
-      (sd.arcs.time === arcs.foldMap(_.timeEstimate)) &&
-      (sd.flats.time === flats.foldMap(_.timeEstimate))
+  private def matches(sd: StepDigest, steps: List[Step[Unit]]): Boolean =
+    (sd.count.value === steps.size) && (sd.time === steps.foldMap(_.timeEstimate))
 
-  property("observing time excludes arcs and flats"):
+  property("buckets steps by type"):
     forAll: (a: Atom[Unit]) =>
-      val sd    = SequenceDigest.Zero.add(a)
-      val other = a.steps.toList.filterNot(s => s.stepConfig.isArc || s.stepConfig.isFlat)
-      (sd.observingTime === other.foldMap(_.timeEstimate)) &&
-      ((sd.observingTime |+| sd.arcs.time |+| sd.flats.time) === sd.timeEstimate)
+      val sd     = SequenceDigest.Zero.add(a)
+      val steps  = a.steps.toList
+      val biases = steps.filter(_.stepConfig.stepType === StepType.Bias)
+      val darks  = steps.filter(_.stepConfig.stepType === StepType.Dark)
+      val arcs   = steps.filter(_.stepConfig.isArc)
+      val flats  = steps.filter(s => s.stepConfig.usesGcalUnit && !s.stepConfig.isArc)
+      val other  = steps.filter(_.stepConfig.stepType === StepType.Science)
+      matches(sd.biases, biases) &&
+      matches(sd.darks, darks) &&
+      matches(sd.arcs, arcs) &&
+      matches(sd.flats, flats) &&
+      matches(sd.observing, other)
+
+  property("buckets sum to the time estimate"):
+    forAll: (a: Atom[Unit]) =>
+      val sd = SequenceDigest.Zero.add(a)
+      (sd.biases.time |+| sd.darks.time |+| sd.arcs.time |+| sd.flats.time |+| sd.observing.time) === sd.timeEstimate
