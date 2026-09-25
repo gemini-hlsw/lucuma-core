@@ -7,6 +7,7 @@ import cats.effect.*
 import cats.syntax.all.*
 import lucuma.catalog.goa.syntax.*
 import lucuma.core.enums.Instrument
+import lucuma.core.enums.ScienceMode
 import lucuma.core.math.Angle
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Declination
@@ -60,6 +61,24 @@ class GoaClientSuite extends CatsEffectSuite:
         assertMatches(errors.head) { case GoaQueryError.UnsupportedInstrument(_) =>
           true
         }
+
+  test("toUri restricts the search with an upper-case mode token"):
+    val imaging      =
+      GoaParams.Sidereal(testCoords, Instrument.GmosNorth, searchRadius, ScienceMode.Imaging.some)
+    val spectroscopy =
+      GoaParams.NonSidereal("Halley",
+                            Instrument.GmosSouth,
+                            searchRadius,
+                            ScienceMode.Spectroscopy.some
+      )
+    assert(GoaParams.toUri(imaging).exists(_.renderString.contains("/OBJECT/IMAGING/ra=")))
+    assert(
+      GoaParams.toUri(spectroscopy).exists(_.renderString.contains("/OBJECT/SPECTROSCOPY/object="))
+    )
+
+  test("toUri leaves the mode out when unrestricted"):
+    val params = GoaParams.Sidereal(testCoords, Instrument.GmosNorth, searchRadius)
+    assert(GoaParams.toUri(params).exists(_.renderString.contains("/OBJECT/ra=")))
 
   test("GoaInstrument maps all supported instruments"):
     assertEquals(Instrument.GmosNorth.goaName, Some("GMOS-N"))
