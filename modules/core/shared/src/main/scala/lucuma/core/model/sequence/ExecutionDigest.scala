@@ -4,6 +4,7 @@
 package lucuma.core.model.sequence
 
 import cats.Eq
+import cats.syntax.monoid.*
 import eu.timepit.refined.cats.given
 import eu.timepit.refined.types.numeric.NonNegInt
 import lucuma.core.enums.ObserveClass
@@ -11,10 +12,11 @@ import monocle.Focus
 import monocle.Lens
 
 case class ExecutionDigest(
-  setup:       SetupTime,
-  setupCount:  NonNegInt,
-  acquisition: SequenceDigest,
-  science:     SequenceDigest
+  setup:            SetupTime,
+  setupCount:       NonNegInt,
+  calibrationCount: NonNegInt,
+  acquisition:      SequenceDigest,
+  science:          SequenceDigest
 ) {
 
   /**
@@ -30,6 +32,13 @@ case class ExecutionDigest(
   def fullTimeEstimate: CategorizedTime =
     science.timeEstimate.sumCharge(science.observeClass.chargeClass, setup.full *| setupCount.value)
 
+  /**
+   * Steps by kind across the acquisition and science sequences.  Excludes
+   * setup time.
+   */
+  def steps: StepDigests =
+    acquisition.steps |+| science.steps
+
 }
 
 object ExecutionDigest {
@@ -37,6 +46,7 @@ object ExecutionDigest {
   val Zero: ExecutionDigest =
     ExecutionDigest(
       SetupTime.Zero,
+      NonNegInt.MinValue,
       NonNegInt.MinValue,
       SequenceDigest.Zero,
       SequenceDigest.Zero
@@ -51,6 +61,10 @@ object ExecutionDigest {
     Focus[ExecutionDigest](_.setupCount)
 
   /** @group Optics */
+  val calibrationCount: Lens[ExecutionDigest, NonNegInt] =
+    Focus[ExecutionDigest](_.calibrationCount)
+
+  /** @group Optics */
   val acquisition: Lens[ExecutionDigest, SequenceDigest] =
     Focus[ExecutionDigest](_.acquisition)
 
@@ -62,6 +76,7 @@ object ExecutionDigest {
     Eq.by { a => (
       a.setup,
       a.setupCount,
+      a.calibrationCount,
       a.acquisition,
       a.science
     )}

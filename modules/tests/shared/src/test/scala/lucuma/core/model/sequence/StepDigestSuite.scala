@@ -4,9 +4,9 @@
 package lucuma.core.model.sequence
 
 import cats.kernel.laws.discipline.*
-import lucuma.core.model.sequence.arb.ArbExecutionDigest.given
+import lucuma.core.model.sequence.arb.ArbStepDigest.given
 import munit.*
 
-final class ExecutionDigestSuite extends DisciplineSuite:
-
-  checkAll("Eq[ExecutionDigest]", EqTests[ExecutionDigest].eqv)
+class StepDigestSuite extends DisciplineSuite:
+  checkAll("Eq[StepDigest]",     EqTests[StepDigest].eqv)
+  checkAll("Monoid[StepDigest]", MonoidTests[StepDigest].monoid)
