@@ -21,10 +21,18 @@ enum Flamingos2SlitOffsetPreset(
   val tag:         String,
   val description: String
 ) extends SlitOffsetPreset derives Enumerated, Display:
-  case Telluric     extends Flamingos2SlitOffsetPreset("telluric",       "Telluric")
-  case MosTelluric  extends Flamingos2SlitOffsetPreset("mos_telluric",   "MOS telluric")
   case NodAlongSlit extends Flamingos2SlitOffsetPreset("nod_along_slit", "Nod along slit")
   case NodToSky     extends Flamingos2SlitOffsetPreset("nod_to_sky",     "Nod to sky")
+
+/**
+ * Enumerated type for the Flamingos2 telluric offset presets.
+ */
+enum Flamingos2TelluricOffsetPreset(
+  val tag:         String,
+  val description: String
+) extends SlitOffsetPreset derives Enumerated, Display:
+  case Telluric    extends Flamingos2TelluricOffsetPreset("telluric",     "Telluric")
+  case MosTelluric extends Flamingos2TelluricOffsetPreset("mos_telluric", "MOS telluric")
 
 /**
  * Enumerated type for the Flamingos2 MOS offset presets.
