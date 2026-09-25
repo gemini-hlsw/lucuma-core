@@ -9,26 +9,21 @@ import org.scalacheck.*
 
 trait LimitedBigDecimals:
   // Scala.js seems to have trouble formatting BigDecimals with very high absolute scale or precision.
-  // We therefore use these bounded arbitraries.
+  // Values are built within bounds instead of filtered, since filtering the default arbitrary
+  // discards most samples and makes property checks give up.
+  private def limitedBigDecimal(minUnscaled: Long): Gen[BigDecimal] =
+    for
+      digits   <- Gen.choose(1, 15)
+      max       = BigInt(10).pow(digits).toLong - 1
+      unscaled <- Gen.choose(minUnscaled.max(-max), max)
+      scale    <- Gen.choose(-99, 99)
+    yield BigDecimal(BigInt(unscaled), scale)
+
   given Arbitrary[BigDecimal] =
-    Arbitrary(
-      org.scalacheck.Arbitrary.arbBigDecimal.arbitrary.suchThat(x =>
-        x.scale.abs < 100 && x.precision <= 15
-      )
-    )
+    Arbitrary(limitedBigDecimal(Long.MinValue))
 
   given Arbitrary[PosBigDecimal] =
-    Arbitrary(
-      given_Arbitrary_BigDecimal.arbitrary
-        .map(_.abs)
-        .suchThat(_ > 0)
-        .map(PosBigDecimal.unsafeFrom)
-    )
+    Arbitrary(limitedBigDecimal(1L).map(PosBigDecimal.unsafeFrom))
 
   given Arbitrary[NonNegBigDecimal] =
-    Arbitrary(
-      given_Arbitrary_BigDecimal.arbitrary
-        .map(_.abs)
-        .suchThat(_ >= 0)
-        .map(NonNegBigDecimal.unsafeFrom)
-    )
+    Arbitrary(limitedBigDecimal(0L).map(NonNegBigDecimal.unsafeFrom))
