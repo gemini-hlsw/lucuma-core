@@ -27,7 +27,7 @@ import SplittabilityOption.*
 enum SchedulingMode(
   val tag:              String,
   val splittability:    SplittabilityOption,
-  val interruptibility: InterruptiblityOption
+  val interruptibility: InterruptibilityOption
 ) derives Enumerated:
 
   def isSplittable: Boolean =

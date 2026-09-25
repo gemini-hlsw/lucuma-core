@@ -6,4 +6,4 @@ package lucuma.core.enums
 import lucuma.core.util.NewBoolean
 
 object InterruptibilityOption extends NewBoolean { val Interruptible = True; val NotInterruptible = False }
-type InterruptiblityOption = InterruptibilityOption.Type
+type InterruptibilityOption = InterruptibilityOption.Type
