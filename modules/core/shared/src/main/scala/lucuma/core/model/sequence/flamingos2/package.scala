@@ -6,6 +6,7 @@ package lucuma.core.model.sequence.flamingos2
 import cats.data.NonEmptyList
 import lucuma.core.enums.Flamingos2MosOffsetPreset
 import lucuma.core.enums.Flamingos2SlitOffsetPreset
+import lucuma.core.enums.Flamingos2TelluricOffsetPreset
 import lucuma.core.enums.StepGuideState
 import lucuma.core.math.Offset
 import lucuma.core.math.syntax.bigDecimal.*
@@ -49,10 +50,13 @@ val NodToSkyDefaultTelescopeConfigs: NonEmptyList[TelescopeConfig] =
 
 def defaultSlitTelescopeConfigs(preset: Flamingos2SlitOffsetPreset): SlitTelescopeConfigs =
   preset match
-    case Flamingos2SlitOffsetPreset.Telluric     => SlitTelescopeConfigs.AlongSlit(TelluricDefaultTelescopeConfigs)
-    case Flamingos2SlitOffsetPreset.MosTelluric  => SlitTelescopeConfigs.AlongSlit(MosTelluricDefaultTelescopeConfigs)
     case Flamingos2SlitOffsetPreset.NodAlongSlit => SlitTelescopeConfigs.AlongSlit(NodAlongSlitDefaultTelescopeConfigs)
     case Flamingos2SlitOffsetPreset.NodToSky     => SlitTelescopeConfigs.ToSky(NodToSkyDefaultTelescopeConfigs)
+
+def defaultTelluricTelescopeConfigs(preset: Flamingos2TelluricOffsetPreset): SlitTelescopeConfigs =
+  preset match
+    case Flamingos2TelluricOffsetPreset.Telluric    => SlitTelescopeConfigs.AlongSlit(TelluricDefaultTelescopeConfigs)
+    case Flamingos2TelluricOffsetPreset.MosTelluric => SlitTelescopeConfigs.AlongSlit(MosTelluricDefaultTelescopeConfigs)
 
 // MOS presets.
 val SparseFieldDefaultTelescopeConfigs: NonEmptyList[TelescopeConfigAlongSlit] =

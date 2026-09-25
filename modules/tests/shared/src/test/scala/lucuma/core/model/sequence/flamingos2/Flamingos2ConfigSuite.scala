@@ -6,6 +6,7 @@ package lucuma.core.model.sequence.flamingos2
 import cats.data.NonEmptyList
 import lucuma.core.enums.Flamingos2MosOffsetPreset
 import lucuma.core.enums.Flamingos2SlitOffsetPreset
+import lucuma.core.enums.Flamingos2TelluricOffsetPreset
 import lucuma.core.enums.SlitOffsetMode
 import lucuma.core.enums.StepGuideState
 import lucuma.core.math.Offset
@@ -21,12 +22,12 @@ class Flamingos2ConfigSuite extends FunSuite:
     )
 
   test("Telluric: along-slit ±15 arcsec, all guided"):
-    val cfg = defaultSlitTelescopeConfigs(Flamingos2SlitOffsetPreset.Telluric)
+    val cfg = defaultTelluricTelescopeConfigs(Flamingos2TelluricOffsetPreset.Telluric)
     assertEquals(cfg.offsetsType, SlitOffsetMode.NodAlongSlit)
     assertEquals(cfg.telescopeConfigs, alongSlit(StepGuideState.Enabled, 15, -15, -15, 15))
 
   test("MosTelluric: along-slit 60,40,20,-20,-40,-60 arcsec, all guided"):
-    val cfg = defaultSlitTelescopeConfigs(Flamingos2SlitOffsetPreset.MosTelluric)
+    val cfg = defaultTelluricTelescopeConfigs(Flamingos2TelluricOffsetPreset.MosTelluric)
     assertEquals(cfg.offsetsType, SlitOffsetMode.NodAlongSlit)
     assertEquals(cfg.telescopeConfigs, alongSlit(StepGuideState.Enabled, 60, 40, 20, -20, -40, -60))
 
