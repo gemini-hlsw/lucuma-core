@@ -73,7 +73,6 @@ object codecs:
       ra               <- c.getOptA("ra")(d => Some(RightAscension.fromDoubleDegrees(d)))
       dec              <- c.getOptA("dec")(Declination.fromDoubleDegrees)
       instrument       <- c.get[String]("instrument")
-      observationType  <- c.get[String]("observation_type").map(GoaObservationType.fromTag)
       observationClass <-
         c.get[Option[String]]("observation_class")
           .map(_.filter(_.nonEmpty).map(GoaObservationClass.fromTag))
@@ -97,7 +96,6 @@ object codecs:
       ra,
       dec,
       instrument,
-      observationType,
       observationClass,
       qaState,
       utDateTime,

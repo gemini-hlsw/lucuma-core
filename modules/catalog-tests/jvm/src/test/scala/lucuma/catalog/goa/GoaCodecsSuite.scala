@@ -39,7 +39,6 @@ class GoaCodecsSuite extends CatsEffectSuite:
       assertEquals(first.ra, Some(RightAscension.fromDoubleDegrees(182.64)))
       assertEquals(first.dec, Declination.fromDoubleDegrees(30.40166667))
       assertEquals(first.instrument, "GMOS-N")
-      assertEquals(first.observationType, GoaObservationType.Object)
       assertEquals(first.observationClass, Some(GoaObservationClass.Science))
       assertEquals(first.qaState, Some("Pass"))
       assertEquals(first.utDateTime, Some(Instant.parse("2024-01-15T06:42:29.400Z")))
@@ -66,14 +65,13 @@ class GoaCodecsSuite extends CatsEffectSuite:
       assertEquals(record.instrument, "GMOS-S")
       assertEquals(record.qaState, Some("Usable"))
 
-  test("decode preserves unrecognized observation_type/observation_class as Unknown"):
+  test("decode preserves unrecognized observation_class as Unknown"):
     val json =
-      """[{"name": "test.fits", "instrument": "GMOS-N", "observation_type": "SOMETHING_NEW", "observation_class": "somethingElse"}]"""
+      """[{"name": "test.fits", "instrument": "GMOS-N", "observation_type": "OBJECT", "observation_class": "somethingElse"}]"""
 
     val result  = decode[List[GoaSummaryRecord]](json)
     assert(result.isRight, s"Failed to decode: ${result.left.getOrElse("")}")
     val records = result.toOption.get
-    assertEquals(records.head.observationType, GoaObservationType.Unknown("SOMETHING_NEW"))
     assertEquals(records.head.observationClass, Some(GoaObservationClass.Unknown("somethingElse")))
 
   test("decode blank observation_class as None"):

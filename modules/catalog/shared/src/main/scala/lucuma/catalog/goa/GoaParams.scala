@@ -43,6 +43,12 @@ object GoaParams:
   private val dateFormatter: DateTimeFormatter =
     DateTimeFormatter.ofPattern("yyyyMMdd")
 
+  // GOA filters on the upper-case mode token, not on the ScienceMode tag.
+  private def goaModeToken(mode: ScienceMode): String =
+    mode match
+      case ScienceMode.Imaging      => "IMAGING"
+      case ScienceMode.Spectroscopy => "SPECTROSCOPY"
+
   /**
    * The GOA query URL for these params against `baseUri`
    */
@@ -50,8 +56,7 @@ object GoaParams:
     params.instrument.goaName.map: goaInstr =>
       val obsType = baseUri / "jsonsummary" / "notengineering" / "NotFail" / goaInstr / "OBJECT"
 
-      // GOA takes the mode as a bare token, whose spelling is the ScienceMode tag.
-      val base = params.scienceMode.fold(obsType)(m => obsType / m.tag)
+      val base = params.scienceMode.fold(obsType)(m => obsType / goaModeToken(m))
 
       val withCoords = params match
         case Sidereal(coords, _, searchRadius, _, _)        =>

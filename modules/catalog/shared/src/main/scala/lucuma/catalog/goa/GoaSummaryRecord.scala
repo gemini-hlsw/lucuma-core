@@ -20,7 +20,6 @@ final case class GoaSummaryRecord(
   ra:               Option[RightAscension],
   dec:              Option[Declination],
   instrument:       String,         // GOA archive name, e.g. "GMOS-N"; see GoaInstrument
-  observationType:  GoaObservationType,
   observationClass: Option[GoaObservationClass],
   qaState:          Option[String],
   utDateTime:       Option[Instant],
