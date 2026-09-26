@@ -49,6 +49,9 @@ object Constants {
   /** Used in numerical differentiation to find Earth velocity. */
   val EarthDiff: Double = 0.05
 
+  /** Sidereal time elapsed per unit of mean solar time. */
+  val SiderealRate: Double = 1.00273790935
+
   /*
    * Physical Constants
    */

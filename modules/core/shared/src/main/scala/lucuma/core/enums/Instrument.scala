@@ -37,6 +37,11 @@ enum Instrument(val tag: String, val shortName: String, val longName: String, va
   def availability(using md: Metadata): Availability =
     md.availability(this)
 
+  /** Whether the Altair adaptive optics system can be configured behind this instrument. */
+  def supportsAltair: Boolean = this match
+    case Gnirs => true
+    case _     => false
+
 object Instrument:
 
   def facilityInstruments: Set[Instrument] =
