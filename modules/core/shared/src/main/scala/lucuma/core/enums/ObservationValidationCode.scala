@@ -135,5 +135,11 @@ object ObservationValidationCode:
         "Configuration Warning",
         "The observation configuration is unusual and should be reviewed.",
       )
+    case TooActivationUnexpected
+      extends Warning(
+        "too_activation_unexpected",
+        "Unexpected Target of Opportunity",
+        "The proposal type does not ordinarily have Targets of Opportunity.",
+      )
 
 

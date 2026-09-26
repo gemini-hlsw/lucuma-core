@@ -25,32 +25,6 @@ import scala.collection.immutable.SortedMap
 sealed trait Target extends Product with Serializable {
   def name: NonEmptyString
   def sourceProfile: SourceProfile
-
-  /**
-   * How this target is tracked, if that is settled yet. A sidereal or nonsidereal target always
-   * knows; a [[Target.Opportunity]] knows only once it has been resolved, which may be from the
-   * outset or not until the alert arrives.
-   */
-  def resolution: Option[TargetResolution]
-
-  /**
-   * This target as a sidereal target, if it tracks siderally -- whether because it is one, or
-   * because it is a Target of Opportunity that resolved to one.
-   *
-   * The result is a projection for computation (coordinates, ITC, guide stars) and not an
-   * identity: it has dropped the region and the fact that this was ever a Target of Opportunity,
-   * so it must not be persisted or used to decide whether a target is a ToO.
-   */
-  def asSidereal: Option[Target.Sidereal] =
-    resolution.collect { case TargetResolution.Sidereal(tracking, catalogInfo) =>
-      Target.Sidereal(name, tracking, sourceProfile, catalogInfo)
-    }
-
-  /** As [[asSidereal]], for nonsidereal tracking. The same caveat applies. */
-  def asNonsidereal: Option[Target.Nonsidereal] =
-    resolution.collect { case TargetResolution.Nonsidereal(ephemerisKey) =>
-      Target.Nonsidereal(name, ephemerisKey, sourceProfile)
-    }
 }
 
 object Target extends WithGid('t'.refined) with TargetOptics {
@@ -61,10 +35,7 @@ object Target extends WithGid('t'.refined) with TargetOptics {
     tracking:      SiderealTracking,
     sourceProfile: SourceProfile,
     catalogInfo:   Option[CatalogInfo]
-  ) extends Target {
-    override def resolution: Option[TargetResolution] =
-      Some(TargetResolution.Sidereal(tracking, catalogInfo))
-  }
+  ) extends Target
 
   object Sidereal extends SiderealOptics {
     given Eq[Sidereal] =
@@ -90,10 +61,7 @@ object Target extends WithGid('t'.refined) with TargetOptics {
     name:          NonEmptyString,
     ephemerisKey:  Ephemeris.Key,
     sourceProfile: SourceProfile
-  ) extends Target {
-    override def resolution: Option[TargetResolution] =
-      Some(TargetResolution.Nonsidereal(ephemerisKey))
-  }
+  ) extends Target
 
   object Nonsidereal extends NonsiderealOptics {
     given Eq[Nonsidereal] =
@@ -115,56 +83,29 @@ object Target extends WithGid('t'.refined) with TargetOptics {
   }
 
   /**
-   * A Target of Opportunity: a target that is not definitive until resolved, typically by a
-   * survey telescope alert.
+   * A Target of Opportunity: a placeholder standing in an asterism for an object that is not
+   * known yet -- typically one a survey telescope alert will name.
    *
-   * What is unsettled is not always the target. Often it is -- a supernova, a burst -- and until
-   * the alert names it, all that can be said is the region it may appear in. But a ToO may equally
-   * be a target known all along, waiting on the news that now is the time to look at it; such a
-   * target is resolved from the outset and never unresolved.
+   * What it carries in the meantime is a region, the patch of sky the object may appear in,
+   * along with the name and source profile the ITC needs to produce exposure times before the
+   * object is known. A region naming an arc in only one axis is the whole sky in the other.
    *
-   * An opportunity target does not stop being one when it is resolved. The region it was approved
-   * for outlives the resolution, and so does the fact that the observation is a ToO -- both of
-   * which would be lost if resolving meant replacing it with a sidereal target.
+   * When the alert arrives, an ordinary sidereal or nonsidereal target takes this one's place in
+   * the asterism. So an opportunity target is a pre-trigger artifact: the thing eventually slewed
+   * to is a plain target like any other, read the same way every other target is read. Being a
+   * Target of Opportunity is a property of the observation, declared by its
+   * [[lucuma.core.enums.TooActivation]], and so survives the swap.
    */
   case class Opportunity(
     name:          NonEmptyString,
     region:        Region,
-    resolution:    Option[TargetResolution],
     sourceProfile: SourceProfile
-  ) extends Target:
-
-    /** Is this target's tracking settled? */
-    def isResolved: Boolean =
-      resolution.isDefined
-
-    /**
-     * This target resolved to `resolution`, as when the alert arrives. The region is kept: it is
-     * what the target was approved for, and the resolution is checked against it.
-     */
-    def resolve(resolution: TargetResolution): Opportunity =
-      copy(resolution = resolution.some)
-
-    /** This target with its resolution discarded, returning it to waiting. The region is kept. */
-    def unresolve: Opportunity =
-      copy(resolution = none)
+  ) extends Target
 
   object Opportunity extends OpportunityOptics:
 
-    /**
-     * A Target of Opportunity whose tracking is already settled -- either because the alert has
-     * arrived, or because the target was known all along and only the timing is awaited.
-     */
-    def resolved(
-      name:          NonEmptyString,
-      region:        Region,
-      resolution:    TargetResolution,
-      sourceProfile: SourceProfile
-    ): Opportunity =
-      Opportunity(name, region, resolution.some, sourceProfile)
-
     given Eq[Opportunity] =
-      Eq.by(a => (a.name, a.region, a.resolution, a.sourceProfile))
+      Eq.by(a => (a.name, a.region, a.sourceProfile))
 
     val NameOrder: Order[Opportunity] =
       Order.by(x => (x.name, x.region))
@@ -175,7 +116,7 @@ object Target extends WithGid('t'.refined) with TargetOptics {
   given Eq[Target] = Eq.instance {
     case (a @ Sidereal(_, _, _, _), b @ Sidereal(_, _, _, _)) => a === b
     case (a @ Nonsidereal(_, _, _), b @ Nonsidereal(_, _, _)) => a === b
-    case (a @ Opportunity(_, _, _, _), b @ Opportunity(_, _, _, _)) => a === b
+    case (a @ Opportunity(_, _, _), b @ Opportunity(_, _, _)) => a === b
     case _                                                    => false
   }
 
@@ -191,20 +132,20 @@ object Target extends WithGid('t'.refined) with TargetOptics {
         Sidereal.TrackOrder.compare(a, b)
       case (a @ Nonsidereal(_, _, _), b @ Nonsidereal(_, _, _)) =>
         Nonsidereal.TrackOrder.compare(a, b)
-      case (a @ Opportunity(_, _, _, _), b @ Opportunity(_, _, _, _)) =>
+      case (a @ Opportunity(_, _, _), b @ Opportunity(_, _, _)) =>
         Opportunity.RegionOrder.compare(a, b)
 
       // Nonsidereal sorts first
       case (Nonsidereal(_, _, _), Sidereal(_, _, _, _)) => -1
-      case (Nonsidereal(_, _, _), Opportunity(_, _, _, _)) => -1
+      case (Nonsidereal(_, _, _), Opportunity(_, _, _)) => -1
 
       // Then Sidereal
       case (Sidereal(_, _, _, _), Nonsidereal(_, _, _)) => 1
-      case (Sidereal(_, _, _, _), Opportunity(_, _, _, _)) => -1
+      case (Sidereal(_, _, _, _), Opportunity(_, _, _)) => -1
 
       // Then Opportunity
-      case (Opportunity(_, _, _, _), Sidereal(_, _, _, _)) => 1
-      case (Opportunity(_, _, _, _), Nonsidereal(_, _, _)) => 1
+      case (Opportunity(_, _, _), Sidereal(_, _, _, _)) => 1
+      case (Opportunity(_, _, _), Nonsidereal(_, _, _)) => 1
 
     }
 
@@ -219,20 +160,20 @@ object Target extends WithGid('t'.refined) with TargetOptics {
         Sidereal.NameOrder.compare(a, b)
       case (a @ Nonsidereal(_, _, _), b @ Nonsidereal(_, _, _)) =>
         Nonsidereal.NameOrder.compare(a, b)
-      case (a @ Opportunity(_, _, _, _), b @ Opportunity(_, _, _, _)) =>
+      case (a @ Opportunity(_, _, _), b @ Opportunity(_, _, _)) =>
         Opportunity.NameOrder.compare(a, b)
 
       // Nonsidereal sorts first
       case (Nonsidereal(_, _, _), Sidereal(_, _, _, _)) => -1
-      case (Nonsidereal(_, _, _), Opportunity(_, _, _, _)) => -1
+      case (Nonsidereal(_, _, _), Opportunity(_, _, _)) => -1
 
       // Then Sidereal
       case (Sidereal(_, _, _, _), Nonsidereal(_, _, _)) => 1
-      case (Sidereal(_, _, _, _), Opportunity(_, _, _, _)) => -1
+      case (Sidereal(_, _, _, _), Opportunity(_, _, _)) => -1
 
       // Then Opportunity
-      case (Opportunity(_, _, _, _), Sidereal(_, _, _, _)) => 1
-      case (Opportunity(_, _, _, _), Nonsidereal(_, _, _)) => 1
+      case (Opportunity(_, _, _), Sidereal(_, _, _, _)) => 1
+      case (Opportunity(_, _, _), Nonsidereal(_, _, _)) => 1
 
     }
 
@@ -511,10 +452,6 @@ object Target extends WithGid('t'.refined) with TargetOptics {
     val region: Lens[Opportunity, Region] =
       Focus[Opportunity](_.region)
 
-    /** @group Optics */
-    val resolution: Lens[Opportunity, Option[TargetResolution]] =
-      Focus[Opportunity](_.resolution)
-
     val sourceProfile: Lens[Opportunity, SourceProfile] =
       Focus[Opportunity](_.sourceProfile)
 
@@ -636,7 +573,7 @@ trait TargetOptics { this: Target.type =>
     Lens[Target, NonEmptyString](_.name)(v => {
       case t @ Target.Sidereal(_, _, _, _) => Target.Sidereal.name.replace(v)(t)
       case t @ Target.Nonsidereal(_, _, _) => Target.Nonsidereal.name.replace(v)(t)
-      case t @ Target.Opportunity(_, _, _, _) => Target.Opportunity.name.replace(v)(t)
+      case t @ Target.Opportunity(_, _, _) => Target.Opportunity.name.replace(v)(t)
     })
 
   /** @group Optics */
@@ -652,21 +589,11 @@ trait TargetOptics { this: Target.type =>
     Lens[Target, SourceProfile](_.sourceProfile)(v => {
       case t @ Target.Sidereal(_, _, _, _) => Target.Sidereal.sourceProfile.replace(v)(t)
       case t @ Target.Nonsidereal(_, _, _) => Target.Nonsidereal.sourceProfile.replace(v)(t)
-      case t @ Target.Opportunity(_, _, _, _) => Target.Opportunity.sourceProfile.replace(v)(t)
+      case t @ Target.Opportunity(_, _, _) => Target.Opportunity.sourceProfile.replace(v)(t)
     })
 
   val region: Optional[Target, Region] =
     opportunity.andThen(Opportunity.region)
-
-  /**
-   * The resolution of a Target of Opportunity. Note this reaches only opportunity targets: the
-   * resolution of a sidereal or nonsidereal target is implied by its tracking and cannot be set
-   * independently of it, so there is nothing here to write through.
-   *
-   * @group Optics
-   */
-  val opportunityResolution: Optional[Target, Option[TargetResolution]] =
-    opportunity.andThen(Opportunity.resolution)
 
   /** @group Optics */
   val integratedSpectralDefinition: Optional[Target, SpectralDefinition[Integrated]] =

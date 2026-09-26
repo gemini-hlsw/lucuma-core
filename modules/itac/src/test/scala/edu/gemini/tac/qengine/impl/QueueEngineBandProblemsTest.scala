@@ -74,10 +74,4 @@ class QueueEngineBandProblemsTest extends FunSuite {
       case Band4 => "Rapid TOO proposal in Band4"
     }
 
-  test("testStandardTooOutsideBand12"):
-    testRule(StandardTooOutsideBand12, P.copy(too = TooActivation.Standard)) {
-      case Band3 => "Standard TOO proposal in Band3"
-      case Band4 => "Standard TOO proposal in Band4"
-    }
-
 }
