@@ -3,6 +3,7 @@
 
 package lucuma.core.math.skycalc
 
+import lucuma.core.enums.Site
 import lucuma.core.math.Constants.*
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Place
@@ -198,4 +199,42 @@ case class ImprovedSkyCalc(place: Place) extends ImprovedSkyCalcMethods {
     val lstHours = getSiderealTime(instant)
     getLst(lstHours, instant)
   }
+
+  /**
+   * Return the next meridian transit (upper culmination) of the given sidereal coordinates,
+   * strictly after the given instant. Precision is to the millisecond.
+   */
+  def nextTransit(coords: Coordinates, after: Instant): Instant = {
+    val hourAngleAtAfter: Double = hourAngleHours(coords, after)
+    // Normalised to [0, 24) so that a target transiting exactly at `after` maps to the next transit.
+    val normalisedHourAngle: Double =
+      if (hourAngleAtAfter < 0.0) hourAngleAtAfter + 24.0 else hourAngleAtAfter
+    val estimate: Instant           =
+      after.plusMillis(siderealHoursToSolarMillis(24.0 - normalisedHourAngle))
+    val refined: Instant            = refineTransit(coords, estimate)
+    // Refinement may land on or before `after` when the transit is within rounding of it.
+    if (refined.isAfter(after)) refined
+    else refineTransit(coords, estimate.plusMillis(siderealHoursToSolarMillis(24.0)))
+  }
+
+  // Uses the hour angle against the RA precessed to the current epoch, consistent with `calculate`.
+  private def hourAngleHours(coords: Coordinates, instant: Instant): Double =
+    calculate(coords, instant, false).hourAngleRaw
+
+  // One correction pass absorbs the drift between the mean sidereal rate and precession.
+  private def refineTransit(coords: Coordinates, estimate: Instant): Instant =
+    estimate.minusMillis(siderealHoursToSolarMillis(hourAngleHours(coords, estimate)))
+
+  private def siderealHoursToSolarMillis(siderealHours: Double): Long =
+    Math.round(siderealHours / SiderealRate * 3600.0 * 1000.0)
+}
+
+object ImprovedSkyCalc {
+
+  /**
+   * Return the next meridian transit (upper culmination) of the given sidereal coordinates at the
+   * given site, strictly after the given instant.
+   */
+  def nextTransit(site: Site, coords: Coordinates, after: Instant): Instant =
+    ImprovedSkyCalc(site.place).nextTransit(coords, after)
 }

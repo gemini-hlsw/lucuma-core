@@ -10,8 +10,10 @@ import cats.data.NonEmptyList
 import cats.derived.*
 import cats.kernel.Order.catsKernelOrderingForOrder
 import cats.syntax.all.*
+import lucuma.core.enums.Site
 import lucuma.core.enums.TrackType
 import lucuma.core.math.*
+import lucuma.core.math.skycalc.ImprovedSkyCalc
 import lucuma.core.optics.SplitMono
 import lucuma.core.syntax.treemap.*
 import lucuma.core.util.Timestamp
@@ -22,6 +24,8 @@ import java.lang.Math.atan2
 import java.lang.Math.cos
 import java.lang.Math.hypot
 import java.lang.Math.sin
+import java.time.Duration
+import java.time.Instant
 import scala.collection.immutable.TreeMap
 
 /**
@@ -38,7 +42,36 @@ sealed trait Tracking:
   def trackType: TrackType =
     if (isNonsidereal) TrackType.Nonsidereal else TrackType.Sidereal
 
+  /**
+   * Next meridian transit (upper culmination) of the tracked object at the site, strictly after
+   * `after`. None if the coordinates are unknown at `after` or at any refinement step (e.g. the
+   * ephemeris does not cover them).
+   */
+  def nextTransit(site: Site, after: Instant): Option[Instant] =
+    // Moving targets shift the transit, so iterate: re-evaluate the coordinates at the latest
+    // estimate and recompute the transit from `after` until consecutive estimates agree.
+    def refine(estimate: Instant, iterationsLeft: Int): Option[Instant] =
+      at(estimate).flatMap: coordinatesAtEstimate =>
+        val nextEstimate: Instant = ImprovedSkyCalc.nextTransit(site, coordinatesAtEstimate, after)
+        val converged: Boolean    =
+          Duration.between(estimate, nextEstimate).abs.compareTo(Tracking.TransitTolerance) <= 0
+        if converged || iterationsLeft <= 1 then nextEstimate.some
+        else refine(nextEstimate, iterationsLeft - 1)
+
+    at(after).flatMap: coordinatesAtAfter =>
+      refine(ImprovedSkyCalc.nextTransit(site, coordinatesAtAfter, after), Tracking.TransitIterations)
+
+  /**
+   * The shared "default observation time" rule used by the ODB and Explore: the explicit time of
+   * an observation when set, otherwise the next transit at the site after `now`.
+   */
+  def timeOrNextTransit(site: Site, explicitTime: Option[Instant], now: Instant): Option[Instant] =
+    explicitTime.orElse(nextTransit(site, now))
+
 object Tracking:
+  private val TransitTolerance: Duration = Duration.ofSeconds(1)
+  private val TransitIterations: Int     = 5
+
   given Eq[Tracking] = Eq.instance:
     case (a: ConstantTracking, b: ConstantTracking)   => a === b
     case (a: CompositeTracking, b: CompositeTracking) => a === b

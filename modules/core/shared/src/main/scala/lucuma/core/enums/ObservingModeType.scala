@@ -33,6 +33,10 @@ sealed trait ObservingModeType derives Enumerated:
   def isVisitor: Boolean =
     fold(_ => false, _ => false, _ => true)
 
+  // Only facility instruments can sit behind Altair.
+  def supportsAltair: Boolean =
+    fold(_ => false, _.instrument.supportsAltair, _ => false)
+
 object ObservingModeType:
   export FacilityObservingModeType.{ values => _, * }
   export VisitorObservingModeType.{ values => _, * }
