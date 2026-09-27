@@ -110,6 +110,17 @@ class AgsGeometryParitySuite extends munit.FunSuite with WasmKernelSuite:
       ) ++
       withProbes("GNIRS imaging keyhole", AgsParams.GnirsImaging(GnirsCamera.LongRed, GnirsFilter.Order4)) ++
       withProbes("GNIRS IFU", AgsParams.GnirsIfu(GnirsFpuIfu.LowResolution)) ++
+      // Altair: the AOWFS has its own oval patrol field and no arm in the beam; LGS+P1 guides on PWFS1.
+      List(
+        "GNIRS imaging Altair NGS"      ->
+          AgsParams.GnirsImaging(GnirsCamera.ShortBlue, GnirsFilter.Order4).withAltair(AltairMode.Ngs),
+        "GNIRS long slit Altair LGS"    ->
+          AgsParams
+            .GnirsLongSlit(GnirsFpuSlit.LongSlit_0_30, GnirsCamera.ShortBlue, GnirsPrism.Mirror)
+            .withAltair(AltairMode.Lgs),
+        "GNIRS IFU Altair LGS+P1"       ->
+          AgsParams.GnirsIfu(GnirsFpuIfu.LowResolution).withAltair(AltairMode.LgsP1)
+      ) ++
       withProbes("GHOST", AgsParams.GhostIfu()) ++
       withProbes("MaroonX", AgsParams.Visitor(MaroonXSkyFiberPatrol, MaroonXScienceFov)) ++
       withProbes("Visitor 30/10", AgsParams.Visitor(30.arcsec, 10.arcsec))
