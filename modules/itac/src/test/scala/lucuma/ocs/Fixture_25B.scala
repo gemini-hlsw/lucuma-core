@@ -3,15 +3,16 @@
 
 package lucuma.ocs
 
+import cats.syntax.all.*
 import edu.gemini.tac.qengine.p1.Proposal
 import lucuma.core.enums.ScienceBand
 import munit.FunSuite
-import cats.syntax.all.*
 
+import java.io.File
 import scala.io.Codec
 import scala.io.Source
-import java.io.File
 import scala.xml.XML
+import lucuma.core.util.Enumerated
 
 object Fixture_25B:
 
@@ -42,7 +43,9 @@ object Fixture_25B:
       .traverse(loadProposal(band, _))
 
   def loadAll() =
-    loadBand(ScienceBand.Band1)
+    Enumerated[ScienceBand]
+      .all
+      .flatTraverse(loadBand)
 
 class Fixture_25B extends FunSuite:
 

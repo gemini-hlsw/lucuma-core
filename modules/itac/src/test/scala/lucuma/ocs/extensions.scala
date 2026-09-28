@@ -69,7 +69,7 @@ extension [F[_]: Applicative](self: ImageQuality.Preset.type)(using R: Raise[F, 
 extension [F[_]: Applicative](self: TooActivation.type)(using R: Raise[F, String])
   def fromOcs(of: String): F[TooActivation] =
     of match
-      case "None" => TooActivation.None.pure
+      case "None" | "" => TooActivation.None.pure
       case "Standard" => TooActivation.Standard.pure
       case "Rapid" => TooActivation.Rapid.pure
       case _ => R.raise(s"can't parse TooActivation: $of")

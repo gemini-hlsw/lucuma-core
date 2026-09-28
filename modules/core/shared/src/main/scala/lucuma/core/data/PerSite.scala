@@ -34,6 +34,11 @@ final case class PerSite[+A](gn: A, gs: A) extends (Site => A):
       case Site.GN => gn
       case Site.GS => gs    
 
+  def put[B >: A](site: Site, value: B): PerSite[B] =
+    site match
+      case Site.GN => copy(gn = value)
+      case Site.GS => copy(gs = value)
+    
   /** PerSite is a functor. */
   def map[B](f: A => B): PerSite[B] =
     PerSite(f(gn), f(gs))

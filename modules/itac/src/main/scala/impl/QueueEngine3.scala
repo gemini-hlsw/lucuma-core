@@ -16,6 +16,7 @@ import edu.gemini.tac.qengine.impl.resource.SemesterResource
 import edu.gemini.tac.qengine.log.ProposalLog
 import edu.gemini.tac.qengine.p1.*
 import edu.gemini.tac.qengine.util.BoundedTime
+import lucuma.core.data.PerSite
 import lucuma.core.enums.ScienceBand
 import lucuma.core.enums.ScienceSubtype
 import lucuma.core.enums.Site
@@ -27,18 +28,18 @@ object QueueEngine3 {
   def calc(
     proposals:    List[Proposal],
     queueTimes:   (ScienceBand, Site) => QueueTime,
-    config:       QueueEngineConfig, // but this is only for one site!
-  ): (SemesterResource, ProposalLog, List[ProposalQueue]) = {
+    config:       PerSite[QueueEngineConfig], // but this is only for one site!
+  ): (PerSite[SemesterResource], ProposalLog, List[ProposalQueue]) = {
 
     // Find all the observations that don't participate in the queue process, because their time
     // needs to be subtracted from the initail RightAscensionMapResource (which happens on construction). Then
     // finish building our SemesterResource
-    val rolloverObs: List[ItacObservation]       = Nil 
-    val classicalProps    = proposals.filter(_.tpe.scienceSubtype == ScienceSubtype.Classical)
-    val classicalObs      = classicalProps.flatMap(_.obsList)
-    val rightAscensionMapResource   = RightAscensionMapResource(config.binConfig).reserveAvailable(rolloverObs ++ classicalObs)._1
+    // val rolloverObs: List[ItacObservation]       = Nil 
+    // val classicalProps    = proposals.filter(_.tpe.scienceSubtype == ScienceSubtype.Classical)
+    // val classicalObs      = classicalProps.flatMap(_.obsList)
+    val rightAscensionMapResource   = config.map(c => RightAscensionMapResource(c.binConfig)) //.reserveAvailable(rolloverObs ++ classicalObs)._1
     val compositeTimeRestrictionResource: List[TimeRestriction[BoundedTime]] = Nil // do we need any of these?
-    val semesterResource  = new SemesterResource(rightAscensionMapResource, compositeTimeRestrictionResource)
+    val semesterResource  = rightAscensionMapResource.map(SemesterResource(_, compositeTimeRestrictionResource))
 
     // We're done with classical proposals. Filter them out.
     val queueProposals: List[Proposal] =
@@ -48,7 +49,7 @@ object QueueEngine3 {
     def iteratorFor(band: ScienceBand, site: Site): BlockIterator =
       BlockIterator(
         queueTimes(band, site).TimeAccountingCategoryQuanta,
-        config.timeAccountingCategorySeq.sequence,
+        config(site).timeAccountingCategorySeq.sequence,
         TimeAccountingCategory
           .values
           .toList
@@ -63,15 +64,15 @@ object QueueEngine3 {
       (Enumerated[ScienceBand].all, Enumerated[Site].all)
         .tupled
         .traverse: (band, site) => 
-          State[(SemesterResource, ProposalLog), ProposalQueue]: (res, log) =>
+          State[(PerSite[SemesterResource], ProposalLog), ProposalQueue]: (res, log) =>
             val stage = QueueCalcStage.compute(
               queue       = ProposalQueueBuilder(queueTimes(band, site), band, site),
               iter        = iteratorFor(band, site), 
               activeList  = _.observations,
-              res         = res,
+              res         = res(site),
               log         = log,
             )
-            ((stage.resource, stage.log), stage.queue)
+            ((res.put(site, stage.resource), stage.log), stage.queue)
         .run((semesterResource, ProposalLog.Empty))
         .value
  
