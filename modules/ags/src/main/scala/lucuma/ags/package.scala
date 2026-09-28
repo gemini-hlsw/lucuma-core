@@ -71,6 +71,37 @@ val widestConstraints: BrightnessConstraints = {
 }
 
 /**
+ * Union of every Altair AOWFS limit, in R. `widestConstraints` covers the Gaia G limits only, and
+ * the AOWFS LGS limits reach fainter than any of them.
+ */
+val widestAltairConstraints: BrightnessConstraints =
+  // The shortest wavelength puts each image quality in its best percentile bucket, which has the
+  // faintest limits.
+  val constraints: List[BrightnessConstraints] =
+    for
+      mode  <- Enumerated[AltairMode].all
+      speed <- Enumerated[GuideSpeed].all
+      sb    <- Enumerated[SkyBackground].all
+      iq    <- Enumerated[ImageQuality.Preset].all
+      ce    <- Enumerated[CloudExtinction.Preset].all
+    yield altairBrightnessConstraints(
+      mode,
+      speed,
+      wvForWidestConstraints,
+      sb,
+      iq.toImageQuality,
+      ce.toCloudExtinction
+    )
+  // The enumerations are never empty
+  constraints.reduceLeft(_ ∪ _)
+
+// Candidates for the AOWFS are only analysed against its R limits.
+def widestConstraintsFor(probe: GuideProbe): BrightnessConstraints =
+  probe match
+    case GuideProbe.AltairAOWFS => widestAltairConstraints
+    case _                      => widestConstraints
+
+/**
  * Calculates the daintness limits for a given Guide Speed/Wavelength and conditions These are based
  * on the gaia G band and described here:
  */
