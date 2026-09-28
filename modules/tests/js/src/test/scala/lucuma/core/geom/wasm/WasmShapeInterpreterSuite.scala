@@ -8,8 +8,8 @@ import cats.effect.Resource
 import lucuma.core.geom.Shape
 import lucuma.core.geom.ShapeExpression
 import lucuma.core.geom.ShapeExpression.*
-import lucuma.core.geom.ShapePolygon
 import lucuma.core.geom.ShapeInterpreter
+import lucuma.core.geom.ShapePolygon
 import lucuma.core.geom.jts.JtsShapeInterpreter
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
