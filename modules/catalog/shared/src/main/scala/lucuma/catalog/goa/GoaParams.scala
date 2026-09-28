@@ -40,6 +40,12 @@ object GoaParams:
     dateRange:    Option[(LocalDate, LocalDate)] = None
   ) extends GoaParams
 
+  /** The instrument a query URL built by `toUri` searches, on either endpoint. */
+  def instrumentOf(uri: Uri): Option[Instrument] =
+    GoaQueryPath
+      .instrumentSegment(uri)
+      .flatMap(name => Instrument.values.find(_.goaName.contains(name)))
+
   private val dateFormatter: DateTimeFormatter =
     DateTimeFormatter.ofPattern("yyyyMMdd")
 
@@ -58,7 +64,8 @@ object GoaParams:
     endpoint: GoaEndpoint = GoaEndpoint.JsonSummary
   ): Option[Uri] =
     params.instrument.goaName.map: goaInstr =>
-      val obsType = baseUri / endpoint.path / "notengineering" / "NotFail" / goaInstr / "OBJECT"
+      val filtered = GoaQueryPath.Filter.foldLeft(baseUri / endpoint.path)(_ / _)
+      val obsType  = filtered / goaInstr / "OBJECT"
 
       val base = params.scienceMode.fold(obsType)(m => obsType / goaModeToken(m))
 
