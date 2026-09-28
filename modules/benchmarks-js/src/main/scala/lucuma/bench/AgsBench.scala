@@ -5,6 +5,7 @@ package lucuma.bench
 
 import cats.data.NonEmptyList
 import cats.data.NonEmptySet
+import cats.effect.unsafe.IORuntime
 import lucuma.ags.*
 import lucuma.ags.syntax.*
 import lucuma.core.enums.Band
@@ -137,7 +138,7 @@ object AgsBench:
     else js.Promise.resolve[js.UndefOr[js.Any]](js.undefined)
 
   def loadKernel(): js.Promise[ShapeInterpreter] =
-    given cats.effect.unsafe.IORuntime = cats.effect.unsafe.implicits.global
+    given IORuntime = cats.effect.unsafe.implicits.global
     wasmBytes().`then`[ShapeInterpreter](b => WasmGeometry.loadFrom(b).unsafeToPromise())
 
   def histogram(s: AgsStats): String =

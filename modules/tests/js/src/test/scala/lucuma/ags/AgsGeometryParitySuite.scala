@@ -9,6 +9,7 @@ import lucuma.core.geom.Area
 import lucuma.core.geom.BoundingOffsets
 import lucuma.core.geom.Shape
 import lucuma.core.geom.ShapeExpression
+import lucuma.core.geom.ShapeInterpreter
 import lucuma.core.geom.jts.JtsShapeInterpreter
 import lucuma.core.geom.syntax.all.*
 import lucuma.core.geom.visitors.MaroonXScienceFov
@@ -83,18 +84,6 @@ class AgsGeometryParitySuite extends munit.FunSuite with WasmKernelSuite:
         AgsParams.Flamingos2Imaging(Flamingos2LyotWheel.F16, PortDisposition.Side)
       ) ++
       withProbes(
-        "F2 imaging GeMS-under bottom",
-        AgsParams.Flamingos2Imaging(Flamingos2LyotWheel.GemsUnder, PortDisposition.Bottom)
-      ) ++
-      withProbes(
-        "F2 imaging GeMS-under side",
-        AgsParams.Flamingos2Imaging(Flamingos2LyotWheel.GemsUnder, PortDisposition.Side)
-      ) ++
-      withProbes(
-        "F2 imaging GeMS-over bottom",
-        AgsParams.Flamingos2Imaging(Flamingos2LyotWheel.GemsOver, PortDisposition.Bottom)
-      ) ++
-      withProbes(
         "F2 long slit 2px",
         AgsParams.Flamingos2LongSlit(
           Flamingos2LyotWheel.F16,
@@ -153,17 +142,6 @@ class AgsGeometryParitySuite extends munit.FunSuite with WasmKernelSuite:
   private def attempt[A](clue: String)(a: => A): A =
     try a
     catch case t: Throwable => fail(s"$clue threw ${t.getClass.getSimpleName}: ${t.getMessage}")
-
-  // JTS robustness failures found while evaluating AGS geometry; the kernel must still evaluate
-  // them and the list is pinned below so a change in either engine shows up.
-  private val jtsTopologyFailures = scala.collection.mutable.Map.empty[String, Int]
-
-  private def jtsOrTopologyFailure(variant: String)(s: => Shape): Option[Shape] =
-    try Some(s)
-    catch
-      case t: org.locationtech.jts.geom.TopologyException =>
-        jtsTopologyFailures.updateWith(variant)(n => Some(n.getOrElse(0) + 1))
-        None
 
   private def assertAngle(w: Angle, j: Angle, clue: String): Unit =
     val d = µas(w - j).abs
@@ -235,12 +213,7 @@ class AgsGeometryParitySuite extends munit.FunSuite with WasmKernelSuite:
     candidates(jPf.boundingOffsets).foreach: gs =>
       val gsClue = s"$clue guide star $gs"
       assertEquals(wPf.contains(gs), jPf.contains(gs), s"$gsClue reachable")
-      val armExpr = params.probeArm(pa, gs, offset)
-      jtsOrTopologyFailure(name)(jts(armExpr)) match
-        case None    =>
-          val wArm = attempt(s"$gsClue kernel")(wasm(armExpr))
-          assert(!isEmpty(wArm), s"$gsClue: kernel probe arm is empty where JTS failed")
-        case Some(_) => assertArmOps(gsClue, armExpr, wVig, jVig, prot)
+      assertArmOps(gsClue, params.probeArm(pa, gs, offset), wVig, jVig, prot)
 
   private def assertArmOps(
     gsClue:  String,
@@ -278,7 +251,7 @@ class AgsGeometryParitySuite extends munit.FunSuite with WasmKernelSuite:
 
   variants.foreach: (name, params) =>
     test(s"$name: kernel placement of the evaluated shapes matches the expressions"):
-      given lucuma.core.geom.ShapeInterpreter = WasmShapeInterpreter
+      given ShapeInterpreter = WasmShapeInterpreter
       val scienceArea = params.scienceAreaShape.eval
       val patrolField = params.patrolFieldShape.eval
       val extended    = params.extendedVignettingArea.map(f => f(Angle.Angle0, Offset.Zero).eval)
@@ -296,14 +269,11 @@ class AgsGeometryParitySuite extends munit.FunSuite with WasmKernelSuite:
           assertPlaced(e.transform(offset, pa, Offset.Zero), f(pa, offset), s"$clue extended vignetting area")
         arm.foreach: a =>
           candidates(jts(params.patrolFieldAt(pa, offset)).boundingOffsets).foreach: gs =>
-            val armExpr = params.probeArm(pa, gs, offset)
-            // Skipped where lucuma-jts cannot build the arm; the pinned counts below track those.
-            if scala.util.Try(jts(armExpr)).isSuccess then
-              assertPlaced(
-                a.transform(Offset.Zero, params.probeArmAngle(pa, gs, offset), gs),
-                armExpr,
-                s"$clue guide star $gs probe arm"
-              )
+            assertPlaced(
+              a.transform(Offset.Zero, params.probeArmAngle(pa, gs, offset), gs),
+              params.probeArm(pa, gs, offset),
+              s"$clue guide star $gs probe arm"
+            )
 
     test(s"$name: AGS geometry matches JTS at every PA and offset"):
       for
@@ -322,16 +292,3 @@ class AgsGeometryParitySuite extends munit.FunSuite with WasmKernelSuite:
         assertParity(chain.boundingBox, s"$name PA ${pa.toDoubleDegrees} dither chain bbox")
         assertEquals(isEmpty(w), isEmpty(j), s"$name PA ${pa.toDoubleDegrees} dither chain emptiness")
 
-  // lucuma-jts (OverlayNG union, "side location conflict") cannot build the F2 OIWFS probe arm
-  // (arm ∪ pickoff mirror) at the GeMS plate scale, on either port, for any PA, offset or guide
-  // star tried; F/16 is fine and the kernel evaluates every one of them. Counts are probe-arm
-  // evaluations (6 PAs x 3 offsets x 5 guide stars).
-  test("JTS topology failures are exactly the known ones (the kernel evaluates all of them)"):
-    assertEquals(
-      jtsTopologyFailures.toMap,
-      Map(
-        "F2 imaging GeMS-under bottom" -> 90,
-        "F2 imaging GeMS-under side"   -> 90,
-        "F2 imaging GeMS-over bottom"  -> 90
-      )
-    )

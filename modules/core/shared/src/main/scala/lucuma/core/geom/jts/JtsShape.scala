@@ -7,9 +7,10 @@ package jts
 import lucuma.core.geom.jts.syntax.all.*
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
+import org.locationtech.jts.geom.Coordinate
 import org.locationtech.jts.geom.Geometry
-import org.locationtech.jts.geom.util.AffineTransformation
 import org.locationtech.jts.geom.Polygon
+import org.locationtech.jts.geom.util.AffineTransformation
 
 /**
  * JTS implementation of Shape.
@@ -57,7 +58,7 @@ final case class JtsShape(g: Geometry) extends Shape {
     JtsShape(translate(rotate(translate(g, preTranslation)), postTranslation))
 
   def polygons: List[ShapePolygon] =
-    def ring(cs: Array[org.locationtech.jts.geom.Coordinate]): List[Offset] =
+    def ring(cs: Array[Coordinate]): List[Offset] =
       cs.toList.map(_.offset)
     (0 until g.getNumGeometries).toList.map(g.getGeometryN).collect:
       case p: Polygon if !p.isEmpty =>
