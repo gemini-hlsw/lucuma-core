@@ -80,6 +80,15 @@ class GoaClientSuite extends CatsEffectSuite:
     val params = GoaParams.Sidereal(testCoords, Instrument.GmosNorth, searchRadius)
     assert(GoaParams.toUri(params).exists(_.renderString.contains("/OBJECT/ra=")))
 
+  test("toUri targets the search form with the same selection"):
+    val params =
+      GoaParams.Sidereal(testCoords, Instrument.GmosNorth, searchRadius, ScienceMode.Imaging.some)
+    val json   = GoaParams.toUri(params).map(_.renderString)
+    val form   =
+      GoaParams.toUri(params, endpoint = GoaEndpoint.SearchForm).map(_.renderString)
+    assert(json.exists(_.startsWith("https://archive.gemini.edu/jsonsummary/")))
+    assertEquals(form, json.map(_.replace("/jsonsummary/", "/searchform/")))
+
   test("GoaInstrument maps all supported instruments"):
     assertEquals(Instrument.GmosNorth.goaName, Some("GMOS-N"))
     assertEquals(Instrument.GmosSouth.goaName, Some("GMOS-S"))
