@@ -92,7 +92,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
     )
   )
   .jsSettings(
-    // lucuma.core.geom.wasm imports the `lucuma-geo-wasm` npm package (root package.json). The
+    // lucuma.core.geom.wasm imports the `lucuma-wasm` npm package (root package.json). The
     // module kind stays the consumer's choice: only a NoModule link that reaches the facade fails.
     libraryDependencies ++= Seq(
       "io.github.cquiroz" %%% "scala-java-time" % scalaJavaTimeVersion,

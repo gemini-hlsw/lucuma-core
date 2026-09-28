@@ -37,7 +37,7 @@ disables wasm tier-up and made wasm run 5x slower than reality. `--dump-dom
 ## Kernel mode, end to end
 
 Pass `wasm` (Node; in a browser `&wasm` also needs an import map or bundler for the bare
-`lucuma-geo-wasm` specifier) to load the `lucuma-geo-wasm` npm package through
+`lucuma-wasm` specifier) to load the `lucuma-wasm` npm package through
 `WasmGeometry.loadFrom` and run the full `Ags.agsAnalysis` on JTS and on the kernel, paired per
 rep, with result histograms and the kernel handle count left behind by each run:
 
@@ -46,4 +46,4 @@ rep, with result histograms and the kernel handle count left behind by each run:
     node modules/benchmarks-js/target/scala-3.9.0/lucuma-benchmarks-js-opt/main.js 20,30,50 wasm
 
 Node resolves the package from the repo-root `node_modules`. Use Node 26 or newer for the wasm
-runs. The kernel crate itself lives in https://github.com/cquiroz/lucuma-geo-wasm.
+runs. The kernel crate itself lives in https://github.com/gemini-hlsw/lucuma-wasm.

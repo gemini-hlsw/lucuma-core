@@ -9,13 +9,13 @@ import scala.scalajs.js.annotation.JSName
 import scala.scalajs.js.typedarray.Float64Array
 
 /**
- * Facade over the `lucuma-geo-wasm` npm package (Rust `geo` compiled with wasm-bindgen, target
+ * Facade over the `lucuma-wasm` npm package (Rust `geo` compiled with wasm-bindgen, target
  * `web`). Geometries live in a wasm-side arena addressed by integer handles; coordinates are µas
  * with x = -p, y = q, the same convention as `lucuma.core.geom.jts`.
  */
 @js.native
-@JSImport("lucuma-geo-wasm", JSImport.Namespace)
-private[wasm] object LucumaGeoWasm extends js.Object {
+@JSImport("lucuma-wasm", JSImport.Namespace)
+private[wasm] object LucumaWasm extends js.Object {
 
   /** wasm-bindgen loader. `opts.module_or_path` may hold bytes, a URL or a compiled module. */
   @JSName("default")

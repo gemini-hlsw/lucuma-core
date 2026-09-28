@@ -35,7 +35,7 @@ object WasmShapeInterpreter extends ShapeInterpreter {
   private var scopes: List[ArrayBuffer[WasmShape]] = Nil
 
   private val registry: js.FinalizationRegistry[WasmShape, Int, WasmShape] =
-    new js.FinalizationRegistry(h => LucumaGeoWasm.free(h))
+    new js.FinalizationRegistry(h => LucumaWasm.free(h))
 
   private var exports: js.Dynamic = null
 
@@ -45,7 +45,7 @@ object WasmShapeInterpreter extends ShapeInterpreter {
   }
 
   /** Number of geometries currently held by the kernel; a leak detector for tests. */
-  def liveHandles: Int = LucumaGeoWasm.live()
+  def liveHandles: Int = LucumaWasm.live()
 
   /**
    * Bytes of wasm linear memory currently reserved by the kernel. Linear memory grows on demand
@@ -79,15 +79,15 @@ object WasmShapeInterpreter extends ShapeInterpreter {
 
   private[wasm] def release(s: WasmShape): Unit = {
     registry.unregister(s)
-    LucumaGeoWasm.free(s.handle)
+    LucumaWasm.free(s.handle)
   }
 
   private def rectBounded(a: Offset, b: Offset)(f: (Double, Double, Double, Double) => Int): Int =
-    if (a.p === b.p || a.q === b.q) LucumaGeoWasm.empty_new()
+    if (a.p === b.p || a.q === b.q) LucumaWasm.empty_new()
     else f(WasmCoords.x(a), WasmCoords.y(a), WasmCoords.x(b), WasmCoords.y(b))
 
   private def polygon(os: List[Offset]): Int =
-    if (os.toSet.size < 3) LucumaGeoWasm.empty_new()
+    if (os.toSet.size < 3) LucumaWasm.empty_new()
     else {
       val os2 = if (os.head === os.last) os else os.last :: os
       val arr = new Float64Array(os2.size * 2)
@@ -97,7 +97,7 @@ object WasmShapeInterpreter extends ShapeInterpreter {
         arr(i + 1) = WasmCoords.y(o)
         i += 2
       }
-      LucumaGeoWasm.poly_new(arr)
+      LucumaWasm.poly_new(arr)
     }
 
   // Folds a chain of same-kind nodes in a loop, see ShapeExpression.leftSpine. Intermediates
@@ -108,12 +108,12 @@ object WasmShapeInterpreter extends ShapeInterpreter {
     rest.foreach { x =>
       val hx   =
         try go(x)
-        catch { case t: Throwable => LucumaGeoWasm.free(acc); throw t }
+        catch { case t: Throwable => LucumaWasm.free(acc); throw t }
       val next =
-        try LucumaGeoWasm.op(kind, acc, hx)
+        try LucumaWasm.op(kind, acc, hx)
         finally {
-          LucumaGeoWasm.free(acc)
-          LucumaGeoWasm.free(hx)
+          LucumaWasm.free(acc)
+          LucumaWasm.free(hx)
         }
       acc = next
     }
@@ -130,27 +130,27 @@ object WasmShapeInterpreter extends ShapeInterpreter {
     m12: Double
   ): Int = {
     val h = go(e)
-    try LucumaGeoWasm.affine(h, m00, m01, m02, m10, m11, m12)
-    finally LucumaGeoWasm.free(h)
+    try LucumaWasm.affine(h, m00, m01, m02, m10, m11, m12)
+    finally LucumaWasm.free(h)
   }
 
   private def go(e: ShapeExpression): Int = e match {
     // Constructors
-    case Empty                 => LucumaGeoWasm.empty_new()
-    case Ellipse(a, b)         => rectBounded(a, b)(LucumaGeoWasm.ellipse_new(_, _, _, _, NPts))
+    case Empty                 => LucumaWasm.empty_new()
+    case Ellipse(a, b)         => rectBounded(a, b)(LucumaWasm.ellipse_new(_, _, _, _, NPts))
     case ClosedArc(a, b, c, d) =>
-      rectBounded(a, b)(LucumaGeoWasm.arc_new(_, _, _, _, c.toDoubleRadians, d.toDoubleRadians, NPts))
+      rectBounded(a, b)(LucumaWasm.arc_new(_, _, _, _, c.toDoubleRadians, d.toDoubleRadians, NPts))
     case Polygon(os)           => polygon(os)
-    case Rectangle(a, b)       => rectBounded(a, b)(LucumaGeoWasm.rect_new)
+    case Rectangle(a, b)       => rectBounded(a, b)(LucumaWasm.rect_new)
     // The kernel has no zero-area point type; JTS's point is empty for every area/overlay purpose.
-    case Point(_)              => LucumaGeoWasm.empty_new()
+    case Point(_)              => LucumaWasm.empty_new()
     case BoundingBox(e)        =>
       val h = go(e)
       val b =
-        try LucumaGeoWasm.bbox(h)
-        finally LucumaGeoWasm.free(h)
-      if (b(0).isNaN || b(0) == b(2) || b(1) == b(3)) LucumaGeoWasm.empty_new()
-      else LucumaGeoWasm.rect_new(b(0), b(1), b(2), b(3))
+        try LucumaWasm.bbox(h)
+        finally LucumaWasm.free(h)
+      if (b(0).isNaN || b(0) == b(2) || b(1) == b(3)) LucumaWasm.empty_new()
+      else LucumaWasm.rect_new(b(0), b(1), b(2), b(3))
 
     // Combinations
     case Difference(_, _)   => chain(BinaryOp.Difference, 2, e)
@@ -177,7 +177,7 @@ object WasmShapeInterpreter extends ShapeInterpreter {
 
   override def interpret(e: ShapeExpression): Shape = {
     if (!loaded)
-      throw new IllegalStateException("lucuma-geo-wasm is not loaded; run WasmGeometry.load first")
+      throw new IllegalStateException("lucuma-wasm is not loaded; run WasmGeometry.load first")
     wrap(go(e))
   }
 }

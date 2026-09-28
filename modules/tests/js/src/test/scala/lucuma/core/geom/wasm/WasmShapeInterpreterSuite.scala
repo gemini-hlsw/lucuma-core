@@ -61,7 +61,7 @@ class WasmShapeInterpreterSuite extends CatsEffectSuite {
   test("load installs the kernel as the default interpreter") {
     assertEquals(kernel(), WasmShapeInterpreter: ShapeInterpreter)
     assertEquals(ShapeInterpreter.default, WasmShapeInterpreter: ShapeInterpreter)
-    assert(WasmGeometry.isCompatible(LucumaGeoWasm.version()), LucumaGeoWasm.version())
+    assert(WasmGeometry.isCompatible(LucumaWasm.version()), LucumaWasm.version())
   }
 
   test("memoryBytes reports the kernel's linear memory once loaded") {

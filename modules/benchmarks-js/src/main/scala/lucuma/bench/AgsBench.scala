@@ -26,6 +26,7 @@ import lucuma.core.model.ConstraintSet
 import lucuma.core.model.ElevationRange
 import lucuma.core.model.ImageQuality
 import lucuma.core.model.SiderealTracking
+import org.locationtech.jts.geom.GeometryOverlay
 
 import java.util.Random
 import scala.collection.immutable.SortedMap
@@ -133,7 +134,7 @@ object AgsBench:
         .`then`[js.UndefOr[js.Any]]: fs =>
           val url = js.`import`.meta
             .asInstanceOf[js.Dynamic]
-            .resolve("lucuma-geo-wasm/lucuma_geo_wasm_bg.wasm")
+            .resolve("lucuma-wasm/lucuma_wasm_bg.wasm")
           fs.readFileSync(js.Dynamic.newInstance(global.URL)(url)).asInstanceOf[js.Any]
     else js.Promise.resolve[js.UndefOr[js.Any]](js.undefined)
 
@@ -151,7 +152,7 @@ object AgsBench:
   def wasmStage(cfg: Config, cands: List[GuideStarCandidate], wasm: ShapeInterpreter): Unit =
     val engines = List("jts" -> JtsShapeInterpreter, "wasm" -> wasm)
     report(
-      s"kernel: lucuma-geo-wasm, default interpreter installed: ${ShapeInterpreter.default eq wasm}"
+      s"kernel: lucuma-wasm, default interpreter installed: ${ShapeInterpreter.default eq wasm}"
     )
     report(f"kernel memory after load: ${WasmShapeInterpreter.memoryBytes / 1048576.0}%.1f MB")
     report(
@@ -211,6 +212,11 @@ object AgsBench:
     val cfg     = Config(offsets, reps = 3, candidates = 91)
     val cands   = candidates(cfg.candidates, seed = 42L)
     val mode    = argv.drop(1)
+    // `old` anywhere in the arguments selects lucuma-jts's legacy snap-if-needed overlay.
+    if mode.contains("old") then
+      GeometryOverlay.OVERLAY_NG_DEFAULT = false
+      GeometryOverlay.setOverlayImpl("old")
+      report("jts overlay: legacy")
     mode match
       case "dump" :: "wasm" :: _ =>
         loadKernel()

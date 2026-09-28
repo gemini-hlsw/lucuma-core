@@ -36,7 +36,7 @@ final class WasmShape private[wasm] (private[wasm] val handle: Int) extends Shap
     }
 
   def boundingOffsets: BoundingOffsets = {
-    val b = LucumaGeoWasm.bbox(h)
+    val b = LucumaWasm.bbox(h)
     if (b(0).isNaN) BoundingOffsets(Offset.Zero, Offset.Zero)
     else
       BoundingOffsets(
@@ -46,13 +46,13 @@ final class WasmShape private[wasm] (private[wasm] val handle: Int) extends Shap
   }
 
   def contains(o: Offset): Boolean =
-    LucumaGeoWasm.contains_point(h, WasmCoords.x(o), WasmCoords.y(o))
+    LucumaWasm.contains_point(h, WasmCoords.x(o), WasmCoords.y(o))
 
   def area: Area =
-    Area.fromMicroarcsecondsSquared.getOption(LucumaGeoWasm.area(h).round).getOrElse(Area.MinArea)
+    Area.fromMicroarcsecondsSquared.getOption(LucumaWasm.area(h).round).getOrElse(Area.MinArea)
 
   def radius: Angle = {
-    val cs   = LucumaGeoWasm.coords(h)
+    val cs   = LucumaWasm.coords(h)
     var best = -1.0
     var bx   = 0.0
     var by   = 0.0
@@ -68,7 +68,7 @@ final class WasmShape private[wasm] (private[wasm] val handle: Int) extends Shap
     else WasmCoords.toOffset(bx, by).distance(Offset.Zero)
   }
 
-  def isEmpty: Boolean = LucumaGeoWasm.bbox(h)(0).isNaN
+  def isEmpty: Boolean = LucumaWasm.bbox(h)(0).isNaN
 
   // One affine call with the composed matrix; agrees with the three-step expression to the last
   // bits only, so tests compare with a tolerance.
@@ -81,22 +81,22 @@ final class WasmShape private[wasm] (private[wasm] val handle: Int) extends Shap
     val qx = WasmCoords.x(postTranslation)
     val qy = WasmCoords.y(postTranslation)
     WasmShapeInterpreter.wrap(
-      LucumaGeoWasm.affine(h, c, -s, c * px - s * py + qx, s, c, s * px + c * py + qy)
+      LucumaWasm.affine(h, c, -s, c * px - s * py + qx, s, c, s * px + c * py + qy)
     )
   }
 
   def intersects(that: Shape): Boolean = that match {
-    case w: WasmShape => LucumaGeoWasm.intersects(h, w.h)
+    case w: WasmShape => LucumaWasm.intersects(h, w.h)
     case _            => throw WasmShape.mixed(that)
   }
 
   def intersection(that: Shape): Shape = that match {
-    case w: WasmShape => WasmShapeInterpreter.wrap(LucumaGeoWasm.op(0, h, w.h))
+    case w: WasmShape => WasmShapeInterpreter.wrap(LucumaWasm.op(0, h, w.h))
     case _            => throw WasmShape.mixed(that)
   }
 
   def polygons: List[ShapePolygon] = {
-    val r = LucumaGeoWasm.rings(h)
+    val r = LucumaWasm.rings(h)
     var i = 1
     def ring(): List[Offset] = {
       val n   = r(i).toInt

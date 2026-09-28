@@ -23,7 +23,7 @@ object WasmKernel {
 
   def wasmBytes: IO[js.typedarray.Uint8Array] = IO {
     val url = js.`import`.meta.asInstanceOf[js.Dynamic]
-      .resolve("lucuma-geo-wasm/lucuma_geo_wasm_bg.wasm")
+      .resolve("lucuma-wasm/lucuma_wasm_bg.wasm")
     NodeFs.readFileSync(js.Dynamic.newInstance(js.Dynamic.global.URL)(url))
   }
 
@@ -36,7 +36,7 @@ object WasmKernel {
  */
 trait WasmKernelSuite extends FunSuite {
 
-  private val kernel = new AnyFixture[Unit]("lucuma-geo-wasm") {
+  private val kernel = new AnyFixture[Unit]("lucuma-wasm") {
     def apply(): Unit                = ()
     override def beforeAll(): Any    = WasmKernel.load.unsafeToFuture()
   }
