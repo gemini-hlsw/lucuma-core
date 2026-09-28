@@ -3,29 +3,62 @@
 
 package lucuma
 
+import cats.implicits.*
+import edu.gemini.tac.qengine.api.config.ConditionsCategory
+import edu.gemini.tac.qengine.api.config.ConditionsCategory.Ge
+import edu.gemini.tac.qengine.api.config.ConditionsCategory.Le
+import edu.gemini.tac.qengine.api.config.ConditionsCategoryMap
+import edu.gemini.tac.qengine.api.config.DecRanged
+import edu.gemini.tac.qengine.api.config.DeclinationMap
 import edu.gemini.tac.qengine.api.config.QueueEngineConfig
+import edu.gemini.tac.qengine.api.config.RightAscensionMap
+import edu.gemini.tac.qengine.api.config.SiteSemesterConfig
 import edu.gemini.tac.qengine.api.config.TimeAccountingCategorySequence
 import edu.gemini.tac.qengine.impl.QueueEngine3
 import edu.gemini.tac.qengine.impl.resource.Fixture
+import lucuma.core.data.PerSite
+import lucuma.core.enums.Half
 import lucuma.core.enums.TimeAccountingCategory
+import lucuma.core.model.CloudExtinction
+import lucuma.core.model.IntCentiPercent
+import lucuma.core.model.Semester
+import lucuma.core.model.Semester.YearInt
 import lucuma.core.util.TimeSpan
-import munit.FunSuite
 import lucuma.ocs.Fixture_25B
+import munit.FunSuite
 
 class QueueEngineSuite extends FunSuite:
+
+  val semester = Semester(YearInt.unsafeFrom(2025), Half.B)
+
+  // (-90,  0]   0%
+  // (  0, 45] 100%
+  // ( 45, 90)  50%
+  val decBins   = DeclinationMap.fromBins(
+    DecRanged( 0, 45, IntCentiPercent.unsafeFromPercent(100)),
+    DecRanged(45, 90, IntCentiPercent.unsafeFromPercent( 50)).inclusive
+  )
+
+  // <=CC70 50%
+  // >=CC80 50%
+  val condsBins = ConditionsCategoryMap.ofPercent(
+    (ConditionsCategory(Le(CloudExtinction.Preset.PointThree)), 50), 
+    (ConditionsCategory(Ge(CloudExtinction.Preset.OnePointZero)), 50)
+  )
+
+  // 0 hrs, 1 hrs, 2 hrs, ... 23 hrs
+  val raLimits   = RightAscensionMap.gen1HrBins((_, _) => TimeSpan.fromHoursBounded(100))
+  val binConfig  = PerSite.unfold(new SiteSemesterConfig(_, semester, raLimits, decBins, List.empty, condsBins))
+
+  val seq = new TimeAccountingCategorySequence:
+    def sequence: LazyList[TimeAccountingCategory] =
+      TimeAccountingCategory.values.to(LazyList) #::: sequence
+
+  def cfg = binConfig.map(QueueEngineConfig(_, seq))
 
   test("foo"):
 
     val qt = Fixture.evenQueueTime(1000, None) // TODO: do this ourselves, this is wrong
-
-    val seq = new TimeAccountingCategorySequence:
-      def sequence: LazyList[TimeAccountingCategory] =
-        TimeAccountingCategory.values.to(LazyList) #::: sequence
-
-
-    val cfg = QueueEngineConfig(Fixture.binConfig, seq)
-
-    println(cfg)
 
     val (resource, log, queues) = QueueEngine3.calc(
       Fixture_25B.loadAll().toOption.get,
@@ -41,6 +74,7 @@ class QueueEngineSuite extends FunSuite:
       TimeAccountingCategory.values.foreach: tac =>
         println(s"  $tac\t${q.queueTime(tac).toHours}\t${q.usedTime(tac).toHours}\t${q.remainingTime(tac).toHours}")
 
+      println()
       q.toList.foreach: ps =>
         println(s"  ${ps.reference}")
 
@@ -48,6 +82,6 @@ class QueueEngineSuite extends FunSuite:
     log.toDetailList.foreach: e =>
       println(s"${e.key.id}: ${e.msg}")
 
-    println()
+    println("done")
 
 

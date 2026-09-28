@@ -31,11 +31,11 @@ import lucuma.core.model.IntPercent
 import lucuma.core.model.ProposalReference
 import lucuma.core.model.ProposalType
 import lucuma.core.model.Semester
+import lucuma.core.util.DateInterval
 import lucuma.core.util.TimeSpan
 
 import scala.xml.Elem
 import scala.xml.Node
-import lucuma.core.util.DateInterval
 
 trait ProposalXml2[F[_]]:
   def proposal: F[Proposal]
@@ -77,10 +77,11 @@ object ProposalXml2:
 
       def awardedTime: F[TimeSpan] =
         try
-          val hrs = (root \ "proposalClass" \\ "accept" \ "recommend").text.toDouble
-          TimeSpan.fromHoursBounded(hrs).pure
+          (root \ "proposalClass" \\ "accept" \ "recommend").text match
+            case "" => TimeSpan.Zero.pure
+            case s  => TimeSpan.fromHoursBounded(s.toDouble).pure
         catch
-          case _: NumberFormatException => raise("can't parse recommend")
+          case _: NumberFormatException => raise(s"can't parse recommend: ${root \ "proposalClass"}")
 
       def allocation: F[Allocation] =
         (timeAccountingCategory, awardedTime).mapN(Allocation(_, band, _))
@@ -179,7 +180,8 @@ object ProposalXml2:
               
               case "flamingos2" => 
                 mode("imaging",      ObservingModeType.Flamingos2Imaging) orElse
-                mode("longslit",     ObservingModeType.Flamingos2LongSlit)
+                mode("longslit",     ObservingModeType.Flamingos2LongSlit) orElse
+                mode("mos",          ObservingModeType.Flamingos2Mos)
               
               case "maroonx" =>
                 mode("MaroonX",      ObservingModeType.MaroonX)
@@ -262,7 +264,8 @@ object ProposalXml2:
             ProposalType.Classical(IntPercent.unsafeFrom(0), Nil).pure
 
       def proposalType: F[ProposalType] =
-        queue orElse largeProgram orElse special orElse classical
+        queue orElse largeProgram orElse special orElse classical orElse
+          raise(s"Can't parse proposal class ${root \ "proposalClass"}")
 
       def groupTree(
         targets: Map[String, ItacTarget],

@@ -3,8 +3,9 @@
 
 package lucuma.ocs
 
-import scala.xml.Elem
 import munit.internal.io.PlatformIO.File
+
+import scala.xml.Elem
 import scala.xml.XML
 
 object Anonymizer:

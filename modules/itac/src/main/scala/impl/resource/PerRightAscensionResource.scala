@@ -60,7 +60,7 @@ final case class PerRightAscensionResource(val absBounds: BoundedTime, val decRe
   override def reserve(block: Block, queue: ProposalQueueBuilder): RejectMessage Either PerRightAscensionResource =
     absBounds.reserve(block.time) match {
       case None =>
-        println(f"PerRightAscensionResource: failed to reserve ${block.time.toHours}%3.2f h, absBounds = $absBounds")
+        // println(f"PerRightAscensionResource: failed to reserve ${block.time.toHours}%3.2f h, absBounds = $absBounds")
         Left(new RejectTarget(block.prop, block.obs, queue.band, RejectTarget.Ra, absBounds.used, absBounds.limit))
       case Some(newAbsBounds) =>
         for {
