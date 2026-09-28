@@ -69,7 +69,8 @@ class AltairAgsParamsSuite extends ScalaCheckSuite:
 
   property("No probe and no Altair leaves the params unchanged"):
     forAll: (fpu: GnirsFpuSlit, camera: GnirsCamera, prism: GnirsPrism, mode: AltairMode) =>
-      val params: AgsParams.GnirsLongSlit = AgsParams.GnirsLongSlit(fpu, camera, prism).withAltair(mode)
+      val params: AgsParams.GnirsLongSlit =
+        AgsParams.GnirsLongSlit(fpu, camera, prism).withAltair(mode)
       assertEquals(params.guidedBy(none, none), params)
 
   property("widestAltairConstraints covers every Altair limit"):
