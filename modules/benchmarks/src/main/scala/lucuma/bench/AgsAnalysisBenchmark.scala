@@ -21,6 +21,7 @@ import lucuma.core.model.ConstraintSet
 import lucuma.core.model.ElevationRange
 import lucuma.core.model.ImageQuality
 import lucuma.core.model.SiderealTracking
+import org.locationtech.jts.geom.GeometryOverlay
 import org.openjdk.jmh.annotations.*
 
 import java.util.Random
@@ -42,6 +43,10 @@ class AgsAnalysisBenchmark:
 
   @Param(Array("10", "50", "100"))
   var offsets: Int = scala.compiletime.uninitialized
+
+  // lucuma-jts defaults to OverlayNG; "old" selects the legacy snap-if-needed overlay.
+  @Param(Array("ng", "old"))
+  var overlay: String = scala.compiletime.uninitialized
 
   private val constraints = ConstraintSet(
     ImageQuality.Preset.PointEight,
@@ -87,6 +92,8 @@ class AgsAnalysisBenchmark:
 
   @Setup(Level.Trial)
   def setUp(): Unit =
+    GeometryOverlay.OVERLAY_NG_DEFAULT = overlay == "ng"
+    GeometryOverlay.setOverlayImpl(overlay)
     scienceOffsets = NonEmptySet
       .fromSet(SortedSet.from(spiral(offsets).map(_.guided)))
       .map(ScienceOffsets(_))
