@@ -25,5 +25,6 @@ final case class RejectTarget(prop: ProposalShard, obs: ItacObservation.Scaled, 
   def reason: String = RejectTarget.reason(raDecType)
   def detail: String = RejectTarget.detail(prop, obs, band, cur, max)
   override def toString =
-    s"RejectTarget(${prop.reference}, requested: ${obs.time.toHours}, $band, $raDecType, cur: ${cur.toHours}, max: ${max.toHours})"
+    // s"RejectTarget(${prop.reference}, requested: ${obs.time.toHours}, $band, $raDecType, cur: ${cur.toHours}, max: ${max.toHours})"
+    s"RejectTarget: $reason, $detail"
 }

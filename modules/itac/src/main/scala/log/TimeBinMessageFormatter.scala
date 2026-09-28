@@ -18,13 +18,12 @@ trait TimeBinMessageFormatter {
     binStatusTemplate.format(perc, curHrs, maxHrs)
   }
 
-  private val obsInfoTemplate   = "%.2f hrs at %s(%.3f hr, %.1f deg)"
   @nowarn
   def obsInfo(prop: ProposalShard, obs: ItacObservation, band: ScienceBand): String = {
-    val obsTime = 999 // TODO prop.relativeObsTime(obs, band)
+    val obsTime = obs.time.toHours
     val target  = obs.itacTarget
     val targetName = target.id.toString
-    obsInfoTemplate.format(obsTime, targetName, target.ra.toHourAngle.toDoubleHours, target.dec.toAngle.toDoubleDegrees)
+    f"$obsTime%.2f hrs at $targetName(${target.ra.toHourAngle.toDoubleHours}%.3f hr, ${target.dec.toAngle.toDoubleDegrees}%.1f deg)"
   }
 
   private val detailTemplate    = "%s. Reject %s."

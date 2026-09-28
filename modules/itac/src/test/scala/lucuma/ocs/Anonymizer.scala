@@ -4,6 +4,8 @@
 package lucuma.ocs
 
 import scala.xml.Elem
+import munit.internal.io.PlatformIO.File
+import scala.xml.XML
 
 object Anonymizer:
 
@@ -16,3 +18,13 @@ object Anonymizer:
       { root \ "observations" }
       { root \ "proposalClass" }
     </proposal>
+
+  def main: Unit =
+    val dir = new File("/Users/rob.norris/Gemini/ocs/itac/itac_WD/band-1/")
+    dir
+      .listFiles
+      .toList
+      .filter(_.getName().endsWith(".xml"))
+      .foreach: file =>
+        val root = anonymize(XML.load(file))
+        println((root \ "proposalClass" \\ "receipt" \ "id").text)

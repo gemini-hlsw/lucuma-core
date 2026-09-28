@@ -19,7 +19,7 @@ import lucuma.core.util.TimeSpan
  * to track time for observation targets and site conditions and ensure that
  * the engine stays under budget.
  */
-final class SiteSemesterConfig(
+final case class SiteSemesterConfig(
         val site: Site,
         val semester: Semester,
         val raLimits: RightAscensionMap[TimeSpan],
@@ -33,4 +33,15 @@ final class SiteSemesterConfig(
   // that if there is sufficient remaining time in the RA bin overall, there
   // must be remaining time in at least one dec bin.
   require(decLimits.bins.exists(_.binValue.toPercent == 100))
+
+  override def toString =
+    s"""|SiteSemesterConfig:
+        |   site: $site
+        |   raLimits: ${raLimits}
+        |   decLimits: ${decLimits}
+        |   shutdowns: ${shutdowns}
+        |   conditions: 
+        |     ${conditions.bins.mkString("\n     ")}
+        |""".stripMargin
+
 }

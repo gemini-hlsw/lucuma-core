@@ -4,13 +4,14 @@
 package lucuma.ocs
 
 import edu.gemini.tac.qengine.p1.Proposal
-import io.circe.yaml.parser
 import lucuma.core.enums.ScienceBand
-import lucuma.core.util.Enumerated
 import munit.FunSuite
+import cats.syntax.all.*
 
 import scala.io.Codec
 import scala.io.Source
+import java.io.File
+import scala.xml.XML
 
 object Fixture_25B:
 
@@ -23,28 +24,29 @@ object Fixture_25B:
       case ScienceBand.Band3 => 3
       case ScienceBand.Band4 => 4
 
-  def withSource[A](rsrc: String)(f: Source => A): A =
+  def withResource[A](rsrc: String)(f: Source => A): A =
     val s = Source.fromResource(rsrc)
     try f(s) finally s.close
+  
 
-  def loadProposalIntoBand(band: ScienceBand, yamlFile: String): Proposal =
-    println(s"$band -> $yamlFile")
-    withSource(yamlFile): s =>
-      parser.parse(s.getLines().mkString("\n")) match
-        case Left(e) => sys.error("can't parse $yamlFile")
-        case Right(j) => println(j.hcursor.downField("Reference").as[String])
-      null
+  def loadProposal(band: ScienceBand, file: File): Either[String, Proposal] =
+    val root = Anonymizer.anonymize(XML.load(file))
+    Converter.convert(root, band)
 
-  def loadBand(band: ScienceBand): List[Proposal] =
-    withSource(s"$Root/band-${band.intValue}.lst"): s =>
-      s.getLines().toList.map: s =>
-        loadProposalIntoBand(band, s"$Root/$s.yaml")
-    
-  def loadAll(): List[Proposal] =
-    Enumerated[ScienceBand].all.flatMap(loadBand)
+  def loadBand(band: ScienceBand): Either[String, List[Proposal]] =
+    val dir = new File(s"/Users/rob.norris/Gemini/ocs/itac/itac_WD/band-${band.intValue}/")
+    dir
+      .listFiles
+      .toList
+      .filter(_.getName().endsWith(".xml"))
+      .traverse(loadProposal(band, _))
+
+  def loadAll() =
+    loadBand(ScienceBand.Band1)
 
 class Fixture_25B extends FunSuite:
 
   test("x") {
-    Fixture_25B.loadAll()
+    println(Fixture_25B.loadAll())
   }
+

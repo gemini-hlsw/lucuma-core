@@ -111,7 +111,9 @@ case class Proposal(
 
   /** Factor by which original estimated times must be multiplied to yield the scaled time used for bucket-filling. */
   private def scaleFactorForSiteAndBand(site: Site, band: ScienceBand)(using Metadata): BigDecimal =
-    estimatedTimeForSiteAndBand(site, band).toHours / usableTimeForSiteAndBand(site, band).toHours
+    val estimated = estimatedTimeForSiteAndBand(site, band).toHours
+    val awarded   = usableTimeForSiteAndBand(site, band).toHours 
+    if estimated > 0 then awarded / estimated else 0
 
   /** Subset of observations observable at the specified site, in the specified band. */    
   private def itacObservationsForSiteAndBand(site: Site, band: ScienceBand)(using Metadata): List[ItacObservation] =

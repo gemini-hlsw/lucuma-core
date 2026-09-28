@@ -21,15 +21,13 @@ import lucuma.core.enums.ScienceSubtype
 import lucuma.core.enums.Site
 import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.util.Enumerated
-// import lucuma.core.model.IntCentiPercent
-// import edu.gemini.tac.qengine.api.config.Default
 
-object QueueEngine3 { //extends QueueEngine {
+object QueueEngine3 {
 
   def calc(
     proposals:    List[Proposal],
     queueTimes:   (ScienceBand, Site) => QueueTime,
-    config:       QueueEngineConfig,
+    config:       QueueEngineConfig, // but this is only for one site!
   ): (SemesterResource, ProposalLog, List[ProposalQueue]) = {
 
     // Find all the observations that don't participate in the queue process, because their time

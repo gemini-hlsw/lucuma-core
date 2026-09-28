@@ -56,7 +56,12 @@ case class RightAscensionMapResource(val grp: RightAscensionMap[PerRightAscensio
 
   private def reserveNonToo(block: Block, queue: ProposalQueueBuilder): RejectMessage Either RightAscensionMapResource = {
     val ra = block.obs.itacTarget.ra
-    grp(ra).reserve(block, queue).map(bin => new RightAscensionMapResource(grp.updated(ra, bin)))
+    val ret = grp(ra).reserve(block, queue).map(bin => new RightAscensionMapResource(grp.updated(ra, bin)))
+    // if ret.isLeft then
+    //   println()
+    //   println(s"RightAscensionMapResource: rejected ${block.time.toHours}h at RA ${ra}")
+    //   println(s"grp(ra) = ${grp(ra)}")
+    ret
   }
 
   def tooBlocks(block: Block): Option[Seq[Block]] =
