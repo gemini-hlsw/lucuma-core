@@ -20,13 +20,15 @@ import lucuma.core.util.TimeSpan
 import java.time.LocalDate
 
 import GroupTree.flattenAndScale
+import eu.timepit.refined.types.numeric.PosDouble
 
 case class Proposal(
   reference: ProposalReference,
   allocations: NonEmptyList[Allocation],
   tpe: ProposalType = ProposalType.Queue(TooActivation.None, IntPercent.unsafeFrom(0), Nil), // TODO
   groupTree: GroupTree[ItacObservation] = GroupTree.empty,
-  cfpActive: DateInterval = DateInterval.between(LocalDate.now(), LocalDate.now())
+  cfpActive: DateInterval = DateInterval.between(LocalDate.now(), LocalDate.now()),
+  ranking: PosDouble = PosDouble.MaxValue // defaulted to avoid having to change all the tests
 ) {
 
   val obsList =

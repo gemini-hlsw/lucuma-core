@@ -36,6 +36,7 @@ import lucuma.core.util.TimeSpan
 
 import scala.xml.Elem
 import scala.xml.Node
+import eu.timepit.refined.types.numeric.PosDouble
 
 trait ProposalXml2[F[_]]:
   def proposal: F[Proposal]
@@ -82,6 +83,17 @@ object ProposalXml2:
             case s  => TimeSpan.fromHoursBounded(s.toDouble).pure
         catch
           case _: NumberFormatException => raise(s"can't parse recommend: ${root \ "proposalClass"}")
+
+      def ranking: F[PosDouble] =
+        try
+          (root \ "proposalClass" \\ "accept" \ "ranking").text match
+            case "" => PosDouble.MaxValue.pure
+            case s  => 
+              PosDouble.from(s.toDouble) match
+                case Left(e)   => raise(s"can't parse ranking: s ($e)}")
+                case Right(n) => n.pure              
+        catch
+          case _: NumberFormatException => raise(s"can't parse ranking: ${root \ "proposalClass"}")
 
       def allocation: F[Allocation] =
         (timeAccountingCategory, awardedTime).mapN(Allocation(_, band, _))
@@ -284,12 +296,14 @@ object ProposalXml2:
           constraintSets    <- constraintSets
           targets           <- targets
           groupTree         <- groupTree(targets, constraintSets, observingModes)
+          ranking           <- ranking
         yield
           Proposal(
             reference   = proposalReference,
             allocations = NonEmptyList.one(allocation),
             tpe         = proposalType,
             groupTree   = groupTree,
-            cfpActive   = DateInterval.between(semester.start.localDate, semester.end.localDate)
+            cfpActive   = DateInterval.between(semester.start.localDate, semester.end.localDate),
+            ranking     = ranking
           )
 

@@ -76,11 +76,11 @@ class QueueEngineSuite extends FunSuite:
 
       println()
       q.toList.foreach: ps =>
-        println(s"  ${ps.reference}")
+        println(s"  ${ps.reference} ${ps.parentProposal.reference} rank ${ps.parentProposal.ranking}")
 
     println()
-    log.toDetailList.foreach: e =>
-      println(s"${e.key.id}: ${e.msg}")
+    // log.toDetailList.foreach: e =>
+    //   println(s"${e.key.id}: ${e.msg}")
 
     println("done")
 
