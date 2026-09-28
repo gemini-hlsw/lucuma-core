@@ -35,6 +35,7 @@ import lucuma.core.util.TimeSpan
 
 import scala.xml.Elem
 import scala.xml.Node
+import lucuma.core.util.DateInterval
 
 trait ProposalXml2[F[_]]:
   def proposal: F[Proposal]
@@ -272,6 +273,7 @@ object ProposalXml2:
 
       def proposal: F[Proposal] =
         for
+          semester          <- semester
           proposalType      <- proposalType
           proposalReference <- proposalReference
           allocation        <- allocation
@@ -285,6 +287,6 @@ object ProposalXml2:
             allocations = NonEmptyList.one(allocation),
             tpe         = proposalType,
             groupTree   = groupTree,
-            cfpActive   = null, // DateInterval = DateInterval.between(LocalDate.now(), LocalDate.now())
+            cfpActive   = DateInterval.between(semester.start.localDate, semester.end.localDate)
           )
 

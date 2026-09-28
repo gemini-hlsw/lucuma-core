@@ -17,6 +17,9 @@ import lucuma.core.util.TimeSpan
  */
 final case class BoundedTime(limit: TimeSpan, used: TimeSpan = TimeSpan.Zero) {
 
+  override def toString(): String =
+    f"BoundedTime(${remaining.toHours}%3.2f/${limit.toHours}%3.2f remaining)"
+
   /**
    * Returns true iff the amount of time used is more or equal to the limit.
    */
