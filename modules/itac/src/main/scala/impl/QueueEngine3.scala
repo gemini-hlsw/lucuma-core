@@ -43,7 +43,9 @@ object QueueEngine3 {
 
     // We're done with classical proposals. Filter them out.
     val queueProposals: List[Proposal] =
-      proposals.filter(_.tpe.scienceSubtype != ScienceSubtype.Classical)
+      proposals
+        .filter(_.tpe.scienceSubtype != ScienceSubtype.Classical)
+        .sortBy(_.ranking.value)
 
     // BlockIterator for a given site and band.
     def iteratorFor(band: ScienceBand, site: Site): BlockIterator =

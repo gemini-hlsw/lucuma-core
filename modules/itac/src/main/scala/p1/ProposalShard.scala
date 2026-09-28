@@ -20,7 +20,7 @@ import lucuma.core.util.TimeSpan
  * by site and time-scaled by the allocation size.
  */
 class ProposalShard(
-  parentProposal: Proposal,
+  val parentProposal: Proposal,
   val site: Site,
   val allocation: Allocation,
 ):
