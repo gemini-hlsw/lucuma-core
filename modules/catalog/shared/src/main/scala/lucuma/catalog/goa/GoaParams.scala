@@ -50,11 +50,15 @@ object GoaParams:
       case ScienceMode.Spectroscopy => "SPECTROSCOPY"
 
   /**
-   * The GOA query URL for these params against `baseUri`
+   * The GOA query URL for these params against `baseUri`, on the given `endpoint`
    */
-  def toUri(params: GoaParams, baseUri: Uri = GoaClient.DefaultBaseUri): Option[Uri] =
+  def toUri(
+    params:   GoaParams,
+    baseUri:  Uri = GoaClient.DefaultBaseUri,
+    endpoint: GoaEndpoint = GoaEndpoint.JsonSummary
+  ): Option[Uri] =
     params.instrument.goaName.map: goaInstr =>
-      val obsType = baseUri / "jsonsummary" / "notengineering" / "NotFail" / goaInstr / "OBJECT"
+      val obsType = baseUri / endpoint.path / "notengineering" / "NotFail" / goaInstr / "OBJECT"
 
       val base = params.scienceMode.fold(obsType)(m => obsType / goaModeToken(m))
 
