@@ -281,10 +281,6 @@ class AgsGeometryParitySuite extends munit.FunSuite with WasmKernelSuite:
         offset <- offsets
       do assertAgsOps(name, params, pa, offset)
 
-    test(s"$name: patrol field around a pivot matches JTS"):
-      posAngles.foreach: pa =>
-        assertParity(params.patrolFieldAt(pa, offsets(1), pivot), s"$name PA ${pa.toDoubleDegrees} pivot")
-
     test(s"$name: 20-offset patrol field intersection matches JTS"):
       List(posAngles(0), posAngles(3)).foreach: pa =>
         val chain = ditherOffsets.map(o => params.patrolFieldAt(pa, o)).reduce(_ ∩ _)

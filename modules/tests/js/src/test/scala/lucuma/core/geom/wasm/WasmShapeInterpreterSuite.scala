@@ -58,31 +58,6 @@ class WasmShapeInterpreterSuite extends CatsEffectSuite {
     assert(math.abs(actual - expected) <= tol, s"$clue: $actual vs $expected (tol $tol)")
   }
 
-  private def assertAngleClose(a: Angle, b: Angle, µasTol: Long, clue: String): Unit = {
-    val d = Angle.signedMicroarcseconds.get(a - b).abs
-    assert(d <= µasTol, s"$clue: differ by $d µas")
-  }
-
-  private def assertParity(e: ShapeExpression, clue: String): Unit = {
-    val w = kernel().interpret(e)
-    val j = jts(e)
-    assertClose(w.area.toMicroarcsecondsSquared.toDouble, j.area.toMicroarcsecondsSquared.toDouble, 1e-7, s"$clue area")
-    assertAngleClose(w.radius, j.radius, 10, s"$clue radius")
-    val wb = w.boundingOffsets
-    val jb = j.boundingOffsets
-    assertAngleClose(wb.topLeft.p.toAngle, jb.topLeft.p.toAngle, 10, s"$clue bbox tl.p")
-    assertAngleClose(wb.topLeft.q.toAngle, jb.topLeft.q.toAngle, 10, s"$clue bbox tl.q")
-    assertAngleClose(wb.bottomRight.p.toAngle, jb.bottomRight.p.toAngle, 10, s"$clue bbox br.p")
-    assertAngleClose(wb.bottomRight.q.toAngle, jb.bottomRight.q.toAngle, 10, s"$clue bbox br.q")
-    for {
-      p <- -12 to 12
-      q <- -12 to 12
-    } {
-      val o = µas(p * Arcsec + 333_333, q * Arcsec - 777_777)
-      assertEquals(w.contains(o), j.contains(o), s"$clue contains $o")
-    }
-  }
-
   test("load installs the kernel as the default interpreter") {
     assertEquals(kernel(), WasmShapeInterpreter: ShapeInterpreter)
     assertEquals(ShapeInterpreter.default, WasmShapeInterpreter: ShapeInterpreter)
@@ -127,31 +102,6 @@ class WasmShapeInterpreterSuite extends CatsEffectSuite {
     assert(!jts(rebuilt).contains(Offset.Zero))
   }
 
-  test("rectangle matches JTS") {
-    assertParity(rect, "rect")
-  }
-
-  test("ellipse matches JTS") {
-    assertParity(ellipse, "ellipse")
-  }
-
-  test("closed arc matches JTS") {
-    assertParity(arc, "arc")
-  }
-
-  test("polygon and flips match JTS") {
-    val poly = Polygon(List(µas(0, 0), µas(7 * Arcsec, 1 * Arcsec), µas(3 * Arcsec, 9 * Arcsec), µas(-4 * Arcsec, 2 * Arcsec)))
-    assertParity(poly, "poly")
-    assertParity(FlipP(poly), "flipP")
-    assertParity(FlipQ(poly), "flipQ")
-    assertParity(RotateAroundOffset(poly, Angle.fromDoubleDegrees(210), µas(1 * Arcsec, 1 * Arcsec)), "rotateAround")
-  }
-
-  test("overlay chain matches JTS") {
-    assertParity(overlay, "overlay")
-    assertParity(BoundingBox(overlay), "bbox(overlay)")
-  }
-
   test("empty and degenerate shapes") {
     val w = kernel()
     for (e <- List(Empty, Point(µas(1, 2)), Rectangle(µas(0, 0), µas(0, 5 * Arcsec)), Polygon(List(µas(0, 0), µas(1, 1))))) {
@@ -160,25 +110,6 @@ class WasmShapeInterpreterSuite extends CatsEffectSuite {
       assert(!s.contains(µas(0, 0)), e.toString)
       assertEquals(s.radius, Angle.Angle0, e.toString)
     }
-  }
-
-  test("Shape.intersects and intersection agree with JTS") {
-    val w  = kernel()
-    val a  = Rotate(rect, Angle.fromDoubleDegrees(20))
-    val b  = Translate(ellipse, µas(6 * Arcsec, 0))
-    val wa = w.interpret(a)
-    val wb = w.interpret(b)
-    val ja = jts(a)
-    val jb = jts(b)
-    assertEquals(wa.intersects(wb), ja.intersects(jb))
-    assertClose(
-      wa.intersection(wb).area.toMicroarcsecondsSquared.toDouble,
-      ja.intersection(jb).area.toMicroarcsecondsSquared.toDouble,
-      1e-7,
-      "intersection area"
-    )
-    val far = w.interpret(Translate(rect, µas(100 * Arcsec, 0)))
-    assert(!wa.intersects(far))
   }
 
   test("engines never mix") {

@@ -7,8 +7,7 @@ import cats.syntax.all.*
 import lucuma.core.enums.GmosNorthFpu
 import lucuma.core.enums.GmosSouthFpu
 import lucuma.core.enums.PortDisposition
-import lucuma.core.geom.ShapeInterpreter
-import lucuma.core.geom.jts.JtsShapeInterpreter
+import lucuma.core.geom.jts.interpreter.given
 import lucuma.core.geom.syntax.all.*
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
@@ -22,7 +21,7 @@ import lucuma.core.math.Offset
  * That zero is why imaging and MOS are pinned here too: they share `patrolFieldAtBase`, so a change
  * meant for the IFU can reach them, and nothing about their own geometry would flag it.
  */
-abstract class GmosOiwfsGeometryTests(using ShapeInterpreter) extends munit.FunSuite:
+class GmosOiwfsGeometrySuite extends munit.FunSuite:
 
   private val Port: PortDisposition = PortDisposition.Side
 
@@ -131,5 +130,3 @@ abstract class GmosOiwfsGeometryTests(using ShapeInterpreter) extends munit.FunS
         box(oiwfs.patrolField.imagingMode.patrolFieldAt(Angle.Angle0, Offset.Zero, port)),
         s"$port"
       )
-
-class GmosOiwfsGeometrySuite extends GmosOiwfsGeometryTests(using JtsShapeInterpreter)

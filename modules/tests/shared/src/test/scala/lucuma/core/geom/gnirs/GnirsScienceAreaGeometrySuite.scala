@@ -7,12 +7,10 @@ import lucuma.core.enums.GnirsCamera
 import lucuma.core.enums.GnirsFilter
 import lucuma.core.enums.GnirsFpuIfu
 import lucuma.core.geom.ScienceAreaGeometrySuite
-import lucuma.core.geom.ShapeInterpreter
-import lucuma.core.geom.jts.JtsShapeInterpreter
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 
-abstract class GnirsScienceAreaGeometryTests(using ShapeInterpreter) extends ScienceAreaGeometrySuite:
+class GnirsScienceAreaGeometrySuite extends ScienceAreaGeometrySuite:
 
   // Bounding-box side lengths (p, q) of the imaging science area at PA 0, no offset.
   private def imagingSides(camera: GnirsCamera, filter: GnirsFilter): (Angle, Angle) =
@@ -55,5 +53,3 @@ abstract class GnirsScienceAreaGeometryTests(using ShapeInterpreter) extends Sci
     val (w, h) = ifuSides(GnirsFpuIfu.HighResolution)
     assertCloseArcsec(w, 1.25)
     assertCloseArcsec(h, 1.8)
-
-class GnirsScienceAreaGeometrySuite extends GnirsScienceAreaGeometryTests(using JtsShapeInterpreter)
