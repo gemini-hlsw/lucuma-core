@@ -588,7 +588,22 @@ object AgsParams:
       lucuma.core.geom.pwfs.patrolField.patrolFieldAt(posAngle, offset, pivot)
 
   trait AltairSupport[A]:
+    this: A & PwfsSupport[A] =>
+
     def withAltair(mode: AltairMode): A
+
+    /**
+     * Params for the selected guide probe. The Altair mode applies only when its own probe is the
+     * one selected; any other PWFS guides without Altair.
+     */
+    def guidedBy(guideProbe: Option[GuideProbe], altair: Option[AltairMode]): A =
+      altair.filter(mode => guideProbe.contains(mode.guideProbe)) match
+        case Some(mode) => withAltair(mode)
+        case None       =>
+          guideProbe match
+            case Some(GuideProbe.PWFS1) => withPWFS1
+            case Some(GuideProbe.PWFS2) => withPWFS2
+            case _                      => this
 
   /**
    * Instruments behind Altair guide with a PWFS or, through Altair, its AOWFS. The AOWFS picks the
