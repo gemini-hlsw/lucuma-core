@@ -10,11 +10,11 @@ trait ShapeInterpreter {
   def interpret(e: ShapeExpression): Shape
 
   /**
-   * Runs `f` in a scope after which every intermediate `Shape` created inside may be released.
-   * Engines with automatic memory management do nothing; native engines free their handles on
-   * exit, so shapes created inside must not escape the scope.
+   * Runs `f` in an arena: every `Shape` created inside may be released when it returns. Engines
+   * with automatic memory management do nothing; native engines free their handles on exit, so
+   * shapes created inside must not escape the block.
    */
-  def scoped[A](f: => A): A = f
+  def withArena[A](f: => A): A = f
 }
 
 object ShapeInterpreter {
@@ -28,7 +28,7 @@ object ShapeInterpreter {
   /** Delegates to `default` at call time; an explicit lexical `given` still takes precedence. */
   given ShapeInterpreter with {
     def interpret(e: ShapeExpression): Shape = default.interpret(e)
-    override def scoped[A](f: => A): A       = default.scoped(f)
+    override def withArena[A](f: => A): A    = default.withArena(f)
   }
 
 }

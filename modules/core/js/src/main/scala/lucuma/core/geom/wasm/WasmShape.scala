@@ -12,8 +12,8 @@ import lucuma.core.math.Offset
 
 /**
  * A `Shape` backed by a geometry in the wasm kernel's arena. The handle is released when the
- * enclosing `WasmShapeInterpreter.scoped` block ends, by `free()`, or by the JS garbage collector
- * if the shape was created outside any scope. Using a released shape throws.
+ * enclosing `WasmShapeInterpreter.withArena` block ends, by `free()`, or by the JS garbage
+ * collector if the shape was created outside any arena. Using a released shape throws.
  */
 final class WasmShape private[wasm] (private[wasm] val handle: Int) extends Shape {
 
@@ -24,7 +24,7 @@ final class WasmShape private[wasm] (private[wasm] val handle: Int) extends Shap
   private def h: Int =
     if (released)
       throw new IllegalStateException(
-        s"WasmShape (handle $handle) used after release; shapes created inside scoped must not escape it"
+        s"WasmShape (handle $handle) used after release; shapes created inside withArena must not escape it"
       )
     else handle
 

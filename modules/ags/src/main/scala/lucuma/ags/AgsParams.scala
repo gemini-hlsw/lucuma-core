@@ -52,7 +52,7 @@ sealed trait AgsGeomCalc:
 
   def intersectionPatrolField: ShapeExpression
 
-  // The evaluated intersection, valid only within the interpreter scope that created it.
+  // The evaluated intersection, valid only within the interpreter arena that created it.
   def intersectionPatrolFieldShape: Shape
 
 trait SingleProbeAgsParams:
@@ -176,10 +176,9 @@ trait SingleProbeAgsParams:
             )
           )
 
-        // Disjoint bounding boxes settle both questions without an overlay. The per-star
-        // overlays run scoped so a native engine frees them as it goes.
+        // Disjoint bounding boxes settle both questions without an overlay.
         override def overlapsProtectedArea(gsOffset: Offset, protectedShape: Shape): Boolean =
-          si.scoped:
+          si.withArena:
             armAt(gsOffset).exists: placed =>
               placed.boundingOffsets.intersects(protectedShape.boundingOffsets) &&
                 placed
@@ -189,7 +188,7 @@ trait SingleProbeAgsParams:
                   .toMicroarcseconds > 5
 
         override def vignettingArea(gsOffset: Offset): Area =
-          si.scoped:
+          si.withArena:
             armAt(gsOffset)
               .filter(_.boundingOffsets.intersects(vignettingBounds))
               .fold(Area.MinArea)(_.intersection(vignettingShapeEval).area)

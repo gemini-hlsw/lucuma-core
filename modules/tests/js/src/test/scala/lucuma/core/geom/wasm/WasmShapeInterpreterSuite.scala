@@ -120,13 +120,13 @@ class WasmShapeInterpreterSuite extends CatsEffectSuite {
     intercept[UnsupportedOperationException](j.intersects(w))
   }
 
-  test("scoped frees every shape created inside, nested scopes included") {
+  test("withArena frees every shape created inside, nested arenas included") {
     val w      = kernel()
     val before = WasmShapeInterpreter.liveHandles
     var leaked: Shape = null
-    val area = w.scoped {
+    val area = w.withArena {
       val s1 = w.interpret(overlay)
-      val a2 = w.scoped(w.interpret(rect).intersection(w.interpret(ellipse)).area)
+      val a2 = w.withArena(w.interpret(rect).intersection(w.interpret(ellipse)).area)
       leaked = s1
       assert(WasmShapeInterpreter.liveHandles > before)
       s1.area.toMicroarcsecondsSquared + a2.toMicroarcsecondsSquared
@@ -134,13 +134,13 @@ class WasmShapeInterpreterSuite extends CatsEffectSuite {
     assert(area > 0)
     assertEquals(WasmShapeInterpreter.liveHandles, before)
     intercept[IllegalStateException](leaked.area)
-    assert(!WasmShapeInterpreter.inScope)
+    assert(!WasmShapeInterpreter.inArena)
   }
 
-  test("scoped frees on failure and free() is idempotent") {
+  test("withArena frees on failure and free() is idempotent") {
     val w      = kernel()
     val before = WasmShapeInterpreter.liveHandles
-    intercept[RuntimeException](w.scoped { w.interpret(rect); throw new RuntimeException("boom") })
+    intercept[RuntimeException](w.withArena { w.interpret(rect); throw new RuntimeException("boom") })
     assertEquals(WasmShapeInterpreter.liveHandles, before)
     val s = w.interpret(rect).asInstanceOf[WasmShape]
     assertEquals(WasmShapeInterpreter.liveHandles, before + 1)
@@ -150,10 +150,10 @@ class WasmShapeInterpreterSuite extends CatsEffectSuite {
     intercept[IllegalStateException](s.contains(µas(0, 0)))
   }
 
-  test("interpreting inside scoped leaves no intermediate handles behind") {
+  test("interpreting inside withArena leaves no intermediate handles behind") {
     val w      = kernel()
     val before = WasmShapeInterpreter.liveHandles
-    w.scoped {
+    w.withArena {
       w.interpret(overlay)
       w.interpret(BoundingBox(Union(overlay, Rotate(overlay, Angle.Angle180))))
       assertEquals(WasmShapeInterpreter.liveHandles, before + 2)

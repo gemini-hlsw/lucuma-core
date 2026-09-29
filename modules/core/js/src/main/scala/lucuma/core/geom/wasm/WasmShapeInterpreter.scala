@@ -17,10 +17,10 @@ import scala.scalajs.js.typedarray.Float64Array
 /**
  * `ShapeInterpreter` over the wasm kernel. Mirrors `JtsShapeInterpreter` case by case (100-point
  * ellipse and arc discretisation, empty-geometry guards) and frees every intermediate handle as
- * it goes, so only the shapes handed back to callers occupy the arena.
+ * it goes, so only the shapes handed back to callers occupy kernel memory.
  *
- * Memory: run computations inside `scoped`, which frees every shape created within it on exit
- * (nesting allowed). Shapes created outside any scope are freed when the JS garbage collector
+ * Memory: run computations inside `withArena`, which frees every shape created within it on exit
+ * (nesting allowed). Shapes created outside any arena are freed when the JS garbage collector
  * collects the wrapper, via `FinalizationRegistry`, or eagerly with `WasmShape.free()`.
  *
  * Obtain it through `WasmGeometry.load`; the kernel must be initialised before use.
@@ -32,7 +32,7 @@ object WasmShapeInterpreter extends ShapeInterpreter {
 
   private var loaded: Boolean = false
 
-  private var scopes: List[ArrayBuffer[WasmShape]] = Nil
+  private var arenas: List[ArrayBuffer[WasmShape]] = Nil
 
   private val registry: js.FinalizationRegistry[WasmShape, Int, WasmShape] =
     new js.FinalizationRegistry(h => LucumaWasm.free(h))
@@ -55,22 +55,22 @@ object WasmShapeInterpreter extends ShapeInterpreter {
     if (exports == null) 0L
     else exports.memory.buffer.byteLength.asInstanceOf[Double].toLong
 
-  /** True while at least one `scoped` block is running. */
-  def inScope: Boolean = scopes.nonEmpty
+  /** True while at least one `withArena` block is running. */
+  def inArena: Boolean = arenas.nonEmpty
 
-  override def scoped[A](f: => A): A = {
+  override def withArena[A](f: => A): A = {
     val arena = ArrayBuffer.empty[WasmShape]
-    scopes = arena :: scopes
+    arenas = arena :: arenas
     try f
     finally {
-      scopes = scopes.tail
+      arenas = arenas.tail
       arena.foreach(_.free())
     }
   }
 
   private[wasm] def wrap(h: Int): WasmShape = {
     val s = new WasmShape(h)
-    scopes match {
+    arenas match {
       case arena :: _ => arena += s
       case Nil        => registry.register(s, h, s)
     }

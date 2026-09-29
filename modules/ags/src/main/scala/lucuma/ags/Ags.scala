@@ -260,7 +260,7 @@ object Ags {
     scienceOffsets:     Option[ScienceOffsets],
     params:             AgsParams,
     candidates:         List[GuideStarCandidate]
-  )(using si: ShapeInterpreter): AgsAnalysisResult = si.scoped {
+  )(using si: ShapeInterpreter): AgsAnalysisResult = si.withArena {
     val positions =
       generatePositions(
         baseCoordinates.some,

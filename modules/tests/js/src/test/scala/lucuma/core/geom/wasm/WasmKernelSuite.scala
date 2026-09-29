@@ -32,7 +32,7 @@ object WasmKernel {
 
 /**
  * Mixin for suites that drive `WasmShapeInterpreter` explicitly: loads the kernel before the
- * suite, runs each (synchronous) test inside `scoped` and fails it if kernel handles leaked.
+ * suite, runs each (synchronous) test inside `withArena` and fails it if kernel handles leaked.
  */
 trait WasmKernelSuite extends FunSuite {
 
@@ -49,7 +49,7 @@ trait WasmKernelSuite extends FunSuite {
       test =>
         test.withBody { () =>
           val before = WasmShapeInterpreter.liveHandles
-          val result = WasmShapeInterpreter.scoped(test.body())
+          val result = WasmShapeInterpreter.withArena(test.body())
           val after  = WasmShapeInterpreter.liveHandles
           assert(after <= before, s"${test.name}: leaked ${after - before} kernel handles")
           result
