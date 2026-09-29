@@ -60,9 +60,7 @@ object AgsBench:
   // End to end agsAnalysis on JTS and on the wasm kernel, paired per rep.
   def wasmStage(cfg: Config, wasm: ShapeInterpreter): Unit =
     val engines = List("jts" -> JtsShapeInterpreter, "wasm" -> wasm)
-    report(
-      s"kernel: lucuma-wasm, default interpreter installed: ${ShapeInterpreter.default eq wasm}"
-    )
+    report("kernel: lucuma-wasm")
     report(f"kernel memory after load: ${WasmShapeInterpreter.memoryBytes / 1048576.0}%.1f MB")
     report(
       "offsets\tengine\trep\tcalcs_ms\tcontext_ms\tanalysis_ms\ttotal_ms\tlive_handles\twasm_mb"

@@ -16,11 +16,3 @@ trait ShapeInterpreter {
    */
   def withArena[A](f: => A): A = f
 }
-
-object ShapeInterpreter:
-
-  /**
-   * Engine behind `lucuma.core.geom.auto.given`. JTS until a native kernel is loaded and installs
-   * itself (see `lucuma.core.geom.wasm.WasmGeometry` on Scala.js).
-   */
-  @volatile var default: ShapeInterpreter = jts.JtsShapeInterpreter

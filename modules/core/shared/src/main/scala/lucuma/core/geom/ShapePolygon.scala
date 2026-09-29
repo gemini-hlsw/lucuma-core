@@ -10,8 +10,7 @@ import lucuma.core.math.Offset
 
 /**
  * One polygon of an evaluated `Shape`, as plain vertices: the exterior ring followed by any
- * holes. Rings are closed (first vertex repeated last). This is the engine-neutral way to carry
- * an evaluated geometry to a renderer or across a worker boundary.
+ * holes. Rings are closed (first vertex repeated last).
  */
 final case class ShapePolygon(exterior: List[Offset], holes: List[List[Offset]]) derives Eq:
 

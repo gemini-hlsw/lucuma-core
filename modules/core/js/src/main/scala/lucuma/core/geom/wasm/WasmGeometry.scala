@@ -11,8 +11,8 @@ import scala.scalajs.js
 
 /**
  * Entry point for the wasm geometry kernel. `load` initialises the `lucuma-wasm` npm module,
- * checks its version against `CompatibleRange`, installs `WasmShapeInterpreter` as
- * `ShapeInterpreter.default` and returns it. Failures surface as the underlying error; callers
+ * checks its version against `CompatibleRange` and returns `WasmShapeInterpreter`, which callers
+ * pass on as their `given ShapeInterpreter`. Failures surface as the underlying error; callers
  * decide whether to stay on JTS.
  */
 object WasmGeometry:
@@ -44,9 +44,7 @@ object WasmGeometry:
                s"lucuma-wasm $v is not compatible with this lucuma-core facade (requires $CompatibleRange)"
              )
            )
-      _ <- IO:
-             WasmShapeInterpreter.markLoaded(x)
-             ShapeInterpreter.default = WasmShapeInterpreter
+      _ <- IO(WasmShapeInterpreter.markLoaded(x))
     yield WasmShapeInterpreter
 
   /** Caret-range check: same major, and for major 0 the same minor too. */

@@ -3,7 +3,6 @@
 
 package lucuma.core.geom.wasm
 
-import cats.effect.IO
 import cats.effect.Resource
 import lucuma.core.geom.Shape
 import lucuma.core.geom.ShapeExpression
@@ -21,12 +20,7 @@ import munit.CatsEffectSuite
  */
 class WasmShapeInterpreterSuite extends CatsEffectSuite:
 
-  private val kernel = ResourceSuiteLocalFixture(
-    "kernel",
-    Resource.make(WasmKernel.load)(_ =>
-      IO(ShapeInterpreter.default = JtsShapeInterpreter)
-    )
-  )
+  private val kernel = ResourceSuiteLocalFixture("kernel", Resource.eval(WasmKernel.load))
 
   override def munitFixtures = List(kernel)
 
@@ -56,9 +50,8 @@ class WasmShapeInterpreterSuite extends CatsEffectSuite:
     val tol = math.max(math.abs(expected) * rel, 1.0)
     assert(math.abs(actual - expected) <= tol, s"$clue: $actual vs $expected (tol $tol)")
 
-  test("load installs the kernel as the default interpreter"):
+  test("load returns the kernel interpreter"):
     assertEquals(kernel(), WasmShapeInterpreter: ShapeInterpreter)
-    assertEquals(ShapeInterpreter.default, WasmShapeInterpreter: ShapeInterpreter)
     assert(WasmGeometry.isCompatible(LucumaWasm.version()), LucumaWasm.version())
 
   test("version range check"):
