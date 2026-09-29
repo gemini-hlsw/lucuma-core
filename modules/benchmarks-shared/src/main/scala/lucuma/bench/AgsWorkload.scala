@@ -80,8 +80,7 @@ object AgsWorkload:
   def withOffsets(n: Int): AgsWorkload =
     real.copy(
       name = n.toString,
-      sciOffsets =
-        NonEmptySet.fromSet(SortedSet.from(grid(n).map(_.guided))).map(ScienceOffsets(_))
+      sciOffsets = NonEmptySet.fromSet(SortedSet.from(grid(n).map(_.guided))).map(ScienceOffsets(_))
     )
 
   /** `real` for the captured Explore request as is, a number N for `withOffsets(N)`. */
@@ -90,20 +89,20 @@ object AgsWorkload:
 
   /** Parses the text printed by Explore's throwaway `AgsDump` (angles and offsets in µas). */
   def parse(name: String, text: String): AgsWorkload =
-    val rows = text.linesIterator.map(_.trim).filter(l => l.nonEmpty && !l.startsWith("#")).toList
+    val rows                              = text.linesIterator.map(_.trim).filter(l => l.nonEmpty && !l.startsWith("#")).toList
     def values(key: String): List[String] = rows.collect { case s"$k $v" if k == key => v }
     def one(key: String): String          =
       values(key).headOption.getOrElse(sys.error(s"$name: missing '$key'"))
 
-    def tag[A: Enumerated](s: String): A =
+    def tag[A: Enumerated](s: String): A                        =
       Enumerated[A].fromTag(s).getOrElse(sys.error(s"$name: unknown tag '$s'"))
-    def angle(s: String): Angle          = Angle.fromMicroarcseconds(s.toLong)
-    def coords(s: String): Coordinates   = s match
+    def angle(s: String): Angle                                 = Angle.fromMicroarcseconds(s.toLong)
+    def coords(s: String): Coordinates                          = s match
       case s"$ra $dec" =>
         Coordinates(RightAscension.fromAngleExact.getOption(angle(ra)).get,
                     Declination.fromAngle.getOption(angle(dec)).get
         )
-    def offset(s: String): GuidedOffset  = s match
+    def offset(s: String): GuidedOffset                         = s match
       case s"$p $q" => Offset(Offset.P(angle(p)), Offset.Q(angle(q))).guided
     def offsets(key: String): Option[NonEmptySet[GuidedOffset]] =
       NonEmptySet.fromSet(SortedSet.from(values(key).map(offset)))
