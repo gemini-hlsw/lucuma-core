@@ -12,13 +12,18 @@ import lucuma.core.util.TimeSpan
 import monocle.Focus
 import monocle.Lens
 
+/**
+ * @param expectedCalibrations time for the calibrations the calibration count
+ *                             predicts but that do not exist yet
+ */
 case class ExecutionDigest(
-  setup:              SetupTime,
-  setupCount:         NonNegInt,
-  reacquisitionCount: NonNegInt,
-  calibrationCount:   NonNegInt,
-  acquisition:        SequenceDigest,
-  science:            SequenceDigest
+  setup:                SetupTime,
+  setupCount:           NonNegInt,
+  reacquisitionCount:   NonNegInt,
+  calibrationCount:     NonNegInt,
+  expectedCalibrations: CategorizedTime,
+  acquisition:          SequenceDigest,
+  science:              SequenceDigest
 ) {
 
   /**
@@ -35,11 +40,13 @@ case class ExecutionDigest(
     (setup.full *| setupCount.value) +| (setup.reacquisition *| reacquisitionCount.value)
 
   /**
-   * Planned time for the observation, including the science sequence and all
-   * expected acquisitions and reacquisitions.
+   * Planned time for the observation, including the science sequence, all
+   * expected acquisitions and reacquisitions, and the calibrations still
+   * expected.
    */
   def fullTimeEstimate: CategorizedTime =
-    science.timeEstimate.sumCharge(science.observeClass.chargeClass, totalSetupTime)
+    science.timeEstimate.sumCharge(science.observeClass.chargeClass, totalSetupTime) |+|
+      expectedCalibrations
 
   /**
    * Steps by kind across the acquisition and science sequences.  Excludes
@@ -58,6 +65,7 @@ object ExecutionDigest {
       NonNegInt.MinValue,
       NonNegInt.MinValue,
       NonNegInt.MinValue,
+      CategorizedTime.Zero,
       SequenceDigest.Zero,
       SequenceDigest.Zero
     )
@@ -79,6 +87,10 @@ object ExecutionDigest {
     Focus[ExecutionDigest](_.calibrationCount)
 
   /** @group Optics */
+  val expectedCalibrations: Lens[ExecutionDigest, CategorizedTime] =
+    Focus[ExecutionDigest](_.expectedCalibrations)
+
+  /** @group Optics */
   val acquisition: Lens[ExecutionDigest, SequenceDigest] =
     Focus[ExecutionDigest](_.acquisition)
 
@@ -92,6 +104,7 @@ object ExecutionDigest {
       a.setupCount,
       a.reacquisitionCount,
       a.calibrationCount,
+      a.expectedCalibrations,
       a.acquisition,
       a.science
     )}
