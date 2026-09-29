@@ -14,7 +14,7 @@ import scala.scalajs.js.typedarray.Float64Array
  * with x = -p, y = q, the same convention as `lucuma.core.geom.jts`.
  */
 @js.native
-@JSImport("lucuma-wasm", JSImport.Namespace)
+@JSImport("@gemini-hlsw/lucuma-wasm", JSImport.Namespace)
 private[wasm] object LucumaWasm extends js.Object {
 
   /** wasm-bindgen loader. `opts.module_or_path` may hold bytes, a URL or a compiled module. */

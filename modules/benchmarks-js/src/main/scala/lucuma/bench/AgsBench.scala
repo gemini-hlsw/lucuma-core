@@ -59,7 +59,7 @@ object AgsBench:
         .`then`[js.UndefOr[js.Any]]: fs =>
           val url = js.`import`.meta
             .asInstanceOf[js.Dynamic]
-            .resolve("lucuma-wasm/lucuma_wasm_bg.wasm")
+            .resolve("@gemini-hlsw/lucuma-wasm/lucuma_wasm_bg.wasm")
           fs.readFileSync(js.Dynamic.newInstance(global.URL)(url)).asInstanceOf[js.Any]
     else js.Promise.resolve[js.UndefOr[js.Any]](js.undefined)
 

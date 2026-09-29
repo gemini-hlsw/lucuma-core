@@ -1,8 +1,8 @@
 {
   "private": true,
   "type": "module",
-  "description": "Node dependencies for the Scala.js test suites (see .scratch/geo-kernel)",
+  "description": "Node dependencies for the Scala.js test suites (wasm geometry kernel)",
   "devDependencies": {
-    "lucuma-wasm": "file:vendor/lucuma-wasm-0.1.0.tgz"
+    "@gemini-hlsw/lucuma-wasm": "0.1.0"
   }
 }
