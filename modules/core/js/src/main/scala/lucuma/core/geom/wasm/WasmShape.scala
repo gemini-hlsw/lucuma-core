@@ -3,6 +3,7 @@
 
 package lucuma.core.geom.wasm
 
+import cats.data.NonEmptyList
 import lucuma.core.geom.Area
 import lucuma.core.geom.BoundingOffsets
 import lucuma.core.geom.Shape
@@ -101,11 +102,18 @@ final class WasmShape private[wasm] (private[wasm] val handle: Int) extends Shap
        at + 1 + 2 * n
       )
 
-    def polygon(at: Int): (ShapePolygon, Int) =
+    // A polygon whose exterior ring came back empty is dropped rather than drawn.
+    def polygon(at: Int): (Option[ShapePolygon], Int) =
       val (rings, end) = many(r(at).toInt, at + 1)(ring)
-      (ShapePolygon(rings.head, rings.tail), end)
+      val polygon      = rings match
+        case exterior :: holes =>
+          NonEmptyList
+            .fromList(exterior)
+            .map(ShapePolygon(_, holes.flatMap(NonEmptyList.fromList)))
+        case Nil               => None
+      (polygon, end)
 
-    many(r(0).toInt, 1)(polygon)._1
+    many(r(0).toInt, 1)(polygon)._1.flatten
 
   override def toString: String =
     if (released) s"WasmShape($handle, released)" else s"WasmShape($handle)"
