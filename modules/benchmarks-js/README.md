@@ -1,12 +1,13 @@
 # AGS Scala.js benchmark
 
 Times `AgsParams.posCalculations` (the per-posAngle overlay build) and the full
-`Ags.agsAnalysis` on the workload from `docs/ags-parallelization.md`: GMOS imaging,
-36 position angles, 20/30/50 science offsets, 91 candidates.
+`Ags.agsAnalysis` on a request captured in Explore (GMOS imaging, PWFS1, 36 position angles,
+50 science offsets, 121 Gaia candidates; `modules/benchmarks-shared`). The first argument lists
+workloads: `real` replays the request as is, a number N swaps in an N-point offset grid.
 
 Node:
 
-    sbt "benchmarksJS/run 20,30,50"
+    sbt "benchmarksJS/run real,20,50"
 
 Browser (ES module, needs an http server, not file://):
 
