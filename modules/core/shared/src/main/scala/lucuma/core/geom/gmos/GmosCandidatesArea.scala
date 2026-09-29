@@ -3,6 +3,7 @@
 
 package lucuma.core.geom.gmos
 
+import cats.data.NonEmptyList
 import lucuma.core.geom.ShapeExpression
 import lucuma.core.geom.syntax.all.*
 import lucuma.core.math.Angle
@@ -35,7 +36,10 @@ trait GmosCandidatesArea:
   /**
     * GMOS area reachable by the problem arm for a set of posAngles and offsets
     */
-  def candidatesAreaAt(posAngles: List[Angle], offsetPositions: List[Offset]): ShapeExpression =
+  def candidatesAreaAt(
+    posAngles:       NonEmptyList[Angle],
+    offsetPositions: NonEmptyList[Offset]
+  ): ShapeExpression =
     candidatesArea.intersectionShape(posAngles, offsetPositions)
 
 object candidatesArea extends GmosCandidatesArea

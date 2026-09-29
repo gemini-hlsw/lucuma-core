@@ -4,6 +4,7 @@
 package lucuma.core.geom
 
 import cats.Order
+import cats.data.NonEmptyList
 import cats.syntax.all.*
 import lucuma.core.geom.ShapeExpression.*
 import lucuma.core.geom.arb.*
@@ -197,6 +198,16 @@ class ShapeExpressionSuite extends munit.DisciplineSuite with RetryFlakyTests {
         assertEquals((p0.µasSquared - p1.µasSquared).abs, p.µasSquared)
       }
     }
+  }
+
+  test("intersectionShape intersects the shape at every angle and offset") {
+    val square = ShapeExpression.regularPolygon(10.arcsec, 4)
+    val shift  = Offset.signedDecimalArcseconds.reverseGet((5.0, 0.0))
+    val actual =
+      square.intersectionShape(NonEmptyList.one(Angle.Angle0), NonEmptyList.of(Offset.Zero, shift))
+    val direct = square.shapeAt(Offset.Zero, Angle.Angle0) ∩ square.shapeAt(shift, Angle.Angle0)
+    assert(actual.µasSquared > 0L)
+    assertEquals(actual.µasSquared, direct.µasSquared)
   }
 
   test("Regression test") {
