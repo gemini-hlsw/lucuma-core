@@ -15,7 +15,7 @@ import scala.scalajs.js
  * `ShapeInterpreter.default` and returns it. Failures surface as the underlying error; callers
  * decide whether to stay on JTS.
  */
-object WasmGeometry {
+object WasmGeometry:
 
   /** npm semver range of `lucuma-wasm` this facade was written against. */
   val CompatibleRange: String = "^0.1"
@@ -33,10 +33,10 @@ object WasmGeometry {
    * Loads the kernel from `moduleOrPath`: wasm bytes, a `URL`/`Response`, or a compiled
    * `WebAssembly.Module`, as accepted by the wasm-bindgen loader.
    */
-  def loadFrom(moduleOrPath: js.UndefOr[js.Any]): IO[ShapeInterpreter] = {
+  def loadFrom(moduleOrPath: js.UndefOr[js.Any]): IO[ShapeInterpreter] =
     val opts: js.UndefOr[js.Object] =
       moduleOrPath.map(m => js.Dynamic.literal(module_or_path = m))
-    for {
+    for
       x <- IO.fromPromise(IO(LucumaWasm.init(opts)))
       v <- IO(LucumaWasm.version())
       _ <- IO.raiseUnless(isCompatible(v))(
@@ -44,20 +44,16 @@ object WasmGeometry {
                s"lucuma-wasm $v is not compatible with this lucuma-core facade (requires $CompatibleRange)"
              )
            )
-      _ <- IO {
+      _ <- IO:
              WasmShapeInterpreter.markLoaded(x)
              ShapeInterpreter.default = WasmShapeInterpreter
-           }
-    } yield WasmShapeInterpreter
-  }
+    yield WasmShapeInterpreter
 
   /** Caret-range check: same major, and for major 0 the same minor too. */
   private[wasm] def isCompatible(version: String): Boolean =
-    version.split("[.\\-+]").toList match {
+    version.split("[.\\-+]").toList match
       case maj :: min :: _ =>
         (maj.toIntOption, min.toIntOption).tupled.exists { (a, b) =>
           a === CompatibleMajor && (if (a === 0) b === CompatibleMinor else b >= CompatibleMinor)
         }
       case _               => false
-    }
-}

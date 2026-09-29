@@ -25,7 +25,7 @@ import scala.scalajs.js.typedarray.Float64Array
  *
  * Obtain it through `WasmGeometry.load`; the kernel must be initialised before use.
  */
-object WasmShapeInterpreter extends ShapeInterpreter {
+object WasmShapeInterpreter extends ShapeInterpreter:
 
   // JTS GeometricShapeFactory default; keeps ellipses and arcs vertex-for-vertex with JTS.
   private val NPts = 100
@@ -39,10 +39,9 @@ object WasmShapeInterpreter extends ShapeInterpreter {
 
   private var exports: js.Dynamic = null
 
-  private[wasm] def markLoaded(wasmExports: js.Any): Unit = {
+  private[wasm] def markLoaded(wasmExports: js.Any): Unit =
     exports = wasmExports.asInstanceOf[js.Dynamic]
     loaded = true
-  }
 
   /** Number of geometries currently held by the kernel; a leak detector for tests. */
   def liveHandles: Int = LucumaWasm.live()
@@ -58,7 +57,7 @@ object WasmShapeInterpreter extends ShapeInterpreter {
   /** True while at least one `withArena` block is running. */
   def inArena: Boolean = arenas.nonEmpty
 
-  override def withArena[A](f: => A): A = {
+  override def withArena[A](f: => A): A =
     val arena = ArrayBuffer.empty[WasmShape]
     arenas = arena :: arenas
     try f
@@ -66,21 +65,18 @@ object WasmShapeInterpreter extends ShapeInterpreter {
       arenas = arenas.tail
       arena.foreach(_.free())
     }
-  }
 
-  private[wasm] def wrap(h: Int): WasmShape = {
+  private[wasm] def wrap(h: Int): WasmShape =
     val s = new WasmShape(h)
     arenas match {
       case arena :: _ => arena += s
       case Nil        => registry.register(s, h, s)
     }
     s
-  }
 
-  private[wasm] def release(s: WasmShape): Unit = {
+  private[wasm] def release(s: WasmShape): Unit =
     registry.unregister(s)
     LucumaWasm.free(s.handle)
-  }
 
   private def rectBounded(a: Offset, b: Offset)(f: (Double, Double, Double, Double) => Int): Int =
     if (a.p === b.p || a.q === b.q) LucumaWasm.empty_new()
@@ -128,13 +124,12 @@ object WasmShapeInterpreter extends ShapeInterpreter {
     m10: Double,
     m11: Double,
     m12: Double
-  ): Int = {
+  ): Int =
     val h = go(e)
     try LucumaWasm.affine(h, m00, m01, m02, m10, m11, m12)
     finally LucumaWasm.free(h)
-  }
 
-  private def go(e: ShapeExpression): Int = e match {
+  private def go(e: ShapeExpression): Int = e match
     // Constructors
     case Empty                 => LucumaWasm.empty_new()
     case Ellipse(a, b)         => rectBounded(a, b)(LucumaWasm.ellipse_new(_, _, _, _, NPts))
@@ -173,11 +168,8 @@ object WasmShapeInterpreter extends ShapeInterpreter {
       val cy = WasmCoords.y(o)
       transform(e, c, -s, cx - cx * c + cy * s, s, c, cy - cx * s - cy * c)
     case Translate(e, o)             => transform(e, 1, 0, WasmCoords.x(o), 0, 1, WasmCoords.y(o))
-  }
 
-  override def interpret(e: ShapeExpression): Shape = {
+  override def interpret(e: ShapeExpression): Shape =
     if (!loaded)
       throw new IllegalStateException("lucuma-wasm is not loaded; run WasmGeometry.load first")
     wrap(go(e))
-  }
-}

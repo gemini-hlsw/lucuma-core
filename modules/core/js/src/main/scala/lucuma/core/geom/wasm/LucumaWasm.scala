@@ -15,7 +15,7 @@ import scala.scalajs.js.typedarray.Float64Array
  */
 @js.native
 @JSImport("@gemini-hlsw/lucuma-wasm", JSImport.Namespace)
-private[wasm] object LucumaWasm extends js.Object {
+private[wasm] object LucumaWasm extends js.Object:
 
   /** wasm-bindgen loader. `opts.module_or_path` may hold bytes, a URL or a compiled module. */
   @JSName("default")
@@ -51,4 +51,3 @@ private[wasm] object LucumaWasm extends js.Object {
 
   def free(h: Int): Unit = js.native
   def live(): Int        = js.native
-}

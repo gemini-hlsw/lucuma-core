@@ -15,7 +15,7 @@ import lucuma.core.math.Offset
  * enclosing `WasmShapeInterpreter.withArena` block ends, by `free()`, or by the JS garbage
  * collector if the shape was created outside any arena. Using a released shape throws.
  */
-final class WasmShape private[wasm] (private[wasm] val handle: Int) extends Shape {
+final class WasmShape private[wasm] (private[wasm] val handle: Int) extends Shape:
 
   private var released: Boolean = false
 
@@ -85,15 +85,15 @@ final class WasmShape private[wasm] (private[wasm] val handle: Int) extends Shap
     )
   }
 
-  def intersects(that: Shape): Boolean = that match {
-    case w: WasmShape => LucumaWasm.intersects(h, w.h)
-    case _            => throw WasmShape.mixed(that)
-  }
+  def intersects(that: Shape): Boolean =
+    that match
+      case w: WasmShape => LucumaWasm.intersects(h, w.h)
+      case _            => throw WasmShape.mixed(that)
 
-  def intersection(that: Shape): Shape = that match {
-    case w: WasmShape => WasmShapeInterpreter.wrap(LucumaWasm.op(0, h, w.h))
-    case _            => throw WasmShape.mixed(that)
-  }
+  def intersection(that: Shape): Shape =
+    that match
+      case w: WasmShape => WasmShapeInterpreter.wrap(LucumaWasm.op(0, h, w.h))
+      case _            => throw WasmShape.mixed(that)
 
   def polygons: List[ShapePolygon] = {
     val r = LucumaWasm.rings(h)
@@ -120,17 +120,15 @@ final class WasmShape private[wasm] (private[wasm] val handle: Int) extends Shap
 
   override def toString: String =
     if (released) s"WasmShape($handle, released)" else s"WasmShape($handle)"
-}
 
-object WasmShape {
+object WasmShape:
   private[wasm] def mixed(that: Shape): UnsupportedOperationException =
     new UnsupportedOperationException(
       s"Cannot combine ${that.getClass.getSimpleName} with WasmShape: shapes from different engines never mix"
     )
-}
 
 /** µas coordinate convention shared with `lucuma.core.geom.jts`: x = -p, y = q. */
-private[wasm] object WasmCoords {
+private[wasm] object WasmCoords:
   inline def x(o: Offset): Double = -Angle.signedMicroarcseconds.get(o.p.toAngle).toDouble
   inline def y(o: Offset): Double = Angle.signedMicroarcseconds.get(o.q.toAngle).toDouble
 
@@ -139,4 +137,3 @@ private[wasm] object WasmCoords {
       Offset.P(Angle.fromMicroarcseconds(-x.round)),
       Offset.Q(Angle.fromMicroarcseconds(y.round))
     )
-}
