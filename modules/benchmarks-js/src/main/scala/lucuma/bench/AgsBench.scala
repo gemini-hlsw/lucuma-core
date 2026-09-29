@@ -15,7 +15,7 @@ import org.locationtech.jts.geom.GeometryOverlay
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.global
 
-// Node/browser benchmark of the AGS hot path on the workloads in `AgsWorkload`: `real` (a request
+// Node benchmark of the AGS hot path on the workloads in `AgsWorkload`: `real` (a request
 // captured in Explore) or N (the same request with an N-point offset grid). Modes: none (JTS timing), `wasm` (paired JTS vs kernel timing),
 // `dump [jts|wasm]` (one line per analysis, for diffing builds or engines).
 object AgsBench:
@@ -32,36 +32,20 @@ object AgsBench:
 
   def ms(nanos: Long): String = f"${nanos / 1.0e6}%.1f"
 
-  def isNode: Boolean = js.typeOf(global.process) != "undefined"
+  def runtime: String = s"node ${global.process.versions.node}"
 
-  def runtime: String =
-    if isNode then s"node ${global.process.versions.node}"
-    else global.navigator.userAgent.toString
+  def argv: List[String] = global.process.argv.asInstanceOf[js.Array[String]].toList.drop(2)
 
-  def argv: List[String] =
-    if isNode then global.process.argv.asInstanceOf[js.Array[String]].toList.drop(2)
-    else if js.typeOf(global.location) != "undefined" then
-      // ?offsets=20,30&wasm maps onto the Node argument list
-      val q = global.location.search.toString.stripPrefix("?").split("&").toList
-      q.collectFirst { case s"offsets=$v" => v }.toList ++ Option.when(q.contains("wasm"))("wasm")
-    else Nil
+  def report(line: String): Unit = println(line)
 
-  def report(line: String): Unit =
-    println(line)
-    if js.typeOf(global.document) != "undefined" then
-      val pre = global.document.getElementById("out")
-      if pre != null then pre.textContent = pre.textContent.toString + line + "\n"
-
-  // Node cannot fetch the package's own file: URL; hand the loader the bytes. Browsers resolve it.
+  // Node cannot fetch the package's own file: URL; hand the loader the bytes.
   def wasmBytes(): js.Promise[js.UndefOr[js.Any]] =
-    if isNode then
-      js.`import`[js.Dynamic]("node:fs")
-        .`then`[js.UndefOr[js.Any]]: fs =>
-          val url = js.`import`.meta
-            .asInstanceOf[js.Dynamic]
-            .resolve("@gemini-hlsw/lucuma-wasm/lucuma_wasm_bg.wasm")
-          fs.readFileSync(js.Dynamic.newInstance(global.URL)(url)).asInstanceOf[js.Any]
-    else js.Promise.resolve[js.UndefOr[js.Any]](js.undefined)
+    js.`import`[js.Dynamic]("node:fs")
+      .`then`[js.UndefOr[js.Any]]: fs =>
+        val url = js.`import`.meta
+          .asInstanceOf[js.Dynamic]
+          .resolve("@gemini-hlsw/lucuma-wasm/lucuma_wasm_bg.wasm")
+        fs.readFileSync(js.Dynamic.newInstance(global.URL)(url)).asInstanceOf[js.Any]
 
   def loadKernel(): js.Promise[ShapeInterpreter] =
     given IORuntime = cats.effect.unsafe.implicits.global
