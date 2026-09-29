@@ -1,0 +1,8 @@
+{
+  "private": true,
+  "type": "module",
+  "description": "Node dependencies for the Scala.js test suites (wasm geometry kernel)",
+  "devDependencies": {
+    "@gemini-hlsw/lucuma-wasm": "0.1.0"
+  }
+}

@@ -1,4 +1,5 @@
 import org.scalajs.linker.interface.ESVersion
+import org.scalajs.linker.interface.OutputPatterns
 import org.typelevel.sbt.gha.PermissionValue
 import org.typelevel.sbt.gha.Permissions
 
@@ -129,6 +130,11 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform)
     )
   )
   .jvmConfigure(_.enablePlugins(AutomateHeaderPlugin))
+  .jsSettings(
+    // ES modules so the wasm kernel tests can import the npm package from <repo>/node_modules
+    scalaJSLinkerConfig ~= (_.withModuleKind(ModuleKind.ESModule)
+      .withOutputPatterns(OutputPatterns.fromJSFile("%s.mjs")))
+  )
   .jvmSettings(
     resolvers += "Gemini Repository".at(
       "https://github.com/gemini-hlsw/maven-repo/raw/master/releases"
@@ -351,6 +357,17 @@ lazy val npm        = project
       "org.scalameta" %%% "munit" % munitVersion % Test
     )
   )
+
+// JS tests need Node and the npm packages from the root package.json (wasm geometry kernel)
+ThisBuild / githubWorkflowBuildPreamble ++= Seq(
+  WorkflowStep.Use(
+    UseRef.Public("actions", "setup-node", "v6"),
+    name = Some("Setup Node"),
+    params = Map("node-version" -> "26", "cache" -> "npm"),
+    cond = Some("matrix.project == 'rootJS'")
+  ),
+  WorkflowStep.Run(List("npm ci"), name = Some("npm ci"), cond = Some("matrix.project == 'rootJS'"))
+)
 
 ThisBuild / githubWorkflowPublishPreamble +=
   WorkflowStep.Use(

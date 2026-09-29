@@ -16,6 +16,7 @@ import lucuma.ags.syntax.*
 import lucuma.catalog.clients.GaiaClient
 import lucuma.core.enums.GmosNorthFpu
 import lucuma.core.enums.PortDisposition
+import lucuma.core.geom.jts.interpreter.given
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 import org.http4s.jdkhttpclient.JdkHttpClient

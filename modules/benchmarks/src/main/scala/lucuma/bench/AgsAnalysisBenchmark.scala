@@ -11,6 +11,7 @@ import lucuma.core.enums.Band
 import lucuma.core.enums.PortDisposition
 import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.WaterVapor
+import lucuma.core.geom.jts.interpreter.given
 import lucuma.core.math.Angle
 import lucuma.core.math.BrightnessValue
 import lucuma.core.math.Coordinates

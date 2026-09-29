@@ -45,4 +45,7 @@ trait Shape {
   /** The evaluated form of `e ↗ preTranslation ⟲ rotation ↗ postTranslation`. */
   def transform(preTranslation: Offset, rotation: Angle, postTranslation: Offset): Shape
 
+  /** The polygons making up this shape, for rendering or transport. */
+  def polygons: List[ShapePolygon]
+
 }
