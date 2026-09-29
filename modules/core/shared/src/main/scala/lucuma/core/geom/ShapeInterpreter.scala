@@ -17,18 +17,10 @@ trait ShapeInterpreter {
   def withArena[A](f: => A): A = f
 }
 
-object ShapeInterpreter {
+object ShapeInterpreter:
 
   /**
-   * Engine used wherever no interpreter is given explicitly. JTS until a native kernel is loaded
-   * and installs itself (see `lucuma.core.geom.wasm.WasmGeometry` on Scala.js).
+   * Engine behind `lucuma.core.geom.auto.given`. JTS until a native kernel is loaded and installs
+   * itself (see `lucuma.core.geom.wasm.WasmGeometry` on Scala.js).
    */
   @volatile var default: ShapeInterpreter = jts.JtsShapeInterpreter
-
-  /** Delegates to `default` at call time; an explicit lexical `given` still takes precedence. */
-  given ShapeInterpreter with {
-    def interpret(e: ShapeExpression): Shape = default.interpret(e)
-    override def withArena[A](f: => A): A    = default.withArena(f)
-  }
-
-}

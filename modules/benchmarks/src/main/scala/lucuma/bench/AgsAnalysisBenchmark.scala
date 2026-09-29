@@ -4,6 +4,7 @@
 package lucuma.bench
 
 import cats.data.NonEmptyList
+import lucuma.core.geom.jts.interpreter.given
 import lucuma.core.geom.offsets.OffsetPosition
 import org.locationtech.jts.geom.GeometryOverlay
 import org.openjdk.jmh.annotations.*

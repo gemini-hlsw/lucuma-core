@@ -9,6 +9,7 @@ import cats.syntax.all.*
 import lucuma.ags.*
 import lucuma.catalog.clients.GaiaClient
 import lucuma.catalog.votable.*
+import lucuma.core.geom.jts.interpreter.given
 import lucuma.core.geom.pwfs.patrolField
 import org.http4s.jdkhttpclient.JdkHttpClient
 import org.typelevel.log4cats.LoggerFactory

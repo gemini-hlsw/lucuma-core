@@ -96,6 +96,7 @@ object AgsBench:
       if hists.map(_._2).distinct.size != 1 then report(s"$n\tHISTOGRAM MISMATCH between engines")
 
   def jtsStage(cfg: Config): Unit =
+    given ShapeInterpreter = JtsShapeInterpreter
     report("offsets\tpositions\trep\tcalcs_ms\tcontext_ms\tanalysis_ms\ttotal_ms")
     runFull(cfg.workloads.head)
     cfg.workloads.foreach: w =>
@@ -134,7 +135,7 @@ object AgsBench:
           .`then`[Unit](wasm => dumpStage(cfg)(using wasm))
           .`catch`[Unit](e => report(s"wasm stage failed: $e")): Unit
       case "dump" :: _           =>
-        dumpStage(cfg)
+        dumpStage(cfg)(using JtsShapeInterpreter)
       case "wasm" :: _           =>
         report(
           s"$runtime  workloads=${names.mkString(",")} reps=${cfg.reps}"
