@@ -51,22 +51,11 @@ final class WasmShape private[wasm] (private[wasm] val handle: Int) extends Shap
   def area: Area =
     Area.fromMicroarcsecondsSquared.getOption(LucumaWasm.area(h).round).getOrElse(Area.MinArea)
 
-  def radius: Angle = {
-    val cs   = LucumaWasm.coords(h)
-    var best = -1.0
-    var bx   = 0.0
-    var by   = 0.0
-    var i    = 0
-    while (i < cs.length) {
-      val x = cs(i)
-      val y = cs(i + 1)
-      val d = x * x + y * y
-      if (d > best) { best = d; bx = x; by = y }
-      i += 2
-    }
-    if (best < 0) Angle.Angle0
-    else WasmCoords.toOffset(bx, by).distance(Offset.Zero)
-  }
+  def radius: Angle =
+    val cs = LucumaWasm.coords(h)
+    (0 until cs.length by 2)
+      .maxByOption(i => cs(i) * cs(i) + cs(i + 1) * cs(i + 1))
+      .fold(Angle.Angle0)(i => WasmCoords.toOffset(cs(i), cs(i + 1)).distance(Offset.Zero))
 
   def isEmpty: Boolean = LucumaWasm.bbox(h)(0).isNaN
 
@@ -95,28 +84,28 @@ final class WasmShape private[wasm] (private[wasm] val handle: Int) extends Shap
       case w: WasmShape => WasmShapeInterpreter.wrap(LucumaWasm.op(0, h, w.h))
       case _            => throw WasmShape.mixed(that)
 
-  def polygons: List[ShapePolygon] = {
+  // Parses the kernel's `rings` layout; each reader returns its value and the index after it.
+  def polygons: List[ShapePolygon] =
     val r = LucumaWasm.rings(h)
-    var i = 1
-    def ring(): List[Offset] = {
-      val n   = r(i).toInt
-      i += 1
-      val out = List.newBuilder[Offset]
-      var k   = 0
-      while (k < n) {
-        out += WasmCoords.toOffset(r(i), r(i + 1))
-        i += 2
-        k += 1
-      }
-      out.result()
-    }
-    List.fill(r(0).toInt) {
-      val nRings   = r(i).toInt
-      i += 1
-      val exterior = ring()
-      ShapePolygon(exterior, List.fill(nRings - 1)(ring()))
-    }
-  }
+
+    def many[A](n: Int, at: Int)(read: Int => (A, Int)): (List[A], Int) =
+      val (as, end) = (0 until n).foldLeft((List.empty[A], at)):
+        case ((acc, i), _) =>
+          val (a, next) = read(i)
+          (a :: acc, next)
+      (as.reverse, end)
+
+    def ring(at: Int): (List[Offset], Int) =
+      val n = r(at).toInt
+      (List.tabulate(n)(k => WasmCoords.toOffset(r(at + 1 + 2 * k), r(at + 2 + 2 * k))),
+       at + 1 + 2 * n
+      )
+
+    def polygon(at: Int): (ShapePolygon, Int) =
+      val (rings, end) = many(r(at).toInt, at + 1)(ring)
+      (ShapePolygon(rings.head, rings.tail), end)
+
+    many(r(0).toInt, 1)(polygon)._1
 
   override def toString: String =
     if (released) s"WasmShape($handle, released)" else s"WasmShape($handle)"

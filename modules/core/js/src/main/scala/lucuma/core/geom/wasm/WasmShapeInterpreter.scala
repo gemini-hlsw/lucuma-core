@@ -82,8 +82,17 @@ object WasmShapeInterpreter extends ShapeInterpreter:
     if (a.p === b.p || a.q === b.q) LucumaWasm.empty_new()
     else f(WasmCoords.x(a), WasmCoords.y(a), WasmCoords.x(b), WasmCoords.y(b))
 
+  // Three distinct vertices, found without building a set.
+  private def hasThreeDistinct(os: List[Offset]): Boolean =
+    os match
+      case a :: tail =>
+        tail.dropWhile(_ === a) match
+          case b :: rest => rest.exists(o => o =!= a && o =!= b)
+          case Nil       => false
+      case Nil       => false
+
   private def polygon(os: List[Offset]): Int =
-    if (os.toSet.size < 3) LucumaWasm.empty_new()
+    if (!hasThreeDistinct(os)) LucumaWasm.empty_new()
     else {
       val os2 = if (os.head === os.last) os else os.last :: os
       val arr = new Float64Array(os2.size * 2)
@@ -96,25 +105,21 @@ object WasmShapeInterpreter extends ShapeInterpreter:
       LucumaWasm.poly_new(arr)
     }
 
-  // Folds a chain of same-kind nodes in a loop, see ShapeExpression.leftSpine. Intermediates
-  // are freed as soon as they are consumed.
-  private def chain(op: BinaryOp, kind: Int, e: ShapeExpression): Int = {
+  // Folds a chain of same-kind nodes, see ShapeExpression.leftSpine. Intermediates are freed as
+  // soon as they are consumed.
+  private def chain(op: BinaryOp, kind: Int, e: ShapeExpression): Int =
     val (head, rest) = ShapeExpression.leftSpine(e, op)
-    var acc          = go(head)
-    rest.foreach { x =>
-      val hx   =
+    rest.foldLeft(go(head)): (acc, x) =>
+      val hx =
         try go(x)
-        catch { case t: Throwable => LucumaWasm.free(acc); throw t }
-      val next =
-        try LucumaWasm.op(kind, acc, hx)
-        finally {
-          LucumaWasm.free(acc)
-          LucumaWasm.free(hx)
-        }
-      acc = next
-    }
-    acc
-  }
+        catch
+          case t: Throwable =>
+            LucumaWasm.free(acc)
+            throw t
+      try LucumaWasm.op(kind, acc, hx)
+      finally
+        LucumaWasm.free(acc)
+        LucumaWasm.free(hx)
 
   private def transform(
     e:   ShapeExpression,
