@@ -307,12 +307,17 @@ lazy val catalogTests = crossProject(JVMPlatform, JSPlatform)
   )
 
 
+// Workloads shared by the JMH and the Scala.js AGS benchmarks
+lazy val benchmarksShared =
+  Def.setting((ThisBuild / baseDirectory).value / "modules" / "benchmarks-shared" / "src" / "main" / "scala")
+
 lazy val benchmarks = project
   .in(file("modules/benchmarks"))
   .dependsOn(core.jvm, ags.jvm)
   .enablePlugins(NoPublishPlugin, AutomateHeaderPlugin, JmhPlugin)
   .settings(
-    name := "lucuma-benchmarks"
+    name := "lucuma-benchmarks",
+    Compile / unmanagedSourceDirectories += benchmarksShared.value
   )
 
 lazy val benchmarksJS = project
@@ -321,6 +326,7 @@ lazy val benchmarksJS = project
   .enablePlugins(ScalaJSPlugin, NoPublishPlugin, AutomateHeaderPlugin)
   .settings(
     name                            := "lucuma-benchmarks-js",
+    Compile / unmanagedSourceDirectories += benchmarksShared.value,
     scalaJSUseMainModuleInitializer := true,
     scalaJSLinkerConfig ~= (_.withModuleKind(ModuleKind.ESModule)
       .withESFeatures(_.withESVersion(ESVersion.ES2022)))
