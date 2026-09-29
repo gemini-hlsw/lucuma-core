@@ -11,12 +11,17 @@ import lucuma.core.enums.ObserveClass
 import monocle.Focus
 import monocle.Lens
 
+/**
+ * @param expectedCalibrations time for the calibrations the calibration count
+ *                             predicts but that do not exist yet
+ */
 case class ExecutionDigest(
-  setup:            SetupTime,
-  setupCount:       NonNegInt,
-  calibrationCount: NonNegInt,
-  acquisition:      SequenceDigest,
-  science:          SequenceDigest
+  setup:                SetupTime,
+  setupCount:           NonNegInt,
+  calibrationCount:     NonNegInt,
+  expectedCalibrations: CategorizedTime,
+  acquisition:          SequenceDigest,
+  science:              SequenceDigest
 ) {
 
   /**
@@ -26,11 +31,13 @@ case class ExecutionDigest(
     science.observeClass
 
   /**
-   * Planned time for the observation, including the science sequence and all
-   * expected acquisitions.
+   * Planned time for the observation, including the science sequence, all
+   * expected acquisitions and the calibrations still expected.
    */
   def fullTimeEstimate: CategorizedTime =
-    science.timeEstimate.sumCharge(science.observeClass.chargeClass, setup.full *| setupCount.value)
+    science.timeEstimate
+      .sumCharge(science.observeClass.chargeClass, setup.full *| setupCount.value) |+|
+      expectedCalibrations
 
   /**
    * Steps by kind across the acquisition and science sequences.  Excludes
@@ -48,6 +55,7 @@ object ExecutionDigest {
       SetupTime.Zero,
       NonNegInt.MinValue,
       NonNegInt.MinValue,
+      CategorizedTime.Zero,
       SequenceDigest.Zero,
       SequenceDigest.Zero
     )
@@ -65,6 +73,10 @@ object ExecutionDigest {
     Focus[ExecutionDigest](_.calibrationCount)
 
   /** @group Optics */
+  val expectedCalibrations: Lens[ExecutionDigest, CategorizedTime] =
+    Focus[ExecutionDigest](_.expectedCalibrations)
+
+  /** @group Optics */
   val acquisition: Lens[ExecutionDigest, SequenceDigest] =
     Focus[ExecutionDigest](_.acquisition)
 
@@ -77,6 +89,7 @@ object ExecutionDigest {
       a.setup,
       a.setupCount,
       a.calibrationCount,
+      a.expectedCalibrations,
       a.acquisition,
       a.science
     )}
