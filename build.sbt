@@ -1,5 +1,4 @@
 import org.scalajs.linker.interface.ESVersion
-import org.scalajs.linker.interface.ModuleKind
 import org.scalajs.linker.interface.OutputPatterns
 import org.typelevel.sbt.gha.PermissionValue
 import org.typelevel.sbt.gha.Permissions
@@ -55,7 +54,7 @@ lazy val spireVersion               = "0.18.0"
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
-val root = tlCrossRootProject.aggregate(core, testkit, tests, catalog, ags, catalogTestkit, catalogTests, horizons, horizonsTests, itac, benchmarks, benchmarksJS, npm)
+val root = tlCrossRootProject.aggregate(core, testkit, tests, catalog, ags, catalogTestkit, catalogTests, horizons, horizonsTests, itac, benchmarks, npm)
 
 lazy val core = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Full)
@@ -92,8 +91,6 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
     )
   )
   .jsSettings(
-    // lucuma.core.geom.wasm imports the `lucuma-wasm` npm package (root package.json). The
-    // module kind stays the consumer's choice: only a NoModule link that reaches the facade fails.
     libraryDependencies ++= Seq(
       "io.github.cquiroz" %%% "scala-java-time" % scalaJavaTimeVersion,
       "edu.gemini"        %%% "gemini-locales"  % geminiLocalesVersion
