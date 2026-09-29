@@ -9,12 +9,11 @@ import lucuma.core.geom.Area
 import lucuma.core.geom.BoundingOffsets
 import lucuma.core.geom.Shape
 import lucuma.core.geom.ShapeExpression
-import lucuma.core.geom.ShapeInterpreter
 import lucuma.core.geom.jts.JtsShapeInterpreter
 import lucuma.core.geom.syntax.all.*
 import lucuma.core.geom.visitors.MaroonXScienceFov
 import lucuma.core.geom.visitors.MaroonXSkyFiberPatrol
-import lucuma.core.geom.wasm.WasmKernelSuite
+import lucuma.core.geom.wasm.WasmKernelFixture
 import lucuma.core.geom.wasm.WasmShapeInterpreter
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
@@ -29,7 +28,7 @@ import lucuma.core.model.sequence.flamingos2.Flamingos2FpuMask
  * Tolerances: area within 1e-7 relative, bounding boxes and radii within 10 µas, `contains` and
  * `intersects` exact.
  */
-class AgsGeometryParitySuite extends munit.FunSuite with WasmKernelSuite:
+class AgsGeometryParitySuite extends munit.FunSuite with WasmKernelFixture:
 
   private val AreaRel  = 1e-7
   private val AngleTol = 10L
@@ -57,62 +56,53 @@ class AgsGeometryParitySuite extends munit.FunSuite with WasmKernelSuite:
   private val ditherOffsets: List[Offset] =
     (0 until 20).toList.map(k => off(k * 1.7 - 17, (k * 2.3) % 11 - 5))
 
-  private def withProbes[A <: Params & PwfsSupport[A]](name: String, a: A): List[(String, Params)] =
-    val pwfs2 = a.probe match
-      case GuideProbe.PWFS2 => Nil
-      case _                => List(s"$name PWFS2" -> a.withPWFS2)
-    List(name -> a, s"$name PWFS1" -> a.withPWFS1) ++ pwfs2
+  // The PWFS patrol field and arm are the same on every instrument, so two hosts suffice.
+  private def withPwfs[A <: Params & PwfsSupport[A]](name: String, a: A): List[(String, Params)] =
+    List(name -> a, s"$name PWFS1" -> a.withPWFS1, s"$name PWFS2" -> a.withPWFS2)
 
   private val variants: List[(String, Params)] =
-    withProbes("GMOS imaging side", AgsParams.GmosImaging(PortDisposition.Side)) ++
-      withProbes("GMOS imaging bottom", AgsParams.GmosImaging(PortDisposition.Bottom)) ++
-      withProbes("GMOS-N long slit 1.0", AgsParams.GmosLongSlit(GmosNorthFpu.LongSlit_1_00.asLeft)) ++
-      withProbes(
-        "GMOS-S long slit 0.5 bottom",
-        AgsParams.GmosLongSlit(GmosSouthFpu.LongSlit_0_50.asRight, PortDisposition.Bottom)
-      ) ++
-      withProbes("GMOS-N N&S 0.5", AgsParams.GmosLongSlit(GmosNorthFpu.Ns1.asLeft)) ++
-      withProbes("GMOS-N IFU-2", AgsParams.GmosIfu(GmosNorthIfuFpu.TwoSlits.asLeft)) ++
-      withProbes(
-        "GMOS-S IFU-R bottom",
-        AgsParams.GmosIfu(GmosSouthIfuFpu.OneSlitRed.asRight, PortDisposition.Bottom)
-      ) ++
-      withProbes("GMOS-N MOS", AgsParams.GmosMos(Site.GN)) ++
-      withProbes("GMOS-S MOS bottom", AgsParams.GmosMos(Site.GS, PortDisposition.Bottom)) ++
-      withProbes(
+    withPwfs("GMOS imaging side", AgsParams.GmosImaging(PortDisposition.Side)) ++
+      withPwfs(
         "F2 imaging f/16 side",
         AgsParams.Flamingos2Imaging(Flamingos2LyotWheel.F16, PortDisposition.Side)
       ) ++
-      withProbes(
-        "F2 long slit 2px",
-        AgsParams.Flamingos2LongSlit(
-          Flamingos2LyotWheel.F16,
-          Flamingos2FpuMask.Builtin(Flamingos2Fpu.LongSlit2),
-          PortDisposition.Side
-        )
-      ) ++
-      withProbes("F2 MOS", AgsParams.Flamingos2Mos(Flamingos2LyotWheel.F16, PortDisposition.Side)) ++
-      withProbes("IGRINS-2", AgsParams.Igrins2LongSlit()) ++
-      withProbes(
-        "GNIRS long slit",
-        AgsParams.GnirsLongSlit(GnirsFpuSlit.LongSlit_0_30, GnirsCamera.ShortBlue, GnirsPrism.Mirror)
-      ) ++
-      withProbes("GNIRS imaging keyhole", AgsParams.GnirsImaging(GnirsCamera.LongRed, GnirsFilter.Order4)) ++
-      withProbes("GNIRS IFU", AgsParams.GnirsIfu(GnirsFpuIfu.LowResolution)) ++
-      // Altair: the AOWFS has its own oval patrol field and no arm in the beam; LGS+P1 guides on PWFS1.
       List(
-        "GNIRS imaging Altair NGS"      ->
+        "GMOS-N long slit 1.0"        -> AgsParams.GmosLongSlit(GmosNorthFpu.LongSlit_1_00.asLeft),
+        "GMOS-S long slit 0.5 bottom" ->
+          AgsParams.GmosLongSlit(GmosSouthFpu.LongSlit_0_50.asRight, PortDisposition.Bottom),
+        "GMOS-N N&S 0.5"              -> AgsParams.GmosLongSlit(GmosNorthFpu.Ns1.asLeft),
+        "GMOS-N IFU-2"                -> AgsParams.GmosIfu(GmosNorthIfuFpu.TwoSlits.asLeft),
+        "GMOS-S IFU-R bottom"         ->
+          AgsParams.GmosIfu(GmosSouthIfuFpu.OneSlitRed.asRight, PortDisposition.Bottom),
+        "GMOS-N MOS"                  -> AgsParams.GmosMos(Site.GN),
+        "GMOS-S MOS bottom"           -> AgsParams.GmosMos(Site.GS, PortDisposition.Bottom),
+        "F2 long slit 2px"            ->
+          AgsParams.Flamingos2LongSlit(
+            Flamingos2LyotWheel.F16,
+            Flamingos2FpuMask.Builtin(Flamingos2Fpu.LongSlit2),
+            PortDisposition.Side
+          ),
+        "F2 MOS"                      ->
+          AgsParams.Flamingos2Mos(Flamingos2LyotWheel.F16, PortDisposition.Side),
+        "IGRINS-2"                    -> AgsParams.Igrins2LongSlit(),
+        "GNIRS long slit"             ->
+          AgsParams.GnirsLongSlit(GnirsFpuSlit.LongSlit_0_30, GnirsCamera.ShortBlue, GnirsPrism.Mirror),
+        "GNIRS imaging keyhole"       ->
+          AgsParams.GnirsImaging(GnirsCamera.LongRed, GnirsFilter.Order4),
+        "GNIRS IFU"                   -> AgsParams.GnirsIfu(GnirsFpuIfu.LowResolution),
+        // Altair: the AOWFS has its own oval patrol field and no arm in the beam; LGS+P1 guides on PWFS1.
+        "GNIRS imaging Altair NGS"    ->
           AgsParams.GnirsImaging(GnirsCamera.ShortBlue, GnirsFilter.Order4).withAltair(AltairMode.Ngs),
-        "GNIRS long slit Altair LGS"    ->
+        "GNIRS long slit Altair LGS"  ->
           AgsParams
             .GnirsLongSlit(GnirsFpuSlit.LongSlit_0_30, GnirsCamera.ShortBlue, GnirsPrism.Mirror)
             .withAltair(AltairMode.Lgs),
-        "GNIRS IFU Altair LGS+P1"       ->
-          AgsParams.GnirsIfu(GnirsFpuIfu.LowResolution).withAltair(AltairMode.LgsP1)
-      ) ++
-      withProbes("GHOST", AgsParams.GhostIfu()) ++
-      withProbes("MaroonX", AgsParams.Visitor(MaroonXSkyFiberPatrol, MaroonXScienceFov)) ++
-      withProbes("Visitor 30/10", AgsParams.Visitor(30.arcsec, 10.arcsec))
+        "GNIRS IFU Altair LGS+P1"     ->
+          AgsParams.GnirsIfu(GnirsFpuIfu.LowResolution).withAltair(AltairMode.LgsP1),
+        "GHOST"                       -> AgsParams.GhostIfu(),
+        "MaroonX"                     -> AgsParams.Visitor(MaroonXSkyFiberPatrol, MaroonXScienceFov),
+        "Visitor 30/10"               -> AgsParams.Visitor(30.arcsec, 10.arcsec)
+      )
 
   private def jts(e: ShapeExpression): Shape  = JtsShapeInterpreter.interpret(e)
   private def wasm(e: ShapeExpression): Shape = WasmShapeInterpreter.interpret(e)
@@ -198,13 +188,54 @@ class AgsGeometryParitySuite extends munit.FunSuite with WasmKernelSuite:
   private def overlaps(arm: Shape, protectedShape: Shape): Boolean =
     arm.intersection(protectedShape).boundingOffsets.maxSide.toMicroarcseconds > 5
 
-  private def assertAgsOps(name: String, params: Params, pa: Angle, offset: Offset): Unit =
-    val clue      = s"$name PA ${pa.toDoubleDegrees} offset $offset"
-    val (wPf, jPf) = assertParity(params.patrolFieldAt(pa, offset), s"$clue patrol field")
+  /** The shapes `posCalculations` evaluates once per run, on the kernel, to be placed. */
+  private case class Evaluated(
+    scienceArea: Shape,
+    patrolField: Shape,
+    extended:    Option[Shape],
+    arm:         Option[Shape]
+  )
+
+  private def evaluate(params: Params): Evaluated =
+    Evaluated(
+      wasm(params.scienceAreaShape),
+      wasm(params.patrolFieldShape),
+      params.extendedVignettingArea.map(f => wasm(f(Angle.Angle0, Offset.Zero))),
+      params.probeArmShape match
+        case ShapeExpression.Empty => None
+        case e                     => Some(wasm(e))
+    )
+
+  /**
+   * `posCalculations` places an evaluated shape with `Shape.transform`. On the kernel that is one
+   * composed affine, so it agrees with the direct expression `w`/`j` only to the area and
+   * bounding-box tolerances.
+   */
+  private def assertPlaced(placed: Shape, w: Shape, j: Shape, clue: String): Unit =
+    assertArea(placed.area, j.area, s"$clue placed")
+    assertEquals(placed.isEmpty, w.isEmpty, s"$clue placed emptiness")
+    assertEquals(w.isEmpty, j.isEmpty, s"$clue emptiness")
+    if !isEmpty(j) then
+      assertBounds(placed.boundingOffsets, j.boundingOffsets, s"$clue placed bbox")
+      assertOverlayArea(placed.intersection(w), w, extent(j.boundingOffsets), s"$clue placed overlap")
+
+  private def assertAgsOps(
+    name:   String,
+    params: Params,
+    ev:     Evaluated,
+    pa:     Angle,
+    offset: Offset
+  ): Unit =
+    val clue       = s"$name PA ${pa.toDoubleDegrees} offset $offset"
+    val (wPf, jPf) = assertParity(params.patrolFieldAt(pa, offset, pivot), s"$clue patrol field")
+    assertPlaced(ev.patrolField.transform(offset - pivot, pa, pivot), wPf, jPf, s"$clue patrol field")
     val (wSa, jSa) = assertParity(params.scienceArea(pa, offset), s"$clue science area")
-    val vignetting = params.extendedVignettingArea.fold((wSa, jSa)): f =>
-      assertParity(f(pa, offset), s"$clue extended vignetting area")
-    val (wVig, jVig) = vignetting
+    assertPlaced(ev.scienceArea.transform(offset, pa, Offset.Zero), wSa, jSa, s"$clue science area")
+    val (wVig, jVig) = params.extendedVignettingArea.fold((wSa, jSa)): f =>
+      val (w, j) = assertParity(f(pa, offset), s"$clue extended vignetting area")
+      ev.extended.foreach: e =>
+        assertPlaced(e.transform(offset, pa, Offset.Zero), w, j, s"$clue extended vignetting area")
+      (w, j)
     val prot       = params
       .protectedAreas(offsets)(using WasmShapeInterpreter)
       .lazyZip(params.protectedAreas(offsets)(using JtsShapeInterpreter))
@@ -213,17 +244,21 @@ class AgsGeometryParitySuite extends munit.FunSuite with WasmKernelSuite:
     candidates(jPf.boundingOffsets).foreach: gs =>
       val gsClue = s"$clue guide star $gs"
       assertEquals(wPf.contains(gs), jPf.contains(gs), s"$gsClue reachable")
-      assertArmOps(gsClue, params.probeArm(pa, gs, offset), wVig, jVig, prot)
+      val (wArm, jArm) = assertParity(params.probeArm(pa, gs, offset), s"$gsClue probe arm")
+      ev.arm.foreach: a =>
+        val placed = a.transform(Offset.Zero, params.probeArmAngle(pa, gs, offset), gs)
+        assertPlaced(placed, wArm, jArm, s"$gsClue probe arm")
+      assertArmOps(gsClue, wArm, jArm, wVig, jVig, prot)
 
   private def assertArmOps(
-    gsClue:  String,
-    armExpr: ShapeExpression,
-    wVig:    Shape,
-    jVig:    Shape,
-    prot:    List[(Shape, Shape, Offset)]
+    gsClue: String,
+    wArm:   Shape,
+    jArm:   Shape,
+    wVig:   Shape,
+    jVig:   Shape,
+    prot:   List[(Shape, Shape, Offset)]
   ): Unit =
-    val (wArm, jArm) = assertParity(armExpr, s"$gsClue probe arm")
-    val ext          = math.max(extent(jArm.boundingOffsets), extent(jVig.boundingOffsets))
+    val ext = math.max(extent(jArm.boundingOffsets), extent(jVig.boundingOffsets))
     assertEquals(wArm.intersects(wVig), jArm.intersects(jVig), s"$gsClue intersects vignetting area")
     val wV = attempt(s"$gsClue kernel vignetting")(wArm.intersection(wVig))
     val jV = attempt(s"$gsClue JTS vignetting")(jArm.intersection(jVig))
@@ -235,51 +270,13 @@ class AgsGeometryParitySuite extends munit.FunSuite with WasmKernelSuite:
       if !isEmpty(jI) then
         assertAngle(wI.boundingOffsets.maxSide, jI.boundingOffsets.maxSide, s"$gsClue protected overlap max side at $nz")
 
-  /**
-   * `posCalculations` evaluates a shape once and places it with `Shape.transform`. On the kernel
-   * that is one composed affine, so `placed` agrees with the direct expression only to the area
-   * and bounding-box tolerances; JTS applies the same steps and stays exact.
-   */
-  private def assertPlaced(placed: Shape, direct: ShapeExpression, clue: String): Unit =
-    val (w, j) = assertParity(direct, clue)
-    assertArea(placed.area, j.area, s"$clue placed")
-    assertEquals(placed.isEmpty, w.isEmpty, s"$clue placed emptiness")
-    assertEquals(w.isEmpty, j.isEmpty, s"$clue emptiness")
-    if !isEmpty(j) then
-      assertBounds(placed.boundingOffsets, j.boundingOffsets, s"$clue placed bbox")
-      assertOverlayArea(placed.intersection(w), w, extent(j.boundingOffsets), s"$clue placed overlap")
-
   variants.foreach: (name, params) =>
-    test(s"$name: kernel placement of the evaluated shapes matches the expressions"):
-      given ShapeInterpreter = WasmShapeInterpreter
-      val scienceArea = params.scienceAreaShape.eval
-      val patrolField = params.patrolFieldShape.eval
-      val extended    = params.extendedVignettingArea.map(f => f(Angle.Angle0, Offset.Zero).eval)
-      val arm         = params.probeArmShape match
-        case ShapeExpression.Empty => None
-        case e                     => Some(e.eval)
+    test(s"$name: AGS geometry and its placement match JTS at every PA and offset"):
+      val ev = evaluate(params)
       for
         pa     <- posAngles
         offset <- offsets
-      do
-        val clue = s"$name PA ${pa.toDoubleDegrees} offset $offset"
-        assertPlaced(scienceArea.transform(offset, pa, Offset.Zero), params.scienceArea(pa, offset), s"$clue science area")
-        assertPlaced(patrolField.transform(offset - pivot, pa, pivot), params.patrolFieldAt(pa, offset, pivot), s"$clue patrol field")
-        extended.zip(params.extendedVignettingArea).foreach: (e, f) =>
-          assertPlaced(e.transform(offset, pa, Offset.Zero), f(pa, offset), s"$clue extended vignetting area")
-        arm.foreach: a =>
-          candidates(jts(params.patrolFieldAt(pa, offset)).boundingOffsets).foreach: gs =>
-            assertPlaced(
-              a.transform(Offset.Zero, params.probeArmAngle(pa, gs, offset), gs),
-              params.probeArm(pa, gs, offset),
-              s"$clue guide star $gs probe arm"
-            )
-
-    test(s"$name: AGS geometry matches JTS at every PA and offset"):
-      for
-        pa     <- posAngles
-        offset <- offsets
-      do assertAgsOps(name, params, pa, offset)
+      do assertAgsOps(name, params, ev, pa, offset)
 
     test(s"$name: 20-offset patrol field intersection matches JTS"):
       List(posAngles(0), posAngles(3)).foreach: pa =>

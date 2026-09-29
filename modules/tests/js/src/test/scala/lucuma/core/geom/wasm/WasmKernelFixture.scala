@@ -6,6 +6,7 @@ package lucuma.core.geom.wasm
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import lucuma.core.geom.ShapeInterpreter
+import lucuma.core.geom.jts.JtsShapeInterpreter
 import munit.AnyFixture
 import munit.FunSuite
 
@@ -19,7 +20,7 @@ private[wasm] object NodeFs extends js.Object {
 }
 
 /** Loads the kernel under Node, which cannot fetch the package's own `file:` URL. */
-object WasmKernel {
+object WasmKernel:
 
   def wasmBytes: IO[js.typedarray.Uint8Array] = IO {
     val url = js.`import`.meta.asInstanceOf[js.Dynamic]
@@ -28,17 +29,18 @@ object WasmKernel {
   }
 
   def load: IO[ShapeInterpreter] = wasmBytes.flatMap(WasmGeometry.loadFrom(_))
-}
 
 /**
  * Mixin for suites that drive `WasmShapeInterpreter` explicitly: loads the kernel before the
  * suite, runs each (synchronous) test inside `withArena` and fails it if kernel handles leaked.
+ * Loading installs the kernel as `ShapeInterpreter.default`; JTS is put back after the suite.
  */
-trait WasmKernelSuite extends FunSuite {
+trait WasmKernelFixture extends FunSuite:
 
   private val kernel = new AnyFixture[Unit]("lucuma-wasm") {
     def apply(): Unit                = ()
     override def beforeAll(): Any    = WasmKernel.load.unsafeToFuture()
+    override def afterAll(): Any     = ShapeInterpreter.default = JtsShapeInterpreter
   }
 
   override def munitFixtures: Seq[AnyFixture[?]] = super.munitFixtures :+ kernel
@@ -55,4 +57,3 @@ trait WasmKernelSuite extends FunSuite {
           result
         }
     )
-}

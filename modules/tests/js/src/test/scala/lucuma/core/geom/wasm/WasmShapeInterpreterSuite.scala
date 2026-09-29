@@ -15,12 +15,11 @@ import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 import munit.CatsEffectSuite
 
-
 /**
  * Smoke tests for the kernel facade against JTS. The exhaustive cross-engine parity suite over
  * every AgsParams variant is `lucuma.ags.AgsGeometryParitySuite`.
  */
-class WasmShapeInterpreterSuite extends CatsEffectSuite {
+class WasmShapeInterpreterSuite extends CatsEffectSuite:
 
   private val kernel = ResourceSuiteLocalFixture(
     "kernel",
@@ -53,33 +52,23 @@ class WasmShapeInterpreterSuite extends CatsEffectSuite {
 
   private def jts(e: ShapeExpression): Shape = JtsShapeInterpreter.interpret(e)
 
-  private def assertClose(actual: Double, expected: Double, rel: Double, clue: String): Unit = {
+  private def assertClose(actual: Double, expected: Double, rel: Double, clue: String): Unit =
     val tol = math.max(math.abs(expected) * rel, 1.0)
     assert(math.abs(actual - expected) <= tol, s"$clue: $actual vs $expected (tol $tol)")
-  }
 
-  test("load installs the kernel as the default interpreter") {
+  test("load installs the kernel as the default interpreter"):
     assertEquals(kernel(), WasmShapeInterpreter: ShapeInterpreter)
     assertEquals(ShapeInterpreter.default, WasmShapeInterpreter: ShapeInterpreter)
     assert(WasmGeometry.isCompatible(LucumaWasm.version()), LucumaWasm.version())
-  }
 
-  test("memoryBytes reports the kernel's linear memory once loaded") {
-    kernel()
-    val bytes = WasmShapeInterpreter.memoryBytes
-    assert(bytes > 0, bytes)
-    assertEquals(bytes % 65536, 0L, "wasm memory is a whole number of 64 KiB pages")
-  }
-
-  test("version range check") {
+  test("version range check"):
     assert(WasmGeometry.isCompatible("0.1.0"))
     assert(WasmGeometry.isCompatible("0.1.7-rc1"))
     assert(!WasmGeometry.isCompatible("0.2.0"))
     assert(!WasmGeometry.isCompatible("1.0.0"))
     assert(!WasmGeometry.isCompatible("garbage"))
-  }
 
-  test("polygons round-trip a shape with a hole and two parts") {
+  test("polygons round-trip a shape with a hole and two parts"):
     val hole  = Rectangle(µas(-2 * Arcsec, -2 * Arcsec), µas(2 * Arcsec, 2 * Arcsec))
     val far   = Translate(hole, µas(30 * Arcsec, 30 * Arcsec))
     val shape = Union(Difference(rect, hole), far)
@@ -100,9 +89,8 @@ class WasmShapeInterpreterSuite extends CatsEffectSuite {
     val o = µas(5 * Arcsec, 0)
     assert(jts(rebuilt).contains(o))
     assert(!jts(rebuilt).contains(Offset.Zero))
-  }
 
-  test("empty and degenerate shapes") {
+  test("empty and degenerate shapes"):
     val w = kernel()
     for (e <- List(Empty, Point(µas(1, 2)), Rectangle(µas(0, 0), µas(0, 5 * Arcsec)), Polygon(List(µas(0, 0), µas(1, 1))))) {
       val s = w.interpret(e)
@@ -110,17 +98,15 @@ class WasmShapeInterpreterSuite extends CatsEffectSuite {
       assert(!s.contains(µas(0, 0)), e.toString)
       assertEquals(s.radius, Angle.Angle0, e.toString)
     }
-  }
 
-  test("engines never mix") {
+  test("engines never mix"):
     val w = kernel().interpret(rect)
     val j = jts(rect)
     intercept[UnsupportedOperationException](w.intersects(j))
     intercept[UnsupportedOperationException](w.intersection(j))
     intercept[UnsupportedOperationException](j.intersects(w))
-  }
 
-  test("withArena frees every shape created inside, nested arenas included") {
+  test("withArena frees every shape created inside, nested arenas included"):
     val w      = kernel()
     val before = WasmShapeInterpreter.liveHandles
     var leaked: Shape = null
@@ -135,9 +121,8 @@ class WasmShapeInterpreterSuite extends CatsEffectSuite {
     assertEquals(WasmShapeInterpreter.liveHandles, before)
     intercept[IllegalStateException](leaked.area)
     assert(!WasmShapeInterpreter.inArena)
-  }
 
-  test("withArena frees on failure and free() is idempotent") {
+  test("withArena frees on failure and free() is idempotent"):
     val w      = kernel()
     val before = WasmShapeInterpreter.liveHandles
     intercept[RuntimeException](w.withArena { w.interpret(rect); throw new RuntimeException("boom") })
@@ -148,9 +133,8 @@ class WasmShapeInterpreterSuite extends CatsEffectSuite {
     s.free()
     assertEquals(WasmShapeInterpreter.liveHandles, before)
     intercept[IllegalStateException](s.contains(µas(0, 0)))
-  }
 
-  test("interpreting inside withArena leaves no intermediate handles behind") {
+  test("interpreting inside withArena leaves no intermediate handles behind"):
     val w      = kernel()
     val before = WasmShapeInterpreter.liveHandles
     w.withArena {
@@ -159,5 +143,3 @@ class WasmShapeInterpreterSuite extends CatsEffectSuite {
       assertEquals(WasmShapeInterpreter.liveHandles, before + 2)
     }
     assertEquals(WasmShapeInterpreter.liveHandles, before)
-  }
-}

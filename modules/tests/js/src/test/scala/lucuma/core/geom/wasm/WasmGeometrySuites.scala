@@ -8,7 +8,7 @@ import lucuma.core.geom.ShapeExpressionTests
 // The shape expression laws, run against the kernel instead of JTS.
 class WasmShapeExpressionSuite
     extends ShapeExpressionTests(using WasmShapeInterpreter)
-    with WasmKernelSuite {
+    with WasmKernelFixture {
   // Overlay identities hold to the parity budget (1e-7 relative), not to JTS's 700 µas².
   override protected def overlayAreaTolerance(nominal: Long): Double =
     math.max(700.0, nominal.toDouble.abs * 1e-7)
