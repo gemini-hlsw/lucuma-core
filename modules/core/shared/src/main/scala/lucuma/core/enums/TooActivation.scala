@@ -3,6 +3,7 @@
 
 package lucuma.core.enums
 
+import cats.syntax.eq.*
 import lucuma.core.util.Enumerated
 
 /**
@@ -10,18 +11,19 @@ import lucuma.core.util.Enumerated
  * both as a proposal-level ceiling (the maximum an observation in the program
  * may reach) and as the observation's own value.
  *
- * An observation does not declare its activation. It is derived from whether the
- * observation is a Target of Opportunity -- that is, whether its asterism holds
- * an opportunity target -- together with its [[SchedulingMode]]; see
- * [[TooActivation.fromSchedulingMode]].
+ * This is a declared value, not a derived one: an observation is a Target of
+ * Opportunity exactly when its activation is above `None`, whatever its asterism
+ * holds.  It answers what the observation may do *to others*; what may be done
+ * *to it* is the other axis, [[SchedulingMode]].
+ *
+ * There is deliberately no level between `None` and `Rapid`.  A "standard" ToO,
+ * content to be observed whenever convenient once its event arrives, would be
+ * scheduled exactly like ordinary science and so is simply `None`.
  */
 enum TooActivation(val tag: String, val label: String) derives Enumerated:
 
-  /** Not a Target of Opportunity. */
+  /** Not a Target of Opportunity; observed whenever convenient. */
   case None extends TooActivation("none", "None")
-
-  /** Observed whenever convenient, like any other observation. */
-  case Standard extends TooActivation("standard", "Standard")
 
   /** Observed as soon as possible, but does not displace ongoing work. */
   case Rapid extends TooActivation("rapid", "Rapid")
@@ -29,18 +31,36 @@ enum TooActivation(val tag: String, val label: String) derives Enumerated:
   /** Observed as soon as possible, displacing ongoing work where permitted. */
   case Interrupting extends TooActivation("interrupting", "Interrupting")
 
-object TooActivation:
+  /** Whether this is a Target of Opportunity at all. */
+  def isToo: Boolean =
+    this =!= TooActivation.None
 
   /**
-   * Which kind of Target of Opportunity an observation scheduled in `mode` is.
-   *
-   * This assumes the observation is one -- that its asterism holds an
-   * opportunity target -- and answers only which kind; asking is what says so.
-   * An observation without an opportunity target has activation `None` whatever
-   * its mode, and the caller answers that before reaching here.
+   * Whether this activation obliges the observation to be
+   * [[SchedulingMode.Uninterruptible]], which is true of every Target of
+   * Opportunity.  One that displaces other science must not itself be
+   * displaceable, and one promised as soon as possible should not be broken up
+   * once it starts.
    */
-  def fromSchedulingMode(mode: SchedulingMode): TooActivation =
-    mode match
-      case SchedulingMode.Unconstrained | SchedulingMode.NoSplitting => TooActivation.Standard
-      case SchedulingMode.Uninterruptible                            => TooActivation.Rapid
-      case SchedulingMode.Interrupting                               => TooActivation.Interrupting
+  def requiresUninterruptible: Boolean =
+    isToo
+
+  /**
+   * Whether this activation may be paired with `mode`.  The single rule relating
+   * the two axes: a Target of Opportunity requires `Uninterruptible`, and an
+   * observation that is not one may take any mode.
+   */
+  def isCompatibleWith(mode: SchedulingMode): Boolean =
+    !requiresUninterruptible || mode === SchedulingMode.Uninterruptible
+
+  /**
+   * Whether an observation at this activation may displace one already running
+   * in `victim`.
+   *
+   * Only `Interrupting` displaces anything, and never something
+   * `Uninterruptible` -- which by [[requiresUninterruptible]] includes every
+   * Target of Opportunity.  So no Target of Opportunity can ever preempt another,
+   * and the Scheduler never has to choose between two of them mid-execution.
+   */
+  def canPreempt(victim: SchedulingMode): Boolean =
+    this === TooActivation.Interrupting && victim.isInterruptible

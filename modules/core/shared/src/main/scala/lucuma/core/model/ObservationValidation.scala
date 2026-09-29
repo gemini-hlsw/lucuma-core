@@ -50,3 +50,6 @@ object ObservationValidation:
 
     def configuration(msg: String, moreMsgs: String*): ObservationValidation =
       fromMsgs(ConfigurationWarning, msg, moreMsgs*)
+
+    def tooActivationUnexpected(msg: String, moreMsgs: String*): ObservationValidation =
+      fromMsgs(TooActivationUnexpected, msg, moreMsgs*)
