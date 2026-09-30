@@ -22,8 +22,10 @@ object ObservationValidation:
     ObservationValidation(code, NonEmptyChain.of(msg, moreMsgs*))
   def configuration(msg: String, moreMsgs: String*): ObservationValidation =
     fromMsgs(ConfigurationError, msg, moreMsgs*)
-  def callForProposals(msg: String, moreMsgs: String*): ObservationValidation =
+  def callForProposalsError(msg: String, moreMsgs: String*): ObservationValidation =
     fromMsgs(CallForProposalsError, msg, moreMsgs*)
+  def callForProposalsWarning(msg: String, moreMsgs: String*): ObservationValidation =
+    fromMsgs(CallForProposalsWarning, msg, moreMsgs*)
   def itc(msg: String, moreMsgs: String*): ObservationValidation =
     fromMsgs(ItcError, msg, moreMsgs*)
   def configurationRequestUnavailable: ObservationValidation =
