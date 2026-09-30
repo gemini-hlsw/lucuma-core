@@ -36,7 +36,11 @@ class WasmShapeInterpreterSuite extends CatsEffectSuite:
     Ellipse(µas(-8 * Arcsec, -3 * Arcsec), µas(4 * Arcsec, 9 * Arcsec))
 
   private val arc: ShapeExpression =
-    ClosedArc(µas(-6 * Arcsec, -6 * Arcsec), µas(6 * Arcsec, 6 * Arcsec), Angle.Angle0, Angle.Angle90)
+    ClosedArc(µas(-6 * Arcsec, -6 * Arcsec),
+              µas(6 * Arcsec, 6 * Arcsec),
+              Angle.Angle0,
+              Angle.Angle90
+    )
 
   private val overlay: ShapeExpression =
     Intersection(
@@ -62,11 +66,11 @@ class WasmShapeInterpreterSuite extends CatsEffectSuite:
     assert(!WasmGeometry.isCompatible("garbage"))
 
   test("polygons round-trip a shape with a hole and two parts"):
-    val hole  = Rectangle(µas(-2 * Arcsec, -2 * Arcsec), µas(2 * Arcsec, 2 * Arcsec))
-    val far   = Translate(hole, µas(30 * Arcsec, 30 * Arcsec))
-    val shape = Union(Difference(rect, hole), far)
-    val w     = kernel().interpret(shape)
-    val j     = jts(shape)
+    val hole    = Rectangle(µas(-2 * Arcsec, -2 * Arcsec), µas(2 * Arcsec, 2 * Arcsec))
+    val far     = Translate(hole, µas(30 * Arcsec, 30 * Arcsec))
+    val shape   = Union(Difference(rect, hole), far)
+    val w       = kernel().interpret(shape)
+    val j       = jts(shape)
     assertEquals(w.polygons.length, 2)
     assertEquals(w.polygons.map(_.holes.length).sorted, List(0, 1))
     assertEquals(j.polygons.length, 2)
@@ -79,13 +83,19 @@ class WasmShapeInterpreterSuite extends CatsEffectSuite:
       1e-7,
       "rebuilt area"
     )
-    val o = µas(5 * Arcsec, 0)
+    val o       = µas(5 * Arcsec, 0)
     assert(jts(rebuilt).contains(o))
     assert(!jts(rebuilt).contains(Offset.Zero))
 
   test("empty and degenerate shapes"):
     val w = kernel()
-    for (e <- List(Empty, Point(µas(1, 2)), Rectangle(µas(0, 0), µas(0, 5 * Arcsec)), Polygon(List(µas(0, 0), µas(1, 1))))) {
+    for (
+      e <- List(Empty,
+                Point(µas(1, 2)),
+                Rectangle(µas(0, 0), µas(0, 5 * Arcsec)),
+                Polygon(List(µas(0, 0), µas(1, 1)))
+           )
+    ) {
       val s = w.interpret(e)
       assertEquals(s.area.toMicroarcsecondsSquared, 0L, e.toString)
       assert(!s.contains(µas(0, 0)), e.toString)
@@ -100,10 +110,10 @@ class WasmShapeInterpreterSuite extends CatsEffectSuite:
     intercept[UnsupportedOperationException](j.intersects(w))
 
   test("withArena frees every shape created inside, nested arenas included"):
-    val w      = kernel()
-    val before = WasmShapeInterpreter.liveHandles
+    val w             = kernel()
+    val before        = WasmShapeInterpreter.liveHandles
     var leaked: Shape = null
-    val area = w.withArena {
+    val area          = w.withArena {
       val s1 = w.interpret(overlay)
       val a2 = w.withArena(w.interpret(rect).intersection(w.interpret(ellipse)).area)
       leaked = s1
@@ -118,9 +128,11 @@ class WasmShapeInterpreterSuite extends CatsEffectSuite:
   test("withArena frees on failure and free() is idempotent"):
     val w      = kernel()
     val before = WasmShapeInterpreter.liveHandles
-    intercept[RuntimeException](w.withArena { w.interpret(rect); throw new RuntimeException("boom") })
+    intercept[RuntimeException](w.withArena {
+      w.interpret(rect); throw new RuntimeException("boom")
+    })
     assertEquals(WasmShapeInterpreter.liveHandles, before)
-    val s = w.interpret(rect).asInstanceOf[WasmShape]
+    val s      = w.interpret(rect).asInstanceOf[WasmShape]
     assertEquals(WasmShapeInterpreter.liveHandles, before + 1)
     s.free()
     s.free()

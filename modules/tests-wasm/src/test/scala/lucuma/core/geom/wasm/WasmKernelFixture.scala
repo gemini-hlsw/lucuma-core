@@ -22,7 +22,8 @@ private[wasm] object NodeFs extends js.Object {
 object WasmKernel:
 
   def wasmBytes: IO[js.typedarray.Uint8Array] = IO {
-    val url = js.`import`.meta.asInstanceOf[js.Dynamic]
+    val url = js.`import`.meta
+      .asInstanceOf[js.Dynamic]
       .resolve("@gemini-hlsw/lucuma-wasm/lucuma_wasm_bg.wasm")
     NodeFs.readFileSync(js.Dynamic.newInstance(js.Dynamic.global.URL)(url))
   }
@@ -30,14 +31,14 @@ object WasmKernel:
   def load: IO[ShapeInterpreter] = wasmBytes.flatMap(WasmGeometry.loadFrom(_))
 
 /**
- * Mixin for suites that drive `WasmShapeInterpreter` explicitly: loads the kernel before the
- * suite, runs each (synchronous) test inside `withArena` and fails it if kernel handles leaked.
+ * Mixin for suites that drive `WasmShapeInterpreter` explicitly: loads the kernel before the suite,
+ * runs each (synchronous) test inside `withArena` and fails it if kernel handles leaked.
  */
 trait WasmKernelFixture extends FunSuite:
 
   private val kernel = new AnyFixture[Unit]("lucuma-wasm") {
-    def apply(): Unit                = ()
-    override def beforeAll(): Any    = WasmKernel.load.unsafeToFuture()
+    def apply(): Unit             = ()
+    override def beforeAll(): Any = WasmKernel.load.unsafeToFuture()
   }
 
   override def munitFixtures: Seq[AnyFixture[?]] = super.munitFixtures :+ kernel

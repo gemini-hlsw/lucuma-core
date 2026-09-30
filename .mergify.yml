@@ -121,3 +121,11 @@ pull_request_rules:
       add:
       - tests
       remove: []
+- name: Label tests-wasm PRs
+  conditions:
+  - files~=^modules/tests-wasm/
+  actions:
+    label:
+      add:
+      - tests-wasm
+      remove: []

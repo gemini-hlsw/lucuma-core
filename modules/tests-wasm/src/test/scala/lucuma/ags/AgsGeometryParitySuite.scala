@@ -31,17 +31,16 @@ import lucuma.core.model.sequence.flamingos2.Flamingos2FpuMask
  * patrol-field reachability, probe-arm vignetting area and protected-area overlap.
  *
  * Tolerances: area within 1e-7 relative, bounding boxes and radii within 2 µas (5 µas after an
- * overlay), `contains` and
- * `intersects` exact.
+ * overlay), `contains` and `intersects` exact.
  */
 class AgsGeometryParitySuite extends munit.FunSuite with WasmKernelFixture:
 
-  private val AreaRel  = 1e-7
+  private val AreaRel         = 1e-7
   // Both engines truncate to whole µas; float noise either side of a µas boundary leaves 1-2 µas.
   private val AngleTol        = 2L
   // Overlay results also carry the kernel's snapping grid, see OverlayGridSteps.
   private val OverlayAngleTol = 5L
-  private val GridN    = 11
+  private val GridN           = 11
 
   // The kernel's overlay (i_overlay via geo) snaps vertices to a grid of 2^29 steps.
   private val OverlayGridSteps = math.pow(2, 29)
@@ -93,13 +92,18 @@ class AgsGeometryParitySuite extends munit.FunSuite with WasmKernelFixture:
           AgsParams.Flamingos2Mos(Flamingos2LyotWheel.F16, PortDisposition.Side),
         "IGRINS-2"                    -> AgsParams.Igrins2LongSlit(),
         "GNIRS long slit"             ->
-          AgsParams.GnirsLongSlit(GnirsFpuSlit.LongSlit_0_30, GnirsCamera.ShortBlue, GnirsPrism.Mirror),
+          AgsParams.GnirsLongSlit(GnirsFpuSlit.LongSlit_0_30,
+                                  GnirsCamera.ShortBlue,
+                                  GnirsPrism.Mirror
+          ),
         "GNIRS imaging keyhole"       ->
           AgsParams.GnirsImaging(GnirsCamera.LongRed, GnirsFilter.Order4),
         "GNIRS IFU"                   -> AgsParams.GnirsIfu(GnirsFpuIfu.LowResolution),
         // Altair: the AOWFS has its own oval patrol field and no arm in the beam; LGS+P1 guides on PWFS1.
         "GNIRS imaging Altair NGS"    ->
-          AgsParams.GnirsImaging(GnirsCamera.ShortBlue, GnirsFilter.Order4).withAltair(AltairMode.Ngs),
+          AgsParams
+            .GnirsImaging(GnirsCamera.ShortBlue, GnirsFilter.Order4)
+            .withAltair(AltairMode.Ngs),
         "GNIRS long slit Altair LGS"  ->
           AgsParams
             .GnirsLongSlit(GnirsFpuSlit.LongSlit_0_30, GnirsCamera.ShortBlue, GnirsPrism.Mirror)
@@ -111,7 +115,7 @@ class AgsGeometryParitySuite extends munit.FunSuite with WasmKernelFixture:
         "Visitor 30/10"               -> AgsParams.Visitor(30.arcsec, 10.arcsec)
       )
 
-  private def jts(e: ShapeExpression): Shape  = JtsShapeInterpreter.interpret(e)
+  private def jts(e:  ShapeExpression): Shape = JtsShapeInterpreter.interpret(e)
   private def wasm(e: ShapeExpression): Shape = WasmShapeInterpreter.interpret(e)
 
   private def µas(a: Angle): Long = Angle.signedMicroarcseconds.get(a)
@@ -132,7 +136,8 @@ class AgsGeometryParitySuite extends munit.FunSuite with WasmKernelFixture:
   private def assertOverlayArea(wi: Shape, ji: Shape, ext: Double, clue: String): Unit =
     val a    = wi.area.toMicroarcsecondsSquared.toDouble
     val b    = ji.area.toMicroarcsecondsSquared.toDouble
-    val snap = if isEmpty(ji) then 0.0 else 2.0 * (ext / OverlayGridSteps) * perimeter(ji.boundingOffsets)
+    val snap =
+      if isEmpty(ji) then 0.0 else 2.0 * (ext / OverlayGridSteps) * perimeter(ji.boundingOffsets)
     val tol  = math.max(math.max(b.abs * AreaRel, snap), 1.0)
     assert((a - b).abs <= tol, s"$clue: area $a vs JTS $b (tol $tol, snap $snap)")
 
@@ -220,7 +225,11 @@ class AgsGeometryParitySuite extends munit.FunSuite with WasmKernelFixture:
     assertEquals(w.isEmpty, j.isEmpty, s"$clue emptiness")
     if !isEmpty(j) then
       assertBounds(placed.boundingOffsets, j.boundingOffsets, s"$clue placed bbox")
-      assertOverlayArea(placed.intersection(w), w, extent(j.boundingOffsets), s"$clue placed overlap")
+      assertOverlayArea(placed.intersection(w),
+                        w,
+                        extent(j.boundingOffsets),
+                        s"$clue placed overlap"
+      )
 
   private def assertAgsOps(
     name:   String,
@@ -229,23 +238,27 @@ class AgsGeometryParitySuite extends munit.FunSuite with WasmKernelFixture:
     pa:     Angle,
     offset: Offset
   ): Unit =
-    val clue       = s"$name PA ${pa.toDoubleDegrees} offset $offset"
-    val (wPf, jPf) = assertParity(params.patrolFieldAt(pa, offset, pivot), s"$clue patrol field")
-    assertPlaced(ev.patrolField.transform(offset - pivot, pa, pivot), wPf, jPf, s"$clue patrol field")
-    val (wSa, jSa) = assertParity(params.scienceArea(pa, offset), s"$clue science area")
+    val clue         = s"$name PA ${pa.toDoubleDegrees} offset $offset"
+    val (wPf, jPf)   = assertParity(params.patrolFieldAt(pa, offset, pivot), s"$clue patrol field")
+    assertPlaced(ev.patrolField.transform(offset - pivot, pa, pivot),
+                 wPf,
+                 jPf,
+                 s"$clue patrol field"
+    )
+    val (wSa, jSa)   = assertParity(params.scienceArea(pa, offset), s"$clue science area")
     assertPlaced(ev.scienceArea.transform(offset, pa, Offset.Zero), wSa, jSa, s"$clue science area")
     val (wVig, jVig) = params.extendedVignettingArea.fold((wSa, jSa)): f =>
       val (w, j) = assertParity(f(pa, offset), s"$clue extended vignetting area")
       ev.extended.foreach: e =>
         assertPlaced(e.transform(offset, pa, Offset.Zero), w, j, s"$clue extended vignetting area")
       (w, j)
-    val prot       = params
+    val prot         = params
       .protectedAreas(offsets)(using WasmShapeInterpreter)
       .lazyZip(params.protectedAreas(offsets)(using JtsShapeInterpreter))
       .lazyZip(offsets)
       .toList
     candidates(jPf.boundingOffsets).foreach: gs =>
-      val gsClue = s"$clue guide star $gs"
+      val gsClue       = s"$clue guide star $gs"
       assertEquals(wPf.contains(gs), jPf.contains(gs), s"$gsClue reachable")
       val (wArm, jArm) = assertParity(params.probeArm(pa, gs, offset), s"$gsClue probe arm")
       ev.arm.foreach: a =>
@@ -262,14 +275,20 @@ class AgsGeometryParitySuite extends munit.FunSuite with WasmKernelFixture:
     prot:   List[(Shape, Shape, Offset)]
   ): Unit =
     val ext = math.max(extent(jArm.boundingOffsets), extent(jVig.boundingOffsets))
-    assertEquals(wArm.intersects(wVig), jArm.intersects(jVig), s"$gsClue intersects vignetting area")
-    val wV = attempt(s"$gsClue kernel vignetting")(wArm.intersection(wVig))
-    val jV = attempt(s"$gsClue JTS vignetting")(jArm.intersection(jVig))
+    assertEquals(wArm.intersects(wVig),
+                 jArm.intersects(jVig),
+                 s"$gsClue intersects vignetting area"
+    )
+    val wV  = attempt(s"$gsClue kernel vignetting")(wArm.intersection(wVig))
+    val jV  = attempt(s"$gsClue JTS vignetting")(jArm.intersection(jVig))
     assertOverlayArea(wV, jV, ext, s"$gsClue vignetting")
     prot.foreach: (wP, jP, nz) =>
       val wI = attempt(s"$gsClue kernel protected overlap at $nz")(wArm.intersection(wP))
       val jI = attempt(s"$gsClue JTS protected overlap at $nz")(jArm.intersection(jP))
-      assertEquals(overlaps(wArm, wP), overlaps(jArm, jP), s"$gsClue overlaps protected area at $nz")
+      assertEquals(overlaps(wArm, wP),
+                   overlaps(jArm, jP),
+                   s"$gsClue overlaps protected area at $nz"
+      )
       if !isEmpty(jI) then
         assertAngle(
           wI.boundingOffsets.maxSide,
@@ -288,20 +307,28 @@ class AgsGeometryParitySuite extends munit.FunSuite with WasmKernelFixture:
 
     test(s"$name: 20-offset patrol field intersection matches JTS"):
       List(posAngles(0), posAngles(3)).foreach: pa =>
-        val chain = ditherOffsets.map(o => params.patrolFieldAt(pa, o)).reduce(_ ∩ _)
+        val chain  = ditherOffsets.map(o => params.patrolFieldAt(pa, o)).reduce(_ ∩ _)
         val (w, j) = assertParity(chain, s"$name PA ${pa.toDoubleDegrees} dither chain")
         assertParity(chain.boundingBox, s"$name PA ${pa.toDoubleDegrees} dither chain bbox")
-        assertEquals(isEmpty(w), isEmpty(j), s"$name PA ${pa.toDoubleDegrees} dither chain emptiness")
+        assertEquals(isEmpty(w),
+                     isEmpty(j),
+                     s"$name PA ${pa.toDoubleDegrees} dither chain emptiness"
+        )
 
   test("visualization frees the shapes it evaluates"):
     given ShapeInterpreter = WasmShapeInterpreter
-    val params    = AgsParams.GmosImaging(PortDisposition.Side)
-    val sci       = ScienceOffsets(NonEmptySet.of(Offset.Zero.guided, off(10, -5).guided))
-    val positions = Ags
-      .generatePositions(Some(Coordinates.Zero), None, NonEmptyList.of(posAngles(0), posAngles(1)), None, Some(sci))
+    val params             = AgsParams.GmosImaging(PortDisposition.Side)
+    val sci                = ScienceOffsets(NonEmptySet.of(Offset.Zero.guided, off(10, -5).guided))
+    val positions          = Ags
+      .generatePositions(Some(Coordinates.Zero),
+                         None,
+                         NonEmptyList.of(posAngles(0), posAngles(1)),
+                         None,
+                         Some(sci)
+      )
       .value
       .toNonEmptyList
-    val before    = WasmShapeInterpreter.liveHandles
+    val before             = WasmShapeInterpreter.liveHandles
     AgsVisualization.patrolFieldGeometries(params, positions)
     AgsVisualization.scienceOverlapVisualization(params, positions.head, off(60, 30))
     assertEquals(WasmShapeInterpreter.liveHandles, before)

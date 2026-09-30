@@ -54,7 +54,7 @@ lazy val spireVersion               = "0.18.0"
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
-val root = tlCrossRootProject.aggregate(core, testkit, tests, catalog, ags, catalogTestkit, catalogTests, horizons, horizonsTests, itac, benchmarks, npm)
+val root = tlCrossRootProject.aggregate(core, testkit, tests, testsWasm, catalog, ags, catalogTestkit, catalogTests, horizons, horizonsTests, itac, benchmarks, npm)
 
 lazy val core = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Full)
@@ -130,11 +130,6 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform)
     )
   )
   .jvmConfigure(_.enablePlugins(AutomateHeaderPlugin))
-  .jsSettings(
-    // ES modules so the wasm kernel tests can import the npm package from <repo>/node_modules
-    scalaJSLinkerConfig ~= (_.withModuleKind(ModuleKind.ESModule)
-      .withOutputPatterns(OutputPatterns.fromJSFile("%s.mjs")))
-  )
   .jvmSettings(
     resolvers += "Gemini Repository".at(
       "https://github.com/gemini-hlsw/maven-repo/raw/master/releases"
@@ -146,6 +141,23 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform)
         .exclude("org.scala-lang.modules", "scala-xml_2.13"),
       "com.47deg"       %% "scalacheck-toolbox-datetime" % "0.7.0"       % Test
     )
+  )
+
+// The wasm kernel suites import the npm package from <repo>/node_modules, so they live apart
+// and only this module needs `npm ci`.
+lazy val testsWasm = project
+  .in(file("modules/tests-wasm"))
+  .enablePlugins(ScalaJSPlugin, NoPublishPlugin, AutomateHeaderPlugin)
+  .dependsOn(tests.js % "test->test")
+  .settings(
+    name := "lucuma-core-tests-wasm",
+    libraryDependencies ++= Seq(
+      "org.scalameta" %%% "munit"             % munitVersion           % Test,
+      "org.typelevel" %%% "discipline-munit"  % munitDisciplineVersion % Test,
+      "org.typelevel" %%% "munit-cats-effect" % munitCatsEffectVersion % Test
+    ),
+    scalaJSLinkerConfig ~= (_.withModuleKind(ModuleKind.ESModule)
+      .withOutputPatterns(OutputPatterns.fromJSFile("%s.mjs")))
   )
 
 lazy val catalog = crossProject(JVMPlatform, JSPlatform)
