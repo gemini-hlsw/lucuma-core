@@ -89,12 +89,14 @@ object WasmShapeInterpreter extends ShapeInterpreter:
     val s = new WasmShape(h)
     arenas match {
       case arena :: _ => arena += s
-      case Nil        => registry.register(s, h, s)
+      case Nil        =>
+        registry.register(s, h, s)
+        s.registered = true
     }
     s
 
   private[wasm] def release(s: WasmShape): Unit =
-    registry.unregister(s)
+    if (s.registered) registry.unregister(s): Unit
     LucumaWasm.free(s.handle)
 
   private def rectBounded(a: Offset, b: Offset)(f: (Double, Double, Double, Double) => Int): Int =

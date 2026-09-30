@@ -11,6 +11,8 @@ import lucuma.core.geom.ShapePolygon
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 
+import scala.scalajs.js.typedarray.Float64Array
+
 /**
  * A `Shape` backed by a geometry in the wasm kernel's arena. The handle is released when the
  * enclosing `WasmShapeInterpreter.withArena` block ends, by `free()`, or by the JS garbage
@@ -19,6 +21,9 @@ import lucuma.core.math.Offset
 final class WasmShape private[wasm] (private[wasm] val handle: Int) extends Shape:
 
   private var released: Boolean = false
+
+  // Set when the garbage-collector cleanup owns the handle, i.e. it was created outside any arena.
+  private[wasm] var registered: Boolean = false
 
   private[wasm] def isReleased: Boolean = released
 
@@ -36,13 +41,15 @@ final class WasmShape private[wasm] (private[wasm] val handle: Int) extends Shap
       WasmShapeInterpreter.release(this)
     }
 
-  def boundingOffsets: BoundingOffsets =
-    val b = LucumaWasm.bbox(h)
-    if (b(0).isNaN) BoundingOffsets(Offset.Zero, Offset.Zero)
+  // Shapes never change, so the kernel is asked for the box once; the AGS loop reads it per star.
+  private lazy val bbox: Float64Array = LucumaWasm.bbox(h)
+
+  lazy val boundingOffsets: BoundingOffsets =
+    if (bbox(0).isNaN) BoundingOffsets(Offset.Zero, Offset.Zero)
     else
       BoundingOffsets(
-        WasmCoords.toOffset(b(0), b(3)),
-        WasmCoords.toOffset(b(2), b(1))
+        WasmCoords.toOffset(bbox(0), bbox(3)),
+        WasmCoords.toOffset(bbox(2), bbox(1))
       )
 
   def contains(o: Offset): Boolean =
@@ -59,7 +66,7 @@ final class WasmShape private[wasm] (private[wasm] val handle: Int) extends Shap
       .maxByOption(i => cs(i) * cs(i) + cs(i + 1) * cs(i + 1))
       .fold(Angle.Angle0)(i => WasmCoords.toOffset(cs(i), cs(i + 1)).distance(Offset.Zero))
 
-  def isEmpty: Boolean = LucumaWasm.bbox(h)(0).isNaN
+  lazy val isEmpty: Boolean = bbox(0).isNaN
 
   // One affine call with the composed matrix; agrees with the three-step expression to the last
   // bits only, so tests compare with a tolerance.
