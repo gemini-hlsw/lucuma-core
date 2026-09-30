@@ -9,7 +9,9 @@ import cats.kernel.Order
 import cats.syntax.all.*
 import lucuma.core.enums.AltairMode
 import lucuma.core.enums.Flamingos2Disperser
+import lucuma.core.enums.Flamingos2Filter
 import lucuma.core.enums.Flamingos2LyotWheel
+import lucuma.core.enums.GhostResolutionMode
 import lucuma.core.enums.GmosNorthFilter
 import lucuma.core.enums.GmosNorthGrating
 import lucuma.core.enums.GmosNorthIfuFpu
@@ -17,6 +19,7 @@ import lucuma.core.enums.GmosSouthFilter
 import lucuma.core.enums.GmosSouthGrating
 import lucuma.core.enums.GmosSouthIfuFpu
 import lucuma.core.enums.GnirsCamera
+import lucuma.core.enums.GnirsFilter
 import lucuma.core.enums.GnirsFpuIfu
 import lucuma.core.enums.GnirsGrating
 import lucuma.core.enums.GnirsPrism
@@ -86,10 +89,10 @@ object Configuration:
   // The radius is used to allow the user to move the base position around without needing approval.
   // We limit this to the radius of the FOV, so you can move the base position anywhere that would be visible from the approved position.
   sealed abstract class ObservingMode(val tpe: ObservingModeType, val radius: Angle):
-    def flamingos2Imaging:  Option[Flamingos2Imaging.type] = Some(this).collect { case m: Flamingos2Imaging.type => m }
+    def flamingos2Imaging:  Option[Flamingos2Imaging   ] = Some(this).collect { case m: Flamingos2Imaging    => m }
     def flamingos2LongSlit: Option[Flamingos2LongSlit  ] = Some(this).collect { case m: Flamingos2LongSlit   => m }
     def flamingos2Mos:      Option[Flamingos2Mos       ] = Some(this).collect { case m: Flamingos2Mos        => m }
-    def ghostIfu:           Option[GhostIfu.type       ] = Some(this).collect { case m: GhostIfu.type        => m }
+    def ghostIfu:           Option[GhostIfu            ] = Some(this).collect { case m: GhostIfu             => m }
     def gmosNorthIfu:       Option[GmosNorthIfu        ] = Some(this).collect { case m: GmosNorthIfu         => m }
     def gmosNorthImaging:   Option[GmosNorthImaging    ] = Some(this).collect { case m: GmosNorthImaging     => m }
     def gmosNorthLongSlit:  Option[GmosNorthLongSlit   ] = Some(this).collect { case m: GmosNorthLongSlit    => m }
@@ -100,7 +103,7 @@ object Configuration:
     def gmosSouthMos:       Option[GmosSouthMos        ] = Some(this).collect { case m: GmosSouthMos         => m }
     def gnirsLongSlit:      Option[GnirsLongSlit       ] = Some(this).collect { case m: GnirsLongSlit        => m }
     def gnirsIfu:           Option[GnirsIfu            ] = Some(this).collect { case m: GnirsIfu             => m }
-    def gnirsImaging:       Option[GnirsImaging.type   ] = Some(this).collect { case m: GnirsImaging.type    => m }
+    def gnirsImaging:       Option[GnirsImaging        ] = Some(this).collect { case m: GnirsImaging         => m }
     def igrins2LongSlit:    Option[Igrins2LongSlit.type] = Some(this).collect { case m: Igrins2LongSlit.type => m }
     def visitor:            Option[Visitor]              = Some(this).collect { case m: Visitor              => m }
 
@@ -108,7 +111,7 @@ object Configuration:
       (this, other) match
         case (Flamingos2LongSlit(d1),    Flamingos2LongSlit(d2)) => d1 === d2
         case (Flamingos2Mos(d1),         Flamingos2Mos(d2))      => d1 === d2
-        case (GhostIfu,                  GhostIfu)               => true
+        case (GhostIfu(r1),              GhostIfu(r2))           => r1 === r2
         case (GmosNorthLongSlit(g1),     GmosNorthLongSlit(g2))  => g1 === g2
         case (GmosNorthMos(g1),          GmosNorthMos(g2))       => g1 === g2
         case (GmosSouthLongSlit(g1),     GmosSouthLongSlit(g2))  => g1 === g2
@@ -126,10 +129,9 @@ object Configuration:
         case (GmosNorthImaging(_),       GmosNorthImaging(_))       => true // f2.forall(f1.contains)
         case (GmosSouthImaging(_),       GmosSouthImaging(_))       => true // f2.forall(f1.contains)
 
-        // The Flamingos-2 and GNIRS imaging configurations carry no parameters at all, for the
-        // same reason: their filter sets would be subject to the relaxation above anyway.
-        case (Flamingos2Imaging,         Flamingos2Imaging)         => true
-        case (GnirsImaging,              GnirsImaging)              => true
+        // The Flamingos-2 and GNIRS imaging filter sets are relaxed in the same way.
+        case (Flamingos2Imaging(_),      Flamingos2Imaging(_))      => true // f2.forall(f1.contains)
+        case (GnirsImaging(_),           GnirsImaging(_))           => true // f2.forall(f1.contains)
 
         case (Igrins2LongSlit,           Igrins2LongSlit)           => true
         case (GnirsLongSlit(g1, c1, p1), GnirsLongSlit(g2, c2, p2)) => g1 === g2 && c1 === c2 && p1 === p2
@@ -166,10 +168,10 @@ object Configuration:
           case GnirsFpuIfu.HighResolution => gnirs.IfuHighResHeight
         height.bisect
 
-    case object Flamingos2Imaging extends ObservingMode(ObservingModeType.Flamingos2Imaging, Radii.Flamingos2Imaging)
+    case class Flamingos2Imaging(filters: List[Flamingos2Filter]) extends ObservingMode(ObservingModeType.Flamingos2Imaging, Radii.Flamingos2Imaging)
     case class Flamingos2LongSlit(disperser: Flamingos2Disperser) extends ObservingMode(ObservingModeType.Flamingos2LongSlit, Radii.Flamingos2LongSlit)
     case class Flamingos2Mos(disperser: Flamingos2Disperser) extends ObservingMode(ObservingModeType.Flamingos2Mos, Radii.Flamingos2Mos)
-    case object GhostIfu extends ObservingMode(ObservingModeType.GhostIfu, Radii.GhostIfu)
+    case class GhostIfu(resolutionMode: GhostResolutionMode) extends ObservingMode(ObservingModeType.GhostIfu, Radii.GhostIfu)
     case class GmosNorthIfu(grating: GmosNorthGrating, fpu: GmosNorthIfuFpu) extends ObservingMode(ObservingModeType.GmosNorthIfu, Radii.gmosIfu(fpu.fieldWidth))
     case class GmosNorthImaging(filters: List[GmosNorthFilter]) extends ObservingMode(ObservingModeType.GmosNorthImaging, Radii.GmosImaging)
     case class GmosNorthLongSlit(grating: GmosNorthGrating) extends ObservingMode(ObservingModeType.GmosNorthLongSlit, Radii.GmosLongSlit)
@@ -180,6 +182,6 @@ object Configuration:
     case class GmosSouthMos(grating: GmosSouthGrating) extends ObservingMode(ObservingModeType.GmosSouthMos, Radii.GmosMos)
     case class GnirsLongSlit(grating: GnirsGrating, camera: GnirsCamera, prism: GnirsPrism) extends ObservingMode(ObservingModeType.GnirsLongSlit, Radii.gnirsLongSlit(camera, prism))
     case class GnirsIfu(grating: GnirsGrating, fpu: GnirsFpuIfu) extends ObservingMode(ObservingModeType.GnirsIfu, Radii.gnirsIfu(fpu))
-    case object GnirsImaging extends ObservingMode(ObservingModeType.GnirsImaging, Radii.GnirsImaging)
+    case class GnirsImaging(filters: List[GnirsFilter]) extends ObservingMode(ObservingModeType.GnirsImaging, Radii.GnirsImaging)
     case object Igrins2LongSlit extends ObservingMode(ObservingModeType.Igrins2LongSlit, Radii.Igrins2LongSlit)
     case class Visitor(mode: VisitorObservingModeType, override val radius: Angle) extends ObservingMode(mode, radius)

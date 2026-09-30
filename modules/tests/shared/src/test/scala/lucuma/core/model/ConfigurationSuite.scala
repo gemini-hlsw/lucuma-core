@@ -53,14 +53,18 @@ final class ConfigurationSuite extends ScalaCheckSuite:
     assert(problems.isEmpty, problems.mkString("\n"))
 
   test("Flamingos2 Imaging has no constraints"):
-    forAll: (cfg: Configuration) =>
-      val c = cfg.copy(observingMode = Flamingos2Imaging)
-      assert(c.subsumes(c))
+    forAll: (cfg: Configuration, a: Flamingos2Imaging, b: Flamingos2Imaging) =>
+      val ca = cfg.copy(observingMode = a)
+      val cb = cfg.copy(observingMode = b)
+      assert(ca.subsumes(cb))
+      assert(cb.subsumes(ca))
 
   test("GNIRS Imaging has no constraints"):
-    forAll: (cfg: Configuration) =>
-      val c = cfg.copy(observingMode = GnirsImaging)
-      assert(c.subsumes(c))
+    forAll: (cfg: Configuration, a: GnirsImaging, b: GnirsImaging) =>
+      val ca = cfg.copy(observingMode = a)
+      val cb = cfg.copy(observingMode = b)
+      assert(ca.subsumes(cb))
+      assert(cb.subsumes(ca))
 
   // The approval radius is the round field the MK filters see, the smallest GNIRS imaging
   // science area, so that a base moved anywhere within it stays on the detector whatever
@@ -125,3 +129,10 @@ final class ConfigurationSuite extends ScalaCheckSuite:
       val cb = cfg.copy(observingMode = b)
       assertEquals(ca.subsumes(cb), a.disperser === b.disperser)
       assertEquals(cb.subsumes(ca), a.disperser === b.disperser)
+
+  test("GHOST IFU is constrained by resolution mode"):
+    forAll: (cfg: Configuration, a: GhostIfu, b: GhostIfu) =>
+      val ca = cfg.copy(observingMode = a)
+      val cb = cfg.copy(observingMode = b)
+      assertEquals(ca.subsumes(cb), a.resolutionMode === b.resolutionMode)
+      assertEquals(cb.subsumes(ca), a.resolutionMode === b.resolutionMode)

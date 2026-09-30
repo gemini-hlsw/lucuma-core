@@ -6,6 +6,8 @@ package arb
 
 import lucuma.core.enums.AltairMode
 import lucuma.core.enums.Flamingos2Disperser
+import lucuma.core.enums.Flamingos2Filter
+import lucuma.core.enums.GhostResolutionMode
 import lucuma.core.enums.GmosNorthFilter
 import lucuma.core.enums.GmosNorthGrating
 import lucuma.core.enums.GmosNorthIfuFpu
@@ -13,6 +15,7 @@ import lucuma.core.enums.GmosSouthFilter
 import lucuma.core.enums.GmosSouthGrating
 import lucuma.core.enums.GmosSouthIfuFpu
 import lucuma.core.enums.GnirsCamera
+import lucuma.core.enums.GnirsFilter
 import lucuma.core.enums.GnirsFpuIfu
 import lucuma.core.enums.GnirsGrating
 import lucuma.core.enums.GnirsPrism
@@ -50,23 +53,26 @@ trait ArbConfiguration:
     Cogen[(CloudExtinction.Preset, ImageQuality.Preset, SkyBackground, WaterVapor)]
       .contramap(c => (c.cloudExtinction,c.imageQuality,  c.skyBackground, c.waterVapor))
 
-  given Arbitrary[ObservingMode.Flamingos2Imaging.type] =
-    Arbitrary(Gen.const(ObservingMode.Flamingos2Imaging))
+  given Arbitrary[ObservingMode.Flamingos2Imaging] =
+    Arbitrary:
+      arbitrary[List[Flamingos2Filter]].map(ObservingMode.Flamingos2Imaging.apply)
 
-  given Cogen[ObservingMode.Flamingos2Imaging.type] =
-    Cogen.cogenUnit.contramap(_ => ())
+  given Cogen[ObservingMode.Flamingos2Imaging] =
+    Cogen[List[Flamingos2Filter]].contramap(_.filters)
 
-  given Arbitrary[ObservingMode.GhostIfu.type] =
-    Arbitrary(Gen.const(ObservingMode.GhostIfu))
+  given Arbitrary[ObservingMode.GhostIfu] =
+    Arbitrary:
+      arbitrary[GhostResolutionMode].map(ObservingMode.GhostIfu.apply)
 
-  given Cogen[ObservingMode.GhostIfu.type] =
-    Cogen.cogenUnit.contramap(_ => ())
+  given Cogen[ObservingMode.GhostIfu] =
+    Cogen[GhostResolutionMode].contramap(_.resolutionMode)
 
-  given Arbitrary[ObservingMode.GnirsImaging.type] =
-    Arbitrary(Gen.const(ObservingMode.GnirsImaging))
+  given Arbitrary[ObservingMode.GnirsImaging] =
+    Arbitrary:
+      arbitrary[List[GnirsFilter]].map(ObservingMode.GnirsImaging.apply)
 
-  given Cogen[ObservingMode.GnirsImaging.type] =
-    Cogen.cogenUnit.contramap(_ => ())
+  given Cogen[ObservingMode.GnirsImaging] =
+    Cogen[List[GnirsFilter]].contramap(_.filters)
 
   given Arbitrary[ObservingMode.GmosNorthLongSlit] =
     Arbitrary:
@@ -184,10 +190,10 @@ trait ArbConfiguration:
   given Arbitrary[ObservingMode] =
     Arbitrary:
       Gen.oneOf(
-        arbitrary[ObservingMode.Flamingos2Imaging.type],
+        arbitrary[ObservingMode.Flamingos2Imaging],
         arbitrary[ObservingMode.Flamingos2LongSlit],
         arbitrary[ObservingMode.Flamingos2Mos],
-        arbitrary[ObservingMode.GhostIfu.type],
+        arbitrary[ObservingMode.GhostIfu],
         arbitrary[ObservingMode.GmosNorthImaging],
         arbitrary[ObservingMode.GmosNorthLongSlit],
         arbitrary[ObservingMode.GmosNorthMos],
@@ -199,7 +205,7 @@ trait ArbConfiguration:
         arbitrary[ObservingMode.Igrins2LongSlit.type],
         arbitrary[ObservingMode.GnirsLongSlit],
         arbitrary[ObservingMode.GnirsIfu],
-        arbitrary[ObservingMode.GnirsImaging.type],
+        arbitrary[ObservingMode.GnirsImaging],
         arbitrary[ObservingMode.Visitor]
       )
 
@@ -209,10 +215,10 @@ trait ArbConfiguration:
   given Cogen[ObservingMode] =
     Cogen: (s, m) =>
       m match
-        case m: ObservingMode.Flamingos2Imaging.type => perturb(s, m)
+        case m: ObservingMode.Flamingos2Imaging      => perturb(s, m)
         case m: ObservingMode.Flamingos2LongSlit   => perturb(s, m)
         case m: ObservingMode.Flamingos2Mos        => perturb(s, m)
-        case m: ObservingMode.GhostIfu.type        => perturb(s, m)
+        case m: ObservingMode.GhostIfu             => perturb(s, m)
         case m: ObservingMode.GmosNorthImaging     => perturb(s, m)
         case m: ObservingMode.GmosNorthLongSlit    => perturb(s, m)
         case m: ObservingMode.GmosNorthMos         => perturb(s, m)
@@ -224,7 +230,7 @@ trait ArbConfiguration:
         case m: ObservingMode.Igrins2LongSlit.type => perturb(s, m)
         case m: ObservingMode.GnirsLongSlit        => perturb(s, m)
         case m: ObservingMode.GnirsIfu             => perturb(s, m)
-        case m: ObservingMode.GnirsImaging.type    => perturb(s, m)
+        case m: ObservingMode.GnirsImaging         => perturb(s, m)
         case m: ObservingMode.Visitor              => perturb(s, m)
 
   given Arbitrary[Configuration] =
