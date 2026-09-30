@@ -3,12 +3,16 @@
 
 package lucuma.ags
 
+import cats.data.NonEmptyList
+import cats.data.NonEmptySet
 import cats.syntax.all.*
+import lucuma.ags.syntax.*
 import lucuma.core.enums.*
 import lucuma.core.geom.Area
 import lucuma.core.geom.BoundingOffsets
 import lucuma.core.geom.Shape
 import lucuma.core.geom.ShapeExpression
+import lucuma.core.geom.ShapeInterpreter
 import lucuma.core.geom.jts.JtsShapeInterpreter
 import lucuma.core.geom.syntax.all.*
 import lucuma.core.geom.visitors.MaroonXScienceFov
@@ -16,6 +20,7 @@ import lucuma.core.geom.visitors.MaroonXSkyFiberPatrol
 import lucuma.core.geom.wasm.WasmKernelFixture
 import lucuma.core.geom.wasm.WasmShapeInterpreter
 import lucuma.core.math.Angle
+import lucuma.core.math.Coordinates
 import lucuma.core.math.Offset
 import lucuma.core.math.syntax.int.*
 import lucuma.core.model.sequence.flamingos2.Flamingos2FpuMask
@@ -287,3 +292,16 @@ class AgsGeometryParitySuite extends munit.FunSuite with WasmKernelFixture:
         val (w, j) = assertParity(chain, s"$name PA ${pa.toDoubleDegrees} dither chain")
         assertParity(chain.boundingBox, s"$name PA ${pa.toDoubleDegrees} dither chain bbox")
         assertEquals(isEmpty(w), isEmpty(j), s"$name PA ${pa.toDoubleDegrees} dither chain emptiness")
+
+  test("visualization frees the shapes it evaluates"):
+    given ShapeInterpreter = WasmShapeInterpreter
+    val params    = AgsParams.GmosImaging(PortDisposition.Side)
+    val sci       = ScienceOffsets(NonEmptySet.of(Offset.Zero.guided, off(10, -5).guided))
+    val positions = Ags
+      .generatePositions(Some(Coordinates.Zero), None, NonEmptyList.of(posAngles(0), posAngles(1)), None, Some(sci))
+      .value
+      .toNonEmptyList
+    val before    = WasmShapeInterpreter.liveHandles
+    AgsVisualization.patrolFieldGeometries(params, positions)
+    AgsVisualization.scienceOverlapVisualization(params, positions.head, off(60, 30))
+    assertEquals(WasmShapeInterpreter.liveHandles, before)
