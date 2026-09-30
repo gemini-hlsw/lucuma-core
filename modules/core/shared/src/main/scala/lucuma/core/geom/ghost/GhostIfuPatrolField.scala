@@ -3,6 +3,7 @@
 
 package lucuma.core.geom.ghost
 
+import cats.data.NonEmptyList
 import lucuma.core.geom.ShapeExpression
 import lucuma.core.geom.ghost.scienceArea.fov
 import lucuma.core.geom.syntax.all.*
@@ -32,10 +33,10 @@ trait GhostIfuPatrolField:
   def ifu2PatrolFieldAt(posAngle: Angle, offsetPos: Offset): ShapeExpression =
     ifu2PatrolField.shapeAt(offsetPos, posAngle)
 
-  def ifu1PatrolFieldAt(posAngles: List[Angle], offsets: List[Offset]): ShapeExpression =
+  def ifu1PatrolFieldAt(posAngles: NonEmptyList[Angle], offsets: NonEmptyList[Offset]): ShapeExpression =
     ifu1PatrolField.intersectionShape(posAngles, offsets)
 
-  def ifu2PatrolFieldAt(posAngles: List[Angle], offsets: List[Offset]): ShapeExpression =
+  def ifu2PatrolFieldAt(posAngles: NonEmptyList[Angle], offsets: NonEmptyList[Offset]): ShapeExpression =
     ifu2PatrolField.intersectionShape(posAngles, offsets)
 
 object GhostIfuPatrolField extends GhostIfuPatrolField
