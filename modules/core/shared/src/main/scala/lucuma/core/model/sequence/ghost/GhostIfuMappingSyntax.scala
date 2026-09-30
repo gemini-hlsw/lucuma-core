@@ -9,7 +9,7 @@ import cats.syntax.either.*
 import cats.syntax.option.*
 import lucuma.core.enums.GhostResolutionMode
 import lucuma.core.geom.ghost.*
-import lucuma.core.geom.jts.interpreter.given
+import lucuma.core.geom.ShapeInterpreter
 import lucuma.core.math.Angle
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Offset
@@ -38,19 +38,19 @@ object GhostIfuMappingSyntax:
     target:        Coordinates,
     skyOrTarget:   Option[Coordinates],
     positionAngle: Option[Angle]
-  ): AssignmentResult =
+  )(using si: ShapeInterpreter): AssignmentResult =
     val angle  = positionAngle.getOrElse(Angle.Angle0)
 
     val field1 = GhostIfuPatrolField.ifu1PatrolFieldAt(angle, Offset.Zero)
     val field2 = GhostIfuPatrolField.ifu2PatrolFieldAt(angle, Offset.Zero)
 
-    val shape1 = field1.eval
-    val shape2 = field2.eval
-
     val pos1 = base.diff(target).offset
     val pos2 = skyOrTarget.map(base.diff(_).offset)
 
-    val preliminaryResult =
+    // Only the verdict leaves the arena, so a native engine frees both fields at once.
+    val preliminaryResult = si.withArena:
+      val shape1 = field1.eval
+      val shape2 = field2.eval
       if shape1.contains(pos1) && pos2.forall(shape2.contains)      then TargetAtIfu1
       else if pos2.forall(shape1.contains) && shape2.contains(pos1) then TargetAtIfu2
       else OutOfRange
@@ -75,7 +75,7 @@ object GhostIfuMappingSyntax:
   private def deriveOneTarget(
     ctx:    IfuMappingContext,
     target: (Target.Id, Target)
-  ): Either[String, GhostIfuMapping] =
+  )(using ShapeInterpreter): Either[String, GhostIfuMapping] =
     ctx.resolutionMode match
       case GhostResolutionMode.Standard =>
         target._2 match
@@ -115,7 +115,7 @@ object GhostIfuMappingSyntax:
     ctx:     IfuMappingContext,
     targetA: (Target.Id, Target),
     targetB: (Target.Id, Target)
-  ): Either[String, GhostIfuMapping] =
+  )(using ShapeInterpreter): Either[String, GhostIfuMapping] =
     (ctx.resolutionMode, ctx.sky) match
       case (GhostResolutionMode.Standard, None)    =>
         (targetA._2, targetB._2) match
@@ -143,7 +143,7 @@ object GhostIfuMappingSyntax:
     def derive(
       ctx:     IfuMappingContext,
       targets: List[(Target.Id, Target)]
-    ): Either[String, GhostIfuMapping] =
+    )(using ShapeInterpreter): Either[String, GhostIfuMapping] =
       targets match
         case Nil          => "Cannot derive a GHOST IFU mapping until targets are defined.".asLeft
         case List(t)      => deriveOneTarget(ctx, t)
@@ -153,5 +153,5 @@ object GhostIfuMappingSyntax:
     def validate(
       ctx:     IfuMappingContext,
       targets: List[(Target.Id, Target)]
-    ): Option[String] =
+    )(using ShapeInterpreter): Option[String] =
       derive(ctx, targets).swap.toOption
