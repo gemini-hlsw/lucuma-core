@@ -161,7 +161,9 @@ object WasmShapeInterpreter extends ShapeInterpreter:
       rectBounded(a, b)(LucumaWasm.arc_new(_, _, _, _, c.toDoubleRadians, d.toDoubleRadians, NPts))
     case Polygon(os)           => polygon(os)
     case Rectangle(a, b)       => rectBounded(a, b)(LucumaWasm.rect_new)
-    // The kernel has no zero-area point type; JTS's point is empty for every area/overlay purpose.
+    // The kernel has no point type, so a point is empty: its area matches JTS, but contains,
+    // intersects, bounds and radius do not. Only drawing uses points, and `polygons` is empty for
+    // a point on both engines.
     case Point(_)              => LucumaWasm.empty_new()
     case BoundingBox(e)        =>
       val h = go(e)
