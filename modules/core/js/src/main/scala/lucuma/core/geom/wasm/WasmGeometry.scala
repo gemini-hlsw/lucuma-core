@@ -10,14 +10,19 @@ import lucuma.core.geom.ShapeInterpreter
 import scala.scalajs.js
 
 /**
- * Entry point for the wasm geometry kernel. `load` initialises the `lucuma-wasm` npm module,
- * checks its version against `CompatibleRange` and returns `WasmShapeInterpreter`, which callers
- * pass on as their `given ShapeInterpreter`. Failures surface as the underlying error; callers
- * decide whether to stay on JTS.
+ * Entry point for the wasm geometry kernel. `load` initialises the `@gemini-hlsw/lucuma-wasm` npm
+ * module, checks its version against `CompatibleRange` and returns `WasmShapeInterpreter`, which
+ * callers pass on as their `given ShapeInterpreter`. Failures surface as the underlying error;
+ * callers decide whether to stay on JTS.
+ *
+ * The npm package is not a dependency of this artifact: an application that uses this object must
+ * install `@gemini-hlsw/lucuma-wasm` in the `CompatibleRange` itself. Applications that never
+ * reference it need nothing, since Scala.js only emits the import when it is reachable. Under
+ * Node, use Node 26 or later and `loadFrom`.
  */
 object WasmGeometry:
 
-  /** npm semver range of `lucuma-wasm` this facade was written against. */
+  /** npm semver range of `@gemini-hlsw/lucuma-wasm` this facade was written against. */
   val CompatibleRange: String = "^0.1"
 
   private val CompatibleMajor = 0
