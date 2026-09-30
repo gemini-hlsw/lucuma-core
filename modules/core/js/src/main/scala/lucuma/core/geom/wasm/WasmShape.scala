@@ -25,8 +25,6 @@ final class WasmShape private[wasm] (private[wasm] val handle: Int) extends Shap
   // Set when the garbage-collector cleanup owns the handle, i.e. it was created outside any arena.
   private[wasm] var registered: Boolean = false
 
-  private[wasm] def isReleased: Boolean = released
-
   private def h: Int =
     if (released)
       throw new IllegalStateException(

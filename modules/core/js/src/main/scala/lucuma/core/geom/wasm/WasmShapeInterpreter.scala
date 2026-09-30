@@ -30,7 +30,6 @@ object WasmShapeInterpreter extends ShapeInterpreter:
   // JTS GeometricShapeFactory default.
   private val NPts = 100
 
-  private var loaded: Boolean = false
 
   private var arenas: List[ArrayBuffer[WasmShape]] = Nil
 
@@ -42,7 +41,6 @@ object WasmShapeInterpreter extends ShapeInterpreter:
 
   private[wasm] def markLoaded(wasmExports: js.Any): Unit =
     exports = wasmExports.asInstanceOf[js.Dynamic]
-    loaded = true
 
   /** Number of geometries currently held by the kernel, used as a leak detector for tests. */
   def liveHandles: Int = LucumaWasm.live()
@@ -197,6 +195,6 @@ object WasmShapeInterpreter extends ShapeInterpreter:
     case Translate(e, o)             => transform(e, 1, 0, WasmCoords.x(o), 0, 1, WasmCoords.y(o))
 
   override def interpret(e: ShapeExpression): Shape =
-    if (!loaded)
+    if (exports == null)
       throw new IllegalStateException("lucuma-wasm is not loaded; run WasmGeometry.load first")
     wrap(go(e))

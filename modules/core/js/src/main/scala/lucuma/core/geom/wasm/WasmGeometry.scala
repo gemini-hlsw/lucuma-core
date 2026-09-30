@@ -22,11 +22,11 @@ import scala.scalajs.js
  */
 object WasmGeometry:
 
-  /** npm semver range of `@gemini-hlsw/lucuma-wasm` this facade was written against. */
-  val CompatibleRange: String = "^0.1"
-
   private val CompatibleMajor = 0
   private val CompatibleMinor = 1
+
+  /** npm semver range of `@gemini-hlsw/lucuma-wasm` this facade was written against. */
+  val CompatibleRange: String = s"^$CompatibleMajor.$CompatibleMinor"
 
   /**
    * Loads the kernel letting the npm module locate its own `.wasm` file (browser bundlers rewrite

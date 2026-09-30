@@ -147,8 +147,6 @@ trait SingleProbeAgsParams:
 
         override val intersectionPatrolFieldShape: Shape = pfShape
 
-        private val intersectionShape: Shape = pfShape
-
         // Cache bounding box for fast rejection
         private val intersectionBounds: BoundingOffsets = pfBounds
 
@@ -166,7 +164,7 @@ trait SingleProbeAgsParams:
 
         override def isReachable(gsOffset: Offset): Boolean =
           // Fast bounding box rejection, then precise check
-          intersectionBounds.contains(gsOffset) && intersectionShape.contains(gsOffset)
+          intersectionBounds.contains(gsOffset) && intersectionPatrolFieldShape.contains(gsOffset)
 
         private def armAt(gsOffset: Offset): Option[Shape] =
           armShape.map(

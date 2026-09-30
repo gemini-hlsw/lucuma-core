@@ -59,6 +59,7 @@ class WasmShapeInterpreterSuite extends CatsEffectSuite:
     assert(WasmGeometry.isCompatible(LucumaWasm.version()), LucumaWasm.version())
 
   test("version range check"):
+    assertEquals(WasmGeometry.CompatibleRange, "^0.1")
     assert(WasmGeometry.isCompatible("0.1.0"))
     assert(WasmGeometry.isCompatible("0.1.7-rc1"))
     assert(!WasmGeometry.isCompatible("0.2.0"))
