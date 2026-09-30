@@ -3,7 +3,6 @@
 
 package lucuma.core.geom.flamingos2
 
-import cats.data.NonEmptyList
 import coulomb.units.accepted.*
 import lucuma.core.enums.Flamingos2LyotWheel
 import lucuma.core.geom.ShapeExpression
@@ -34,15 +33,5 @@ trait Flamingos2CandidatesArea:
     */
   def candidatesAreaAt(l: Flamingos2LyotWheel, posAngle: Angle, offsetPos: Offset): ShapeExpression =
     candidatesArea(l).shapeAt(offsetPos, posAngle)
-
-  /**
-    * Flamingos2 area reachable by the probe arm for a set of posAngles and offsets
-    */
-  def candidatesAreaAt(
-    l:               Flamingos2LyotWheel,
-    posAngles:       NonEmptyList[Angle],
-    offsetPositions: NonEmptyList[Offset]
-  ): ShapeExpression =
-    candidatesArea(l).intersectionShape(posAngles, offsetPositions)
 
 object candidatesArea extends Flamingos2CandidatesArea
