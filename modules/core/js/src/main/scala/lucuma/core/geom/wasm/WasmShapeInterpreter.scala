@@ -59,13 +59,31 @@ object WasmShapeInterpreter extends ShapeInterpreter:
   def inArena: Boolean = arenas.nonEmpty
 
   override def withArena[A](f: => A): A =
-    val arena = ArrayBuffer.empty[WasmShape]
+    val arena                       = ArrayBuffer.empty[WasmShape]
     arenas = arena :: arenas
+    var primary: Option[Throwable] = None
     try f
-    finally {
+    catch
+      case t: Throwable =>
+        primary = Some(t)
+        throw t
+    finally
       arenas = arenas.tail
-      arena.foreach(_.free())
-    }
+      freeAll(arena, primary)
+
+  // Frees every handle even if some fail. An exception already propagating from the arena's body
+  // wins and carries the free failures as suppressed; otherwise the first free failure is thrown.
+  // Allocates nothing unless a free fails: the per-star checks open an arena for every candidate.
+  private def freeAll(arena: ArrayBuffer[WasmShape], primary: Option[Throwable]): Unit =
+    var first: Option[Throwable] = None
+    arena.foreach: s =>
+      try s.free()
+      catch
+        case t: Throwable =>
+          primary.orElse(first) match
+            case Some(p) => p.addSuppressed(t)
+            case None    => first = Some(t)
+    first.foreach(t => throw t)
 
   private[wasm] def wrap(h: Int): WasmShape =
     val s = new WasmShape(h)
