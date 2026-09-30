@@ -25,13 +25,17 @@ import lucuma.core.model.sequence.flamingos2.Flamingos2FpuMask
  * exercising the operations AGS performs on the results (`SingleProbeAgsParams.posCalculations`):
  * patrol-field reachability, probe-arm vignetting area and protected-area overlap.
  *
- * Tolerances: area within 1e-7 relative, bounding boxes and radii within 10 µas, `contains` and
+ * Tolerances: area within 1e-7 relative, bounding boxes and radii within 2 µas (5 µas after an
+ * overlay), `contains` and
  * `intersects` exact.
  */
 class AgsGeometryParitySuite extends munit.FunSuite with WasmKernelFixture:
 
   private val AreaRel  = 1e-7
-  private val AngleTol = 10L
+  // Both engines truncate to whole µas; float noise either side of a µas boundary leaves 1-2 µas.
+  private val AngleTol        = 2L
+  // Overlay results also carry the kernel's snapping grid, see OverlayGridSteps.
+  private val OverlayAngleTol = 5L
   private val GridN    = 11
 
   // The kernel's overlay (i_overlay via geo) snaps vertices to a grid of 2^29 steps.
@@ -131,9 +135,9 @@ class AgsGeometryParitySuite extends munit.FunSuite with WasmKernelFixture:
     try a
     catch case t: Throwable => fail(s"$clue threw ${t.getClass.getSimpleName}: ${t.getMessage}")
 
-  private def assertAngle(w: Angle, j: Angle, clue: String): Unit =
+  private def assertAngle(w: Angle, j: Angle, clue: String, tol: Long = AngleTol): Unit =
     val d = µas(w - j).abs
-    assert(d <= AngleTol, s"$clue: $d µas apart (kernel $w, JTS $j)")
+    assert(d <= tol, s"$clue: $d µas apart (kernel $w, JTS $j)")
 
   private def assertBounds(w: BoundingOffsets, j: BoundingOffsets, clue: String): Unit =
     assertAngle(w.topLeft.p.toAngle, j.topLeft.p.toAngle, s"$clue top-left p")
@@ -262,7 +266,12 @@ class AgsGeometryParitySuite extends munit.FunSuite with WasmKernelFixture:
       val jI = attempt(s"$gsClue JTS protected overlap at $nz")(jArm.intersection(jP))
       assertEquals(overlaps(wArm, wP), overlaps(jArm, jP), s"$gsClue overlaps protected area at $nz")
       if !isEmpty(jI) then
-        assertAngle(wI.boundingOffsets.maxSide, jI.boundingOffsets.maxSide, s"$gsClue protected overlap max side at $nz")
+        assertAngle(
+          wI.boundingOffsets.maxSide,
+          jI.boundingOffsets.maxSide,
+          s"$gsClue protected overlap max side at $nz",
+          OverlayAngleTol
+        )
 
   variants.foreach: (name, params) =>
     test(s"$name: AGS geometry and its placement match JTS at every PA and offset"):

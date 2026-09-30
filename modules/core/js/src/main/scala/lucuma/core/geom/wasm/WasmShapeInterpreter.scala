@@ -150,8 +150,9 @@ object WasmShapeInterpreter extends ShapeInterpreter:
       val b =
         try LucumaWasm.bbox(h)
         finally LucumaWasm.free(h)
-      if (b(0).isNaN || b(0) == b(2) || b(1) == b(3)) LucumaWasm.empty_new()
-      else LucumaWasm.rect_new(b(0), b(1), b(2), b(3))
+      // Corners truncated to whole µas first, as JTS does, so both engines build the same box.
+      if (b(0).isNaN) LucumaWasm.empty_new()
+      else rectBounded(WasmCoords.toOffset(b(0), b(3)), WasmCoords.toOffset(b(2), b(1)))(LucumaWasm.rect_new)
 
     // Combinations
     case Difference(_, _)   => chain(BinaryOp.Difference, 2, e)

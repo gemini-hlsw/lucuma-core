@@ -130,8 +130,9 @@ private[wasm] object WasmCoords:
   inline def x(o: Offset): Double = -Angle.signedMicroarcseconds.get(o.p.toAngle).toDouble
   inline def y(o: Offset): Double = Angle.signedMicroarcseconds.get(o.q.toAngle).toDouble
 
+  // Truncates to whole µas, as JTS does, so both engines report the same offsets.
   def toOffset(x: Double, y: Double): Offset =
     Offset(
-      Offset.P(Angle.fromMicroarcseconds(-x.round)),
-      Offset.Q(Angle.fromMicroarcseconds(y.round))
+      Offset.P(Angle.fromMicroarcseconds(-x.toLong)),
+      Offset.Q(Angle.fromMicroarcseconds(y.toLong))
     )
