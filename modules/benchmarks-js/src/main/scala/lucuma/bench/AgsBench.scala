@@ -15,14 +15,16 @@ import org.locationtech.jts.geom.GeometryOverlay
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.global
 
-// Node benchmark of the AGS hot path on the workloads in `AgsWorkload`: `real` (a request
-// captured in Explore) or N (the same request with an N-point offset grid). Modes: none (JTS timing), `wasm` (paired JTS vs kernel timing),
-// `dump [jts|wasm]` (one line per analysis, for diffing builds or engines).
+// Node benchmark of the AGS hot path on the workloads in `AgsWorkload`. Arguments: workloads
+// (`real`, or N for an N-point offset grid), then any of `wasm` (pair JTS with the kernel),
+// `dump` (one line per analysis instead of timings) and `old` (legacy JTS overlay).
 object AgsBench:
 
-  case class Config(workloads: List[AgsWorkload], reps: Int)
+  private val Reps = 3
 
-  def runFull(w: AgsWorkload)(using ShapeInterpreter): AgsAnalysisResult = w.run
+  def ms(nanos: Long): String = f"${nanos / 1.0e6}%.1f"
+
+  def argv: List[String] = global.process.argv.asInstanceOf[js.Array[String]].toList.drop(2)
 
   def dumpLine(a: AgsAnalysis): String =
     val vig = a match
@@ -30,119 +32,78 @@ object AgsBench:
       case _                     => "-"
     s"${Ags.resultLabel(a)}\t${a.target.id}\t${Angle.microarcseconds.get(a.posAngle)}\t$vig"
 
-  def ms(nanos: Long): String = f"${nanos / 1.0e6}%.1f"
-
-  def runtime: String = s"node ${global.process.versions.node}"
-
-  def argv: List[String] = global.process.argv.asInstanceOf[js.Array[String]].toList.drop(2)
-
-  def report(line: String): Unit = println(line)
-
-  // Node cannot fetch the package's own file: URL; hand the loader the bytes.
-  def wasmBytes(): js.Promise[js.UndefOr[js.Any]] =
-    js.`import`[js.Dynamic]("node:fs")
-      .`then`[js.UndefOr[js.Any]]: fs =>
-        val url = js.`import`.meta
-          .asInstanceOf[js.Dynamic]
-          .resolve("@gemini-hlsw/lucuma-wasm/lucuma_wasm_bg.wasm")
-        fs.readFileSync(js.Dynamic.newInstance(global.URL)(url)).asInstanceOf[js.Any]
-
-  def loadKernel(): js.Promise[ShapeInterpreter] =
-    given IORuntime = cats.effect.unsafe.implicits.global
-    wasmBytes().`then`[ShapeInterpreter](b => WasmGeometry.loadFrom(b).unsafeToPromise())
-
   def histogram(s: AgsStats): String =
     s"accepted=${s.acceptedCount} " + s.resultCounts.toList
       .sortBy(_._1)
       .map((k, v) => s"$k=$v")
       .mkString(" ")
 
-  // End to end agsAnalysis on JTS and on the wasm kernel, paired per rep.
-  def wasmStage(cfg: Config, wasm: ShapeInterpreter): Unit =
-    val engines = List("jts" -> JtsShapeInterpreter, "wasm" -> wasm)
-    report("kernel: lucuma-wasm")
-    report(f"kernel memory after load: ${WasmShapeInterpreter.memoryBytes / 1048576.0}%.1f MB")
-    report(
-      "offsets\tengine\trep\tcalcs_ms\tcontext_ms\tanalysis_ms\ttotal_ms\tlive_handles\twasm_mb"
+  // Node cannot fetch the package's own file: URL; hand the loader the bytes.
+  def loadKernel(): js.Promise[ShapeInterpreter] =
+    given IORuntime = cats.effect.unsafe.implicits.global
+    js.`import`[js.Dynamic]("node:fs")
+      .`then`[ShapeInterpreter]: fs =>
+        val url   = js.`import`.meta
+          .asInstanceOf[js.Dynamic]
+          .resolve("@gemini-hlsw/lucuma-wasm/lucuma_wasm_bg.wasm")
+        val bytes = fs.readFileSync(js.Dynamic.newInstance(global.URL)(url)).asInstanceOf[js.Any]
+        WasmGeometry.loadFrom(bytes).unsafeToPromise()
+
+  // Times each workload on every engine, paired per rep, then compares the engines' outcomes.
+  def timeStage(workloads: List[AgsWorkload], engines: List[(String, ShapeInterpreter)]): Unit =
+    val kernel    = engines.size > 1
+    def live: Int = if kernel then WasmShapeInterpreter.liveHandles else 0
+    println(
+      "workload\tengine\trep\tcalcs_ms\tcontext_ms\tanalysis_ms\ttotal_ms\tlive_handles\twasm_mb"
     )
-    engines.foreach((_, si) => runFull(cfg.workloads.head)(using si))
-    cfg.workloads.foreach: w =>
-      val n           = w.name
-      val stats       = (1 to cfg.reps).toList.flatMap: rep =>
+    engines.foreach((_, si) => workloads.head.run(using si))
+    workloads.foreach: w =>
+      val stats    = (1 to Reps).toList.flatMap: rep =>
         engines.map: (name, si) =>
-          val before = WasmShapeInterpreter.liveHandles
-          val s      = runFull(w)(using si).stats
-          val live   = WasmShapeInterpreter.liveHandles - before
+          val before = live
+          val s      = w.run(using si).stats
           val mb     = f"${WasmShapeInterpreter.memoryBytes / 1048576.0}%.1f"
-          report(
-            s"$n\t$name\t$rep\t${ms(s.calcsNanos)}\t${ms(s.contextNanos)}\t${ms(s.analysisNanos)}\t${ms(s.contextNanos + s.analysisNanos)}\t$live\t$mb"
+          println(
+            s"${w.name}\t$name\t$rep\t${ms(s.calcsNanos)}\t${ms(s.contextNanos)}\t${ms(s.analysisNanos)}\t${ms(s.contextNanos + s.analysisNanos)}\t${live - before}\t$mb"
           )
           name -> s
-      val avg         = engines.map: (name, _) =>
-        val ss = stats.collect { case (`name`, s) => s }
-        (name, ss.map(_.calcsNanos).sum / ss.size, ss.map(_.analysisNanos).sum / ss.size)
-      avg.foreach: (name, c, a) =>
-        report(s"$n\t$name\tavg\tcalcs=${ms(c)} analysis=${ms(a)} total=${ms(c + a)}")
-      val (_, jc, ja) = avg.find(_._1 == "jts").get
-      val (_, wc, wa) = avg.find(_._1 == "wasm").get
-      report(
-        f"$n\tspeedup\tcalcs=${jc.toDouble / wc}%.2fx analysis=${ja.toDouble / wa}%.2fx total=${(jc + ja).toDouble / (wc + wa)}%.2fx"
-      )
-      val hists       =
-        engines.map((name, _) => name -> histogram(stats.findLast(_._1 == name).get._2))
-      hists.foreach((name, h) => report(s"$n\thistogram\t$name\t$h"))
-      if hists.map(_._2).distinct.size != 1 then report(s"$n\tHISTOGRAM MISMATCH between engines")
-
-  def jtsStage(cfg: Config): Unit =
-    given ShapeInterpreter = JtsShapeInterpreter
-    report("offsets\tpositions\trep\tcalcs_ms\tcontext_ms\tanalysis_ms\ttotal_ms")
-    runFull(cfg.workloads.head)
-    cfg.workloads.foreach: w =>
-      val n     = w.name
-      val stats = (1 to cfg.reps).toList.map: rep =>
-        val s = runFull(w).stats
-        report(
-          s"$n\t${s.positionCount}\t$rep\t${ms(s.calcsNanos)}\t${ms(s.contextNanos)}\t${ms(s.analysisNanos)}\t${ms(s.contextNanos + s.analysisNanos)}"
-        )
-        s
-      val last  = stats.last
-      val avgC  = stats.map(_.calcsNanos).sum / stats.size
-      val avgA  = stats.map(_.analysisNanos).sum / stats.size
-      report(s"$n\tavg\tcalcs=${ms(avgC)} analysis=${ms(avgA)} total=${ms(avgC + avgA)}")
-      report(s"$n\thistogram\t${histogram(last)}")
-
-  def dumpStage(cfg: Config)(using ShapeInterpreter): Unit =
-    runFull(cfg.workloads.head).analyses.foreach(a => println(dumpLine(a)))
+      val byEngine = engines.map((name, _) => name -> stats.collect { case (`name`, s) => s })
+      val avgs     = byEngine.map: (name, ss) =>
+        val c = ss.map(_.calcsNanos).sum / ss.size
+        val a = ss.map(_.analysisNanos).sum / ss.size
+        println(s"${w.name}\t$name\tavg\tcalcs=${ms(c)} analysis=${ms(a)} total=${ms(c + a)}")
+        (c, a)
+      avgs match
+        case List((jc, ja), (wc, wa)) =>
+          println(
+            f"${w.name}\tspeedup\tcalcs=${jc.toDouble / wc}%.2fx analysis=${ja.toDouble / wa}%.2fx total=${(jc + ja).toDouble / (wc + wa)}%.2fx"
+          )
+        case _                        => ()
+      val hists    = byEngine.map((name, ss) => name -> histogram(ss.last))
+      hists.foreach((name, h) => println(s"${w.name}\thistogram\t$name\t$h"))
+      if hists.map(_._2).distinct.size > 1 then
+        println(s"${w.name}\tHISTOGRAM MISMATCH between engines")
 
   def main(args: Array[String]): Unit =
-    val names =
-      argv.headOption.map(_.split(",").toList.map(_.trim)).getOrElse(List("20", "30", "50"))
-    val cfg   = Config(
-      names.map(n => AgsWorkload.named(n).getOrElse(sys.error(s"unknown workload $n"))),
-      reps = 3
-    )
-    val mode  = argv.drop(1)
-    // `old` anywhere in the arguments selects lucuma-jts's legacy snap-if-needed overlay.
+    val names     = argv.headOption.fold(List("real"))(_.split(",").toList.map(_.trim))
+    val workloads =
+      names.map(n => AgsWorkload.named(n).getOrElse(sys.error(s"unknown workload $n")))
+    val mode      = argv.drop(1)
     if mode.contains("old") then
       GeometryOverlay.OVERLAY_NG_DEFAULT = false
       GeometryOverlay.setOverlayImpl("old")
-      report("jts overlay: legacy")
-    mode match
-      case "dump" :: "wasm" :: _ =>
-        loadKernel()
-          .`then`[Unit](wasm => dumpStage(cfg)(using wasm))
-          .`catch`[Unit](e => report(s"wasm stage failed: $e")): Unit
-      case "dump" :: _           =>
-        dumpStage(cfg)(using JtsShapeInterpreter)
-      case "wasm" :: _           =>
-        report(
-          s"$runtime  workloads=${names.mkString(",")} reps=${cfg.reps}"
-        )
-        loadKernel()
-          .`then`[Unit](wasm => wasmStage(cfg, wasm))
-          .`catch`[Unit](e => report(s"wasm stage failed: $e")): Unit
-      case _                     =>
-        report(
-          s"$runtime  workloads=${names.mkString(",")} reps=${cfg.reps}"
-        )
-        jtsStage(cfg)
+      println("jts overlay: legacy")
+    val kernel    =
+      if mode.contains("wasm") then loadKernel().`then`[Option[ShapeInterpreter]](Some(_))
+      else js.Promise.resolve[Option[ShapeInterpreter]](None)
+    kernel
+      .`then`[Unit]: k =>
+        if mode.contains("dump") then
+          val si = k.getOrElse(JtsShapeInterpreter)
+          workloads.head.run(using si).analyses.foreach(a => println(dumpLine(a)))
+        else
+          println(
+            s"node ${global.process.versions.node}  workloads=${names.mkString(",")} reps=$Reps"
+          )
+          timeStage(workloads, ("jts" -> JtsShapeInterpreter) :: k.map("wasm" -> _).toList)
+      .`catch`[Unit](e => println(s"failed: $e")): Unit
