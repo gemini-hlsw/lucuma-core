@@ -36,7 +36,7 @@ final class WasmShape private[wasm] (private[wasm] val handle: Int) extends Shap
       WasmShapeInterpreter.release(this)
     }
 
-  def boundingOffsets: BoundingOffsets = {
+  def boundingOffsets: BoundingOffsets =
     val b = LucumaWasm.bbox(h)
     if (b(0).isNaN) BoundingOffsets(Offset.Zero, Offset.Zero)
     else
@@ -44,7 +44,6 @@ final class WasmShape private[wasm] (private[wasm] val handle: Int) extends Shap
         WasmCoords.toOffset(b(0), b(3)),
         WasmCoords.toOffset(b(2), b(1))
       )
-  }
 
   def contains(o: Offset): Boolean =
     LucumaWasm.contains_point(h, WasmCoords.x(o), WasmCoords.y(o))
@@ -52,6 +51,8 @@ final class WasmShape private[wasm] (private[wasm] val handle: Int) extends Shap
   def area: Area =
     Area.fromMicroarcsecondsSquared.getOption(LucumaWasm.area(h).round).getOrElse(Area.MinArea)
 
+  // Distance to the vertex farthest from the origin, as JTS does. `coords` has exterior rings
+  // only, which is enough: a hole lies inside its polygon, so its vertices are never farthest.
   def radius: Angle =
     val cs = LucumaWasm.coords(h)
     (0 until cs.length by 2)

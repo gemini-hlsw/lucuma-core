@@ -27,7 +27,7 @@ import scala.scalajs.js.typedarray.Float64Array
  */
 object WasmShapeInterpreter extends ShapeInterpreter:
 
-  // JTS GeometricShapeFactory default; keeps ellipses and arcs vertex-for-vertex with JTS.
+  // JTS GeometricShapeFactory default.
   private val NPts = 100
 
   private var loaded: Boolean = false
@@ -35,6 +35,7 @@ object WasmShapeInterpreter extends ShapeInterpreter:
   private var arenas: List[ArrayBuffer[WasmShape]] = Nil
 
   private val registry: js.FinalizationRegistry[WasmShape, Int, WasmShape] =
+    // Dependens on js garbage collection so consider it just as best-effort.
     new js.FinalizationRegistry(h => LucumaWasm.free(h))
 
   private var exports: js.Dynamic = null
@@ -43,7 +44,7 @@ object WasmShapeInterpreter extends ShapeInterpreter:
     exports = wasmExports.asInstanceOf[js.Dynamic]
     loaded = true
 
-  /** Number of geometries currently held by the kernel; a leak detector for tests. */
+  /** Number of geometries currently held by the kernel, used as a leak detector for tests. */
   def liveHandles: Int = LucumaWasm.live()
 
   /**

@@ -178,6 +178,9 @@ object Ags {
   /**
    * FS2 pipe to do analysis of a stream of Candidate Guide Stars. The base and candidates must be
    * PM corrected by the caller.
+   *
+   * Use it with JTS only. Its shapes outlive any `withArena`, so a native kernel would free them
+   * only on garbage collection; wrapping the call in `withArena` frees them before the stream runs.
    */
   def agsAnalysisStream[F[_]](
     constraints:        ConstraintSet,

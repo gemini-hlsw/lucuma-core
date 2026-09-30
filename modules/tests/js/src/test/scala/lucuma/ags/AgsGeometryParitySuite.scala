@@ -34,9 +34,7 @@ class AgsGeometryParitySuite extends munit.FunSuite with WasmKernelFixture:
   private val AngleTol = 10L
   private val GridN    = 11
 
-  // The kernel's overlay (i_overlay via geo) snaps vertices to a grid of 2^29 steps across the
-  // operands' combined extent, so an overlay result carries an area error of about
-  // perimeter x step on top of the 1e-7 budget; primitives and predicates are unaffected.
+  // The kernel's overlay (i_overlay via geo) snaps vertices to a grid of 2^29 steps.
   private val OverlayGridSteps = math.pow(2, 29)
 
   private type Params = AgsParams & SingleProbeAgsParams
@@ -56,7 +54,7 @@ class AgsGeometryParitySuite extends munit.FunSuite with WasmKernelFixture:
   private val ditherOffsets: List[Offset] =
     (0 until 20).toList.map(k => off(k * 1.7 - 17, (k * 2.3) % 11 - 5))
 
-  // The PWFS patrol field and arm are the same on every instrument, so two hosts suffice.
+  // The PWFS patrol field and arm are the same on every instrument.
   private def withPwfs[A <: Params & PwfsSupport[A]](name: String, a: A): List[(String, Params)] =
     List(name -> a, s"$name PWFS1" -> a.withPWFS1, s"$name PWFS2" -> a.withPWFS2)
 
@@ -143,8 +141,6 @@ class AgsGeometryParitySuite extends munit.FunSuite with WasmKernelFixture:
     assertAngle(w.bottomRight.p.toAngle, j.bottomRight.p.toAngle, s"$clue bottom-right p")
     assertAngle(w.bottomRight.q.toAngle, j.bottomRight.q.toAngle, s"$clue bottom-right q")
 
-  // Points over the bounding box plus a 10% margin; the fractional phase keeps them off the
-  // lattice edges and vertices land on.
   private def probePoints(b: BoundingOffsets): List[Offset] =
     val pMin = µas(b.bottomRight.p.toAngle)
     val qMin = µas(b.bottomRight.q.toAngle)
@@ -207,9 +203,7 @@ class AgsGeometryParitySuite extends munit.FunSuite with WasmKernelFixture:
     )
 
   /**
-   * `posCalculations` places an evaluated shape with `Shape.transform`. On the kernel that is one
-   * composed affine, so it agrees with the direct expression `w`/`j` only to the area and
-   * bounding-box tolerances.
+   * `posCalculations` places an evaluated shape with `Shape.transform`.
    */
   private def assertPlaced(placed: Shape, w: Shape, j: Shape, clue: String): Unit =
     assertArea(placed.area, j.area, s"$clue placed")
