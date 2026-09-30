@@ -3,7 +3,7 @@ import org.scalajs.linker.interface.OutputPatterns
 import org.typelevel.sbt.gha.PermissionValue
 import org.typelevel.sbt.gha.Permissions
 
-ThisBuild / tlBaseVersion                         := "0.259"
+ThisBuild / tlBaseVersion                         := "0.260"
 ThisBuild / tlCiReleaseBranches                   := Seq("master")
 ThisBuild / githubWorkflowEnv += "MUNIT_FLAKY_OK" -> "true"
 

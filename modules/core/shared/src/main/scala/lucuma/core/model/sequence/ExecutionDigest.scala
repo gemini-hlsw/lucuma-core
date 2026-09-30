@@ -8,15 +8,17 @@ import cats.syntax.monoid.*
 import eu.timepit.refined.cats.given
 import eu.timepit.refined.types.numeric.NonNegInt
 import lucuma.core.enums.ObserveClass
+import lucuma.core.util.TimeSpan
 import monocle.Focus
 import monocle.Lens
 
 case class ExecutionDigest(
-  setup:            SetupTime,
-  setupCount:       NonNegInt,
-  calibrationCount: NonNegInt,
-  acquisition:      SequenceDigest,
-  science:          SequenceDigest
+  setup:              SetupTime,
+  setupCount:         NonNegInt,
+  reacquisitionCount: NonNegInt,
+  calibrationCount:   NonNegInt,
+  acquisition:        SequenceDigest,
+  science:            SequenceDigest
 ) {
 
   /**
@@ -26,11 +28,18 @@ case class ExecutionDigest(
     science.observeClass
 
   /**
+   * Total setup time for the observation: every expected full setup plus
+   * every expected reacquisition.
+   */
+  def totalSetupTime: TimeSpan =
+    (setup.full *| setupCount.value) +| (setup.reacquisition *| reacquisitionCount.value)
+
+  /**
    * Planned time for the observation, including the science sequence and all
-   * expected acquisitions.
+   * expected acquisitions and reacquisitions.
    */
   def fullTimeEstimate: CategorizedTime =
-    science.timeEstimate.sumCharge(science.observeClass.chargeClass, setup.full *| setupCount.value)
+    science.timeEstimate.sumCharge(science.observeClass.chargeClass, totalSetupTime)
 
   /**
    * Steps by kind across the acquisition and science sequences.  Excludes
@@ -48,6 +57,7 @@ object ExecutionDigest {
       SetupTime.Zero,
       NonNegInt.MinValue,
       NonNegInt.MinValue,
+      NonNegInt.MinValue,
       SequenceDigest.Zero,
       SequenceDigest.Zero
     )
@@ -59,6 +69,10 @@ object ExecutionDigest {
   /** @group Optics */
   val setupCount: Lens[ExecutionDigest, NonNegInt] =
     Focus[ExecutionDigest](_.setupCount)
+
+  /** @group Optics */
+  val reacquisitionCount: Lens[ExecutionDigest, NonNegInt] =
+    Focus[ExecutionDigest](_.reacquisitionCount)
 
   /** @group Optics */
   val calibrationCount: Lens[ExecutionDigest, NonNegInt] =
@@ -76,6 +90,7 @@ object ExecutionDigest {
     Eq.by { a => (
       a.setup,
       a.setupCount,
+      a.reacquisitionCount,
       a.calibrationCount,
       a.acquisition,
       a.science
