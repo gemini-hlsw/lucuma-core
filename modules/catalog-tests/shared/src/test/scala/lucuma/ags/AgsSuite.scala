@@ -14,6 +14,7 @@ import lucuma.ags.ScienceOffsets
 import lucuma.ags.syntax.*
 import lucuma.core.enums.*
 import lucuma.core.geom.Area
+import lucuma.core.geom.jts.interpreter.given
 import lucuma.core.geom.offsets.GeometryType
 import lucuma.core.geom.offsets.OffsetPosition
 import lucuma.core.math.Angle

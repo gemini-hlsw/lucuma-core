@@ -8,7 +8,7 @@ import cats.data.NonEmptyList
 import cats.data.NonEmptyMap
 import lucuma.core.geom.Area
 import lucuma.core.geom.ShapeExpression
-import lucuma.core.geom.jts.interpreter.given
+import lucuma.core.geom.ShapeInterpreter
 import lucuma.core.geom.offsets.OffsetPosition
 import lucuma.core.geom.offsets.RotatedOffset
 import lucuma.core.geom.syntax.all.*
@@ -58,7 +58,8 @@ object AgsVisualization {
   def patrolFieldGeometries(
     params:    SingleProbeAgsParams,
     positions: NonEmptyList[OffsetPosition]
-  ): NonEmptyList[PatrolFieldVisualization] = {
+  )(using si: ShapeInterpreter): NonEmptyList[PatrolFieldVisualization] = si.withArena {
+    // Only expressions leave the arena, so a native engine frees the evaluated fields here.
     given Order[Angle] = Angle.SignedAngleOrder
 
     val calcsByPA: Map[Angle, NonEmptyMap[OffsetPosition, AgsGeomCalc]] =
@@ -89,7 +90,7 @@ object AgsVisualization {
     params:          SingleProbeAgsParams,
     position:        OffsetPosition,
     guideStarOffset: Offset
-  ): ScienceOverlapVisualization = {
+  )(using si: ShapeInterpreter): ScienceOverlapVisualization = {
     val probeArm = params.probeArm(position.posAngle, guideStarOffset, position.offsetPos)
 
     val scienceTargetArea =
@@ -103,9 +104,9 @@ object AgsVisualization {
     val targetOverlap      = probeArm ∩ scienceTargetArea
     val detectorVignetting = probeArm ∩ scienceArea
 
-    // Compute metrics
-    val overlaps      = targetOverlap.maxSide.toMicroarcseconds > 5
-    val vignettedArea = detectorVignetting.eval.area
+    // Only the metrics leave the arena, so a native engine frees both overlays here.
+    val (overlaps, vignettedArea) = si.withArena:
+      (targetOverlap.maxSide.toMicroarcseconds > 5, detectorVignetting.eval.area)
 
     ScienceOverlapVisualization(
       position = position,

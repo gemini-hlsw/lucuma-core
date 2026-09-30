@@ -30,8 +30,8 @@ import lucuma.core.geom.Area
 import lucuma.core.geom.BoundingOffsets
 import lucuma.core.geom.Shape
 import lucuma.core.geom.ShapeExpression
+import lucuma.core.geom.ShapeInterpreter
 import lucuma.core.geom.gnirs
-import lucuma.core.geom.jts.interpreter.given
 import lucuma.core.geom.offsets.OffsetPosition
 import lucuma.core.geom.syntax.all.*
 import lucuma.core.geom.visitors.visitorScienceArea
@@ -51,6 +51,9 @@ sealed trait AgsGeomCalc:
   def overlapsProtectedArea(gsOffset: Offset, protectedShape: Shape): Boolean
 
   def intersectionPatrolField: ShapeExpression
+
+  // The evaluated intersection, valid only within the interpreter arena that created it.
+  def intersectionPatrolFieldShape: Shape
 
 trait SingleProbeAgsParams:
   def probe: GuideProbe
@@ -89,7 +92,7 @@ trait SingleProbeAgsParams:
   private val scienceShape = ShapeExpression.centeredEllipse(scienceDiameter, scienceDiameter)
 
   // Return the protected shapes for each offset
-  def protectedAreas(noZones: List[Offset]): List[Shape] =
+  def protectedAreas(noZones: List[Offset])(using ShapeInterpreter): List[Shape] =
     noZones.map(nz => (scienceShape ↗ nz).eval)
 
   /**
@@ -100,7 +103,7 @@ trait SingleProbeAgsParams:
 
   def posCalculations(
     positions: NonEmptyList[OffsetPosition]
-  ): NonEmptyMap[OffsetPosition, AgsGeomCalc] =
+  )(using si: ShapeInterpreter): NonEmptyMap[OffsetPosition, AgsGeomCalc] =
     val distinctOffsets: NonEmptyList[(Offset, Offset)] =
       positions.map(pos => (pos.offsetPos, pos.pivot)).distinct
 
@@ -142,7 +145,7 @@ trait SingleProbeAgsParams:
 
         override val intersectionPatrolField: ShapeExpression = pfExpr
 
-        private val intersectionShape: Shape = pfShape
+        override val intersectionPatrolFieldShape: Shape = pfShape
 
         // Cache bounding box for fast rejection
         private val intersectionBounds: BoundingOffsets = pfBounds
@@ -161,7 +164,7 @@ trait SingleProbeAgsParams:
 
         override def isReachable(gsOffset: Offset): Boolean =
           // Fast bounding box rejection, then precise check
-          intersectionBounds.contains(gsOffset) && intersectionShape.contains(gsOffset)
+          intersectionBounds.contains(gsOffset) && intersectionPatrolFieldShape.contains(gsOffset)
 
         private def armAt(gsOffset: Offset): Option[Shape] =
           armShape.map(
@@ -173,18 +176,20 @@ trait SingleProbeAgsParams:
 
         // Disjoint bounding boxes settle both questions without an overlay.
         override def overlapsProtectedArea(gsOffset: Offset, protectedShape: Shape): Boolean =
-          armAt(gsOffset).exists: placed =>
-            placed.boundingOffsets.intersects(protectedShape.boundingOffsets) &&
-              placed
-                .intersection(protectedShape)
-                .boundingOffsets
-                .maxSide
-                .toMicroarcseconds > 5
+          si.withArena:
+            armAt(gsOffset).exists: placed =>
+              placed.boundingOffsets.intersects(protectedShape.boundingOffsets) &&
+                placed
+                  .intersection(protectedShape)
+                  .boundingOffsets
+                  .maxSide
+                  .toMicroarcseconds > 5
 
         override def vignettingArea(gsOffset: Offset): Area =
-          armAt(gsOffset)
-            .filter(_.boundingOffsets.intersects(vignettingBounds))
-            .fold(Area.MinArea)(_.intersection(vignettingShapeEval).area)
+          si.withArena:
+            armAt(gsOffset)
+              .filter(_.boundingOffsets.intersects(vignettingBounds))
+              .fold(Area.MinArea)(_.intersection(vignettingShapeEval).area)
 
       }
     result.toNem
@@ -210,9 +215,9 @@ sealed trait AgsParams extends Product derives Eq:
   // The geometries won't chage with the position and we can cache them
   def posCalculations(
     positions: NonEmptyList[OffsetPosition]
-  ): NonEmptyMap[OffsetPosition, AgsGeomCalc]
+  )(using ShapeInterpreter): NonEmptyMap[OffsetPosition, AgsGeomCalc]
 
-  def protectedAreas(noZones: List[Offset]): List[Shape]
+  def protectedAreas(noZones: List[Offset])(using ShapeInterpreter): List[Shape]
 
 object AgsParams:
   private val GmosScienceDiameter = 20.arcseconds

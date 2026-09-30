@@ -4,10 +4,13 @@
 package lucuma.core.geom
 package jts
 
+import cats.data.NonEmptyList
 import lucuma.core.geom.jts.syntax.all.*
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
+import org.locationtech.jts.geom.Coordinate
 import org.locationtech.jts.geom.Geometry
+import org.locationtech.jts.geom.Polygon
 import org.locationtech.jts.geom.util.AffineTransformation
 
 /**
@@ -54,4 +57,18 @@ final case class JtsShape(g: Geometry) extends Shape {
       else AffineTransformation.rotationInstance(rotation.toDoubleRadians).transform(geom)
 
     JtsShape(translate(rotate(translate(g, preTranslation)), postTranslation))
+
+  def polygons: List[ShapePolygon] =
+    def ring(cs: Array[Coordinate]): Option[NonEmptyList[Offset]] =
+      NonEmptyList.fromList(cs.toList.map(_.offset))
+    (0 until g.getNumGeometries).toList.map(g.getGeometryN).flatMap:
+      case p: Polygon =>
+        ring(p.getExteriorRing.getCoordinates).map: exterior =>
+          ShapePolygon(
+            exterior,
+            (0 until p.getNumInteriorRing).toList
+              .flatMap(i => ring(p.getInteriorRingN(i).getCoordinates))
+          )
+      case _          => None
+
 }

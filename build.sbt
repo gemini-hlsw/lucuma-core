@@ -1,4 +1,5 @@
 import org.scalajs.linker.interface.ESVersion
+import org.scalajs.linker.interface.OutputPatterns
 import org.typelevel.sbt.gha.PermissionValue
 import org.typelevel.sbt.gha.Permissions
 
@@ -53,7 +54,7 @@ lazy val spireVersion               = "0.18.0"
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
-val root = tlCrossRootProject.aggregate(core, testkit, tests, catalog, ags, catalogTestkit, catalogTests, horizons, horizonsTests, itac, benchmarks, npm)
+val root = tlCrossRootProject.aggregate(core, testkit, tests, testsWasm, catalog, ags, catalogTestkit, catalogTests, horizons, horizonsTests, itac, benchmarks, benchmarksJS, npm)
 
 lazy val core = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Full)
@@ -140,6 +141,23 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform)
         .exclude("org.scala-lang.modules", "scala-xml_2.13"),
       "com.47deg"       %% "scalacheck-toolbox-datetime" % "0.7.0"       % Test
     )
+  )
+
+// The wasm kernel suites import the npm package from <repo>/node_modules, so they live apart
+// and only this module needs `npm ci`.
+lazy val testsWasm = project
+  .in(file("modules/tests-wasm"))
+  .enablePlugins(ScalaJSPlugin, NoPublishPlugin, AutomateHeaderPlugin)
+  .dependsOn(tests.js % "test->test")
+  .settings(
+    name := "lucuma-core-tests-wasm",
+    libraryDependencies ++= Seq(
+      "org.scalameta" %%% "munit"             % munitVersion           % Test,
+      "org.typelevel" %%% "discipline-munit"  % munitDisciplineVersion % Test,
+      "org.typelevel" %%% "munit-cats-effect" % munitCatsEffectVersion % Test
+    ),
+    scalaJSLinkerConfig ~= (_.withModuleKind(ModuleKind.ESModule)
+      .withOutputPatterns(OutputPatterns.fromJSFile("%s.mjs")))
   )
 
 lazy val catalog = crossProject(JVMPlatform, JSPlatform)
@@ -289,12 +307,17 @@ lazy val catalogTests = crossProject(JVMPlatform, JSPlatform)
   )
 
 
+// Workloads shared by the JMH and the Scala.js AGS benchmarks
+lazy val benchmarksShared =
+  Def.setting((ThisBuild / baseDirectory).value / "modules" / "benchmarks-shared" / "src" / "main" / "scala")
+
 lazy val benchmarks = project
   .in(file("modules/benchmarks"))
   .dependsOn(core.jvm, ags.jvm)
   .enablePlugins(NoPublishPlugin, AutomateHeaderPlugin, JmhPlugin)
   .settings(
-    name := "lucuma-benchmarks"
+    name := "lucuma-benchmarks",
+    Compile / unmanagedSourceDirectories += benchmarksShared.value
   )
 
 lazy val benchmarksJS = project
@@ -303,6 +326,7 @@ lazy val benchmarksJS = project
   .enablePlugins(ScalaJSPlugin, NoPublishPlugin, AutomateHeaderPlugin)
   .settings(
     name                            := "lucuma-benchmarks-js",
+    Compile / unmanagedSourceDirectories += benchmarksShared.value,
     scalaJSUseMainModuleInitializer := true,
     scalaJSLinkerConfig ~= (_.withModuleKind(ModuleKind.ESModule)
       .withESFeatures(_.withESVersion(ESVersion.ES2022)))
@@ -351,6 +375,17 @@ lazy val npm        = project
       "org.scalameta" %%% "munit" % munitVersion % Test
     )
   )
+
+// JS tests need Node and the npm packages from the root package.json (wasm geometry kernel)
+ThisBuild / githubWorkflowBuildPreamble ++= Seq(
+  WorkflowStep.Use(
+    UseRef.Public("actions", "setup-node", "v6"),
+    name = Some("Setup Node"),
+    params = Map("node-version" -> "26", "cache" -> "npm"),
+    cond = Some("matrix.project == 'rootJS'")
+  ),
+  WorkflowStep.Run(List("npm ci"), name = Some("npm ci"), cond = Some("matrix.project == 'rootJS'"))
+)
 
 ThisBuild / githubWorkflowPublishPreamble +=
   WorkflowStep.Use(

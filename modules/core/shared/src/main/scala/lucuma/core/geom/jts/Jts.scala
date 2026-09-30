@@ -29,11 +29,14 @@ object Jts {
             Offset.Q(Angle.fromMicroarcseconds(y.toLong))
     )
 
+  // An empty geometry has a null envelope (max < min), which would otherwise read as a 1 µas box.
   def boundingOffsets(g: Geometry): (Offset, Offset) = {
-    val envelope    = g.getEnvelopeInternal
-    val leftTop     = coord2offset(envelope.getMinX, envelope.getMaxY)
-    val bottomRight = coord2offset(envelope.getMaxX, envelope.getMinY)
-    (leftTop, bottomRight)
+    val envelope = g.getEnvelopeInternal
+    if (envelope.isNull) (Offset.Zero, Offset.Zero)
+    else
+      (coord2offset(envelope.getMinX, envelope.getMaxY),
+       coord2offset(envelope.getMaxX, envelope.getMinY)
+      )
   }
 
 }

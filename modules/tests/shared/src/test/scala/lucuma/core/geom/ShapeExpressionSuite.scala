@@ -4,11 +4,10 @@
 package lucuma.core.geom
 
 import cats.Order
-import cats.data.NonEmptyList
 import cats.syntax.all.*
 import lucuma.core.geom.ShapeExpression.*
 import lucuma.core.geom.arb.*
-import lucuma.core.geom.jts.interpreter.given
+import lucuma.core.geom.jts.JtsShapeInterpreter
 import lucuma.core.geom.syntax.all.*
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
@@ -20,7 +19,7 @@ import org.scalacheck.*
 import org.scalacheck.Arbitrary.*
 import org.scalacheck.Prop.*
 
-class ShapeExpressionSuite extends munit.DisciplineSuite with RetryFlakyTests {
+abstract class ShapeExpressionTests(using ShapeInterpreter) extends munit.DisciplineSuite with RetryFlakyTests {
 
   implicit def saneUnitToProp(unit: Unit): Prop = super.unitToProp(unit)
 
@@ -30,6 +29,9 @@ class ShapeExpressionSuite extends munit.DisciplineSuite with RetryFlakyTests {
   import ShapeExpressionSpec.*
 
   def at(arcseconds: Int): Offset = Offset.symmetric(arcseconds.arcsec)
+
+  // Area calculation isn't exact but within 1/2 mas^2 seems fine for our purposes.
+  protected def overlayAreaTolerance(nominal: Long): Double = 700.0
 
   // Regression test on Scala.js only: the JVM stack is deep enough that 2000 levels pass either way
   test("deep chains of one operation evaluate without recursion per operand"):
@@ -100,9 +102,7 @@ class ShapeExpressionSuite extends munit.DisciplineSuite with RetryFlakyTests {
       val lhs = (tcs.shape0.µasSquared + tcs.shape1.µasSquared) -
         (tcs.shape0 ∩ tcs.shape1).µasSquared
 
-      // Area calculation isn't exact but within 1/2 mas^2 seems fine for our
-      // purposes.
-      assertEqualsDouble((rhs - lhs).toDouble, 0L, 700L)
+      assertEqualsDouble((rhs - lhs).toDouble, 0.0, overlayAreaTolerance(rhs))
     }
   }
 
@@ -114,8 +114,7 @@ class ShapeExpressionSuite extends munit.DisciplineSuite with RetryFlakyTests {
           (tcs.shape1 - tcs.shape0).µasSquared
       )
 
-      // Area calculation isn't exact but within 1/2 mas^2 seems fine.
-      assertEqualsDouble((rhs - lhs).toDouble, 0L, 700L)
+      assertEqualsDouble((rhs - lhs).toDouble, 0.0, overlayAreaTolerance(rhs))
     }
   }
 
@@ -200,14 +199,10 @@ class ShapeExpressionSuite extends munit.DisciplineSuite with RetryFlakyTests {
     }
   }
 
-  test("intersectionShape intersects the shape at every angle and offset") {
-    val square = ShapeExpression.regularPolygon(10.arcsec, 4)
-    val shift  = Offset.signedDecimalArcseconds.reverseGet((5.0, 0.0))
-    val actual =
-      square.intersectionShape(NonEmptyList.one(Angle.Angle0), NonEmptyList.of(Offset.Zero, shift))
-    val direct = square.shapeAt(Offset.Zero, Angle.Angle0) ∩ square.shapeAt(shift, Angle.Angle0)
-    assert(actual.µasSquared > 0L)
-    assertEquals(actual.µasSquared, direct.µasSquared)
+  test("empty shapes have zero bounds and an empty bounding box") {
+    assertEquals(Empty.eval.boundingOffsets, BoundingOffsets(Offset.Zero, Offset.Zero))
+    assertEquals(BoundingBox(Empty).µasSquared, 0L)
+    assertEquals(BoundingBox(Empty).eval.boundingOffsets.maxSide, Angle.Angle0)
   }
 
   test("Regression test") {
@@ -289,6 +284,8 @@ class ShapeExpressionSuite extends munit.DisciplineSuite with RetryFlakyTests {
     assert(l.reduce(_ ∩ _).eval != null)
   }
 }
+
+class ShapeExpressionSuite extends ShapeExpressionTests(using JtsShapeInterpreter)
 
 object ShapeExpressionSpec {
 

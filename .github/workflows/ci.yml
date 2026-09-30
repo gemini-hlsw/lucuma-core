@@ -83,6 +83,17 @@ jobs:
           done
           exit 1
 
+      - name: Setup Node
+        if: matrix.project == 'rootJS'
+        uses: actions/setup-node@v6
+        with:
+          node-version: 26
+          cache: npm
+
+      - name: npm ci
+        if: matrix.project == 'rootJS'
+        run: npm ci
+
       - name: Check that workflows are up to date
         run: sbt githubWorkflowCheck
 

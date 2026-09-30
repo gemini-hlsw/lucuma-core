@@ -17,6 +17,7 @@ import lucuma.core.enums.GuideProbe
 import lucuma.core.enums.GuideSpeed
 import lucuma.core.enums.StepGuideState
 import lucuma.core.geom.Shape
+import lucuma.core.geom.ShapeInterpreter
 import lucuma.core.geom.offsets.OffsetPosition
 import lucuma.core.geom.offsets.OffsetPositions
 import lucuma.core.math.Angle
@@ -163,7 +164,7 @@ object Ags {
     wavelength:  Wavelength,
     positions:   NonEmptyList[OffsetPosition],
     params:      AgsParams
-  ): AgsContextBuffer = {
+  )(using ShapeInterpreter): AgsContextBuffer = {
     val guideSpeeds   = guideSpeedLimits(constraints, params, wavelength)
     val calcsStart    = System.nanoTime()
     val calcs         = params.posCalculations(positions)
@@ -177,6 +178,9 @@ object Ags {
   /**
    * FS2 pipe to do analysis of a stream of Candidate Guide Stars. The base and candidates must be
    * PM corrected by the caller.
+   *
+   * Use it with JTS only. Its shapes outlive any `withArena`, so a native kernel would free them
+   * only on garbage collection; wrapping the call in `withArena` frees them before the stream runs.
    */
   def agsAnalysisStream[F[_]](
     constraints:        ConstraintSet,
@@ -188,7 +192,7 @@ object Ags {
     acquisitionOffsets: Option[AcquisitionOffsets],
     scienceOffsets:     Option[ScienceOffsets],
     params:             AgsParams
-  ): Pipe[F, GuideStarCandidate, AgsAnalysis] = {
+  )(using ShapeInterpreter): Pipe[F, GuideStarCandidate, AgsAnalysis] = {
     val positions =
       generatePositions(
         baseCoordinates.some,
@@ -259,7 +263,7 @@ object Ags {
     scienceOffsets:     Option[ScienceOffsets],
     params:             AgsParams,
     candidates:         List[GuideStarCandidate]
-  ): AgsAnalysisResult = {
+  )(using si: ShapeInterpreter): AgsAnalysisResult = si.withArena {
     val positions =
       generatePositions(
         baseCoordinates.some,

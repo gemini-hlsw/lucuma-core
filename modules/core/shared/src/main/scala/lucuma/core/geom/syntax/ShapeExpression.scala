@@ -4,7 +4,6 @@
 package lucuma.core.geom
 package syntax
 
-import cats.data.NonEmptyList
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 
@@ -66,18 +65,6 @@ trait shapeexpression {
      */
     def shapePivotAt(offset: Offset, posAngle: Angle, pivot: Offset): ShapeExpression =
       self ↗ (offset - pivot) ⟲ posAngle ↗ pivot
-
-    /**
-     * Intersect positions at a set of offsets, used by AGS to intersect patrol fields
-     */
-    def intersectionShape(
-      posAngles: NonEmptyList[Angle],
-      offsets:   NonEmptyList[Offset]
-    ): ShapeExpression =
-      (for
-        a <- posAngles
-        o <- offsets
-      yield self.shapeAt(o, a)).reduceLeft(_ ∩ _)
 
     /**
     * Creates a bounding box for an expression

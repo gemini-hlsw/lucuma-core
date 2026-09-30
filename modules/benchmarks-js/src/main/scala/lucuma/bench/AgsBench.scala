@@ -3,81 +3,28 @@
 
 package lucuma.bench
 
-import cats.data.NonEmptyList
-import cats.data.NonEmptySet
+import cats.effect.unsafe.IORuntime
 import lucuma.ags.*
-import lucuma.ags.syntax.*
-import lucuma.core.enums.Band
-import lucuma.core.enums.PortDisposition
-import lucuma.core.enums.SkyBackground
-import lucuma.core.enums.WaterVapor
+import lucuma.core.geom.ShapeInterpreter
+import lucuma.core.geom.jts.JtsShapeInterpreter
+import lucuma.core.geom.wasm.WasmGeometry
+import lucuma.core.geom.wasm.WasmShapeInterpreter
 import lucuma.core.math.Angle
-import lucuma.core.math.BrightnessValue
-import lucuma.core.math.Coordinates
-import lucuma.core.math.Offset
-import lucuma.core.math.Wavelength
-import lucuma.core.model.CloudExtinction
-import lucuma.core.model.ConstraintSet
-import lucuma.core.model.ElevationRange
-import lucuma.core.model.ImageQuality
-import lucuma.core.model.SiderealTracking
+import org.locationtech.jts.geom.GeometryOverlay
 
-import java.util.Random
-import scala.collection.immutable.SortedMap
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.global
 
-// Node benchmark of the AGS hot path: GMOS imaging, 36 position angles, N science offsets,
-// 91 candidates. `dump` mode prints one line per analysis so two builds can be diffed.
+// Node benchmark of the AGS hot path on the workloads in `AgsWorkload`. Arguments: workloads
+// (`real`, or N for an N-point offset grid), then any of `wasm` (pair JTS with the kernel),
+// `dump` (one line per analysis instead of timings) and `old` (legacy JTS overlay).
 object AgsBench:
 
-  case class Config(offsets: List[Int], reps: Int, candidates: Int)
+  private val Reps = 3
 
-  val constraints: ConstraintSet = ConstraintSet(
-    ImageQuality.Preset.PointEight,
-    CloudExtinction.Preset.PointFive,
-    SkyBackground.Dark,
-    WaterVapor.Wet,
-    ElevationRange.ByAirMass.Default
-  )
+  def ms(nanos: Long): String = f"${nanos / 1.0e6}%.1f"
 
-  val wavelength: Wavelength = Wavelength.fromIntNanometers(500).get
-  val params: AgsParams      = AgsParams.GmosImaging(PortDisposition.Side)
-  val base: Coordinates      = Coordinates.Zero
-
-  val posAngles: NonEmptyList[Angle] =
-    NonEmptyList.fromListUnsafe(0.until(360).by(10).toList.map(d => Angle.fromDoubleDegrees(d)))
-
-  def spiralOffsets(n: Int): List[Offset] =
-    1.to(n)
-      .toList
-      .map: i =>
-        val r = i.toDouble / n * 30.0
-        val a = i * 2.399963
-        Offset.signedDecimalArcseconds.reverseGet((r * math.cos(a), r * math.sin(a)))
-
-  def scienceOffsets(n: Int): Option[ScienceOffsets] =
-    NonEmptySet
-      .fromSet(scala.collection.immutable.SortedSet.from(spiralOffsets(n).map(_.guided)))
-      .map(ScienceOffsets(_))
-
-  def candidates(n: Int, seed: Long): List[GuideStarCandidate] =
-    val rnd = new Random(seed)
-    1.to(n)
-      .toList
-      .map: i =>
-        val p      = (rnd.nextDouble() - 0.5) * 600.0
-        val q      = (rnd.nextDouble() - 0.5) * 600.0
-        val coords =
-          base.offsetBy(Angle.Angle0, Offset.signedDecimalArcseconds.reverseGet((p, q))).get
-        val g      = BrightnessValue.unsafeFrom(
-          BigDecimal(8.0 + rnd.nextDouble() * 12.0).setScale(3, BigDecimal.RoundingMode.HALF_UP)
-        )
-        GuideStarCandidate(i.toLong, SiderealTracking.const(coords), SortedMap(Band.Gaia -> g))
-
-  def runFull(offsets: Int, cands: List[GuideStarCandidate]): AgsAnalysisResult =
-    Ags.agsAnalysis(constraints, wavelength, base, Nil, None, posAngles, None,
-                    scienceOffsets(offsets), params, cands)
+  def argv: List[String] = global.process.argv.asInstanceOf[js.Array[String]].toList.drop(2)
 
   def dumpLine(a: AgsAnalysis): String =
     val vig = a match
@@ -85,31 +32,78 @@ object AgsBench:
       case _                     => "-"
     s"${Ags.resultLabel(a)}\t${a.target.id}\t${Angle.microarcseconds.get(a.posAngle)}\t$vig"
 
-  def ms(nanos: Long): String = f"${nanos / 1.0e6}%.1f"
+  def histogram(s: AgsStats): String =
+    s"accepted=${s.acceptedCount} " + s.resultCounts.toList
+      .sortBy(_._1)
+      .map((k, v) => s"$k=$v")
+      .mkString(" ")
 
-  def argv: List[String] = global.process.argv.asInstanceOf[js.Array[String]].toList.drop(2)
+  // Node cannot fetch the package's own file: URL; hand the loader the bytes.
+  def loadKernel(): js.Promise[ShapeInterpreter] =
+    given IORuntime = cats.effect.unsafe.implicits.global
+    js.`import`[js.Dynamic]("node:fs")
+      .`then`[ShapeInterpreter]: fs =>
+        val url   = js.`import`.meta
+          .asInstanceOf[js.Dynamic]
+          .resolve("@gemini-hlsw/lucuma-wasm/lucuma_wasm_bg.wasm")
+        val bytes = fs.readFileSync(js.Dynamic.newInstance(global.URL)(url)).asInstanceOf[js.Any]
+        WasmGeometry.loadFrom(bytes).unsafeToPromise()
+
+  // Times each workload on every engine, paired per rep, then compares the engines' outcomes.
+  def timeStage(workloads: List[AgsWorkload], engines: List[(String, ShapeInterpreter)]): Unit =
+    val kernel    = engines.size > 1
+    def live: Int = if kernel then WasmShapeInterpreter.liveHandles else 0
+    println(
+      "workload\tengine\trep\tcalcs_ms\tcontext_ms\tanalysis_ms\ttotal_ms\tlive_handles\twasm_mb"
+    )
+    engines.foreach((_, si) => workloads.head.run(using si))
+    workloads.foreach: w =>
+      val stats    = (1 to Reps).toList.flatMap: rep =>
+        engines.map: (name, si) =>
+          val before = live
+          val s      = w.run(using si).stats
+          val mb     = f"${WasmShapeInterpreter.memoryBytes / 1048576.0}%.1f"
+          println(
+            s"${w.name}\t$name\t$rep\t${ms(s.calcsNanos)}\t${ms(s.contextNanos)}\t${ms(s.analysisNanos)}\t${ms(s.contextNanos + s.analysisNanos)}\t${live - before}\t$mb"
+          )
+          name -> s
+      val byEngine = engines.map((name, _) => name -> stats.collect { case (`name`, s) => s })
+      val avgs     = byEngine.map: (name, ss) =>
+        val c = ss.map(_.calcsNanos).sum / ss.size
+        val a = ss.map(_.analysisNanos).sum / ss.size
+        println(s"${w.name}\t$name\tavg\tcalcs=${ms(c)} analysis=${ms(a)} total=${ms(c + a)}")
+        (c, a)
+      avgs match
+        case List((jc, ja), (wc, wa)) =>
+          println(
+            f"${w.name}\tspeedup\tcalcs=${jc.toDouble / wc}%.2fx analysis=${ja.toDouble / wa}%.2fx total=${(jc + ja).toDouble / (wc + wa)}%.2fx"
+          )
+        case _                        => ()
+      val hists    = byEngine.map((name, ss) => name -> histogram(ss.last))
+      hists.foreach((name, h) => println(s"${w.name}\thistogram\t$name\t$h"))
+      if hists.map(_._2).distinct.size > 1 then
+        println(s"${w.name}\tHISTOGRAM MISMATCH between engines")
 
   def main(args: Array[String]): Unit =
-    val offsets = argv.headOption
-      .map(_.split(",").toList.flatMap(_.trim.toIntOption))
-      .filter(_.nonEmpty)
-      .getOrElse(List(20, 30, 50))
-    val cfg     = Config(offsets, reps = 3, candidates = 91)
-    val cands   = candidates(cfg.candidates, seed = 42L)
-    if argv.drop(1).headOption.contains("dump") then
-      runFull(cfg.offsets.min, cands).analyses.foreach(a => println(dumpLine(a)))
-      return
-    println(s"node ${global.process.versions.node}  offsets=${cfg.offsets.mkString(",")} reps=${cfg.reps} candidates=${cfg.candidates}")
-    println("offsets\tpositions\trep\tcalcs_ms\tcontext_ms\tanalysis_ms\ttotal_ms")
-    runFull(cfg.offsets.min, cands)
-    cfg.offsets.foreach: n =>
-      val stats = (1 to cfg.reps).toList.map: rep =>
-        val s = runFull(n, cands).stats
-        println(s"$n\t${s.positionCount}\t$rep\t${ms(s.calcsNanos)}\t${ms(s.contextNanos)}\t${ms(s.analysisNanos)}\t${ms(s.contextNanos + s.analysisNanos)}")
-        s
-      val last  = stats.last
-      val avgC  = stats.map(_.calcsNanos).sum / stats.size
-      val avgA  = stats.map(_.analysisNanos).sum / stats.size
-      println(s"$n\tavg\tcalcs=${ms(avgC)} analysis=${ms(avgA)} total=${ms(avgC + avgA)}")
-      println(s"$n\thistogram\taccepted=${last.acceptedCount} " +
-        last.resultCounts.toList.sortBy(_._1).map((k, v) => s"$k=$v").mkString(" "))
+    val names     = argv.headOption.fold(List("real"))(_.split(",").toList.map(_.trim))
+    val workloads =
+      names.map(n => AgsWorkload.named(n).getOrElse(sys.error(s"unknown workload $n")))
+    val mode      = argv.drop(1)
+    if mode.contains("old") then
+      GeometryOverlay.OVERLAY_NG_DEFAULT = false
+      GeometryOverlay.setOverlayImpl("old")
+      println("jts overlay: legacy")
+    val kernel    =
+      if mode.contains("wasm") then loadKernel().`then`[Option[ShapeInterpreter]](Some(_))
+      else js.Promise.resolve[Option[ShapeInterpreter]](None)
+    kernel
+      .`then`[Unit]: k =>
+        if mode.contains("dump") then
+          val si = k.getOrElse(JtsShapeInterpreter)
+          workloads.head.run(using si).analyses.foreach(a => println(dumpLine(a)))
+        else
+          println(
+            s"node ${global.process.versions.node}  workloads=${names.mkString(",")} reps=$Reps"
+          )
+          timeStage(workloads, ("jts" -> JtsShapeInterpreter) :: k.map("wasm" -> _).toList)
+      .`catch`[Unit](e => println(s"failed: $e")): Unit

@@ -15,6 +15,7 @@ import lucuma.core.enums.GnirsPrism
 import lucuma.core.enums.GuideProbe
 import lucuma.core.enums.GuideSpeed
 import lucuma.core.enums.PortDisposition
+import lucuma.core.geom.jts.interpreter.given
 import lucuma.core.math.Wavelength
 import org.http4s.jdkhttpclient.JdkHttpClient
 import org.typelevel.log4cats.LoggerFactory
