@@ -199,6 +199,12 @@ abstract class ShapeExpressionTests(using ShapeInterpreter) extends munit.Discip
     }
   }
 
+  test("empty shapes have zero bounds and an empty bounding box") {
+    assertEquals(Empty.eval.boundingOffsets, BoundingOffsets(Offset.Zero, Offset.Zero))
+    assertEquals(BoundingBox(Empty).µasSquared, 0L)
+    assertEquals(BoundingBox(Empty).eval.boundingOffsets.maxSide, Angle.Angle0)
+  }
+
   test("Regression test") {
     val l = List[ShapeExpression](
       Rotate(
