@@ -20,10 +20,11 @@ trait ArbExecutionDigest {
       for {
         t <- arbitrary[SetupTime]
         c <- arbitrary[NonNegInt]
+        r <- arbitrary[NonNegInt]
         n <- arbitrary[NonNegInt]
         a <- arbitrary[SequenceDigest]
         s <- arbitrary[SequenceDigest]
-      } yield ExecutionDigest(t, c, n, a, s)
+      } yield ExecutionDigest(t, c, r, n, a, s)
     }
 
   given Cogen[ExecutionDigest] =
@@ -31,11 +32,13 @@ trait ArbExecutionDigest {
       SetupTime,
       Int,
       Int,
+      Int,
       SequenceDigest,
       SequenceDigest
     )].contramap { a => (
       a.setup,
       a.setupCount.value,
+      a.reacquisitionCount.value,
       a.calibrationCount.value,
       a.acquisition,
       a.science
