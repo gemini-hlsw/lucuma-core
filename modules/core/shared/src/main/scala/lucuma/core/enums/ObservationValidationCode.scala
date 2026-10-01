@@ -141,5 +141,11 @@ object ObservationValidationCode:
         "Unexpected Target of Opportunity",
         "The proposal type does not ordinarily have Targets of Opportunity.",
       )
+    case CallForProposalsWarning
+      extends Warning(
+        "cfp_warning",
+        "Call for Proposals Warning",
+        "Outside the recommendations of the selected Call for Proposals.",
+      )
 
 
