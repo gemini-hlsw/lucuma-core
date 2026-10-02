@@ -5,11 +5,11 @@ package lucuma.core.model.sequence
 
 import cats.Eq
 import cats.Monoid
-import cats.syntax.monoid.*
 import eu.timepit.refined.cats.*
 import eu.timepit.refined.types.numeric.NonNegInt
 import lucuma.core.enums.ExecutionState
 import lucuma.core.enums.ObserveClass
+import lucuma.core.model.sequence.exposure.ExposureTimeViolation
 import monocle.Focus
 import monocle.Lens
 
@@ -26,29 +26,19 @@ import scala.collection.immutable.SortedSet
  * @param gcalSets       number of atoms that contain at least one GCAL step
  * @param steps          count and estimated time of the steps, by kind
  * @param executionState completion state for this sequence
+ * @param exposureTimeViolations the exposure rules that steps of the
+ *                       sequence violate
  */
 case class SequenceDigest(
-  observeClass:     ObserveClass,
-  timeEstimate:     CategorizedTime,
-  telescopeConfigs: SortedSet[TelescopeConfig],
-  atomCount:        NonNegInt,
-  gcalSets:         NonNegInt,
-  steps:            StepDigests,
-  executionState:   ExecutionState
-):
-
-  def add[D](a: Atom[D]): SequenceDigest =
-    SequenceDigest(
-      observeClass     = observeClass |+| a.observeClass,
-      timeEstimate     = timeEstimate |+| a.timeEstimate,
-      telescopeConfigs = telescopeConfigs ++ a.steps.toList.map(_.telescopeConfig),
-      atomCount        = NonNegInt.unsafeFrom(atomCount.value + 1),
-      gcalSets         =
-        if a.steps.exists(_.stepConfig.usesGcalUnit) then NonNegInt.unsafeFrom(gcalSets.value + 1)
-        else gcalSets,
-      steps            = a.steps.toList.foldLeft(steps)(_.add(_)),
-      executionState   = executionState
-    )
+  observeClass:           ObserveClass,
+  timeEstimate:           CategorizedTime,
+  telescopeConfigs:       SortedSet[TelescopeConfig],
+  atomCount:              NonNegInt,
+  gcalSets:               NonNegInt,
+  steps:                  StepDigests,
+  executionState:         ExecutionState,
+  exposureTimeViolations: SortedSet[ExposureTimeViolation]
+)
 
 object SequenceDigest:
 
@@ -60,7 +50,8 @@ object SequenceDigest:
       NonNegInt.unsafeFrom(0),
       NonNegInt.unsafeFrom(0),
       StepDigests.Zero,
-      ExecutionState.NotStarted
+      ExecutionState.NotStarted,
+      SortedSet.empty
     )
 
   /** @group Optics */
@@ -91,6 +82,10 @@ object SequenceDigest:
   val gcalSets: Lens[SequenceDigest, NonNegInt] =
     Focus[SequenceDigest](_.gcalSets)
 
+  /** @group Optics */
+  val exposureTimeViolations: Lens[SequenceDigest, SortedSet[ExposureTimeViolation]] =
+    Focus[SequenceDigest](_.exposureTimeViolations)
+
   given Eq[SequenceDigest] =
     Eq.by: a =>
       (
@@ -100,5 +95,6 @@ object SequenceDigest:
         a.atomCount,
         a.gcalSets,
         a.steps,
-        a.executionState
+        a.executionState,
+        a.exposureTimeViolations
       )

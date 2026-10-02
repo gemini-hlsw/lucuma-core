@@ -55,3 +55,6 @@ object ObservationValidation:
 
     def tooActivationUnexpected(msg: String, moreMsgs: String*): ObservationValidation =
       fromMsgs(TooActivationUnexpected, msg, moreMsgs*)
+
+    def exposureTime(msg: String, moreMsgs: String*): ObservationValidation =
+      fromMsgs(ExposureTimeWarning, msg, moreMsgs*)
