@@ -20,8 +20,9 @@ import ConvenienceOps.*
  * Each can be used in both imaging and long-slit spectroscopy.
  *
  * `wavelength` and `spectroscopyWidth` come from the long-slit spectral coverage table
- * (Table 4-4, 50% cutoffs). `imagingWidth` comes from the imaging channel table, where the edges
- * are set by dichroics and filter cutoffs and differ from the spectroscopic ones.
+ * (Table 4-4 of the ConOps document, 50% cutoffs). `imagingWidth` comes from the imaging
+ * channel table, where the edges are set by dichroics and filter cutoffs and differ from
+ * the spectroscopic ones.
  *
  * @group Enumerations
  */
