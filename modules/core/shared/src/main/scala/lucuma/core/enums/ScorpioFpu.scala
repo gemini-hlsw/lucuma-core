@@ -13,9 +13,12 @@ import lucuma.core.util.Enumerated
 /**
  * Enumerated type for SCORPIO long-slit focal plane units.
  *
- * Slit widths come from Table 4-5, with the pixel count at the SCORPIO plate scale (0.18"/pix).
+ * Slit widths come from Table 4-5 of the ConOps document, with the pixel count at the SCORPIO
+ * plate scale (0.18"/pix).
+ *
  * The 4.32" slit is meant for slitless spectroscopy or as a field stop; its resolution is set by
  * the target size rather than the slit.
+ *
  * @group Enumerations
  */
 enum ScorpioFpu(
