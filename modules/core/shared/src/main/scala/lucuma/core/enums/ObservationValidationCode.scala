@@ -147,5 +147,11 @@ object ObservationValidationCode:
         "Call for Proposals Warning",
         "Outside the recommendations of the selected Call for Proposals.",
       )
+    case ExposureTimeWarning
+      extends Warning(
+        "exposure_time_warning",
+        "Exposure Time Warning",
+        "An exposure time is outside the recommended range for the instrument configuration.",
+      )
 
 
