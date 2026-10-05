@@ -11,3 +11,5 @@ import lucuma.core.math.units.*
 val ScorpioPixelScale: PixelScale = 0.18.pixelScale
 
 val LongSlitHeight: Angle = 180000.mas
+
+object all extends ScorpioScienceAreaGeometry
