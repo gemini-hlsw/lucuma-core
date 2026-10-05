@@ -10,8 +10,7 @@ import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 
 /**
- * SCORPIO science area geometry. Both channels share the same slit, so the shapes do not depend on
- * the channel.
+ * SCORPIO science area geometry. VIS and IR share the same slits.
  */
 trait ScorpioScienceAreaGeometry:
 
