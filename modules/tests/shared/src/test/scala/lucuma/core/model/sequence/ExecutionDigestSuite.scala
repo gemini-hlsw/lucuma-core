@@ -5,6 +5,7 @@ package lucuma.core.model.sequence
 
 import cats.kernel.laws.discipline.*
 import eu.timepit.refined.types.numeric.NonNegInt
+import lucuma.core.enums.ChargeClass
 import lucuma.core.model.sequence.arb.ArbExecutionDigest.given
 import lucuma.core.util.TimeSpan
 import munit.*
@@ -23,3 +24,17 @@ final class ExecutionDigestSuite extends DisciplineSuite:
 
     assertEquals(digest.totalSetupTime, TimeSpan.fromMinutes(47).get)
     assertEquals(digest.fullTimeEstimate.sum, TimeSpan.fromMinutes(47).get)
+
+  test("fullTimeEstimate includes expected calibrations but not existing ones"):
+    def estimate(minutes: Int): CalibrationEstimate =
+      CalibrationEstimate(
+        NonNegInt.unsafeFrom(1),
+        CategorizedTime.Zero.sumCharge(ChargeClass.Program, TimeSpan.fromMinutes(minutes).get)
+      )
+
+    val digest =
+      ExecutionDigest.Zero.copy(
+        calibrations = CalibrationDigest(existing = estimate(10), expected = estimate(15))
+      )
+
+    assertEquals(digest.fullTimeEstimate.sum, TimeSpan.fromMinutes(15).get)

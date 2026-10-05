@@ -12,22 +12,13 @@ import lucuma.core.util.TimeSpan
 import monocle.Focus
 import monocle.Lens
 
-/**
- * @param existingCalibrationCount calibrations already created for the observation
- * @param existingCalibrationTime  time for the existing calibrations, from their own estimates
- * @param expectedCalibrationCount calibrations predicted but not created yet
- * @param expectedCalibrationTime  time for the expected calibrations
- */
 case class ExecutionDigest(
-  setup:                    SetupTime,
-  setupCount:               NonNegInt,
-  reacquisitionCount:       NonNegInt,
-  existingCalibrationCount: NonNegInt,
-  existingCalibrationTime:  CategorizedTime,
-  expectedCalibrationCount: NonNegInt,
-  expectedCalibrationTime:  CategorizedTime,
-  acquisition:              SequenceDigest,
-  science:                  SequenceDigest
+  setup:              SetupTime,
+  setupCount:         NonNegInt,
+  reacquisitionCount: NonNegInt,
+  calibrations:       CalibrationDigest,
+  acquisition:        SequenceDigest,
+  science:            SequenceDigest
 ) {
 
   /**
@@ -35,12 +26,6 @@ case class ExecutionDigest(
    */
   lazy val observeClass: ObserveClass =
     science.observeClass
-
-  /** Calibrations still needed over the science time, existing and expected. */
-  def calibrationCount: NonNegInt =
-    NonNegInt.unsafeFrom(
-      math.min(existingCalibrationCount.value.toLong + expectedCalibrationCount.value.toLong, Int.MaxValue).toInt
-    )
 
   /**
    * Total setup time for the observation: every expected full setup plus
@@ -57,7 +42,7 @@ case class ExecutionDigest(
    */
   def fullTimeEstimate: CategorizedTime =
     science.timeEstimate.sumCharge(science.observeClass.chargeClass, totalSetupTime) |+|
-      expectedCalibrationTime
+      calibrations.chargedTime
 
   /**
    * Steps by kind across the acquisition and science sequences.  Excludes
@@ -75,10 +60,7 @@ object ExecutionDigest {
       SetupTime.Zero,
       NonNegInt.MinValue,
       NonNegInt.MinValue,
-      NonNegInt.MinValue,
-      CategorizedTime.Zero,
-      NonNegInt.MinValue,
-      CategorizedTime.Zero,
+      CalibrationDigest.Zero,
       SequenceDigest.Zero,
       SequenceDigest.Zero
     )
@@ -96,20 +78,8 @@ object ExecutionDigest {
     Focus[ExecutionDigest](_.reacquisitionCount)
 
   /** @group Optics */
-  val existingCalibrationCount: Lens[ExecutionDigest, NonNegInt] =
-    Focus[ExecutionDigest](_.existingCalibrationCount)
-
-  /** @group Optics */
-  val existingCalibrationTime: Lens[ExecutionDigest, CategorizedTime] =
-    Focus[ExecutionDigest](_.existingCalibrationTime)
-
-  /** @group Optics */
-  val expectedCalibrationCount: Lens[ExecutionDigest, NonNegInt] =
-    Focus[ExecutionDigest](_.expectedCalibrationCount)
-
-  /** @group Optics */
-  val expectedCalibrationTime: Lens[ExecutionDigest, CategorizedTime] =
-    Focus[ExecutionDigest](_.expectedCalibrationTime)
+  val calibrations: Lens[ExecutionDigest, CalibrationDigest] =
+    Focus[ExecutionDigest](_.calibrations)
 
   /** @group Optics */
   val acquisition: Lens[ExecutionDigest, SequenceDigest] =
@@ -124,10 +94,7 @@ object ExecutionDigest {
       a.setup,
       a.setupCount,
       a.reacquisitionCount,
-      a.existingCalibrationCount,
-      a.existingCalibrationTime,
-      a.expectedCalibrationCount,
-      a.expectedCalibrationTime,
+      a.calibrations,
       a.acquisition,
       a.science
     )}
