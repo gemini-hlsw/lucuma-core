@@ -70,6 +70,8 @@ object AgsParamsVariants:
                  AgsParams.Flamingos2Mos(Flamingos2LyotWheel.F16, PortDisposition.Side)
       ) ++
       withProbes("IGRINS-2", AgsParams.Igrins2LongSlit()) ++
+      withProbes("SCORPIO long slit", AgsParams.ScorpioLongSlit(ScorpioFpu.LongSlit_1_08)) ++
+      withProbes("SCORPIO imaging", AgsParams.ScorpioImaging()) ++
       withProbes(
         "GNIRS long slit",
         AgsParams.GnirsLongSlit(GnirsFpuSlit.LongSlit_0_30,

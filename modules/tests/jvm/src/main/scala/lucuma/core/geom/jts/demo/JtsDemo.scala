@@ -739,3 +739,52 @@ trait MaroonXShapes extends InstrumentShapes:
 
 object JtsMaroonXDemo extends JtsDemo with MaroonXShapes:
   override val arcsecPerPixel: Double = 0.01
+
+trait ScorpioShapes extends InstrumentShapes:
+  import lucuma.core.geom.pwfs.{patrolField, probeArm}
+  import lucuma.core.enums.GuideProbe
+
+  val posAngle: Angle =
+    15.deg
+
+  val offsetPos: Offset =
+    Offset.Zero
+
+  val guideStarOffset: Offset =
+    Offset(270.arcsec.p, 224.arcsec.q)
+
+  val probe: GuideProbe = GuideProbe.PWFS2
+
+  def scienceShape: ShapeExpression
+
+  def shapes: List[ShapeExpression] =
+    List(
+      ShapeExpression.centeredRectangle(1.arcsec, 1.arcsec).translate(guideStarOffset),
+      scienceShape,
+      patrolField.patrolFieldAt(posAngle, offsetPos),
+      probeArm.mirrorAt(probe, guideStarOffset, offsetPos),
+      probeArm.mirrorVignettedAreaAt(probe, guideStarOffset, offsetPos),
+      probeArm.armVignettedAreaAt(probe, guideStarOffset, offsetPos),
+      probeArm.armAt(probe, guideStarOffset, offsetPos)
+    )
+
+trait ScorpioLSShapes extends ScorpioShapes:
+  import lucuma.core.geom.scorpio.scienceArea
+  import lucuma.core.enums.ScorpioFpu
+
+  val fpu: ScorpioFpu = ScorpioFpu.LongSlit_4_32
+
+  def scienceShape: ShapeExpression =
+    scienceArea.longSlitMode.shapeAt(posAngle, offsetPos, fpu)
+
+trait ScorpioImagingShapes extends ScorpioShapes:
+  import lucuma.core.geom.scorpio.scienceArea
+
+  def scienceShape: ShapeExpression =
+    scienceArea.imagingMode.shapeAt(posAngle, offsetPos)
+
+object JtsScorpioLSDemo extends JtsDemo with ScorpioLSShapes:
+  override val arcsecPerPixel: Double = 1.0
+
+object JtsScorpioImagingDemo extends JtsDemo with ScorpioImagingShapes:
+  override val arcsecPerPixel: Double = 1.0

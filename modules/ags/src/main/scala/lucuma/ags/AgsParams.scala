@@ -25,6 +25,7 @@ import lucuma.core.enums.GnirsPrism
 import lucuma.core.enums.GuideProbe
 import lucuma.core.enums.PWFSGuideProbe
 import lucuma.core.enums.PortDisposition
+import lucuma.core.enums.ScorpioFpu
 import lucuma.core.enums.Site
 import lucuma.core.geom.Area
 import lucuma.core.geom.BoundingOffsets
@@ -659,6 +660,45 @@ object AgsParams:
       Igrins2LongSlit(port, GuideProbe.PWFS2)
 
     val Igrins2ScienceDiameter = 20.arcseconds
+
+  private val ScorpioScienceDiameter = 20.arcseconds
+
+  case class ScorpioLongSlit private (
+    fpu:   ScorpioFpu,
+    port:  PortDisposition,
+    probe: PWFSGuideProbe
+  ) extends AgsParams
+      with PwfsOnlyParams
+      with PwfsSupport[ScorpioLongSlit] derives Eq:
+
+    protected def withPWFSProbe(probe: PWFSGuideProbe): ScorpioLongSlit = copy(probe = probe)
+
+    override def scienceArea(posAngle: Angle, offset: Offset): ShapeExpression =
+      lucuma.core.geom.scorpio.scienceArea.longSlitMode.shapeAt(posAngle, offset, fpu)
+
+    override def scienceDiameter: Angle = ScorpioScienceDiameter
+
+  object ScorpioLongSlit:
+    def apply(fpu: ScorpioFpu, port: PortDisposition = PortDisposition.Side): ScorpioLongSlit =
+      ScorpioLongSlit(fpu, port, GuideProbe.PWFS2)
+
+  case class ScorpioImaging private (
+    port:  PortDisposition,
+    probe: PWFSGuideProbe
+  ) extends AgsParams
+      with PwfsOnlyParams
+      with PwfsSupport[ScorpioImaging] derives Eq:
+
+    protected def withPWFSProbe(probe: PWFSGuideProbe): ScorpioImaging = copy(probe = probe)
+
+    override def scienceArea(posAngle: Angle, offset: Offset): ShapeExpression =
+      lucuma.core.geom.scorpio.scienceArea.imagingMode.shapeAt(posAngle, offset)
+
+    override def scienceDiameter: Angle = ScorpioScienceDiameter
+
+  object ScorpioImaging:
+    def apply(port: PortDisposition = PortDisposition.Side): ScorpioImaging =
+      ScorpioImaging(port, GuideProbe.PWFS2)
 
   case class GnirsLongSlit private (
     fpu:                 GnirsFpuSlit,

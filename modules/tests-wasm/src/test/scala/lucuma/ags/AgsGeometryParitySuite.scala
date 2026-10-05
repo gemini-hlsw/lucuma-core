@@ -91,6 +91,8 @@ class AgsGeometryParitySuite extends munit.FunSuite with WasmKernelFixture:
         "F2 MOS"                      ->
           AgsParams.Flamingos2Mos(Flamingos2LyotWheel.F16, PortDisposition.Side),
         "IGRINS-2"                    -> AgsParams.Igrins2LongSlit(),
+        "SCORPIO long slit"           -> AgsParams.ScorpioLongSlit(ScorpioFpu.LongSlit_1_08),
+        "SCORPIO imaging"             -> AgsParams.ScorpioImaging(),
         "GNIRS long slit"             ->
           AgsParams.GnirsLongSlit(GnirsFpuSlit.LongSlit_0_30,
                                   GnirsCamera.ShortBlue,
