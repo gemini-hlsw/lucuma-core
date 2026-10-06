@@ -16,7 +16,7 @@ case class ExecutionDigest(
   setup:              SetupTime,
   setupCount:         NonNegInt,
   reacquisitionCount: NonNegInt,
-  calibrationCount:   NonNegInt,
+  calibrations:       CalibrationDigest,
   acquisition:        SequenceDigest,
   science:            SequenceDigest
 ) {
@@ -35,11 +35,14 @@ case class ExecutionDigest(
     (setup.full *| setupCount.value) +| (setup.reacquisition *| reacquisitionCount.value)
 
   /**
-   * Planned time for the observation, including the science sequence and all
-   * expected acquisitions and reacquisitions.
+   * Planned time for the observation, including the science sequence, all
+   * expected acquisitions and reacquisitions, and the calibrations still
+   * expected.  Existing calibrations are observations of their own and are
+   * not included.
    */
   def fullTimeEstimate: CategorizedTime =
-    science.timeEstimate.sumCharge(science.observeClass.chargeClass, totalSetupTime)
+    science.timeEstimate.sumCharge(science.observeClass.chargeClass, totalSetupTime) |+|
+      calibrations.chargedTime
 
   /**
    * Steps by kind across the acquisition and science sequences.  Excludes
@@ -57,7 +60,7 @@ object ExecutionDigest {
       SetupTime.Zero,
       NonNegInt.MinValue,
       NonNegInt.MinValue,
-      NonNegInt.MinValue,
+      CalibrationDigest.Zero,
       SequenceDigest.Zero,
       SequenceDigest.Zero
     )
@@ -75,8 +78,8 @@ object ExecutionDigest {
     Focus[ExecutionDigest](_.reacquisitionCount)
 
   /** @group Optics */
-  val calibrationCount: Lens[ExecutionDigest, NonNegInt] =
-    Focus[ExecutionDigest](_.calibrationCount)
+  val calibrations: Lens[ExecutionDigest, CalibrationDigest] =
+    Focus[ExecutionDigest](_.calibrations)
 
   /** @group Optics */
   val acquisition: Lens[ExecutionDigest, SequenceDigest] =
@@ -91,7 +94,7 @@ object ExecutionDigest {
       a.setup,
       a.setupCount,
       a.reacquisitionCount,
-      a.calibrationCount,
+      a.calibrations,
       a.acquisition,
       a.science
     )}

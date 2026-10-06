@@ -12,6 +12,7 @@ import org.scalacheck.Cogen
 
 trait ArbExecutionDigest {
 
+  import ArbCalibrationDigest.given
   import ArbSetupTime.given
   import ArbSequenceDigest.given
 
@@ -21,7 +22,7 @@ trait ArbExecutionDigest {
         t <- arbitrary[SetupTime]
         c <- arbitrary[NonNegInt]
         r <- arbitrary[NonNegInt]
-        n <- arbitrary[NonNegInt]
+        n <- arbitrary[CalibrationDigest]
         a <- arbitrary[SequenceDigest]
         s <- arbitrary[SequenceDigest]
       } yield ExecutionDigest(t, c, r, n, a, s)
@@ -32,14 +33,14 @@ trait ArbExecutionDigest {
       SetupTime,
       Int,
       Int,
-      Int,
+      CalibrationDigest,
       SequenceDigest,
       SequenceDigest
     )].contramap { a => (
       a.setup,
       a.setupCount.value,
       a.reacquisitionCount.value,
-      a.calibrationCount.value,
+      a.calibrations,
       a.acquisition,
       a.science
     )}
