@@ -72,6 +72,19 @@ object GhostIfuMappingSyntax:
       .stripTrailingZeros
       .toPlainString
 
+  // An opportunity target is a placeholder without coordinates, so nothing can
+  // be checked.  Assume the target falls on IFU1, with the sky position (if
+  // any) on IFU2, so that the sequence and its time estimate can be computed
+  // before the target is known.  The mapping does not affect the time estimate,
+  // and the real one is derived once the actual target replaces the
+  // placeholder.  In particular, High Resolution mode only requires a sky
+  // position at that point.
+  private def opportunityPlaceholder(
+    ctx:      IfuMappingContext,
+    targetId: Target.Id
+  ): GhostIfuMapping =
+    ctx.sky.fold(GhostIfuMapping.SingleTarget(targetId))(GhostIfuMapping.TargetPlusSky(targetId, _))
+
   private def deriveOneTarget(
     ctx:    IfuMappingContext,
     target: (Target.Id, Target)
@@ -92,7 +105,7 @@ object GhostIfuMappingSyntax:
               "GHOST does not support sky positions for nonsidereal targets.".asLeft
 
           case Target.Opportunity(_, _, _)     =>
-            "A GHOST IFU mapping can only be determined after the science target is identified.".asLeft
+            opportunityPlaceholder(ctx, target._1).asRight
 
       case GhostResolutionMode.High =>
         target._2 match
@@ -109,7 +122,7 @@ object GhostIfuMappingSyntax:
               "GHOST does not support sky positions for nonsidereal targets.".asLeft
 
           case Target.Opportunity(_, _, _)     =>
-            "A GHOST IFU mapping can only be determined after the science target is identified.".asLeft
+            opportunityPlaceholder(ctx, target._1).asRight
 
   private def deriveDualTarget(
     ctx:     IfuMappingContext,
