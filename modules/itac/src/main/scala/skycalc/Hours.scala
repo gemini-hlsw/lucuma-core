@@ -12,6 +12,8 @@
 
 package edu.gemini.qengine.skycalc;
 
+import lucuma.core.util.TimeSpan
+
 /**
  * Contains a time amount in hours.  Used for expressing how much time is
  * available in particular RA bins.
@@ -21,6 +23,10 @@ final case class Hours(hours: Double) {
     @deprecated def getHours = hours
     def add(that: Hours): Hours = Hours(this.hours + that.hours)
     override def toString() = String.format("%.2f hrs", hours)
+
+    def toTimeSpan: TimeSpan =
+        TimeSpan.fromHoursBounded(hours)
+
 }
 
 object Hours:

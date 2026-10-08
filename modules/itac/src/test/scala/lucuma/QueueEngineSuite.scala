@@ -26,6 +26,9 @@ import lucuma.core.model.Semester.YearInt
 import lucuma.core.util.TimeSpan
 import lucuma.ocs.Fixture_25B
 import munit.FunSuite
+import lucuma.core.model.IntCentiPercentUnbounded
+import lucuma.core.enums.ScienceBand
+import lucuma.core.util.Enumerated
 
 class QueueEngineSuite extends FunSuite:
 
@@ -35,8 +38,8 @@ class QueueEngineSuite extends FunSuite:
   // (  0, 45] 100%
   // ( 45, 90)  50%
   val decBins   = DeclinationMap.fromBins(
-    DecRanged( 0, 45, IntCentiPercent.unsafeFromPercent(100)),
-    DecRanged(45, 90, IntCentiPercent.unsafeFromPercent( 50)).inclusive
+    DecRanged( 0, 45, IntCentiPercentUnbounded.unsafeFromPercent(100)),
+    DecRanged(45, 90, IntCentiPercentUnbounded.unsafeFromPercent( 50)).inclusive
   )
 
   // <=CC70 50%
@@ -60,23 +63,24 @@ class QueueEngineSuite extends FunSuite:
 
     val qt = Fixture.evenQueueTime(1000, None) // TODO: do this ourselves, this is wrong
 
-    val (resource, log, queues) = QueueEngine3.calc(
+    val calc = QueueEngine3.calc(
       Fixture_25B.loadAll().toOption.get,
       (_, _) => qt, 
       cfg
     )
 
-    queues.foreach: q =>
-      println()
-      println(s"${q.band} at ${q.site}:")
-      println()
-      println(s"    \tAvailable\tUsed\t\tRemaining")
-      TimeAccountingCategory.values.foreach: tac =>
-        println(s"  $tac\t${q.queueTime(tac).toHours}\t${q.usedTime(tac).toHours}\t${q.remainingTime(tac).toHours}")
+    calc.queues.toList.foreach: queues =>
+      Enumerated[ScienceBand].all.map(queues).foreach: q =>
+        println()
+        println(s"${q.band} at ${q.site}:")
+        println()
+        println(s"    \tAvailable\tUsed\t\tRemaining")
+        TimeAccountingCategory.values.foreach: tac =>
+          println(s"  $tac\t${q.queueTime(tac).toHours}\t${q.usedTime(tac).toHours}\t${q.remainingTime(tac).toHours}")
 
-      println()
-      q.toList.foreach: ps =>
-        println(s"  ${ps.reference} ${ps.parentProposal.reference} rank ${ps.parentProposal.ranking}")
+        println()
+        q.toList.foreach: ps =>
+          println(s"  ${ps.reference} ${ps.parentProposal.reference} rank ${ps.parentProposal.ranking}")
 
     println()
     // log.toDetailList.foreach: e =>

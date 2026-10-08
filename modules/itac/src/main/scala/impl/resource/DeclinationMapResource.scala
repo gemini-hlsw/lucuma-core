@@ -15,11 +15,11 @@ import edu.gemini.tac.qengine.util.BoundedTime
 import lucuma.core.enums.ScienceBand
 import lucuma.core.enums.TooActivation
 import lucuma.core.math.Declination
-import lucuma.core.model.IntCentiPercent
 import lucuma.core.util.TimeSpan
+import lucuma.core.model.IntCentiPercentUnbounded
 
 object DeclinationMapResource {
-  def apply(t: TimeSpan, bins: DeclinationMap[IntCentiPercent]): DeclinationMapResource = {
+  def apply(t: TimeSpan, bins: DeclinationMap[IntCentiPercentUnbounded]): DeclinationMapResource = {
     new DeclinationMapResource(bins.map(perc => BoundedTime(t *| perc)))
   }
 

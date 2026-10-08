@@ -33,6 +33,7 @@ import lucuma.core.util.Enumerated
 import lucuma.core.util.TimeSpan
 
 import scala.annotation.unused
+import lucuma.core.model.IntCentiPercentUnbounded
 
 object Fixture {
   val site = Site.GS
@@ -43,8 +44,8 @@ object Fixture {
   // (  0, 45] 100%
   // ( 45, 90)  50%
   val decBins   = DeclinationMap.fromBins(
-    DecRanged( 0, 45, IntCentiPercent.unsafeFromPercent(100)),
-    DecRanged(45, 90, IntCentiPercent.unsafeFromPercent( 50)).inclusive
+    DecRanged( 0, 45, IntCentiPercentUnbounded.unsafeFromPercent(100)),
+    DecRanged(45, 90, IntCentiPercentUnbounded.unsafeFromPercent( 50)).inclusive
   )
 
   // <=CC70 50%

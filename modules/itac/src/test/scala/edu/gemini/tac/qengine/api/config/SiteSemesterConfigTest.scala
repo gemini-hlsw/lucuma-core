@@ -10,6 +10,7 @@ import lucuma.core.model.Semester
 import lucuma.core.model.Semester.YearInt
 import lucuma.core.util.TimeSpan
 import munit.FunSuite
+import lucuma.core.model.IntCentiPercentUnbounded
 
 class SiteSemesterConfigTest extends FunSuite {
   // these aren't really relevant for the test cases, but required to
@@ -19,14 +20,14 @@ class SiteSemesterConfigTest extends FunSuite {
 
   test("testPassSingleDecBinPercentageRequirement") {
     val ra  = RightAscensionMap(List(TimeSpan.fromHoursBounded(100.0)))
-    val dec = DeclinationMap(List(IntCentiPercent.unsafeFromPercent(100)))
+    val dec = DeclinationMap(List(IntCentiPercentUnbounded.unsafeFromPercent(100)))
     new SiteSemesterConfig(site, semester, ra, dec, List.empty)
     ()
   }
 
   test("testFailSingleDecBinPercentageRequirement") {
     val ra  = RightAscensionMap(List(TimeSpan.fromHoursBounded(100.0)))
-    val dec = DeclinationMap(List(IntCentiPercent.unsafeFromPercent(99)))
+    val dec = DeclinationMap(List(IntCentiPercentUnbounded.unsafeFromPercent(99)))
     try {
       new SiteSemesterConfig(site, semester, ra, dec, List.empty)
       ()
@@ -37,14 +38,14 @@ class SiteSemesterConfigTest extends FunSuite {
 
   test("testPassMultiDecBinPercentageRequirement") {
     val ra  = RightAscensionMap(List(TimeSpan.fromHoursBounded(100.0)))
-    val dec = DeclinationMap(List(IntCentiPercent.unsafeFromPercent(10), IntCentiPercent.unsafeFromPercent(100), IntCentiPercent.unsafeFromPercent(0)))
+    val dec = DeclinationMap(List(IntCentiPercentUnbounded.unsafeFromPercent(10), IntCentiPercentUnbounded.unsafeFromPercent(100), IntCentiPercentUnbounded.unsafeFromPercent(0)))
     new SiteSemesterConfig(site, semester, ra, dec, List.empty)
     ()
   }
 
   test("testFailMultiDecBinPercentageRequirement") {
     val ra  = RightAscensionMap(List(TimeSpan.fromHoursBounded(100.0)))
-    val dec = DeclinationMap(List(IntCentiPercent.unsafeFromPercent(10), IntCentiPercent.unsafeFromPercent(99), IntCentiPercent.unsafeFromPercent(0)))
+    val dec = DeclinationMap(List(IntCentiPercentUnbounded.unsafeFromPercent(10), IntCentiPercentUnbounded.unsafeFromPercent(99), IntCentiPercentUnbounded.unsafeFromPercent(0)))
     try {
       new SiteSemesterConfig(site, semester, ra, dec, List.empty)
       ()

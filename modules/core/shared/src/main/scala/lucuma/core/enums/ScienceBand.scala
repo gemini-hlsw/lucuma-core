@@ -5,8 +5,8 @@ package lucuma.core.enums
 
 import lucuma.core.util.Enumerated
 
-enum ScienceBand(val tag: String) derives Enumerated:
-  case Band1 extends ScienceBand("band1")
-  case Band2 extends ScienceBand("band2")
-  case Band3 extends ScienceBand("band3")
-  case Band4 extends ScienceBand("band4")
+enum ScienceBand(val tag: String, val intValue: Int) derives Enumerated:
+  case Band1 extends ScienceBand("band1", 1)
+  case Band2 extends ScienceBand("band2", 2)
+  case Band3 extends ScienceBand("band3", 3)
+  case Band4 extends ScienceBand("band4", 4)
