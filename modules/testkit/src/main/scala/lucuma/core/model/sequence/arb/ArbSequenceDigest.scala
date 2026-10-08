@@ -9,10 +9,13 @@ import eu.timepit.refined.types.numeric.NonNegInt
 import lucuma.core.enums.ExecutionState
 import lucuma.core.enums.ObserveClass
 import lucuma.core.model.sequence.arb.ArbTelescopeConfig.given
+import lucuma.core.model.sequence.exposure.ExposureTimeViolation
+import lucuma.core.model.sequence.exposure.arb.ArbExposureTimeViolation.given
 import lucuma.core.util.arb.ArbEnumerated
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.*
 import org.scalacheck.Cogen
+import org.scalacheck.Gen
 
 import scala.collection.immutable.SortedSet
 
@@ -31,7 +34,8 @@ trait ArbSequenceDigest:
         g <- arbitrary[NonNegInt]
         d <- arbitrary[StepDigests]
         s <- arbitrary[ExecutionState]
-      yield SequenceDigest(c, t, o, n, g, d, s)
+        v <- Gen.choose(0, 3).flatMap(Gen.listOfN(_, arbitrary[ExposureTimeViolation])).map(SortedSet.from)
+      yield SequenceDigest(c, t, o, n, g, d, s, v)
 
   given Cogen[SequenceDigest] =
     Cogen[(
@@ -41,7 +45,8 @@ trait ArbSequenceDigest:
       NonNegInt,
       NonNegInt,
       StepDigests,
-      ExecutionState
+      ExecutionState,
+      List[ExposureTimeViolation]
     )].contramap: a =>
       (
         a.observeClass,
@@ -50,7 +55,8 @@ trait ArbSequenceDigest:
         a.atomCount,
         a.gcalSets,
         a.steps,
-        a.executionState
+        a.executionState,
+        a.exposureTimeViolations.toList
       )
 
 object ArbSequenceDigest extends ArbSequenceDigest
