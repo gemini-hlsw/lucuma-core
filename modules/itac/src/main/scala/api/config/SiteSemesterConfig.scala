@@ -7,6 +7,7 @@ import lucuma.core.enums.Site
 import lucuma.core.model.IntCentiPercent
 import lucuma.core.model.Semester
 import lucuma.core.util.TimeSpan
+import lucuma.core.model.IntCentiPercentUnbounded
 
 // TODO:
 // The RightAscensionMap[Time] limits and DeclinationMap[IntCentiPercent] can be calculated given
@@ -23,7 +24,7 @@ final case class SiteSemesterConfig(
         val site: Site,
         val semester: Semester,
         val raLimits: RightAscensionMap[TimeSpan],
-        val decLimits: DeclinationMap[IntCentiPercent],
+        val decLimits: DeclinationMap[IntCentiPercentUnbounded],
         val shutdowns : List[Shutdown],
         val conditions: ConditionsCategoryMap[IntCentiPercent] = Default.Conditions) {
 

@@ -22,6 +22,7 @@ import lucuma.core.enums.ScienceSubtype
 import lucuma.core.enums.Site
 import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.util.Enumerated
+import edu.gemini.tac.qengine.api.QueueCalc
 
 object QueueEngine3 {
 
@@ -29,7 +30,7 @@ object QueueEngine3 {
     proposals:    List[Proposal],
     queueTimes:   (ScienceBand, Site) => QueueTime,
     config:       PerSite[QueueEngineConfig], // but this is only for one site!
-  ): (PerSite[SemesterResource], ProposalLog, List[ProposalQueue]) = {
+  ): QueueCalc = {
 
     // Find all the observations that don't participate in the queue process, because their time
     // needs to be subtracted from the initail RightAscensionMapResource (which happens on construction). Then
@@ -129,6 +130,11 @@ object QueueEngine3 {
     //       case Band4 => queue4
     //     }
     // }
+
+    QueueCalc(
+      PerSite.unfold(site => band => queues.find(q => q.site === site && q.band === band).getOrElse(sys.error(s"unpossible: missing queue for $site $band"))),
+      log
+    )
 
   }
 
