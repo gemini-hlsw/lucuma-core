@@ -31,6 +31,7 @@ object codecs:
       case TelluricType.Solar             => "solar"
       case TelluricType.NoTelluric        => "NoTelluric"
       case TelluricType.Manual(starTypes) => starTypes.toList.mkString(",")
+      case TelluricType.UserDefined(_)    => "UserDefined"
 
   given Decoder[TelluricCalibrationOrder] =
     Decoder[String].emap: s =>
