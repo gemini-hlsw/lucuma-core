@@ -6,11 +6,12 @@ package lucuma.core.model
 import lucuma.core.refined.auto.*
 import lucuma.core.util.WithGid
 
-object Attachment       extends WithGid('a'.refined)
-object CallForProposals extends WithGid('c'.refined)
-object Group            extends WithGid('g'.refined)
-object Observation      extends WithGid('o'.refined)
-object Program          extends WithGid('p'.refined)
-object ProgramNote      extends WithGid('n'.refined)
-object ProgramUser      extends WithGid('m'.refined)
-object Visit            extends WithGid('v'.refined)
+object Attachment           extends WithGid('a'.refined)
+object CallForProposals     extends WithGid('c'.refined)
+object ConfigurationRequest extends WithGid('x'.refined)
+object Group                extends WithGid('g'.refined)
+object Observation          extends WithGid('o'.refined)
+object Program              extends WithGid('p'.refined)
+object ProgramNote          extends WithGid('n'.refined)
+object ProgramUser          extends WithGid('m'.refined)
+object Visit                extends WithGid('v'.refined)
