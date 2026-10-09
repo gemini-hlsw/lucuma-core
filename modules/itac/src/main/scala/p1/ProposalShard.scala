@@ -47,6 +47,12 @@ class ProposalShard(
     if allocation.duration.isEmpty then Nil
     else parentProposal.itacObservationsScaledForSiteAndBand(site, allocation.scienceBand)(using Metadata.placeholder)
 
+  def isEmpty: Boolean =
+    observations.isEmpty
+
+  def nonEmpty: Boolean =
+    !isEmpty
+
 object ProposalShard:
   case class Reference(
     parentReference: ProposalReference, 

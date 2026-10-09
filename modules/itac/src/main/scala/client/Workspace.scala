@@ -28,6 +28,8 @@ import java.nio.file.Files
 import java.nio.file.NoSuchFileException
 import java.nio.file.Path
 import java.nio.file.Paths
+import edu.gemini.tac.qengine.p1.ProposalShard
+import lucuma.core.enums.TimeAccountingCategory
 
 /** Interface for some Workspace operations. */
 trait Workspace[F[_]] {
@@ -53,6 +55,7 @@ trait Workspace[F[_]] {
   def commonConfig: F[Common]
   def queueConfig(path: Path): F[QueueConfig]
   def proposals: F[List[Proposal]]
+  def shards: F[List[ProposalShard]]
   // def removed: F[List[Proposal]]
 
   def proposal(ref: String): F[(File, NonEmptyList[Proposal])]
@@ -234,6 +237,12 @@ object Workspace {
           cwd.flatMap: cwd =>
             loadOcsProposals:
               Enumerated[ScienceBand].all.fproduct(b => cwd.resolve(proposalDir(b))).toMap
+
+        def shards: F[List[ProposalShard]] =
+          proposals.map: ps =>
+            (ps, Enumerated[Site].all, Enumerated[TimeAccountingCategory].all, Enumerated[ScienceBand].all)
+              .mapN(_.shardFor(_, _, _))
+              .filter(_.nonEmpty)
 
         def proposal(ref: String, band: ScienceBand): F[(File, NonEmptyList[Proposal])] =
           ???

@@ -23,6 +23,8 @@ import org.typelevel.log4cats.slf4j.Slf4jLogger
 import java.nio.file.Path
 import java.nio.file.Paths
 import scala.util.control.NonFatal
+import itac.operation.Ls
+import cats.data.ValidatedNel
 
 // object Stub {
 //   def main(args: Array[String]): Unit =
@@ -143,11 +145,11 @@ trait MainOpts { this: CommandIOApp =>
             |""".stripMargin.trim
     )(semester.map(Init[IO]))
 
-  // lazy val ls: Command[Operation[IO]] =
-  //   Command(
-  //     name   = "ls",
-  //     header = "List proposals in the workspace."
-  //   )((lsFields, lsPartners).mapN(Ls[IO](_, _)))
+  lazy val ls: Command[Operation[IO]] =
+    Command(
+      name   = "ls",
+      header = "List proposals in the workspace."
+    )((lsFields, lsPartners).mapN(Ls[IO](_, _)))
 
   lazy val lsPartners: Opts[List[String]] =
       Opts.arguments[String](
@@ -308,19 +310,19 @@ trait MainOpts { this: CommandIOApp =>
   //     help = "Angular separation of targets that might be the same. Default 00:00:10.00"
   //   ).withDefault(Angle.fromDoubleArcseconds(10))
 
-  // implicit lazy val ArgumentNelLsField: Argument[NonEmptyList[Ls.Field]] =
-  //   new Argument[NonEmptyList[Ls.Field]] {
-  //     def defaultMetavar: String = "sort"
-  //     def read(string: String): ValidatedNel[String,NonEmptyList[Ls.Field]] =
-  //       Ls.Field.parse(string).toValidatedNel
-  //   }
+  implicit lazy val ArgumentNelLsField: Argument[NonEmptyList[Ls.Field]] =
+    new Argument[NonEmptyList[Ls.Field]] {
+      def defaultMetavar: String = "sort"
+      def read(string: String): ValidatedNel[String,NonEmptyList[Ls.Field]] =
+        Ls.Field.parse(string).toValidatedNel
+    }
 
-  // lazy val lsFields: Opts[NonEmptyList[Ls.Field]] =
-  //   Opts.option[NonEmptyList[Ls.Field]](
-  //     short = "s",
-  //     long  = "sort",
-  //     help  = s"Fields to sort by, comma-delimited. One or more of ${Ls.Field.all.map(_.name).mkString(",")}. Default is band,ra"
-  //   ) .withDefault(NonEmptyList.of(Ls.Field.partner, Ls.Field.rank))
+  lazy val lsFields: Opts[NonEmptyList[Ls.Field]] =
+    Opts.option[NonEmptyList[Ls.Field]](
+      short = "s",
+      long  = "sort",
+      help  = s"Fields to sort by, comma-delimited. One or more of ${Ls.Field.all.map(_.name).mkString(",")}. Default is band,ra"
+    ) .withDefault(NonEmptyList.of(Ls.Field.partner, Ls.Field.rank))
 
   // implicit lazy val ArgumentNelSummarizeField: Argument[NonEmptyList[Summarize.Field]] =
   //   new Argument[NonEmptyList[Summarize.Field]] {
@@ -389,7 +391,7 @@ trait MainOpts { this: CommandIOApp =>
       // emailGen,
       // placeholder("skeleton"),
       init,
-      // ls,
+      ls,
       // rollover,
       queue,
       // summarize,
