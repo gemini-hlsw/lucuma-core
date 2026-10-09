@@ -368,6 +368,9 @@ object CatalogAdapter {
      */
     def stellarParametersByIdQuery(sourceIds: List[Long]): Option[String] = None
 
+    /** Whether the lookup returns ESP-HS values, preferred for hot stars. */
+    def providesEspHs: Boolean = false
+
     /**
      * Build the query string for a cone search. Default implementation uses ADQL syntax. Override
      * for non-ADQL backends like DataLab.
@@ -559,6 +562,8 @@ object CatalogAdapter {
     override val adapterName: String = "ESA"
     override lazy val uri: Uri       = uri"https://gea.esac.esa.int/tap-server/tap/sync"
     override lazy val format: String = "votable_plain"
+
+    override def providesEspHs: Boolean = true
 
     override def stellarParametersByIdQuery(sourceIds: List[Long]): Option[String] =
       Gaia.byIdQuery(Gaia.GspPhotFields ++ Gaia.EspHsFields,
