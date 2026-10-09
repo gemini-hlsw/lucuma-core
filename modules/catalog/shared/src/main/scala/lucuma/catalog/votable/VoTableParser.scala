@@ -68,40 +68,49 @@ object VoTableParser extends VoTableParser {
 trait VoTableParser {
   private val NoneRightNec = none.rightNec
 
-  /**
-   * FS2 pipe to convert a stream of xml events to targets
-   */
-  def xml2targets[F[_]](
-    adapter: CatalogAdapter
-  ): Pipe[F, XmlEvent, EitherNec[CatalogProblem, CatalogTargetResult]] = {
+  // Applies `f` to every parsed row, passing row errors through
+  private def rowsPipe[F[_], A](
+    f: TableRow => List[EitherNec[CatalogProblem, A]]
+  ): Pipe[F, XmlEvent, EitherNec[CatalogProblem, A]] = {
     def go(
       s: Stream[F, EitherNec[CatalogProblem, TableRow]]
-    ): Pull[F, EitherNec[CatalogProblem, CatalogTargetResult], Unit] =
+    ): Pull[F, EitherNec[CatalogProblem, A], Unit] =
       s.pull.uncons1.flatMap {
-        case Some((q @ Left(_), s))          =>
-          Pull.output1(q.rightCast[CatalogTargetResult]) >> go(s)
-        case Some((Right(row: TableRow), s)) =>
-          Pull.output1(targetRow2Target(adapter, row)) >> go(s)
+        case Some((q @ Left(_), s))          => Pull.output1(q.rightCast[A]) >> go(s)
+        case Some((Right(row: TableRow), s)) => Pull.output(Chunk.from(f(row))) >> go(s)
         case _                               => Pull.done
       }
     in => go(in.through(trsf[F])).stream
   }
 
+  /**
+   * FS2 pipe to convert a stream of xml events to targets
+   */
+  def xml2targets[F[_]](
+    adapter: CatalogAdapter
+  ): Pipe[F, XmlEvent, EitherNec[CatalogProblem, CatalogTargetResult]] =
+    rowsPipe(row => List(targetRow2Target(adapter, row)))
+
   def xml2guidestars[F[_]](
     adapter: CatalogAdapter
-  ): Pipe[F, XmlEvent, EitherNec[CatalogProblem, Target.Sidereal]] = {
-    def go(
-      s: Stream[F, EitherNec[CatalogProblem, TableRow]]
-    ): Pull[F, EitherNec[CatalogProblem, Target.Sidereal], Unit] =
-      s.pull.uncons1.flatMap {
-        case Some((q @ Left(_), s))          =>
-          Pull.output1(q.rightCast[Target.Sidereal]) >> go(s)
-        case Some((Right(row: TableRow), s)) =>
-          Pull.output1(targetRow2GuideStar(adapter, BandsList.GaiaBandsList, row)) >> go(s)
-        case _                               => Pull.done
-      }
-    in => go(in.through(trsf[F])).stream
-  }
+  ): Pipe[F, XmlEvent, EitherNec[CatalogProblem, Target.Sidereal]] =
+    rowsPipe(row => List(targetRow2GuideStar(adapter, BandsList.GaiaBandsList, row)))
+
+  /**
+   * FS2 pipe to convert a stream of xml events to stellar parameters keyed by Gaia source id. Rows
+   * without parameters are dropped.
+   */
+  def xml2stellarParameters[F[_]](
+    adapter: CatalogAdapter
+  ): Pipe[F, XmlEvent, EitherNec[CatalogProblem, (Long, GaiaStellarParameters)]] =
+    val sourceIdField = CatalogAdapter.Gaia.sourceIdField
+    rowsPipe: row =>
+      val entries = row.itemsMap
+      val id      = entries.collectFirst:
+        case (f, v) if f.id.value.equalsIgnoreCase(sourceIdField.id.value) => v.trim
+      (id.flatMap(_.toLongOption).toRightNec(MissingValue(sourceIdField)),
+       adapter.parseStellarParameters(entries)
+      ).parMapN((id, params) => params.tupleLeft(id)).sequence.toList
 
   def parseId(
     adapter: CatalogAdapter,

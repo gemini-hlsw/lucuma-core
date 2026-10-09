@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Produced with astropy.io.votable version 5.1.1
+     http://www.astropy.org/ -->
+<VOTABLE version="1.4" xmlns="http://www.ivoa.net/xml/VOTable/v1.3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ivoa.net/xml/VOTable/v1.3 http://www.ivoa.net/xml/VOTable/VOTable-1.4.xsd">
+ <RESOURCE type="results">
+  <TABLE>
+   <FIELD ID="source_id" datatype="long" name="source_id"/>
+   <FIELD ID="teff_gspphot" datatype="float" name="teff_gspphot"/>
+   <FIELD ID="logg_gspphot" datatype="float" name="logg_gspphot"/>
+   <DATA>
+    <TABLEDATA>
+     <TR>
+      <TD>628705013665242240</TD>
+      <TD>5569.4453</TD>
+      <TD>4.3463</TD>
+     </TR>
+     <TR>
+      <TD>2109057984352250368</TD>
+      <TD>3785.2493</TD>
+      <TD>4.732</TD>
+     </TR>
+     <TR>
+      <TD>3266527962404665088</TD>
+      <TD>NaN</TD>
+      <TD>NaN</TD>
+     </TR>
+     <TR>
+      <TD>3725398080716580352</TD>
+      <TD>5597.1294</TD>
+      <TD>4.5355</TD>
+     </TR>
+     <TR>
+      <TD>3726010543053126656</TD>
+      <TD>NaN</TD>
+      <TD>NaN</TD>
+     </TR>
+    </TABLEDATA>
+   </DATA>
+  </TABLE>
+ </RESOURCE>
+</VOTABLE>

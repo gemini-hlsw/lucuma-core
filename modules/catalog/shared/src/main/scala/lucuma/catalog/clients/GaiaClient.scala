@@ -10,6 +10,7 @@ import cats.effect.Concurrent
 import cats.syntax.applicative.*
 import cats.syntax.either.*
 import lucuma.catalog.CatalogTargetResult
+import lucuma.catalog.GaiaStellarParameters
 import lucuma.catalog.votable.*
 import lucuma.core.model.Target
 import org.http4s.Uri
@@ -42,6 +43,13 @@ trait GaiaClient[F[_]]:
    */
   def queryByIdGuideStar(sourceId: Long): F[EitherNec[CatalogProblem, Target.Sidereal]]
 
+  /**
+   * Effective temperature and surface gravity of the given sources, ESP-HS where Gaia has it and
+   * GSP-Phot otherwise. Sources without values are absent. Empty when no configured adapter can
+   * look them up (GAVO cannot; DataLab has GSP-Phot only).
+   */
+  def queryStellarParameters(sourceIds: List[Long]): F[Map[Long, GaiaStellarParameters]]
+
 object GaiaClient:
   inline def build[F[_]: Concurrent: Tracer: LoggerFactory](
     httpClient: Client[F],
@@ -53,7 +61,7 @@ object GaiaClient:
     def query(adqlQuery: ADQLQuery)(using
       ADQLInterpreter
     ): F[List[EitherNec[CatalogProblem, CatalogTargetResult]]] =
-      List.empty.pure[F]
+      List.empty.pure
 
     def queryById(sourceId: Long): F[EitherNec[CatalogProblem, CatalogTargetResult]] =
       CatalogProblem.SourceIdNotFound(sourceId).leftNec.pure[F]
@@ -61,10 +69,13 @@ object GaiaClient:
     def queryGuideStars(adqlQuery: ADQLQuery)(using
       ADQLInterpreter
     ): F[List[EitherNec[CatalogProblem, Target.Sidereal]]] =
-      List.empty.pure[F]
+      List.empty.pure
 
     def queryByIdGuideStar(sourceId: Long): F[EitherNec[CatalogProblem, Target.Sidereal]] =
       CatalogProblem.SourceIdNotFound(sourceId).leftNec.pure[F]
+
+    def queryStellarParameters(sourceIds: List[Long]): F[Map[Long, GaiaStellarParameters]] =
+      Map.empty.pure
 
   val DefaultAdapters: NonEmptyChain[CatalogAdapter.Gaia] =
     NonEmptyChain.of(

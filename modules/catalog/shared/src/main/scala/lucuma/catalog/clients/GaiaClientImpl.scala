@@ -10,6 +10,7 @@ import cats.effect.kernel.Resource
 import cats.syntax.all.*
 import fs2.RaiseThrowable
 import lucuma.catalog.CatalogTargetResult
+import lucuma.catalog.GaiaStellarParameters
 import lucuma.catalog.votable.*
 import lucuma.core.model.Target
 import lucuma.core.syntax.effect.raceAllToSuccess
@@ -71,6 +72,32 @@ class GaiaClientImpl[F[_]: {Concurrent, Tracer as T, LoggerFactory as LF}](
   def queryByIdGuideStar(sourceId: Long): F[EitherNec[CatalogProblem, Target.Sidereal]] =
     multiAdapterQuery(queryUriById(_, sourceId), CatalogSearch.guideStars).map:
       _.headOption.toRight(NonEmptyChain(CatalogProblem.SourceIdNotFound(sourceId))).flatten
+
+  // Adapters with ESP-HS are raced first; the others only answer when those fail or find nothing,
+  // as their complete-looking answers would otherwise replace ESP-HS values with GSP-Phot.
+  def queryStellarParameters(sourceIds: List[Long]): F[Map[Long, GaiaStellarParameters]] =
+    val capable                  = adapters.toList.flatMap: adapter =>
+      adapter.stellarParametersByIdQuery(sourceIds).map(q => (adapter, adapter.queryUri(q)))
+    val (withEspHs, gspPhotOnly) = capable.partition(_._1.providesEspHs)
+    (raceStellarParameters(withEspHs), raceStellarParameters(gspPhotOnly)) match
+      case (Some(preferred), Some(fallback)) =>
+        preferred.attempt.flatMap:
+          case Right(found) if found.nonEmpty => found.pure
+          case _                              => fallback
+      case (preferred, fallback)             => preferred.orElse(fallback).getOrElse(Map.empty.pure)
+
+  private def raceStellarParameters(
+    group: List[(CatalogAdapter.Gaia, Uri)]
+  ): Option[F[Map[Long, GaiaStellarParameters]]] =
+    NonEmptyChain
+      .fromSeq(group)
+      .map:
+        _.map((adapter, uri) =>
+          queryGaia(adapter, uri, CatalogSearch.stellarParameters(adapter))
+        ).raceAllToSuccess
+          .flatMap: (adapter, results) =>
+            info"Selected catalog: ${adapter.adapterName}" *>
+              results.collect { case Right(r) => r }.toMap.pure[F]
 
   private def multiAdapterQuery[A](
     queryUri: CatalogAdapter.Gaia => Uri,
