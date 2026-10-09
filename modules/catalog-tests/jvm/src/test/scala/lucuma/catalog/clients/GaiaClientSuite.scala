@@ -8,6 +8,8 @@ import cats.effect.*
 import cats.syntax.all.*
 import coulomb.*
 import coulomb.syntax.*
+import fs2.io.readClassLoaderResource
+import lucuma.catalog.GaiaStellarParametersSource
 import lucuma.catalog.clients.GaiaClientMock
 import lucuma.catalog.votable.*
 import lucuma.core.enums.Band
@@ -27,9 +29,14 @@ import lucuma.core.math.units.*
 import lucuma.core.model.Target
 import lucuma.core.syntax.all.*
 import munit.CatsEffectSuite
+import org.http4s.Response
+import org.http4s.Status
+import org.http4s.client.Client
 import org.typelevel.log4cats.LoggerFactory
 import org.typelevel.log4cats.noop.NoOpFactory
 import org.typelevel.otel4s.trace.Tracer.Implicits.noop
+
+import scala.concurrent.duration.*
 
 class GaiaClientSuite extends CatsEffectSuite with VoTableSamples:
 
@@ -321,3 +328,39 @@ class GaiaClientSuite extends CatsEffectSuite with VoTableSamples:
         .getOrElse(0.0)
       assertEqualsDouble(bpMagDataLab, bpMagGavo, 0.0001)
       assertEqualsDouble(bpMagDataLab, bpMagEsa, 0.0001)
+
+  private def resource(name: String): IO[String] =
+    readClassLoaderResource[IO](name).through(fs2.text.utf8.decode).compile.string
+
+  // DataLab answers at once; every other host answers with `esa`
+  private def lookupClient(esa: IO[String]): GaiaClient[IO] =
+    val http = Client[IO]: request =>
+      val body =
+        if request.uri.host.exists(_.value === "datalab.noirlab.edu")
+        then resource("gaia-stellar-parameters-datalab.xml")
+        else esa
+      Resource.eval(body).map(Response[IO](Status.Ok).withEntity(_))
+    GaiaClient.build[IO](
+      http,
+      adapters = NonEmptyChain.of(CatalogAdapter.Gaia3DataLab, CatalogAdapter.Gaia3EsaProxy)
+    )
+
+  private val lookupIds: List[Long] =
+    List(3725398080716580352L, 2109057984352250368L, 628705013665242240L, 3266527962404665088L,
+         3726010543053126656L)
+
+  test("queryStellarParameters waits for ESP-HS even when DataLab answers first"):
+    lookupClient(IO.sleep(200.millis) *> resource("gaia-stellar-parameters-esa.xml"))
+      .queryStellarParameters(lookupIds)
+      .map: params =>
+        assertEquals(params.size, 4)
+        assertEquals(params.get(3726010543053126656L).map(_.source),
+                     Some(GaiaStellarParametersSource.EspHs)
+        )
+
+  test("queryStellarParameters falls back to DataLab when ESA fails"):
+    lookupClient(IO.raiseError(new RuntimeException("ESA down")))
+      .queryStellarParameters(lookupIds)
+      .map: params =>
+        assertEquals(params.size, 3)
+        assert(params.values.forall(_.source === GaiaStellarParametersSource.GspPhot))
