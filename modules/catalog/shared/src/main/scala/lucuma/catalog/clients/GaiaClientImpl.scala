@@ -78,7 +78,7 @@ class GaiaClientImpl[F[_]: {Concurrent, Tracer as T, LoggerFactory as LF}](
       adapter.stellarParametersByIdQuery(sourceIds).map(q => (adapter, adapter.queryUri(q)))
     NonEmptyChain
       .fromSeq(capable)
-      .fold(Map.empty[Long, GaiaStellarParameters].pure[F]): adapters =>
+      .fold(Map.empty.pure): adapters =>
         adapters
           .map((adapter, uri) => queryGaia(adapter, uri, CatalogSearch.stellarParameters(adapter)))
           .raceAllToSuccess
