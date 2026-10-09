@@ -3,9 +3,9 @@
 
 package itac.codec
 
+import io.circe.Decoder
 import io.circe.Encoder
 import lucuma.core.model.IntCentiPercent
-import io.circe.Decoder
 
 object intcentipercent:
   given Encoder[IntCentiPercent] = Encoder[BigDecimal].contramap(_.toPercent)

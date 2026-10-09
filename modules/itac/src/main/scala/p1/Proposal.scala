@@ -5,6 +5,7 @@ package edu.gemini.tac.qengine.p1
 
 import cats.data.NonEmptyList
 import cats.syntax.all.*
+import eu.timepit.refined.types.numeric.PosDouble
 import lucuma.core.data.Metadata
 import lucuma.core.enums.ScienceBand
 import lucuma.core.enums.Site
@@ -20,7 +21,6 @@ import lucuma.core.util.TimeSpan
 import java.time.LocalDate
 
 import GroupTree.flattenAndScale
-import eu.timepit.refined.types.numeric.PosDouble
 
 case class Proposal(
   reference: ProposalReference,

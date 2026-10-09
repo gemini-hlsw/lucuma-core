@@ -4,26 +4,24 @@
 package itac
 package operation
 
-import cats._
-import cats.implicits._
-import edu.gemini.tac.qengine.api.config._
-import edu.gemini.tac.qengine.impl.QueueEngine3
-import java.nio.file.Path
-import edu.gemini.qengine.skycalc.RaBinSize
-import edu.gemini.qengine.skycalc.DecBinSize
-import edu.gemini.qengine.skycalc.RaDecBinCalc
-import edu.gemini.tac.qengine.p1.Proposal
-import lucuma.core.model.IntCentiPercent
-import lucuma.core.data.PerSite
+import cats.*
 import cats.Applicative
-import edu.gemini.tac.qengine.impl.resource.SemesterResource
-import edu.gemini.tac.qengine.log.ProposalLog
-import edu.gemini.tac.qengine.api.queue.ProposalQueue
-import lucuma.core.enums.Site
-import lucuma.core.model.Semester
-import edu.gemini.tac.qservice.impl.shutdown.ShutdownCalc
-import lucuma.core.util.TimeSpan
+import cats.implicits.*
+import edu.gemini.qengine.skycalc.DecBinSize
+import edu.gemini.qengine.skycalc.RaBinSize
+import edu.gemini.qengine.skycalc.RaDecBinCalc
 import edu.gemini.tac.qengine.api.QueueCalc
+import edu.gemini.tac.qengine.api.config.*
+import edu.gemini.tac.qengine.impl.QueueEngine3
+import edu.gemini.tac.qengine.p1.Proposal
+import edu.gemini.tac.qservice.impl.shutdown.ShutdownCalc
+import lucuma.core.data.PerSite
+import lucuma.core.enums.Site
+import lucuma.core.model.IntCentiPercent
+import lucuma.core.model.Semester
+import lucuma.core.util.TimeSpan
+
+import java.nio.file.Path
 
 abstract class AbstractQueueOperation[F[_]: Applicative](
   qe:             QueueEngine3.type,
@@ -56,7 +54,7 @@ abstract class AbstractQueueOperation[F[_]: Applicative](
                 shutdowns  = cc.engine.shutdowns(qc.site),
                 conditions = cc.engine.conditionsBins
               ),
-              timeAccountingCategorySeq = ???,
+              timeAccountingCategorySeq = cc.engine.partnerSequence(qc.site),
               restrictedBinConfig = RestrictionConfig(
                 relativeTimeRestrictions = Nil, // TODO
                 absoluteTimeRestrictions = Nil, // TODO

@@ -4,20 +4,19 @@
 package itac
 package config
 
-import io.circe._
-import io.circe.generic.semiauto._
-import edu.gemini.qengine.skycalc.RaBinSize
+import cats.syntax.all.*
 import edu.gemini.qengine.skycalc.DecBinSize
+import edu.gemini.qengine.skycalc.RaBinSize
 import edu.gemini.tac.qengine.api.queue.time.QueueTime
-
-import lucuma.core.enums.ScienceBand
-import lucuma.core.enums.TimeAccountingCategory
-import lucuma.core.util.Enumerated
 import edu.gemini.tac.qengine.api.queue.time.TimeAccountingCategoryTime
-import cats.syntax.all._
-import lucuma.core.util.TimeSpan
+import io.circe.*
+import io.circe.generic.semiauto.*
+import lucuma.core.enums.ScienceBand
 import lucuma.core.enums.Site
+import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.model.IntCentiPercent
+import lucuma.core.util.Enumerated
+import lucuma.core.util.TimeSpan
 
 // queue configuration
 final case class QueueConfig(
@@ -60,13 +59,12 @@ final case class QueueConfig(
 }
 
 object QueueConfig {
+  import itac.codec.intcentipercent.given
 
-  // implicit val DecoderQueueBand: Decoder[ScienceBand] =
-  //   Decoder[Int].emap { n =>
-  //     ScienceBand.values.find(_.intValue == n).toRight(s"No such queue band: $n")
-  //   }
+  given [A](using e: Enumerated[A]): KeyDecoder[A] =
+    KeyDecoder.instance(e.fromTag)
 
-  // implicit val DecoderQueue: Decoder[QueueConfig] = deriveDecoder
+  implicit val DecoderQueue: Decoder[QueueConfig] = deriveDecoder
 }
 
 case class BandTimes(band1: TimeSpan, band2: TimeSpan, band3: TimeSpan, band4: TimeSpan)

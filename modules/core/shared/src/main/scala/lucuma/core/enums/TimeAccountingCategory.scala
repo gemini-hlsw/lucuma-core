@@ -14,28 +14,40 @@ import lucuma.core.util.Enumerated
 enum TimeAccountingCategory(
   val tag: String,
   val description: String,
-  val sites: Set[Site] = Site.all.toSet
 ) derives Enumerated:
 
   def abbreviation: String = tag.toUpperCase
 
-  case AR   extends TimeAccountingCategory("ar",   "Argentina", Partner.AR.sites)
-  case BR   extends TimeAccountingCategory("br",   "Brazil", Partner.BR.sites)
-  case CA   extends TimeAccountingCategory("ca",   "Canada", Partner.CA.sites)
+  lazy val sites: Set[Site] =
+    this match
+      case AR   => Partner.AR.sites
+      case BR   => Partner.BR.sites
+      case CA   => Partner.CA.sites
+      case CFHT => Set(Site.GN)
+      case CL   => Partner.CL.sites
+      case JP   => Set(Site.GN)
+      case KECK => Set(Site.GN)
+      case UH   => Partner.UH.sites
+      case US   => Partner.US.sites
+      case _    => Site.values.toSet
+
+  case AR   extends TimeAccountingCategory("ar",   "Argentina")
+  case BR   extends TimeAccountingCategory("br",   "Brazil")
+  case CA   extends TimeAccountingCategory("ca",   "Canada")
   case CAL  extends TimeAccountingCategory("cal",  "Calibration")
-  case CFHT extends TimeAccountingCategory("cfht", "CFHT Exchange", Set(Site.GN))
-  case CL   extends TimeAccountingCategory("cl",   "Chile", Partner.CL.sites)
+  case CFHT extends TimeAccountingCategory("cfht", "CFHT Exchange")
+  case CL   extends TimeAccountingCategory("cl",   "Chile")
   case DD   extends TimeAccountingCategory("dd",   "Director's Time")
   case DS   extends TimeAccountingCategory("ds",   "Demo Science")
   case ENG  extends TimeAccountingCategory("eng",  "Engineering")
   case GT   extends TimeAccountingCategory("gt",   "Guaranteed Time")
-  case JP   extends TimeAccountingCategory("jp",   "Subaru", Set(Site.GN))
-  case KECK extends TimeAccountingCategory("keck", "Keck Exchange", Set(Site.GN))
+  case JP   extends TimeAccountingCategory("jp",   "Subaru")
+  case KECK extends TimeAccountingCategory("keck", "Keck Exchange")
   case KR   extends TimeAccountingCategory("kr",   "Republic of Korea")
   case LP   extends TimeAccountingCategory("lp",   "Large Program")
   case LTP  extends TimeAccountingCategory("ltp",  "Limited-term Participant")
   case SV   extends TimeAccountingCategory("sv",   "System Verification")
-  case UH   extends TimeAccountingCategory("uh",   "University of Hawaii", Partner.UH.sites)
-  case US   extends TimeAccountingCategory("us",   "United States", Partner.US.sites)
+  case UH   extends TimeAccountingCategory("uh",   "University of Hawaii")
+  case US   extends TimeAccountingCategory("us",   "United States")
 
 end TimeAccountingCategory

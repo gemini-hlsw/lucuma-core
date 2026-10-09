@@ -5,26 +5,24 @@ package itac
 
 import cats.data.NonEmptyList
 import cats.data.Validated
-import cats.data.ValidatedNel
-import cats.effect._
-import cats.syntax.all._
+import cats.effect.*
+import cats.syntax.all.*
 import com.monovore.decline.Argument
 import com.monovore.decline.Command
-import com.monovore.decline.effect.CommandIOApp
 import com.monovore.decline.Opts
-import edu.gemini.tac.qengine.impl.{ QueueEngine3 => QueueEngine }
-import org.typelevel.log4cats.Logger
-import org.typelevel.log4cats.slf4j.Slf4jLogger
-import java.nio.file.Path
-import java.nio.file.Paths
-import java.text.ParseException
-import scala.util.control.NonFatal
-import lucuma.core.model.Semester
+import com.monovore.decline.effect.CommandIOApp
+import edu.gemini.tac.qengine.impl.QueueEngine3 as QueueEngine
+import itac.operation.Init
+import itac.operation.Queue
 import lucuma.core.data.PerSite
 import lucuma.core.enums.Site
-import itac.operation.Init
-import org.typelevel.log4cats.LoggerFactory
-import itac.operation.Queue
+import lucuma.core.model.Semester
+import org.typelevel.log4cats.Logger
+import org.typelevel.log4cats.slf4j.Slf4jLogger
+
+import java.nio.file.Path
+import java.nio.file.Paths
+import scala.util.control.NonFatal
 
 // object Stub {
 //   def main(args: Array[String]): Unit =

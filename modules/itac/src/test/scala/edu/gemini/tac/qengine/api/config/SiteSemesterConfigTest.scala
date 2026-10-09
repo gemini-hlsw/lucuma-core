@@ -5,7 +5,6 @@ package edu.gemini.tac.qengine.api.config
 
 import lucuma.core.enums.Half
 import lucuma.core.enums.Site
-import lucuma.core.model.IntCentiPercent
 import lucuma.core.model.Semester
 import lucuma.core.model.Semester.YearInt
 import lucuma.core.util.TimeSpan

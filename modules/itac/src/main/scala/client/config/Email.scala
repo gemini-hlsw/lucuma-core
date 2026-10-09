@@ -3,8 +3,9 @@
 
 package itac.config
 
+import io.circe.*
+
 import scala.util.matching.Regex
-import io.circe._
 
 sealed abstract case class Email(value: String)
 

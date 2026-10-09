@@ -3,10 +3,10 @@
 
 package itac.codec
 
-import io.circe._
-import io.circe.syntax._
 import edu.gemini.tac.qengine.api.config.ConditionsBin
 import edu.gemini.tac.qengine.api.config.ConditionsCategory
+import io.circe.*
+import io.circe.syntax.*
 
 object conditionsbin:
   import conditionscategory.given

@@ -3,33 +3,31 @@
 
 package itac
 
+import cats.data.NonEmptyList
 import cats.effect.Sync
-import cats.implicits._
-import cats.Parallel
+import cats.effect.kernel.Ref
+import cats.implicits.*
 import edu.gemini.tac.qengine.p1.Proposal
-import io.circe.{ Encoder, Decoder, DecodingFailure }
-import io.circe.yaml.Printer
 import io.circe.CursorOp.DownField
-import io.circe.syntax._
+import io.circe.Decoder
+import io.circe.DecodingFailure
+import io.circe.Encoder
+import io.circe.syntax.*
+import io.circe.yaml.Printer
 import io.circe.yaml.parser
 import itac.config.Common
 import itac.config.QueueConfig
+import itac.ocs.OcsLoader
+import lucuma.core.enums.ScienceBand
+import lucuma.core.enums.Site
+import lucuma.core.util.Enumerated
+import org.typelevel.log4cats.Logger
+
+import java.io.File
 import java.nio.file.Files
 import java.nio.file.NoSuchFileException
 import java.nio.file.Path
 import java.nio.file.Paths
-import java.time.format.DateTimeFormatter
-import java.time.LocalDateTime
-import java.time.ZonedDateTime
-import java.time.ZoneId
-import java.io.File
-import cats.data.NonEmptyList
-import scala.jdk.CollectionConverters._
-import lucuma.core.enums.ScienceBand
-import lucuma.core.enums.Site
-import cats.effect.kernel.Ref
-import org.typelevel.log4cats.Logger
-import lucuma.core.util.Enumerated
 
 /** Interface for some Workspace operations. */
 trait Workspace[F[_]] {
@@ -82,7 +80,7 @@ object Workspace {
   // val EditsDir              = Paths.get("edits")
   // val BulkEditsFile         = Paths.get("bulk_edits.xls")
 
-  def proposalDir(band: ScienceBand): Path = ??? //Paths.get(s"band-${band.number}")
+  def proposalDir(band: ScienceBand): Path = Paths.get(s"band-${band.intValue}")
 
   // val WorkspaceDirs: List[Path] =
   //   List(RemovedDir, EditsDir) ++ ScienceBand.values.map(proposalDir)
@@ -111,12 +109,11 @@ object Workspace {
       // version = YamlVersion.Auto
     )
 
-  def apply[F[_]: Sync: Parallel](dir: Path, cc: Path, log: Logger[F], force: Boolean): F[Workspace[F]] =
+  def apply[F[_]: Sync](dir: Path, cc: Path, log: Logger[F], force: Boolean): F[Workspace[F]] =
     ItacException(s"Workspace directory not found: ${dir}").raiseError[F, Workspace[F]].unlessA(dir.toFile.getAbsoluteFile.isDirectory) *>
     log.info(s"Working directory is ${dir.toAbsolutePath()}") >>
     Ref[F].of(Map.empty[Path, String]).map { cache =>
       new Workspace[F] {
-        given Logger[F] = log
 
         def cwd = dir.pure[F]
 
@@ -155,18 +152,8 @@ object Workspace {
                 )
             }
 
-        def listFiles(path: Path): F[List[Path]] =
-          Sync[F].delay {
-            Files
-              .list(dir.resolve(path))
-              .iterator
-              .asScala
-              .map(dir.relativize)
-              .toList
-          }
-
-        def readAll[A: Decoder](path: Path, suffix: String): F[List[A]] =
-          listFiles(path).flatMap(_.filter(_.toFile.getName.endsWith(suffix)).traverse(readData[A]))
+        // def readAll[A: Decoder](path: Path, suffix: String): F[List[A]] =
+        //   listFiles(path).flatMap(_.filter(_.toFile.getName.endsWith(suffix)).traverse(readData[A]))
 
         def writeText(path: Path, text: String): F[Path] = {
           val p = dir.resolve(path)
@@ -206,15 +193,15 @@ object Workspace {
         //   }
         // }
 
-        def commonConfig: F[Common] = ???
+        def commonConfig: F[Common] =
           readData[Common](cc).recoverWith {
             case _: NoSuchFileException => cwd.flatMap(p => Sync[F].raiseError(ItacException(s"Not an ITAC Workspace: $p")))
           }
 
-        def queueConfig(path: Path): F[QueueConfig] = ???
-        //   readData[QueueConfig](path).recoverWith {
-        //     case _: NoSuchFileException => cwd.flatMap(p => Sync[F].raiseError(ItacException(s"Site-specific configuration file not found: ${p.resolve(path)}")))
-        //   }
+        def queueConfig(path: Path): F[QueueConfig] =
+          readData[QueueConfig](path).recoverWith {
+            case _: NoSuchFileException => cwd.flatMap(p => Sync[F].raiseError(ItacException(s"Site-specific configuration file not found: ${p.resolve(path)}")))
+          }
 
         // def edits: F[Map[String, SummaryEdit]] =
         //   readAll[SummaryEdit](EditsDir, ".yaml").map(_.map(e => (e.reference -> e)).toMap)
@@ -227,27 +214,27 @@ object Workspace {
         //     m <- BulkEditFile.read(f)
         //   } yield m
 
-        def loadProposals(dir: Path): F[List[Proposal]] =
-          ???
-          // for {
-          //   cwd  <- cwd
-          //   conf <- commonConfig
-          //   p     = cwd.resolve(dir)
-          //   when  = conf.semester.getMidpointDate(Site.GN).getTime // arbitrary
-          //   _    <- log.debug(s"Reading proposals from $p")
-          //   es   <- edits
-          //   ps   <- ProposalLoader[F](when, es, log, mutator).loadMany(p.toFile.getAbsoluteFile)
-          //   _    <- ps.traverse { case (f, Left(es)) => log.warn(s"${f.getName}: ${es.toList.mkString(", ")}") ; case _ => ().pure[F] }
-          //   psʹ   = ps.collect { case (_, Right(ps)) => ps.toList } .flatten
-          //   _    <- log.debug(s"Read ${ps.length} proposals.")
-          //   ret   = ps.collect { case (_, Right(ps)) => ps.toList } .flatten
-          // } yield ret
+        private def loadOcsProposals(band: ScienceBand, dir: Path): F[List[Proposal]] =
+          for {
+            cwd  <- cwd
+            conf <- commonConfig
+            p     = cwd.resolve(dir)
+            // when  = conf.semester.getMidpointDate(Site.GN).getTime // arbitrary
+            e    <- OcsLoader[F].loadProposals(log, band, p)
+            _    <- e.swap.traverse(s => Sync[F].raiseError(ItacException(s"Error loading OCS proposal: $s")))
+            // es   <- edits
+            // ps   <- ProposalLoader[F](when, es, log, mutator).loadMany(p.toFile.getAbsoluteFile)
+            // _    <- ps.traverse { case (f, Left(es)) => log.warn(s"${f.getName}: ${es.toList.mkString(", ")}") ; case _ => ().pure[F] }
+            // psʹ   = ps.collect { case (_, Right(ps)) => ps.toList } .flatten
+            // _    <- log.debug(s"Read ${ps.length} proposals.")
+            // ret   = ps.collect { case (_, Right(ps)) => ps.toList } .flatten
+          } yield e.toOption.orEmpty
 
         def bandedProposals: F[Map[ScienceBand, List[Proposal]]] =
           Enumerated[ScienceBand]
             .all
             .traverse: b => 
-              loadProposals(proposalDir(b))
+              loadOcsProposals(b, proposalDir(b))
                 .map: ps =>
                   Map(b -> ps)
             .map: maps =>

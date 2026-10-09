@@ -6,50 +6,24 @@ package lucuma.ocs
 import cats.syntax.all.*
 import edu.gemini.tac.qengine.p1.Proposal
 import lucuma.core.enums.ScienceBand
-import munit.FunSuite
-
-import java.io.File
-import scala.io.Codec
-import scala.io.Source
-import scala.xml.XML
 import lucuma.core.util.Enumerated
+import itac.ocs.OcsLoader
+import org.typelevel.log4cats.slf4j.Slf4jLogger
+import cats.effect.IO
+import java.nio.file.Path
 
 object Fixture_25B:
 
-  val Root = s"25B"
+  val log = Slf4jLogger.getLogger[IO]
 
-  extension (b: ScienceBand) def intValue =
-    b match
-      case ScienceBand.Band1 => 1
-      case ScienceBand.Band2 => 2
-      case ScienceBand.Band3 => 3
-      case ScienceBand.Band4 => 4
+  def loadBand(band: ScienceBand): IO[Either[String, List[Proposal]]] =
+    val dir = Path.of(s"/Users/rob.norris/Gemini/ocs/itac/itac_WD/band-${band.intValue}/")
+    OcsLoader[IO].loadProposals(log, band, dir)
 
-  def withResource[A](rsrc: String)(f: Source => A): A =
-    val s = Source.fromResource(rsrc)
-    try f(s) finally s.close
-  
-
-  def loadProposal(band: ScienceBand, file: File): Either[String, Proposal] =
-    val root = Anonymizer.anonymize(XML.load(file))
-    Converter.convert(root, band)
-
-  def loadBand(band: ScienceBand): Either[String, List[Proposal]] =
-    val dir = new File(s"/Users/rob.norris/Gemini/ocs/itac/itac_WD/band-${band.intValue}/")
-    dir
-      .listFiles
-      .toList
-      .filter(_.getName().endsWith(".xml"))
-      .traverse(loadProposal(band, _))
-
-  def loadAll() =
+  def loadAll: IO[Either[String, List[Proposal]]] =
     Enumerated[ScienceBand]
       .all
-      .flatTraverse(loadBand)
+      .traverse(loadBand)
+      .map(_.combineAll)
 
-class Fixture_25B extends FunSuite:
-
-  test("x") {
-    println(Fixture_25B.loadAll())
-  }
 

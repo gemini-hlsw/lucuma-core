@@ -20,17 +20,16 @@ import lucuma.core.data.PerSite
 import lucuma.core.enums.Half
 import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.model.CloudExtinction
-import lucuma.core.model.IntCentiPercent
 import lucuma.core.model.Semester
 import lucuma.core.model.Semester.YearInt
 import lucuma.core.util.TimeSpan
-import lucuma.ocs.Fixture_25B
-import munit.FunSuite
+import ocs.Fixture_25B
 import lucuma.core.model.IntCentiPercentUnbounded
 import lucuma.core.enums.ScienceBand
 import lucuma.core.util.Enumerated
+import munit.CatsEffectSuite
 
-class QueueEngineSuite extends FunSuite:
+class QueueEngineSuite extends CatsEffectSuite:
 
   val semester = Semester(YearInt.unsafeFrom(2025), Half.B)
 
@@ -61,31 +60,34 @@ class QueueEngineSuite extends FunSuite:
 
   test("foo"):
 
-    val qt = Fixture.evenQueueTime(1000, None) // TODO: do this ourselves, this is wrong
+    Fixture_25B.loadAll.flatMap: loaded =>
+      println(loaded)
+      val qt = Fixture.evenQueueTime(1000, None) // TODO: do this ourselves, this is wrong
 
-    val calc = QueueEngine3.calc(
-      Fixture_25B.loadAll().toOption.get,
-      (_, _) => qt, 
-      cfg
-    )
+      val calc = QueueEngine3.calc(
+        loaded.toOption.get,
+        (_, _) => qt, 
+        cfg
+      )
 
-    calc.queues.toList.foreach: queues =>
-      Enumerated[ScienceBand].all.map(queues).foreach: q =>
+      cats.effect.IO.blocking:
+        calc.queues.toList.foreach: queues =>
+          Enumerated[ScienceBand].all.map(queues).foreach: q =>
+            println()
+            println(s"${q.band} at ${q.site}:")
+            println()
+            println(s"    \tAvailable\tUsed\t\tRemaining")
+            TimeAccountingCategory.values.foreach: tac =>
+              println(s"  $tac\t${q.queueTime(tac).toHours}\t${q.usedTime(tac).toHours}\t${q.remainingTime(tac).toHours}")
+
+            println()
+            q.toList.foreach: ps =>
+              println(s"  ${ps.reference} ${ps.parentProposal.reference} rank ${ps.parentProposal.ranking}")
+
         println()
-        println(s"${q.band} at ${q.site}:")
-        println()
-        println(s"    \tAvailable\tUsed\t\tRemaining")
-        TimeAccountingCategory.values.foreach: tac =>
-          println(s"  $tac\t${q.queueTime(tac).toHours}\t${q.usedTime(tac).toHours}\t${q.remainingTime(tac).toHours}")
+        // log.toDetailList.foreach: e =>
+        //   println(s"${e.key.id}: ${e.msg}")
 
-        println()
-        q.toList.foreach: ps =>
-          println(s"  ${ps.reference} ${ps.parentProposal.reference} rank ${ps.parentProposal.ranking}")
-
-    println()
-    // log.toDetailList.foreach: e =>
-    //   println(s"${e.key.id}: ${e.msg}")
-
-    println("done")
+        println("done")
 
 

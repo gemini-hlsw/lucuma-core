@@ -3,20 +3,21 @@
 
 package itac.operation
 
-import cats._
+import cats.*
 import cats.effect.*
-import cats.implicits._
-import io.circe.syntax._
-import io.circe.yaml.syntax._
-import itac.config.LocalDateRange
+import cats.effect.Sync
+import cats.implicits.*
+import io.circe.syntax.*
+import io.circe.yaml.syntax.*
 import itac.Operation
 import itac.Workspace
-import java.time.LocalDate
-import cats.effect.Sync
-import lucuma.core.model.Semester
-import org.typelevel.log4cats.Logger
+import itac.config.LocalDateRange
 import lucuma.core.enums.Site
+import lucuma.core.model.Semester
 import lucuma.core.util.Enumerated
+import org.typelevel.log4cats.Logger
+
+import java.time.LocalDate
 
 object Init {
 
@@ -62,7 +63,7 @@ object Init {
         |# long as the format remains the same. You can also add comment lines.
         |
         |# The queue semester.
-        |semester: $semester
+        |semester: ${Semester.fromString.reverseGet(semester)}
         |
         |# Shutdown periods, given as date ranges of the form YYYYMMDD-YYYYMMDD during which observing is not
         |# possible. Use this to black out dates or simply reduce time during periods when weather loss is

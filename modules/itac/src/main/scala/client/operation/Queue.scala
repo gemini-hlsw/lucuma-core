@@ -4,21 +4,19 @@
 package itac
 package operation
 
-import cats._
-import cats.effect._
-import cats.implicits._
-import java.nio.file.Path
+import cats.*
+import cats.effect.*
+import cats.implicits.*
 import edu.gemini.tac.qengine.impl.QueueEngine3
-import lucuma.core.data.PerSite
-import org.typelevel.log4cats.Logger
-import itac.util.Colors
-import itac.config.Common
-import lucuma.core.enums.ScienceBand
-import edu.gemini.tac.qengine.api.queue.ProposalQueue
-import edu.gemini.tac.qengine.impl.resource.SemesterResource
-import lucuma.core.enums.Site
 import edu.gemini.tac.qengine.log.ProposalLog
+import itac.config.Common
+import itac.util.Colors
+import lucuma.core.data.PerSite
+import lucuma.core.enums.Site
 import lucuma.core.util.Enumerated
+import org.typelevel.log4cats.Logger
+
+import java.nio.file.Path
 
 object Queue {
 
@@ -26,16 +24,18 @@ object Queue {
     * @param siteConfig path to site-specific configuration file, which can be absolute or relative
     *   (in which case it will be resolved relative to the workspace directory).
     */
-  def apply[F[_]: Sync: Parallel](
+  def apply[F[_]: Sync](
     qe:             QueueEngine3.type,
     siteConfig:     PerSite[Path],
   ): Operation[F] =
     new AbstractQueueOperation[F](qe, siteConfig):
 
       def siteReport(site: Site, log: ProposalLog, cc: Common): F[Unit] =
-        Sync[F].delay {
+        Sync[F].delay {          
 
-          val pids = log.proposalIds // proposals that were considered
+          println(log) // to get rid of warnings
+
+          // val pids = log.proposalIds // proposals that were considered
           val separator = "━" * 100 + "\n"
 
           println(s"\n${Colors.BOLD}${site.shortName} ${cc.semester} Queue Candidate${Colors.RESET}")
@@ -164,7 +164,7 @@ object Queue {
 
       def run(ws: Workspace[F], log: Logger[F]): F[ExitCode] =
         ws.commonConfig.flatMap: cc =>
-          computeQueue(ws).flatMap: (proposals, queueCalc) =>
+          computeQueue(ws).flatMap: (_, queueCalc) =>
             Enumerated[Site]
               .all
               .traverse: site =>
