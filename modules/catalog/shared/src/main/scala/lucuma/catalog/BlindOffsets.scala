@@ -7,13 +7,11 @@ import cats.Eq
 import cats.derived.*
 import cats.effect.Concurrent
 import cats.syntax.all.*
-import coulomb.*
-import coulomb.syntax.*
 import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.catalog.clients.GaiaClient
+import lucuma.catalog.simbad.SEDMatcher
 import lucuma.catalog.votable.*
-import lucuma.core.enums.Band
-import lucuma.core.enums.StellarLibrarySpectrum
+import lucuma.core.enums.Instrument
 import lucuma.core.geom.ShapeExpression
 import lucuma.core.geom.ShapeInterpreter
 import lucuma.core.geom.syntax.all.*
@@ -21,8 +19,6 @@ import lucuma.core.math.Angle
 import lucuma.core.math.BrightnessUnits.*
 import lucuma.core.math.BrightnessValue
 import lucuma.core.math.Coordinates
-import lucuma.core.math.dimensional.syntax.*
-import lucuma.core.math.units.*
 import lucuma.core.model.SourceProfile
 import lucuma.core.model.SpectralDefinition.BandNormalized
 import lucuma.core.model.Target
@@ -35,154 +31,217 @@ import org.typelevel.cats.time.*
 
 import java.time.Instant
 
+/**
+ * A Gaia star near the science target that could be used to acquire it. The target in
+ * `catalogResult` carries the estimated magnitudes and the matched SED. `stellarParameters` is only
+ * looked up for the best candidates.
+ */
 case class BlindOffsetCandidate(
-  catalogResult:   CatalogTargetResult,
-  distance:        Angle,
-  baseCoordinates: Coordinates,
-  candidateCoords: Coordinates,
-  observationTime: Instant
+  catalogResult:     CatalogTargetResult,
+  distance:          Angle,
+  baseCoordinates:   Coordinates,
+  candidateCoords:   Coordinates,
+  observationTime:   Instant,
+  limits:            BlindOffsetLimits,
+  stellarParameters: Option[GaiaStellarParameters] = None
 ) derives Eq:
-  val score: BigDecimal        = BlindOffsetCandidate.calculateScore(this)
+  import BlindOffsetCandidate.*
+
   def sourceId: NonEmptyString = catalogResult.target.name
 
-object BlindOffsetCandidate:
-  // use the brightness from the Gaia band (G)
-  def referenceBrightness(catalogResult: CatalogTargetResult): Option[BigDecimal] =
+  /** Magnitude in the instrument's selection band, estimated from Gaia photometry. */
+  val selectionBrightness: Option[BrightnessValue] =
     SourceProfile
-      .integratedBrightnessIn(Band.Gaia)
+      .integratedBrightnessIn(limits.band)
       .headOption(catalogResult.target.sourceProfile)
-      .map(_.value.value.value)
+      .map(_.value)
 
-  private val distanceDivisor: BigDecimal = BigDecimal(60)
+  val rejection: Option[BlindOffsetRejection] = limits.rejection(selectionBrightness)
 
-  private def calculateScore(candidate: BlindOffsetCandidate): BigDecimal =
-    referenceBrightness(candidate.catalogResult) match
-      case Some(g) =>
-        // score = sqrt(((G-15)/3)^2 + (distance / 60 arcsec)^2)
-        val distanceTerm =
-          Angle.decimalArcseconds.get(candidate.distance) / distanceDivisor
+  def isUsable: Boolean = rejection.isEmpty
 
-        val magnitudeTerm = (g - 15.0) / 3.0
-        // The original formula had a square root but we don't care about the value, just the
-        // relative order
-        magnitudeTerm.pow(2) + distanceTerm.pow(2)
+  /**
+   * Ranking of the candidate, lower is better. A star `MagnitudeScale` magnitudes from the optimal
+   * one is penalised the same as one `SeparationScale` away from the target. Undefined without a
+   * magnitude in the selection band.
+   */
+  val score: Option[BigDecimal] =
+    selectionBrightness.map: m =>
+      val magnitudeTerm = (m.value.value - limits.optimal.value.value).toDouble / MagnitudeScale
+      val distanceTerm  = Angle.decimalArcseconds.get(distance).toDouble / SeparationScale
+      BigDecimal(math.sqrt(magnitudeTerm * magnitudeTerm + distanceTerm * distanceTerm))
 
-      case None =>
-        Double.MaxValue
+object BlindOffsetCandidate:
+  val MagnitudeScale: Double  = 5.0
+  val SeparationScale: Double = 30.0
+
+  // Usable candidates first, then by score, candidates without a score last. Ties go to the
+  // closer star, then the source id, so the order does not depend on the catalog row order.
+  given Ordering[BlindOffsetCandidate] =
+    Ordering.by(c =>
+      (c.rejection.isDefined,
+       c.score.isEmpty,
+       c.score.getOrElse(BigDecimal(0)),
+       c.distance.toMicroarcseconds,
+       c.sourceId.value
+      )
+    )
 
   // Optics
-  val catalogResult: Lens[BlindOffsetCandidate, CatalogTargetResult] =
+  val catalogResult: Lens[BlindOffsetCandidate, CatalogTargetResult]               =
     Focus[BlindOffsetCandidate](_.catalogResult)
-  val distance: Lens[BlindOffsetCandidate, Angle]                    =
+  val distance: Lens[BlindOffsetCandidate, Angle]                                  =
     Focus[BlindOffsetCandidate](_.distance)
-  val baseCoordinates: Lens[BlindOffsetCandidate, Coordinates]       =
+  val baseCoordinates: Lens[BlindOffsetCandidate, Coordinates]                     =
     Focus[BlindOffsetCandidate](_.baseCoordinates)
-  val candidateCoords: Lens[BlindOffsetCandidate, Coordinates]       =
+  val candidateCoords: Lens[BlindOffsetCandidate, Coordinates]                     =
     Focus[BlindOffsetCandidate](_.candidateCoords)
-  val observationTime: Lens[BlindOffsetCandidate, Instant]           =
+  val observationTime: Lens[BlindOffsetCandidate, Instant]                         =
     Focus[BlindOffsetCandidate](_.observationTime)
+  val limits: Lens[BlindOffsetCandidate, BlindOffsetLimits]                        =
+    Focus[BlindOffsetCandidate](_.limits)
+  val stellarParameters: Lens[BlindOffsetCandidate, Option[GaiaStellarParameters]] =
+    Focus[BlindOffsetCandidate](_.stellarParameters)
 
 object BlindOffsets:
+  val SearchRadius: Angle = 300.arcseconds
+
+  // ESP-HS parameters are fetched in a second query for the best candidates only. Joining the
+  // astrophysical parameters table into the cone search costs 15 s instead of 3 s.
+  val StellarParameterLookups: Int = 10
+
+  private val GaiaName = """Gaia DR3 (\d+)""".r
+
+  def gaiaSourceId(target: Target.Sidereal): Option[Long] =
+    target.name.value match
+      case GaiaName(id) => id.toLongOption
+      case _            => None
+
+  def gaiaSourceId(candidate: BlindOffsetCandidate): Option[Long] =
+    gaiaSourceId(candidate.catalogResult.target)
+
+  /** Candidates for `instrument`, or none when it does not support blind offsets. */
   def runBlindOffsetAnalysis[F[_]: Concurrent](
     gaiaClient:      GaiaClient[F],
+    sedMatcher:      SEDMatcher,
+    instrument:      Instrument,
     baseTracking:    Tracking,
     observationTime: Instant
   )(using ShapeInterpreter): F[List[BlindOffsetCandidate]] =
     baseTracking
       .at(observationTime)
       .map: baseCoordinates =>
-        runBlindOffsetAnalysis(gaiaClient, baseCoordinates, observationTime)
+        runBlindOffsetAnalysis(gaiaClient, sedMatcher, instrument, baseCoordinates, observationTime)
       .getOrElse(List.empty.pure[F])
 
   def runBlindOffsetAnalysis[F[_]: Concurrent](
     gaiaClient:      GaiaClient[F],
+    sedMatcher:      SEDMatcher,
+    instrument:      Instrument,
     baseCoordinates: Coordinates,
     observationTime: Instant
   )(using ShapeInterpreter): F[List[BlindOffsetCandidate]] =
-    val searchRadius = 300.arcseconds
+    BlindOffsetLimits
+      .forInstrument(instrument)
+      .fold(List.empty.pure[F]): limits =>
+        val adqlQuery = QueryByADQL(
+          base = baseCoordinates,
+          shapeConstraint = ShapeExpression.centeredEllipse(SearchRadius * 2, SearchRadius * 2),
+          brightnessConstraints = None,
+          areaBuffer = Angle.Angle0
+        )
 
-    val adqlQuery = QueryByADQL(
-      base = baseCoordinates,
-      shapeConstraint = ShapeExpression.centeredEllipse(searchRadius * 2, searchRadius * 2),
-      brightnessConstraints = None,
-      areaBuffer = Angle.Angle0
-    )
+        val interpreter = ADQLInterpreter.blindOffsetCandidates
 
-    val interpreter = ADQLInterpreter.blindOffsetCandidates
-
-    gaiaClient
-      .query(adqlQuery)(using interpreter)
-      .map(_.collect { case Right(result) => result })
-      .map(analysis(_, baseCoordinates, observationTime))
+        for
+          results <- gaiaClient
+                       .query(adqlQuery)(using interpreter)
+                       .map(_.collect { case Right(result) => result })
+          initial  =
+            analysis(results, sedMatcher, limits, baseCoordinates, observationTime, Map.empty)
+          // The score does not use Teff, so only the best candidates need an SED. A failed lookup
+          // leaves them with the power law.
+          params  <- gaiaClient
+                       .queryStellarParameters(
+                         initial
+                           .filter(_.isUsable)
+                           .take(StellarParameterLookups)
+                           .flatMap(gaiaSourceId)
+                       )
+                       .handleError(_ => Map.empty)
+        yield
+          if params.isEmpty then initial
+          else analysis(results, sedMatcher, limits, baseCoordinates, observationTime, params)
 
   def analysis(
-    catalogResults:  List[CatalogTargetResult],
-    baseTracking:    Tracking,
-    observationTime: Instant
+    catalogResults:    List[CatalogTargetResult],
+    sedMatcher:        SEDMatcher,
+    limits:            BlindOffsetLimits,
+    baseTracking:      Tracking,
+    observationTime:   Instant,
+    stellarParameters: Map[Long, GaiaStellarParameters]
   ): List[BlindOffsetCandidate] =
     baseTracking
       .at(observationTime)
       .foldMap: baseCoordinates =>
-        analysis(catalogResults, baseCoordinates, observationTime)
+        analysis(catalogResults,
+                 sedMatcher,
+                 limits,
+                 baseCoordinates,
+                 observationTime,
+                 stellarParameters
+        )
 
   def analysis(
-    catalogResults:  List[CatalogTargetResult],
-    baseCoordinates: Coordinates,
-    observationTime: Instant
+    catalogResults:    List[CatalogTargetResult],
+    sedMatcher:        SEDMatcher,
+    limits:            BlindOffsetLimits,
+    baseCoordinates:   Coordinates,
+    observationTime:   Instant,
+    stellarParameters: Map[Long, GaiaStellarParameters]
   ): List[BlindOffsetCandidate] =
     catalogResults
       .flatMap: catalogResult =>
         catalogResult.target.tracking.at(observationTime).map { candidateCoords =>
           val distance = baseCoordinates.angularDistance(candidateCoords)
+          val params   = gaiaSourceId(catalogResult.target).flatMap(stellarParameters.get)
           BlindOffsetCandidate(
-            fakeSedAndBrightness(catalogResult),
+            withEstimatedBrightnessesAndSed(sedMatcher, params, catalogResult),
             distance,
             baseCoordinates,
             candidateCoords,
-            observationTime
+            observationTime,
+            limits,
+            params
           )
         }
-      .sortBy(_.score)
+      .sorted
 
-  // See shortcut 7655
-  // The Gaia catalog only has Gaia, GaiaBP and GaiaRP brightnesses and an SED is not specified.
-  // Unfortunately the ITC does not yet use the `G` bands, so while Andy is fixing that, we'll
-  // make a V band out of the Gaia bands.
-  // Also we'll default the SED.
-  // Once the ITC is updated, we can remove the Gaia => V part. But, we may always need to
-  // fake the SED? We can figure that out at that point.
-  private def fakeSedAndBrightness(candidate: CatalogTargetResult): CatalogTargetResult =
+  // Gaia only has G, BP and RP and no SED. The ITC needs a brightness in a band it knows and an
+  // SED, so both are estimated: magnitudes from the Gaia colour transformations, the SED from
+  // the Gaia Teff and log g. Without those, or without a library match, a flat power law.
+  private def withEstimatedBrightnessesAndSed(
+    sedMatcher: SEDMatcher,
+    params:     Option[GaiaStellarParameters],
+    candidate:  CatalogTargetResult
+  ): CatalogTargetResult =
+    val sed: UnnormalizedSED =
+      params
+        .flatMap(p => sedMatcher.matchStellarParameters(p.teff, p.logG))
+        .fold(UnnormalizedSED.PowerLaw(BigDecimal(0)))(UnnormalizedSED.StellarLibrary(_))
+
     CatalogTargetResult.target
       .andThen(Target.Sidereal.integratedBandNormalizedSpectralDefinition)
-      .modify(bn =>
-        // Add an SED if there isn't one.
-        val withSed = BandNormalized.sed
-          .modify(_.orElse(UnnormalizedSED.StellarLibrary(StellarLibrarySpectrum.M0V_new).some))(bn)
+      .modify: bn =>
+        val withSed = BandNormalized.sed.modify(_.orElse(sed.some))(bn)
         BandNormalized
           .brightnesses[Integrated]
-          .modify { map =>
-            // calculate V from Gaia bands - see shortcut 7655
-            map
-              .get(Band.Gaia)
-              .fold(map)(g =>
-                val optGbp = map.get(Band.GaiaBP)
-                val optGrp = map.get(Band.GaiaRP)
-                val v      = (optGbp, optGrp)
-                  .mapN((gbp, grp) =>
-                    val c    = gbp.value.value.value - grp.value.value.value
-                    val newV =
-                      g.value.value.value + 0.02704 - 0.01424 * c + 0.2156 * c.pow(2) -
-                        0.01426 * c.pow(3)
-                    // Need to set the scale or later precision gets lost somewhere between the ODB and Explore
-                    BrightnessValue
-                      .from(newV.setScale(5, scala.math.BigDecimal.RoundingMode.HALF_UP))
-                      .toOption
-                      .fold(g): bv =>
-                        bv.withUnit[VegaMagnitude].toMeasureTagged
-                  )
-                  .getOrElse(g)
-                map.updated(Band.V, v)
-              )
-
-          }(withSed)
-      )(candidate)
+          .modify: map =>
+            val estimates =
+              GaiaPhotometry
+                .estimatedBrightnesses(map.map((band, m) => band -> m.value))
+                .map((band, bv) => band -> band.defaultIntegrated.units.withValueTagged(bv))
+            // Measured brightnesses are never replaced by estimates
+            estimates ++ map
+          .apply(withSed)
+      .apply(candidate)

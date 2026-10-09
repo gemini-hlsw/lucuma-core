@@ -122,7 +122,8 @@ object ADQLInterpreter {
       )
     }
 
-  // Find blind offset star candidates within 180 arcseconds with G > 12
+  // Find blind offset star candidates with a reliable position. Magnitude limits depend on the
+  // instrument and are applied after the estimated magnitudes are known, see BlindOffsets.
   def blindOffsetCandidates(using si: ShapeInterpreter): ADQLInterpreter =
     new ADQLInterpreter {
       val MaxCount         = 1000
@@ -137,10 +138,6 @@ object ADQLInterpreter {
       override def orderBy = "separation ASC".some
 
       override val extraConstraints: List[String] =
-        List("phot_g_mean_mag > 12.0",
-             "phot_g_mean_mag IS NOT NULL",
-             "ruwe < 1.4",
-             "astrometric_excess_noise < 1"
-        )
+        List("phot_g_mean_mag IS NOT NULL", "ruwe < 1.4", "astrometric_excess_noise < 1")
     }
 }
