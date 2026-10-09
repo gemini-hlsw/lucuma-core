@@ -121,8 +121,3 @@ object PerSite:
       gs <- hc.downField("gs").as[A]
     yield PerSite(gn, gs)
 
-
-
-case class X()
-
-class Y extends X
