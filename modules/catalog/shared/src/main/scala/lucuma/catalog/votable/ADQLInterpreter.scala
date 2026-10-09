@@ -31,13 +31,18 @@ trait ADQLInterpreter {
   // The "separation" field can than be used, for example, in the ORDER BY.
   def distanceFieldAsName: Option[String] = None
 
+  // Request effective temperature and surface gravity from backends that have them
+  def withStellarParameters: Boolean = false
+
   given shapeInterpreter: ShapeInterpreter
 
   /**
    * Builds a query for gaia taking input from the adapter and the query itself.
    */
   def buildQueryString(adapter: CatalogAdapter.Gaia, cs: ADQLQuery): String = {
-    val fields           = allFields(adapter).map(_.id.value.toLowerCase).mkString(",")
+    val stellarFields    = if (withStellarParameters) adapter.stellarParametersFields else Nil
+    val fields           =
+      (allFields(adapter) ++ stellarFields).map(_.id.value.toLowerCase).mkString(",")
     val distanceField    = distanceFieldAsName.map(as => s"${adapter.distanceField(cs.base)} AS $as")
     val extraFields      = this.extraFields(cs.base) ++ distanceField.toList
     val extraFieldsStr   =
@@ -135,6 +140,8 @@ object ADQLInterpreter {
       override def extraFields(c: Coordinates) = Nil
 
       override def orderBy = "separation ASC".some
+
+      override val withStellarParameters: Boolean = true
 
       override val extraConstraints: List[String] =
         List("phot_g_mean_mag > 12.0",

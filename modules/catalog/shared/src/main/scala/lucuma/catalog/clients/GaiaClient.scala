@@ -10,6 +10,7 @@ import cats.effect.Concurrent
 import cats.syntax.applicative.*
 import cats.syntax.either.*
 import lucuma.catalog.CatalogTargetResult
+import lucuma.catalog.GaiaStellarParameters
 import lucuma.catalog.votable.*
 import lucuma.core.model.Target
 import org.http4s.Uri
@@ -42,6 +43,13 @@ trait GaiaClient[F[_]]:
    */
   def queryByIdGuideStar(sourceId: Long): F[EitherNec[CatalogProblem, Target.Sidereal]]
 
+  /**
+   * Hot-star (ESP-HS) effective temperature and surface gravity for the given sources, from the
+   * Gaia astrophysical parameters table. Sources without ESP-HS values are absent. Empty when no
+   * configured adapter has that table.
+   */
+  def queryStellarParameters(sourceIds: List[Long]): F[Map[Long, GaiaStellarParameters]]
+
 object GaiaClient:
   inline def build[F[_]: Concurrent: Tracer: LoggerFactory](
     httpClient: Client[F],
@@ -65,6 +73,9 @@ object GaiaClient:
 
     def queryByIdGuideStar(sourceId: Long): F[EitherNec[CatalogProblem, Target.Sidereal]] =
       CatalogProblem.SourceIdNotFound(sourceId).leftNec.pure[F]
+
+    def queryStellarParameters(sourceIds: List[Long]): F[Map[Long, GaiaStellarParameters]] =
+      Map.empty.pure[F]
 
   val DefaultAdapters: NonEmptyChain[CatalogAdapter.Gaia] =
     NonEmptyChain.of(

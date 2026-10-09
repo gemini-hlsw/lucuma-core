@@ -50,7 +50,7 @@ class AdaptersSuite extends CatsEffectSuite with VoTableParser with VoTableSampl
       .compile
       .lastOrError
       .map {
-        case Right(CatalogTargetResult(t, _)) =>
+        case Right(CatalogTargetResult(t, _, _)) =>
           assertEquals(t.name, "Gaia DR2 5500810326779190016".refined[NonEmpty])
           assertEquals(t.tracking.epoch.some, Epoch.Julian.fromEpochYears(2015.5))
           assertEquals(
@@ -89,7 +89,7 @@ class AdaptersSuite extends CatsEffectSuite with VoTableParser with VoTableSampl
             Target.radialVelocity.getOption(t).flatten,
             RadialVelocity(BigDecimal(20.30).withUnit[KilometersPerSecond])
           )
-        case Left(_)                          =>
+        case Left(_)                             =>
           fail("Gaia response could not be parsed")
       }
   }

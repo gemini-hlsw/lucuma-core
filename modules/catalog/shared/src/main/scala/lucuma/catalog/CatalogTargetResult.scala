@@ -10,8 +10,11 @@ import monocle.Focus
 import monocle.Lens
 
 /** Result of parsing target information from a catalog. */
-final case class CatalogTargetResult(target: Target.Sidereal, angularSize: Option[AngularSize])
-    derives Eq
+final case class CatalogTargetResult(
+  target:            Target.Sidereal,
+  angularSize:       Option[AngularSize],
+  stellarParameters: Option[GaiaStellarParameters] = None
+) derives Eq
 
 object CatalogTargetResult:
   val target: Lens[CatalogTargetResult, Target.Sidereal] =
@@ -19,3 +22,6 @@ object CatalogTargetResult:
 
   val angularSize: Lens[CatalogTargetResult, Option[AngularSize]] =
     Focus[CatalogTargetResult](_.angularSize)
+
+  val stellarParameters: Lens[CatalogTargetResult, Option[GaiaStellarParameters]] =
+    Focus[CatalogTargetResult](_.stellarParameters)

@@ -5,6 +5,7 @@ package lucuma.catalog.arb
 
 import lucuma.catalog.AngularSize
 import lucuma.catalog.CatalogTargetResult
+import lucuma.catalog.GaiaStellarParameters
 import lucuma.core.model.Target
 import lucuma.core.model.arb.ArbTarget
 import org.scalacheck.*
@@ -14,17 +15,20 @@ import org.scalacheck.Cogen.*
 trait ArbCatalogTargetResult {
   import ArbTarget.given
   import ArbAngularSize.given
+  import ArbGaiaStellarParameters.given
 
   given Arbitrary[CatalogTargetResult] =
     Arbitrary {
       for {
         t <- arbitrary[Target.Sidereal]
         s <- arbitrary[Option[AngularSize]]
-      } yield CatalogTargetResult(t, s)
+        p <- arbitrary[Option[GaiaStellarParameters]]
+      } yield CatalogTargetResult(t, s, p)
     }
 
   given Cogen[CatalogTargetResult] =
-    Cogen[(Target.Sidereal, Option[AngularSize])].contramap(r => (r.target, r.angularSize))
+    Cogen[(Target.Sidereal, Option[AngularSize], Option[GaiaStellarParameters])]
+      .contramap(r => (r.target, r.angularSize, r.stellarParameters))
 }
 
 object ArbCatalogTargetResult extends ArbCatalogTargetResult
