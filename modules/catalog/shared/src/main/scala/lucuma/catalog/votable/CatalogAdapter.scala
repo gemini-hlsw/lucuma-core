@@ -364,8 +364,7 @@ object CatalogAdapter {
       s"DISTANCE(POINT('ICRS', ${raField.id}, ${decField.id}), POINT('ICRS', $centerRa, $centerDec))"
 
     /**
-     * Query for the effective temperature and surface gravity of the given sources, on backends
-     * that have them.
+     * Query for the effective temperature and surface gravity of the given sources
      */
     def stellarParametersByIdQuery(sourceIds: List[Long]): Option[String] = None
 
@@ -514,12 +513,10 @@ object CatalogAdapter {
     // Gaia has no sed
     override def parseSED(entries: Map[FieldId, String]) = none.rightNec
 
-    // ESP-HS is specific to hot stars and more accurate for them, so it wins over GSP-Phot
     override def parseStellarParameters(
       entries: Map[FieldId, String]
     ): EitherNec[CatalogProblem, Option[GaiaStellarParameters]] =
-      // UCDs differ between backends, so fields are found by id. Missing values are blank cells,
-      // or NaN on DataLab.
+      // ESP-HS is specific to hot stars and more accurate for them, so it wins over GSP-Phot
       val byId = entries
         .map { case (k, v) => (k.id.value, v.trim) }
         .filter((_, v) => v.nonEmpty && !v.equalsIgnoreCase("NaN"))

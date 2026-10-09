@@ -61,7 +61,7 @@ object GaiaClient:
     def query(adqlQuery: ADQLQuery)(using
       ADQLInterpreter
     ): F[List[EitherNec[CatalogProblem, CatalogTargetResult]]] =
-      List.empty.pure[F]
+      List.empty.pure
 
     def queryById(sourceId: Long): F[EitherNec[CatalogProblem, CatalogTargetResult]] =
       CatalogProblem.SourceIdNotFound(sourceId).leftNec.pure[F]
@@ -69,13 +69,13 @@ object GaiaClient:
     def queryGuideStars(adqlQuery: ADQLQuery)(using
       ADQLInterpreter
     ): F[List[EitherNec[CatalogProblem, Target.Sidereal]]] =
-      List.empty.pure[F]
+      List.empty.pure
 
     def queryByIdGuideStar(sourceId: Long): F[EitherNec[CatalogProblem, Target.Sidereal]] =
       CatalogProblem.SourceIdNotFound(sourceId).leftNec.pure[F]
 
     def queryStellarParameters(sourceIds: List[Long]): F[Map[Long, GaiaStellarParameters]] =
-      Map.empty.pure[F]
+      Map.empty.pure
 
   val DefaultAdapters: NonEmptyChain[CatalogAdapter.Gaia] =
     NonEmptyChain.of(
