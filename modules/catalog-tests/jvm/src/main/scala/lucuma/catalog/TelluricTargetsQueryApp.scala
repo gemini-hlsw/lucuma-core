@@ -27,12 +27,12 @@ object TelluricTargetsQueryApp extends IOApp.Simple:
 
   val telluricUri = uri"https://telluric-targets.gpp.gemini.edu/"
 
-  // Manual uses temperature classes.
+  // ExplicitSpectralTypes uses temperature classes.
   val searchTypes: List[TelluricType] = List(
     TelluricType.Hot,
     TelluricType.Solar,
     TelluricType.A0V,
-    TelluricType.Manual(NonEmptyList.of("A0", "A2"))
+    TelluricType.ExplicitSpectralTypes(NonEmptyList.of("A0", "A2"))
   )
 
   def run =
