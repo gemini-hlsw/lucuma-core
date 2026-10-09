@@ -5,9 +5,9 @@ package edu.gemini.tac.qengine.api.config
 
 import lucuma.core.enums.Site
 import lucuma.core.model.IntCentiPercent
+import lucuma.core.model.IntCentiPercentUnbounded
 import lucuma.core.model.Semester
 import lucuma.core.util.TimeSpan
-import lucuma.core.model.IntCentiPercentUnbounded
 
 // TODO:
 // The RightAscensionMap[Time] limits and DeclinationMap[IntCentiPercent] can be calculated given

@@ -3,6 +3,7 @@
 
 package edu.gemini.qengine.skycalc
 
+import io.circe.Decoder
 import lucuma.core.math.HourAngle
 import lucuma.core.math.RightAscension
 
@@ -22,3 +23,7 @@ object RaBinSize:
       .filter(_ > 0)
       .filter(1440 % _ == 0)
       .map(new RaBinSize(_) {})
+
+  given Decoder[RaBinSize] =
+    Decoder[Int].emap: n =>
+      ofArcMinutes(n).toRight(s"Invalid RA bin size: $n")

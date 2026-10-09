@@ -3,10 +3,10 @@
 
 package itac.config
 
-import io.circe._
-import io.circe.generic.semiauto._
-import lucuma.core.model.IntCentiPercent
+// import io.circe.*
+// import io.circe.generic.semiauto.*
 import lucuma.core.enums.Site
+import lucuma.core.model.IntCentiPercent
 
 final case class PartnerConfig(
   email:   Email,

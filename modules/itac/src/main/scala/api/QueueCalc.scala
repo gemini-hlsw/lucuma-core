@@ -3,10 +3,10 @@
 
 package edu.gemini.tac.qengine.api
 
-import lucuma.core.enums.ScienceBand
 import edu.gemini.tac.qengine.api.queue.ProposalQueue
-import lucuma.core.data.PerSite
 import edu.gemini.tac.qengine.log.ProposalLog
+import lucuma.core.data.PerSite
+import lucuma.core.enums.ScienceBand
 
 trait BucketsAllocation {
   def raTablesANSI: String

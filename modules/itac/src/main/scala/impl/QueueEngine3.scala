@@ -5,6 +5,7 @@ package edu.gemini.tac.qengine.impl
 
 import cats.data.State
 import cats.syntax.all.*
+import edu.gemini.tac.qengine.api.QueueCalc
 import edu.gemini.tac.qengine.api.config.QueueEngineConfig
 import edu.gemini.tac.qengine.api.config.TimeRestriction
 import edu.gemini.tac.qengine.api.queue.ProposalQueue
@@ -22,7 +23,6 @@ import lucuma.core.enums.ScienceSubtype
 import lucuma.core.enums.Site
 import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.util.Enumerated
-import edu.gemini.tac.qengine.api.QueueCalc
 
 object QueueEngine3 {
 
@@ -88,7 +88,7 @@ object QueueEngine3 {
     // it indicates times need to be adjusted. 
 
 
-    (remaining, log, queues)
+
 
 
     // val ((finalResource, band123log), (queue1WithoutClassical, queue2, queue3)) = (

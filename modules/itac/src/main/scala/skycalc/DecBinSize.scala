@@ -3,6 +3,7 @@
 
 package edu.gemini.qengine.skycalc
 
+import io.circe.Decoder
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Declination
 import lucuma.core.math.RightAscension
@@ -26,3 +27,7 @@ object DecBinSize:
       .filter(_ > 0)
       .filter(180 % _ == 0)
       .map(new DecBinSize(_) {})
+
+  given Decoder[DecBinSize] =
+    Decoder[Int].emap: n =>
+      ofDegrees(n).toRight(s"Invalid Dec bin size: $n")

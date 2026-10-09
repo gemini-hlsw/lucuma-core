@@ -3,14 +3,11 @@
 
 package itac.config
 
-import cats.implicits._
-import io.circe._
+import cats.implicits.*
+import io.circe.*
 import java.time.LocalDate
-import java.time.format.DateTimeParseException
 import java.time.format.DateTimeFormatter.BASIC_ISO_DATE
-import java.time.Instant
-import lucuma.core.model.Semester
-import lucuma.core.enums.Site
+import java.time.format.DateTimeParseException
 
 sealed abstract case class LocalDateRange(
   start: LocalDate,

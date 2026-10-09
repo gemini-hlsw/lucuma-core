@@ -3,7 +3,7 @@
 
 package itac.codec
 
-import io.circe._
+import io.circe.*
 import lucuma.core.model.Semester
 
 object semester:

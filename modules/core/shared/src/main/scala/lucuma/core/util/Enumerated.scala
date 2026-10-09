@@ -87,4 +87,3 @@ object Enumerated:
     }
 
   inline def derived[E]: Enumerated[E] = ${ enumeratedImpl[E] }
-

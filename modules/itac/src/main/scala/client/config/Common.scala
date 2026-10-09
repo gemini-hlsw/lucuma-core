@@ -3,21 +3,21 @@
 
 package itac.config
 
-import io.circe._
-import io.circe.generic.semiauto._
-import edu.gemini.tac.qengine.api.config.Shutdown
-import java.time.LocalDate
 import edu.gemini.tac.qengine.api.config.ConditionsBin
 import edu.gemini.tac.qengine.api.config.ConditionsCategoryMap
-import itac.config.Common.EmailConfig
+import edu.gemini.tac.qengine.api.config.Shutdown
 import edu.gemini.tac.qengine.api.config.TimeAccountingCategorySequence
-import lucuma.core.enums.Site
-import lucuma.core.model.Semester
-import lucuma.core.data.PerSite
-import lucuma.core.model.IntCentiPercent
-import lucuma.core.enums.TimeAccountingCategory
-import java.time.ZonedDateTime
+import io.circe.*
 import io.circe.generic.semiauto.*
+import itac.config.Common.EmailConfig
+import lucuma.core.data.PerSite
+import lucuma.core.enums.Site
+import lucuma.core.enums.TimeAccountingCategory
+import lucuma.core.model.IntCentiPercent
+import lucuma.core.model.Semester
+
+import java.time.LocalDate
+import java.time.ZonedDateTime
 
 final case class Common(
   semester: Semester,

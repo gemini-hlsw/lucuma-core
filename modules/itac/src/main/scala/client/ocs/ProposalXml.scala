@@ -1,7 +1,7 @@
 // Copyright (c) 2016-2025 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package lucuma.ocs
+package itac.ocs
 
 import cats.Monad
 import cats.data.NonEmptyList
@@ -13,6 +13,7 @@ import edu.gemini.tac.qengine.p1.GroupTree
 import edu.gemini.tac.qengine.p1.ItacObservation
 import edu.gemini.tac.qengine.p1.ItacTarget
 import edu.gemini.tac.qengine.p1.Proposal
+import eu.timepit.refined.types.numeric.PosDouble
 import lucuma.core.enums.ObservingModeType
 import lucuma.core.enums.ScienceBand
 import lucuma.core.enums.SkyBackground
@@ -36,7 +37,6 @@ import lucuma.core.util.TimeSpan
 
 import scala.xml.Elem
 import scala.xml.Node
-import eu.timepit.refined.types.numeric.PosDouble
 
 trait ProposalXml2[F[_]]:
   def proposal: F[Proposal]
