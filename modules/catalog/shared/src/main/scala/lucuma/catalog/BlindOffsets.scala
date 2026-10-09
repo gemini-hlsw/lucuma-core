@@ -70,7 +70,6 @@ case class BlindOffsetCandidate(
       val magnitudeTerm = (m.value.value - limits.optimal.value.value).toDouble / MagnitudeScale
       val distanceTerm  = Angle.decimalArcseconds.get(distance).toDouble / SeparationScale
       BigDecimal(math.sqrt(magnitudeTerm * magnitudeTerm + distanceTerm * distanceTerm))
-        .setScale(6, BigDecimal.RoundingMode.HALF_UP)
 
 object BlindOffsetCandidate:
   val MagnitudeScale: Double  = 5.0
