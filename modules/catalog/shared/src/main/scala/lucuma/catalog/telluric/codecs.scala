@@ -21,17 +21,17 @@ object codecs:
         case "notelluric" => TelluricType.NoTelluric.asRight
         case other        =>
           NonEmptyList.fromList(other.split(",").map(_.trim).filter(_.nonEmpty).toList) match
-            case Some(types) => TelluricType.Manual(types).asRight
+            case Some(types) => TelluricType.ExplicitSpectralTypes(types).asRight
             case None        => s"Invalid telluric type: $s".asLeft
 
   given Encoder[TelluricType] =
     Encoder[String].contramap:
-      case TelluricType.Hot               => "hot"
-      case TelluricType.A0V               => "A0"
-      case TelluricType.Solar             => "solar"
-      case TelluricType.NoTelluric        => "NoTelluric"
-      case TelluricType.Manual(starTypes) => starTypes.toList.mkString(",")
-      case TelluricType.UserDefined(_)    => "UserDefined"
+      case TelluricType.Hot                              => "hot"
+      case TelluricType.A0V                              => "A0"
+      case TelluricType.Solar                            => "solar"
+      case TelluricType.NoTelluric                       => "NoTelluric"
+      case TelluricType.ExplicitSpectralTypes(starTypes) => starTypes.toList.mkString(",")
+      case TelluricType.UserDefined(_)                   => "UserDefined"
 
   given Decoder[TelluricCalibrationOrder] =
     Decoder[String].emap: s =>

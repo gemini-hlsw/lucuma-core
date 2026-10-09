@@ -29,15 +29,15 @@ type IsUserDefinedTelluric = IsUserDefinedTelluric.Type
 sealed trait TelluricType(val tag: String) derives Eq
 
 object TelluricType:
-  case object Hot                                     extends TelluricType("Hot")
-  case object A0V                                     extends TelluricType("A0V")
-  case object Solar                                   extends TelluricType("Solar")
-  case class  Manual(starTypes: NonEmptyList[String]) extends TelluricType("Manual") derives Eq
-  case class  UserDefined(count: TelluricCount)       extends TelluricType("UserDefined") derives Eq
-  case object NoTelluric                              extends TelluricType("NoTelluric")
+  case object Hot                                                    extends TelluricType("Hot")
+  case object A0V                                                    extends TelluricType("A0V")
+  case object Solar                                                  extends TelluricType("Solar")
+  case class  ExplicitSpectralTypes(starTypes: NonEmptyList[String]) extends TelluricType("ExplicitSpectralTypes") derives Eq
+  case class  UserDefined(count: TelluricCount)                      extends TelluricType("UserDefined") derives Eq
+  case object NoTelluric                                             extends TelluricType("NoTelluric")
 
-  object Manual:
-    val starTypes: Lens[Manual, NonEmptyList[String]] = Focus[Manual](_.starTypes)
+  object ExplicitSpectralTypes:
+    val starTypes: Lens[ExplicitSpectralTypes, NonEmptyList[String]] = Focus[ExplicitSpectralTypes](_.starTypes)
 
   object UserDefined:
     val count: Lens[UserDefined, TelluricCount] = Focus[UserDefined](_.count)
@@ -51,8 +51,8 @@ object TelluricType:
   val solar: Prism[TelluricType, TelluricType.Solar.type] =
     GenPrism[TelluricType, TelluricType.Solar.type]
 
-  val manual: Prism[TelluricType, TelluricType.Manual] =
-    GenPrism[TelluricType, TelluricType.Manual]
+  val explicitSpectralTypes: Prism[TelluricType, TelluricType.ExplicitSpectralTypes] =
+    GenPrism[TelluricType, TelluricType.ExplicitSpectralTypes]
 
   val userDefined: Prism[TelluricType, TelluricType.UserDefined] =
     GenPrism[TelluricType, TelluricType.UserDefined]
