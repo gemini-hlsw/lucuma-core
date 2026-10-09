@@ -67,3 +67,70 @@ class GaiaPhotometrySuite extends FunSuite:
       None
     )
   }
+
+  test("estimated brightnesses follow the DR3 polynomials"):
+    // BP - RP = 1.5 is inside every range, and its powers differ, so a sign error or a misplaced
+    // coefficient changes the result
+    val gaia                                     = SortedMap[Band, BrightnessValue](Band.Gaia -> bv(14.0),
+                                                Band.GaiaBP -> bv(14.75),
+                                                Band.GaiaRP -> bv(13.25)
+    )
+    val est                                      = GaiaPhotometry.estimatedBrightnesses(gaia)
+    assertEquals(est.keySet, GaiaPhotometry.EstimatedBands)
+    // Coefficients c0, c1, ... of G - X from GDR3 tables 5.8 and 5.9
+    def check(band: Band, coefficients: Double*) =
+      val gMinusX = coefficients.zipWithIndex.map((c, i) => c * math.pow(1.5, i)).sum
+      assertEqualsDouble(est(band).value.value.toDouble, 14.0 - gMinusX, 1e-9)
+    check(Band.V, -0.02704, 0.01424, -0.2156, 0.01426)
+    check(Band.SloanG, 0.2199, -0.6365, -0.1548, 0.0064)
+    check(Band.SloanR, -0.09837, 0.08592, 0.1907, -0.1701, 0.02263)
+    check(Band.SloanI, -0.293, 0.6404, -0.09609, -0.002104)
+    check(Band.J, 0.01798, 1.389, -0.09338)
+    check(Band.H, -0.1048, 2.011, -0.1758)
+    check(Band.K, -0.0981, 2.089, -0.1579)
+
+  test("bands whose colour range excludes the star are left out"):
+    // BP - RP = 3.5: V (-0.5, 5.0) is in range, every other transformation is not
+    val red  = SortedMap[Band, BrightnessValue](Band.Gaia -> bv(14.0),
+                                               Band.GaiaBP -> bv(16.0),
+                                               Band.GaiaRP -> bv(12.5)
+    )
+    assertEquals(GaiaPhotometry.estimatedBrightnesses(red).keySet, Set[Band](Band.V))
+    // BP - RP = 0.1: Sloan g (0.3, 3.0) and i (0.5, 2.0) are out
+    val blue = SortedMap[Band, BrightnessValue](Band.Gaia -> bv(14.0),
+                                                Band.GaiaBP -> bv(14.0),
+                                                Band.GaiaRP -> bv(13.9)
+    )
+    assertEquals(
+      GaiaPhotometry.estimatedBrightnesses(blue).keySet,
+      Set[Band](Band.V, Band.SloanR, Band.J, Band.H, Band.K)
+    )
+
+  test("no estimates without all three Gaia bands"):
+    assertEquals(
+      GaiaPhotometry.estimatedBrightnesses(SortedMap[Band, BrightnessValue](Band.Gaia -> bv(14.0))),
+      SortedMap.empty[Band, BrightnessValue]
+    )
+
+  test("the validity ranges exclude their edges"):
+    // BP - RP = 0.0 and 4.0, the edges of the R relation
+    assertEquals(GaiaPhotometry.johnsonCousinsR(bv(14.0), bv(14.0), bv(14.0)), None)
+    assertEquals(GaiaPhotometry.johnsonCousinsR(bv(14.0), bv(17.0), bv(13.0)), None)
+    // BP - RP = 5.0, the upper edge of V and beyond every other band
+    val edge = SortedMap[Band, BrightnessValue](Band.Gaia -> bv(14.0),
+                                                Band.GaiaBP -> bv(18.0),
+                                                Band.GaiaRP -> bv(13.0)
+    )
+    assertEquals(GaiaPhotometry.estimatedBrightnesses(edge), SortedMap.empty[Band, BrightnessValue])
+
+  test("estimates are not rounded"):
+    val gaia = SortedMap[Band, BrightnessValue](Band.Gaia -> bv(14.0),
+                                                Band.GaiaBP -> bv(14.5),
+                                                Band.GaiaRP -> bv(13.5)
+    )
+    // G - V = -0.02704 + 0.01424 - 0.2156 + 0.01426 = -0.21414
+    assertEqualsDouble(
+      GaiaPhotometry.estimatedBrightnesses(gaia)(Band.V).value.value.toDouble,
+      14.21414,
+      1e-9
+    )
