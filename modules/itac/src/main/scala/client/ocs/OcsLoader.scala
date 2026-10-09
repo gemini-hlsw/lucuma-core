@@ -12,30 +12,33 @@ import itac.ocs.Namer.State
 import lucuma.core.enums.ScienceBand
 import org.typelevel.log4cats.Logger
 
-import java.io.File
 import java.nio.file.Path
 import scala.xml.Elem
 import scala.xml.XML
 
 trait OcsLoader[F[_]]:
-  def loadProposal(log: Logger[F], band: ScienceBand, file: File): F[Either[String, Proposal]]
-  def loadProposals(log: Logger[F], band: ScienceBand, dir: Path): F[Either[String, List[Proposal]]]
+  def loadProposals(log: Logger[F], dirs: Map[ScienceBand, Path]): F[Either[String, List[Proposal]]]
 
 object OcsLoader:
   
   def apply[F[_]: Sync]: OcsLoader[F] =
     new OcsLoader[F]:
 
-      def loadProposals(log: Logger[F], band: ScienceBand, dir: Path): F[Either[String, List[Proposal]]] =
-        log.debug(s"OcsLoader: Loading band ${band.intValue} proposals from $dir") >>
-        Sync[F].blocking(dir.toFile.listFiles.toList.filter(_.getName().endsWith(".xml"))).flatMap: fs =>
-          fs.traverse(loadProposal(log, band, _)).map(_.sequence)
-
-      def loadProposal(log: Logger[F], band: ScienceBand, file: File): F[Either[String, Proposal]] =
-        log.debug(s"OcsLoader: Loading band ${band.intValue} proposal from $file") >>
+      def loadXmlFiles(dir: Path): F[List[Elem]] =
         Sync[F].blocking:
-          convert(XML.load(file), band)
+          if dir.toFile.isDirectory then
+            dir.toFile.listFiles.toList.filter(_.getName().endsWith(".xml")).map(XML.load(_))
+          else Nil
 
-      private def convert(root: Elem, band: ScienceBand): Either[String, Proposal] =
-        val xml = ProposalXml2[EitherT[StateT[cats.Id, State, *], String, *]](root, band)
-        xml.proposal.value.runA(State.Initial)
+      def loadProposals(log: Logger[F], dirs: Map[ScienceBand, Path]): F[Either[String, List[Proposal]]] =
+        dirs
+          .toList
+          .flatTraverse: (band, dir) =>
+            loadXmlFiles(dir).map(_.tupleRight(band))  
+          .map(convertMany(_).value.runA(State.Initial))
+
+      private def convert1(root: Elem, band: ScienceBand): EitherT[StateT[cats.Id, State, _], String, Proposal] =
+        ProposalXml2[EitherT[StateT[cats.Id, State, *], String, *]](root, band).proposal
+
+      private def convertMany(xmls: List[(Elem, ScienceBand)]): EitherT[StateT[cats.Id, State, _], String, List[Proposal]]  =
+        xmls.traverse(convert1)

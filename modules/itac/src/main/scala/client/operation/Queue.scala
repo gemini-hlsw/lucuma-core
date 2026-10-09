@@ -8,7 +8,6 @@ import cats.*
 import cats.effect.*
 import cats.implicits.*
 import edu.gemini.tac.qengine.impl.QueueEngine3
-import edu.gemini.tac.qengine.log.ProposalLog
 import itac.config.Common
 import itac.util.Colors
 import lucuma.core.data.PerSite
@@ -17,6 +16,18 @@ import lucuma.core.util.Enumerated
 import org.typelevel.log4cats.Logger
 
 import java.nio.file.Path
+import lucuma.core.enums.ScienceBand
+import edu.gemini.tac.qengine.api.QueueCalc
+import lucuma.core.model.Semester
+import edu.gemini.tac.qengine.p1.Proposal
+import edu.gemini.tac.qengine.log.AcceptMessage
+import lucuma.core.enums.TimeAccountingCategory
+import edu.gemini.tac.qengine.log.RejectTimeAccountingCategoryOverAllocation
+import edu.gemini.tac.qengine.log.RejectCategoryOverAllocation
+import edu.gemini.tac.qengine.log.RejectTarget
+import edu.gemini.tac.qengine.log.RejectConditions
+import edu.gemini.tac.qengine.log.RejectOverAllocation
+import edu.gemini.tac.qengine.log.RemovedRejectMessage
 
 object Queue {
 
@@ -30,12 +41,11 @@ object Queue {
   ): Operation[F] =
     new AbstractQueueOperation[F](qe, siteConfig):
 
-      def siteReport(site: Site, log: ProposalLog, cc: Common): F[Unit] =
+      def siteReport(ps: List[Proposal], site: Site, semester: Semester, queueCalc: QueueCalc, cc: Common): F[Unit] =
         Sync[F].delay {          
 
-          println(log) // to get rid of warnings
+          val pids = queueCalc.proposalLog.proposalIds // proposals that were considered
 
-          // val pids = log.proposalIds // proposals that were considered
           val separator = "━" * 100 + "\n"
 
           println(s"\n${Colors.BOLD}${site.shortName} ${cc.semester} Queue Candidate${Colors.RESET}")
@@ -49,25 +59,28 @@ object Queue {
           println()
 
           println(separator)
-          // val result = QueueResult(queueCalc)
 
-          // QueueBand.values.foreach { qb =>
+          Enumerated[ScienceBand].all.foreach { qb =>
 
-          //   println(s"${Colors.BOLD}The following proposals were accepted for Band ${qb.number}.${Colors.RESET}")
-          //   println(qb.number match {
-          //     case 1 => Colors.YELLOW
-          //     case 2 => Colors.GREEN
-          //     case 3 => Colors.BLUE
-          //     case 4 => Colors.RED
-          //   })
-          //   result.entries(qb).sortBy(_.proposals.head.ntac.ranking.num.orEmpty).foreach { case QueueResult.Entry(ps, pid) =>
-          //     val ss = ps.map { p =>
-          //       f"${p.ntac.ranking.num.orEmpty}%5.1f ${p.id.reference}%-30s ${p.piName.orEmpty.take(20)}%-20s ${p.time.toHours.value}%5.1f h  $pid"
-          //     }
-          //     printWithGroupBars(ss.toList)
-          //   }
-          //   println(Colors.RESET)
-          // }
+            println(s"${Colors.BOLD}The following proposals were accepted for Band ${qb.intValue}.${Colors.RESET}")
+            println(qb.intValue match {
+              case 1 => Colors.YELLOW
+              case 2 => Colors.GREEN
+              case 3 => Colors.BLUE
+              case 4 => Colors.RED
+            })
+
+            queueCalc.queues(site)(qb).toList.sortBy(_.parentProposal.ranking.value).foreach: p =>
+              println(f"${p.parentProposal.ranking}%5.1f ${p.reference}%-30s ${"todo-pi name"}%-20s ${p.allocation.duration.toHours}%5.1f h  ${"todo: programid"}")
+
+            // result.entries(qb).sortBy(_.proposals.head.ntac.ranking.num.orEmpty).foreach { case QueueResult.Entry(ps, pid) =>
+            //   val ss = ps.map { p =>
+            //     f"${p.ntac.ranking.num.orEmpty}%5.1f ${p.id.reference}%-30s ${p.piName.orEmpty.take(20)}%-20s ${p.time.toHours.value}%5.1f h  $pid"
+            //   }
+            //   printWithGroupBars(ss.toList)
+            // }
+            println(Colors.RESET)
+          }
 
           // println(separator)
 
@@ -105,27 +118,29 @@ object Queue {
           //   println()
           // }
 
-          // println(separator)
-          // println(s"${Colors.BOLD}Rejection Report for ${queueCalc.context.site.abbreviation}-${queueCalc.context.semester}${Colors.RESET}\n")
+          println(separator)
+          println(s"${Colors.BOLD}Rejection Report for ${site.shortName}-${Semester.fromString.reverseGet(semester)}${Colors.RESET}\n")
 
-          // QueueBand.values.foreach { qb =>
-          //   println(s"${Colors.BOLD}The following proposals were rejected for $qb.${Colors.RESET}")
-          //   pids.toList.flatMap(pid => ps.find(_.id == pid)).sortBy(_.ntac.ranking.num).foreach { p=>
-          //     val pid = p.id
-          //     log.get(pid, qb) match {
-          //       case None =>
-          //       case Some(AcceptMessage(_))                => //println(f"- ${pid.reference}%-20s ${p.piName.orEmpty}%-15s 👍")
-          //       case Some(m: RejectPartnerOverAllocation)  => println(f"${p.ntac.ranking.num.orEmpty}%5.1f ${pid.reference}%-20s ${p.piName.orEmpty}%-15s ${"Partner full:"}%-20s ${m.detail}")
-          //       case Some(m: RejectCategoryOverAllocation) => println(f"${p.ntac.ranking.num.orEmpty}%5.1f ${pid.reference}%-20s ${p.piName.orEmpty}%-15s ${"Category overallocated:"}%-20s ${m.detail}")
-          //       case Some(m: RejectTarget)                 => println(f"${p.ntac.ranking.num.orEmpty}%5.1f ${pid.reference}%-20s ${p.piName.orEmpty}%-15s ${m.raDecType.toString + " bin full:"}%-20s ${m.detail} -- ${ObservationDigest.digest(m.obs.p1Observation)}")
-          //       case Some(m: RejectConditions)             => println(f"${p.ntac.ranking.num.orEmpty}%5.1f ${pid.reference}%-20s ${p.piName.orEmpty}%-15s ${"Conditions bin full:"}%-20s ${m.detail} -- ${ObservationDigest.digest(m.obs.p1Observation)}")
-          //       case Some(m: RejectOverAllocation)         => println(f"${p.ntac.ranking.num.orEmpty}%5.1f ${pid.reference}%-20s ${p.piName.orEmpty}%-15s ${"Overallocation"}%-20s ${m.detail}")
-          //       case Some(m: RemovedRejectMessage)         => println(f"${p.ntac.ranking.num.orEmpty}%5.1f ${pid.reference}%-20s ${p.piName.orEmpty}%-15s ${"Removed"}%-20s ${m.detail}")
-          //       case Some(lm)                              => println(f"${p.ntac.ranking.num.orEmpty}%5.1f ${pid.reference}%-20s ${p.piName.orEmpty}%-15s ${"Miscellaneous"}%-20s ${lm.getClass.getName}")
-          //     }
-          //   }
-          //   println()
-          // }
+          Enumerated[ScienceBand].all.foreach { qb =>
+            println(s"${Colors.BOLD}The following proposals were rejected for $qb.${Colors.RESET}")
+            pids.toList.flatMap(pid => ps.find(_.reference === pid.parentReference)).sortBy(_.ranking.value).foreach { p =>
+              Enumerated[TimeAccountingCategory].all.foreach: cat =>
+                val shard = p.shardFor(site, cat, qb)
+                if shard.allocation.duration.nonZero then
+                  val sid = shard.reference
+                  queueCalc.proposalLog.get(sid, qb) match {
+                    case None | Some(AcceptMessage(_))            => //println(f"- ${pid.reference}%-20s ${p.piName.orEmpty}%-15s 👍")
+                    case Some(m: RejectTimeAccountingCategoryOverAllocation)  => println(f"${p.ranking.value}%5.1f ${sid}%-20s ${"todo-pi name"}%-15s ${"Time accounting category full:"}%-20s ${m.detail}")
+                    case Some(m: RejectCategoryOverAllocation) => println(f"${p.ranking.value}%5.1f ${sid}%-20s ${"todo-pi name"}%-15s ${"Category overallocated:"}%-20s ${m.detail}")
+                    case Some(m: RejectTarget)                 => println(f"${p.ranking.value}%5.1f ${sid}%-20s ${"todo-pi name"}%-15s ${m.raDecType.toString + " bin full:"}%-20s ${m.detail}}")
+                    case Some(m: RejectConditions)             => println(f"${p.ranking.value}%5.1f ${sid}%-20s ${"todo-pi name"}%-15s ${"Conditions bin full:"}%-20s ${m.detail}}")
+                    case Some(m: RejectOverAllocation)         => println(f"${p.ranking.value}%5.1f ${sid}%-20s ${"todo-pi name"}%-15s ${"Overallocation"}%-20s ${m.detail}")
+                    case Some(m: RemovedRejectMessage)         => println(f"${p.ranking.value}%5.1f ${sid}%-20s ${"todo-pi name"}%-15s ${"Removed"}%-20s ${m.detail}")
+                    case Some(lm)                              => println(f"${p.ranking.value}%5.1f ${sid}%-20s ${"todo-pi name"}%-15s ${"Miscellaneous"}%-20s ${lm.getClass.getName}")
+                  }
+            }
+            println()
+          }
 
           // println(s"${Colors.BOLD}The following proposals for ${queueCalc.context.site.abbreviation} do not appear in the proposal log:${Colors.RESET}")
           // ps.foreach { p =>
@@ -164,11 +179,11 @@ object Queue {
 
       def run(ws: Workspace[F], log: Logger[F]): F[ExitCode] =
         ws.commonConfig.flatMap: cc =>
-          computeQueue(ws).flatMap: (_, queueCalc) =>
+          computeQueue(ws).flatMap: (ps, queueCalc) =>
             Enumerated[Site]
               .all
               .traverse: site =>
-                siteReport(site, queueCalc.proposalLog, cc)
+                siteReport(ps, site, cc.semester, queueCalc, cc)
               .as(ExitCode.Success)
 
 }

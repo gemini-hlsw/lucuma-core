@@ -214,13 +214,13 @@ object Workspace {
         //     m <- BulkEditFile.read(f)
         //   } yield m
 
-        private def loadOcsProposals(band: ScienceBand, dir: Path): F[List[Proposal]] =
+        private def loadOcsProposals(dirs: Map[ScienceBand, Path]): F[List[Proposal]] =
           for {
             cwd  <- cwd
             conf <- commonConfig
             p     = cwd.resolve(dir)
             // when  = conf.semester.getMidpointDate(Site.GN).getTime // arbitrary
-            e    <- OcsLoader[F].loadProposals(log, band, p)
+            e    <- OcsLoader[F].loadProposals(log, dirs)
             _    <- e.swap.traverse(s => Sync[F].raiseError(ItacException(s"Error loading OCS proposal: $s")))
             // es   <- edits
             // ps   <- ProposalLoader[F](when, es, log, mutator).loadMany(p.toFile.getAbsoluteFile)
@@ -230,19 +230,10 @@ object Workspace {
             // ret   = ps.collect { case (_, Right(ps)) => ps.toList } .flatten
           } yield e.toOption.orEmpty
 
-        def bandedProposals: F[Map[ScienceBand, List[Proposal]]] =
-          Enumerated[ScienceBand]
-            .all
-            .traverse: b => 
-              loadOcsProposals(b, proposalDir(b))
-                .map: ps =>
-                  Map(b -> ps)
-            .map: maps =>
-              maps.combineAll
-
-        def proposals: F[List[Proposal]] = bandedProposals.map(_.values.toList.flatten)
-
-        // def removed: F[List[Proposal]] = loadProposals(RemovedDir)
+        def proposals: F[List[Proposal]] =
+          cwd.flatMap: cwd =>
+            loadOcsProposals:
+              Enumerated[ScienceBand].all.fproduct(b => cwd.resolve(proposalDir(b))).toMap
 
         def proposal(ref: String, band: ScienceBand): F[(File, NonEmptyList[Proposal])] =
           ???

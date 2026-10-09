@@ -18,7 +18,7 @@ object Fixture_25B:
 
   def loadBand(band: ScienceBand): IO[Either[String, List[Proposal]]] =
     val dir = Path.of(s"/Users/rob.norris/Gemini/ocs/itac/itac_WD/band-${band.intValue}/")
-    OcsLoader[IO].loadProposals(log, band, dir)
+    OcsLoader[IO].loadProposals(log, Map(band -> dir))
 
   def loadAll: IO[Either[String, List[Proposal]]] =
     Enumerated[ScienceBand]
