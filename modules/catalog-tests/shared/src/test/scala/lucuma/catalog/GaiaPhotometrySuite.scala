@@ -68,19 +68,26 @@ class GaiaPhotometrySuite extends FunSuite:
     )
   }
 
-  test("estimated brightnesses follow the DR3 polynomials at BP - RP = 1"):
-    val gaia = SortedMap[Band, BrightnessValue](Band.Gaia -> bv(14.0),
-                                                Band.GaiaBP -> bv(14.5),
-                                                Band.GaiaRP -> bv(13.5)
+  test("estimated brightnesses follow the DR3 polynomials"):
+    // BP - RP = 1.5 is inside every range, and its powers differ, so a sign error or a misplaced
+    // coefficient changes the result
+    val gaia                                     = SortedMap[Band, BrightnessValue](Band.Gaia -> bv(14.0),
+                                                Band.GaiaBP -> bv(14.75),
+                                                Band.GaiaRP -> bv(13.25)
     )
-    val est  = GaiaPhotometry.estimatedBrightnesses(gaia)
+    val est                                      = GaiaPhotometry.estimatedBrightnesses(gaia)
     assertEquals(est.keySet, GaiaPhotometry.EstimatedBands)
-    // G - V = -0.02704 + 0.01424 - 0.2156 + 0.01426
-    assertEqualsDouble(est(Band.V).value.value.toDouble, 14.0 + 0.21414, 1e-3)
-    // G - H = -0.1048 + 2.011 - 0.1758
-    assertEqualsDouble(est(Band.H).value.value.toDouble, 14.0 - 1.7304, 1e-3)
-    // G - r = -0.09837 + 0.08592 + 0.1907 - 0.1701 + 0.02263
-    assertEqualsDouble(est(Band.SloanR).value.value.toDouble, 14.0 - 0.03078, 1e-3)
+    // Coefficients c0, c1, ... of G - X from GDR3 tables 5.8 and 5.9
+    def check(band: Band, coefficients: Double*) =
+      val gMinusX = coefficients.zipWithIndex.map((c, i) => c * math.pow(1.5, i)).sum
+      assertEqualsDouble(est(band).value.value.toDouble, 14.0 - gMinusX, 1e-9)
+    check(Band.V, -0.02704, 0.01424, -0.2156, 0.01426)
+    check(Band.SloanG, 0.2199, -0.6365, -0.1548, 0.0064)
+    check(Band.SloanR, -0.09837, 0.08592, 0.1907, -0.1701, 0.02263)
+    check(Band.SloanI, -0.293, 0.6404, -0.09609, -0.002104)
+    check(Band.J, 0.01798, 1.389, -0.09338)
+    check(Band.H, -0.1048, 2.011, -0.1758)
+    check(Band.K, -0.0981, 2.089, -0.1579)
 
   test("bands whose colour range excludes the star are left out"):
     // BP - RP = 3.5: V (-0.5, 5.0) is in range, every other transformation is not
