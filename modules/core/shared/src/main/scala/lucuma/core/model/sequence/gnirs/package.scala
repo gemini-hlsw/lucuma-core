@@ -58,7 +58,7 @@ private val LowResolutionIfuPresets: NonEmptyList[(String, NonEmptyList[Telescop
       TelescopeConfig(Offset(  -(10.pArcsec),   -(10.qArcsec)), StepGuideState.Disabled)
     ),
     "Point"    -> NonEmptyList.of(
-      TelescopeConfig(Offset(  0.75.pArcsec,  -(1.5.qArcsec)), StepGuideState.Enabled),
+      TelescopeConfig(Offset(  0.75.pArcsec,    1.5.qArcsec), StepGuideState.Enabled),
       TelescopeConfig(Offset(-(0.75.pArcsec), -(1.5.qArcsec)), StepGuideState.Enabled),
       TelescopeConfig(Offset(-(0.75.pArcsec),   1.5.qArcsec),  StepGuideState.Enabled),
       TelescopeConfig(Offset(  0.75.pArcsec,  -(1.5.qArcsec)), StepGuideState.Enabled)
