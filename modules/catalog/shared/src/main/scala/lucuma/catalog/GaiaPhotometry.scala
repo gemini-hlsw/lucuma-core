@@ -16,12 +16,12 @@ import scala.collection.immutable.SortedSet
  * https://gea.esac.esa.int/archive/documentation/GDR3/Data_processing/chap_cu5pho/cu5pho_sec_photSystem/cu5pho_ssec_photRelations.html
  *
  * Every relation has the form G - X = c0 + c1 x + c2 x^2 + ..., with x = BP - RP, and is only valid
- * inside a closed colour range. The polynomials run to 4th order and stop behaving physically
+ * strictly inside a colour range. The polynomials run to 4th order and stop behaving physically
  * beyond their range, so no estimate is produced outside it.
  */
 object GaiaPhotometry:
 
-  /** Polynomial in BP - RP giving G - X for a band X, valid inside a closed colour range. */
+  /** Polynomial in BP - RP giving G - X for a band X, valid strictly inside a colour range. */
   private final case class BandTransformation(
     band:         Band,
     coefficients: List[Double],
@@ -34,7 +34,7 @@ object GaiaPhotometry:
         acc + c * math.pow(bpMinusRp, i.toDouble)
 
     def inRange(bpMinusRp: Double): Boolean =
-      bpMinusRp >= minBpMinusRp && bpMinusRp <= maxBpMinusRp
+      bpMinusRp > minBpMinusRp && bpMinusRp < maxBpMinusRp
 
     /** X estimated from G and the colour, if the colour is in the validity range. */
     def estimate(g: BrightnessValue, bpMinusRp: Double): Option[BrightnessValue] =

@@ -105,11 +105,16 @@ class GaiaPhotometrySuite extends FunSuite:
       SortedMap.empty[Band, BrightnessValue]
     )
 
-  test("the validity range includes its edges, as in the ADQL query for R"):
-    // BP - RP = 0.0
-    assert(GaiaPhotometry.johnsonCousinsR(bv(14.0), bv(14.0), bv(14.0)).isDefined)
-    // BP - RP = 4.0
-    assert(GaiaPhotometry.johnsonCousinsR(bv(14.0), bv(17.0), bv(13.0)).isDefined)
+  test("the validity ranges exclude their edges"):
+    // BP - RP = 0.0 and 4.0, the edges of the R relation
+    assertEquals(GaiaPhotometry.johnsonCousinsR(bv(14.0), bv(14.0), bv(14.0)), None)
+    assertEquals(GaiaPhotometry.johnsonCousinsR(bv(14.0), bv(17.0), bv(13.0)), None)
+    // BP - RP = 5.0, the upper edge of V and beyond every other band
+    val edge = SortedMap[Band, BrightnessValue](Band.Gaia -> bv(14.0),
+                                                Band.GaiaBP -> bv(18.0),
+                                                Band.GaiaRP -> bv(13.0)
+    )
+    assertEquals(GaiaPhotometry.estimatedBrightnesses(edge), SortedMap.empty[Band, BrightnessValue])
 
   test("estimates are not rounded"):
     val gaia = SortedMap[Band, BrightnessValue](Band.Gaia -> bv(14.0),
