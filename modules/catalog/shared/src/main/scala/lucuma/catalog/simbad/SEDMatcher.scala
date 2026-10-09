@@ -8,6 +8,8 @@ import cats.data.NonEmptyChain
 import cats.syntax.either.*
 import cats.syntax.eq.*
 import cats.syntax.option.*
+import coulomb.syntax.*
+import coulomb.units.si.Kelvin
 import lucuma.catalog.votable.CatalogProblem
 import lucuma.catalog.votable.CatalogProblem.*
 import lucuma.core.enums.*
@@ -54,6 +56,20 @@ class SEDMatcher(
       case None                                 =>
         Left(NonEmptyChain.one(UnknownObjectType(otype)))
     }
+
+  /**
+   * Closest library spectrum to a measured effective temperature (K) and surface gravity, if one is
+   * within 10% in temperature and 0.5 dex in gravity. Nothing is known about the luminosity class
+   * so every spectrum is a candidate.
+   */
+  def matchStellarParameters(teff: Int, logG: Double): Option[StellarLibrarySpectrum] =
+    val params = StellarPhysics.StellarParameters(teff.withUnit[Kelvin], logG)
+    stellarLibrary.preferredSpectraOrdered
+      .flatMap(scoreSpectrum(params))
+      .sortBy(m => (m.score, stellarLibrary.fileOrderIndex(m.spectrum)))
+      .headOption
+      .filter(_.isWithinTolerance)
+      .map(_.spectrum)
 
   private def matchStellarSED(spectralType: String): EitherNec[CatalogProblem, UnnormalizedSED] =
     parseSpectralType(spectralType) match {

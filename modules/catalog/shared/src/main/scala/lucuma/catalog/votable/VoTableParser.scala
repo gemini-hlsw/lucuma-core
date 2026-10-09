@@ -103,6 +103,34 @@ trait VoTableParser {
     in => go(in.through(trsf[F])).stream
   }
 
+  /**
+   * FS2 pipe to convert a stream of xml events to stellar parameters keyed by Gaia source id. Rows
+   * without parameters are dropped.
+   */
+  def xml2stellarParameters[F[_]](
+    adapter: CatalogAdapter
+  ): Pipe[F, XmlEvent, EitherNec[CatalogProblem, (Long, StellarParameters)]] = {
+    def row2params(row: TableRow): EitherNec[CatalogProblem, Option[(Long, StellarParameters)]] =
+      val entries = row.itemsMap
+      val id      = entries.collectFirst:
+        case (f, v) if f.id.value.equalsIgnoreCase("source_id") => v.trim
+      (id.flatMap(_.toLongOption).toRightNec(MissingValue(adapter.idField)),
+       adapter.parseStellarParameters(entries)
+      ).parMapN((id, params) => params.tupleLeft(id))
+
+    def go(
+      s: Stream[F, EitherNec[CatalogProblem, TableRow]]
+    ): Pull[F, EitherNec[CatalogProblem, (Long, StellarParameters)], Unit] =
+      s.pull.uncons1.flatMap {
+        case Some((q @ Left(_), s))          =>
+          Pull.output1(q.rightCast[(Long, StellarParameters)]) >> go(s)
+        case Some((Right(row: TableRow), s)) =>
+          Pull.output(Chunk.from(row2params(row).sequence.toList)) >> go(s)
+        case _                               => Pull.done
+      }
+    in => go(in.through(trsf[F])).stream
+  }
+
   def parseId(
     adapter: CatalogAdapter,
     entries: Map[FieldId, String]
@@ -305,15 +333,19 @@ trait VoTableParser {
 
     def parseSED: EitherNec[CatalogProblem, Option[UnnormalizedSED]] = adapter.parseSED(entries)
 
+    def parseStellarParameters: EitherNec[CatalogProblem, Option[StellarParameters]] =
+      adapter.parseStellarParameters(entries)
+
     def parseSiderealTarget: EitherNec[CatalogProblem, CatalogTargetResult] =
       (parseName(adapter, entries),
        parseSiderealTracking(adapter, entries),
        parseBandBrightnesses,
        parseCatalogInfo,
        parseAngularSize,
-       parseSED
+       parseSED,
+       parseStellarParameters
       )
-        .parMapN { (name, pm, brightnesses, info, angSize, sed) =>
+        .parMapN { (name, pm, brightnesses, info, angSize, sed, stellarParams) =>
           CatalogTargetResult(
             Target.Sidereal(
               name,
@@ -323,7 +355,8 @@ trait VoTableParser {
               ),
               info
             ),
-            angSize
+            angSize,
+            stellarParams
           )
         }
 

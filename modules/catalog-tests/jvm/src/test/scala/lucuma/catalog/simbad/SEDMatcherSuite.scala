@@ -17,6 +17,13 @@ class SEDMatcherSuite extends CatsEffectSuite with SEDMatcherFixture:
 
   override def munitFixtures = List(sedFixture)
 
+  test("match on Teff and log g"):
+    // Values the library derives for A0V and G2V from their spectral types (Malkov et al. 2020)
+    assertEquals(sedMatcher.matchStellarParameters(11531, 4.07).map(_.tag), Some("A0V_calspec"))
+    assert(sedMatcher.matchStellarParameters(5199, 4.4).exists(_.tag.startsWith("G2V")))
+    // Nothing in the library is this hot and compact
+    assertEquals(sedMatcher.matchStellarParameters(100000, 8.0), None)
+
   test("SED matcher validation"):
     assert(
       sedMatcher

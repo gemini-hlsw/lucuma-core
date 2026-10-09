@@ -59,7 +59,7 @@ class ParseSimbadFileSuite extends CatsEffectSuite with VoTableParser with SEDMa
         .compile
         .lastOrError
         .map {
-          case Right(CatalogTargetResult(t, _)) =>
+          case Right(CatalogTargetResult(t, _, _)) =>
             // id and search name
             assertEquals(t.name, "Vega".refined[NonEmpty])
             assertEquals(
@@ -136,7 +136,7 @@ class ParseSimbadFileSuite extends CatsEffectSuite with VoTableParser with SEDMa
               Target.radialVelocity.getOption(t).flatten,
               RadialVelocity(BigDecimal(-20.60).withUnit[KilometersPerSecond])
             )
-          case Left(_)                          => fail(s"VOTable xml $xmlFile cannot be parsed")
+          case Left(_)                             => fail(s"VOTable xml $xmlFile cannot be parsed")
         }
     }
   }
@@ -153,7 +153,7 @@ class ParseSimbadFileSuite extends CatsEffectSuite with VoTableParser with SEDMa
         .compile
         .lastOrError
         .map {
-          case Right(CatalogTargetResult(t, angularSize)) =>
+          case Right(CatalogTargetResult(t, angularSize, _)) =>
             // id and search name
             assertEquals(t.name, "2MFGC6625".refined[NonEmpty])
             assertEquals(t.catalogInfo, CatalogInfo(CatalogName.Simbad, "2MFGC 6625", "EmG, I"))
@@ -240,7 +240,7 @@ class ParseSimbadFileSuite extends CatsEffectSuite with VoTableParser with SEDMa
               angularSize,
               AngularSize(Angle.fromDMS(0, 0, 35, 400, 0), Angle.fromDMS(0, 0, 6, 359, 999)).some
             )
-          case Left(_)                                    => fail(s"VOTable xml $xmlFile cannot be parsed")
+          case Left(_)                                       => fail(s"VOTable xml $xmlFile cannot be parsed")
         }
     }
   }
@@ -256,7 +256,7 @@ class ParseSimbadFileSuite extends CatsEffectSuite with VoTableParser with SEDMa
         .compile
         .lastOrError
         .map {
-          case Right(CatalogTargetResult(t, _)) =>
+          case Right(CatalogTargetResult(t, _, _)) =>
             // id and search name
             assertEquals(t.name, "2SLAQ J000008.13+001634.6".refined[NonEmpty])
             assertEquals(
@@ -379,7 +379,7 @@ class ParseSimbadFileSuite extends CatsEffectSuite with VoTableParser with SEDMa
                 .withError(BrightnessValue.unsafeFrom(0.068))
                 .some
             )
-          case Left(_)                          => fail(s"VOTable xml $xmlFile cannot be parsed")
+          case Left(_)                             => fail(s"VOTable xml $xmlFile cannot be parsed")
         }
     }
   }
@@ -396,13 +396,13 @@ class ParseSimbadFileSuite extends CatsEffectSuite with VoTableParser with SEDMa
         .compile
         .lastOrError
         .map {
-          case Right(CatalogTargetResult(t, _)) =>
+          case Right(CatalogTargetResult(t, _, _)) =>
             // parallax
             assertEquals(
               Target.parallax.getOption(t).flatten,
               Parallax.Zero.some
             )
-          case Left(_)                          => fail(s"VOTable xml $xmlFile cannot be parsed")
+          case Left(_)                             => fail(s"VOTable xml $xmlFile cannot be parsed")
         }
     }
   }
@@ -454,7 +454,7 @@ class ParseSimbadFileSuite extends CatsEffectSuite with VoTableParser with SEDMa
         .compile
         .lastOrError
         .map {
-          case Right(CatalogTargetResult(t, angularSize)) =>
+          case Right(CatalogTargetResult(t, angularSize, _)) =>
             // id and search name
             assertEquals(t.name, "NGC 2438".refined[NonEmpty])
             assertEquals(t.catalogInfo, CatalogInfo(CatalogName.Simbad, "NGC  2438", "PN"))
@@ -481,7 +481,7 @@ class ParseSimbadFileSuite extends CatsEffectSuite with VoTableParser with SEDMa
               angularSize,
               AngularSize(Angle.fromDMS(0, 1, 10, 380, 0), Angle.fromDMS(0, 1, 10, 380, 0)).some
             )
-          case Left(_)                                    => fail(s"VOTable xml $xmlFile cannot be parsed")
+          case Left(_)                                       => fail(s"VOTable xml $xmlFile cannot be parsed")
         }
     }
   }
@@ -499,7 +499,7 @@ class ParseSimbadFileSuite extends CatsEffectSuite with VoTableParser with SEDMa
         .compile
         .lastOrError
         .map {
-          case Right(CatalogTargetResult(t, _)) =>
+          case Right(CatalogTargetResult(t, _, _)) =>
             // proper motions
             assertEquals(
               Target.properMotionRA.getOption(t),
@@ -509,7 +509,7 @@ class ParseSimbadFileSuite extends CatsEffectSuite with VoTableParser with SEDMa
               Target.properMotionDec.getOption(t),
               ProperMotion.μasyDec(286230).some
             )
-          case Left(_)                          => fail(s"VOTable xml $xmlFile cannot be parsed")
+          case Left(_)                             => fail(s"VOTable xml $xmlFile cannot be parsed")
         }
     }
   }
@@ -532,7 +532,7 @@ class ParseSimbadFileSuite extends CatsEffectSuite with VoTableParser with SEDMa
         .compile
         .lastOrError
         .map {
-          case Right(CatalogTargetResult(t, _)) =>
+          case Right(CatalogTargetResult(t, _, _)) =>
             // id and search name
             assertEquals(t.name, "Vega".refined[NonEmpty])
             assertEquals(
@@ -623,7 +623,7 @@ class ParseSimbadFileSuite extends CatsEffectSuite with VoTableParser with SEDMa
               Target.radialVelocity.getOption(t).flatten,
               RadialVelocity(BigDecimal(-20.60).withUnit[KilometersPerSecond])
             )
-          case Left(_)                          => fail(s"VOTable xml $xmlFile cannot be parsed")
+          case Left(_)                             => fail(s"VOTable xml $xmlFile cannot be parsed")
         }
     }
   }
@@ -642,7 +642,7 @@ class ParseSimbadFileSuite extends CatsEffectSuite with VoTableParser with SEDMa
         .compile
         .lastOrError
         .map {
-          case Right(CatalogTargetResult(t, _)) =>
+          case Right(CatalogTargetResult(t, _, _)) =>
             // id and search name
             assertEquals(t.name, "Vega".refined[NonEmpty])
             assertEquals(
@@ -733,7 +733,7 @@ class ParseSimbadFileSuite extends CatsEffectSuite with VoTableParser with SEDMa
               Target.radialVelocity.getOption(t).flatten,
               RadialVelocity(BigDecimal(-20.60).withUnit[KilometersPerSecond])
             )
-          case Left(_)                          => fail(s"VOTable xml $xmlFile cannot be parsed")
+          case Left(_)                             => fail(s"VOTable xml $xmlFile cannot be parsed")
         }
     }
   }

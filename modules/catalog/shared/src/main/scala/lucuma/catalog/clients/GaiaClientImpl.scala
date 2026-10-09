@@ -10,6 +10,7 @@ import cats.effect.kernel.Resource
 import cats.syntax.all.*
 import fs2.RaiseThrowable
 import lucuma.catalog.CatalogTargetResult
+import lucuma.catalog.StellarParameters
 import lucuma.catalog.votable.*
 import lucuma.core.model.Target
 import lucuma.core.syntax.effect.raceAllToSuccess
@@ -71,6 +72,19 @@ class GaiaClientImpl[F[_]: {Concurrent, Tracer as T, LoggerFactory as LF}](
   def queryByIdGuideStar(sourceId: Long): F[EitherNec[CatalogProblem, Target.Sidereal]] =
     multiAdapterQuery(queryUriById(_, sourceId), CatalogSearch.guideStars).map:
       _.headOption.toRight(NonEmptyChain(CatalogProblem.SourceIdNotFound(sourceId))).flatten
+
+  def queryStellarParameters(sourceIds: List[Long]): F[Map[Long, StellarParameters]] =
+    val capable = adapters.toList.flatMap: adapter =>
+      adapter.stellarParametersByIdQuery(sourceIds).map(q => (adapter, adapter.queryUri(q)))
+    NonEmptyChain
+      .fromSeq(capable)
+      .fold(Map.empty[Long, StellarParameters].pure[F]): adapters =>
+        adapters
+          .map((adapter, uri) => queryGaia(adapter, uri, CatalogSearch.stellarParameters(adapter)))
+          .raceAllToSuccess
+          .flatMap: (adapter, results) =>
+            info"Selected catalog: ${adapter.adapterName}" *>
+              results.collect { case Right(r) => r }.toMap.pure[F]
 
   private def multiAdapterQuery[A](
     queryUri: CatalogAdapter.Gaia => Uri,
