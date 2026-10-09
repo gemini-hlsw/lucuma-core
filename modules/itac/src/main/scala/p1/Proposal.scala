@@ -104,8 +104,9 @@ case class Proposal(
    */
   def itacObservationsScaledForSiteAndBand(site: Site, band: ScienceBand)(using Metadata): List[ItacObservation.Scaled] =
     val f = scaleFactorForSiteAndBand(site, band)
-    itacObservationsForSiteAndBand(site, band).map: o =>
-      ItacObservation.Scaled(o.copy(time = o.time *| f))
+    if f == 0 then Nil else
+      itacObservationsForSiteAndBand(site, band).map: o =>
+        ItacObservation.Scaled(o.copy(time = o.time *| f))
 
   /** Estimated time required for all observations at the specified site, in the given band. */
   private def estimatedTimeForSiteAndBand(site: Site, band: ScienceBand)(using Metadata): TimeSpan =
