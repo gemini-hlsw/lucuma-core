@@ -8,6 +8,7 @@ import cats.data.NonEmptyList
 import cats.derived.*
 import eu.timepit.refined.cats.given
 import eu.timepit.refined.numeric.Interval
+import lucuma.core.util.NewBoolean
 import lucuma.core.util.NewRefined
 import monocle.Focus
 import monocle.Lens
@@ -17,6 +18,10 @@ import monocle.macros.GenPrism
 /** How many telluric observations the user supplies: one after the science, or one before and one after. */
 object TelluricCount extends NewRefined[Int, Interval.Closed[1, 2]]
 type TelluricCount = TelluricCount.Type
+
+/** Whether a telluric calibration's target and configuration are the user's rather than generated. */
+object IsUserDefinedTelluric extends NewBoolean
+type IsUserDefinedTelluric = IsUserDefinedTelluric.Type
 
 /**
  * Possible telluric calibration type
