@@ -29,17 +29,23 @@ object CatalogSearch:
       .withQueryParam("Ident", query.id.value)
   }
 
+  // Parses a VOTable document with the given row pipe
+  private def votable[F[_]: RaiseThrowable, A](
+    rows: Pipe[F, xml.XmlEvent, A]
+  ): Pipe[F, String, A] =
+    in =>
+      in.flatMap(Stream.emits(_))
+        .through(xml.events[F, Char]())
+        .through(xml.normalize[F])
+        .through(rows)
+
   /**
    * FS2 pipe to convert a stream of String to targets
    */
   def siderealTargets[F[_]: RaiseThrowable](
     adapter: CatalogAdapter
   ): Pipe[F, String, EitherNec[CatalogProblem, CatalogTargetResult]] =
-    in =>
-      in.flatMap(Stream.emits(_))
-        .through(xml.events[F, Char]())
-        .through(xml.normalize[F])
-        .through(VoTableParser.xml2targets[F](adapter))
+    votable(VoTableParser.xml2targets[F](adapter))
 
   /**
    * FS2 pipe to convert a stream of String to guide stars
@@ -47,8 +53,12 @@ object CatalogSearch:
   def guideStars[F[_]: RaiseThrowable](
     adapter: CatalogAdapter
   ): Pipe[F, String, EitherNec[CatalogProblem, Target.Sidereal]] =
-    in =>
-      in.flatMap(fs2.Stream.emits(_))
-        .through(xml.events[F, Char]())
-        .through(xml.normalize[F])
-        .through(VoTableParser.xml2guidestars[F](adapter))
+    votable(VoTableParser.xml2guidestars[F](adapter))
+
+  /**
+   * FS2 pipe to convert a stream of String to stellar parameters keyed by Gaia source id
+   */
+  def stellarParameters[F[_]: RaiseThrowable](
+    adapter: CatalogAdapter
+  ): Pipe[F, String, EitherNec[CatalogProblem, (Long, GaiaStellarParameters)]] =
+    votable(VoTableParser.xml2stellarParameters[F](adapter))
