@@ -79,25 +79,31 @@ class GaiaClientImpl[F[_]: {Concurrent, Tracer as T, LoggerFactory as LF}](
     val capable                  = adapters.toList.flatMap: adapter =>
       adapter.stellarParametersByIdQuery(sourceIds).map(q => (adapter, adapter.queryUri(q)))
     val (withEspHs, gspPhotOnly) = capable.partition(_._1.providesEspHs)
-    (raceStellarParameters(withEspHs), raceStellarParameters(gspPhotOnly)) match
-      case (Some(preferred), Some(fallback)) =>
-        preferred.attempt.flatMap:
-          case Right(found) if found.nonEmpty => found.pure
-          case _                              => fallback
-      case (preferred, fallback)             => preferred.orElse(fallback).getOrElse(Map.empty.pure)
+    List(withEspHs, gspPhotOnly).flatMap(raceStellarParameters) match
+      case Nil           => Map.empty.pure
+      case first :: rest =>
+        rest
+          .foldLeft(first)((found, next) => found.handleErrorWith(_ => next))
+          .handleErrorWith: e =>
+            warn"No stellar parameters found: ${e.getMessage}".as(Map.empty)
 
+  // An attempt that finds nothing fails, so an error document or an empty reply does not win the
+  // race: queryGaia does not check the HTTP status, and such replies parse to no rows.
   private def raceStellarParameters(
     group: List[(CatalogAdapter.Gaia, Uri)]
   ): Option[F[Map[Long, GaiaStellarParameters]]] =
     NonEmptyChain
       .fromSeq(group)
       .map:
-        _.map((adapter, uri) =>
-          queryGaia(adapter, uri, CatalogSearch.stellarParameters(adapter))
-        ).raceAllToSuccess
-          .flatMap: (adapter, results) =>
-            info"Selected catalog: ${adapter.adapterName}" *>
-              results.collect { case Right(r) => r }.toMap.pure[F]
+        _.map: (adapter, uri) =>
+          queryGaia(adapter, uri, CatalogSearch.stellarParameters(adapter)).flatMap: (_, results) =>
+            val found = results.collect { case Right(r) => r }.toMap
+            if found.isEmpty then
+              new RuntimeException(s"${adapter.adapterName} found no values").raiseError
+            else (adapter, found).pure
+        .raceAllToSuccess
+          .flatMap: (adapter, found) =>
+            info"Selected catalog: ${adapter.adapterName}".as(found)
 
   private def multiAdapterQuery[A](
     queryUri: CatalogAdapter.Gaia => Uri,

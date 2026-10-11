@@ -46,7 +46,7 @@ trait GaiaClient[F[_]]:
   /**
    * Effective temperature and surface gravity of the given sources, ESP-HS where Gaia has it and
    * GSP-Phot otherwise. Sources without values are absent. Empty when no configured adapter can
-   * look them up (GAVO cannot; DataLab has GSP-Phot only).
+   * look them up (GAVO cannot; DataLab has GSP-Phot only) or none of them answers.
    */
   def queryStellarParameters(sourceIds: List[Long]): F[Map[Long, GaiaStellarParameters]]
 

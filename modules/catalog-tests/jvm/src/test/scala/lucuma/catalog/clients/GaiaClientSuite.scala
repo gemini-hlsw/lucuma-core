@@ -332,26 +332,37 @@ class GaiaClientSuite extends CatsEffectSuite with VoTableSamples:
   private def resource(name: String): IO[String] =
     readClassLoaderResource[IO](name).through(fs2.text.utf8.decode).compile.string
 
-  // DataLab answers at once; every other host answers with `esa`
-  private def lookupClient(esa: IO[String]): GaiaClient[IO] =
+  private val DataLab = "datalab.noirlab.edu"
+  private val Proxy   = "gaia.noirlab.edu"
+  private val Esa     = "gea.esac.esa.int"
+
+  private def lookupClient(
+    adapters: NonEmptyChain[CatalogAdapter.Gaia],
+    byHost:   Map[String, IO[String]]
+  ): GaiaClient[IO] =
     val http = Client[IO]: request =>
-      val body =
-        if request.uri.host.exists(_.value === "datalab.noirlab.edu")
-        then resource("gaia-stellar-parameters-datalab.xml")
-        else esa
+      val body = request.uri.host.flatMap(h => byHost.get(h.value)).getOrElse(IO.never)
       Resource.eval(body).map(Response[IO](Status.Ok).withEntity(_))
-    GaiaClient.build[IO](
-      http,
-      adapters = NonEmptyChain.of(CatalogAdapter.Gaia3DataLab, CatalogAdapter.Gaia3EsaProxy)
-    )
+    GaiaClient.build[IO](http, adapters = adapters)
+
+  private val dataLabAndProxy =
+    NonEmptyChain.of(CatalogAdapter.Gaia3DataLab, CatalogAdapter.Gaia3EsaProxy)
+
+  // What a TAP service sends for a failed query: no fields, no rows
+  private val tapError =
+    """<?xml version="1.0"?><VOTABLE version="1.4"><RESOURCE type="results"><INFO name="QUERY_STATUS" value="ERROR">bad query</INFO></RESOURCE></VOTABLE>"""
 
   private val lookupIds: List[Long] =
     List(3725398080716580352L, 2109057984352250368L, 628705013665242240L, 3266527962404665088L,
          3726010543053126656L)
 
   test("queryStellarParameters waits for ESP-HS even when DataLab answers first"):
-    lookupClient(IO.sleep(200.millis) *> resource("gaia-stellar-parameters-esa.xml"))
-      .queryStellarParameters(lookupIds)
+    lookupClient(
+      dataLabAndProxy,
+      Map(DataLab -> resource("gaia-stellar-parameters-datalab.xml"),
+          Proxy   -> (IO.sleep(200.millis) *> resource("gaia-stellar-parameters-esa.xml"))
+      )
+    ).queryStellarParameters(lookupIds)
       .map: params =>
         assertEquals(params.size, 4)
         assertEquals(params.get(3726010543053126656L).map(_.source),
@@ -359,8 +370,37 @@ class GaiaClientSuite extends CatsEffectSuite with VoTableSamples:
         )
 
   test("queryStellarParameters falls back to DataLab when ESA fails"):
-    lookupClient(IO.raiseError(new RuntimeException("ESA down")))
-      .queryStellarParameters(lookupIds)
+    lookupClient(
+      dataLabAndProxy,
+      Map(DataLab -> resource("gaia-stellar-parameters-datalab.xml"),
+          Proxy   -> IO.raiseError(new RuntimeException("ESA down"))
+      )
+    ).queryStellarParameters(lookupIds)
       .map: params =>
         assertEquals(params.size, 3)
         assert(params.values.forall(_.source === GaiaStellarParametersSource.GspPhot))
+
+  test("queryStellarParameters does not let an error reply win the ESA race"):
+    // The proxy fails fast with an error document; ESA answers later with ESP-HS
+    lookupClient(
+      NonEmptyChain.of(CatalogAdapter.Gaia3LiteEsaProxy,
+                       CatalogAdapter.Gaia3Esa,
+                       CatalogAdapter.Gaia3DataLab
+      ),
+      Map(
+        Proxy   -> IO.pure(tapError),
+        Esa     -> (IO.sleep(200.millis) *> resource("gaia-stellar-parameters-esa.xml")),
+        DataLab -> resource("gaia-stellar-parameters-datalab.xml")
+      )
+    ).queryStellarParameters(lookupIds)
+      .map: params =>
+        assertEquals(params.get(3726010543053126656L).map(_.source),
+                     Some(GaiaStellarParametersSource.EspHs)
+        )
+
+  test("queryStellarParameters is empty when no adapter answers"):
+    lookupClient(
+      dataLabAndProxy,
+      Map(Proxy -> IO.pure(tapError), DataLab -> IO.pure(tapError))
+    ).queryStellarParameters(lookupIds)
+      .map(params => assertEquals(params, Map.empty))
