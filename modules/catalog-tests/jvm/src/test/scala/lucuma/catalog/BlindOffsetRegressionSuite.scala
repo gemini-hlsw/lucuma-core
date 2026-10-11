@@ -65,11 +65,9 @@ class BlindOffsetRegressionSuite extends CatsEffectSuite with SEDMatcherFixture:
         assertEquals(errors, Nil)
         BlindOffsets.analysis(
           targets,
-          sedMatcher,
           BlindOffsetLimits.forInstrument(instrument).get,
           base,
-          observationTime,
-          Map.empty
+          observationTime
         )
 
   // Serves a field from its fixture, and answers lookups with `lookup`

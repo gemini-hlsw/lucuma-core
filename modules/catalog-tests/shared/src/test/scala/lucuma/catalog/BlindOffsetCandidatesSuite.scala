@@ -4,12 +4,7 @@
 package lucuma.catalog
 
 import cats.syntax.all.*
-import lucuma.catalog.simbad.GravityTableConfig
-import lucuma.catalog.simbad.SEDDataConfig
-import lucuma.catalog.simbad.SEDMatcher
-import lucuma.catalog.simbad.StellarLibraryConfig
 import lucuma.core.enums.Band
-import lucuma.core.enums.StellarLibrarySpectrum
 import lucuma.core.math.BrightnessUnits.*
 import lucuma.core.math.BrightnessValue
 import lucuma.core.math.Coordinates
@@ -20,6 +15,7 @@ import lucuma.core.model.SiderealTracking
 import lucuma.core.model.SourceProfile
 import lucuma.core.model.SpectralDefinition
 import lucuma.core.model.Target
+import lucuma.core.model.UnnormalizedSED
 import munit.FunSuite
 
 import java.time.Instant
@@ -31,15 +27,6 @@ class BlindOffsetCandidatesSuite extends FunSuite:
 
   private val observationTime: Instant =
     LocalDate.of(2025, 9, 4).atStartOfDay(ZoneOffset.UTC).toInstant()
-
-  // A one-spectrum library: G2V, Teff 5778 K from the Malkov fit, log g 4.4
-  private val sedMatcher: SEDMatcher =
-    SEDMatcher.fromConfig(
-      SEDDataConfig(
-        StellarLibraryConfig(List(StellarLibrarySpectrum.G2V -> (List("V"), List("G2")))),
-        GravityTableConfig(List(40.0 -> Map("V" -> 4.4), 50.0 -> Map("V" -> 4.6)))
-      )
-    )
 
   private def coords(ra: String, dec: String): Coordinates =
     (RightAscension.fromStringHMS.getOption(ra), Declination.fromStringSignedDMS.getOption(dec))
@@ -78,10 +65,9 @@ class BlindOffsetCandidatesSuite extends FunSuite:
 
   private def analyse(
     results: List[CatalogTargetResult],
-    limits:  BlindOffsetLimits,
-    params:  Map[Long, GaiaStellarParameters] = Map.empty
+    limits:  BlindOffsetLimits
   ) =
-    BlindOffsets.analysis(results, sedMatcher, limits, baseCoords, observationTime, params)
+    BlindOffsets.analysis(results, limits, baseCoords, observationTime)
 
   test("score matches the pyexplore formula"):
     // Gmos: V optimal 13. BP-RP = 1 gives V = G + 0.02704 - 0.01424 + 0.2156 - 0.01426
@@ -110,16 +96,21 @@ class BlindOffsetCandidatesSuite extends FunSuite:
     // Rejected candidates still have a score
     assert(sorted.forall(_.score.isDefined))
 
-  test("estimated magnitudes are attached for every band in range"):
-    val star   = gaiaStar("s", coords("05:35:18.0", "+22:00:53.0"), 14.0, 14.5, 13.5)
-    val result = analyse(List(star), BlindOffsetLimits.Gmos).head
-    val bands  = SourceProfile.integratedBrightnesses
-      .getOption(result.catalogResult.target.sourceProfile)
-      .map(_.keySet)
-      .getOrElse(Set.empty)
+  test("estimated magnitudes are attached for every band in range, rounded to 5 decimals"):
+    val star         = gaiaStar("s", coords("05:35:18.0", "+22:00:53.0"), 14.0, 14.5, 13.5)
+    val profile      =
+      analyse(List(star), BlindOffsetLimits.Gmos).head.catalogResult.target.sourceProfile
+    val brightnesses =
+      SourceProfile.integratedBrightnesses.getOption(profile).get
     assertEquals(
-      bands,
+      brightnesses.keySet,
       Set(Band.Gaia, Band.GaiaBP, Band.GaiaRP) ++ GaiaPhotometry.EstimatedBands
+    )
+    assert(brightnesses.values.forall(_.value.value.value.scale <= 5))
+    // The SED starts as a power law; only looked-up candidates get a library spectrum
+    assertEquals(
+      SourceProfile.unnormalizedSED.getOption(profile).flatten,
+      Some(UnnormalizedSED.PowerLaw(BigDecimal(0)))
     )
 
   test("ties are broken by distance, then source id, whatever the input order"):

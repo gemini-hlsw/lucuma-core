@@ -20,9 +20,7 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
 
-class BlindOffsetFileTestSuite extends CatsEffectSuite with SEDMatcherFixture:
-
-  override def munitFixtures = List(sedFixture)
+class BlindOffsetFileTestSuite extends CatsEffectSuite:
 
   private val observationTime: Instant =
     LocalDate.of(2025, 9, 4).atStartOfDay(ZoneOffset.UTC).toInstant()
@@ -71,11 +69,9 @@ class BlindOffsetFileTestSuite extends CatsEffectSuite with SEDMatcherFixture:
       .map: targetResults =>
         val sorted = BlindOffsets.analysis(
           targetResults,
-          sedMatcher,
           BlindOffsetLimits.Gmos,
           baseSiderealTracking,
-          observationTime,
-          Map.empty
+          observationTime
         )
 
         assertEquals(sorted.length, 5)

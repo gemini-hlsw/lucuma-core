@@ -157,8 +157,7 @@ object BlindOffsets:
           results <- gaiaClient
                        .query(adqlQuery)(using interpreter)
                        .map(_.collect { case Right(result) => result })
-          initial  =
-            analysis(results, sedMatcher, limits, baseCoordinates, observationTime, Map.empty)
+          initial  = analysis(results, limits, baseCoordinates, observationTime)
           // The score does not use Teff, so only the best candidates need an SED. A failed lookup
           // leaves them with the power law.
           params  <- gaiaClient
@@ -169,78 +168,82 @@ object BlindOffsets:
                            .flatMap(gaiaSourceId)
                        )
                        .handleError(_ => Map.empty)
-        yield
-          if params.isEmpty then initial
-          else analysis(results, sedMatcher, limits, baseCoordinates, observationTime, params)
+        yield initial.map(withStellarParameters(sedMatcher, params))
 
+  /** Candidates sorted best first, with estimated magnitudes and a power-law SED. */
   def analysis(
-    catalogResults:    List[CatalogTargetResult],
-    sedMatcher:        SEDMatcher,
-    limits:            BlindOffsetLimits,
-    baseTracking:      Tracking,
-    observationTime:   Instant,
-    stellarParameters: Map[Long, GaiaStellarParameters]
+    catalogResults:  List[CatalogTargetResult],
+    limits:          BlindOffsetLimits,
+    baseTracking:    Tracking,
+    observationTime: Instant
   ): List[BlindOffsetCandidate] =
     baseTracking
       .at(observationTime)
       .foldMap: baseCoordinates =>
-        analysis(catalogResults,
-                 sedMatcher,
-                 limits,
-                 baseCoordinates,
-                 observationTime,
-                 stellarParameters
-        )
+        analysis(catalogResults, limits, baseCoordinates, observationTime)
 
   def analysis(
-    catalogResults:    List[CatalogTargetResult],
-    sedMatcher:        SEDMatcher,
-    limits:            BlindOffsetLimits,
-    baseCoordinates:   Coordinates,
-    observationTime:   Instant,
-    stellarParameters: Map[Long, GaiaStellarParameters]
+    catalogResults:  List[CatalogTargetResult],
+    limits:          BlindOffsetLimits,
+    baseCoordinates: Coordinates,
+    observationTime: Instant
   ): List[BlindOffsetCandidate] =
     catalogResults
       .flatMap: catalogResult =>
         catalogResult.target.tracking.at(observationTime).map { candidateCoords =>
-          val distance = baseCoordinates.angularDistance(candidateCoords)
-          val params   = gaiaSourceId(catalogResult.target).flatMap(stellarParameters.get)
           BlindOffsetCandidate(
-            withEstimatedBrightnessesAndSed(sedMatcher, params, catalogResult),
-            distance,
+            withEstimatedBrightnesses(catalogResult),
+            baseCoordinates.angularDistance(candidateCoords),
             baseCoordinates,
             candidateCoords,
             observationTime,
-            limits,
-            params
+            limits
           )
         }
       .sorted
 
-  // Gaia only has G, BP and RP and no SED. The ITC needs a brightness in a band it knows and an
-  // SED, so both are estimated: magnitudes from the Gaia colour transformations, the SED from
-  // the Gaia Teff and log g. Without those, or without a library match, a flat power law.
-  private def withEstimatedBrightnessesAndSed(
-    sedMatcher: SEDMatcher,
-    params:     Option[GaiaStellarParameters],
-    candidate:  CatalogTargetResult
-  ): CatalogTargetResult =
-    val sed: UnnormalizedSED =
-      params
-        .flatMap(p => sedMatcher.matchStellarParameters(p.teff, p.logG))
-        .fold(UnnormalizedSED.PowerLaw(BigDecimal(0)))(UnnormalizedSED.StellarLibrary(_))
+  private val candidateSed =
+    BlindOffsetCandidate.catalogResult
+      .andThen(CatalogTargetResult.target)
+      .andThen(Target.Sidereal.integratedBandNormalizedSpectralDefinition)
+      .andThen(BandNormalized.sed[Integrated])
 
+  // Stores the looked-up parameters and, when the library has a close spectrum, uses it as SED
+  def withStellarParameters(
+    sedMatcher: SEDMatcher,
+    params:     Map[Long, GaiaStellarParameters]
+  )(candidate: BlindOffsetCandidate): BlindOffsetCandidate =
+    gaiaSourceId(candidate)
+      .flatMap(params.get)
+      .fold(candidate): p =>
+        val withParams = BlindOffsetCandidate.stellarParameters.replace(p.some)(candidate)
+        sedMatcher
+          .matchStellarParameters(p.teff, p.logG)
+          .fold(withParams)(s =>
+            candidateSed.replace(UnnormalizedSED.StellarLibrary(s).some)(withParams)
+          )
+
+  // Gaia only has G, BP and RP and no SED. The ITC needs a brightness in a band it knows and an
+  // SED, so magnitudes are estimated from the Gaia colour transformations and the SED starts as a
+  // flat power law. Estimates are rounded to 5 decimals, otherwise precision is lost somewhere
+  // between the ODB and Explore and their targets no longer compare equal.
+  private def withEstimatedBrightnesses(candidate: CatalogTargetResult): CatalogTargetResult =
     CatalogTargetResult.target
       .andThen(Target.Sidereal.integratedBandNormalizedSpectralDefinition)
       .modify: bn =>
-        val withSed = BandNormalized.sed.modify(_.orElse(sed.some))(bn)
+        val withSed =
+          BandNormalized.sed.modify(_.orElse(UnnormalizedSED.PowerLaw(BigDecimal(0)).some))(bn)
         BandNormalized
           .brightnesses[Integrated]
           .modify: map =>
             val estimates =
               GaiaPhotometry
                 .estimatedBrightnesses(map.map((band, m) => band -> m.value))
-                .map((band, bv) => band -> band.defaultIntegrated.units.withValueTagged(bv))
+                .map: (band, bv) =>
+                  val rounded = BrightnessValue
+                    .from(bv.value.value.setScale(5, BigDecimal.RoundingMode.HALF_UP))
+                    .getOrElse(bv)
+                  band -> band.defaultIntegrated.units.withValueTagged(rounded)
             // Measured brightnesses are never replaced by estimates
             estimates ++ map
           .apply(withSed)
