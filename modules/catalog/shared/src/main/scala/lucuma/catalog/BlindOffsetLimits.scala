@@ -27,6 +27,10 @@ final case class BlindOffsetLimits(
   optimal: BrightnessValue
 ) derives Eq:
 
+  /**
+   * Usable strictly between the limits, as in pyexplore: a magnitude equal to `bright` or `faint`
+   * is rejected.
+   */
   def rejection(magnitude: Option[BrightnessValue]): Option[BlindOffsetRejection] =
     magnitude match
       case None                                           => Some(BlindOffsetRejection.NoMagnitudeEstimate)
