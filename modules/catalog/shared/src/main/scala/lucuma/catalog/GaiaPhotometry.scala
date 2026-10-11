@@ -41,21 +41,24 @@ object GaiaPhotometry:
         .when(inRange(bpMinusRp))(gMinusX(bpMinusRp))
         .flatMap(d => BrightnessValue.from(g.value.value - BigDecimal(d)).toOption)
 
-  // Johnson-Cousins R (table 5.9), also used for Altair guide star limits
+  // Johnson-Cousins R (table 5.9), also used for Altair guide star limits. Above BP - RP 2.0 the
+  // relation was fitted to M giants (table 5.10 note j), so red dwarfs get a biased estimate.
   private val R: BandTransformation =
     BandTransformation(Band.R, List(-0.02275, 0.3961, -0.1243, -0.01396, 0.003775), 0.0, 4.0)
 
-  // Johnson-Cousins V R, SDSS g r i and 2MASS J H Ks (tables 5.8-5.10). Ks is stored as K.
+  // Johnson-Cousins V R, SDSS g r i and 2MASS J H Ks (tables 5.8-5.10). Ks is stored as K. Above
+  // BP - RP 2.0, g and r only hold for M giants (table 5.10 notes f and g); the luminosity class is
+  // unknown here, so their ranges stop at 2.0.
   private val Transformations: SortedMap[Band, BandTransformation] =
     SortedMap.from(
       List(
         R,
         BandTransformation(Band.V, List(-0.02704, 0.01424, -0.2156, 0.01426), -0.5, 5.0),
-        BandTransformation(Band.SloanG, List(0.2199, -0.6365, -0.1548, 0.0064), 0.3, 3.0),
+        BandTransformation(Band.SloanG, List(0.2199, -0.6365, -0.1548, 0.0064), 0.3, 2.0),
         BandTransformation(Band.SloanR,
                            List(-0.09837, 0.08592, 0.1907, -0.1701, 0.02263),
                            0.0,
-                           3.0
+                           2.0
         ),
         BandTransformation(Band.SloanI, List(-0.293, 0.6404, -0.09609, -0.002104), 0.5, 2.0),
         BandTransformation(Band.J, List(0.01798, 1.389, -0.09338), -0.5, 2.5),

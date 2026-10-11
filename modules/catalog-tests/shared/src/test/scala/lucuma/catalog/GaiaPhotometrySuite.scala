@@ -92,19 +92,28 @@ class GaiaPhotometrySuite extends FunSuite:
 
   test("bands whose colour range excludes the star are left out"):
     // BP - RP = 3.5: V (-0.5, 5.0) and R (0.0, 4.0) are in range, every other band is not
-    val red  = SortedMap[Band, BrightnessValue](Band.Gaia -> bv(14.0),
+    val red     = SortedMap[Band, BrightnessValue](Band.Gaia -> bv(14.0),
                                                Band.GaiaBP -> bv(16.0),
                                                Band.GaiaRP -> bv(12.5)
     )
     assertEquals(GaiaPhotometry.estimatedBrightnesses(red).keySet, Set[Band](Band.V, Band.R))
     // BP - RP = 0.1: Sloan g (0.3, 3.0) and i (0.5, 2.0) are out
-    val blue = SortedMap[Band, BrightnessValue](Band.Gaia -> bv(14.0),
+    val blue    = SortedMap[Band, BrightnessValue](Band.Gaia -> bv(14.0),
                                                 Band.GaiaBP -> bv(14.0),
                                                 Band.GaiaRP -> bv(13.9)
     )
     assertEquals(
       GaiaPhotometry.estimatedBrightnesses(blue).keySet,
       Set[Band](Band.V, Band.R, Band.SloanR, Band.J, Band.H, Band.K)
+    )
+    // BP - RP = 2.2: g and r stop at 2.0, where their relations turn to M giants only
+    val reddish = SortedMap[Band, BrightnessValue](Band.Gaia -> bv(14.0),
+                                                   Band.GaiaBP -> bv(15.2),
+                                                   Band.GaiaRP -> bv(13.0)
+    )
+    assertEquals(
+      GaiaPhotometry.estimatedBrightnesses(reddish).keySet,
+      Set[Band](Band.V, Band.R, Band.J, Band.H, Band.K)
     )
 
   test("no estimates without all three Gaia bands"):
