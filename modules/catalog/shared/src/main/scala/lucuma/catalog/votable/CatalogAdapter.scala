@@ -519,22 +519,25 @@ object CatalogAdapter {
     override def parseStellarParameters(
       entries: Map[FieldId, String]
     ): EitherNec[CatalogProblem, Option[GaiaStellarParameters]] =
-      // ESP-HS is specific to hot stars and more accurate for them, so it wins over GSP-Phot
-      val byId = entries
-        .map { case (k, v) => (k.id.value, v.trim) }
-        .filter((_, v) => v.nonEmpty && !v.equalsIgnoreCase("NaN"))
+      // Servers may upper-case the FIELD ID, so keys are compared in lower case
+      val byId = entries.map((k, v) => (k.id.value.toLowerCase, v.trim)).filter(_._2.nonEmpty)
+
+      // Missing values are blank cells, or NaN on DataLab
+      def value(field: FieldId): EitherNec[CatalogProblem, Option[Double]] =
+        byId
+          .get(field.id.value)
+          .traverse(parseDoubleValue(field.ucd, _))
+          .map(_.filterNot(d => d.isNaN || d.isInfinity))
 
       def read(teff: FieldId, logG: FieldId, source: GaiaStellarParametersSource) =
-        (byId.get(teff.id.value), byId.get(logG.id.value))
-          .mapN: (t, g) =>
-            (parseDoubleValue(teff.ucd, t), parseDoubleValue(logG.ucd, g))
-              .parMapN((t, g) => GaiaStellarParameters(t.round.toInt.withUnit[Kelvin], g, source))
+        (value(teff), value(logG)).parMapN: (t, g) =>
+          (t, g).mapN((t, g) => GaiaStellarParameters(t.round.toInt.withUnit[Kelvin], g, source))
 
-      read(Gaia.teffEspHsField, Gaia.logGEspHsField, GaiaStellarParametersSource.EspHs)
-        .orElse(
+      // ESP-HS is specific to hot stars and more accurate for them, so it wins over GSP-Phot
+      read(Gaia.teffEspHsField, Gaia.logGEspHsField, GaiaStellarParametersSource.EspHs).flatMap:
+        case None =>
           read(Gaia.teffGspPhotField, Gaia.logGGspPhotField, GaiaStellarParametersSource.GspPhot)
-        )
-        .sequence
+        case some => some.rightNec
   }
 
   object Gaia {

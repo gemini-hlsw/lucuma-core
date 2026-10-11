@@ -76,6 +76,13 @@ class GaiaClientImpl[F[_]: {Concurrent, Tracer as T, LoggerFactory as LF}](
   // Adapters with ESP-HS are raced first; the others only answer when those fail or find nothing,
   // as their complete-looking answers would otherwise replace ESP-HS values with GSP-Phot.
   def queryStellarParameters(sourceIds: List[Long]): F[Map[Long, GaiaStellarParameters]] =
+    sourceIds.distinct
+      .grouped(GaiaClientImpl.MaxIdsPerQuery)
+      .toList
+      .traverse(lookupBatch)
+      .map(_.foldLeft(Map.empty[Long, GaiaStellarParameters])(_ ++ _))
+
+  private def lookupBatch(sourceIds: List[Long]): F[Map[Long, GaiaStellarParameters]] =
     val capable                  = adapters.toList.flatMap: adapter =>
       adapter.stellarParametersByIdQuery(sourceIds).map(q => (adapter, adapter.queryUri(q)))
     val (withEspHs, gspPhotOnly) = capable.partition(_._1.providesEspHs)
@@ -97,10 +104,15 @@ class GaiaClientImpl[F[_]: {Concurrent, Tracer as T, LoggerFactory as LF}](
       .map:
         _.map: (adapter, uri) =>
           queryGaia(adapter, uri, CatalogSearch.stellarParameters(adapter)).flatMap: (_, results) =>
-            val found = results.collect { case Right(r) => r }.toMap
-            if found.isEmpty then
-              new RuntimeException(s"${adapter.adapterName} found no values").raiseError
-            else (adapter, found).pure
+            val (problems, rows) = results.partitionEither(identity)
+            val found            = rows.toMap
+            val report           =
+              warn"${adapter.adapterName}: ${problems.length} unreadable rows, e.g. ${problems.take(3).map(_.head).mkString("; ")}"
+                .whenA(problems.nonEmpty)
+            report *>
+              (if found.isEmpty then
+                 new RuntimeException(s"${adapter.adapterName} found no values").raiseError
+               else (adapter, found).pure)
         .raceAllToSuccess
           .flatMap: (adapter, found) =>
             info"Selected catalog: ${adapter.adapterName}".as(found)
@@ -161,3 +173,7 @@ class GaiaClientImpl[F[_]: {Concurrent, Tracer as T, LoggerFactory as LF}](
         |     WHERE source_id = $sourceId
     """.stripMargin
 }
+
+object GaiaClientImpl:
+  // Keeps the sync TAP GET request well under common URL length limits
+  val MaxIdsPerQuery: Int = 100

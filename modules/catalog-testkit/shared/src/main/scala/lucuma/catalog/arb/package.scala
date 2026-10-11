@@ -11,3 +11,4 @@ object all
     with ArbAngularSize
     with ArbBrightnessConstraints
     with ArbCatalogTargetResult
+    with ArbGaiaStellarParameters

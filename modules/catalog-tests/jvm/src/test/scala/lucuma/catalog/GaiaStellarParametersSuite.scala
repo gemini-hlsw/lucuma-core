@@ -64,6 +64,33 @@ class GaiaStellarParametersSuite extends CatsEffectSuite:
       assertEquals(params.get(HotStar), None)
       assertEquals(params.get(NoValues), None)
 
+  private def lookupEdited(edit: String => String): IO[Map[Long, GaiaStellarParameters]] =
+    readClassLoaderResource[IO]("gaia-stellar-parameters-esa.xml")
+      .through(text.utf8.decode)
+      .compile
+      .string
+      .flatMap: xml =>
+        fs2.Stream
+          .emit(edit(xml))
+          .through(CatalogSearch.stellarParameters[IO](CatalogAdapter.Gaia3EsaProxy))
+          .compile
+          .toList
+      .map(_.collect { case Right(p) => p }.toMap)
+
+  test("columns are matched whatever the case of their FIELD ID"):
+    for
+      plain <- lookup("gaia-stellar-parameters-esa.xml", CatalogAdapter.Gaia3EsaProxy)
+      upper <- lookupEdited(
+                 _.replace("""name="teff_gspphot"""", """ID="TEFF_GSPPHOT" name="teff_gspphot"""")
+                   .replace("""name="logg_gspphot"""", """ID="LOGG_GSPPHOT" name="logg_gspphot"""")
+               )
+    yield assertEquals(upper, plain)
+
+  test("an infinite Teff counts as missing"):
+    lookupEdited(_.replace("<TD>5597.1294</TD>", "<TD>Infinity</TD>")).map: params =>
+      assertEquals(params.get(3725398080716580352L), None)
+      assertEquals(params.size, 3)
+
   test("an unreadable Teff drops that star only"):
     readClassLoaderResource[IO]("gaia-stellar-parameters-esa.xml")
       .through(text.utf8.decode)

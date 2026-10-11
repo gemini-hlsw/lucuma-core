@@ -66,12 +66,7 @@ class SEDMatcher(
     teff: Quantity[Int, Kelvin],
     logG: Double
   ): Option[StellarLibrarySpectrum] =
-    val params = StellarPhysics.StellarParameters(teff, logG)
-    stellarLibrary.preferredSpectraOrdered
-      .flatMap(scoreSpectrum(params))
-      .sortBy(m => (m.score, stellarLibrary.fileOrderIndex(m.spectrum)))
-      .headOption
-      .filter(_.isWithinTolerance)
+    bestMatch(StellarPhysics.StellarParameters(teff, logG))(stellarLibrary.preferredSpectraOrdered)
       .map(_.spectrum)
 
   private def matchStellarSED(spectralType: String): EitherNec[CatalogProblem, UnnormalizedSED] =
@@ -100,14 +95,10 @@ class SEDMatcher(
             val targetHasDwarfClass = l.exists(c => c === "V" || c === "IV")
             val needsStrictGravity  = targetHasGiantClass && !targetHasDwarfClass
 
-            val compatibleMatches = stellarLibrary.preferredSpectraOrdered
-              .filter(s => luminosityCompatible(l, libraryLuminosity(s)))
-              .flatMap(scoreSpectrum(params))
-              .sortBy(m => (m.score, stellarLibrary.fileOrderIndex(m.spectrum)))
-
-            val bestMatch = compatibleMatches.headOption.filter(_.isWithinTolerance)
-
-            bestMatch
+            bestMatch(params)(
+              stellarLibrary.preferredSpectraOrdered
+                .filter(s => luminosityCompatible(l, libraryLuminosity(s)))
+            )
               .flatMap: m =>
                 val libLum       = libraryLuminosity(m.spectrum)
                 val isVMatch     = libLum.contains("V") && !libLum.exists(GiantClasses.contains)
@@ -120,16 +111,23 @@ class SEDMatcher(
 
                 Option
                   .when(targetCat === LuminosityCategory.Subdwarf):
-                    stellarLibrary.preferredSpectraOrdered
-                      .filter(s =>
-                        categorizeLuminosity(libraryLuminosity(s)) === LuminosityCategory.Normal
-                      )
-                      .flatMap(scoreSpectrum(params))
-                      .sortBy(m => (m.score, stellarLibrary.fileOrderIndex(m.spectrum)))
-                      .headOption
-                      .filter(_.isWithinTolerance)
-                      .map(_.spectrum)
+                    bestMatch(params)(
+                      stellarLibrary.preferredSpectraOrdered
+                        .filter(s =>
+                          categorizeLuminosity(libraryLuminosity(s)) === LuminosityCategory.Normal
+                        )
+                    ).map(_.spectrum)
                   .flatten
+
+  // Lowest score among the candidates, ties going to library file order, if within tolerance
+  private def bestMatch(params: StellarPhysics.StellarParameters)(
+    candidates: List[StellarLibrarySpectrum]
+  ): Option[ScoredMatch] =
+    candidates
+      .flatMap(scoreSpectrum(params))
+      .sortBy(m => (m.score, stellarLibrary.fileOrderIndex(m.spectrum)))
+      .headOption
+      .filter(_.isWithinTolerance)
 
   private def scoreSpectrum(targetParams: StellarPhysics.StellarParameters)(
     spectrum: StellarLibrarySpectrum
