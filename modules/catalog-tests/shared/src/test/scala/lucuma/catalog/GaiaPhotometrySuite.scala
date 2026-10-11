@@ -82,6 +82,7 @@ class GaiaPhotometrySuite extends FunSuite:
       val gMinusX = coefficients.zipWithIndex.map((c, i) => c * math.pow(1.5, i)).sum
       assertEqualsDouble(est(band).value.value.toDouble, 14.0 - gMinusX, 1e-9)
     check(Band.V, -0.02704, 0.01424, -0.2156, 0.01426)
+    check(Band.R, -0.02275, 0.3961, -0.1243, -0.01396, 0.003775)
     check(Band.SloanG, 0.2199, -0.6365, -0.1548, 0.0064)
     check(Band.SloanR, -0.09837, 0.08592, 0.1907, -0.1701, 0.02263)
     check(Band.SloanI, -0.293, 0.6404, -0.09609, -0.002104)
@@ -90,12 +91,12 @@ class GaiaPhotometrySuite extends FunSuite:
     check(Band.K, -0.0981, 2.089, -0.1579)
 
   test("bands whose colour range excludes the star are left out"):
-    // BP - RP = 3.5: V (-0.5, 5.0) is in range, every other transformation is not
+    // BP - RP = 3.5: V (-0.5, 5.0) and R (0.0, 4.0) are in range, every other band is not
     val red  = SortedMap[Band, BrightnessValue](Band.Gaia -> bv(14.0),
                                                Band.GaiaBP -> bv(16.0),
                                                Band.GaiaRP -> bv(12.5)
     )
-    assertEquals(GaiaPhotometry.estimatedBrightnesses(red).keySet, Set[Band](Band.V))
+    assertEquals(GaiaPhotometry.estimatedBrightnesses(red).keySet, Set[Band](Band.V, Band.R))
     // BP - RP = 0.1: Sloan g (0.3, 3.0) and i (0.5, 2.0) are out
     val blue = SortedMap[Band, BrightnessValue](Band.Gaia -> bv(14.0),
                                                 Band.GaiaBP -> bv(14.0),
@@ -103,7 +104,7 @@ class GaiaPhotometrySuite extends FunSuite:
     )
     assertEquals(
       GaiaPhotometry.estimatedBrightnesses(blue).keySet,
-      Set[Band](Band.V, Band.SloanR, Band.J, Band.H, Band.K)
+      Set[Band](Band.V, Band.R, Band.SloanR, Band.J, Band.H, Band.K)
     )
 
   test("no estimates without all three Gaia bands"):

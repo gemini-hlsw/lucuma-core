@@ -28,10 +28,9 @@ object GaiaPhotometry:
     minBpMinusRp: Double,
     maxBpMinusRp: Double
   ):
+    // Horner's form
     def gMinusX(bpMinusRp: Double): Double =
-      coefficients.zipWithIndex.foldLeft(0.0): (acc, ci) =>
-        val (c, i) = ci
-        acc + c * math.pow(bpMinusRp, i.toDouble)
+      coefficients.foldRight(0.0)((c, acc) => c + bpMinusRp * acc)
 
     def inRange(bpMinusRp: Double): Boolean =
       bpMinusRp > minBpMinusRp && bpMinusRp < maxBpMinusRp
@@ -42,10 +41,15 @@ object GaiaPhotometry:
         .when(inRange(bpMinusRp))(gMinusX(bpMinusRp))
         .flatMap(d => BrightnessValue.from(g.value.value - BigDecimal(d)).toOption)
 
-  // Johnson-Cousins V, SDSS g r i and 2MASS J H Ks (tables 5.8-5.10). Ks is stored as K.
+  // Johnson-Cousins R (table 5.9), also used for Altair guide star limits
+  private val R: BandTransformation =
+    BandTransformation(Band.R, List(-0.02275, 0.3961, -0.1243, -0.01396, 0.003775), 0.0, 4.0)
+
+  // Johnson-Cousins V R, SDSS g r i and 2MASS J H Ks (tables 5.8-5.10). Ks is stored as K.
   private val Transformations: SortedMap[Band, BandTransformation] =
     SortedMap.from(
       List(
+        R,
         BandTransformation(Band.V, List(-0.02704, 0.01424, -0.2156, 0.01426), -0.5, 5.0),
         BandTransformation(Band.SloanG, List(0.2199, -0.6365, -0.1548, 0.0064), 0.3, 3.0),
         BandTransformation(Band.SloanR,
@@ -60,13 +64,11 @@ object GaiaPhotometry:
       ).map(t => t.band -> t)
     )
 
-  /** Bands that `estimatedBrightnesses` can produce. */
+  /**
+   * Bands that `estimatedBrightnesses` can produce. `Band.K` holds the 2MASS Ks relation, which
+   * differs from K by up to about 0.1 mag for red stars.
+   */
   val EstimatedBands: SortedSet[Band] = Transformations.keySet
-
-  // Johnson-Cousins R (table 5.7, scatter 0.032 mag), used for Altair guide star limits. Not in
-  // `Transformations`, blind offsets have no use for it.
-  private val R: BandTransformation =
-    BandTransformation(Band.R, List(-0.02275, 0.3961, -0.1243, -0.01396, 0.003775), 0.0, 4.0)
 
   val MinBpMinusRp: Double = R.minBpMinusRp
   val MaxBpMinusRp: Double = R.maxBpMinusRp
@@ -115,7 +117,8 @@ object GaiaPhotometry:
 
   /**
    * Every band in `EstimatedBands` whose colour range contains the star, estimated from the G, BP
-   * and RP entries of a set of brightnesses. Empty when G, BP or RP is missing.
+   * and RP entries of a set of brightnesses. Empty when G, BP or RP is missing. `Band.K` is 2MASS
+   * Ks.
    */
   def estimatedBrightnesses(
     brightnesses: SortedMap[Band, BrightnessValue]
