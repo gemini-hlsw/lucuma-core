@@ -21,6 +21,11 @@ import lucuma.core.util.TimeSpan
 import java.time.LocalDate
 
 import GroupTree.flattenAndScale
+import lucuma.core.util.Enumerated
+import lucuma.core.model.ProgramReference
+import lucuma.core.enums.ScienceSubtype
+
+import lucuma.core.enums.Observatory
 
 case class Proposal(
   reference: ProposalReference,
@@ -31,9 +36,31 @@ case class Proposal(
   ranking: PosDouble = PosDouble.MaxValue // defaulted to avoid having to change all the tests
 ) {
 
-  val obsList =
+  val obsList: List[ItacObservation] =
     groupTree.flattenAndScale
 
+  def scienceSubtype: ScienceSubtype =
+    tpe match
+      case ProposalType.Classical(_, _)            => ScienceSubtype.Classical
+      case ProposalType.DemoScience(_, _)          => ScienceSubtype.DemoScience
+      case ProposalType.DirectorsTime(_, _)        => ScienceSubtype.DirectorsTime
+      case ProposalType.FastTurnaround(_, _, _, _) => ScienceSubtype.FastTurnaround
+      case ProposalType.LargeProgram(_, _, _, _)   => ScienceSubtype.LargeProgram
+      case ProposalType.PoorWeather                => ScienceSubtype.PoorWeather
+      case ProposalType.Queue(_, _, _)             => ScienceSubtype.Queue
+      case ProposalType.SystemVerification(_, _)   => ScienceSubtype.SystemVerification
+
+  def observatory: Observatory =
+    obsList.map(_.mode.observatory).distinct match
+      case a :: Nil => a
+      case other => sys.error(s"Unpossible: proproposal $reference doesn't have exactly one observatory: ${other.mkString("[", ", ", "]")}")
+
+  def programReference: ProgramReference =
+    observatory match
+      case Observatory.Gemini => ProgramReference.Science(reference, scienceSubtype)
+      case Observatory.Keck   => ProgramReference.Keck(reference)
+      case Observatory.Subaru => ProgramReference.Subaru(reference, ???)
+    
   /** 
    * The possibly empty allocation for the specified category and band. There should never be more than
    * one of these but we handle this case and combine the result.
@@ -53,7 +80,12 @@ case class Proposal(
       site,
       allocationFor(category, band)
     )
-    
+  
+  def shards: List[ProposalShard] =
+    (Enumerated[Site].all, Enumerated[TimeAccountingCategory].all, Enumerated[ScienceBand].all)
+      .mapN(shardFor(_, _, _))
+      .filter(_.nonEmpty)
+
   def too: TooActivation =
     ProposalType.TooActivation.getOption(tpe).getOrElse(TooActivation.None)
 

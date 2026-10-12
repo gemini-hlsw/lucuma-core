@@ -3,7 +3,6 @@
 
 package itac
 
-import cats.data.NonEmptyList
 import cats.effect.Sync
 import cats.effect.kernel.Ref
 import cats.implicits.*
@@ -23,13 +22,13 @@ import lucuma.core.enums.Site
 import lucuma.core.util.Enumerated
 import org.typelevel.log4cats.Logger
 
-import java.io.File
 import java.nio.file.Files
 import java.nio.file.NoSuchFileException
 import java.nio.file.Path
 import java.nio.file.Paths
 import edu.gemini.tac.qengine.p1.ProposalShard
 import lucuma.core.enums.TimeAccountingCategory
+import lucuma.core.model.ProposalReference
 
 /** Interface for some Workspace operations. */
 trait Workspace[F[_]] {
@@ -58,7 +57,7 @@ trait Workspace[F[_]] {
   def shards: F[List[ProposalShard]]
   // def removed: F[List[Proposal]]
 
-  def proposal(ref: String): F[(File, NonEmptyList[Proposal])]
+  def proposal(ref: ProposalReference): F[Proposal] 
 
   /**
    * Create a directory under `cwd` with a name like GN-20190524-103322 and return its path
@@ -114,7 +113,7 @@ object Workspace {
 
   def apply[F[_]: Sync](dir: Path, cc: Path, log: Logger[F], force: Boolean): F[Workspace[F]] =
     ItacException(s"Workspace directory not found: ${dir}").raiseError[F, Workspace[F]].unlessA(dir.toFile.getAbsoluteFile.isDirectory) *>
-    log.info(s"Working directory is ${dir.toAbsolutePath()}") >>
+    log.debug(s"Working directory is ${dir.toAbsolutePath()}") >>
     Ref[F].of(Map.empty[Path, String]).map { cache =>
       new Workspace[F] {
 
@@ -244,8 +243,12 @@ object Workspace {
               .mapN(_.shardFor(_, _, _))
               .filter(_.nonEmpty)
 
-        def proposal(ref: String, band: ScienceBand): F[(File, NonEmptyList[Proposal])] =
-          ???
+        def proposal(ref: ProposalReference): F[Proposal] =
+          proposals.flatMap: ps =>
+            ps.find(_.reference === ref) match
+              case Some(p) => p.pure
+              case None    => Sync[F].raiseError(ItacException(s"No such proposal: $ref"))
+            
           // for {
           //   cwd  <- cwd
           //   conf <- commonConfig
@@ -255,12 +258,6 @@ object Workspace {
           //   es   <- edits
           //   p    <- ProposalLoader[F](when, es, log, (_, _) => ().pure[F]).loadByReference(p.toFile.getAbsoluteFile, ref)
           // } yield p
-
-        def proposal(ref: String): F[(File, NonEmptyList[Proposal])] =
-          proposal(ref, ScienceBand.Band1) orElse
-          proposal(ref, ScienceBand.Band2) orElse
-          proposal(ref, ScienceBand.Band3) orElse
-          proposal(ref, ScienceBand.Band4)
 
         // def newQueueFolder(site: Site): F[Path] =
         //   for {
