@@ -151,7 +151,7 @@ object BlindOffsets:
           areaBuffer = Angle.Angle0
         )
 
-        val interpreter = ADQLInterpreter.blindOffsetCandidates
+        val interpreter = ADQLInterpreter.blindOffsetCandidates(limits.faintestUsableG)
 
         for
           results <- gaiaClient

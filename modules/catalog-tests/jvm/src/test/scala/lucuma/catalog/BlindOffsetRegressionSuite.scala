@@ -17,9 +17,13 @@ import lucuma.catalog.votable.ADQLQuery
 import lucuma.catalog.votable.CatalogAdapter
 import lucuma.catalog.votable.CatalogProblem
 import lucuma.catalog.votable.CatalogSearch
+import lucuma.catalog.votable.QueryByADQL
 import lucuma.core.enums.Instrument
 import lucuma.core.enums.StellarLibrarySpectrum
+import lucuma.core.geom.ShapeExpression
 import lucuma.core.geom.jts.interpreter.given
+import lucuma.core.geom.syntax.all.*
+import lucuma.core.math.Angle
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Declination
 import lucuma.core.math.RightAscension
@@ -283,3 +287,17 @@ class BlindOffsetRegressionSuite extends CatsEffectSuite with SEDMatcherFixture:
     yield
       assertEquals(sorted, Nil)
       assertEquals(ids, List(1L))
+
+  test("the cone search skips stars without a colour or too faint to be usable"):
+    val query       = QueryByADQL(
+      coords("13:42:08.10", "+09:28:38.4"),
+      ShapeExpression.centeredEllipse(BlindOffsets.SearchRadius * 2, BlindOffsets.SearchRadius * 2),
+      None,
+      Angle.Angle0
+    )
+    val interpreter = ADQLInterpreter.blindOffsetCandidates(BlindOffsetLimits.Gmos.faintestUsableG)
+    List(CatalogAdapter.Gaia3EsaProxy, CatalogAdapter.Gaia3DataLab).foreach: adapter =>
+      val sql = interpreter.buildQueryString(adapter, query)
+      assert(sql.contains("phot_bp_mean_mag IS NOT NULL"), sql)
+      assert(sql.contains("phot_rp_mean_mag IS NOT NULL"), sql)
+      assert(sql.contains("phot_g_mean_mag < 18.98"), sql)

@@ -125,3 +125,10 @@ class BlindOffsetCandidatesSuite extends FunSuite:
     val expected = List("a", "b", "far")
     assertEquals(analyse(stars, BlindOffsetLimits.Gnirs).map(_.sourceId.value), expected)
     assertEquals(analyse(stars.reverse, BlindOffsetLimits.Gnirs).map(_.sourceId.value), expected)
+
+  test("the faintest usable G adds the largest G - band offset to the faint limit"):
+    // max(G - V) is -0.027 near BP - RP 0, max(G - H) is 3.824 at BP - RP 2.5
+    assertEquals(BlindOffsetLimits.Gmos.faintestUsableG, Some(18.98))
+    assertEquals(BlindOffsetLimits.Ghost.faintestUsableG, Some(17.98))
+    assertEquals(BlindOffsetLimits.Flamingos2.faintestUsableG, Some(21.83))
+    assertEquals(BlindOffsetLimits.Gnirs.faintestUsableG, Some(20.83))

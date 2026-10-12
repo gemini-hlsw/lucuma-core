@@ -11,6 +11,8 @@ import lucuma.core.math.BrightnessValue
 import lucuma.core.refined.cats.given
 import lucuma.core.util.Enumerated
 
+import scala.collection.immutable.SortedMap
+
 /** Why a blind offset candidate cannot be used with an instrument. */
 enum BlindOffsetRejection(val tag: String) derives Enumerated:
   case TooBright           extends BlindOffsetRejection("too_bright")
@@ -37,6 +39,25 @@ final case class BlindOffsetLimits(
       case Some(m) if m.value.value <= bright.value.value => Some(BlindOffsetRejection.TooBright)
       case Some(m) if m.value.value >= faint.value.value  => Some(BlindOffsetRejection.TooFaint)
       case _                                              => None
+
+  /**
+   * Faintest Gaia G a usable star can have: the faint limit plus the largest G - band difference
+   * over the band's colour range, padded up to 0.01 mag. `None` when the band is not estimated.
+   */
+  lazy val faintestUsableG: Option[Double] =
+    val g       = BrightnessValue.unsafeFrom(BigDecimal(20))
+    val samples = (-1000 to 6000).toList.flatMap: i =>
+      val bpMinusRp = BigDecimal(i) / 1000
+      GaiaPhotometry
+        .estimatedBrightnesses(
+          SortedMap(Band.Gaia   -> g,
+                    Band.GaiaBP -> BrightnessValue.unsafeFrom(g.value.value + bpMinusRp),
+                    Band.GaiaRP -> g
+          )
+        )
+        .get(band)
+        .map(x => (g.value.value - x.value.value).toDouble)
+    samples.maxOption.map(gMinusX => math.ceil((faint.value.value.toDouble + gMinusX) * 100) / 100)
 
 object BlindOffsetLimits:
   private def limits(band: Band, bright: Double, faint: Double, optimal: Double) =

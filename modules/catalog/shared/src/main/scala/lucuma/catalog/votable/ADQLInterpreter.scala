@@ -122,9 +122,12 @@ object ADQLInterpreter {
       )
     }
 
-  // Find blind offset star candidates with a reliable position. Magnitude limits depend on the
-  // instrument and are applied after the estimated magnitudes are known, see BlindOffsets.
-  def blindOffsetCandidates(using si: ShapeInterpreter): ADQLInterpreter =
+  // Find blind offset star candidates with a reliable position and a colour, no fainter than
+  // `faintestG`. The exact limits apply to the estimated magnitudes, see BlindOffsets; this only
+  // keeps stars that can never be usable from filling the row limit in crowded fields.
+  def blindOffsetCandidates(
+    faintestG: Option[Double]
+  )(using si: ShapeInterpreter): ADQLInterpreter =
     new ADQLInterpreter {
       val MaxCount         = 1000
       val shapeInterpreter = si
@@ -138,6 +141,11 @@ object ADQLInterpreter {
       override def orderBy = "separation ASC".some
 
       override val extraConstraints: List[String] =
-        List("phot_g_mean_mag IS NOT NULL", "ruwe < 1.4", "astrometric_excess_noise < 1")
+        List("phot_g_mean_mag IS NOT NULL",
+             "phot_bp_mean_mag IS NOT NULL",
+             "phot_rp_mean_mag IS NOT NULL",
+             "ruwe < 1.4",
+             "astrometric_excess_noise < 1"
+        ) ++ faintestG.map(g => s"phot_g_mean_mag < ${BigDecimal(g)}").toList
     }
 }
