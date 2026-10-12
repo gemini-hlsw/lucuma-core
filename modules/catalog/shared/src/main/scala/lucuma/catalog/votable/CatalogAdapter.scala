@@ -220,11 +220,6 @@ sealed trait CatalogAdapter {
   // Method to parse SED from the votable results
   def parseSED(entries: Map[FieldId, String]): EitherNec[CatalogProblem, Option[UnnormalizedSED]]
 
-  // Method to parse effective temperature and surface gravity, when the catalog provides them
-  def parseStellarParameters(
-    @annotation.unused entries: Map[FieldId, String]
-  ): EitherNec[CatalogProblem, Option[GaiaStellarParameters]] = none.rightNec
-
   // Indicates if the field has a brightness value field
   protected def containsBrightnessValue(v: FieldId): Boolean =
     v.ucd.exists(_.includes(VoTableParser.UCD_MAG)) &&
@@ -516,7 +511,8 @@ object CatalogAdapter {
     // Gaia has no sed
     override def parseSED(entries: Map[FieldId, String]) = none.rightNec
 
-    override def parseStellarParameters(
+    // Effective temperature and surface gravity, when the row has them
+    def parseStellarParameters(
       entries: Map[FieldId, String]
     ): EitherNec[CatalogProblem, Option[GaiaStellarParameters]] =
       // Servers may upper-case the FIELD ID, so keys are compared in lower case
@@ -533,11 +529,17 @@ object CatalogAdapter {
         (value(teff), value(logG)).parMapN: (t, g) =>
           (t, g).mapN((t, g) => GaiaStellarParameters(t.round.toInt.withUnit[Kelvin], g, source))
 
-      // ESP-HS is specific to hot stars and more accurate for them, so it wins over GSP-Phot
-      read(Gaia.teffEspHsField, Gaia.logGEspHsField, GaiaStellarParametersSource.EspHs).flatMap:
-        case None =>
+      // ESP-HS is specific to hot stars and more accurate for them, so it wins over GSP-Phot. An
+      // unreadable ESP-HS value counts as missing so GSP-Phot can still be used.
+      read(Gaia.teffEspHsField,
+           Gaia.logGEspHsField,
+           GaiaStellarParametersSource.EspHs
+      ).toOption.flatten
+        .fold(
           read(Gaia.teffGspPhotField, Gaia.logGGspPhotField, GaiaStellarParametersSource.GspPhot)
-        case some => some.rightNec
+        )(
+          _.some.rightNec
+        )
   }
 
   object Gaia {

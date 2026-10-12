@@ -59,6 +59,6 @@ object CatalogSearch:
    * FS2 pipe to convert a stream of String to stellar parameters keyed by Gaia source id
    */
   def stellarParameters[F[_]: RaiseThrowable](
-    adapter: CatalogAdapter
+    adapter: CatalogAdapter.Gaia
   ): Pipe[F, String, EitherNec[CatalogProblem, (Long, GaiaStellarParameters)]] =
     votable(VoTableParser.xml2stellarParameters[F](adapter))

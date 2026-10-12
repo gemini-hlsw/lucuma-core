@@ -406,7 +406,7 @@ class GaiaClientSuite extends CatsEffectSuite with VoTableSamples:
       .map(params => assertEquals(params, Map.empty))
 
   test("queryStellarParameters sends large id lists in batches"):
-    // 245 extra ids plus the five recorded ones, repeated: 250 distinct ids
+    // 245 extra ids plus the five recorded ones, repeated: 250 distinct ids, 50 per request
     val ids = lookupIds ++ lookupIds ++ (1L to 245L).toList
     for
       requests <- Ref.of[IO, Int](0)
@@ -421,5 +421,25 @@ class GaiaClientSuite extends CatsEffectSuite with VoTableSamples:
                     .queryStellarParameters(ids)
       count    <- requests.get
     yield
-      assertEquals(count, 3)
+      assertEquals(count, 5)
       assertEquals(params.size, 4)
+
+  test("queryStellarParameters sends identical requests once"):
+    // Both proxy adapters build the same lookup against the same server
+    for
+      requests <- Ref.of[IO, Int](0)
+      http      = Client[IO]: _ =>
+                    Resource
+                      .eval(
+                        requests.update(_ + 1) *> resource("gaia-stellar-parameters-esa.xml")
+                      )
+                      .map(Response[IO](Status.Ok).withEntity(_))
+      _        <- GaiaClient
+                    .build[IO](
+                      http,
+                      adapters =
+                        NonEmptyChain.of(CatalogAdapter.Gaia3EsaProxy, CatalogAdapter.Gaia3LiteEsaProxy)
+                    )
+                    .queryStellarParameters(lookupIds)
+      count    <- requests.get
+    yield assertEquals(count, 1)

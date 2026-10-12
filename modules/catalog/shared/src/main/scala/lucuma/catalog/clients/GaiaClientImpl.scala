@@ -7,6 +7,7 @@ import cats.data.EitherNec
 import cats.data.NonEmptyChain
 import cats.effect.Concurrent
 import cats.effect.kernel.Resource
+import cats.effect.syntax.all.*
 import cats.syntax.all.*
 import fs2.RaiseThrowable
 import lucuma.catalog.CatalogTargetResult
@@ -79,13 +80,14 @@ class GaiaClientImpl[F[_]: {Concurrent, Tracer as T, LoggerFactory as LF}](
     sourceIds.distinct
       .grouped(GaiaClientImpl.MaxIdsPerQuery)
       .toList
-      .traverse(lookupBatch)
+      .parTraverseN(GaiaClientImpl.ParallelBatches)(lookupBatch)
       .map(_.foldLeft(Map.empty[Long, GaiaStellarParameters])(_ ++ _))
 
   private def lookupBatch(sourceIds: List[Long]): F[Map[Long, GaiaStellarParameters]] =
     val capable                  = adapters.toList.flatMap: adapter =>
       adapter.stellarParametersByIdQuery(sourceIds).map(q => (adapter, adapter.queryUri(q)))
-    val (withEspHs, gspPhotOnly) = capable.partition(_._1.providesEspHs)
+    // Adapters sharing a server and a query would otherwise send the same request twice
+    val (withEspHs, gspPhotOnly) = capable.distinctBy(_._2).partition(_._1.providesEspHs)
     List(withEspHs, gspPhotOnly).flatMap(raceStellarParameters) match
       case Nil           => Map.empty.pure
       case first :: rest =>
@@ -175,5 +177,8 @@ class GaiaClientImpl[F[_]: {Concurrent, Tracer as T, LoggerFactory as LF}](
 }
 
 object GaiaClientImpl:
-  // Keeps the sync TAP GET request well under common URL length limits
-  val MaxIdsPerQuery: Int = 100
+  // 50 ids of up to 19 digits, comma-encoded, are about 1.1 KB, under the 2048-character URL
+  // limit some proxies enforce even after modUri wraps the request
+  val MaxIdsPerQuery: Int = 50
+
+  val ParallelBatches: Int = 4

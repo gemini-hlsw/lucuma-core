@@ -30,6 +30,15 @@ class SEDMatcherSuite extends CatsEffectSuite with SEDMatcherFixture:
     // Nothing in the library is this hot and compact
     assertEquals(sedMatcher.matchStellarParameters(100000.withUnit[Kelvin], 8.0), None)
 
+  test("Teff and log g matching leaves out subdwarfs and keeps white dwarfs for high log g"):
+    // An F8 subgiant sits close to the sdF8 class defaults
+    assertEquals(sedMatcher.matchStellarParameters(5600.withUnit[Kelvin], 3.65).map(_.tag),
+                 Some("F8IV_calspec")
+    )
+    assert(
+      sedMatcher.matchStellarParameters(42000.withUnit[Kelvin], 8.0).exists(_.tag.startsWith("DA"))
+    )
+
   test("SED matcher validation"):
     assert(
       sedMatcher

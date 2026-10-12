@@ -24,7 +24,7 @@ class GaiaStellarParametersSuite extends CatsEffectSuite:
 
   private def lookup(
     file:    String,
-    adapter: CatalogAdapter
+    adapter: CatalogAdapter.Gaia
   ): IO[Map[Long, GaiaStellarParameters]] =
     readClassLoaderResource[IO](file)
       .through(text.utf8.decode)
@@ -85,6 +85,17 @@ class GaiaStellarParametersSuite extends CatsEffectSuite:
                    .replace("""name="logg_gspphot"""", """ID="LOGG_GSPPHOT" name="logg_gspphot"""")
                )
     yield assertEquals(upper, plain)
+
+  test("an unreadable ESP-HS value falls back to GSP-Phot"):
+    // Fill the empty ESP-HS cells of a star that has GSP-Phot values
+    val withBadEspHs =
+      "(<TD>3725398080716580352</TD>\\s*<TD>5597.1294</TD>\\s*<TD>4.5355</TD>\\s*)<TD></TD>"
+    lookupEdited: xml =>
+      val edited = xml.replaceFirst(withBadEspHs, "$1<TD>bad</TD>")
+      assertNotEquals(edited, xml)
+      edited
+    .map: params =>
+      assertEquals(params.get(3725398080716580352L), Some(gspPhot(5597, 4.5355)))
 
   test("an infinite Teff counts as missing"):
     lookupEdited(_.replace("<TD>5597.1294</TD>", "<TD>Infinity</TD>")).map: params =>

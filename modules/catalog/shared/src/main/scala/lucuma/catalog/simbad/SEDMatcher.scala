@@ -59,15 +59,19 @@ class SEDMatcher(
 
   /**
    * Closest library spectrum to a measured effective temperature and surface gravity, if one is
-   * within 10% in temperature and 0.5 dex in gravity. Nothing is known about the luminosity class
-   * so every spectrum is a candidate.
+   * within 10% in temperature and 0.5 dex in gravity. Nothing is known about the luminosity class,
+   * so subdwarf spectra are left out, and white dwarf spectra are only candidates above log g 7.
    */
   def matchStellarParameters(
     teff: Quantity[Int, Kelvin],
     logG: Double
   ): Option[StellarLibrarySpectrum] =
-    bestMatch(StellarPhysics.StellarParameters(teff, logG))(stellarLibrary.preferredSpectraOrdered)
-      .map(_.spectrum)
+    val candidates = stellarLibrary.preferredSpectraOrdered.filter: s =>
+      categorizeLuminosity(libraryLuminosity(s)) match
+        case LuminosityCategory.Normal     => true
+        case LuminosityCategory.WhiteDwarf => logG > WhiteDwarfMinLogG
+        case LuminosityCategory.Subdwarf   => false
+    bestMatch(StellarPhysics.StellarParameters(teff, logG))(candidates).map(_.spectrum)
 
   private def matchStellarSED(spectralType: String): EitherNec[CatalogProblem, UnnormalizedSED] =
     parseSpectralType(spectralType) match {
@@ -180,6 +184,7 @@ object SEDMatcher:
     def isWithinTolerance: Boolean = absDt < dtMax && absDg < dgMax
 
   // Tolerance factors are unitless
+  private val WhiteDwarfMinLogG: Double               = 7.0
   private val TemperatureToleranceFraction: Double    = 0.1
   private val GravityToleranceDex: Double             = 0.5
   private val CrossLuminosityGravityTolerance: Double = 0.4

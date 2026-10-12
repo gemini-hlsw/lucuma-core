@@ -101,7 +101,7 @@ trait VoTableParser {
    * without parameters are dropped.
    */
   def xml2stellarParameters[F[_]](
-    adapter: CatalogAdapter
+    adapter: CatalogAdapter.Gaia
   ): Pipe[F, XmlEvent, EitherNec[CatalogProblem, (Long, GaiaStellarParameters)]] =
     val sourceIdField = CatalogAdapter.Gaia.sourceIdField
     rowsPipe: row =>
