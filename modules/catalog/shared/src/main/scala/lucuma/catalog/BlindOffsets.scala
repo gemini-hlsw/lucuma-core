@@ -50,13 +50,13 @@ case class BlindOffsetCandidate(
   def sourceId: NonEmptyString = catalogResult.target.name
 
   /** Magnitude in the instrument's selection band, estimated from Gaia photometry. */
-  val selectionBrightness: Option[BrightnessValue] =
+  lazy val selectionBrightness: Option[BrightnessValue] =
     SourceProfile
       .integratedBrightnessIn(limits.band)
       .headOption(catalogResult.target.sourceProfile)
       .map(_.value)
 
-  val rejection: Option[BlindOffsetRejection] = limits.rejection(selectionBrightness)
+  lazy val rejection: Option[BlindOffsetRejection] = limits.rejection(selectionBrightness)
 
   def isUsable: Boolean = rejection.isEmpty
 
@@ -65,7 +65,7 @@ case class BlindOffsetCandidate(
    * one is penalised the same as one `SeparationScale` away from the target. Undefined without a
    * magnitude in the selection band.
    */
-  val score: Option[BigDecimal] =
+  lazy val score: Option[BigDecimal] =
     selectionBrightness.map: m =>
       val magnitudeTerm = (m.value.value - limits.optimal.value.value).toDouble / MagnitudeScale
       val distanceTerm  = Angle.decimalArcseconds.get(distance).toDouble / SeparationScale
@@ -120,7 +120,11 @@ object BlindOffsets:
   def gaiaSourceId(candidate: BlindOffsetCandidate): Option[Long] =
     gaiaSourceId(candidate.catalogResult.target)
 
-  /** Candidates for `instrument`, or none when it does not support blind offsets. */
+  /**
+   * Candidates for `instrument`, or none when it does not support blind offsets. Rejected
+   * candidates are kept after the usable ones, so the first one is only a valid choice if
+   * `isUsable`.
+   */
   def runBlindOffsetAnalysis[F[_]: Concurrent](
     gaiaClient:      GaiaClient[F],
     sedMatcher:      SEDMatcher,
@@ -160,17 +164,16 @@ object BlindOffsets:
           initial  = analysis(results, limits, baseCoordinates, observationTime)
           // The score does not use Teff, so only the best candidates need an SED. A failed lookup
           // leaves them with the power law.
-          params  <- gaiaClient
-                       .queryStellarParameters(
-                         initial
-                           .filter(_.isUsable)
-                           .take(StellarParameterLookups)
-                           .flatMap(gaiaSourceId)
-                       )
-                       .handleError(_ => Map.empty)
+          ids      = initial.filter(_.isUsable).take(StellarParameterLookups).flatMap(gaiaSourceId)
+          params  <-
+            if ids.isEmpty then Map.empty.pure[F]
+            else gaiaClient.queryStellarParameters(ids).handleError(_ => Map.empty)
         yield initial.map(withStellarParameters(sedMatcher, params))
 
-  /** Candidates sorted best first, with estimated magnitudes and a power-law SED. */
+  /**
+   * Candidates sorted best first, with estimated magnitudes and a power-law SED. Rejected
+   * candidates come last; check `isUsable` before taking the first one.
+   */
   def analysis(
     catalogResults:  List[CatalogTargetResult],
     limits:          BlindOffsetLimits,

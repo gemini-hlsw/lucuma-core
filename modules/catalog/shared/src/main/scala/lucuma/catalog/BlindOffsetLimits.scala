@@ -81,15 +81,18 @@ object BlindOffsetLimits:
   /** Limits for an instrument, or `None` when it does not support blind offsets. */
   def forInstrument(instrument: Instrument): Option[BlindOffsetLimits] =
     instrument match
-      case Instrument.Alopeke                          => Some(Alopeke)
-      case Instrument.Zorro                            => Some(Zorro)
-      case Instrument.Ghost                            => Some(Ghost)
-      case Instrument.GmosNorth | Instrument.GmosSouth => Some(Gmos)
-      case Instrument.Flamingos2                       => Some(Flamingos2)
-      case Instrument.Gnirs                            => Some(Gnirs)
-      case Instrument.Igrins2                          => Some(Igrins2)
-      case Instrument.MaroonX                          => None
+      case Instrument.Alopeke                                                     => Some(Alopeke)
+      case Instrument.Zorro                                                       => Some(Zorro)
+      case Instrument.Ghost                                                       => Some(Ghost)
+      case Instrument.GmosNorth | Instrument.GmosSouth                            => Some(Gmos)
+      case Instrument.Flamingos2                                                  => Some(Flamingos2)
+      case Instrument.Gnirs                                                       => Some(Gnirs)
+      case Instrument.Igrins2                                                     => Some(Igrins2)
+      // MAROON-X cannot do blind offsets
+      case Instrument.MaroonX                                                     => None
+      // Retired instruments
       case Instrument.AcqCamNorth | Instrument.AcqCamSouth | Instrument.Gpi | Instrument.Gsaoi |
-          Instrument.Niri | Instrument.Scorpio | Instrument.VisitorNorth |
-          Instrument.VisitorSouth =>
+          Instrument.Niri =>
         None
+      // No blind offset limits defined yet
+      case Instrument.Scorpio | Instrument.VisitorNorth | Instrument.VisitorSouth => None

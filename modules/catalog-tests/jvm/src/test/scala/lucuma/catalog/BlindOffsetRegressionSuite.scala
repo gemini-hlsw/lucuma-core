@@ -273,6 +273,22 @@ class BlindOffsetRegressionSuite extends CatsEffectSuite with SEDMatcherFixture:
       assertEquals(sorted, expected)
       assert(sorted.forall(_.stellarParameters.isEmpty))
 
+  test("no lookup is made when no candidate is usable"):
+    // Stars with G only: no colour, so no estimate and nothing usable
+    for
+      requested <- Ref.of[IO, Boolean](false)
+      sorted    <- BlindOffsets.runBlindOffsetAnalysis(
+                     stubClient("gaia-blind-offset-test.xml", _ => requested.set(true).as(Map.empty)),
+                     sedMatcher,
+                     Instrument.GmosNorth,
+                     coords("05:35:17.3", "+22:00:52.0"),
+                     observationTime
+                   )
+      asked     <- requested.get
+    yield
+      assert(sorted.forall(!_.isUsable))
+      assert(!asked)
+
   test("instruments without limits return no candidates and query nothing"):
     for
       requested <- Ref.of[IO, List[Long]](List(1L))
