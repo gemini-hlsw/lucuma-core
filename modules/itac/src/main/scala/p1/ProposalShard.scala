@@ -37,7 +37,7 @@ class ProposalShard(
     )
 
   def too: TooActivation =
-    TooActivation.None // TODO
+    parentProposal.too
 
   /** 
    * Empty if the allocation is empty, otherwise all observations observable at `site`, scaled to
@@ -61,7 +61,7 @@ object ProposalShard:
     site: Site
   ):
     override def toString(): String =
-      s"${parentReference.semester.format}-${parentReference.index} ($category/$band/$site)"
+      s"${parentReference.label} ($category/$band/$site)"
     
   object Reference:
     given Order[Reference] =

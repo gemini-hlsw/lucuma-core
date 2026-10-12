@@ -23,6 +23,7 @@ import lucuma.core.enums.ScienceSubtype
 import lucuma.core.enums.Site
 import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.util.Enumerated
+import edu.gemini.tac.qengine.api.BucketsAllocation
 
 object QueueEngine3 {
 
@@ -133,7 +134,8 @@ object QueueEngine3 {
 
     QueueCalc(
       PerSite.unfold(site => band => queues.find(q => q.site === site && q.band === band).getOrElse(sys.error(s"unpossible: missing queue for $site $band"))),
-      log
+      log,
+      remaining.map(rsrc => BucketsAllocation(rsrc.ra.grp.bins.toList))
     )
 
   }

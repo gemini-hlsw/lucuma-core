@@ -54,15 +54,14 @@ object Queue {
           println(separator)
 
           println(s"${Colors.BOLD}RA/Conditions Bucket Allocations:                                                    Limit    Used   Avail${Colors.RESET}")
-          println("TODO!!!")
-          // println(queueCalc.bucketsAllocation.raTablesANSI)
+          println(queueCalc.bucketsAllocation(site).raTablesANSI)
           println()
 
           println(separator)
 
           Enumerated[ScienceBand].all.foreach { qb =>
 
-            println(s"${Colors.BOLD}The following proposals were accepted for Band ${qb.intValue}.${Colors.RESET}")
+            println(s"${Colors.BOLD}The following proposals were accepted for time in Band ${qb.intValue}.${Colors.RESET}")
             println(qb.intValue match {
               case 1 => Colors.YELLOW
               case 2 => Colors.GREEN
@@ -71,7 +70,7 @@ object Queue {
             })
 
             queueCalc.queues(site)(qb).toList.sortBy(_.parentProposal.ranking.value).foreach: p =>
-              println(f"${p.parentProposal.ranking}%5.1f ${p.reference}%-30s ${"todo-pi name"}%-20s ${p.allocation.duration.toHours}%5.1f h  ${"todo: programid"}")
+              println(f"${p.parentProposal.ranking}%5.1f ${p.reference}%-30s ${"todo-pi name"}%-20s ${p.allocation.duration.toHours}%5.1f h  ${p.parentProposal.programReference.label}")
 
             // result.entries(qb).sortBy(_.proposals.head.ntac.ranking.num.orEmpty).foreach { case QueueResult.Entry(ps, pid) =>
             //   val ss = ps.map { p =>
@@ -122,7 +121,7 @@ object Queue {
           println(s"${Colors.BOLD}Rejection Report for ${site.shortName}-${Semester.fromString.reverseGet(semester)}${Colors.RESET}\n")
 
           Enumerated[ScienceBand].all.foreach { qb =>
-            println(s"${Colors.BOLD}The following proposals were rejected for $qb.${Colors.RESET}")
+            println(s"${Colors.BOLD}The following proposals were rejected for time in $qb.${Colors.RESET}")
             pids.toList.flatMap(pid => ps.find(_.reference === pid.parentReference)).sortBy(_.ranking.value).foreach { p =>
               Enumerated[TimeAccountingCategory].all.foreach: cat =>
                 val shard = p.shardFor(site, cat, qb)

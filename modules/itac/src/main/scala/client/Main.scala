@@ -25,6 +25,8 @@ import java.nio.file.Paths
 import scala.util.control.NonFatal
 import itac.operation.Ls
 import cats.data.ValidatedNel
+import lucuma.core.model.ProposalReference
+import client.operation.Info
 
 // object Stub {
 //   def main(args: Array[String]): Unit =
@@ -162,6 +164,12 @@ trait MainOpts { this: CommandIOApp =>
       header = "Generate a queue."
     )(Queue[IO](QueueEngine, PerSite.unfold(Workspace.Default.queueConfigFile)).pure[Opts])
 
+  lazy val info: Command[Operation[IO]] =
+    Command(
+      name = "info",
+      header = "Print information about the specified proposal."
+    )(proposalReference.map(Info[IO](_)))
+
   // lazy val staffEmailSpreadsheet: Command[Operation[IO]] =
   //   Command(
   //     name   = "staff-email-spreadsheet",
@@ -293,8 +301,9 @@ trait MainOpts { this: CommandIOApp =>
   //     header = s"Placeholder for $name, which is not yet implemented."
   //   )(Placeholder.pure[Opts])
 
-  // lazy val reference: Opts[String] =
-  //   Opts.argument[String]("semester")
+  lazy val proposalReference: Opts[ProposalReference] =
+    Opts.argument[String]("proposal reference").mapValidated: s =>
+      ProposalReference.fromString.getOption(s).toValidNel(s"Invalid proposal reference: $s")      
 
   // implicit lazy val ArgumentAngle: Argument[Angle] =
   //   new Argument[Angle] {
@@ -392,6 +401,7 @@ trait MainOpts { this: CommandIOApp =>
       // placeholder("skeleton"),
       init,
       ls,
+      info,
       // rollover,
       queue,
       // summarize,

@@ -17,6 +17,7 @@ import monocle.Prism
 
 import java.time.*
 import java.time.Month.*
+import lucuma.core.util.DateInterval
 
 /**
  * A (year, half) tuple where the year falls in the bounds [2000, 9999].
@@ -104,6 +105,9 @@ final case class Semester(yearInt: Semester.YearInt, half: Half) {
     def atSite(site: Site): ZonedDateTime =
       zonedDateTime(site.timezone)
   }
+
+  def interval: DateInterval =
+    DateInterval.between(start.localDate, end.localDate)
 
   /** Format as full year and semester half, `2009A`. */
   def format: String =
