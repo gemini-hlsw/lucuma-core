@@ -8,7 +8,10 @@ import cats.effect.IO
 import cats.effect.IOApp
 import cats.syntax.all.*
 import lucuma.catalog.clients.GaiaClient
+import lucuma.catalog.simbad.SEDDataLoader
+import lucuma.catalog.simbad.SEDMatcher
 import lucuma.catalog.votable.CatalogAdapter.*
+import lucuma.core.enums.Instrument
 import lucuma.core.geom.jts.interpreter.given
 import lucuma.core.math.Angle
 import lucuma.core.math.Coordinates
@@ -16,6 +19,8 @@ import lucuma.core.math.Declination
 import lucuma.core.math.Epoch
 import lucuma.core.math.RightAscension
 import lucuma.core.model.SiderealTracking
+import lucuma.core.model.SourceProfile
+import lucuma.core.model.SpectralDefinition
 import org.http4s.client.middleware.ResponseLogger as CliLogger
 import org.http4s.jdkhttpclient.JdkHttpClient
 import org.typelevel.log4cats.*
@@ -40,6 +45,8 @@ trait BlindOffsetSample:
 
   def runBlindOffsets(
     gaiaClient:  GaiaClient[IO],
+    sedMatcher:  SEDMatcher,
+    instrument:  Instrument,
     coordinates: Coordinates
   ): IO[List[BlindOffsetCandidate]] = {
     val siderealTracking = SiderealTracking(
@@ -49,22 +56,36 @@ trait BlindOffsetSample:
       radialVelocity = None,
       parallax = None
     )
-    BlindOffsets.runBlindOffsetAnalysis(gaiaClient, siderealTracking, observationTime)
+    BlindOffsets.runBlindOffsetAnalysis(
+      gaiaClient,
+      sedMatcher,
+      instrument,
+      siderealTracking,
+      observationTime
+    )
   }
 
   def printCandidates(candidates: List[BlindOffsetCandidate]): IO[Unit] =
     L.info(s"Found ${candidates.length} blind offset star candidates, sorted by score:") *>
-      L.info(f"rank, ${"sourceId"}%28s,  gmag, ${"distance"}%4s, score") *>
+      L.info(
+        f"rank, ${"sourceId"}%28s,   mag, ${"distance"}%4s, score, teff, logg, sed, rejection"
+      ) *>
       candidates.zipWithIndex.traverse_ : (candidate, index) =>
-        val rank     = index + 1
-        val sourceId = candidate.sourceId
-        val gMag     = BlindOffsetCandidate.referenceBrightness(candidate.catalogResult) match {
-          case Some(mag) => f"${mag}%5.2f"
-          case None      => " N/A"
-        }
-        val distance = f"${Angle.decimalArcseconds.get(candidate.distance)}%3.1f"
-        val score    = f"${candidate.score}%3.3f"
-        val msg      = f"$rank%4d, $sourceId%18s, $gMag%5s, ${distance} arcsec, $score%6s"
+        val rank      = index + 1
+        val sourceId  = candidate.sourceId
+        val mag       = candidate.selectionBrightness.fold(" N/A")(m => f"${m.value.value}%5.2f")
+        val distance  = f"${Angle.decimalArcseconds.get(candidate.distance)}%3.1f"
+        val score     = candidate.score.fold("   N/A")(s => f"$s%3.3f")
+        val params    =
+          candidate.stellarParameters.fold("    -,    -")(p =>
+            f"${p.teff.value}%5d, ${p.logG}%4.2f"
+          )
+        val sed       = candidate.catalogResult.target.sourceProfile match
+          case SourceProfile.Point(SpectralDefinition.BandNormalized(Some(sed), _)) => sed.toString
+          case _                                                                    => "-"
+        val rejection = candidate.rejection.fold("")(_.tag)
+        val msg       =
+          f"$rank%4d, $sourceId%28s, $mag%5s, ${distance} arcsec, $score%6s, $params, $sed, $rejection"
         L.info(msg)
 
 object BlindOffsetApp extends IOApp.Simple with BlindOffsetSample:
@@ -86,6 +107,7 @@ object BlindOffsetApp extends IOApp.Simple with BlindOffsetSample:
       .use: gaiaClient =>
         for {
           _          <- IO.println(s"Querying blind offset star candidates on: $coords")
-          candidates <- runBlindOffsets(gaiaClient, coords)
+          sedMatcher <- SEDDataLoader.loadMatcher[IO]
+          candidates <- runBlindOffsets(gaiaClient, sedMatcher, Instrument.GmosNorth, coords)
           _          <- printCandidates(candidates)
         } yield ()

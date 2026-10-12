@@ -7,6 +7,7 @@ import algebra.instances.all.*
 import cats.data.*
 import cats.syntax.all.*
 import coulomb.syntax.*
+import coulomb.units.si.Kelvin
 import lucuma.catalog.*
 import lucuma.catalog.simbad.SEDMatcher
 import lucuma.catalog.votable.CatalogProblem.*
@@ -358,6 +359,14 @@ object CatalogAdapter {
       s"DISTANCE(POINT('ICRS', ${raField.id}, ${decField.id}), POINT('ICRS', $centerRa, $centerDec))"
 
     /**
+     * Query for the effective temperature and surface gravity of the given sources
+     */
+    def stellarParametersByIdQuery(sourceIds: List[Long]): Option[String] = None
+
+    /** Whether the lookup returns ESP-HS values, preferred for hot stars. */
+    def providesEspHs: Boolean = false
+
+    /**
      * Build the query string for a cone search. Default implementation uses ADQL syntax. Override
      * for non-ADQL backends like DataLab.
      */
@@ -501,16 +510,76 @@ object CatalogAdapter {
 
     // Gaia has no sed
     override def parseSED(entries: Map[FieldId, String]) = none.rightNec
+
+    // Effective temperature and surface gravity, when the row has them
+    def parseStellarParameters(
+      entries: Map[FieldId, String]
+    ): EitherNec[CatalogProblem, Option[GaiaStellarParameters]] =
+      // Servers may upper-case the FIELD ID, so keys are compared in lower case
+      val byId = entries.map((k, v) => (k.id.value.toLowerCase, v.trim)).filter(_._2.nonEmpty)
+
+      // Missing values are blank cells, or NaN on DataLab
+      def value(field: FieldId): EitherNec[CatalogProblem, Option[Double]] =
+        byId
+          .get(field.id.value)
+          .traverse(parseDoubleValue(field.ucd, _))
+          .map(_.filterNot(d => d.isNaN || d.isInfinity))
+
+      def read(teff: FieldId, logG: FieldId, source: GaiaStellarParametersSource) =
+        (value(teff), value(logG)).parMapN: (t, g) =>
+          (t, g).mapN((t, g) => GaiaStellarParameters(t.round.toInt.withUnit[Kelvin], g, source))
+
+      // ESP-HS is specific to hot stars and more accurate for them, so it wins over GSP-Phot. An
+      // unreadable ESP-HS value counts as missing so GSP-Phot can still be used.
+      read(Gaia.teffEspHsField,
+           Gaia.logGEspHsField,
+           GaiaStellarParametersSource.EspHs
+      ).toOption.flatten
+        .fold(
+          read(Gaia.teffGspPhotField, Gaia.logGGspPhotField, GaiaStellarParametersSource.GspPhot)
+        )(
+          _.some.rightNec
+        )
+  }
+
+  object Gaia {
+    val teffGspPhotField: FieldId =
+      FieldId.unsafeFrom("teff_gspphot", Ucd.unsafeFromString("phys.temperature.effective"))
+    val logGGspPhotField: FieldId =
+      FieldId.unsafeFrom("logg_gspphot", Ucd.unsafeFromString("phys.gravity"))
+    val teffEspHsField: FieldId   =
+      FieldId.unsafeFrom("teff_esphs", Ucd.unsafeFromString("phys.temperature.effective"))
+    val logGEspHsField: FieldId   =
+      FieldId.unsafeFrom("logg_esphs", Ucd.unsafeFromString("phys.gravity"))
+
+    val sourceIdField: FieldId = FieldId.unsafeFrom("source_id", VoTableParser.UCD_TYPEDID)
+
+    val GspPhotFields: List[FieldId] = List(teffGspPhotField, logGGspPhotField)
+    val EspHsFields: List[FieldId]   = List(teffEspHsField, logGEspHsField)
+
+    def byIdQuery(fields: List[FieldId], table: String, sourceIds: List[Long]): Option[String] =
+      Option.when(sourceIds.nonEmpty):
+        val columns = (sourceIdField :: fields).map(_.id.value).mkString(",")
+        s"SELECT $columns FROM $table WHERE source_id IN (${sourceIds.mkString(",")})"
   }
 
   trait GaiaEsa extends Gaia {
     override val adapterName: String = "ESA"
     override lazy val uri: Uri       = uri"https://gea.esac.esa.int/tap-server/tap/sync"
     override lazy val format: String = "votable_plain"
+
+    override def providesEspHs: Boolean = true
+
+    override def stellarParametersByIdQuery(sourceIds: List[Long]): Option[String] =
+      Gaia.byIdQuery(Gaia.GspPhotFields ++ Gaia.EspHsFields,
+                     "gaiadr3.astrophysical_parameters",
+                     sourceIds
+      )
+
     // ESA uses pos.parallax.trig and spect.dopplerVeloc.opt;em.opt.I
-    override val plxField: FieldId   =
+    override val plxField: FieldId =
       FieldId.unsafeFrom("parallax", Ucd.unsafeFromString("pos.parallax.trig"))
-    override val rvField: FieldId    =
+    override val rvField: FieldId  =
       FieldId.unsafeFrom("radial_velocity", Ucd.unsafeFromString("spect.dopplerVeloc.opt;em.opt.I"))
   }
 
@@ -533,6 +602,10 @@ object CatalogAdapter {
     override lazy val format: String = "votable"
 
     def authToken: String = "anonymous.0.0.anon_access"
+
+    // DataLab's copy of the astrophysical parameters table has no ESP-HS columns
+    override def stellarParametersByIdQuery(sourceIds: List[Long]): Option[String] =
+      Gaia.byIdQuery(Gaia.GspPhotFields, "gaia_dr3.gaia_source", sourceIds)
 
     // DataLab doesn't return UCDs
     override val plxField: FieldId   = FieldId.unsafeFrom("parallax")
@@ -600,7 +673,8 @@ object CatalogAdapter {
   }
 
   trait Gaia3Esa extends GaiaEsa {
-    override lazy val gaiaDB: String   = "gaiadr3.gaia_source"
+    override lazy val gaiaDB: String = "gaiadr3.gaia_source"
+
     lazy val alternateIdField: FieldId =
       FieldId.unsafeFrom("source_id", VoTableParser.UCD_OBJID)
   }

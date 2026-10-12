@@ -8,6 +8,8 @@ import cats.data.NonEmptyChain
 import cats.syntax.either.*
 import cats.syntax.eq.*
 import cats.syntax.option.*
+import coulomb.Quantity
+import coulomb.units.si.Kelvin
 import lucuma.catalog.votable.CatalogProblem
 import lucuma.catalog.votable.CatalogProblem.*
 import lucuma.core.enums.*
@@ -55,6 +57,22 @@ class SEDMatcher(
         Left(NonEmptyChain.one(UnknownObjectType(otype)))
     }
 
+  /**
+   * Closest library spectrum to a measured effective temperature and surface gravity, if one is
+   * within 10% in temperature and 0.5 dex in gravity. Nothing is known about the luminosity class,
+   * so subdwarf spectra are left out, and white dwarf spectra are only candidates above log g 7.
+   */
+  def matchStellarParameters(
+    teff: Quantity[Int, Kelvin],
+    logG: Double
+  ): Option[StellarLibrarySpectrum] =
+    val candidates = stellarLibrary.preferredSpectraOrdered.filter: s =>
+      categorizeLuminosity(libraryLuminosity(s)) match
+        case LuminosityCategory.Normal     => true
+        case LuminosityCategory.WhiteDwarf => logG > WhiteDwarfMinLogG
+        case LuminosityCategory.Subdwarf   => false
+    bestMatch(StellarPhysics.StellarParameters(teff, logG))(candidates).map(_.spectrum)
+
   private def matchStellarSED(spectralType: String): EitherNec[CatalogProblem, UnnormalizedSED] =
     parseSpectralType(spectralType) match {
       case Some((luminosity, temperature)) =>
@@ -81,14 +99,10 @@ class SEDMatcher(
             val targetHasDwarfClass = l.exists(c => c === "V" || c === "IV")
             val needsStrictGravity  = targetHasGiantClass && !targetHasDwarfClass
 
-            val compatibleMatches = stellarLibrary.preferredSpectraOrdered
-              .filter(s => luminosityCompatible(l, libraryLuminosity(s)))
-              .flatMap(scoreSpectrum(params))
-              .sortBy(m => (m.score, stellarLibrary.fileOrderIndex(m.spectrum)))
-
-            val bestMatch = compatibleMatches.headOption.filter(_.isWithinTolerance)
-
-            bestMatch
+            bestMatch(params)(
+              stellarLibrary.preferredSpectraOrdered
+                .filter(s => luminosityCompatible(l, libraryLuminosity(s)))
+            )
               .flatMap: m =>
                 val libLum       = libraryLuminosity(m.spectrum)
                 val isVMatch     = libLum.contains("V") && !libLum.exists(GiantClasses.contains)
@@ -101,16 +115,23 @@ class SEDMatcher(
 
                 Option
                   .when(targetCat === LuminosityCategory.Subdwarf):
-                    stellarLibrary.preferredSpectraOrdered
-                      .filter(s =>
-                        categorizeLuminosity(libraryLuminosity(s)) === LuminosityCategory.Normal
-                      )
-                      .flatMap(scoreSpectrum(params))
-                      .sortBy(m => (m.score, stellarLibrary.fileOrderIndex(m.spectrum)))
-                      .headOption
-                      .filter(_.isWithinTolerance)
-                      .map(_.spectrum)
+                    bestMatch(params)(
+                      stellarLibrary.preferredSpectraOrdered
+                        .filter(s =>
+                          categorizeLuminosity(libraryLuminosity(s)) === LuminosityCategory.Normal
+                        )
+                    ).map(_.spectrum)
                   .flatten
+
+  // Lowest score among the candidates, ties going to library file order, if within tolerance
+  private def bestMatch(params: StellarPhysics.StellarParameters)(
+    candidates: List[StellarLibrarySpectrum]
+  ): Option[ScoredMatch] =
+    candidates
+      .flatMap(scoreSpectrum(params))
+      .sortBy(m => (m.score, stellarLibrary.fileOrderIndex(m.spectrum)))
+      .headOption
+      .filter(_.isWithinTolerance)
 
   private def scoreSpectrum(targetParams: StellarPhysics.StellarParameters)(
     spectrum: StellarLibrarySpectrum
@@ -163,6 +184,7 @@ object SEDMatcher:
     def isWithinTolerance: Boolean = absDt < dtMax && absDg < dgMax
 
   // Tolerance factors are unitless
+  private val WhiteDwarfMinLogG: Double               = 7.0
   private val TemperatureToleranceFraction: Double    = 0.1
   private val GravityToleranceDex: Double             = 0.5
   private val CrossLuminosityGravityTolerance: Double = 0.4

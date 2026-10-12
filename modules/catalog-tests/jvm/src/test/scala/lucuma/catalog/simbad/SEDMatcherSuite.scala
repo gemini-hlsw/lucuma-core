@@ -4,6 +4,8 @@
 package lucuma.catalog.simbad
 
 import cats.syntax.eq.*
+import coulomb.syntax.*
+import coulomb.units.si.Kelvin
 import lucuma.catalog.SEDMatcherFixture
 import lucuma.core.enums.GalaxySpectrum
 import lucuma.core.enums.HIIRegionSpectrum
@@ -16,6 +18,26 @@ import munit.CatsEffectSuite
 class SEDMatcherSuite extends CatsEffectSuite with SEDMatcherFixture:
 
   override def munitFixtures = List(sedFixture)
+
+  test("match on Teff and log g"):
+    // Values the library derives for A0V and G2V from their spectral types (Malkov et al. 2020)
+    assertEquals(sedMatcher.matchStellarParameters(11531.withUnit[Kelvin], 4.07).map(_.tag),
+                 Some("A0V_calspec")
+    )
+    assert(
+      sedMatcher.matchStellarParameters(5199.withUnit[Kelvin], 4.4).exists(_.tag.startsWith("G2V"))
+    )
+    // Nothing in the library is this hot and compact
+    assertEquals(sedMatcher.matchStellarParameters(100000.withUnit[Kelvin], 8.0), None)
+
+  test("Teff and log g matching leaves out subdwarfs and keeps white dwarfs for high log g"):
+    // An F8 subgiant sits close to the sdF8 class defaults
+    assertEquals(sedMatcher.matchStellarParameters(5600.withUnit[Kelvin], 3.65).map(_.tag),
+                 Some("F8IV_calspec")
+    )
+    assert(
+      sedMatcher.matchStellarParameters(42000.withUnit[Kelvin], 8.0).exists(_.tag.startsWith("DA"))
+    )
 
   test("SED matcher validation"):
     assert(
