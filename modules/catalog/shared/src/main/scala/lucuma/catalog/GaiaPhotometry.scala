@@ -15,9 +15,10 @@ import scala.collection.immutable.SortedSet
  * 5.5.1 "Photometric relationships with other photometric systems":
  * https://gea.esac.esa.int/archive/documentation/GDR3/Data_processing/chap_cu5pho/cu5pho_sec_photSystem/cu5pho_ssec_photRelations.html
  *
- * Every relation has the form G - X = c0 + c1 x + c2 x^2 + ..., with x = BP - RP, and is only valid
- * strictly inside a colour range. The polynomials run to 4th order and stop behaving physically
- * beyond their range, so no estimate is produced outside it.
+ * Coefficients come from tables 5.8 (SDSS) and 5.9 (Johnson-Cousins, 2MASS), colour ranges and
+ * their notes from table 5.10. Every relation has the form G - X = c0 + c1 x + c2 x^2 + ..., with x =
+ * BP - RP, and is only valid strictly inside its colour range. The polynomials run to 4th order and
+ * stop behaving physically beyond their range, so no estimate is produced outside it.
  */
 object GaiaPhotometry:
 
@@ -41,14 +42,14 @@ object GaiaPhotometry:
         .when(inRange(bpMinusRp))(gMinusX(bpMinusRp))
         .flatMap(d => BrightnessValue.from(g.value.value - BigDecimal(d)).toOption)
 
-  // Johnson-Cousins R (table 5.9), also used for Altair guide star limits. Above BP - RP 2.0 the
-  // relation was fitted to M giants (table 5.10 note j), so red dwarfs get a biased estimate.
+  // Johnson-Cousins R, also used for Altair guide star limits. The fit runs to BP - RP 4.0, but
+  // above 2.0 it only holds for M giants (table 5.10 note j).
   private val R: BandTransformation =
-    BandTransformation(Band.R, List(-0.02275, 0.3961, -0.1243, -0.01396, 0.003775), 0.0, 4.0)
+    BandTransformation(Band.R, List(-0.02275, 0.3961, -0.1243, -0.01396, 0.003775), 0.0, 2.0)
 
-  // Johnson-Cousins V R, SDSS g r i and 2MASS J H Ks (tables 5.8-5.10). Ks is stored as K. Above
-  // BP - RP 2.0, g and r only hold for M giants (table 5.10 notes f and g); the luminosity class is
-  // unknown here, so their ranges stop at 2.0.
+  // Johnson-Cousins V R, SDSS g r i and 2MASS J H Ks. Ks is stored as K. Above BP - RP 2.0, g, r and
+  // R only hold for M giants (table 5.10 notes f, g and j) and the luminosity class is unknown here,
+  // so their ranges stop at 2.0. V, i, J, H and Ks have no such note.
   private val Transformations: SortedMap[Band, BandTransformation] =
     SortedMap.from(
       List(
@@ -73,8 +74,12 @@ object GaiaPhotometry:
    */
   val EstimatedBands: SortedSet[Band] = Transformations.keySet
 
-  val MinBpMinusRp: Double = R.minBpMinusRp
-  val MaxBpMinusRp: Double = R.maxBpMinusRp
+  /**
+   * Colour range of the R fit. Queries for R-limited guide stars use it as a broad pre-filter; the
+   * estimate itself stops at 2.0.
+   */
+  val MinBpMinusRp: Double = 0.0
+  val MaxBpMinusRp: Double = 4.0
 
   /** Difference G - R for a given BP - RP colour, without checking the validity range. */
   def gMinusR(bpMinusRp: Double): Double = R.gMinusX(bpMinusRp)
@@ -119,13 +124,15 @@ object GaiaPhotometry:
     gaiaBands(brightnesses).flatMap((g, bp, rp) => johnsonCousinsR(g, bp, rp))
 
   /**
-   * Every band in `EstimatedBands` whose colour range contains the star, estimated from the G, BP
-   * and RP entries of a set of brightnesses. Empty when G, BP or RP is missing. `Band.K` is 2MASS
-   * Ks.
+   * Every band in `EstimatedBands` that the brightnesses lack and whose colour range contains the
+   * star, estimated from their G, BP and RP entries. Measured bands are never estimated. Empty when
+   * G, BP or RP is missing. `Band.K` is 2MASS Ks.
    */
   def estimatedBrightnesses(
     brightnesses: SortedMap[Band, BrightnessValue]
   ): SortedMap[Band, BrightnessValue] =
     gaiaBands(brightnesses).fold(SortedMap.empty[Band, BrightnessValue]): (g, bp, rp) =>
       val c = colour(bp, rp)
-      Transformations.flatMap((band, t) => t.estimate(g, c).tupleLeft(band))
+      Transformations
+        .filterNot((band, _) => brightnesses.contains(band))
+        .flatMap((band, t) => t.estimate(g, c).tupleLeft(band))

@@ -91,13 +91,13 @@ class GaiaPhotometrySuite extends FunSuite:
     check(Band.K, -0.0981, 2.089, -0.1579)
 
   test("bands whose colour range excludes the star are left out"):
-    // BP - RP = 3.5: V (-0.5, 5.0) and R (0.0, 4.0) are in range, every other band is not
+    // BP - RP = 3.5: only V (-0.5, 5.0) is in range
     val red     = SortedMap[Band, BrightnessValue](Band.Gaia -> bv(14.0),
                                                Band.GaiaBP -> bv(16.0),
                                                Band.GaiaRP -> bv(12.5)
     )
-    assertEquals(GaiaPhotometry.estimatedBrightnesses(red).keySet, Set[Band](Band.V, Band.R))
-    // BP - RP = 0.1: Sloan g (0.3, 3.0) and i (0.5, 2.0) are out
+    assertEquals(GaiaPhotometry.estimatedBrightnesses(red).keySet, Set[Band](Band.V))
+    // BP - RP = 0.1: Sloan g (0.3, 2.0) and i (0.5, 2.0) are out
     val blue    = SortedMap[Band, BrightnessValue](Band.Gaia -> bv(14.0),
                                                 Band.GaiaBP -> bv(14.0),
                                                 Band.GaiaRP -> bv(13.9)
@@ -106,15 +106,25 @@ class GaiaPhotometrySuite extends FunSuite:
       GaiaPhotometry.estimatedBrightnesses(blue).keySet,
       Set[Band](Band.V, Band.R, Band.SloanR, Band.J, Band.H, Band.K)
     )
-    // BP - RP = 2.2: g and r stop at 2.0, where their relations turn to M giants only
+    // BP - RP = 2.2: g, r and R stop at 2.0, where their relations turn to M giants only
     val reddish = SortedMap[Band, BrightnessValue](Band.Gaia -> bv(14.0),
                                                    Band.GaiaBP -> bv(15.2),
                                                    Band.GaiaRP -> bv(13.0)
     )
     assertEquals(
       GaiaPhotometry.estimatedBrightnesses(reddish).keySet,
-      Set[Band](Band.V, Band.R, Band.J, Band.H, Band.K)
+      Set[Band](Band.V, Band.J, Band.H, Band.K)
     )
+
+  test("measured bands are not estimated"):
+    val measured = SortedMap[Band, BrightnessValue](Band.Gaia -> bv(14.0),
+                                                    Band.GaiaBP -> bv(14.5),
+                                                    Band.GaiaRP -> bv(13.5),
+                                                    Band.V      -> bv(12.0)
+    )
+    val est      = GaiaPhotometry.estimatedBrightnesses(measured)
+    assertEquals(est.get(Band.V), None)
+    assertEquals(est.keySet, GaiaPhotometry.EstimatedBands - Band.V)
 
   test("no estimates without all three Gaia bands"):
     assertEquals(
@@ -123,9 +133,9 @@ class GaiaPhotometrySuite extends FunSuite:
     )
 
   test("the validity ranges exclude their edges"):
-    // BP - RP = 0.0 and 4.0, the edges of the R relation
+    // BP - RP = 0.0 and 2.0, the edges of the R relation
     assertEquals(GaiaPhotometry.johnsonCousinsR(bv(14.0), bv(14.0), bv(14.0)), None)
-    assertEquals(GaiaPhotometry.johnsonCousinsR(bv(14.0), bv(17.0), bv(13.0)), None)
+    assertEquals(GaiaPhotometry.johnsonCousinsR(bv(14.0), bv(15.0), bv(13.0)), None)
     // BP - RP = 5.0, the upper edge of V and beyond every other band
     val edge = SortedMap[Band, BrightnessValue](Band.Gaia -> bv(14.0),
                                                 Band.GaiaBP -> bv(18.0),
