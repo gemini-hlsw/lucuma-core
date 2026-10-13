@@ -55,7 +55,7 @@ class ShortCut_7060 extends CatsEffectSuite:
 
   // Target coordinates for GP221000-483213
   // made to match
-  // https://explore-dev.lucuma.xyz/p-d34/observation/o-3cf6/target/t-13784
+  // https://explore-dev.gemini.edu/p-d34/observation/o-3cf6/target/t-13784
   val targetCoords = Coordinates(
     RightAscension.fromDoubleDegrees(317.50417),
     Declination.fromDoubleDegrees(-48.53700).getOrElse(Declination.Zero)
