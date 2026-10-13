@@ -10,7 +10,7 @@ import lucuma.core.util.Enumerated
  * @group Enumerations
  */
 enum GcalArc(val tag: String, val shortName: String, val longName: String) derives Enumerated:
-  /** @group Constructors */ case ArArc extends GcalArc("ArArc", "Ar arc", "Ar arc")
-  /** @group Constructors */ case ThArArc extends GcalArc("ThArArc", "ThAr arc", "ThAr arc")
-  /** @group Constructors */ case CuArArc extends GcalArc("CuArArc", "CuAr arc", "CuAr arc")
-  /** @group Constructors */ case XeArc extends GcalArc("XeArc", "Xe arc", "Xe arc")
+  /** @group Constructors */ case ArArc extends GcalArc("ArArc", "Ar", "Ar arc")
+  /** @group Constructors */ case ThArArc extends GcalArc("ThArArc", "ThAr", "ThAr arc")
+  /** @group Constructors */ case CuArArc extends GcalArc("CuArArc", "CuAr", "CuAr arc")
+  /** @group Constructors */ case XeArc extends GcalArc("XeArc", "Xe", "Xe arc")
