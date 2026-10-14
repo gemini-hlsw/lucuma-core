@@ -15,33 +15,44 @@ sealed trait ObservingModeType derives Enumerated:
   def observatory: Observatory
 
   def fold[A](
+    fd: DayCalObservingModeType   => A,
     fe: ExchangeObservingModeType => A,
     ff: FacilityObservingModeType => A,
     fv: VisitorObservingModeType  => A
   ): A =
     this match
+      case m: DayCalObservingModeType   => fd(m)
       case m: ExchangeObservingModeType => fe(m)
       case m: FacilityObservingModeType => ff(m)
       case m: VisitorObservingModeType  => fv(m)
 
+  def isDaytimeCalibration: Boolean =
+    fold(_ => true, _ => false, _ => false, _ => false)
+
   def isExchange: Boolean =
-    fold(_ => true, _ => false, _ => false)
+    fold(_ => false, _ => true, _ => false, _ => false)
 
   def isFacility: Boolean =
-    fold(_ => false, _ => true, _ => false)
+    fold(_ => false, _ => false, _ => true, _ => false)
 
   def isVisitor: Boolean =
-    fold(_ => false, _ => false, _ => true)
+    fold(_ => false, _ => false, _ => false, _ => true)
 
   // Only facility instruments can sit behind Altair.
   def supportsAltair: Boolean =
-    fold(_ => false, _.instrument.supportsAltair, _ => false)
+    fold(_ => false, _ => false, _.instrument.supportsAltair, _ => false)
 
 object ObservingModeType:
   export FacilityObservingModeType.{ values => _, * }
   export VisitorObservingModeType.{ values => _, * }
   export ExchangeObservingModeType.{ values => _, * }
-  val values = FacilityObservingModeType.values ++ VisitorObservingModeType.values ++ ExchangeObservingModeType.values
+  export DayCalObservingModeType.{ values => _, * }
+  val values =
+    FacilityObservingModeType.values ++ VisitorObservingModeType.values ++ ExchangeObservingModeType.values ++
+      DayCalObservingModeType.values
+
+  val toDaytimeCalibration: Prism[ObservingModeType, DayCalObservingModeType] =
+    GenPrism[ObservingModeType, DayCalObservingModeType]
 
   val toExchange: Prism[ObservingModeType, ExchangeObservingModeType] =
     GenPrism[ObservingModeType, ExchangeObservingModeType]
@@ -64,6 +75,17 @@ enum ExchangeObservingModeType(
   val defaultPosAngleConstraint = PosAngleConstraint.Fixed(Angle.Angle0) // for all exchanges
   case ExchangeKeck   extends ExchangeObservingModeType("exchange_keck",   Observatory.Keck)
   case ExchangeSubaru extends ExchangeObservingModeType("exchange_subaru", Observatory.Subaru)
+
+// Daytime calibration observing modes: staff-created calibrations taken without a
+// science target.  The instrument is carried alongside in the observation's config.
+enum DayCalObservingModeType(
+  val tag: String
+) extends ObservingModeType derives Enumerated:
+  val defaultPosAngleConstraint = PosAngleConstraint.Fixed(Angle.Angle0)
+  case DaytimeCalibration extends DayCalObservingModeType("daytime_calibration")
+
+  override def observatory: Observatory =
+    Observatory.Gemini
 
 enum FacilityObservingModeType(
   val tag: String,

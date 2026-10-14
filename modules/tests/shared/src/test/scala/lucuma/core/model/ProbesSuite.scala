@@ -4,7 +4,6 @@
 package lucuma.core.model
 
 import lucuma.core.enums.AltairMode
-import lucuma.core.enums.ExchangeObservingModeType
 import lucuma.core.enums.GuideProbe
 import lucuma.core.enums.ObservingModeType
 import lucuma.core.enums.TrackType
@@ -18,10 +17,10 @@ final class ProbesSuite extends FunSuite:
   test("every observing mode has an allowed set (no MatchError)"):
     modes.foreach(m => probes.allowedProbes(m))
 
-  test("only exchange modes have no allowed probe"):
+  test("only exchange and daytime calibration modes have no allowed probe"):
     modes.foreach: m =>
       val empty = probes.allowedProbes(m).isEmpty
-      assertEquals(empty, m.isInstanceOf[ExchangeObservingModeType], clue = m.tag)
+      assertEquals(empty, m.isExchange || m.isDaytimeCalibration, clue = m.tag)
 
   test("an OIWFS is never selected for a nonsidereal target"):
     modes.foreach: m =>

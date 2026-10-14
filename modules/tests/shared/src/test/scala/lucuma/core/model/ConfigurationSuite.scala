@@ -28,8 +28,8 @@ final class ConfigurationSuite extends ScalaCheckSuite:
 
   // Guards against adding an ObservingModeType without a Configuration.ObservingMode for it.  The
   // subclasses come from the compiler-derived Mirror, so there is no list here to keep up to date;
-  // a new subclass without an Arbitrary given fails to compile.  Exchange modes are deliberately
-  // excluded: they are not Gemini instruments and need no configuration approval.
+  // a new subclass without an Arbitrary given fails to compile.  Exchange and daytime calibration modes
+  // are deliberately excluded: neither is a Gemini science configuration needing approval.
   test("every facility and visitor ObservingModeType has exactly one Configuration.ObservingMode"):
     val m      = summon[Mirror.SumOf[Configuration.ObservingMode]]
     val labels = constValueTuple[m.MirroredElemLabels].toList.asInstanceOf[List[String]]

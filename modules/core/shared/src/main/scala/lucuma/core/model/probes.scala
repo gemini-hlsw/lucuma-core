@@ -5,6 +5,7 @@ package lucuma.core.model
 
 import cats.syntax.all.*
 import lucuma.core.enums.AltairMode
+import lucuma.core.enums.DayCalObservingModeType
 import lucuma.core.enums.ExchangeObservingModeType
 import lucuma.core.enums.FacilityObservingModeType
 import lucuma.core.enums.GuideProbe
@@ -43,7 +44,8 @@ trait probes:
       case Some(_)               => SortedSet.empty
       case None                  =>
         observingMode match
-          // Exchange observations are not supported by AGS; there is no guide probe.
+          // Exchange and daytime calibration observations have no guided target.
+          case _: DayCalObservingModeType   => SortedSet.empty
           case _: ExchangeObservingModeType => SortedSet.empty
           case _: VisitorObservingModeType  => Pwfs
           case m: FacilityObservingModeType => facilityProbes(m)
