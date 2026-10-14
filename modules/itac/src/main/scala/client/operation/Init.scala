@@ -87,37 +87,37 @@ object Init {
         |
         |# Partner sequences for both sites.
         |sequence:
-        |  gn: US LP LP US BR US AR US UH US KR CA US US US US CA LP LP KR UH UH US US US BR CA CA US US US US LP LP KR CA CA US US US BR BR US US US UH UH US US US LP BR LP US US US CA CA CA US US US US AR US US US US KR LP US US US UH UH UH CA CA US US KR BR AR US US US CA UH LP US US CA CA UH US US LP LP LP US
-        |  gs: US LP LP US BR US AR US CL US KR CA US US US US CA LP LP KR CL CL US US US BR CA CA US US US US LP LP KR CA CA US US US BR BR US US US CL CL US US US LP BR LP US US US CA CA CA US US US US AR US US US US KR LP US US US CL CL CL CA CA US US KR BR AR US US US CA CL LP US US CA CA CL US US LP LP LP US
+        |  gn: ["US","LP","LP","US","BR","US","AR","US","UH","US","KR","CA","US","US","US","US","CA","LP","LP","KR","UH","UH","US","US","US","BR","CA","CA","US","US","US","US","LP","LP","KR","CA","CA","US","US","US","BR","BR","US","US","US","UH","UH","US","US","US","LP","BR","LP","US","US","US","CA","CA","CA","US","US","US","US","AR","US","US","US","US","KR","LP","US","US","US","UH","UH","UH","CA","CA","US","US","KR","BR","AR","US","US","US","CA","UH","LP","US","US","CA","CA","UH","US","US","LP","LP","LP","US"]
+        |  gs: ["US","LP","LP","US","BR","US","AR","US","CL","US","KR","CA","US","US","US","US","CA","LP","LP","KR","CL","CL","US","US","US","BR","CA","CA","US","US","US","US","LP","LP","KR","CA","CA","US","US","US","BR","BR","US","US","US","CL","CL","US","US","US","LP","BR","LP","US","US","US","CA","CA","CA","US","US","US","US","AR","US","US","US","US","KR","LP","US","US","US","CL","CL","CL","CA","CA","US","US","KR","BR","AR","US","US","US","CA","CL","LP","US","US","CA","CA","CL","US","US","LP","LP","LP","US"]
         |
         |# Conditions bins and percentages for each, which must add up to 100.
         |conditionsBins:
         |  - name: "super-seeing, dark, photometric"
-        |    conditions: "CC50 IQ20 <=SB20"
+        |    conditions: "zero point_one <=darkest"
         |    available: 5
         |  - name: "super-seeing, grey/bright, photometric"
-        |    conditions: "CC50 IQ20 <=SB80"
+        |    conditions: "zero point_one <=gray"
         |    available: 5
         |  - name: "super-seeing, cloudy"
-        |    conditions: "CC80 IQ20 SBAny"
+        |    conditions: "one_point_zero point_one bright"
         |    available: 10
         |  - name: "good-seeing, dark, photometric"
-        |    conditions: "CC50 IQ70 <=SB20"
+        |    conditions: "zero one_point_zero <=darkest"
         |    available: 15
         |  - name: "good-seeing, grey/bright, photometric"
-        |    conditions: "CC50 IQ70 <=SB80"
+        |    conditions: "zero one_point_zero <=gray"
         |    available: 15
         |  - name: "poor-seeing, photometric"
-        |    conditions: "CC50 IQ85 SBAny"
+        |    conditions: "zero two_point_zero bright"
         |    available: 15
         |  - name: "poor-seeing cloudy"
-        |    conditions: "CC80 IQ85 SBAny"
+        |    conditions: "one_point_zero two_point_zero bright"
         |    available: 20
         |  - name: "good-seeing, cloudy"
-        |    conditions: "CC80 IQ70 SBAny"
+        |    conditions: "one_point_zero one_point_zero bright"
         |    available: 25
         |  - name: "terrible seeing"
-        |    conditions: "IQAny SBAny"
+        |    conditions: "three_point_zero bright"
         |    available: 30
         |
         |""".stripMargin
