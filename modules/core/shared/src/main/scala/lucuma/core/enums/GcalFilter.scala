@@ -11,10 +11,10 @@ import lucuma.core.util.Enumerated
  */
 enum GcalFilter(val tag: String, val shortName: String, val longName: String) derives Enumerated:
   /** @group Constructors */ case None extends GcalFilter("None", "none", "none")
-  /** @group Constructors */ case Gmos extends GcalFilter("Gmos", "GMOS balance", "GMOS balance")
-  /** @group Constructors */ case Nir extends GcalFilter("Nir", "NIR balance", "NIR balance")
-  /** @group Constructors */ case Nd10 extends GcalFilter("Nd10", "ND1.0", "ND1.0")
-  /** @group Constructors */ case Nd20 extends GcalFilter("Nd20", "ND2.0", "ND2.0")
-  /** @group Constructors */ case Nd30 extends GcalFilter("Nd30", "ND3.0", "ND3.0")
-  /** @group Constructors */ case Nd40 extends GcalFilter("Nd40", "ND4.0", "ND4.0")
-  /** @group Constructors */ case Nd45 extends GcalFilter("Nd45", "ND4-5", "ND4-5")
+  /** @group Constructors */ case Gmos extends GcalFilter("Gmos", "GMOS", "GMOS balance")
+  /** @group Constructors */ case Nir extends GcalFilter("Nir", "NIR", "NIR balance")
+  /** @group Constructors */ case Nd10 extends GcalFilter("Nd10", "ND1", "ND1.0")
+  /** @group Constructors */ case Nd20 extends GcalFilter("Nd20", "ND2", "ND2.0")
+  /** @group Constructors */ case Nd30 extends GcalFilter("Nd30", "ND3", "ND3.0")
+  /** @group Constructors */ case Nd40 extends GcalFilter("Nd40", "ND4", "ND4.0")
+  /** @group Constructors */ case Nd45 extends GcalFilter("Nd45", "ND4", "ND4-5")

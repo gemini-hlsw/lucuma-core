@@ -11,4 +11,4 @@ import lucuma.core.util.Enumerated
  */
 enum GcalDiffuser(val tag: String, val shortName: String, val longName: String) derives Enumerated:
   /** @group Constructors */ case Ir      extends GcalDiffuser("Ir", "IR", "IR")
-  /** @group Constructors */ case Visible extends GcalDiffuser("Visible", "Visible", "Visible")
+  /** @group Constructors */ case Visible extends GcalDiffuser("Visible", "Vis", "Visible")
