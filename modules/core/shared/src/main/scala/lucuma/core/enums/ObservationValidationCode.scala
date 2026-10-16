@@ -153,5 +153,11 @@ object ObservationValidationCode:
         "Exposure Time Warning",
         "An exposure time is outside the recommended range for the instrument configuration.",
       )
+    case SecondOrderOverlap
+      extends Warning(
+        "second_order_overlap",
+        "Second Order Overlap",
+        "Second order light overlaps the first order spectrum; an order-blocking filter may be needed.",
+      )
 
 

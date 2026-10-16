@@ -11,6 +11,8 @@ import lucuma.core.enums.ObserveClass
 import lucuma.core.model.sequence.arb.ArbTelescopeConfig.given
 import lucuma.core.model.sequence.exposure.ExposureTimeViolation
 import lucuma.core.model.sequence.exposure.arb.ArbExposureTimeViolation.given
+import lucuma.core.model.sequence.gmos.SecondOrderOverlap
+import lucuma.core.model.sequence.gmos.arb.ArbSecondOrderOverlap.given
 import lucuma.core.util.arb.ArbEnumerated
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.*
@@ -35,7 +37,8 @@ trait ArbSequenceDigest:
         d <- arbitrary[StepDigests]
         s <- arbitrary[ExecutionState]
         v <- Gen.choose(0, 3).flatMap(Gen.listOfN(_, arbitrary[ExposureTimeViolation])).map(SortedSet.from)
-      yield SequenceDigest(c, t, o, n, g, d, s, v)
+        w <- Gen.choose(0, 3).flatMap(Gen.listOfN(_, arbitrary[SecondOrderOverlap])).map(SortedSet.from)
+      yield SequenceDigest(c, t, o, n, g, d, s, v, w)
 
   given Cogen[SequenceDigest] =
     Cogen[(
@@ -46,7 +49,8 @@ trait ArbSequenceDigest:
       NonNegInt,
       StepDigests,
       ExecutionState,
-      List[ExposureTimeViolation]
+      List[ExposureTimeViolation],
+      List[SecondOrderOverlap]
     )].contramap: a =>
       (
         a.observeClass,
@@ -56,7 +60,8 @@ trait ArbSequenceDigest:
         a.gcalSets,
         a.steps,
         a.executionState,
-        a.exposureTimeViolations.toList
+        a.exposureTimeViolations.toList,
+        a.secondOrderOverlaps.toList
       )
 
 object ArbSequenceDigest extends ArbSequenceDigest
