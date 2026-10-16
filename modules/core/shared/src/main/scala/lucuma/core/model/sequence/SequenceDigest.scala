@@ -10,6 +10,7 @@ import eu.timepit.refined.types.numeric.NonNegInt
 import lucuma.core.enums.ExecutionState
 import lucuma.core.enums.ObserveClass
 import lucuma.core.model.sequence.exposure.ExposureTimeViolation
+import lucuma.core.model.sequence.gmos.SecondOrderOverlap
 import monocle.Focus
 import monocle.Lens
 
@@ -28,6 +29,8 @@ import scala.collection.immutable.SortedSet
  * @param executionState completion state for this sequence
  * @param exposureTimeViolations the exposure rules that steps of the
  *                       sequence violate
+ * @param secondOrderOverlaps GMOS spectroscopy steps exposed to second order
+ *                       light
  */
 case class SequenceDigest(
   observeClass:           ObserveClass,
@@ -37,7 +40,8 @@ case class SequenceDigest(
   gcalSets:               NonNegInt,
   steps:                  StepDigests,
   executionState:         ExecutionState,
-  exposureTimeViolations: SortedSet[ExposureTimeViolation]
+  exposureTimeViolations: SortedSet[ExposureTimeViolation],
+  secondOrderOverlaps:    SortedSet[SecondOrderOverlap]
 )
 
 object SequenceDigest:
@@ -51,6 +55,7 @@ object SequenceDigest:
       NonNegInt.unsafeFrom(0),
       StepDigests.Zero,
       ExecutionState.NotStarted,
+      SortedSet.empty,
       SortedSet.empty
     )
 
@@ -86,6 +91,10 @@ object SequenceDigest:
   val exposureTimeViolations: Lens[SequenceDigest, SortedSet[ExposureTimeViolation]] =
     Focus[SequenceDigest](_.exposureTimeViolations)
 
+  /** @group Optics */
+  val secondOrderOverlaps: Lens[SequenceDigest, SortedSet[SecondOrderOverlap]] =
+    Focus[SequenceDigest](_.secondOrderOverlaps)
+
   given Eq[SequenceDigest] =
     Eq.by: a =>
       (
@@ -96,5 +105,6 @@ object SequenceDigest:
         a.gcalSets,
         a.steps,
         a.executionState,
-        a.exposureTimeViolations
+        a.exposureTimeViolations,
+        a.secondOrderOverlaps
       )
