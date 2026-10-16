@@ -11,3 +11,4 @@ enum CalibrationRole(val tag: String) derives Enumerated:
   case SpectroPhotometric extends CalibrationRole("spectrophotometric")
   case Telluric           extends CalibrationRole("telluric")
   case DaytimePinhole     extends CalibrationRole("daytime_pinhole")
+  case DaytimeCalibration extends CalibrationRole("daytime_calibration")
