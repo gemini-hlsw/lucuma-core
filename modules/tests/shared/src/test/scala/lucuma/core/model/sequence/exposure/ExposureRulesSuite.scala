@@ -13,12 +13,14 @@ import lucuma.core.enums.GmosSouthFilter
 import lucuma.core.enums.GmosXBinning
 import lucuma.core.enums.GmosYBinning
 import lucuma.core.enums.GnirsReadMode
+import lucuma.core.enums.ObservationValidationCode
 import lucuma.core.enums.ObserveClass
 import lucuma.core.enums.SkyBackground
 import lucuma.core.model.ConstraintSet
 import lucuma.core.model.arb.ArbConstraintSet.given
 import lucuma.core.model.sequence.Step
 import lucuma.core.model.sequence.StepConfig
+import lucuma.core.model.sequence.StepViolation
 import lucuma.core.model.sequence.arb.ArbStep.given
 import lucuma.core.model.sequence.flamingos2.Flamingos2DynamicConfig
 import lucuma.core.model.sequence.flamingos2.arb.ArbFlamingos2DynamicConfig.given
@@ -291,3 +293,13 @@ class ExposureRulesSuite extends FunSuite:
 
   test("bias steps are not checked"):
     assertEquals(violations(SkyBackground.Darkest, gmosNorth(0, imaging = false, stepConfig = StepConfig.Bias)), Nil)
+
+  test("as step violations, errors are configuration errors and warnings exposure time warnings"):
+    assertEquals(
+      ExposureTimeViolation(ExposureTimeViolation.Severity.Error, "e").toStepViolation,
+      StepViolation(ObservationValidationCode.ConfigurationError, "e")
+    )
+    assertEquals(
+      ExposureTimeViolation(ExposureTimeViolation.Severity.Warning, "w").toStepViolation,
+      StepViolation(ObservationValidationCode.ExposureTimeWarning, "w")
+    )

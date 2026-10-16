@@ -9,7 +9,6 @@ import eu.timepit.refined.cats.*
 import eu.timepit.refined.types.numeric.NonNegInt
 import lucuma.core.enums.ExecutionState
 import lucuma.core.enums.ObserveClass
-import lucuma.core.model.sequence.exposure.ExposureTimeViolation
 import monocle.Focus
 import monocle.Lens
 
@@ -26,8 +25,8 @@ import scala.collection.immutable.SortedSet
  * @param gcalSets       number of atoms that contain at least one GCAL step
  * @param steps          count and estimated time of the steps, by kind
  * @param executionState completion state for this sequence
- * @param exposureTimeViolations the exposure rules that steps of the
- *                       sequence violate
+ * @param stepViolations the problems found in steps of the sequence, such as
+ *                       exposure times outside the instrument's limits
  */
 case class SequenceDigest(
   observeClass:           ObserveClass,
@@ -37,7 +36,7 @@ case class SequenceDigest(
   gcalSets:               NonNegInt,
   steps:                  StepDigests,
   executionState:         ExecutionState,
-  exposureTimeViolations: SortedSet[ExposureTimeViolation]
+  stepViolations:         SortedSet[StepViolation]
 )
 
 object SequenceDigest:
@@ -83,8 +82,8 @@ object SequenceDigest:
     Focus[SequenceDigest](_.gcalSets)
 
   /** @group Optics */
-  val exposureTimeViolations: Lens[SequenceDigest, SortedSet[ExposureTimeViolation]] =
-    Focus[SequenceDigest](_.exposureTimeViolations)
+  val stepViolations: Lens[SequenceDigest, SortedSet[StepViolation]] =
+    Focus[SequenceDigest](_.stepViolations)
 
   given Eq[SequenceDigest] =
     Eq.by: a =>
@@ -96,5 +95,5 @@ object SequenceDigest:
         a.gcalSets,
         a.steps,
         a.executionState,
-        a.exposureTimeViolations
+        a.stepViolations
       )

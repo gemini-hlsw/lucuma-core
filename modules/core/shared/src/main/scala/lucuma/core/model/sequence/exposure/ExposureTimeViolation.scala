@@ -5,9 +5,11 @@ package lucuma.core.model.sequence.exposure
 
 import cats.Order
 import cats.syntax.all.*
+import lucuma.core.enums.ObservationValidationCode
 import lucuma.core.enums.ObserveClass
 import lucuma.core.model.sequence.Step
 import lucuma.core.model.sequence.StepConfig
+import lucuma.core.model.sequence.StepViolation
 import lucuma.core.util.Enumerated
 import lucuma.core.util.TimeSpan
 
@@ -26,6 +28,17 @@ final case class ExposureTimeViolation(
 
   def isError: Boolean =
     severity === ExposureTimeViolation.Severity.Error
+
+  /**
+   * As the validation it raises: an exposure that cannot be taken is a
+   * configuration error, one merely outside the recommended range an
+   * (dismissable) exposure time warning.
+   */
+  def toStepViolation: StepViolation =
+    StepViolation(
+      if isError then ObservationValidationCode.ConfigurationError else ObservationValidationCode.ExposureTimeWarning,
+      description
+    )
 
 object ExposureTimeViolation:
 

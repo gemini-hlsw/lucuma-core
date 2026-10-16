@@ -58,3 +58,6 @@ object ObservationValidation:
 
     def exposureTime(msg: String, moreMsgs: String*): ObservationValidation =
       fromMsgs(ExposureTimeWarning, msg, moreMsgs*)
+
+    def secondOrderOverlap(msg: String, moreMsgs: String*): ObservationValidation =
+      fromMsgs(SecondOrderOverlap, msg, moreMsgs*)
