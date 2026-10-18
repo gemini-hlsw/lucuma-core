@@ -30,9 +30,14 @@ trait ArbEmailAddress {
     """very.”(),:;<>[]”.VERY.”very@\\ "very”.unusual@strange.example.com"""
   )
 
+  // Only the samples that satisfy `EmailPred`: a few of them are valid addresses that the
+  // predicate's regex does not accept, and `unsafeFrom` would throw on those.
+  private val validSamples: List[EmailAddress] =
+    samples.flatMap(s => EmailAddress.from(s).toOption)
+
   given Arbitrary[EmailAddress] =
     Arbitrary {
-        Gen.oneOf(samples).map(EmailAddress.unsafeFrom)
+      Gen.oneOf(validSamples)
     }
 
   given Cogen[EmailAddress] =
