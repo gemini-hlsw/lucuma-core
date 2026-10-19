@@ -61,13 +61,20 @@ trait ArbGhostIfuMapping:
     Cogen[(Target.Id, Target.Id)].contramap: a =>
       (a.ifu1, a.ifu2)
 
+  given Arbitrary[NoTarget.type] =
+    Arbitrary(Gen.const(NoTarget))
+
+  given Cogen[NoTarget.type] =
+    Cogen[Unit].contramap(_ => ())
+
   given Arbitrary[GhostIfuMapping] =
     Arbitrary:
       Gen.oneOf(
         arbitrary[SingleTarget],
         arbitrary[TargetPlusSky],
         arbitrary[SkyPlusTarget],
-        arbitrary[DualTarget]
+        arbitrary[DualTarget],
+        arbitrary[NoTarget.type]
       )
 
   given Cogen[GhostIfuMapping] =
@@ -82,5 +89,6 @@ trait ArbGhostIfuMapping:
       case TargetPlusSky(t, c) => (1, None, Some((t, c)), None, None)
       case SkyPlusTarget(c, t) => (2, None, None, Some((c, t)), None)
       case DualTarget(t0, t1)  => (3, None, None, None, Some((t0, t1)))
+      case NoTarget            => (4, None, None, None, None)
 
 object ArbGhostIfuMapping extends ArbGhostIfuMapping

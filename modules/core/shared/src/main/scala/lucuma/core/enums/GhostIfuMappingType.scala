@@ -10,3 +10,4 @@ enum GhostIfuMappingType(val tag: String, val name: String) derives Enumerated:
   case TargetPlusSky extends GhostIfuMappingType("target_plus_sky", "Target+Sky")
   case SkyPlusTarget extends GhostIfuMappingType("sky_plus_target", "Sky+Target")
   case DualTarget    extends GhostIfuMappingType("dual_target",     "Dual Target")
+  case NoTarget      extends GhostIfuMappingType("no_target",       "No Target")
