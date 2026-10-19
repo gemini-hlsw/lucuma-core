@@ -52,12 +52,20 @@ object GhostIfuMapping:
   ) extends GhostIfuMapping derives Eq:
     override def mappingType: GhostIfuMappingType = GhostIfuMappingType.DualTarget
 
+  /**
+   * No IFU is assigned a target.  Used by daytime calibrations, which have no
+   * asterism.
+   */
+  case object NoTarget extends GhostIfuMapping derives Eq:
+    override def mappingType: GhostIfuMappingType = GhostIfuMappingType.NoTarget
+
   given Eq[GhostIfuMapping] =
     Eq.instance:
       case (a: SingleTarget,  b: SingleTarget)  => a === b
       case (a: SkyPlusTarget, b: SkyPlusTarget) => a === b
       case (a: TargetPlusSky, b: TargetPlusSky) => a === b
       case (a: DualTarget,    b: DualTarget)    => a === b
+      case (NoTarget,         NoTarget)         => true
       case _                                    => false
 
   val singleTarget: Prism[GhostIfuMapping, SingleTarget] =
@@ -71,3 +79,6 @@ object GhostIfuMapping:
 
   val dualTarget: Prism[GhostIfuMapping, DualTarget] =
     GenPrism[GhostIfuMapping, DualTarget]
+
+  val noTarget: Prism[GhostIfuMapping, NoTarget.type] =
+    GenPrism[GhostIfuMapping, NoTarget.type]

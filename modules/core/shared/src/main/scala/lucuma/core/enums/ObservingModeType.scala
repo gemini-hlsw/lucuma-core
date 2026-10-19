@@ -87,10 +87,10 @@ enum DaytimeCalibrationObservingModeType(
   override def observatory: Observatory =
     Observatory.Gemini
 
-  // GHOST is pending.
   val daytimeCalInstruments: Set[Instrument] =
     Set(
       Instrument.Flamingos2,
+      Instrument.Ghost,
       Instrument.GmosNorth,
       Instrument.GmosSouth,
       Instrument.Gnirs,
