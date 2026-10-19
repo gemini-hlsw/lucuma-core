@@ -14,7 +14,10 @@ import lucuma.core.enums.GmosYBinning
 import lucuma.core.enums.GnirsReadMode
 import lucuma.core.enums.ObserveClass
 import lucuma.core.enums.SkyBackground
-import lucuma.core.model.sequence.exposure.ExposureTimeViolation.Severity
+import lucuma.core.model.sequence.Step
+import lucuma.core.model.sequence.StepConfig
+import lucuma.core.model.sequence.StepViolation
+import lucuma.core.model.sequence.exposure.ExposureRule.Severity
 import lucuma.core.model.sequence.ghost.MaxExposureTime as GhostMaxExposureTime
 import lucuma.core.model.sequence.ghost.MaxWarningExposureTime as GhostMaxWarningExposureTime
 import lucuma.core.model.sequence.ghost.MinExposureTime as GhostMinExposureTime
@@ -46,6 +49,38 @@ object ExposureRules:
 
   private def nes(s: String): NonEmptyString =
     NonEmptyString.unsafeFrom(s)
+
+  /**
+   * The violations of `rules` by an exposure of `time` with the given observe
+   * class.  Errors are reported if there are any.  Otherwise warnings are
+   * reported, but for science exposures alone, so calibrations and
+   * acquisitions are only checked for errors.  Use this to check an exposure
+   * time against rules from here directly, so that the rules are applied in
+   * the same way as for a sequence step.
+   */
+  def check(
+    rules:        List[ExposureRule],
+    time:         TimeSpan,
+    observeClass: ObserveClass
+  ): List[StepViolation] =
+    val (errorRules, warningRules) = rules.partition(_.isError)
+    errorRules.flatMap(_.check(time)) match
+      case Nil if observeClass === ObserveClass.Science => warningRules.flatMap(_.check(time))
+      case errors                                       => errors
+
+  /**
+   * The violations in a step, as for the exposure time version.  Bias steps
+   * are skipped since they take no exposure.
+   */
+  def check[D: PendingExposureRules](
+    step: Step[D],
+    ctx:  PendingExposureRules.Context
+  ): List[StepViolation] =
+    step.stepConfig match
+      case StepConfig.Bias => Nil
+      case _               =>
+        PendingExposureRules[D].pendingRules(step, ctx).flatMap: (time, rules) =>
+          check(rules, time, step.observeClass)
 
   // Flamingos 2
 

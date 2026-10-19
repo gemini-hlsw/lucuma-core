@@ -42,7 +42,6 @@ import org.scalacheck.Arbitrary
 
 import scala.collection.immutable.SortedSet
 
-import ExposureTimeViolation.Severity
 
 class ExposureRulesSuite extends FunSuite:
 
@@ -82,8 +81,8 @@ class ExposureRulesSuite extends FunSuite:
   private def secs(s: BigDecimal): TimeSpan =
     TimeSpan.unsafeFromMicroseconds((s * 1_000_000).toLongExact)
 
-  private def check(rules: List[ExposureRule], time: TimeSpan): List[ExposureTimeViolation] =
-    ExposureTimeViolation.check(rules, time, ObserveClass.Science)
+  private def check(rules: List[ExposureRule], time: TimeSpan): List[StepViolation] =
+    ExposureRules.check(rules, time, ObserveClass.Science)
 
   test("GNIRS read mode limits"):
     assertEquals(check(ExposureRules.gnirs(GnirsReadMode.Bright), secs(10)), Nil)
@@ -95,31 +94,31 @@ class ExposureRulesSuite extends FunSuite:
     val rules = ExposureRules.flamingos2(Flamingos2ReadMode.Bright)
     assertEquals(rules.flatMap(_.check(TimeSpan.Zero)).map(_.isError), List(true, false))
     assertEquals(check(rules, TimeSpan.Zero).map(_.isError), List(true))
-    assertEquals(ExposureTimeViolation.check(rules, TimeSpan.Zero, ObserveClass.NightCal).map(_.isError), List(true))
+    assertEquals(ExposureRules.check(rules, TimeSpan.Zero, ObserveClass.NightCal).map(_.isError), List(true))
 
   test("checking rules directly applies the same selection as checking a step"):
     // Warnings are for science exposures alone.
-    assertEquals(ExposureTimeViolation.check(ExposureRules.gnirs(GnirsReadMode.Bright), secs(30), ObserveClass.Acquisition), Nil)
+    assertEquals(ExposureRules.check(ExposureRules.gnirs(GnirsReadMode.Bright), secs(30), ObserveClass.Acquisition), Nil)
     // IGRINS-2 acquisitions use the slit viewing camera.
-    assertEquals(ExposureTimeViolation.check(ExposureRules.igrins2(ObserveClass.Acquisition), secs(2), ObserveClass.Acquisition), Nil)
-    assertEquals(ExposureTimeViolation.check(ExposureRules.igrins2(ObserveClass.Science), secs(2), ObserveClass.Science).map(_.isError), List(true))
+    assertEquals(ExposureRules.check(ExposureRules.igrins2(ObserveClass.Acquisition), secs(2), ObserveClass.Acquisition), Nil)
+    assertEquals(ExposureRules.check(ExposureRules.igrins2(ObserveClass.Science), secs(2), ObserveClass.Science).map(_.isError), List(true))
     // GMOS acquisitions are not checked for saturation.
     def gmosImaging(oc: ObserveClass): List[ExposureRule] =
       ExposureRules.gmosNorth(ExposureRules.GmosImaging(oc, GmosNorthFilter.RPrime.some, GmosXBinning.One, GmosYBinning.One, GmosAmpGain.Low).some, SkyBackground.Bright)
-    assertEquals(ExposureTimeViolation.check(gmosImaging(ObserveClass.Acquisition), secs(500), ObserveClass.Acquisition), Nil)
-    assertEquals(ExposureTimeViolation.check(gmosImaging(ObserveClass.Science), secs(500), ObserveClass.Science).map(_.isError), List(true))
+    assertEquals(ExposureRules.check(gmosImaging(ObserveClass.Acquisition), secs(500), ObserveClass.Acquisition), Nil)
+    assertEquals(ExposureRules.check(gmosImaging(ObserveClass.Science), secs(500), ObserveClass.Science).map(_.isError), List(true))
 
-  test("violations carry the severity and the rule as a sentence"):
+  test("violations carry the validation code and the rule as a sentence"):
     assertEquals(
       check(ExposureRules.gnirs(GnirsReadMode.VeryFaint), secs(5)),
-      List(ExposureTimeViolation(Severity.Error, "Exposure times for GNIRS very faint read mode must be at least 18 s."))
+      List(StepViolation(ObservationValidationCode.ConfigurationError, "Exposure times for GNIRS very faint read mode must be at least 18 s."))
     )
     assertEquals(
       check(ExposureRules.gmosNorth(none, SkyBackground.Dark), secs(1500)),
-      List(ExposureTimeViolation(Severity.Warning, "Exposure times above 1200 s are not recommended for GMOS North due to cosmic ray contamination."))
+      List(StepViolation(ObservationValidationCode.ExposureTimeWarning, "Exposure times above 1200 s are not recommended for GMOS North due to cosmic ray contamination."))
     )
 
-  // ExposureTimeViolation.check, applied to sequence steps
+  // ExposureRules.check, applied to sequence steps
 
   private def sample[A](using a: Arbitrary[A]): A =
     Iterator.continually(a.arbitrary.sample).flatten.next()
@@ -148,7 +147,7 @@ class ExposureRulesSuite extends FunSuite:
     sample[Step[DynamicConfig.GmosNorth]].copy(instrumentConfig = d, stepConfig = stepConfig, observeClass = observeClass)
 
   private def violations(sb: SkyBackground, step: Step[DynamicConfig.GmosNorth]): List[String] =
-    ExposureTimeViolation.check(step, ctx(sb)).map(_.description)
+    ExposureRules.check(step, ctx(sb)).map(_.message)
 
   private val CosmicRays = "Exposure times above 1200 s are not recommended for GMOS North due to cosmic ray contamination."
 
@@ -207,7 +206,7 @@ class ExposureRulesSuite extends FunSuite:
         stepConfig       = StepConfig.Science,
         observeClass     = observeClass
       )
-      ExposureTimeViolation.check(step, ctx(SkyBackground.Darkest)).map(_.description)
+      ExposureRules.check(step, ctx(SkyBackground.Darkest)).map(_.message)
 
     assertEquals(igrins2(2, ObserveClass.Acquisition), Nil)
     assertEquals(igrins2(1, ObserveClass.Acquisition), List("Exposure times for the IGRINS-2 slit viewing camera must be at least 1.63 s."))
@@ -219,7 +218,7 @@ class ExposureRulesSuite extends FunSuite:
     using Arbitrary[Step[D]], PendingExposureRules[D]
   ): List[String] =
     val step = sample[Step[D]].copy(instrumentConfig = d, stepConfig = StepConfig.Science, observeClass = observeClass)
-    ExposureTimeViolation.check(step, ctx(sb)).map(_.description)
+    ExposureRules.check(step, ctx(sb)).map(_.message)
 
   private def flamingos2(seconds: BigDecimal, readMode: Flamingos2ReadMode): Flamingos2DynamicConfig =
     sample[Flamingos2DynamicConfig].copy(exposure = secs(seconds), readMode = readMode)
@@ -274,10 +273,10 @@ class ExposureRulesSuite extends FunSuite:
     assertEquals(describe(Igrins2DynamicConfig(secs(601))), List("Exposure times for IGRINS-2 must be at most 600 s."))
     assertEquals(describe(Igrins2DynamicConfig(secs(601)), ObserveClass.Acquisition), List("Exposure times for the IGRINS-2 slit viewing camera must be at most 600 s."))
 
-  test("violations are ordered errors first, then by description"):
-    val warning = ExposureTimeViolation(Severity.Warning, "A")
-    val error1  = ExposureTimeViolation(Severity.Error,   "C")
-    val error2  = ExposureTimeViolation(Severity.Error,   "B")
+  test("violations are ordered errors first, then by message"):
+    val warning = StepViolation(ObservationValidationCode.ExposureTimeWarning, "A")
+    val error1  = StepViolation(ObservationValidationCode.ConfigurationError,  "C")
+    val error2  = StepViolation(ObservationValidationCode.ConfigurationError,  "B")
     assertEquals(SortedSet(warning, error1, error2).toList, List(error2, error1, warning))
 
   test("Eq instances"):
@@ -286,20 +285,15 @@ class ExposureRulesSuite extends FunSuite:
     assert(rules =!= ExposureRules.gmosSouth(none, SkyBackground.Dark))
     assert(ExposureTimeLimits.fromMin(1.secTimeSpan) === ExposureTimeLimits.fromMin(1.secTimeSpan))
     assert(ExposureTimeLimits.fromMin(1.secTimeSpan) =!= ExposureTimeLimits.fromMax(1.secTimeSpan))
-    val v = ExposureTimeViolation.check(rules, secs(0.5), ObserveClass.Science)
-    assert(v === ExposureTimeViolation.check(rules, secs(0.5), ObserveClass.Science))
-    assert(v === ExposureTimeViolation.check(rules, secs(0.25), ObserveClass.Science))
-    assert(v =!= ExposureTimeViolation.check(rules, secs(1.5), ObserveClass.Science))
+    val v = ExposureRules.check(rules, secs(0.5), ObserveClass.Science)
+    assert(v === ExposureRules.check(rules, secs(0.5), ObserveClass.Science))
+    assert(v === ExposureRules.check(rules, secs(0.25), ObserveClass.Science))
+    assert(v =!= ExposureRules.check(rules, secs(1.5), ObserveClass.Science))
 
   test("bias steps are not checked"):
     assertEquals(violations(SkyBackground.Darkest, gmosNorth(0, imaging = false, stepConfig = StepConfig.Bias)), Nil)
 
-  test("as step violations, errors are configuration errors and warnings exposure time warnings"):
-    assertEquals(
-      ExposureTimeViolation(ExposureTimeViolation.Severity.Error, "e").toStepViolation,
-      StepViolation(ObservationValidationCode.ConfigurationError, "e")
-    )
-    assertEquals(
-      ExposureTimeViolation(ExposureTimeViolation.Severity.Warning, "w").toStepViolation,
-      StepViolation(ObservationValidationCode.ExposureTimeWarning, "w")
-    )
+  test("a rule's severity decides its validation code"):
+    val rules = ExposureRules.gmosNorth(none, SkyBackground.Dark)
+    assertEquals(rules.filter(_.isError).map(_.code).distinct, List(ObservationValidationCode.ConfigurationError))
+    assertEquals(rules.filterNot(_.isError).map(_.code).distinct, List(ObservationValidationCode.ExposureTimeWarning))

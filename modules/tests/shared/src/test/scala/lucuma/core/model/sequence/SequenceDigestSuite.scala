@@ -11,15 +11,12 @@ import lucuma.core.model.sequence.arb.ArbSequenceDigest.given
 import lucuma.core.model.sequence.arb.ArbStepDigests.given
 import lucuma.core.model.sequence.arb.ArbStepViolation.given
 import lucuma.core.model.sequence.arb.ArbTelescopeConfig.given
-import lucuma.core.model.sequence.exposure.ExposureTimeViolation
-import lucuma.core.model.sequence.exposure.arb.ArbExposureTimeViolation.given
 import lucuma.core.util.arb.ArbEnumerated.given
 import monocle.law.discipline.*
 import munit.*
 
 class SequenceDigestSuite extends DisciplineSuite:
   checkAll("Eq[SequenceDigest]",                    EqTests[SequenceDigest].eqv)
-  checkAll("Order[ExposureTimeViolation]",          OrderTests[ExposureTimeViolation].order)
   checkAll("Order[StepViolation]",                  OrderTests[StepViolation].order)
   checkAll("SequenceDigest.observeClass",           LensTests(SequenceDigest.observeClass))
   checkAll("SequenceDigest.plannedTime",            LensTests(SequenceDigest.timeEstimate))

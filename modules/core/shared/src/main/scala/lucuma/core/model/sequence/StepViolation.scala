@@ -18,7 +18,10 @@ import lucuma.core.enums.ObservationValidationCode
 final case class StepViolation(
   code:    ObservationValidationCode,
   message: String
-)
+):
+
+  def isError: Boolean =
+    code.isError
 
 object StepViolation:
 
