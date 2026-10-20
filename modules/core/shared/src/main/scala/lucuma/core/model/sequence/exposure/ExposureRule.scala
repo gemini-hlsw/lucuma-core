@@ -8,10 +8,12 @@ import cats.derived.*
 import cats.syntax.all.*
 import eu.timepit.refined.cats.given
 import eu.timepit.refined.types.string.NonEmptyString
+import lucuma.core.enums.ObservationValidationCode
+import lucuma.core.model.sequence.StepViolation
+import lucuma.core.util.Enumerated
 import lucuma.core.util.TimeSpan
 
-import ExposureTimeViolation.Severity
-import ExposureTimeViolation.formatSeconds
+import ExposureRule.Severity
 
 /**
  * A requirement on an exposure time in some configuration.  Breaking a rule
@@ -31,10 +33,36 @@ sealed trait ExposureRule derives Eq:
   def isError: Boolean =
     severity === Severity.Error
 
-  /** The violation of this rule by `time`, if any. */
-  def check(time: TimeSpan): Option[ExposureTimeViolation]
+  /**
+   * The validation code a violation of this rule is reported with: an
+   * exposure that cannot be taken is a configuration error, one merely
+   * outside the recommended range a (dismissable) exposure time warning.
+   */
+  def code: ObservationValidationCode =
+    severity match
+      case Severity.Error   => ObservationValidationCode.ConfigurationError
+      case Severity.Warning => ObservationValidationCode.ExposureTimeWarning
+
+  /**
+   * The violation of this rule by `time`, if any, stating the rule as a
+   * sentence.  It says nothing of the exposure time that broke the rule, so a
+   * sequence that breaks a rule in many steps has just one violation of it.
+   */
+  def check(time: TimeSpan): Option[StepViolation]
 
 object ExposureRule:
+
+  /**
+   * Whether breaking a rule means the exposure cannot be taken (`Error`) or is
+   * merely outside the recommended range (`Warning`).
+   */
+  enum Severity(val tag: String) derives Enumerated:
+    case Error   extends Severity("error")
+    case Warning extends Severity("warning")
+
+  /** Seconds without trailing zeros, e.g. "0.5" or "1200". */
+  def formatSeconds(time: TimeSpan): String =
+    time.toSeconds.bigDecimal.stripTrailingZeros.toPlainString
 
   /**
    * Exposure times must fall within `limits`.
@@ -49,10 +77,10 @@ object ExposureRule:
     limits:   ExposureTimeLimits
   ) extends ExposureRule:
 
-    override def check(time: TimeSpan): Option[ExposureTimeViolation] =
+    override def check(time: TimeSpan): Option[StepViolation] =
       // e.g. "Exposure times above 1200 s are not recommended for GMOS North
       // due to cosmic ray contamination."
-      def violation(limit: TimeSpan, below: Boolean): ExposureTimeViolation =
+      def violation(limit: TimeSpan, below: Boolean): StepViolation =
         val because     = reason.foldMap(r => s" ${r.value}")
         val description = severity match
           case Severity.Error   =>
@@ -61,7 +89,7 @@ object ExposureRule:
           case Severity.Warning =>
             val side = if below then "below" else "above"
             s"Exposure times $side ${formatSeconds(limit)} s are not recommended for ${subject.value}$because."
-        ExposureTimeViolation(severity, description)
+        StepViolation(code, description)
 
       limits.check(time) match
         case ExposureTimeLimits.Result.InRange    => none
@@ -75,6 +103,6 @@ object ExposureRule:
 
     override def severity: Severity = Severity.Error
 
-    override def check(time: TimeSpan): Option[ExposureTimeViolation] =
+    override def check(time: TimeSpan): Option[StepViolation] =
       Option.when(time.toMicroseconds % 1_000_000L =!= 0L):
-        ExposureTimeViolation(severity, s"Exposure times for ${subject.value} must be a whole number of seconds.")
+        StepViolation(code, s"Exposure times for ${subject.value} must be a whole number of seconds.")

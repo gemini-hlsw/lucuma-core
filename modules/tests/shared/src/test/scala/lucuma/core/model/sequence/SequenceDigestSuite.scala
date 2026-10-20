@@ -9,16 +9,15 @@ import eu.timepit.refined.scalacheck.all.*
 import lucuma.core.model.sequence.arb.ArbCategorizedTime.given
 import lucuma.core.model.sequence.arb.ArbSequenceDigest.given
 import lucuma.core.model.sequence.arb.ArbStepDigests.given
+import lucuma.core.model.sequence.arb.ArbStepViolation.given
 import lucuma.core.model.sequence.arb.ArbTelescopeConfig.given
-import lucuma.core.model.sequence.exposure.ExposureTimeViolation
-import lucuma.core.model.sequence.exposure.arb.ArbExposureTimeViolation.given
 import lucuma.core.util.arb.ArbEnumerated.given
 import monocle.law.discipline.*
 import munit.*
 
 class SequenceDigestSuite extends DisciplineSuite:
   checkAll("Eq[SequenceDigest]",                    EqTests[SequenceDigest].eqv)
-  checkAll("Order[ExposureTimeViolation]",          OrderTests[ExposureTimeViolation].order)
+  checkAll("Order[StepViolation]",                  OrderTests[StepViolation].order)
   checkAll("SequenceDigest.observeClass",           LensTests(SequenceDigest.observeClass))
   checkAll("SequenceDigest.plannedTime",            LensTests(SequenceDigest.timeEstimate))
   checkAll("SequenceDigest.atomCount",              LensTests(SequenceDigest.atomCount))
@@ -26,4 +25,4 @@ class SequenceDigestSuite extends DisciplineSuite:
   checkAll("SequenceDigest.executionState",         LensTests(SequenceDigest.executionState))
   checkAll("SequenceDigest.configs",                LensTests(SequenceDigest.configs))
   checkAll("SequenceDigest.steps",                  LensTests(SequenceDigest.steps))
-  checkAll("SequenceDigest.exposureTimeViolations", LensTests(SequenceDigest.exposureTimeViolations))
+  checkAll("SequenceDigest.stepViolations",         LensTests(SequenceDigest.stepViolations))

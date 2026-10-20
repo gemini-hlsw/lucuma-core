@@ -18,7 +18,7 @@ import lucuma.core.util.TimeSpan
 /**
  * Finds the exposure times in a sequence step and the rules each must meet,
  * by passing the relevant parts of the step's configuration to
- * `ExposureRules`.  Use `ExposureTimeViolation.check` to check a step, so
+ * `ExposureRules`.  Use `ExposureRules.check` to check a step, so
  * that every caller applies the rules the same way.
  */
 trait PendingExposureRules[D]:
