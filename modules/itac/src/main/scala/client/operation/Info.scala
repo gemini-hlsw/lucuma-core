@@ -10,6 +10,7 @@ import cats.effect.ExitCode
 import lucuma.core.model.ProposalReference
 import cats.effect.Sync
 import cats.syntax.all.* 
+import lucuma.core.enums.TooActivation
 
 object Info:
 
@@ -20,13 +21,16 @@ object Info:
           val ss = p.shards
           Sync[F].blocking:
             println()
-            println(f"${p.reference.label} - ${p.tpe.scienceSubtype} Proposal ${Some(ss.length).filter(_ > 1).foldMap(n => s"with $n shards")} - Ranking ${p.ranking.value}%2.1f")  
+            println(f"${p.reference.label} (${p.piName}) - ${p.tpe.scienceSubtype} Proposal ${Some(ss.length).filter(_ > 1).foldMap(n => s"with $n shards")} - Ranking ${p.ranking.value}%2.1f")  
             ss.zipWithIndex.foreach: (s, n) =>
               println()
               println(f"  ${Option.when(ss.length > 1)(s"Shard ${n+1} at ").orEmpty}${s.site}, ${s.allocation.duration.toHours}%2.2f h available, awarded by ${s.allocation.category.description}")
               println()
               s.observations.foreach: o =>
-                println(f"    ${o.time.toHours}%2.2f h, ${o.mode.tag}, ${o.itacTarget}")
+                if (p.too == TooActivation.None) then
+                  println(f"    ${o.time.toHours}%2.2f h, ${o.mode.tag}, ${o.itacTarget}")
+                else
+                  println(f"    ${o.time.toHours}%2.2f h, ${o.mode.tag}, «TOO Target»")
             println()
             ExitCode.Success
  

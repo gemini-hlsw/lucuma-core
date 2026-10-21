@@ -178,6 +178,9 @@ object ProposalLog {
       case (id, band, msg) => Entry(Key(id, band), msg)
     }*).reverse)
 
+  def apply(log: List[Entry]): ProposalLog =
+    ProposalLogImpl(log)
+
   private class ProposalLogImpl(val log: List[Entry]) extends ProposalLog {
     protected def mkProposalLog(l: List[Entry]): ProposalLog = new ProposalLogImpl(l)
   }

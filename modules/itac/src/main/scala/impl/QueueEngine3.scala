@@ -24,62 +24,135 @@ import lucuma.core.enums.Site
 import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.util.Enumerated
 import edu.gemini.tac.qengine.api.BucketsAllocation
+import cats.data.NonEmptyList
+import lucuma.core.model.ProposalReference
+import edu.gemini.tac.qengine.log.AcceptMessage
+import edu.gemini.tac.qengine.log.ProposalLog.Key
+import edu.gemini.tac.qengine.log.RejectToo
+import edu.gemini.tac.qengine.log.RejectMessage
 
-object QueueEngine3 {
+object QueueEngine3:
 
-  def calc(
-    proposals:    List[Proposal],
+  def calc(proposals:    List[Proposal],
     queueTimes:   (ScienceBand, Site) => QueueTime,
     config:       PerSite[QueueEngineConfig], // but this is only for one site!
-  ): QueueCalc = {
+  ): QueueCalc =
+    apply(proposals, queueTimes, config).calc
 
-    // Find all the observations that don't participate in the queue process, because their time
-    // needs to be subtracted from the initail RightAscensionMapResource (which happens on construction). Then
-    // finish building our SemesterResource
-    // val rolloverObs: List[ItacObservation]       = Nil 
-    // val classicalProps    = proposals.filter(_.tpe.scienceSubtype == ScienceSubtype.Classical)
-    // val classicalObs      = classicalProps.flatMap(_.obsList)
-    val rightAscensionMapResource   = config.map(c => RightAscensionMapResource(c.binConfig)) //.reserveAvailable(rolloverObs ++ classicalObs)._1
-    val compositeTimeRestrictionResource: List[TimeRestriction[BoundedTime]] = Nil // do we need any of these?
-    val semesterResource  = rightAscensionMapResource.map(SemesterResource(_, compositeTimeRestrictionResource))
+case class QueueEngine3(
+  proposals:    List[Proposal],
+  queueTimes:   (ScienceBand, Site) => QueueTime,
+  config:       PerSite[QueueEngineConfig], // but this is only for one site!
+) {
 
-    // We're done with classical proposals. Filter them out.
-    val queueProposals: List[Proposal] =
-      proposals
-        .filter(_.tpe.scienceSubtype != ScienceSubtype.Classical)
-        .sortBy(_.ranking.value)
+  // Find all the observations that don't participate in the queue process, because their time
+  // needs to be subtracted from the initail RightAscensionMapResource (which happens on construction). Then
+  // finish building our SemesterResource
+  // val rolloverObs: List[ItacObservation]       = Nil 
+  // val classicalProps    = proposals.filter(_.tpe.scienceSubtype == ScienceSubtype.Classical)
+  // val classicalObs      = classicalProps.flatMap(_.obsList)
+  val rightAscensionMapResource   = config.map(c => RightAscensionMapResource(c.binConfig)) //.reserveAvailable(rolloverObs ++ classicalObs)._1
+  val compositeTimeRestrictionResource: List[TimeRestriction[BoundedTime]] = Nil // do we need any of these?
+  val semesterResource  = rightAscensionMapResource.map(SemesterResource(_, compositeTimeRestrictionResource))
 
-    // BlockIterator for a given site and band.
-    def iteratorFor(band: ScienceBand, site: Site): BlockIterator =
-      BlockIterator(
-        queueTimes(band, site).TimeAccountingCategoryQuanta,
-        config(site).timeAccountingCategorySeq.sequence,
-        TimeAccountingCategory
-          .values
-          .toList
-          .fproduct: cat =>
-            queueProposals.map(_.shardFor(site, cat, band))
-          .toMap,
-        p => p.observations
-      )
+  // We're done with classical proposals. Filter them out.
+  val queueProposals: List[Proposal] =
+    proposals
+      .filter(_.tpe.scienceSubtype != ScienceSubtype.Classical)
+      .sortBy(_.ranking.value)
 
-    // Build a queue for each site+band combination, in ascending order by band, alternating between sites.
-    val ((remaining, log), queues) =
-      (Enumerated[ScienceBand].all, Enumerated[Site].all)
-        .tupled
-        .traverse: (band, site) => 
-          State[(PerSite[SemesterResource], ProposalLog), ProposalQueue]: (res, log) =>
-            val stage = QueueCalcStage.compute(
-              queue       = ProposalQueueBuilder(queueTimes(band, site), band, site),
-              iter        = iteratorFor(band, site), 
-              activeList  = _.observations,
-              res         = res(site),
-              log         = log,
-            )
-            ((res.put(site, stage.resource), stage.log), stage.queue)
-        .run((semesterResource, ProposalLog.Empty))
-        .value
- 
+  // BlockIterator for a given site and band.
+  def iteratorFor(candidates: List[Proposal], band: ScienceBand, site: Site): BlockIterator =
+    BlockIterator(
+      queueTimes(band, site).TimeAccountingCategoryQuanta,
+      config(site).timeAccountingCategorySeq.sequence,
+      Enumerated[TimeAccountingCategory]
+        .all
+        .fproduct: cat =>
+          candidates.map(_.shardFor(site, cat, band)).filterNot(_.isEmpty)
+        .toMap,
+      p => p.observations
+    )
+
+  def tryCalc(candidates: List[Proposal], initialLog: ProposalLog) =
+    (Enumerated[ScienceBand].all, Enumerated[Site].all)
+      .tupled
+      .traverse: (band, site) => 
+        State[(PerSite[SemesterResource], ProposalLog), ProposalQueue]: (res, log) =>
+          val stage = QueueCalcStage.compute(
+            queue       = ProposalQueueBuilder(queueTimes(band, site), band, site),
+            iter        = iteratorFor(candidates, band, site), 
+            activeList  = _.observations,
+            res         = res(site),
+            log         = log,
+          )
+          ((res.put(site, stage.resource), stage.log), stage.queue)
+      .run((semesterResource, initialLog))
+      .value
+
+  def calc: QueueCalc = {
+
+    def go(candidates: List[Proposal], currentLog: ProposalLog): QueueCalc = {
+
+      val ((remaining, log), queues) = tryCalc(candidates, currentLog)
+  
+      // Look at the reject list. If there are any rejected shards that have associated *accepted* shards 
+      // then we need to remove the accepted ones and re-run the queue.
+
+      val allShards: List[ProposalShard] = candidates.flatMap(_.shards)
+      val allAcceptedShards: List[ProposalShard] = queues.flatMap(_.toList)
+      val allRejectedShards: List[ProposalShard] = allShards.filterNot(allAcceptedShards.contains)
+
+      val mustAlsoReject: Option[NonEmptyList[ProposalShard]] =
+        NonEmptyList.fromList:
+          allRejectedShards.flatMap: rs =>
+            allAcceptedShards.filter(_.parentProposal.reference === rs.parentProposal.reference)
+
+      mustAlsoReject match
+        case None =>
+          QueueCalc(
+            PerSite.unfold: site =>
+              band => 
+                queues
+                  .find(q => q.site === site && q.band === band)
+                  .getOrElse(sys.error(s"unpossible: missing queue for $site $band")),
+            log,
+            remaining.map(rsrc => BucketsAllocation(rsrc.ra.grp.bins.toList))
+          )
+        case Some(nel) =>
+
+          // Kick out the lowest-ranked proposale that has a rejected shard, then try again
+          val toKickOut: ProposalReference = 
+            nel.sortBy(_.parentProposal.ranking.value).last.parentProposal.reference
+
+          val shardsToKickOut: List[ProposalShard] =
+            nel.filter(_.parentProposal.reference === toKickOut)
+
+          val relevantLogEntriesToPreserve = 
+            ProposalLog:
+              log
+                .toList
+                .filter:
+                  case ProposalLog.Entry(_, AcceptMessage(_)) => false
+                  case ProposalLog.Entry(Key(toKickOut, _), _) => true                              
+
+          val newLog =
+            shardsToKickOut.foldLeft(relevantLogEntriesToPreserve): (log, shard) =>
+              log.updated(shard.reference, shard.allocation.scienceBand, new RejectMessage {
+                val prop = shard
+                val detail: String = "Sibling shard was rejected."
+                val reason: String = s"Shard was rejected because another shard (${toKickOut}) in the same proposal was rejected."
+              })
+
+          go(candidates.filterNot(_.reference === toKickOut), newLog)
+
+    }
+
+
+
+    go(queueProposals, ProposalLog.Empty)
+
+
     // ACTUALLY we should do the following after each pass in order to free up time. There's no
     // point allocating time in the band 2 shard if there's not time for the band 1 shard.
 
@@ -132,11 +205,6 @@ object QueueEngine3 {
     //     }
     // }
 
-    QueueCalc(
-      PerSite.unfold(site => band => queues.find(q => q.site === site && q.band === band).getOrElse(sys.error(s"unpossible: missing queue for $site $band"))),
-      log,
-      remaining.map(rsrc => BucketsAllocation(rsrc.ra.grp.bins.toList))
-    )
 
   }
 

@@ -50,7 +50,7 @@ class TimeRestrictionResourceTest extends ItacSuite {
   private val res60min = TimeRestrictionResource(bin, TimeSpan.fromHoursBounded(10))
   private def mkProp(wv: WaterVapor): ProposalShard =
     val obs = ItacObservation(target, conds(wv), TimeSpan.fromHoursBounded(10))
-    Proposal(
+    Proposal.forTesting(
       ProposalReference(Semester(YearInt.unsafeFrom(2026), Half.A), 
       PosInt.unsafeFrom(1)), 
       allocs, 

@@ -10,10 +10,11 @@ import itac.ocs.Namer.State
 import lucuma.core.enums.ScienceBand
 
 import scala.xml.Elem
+import java.io.File
 
 object Converter:
 
-  def convert(root: Elem, band: ScienceBand): Either[String, Proposal] =
-    val xml = ProposalXml2[EitherT[StateT[cats.Id, State, *], String, *]](root, band)
+  def convert(root: Elem, band: ScienceBand, xmlFile: Option[File]): Either[String, Proposal] =
+    val xml = ProposalXml2[EitherT[StateT[cats.Id, State, *], String, *]](root, band, xmlFile)
     xml.proposal.value.runA(State.Initial)
 

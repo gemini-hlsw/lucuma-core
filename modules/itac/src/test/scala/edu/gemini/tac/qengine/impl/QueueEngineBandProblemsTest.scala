@@ -24,7 +24,7 @@ class QueueEngineBandProblemsTest extends FunSuite {
 
   // A proposal with no data. We .copy it to make test proposals.
   private val P: Proposal =
-    Proposal(
+    Proposal.forTesting(
       ProposalReference(Semester(YearInt.unsafeFrom(2026), Half.A), PosInt.unsafeFrom(1)),
       allocations       = null,
       tpe               = null,

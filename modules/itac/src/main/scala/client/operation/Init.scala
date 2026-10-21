@@ -21,7 +21,8 @@ import java.time.LocalDate
 
 object Init {
 
-  def apply[F[_]: Sync](semester: Semester): Operation[F] =
+  def apply[F[_]: Sync](semester: Semester, force: Boolean): Operation[F] =
+    println(s"--> force is $force")
     new Operation[F] {
 
       def run(ws: Workspace[F], log: Logger[F]): F[ExitCode] = {
@@ -39,7 +40,7 @@ object Init {
           _   <- initLog.trace(s"semester is $semester")
           cwd <- ws.cwd
           ok  <- ws.isEmpty
-          ec  <- if (ok) init <* initLog.info(s"initialized ITAC workspace in $cwd")
+          ec  <- if (ok || force) init <* initLog.info(s"initialized ITAC workspace in $cwd")
                  else initLog.error(s"working directory is not empty: $cwd").as(ExitCode.Error)
         } yield ec
 
@@ -133,13 +134,13 @@ object Init {
         |
         |# Observing hours per partner in each band.
         |hours:
-        |  US: 226.5	247.8	165.2
-        |  CA:  60.5  66.2	 44.2
-        |  AR:  11.3  11.3   7.5
-        |  BR:  23.8  23.8  15.9
-        |  KR:  18.2  18.2  12.2
-        |  CL:  43.2  43.2  28.8
-        |  LP:  27.0   0.0   0.0
+        |  us: 226.5	247.8	165.2 0.0
+        |  ca:  60.5  66.2	 44.2 0.0
+        |  ar:  11.3  11.3   7.5 0.0
+        |  br:  23.8  23.8  15.9 0.0
+        |  kr:  18.2  18.2  12.2 0.0
+        |  # cl:  43.2  43.2  28.8 0.0
+        |  lp:  27.0   0.0   0.0 0.0
         |
         |# RA bin size, in minutes. Must evenly divide 24 * 60 = 1440
         |raBinSize: 180
@@ -153,9 +154,9 @@ object Init {
         |
         |# Queue filling limit (percentage over 80).
         |overfill:
-        |  QBand1: 5
-        |  QBand2: 5
-        |  QBand3: 10
+        |  band1: 5
+        |  band2: 5
+        |  band3: 10
         |""".stripMargin
 
 }

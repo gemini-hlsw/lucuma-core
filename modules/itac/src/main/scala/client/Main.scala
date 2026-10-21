@@ -145,7 +145,7 @@ trait MainOpts { this: CommandIOApp =>
         s"""|Initialize an ITAC workspace in the current directory (override with --dir). Requires
             |an internal network connection.
             |""".stripMargin.trim
-    )(semester.map(Init[IO]))
+    )((semester, force).mapN(Init[IO]))
 
   lazy val ls: Command[Operation[IO]] =
     Command(

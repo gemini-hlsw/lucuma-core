@@ -29,6 +29,7 @@ import java.nio.file.Paths
 import edu.gemini.tac.qengine.p1.ProposalShard
 import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.model.ProposalReference
+import cats.data.NonEmptyList
 
 /** Interface for some Workspace operations. */
 trait Workspace[F[_]] {
@@ -216,6 +217,21 @@ object Workspace {
         //     m <- BulkEditFile.read(f)
         //   } yield m
 
+        private def merge(p: Proposal, ps: NonEmptyList[Proposal]): Proposal =
+          p.copy(allocations = (p.allocations.concatNel(ps.map(_.allocations).reduce)))
+
+        private def mergeSplits(ps: List[Proposal]): List[Proposal] = 
+          def go(toExamine: List[Proposal], accum: List[Proposal]): List[Proposal] =
+            toExamine match
+              case Nil => accum
+              case curr :: rest =>
+                rest.partition(_.piName === curr.piName) match
+                  case (matched, unmatched) =>
+                    NonEmptyList.fromList(matched) match
+                      case None => go(unmatched, curr :: accum)
+                      case Some(nel) => go(unmatched, merge(curr, nel) :: accum)
+          go(ps, Nil)
+
         private def loadOcsProposals(dirs: Map[ScienceBand, Path]): F[List[Proposal]] =
           for {
             cwd  <- cwd
@@ -230,7 +246,7 @@ object Workspace {
             // psʹ   = ps.collect { case (_, Right(ps)) => ps.toList } .flatten
             // _    <- log.debug(s"Read ${ps.length} proposals.")
             // ret   = ps.collect { case (_, Right(ps)) => ps.toList } .flatten
-          } yield e.toOption.orEmpty
+          } yield e.toOption.foldMap(mergeSplits)
 
         def proposals: F[List[Proposal]] =
           cwd.flatMap: cwd =>

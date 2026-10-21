@@ -26,9 +26,12 @@ import lucuma.core.model.ProgramReference
 import lucuma.core.enums.ScienceSubtype
 
 import lucuma.core.enums.Observatory
+import java.io.File
 
 case class Proposal(
+  xmlFile: Option[File],
   reference: ProposalReference,
+  piName: String,
   allocations: NonEmptyList[Allocation],
   tpe: ProposalType = ProposalType.Queue(TooActivation.None, IntPercent.unsafeFrom(0), Nil), // TODO
   groupTree: GroupTree[ItacObservation] = GroupTree.empty,
@@ -168,3 +171,14 @@ case class Proposal(
 
 }
 
+object Proposal:
+
+  def forTesting(
+    reference: ProposalReference,
+    allocations: NonEmptyList[Allocation],
+    tpe: ProposalType = ProposalType.Queue(TooActivation.None, IntPercent.unsafeFrom(0), Nil), // TODO
+    groupTree: GroupTree[ItacObservation] = GroupTree.empty,
+    cfpActive: DateInterval = DateInterval.between(LocalDate.now(), LocalDate.now()),
+    ranking: PosDouble = PosDouble.MaxValue // defaulted to avoid having to change all the tests
+  ): Proposal =
+    apply(None, reference, "Unknown", allocations, tpe, groupTree, cfpActive, ranking)

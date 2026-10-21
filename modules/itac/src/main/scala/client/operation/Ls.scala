@@ -28,7 +28,7 @@ object Ls {
         f"${Colors.BOLD}${"Id"}%-25s  Site  ${"PI"}%-20s   ${"Rank"}%4s ${"Partner"}%6s   ${"Time"}%6s${Colors.RESET}"
 
       def format(s: ProposalShard): String =
-        f"${s.reference}%-25s  ${s.site.shortName}    ${"todo-pi name"}%-20s  ${s.parentProposal.ranking.value}%5.2f  ${s.allocation.category.tag.toUpperCase}%6s  ${s.allocation.duration.toHours}%5.1f h"
+        f"${s.reference}%-25s  ${s.site.shortName}    ${s.parentProposal.piName}%-20s  ${s.parentProposal.ranking.value}%5.2f  ${s.allocation.category.tag.toUpperCase}%6s  ${s.allocation.duration.toHours}%5.1f h"
 
       def findPartner(name: String): F[TimeAccountingCategory] =
         Enumerated[TimeAccountingCategory].all.find(_.tag.equalsIgnoreCase(name)) match {
