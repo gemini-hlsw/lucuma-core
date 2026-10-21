@@ -37,13 +37,14 @@ import lucuma.core.util.TimeSpan
 
 import scala.xml.Elem
 import scala.xml.Node
+import java.io.File
 
 trait ProposalXml2[F[_]]:
   def proposal: F[Proposal]
 
 object ProposalXml2:
 
-  def apply[F[_]: Monad](root: Elem, band: ScienceBand)(
+  def apply[F[_]: Monad](root: Elem, band: ScienceBand, xmlFile: Option[File])(
     using S: Stateful[F, Namer.State], 
           R: Raise[F, String],
           H: Handle[F, String],
@@ -286,6 +287,9 @@ object ProposalXml2:
       ): F[GroupTree[ItacObservation]] =
         itacObservations(targets, constraintSets, observingModes).map(GroupTree.fromList)
 
+      def piName: String =
+        (root \ "investigators" \ "pi" \ "lastName").text
+
       def proposal: F[Proposal] =
         for
           semester          <- semester
@@ -299,7 +303,9 @@ object ProposalXml2:
           ranking           <- ranking
         yield
           Proposal(
+            xmlFile     = xmlFile,
             reference   = proposalReference,
+            piName      = piName,
             allocations = NonEmptyList.one(allocation),
             tpe         = proposalType,
             groupTree   = groupTree,

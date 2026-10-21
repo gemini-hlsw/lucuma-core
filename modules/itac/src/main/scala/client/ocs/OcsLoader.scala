@@ -15,6 +15,7 @@ import org.typelevel.log4cats.Logger
 import java.nio.file.Path
 import scala.xml.Elem
 import scala.xml.XML
+import java.io.File
 
 trait OcsLoader[F[_]]:
   def loadProposals(log: Logger[F], dirs: Map[ScienceBand, Path]): F[Either[String, List[Proposal]]]
@@ -24,21 +25,23 @@ object OcsLoader:
   def apply[F[_]: Sync]: OcsLoader[F] =
     new OcsLoader[F]:
 
-      def loadXmlFiles(dir: Path): F[List[Elem]] =
+      def loadXmlFiles(dir: Path): F[List[(File, Elem)]] =
         Sync[F].blocking:
           if dir.toFile.isDirectory then
-            dir.toFile.listFiles.toList.filter(_.getName().endsWith(".xml")).map(XML.load(_))
+            dir.toFile.listFiles.toList.filter(_.getName().endsWith(".xml")).fproduct(XML.load(_))
           else Nil
 
       def loadProposals(log: Logger[F], dirs: Map[ScienceBand, Path]): F[Either[String, List[Proposal]]] =
         dirs
           .toList
           .flatTraverse: (band, dir) =>
-            loadXmlFiles(dir).map(_.tupleRight(band))  
+            loadXmlFiles(dir).map: ps =>
+              ps.map: (file, elem) =>
+                (elem, band, Some(file))
           .map(convertMany(_).value.runA(State.Initial))
 
-      private def convert1(root: Elem, band: ScienceBand): EitherT[StateT[cats.Id, State, _], String, Proposal] =
-        ProposalXml2[EitherT[StateT[cats.Id, State, *], String, *]](root, band).proposal
+      private def convert1(root: Elem, band: ScienceBand, xmlFile: Option[File]): EitherT[StateT[cats.Id, State, _], String, Proposal] =
+        ProposalXml2[EitherT[StateT[cats.Id, State, *], String, *]](root, band, xmlFile).proposal
 
-      private def convertMany(xmls: List[(Elem, ScienceBand)]): EitherT[StateT[cats.Id, State, _], String, List[Proposal]]  =
+      private def convertMany(xmls: List[(Elem, ScienceBand, Option[File])]): EitherT[StateT[cats.Id, State, _], String, List[Proposal]]  =
         xmls.traverse(convert1)

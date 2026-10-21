@@ -63,7 +63,7 @@ class DecResourceTest extends ItacSuite {
   private val allocs = NonEmptyList.one(alloc)
 
   private def mkProp(target: ItacTarget): ProposalShard =
-    val p = Proposal(ProposalReference(Semester(YearInt.unsafeFrom(2026), Half.A), PosInt.unsafeFrom(1)), allocs, groupTree = GroupTree.from(ItacObservation(target, conds, TimeSpan.Zero)))
+    val p = Proposal.forTesting(ProposalReference(Semester(YearInt.unsafeFrom(2026), Half.A), PosInt.unsafeFrom(1)), allocs, groupTree = GroupTree.from(ItacObservation(target, conds, TimeSpan.Zero)))
     ProposalShard(p, Site.GN, allocs.head)
 
   test("testNormalReserveWithRemainingTime") {

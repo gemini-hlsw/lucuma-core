@@ -80,7 +80,7 @@ object Fixture {
   // Makes a proposal with the given ntac info, and observations according
   // to the descriptions (target, conditions, time)
   def mkProp(alloc: Allocation, obsDefs: (ItacTarget, ConstraintSet, TimeSpan)*): ProposalShard =
-    val p = Proposal(ProposalReference(Semester(YearInt.unsafeFrom(2026), Half.A), PosInt.unsafeFrom(1)), NonEmptyList.one(alloc), groupTree = GroupTree.fromList(obsDefs.map(tup => ItacObservation(tup._1, tup._2, tup._3)).toList))
+    val p = Proposal.forTesting(ProposalReference(Semester(YearInt.unsafeFrom(2026), Half.A), PosInt.unsafeFrom(1)), NonEmptyList.one(alloc), groupTree = GroupTree.fromList(obsDefs.map(tup => ItacObservation(tup._1, tup._2, tup._3)).toList))
     p.shardFor(Site.GN, alloc.category, alloc.scienceBand)
 
   val emptyQueue = ProposalQueueBuilder(QueueTime(TimeAccountingCategoryTime.empty, IntCentiPercent.Min), ScienceBand.Band1, Site.GN, Nil) // QueueTime(Site.GN, TimeAccountingCategoryTime.empty(TimeAccountingCategorys).map, TimeAccountingCategorys))

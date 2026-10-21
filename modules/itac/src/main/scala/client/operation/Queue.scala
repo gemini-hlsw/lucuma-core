@@ -20,7 +20,6 @@ import lucuma.core.enums.ScienceBand
 import edu.gemini.tac.qengine.api.QueueCalc
 import lucuma.core.model.Semester
 import edu.gemini.tac.qengine.p1.Proposal
-import edu.gemini.tac.qengine.log.AcceptMessage
 import lucuma.core.enums.TimeAccountingCategory
 import edu.gemini.tac.qengine.log.RejectTimeAccountingCategoryOverAllocation
 import edu.gemini.tac.qengine.log.RejectCategoryOverAllocation
@@ -28,6 +27,7 @@ import edu.gemini.tac.qengine.log.RejectTarget
 import edu.gemini.tac.qengine.log.RejectConditions
 import edu.gemini.tac.qengine.log.RejectOverAllocation
 import edu.gemini.tac.qengine.log.RemovedRejectMessage
+import edu.gemini.tac.qengine.log.RejectMessage
 
 object Queue {
 
@@ -53,11 +53,11 @@ object Queue {
 
           println(separator)
 
-          println(s"${Colors.BOLD}RA/Conditions Bucket Allocations:                                                    Limit    Used   Avail${Colors.RESET}")
-          println(queueCalc.bucketsAllocation(site).raTablesANSI)
-          println()
+          // println(s"${Colors.BOLD}RA/Conditions Bucket Allocations:                                                    Limit    Used   Avail${Colors.RESET}")
+          // println(queueCalc.bucketsAllocation(site).raTablesANSI)
+          // println()
 
-          println(separator)
+          // println(separator)
 
           Enumerated[ScienceBand].all.foreach { qb =>
 
@@ -70,7 +70,7 @@ object Queue {
             })
 
             queueCalc.queues(site)(qb).toList.sortBy(_.parentProposal.ranking.value).foreach: p =>
-              println(f"${p.parentProposal.ranking}%5.1f ${p.reference}%-30s ${"todo-pi name"}%-20s ${p.allocation.duration.toHours}%5.1f h  ${p.parentProposal.programReference.label}")
+              println(f"${p.parentProposal.ranking}%5.1f ${p.reference}%-30s ${p.parentProposal.piName}%-20s ${p.allocation.duration.toHours}%3.1f/${p.observations.foldMap(_.time).toHours}%3.1f h (${p.allocation.category}) ${p.parentProposal.programReference.label}")
 
             // result.entries(qb).sortBy(_.proposals.head.ntac.ranking.num.orEmpty).foreach { case QueueResult.Entry(ps, pid) =>
             //   val ss = ps.map { p =>
@@ -122,20 +122,19 @@ object Queue {
 
           Enumerated[ScienceBand].all.foreach { qb =>
             println(s"${Colors.BOLD}The following proposals were rejected for time in $qb.${Colors.RESET}")
-            pids.toList.flatMap(pid => ps.find(_.reference === pid.parentReference)).sortBy(_.ranking.value).foreach { p =>
+            pids.toList.flatMap(pid => ps.find(_.reference === pid.parentReference)).sortBy(_.ranking.value).distinct.foreach { p =>
               Enumerated[TimeAccountingCategory].all.foreach: cat =>
                 val shard = p.shardFor(site, cat, qb)
                 if shard.allocation.duration.nonZero then
                   val sid = shard.reference
-                  queueCalc.proposalLog.get(sid, qb) match {
-                    case None | Some(AcceptMessage(_))            => //println(f"- ${pid.reference}%-20s ${p.piName.orEmpty}%-15s 👍")
-                    case Some(m: RejectTimeAccountingCategoryOverAllocation)  => println(f"${p.ranking.value}%5.1f ${sid}%-20s ${"todo-pi name"}%-15s ${"Time accounting category full:"}%-20s ${m.detail}")
-                    case Some(m: RejectCategoryOverAllocation) => println(f"${p.ranking.value}%5.1f ${sid}%-20s ${"todo-pi name"}%-15s ${"Category overallocated:"}%-20s ${m.detail}")
-                    case Some(m: RejectTarget)                 => println(f"${p.ranking.value}%5.1f ${sid}%-20s ${"todo-pi name"}%-15s ${m.raDecType.toString + " bin full:"}%-20s ${m.detail}}")
-                    case Some(m: RejectConditions)             => println(f"${p.ranking.value}%5.1f ${sid}%-20s ${"todo-pi name"}%-15s ${"Conditions bin full:"}%-20s ${m.detail}}")
-                    case Some(m: RejectOverAllocation)         => println(f"${p.ranking.value}%5.1f ${sid}%-20s ${"todo-pi name"}%-15s ${"Overallocation"}%-20s ${m.detail}")
-                    case Some(m: RemovedRejectMessage)         => println(f"${p.ranking.value}%5.1f ${sid}%-20s ${"todo-pi name"}%-15s ${"Removed"}%-20s ${m.detail}")
-                    case Some(lm)                              => println(f"${p.ranking.value}%5.1f ${sid}%-20s ${"todo-pi name"}%-15s ${"Miscellaneous"}%-20s ${lm.getClass.getName}")
+                  queueCalc.proposalLog.get(sid, qb) foreach {
+                    case m: RejectTimeAccountingCategoryOverAllocation => println(f"${p.ranking.value}%5.1f ${sid}%-20s ${p.piName}%-15s ${"Time accounting category full:"}%-20s ${m.detail}")
+                    case m: RejectCategoryOverAllocation => println(f"${p.ranking.value}%5.1f ${sid}%-20s ${p.piName}%-15s ${"Category overallocated:"}%-20s ${m.detail}")
+                    case m: RejectTarget                => println(f"${p.ranking.value}%5.1f ${sid}%-20s ${p.piName}%-15s ${m.raDecType.toString + " bin full:"}%-20s ${m.detail}}")
+                    case m: RejectConditions            => println(f"${p.ranking.value}%5.1f ${sid}%-20s ${p.piName}%-15s ${"Conditions bin full:"}%-20s ${m.detail}}")
+                    case m: RejectOverAllocation        => println(f"${p.ranking.value}%5.1f ${sid}%-20s ${p.piName}%-15s ${"Overallocation"}%-20s ${m.detail}")
+                    case m: RemovedRejectMessage        => println(f"${p.ranking.value}%5.1f ${sid}%-20s ${p.piName}%-15s ${"Removed"}%-20s ${m.detail}")
+                    case lm: RejectMessage              => println(f"${p.ranking.value}%5.1f ${sid}%-20s ${p.piName}%-15s ${"Miscellaneous"}%-20s ${lm.detail}")
                   }
             }
             println()
@@ -178,12 +177,13 @@ object Queue {
 
       def run(ws: Workspace[F], log: Logger[F]): F[ExitCode] =
         ws.commonConfig.flatMap: cc =>
-          computeQueue(ws).flatMap: (ps, queueCalc) =>
-            Enumerated[Site]
-              .all
-              .traverse: site =>
-                siteReport(ps, site, cc.semester, queueCalc, cc)
-              .as(ExitCode.Success)
+          computeQueue(ws)
+            .flatMap: (ps, queueCalc) =>
+              Enumerated[Site]
+                .all
+                .traverse: site =>
+                  siteReport(ps, site, cc.semester, queueCalc, cc)
+                .as(ExitCode.Success)
 
 }
 
