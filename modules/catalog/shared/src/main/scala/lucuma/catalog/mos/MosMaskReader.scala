@@ -165,7 +165,7 @@ object MosMaskReader:
         // Zero is retained rather than read as "absent". Mask files use it for both an unknown
         // redshift and a genuine zero, and inventing the distinction would lose information.
         redshift = redshift.map(z => Redshift(BigDecimal(z))),
-        spectrumFootprint = (left, right, bottom, top).tupled.map(MosSpectrumFootprint.apply)
+        spectrumFootprint = (left, right, bottom, top).mapN(MosSpectrumFootprint.apply)
       )
 
   private def charCell(
