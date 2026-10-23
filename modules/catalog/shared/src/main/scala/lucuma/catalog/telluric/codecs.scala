@@ -7,7 +7,7 @@ import cats.data.NonEmptyList
 import cats.syntax.either.*
 import io.circe.Decoder
 import io.circe.Encoder
-import lucuma.core.enums.TelluricCalibrationOrder
+import lucuma.core.enums.TelluricSlot
 import lucuma.core.model.TelluricType
 
 object codecs:
@@ -33,9 +33,9 @@ object codecs:
       case TelluricType.ExplicitSpectralTypes(starTypes) => starTypes.toList.mkString(",")
       case TelluricType.UserDefined(_)                   => "UserDefined"
 
-  given Decoder[TelluricCalibrationOrder] =
+  given Decoder[TelluricSlot] =
     Decoder[String].emap: s =>
-      TelluricCalibrationOrder.fromString(s).toRight(s"Invalid telluric calibration order: $s")
+      TelluricSlot.fromString(s).toRight(s"Invalid telluric slot: $s")
 
-  given Encoder[TelluricCalibrationOrder] =
+  given Encoder[TelluricSlot] =
     Encoder[String].contramap(_.tag)
