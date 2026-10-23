@@ -4,7 +4,6 @@
 package edu.gemini.tac.qengine.impl
 
 import cats.data.*
-import cats.data.Validated
 import cats.syntax.all.*
 import edu.gemini.tac.qengine.p1.*
 import lucuma.core.enums.ScienceBand
@@ -45,7 +44,7 @@ object QueueEngineBandProblems {
 
   def checkAll(p: Proposal, b: ScienceBand): ValidatedNel[String, Unit] =
     All.foldMap: problem => 
-      problem.lift((p, b)).fold(().valid)(NonEmptyList.one(_).invalid)
+      problem.lift((p, b)).toInvalidNel(())
 
   def unsafeCheckAll(p: Proposal, b: ScienceBand): Unit =
     checkAll(p, b) match {

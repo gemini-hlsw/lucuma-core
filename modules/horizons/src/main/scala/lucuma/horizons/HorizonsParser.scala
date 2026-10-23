@@ -73,13 +73,13 @@ object HorizonsParser:
           parseInstant(sYMD, sHMS),
           RightAscension.fromStringHMS.getOption(s"$sRaH:$sRaM:$sRaS").toRight(s"Invalid RA: $sRaH:$sRaM:$sRaS"),
           Declination.fromStringSignedDMS.getOption(s"$sDecD:$sDecM:$sDecS").toRight(s"Invalid Dec: $sDecD:$sDecM:$sDecS"),
-          sRaRate.parseBigDecimalOption.map(Angle.fromBigDecimalArcseconds) toRight(s"Invalid RA delta: $sRaRate"),
-          sDecRate.parseBigDecimalOption.map(Angle.fromBigDecimalArcseconds).toRight(s"Invalid Dec delta: $sRaRate"),
+          sRaRate.parseBigDecimalOption.map(Angle.fromBigDecimalArcseconds).toRight(s"Invalid RA delta: $sRaRate"),
+          sDecRate.parseBigDecimalOption.map(Angle.fromBigDecimalArcseconds).toRight(s"Invalid Dec delta: $sDecRate"),
           sAirmass.parseDoubleOrNA("airmass")(AirMass.from(_).toOption),
           sExtinction.parseBigDecimalOrNA("extinction")(Extinction.FromVegaMagnitude.getOption),
           sVMag.parseDoubleOrNA("visual magnitude")(_.some),
           sSB.parseDoubleOrNA("surface brightness")(_.some)
-        ).tupled.map: (inst, ra, dec, dRa, dDec, airmass, extinction, vmag, sb) =>
+        ).mapN: (inst, ra, dec, dRa, dDec, airmass, extinction, vmag, sb) =>
           Ephemeris.Horizons.Element(
             inst,
             Coordinates(ra, dec),
@@ -105,14 +105,14 @@ object HorizonsParser:
   // headers are found, then parse the remaining lines (until a blank line is encountered) using
   // the function constructed by `f`, if any (otherwise it is assumed that there were not enough
   // columns found). Returns a list of values or an error message.
-  private def parseMany[A](header: String, tail: List[String], headerPattern: Regex)(f: Offsets => Option[String => A] ): Either[String, List[A]] =
+  private def parseMany[A](header: String, tail: List[String], headerPattern: Regex)(f: PartialFunction[Offsets, String => A]): Either[String, List[A]] =
     (headerPattern.findFirstMatchIn(header).toRight("Header pattern not found: " + headerPattern)) *>
     (tail.dropWhile(s => !s.trim.startsWith("---")) match {
       case Nil                => Nil.asRight // no column headers means no results!
       case colHeaders :: rows =>           // we have a header row with data rows following
         val offsets = "-+".r.findAllMatchIn(colHeaders).map(m => (m.start, m.end)).toList
         try
-          f(offsets).map(g => rows.takeWhile(_.trim.nonEmpty).map(g)).toRight("Not enough columns.")
+          f.lift(offsets).map(g => rows.takeWhile(_.trim.nonEmpty).map(g)).toRight("Not enough columns.")
         catch
           case    nfe: NumberFormatException           =>  ("Number format exception: " + nfe.getMessage).asLeft
           case sioobe: StringIndexOutOfBoundsException =>   "Column value(s) not found.".asLeft
@@ -135,12 +135,11 @@ object HorizonsParser:
 
           // Common case is that we have many results, or none.
           lazy val case0 =
-            parseMany[Row[Ephemeris.Key.Comet]](header, tail, """  +Small-body Index Search Results  """.r): os =>
-              (os.lift(2), os.lift(3)).tupled.map:
-                case ((ods, ode), (ons, one)) => row =>
-                  val desig = row.substring(ods, ode).trim
-                  val name  = row.substring(ons     ).trim // last column, so no end index because rows are ragged
-                  Row(Ephemeris.Key.Comet(desig), name)
+            parseMany[Row[Ephemeris.Key.Comet]](header, tail, """  +Small-body Index Search Results  """.r):
+              case _ :: _ :: (ods, ode) :: (ons, _) :: _ => row =>
+                val desig = row.substring(ods, ode).trim
+                val name  = row.substring(ons     ).trim // last column, so no end index because rows are ragged
+                Row(Ephemeris.Key.Comet(desig), name)
 
           // Single result with form: JPL/HORIZONS      Hubble (C/1937 P1)     2015-Dec-31 11:40:21
           lazy val case1 =
@@ -167,15 +166,14 @@ object HorizonsParser:
 
           // Common case is that we have many results, or none.
           lazy val case0 =
-            parseMany[Row[Ephemeris.Key.Asteroid]](header, tail, """  +Small-body Index Search Results  """.r): os =>
-              (os.lift(0), os.lift(1), os.lift(2)).tupled.map:
-                case ((ors, ore), (ods, ode), (ons, one)) => row =>
-                  val rec   = row.substring(ors, ore).trim.toInt
-                  val desig = row.substring(ods, ode).trim
-                  val name  = row.substring(ons     ).trim // last column, so no end index because rows are ragged
-                  desig match
-                    case "(undefined)" => Row(Ephemeris.Key.AsteroidOld(rec): Ephemeris.Key.Asteroid, name)
-                    case des           => Row(Ephemeris.Key.AsteroidNew(des): Ephemeris.Key.Asteroid, name)
+            parseMany[Row[Ephemeris.Key.Asteroid]](header, tail, """  +Small-body Index Search Results  """.r):
+              case (ors, ore) :: (ods, ode) :: (ons, _) :: _ => row =>
+                val rec   = row.substring(ors, ore).trim.toInt
+                val desig = row.substring(ods, ode).trim
+                val name  = row.substring(ons     ).trim // last column, so no end index because rows are ragged
+                desig match
+                  case "(undefined)" => Row(Ephemeris.Key.AsteroidOld(rec): Ephemeris.Key.Asteroid, name)
+                  case des           => Row(Ephemeris.Key.AsteroidNew(des): Ephemeris.Key.Asteroid, name)
 
           // Single result with form: JPL/HORIZONS      90377 Sedna (2003 VB12)     2015-Dec-31 11:40:21
           lazy val case1 =
@@ -239,12 +237,11 @@ object HorizonsParser:
           // Common case is that we have many results, or none.
           lazy val case0 =
             this
-              .parseMany[Row[Ephemeris.Key.MajorBody]](header, tail, """Multiple major-bodies match string""".r): os =>
-                (os.lift(0), os.lift(1)).tupled.map:
-                  case ((ors, ore), (ons, one)) => row =>
-                    val rec  = row.substring(ors, ore).trim.toInt
-                    val name = row.substring(ons, one).trim
-                    Row(Ephemeris.Key.MajorBody(rec.toInt), name)
+              .parseMany[Row[Ephemeris.Key.MajorBody]](header, tail, """Multiple major-bodies match string""".r):
+                case (ors, ore) :: (ons, one) :: _ => row =>
+                  val rec  = row.substring(ors, ore).trim.toInt
+                  val name = row.substring(ons, one).trim
+                  Row(Ephemeris.Key.MajorBody(rec), name)
               .map(_.filterNot(_.a.num < 0)) // filter out spacecraft
 
           // Single result with form:  Revised: Aug 11, 2015       Charon / (Pluto)     901
