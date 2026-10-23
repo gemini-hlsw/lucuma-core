@@ -13,7 +13,7 @@ import io.circe.syntax.*
 import lucuma.catalog.telluric.codecs.given
 import lucuma.core.enums.CatalogName
 import lucuma.core.enums.StellarLibrarySpectrum
-import lucuma.core.enums.TelluricCalibrationOrder
+import lucuma.core.enums.TelluricSlot
 import lucuma.core.math.Coordinates
 import lucuma.core.math.Declination
 import lucuma.core.math.Epoch
@@ -36,7 +36,7 @@ case class TelluricStar(
   distance:    Double,
   hmag:        Double,
   score:       Double,
-  order:       TelluricCalibrationOrder,
+  slot:        TelluricSlot,
   sed:         Option[UnnormalizedSED]
 ):
   val simbadName: NonEmptyString = NonEmptyString.unsafeFrom(id)
@@ -79,7 +79,7 @@ object TelluricStar:
       distance <- c.downField("Distance").as[Double]
       hmag     <- c.downField("Hmag").as[Double]
       score    <- c.downField("Score").as[Double]
-      order    <- c.downField("Order").as[TelluricCalibrationOrder]
+      slot     <- c.downField("Order").as[TelluricSlot]
       sed       = c.downField("SED").as[String].toOption.flatMap(decodeSed)
       dec      <- Declination
                     .fromDoubleDegrees(decDeg)
@@ -88,7 +88,7 @@ object TelluricStar:
                     )
       ra        = RightAscension.fromDoubleDegrees(raDeg)
       coords    = Coordinates(ra, dec)
-    } yield TelluricStar(id, spType, coords, distance, hmag, score, order, sed)
+    } yield TelluricStar(id, spType, coords, distance, hmag, score, slot, sed)
 
   given Encoder[TelluricStar] = star =>
     Json.obj(
@@ -99,6 +99,6 @@ object TelluricStar:
       "distance" -> Json.fromDoubleOrNull(star.distance),
       "hmag"     -> Json.fromDoubleOrNull(star.hmag),
       "score"    -> Json.fromDoubleOrNull(star.score),
-      "order"    -> star.order.asJson,
+      "order"    -> star.slot.asJson,
       "sed"      -> star.sed.flatMap(encodeSed).asJson
     )

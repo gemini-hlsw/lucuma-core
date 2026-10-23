@@ -5,12 +5,12 @@ package lucuma.core.enums
 
 import lucuma.core.util.Enumerated
 
-enum TelluricCalibrationOrder(val tag: String) derives Enumerated:
-  case Before extends TelluricCalibrationOrder("before")
-  case After  extends TelluricCalibrationOrder("after")
+enum TelluricSlot(val tag: String) derives Enumerated:
+  case Before extends TelluricSlot("before")
+  case After  extends TelluricSlot("after")
 
-object TelluricCalibrationOrder:
-  def fromString(s: String): Option[TelluricCalibrationOrder] =
+object TelluricSlot:
+  def fromString(s: String): Option[TelluricSlot] =
     s.toLowerCase match
       case "before" => Some(Before)
       case "after"  => Some(After)
