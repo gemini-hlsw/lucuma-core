@@ -19,7 +19,8 @@ case class Flamingos2DynamicConfig(
   fpu:         Flamingos2FpuMask,
   decker:      Flamingos2Decker,
   readoutMode: Flamingos2ReadoutMode,
-  reads:       Flamingos2Reads
+  reads:       Flamingos2Reads,
+  windowCover: Option[Flamingos2WindowCover] = None
 ):
   val isImaging: Boolean  = fpu.isImaging
   val isMOS: Boolean      = fpu.isMOS
@@ -30,7 +31,7 @@ case class Flamingos2DynamicConfig(
 
 object Flamingos2DynamicConfig:
   given Eq[Flamingos2DynamicConfig] =
-    Eq.by(x => (x.exposure, x.disperser, x.filter, x.readMode, x.lyotWheel, x.fpu, x.decker, x.readoutMode, x.reads))
+    Eq.by(x => (x.exposure, x.disperser, x.filter, x.readMode, x.lyotWheel, x.fpu, x.decker, x.readoutMode, x.reads, x.windowCover))
 
   /** @group Optics */
   val exposure: Lens[Flamingos2DynamicConfig, TimeSpan] =
@@ -67,3 +68,7 @@ object Flamingos2DynamicConfig:
   /** @group Optics */
   val reads: Lens[Flamingos2DynamicConfig, Flamingos2Reads] =
     Focus[Flamingos2DynamicConfig](_.reads)
+
+  /** @group Optics */
+  val windowCover: Lens[Flamingos2DynamicConfig, Option[Flamingos2WindowCover]] =
+    Focus[Flamingos2DynamicConfig](_.windowCover)
