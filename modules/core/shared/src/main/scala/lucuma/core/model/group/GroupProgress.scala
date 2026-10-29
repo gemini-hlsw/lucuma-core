@@ -27,8 +27,9 @@ object GroupProgress:
 
   /**
    * The group has nothing to observe: no elements, or only inactive
-   * observations and empty subgroups.  It requires nothing, and its parent
-   * group leaves it out.
+   * observations, observations declared complete without ever having been
+   * observed, and empty subgroups.  It requires nothing, and its parent group
+   * leaves it out.
    */
   case object Empty extends GroupProgress:
     override def status: GroupStatus = GroupStatus.Empty
@@ -41,7 +42,10 @@ object GroupProgress:
 
   /**
    * Execution has started, and fewer elements are complete than the group
-   * requires (with enough, it would be complete or unschedulable).
+   * requires (with enough, it would be complete or unschedulable).  The
+   * exception is a group with a minimum number of observations per night:
+   * having enough, it stays ongoing while the night in progress is short of
+   * that minimum and may still take an extra observation.
    *
    * `nextWindow` is set when the group's constraints restrict when the next
    * element may be observed, given the completions so far.  Its `start` is
