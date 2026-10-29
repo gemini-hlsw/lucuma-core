@@ -27,7 +27,8 @@ import edu.gemini.tac.qengine.log.RejectTarget
 import edu.gemini.tac.qengine.log.RejectConditions
 import edu.gemini.tac.qengine.log.RejectOverAllocation
 import edu.gemini.tac.qengine.log.RemovedRejectMessage
-import edu.gemini.tac.qengine.log.RejectMessage
+import edu.gemini.tac.qengine.impl.RejectPartial
+import edu.gemini.tac.qengine.log.AcceptMessage
 
 object Queue {
 
@@ -59,7 +60,8 @@ object Queue {
 
           // println(separator)
 
-          Enumerated[ScienceBand].all.foreach { qb =>
+          // Enumerated[ScienceBand].all.foreach { qb =>
+          List(ScienceBand.Band1).foreach { qb =>
 
             println(s"${Colors.BOLD}The following proposals were accepted for time in Band ${qb.intValue}.${Colors.RESET}")
             println(qb.intValue match {
@@ -69,8 +71,14 @@ object Queue {
               case 4 => Colors.RED
             })
 
+            // val pq = queueCalc.queues(site)(qb)
+            // println("remaining time\n")
+            // Enumerated[TimeAccountingCategory].all.foreach: cat =>
+            //   println(f"   $cat - ${pq.queueTime(cat).toHours}%3.2f")
+            // println()
+
             queueCalc.queues(site)(qb).toList.sortBy(_.parentProposal.ranking.value).foreach: p =>
-              println(f"${p.parentProposal.ranking}%5.1f ${p.reference}%-30s ${p.parentProposal.piName}%-20s ${p.allocation.duration.toHours}%3.1f/${p.observations.foldMap(_.time).toHours}%3.1f h (${p.allocation.category}) ${p.parentProposal.programReference.label}")
+              println(f"${p.parentProposal.ranking}%5.1f ${p.reference}%-30s ${p.parentProposal.piName}%-20s ${p.allocation.duration.toHours}%4.1f of ${p.observations.foldMap(_.time).toHours}%4.1f h (${p.allocation.category}) ${p.parentProposal.programReference.label}")
 
             // result.entries(qb).sortBy(_.proposals.head.ntac.ranking.num.orEmpty).foreach { case QueueResult.Entry(ps, pid) =>
             //   val ss = ps.map { p =>
@@ -128,13 +136,15 @@ object Queue {
                 if shard.allocation.duration.nonZero then
                   val sid = shard.reference
                   queueCalc.proposalLog.get(sid, qb) foreach {
-                    case m: RejectTimeAccountingCategoryOverAllocation => println(f"${p.ranking.value}%5.1f ${sid}%-20s ${p.piName}%-15s ${"Time accounting category full:"}%-20s ${m.detail}")
-                    case m: RejectCategoryOverAllocation => println(f"${p.ranking.value}%5.1f ${sid}%-20s ${p.piName}%-15s ${"Category overallocated:"}%-20s ${m.detail}")
-                    case m: RejectTarget                => println(f"${p.ranking.value}%5.1f ${sid}%-20s ${p.piName}%-15s ${m.raDecType.toString + " bin full:"}%-20s ${m.detail}}")
-                    case m: RejectConditions            => println(f"${p.ranking.value}%5.1f ${sid}%-20s ${p.piName}%-15s ${"Conditions bin full:"}%-20s ${m.detail}}")
-                    case m: RejectOverAllocation        => println(f"${p.ranking.value}%5.1f ${sid}%-20s ${p.piName}%-15s ${"Overallocation"}%-20s ${m.detail}")
-                    case m: RemovedRejectMessage        => println(f"${p.ranking.value}%5.1f ${sid}%-20s ${p.piName}%-15s ${"Removed"}%-20s ${m.detail}")
-                    case lm: RejectMessage              => println(f"${p.ranking.value}%5.1f ${sid}%-20s ${p.piName}%-15s ${"Miscellaneous"}%-20s ${lm.detail}")
+                    case m: AcceptMessage => () // do nothing
+                    case m: RejectTimeAccountingCategoryOverAllocation => println(f"${p.ranking.value}%5.1f ${sid}%-20s ${p.piName}%-15s ${"Category Full"}%-20s ${m.detail}")
+                    case m: RejectCategoryOverAllocation               => println(f"${p.ranking.value}%5.1f ${sid}%-20s ${p.piName}%-15s ${"Category overallocated:"}%-20s ${m.detail}")
+                    case m: RejectTarget                               => println(f"${p.ranking.value}%5.1f ${sid}%-20s ${p.piName}%-15s ${m.raDecType.toString + " bin full:"}%-20s ${m.detail}}")
+                    case m: RejectConditions                           => println(f"${p.ranking.value}%5.1f ${sid}%-20s ${p.piName}%-15s ${"Conditions bin full:"}%-20s ${m.detail}}")
+                    case m: RejectOverAllocation                       => println(f"${p.ranking.value}%5.1f ${sid}%-20s ${p.piName}%-15s ${"Overallocation"}%-20s ${m.detail}")
+                    case m: RemovedRejectMessage                       => println(f"${p.ranking.value}%5.1f ${sid}%-20s ${p.piName}%-15s ${"Removed"}%-20s ${m.detail}")
+                    case m: RejectPartial                              => println(f"${p.ranking.value}%5.1f ${sid}%-20s ${p.piName}%-15s ${"Partial"}%-20s ${m.detail}")
+                    case lm                                            => println(f"${p.ranking.value}%5.1f ${sid}%-20s ${p.piName}%-15s ${"Miscellaneous"}%-20s ${lm.getClass().getSimpleName()}")
                   }
             }
             println()

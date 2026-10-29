@@ -30,6 +30,7 @@ import edu.gemini.tac.qengine.p1.ProposalShard
 import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.model.ProposalReference
 import cats.data.NonEmptyList
+import edu.gemini.tac.qengine.p1.GroupTree
 
 /** Interface for some Workspace operations. */
 trait Workspace[F[_]] {
@@ -217,15 +218,24 @@ object Workspace {
         //     m <- BulkEditFile.read(f)
         //   } yield m
 
+        private def merge(a: Proposal, b: Proposal): Proposal =
+          val allocs = a.allocations.concatNel(b.allocations)
+          // println(s"${a.piName} - same obs? ${a.originalObsList == b.originalObsList}, allocs == $allocs")
+          val groups =
+            if a.originalObsList == b.originalObsList
+            then a.groupTree
+            else GroupTree.fromList(a.originalObsList ++ b.originalObsList)
+          a.copy(allocations = allocs, groupTree = groups)
+
         private def merge(p: Proposal, ps: NonEmptyList[Proposal]): Proposal =
-          p.copy(allocations = (p.allocations.concatNel(ps.map(_.allocations).reduce)))
+          ps.foldLeft(p)(merge)
 
         private def mergeSplits(ps: List[Proposal]): List[Proposal] = 
           def go(toExamine: List[Proposal], accum: List[Proposal]): List[Proposal] =
             toExamine match
               case Nil => accum
               case curr :: rest =>
-                rest.partition(_.piName === curr.piName) match
+                rest.partition(p => p.piName === curr.piName) match
                   case (matched, unmatched) =>
                     NonEmptyList.fromList(matched) match
                       case None => go(unmatched, curr :: accum)
