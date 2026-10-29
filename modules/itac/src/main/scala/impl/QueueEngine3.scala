@@ -26,10 +26,8 @@ import lucuma.core.util.Enumerated
 import edu.gemini.tac.qengine.api.BucketsAllocation
 import cats.data.NonEmptyList
 import lucuma.core.model.ProposalReference
-import edu.gemini.tac.qengine.log.AcceptMessage
-import edu.gemini.tac.qengine.log.ProposalLog.Key
-import edu.gemini.tac.qengine.log.RejectToo
 import edu.gemini.tac.qengine.log.RejectMessage
+import edu.gemini.tac.qengine.log.ProposalLog.Entry
 
 object QueueEngine3:
 
@@ -94,14 +92,31 @@ case class QueueEngine3(
 
     def go(candidates: List[Proposal], currentLog: ProposalLog): QueueCalc = {
 
+      // println("---- calc.go: currentLog =")
+      // currentLog.toList.foreach: 
+      //   case ProposalLog.Entry(key, m: RejectMessage) =>
+      //     println(s"  ${key.id} - ${m.prop.parentProposal.piName} - ${m.detail}")
+      //   case e => ()
+      // println()
+
       val ((remaining, log), queues) = tryCalc(candidates, currentLog)
-  
+
+      // println("---- calc.go: next log =")
+      // log.toList.foreach: 
+      //   case ProposalLog.Entry(key, m: RejectMessage) =>
+      //     println(s"  ${key.id} - ${m.prop.parentProposal.piName} - ${m.detail}")
+      //   case e => ()
+      // println()
+
       // Look at the reject list. If there are any rejected shards that have associated *accepted* shards 
       // then we need to remove the accepted ones and re-run the queue.
 
-      val allShards: List[ProposalShard] = candidates.flatMap(_.shards)
+      val allShards: List[ProposalShard] = candidates.flatMap(_.shards).filterNot(_.isEmpty)
       val allAcceptedShards: List[ProposalShard] = queues.flatMap(_.toList)
-      val allRejectedShards: List[ProposalShard] = allShards.filterNot(allAcceptedShards.contains)
+      val allRejectedShards: List[ProposalShard] = allShards.filterNot(s => allAcceptedShards.exists(_.reference === s.reference))
+
+      allRejectedShards.foreach: s =>
+        println(s"rejected or not considered: ${s.parentProposal.piName} - ${s.reference}")
 
       val mustAlsoReject: Option[NonEmptyList[ProposalShard]] =
         NonEmptyList.fromList:
@@ -122,29 +137,36 @@ case class QueueEngine3(
         case Some(nel) =>
 
           // Kick out the lowest-ranked proposale that has a rejected shard, then try again
-          val toKickOut: ProposalReference = 
-            nel.sortBy(_.parentProposal.ranking.value).last.parentProposal.reference
+          val toKickOut: Proposal = 
+            nel.sortBy(_.parentProposal.ranking.value).last.parentProposal
 
           val shardsToKickOut: List[ProposalShard] =
-            nel.filter(_.parentProposal.reference === toKickOut)
+            nel.filter(_.parentProposal.reference === toKickOut.reference)
+
+          val previousPartialRejects: Set[ProposalReference] =
+            log
+              .toList
+              .collect: 
+                case ProposalLog.Entry(_, RejectPartial(prop)) => prop.parentProposal.reference
+              .toSet
+              
+          val allPartialRejects = previousPartialRejects + toKickOut.reference
 
           val relevantLogEntriesToPreserve = 
             ProposalLog:
               log
                 .toList
                 .filter:
-                  case ProposalLog.Entry(_, AcceptMessage(_)) => false
-                  case ProposalLog.Entry(Key(toKickOut, _), _) => true                              
+                  // case ProposalLog.Entry(_, AcceptMessage(_)) => false
+                  case ProposalLog.Entry(k, _) if allPartialRejects(k.id.parentReference) => true       
+                  case _ => false                       
 
           val newLog =
             shardsToKickOut.foldLeft(relevantLogEntriesToPreserve): (log, shard) =>
-              log.updated(shard.reference, shard.allocation.scienceBand, new RejectMessage {
-                val prop = shard
-                val detail: String = "Sibling shard was rejected."
-                val reason: String = s"Shard was rejected because another shard (${toKickOut}) in the same proposal was rejected."
-              })
+              log.updated(shard.reference, shard.allocation.scienceBand, RejectPartial(shard))
 
-          go(candidates.filterNot(_.reference === toKickOut), newLog)
+          println(s"${toKickOut.reference.label} (${toKickOut.piName}) was partially accepted and partially rejected. Re-running without it...")
+          go(candidates.filterNot(_.reference === toKickOut.reference), newLog)
 
     }
 
@@ -210,3 +232,6 @@ case class QueueEngine3(
 
 }
 
+case class RejectPartial(prop: ProposalShard) extends RejectMessage:
+  val detail: String = "Another shard in this proposal was rejected."
+  val reason: String = reason

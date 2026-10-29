@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2025 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2026 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package itac
@@ -15,7 +15,6 @@ import edu.gemini.tac.qengine.impl.QueueEngine3 as QueueEngine
 import itac.operation.Init
 import itac.operation.Queue
 import lucuma.core.data.PerSite
-import lucuma.core.enums.Site
 import lucuma.core.model.Semester
 import org.typelevel.log4cats.Logger
 import org.typelevel.log4cats.slf4j.Slf4jLogger

@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2025 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2026 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package client.operation
@@ -22,6 +22,10 @@ object Info:
           Sync[F].blocking:
             println()
             println(f"${p.reference.label} (${p.piName}) - ${p.tpe.scienceSubtype} Proposal ${Some(ss.length).filter(_ > 1).foldMap(n => s"with $n shards")} - Ranking ${p.ranking.value}%2.1f")  
+            println()
+            println("  Allocations:")
+            p.allocations.toList.foreach: a =>
+              println(f"    ${a.category} ${a.scienceBand} ${a.duration.toHours}%3.2f")
             ss.zipWithIndex.foreach: (s, n) =>
               println()
               println(f"  ${Option.when(ss.length > 1)(s"Shard ${n+1} at ").orEmpty}${s.site}, ${s.allocation.duration.toHours}%2.2f h available, awarded by ${s.allocation.category.description}")

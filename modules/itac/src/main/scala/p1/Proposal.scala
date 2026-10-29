@@ -39,10 +39,11 @@ case class Proposal(
   ranking: PosDouble = PosDouble.MaxValue // defaulted to avoid having to change all the tests
 ) {
 
-  val obsList: List[ItacObservation] =
+  /** All observations, scaled only for group membership (not for allocations). */
+  val originalObsList: List[ItacObservation] =
     groupTree.flattenAndScale
 
-  def scienceSubtype: ScienceSubtype =
+  private def scienceSubtype: ScienceSubtype =
     tpe match
       case ProposalType.Classical(_, _)            => ScienceSubtype.Classical
       case ProposalType.DemoScience(_, _)          => ScienceSubtype.DemoScience
@@ -53,8 +54,8 @@ case class Proposal(
       case ProposalType.Queue(_, _, _)             => ScienceSubtype.Queue
       case ProposalType.SystemVerification(_, _)   => ScienceSubtype.SystemVerification
 
-  def observatory: Observatory =
-    obsList.map(_.mode.observatory).distinct match
+  private def observatory: Observatory =
+    originalObsList.map(_.mode.observatory).distinct match
       case a :: Nil => a
       case other => sys.error(s"Unpossible: proproposal $reference doesn't have exactly one observatory: ${other.mkString("[", ", ", "]")}")
 
@@ -64,26 +65,32 @@ case class Proposal(
       case Observatory.Keck   => ProgramReference.Keck(reference)
       case Observatory.Subaru => ProgramReference.Subaru(reference, ???)
     
-  /** 
-   * The possibly empty allocation for the specified category and band. There should never be more than
-   * one of these but we handle this case and combine the result.
-   */
-  private def allocationFor(category: TimeAccountingCategory, band: ScienceBand): Allocation =
-    Allocation(
-      category,
-      band,
-      allocations
-        .collectFold: 
-          case Allocation(`category`, `band`, duration) => duration
-    )
- 
-  def shardFor(site: Site, category: TimeAccountingCategory, band: ScienceBand): ProposalShard =
-    ProposalShard(
-      this,
-      site,
-      allocationFor(category, band)
-    )
+  ///
+  /// SHARDS
+  ///
+
+  // In order to compute a shard, we need to take site affinity into account.
+  //
+  // Strategy 1:
+  // - Scale all observations based on total recommended time, without taking site affinity into account.
+  //   Call this the working set.
+  // - Create the shards for single-site time accounting categories, assigning all time to those sites,
+  //   subtracting that time evenly from corresponding site-affiliated observations in the working set.
+  // - Create shards for dual-site time accounting categories, dividing the time evenly across the working
+  //   set, which should be empty when we're done.
   
+  val shardFor = Chopper(cfpActive).shards(this)(using Metadata.placeholder)
+
+  // def shardFor(site: Site, category: TimeAccountingCategory, band: ScienceBand): ProposalShard =
+    // val alloc = 
+    //   if category.sites.contains(site) then allocationFor(category, band)
+    //   else Allocation(category, band, TimeSpan.Zero)
+    // ProposalShard(
+    //   this,
+    //   site,
+    //   alloc
+    // )
+
   def shards: List[ProposalShard] =
     (Enumerated[Site].all, Enumerated[TimeAccountingCategory].all, Enumerated[ScienceBand].all)
       .mapN(shardFor(_, _, _))
@@ -96,9 +103,22 @@ case class Proposal(
   /// ALLOCATIONS
   ///
 
-  /** Allocations awarded in the specified accounting category. */
-  private def allocationsForTimeAccountingCategory(category: TimeAccountingCategory): List[Allocation] =
-    allocations.filter(_.category === category)
+  /** 
+   * The possibly empty allocation for the specified category and band. There should never be more than
+   * one of these but we handle this case and combine the result.
+   */
+  // private def allocationFor(category: TimeAccountingCategory, band: ScienceBand): Allocation =
+  //   Allocation(
+  //     category,
+  //     band,
+  //     allocations
+  //       .collectFold: 
+  //         case Allocation(`category`, `band`, duration) => duration
+  //   )
+ 
+  // /** Allocations awarded in the specified accounting category. */
+  // private def allocationsForTimeAccountingCategory(category: TimeAccountingCategory): List[Allocation] =
+  //   allocations.filter(_.category === category)
 
   /** Allocations that can be used at the specified site, filtered for the given band. */
   private def allocationsForSiteAndBand(site: Site, band: ScienceBand): List[Allocation] =
@@ -112,11 +132,11 @@ case class Proposal(
   /// ALLOCATED TIME
   ///
 
-  def allocatedTime: TimeSpan =
-    allocations.foldMap(_.duration)
+  // private def allocatedTime: TimeSpan =
+  //   allocations.foldMap(_.duration)
 
-  def allocatedTimeForTimeAccountingCategory(category: TimeAccountingCategory): TimeSpan =
-    allocationsForTimeAccountingCategory(category).foldMap(_.duration)
+  // private def allocatedTimeForTimeAccountingCategory(category: TimeAccountingCategory): TimeSpan =
+  //   allocationsForTimeAccountingCategory(category).foldMap(_.duration)
 
   ///
   /// USABLE TIME
@@ -131,14 +151,14 @@ case class Proposal(
   ///
 
   private def itacObservations: List[ItacObservation] =
-    obsList
+    originalObsList
 
   /** 
    * The subset of observations observable at the specified site, in the specified band, with
    * their times scaled proportionally based on allocated time in the specified time/band.
    */
   def itacObservationsScaledForSiteAndBand(site: Site, band: ScienceBand)(using Metadata): List[ItacObservation.Scaled] =
-    val f = scaleFactorForSiteAndBand(site, band)
+    val f = scaleFactorForSiteAndBand(site, band) 
     if f == 0 then Nil else
       itacObservationsForSiteAndBand(site, band).map: o =>
         ItacObservation.Scaled(o.copy(time = o.time *| f))
@@ -151,7 +171,8 @@ case class Proposal(
   private def scaleFactorForSiteAndBand(site: Site, band: ScienceBand)(using Metadata): BigDecimal =
     val estimated = estimatedTimeForSiteAndBand(site, band).toHours
     val awarded   = usableTimeForSiteAndBand(site, band).toHours 
-    if estimated > 0 then awarded / estimated else 0
+    // if estimated > 0 then awarded / estimated else 0
+    if estimated > 0 then (awarded / estimated) min 1.0 else 0
 
   /** Subset of observations observable at the specified site, in the specified band. */    
   private def itacObservationsForSiteAndBand(site: Site, band: ScienceBand)(using Metadata): List[ItacObservation] =
@@ -166,7 +187,7 @@ case class Proposal(
         |   allocations:
         |     ${allocations.toList.mkString("\n     ")}
         |   observations (scaled):
-        |     ${obsList.mkString("\n     ")}
+        |     ${originalObsList.mkString("\n     ")}
         |""".stripMargin
 
 }
