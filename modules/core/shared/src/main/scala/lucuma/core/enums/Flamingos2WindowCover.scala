@@ -1,9 +1,9 @@
 // Copyright (c) 2016-2026 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package lucuma
-package core
-package enums
+package lucuma.core.enums
+
+import lucuma.core.util.Display
 import lucuma.core.util.Enumerated
 
 /**
@@ -14,7 +14,7 @@ enum Flamingos2WindowCover(
   val tag: String,
   val shortName: String,
   val longName: String
-) derives Enumerated:
+) derives Enumerated, Display:
 
   case Open  extends Flamingos2WindowCover("Open",  "Open",  "Open")
   case Close extends Flamingos2WindowCover("Close", "Close", "Close")
