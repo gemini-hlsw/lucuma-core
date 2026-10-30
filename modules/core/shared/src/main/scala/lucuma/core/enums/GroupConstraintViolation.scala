@@ -43,6 +43,24 @@ enum GroupConstraintViolation(val tag: String) derives Enumerated:
   case SameNightMultipleSites extends GroupConstraintViolation("same_night_multiple_sites")
 
   /**
+   * A night on which at least one counted observation completed ended with
+   * fewer than the group's minimum observations per night.
+   */
+  case ObservationsPerNightMinimum extends GroupConstraintViolation("observations_per_night_minimum")
+
+  /**
+   * More than the group's maximum observations per night completed on a
+   * single night.
+   */
+  case ObservationsPerNightMaximum extends GroupConstraintViolation("observations_per_night_maximum")
+
+  /**
+   * A group with observations-per-night limits has observations at more than
+   * one site, so its nights are ambiguous.
+   */
+  case ObservationsPerNightMultipleSites extends GroupConstraintViolation("observations_per_night_multiple_sites")
+
+  /**
    * Too few viable (not inactive) elements remain to reach the minimum.
    */
   case InsufficientElements  extends GroupConstraintViolation("insufficient_elements")
