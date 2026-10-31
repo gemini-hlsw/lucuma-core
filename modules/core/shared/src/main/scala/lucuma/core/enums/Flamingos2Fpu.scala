@@ -28,3 +28,10 @@ enum Flamingos2Fpu(
   case LongSlit4     extends Flamingos2Fpu("LongSlit_4",    "Long Slit 4px",   "4-Pixel Long Slit",    4.pixels, Flamingos2Decker.LongSlit)
   case LongSlit6     extends Flamingos2Fpu("LongSlit_6",    "Long Slit 6px",   "6-Pixel Long Slit",    6.pixels, Flamingos2Decker.LongSlit)
   case LongSlit8     extends Flamingos2Fpu("LongSlit_8",    "Long Slit 8px",   "8-Pixel Long Slit",    8.pixels, Flamingos2Decker.LongSlit)
+
+  def isPinhole: Boolean = this match
+    case Pinhole | SubPixPinhole => true
+    case _                       => false
+
+object Flamingos2Fpu:
+  val Pinholes: Set[Flamingos2Fpu] = values.filter(_.isPinhole).toSet
