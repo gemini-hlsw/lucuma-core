@@ -3,16 +3,17 @@
 
 package lucuma.core.enums
 
+import lucuma.core.util.Display
 import lucuma.core.util.Enumerated
 
 /**
  * Enumerated type for dataset QA state.
  * @group Enumerations
  */
-enum DatasetQaState(val tag: String) derives Enumerated:
-  def shortName: String = tag
-  def longName: String = tag
+enum DatasetQaState(val tag: String, val name: String) derives Enumerated, Display:
+  def shortName: String = name
+  def longName: String = name
 
-  /** @group Constructors */ case Pass   extends DatasetQaState("Pass")
-  /** @group Constructors */ case Usable extends DatasetQaState("Usable")
-  /** @group Constructors */ case Fail   extends DatasetQaState("Fail")
+  /** @group Constructors */ case Pass   extends DatasetQaState("pass",   "Pass")
+  /** @group Constructors */ case Usable extends DatasetQaState("usable", "Usable")
+  /** @group Constructors */ case Fail   extends DatasetQaState("fail",   "Fail")
