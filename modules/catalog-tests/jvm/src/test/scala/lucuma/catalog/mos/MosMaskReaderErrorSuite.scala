@@ -9,6 +9,7 @@ import fs2.*
 import lucuma.catalog.fits.Fits
 import lucuma.catalog.fits.FitsProblem
 import lucuma.core.enums.MosSlitPriority
+import lucuma.core.math.Coordinates
 import munit.CatsEffectSuite
 
 import java.nio.file.Files as JFiles
@@ -170,6 +171,32 @@ class MosMaskReaderErrorSuite extends CatsEffectSuite:
     failsWith(stream(bs).through(MosMaskReader.header[IO])):
       case MosMaskProblem.MissingKeyword("PIXSCALE") => true
       case _                                         => false
+
+  test("a sexagesimal pointing centre is accepted"):
+    // GMMPS writes RA_IMAG and DEC_IMAG as quoted sexagesimal strings in some versions.
+    val bs = patch(
+      patch(golden, "RA_IMAG =            359.77940", "RA_IMAG = '23:59:07.056'      "),
+      "DEC_IMAG=            -55.47128",
+      "DEC_IMAG= '-55:28:16.61'      "
+    )
+    stream(bs)
+      .through(MosMaskReader.header[IO])
+      .compile
+      .lastOrError
+      .map: h =>
+        assertEquals(h.pointing, Coordinates.fromHmsDms.unsafeGet("23:59:07.056 -55:28:16.61"))
+
+  test("a missing pointing centre is reported as missing"):
+    val bs = patch(golden, "RA_IMAG =", "RA_IMAX =")
+    failsWith(stream(bs).through(MosMaskReader.header[IO])):
+      case MosMaskProblem.MissingKeyword("RA_IMAG") => true
+      case _                                        => false
+
+  test("an unparsable pointing centre is reported as invalid, not missing"):
+    val bs = patch(golden, "RA_IMAG =            359.77940", "RA_IMAG = 'twenty-four hours' ")
+    failsWith(stream(bs).through(MosMaskReader.header[IO])):
+      case MosMaskProblem.InvalidKeyword("RA_IMAG", "twenty-four hours") => true
+      case _                                                             => false
 
   test("an unrecognised instrument is rejected"):
     val bs = patch(golden, "INSTRUME= 'GMOS-S  '", "INSTRUME= 'GMOS-Q  '")
