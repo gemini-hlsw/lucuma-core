@@ -72,6 +72,22 @@ class MosMaskReaderSuite extends CatsEffectSuite:
                      BigDecimal(0.6667).withUnit[NanometersPerPixel].some
         )
 
+  test("sexagesimal pointing centres decode (sc-11209)"):
+    // GMMPS writes RA_IMAG and DEC_IMAG as quoted sexagesimal strings in some versions. Both of
+    // these files were rejected as missing the keyword before that form was accepted.
+    List(
+      "/GS2025BQ206-01_ODF.fits" -> (Instrument.Flamingos2, "02:17:56.500 -05:15:23.64"),
+      "/GS2026BQ321-01_ODF.fits" -> (Instrument.GmosSouth, "01:02:24.489 -21:55:51.95")
+    ).traverse_ { case (file, (instrument, pointing)) =>
+      bytes(file)
+        .through(MosMaskReader.header[IO])
+        .compile
+        .lastOrError
+        .map: h =>
+          assertEquals(h.instrument, instrument)
+          assertEquals(h.pointing, coordinates(pointing))
+    }
+
   test("GMOS-S design is microshuffling"):
     bytes("/ngc7796_ODF.fits")
       .through(MosMaskReader.header[IO])
