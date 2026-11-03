@@ -148,8 +148,19 @@ object Configuration:
       val GmosLongSlit       = gmos.scienceArea.longSlitFov(Angle.fromMicroarcseconds(2L)).eval.radius // width doesn't matter but should be > 1 µas
       val GmosImaging        = gmos.scienceArea.imaging.eval.radius
       val GmosMos            = gmos.scienceArea.imaging.eval.radius.bisect // We allow moving up to half of the imaging field
-      val GnirsImaging       = gnirs.scienceArea.roundImagingFov.eval.radius // the smallest GNIRS imaging field, and the only camera-independent one
+      val GnirsImagingRound  = gnirs.scienceArea.roundImagingFov.eval.radius // the smallest GNIRS imaging field, and camera-independent
       val Igrins2LongSlit    = igrins2.scienceArea.scienceSlitFOV.eval.radius
+
+      private val GnirsImagingKeyhole: Map[GnirsCamera, Angle] =
+        GnirsCamera.values.toList.fproduct(c => gnirs.scienceArea.keyholeImagingFov(c).eval.radius).toMap
+
+      // The field every one of the filters sees, so that a base moved anywhere within it stays
+      // on the detector whichever approved filter is used.  The Y, J and K MK filters see the
+      // small round field and the rest the camera-dependent keyhole, so the keyhole applies only
+      // when no MK filter is among them.  With no filters at all, the smallest: the round field.
+      def gnirsImaging(camera: GnirsCamera, filters: List[GnirsFilter]): Angle =
+        if filters.nonEmpty && !filters.exists(gnirs.scienceArea.isRoundImagingFilter) then GnirsImagingKeyhole(camera)
+        else GnirsImagingRound
 
       def gmosIfu(fieldWidth: Angle): Angle =
         gmos.scienceArea.ifuFov(fieldWidth).eval.radius
@@ -178,6 +189,6 @@ object Configuration:
     case class GmosSouthMos(grating: GmosSouthGrating) extends ObservingMode(ObservingModeType.GmosSouthMos, Radii.GmosMos)
     case class GnirsLongSlit(grating: GnirsGrating, camera: GnirsCamera, prism: GnirsPrism) extends ObservingMode(ObservingModeType.GnirsLongSlit, Radii.gnirsLongSlit(camera, prism))
     case class GnirsIfu(grating: GnirsGrating, fpu: GnirsFpuIfu) extends ObservingMode(ObservingModeType.GnirsIfu, Radii.gnirsIfu(fpu))
-    case class GnirsImaging(camera: GnirsCamera, filters: List[GnirsFilter]) extends ObservingMode(ObservingModeType.GnirsImaging, Radii.GnirsImaging)
+    case class GnirsImaging(camera: GnirsCamera, filters: List[GnirsFilter]) extends ObservingMode(ObservingModeType.GnirsImaging, Radii.gnirsImaging(camera, filters))
     case object Igrins2LongSlit extends ObservingMode(ObservingModeType.Igrins2LongSlit, Radii.Igrins2LongSlit)
     case class Visitor(mode: VisitorObservingModeType, override val radius: Angle) extends ObservingMode(mode, radius)

@@ -7,10 +7,13 @@ import cats.syntax.all.*
 import lucuma.core.enums.AltairMode
 import lucuma.core.enums.FacilityObservingModeType
 import lucuma.core.enums.GnirsCamera
+import lucuma.core.enums.GnirsFilter
 import lucuma.core.enums.GnirsPrism
 import lucuma.core.enums.ObservingModeType
 import lucuma.core.enums.SchedulingMode
 import lucuma.core.enums.VisitorObservingModeType
+import lucuma.core.geom.gnirs
+import lucuma.core.geom.jts.interpreter.given
 import lucuma.core.model.arb.ArbConfiguration.given
 import lucuma.core.util.arb.ArbEnumerated.given
 import munit.ScalaCheckSuite
@@ -82,14 +85,29 @@ final class ConfigurationSuite extends ScalaCheckSuite:
       val c = cfg.copy(observingMode = a)
       assert(c.subsumes(cfg.copy(observingMode = a.copy(filters = a.filters.drop(1)))))
 
-  // The approval radius is the round field the MK filters see, the smallest GNIRS imaging
-  // science area, so that a base moved anywhere within it stays on the detector whatever
-  // filter is used. The keyhole the other filters see is bounded below by the no-XD slit
-  // length, which is how the comparison below pins that the smaller field was chosen.
+  // The approval radius is the field every approved filter sees, so that a base moved anywhere
+  // within it stays on the detector whichever is used: the round field the MK filters see,
+  // the smallest GNIRS imaging science area, unless all filters see the camera's keyhole.
+  // The keyhole is bounded below by half the no-XD slit length.
   test("GNIRS Imaging radius is the round field, smaller than the keyhole"):
-    assertEqualsDouble(Radii.GnirsImaging.toSignedDoubleDegrees * 3600, 12.816, 0.001)
+    assertEqualsDouble(Radii.GnirsImagingRound.toSignedDoubleDegrees * 3600, 12.816, 0.001)
     forAll: (camera: GnirsCamera) =>
-      assert(Radii.GnirsImaging.toMicroarcseconds < Radii.gnirsLongSlit(camera, GnirsPrism.Mirror).toMicroarcseconds)
+      assert(Radii.GnirsImagingRound.toMicroarcseconds < Radii.gnirsLongSlit(camera, GnirsPrism.Mirror).toMicroarcseconds)
+
+  test("GNIRS Imaging radius is the keyhole only when no filter is an MK one"):
+    forAll: (a: GnirsImaging) =>
+      val round   = a.filters.isEmpty || a.filters.exists(gnirs.scienceArea.isRoundImagingFilter)
+      val keyhole = gnirs.scienceArea.keyholeImagingFov(a.camera).eval.radius
+      assertEquals(a.radius, if round then Radii.GnirsImagingRound else keyhole)
+      assert(keyhole.toMicroarcseconds >= Radii.gnirsLongSlit(a.camera, GnirsPrism.Mirror).toMicroarcseconds)
+
+  test("GNIRS Imaging radius depends on the camera"):
+    val keyholeOnly = List(GnirsFilter.Order3)
+    assertNotEquals(
+      GnirsImaging(GnirsCamera.ShortBlue, keyholeOnly).radius,
+      GnirsImaging(GnirsCamera.LongBlue, keyholeOnly).radius
+    )
+    assertEquals(GnirsImaging(GnirsCamera.LongBlue, GnirsFilter.J :: keyholeOnly).radius, Radii.GnirsImagingRound)
 
   test("GMOS North Imaging covers a subset of its filters, not an addition"):
     forAll: (cfg: Configuration, a: GmosNorthImaging, b: GmosNorthImaging) =>

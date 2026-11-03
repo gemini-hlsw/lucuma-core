@@ -74,12 +74,15 @@ trait GnirsScienceAreaGeometry:
     ShapeExpression.centeredRectangle(RoundFieldHeight, RoundFieldWidth) ∪
       cap(RoundCapWidth, RoundCapHeight, RoundFieldHeight)
 
+  // The keyhole every imaging filter other than the MK ones sees; its length depends on
+  // the camera.
+  def keyholeImagingFov(camera: GnirsCamera): ShapeExpression =
+    ShapeExpression.centeredRectangle(KeyholeBarHeight, slitLength(camera, GnirsPrism.Mirror)) ∪
+      cap(KeyholeCapWidth, KeyholeCapHeight, KeyholeBarHeight)
+
   private def imagingFov(camera: GnirsCamera, filter: GnirsFilter): ShapeExpression =
-    if isRoundImagingFilter(filter) then
-      roundImagingFov
-    else
-      ShapeExpression.centeredRectangle(KeyholeBarHeight, slitLength(camera, GnirsPrism.Mirror)) ∪
-        cap(KeyholeCapWidth, KeyholeCapHeight, KeyholeBarHeight)
+    if isRoundImagingFilter(filter) then roundImagingFov
+    else keyholeImagingFov(camera)
 
   // IFU science area: a rectangle of the IFU "slit width" by a fixed,
   // resolution-dependent height (derived from ocs InstGNIRS.getScienceArea).
