@@ -16,12 +16,12 @@ enum GnirsDecker(
   val shortName: String,
   val longName: String,
 ) derives Enumerated, Display:
-  case Acquisition extends GnirsDecker("Acquisition", "Acquisition", "Acquisition")
+  case Acquisition extends GnirsDecker("Acquisition", "Acq", "Acquisition")
   case PupilViewer extends GnirsDecker("PupilViewer", "Pupil", "Pupil viewer")
-  case ShortCamCrossDispersed extends GnirsDecker("ShortCamCrossDispersed", "Short camera XD", "Short camera cross dispersed")
-  case LongCamLongSlit extends GnirsDecker("LongCamLongSlit", "Long camera slit", "Long camera long slit")
-  case ShortCamLongSlit extends GnirsDecker("ShortCamLongSlit", "Short camera slit", "Short camera long slit")
-  case LongCamCrossDispersed extends GnirsDecker("LongCamCrossDispersed", "Long camera XD", "Long camera cross dispersed")
+  case ShortCamCrossDispersed extends GnirsDecker("ShortCamCrossDispersed", "SC XD", "Short camera cross dispersed")
+  case LongCamLongSlit extends GnirsDecker("LongCamLongSlit", "LC LS", "Long camera long slit")
+  case ShortCamLongSlit extends GnirsDecker("ShortCamLongSlit", "SC LS", "Short camera long slit")
+  case LongCamCrossDispersed extends GnirsDecker("LongCamCrossDispersed", "LC XD", "Long camera cross dispersed")
   case LowResolutionIfu extends GnirsDecker("LowResolutionIfu", "LR-IFU", "Low resolution IFU")
   case HighResolutionIfu extends GnirsDecker("HighResolutionIfu", "HR-IFU", "High resolution IFU")
 
