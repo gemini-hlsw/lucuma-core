@@ -83,23 +83,44 @@ object MosMaskHeaderDecoder:
         Instruments.get(s).toRight(MosMaskProblem.InvalidKeyword("INSTRUME", s))
 
   /**
-   * Pointing centre, in degrees.
+   * Pointing centre.
    *
    * `RA_IMAG` and `DEC_IMAG` were called `RA` and `DEC` in early versions of the format, so both
-   * spellings are accepted. Note that these are degrees, unlike the table's `RA` column, which is
-   * hours.
+   * spellings are accepted. Values are either decimal degrees or quoted sexagesimal strings; GMMPS
+   * writes both. Note that the degrees form differs from the table's `RA` column, which is hours.
    */
   private def decodePointing(h: FitsHeader): Either[MosMaskProblem, Coordinates] =
-    val ra  = h.double("RA_IMAG").orElse(h.double("RA"))
-    val dec = h.double("DEC_IMAG").orElse(h.double("DEC"))
-    (ra, dec) match
-      case (None, _)          => MosMaskProblem.MissingKeyword("RA_IMAG").asLeft
-      case (_, None)          => MosMaskProblem.MissingKeyword("DEC_IMAG").asLeft
-      case (Some(r), Some(d)) =>
-        Declination
-          .fromDoubleDegrees(d)
-          .toRight(MosMaskProblem.InvalidKeyword("DEC_IMAG", d.toString))
-          .map(dd => Coordinates(RightAscension.fromDoubleDegrees(r), dd))
+    def keyword(primary: String, alternate: String): Either[MosMaskProblem, (String, String)] =
+      h.raw(primary)
+        .tupleLeft(primary)
+        .orElse(h.raw(alternate).tupleLeft(alternate))
+        .toRight(MosMaskProblem.MissingKeyword(primary))
+
+    def parse[A](
+      key:     String,
+      raw:     String,
+      degrees: Double => Option[A],
+      hmsDms:  String => Option[A]
+    ): Either[MosMaskProblem, A] =
+      h.double(key)
+        .flatMap(degrees)
+        .orElse(hmsDms(FitsHeader.unquote(raw)))
+        .toRight(MosMaskProblem.InvalidKeyword(key, FitsHeader.unquote(raw)))
+
+    for
+      (raKey, raRaw)   <- keyword("RA_IMAG", "RA")
+      (decKey, decRaw) <- keyword("DEC_IMAG", "DEC")
+      ra               <- parse(raKey,
+                                raRaw,
+                                d => RightAscension.fromDoubleDegrees(d).some,
+                                RightAscension.lenientFromStringHMS.getOption
+                          )
+      dec              <- parse(decKey,
+                                decRaw,
+                                Declination.fromDoubleDegrees,
+                                Declination.lenientFromStringDMS.getOption
+                          )
+    yield Coordinates(ra, dec)
 
   /**
    * Nod & Shuffle configuration.
