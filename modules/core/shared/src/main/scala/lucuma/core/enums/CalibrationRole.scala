@@ -5,12 +5,12 @@ package lucuma.core.enums
 
 import lucuma.core.util.Enumerated
 
-enum CalibrationRole(val tag: String) derives Enumerated:
-  case Twilight           extends CalibrationRole("twilight")
-  case Photometric        extends CalibrationRole("photometric")
-  case SpectroPhotometric extends CalibrationRole("spectrophotometric")
-  case Telluric           extends CalibrationRole("telluric")
-  case DaytimePinhole     extends CalibrationRole("daytime_pinhole")
-  case DaytimeFlat        extends CalibrationRole("daytime_flat")
-  case DaytimeArc         extends CalibrationRole("daytime_arc")
-  case DaytimeCalibration extends CalibrationRole("daytime_calibration")
+enum CalibrationRole(val tag: String, val observeClass: ObserveClass) derives Enumerated:
+  case Twilight           extends CalibrationRole("twilight", ObserveClass.DayCal)
+  case Photometric        extends CalibrationRole("photometric", ObserveClass.NightCal)
+  case SpectroPhotometric extends CalibrationRole("spectrophotometric", ObserveClass.NightCal)
+  case Telluric           extends CalibrationRole("telluric", ObserveClass.NightCal)
+  case DaytimePinhole     extends CalibrationRole("daytime_pinhole", ObserveClass.DayCal)
+  case DaytimeFlat        extends CalibrationRole("daytime_flat", ObserveClass.DayCal)
+  case DaytimeArc         extends CalibrationRole("daytime_arc", ObserveClass.DayCal)
+  case DaytimeCalibration extends CalibrationRole("daytime_calibration", ObserveClass.DayCal)
