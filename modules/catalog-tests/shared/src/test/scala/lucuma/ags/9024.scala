@@ -34,7 +34,7 @@ import scala.collection.immutable.SortedMap
 class ShortCut_9024 extends munit.FunSuite {
 
   private val constraints = ConstraintSet(
-    ImageQuality.Preset.PointTwo,
+    ImageQuality.Preset.PointThree,
     CloudExtinction.Preset.PointFive,
     SkyBackground.Dark,
     WaterVapor.Wet,

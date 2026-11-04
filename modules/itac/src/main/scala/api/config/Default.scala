@@ -19,9 +19,9 @@ object Default {
   import ConditionsCategory.*
   
   val Conditions = ConditionsCategoryMap.ofPercent(
-    (ConditionsCategory(Eq(CloudExtinction.Preset.Zero), Eq(ImageQuality.Preset.PointOne), Le(SkyBackground.Dark), UnspecifiedWV, Some("1")), 4),
-    (ConditionsCategory(Eq(CloudExtinction.Preset.Zero), Eq(ImageQuality.Preset.PointOne), Ge(SkyBackground.Gray), UnspecifiedWV, Some("2")), 4),
-    (ConditionsCategory(Ge(CloudExtinction.Preset.PointThree), Eq(ImageQuality.Preset.PointOne), UnspecifiedSB, UnspecifiedWV, Some("3")), 3),
+    (ConditionsCategory(Eq(CloudExtinction.Preset.Zero), Eq(ImageQuality.Preset.PointThree), Le(SkyBackground.Dark), UnspecifiedWV, Some("1")), 4),
+    (ConditionsCategory(Eq(CloudExtinction.Preset.Zero), Eq(ImageQuality.Preset.PointThree), Ge(SkyBackground.Gray), UnspecifiedWV, Some("2")), 4),
+    (ConditionsCategory(Ge(CloudExtinction.Preset.PointThree), Eq(ImageQuality.Preset.PointThree), UnspecifiedSB, UnspecifiedWV, Some("3")), 3),
     (ConditionsCategory(Eq(CloudExtinction.Preset.Zero), Eq(ImageQuality.Preset.OnePointZero), Le(SkyBackground.Dark), UnspecifiedWV, Some("4")), 10),
     (ConditionsCategory(Eq(CloudExtinction.Preset.Zero), Eq(ImageQuality.Preset.OnePointZero), Ge(SkyBackground.Gray), UnspecifiedWV, Some("5")), 10),
     (ConditionsCategory(Ge(CloudExtinction.Preset.PointThree), Eq(ImageQuality.Preset.OnePointZero), UnspecifiedSB, UnspecifiedWV, Some("6")), 10),

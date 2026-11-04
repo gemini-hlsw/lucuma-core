@@ -62,8 +62,6 @@ object ImageQuality extends NewRefinedQuantity[Short, ImageQualityPredicate, Cen
   given Display[ImageQuality] = Display.byShortName(_.label)
 
   enum Preset(val tag: String, val toImageQuality: ImageQuality) derives Enumerated:
-    case PointOne     extends Preset("point_one",      ImageQuality.unsafeFromArcSeconds(0.1))
-    case PointTwo     extends Preset("point_two",      ImageQuality.unsafeFromArcSeconds(0.2))
     case PointThree   extends Preset("point_three",    ImageQuality.unsafeFromArcSeconds(0.3))
     case PointFour    extends Preset("point_four",     ImageQuality.unsafeFromArcSeconds(0.4))
     case PointSix     extends Preset("point_six",      ImageQuality.unsafeFromArcSeconds(0.6))

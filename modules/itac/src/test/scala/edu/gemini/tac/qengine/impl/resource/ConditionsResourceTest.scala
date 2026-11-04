@@ -46,7 +46,7 @@ class ConditionsResourceTest extends ItacSuite {
   }
 
   private def mkConds(cc: CloudExtinction.Preset): ConstraintSet =
-    ConstraintSet(ImageQuality.Preset.PointOne, cc, SkyBackground.Darkest, WaterVapor.VeryDry, ElevationRange.ByAirMass.Default)
+    ConstraintSet(ImageQuality.Preset.PointThree, cc, SkyBackground.Darkest, WaterVapor.VeryDry, ElevationRange.ByAirMass.Default)
 
   // Verify that the given remaining times match -- times must be specified
   // in order of CloudCover values.
