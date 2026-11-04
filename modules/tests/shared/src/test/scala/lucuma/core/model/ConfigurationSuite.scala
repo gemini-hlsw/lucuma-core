@@ -7,10 +7,13 @@ import cats.syntax.all.*
 import lucuma.core.enums.AltairMode
 import lucuma.core.enums.FacilityObservingModeType
 import lucuma.core.enums.GnirsCamera
+import lucuma.core.enums.GnirsFilter
 import lucuma.core.enums.GnirsPrism
 import lucuma.core.enums.ObservingModeType
 import lucuma.core.enums.SchedulingMode
 import lucuma.core.enums.VisitorObservingModeType
+import lucuma.core.geom.gnirs
+import lucuma.core.geom.jts.interpreter.given
 import lucuma.core.model.arb.ArbConfiguration.given
 import lucuma.core.util.arb.ArbEnumerated.given
 import munit.ScalaCheckSuite
@@ -52,38 +55,83 @@ final class ConfigurationSuite extends ScalaCheckSuite:
     val problems = missing ++ unexpected ++ duplicated
     assert(problems.isEmpty, problems.mkString("\n"))
 
-  test("Flamingos2 Imaging has no constraints"):
-    forAll: (cfg: Configuration) =>
-      val c = cfg.copy(observingMode = Flamingos2Imaging)
-      assert(c.subsumes(c))
+  test("Flamingos2 Imaging covers a subset of its filters, not an addition"):
+    forAll: (cfg: Configuration, a: Flamingos2Imaging, b: Flamingos2Imaging) =>
+      val ca = cfg.copy(observingMode = a)
+      val cb = cfg.copy(observingMode = b)
+      assertEquals(ca.subsumes(cb), b.filters.forall(a.filters.contains))
+      assertEquals(cb.subsumes(ca), a.filters.forall(b.filters.contains))
 
-  test("GNIRS Imaging has no constraints"):
-    forAll: (cfg: Configuration) =>
-      val c = cfg.copy(observingMode = GnirsImaging)
-      assert(c.subsumes(c))
+  test("Flamingos2 Imaging covers its own filters minus one"):
+    forAll: (cfg: Configuration, a: Flamingos2Imaging) =>
+      val c = cfg.copy(observingMode = a)
+      assert(c.subsumes(cfg.copy(observingMode = a.copy(filters = a.filters.drop(1)))))
 
-  // The approval radius is the round field the MK filters see, the smallest GNIRS imaging
-  // science area, so that a base moved anywhere within it stays on the detector whatever
-  // filter is used. The keyhole the other filters see is bounded below by the no-XD slit
-  // length, which is how the comparison below pins that the smaller field was chosen.
+  test("GNIRS Imaging covers a subset of its filters, not an addition"):
+    forAll: (cfg: Configuration, a: GnirsImaging, b: GnirsImaging) =>
+      val ca = cfg.copy(observingMode = a)
+      val cb = cfg.copy(observingMode = b)
+      assertEquals(ca.subsumes(cb), a.camera === b.camera && b.filters.forall(a.filters.contains))
+      assertEquals(cb.subsumes(ca), a.camera === b.camera && a.filters.forall(b.filters.contains))
+
+  test("GNIRS Imaging is constrained by camera"):
+    forAll: (cfg: Configuration, a: GnirsImaging, c: GnirsCamera) =>
+      val ca = cfg.copy(observingMode = a)
+      val cb = cfg.copy(observingMode = a.copy(camera = c))
+      assertEquals(ca.subsumes(cb), a.camera === c)
+
+  test("GNIRS Imaging covers its own filters minus one"):
+    forAll: (cfg: Configuration, a: GnirsImaging) =>
+      val c = cfg.copy(observingMode = a)
+      assert(c.subsumes(cfg.copy(observingMode = a.copy(filters = a.filters.drop(1)))))
+
+  // The approval radius is the field every approved filter sees, so that a base moved anywhere
+  // within it stays on the detector whichever is used: the round field the MK filters see,
+  // the smallest GNIRS imaging science area, unless all filters see the camera's keyhole.
+  // The keyhole is bounded below by half the no-XD slit length.
   test("GNIRS Imaging radius is the round field, smaller than the keyhole"):
-    assertEqualsDouble(Radii.GnirsImaging.toSignedDoubleDegrees * 3600, 12.816, 0.001)
+    assertEqualsDouble(Radii.GnirsImagingRound.toSignedDoubleDegrees * 3600, 12.816, 0.001)
     forAll: (camera: GnirsCamera) =>
-      assert(Radii.GnirsImaging.toMicroarcseconds < Radii.gnirsLongSlit(camera, GnirsPrism.Mirror).toMicroarcseconds)
+      assert(Radii.GnirsImagingRound.toMicroarcseconds < Radii.gnirsLongSlit(camera, GnirsPrism.Mirror).toMicroarcseconds)
 
-  test("GMOS North Imaging has no constraints"):
+  test("GNIRS Imaging radius is the keyhole only when no filter is an MK one"):
+    forAll: (a: GnirsImaging) =>
+      val round   = a.filters.isEmpty || a.filters.exists(gnirs.scienceArea.isRoundImagingFilter)
+      val keyhole = gnirs.scienceArea.keyholeImagingFov(a.camera).eval.radius
+      assertEquals(a.radius, if round then Radii.GnirsImagingRound else keyhole)
+      assert(keyhole.toMicroarcseconds >= Radii.gnirsLongSlit(a.camera, GnirsPrism.Mirror).toMicroarcseconds)
+
+  test("GNIRS Imaging radius depends on the camera"):
+    val keyholeOnly = List(GnirsFilter.Order3)
+    assertNotEquals(
+      GnirsImaging(GnirsCamera.ShortBlue, keyholeOnly).radius,
+      GnirsImaging(GnirsCamera.LongBlue, keyholeOnly).radius
+    )
+    assertEquals(GnirsImaging(GnirsCamera.LongBlue, GnirsFilter.J :: keyholeOnly).radius, Radii.GnirsImagingRound)
+
+  test("GMOS North Imaging covers a subset of its filters, not an addition"):
     forAll: (cfg: Configuration, a: GmosNorthImaging, b: GmosNorthImaging) =>
       val ca = cfg.copy(observingMode = a)
       val cb = cfg.copy(observingMode = b)
-      assert(ca.subsumes(cb))
-      assert(cb.subsumes(ca))
+      assertEquals(ca.subsumes(cb), b.filters.forall(a.filters.contains))
+      assertEquals(cb.subsumes(ca), a.filters.forall(b.filters.contains))
 
-  test("GMOS South Imaging has no constraints"):
+  test("GMOS North Imaging covers its own filters minus one"):
+    forAll: (cfg: Configuration, a: GmosNorthImaging) =>
+      val c = cfg.copy(observingMode = a)
+      assert(c.subsumes(cfg.copy(observingMode = a.copy(filters = a.filters.drop(1)))))
+
+  test("GMOS South Imaging covers a subset of its filters, not an addition"):
     forAll: (cfg: Configuration, a: GmosSouthImaging, b: GmosSouthImaging) =>
       val ca = cfg.copy(observingMode = a)
       val cb = cfg.copy(observingMode = b)
-      assert(ca.subsumes(cb))
-      assert(cb.subsumes(ca))
+      assertEquals(ca.subsumes(cb), b.filters.forall(a.filters.contains))
+      assertEquals(cb.subsumes(ca), a.filters.forall(b.filters.contains))
+
+  test("GMOS South Imaging covers its own filters minus one"):
+    forAll: (cfg: Configuration, a: GmosSouthImaging) =>
+      val c = cfg.copy(observingMode = a)
+      assert(c.subsumes(cfg.copy(observingMode = a.copy(filters = a.filters.drop(1)))))
 
   test("GMOS-N MOS is constrained by grating"):
     forAll: (cfg: Configuration, a: GmosNorthMos, b: GmosNorthMos) =>
@@ -125,3 +173,10 @@ final class ConfigurationSuite extends ScalaCheckSuite:
       val cb = cfg.copy(observingMode = b)
       assertEquals(ca.subsumes(cb), a.disperser === b.disperser)
       assertEquals(cb.subsumes(ca), a.disperser === b.disperser)
+
+  test("GHOST IFU is constrained by resolution mode"):
+    forAll: (cfg: Configuration, a: GhostIfu, b: GhostIfu) =>
+      val ca = cfg.copy(observingMode = a)
+      val cb = cfg.copy(observingMode = b)
+      assertEquals(ca.subsumes(cb), a.resolutionMode === b.resolutionMode)
+      assertEquals(cb.subsumes(ca), a.resolutionMode === b.resolutionMode)
