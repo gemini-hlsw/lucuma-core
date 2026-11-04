@@ -44,7 +44,7 @@ class BinningSuite extends FunSuite:
     testLongslit(
       GmosNorthFpu.LongSlit_0_50,
       SourceProfile.Gaussian(Angle.microarcseconds.reverseGet(600_000L), bandNormalized),
-      ImageQuality.Preset.PointOne.toImageQuality,
+      ImageQuality.Preset.PointThree.toImageQuality,
       GmosNorthGrating.R831_G5302,
       GmosXBinning.One,
       GmosYBinning.Two
@@ -54,7 +54,7 @@ class BinningSuite extends FunSuite:
     testLongslit(
       GmosNorthFpu.LongSlit_0_75,
       SourceProfile.Gaussian(Angle.microarcseconds.reverseGet(1_000_000L), bandNormalized),
-      ImageQuality.Preset.PointOne.toImageQuality,
+      ImageQuality.Preset.PointThree.toImageQuality,
       GmosNorthGrating.R831_G5302,
       GmosXBinning.Two,
       GmosYBinning.Two
@@ -64,7 +64,7 @@ class BinningSuite extends FunSuite:
     testLongslit(
       GmosNorthFpu.LongSlit_1_00,
       SourceProfile.Gaussian(Angle.microarcseconds.reverseGet(1_500_000L), bandNormalized),
-      ImageQuality.Preset.PointOne.toImageQuality,
+      ImageQuality.Preset.PointThree.toImageQuality,
       GmosNorthGrating.R831_G5302,
       GmosXBinning.Two,
       GmosYBinning.Two
@@ -74,7 +74,7 @@ class BinningSuite extends FunSuite:
     testLongslit(
       GmosNorthFpu.LongSlit_0_50,
       SourceProfile.Uniform(bandNormalized),
-      ImageQuality.Preset.PointOne.toImageQuality,
+      ImageQuality.Preset.PointThree.toImageQuality,
       GmosNorthGrating.R831_G5302,
       GmosXBinning.One,
       GmosYBinning.Two
@@ -96,7 +96,7 @@ class BinningSuite extends FunSuite:
     testLongslit(
       GmosNorthFpu.LongSlit_0_50,
       SourceProfile.Gaussian(Angle.Angle0, bandNormalized),
-      ImageQuality.Preset.PointOne.toImageQuality,
+      ImageQuality.Preset.PointThree.toImageQuality,
       GmosNorthGrating.R831_G5302,
       GmosXBinning.One,
       GmosYBinning.One
@@ -126,7 +126,7 @@ class BinningSuite extends FunSuite:
     testLongslit(
       GmosNorthFpu.LongSlit_1_00,
       SourceProfile.Gaussian(Angle.microarcseconds.reverseGet(600_000L), bandNormalized),
-      ImageQuality.Preset.PointOne.toImageQuality,
+      ImageQuality.Preset.PointThree.toImageQuality,
       GmosNorthGrating.B480_G5309,
       GmosXBinning.Two,
       GmosYBinning.Two
@@ -196,7 +196,7 @@ class BinningSuite extends FunSuite:
   test("imaging, Gaussian fwhm=0.6: 2x2"):
     testImaging(
       SourceProfile.Gaussian(Angle.microarcseconds.reverseGet(600_000L), bandNormalized),
-      ImageQuality.Preset.PointOne.toImageQuality,
+      ImageQuality.Preset.PointThree.toImageQuality,
       GmosXBinning.Two,
       GmosYBinning.Two
     )
@@ -204,7 +204,7 @@ class BinningSuite extends FunSuite:
   test("imaging, Uniform source: 2x2"):
     testImaging(
       SourceProfile.Uniform(bandNormalized),
-      ImageQuality.Preset.PointOne.toImageQuality,
+      ImageQuality.Preset.PointThree.toImageQuality,
       GmosXBinning.Two,
       GmosYBinning.Two
     )
@@ -285,11 +285,11 @@ class BinningSuite extends FunSuite:
     assertEquals(actual, expected)
 
   test("mos ccd mode with multiple profiles"):
-    // R831, slit=0.50", shared IQ=PointOne: Gaussian fwhm=0.0 -> (1,1); Gaussian fwhm=0.6 -> (1,2).
+    // R831, slit=0.50", shared IQ=PointThree: Gaussian fwhm=0.0 -> (1,1); Gaussian fwhm=0.6 -> (1,2).
     // The set's CCD mode must therefore select yBin = One (the minimum count).
     val fpu = GmosNorthFpu.LongSlit_0_50
     val grating = GmosNorthGrating.R831_G5302
-    val iq = ImageQuality.Preset.PointOne.toImageQuality
+    val iq = ImageQuality.Preset.PointThree.toImageQuality
     val slitWidth = fpu.effectiveSlitWidth
     val dispersion = grating.dispersion
     val resolution = grating.referenceResolution

@@ -115,7 +115,7 @@ class AgsSuite extends munit.FunSuite {
 
   test("discard science target for gmos") {
     val constraints = ConstraintSet(
-      ImageQuality.Preset.PointTwo,
+      ImageQuality.Preset.PointThree,
       CloudExtinction.Preset.PointFive,
       SkyBackground.Dark,
       WaterVapor.Wet,
@@ -178,7 +178,7 @@ class AgsSuite extends munit.FunSuite {
 
   test("discard science target - Flamingos2") {
     val constraints = ConstraintSet(
-      ImageQuality.Preset.PointTwo,
+      ImageQuality.Preset.PointThree,
       CloudExtinction.Preset.PointFive,
       SkyBackground.Dark,
       WaterVapor.Wet,
@@ -249,7 +249,7 @@ class AgsSuite extends munit.FunSuite {
 
   test("discard science target for flamingos2 mos") {
     val constraints = ConstraintSet(
-      ImageQuality.Preset.PointTwo,
+      ImageQuality.Preset.PointThree,
       CloudExtinction.Preset.PointFive,
       SkyBackground.Dark,
       WaterVapor.Wet,
@@ -318,7 +318,7 @@ class AgsSuite extends munit.FunSuite {
 
   test("discard science target - Igrins2") {
     val constraints = ConstraintSet(
-      ImageQuality.Preset.PointTwo,
+      ImageQuality.Preset.PointThree,
       CloudExtinction.Preset.PointFive,
       SkyBackground.Dark,
       WaterVapor.Wet,
@@ -387,7 +387,7 @@ class AgsSuite extends munit.FunSuite {
 
   test("discard science target - Gnirs") {
     val constraints = ConstraintSet(
-      ImageQuality.Preset.PointTwo,
+      ImageQuality.Preset.PointThree,
       CloudExtinction.Preset.PointFive,
       SkyBackground.Dark,
       WaterVapor.Wet,
@@ -463,7 +463,7 @@ class AgsSuite extends munit.FunSuite {
 
   test("discard science target for gmos mos") {
     val constraints = ConstraintSet(
-      ImageQuality.Preset.PointTwo,
+      ImageQuality.Preset.PointThree,
       CloudExtinction.Preset.PointFive,
       SkyBackground.Dark,
       WaterVapor.Wet,
@@ -526,7 +526,7 @@ class AgsSuite extends munit.FunSuite {
 
   test("magnitude limits with gmps OIWFS and PWFS1") {
     val constraints = ConstraintSet(
-      ImageQuality.Preset.PointOne,
+      ImageQuality.Preset.PointThree,
       CloudExtinction.Preset.PointOne,
       SkyBackground.Darkest,
       WaterVapor.Wet,
@@ -573,7 +573,7 @@ class AgsSuite extends munit.FunSuite {
 
   test("altair guides on the AOWFS oval using the estimated R magnitude") {
     val constraints = ConstraintSet(
-      ImageQuality.Preset.PointTwo,
+      ImageQuality.Preset.PointThree,
       CloudExtinction.Preset.PointOne,
       SkyBackground.Dark,
       WaterVapor.Wet,

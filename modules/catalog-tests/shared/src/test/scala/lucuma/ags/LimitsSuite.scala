@@ -21,7 +21,7 @@ class LimitsSuite extends munit.FunSuite {
       widestConstraints,
       BrightnessConstraints(
         BandsList.GaiaBandsList,
-        FaintnessConstraint(BrightnessValue.unsafeFrom(17.527769563884206)),
+        FaintnessConstraint(BrightnessValue.unsafeFrom(17.383308691652616)),
         None
       )
     )
@@ -31,7 +31,7 @@ class LimitsSuite extends munit.FunSuite {
     // Sample query from explore
 
     val constraints = ConstraintSet(
-      ImageQuality.Preset.PointOne,    // min image quality
+      ImageQuality.Preset.PointThree,  // min image quality
       CloudExtinction.Preset.PointOne, // min cloud extinction
       SkyBackground.Dark,              // Not relevant
       WaterVapor.Wet,                  // Not relevant
@@ -47,13 +47,13 @@ class LimitsSuite extends munit.FunSuite {
       brightnessConstraints,
       BrightnessConstraints(
         BandsList.GaiaBandsList,
-        FaintnessConstraint(BrightnessValue.unsafeFrom(16.227769563884202)),
-        Some(SaturationConstraint(BrightnessValue.unsafeFrom(10.227769563884202)))
+        FaintnessConstraint(BrightnessValue.unsafeFrom(16.08330869165261)),
+        Some(SaturationConstraint(BrightnessValue.unsafeFrom(10.08330869165261)))
       )
     )
   }
 
-  // IQ 0.2" is in the 20% bucket, 2.0" in the "any" bucket, at any wavelength
+  // IQ 0.3" is in the 20% bucket, 2.0" in the "any" bucket, at any wavelength
   private def altairConstraints(iq: ImageQuality.Preset, sb: SkyBackground): ConstraintSet =
     ConstraintSet(
       iq,
@@ -67,7 +67,7 @@ class LimitsSuite extends munit.FunSuite {
 
   test("altair NGS limits are the OCS R table minus cloud extinction") {
     val limits = guideStarBrightnessConstraints(
-      altairConstraints(ImageQuality.Preset.PointTwo, SkyBackground.Dark),
+      altairConstraints(ImageQuality.Preset.PointThree, SkyBackground.Dark),
       GuideProbe.AltairAOWFS,
       Some(AltairMode.Ngs),
       GuideSpeed.Slow,
@@ -85,7 +85,7 @@ class LimitsSuite extends munit.FunSuite {
 
   test("altair LGS limits are fainter and saturate sooner") {
     val limits = guideStarBrightnessConstraints(
-      altairConstraints(ImageQuality.Preset.PointTwo, SkyBackground.Dark),
+      altairConstraints(ImageQuality.Preset.PointThree, SkyBackground.Dark),
       GuideProbe.AltairAOWFS,
       Some(AltairMode.Lgs),
       GuideSpeed.Fast,
@@ -113,7 +113,7 @@ class LimitsSuite extends munit.FunSuite {
   }
 
   test("LGS+P1 guides on PWFS1 with the Gaia limits") {
-    val constraints = altairConstraints(ImageQuality.Preset.PointTwo, SkyBackground.Dark)
+    val constraints = altairConstraints(ImageQuality.Preset.PointThree, SkyBackground.Dark)
     assertEquals(
       guideStarBrightnessConstraints(
         constraints,

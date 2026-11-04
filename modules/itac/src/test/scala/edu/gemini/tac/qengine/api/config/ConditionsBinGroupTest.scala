@@ -23,10 +23,10 @@ class ConditionsCategoryMapTest extends FunSuite {
   val bin1 = ConditionsBin(cat1, IntCentiPercent.unsafeFromPercent(20))
   val bin2 = ConditionsBin(cat2, IntCentiPercent.unsafeFromPercent(30))
   val bin3 = ConditionsBin(cat3, IntCentiPercent.unsafeFromPercent(40))
-  val oc0  = ConstraintSet(ImageQuality.Preset.PointOne, CloudExtinction.Preset.Zero,  SkyBackground.Darkest, WaterVapor.VeryDry, ElevationRange.ByAirMass.Default)
-  val oc1  = ConstraintSet(ImageQuality.Preset.PointOne, CloudExtinction.Preset.PointThree,  SkyBackground.Darkest, WaterVapor.VeryDry, ElevationRange.ByAirMass.Default)
-  val oc2  = ConstraintSet(ImageQuality.Preset.PointOne, CloudExtinction.Preset.OnePointZero,  SkyBackground.Darkest, WaterVapor.VeryDry, ElevationRange.ByAirMass.Default)
-  val oc3  = ConstraintSet(ImageQuality.Preset.PointOne, CloudExtinction.Preset.ThreePointZero, SkyBackground.Darkest, WaterVapor.VeryDry, ElevationRange.ByAirMass.Default)
+  val oc0  = ConstraintSet(ImageQuality.Preset.PointThree, CloudExtinction.Preset.Zero,  SkyBackground.Darkest, WaterVapor.VeryDry, ElevationRange.ByAirMass.Default)
+  val oc1  = ConstraintSet(ImageQuality.Preset.PointThree, CloudExtinction.Preset.PointThree,  SkyBackground.Darkest, WaterVapor.VeryDry, ElevationRange.ByAirMass.Default)
+  val oc2  = ConstraintSet(ImageQuality.Preset.PointThree, CloudExtinction.Preset.OnePointZero,  SkyBackground.Darkest, WaterVapor.VeryDry, ElevationRange.ByAirMass.Default)
+  val oc3  = ConstraintSet(ImageQuality.Preset.PointThree, CloudExtinction.Preset.ThreePointZero, SkyBackground.Darkest, WaterVapor.VeryDry, ElevationRange.ByAirMass.Default)
 
   val grp = ConditionsCategoryMap.of(List(bin0, bin1, bin2, bin3))
 
@@ -93,7 +93,7 @@ class ConditionsCategoryMapTest extends FunSuite {
 
   test("testUndefinedSimpleUpdated") {
     try {
-      grp.updated(ConditionsCategory(Eq(CloudExtinction.Preset.Zero), Eq(ImageQuality.Preset.PointOne)), IntCentiPercent.unsafeFromPercent(99))
+      grp.updated(ConditionsCategory(Eq(CloudExtinction.Preset.Zero), Eq(ImageQuality.Preset.PointThree)), IntCentiPercent.unsafeFromPercent(99))
       fail("undefined category should have thrown an exception")
     } catch {
       case _: IllegalArgumentException => // ok
@@ -101,7 +101,7 @@ class ConditionsCategoryMapTest extends FunSuite {
   }
 
   test("testUndefinedMultipleUpdated") {
-    val cat4 = ConditionsCategory(Eq(CloudExtinction.Preset.Zero), Eq(ImageQuality.Preset.PointOne))
+    val cat4 = ConditionsCategory(Eq(CloudExtinction.Preset.Zero), Eq(ImageQuality.Preset.PointThree))
     try {
       grp.updated(List((cat0, IntCentiPercent.unsafeFromPercent(1)), (cat4, IntCentiPercent.unsafeFromPercent(99))))
       fail("undefined category should have thrown an exception")
