@@ -22,6 +22,7 @@ object RejectTarget extends TimeBinMessageFormatter {
 }
 
 final case class RejectTarget(prop: ProposalShard, obs: ItacObservation.Scaled, band: ScienceBand, raDecType: RejectTarget.RaDecType, cur: TimeSpan, max: TimeSpan) extends ObsRejectMessage {
+  // Thread.dumpStack()
   def reason: String = RejectTarget.reason(raDecType)
   def detail: String = RejectTarget.detail(prop, obs, band, cur, max)
   override def toString =

@@ -24,7 +24,7 @@ class DecRange(val startDeg: Int, val endDeg: Int) {
   def inclusive: DecRange = DecRange.inclusive(startDeg, endDeg)
 
   def contains(dec: Declination): Boolean = {
-    val dint = dec.toAngle.toDoubleDegrees.toInt
+    val dint = dec.toAngle.toSignedDoubleDegrees.toInt
     dint >= startDeg && dint < endDeg
   }
 
@@ -67,7 +67,7 @@ object DecRange {
     override def isInclusive = true
     override def inclusive = this
     override def contains(dec: Declination): Boolean = {
-      super.contains(dec) || dec.toAngle.toDoubleDegrees.toInt == endDeg
+      super.contains(dec) || dec.toAngle.toSignedDoubleDegrees.toInt == endDeg
     }
     override def abutsRight(that: DecRange) = false
     override def toString: String = "(%d, %d)".format(startDeg, endDeg)

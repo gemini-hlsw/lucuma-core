@@ -49,7 +49,11 @@ final case class DeclinationMapResource(val bins: DeclinationMap[BoundedTime]) e
   private def reserveNormal(block: Block, band: ScienceBand): RejectMessage Either DeclinationMapResource = {
     val dec = block.obs.itacTarget.dec
     bins.updated(dec, _.reserve(block.time)) match {
-      case None => Left(RejectTarget(block.prop, block.obs, band, RejectTarget.Dec, lookup(dec, _.used), lookup(dec, _.limit)))
+      case None => 
+        // println(f"DeclinationMapResource.reserveNormal: couldn't reserve ${block.time.toHours}%3.2f h at $dec")
+        // println("  my bins are")
+        // bins.bins.foreach(b => println(f"  ${b.range} - ${b.binValue}"))
+        Left(RejectTarget(block.prop, block.obs, band, RejectTarget.Dec, lookup(dec, _.used), lookup(dec, _.limit)))
       case Some(updated) => Right(new DeclinationMapResource(updated))
     }
   }

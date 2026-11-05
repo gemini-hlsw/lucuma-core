@@ -115,8 +115,8 @@ case class QueueEngine3(
       val allAcceptedShards: List[ProposalShard] = queues.flatMap(_.toList)
       val allRejectedShards: List[ProposalShard] = allShards.filterNot(s => allAcceptedShards.exists(_.reference === s.reference))
 
-      allRejectedShards.foreach: s =>
-        println(s"rejected or not considered: ${s.parentProposal.piName} - ${s.reference}")
+      // allRejectedShards.foreach: s =>
+      //   println(s"rejected or not considered: ${s.parentProposal.piName} - ${s.reference}")
 
       val mustAlsoReject: Option[NonEmptyList[ProposalShard]] =
         NonEmptyList.fromList:

@@ -27,11 +27,6 @@ import cats.data.ValidatedNel
 import lucuma.core.model.ProposalReference
 import client.operation.Info
 
-// object Stub {
-//   def main(args: Array[String]): Unit =
-//     Main.main(Array("-d", "test-ws", "queue", "-n"))
-// }
-
 object BuildInfo:
   val version = s"***** NEED TO ADD ACTUAL BUILDINFO!!!"
 

@@ -77,7 +77,7 @@ object Queue {
             //   println(f"   $cat - ${pq.queueTime(cat).toHours}%3.2f")
             // println()
 
-            queueCalc.queues(site)(qb).toList.sortBy(_.parentProposal.ranking.value).foreach: p =>
+            queueCalc.queues(site)(qb).toList.sortBy(s => (s.parentProposal.ranking.value, s.parentProposal.piName.reverse, s.parentProposal.programReference)).foreach: p =>
               println(f"${p.parentProposal.ranking}%5.1f ${p.reference}%-30s ${p.parentProposal.piName}%-20s ${p.allocation.duration.toHours}%4.1f of ${p.observations.foldMap(_.time).toHours}%4.1f h (${p.allocation.category}) ${p.parentProposal.programReference.label}")
 
             // result.entries(qb).sortBy(_.proposals.head.ntac.ranking.num.orEmpty).foreach { case QueueResult.Entry(ps, pid) =>
