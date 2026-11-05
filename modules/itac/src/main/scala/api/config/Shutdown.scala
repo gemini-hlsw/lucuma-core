@@ -30,7 +30,8 @@ case class Shutdown(site: Site, start: ZonedDateTime, end: ZonedDateTime) extend
     val df = new SimpleDateFormat("MMM d")
     df.setTimeZone(TimeZone.getTimeZone(site.timezone))
 
-    "%s - %s".format(df.format(start), df.format(end))
+    "Shutdown.toDateString: TODO"
+    // "%s - %s".format(df.format(start), df.format(end))
   }
 
   override def toString: String =

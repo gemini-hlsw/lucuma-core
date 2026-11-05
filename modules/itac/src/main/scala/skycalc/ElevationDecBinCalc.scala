@@ -24,12 +24,13 @@ import java.time.ZonedDateTime
  */
 class ElevationDecBinCalc(conf: ElevationConfig) extends DecBinCalc {
 
+
   def getSolvers(site: Site, coords: List[Coordinates]): List[BoundedInterval[Instant] => IntervalSeq[Instant]] =
     val isc = ImprovedSkyCalc(site.place)
     coords.map: cs =>
       bi =>
         val samples =
-          Samples.atFixedRate(bi, java.time.Duration.ofMinutes(15)): i =>
+          Samples.atFixedRate(bi, java.time.Duration.ofMinutes(1)): i =>
             isc.calculate(cs, i, false)
         AirmassSolver(conf.minAirmass, conf.maxAirmass, Duration.ofMinutes(7)).solve(samples)(bi)
 
@@ -46,7 +47,7 @@ class ElevationDecBinCalc(conf: ElevationConfig) extends DecBinCalc {
       val night = it.next()
       solvers.foreach { s =>
         val u = s.apply(night.interval)
-        u.intervalIterator.foreach: i =>
+        u.intervalIterator.foreach { i =>
 
           val end = i.upperBound match
             case Closed(a) => a
@@ -59,8 +60,8 @@ class ElevationDecBinCalc(conf: ElevationConfig) extends DecBinCalc {
             case b => sys.error(s"can't handle $b")
 
           totals(bin) += end.toEpochMilli() - start.toEpochMilli()
-
-          bin += 1
+        }
+        bin += 1
       }
     }
     val max = totals(ElevationDecBinCalc.getSiteIndex(site, size))

@@ -31,6 +31,8 @@ import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.model.ProposalReference
 import cats.data.NonEmptyList
 import edu.gemini.tac.qengine.p1.GroupTree
+import lucuma.core.model.Allocation
+import eu.timepit.refined.types.numeric.PosDouble
 
 /** Interface for some Workspace operations. */
 trait Workspace[F[_]] {
@@ -218,14 +220,29 @@ object Workspace {
         //     m <- BulkEditFile.read(f)
         //   } yield m
 
+        private def merge(a: NonEmptyList[Allocation], b: NonEmptyList[Allocation]): NonEmptyList[Allocation] =
+          val collected = a.concatNel(b).toList.groupBy(_.category).values.toList.map(_.distinct)
+          val ret = NonEmptyList
+            .fromList:
+              collected.map: as =>
+                println(as)
+                as.head.copy(duration = as.foldMap(_.duration))
+            .get    
+          println(ret.map(a => f"${a.category} - ${a.duration.toHours}%3.2f h"))
+          ret
+
         private def merge(a: Proposal, b: Proposal): Proposal =
-          val allocs = a.allocations.concatNel(b.allocations)
-          // println(s"${a.piName} - same obs? ${a.originalObsList == b.originalObsList}, allocs == $allocs")
+          println(s"merging ${a.piName}: ${a.xmlFile.get.getName()} + ${b.xmlFile.get.getName()}")
+          val allocs = merge(a.allocations, b.allocations)
           val groups =
             if a.originalObsList == b.originalObsList
             then a.groupTree
             else GroupTree.fromList(a.originalObsList ++ b.originalObsList)
-          a.copy(allocations = allocs, groupTree = groups)
+          a.copy(
+            ranking = PosDouble.unsafeFrom(a.ranking.value min b.ranking.value),
+            allocations = allocs,
+            groupTree = groups
+          )
 
         private def merge(p: Proposal, ps: NonEmptyList[Proposal]): Proposal =
           ps.foldLeft(p)(merge)
@@ -235,7 +252,7 @@ object Workspace {
             toExamine match
               case Nil => accum
               case curr :: rest =>
-                rest.partition(p => p.piName === curr.piName) match
+                rest.partition(p => p.piName === curr.piName && p.title === curr.title) match
                   case (matched, unmatched) =>
                     NonEmptyList.fromList(matched) match
                       case None => go(unmatched, curr :: accum)

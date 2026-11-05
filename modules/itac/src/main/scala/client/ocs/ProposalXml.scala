@@ -290,6 +290,9 @@ object ProposalXml2:
       def piName: String =
         (root \ "investigators" \ "pi" \ "lastName").text
 
+      def title: String =
+        (root \ "title").text
+
       def proposal: F[Proposal] =
         for
           semester          <- semester
@@ -306,6 +309,7 @@ object ProposalXml2:
             xmlFile     = xmlFile,
             reference   = proposalReference,
             piName      = piName,
+            title       = title,
             allocations = NonEmptyList.one(allocation),
             tpe         = proposalType,
             groupTree   = groupTree,

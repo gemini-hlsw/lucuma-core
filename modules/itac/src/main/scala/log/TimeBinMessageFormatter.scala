@@ -23,7 +23,7 @@ trait TimeBinMessageFormatter {
     val obsTime = obs.time.toHours
     val target  = obs.itacTarget
     val targetName = target.id.toString
-    f"$obsTime%.2f hrs at $targetName(${target.ra.toHourAngle.toDoubleHours}%.3f hr, ${target.dec.toAngle.toDoubleDegrees}%.1f deg)"
+    f"$obsTime%.2f hrs at $targetName(${target.coords})"
   }
 
   private val detailTemplate    = "%s. Reject %s."

@@ -32,6 +32,7 @@ case class Proposal(
   xmlFile: Option[File],
   reference: ProposalReference,
   piName: String,
+  title: String,
   allocations: NonEmptyList[Allocation],
   tpe: ProposalType = ProposalType.Queue(TooActivation.None, IntPercent.unsafeFrom(0), Nil), // TODO
   groupTree: GroupTree[ItacObservation] = GroupTree.empty,
@@ -172,7 +173,7 @@ case class Proposal(
     val estimated = estimatedTimeForSiteAndBand(site, band).toHours
     val awarded   = usableTimeForSiteAndBand(site, band).toHours 
     // if estimated > 0 then awarded / estimated else 0
-    if estimated > 0 then (awarded / estimated) min 1.0 else 0
+    if estimated > 0 then (awarded / estimated) /*min 1.0*/ else 0
 
   /** Subset of observations observable at the specified site, in the specified band. */    
   private def itacObservationsForSiteAndBand(site: Site, band: ScienceBand)(using Metadata): List[ItacObservation] =
@@ -202,4 +203,4 @@ object Proposal:
     cfpActive: DateInterval = DateInterval.between(LocalDate.now(), LocalDate.now()),
     ranking: PosDouble = PosDouble.MaxValue // defaulted to avoid having to change all the tests
   ): Proposal =
-    apply(None, reference, "Unknown", allocations, tpe, groupTree, cfpActive, ranking)
+    apply(None, reference, "Unknown", "Unknown", allocations, tpe, groupTree, cfpActive, ranking)
