@@ -12,9 +12,7 @@ import lucuma.core.enums.Site
 import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.enums.TooActivation
 import lucuma.core.model.Allocation
-import lucuma.core.model.IntPercent
 import lucuma.core.model.ProposalReference
-import lucuma.core.model.ProposalType
 import lucuma.core.util.DateInterval
 import lucuma.core.util.TimeSpan
 
@@ -34,26 +32,20 @@ case class Proposal(
   piName: String,
   title: String,
   allocations: NonEmptyList[Allocation],
-  tpe: ProposalType = ProposalType.Queue(TooActivation.None, IntPercent.unsafeFrom(0), Nil), // TODO
+  scienceSubtype: ScienceSubtype = ScienceSubtype.Queue,
+  too: TooActivation = TooActivation.None,
   groupTree: GroupTree[ItacObservation] = GroupTree.empty,
   cfpActive: DateInterval = DateInterval.between(LocalDate.now(), LocalDate.now()),
   ranking: PosDouble = PosDouble.MaxValue // defaulted to avoid having to change all the tests
 ) {
 
+  object tpe {
+    def scienceSubtype = Proposal.this.scienceSubtype
+  }
+
   /** All observations, scaled only for group membership (not for allocations). */
   val originalObsList: List[ItacObservation] =
     groupTree.flattenAndScale
-
-  private def scienceSubtype: ScienceSubtype =
-    tpe match
-      case ProposalType.Classical(_, _)            => ScienceSubtype.Classical
-      case ProposalType.DemoScience(_, _)          => ScienceSubtype.DemoScience
-      case ProposalType.DirectorsTime(_, _)        => ScienceSubtype.DirectorsTime
-      case ProposalType.FastTurnaround(_, _, _, _) => ScienceSubtype.FastTurnaround
-      case ProposalType.LargeProgram(_, _, _, _)   => ScienceSubtype.LargeProgram
-      case ProposalType.PoorWeather                => ScienceSubtype.PoorWeather
-      case ProposalType.Queue(_, _, _)             => ScienceSubtype.Queue
-      case ProposalType.SystemVerification(_, _)   => ScienceSubtype.SystemVerification
 
   private def observatory: Observatory =
     originalObsList.map(_.mode.observatory).distinct match
@@ -96,9 +88,6 @@ case class Proposal(
     (Enumerated[Site].all, Enumerated[TimeAccountingCategory].all, Enumerated[ScienceBand].all)
       .mapN(shardFor(_, _, _))
       .filter(_.nonEmpty)
-
-  def too: TooActivation =
-    ProposalType.TooActivation.getOption(tpe).getOrElse(TooActivation.None)
 
   ///
   /// ALLOCATIONS
@@ -198,9 +187,10 @@ object Proposal:
   def forTesting(
     reference: ProposalReference,
     allocations: NonEmptyList[Allocation],
-    tpe: ProposalType = ProposalType.Queue(TooActivation.None, IntPercent.unsafeFrom(0), Nil), // TODO
-    groupTree: GroupTree[ItacObservation] = GroupTree.empty,
+    scienceSubtype: ScienceSubtype = ScienceSubtype.Queue,
+    too: TooActivation = TooActivation.None,
+     groupTree: GroupTree[ItacObservation] = GroupTree.empty,
     cfpActive: DateInterval = DateInterval.between(LocalDate.now(), LocalDate.now()),
     ranking: PosDouble = PosDouble.MaxValue // defaulted to avoid having to change all the tests
   ): Proposal =
-    apply(None, reference, "Unknown", "Unknown", allocations, tpe, groupTree, cfpActive, ranking)
+    apply(None, reference, "Unknown", "Unknown", allocations, scienceSubtype, too, groupTree, cfpActive, ranking)

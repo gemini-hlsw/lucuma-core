@@ -12,7 +12,6 @@ import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.enums.TooActivation
 import lucuma.core.model.Allocation
 import lucuma.core.model.ProposalReference
-import lucuma.core.model.ProposalType
 import lucuma.core.util.TimeSpan
 
 /**
