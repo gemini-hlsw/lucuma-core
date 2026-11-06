@@ -227,7 +227,7 @@ class ExposureRulesSuite extends FunSuite:
     assertEquals(describe(flamingos2(5, Flamingos2ReadMode.Bright)), Nil)
     assertEquals(describe(flamingos2(3, Flamingos2ReadMode.Bright)), List("Exposure times below 5 s are not recommended for Flamingos 2 bright read mode."))
     assertEquals(describe(flamingos2(3, Flamingos2ReadMode.Bright), ObserveClass.NightCal), Nil)
-    assertEquals(describe(flamingos2(1, Flamingos2ReadMode.Bright)), List("Exposure times for Flamingos 2 bright read mode must be at least 1.5 s."))
+    assertEquals(describe(flamingos2(1, Flamingos2ReadMode.Bright)), List("Exposure times for Flamingos 2 bright read mode must be at least 2 s."))
     assertEquals(describe(flamingos2(80, Flamingos2ReadMode.Faint)), List("Exposure times below 85 s are not recommended for Flamingos 2 faint read mode."))
     assertEquals(describe(flamingos2(21.5, Flamingos2ReadMode.Medium)), List("Exposure times for Flamingos 2 must be a whole number of seconds."))
 
