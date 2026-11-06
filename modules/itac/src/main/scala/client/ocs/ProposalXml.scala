@@ -311,7 +311,8 @@ object ProposalXml2:
             piName      = piName,
             title       = title,
             allocations = NonEmptyList.one(allocation),
-            tpe         = proposalType,
+            scienceSubtype  = proposalType.scienceSubtype,
+            too = ProposalType.TooActivation.getOption(proposalType).getOrElse(TooActivation.None),
             groupTree   = groupTree,
             cfpActive   = DateInterval.between(semester.start.localDate, semester.end.localDate),
             ranking     = ranking

@@ -9,15 +9,12 @@ import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.enums.Half
 import lucuma.core.enums.ScienceBand
 import lucuma.core.enums.ScienceBand.*
-import lucuma.core.enums.TooActivation
-import lucuma.core.model.IntPercent
 import lucuma.core.model.ProposalReference
-import lucuma.core.model.ProposalType
 import lucuma.core.model.Semester
 import lucuma.core.model.Semester.YearInt
-import lucuma.core.util.TimeSpan
 import munit.FunSuite
 import org.junit.Assert
+import lucuma.core.enums.ScienceSubtype
 
 class QueueEngineBandProblemsTest extends FunSuite {
   import QueueEngineBandProblems._
@@ -27,7 +24,6 @@ class QueueEngineBandProblemsTest extends FunSuite {
     Proposal.forTesting(
       ProposalReference(Semester(YearInt.unsafeFrom(2026), Half.A), PosInt.unsafeFrom(1)),
       allocations       = null,
-      tpe               = null,
       groupTree         = GroupTree.empty,
     )
 
@@ -36,7 +32,7 @@ class QueueEngineBandProblemsTest extends FunSuite {
     ScienceBand.values.foreach(b => Assert.assertEquals(expect.lift(b), problem.lift((proposal, b))))
 
   test("testClassicalNotInBand1"):
-    testRule(ClassicalNotInBand1, P.copy(tpe = ProposalType.Classical(IntPercent.unsafeFrom(100), Nil))) { // TODO
+    testRule(ClassicalNotInBand1, P.copy(scienceSubtype = ScienceSubtype.Classical)) { // TODO
       case Band2 => "Classical proposal in Band2"
       case Band3 => "Classical proposal in Band3"
       case Band4 => "Classical proposal in Band4"
@@ -55,27 +51,27 @@ class QueueEngineBandProblemsTest extends FunSuite {
   //   }
 
   test("testLpInBand3Or4"):
-    testRule(LpInBand3Or4, P.copy(tpe = ProposalType.LargeProgram(TooActivation.None, IntPercent.unsafeFrom(100), IntPercent.unsafeFrom(100), TimeSpan.Min))) { // TODO
+    testRule(LpInBand3Or4, P.copy(scienceSubtype = ScienceSubtype.LargeProgram)) {
       case Band3 => "LP proposal in Band3"
       case Band4 => "LP proposal in Band4"
     }
 
   test("testInterruptingTooOutsideBand1"):
-    testRule(RapidTooOutsideBand1, P.copy(tpe = ProposalType.Queue(TooActivation.Interrupting, IntPercent.unsafeFrom(100), Nil))) { // TODO
+    testRule(RapidTooOutsideBand1, P.copy(scienceSubtype = ScienceSubtype.Queue)) {
       case Band2 => "Rapid TOO proposal in Band2"
       case Band3 => "Rapid TOO proposal in Band3"
       case Band4 => "Rapid TOO proposal in Band4"
     }
 
   test("testRapidTooOutsideBand1"):
-    testRule(RapidTooOutsideBand1, P.copy(tpe = ProposalType.Queue(TooActivation.Rapid, IntPercent.unsafeFrom(100), Nil))) { // TODO
+    testRule(RapidTooOutsideBand1, P.copy(scienceSubtype = ScienceSubtype.Queue)) {
       case Band2 => "Rapid TOO proposal in Band2"
       case Band3 => "Rapid TOO proposal in Band3"
       case Band4 => "Rapid TOO proposal in Band4"
     }
 
   test("testStandardTooOutsideBand12"):
-    testRule(StandardTooOutsideBand12, P.copy(tpe = ProposalType.Queue(TooActivation.Standard, IntPercent.unsafeFrom(100), Nil))) { // TODO
+    testRule(StandardTooOutsideBand12, P.copy(scienceSubtype = ScienceSubtype.Queue)) {
       case Band3 => "Standard TOO proposal in Band3"
       case Band4 => "Standard TOO proposal in Band4"
     }
