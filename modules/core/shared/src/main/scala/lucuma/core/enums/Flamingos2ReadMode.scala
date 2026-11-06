@@ -25,9 +25,9 @@ enum Flamingos2ReadMode(
   val readNoise: Double
 ) derives Enumerated:
 
-  case Bright extends Flamingos2ReadMode("Bright", "bright", "Bright Object", "Strong Source", 1500.msTimeSpan, 5000.msTimeSpan, 8000.msTimeSpan, Flamingos2Reads.Reads_1, 11.7)
-  case Medium extends Flamingos2ReadMode("Medium", "medium", "Medium Object", "Medium Source", 6.secTimeSpan,   21.secTimeSpan,  14.secTimeSpan,  Flamingos2Reads.Reads_4, 6.0)
-  case Faint  extends Flamingos2ReadMode("Faint",  "faint",  "Faint Object",  "Weak Source",   12.secTimeSpan,  85.secTimeSpan,  20.secTimeSpan,  Flamingos2Reads.Reads_8, 5.0)
+  case Bright extends Flamingos2ReadMode("Bright", "bright", "Bright Object", "Strong Source",  2.secTimeSpan,  5.secTimeSpan,  8.secTimeSpan, Flamingos2Reads.Reads_1, 11.7)
+  case Medium extends Flamingos2ReadMode("Medium", "medium", "Medium Object", "Medium Source",  8.secTimeSpan, 21.secTimeSpan, 14.secTimeSpan, Flamingos2Reads.Reads_4, 6.0)
+  case Faint  extends Flamingos2ReadMode("Faint",  "faint",  "Faint Object",  "Weak Source",   14.secTimeSpan, 85.secTimeSpan, 20.secTimeSpan, Flamingos2Reads.Reads_8, 5.0)
 
 object Flamingos2ReadMode:
 
