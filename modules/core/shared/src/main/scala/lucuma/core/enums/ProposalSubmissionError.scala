@@ -69,6 +69,13 @@ enum ProposalSubmissionError(val tag: String, val message: String) derives Enume
   case UnmatchedPartnerTime
     extends ProposalSubmissionError("unmatched_partner_time", "Non-US partner time requests must have matching collaborators.")
 
+  /**
+   * Reported once per partner; `ProposalSubmissionError.missingPartnerLead` gives the message
+   * naming the partner.  `message` is the general statement of the rule.
+   */
+  case MissingPartnerLead
+    extends ProposalSubmissionError("missing_partner_lead", "Select a partner lead for each partner with requested time.")
+
   case MissingInvestigatorName
     extends ProposalSubmissionError("missing_investigator_name", "Every investigator must have a name.")
 
@@ -107,3 +114,9 @@ enum ProposalSubmissionError(val tag: String, val message: String) derives Enume
 
   case PastDeadline
     extends ProposalSubmissionError("past_deadline", "The Call for Proposals has passed its deadline.")
+
+object ProposalSubmissionError:
+
+  /** The `MissingPartnerLead` message for partner `p`. */
+  def missingPartnerLead(p: Partner): String =
+    s"Select a partner lead for ${p.longName}."
