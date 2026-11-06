@@ -12,9 +12,7 @@ import lucuma.core.enums.Site
 import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.enums.TooActivation
 import lucuma.core.model.Allocation
-import lucuma.core.model.IntPercent
 import lucuma.core.model.ProposalReference
-import lucuma.core.model.ProposalType
 import lucuma.core.util.DateInterval
 import lucuma.core.util.TimeSpan
 

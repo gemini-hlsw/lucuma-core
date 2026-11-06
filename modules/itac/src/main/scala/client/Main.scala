@@ -26,6 +26,7 @@ import itac.operation.Ls
 import cats.data.ValidatedNel
 import lucuma.core.model.ProposalReference
 import client.operation.Info
+import itac.operation.StaffEmailSpreadsheet
 
 object BuildInfo:
   val version = s"***** NEED TO ADD ACTUAL BUILDINFO!!!"
@@ -164,11 +165,11 @@ trait MainOpts { this: CommandIOApp =>
       header = "Print information about the specified proposal."
     )(proposalReference.map(Info[IO](_)))
 
-  // lazy val staffEmailSpreadsheet: Command[Operation[IO]] =
-  //   Command(
-  //     name   = "staff-email-spreadsheet",
-  //     header = "Generate the staff email spreadsheet."
-  //   )(StaffEmailSpreadsheet[IO](QueueEngine, PerSite.unfold(Workspace.Default.queueConfigFile), PerSite.unfold(Workspace.Default.rolloverReport)).pure[Opts])
+  lazy val staffEmailSpreadsheet: Command[Operation[IO]] =
+    Command(
+      name   = "staff-email-spreadsheet",
+      header = "Generate the staff email spreadsheet."
+    )(StaffEmailSpreadsheet[IO](QueueEngine, PerSite.unfold(Workspace.Default.queueConfigFile)).pure[Opts])
 
   // lazy val ngoSpreadsheet: Command[Operation[IO]] =
   //   Command(
@@ -405,7 +406,7 @@ trait MainOpts { this: CommandIOApp =>
       // scheduling,
       // blueprints,
       // chartData,
-      // staffEmailSpreadsheet,
+      staffEmailSpreadsheet,
       // ngoSpreadsheet,
       // instrumentSpreadsheet,
       // directorSpreadsheet,
