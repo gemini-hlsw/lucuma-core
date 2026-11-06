@@ -97,9 +97,10 @@ object PartnerLeads:
         Left(s"Program user $id is not an investigator affiliated with ${p.longName}, so may not be its partner lead.")
 
   /**
-   * The requested partners that lack a lead even though at least one investigator is eligible to
-   * lead them, in partner order.  A partner nobody on the team may lead is left to the rule that
-   * requires a matching investigator.
+   * The requested partners that lack a valid lead even though at least one investigator is eligible
+   * to lead them, in partner order.  A lead counts only if `validateSelection` accepts it, so a
+   * co-investigator recorded as the lead of the PI's partner does not.  A partner nobody on the team
+   * may lead is left to the rule that requires a matching investigator.
    */
   def missing(
     requested: Set[Partner],
@@ -109,7 +110,7 @@ object PartnerLeads:
     Enumerated[Partner].all.filter: p =>
       requested.contains(p) && {
         val eligible = candidates(p, team)
-        eligible.nonEmpty && !leads.get(p).exists(id => eligible.exists(_.id === id))
+        eligible.nonEmpty && !leads.get(p).exists(id => validateSelection(p, id, team).isRight)
       }
 
 end PartnerLeads

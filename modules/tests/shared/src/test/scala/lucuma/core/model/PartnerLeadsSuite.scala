@@ -97,6 +97,10 @@ final class PartnerLeadsSuite extends ScalaCheckSuite:
     val team = List(pi(1, gemini(CA)), coi(2, gemini(AR)), coi(3, gemini(AR)))
     assertEquals(PartnerLeads.missing(Set(AR), team, Map(AR -> id(1))), List(AR))
 
+  test("missing ignores a co-investigator recorded as the lead of the PI's partner"):
+    val team = List(pi(1, gemini(CA)), coi(2, gemini(CA)))
+    assertEquals(PartnerLeads.missing(Set(CA), team, Map(CA -> id(2))), List(CA))
+
   private val genCandidate: Gen[Candidate] =
     for
       n    <- Gen.choose(1, 8)
