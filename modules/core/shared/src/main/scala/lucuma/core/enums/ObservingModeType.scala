@@ -38,6 +38,8 @@ sealed trait ObservingModeType derives Enumerated:
   def isVisitor: Boolean =
     fold(_ => false, _ => false, _ => false, _ => true)
 
+  def isMos: Boolean = false
+
   // Only facility instruments can sit behind Altair.
   def supportsAltair: Boolean =
     fold(_ => false, _ => false, _.instrument.supportsAltair, _ => false)
@@ -121,6 +123,11 @@ enum FacilityObservingModeType(
 
   override def observatory: Observatory =
     Observatory.Gemini
+
+  override def isMos: Boolean =
+    this match
+      case Flamingos2Mos | GmosNorthMos | GmosSouthMos => true
+      case _                                           => false
 
 enum VisitorObservingModeType(
   val tag: String,
