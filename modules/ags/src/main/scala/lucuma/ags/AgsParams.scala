@@ -377,6 +377,7 @@ object AgsParams:
       fpu.fold(_.fpuType, _.fpuType) match
         case GmosFpuType.LongSlit | GmosFpuType.Ns => true
         case GmosFpuType.Ifu                       => false
+        case GmosFpuType.MOS                       => false
 
   // GMOS MOS. use as the science are the MOS outline.
   case class GmosMos private (
