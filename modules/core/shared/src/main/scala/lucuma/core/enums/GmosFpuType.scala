@@ -11,3 +11,4 @@ enum GmosFpuType(val tag: String) derives Enumerated:
   case LongSlit extends GmosFpuType("LongSlit")
   case Ns       extends GmosFpuType("Ns")
   case Ifu      extends GmosFpuType("Ifu")
+  case MOS      extends GmosFpuType("MOS")

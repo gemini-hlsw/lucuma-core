@@ -139,7 +139,7 @@ trait GmosScienceAreaGeometry {
                   GmosNorthFpu.Ns4 | GmosNorthFpu.Ns5) =>
           nsFov(n.effectiveSlitWidth)
 
-        case GmosNorthFpu.Ifu2Slits | GmosNorthFpu.IfuBlue | GmosNorthFpu.IfuRed =>
+        case GmosNorthFpu.Ifu2Slits | GmosNorthFpu.IfuBlue | GmosNorthFpu.IfuRed | GmosNorthFpu.Pinhole =>
           ShapeExpression.empty
 
         case n@(GmosNorthFpu.LongSlit_0_25 | GmosNorthFpu.LongSlit_0_50 |
@@ -156,7 +156,7 @@ trait GmosScienceAreaGeometry {
 
         case GmosSouthFpu.Ifu2Slits | GmosSouthFpu.IfuBlue |
              GmosSouthFpu.IfuRed | GmosSouthFpu.IfuNS2Slits | GmosSouthFpu.IfuNSBlue |
-             GmosSouthFpu.IfuNSRed =>
+             GmosSouthFpu.IfuNSRed | GmosSouthFpu.Pinhole =>
           ShapeExpression.empty
 
         case s@(GmosSouthFpu.LongSlit_0_25 | GmosSouthFpu.LongSlit_0_50 |
