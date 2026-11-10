@@ -159,5 +159,11 @@ object ObservationValidationCode:
         "Second Order Overlap",
         "Second order light overlaps the first order spectrum; an order-blocking filter may be needed.",
       )
+    case MissingSmartGcal
+      extends Warning(
+        "missing_smart_gcal",
+        "Missing Smart GCAL",
+        "A calibration was left out of the sequence because no Smart GCAL entry is defined for its configuration.",
+      )
 
 

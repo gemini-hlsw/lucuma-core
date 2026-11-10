@@ -61,3 +61,6 @@ object ObservationValidation:
 
     def secondOrderOverlap(msg: String, moreMsgs: String*): ObservationValidation =
       fromMsgs(SecondOrderOverlap, msg, moreMsgs*)
+
+    def missingSmartGcal(msg: String, moreMsgs: String*): ObservationValidation =
+      fromMsgs(MissingSmartGcal, msg, moreMsgs*)
