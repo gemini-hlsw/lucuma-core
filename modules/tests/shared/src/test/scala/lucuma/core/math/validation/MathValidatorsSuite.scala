@@ -27,18 +27,18 @@ final class MathValidatorsSuite extends DisciplineSuite {
   checkAll("angleArcSec", ValidSplitEpiTests(MathValidators.angleArcSec).validSplitEpiLaws)
 
   checkAll(
-    "truncatedAngleSignedArcSec",
-    ValidWedgeTests(MathValidators.truncatedAngleSignedArcSec).validWedgeWith(genNumericString)
+    "roundedAngleSignedArcSec",
+    ValidWedgeTests(MathValidators.roundedAngleSignedArcSec).validWedgeWith(genNumericString)
   )
 
   checkAll(
-    "truncatedAngleDegrees",
-    ValidWedgeTests(MathValidators.truncatedAngleDegrees).validWedgeWith(genNumericString)
+    "roundedAngleDegrees",
+    ValidWedgeTests(MathValidators.roundedAngleDegrees).validWedgeWith(genNumericString)
   )
 
   checkAll(
-    "truncatedAngleSignedDegrees",
-    ValidWedgeTests(MathValidators.truncatedAngleSignedDegrees).validWedgeWith(genNumericString)
+    "roundedAngleSignedDegrees",
+    ValidWedgeTests(MathValidators.roundedAngleSignedDegrees).validWedgeWith(genNumericString)
   )
 
   val genHourAngleString      = arbitrary[HourAngle].map(HourAngle.fromStringHMS.reverseGet)
@@ -50,8 +50,8 @@ final class MathValidatorsSuite extends DisciplineSuite {
   )
 
   checkAll(
-    "truncatedRA",
-    ValidWedgeTests(MathValidators.truncatedRA).validWedgeWith(genMaybeHourAngleString)
+    "roundedRA",
+    ValidWedgeTests(MathValidators.roundedRA).validWedgeWith(genMaybeHourAngleString)
   )
 
   val genDeclinationString      = arbitrary[Declination].map(Declination.fromStringSignedDMS.reverseGet)
@@ -64,7 +64,7 @@ final class MathValidatorsSuite extends DisciplineSuite {
   )
 
   checkAll(
-    "truncatedDec",
-    ValidWedgeTests(MathValidators.truncatedDec).validWedgeWith(genMaybeDeclinationString)
+    "roundedDec",
+    ValidWedgeTests(MathValidators.roundedDec).validWedgeWith(genMaybeDeclinationString)
   )
 }

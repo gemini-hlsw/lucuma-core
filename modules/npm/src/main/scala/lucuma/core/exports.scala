@@ -23,12 +23,12 @@ import scala.scalajs.js.annotation.JSExportTopLevel
 @JSExportTopLevel("deg2hms")
 def deg2hms(deg: Double): String =
   val ra = RightAscension.fromDoubleDegrees(deg)
-  MathValidators.truncatedRA.reverseGet(ra)
+  MathValidators.roundedRA.reverseGet(ra)
 
 @JSExportTopLevel("deg2dms")
 def deg2dms(deg: Double): String =
   val dec = Declination.fromAngleWithCarry(Angle.fromDoubleDegrees(deg))._1
-  MathValidators.truncatedDec.reverseGet(dec)
+  MathValidators.roundedDec.reverseGet(dec)
 
 @JSExportTopLevel("hms2deg")
 def hms2deg(hms: String): Double =
@@ -130,7 +130,7 @@ def parseDmsString(maybeDms: String): js.UndefOr[String] =
 def parseHmsString(maybeHms: String): js.UndefOr[String] =
   RightAscension.fromStringHMS
     .getOption(maybeHms)
-    .fold(js.undefined)(MathValidators.truncatedRA.reverseGet)
+    .fold(js.undefined)(MathValidators.roundedRA.reverseGet)
 
 @JSExportTopLevel("parseEpochString")
 def parseEpochString(maybeEpoch: String): js.UndefOr[String] =
