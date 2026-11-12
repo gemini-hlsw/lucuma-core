@@ -82,18 +82,19 @@ final case class TimingWindow(
 
     val windowStart = start.toInstant
 
-    // find the start of a repeat window nearest to the start of `within`
-    def windowStartForPeriod(period: TimeSpan) =
-      windowStart
-        .plusMillis(
-          period.toDuration
-            .multipliedBy(
-              Duration.between(windowStart, within.lower).toMillis() / period.toDuration
-                .toMillis()
-            )
-            .toMillis()
-        )
-        .max(windowStart) // window start could be set after `within`
+    // The index (0 being the initial window) of the first repetition that may still be open at the
+    // start of `within`, together with its start. Skipping the repetitions that ended earlier keeps
+    // the work proportional to `within` rather than to the time elapsed since `windowStart`.
+    def firstRelevantRepeat(duration: TimeSpan, period: TimeSpan): (Long, Instant) =
+      val periodMillis = period.toDuration.toMillis.max(1L)
+      val index        =
+        Math
+          .floorDiv(
+            Duration.between(windowStart, within.lower).toMillis - duration.toDuration.toMillis,
+            periodMillis
+          )
+          .max(0L) // window start could be set after `within`
+      (index, windowStart.plusMillis(index * periodMillis))
 
     val intervals =
       end match {
@@ -104,23 +105,22 @@ final case class TimingWindow(
         // No repetition
         case Some(TimingWindowEnd.After(duration, None))                                          =>
           IntervalSeq(Interval(windowStart, windowStart.plus(duration.toDuration)))
-        // Repeat period n times
+        // Repeat period n times: the initial window plus `times` repetitions, so indices 0 to `times`.
+        // The index counts from `windowStart`, not from the start of `within`.
         case Some(TimingWindowEnd.After(duration, Some(TimingWindowRepeat(period, Some(times))))) =>
-          val nearestStart = windowStartForPeriod(period)
           intervalsForStarts(
-            List.unfold((0, nearestStart))(
+            List.unfold(firstRelevantRepeat(duration, period))(
               _.some
-                .filter(_._1 <= times.value)
+                .filter(_._1 <= times.value.toLong)
                 .filter(_._2 <= within.upper)
-                .map((iter, start) => (start, (iter + 1, start.plus(period.toDuration))))
+                .map((index, start) => (start, (index + 1, start.plus(period.toDuration))))
             ),
             duration.toDuration
           )
         // Repeat period for ever
         case Some(TimingWindowEnd.After(duration, Some(TimingWindowRepeat(period, None))))        =>
-          val nearestStart = windowStartForPeriod(period)
           intervalsForStarts(
-            List.unfold(nearestStart)(
+            List.unfold(firstRelevantRepeat(duration, period)._2)(
               _.some
                 .filter(i => i <= within.upper)
                 .map(start => (start, start.plus(period.toDuration)))

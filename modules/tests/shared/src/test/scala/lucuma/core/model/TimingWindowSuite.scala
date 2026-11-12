@@ -61,6 +61,38 @@ final class TimingWindowSuite extends DisciplineSuite {
     assertEquals(seq.duration, Duration.ofHours(4))
   }
 
+  test("toIntervalSeq: repeat n times that all ended before the bounds is empty") {
+    val seq = repeating(lower.minus(5, ChronoUnit.DAYS), Duration.ofHours(1), Duration.ofDays(1), Some(3))
+      .toIntervalSeq(within(10))
+    assert(seq.isEmpty)
+  }
+
+  test("toIntervalSeq: repeat n times starting before the bounds counts repeats from the window start") {
+    val seq = repeating(lower.minus(2, ChronoUnit.DAYS), Duration.ofHours(1), Duration.ofDays(1), Some(3))
+      .toIntervalSeq(within(10))
+    // Only repeats 2 and 3 fall within the bounds.
+    assertEquals(seq.intervals.size, 2)
+    assertEquals(seq.duration, Duration.ofHours(2))
+    assert(seq.intervals.head.contains(lower))
+    assert(seq.intervals.last.contains(lower.plus(1, ChronoUnit.DAYS)))
+  }
+
+  test("toIntervalSeq: repeat forever starting before the bounds") {
+    val seq = repeating(lower.minus(2, ChronoUnit.DAYS), Duration.ofHours(1), Duration.ofDays(1), None)
+      .toIntervalSeq(within(10))
+    assertEquals(seq.intervals.size, 10)
+    assertEquals(seq.duration, Duration.ofHours(10))
+  }
+
+  test("toIntervalSeq: a repetition still open at the start of the bounds is included") {
+    // Opens 3h before the bounds and lasts 5h, repeating every 2h: the repetitions opening at -3h
+    // and -1h are both still open at the start of the bounds.
+    val seq = repeating(lower.minus(3, ChronoUnit.HOURS), Duration.ofHours(5), Duration.ofHours(2), Some(1))
+      .toIntervalSeq(within(1))
+    assertEquals(seq.intervals.size, 1)
+    assertEquals(seq.duration, Duration.ofHours(4))
+  }
+
   test("toIntervalSeq: a repeating window starting after the bounds is empty") {
     val seq = repeating(lower.plus(20, ChronoUnit.DAYS), Duration.ofHours(1), Duration.ofDays(1), None)
       .toIntervalSeq(within(10))
