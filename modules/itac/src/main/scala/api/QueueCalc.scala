@@ -9,6 +9,8 @@ import lucuma.core.data.PerSite
 import lucuma.core.enums.ScienceBand
 import edu.gemini.tac.qengine.impl.resource.PerRightAscensionResource
 import edu.gemini.tac.qengine.api.config.ConditionsCategory
+import edu.gemini.tac.qengine.p1.ProposalShard
+import edu.gemini.tac.qengine.log.RejectMessage
 
 /**
  * A queue calculation result.  This is a combination of a ProposalQueue and
@@ -20,7 +22,10 @@ case class QueueCalc(
   proposalLog: ProposalLog,
   bucketsAllocation: PerSite[BucketsAllocation],
   // def toList: List[Proposal] = Enumerated[ScienceBand].all.flatMap(queue(_).toList)
-)
+):
+  val rejects: List[ProposalShard] =
+    proposalLog.toList.collect:
+      case ProposalLog.Entry(_, m: RejectMessage) => m.prop
 
 case class BucketsAllocation(raBins: List[PerRightAscensionResource]) {
 
