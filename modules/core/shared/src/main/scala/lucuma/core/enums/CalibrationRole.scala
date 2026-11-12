@@ -14,3 +14,4 @@ enum CalibrationRole(val tag: String, val observeClass: ObserveClass, val autoGe
   case DaytimeFlat        extends CalibrationRole("daytime_flat", ObserveClass.DayCal)
   case DaytimeArc         extends CalibrationRole("daytime_arc", ObserveClass.DayCal)
   case DaytimeCalibration extends CalibrationRole("daytime_calibration", ObserveClass.DayCal, false)
+  case MosMaskFlat        extends CalibrationRole("mos_mask_flat", ObserveClass.DayCal)
