@@ -33,6 +33,7 @@ class EnumeratedSuite extends DisciplineSuite {
   checkEnumLaws[SchedulingMode]
   checkEnumLaws[GroupStatus]
   checkEnumLaws[GroupConstraintViolation]
+  checkEnumLaws[GroupStandingStatus]
 
   // Derivation
   checkEnumLaws[Theme]
