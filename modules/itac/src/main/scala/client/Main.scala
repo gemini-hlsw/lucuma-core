@@ -27,6 +27,7 @@ import cats.data.ValidatedNel
 import lucuma.core.model.ProposalReference
 import client.operation.Info
 import itac.operation.StaffEmailSpreadsheet
+import itac.operation.NgoSpreadsheet
 
 object BuildInfo:
   val version = s"***** NEED TO ADD ACTUAL BUILDINFO!!!"
@@ -171,11 +172,11 @@ trait MainOpts { this: CommandIOApp =>
       header = "Generate the staff email spreadsheet."
     )(StaffEmailSpreadsheet[IO](QueueEngine, PerSite.unfold(Workspace.Default.queueConfigFile)).pure[Opts])
 
-  // lazy val ngoSpreadsheet: Command[Operation[IO]] =
-  //   Command(
-  //     name   = "ngo-spreadsheets",
-  //     header = "Generate NGO spreadsheets."
-  //   )(NgoSpreadsheet[IO](QueueEngine, PerSite.unfold(Workspace.Default.queueConfigFile), PerSite.unfold(Workspace.Default.rolloverReport)).pure[Opts])
+  lazy val ngoSpreadsheet: Command[Operation[IO]] =
+    Command(
+      name   = "ngo-spreadsheets",
+      header = "Generate NGO spreadsheets."
+    )(NgoSpreadsheet[IO](QueueEngine, PerSite.unfold(Workspace.Default.queueConfigFile)).pure[Opts])
 
   // lazy val instrumentSpreadsheet: Command[Operation[IO]] =
   //   Command(
@@ -407,7 +408,7 @@ trait MainOpts { this: CommandIOApp =>
       // blueprints,
       // chartData,
       staffEmailSpreadsheet,
-      // ngoSpreadsheet,
+      ngoSpreadsheet,
       // instrumentSpreadsheet,
       // directorSpreadsheet,
       // bulkEdits,
