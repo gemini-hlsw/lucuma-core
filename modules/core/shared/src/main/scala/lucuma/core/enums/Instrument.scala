@@ -29,7 +29,7 @@ enum Instrument(val tag: String, val shortName: String, val longName: String, va
   /** @group Constructors */ case Igrins2      extends Instrument("Igrins2", "IGRINS-2", "IGRINS-2", "IGRINS2".refined[NonEmpty])
   /** @group Constructors */ case MaroonX      extends Instrument("MaroonX", "MAROON-X", "MAROON-X", "MAROONX".refined[NonEmpty], isVisitor = true)
   /** @group Constructors */ case Niri         extends Instrument("Niri", "NIRI", "NIRI", "NIRI".refined[NonEmpty])
-  /** @group Constructors */ case Scorpio      extends Instrument("Scorpio", "SCORPIO", "Scorpio", "SCORPIO".refined[NonEmpty])
+  /** @group Constructors */ case Scorpio      extends Instrument("Scorpio", "SCORPIO", "SCORPIO", "SCORPIO".refined[NonEmpty])
   /** @group Constructors */ case VisitorNorth extends Instrument("VisitorNorth", "Visitor (North)", "Visitor Instrument (North)", "VISITORN".refined[NonEmpty], isVisitor = true)
   /** @group Constructors */ case VisitorSouth extends Instrument("VisitorSouth", "Visitor (South)", "Visitor Instrument (South)", "VISITORS".refined[NonEmpty], isVisitor = true)
   /** @group Constructors */ case Zorro        extends Instrument("Zorro", "ZORRO", "Zorro", "ZORRO".refined[NonEmpty], isVisitor = true)

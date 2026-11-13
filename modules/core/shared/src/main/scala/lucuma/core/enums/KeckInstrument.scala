@@ -3,8 +3,9 @@
 
 package lucuma.core.enums
 
+import lucuma.core.util.Display
 import lucuma.core.util.Enumerated
 
-enum KeckInstrument(val tag: String) derives Enumerated:
-  case Hires extends KeckInstrument("hires")
-  case Other extends KeckInstrument("other")
+enum KeckInstrument(val tag: String, val name: String) derives Enumerated, Display:
+  case Hires extends KeckInstrument("hires", "HIRES")
+  case Other extends KeckInstrument("other", "Other")
