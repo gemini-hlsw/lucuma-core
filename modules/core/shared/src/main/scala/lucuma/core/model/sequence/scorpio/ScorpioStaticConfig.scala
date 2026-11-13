@@ -13,12 +13,15 @@ import monocle.Lens
 
 /**
  * Configuration shared by SCORPIO imaging and long-slit observations. The SVC (slit viewing
- * camera) is only used in long-slit, so its exposure time is empty for imaging.
+ * camera) and VIS Nod-and-Shift are only used in long-slit, so they are empty for imaging.
+ *
+ * ADC and SVC default to off because both are currently disabled in the hardware.
  */
 final case class ScorpioStaticConfig(
   channelSet:      ScorpioChannelSet,
-  adc:             ScorpioAdc,
-  svcExposureTime: Option[TimeSpan]
+  adc:             ScorpioAdc                 = ScorpioAdc.Out,
+  svcExposureTime: Option[TimeSpan]           = None,
+  nodAndShift:     Option[ScorpioNodAndShift] = None
 ) derives Eq
 
 object ScorpioStaticConfig:
@@ -33,3 +36,7 @@ object ScorpioStaticConfig:
   /** @group Optics */
   val svcExposureTime: Lens[ScorpioStaticConfig, Option[TimeSpan]] =
     Focus[ScorpioStaticConfig](_.svcExposureTime)
+
+  /** @group Optics */
+  val nodAndShift: Lens[ScorpioStaticConfig, Option[ScorpioNodAndShift]] =
+    Focus[ScorpioStaticConfig](_.nodAndShift)

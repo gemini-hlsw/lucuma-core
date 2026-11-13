@@ -17,6 +17,7 @@ import org.scalacheck.Cogen
 trait ArbScorpioStaticConfig:
 
   import ArbEnumerated.given
+  import ArbScorpioNodAndShift.given
   import ArbTimeSpan.given
 
   given Arbitrary[ScorpioStaticConfig] =
@@ -25,18 +26,21 @@ trait ArbScorpioStaticConfig:
         c <- arbitrary[ScorpioChannelSet]
         a <- arbitrary[ScorpioAdc]
         s <- arbitrary[Option[TimeSpan]]
-      yield ScorpioStaticConfig(c, a, s)
+        n <- arbitrary[Option[ScorpioNodAndShift]]
+      yield ScorpioStaticConfig(c, a, s, n)
 
   given Cogen[ScorpioStaticConfig] =
     Cogen[(
       ScorpioChannelSet,
       ScorpioAdc,
-      Option[TimeSpan]
+      Option[TimeSpan],
+      Option[ScorpioNodAndShift]
     )].contramap: a =>
       (
         a.channelSet,
         a.adc,
-        a.svcExposureTime
+        a.svcExposureTime,
+        a.nodAndShift
       )
 
 object ArbScorpioStaticConfig extends ArbScorpioStaticConfig

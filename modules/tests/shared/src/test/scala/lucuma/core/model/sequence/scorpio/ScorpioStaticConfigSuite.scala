@@ -10,6 +10,7 @@ import munit.*
 
 class ScorpioStaticConfigSuite extends DisciplineSuite:
 
+  import lucuma.core.model.sequence.scorpio.arb.ArbScorpioNodAndShift.given
   import lucuma.core.util.arb.ArbEnumerated.given
   import lucuma.core.util.arb.ArbTimeSpan.given
 
@@ -17,3 +18,4 @@ class ScorpioStaticConfigSuite extends DisciplineSuite:
   checkAll("ScorpioStaticConfig.channelSet", LensTests(ScorpioStaticConfig.channelSet))
   checkAll("ScorpioStaticConfig.adc", LensTests(ScorpioStaticConfig.adc))
   checkAll("ScorpioStaticConfig.svcExposureTime", LensTests(ScorpioStaticConfig.svcExposureTime))
+  checkAll("ScorpioStaticConfig.nodAndShift", LensTests(ScorpioStaticConfig.nodAndShift))
