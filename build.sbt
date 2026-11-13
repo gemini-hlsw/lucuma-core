@@ -233,6 +233,9 @@ lazy val itac = project
       "org.typelevel" %% "munit-cats-effect"   % munitCatsEffectVersion % Test,
       "org.scala-lang.modules" %% "scala-xml"  % scalaXmlVersion,
       "org.typelevel" %% "cats-mtl" % "1.4.0",
+      "edu.gemini"    %% "clue-core"            % clueVersion,
+      "edu.gemini"    %% "clue-http4s"          % clueVersion,
+      "org.http4s"                       %% "http4s-jdk-http-client"                     % http4sJdkHttpClientVersion,
     )
   )
 

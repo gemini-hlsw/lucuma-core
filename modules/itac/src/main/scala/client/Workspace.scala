@@ -33,6 +33,9 @@ import cats.data.NonEmptyList
 import edu.gemini.tac.qengine.p1.GroupTree
 import lucuma.core.model.Allocation
 import eu.timepit.refined.types.numeric.PosDouble
+import client.graphql.Fetch
+import cats.effect.Async
+import lucuma.core.model.CallForProposals
 
 /** Interface for some Workspace operations. */
 trait Workspace[F[_]] {
@@ -115,11 +118,12 @@ object Workspace {
       // version = YamlVersion.Auto
     )
 
-  def apply[F[_]: Sync](dir: Path, cc: Path, log: Logger[F], force: Boolean): F[Workspace[F]] =
+  def apply[F[_]: Sync: Async](dir: Path, cc: Path, log: Logger[F], force: Boolean, ocs: Boolean, callId: CallForProposals.Id): F[Workspace[F]] =
     ItacException(s"Workspace directory not found: ${dir}").raiseError[F, Workspace[F]].unlessA(dir.toFile.getAbsoluteFile.isDirectory) *>
     log.debug(s"Working directory is ${dir.toAbsolutePath()}") >>
     Ref[F].of(Map.empty[Path, String]).map { cache =>
       new Workspace[F] {
+        given Logger[F] = log
 
         def cwd = dir.pure[F]
 
@@ -276,9 +280,13 @@ object Workspace {
           } yield e.toOption.foldMap(mergeSplits)
 
         def proposals: F[List[Proposal]] =
-          cwd.flatMap: cwd =>
-            loadOcsProposals:
-              Enumerated[ScienceBand].all.fproduct(b => cwd.resolve(proposalDir(b))).toMap
+          if ocs then
+            cwd.flatMap: cwd =>
+              loadOcsProposals:
+                Enumerated[ScienceBand].all.fproduct(b => cwd.resolve(proposalDir(b))).toMap
+          else
+            commonConfig.flatMap: config =>
+              Fetch(config.uri, config.authorization, callId).fetch
 
         def shards: F[List[ProposalShard]] =
           proposals.map: ps =>
