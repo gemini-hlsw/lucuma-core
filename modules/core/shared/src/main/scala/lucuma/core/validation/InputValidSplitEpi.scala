@@ -151,7 +151,7 @@ object InputValidSplitEpi {
    * `InputValidSplitEpi` for `BigDecimal`.
    *
    * Does not, and cannot, format to a particular number of decimal places. For that you need a
-   * `truncatedBigDecimal`.
+   * `roundedBigDecimal`.
    */
   val bigDecimal: InputValidSplitEpi[BigDecimal] =
     InputValidSplitEpi(

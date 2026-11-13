@@ -16,7 +16,7 @@ final class RightAscensionJS(ra: RightAscension) extends js.Object:
 
   private def divMicro(micro: Long, denom: Int) = BigDecimal(micro, 6) / denom
 
-  val hms: String             = MathValidators.truncatedRA.reverseGet(ra)
+  val hms: String             = MathValidators.roundedRA.reverseGet(ra)
   val hours: Double           = divMicro(µs, 3_600).floatValue
   val degrees: Double         = divMicro(µas, 3_600).floatValue
   val microseconds: js.BigInt = js.BigInt(µs.toString())
