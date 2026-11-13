@@ -13,6 +13,8 @@ import lucuma.core.enums.GmosXBinning
 import lucuma.core.enums.GmosYBinning
 import lucuma.core.enums.GnirsReadMode
 import lucuma.core.enums.ObserveClass
+import lucuma.core.enums.ScorpioChannel
+import lucuma.core.enums.ScorpioFilter
 import lucuma.core.enums.SkyBackground
 import lucuma.core.model.sequence.Step
 import lucuma.core.model.sequence.StepConfig
@@ -27,6 +29,7 @@ import lucuma.core.model.sequence.gmos.MinExposureTime as GmosMinExposureTime
 import lucuma.core.model.sequence.igrins2.MaxExposureTime as Igrins2MaxExposureTime
 import lucuma.core.model.sequence.igrins2.MinExposureTime as Igrins2MinExposureTime
 import lucuma.core.model.sequence.igrins2.SvcMinExposureTime as Igrins2SvcMinExposureTime
+import lucuma.core.model.sequence.scorpio.VisMinExposureTime as ScorpioVisMinExposureTime
 import lucuma.core.util.Enumerated
 import lucuma.core.util.TimeSpan
 
@@ -212,3 +215,22 @@ object ExposureRules:
   def igrins2(observeClass: ObserveClass): List[ExposureRule] =
     if observeClass === ObserveClass.Acquisition then igrins2Svc
     else igrins2Spectrograph
+
+  // SCORPIO
+
+  // Only the VIS shutter minimum is known so far, the NIR channels have no rules yet.
+  private val scorpioRules: Map[ScorpioFilter, List[ExposureRule]] =
+    Enumerated[ScorpioFilter].all.fproduct: filter =>
+      filter.channel match
+        case ScorpioChannel.Vis =>
+          List(
+            ExposureRule.Limits(nes(s"the SCORPIO ${filter.shortName} channel"), none, Severity.Error, ExposureTimeLimits.fromMin(ScorpioVisMinExposureTime))
+          )
+        case ScorpioChannel.Ir  => Nil
+    .toMap
+
+  /**
+   * SCORPIO rules for the detector behind `filter`.
+   */
+  def scorpio(filter: ScorpioFilter): List[ExposureRule] =
+    scorpioRules(filter)
