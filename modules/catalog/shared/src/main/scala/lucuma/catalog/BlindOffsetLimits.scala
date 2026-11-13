@@ -76,7 +76,7 @@ object BlindOffsetLimits:
   val Gmos: BlindOffsetLimits       = limits(Band.V, 12.4, 19.0, 13.0)
   val Flamingos2: BlindOffsetLimits = limits(Band.H, 13.0, 18.0, 14.0)
   val Gnirs: BlindOffsetLimits      = limits(Band.H, 12.0, 17.0, 13.0)
-  val Igrins2: BlindOffsetLimits    = limits(Band.H, 13.0, 18.0, 14.0)
+  val Igrins2: BlindOffsetLimits    = limits(Band.K, 9.0, 14.0, 10.0)
 
   /** Limits for an instrument, or `None` when it does not support blind offsets. */
   def forInstrument(instrument: Instrument): Option[BlindOffsetLimits] =
