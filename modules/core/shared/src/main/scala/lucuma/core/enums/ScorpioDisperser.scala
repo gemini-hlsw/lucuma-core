@@ -11,5 +11,5 @@ import lucuma.core.util.Enumerated
  * @group Enumerations
  */
 enum ScorpioDisperser(val tag: String, val name: String) derives Enumerated, Display:
-  case Out extends ScorpioDisperser("Out", "Out")
-  case Vph extends ScorpioDisperser("Vph", "VPH")
+  case Out extends ScorpioDisperser("out", "Out")
+  case Vph extends ScorpioDisperser("vph", "VPH")
