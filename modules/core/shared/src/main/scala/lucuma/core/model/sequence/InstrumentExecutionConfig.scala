@@ -14,6 +14,8 @@ import lucuma.core.model.sequence.ghost.GhostStaticConfig
 import lucuma.core.model.sequence.gnirs.GnirsDynamicConfig
 import lucuma.core.model.sequence.gnirs.GnirsStaticConfig
 import lucuma.core.model.sequence.igrins2 as ig2
+import lucuma.core.model.sequence.scorpio.ScorpioDynamicConfig
+import lucuma.core.model.sequence.scorpio.ScorpioStaticConfig
 import monocle.Focus
 import monocle.Lens
 import monocle.Prism
@@ -142,6 +144,19 @@ object InstrumentExecutionConfig:
   val igrins2: Prism[InstrumentExecutionConfig, Igrins2] =
     GenPrism[InstrumentExecutionConfig, Igrins2]
 
+  case class Scorpio(
+    executionConfig: ExecutionConfig[ScorpioStaticConfig, ScorpioDynamicConfig]
+  ) extends InstrumentExecutionConfig derives Eq:
+    override def instrument: Option[Instrument] = Instrument.Scorpio.some
+    override def isComplete: Boolean    = executionConfig.isComplete
+
+  object Scorpio:
+    val executionConfig: Lens[Scorpio, ExecutionConfig[ScorpioStaticConfig, ScorpioDynamicConfig]] =
+      Focus[Scorpio](_.executionConfig)
+
+  val scorpio: Prism[InstrumentExecutionConfig, Scorpio] =
+    GenPrism[InstrumentExecutionConfig, Scorpio]
+
   case class Visitor(visitorInstrument: Instrument) extends InstrumentExecutionConfig derives Eq:
     override def instrument: Option[Instrument] = visitorInstrument.some
     val isComplete = true
@@ -158,5 +173,6 @@ object InstrumentExecutionConfig:
       case (a @ GmosSouth(_),  b @ GmosSouth(_))  => a === b
       case (a @ Gnirs(_),      b @ Gnirs(_))      => a === b
       case (a @ Igrins2(_),    b @ Igrins2(_))    => a === b
+      case (a @ Scorpio(_),    b @ Scorpio(_))    => a === b
       case (a @ Visitor(_),    b @ Visitor(_))    => a === b
       case _                                      => false
