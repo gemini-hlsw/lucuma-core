@@ -6,7 +6,7 @@ package scorpio
 package arb
 
 import lucuma.core.enums.ScorpioAdc
-import lucuma.core.enums.ScorpioChannelSet
+import lucuma.core.enums.ScorpioArmSet
 import lucuma.core.util.TimeSpan
 import lucuma.core.util.arb.ArbEnumerated
 import lucuma.core.util.arb.ArbTimeSpan
@@ -23,7 +23,7 @@ trait ArbScorpioStaticConfig:
   given Arbitrary[ScorpioStaticConfig] =
     Arbitrary:
       for
-        c <- arbitrary[ScorpioChannelSet]
+        c <- arbitrary[ScorpioArmSet]
         a <- arbitrary[ScorpioAdc]
         s <- arbitrary[Option[TimeSpan]]
         n <- arbitrary[Option[ScorpioNodAndShift]]
@@ -31,13 +31,13 @@ trait ArbScorpioStaticConfig:
 
   given Cogen[ScorpioStaticConfig] =
     Cogen[(
-      ScorpioChannelSet,
+      ScorpioArmSet,
       ScorpioAdc,
       Option[TimeSpan],
       Option[ScorpioNodAndShift]
     )].contramap: a =>
       (
-        a.channelSet,
+        a.armSet,
         a.adc,
         a.svcExposureTime,
         a.nodAndShift

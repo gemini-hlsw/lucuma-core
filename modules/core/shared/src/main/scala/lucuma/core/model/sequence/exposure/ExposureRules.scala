@@ -13,7 +13,7 @@ import lucuma.core.enums.GmosXBinning
 import lucuma.core.enums.GmosYBinning
 import lucuma.core.enums.GnirsReadMode
 import lucuma.core.enums.ObserveClass
-import lucuma.core.enums.ScorpioChannel
+import lucuma.core.enums.ScorpioArm
 import lucuma.core.enums.ScorpioFilter
 import lucuma.core.enums.SkyBackground
 import lucuma.core.model.sequence.Step
@@ -221,12 +221,12 @@ object ExposureRules:
   // Only the VIS shutter minimum is known so far, the NIR channels have no rules yet.
   private val scorpioRules: Map[ScorpioFilter, List[ExposureRule]] =
     Enumerated[ScorpioFilter].all.fproduct: filter =>
-      filter.channel match
-        case ScorpioChannel.Vis =>
+      filter.arm match
+        case ScorpioArm.Vis =>
           List(
             ExposureRule.Limits(nes(s"the SCORPIO ${filter.shortName} channel"), none, Severity.Error, ExposureTimeLimits.fromMin(ScorpioVisMinExposureTime))
           )
-        case ScorpioChannel.Ir  => Nil
+        case ScorpioArm.Ir  => Nil
     .toMap
 
   /**

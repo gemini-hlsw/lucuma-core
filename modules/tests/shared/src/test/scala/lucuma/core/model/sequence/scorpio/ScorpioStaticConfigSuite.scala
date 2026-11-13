@@ -15,7 +15,7 @@ class ScorpioStaticConfigSuite extends DisciplineSuite:
   import lucuma.core.util.arb.ArbTimeSpan.given
 
   checkAll("Eq[ScorpioStaticConfig]", EqTests[ScorpioStaticConfig].eqv)
-  checkAll("ScorpioStaticConfig.channelSet", LensTests(ScorpioStaticConfig.channelSet))
+  checkAll("ScorpioStaticConfig.armSet", LensTests(ScorpioStaticConfig.armSet))
   checkAll("ScorpioStaticConfig.adc", LensTests(ScorpioStaticConfig.adc))
   checkAll("ScorpioStaticConfig.svcExposureTime", LensTests(ScorpioStaticConfig.svcExposureTime))
   checkAll("ScorpioStaticConfig.nodAndShift", LensTests(ScorpioStaticConfig.nodAndShift))
