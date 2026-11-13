@@ -25,6 +25,7 @@ import lucuma.core.enums.GnirsGrating
 import lucuma.core.enums.GnirsPrism
 import lucuma.core.enums.ObservingModeType
 import lucuma.core.enums.SchedulingMode
+import lucuma.core.enums.ScorpioFpu
 import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.VisitorObservingModeType
 import lucuma.core.enums.WaterVapor
@@ -105,6 +106,7 @@ object Configuration:
     def gnirsIfu:           Option[GnirsIfu            ] = Some(this).collect { case m: GnirsIfu             => m }
     def gnirsImaging:       Option[GnirsImaging        ] = Some(this).collect { case m: GnirsImaging         => m }
     def igrins2LongSlit:    Option[Igrins2LongSlit.type] = Some(this).collect { case m: Igrins2LongSlit.type => m }
+    def scorpioLongSlit:    Option[ScorpioLongSlit     ] = Some(this).collect { case m: ScorpioLongSlit      => m }
     def visitor:            Option[Visitor]              = Some(this).collect { case m: Visitor              => m }
 
     def subsumes(other: ObservingMode): Boolean =
@@ -132,6 +134,7 @@ object Configuration:
         case (Igrins2LongSlit,           Igrins2LongSlit)           => true
         case (GnirsLongSlit(g1, c1, p1), GnirsLongSlit(g2, c2, p2)) => g1 === g2 && c1 === c2 && p1 === p2
         case (GnirsIfu(g1, f1),          GnirsIfu(g2, f2))          => g1 === g2 && f1 === f2
+        case (ScorpioLongSlit(f1),       ScorpioLongSlit(f2))       => f1 === f2
         case (Visitor(ma, ra),           Visitor(mb, rb))           => ma === mb && rb.toMicroarcseconds <= ra.toMicroarcseconds
         case _                                                      => false
 
@@ -150,6 +153,7 @@ object Configuration:
       val GmosMos            = gmos.scienceArea.imaging.eval.radius.bisect // We allow moving up to half of the imaging field
       val GnirsImagingRound  = gnirs.scienceArea.roundImagingFov.eval.radius // the smallest GNIRS imaging field, and camera-independent
       val Igrins2LongSlit    = igrins2.scienceArea.scienceSlitFOV.eval.radius
+      val ScorpioLongSlit    = scorpio.scienceArea.longSlitFov(Angle.fromMicroarcseconds(2L)).eval.radius // width doesn't matter but should be > 1 µas
 
       private val GnirsImagingKeyhole: Map[GnirsCamera, Angle] =
         GnirsCamera.values.toList.fproduct(c => gnirs.scienceArea.keyholeImagingFov(c).eval.radius).toMap
@@ -191,4 +195,5 @@ object Configuration:
     case class GnirsIfu(grating: GnirsGrating, fpu: GnirsFpuIfu) extends ObservingMode(ObservingModeType.GnirsIfu, Radii.gnirsIfu(fpu))
     case class GnirsImaging(camera: GnirsCamera, filters: List[GnirsFilter]) extends ObservingMode(ObservingModeType.GnirsImaging, Radii.gnirsImaging(camera, filters))
     case object Igrins2LongSlit extends ObservingMode(ObservingModeType.Igrins2LongSlit, Radii.Igrins2LongSlit)
+    case class ScorpioLongSlit(fpu: ScorpioFpu) extends ObservingMode(ObservingModeType.ScorpioLongSlit, Radii.ScorpioLongSlit)
     case class Visitor(mode: VisitorObservingModeType, override val radius: Angle) extends ObservingMode(mode, radius)
