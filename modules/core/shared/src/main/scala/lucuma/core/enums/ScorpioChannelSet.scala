@@ -18,6 +18,6 @@ enum ScorpioChannelSet(
   val longName:  String,
   val channels:  NonEmptyList[ScorpioChannel]
 ) derives Enumerated, Display:
-  case Both    extends ScorpioChannelSet("Both",    "VIS+IR", "Visible and Infrared", NonEmptyList.of(ScorpioChannel.Vis, ScorpioChannel.Ir))
-  case VisOnly extends ScorpioChannelSet("VisOnly", "VIS",    "Visible only",         NonEmptyList.one(ScorpioChannel.Vis))
-  case IrOnly  extends ScorpioChannelSet("IrOnly",  "IR",     "Infrared only",        NonEmptyList.one(ScorpioChannel.Ir))
+  case Both    extends ScorpioChannelSet("both",    "VIS+IR", "Visible and Infrared", NonEmptyList.of(ScorpioChannel.Vis, ScorpioChannel.Ir))
+  case VisOnly extends ScorpioChannelSet("vis_only", "VIS",    "Visible only",         NonEmptyList.one(ScorpioChannel.Vis))
+  case IrOnly  extends ScorpioChannelSet("ir_only",  "IR",     "Infrared only",        NonEmptyList.one(ScorpioChannel.Ir))

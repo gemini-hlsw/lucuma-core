@@ -12,5 +12,5 @@ import lucuma.core.util.Enumerated
  * @group Enumerations
  */
 enum ScorpioChannel(val tag: String, val shortName: String, val longName: String) derives Enumerated, Display:
-  case Vis extends ScorpioChannel("Vis", "VIS", "Visible")
-  case Ir  extends ScorpioChannel("Ir",  "IR",  "Infrared")
+  case Vis extends ScorpioChannel("vis", "VIS", "Visible")
+  case Ir  extends ScorpioChannel("ir",  "IR",  "Infrared")

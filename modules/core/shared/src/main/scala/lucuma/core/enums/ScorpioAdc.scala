@@ -11,6 +11,6 @@ import lucuma.core.util.Enumerated
  * @group Enumerations
  */
 enum ScorpioAdc(val tag: String, val shortName: String, val longName: String) derives Enumerated, Display:
-  case Out      extends ScorpioAdc("Out",      "Out",      "Retracted")
-  case Static   extends ScorpioAdc("Static",   "Static",   "Deployed, tracking off")
-  case Tracking extends ScorpioAdc("Tracking", "Tracking", "Deployed, tracking on")
+  case Out      extends ScorpioAdc("out",      "Out",      "Retracted")
+  case Static   extends ScorpioAdc("static",   "Static",   "Deployed, tracking off")
+  case Tracking extends ScorpioAdc("tracking", "Tracking", "Deployed, tracking on")
