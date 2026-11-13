@@ -8,7 +8,6 @@ import cats.free.Free
 import cats.syntax.all.*
 import eu.timepit.refined.types.numeric.NonNegShort
 import lucuma.core.model.Group
-import lucuma.core.model.Observation
 
 /**
  * To handle groups we unfold the flattened structure we get from the database into
@@ -43,14 +42,14 @@ object GroupTree:
   def fromList[A](as: List[A]): GroupTree[A] =
     Free.roll(ItacGroup(None, as.map(Free.pure)))
 
-  enum Item:
+  enum Item[A]:
     def parent: Option[Group.Id]
     case Node(id: Group.Id, parent: Option[Group.Id], minimumRequired: Option[NonNegShort])
-    case Leaf(id: Observation.Id, parent: Option[Group.Id])
+    case Leaf(id: A, parent: Option[Group.Id])
 
   /** Unfold a flat list of items into a tree. */
-  def unfold(items: List[Item]): GroupTree[Observation.Id] =
-    def go(item: Item): GroupTree[Observation.Id] =
+  def unfold[A](items: List[Item[A]]): GroupTree[A] =
+    def go(item: Item[A]): GroupTree[A] =
       item match
         case Item.Leaf(id, _) => Free.pure(id)
         case Item.Node(id, _, min) => Free.roll(ItacGroup(min, items.filter(_.parent == Some(id)).map(go)))

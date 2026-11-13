@@ -15,16 +15,20 @@ import lucuma.core.enums.Site
 import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.model.IntCentiPercent
 import lucuma.core.model.Semester
-
+import cats.syntax.all.*
 import java.time.LocalDate
 import java.time.ZonedDateTime
+import org.http4s.Uri
+import org.http4s.headers.Authorization
 
 final case class Common(
   semester: Semester,
   shutdown: PerSite[List[LocalDateRange]],
   sequence: PerSite[List[TimeAccountingCategory]],
   conditionsBins: List[ConditionsBin[IntCentiPercent]],
-  emailConfig: EmailConfig
+  emailConfig: EmailConfig,
+  uri: Uri,
+  authorization: Authorization,
 ):
 
   object engine:
@@ -50,10 +54,16 @@ object Common:
   import itac.codec.conditionsbin.given
   import itac.codec.intcentipercent.given
 
-  // implicit val encoderListPartner: Encoder[List[TimeAccountingCategory]] = encodeTokens(_.id)
-  // implicit val decoderListPartner: Decoder[List[TimeAccountingCategory]] = decodeTokens(s => TimeAccountingCategory.fromString(s).toRight(s"Invalid partner: $s"))
+  given Decoder[Uri] = hc =>
+    hc.as[String].flatMap: s =>
+      Uri.fromString(s).leftMap: e =>
+        DecodingFailure(e.toString(), hc.history)
 
-  implicit val encoderCommon: Encoder[Common] = deriveEncoder
+  given Decoder[Authorization] = hc =>
+    hc.as[String].flatMap: s =>
+      Authorization.parse(s).leftMap: e =>
+        DecodingFailure(e.toString(), hc.history)
+
   implicit val decoderCommon: Decoder[Common] = deriveDecoder
 
   case class EmailConfig(

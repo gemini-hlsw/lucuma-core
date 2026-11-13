@@ -17,7 +17,6 @@ import org.apache.poi.ss.usermodel.BorderStyle
 import cats.implicits._
 import java.nio.file.Paths
 import scala.math.BigDecimal.RoundingMode
-import edu.gemini.tac.qengine.p1.Proposal
 import lucuma.core.enums.ScienceBand
 import lucuma.core.enums.TimeAccountingCategory
 import edu.gemini.tac.qengine.api.QueueCalc
@@ -64,12 +63,10 @@ object NgoSpreadsheet {
     new AbstractQueueOperation[F](qe, siteConfig) {
       def run(ws: Workspace[F], log: Logger[F]): F[ExitCode] =
         for {
-          // TODO: include removed proposals
-          p   <- computeQueue(ws)
-          (ps, qc) = p
+          qc  <- computeQueue(ws).map(_._2)
           _   <- wbs.traverse: (p, wb) => 
                   Enumerated[Site].all.traverse: site =>
-                    Sync[F].delay(writeSheet(wb, p, ps, site, qc))
+                    Sync[F].delay(writeSheet(wb, p, site, qc))
         } yield ExitCode.Success
     }
 
@@ -85,7 +82,7 @@ object NgoSpreadsheet {
   val ItacComment =  9 // ITAC Feedback: @ITAC_COMMENTS@
   val Title       = 10 // Program Title: @PROG_TITLE@
 
-  def writeSheet(wb: Workbook, p: TimeAccountingCategory, ps: List[Proposal], site: Site, qr: QueueCalc): Unit = {
+  def writeSheet(wb: Workbook, p: TimeAccountingCategory, site: Site, qr: QueueCalc): Unit = {
     val sh = wb.createSheet(site.longName)
 
     // A bold font!

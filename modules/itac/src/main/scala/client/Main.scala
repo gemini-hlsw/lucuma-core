@@ -28,6 +28,8 @@ import lucuma.core.model.ProposalReference
 import client.operation.Info
 import itac.operation.StaffEmailSpreadsheet
 import itac.operation.NgoSpreadsheet
+import lucuma.core.model.CallForProposals
+import lucuma.core.util.Gid
 
 object BuildInfo:
   val version = s"***** NEED TO ADD ACTUAL BUILDINFO!!!"
@@ -47,11 +49,11 @@ object Main extends CommandIOApp(
 ) with MainOpts {
 
   def main: Opts[IO[ExitCode]] =
-    (cwd, commonConfig, logger[IO], force, ops).mapN { (cwd, commonConfig, log, force, cmd) =>
+    (cwd, commonConfig, logger[IO], force, ops, ocs, callId).mapN { (cwd, commonConfig, log, force, cmd, ocs, callId) =>
       for {
         _  <- IO(System.setProperty("edu.gemini.model.p1.schemaVersion", "2020.2.1")) // how do we figure out what to do here?
         _  <- log.debug(s"main: workspace directory is ${cwd.toAbsolutePath}")
-        c  <- Workspace[IO](cwd, commonConfig, log, force).flatMap(cmd.run(_, log)).handleErrorWith {
+        c  <- Workspace[IO](cwd, commonConfig, log, force, ocs, callId).flatMap(cmd.run(_, log)).handleErrorWith {
                 case ItacException(msg) => log.error(msg).as(ExitCode.Error)
                 case NonFatal(e)        => log.error(e)(e.getMessage).as(ExitCode.Error)
               }
@@ -77,6 +79,18 @@ trait MainOpts { this: CommandIOApp =>
       long  = "common",
       help  = s"Common configuation file, relative to workspace (or absolute). Default is ${Workspace.Default.CommonConfigFile}"
     ).withDefault(Workspace.Default.CommonConfigFile)
+
+  given [A](using g: Gid[A]): Argument[A] = 
+    new Argument[A]:
+      def defaultMetavar: String = "gid"
+      def read(s: String): ValidatedNel[String, A] =
+        g.fromString.getOption(s).toValidNel(s"Invalid call id: $s")
+
+  lazy val callId: Opts[CallForProposals.Id] =
+    Opts.option[CallForProposals.Id](
+      long  = "call",
+      help  = s"Call for proposals id, in the form c-1234"
+    )
 
   // lazy val siteConfig: Opts[PerSite[Path]] =
   //   site.map(Workspace.Default.queueConfigFile) <+> Opts.option[Path](
@@ -269,6 +283,12 @@ trait MainOpts { this: CommandIOApp =>
       long  = "force",
       short = "f",
       help  = "Overwrite existing files (normally itac will not do this)."
+    ).orFalse
+
+  lazy val ocs: Opts[Boolean] =
+    Opts.flag(
+      long  = "ocs",
+      help  = "OCS mode (read OCS proposals from local folders)."
     ).orFalse
 
   // lazy val site = gn <+> gs
