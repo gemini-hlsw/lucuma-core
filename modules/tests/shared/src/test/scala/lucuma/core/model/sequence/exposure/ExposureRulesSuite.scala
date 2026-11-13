@@ -35,6 +35,10 @@ import lucuma.core.model.sequence.gmos.arb.ArbDynamicConfig.given
 import lucuma.core.model.sequence.gmos.arb.ArbGmosGratingConfig.given
 import lucuma.core.model.sequence.igrins2.Igrins2DynamicConfig
 import lucuma.core.model.sequence.igrins2.arb.ArbIgrins2DynamicConfig.given
+import lucuma.core.model.sequence.scorpio.ScorpioDetector
+import lucuma.core.model.sequence.scorpio.ScorpioDynamicConfig
+import lucuma.core.model.sequence.scorpio.arb.ArbScorpioDetector.given
+import lucuma.core.model.sequence.scorpio.arb.ArbScorpioDynamicConfig.given
 import lucuma.core.syntax.timespan.*
 import lucuma.core.util.TimeSpan
 import munit.FunSuite
@@ -246,6 +250,18 @@ class ExposureRulesSuite extends FunSuite:
       describe(ghost(0.05, 2000)),
       List("Exposure times for the GHOST red camera must be at least 0.1 s.", "Exposure times above 1800 s are not recommended for the GHOST blue camera due to cosmic ray contamination.")
     )
+
+  private def scorpio(g: Option[BigDecimal], ks: Option[BigDecimal]): ScorpioDynamicConfig =
+    def detector(s: BigDecimal): ScorpioDetector =
+      sample[ScorpioDetector].copy(exposureTime = secs(s))
+    sample[ScorpioDynamicConfig].copy(g = g.map(detector), r = none, i = none, z = none, y = none, j = none, h = none, ks = ks.map(detector))
+
+  test("SCORPIO checks the VIS shutter minimum on active VIS detectors only"):
+    val tooShort = BigDecimal("0.05")
+    assertEquals(describe(scorpio(BigDecimal("0.116").some, tooShort.some)), Nil)
+    assertEquals(describe(scorpio(tooShort.some, none)), List("Exposure times for the SCORPIO g channel must be at least 0.116 s."))
+    assertEquals(describe(scorpio(none, tooShort.some)), Nil)
+    assertEquals(describe(scorpio(none, none)), Nil)
 
   private def gmosSouth(seconds: BigDecimal, imaging: Boolean = true): DynamicConfig.GmosSouth =
     val d0 = sample[DynamicConfig.GmosSouth]
