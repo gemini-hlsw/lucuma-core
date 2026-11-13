@@ -3,13 +3,14 @@
 
 package lucuma.core.enums
 
+import lucuma.core.util.Display
 import lucuma.core.util.Enumerated
 
-enum SubaruInstrument(val tag: String) derives Enumerated:
-  case Focas   extends SubaruInstrument("focas")
-  case Hds     extends SubaruInstrument("hds")
-  case Hsc     extends SubaruInstrument("hsc")
-  case Ircs    extends SubaruInstrument("ircs")
-  case Moircs  extends SubaruInstrument("moircs")
-  case Pfs     extends SubaruInstrument("pfs")
-  case Visitor extends SubaruInstrument("visitor")
+enum SubaruInstrument(val tag: String, val name: String) derives Enumerated, Display:
+  case Focas   extends SubaruInstrument("focas", "FOCAS")
+  case Hds     extends SubaruInstrument("hds", "HDS")
+  case Hsc     extends SubaruInstrument("hsc", "HSC")
+  case Ircs    extends SubaruInstrument("ircs", "IRCS")
+  case Moircs  extends SubaruInstrument("moircs", "MOIRCS")
+  case Pfs     extends SubaruInstrument("pfs", "PFS")
+  case Visitor extends SubaruInstrument("visitor", "Visitor")
