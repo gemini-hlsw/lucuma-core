@@ -7,10 +7,10 @@ import lucuma.core.util.Display
 import lucuma.core.util.Enumerated
 
 /**
- * SCORPIO optical arms. Light is split by dichroics into a visible and an infrared channel,
+ * SCORPIO optical arms. Light is split by dichroics into a visible and an infrared arm,
  * each with its own detectors.
  * @group Enumerations
  */
-enum ScorpioChannel(val tag: String, val shortName: String, val longName: String) derives Enumerated, Display:
-  case Vis extends ScorpioChannel("vis", "VIS", "Visible")
-  case Ir  extends ScorpioChannel("ir",  "IR",  "Infrared")
+enum ScorpioArm(val tag: String, val shortName: String, val longName: String) derives Enumerated, Display:
+  case Vis extends ScorpioArm("vis", "VIS", "Visible")
+  case Ir  extends ScorpioArm("ir",  "IR",  "Infrared")

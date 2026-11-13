@@ -76,6 +76,8 @@ trait probes:
         Pwfs
       case FacilityObservingModeType.GhostIfu =>
         Pwfs
+      case FacilityObservingModeType.ScorpioLongSlit =>
+        Pwfs
 
   /**
    * The probe AGS selects by default: the most preferred allowed probe.  An

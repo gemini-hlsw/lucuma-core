@@ -6,7 +6,7 @@ package lucuma.core.model.sequence.scorpio
 import cats.Eq
 import cats.derived.*
 import lucuma.core.enums.ScorpioAdc
-import lucuma.core.enums.ScorpioChannelSet
+import lucuma.core.enums.ScorpioArmSet
 import lucuma.core.util.TimeSpan
 import monocle.Focus
 import monocle.Lens
@@ -18,7 +18,7 @@ import monocle.Lens
  * ADC and SVC default to off because both are currently disabled in the hardware.
  */
 final case class ScorpioStaticConfig(
-  channelSet:      ScorpioChannelSet,
+  armSet:          ScorpioArmSet,
   adc:             ScorpioAdc                 = ScorpioAdc.Out,
   svcExposureTime: Option[TimeSpan]           = None,
   nodAndShift:     Option[ScorpioNodAndShift] = None
@@ -26,8 +26,8 @@ final case class ScorpioStaticConfig(
 
 object ScorpioStaticConfig:
   /** @group Optics */
-  val channelSet: Lens[ScorpioStaticConfig, ScorpioChannelSet] =
-    Focus[ScorpioStaticConfig](_.channelSet)
+  val armSet: Lens[ScorpioStaticConfig, ScorpioArmSet] =
+    Focus[ScorpioStaticConfig](_.armSet)
 
   /** @group Optics */
   val adc: Lens[ScorpioStaticConfig, ScorpioAdc] =

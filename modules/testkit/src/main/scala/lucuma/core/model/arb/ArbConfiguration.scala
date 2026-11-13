@@ -20,6 +20,7 @@ import lucuma.core.enums.GnirsFpuIfu
 import lucuma.core.enums.GnirsGrating
 import lucuma.core.enums.GnirsPrism
 import lucuma.core.enums.SchedulingMode
+import lucuma.core.enums.ScorpioFpu
 import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.VisitorObservingModeType
 import lucuma.core.enums.WaterVapor
@@ -180,6 +181,13 @@ trait ArbConfiguration:
   given Cogen[ObservingMode.GnirsIfu] =
     Cogen[(GnirsGrating, GnirsFpuIfu)].contramap(m => (m.grating, m.fpu))
 
+  given Arbitrary[ObservingMode.ScorpioLongSlit] =
+    Arbitrary:
+      arbitrary[ScorpioFpu].map(ObservingMode.ScorpioLongSlit.apply)
+
+  given Cogen[ObservingMode.ScorpioLongSlit] =
+    Cogen[ScorpioFpu].contramap(_.fpu)
+
   given Arbitrary[ObservingMode.Visitor] =
     Arbitrary:
       for 
@@ -209,6 +217,7 @@ trait ArbConfiguration:
         arbitrary[ObservingMode.GnirsLongSlit],
         arbitrary[ObservingMode.GnirsIfu],
         arbitrary[ObservingMode.GnirsImaging],
+        arbitrary[ObservingMode.ScorpioLongSlit],
         arbitrary[ObservingMode.Visitor]
       )
 
@@ -234,6 +243,7 @@ trait ArbConfiguration:
         case m: ObservingMode.GnirsLongSlit        => perturb(s, m)
         case m: ObservingMode.GnirsIfu             => perturb(s, m)
         case m: ObservingMode.GnirsImaging         => perturb(s, m)
+        case m: ObservingMode.ScorpioLongSlit      => perturb(s, m)
         case m: ObservingMode.Visitor              => perturb(s, m)
 
   given Arbitrary[Configuration] =

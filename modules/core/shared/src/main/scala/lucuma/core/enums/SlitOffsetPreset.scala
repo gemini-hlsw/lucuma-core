@@ -73,3 +73,12 @@ enum Igrins2SlitOffsetPreset(
 ) extends SlitOffsetPreset derives Enumerated, Display:
   case NodAlongSlit extends Igrins2SlitOffsetPreset("nod_along_slit", "Nod along slit")
   case NodToSky     extends Igrins2SlitOffsetPreset("nod_to_sky",     "Nod to sky")
+
+/**
+ * Enumerated type for the SCORPIO slit offset presets.
+ */
+enum ScorpioSlitOffsetPreset(
+  val tag:         String,
+  val description: String
+) extends SlitOffsetPreset derives Enumerated, Display:
+  case NodAlongSlit extends ScorpioSlitOffsetPreset("nod_along_slit", "Nod along slit")
