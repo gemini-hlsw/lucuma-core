@@ -4,10 +4,11 @@
 package lucuma.core.model.group
 
 import cats.Eq
+import cats.data.NonEmptyList
 import cats.data.NonEmptySet
 import eu.timepit.refined.types.numeric.NonNegInt
 import eu.timepit.refined.types.numeric.PosInt
-import lucuma.core.enums.GroupConstraintViolation
+import lucuma.core.enums.GroupConstraintViolationCode
 import lucuma.core.enums.GroupStatus
 import lucuma.core.util.TimestampInterval
 
@@ -19,9 +20,16 @@ import lucuma.core.util.TimestampInterval
  * count toward it (a subgroup counts as one element) and `required` is how
  * many it needs.  An ordered group's elements after the first `required`
  * don't count, nor do an unordered group's completions after it is complete.
+ *
+ * `waived` are the waivers that accept violations of the group's constraints
+ * that would otherwise have made it unschedulable.  An ongoing, complete or
+ * unschedulable group may have them.  An empty or pending group, which has
+ * completed nothing, has none.
  */
 sealed trait GroupProgress:
   def status: GroupStatus
+
+  def waived: List[GroupConstraintWaiver]
 
 object GroupProgress:
 
@@ -33,12 +41,14 @@ object GroupProgress:
    */
   case object Empty extends GroupProgress:
     override def status: GroupStatus = GroupStatus.Empty
+    override def waived: List[GroupConstraintWaiver] = Nil
 
   /** Nothing has started, so nothing is complete. */
   final case class Pending(
     required: PosInt
   ) extends GroupProgress:
     override def status: GroupStatus = GroupStatus.Pending
+    override def waived: List[GroupConstraintWaiver] = Nil
 
   /**
    * Execution has started, and fewer elements are complete than the group
@@ -62,29 +72,36 @@ object GroupProgress:
   final case class Ongoing(
     completed:  NonNegInt,
     required:   PosInt,
-    nextWindow: Option[TimestampInterval]
+    nextWindow: Option[TimestampInterval],
+    override val waived: List[GroupConstraintWaiver] = Nil
   ) extends GroupProgress:
     override def status: GroupStatus = GroupStatus.Ongoing
 
   /**
    * At least as many elements are complete as the group requires, and every
-   * constraint is met.
+   * constraint is met, or its violations waived.
    */
   final case class Complete(
     completed: NonNegInt,
-    required:  PosInt
+    required:  PosInt,
+    override val waived: List[GroupConstraintWaiver] = Nil
   ) extends GroupProgress:
     override def status: GroupStatus = GroupStatus.Complete
 
   /**
-   * The group can no longer be completed, for the given reasons: the
-   * constraints it can no longer meet.
+   * The group can no longer be completed, for the given reasons: its
+   * `violations` of its constraints that no waiver accepts.
    */
   final case class Unschedulable(
     completed:  NonNegInt,
     required:   PosInt,
-    violations: NonEmptySet[GroupConstraintViolation]
+    violations: NonEmptyList[GroupConstraintViolation],
+    override val waived: List[GroupConstraintWaiver] = Nil
   ) extends GroupProgress:
     override def status: GroupStatus = GroupStatus.Unschedulable
+
+    /** The kinds of the violations. */
+    def codes: NonEmptySet[GroupConstraintViolationCode] =
+      violations.map(_.code).toNes
 
   given Eq[GroupProgress] = Eq.fromUniversalEquals

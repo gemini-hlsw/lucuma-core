@@ -4,11 +4,10 @@
 package lucuma.core.model.group
 package arb
 
-import cats.data.NonEmptySet
+import cats.data.NonEmptyList
 import eu.timepit.refined.scalacheck.all.*
 import eu.timepit.refined.types.numeric.NonNegInt
 import eu.timepit.refined.types.numeric.PosInt
-import lucuma.core.enums.GroupConstraintViolation
 import lucuma.core.enums.GroupStatus
 import lucuma.core.util.Timestamp
 import lucuma.core.util.TimestampInterval
@@ -24,6 +23,8 @@ import GroupProgress.*
 
 trait ArbGroupProgress:
   import ArbEnumerated.given
+  import ArbGroupConstraintViolation.given
+  import ArbGroupConstraintWaiver.given
   import ArbTimestamp.given
   import ArbTimestampInterval.given
 
@@ -36,20 +37,24 @@ trait ArbGroupProgress:
       )
     )
 
-  private val genViolations: Gen[NonEmptySet[GroupConstraintViolation]] =
+  private val genViolations: Gen[NonEmptyList[GroupConstraintViolation]] =
     for
       v  <- arbitrary[GroupConstraintViolation]
-      vs <- Gen.listOf(arbitrary[GroupConstraintViolation])
-    yield NonEmptySet.of(v, vs*)
+      vs <- Gen.listOfN(2, arbitrary[GroupConstraintViolation])
+    yield NonEmptyList(v, vs)
+
+  private val genWaived: Gen[List[GroupConstraintWaiver]] =
+    Gen.listOfN(2, arbitrary[GroupConstraintWaiver]).flatMap(Gen.someOf(_)).map(_.toList)
 
   given Arbitrary[GroupProgress] =
     Arbitrary:
       for
-        c <- arbitrary[NonNegInt]
-        r <- arbitrary[PosInt]
-        w <- genNextWindow
-        v <- genViolations
-        p <- Gen.oneOf(Empty, Pending(r), Ongoing(c, r, w), Complete(c, r), Unschedulable(c, r, v))
+        c  <- arbitrary[NonNegInt]
+        r  <- arbitrary[PosInt]
+        w  <- genNextWindow
+        vs <- genViolations
+        ws <- genWaived
+        p  <- Gen.oneOf(Empty, Pending(r), Ongoing(c, r, w, ws), Complete(c, r, ws), Unschedulable(c, r, vs, ws))
       yield p
 
   given Cogen[GroupProgress] =
@@ -58,12 +63,13 @@ trait ArbGroupProgress:
       Int,
       Int,
       Option[TimestampInterval],
-      List[GroupConstraintViolation]
+      List[GroupConstraintViolation],
+      List[GroupConstraintWaiver]
     )].contramap:
-      case Empty                  => (GroupStatus.Empty, 0, 0, None, Nil)
-      case Pending(r)             => (GroupStatus.Pending, 0, r.value, None, Nil)
-      case Ongoing(c, r, w)       => (GroupStatus.Ongoing, c.value, r.value, w, Nil)
-      case Complete(c, r)         => (GroupStatus.Complete, c.value, r.value, None, Nil)
-      case Unschedulable(c, r, v) => (GroupStatus.Unschedulable, c.value, r.value, None, v.toSortedSet.toList)
+      case Empty                       => (GroupStatus.Empty, 0, 0, None, Nil, Nil)
+      case Pending(r)                  => (GroupStatus.Pending, 0, r.value, None, Nil, Nil)
+      case Ongoing(c, r, w, ws)        => (GroupStatus.Ongoing, c.value, r.value, w, Nil, ws)
+      case Complete(c, r, ws)          => (GroupStatus.Complete, c.value, r.value, None, Nil, ws)
+      case Unschedulable(c, r, vs, ws) => (GroupStatus.Unschedulable, c.value, r.value, None, vs.toList, ws)
 
 object ArbGroupProgress extends ArbGroupProgress
