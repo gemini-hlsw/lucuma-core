@@ -7,7 +7,7 @@ import cats.kernel.laws.discipline.*
 import cats.syntax.order.*
 import lucuma.core.enums.ScorpioDisperser
 import lucuma.core.enums.ScorpioFpu
-import lucuma.core.model.sequence.scorpio.arb.ArbScorpioDetector.given
+import lucuma.core.model.sequence.scorpio.arb.ArbScorpioChannelConfig.given
 import lucuma.core.model.sequence.scorpio.arb.ArbScorpioDynamicConfig.given
 import lucuma.core.model.sequence.scorpio.arb.ArbScorpioFpuMask.given
 import lucuma.core.util.TimeSpan
@@ -17,21 +17,21 @@ import org.scalacheck.Prop.forAll
 
 class ScorpioDynamicConfigSuite extends DisciplineSuite:
 
-  checkAll("Eq[ScorpioDetector]", EqTests[ScorpioDetector].eqv)
+  checkAll("Eq[ScorpioChannelConfig]", EqTests[ScorpioChannelConfig].eqv)
   checkAll("Eq[ScorpioFpuMask]", EqTests[ScorpioFpuMask].eqv)
   checkAll("Eq[ScorpioDynamicConfig]", EqTests[ScorpioDynamicConfig].eqv)
 
-  test("totalExposureTime is the longest active detector"):
+  test("totalExposureTime is the longest active channel"):
     forAll: (c: ScorpioDynamicConfig) =>
-      val totals = c.detectors.map(_.totalExposureTime)
+      val totals = c.channels.map(_.totalExposureTime)
       assert(totals.forall(_ <= c.totalExposureTime))
       assert(totals.isEmpty || totals.contains(c.totalExposureTime))
 
-  test("totalExposureTime is zero when all detectors are off"):
+  test("totalExposureTime is zero when all channels are off"):
     val off = ScorpioDynamicConfig(None, None, None, None, None, None, None, None, ScorpioFpuMask.Imaging, ScorpioDisperser.Out)
     assertEquals(off.totalExposureTime, TimeSpan.Zero)
 
   test("totalExposureTime multiplies time by count"):
-    val d   = ScorpioDetector(TimeSpan.unsafeFromMicroseconds(10_000_000L), 3.refined)
+    val d   = ScorpioChannelConfig(TimeSpan.unsafeFromMicroseconds(10_000_000L), 3.refined)
     val cfg = ScorpioDynamicConfig(Some(d), None, None, None, None, None, None, None, ScorpioFpuMask.LongSlit(ScorpioFpu.LongSlit_0_54), ScorpioDisperser.Vph)
     assertEquals(cfg.totalExposureTime, TimeSpan.unsafeFromMicroseconds(30_000_000L))

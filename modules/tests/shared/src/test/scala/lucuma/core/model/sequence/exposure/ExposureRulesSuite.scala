@@ -35,9 +35,9 @@ import lucuma.core.model.sequence.gmos.arb.ArbDynamicConfig.given
 import lucuma.core.model.sequence.gmos.arb.ArbGmosGratingConfig.given
 import lucuma.core.model.sequence.igrins2.Igrins2DynamicConfig
 import lucuma.core.model.sequence.igrins2.arb.ArbIgrins2DynamicConfig.given
-import lucuma.core.model.sequence.scorpio.ScorpioDetector
+import lucuma.core.model.sequence.scorpio.ScorpioChannelConfig
 import lucuma.core.model.sequence.scorpio.ScorpioDynamicConfig
-import lucuma.core.model.sequence.scorpio.arb.ArbScorpioDetector.given
+import lucuma.core.model.sequence.scorpio.arb.ArbScorpioChannelConfig.given
 import lucuma.core.model.sequence.scorpio.arb.ArbScorpioDynamicConfig.given
 import lucuma.core.syntax.timespan.*
 import lucuma.core.util.TimeSpan
@@ -252,8 +252,8 @@ class ExposureRulesSuite extends FunSuite:
     )
 
   private def scorpio(g: Option[BigDecimal], ks: Option[BigDecimal]): ScorpioDynamicConfig =
-    def detector(s: BigDecimal): ScorpioDetector =
-      sample[ScorpioDetector].copy(exposureTime = secs(s))
+    def detector(s: BigDecimal): ScorpioChannelConfig =
+      sample[ScorpioChannelConfig].copy(exposureTime = secs(s))
     sample[ScorpioDynamicConfig].copy(g = g.map(detector), r = none, i = none, z = none, y = none, j = none, h = none, ks = ks.map(detector))
 
   test("SCORPIO checks the VIS shutter minimum on active VIS detectors only"):

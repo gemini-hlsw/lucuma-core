@@ -14,26 +14,26 @@ import org.scalacheck.Cogen
 trait ArbScorpioDynamicConfig:
 
   import ArbEnumerated.given
-  import ArbScorpioDetector.given
+  import ArbScorpioChannelConfig.given
   import ArbScorpioFpuMask.given
 
   given Arbitrary[ScorpioDynamicConfig] =
     Arbitrary:
       for
-        g  <- arbitrary[Option[ScorpioDetector]]
-        r  <- arbitrary[Option[ScorpioDetector]]
-        i  <- arbitrary[Option[ScorpioDetector]]
-        z  <- arbitrary[Option[ScorpioDetector]]
-        y  <- arbitrary[Option[ScorpioDetector]]
-        j  <- arbitrary[Option[ScorpioDetector]]
-        h  <- arbitrary[Option[ScorpioDetector]]
-        ks <- arbitrary[Option[ScorpioDetector]]
+        g  <- arbitrary[Option[ScorpioChannelConfig]]
+        r  <- arbitrary[Option[ScorpioChannelConfig]]
+        i  <- arbitrary[Option[ScorpioChannelConfig]]
+        z  <- arbitrary[Option[ScorpioChannelConfig]]
+        y  <- arbitrary[Option[ScorpioChannelConfig]]
+        j  <- arbitrary[Option[ScorpioChannelConfig]]
+        h  <- arbitrary[Option[ScorpioChannelConfig]]
+        ks <- arbitrary[Option[ScorpioChannelConfig]]
         f  <- arbitrary[ScorpioFpuMask]
         d  <- arbitrary[ScorpioDisperser]
       yield ScorpioDynamicConfig(g, r, i, z, y, j, h, ks, f, d)
 
   given Cogen[ScorpioDynamicConfig] =
-    Cogen[(List[Option[ScorpioDetector]], ScorpioFpuMask, ScorpioDisperser)].contramap: a =>
+    Cogen[(List[Option[ScorpioChannelConfig]], ScorpioFpuMask, ScorpioDisperser)].contramap: a =>
       (List(a.g, a.r, a.i, a.z, a.y, a.j, a.h, a.ks), a.fpu, a.disperser)
 
 object ArbScorpioDynamicConfig extends ArbScorpioDynamicConfig

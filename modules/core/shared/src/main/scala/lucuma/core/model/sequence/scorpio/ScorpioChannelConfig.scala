@@ -12,9 +12,9 @@ import monocle.Focus
 import monocle.Lens
 
 /**
- * Exposure settings for one SCORPIO science detector within a step.
+ * Exposure settings for one SCORPIO channel within a step.
  */
-final case class ScorpioDetector(
+final case class ScorpioChannelConfig(
   exposureTime:  TimeSpan,
   exposureCount: PosInt
 ) derives Eq:
@@ -22,11 +22,11 @@ final case class ScorpioDetector(
   def totalExposureTime: TimeSpan =
     exposureTime *| exposureCount.value
 
-object ScorpioDetector:
+object ScorpioChannelConfig:
   /** @group Optics */
-  val exposureTime: Lens[ScorpioDetector, TimeSpan] =
-    Focus[ScorpioDetector](_.exposureTime)
+  val exposureTime: Lens[ScorpioChannelConfig, TimeSpan] =
+    Focus[ScorpioChannelConfig](_.exposureTime)
 
   /** @group Optics */
-  val exposureCount: Lens[ScorpioDetector, PosInt] =
-    Focus[ScorpioDetector](_.exposureCount)
+  val exposureCount: Lens[ScorpioChannelConfig, PosInt] =
+    Focus[ScorpioChannelConfig](_.exposureCount)

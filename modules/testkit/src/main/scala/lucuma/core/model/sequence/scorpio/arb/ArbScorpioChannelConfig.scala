@@ -13,19 +13,19 @@ import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Cogen
 
-trait ArbScorpioDetector:
+trait ArbScorpioChannelConfig:
 
   import ArbTimeSpan.given
 
-  given Arbitrary[ScorpioDetector] =
+  given Arbitrary[ScorpioChannelConfig] =
     Arbitrary:
       for
         t <- arbitrary[TimeSpan]
         c <- arbitrary[PosInt]
-      yield ScorpioDetector(t, c)
+      yield ScorpioChannelConfig(t, c)
 
-  given Cogen[ScorpioDetector] =
+  given Cogen[ScorpioChannelConfig] =
     Cogen[(TimeSpan, Int)].contramap: a =>
       (a.exposureTime, a.exposureCount.value)
 
-object ArbScorpioDetector extends ArbScorpioDetector
+object ArbScorpioChannelConfig extends ArbScorpioChannelConfig
