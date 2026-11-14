@@ -120,6 +120,7 @@ enum FacilityObservingModeType(
   case GnirsLongSlit      extends FacilityObservingModeType("gnirs_long_slit",       Instrument.Gnirs,      PosAngleConstraint.AverageParallactic)
   case GnirsIfu           extends FacilityObservingModeType("gnirs_ifu",             Instrument.Gnirs,      PosAngleConstraint.Fixed(Angle.Angle0))
   case Igrins2LongSlit    extends FacilityObservingModeType("igrins_2_long_slit",    Instrument.Igrins2,    PosAngleConstraint.AverageParallactic)
+  case ScorpioLongSlit    extends FacilityObservingModeType("scorpio_long_slit",     Instrument.Scorpio,    PosAngleConstraint.AverageParallactic)
 
   override def observatory: Observatory =
     Observatory.Gemini

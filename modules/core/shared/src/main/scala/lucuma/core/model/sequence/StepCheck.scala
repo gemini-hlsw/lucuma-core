@@ -11,6 +11,7 @@ import lucuma.core.model.sequence.gmos.DynamicConfig
 import lucuma.core.model.sequence.gmos.SecondOrderOverlap
 import lucuma.core.model.sequence.gnirs.GnirsDynamicConfig
 import lucuma.core.model.sequence.igrins2.Igrins2DynamicConfig
+import lucuma.core.model.sequence.scorpio.ScorpioDynamicConfig
 
 /**
  * The problems found in a step of a sequence, as validations.  The ODB checks
@@ -39,6 +40,7 @@ object StepCheck:
   given StepCheck[GhostDynamicConfig]      = exposureOnly
   given StepCheck[GnirsDynamicConfig]      = exposureOnly
   given StepCheck[Igrins2DynamicConfig]    = exposureOnly
+  given StepCheck[ScorpioDynamicConfig]    = exposureOnly
 
   given StepCheck[DynamicConfig.GmosNorth] = (step, ctx) =>
     exposure(step, ctx) ++ SecondOrderOverlap.gmosNorth(step)

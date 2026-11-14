@@ -174,6 +174,13 @@ final class ConfigurationSuite extends ScalaCheckSuite:
       assertEquals(ca.subsumes(cb), a.disperser === b.disperser)
       assertEquals(cb.subsumes(ca), a.disperser === b.disperser)
 
+  test("SCORPIO long slit is constrained by slit"):
+    forAll: (cfg: Configuration, a: ScorpioLongSlit, b: ScorpioLongSlit) =>
+      val ca = cfg.copy(observingMode = a)
+      val cb = cfg.copy(observingMode = b)
+      assertEquals(ca.subsumes(cb), a.fpu === b.fpu)
+      assertEquals(cb.subsumes(ca), a.fpu === b.fpu)
+
   test("GHOST IFU is constrained by resolution mode"):
     forAll: (cfg: Configuration, a: GhostIfu, b: GhostIfu) =>
       val ca = cfg.copy(observingMode = a)

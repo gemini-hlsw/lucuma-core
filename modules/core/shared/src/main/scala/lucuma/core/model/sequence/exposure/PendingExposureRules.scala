@@ -4,6 +4,7 @@
 package lucuma.core.model.sequence.exposure
 
 import cats.syntax.all.*
+import lucuma.core.enums.ScorpioFilter
 import lucuma.core.model.ConstraintSet
 import lucuma.core.model.sequence.Step
 import lucuma.core.model.sequence.StepConfig
@@ -13,6 +14,7 @@ import lucuma.core.model.sequence.gmos.DynamicConfig
 import lucuma.core.model.sequence.gmos.GmosCcdMode
 import lucuma.core.model.sequence.gnirs.GnirsDynamicConfig
 import lucuma.core.model.sequence.igrins2.Igrins2DynamicConfig
+import lucuma.core.model.sequence.scorpio.ScorpioDynamicConfig
 import lucuma.core.util.TimeSpan
 
 /**
@@ -76,3 +78,17 @@ object PendingExposureRules:
 
   given PendingExposureRules[Igrins2DynamicConfig] = (step, _) =>
     List(step.instrumentConfig.exposure -> ExposureRules.igrins2(step.observeClass))
+
+  given PendingExposureRules[ScorpioDynamicConfig] = (step, _) =>
+    val d = step.instrumentConfig
+    List(
+      ScorpioFilter.G  -> d.g,
+      ScorpioFilter.R  -> d.r,
+      ScorpioFilter.I  -> d.i,
+      ScorpioFilter.Z  -> d.z,
+      ScorpioFilter.Y  -> d.y,
+      ScorpioFilter.J  -> d.j,
+      ScorpioFilter.H  -> d.h,
+      ScorpioFilter.Ks -> d.ks
+    ).collect:
+      case (filter, Some(detector)) => detector.exposureTime -> ExposureRules.scorpio(filter)

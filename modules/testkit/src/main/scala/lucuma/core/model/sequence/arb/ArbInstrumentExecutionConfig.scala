@@ -25,6 +25,10 @@ import lucuma.core.model.sequence.igrins2.Igrins2DynamicConfig
 import lucuma.core.model.sequence.igrins2.Igrins2StaticConfig
 import lucuma.core.model.sequence.igrins2.arb.ArbIgrins2DynamicConfig
 import lucuma.core.model.sequence.igrins2.arb.ArbIgrins2StaticConfig
+import lucuma.core.model.sequence.scorpio.ScorpioDynamicConfig
+import lucuma.core.model.sequence.scorpio.ScorpioStaticConfig
+import lucuma.core.model.sequence.scorpio.arb.ArbScorpioDynamicConfig
+import lucuma.core.model.sequence.scorpio.arb.ArbScorpioStaticConfig
 import lucuma.core.util.arb.ArbEnumerated
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
@@ -44,6 +48,8 @@ trait ArbInstrumentExecutionConfig:
   import ArbGnirsStaticConfig.given
   import ArbIgrins2DynamicConfig.given
   import ArbIgrins2StaticConfig.given
+  import ArbScorpioDynamicConfig.given
+  import ArbScorpioStaticConfig.given
   import ArbStaticConfig.given
 
   given Arbitrary[InstrumentExecutionConfig.Exchange.type] =
@@ -74,6 +80,10 @@ trait ArbInstrumentExecutionConfig:
     Arbitrary:
       arbitrary[ExecutionConfig[Igrins2StaticConfig, Igrins2DynamicConfig]].map(InstrumentExecutionConfig.Igrins2(_))
 
+  given Arbitrary[InstrumentExecutionConfig.Scorpio] =
+    Arbitrary:
+      arbitrary[ExecutionConfig[ScorpioStaticConfig, ScorpioDynamicConfig]].map(InstrumentExecutionConfig.Scorpio(_))
+
   given Arbitrary[InstrumentExecutionConfig.Visitor] =
     Arbitrary:
       Gen
@@ -90,6 +100,7 @@ trait ArbInstrumentExecutionConfig:
         arbitrary[InstrumentExecutionConfig.GmosSouth],
         arbitrary[InstrumentExecutionConfig.Gnirs],
         arbitrary[InstrumentExecutionConfig.Igrins2],
+        arbitrary[InstrumentExecutionConfig.Scorpio],
         arbitrary[InstrumentExecutionConfig.Visitor]
       )
 
@@ -114,6 +125,9 @@ trait ArbInstrumentExecutionConfig:
   given Cogen[InstrumentExecutionConfig.Igrins2] =
     Cogen[ExecutionConfig[Igrins2StaticConfig, Igrins2DynamicConfig]].contramap(_.executionConfig)
 
+  given Cogen[InstrumentExecutionConfig.Scorpio] =
+    Cogen[ExecutionConfig[ScorpioStaticConfig, ScorpioDynamicConfig]].contramap(_.executionConfig)
+
   given Cogen[InstrumentExecutionConfig.Visitor] =
     Cogen[Instrument]
       .contramap: v =>
@@ -128,6 +142,7 @@ trait ArbInstrumentExecutionConfig:
       Option[InstrumentExecutionConfig.GmosSouth],
       Option[InstrumentExecutionConfig.Gnirs],
       Option[InstrumentExecutionConfig.Igrins2],
+      Option[InstrumentExecutionConfig.Scorpio],
       Option[InstrumentExecutionConfig.Visitor]
     )].contramap { a => (
       InstrumentExecutionConfig.exchange.getOption(a),
@@ -137,6 +152,7 @@ trait ArbInstrumentExecutionConfig:
       InstrumentExecutionConfig.gmosSouth.getOption(a),
       InstrumentExecutionConfig.gnirs.getOption(a),
       InstrumentExecutionConfig.igrins2.getOption(a),
+      InstrumentExecutionConfig.scorpio.getOption(a),
       InstrumentExecutionConfig.visitor.getOption(a)
     )}
 
