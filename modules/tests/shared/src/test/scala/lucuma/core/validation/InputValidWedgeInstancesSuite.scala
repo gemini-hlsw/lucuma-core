@@ -18,11 +18,11 @@ final class InputValidWedgeInstancesSuite extends DisciplineSuite:
     Gen.frequency(5 -> genNumericString, 1 -> arbitrary[String])
 
   checkAll(
-    "truncatedBigDecimal(2)",
-    ValidWedgeTests(InputValidWedge.truncatedBigDecimal(2.refined)).validWedgeWith(genMaybeNumericString)
+    "roundedBigDecimal(2)",
+    ValidWedgeTests(InputValidWedge.roundedBigDecimal(2.refined)).validWedgeWith(genMaybeNumericString)
   )
 
   checkAll(
-    "truncatedPosBigDecimal(2)",
-    ValidWedgeTests(InputValidWedge.truncatedPosBigDecimal(2.refined)).validWedgeWith(genMaybeNumericString)
+    "roundedPosBigDecimal(2)",
+    ValidWedgeTests(InputValidWedge.roundedPosBigDecimal(2.refined)).validWedgeWith(genMaybeNumericString)
   )

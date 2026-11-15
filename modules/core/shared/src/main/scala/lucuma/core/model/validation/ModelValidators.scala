@@ -33,7 +33,7 @@ object ModelValidators {
 
   val AirMassElevationRangeValidWedge: InputValidWedge[AirMassBound] =
     InputValidWedge
-      .truncatedBigDecimal(decimals = 1.refined)
+      .roundedBigDecimal(decimals = 1.refined)
       .andThen(AirMassValidate.toErrorsValidSplitEpiUnsafe)
       .andThen(AirMassConstraintValidate.toErrorsValidSplitEpiUnsafe)
 
@@ -44,20 +44,20 @@ object ModelValidators {
 
   val HourAngleElevationRangeValidWedge: InputValidWedge[HourAngleBound] =
     InputValidWedge
-      .truncatedBigDecimal(decimals = 1.refined)
+      .roundedBigDecimal(decimals = 1.refined)
       .andThen(HourAngleConstraintValidate.toErrorsValidSplitEpiUnsafe)
 
   private val ImageQualityErrorMsg: String  = s"Must be more than 0.00 and up to 5.00"
 
   val ImageQualityValidWedge: InputValidWedge[ImageQuality] =
     InputValidWedge
-      .truncatedBigDecimal(decimals = 2.refined)
+      .roundedBigDecimal(decimals = 2.refined)
       .andThen(ImageQuality.FromArcSeconds, _ => ImageQualityErrorMsg.toEitherErrorsUnsafe)
 
   private val CloudExtinctionErrorMsg: String  = s"Must be 0.00 to 5.00"
 
   val CloudExtinctionValidWedge: InputValidWedge[CloudExtinction] =
-    InputValidWedge.truncatedBigDecimal(decimals = 2.refined)
+    InputValidWedge.roundedBigDecimal(decimals = 2.refined)
       .andThen(Extinction.FromVegaMagnitude, _ => CloudExtinctionErrorMsg.toEitherErrorsUnsafe)
        .andThen(CloudExtinction.From, _ => CloudExtinctionErrorMsg.toEitherErrorsUnsafe)
 }
