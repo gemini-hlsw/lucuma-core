@@ -48,7 +48,7 @@ class ShortCut_9024 extends munit.FunSuite {
 
   private def guidestarAt(offset: Offset): GuideStarCandidate =
     GuideStarCandidate(
-      0L,
+      GuideStarId.gaia(0L),
       SiderealTracking.const(coordAt(offset)),
       SortedMap[Band, BrightnessValue](Band.Gaia -> BrightnessValue.unsafeFrom(12.0))
     )
@@ -107,7 +107,7 @@ class ShortCut_9024 extends munit.FunSuite {
 
   private def gaiaCandidate(id: Long, ra: String, dec: String, g: Double): GuideStarCandidate =
     GuideStarCandidate(
-      id,
+      GuideStarId.gaia(id),
       SiderealTracking.const(coord(ra, dec)),
       SortedMap[Band, BrightnessValue](Band.GaiaRP -> BrightnessValue.unsafeFrom(g))
     )
@@ -148,12 +148,14 @@ class ShortCut_9024 extends munit.FunSuite {
       .analyses
 
     // The offending star's probe vignettes the second IFU target.
-    assert(analyses.filter(_.target.id === offendingId).exists {
+    assert(analyses.filter(_.target.id === GuideStarId.gaia(offendingId)).exists {
       case VignettesScience(_, _) => true
       case _                      => false
     })
 
     // The clean star is the one selected.
-    assertEquals(analyses.sortUsablePositions.headOption.map(_.target.id), cleanId.some)
+    assertEquals(analyses.sortUsablePositions.headOption.flatMap(_.target.id.gaiaSourceId),
+                 cleanId.some
+    )
   }
 }

@@ -5,6 +5,7 @@ package lucuma.ags.arb
 
 import eu.timepit.refined.scalacheck.numeric.*
 import lucuma.ags.GuideStarCandidate
+import lucuma.ags.GuideStarId
 import lucuma.catalog.BandsList
 import lucuma.core.enums.Band
 import lucuma.core.math.BrightnessValue
@@ -20,6 +21,7 @@ import org.scalacheck.Cogen.*
 import scala.collection.immutable.SortedMap
 
 trait ArbGuideStarCandidate:
+  import ArbGuideStarId.given
   import ArbNewType.given
   import ArbRefined.given
   import ArbSiderealTracking.given
@@ -29,7 +31,7 @@ trait ArbGuideStarCandidate:
   given Arbitrary[GuideStarCandidate] =
     Arbitrary:
       for {
-        id           <- arbitrary[Long]
+        id           <- arbitrary[GuideStarId]
         tracking     <- arbitrary[SiderealTracking]
         bands        <- Gen.someOf(candidateBands)
         brightnesses <- Gen.sequence[List[(Band, BrightnessValue)], (Band, BrightnessValue)](
@@ -38,7 +40,7 @@ trait ArbGuideStarCandidate:
       } yield GuideStarCandidate(id, tracking, SortedMap.from(brightnesses))
 
   given Cogen[GuideStarCandidate] =
-    Cogen[(Long, SiderealTracking, List[(Band, BrightnessValue)])].contramap(candidate =>
+    Cogen[(GuideStarId, SiderealTracking, List[(Band, BrightnessValue)])].contramap(candidate =>
       (candidate.id, candidate.tracking, candidate.brightnesses.toList)
     )
 

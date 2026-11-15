@@ -6,26 +6,17 @@ package lucuma.ags
 import cats.Eq
 import cats.derived.*
 import cats.syntax.all.*
-import coulomb.*
-import coulomb.syntax.*
-import eu.timepit.refined.*
 import eu.timepit.refined.cats.*
-import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.catalog.BandsList
 import lucuma.catalog.GaiaPhotometry
 import lucuma.core.enums.Band
-import lucuma.core.enums.CatalogName
 import lucuma.core.math.BrightnessUnits.*
 import lucuma.core.math.BrightnessValue
 import lucuma.core.math.Epoch
-import lucuma.core.math.dimensional.syntax.*
-import lucuma.core.math.units.*
-import lucuma.core.model.CatalogInfo
+import lucuma.core.math.dimensional.Units
 import lucuma.core.model.SiderealTracking
 import lucuma.core.model.SourceProfile
-import lucuma.core.model.SpectralDefinition
 import lucuma.core.model.Target
-import lucuma.core.optics.SplitEpi
 import monocle.Focus
 import monocle.Lens
 
@@ -40,12 +31,12 @@ import scala.collection.immutable.SortedMap
  * memoized, so a cached candidate holds catalog data only.
  */
 case class GuideStarCandidate(
-  id:           Long,
+  id:           GuideStarId,
   tracking:     SiderealTracking,
   brightnesses: SortedMap[Band, BrightnessValue]
 ) derives Eq {
 
-  def name: NonEmptyString = GuideStarName.gaiaSourceId.reverseGet(id).toNonEmptyString
+  def catalogName: Option[GuideStarName] = id.catalogName
 
   /** Catalog R if the star has one, else the estimate from G, BP and RP. */
   lazy val rBrightness: Option[BrightnessValue] =
@@ -76,7 +67,7 @@ case class GuideStarCandidate(
 object GuideStarCandidate {
   val UTC = ZoneId.of("UTC")
 
-  val id: Lens[GuideStarCandidate, Long] =
+  val id: Lens[GuideStarCandidate, GuideStarId] =
     Focus[GuideStarCandidate](_.id)
 
   val tracking: Lens[GuideStarCandidate, SiderealTracking] =
@@ -85,34 +76,54 @@ object GuideStarCandidate {
   val brightnesses: Lens[GuideStarCandidate, SortedMap[Band, BrightnessValue]] =
     Focus[GuideStarCandidate](_.brightnesses)
 
-  // There is some loss of info converting one to the other but further
-  // conversions are always the same, thus SplitEpi
-  val siderealTarget: SplitEpi[Target.Sidereal, GuideStarCandidate] =
-    SplitEpi(
-      target =>
-        GuideStarCandidate(
-          GuideStarName.from(target.name.value).toOption.flatMap(_.toGaiaSourceId).getOrElse(-1),
-          target.tracking,
-          SortedMap.from(
-            SourceProfile.integratedBrightnesses
-              .getOption(target.sourceProfile)
-              .foldMap(_.toList)
-              .map((band, measure) => band -> measure.value)
-          )
-        ),
-      candidate =>
-        Target.Sidereal(
-          candidate.name,
-          candidate.tracking,
-          SourceProfile.Point(
-            SpectralDefinition.BandNormalized(
-              None,
-              candidate.brightnesses.map((band, brightness) =>
-                band -> brightness.withUnit[VegaMagnitude].toMeasureTagged
-              )
-            )
-          ),
-          CatalogInfo(CatalogName.Gaia, candidate.id.toString)
-        )
+  /** A catalog star as a candidate; its id is the catalog name, read from the target name. */
+  def fromCatalog(target: Target.Sidereal): GuideStarCandidate =
+    GuideStarCandidate(
+      GuideStarName
+        .from(target.name.value)
+        .toOption
+        .fold(GuideStarId.gaia(-1))(GuideStarId.Catalog(_)),
+      target.tracking,
+      SortedMap.from(
+        SourceProfile.integratedBrightnesses
+          .getOption(target.sourceProfile)
+          .foldMap(_.toList)
+          .map((band, measure) => band -> measure.value)
+      )
+    )
+
+  private val MagnitudeUnits: List[Units] =
+    List(
+      VegaMagnitudeIsIntegratedBrightnessUnit.unit,
+      ABMagnitudeIsIntegratedBrightnessUnit.unit
+    )
+
+  /**
+   * One of the observation's targets as a guide star candidate.
+   *
+   * Only the integrated brightnesses in magnitudes (Vega or AB) are kept: candidate brightnesses
+   * are bare magnitude values, so a flux density would be read as a magnitude. AB values are taken
+   * as they are, there is no AB to Vega conversion in core (the difference is a few tenths in R). A
+   * surface profile has no integrated brightnesses and yields none.
+   *
+   * It takes a tracking rather than a target so a non-sidereal target can pass its position at the
+   * observation time as a constant tracking.
+   */
+  def observationTarget(
+    targetId:      Target.Id,
+    tracking:      SiderealTracking,
+    sourceProfile: SourceProfile
+  ): GuideStarCandidate =
+    GuideStarCandidate(
+      GuideStarId.ObservationTarget(targetId.some),
+      tracking,
+      SortedMap.from(
+        SourceProfile.integratedBrightnesses
+          .getOption(sourceProfile)
+          .foldMap(_.toList)
+          .collect:
+            case (band, measure) if MagnitudeUnits.contains(measure.units) =>
+              band -> measure.value
+      )
     )
 }

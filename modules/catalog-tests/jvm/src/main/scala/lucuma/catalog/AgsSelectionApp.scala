@@ -116,7 +116,7 @@ trait AgsSelectionSample {
         QueryByADQL(tracking.at(now).get, candidatesArea, widestConstraints.some, DefaultAreaBuffer)
       .map:
         _.collect { case Right(t) => t }
-          .map(GuideStarCandidate.siderealTarget.get)
+          .map(GuideStarCandidate.fromCatalog)
 }
 
 object AgsSelectionSampleApp extends IOApp.Simple with AgsSelectionSample:

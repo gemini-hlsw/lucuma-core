@@ -422,6 +422,13 @@ def probeBands(probe: GuideProbe): BandsList =
     case GuideProbe.AltairAOWFS => BandsList.RBandsList
     case _                      => BandsList.GaiaBandsList
 
+extension (probe: GuideProbe)
+  /** Whether the probe can guide on axis, on the observation's own target. */
+  def guidesOnAxis: Boolean =
+    probe match
+      case GuideProbe.AltairAOWFS => true
+      case _                      => false
+
 // OCS image quality buckets ("Guide Limits - OT Config.csv" rows), from the percentile the
 // requested image quality corresponds to at the science wavelength.
 private enum IqBucket:

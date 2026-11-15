@@ -135,7 +135,7 @@ object AgsWorkload:
           .toList
           .map:
             case s"$b=$v" => tag[Band](b) -> BrightnessValue.unsafeFrom(BigDecimal(v))
-        GuideStarCandidate(id.toLong,
+        GuideStarCandidate(GuideStarId.gaia(id.toLong),
                            SiderealTracking.const(coords(s"$ra $dec")),
                            SortedMap.from(bs)
         )

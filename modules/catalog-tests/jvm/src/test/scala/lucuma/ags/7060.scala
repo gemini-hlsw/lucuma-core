@@ -153,10 +153,11 @@ class ShortCut_7060 extends CatsEffectSuite:
             Some(acqOffsets),
             Some(sciOffsets),
             conf,
-            gs.collect { case Right(t) => t }.map(GuideStarCandidate.siderealTarget.get)
+            gs.collect { case Right(t) => t }.map(GuideStarCandidate.fromCatalog)
           )
         r.analyses.sortUsablePositions.collectFirst:
-          case Usable(target = GuideStarCandidate(id = id)) => id
+          case Usable(target = GuideStarCandidate(id = GuideStarId.Catalog(name))) => name
+      .map(_.flatMap(_.toGaiaSourceId))
       .assertEquals(6479709205473911296L.some)
 
   test("Run ags with blindOffset matching baseCoordinates"):
@@ -181,10 +182,11 @@ class ShortCut_7060 extends CatsEffectSuite:
             Some(acqOffsets),
             Some(sciOffsets),
             conf,
-            gs.collect { case Right(t) => t }.map(GuideStarCandidate.siderealTarget.get)
+            gs.collect { case Right(t) => t }.map(GuideStarCandidate.fromCatalog)
           )
         r.analyses.sortUsablePositions.collectFirst:
-          case Usable(target = GuideStarCandidate(id = id)) => id
+          case Usable(target = GuideStarCandidate(id = GuideStarId.Catalog(name))) => name
+      .map(_.flatMap(_.toGaiaSourceId))
       .assertEquals(6479709205473911296L.some)
 
   test("Run ags with blindOffset 1 degree away"):
@@ -211,7 +213,7 @@ class ShortCut_7060 extends CatsEffectSuite:
             Some(acqOffsets),
             Some(sciOffsets),
             conf,
-            gs.collect { case Right(t) => t }.map(GuideStarCandidate.siderealTarget.get)
+            gs.collect { case Right(t) => t }.map(GuideStarCandidate.fromCatalog)
           )
         r.analyses.sortUsablePositions
       .assertEquals(Nil)
