@@ -22,10 +22,10 @@ trait ArbAttribution:
       for
         u <- arbitrary[User.Id]
         t <- arbitrary[Timestamp]
-        r <- arbitrary[NonEmptyString]
+        r <- arbitrary[Option[NonEmptyString]]
       yield Attribution(u, t, r)
 
   given Cogen[Attribution] =
-    Cogen[(User.Id, Timestamp, String)].contramap(a => (a.by, a.at, a.reason.value))
+    Cogen[(User.Id, Timestamp, Option[String])].contramap(a => (a.by, a.at, a.reason.map(_.value)))
 
 object ArbAttribution extends ArbAttribution
