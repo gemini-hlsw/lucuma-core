@@ -18,8 +18,8 @@ import lucuma.core.util.WithGid
  *
  * Only a waivable violation can be waived (`GroupConstraintViolation.Waivable`).
  * A waiver is granted only for a violation that has happened.  `granted` records
- * who granted it, when and why.  A revoked waiver is kept, with `revoked`
- * recording who revoked it, when and why, but no longer applies.
+ * who granted it and when, and why if they said.  A revoked waiver is kept,
+ * with `revoked` recording the same for its revocation, but no longer applies.
  */
 final case class GroupConstraintWaiver(
   id:        GroupConstraintWaiver.Id,

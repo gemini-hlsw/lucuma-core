@@ -9,12 +9,13 @@ import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.core.util.Timestamp
 
 /**
- * Who took an action, when, and why: say, granting or revoking a waiver.
+ * Who took an action, when, and why, if they said: say, granting or revoking a
+ * waiver.
  */
 final case class Attribution(
   by:     User.Id,
   at:     Timestamp,
-  reason: NonEmptyString
+  reason: Option[NonEmptyString]
 )
 
 object Attribution:
