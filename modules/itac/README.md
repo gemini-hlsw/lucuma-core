@@ -48,6 +48,10 @@ You should now be able to create a dual-site queue via
 
 Do `itac2 --help` to see a list of implemented commands.
 
+### 7. Update
+
+Do `cs update itac2` to get the newest version.
+
 ## OCS Compatibility Mode
 
 If you copy your `band-N/` folders from an OCS ITAC workspace into your ITAC2 workspace you can run `itac --ocs <command>` to run a command against these proposals rather than the ones in the ODB. Note that **edit files are not supported** here; what you will see is the original queue with a lot of rejections. The goal here is simply to demonstrate that the new code does the same thing as the old code, modulo differences coming from merged proposals.
