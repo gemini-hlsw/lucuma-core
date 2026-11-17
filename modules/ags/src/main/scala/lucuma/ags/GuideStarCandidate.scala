@@ -25,6 +25,10 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import scala.collection.immutable.SortedMap
 
+// The only bands a candidate keeps, those AGS reads: R for the Altair AOWFS, the Gaia ones elsewhere.
+val CandidateBands: List[Band] =
+  List(Band.R, Band.Gaia, Band.GaiaBP, Band.GaiaRP)
+
 /**
  * Poors' man Target.Sidereal: tracking plus the catalog's bare brightness values, no units, errors
  * or metadata. R for Altair is not stored: it is estimated from the Gaia bands on first use and
@@ -76,7 +80,7 @@ object GuideStarCandidate {
   val brightnesses: Lens[GuideStarCandidate, SortedMap[Band, BrightnessValue]] =
     Focus[GuideStarCandidate](_.brightnesses)
 
-  /** A catalog star as a candidate; its id is the catalog name, read from the target name. */
+  /** A catalog star as a candidate; its id is the source id, read from the target name. */
   def fromCatalog(target: Target.Sidereal): GuideStarCandidate =
     GuideStarCandidate(
       GuideStarName
@@ -89,7 +93,8 @@ object GuideStarCandidate {
         SourceProfile.integratedBrightnesses
           .getOption(target.sourceProfile)
           .foldMap(_.toList)
-          .map((band, measure) => band -> measure.value)
+          .collect:
+            case (band, measure) if CandidateBands.contains(band) => band -> measure.value
       )
     )
 
@@ -102,10 +107,11 @@ object GuideStarCandidate {
   /**
    * One of the observation's targets as a guide star candidate.
    *
-   * Only the integrated brightnesses in magnitudes (Vega or AB) are kept: candidate brightnesses
-   * are bare magnitude values, so a flux density would be read as a magnitude. AB values are taken
-   * as they are, there is no AB to Vega conversion in core (the difference is a few tenths in R). A
-   * surface profile has no integrated brightnesses and yields none.
+   * Only the integrated brightnesses in `CandidateBands` and in magnitudes (Vega or AB) are kept:
+   * candidate brightnesses are bare magnitude values, so a flux density would be read as a
+   * magnitude. AB values are taken as they are, there is no AB to Vega conversion in core (the
+   * difference is a few tenths in R). A surface profile has no integrated brightnesses and yields
+   * none.
    *
    * It takes a tracking rather than a target so a non-sidereal target can pass its position at the
    * observation time as a constant tracking.
@@ -123,7 +129,8 @@ object GuideStarCandidate {
           .getOption(sourceProfile)
           .foldMap(_.toList)
           .collect:
-            case (band, measure) if MagnitudeUnits.contains(measure.units) =>
+            case (band, measure)
+                if CandidateBands.contains(band) && MagnitudeUnits.contains(measure.units) =>
               band -> measure.value
       )
     )

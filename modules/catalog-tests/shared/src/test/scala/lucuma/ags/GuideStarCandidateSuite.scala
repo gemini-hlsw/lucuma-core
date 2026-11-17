@@ -10,6 +10,7 @@ import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.ags.arb.*
 import lucuma.catalog.BandsList
 import lucuma.core.enums.Band
+import lucuma.core.enums.GuideProbe
 import lucuma.core.math.BrightnessUnits.*
 import lucuma.core.math.BrightnessValue
 import lucuma.core.math.Coordinates
@@ -20,6 +21,7 @@ import lucuma.core.model.SiderealTracking
 import lucuma.core.model.SourceProfile
 import lucuma.core.model.SpectralDefinition
 import lucuma.core.model.Target
+import lucuma.core.util.Enumerated
 import lucuma.core.util.Of
 import munit.*
 
@@ -90,18 +92,39 @@ class GuideStarCandidateSuite extends DisciplineSuite {
       TargetId,
       Tracking,
       point(
-        Band.R -> BrightnessValue.unsafeFrom(12.0).withUnit[VegaMagnitude].toMeasureTagged,
-        Band.V -> BrightnessValue.unsafeFrom(13.0).withUnit[ABMagnitude].toMeasureTagged,
-        Band.J -> BrightnessValue.unsafeFrom(1.0).withUnit[Jansky].toMeasureTagged
+        Band.R      -> BrightnessValue.unsafeFrom(12.0).withUnit[VegaMagnitude].toMeasureTagged,
+        Band.Gaia   -> BrightnessValue.unsafeFrom(13.0).withUnit[ABMagnitude].toMeasureTagged,
+        Band.GaiaRP -> BrightnessValue.unsafeFrom(1.0).withUnit[Jansky].toMeasureTagged
       )
     )
     assertEquals(candidate.id, GuideStarId.ObservationTarget(Some(TargetId)))
     assertEquals(
       candidate.brightnesses,
-      SortedMap[Band, BrightnessValue](Band.R -> BrightnessValue.unsafeFrom(12.0),
-                                       Band.V -> BrightnessValue.unsafeFrom(13.0)
+      SortedMap[Band, BrightnessValue](Band.R    -> BrightnessValue.unsafeFrom(12.0),
+                                       Band.Gaia -> BrightnessValue.unsafeFrom(13.0)
       )
     )
+  }
+
+  test("the observation target drops the bands AGS does not read") {
+    val candidate: GuideStarCandidate = GuideStarCandidate.observationTarget(
+      TargetId,
+      Tracking,
+      point(
+        Band.R -> BrightnessValue.unsafeFrom(12.0).withUnit[VegaMagnitude].toMeasureTagged,
+        Band.V -> BrightnessValue.unsafeFrom(13.0).withUnit[VegaMagnitude].toMeasureTagged,
+        Band.K -> BrightnessValue.unsafeFrom(14.0).withUnit[VegaMagnitude].toMeasureTagged
+      )
+    )
+    assertEquals(
+      candidate.brightnesses,
+      SortedMap[Band, BrightnessValue](Band.R -> BrightnessValue.unsafeFrom(12.0))
+    )
+  }
+
+  test("the candidate bands cover the bands of every probe") {
+    Enumerated[GuideProbe].all.foreach: probe =>
+      assert(probeBands(probe).bands.forall(CandidateBands.contains), probe.toString)
   }
 
   test("a surface profile gives the observation target no brightnesses") {
