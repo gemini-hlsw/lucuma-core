@@ -3,7 +3,7 @@
 
 package edu.gemini.tac.qengine.log
 
-import edu.gemini.tac.qengine.p1.Proposal
+import edu.gemini.tac.qengine.p1.ProposalShard
 import edu.gemini.tac.qengine.util.BoundedTime
 
 import java.text.SimpleDateFormat
@@ -11,7 +11,7 @@ import java.util.Date
 import java.util.UUID
 
 trait LogMessage {
-  val prop: Proposal
+  val prop: ProposalShard
   val timestamp = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").format(new Date())
   val id = UUID.randomUUID()
 }
@@ -25,8 +25,8 @@ object LogMessage {
   }
   private def timeTemplate = "%4.1f%% (%.1f / %.1f)"
   def formatBoundedTime(bt: BoundedTime): String = {
-    val usedH = bt.used.toHours.value
-    val maxH  = bt.limit.toHours.value
+    val usedH = bt.used.toHours
+    val maxH  = bt.limit.toHours
     val perc  = bt.fillPercent
     timeTemplate.format(perc, usedH, maxH)
   }

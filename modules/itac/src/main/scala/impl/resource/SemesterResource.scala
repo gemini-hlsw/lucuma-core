@@ -3,6 +3,7 @@
 
 package edu.gemini.tac.qengine.impl.resource
 
+import cats.syntax.all.*
 import edu.gemini.tac.qengine.api.config.TimeRestriction
 import edu.gemini.tac.qengine.impl.block.Block
 import edu.gemini.tac.qengine.impl.queue.ProposalQueueBuilder
@@ -10,8 +11,8 @@ import edu.gemini.tac.qengine.log.RejectMessage
 import edu.gemini.tac.qengine.log.RejectTimeAccountingCategoryOverAllocation
 import edu.gemini.tac.qengine.p1.ItacTarget
 import edu.gemini.tac.qengine.util.BoundedTime
-import edu.gemini.tac.qengine.util.Time
 import lucuma.core.model.ConstraintSet
+import lucuma.core.util.TimeSpan
 import org.slf4j.LoggerFactory
 
 final case class SemesterResource(
@@ -29,20 +30,20 @@ final case class SemesterResource(
 
   // Determines whether the TimeAccountingCategory is already over allocated.
   private def TimeAccountingCategoryAlreadyOverallocated(block: Block, queue: ProposalQueueBuilder): Boolean = {
-    LOGGER.debug(f"Remaining time for ${block.prop.ntac.TimeAccountingCategory} is ${queue.remainingTime(block.prop.ntac.TimeAccountingCategory).toHours.value}%5.1f")
-    queue.remainingTime(block.prop.ntac.TimeAccountingCategory) <= Time.Zero
+    LOGGER.debug(f"Remaining time for ${block.prop.allocation.category} is ${queue.remainingTime(block.prop.allocation.category).toHours}%5.1f")
+    queue.remainingTime(block.prop.allocation.category) <= TimeSpan.Zero
   }
 
   // Determines whether including the indicated proposal will overallocate the
   // TimeAccountingCategory past the limit and allowance.
   private def TimeAccountingCategoryWouldBeOverallocated(block: Block, queue: ProposalQueueBuilder): Boolean = {
     val perc      = queue.queueTime.overfillAllowance
-    val TimeAccountingCategory   = block.prop.ntac.TimeAccountingCategory
+    val TimeAccountingCategory   = block.prop.allocation.category
     val used      = queue.usedTime(TimeAccountingCategory)
     val softLimit = queue.queueTime(TimeAccountingCategory)
-    val allowance = softLimit * perc // overfill is per category (B1_2 and B3 are what we're using)
-    val hardlimit = softLimit + allowance
-    val ret = (used + block.prop.time) >= hardlimit
+    val allowance = softLimit *| perc // overfill is per category (B1_2 and B3 are what we're using)
+    val hardlimit = softLimit +| allowance
+    val ret = (used +| block.prop.allocation.duration) >= hardlimit
     // println(f"==> used ${used.toHours.value}%5.1f, available = ${softLimit.toHours.value}%5.1f, overfill = ${perc.value.toDouble}%5.1f, percentage = ${(used.toHours.value / softLimit.toHours.value) * 100.0}%5.1f, prop = ${block.prop.ntac.reference}, award = ${block.prop.time.toHours.value}%5.1f, TimeAccountingCategoryWouldBeOverallocated = ${ret}")
     ret
   }
@@ -59,7 +60,7 @@ final case class SemesterResource(
     // proposal is added so there is no need to check with every block that is
     // considered.
     if (block.isStart && TimeAccountingCategoryOverallocated(block, queue)) {
-      val p = block.prop.ntac.TimeAccountingCategory
+      val p = block.prop.allocation.category
       LOGGER.debug("Rejected due to TimeAccountingCategory overallocation")
       Left(RejectTimeAccountingCategoryOverAllocation(block.prop, queue.bounds(p), queue.bounds(p)))
     } else {
@@ -71,7 +72,7 @@ final case class SemesterResource(
     }
   }
 
-  def reserveAvailable(time: Time, target: ItacTarget, conds: ConstraintSet): (SemesterResource, Time) = {
+  def reserveAvailable(time: TimeSpan, target: ItacTarget, conds: ConstraintSet): (SemesterResource, TimeSpan) = {
     val (newRa, rem) = ra.reserveAvailable(time, target, conds)
     (new SemesterResource(newRa, this.time), rem)
   }

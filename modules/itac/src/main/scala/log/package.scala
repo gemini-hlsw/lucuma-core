@@ -3,13 +3,13 @@
 
 package edu.gemini.tac.qengine
 
-import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.ScienceBand
+import lucuma.core.util.TimeSpan
 
 import p1.ItacObservation
-import p1.Proposal
+import p1.ProposalShard
 
 package object log {
-  def rejectConditions(p: Proposal, o: ItacObservation, b: ScienceBand, c: Time, m: Time) = RejectConditions(p, o, b, c, m)
-  def rejectTarget(p: Proposal, o: ItacObservation, b: ScienceBand, t: RejectTarget.RaDecType, c: Time, m: Time) = RejectTarget(p, o, b, t, c, m)
+  def rejectConditions(p: ProposalShard, o: ItacObservation, b: ScienceBand, c: TimeSpan, m: TimeSpan) = RejectConditions(p, o, b, c, m)
+  def rejectTarget(p: ProposalShard, o: ItacObservation.Scaled, b: ScienceBand, t: RejectTarget.RaDecType, c: TimeSpan, m: TimeSpan) = RejectTarget(p, o, b, t, c, m)
 }

@@ -7,6 +7,8 @@ import cats.Monoid
 import cats.Order
 import cats.syntax.order.*
 import eu.timepit.refined.types.numeric.NonNegLong
+import lucuma.core.model.IntCentiPercent
+import lucuma.core.model.IntCentiPercentUnbounded
 import lucuma.core.optics.Format
 import lucuma.core.refined.numeric.NonZeroBigDecimal
 import lucuma.core.refined.numeric.NonZeroInt
@@ -127,6 +129,21 @@ object TimeSpan {
   def fromHours(h: BigDecimal): Option[TimeSpan] =
     fromSeconds(h * 3_600L)
 
+
+
+  def fromMillisecondsBounded(ms: Long): TimeSpan = 
+    if ms < 0 then Min else fromMilliseconds(ms).getOrElse(Max)
+
+  def fromSecondsBounded(secs: Double): TimeSpan = 
+    if secs < 0 then Min else fromSeconds(secs).getOrElse(Max)
+
+  def fromMinutesBounded(mins: Double): TimeSpan = 
+    if mins < 0 then Min else fromMinutes(mins).getOrElse(Max)
+
+  def fromHoursBounded(hours: Double): TimeSpan = 
+    if hours < 0 then Min else fromHours(hours).getOrElse(Max)
+
+
   /**
    * Parses the string into a TimeSpan according to ISO-8601 standard, if possible.
    */
@@ -220,6 +237,14 @@ object TimeSpan {
     @targetName("boundedMultiply")
     def *|(multiplier: BigDecimal): TimeSpan =
       fromMicrosecondsBounded(timeSpan.toMicroseconds * multiplier)
+
+    @targetName("boundedMultiply")
+    def *|(multiplier: IntCentiPercent)(using DummyImplicit): TimeSpan =
+      fromMicrosecondsBounded(timeSpan.toMicroseconds * multiplier.toPercent / 100.0)
+
+    @targetName("boundedMultiply")
+    def *|(multiplier: IntCentiPercentUnbounded)(using DummyImplicit, DummyImplicit): TimeSpan =
+      fromMicrosecondsBounded(timeSpan.toMicroseconds * multiplier.toPercent / 100.0)
 
     /**
      * Divides a TimeSpan by a non-negative integer, via integer division.

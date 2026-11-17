@@ -7,7 +7,7 @@ import edu.gemini.tac.qengine.impl.resource.SemesterResource
 import edu.gemini.tac.qengine.log.AcceptMessage
 import edu.gemini.tac.qengine.log.RejectMessage
 import edu.gemini.tac.qengine.p1.ItacObservation
-import edu.gemini.tac.qengine.p1.Proposal
+import edu.gemini.tac.qengine.p1.ProposalShard
 import org.slf4j.LoggerFactory
 
 import block.Block
@@ -29,9 +29,9 @@ final class QueueFrame(val queue: ProposalQueueBuilder, val iter: BlockIterator,
 
   case class Next(frame: QueueFrame, accept: Option[AcceptMessage])
 
-  def isStartOf(prop: Proposal): Boolean = iter.isStartOf(prop)
+  def isStartOf(prop: ProposalShard): Boolean = iter.isStartOf(prop)
 
-  def skip(activeList : Proposal => List[ItacObservation]): QueueFrame = new QueueFrame(queue, iter.skip(activeList), res)
+  def skip(activeList : ProposalShard => List[ItacObservation.Scaled]): QueueFrame = new QueueFrame(queue, iter.skip(activeList), res)
 
   def hasNext: Boolean = iter.hasNext
 
@@ -47,13 +47,13 @@ final class QueueFrame(val queue: ProposalQueueBuilder, val iter: BlockIterator,
       (queue, None)
 
   private def logBlock(block : Block) = {
-    val msg = "Block of time " + block.time.toHours + " proposed for Proposal[" +block.prop.id + "] w observation time=" + block.obs.time.toHours.toString + "" +
-      " Proposal Awarded [" + block.prop.ntac.awardedTime.toHours.toString + "] by " + block.prop.ntac.TimeAccountingCategory.tag + "]"
+    val msg = "Block of time " + block.time.toHours + " proposed for ProposalShard[" +block.prop.reference + "] w observation time=" + block.obs.time.toHours.toString + "" +
+      " ProposalShard Awarded [" + block.prop.allocation.duration.toHours.toString + "] by " + block.prop.allocation.category.tag + "]"
     LOGGER.debug(msg)
     //applicationLogger.log(Level.trace, "next():" + block.toString);
   }
 
-  def next(activeList : Proposal=>List[ItacObservation]): RejectMessage Either Next = {
+  def next(activeList : ProposalShard => List[ItacObservation.Scaled]): RejectMessage Either Next = {
     val (block, newIter) = iter.next(activeList)
     logBlock(block)
     res.reserve(block, queue) map {

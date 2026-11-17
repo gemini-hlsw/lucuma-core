@@ -18,7 +18,7 @@ import io.circe.syntax.*
 import lucuma.core.enums.Site
 
 /** A total map from Site to A. */
-final case class PerSite[+A](gn: A, gs: A) extends (Site => A):
+final case class PerSite[A](gn: A, gs: A) extends (Site => A):
 
   /** PerSite is a total function from Site to A. Alias for `forSite`. */
   def apply(site: Site): A =
@@ -34,6 +34,11 @@ final case class PerSite[+A](gn: A, gs: A) extends (Site => A):
       case Site.GN => gn
       case Site.GS => gs    
 
+  def put[B >: A](site: Site, value: B): PerSite[B] =
+    site match
+      case Site.GN => copy(gn = value)
+      case Site.GS => copy(gs = value)
+    
   /** PerSite is a functor. */
   def map[B](f: A => B): PerSite[B] =
     PerSite(f(gn), f(gs))
@@ -44,6 +49,9 @@ final case class PerSite[+A](gn: A, gs: A) extends (Site => A):
   /** Collapse values into monoid B. */
   def fold[B: Monoid](fgn: A => B, fgs: A => B): B =
     fgn(gn) |+| fgs(gs)
+
+  def combineAll(using Monoid[A]): A =
+    gn |+| gs
 
   /** Examine each (Site, A) pair and fold into monoid B. */
   def foldWithSite[B: Monoid](f: (Site, A) => B): B =
@@ -116,8 +124,3 @@ object PerSite:
       gs <- hc.downField("gs").as[A]
     yield PerSite(gn, gs)
 
-
-
-case class X()
-
-class Y extends X

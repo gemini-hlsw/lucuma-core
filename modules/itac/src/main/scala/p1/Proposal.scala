@@ -3,99 +3,193 @@
 
 package edu.gemini.tac.qengine.p1
 
-import edu.gemini.tac.qengine.util.Time
+import cats.data.NonEmptyList
+import cats.syntax.all.*
+import eu.timepit.refined.types.numeric.PosDouble
+import lucuma.core.data.Metadata
+import lucuma.core.enums.Observatory
 import lucuma.core.enums.ScienceBand
 import lucuma.core.enums.ScienceSubtype
 import lucuma.core.enums.Site
 import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.enums.TooActivation
+import lucuma.core.model.Allocation
+import lucuma.core.model.ProgramReference
+import lucuma.core.model.ProposalReference
+import lucuma.core.util.DateInterval
+import lucuma.core.util.Enumerated
+import lucuma.core.util.TimeSpan
 
 import java.io.File
+import java.time.LocalDate
+
+import GroupTree.flattenAndScale
 
 case class Proposal(
-  ntac:              Ntac,
-  site:              Site,
-  mode:              ScienceSubtype = ScienceSubtype.Queue,
-  too:               TooActivation = TooActivation.None,
-  obsList:           List[ItacObservation] = Nil,
-  band3Observations: List[ItacObservation] = Nil,
-  isPoorWeather:     Boolean = false,
-  piName:            Option[String] = None,
-  piEmail:           Option[String] = None,
-  p1proposal:        Null = null, // edu.gemini.model.p1.immutable.Proposal = null, // to avoid having to generate one for testcases that don't care
-  p1mutableProposal: Null = null, // edu.gemini.model.p1.mutable.Proposal = null, // to avoid having to generate one for testcases that don't care
-  p1xmlFile:         File = null, // to avoid having to generate one for testcases that don't care
-  itacComment:       Option[String] = None,
+  xmlFile: Option[File],
+  reference: ProposalReference,
+  piName: String,
+  title: String,
+  allocations: NonEmptyList[Allocation],
+  scienceSubtype: ScienceSubtype = ScienceSubtype.Queue,
+  too: TooActivation = TooActivation.None,
+  groupTree: GroupTree[ItacObservation] = GroupTree.empty,
+  cfpActive: DateInterval = DateInterval.between(LocalDate.now(), LocalDate.now()),
+  ranking: PosDouble = PosDouble.MaxValue // defaulted to avoid having to change all the tests
 ) {
 
-  lazy val id: Proposal.Id = Proposal.Id(ntac.TimeAccountingCategory, ntac.reference)
-
-  def obsListFor(band: ScienceBand): List[ItacObservation] =
-    if (band == ScienceBand.Band3) band3Observations else obsList
-
-  /**
-   * Gets the time for the proposal as a whole.
-   */
-  def time: Time = ntac.awardedTime
-
-  /**
-   * Returns the original awarded time for this proposal, which will be more than `awardedTime` if
-   * the original proposal was split in half due to the presence of observations at both sites.
-   */
-  def undividedTime: Time = ntac.undividedTime.getOrElse(time)
-
-  /**
-   * Gets the time for the given observation relative to the total for all
-   * observations in the proposal.
-   */
-  def relativeObsTime(obs: ItacObservation, band: ScienceBand): Time =
-    ItacObservation.relativeObsTime(obs, time, obsListFor(band))
-
-  /**
-   * Gets the observation list with their times adjusted to be relative to
-   * the total for all observations in the proposal.
-   */
-  def relativeObsList(band: ScienceBand): List[ItacObservation] =
-    ItacObservation.relativeObsList(time, obsListFor(band))
-
-  def p1pdfBaseName: Option[String] =
-    Option(p1xmlFile).map { f =>
-      val name     = f.getName
-      name.lastIndexOf('.') match {
-        case -1 => name
-        case  n => name.substring(0, n)
-      }
-    }
-
-  def p1pdfFile: String =
-    p1pdfBaseName.map(s => s + ".pdf").orNull
-
-  def p1pdfStage2File: String =
-    p1pdfBaseName.map(s => s + "_stage2.pdf").orNull
-
-  def p1pdfs: Proposal.Pdfs[String] =
-    Proposal.Pdfs(p1pdfFile, p1pdfStage2File)
-}
-
-object Proposal {
-
-  final case class Id(TimeAccountingCategory: TimeAccountingCategory, reference: String)
-  object Id {
-    implicit val OrderingId: Ordering[Id] =
-      Ordering.by(id => (id.TimeAccountingCategory.tag, id.reference))
+  object tpe {
+    def scienceSubtype = Proposal.this.scienceSubtype
   }
 
-  case class Pdfs[A](
-    p1pdf: A,
-    p1pdfStage2: A
-  ) {
+  /** All observations, scaled only for group membership (not for allocations). */
+  val originalObsList: List[ItacObservation] =
+    groupTree.flattenAndScale
 
-    def map[B](f: A => B): Pdfs[B] =
-      Pdfs(f(p1pdf), f(p1pdfStage2))
+  private def observatory: Observatory =
+    originalObsList.map(_.mode.observatory).distinct match
+      case a :: Nil => a
+      case other => sys.error(s"Unpossible: proproposal $reference doesn't have exactly one observatory: ${other.mkString("[", ", ", "]")}")
 
-    def toList: List[A] =
-      List(p1pdf, p1pdfStage2)
+  def programReference: ProgramReference =
+    observatory match
+      case Observatory.Gemini => ProgramReference.Science(reference, scienceSubtype)
+      case Observatory.Keck   => ProgramReference.Keck(reference)
+      case Observatory.Subaru => ProgramReference.Subaru(reference, ???)
+    
+  ///
+  /// SHARDS
+  ///
 
-  }
+  // In order to compute a shard, we need to take site affinity into account.
+  //
+  // Strategy 1:
+  // - Scale all observations based on total recommended time, without taking site affinity into account.
+  //   Call this the working set.
+  // - Create the shards for single-site time accounting categories, assigning all time to those sites,
+  //   subtracting that time evenly from corresponding site-affiliated observations in the working set.
+  // - Create shards for dual-site time accounting categories, dividing the time evenly across the working
+  //   set, which should be empty when we're done.
+  
+  lazy val shardFor = Chopper(cfpActive).shards(this)(using Metadata.placeholder)
+
+  // def shardFor(site: Site, category: TimeAccountingCategory, band: ScienceBand): ProposalShard =
+    // val alloc = 
+    //   if category.sites.contains(site) then allocationFor(category, band)
+    //   else Allocation(category, band, TimeSpan.Zero)
+    // ProposalShard(
+    //   this,
+    //   site,
+    //   alloc
+    // )
+
+  def shards: List[ProposalShard] =
+    (Enumerated[Site].all, Enumerated[TimeAccountingCategory].all, Enumerated[ScienceBand].all)
+      .mapN(shardFor(_, _, _))
+      .filter(_.nonEmpty)
+
+  ///
+  /// ALLOCATIONS
+  ///
+
+  /** 
+   * The possibly empty allocation for the specified category and band. There should never be more than
+   * one of these but we handle this case and combine the result.
+   */
+  // private def allocationFor(category: TimeAccountingCategory, band: ScienceBand): Allocation =
+  //   Allocation(
+  //     category,
+  //     band,
+  //     allocations
+  //       .collectFold: 
+  //         case Allocation(`category`, `band`, duration) => duration
+  //   )
+ 
+  // /** Allocations awarded in the specified accounting category. */
+  // private def allocationsForTimeAccountingCategory(category: TimeAccountingCategory): List[Allocation] =
+  //   allocations.filter(_.category === category)
+
+  /** Allocations that can be used at the specified site, filtered for the given band. */
+  private def allocationsForSiteAndBand(site: Site, band: ScienceBand): List[Allocation] =
+    allocations.filter:
+      case Allocation(TimeAccountingCategory.UH, `band`, _) => site == Site.GN
+      case Allocation(TimeAccountingCategory.CL, `band`, _) => site == Site.GS
+      case Allocation(_, `band`, _)                         => true
+      case _                                                => false
+
+  ///
+  /// ALLOCATED TIME
+  ///
+
+  // private def allocatedTime: TimeSpan =
+  //   allocations.foldMap(_.duration)
+
+  // private def allocatedTimeForTimeAccountingCategory(category: TimeAccountingCategory): TimeSpan =
+  //   allocationsForTimeAccountingCategory(category).foldMap(_.duration)
+
+  ///
+  /// USABLE TIME
+  ///
+
+  /** Total time usable at the specified site, in the given band. In most cases time can be used at either site. */
+  private def usableTimeForSiteAndBand(site: Site, band: ScienceBand): TimeSpan =
+    allocationsForSiteAndBand(site, band).foldMap(_.duration)
+
+  ///
+  /// OBSERVATIONS
+  ///
+
+  private def itacObservations: List[ItacObservation] =
+    originalObsList
+
+  /** 
+   * The subset of observations observable at the specified site, in the specified band, with
+   * their times scaled proportionally based on allocated time in the specified time/band.
+   */
+  def itacObservationsScaledForSiteAndBand(site: Site, band: ScienceBand)(using Metadata): List[ItacObservation.Scaled] =
+    val f = scaleFactorForSiteAndBand(site, band) 
+    if f == 0 then Nil else
+      itacObservationsForSiteAndBand(site, band).map: o =>
+        ItacObservation.Scaled(o.copy(time = o.time *| f))
+
+  /** Estimated time required for all observations at the specified site, in the given band. */
+  private def estimatedTimeForSiteAndBand(site: Site, band: ScienceBand)(using Metadata): TimeSpan =
+    itacObservationsForSiteAndBand(site, band).foldMap(_.time)
+
+  /** Factor by which original estimated times must be multiplied to yield the scaled time used for bucket-filling. */
+  private def scaleFactorForSiteAndBand(site: Site, band: ScienceBand)(using Metadata): BigDecimal =
+    val estimated = estimatedTimeForSiteAndBand(site, band).toHours
+    val awarded   = usableTimeForSiteAndBand(site, band).toHours 
+    // if estimated > 0 then awarded / estimated else 0
+    if estimated > 0 then (awarded / estimated) /*min 1.0*/ else 0
+
+  /** Subset of observations observable at the specified site, in the specified band. */    
+  private def itacObservationsForSiteAndBand(site: Site, band: ScienceBand)(using Metadata): List[ItacObservation] =
+    itacObservations.filter: o =>
+      o.isObservableAtSite(site, cfpActive) && o.isObservableInBand(band)
+
+  override def toString(): String =
+    s"""|Proposal:
+        |   reference: $reference
+        |   tpe: $tpe
+        |   cfpActive: $cfpActive
+        |   allocations:
+        |     ${allocations.toList.mkString("\n     ")}
+        |   observations (scaled):
+        |     ${originalObsList.mkString("\n     ")}
+        |""".stripMargin
 
 }
+
+object Proposal:
+
+  def forTesting(
+    reference: ProposalReference,
+    allocations: NonEmptyList[Allocation],
+    scienceSubtype: ScienceSubtype = ScienceSubtype.Queue,
+    too: TooActivation = TooActivation.None,
+     groupTree: GroupTree[ItacObservation] = GroupTree.empty,
+    cfpActive: DateInterval = DateInterval.between(LocalDate.now(), LocalDate.now()),
+    ranking: PosDouble = PosDouble.MaxValue // defaulted to avoid having to change all the tests
+  ): Proposal =
+    apply(None, reference, "Unknown", "Unknown", allocations, scienceSubtype, too, groupTree, cfpActive, ranking)

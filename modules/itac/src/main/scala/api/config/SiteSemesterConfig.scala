@@ -3,11 +3,11 @@
 
 package edu.gemini.tac.qengine.api.config
 
-import edu.gemini.tac.qengine.ctx.Context
-import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.Site
 import lucuma.core.model.IntCentiPercent
+import lucuma.core.model.IntCentiPercentUnbounded
 import lucuma.core.model.Semester
+import lucuma.core.util.TimeSpan
 
 // TODO:
 // The RightAscensionMap[Time] limits and DeclinationMap[IntCentiPercent] can be calculated given
@@ -20,11 +20,11 @@ import lucuma.core.model.Semester
  * to track time for observation targets and site conditions and ensure that
  * the engine stays under budget.
  */
-final class SiteSemesterConfig(
+final case class SiteSemesterConfig(
         val site: Site,
         val semester: Semester,
-        val raLimits: RightAscensionMap[Time],
-        val decLimits: DeclinationMap[IntCentiPercent],
+        val raLimits: RightAscensionMap[TimeSpan],
+        val decLimits: DeclinationMap[IntCentiPercentUnbounded],
         val shutdowns : List[Shutdown],
         val conditions: ConditionsCategoryMap[IntCentiPercent] = Default.Conditions) {
 
@@ -35,5 +35,14 @@ final class SiteSemesterConfig(
   // must be remaining time in at least one dec bin.
   require(decLimits.bins.exists(_.binValue.toPercent == 100))
 
-  def context: Context = new Context(site, semester)
+  override def toString =
+    s"""|SiteSemesterConfig:
+        |   site: $site
+        |   raLimits: ${raLimits}
+        |   decLimits: ${decLimits}
+        |   shutdowns: ${shutdowns}
+        |   conditions: 
+        |     ${conditions.bins.mkString("\n     ")}
+        |""".stripMargin
+
 }

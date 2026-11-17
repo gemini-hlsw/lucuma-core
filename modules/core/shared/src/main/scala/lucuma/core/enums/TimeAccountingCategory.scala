@@ -13,10 +13,23 @@ import lucuma.core.util.Enumerated
   */
 enum TimeAccountingCategory(
   val tag: String,
-  val description: String
+  val description: String,
 ) derives Enumerated:
 
   def abbreviation: String = tag.toUpperCase
+
+  lazy val sites: Set[Site] =
+    this match
+      case AR   => Partner.AR.sites
+      case BR   => Partner.BR.sites
+      case CA   => Partner.CA.sites
+      case CFHT => Set(Site.GN)
+      case CL   => Partner.CL.sites
+      case JP   => Set(Site.GN)
+      case KECK => Set(Site.GN)
+      case UH   => Partner.UH.sites
+      case US   => Partner.US.sites
+      case _    => Site.values.toSet
 
   case AR   extends TimeAccountingCategory("ar",   "Argentina")
   case BR   extends TimeAccountingCategory("br",   "Brazil")

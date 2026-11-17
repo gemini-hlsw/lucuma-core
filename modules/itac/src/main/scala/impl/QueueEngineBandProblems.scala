@@ -20,17 +20,17 @@ object QueueEngineBandProblems {
   type Problem = PartialFunction[(Proposal, ScienceBand), String]
 
   val ClassicalNotInBand1: Problem = {
-    case (p, b@(Band2 | Band3 | Band4)) if p.mode == ScienceSubtype.Classical =>
+    case (p, b@(Band2 | Band3 | Band4)) if p.tpe.scienceSubtype === ScienceSubtype.Classical =>
       s"Classical proposal in $b"
   }
 
-  val NoObsInBand: Problem = {
-    case (p, b) if p.obsListFor(b).isEmpty =>
-      s"No observations were found for $b"
-  }
+  // val NoObsInBand: Problem = {
+  //   case (p, b) if p.obsListFor(b).isEmpty =>
+  //     s"No observations were found for $b"
+  // }
 
   val LpInBand3Or4: Problem = {
-    case (p, b@(Band3 | Band4)) if p.mode == ScienceSubtype.LargeProgram =>
+    case (p, b@(Band3 | Band4)) if p.tpe.scienceSubtype === ScienceSubtype.LargeProgram =>
       s"LP proposal in $b"
   }
 
@@ -40,7 +40,7 @@ object QueueEngineBandProblems {
   }
 
   val All: NonEmptyList[Problem] =
-    NonEmptyList.of(ClassicalNotInBand1, NoObsInBand, LpInBand3Or4, RapidTooOutsideBand1)
+    NonEmptyList.of(ClassicalNotInBand1, LpInBand3Or4, RapidTooOutsideBand1)
 
   def checkAll(p: Proposal, b: ScienceBand): ValidatedNel[String, Unit] =
     All.foldMap: problem => 
@@ -49,7 +49,7 @@ object QueueEngineBandProblems {
   def unsafeCheckAll(p: Proposal, b: ScienceBand): Unit =
     checkAll(p, b) match {
       case Validated.Valid(u)  => u
-      case Validated.Invalid(es) => es.toList.foreach(w => Log.warn(s"${p.ntac.reference}: $w"))
+      case Validated.Invalid(es) => es.toList.foreach(w => Log.warn(s"${p.reference}: $w"))
     }
 
 }

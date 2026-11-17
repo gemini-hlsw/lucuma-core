@@ -3,6 +3,7 @@
 
 package edu.gemini.tac.qengine.impl.resource
 
+import cats.data.NonEmptyList
 import cats.implicits.*
 import edu.gemini.tac.qengine.ItacSuite
 import edu.gemini.tac.qengine.api.config.ConditionsBin
@@ -11,17 +12,24 @@ import edu.gemini.tac.qengine.api.config.ConditionsCategoryMap
 import edu.gemini.tac.qengine.impl.block.Block
 import edu.gemini.tac.qengine.log.RejectConditions
 import edu.gemini.tac.qengine.p1.*
-import edu.gemini.tac.qengine.util.Time
+import eu.timepit.refined.types.numeric.PosInt
+import lucuma.core.enums.Half
+import lucuma.core.enums.ScienceBand
 import lucuma.core.enums.Site
 import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.enums.WaterVapor
+import lucuma.core.model.Allocation
 import lucuma.core.model.CloudExtinction
 import lucuma.core.model.ConstraintSet
 import lucuma.core.model.ElevationRange
 import lucuma.core.model.ImageQuality
 import lucuma.core.model.IntCentiPercent
+import lucuma.core.model.ProposalReference
+import lucuma.core.model.Semester
+import lucuma.core.model.Semester.YearInt
 import lucuma.core.util.Enumerated
+import lucuma.core.util.TimeSpan
 
 import Cat.*
 
@@ -35,14 +43,16 @@ class ConditionsResourceTest extends ItacSuite {
     }*)
 
   private val binGrp = ConditionsCategoryMap.of(bins)
-  private val resGrp = ConditionsCategoryMapResource(Time.minutes(100), binGrp)
+  private val resGrp = ConditionsCategoryMapResource(TimeSpan.fromMinutesBounded(100), binGrp)
 
-  private val ntac   = Ntac(KR, "x", 0, Time.minutes(100)) // not used
+  private val alloc  = Allocation(KR, ScienceBand.Band1, TimeSpan.fromMinutesBounded(100))
+  private val allocs = NonEmptyList.one(alloc)
   private val target = ItacTarget(0,0)                               // not used
 
-  private def mkProp(obsConds: ConstraintSet): Proposal = {
-    val obsList = List(ItacObservation(target, obsConds, Time.minutes(10)))
-    Proposal(ntac, site = Site.GS, obsList = obsList)
+  private def mkProp(obsConds: ConstraintSet): ProposalShard = {
+    val obsList = List(ItacObservation(target, obsConds, TimeSpan.fromMinutesBounded(10)))
+    val prop = Proposal.forTesting(ProposalReference(Semester(YearInt.unsafeFrom(2026), Half.A), PosInt.unsafeFrom(1)), allocs, groupTree = GroupTree.fromList(obsList))
+    prop.shardFor(Site.GN, allocs.head.category, allocs.head.scienceBand)
   }
 
   private def mkConds(cc: CloudExtinction.Preset): ConstraintSet =
@@ -51,20 +61,20 @@ class ConditionsResourceTest extends ItacSuite {
   // Verify that the given remaining times match -- times must be specified
   // in order of CloudCover values.
   private def verifyTimes(track: ConditionsCategoryMapResource, mins: Int*) = {
-    val expected = mins.map(m => Time.minutes(m.toDouble))
+    val expected = mins.map(m => TimeSpan.fromMinutesBounded(m.toDouble))
     val obtained = 
       CloudExtinction.Preset.values.toList.map: cc =>
         track.remaining(mkConds(cc))
-    assertEquals(obtained.mkString(", "), expected.mkString(", ")) // diff is easier to read this way
+    assertEquals(obtained, expected)
   }
 
-  private def testSuccess(time: Time, cnds: ConstraintSet, mins: Int*) = {
+  private def testSuccess(time: TimeSpan, cnds: ConstraintSet, mins: Int*) = {
     val (newResGrp, rem) = resGrp.reserveAvailable(time, cnds)
-    assertEquals(Time.Zero, rem)
+    assertEquals(TimeSpan.Zero, rem)
     verifyTimes(newResGrp, mins*)
 
     val prop  = mkProp(cnds)
-    val otb   = Block(prop, prop.obsList.head, time)
+    val otb   = Block(prop, prop.observations.head, time)
     resGrp.reserve(otb, Fixture.emptyQueue) match {
       case Right(res) => verifyTimes(res, mins*)
       case _ => fail("failed")
@@ -72,7 +82,7 @@ class ConditionsResourceTest extends ItacSuite {
   }
 
   test("testSimpleReservationThatRequiresNoTimeFromABetterBin") {
-    val time  = Time.minutes(10)
+    val time  = TimeSpan.fromMinutesBounded(10)
     val cnds  = mkConds(CloudExtinction.Preset.PointThree)
 
     // Given 14 minutes for PointThree, we should be able to fully reserve the time
@@ -88,7 +98,7 @@ class ConditionsResourceTest extends ItacSuite {
   }
 
   test("testStealTimeFromABetterBin") {
-    val time  = Time.minutes(29)
+    val time  = TimeSpan.fromMinutesBounded(29)
     val cnds  = mkConds(CloudExtinction.Preset.OnePointZero)
 
     // Given 29 minutes for OnePointZero, we use all 14 minutes of OnePointZero, all 14 of PointFive,
@@ -104,7 +114,7 @@ class ConditionsResourceTest extends ItacSuite {
   }
 
   test("testStealExactlyAllRemainingTimeFromBetterBins") {
-    val time  = Time.minutes(14 * 5)
+    val time  = TimeSpan.fromMinutesBounded(14 * 5)
     val cnds  = mkConds(CloudExtinction.Preset.OnePointZero)
 
     // Zero          : 14 - 14 =  0 (+ 0 =  0) 
@@ -118,15 +128,15 @@ class ConditionsResourceTest extends ItacSuite {
   }
 
   test("testAttemptToReserveMoreThanAvailable") {
-    val (newGrp, rem) = resGrp.reserveAvailable(Time.minutes(14 * 5 + 1), mkConds(CloudExtinction.Preset.OnePointZero))
+    val (newGrp, rem) = resGrp.reserveAvailable(TimeSpan.fromMinutesBounded(14 * 5 + 1), mkConds(CloudExtinction.Preset.OnePointZero))
     verifyTimes(newGrp, 0, 0, 0, 0, 0, 14, 28)
-    assertEquals(Time.minutes(1), rem) // 1 minute could not be reserved
+    assertEquals(TimeSpan.fromMinutesBounded(1), rem) // 1 minute could not be reserved
   }
 
   test("testCannotStealMoreThanThanAvailableFromBetterBins") {
     val prop = mkProp(mkConds(CloudExtinction.Preset.OnePointZero))
 
-    val otb2 = Block(prop, prop.obsList.head, Time.minutes(76))
+    val otb2 = Block(prop, prop.observations.head, TimeSpan.fromMinutesBounded(76))
     resGrp.reserve(otb2, Fixture.emptyQueue) match {
       case Left(rc: RejectConditions) => // pass
       case _ => fail("failed")

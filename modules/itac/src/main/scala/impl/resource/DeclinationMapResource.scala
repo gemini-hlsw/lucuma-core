@@ -12,15 +12,15 @@ import edu.gemini.tac.qengine.log.RejectMessage
 import edu.gemini.tac.qengine.log.RejectTarget
 import edu.gemini.tac.qengine.p1.ItacTarget
 import edu.gemini.tac.qengine.util.BoundedTime
-import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.ScienceBand
 import lucuma.core.enums.TooActivation
 import lucuma.core.math.Declination
-import lucuma.core.model.IntCentiPercent
+import lucuma.core.model.IntCentiPercentUnbounded
+import lucuma.core.util.TimeSpan
 
 object DeclinationMapResource {
-  def apply(t: Time, bins: DeclinationMap[IntCentiPercent]): DeclinationMapResource = {
-    new DeclinationMapResource(bins.map(perc => BoundedTime(t * perc)))
+  def apply(t: TimeSpan, bins: DeclinationMap[IntCentiPercentUnbounded]): DeclinationMapResource = {
+    new DeclinationMapResource(bins.map(perc => BoundedTime(t *| perc)))
   }
 
   def tooBlocks(block: Block, grp: DeclinationMap[BoundedTime]): Option[Seq[Block]] =
@@ -34,14 +34,14 @@ object DeclinationMapResource {
 final case class DeclinationMapResource(val bins: DeclinationMap[BoundedTime]) extends Resource {
   type T = DeclinationMapResource
 
-  private def lookup(dec: Declination, f: BoundedTime => Time): Time =
-    bins.get(dec).map(bin => f(bin.binValue)).getOrElse(Time.Zero)
+  private def lookup(dec: Declination, f: BoundedTime => TimeSpan): TimeSpan =
+    bins.get(dec).map(bin => f(bin.binValue)).getOrElse(TimeSpan.Zero)
 
-  def limit(dec: Declination): Time      = lookup(dec, _.limit)
-  def limit(t: ItacTarget): Time       = limit(t.dec)
+  def limit(dec: Declination): TimeSpan      = lookup(dec, _.limit)
+  def limit(t: ItacTarget): TimeSpan       = limit(t.dec)
 
-  def remaining(dec: Declination): Time  = lookup(dec, _.remaining)
-  def remaining(t: ItacTarget): Time   = remaining(t.dec)
+  def remaining(dec: Declination): TimeSpan  = lookup(dec, _.remaining)
+  def remaining(t: ItacTarget): TimeSpan   = remaining(t.dec)
 
   def isFull(dec: Declination): Boolean  = remaining(dec).isZero
   def isFull(t: ItacTarget): Boolean   = isFull(t.dec)
@@ -49,7 +49,11 @@ final case class DeclinationMapResource(val bins: DeclinationMap[BoundedTime]) e
   private def reserveNormal(block: Block, band: ScienceBand): RejectMessage Either DeclinationMapResource = {
     val dec = block.obs.itacTarget.dec
     bins.updated(dec, _.reserve(block.time)) match {
-      case None => Left(RejectTarget(block.prop, block.obs, band, RejectTarget.Dec, lookup(dec, _.used), lookup(dec, _.limit)))
+      case None => 
+        // println(f"DeclinationMapResource.reserveNormal: couldn't reserve ${block.time.toHours}%3.2f h at $dec")
+        // println("  my bins are")
+        // bins.bins.foreach(b => println(f"  ${b.range} - ${b.binValue}"))
+        Left(RejectTarget(block.prop, block.obs, band, RejectTarget.Dec, lookup(dec, _.used), lookup(dec, _.limit)))
       case Some(updated) => Right(new DeclinationMapResource(updated))
     }
   }
@@ -68,8 +72,8 @@ final case class DeclinationMapResource(val bins: DeclinationMap[BoundedTime]) e
         Right(new DeclinationMapResource(DeclinationMap.fromBins(updatedBins*)))
       }
       case _ =>
-        val cur = bins.bins.foldLeft(Time.ZeroHours)(_ + _.binValue.used)
-        val max = bins.bins.foldLeft(Time.ZeroHours)(_ + _.binValue.limit)
+        val cur = bins.bins.foldLeft(TimeSpan.Zero)(_ +| _.binValue.used)
+        val max = bins.bins.foldLeft(TimeSpan.Zero)(_ +| _.binValue.limit)
         Left(RejectTarget(block.prop, block.obs, band, RejectTarget.Dec, cur, max))
     }
 
@@ -84,7 +88,7 @@ final case class DeclinationMapResource(val bins: DeclinationMap[BoundedTime]) e
    * of the given target.  Returns a new DeclinationMapResource and any time that
    * could not be reserved.
    */
-  def reserveAvailable(time: Time, target: ItacTarget): (DeclinationMapResource, Time) =
+  def reserveAvailable(time: TimeSpan, target: ItacTarget): (DeclinationMapResource, TimeSpan) =
     reserveAvailable(time, target.dec)
 
   /**
@@ -92,7 +96,7 @@ final case class DeclinationMapResource(val bins: DeclinationMap[BoundedTime]) e
    * declination.  Returns a new DeclinationMapResource and any time that
    * could not be reserved.
    */
-  def reserveAvailable(time: Time, dec: Declination): (DeclinationMapResource, Time) = {
+  def reserveAvailable(time: TimeSpan, dec: Declination): (DeclinationMapResource, TimeSpan) = {
     bins.get(dec) match {
       case Some(DecRanged(_, bt)) =>
         val (newBoundedTime, remainingTime) = bt.reserveAvailable(time)

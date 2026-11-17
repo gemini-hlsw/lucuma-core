@@ -3,7 +3,7 @@ import org.scalajs.linker.interface.OutputPatterns
 import org.typelevel.sbt.gha.PermissionValue
 import org.typelevel.sbt.gha.Permissions
 
-ThisBuild / tlBaseVersion                         := "0.283"
+ThisBuild / tlBaseVersion                         := "0.284"
 ThisBuild / tlCiReleaseBranches                   := Seq("master")
 ThisBuild / githubWorkflowEnv += "MUNIT_FLAKY_OK" -> "true"
 
@@ -240,9 +240,40 @@ lazy val itac = project
   .settings(
     name := "lucuma-itac",
     libraryDependencies ++= Seq(
+      "org.typelevel" %% "cats-parse"             % catsParseVersion,
+      "org.typelevel" %% "log4cats-slf4j"         % log4catsVersion,
       "org.slf4j"     %  "slf4j-simple"           % slf4jVersion,
-      "org.typelevel" %%% "munit-cats-effect"   % munitCatsEffectVersion % Test,
-    )
+      "com.monovore"                 %% "decline-effect"         % "2.6.1",
+      "com.monovore"                 %% "decline"                % "2.6.1",
+      "io.circe"      %% "circe-yaml"           % "0.16.1",
+      "io.circe"      %% "circe-generic"         % "0.14.16",
+      "org.apache.poi"                % "poi"                    % "4.1.2", 
+      "org.typelevel" %% "munit-cats-effect"   % munitCatsEffectVersion % Test,
+      "org.scala-lang.modules" %% "scala-xml"  % scalaXmlVersion,
+      "org.typelevel" %% "cats-mtl" % "1.4.0",
+      "edu.gemini"    %% "clue-core"            % clueVersion,
+      "edu.gemini"    %% "clue-http4s"          % clueVersion,
+      "org.http4s"                       %% "http4s-jdk-http-client"                     % http4sJdkHttpClientVersion,
+    ),
+    Compile / sourceGenerators += Def.task {
+      val outDir = (Compile / sourceManaged).value / "scala" / "itac"
+      val outFile = new File(outDir, "BuildInfo.scala")
+      outDir.mkdirs
+      val v = version.value
+      val t = System.currentTimeMillis
+      IO.write(outFile,
+        s"""|package itac
+            |
+            |/** Auto-generated build information. */
+            |object BuildInfo {
+            |  /** Current version of ITAC ($v). */
+            |  val version = "$v"
+            |  /** Build date (${new java.util.Date(t)}). */
+            |  val date    = new java.util.Date(${t}L)
+            |}
+            |""".stripMargin)
+      Seq(outFile)
+    }.taskValue
   )
 
 lazy val ags = crossProject(JVMPlatform, JSPlatform)

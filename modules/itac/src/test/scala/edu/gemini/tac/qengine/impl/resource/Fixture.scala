@@ -3,6 +3,7 @@
 
 package edu.gemini.tac.qengine.impl.resource
 
+import cats.data.NonEmptyList
 import cats.implicits.*
 import edu.gemini.tac.qengine.api.config.*
 import edu.gemini.tac.qengine.api.config.ConditionsCategory.Ge
@@ -12,21 +13,25 @@ import edu.gemini.tac.qengine.api.queue.time.TimeAccountingCategoryTime
 import edu.gemini.tac.qengine.impl.queue.ProposalQueueBuilder
 import edu.gemini.tac.qengine.p1.*
 import edu.gemini.tac.qengine.util.BoundedTime
-import edu.gemini.tac.qengine.util.Time
+import eu.timepit.refined.types.numeric.PosInt
 import lucuma.core.enums.Half
 import lucuma.core.enums.ScienceBand
 import lucuma.core.enums.Site
 import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.enums.WaterVapor
+import lucuma.core.model.Allocation
 import lucuma.core.model.CloudExtinction
 import lucuma.core.model.ConstraintSet
 import lucuma.core.model.ElevationRange
 import lucuma.core.model.ImageQuality
 import lucuma.core.model.IntCentiPercent
+import lucuma.core.model.IntCentiPercentUnbounded
+import lucuma.core.model.ProposalReference
 import lucuma.core.model.Semester
 import lucuma.core.model.Semester.YearInt
 import lucuma.core.util.Enumerated
+import lucuma.core.util.TimeSpan
 
 import scala.annotation.unused
 
@@ -39,8 +44,8 @@ object Fixture {
   // (  0, 45] 100%
   // ( 45, 90)  50%
   val decBins   = DeclinationMap.fromBins(
-    DecRanged( 0, 45, IntCentiPercent.unsafeFromPercent(100)),
-    DecRanged(45, 90, IntCentiPercent.unsafeFromPercent( 50)).inclusive
+    DecRanged( 0, 45, IntCentiPercentUnbounded.unsafeFromPercent(100)),
+    DecRanged(45, 90, IntCentiPercentUnbounded.unsafeFromPercent( 50)).inclusive
   )
 
   // <=CC70 50%
@@ -50,18 +55,18 @@ object Fixture {
   )
 
   // 0 hrs, 1 hrs, 2 hrs, ... 23 hrs
-  val raLimits   = RightAscensionMap((0 to 23).map(Time.hours(_)))
+  val raLimits   = RightAscensionMap((0 to 23).map(TimeSpan.fromHoursBounded(_)))
   val binConfig  = new SiteSemesterConfig(site, semester, raLimits, decBins, List.empty, condsBins)
   val raResGroup = RightAscensionMapResource(binConfig)
 
-  def compositeTimeRestrictionResource(total: Time): List[TimeRestriction[BoundedTime]] = {
+  def compositeTimeRestrictionResource(total: TimeSpan): List[TimeRestriction[BoundedTime]] = {
     val bins = RestrictionConfig().mapTimeRestrictions(
-      perc => BoundedTime(total * perc),
+      perc => BoundedTime(total *| perc),
       _ => BoundedTime(total))
     bins
   }
 
-  def semesterRes(total: Time): SemesterResource =
+  def semesterRes(total: TimeSpan): SemesterResource =
     new SemesterResource(raResGroup, compositeTimeRestrictionResource(total))
 
   // Falls in the first conditions bin (<=CC70)
@@ -70,14 +75,15 @@ object Fixture {
   // Falls in the second conditions bin (>=CC80)
   val badCC  = ConstraintSet(ImageQuality.Preset.TwoPointZero, CloudExtinction.Preset.OnePointZero, SkyBackground.Bright, WaterVapor.Wet, ElevationRange.ByAirMass.Default)
 
-  def genQuanta(hrs: Double): TimeAccountingCategoryTime = TimeAccountingCategoryTime.constant(Time.hours(hrs))
+  def genQuanta(hrs: Double): TimeAccountingCategoryTime = TimeAccountingCategoryTime.constant(TimeSpan.fromHoursBounded(hrs))
 
   // Makes a proposal with the given ntac info, and observations according
   // to the descriptions (target, conditions, time)
-  def mkProp(ntac: Ntac, obsDefs: (ItacTarget, ConstraintSet, Time)*): Proposal =
-    Proposal(ntac, site = site, obsList = obsDefs.map(tup => ItacObservation(tup._1, tup._2, tup._3)).toList)
+  def mkProp(alloc: Allocation, obsDefs: (ItacTarget, ConstraintSet, TimeSpan)*): ProposalShard =
+    val p = Proposal.forTesting(ProposalReference(Semester(YearInt.unsafeFrom(2026), Half.A), PosInt.unsafeFrom(1)), NonEmptyList.one(alloc), groupTree = GroupTree.fromList(obsDefs.map(tup => ItacObservation(tup._1, tup._2, tup._3)).toList))
+    p.shardFor(Site.GN, alloc.category, alloc.scienceBand)
 
-  val emptyQueue = ProposalQueueBuilder(QueueTime(TimeAccountingCategoryTime.empty, IntCentiPercent.Min), ScienceBand.Band1, Nil) // QueueTime(Site.GN, TimeAccountingCategoryTime.empty(TimeAccountingCategorys).map, TimeAccountingCategorys))
+  val emptyQueue = ProposalQueueBuilder(QueueTime(TimeAccountingCategoryTime.empty, IntCentiPercent.Min), ScienceBand.Band1, Site.GN, Nil) // QueueTime(Site.GN, TimeAccountingCategoryTime.empty(TimeAccountingCategorys).map, TimeAccountingCategorys))
   def evenQueue(hrs: Double): ProposalQueueBuilder =
     evenQueue(hrs, Some(QueueTime.DefaultTimeAccountingCategoryOverfillAllowance))
 
@@ -87,12 +93,12 @@ object Fixture {
   val Band3Percent = IntCentiPercent.unsafeFromPercent(20)
 
   def evenQueueTime(hrs: Double, @unused overfill: Option[IntCentiPercent]): QueueTime = {
-    val pt = TimeAccountingCategoryTime.fromFunction { _ => Time.hours(hrs) * Band1Percent }
+    val pt = TimeAccountingCategoryTime.fromFunction { _ => TimeSpan.fromHoursBounded(hrs) *| Band1Percent }
     QueueTime(pt, IntCentiPercent.Min)
   }
 
   def evenQueue(hrs: Double, overfill: Option[IntCentiPercent]): ProposalQueueBuilder =
-    ProposalQueueBuilder(evenQueueTime(hrs, overfill), ScienceBand.Band1)
+    ProposalQueueBuilder(evenQueueTime(hrs, overfill), ScienceBand.Band1, Site.GN)
 
 
 }

@@ -3,7 +3,7 @@
 
 package edu.gemini.tac.qengine.log
 
-import edu.gemini.tac.qengine.p1.Proposal
+import edu.gemini.tac.qengine.p1.ProposalShard
 import lucuma.core.enums.ScienceBand
 
 /**
@@ -18,7 +18,7 @@ object RejectCategoryOverAllocation {
     detailTemplate.format(cat)
 }
 
-case class RejectCategoryOverAllocation(prop: Proposal, cat: ScienceBand) extends RejectMessage {
+case class RejectCategoryOverAllocation(prop: ProposalShard, cat: ScienceBand) extends RejectMessage {
   def reason: String = RejectCategoryOverAllocation.name
   def detail: String = RejectCategoryOverAllocation.detail(cat)
 }

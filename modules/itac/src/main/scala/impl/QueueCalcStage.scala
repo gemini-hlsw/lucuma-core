@@ -8,7 +8,7 @@ import edu.gemini.tac.qengine.impl.queue.ProposalQueueBuilder
 import edu.gemini.tac.qengine.log.ProposalLog
 import edu.gemini.tac.qengine.log.RejectCategoryOverAllocation
 import edu.gemini.tac.qengine.p1.ItacObservation
-import edu.gemini.tac.qengine.p1.Proposal
+import edu.gemini.tac.qengine.p1.ProposalShard
 import org.slf4j.LoggerFactory
 
 import block.BlockIterator
@@ -20,7 +20,7 @@ object QueueCalcStage {
 
   private val Log = LoggerFactory.getLogger("edu.gemini.itac")
 
-  private def rollback(stack: List[QueueFrame], prop: Proposal, activeList: Proposal => List[ItacObservation]): List[QueueFrame] =
+  private def rollback(stack: List[QueueFrame], prop: ProposalShard, activeList: ProposalShard => List[ItacObservation.Scaled]): List[QueueFrame] =
     stack.dropWhile(!_.isStartOf(prop)) match {
       case head :: tail => head.skip(activeList) :: tail
       case Nil => sys.error("Tried to skip a proposal that wasn't seen.")
@@ -38,16 +38,16 @@ object QueueCalcStage {
   // RejectMessage. Call skip on that frame and push it so that it considers
   // the next proposal in the sequence.
   //
-  @tailrec private def compute(stack: List[QueueFrame], log: ProposalLog, activeList : Proposal=>List[ItacObservation]): Result = {
+  @tailrec private def compute(stack: List[QueueFrame], log: ProposalLog, activeList : ProposalShard => List[ItacObservation.Scaled]): Result = {
     val stackHead = stack.head
     if (!stackHead.hasNext) {
       Log.trace( "Stack is empty [" + ! stackHead.hasNext + "]")
       (stackHead, log.updated(stackHead.iter.remPropList, stackHead.queue.band, RejectCategoryOverAllocation(_, stackHead.queue.band)))
     } else stackHead.next(activeList) match {
       case Left(msg) => //Error, so roll back (and recurse)
-        compute(rollback(stack, msg.prop, activeList), log.updated(msg.prop.id, stackHead.queue.band, msg), activeList)
+        compute(rollback(stack, msg.prop, activeList), log.updated(msg.prop.reference, stackHead.queue.band, msg), activeList)
       case Right(frameNext) => //OK, so accept (and recurse)
-        val updatedLog = frameNext.accept.map(msg => log.updated(msg.prop.id, stackHead.queue.band, msg)).getOrElse(log)
+        val updatedLog = frameNext.accept.map(msg => log.updated(msg.prop.reference, stackHead.queue.band, msg)).getOrElse(log)
         compute(frameNext.frame :: stack, updatedLog, activeList)
     }
   }
@@ -57,17 +57,17 @@ object QueueCalcStage {
    * provided parameters:
    * p.cat : Category -> The current band (essentially)
    * p.queue : ProposalQueueBuilder -> Encapsulates the state of the being-built queue
-   * p.iter : BlockIterator -> Produces a block of time for the current TimeAccountingCategory's preferred Proposal
+   * p.iter : BlockIterator -> Produces a block of time for the current TimeAccountingCategory's preferred ProposalShard
    * p.res :  SemesterResource -> Encapsulates the state of the remaining resources
    * p.log :  ProposalLog -> Holds a record of decisions
-   * p.activeList : Proposal=>List[ItacObservation] -> Either _.obsList or _.band3Observations
+   * p.activeList : ProposalShard=>List[ItacObservation] -> Either _.obsList or _.band3Observations
    *
    * Begins recursive call to compute(ProposalQueueBuilder, BlockIterator, SemesterResource)
    */
-  def apply(
+  def compute(
     queue:      ProposalQueueBuilder,
     iter:       BlockIterator,
-    activeList: Proposal => List[ItacObservation],
+    activeList: ProposalShard => List[ItacObservation.Scaled],
     res:        SemesterResource,
     log:        ProposalLog,
   ): QueueCalcStage = {
@@ -75,6 +75,7 @@ object QueueCalcStage {
     val result = compute(queueFrameHead, log, activeList)
     new QueueCalcStage(result)
   }
+
 }
 
 /**

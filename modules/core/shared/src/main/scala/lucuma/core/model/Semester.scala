@@ -13,6 +13,7 @@ import lucuma.core.enums.Half
 import lucuma.core.enums.Site
 import lucuma.core.enums.parser.EnumParsers.half
 import lucuma.core.parser.MiscParsers.intN
+import lucuma.core.util.DateInterval
 import monocle.Prism
 
 import java.time.*
@@ -104,6 +105,9 @@ final case class Semester(yearInt: Semester.YearInt, half: Half) {
     def atSite(site: Site): ZonedDateTime =
       zonedDateTime(site.timezone)
   }
+
+  def interval: DateInterval =
+    DateInterval.between(start.localDate, end.localDate)
 
   /** Format as full year and semester half, `2009A`. */
   def format: String =

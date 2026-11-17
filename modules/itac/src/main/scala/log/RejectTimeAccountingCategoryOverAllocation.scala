@@ -3,10 +3,10 @@
 
 package edu.gemini.tac.qengine.log
 
-import edu.gemini.tac.qengine.p1.Proposal
+import edu.gemini.tac.qengine.p1.ProposalShard
 import edu.gemini.tac.qengine.util.BoundedTime
-import edu.gemini.tac.qengine.util.Time
 import lucuma.core.enums.TimeAccountingCategory
+import lucuma.core.util.TimeSpan
 
 /**
  * A proposal rejection message for proposals of TimeAccountingCategorys that have already
@@ -17,17 +17,17 @@ object RejectTimeAccountingCategoryOverAllocation {
 
   private val fullTemplate = "%s has reached allocation limit: %s"
   private val longTemplate = "%s proposal (%.1f hr) would exceed overfill limit: %s"
-  def detail(p: TimeAccountingCategory, t: Time, guaranteed: BoundedTime, all: BoundedTime): String = {
+  def detail(p: TimeAccountingCategory, t: TimeSpan, guaranteed: BoundedTime, all: BoundedTime): String = {
     if (guaranteed.isFull)
       fullTemplate.format(p, LogMessage.formatBoundedTime(all))
     else {
       val s = all.overbook(t) map { b => LogMessage.formatBoundedTime(b) } getOrElse ""
-      longTemplate.format(p, t.toHours.value, s)
+      longTemplate.format(p, t.toHours, s)
     }
   }
 }
 
-case class RejectTimeAccountingCategoryOverAllocation(prop: Proposal, guaranteed: BoundedTime, all: BoundedTime) extends RejectMessage {
+case class RejectTimeAccountingCategoryOverAllocation(prop: ProposalShard, guaranteed: BoundedTime, all: BoundedTime) extends RejectMessage {
   def reason: String = RejectTimeAccountingCategoryOverAllocation.name
-  def detail: String = RejectTimeAccountingCategoryOverAllocation.detail(prop.ntac.TimeAccountingCategory, prop.time, guaranteed, all)
+  def detail: String = RejectTimeAccountingCategoryOverAllocation.detail(prop.allocation.category, prop.allocation.duration, guaranteed, all)
 }

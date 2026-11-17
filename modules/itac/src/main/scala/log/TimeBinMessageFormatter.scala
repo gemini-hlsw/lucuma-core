@@ -4,29 +4,30 @@
 package edu.gemini.tac.qengine.log
 
 import edu.gemini.tac.qengine.p1.ItacObservation
-import edu.gemini.tac.qengine.p1.Proposal
-import edu.gemini.tac.qengine.util.Time
+import edu.gemini.tac.qengine.p1.ProposalShard
 import lucuma.core.enums.ScienceBand
+import lucuma.core.util.TimeSpan
+import org.typelevel.scalaccompat.annotation.nowarn
 
 trait TimeBinMessageFormatter {
   private val binStatusTemplate = "Bin %.1f%% full (%.2f / %.2f hrs)"
-  def binStatus(cur: Time, max: Time): String = {
-    val curHrs = cur.toHours.value
-    val maxHrs = max.toHours.value
+  def binStatus(cur: TimeSpan, max: TimeSpan): String = {
+    val curHrs = cur.toHours
+    val maxHrs = max.toHours
     val perc   = if (maxHrs.abs < 0.0001) 100.0 else curHrs/maxHrs * 100
     binStatusTemplate.format(perc, curHrs, maxHrs)
   }
 
-  private val obsInfoTemplate   = "%.2f hrs at %s(%.3f hr, %.1f deg)"
-  def obsInfo(prop: Proposal, obs: ItacObservation, band: ScienceBand): String = {
-    val obsTime = prop.relativeObsTime(obs, band)
+  @nowarn
+  def obsInfo(prop: ProposalShard, obs: ItacObservation, band: ScienceBand): String = {
+    val obsTime = obs.time.toHours
     val target  = obs.itacTarget
     val targetName = target.id.toString
-    obsInfoTemplate.format(obsTime.toHours.value, targetName, target.ra.toHourAngle.toDoubleHours, target.dec.toAngle.toDoubleDegrees)
+    f"$obsTime%.2f hrs at $targetName(${target.coords})"
   }
 
   private val detailTemplate    = "%s. Reject %s."
-  def detail(prop: Proposal, obs: ItacObservation, band: ScienceBand, cur: Time, max: Time): String = {
+  def detail(prop: ProposalShard, obs: ItacObservation, band: ScienceBand, cur: TimeSpan, max: TimeSpan): String = {
     val statusMsg  = binStatus(cur, max)
     val obsInfoMsg = obsInfo(prop, obs, band)
     detailTemplate.format(statusMsg, obsInfoMsg)

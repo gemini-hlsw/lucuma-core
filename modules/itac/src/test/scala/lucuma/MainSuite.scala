@@ -1,9 +1,11 @@
 // Copyright (c) 2016-2026 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
-package edu.gemini.tac.qengine.ctx
+package lucuma
 
-import lucuma.core.enums.Site
-import lucuma.core.model.Semester
+import munit.CatsEffectSuite
 
-final case class Context(site: Site, semester: Semester) 
+class MainSuite extends CatsEffectSuite:
+
+  test("run against local ocs workspace"):
+    itac.Main.run(List("-d", "/tmp/itac", "queue"))

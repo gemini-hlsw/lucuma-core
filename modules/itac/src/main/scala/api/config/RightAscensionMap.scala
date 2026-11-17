@@ -48,6 +48,7 @@ import RightAscensionMap._
  * An RightAscensionMap is a parametrized collection indexed by RA angle.
  */
 case class RightAscensionMap[T] private (val bins: IndexedSeq[T]) {
+
   require((TotalMin % bins.length) == 0)
 
   /** Size of each bin in minutes. */
@@ -65,7 +66,14 @@ case class RightAscensionMap[T] private (val bins: IndexedSeq[T]) {
   def indexOf(ra: RightAscension): Int = ra.toHourAngle.toDoubleMinutes.toInt / sizeMin
 
   def apply(min: Int): T  = bins((min % TotalMin) / sizeMin)
-  def apply(ra: RightAscension): T  = bins(indexOf(ra))
+  def apply(ra: RightAscension): T  = {
+    // println(s"Looking for value at $ra")
+    val i = indexOf(ra)
+    // println(s"The index is $i")
+    val v = bins(i)
+    // println(s"The value is $v")
+    v
+  }
   def apply(t: ItacTarget): T = apply(t.ra)
 
   def map[U](f: T => U): RightAscensionMap[U] = new RightAscensionMap[U](bins.map(f))

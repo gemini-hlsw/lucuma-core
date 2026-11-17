@@ -3,27 +3,35 @@
 
 package edu.gemini.tac.qengine.api.config
 
+import cats.data.NonEmptyList
 import cats.syntax.all.*
 import edu.gemini.tac.qengine.ItacSuite
 import edu.gemini.tac.qengine.p1.*
-import edu.gemini.tac.qengine.util.Time
+import eu.timepit.refined.types.numeric.PosInt
+import lucuma.core.enums.Half
 import lucuma.core.enums.ScienceBand
 import lucuma.core.enums.Site
 import lucuma.core.enums.SkyBackground
 import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.enums.WaterVapor
+import lucuma.core.model.Allocation
 import lucuma.core.model.CloudExtinction
 import lucuma.core.model.ConstraintSet
 import lucuma.core.model.ElevationRange
 import lucuma.core.model.ImageQuality
 import lucuma.core.model.IntCentiPercent
+import lucuma.core.model.ProposalReference
+import lucuma.core.model.Semester
+import lucuma.core.model.Semester.YearInt
 import lucuma.core.util.Enumerated
+import lucuma.core.util.TimeSpan
 
 class TimeRestrictionTest extends ItacSuite {
 
   val US = TimeAccountingCategory.US
 
-  private val ntac   = Ntac(US, "x", 0, Time.hours(10))
+  private val alloc  = Allocation(US, ScienceBand.Band1, TimeSpan.fromHoursBounded(10))
+  private val allocs   = NonEmptyList.one(alloc)
   private val target = ItacTarget(0.0, 0.0) // not used
   private def conds(wv: WaterVapor) =
     ConstraintSet(ImageQuality.Preset.TwoPointZero, CloudExtinction.Preset.ThreePointZero, SkyBackground.Bright, wv, ElevationRange.ByAirMass.Default)
@@ -32,13 +40,13 @@ class TimeRestrictionTest extends ItacSuite {
     (_, obs, _) => obs.constraintSet.waterVapor <= WaterVapor.Dry
   }
 
-  private def mkProp(wv: WaterVapor): Proposal =
-    Proposal(ntac, site = Site.GS, obsList = List(ItacObservation(target, conds(wv), Time.hours(10))))
-
+  private def mkProp(wv: WaterVapor): ProposalShard =
+    val prop = Proposal.forTesting(ProposalReference(Semester(YearInt.unsafeFrom(2026), Half.A), PosInt.unsafeFrom(1)), allocs, groupTree = GroupTree.from(ItacObservation(target, conds(wv), TimeSpan.fromHoursBounded(10))))
+    prop.shardFor(Site.GN, alloc.category, alloc.scienceBand)
 
   test("testMatches") {
     val propList = Enumerated[WaterVapor].all.map(mkProp(_))
-    val boolList = propList.map(prop => bin.matches(prop, prop.obsList.head, ScienceBand.Band1))
+    val boolList = propList.map(prop => bin.matches(prop, prop.observations.head, ScienceBand.Band1))
     assertEquals(List(true, true, false, false), boolList)
   }
 
@@ -47,6 +55,6 @@ class TimeRestrictionTest extends ItacSuite {
   }
 
   test("testMap") {
-    assertEquals(Time.hours(10), bin.map(perc => Time.hours(100) * perc).value)
+    assertEquals(TimeSpan.fromHoursBounded(10), bin.map(perc => TimeSpan.fromHoursBounded(100) *| perc).value)
   }
 }

@@ -1,0 +1,40 @@
+// Copyright (c) 2016-2026 Association of Universities for Research in Astronomy, Inc. (AURA)
+// For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
+
+package client.operation
+
+import cats.effect.ExitCode
+import cats.effect.Sync
+import cats.syntax.all.*
+import itac.Operation
+import itac.Workspace
+import lucuma.core.enums.TooActivation
+import lucuma.core.model.ProposalReference
+import org.typelevel.log4cats.Logger
+
+object Info:
+
+  def apply[F[_]: Sync](ref: ProposalReference): Operation[F] =
+    new Operation[F]:
+      def run(ws: Workspace[F], log: Logger[F]): F[ExitCode] =
+        ws.proposal(ref).flatMap: p =>
+          val ss = p.shards
+          Sync[F].blocking:
+            println()
+            println(f"${p.reference.label} (${p.piName}) - ${p.tpe.scienceSubtype} Proposal ${Some(ss.length).filter(_ > 1).foldMap(n => s"with $n shards")} - Ranking ${p.ranking.value}%2.1f")  
+            println()
+            println("  Allocations:")
+            p.allocations.toList.foreach: a =>
+              println(f"    ${a.category} ${a.scienceBand} ${a.duration.toHours}%3.2f")
+            ss.zipWithIndex.foreach: (s, n) =>
+              println()
+              println(f"  ${Option.when(ss.length > 1)(s"Shard ${n+1} at ").orEmpty}${s.site}, ${s.allocation.duration.toHours}%2.2f h available, awarded by ${s.allocation.category.description}")
+              println()
+              s.observations.foreach: o =>
+                if (p.too == TooActivation.None) then
+                  println(f"    ${o.time.toHours}%2.2f h, ${o.mode.tag}, ${o.itacTarget}")
+                else
+                  println(f"    ${o.time.toHours}%2.2f h, ${o.mode.tag}, «TOO Target»")
+            println()
+            ExitCode.Success
+ 

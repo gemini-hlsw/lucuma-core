@@ -1,0 +1,333 @@
+// Copyright (c) 2016-2026 Association of Universities for Research in Astronomy, Inc. (AURA)
+// For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
+
+package itac
+
+import cats.data.NonEmptyList
+import cats.effect.Async
+import cats.effect.Sync
+import cats.effect.kernel.Ref
+import cats.implicits.*
+import client.graphql.Fetch
+import edu.gemini.tac.qengine.p1.GroupTree
+import edu.gemini.tac.qengine.p1.Proposal
+import edu.gemini.tac.qengine.p1.ProposalShard
+import eu.timepit.refined.types.numeric.PosDouble
+import io.circe.CursorOp.DownField
+import io.circe.Decoder
+import io.circe.DecodingFailure
+import io.circe.Encoder
+import io.circe.syntax.*
+import io.circe.yaml.Printer
+import io.circe.yaml.parser
+import itac.config.Common
+import itac.config.QueueConfig
+import itac.ocs.OcsLoader
+import lucuma.core.enums.ScienceBand
+import lucuma.core.enums.Site
+import lucuma.core.enums.TimeAccountingCategory
+import lucuma.core.model.Allocation
+import lucuma.core.model.ProposalReference
+import lucuma.core.util.Enumerated
+import org.typelevel.log4cats.Logger
+
+import java.nio.file.Files
+import java.nio.file.NoSuchFileException
+import java.nio.file.Path
+import java.nio.file.Paths
+
+/** Interface for some Workspace operations. */
+trait Workspace[F[_]] {
+
+  def cwd: F[Path]
+
+  /** True if the working directory is empty. */
+  def isEmpty: F[Boolean]
+
+  /** Write an encodable value to a file. Header must be a YAML comment. */
+  def writeData[A: Encoder](path: Path, a: A, header: String = ""): F[Path]
+
+  /** Read a decodable value from the specified file. */
+  def readData[A: Decoder](path: Path): F[A]
+
+  def readText(path: Path): F[String]
+
+  /**
+   * Create a directory relative to `cwd`, including any intermediate ones, returning the path of
+   * the created directory.
+   */
+  // def mkdirs(path: Path): F[Path]
+  def commonConfig: F[Common]
+  def queueConfig(path: Path): F[QueueConfig]
+  def proposals: F[List[Proposal]]
+  def shards: F[List[ProposalShard]]
+  // def removed: F[List[Proposal]]
+
+  def proposal(ref: ProposalReference): F[Proposal] 
+
+  /**
+   * Create a directory under `cwd` with a name like GN-20190524-103322 and return its path
+   * relative to the workspace root.
+   */
+  // def newQueueFolder(site: Site): F[Path]
+
+  // def writeRolloveReport(path: Path, rr: RolloverReport): F[Path]
+
+  // def readRolloverReport(path: Path): F[RolloverReport]
+  def writeText(path: Path, text: String): F[Path]
+
+  // def progIdHash: F[ProgIdHash]
+
+  // def bulkEdits(ps: List[Proposal]): F[Map[String, BulkEdit]]
+
+}
+
+object Workspace {
+
+  // val RemovedDir            = Paths.get("removed")
+  // val EditsDir              = Paths.get("edits")
+  // val BulkEditsFile         = Paths.get("bulk_edits.xls")
+
+  def proposalDir(band: ScienceBand): Path = Paths.get(s"band-${band.intValue}")
+
+  // val WorkspaceDirs: List[Path] =
+  //   List(RemovedDir, EditsDir) ++ ScienceBand.values.map(proposalDir)
+
+  object Default {
+    val CommonConfigFile = Paths.get("common.yaml")
+    def queueConfigFile(site: Site) = Paths.get(s"${site.shortName.toLowerCase}-queue.yaml")
+    def rolloverReport(site: Site) = Paths.get(s"${site.shortName.toLowerCase}-rollovers.yaml")
+  }
+
+  val printer: Printer =
+    Printer(
+      preserveOrder = true,
+      // dropNullKeys = false,
+      // indent = 2,
+      maxScalarWidth = 120,
+      // splitLines = true,
+      // indicatorIndent = 0,
+      // tags = Map.empty,
+      // sequenceStyle = FlowStyle.Block,
+      // mappingStyle = FlowStyle.Block,
+      // stringStyle = StringStyle.Plain,
+      // lineBreak = LineBreak.Unix,
+      // explicitStart = false,
+      // explicitEnd = false,
+      // version = YamlVersion.Auto
+    )
+
+  def apply[F[_]: Sync: Async](dir: Path, cc: Path, log: Logger[F], force: Boolean, ocs: Boolean): F[Workspace[F]] =
+    ItacException(s"Workspace directory not found: ${dir}").raiseError[F, Workspace[F]].unlessA(dir.toFile.getAbsoluteFile.isDirectory) *>
+    log.debug(s"Working directory is ${dir.toAbsolutePath()}") >>
+    Ref[F].of(Map.empty[Path, String]).map { cache =>
+      new Workspace[F] {
+        given Logger[F] = log
+
+        def cwd = dir.pure[F]
+
+        def isEmpty: F[Boolean] =
+          Sync[F].delay(Option(dir.toFile.getAbsoluteFile.listFiles).foldMap(_.toList).isEmpty)
+
+        def readText(path: Path): F[String] =
+          cache.get.flatMap { map =>
+            val p = dir.resolve(path)
+            map.get(path) match {
+              case Some(a) => log.debug(s"Getting $p from cache.").as(a)
+              case None    => log.debug(s"Reading: $p") *>
+                Sync[F].delay(new String(Files.readAllBytes(p), "UTF-8"))
+                  .flatTap(text =>  cache.set(map + (path -> text)))
+                  .onError {
+                    case _: NoSuchFileException =>
+                      ItacException(s"No such file: $path").raiseError[F, Unit]
+                  }
+            }
+          }
+
+        def readData[A: Decoder](path: Path): F[A] =
+          readText(path)
+            .map(parser.parse(_))
+            .flatMap {
+              _.leftMap(ex => ItacException(s"Failure reading $path\n$ex.message"))
+               .flatMap(Decoder[A].decodeJson)
+               .liftTo[F]
+            }
+            .onError {
+              case f: DecodingFailure =>
+                Sync[F].raiseError(
+                  ItacException(s"""|Failure reading $path\n  ${f.message}
+                                    |    at ${f.history.collect { case DownField(k) => k } mkString("/")}
+                                    |""".stripMargin.trim)
+                )
+            }
+
+        // def readAll[A: Decoder](path: Path, suffix: String): F[List[A]] =
+        //   listFiles(path).flatMap(_.filter(_.toFile.getName.endsWith(suffix)).traverse(readData[A]))
+
+        def writeText(path: Path, text: String): F[Path] = {
+          val p = dir.resolve(path)
+          Sync[F].delay(p.toFile.getAbsoluteFile.isFile).flatMap {
+            case false | `force` => log.info(s"Writing: $p") *>
+              Sync[F].delay(Files.write(dir.resolve(path), text.getBytes("UTF-8")))
+            case true  => Sync[F].raiseError(ItacException(s"File exists: $p"))
+          }
+        }
+
+        def writeData[A: Encoder](path: Path, a: A, header: String = ""): F[Path] =
+          writeText(path, header + printer.pretty(a.asJson))
+
+        // def writeRolloveReport(path: Path, rr: RolloverReport): F[Path] = {
+        //   // The user cares about when report was generated in local time, so that's what we will
+        //   // use in the header comment.
+        //   val ldt = ZonedDateTime.ofInstant(rr.timestamp, ZoneId.systemDefault)
+        //   val fmt = DateTimeFormatter.ofPattern("yyyy-dd-MM HH:mm 'local time' (z)")
+        //   val header =
+        //     s"""|
+        //         |# This is the ${rr.semester} rollover report for ${rr.site.displayName}, generated at ${fmt.format(ldt)}.
+        //         |# It is ok to edit this file as long as the format is preserved, and it is ok to add comment lines.
+        //         |
+        //         |""".stripMargin
+        //   writeData(path, rr, header)
+        // }
+
+        // def readRolloverReport(path: Path): F[RolloverReport] =
+        //   readData(path)(decoderRolloverReport)
+
+        // def mkdirs(path: Path): F[Path] = {
+        //   val p = dir.resolve(path)
+        //   Sync[F].delay(p.toFile.getAbsoluteFile.isDirectory) flatMap {
+        //     case true  => log.debug(s"Already exists: $path").as(p)
+        //     case false => log.info(s"Creating folder: $path") *>
+        //       Sync[F].delay(Files.createDirectories(dir.resolve(path)))
+        //   }
+        // }
+
+        def commonConfig: F[Common] =
+          readData[Common](cc).recoverWith {
+            case _: NoSuchFileException => cwd.flatMap(p => Sync[F].raiseError(ItacException(s"Not an ITAC Workspace: $p")))
+          }
+
+        def queueConfig(path: Path): F[QueueConfig] =
+          readData[QueueConfig](path).recoverWith {
+            case _: NoSuchFileException => cwd.flatMap(p => Sync[F].raiseError(ItacException(s"Site-specific configuration file not found: ${p.resolve(path)}")))
+          }
+
+        // def edits: F[Map[String, SummaryEdit]] =
+        //   readAll[SummaryEdit](EditsDir, ".yaml").map(_.map(e => (e.reference -> e)).toMap)
+
+        // def bulkEdits(ps: List[Proposal]): F[Map[String, BulkEdit]] =
+        //   for {
+        //     f <- cwd.map(_.resolve(BulkEditsFile).toFile.getAbsoluteFile)
+        //     _ <- log.debug(s"Creating/updating and then reading bulk edits from ${f.getAbsoluteFile()}")
+        //     _ <- BulkEditFile.createOrUpdate(f, ps)
+        //     m <- BulkEditFile.read(f)
+        //   } yield m
+
+        private def merge(a: NonEmptyList[Allocation], b: NonEmptyList[Allocation]): NonEmptyList[Allocation] =
+          val collected = a.concatNel(b).toList.groupBy(_.category).values.toList.map(_.distinct)
+          val ret = NonEmptyList
+            .fromList:
+              collected.map: as =>
+                // println(as)
+                as.head.copy(duration = as.foldMap(_.duration))
+            .get    
+          // println(ret.map(a => f"${a.category} - ${a.duration.toHours}%3.2f h"))
+          ret
+
+        private def merge(a: Proposal, b: Proposal): Proposal =
+          // println(s"merging ${a.piName}: ${a.xmlFile.get.getName()} + ${b.xmlFile.get.getName()}")
+          val allocs = merge(a.allocations, b.allocations)
+          val groups =
+            if a.originalObsList == b.originalObsList
+            then a.groupTree
+            else GroupTree.fromList(a.originalObsList ++ b.originalObsList)
+          a.copy(
+            ranking = PosDouble.unsafeFrom(a.ranking.value min b.ranking.value),
+            allocations = allocs,
+            groupTree = groups
+          )
+
+        private def merge(p: Proposal, ps: NonEmptyList[Proposal]): Proposal =
+          ps.foldLeft(p)(merge)
+
+        private def mergeSplits(ps: List[Proposal]): List[Proposal] = 
+          def go(toExamine: List[Proposal], accum: List[Proposal]): List[Proposal] =
+            toExamine match
+              case Nil => accum
+              case curr :: rest =>
+                rest.partition(p => p.piName === curr.piName && p.title === curr.title) match
+                  case (matched, unmatched) =>
+                    NonEmptyList.fromList(matched) match
+                      case None => go(unmatched, curr :: accum)
+                      case Some(nel) => go(unmatched, merge(curr, nel) :: accum)
+          go(ps, Nil)
+
+        private def loadOcsProposals(dirs: Map[ScienceBand, Path]): F[List[Proposal]] =
+          for {
+            cwd  <- cwd
+            conf <- commonConfig
+            p     = cwd.resolve(dir)
+            // when  = conf.semester.getMidpointDate(Site.GN).getTime // arbitrary
+            e    <- OcsLoader[F].loadProposals(log, dirs)
+            _    <- e.swap.traverse(s => Sync[F].raiseError(ItacException(s"Error loading OCS proposal: $s")))
+            // es   <- edits
+            // ps   <- ProposalLoader[F](when, es, log, mutator).loadMany(p.toFile.getAbsoluteFile)
+            // _    <- ps.traverse { case (f, Left(es)) => log.warn(s"${f.getName}: ${es.toList.mkString(", ")}") ; case _ => ().pure[F] }
+            // psʹ   = ps.collect { case (_, Right(ps)) => ps.toList } .flatten
+            // _    <- log.debug(s"Read ${ps.length} proposals.")
+            // ret   = ps.collect { case (_, Right(ps)) => ps.toList } .flatten
+          } yield e.toOption.foldMap(mergeSplits)
+
+        def proposals: F[List[Proposal]] =
+          if ocs then
+            cwd.flatMap: cwd =>
+              loadOcsProposals:
+                Enumerated[ScienceBand].all.fproduct(b => cwd.resolve(proposalDir(b))).toMap
+          else
+            commonConfig.flatMap: config =>
+              Fetch(config.uri, config.authorization, config.semester).fetch
+
+        def shards: F[List[ProposalShard]] =
+          proposals.map: ps =>
+            (ps, Enumerated[Site].all, Enumerated[TimeAccountingCategory].all, Enumerated[ScienceBand].all)
+              .mapN(_.shardFor(_, _, _))
+              .filter(_.nonEmpty)
+
+        def proposal(ref: ProposalReference): F[Proposal] =
+          proposals.flatMap: ps =>
+            ps.find(_.reference === ref) match
+              case Some(p) => p.pure
+              case None    => Sync[F].raiseError(ItacException(s"No such proposal: $ref"))
+            
+          // for {
+          //   cwd  <- cwd
+          //   conf <- commonConfig
+          //   p     = cwd.resolve(proposalDir(band))
+          //   when  = conf.semester.getMidpointDate(Site.GN).getTime // arbitrary
+          //   _    <- log.debug(s"Reading proposals from $p")
+          //   es   <- edits
+          //   p    <- ProposalLoader[F](when, es, log, (_, _) => ().pure[F]).loadByReference(p.toFile.getAbsoluteFile, ref)
+          // } yield p
+
+        // def newQueueFolder(site: Site): F[Path] =
+        //   for {
+        //     dt <- Sync[F].delay(LocalDateTime.now)
+        //     f   = DateTimeFormatter.ofPattern("yyyyMMdd-HHmms")
+        //     n   = s"${site.shiort}-${f.format(dt)}"
+        //     p   = Paths.get(n)
+        //     _  <- mkdirs(p)
+        //   } yield p
+
+        // def progIdHash: F[ProgIdHash] =
+        //   commonConfig.map(c => new ProgIdHash(c.emailConfig.hashKey))
+
+      }
+    }
+
+  // // Wee wrapper class for edits … may move this out.
+  // private case class Edits(edits: Option[Map[String, Edit]]) // allow for empty map
+  // private object Edits {
+  //   implicit val DecoderEdits: Decoder[Edits] = io.circe.generic.semiauto.deriveDecoder
+  // }
+
+}
