@@ -165,7 +165,7 @@ object FetchDecoder:
       allocations       <- hc.downField("allocations").as[List[Allocation]]
     yield NonEmptyList.fromList(allocations)
       match
-        case None => Left(s"${proposalReference.label}: No allocations")
+        case None => Left(s"${proposalReference.label}: submitted proposal has no allocations (yet), skipping")
         case Some(nel) => Right((      
           Proposal(
             xmlFile        = None,

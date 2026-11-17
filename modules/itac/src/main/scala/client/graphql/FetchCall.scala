@@ -6,17 +6,22 @@ package client.graphql
 import clue.*
 import io.circe.Json
 import io.circe.JsonObject
-import lucuma.core.model.CallForProposals
+import lucuma.core.model.Semester
 
 object FetchCall:
 
-  def apply(cid: CallForProposals.Id): GraphQLOperation.Typed[Nothing, JsonObject, Json] =
+  def apply(sem: Semester): GraphQLOperation.Typed[Nothing, JsonObject, Json] =
     new GraphQLOperation.Typed[Nothing, JsonObject, Json]:
       override val document = GraphQLDocument.unsafeFromString:
         s"""
-{
-  callForProposals(callForProposalsId: "$cid") {
-    title
+query MyQuery {
+  callsForProposals(
+    includeDeleted: false
+    WHERE: { semester: { EQ: "${sem.format}" }, gemini: { type: { EQ: REGULAR_SEMESTER } } }
+  ) {
+    matches {
+      id
+      title
+    }
   }
-}
-        """
+}        """

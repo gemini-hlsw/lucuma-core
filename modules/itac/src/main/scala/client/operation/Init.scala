@@ -64,7 +64,11 @@ object Init {
         |# long as the format remains the same. You can also add comment lines.
         |
         |# The queue semester.
-        |semester: ${Semester.fromString.reverseGet(semester)}
+        |semester: ${semester.format}
+        |
+        |# ODB information
+        |uri: https://odb-dev.gpp.gemini.edu/odb
+        |authorization: Bearer <API KEY HERE>
         |
         |# Shutdown periods, given as date ranges of the form YYYYMMDD-YYYYMMDD during which observing is not
         |# possible. Use this to black out dates or simply reduce time during periods when weather loss is
@@ -134,13 +138,16 @@ object Init {
         |
         |# Observing hours per partner in each band.
         |hours:
-        |  us: 226.5	247.8	165.2 0.0
-        |  ca:  60.5  66.2	 44.2 0.0
-        |  ar:  11.3  11.3   7.5 0.0
-        |  br:  23.8  23.8  15.9 0.0
-        |  kr:  18.2  18.2  12.2 0.0
-        |  # cl:  43.2  43.2  28.8 0.0
-        |  lp:  27.0   0.0   0.0 0.0
+        |  ar:   7.1   7.1    4.7  1000.0
+        |  br:  22.7  22.7   15.2  1000.0
+        |  ca:  38.4  45.7   37.9  1000.0
+        |${if site === Site.GN then "# " else "  "}cl:  45.9  45.9  30.73  1000.0
+        |  gt:  37.5   0.0    0.0  1000.0
+        |${if site === Site.GS then "# " else "  "}jp:  20.0   5.0    0.0  1000.0
+        |  kr:  23.8  23.8   16.3  1000.0
+        |  lp:  89.3  54.2    0.0  1000.0
+        |${if site === Site.GS then "# " else "  "}uh:  36.4  36.4   24.3  1000.0
+        |  us: 141.9 169.8  160.6  1000.0
         |
         |# RA bin size, in minutes. Must evenly divide 24 * 60 = 1440
         |raBinSize: 180
@@ -148,15 +155,12 @@ object Init {
         |# Dec bin size, in degrees. Must evenly divide 180.
         |decBinSize: 20
         |
-        |# NOT IMPLEMENTED -- how does this work?
-        |# Which partner gets the initial pick?
-        |initialPick: US
-        |
         |# Queue filling limit (percentage over 80).
         |overfill:
         |  band1: 5
         |  band2: 5
         |  band3: 10
+        |
         |""".stripMargin
 
 }
