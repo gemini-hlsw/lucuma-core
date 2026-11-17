@@ -35,13 +35,13 @@ import scala.collection.immutable.SortedMap
 
 class AgsSuite extends munit.FunSuite {
   val gs1 = GuideStarCandidate(
-    GuideStarId.gaia(0L),
+    GuideStarId.GaiaDr3(0L),
     SiderealTracking.const(Coordinates.Zero),
     SortedMap[Band, BrightnessValue](Band.Gaia -> BrightnessValue.unsafeFrom(16.05))
   )
 
   val gs2 = GuideStarCandidate(
-    GuideStarId.gaia(1L),
+    GuideStarId.GaiaDr3(1L),
     SiderealTracking.const(Coordinates.Zero),
     SortedMap[Band, BrightnessValue](Band.Gaia -> BrightnessValue.unsafeFrom(11.23))
   )
@@ -149,7 +149,7 @@ class AgsSuite extends munit.FunSuite {
 
     val guideStarOffset =
       GuideStarCandidate(
-        GuideStarId.gaia(0L),
+        GuideStarId.GaiaDr3(0L),
         SiderealTracking.const(
           Coordinates.Zero
             .offsetBy(Angle.Angle0, Offset.signedDecimalArcseconds.reverseGet(0.0, 23.0))
@@ -216,7 +216,7 @@ class AgsSuite extends munit.FunSuite {
 
     val guideStarOffset =
       GuideStarCandidate(
-        GuideStarId.gaia(0L),
+        GuideStarId.GaiaDr3(0L),
         SiderealTracking.const(
           Coordinates.Zero
             .offsetBy(Angle.Angle0, Offset.signedDecimalArcseconds.reverseGet(0.0, 23.0))
@@ -286,7 +286,7 @@ class AgsSuite extends munit.FunSuite {
 
     val guideStarOffset =
       GuideStarCandidate(
-        GuideStarId.gaia(0L),
+        GuideStarId.GaiaDr3(0L),
         SiderealTracking.const(
           Coordinates.Zero
             .offsetBy(Angle.Angle0, Offset.signedDecimalArcseconds.reverseGet(0.0, 23.0))
@@ -330,7 +330,7 @@ class AgsSuite extends munit.FunSuite {
     val wavelength = Wavelength.fromIntNanometers(300).get
 
     val pwfsGS = GuideStarCandidate(
-      GuideStarId.gaia(0L),
+      GuideStarId.GaiaDr3(0L),
       SiderealTracking.const(Coordinates.Zero),
       SortedMap[Band, BrightnessValue](Band.Gaia -> BrightnessValue.unsafeFrom(12.0))
     )
@@ -358,7 +358,7 @@ class AgsSuite extends munit.FunSuite {
 
     val guideStarOffset =
       GuideStarCandidate(
-        GuideStarId.gaia(0L),
+        GuideStarId.GaiaDr3(0L),
         SiderealTracking.const(
           Coordinates.Zero
             .offsetBy(Angle.Angle0, Offset.signedDecimalArcseconds.reverseGet(0.0, 23.0))
@@ -399,7 +399,7 @@ class AgsSuite extends munit.FunSuite {
     val wavelength = Wavelength.fromIntNanometers(300).get
 
     val pwfsGS = GuideStarCandidate(
-      GuideStarId.gaia(0L),
+      GuideStarId.GaiaDr3(0L),
       SiderealTracking.const(Coordinates.Zero),
       SortedMap[Band, BrightnessValue](Band.Gaia -> BrightnessValue.unsafeFrom(12.0))
     )
@@ -434,7 +434,7 @@ class AgsSuite extends munit.FunSuite {
 
     val guideStarOffset =
       GuideStarCandidate(
-        GuideStarId.gaia(0L),
+        GuideStarId.GaiaDr3(0L),
         SiderealTracking.const(
           Coordinates.Zero
             .offsetBy(Angle.Angle0, Offset.signedDecimalArcseconds.reverseGet(0.0, 23.0))
@@ -497,7 +497,7 @@ class AgsSuite extends munit.FunSuite {
 
     val guideStarOffset =
       GuideStarCandidate(
-        GuideStarId.gaia(0L),
+        GuideStarId.GaiaDr3(0L),
         SiderealTracking.const(
           Coordinates.Zero
             .offsetBy(Angle.Angle0, Offset.signedDecimalArcseconds.reverseGet(0.0, 23.0))
@@ -538,7 +538,7 @@ class AgsSuite extends munit.FunSuite {
 
     // candiate whithin OIWFS patrol field but too faint for PWFS1
     val faintStar = GuideStarCandidate(
-      GuideStarId.gaia(0L),
+      GuideStarId.GaiaDr3(0L),
       SiderealTracking.const(
         Coordinates.Zero
           .offsetBy(Angle.Angle0, Offset.signedDecimalArcseconds.reverseGet(0.0, 23.0))
@@ -585,7 +585,7 @@ class AgsSuite extends munit.FunSuite {
 
     def candidate(id: Long, q: Double, r: Option[Double]): GuideStarCandidate =
       GuideStarCandidate(
-        GuideStarId.gaia(id),
+        GuideStarId.GaiaDr3(id),
         SiderealTracking.const(
           Coordinates.Zero
             .offsetBy(Angle.Angle0, Offset.signedDecimalArcseconds.reverseGet(0.0, q))
@@ -674,7 +674,7 @@ class AgsSuite extends munit.FunSuite {
     val observationTarget: GuideStarCandidate =
       GuideStarCandidate(observationTargetId, onAxis, brightnesses)
     val gaiaStar: GuideStarCandidate          =
-      GuideStarCandidate(GuideStarId.gaia(0L), onAxis, brightnesses)
+      GuideStarCandidate(GuideStarId.GaiaDr3(0L), onAxis, brightnesses)
 
     val ngs: AgsParams = AgsParams
       .GnirsLongSlit(GnirsFpuSlit.LongSlit_0_30, GnirsCamera.ShortBlue, GnirsPrism.Mirror)

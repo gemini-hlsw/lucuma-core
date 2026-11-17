@@ -125,7 +125,7 @@ class GuideStarCandidateSuite extends DisciplineSuite {
 
   test("a catalog star takes its id from its catalog name") {
     val candidate: GuideStarCandidate = GuideStarCandidate.fromCatalog(target())
-    assertEquals(candidate.id, GuideStarId.Catalog(GuideStarName.unsafeFrom("Gaia DR3 123")))
+    assertEquals(candidate.id, GuideStarId.GaiaDr3(123L))
     assertEquals(candidate.catalogName.map(_.value.value), Some("Gaia DR3 123"))
     assertEquals(candidate.id.gaiaSourceId, Some(123L))
   }
@@ -133,7 +133,7 @@ class GuideStarCandidateSuite extends DisciplineSuite {
   test("a catalog star with another name gets gaia(-1)") {
     val candidate: GuideStarCandidate =
       GuideStarCandidate.fromCatalog(namedTarget("HD 1234"))
-    assertEquals(candidate.id, GuideStarId.gaia(-1L))
+    assertEquals(candidate.id, GuideStarId.GaiaDr3(-1L))
   }
 
   test("the observation target has its target id and no catalog name") {

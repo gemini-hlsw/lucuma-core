@@ -4,8 +4,6 @@
 package lucuma.ags.arb
 
 import lucuma.ags.GuideStarId
-import lucuma.ags.GuideStarName
-import lucuma.ags.arb.ArbGuideStarName.given
 import lucuma.core.model.Target
 import lucuma.core.util.arb.ArbGid.given
 import org.scalacheck.Arbitrary
@@ -21,11 +19,11 @@ trait ArbGuideStarId:
         2 -> Arbitrary
           .arbitrary[Target.Id]
           .map(targetId => GuideStarId.ObservationTarget(Some(targetId))),
-        4 -> Arbitrary.arbitrary[GuideStarName].map(GuideStarId.Catalog(_))
+        4 -> Arbitrary.arbitrary[Long].map(GuideStarId.GaiaDr3(_))
       )
 
   given Cogen[GuideStarId] =
-    Cogen[(Option[GuideStarName], Option[Target.Id], Boolean)].contramap: id =>
-      (id.catalogName, id.observationTargetId, id.isObservationTarget)
+    Cogen[(Option[Long], Option[Target.Id], Boolean)].contramap: id =>
+      (id.gaiaSourceId, id.observationTargetId, id.isObservationTarget)
 
 object ArbGuideStarId extends ArbGuideStarId

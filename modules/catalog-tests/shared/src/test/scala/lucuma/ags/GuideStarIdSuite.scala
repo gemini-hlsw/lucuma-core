@@ -13,8 +13,8 @@ class GuideStarIdSuite extends munit.DisciplineSuite:
   private val T1: GuideStarId   = GuideStarId.ObservationTarget(Target.Id.fromLong(1L))
   private val T2: GuideStarId   = GuideStarId.ObservationTarget(Target.Id.fromLong(2L))
   private val NoId: GuideStarId = GuideStarId.ObservationTarget(None)
-  private val G1: GuideStarId   = GuideStarId.gaia(1L)
-  private val G2: GuideStarId   = GuideStarId.gaia(2L)
+  private val G1: GuideStarId   = GuideStarId.GaiaDr3(1L)
+  private val G2: GuideStarId   = GuideStarId.GaiaDr3(2L)
 
   checkAll("GuideStarId", OrderTests[GuideStarId].order)
 
@@ -24,12 +24,12 @@ class GuideStarIdSuite extends munit.DisciplineSuite:
 
   test("catalog stars sort numerically by Gaia source id"):
     val ids: List[GuideStarId] =
-      List(10L, 9L, 0L, -1L, -10L, 100L, Long.MaxValue, Long.MinValue).map(GuideStarId.gaia)
+      List(10L, 9L, 0L, -1L, -10L, 100L, Long.MaxValue, Long.MinValue).map(GuideStarId.GaiaDr3(_))
     assertEquals(
       ids.sorted(using Order[GuideStarId].toOrdering).map(_.gaiaSourceId),
       List(Long.MinValue, -10L, -1L, 0L, 9L, 10L, 100L, Long.MaxValue).map(Option.apply)
     )
-    assert(Order[GuideStarId].lt(GuideStarId.gaia(9L), GuideStarId.gaia(10L)))
+    assert(Order[GuideStarId].lt(GuideStarId.GaiaDr3(9L), GuideStarId.GaiaDr3(10L)))
     assert(Order[GuideStarId].lt(G1, G2))
 
   test("observation targets sort by target id, the id-less one first"):
@@ -62,12 +62,12 @@ class GuideStarIdSuite extends munit.DisciplineSuite:
     assertEquals(List(T1, NoId, G1).map(_.isObservationTarget), List(true, true, false))
 
   test("catalogName"):
-    assertEquals(GuideStarId.gaia(123L).catalogName.map(_.value.value), Some("Gaia DR3 123"))
-    assertEquals(GuideStarId.gaia(-5L).catalogName.map(_.value.value), Some("Gaia DR3 -5"))
+    assertEquals(GuideStarId.GaiaDr3(123L).catalogName.map(_.value.value), Some("Gaia DR3 123"))
+    assertEquals(GuideStarId.GaiaDr3(-5L).catalogName.map(_.value.value), Some("Gaia DR3 -5"))
     assertEquals(T1.catalogName, None)
     assertEquals(NoId.catalogName, None)
 
   test("gaiaSourceId"):
-    assertEquals(GuideStarId.gaia(123L).gaiaSourceId, Some(123L))
+    assertEquals(GuideStarId.GaiaDr3(123L).gaiaSourceId, Some(123L))
     assertEquals(T1.gaiaSourceId, None)
     assertEquals(NoId.gaiaSourceId, None)

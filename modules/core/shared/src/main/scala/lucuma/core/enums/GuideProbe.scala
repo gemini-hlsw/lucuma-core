@@ -33,6 +33,11 @@ enum GuideProbe(val tag: String) derives Enumerated:
     // For Altair 54", the patrol field oval at any position angle
     case AltairAOWFS     => geom.altair.patrolField.candidatesArea
 
+  /** Whether the probe can guide on axis, on the observation's own target. */
+  def guidesOnAxis: Boolean = this match
+    case AltairAOWFS => true
+    case _           => false
+
 object GuideProbe:
   given Enumerated[PWFSGuideProbe] = Enumerated.from(GuideProbe.PWFS1, GuideProbe.PWFS2).withTag(_.tag)
 

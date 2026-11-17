@@ -82,7 +82,8 @@ object GuideStarCandidate {
       GuideStarName
         .from(target.name.value)
         .toOption
-        .fold(GuideStarId.gaia(-1))(GuideStarId.Catalog(_)),
+        .flatMap(GuideStarId.fromCatalogName)
+        .getOrElse(GuideStarId.GaiaDr3(-1)),
       target.tracking,
       SortedMap.from(
         SourceProfile.integratedBrightnesses
