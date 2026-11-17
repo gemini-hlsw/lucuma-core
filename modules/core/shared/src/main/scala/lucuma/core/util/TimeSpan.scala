@@ -7,6 +7,8 @@ import cats.Monoid
 import cats.Order
 import cats.syntax.order.*
 import eu.timepit.refined.types.numeric.NonNegLong
+import lucuma.core.model.IntCentiPercent
+import lucuma.core.model.IntCentiPercentUnbounded
 import lucuma.core.optics.Format
 import lucuma.core.refined.numeric.NonZeroBigDecimal
 import lucuma.core.refined.numeric.NonZeroInt
@@ -18,8 +20,6 @@ import java.time.temporal.ChronoUnit.MICROS
 import java.time.temporal.TemporalUnit
 import scala.annotation.targetName
 import scala.util.Try
-import lucuma.core.model.IntCentiPercent
-import lucuma.core.model.IntCentiPercentUnbounded
 
 /**
  * TimeSpan is a time span, similar to a `FiniteDuration` in that it is a

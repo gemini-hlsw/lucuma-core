@@ -13,11 +13,11 @@ import lucuma.core.enums.Half
 import lucuma.core.enums.Site
 import lucuma.core.enums.parser.EnumParsers.half
 import lucuma.core.parser.MiscParsers.intN
+import lucuma.core.util.DateInterval
 import monocle.Prism
 
 import java.time.*
 import java.time.Month.*
-import lucuma.core.util.DateInterval
 
 /**
  * A (year, half) tuple where the year falls in the bounds [2000, 9999].

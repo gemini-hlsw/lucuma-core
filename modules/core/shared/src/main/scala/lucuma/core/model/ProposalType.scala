@@ -3,10 +3,10 @@
 
 package lucuma.core.model
 
+import lucuma.core.enums.ScienceSubtype
 import lucuma.core.enums.TooActivation
 import lucuma.core.util.TimeSpan
 import monocle.Optional
-import lucuma.core.enums.ScienceSubtype
 
 enum ProposalType(val scienceSubtype: ScienceSubtype) {
   case Classical(minPercentTime: IntPercent, partnerSplits: List[PartnerSplit]) extends ProposalType(ScienceSubtype.Classical)

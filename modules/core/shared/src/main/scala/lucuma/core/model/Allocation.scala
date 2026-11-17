@@ -3,10 +3,10 @@
 
 package lucuma.core.model
 
-import lucuma.core.enums.TimeAccountingCategory
-import lucuma.core.enums.ScienceBand
-import lucuma.core.util.TimeSpan
 import cats.Order
+import lucuma.core.enums.ScienceBand
+import lucuma.core.enums.TimeAccountingCategory
+import lucuma.core.util.TimeSpan
 
 final case class Allocation(
   category: TimeAccountingCategory,
