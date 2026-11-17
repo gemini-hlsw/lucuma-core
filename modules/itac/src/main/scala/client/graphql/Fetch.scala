@@ -23,6 +23,7 @@ import edu.gemini.tac.qengine.p1.ItacObservation
 import lucuma.core.model.Observation
 import edu.gemini.tac.qengine.p1.GroupTree
 import cats.free.Free
+import lucuma.core.model.Semester
 
 trait Fetch[F[_]]:
   def fetch: F[List[Proposal]]
@@ -30,7 +31,7 @@ trait Fetch[F[_]]:
 object Fetch:
   import FetchDecoder.given
 
-  def apply[F[_]: Async: Logger](uri: Uri, auth: Authorization, callId: CallForProposals.Id): Fetch[F] =
+  def apply[F[_]: Async: Logger](uri: Uri, auth: Authorization, sem: Semester): Fetch[F] =
     new Fetch[F]:
 
       val client: Resource[F, FetchClient[F, Nothing]] = 
@@ -40,18 +41,18 @@ object Fetch:
 
       def fetch: F[List[Proposal]] =
         for
-          _  <- fetchCall(callId)
-          _  <- Logger[F].info("Fetching SUBMITTED proposals...")
-          eps <- fetchProposals(callId)
+          cid <- fetchCall(sem)
+          _   <- Logger[F].info("Fetching SUBMITTED proposals...")
+          eps <- fetchProposals(cid)
           _   <- eps.collect { case Left(s) => s } .traverse(Logger[F].warn(_))
           ps   = eps.collect { case Right(a) => a }
           _   <- Logger[F].info("Fetching DEFINED observations...")
-          eos <- fetchObservations(callId)
+          eos <- fetchObservations(cid)
           _   <- eos.collect { case (id, Left(a)) => (id, a) } .traverse(x => Logger[F].warn(x._2))
           os  = eos.collect { case (id, Right(a)) => (id, a) }
           _   <- Logger[F].info(s"Fetched ${os.length} observations in ${ps.length} proposals.")
           ret  = stitch(ps, os)
-          _   <- ret.filter(_.originalObsList.isEmpty).traverse(p => Logger[F].warn(s"${p.reference.label}: no DEFINED observations"))
+          _   <- ret.filter(_.originalObsList.isEmpty).traverse(p => Logger[F].warn(s"${p.reference.label}: proposal has no defined observations, skipping"))
         yield ret.filter(_.originalObsList.nonEmpty)
 
       def stitch(ps: List[(Proposal, GroupTree[Observation.Id])], os: List[(Observation.Id, ItacObservation)]): List[Proposal] =
@@ -64,13 +65,19 @@ object Fetch:
                 case None    => GroupTree.empty[ItacObservation]
           )
 
-      def fetchCall(cid: CallForProposals.Id): F[Unit] =
-        fetchJson(FetchCall(cid)).flatMap: json =>
-          val hc = json.hcursor.downFields("callForProposals")
-          hc.downField("title").as[String] match
-            case Left(_) => Logger[F].error(s"No such call for proposals: $cid")
-            case Right(t) => Logger[F].info(s"Found CFP: \"$t\"")          
-
+      def fetchCall(sem: Semester): F[CallForProposals.Id] =
+        fetchJson(FetchCall(sem)).flatMap: json =>
+          val hc = json.hcursor.downFields("callsForProposals", "matches").downArray
+          val res =
+            for
+              title <- hc.downField("title").as[String]
+              id    <- hc.downField("id").as[CallForProposals.Id]
+            yield (title, id) 
+          res.toOption match
+            case Some((title, cid)) => 
+              Logger[F].info(s"Found CFP for ${sem.format}: \"$title\"").as(cid)
+            case None => Async[F].raiseError(new RuntimeException(s"No CFP was found for semester ${sem.format}"))
+          
       def fetchProposals(cid: CallForProposals.Id): F[List[Either[String, (Proposal, GroupTree[Observation.Id])]]] =
         fetchJson(FetchPrograms(cid)).map: json =>
           json.hcursor.downFields("programs", "matches").as[List[Either[String, (Proposal, GroupTree[Observation.Id])]]] match
