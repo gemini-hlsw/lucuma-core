@@ -72,7 +72,7 @@ case class Proposal(
   // - Create shards for dual-site time accounting categories, dividing the time evenly across the working
   //   set, which should be empty when we're done.
   
-  val shardFor = Chopper(cfpActive).shards(this)(using Metadata.placeholder)
+  lazy val shardFor = Chopper(cfpActive).shards(this)(using Metadata.placeholder)
 
   // def shardFor(site: Site, category: TimeAccountingCategory, band: ScienceBand): ProposalShard =
     // val alloc = 

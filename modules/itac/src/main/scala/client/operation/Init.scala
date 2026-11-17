@@ -98,13 +98,13 @@ object Init {
         |# Conditions bins and percentages for each, which must add up to 100.
         |conditionsBins:
         |  - name: "super-seeing, dark, photometric"
-        |    conditions: "zero point_one <=darkest"
+        |    conditions: "zero point_three <=darkest"
         |    available: 5
         |  - name: "super-seeing, grey/bright, photometric"
-        |    conditions: "zero point_one <=gray"
+        |    conditions: "zero point_three <=gray"
         |    available: 5
         |  - name: "super-seeing, cloudy"
-        |    conditions: "one_point_zero point_one bright"
+        |    conditions: "one_point_zero point_three bright"
         |    available: 10
         |  - name: "good-seeing, dark, photometric"
         |    conditions: "zero one_point_zero <=darkest"

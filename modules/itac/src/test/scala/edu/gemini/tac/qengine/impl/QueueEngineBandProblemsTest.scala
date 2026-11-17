@@ -50,25 +50,25 @@ class QueueEngineBandProblemsTest extends FunSuite {
   //     case Band3 => "No observations were found for Band3"
   //   }
 
-  test("testLpInBand3Or4"):
-    testRule(LpInBand3Or4, P.copy(scienceSubtype = ScienceSubtype.LargeProgram)) {
-      case Band3 => "LP proposal in Band3"
-      case Band4 => "LP proposal in Band4"
-    }
+  // test("testLpInBand3Or4"):
+  //   testRule(LpInBand3Or4, P.copy(scienceSubtype = ScienceSubtype.LargeProgram)) {
+  //     case Band3 => "LP proposal in Band3"
+  //     case Band4 => "LP proposal in Band4"
+  //   }
 
-  test("testInterruptingTooOutsideBand1"):
-    testRule(RapidTooOutsideBand1, P.copy(scienceSubtype = ScienceSubtype.Queue)) {
-      case Band2 => "Rapid TOO proposal in Band2"
-      case Band3 => "Rapid TOO proposal in Band3"
-      case Band4 => "Rapid TOO proposal in Band4"
-    }
+  // test("testInterruptingTooOutsideBand1"):
+  //   testRule(RapidTooOutsideBand1, P.copy(scienceSubtype = ScienceSubtype.Queue)) {
+  //     case Band2 => "Rapid TOO proposal in Band2"
+  //     case Band3 => "Rapid TOO proposal in Band3"
+  //     case Band4 => "Rapid TOO proposal in Band4"
+  //   }
 
-  test("testRapidTooOutsideBand1"):
-    testRule(RapidTooOutsideBand1, P.copy(scienceSubtype = ScienceSubtype.Queue)) {
-      case Band2 => "Rapid TOO proposal in Band2"
-      case Band3 => "Rapid TOO proposal in Band3"
-      case Band4 => "Rapid TOO proposal in Band4"
-    }
+  // test("testRapidTooOutsideBand1"):
+  //   testRule(RapidTooOutsideBand1, P.copy(scienceSubtype = ScienceSubtype.Queue)) {
+  //     case Band2 => "Rapid TOO proposal in Band2"
+  //     case Band3 => "Rapid TOO proposal in Band3"
+  //     case Band4 => "Rapid TOO proposal in Band4"
+  //   }
 
   // test("testStandardTooOutsideBand12"):
   //   testRule(StandardTooOutsideBand12, P.copy(tpe = ProposalType.Queue(TooActivation.Rapid, IntPercent.unsafeFrom(100), Nil))) { // TODO

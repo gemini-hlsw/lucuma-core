@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2025 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2026 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package client.graphql
@@ -113,7 +113,7 @@ object FetchDecoder:
           ObservationWorkflowState.Inactive | 
           ObservationWorkflowState.Undefined |
           ObservationWorkflowState.Unapproved |
-          ObservationWorkflowState.ForReview |
+          ObservationWorkflowState.Suspended |
           ObservationWorkflowState.Ready |
           ObservationWorkflowState.Ongoing |
           ObservationWorkflowState.Completed

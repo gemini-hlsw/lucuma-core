@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2025 Association of Universities for Research in Astronomy, Inc. (AURA)
+// Copyright (c) 2016-2026 Association of Universities for Research in Astronomy, Inc. (AURA)
 // For license information see LICENSE or https://opensource.org/licenses/BSD-3-Clause
 
 package itac.operation
@@ -200,13 +200,13 @@ object StaffEmailSpreadsheet {
                 case VisitorObservingModeType.MaroonX            => MaroonX.shortName
                 case VisitorObservingModeType.ZorroSpeckle       
                    | VisitorObservingModeType.ZorroWideField     => Zorro.shortName
+                case _ => "(TODO)"
 
           addCell(Instrument, insts.mkString(", "))
 
           addCell(ToO, 
             p.too match
               case TooActivation.None         => ""
-              case TooActivation.Standard     => "S"
               case TooActivation.Rapid        => "R"
               case TooActivation.Interrupting => "I"
           )
