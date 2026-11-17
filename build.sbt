@@ -54,7 +54,7 @@ lazy val spireVersion               = "0.18.0"
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
-val root = tlCrossRootProject.aggregate(core, testkit, tests, testsWasm, catalog, ags, catalogTestkit, catalogTests, horizons, horizonsTests, itac, benchmarks, benchmarksJS, npm)
+val root = tlCrossRootProject.aggregate(core, testkit, tests, testsWasm, catalog, ags, catalogTestkit, catalogTests, horizons, horizonsTests, itac, itacChannel, benchmarks, benchmarksJS, npm)
 
 lazy val core = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Full)
@@ -274,6 +274,43 @@ lazy val itac = project
             |""".stripMargin)
       Seq(outFile)
     }.taskValue
+  )
+
+/** This creates and publishes the app descriptor for itac so it can be fetched by Coursier. */
+lazy val itacChannel = project
+  .in(file("modules/itac-channel"))
+  .settings(
+    name := "lucuma-itac-channel",
+
+    // Create the app manifest such that it includes the version string.
+    Compile / resourceGenerators += Def.task {
+      val outDir = resourceManaged.value
+      val outFile = new File(outDir, "itac2.json")
+      outDir.mkdirs
+      val v = version.value
+      IO.write(outFile,
+        s"""|{
+            |  "repositories": [
+            |    "central",
+            |    "sonatype:public",
+            |    "ivy2Local"
+            |  ],
+            |  "dependencies": [
+            |    "edu.gemini:lucuma-itac_3:${version.value}"
+            |  ],
+            |  "javaOptions": [
+            |    "-Djava.awt.headless=true"
+            |  ],
+            |  "mainClass": "itac.Main"
+            |}
+            |""".stripMargin)
+      Seq(outFile)
+    }.taskValue,
+
+    // Don't add _2.12 to the artifact name, and also don't add a dependency to the Scala lib.
+    crossPaths := false,
+    autoScalaLibrary := false
+
   )
 
 lazy val ags = crossProject(JVMPlatform, JSPlatform)
