@@ -52,6 +52,9 @@ class ProposalShard(
   def nonEmpty: Boolean =
     !isEmpty
 
+  override def toString =
+    s"ProposalShard($parentProposal, $site, $allocation)"
+
 object ProposalShard:
   case class Reference(
     parentReference: ProposalReference, 

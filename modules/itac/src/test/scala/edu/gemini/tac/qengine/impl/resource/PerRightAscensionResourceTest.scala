@@ -25,10 +25,10 @@ class PerRightAscensionResourceTest extends ItacSuite {
   // test.  We will make time blocks with the explicit amount of time we need
   // for testing.
 
-  private val alloc = Allocation(KR, ScienceBand.Band1, TimeSpan.Max)
+  private val alloc = Allocation(KR, ScienceBand.Band1, TimeSpan.fromHoursBounded(10))
 
   private def mkProp(target: ItacTarget, conds: ConstraintSet): ProposalShard =
-    Fixture.mkProp(alloc,  (target, conds, TimeSpan.Zero))
+    Fixture.mkProp(alloc,  (target, conds, TimeSpan.fromHoursBounded(1)))
 
   private def verifyReserve(raRes: PerRightAscensionResource) = {
     val target = ItacTarget(15.0, 0.0) // RA 1hr, Dec 0 deg
@@ -55,6 +55,7 @@ class PerRightAscensionResourceTest extends ItacSuite {
   test("testReserve") {
     val target = ItacTarget(15.0, 0.0) // RA 1hr, Dec 0 deg
     val prop   = mkProp(target, goodCC)
+    println(prop)
     val block  = Block(prop, prop.observations.head, TimeSpan.fromMinutesBounded(15))
 
     Fixture.raResGroup.grp(target).reserve(block, emptyQueue) match {
