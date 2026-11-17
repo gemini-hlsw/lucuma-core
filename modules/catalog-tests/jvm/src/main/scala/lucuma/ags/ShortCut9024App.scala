@@ -104,7 +104,7 @@ object ShortCut9024App extends IOApp.Simple {
           )
           .map(_.collect { case Right(t) =>
             t
-          }.map(GuideStarCandidate.siderealTarget.get(_).at(now)))
+          }.map(GuideStarCandidate.fromCatalog(_).at(now)))
           .map { candidates =>
             println(s"obs instant      : $now")
             println(s"base             : $base")
@@ -133,7 +133,7 @@ object ShortCut9024App extends IOApp.Simple {
               overlapsProtected(base.diff(candidate.tracking.baseCoordinates).offset, noZones)
 
             // Verdict for the known offending star.
-            val offending = analyses.filter(_.target.id === OffendingId)
+            val offending = analyses.filter(_.target.id.gaiaSourceId === OffendingId.some)
             println(
               s"offending star $OffendingId verdict(s): ${offending.map(Ags.resultLabel).mkString(", ")}"
             )
@@ -148,7 +148,9 @@ object ShortCut9024App extends IOApp.Simple {
                 println(
                   s"selected         : id=${best.target.id} vignetting=${best.vignetting.toMicroarcsecondsSquared} µas² overlapsProtected=${overlapsFor(best.target)} posAngle=${best.posAngle.toDoubleDegrees}"
                 )
-                println(s"selected == offending? ${best.target.id === OffendingId}")
+                println(
+                  s"selected == offending? ${best.target.id.gaiaSourceId === OffendingId.some}"
+                )
 
             println("--- top usable (id, vignetting µas², overlapsProtected, posAngle°) ---")
             ranked

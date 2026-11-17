@@ -27,19 +27,21 @@ import lucuma.core.model.ConstraintSet
 import lucuma.core.model.ElevationRange
 import lucuma.core.model.ImageQuality
 import lucuma.core.model.SiderealTracking
+import lucuma.core.model.Target
 import lucuma.core.model.sequence.flamingos2.Flamingos2FpuMask
+import lucuma.core.util.Enumerated
 
 import scala.collection.immutable.SortedMap
 
 class AgsSuite extends munit.FunSuite {
   val gs1 = GuideStarCandidate(
-    0L,
+    GuideStarId.GaiaDr3(0L),
     SiderealTracking.const(Coordinates.Zero),
     SortedMap[Band, BrightnessValue](Band.Gaia -> BrightnessValue.unsafeFrom(16.05))
   )
 
   val gs2 = GuideStarCandidate(
-    1L,
+    GuideStarId.GaiaDr3(1L),
     SiderealTracking.const(Coordinates.Zero),
     SortedMap[Band, BrightnessValue](Band.Gaia -> BrightnessValue.unsafeFrom(11.23))
   )
@@ -147,7 +149,7 @@ class AgsSuite extends munit.FunSuite {
 
     val guideStarOffset =
       GuideStarCandidate(
-        0L,
+        GuideStarId.GaiaDr3(0L),
         SiderealTracking.const(
           Coordinates.Zero
             .offsetBy(Angle.Angle0, Offset.signedDecimalArcseconds.reverseGet(0.0, 23.0))
@@ -214,7 +216,7 @@ class AgsSuite extends munit.FunSuite {
 
     val guideStarOffset =
       GuideStarCandidate(
-        0L,
+        GuideStarId.GaiaDr3(0L),
         SiderealTracking.const(
           Coordinates.Zero
             .offsetBy(Angle.Angle0, Offset.signedDecimalArcseconds.reverseGet(0.0, 23.0))
@@ -284,7 +286,7 @@ class AgsSuite extends munit.FunSuite {
 
     val guideStarOffset =
       GuideStarCandidate(
-        0L,
+        GuideStarId.GaiaDr3(0L),
         SiderealTracking.const(
           Coordinates.Zero
             .offsetBy(Angle.Angle0, Offset.signedDecimalArcseconds.reverseGet(0.0, 23.0))
@@ -328,7 +330,7 @@ class AgsSuite extends munit.FunSuite {
     val wavelength = Wavelength.fromIntNanometers(300).get
 
     val pwfsGS = GuideStarCandidate(
-      0L,
+      GuideStarId.GaiaDr3(0L),
       SiderealTracking.const(Coordinates.Zero),
       SortedMap[Band, BrightnessValue](Band.Gaia -> BrightnessValue.unsafeFrom(12.0))
     )
@@ -356,7 +358,7 @@ class AgsSuite extends munit.FunSuite {
 
     val guideStarOffset =
       GuideStarCandidate(
-        0L,
+        GuideStarId.GaiaDr3(0L),
         SiderealTracking.const(
           Coordinates.Zero
             .offsetBy(Angle.Angle0, Offset.signedDecimalArcseconds.reverseGet(0.0, 23.0))
@@ -397,7 +399,7 @@ class AgsSuite extends munit.FunSuite {
     val wavelength = Wavelength.fromIntNanometers(300).get
 
     val pwfsGS = GuideStarCandidate(
-      0L,
+      GuideStarId.GaiaDr3(0L),
       SiderealTracking.const(Coordinates.Zero),
       SortedMap[Band, BrightnessValue](Band.Gaia -> BrightnessValue.unsafeFrom(12.0))
     )
@@ -432,7 +434,7 @@ class AgsSuite extends munit.FunSuite {
 
     val guideStarOffset =
       GuideStarCandidate(
-        0L,
+        GuideStarId.GaiaDr3(0L),
         SiderealTracking.const(
           Coordinates.Zero
             .offsetBy(Angle.Angle0, Offset.signedDecimalArcseconds.reverseGet(0.0, 23.0))
@@ -495,7 +497,7 @@ class AgsSuite extends munit.FunSuite {
 
     val guideStarOffset =
       GuideStarCandidate(
-        0L,
+        GuideStarId.GaiaDr3(0L),
         SiderealTracking.const(
           Coordinates.Zero
             .offsetBy(Angle.Angle0, Offset.signedDecimalArcseconds.reverseGet(0.0, 23.0))
@@ -536,7 +538,7 @@ class AgsSuite extends munit.FunSuite {
 
     // candiate whithin OIWFS patrol field but too faint for PWFS1
     val faintStar = GuideStarCandidate(
-      0L,
+      GuideStarId.GaiaDr3(0L),
       SiderealTracking.const(
         Coordinates.Zero
           .offsetBy(Angle.Angle0, Offset.signedDecimalArcseconds.reverseGet(0.0, 23.0))
@@ -583,7 +585,7 @@ class AgsSuite extends munit.FunSuite {
 
     def candidate(id: Long, q: Double, r: Option[Double]): GuideStarCandidate =
       GuideStarCandidate(
-        id,
+        GuideStarId.GaiaDr3(id),
         SiderealTracking.const(
           Coordinates.Zero
             .offsetBy(Angle.Angle0, Offset.signedDecimalArcseconds.reverseGet(0.0, q))
@@ -651,5 +653,58 @@ class AgsSuite extends munit.FunSuite {
     // Going back to a PWFS drops Altair
     assertEquals(ngs.withPWFS2.altair, None)
     assertEquals(ngs.withPWFS2.probe, GuideProbe.PWFS2)
+  }
+
+  test("an on-axis science target guides behind Altair NGS and ranks before an equal Gaia star") {
+    val constraints: ConstraintSet = ConstraintSet(
+      ImageQuality.Preset.PointThree,
+      CloudExtinction.Preset.PointOne,
+      SkyBackground.Dark,
+      WaterVapor.Wet,
+      ElevationRange.ByAirMass.Default
+    )
+    val wavelength: Wavelength     = Wavelength.fromIntNanometers(1650).get
+
+    val brightnesses: SortedMap[Band, BrightnessValue] =
+      SortedMap(Band.R -> BrightnessValue.unsafeFrom(11.0))
+    val onAxis: SiderealTracking                       = SiderealTracking.const(Coordinates.Zero)
+
+    val observationTargetId: GuideStarId      =
+      GuideStarId.ObservationTarget(Target.Id.fromLong(1L))
+    val observationTarget: GuideStarCandidate =
+      GuideStarCandidate(observationTargetId, onAxis, brightnesses)
+    val gaiaStar: GuideStarCandidate          =
+      GuideStarCandidate(GuideStarId.GaiaDr3(0L), onAxis, brightnesses)
+
+    val ngs: AgsParams = AgsParams
+      .GnirsLongSlit(GnirsFpuSlit.LongSlit_0_30, GnirsCamera.ShortBlue, GnirsPrism.Mirror)
+      .withAltair(AltairMode.Ngs)
+
+    def runAgs(candidates: List[GuideStarCandidate]): List[AgsAnalysis] =
+      Ags
+        .agsAnalysis(
+          constraints,
+          wavelength,
+          Coordinates.Zero,
+          Nil,
+          None,
+          NonEmptyList.of(Angle.Angle0),
+          Some(AcquisitionOffsets(NonEmptySet.of(Offset.Zero.guided))),
+          Some(ScienceOffsets(NonEmptySet.of(Offset.Zero.guided))),
+          ngs,
+          candidates
+        )
+        .analyses
+
+    assert(runAgs(List(observationTarget)).headOption.exists(_.isUsable))
+
+    val ranked: List[GuideStarId] =
+      runAgs(List(gaiaStar, observationTarget)).sortUsablePositions.map(_.target.id)
+    assertEquals(ranked.headOption, Some(observationTargetId))
+  }
+
+  test("only the Altair AOWFS guides on axis") {
+    Enumerated[GuideProbe].all.foreach: probe =>
+      assertEquals(probe.guidesOnAxis, probe === GuideProbe.AltairAOWFS, probe.toString)
   }
 }

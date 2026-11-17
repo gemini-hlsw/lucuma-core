@@ -18,3 +18,7 @@ class GuideStarNameSuite extends munit.DisciplineSuite:
   checkAll("GuideStarNameCodec", CodecTests[GuideStarName].codec)
   checkAll("GuideStarName.from", PrismTests(GuideStarName.From))
   checkAll("GuideStarName.gaiaSourceId", PrismTests(GuideStarName.gaiaSourceId))
+
+  test("the science target has no name"):
+    List("Science Target", "Science Target t-1f").foreach: s =>
+      assert(GuideStarName.from(s).isLeft, s)

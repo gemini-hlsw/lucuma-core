@@ -10,7 +10,7 @@ import monocle.Prism
 
 import scala.util.matching.Regex
 
-// For now, at least, we only support Gaia.
+// Names Gaia DR3 sources only; an observation target used as guide star has no name (see GuideStarId).
 // The same regex used in the odb for a database check. When changing one, both should be updated.
 private val regexStr = """^Gaia DR3 (-?\d+)$"""
 type GuideStarNamePred = MatchesRegex[regexStr.type]

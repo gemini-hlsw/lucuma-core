@@ -61,13 +61,13 @@ object AltairAgsSelectionApp extends IOApp.Simple with AgsSelectionSample {
             )
           .map:
             _.collect { case Right(t) => t }
-              .map(GuideStarCandidate.siderealTarget.get)
+              .map(GuideStarCandidate.fromCatalog)
           .map { candidates =>
             println(s"Altair candidates: ${candidates.length}")
             candidates
               .foreach(candidate =>
                 println(
-                  s"  ${candidate.name} ${candidate.brightnesses} R: ${candidate.rBrightness}"
+                  s"  ${candidate.id} ${candidate.brightnesses} R: ${candidate.rBrightness}"
                 )
               )
             List(AltairMode.Ngs, AltairMode.Lgs).map { mode =>

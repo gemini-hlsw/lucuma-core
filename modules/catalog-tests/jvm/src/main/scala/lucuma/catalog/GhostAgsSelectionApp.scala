@@ -36,7 +36,7 @@ object GhostAgsSelectionApp extends IOApp.Simple with AgsSelectionSample {
             )
           .map:
             _.collect { case Right(t) => t }
-              .map(GuideStarCandidate.siderealTarget.get)
+              .map(GuideStarCandidate.fromCatalog)
           .map { candidates =>
             println(s"GHOST candidates: ${candidates.length}")
             val r = Ags
