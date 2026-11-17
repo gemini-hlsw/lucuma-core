@@ -20,20 +20,20 @@ trait ArbScorpioDynamicConfig:
   given Arbitrary[ScorpioDynamicConfig] =
     Arbitrary:
       for
-        g  <- arbitrary[Option[ScorpioChannelConfig]]
-        r  <- arbitrary[Option[ScorpioChannelConfig]]
-        i  <- arbitrary[Option[ScorpioChannelConfig]]
-        z  <- arbitrary[Option[ScorpioChannelConfig]]
-        y  <- arbitrary[Option[ScorpioChannelConfig]]
-        j  <- arbitrary[Option[ScorpioChannelConfig]]
-        h  <- arbitrary[Option[ScorpioChannelConfig]]
-        ks <- arbitrary[Option[ScorpioChannelConfig]]
+        g  <- arbitrary[Option[ScorpioChannelConfig.Vis]]
+        r  <- arbitrary[Option[ScorpioChannelConfig.Vis]]
+        i  <- arbitrary[Option[ScorpioChannelConfig.Vis]]
+        z  <- arbitrary[Option[ScorpioChannelConfig.Vis]]
+        y  <- arbitrary[Option[ScorpioChannelConfig.Ir]]
+        j  <- arbitrary[Option[ScorpioChannelConfig.Ir]]
+        h  <- arbitrary[Option[ScorpioChannelConfig.Ir]]
+        ks <- arbitrary[Option[ScorpioChannelConfig.Ir]]
         f  <- arbitrary[ScorpioFpuMask]
         d  <- arbitrary[ScorpioDisperser]
       yield ScorpioDynamicConfig(g, r, i, z, y, j, h, ks, f, d)
 
   given Cogen[ScorpioDynamicConfig] =
-    Cogen[(List[Option[ScorpioChannelConfig]], ScorpioFpuMask, ScorpioDisperser)].contramap: a =>
-      (List(a.g, a.r, a.i, a.z, a.y, a.j, a.h, a.ks), a.fpu, a.disperser)
+    Cogen[(List[Option[ScorpioChannelConfig.Vis]], List[Option[ScorpioChannelConfig.Ir]], ScorpioFpuMask, ScorpioDisperser)].contramap: a =>
+      (List(a.g, a.r, a.i, a.z), List(a.y, a.j, a.h, a.ks), a.fpu, a.disperser)
 
 object ArbScorpioDynamicConfig extends ArbScorpioDynamicConfig

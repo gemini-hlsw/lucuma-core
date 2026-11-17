@@ -252,9 +252,11 @@ class ExposureRulesSuite extends FunSuite:
     )
 
   private def scorpio(g: Option[BigDecimal], ks: Option[BigDecimal]): ScorpioDynamicConfig =
-    def detector(s: BigDecimal): ScorpioChannelConfig =
-      sample[ScorpioChannelConfig].copy(exposureTime = secs(s))
-    sample[ScorpioDynamicConfig].copy(g = g.map(detector), r = none, i = none, z = none, y = none, j = none, h = none, ks = ks.map(detector))
+    def vis(s: BigDecimal): ScorpioChannelConfig.Vis =
+      sample[ScorpioChannelConfig.Vis].copy(exposureTime = secs(s))
+    def ir(s: BigDecimal): ScorpioChannelConfig.Ir =
+      sample[ScorpioChannelConfig.Ir].copy(exposureTime = secs(s))
+    sample[ScorpioDynamicConfig].copy(g = g.map(vis), r = none, i = none, z = none, y = none, j = none, h = none, ks = ks.map(ir))
 
   test("SCORPIO checks the VIS shutter minimum on active VIS detectors only"):
     val tooShort = BigDecimal("0.05")
