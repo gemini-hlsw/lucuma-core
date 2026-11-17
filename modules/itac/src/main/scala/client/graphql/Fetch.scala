@@ -40,27 +40,40 @@ object Fetch:
 
       def fetch: F[List[Proposal]] =
         for
-          _  <- Logger[F].info("Fetching proposals...")
-          ps <- fetchProposals(callId)
-          _  <- Logger[F].info("Fetching observations...")
-          es <- fetchObservations(callId)
-          _  <- Logger[F].info(s"Fetched ${es.length} observations in ${ps.length} proposals.")
-          _  <- es.collect { case (id, Left(a)) => (id, a) } .traverse(x => Logger[F].info(x.toString()))
-          os  = es.collect { case (id, Right(a)) => (id, a) }
-        yield stitch(ps, os)
+          _  <- fetchCall(callId)
+          _  <- Logger[F].info("Fetching SUBMITTED proposals...")
+          eps <- fetchProposals(callId)
+          _   <- eps.collect { case Left(s) => s } .traverse(Logger[F].warn(_))
+          ps   = eps.collect { case Right(a) => a }
+          _   <- Logger[F].info("Fetching DEFINED observations...")
+          eos <- fetchObservations(callId)
+          _   <- eos.collect { case (id, Left(a)) => (id, a) } .traverse(x => Logger[F].warn(x._2))
+          os  = eos.collect { case (id, Right(a)) => (id, a) }
+          _   <- Logger[F].info(s"Fetched ${os.length} observations in ${ps.length} proposals.")
+          ret  = stitch(ps, os)
+          _   <- ret.filter(_.originalObsList.isEmpty).traverse(p => Logger[F].warn(s"${p.reference.label}: no DEFINED observations"))
+        yield ret.filter(_.originalObsList.nonEmpty)
 
       def stitch(ps: List[(Proposal, GroupTree[Observation.Id])], os: List[(Observation.Id, ItacObservation)]): List[Proposal] =
         val omap = os.toMap
         ps.map: (p, gt) =>
-          p.copy(groupTree =
-            gt.map(omap.get).flatMap:
-              case Some(o) => Free.pure(o)
-              case None    => GroupTree.empty[ItacObservation]
+          p.copy(
+            groupTree =
+              gt.map(omap.get).flatMap:
+                case Some(o) => Free.pure(o)
+                case None    => GroupTree.empty[ItacObservation]
           )
 
-      def fetchProposals(cid: CallForProposals.Id): F[List[(Proposal, GroupTree[Observation.Id])]] =
+      def fetchCall(cid: CallForProposals.Id): F[Unit] =
+        fetchJson(FetchCall(cid)).flatMap: json =>
+          val hc = json.hcursor.downFields("callForProposals")
+          hc.downField("title").as[String] match
+            case Left(_) => Logger[F].error(s"No such call for proposals: $cid")
+            case Right(t) => Logger[F].info(s"Found CFP: \"$t\"")          
+
+      def fetchProposals(cid: CallForProposals.Id): F[List[Either[String, (Proposal, GroupTree[Observation.Id])]]] =
         fetchJson(FetchPrograms(cid)).map: json =>
-          json.hcursor.downFields("programs", "matches").as[List[(Proposal, GroupTree[Observation.Id])]] match
+          json.hcursor.downFields("programs", "matches").as[List[Either[String, (Proposal, GroupTree[Observation.Id])]]] match
             case Right(ps) => ps
             case Left(e) => throw new RuntimeException(e.toString)
 

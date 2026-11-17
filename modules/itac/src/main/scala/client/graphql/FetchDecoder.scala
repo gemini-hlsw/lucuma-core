@@ -31,6 +31,15 @@ import lucuma.core.enums.ScienceBand
 import cats.data.NonEmptyList
 import lucuma.core.model.Observation
 import lucuma.core.enums.ObservationWorkflowState
+import edu.gemini.tac.qengine.p1.ItacTarget
+import lucuma.core.math.Declination
+import lucuma.core.math.Angle
+import io.circe.DecodingFailure
+import lucuma.core.math.RightAscension
+import lucuma.core.math.HourAngle
+import lucuma.core.math.Coordinates
+import lucuma.core.model.Target
+import eu.timepit.refined.types.numeric.PosLong
 
 object FetchDecoder:
 
@@ -54,6 +63,29 @@ object FetchDecoder:
       elevationRange  = ElevationRange.ByAirMass.Default,
     )
 
+  given Decoder[Declination] = hc =>
+    hc.downFields("microarcseconds").as[Long].flatMap: n =>
+      val a = Angle.fromMicroarcseconds(n)
+      Declination.fromAngle.getOption(a) match
+        case Some(dec) => Right(dec)
+        case None      => Left(DecodingFailure(s"Invalid declination: ${Angle.fromStringDMS.reverseGet(a)}", Nil))
+
+  given Decoder[RightAscension] = hc =>
+    hc.downFields("microseconds").as[Long].map: n =>
+      RightAscension(HourAngle.fromMicroseconds(n))
+
+  given Decoder[Coordinates] = hc =>
+    for
+      ra  <- hc.downField("ra").as[RightAscension]
+      dec <- hc.downField("dec").as[Declination]
+    yield Coordinates(ra, dec)
+
+  given Decoder[ItacTarget] = hc =>
+    for
+      oc <- hc.downField("coordinates").as[Option[Coordinates]]
+      // id <- hc.downField("id").as[Target.Id]
+    yield ItacTarget(oc.getOrElse(Coordinates.Zero), Target.Id(PosLong.MinValue)) // TODO
+
   given Decoder[(Observation.Id, Either[String, ItacObservation])] = hc =>
     for
       id            <- hc.downFields("id").as[Observation.Id]
@@ -63,19 +95,20 @@ object FetchDecoder:
                         .as[BigDecimal]
                         .map(ms => Some(TimeSpan.fromMicrosecondsBounded(ms)))
                         .orElse(Right(None))       
-      state         <- hc.downFields("workflow", "value", "state").as[ObservationWorkflowState]               
+      state         <- hc.downFields("workflow", "value", "state").as[ObservationWorkflowState]
+      target        <- hc.downFields("configuration", "target").as[ItacTarget]
     yield (
       id,
       state match
         case ObservationWorkflowState.Defined =>
           time.toRight(s"${id}: No execution time.").map: t =>
             ItacObservation(
-            itacTarget    = null,
-            constraintSet = constraintSet,
-            time          = t,
-            lgs           = false, // TODO
-            mode          = mode,
-          )
+              itacTarget    = target,
+              constraintSet = constraintSet,
+              time          = t,
+              lgs           = false, // TODO
+              mode          = mode,
+            )
         case s @ (
           ObservationWorkflowState.Inactive | 
           ObservationWorkflowState.Undefined |
@@ -119,7 +152,7 @@ object FetchDecoder:
     hc.as[List[GroupTree.Item[Observation.Id]]]
       .map(GroupTree.unfold)      
 
-  given Decoder[(Proposal, GroupTree[Observation.Id])] = hc =>
+  given Decoder[Either[String, (Proposal, GroupTree[Observation.Id])]] = hc =>
     for 
       name              <- hc.downField("name").as[String]
       proposalStatus    <- hc.downField("proposalStatus").as[ProposalStatus]
@@ -130,19 +163,21 @@ object FetchDecoder:
       cfpActive         <- hc.downFields("proposal", "call", "active").as[DateInterval]
       groupTree         <- hc.downField("allGroupElements").as[GroupTree[Observation.Id]]
       allocations       <- hc.downField("allocations").as[List[Allocation]]
-    yield (      
-      Proposal(
-        xmlFile        = None,
-        reference      = proposalReference,
-        piName         = piName,
-        title          = name,
-        allocations    = NonEmptyList(Allocation(TimeAccountingCategory.US, ScienceBand.Band1, TimeSpan.fromHoursBounded(1)), allocations),
-        scienceSubtype = scienceSubtype,
-        too            = maxTooActivation,
-        // groupTree      = groupTree,
-        cfpActive      = cfpActive,
-        ranking        = PosDouble.unsafeFrom(0.1) // TODO,
-      ),
-      groupTree
-    )
+    yield NonEmptyList.fromList(allocations)
+      match
+        case None => Left(s"${proposalReference.label}: No allocations")
+        case Some(nel) => Right((      
+          Proposal(
+            xmlFile        = None,
+            reference      = proposalReference,
+            piName         = piName,
+            title          = name,
+            allocations    = nel,
+            scienceSubtype = scienceSubtype,
+            too            = maxTooActivation,
+            cfpActive      = cfpActive,
+            ranking        = PosDouble.unsafeFrom(0.1) // TODO,
+          ),
+          groupTree
+        ))
 

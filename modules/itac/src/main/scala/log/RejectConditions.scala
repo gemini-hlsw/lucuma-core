@@ -15,9 +15,21 @@ import lucuma.core.util.TimeSpan
 object RejectConditions extends TimeBinMessageFormatter {
   val name = "Conditions Limit"
 
-  private val detailTemplate = "%s %s"
+
+  // imageQuality:    ImageQuality.Preset,
+  // cloudExtinction: CloudExtinction.Preset,
+  // skyBackground:   SkyBackground,
+  // waterVapor:      WaterVapor,
+  // elevationRange:  ElevationRange
+  private val detailTemplate = "%s %s %s %s %s"
   override def detail(prop: ProposalShard, obs: ItacObservation, band: ScienceBand, cur: TimeSpan, max: TimeSpan): String =
-    detailTemplate.format(obs.constraintSet, super.detail(prop, obs, band, cur, max))
+    detailTemplate.format(
+      obs.constraintSet.imageQuality,
+      obs.constraintSet.cloudExtinction,
+      obs.constraintSet.skyBackground,
+      obs.constraintSet.waterVapor,
+      super.detail(prop, obs, band, cur, max)
+    )
 }
 
 final case class RejectConditions(prop: ProposalShard, obs: ItacObservation, band: ScienceBand, cur: TimeSpan, max: TimeSpan) extends ObsRejectMessage {

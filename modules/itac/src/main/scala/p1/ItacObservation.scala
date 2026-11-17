@@ -13,6 +13,7 @@ import lucuma.core.enums.ScienceBand
 import lucuma.core.enums.Instrument
 import lucuma.core.util.TimeSpan
 
+
 case class ItacObservation(
   itacTarget: ItacTarget, // TODO: ToO
   constraintSet: ConstraintSet, 

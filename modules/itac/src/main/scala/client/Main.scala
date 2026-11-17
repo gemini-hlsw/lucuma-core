@@ -31,17 +31,12 @@ import itac.operation.NgoSpreadsheet
 import lucuma.core.model.CallForProposals
 import lucuma.core.util.Gid
 
-object BuildInfo:
-  val version = s"***** NEED TO ADD ACTUAL BUILDINFO!!!"
-
 object Main extends CommandIOApp(
   name    = "itac",
   header  =
     s"""|For more information pass `--help` to a subcommand, for instance `itac init --help`.
         |
-        |ITAC Command Line Interface ${BuildInfo.version}
-        |
-        |TODO
+        |ITAC2 for GPP Command Line Interface ${BuildInfo.version}
         |
         |The options below are valid for all sub-commands. For information on specific sub-commands
         |try `itac <sub-command> --help`, for example `itac rollover --help`.
