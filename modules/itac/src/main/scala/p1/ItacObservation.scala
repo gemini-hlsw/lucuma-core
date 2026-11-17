@@ -5,12 +5,12 @@ package edu.gemini.tac.qengine.p1
 
 import cats.syntax.all.*
 import lucuma.core.data.Metadata
+import lucuma.core.enums.Instrument
 import lucuma.core.enums.ObservingModeType
+import lucuma.core.enums.ScienceBand
 import lucuma.core.enums.Site
 import lucuma.core.model.ConstraintSet
 import lucuma.core.util.DateInterval
-import lucuma.core.enums.ScienceBand
-import lucuma.core.enums.Instrument
 import lucuma.core.util.TimeSpan
 
 

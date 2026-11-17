@@ -5,11 +5,11 @@ package edu.gemini.tac.qengine.api.config
 
 import lucuma.core.enums.Half
 import lucuma.core.enums.Site
+import lucuma.core.model.IntCentiPercentUnbounded
 import lucuma.core.model.Semester
 import lucuma.core.model.Semester.YearInt
 import lucuma.core.util.TimeSpan
 import munit.FunSuite
-import lucuma.core.model.IntCentiPercentUnbounded
 
 class SiteSemesterConfigTest extends FunSuite {
   // these aren't really relevant for the test cases, but required to

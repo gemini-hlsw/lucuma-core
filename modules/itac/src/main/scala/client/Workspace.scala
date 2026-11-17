@@ -3,10 +3,16 @@
 
 package itac
 
+import cats.data.NonEmptyList
+import cats.effect.Async
 import cats.effect.Sync
 import cats.effect.kernel.Ref
 import cats.implicits.*
+import client.graphql.Fetch
+import edu.gemini.tac.qengine.p1.GroupTree
 import edu.gemini.tac.qengine.p1.Proposal
+import edu.gemini.tac.qengine.p1.ProposalShard
+import eu.timepit.refined.types.numeric.PosDouble
 import io.circe.CursorOp.DownField
 import io.circe.Decoder
 import io.circe.DecodingFailure
@@ -19,6 +25,9 @@ import itac.config.QueueConfig
 import itac.ocs.OcsLoader
 import lucuma.core.enums.ScienceBand
 import lucuma.core.enums.Site
+import lucuma.core.enums.TimeAccountingCategory
+import lucuma.core.model.Allocation
+import lucuma.core.model.ProposalReference
 import lucuma.core.util.Enumerated
 import org.typelevel.log4cats.Logger
 
@@ -26,15 +35,6 @@ import java.nio.file.Files
 import java.nio.file.NoSuchFileException
 import java.nio.file.Path
 import java.nio.file.Paths
-import edu.gemini.tac.qengine.p1.ProposalShard
-import lucuma.core.enums.TimeAccountingCategory
-import lucuma.core.model.ProposalReference
-import cats.data.NonEmptyList
-import edu.gemini.tac.qengine.p1.GroupTree
-import lucuma.core.model.Allocation
-import eu.timepit.refined.types.numeric.PosDouble
-import client.graphql.Fetch
-import cats.effect.Async
 
 /** Interface for some Workspace operations. */
 trait Workspace[F[_]] {

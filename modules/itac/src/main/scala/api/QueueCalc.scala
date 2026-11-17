@@ -3,14 +3,14 @@
 
 package edu.gemini.tac.qengine.api
 
+import edu.gemini.tac.qengine.api.config.ConditionsCategory
 import edu.gemini.tac.qengine.api.queue.ProposalQueue
+import edu.gemini.tac.qengine.impl.resource.PerRightAscensionResource
 import edu.gemini.tac.qengine.log.ProposalLog
+import edu.gemini.tac.qengine.log.RejectMessage
+import edu.gemini.tac.qengine.p1.ProposalShard
 import lucuma.core.data.PerSite
 import lucuma.core.enums.ScienceBand
-import edu.gemini.tac.qengine.impl.resource.PerRightAscensionResource
-import edu.gemini.tac.qengine.api.config.ConditionsCategory
-import edu.gemini.tac.qengine.p1.ProposalShard
-import edu.gemini.tac.qengine.log.RejectMessage
 
 /**
  * A queue calculation result.  This is a combination of a ProposalQueue and

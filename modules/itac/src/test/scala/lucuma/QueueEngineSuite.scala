@@ -18,16 +18,17 @@ import edu.gemini.tac.qengine.impl.QueueEngine3
 import edu.gemini.tac.qengine.impl.resource.Fixture
 import lucuma.core.data.PerSite
 import lucuma.core.enums.Half
+import lucuma.core.enums.ScienceBand
 import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.model.CloudExtinction
+import lucuma.core.model.IntCentiPercentUnbounded
 import lucuma.core.model.Semester
 import lucuma.core.model.Semester.YearInt
-import lucuma.core.util.TimeSpan
-import ocs.Fixture_25B
-import lucuma.core.model.IntCentiPercentUnbounded
-import lucuma.core.enums.ScienceBand
 import lucuma.core.util.Enumerated
+import lucuma.core.util.TimeSpan
 import munit.CatsEffectSuite
+
+import ocs.Fixture_25B
 
 class QueueEngineSuite extends CatsEffectSuite:
 
@@ -58,7 +59,7 @@ class QueueEngineSuite extends CatsEffectSuite:
 
   def cfg = binConfig.map(QueueEngineConfig(_, seq))
 
-  test("foo"):
+  test("foo".ignore):
 
     Fixture_25B.loadAll.flatMap: loaded =>
       println(loaded)

@@ -3,31 +3,32 @@
 
 package itac.operation
 
-import itac._
-import java.nio.file.Path
 import cats.effect.ExitCode
-import org.apache.poi.ss.usermodel.Workbook
-import cats.implicits._
-import org.apache.poi.hssf.usermodel.HSSFWorkbookFactory
 import cats.effect.Sync
-import org.apache.poi.ss.usermodel.FillPatternType
-import org.apache.poi.ss.usermodel.IndexedColors
-import org.apache.poi.ss.usermodel.CellStyle
-import org.apache.poi.ss.usermodel.Cell
-import org.apache.poi.ss.usermodel.BorderStyle
-import java.nio.file.Paths
-import edu.gemini.tac.qengine.impl.QueueEngine3
-import lucuma.core.data.PerSite
-import org.typelevel.log4cats.Logger
-import lucuma.core.enums.Site
-import lucuma.core.enums.ScienceBand
+import cats.implicits.*
 import edu.gemini.tac.qengine.api.queue.ProposalQueue
-import lucuma.core.util.Enumerated
+import edu.gemini.tac.qengine.impl.QueueEngine3
+import itac.*
+import lucuma.core.data.PerSite
 import lucuma.core.enums.ExchangeObservingModeType
 import lucuma.core.enums.FacilityObservingModeType
-import lucuma.core.enums.VisitorObservingModeType
+import lucuma.core.enums.ScienceBand
+import lucuma.core.enums.Site
 import lucuma.core.enums.TooActivation
+import lucuma.core.enums.VisitorObservingModeType
 import lucuma.core.model.ConstraintSet
+import lucuma.core.util.Enumerated
+import org.apache.poi.hssf.usermodel.HSSFWorkbookFactory
+import org.apache.poi.ss.usermodel.BorderStyle
+import org.apache.poi.ss.usermodel.Cell
+import org.apache.poi.ss.usermodel.CellStyle
+import org.apache.poi.ss.usermodel.FillPatternType
+import org.apache.poi.ss.usermodel.IndexedColors
+import org.apache.poi.ss.usermodel.Workbook
+import org.typelevel.log4cats.Logger
+
+import java.nio.file.Path
+import java.nio.file.Paths
 
 object StaffEmailSpreadsheet {
 

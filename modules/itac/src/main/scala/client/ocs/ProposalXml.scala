@@ -35,9 +35,9 @@ import lucuma.core.model.Semester
 import lucuma.core.util.DateInterval
 import lucuma.core.util.TimeSpan
 
+import java.io.File
 import scala.xml.Elem
 import scala.xml.Node
-import java.io.File
 
 trait ProposalXml2[F[_]]:
   def proposal: F[Proposal]

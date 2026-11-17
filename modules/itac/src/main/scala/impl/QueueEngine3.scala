@@ -3,8 +3,10 @@
 
 package edu.gemini.tac.qengine.impl
 
+import cats.data.NonEmptyList
 import cats.data.State
 import cats.syntax.all.*
+import edu.gemini.tac.qengine.api.BucketsAllocation
 import edu.gemini.tac.qengine.api.QueueCalc
 import edu.gemini.tac.qengine.api.config.QueueEngineConfig
 import edu.gemini.tac.qengine.api.config.TimeRestriction
@@ -15,6 +17,8 @@ import edu.gemini.tac.qengine.impl.queue.ProposalQueueBuilder
 import edu.gemini.tac.qengine.impl.resource.RightAscensionMapResource
 import edu.gemini.tac.qengine.impl.resource.SemesterResource
 import edu.gemini.tac.qengine.log.ProposalLog
+import edu.gemini.tac.qengine.log.ProposalLog.Entry
+import edu.gemini.tac.qengine.log.RejectMessage
 import edu.gemini.tac.qengine.p1.*
 import edu.gemini.tac.qengine.util.BoundedTime
 import lucuma.core.data.PerSite
@@ -22,12 +26,8 @@ import lucuma.core.enums.ScienceBand
 import lucuma.core.enums.ScienceSubtype
 import lucuma.core.enums.Site
 import lucuma.core.enums.TimeAccountingCategory
-import lucuma.core.util.Enumerated
-import edu.gemini.tac.qengine.api.BucketsAllocation
-import cats.data.NonEmptyList
 import lucuma.core.model.ProposalReference
-import edu.gemini.tac.qengine.log.RejectMessage
-import edu.gemini.tac.qengine.log.ProposalLog.Entry
+import lucuma.core.util.Enumerated
 
 object QueueEngine3:
 

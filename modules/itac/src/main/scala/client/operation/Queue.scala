@@ -7,28 +7,28 @@ package operation
 import cats.*
 import cats.effect.*
 import cats.implicits.*
+import edu.gemini.tac.qengine.api.QueueCalc
 import edu.gemini.tac.qengine.impl.QueueEngine3
+import edu.gemini.tac.qengine.impl.RejectPartial
+import edu.gemini.tac.qengine.log.AcceptMessage
+import edu.gemini.tac.qengine.log.RejectCategoryOverAllocation
+import edu.gemini.tac.qengine.log.RejectConditions
+import edu.gemini.tac.qengine.log.RejectOverAllocation
+import edu.gemini.tac.qengine.log.RejectTarget
+import edu.gemini.tac.qengine.log.RejectTimeAccountingCategoryOverAllocation
+import edu.gemini.tac.qengine.log.RemovedRejectMessage
+import edu.gemini.tac.qengine.p1.Proposal
 import itac.config.Common
 import itac.util.Colors
 import lucuma.core.data.PerSite
+import lucuma.core.enums.ScienceBand
 import lucuma.core.enums.Site
+import lucuma.core.enums.TimeAccountingCategory
+import lucuma.core.model.Semester
 import lucuma.core.util.Enumerated
 import org.typelevel.log4cats.Logger
 
 import java.nio.file.Path
-import lucuma.core.enums.ScienceBand
-import edu.gemini.tac.qengine.api.QueueCalc
-import lucuma.core.model.Semester
-import edu.gemini.tac.qengine.p1.Proposal
-import lucuma.core.enums.TimeAccountingCategory
-import edu.gemini.tac.qengine.log.RejectTimeAccountingCategoryOverAllocation
-import edu.gemini.tac.qengine.log.RejectCategoryOverAllocation
-import edu.gemini.tac.qengine.log.RejectTarget
-import edu.gemini.tac.qengine.log.RejectConditions
-import edu.gemini.tac.qengine.log.RejectOverAllocation
-import edu.gemini.tac.qengine.log.RemovedRejectMessage
-import edu.gemini.tac.qengine.impl.RejectPartial
-import edu.gemini.tac.qengine.log.AcceptMessage
 
 object Queue {
 

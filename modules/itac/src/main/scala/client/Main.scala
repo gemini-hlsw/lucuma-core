@@ -5,16 +5,22 @@ package itac
 
 import cats.data.NonEmptyList
 import cats.data.Validated
+import cats.data.ValidatedNel
 import cats.effect.*
 import cats.syntax.all.*
+import client.operation.Info
 import com.monovore.decline.Argument
 import com.monovore.decline.Command
 import com.monovore.decline.Opts
 import com.monovore.decline.effect.CommandIOApp
 import edu.gemini.tac.qengine.impl.QueueEngine3 as QueueEngine
 import itac.operation.Init
+import itac.operation.Ls
+import itac.operation.NgoSpreadsheet
 import itac.operation.Queue
+import itac.operation.StaffEmailSpreadsheet
 import lucuma.core.data.PerSite
+import lucuma.core.model.ProposalReference
 import lucuma.core.model.Semester
 import org.typelevel.log4cats.Logger
 import org.typelevel.log4cats.slf4j.Slf4jLogger
@@ -22,12 +28,6 @@ import org.typelevel.log4cats.slf4j.Slf4jLogger
 import java.nio.file.Path
 import java.nio.file.Paths
 import scala.util.control.NonFatal
-import itac.operation.Ls
-import cats.data.ValidatedNel
-import lucuma.core.model.ProposalReference
-import client.operation.Info
-import itac.operation.StaffEmailSpreadsheet
-import itac.operation.NgoSpreadsheet
 
 object Main extends CommandIOApp(
   name    = "itac",

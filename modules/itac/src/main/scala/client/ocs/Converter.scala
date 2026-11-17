@@ -9,8 +9,8 @@ import edu.gemini.tac.qengine.p1.Proposal
 import itac.ocs.Namer.State
 import lucuma.core.enums.ScienceBand
 
-import scala.xml.Elem
 import java.io.File
+import scala.xml.Elem
 
 object Converter:
 

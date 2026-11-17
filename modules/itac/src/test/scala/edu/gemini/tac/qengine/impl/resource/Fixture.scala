@@ -26,6 +26,7 @@ import lucuma.core.model.ConstraintSet
 import lucuma.core.model.ElevationRange
 import lucuma.core.model.ImageQuality
 import lucuma.core.model.IntCentiPercent
+import lucuma.core.model.IntCentiPercentUnbounded
 import lucuma.core.model.ProposalReference
 import lucuma.core.model.Semester
 import lucuma.core.model.Semester.YearInt
@@ -33,7 +34,6 @@ import lucuma.core.util.Enumerated
 import lucuma.core.util.TimeSpan
 
 import scala.annotation.unused
-import lucuma.core.model.IntCentiPercentUnbounded
 
 object Fixture {
   val site = Site.GS

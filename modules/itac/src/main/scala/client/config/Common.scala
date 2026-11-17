@@ -3,6 +3,7 @@
 
 package itac.config
 
+import cats.syntax.all.*
 import edu.gemini.tac.qengine.api.config.ConditionsBin
 import edu.gemini.tac.qengine.api.config.ConditionsCategoryMap
 import edu.gemini.tac.qengine.api.config.Shutdown
@@ -15,11 +16,11 @@ import lucuma.core.enums.Site
 import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.model.IntCentiPercent
 import lucuma.core.model.Semester
-import cats.syntax.all.*
-import java.time.LocalDate
-import java.time.ZonedDateTime
 import org.http4s.Uri
 import org.http4s.headers.Authorization
+
+import java.time.LocalDate
+import java.time.ZonedDateTime
 
 final case class Common(
   semester: Semester,

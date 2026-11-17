@@ -12,10 +12,10 @@ import itac.ocs.Namer.State
 import lucuma.core.enums.ScienceBand
 import org.typelevel.log4cats.Logger
 
+import java.io.File
 import java.nio.file.Path
 import scala.xml.Elem
 import scala.xml.XML
-import java.io.File
 
 trait OcsLoader[F[_]]:
   def loadProposals(log: Logger[F], dirs: Map[ScienceBand, Path]): F[Either[String, List[Proposal]]]

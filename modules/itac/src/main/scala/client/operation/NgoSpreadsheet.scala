@@ -3,30 +3,31 @@
 
 package itac.operation
 
-import itac._
-import java.nio.file.Path
 import cats.effect.ExitCode
-import org.apache.poi.ss.usermodel.Workbook
-import org.apache.poi.hssf.usermodel.HSSFWorkbookFactory
 import cats.effect.Sync
+import cats.implicits.*
+import edu.gemini.tac.qengine.api.QueueCalc
+import edu.gemini.tac.qengine.impl.QueueEngine3
+import edu.gemini.tac.qengine.p1.ProposalShard
+import itac.*
+import lucuma.core.data.PerSite
+import lucuma.core.enums.ScienceBand
+import lucuma.core.enums.Site
+import lucuma.core.enums.TimeAccountingCategory
+import lucuma.core.util.Enumerated
+import lucuma.core.util.TimeSpan
+import org.apache.poi.hssf.usermodel.HSSFWorkbookFactory
+import org.apache.poi.ss.usermodel.BorderStyle
+import org.apache.poi.ss.usermodel.Cell
+import org.apache.poi.ss.usermodel.CellStyle
 import org.apache.poi.ss.usermodel.FillPatternType
 import org.apache.poi.ss.usermodel.IndexedColors
-import org.apache.poi.ss.usermodel.CellStyle
-import org.apache.poi.ss.usermodel.Cell
-import org.apache.poi.ss.usermodel.BorderStyle
-import cats.implicits._
+import org.apache.poi.ss.usermodel.Workbook
+import org.typelevel.log4cats.Logger
+
+import java.nio.file.Path
 import java.nio.file.Paths
 import scala.math.BigDecimal.RoundingMode
-import lucuma.core.enums.ScienceBand
-import lucuma.core.enums.TimeAccountingCategory
-import edu.gemini.tac.qengine.api.QueueCalc
-import lucuma.core.enums.Site
-import edu.gemini.tac.qengine.p1.ProposalShard
-import lucuma.core.util.TimeSpan
-import edu.gemini.tac.qengine.impl.QueueEngine3
-import lucuma.core.data.PerSite
-import org.typelevel.log4cats.Logger
-import lucuma.core.util.Enumerated
 
 object NgoSpreadsheet {
 

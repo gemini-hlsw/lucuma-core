@@ -5,16 +5,16 @@ package edu.gemini.tac.qengine.p1
 
 import cats.data.State
 import cats.syntax.all.*
-import lucuma.core.util.DateInterval
-import lucuma.core.data.PerSite
-import lucuma.core.enums.TimeAccountingCategory
-import lucuma.core.enums.ScienceBand
-import lucuma.core.model.Allocation
-import lucuma.core.util.TimeSpan
-import lucuma.core.enums.Site
-import lucuma.core.util.Enumerated
 import lucuma.core.data.Metadata
+import lucuma.core.data.PerSite
+import lucuma.core.enums.ScienceBand
+import lucuma.core.enums.Site
+import lucuma.core.enums.TimeAccountingCategory
+import lucuma.core.model.Allocation
 import lucuma.core.util
+import lucuma.core.util.DateInterval
+import lucuma.core.util.Enumerated
+import lucuma.core.util.TimeSpan
 
 case class Chopper(cfpActive: DateInterval):
 

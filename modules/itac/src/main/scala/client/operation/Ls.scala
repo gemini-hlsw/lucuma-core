@@ -3,19 +3,19 @@
 
 package itac.operation
 
-import cats._
-import cats.effect.ExitCode
-import cats.implicits._
-import itac.Workspace
-import itac.Operation
-import cats.effect.Sync
+import cats.*
 import cats.data.NonEmptyList
+import cats.effect.ExitCode
+import cats.effect.Sync
+import cats.implicits.*
+import edu.gemini.tac.qengine.p1.ProposalShard
 import itac.ItacException
+import itac.Operation
+import itac.Workspace
 import itac.util.Colors
-import org.typelevel.log4cats.Logger
 import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.util.Enumerated
-import edu.gemini.tac.qengine.p1.ProposalShard
+import org.typelevel.log4cats.Logger
 
 object Ls {
 

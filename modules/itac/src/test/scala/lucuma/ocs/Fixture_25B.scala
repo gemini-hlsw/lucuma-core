@@ -3,13 +3,14 @@
 
 package lucuma.ocs
 
+import cats.effect.IO
 import cats.syntax.all.*
 import edu.gemini.tac.qengine.p1.Proposal
+import itac.ocs.OcsLoader
 import lucuma.core.enums.ScienceBand
 import lucuma.core.util.Enumerated
-import itac.ocs.OcsLoader
 import org.typelevel.log4cats.slf4j.Slf4jLogger
-import cats.effect.IO
+
 import java.nio.file.Path
 
 object Fixture_25B:

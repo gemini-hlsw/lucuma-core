@@ -3,27 +3,27 @@
 
 package client.graphql
 
+import cats.effect.Async
+import cats.effect.kernel.Resource
+import cats.free.Free
+import cats.syntax.all.*
 import clue.*
 import clue.http4s.Http4sHttpBackend
 import clue.http4s.Http4sHttpClient
-import org.http4s.Uri
-import org.typelevel.log4cats.Logger
-import cats.effect.Async
-import cats.effect.kernel.Resource
-import org.http4s.headers.Authorization
-import org.http4s.Headers
-import org.http4s.jdkhttpclient.JdkHttpClient
+import edu.gemini.tac.qengine.p1.GroupTree
+import edu.gemini.tac.qengine.p1.ItacObservation
 import edu.gemini.tac.qengine.p1.Proposal
 import io.circe.Decoder
-import cats.syntax.all.* 
-import lucuma.core.model.CallForProposals
 import io.circe.Json
 import io.circe.JsonObject
-import edu.gemini.tac.qengine.p1.ItacObservation
+import lucuma.core.model.CallForProposals
 import lucuma.core.model.Observation
-import edu.gemini.tac.qengine.p1.GroupTree
-import cats.free.Free
 import lucuma.core.model.Semester
+import org.http4s.Headers
+import org.http4s.Uri
+import org.http4s.headers.Authorization
+import org.http4s.jdkhttpclient.JdkHttpClient
+import org.typelevel.log4cats.Logger
 
 trait Fetch[F[_]]:
   def fetch: F[List[Proposal]]

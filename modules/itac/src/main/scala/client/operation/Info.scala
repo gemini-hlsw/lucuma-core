@@ -3,14 +3,14 @@
 
 package client.operation
 
+import cats.effect.ExitCode
+import cats.effect.Sync
+import cats.syntax.all.*
 import itac.Operation
 import itac.Workspace
-import org.typelevel.log4cats.Logger
-import cats.effect.ExitCode
-import lucuma.core.model.ProposalReference
-import cats.effect.Sync
-import cats.syntax.all.* 
 import lucuma.core.enums.TooActivation
+import lucuma.core.model.ProposalReference
+import org.typelevel.log4cats.Logger
 
 object Info:
 

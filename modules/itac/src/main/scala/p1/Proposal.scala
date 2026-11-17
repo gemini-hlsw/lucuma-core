@@ -7,24 +7,23 @@ import cats.data.NonEmptyList
 import cats.syntax.all.*
 import eu.timepit.refined.types.numeric.PosDouble
 import lucuma.core.data.Metadata
+import lucuma.core.enums.Observatory
 import lucuma.core.enums.ScienceBand
+import lucuma.core.enums.ScienceSubtype
 import lucuma.core.enums.Site
 import lucuma.core.enums.TimeAccountingCategory
 import lucuma.core.enums.TooActivation
 import lucuma.core.model.Allocation
+import lucuma.core.model.ProgramReference
 import lucuma.core.model.ProposalReference
 import lucuma.core.util.DateInterval
+import lucuma.core.util.Enumerated
 import lucuma.core.util.TimeSpan
 
+import java.io.File
 import java.time.LocalDate
 
 import GroupTree.flattenAndScale
-import lucuma.core.util.Enumerated
-import lucuma.core.model.ProgramReference
-import lucuma.core.enums.ScienceSubtype
-
-import lucuma.core.enums.Observatory
-import java.io.File
 
 case class Proposal(
   xmlFile: Option[File],
