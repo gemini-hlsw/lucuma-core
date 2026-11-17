@@ -40,16 +40,27 @@ final case class BoundedTime(limit: TimeSpan, used: TimeSpan = TimeSpan.Zero) {
     100 * (if (limit.toMilliseconds == 0) 1.0 else used.toMilliseconds.toDouble/limit.toMilliseconds.toDouble)
 
   /**
+   * Reserves the given time amount, returning a new BoundedTime instance.
+   * Differs from the reserve method in that reservations beyond the limit
+   * are permitted. Releasing more time than reserved still results in a None.
+   */
+  def overbook(time: TimeSpan): Option[BoundedTime] =
+    doReserve(time, true)
+
+  /**
    * Reserves the given time amount into a new BoundedTime instance together
    * with the current amount of time in this instance.  If there isn't enough
    * remaining space (or if releasing more time than used), None is returned.
    */
   def reserve(time: TimeSpan): Option[BoundedTime] =
+    doReserve(time, false)
+    
+  private def doReserve(time: TimeSpan, overbook: Boolean): Option[BoundedTime] =
     if (time == TimeSpan.Zero)
       Some(this)
     else {
       val tmp = used +| time
-      if (tmp > limit)
+      if (tmp > limit && !overbook)
         None
       else
         if (tmp < TimeSpan.Zero) None else Some(BoundedTime(limit, tmp))

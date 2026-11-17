@@ -236,7 +236,26 @@ lazy val itac = project
       "edu.gemini"    %% "clue-core"            % clueVersion,
       "edu.gemini"    %% "clue-http4s"          % clueVersion,
       "org.http4s"                       %% "http4s-jdk-http-client"                     % http4sJdkHttpClientVersion,
-    )
+    ),
+    Compile / sourceGenerators += Def.task {
+      val outDir = (Compile / sourceManaged).value / "scala" / "itac"
+      val outFile = new File(outDir, "BuildInfo.scala")
+      outDir.mkdirs
+      val v = version.value
+      val t = System.currentTimeMillis
+      IO.write(outFile,
+        s"""|package itac
+            |
+            |/** Auto-generated build information. */
+            |object BuildInfo {
+            |  /** Current version of ITAC ($v). */
+            |  val version = "$v"
+            |  /** Build date (${new java.util.Date(t)}). */
+            |  val date    = new java.util.Date(${t}L)
+            |}
+            |""".stripMargin)
+      Seq(outFile)
+    }.taskValue
   )
 
 lazy val ags = crossProject(JVMPlatform, JSPlatform)

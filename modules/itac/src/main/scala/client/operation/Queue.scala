@@ -54,11 +54,11 @@ object Queue {
 
           println(separator)
 
-          // println(s"${Colors.BOLD}RA/Conditions Bucket Allocations:                                                    Limit    Used   Avail${Colors.RESET}")
-          // println(queueCalc.bucketsAllocation(site).raTablesANSI)
-          // println()
+          println(s"${Colors.BOLD}RA/Conditions Bucket Allocations:                                                    Limit    Used   Avail${Colors.RESET}")
+          println(queueCalc.bucketsAllocation(site).raTablesANSI)
+          println()
 
-          // println(separator)
+          println(separator)
 
           // Enumerated[ScienceBand].all.foreach { qb =>
           List(ScienceBand.Band1).foreach { qb =>

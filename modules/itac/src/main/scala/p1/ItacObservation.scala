@@ -13,6 +13,7 @@ import lucuma.core.model.ConstraintSet
 import lucuma.core.util.DateInterval
 import lucuma.core.util.TimeSpan
 
+
 case class ItacObservation(
   itacTarget: ItacTarget, // TODO: ToO
   constraintSet: ConstraintSet, 

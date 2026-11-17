@@ -229,14 +229,14 @@ object Workspace {
           val ret = NonEmptyList
             .fromList:
               collected.map: as =>
-                println(as)
+                // println(as)
                 as.head.copy(duration = as.foldMap(_.duration))
             .get    
-          println(ret.map(a => f"${a.category} - ${a.duration.toHours}%3.2f h"))
+          // println(ret.map(a => f"${a.category} - ${a.duration.toHours}%3.2f h"))
           ret
 
         private def merge(a: Proposal, b: Proposal): Proposal =
-          println(s"merging ${a.piName}: ${a.xmlFile.get.getName()} + ${b.xmlFile.get.getName()}")
+          // println(s"merging ${a.piName}: ${a.xmlFile.get.getName()} + ${b.xmlFile.get.getName()}")
           val allocs = merge(a.allocations, b.allocations)
           val groups =
             if a.originalObsList == b.originalObsList

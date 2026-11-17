@@ -14,57 +14,57 @@ object FetchObservations:
     new GraphQLOperation.Typed[Nothing, JsonObject, Json]:
       override val document = GraphQLDocument.unsafeFromString:
         s"""
-          query {
-            observations(
-              includeDeleted: false
-              WHERE: {
-                calibrationRole: { IS_NULL: true }
-                workflow: { workflowState: { EQ: DEFINED } }
-                program: { proposal: { call: { id: { EQ: "${cid}" } } } }
-              }
-            ) {
-              matches {
-                id
-                configuration {
-                  conditions {
-                    cloudExtinction
-                    imageQuality
-                    skyBackground
-                    waterVapor
-                  }
-                  observingMode {
-                    mode
-                  }
-                  target {
-                    coordinates {
-                      dec {
-                        dms
-                      }
-                      ra {
-                        hms
-                      }
-                    }
-                  }
-                  altairMode
-                }
-                execution {
-                  digest {
-                    value {
-                      fullTimeEstimate {
-                        program {
-                          microseconds
-                        }
-                      }
-                    }
-                  }
-                }
-                id
-                workflow {
-                  value {
-                    state
-                  }
-                }
+{
+  observations(
+    includeDeleted: false
+    WHERE: {
+      calibrationRole: { IS_NULL: true }
+      workflow: { workflowState: { EQ: DEFINED } }
+      program: { proposal: { call: { id: { EQ: "$cid" } } } }
+    }
+  ) {
+    matches {
+      id
+      configuration {
+        conditions {
+          cloudExtinction
+          imageQuality
+          skyBackground
+          waterVapor
+        }
+        observingMode {
+          mode
+        }
+        target {
+          coordinates {
+            dec {
+              microarcseconds
+            }
+            ra {
+              microseconds
+            }
+          }
+        }
+        altairMode
+      }
+      execution {
+        digest {
+          value {
+            fullTimeEstimate {
+              program {
+                microseconds
               }
             }
           }
+        }
+      }
+      id
+      workflow {
+        value {
+          state
+        }
+      }
+    }
+  }
+}
         """
