@@ -97,6 +97,14 @@ pull_request_rules:
       add:
       - itac
       remove: []
+- name: Label itac-channel PRs
+  conditions:
+  - files~=^modules/itac-channel/
+  actions:
+    label:
+      add:
+      - itac-channel
+      remove: []
 - name: Label npm PRs
   conditions:
   - files~=^modules/npm/
