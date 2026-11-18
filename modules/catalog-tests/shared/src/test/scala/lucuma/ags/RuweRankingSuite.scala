@@ -3,6 +3,7 @@
 
 package lucuma.ags
 
+import eu.timepit.refined.types.numeric.NonNegBigDecimal
 import eu.timepit.refined.types.string.NonEmptyString
 import lucuma.ags.AgsAnalysis.Usable
 import lucuma.catalog.GuideStarCatalogResult
@@ -26,7 +27,7 @@ import scala.collection.immutable.SortedMap
 
 class RuweRankingSuite extends munit.FunSuite:
 
-  private def candidate(id: Long, g: Double, ruwe: Option[BigDecimal]): GuideStarCandidate =
+  private def candidate(id: Long, g: Double, ruwe: Option[NonNegBigDecimal]): GuideStarCandidate =
     GuideStarCandidate(
       GuideStarId.GaiaDr3(id),
       SiderealTracking.const(Coordinates.Zero),
@@ -50,7 +51,9 @@ class RuweRankingSuite extends munit.FunSuite:
 
   private def best(us: Usable*): Usable = us.toList.sorted(using Usable.rankOrdering).head
 
-  private def r(s: String): Option[BigDecimal] = Some(BigDecimal(s))
+  private def r(s: String): Option[NonNegBigDecimal] = Some(
+    NonNegBigDecimal.unsafeFrom(BigDecimal(s))
+  )
 
   test("RUWE tiers, missing is worst"):
     List(
@@ -101,7 +104,7 @@ class RuweRankingSuite extends munit.FunSuite:
     assertEquals(best(vignettedGood, clearPoor), clearPoor)
 
   test("parseRuwe reads the column by name, ignoring case and UCD"):
-    def parse(adapter: CatalogAdapter, entries: (FieldId, String)*): Option[BigDecimal] =
+    def parse(adapter: CatalogAdapter, entries: (FieldId, String)*): Option[NonNegBigDecimal] =
       VoTableParser.parseRuwe(adapter, entries.toMap)
 
     val gaia     = CatalogAdapter.Gaia3LiteGavo
@@ -109,7 +112,7 @@ class RuweRankingSuite extends munit.FunSuite:
     val withUcd  = FieldId.unsafeFrom("ruwe", Ucd.unsafeFromString("stat.fit.goodness"))
     val upper    = FieldId.unsafeFrom("RUWE")
     val other    = FieldId.unsafeFrom("parallax")
-    val expected = Some(BigDecimal(1.25))
+    val expected = Some(NonNegBigDecimal.unsafeFrom(BigDecimal(1.25)))
 
     assertEquals(parse(gaia, plain -> "1.25"), expected)
     assertEquals(parse(gaia, withUcd -> " 1.25 "), expected)
@@ -118,6 +121,7 @@ class RuweRankingSuite extends munit.FunSuite:
     assertEquals(parse(gaia, plain -> "NaN"), None)
     assertEquals(parse(gaia, plain -> "Infinity"), None)
     assertEquals(parse(gaia, plain -> "junk"), None)
+    assertEquals(parse(gaia, plain -> "-1.0"), None)
     assertEquals(parse(gaia, other -> "1.25"), None)
 
   test("fromCatalogResult keeps RUWE"):

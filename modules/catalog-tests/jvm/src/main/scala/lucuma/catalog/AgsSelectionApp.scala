@@ -37,7 +37,6 @@ import lucuma.core.model.ElevationRange
 import lucuma.core.model.ImageQuality
 import lucuma.core.model.PosAngleConstraint
 import lucuma.core.model.SiderealTracking
-import lucuma.core.model.Target
 import lucuma.core.model.sequence.flamingos2.Flamingos2FpuMask
 import org.http4s.jdkhttpclient.JdkHttpClient
 import org.typelevel.log4cats.LoggerFactory

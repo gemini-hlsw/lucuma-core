@@ -9,6 +9,7 @@ import cats.syntax.all.*
 import coulomb.syntax.*
 import eu.timepit.refined.*
 import eu.timepit.refined.collection.NonEmpty
+import eu.timepit.refined.types.numeric.NonNegBigDecimal
 import eu.timepit.refined.types.string.NonEmptyString
 import fs2.*
 import fs2.data.xml.*
@@ -198,10 +199,10 @@ trait VoTableParser {
       )
 
   /**
-   * Gaia RUWE, matched by column name as servers differ on its UCD. A missing, blank, NaN, infinite
-   * or unreadable value is None, so it never drops the star.
+   * Gaia RUWE, matched by column name as servers differ on its UCD. A missing, blank, NaN,
+   * infinite, negative or unreadable value is None, so it never drops the star.
    */
-  def parseRuwe(adapter: CatalogAdapter, entries: Map[FieldId, String]): Option[BigDecimal] =
+  def parseRuwe(adapter: CatalogAdapter, entries: Map[FieldId, String]): Option[NonNegBigDecimal] =
     adapter match
       case gaia: CatalogAdapter.Gaia =>
         entries
@@ -209,7 +210,7 @@ trait VoTableParser {
             case (f, v) if f.id.value.equalsIgnoreCase(gaia.ruweField.id.value) => v.trim
           .flatMap(_.toDoubleOption)
           .filterNot(d => d.isNaN || d.isInfinity)
-          .map(BigDecimal(_))
+          .flatMap(d => NonNegBigDecimal.from(BigDecimal(d)).toOption)
       case _                         => none
 
   def parsePV(adapter: CatalogAdapter, entries: Map[FieldId, String]) =

@@ -9,6 +9,7 @@ import cats.data.NonEmptyList
 import cats.derived.*
 import cats.syntax.all.*
 import eu.timepit.refined.cats.*
+import eu.timepit.refined.types.numeric.NonNegBigDecimal
 import lucuma.core.enums.Band
 import lucuma.core.enums.GuideProbe
 import lucuma.core.enums.GuideSpeed
@@ -122,7 +123,7 @@ object AgsAnalysis {
 
   object Usable:
     // Binned in steps of 1.4 so small RUWE differences don't override brightness. no ruwe is the worst case
-    def ruweTier(ruwe: Option[BigDecimal]): Int = ruwe match
+    def ruweTier(ruwe: Option[NonNegBigDecimal]): Int = ruwe.map(_.value) match
       case Some(r) if r <= 1.4 => 0
       case Some(r) if r < 2.8  => 1
       case Some(r) if r < 4.2  => 2

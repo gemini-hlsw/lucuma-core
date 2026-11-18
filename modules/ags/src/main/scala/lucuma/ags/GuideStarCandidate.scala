@@ -7,6 +7,7 @@ import cats.Eq
 import cats.derived.*
 import cats.syntax.all.*
 import eu.timepit.refined.cats.*
+import eu.timepit.refined.types.numeric.NonNegBigDecimal
 import lucuma.catalog.BandsList
 import lucuma.catalog.GaiaPhotometry
 import lucuma.catalog.GuideStarCatalogResult
@@ -40,7 +41,7 @@ case class GuideStarCandidate(
   id:           GuideStarId,
   tracking:     SiderealTracking,
   brightnesses: SortedMap[Band, BrightnessValue],
-  ruwe:         Option[BigDecimal] = None
+  ruwe:         Option[NonNegBigDecimal] = None
 ) derives Eq {
 
   def catalogName: Option[GuideStarName] = id.catalogName
@@ -83,7 +84,7 @@ object GuideStarCandidate {
   val brightnesses: Lens[GuideStarCandidate, SortedMap[Band, BrightnessValue]] =
     Focus[GuideStarCandidate](_.brightnesses)
 
-  val ruwe: Lens[GuideStarCandidate, Option[BigDecimal]] =
+  val ruwe: Lens[GuideStarCandidate, Option[NonNegBigDecimal]] =
     Focus[GuideStarCandidate](_.ruwe)
 
   /** A catalog star as a candidate; its id is the source id, read from the target name. */
