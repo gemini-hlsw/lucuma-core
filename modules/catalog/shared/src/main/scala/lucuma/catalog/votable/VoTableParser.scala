@@ -96,6 +96,15 @@ trait VoTableParser {
   ): Pipe[F, XmlEvent, EitherNec[CatalogProblem, Target.Sidereal]] =
     rowsPipe(row => List(targetRow2GuideStar(adapter, BandsList.GaiaBandsList, row)))
 
+  def xml2guidestarResults[F[_]](
+    adapter: CatalogAdapter
+  ): Pipe[F, XmlEvent, EitherNec[CatalogProblem, GuideStarCatalogResult]] =
+    rowsPipe: row =>
+      List(
+        targetRow2GuideStar(adapter, BandsList.GaiaBandsList, row)
+          .map(GuideStarCatalogResult(_, parseRuwe(adapter, row.itemsMap)))
+      )
+
   /**
    * FS2 pipe to convert a stream of xml events to stellar parameters keyed by Gaia source id. Rows
    * without parameters are dropped.
@@ -187,6 +196,21 @@ trait VoTableParser {
         parseDoubleValue(VoTableParser.UCD_RA.some, v)
           .map(a => RightAscension.fromDoubleDegrees(a))
       )
+
+  /**
+   * Gaia RUWE, matched by column name as servers differ on its UCD. A missing, blank, NaN, infinite
+   * or unreadable value is None, so it never drops the star.
+   */
+  def parseRuwe(adapter: CatalogAdapter, entries: Map[FieldId, String]): Option[BigDecimal] =
+    adapter match
+      case gaia: CatalogAdapter.Gaia =>
+        entries
+          .collectFirst:
+            case (f, v) if f.id.value.equalsIgnoreCase(gaia.ruweField.id.value) => v.trim
+          .flatMap(_.toDoubleOption)
+          .filterNot(d => d.isNaN || d.isInfinity)
+          .map(BigDecimal(_))
+      case _                         => none
 
   def parsePV(adapter: CatalogAdapter, entries: Map[FieldId, String]) =
     adapter.parseProperMotion(entries)

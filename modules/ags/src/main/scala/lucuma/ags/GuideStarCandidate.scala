@@ -9,6 +9,7 @@ import cats.syntax.all.*
 import eu.timepit.refined.cats.*
 import lucuma.catalog.BandsList
 import lucuma.catalog.GaiaPhotometry
+import lucuma.catalog.GuideStarCatalogResult
 import lucuma.core.enums.Band
 import lucuma.core.math.BrightnessUnits.*
 import lucuma.core.math.BrightnessValue
@@ -32,12 +33,14 @@ val CandidateBands: List[Band] =
 /**
  * Poors' man Target.Sidereal: tracking plus the catalog's bare brightness values, no units, errors
  * or metadata. R for Altair is not stored: it is estimated from the Gaia bands on first use and
- * memoized, so a cached candidate holds catalog data only.
+ * memoized, so a cached candidate holds catalog data only. RUWE, when known, ranks otherwise equal
+ * candidates.
  */
 case class GuideStarCandidate(
   id:           GuideStarId,
   tracking:     SiderealTracking,
-  brightnesses: SortedMap[Band, BrightnessValue]
+  brightnesses: SortedMap[Band, BrightnessValue],
+  ruwe:         Option[BigDecimal] = None
 ) derives Eq {
 
   def catalogName: Option[GuideStarName] = id.catalogName
@@ -80,6 +83,9 @@ object GuideStarCandidate {
   val brightnesses: Lens[GuideStarCandidate, SortedMap[Band, BrightnessValue]] =
     Focus[GuideStarCandidate](_.brightnesses)
 
+  val ruwe: Lens[GuideStarCandidate, Option[BigDecimal]] =
+    Focus[GuideStarCandidate](_.ruwe)
+
   /** A catalog star as a candidate; its id is the source id, read from the target name. */
   def fromCatalog(target: Target.Sidereal): GuideStarCandidate =
     GuideStarCandidate(
@@ -97,6 +103,10 @@ object GuideStarCandidate {
             case (band, measure) if CandidateBands.contains(band) => band -> measure.value
       )
     )
+
+  /** A catalog star as a candidate, keeping its RUWE. */
+  def fromCatalogResult(result: GuideStarCatalogResult): GuideStarCandidate =
+    fromCatalog(result.target).copy(ruwe = result.ruwe)
 
   private val MagnitudeUnits: List[Units] =
     List(

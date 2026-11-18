@@ -121,12 +121,20 @@ object AgsAnalysis {
   }
 
   object Usable {
+    // Binned in steps of 1.4 so small RUWE differences don't override brightness; missing is worst.
+    def ruweTier(ruwe: Option[BigDecimal]): Int = ruwe match
+      case Some(r) if r <= 1.4 => 0
+      case Some(r) if r < 2.8  => 1
+      case Some(r) if r < 4.2  => 2
+      case _                   => 3
+
     val rankOrder: Order[Usable] =
       Order
         .by(u =>
           (u.guideSpeed,
            u.quality,
            u.vignetting.toMicroarcsecondsSquared,
+           ruweTier(u.target.ruwe),
            u.target.brightnessIn(probeBands(u.guideProbe)).map(_._2),
            u.target.id
           )

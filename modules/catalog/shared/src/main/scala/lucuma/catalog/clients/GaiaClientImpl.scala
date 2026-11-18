@@ -12,6 +12,7 @@ import cats.syntax.all.*
 import fs2.RaiseThrowable
 import lucuma.catalog.CatalogTargetResult
 import lucuma.catalog.GaiaStellarParameters
+import lucuma.catalog.GuideStarCatalogResult
 import lucuma.catalog.votable.*
 import lucuma.core.model.Target
 import lucuma.core.syntax.effect.raceAllToSuccess
@@ -66,6 +67,14 @@ class GaiaClientImpl[F[_]: {Concurrent, Tracer as T, LoggerFactory as LF}](
     ADQLInterpreter
   ): F[List[EitherNec[CatalogProblem, Target.Sidereal]]] =
     multiAdapterQuery(queryUri(_, adqlQuery), CatalogSearch.guideStars)
+
+  /**
+   * Request and parse data from Gaia for guide stars, keeping each star's RUWE for ranking.
+   */
+  def queryGuideStarResults(adqlQuery: ADQLQuery)(using
+    ADQLInterpreter
+  ): F[List[EitherNec[CatalogProblem, GuideStarCatalogResult]]] =
+    multiAdapterQuery(queryUri(_, adqlQuery), CatalogSearch.guideStarResults)
 
   /**
    * Request and parse data from Gaia for a single guide star source.

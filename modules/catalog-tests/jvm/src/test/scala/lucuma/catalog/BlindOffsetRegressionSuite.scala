@@ -94,6 +94,10 @@ class BlindOffsetRegressionSuite extends CatsEffectSuite with SEDMatcherFixture:
         ADQLInterpreter
       ): IO[List[EitherNec[CatalogProblem, Target.Sidereal]]]                                 =
         IO.raiseError(new NotImplementedError)
+      def queryGuideStarResults(adqlQuery: ADQLQuery)(using
+        ADQLInterpreter
+      ): IO[List[EitherNec[CatalogProblem, GuideStarCatalogResult]]]                          =
+        IO.raiseError(new NotImplementedError)
       def queryByIdGuideStar(sourceId: Long): IO[EitherNec[CatalogProblem, Target.Sidereal]]  =
         IO.raiseError(new NotImplementedError)
       def queryStellarParameters(sourceIds: List[Long]): IO[Map[Long, GaiaStellarParameters]] =

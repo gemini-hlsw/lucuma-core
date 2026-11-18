@@ -11,6 +11,7 @@ import cats.syntax.applicative.*
 import cats.syntax.either.*
 import lucuma.catalog.CatalogTargetResult
 import lucuma.catalog.GaiaStellarParameters
+import lucuma.catalog.GuideStarCatalogResult
 import lucuma.catalog.votable.*
 import lucuma.core.model.Target
 import org.http4s.Uri
@@ -37,6 +38,13 @@ trait GaiaClient[F[_]]:
   def queryGuideStars(adqlQuery: ADQLQuery)(using
     ADQLInterpreter
   ): F[List[EitherNec[CatalogProblem, Target.Sidereal]]]
+
+  /**
+   * Request and parse data from Gaia for guide stars, keeping each star's RUWE for ranking.
+   */
+  def queryGuideStarResults(adqlQuery: ADQLQuery)(using
+    ADQLInterpreter
+  ): F[List[EitherNec[CatalogProblem, GuideStarCatalogResult]]]
 
   /**
    * Request and parse data from Gaia for a single guide star source.
@@ -69,6 +77,11 @@ object GaiaClient:
     def queryGuideStars(adqlQuery: ADQLQuery)(using
       ADQLInterpreter
     ): F[List[EitherNec[CatalogProblem, Target.Sidereal]]] =
+      List.empty.pure
+
+    def queryGuideStarResults(adqlQuery: ADQLQuery)(using
+      ADQLInterpreter
+    ): F[List[EitherNec[CatalogProblem, GuideStarCatalogResult]]] =
       List.empty.pure
 
     def queryByIdGuideStar(sourceId: Long): F[EitherNec[CatalogProblem, Target.Sidereal]] =

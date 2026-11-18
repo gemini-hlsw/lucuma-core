@@ -451,6 +451,9 @@ object CatalogAdapter {
     val rpMagField: FieldId =
       FieldId.unsafeFrom("phot_rp_mean_mag", Ucd.unsafeFromString("phot.mag;stat.mean"))
 
+    // Servers disagree on the UCD, so it is matched by name
+    val ruweField: FieldId = FieldId.unsafeFrom("ruwe")
+
     /**
      * List of all Gaia fields of interest. These are used in forming the ADQL query that produces
      * the VO Table. See VoTableClient and the GaiaBackend.
@@ -467,7 +470,8 @@ object CatalogAdapter {
         rvField,
         gMagField,
         bpMagField,
-        rpMagField
+        rpMagField,
+        ruweField
       )
 
     override def ignoreBrightnessValueField(f: FieldId): Boolean =
@@ -706,7 +710,8 @@ object CatalogAdapter {
         rvField,
         gMagField,
         bpMagField,
-        rpMagField
+        rpMagField,
+        ruweField
       )
   }
 
