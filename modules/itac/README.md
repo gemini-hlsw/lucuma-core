@@ -22,7 +22,7 @@ cs setup --yes
 
 ### 2. Install ITAC
 
-Use `cs setup` to set up Java, configure your path, and install ITAC2. This will not interfere with your existing `itac` install, if you have one.
+Use `cs install` to install ITAC2. This will not interfere with your existing `itac` install, if you have one.
 
 ```
 cs install --channel edu.gemini:lucuma-itac-channel itac2
