@@ -246,7 +246,7 @@ lazy val itac = project
       "com.monovore"                 %% "decline-effect"         % "2.6.2",
       "com.monovore"                 %% "decline"                % "2.6.2",
       "io.circe"      %% "circe-yaml"           % "0.16.1",
-      "io.circe"      %% "circe-generic"         % "0.14.16",
+      "io.circe"      %% "circe-generic"         % "0.14.17",
       "org.apache.poi"                % "poi"                    % "4.1.2", 
       "org.typelevel" %% "munit-cats-effect"   % munitCatsEffectVersion % Test,
       "org.scala-lang.modules" %% "scala-xml"  % scalaXmlVersion,
