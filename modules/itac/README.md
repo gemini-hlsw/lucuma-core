@@ -14,12 +14,18 @@ Depending on how you installed it, you may need to move `cs` into a directory th
 
 On success you will be able to do `cs --help` and see some some text.
 
+To complete setup do
+
+```
+cs setup --yes
+```
+
 ### 2. Install ITAC
 
 Use `cs setup` to set up Java, configure your path, and install ITAC2. This will not interfere with your existing `itac` install, if you have one.
 
 ```
-cs setup --yes --channel edu.gemini:itac2-channel --apps itac2
+cs install --channel edu.gemini:lucuma-itac-channel itac2
 ```
 
 On success you will be able to do `itac2` and see some help text.
