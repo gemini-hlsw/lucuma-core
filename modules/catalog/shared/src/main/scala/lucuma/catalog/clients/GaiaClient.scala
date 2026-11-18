@@ -33,13 +33,6 @@ trait GaiaClient[F[_]]:
   def queryById(sourceId: Long): F[EitherNec[CatalogProblem, CatalogTargetResult]]
 
   /**
-   * Request and parse data from Gaia for guide stars.
-   */
-  def queryGuideStars(adqlQuery: ADQLQuery)(using
-    ADQLInterpreter
-  ): F[List[EitherNec[CatalogProblem, Target.Sidereal]]]
-
-  /**
    * Request and parse data from Gaia for guide stars, keeping each star's RUWE for ranking.
    */
   def queryGuideStarResults(adqlQuery: ADQLQuery)(using
@@ -73,11 +66,6 @@ object GaiaClient:
 
     def queryById(sourceId: Long): F[EitherNec[CatalogProblem, CatalogTargetResult]] =
       CatalogProblem.SourceIdNotFound(sourceId).leftNec.pure[F]
-
-    def queryGuideStars(adqlQuery: ADQLQuery)(using
-      ADQLInterpreter
-    ): F[List[EitherNec[CatalogProblem, Target.Sidereal]]] =
-      List.empty.pure
 
     def queryGuideStarResults(adqlQuery: ADQLQuery)(using
       ADQLInterpreter

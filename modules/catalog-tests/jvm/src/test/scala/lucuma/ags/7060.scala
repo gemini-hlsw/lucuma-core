@@ -140,7 +140,7 @@ class ShortCut_7060 extends CatsEffectSuite:
       )
 
     gaia
-      .queryGuideStars(query)
+      .queryGuideStarResults(query)
       .map: gs =>
         val r = Ags
           .agsAnalysis(
@@ -153,7 +153,7 @@ class ShortCut_7060 extends CatsEffectSuite:
             Some(acqOffsets),
             Some(sciOffsets),
             conf,
-            gs.collect { case Right(t) => t }.map(GuideStarCandidate.fromCatalog)
+            gs.collect { case Right(t) => t }.map(GuideStarCandidate.fromCatalogResult)
           )
         r.analyses.sortUsablePositions.collectFirst:
           case Usable(target = GuideStarCandidate(id = GuideStarId.GaiaDr3(sourceId))) => sourceId
@@ -168,7 +168,7 @@ class ShortCut_7060 extends CatsEffectSuite:
 
     // if the blind offset is at science it is the same is if it didn't exist
     gaia
-      .queryGuideStars(query)
+      .queryGuideStarResults(query)
       .map: gs =>
         val r = Ags
           .agsAnalysis(
@@ -181,7 +181,7 @@ class ShortCut_7060 extends CatsEffectSuite:
             Some(acqOffsets),
             Some(sciOffsets),
             conf,
-            gs.collect { case Right(t) => t }.map(GuideStarCandidate.fromCatalog)
+            gs.collect { case Right(t) => t }.map(GuideStarCandidate.fromCatalogResult)
           )
         r.analyses.sortUsablePositions.collectFirst:
           case Usable(target = GuideStarCandidate(id = GuideStarId.GaiaDr3(sourceId))) => sourceId
@@ -198,7 +198,7 @@ class ShortCut_7060 extends CatsEffectSuite:
       targetCoords.offsetBy(Angle.Angle0, Offset.signedDecimalArcseconds.reverseGet(3600, 3600))
 
     gaia
-      .queryGuideStars(query)
+      .queryGuideStarResults(query)
       .map: gs =>
         val r = Ags
           .agsAnalysis(
@@ -211,7 +211,7 @@ class ShortCut_7060 extends CatsEffectSuite:
             Some(acqOffsets),
             Some(sciOffsets),
             conf,
-            gs.collect { case Right(t) => t }.map(GuideStarCandidate.fromCatalog)
+            gs.collect { case Right(t) => t }.map(GuideStarCandidate.fromCatalogResult)
           )
         r.analyses.sortUsablePositions
       .assertEquals(Nil)

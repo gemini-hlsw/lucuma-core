@@ -112,11 +112,11 @@ trait AgsSelectionSample {
 
   def gaiaQuery[F[_]: Functor](gaiaClient: GaiaClient[F]): F[List[GuideStarCandidate]] =
     gaiaClient
-      .queryGuideStars:
+      .queryGuideStarResults:
         QueryByADQL(tracking.at(now).get, candidatesArea, widestConstraints.some, DefaultAreaBuffer)
       .map:
         _.collect { case Right(t) => t }
-          .map(GuideStarCandidate.fromCatalog)
+          .map(GuideStarCandidate.fromCatalogResult)
 }
 
 object AgsSelectionSampleApp extends IOApp.Simple with AgsSelectionSample:

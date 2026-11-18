@@ -61,14 +61,6 @@ class GaiaClientImpl[F[_]: {Concurrent, Tracer as T, LoggerFactory as LF}](
       _.headOption.toRight(NonEmptyChain(CatalogProblem.SourceIdNotFound(sourceId))).flatten
 
   /**
-   * Request and parse data from Gaia for guide stars.
-   */
-  def queryGuideStars(adqlQuery: ADQLQuery)(using
-    ADQLInterpreter
-  ): F[List[EitherNec[CatalogProblem, Target.Sidereal]]] =
-    multiAdapterQuery(queryUri(_, adqlQuery), CatalogSearch.guideStars)
-
-  /**
    * Request and parse data from Gaia for guide stars, keeping each star's RUWE for ranking.
    */
   def queryGuideStarResults(adqlQuery: ADQLQuery)(using

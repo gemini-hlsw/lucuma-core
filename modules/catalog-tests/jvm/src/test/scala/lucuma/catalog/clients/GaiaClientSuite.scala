@@ -67,7 +67,7 @@ class GaiaClientSuite extends CatsEffectSuite with VoTableSamples:
         assertEquals(target.get.name.value, "Gaia DR2 5500810292414804352")
         assertEquals(target.get.catalogInfo.map(_.catalog), CatalogName.Gaia.some)
 
-  test("GaiaClient.queryGuideStars returns minimal Target.Sidereal"):
+  test("GaiaClient.queryGuideStarResults returns minimal Target.Sidereal"):
     val client       = GaiaClientMock.fromXML[IO](voTableAlternative,
                                             NonEmptyChain.one(CatalogAdapter.Gaia3LiteGavo).some
     )
@@ -78,9 +78,12 @@ class GaiaClientSuite extends CatsEffectSuite with VoTableSamples:
     )
 
     client
-      .queryGuideStars(query)
+      .queryGuideStarResults(query)
       .map: results =>
-        val target = results.headOption.flatMap(_.toOption)
+        val result = results.headOption.flatMap(_.toOption)
+        // The fixture has no ruwe column
+        assertEquals(result.flatMap(_.ruwe), None)
+        val target = result.map(_.target)
         assert(target.isDefined)
         // Guide star names include "Gaia DR3" prefix from Gaia3Lite.parseName
         assertEquals(target.get.name.value, "Gaia DR3 5717302551387263616")

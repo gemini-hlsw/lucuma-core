@@ -99,12 +99,12 @@ object ShortCut9024App extends IOApp.Simple {
       .map(GaiaClient.build[IO](_))
       .use: gaiaClient =>
         gaiaClient
-          .queryGuideStars(
+          .queryGuideStarResults(
             QueryByADQL(base, patrolField.patrolField, widestConstraints.some, DefaultAreaBuffer)
           )
           .map(_.collect { case Right(t) =>
             t
-          }.map(GuideStarCandidate.fromCatalog(_).at(now)))
+          }.map(GuideStarCandidate.fromCatalogResult(_).at(now)))
           .map { candidates =>
             println(s"obs instant      : $now")
             println(s"base             : $base")

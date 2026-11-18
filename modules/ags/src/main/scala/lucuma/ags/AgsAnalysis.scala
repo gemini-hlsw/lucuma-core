@@ -120,8 +120,8 @@ object AgsAnalysis {
     }
   }
 
-  object Usable {
-    // Binned in steps of 1.4 so small RUWE differences don't override brightness; missing is worst.
+  object Usable:
+    // Binned in steps of 1.4 so small RUWE differences don't override brightness. no ruwe is the worst case
     def ruweTier(ruwe: Option[BigDecimal]): Int = ruwe match
       case Some(r) if r <= 1.4 => 0
       case Some(r) if r < 2.8  => 1
@@ -141,7 +141,6 @@ object AgsAnalysis {
         )
 
     val rankOrdering: Ordering[Usable] = rankOrder.toOrdering
-  }
 
   extension (analysis: Option[AgsAnalysis]) def posAngle: Option[Angle] = analysis.map(_.posAngle)
 
