@@ -91,4 +91,4 @@ object PendingExposureRules:
       ScorpioFilter.H  -> d.h,
       ScorpioFilter.Ks -> d.ks
     ).collect:
-      case (filter, Some(detector)) => detector.exposureTime -> ExposureRules.scorpio(filter)
+      case (filter, Some(channel)) => channel.exposureTime -> ExposureRules.scorpio(filter)

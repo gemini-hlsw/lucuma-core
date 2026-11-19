@@ -19,14 +19,14 @@ import monocle.Lens
  * but that is left to the sequence generator.
  */
 final case class ScorpioDynamicConfig(
-  g:         Option[ScorpioChannelConfig],
-  r:         Option[ScorpioChannelConfig],
-  i:         Option[ScorpioChannelConfig],
-  z:         Option[ScorpioChannelConfig],
-  y:         Option[ScorpioChannelConfig],
-  j:         Option[ScorpioChannelConfig],
-  h:         Option[ScorpioChannelConfig],
-  ks:        Option[ScorpioChannelConfig],
+  g:         Option[ScorpioChannelConfig.Vis],
+  r:         Option[ScorpioChannelConfig.Vis],
+  i:         Option[ScorpioChannelConfig.Vis],
+  z:         Option[ScorpioChannelConfig.Vis],
+  y:         Option[ScorpioChannelConfig.Ir],
+  j:         Option[ScorpioChannelConfig.Ir],
+  h:         Option[ScorpioChannelConfig.Ir],
+  ks:        Option[ScorpioChannelConfig.Ir],
   fpu:       ScorpioFpuMask,
   disperser: ScorpioDisperser
 ) derives Eq:
@@ -42,35 +42,35 @@ final case class ScorpioDynamicConfig(
 
 object ScorpioDynamicConfig:
   /** @group Optics */
-  val g: Lens[ScorpioDynamicConfig, Option[ScorpioChannelConfig]] =
+  val g: Lens[ScorpioDynamicConfig, Option[ScorpioChannelConfig.Vis]] =
     Focus[ScorpioDynamicConfig](_.g)
 
   /** @group Optics */
-  val r: Lens[ScorpioDynamicConfig, Option[ScorpioChannelConfig]] =
+  val r: Lens[ScorpioDynamicConfig, Option[ScorpioChannelConfig.Vis]] =
     Focus[ScorpioDynamicConfig](_.r)
 
   /** @group Optics */
-  val i: Lens[ScorpioDynamicConfig, Option[ScorpioChannelConfig]] =
+  val i: Lens[ScorpioDynamicConfig, Option[ScorpioChannelConfig.Vis]] =
     Focus[ScorpioDynamicConfig](_.i)
 
   /** @group Optics */
-  val z: Lens[ScorpioDynamicConfig, Option[ScorpioChannelConfig]] =
+  val z: Lens[ScorpioDynamicConfig, Option[ScorpioChannelConfig.Vis]] =
     Focus[ScorpioDynamicConfig](_.z)
 
   /** @group Optics */
-  val y: Lens[ScorpioDynamicConfig, Option[ScorpioChannelConfig]] =
+  val y: Lens[ScorpioDynamicConfig, Option[ScorpioChannelConfig.Ir]] =
     Focus[ScorpioDynamicConfig](_.y)
 
   /** @group Optics */
-  val j: Lens[ScorpioDynamicConfig, Option[ScorpioChannelConfig]] =
+  val j: Lens[ScorpioDynamicConfig, Option[ScorpioChannelConfig.Ir]] =
     Focus[ScorpioDynamicConfig](_.j)
 
   /** @group Optics */
-  val h: Lens[ScorpioDynamicConfig, Option[ScorpioChannelConfig]] =
+  val h: Lens[ScorpioDynamicConfig, Option[ScorpioChannelConfig.Ir]] =
     Focus[ScorpioDynamicConfig](_.h)
 
   /** @group Optics */
-  val ks: Lens[ScorpioDynamicConfig, Option[ScorpioChannelConfig]] =
+  val ks: Lens[ScorpioDynamicConfig, Option[ScorpioChannelConfig.Ir]] =
     Focus[ScorpioDynamicConfig](_.ks)
 
   /** @group Optics */

@@ -7,6 +7,7 @@ import cats.kernel.laws.discipline.*
 import cats.syntax.order.*
 import lucuma.core.enums.ScorpioDisperser
 import lucuma.core.enums.ScorpioFpu
+import lucuma.core.enums.ScorpioVisReadoutMode
 import lucuma.core.model.sequence.scorpio.arb.ArbScorpioChannelConfig.given
 import lucuma.core.model.sequence.scorpio.arb.ArbScorpioDynamicConfig.given
 import lucuma.core.model.sequence.scorpio.arb.ArbScorpioFpuMask.given
@@ -18,6 +19,8 @@ import org.scalacheck.Prop.forAll
 class ScorpioDynamicConfigSuite extends DisciplineSuite:
 
   checkAll("Eq[ScorpioChannelConfig]", EqTests[ScorpioChannelConfig].eqv)
+  checkAll("Eq[ScorpioChannelConfig.Vis]", EqTests[ScorpioChannelConfig.Vis].eqv)
+  checkAll("Eq[ScorpioChannelConfig.Ir]", EqTests[ScorpioChannelConfig.Ir].eqv)
   checkAll("Eq[ScorpioFpuMask]", EqTests[ScorpioFpuMask].eqv)
   checkAll("Eq[ScorpioDynamicConfig]", EqTests[ScorpioDynamicConfig].eqv)
 
@@ -32,6 +35,6 @@ class ScorpioDynamicConfigSuite extends DisciplineSuite:
     assertEquals(off.totalExposureTime, TimeSpan.Zero)
 
   test("totalExposureTime multiplies time by count"):
-    val d   = ScorpioChannelConfig(TimeSpan.unsafeFromMicroseconds(10_000_000L), 3.refined)
+    val d   = ScorpioChannelConfig.Vis(TimeSpan.unsafeFromMicroseconds(10_000_000L), 3.refined, ScorpioVisReadoutMode.LowNoise)
     val cfg = ScorpioDynamicConfig(Some(d), None, None, None, None, None, None, None, ScorpioFpuMask.LongSlit(ScorpioFpu.LongSlit_0_54), ScorpioDisperser.Vph)
     assertEquals(cfg.totalExposureTime, TimeSpan.unsafeFromMicroseconds(30_000_000L))
