@@ -125,8 +125,8 @@ object AgsAnalysis {
     // Binned in steps of 1.4 so small RUWE differences don't override brightness. no ruwe is the worst case
     def ruweTier(ruwe: Option[NonNegBigDecimal]): Int = ruwe.map(_.value) match
       case Some(r) if r <= 1.4 => 0
-      case Some(r) if r < 2.8  => 1
-      case Some(r) if r < 4.2  => 2
+      case Some(r) if r <= 2.8 => 1
+      case Some(r) if r <= 4.2 => 2
       case _                   => 3
 
     val rankOrder: Order[Usable] =

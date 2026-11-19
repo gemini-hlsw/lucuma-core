@@ -61,9 +61,10 @@ class RuweRankingSuite extends munit.FunSuite:
       "1.4"  -> 0,
       "1.41" -> 1,
       "2.79" -> 1,
-      "2.8"  -> 2,
-      "4.19" -> 2,
-      "4.2"  -> 3,
+      "2.8"  -> 1,
+      "2.81" -> 2,
+      "4.2"  -> 2,
+      "4.21" -> 3,
       "25"   -> 3
     ).foreach: (ruwe, tier) =>
       assertEquals(Usable.ruweTier(r(ruwe)), tier, ruwe)
