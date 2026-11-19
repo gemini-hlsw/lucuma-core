@@ -14,7 +14,6 @@ import lucuma.catalog.CatalogTargetResult
 import lucuma.catalog.GaiaStellarParameters
 import lucuma.catalog.GuideStarCatalogResult
 import lucuma.catalog.votable.*
-import lucuma.core.model.Target
 import lucuma.core.syntax.effect.raceAllToSuccess
 import org.http4s.Header
 import org.http4s.Headers
@@ -69,10 +68,10 @@ class GaiaClientImpl[F[_]: {Concurrent, Tracer as T, LoggerFactory as LF}](
     multiAdapterQuery(queryUri(_, adqlQuery), CatalogSearch.guideStarResults)
 
   /**
-   * Request and parse data from Gaia for a single guide star source.
+   * Request and parse data from Gaia for a single guide star source, keeping its RUWE.
    */
-  def queryByIdGuideStar(sourceId: Long): F[EitherNec[CatalogProblem, Target.Sidereal]] =
-    multiAdapterQuery(queryUriById(_, sourceId), CatalogSearch.guideStars).map:
+  def queryByIdGuideStar(sourceId: Long): F[EitherNec[CatalogProblem, GuideStarCatalogResult]] =
+    multiAdapterQuery(queryUriById(_, sourceId), CatalogSearch.guideStarResults).map:
       _.headOption.toRight(NonEmptyChain(CatalogProblem.SourceIdNotFound(sourceId))).flatten
 
   // Adapters with ESP-HS are raced first; the others only answer when those fail or find nothing,
