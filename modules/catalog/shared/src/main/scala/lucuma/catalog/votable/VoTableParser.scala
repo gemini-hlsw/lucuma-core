@@ -97,13 +97,14 @@ trait VoTableParser {
   ): Pipe[F, XmlEvent, EitherNec[CatalogProblem, Target.Sidereal]] =
     rowsPipe(row => List(targetRow2GuideStar(adapter, BandsList.GaiaBandsList, row)))
 
+  // Full targets, unlike xml2guidestars, so consumers keep the catalog info
   def xml2guidestarResults[F[_]](
     adapter: CatalogAdapter
   ): Pipe[F, XmlEvent, EitherNec[CatalogProblem, GuideStarCatalogResult]] =
     rowsPipe: row =>
       List(
-        targetRow2GuideStar(adapter, BandsList.GaiaBandsList, row)
-          .map(GuideStarCatalogResult(_, parseRuwe(adapter, row.itemsMap)))
+        targetRow2Target(adapter, row)
+          .map(r => GuideStarCatalogResult(r.target, parseRuwe(adapter, row.itemsMap)))
       )
 
   /**
