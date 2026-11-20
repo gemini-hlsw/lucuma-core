@@ -17,6 +17,7 @@ object all
     with TimeOps
     with ToIntOps
     with ToPrismOps
+    with ToRefinedOps
     with ToStringOps
     with ToTreeMapCompanionOps
     with ToTreeMapOps

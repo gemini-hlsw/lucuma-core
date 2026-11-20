@@ -9,6 +9,7 @@ import cats.derived.*
 import cats.syntax.monoid.*
 import eu.timepit.refined.cats.given
 import eu.timepit.refined.types.numeric.NonNegInt
+import lucuma.core.syntax.refined.*
 import monocle.Focus
 import monocle.Lens
 
@@ -35,9 +36,7 @@ object StepDigest:
   given Monoid[StepDigest] =
     Monoid.instance(
       Zero,
-      (a, b) =>
-        val count = (a.count.value.toLong + b.count.value).min(Int.MaxValue).toInt
-        StepDigest(NonNegInt.unsafeFrom(count), a.time |+| b.time)
+      (a, b) => StepDigest(a.count +| b.count, a.time |+| b.time)
     )
 
   /** @group Optics */
