@@ -3,7 +3,7 @@ import org.scalajs.linker.interface.OutputPatterns
 import org.typelevel.sbt.gha.PermissionValue
 import org.typelevel.sbt.gha.Permissions
 
-ThisBuild / tlBaseVersion                         := "0.287"
+ThisBuild / tlBaseVersion                         := "0.288"
 ThisBuild / tlCiReleaseBranches                   := Seq("master")
 ThisBuild / githubWorkflowEnv += "MUNIT_FLAKY_OK" -> "true"
 
@@ -66,6 +66,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
       "org.typelevel"  %%% "cats-core"             % catsVersion,
       "org.typelevel"  %%% "cats-collections-core" % catsCollctionsVersion,
       "org.typelevel"  %%% "cats-effect"           % catsEffectVersion,
+      "org.typelevel"  %%% "log4cats-core"         % log4catsVersion,
       "dev.optics"     %%% "monocle-core"          % monocleVersion,
       "dev.optics"     %%% "monocle-macro"         % monocleVersion,
       "dev.optics"     %%% "monocle-state"         % monocleVersion,
