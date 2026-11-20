@@ -8,6 +8,7 @@ import cats.Eq
 import cats.implicits.*
 import lucuma.core.refined.auto.*
 import lucuma.core.util.WithGid
+import org.typelevel.log4cats.Logger
 
 /** A user has [at least] an identity and a role. */
 sealed trait User extends Product with Serializable {
@@ -21,12 +22,16 @@ sealed trait User extends Product with Serializable {
    */
   def displayName: String
 
-  /** Verity that this user has access greater than or equal to `access`. */
-  final def verifyAccess[F[_]](
+  /**
+   * Verify that this user has access greater than or equal to `access`. If not, write a WARN line
+   * with the user and the access, and raise an `AccessControlException`.
+   */
+  final def verifyAccess[F[_]: Logger](
     access:      Access
   )(using ev: ApplicativeError[F, Throwable]): F[Unit] =
-    ev.raiseError(
-      AccessControlException(displayName, id, role, access)
+    (
+      Logger[F].warn(s"Not authorized: user $id ($displayName) has ${role.access} access, but $access access is required.") *>
+        ev.raiseError[Unit](AccessControlException(displayName, id, role, access))
     ).whenA(role.access < access)
 
 }
