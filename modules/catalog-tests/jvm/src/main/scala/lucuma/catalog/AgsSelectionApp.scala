@@ -37,7 +37,6 @@ import lucuma.core.model.ElevationRange
 import lucuma.core.model.ImageQuality
 import lucuma.core.model.PosAngleConstraint
 import lucuma.core.model.SiderealTracking
-import lucuma.core.model.Target
 import lucuma.core.model.sequence.flamingos2.Flamingos2FpuMask
 import org.http4s.jdkhttpclient.JdkHttpClient
 import org.typelevel.log4cats.LoggerFactory
@@ -112,11 +111,11 @@ trait AgsSelectionSample {
 
   def gaiaQuery[F[_]: Functor](gaiaClient: GaiaClient[F]): F[List[GuideStarCandidate]] =
     gaiaClient
-      .queryGuideStars:
+      .queryGuideStarResults:
         QueryByADQL(tracking.at(now).get, candidatesArea, widestConstraints.some, DefaultAreaBuffer)
       .map:
         _.collect { case Right(t) => t }
-          .map(GuideStarCandidate.fromCatalog)
+          .map(GuideStarCandidate.fromCatalogResult)
 }
 
 object AgsSelectionSampleApp extends IOApp.Simple with AgsSelectionSample:

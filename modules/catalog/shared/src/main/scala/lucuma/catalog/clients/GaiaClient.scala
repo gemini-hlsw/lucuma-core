@@ -11,8 +11,8 @@ import cats.syntax.applicative.*
 import cats.syntax.either.*
 import lucuma.catalog.CatalogTargetResult
 import lucuma.catalog.GaiaStellarParameters
+import lucuma.catalog.GuideStarCatalogResult
 import lucuma.catalog.votable.*
-import lucuma.core.model.Target
 import org.http4s.Uri
 import org.http4s.client.Client
 import org.typelevel.log4cats.LoggerFactory
@@ -32,16 +32,16 @@ trait GaiaClient[F[_]]:
   def queryById(sourceId: Long): F[EitherNec[CatalogProblem, CatalogTargetResult]]
 
   /**
-   * Request and parse data from Gaia for guide stars.
+   * Request and parse data from Gaia for guide stars, keeping each star's RUWE for ranking.
    */
-  def queryGuideStars(adqlQuery: ADQLQuery)(using
+  def queryGuideStarResults(adqlQuery: ADQLQuery)(using
     ADQLInterpreter
-  ): F[List[EitherNec[CatalogProblem, Target.Sidereal]]]
+  ): F[List[EitherNec[CatalogProblem, GuideStarCatalogResult]]]
 
   /**
-   * Request and parse data from Gaia for a single guide star source.
+   * Request and parse data from Gaia for a single guide star source, keeping its RUWE.
    */
-  def queryByIdGuideStar(sourceId: Long): F[EitherNec[CatalogProblem, Target.Sidereal]]
+  def queryByIdGuideStar(sourceId: Long): F[EitherNec[CatalogProblem, GuideStarCatalogResult]]
 
   /**
    * Effective temperature and surface gravity of the given sources, ESP-HS where Gaia has it and
@@ -66,12 +66,12 @@ object GaiaClient:
     def queryById(sourceId: Long): F[EitherNec[CatalogProblem, CatalogTargetResult]] =
       CatalogProblem.SourceIdNotFound(sourceId).leftNec.pure[F]
 
-    def queryGuideStars(adqlQuery: ADQLQuery)(using
+    def queryGuideStarResults(adqlQuery: ADQLQuery)(using
       ADQLInterpreter
-    ): F[List[EitherNec[CatalogProblem, Target.Sidereal]]] =
+    ): F[List[EitherNec[CatalogProblem, GuideStarCatalogResult]]] =
       List.empty.pure
 
-    def queryByIdGuideStar(sourceId: Long): F[EitherNec[CatalogProblem, Target.Sidereal]] =
+    def queryByIdGuideStar(sourceId: Long): F[EitherNec[CatalogProblem, GuideStarCatalogResult]] =
       CatalogProblem.SourceIdNotFound(sourceId).leftNec.pure[F]
 
     def queryStellarParameters(sourceIds: List[Long]): F[Map[Long, GaiaStellarParameters]] =

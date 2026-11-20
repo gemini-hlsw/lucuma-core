@@ -9,6 +9,7 @@ import cats.syntax.all.*
 import coulomb.syntax.*
 import eu.timepit.refined.*
 import eu.timepit.refined.collection.NonEmpty
+import eu.timepit.refined.types.numeric.NonNegBigDecimal
 import eu.timepit.refined.types.string.NonEmptyString
 import fs2.*
 import fs2.data.xml.*
@@ -95,6 +96,16 @@ trait VoTableParser {
     adapter: CatalogAdapter
   ): Pipe[F, XmlEvent, EitherNec[CatalogProblem, Target.Sidereal]] =
     rowsPipe(row => List(targetRow2GuideStar(adapter, BandsList.GaiaBandsList, row)))
+
+  // Full targets, unlike xml2guidestars, so consumers keep the catalog info
+  def xml2guidestarResults[F[_]](
+    adapter: CatalogAdapter
+  ): Pipe[F, XmlEvent, EitherNec[CatalogProblem, GuideStarCatalogResult]] =
+    rowsPipe: row =>
+      List(
+        targetRow2Target(adapter, row)
+          .map(r => GuideStarCatalogResult(r.target, parseRuwe(adapter, row.itemsMap)))
+      )
 
   /**
    * FS2 pipe to convert a stream of xml events to stellar parameters keyed by Gaia source id. Rows
@@ -187,6 +198,21 @@ trait VoTableParser {
         parseDoubleValue(VoTableParser.UCD_RA.some, v)
           .map(a => RightAscension.fromDoubleDegrees(a))
       )
+
+  /**
+   * Gaia RUWE, matched by column name as servers differ on its UCD. A missing, blank, NaN,
+   * infinite, negative or unreadable value is None, so it never drops the star.
+   */
+  def parseRuwe(adapter: CatalogAdapter, entries: Map[FieldId, String]): Option[NonNegBigDecimal] =
+    adapter match
+      case gaia: CatalogAdapter.Gaia =>
+        entries
+          .collectFirst:
+            case (f, v) if f.id.value.equalsIgnoreCase(gaia.ruweField.id.value) => v.trim
+          .flatMap(_.toDoubleOption)
+          .filterNot(d => d.isNaN || d.isInfinity)
+          .flatMap(d => NonNegBigDecimal.from(BigDecimal(d)).toOption)
+      case _                         => none
 
   def parsePV(adapter: CatalogAdapter, entries: Map[FieldId, String]) =
     adapter.parseProperMotion(entries)

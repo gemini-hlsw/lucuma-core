@@ -46,7 +46,7 @@ object AltairAgsSelectionApp extends IOApp.Simple with AgsSelectionSample {
       .map(GaiaClient.build[IO](_))
       .use(gaiaClient =>
         gaiaClient
-          .queryGuideStars:
+          .queryGuideStarResults:
             QueryByADQL(
               tracking.at(now).get,
               GuideProbe.AltairAOWFS.candidatesArea,
@@ -61,7 +61,7 @@ object AltairAgsSelectionApp extends IOApp.Simple with AgsSelectionSample {
             )
           .map:
             _.collect { case Right(t) => t }
-              .map(GuideStarCandidate.fromCatalog)
+              .map(GuideStarCandidate.fromCatalogResult)
           .map { candidates =>
             println(s"Altair candidates: ${candidates.length}")
             candidates

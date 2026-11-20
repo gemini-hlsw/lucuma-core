@@ -28,7 +28,6 @@ import lucuma.core.math.Coordinates
 import lucuma.core.math.Declination
 import lucuma.core.math.RightAscension
 import lucuma.core.model.SourceProfile
-import lucuma.core.model.Target
 import lucuma.core.model.UnnormalizedSED
 import munit.CatsEffectSuite
 
@@ -90,11 +89,13 @@ class BlindOffsetRegressionSuite extends CatsEffectSuite with SEDMatcherFixture:
           .toList
       def queryById(sourceId: Long): IO[EitherNec[CatalogProblem, CatalogTargetResult]]       =
         IO.raiseError(new NotImplementedError)
-      def queryGuideStars(adqlQuery: ADQLQuery)(using
+      def queryGuideStarResults(adqlQuery: ADQLQuery)(using
         ADQLInterpreter
-      ): IO[List[EitherNec[CatalogProblem, Target.Sidereal]]]                                 =
+      ): IO[List[EitherNec[CatalogProblem, GuideStarCatalogResult]]]                          =
         IO.raiseError(new NotImplementedError)
-      def queryByIdGuideStar(sourceId: Long): IO[EitherNec[CatalogProblem, Target.Sidereal]]  =
+      def queryByIdGuideStar(
+        sourceId: Long
+      ): IO[EitherNec[CatalogProblem, GuideStarCatalogResult]]                                =
         IO.raiseError(new NotImplementedError)
       def queryStellarParameters(sourceIds: List[Long]): IO[Map[Long, GaiaStellarParameters]] =
         lookup(sourceIds)

@@ -56,6 +56,14 @@ object CatalogSearch:
     votable(VoTableParser.xml2guidestars[F](adapter))
 
   /**
+   * FS2 pipe to convert a stream of String to guide stars with their RUWE
+   */
+  def guideStarResults[F[_]: RaiseThrowable](
+    adapter: CatalogAdapter
+  ): Pipe[F, String, EitherNec[CatalogProblem, GuideStarCatalogResult]] =
+    votable(VoTableParser.xml2guidestarResults[F](adapter))
+
+  /**
    * FS2 pipe to convert a stream of String to stellar parameters keyed by Gaia source id
    */
   def stellarParameters[F[_]: RaiseThrowable](

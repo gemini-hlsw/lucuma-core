@@ -67,7 +67,7 @@ class GaiaClientSuite extends CatsEffectSuite with VoTableSamples:
         assertEquals(target.get.name.value, "Gaia DR2 5500810292414804352")
         assertEquals(target.get.catalogInfo.map(_.catalog), CatalogName.Gaia.some)
 
-  test("GaiaClient.queryGuideStars returns minimal Target.Sidereal"):
+  test("GaiaClient.queryGuideStarResults keeps the catalog info"):
     val client       = GaiaClientMock.fromXML[IO](voTableAlternative,
                                             NonEmptyChain.one(CatalogAdapter.Gaia3LiteGavo).some
     )
@@ -78,13 +78,17 @@ class GaiaClientSuite extends CatsEffectSuite with VoTableSamples:
     )
 
     client
-      .queryGuideStars(query)
+      .queryGuideStarResults(query)
       .map: results =>
-        val target = results.headOption.flatMap(_.toOption)
+        val result = results.headOption.flatMap(_.toOption)
+        // The fixture has no ruwe column
+        assertEquals(result.flatMap(_.ruwe), None)
+        val target = result.map(_.target)
         assert(target.isDefined)
         // Guide star names include "Gaia DR3" prefix from Gaia3Lite.parseName
         assertEquals(target.get.name.value, "Gaia DR3 5717302551387263616")
-        assert(target.get.catalogInfo.isEmpty)
+        assertEquals(target.get.catalogInfo.map(_.catalog), CatalogName.Gaia.some)
+        assertEquals(target.get.catalogInfo.map(_.id.value), "5717302551387263616".some)
 
   test("GaiaClient.queryById returns CatalogTargetResult for single source"):
     val client = GaiaClientMock.fromXML[IO](
@@ -101,7 +105,7 @@ class GaiaClientSuite extends CatsEffectSuite with VoTableSamples:
         case Left(e)       =>
           fail(s"queryById failed: ${e.toList.mkString("; ")}")
 
-  test("GaiaClient.queryByIdGuideStar returns Target.Sidereal for single source"):
+  test("GaiaClient.queryByIdGuideStar keeps the catalog info"):
     val client = GaiaClientMock.fromXML[IO](voTableAlternative,
                                             NonEmptyChain.one(CatalogAdapter.Gaia3LiteGavo).some
     )
@@ -109,9 +113,29 @@ class GaiaClientSuite extends CatsEffectSuite with VoTableSamples:
     client
       .queryByIdGuideStar(5717266885975823616L)
       .map:
-        case Right(target) =>
-          assertEquals(target.name.value, "Gaia DR3 5717266885975823616")
-          assertEquals(target.catalogInfo.map(_.catalog), none)
+        case Right(result) =>
+          assertEquals(result.target.name.value, "Gaia DR3 5717266885975823616")
+          assertEquals(result.target.catalogInfo.map(_.catalog), CatalogName.Gaia.some)
+          assertEquals(result.target.catalogInfo.map(_.id.value), "5717266885975823616".some)
+          assertEquals(result.ruwe, None)
+        case Left(e)       =>
+          fail(s"queryByIdGuideStar failed: ${e.toList.mkString("; ")}")
+
+  test("GaiaClient.queryByIdGuideStar keeps the RUWE"):
+    val withRuwe = gavoParallaxAndRV
+      .replace(
+        """<FIELD ID="phot_rp_mean_mag"""",
+        """<FIELD ID="ruwe" datatype="float" name="ruwe"/><FIELD ID="phot_rp_mean_mag""""
+      )
+      .replace("<TD>14.250962</TD>", "<TD>1.2</TD><TD>14.250962</TD>")
+    val client   =
+      GaiaClientMock.fromString[IO](withRuwe, NonEmptyChain.one(CatalogAdapter.Gaia3LiteGavo).some)
+
+    client
+      .queryByIdGuideStar(538670232718296576L)
+      .map:
+        case Right(result) =>
+          assertEquals(result.ruwe.map(_.value), BigDecimal(1.2).some)
         case Left(e)       =>
           fail(s"queryByIdGuideStar failed: ${e.toList.mkString("; ")}")
 
