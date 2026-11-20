@@ -9,6 +9,7 @@ import cats.derived.*
 import cats.syntax.monoid.*
 import eu.timepit.refined.cats.given
 import eu.timepit.refined.types.numeric.NonNegInt
+import lucuma.core.syntax.refined.*
 import monocle.Focus
 import monocle.Lens
 
@@ -32,9 +33,7 @@ object CalibrationEstimate:
   given Monoid[CalibrationEstimate] =
     Monoid.instance(
       Zero,
-      (a, b) =>
-        val count = (a.count.value.toLong + b.count.value).min(Int.MaxValue).toInt
-        CalibrationEstimate(NonNegInt.unsafeFrom(count), a.time |+| b.time)
+      (a, b) => CalibrationEstimate(a.count +| b.count, a.time |+| b.time)
     )
 
   /** @group Optics */
