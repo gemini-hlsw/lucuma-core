@@ -4,10 +4,12 @@
 package lucuma.core.geom.flamingos2
 
 import algebra.instances.all.given
+import cats.syntax.eq.*
 import coulomb.*
 import coulomb.conversion.*
 import coulomb.units.accepted.*
 import lucuma.core.enums.Flamingos2Fpu
+import lucuma.core.enums.Flamingos2FpuType
 import lucuma.core.enums.Flamingos2LyotWheel
 import lucuma.core.geom.*
 import lucuma.core.geom.syntax.all.*
@@ -37,6 +39,8 @@ trait Flamingos2ScienceAreaGeometry:
           case Flamingos2FpuMask.Imaging | Flamingos2FpuMask.Builtin(Flamingos2Fpu.Pinhole) | Flamingos2FpuMask.Builtin(Flamingos2Fpu.SubPixPinhole) =>
             val size = ImagingFOVSize ⨱ plateScale
             (size.toAngle, size.toAngle)
+          case Flamingos2FpuMask.Builtin(fpu) if fpu.fpuType === Flamingos2FpuType.MOS =>
+            (MosFOVWidth, MosFOVHeight)
           case Flamingos2FpuMask.Builtin(fpu) =>
             (Angle.fromBigDecimalArcseconds((fpu.slitWidth.toValue[BigDecimal] * pixelScale).value),
               (LongSlitFOVHeight ⨱ plateScale).toAngle)
@@ -56,7 +60,9 @@ trait Flamingos2ScienceAreaGeometry:
     val shape =
       fpu.fold(
         imaging(plateScale),
-        _ => longslit(plateScale, scienceAreaWidth),
+        b =>
+          if b.value.fpuType === Flamingos2FpuType.MOS then mosOutline
+          else longslit(plateScale, scienceAreaWidth),
         _ => mosOutline
       )
     shape.shapeAt(offsetPos, posAngle)

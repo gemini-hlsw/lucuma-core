@@ -3,6 +3,7 @@
 
 package lucuma.core.enums
 
+import cats.syntax.eq.*
 import coulomb.*
 import lucuma.core.math.syntax.units.*
 import lucuma.core.math.units.Pixels
@@ -17,21 +18,21 @@ enum Flamingos2Fpu(
   val shortName: String,
   val longName: String,
   val slitWidth: Quantity[Int, Pixels],
-  val decker: Flamingos2Decker
+  val decker: Flamingos2Decker,
+  val fpuType: Flamingos2FpuType
 ) derives Enumerated:
 
-  case Pinhole       extends Flamingos2Fpu("Pinhole",       "Pinhole",         "2-Pixel Pinhole Grid", 0.pixels, Flamingos2Decker.Imaging)
-  case SubPixPinhole extends Flamingos2Fpu("SubPixPinhole", "Sub-Pix Pinhole", "Sub-Pixel Pinhole Gr", 0.pixels, Flamingos2Decker.Imaging)
-  case LongSlit1     extends Flamingos2Fpu("LongSlit_1",    "Long Slit 1px",   "1-Pixel Long Slit",    1.pixels, Flamingos2Decker.LongSlit)
-  case LongSlit2     extends Flamingos2Fpu("LongSlit_2",    "Long Slit 2px",   "2-Pixel Long Slit",    2.pixels, Flamingos2Decker.LongSlit)
-  case LongSlit3     extends Flamingos2Fpu("LongSlit_3",    "Long Slit 3px",   "3-Pixel Long Slit",    3.pixels, Flamingos2Decker.LongSlit)
-  case LongSlit4     extends Flamingos2Fpu("LongSlit_4",    "Long Slit 4px",   "4-Pixel Long Slit",    4.pixels, Flamingos2Decker.LongSlit)
-  case LongSlit6     extends Flamingos2Fpu("LongSlit_6",    "Long Slit 6px",   "6-Pixel Long Slit",    6.pixels, Flamingos2Decker.LongSlit)
-  case LongSlit8     extends Flamingos2Fpu("LongSlit_8",    "Long Slit 8px",   "8-Pixel Long Slit",    8.pixels, Flamingos2Decker.LongSlit)
+  case Pinhole       extends Flamingos2Fpu("Pinhole",       "Pinhole",         "2-Pixel Pinhole Grid", 0.pixels, Flamingos2Decker.Imaging, Flamingos2FpuType.Pinhole)
+  case SubPixPinhole extends Flamingos2Fpu("SubPixPinhole", "Sub-Pix Pinhole", "Sub-Pixel Pinhole Gr", 0.pixels, Flamingos2Decker.Imaging, Flamingos2FpuType.Pinhole)
+  case LongSlit1     extends Flamingos2Fpu("LongSlit_1",    "Long Slit 1px",   "1-Pixel Long Slit",    1.pixels, Flamingos2Decker.LongSlit, Flamingos2FpuType.LongSlit)
+  case LongSlit2     extends Flamingos2Fpu("LongSlit_2",    "Long Slit 2px",   "2-Pixel Long Slit",    2.pixels, Flamingos2Decker.LongSlit, Flamingos2FpuType.LongSlit)
+  case LongSlit3     extends Flamingos2Fpu("LongSlit_3",    "Long Slit 3px",   "3-Pixel Long Slit",    3.pixels, Flamingos2Decker.LongSlit, Flamingos2FpuType.LongSlit)
+  case LongSlit4     extends Flamingos2Fpu("LongSlit_4",    "Long Slit 4px",   "4-Pixel Long Slit",    4.pixels, Flamingos2Decker.LongSlit, Flamingos2FpuType.LongSlit)
+  case LongSlit6     extends Flamingos2Fpu("LongSlit_6",    "Long Slit 6px",   "6-Pixel Long Slit",    6.pixels, Flamingos2Decker.LongSlit, Flamingos2FpuType.LongSlit)
+  case LongSlit8     extends Flamingos2Fpu("LongSlit_8",    "Long Slit 8px",   "8-Pixel Long Slit",    8.pixels, Flamingos2Decker.LongSlit, Flamingos2FpuType.LongSlit)
+  case BlankMask     extends Flamingos2Fpu("BlankMask",     "Blank Mask",      "GS2018BSV301-8",       0.pixels, Flamingos2Decker.Imaging,  Flamingos2FpuType.MOS)
 
-  def isPinhole: Boolean = this match
-    case Pinhole | SubPixPinhole => true
-    case _                       => false
+  def isPinhole: Boolean = fpuType === Flamingos2FpuType.Pinhole
 
 object Flamingos2Fpu:
   val Pinholes: Set[Flamingos2Fpu] = values.filter(_.isPinhole).toSet
