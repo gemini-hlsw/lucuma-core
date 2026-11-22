@@ -19,7 +19,8 @@ enum Flamingos2Fpu(
   val longName: String,
   val slitWidth: Quantity[Int, Pixels],
   val decker: Flamingos2Decker,
-  val fpuType: Flamingos2FpuType
+  val fpuType: Flamingos2FpuType,
+  val maskId: Option[String] = None
 ) derives Enumerated:
 
   case Pinhole       extends Flamingos2Fpu("Pinhole",       "Pinhole",         "2-Pixel Pinhole Grid", 0.pixels, Flamingos2Decker.Imaging, Flamingos2FpuType.Pinhole)
@@ -30,7 +31,7 @@ enum Flamingos2Fpu(
   case LongSlit4     extends Flamingos2Fpu("LongSlit_4",    "Long Slit 4px",   "4-Pixel Long Slit",    4.pixels, Flamingos2Decker.LongSlit, Flamingos2FpuType.LongSlit)
   case LongSlit6     extends Flamingos2Fpu("LongSlit_6",    "Long Slit 6px",   "6-Pixel Long Slit",    6.pixels, Flamingos2Decker.LongSlit, Flamingos2FpuType.LongSlit)
   case LongSlit8     extends Flamingos2Fpu("LongSlit_8",    "Long Slit 8px",   "8-Pixel Long Slit",    8.pixels, Flamingos2Decker.LongSlit, Flamingos2FpuType.LongSlit)
-  case BlankMask     extends Flamingos2Fpu("BlankMask",     "Blank Mask",      "GS2018BSV301-8",       0.pixels, Flamingos2Decker.Imaging,  Flamingos2FpuType.MOS)
+  case BlankMask     extends Flamingos2Fpu("BlankMask",     "Blank Mask",      "Blank Mask",           0.pixels, Flamingos2Decker.Imaging,  Flamingos2FpuType.MOS, Some("GS2018BSV301-8"))
 
   def isPinhole: Boolean = fpuType === Flamingos2FpuType.Pinhole
 
