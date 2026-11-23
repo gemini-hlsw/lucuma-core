@@ -8,6 +8,7 @@ import cats.syntax.all.*
 import lucuma.core.enums.Flamingos2CustomSlitWidth
 import lucuma.core.enums.Flamingos2Decker
 import lucuma.core.enums.Flamingos2Fpu
+import lucuma.core.enums.Flamingos2FpuType
 import lucuma.core.model.MaskDefinition
 import monocle.Focus
 import monocle.Iso
@@ -53,7 +54,7 @@ sealed trait Flamingos2FpuMask:
     fold(false, _ => false, _ => true)
 
   def isLongSlit: Boolean =
-    fold(false, _ => true, _ => false)
+    fold(false, _.value.fpuType === Flamingos2FpuType.LongSlit, _ => false)
 
   def defaultDecker: Flamingos2Decker =
     fold(Flamingos2Decker.Imaging, _.value.decker, _ => Flamingos2Decker.MOS)
