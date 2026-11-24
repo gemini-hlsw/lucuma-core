@@ -10,8 +10,21 @@ import lucuma.core.enums.GmosSouthDetector
 import lucuma.core.enums.GmosXBinning
 import lucuma.core.enums.GmosYBinning
 import lucuma.core.math.Angle
+import lucuma.core.math.Offset
+import lucuma.core.math.syntax.bigDecimal.*
 import lucuma.core.model.ImageQuality
 import lucuma.core.model.SourceProfile
+
+/**
+ * Default MOS pre-imaging offsets, in arcseconds: (0, 0), (-4, -6), (4, -6), (8, 0).
+ */
+val DefaultPreImagingOffsets: (Offset, Offset, Offset, Offset) =
+  (
+    Offset.Zero,
+    Offset(-(4.pArcsec), -(6.qArcsec)),
+    Offset(  4.pArcsec,  -(6.qArcsec)),
+    Offset(  8.pArcsec,    0.qArcsec)
+  )
 
 /**
   * Optimal GMOS binning calculation for imaging mode.
