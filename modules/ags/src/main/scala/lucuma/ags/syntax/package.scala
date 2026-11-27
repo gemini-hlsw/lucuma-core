@@ -52,7 +52,7 @@ extension (c: NonEmptySet[TelescopeConfig])
   def guidedOffsets: Option[NonEmptySet[GuidedOffset]] =
     NonEmptySet.fromSet:
       c.collect:
-        case TelescopeConfig(o, StepGuideState.Enabled) => GuidedOffset(o)
+        case TelescopeConfig(o, StepGuideState.Enabled, _) => GuidedOffset(o)
 
   def asAcqOffsets: Option[AcquisitionOffsets] = guidedOffsets.map(AcquisitionOffsets.apply)
 

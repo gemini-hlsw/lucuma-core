@@ -4,6 +4,7 @@
 package lucuma.core.model.sequence
 package arb
 
+import lucuma.core.enums.OffsetPurpose
 import lucuma.core.enums.StepGuideState
 import lucuma.core.math.Offset
 import lucuma.core.math.arb.ArbOffset
@@ -21,13 +22,15 @@ trait ArbTelescopeConfig:
       for
         o <- arbitrary[Offset]
         g <- arbitrary[StepGuideState]
-      yield TelescopeConfig(o, g)
+        p <- arbitrary[OffsetPurpose]
+      yield TelescopeConfig(o, g, p)
 
   given Cogen[TelescopeConfig] =
     Cogen[(
       Offset,
-      StepGuideState
+      StepGuideState,
+      OffsetPurpose
     )].contramap: a =>
-      (a.offset, a.guiding)
+      (a.offset, a.guiding, a.purpose)
 
 object ArbTelescopeConfig extends ArbTelescopeConfig

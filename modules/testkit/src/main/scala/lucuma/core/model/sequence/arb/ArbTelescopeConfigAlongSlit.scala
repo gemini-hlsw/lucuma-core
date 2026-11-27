@@ -4,6 +4,7 @@
 package lucuma.core.model.sequence
 package arb
 
+import lucuma.core.enums.OffsetPurpose
 import lucuma.core.enums.StepGuideState
 import lucuma.core.math.Offset
 import lucuma.core.math.arb.ArbOffset
@@ -21,10 +22,11 @@ trait ArbTelescopeConfigAlongSlit:
       for
         o <- arbitrary[Offset.Q]
         g <- arbitrary[StepGuideState]
-      yield TelescopeConfigAlongSlit(o, g)
+        p <- arbitrary[Option[OffsetPurpose]]
+      yield TelescopeConfigAlongSlit(o, g, p)
 
   given Cogen[TelescopeConfigAlongSlit] =
-    Cogen[(Offset.Q, StepGuideState)].contramap: a =>
-      (a.offset, a.guiding)
+    Cogen[(Offset.Q, StepGuideState, Option[OffsetPurpose])].contramap: a =>
+      (a.offset, a.guiding, a.explicitPurpose)
 
 object ArbTelescopeConfigAlongSlit extends ArbTelescopeConfigAlongSlit

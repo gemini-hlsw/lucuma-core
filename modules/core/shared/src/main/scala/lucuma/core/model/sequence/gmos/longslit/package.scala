@@ -25,8 +25,8 @@ import lucuma.core.math.syntax.bigDecimal.*
 import lucuma.core.model.ImageQuality
 import lucuma.core.model.SlitTelescopeConfigs
 import lucuma.core.model.SourceProfile
-import lucuma.core.model.sequence.TelescopeConfig
 import lucuma.core.model.sequence.TelescopeConfigAlongSlit
+import lucuma.core.model.sequence.TelescopeConfigSpec
 
 val DefaultAmpReadMode: GmosAmpReadMode =
   GmosAmpReadMode.Slow
@@ -53,9 +53,9 @@ val DefaultSlitTelescopeConfigs: SlitTelescopeConfigs =
     )
   )
 
-val DefaultTelescopeConfigs: NonEmptyList[TelescopeConfig] =
+val DefaultTelescopeConfigs: NonEmptyList[TelescopeConfigSpec] =
   NonEmptyList.of(
-    TelescopeConfig(Offset.Zero, StepGuideState.Enabled)
+    TelescopeConfigSpec.objectAt(Offset.Zero)
   )
 
 /** The telescope configurations a preset stands for. */

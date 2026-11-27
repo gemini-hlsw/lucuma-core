@@ -11,8 +11,8 @@ import lucuma.core.math.Offset
 import lucuma.core.math.Wavelength
 import lucuma.core.math.syntax.bigDecimal.*
 import lucuma.core.model.SlitTelescopeConfigs
-import lucuma.core.model.sequence.TelescopeConfig
 import lucuma.core.model.sequence.TelescopeConfigAlongSlit
+import lucuma.core.model.sequence.TelescopeConfigSpec
 import lucuma.core.syntax.timespan.*
 import lucuma.core.util.NewBoolean
 import lucuma.core.util.TimeSpan
@@ -55,11 +55,11 @@ val NodAlongSlitDefaultTelescopeConfigs: NonEmptyList[TelescopeConfigAlongSlit] 
     TelescopeConfigAlongSlit(-(1.25.qArcsec), StepGuideState.Enabled),
   )
 
-val NodToSkyDefaultTelescopeConfigs: NonEmptyList[TelescopeConfig] =
+val NodToSkyDefaultTelescopeConfigs: NonEmptyList[TelescopeConfigSpec] =
   NonEmptyList.of(
-    TelescopeConfig(Offset.Zero, StepGuideState.Enabled),
-    TelescopeConfig(Offset(10.pArcsec, 10.qArcsec), StepGuideState.Disabled),
-    TelescopeConfig(Offset.Zero, StepGuideState.Enabled),
+    TelescopeConfigSpec.objectAt(Offset.Zero),
+    TelescopeConfigSpec.skyAt(Offset(10.pArcsec, 10.qArcsec)),
+    TelescopeConfigSpec.objectAt(Offset.Zero),
   )
 
 def defaultSlitTelescopeConfigs(preset: Igrins2SlitOffsetPreset): SlitTelescopeConfigs =
@@ -67,8 +67,8 @@ def defaultSlitTelescopeConfigs(preset: Igrins2SlitOffsetPreset): SlitTelescopeC
     case Igrins2SlitOffsetPreset.NodAlongSlit => SlitTelescopeConfigs.AlongSlit(NodAlongSlitDefaultTelescopeConfigs)
     case Igrins2SlitOffsetPreset.NodToSky     => SlitTelescopeConfigs.ToSky(NodToSkyDefaultTelescopeConfigs)
 
-val SvcDefaultTelescopeConfigs: NonEmptyList[TelescopeConfig] =
+val SvcDefaultTelescopeConfigs: NonEmptyList[TelescopeConfigSpec] =
   NonEmptyList.of(
-    TelescopeConfig(Offset.Zero,                  StepGuideState.Enabled),
-    TelescopeConfig(Offset(5.pArcsec, 0.qArcsec), StepGuideState.Enabled)
+    TelescopeConfigSpec.objectAt(Offset.Zero),
+    TelescopeConfigSpec.objectAt(Offset(5.pArcsec, 0.qArcsec))
   )

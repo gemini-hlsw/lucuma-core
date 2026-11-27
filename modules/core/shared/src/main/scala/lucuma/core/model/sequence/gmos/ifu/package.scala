@@ -9,10 +9,9 @@ import lucuma.core.enums.GmosNorthIfuFpu
 import lucuma.core.enums.GmosSouthIfuFpu
 import lucuma.core.enums.GmosXBinning
 import lucuma.core.enums.GmosYBinning
-import lucuma.core.enums.StepGuideState
 import lucuma.core.math.Offset
 import lucuma.core.math.syntax.bigDecimal.*
-import lucuma.core.model.sequence.TelescopeConfig
+import lucuma.core.model.sequence.TelescopeConfigSpec
 
 /**
   * Optimal GMOS binning calculation for IFU (Integral Field Unit) mode.
@@ -33,35 +32,35 @@ val SouthBinning: (GmosXBinning, GmosYBinning) =
 private def presets(
   p: BigDecimal,
   q: BigDecimal
-): NonEmptyList[(String, NonEmptyList[TelescopeConfig])] =
-  def at(dp: BigDecimal, dq: BigDecimal): TelescopeConfig =
-    TelescopeConfig(Offset(dp.pArcsec, dq.qArcsec), StepGuideState.Enabled)
+): NonEmptyList[(String, NonEmptyList[TelescopeConfigSpec])] =
+  def at(dp: BigDecimal, dq: BigDecimal): TelescopeConfigSpec =
+    TelescopeConfigSpec.objectAt(Offset(dp.pArcsec, dq.qArcsec))
 
   NonEmptyList.of(
-    "No offsets" -> NonEmptyList.one(TelescopeConfig(Offset.Zero, StepGuideState.Enabled)),
+    "No offsets" -> NonEmptyList.one(TelescopeConfigSpec.objectAt(Offset.Zero)),
     "On-source"  -> NonEmptyList.of(at(p, q), at(p, -q), at(-p, -q), at(-p, q))
   )
 
-private val OneSlitPresets: NonEmptyList[(String, NonEmptyList[TelescopeConfig])] =
+private val OneSlitPresets: NonEmptyList[(String, NonEmptyList[TelescopeConfigSpec])] =
   presets(BigDecimal("0.2"), BigDecimal("0.5"))
 
-private val TwoSlitsPresets: NonEmptyList[(String, NonEmptyList[TelescopeConfig])] =
+private val TwoSlitsPresets: NonEmptyList[(String, NonEmptyList[TelescopeConfigSpec])] =
   presets(BigDecimal("1.5"), BigDecimal("0.9"))
 
 def northTelescopeConfigPresets(
   fpu: GmosNorthIfuFpu
-): NonEmptyList[(String, NonEmptyList[TelescopeConfig])] =
+): NonEmptyList[(String, NonEmptyList[TelescopeConfigSpec])] =
   fpu match
     case GmosNorthIfuFpu.TwoSlits                                 => TwoSlitsPresets
     case GmosNorthIfuFpu.OneSlitRed | GmosNorthIfuFpu.OneSlitBlue => OneSlitPresets
 
 def southTelescopeConfigPresets(
   fpu: GmosSouthIfuFpu
-): NonEmptyList[(String, NonEmptyList[TelescopeConfig])] =
+): NonEmptyList[(String, NonEmptyList[TelescopeConfigSpec])] =
   fpu match
     case GmosSouthIfuFpu.TwoSlits                                 => TwoSlitsPresets
     case GmosSouthIfuFpu.OneSlitRed | GmosSouthIfuFpu.OneSlitBlue => OneSlitPresets
 
 /** The value observing modes are created with: a single guided position on target. */
-val DefaultTelescopeConfigs: NonEmptyList[TelescopeConfig] =
+val DefaultTelescopeConfigs: NonEmptyList[TelescopeConfigSpec] =
   OneSlitPresets.head._2

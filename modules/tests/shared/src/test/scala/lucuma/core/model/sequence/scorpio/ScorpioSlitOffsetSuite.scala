@@ -9,7 +9,7 @@ import lucuma.core.enums.SlitOffsetMode
 import lucuma.core.enums.StepGuideState
 import lucuma.core.math.Offset
 import lucuma.core.math.syntax.bigDecimal.*
-import lucuma.core.model.sequence.TelescopeConfig
+import lucuma.core.model.sequence.TelescopeConfigSpec
 import munit.*
 
 class ScorpioSlitOffsetSuite extends FunSuite:
@@ -18,6 +18,6 @@ class ScorpioSlitOffsetSuite extends FunSuite:
     val cfg = defaultSlitTelescopeConfigs(ScorpioSlitOffsetPreset.NodAlongSlit)
     assertEquals(cfg.offsetsType, SlitOffsetMode.NodAlongSlit)
     assertEquals(
-      cfg.telescopeConfigs,
-      NonEmptyList.of[BigDecimal](0, -15, 15, 0).map(q => TelescopeConfig(Offset(0.pArcsec, q.qArcsec), StepGuideState.Enabled))
+      cfg.specs,
+      NonEmptyList.of[BigDecimal](0, -15, 15, 0).map(q => TelescopeConfigSpec(Offset(0.pArcsec, q.qArcsec), StepGuideState.Enabled))
     )

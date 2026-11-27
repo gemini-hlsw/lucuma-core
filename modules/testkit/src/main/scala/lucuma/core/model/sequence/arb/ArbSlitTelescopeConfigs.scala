@@ -4,8 +4,8 @@
 package lucuma.core.model.sequence.arb
 
 import lucuma.core.model.SlitTelescopeConfigs
-import lucuma.core.model.sequence.TelescopeConfig
 import lucuma.core.model.sequence.TelescopeConfigAlongSlit
+import lucuma.core.model.sequence.TelescopeConfigSpec
 import lucuma.core.util.arb.ArbBoundedCollection
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.*
@@ -13,8 +13,8 @@ import org.scalacheck.Cogen
 
 trait ArbSlitTelescopeConfigs:
   import ArbBoundedCollection.*
-  import ArbTelescopeConfig.given
   import ArbTelescopeConfigAlongSlit.given
+  import ArbTelescopeConfigSpec.given
 
   given Arbitrary[SlitTelescopeConfigs] =
     Arbitrary:
@@ -23,11 +23,11 @@ trait ArbSlitTelescopeConfigs:
           genBoundedNonEmptyList[TelescopeConfigAlongSlit](BoundedCollectionLimit)
             .map(SlitTelescopeConfigs.AlongSlit(_))
         case false =>
-          genBoundedNonEmptyList[TelescopeConfig](BoundedCollectionLimit)
+          genBoundedNonEmptyList[TelescopeConfigSpec](BoundedCollectionLimit)
             .map(SlitTelescopeConfigs.ToSky(_))
 
   given Cogen[SlitTelescopeConfigs] =
-    Cogen[(Option[List[TelescopeConfigAlongSlit]], Option[List[TelescopeConfig]])].contramap:
+    Cogen[(Option[List[TelescopeConfigAlongSlit]], Option[List[TelescopeConfigSpec]])].contramap:
       case SlitTelescopeConfigs.AlongSlit(vs) => (Some(vs.toList), None)
       case SlitTelescopeConfigs.ToSky(vs)     => (None, Some(vs.toList))
 
