@@ -29,8 +29,6 @@ enum Flamingos2Filter(
   val supportsSpectroscopy: Boolean,
   val filterType: FilterType
 ) derives Enumerated:
-  // Band width: 89.4 nm
-  case Y      extends Flamingos2Filter("Y",      "Y",       "Y (1.02 um)",        1_020_000.pm, (975_300,   1_064_700).pmRange, true,  FilterType.BroadBand)
   // Band width: 151 nm
   case J      extends Flamingos2Filter("J",      "J",       "J (1.25 um)",        1_250_000.pm, (1_174_500, 1_325_500).pmRange, true,  FilterType.BroadBand)
   // Band width: 274 nm
