@@ -473,9 +473,9 @@ ThisBuild / githubWorkflowPublish ++= Seq(
   )
 )
 
-// Needed for npm trusted publishing
+// id-token: write is needed for npm trusted publishing.
+// contents: write (from defaultPermissive) is needed for dependency submission.
 ThisBuild / githubWorkflowPermissions := Some(
   Permissions.Specify.defaultPermissive
     .withIdToken(PermissionValue.Write)
-    .withContents(PermissionValue.Read)
 )
