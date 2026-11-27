@@ -73,3 +73,18 @@ final class ProbesSuite extends FunSuite:
     modes.filterNot(_.tag.startsWith("gnirs")).foreach: m =>
       assert(probes.allowedProbes(m, Some(AltairMode.Ngs)).isEmpty, clue = m.tag)
       assertEquals(probes.defaultGuideProbe(m, TrackType.Sidereal, Some(AltairMode.Ngs)), None, clue = m.tag)
+
+  test("unguided is never an allowed or default probe"):
+    for
+      m <- modes
+      a <- None :: Enumerated[AltairMode].all.map(Some(_))
+    do
+      assert(!probes.allowedProbes(m, a).contains(GuideProbe.Unguided), clue = m.tag)
+      Enumerated[TrackType].all.foreach: t =>
+        assert(!probes.defaultGuideProbe(m, t, a).contains(GuideProbe.Unguided), clue = m.tag)
+
+  test("unguided may be chosen in every mode that guides, but never behind Altair"):
+    modes.foreach: m =>
+      assertEquals(probes.isProbeAllowed(m, GuideProbe.Unguided), !(m.isExchange || m.isDaytimeCalibration), clue = m.tag)
+      Enumerated[AltairMode].all.foreach: a =>
+        assert(!probes.isProbeAllowed(m, GuideProbe.Unguided, Some(a)), clue = s"${m.tag} / ${a.tag}")

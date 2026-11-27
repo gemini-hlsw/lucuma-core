@@ -22,6 +22,8 @@ enum GuideProbe(val tag: String) derives Enumerated:
   case GmosOIWFS       extends GuideProbe("GmosOiwfs")
   case Flamingos2OIWFS extends GuideProbe("Flamingos2Oiwfs")
   case AltairAOWFS     extends GuideProbe("AltairAowfs")
+  // Used for unguided observations
+  case Unguided        extends GuideProbe("Unguided")
 
   def candidatesArea: ShapeExpression = this match
     // For pwfs1/2 417"
@@ -32,19 +34,24 @@ enum GuideProbe(val tag: String) derives Enumerated:
     case Flamingos2OIWFS => geom.flamingos2.candidatesArea.candidatesArea(Flamingos2LyotWheel.F16)
     // For Altair 54", the patrol field oval at any position angle
     case AltairAOWFS     => geom.altair.patrolField.candidatesArea
+    case Unguided        => ShapeExpression.Empty
 
   /** Whether the probe can guide on axis, on the observation's own target. */
   def guidesOnAxis: Boolean = this match
     case AltairAOWFS => true
     case _           => false
 
+  def isUnguided: Boolean = this match
+    case Unguided => true
+    case _        => false
+
 object GuideProbe:
   given Enumerated[PWFSGuideProbe] = Enumerated.from(GuideProbe.PWFS1, GuideProbe.PWFS2).withTag(_.tag)
 
   /**
    * Probes ranked best-first: the Altair AOWFS beats an OIWFS, which beats PWFS2,
-   * which beats PWFS1. Every probe gets its own rank so the order is total and
-   * usable in a SortedSet.
+   * which beats PWFS1. Unguided ranks last. Every probe gets its own rank so
+   * the order is total and usable in a SortedSet.
    */
   val Preference: Order[GuideProbe] =
     Order.by:
@@ -53,3 +60,4 @@ object GuideProbe:
       case Flamingos2OIWFS => 2
       case PWFS2           => 3
       case PWFS1           => 4
+      case Unguided        => 5

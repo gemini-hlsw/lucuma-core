@@ -165,5 +165,11 @@ object ObservationValidationCode:
         "Missing Smart GCAL",
         "A calibration was left out of the sequence because no Smart GCAL entry is defined for its configuration.",
       )
+    case Unguided
+      extends Warning(
+        "unguided",
+        "Unguided",
+        "The observation will be taken without a guide star.",
+      )
 
 

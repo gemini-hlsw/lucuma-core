@@ -62,5 +62,8 @@ object ObservationValidation:
     def secondOrderOverlap(msg: String, moreMsgs: String*): ObservationValidation =
       fromMsgs(SecondOrderOverlap, msg, moreMsgs*)
 
+    val unguided: ObservationValidation =
+      fromMsgs(Unguided, "The observation is unguided: no guide star is used and no step guides.")
+
     def missingSmartGcal(msg: String, moreMsgs: String*): ObservationValidation =
       fromMsgs(MissingSmartGcal, msg, moreMsgs*)

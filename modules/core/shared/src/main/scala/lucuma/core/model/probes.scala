@@ -32,6 +32,8 @@ trait probes:
    *
    * Behind Altair the probe is fixed to the one holding its natural guide
    * star, and Altair only supports GNIRS.
+   *
+   * `GuideProbe.Unguided` is never in this set, so it is never a default.
    */
   def allowedProbes(
     observingMode: ObservingModeType,
@@ -55,7 +57,10 @@ trait probes:
     probe:         GuideProbe,
     altair:        Option[AltairMode] = None
   ): Boolean =
-    allowedProbes(observingMode, altair).contains(probe)
+    probe match
+      // A mode that guides may also go unguided by choice, but never behind Altair.
+      case GuideProbe.Unguided => altair.isEmpty && allowedProbes(observingMode).nonEmpty
+      case p                   => allowedProbes(observingMode, altair).contains(p)
 
   // Split out so the compiler enforces exhaustivity: adding a facility mode
   // must not silently fall through to a MatchError at runtime.
