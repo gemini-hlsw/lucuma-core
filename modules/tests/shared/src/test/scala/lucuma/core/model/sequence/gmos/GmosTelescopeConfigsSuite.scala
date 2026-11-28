@@ -8,23 +8,23 @@ import lucuma.core.enums.SlitOffsetMode
 import lucuma.core.enums.StepGuideState
 import lucuma.core.math.Offset
 import lucuma.core.math.syntax.bigDecimal.*
-import lucuma.core.model.sequence.TelescopeConfig
+import lucuma.core.model.sequence.TelescopeConfigSpec
 import munit.*
 
 class GmosTelescopeConfigsSuite extends FunSuite:
 
-  private def guidedAlongSlit(qs: BigDecimal*): NonEmptyList[TelescopeConfig] =
+  private def guidedAlongSlit(qs: BigDecimal*): NonEmptyList[TelescopeConfigSpec] =
     NonEmptyList.fromListUnsafe(
-      qs.toList.map(q => TelescopeConfig(Offset(0.pArcsec, q.qArcsec), StepGuideState.Enabled))
+      qs.toList.map(q => TelescopeConfigSpec(Offset(0.pArcsec, q.qArcsec), StepGuideState.Enabled))
     )
 
   test("long slit default nods along the slit, guided throughout"):
     val cfg = longslit.DefaultSlitTelescopeConfigs
     assertEquals(cfg.offsetsType, SlitOffsetMode.NodAlongSlit)
-    assertEquals(cfg.telescopeConfigs, guidedAlongSlit(0, 15, -15))
+    assertEquals(cfg.specs, guidedAlongSlit(0, 15, -15))
 
   test("MOS default stays on axis so targets keep their slitlets"):
     assertEquals(
       mos.DefaultTelescopeConfigs,
-      NonEmptyList.one(TelescopeConfig(Offset.Zero, StepGuideState.Enabled))
+      NonEmptyList.one(TelescopeConfigSpec.objectAt(Offset.Zero))
     )

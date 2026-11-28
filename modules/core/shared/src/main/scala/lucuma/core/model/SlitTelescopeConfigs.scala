@@ -7,9 +7,12 @@ import cats.Eq
 import cats.data.NonEmptyList
 import cats.derived.*
 import cats.derived.semiauto
+import lucuma.core.enums.OffsetPurpose
 import lucuma.core.enums.SlitOffsetMode
+import lucuma.core.math.Offset
 import lucuma.core.model.sequence.TelescopeConfig
 import lucuma.core.model.sequence.TelescopeConfigAlongSlit
+import lucuma.core.model.sequence.TelescopeConfigSpec
 import monocle.Focus
 import monocle.Iso
 import monocle.Prism
@@ -17,12 +20,20 @@ import monocle.macros.GenPrism
 
 enum SlitTelescopeConfigs(val offsetsType: SlitOffsetMode) derives Eq:
   case AlongSlit(value: NonEmptyList[TelescopeConfigAlongSlit]) extends SlitTelescopeConfigs(SlitOffsetMode.NodAlongSlit)
-  case ToSky(value: NonEmptyList[TelescopeConfig]) extends SlitTelescopeConfigs(SlitOffsetMode.NodToSky)
+  case ToSky(value: NonEmptyList[TelescopeConfigSpec]) extends SlitTelescopeConfigs(SlitOffsetMode.NodToSky)
 
-  def telescopeConfigs: NonEmptyList[TelescopeConfig] =
+  /** The user-specified positions, with along-slit offsets expressed in (p, q). */
+  def specs: NonEmptyList[TelescopeConfigSpec] =
     this match
-      case AlongSlit(value) => value.map(_.toTelescopeConfig)
-      case ToSky(telescopeConfigs) => telescopeConfigs
+      case AlongSlit(value) => value.map(_.toTelescopeConfigSpec)
+      case ToSky(value)     => value
+
+  /**
+   * The positions as telescope configs, each purpose resolved from its explicit
+   * value or, when unspecified, from `defaultPurpose`.
+   */
+  def telescopeConfigs(defaultPurpose: Offset => OffsetPurpose): NonEmptyList[TelescopeConfig] =
+    specs.map(_.toTelescopeConfig(defaultPurpose))
 
 object SlitTelescopeConfigs:
   val alongSlit: Prism[SlitTelescopeConfigs, SlitTelescopeConfigs.AlongSlit] =
@@ -35,5 +46,5 @@ object SlitTelescopeConfigs:
     given Eq[AlongSlit] = semiauto.eq
 
   object ToSky:
-    val value: Iso[ToSky, NonEmptyList[TelescopeConfig]] = Focus[ToSky](_.value)
+    val value: Iso[ToSky, NonEmptyList[TelescopeConfigSpec]] = Focus[ToSky](_.value)
     given Eq[ToSky] = semiauto.eq

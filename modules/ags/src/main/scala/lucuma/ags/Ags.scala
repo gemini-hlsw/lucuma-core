@@ -15,6 +15,7 @@ import lucuma.catalog.BrightnessConstraints
 import lucuma.core.enums.Band
 import lucuma.core.enums.GuideProbe
 import lucuma.core.enums.GuideSpeed
+import lucuma.core.enums.OffsetPurpose
 import lucuma.core.enums.StepGuideState
 import lucuma.core.geom.Shape
 import lucuma.core.geom.ShapeInterpreter
@@ -153,9 +154,11 @@ object Ags {
         baseCoordinates,
         blindOffset,
         NonEmptySet.fromSetUnsafe(SortedSet.from(posAngles.toList)),
-        acqOffsets.map(os => os.value.map(o => TelescopeConfig(o.value, StepGuideState.Enabled))),
+        acqOffsets.map(os =>
+          os.value.map(o => TelescopeConfig(o.value, StepGuideState.Enabled, OffsetPurpose.Object))
+        ),
         scienceOffsets.map(os =>
-          os.value.map(o => TelescopeConfig(o.value, StepGuideState.Enabled))
+          os.value.map(o => TelescopeConfig(o.value, StepGuideState.Enabled, OffsetPurpose.Object))
         )
       )
 

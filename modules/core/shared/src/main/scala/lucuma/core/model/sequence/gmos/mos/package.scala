@@ -16,14 +16,13 @@ import lucuma.core.enums.GmosSouthFpu
 import lucuma.core.enums.GmosSouthGrating
 import lucuma.core.enums.GmosXBinning
 import lucuma.core.enums.GmosYBinning
-import lucuma.core.enums.StepGuideState
 import lucuma.core.math.Angle
 import lucuma.core.math.Offset
 import lucuma.core.math.Wavelength
 import lucuma.core.math.units.NanometersPerPixel
 import lucuma.core.model.ImageQuality
 import lucuma.core.model.SourceProfile
-import lucuma.core.model.sequence.TelescopeConfig
+import lucuma.core.model.sequence.TelescopeConfigSpec
 import spire.math.Rational
 
 /**
@@ -31,8 +30,8 @@ import spire.math.Rational
  *
  * The default does not nod at all.
  */
-val DefaultTelescopeConfigs: NonEmptyList[TelescopeConfig] =
-  NonEmptyList.one(TelescopeConfig(Offset.Zero, StepGuideState.Enabled))
+val DefaultTelescopeConfigs: NonEmptyList[TelescopeConfigSpec] =
+  NonEmptyList.one(TelescopeConfigSpec.objectAt(Offset.Zero))
 
 /**
   * Spatial binning for MOS mode with maximum binning constraint.

@@ -11,7 +11,7 @@ import lucuma.core.enums.SlitOffsetMode
 import lucuma.core.enums.StepGuideState
 import lucuma.core.math.Offset
 import lucuma.core.math.syntax.bigDecimal.*
-import lucuma.core.model.sequence.TelescopeConfig
+import lucuma.core.model.sequence.TelescopeConfigSpec
 import lucuma.core.model.sequence.igrins2.arb.ArbIgrins2DynamicConfig.given
 import lucuma.core.model.sequence.igrins2.arb.ArbIgrins2StaticConfig.given
 import lucuma.core.syntax.timespan.*
@@ -21,9 +21,9 @@ class Igrins2ConfigSuite extends DisciplineSuite:
   checkAll("Eq[Igrins2DynamicConfig]", EqTests[Igrins2DynamicConfig].eqv)
   checkAll("Eq[Igrins2StaticConfig]", EqTests[Igrins2StaticConfig].eqv)
 
-  private def alongSlit(guiding: StepGuideState, qs: BigDecimal*): NonEmptyList[TelescopeConfig] =
+  private def alongSlit(guiding: StepGuideState, qs: BigDecimal*): NonEmptyList[TelescopeConfigSpec] =
     NonEmptyList.fromListUnsafe(
-      qs.toList.map(q => TelescopeConfig(Offset(0.pArcsec, q.qArcsec), guiding))
+      qs.toList.map(q => TelescopeConfigSpec(Offset(0.pArcsec, q.qArcsec), guiding))
     )
 
   test("fowlerSamples from exposure time"):
@@ -37,16 +37,16 @@ class Igrins2ConfigSuite extends DisciplineSuite:
   test("defaultSlitTelescopeConfigs for NodAlongSlit"):
     val cfg = defaultSlitTelescopeConfigs(Igrins2SlitOffsetPreset.NodAlongSlit)
     assertEquals(cfg.offsetsType, SlitOffsetMode.NodAlongSlit)
-    assertEquals(cfg.telescopeConfigs, alongSlit(StepGuideState.Enabled, -1.25, 1.25, 1.25, -1.25))
+    assertEquals(cfg.specs, alongSlit(StepGuideState.Enabled, -1.25, 1.25, 1.25, -1.25))
 
   test("defaultSlitTelescopeConfigs for NodToSky"):
     val cfg = defaultSlitTelescopeConfigs(Igrins2SlitOffsetPreset.NodToSky)
     assertEquals(cfg.offsetsType, SlitOffsetMode.NodToSky)
     assertEquals(
-      cfg.telescopeConfigs,
+      cfg.specs,
       NonEmptyList.of(
-        TelescopeConfig(Offset.Zero, StepGuideState.Enabled),
-        TelescopeConfig(Offset(10.pArcsec, 10.qArcsec), StepGuideState.Disabled),
-        TelescopeConfig(Offset.Zero, StepGuideState.Enabled)
+        TelescopeConfigSpec.objectAt(Offset.Zero),
+        TelescopeConfigSpec.skyAt(Offset(10.pArcsec, 10.qArcsec)),
+        TelescopeConfigSpec.objectAt(Offset.Zero)
       )
     )
