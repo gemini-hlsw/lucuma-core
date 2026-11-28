@@ -119,8 +119,9 @@ def faintLimit(
 ): FaintnessConstraint = {
   val limit = probe match {
     // The Altair AOWFS has no Gaia G limits; callers route it to `altairBrightnessConstraints`
-    // and this branch only keeps the match total.
-    case GuideProbe.GmosOIWFS | GuideProbe.Flamingos2OIWFS | GuideProbe.AltairAOWFS =>
+    // and this branch only keeps the match total. The same goes for Unguided, which is never searched.
+    case GuideProbe.GmosOIWFS | GuideProbe.Flamingos2OIWFS | GuideProbe.AltairAOWFS |
+        GuideProbe.Unguided =>
       sb match {
         case SkyBackground.Darkest | SkyBackground.Dark =>
           guideSpeed match {
@@ -150,7 +151,7 @@ def faintLimit(
               17.4 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.toDouble
           }
       }
-    case GuideProbe.PWFS2                                                           =>
+    case GuideProbe.PWFS2 =>
       sb match {
         case SkyBackground.Darkest | SkyBackground.Dark =>
           guideSpeed match {
@@ -180,7 +181,7 @@ def faintLimit(
               16.1 - 0.8 * wfsFwhm(iq, wavelength) - ce.toVegaMagnitude.toDouble
           }
       }
-    case GuideProbe.PWFS1                                                           =>
+    case GuideProbe.PWFS1 =>
       sb match {
         case SkyBackground.Darkest | SkyBackground.Dark =>
           guideSpeed match {
